@@ -1,0 +1,164 @@
+{
+  "artifacts": [
+    {
+      "path": "catalogs/us-equities/market-data-reference-gap-review-20261010.json",
+      "sha256": "2d78f8735cb1365e398f41b3e8daf78c37bf0cacca6304b40178674d5e849718"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/7-data-licensing-clauses.json",
+      "sha256": "d4aff983e380e9d84a3c92933d5c7d07e2721f4a9aa280ca481382ccd48075a2"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-AcctAppMarginAndCustAgmt.pypdf.txt",
+      "sha256": "91e9dcaaf34843c834c006269c83d25507d34fe66559021ded7a5448432bd32a"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-NASDAQ_OMX_Global_Subscriber_Agreement.pypdf.txt",
+      "sha256": "2a03882e63c8e95fb3cd256d8639023b740e3df55fc9de1a1bb2b71a7b5c6742"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-NYSE_Market_Data_Display_Services_Agreement.pypdf.txt",
+      "sha256": "cdf7da75bd5e7404611440b2bd4296bac45e59fb07ac84d2152eb582fbeb4f1f"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-TermsAndConditions.pypdf.txt",
+      "sha256": "bacb70eb1d5455f1117e0659955a6ade77e5581243312604d3b303ef683a489f"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-lean-Data-equity-readme.md",
+      "sha256": "3752faae1328d3db99d4e2ea2e3525886b979724d74d6c228d7036d193be444a"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-lean-LICENSE.txt",
+      "sha256": "522cf0a716ce03f67d46f8fceb5bf78c5b84400ec5cd8d14bf9f02cddc1cb6ba"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-lean-rights.eolfix3.json",
+      "sha256": "23bfff76936e7f6dd1794e34314652ba9c4a6feb312220a81ce2620fa2602263"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-lean-rights.fix2.json",
+      "sha256": "23bfff76936e7f6dd1794e34314652ba9c4a6feb312220a81ce2620fa2602263"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-lean-rights.fix2.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-license-clauses.json",
+      "sha256": "3dbcb58b445d957966d673dbdc028c545a7cca00d8a48b1d852bf57a65dc83e1"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-quantconnect-terms.html",
+      "sha256": "b0061581c86f8e9d8eb0750aa1802c432188a5f94bf4015fb5e393f3f15f50db"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-sec-accessing-edgar-data-wb20260821.html",
+      "sha256": "c3380a32963b9e68d6edcbfd82c659ad8cbe60e08a419024f074e88e904576cc"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-sec-live-403-response.html",
+      "sha256": "26537ebfdae04ffbdba670f71b52334efac5f5e7f347b337d64fb34d8c536034"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-sec-privacy-information-wb20260919.html",
+      "sha256": "a8897135a1f720fa60bb019e1e0407b947a42cab6a82002ddcc57b54fa49628d"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/REDACTIONS.json",
+      "sha256": "7d08a65951826ef4a8d0bd6fd9a21aa747305527b3e2b1daa42173cffe090c69"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/comparison-and-closeout-tests.stderr.txt",
+      "sha256": "317309f65b12fc55b82658f515409f99fccae3f73108ddc2cad27d348edd12f7"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/comparison-and-closeout-tests.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/feast-packages.stderr.txt",
+      "sha256": "b03c46b26c837386a8a174ae5382c070e7d722e9f436159749771e3514b9dc84"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/feast-packages.stdout.txt",
+      "sha256": "28369982095abc2807cec2521f6e435f3aaf3eec33c4abf4eee893cd3dc18a0d"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/feast-pit.stderr.txt",
+      "sha256": "1f86321193d1e36a164b95b8e099731efae3756e52eaf6231adc2237ae6236c6"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/feast-pit.stdout.txt",
+      "sha256": "476cfc1a02342f15ebe95ef8dc428a0ad51a5ed7ffc1cc2dc1813bec465d44e2"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/retry-mutation.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/retry-mutation.stdout.txt",
+      "sha256": "26671436738a3f39dae425706e238075fcd79c5ed40d67aeb92ddc1b77f1e429"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/sdk-packages.stderr.txt",
+      "sha256": "570c8451e3b1de15180e0d531f7b98a7850138d82bafb69f69b553bb47bf9b40"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/sdk-packages.stdout.txt",
+      "sha256": "98cc9741e43e7eb1939405ff40da2b8aa24a69a0ef883303384aa17d8f43dc45"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/sdk-seams.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/sdk-seams.stdout.txt",
+      "sha256": "1bd662b52bd60f9191a9826912e022e3aa7598b18055a82bcfd6a217eeebcffe"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/sdk-source-binding.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/sdk-source-binding.stdout.txt",
+      "sha256": "ed74daab81575caf115d0f7d6c0cf930af58af2ee23f13afdbc6efe71bc9020f"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/sdk-tests.stderr.txt",
+      "sha256": "57e995c3dcc0180f0d4deea149fb687bb86914ba6a2b57a56810933af40b52db"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/sdk-tests.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/retained-integrity.json",
+      "sha256": "38939ce8159db334b136e9a04f20fb01bcc14ccdca10120f026dfa1715186445"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/run.json",
+      "sha256": "7200a89a6507304c1cea3834d06588c06edfec613710cb9f4cb7b864ed53ac17"
+    }
+  ],
+  "base_commit": "0947b01289dcaa9157aa38392a94cf00f592b86d",
+  "catalog": "us-equities",
+  "claim": "Public Alpaca/SEC/LEAN clauses and the prior source captures are retained and their hashes verified.",
+  "evidence_class": "source_review",
+  "gap_index": 7,
+  "gap_text_sha256": "7b72e77cdeef45acbb5e1806600b218f94ad97e2c73332690682db5e5d96a097",
+  "id": "market-data-reference-20261010-gap-7",
+  "layer_id": "market-data-reference",
+  "limitations": [
+    "SDK transports and comparison controls are synthetic; Feast is a native local tool over synthetic data.",
+    "The September private market-data inputs are unavailable here. Their retained aggregate results are dated observations, not a fresh data acquisition or a replay on this host.",
+    "No provider ranking, entitlement, host qualification, strategy number, order or historical as-known universe is established."
+  ],
+  "observed_at_utc": "2026-10-10T17:03:01.201214+00:00",
+  "outcome": "advanced",
+  "residuals": [
+    "The acquiring account's applicable agreements, storage/derived-data rights and LEAN third-party sample-data rights are unestablished; the owner/account lane must supply them."
+  ],
+  "schema_version": 1,
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f"
+}

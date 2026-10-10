@@ -1,0 +1,91 @@
+{
+  "alpaca_pypi_latest": "0.44.0",
+  "alpaca_pypi_response_sha256": "307ab2dec1484d06935a61f7a08ee302a51f12e0e560b13ec8491ede623e9a20",
+  "candidate_sources": [
+    {
+      "archived": false,
+      "default_branch": "master",
+      "license": {
+        "key": "mit",
+        "name": "MIT License",
+        "node_id": "MDc6TGljZW5zZTEz",
+        "spdx_id": "MIT",
+        "url": "https://api.github.com/licenses/mit"
+      },
+      "license_files": [
+        "LICENSE"
+      ],
+      "observed_at_utc": "2026-10-10T16:46:48.899912+00:00",
+      "pin": "891443361734c8f09de96750c679e82bd251936d",
+      "public_response_sha256": {
+        "commit": "8444e3a23821a17f4e46a4ec681288dd950c155a3d34c3b72860a5dded1afa49",
+        "metadata": "2ed02c628b625f0653befa0190bbf458e9b310fd776eb74da3ff701a9d229a50",
+        "readme_json": "582f341c7bc5911304d0aa445d4712aba79ebea2f53e28c9bd4cfb0f50464a0f",
+        "releases": "78e2e1571de0daa9a23e8aeca0eeef6055373ae648d3cdd806c2eed376c513b9",
+        "tree": "4e8710271e70726d8d278e85a580c6e0ef1a54c357d5eb542df2e35f26a8bfd1"
+      },
+      "pushed_at": "2026-04-13T10:24:14Z",
+      "readme": {
+        "decoded_sha256": "b53d1739870767d57b3e730f28fd4ce099d24c44c128225b8c2622948acc4788",
+        "path": "evidence/artifacts/market-data-reference-20261010/final/sources/sec-api-python-README.md.base64",
+        "sha256": "34efd6453362146929d106d981377073b06ad5db1466de349cd93addb5440441",
+        "source_url": "https://github.com/SEC-API-io/sec-api-python/blob/891443361734c8f09de96750c679e82bd251936d/README.md"
+      },
+      "releases": [
+        {
+          "html_url": "https://github.com/SEC-API-io/sec-api-python/releases/tag/v1.0.36",
+          "published_at": "2026-04-13T10:24:15Z",
+          "tag_name": "v1.0.36"
+        },
+        {
+          "html_url": "https://github.com/SEC-API-io/sec-api-python/releases/tag/1.0.35",
+          "published_at": "2026-04-09T12:13:40Z",
+          "tag_name": "1.0.35"
+        },
+        {
+          "html_url": "https://github.com/SEC-API-io/sec-api-python/releases/tag/1.0.34",
+          "published_at": "2026-04-09T11:49:59Z",
+          "tag_name": "1.0.34"
+        },
+        {
+          "html_url": "https://github.com/SEC-API-io/sec-api-python/releases/tag/1.0.33",
+          "published_at": "2026-04-02T11:32:27Z",
+          "tag_name": "1.0.33"
+        },
+        {
+          "html_url": "https://github.com/SEC-API-io/sec-api-python/releases/tag/1.0.32",
+          "published_at": "2025-04-23T07:16:47Z",
+          "tag_name": "1.0.32"
+        }
+      ],
+      "repository": "https://github.com/SEC-API-io/sec-api-python",
+      "tree_truncated": false
+    },
+    {
+      "archived": false,
+      "default_branch": "main",
+      "license": null,
+      "license_files": [],
+      "observed_at_utc": "2026-10-10T16:46:49.902442+00:00",
+      "pin": "883d893b5f41bec6c1ffa67c88420f5068376e09",
+      "public_response_sha256": {
+        "commit": "8a228edf40f6c3f3a25b06d457578566332e0b14d00949a57ce2eb572ebaf992",
+        "metadata": "2a6a9a40410b1105698b84799a5a50932111293d4380303629e6d5beee47d523",
+        "readme_json": "e9be6ad5a5b118f605913383cd1d304dceb1ca79fddeb3102aedd90b5c5d11ca",
+        "releases": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "tree": "c2412ea09c9f9d1e2248d24c5a29f2dd7e9ea725917358f8e8edff14d3ccd45f"
+      },
+      "pushed_at": "2026-10-06T08:09:55Z",
+      "readme": {
+        "decoded_sha256": "ee2e25a2b14002d690aca7189fde31d77da4d9d85584ac75f0ee9b37c283ff0d",
+        "path": "evidence/artifacts/market-data-reference-20261010/final/sources/quantlab-README.md.base64",
+        "sha256": "a13172ba3a176c29dc2a0c92e39191d4dc0f25ab6cb90a3a775f75ba72b52361",
+        "source_url": "https://github.com/Rossod4/quantlab/blob/883d893b5f41bec6c1ffa67c88420f5068376e09/README.md"
+      },
+      "releases": [],
+      "repository": "https://github.com/Rossod4/quantlab",
+      "tree_truncated": false
+    }
+  ],
+  "source_scope": "public source/metadata only; no install or native data qualification of either alternative"
+}

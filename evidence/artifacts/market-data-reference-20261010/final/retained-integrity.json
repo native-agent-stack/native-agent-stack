@@ -1,0 +1,354 @@
+[
+  {
+    "historical_observation": "2026-09-23T04:24:19Z",
+    "historical_outcome": "advanced",
+    "index": 1,
+    "receipt": {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/1-ca-currency-field.json",
+      "sha256": "27bb20af9d2289f8a65c25113449c11f908efd6f10f9f5458cc615b50d221910"
+    },
+    "scope": "integrity of retained published bytes; original private market-data inputs are unavailable here",
+    "verified_artifacts": [
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/1-ca-currency-probe.json",
+        "sha256": "d0a6eade4eaf0365d4d69fce09dc3d6c9846f3d6de389743aaf6f932e319b96c"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/1-alpaca-corporateactions-docs.excerpt.json",
+        "sha256": "f4489cadad9cc796a9bc3030b98468abadee7838dcfef25e0a4df817942188b2"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/REDACTIONS.json",
+        "sha256": "7d08a65951826ef4a8d0bd6fd9a21aa747305527b3e2b1daa42173cffe090c69"
+      }
+    ]
+  },
+  {
+    "historical_observation": "2026-09-23T04:35:41Z",
+    "historical_outcome": "settled",
+    "index": 4,
+    "receipt": {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/4-alpaca-py-latest-seams.json",
+      "sha256": "fdfec6a7e154955cbaf85c6fc15f9d5bb9f4e1d737bfcc4709835de5ae763560"
+    },
+    "scope": "integrity of retained published bytes; original private market-data inputs are unavailable here",
+    "verified_artifacts": [
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/4-alpaca-latest-tests.txt",
+        "sha256": "681d5d8c60703917bcf4829e693d37d5a3b9992e7a23b08f7a8a39296eccaa2d"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/4-alpaca-master-tests.txt",
+        "sha256": "c968c934ce2a4d54ce7c21667d8dbedbf9e21ebcf1bff2f2ee1f920f4c4047c4"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/4-alpaca-master-retry-mutant.txt",
+        "sha256": "2b024a325813ac4b8566e0a31f4546d12b688b66da96bc7e9912b02a554691ed"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/4-sdk-0440-vs-master-diff.txt",
+        "sha256": "361935c34aebc7b5cd9f71f62e198908c9297ea6ba7ef710498b001c59c15597"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/4-pypi-alpaca-py.json",
+        "sha256": "307ab2dec1484d06935a61f7a08ee302a51f12e0e560b13ec8491ede623e9a20"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/4-alpaca-py-ls-remote.txt",
+        "sha256": "5f74468b29065dd2eced7f3dea199187c4a17b2bc95c07fa5e002cd546e96458"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/REDACTIONS.json",
+        "sha256": "7d08a65951826ef4a8d0bd6fd9a21aa747305527b3e2b1daa42173cffe090c69"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/install-alpaca-install.log",
+        "sha256": "d5c07e3ee98ccea3f28dbd3260722b7737a42ffa0071c231aa8d5dafd982e29d"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/install-alpaca-master-install.log",
+        "sha256": "e760613696b3bca8ae84ac668065ca01988bf94f7ce406651d24859282912fa7"
+      }
+    ]
+  },
+  {
+    "historical_observation": "2026-09-23T04:42:15Z",
+    "historical_outcome": "advanced",
+    "index": 5,
+    "receipt": {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/5-parameterized-comparator.json",
+      "sha256": "06402e99525f7ba6ab85eb1efdf3d38c41914aff9dd99427e206753df126b820"
+    },
+    "scope": "integrity of retained published bytes; original private market-data inputs are unavailable here",
+    "verified_artifacts": [
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/5-compare-multi-run.txt",
+        "sha256": "f3bbb92892b7b75eb3887565c1da90add017a12cf399678f44908213fab052a8"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/5-diff-by-year.json",
+        "sha256": "e9a049492d54c9aa98c48ddd75f9cc5a713220ff39711c9453e3f2062d0a9c6e"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/5-compare-multi-run.fix1.txt",
+        "sha256": "309a313b23b91dce3553c3ea2e76c389c009c56d7610428a4db62a50b20f5cc8"
+      }
+    ]
+  },
+  {
+    "historical_observation": "2026-09-23T13:25:49Z",
+    "historical_outcome": "advanced",
+    "index": 7,
+    "receipt": {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/7-data-licensing-clauses.json",
+      "sha256": "d4aff983e380e9d84a3c92933d5c7d07e2721f4a9aa280ca481382ccd48075a2"
+    },
+    "scope": "integrity of retained published bytes; original private market-data inputs are unavailable here",
+    "verified_artifacts": [
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-license-clauses.json",
+        "sha256": "3dbcb58b445d957966d673dbdc028c545a7cca00d8a48b1d852bf57a65dc83e1"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-AcctAppMarginAndCustAgmt.pypdf.txt",
+        "sha256": "91e9dcaaf34843c834c006269c83d25507d34fe66559021ded7a5448432bd32a"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-TermsAndConditions.pypdf.txt",
+        "sha256": "bacb70eb1d5455f1117e0659955a6ade77e5581243312604d3b303ef683a489f"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-NYSE_Market_Data_Display_Services_Agreement.pypdf.txt",
+        "sha256": "cdf7da75bd5e7404611440b2bd4296bac45e59fb07ac84d2152eb582fbeb4f1f"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-NASDAQ_OMX_Global_Subscriber_Agreement.pypdf.txt",
+        "sha256": "2a03882e63c8e95fb3cd256d8639023b740e3df55fc9de1a1bb2b71a7b5c6742"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-sec-privacy-information-wb20260919.html",
+        "sha256": "a8897135a1f720fa60bb019e1e0407b947a42cab6a82002ddcc57b54fa49628d"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-sec-accessing-edgar-data-wb20260821.html",
+        "sha256": "c3380a32963b9e68d6edcbfd82c659ad8cbe60e08a419024f074e88e904576cc"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-sec-live-403-response.html",
+        "sha256": "26537ebfdae04ffbdba670f71b52334efac5f5e7f347b337d64fb34d8c536034"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/REDACTIONS.json",
+        "sha256": "7d08a65951826ef4a8d0bd6fd9a21aa747305527b3e2b1daa42173cffe090c69"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-lean-rights.fix2.json",
+        "sha256": "23bfff76936e7f6dd1794e34314652ba9c4a6feb312220a81ce2620fa2602263"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-lean-rights.fix2.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-lean-LICENSE.txt",
+        "sha256": "522cf0a716ce03f67d46f8fceb5bf78c5b84400ec5cd8d14bf9f02cddc1cb6ba"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-lean-Data-equity-readme.md",
+        "sha256": "3752faae1328d3db99d4e2ea2e3525886b979724d74d6c228d7036d193be444a"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-quantconnect-terms.html",
+        "sha256": "b0061581c86f8e9d8eb0750aa1802c432188a5f94bf4015fb5e393f3f15f50db"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-lean-rights.eolfix3.json",
+        "sha256": "23bfff76936e7f6dd1794e34314652ba9c4a6feb312220a81ce2620fa2602263"
+      }
+    ]
+  },
+  {
+    "historical_observation": "2026-09-23T04:42:57Z",
+    "historical_outcome": "advanced",
+    "index": 8,
+    "receipt": {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/8-feast-pit-join.json",
+      "sha256": "00a3f54c03d42f107a3fb248c52b27062b371fcd91cb7cdd4df134f10ba5f12b"
+    },
+    "scope": "integrity of retained published bytes; original private market-data inputs are unavailable here",
+    "verified_artifacts": [
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/8-feast-pit-fixture.json",
+        "sha256": "8e64af64d5c54e4642d8afe0d614f6a57b6407c5fa47207a31a6ad2ee0be221c"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/8-feast-pit-fixture.stderr",
+        "sha256": "d9e853e9d1236d2255db0ff8a30baf5781d0b2e441c33dc5b2fad91dd8054f21"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/8-feast-pit-fixture.attempt1.json",
+        "sha256": "740d4538b8fd64e72707ffbca83bd36ee7f72fca895cbe936b13bf542b050ab9"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/8-feast-pit-fixture.attempt1.stderr",
+        "sha256": "a4bdb48ec007dfd3d2438063dd80a5da88bef4eb43a611968667a4a2abe8fd33"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/install-feast-install.log",
+        "sha256": "429b741aa896a84b34d607f7179e57b44df4f0101b0ffc325190cf7b988b64eb"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/8-feast-pit-fixture.fix1.json",
+        "sha256": "476cfc1a02342f15ebe95ef8dc428a0ad51a5ed7ffc1cc2dc1813bec465d44e2"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/8-feast-pit-fixture.fix1.stderr",
+        "sha256": "d9e853e9d1236d2255db0ff8a30baf5781d0b2e441c33dc5b2fad91dd8054f21"
+      }
+    ]
+  },
+  {
+    "historical_observation": "2026-09-23T04:24:19Z",
+    "historical_outcome": "advanced",
+    "index": 12,
+    "receipt": {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/12-ca-currency-shared-capture.json",
+      "sha256": "28bfc86cee0f2b4a7c0c539a193a8fa85c7914758b7cb3c1cd429aa93c3dead2"
+    },
+    "scope": "integrity of retained published bytes; original private market-data inputs are unavailable here",
+    "verified_artifacts": [
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/1-ca-currency-probe.json",
+        "sha256": "d0a6eade4eaf0365d4d69fce09dc3d6c9846f3d6de389743aaf6f932e319b96c"
+      }
+    ]
+  },
+  {
+    "historical_observation": "2026-09-23T04:31:58Z",
+    "historical_outcome": "advanced",
+    "index": 17,
+    "receipt": {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/17-sec-api-python-disposition.json",
+      "sha256": "ec7a70e9cca12e3ad46f4ab2ae87197d73ad47ce2cabc3751fa013b85b8d776f"
+    },
+    "scope": "integrity of retained published bytes; original private market-data inputs are unavailable here",
+    "verified_artifacts": [
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/17-gh-repo.json",
+        "sha256": "b6938e2592d3fd71b38c4ca73b91ea42bd77ed12d0846b239fc250dc7254176c"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/17-gh-release-latest.json",
+        "sha256": "700d0b96e02903b8f114064c6183d0bae7759510bb27f5220e48ddd24286af19"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/17-gh-releases.json",
+        "sha256": "78e2e1571de0daa9a23e8aeca0eeef6055373ae648d3cdd806c2eed376c513b9"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/17-gh-tags.json",
+        "sha256": "20c5cab88adf537f1089982b93d1fbbc66981dc70a9d689db4fd3c7235c8e5aa"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/17-gh-license.json",
+        "sha256": "9db821de61f36454e86041928f19dee28f278c4577ef967a2495b0463376bf93"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/17-gh-commits.json",
+        "sha256": "6daad5257dbc4823bdbab41d290733b1d4683391d636087c595a69d546976e48"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/17-gh-readme.json",
+        "sha256": "d1c1316a06b3974460604da579e99b4b9b7b26af5897e21e9d6d8e3ce517e8d3"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/17-gh-tree.json",
+        "sha256": "4e8710271e70726d8d278e85a580c6e0ef1a54c357d5eb542df2e35f26a8bfd1"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/17-gh-contributors.json",
+        "sha256": "8394d37db3e9ffbd0bca0293a17473ddbd475abab67bd49f3262b06b8d7344d6"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/17-pypi-sec-api.json",
+        "sha256": "b689894797f7fc07e85ace29d99ed152d968b5547f665c6e741e6d15b615262a"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/REDACTIONS.json",
+        "sha256": "7d08a65951826ef4a8d0bd6fd9a21aa747305527b3e2b1daa42173cffe090c69"
+      }
+    ]
+  },
+  {
+    "historical_observation": "2026-09-23T04:32:12Z",
+    "historical_outcome": "advanced",
+    "index": 18,
+    "receipt": {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/18-rossod4-quantlab-disposition.json",
+      "sha256": "aaeaaf65083d22d915581e44329c739630e9d9979c18dd849a53c9a05577ff9c"
+    },
+    "scope": "integrity of retained published bytes; original private market-data inputs are unavailable here",
+    "verified_artifacts": [
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/18-gh-repo.json",
+        "sha256": "40f68d5c2cc2395ed82c5cc5898ce47d605887daf11d093de36155ad3f8f6aeb"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/18-gh-release-latest.json",
+        "sha256": "d9e37600354c1839f6b22cebde497e9d14750d2401a06c9a51b1619baf991613"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/18-gh-release-latest.err",
+        "sha256": "d2c8985c89b29a842ac4946d13bdbc297709f44f20bb968faf9682664b211db6"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/18-gh-releases.json",
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/18-gh-tags.json",
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/18-gh-license.json",
+        "sha256": "6c0109c2ac75f1f264b61da6aff1737f7bc7eac254e6396710ff81a4139f32b1"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/18-gh-license.err",
+        "sha256": "d2c8985c89b29a842ac4946d13bdbc297709f44f20bb968faf9682664b211db6"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/18-gh-commits.json",
+        "sha256": "dffcdf7f1099fe9fb29d289c9a1d5c6e9349cf90caf748664af5092ff945e8ca"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/18-gh-readme.json",
+        "sha256": "cd06f5cb22929a0bc5fb340149daaab49796a37572df0b2fcb8ac3dfafbae4c9"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/18-gh-readme.err",
+        "sha256": "d2c8985c89b29a842ac4946d13bdbc297709f44f20bb968faf9682664b211db6"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/18-gh-tree.json",
+        "sha256": "3ec72bef87aba06e86a12d47d5f2193e04813325c0eeb4c2a24c72585c07c8df"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/18-gh-contributors.json",
+        "sha256": "601d68a661d3f4ab20ed8693e9813ca4ffc3dca6982815bca6674fc4465a2e4f"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/18-gh-contents-plans_M01-data-providers.md.json",
+        "sha256": "f32deee373987052c884e0114a43378f359e96946d433f2bcadfb529458a8732"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/18-gh-contents-pyproject.toml.json",
+        "sha256": "db8adb4ea364eb562d73aba2f5c5fdeabf5d5b3c97efd8f977879139b281a169"
+      },
+      {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/18-gh-contents-src_quantlab_data_pit.py.json",
+        "sha256": "0e755b9031c81414483bb377c2b274670cbdab5a1f274fceb517a2a0826611fa"
+      }
+    ]
+  }
+]

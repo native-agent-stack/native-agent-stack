@@ -1,0 +1,244 @@
+{
+  "commands": [
+    {
+      "argv": [
+        "uv",
+        "pip",
+        "freeze",
+        "--python",
+        "~/.cache/ns2604-catalyst-market-data-gaps/sdk/bin/python"
+      ],
+      "duration_s": 0.0188,
+      "exit_code": 0,
+      "label": "sdk-packages",
+      "outputs": [
+        {
+          "path": "evidence/artifacts/market-data-reference-20261010/final/raw/sdk-packages.stdout.txt",
+          "sha256": "98cc9741e43e7eb1939405ff40da2b8aa24a69a0ef883303384aa17d8f43dc45"
+        },
+        {
+          "path": "evidence/artifacts/market-data-reference-20261010/final/raw/sdk-packages.stderr.txt",
+          "sha256": "570c8451e3b1de15180e0d531f7b98a7850138d82bafb69f69b553bb47bf9b40"
+        }
+      ],
+      "publication_transform": "host/worktree paths replaced with ~/ <worktree>; output hashes bind published bytes",
+      "started_at_utc": "2026-10-10T16:46:49.964070+00:00",
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "uv",
+        "pip",
+        "freeze",
+        "--python",
+        "~/.cache/ns2604-catalyst-market-data-gaps/feast/bin/python"
+      ],
+      "duration_s": 0.0186,
+      "exit_code": 0,
+      "label": "feast-packages",
+      "outputs": [
+        {
+          "path": "evidence/artifacts/market-data-reference-20261010/final/raw/feast-packages.stdout.txt",
+          "sha256": "28369982095abc2807cec2521f6e435f3aaf3eec33c4abf4eee893cd3dc18a0d"
+        },
+        {
+          "path": "evidence/artifacts/market-data-reference-20261010/final/raw/feast-packages.stderr.txt",
+          "sha256": "b03c46b26c837386a8a174ae5382c070e7d722e9f436159749771e3514b9dc84"
+        }
+      ],
+      "publication_transform": "host/worktree paths replaced with ~/ <worktree>; output hashes bind published bytes",
+      "started_at_utc": "2026-10-10T16:46:49.982937+00:00",
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "~/.cache/ns2604-catalyst-market-data-gaps/sdk/bin/python",
+        "blueprints/gap-wave2-20260923/us-equities__market-data-reference/seam_probe.py"
+      ],
+      "duration_s": 1.1669,
+      "exit_code": 0,
+      "label": "sdk-seams",
+      "outputs": [
+        {
+          "path": "evidence/artifacts/market-data-reference-20261010/final/raw/sdk-seams.stdout.txt",
+          "sha256": "1bd662b52bd60f9191a9826912e022e3aa7598b18055a82bcfd6a217eeebcffe"
+        },
+        {
+          "path": "evidence/artifacts/market-data-reference-20261010/final/raw/sdk-seams.stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "publication_transform": "host/worktree paths replaced with ~/ <worktree>; output hashes bind published bytes",
+      "started_at_utc": "2026-10-10T16:46:50.001558+00:00",
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "~/.cache/ns2604-catalyst-market-data-gaps/sdk/bin/python",
+        "-m",
+        "unittest",
+        "tests.test_alpaca_historical",
+        "-v"
+      ],
+      "duration_s": 1.4071,
+      "exit_code": 0,
+      "label": "sdk-tests",
+      "outputs": [
+        {
+          "path": "evidence/artifacts/market-data-reference-20261010/final/raw/sdk-tests.stdout.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "evidence/artifacts/market-data-reference-20261010/final/raw/sdk-tests.stderr.txt",
+          "sha256": "bd879bcf5b0215f7ac6f478a50fa9e12af5e8a0885e0a63b835ad4dd618b6ede"
+        }
+      ],
+      "publication_transform": "host/worktree paths replaced with ~/ <worktree>; output hashes bind published bytes",
+      "started_at_utc": "2026-10-10T16:46:51.168520+00:00",
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "~/.local/share/mise/installs/python/3.13.16/bin/python3",
+        "blueprints/us-equities/market-data-reference/retry_probe.py",
+        "--python",
+        "~/.cache/ns2604-catalyst-market-data-gaps/sdk/bin/python"
+      ],
+      "duration_s": 0.2772,
+      "exit_code": 1,
+      "label": "retry-mutation",
+      "outputs": [
+        {
+          "path": "evidence/artifacts/market-data-reference-20261010/final/raw/retry-mutation.stdout.txt",
+          "sha256": "e4ffd2e96426be8b88c5ae11d0d3988c7fc00df96a21e9c3053172b58fd7dc20"
+        },
+        {
+          "path": "evidence/artifacts/market-data-reference-20261010/final/raw/retry-mutation.stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "publication_transform": "host/worktree paths replaced with ~/ <worktree>; output hashes bind published bytes",
+      "started_at_utc": "2026-10-10T16:46:52.575648+00:00",
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "~/.local/share/mise/installs/python/3.13.16/bin/python3",
+        "-m",
+        "unittest",
+        "tests.test_market_data_gap_integration",
+        "-v"
+      ],
+      "duration_s": 0.2404,
+      "exit_code": 0,
+      "label": "comparison-and-closeout-tests",
+      "outputs": [
+        {
+          "path": "evidence/artifacts/market-data-reference-20261010/final/raw/comparison-and-closeout-tests.stdout.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "evidence/artifacts/market-data-reference-20261010/final/raw/comparison-and-closeout-tests.stderr.txt",
+          "sha256": "bbb1683ff72580458e052a85877053bb3298ade3d00c5cbdc08e9f261268994a"
+        }
+      ],
+      "publication_transform": "host/worktree paths replaced with ~/ <worktree>; output hashes bind published bytes",
+      "started_at_utc": "2026-10-10T16:46:52.852867+00:00",
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "~/.cache/ns2604-catalyst-market-data-gaps/feast/bin/python",
+        "blueprints/gap-wave2-20260923/us-equities__market-data-reference/feast_pit_fixture.py"
+      ],
+      "duration_s": 8.3768,
+      "exit_code": 0,
+      "label": "feast-pit",
+      "outputs": [
+        {
+          "path": "evidence/artifacts/market-data-reference-20261010/final/raw/feast-pit.stdout.txt",
+          "sha256": "476cfc1a02342f15ebe95ef8dc428a0ad51a5ed7ffc1cc2dc1813bec465d44e2"
+        },
+        {
+          "path": "evidence/artifacts/market-data-reference-20261010/final/raw/feast-pit.stderr.txt",
+          "sha256": "1f86321193d1e36a164b95b8e099731efae3756e52eaf6231adc2237ae6236c6"
+        }
+      ],
+      "publication_transform": "host/worktree paths replaced with ~/ <worktree>; output hashes bind published bytes",
+      "started_at_utc": "2026-10-10T16:46:53.093285+00:00",
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "~/.cache/ns2604-catalyst-market-data-gaps/sdk/bin/python",
+        "blueprints/us-equities/market-data-reference/native_news.py"
+      ],
+      "duration_s": 12.0124,
+      "exit_code": 1,
+      "label": "gdelt-news",
+      "outputs": [
+        {
+          "path": "evidence/artifacts/market-data-reference-20261010/final/raw/gdelt-news.stdout.txt",
+          "sha256": "f1e8ec219a404d4bd831f41e25e4a3a672f38b13729897491f90a166843da9e9"
+        },
+        {
+          "path": "evidence/artifacts/market-data-reference-20261010/final/raw/gdelt-news.stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "publication_transform": "host/worktree paths replaced with ~/ <worktree>; output hashes bind published bytes",
+      "started_at_utc": "2026-10-10T16:47:01.470102+00:00",
+      "timed_out": false
+    }
+  ],
+  "inputs": [
+    {
+      "path": "blueprints/us-equities/market-data-reference/run.py",
+      "sha256": "1d0050dd3806bdbf507d0a8313a23273fe65406e5debf5952fd50bdfb2a31eb3"
+    },
+    {
+      "path": "blueprints/us-equities/market-data-reference/native_news.py",
+      "sha256": "6786a14a567fbc77121776c1f4210bcc98d84ba591edd2a7663691dd0f151ecf"
+    },
+    {
+      "path": "blueprints/us-equities/authenticated-data/compare_providers.py",
+      "sha256": "2ef455406bd90744b00273df561955b8a9eee4af7b7569ee37710c20ed6ef3b9"
+    },
+    {
+      "path": "tests/test_market_data_gap_integration.py",
+      "sha256": "cb4e0b3b2d48bf7256f98293cfbd8bab967322c1e7e27bfe64a4928740e903da"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/us-equities__market-data-reference/compare_multi.py",
+      "sha256": "b41ee92fad2b4af455310e0a29638666dd58c5ff371e9da8b1b7b93c34dd0f5f"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/us-equities__market-data-reference/feast_pit_fixture.py",
+      "sha256": "eda8eb1b218f6661cffbf2174b08ecaf6e3698e0c18e3c5556b5e0376c86a336"
+    },
+    {
+      "path": "blueprints/gap-wave2-20260923/us-equities__market-data-reference/seam_probe.py",
+      "sha256": "a7e189532ac8fbffa07e0daf10bc08d7c16d63319ec71b58d20257c2b4957b47"
+    },
+    {
+      "path": "blueprints/us-equities/market-data-reference/retry_probe.py",
+      "sha256": "816cd116fad1413ac038b7fb35b6041719b0de8fbd487364598041974ca4784f"
+    },
+    {
+      "path": "tests/test_alpaca_historical.py",
+      "sha256": "4ec30086b77d6a75081be8ffdae1a7aa5fe516229573aa71eec818c2f5f58ac0"
+    },
+    {
+      "path": "blueprints/us-equities/alpaca-historical/collect.py",
+      "sha256": "9e9eb3a410f104827dc59cb494295a0d2baba9148ac256e5e3f6de85322ff9c3"
+    },
+    {
+      "path": "blueprints/us-equities/alpaca-historical/plan.json",
+      "sha256": "258a3f935ba385105f831f9270db4a14cfccfdfec2feb1046af2f4184a4fa66b"
+    }
+  ],
+  "kind": "artifact_measurement",
+  "observed_at_utc": "2026-10-10T16:47:13.483121+00:00",
+  "schema_version": 1,
+  "source_scope": "public sources, synthetic SDK transports and local Feast fixture; GDELT is a separate native attempt"
+}

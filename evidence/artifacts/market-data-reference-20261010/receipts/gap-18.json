@@ -1,0 +1,174 @@
+{
+  "artifacts": [
+    {
+      "path": "catalogs/us-equities/decision-index.json",
+      "sha256": "4e5e2694b1dfc4b6180f1e7e77a448349254c1200a635e11b7e77969057f4339"
+    },
+    {
+      "path": "catalogs/us-equities/manifest.json",
+      "sha256": "c0e4bf507f26395528ba8bc4d79da513af82b32ff948411e4997295a2e44cc47"
+    },
+    {
+      "path": "catalogs/us-equities/market-data-reference-gap-review-20261010.json",
+      "sha256": "2d78f8735cb1365e398f41b3e8daf78c37bf0cacca6304b40178674d5e849718"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/18-rossod4-quantlab-disposition.json",
+      "sha256": "aaeaaf65083d22d915581e44329c739630e9d9979c18dd849a53c9a05577ff9c"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/18-gh-commits.json",
+      "sha256": "dffcdf7f1099fe9fb29d289c9a1d5c6e9349cf90caf748664af5092ff945e8ca"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/18-gh-contents-plans_M01-data-providers.md.json",
+      "sha256": "f32deee373987052c884e0114a43378f359e96946d433f2bcadfb529458a8732"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/18-gh-contents-pyproject.toml.json",
+      "sha256": "db8adb4ea364eb562d73aba2f5c5fdeabf5d5b3c97efd8f977879139b281a169"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/18-gh-contents-src_quantlab_data_pit.py.json",
+      "sha256": "0e755b9031c81414483bb377c2b274670cbdab5a1f274fceb517a2a0826611fa"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/18-gh-contributors.json",
+      "sha256": "601d68a661d3f4ab20ed8693e9813ca4ffc3dca6982815bca6674fc4465a2e4f"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/18-gh-license.err",
+      "sha256": "d2c8985c89b29a842ac4946d13bdbc297709f44f20bb968faf9682664b211db6"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/18-gh-license.json",
+      "sha256": "6c0109c2ac75f1f264b61da6aff1737f7bc7eac254e6396710ff81a4139f32b1"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/18-gh-readme.err",
+      "sha256": "d2c8985c89b29a842ac4946d13bdbc297709f44f20bb968faf9682664b211db6"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/18-gh-readme.json",
+      "sha256": "cd06f5cb22929a0bc5fb340149daaab49796a37572df0b2fcb8ac3dfafbae4c9"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/18-gh-release-latest.err",
+      "sha256": "d2c8985c89b29a842ac4946d13bdbc297709f44f20bb968faf9682664b211db6"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/18-gh-release-latest.json",
+      "sha256": "d9e37600354c1839f6b22cebde497e9d14750d2401a06c9a51b1619baf991613"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/18-gh-releases.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/18-gh-repo.json",
+      "sha256": "40f68d5c2cc2395ed82c5cc5898ce47d605887daf11d093de36155ad3f8f6aeb"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/18-gh-tags.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/18-gh-tree.json",
+      "sha256": "3ec72bef87aba06e86a12d47d5f2193e04813325c0eeb4c2a24c72585c07c8df"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/comparison-and-closeout-tests.stderr.txt",
+      "sha256": "317309f65b12fc55b82658f515409f99fccae3f73108ddc2cad27d348edd12f7"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/comparison-and-closeout-tests.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/feast-packages.stderr.txt",
+      "sha256": "b03c46b26c837386a8a174ae5382c070e7d722e9f436159749771e3514b9dc84"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/feast-packages.stdout.txt",
+      "sha256": "28369982095abc2807cec2521f6e435f3aaf3eec33c4abf4eee893cd3dc18a0d"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/feast-pit.stderr.txt",
+      "sha256": "1f86321193d1e36a164b95b8e099731efae3756e52eaf6231adc2237ae6236c6"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/feast-pit.stdout.txt",
+      "sha256": "476cfc1a02342f15ebe95ef8dc428a0ad51a5ed7ffc1cc2dc1813bec465d44e2"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/retry-mutation.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/retry-mutation.stdout.txt",
+      "sha256": "26671436738a3f39dae425706e238075fcd79c5ed40d67aeb92ddc1b77f1e429"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/sdk-packages.stderr.txt",
+      "sha256": "570c8451e3b1de15180e0d531f7b98a7850138d82bafb69f69b553bb47bf9b40"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/sdk-packages.stdout.txt",
+      "sha256": "98cc9741e43e7eb1939405ff40da2b8aa24a69a0ef883303384aa17d8f43dc45"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/sdk-seams.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/sdk-seams.stdout.txt",
+      "sha256": "1bd662b52bd60f9191a9826912e022e3aa7598b18055a82bcfd6a217eeebcffe"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/sdk-source-binding.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/sdk-source-binding.stdout.txt",
+      "sha256": "ed74daab81575caf115d0f7d6c0cf930af58af2ee23f13afdbc6efe71bc9020f"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/sdk-tests.stderr.txt",
+      "sha256": "57e995c3dcc0180f0d4deea149fb687bb86914ba6a2b57a56810933af40b52db"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/sdk-tests.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/retained-integrity.json",
+      "sha256": "38939ce8159db334b136e9a04f20fb01bcc14ccdca10120f026dfa1715186445"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/run.json",
+      "sha256": "7200a89a6507304c1cea3834d06588c06edfec613710cb9f4cb7b864ed53ac17"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/sources/public-observations.json",
+      "sha256": "49afe9e7ef7408c64ea80a253b30ccab7be7e8bcd425c24d018c19a170383d2d"
+    }
+  ],
+  "base_commit": "0947b01289dcaa9157aa38392a94cf00f592b86d",
+  "catalog": "us-equities",
+  "claim": "The current quantlab README/tree and absent software license have an explicit not-adopted disposition registered in the canonical catalog identity union.",
+  "evidence_class": "source_review",
+  "gap_index": 18,
+  "gap_text_sha256": "9b7b707681cae957cee821c3358b4d2b5d1cfd7785a5203b6e634737f9eb6c7b",
+  "id": "market-data-reference-20261010-gap-18",
+  "layer_id": "market-data-reference",
+  "limitations": [
+    "SDK transports and comparison controls are synthetic; Feast is a native local tool over synthetic data.",
+    "The September private market-data inputs are unavailable here. Their retained aggregate results are dated observations, not a fresh data acquisition or a replay on this host.",
+    "No provider ranking, entitlement, host qualification, strategy number, order or historical as-known universe is established."
+  ],
+  "observed_at_utc": "2026-10-10T17:03:01.201214+00:00",
+  "outcome": "settled",
+  "residuals": [],
+  "schema_version": 1,
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f"
+}

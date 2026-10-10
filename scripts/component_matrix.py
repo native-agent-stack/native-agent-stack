@@ -6,8 +6,9 @@ E2E-status view.
 This never selects a winner, records a receipt or runs a lane; it only joins
 what ``catalogs/landscape/{foundation,us-equities}.json``,
 ``catalogs/foundation/decisions.json``, ``scripts/host_receipts.py`` receipts
-and ``catalogs/landscape/gap-crosswalk-92bb279.json`` (optional) already say,
-and writes the result deterministically to
+the optional ``catalogs/landscape/gap-crosswalk-92bb279.json``, and explicit
+later receipts under ``catalogs/landscape/gap-closeouts/`` already say, and
+writes the result deterministically to
 ``catalogs/landscape/component-evidence-matrix.json`` and
 ``docs/component-evidence-matrix.md``.
 
@@ -30,7 +31,9 @@ and writes them.
 from __future__ import annotations
 
 import argparse
+from copy import deepcopy
 from datetime import date
+import hashlib
 import json
 from pathlib import Path
 import re
@@ -58,7 +61,7 @@ SCOPE = (
     "Per-component independent-review status and per-platform E2E state, joined from "
     "catalogs/landscape/{foundation,us-equities}.json winners/alternatives, "
     "catalogs/foundation/decisions.json lifecycle stage_refs, scripts/host_receipts.py receipts "
-    "and the gap crosswalk (open executable_now gaps per layer, when present), with each layer's "
+    "and the gap crosswalk plus hash-bound later gap-closeout receipts (open executable_now gaps per layer, when present), with each layer's "
     "convergence by layer from the saturation ledger and the newest sweep manifest. It never selects "
     "a winner or records a receipt; it is a read-only join of evidence recorded elsewhere."
 )
@@ -66,6 +69,7 @@ SCOPE = (
 LANDSCAPE_FILES = host_receipts.LANDSCAPE_CATALOGS
 DECISIONS_FILE = "catalogs/foundation/decisions.json"
 GAP_CROSSWALK_FILE = "catalogs/landscape/gap-crosswalk-92bb279.json"
+GAP_CLOSEOUT_DIR = "catalogs/landscape/gap-closeouts"
 STACK_FILE = "manifests/stack.json"
 ADJUDICATION_TEMPLATE = "evidence/artifacts/layer-verdicts-20260922/adjudication/{catalog}-{layer_id}-20260922.json"
 
@@ -193,6 +197,70 @@ def decisions_by_component(decisions_doc: dict | None) -> dict[str, list[dict]]:
         component_id: [{"stage": stage, "status": status} for stage, status in sorted(pairs)]
         for component_id, pairs in result.items()
     }
+
+
+def apply_gap_closeouts(root: Path, gap_doc: dict | None):
+    """Join explicit, hash-bound later receipts; never rewrite the frozen crosswalk.
+
+    Only a settled receipt removes an open gap from the counts. Advanced and
+    deferred work retains its open status and is listed with its residuals.
+    This uses the same confined paths and strict JSON loader as the other joins.
+    """
+    directory = safe_file(root, GAP_CLOSEOUT_DIR)
+    if not directory.exists():
+        return gap_doc, {}
+    if not directory.is_dir() or gap_doc is None:
+        raise InvalidDecisionIndex("gap closeouts need a directory and the source crosswalk")
+    effective = deepcopy(gap_doc)
+    known = {(layer["catalog"], layer["layer_id"], gap["index"]): gap
+             for layer in effective["layers"] for gap in layer["gaps"]}
+    crosswalk_sha = hashlib.sha256(safe_file(root, GAP_CROSSWALK_FILE).read_bytes()).hexdigest()
+    listed, seen = {}, set()
+    for path in sorted(directory.glob("*.json")):
+        relative = path.relative_to(root).as_posix()
+        declaration = load(root, relative)
+        if (declaration.get("schema_version") != 1 or
+                declaration.get("source_revision") != gap_doc["source_revision"] or
+                declaration.get("crosswalk_sha256") != crosswalk_sha):
+            raise InvalidDecisionIndex("gap closeout source binding differs")
+        refs = declaration.get("receipts")
+        if not isinstance(refs, list) or not refs:
+            raise InvalidDecisionIndex("gap closeout needs receipt references")
+        for ref in refs:
+            receipt_path = safe_file(root, ref["path"])
+            if hashlib.sha256(receipt_path.read_bytes()).hexdigest() != ref["sha256"]:
+                raise InvalidDecisionIndex("gap closeout receipt hash differs")
+            receipt = load(root, ref["path"])
+            key = (receipt.get("catalog"), receipt.get("layer_id"), receipt.get("gap_index"))
+            if key not in known or key in seen:
+                raise InvalidDecisionIndex("gap closeout names an unknown or duplicate gap")
+            seen.add(key)
+            gap = known[key]
+            if (receipt.get("source_revision") != gap_doc["source_revision"] or
+                    receipt.get("gap_text_sha256") != hashlib.sha256(gap["text"].encode()).hexdigest()):
+                raise InvalidDecisionIndex("gap closeout text binding differs")
+            outcome = receipt.get("outcome")
+            residuals = receipt.get("residuals")
+            if (outcome not in {"settled", "advanced", "not_settled", "deferred"} or
+                    not isinstance(residuals, list) or (outcome != "settled" and not residuals)):
+                raise InvalidDecisionIndex("gap closeout needs a supported outcome and residuals")
+            artifacts = receipt.get("artifacts")
+            if not isinstance(artifacts, list) or not artifacts:
+                raise InvalidDecisionIndex("gap closeout needs retained evidence")
+            for artifact in artifacts:
+                raw = safe_file(root, artifact["path"]).read_bytes()
+                if hashlib.sha256(raw).hexdigest() != artifact["sha256"]:
+                    raise InvalidDecisionIndex("gap closeout artifact hash differs")
+            if outcome == "settled":
+                gap["status"] = "settled_by_receipt"
+            listed.setdefault(key[:2], []).append({
+                "index": key[2], "outcome": outcome, "receipt": ref["path"],
+                "receipt_sha256": ref["sha256"], "evidence_class": receipt["evidence_class"],
+                "residuals": residuals,
+            })
+    for entries in listed.values():
+        entries.sort(key=lambda entry: entry["index"])
+    return effective, listed
 
 
 def gap_counts_by_layer(gap_crosswalk_doc: dict | None) -> dict[tuple[str, str], int]:
@@ -867,6 +935,7 @@ def build_document(root: Path):
     decisions_doc = load_optional(root, DECISIONS_FILE)
     decisions = decisions_by_component(decisions_doc)
     gap_doc = load_optional(root, GAP_CROSSWALK_FILE)
+    gap_doc, gap_closeouts = apply_gap_closeouts(root, gap_doc)
     gap_counts = gap_counts_by_layer(gap_doc)
     open_gap_counts = open_gap_counts_by_layer(gap_doc)
     stack_doc = load_optional(root, STACK_FILE)
@@ -895,6 +964,8 @@ def build_document(root: Path):
                 status_context, winner_aliases, repo_layers,
             )
             row["convergence"] = build_layer_convergence(catalog, layer, row, convergence_context)
+            if (catalog, layer["layer_id"]) in gap_closeouts:
+                row["gap_closeouts"] = gap_closeouts[(catalog, layer["layer_id"])]
             rows.append(row)
             flip_violations.extend(row_flip_violations)
 
@@ -1175,13 +1246,26 @@ def render_markdown(document: dict) -> str:
     else:
         for entry in needs_review:
             lines.append(f"- `{entry['catalog']}/{entry['layer_id']}`: {entry['independent_review']}")
+    lines += ["", "## Later gap evidence", "",
+              "Explicit receipts under `catalogs/landscape/gap-closeouts/` are joined after the frozen "
+              "crosswalk. Every receipt, gap text and retained artifact is hash-bound. Only `settled` "
+              "removes an open gap from the counts; `advanced`, `not_settled` and `deferred` keep "
+              "their residuals open. These records do not select a winner or qualify a host.", ""]
+    closeout_lines = []
+    for row in document["rows"]:
+        for entry in row.get("gap_closeouts", []):
+            residual = "; ".join(entry["residuals"]) or "no residual within this gap's stated scope"
+            closeout_lines.append(
+                f"- `{row['catalog']}/{row['layer_id']}:{entry['index']}`: **{entry['outcome']}** "
+                f"({entry['evidence_class']}); [{entry['receipt']}](../{entry['receipt']}). {residual}")
+    lines += closeout_lines or ["None."]
     lines += ["", *render_convergence_markdown(document)]
     lines += [
         "",
         "## How to update this page",
         "",
         "This page and `catalogs/landscape/component-evidence-matrix.json` are generated, not hand-edited. "
-        "After adding host receipts, a decision, a gap-crosswalk regeneration or a landscape verdict update, "
+        "After adding host receipts, a decision, a gap-crosswalk regeneration, later gap closeouts or a landscape verdict update, "
         "run `python3 scripts/component_matrix.py --write` and commit both files. "
         f"Convergence by layer also reads `{SATURATION_LEDGER_FILE}`, the newest "
         f"`{SWEEP_MANIFEST_DIR}/manifest-YYYYMMDD.json`, `{STACK_FILE}` and `{RECEIPT_ALIASES_FILE}`, so run "

@@ -51,6 +51,36 @@ the LEAN reference hash is
 `b31c282c90367c3baf87232772fc78a7bc36a8c64229faa2ef86a9068e88b25b`.
 Use a new run's actual receipt hash on another host. No raw prices are published.
 
+## Provider-neutral comparison entry point
+
+The supported [compare_providers.py](compare_providers.py) entry point uses the
+retained September 23 [comparison recipe](../../gap-wave2-20260923/us-equities__market-data-reference/compare_multi.py)
+without changing the hash-bound original `compare.py`. It accepts reference and
+provider adapters, multiple symbols, an inclusive session-date range and an
+optional expected-session count. A normalized CSV export from any provider uses
+`symbol,session_date,close` with exact decimal text; it requires no new provider
+adapter. The other retained adapters read a verified Alpaca run, an Alpaca
+Parquet export, the frozen LEAN probe or LEAN daily files.
+
+```sh
+python3 blueprints/us-equities/authenticated-data/compare_providers.py \
+  --reference "normalized-csv:$REFERENCE_EXPORT" \
+  --provider "normalized-csv:$PROVIDER_EXPORT" --symbols AAPL,IBM \
+  --start 2020-08-03 --end 2020-09-04 --expect-sessions 25
+```
+
+The retained [gap-5 receipt](../../../evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/5-parameterized-comparator.json)
+records the native-data AAPL reproduction and IBM/SPY comparisons. Those are
+September observations, not a fresh acquisition: their original private input
+paths are unavailable on this host. Fresh fixture tests exercise the promoted
+entry point, multiple symbols, date filtering, decimal differences and refused
+or absent references. Missing or empty dividend currency stays unqualified;
+Alpaca's [corporate-action schema](https://docs.alpaca.markets/us/reference/corporateactions-1)
+allows an empty currency to mean USD, non-applicable **or unknown**, so a US
+listing alone cannot resolve that ambiguity. Comparisons do not establish data
+rights, original historical availability, provider superiority or a strategy
+result.
+
 The full local SDK suite passed **292 tests with no skips**. Independent review
 reproduced the native comparison and checked all 14 retained artifact anchors and
 four installed SDK source hashes. Repository/catalog checks and the redacted

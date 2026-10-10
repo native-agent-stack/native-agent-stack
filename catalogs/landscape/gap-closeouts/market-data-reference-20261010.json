@@ -1,0 +1,41 @@
+{
+  "crosswalk_sha256": "bb354c43a6d318c26eaeb889baa30b8006c23a0f3de2e6dfc123d999ad1726b8",
+  "owner": "catalyst-watch",
+  "receipts": [
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/receipts/gap-01.json",
+      "sha256": "658b97bf4ee27ef70601d0594e211a8de24da8ea4f25bb3e7854125f198b8b5b"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/receipts/gap-04.json",
+      "sha256": "fbc94b77f2cd9f4a4aae427c0cd84c92facbe218edfbb9c004437db9c03cb633"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/receipts/gap-05.json",
+      "sha256": "f9ba68054302d2c2ee15825320728ee14ddf0264fe91f247fa2369b68fa06367"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/receipts/gap-07.json",
+      "sha256": "108d79c046834bdc9ab073b7463ff7745f4daabd8bb902c0ee76956bb53be987"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/receipts/gap-08.json",
+      "sha256": "bd8eb25cb9adcbd3cbe940ce14e33e525ea47db0a0711e11bd9d4804a1f00d31"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/receipts/gap-12.json",
+      "sha256": "be678d6baf528e269789d84b8f27b5309930dc68ddea033f606f38f04b9da294"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/receipts/gap-17.json",
+      "sha256": "4701d397cda0f8510e92b7a8f262300a2a01658ae50dcddd3e4fc19064c1fa7c"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/receipts/gap-18.json",
+      "sha256": "86ef91bf9a615473167e1de25d5698d9713e591a42faede2ff238c6b5f662625"
+    }
+  ],
+  "schema_version": 1,
+  "scope": "Eight assigned market-data-reference gaps; only four settled receipts reduce counts. Partial residuals stay open.",
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f"
+}

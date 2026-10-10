@@ -1,0 +1,7 @@
+Command: python3 scripts/validate.py
+Observed exit: 1
+Publication validation failed:
+evidence/receipts/market-data-reference-gap-burndown-20261010.json: unsupported schema_version
+
+The authoring receipt lacked schema_version. The generator now emits schema_version=1.
+This failed validation is retained; it is not a passing evidence or native acceptance run.
