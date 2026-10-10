@@ -1317,7 +1317,15 @@ RECORD = TOOL.parents[1] / "docs" / "decisions" / "2026-10-09-claude-review-work
 # The sections of the record that carry the owner's or the command center's direction. The records rule: that direction
 # is paraphrased, dated and attributed, never quoted. Upstream documentation may be quoted elsewhere in the record.
 DIRECTION_SECTIONS = ("## Upstream alignment in every trading review", "## Command center decisions on #953")
-# A quotation may be wrapped across lines, but not across a blank line (a paragraph break ends any span).
+# A quotation may be wrapped across lines, but not across a blank line (a paragraph break ends any span). The Python
+# behaviour this rests on, as documented for 3.13 (the interpreter the tests ran on, 3.13.16), read 2026-10-10:
+# - [^...] matches every character not in the set, a newline included, so [^"\n] stops at a line break and the second
+#   branch takes a newline only when the negative lookahead (?!...) finds no blank line after it:
+#   https://docs.python.org/3.13/library/re.html#regular-expression-syntax ("complementing the set"; "(?!...)").
+# - With re.MULTILINE, ^ matches at the beginning of each line, so BLOCK sees each > line:
+#   https://docs.python.org/3.13/library/re.html#re.MULTILINE
+# - str.split() with no separator treats runs of whitespace, newlines included, as one separator, which collapses a
+#   wrapped span before its words are counted: https://docs.python.org/3.13/library/stdtypes.html#str.split
 SPAN = r'(?:[^{close}\n]|\n(?![ \t]*\n))+'
 QUOTED = re.compile('"(' + SPAN.format(close='"') + ')"|\u201c(' + SPAN.format(close='\u201d') + ')\u201d', re.S)
 BLOCK = re.compile(r"(?:^[ \t]*>[^\n]*(?:\n|$))+", re.M)  # consecutive > lines: one block quotation

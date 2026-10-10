@@ -601,9 +601,15 @@ The GPT read of #953 at d784fe0e asked for changes with four P2 findings, fixed 
 - **The records correction had no regression test.** `RecordRuleTest` fails when a quotation of eight or more words,
   straight, curly or block-quoted, comes back into the sections that carry the owner's or the command center's
   direction, using synthetic text. A quotation wrapped across lines counts (whitespace collapsed, consecutive `>`
-  lines joined), and a blank line ends a span. Its detector finds one 25-word span in the 4b8027b8 form of the
-  section and none in the current form. Put back into a scratch copy, that prior form fails the test on the
-  detector's assertion (script `readers/crw-mutants-20261010/prior_record_check.py`, run 2026-10-10 12:58Z). The
+  lines joined), and a blank line ends a span. The matching rests on documented Python 3.13 behaviour (the tests ran
+  on 3.13.16; read 2026-10-10): a complemented set `[^…]` matches a newline unless the set names it, and `(?!…)` is a
+  negative lookahead (<https://docs.python.org/3.13/library/re.html#regular-expression-syntax>); with
+  `re.MULTILINE`, `^` matches at the start of each line (<https://docs.python.org/3.13/library/re.html#re.MULTILINE>);
+  `str.split()` with no separator treats runs of whitespace, newlines included, as one separator
+  (<https://docs.python.org/3.13/library/stdtypes.html#str.split>). Measured, not cited: the detector finds one
+  25-word span in the 4b8027b8 form of the section and none in the current form, and put back into a scratch copy,
+  that prior form fails the test on the detector's assertion (an external measurement by the coordinator, script
+  `readers/crw-mutants-20261010/prior_record_check.py`, run 2026-10-10 12:58Z). The
   first version of the detector, at 3d0bead8, stopped at a line break, so it found no span in that wrapped quotation:
   the prior form failed that version only on its other assertions (the command center's read at 3d0bead8 found
   this).
