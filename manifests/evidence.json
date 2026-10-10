@@ -5016,8 +5016,8 @@
     },
     {
       "path": ".github/actions-permissions.json",
-      "sha256": "49f9a1464b2648153eb14c5ef67c986b852d91b2419d02099475cf39b8b65a5c",
-      "bytes": 808
+      "sha256": "6136c77ffa84849ef0dc3d1a1267eef72b7e2921c05627e5f8b5ebd4eae3a74a",
+      "bytes": 750
     },
     {
       "path": ".github/actions/setup-host-name-scanner/action.yml",
@@ -18572,8 +18572,8 @@
     },
     {
       "path": "docs/decisions/2026-10-10-claude-federation-diagnostics.md",
-      "sha256": "0a04e1b45c967eed92d4060c6c98b9a42885fbc93b649bb7409036aa89b00a8d",
-      "bytes": 10746
+      "sha256": "a639381861c599000ff1d48608c1bb2ccd9866257dec19aef0c92c3530fea5a3",
+      "bytes": 10754
     },
     {
       "path": "docs/decisions/2026-10-10-codex-lane-omniroute.md",
@@ -18587,8 +18587,8 @@
     },
     {
       "path": "docs/decisions/2026-10-10-retire-in-github-claude-review.md",
-      "sha256": "7c7891c87e3d3e8b5616ea4c8d4295852bfeb937f6fa3634f91d1c85add9dbec",
-      "bytes": 5554
+      "sha256": "81d42f2675a525f168e5cc0e72d002347d3b190d5555836740ec2c70db2532cd",
+      "bytes": 6106
     },
     {
       "path": "docs/decisions/2026-10-10-retire-macos-ci.md",
@@ -18747,8 +18747,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "f97421f868c773a79f34152d0aba632d18060fa2dcfef11d898f458ccc694fac",
-      "bytes": 102811
+      "sha256": "5b12ec4c5b5323d1ff39987a710de18cab5e2c1beb916c5a6918e076a42643d1",
+      "bytes": 102555
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -61512,8 +61512,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "b40717ecd89db4618ecaa05aa47311f32ad0e1a51c48754f372254d463451dda",
-      "bytes": 134063
+      "sha256": "150e7fd9567f624fcde24081661aadefeba129beaccb81bc4511ee56b11cb9b7",
+      "bytes": 134803
     },
     {
       "path": "tests/test_workflow_policy.py",

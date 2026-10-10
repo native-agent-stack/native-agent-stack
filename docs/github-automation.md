@@ -29,7 +29,7 @@ The committed target [`.github/main-ruleset.json`](../.github/main-ruleset.json)
 The adoption macOS policy below follows the [2026-10-10 retirement decision](decisions/2026-10-10-retire-macos-ci.md).
 Other settings observations retain their stated dates.
 
-The Actions allow-list and harness description below were checked against live settings and pinned sources on 2026-10-08.
+The Actions allow-list below was checked against live settings and pinned sources on 2026-10-08.
 
 - **Required checks** (job IDs from GitHub Actions, app ID 15368; strict up-to-date checks off): `validate`,
   `token-report`, `secret-scan`, `dependency-review`, `osv-scanner`, `verdict-review-gate` and
@@ -59,10 +59,9 @@ The Actions allow-list and harness description below were checked against live s
   carries the osv-scanner, zizmor and Scorecard SARIF. Dependabot version updates cover GitHub Actions only (weekly,
   7-day cooldown), and Dependabot security updates are on.
 - **Actions.** Every `uses:` is pinned to a full commit SHA, which the repository also requires. The allow-list is
-  GitHub-owned actions plus the four external patterns `step-security/harden-runner@*`, `ossf/scorecard-action@*`,
-  `anthropics/claude-code-action@*` and `oven-sh/setup-bun@*`; verified-publisher actions are not separately allowed.
-  The pinned Claude action's composite bootstrap uses `oven-sh/setup-bun` when no custom Bun executable is supplied;
-  the repository has no direct workflow reference to it. Only the catalog-freshness `propose` job holds
+  GitHub-owned actions plus the two external patterns `step-security/harden-runner@*` and `ossf/scorecard-action@*`;
+  verified-publisher actions are not separately allowed. The Claude action's two patterns left with its workflows
+  (2026-10-10). Only the catalog-freshness `propose` job holds
   `pull-requests: write`, and no workflow reviews or approves a pull
   request (`test_pull_requests_write_is_granted_only_to_the_propose_job`,
   `test_no_workflow_reviews_or_approves_a_pull_request`).
@@ -76,8 +75,7 @@ The Actions allow-list and harness description below were checked against live s
   family made for these layers. The clean-room definitive round announced there decides one pick per slot.
   - git-github-automation: both families picked git, gh, Worktrunk and sem (the Claude pick keeps sem only if a
     structural-diff comparison shows a gain); one picked difftastic and claude-code-action. difftastic remains the
-    selection of record; decision M45 recorded claude-code-action as unadopted. The later configured harness above
-    still awaits hosted acceptance.
+    selection of record; decision M45 recorded claude-code-action as unadopted.
   - ci-supply-chain: both families picked attest, Syft, Dependabot, actionlint (kjanat) and zizmor, all in use;
     `github/codeql-action`, picked by one, is the `upload-sarif` step above.
   - secrets-credentials: both families picked betterleaks, and one picked trufflehog. gitleaks stays the required

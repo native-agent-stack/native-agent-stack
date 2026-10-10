@@ -217,12 +217,13 @@ class InGitHubClaudeReviewRetiredTests(unittest.TestCase):
             self.assertFalse((WORKFLOWS / name).exists(), name)
 
     def test_no_workflow_runs_the_claude_action_or_names_an_anthropic_key(self):
-        for path in sorted(WORKFLOWS.glob("*.yml")):
+        for path in sorted([*WORKFLOWS.glob("*.yml"), *WORKFLOWS.glob("*.yaml")]):
             text = path.read_text(encoding="utf-8")
             with self.subTest(workflow=path.name):
                 self.assertNotIn("anthropics/claude-code-action", text)
                 self.assertNotIn("ANTHROPIC_API_KEY", text.upper())
-                self.assertNotIn("environment: claude-review", text)
+                # The plain, the `name:` and the quoted forms of the environment (the command center's read).
+                self.assertNotRegex(text, r"environment:\s*(?:name:\s*)?[\"']?claude-review(?![\w-])")
 
 class ScorecardTests(unittest.TestCase):
     text = (WORKFLOWS / "scorecard.yml").read_text(encoding="utf-8")
@@ -2198,6 +2199,14 @@ class ActionsAllowListTests(unittest.TestCase):
                     continue
                 not_allowed.append(f"{path.name}:{line_number}: {target}")
         self.assertEqual(not_allowed, [])
+
+    def test_every_allowed_pattern_is_used_by_a_workflow(self):
+        # Least privilege: a pattern no workflow uses is removed (the Claude action's two left on 2026-10-10).
+        targets = [match.group(1) for path in sorted(WORKFLOWS.glob("*.yml"))
+                   for match in re.finditer(r"uses:\s*([^\s#]+)", path.read_text(encoding="utf-8"))]
+        for pattern in self.permissions["patterns_allowed"]:
+            with self.subTest(pattern=pattern):
+                self.assertTrue(any(fnmatch.fnmatch(target, pattern) for target in targets), pattern)
 
 
 if __name__ == "__main__":

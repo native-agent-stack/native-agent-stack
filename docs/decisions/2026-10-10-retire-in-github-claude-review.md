@@ -36,11 +36,11 @@ Before this change the command center disabled the three workflows (`disabled_ma
 
 ## What remains
 
-- **Local AI reads:** the local Claude review worker (`tools/claude-review-worker`, #953), the command center's and the
+- **Local AI reads:** the local Claude review worker (`tools/claude-review-worker`, #953, open), the command center's and the
   co-op's GPT reads, and trading-cc's toolkit reads, all run on the host with the stored keys through the credential
   runner.
 - **Codex's GitHub review**, which is not affected.
-- **GitHub's gates:** the required checks (`validate`, `sota-sources-gate`, `verdict-review-gate` in
+- **GitHub's gates:** the required checks (`validate`, `sota-sources`, `verdict-review-gate` in
   `pr-metadata.yml`, the supply-chain and security scans) and the landing scripts the command center is moving into
   the repository (`tools/landing`, #975).
 
@@ -60,6 +60,14 @@ Before this change the command center disabled the three workflows (`disabled_ma
 2. Re-set the `claude-review` environment secret from slot `anthropic-api-3` through `credential_run.py`, with the
    value on `gh secret set`'s standard input only (the procedure in `docs/secret-storage.md`).
 3. Re-enable the three workflows (`gh workflow enable`) and keep their repository variables set.
+4. Put the Claude action's two patterns back in `.github/actions-permissions.json` (`anthropics/claude-code-action@*`,
+   and `oven-sh/setup-bun@*`, which its composite bootstrap uses) and in the live selected-actions setting.
+
+## Actions allow-list
+
+`.github/actions-permissions.json` drops `anthropics/claude-code-action@*` and `oven-sh/setup-bun@*`: no workflow uses
+them now, and `test_every_allowed_pattern_is_used_by_a_workflow` keeps every remaining pattern in use. The command
+center applies the live selected-actions change after this lands.
 
 ## Alternatives considered
 
