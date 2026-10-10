@@ -5096,8 +5096,8 @@
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
-      "sha256": "98c3b78a9a729499c8ed9e7090eec32ac6b2af1cef583dd8fc6d02c6882e9bdb",
-      "bytes": 27093
+      "sha256": "f27e408e1eda6a71a0ac0502c117146fc099297904a4940a784469d0608e0aa2",
+      "bytes": 28580
     },
     {
       "path": ".github/workflows/dependency-review.yml",
@@ -18579,6 +18579,11 @@
       "path": "docs/decisions/2026-10-10-claude-federation-diagnostics.md",
       "sha256": "d4d68b887665a39c4ec1114faa3c648ee3b5d7b5b4e7d5475cc571f1a9d8a792",
       "bytes": 10756
+    },
+    {
+      "path": "docs/decisions/2026-10-10-codex-blind-audit-command-positions.md",
+      "sha256": "0685f40686abda0d9648d1c6e9147bf884701235553afd2cef7b15a167648179",
+      "bytes": 6193
     },
     {
       "path": "docs/decisions/2026-10-10-codex-lane-omniroute.md",
@@ -60061,6 +60066,11 @@
       "bytes": 495
     },
     {
+      "path": "tests/fixtures/codex_lane_blind_audit_quarantines.json",
+      "sha256": "5c5a6a23d54352d0f9e62a23e765fe84473f0bb61ec2be09bda347e7faa84dc2",
+      "bytes": 3302
+    },
+    {
       "path": "tests/fixtures/g5-merge-gdelt.json",
       "sha256": "6bfe600d1dae0c77350f7edcbef05f8cb1e3ae80f84183cd4af513d3f0542c24",
       "bytes": 3117
@@ -60587,8 +60597,8 @@
     },
     {
       "path": "tests/test_codex_lane.py",
-      "sha256": "2d07203ef7bc255098b667afa13d29407b1afecbf810aba07208b8423eee77eb",
-      "bytes": 120738
+      "sha256": "dd4fbad105aa5ad70b78d028eb456acb0d9115e2afd5e0ab8b1d4ae24778d21d",
+      "bytes": 133683
     },
     {
       "path": "tests/test_codex_quota.py",
@@ -61367,8 +61377,8 @@
     },
     {
       "path": "tests/test_shell_parser_ci.py",
-      "sha256": "abbe643e6d448ef7cd0e84e31548a708c198922a4736e612663b3737dbab7297",
-      "bytes": 43278
+      "sha256": "6ee9404a6437334f2b415ed38f1135e52cd9863bcb47d14df57692888eeebde7",
+      "bytes": 43320
     },
     {
       "path": "tests/test_sim_capacity.py",
@@ -61857,8 +61867,8 @@
     },
     {
       "path": "tools/sota-convergence/README.md",
-      "sha256": "7180cbcf0e13d0b52da62620c23fd9d3a558ae6eaf4d38e40f089fb603504077",
-      "bytes": 193238
+      "sha256": "693554627319717b90ed82d4cea969caf4aa39e25d6469c2e98e9d70433668af",
+      "bytes": 193243
     },
     {
       "path": "tools/sota-convergence/adjudicate.py",
@@ -61869,6 +61879,11 @@
       "path": "tools/sota-convergence/adjudication-prompt.md",
       "sha256": "f82b527d179cc60ed985d9266d74071f936e4fa73f29c680a3d3f7635516004e",
       "bytes": 5071
+    },
+    {
+      "path": "tools/sota-convergence/blind-command-analysis.mjs",
+      "sha256": "bcb1b9d483901259aee4cdafa3d779a2c2ee2feec71cb997257035b4549939dd",
+      "bytes": 15200
     },
     {
       "path": "tools/sota-convergence/blind_checkout.py",
@@ -61887,8 +61902,8 @@
     },
     {
       "path": "tools/sota-convergence/codex_lane.py",
-      "sha256": "3ed9524ca7523b30a1258a18a06b1c7c7cc6d5f9826c2c14edfbc91394148d7a",
-      "bytes": 86255
+      "sha256": "82280d901c54a6539822ad3c9ef0efda48e0edc79c8bdb00cba6e41fb316877c",
+      "bytes": 115319
     },
     {
       "path": "tools/sota-convergence/compact_manifest.py",
@@ -61899,6 +61914,11 @@
       "path": "tools/sota-convergence/evidence/adjudicate-omniroute-transport-binding-20261011.json",
       "sha256": "5211cf5d4d8462e5a6e9c00cd188f3952c923003283026d35c509f1cb98a67bb",
       "bytes": 4631
+    },
+    {
+      "path": "tools/sota-convergence/evidence/codex-blind-audit-command-positions-20261010.json",
+      "sha256": "e9faa708fdbc9a36a690988aabc545f809d3d735ca1a52fe14d0645632f4cab7",
+      "bytes": 7648
     },
     {
       "path": "tools/sota-convergence/evidence/codex-lane-omniroute-20261010.json",
@@ -62047,8 +62067,8 @@
     },
     {
       "path": "tools/sota-convergence/lane-provenance.json",
-      "sha256": "f097b8c982e613d59e80e7213ae55a500dd615302dcedb65eb5deae8546f13fa",
-      "bytes": 19787
+      "sha256": "ce40739989e5b3fab739aa94a9bad0b94e96e626fee8f776361438b6f1fb8066",
+      "bytes": 20810
     },
     {
       "path": "tools/sota-convergence/lane-return.schema.json",

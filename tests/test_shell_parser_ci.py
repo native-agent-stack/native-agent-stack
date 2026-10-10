@@ -8,11 +8,10 @@ that true. A GitHub Actions job (GITHUB_ACTIONS=true) fails when the loader does
 install, and the suite fails when the provisioning step is dropped, moved after the suite, retyped away from the pin,
 no longer exports the directory, or can be skipped.
 
-Every Actions job is held to that runtime tripwire except the recorded gap. The remaining serial suite without
-the parser is catalog-freshness.yml freshness. Its provisioning remains outside this unit's owned paths, so
-KNOWN_UNPROVISIONED records it and the tripwire skips there
-and says so. A job that is not listed fails closed, as does an Actions environment that names no job. A whole-suite
-job that neither provisions nor is listed there fails the suite, so the list can only shrink.
+Every remaining Actions job running this suite is held to the runtime tripwire. validate.yml and
+catalog-freshness.yml's freshness job provision the pinned parser before project tests.
+KNOWN_UNPROVISIONED is empty. A job without the pinned install fails closed, as does an Actions environment that
+names no job. The structure checks reject suite/shard jobs without provisioning and reject stale recorded gaps.
 
 Rules and their sources (read 2026-09-29):
 - GITHUB_ACTIONS is always "true" in Actions, GITHUB_JOB is the job id and GITHUB_WORKFLOW_REF is
@@ -55,14 +54,15 @@ HANDBOOK = ROOT / "docs/token-session-handbook.md"
 PIN_PATH = "examples/claude-native/workflows/shell-parser.pin.json"
 KERNEL = ROOT / "examples/claude-native/workflows/child-usage.mjs"
 ENV_NAME = "CHILD_USAGE_SHELL_PARSER"
-# The one job that provisions the parser today, and so the one job whose provisioning step this module inspects.
+# Required reference job; its provisioning step supplies the mutation fixtures. Every other provisioning job is
+# inspected too (provisioning_targets).
 PROVISIONING_WORKFLOW = "validate.yml"
 PROVISIONING_JOB = "validate"
 PROVISIONING_KEY = f"{PROVISIONING_WORKFLOW}:{PROVISIONING_JOB}"
-# The remaining serial suite without this parser is catalog-freshness.yml:freshness.
-# Adding its provisioning step and deleting this entry closes the recorded gap;
-# the ratchet rejects stale exemptions.
-KNOWN_UNPROVISIONED = {"catalog-freshness.yml:freshness"}
+# Suite/shard jobs without parser provisioning; none remain after catalog-freshness.yml
+# adopted the pinned install. To close a recorded gap, provision its job and delete its entry here: until deletion
+# the ratchet reports the entry as stale; afterward the runtime tripwire and structure checks hold that job too.
+KNOWN_UNPROVISIONED = set()
 # The read-only check the handbook gives a host, run from the repository root.
 CHECK_PREFIX = "node --input-type=module -e "
 TRIPWIRE = "tests.test_shell_parser_ci.ShellParserInstalledInCI"
@@ -613,15 +613,16 @@ class RealRatchetControls(unittest.TestCase):
         self.assertEqual([category for category, _ in ratchet_problems({**self.texts, name: added})], ["unlisted"])
 
     def test_provisioning_a_recorded_gap_job_is_cleared_by_deleting_its_entry(self):
-        self.assertTrue(KNOWN_UNPROVISIONED, "no recorded gap is left to provision")
-        for key in sorted(KNOWN_UNPROVISIONED):
-            name, _, job = key.partition(":")
-            with self.subTest(key):
-                mutant = {**self.texts, name: with_step(self.texts[name], job, self.step)}
-                self.assertEqual([category for category, _ in ratchet_problems(mutant)], ["stale"])
-                self.assertEqual(ratchet_problems(mutant, KNOWN_UNPROVISIONED - {key}), [])
-                self.assertEqual(provisioning_problems(mutant[name], job), [], "the transplanted step is judged like validate.yml's")
-                self.assertTrue(key in provisioning_targets(mutant), "the structure checks do not inspect the newly provisioned job")
+        name, job = "recorded-gap-fixture.yml", "fixture-suite"
+        key = f"{name}:{job}"
+        texts = {**self.texts, name: synthetic_workflow(**{job: SUITE_STEP})}
+        gaps = KNOWN_UNPROVISIONED | {key}
+        self.assertEqual(ratchet_problems(texts, gaps), [])
+        mutant = {**texts, name: with_step(texts[name], job, self.step)}
+        self.assertEqual([category for category, _ in ratchet_problems(mutant, gaps)], ["stale"])
+        self.assertEqual(ratchet_problems(mutant, gaps - {key}), [])
+        self.assertEqual(provisioning_problems(mutant[name], job), [], "the transplanted step is judged like validate.yml's")
+        self.assertTrue(key in provisioning_targets(mutant), "the structure checks do not inspect the newly provisioned job")
 
     def test_a_step_that_only_names_the_pin_file_is_judged_by_the_structure_checks(self):
         fake = ["      - name: Pretend to provision", f"        run: echo {PIN_PATH}"]

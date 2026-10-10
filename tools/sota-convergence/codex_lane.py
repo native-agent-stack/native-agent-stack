@@ -43,12 +43,13 @@ fields the contract assigns to it.
 
 ``--dry-run`` prints the exact command it would run for every pending layer,
 one per line, and writes nothing -- no directories, no events, no usage rows,
-no output files. Stdlib only; this script is a subprocess/text pipeline, not
-a landscape-schema validator, so it does not import scripts/landscape.py.
+no output files. The Python runner uses the standard library; its host-side command audit uses the existing
+verified Node/tree-sitter Bash parser. It is not a landscape-schema validator and does not import scripts/landscape.py.
 """
 from __future__ import annotations
 
 import argparse
+import ast
 import contextlib
 import hashlib
 import errno
@@ -349,6 +350,16 @@ ISOLATION_ARGS = ("--ignore-user-config", "-c", "features.hooks=false", "-c", "f
                   "-c", 'web_search="disabled"', "-c", 'cli_auth_credentials_store="file"')
 
 AUDIT_NAME = "blind-audit.json"
+# Bind the existing verified Bash parser and its thin adapter into this runner's digest.
+# Codex@092d3acd exec_events.rs:159-166 records a command display, not syscall paths.
+AUDIT_ADAPTER = HERE / "blind-command-analysis.mjs"
+AUDIT_DEPENDENCIES = {
+    AUDIT_ADAPTER: "bcb1b9d483901259aee4cdafa3d779a2c2ee2feec71cb997257035b4549939dd",
+    HERE.parents[1] / "examples/claude-native/workflows/child-usage.mjs":
+        "3e5189342734135e88a2295c1c2152275d9e26c0c7731ed5cbc8905bbccd98a4",
+    HERE.parents[1] / "examples/claude-native/workflows/shell-parser.pin.json":
+        "961f4555c9067f17ae5fc2666d20ee797fbd2cd7abcbff80aa4963e912bf64d0",
+}
 # CLIs that reach memory stores, code indexes or session history, and the agent CLIs (a nested ``codex exec`` would
 # find the linked credential and run without the isolation flags). A blind child's PATH resolves none of them
 # (BLIND_CHILD_PATH; blind_path_issue refuses a host where one would), so its audit no longer looks for their names:
@@ -356,7 +367,7 @@ AUDIT_NAME = "blind-audit.json"
 # of candidate ids voided 11 of 32 layers with no read outside the export. A non-blind run keeps looking for them.
 BLIND_UNRESOLVABLE = ("ai-memory", "agentsview", "mcporter", "qmd", "socraticode", "jcodemunch", "serena", "codex",
                       "claude")
-# System tools a blind child's PATH keeps (git history, a database, the network): a command naming one is flagged.
+# System tools a blind child's PATH keeps (git history, a database, the network): executing one is flagged.
 AUDIT_TOOLS = ("git", "sqlite3", "curl", "wget")
 # A blind child's PATH: the system executable directories only. The caller's PATH carried the retrieval CLIs
 # (~/.local/share/codex-ecosystem/bin on this WSL host); codex itself is launched by the absolute path the caller's
@@ -384,9 +395,8 @@ CODEX_HOME_REFERENCE = re.compile(r"\$\{?CODEX_HOME\b[^\s'\"]*")
 # round 7, ISO-R7-9). The bare word in a search (``rg -n CODEX_HOME docs``) is not one (round 8, REG8-3).
 ENVIRONMENT_READ = re.compile(r"(?:^|[\s;&|(`'\"])(printenv|env|export\s+-p|declare\s+-p)(?=$|[\s;&|)`'\"])")
 COMMAND_SUBSTITUTION = re.compile(r"\$\(|`")
-# All of these match the raw command text (round 8, REG8-1): a stricter reading of which spans bash expands let
-# double-quoted apostrophes, escaped quotes, heredocs and nested shells hide reads. A literal backtick in a
-# single-quoted search pattern is voided too (REG7-3, a known low: a benign void is cheaper than a missed read).
+# Match only expansion spans supplied by the Bash grammar. Quoted literal data and quoted heredoc bodies
+# are not shell expansion; nested shell code is parsed separately.
 PARAMETER_EXPANSION = re.compile(r"\$\{(?:![^}]*|[^}]*[%#:/^,@*?\[][^}]*)\}")
 # A ``cd`` that leaves the working directory for somewhere the command does not name: bare ``cd`` (home),
 # ``cd -``, ``cd ~`` and ``cd $OLDPWD`` / ``cd "${OLDPWD}"`` (the previous directory), or any other bare variable.
@@ -479,19 +489,605 @@ def unnamed_cd_targets(command: str) -> list:
     return found
 
 
+class AuditAnalysisUnavailable(ValueError):
+    """An audit dependency cannot establish command structure; never a clean audit."""
+
+
+def command_analyses(commands: list[str]) -> list[dict]:
+    """Parse recorded command displays with the repository's pinned Bash grammar; execute no payload."""
+    for path, expected in AUDIT_DEPENDENCIES.items():
+        if not path.is_file() or sha256_file(path) != expected:
+            raise AuditAnalysisUnavailable(f"blind audit dependency missing or digest mismatch: {path.name}")
+    node = shutil.which("node")
+    if node is None:
+        raise AuditAnalysisUnavailable("blind audit needs Node and the pinned shell parser")
+    try:
+        result = subprocess.run([node, str(AUDIT_ADAPTER)], input=json.dumps(commands),
+                                capture_output=True, text=True, timeout=30)
+        data = json.loads(result.stdout)
+    except (OSError, ValueError, subprocess.TimeoutExpired) as error:
+        raise AuditAnalysisUnavailable("blind audit command parser unavailable") from error
+    if result.returncode or not isinstance(data, list) or len(data) != len(commands) or \
+            any(not isinstance(item, dict) for item in data):
+        raise AuditAnalysisUnavailable("blind audit pinned shell parser unavailable or invalid")
+    return data
+
+
+def audit_analysis_issue() -> str | None:
+    """Setup refusal before a pending real run spends a model turn; previews still write nothing."""
+    try:
+        command_analyses([])
+    except AuditAnalysisUnavailable as error:
+        return str(error)
+    return None
+
+
+def operand_reasons(value: str, allowed_roots) -> list[str]:
+    """Apply the existing boundary policy to a read operand, rather than unrelated command data."""
+    text = "operand " + repr(value)
+    reasons = [f"path outside the repository and packets: {p}" for p in outside_paths(text, allowed_roots)]
+    if names_root(text):
+        reasons.append("names the filesystem root /")
+    reasons += [f"home-relative path: {p}" for p in HOME_PATH.findall(text)]
+    reasons += [f"variable path: {p}" for p in VARIABLE_PATH.findall(text)]
+    reasons += [f"path climbs out of the working directory: {p}" for p in PARENT_PATH.findall(text)]
+    return reasons
+
+
+def search_operands(program: str, words: list[str]) -> tuple[list[str], list[str]]:
+    """Separate search/filter data from files, including pattern files and jq variable files.
+
+    An unrecognized option is refused instead of guessing which later word is data. In particular -f never
+    consumes a file silently as the positional pattern. Shell expansions are handled before this function.
+    """
+    files, reasons = [], []
+    pattern_given = "--files" in words
+    positional, index = False, 0
+    file_options = {"-f", "--file", "--from-file", "--ignore-file", "--exclude-from"}
+    pattern_options = {"-e", "--regexp"} if program != "jq" else set()
+    data_options = {"-g", "--glob", "--iglob", "--include", "--exclude", "--exclude-dir", "-t", "--type",
+                    "-T", "--type-not", "--type-add", "--type-clear", "--encoding", "-E", "--engine",
+                    "--color", "--colors", "--sort", "--sortr", "--path-separator", "--field-context-separator",
+                    "--field-match-separator", "-r", "--replace", "-A", "--after-context", "-B",
+                    "--before-context", "-C", "--context", "-m", "--max-count", "-M", "--max-columns",
+                    "-j", "--threads", "--maxdepth", "--max-filesize", "--dfa-size-limit", "--regex-size-limit",
+                    "--context-separator", "--label", "--binary-files", "--directories", "--devices",
+                    "--tab", "--indent"}
+    if program != "rg":
+        # The same short spelling can mean a flag in grep/jq and take a value in rg.
+        data_options -= {"-E", "-r", "-j", "-M", "-t", "-T", "-g"}
+    if program == "jq":
+        data_options = {"--indent"}
+        file_options.add("-L")
+    flags = {"--files", "--hidden", "--no-ignore", "--no-ignore-vcs", "--no-ignore-parent", "--no-ignore-global",
+             "--no-ignore-dot", "--no-messages", "--no-heading", "--heading", "--line-number", "--no-line-number",
+             "--column", "--with-filename", "--no-filename", "--files-with-matches", "--files-without-match",
+             "--fixed-strings", "--ignore-case", "--smart-case", "--invert-match", "--word-regexp", "--line-regexp",
+             "--only-matching", "--count", "--count-matches", "--quiet", "--null", "--null-data", "--text",
+             "--multiline", "--multiline-dotall", "--pcre2", "--pcre2-unicode", "--crlf", "--json", "--stats",
+             "--follow", "--no-follow", "--help", "--version", "--extended-regexp", "--basic-regexp",
+             "--recursive", "--dereference-recursive", "--raw-input", "--raw-output", "--join-output", "--compact-output",
+             "--slurp", "--null-input", "--sort-keys", "--monochrome-output", "--color-output", "--exit-status"}
+    short_flags = "inlLHhvwxcqoszZaPUuNFSErR" if program != "jq" else "rRscnjSMCe"
+    while index < len(words):
+        word = words[index]
+        index += 1
+        if word == "--" and not positional:
+            positional = True
+            continue
+        if not positional and word.startswith("-") and word != "-":
+            option, separator, attached = word.partition("=")
+            if word.startswith(("-f", "-e")) and not word.startswith("--") and len(word) > 2:
+                option, separator, attached = word[:2], "=", word[2:]
+            if option in file_options | pattern_options | data_options:
+                if not separator:
+                    if index == len(words):
+                        reasons.append("unresolved search/filter option operand: " + option)
+                        continue
+                    attached = words[index]
+                    index += 1
+                if option in file_options:
+                    files.append(attached)
+                if option in file_options & {"-f", "--file", "--from-file"} or option in pattern_options:
+                    pattern_given = True
+                continue
+            if program == "jq" and option in {"--arg", "--argjson", "--rawfile", "--slurpfile"}:
+                if separator or index + 1 >= len(words):
+                    reasons.append("unresolved jq variable option: " + option)
+                    continue
+                if option in {"--rawfile", "--slurpfile"}:
+                    files.append(words[index + 1])
+                index += 2
+                continue
+            if word in flags or re.fullmatch(r"-[" + short_flags + r"]+", word) or \
+                    re.fullmatch(r"-(?:[ABCmjM]|[0-9])[0-9]+", word):
+                continue
+            reasons.append("unresolved search/filter option: " + word)
+            files.append(word)
+            continue
+        if pattern_given:
+            files.append(word)
+        else:
+            pattern_given = True
+    return files, reasons
+
+
+def argv_reasons(argv: list[str], allowed_roots, tools, *, forwarding=False) -> list[str]:
+    """Executable position is distinct from pattern/filter arguments; inspect file operands separately."""
+    if not argv or any(not isinstance(word, str) for word in argv):
+        return ["unresolved executable or argument"]
+    program = os.path.basename(argv[0])
+    reasons = [f"runs {program}"] if program in tools else []
+    if argv[0].startswith("/"):
+        if not argv[0].startswith(SYSTEM_EXECUTABLE_PREFIXES):
+            reasons += operand_reasons(argv[0], allowed_roots)
+        if program in AUDIT_TOOLS + BLIND_UNRESOLVABLE and program not in tools:
+            reasons.append(f"runs {program} by path: {argv[0]}")
+    if program == "printenv" or program == "env" and not forwarding or \
+            program in ("export", "declare") and "-p" in argv[1:]:
+        reasons.append(f"reads the environment: {program}")
+    if program == "cd" and (len(argv) == 1 or UNNAMED_CD_TARGETS.fullmatch(argv[1])):
+        reasons.append(f"cd leaves for an unnamed directory: cd {argv[1] if len(argv) > 1 else '(home)'}")
+    operands = argv[1:]
+    if program in ("echo", "printf", "true", "false"):
+        operands = []
+    elif program in ("rg", "grep", "egrep", "fgrep", "jq"):
+        operands, option_reasons = search_operands(program, operands)
+        reasons += option_reasons
+    for word in operands:
+        reasons += operand_reasons(word, allowed_roots)
+    return reasons
+
+
+def python_audit(source: str, allowed_roots, tools, depth=0) -> list[str]:
+    """Statically identify Python read operands and subprocess argv with ast; never eval/exec code.
+
+    Literal data (including '/'.join for JSON locations) is not a filesystem read. Dynamic/unresolved read
+    operands and execution stay refused. This is command analysis, not syscall or branch attestation.
+    """
+    if depth > 8 or len(source) > 250_000:
+        return ["Python audit nesting or source limit"]
+    try:
+        tree = ast.parse(source)
+    except (SyntaxError, ValueError, RecursionError):
+        return ["unresolved Python interpreter source"]
+    nodes = list(ast.walk(tree))
+    if len(nodes) > 50_000:
+        return ["Python audit node limit"]
+    reasons = []
+    read_keywords = {"open": "file", "io.open": "file", "builtins.open": "file", "os.open": "path",
+                     "os.listdir": "path", "os.scandir": "path", "os.walk": "top", "os.stat": "path",
+                     "os.lstat": "path", "os.readlink": "path", "os.chdir": "path", "glob.glob": "pathname",
+                     "glob.iglob": "pathname", "urllib.request.urlopen": "url", "os.path.samefile": "f1"}
+    path_methods = {"read_text", "read_bytes", "open", "iterdir", "glob", "rglob", "stat", "lstat",
+                    "is_file", "is_dir", "exists", "is_symlink", "readlink", "samefile"}
+    execution = {"subprocess.run", "subprocess.Popen", "subprocess.call", "subprocess.check_call",
+                 "subprocess.check_output", "subprocess.getoutput", "subprocess.getstatusoutput", "os.system", "os.popen"}
+    dynamic = {"eval", "exec", "__import__", "compile", "globals", "locals"}
+    constructors = {"Path", "pathlib.Path", "PurePath", "pathlib.PurePath", "pathlib.PosixPath", "pathlib.PurePosixPath"}
+    read_keywords.update({constructor + '.' + method: "self" for constructor in constructors for method in ("owner", "group")})
+    known = set(read_keywords) | execution | dynamic | constructors | {"getattr", "os.getenv", "os.environ.get"}
+
+    # Bindings are lexical and conservative across branches: every possible assignment must resolve.
+    scopes, parent_scope, bindings, namespace_writes = {}, {id(tree): None}, {}, []
+    stack = [(tree, id(tree))]
+    while stack:
+        node, scope = stack.pop()
+        scopes[id(node)] = scope
+        child_scope = scope
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef, ast.Lambda)):
+            if not isinstance(node, ast.Lambda):
+                bindings.setdefault((scope, node.name), []).append(node)
+            child_scope = id(node)
+            parent_scope[child_scope] = scope
+            if hasattr(node, "args"):
+                parameters = [*node.args.posonlyargs, *node.args.args, *node.args.kwonlyargs]
+                parameters += [arg for arg in (node.args.vararg, node.args.kwarg) if arg]
+                for arg in parameters:
+                    bindings[(child_scope, arg.arg)] = [None]
+        stack.extend((child, child_scope) for child in ast.iter_child_nodes(node))
+
+    def bind(target, value, scope):
+        if isinstance(target, ast.Name):
+            bindings.setdefault((scope, target.id), []).append(value)
+        elif isinstance(target, (ast.List, ast.Tuple)):
+            parts = value.elts if isinstance(value, (ast.List, ast.Tuple)) and len(value.elts) == len(target.elts) else [None] * len(target.elts)
+            for element, part in zip(target.elts, parts):
+                bind(element, part, scope)
+        elif isinstance(target, (ast.Attribute, ast.Subscript)):
+            namespace_writes.append(value)
+
+    for node in nodes:
+        scope = scopes[id(node)]
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                bind(ast.Name(id=alias.asname or alias.name.split('.')[0]),
+                     alias.name if alias.asname else alias.name.split('.')[0], scope)
+        elif isinstance(node, ast.ImportFrom) and node.module:
+            for alias in node.names:
+                if alias.name == "*":
+                    reasons.append("unresolved Python imported namespace")
+                else:
+                    bind(ast.Name(id=alias.asname or alias.name), node.module + '.' + alias.name, scope)
+        elif isinstance(node, ast.Assign):
+            for target in node.targets:
+                bind(target, node.value, scope)
+        elif isinstance(node, (ast.AnnAssign, ast.NamedExpr)):
+            bind(node.target, node.value, scope)
+        elif isinstance(node, ast.AugAssign):
+            bind(node.target, None, scope)
+        elif isinstance(node, (ast.For, ast.AsyncFor)):
+            if isinstance(node.iter, (ast.List, ast.Tuple)):
+                for element in node.iter.elts:
+                    bind(node.target, element, scope)
+            else:
+                bind(node.target, None, scope)
+        elif isinstance(node, (ast.Global, ast.Nonlocal)):
+            reasons.append("unresolved Python namespace rebinding")
+
+    def lookup(node):
+        scope = scopes.get(id(node), id(tree))
+        while scope is not None:
+            key = (scope, node.id)
+            if key in bindings:
+                return bindings[key]
+            scope = parent_scope[scope]
+        return None
+
+    memo, active, path_receivers, path_receiver_active = {}, set(), {}, set()
+    budget = {"work": 20_000, "characters": 1_000_000}
+
+    def limited():
+        if "Python static resolution limit" not in reasons:
+            reasons.append("Python static resolution limit")
+        return None
+
+    def resolve(node, domain, level):
+        if node is None:
+            return None
+        key = (domain, id(node))
+        if key in memo:
+            return memo[key]
+        if level > 64 or budget["work"] <= 0:
+            return limited()
+        if key in active:
+            return None
+        budget["work"] -= 1
+        active.add(key)
+        try:
+            result = string_values(node, level + 1) if domain == "strings" else callable_values(node, level + 1)
+            if result is not None:
+                if len(result) > 64:
+                    result = limited()
+                elif domain == "strings":
+                    size = sum(len(value) for value in result)
+                    if any(len(value) > 16_384 for value in result) or size > budget["characters"]:
+                        result = limited()
+                    else:
+                        budget["characters"] -= size
+            memo[key] = result
+            return result
+        finally:
+            active.remove(key)
+
+    def strings(node, level=0):
+        return resolve(node, "strings", level)
+
+    def callables(node, level=0):
+        return resolve(node, "callables", level)
+
+    def labels(node, level=0):
+        values = callables(node, level)
+        return {label for kind, label, _ in values if kind == "named"} if values is not None else set()
+
+    def attributes(receiver, attribute, level):
+        prefixes = labels(receiver, level)
+        named = {prefix + '.' + attribute for prefix in prefixes}
+        if named & known or named & {"os.environ", "os.getcwd"}:
+            return {("named", value, None) for value in named}
+        if attribute in path_methods:
+            return {("path", attribute, receiver)}
+        if attribute in {"owner", "group"} and path_receiver(receiver, level):
+            return {("path", attribute, receiver)}
+        if attribute != "get" and attribute in {value.rsplit('.', 1)[-1] for value in known}:
+            return None
+        return {("named", value, None) for value in named} if named else {("named", attribute, None)}
+
+    def path_receiver(node, level):
+        key = id(node)
+        if key in path_receivers:
+            return path_receivers[key]
+        if level > 64 or budget["work"] <= 0:
+            limited()
+            return False
+        if key in path_receiver_active:
+            reasons.append("unresolved Python path receiver")
+            return False
+        budget["work"] -= 1
+        path_receiver_active.add(key)
+        try:
+            value = False
+            if isinstance(node, ast.Name):
+                values = lookup(node)
+                value = bool(values) and all(isinstance(item, ast.AST) and path_receiver(item, level + 1) for item in values)
+            elif isinstance(node, ast.Attribute) and node.attr == "parent":
+                value = path_receiver(node.value, level + 1)
+            elif isinstance(node, ast.BinOp) and isinstance(node.op, ast.Div):
+                value = path_receiver(node.left, level + 1)
+            elif isinstance(node, ast.Call):
+                value = bool(labels(node.func, level) & (constructors | {"Path.cwd", "pathlib.Path.cwd"})) or (
+                    isinstance(node.func, ast.Attribute) and node.func.attr in {"resolve", "absolute", "joinpath"}
+                    and path_receiver(node.func.value, level + 1))
+            path_receivers[key] = value
+            return value
+        finally:
+            path_receiver_active.remove(key)
+
+    def callable_values(node, level):
+        if isinstance(node, ast.Name):
+            assigned = lookup(node)
+            if assigned is None:
+                return {("named", node.id, None)}
+            result = set()
+            for value in assigned:
+                part = {("named", value, None)} if isinstance(value, str) else callables(value, level)
+                if part is None:
+                    return None
+                result.update(part)
+            return result
+        if isinstance(node, ast.Attribute):
+            return attributes(node.value, node.attr, level)
+        if isinstance(node, ast.Call) and labels(node.func, level) == {"getattr"}:
+            if len(node.args) != 2 or node.keywords:
+                return None
+            names = strings(node.args[1], level)
+            if names is None or len(names) != 1:
+                return None
+            return attributes(node.args[0], next(iter(names)), level)
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            return {("local", node.name, None)}
+        return None
+
+    def combine(left, right, join):
+        if left is None or right is None:
+            return None
+        if len(left) * len(right) > 64:
+            return limited()
+        if any(len(a) + len(b) > 16_384 for a in left for b in right):
+            return limited()
+        return {join(a, b) for a in left for b in right}
+
+    def string_values(node, level):
+        if isinstance(node, ast.Constant) and isinstance(node.value, str):
+            return {node.value}
+        if isinstance(node, ast.Name):
+            assigned = lookup(node)
+            if assigned is None:
+                return None
+            result = set()
+            for value in assigned:
+                part = strings(value, level) if isinstance(value, ast.AST) else None
+                if part is None:
+                    return None
+                result.update(part)
+                if len(result) > 64:
+                    return limited()
+            return result
+        if isinstance(node, ast.BinOp) and isinstance(node.op, (ast.Add, ast.Div)):
+            return combine(strings(node.left, level), strings(node.right, level),
+                           (lambda a, b: a + b) if isinstance(node.op, ast.Add) else os.path.join)
+        if isinstance(node, ast.Attribute) and node.attr == "parent":
+            base = strings(node.value, level)
+            return {os.path.dirname(value.rstrip('/')) or ("/" if value.startswith('/') else ".") for value in base} if base is not None else None
+        if isinstance(node, ast.Call):
+            called = labels(node.func, level)
+            if called and called <= constructors | {"os.path.join"}:
+                if node.keywords:
+                    return None
+                result = {"."} if not node.args else {""}
+                for argument in node.args:
+                    result = combine(result, strings(argument, level), os.path.join)
+                return result
+            if called & {"Path.cwd", "pathlib.Path.cwd", "os.getcwd"}:
+                return {str(allowed_roots[0])} if allowed_roots and not node.args and not node.keywords else None
+            if isinstance(node.func, ast.Attribute):
+                method = node.func.attr
+                if method in ("resolve", "absolute"):
+                    return strings(node.func.value, level)
+                if method == "joinpath":
+                    result = strings(node.func.value, level)
+                    for argument in node.args:
+                        result = combine(result, strings(argument, level), os.path.join)
+                    return result if not node.keywords else None
+                if method in ("rstrip", "lstrip", "strip"):
+                    base = strings(node.func.value, level)
+                    chars = strings(node.args[0], level) if node.args else {None}
+                    if base is not None and chars is not None and len(base) * len(chars) <= 64:
+                        return {getattr(value, method)(char) for value in base for char in chars}
+        return None
+
+    def argument(node, position, keywords):
+        if len(node.args) > position:
+            return node.args[position]
+        return next((keyword.value for keyword in node.keywords if keyword.arg in keywords), None)
+
+    def read_operand(operand, default=None, network=False):
+        if operand is None and default is not None:
+            resolved = {default}
+        else:
+            resolved = strings(operand)
+        if resolved is None:
+            expression = ast.get_source_segment(source, operand) if operand is not None else None
+            if expression:
+                reasons.extend(operand_reasons(expression, allowed_roots))
+            reasons.append("unresolved Python read operand")
+            return
+        for value in resolved:
+            original = value
+            try:
+                parsed = urlsplit(value)
+            except ValueError:
+                reasons.append("unresolved Python read URL")
+                continue
+            if parsed.scheme and local_scheme(parsed.scheme):
+                value = parsed.path or "/"
+            elif parsed.scheme and network:
+                reasons.append("Python network read")
+            path_reasons = operand_reasons(value, allowed_roots)
+            reasons.extend(path_reasons)
+            if path_reasons:
+                if value != original:
+                    reasons.extend(operand_reasons(original, allowed_roots))
+                if os.path.isabs(value) and operand is not None:
+                    expression = ast.get_source_segment(source, operand) or ""
+                    if names_root(expression):
+                        reasons.append("names the filesystem root /")
+
+    def sequence(node):
+        if isinstance(node, (ast.List, ast.Tuple)):
+            return node.elts
+        if isinstance(node, ast.Name):
+            assigned = lookup(node)
+            if assigned is not None and len(assigned) == 1 and isinstance(assigned[0], (ast.List, ast.Tuple)):
+                return assigned[0].elts
+        return None
+
+    def analyze_execution(node, called):
+        operand = argument(node, 0, {"args", "command", "cmd"})
+        elements = sequence(operand)
+        shell_keyword = next((keyword.value for keyword in node.keywords if keyword.arg == "shell"), None)
+        shell = called in {"os.system", "os.popen", "subprocess.getoutput", "subprocess.getstatusoutput"}
+        if shell_keyword is not None:
+            if not isinstance(shell_keyword, ast.Constant) or not isinstance(shell_keyword.value, bool):
+                reasons.append("unresolved Python shell execution mode")
+                return
+            shell = shell_keyword.value
+        if elements is not None:
+            argv = []
+            for element in elements:
+                candidates = strings(element)
+                if candidates is None or len(candidates) != 1:
+                    reasons.append("unresolved Python executable argv")
+                    return
+                argv.append(next(iter(candidates)))
+            if not argv:
+                reasons.append("unresolved Python executable argv")
+                return
+            commands = [shlex.join(["/bin/sh", "-c", *argv] if shell else argv)]
+        else:
+            candidates = strings(operand)
+            if candidates is None:
+                reasons.append("unresolved Python executable source")
+                return
+            commands = [value if shell else shlex.join([value]) for value in candidates]
+        for keyword in node.keywords:
+            if keyword.arg in {"cwd", "executable"}:
+                read_operand(keyword.value)
+        for command in commands:
+            try:
+                reasons.extend(analysis_reasons(command_analyses([command])[0], allowed_roots, tools, depth + 1))
+            except AuditAnalysisUnavailable as error:
+                reasons.append(str(error))
+
+    for expression in namespace_writes:
+        if expression is not None and not isinstance(expression, (ast.Constant, ast.List, ast.Tuple, ast.Dict, ast.Set)) and strings(expression) is None:
+            reasons.append("unresolved Python callable namespace write")
+
+    for node in nodes:
+        if isinstance(node, ast.Attribute) and "os.environ" in labels(node):
+            reasons.append("reads the environment: os.environ")
+        if not isinstance(node, ast.Call):
+            continue
+        resolved = callables(node.func)
+        if resolved is None:
+            reasons.append("unresolved Python callable alias")
+            continue
+        for kind, called, receiver in resolved:
+            if kind == "path":
+                read_operand(receiver)
+                if called == "samefile":
+                    read_operand(argument(node, 0, {"other_path"}))
+                if called in ("glob", "rglob"):
+                    pattern = argument(node, 0, {"pattern"})
+                    read_operand(pattern)
+                    bases, patterns = strings(receiver), strings(pattern)
+                    joined = combine(bases, patterns, os.path.join)
+                    if joined is None:
+                        reasons.append("unresolved Python glob operand")
+                    else:
+                        for value in joined:
+                            reasons.extend(operand_reasons(value, allowed_roots))
+            elif called in dynamic:
+                reasons.append("unresolved dynamic Python execution or namespace")
+            elif called in ("os.getenv", "os.environ.get"):
+                reasons.append("reads the environment: " + called)
+            elif called in read_keywords:
+                read_operand(argument(node, 0, {read_keywords[called]}),
+                             default="." if called in ("os.listdir", "os.scandir") else None,
+                             network=called == "urllib.request.urlopen")
+                if called == "os.path.samefile":
+                    read_operand(argument(node, 1, {"f2"}))
+            elif called in execution:
+                analyze_execution(node, called)
+            elif called.startswith(("os.exec", "os.spawn")):
+                reasons.append("unresolved Python executable interface")
+            if kind == "path" or called in read_keywords:
+                for keyword in node.keywords:
+                    if keyword.arg in {"root_dir", "cwd"}:
+                        read_operand(keyword.value)
+                    elif keyword.arg == "dir_fd" and not (isinstance(keyword.value, ast.Constant) and keyword.value.value is None):
+                        reasons.append("unresolved Python read directory descriptor")
+    return list(dict.fromkeys(reasons))
+
+
+def analysis_reasons(analysis, allowed_roots, tools, depth=0) -> list[str]:
+    """Policy over parsed command positions, read operands, interpreter source and real shell expansions."""
+    if depth > 8:
+        return ["command audit nesting limit"]
+    reasons = ["unresolved shell command: " + str(error) for error in analysis.get("errors", [])]
+    if not analysis.get("ok") and not reasons:
+        reasons.append("unresolved shell command")
+    for invocation in analysis.get("invocations", []):
+        argv = invocation.get("argv", [])
+        end = invocation.get("wrapped_program_index", len(argv))
+        code_index = invocation.get("code_arg_index")
+        raw = invocation.get("raw_argv", [])
+        # An unresolved shell word remains refused. Its source span can still preserve a specific home/variable
+        # path or cd reason; it is never expanded or used to infer a clean command.
+        operands = [value if value is not None else raw[i].strip("'\"") if i < len(raw) else None
+                    for i, value in enumerate(argv[:end]) if i != code_index]
+        reasons += argv_reasons(operands, allowed_roots, tools,
+                                forwarding=invocation.get("source_kind") == "wrapper")
+    for source in analysis.get("python_sources", []):
+        reasons += python_audit(source, allowed_roots, tools, depth)
+    for source in analysis.get("expansions", []):
+        if COMMAND_SUBSTITUTION.search(source) or source.startswith("<(") or source.startswith(">("):
+            reasons.append("command substitution")
+        reasons += [f"parameter expansion: {m}" for m in PARAMETER_EXPANSION.findall(source)]
+        reasons += [f"inherited directory variable: {m}" for m in INHERITED_DIRECTORY.findall(source)]
+        reasons += [f"names the Codex home: {m}" for m in CODEX_HOME_REFERENCE.findall(source)]
+        reasons += [f"home-relative path: {m}" for m in HOME_PATH.findall(source)]
+        reasons += [f"variable path: {m}" for m in VARIABLE_PATH.findall(source)]
+    for value in analysis.get("redirect_paths", []):
+        reasons += operand_reasons(value, allowed_roots)
+    return list(dict.fromkeys(reasons))
+
+
 def blind_audit(events_path: Path, allowed_roots, tools=AUDIT_TOOLS) -> dict:
-    """Reading of one child's event stream: web searches, MCP tool calls, and commands that name an absolute path
-    outside ``allowed_roots`` (the repository and the packets directory) or name a CLI in ``tools`` (AUDIT_TOOLS; a
+    """Reading of one child's event stream: web searches, MCP tool calls, and commands with read operands
+    outside ``allowed_roots`` (the repository and the packets directory) or executables in ``tools`` (AUDIT_TOOLS; a
     non-blind run adds BLIND_UNRESOLVABLE, which its PATH may resolve). In a blind run
     a flagged layer is void: its return is set aside before it is written, and a resume re-audits a kept return
     (round 7, REG7-1); in a non-blind run the report is for review and disclosure.
 
-    This is a heuristic lower bound, not a boundary: it reads command text only, so a path a program
-    computes (``python3 -c`` joining parts, a glob, a variable set earlier) and anything a command reads
-    indirectly (a script's own reads, a config it loads, a symlink under the repository) are not seen."""
+    This statically parses Codex's recorded command display. It is not syscall/branch attestation: indirect
+    script/config/symlink reads are not observed. Unsupported shell source/expansion and unresolved interpreted
+    read or execution operands are refused.
+    Executable words and interpreter read operands are distinguished from patterns and formatting data."""
     report = {"web_search": 0, "mcp_tool_calls": 0, "commands": 0, "flagged_commands": []}
     if not events_path.is_file():
         return report
+    completed = []
     for line in events_path.read_text(encoding="utf-8", errors="replace").splitlines():
         try:
             event = json.loads(line)
@@ -508,36 +1104,15 @@ def blind_audit(events_path: Path, allowed_roots, tools=AUDIT_TOOLS) -> dict:
         elif kind == "command_execution":
             report["commands"] += 1
             command = item.get("command") if isinstance(item.get("command"), str) else ""
-            reasons = [f"path outside the repository and packets: {path}"
-                       for path in outside_paths(command, allowed_roots)]
-            reasons += ["names the filesystem root /"] if names_root(command) else []
-            reasons += [f"home-relative path: {path}" for path in HOME_PATH.findall(command)]
-            reasons += [f"variable path: {path}" for path in VARIABLE_PATH.findall(command)]
-            # Parameter expansion (${CODEX_HOME%/*}, ${X:-/path}) builds a path the event does not show
-            # (independent review of #145, BIND-R4-7).
-            reasons += [f"parameter expansion: {match}" for match in PARAMETER_EXPANSION.findall(command)]
-            reasons += [f"inherited directory variable: {match}" for match in INHERITED_DIRECTORY.findall(command)]
-            # A blind child never needs its CODEX_HOME or the environment, and a command substitution builds a path
-            # the event does not show (round 6, ISO-R6-2).
-            reasons += [f"names the Codex home: {match}" for match in CODEX_HOME_REFERENCE.findall(command)]
-            reasons += [f"reads the environment: {match}" for match in ENVIRONMENT_READ.findall(command)]
-            reasons += ["command substitution" for _ in COMMAND_SUBSTITUTION.findall(command)][:1]
-            reasons += [f"cd leaves for an unnamed directory: cd {target}" for target in unnamed_cd_targets(command)]
-            reasons += [f"path climbs out of the working directory: {path}" for path in PARENT_PATH.findall(command)]
-            words = set(re.findall(r"[A-Za-z][\w.-]*", command))
-            reasons += [f"runs {tool}" for tool in tools if tool in words]
-            # A CLI named by an absolute path runs whatever PATH says (``/usr/local/bin/qmd``, an exempt system
-            # executable token otherwise), so its basename is checked against every audited CLI (Codex review of
-            # #206, P2); a bare search word is not a path.
-            # A network URL ending in a CLI's name (``https://github.com/tobi/qmd``) is a search term (Codex review of
-            # #206 at 882ba4b9).
-            reasons += [f"runs {name} by path: {path}" for match in ABSOLUTE_PATH.finditer(command)
-                        if not network_authority(command, match)
-                        for path in [match.group(1)] for name in [os.path.basename(path.rstrip("/"))]
-                        if name in AUDIT_TOOLS + BLIND_UNRESOLVABLE and name not in tools
-                        and not any(path == root or path.startswith(root.rstrip("/") + "/") for root in allowed_roots)]
+            completed.append(command)
+    try:
+        analyses = command_analyses(completed) if completed else []
+        for command, analysis in zip(completed, analyses):
+            reasons = analysis_reasons(analysis, allowed_roots, tools)
             if reasons:
                 report["flagged_commands"].append({"command": command, "reasons": reasons})
+    except AuditAnalysisUnavailable as error:
+        report["flagged_commands"].append({"command": "", "reasons": [str(error)]})
     return report
 
 
@@ -1345,6 +1920,11 @@ def main(argv=None) -> int:
         print("codex_lane: the codex CLI is not on PATH; install it and sign in natively "
               "(see adoption/) before running the Codex lane", file=sys.stderr)
         return 2
+    if pending and blind:
+        issue = audit_analysis_issue()
+        if issue:
+            print(f"codex_lane: {issue}", file=sys.stderr)
+            return 2
     with contextlib.ExitStack() as stack:
         if pending:
             try:

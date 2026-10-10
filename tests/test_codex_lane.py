@@ -790,9 +790,193 @@ class BlindIsolationTests(CodexLaneFixture):
         for command, reason in expected.items():
             self.assertIn(reason, self.audit_reasons(command), command)
         for command in ("/bin/bash -lc 'cd catalogs && ls'", "/usr/local/bin/rg -n x catalogs",
-                        "/usr/sbin/tool x", "/sbin/tool x", "/bin/bash -lc 'for f in a b; do cat $f; done'"):
+                        "/usr/sbin/tool x", "/sbin/tool x", "/bin/bash -lc 'cat a; cat b'"):
             self.assertEqual(self.audit_reasons(command), [], command)
+        # The parser cannot resolve an iteration variable into a bounded read operand.
+        self.assertTrue(self.audit_reasons("/bin/bash -lc 'for f in a b; do cat $f; done'"))
 
+
+
+class BlindAuditQuarantineRegressionTests(unittest.TestCase):
+    """Replay only retained tool command metadata from the three tier-1 quarantines; execute no command."""
+
+    def setUp(self):
+        self.fixture = json.loads((ROOT / "tests" / "fixtures" / "codex_lane_blind_audit_quarantines.json")
+                                  .read_text(encoding="utf-8"))
+
+    def audit_command(self, command):
+        self.assertIsNone(codex_lane.audit_analysis_issue(), "regression cases require a verified audit parser")
+        with tempfile.TemporaryDirectory() as temporary:
+            events = Path(temporary) / "events.jsonl"
+            events.write_text(json.dumps({"type": "item.completed", "item": {
+                "type": "command_execution", "command": command}}) + "\n", encoding="utf-8")
+            return codex_lane.blind_audit(events, self.fixture["allowed_roots"])
+
+    def assert_case_is_clean(self, layer):
+        report = self.audit_command(self.fixture["cases"][layer]["command"])
+        self.assertEqual((report["commands"], report["web_search"], report["mcp_tool_calls"]), (1, 0, 0))
+        self.assertEqual(report["flagged_commands"], [], report["flagged_commands"])
+
+    def test_document_retrieval_python_join_separator_is_not_a_root_read(self):
+        self.assert_case_is_clean("document-retrieval")
+
+    def test_git_github_automation_rg_pattern_is_not_git_execution(self):
+        self.assert_case_is_clean("git-github-automation")
+
+    def test_mcp_surfaces_backtick_literal_in_a_quoted_heredoc_is_not_substitution(self):
+        self.assert_case_is_clean("mcp-surfaces")
+
+    def test_an_actual_python_root_read_remains_flagged(self):
+        report = self.audit_command("/bin/bash -lc \"python3 - <<'PY'\nfrom pathlib import Path\n"
+                                    "print(list(Path('/').iterdir()))\nPY\"")
+        self.assertTrue(report["flagged_commands"])
+        self.assertTrue(any("filesystem root" in reason for row in report["flagged_commands"]
+                            for reason in row["reasons"]), report["flagged_commands"])
+
+    def test_python_alias_keyword_attribute_and_indirect_reads_remain_flagged(self):
+        cases = {
+            "open_alias": "reader=open;reader('/etc/passwd')",
+            "rebound_print": "print=open;print('/etc/passwd')",
+            "open_keyword": "open(file='/etc/passwd')",
+            "listdir_keyword": "import os;os.listdir(path='/')",
+            "urlopen_keyword": "from urllib.request import urlopen;urlopen(url='file:///etc/passwd')",
+            "path_parent_glob": "from pathlib import Path;Path('/etc/passwd').parent.glob('*')",
+            "path_getattr": "from pathlib import Path;getattr(Path('/etc/passwd'),'read_text')()",
+            "readlink": "import os;os.readlink('/etc/passwd')",
+        }
+        for name, code in cases.items():
+            with self.subTest(operation=name):
+                shell = "python3 -c " + shlex.quote(code)
+                command = shlex.join(["/bin/bash", "-lc", shell])
+                report = self.audit_command(command)
+                self.assertTrue(report["flagged_commands"], "an outside read must be flagged")
+
+    def test_pattern_and_filter_file_options_audit_the_file_argument(self):
+        for tool, long_option in (("rg", "--file"), ("grep", "--file"), ("jq", "--from-file")):
+            for option, attached in (("-f", False), ("-f", True), (long_option, False), (long_option, True)):
+                with self.subTest(tool=tool, option=option, attached=attached):
+                    if attached:
+                        arguments = [option + ("=" if option.startswith("--") else "") + "/etc/passwd"]
+                    else:
+                        arguments = [option, "/etc/passwd"]
+                    argv = [tool, *arguments, "evidence/input.json"]
+                    command = shlex.join(["/bin/bash", "-lc", shlex.join(argv)])
+                    self.assertTrue(self.audit_command(command)["flagged_commands"],
+                                    "a pattern/filter file outside the export must be flagged")
+                    safe_argv = [argument.replace("/etc/passwd", "evidence/filter.txt") for argument in argv]
+                    safe = shlex.join(["/bin/bash", "-lc", shlex.join(safe_argv)])
+                    self.assertEqual(self.audit_command(safe)["flagged_commands"], [])
+
+    def test_nested_python_subprocess_wrappers_audit_the_executed_command(self):
+        cases = [
+            (["sh", "-c", "git log"], ["sh", "-c", "rg -n x evidence"]),
+            (["bash", "-lc", "printenv"], ["bash", "-lc", "printf '%s\\n' literal"]),
+            (["nice", "git", "log"], ["nice", "rg", "-n", "x", "evidence"]),
+        ]
+        for unsafe_argv, safe_argv in cases:
+            with self.subTest(argv=unsafe_argv):
+                code = "import subprocess;subprocess.run(" + repr(unsafe_argv) + ")"
+                unsafe = shlex.join(["/bin/bash", "-lc", "python3 -c " + shlex.quote(code)])
+                self.assertTrue(self.audit_command(unsafe)["flagged_commands"],
+                                "nested shell/wrapper execution must retain the blind audit")
+                code = "import subprocess;subprocess.run(" + repr(safe_argv) + ")"
+                safe = shlex.join(["/bin/bash", "-lc", "python3 -c " + shlex.quote(code)])
+                self.assertEqual(self.audit_command(safe)["flagged_commands"], [])
+
+    def test_python_os_open_parent_glob_and_alias_concat_read_paths(self):
+        cases = {
+            "os_open": "import os;os.open('/etc/passwd',os.O_RDONLY)",
+            "parent_glob": "from pathlib import Path;list(Path('.').glob('../outside'))",
+            "alias_concat": "reader=open;prefix='/etc/';reader(prefix+'passwd')",
+        }
+        for name, code in cases.items():
+            with self.subTest(operation=name):
+                command = shlex.join(["/bin/bash", "-lc", "python3 -c " + shlex.quote(code)])
+                self.assertTrue(self.audit_command(command)["flagged_commands"], "an outside read must be flagged")
+        safe_code = "reader=open;prefix='evidence/';reader(prefix+'receipt.json')"
+        safe = shlex.join(["/bin/bash", "-lc", "python3 -c " + shlex.quote(safe_code)])
+        self.assertEqual(self.audit_command(safe)["flagged_commands"], [])
+
+    def test_git_through_stdio_lock_and_session_wrappers_remains_flagged(self):
+        # These executing wrappers are outside the supported grammar; both payloads must fail closed.
+        wrappers = [["stdbuf", "-oL"], ["flock", "local.lock"], ["setsid"]]
+        for wrapper in wrappers:
+            with self.subTest(wrapper=wrapper[0]):
+                command = shlex.join(["/bin/bash", "-lc", shlex.join([*wrapper, "git", "log"])])
+                self.assertTrue(self.audit_command(command)["flagged_commands"], "the wrapper must retain git refusal")
+                safe = shlex.join(["/bin/bash", "-lc", shlex.join([*wrapper, "rg", "-n", "x", "evidence"])])
+                self.assertTrue(self.audit_command(safe)["flagged_commands"], "unsupported wrappers must fail closed")
+        bare = shlex.join(["/bin/bash", "-lc", "rg -n x evidence"])
+        self.assertEqual(self.audit_command(bare)["flagged_commands"], [])
+
+    def test_python_end_of_options_stdin_retains_path_read_auditing(self):
+        unsafe_script = "python3 -- - <<'PY'\nopen('/outside/file').read()\nPY"
+        command = shlex.join(["/bin/bash", "-lc", unsafe_script])
+        self.assertTrue(self.audit_command(command)["flagged_commands"], "Python stdin must retain outside-read refusal")
+        safe_script = "python3 -- - <<'PY'\nopen('evidence/receipt.json').read()\nPY"
+        safe = shlex.join(["/bin/bash", "-lc", safe_script])
+        self.assertEqual(self.audit_command(safe)["flagged_commands"], [])
+
+    def test_a_quoted_heredoc_piped_to_a_shell_audits_the_executed_body(self):
+        unsafe_script = "cat <<'SH' | sh\ngit log\nSH"
+        command = shlex.join(["/bin/bash", "-lc", unsafe_script])
+        self.assertTrue(self.audit_command(command)["flagged_commands"], "the receiving shell executes the heredoc")
+        safe_script = "cat <<'SH'\ngit log\nSH"
+        safe = shlex.join(["/bin/bash", "-lc", safe_script])
+        self.assertEqual(self.audit_command(safe)["flagged_commands"], [])
+
+    def test_python_namespace_read_aliases_and_path_metadata_reads_remain_flagged(self):
+        cases = {
+            "module_attribute_alias": "import os;os.reader=open;os.reader('/outside/file')",
+            "namespace_attribute_alias": ("from types import SimpleNamespace;ns=SimpleNamespace();"
+                                          "ns.reader=open;ns.reader('/outside/file')"),
+            "path_is_symlink": "from pathlib import Path;Path('/outside/file').is_symlink()",
+            "path_samefile_argument": ("from pathlib import Path;"
+                                       "Path('evidence/receipt.json').samefile('/outside/file')"),
+        }
+        for name, code in cases.items():
+            with self.subTest(operation=name):
+                command = shlex.join(["/bin/bash", "-lc", "python3 -c " + shlex.quote(code)])
+                self.assertTrue(self.audit_command(command)["flagged_commands"], "an outside read must be flagged")
+        for code in ("from pathlib import Path;Path('evidence/receipt.json').is_symlink()",
+                     "from pathlib import Path;Path('evidence/receipt.json').samefile('evidence/other.json')"):
+            with self.subTest(local_metadata=code):
+                safe = shlex.join(["/bin/bash", "-lc", "python3 -c " + shlex.quote(code)])
+                self.assertEqual(self.audit_command(safe)["flagged_commands"], [])
+
+    def test_opaque_interpreter_and_find_execution_remain_refused(self):
+        cases = {
+            "shell_stdin_pipe": "printf '%s\\n' 'git log' | sh",
+            "node_code": shlex.join(["node", "-e", "require('child_process').execSync('git log')"]),
+            "find_exec": shlex.join(["find", "evidence", "-exec", "git", "log", "{}", ";"]),
+        }
+        for name, script in cases.items():
+            with self.subTest(operation=name):
+                command = shlex.join(["/bin/bash", "-lc", script])
+                self.assertTrue(self.audit_command(command)["flagged_commands"], "opaque command execution must fail closed")
+        for script in ("printf '%s\\n' 'git log'", "find evidence -name 'git*'"):
+            with self.subTest(literal_data=script):
+                safe = shlex.join(["/bin/bash", "-lc", script])
+                self.assertEqual(self.audit_command(safe)["flagged_commands"], [])
+
+
+class BlindAuditBackendPreflightTests(CodexLaneFixture):
+    def test_missing_or_changed_parser_dependencies_refuse_before_a_child_or_home(self):
+        self.write_packet("foundation", "native-clients")
+        cases = [("missing", None), ("digest-mismatch", "modified fixture adapter\n")]
+        for name, content in cases:
+            dependency = self.work_dir.parent / f"{name}-parser.mjs"
+            if content is not None:
+                dependency.write_text(content, encoding="utf-8")
+            with self.subTest(dependency=name), \
+                    mock.patch.object(codex_lane, "AUDIT_DEPENDENCIES", {dependency: "0" * 64}), \
+                    contextlib.redirect_stderr(io.StringIO()) as err:
+                self.assertEqual(self.run_lane(), 2)
+                self.assertIn("blind audit dependency missing or digest mismatch", err.getvalue())
+                self.assertEqual(self.argv_calls(), [])
+                self.assertFalse(codex_lane.codex_home_base().exists())
+                self.assertFalse((self.work_dir / "codex").exists())
+                self.assertIsNone(codex_lane.CHILD_CODEX_HOME)
 
 
 class BlindPathAndPrecisionTests(CodexLaneFixture):
@@ -940,22 +1124,17 @@ class BlindPathAndPrecisionTests(CodexLaneFixture):
                 self.assertEqual(self.reasons(command), [])
 
     def test_independent_review_of_206_reaches_still_flag(self):
-        # C2: a '/' joined on one side only builds an absolute path; C1: file:/// and https:/// are no network authority.
+        # C2: root-prefixed concatenation remains an outside read; C1: file:/// and https:/// have no network authority.
         expected = {
             "/bin/bash -lc \"python3 -c \\\"print(open('/'+'etc/passwd').read())\\\"\"": "names the filesystem root /",
             "/bin/bash -lc \"python3 -c \\\"x = 'etc' ; print(open('/' + x))\\\"\"": "names the filesystem root /",
             "/bin/bash -lc \"python3 -c \\\"print(open(''+'/'+'etc/passwd').read())\\\"\"": "names the filesystem root /",
             "/bin/bash -lc 'python3 - <<\"PY\"\nprint(open(\"/\"+\"etc\"))\nPY'": "names the filesystem root /",
-            "/bin/bash -lc \"python3 -c \\\"x='a'; print(open(x+'/'+'etc'))\\\"\"": "names the filesystem root /",
             "/bin/bash -lc \"python3 -c \\\"x='etc'; print(open(''+'/'+x))\\\"\"": "names the filesystem root /",
             "/bin/bash -lc 'cat https:///etc/passwd'": "path outside the repository and packets: ///etc/passwd",
             "/bin/bash -lc \"python3 -c \\\"import urllib.request as u; u.urlopen('FILE://localhost/etc/passwd')\\\"\"":
                 "path outside the repository and packets: //localhost/etc/passwd",
             "/bin/bash -lc 'unzip -p jar:file:///etc/x.jar'": "path outside the repository and packets: ///etc/x.jar",
-            "/bin/bash -lc \"python3 -c \\\"print('http+unix://%2Frun%2Fuser%2F1000%2Fx.sock/v1')\\\"\"":
-                "path outside the repository and packets: //%2Frun%2Fuser%2F1000%2Fx.sock/v1",
-            "/bin/bash -lc \"python3 -c \\\"print('local://etc/passwd')\\\"\"":
-                "path outside the repository and packets: //etc/passwd",
             "/bin/bash -lc 'cat LOCAL://etc/passwd'": "path outside the repository and packets: //etc/passwd",
             "/bin/bash -lc 'cat HTTP+UNIX://socket/v1'": "path outside the repository and packets: //socket/v1",
             "/bin/bash -lc '/bin/sh -c file:///usr/local/bin/qmd; /usr/local/bin/qmd x'":
@@ -964,6 +1143,17 @@ class BlindPathAndPrecisionTests(CodexLaneFixture):
         for command, reason in expected.items():
             with self.subTest(command=command):
                 self.assertIn(reason, self.reasons(command))
+        for prefix, outside in (("a", False), ("", True)):
+            code = f"x={prefix!r};print(open(x+'/'+'etc'))"
+            command = shlex.join(["/bin/bash", "-lc", "python3 -c " + shlex.quote(code)])
+            with self.subTest(bounded_prefix=prefix):
+                self.assertEqual(bool(self.reasons(command)), outside)
+        # Printed URI text does not read the resource; the cat/local-URI controls above still do.
+        for code in ("print('http+unix://%2Frun%2Fuser%2F1000%2Fx.sock/v1')", "print('local://etc/passwd')",
+                     "print('local://qmd')", "print('http+unix://qmd')"):
+            command = shlex.join(["/bin/bash", "-lc", "python3 -c " + shlex.quote(code)])
+            with self.subTest(printed_uri=code):
+                self.assertEqual(self.reasons(command), [])
 
     def test_separator_and_anchor_exemptions_do_not_hide_constructed_reads(self):
         # PR #216's broad exemptions hide these command-text paths at both audit call sites.
@@ -973,31 +1163,41 @@ class BlindPathAndPrecisionTests(CodexLaneFixture):
             "/bin/bash -lc \"python3 -c \\\"print(open('/etc/passwd$)'[:-2]).read())\\\"\"": "/etc/passwd$",
             "/bin/bash -lc \"python3 -c \\\"print(open('/etc/passwd$|'.rstrip('$|')).read())\\\"\"": "/etc/passwd$",
             "/bin/bash -lc \"rg x $(python3 -c \\\"print('|/etc/passwd$|'[1:-2])\\\")\"": "/etc/passwd$",
-            "/bin/bash -lc \"cat /etc/passwd$''\"": "/etc/passwd$",
-            "/bin/bash -lc \"rg -n '/runner.py$' x\"": "/runner.py$",
+            "/bin/bash -lc \"cat /etc/passwd$''\"": "/etc/passwd",
             "/bin/bash -lc 'cat ://x'": "//x",
             "/bin/bash -lc 'ls //'": "//",
-            "/bin/bash -lc 'rg -n \"://|file\" docs'": "//",
-            "/bin/bash -lc \"python3 -c \\\"print(':'+'//etc')\\\"\"": "//etc",
+            "/bin/bash -lc 'cat /runner.py'": "/runner.py",
         }
         for command, path in expected.items():
             with self.subTest(command=command):
-                self.assertIn(f"path outside the repository and packets: {path}", self.reasons(command))
-        # Local authorities must also reach the CLI-by-path comprehension, not just outside_paths.
+                reasons = self.reasons(command)
+                if "$(" in command or "python3 -c" in command:
+                    self.assertTrue(reasons, "a computed read or substitution must remain refused")
+                else:
+                    self.assertIn(f"path outside the repository and packets: {path}", reasons)
+        for command in ("/bin/bash -lc \"rg -n '/runner.py$' x\"", "/bin/bash -lc 'rg -n \"://|file\" docs'",
+                        shlex.join(["/bin/bash", "-lc", "python3 -c " + shlex.quote("print(':'+'//etc')")])):
+            with self.subTest(literal_data=command):
+                self.assertEqual(self.reasons(command), [])
+        # URI text is data; an actual qmd executable invocation remains forbidden.
         for scheme in ("local", "http+unix"):
-            command = f"/bin/bash -lc '{scheme}://qmd search x'"
+            code = f"print({scheme + '://qmd'!r})"
+            command = shlex.join(["/bin/bash", "-lc", "python3 -c " + shlex.quote(code)])
             with self.subTest(scheme=scheme):
-                self.assertIn("runs qmd by path: //qmd", self.reasons(command))
+                self.assertEqual(self.reasons(command), [])
+        self.assertIn("runs qmd by path: /usr/bin/qmd", self.reasons("/bin/bash -lc '/usr/bin/qmd search x'"))
 
     def test_wave_20260924_separator_and_regex_residuals(self):
-        # Exact historical shapes from 3f456ec286: both remain flagged when the unsafe exemptions are dropped.
-        expected = {
-            "/bin/bash -lc \"python3 - <<'PY'\nfor ref in refs:\n print(ref, 'EXTERNAL' if '://' in ref else ref)\nPY\"": "//",
-            "/bin/bash -lc \"rg --files tests | rg '(test_adaptive_paper_(recovery|safety)\\\\.py$|/runner.py$)'\"": "/runner.py$",
-        }
-        for command, path in expected.items():
+        # The historical separator and regex are literal data, paired with actual reads outside the export.
+        script = "python3 - <<'PY'\nfor ref in refs:\n print(ref, 'EXTERNAL' if '://' in ref else ref)\nPY"
+        clean = [shlex.join(["/bin/bash", "-lc", script]),
+                 "/bin/bash -lc \"rg --files tests | rg '(test_adaptive_paper_(recovery|safety)\\\\.py$|/runner.py$)'\""]
+        for command in clean:
             with self.subTest(command=command):
-                self.assertIn(f"path outside the repository and packets: {path}", self.reasons(command))
+                self.assertEqual(self.reasons(command), [])
+        for command in ("/bin/bash -lc 'cat /runner.py'", "/bin/bash -lc 'cat file:///etc/passwd'"):
+            with self.subTest(actual_read=command):
+                self.assertTrue(self.reasons(command))
 
     def test_env_shell_shims_are_measured_under_the_blind_path(self):
         bin_dir = self.work_dir / "env-shims"

@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-10-10T19:14:27Z",
+  "base_commit": "9d4c00cd05d79b3fd5074df2e46bacab87ee67ff",
+  "status": "structured_audit_regressions_passed",
+  "codex_lane_py_sha256": "82280d901c54a6539822ad3c9ef0efda48e0edc79c8bdb00cba6e41fb316877c",
+  "adapter_sha256": "bcb1b9d483901259aee4cdafa3d779a2c2ee2feec71cb997257035b4549939dd",
+  "audit_interface": {
+    "class": "source_review",
+    "client": "codex-cli 0.162.1",
+    "upstream_pin": "092d3acd6bec3e3a14bdc7e7a2810ab628ab759d",
+    "events_source": "codex-rs/exec/src/exec_events.rs:159-166",
+    "conversion_source": "codex-rs/exec/src/event_processor_with_jsonl_output.rs:162-180",
+    "consumed_command_field": "display string; no argv or read/syscall event fields",
+    "method": "static executable-position, read-operand and interpreter-source parsing; execute no payload"
+  },
+  "original_policy_sites": {
+    "revision": "9d4c00cd05d79b3fd5074df2e46bacab87ee67ff",
+    "file": "tools/sota-convergence/codex_lane.py",
+    "ROOT_PATH": "396",
+    "names_root": "454-469",
+    "audit_emission": "513"
+  },
+  "quarantine_fixture": {
+    "class": "synthetic",
+    "path": "tests/fixtures/codex_lane_blind_audit_quarantines.json",
+    "sha256": "5c5a6a23d54352d0f9e62a23e765fe84473f0bb61ec2be09bda347e7faa84dc2",
+    "origin": "exact nonsecret completed-command metadata and reasons from the three retained tier-1 quarantines; byte comparison verified",
+    "cases": [
+      {"layer": "document-retrieval", "command_sha256": "747e3c86f8fa996221a4565d56076d87d52624ef9381dbff4b7d410776dea91b", "original_reason": "names the filesystem root /", "data": "Python '/'.join(...) separator"},
+      {"layer": "git-github-automation", "command_sha256": "4157303759021000650d1aedb4c7d69799660aea6f69ef951b464aecfc588065", "original_reason": "runs git", "data": "rg '(git|diff|...)' pattern"},
+      {"layer": "mcp-surfaces", "command_sha256": "1f02e5a57b0e13aa0fcda28e2b79edf44de7a95c56b038d70aefc57afc2ba3ac", "original_reason": "command substitution", "data": "literal backticks in quoted Python heredoc"}
+    ],
+    "payload_commands_executed": 0,
+    "upstream_model_turns": 0
+  },
+  "fail_before": {
+    "class": "synthetic",
+    "core_revision": "9d4c00cd05d79b3fd5074df2e46bacab87ee67ff",
+    "core_sha256": "3ed9524ca7523b30a1258a18a06b1c7c7cc6d5f9826c2c14edfbc91394148d7a",
+    "command": "python3 -B -m unittest tests.test_codex_lane.BlindAuditQuarantineRegressionTests -v",
+    "scope": "original four-method quarantine fixture against unchanged base runner; later safety regressions are separate",
+    "tests": 4,
+    "failures": 3,
+    "errors": 0,
+    "exit_code": 1,
+    "elapsed_seconds": 0.006,
+    "actual_python_root_control_still_flagged": true
+  },
+  "review_regressions": {
+    "class": "synthetic",
+    "verified_parser_required": true,
+    "first_alias_keyword_run": {"tests": 1, "failed_subtests": 8, "errors": 0, "exit_code": 1, "scope": "eight true Python read variants, frozen verified f09b adapter"},
+    "nested_and_budget_run": {"tests": 2, "failed_subtests": 5, "errors": 0, "exit_code": 1, "scope": "three nested subprocess wrappers, parent glob and alias doubling"},
+    "shell_indirection_run": {"tests": 3, "failed_subtests": 5, "errors": 0, "exit_code": 1, "scope": "three unsupported executing wrappers, Python -- stdin and heredoc pipeline"},
+    "namespace_metadata_run": {"tests": 1, "failed_subtests": 4, "errors": 0, "exit_code": 1, "scope": "two namespace callable aliases, Path.is_symlink and samefile's outside operand"},
+    "correction": "The earlier two-failure/six-pass alias run was invalid as semantic evidence: six cases refused on an unrelated dependency hash mismatch. The verified frozen-parser eight-failure run supersedes it."
+  },
+  "fresh_same_case_replay": {
+    "class": "synthetic",
+    "method": "Compile byte-verified unchanged main runner from Git; run the same three current quarantine methods plus root-read control in memory. The current fixture-side parser availability check is attached to the base module only for that check; the old audit policy is not modified and never invokes the parser.",
+    "unchanged_base": {"tests": 4, "failures": 3, "errors": 0, "exit_code": 1, "elapsed_seconds": 0.327},
+    "fixed": {"tests": 4, "failures": 0, "errors": 0, "exit_code": 0, "elapsed_seconds": 3.188},
+    "payload_commands_executed": 0,
+    "upstream_model_turns": 0
+  },
+  "required_tests": {
+    "class": "synthetic",
+    "parser_integration_class": "local_integration",
+    "command": "nice -n 10 ionice -c 3 python3 -B -m unittest tests.test_codex_lane tests.test_shell_parser_ci tests.test_command_position_oracle tests.test_verdict_lane_vendoring -v",
+    "tests": 168,
+    "failures": 0,
+    "errors": 0,
+    "skips": 1,
+    "skip_reason": "The GitHub Actions runtime tripwire is skipped locally because GITHUB_ACTIONS is not true; its mutation and provisioning controls passed.",
+    "exit_code": 0,
+    "elapsed_seconds": 166.027,
+    "inputs_unchanged_during_run": true,
+    "test_codex_lane_sha256": "dd4fbad105aa5ad70b78d028eb456acb0d9115e2afd5e0ab8b1d4ae24778d21d",
+    "test_shell_parser_ci_sha256": "ea9c3f9b58a5a3e7c93dcb34622d5591036cf3038f43bd8531f03bd055203699",
+    "lane_provenance_sha256": "2ab850e4623196676ea55c7f651df9c5beeb58ca6be7c457000b1fac91df278c",
+    "covers": ["three exact real quarantines", "real Git/root/outside reads", "pattern/filter files", "shell/wrapper/interpreter indirection refusal", "Python callable aliases and keyword/chained/metadata reads", "nested subprocess argv", "bounded resolver refusal", "parser missing/tampered preflight", "native exact provenance assertion", "native no-provider-fields assertions", "unchanged isolation args and README block", "CI parser provisioning", "Bash command-position oracle", "append-only code/prompt registries"]
+  },
+  "native_source_identity_check": {
+    "class": "source_review",
+    "base_revision": "9d4c00cd05d79b3fd5074df2e46bacab87ee67ff",
+    "unchanged": ["ISOLATION_ARGS", "BLIND_CHILD_PATH", "CHILD_ENV_ALLOWLIST", "CHILD_ENV_EXTRA_PREFIXES", "build_command", "child_env", "isolated_codex_home", "lane_provenance", "finalize_lane_return"]
+  },
+  "parser": {
+    "class": "local_integration",
+    "existing_loader": "examples/claude-native/workflows/child-usage.mjs",
+    "existing_pin": "examples/claude-native/workflows/shell-parser.pin.json",
+    "web_tree_sitter": "0.27.0",
+    "tree_sitter_bash": "0.25.1",
+    "install_command": "npm install --prefix <parser-dir> --ignore-scripts --no-audit --no-fund --save-exact web-tree-sitter@0.27.0 tree-sitter-bash@0.25.1",
+    "host_only": true,
+    "runner_binds_dependency_digests": true,
+    "preflight_before_model_or_home": true
+  },
+  "python_resolver_limits": {"source_chars": 250000, "ast_nodes": 50000, "work": 20000, "depth": 64, "alternatives": 64, "string_chars": 16384, "generated_chars": 1000000, "nested_execution_depth": 8},
+  "native_receipt_fields_unchanged": true,
+  "isolation_arguments_and_child_environment_unchanged": true,
+  "collected_returns_modified": false,
+  "verdict_promotions": 0,
+  "limitations": [
+    "Static parsing is not syscall, runtime branch or symlink attestation. Codex JSONL exposes only the command display.",
+    "Indirect script/config reads and symlink targets remain unobserved; unsupported source/expansions and unresolved interpreted reads refuse the result.",
+    "Unsupported wrapper grammar is refused even for a benign utility; supported env/nice/timeout forms retain position decoding.",
+    "Fixture replay does not rerun any quarantined model verdict or prove the family judgments correct."
+  ]
+}
