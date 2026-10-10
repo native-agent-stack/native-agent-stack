@@ -146,6 +146,44 @@ class StarredMaintenanceTests(unittest.TestCase):
 
     @unittest.skipUnless(shutil.which("systemd-analyze") and Path("/usr/bin/python3").is_file(),
                          "requires installed systemd-analyze and /usr/bin/python3")
+    def test_native_environment_finds_gh_without_interactive_shell_path(self):
+        home = self.scratch / "native home"
+        ecosystem_bin = home / ".local" / "share" / "codex-ecosystem" / "bin"
+        ecosystem_bin.mkdir(parents=True)
+        cli = ecosystem_bin / "gh"
+        cli.write_text("#!/bin/sh\nprintf 'fixture-gh\\n'\n", encoding="utf-8")
+        cli.chmod(0o700)
+        output = self.scratch / "native environment review"
+        output.mkdir()
+        units = renderer.render_units(self.repo, self.state, self.questions)
+        for name, text in units.items():
+            (output / name).write_text(text, encoding="utf-8")
+        runtime = self.scratch / "runtime"
+        runtime.mkdir(mode=0o700)
+        system_paths = [path for path in ["/usr/lib/systemd/user", "/lib/systemd/user"] if Path(path).is_dir()]
+        result = subprocess.run([
+            "systemd-analyze", "--user", "verify", str(output / renderer.SERVICE), str(output / renderer.TIMER)
+        ], capture_output=True, text=True, timeout=20, env={
+            "HOME": str(home), "PATH": "/usr/bin:/bin", "LC_ALL": "C.UTF-8",
+            "XDG_RUNTIME_DIR": str(runtime), "SYSTEMD_LOG_LEVEL": "debug",
+            "SYSTEMD_UNIT_PATH": ":".join([str(output), *system_paths]),
+        })
+        self.assertEqual(result.returncode, 0, "systemd-analyze --user verify rejected rendered units")
+        paths = [line.split("Environment: PATH=", 1)[1]
+                 for line in (result.stdout + result.stderr).splitlines() if "Environment: PATH=" in line]
+        self.assertEqual(len(paths), 1, "the rendered service must declare its own CLI PATH")
+        self.assertEqual(paths[0].split(":")[0], str(ecosystem_bin))
+        sibling_path = next(line for line in (ROOT / "adoption" / "templates" / "systemd" /
+                                             "stack-currency.service").read_text(encoding="utf-8").splitlines()
+                            if line.startswith("Environment=PATH="))
+        self.assertIn(sibling_path, units[renderer.SERVICE].splitlines())
+        command = subprocess.run(["gh", "--version"], capture_output=True, text=True, timeout=5,
+                                 env={"PATH": paths[0], "HOME": str(home)})
+        self.assertEqual(command.returncode, 0, command.stderr)
+        self.assertEqual(command.stdout, "fixture-gh\n")
+
+    @unittest.skipUnless(shutil.which("systemd-analyze") and Path("/usr/bin/python3").is_file(),
+                         "requires installed systemd-analyze and /usr/bin/python3")
     def test_native_verify_preserves_special_path_arguments(self):
         special = 'engineering 工程 %h $HOME "quoted" \\literal'
         repo = self.scratch / special / "clone"

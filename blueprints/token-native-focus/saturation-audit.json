@@ -32,16 +32,16 @@
   },
   "counts": {
     "selected_components": 70,
-    "catalog_identities": 878,
-    "nonselected_catalog_identities": 808,
+    "catalog_identities": 901,
+    "nonselected_catalog_identities": 831,
     "exclusive_identity_groups": {
       "star_review": 281,
       "component_record": 69,
       "catalog_card": 114,
-      "research_supplement": 398,
+      "research_supplement": 421,
       "legacy_candidate": 16
     },
-    "exclusive_identity_group_scope": "Retains the preceding reconciliation groups. Thirteen Codex independent-discovery additions and 303 Claude discovery/refuter additions enter as research supplements after the prior 527-identity catalog. The six identities first recorded by the 2026-09-24 star-audit refresh enter as star reviews; stars already in the union keep their earlier groups. The seven identities first recorded by the 2026-09-24 local-model workload discovery (catalogs/us-equities/local-model-workloads-20260924.json) enter as research supplements. The four identities first recorded by the 2026-09-25 memory-stack convergence (catalogs/foundation/memory-stack-20260925.json) enter as research supplements. The ten identities first recorded by the 2026-09-26 SOTA-gap audit (manifests/candidates.json, audit_batch sota-gap-audit-20260926) enter as legacy candidates, and so do the four identities of that audit's P1 trial batch (blueprints/trials-20260926). Source discovery is not installation or qualification. Current public-star membership remains a separate dated snapshot."
+    "exclusive_identity_group_scope": "Retains the preceding reconciliation groups. Thirteen Codex independent-discovery additions and 303 Claude discovery/refuter additions enter as research supplements after the prior 527-identity catalog. The six identities first recorded by the 2026-09-24 star-audit refresh enter as star reviews; stars already in the union keep their earlier groups. The seven identities first recorded by the 2026-09-24 local-model workload discovery (catalogs/us-equities/local-model-workloads-20260924.json) enter as research supplements. The four identities first recorded by the 2026-09-25 memory-stack convergence (catalogs/foundation/memory-stack-20260925.json) enter as research supplements. The ten identities first recorded by the 2026-09-26 SOTA-gap audit (manifests/candidates.json, audit_batch sota-gap-audit-20260926) enter as legacy candidates, and so do the four identities of that audit's P1 trial batch (blueprints/trials-20260926). Source discovery is not installation or qualification. Current public-star membership remains a separate dated snapshot. G5 adds 23 identities whose native registered record type is exclusively research_supplement. This changes source inventory counters only."
   },
   "counter_policy": {
     "rtk": "retained upstream command-output estimate; global/project overlap",
@@ -9751,5 +9751,65 @@
     "cleanup_boundary": "Owned processes/listeners/task records can be cleaned while evidence and data remain retained. Cleanup never implies deleting user state or having tested package uninstall.",
     "new_host_rule": "Reproduce applicable stages on the intended platform and retain its own native commands/results. Historical authoring-host evidence does not certify a new PC.",
     "source_history_rule": "base_public_commit and retained snapshots keep their original historical identity; reconciliation_base_public_commit records only this aggregation input."
+  },
+  "g5_catalog_reconciliation": {
+    "schema_version": 1,
+    "source": "scripts/catalog_decisions.py native typed identity union",
+    "baseline_commit": "0947b01289dcaa9157aa38392a94cf00f592b86d",
+    "baseline_index_sha256": "c203bd694384f31dca4f75333ef6f3e1ac4bfa0f04972290581d5c9f6b259459",
+    "baseline_audit_sha256": "39507165e70ff78cd76cf80e61da42f83531e150e968013289f5bd548bc5feae",
+    "current_index_sha256": "16a255eaa96ec3a861cfd74f6ec69cc52b630dbf8f53e17ebc5560ccc87ee690",
+    "baseline_counts": {
+      "selected_components": 70,
+      "catalog_identities": 878,
+      "nonselected_catalog_identities": 808,
+      "exclusive_identity_groups": {
+        "star_review": 281,
+        "component_record": 69,
+        "catalog_card": 114,
+        "research_supplement": 398,
+        "legacy_candidate": 16
+      },
+      "exclusive_identity_group_scope": "Retains the preceding reconciliation groups. Thirteen Codex independent-discovery additions and 303 Claude discovery/refuter additions enter as research supplements after the prior 527-identity catalog. The six identities first recorded by the 2026-09-24 star-audit refresh enter as star reviews; stars already in the union keep their earlier groups. The seven identities first recorded by the 2026-09-24 local-model workload discovery (catalogs/us-equities/local-model-workloads-20260924.json) enter as research supplements. The four identities first recorded by the 2026-09-25 memory-stack convergence (catalogs/foundation/memory-stack-20260925.json) enter as research supplements. The ten identities first recorded by the 2026-09-26 SOTA-gap audit (manifests/candidates.json, audit_batch sota-gap-audit-20260926) enter as legacy candidates, and so do the four identities of that audit's P1 trial batch (blueprints/trials-20260926). Source discovery is not installation or qualification. Current public-star membership remains a separate dated snapshot."
+    },
+    "current_counts": {
+      "selected_components": 70,
+      "catalog_identities": 901,
+      "nonselected_catalog_identities": 831,
+      "exclusive_identity_groups": {
+        "star_review": 281,
+        "component_record": 69,
+        "catalog_card": 114,
+        "research_supplement": 421,
+        "legacy_candidate": 16
+      },
+      "exclusive_identity_group_scope": "Retains the preceding reconciliation groups. Thirteen Codex independent-discovery additions and 303 Claude discovery/refuter additions enter as research supplements after the prior 527-identity catalog. The six identities first recorded by the 2026-09-24 star-audit refresh enter as star reviews; stars already in the union keep their earlier groups. The seven identities first recorded by the 2026-09-24 local-model workload discovery (catalogs/us-equities/local-model-workloads-20260924.json) enter as research supplements. The four identities first recorded by the 2026-09-25 memory-stack convergence (catalogs/foundation/memory-stack-20260925.json) enter as research supplements. The ten identities first recorded by the 2026-09-26 SOTA-gap audit (manifests/candidates.json, audit_batch sota-gap-audit-20260926) enter as legacy candidates, and so do the four identities of that audit's P1 trial batch (blueprints/trials-20260926). Source discovery is not installation or qualification. Current public-star membership remains a separate dated snapshot. G5 adds 23 identities whose native registered record type is exclusively research_supplement. This changes source inventory counters only."
+    },
+    "added_research_identities": [
+      "https://github.com/aannoo/hcom",
+      "https://github.com/anthropics/claude-code-action",
+      "https://github.com/anthropics/financial-services",
+      "https://github.com/astral-sh/ty",
+      "https://github.com/cloudflare/security-audit-skill",
+      "https://github.com/deepentropy/tvscreener",
+      "https://github.com/getpaseo/paseo",
+      "https://github.com/ghostfolio/ghostfolio",
+      "https://github.com/harness/harness",
+      "https://github.com/harnessmd/munder-difflin",
+      "https://github.com/hkuds/nanobot",
+      "https://github.com/languagetool-org/languagetool",
+      "https://github.com/llvm/llvm-project",
+      "https://github.com/margelo/react-native-graph",
+      "https://github.com/mathieu2301/tradingview-api",
+      "https://github.com/microsoft/pyright",
+      "https://github.com/minishlab/semble",
+      "https://github.com/nofxaios/nofx",
+      "https://github.com/nvidia/model-optimizer",
+      "https://github.com/ohmyzsh/ohmyzsh",
+      "https://github.com/orchestratorinc/agent-orchestrator",
+      "https://github.com/pingdotgg/t3code",
+      "https://github.com/shner-elmo/tradingview-screener"
+    ],
+    "boundary": "Catalog inventory reconciliation only; selected component, lifecycle, receipt, install and host acceptance facts unchanged."
   }
 }

@@ -258,8 +258,9 @@ def _build(baseline, raw_rows, now, previous=None):
         "filtered_nonpublic_count": filtered, "kind": "public_starred",
         "repositories": rows, "retrieved_at": _stamp(now), "schema_version": 1,
     }
-    if "convergence_manifest" in baseline:
-        snapshot["convergence_manifest"] = baseline["convergence_manifest"]
+    for field in ("convergence_manifest", "convergence_status"):
+        if field in baseline:
+            snapshot[field] = baseline[field]
     return snapshot
 
 

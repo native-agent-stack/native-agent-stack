@@ -78,6 +78,17 @@ class PublicStarredTests(unittest.TestCase):
             self.assertIn(flag, args)
         self.assertEqual(args[2], "users/example/starred?per_page=100")
 
+    def test_rebuild_keeps_top_level_convergence_status_and_exact_canonical_bytes(self):
+        self.baseline["convergence_status"] = "SOURCE-SCOPED; recorded tier verdicts pending"
+        self.save_baseline()
+        with self.api([[api_row()]]):
+            stars.refresh_public_stars(self.root, output=stars.STARS, now=NOW)
+        first = self.canonical.read_bytes()
+        self.assertEqual(json.loads(first).get("convergence_status"), self.baseline["convergence_status"])
+        rebuilt = stars._build(json.loads(first), [api_row()], NOW)
+        stars._write_json(self.canonical, rebuilt)
+        self.assertEqual(self.canonical.read_bytes(), first)
+
     def test_duplicate_or_malformed_page_does_not_replace_snapshot(self):
         original = self.canonical.read_bytes()
         for pages in ([[api_row()], [api_row("EXAMPLE/project")]], [api_row()], {"message": "error"}, []):
