@@ -6,8 +6,8 @@
   "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
   "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
   "outputs": {
-    "docs/new-wsl-handbook.md": "e2212ffd84fbdc7b23fec7d46ed85e557b3550546fc6128be94a416f2e9d999d",
-    "docs/new-wsl-handbook.json": "9a30d61e035bf73abd81aafe34260ab1bb3b6b9fa61247cdbe5ee98d178157ed"
+    "docs/new-wsl-handbook.md": "ca26a226a91ffca2f9fdfc0cbbff06e49420355ca22346c22e44a488de5ca5b3",
+    "docs/new-wsl-handbook.json": "bb36e91a4153b4ae2cb7477a01d28ba4e255ac2466d958544f49f505e401d4d1"
   },
   "inventory": {
     "layers": 37,
@@ -964,6 +964,76 @@
       "check_exit_code": 0,
       "evidence_class": "local_integration",
       "scope": "Current source-authority/generated-byte binding only; the recorded source_head is the repair's working-tree base."
+    },
+    {
+      "recorded_at_utc": "2026-10-10T17:29:46Z",
+      "source_main": "0947b01289dcaa9157aa38392a94cf00f592b86d",
+      "cause": "PR #976 adds the data-quality gap-resolution reference to the landscape source. Refresh its two generated handbook source-hash mirrors and current publication binding through the unchanged supported builder; retain all earlier validation and regeneration observations.",
+      "source": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/0947b01289dcaa9157aa38392a94cf00f592b86d/scripts/build_new_wsl_handbook.py#L1334-L1374",
+      "command": "nice -n 10 ionice -c 3 python3 scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
+      "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "e2212ffd84fbdc7b23fec7d46ed85e557b3550546fc6128be94a416f2e9d999d",
+        "docs/new-wsl-handbook.json": "9a30d61e035bf73abd81aafe34260ab1bb3b6b9fa61247cdbe5ee98d178157ed"
+      },
+      "current_outputs": {
+        "docs/new-wsl-handbook.md": "14bfaa1fe544d096e8624546eed7a77ec743f1ea2954199901d43fe5c72e3b51",
+        "docs/new-wsl-handbook.json": "33488b7f41ea6e1b8d7ba5621f50e1a5cbece2fc6742aef69d112912d9d7b525"
+      },
+      "failed_check_retained": {
+        "job_url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/38071101984/job/114268688874",
+        "test": "tests.test_new_wsl_handbook.NewWslHandbookTests.test_the_committed_outputs_are_current_and_the_handbook_receipt_names_them",
+        "tests": 1726,
+        "failures": 1,
+        "skipped": 192,
+        "raw_job_log_sha256": "eb3dc47a8b8564b57777a51f6528676bab4c5ec165499eae66aac41fe836aab8",
+        "local_command": "nice -n 10 ionice -c 3 python3 scripts/build_new_wsl_handbook.py --check",
+        "local_native_exit_code": 1,
+        "local_error": "new-wsl-handbook: stale generated output: docs/new-wsl-handbook.md; run --write"
+      },
+      "check": "nice -n 10 ionice -c 3 python3 scripts/build_new_wsl_handbook.py --check",
+      "check_exit_code": 0,
+      "evidence_class": "local_integration",
+      "scope": "Only the landscape source SHA-256 changed in each generated output. No winner, profile, pin, verdict, native vendor execution or host acceptance changed."
+    },
+    {
+      "recorded_at_utc": "2026-10-10T17:33:01Z",
+      "source_main": "0947b01289dcaa9157aa38392a94cf00f592b86d",
+      "cause": "The added landscape resolution-reference line shifts four architecture pin-source citations by one line. Bind Pandera, agent-retrieval-bench, Inspect AI and MLflow to their actual unchanged pin fields, then regenerate the handbook through its unchanged supported builder. Preserve the first source-hash regeneration and every historical observation.",
+      "sources": [
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/0947b01289dcaa9157aa38392a94cf00f592b86d/tests/test_architecture_pin_source.py#L178-L196",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/0947b01289dcaa9157aa38392a94cf00f592b86d/scripts/build_new_wsl_handbook.py#L1334-L1374"
+      ],
+      "command": "nice -n 10 ionice -c 3 python3 scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
+      "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "14bfaa1fe544d096e8624546eed7a77ec743f1ea2954199901d43fe5c72e3b51",
+        "docs/new-wsl-handbook.json": "33488b7f41ea6e1b8d7ba5621f50e1a5cbece2fc6742aef69d112912d9d7b525"
+      },
+      "current_outputs": {
+        "docs/new-wsl-handbook.md": "ca26a226a91ffca2f9fdfc0cbbff06e49420355ca22346c22e44a488de5ca5b3",
+        "docs/new-wsl-handbook.json": "bb36e91a4153b4ae2cb7477a01d28ba4e255ac2466d958544f49f505e401d4d1"
+      },
+      "failed_check_retained": {
+        "job_url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/38071101984/job/114268688787",
+        "test": "tests.test_architecture_pin_source.ArchitecturePinSourceTests.test_all_line_citations_identify_the_winners_pin_fields",
+        "tests": 1839,
+        "failures": 4,
+        "skipped": 145,
+        "raw_job_log_sha256": "6d320573339ef9c3ec5112ea0bdb9759e8eddb3a41c64df4e277d3b85d378172",
+        "local_command": "nice -n 10 ionice -c 3 python3 -m unittest tests.test_architecture_pin_source.ArchitecturePinSourceTests.test_all_line_citations_identify_the_winners_pin_fields",
+        "local_native_exit_code": 1,
+        "local_tests": 1,
+        "local_subtest_failures": 4
+      },
+      "check": "nice -n 10 ionice -c 3 python3 scripts/build_new_wsl_handbook.py --check",
+      "check_exit_code": 0,
+      "evidence_class": "local_integration",
+      "scope": "Citation and generated-source binding only; winner identities, pin values, supported install commands, profiles, verdicts and all historical native acceptance remain unchanged."
     }
   ],
   "previous_outputs": [

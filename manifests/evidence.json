@@ -17057,7 +17057,7 @@
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
-      "sha256": "d1ed06b8db2a6de06b4e3e3ff9e7455ffd9a10cafee3cbb0ed0196a6da8c8c9c",
+      "sha256": "dc9139ecd25c5de237eb2015fff61dac93902ee0b6368f8f6b13d1f403bf24be",
       "bytes": 326276
     },
     {
@@ -18872,12 +18872,12 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "9a30d61e035bf73abd81aafe34260ab1bb3b6b9fa61247cdbe5ee98d178157ed",
+      "sha256": "bb36e91a4153b4ae2cb7477a01d28ba4e255ac2466d958544f49f505e401d4d1",
       "bytes": 699356
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "e2212ffd84fbdc7b23fec7d46ed85e557b3550546fc6128be94a416f2e9d999d",
+      "sha256": "ca26a226a91ffca2f9fdfc0cbbff06e49420355ca22346c22e44a488de5ca5b3",
       "bytes": 369789
     },
     {
@@ -42077,8 +42077,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "855f6c39941f68d0b596b14ba2f843e4902f1afa3580719ed86209c391d0772f",
-      "bytes": 70304
+      "sha256": "ff5b0cc54846863e2184fdb5cd3dca2f6a253a775a47810571a65fad697b63b2",
+      "bytes": 75513
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/slot-state-and-core-recipes.json",
