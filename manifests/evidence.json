@@ -61486,6 +61486,11 @@
       "bytes": 22270
     },
     {
+      "path": "tests/test_anthropic_key_health.py",
+      "sha256": "0a2462b43c8d9ab6fe2b3c441f7cbe396dc2a769acb8504a9ecb2d690c5289bf",
+      "bytes": 24953
+    },
+    {
       "path": "tests/test_apply_claude_settings.py",
       "sha256": "4c40b74a699fa29a307935c1b309edc7869e7b50e390c5b5d8613ae74ea6a5d3",
       "bytes": 47548
@@ -62964,6 +62969,11 @@
       "path": "tools/claude-review-worker/worker.py",
       "sha256": "30d5fbd68f6c521a3336a104df7b1cec223177ff6c3008d66cdfc7d7fef270a6",
       "bytes": 129379
+    },
+    {
+      "path": "tools/credentials/anthropic_key_health.py",
+      "sha256": "4d4160a4d8a3db7b83aa9c232532f68d67aa088a64e4d18dca24ef66c89f58c3",
+      "bytes": 17424
     },
     {
       "path": "tools/credentials/canary_lane_consumer.sh",
