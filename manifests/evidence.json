@@ -5211,8 +5211,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "61a9ed511b422382bcf4433167aa6627e51eb390b6a6a4efd9aa5cc377e99a66",
-      "bytes": 35456
+      "sha256": "1c8a817bff26722134d9707dc47a7d9a5092342b95e1899e9977d9b1d3c1ece0",
+      "bytes": 39299
     },
     {
       "path": ".gitignore",
@@ -5221,8 +5221,8 @@
     },
     {
       "path": ".gitleaks.toml",
-      "sha256": "5d27274ab0beee758ea4431e6847031bc72899cd0a8852c2a2478f7af0bc3056",
-      "bytes": 32997
+      "sha256": "f9abe05a349ba68f75a0c326d86536226a9f3b1276e36f89971a2d02a67aef76",
+      "bytes": 33070
     },
     {
       "path": ".gitleaksignore",
@@ -18581,6 +18581,11 @@
       "bytes": 2956
     },
     {
+      "path": "docs/decisions/2026-10-10-secret-scan-large-targets.md",
+      "sha256": "35da27177c245d8030a586831d747489cbbb070c1e100e2d4e808cfe65640950",
+      "bytes": 11911
+    },
+    {
       "path": "docs/decisions/2026-10-10-skills-claude-native-practice-row.md",
       "sha256": "5d09bcc37df78410545b831c8f73952d6206356695be9cadfaba2bcca381fff6",
       "bytes": 5864
@@ -18722,8 +18727,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "ef1654f0bdcb863754793425243647eb56879837ebbc2af3d81535ce407c4fd0",
-      "bytes": 106604
+      "sha256": "50c2e1498bc50f7a6733a082cd797a077160895f1f30dc8aaeca7172c534cbe8",
+      "bytes": 106805
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -50296,6 +50301,11 @@
       "bytes": 248046
     },
     {
+      "path": "evidence/artifacts/secret-scan-large-targets-20261010/measurements.json",
+      "sha256": "2b220549599f2fb33a8f39a1b1e85446423abb5b97ac4a490abc9177f31237e2",
+      "bytes": 10253
+    },
+    {
       "path": "evidence/artifacts/security-audit-host-install-20260928/README.md",
       "sha256": "d966c5ee27bb53eec21003ea1533b3e11636290c32ab9bad231c95291d8fd323",
       "bytes": 3663
@@ -59736,6 +59746,11 @@
       "bytes": 110935
     },
     {
+      "path": "scripts/secret_scan_metrics.py",
+      "sha256": "89bd8c4f4d21d9328a8955d7a6103f10b7e4d921deaa8418a60181f0cf2cd774",
+      "bytes": 3590
+    },
+    {
       "path": "scripts/skills_status.py",
       "sha256": "eeb462e9b6b2b4acb6cc39af42ea96bf4a6dd14892a45a71d9fa61db229b806d",
       "bytes": 42439
@@ -60702,7 +60717,7 @@
     },
     {
       "path": "tests/test_local_pages_policy_grants.py",
-      "sha256": "7ea348554ca4d467b71b18833167858f77715ee962832e1f503ed4682c983585",
+      "sha256": "6ee5152d9bb4827c8a27e4dec46d53c04c0b8bdb39d2c697f1760c6a2507be4a",
       "bytes": 19309
     },
     {
@@ -61086,6 +61101,16 @@
       "bytes": 391697
     },
     {
+      "path": "tests/test_secret_scan_metrics.py",
+      "sha256": "0ce1a4e1be35cb2e1c38a580388b19c87993044f967eb119d77decc0ef08c086",
+      "bytes": 5392
+    },
+    {
+      "path": "tests/test_secret_scan_size.py",
+      "sha256": "d1d2ba30337805d1717c5916417701e46989a8641efcfe5859d8f6c1e62d3cc1",
+      "bytes": 17626
+    },
+    {
       "path": "tests/test_security_identity.py",
       "sha256": "cdd357d5cc1521959509ce41b519787790d046b51f91a2c29275f3842b667fee",
       "bytes": 22857
@@ -61277,8 +61302,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "86e4dc0183af8234ff78840354d8526d43b3e09bec0ea7c11dd54e5fc8233a88",
-      "bytes": 178463
+      "sha256": "1c04aafa14b56e0f21185391884e78e64bab2dd11b834e96cac0e715d91044e9",
+      "bytes": 182403
     },
     {
       "path": "tests/test_workflow_policy.py",
@@ -61532,8 +61557,8 @@
     },
     {
       "path": "tools/local-pages/source_policy.json",
-      "sha256": "3ada6228d67a4f187df65f7bccb68fcfbe9cd37a540d50e834a56c726bece90f",
-      "bytes": 757267
+      "sha256": "af2b24cf4047d75a058e20e83f8417e4aedf039b6f51f1d75dff53e7796ca32a",
+      "bytes": 757349
     },
     {
       "path": "tools/omniroute/gateway_record.py",
