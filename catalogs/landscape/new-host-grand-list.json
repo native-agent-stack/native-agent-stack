@@ -2289,8 +2289,8 @@
       "decision": "keep_but_compare",
       "verdict_status": "recorded",
       "independent_review": "dual_lane_same_winner",
-      "open_executable_now_gaps": 8,
-      "open_gaps": 12,
+      "open_executable_now_gaps": 5,
+      "open_gaps": 9,
       "winners": [
         {
           "component_id": "nautilustrader",

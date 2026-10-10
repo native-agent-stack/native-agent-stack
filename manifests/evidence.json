@@ -17177,8 +17177,8 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "45da8044fb6c582b08b59dc3e7ba835bf5cb89251048d8f13bd47940d3a0a278",
-      "bytes": 287577
+      "sha256": "0ef470fd627e086eab11ec43f260bf0d6a554ae8b1a4a292b21630f85b5d9135",
+      "bytes": 287576
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -18887,8 +18887,8 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "e8d75bcab6363af4946da59220a8adc9110c50fe42622d0bfeec8a7154162956",
-      "bytes": 18484
+      "sha256": "e4378cf907b965f18c97083ba2420469022ca102c2bc56732c9d26356d0e6590",
+      "bytes": 18483
     },
     {
       "path": "docs/new-workstation-runtime-profile-20260922.md",

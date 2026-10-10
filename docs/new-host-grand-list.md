@@ -108,7 +108,7 @@ Locally-run model weights a host receipt recorded qualifying on a runtime compon
 | Agents, models and workers | keep_but_compare | `codex-native-sdk` | CLI rust-v0.155.1; Python openai-codex 0.154.0 (behind rust-v0.156.0) | native_proven | accepted | untested | — | 9 / 15 |
 |  |  | `foundation-ai-memory` | v2.3.1 (behind v2.4.0) | native_proven | accepted, bootstrap 2.4.1 | untested, bootstrap 2.3.2 | foundation-cpu, recovery, macos-arm64-foundation, token-efficiency |  |
 |  |  | `foundation-socraticode` | v1.14.0 | native_proven | accepted, bootstrap 1.15.0 | untested, bootstrap 1.14.0 | semantic-rag, macos-arm64-foundation, token-efficiency |  |
-| Backtesting engine | keep_but_compare | `nautilustrader` | 2.0.0rc5 (tag v2.0.0rc5; source pin from evidence/receipts/native-nautilus-v2-20260920.json — commit 1b0a49d2792a9432a3aca3fcb617ce7a630d905e) | native_proven | host_verified | untested | trading-nautilus | 8 / 12 |
+| Backtesting engine | keep_but_compare | `nautilustrader` | 2.0.0rc5 (tag v2.0.0rc5; source pin from evidence/receipts/native-nautilus-v2-20260920.json — commit 1b0a49d2792a9432a3aca3fcb617ce7a630d905e) | native_proven | host_verified | untested | trading-nautilus | 5 / 9 |
 |  |  | `lean` | 985ef30ad3ac774218c5ac516b4cb0aa2655730f | native_proven | host_verified | untested | research-runtime |  |
 | Data quality and orchestration | retain | `dagu` | v2.16.6 (behind v2.17.0) | synthetic | host_verified | untested | research-runtime | 6 / 9 |
 |  |  | `data-pandera` | v0.33.1; source 62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6 | synthetic | host_verified | untested | — |  |
