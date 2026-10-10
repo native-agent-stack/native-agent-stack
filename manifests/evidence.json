@@ -5071,8 +5071,8 @@
     },
     {
       "path": ".github/requirements-ci.txt",
-      "sha256": "0b37433fb0fb165c893737e8e887581a07a6469683fbdf67ada1a08288758605",
-      "bytes": 467
+      "sha256": "33f5626de125815129498eb607a8cb7c717e016c759b3df9eb0bdd4f4b9d7d6c",
+      "bytes": 12577
     },
     {
       "path": ".github/requirements-validation.txt",
@@ -17126,6 +17126,16 @@
       "bytes": 479154
     },
     {
+      "path": "catalogs/landscape/gap-closeouts/README.md",
+      "sha256": "8ac3ccb06c939eebe78ff8f137c33c43b06649c1ac8b32759bfdc2790171b066",
+      "bytes": 4223
+    },
+    {
+      "path": "catalogs/landscape/gap-closeouts/schema.json",
+      "sha256": "7cbe1df401f07b472b7074bfb8321297fed0a2a009623814f49eb47c683e0f27",
+      "bytes": 3073
+    },
+    {
       "path": "catalogs/landscape/gap-crosswalk-92bb279.json",
       "sha256": "bb354c43a6d318c26eaeb889baa30b8006c23a0f3de2e6dfc123d999ad1726b8",
       "bytes": 614862
@@ -18599,6 +18609,11 @@
       "path": "docs/decisions/2026-10-10-secret-scan-large-targets.md",
       "sha256": "35da27177c245d8030a586831d747489cbbb070c1e100e2d4e808cfe65640950",
       "bytes": 11911
+    },
+    {
+      "path": "docs/decisions/2026-10-10-shared-gap-closeouts.md",
+      "sha256": "63ff9077afc1b2c689f6fbd7692e609a570a155c80c16b4bc54a6f76b9761d12",
+      "bytes": 3691
     },
     {
       "path": "docs/decisions/2026-10-10-skills-claude-native-practice-row.md",
@@ -50336,6 +50351,36 @@
       "bytes": 6435
     },
     {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/before.log",
+      "sha256": "f0dde5d856c768b4a9bb3eaf7ef123b742f77df05da735b59321ec66617b0771",
+      "bytes": 2441
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/matrix-check.log",
+      "sha256": "08ce4f275c99b7f91a141cfca5b7384f060aacf620f23a324cde692d55e6ffcd",
+      "bytes": 34
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/pre-registration-validate.log",
+      "sha256": "58f5500a916fdbc7186e9fabfae37588ac9b059a5fbf94708011d9551c5870fe",
+      "bytes": 221
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/receipt.json",
+      "sha256": "97bf90f2c7dbb45b87902f7c3669722c3272091156dd4bc9673047c994ef3f47",
+      "bytes": 5360
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/registry-before.log",
+      "sha256": "2c3cd95e41edd8330c40afe5009c496486266ba63b059862dbe1e4cafeafe66d",
+      "bytes": 1280
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/tests.log",
+      "sha256": "fefd1f619a84bf6fc5d1ed2cdc606d06e47ce7f6ad5e8798f85baa278c02d5cc",
+      "bytes": 183
+    },
+    {
       "path": "evidence/artifacts/skills-agents-layer-20260926/README.md",
       "sha256": "dc170a49e01f35c5ab30af6f51108c8a29559294467353d156b3c626e71829f3",
       "bytes": 8407
@@ -59652,8 +59697,8 @@
     },
     {
       "path": "scripts/component_matrix.py",
-      "sha256": "ab4cbdd0521d2a42108395509589b12a82e83afef76e6377574177ff54c5d899",
-      "bytes": 72137
+      "sha256": "7cab7e416cf833b69a68abe810b8d2afbea47bb5c10ae0a6b7e581be5c129a94",
+      "bytes": 78303
     },
     {
       "path": "scripts/credential_boot_receipt.py",
@@ -60534,6 +60579,11 @@
       "path": "tests/test_g5_merge_fragments.py",
       "sha256": "766a9fa116c54dd365304cffc982b97fab186e29749ddec6365dee20d10013d9",
       "bytes": 51421
+    },
+    {
+      "path": "tests/test_gap_closeouts.py",
+      "sha256": "68c9cacc9d4a6e77b05e268c1d739a6e26dda2dcd7b3906d246a336548eee637",
+      "bytes": 11356
     },
     {
       "path": "tests/test_gap_crosswalk.py",

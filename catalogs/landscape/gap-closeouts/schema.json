@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Retained per-layer gap closeouts",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "catalog", "layer_id", "date", "source_crosswalk_sha256", "gaps"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "catalog": {"enum": ["foundation", "us-equities"]},
+    "layer_id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+    "date": {"type": "string", "minLength": 10, "maxLength": 10, "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+    "source_crosswalk_sha256": {"$ref": "#/$defs/sha256"},
+    "gaps": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/gap"}}
+  },
+  "$defs": {
+    "text": {"type": "string", "minLength": 1, "pattern": "\\S"},
+    "sha256": {"type": "string", "minLength": 64, "maxLength": 64, "pattern": "^[0-9a-f]{64}$"},
+    "head": {"type": "string", "minLength": 40, "maxLength": 40, "pattern": "^[0-9a-f]{40}$"},
+    "category": {"enum": ["executable_now", "catalog_edit", "needs_user_login", "needs_paid_entitlement", "needs_hardware", "time_gated", "needs_user_decision", "not_actionable"]},
+    "evidence": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {"path": {"$ref": "#/$defs/text"}, "sha256": {"$ref": "#/$defs/sha256"}}
+    },
+    "vendor": {
+      "type": "object", "additionalProperties": false,
+      "required": ["repository", "pin", "path"],
+      "properties": {
+        "repository": {"type": "string", "pattern": "^https://[^\\s]+$"},
+        "pin": {"$ref": "#/$defs/text"},
+        "path": {"$ref": "#/$defs/text"},
+        "command": {"$ref": "#/$defs/text"}
+      }
+    },
+    "review": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "sha256", "head", "family"],
+      "properties": {
+        "path": {"$ref": "#/$defs/text"},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "head": {"$ref": "#/$defs/head"},
+        "family": {"enum": ["gpt", "claude"]}
+      }
+    },
+    "gap": {
+      "type": "object", "additionalProperties": false,
+      "required": ["index", "source_text_sha256", "status", "reason", "evidence", "vendor_paths", "reviews"],
+      "properties": {
+        "index": {"type": "integer", "minimum": 0},
+        "source_text_sha256": {"$ref": "#/$defs/sha256"},
+        "status": {"enum": ["proposed", "settled", "residual", "blocked"]},
+        "reason": {"$ref": "#/$defs/text"},
+        "category": {"$ref": "#/$defs/category"},
+        "evidence": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/evidence"}},
+        "vendor_paths": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/vendor"}},
+        "reviews": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/review"}}
+      },
+      "allOf": [
+        {"if": {"properties": {"status": {"enum": ["residual", "blocked"]}}}, "then": {"required": ["category"]}, "else": {"not": {"required": ["category"]}}}
+      ]
+    }
+  }
+}
