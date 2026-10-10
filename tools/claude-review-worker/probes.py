@@ -21,7 +21,8 @@ offline:
   O4 the API host is reachable from the sandbox (DNS and a TCP connect; nothing is sent);
   O5 the pinned client starts in the sandbox with no network and no key, and its init record lists only Read, Glob
      and Grep, no MCP server and no plugin (so the --settings JSON was applied);
-  O6 each configured key is present in its store (credential_run.py --check prints names and state, never a value);
+  O6 the first fill-first key is present in its store, O6i each later slot, for information (the runner's --check
+     prints names and state, never a value);
   O7 main's committed .claude/settings.json stays out: it selects a project output style, which a control run
      without --restricted and --setting-sources reports in its init record and the fenced run must not.
   The L checks run the same invocation against a loopback stand-in for the Messages API inside the sandbox (after
@@ -431,13 +432,21 @@ def sandbox_checks(bwrap: str, plan, fixture: Fixture, claude_bin: Path, scratch
 
 
 def key_checks(keys, checks: list) -> None:
-    for key in keys:
+    """O6: the first key of the fill-first order is present in its store. The later slots are reported as O6i, for
+    information: a slot not stored yet is skipped by the worker, not a failure."""
+    for index, key in enumerate(keys):
         done = subprocess.run([sys.executable, "-I", "-S", str(crw.CREDENTIAL_RUN), key, "--check"],
                               env=crw.runner_environment(dict(os.environ)), capture_output=True, text=True,
                               timeout=60, check=False)
         line = (done.stdout.strip().splitlines() or [""])[0]
-        check(checks, "O6", f"{key} is present in its store", done.returncode == 0 and ": ok;" in line,
-              line[:200] or f"exit {done.returncode}")
+        present = done.returncode == 0 and ": ok;" in line
+        if index == 0:
+            check(checks, "O6", f"{key} is present in its store", present, line[:200] or f"exit {done.returncode}")
+        else:
+            checks.append({"id": "O6i", "name": f"{key} (a later fill-first slot): stored or not",
+                           "result": "INFO", "exercised": True,
+                           "detail": ("present; " if present else "not stored; skipped by the worker; ")
+                           + (line[:160] or f"exit {done.returncode}")})
 
 
 # --------------------------------------------------------------------------- loopback (offline)
@@ -819,12 +828,12 @@ def main(argv=None) -> int:
                                    "config_dirs": {"control": control_scan, "fenced": fenced_scan}}
             config_checks({"control": control_scan, "fenced": fenced_scan}, checks)
             key_checks(settings.keys, checks)
-            if args.mode == "live" and all(c["result"] == "PASS" for c in checks if c["id"] != "O6"):
+            if args.mode == "live" and all(c["result"] in ("PASS", "INFO") for c in checks if c["id"] != "O6"):
                 receipt["runs"] = live(worker, fixture, candidate, plan, out, checks)
             elif args.mode == "live":
                 receipt["runs"] = []
                 receipt["not_run"] = "an offline check failed, so no paid run was made"
-    passed = all(c["result"] == "PASS" for c in checks)
+    passed = all(c["result"] in ("PASS", "INFO") for c in checks)  # INFO: O6i, a later slot's presence
     receipt["result"] = "PASS" if passed else "FAIL"
     receipt["evidence_class"] = "native_proven" if args.mode == "live" and passed and receipt.get("runs") else \
         "not_native_proven"

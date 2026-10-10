@@ -40,7 +40,7 @@ crw = load("claude_review_worker", TOOL / "worker.py")
 probes = load("claude_review_worker_probes", TOOL / "probes.py")  # it reuses the module loaded above
 assert probes.crw is crw
 
-KEYS = ("anthropic-api-4", "anthropic-api-3", "anthropic-api-2")
+KEYS = ("anthropic-api-4", "anthropic-api-5", "anthropic-api")  # the head of the fill-first order
 GIT_ID = {"GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@example.invalid", "GIT_COMMITTER_NAME": "t",
           "GIT_COMMITTER_EMAIL": "t@example.invalid"}
 
@@ -896,16 +896,53 @@ class ReviewRunTest(unittest.TestCase):
                 h.worker([repo]).tick()
                 self.assertEqual([c["key"] for c in h.launcher.calls], [KEYS[0], KEYS[1]])
                 self.assertEqual([(r["kind"], r["key"]) for r in h.rows()],
-                                 [("debit", KEYS[0]), ("void", KEYS[0]), ("debit", KEYS[1]), ("settle", KEYS[1])])
+                                 [("debit", KEYS[0]), ("void", KEYS[0]), ("switch", KEYS[1]), ("debit", KEYS[1]),
+                                  ("settle", KEYS[1])])
+                switch = h.rows()[2]
+                self.assertEqual((switch["from"], switch["to"], switch["reason"]),
+                                 (KEYS[0], KEYS[1], f"credit_exhausted (HTTP {status})"))
                 attempt = h.record(repo, 3, sha)["attempts"][0]
                 self.assertEqual((attempt["outcome"], attempt["keys"]), ("completed", [KEYS[0], KEYS[1]]))
                 self.assertEqual(len(set(attempt["ledger_refs"])), 2)
-                # Single-key mode: a run on a cold spare is logged at warning priority.
-                spare = [line for line in h.logs if line.startswith("<4>WARNING") and f"cold spare {KEYS[1]}" in line]
-                self.assertEqual(len(spare), 1, h.logs)
+                moved = [line for line in h.logs if line.startswith("<4>WARNING") and f"to {KEYS[1]}" in line]
+                self.assertEqual(len(moved), 1, h.logs)
 
-    def test_the_default_key_order_is_api_4_then_the_cold_spares(self):
-        self.assertEqual(crw.DEFAULT_KEYS, ("anthropic-api-4", "anthropic-api-3", "anthropic-api-2"))
+    def test_a_revoked_key_moves_to_the_next_key(self):
+        h = Harness(self)
+        repo, sha = self.private(h)
+        h.queue([refusal(401, "API Error: 401 invalid x-api-key"), run_of(PASS_REPORT)])
+        h.worker([repo]).tick()
+        self.assertEqual([c["key"] for c in h.launcher.calls], [KEYS[0], KEYS[1]])
+        self.assertEqual([r["kind"] for r in h.rows()], ["debit", "void", "switch", "debit", "settle"])
+        self.assertEqual(h.rows()[2]["reason"], "revoked_key (HTTP 401)")
+
+    def test_the_default_key_order_is_fill_first_without_the_ci_key(self):
+        self.assertEqual(crw.DEFAULT_KEYS, ("anthropic-api-4", "anthropic-api-5", "anthropic-api", "anthropic-api-2",
+                                            "anthropic-api-6", "anthropic-api-7", "anthropic-api-8", "anthropic-api-9",
+                                            "anthropic-api-10"))
+        self.assertNotIn("anthropic-api-3", crw.DEFAULT_KEYS)  # CI review's key
+
+    def test_a_key_the_runner_refuses_is_skipped_before_any_debit(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            runner = Path(temporary) / "credential_run.py"
+            runner.write_text("import sys\nsys.exit(0 if sys.argv[1] == 'anthropic-api-4' else 1)\n")
+            launcher = crw.SandboxLauncher(Path("/c/claude"), "/usr/bin/true", credential_run=runner)
+            settings = crw.Settings(Path(temporary) / "state", None, KEYS, Path("/c/claude"), False, 60)
+            worker = crw.Worker([], settings, {"PATH": "/usr/bin:/bin", "HOME": temporary}, launcher=launcher,
+                                log=lambda line: None, bwrap="")
+            self.assertEqual([worker.key_usable(k) for k in KEYS], [True, False, False])
+
+    def test_a_settle_records_the_run_tokens_and_cache_hit_rate(self):
+        h = Harness(self)
+        repo, sha = self.public(h)
+        h.queue([run_of(PASS_REPORT)])
+        h.worker([repo]).tick()
+        settle = [r for r in h.rows() if r["kind"] == "settle"][0]
+        self.assertEqual(sorted(next(iter(settle["tokens"].values()))),
+                         ["cache_creation_input_tokens", "cache_read_input_tokens", "input_tokens", "output_tokens"])
+        counts = next(iter(settle["tokens"].values()))
+        total = counts["cache_read_input_tokens"] + counts["cache_creation_input_tokens"] + counts["input_tokens"]
+        self.assertEqual(settle["cache_hit_rate"], round(counts["cache_read_input_tokens"] / total, 6))
 
     def test_a_journal_priority_prefix_stays_at_the_start_of_the_line(self):
         out = io.StringIO()
@@ -917,13 +954,13 @@ class ReviewRunTest(unittest.TestCase):
     def test_any_other_refusal_stops_at_once_and_is_final(self):
         h = Harness(self)
         repo, sha = self.private(h)
-        h.queue([refusal(401, "API Error: 401 invalid x-api-key"), run_of(PASS_REPORT)])
+        h.queue([refusal(403, "API Error: 403 permission_error"), run_of(PASS_REPORT)])
         h.worker([repo], post=True).tick()
         self.assertEqual([c["key"] for c in h.launcher.calls], [KEYS[0]])
-        self.assertEqual([r["kind"] for r in h.rows()], ["debit", "void"])
+        self.assertEqual([r["kind"] for r in h.rows()], ["debit", "void"])  # no switch: only 402 and 401 move on
         attempt = h.record(repo, 3, sha)["attempts"][0]
         self.assertEqual((attempt["outcome"], attempt["final"]), ("api_refused", True))
-        self.assertEqual(h.posts()[0]["body"]["description"], "Claude local review: the API refused the request (HTTP 401)")
+        self.assertEqual(h.posts()[0]["body"]["description"], "Claude local review: the API refused the request (HTTP 403)")
 
     def test_every_key_out_of_credit_is_a_final_refusal(self):
         h = Harness(self)
@@ -931,7 +968,8 @@ class ReviewRunTest(unittest.TestCase):
         h.queue([refusal(402)] * 3)
         h.worker([repo], post=True).tick()
         self.assertEqual([c["key"] for c in h.launcher.calls], list(KEYS))
-        self.assertEqual([r["kind"] for r in h.rows()], ["debit", "void"] * 3)
+        self.assertEqual([r["kind"] for r in h.rows()], ["debit", "void", "switch", "debit", "void", "switch", "debit",
+                                                         "void"])
         attempt = h.record(repo, 3, sha)["attempts"][0]
         self.assertEqual((attempt["outcome"], attempt["final"]), ("api_refused", True))
         self.assertEqual(h.posts()[0]["body"]["description"], "Claude local review: every configured key is out of credit")
@@ -1174,7 +1212,8 @@ class BoundsTest(unittest.TestCase):
         self.assertEqual((len(records), unparseable), (4, 2))
 
     def test_the_refusal_class(self):
-        self.assertEqual(self.classify(refusal(401)), ("api_refused", []))
+        self.assertEqual(self.classify(refusal(401)), ("revoked_key", []))
+        self.assertEqual(self.classify(refusal(403)), ("api_refused", []))
         self.assertEqual(self.classify(refusal(402)), ("credit_exhausted", []))
         self.assertEqual(self.classify(refusal(400, "Your credit balance is too low to access the API")),
                          ("credit_exhausted", []))
@@ -1554,7 +1593,7 @@ class InvocationTest(unittest.TestCase):
 
     def test_settings_read_the_environment(self):
         settings = crw.settings_from({"HOME": "/h", "API_ACTIONS_LEDGER": "~/l.jsonl"})
-        self.assertEqual(settings.keys, KEYS)
+        self.assertEqual(settings.keys, crw.DEFAULT_KEYS)
         self.assertEqual(settings.claude_bin, Path("/h/.local/share/claude/versions/2.1.296"))
         self.assertEqual(settings.state, Path("/h/.local/state/native-agent-stack/claude-review-worker"))
         self.assertEqual(settings.ledger, Path("/h/l.jsonl"))

@@ -18627,8 +18627,8 @@
     },
     {
       "path": "docs/decisions/2026-10-09-claude-review-worker.md",
-      "sha256": "ed052164f94d3e4bc3ffe1c4674cfeaed311cc9867d860fc50a79ed8f8d83c4d",
-      "bytes": 57562
+      "sha256": "1c0a485f6ed2d12df4df3580c7a94cc81a814caae5e25659dcc763415b0c60d8",
+      "bytes": 58512
     },
     {
       "path": "docs/decisions/2026-10-09-codex-native-review-trial.md",
@@ -61462,8 +61462,8 @@
     },
     {
       "path": "tests/test_claude_review_worker.py",
-      "sha256": "1ad5831b1b59761e177482faa30ef0f44ac45803701d39b2e8412eae1bc1a471",
-      "bytes": 122802
+      "sha256": "240508db2a6eff99361bbf7a51a69025ac08126cd5da35413bd7540d869fa19c",
+      "bytes": 125522
     },
     {
       "path": "tests/test_claude_spend_scan.py",
@@ -62757,8 +62757,8 @@
     },
     {
       "path": "tools/claude-review-worker/README.md",
-      "sha256": "c8105133c32b688a96dbe196434478597277df9c2ed06bc282feafff23bf9371",
-      "bytes": 13648
+      "sha256": "3e04081c3ece35826662c1f27748205f3c64490800019da0e614371a9bb95327",
+      "bytes": 13788
     },
     {
       "path": "tools/claude-review-worker/essential-paths.json",
@@ -62767,8 +62767,8 @@
     },
     {
       "path": "tools/claude-review-worker/probes.py",
-      "sha256": "79bea326b639c367bedd391b843fbca442f1de18a781eb16ff418d315d013bfa",
-      "bytes": 50930
+      "sha256": "e8c6b5b00da9bd1011835a42a9768e31a427ce34b137ea9676d726010d311bf6",
+      "bytes": 51641
     },
     {
       "path": "tools/claude-review-worker/systemd/claude-review-worker.service",
@@ -62782,8 +62782,8 @@
     },
     {
       "path": "tools/claude-review-worker/worker.py",
-      "sha256": "f7c7baf895064ef0a057a8ca9918717fc57f3f26252ef77ac098e1b9e412d9e1",
-      "bytes": 121908
+      "sha256": "613e89efd6ee130e862dc8ac809fffe95180be44134903e8c78792e1c7038c31",
+      "bytes": 125459
     },
     {
       "path": "tools/credentials/canary_lane_consumer.sh",

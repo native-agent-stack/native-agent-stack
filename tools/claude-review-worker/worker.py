@@ -76,9 +76,13 @@ COMMENT_LIMIT = 60_000
 DESCRIPTION_LIMIT = 140
 RULES_LIMIT_BYTES = 65_536
 FILES_API_CAP = 3000  # GET /pulls/{n}/files lists at most 3000 files; a list that long is treated as essential
-# Single-key mode (owner direction, command center 2026-10-10 01:49Z): anthropic-api-4 is the one key; the other two
-# are cold spares, tried only after a credit-exhausted refusal, and every run on a spare is logged as a warning.
-DEFAULT_KEYS = ("anthropic-api-4", "anthropic-api-3", "anthropic-api-2")
+# Fill-first (owner direction relayed by the command center, 2026-10-10 ~14:19Z): one key until Anthropic reports it out
+# of credit or revoked, then the next, never round-robin, because a prompt cache never crosses organizations
+# (anthropics/skills@dbd4588f skills/claude-api/shared/prompt-caching.md:130). anthropic-api-3 serves CI review only
+# (the main-only claude-review environment secret) and is not in the order. A slot the runner refuses is skipped.
+DEFAULT_KEYS = ("anthropic-api-4", "anthropic-api-5", "anthropic-api", "anthropic-api-2", "anthropic-api-6",
+                "anthropic-api-7", "anthropic-api-8", "anthropic-api-9", "anthropic-api-10")
+SWITCH_CLASSES = ("credit_exhausted", "revoked_key")
 DEFAULT_CLAUDE_BIN = "~/.local/share/claude/versions/2.1.296"
 DEFAULT_STATE = "~/.local/state/native-agent-stack/claude-review-worker"
 DEFAULT_TIMEOUT_SECONDS = 2700
@@ -964,6 +968,18 @@ def assistant_texts(records: list) -> list:
     return texts
 
 
+TOKEN_FIELDS = ("input_tokens", "output_tokens", "cache_read_input_tokens", "cache_creation_input_tokens")
+
+
+def cache_hit_rate(rows: list) -> float | None:
+    """cache_read / (cache_read + cache_creation + uncached input) over a run's models (claude-api skill,
+    anthropics/skills@dbd4588f skills/claude-api/shared/prompt-caching.md:186-192: input_tokens is the uncached
+    remainder only)."""
+    read = sum(r["cache_read_input_tokens"] for r in rows)
+    total = read + sum(r["cache_creation_input_tokens"] + r["input_tokens"] for r in rows)
+    return round(read / total, 6) if total else None
+
+
 def model_rows(usage) -> list | None:
     if not isinstance(usage, dict) or not usage:
         return None
@@ -1071,6 +1087,8 @@ def classify(numbers: dict) -> tuple:
     if refused:
         if numbers["credit_exhausted"]:
             return "credit_exhausted", []
+        if numbers["api_error_status"] == 401:
+            return "revoked_key", []  # authentication_error: the key is invalid or revoked; fill-first moves on
         if numbers["api_error_status"] is None:
             return "no_api_response", []  # no HTTP status: nothing answered (a network fault or a local auth error)
         return "api_refused", []
@@ -1349,8 +1367,20 @@ class Ledger:
                          **fields})
             return True
 
-    def settle(self, ref: str, actual: float, detail: dict, now: dt.datetime) -> None:
-        self.close("settle", ref, now, actual_usd=actual, detail=detail)
+    def settle(self, ref: str, actual: float, detail: dict, now: dt.datetime, tokens: list | None = None) -> None:
+        """tokens: per-model rows (model_rows), recorded next to the dollars with the run's cache hit rate."""
+        extra = {}
+        if tokens:
+            extra["tokens"] = {row["model"]: {f: row[f] for f in TOKEN_FIELDS} for row in tokens}
+            extra["cache_hit_rate"] = cache_hit_rate(tokens)
+        self.close("settle", ref, now, actual_usd=actual, detail=detail, **extra)
+
+    def switch(self, from_key: str, to_key: str, reason: str, now: dt.datetime) -> None:
+        """A fill-first switch row (from, to, reason, time), the api-actions harness's schema (common.record_switch)."""
+        with self.locked():
+            self.append({"kind": "switch", "ts": iso(now), "key": to_key, "workload": "SWITCH",
+                         "ref": f"SWITCH:{stamp(now)}:{from_key}>{to_key}", "from": from_key, "to": to_key,
+                         "reason": reason, "actual_usd": 0.0})
 
     def settle_unknown(self, ref: str, reason: str, detail: dict, now: dt.datetime, *, if_open: bool = False) -> bool:
         return self.close("settle", ref, now, if_open=if_open, unknown=True, reason=reason, detail=detail)
@@ -1535,7 +1565,8 @@ class Worker:
         self.visibility: dict = {}
         self.binary: dict = {}
         self.preflight_detail = ""
-        self.login: str | None = None  # the gh login that posts, read once a tick when a retry must be reconciled
+        self.login: str | None = None
+        self.usable: dict = {}  # key_usable's answers  # the gh login that posts, read once a tick when a retry must be reconciled
 
     # ---- tick -----------------------------------------------------------------------------------------------------
 
@@ -1832,6 +1863,20 @@ class Worker:
         # The labels come from the pull request, so they go to a data file, never into the prompt's instructions.
         write_private(plan.input_dir / "upstream-citations.txt", citation_list(plan.upstream))
 
+    def key_usable(self, key: str) -> bool:
+        """The credential runner's own presence check (credential_run.py <id> --check; it reads no value into this
+        process). A test launcher has no runner, so every key is usable there. One answer per key per process."""
+        if not isinstance(self.launcher, SandboxLauncher):
+            return True
+        if key not in self.usable:
+            try:
+                done = subprocess.run([sys.executable, "-I", "-S", str(self.launcher.credential_run), key, "--check"],
+                                      env=runner_environment(self.env), capture_output=True, timeout=60, check=False)
+                self.usable[key] = done.returncode == 0
+            except (OSError, subprocess.TimeoutExpired):
+                self.usable[key] = False
+        return self.usable[key]
+
     def binary_identity(self) -> dict:
         path = self.settings.claude_bin
         info = path.stat()
@@ -1921,28 +1966,35 @@ class Worker:
 
     def run_keys(self, candidate: Candidate, plan: Plan, prompt: str, report_dir: Path, run_id: str, extra: dict,
                  *, on_debit=None, launcher=None) -> dict:
-        """One paid run: debit, run under the first key, settle; on a credit-exhausted refusal only, void and move to
-        the next key. Every other ending stops here; there is no silent retry."""
+        """One paid run: debit, run under the first usable key, settle; on a credit-exhausted or revoked-key refusal
+        only, void, write a switch row and move to the next key (fill-first). Every other ending stops here; there is
+        no silent retry."""
         launcher = launcher or self.launcher
         label = f"{candidate.repo.name}#{candidate.pr}@{candidate.sha[:12]}"
         binary = self.binary_identity()
         tries, numbers, stop, unmet = [], None, "no_stream", []
+        previous = None
         for index, key in enumerate(self.settings.keys):
+            if not self.key_usable(key):
+                self.log(f"{label}: {key} is skipped: the credential runner refuses it (--check)")
+                continue
+            if previous is not None:
+                self.ledger.switch(previous[0], key, previous[1], self.clock())
             detail = {"repo": candidate.repo.name, "pr": candidate.pr, "head_sha": candidate.sha, "run_id": run_id,
                       **extra, "model": MODEL, "effort": EFFORT, "budget_usd": BUDGET_USD, "client": binary["name"],
                       "binary_sha256": binary["sha256"]}
             ref, spent = self.debit(candidate, key, detail)
             if ref is None:
-                if index == 0:
+                if not tries:
                     return {"no_room": True, "spent": spent}
                 stop, unmet = "no_room", ["no room under the daily ceiling for the next key"]
                 break
             if on_debit is not None:
-                on_debit(index, key, ref)
-            if index > 0:
+                on_debit(len(tries), key, ref)  # 0 for this run's first debit, whichever key it is on
+            if previous is not None:
                 # "<4>" makes the journal record this line at warning priority (systemd SyslogLevelPrefix, on by default).
-                self.log(f"<4>WARNING {label}: the primary key {self.settings.keys[0]} is out of credit; this run uses the "
-                         f"cold spare {key}; tell the command center")
+                self.log(f"<4>WARNING {label}: this run moved from {previous[0]} ({previous[1]}) to {key}; tell the "
+                         "command center")
             stream_path = report_dir / f"stream-{index + 1}.jsonl"
             plan.config_dir = Path(tempfile.mkdtemp(prefix="config-", dir=ensure_dir(self.state / "tmp")))
             try:
@@ -1966,8 +2018,10 @@ class Worker:
                           "returncode": launch.returncode, "seconds": launch.seconds,
                           "api_error_status": numbers["api_error_status"], "stream": stream_path.name})
             self.close_ref(ref, stop, numbers, launch, run_id)
-            if stop == "credit_exhausted":
-                self.log(f"{label}: {key} is out of credit; the next key is tried")
+            if stop in SWITCH_CLASSES:
+                self.log(f"<4>WARNING {label}: {key} is {'out of credit' if stop == 'credit_exhausted' else 'revoked'}; "
+                         "the next key is tried; tell the command center")
+                previous = (key, f"{stop} (HTTP {numbers['api_error_status']})")
                 continue
             break
         else:
@@ -1978,7 +2032,7 @@ class Worker:
         now = self.clock()
         detail = {"run_id": run_id, "class": stop, "subtype": numbers["subtype"], "stop_reason": numbers["stop_reason"],
                   "session_id": numbers["session_id"], "models": numbers["models"], "seconds": launch.seconds}
-        if stop in ("credit_exhausted", "api_refused", "no_api_response"):
+        if stop in ("credit_exhausted", "revoked_key", "api_refused", "no_api_response"):
             status = numbers["api_error_status"]
             self.ledger.void(ref, f"refused before any model call ({stop}, HTTP {status})", detail, now)
         elif stop == "no_stream":  # an empty or absent stream only; output that does not parse is unreadable_stream
@@ -1986,7 +2040,7 @@ class Worker:
         elif numbers["total_cost_usd"] is None or launch.timed_out:
             self.ledger.settle_unknown(ref, f"no usable cost ({stop})", detail, now)
         else:
-            self.ledger.settle(ref, numbers["total_cost_usd"], detail, now)
+            self.ledger.settle(ref, numbers["total_cost_usd"], detail, now, tokens=numbers["models"])
 
     def conclude(self, candidate, record, attempt, report_dir, plan, tries, numbers, stop, unmet, label) -> dict:
         repo = candidate.repo

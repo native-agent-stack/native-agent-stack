@@ -88,13 +88,22 @@ requests now. It reuses the repository's own fence: main at the working director
    - `CLAUDE_CODE_DISABLE_AUTO_MEMORY=1`, `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1` and `DISABLE_AUTOUPDATER=1`;
    - `HOME`, `CLAUDE_CONFIG_DIR` (fresh per run), `TMPDIR`, `USER`, `PATH` and `LANG`.
 
-   Single-key mode (owner direction, relayed by the command center on 2026-10-10 at 01:49Z): `anthropic-api-4` is the
-   one key. `anthropic-api-3` and `anthropic-api-2` are cold spares. The keys are tried in the order of
-   `CLAUDE_REVIEW_KEYS` (default `anthropic-api-4,anthropic-api-3,anthropic-api-2`), and the worker moves to the next key
-   only on a credit-exhausted refusal (HTTP 402, or 400 with "credit balance is too low"). A run on a spare is logged at
-   warning priority in the journal ("the primary key … is out of credit; this run uses the cold spare …; tell the
-   command center"). Each key try is its own ledger ref. The key is still injected per command by the credential
-   runner, never through a shared gateway or a lane's environment.
+   Fill-first (owner direction, relayed by the command center on 2026-10-10 at about 14:19Z; it replaces the single-key
+   mode of 01:49Z). The keys are tried in the order of `CLAUDE_REVIEW_KEYS`, by default `anthropic-api-4`,
+   `anthropic-api-5`, `anthropic-api`, `anthropic-api-2`, then `anthropic-api-6` to `anthropic-api-10`.
+   `anthropic-api-3` serves CI review only (the main-only `claude-review` environment secret) and is not in the order.
+   - The worker stays on one key and moves to the next only when Anthropic reports it out of credit (HTTP 402, or 400
+     with "credit balance is too low") or revoked (HTTP 401). It never round-robins: a prompt cache is per workspace and
+     never crosses organizations (claude-api skill, anthropics/skills@`dbd4588f`
+     `skills/claude-api/shared/prompt-caching.md:130`), so filling one key keeps its account's cache warm.
+   - A slot the credential runner refuses (`--check`, for instance one not stored yet) is skipped before any debit.
+   - Each move writes a ledger row (`kind: switch`; from, to, reason, time; the api-actions harness's schema) and a
+     journal line at warning priority ("this run moved from … to …; tell the command center").
+   - Each settle records the run's tokens per model (input, output, cache read, cache creation) and its cache hit rate,
+     cache read over cache read plus cache creation plus uncached input (`prompt-caching.md:186-192`).
+   - Each key try is its own ledger ref. The key is still injected per command by the credential runner, never through a
+     shared gateway or a lane's environment. The offline probes' O6 requires the first key to be stored and report each
+     later slot as O6i, for information.
 5. **Prompt:**
    - main's `AGENTS.md` plus `REVIEW.md` (`us-equities-trading`), or main's `AGENTS.md` plus
      `.github/pull_request_template.md` (`native-agent-stack`), each capped at 64 KiB;
