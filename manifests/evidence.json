@@ -17022,8 +17022,8 @@
     },
     {
       "path": "catalogs/convergence-practice/public-starred.json",
-      "sha256": "9f85c5f16a52731348b21ea18af416ac9acb689b58b8086b26d9f319bb5ac04b",
-      "bytes": 311989
+      "sha256": "284c4434c9f86ff20ad26269bec3da7cd4b40e868bb3a035664332c4404eff94",
+      "bytes": 765241
     },
     {
       "path": "catalogs/convergence-practice/source-review.json",
@@ -17034,6 +17034,21 @@
       "path": "catalogs/convergence-practice/source-review.md",
       "sha256": "c0e915563472bdce42455978fde17276f482cb088ea77e852312720dd845c909",
       "bytes": 6039
+    },
+    {
+      "path": "catalogs/convergence-practice/starred-convergence-20261010.json",
+      "sha256": "7a1667228e70611434489f912103a20d36cb7205b67fcb7723b54813b472525b",
+      "bytes": 433383
+    },
+    {
+      "path": "catalogs/convergence-practice/starred-seeds-20261010.json",
+      "sha256": "7a26a4102710075c1a53c21cfea172380d564e46b3867d596023e7f5b5c90baf",
+      "bytes": 434080
+    },
+    {
+      "path": "catalogs/convergence-practice/starred-source-review-20261010.json",
+      "sha256": "d0080f19217bb5fba3cd1a84216dc619458b56cb6880b796d73aee8da4d4cfe6",
+      "bytes": 28614
     },
     {
       "path": "catalogs/foundation/README.md",
@@ -17467,8 +17482,8 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "c203bd694384f31dca4f75333ef6f3e1ac4bfa0f04972290581d5c9f6b259459",
-      "bytes": 778605
+      "sha256": "16a255eaa96ec3a861cfd74f6ec69cc52b630dbf8f53e17ebc5560ccc87ee690",
+      "bytes": 980363
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
@@ -17522,7 +17537,7 @@
     },
     {
       "path": "catalogs/us-equities/manifest.json",
-      "sha256": "75bb7c9df961e59f920b63993bc964e6c09f46607fcf5f49dde6456d3598b9d5",
+      "sha256": "38538192317d87f45cf811f148c4f79b36bd4c65b06bf0e171e16b87978dda64",
       "bytes": 3215
     },
     {
@@ -18654,6 +18669,11 @@
       "path": "docs/decisions/2026-10-10-skills-claude-native-practice-row.md",
       "sha256": "5d09bcc37df78410545b831c8f73952d6206356695be9cadfaba2bcca381fff6",
       "bytes": 5864
+    },
+    {
+      "path": "docs/decisions/2026-10-10-starred-repository-convergence.md",
+      "sha256": "1b1be75c0e7bbf7a8bea236178b831ad9fd30ea9774476173132882b383dc8d7",
+      "bytes": 7614
     },
     {
       "path": "docs/decisions/2026-10-11-adjudication-omniroute-transport-binding.md",
@@ -60547,8 +60567,8 @@
     },
     {
       "path": "scripts/build_ecosystem.py",
-      "sha256": "97ac2b237e905d9806160d90ddfcf8f91fb38c83f78d05d1314e427616d210a8",
-      "bytes": 87297
+      "sha256": "aec5740a58da0797df4efc095918025f6527528722fd46c51b71893bc105ad40",
+      "bytes": 89659
     },
     {
       "path": "scripts/build_new_wsl_handbook.py",
@@ -60661,6 +60681,11 @@
       "bytes": 15668
     },
     {
+      "path": "scripts/public_starred.py",
+      "sha256": "a7889f7e868089de8501f79044c82fd3a3cfed4ee858fb4852df984896979063",
+      "bytes": 18682
+    },
+    {
       "path": "scripts/receipt_staleness.py",
       "sha256": "2360fcd200cf9a98914367408aca1ec7df44fdadf32c97c2f13df27a2b18a997",
       "bytes": 13408
@@ -60691,6 +60716,11 @@
       "bytes": 42439
     },
     {
+      "path": "scripts/starred_convergence.py",
+      "sha256": "47864bcd9263060105875962eacc3d8d68829296cd8540859b8ee6502818cd47",
+      "bytes": 9024
+    },
+    {
       "path": "scripts/trading_gates.py",
       "sha256": "9781ed54be63cef127a9bb2e99f9e0b24d0aea09b048cde5402f8a151bcde70f",
       "bytes": 34570
@@ -60702,8 +60732,8 @@
     },
     {
       "path": "scripts/validate.py",
-      "sha256": "1bfad8a033d0b10af7591dba642a11bfc13ca419bd0c25837e87749e4c27bd82",
-      "bytes": 42239
+      "sha256": "3f916684e81286af40aba000b8519cc54e6c5851e27f21f3d6115ffff2a3b882",
+      "bytes": 43199
     },
     {
       "path": "scripts/validate_catalogs.py",
@@ -61417,8 +61447,8 @@
     },
     {
       "path": "tests/test_ecosystem_manifest.py",
-      "sha256": "03900b5be52d6e13a4a15ae46347eddf5eb09d3324ff973a967455fe40b18202",
-      "bytes": 142162
+      "sha256": "d70788ced11d9da3d5ecc5ba9ce681438a44523becc7fd8efced9a205cb4c1d4",
+      "bytes": 144556
     },
     {
       "path": "tests/test_edgartools_pin_move.py",
@@ -62011,6 +62041,11 @@
       "bytes": 20781
     },
     {
+      "path": "tests/test_public_starred.py",
+      "sha256": "79cfa7e6f26c5ee51f2f87bf632449654aea423fc307390a83eb3975f3d23cb0",
+      "bytes": 19225
+    },
+    {
       "path": "tests/test_r3_verify.py",
       "sha256": "3c9daa4270f4309cf73ac412808b3bbebe7489a9685eb03897f64d7db5810bed",
       "bytes": 23428
@@ -62196,6 +62231,16 @@
       "bytes": 7192
     },
     {
+      "path": "tests/test_starred_convergence.py",
+      "sha256": "ad9e0d9a7d8ee471855680686b33355e5100d4a89be36fc0c01cd66efdfa5c97",
+      "bytes": 8188
+    },
+    {
+      "path": "tests/test_starred_maintenance.py",
+      "sha256": "1e37bc09e4c8c4937ad2bda5a0473b8d59b645e3a27c385c376abe9cb3d7cd78",
+      "bytes": 9955
+    },
+    {
       "path": "tests/test_start_closure_sampler.py",
       "sha256": "a8f03d94473cf64a537c137d9f99361d92ef25233661180f2192fd416239a1c1",
       "bytes": 57351
@@ -62282,8 +62327,8 @@
     },
     {
       "path": "tests/test_validate.py",
-      "sha256": "6e44ecb624d3ba1723c3af59b4a7fb3e38f6c12e342cd982b598af2e419fa06b",
-      "bytes": 51851
+      "sha256": "2fadd21151974c7ffbd0141a8c45ad3c2a833090d4d615476c3cd2318cf8bcaf",
+      "bytes": 53117
     },
     {
       "path": "tests/test_validate_shards.py",
@@ -62864,6 +62909,26 @@
       "path": "tools/sota-convergence/start_closure_sampler.py",
       "sha256": "6255be2d5c8bd7e766ba717df4a0bfc87649e13179c940f1fa97568a7ac7ee3a",
       "bytes": 41767
+    },
+    {
+      "path": "tools/starred-maintenance/README.md",
+      "sha256": "921e5ff53bd4a3b23160dba6e76f0df6ff9ec13f7b4ad914cc231a819350a92d",
+      "bytes": 4066
+    },
+    {
+      "path": "tools/starred-maintenance/render_units.py",
+      "sha256": "a3b2c83a1df45f51bfa4de6e34081b399acd8e0dd9e9a4ce64601be120399fc5",
+      "bytes": 4735
+    },
+    {
+      "path": "tools/starred-maintenance/systemd/native-agent-newstars.service.in",
+      "sha256": "6409e31be556e5b01357f7ff3aff35459b52473ab0c2a750f5a924b457addd52",
+      "bytes": 451
+    },
+    {
+      "path": "tools/starred-maintenance/systemd/native-agent-newstars.timer.in",
+      "sha256": "cbefc2da967aca3c1789ad96052cdd678231f42f0ff83ceced71290731fe205d",
+      "bytes": 229
     },
     {
       "path": "tools/token-e2e/README.md",

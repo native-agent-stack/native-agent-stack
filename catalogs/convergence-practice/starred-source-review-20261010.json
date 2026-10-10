@@ -1,0 +1,573 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-10-10T16:32:37Z",
+  "evidence_class": "source_review",
+  "base_main": "0947b01289dcaa9157aa38392a94cf00f592b86d",
+  "new_public_repositories": [
+    {
+      "repo": "HKUDS/nanobot",
+      "checked_at": "2026-10-10T16:22:06Z",
+      "upstream_pin": "8080ea843ac281432a747745ac487f98d3a9ccb1",
+      "default_branch": "main",
+      "default_head_committed_at": "2026-10-10T06:59:48Z",
+      "archived": false,
+      "disabled": false,
+      "license_metadata": "MIT",
+      "latest_release": {
+        "tag": "v0.3.5",
+        "published_at": "2026-09-15T19:05:37Z",
+        "url": "https://github.com/HKUDS/nanobot/releases/tag/v0.3.5"
+      },
+      "sources": [
+        {
+          "path": "README.md",
+          "pin": "8080ea843ac281432a747745ac487f98d3a9ccb1",
+          "url": "https://github.com/HKUDS/nanobot/blob/8080ea843ac281432a747745ac487f98d3a9ccb1/README.md",
+          "raw_url": "https://raw.githubusercontent.com/HKUDS/nanobot/8080ea843ac281432a747745ac487f98d3a9ccb1/README.md",
+          "sha256": "f8e48db7c2d126f9f6e9ba7904b2aecebc3b746c82846cf85052111a64afc3d7",
+          "git_blob": "d8d0d53ef2b251d0eb80a418e0f809176bdd251a",
+          "bytes": 83853,
+          "line_count": 792,
+          "excerpts": [
+            {
+              "line": 37,
+              "excerpt": "nanobot is an ultra-lightweight, open-source, self-hosted personal AI agent framework written in Python. It runs in a WebUI, terminal, or chat apps and combines tools, long-term memory, MCP integrations, model routing, multi-agent delegation, scheduled automation, and an OpenAI-compatible API in a small, readable core.",
+              "quote_note": "Initial decorative icon and Markdown emphasis removed; upstream role description only."
+            },
+            {
+              "line": 53,
+              "excerpt": "nanobot is a self-hosted personal AI agent runtime. It can:"
+            },
+            {
+              "line": 59,
+              "excerpt": "- run long-horizon goals and scheduled automations"
+            }
+          ]
+        },
+        {
+          "path": "LICENSE",
+          "pin": "8080ea843ac281432a747745ac487f98d3a9ccb1",
+          "url": "https://github.com/HKUDS/nanobot/blob/8080ea843ac281432a747745ac487f98d3a9ccb1/LICENSE",
+          "raw_url": "https://raw.githubusercontent.com/HKUDS/nanobot/8080ea843ac281432a747745ac487f98d3a9ccb1/LICENSE",
+          "sha256": "f69260cd9a0a4e074c3d5e7140989303042fa3626a7564d9bb6893043e0d4fce",
+          "git_blob": "e06eb24cf4abdc5b46d354fc7d1c9531b2f52dfa",
+          "bytes": 1102,
+          "line_count": 21,
+          "excerpts": [
+            {
+              "line": 1,
+              "excerpt": "MIT License"
+            }
+          ]
+        }
+      ],
+      "proposed_seed_roles": [
+        {
+          "layer": "agent-sdks",
+          "reason": "Source describes a self-hosted agent runtime with tools, MCP and multi-agent delegation; canonical layer covers programmatic SDK/runtime worker discovery.",
+          "definition_pointer": "catalogs/foundation/manifest.json#/layers/16",
+          "primary_locators": [
+            "README.md:37",
+            "README.md:53"
+          ],
+          "evidence_class": "source_review",
+          "runtime_qualified": false
+        }
+      ],
+      "recorded_seed_links": [],
+      "recorded_tier_verdict_links": [],
+      "recommendation": {
+        "disposition_status": "NEEDS-EVIDENCE",
+        "disposition": "NEEDS-EVIDENCE: agent-sdks role is documented at the pinned README, but no prior S1 seed or recorded tier verdict joins this repo in the checked evidence.",
+        "when_new_seed_recorded": "IN-SCOPE: agent-sdks; point to the newly recorded source-bearing intake seed. This registers role discovery only.",
+        "missing_evidence": "Concrete canonical source-bearing intake seed or recorded tier verdict; root may close the intake gap in this PR."
+      },
+      "limitations": [
+        "No local installation, upstream harness execution, provider verdict, comparison, adoption or runtime acceptance was performed.",
+        "The README mentions many optional integrations; this review proposes only the agent-sdks role rather than granting every named feature a layer assignment."
+      ]
+    },
+    {
+      "repo": "astral-sh/ty",
+      "checked_at": "2026-10-10T16:22:06Z",
+      "upstream_pin": "1179aeb8824e3d0793584a3b166c1781fe3c64c7",
+      "default_branch": "main",
+      "default_head_committed_at": "2026-10-10T12:55:58Z",
+      "archived": false,
+      "disabled": false,
+      "license_metadata": "MIT",
+      "latest_release": {
+        "tag": "0.0.86",
+        "published_at": "2026-10-09T22:22:06Z",
+        "url": "https://github.com/astral-sh/ty/releases/tag/0.0.86"
+      },
+      "sources": [
+        {
+          "path": "README.md",
+          "pin": "1179aeb8824e3d0793584a3b166c1781fe3c64c7",
+          "url": "https://github.com/astral-sh/ty/blob/1179aeb8824e3d0793584a3b166c1781fe3c64c7/README.md",
+          "raw_url": "https://raw.githubusercontent.com/astral-sh/ty/1179aeb8824e3d0793584a3b166c1781fe3c64c7/README.md",
+          "sha256": "8da93511cec1298648c345618960559c7dec67504b9132c1b9aee9a841e9fe08",
+          "git_blob": "ac9a0b09776b84e515a40e91fab9fc69edf6afca",
+          "bytes": 5610,
+          "line_count": 123,
+          "excerpts": [
+            {
+              "line": 7,
+              "excerpt": "An extremely fast Python type checker and language server, written in Rust.",
+              "quote_note": "Upstream description; speed was not measured or adopted as a finding."
+            },
+            {
+              "line": 24,
+              "excerpt": "ty is currently in [beta](#version-policy)."
+            },
+            {
+              "line": 32,
+              "excerpt": "- [Language server](https://docs.astral.sh/ty/features/language-server/) with code navigation, completions, code actions, auto-import, inlay hints, on-hover help, etc."
+            },
+            {
+              "line": 43,
+              "excerpt": "uvx ty check"
+            }
+          ]
+        },
+        {
+          "path": "LICENSE",
+          "pin": "1179aeb8824e3d0793584a3b166c1781fe3c64c7",
+          "url": "https://github.com/astral-sh/ty/blob/1179aeb8824e3d0793584a3b166c1781fe3c64c7/LICENSE",
+          "raw_url": "https://raw.githubusercontent.com/astral-sh/ty/1179aeb8824e3d0793584a3b166c1781fe3c64c7/LICENSE",
+          "sha256": "860e3d7a86b84e6a7012c7a635fc64df475cebc6cce34dfeb73a5982ec58176c",
+          "git_blob": "014835144877ea9c926d027ece3e1a26290cf481",
+          "bytes": 1077,
+          "line_count": 21,
+          "excerpts": [
+            {
+              "line": 1,
+              "excerpt": "MIT License"
+            }
+          ]
+        }
+      ],
+      "proposed_seed_roles": [
+        {
+          "layer": "quality-evaluation",
+          "reason": "Pinned README identifies a Python static type checker and supported check invocation; canonical layer covers deterministic behavior oracles.",
+          "definition_pointer": "catalogs/foundation/manifest.json#/layers/10",
+          "primary_locators": [
+            "README.md:7",
+            "README.md:43"
+          ],
+          "evidence_class": "source_review",
+          "runtime_qualified": false
+        },
+        {
+          "layer": "code-navigation",
+          "reason": "Pinned README explicitly describes language-server code navigation and completions.",
+          "definition_pointer": "catalogs/foundation/manifest.json#/layers/4",
+          "primary_locators": [
+            "README.md:32"
+          ],
+          "evidence_class": "source_review",
+          "runtime_qualified": false
+        }
+      ],
+      "recorded_seed_links": [],
+      "recorded_tier_verdict_links": [],
+      "recommendation": {
+        "disposition_status": "NEEDS-EVIDENCE",
+        "disposition": "NEEDS-EVIDENCE: quality-evaluation and code-navigation roles are documented at the pinned README, but no prior S1 seed or recorded tier verdict joins this repo in the checked evidence.",
+        "when_new_seed_recorded": "IN-SCOPE: quality-evaluation, code-navigation; point each role to its newly recorded source-bearing intake seed.",
+        "missing_evidence": "Concrete canonical source-bearing intake seeds or recorded tier verdicts; root may close the intake gap in this PR."
+      },
+      "limitations": [
+        "Upstream describes the project as beta.",
+        "No local installation, upstream harness execution, comparative speed measurement, provider verdict, adoption or runtime acceptance was performed."
+      ]
+    },
+    {
+      "repo": "languagetool-org/languagetool",
+      "checked_at": "2026-10-10T16:22:06Z",
+      "upstream_pin": "8a240373a230477fa2cacfbfec626a681df34b9d",
+      "default_branch": "master",
+      "default_head_committed_at": "2026-10-10T11:52:39Z",
+      "archived": false,
+      "disabled": false,
+      "license_metadata": "LGPL-2.1",
+      "latest_release": null,
+      "latest_release_endpoint_observation": {
+        "endpoint": "https://api.github.com/repos/languagetool-org/languagetool/releases/latest",
+        "http_status": 404,
+        "interpretation": "No latest GitHub release was returned by this endpoint; no broader no-release claim is made."
+      },
+      "sources": [
+        {
+          "path": "README.md",
+          "pin": "8a240373a230477fa2cacfbfec626a681df34b9d",
+          "url": "https://github.com/languagetool-org/languagetool/blob/8a240373a230477fa2cacfbfec626a681df34b9d/README.md",
+          "raw_url": "https://raw.githubusercontent.com/languagetool-org/languagetool/8a240373a230477fa2cacfbfec626a681df34b9d/README.md",
+          "sha256": "999c7c74959a7bef9b355b09f23146c144988eae5cfb6a23acc5e5674d5f4d7b",
+          "git_blob": "eea689ae7261f6f57d34e5553d5e0df7767a39e9",
+          "bytes": 5927,
+          "line_count": 150,
+          "excerpts": [
+            {
+              "line": 3,
+              "excerpt": "**LanguageTool** is open-source proofreading software for English, Spanish, French, German,"
+            },
+            {
+              "line": 5,
+              "excerpt": "It finds many errors that a simple spell checker cannot detect."
+            },
+            {
+              "line": 9,
+              "excerpt": "* [How to run your own LanguageTool server](https://dev.languagetool.org/http-server)"
+            },
+            {
+              "line": 21,
+              "excerpt": "The LanguageTool core (this repo) is freely available under the LGPL 2.1 or later."
+            }
+          ]
+        },
+        {
+          "path": "COPYING.txt",
+          "pin": "8a240373a230477fa2cacfbfec626a681df34b9d",
+          "url": "https://github.com/languagetool-org/languagetool/blob/8a240373a230477fa2cacfbfec626a681df34b9d/COPYING.txt",
+          "raw_url": "https://raw.githubusercontent.com/languagetool-org/languagetool/8a240373a230477fa2cacfbfec626a681df34b9d/COPYING.txt",
+          "sha256": "95a62130965bddc821631fcec03abe97246f9130f11a8be6f47579f8bc016fc8",
+          "git_blob": "97bc508d438527db2a268df32fbe51cbb12ff3db",
+          "bytes": 26432,
+          "line_count": 513,
+          "excerpts": [
+            {
+              "line": 3,
+              "excerpt": "GNU LESSER GENERAL PUBLIC LICENSE",
+              "quote_note": "Leading whitespace removed."
+            }
+          ]
+        }
+      ],
+      "proposed_seed_roles": [
+        {
+          "layer": "quality-evaluation",
+          "reason": "Pinned README describes proofreading and grammar/style error detection; a seed records discovery of a text-quality checking candidate without qualifying its checks.",
+          "definition_pointer": "catalogs/foundation/manifest.json#/layers/10",
+          "primary_locators": [
+            "README.md:3",
+            "README.md:5"
+          ],
+          "evidence_class": "source_review",
+          "runtime_qualified": false
+        }
+      ],
+      "recorded_seed_links": [],
+      "recorded_tier_verdict_links": [],
+      "recommendation": {
+        "disposition_status": "NEEDS-EVIDENCE",
+        "disposition": "NEEDS-EVIDENCE: quality-evaluation proofreading role is documented at the pinned README, but no prior S1 seed or recorded tier verdict joins this repo in the checked evidence.",
+        "when_new_seed_recorded": "IN-SCOPE: quality-evaluation; point to the newly recorded source-bearing proofreading intake seed.",
+        "missing_evidence": "Concrete canonical source-bearing intake seed or recorded tier verdict; root may close the intake gap in this PR."
+      },
+      "limitations": [
+        "No local installation, representative grammar/lint fixture, upstream harness execution, provider verdict, adoption or runtime acceptance was performed.",
+        "No version was inferred from a missing latest-release response."
+      ]
+    },
+    {
+      "repo": "microsoft/playwright",
+      "checked_at": "2026-10-10T16:22:06Z",
+      "upstream_pin": "d9f2fd3e2232ace8e317a84eda6cb86e25bcf49c",
+      "default_branch": "main",
+      "default_head_committed_at": "2026-10-09T18:01:12Z",
+      "archived": false,
+      "disabled": false,
+      "license_metadata": "Apache-2.0",
+      "latest_release": {
+        "tag": "v1.64.0",
+        "published_at": "2026-10-07T20:40:43Z",
+        "url": "https://github.com/microsoft/playwright/releases/tag/v1.64.0"
+      },
+      "sources": [
+        {
+          "path": "README.md",
+          "pin": "d9f2fd3e2232ace8e317a84eda6cb86e25bcf49c",
+          "url": "https://github.com/microsoft/playwright/blob/d9f2fd3e2232ace8e317a84eda6cb86e25bcf49c/README.md",
+          "raw_url": "https://raw.githubusercontent.com/microsoft/playwright/d9f2fd3e2232ace8e317a84eda6cb86e25bcf49c/README.md",
+          "sha256": "0a6a9dddcbf1295b61e83462ee7aa130289a4d4e60bac1a0deccd661f8fc8146",
+          "git_blob": "f698c9470684b26aedc8e53f07408859fa7394ec",
+          "bytes": 11282,
+          "line_count": 318,
+          "excerpts": [
+            {
+              "line": 7,
+              "excerpt": "Playwright is a framework for web automation and testing. It drives Chromium, Firefox, and WebKit with a single API — in your tests, in your scripts, and as a tool for AI agents."
+            },
+            {
+              "line": 25,
+              "excerpt": "Playwright Test is a full-featured test runner built for end-to-end testing. It runs tests across Chromium, Firefox, and WebKit with full browser isolation, auto-waiting, and web-first assertions."
+            },
+            {
+              "line": 60,
+              "excerpt": "npx playwright test"
+            },
+            {
+              "line": 214,
+              "excerpt": "Use `playwright` as a library for browser automation scripts — web scraping, PDF generation, screenshot capture, and any workflow that needs programmatic browser control without a test runner."
+            }
+          ]
+        },
+        {
+          "path": "LICENSE",
+          "pin": "d9f2fd3e2232ace8e317a84eda6cb86e25bcf49c",
+          "url": "https://github.com/microsoft/playwright/blob/d9f2fd3e2232ace8e317a84eda6cb86e25bcf49c/LICENSE",
+          "raw_url": "https://raw.githubusercontent.com/microsoft/playwright/d9f2fd3e2232ace8e317a84eda6cb86e25bcf49c/LICENSE",
+          "sha256": "45873d00a0dd243596deb4aa23b2493b3d1f0671921bf2538ea431d7380220eb",
+          "git_blob": "df112373eb2e23e459bf93ec412be1764dc5a38b",
+          "bytes": 11601,
+          "line_count": 202,
+          "excerpts": [
+            {
+              "line": 1,
+              "excerpt": "Apache License",
+              "quote_note": "Leading whitespace removed."
+            }
+          ]
+        }
+      ],
+      "proposed_seed_roles": [
+        {
+          "layer": "quality-evaluation",
+          "reason": "Pinned README documents the upstream browser test runner and test command; existing recorded S1 seed places this exact repository under quality-evaluation.",
+          "definition_pointer": "catalogs/foundation/manifest.json#/layers/10",
+          "primary_locators": [
+            "README.md:25",
+            "README.md:60"
+          ],
+          "evidence_class": "source_review",
+          "runtime_qualified": false
+        }
+      ],
+      "recorded_seed_links": [
+        {
+          "layer": "quality-evaluation",
+          "pointer": "~/.local/state/native-agent-stack/research/wave-20261010/seeds/seeds-20261010.json#/quality-evaluation/122",
+          "seed": "https://github.com/microsoft/playwright; source=catalogs/landscape/grand-catalog-20261008.json#/rows/2543"
+        },
+        {
+          "layer": "quality-evaluation",
+          "pointer": "~/.local/state/native-agent-stack/research/wave-20261010/seeds/seeds-20261010.json#/quality-evaluation/123",
+          "seed": "https://github.com/microsoft/playwright@606ecd8b34bac100db32561b6278ffd76e5eb3cd; source=~/.local/state/native-agent-stack/research/wave-20261010/seeds/s1z-live.json#/seeds/5; as_of=2026-10-08T15:34:56Z; recorded_disposition=NO-GAP; claim=UNVERIFIED. No newly demonstrated current gap in this discovery pass. Static gap-register entries are hypotheses until current primary evidence and reproduced results agree.; first-pass recorded discovery lead only"
+        },
+        {
+          "layer": "git-github-automation",
+          "pointer": "~/.local/state/native-agent-stack/research/wave-20261010/seeds/seeds-20261010.json#/git-github-automation/61",
+          "seed": "https://github.com/microsoft/playwright; source=catalogs/landscape/grand-catalog-20261008.json#/rows/2542",
+          "note": "Recorded prior association only; this review does not propose an additional git/GitHub role."
+        }
+      ],
+      "recorded_role_links": [
+        {
+          "pointer": "catalogs/sota-convergence/manifest-20261009.json#/foundation/10/components/4",
+          "sha256": "3f061eeb261a91e8eec0f586bc135179e56bacd6216adcf9ddfa526877879153",
+          "recorded_id": "playwright-test",
+          "recorded_pin": "1.63.0",
+          "kind": "historical_manifest_role",
+          "tier_verdict_asserted": false
+        },
+        {
+          "pointer": "manifests/stack.json#/components/65",
+          "sha256": "613b658a3fcb5d57ffbdd5e5ef27899afc5b90dfa23e52e0d8c6e4869be3c904",
+          "kind": "historical_component_role",
+          "tier_verdict_asserted": false
+        }
+      ],
+      "recorded_tier_verdict_links": [],
+      "recommendation": {
+        "disposition_status": "IN-SCOPE",
+        "disposition": "IN-SCOPE: quality-evaluation; feeds recorded S1 seed #/quality-evaluation/122; pinned primary README documents the browser test runner.",
+        "missing_evidence": "No tier-1/tier-2 row was independently established by this bounded review; a later recorded verdict needs an explicit join."
+      },
+      "limitations": [
+        "Playwright, playwright-cli and playwright-mcp are distinct canonical repositories; substring matching must not join their records.",
+        "The historic 1.63.0 component pin is recorded context; this source review pins default-branch commit d9f2fd3e and observes release v1.64.0.",
+        "No local browser run, upstream harness execution, new provider verdict, comparison or adoption was performed."
+      ]
+    },
+    {
+      "repo": "microsoft/pyright",
+      "checked_at": "2026-10-10T16:22:06Z",
+      "upstream_pin": "543798c27937b3469f869ee572be254cd809286f",
+      "default_branch": "main",
+      "default_head_committed_at": "2026-10-09T23:19:33Z",
+      "archived": false,
+      "disabled": false,
+      "license_metadata": "NOASSERTION",
+      "license_source_finding": "The pinned LICENSE.txt explicitly identifies MIT License.",
+      "latest_release": {
+        "tag": "1.1.414",
+        "published_at": "2026-09-09T20:40:05Z",
+        "url": "https://github.com/microsoft/pyright/releases/tag/1.1.414"
+      },
+      "sources": [
+        {
+          "path": "README.md",
+          "pin": "543798c27937b3469f869ee572be254cd809286f",
+          "url": "https://github.com/microsoft/pyright/blob/543798c27937b3469f869ee572be254cd809286f/README.md",
+          "raw_url": "https://raw.githubusercontent.com/microsoft/pyright/543798c27937b3469f869ee572be254cd809286f/README.md",
+          "sha256": "b422e201f335a9b615ee9f4454026d32cb51c3f6df7cc6b592301c8ab50aa4b6",
+          "git_blob": "f323fce36a71f9eb129ab8afc0e01aed66106800",
+          "bytes": 3581,
+          "line_count": 48,
+          "excerpts": [
+            {
+              "line": 3,
+              "excerpt": "# Static Type Checker for Python"
+            },
+            {
+              "line": 5,
+              "excerpt": "Pyright is a full-featured, standards-based static type checker for Python. It is designed for high performance and can be used with large Python source bases.",
+              "quote_note": "Upstream description; performance was not measured."
+            },
+            {
+              "line": 7,
+              "excerpt": "Pyright includes both a [command-line tool](https://microsoft.github.io/pyright/#/command-line) and an [extension for Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=ms-pyright.pyright)."
+            },
+            {
+              "line": 39,
+              "excerpt": "In general, core type checking functionality is associated with Pyright while language service functionality is associated with Pylance, but the same contributors monitor both repos.",
+              "quote_note": "Excerpt from the paragraph; no Pylance feature was attributed to Pyright."
+            }
+          ]
+        },
+        {
+          "path": "LICENSE.txt",
+          "pin": "543798c27937b3469f869ee572be254cd809286f",
+          "url": "https://github.com/microsoft/pyright/blob/543798c27937b3469f869ee572be254cd809286f/LICENSE.txt",
+          "raw_url": "https://raw.githubusercontent.com/microsoft/pyright/543798c27937b3469f869ee572be254cd809286f/LICENSE.txt",
+          "sha256": "f7c936bc43f132b08497ac952e9376cbc102e5eedb4bf6ec902ea8442bd9c68d",
+          "git_blob": "0c537977906fbe6f3fb260109f579bc4d9cad402",
+          "bytes": 1150,
+          "line_count": 22,
+          "excerpts": [
+            {
+              "line": 1,
+              "excerpt": "MIT License"
+            }
+          ]
+        },
+        {
+          "path": "packages/pyright-internal/src/languageServerBase.ts",
+          "pin": "543798c27937b3469f869ee572be254cd809286f",
+          "url": "https://github.com/microsoft/pyright/blob/543798c27937b3469f869ee572be254cd809286f/packages/pyright-internal/src/languageServerBase.ts",
+          "raw_url": "https://raw.githubusercontent.com/microsoft/pyright/543798c27937b3469f869ee572be254cd809286f/packages/pyright-internal/src/languageServerBase.ts",
+          "sha256": "4dfd505ab008d6d7406af4777fc1ab34bd11acd563ebe1e6d38bf75ec8a78d7e",
+          "git_blob": "d4e41684a25c9b01cab5689ce13bf1af3e249816",
+          "bytes": 69185,
+          "line_count": 1630,
+          "excerpts": [
+            {
+              "line": 526,
+              "excerpt": "this.connection.onDefinition(async (params, token) => this.onDefinition(params, token));"
+            },
+            {
+              "line": 530,
+              "excerpt": "this.connection.onReferences(async (params, token, workDoneReporter, resultReporter) =>"
+            },
+            {
+              "line": 534,
+              "excerpt": "this.connection.onDocumentSymbol(async (params, token) => this.onDocumentSymbol(params, token));"
+            },
+            {
+              "line": 535,
+              "excerpt": "this.connection.onWorkspaceSymbol(async (params, token, _, resultReporter) =>"
+            },
+            {
+              "line": 739,
+              "excerpt": "return new DefinitionProvider(program, filePath, position, filter, token).getDefinitions();"
+            }
+          ]
+        },
+        {
+          "path": "packages/pyright-internal/src/languageService/definitionProvider.ts",
+          "pin": "543798c27937b3469f869ee572be254cd809286f",
+          "url": "https://github.com/microsoft/pyright/blob/543798c27937b3469f869ee572be254cd809286f/packages/pyright-internal/src/languageService/definitionProvider.ts",
+          "raw_url": "https://raw.githubusercontent.com/microsoft/pyright/543798c27937b3469f869ee572be254cd809286f/packages/pyright-internal/src/languageService/definitionProvider.ts",
+          "sha256": "bb01e06863cd341c4e05f1c6e8a67b8f1a3273b7561a21568bcac816f7e7ba18",
+          "git_blob": "d95d7e10437a7f833ad78ef6d0291e00998fca6c",
+          "bytes": 16474,
+          "line_count": 424,
+          "excerpts": [
+            {
+              "line": 225,
+              "excerpt": "export class DefinitionProvider extends DefinitionProviderBase {"
+            }
+          ]
+        }
+      ],
+      "proposed_seed_roles": [
+        {
+          "layer": "quality-evaluation",
+          "reason": "Pinned README identifies the Python static checker; seed discovery does not qualify its diagnostics on the project's code.",
+          "definition_pointer": "catalogs/foundation/manifest.json#/layers/10",
+          "primary_locators": [
+            "README.md:3",
+            "README.md:5"
+          ],
+          "evidence_class": "source_review",
+          "runtime_qualified": false
+        },
+        {
+          "layer": "code-navigation",
+          "reason": "Pinned Pyright source registers definition, reference and symbol handlers and invokes its DefinitionProvider; this role uses Pyright's own code, not Pylance claims.",
+          "definition_pointer": "catalogs/foundation/manifest.json#/layers/4",
+          "primary_locators": [
+            "packages/pyright-internal/src/languageServerBase.ts:526",
+            "packages/pyright-internal/src/languageServerBase.ts:530",
+            "packages/pyright-internal/src/languageServerBase.ts:534",
+            "packages/pyright-internal/src/languageServerBase.ts:739",
+            "packages/pyright-internal/src/languageService/definitionProvider.ts:225"
+          ],
+          "evidence_class": "source_review",
+          "runtime_qualified": false
+        }
+      ],
+      "recorded_seed_links": [],
+      "recorded_tier_verdict_links": [],
+      "recommendation": {
+        "disposition_status": "NEEDS-EVIDENCE",
+        "disposition": "NEEDS-EVIDENCE: quality-evaluation and code-navigation roles are backed by pinned Pyright README/source, but no prior S1 seed or recorded tier verdict joins this repo in the checked evidence.",
+        "when_new_seed_recorded": "IN-SCOPE: quality-evaluation, code-navigation; point each role to its newly recorded source-bearing intake seed.",
+        "missing_evidence": "Concrete canonical source-bearing intake seeds or recorded tier verdicts; root may close the intake gap in this PR."
+      },
+      "limitations": [
+        "GitHub license metadata was NOASSERTION while the pinned license file explicitly says MIT; keep the two observations distinct.",
+        "No local installation, upstream harness execution, provider verdict, comparison, adoption or runtime acceptance was performed."
+      ]
+    }
+  ],
+  "t3code_primary": {
+    "repository": "pingdotgg/t3code",
+    "pin": "57b3780770a829ff81e62d8dc658683bf51d5155",
+    "url": "https://github.com/pingdotgg/t3code/blob/57b3780770a829ff81e62d8dc658683bf51d5155/README.md",
+    "path": "README.md",
+    "blob_sha": "8aa78f81b9ad72753cde7a8d3106ef8c7a8f0697",
+    "bytes": 4703,
+    "finding": "The pinned README describes an agent harness control surface for agents on the local machine and explicitly supports Claude Code, Codex, Cursor, Grok Build, OpenCode and Antigravity through mobile, web and desktop clients.",
+    "locators": [
+      "README.md#T3 Code, first two paragraphs"
+    ]
+  },
+  "recorded_scope_input": {
+    "input": "S2 recorded scope dispositions and complete master seed joins",
+    "starred_rows": 368,
+    "source_review_date": "2026-10-10",
+    "master_seed_sha256": "4a62af4ca834d6170e24d511f4982dc864d1b15502534733cd3fe9cf2cc633ad",
+    "master_seed_strings": 3554,
+    "joined_layer_seed_rows": 528,
+    "limits": "Prior S2 seed linkage is a scope/discovery witness. Source pins, metadata and current layer definitions are checked separately; no tier/adoption/runtime claim."
+  },
+  "limits": [
+    "Scope/discovery review only; no tool was installed or benchmarked for this record.",
+    "Four of the five additions lacked prior S1 seeds; this PR creates concrete primary-source-bearing rows in starred-seeds-20261010.json.",
+    "No recorded tier-1/tier-2 verdict exists for these new entries; follow-up fields remain explicit."
+  ]
+}

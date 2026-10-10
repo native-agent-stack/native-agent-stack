@@ -10,6 +10,8 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from datetime import datetime, timedelta, timezone
+from unittest.mock import patch
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -152,6 +154,45 @@ class EcosystemManifestTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         text = (self.root / "docs/ecosystem/index.html").read_text()
         return Page(text), text
+
+    def test_pending_star_older_than_seven_days_fails_the_builder(self):
+        observed = (datetime.now(timezone.utc).date() - timedelta(days=8)).isoformat()
+        self.write("catalogs/convergence-practice/public-starred.json", {
+            "retrieved_at": observed, "count": 1, "repositories": [
+                {"repository": "example/search", "description": "Search", "topics": [],
+                 "disposition": "PENDING", "first_observed_at": observed}]})
+        result = self.run_generator("--write")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("PENDING", result.stdout)
+
+    def test_refresh_cannot_reset_the_age_of_an_undispositioned_star(self):
+        now = datetime.now(timezone.utc).date()
+        old = (now - timedelta(days=8)).isoformat()
+        self.write("catalogs/convergence-practice/public-starred.json", {
+            "retrieved_at": now.isoformat(), "count": 1, "repositories": [
+                {"repository": "example/search", "description": "Search", "topics": [],
+                 "disposition": "PENDING", "first_observed_at": old}]})
+        result = self.run_generator("--write")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("PENDING", result.stdout)
+
+    def test_older_landscape_snapshot_cannot_remove_current_public_stars(self):
+        from scripts import build_ecosystem
+
+        self.config["landscape_manifest"] = "catalogs/landscape/manifest.json"
+        self.save()
+        self.write("catalogs/landscape/manifest.json", {
+            "sources": {"freshness_snapshot": "catalogs/landscape/old-stars.json"}})
+        self.write("catalogs/landscape/old-stars.json", {"stars": {
+            "status": "checked", "repository_snapshot_checked_at": "2026-09-19T00:00:00Z",
+            "repositories": []}})
+        for path in ("catalogs/landscape/README.md", "docs/landscape-foundation-notes.md",
+                     "docs/landscape-domain-notes.md", "docs/landscape-freshness-notes.md"):
+            self.write(path, "# Recorded landscape\n")
+        with patch.object(build_ecosystem, "build_landscape", return_value=None):
+            data = build_ecosystem.build_data(self.root)
+        self.assertEqual(data["counts"]["stars"], 1)
+        self.assertEqual(data["stars_observed_at"], "2026-09-20T00:00:00Z")
 
     def check_report(self):
         result = self.run_generator("--check")

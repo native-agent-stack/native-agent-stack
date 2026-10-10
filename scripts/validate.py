@@ -686,6 +686,22 @@ class Validator:
                     self.error(f"model: unknown evidence {receipt_id}")
         if (self.root / MODEL_CURRENCY_PATH).exists():
             self.errors.extend(model_currency_problems(self.load(MODEL_CURRENCY_PATH), self.today))
+        starred_path = "catalogs/convergence-practice/public-starred.json"
+        if (self.root / starred_path).exists():
+            try:
+                try:
+                    from .public_starred import validate_pending_age
+                    from .starred_convergence import validate_convergence
+                except ImportError:
+                    from public_starred import validate_pending_age
+                    from starred_convergence import validate_convergence
+                snapshot = self.load(starred_path)
+                observed_now = (datetime.combine(self.today, datetime.max.time(), timezone.utc)
+                                if self.today is not None else None)
+                validate_pending_age(snapshot, observed_now)
+                validate_convergence(self.root, snapshot)
+            except (ValueError, OSError, KeyError, TypeError) as error:
+                self.errors.append(f"Public-star convergence: {error}")
         self.check_credential_inventory()
         self.scan_publication(files)
         if self.errors:
