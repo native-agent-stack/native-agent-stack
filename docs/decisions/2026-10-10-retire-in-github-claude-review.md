@@ -15,7 +15,8 @@ Their tests go with them (`tests/test_claude_pr_review_workflow.py`, `tests/test
 local-pages inventory. `tests/test_claude_federation_diagnostics.py` keeps its retained-snapshot and decision-claim
 tests; its tests of the workflows' accounting shell go. `tests.test_workflow_hardening.InGitHubClaudeReviewRetiredTests`
 replaces the API-key tests: the three files must stay absent, and no workflow may run the Claude action, name an
-Anthropic key or use the `claude-review` environment without a decision that reverses this one.
+Anthropic key or deploy a job to the `claude-review` environment, read from each job's `environment` as a scalar or a
+mapping's `name`, without a decision that reverses this one.
 
 Before this change the command center disabled the three workflows (`disabled_manually`, 17:16Z) and deleted the
 `claude-review` environment's `ANTHROPIC_API_KEY` secret (17:16:48Z).
@@ -36,13 +37,20 @@ Before this change the command center disabled the three workflows (`disabled_ma
 
 ## What remains
 
-- **Local AI reads:** the local Claude review worker (`tools/claude-review-worker`, #953, open), the command center's and the
-  co-op's GPT reads, and trading-cc's toolkit reads, all run on the host with the stored keys through the credential
-  runner.
+- **Local AI reads:** the local Claude review worker (`tools/claude-review-worker`, #953, open), the command
+  center's and the co-op's GPT reads, and trading-cc's toolkit reads, all run on the host with the stored keys through
+  the credential runner.
 - **Codex's GitHub review**, which is not affected.
 - **GitHub's gates:** the required checks (`validate`, `sota-sources`, `verdict-review-gate` in
   `pr-metadata.yml`, the supply-chain and security scans) and the landing scripts the command center is moving into
   the repository (`tools/landing`, #975).
+
+**Follow-up (dated 2026-10-10, the command center's ruling at 20:19Z).** The `claude-native-practice` skill still
+selects the retired route: its `github-action` row and the Actions part of `pr-review-pre-cue`
+(`reference/git-github-automation.md`, `reference/slots.md`, `reference/slots.json`). Sessions load the pinned personal
+copy of that skill, not this repository's folder, so editing the folder here would change nothing until the pin
+moves. cc-native-practice retires those rows, points them to the local review route and re-pins the skill in its own
+pull request right after this one lands.
 
 ## Revisit when
 

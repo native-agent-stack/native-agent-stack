@@ -205,6 +205,58 @@ class HardenRunnerTests(unittest.TestCase):
 
 
 RETIRED_CLAUDE_WORKFLOWS = ("claude-pr-review.yml", "claude-pr-toolkit-review.yml", "harness-audit.yml")
+RETIRED_ENVIRONMENT = "claude-review"
+
+
+def job_environments(text):
+    """{job_id: environment name or None}: a job's `environment:` as a scalar, or its mapping's `name` in flow or block
+    form, quoted or not, with comments. A text reading, so it needs no YAML library; PyYAML cross-checks it when
+    installed (InGitHubClaudeReviewRetiredTests)."""
+    names = {}
+    for job_id, block in jobs(text).items():
+        lines = block.split("\n")
+        name = None
+        for index, line in enumerate(lines):
+            found = re.match(r"^    environment:(.*)$", line)
+            if not found:
+                continue
+            value = re.sub(r"\s+#.*$", "", found.group(1)).strip()
+            if value.startswith("{"):
+                inline = re.search(r"[\"']?name[\"']?\s*:\s*[\"']?([^\"',}\s]+)", value)
+                name = inline.group(1) if inline else None
+            elif value:
+                name = value.strip("\"'")
+            else:
+                for nested in lines[index + 1:]:
+                    if nested.strip() and not nested.startswith("      "):
+                        break
+                    key = re.match(r"^\s+[\"']?name[\"']?\s*:\s*[\"']?([^\"'#\s]+)", nested)
+                    if key:
+                        name = key.group(1)
+                        break
+            break
+        names[job_id] = name
+    return names
+
+
+ENVIRONMENT_FORMS = {
+    # (job text after `    runs-on: ubuntu-24.04\n`, the environment name it declares)
+    "plain": ("    environment: claude-review\n", RETIRED_ENVIRONMENT),
+    "quoted": ("    environment: 'claude-review'\n", RETIRED_ENVIRONMENT),
+    "block name": ("    environment:\n      name: claude-review\n", RETIRED_ENVIRONMENT),
+    # The three forms the GPT read at 48e4bd35 found the earlier regex let through:
+    "flow mapping": ("    environment: {name: claude-review}\n", RETIRED_ENVIRONMENT),
+    "quoted key": ('    environment:\n      "name": claude-review\n', RETIRED_ENVIRONMENT),
+    "comment after the key": ("    environment: # deployment\n      name: claude-review\n", RETIRED_ENVIRONMENT),
+    "another environment": ("    environment:\n      name: offhost-fixture\n", "offhost-fixture"),
+    "a longer name": ("    environment: claude-review-two\n", "claude-review-two"),
+    "none": ("", None),
+}
+
+
+def environment_fixture(job_text):
+    return ("name: fixture\non:\n  workflow_dispatch:\npermissions: {}\njobs:\n  review:\n    runs-on: ubuntu-24.04\n"
+            + job_text + "    steps:\n      - run: echo ok\n")
 
 
 class InGitHubClaudeReviewRetiredTests(unittest.TestCase):
@@ -212,18 +264,48 @@ class InGitHubClaudeReviewRetiredTests(unittest.TestCase):
     runs locally, not inside GitHub, because the API refuses requests that carry the action's attribution. No workflow
     may bring it back without a decision that reverses that one."""
 
+    def workflows(self):
+        return sorted([*WORKFLOWS.glob("*.yml"), *WORKFLOWS.glob("*.yaml")])
+
     def test_the_retired_workflows_are_gone(self):
         for name in RETIRED_CLAUDE_WORKFLOWS:
             self.assertFalse((WORKFLOWS / name).exists(), name)
 
     def test_no_workflow_runs_the_claude_action_or_names_an_anthropic_key(self):
-        for path in sorted([*WORKFLOWS.glob("*.yml"), *WORKFLOWS.glob("*.yaml")]):
+        for path in self.workflows():
             text = path.read_text(encoding="utf-8")
             with self.subTest(workflow=path.name):
                 self.assertNotIn("anthropics/claude-code-action", text)
                 self.assertNotIn("ANTHROPIC_API_KEY", text.upper())
-                # The plain, the `name:` and the quoted forms of the environment (the command center's read).
-                self.assertNotRegex(text, r"environment:\s*(?:name:\s*)?[\"']?claude-review(?![\w-])")
+
+    def test_no_job_deploys_to_the_retired_environment(self):
+        for path in self.workflows():
+            with self.subTest(workflow=path.name):
+                environments = job_environments(path.read_text(encoding="utf-8"))
+                self.assertNotIn(RETIRED_ENVIRONMENT, environments.values(), environments)
+
+    def test_the_environment_reading_covers_every_form(self):
+        for form, (job_text, expected) in ENVIRONMENT_FORMS.items():
+            with self.subTest(form=form):
+                self.assertEqual(job_environments(environment_fixture(job_text)), {"review": expected})
+
+    def test_the_environment_reading_matches_yaml_when_available(self):
+        try:
+            import yaml
+        except ImportError:
+            self.skipTest("PyYAML not installed; the text reading is the only source")
+        for form, (job_text, _expected) in ENVIRONMENT_FORMS.items():
+            with self.subTest(form=form):
+                parsed = yaml.safe_load(environment_fixture(job_text))["jobs"]["review"].get("environment")
+                name = parsed.get("name") if isinstance(parsed, dict) else parsed
+                self.assertEqual(job_environments(environment_fixture(job_text))["review"], name)
+        for path in self.workflows():
+            text = path.read_text(encoding="utf-8")
+            for job_id, job in yaml.safe_load(text)["jobs"].items():
+                parsed = job.get("environment")
+                name = parsed.get("name") if isinstance(parsed, dict) else parsed
+                with self.subTest(workflow=path.name, job=job_id):
+                    self.assertEqual(job_environments(text).get(job_id), name)
 
 class ScorecardTests(unittest.TestCase):
     text = (WORKFLOWS / "scorecard.yml").read_text(encoding="utf-8")
