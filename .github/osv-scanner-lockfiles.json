@@ -163,6 +163,14 @@
       "parser": "requirements.txt"
     },
     {
+      "path": "blueprints/us-equities/research-gap-burndown/requirements.in",
+      "parser": "requirements.txt"
+    },
+    {
+      "path": "blueprints/us-equities/research-gap-burndown/requirements.lock",
+      "parser": "requirements.txt"
+    },
+    {
       "path": "blueprints/us-equities/workers/requirements.txt"
     },
     {
