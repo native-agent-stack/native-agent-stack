@@ -254,7 +254,9 @@ current state: `{"id": "macos-arm64", "status": "drafted_not_accepted",
 "evidence_ref": null}`, with the hosted smoke job carried in its own
 `hosted_smoke` field: `{"workflow": ".github/workflows/adoption-bootstrap.yml",
 "job": "bootstrap-macos", "status": "green_on_hosted_runner"}` and its `run_id`
-and `receipt`. The current run is `35875188590` at head `75a6e0d` on a
+and `receipt`. These jobs were retired on 2026-10-10 under the
+[retirement decision](docs/decisions/2026-10-10-retire-macos-ci.md).
+The retained historical run is `35875188590` at head `75a6e0d` on a
 GitHub-hosted `macos-15` arm64 runner (macOS 15.7.9 build 24G830): it installed
 the pinned darwin-arm64 components, bootstrapped and booted out the `qdrant` and
 `llama-embed` LaunchAgents, passed the embedding acceptance against the Linux

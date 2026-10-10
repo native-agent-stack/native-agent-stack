@@ -277,7 +277,7 @@ do not transfer a native client's credential store.
 
 ## Publication and practical acceptance
 
-**Superseded 2026-10-05** by "Current practice (2026-10-05)" above: the live ruleset requires seven
+**Superseded 2026-10-05** by "Current practice (2026-10-10)" above: the live ruleset requires seven
 checks and allows squash merges only. This section is kept as history.
 
 As of a dated 2026-09-23 GET (see below), the active [main ruleset](https://github.com/seathatflowsinourveins/native-agent-stack/rules/23739774)
@@ -501,7 +501,7 @@ catalog is malformed, including a decision record that does not exist.
 ## Secret and supply-chain scanning, 2026-09-22
 
 For the current state, which adds the report-only betterleaks trial and GitHub push protection, see
-"Current practice (2026-10-05)" above.
+"Current practice (2026-10-10)" above.
 
 `validate.yml`'s `secret-scan` job runs gitleaks 8.30.1 (SHA-256 verified
 against `blueprints/convergence-practice/wsl-native-tools/pins.json`,
@@ -588,7 +588,7 @@ section 10 ("Rulesets"). This section is kept as history and is not
 corrected in place; the `gh api` commands below still apply (a `PUT` is
 idempotent), just against the current target file. **Update 2026-10-02:** `sota-sources` is live, and the live
 ruleset matched the target file then. **Update 2026-10-05:** `validate-macos`
-is advisory and absent from the current target (see "Current practice (2026-10-05)").
+is advisory and absent from the current target (see "Current practice (2026-10-10)").
 
 [`.github/main-ruleset.json`](../.github/main-ruleset.json) gained
 `deletion`, `non_fast_forward`, `required_linear_history`, a `pull_request`
@@ -837,7 +837,7 @@ nightly at 06:47 UTC, and on manual dispatch, then asserts every
 `scripts/adoption_status.py --profile foundation-cpu --json`. Its workflow
 header records this as synthetic/local-integration evidence on a disposable
 runner, not a second-machine developer-laptop acceptance. The schedule and PR
-selection follow the [2026-10-05 section](#scheduled-portability-and-report-only-lanes-2026-10-05).
+selection follow the [current scheduled-bootstrap section](#scheduled-bootstrap-and-report-only-lanes-2026-10-10).
 
 ### Secret-scan coverage boundary (2026-09-22, updated 2026-10-10)
 

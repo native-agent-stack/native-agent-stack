@@ -2030,6 +2030,8 @@ def write_tree(root, files):
         path.write_text(content, encoding="utf-8")
 
 
+@unittest.skipUnless(shutil.which("bash") and shutil.which("git"),
+                     "Linux bootstrap detector requires bash and git")
 class LinuxBootstrapChangesTests(unittest.TestCase):
     """Run the actual PR detector against scratch Git history, including failure controls."""
 
