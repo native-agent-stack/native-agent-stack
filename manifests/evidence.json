@@ -61182,8 +61182,8 @@
     },
     {
       "path": "tests/test_skill_usage.py",
-      "sha256": "fb57389be7a0a11640b514671191a65c646d25845bea9089f123f6a97ea0adf4",
-      "bytes": 268346
+      "sha256": "852cf10241803f49fc7f2a323fdb5e3748bcf3b2477b05e9231d60563606bc1e",
+      "bytes": 270880
     },
     {
       "path": "tests/test_skills_manifest.py",
