@@ -59,11 +59,42 @@ BOATS construction as `boats_stream_unqualified_sdk` before constructing a
 client. It does not substitute another feed, fork the SDK or rebuild its
 stream. A supported native BOATS path, authenticated real-time parsing,
 per-paper-account entitlement/linkage, refreshed status delivery and the
-owning T15 overnight paper/journal run are still required. That run must cover
-eligible-but-halted, unknown halt state and accepted-but-held orders, including
-reconciliation/cancellation at the intended carry boundary. A broker
-`accepted` observation is resting, never execution. Paper acceptance remains
-**NOT_RUN** until its actual run and retained receipt.
+owning T15 overnight paper/journal run are still required.
+
+The PR that removes the native OVERNIGHT
+`entry_dispatch_session_unavailable` refusal must include the staged overnight
+adapter, the supported fresh BOATS path, the accepted-but-held lifecycle and
+carry-boundary behavior below, and the third D6 fixture covering halted and
+unknown status at the cutoff. **Admission and lifecycle open together.** The
+classifier/status slice may land while these admission requirements remain
+pending and the deterministic refusal stays in place.
+
+- A held ENTRY is cancelled at a halt and at its carry boundary, through a
+  path independent of any repricing exemption.
+- A held EXIT in a halt deliberately remains resting, as
+  `native_strategy.cancel_expired` specifies (E4), consistent with
+  [uet#63 decision 2 (F-1), at 010a5a33](https://github.com/seathatflowsinourveins/us-equities-trading/blob/010a5a33e329c9d2e694b3d09fd2d5a165ea3c66/docs/decisions/2026-10-10-halt-exit-policy.md).
+  At DAY expiry the position is flagged, the session is notified and the
+  instance freezes for handoff.
+- A broker `accepted` observation is resting, never execution. The carry
+  deadline is persisted; the cutoff fixture covers both halted and unknown
+  status.
+
+T15 owns adaptive-paper transport and feeds, overnight quote qualification
+and the halt-status publisher; T22 consumes them. The qualification record
+must name the process that owns the market-data stream under D5's single-stream
+rule (the watcher is the candidate) and establish the status-carrier freshness
+bound. These are required acceptance work, with no measured live bound or
+stream-owner claim supplied by this slice.
+
+The committed admission tripwire is
+`IntegratedRunner.test_native_queued_buy_rechecks_dispatch_session_and_preserves_supported_sessions`
+in `tests/test_adaptive_paper_runner.py`. Its `CLOSED`-labelled case dispatches
+at `2026-03-11T00:00:00Z`, which the current classifier identifies as 20:00
+Eastern OVERNIGHT. The native BUY LIMIT/DAY must be denied with
+`entry_dispatch_session_unavailable`, with no submission to the synthetic
+broker port, fill or reserved intent. Paper acceptance remains **NOT_RUN** until its actual run
+and retained receipt.
 
 ## Primary sources
 
