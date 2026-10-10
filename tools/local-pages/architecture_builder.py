@@ -23,6 +23,19 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 RETAINED_REFRESH = Path("research/fullspeed-20261008/g5-stars-gap/local-pages/refresh-receipt.json")
 SOURCE_POLICY_PATH = HERE / "source_policy.json"
+# Manifest views read only these records, each under a role source_policy.json
+# already grants for that exact path. An absent record leaves its view unreported.
+MANIFEST_SOURCES = (
+    ("matrix", "catalogs/landscape/component-evidence-matrix.json", "architecture_static"),
+    ("plan", "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json", "architecture_receipt"),
+    ("handbook", "docs/new-wsl-handbook.json", "architecture_receipt"),
+    ("ruleset", ".github/main-ruleset.json", "architecture_receipt"),
+    ("gates", "catalogs/us-equities/gates-20260922.json", "architecture_receipt"),
+    ("runtime", "catalogs/us-equities/runtime-target.json", "architecture_receipt"),
+)
+MANIFEST_STYLE = HERE / "assets/architecture-manifest.css"
+MODULES = ("architecture_sources", "architecture_inventory", "architecture_evidence", "architecture_view",
+           "architecture_manifest", "architecture_diagrams", "evidence_sources", "build_pages", "sanitization", "source_policy")
 
 
 def load(name: str) -> Any:
@@ -143,6 +156,10 @@ def build(root: Path, state_root: Path, output_dir: Path, receipt: Path,
     evidence = load("architecture_evidence")
     model["host_receipts"] = evidence.host_receipts_index(state_root, reads=reads)
     model["sources"] = list(model.get("sources") or []) + model["host_receipts"].get("sources", []) + [retained["source"]]
+    manifest = load("architecture_manifest").build(root, model, reads, MANIFEST_SOURCES, pages=pages.PAGES, refresh_utc=retained["generated_utc"])
+    model["manifest"] = manifest
+    custody = {(source.get("path"), source.get("sha256")) for source in model["sources"] if isinstance(source, dict)}
+    model["sources"] += [source for source in manifest["sources"] if (source["path"], source["sha256"]) not in custody]
     if hasattr(evidence, "attach_inventory"):
         inventory["items"] = evidence.attach_inventory(inventory.get("items", []), model.get("evidence_index", {}), root=root, state_root=state_root, reads=reads)
     observation = model.get("adoption_observation") or {}
@@ -167,7 +184,9 @@ def build(root: Path, state_root: Path, output_dir: Path, receipt: Path,
     generated = datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
     manifest_sha = retained["manifest_sha256"]
     scope = "Builder reads dated landscape choices, current CC stage records and published invoke observations."
-    html = pages.document("architecture", "Architecture by layer", "Read the selected tools, alternatives, inventories and evidence for each layer.", scope, body, generated, manifest_sha, [])
+    style_raw = policy_module._read_regular(MANIFEST_STYLE, 1024 * 1024)
+    style = "\n  <style>\n" + style_raw.decode("utf-8") + "  </style>"
+    html = pages.document("architecture", "Architecture by layer", "The whole stack first, then each layer's selected tools, alternatives, inventories and evidence.", scope, body, generated, manifest_sha, [], head=style)
     builder_path = Path(__file__).resolve()
     outputs = {"architecture.html": html}
     for name, raw in detail_outputs.items():
@@ -187,9 +206,11 @@ def build(root: Path, state_root: Path, output_dir: Path, receipt: Path,
                 "local_host_receipts": model["host_receipts"],
                 "e2e_components": {"with_evidence": e2e_components, "total": len(components), "successful_qualifying": sum(1 for item in components if (item.get("e2e") or {}).get("verified"))},
               "design": model.get("design"), "g5": model.get("g5"),
+              "manifest": {**manifest["receipt"], "design": load("architecture_diagrams").DESIGN,
+                           "style": {"path": str(MANIFEST_STYLE), "sha256": hashlib.sha256(style_raw).hexdigest()}},
               "invocation_source": {key: (model.get("adoption_observation") or {}).get(key) for key in ("path", "sha256", "generated_utc", "window_hours")},
               "role_attribution_sources": [attribution["source"]], "role_attribution": attribution,
-                "modules": [{"path": str(HERE / (name + ".py")), "sha256": hashlib.sha256(policy_module._read_regular(HERE / (name + ".py"), 8 * 1024 * 1024)).hexdigest()} for name in ("architecture_sources", "architecture_inventory", "architecture_evidence", "architecture_view", "evidence_sources", "build_pages", "sanitization", "source_policy") if (HERE / (name + ".py")).exists()],
+                "modules": [{"path": str(HERE / (name + ".py")), "sha256": hashlib.sha256(policy_module._read_regular(HERE / (name + ".py"), 8 * 1024 * 1024)).hexdigest()} for name in MODULES if (HERE / (name + ".py")).exists()],
               "sources": model.get("sources"), "inventory_sources": inventory.get("sources"),
               "source_policy": dict(reads.policy.receipt),
               "inventory_coverage": inventory.get("coverage"),
@@ -235,6 +256,9 @@ def refresh_if_changed(root: Path, state_root: Path, output_dir: Path, receipt: 
         state_root / "coordination/command-center/pages/host-receipts-index.json",
         state_root / RETAINED_REFRESH,
     ) if path.exists()]
+    selected = {path for path, _ in selections}
+    selections += [(root / relative, role) for _, relative, role in MANIFEST_SOURCES
+                   if root / relative not in selected and (root / relative).is_file()]
     for path, role in selections:
         _, captured = reads.read(role, path, max_bytes=16 * 1024 * 1024)
         signature["files"].append([str(path), captured["bytes"], captured["sha256"]])
@@ -243,8 +267,8 @@ def refresh_if_changed(root: Path, state_root: Path, output_dir: Path, receipt: 
         with reads.open("architecture_g5_asset", archive, max_bytes=512 * 1024 * 1024) as handle:
             stat = os.fstat(handle.fileno())
             signature["files"].append([str(archive), stat.st_size, stat.st_mtime_ns])
-    helper_paths = [HERE / (name + ".py") for name in ("architecture_builder", "architecture_sources", "architecture_inventory", "architecture_evidence", "architecture_view", "build_pages", "evidence_sources", "sanitization", "source_policy")]
-    helper_paths += [HERE / "assets/site.css", HERE / "assets/site.js"]
+    helper_paths = [HERE / (name + ".py") for name in ("architecture_builder",) + MODULES]
+    helper_paths += [HERE / "assets/site.css", HERE / "assets/site.js", MANIFEST_STYLE]
     for path in helper_paths:
         if path.exists():
             raw = policy._read_regular(path, 8 * 1024 * 1024)
