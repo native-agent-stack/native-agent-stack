@@ -7,8 +7,9 @@ import importlib.util
 import tempfile
 import time
 import unittest
+from contextlib import nullcontext
 from dataclasses import replace
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -136,6 +137,205 @@ def run_strategy(
 
 @unittest.skipUnless(NATIVE, "requires the exact locked Nautilus rc5 runtime")
 class LifecycleTests(unittest.TestCase):
+    def test_clock_ahead_and_stale_native_halts_cancel_at_delivery(self):
+        from nautilus_trader.model import InstrumentStatus, MarketStatusAction
+
+        start = simulation.BASE_NS
+        for lead, init_lead in (
+            (-200_000_000, 0),
+            (0, 0),
+            (1_000_000, 0),
+            (400_000_000, 0),
+            (0, 400_000_000),
+        ):
+
+            class InitClockLeadStrategy(families.GapPremarketStrategy):
+                def on_instrument_status(self, status):
+                    if init_lead and status.action == MarketStatusAction.HALT:
+                        # Native simulation schedules delivery by ts_init.
+                        # Shift only the delivered event's init metadata at
+                        # this callback seam to isolate host-clock lead.
+                        status = InstrumentStatus(
+                            status.instrument_id,
+                            status.action,
+                            status.ts_event,
+                            status.ts_init + init_lead,
+                        )
+                    super().on_instrument_status(status)
+
+            with self.subTest(event_lead_ns=lead, init_lead_ns=init_lead):
+                strategy = run_strategy(
+                    ledger=None,
+                    faults=[],
+                    strategy_type=InitClockLeadStrategy,
+                    bids=("10", "11", "11", "10", "10", "10"),
+                    quote_offsets_ns=(
+                        0,
+                        200_000_000,
+                        400_000_000,
+                        600_000_000,
+                        800_000_000,
+                        1_200_000_000,
+                    ),
+                    status_events=(
+                        (200_000_000, 200_000_000, "TRADING", {}),
+                        (300_000_000 + lead, 300_000_000, "HALT", {}),
+                    ),
+                    overrides={"entry_timeout_ns": 10_000_000_000},
+                )
+                cancels = [
+                    row for row in strategy.trace if row["event"] == "cancel_requested"
+                ]
+                self.assertEqual(len(cancels), 1)
+                self.assertEqual(cancels[0]["now_ns"], start + 300_000_000)
+                self.assertEqual(cancels[0]["role"], "entry")
+                self.assertTrue(
+                    any(
+                        row["event"] == "terminal"
+                        and row["now_ns"] == start + 400_000_000
+                        for row in strategy.trace
+                    )
+                )
+                self.assertFalse(any(row["event"] == "fill" for row in strategy.trace))
+                self.assertIsNone(strategy.pending)
+                self.assertEqual(strategy.quantity, 0)
+                self.assertEqual(strategy.sequence, 1)
+                ahead = lead > 0 or init_lead > 0
+                self.assertEqual("status_clock_ahead" in strategy.flags, ahead)
+                leads = [
+                    row
+                    for row in strategy.trace
+                    if row["event"] == "status_clock_ahead"
+                ]
+                self.assertEqual(len(leads), int(ahead))
+                if ahead:
+                    self.assertEqual(leads[0]["event_lead_ns"], max(0, lead))
+                    self.assertEqual(leads[0]["init_lead_ns"], init_lead)
+
+    def test_clock_ahead_halt_requires_available_ordered_resumption(self):
+        class SignalAfterStatusStrategy(families.GapPremarketStrategy):
+            def entry_condition(self, snapshot):
+                return (
+                    self.clock.timestamp_ns() >= simulation.BASE_NS + 600_000_000
+                    and super().entry_condition(snapshot)
+                )
+
+        for halt_event, resumed in (
+            (700_000_000, False),
+            (700_000_000, True),
+            (100_000_000, False),
+            (100_000_000, True),
+        ):
+            statuses = [
+                (200_000_000, 200_000_000, "TRADING", {}),
+                (halt_event, 300_000_000, "HALT", {}),
+                (900_000_000, 500_000_000, "TRADING", {}),
+                (150_000_000, 600_000_000, "TRADING", {}),
+            ]
+            if resumed:
+                statuses.append((600_000_000, 600_000_000, "TRADING", {}))
+            with self.subTest(halt_event_ns=halt_event, resumed=resumed):
+                strategy = run_strategy(
+                    ledger=None,
+                    faults=[],
+                    strategy_type=SignalAfterStatusStrategy,
+                    bids=("10",) * 6,
+                    quote_offsets_ns=(
+                        0,
+                        200_000_000,
+                        600_000_000,
+                        1_000_000_000,
+                        1_400_000_000,
+                        1_800_000_000,
+                    ),
+                    status_events=statuses,
+                    overrides={"preset": "aggressive-v1"},
+                )
+                buys = [
+                    row
+                    for row in strategy.trace
+                    if row["event"] == "submit" and row["side"] == "BUY"
+                ]
+                self.assertEqual(len(buys), int(resumed))
+                if resumed:
+                    self.assertEqual(
+                        buys[0]["now_ns"], simulation.BASE_NS + 600_000_000
+                    )
+                else:
+                    self.assertEqual(strategy.quantity, 0)
+                    self.assertEqual(strategy.sequence, 0)
+                refusals = [
+                    row["reason"]
+                    for row in strategy.trace
+                    if row["event"] == "instrument_status_refused"
+                ]
+                self.assertEqual(refusals, ["future_availability", "out_of_order"])
+
+    def test_unsupported_session_names_block_entry_and_durably_hold_exit(self):
+        for name in ("CLOSED", "OVERNIGHT"):
+
+            def session_at(now):
+                return SimpleNamespace(kind=SimpleNamespace(name=name))
+
+            with (
+                self.subTest(kind=name, scenario="entry"),
+                patch.object(
+                    families.FamilyStrategy, "_session", side_effect=session_at
+                ),
+            ):
+                strategy = run_strategy(
+                    ledger=None,
+                    faults=[],
+                    bids=("10",) * 6,
+                    overrides={"preset": "aggressive-v1"},
+                )
+                self.assertFalse(
+                    any(row["event"] == "submit" for row in strategy.trace)
+                )
+                self.assertEqual(strategy.sequence, 0)
+                self.assertEqual(strategy.quantity, 0)
+
+            def cross_session(now):
+                if now >= simulation.BASE_NS + 3_000_000_000:
+                    return session_at(now)
+                return families._sessions.session_at(
+                    datetime.fromtimestamp(now / 1e9, timezone.utc)
+                )
+
+            with (
+                self.subTest(kind=name, scenario="held"),
+                tempfile.TemporaryDirectory() as directory,
+                patch.object(
+                    families.FamilyStrategy, "_session", side_effect=cross_session
+                ),
+            ):
+                ledger = safety.Ledger(Path(directory) / "unsupported-session.sqlite")
+                faults = []
+                try:
+                    strategy = run_strategy(
+                        ledger=ledger,
+                        faults=faults,
+                        bids=("10",) * 12,
+                        overrides={
+                            "preset": "aggressive-v1",
+                            "exit_policy": "overnight-v1",
+                            "exit_deadline_ns": simulation.BASE_NS + 8_000_000_000,
+                        },
+                    )
+                    self.assertGreater(strategy.quantity, 0)
+                    self.assertEqual(
+                        ledger.halted_reason(), "closed_session_requires_handoff"
+                    )
+                    self.assertIn("closed_session_requires_handoff", faults)
+                    self.assertFalse(
+                        any(
+                            row["event"] == "submit" and row["side"] == "SELL"
+                            for row in strategy.trace
+                        )
+                    )
+                finally:
+                    ledger.close()
+
     def test_native_status_halt_cancels_pending_entry_before_reopen(self):
         start = simulation.BASE_NS
         native_cancel = families.FamilyStrategy.cancel_order
@@ -739,8 +939,9 @@ class LifecycleTests(unittest.TestCase):
         def apply_post_fill_account(strategy, event, cutoff_ns):
             # Declared one-instrument synthetic account producer. Its native
             # portfolio is updated by rc5 before this strategy fill callback.
-            # An actual T14 writer supplies all holdings, uncertain orders and
-            # frozen day anchors to risk.caps.post_cutoff_fill in the same call.
+            # The coming T14 consumer contract is risk.caps.post_cutoff_fill;
+            # no implementation/binding is supplied here. Its actual writer
+            # must supply all holdings, uncertain orders and frozen day anchors.
             mark = Price.from_str("10.0000")
             exposure = strategy.portfolio.net_exposure(strategy.instrument_id, mark)
             unrealized = strategy.portfolio.unrealized_pnl(strategy.instrument_id, mark)
@@ -813,10 +1014,146 @@ class LifecycleTests(unittest.TestCase):
             ],
         )
         self.assertIn("post_cutoff_fill", strategy.flags)
+        applied_events = [
+            row for row in strategy.trace if row["event"] == "post_cutoff_risk_applied"
+        ]
+        self.assertEqual(len(applied_events), 1)
+        self.assertEqual(applied_events[0]["now_ns"], cutoff + 100_000_000)
         self.assertEqual(strategy.quantity, 0)
         self.assertIsNone(strategy.pending)
         self.assertEqual(strategy.sequence, 2)
         self.assertEqual(strategy.callback_faults, [])
+
+    def test_explicit_deadline_and_timeout_races_use_armed_cutoff(self):
+        start = simulation.BASE_NS
+        cutoff = start + 500_000_000
+        for source in ("entry_deadline", "exit_deadline", "entry_timeout"):
+            applied = []
+
+            def observe_risk(strategy, event, cutoff_ns):
+                applied.append(
+                    (
+                        event.ts_event,
+                        cutoff_ns,
+                        strategy.clock.timestamp_ns(),
+                        str(event.client_order_id),
+                        strategy.quantity,
+                    )
+                )
+
+            with self.subTest(source=source):
+                strategy = run_strategy(
+                    ledger=None,
+                    faults=[],
+                    post_cutoff_fill_sink=observe_risk,
+                    bids=("10", "11", "11", "10", "10", "10", "10"),
+                    quote_offsets_ns=(
+                        0,
+                        200_000_000,
+                        400_000_000,
+                        600_000_000,
+                        800_000_000,
+                        1_000_000_000,
+                        1_200_000_000,
+                    ),
+                    overrides={
+                        "preset": "aggressive-v1",
+                        "exit_policy": None,
+                        "entry_deadline_ns": cutoff
+                        if source == "entry_deadline"
+                        else None,
+                        "exit_deadline_ns": cutoff
+                        if source == "exit_deadline"
+                        else start + 900_000_000,
+                        "entry_timeout_ns": 500_000_000
+                        if source == "entry_timeout"
+                        else 10_000_000_000,
+                    },
+                )
+                self.assertIn("post_cutoff_fill", strategy.flags)
+                self.assertEqual(
+                    applied,
+                    [
+                        (
+                            start + 600_000_000,
+                            cutoff,
+                            start + 600_000_000,
+                            strategy.client_id_prefix + "0000001",
+                            contracts.decimal("16"),
+                        )
+                    ],
+                )
+                cancels = [
+                    row for row in strategy.trace if row["event"] == "cancel_requested"
+                ]
+                self.assertEqual(cancels[0]["now_ns"], cutoff)
+                sells = [
+                    row
+                    for row in strategy.trace
+                    if row["event"] == "submit" and row["side"] == "SELL"
+                ]
+                self.assertEqual(sells[0]["now_ns"], start + 600_000_000)
+                self.assertEqual(sells[0]["reason"], "time_exit")
+                self.assertEqual(strategy.quantity, 0)
+                self.assertIsNone(strategy.pending)
+                self.assertIsNone(strategy.pending_entry_deadline_ns)
+                self.assertEqual(strategy.sequence, 2)
+                self.assertEqual(strategy.callback_faults, [])
+
+    def test_post_cutoff_classification_includes_exact_boundary_and_pins_missing_sink(
+        self,
+    ):
+        from nautilus_trader.model import OrderSide
+
+        start = simulation.BASE_NS
+        cutoff = start + 500_000_000
+        for fill_offset in (499_999_999, 500_000_000):
+            with self.subTest(fill_offset_ns=fill_offset):
+                callback_state = []
+
+                class ObservedBoundaryStrategy(families.GapPremarketStrategy):
+                    def on_order_filled(self, event):
+                        super().on_order_filled(event)
+                        if event.order_side == OrderSide.BUY:
+                            callback_state.append((event.ts_event, set(self.flags)))
+
+                strategy = run_strategy(
+                    ledger=None,
+                    faults=[],
+                    strategy_type=ObservedBoundaryStrategy,
+                    bids=("10", "11", "10", "10", "10", "10"),
+                    quote_offsets_ns=(
+                        0,
+                        200_000_000,
+                        fill_offset,
+                        700_000_000,
+                        900_000_000,
+                        1_200_000_000,
+                    ),
+                    overrides={
+                        "preset": "aggressive-v1",
+                        "exit_policy": None,
+                        "entry_deadline_ns": cutoff,
+                        "entry_timeout_ns": 10_000_000_000,
+                        "exit_deadline_ns": start + 800_000_000,
+                    },
+                )
+                self.assertEqual(len(callback_state), 1)
+                ts_event, flags = callback_state[0]
+                self.assertEqual(ts_event, start + fill_offset)
+                at_cutoff = fill_offset == 500_000_000
+                self.assertEqual("post_cutoff_fill" in flags, at_cutoff)
+                self.assertEqual(
+                    "post_cutoff_risk_sink_unqualified" in flags, at_cutoff
+                )
+                self.assertEqual(strategy.quantity, 0)
+                self.assertIsNone(strategy.pending)
+                self.assertFalse(
+                    any(
+                        row["event"] == "post_cutoff_risk_applied"
+                        for row in strategy.trace
+                    )
+                )
 
     def test_post_cutoff_risk_sink_cannot_defer_accounting(self):
         async def deferred_update():
@@ -1467,7 +1804,15 @@ class LifecycleTests(unittest.TestCase):
                 faults = []
                 try:
                     ledger.start_trial(simulation.BASE_NS / 1e9)
-                    strategy = run_strategy(ledger=ledger, faults=faults, **kwargs)
+                    if reason == "closed_session_requires_handoff":
+                        legacy = importlib.import_module(
+                            "tests.test_us_equities_strategies"
+                        )
+                        context = legacy.synthetic_overnight_session_context()
+                    else:
+                        context = nullcontext()
+                    with context:
+                        strategy = run_strategy(ledger=ledger, faults=faults, **kwargs)
                     self.assertGreater(strategy.quantity, 0)
                     self.assertEqual(ledger.halted_reason(), reason)
                     self.assertIn(reason, faults)

@@ -204,20 +204,44 @@ an explicit non-trading flag does. Native resumption likewise cannot clear a
 halted snapshot. Quote-only, paused, suspended and unavailable native status
 actions, or an explicit non-trading flag, also block trading.
 
+Halting actions take effect at observation even when their event or init
+timestamp leads the host clock or regresses. `status_clock_ahead` records any
+lead; availability and ordering refusals apply to TRADING resumptions. The
+ordering fence retains observed history without requiring the host to wait
+for a future-dated halt before accepting a later available resumption.
+
+The status latch is memory-only and resets on construction; it is not persisted
+across a restart. Snapshot halts and durable ledger halts remain separate. Before
+the first non-synthetic runner, the owning status producer must qualify fresh
+restart status reconciliation or persist/restore the halt through its journal.
+A new actor's initial false latch is not evidence that trading has resumed.
+
+The unsupported-session branch holds both enum names `CLOSED` and `OVERNIGHT`
+and returns before entry admission or a new exit. It freezes/flags an owned
+position with `closed_session_requires_handoff` under the existing durable
+handoff. OVERNIGHT is held even when a future session classifier introduces
+that enum member; this does not depend on importing an unmerged PR version.
+
 Pending exits intentionally keep their working order and original identity
 through a halt. The entry cancellation rule does not cancel them; timeout and
 deadline processing resumes after the halt clears. Follow-up F-1 remains on
 T13-runtime/T15 acceptance: decide hold-and-flag versus cancel-and-escalate
 with the applicable caps before the first non-synthetic run.
 
-F-2 never depends on venue expiry. A BUY executed at or after its latched policy
-cutoff is logged and flagged as `post_cutoff_fill`, while the original fill
+F-2 never depends on venue expiry. Its cutoff is the latched earliest pending-
+entry deadline: the policy boundary, explicit entry or exit deadline, or entry
+timeout. A BUY executed at or after that cutoff is logged and flagged as
+`post_cutoff_fill`, while the original fill
 remains owned. An injected synchronous
 `post_cutoff_fill_sink(strategy, native_order_filled, cutoff_ns)` runs after
 fill accounting and before this callback returns or another admission occurs.
-The T14 account/rung writer builds the complete native post-fill account view,
-calls `risk.caps.post_cutoff_fill(state, snapshot, caps, now)` and installs the
-returned state in that same call. Exposure and daily-loss state therefore move
+The coming T14 follow-up contract is
+`risk.caps.post_cutoff_fill(state, snapshot, caps, now) -> AccountState`; this
+callable is not implemented or bound by this repository, and the selected
+merged UET main pin does not supply it. T14's follow-up may publish it separately;
+that publication alone does not bind this strategy. An actual account/rung writer must build
+the complete native post-fill account view and install the consumer's returned
+state in that same call. The fixture verifies exposure and daily-loss state move
 together; neither is inferred from one instrument or logged by this strategy.
 An awaitable sink result is refused through the existing callback freeze and
 escalation path. Synthetic fixtures without the sink are explicitly flagged
@@ -225,9 +249,11 @@ escalation path. Synthetic fixtures without the sink are explicitly flagged
 Non-synthetic startup refuses without a callable sink, independently of the
 durable-ledger requirement; a deferred accounting result freezes at the fill.
 
-The next exit path applies the existing session rules; when F-1 requires a hold,
-the residual stays held and flagged. Paper acceptance must exercise the complete
-exception-to-accounting-to-exit/hold path before the first non-synthetic run.
+The marker forces a time-exit at the next drive permitted by the existing
+session rules, including races at an explicit entry/exit deadline or ordinary
+entry timeout. When F-1 requires a hold, the residual stays held and flagged.
+Paper acceptance must exercise the complete exception-to-accounting-to-exit/hold
+path before the first non-synthetic run.
 The sink fixture and T14's consumer tests remain separate engineering evidence
 until their actual main-to-main binding is qualified. GTD or IOC is an optional
 execution-profile capability qualified per broker later, not a dependency.

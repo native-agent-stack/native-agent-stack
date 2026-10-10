@@ -380,7 +380,7 @@ or held/flagged under F-1. It does not rely on venue-enforced expiry.
 
 The mechanism retains the [native fill event timestamp](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/python/nautilus_trader/model/__init__.pyi#L4484-L4503)
 and [native callback dispatch](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/trading/src/python/strategy.rs#L576-L583).
-The execution timestamp is compared with the entry's latched policy deadline,
+The execution timestamp is compared with the entry's latched earliest deadline,
 so a pre-cutoff execution delivered later is not misclassified. Owned quantity,
 cost basis and fill identity are updated before the synchronous injected sink
 is called. Duplicate native trade IDs cannot apply the exception twice. The
@@ -398,11 +398,13 @@ The strategies/T14 boundary is
 `post_cutoff_fill_sink(strategy, native_order_filled, cutoff_ns)`. The account's
 single writer supplies the complete post-fill native `AccountSnapshot`, owner
 `CapsConfig`, frozen trade-day anchors and current UTC time to the owned
-`risk.caps.post_cutoff_fill(state, snapshot, caps, now) -> AccountState`, then
+coming `risk.caps.post_cutoff_fill(state, snapshot, caps, now) -> AccountState`, then
 installs that returned state before the sink returns. The underlying governor
 seam is [UET risk.check and State at the selected merged main pin](https://github.com/seathatflowsinourveins/us-equities-trading/blob/586171951a1595cfd0811cfb8b9c012897eb9543/risk/__init__.py#L119-L198).
-The new caps consumer is the T14 follow-up's declared interface, not a PR-branch
-commit dependency or an already-qualified cross-repository runtime. A family
+The new caps consumer is the T14 follow-up's declared interface: no
+implementation/binding is supplied by this repository or the selected merged
+UET main pin. It is not a PR-branch commit dependency or an already-qualified
+cross-repository runtime. A family
 actor cannot derive account-wide holdings, uncertain reservations or opening
 P&L anchors from its one instrument. A synthetic run without the sink remains
 explicitly `post_cutoff_risk_sink_unqualified`.
@@ -423,3 +425,78 @@ logs and isolated exception/callback/awaitability mutants are retained in
 `strategies-pr938-integration-20261010/`; T14 independently owns the actual caps
 transition tests. Neither fixture substitutes for paper acceptance of the
 real main-to-main account writer, or qualifies F-1's held residual management.
+
+## Clock-leading halt correction after 0ea8aee2
+
+The status handler's availability fence accidentally rejected halts, preventing
+entry cancellation when the venue timestamp led the host clock. The pinned
+primary mechanisms remain the rc5 [InstrumentStatus timestamp/action fields](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/python/nautilus_trader/model/__init__.pyi#L2480-L2507),
+[native status callback](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/trading/src/python/strategy.rs#L756-L763)
+and [HALT/non-trading actions](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/model/src/enums.rs#L969-L1002).
+The correction applies negative trading signals at observation and records the
+event/init lead in `status_clock_ahead`. Only a TRADING resumption requires
+available, ordered timestamps. Halting timestamps bound the ordering fence at
+their observation time, and the fence never regresses; a future-dated halt
+therefore does not force waiting for that timestamp to accept a valid resumption.
+Neutral metadata neither resumes trading nor moves the fence.
+
+First-hand results are retained at
+`~/.local/state/native-agent-stack/coordination/ns2604-coop/lanes/strategies-pr938-status-clock-fix-20261010/`.
+`native-clock-before.log` reproduces missing cancellation for 1 ms/400 ms venue
+lead, an init-clock lead and a stale halt, plus the missing active halt in the
+resumption controls. `native-clock-after.log` verifies cancellation at 300 ms
+delivery and terminal confirmation at 400 ms, with no fill. Future/stale TRADING
+still cannot clear the latch, while an available ordered resumption can. The
+unchanged owning `probe938_future_halt.py` SHA256
+`014ce90f8982028dd93cb1da743960f279add024ec27fe0b985a056da8efec1f`
+is retained by digest; `owning-probe-before.log`/`owning-probe-after.log` measure
+all five clock leads independently. The init-lead fixture shifts metadata at
+the native callback seam because the native simulation schedules by ts_init;
+it does not claim that the backtest dispatcher normally delivers future init.
+
+The F-2 cutoff now uses the same earliest deadline latched before entry submit
+and armed through the existing [native nanosecond alert API](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/common/src/python/clock.rs#L158-L177):
+policy cutoff, explicit entry/exit deadline or entry timeout. Classification no
+longer omits spec-level deadline and timeout races. `earliest-cutoff-before.log`
+fails three native subcases; the corrected cases sink the owned late fill at
+the delivery step, retain the original ID and close through the permitted exit.
+The marker forces the next session-permitted time-exit rather than waiting for
+a later unrelated holding deadline; its isolated guard regression fails for
+both the explicit-entry-deadline and entry-timeout races when removed.
+The original policy-cutoff native portfolio/state test remains binding.
+
+The native status latch and its ordering fence are memory-only. A restart does
+not establish resumption; snapshot and durable ledger halts remain separate,
+and fresh broker status/restart reconciliation or journal persistence must be
+qualified by the owning runner before any non-synthetic run. The coming T14
+consumer interface remains explicitly unimplemented/unbound at this repository
+and selected merged UET main pin. This correction adds no broker status producer,
+T14 implementation or paper acceptance claim.
+
+## Unsupported OVERNIGHT hold and cutoff coverage controls
+
+The existing T22 unsupported-session hold must survive a classifier extension
+that names the 20:00–04:00 ET window `OVERNIGHT`. The implementation now holds
+`session.kind.name in ("CLOSED", "OVERNIGHT")` before entry or exit admission,
+retaining the existing `closed_session_requires_handoff` durable freeze and
+escalation. Current shared calendar boundaries remain based on the pinned
+[exchange-calendars session API](https://github.com/gerrymanoim/exchange_calendars/blob/dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a/exchange_calendars/exchange_calendar.py#L1006-L1016).
+The dated hold policy remains in [the trading scope decision](https://github.com/seathatflowsinourveins/us-equities-trading/blob/586171951a1595cfd0811cfb8b9c012897eb9543/docs/decisions/2026-10-09-equities-intraday-scope.md).
+No classifier or broker transport is rebuilt here.
+
+The two existing native hold tests run with a test-only public-name overlay at
+the shared calendar boundary; an additional native case pins both names for
+flat entry refusal and held-position durable escalation. They do not import
+or test against another PR branch. Before/after and per-name mutant evidence
+are retained in this correction packet. Initial fixture attempts that used a
+naive clock are retained separately and are not accepted fail-before evidence.
+
+The native cutoff controls now distinguish execution exactly at the armed
+deadline from one nanosecond before it, require `post_cutoff_risk_applied` on a
+completed synchronous sink, and require `post_cutoff_risk_sink_unqualified`
+when an eligible synthetic fill has no sink. Single-site comparator, ack-label
+and missing-sink-flag mutants fail those oracles. The source is the same pinned
+rc5 fill timestamp/callback mechanism cited above. The coming T14 consumer
+name is an interface declaration, not an implemented or bound dependency in
+this repository or the selected merged UET main pin; T14 publication still
+requires a separately verified main-to-main account-writer binding.

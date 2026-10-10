@@ -104,6 +104,7 @@ class FamilyStrategy(Strategy):
         self.snapshot = None
         self.instrument_status_halted = False
         self.last_instrument_status = None
+        self.instrument_status_timestamps = (0, 0)
         self.last_quote = None
         self.trace = []
         self.flags = set()
@@ -133,6 +134,7 @@ class FamilyStrategy(Strategy):
         self.pending_remaining = D(0)
         self.pending_since_ns = 0
         self.pending_policy_deadline_ns = None
+        self.pending_entry_deadline_ns = None
         self.cancel_requested = False
         self.cancel_requested_ns = 0
         self.quantity = D(0)
@@ -340,18 +342,9 @@ class FamilyStrategy(Strategy):
         if status.instrument_id != self.instrument_id:
             return
         now = self.clock.timestamp_ns()
-        if status.ts_event > now or status.ts_init > now:
-            self._record("instrument_status_refused", reason="future_availability")
-            return
-        previous = self.last_instrument_status
-        if previous is not None and (
-            status.ts_event < previous.ts_event or status.ts_init < previous.ts_init
-        ):
-            self._record("instrument_status_refused", reason="out_of_order")
-            return
         # Official rc5 InstrumentStatus/MarketStatusAction. Keep this carrier
         # separate: a new factor snapshot cannot resume a native status halt.
-        if (
+        halting = (
             status.action
             in {
                 MarketStatusAction.HALT,
@@ -361,10 +354,40 @@ class FamilyStrategy(Strategy):
                 MarketStatusAction.NOT_AVAILABLE_FOR_TRADING,
             }
             or status.is_trading is False
-        ):
+        )
+        event_ns, init_ns = status.ts_event, status.ts_init
+        if halting:
+            # A negative trading signal acts at observation, regardless of
+            # venue-clock lead or timestamp regression. Lead is diagnostic.
+            event_lead, init_lead = max(0, event_ns - now), max(0, init_ns - now)
+            if event_lead or init_lead:
+                self.flags.add("status_clock_ahead")
+                self._record(
+                    "status_clock_ahead",
+                    event_lead_ns=event_lead,
+                    init_lead_ns=init_lead,
+                )
             self.instrument_status_halted = True
+            # Preserve ordering without making a future-dated halt an
+            # unavailable timestamp barrier to a later valid resumption.
+            event_ns, init_ns = min(event_ns, now), min(init_ns, now)
         elif status.action == MarketStatusAction.TRADING:
+            if event_ns > now or init_ns > now:
+                self._record("instrument_status_refused", reason="future_availability")
+                return
+            previous_event, previous_init = self.instrument_status_timestamps
+            if event_ns < previous_event or init_ns < previous_init:
+                self._record("instrument_status_refused", reason="out_of_order")
+                return
             self.instrument_status_halted = False
+        else:
+            return  # No-change metadata does not resume trading or move its clock fence.
+        self.instrument_status_timestamps = tuple(
+            max(previous, current)
+            for previous, current in zip(
+                self.instrument_status_timestamps, (event_ns, init_ns), strict=True
+            )
+        )
         self.last_instrument_status = status
         self._record(
             "instrument_status",
@@ -380,9 +403,7 @@ class FamilyStrategy(Strategy):
             self._fault("watchdog", error)
             raise
 
-    def _arm_pending_entry_alert(self):
-        if self.pending is None or self.pending_role != "entry":
-            return
+    def _entry_order_deadline(self):
         deadlines = [self.pending_since_ns + self.spec.entry_timeout_ns]
         deadlines.extend(
             deadline
@@ -393,7 +414,12 @@ class FamilyStrategy(Strategy):
             )
             if deadline is not None
         )
-        deadline = min(deadlines)
+        return min(deadlines)
+
+    def _arm_pending_entry_alert(self):
+        if self.pending is None or self.pending_role != "entry":
+            return
+        deadline = self.pending_entry_deadline_ns
         if deadline <= self.clock.timestamp_ns():
             self._drive()
             return
@@ -489,7 +515,7 @@ class FamilyStrategy(Strategy):
             return
         self.flags.discard("held_halted")
         session = self._session(now)
-        if session.kind == _sessions.SessionKind.CLOSED:
+        if session.kind.name in ("CLOSED", "OVERNIGHT"):
             if self.quantity:
                 self._freeze("closed_session_requires_handoff")
             return
@@ -663,7 +689,8 @@ class FamilyStrategy(Strategy):
 
     def _exit(self, now, bid):
         forced = (
-            (
+            "post_cutoff_fill" in self.flags
+            or (
                 self.spec.exit_deadline_ns is not None
                 and now >= self.spec.exit_deadline_ns
             )
@@ -743,6 +770,9 @@ class FamilyStrategy(Strategy):
             if role == "entry" and self.preset.exit_policy is not None
             else None
         )
+        self.pending_entry_deadline_ns = (
+            self._entry_order_deadline() if role == "entry" else None
+        )
         self.cancel_requested = False
         self.cancel_requested_ns = 0
         self._record(
@@ -768,7 +798,7 @@ class FamilyStrategy(Strategy):
         quantity, price = decimal(str(event.last_qty)), decimal(str(event.last_px))
         if not D(0) < quantity <= self.pending_remaining:
             raise ValueError("fill_quantity_outside_pending")
-        cutoff = self.pending_policy_deadline_ns
+        cutoff = self.pending_entry_deadline_ns
         post_cutoff = (
             event.order_side == OrderSide.BUY
             and cutoff is not None
@@ -819,6 +849,7 @@ class FamilyStrategy(Strategy):
         self.pending_role = None
         self.pending_remaining = D(0)
         self.pending_policy_deadline_ns = None
+        self.pending_entry_deadline_ns = None
         self.cancel_requested = False
         self.cancel_requested_ns = 0
 

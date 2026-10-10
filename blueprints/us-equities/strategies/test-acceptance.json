@@ -37,6 +37,8 @@
     "test_same_family_classes_use_real_LiveNode_and_owned_partial_fills",
     "test_same_family_presets_register_together_in_BacktestEngine_and_LiveNode",
     "test_stale_extended_quote_flags_held_position_and_sends_no_exit",
+    "test_clock_ahead_and_stale_native_halts_cancel_at_delivery",
+    "test_clock_ahead_halt_requires_available_ordered_resumption",
     "test_delayed_first_buy_callback_uses_native_fill_event_time",
     "test_delayed_native_fill_keeps_original_session_calendar_deadline",
     "test_development_startup_requires_durable_ledger_before_entry",
@@ -46,6 +48,7 @@
     "test_exit_deadline_cancels_pending_entry_before_ordinary_timeout",
     "test_exit_deadline_cancels_pending_exit_before_ordinary_timeout",
     "test_exit_deadline_refuses_new_entry_at_and_after_boundary",
+    "test_explicit_deadline_and_timeout_races_use_armed_cutoff",
     "test_explicit_nontrading_status_cancels_entry_without_halt_action",
     "test_forced_exit_rests_until_timeout_and_fills_once",
     "test_fractional_policy_boundary_dispatches_cancel_before_crossing_quote",
@@ -65,6 +68,7 @@
     "test_non_equity_freeze_is_durable_and_escalates_to_session",
     "test_nonhalted_snapshot_does_not_clear_native_status_halt",
     "test_policy_boundary_refuses_new_entries_at_and_after_cutoff",
+    "test_post_cutoff_classification_includes_exact_boundary_and_pins_missing_sink",
     "test_post_cutoff_fill_updates_risk_state_in_native_callback",
     "test_post_cutoff_risk_sink_cannot_defer_accounting",
     "test_restart_never_enters_when_durable_halt_exists_without_exposure",
@@ -72,7 +76,8 @@
     "test_session_is_notified_even_when_durable_freeze_fails",
     "test_subsecond_halt_cancels_on_acceptance_before_reopen_and_fill",
     "test_terminal_entry_is_consumed_without_other_startup_refusal",
-    "test_unacknowledged_cancel_times_out_without_new_id"
+    "test_unacknowledged_cancel_times_out_without_new_id",
+    "test_unsupported_session_names_block_entry_and_durably_hold_exit"
   ],
   "runtime_install": "T13 unchanged uv sync --locked from ee3883699870d972058516192b1ee1c6e3ffb762",
   "schema_version": 1,
@@ -85,17 +90,17 @@
     "blueprints/us-equities/strategies/__init__.py": "a6e37c81a6492dde3adf9d050ab4c7b99278f9821e224b5b9f8c3200496e91ff",
     "blueprints/us-equities/strategies/acceptance.py": "090273ec96f4bce0762ac7aadb39c71dcc9be50d4c0ffc5a1cf28c10d5c5d122",
     "blueprints/us-equities/strategies/contracts.py": "447be2ce6a099494d87a37496d4d4a81eec4f2857cdd8647215d705e9133af1f",
-    "blueprints/us-equities/strategies/families.py": "95001a29bf46ab64872faa072deedb79a2da085c550a4dba8a25015f718e6090",
+    "blueprints/us-equities/strategies/families.py": "b72c2060f5d15bcd03ceff548bea26cd47ffe75136fd0d5818b9d1e915790d69",
     "blueprints/us-equities/strategies/presets.py": "c8163295938ed9f303903d3f9f07d1a6060e81b7ae9cd74e6bf4a8a7166e2be7",
     "blueprints/us-equities/strategies/registry.json": "091868499c161b5b485f1dbf831f67320af72133b17bfda1804ab60d97e27711",
     "blueprints/us-equities/strategies/simulation.py": "a4ac2b5d7e6cdde702d48dca87f25cdb667445042286c22dcc928d3e939699b1",
     "tests/test_adaptive_paper_native.py": "728458624788243abcaf653f6a20a5a6201cfa9ec3328e8d7eb3fd58fdfa94b0",
-    "tests/test_us_equities_strategies.py": "92ccf91f235e6c1a3bf6f851afedc1c416f2c5c6d9e071a8e69869dd771ec43d",
-    "tests/test_us_equities_strategy_lifecycle.py": "97802802bd72306738b38f032cb6d4b966844e480fa3e56442b69d871b29311b"
+    "tests/test_us_equities_strategies.py": "ccdf1d0085c09a4b4386dc30609f4bf85f5eff2e90facc7b8eab74a9063a59c7",
+    "tests/test_us_equities_strategy_lifecycle.py": "27cf9dcf85340f0d0ca7639eaa2a17c3e3bb4441b8c44d2f362557a91ca88d21"
   },
   "status": "passed",
-  "stderr_sha256": "2a637c2092f2d4563c0b9085084634ff6d5aa8a046285161902695a0322c259f",
-  "stdout_sha256": "a4ce670e6ec4b5c9e11f15901eb3eb9a84d1d21f996911c7bc0d699140901472",
+  "stderr_sha256": "cb9eca439168ff3829b874f3ebb6ba14b91d455b3278a510cda3cb6f36576de4",
+  "stdout_sha256": "9445170694228aad4bafdb4d37d30a8a48d3fa6678dfd17b30757ff0fa0807e5",
   "strategy_performance": "NOT_CITED",
-  "tests_run": 63
+  "tests_run": 68
 }

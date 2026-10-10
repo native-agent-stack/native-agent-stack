@@ -14,6 +14,7 @@ from contextlib import ExitStack, contextmanager
 from dataclasses import replace
 from datetime import datetime, timezone
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import patch
 
 contracts = importlib.import_module("blueprints.us-equities.strategies.contracts")
@@ -88,6 +89,25 @@ def synthetic_native_status_context():
             )
 
     with patch.object(adapter, "AlpacaDataClient", StatusFixtureClient):
+        yield
+
+
+@contextmanager
+def synthetic_overnight_session_context():
+    """Overlay only the public OVERNIGHT enum name at the calendar boundary.
+
+    No PR-branch implementation is imported or pinned by these fixtures.
+    """
+    sessions = families._sessions
+    original = sessions.session_at
+
+    def session_at(ts):
+        info = original(ts)
+        if info.kind.name == "CLOSED":
+            return replace(info, kind=SimpleNamespace(name="OVERNIGHT"))
+        return info
+
+    with patch.object(sessions, "session_at", side_effect=session_at):
         yield
 
 
@@ -457,14 +477,15 @@ class NativeStrategyTests(unittest.TestCase):
             ts_init=start - 600_000_000_000,
             valid_until_ns=start + 7200_000_000_000,
         )
-        result = simulation.run_case(
-            "gap_premarket",
-            "aggressive-v1",
-            start_ns=start,
-            snapshot=snapshot,
-            bids=("10",) * 12,
-            spec_overrides={"exit_policy": "overnight-v1"},
-        )
+        with synthetic_overnight_session_context():
+            result = simulation.run_case(
+                "gap_premarket",
+                "aggressive-v1",
+                start_ns=start,
+                snapshot=snapshot,
+                bids=("10",) * 12,
+                spec_overrides={"exit_policy": "overnight-v1"},
+            )
         self.assertEqual(result["callback_faults"], [])
         self.assertGreater(float(result["owned_quantity"]), 0)
         self.assertIn("closed_session_requires_handoff", result["flags"])
