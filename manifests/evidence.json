@@ -61782,8 +61782,8 @@
     },
     {
       "path": "tests/test_local_pages_policy_grants.py",
-      "sha256": "6c20e1a9f90811ce6b9bed62e475cccdda3b7175576580a0833ce9fe2fa36e51",
-      "bytes": 19409
+      "sha256": "fc5a55db438f3615d18954c465da35492a41efe433f8c31c34ea99866720e8a1",
+      "bytes": 19408
     },
     {
       "path": "tests/test_managed_block.py",
@@ -62667,8 +62667,8 @@
     },
     {
       "path": "tools/local-pages/source_policy.json",
-      "sha256": "f3a2557e7214257f41ec7720eb0915cb49eed13f98d88894b6a85235f3016a41",
-      "bytes": 758170
+      "sha256": "78052497a0d7414fa4bc55ad9783592b7a127794c08ac9198bec726131820fe6",
+      "bytes": 758254
     },
     {
       "path": "tools/omniroute/gateway_record.py",
