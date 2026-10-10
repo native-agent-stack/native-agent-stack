@@ -17,6 +17,7 @@ from urllib.parse import urlsplit
 
 
 _SANITIZER = None
+_DIAGRAMS = None
 
 
 def _sanitizer():
@@ -28,6 +29,17 @@ def _sanitizer():
         spec.loader.exec_module(module)
         _SANITIZER = module
     return _SANITIZER
+
+
+def _diagrams():
+    """Manifest figures render from the builder's projection; no file is read here."""
+    global _DIAGRAMS
+    if _DIAGRAMS is None:
+        spec = importlib.util.spec_from_file_location("architecture_manifest_figures", Path(__file__).with_name("architecture_diagrams.py"))
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        _DIAGRAMS = module
+    return _DIAGRAMS
 
 
 def _portable(item: Any) -> Any:
@@ -297,7 +309,9 @@ def render(model: dict, inventory: dict, first_layer: str | None = None,
     sources = [source for source in (model.get("sources") or []) + (inventory.get("sources") or [])
                if isinstance(source, dict) and source.get("status") != "UNAPPROVED"]
     custody = _table("Architecture input custody", ["Source path", "SHA-256", "Source date / state"], [[esc(value(source.get("path"))), esc(value(source.get("sha256"))), esc(value(source.get("checked_at") or source.get("generated_utc") or source.get("status")))] for source in sources])
-    body = f'<div class="architecture-summary"><p><strong>{len(selected)}</strong> rendered sections / <strong>{len(all_layers)}</strong> canonical landscape layers.</p><p>Invoke counts are observational (organic use, not a controlled trial). Client counts measure sessions; Bash-run CLI invocations are outside the producer’s MCP counters. Native host E2E, local receipts and vendor test-suite runs retain their distinct scopes.</p></div>' + toc + '<div class="architecture-sections">' + "".join(sections) + '</div>'
+    manifest = _diagrams().render(model.get("manifest")) if first_layer is None else ""
+    ledger = '<h2 id="architecture-ledger">Layer ledger</h2><p>Every layer in catalog order, with its recorded choice, alternatives, inventory and evidence tables.</p>' if manifest else ""
+    body = manifest + ledger + f'<div class="architecture-summary"><p><strong>{len(selected)}</strong> rendered sections / <strong>{len(all_layers)}</strong> canonical landscape layers.</p><p>Invoke counts are observational (organic use, not a controlled trial). Client counts measure sessions; Bash-run CLI invocations are outside the producer’s MCP counters. Native host E2E, local receipts and vendor test-suite runs retain their distinct scopes.</p></div>' + toc + '<div class="architecture-sections">' + "".join(sections) + '</div>'
     coverage = inventory.get("coverage") or {}
     projection = coverage.get("automation_projection") or {}
     limits = projection.get("limits") or coverage.get("automation_limits") or []
@@ -318,7 +332,9 @@ def render(model: dict, inventory: dict, first_layer: str | None = None,
         for row in unapproved.get("by_kind_root", []) if isinstance(row, dict)
     ) + '</ul>'
     body += '<section id="architecture-unapproved"><h2>Unapproved discoveries</h2><p>' + esc(value(unapproved_total)) + ' unapproved inventory entries; individual names and paths withheld, metadata and content unread. Unavailable directory inventories remain UNREPORTED.</p>' + counts_list + '</section>'
-    custody_detail = '<p>Installed frontend-design metadata: <code>' + design_text + '</code></p>' + _closed("Architecture input custody", len(sources), custody)
+    excluded = [row for row in model.get("excluded_supplements") or [] if isinstance(row, dict)]
+    exclusions = ('<p>Landscape files excluded by the source policy and never opened: ' + "; ".join(f'<code>{esc(row.get("path"))}</code> ({esc(row.get("reason"))})' for row in excluded) + '.</p>') if excluded else ''
+    custody_detail = '<p>Installed frontend-design metadata: <code>' + design_text + '</code></p>' + exclusions + _closed("Architecture input custody", len(sources), custody)
     body += '<section id="architecture-custody"><h2>Builder sources and design provenance</h2>' + _deferred("custody", f'Source custody · {len(sources)} records', custody_detail, detail_outputs) + '</section>'
     receipt = {"canonical_layer_count": len(all_layers), "rendered_layer_count": len(selected), "layer_keys": [row["key"] for row in selected], "mapped_inventory_occurrences": sum(len(items) for items in mapped.values()), "unmapped_inventory_items": len(unmapped), "unapproved_inventory_items": unapproved_total}
     return body, receipt

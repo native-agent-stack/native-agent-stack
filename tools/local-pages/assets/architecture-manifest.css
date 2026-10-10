@@ -1,0 +1,119 @@
+/* Architecture manifest: diagram-design roles mapped onto the local-pages tokens.
+   paper = --canvas, node fill = --surface, ink = --ink, muted = --muted, rule = --rule.
+   Status marks reuse --ok (built), --link (adopted), --warn (candidate) and --muted
+   (planned); the one focus accent per view is --mf-focus. System fonts only. */
+:root {
+  --mf-focus: #5b3fa0;
+  --mf-focus-tint: rgba(91, 63, 160, .08);
+  --mf-band: rgba(24, 48, 71, .025);
+  --mf-zone: rgba(24, 48, 71, .34);
+  --mf-hair: rgba(24, 48, 71, .16);
+}
+:root[data-theme="dark"] {
+  --mf-focus: #b9a4f5;
+  --mf-focus-tint: rgba(185, 164, 245, .12);
+  --mf-band: rgba(232, 238, 245, .035);
+  --mf-zone: rgba(232, 238, 245, .34);
+  --mf-hair: rgba(232, 238, 245, .16);
+}
+@media screen and (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]):not([data-theme="dark"]) {
+    --mf-focus: #b9a4f5;
+    --mf-focus-tint: rgba(185, 164, 245, .12);
+    --mf-band: rgba(232, 238, 245, .035);
+    --mf-zone: rgba(232, 238, 245, .34);
+    --mf-hair: rgba(232, 238, 245, .16);
+  }
+}
+
+body[data-page="architecture"] { --mf-display: "Iowan Old Style", "Sitka Heading", "Palatino Linotype", Palatino, "Book Antiqua", "Noto Serif", Georgia, serif; }
+body[data-page="architecture"] .page-header h1,
+.mf-view > h2, .mf-key > h2, #architecture-ledger { font-family: var(--mf-display); font-weight: 600; letter-spacing: -.01em; }
+body[data-page="architecture"] .page-header h1 { font-size: clamp(2.1rem, 4.2vw, 3.4rem); font-weight: 500; }
+.mf-view > h2, #architecture-ledger { font-size: clamp(1.45rem, 2.2vw, 1.8rem); }
+.mf { margin-block: 0 3rem; min-width: 0; }
+.mf-summary { max-width: 68ch; font-size: 1.05rem; }
+.mf-hero { margin-top: 1.25rem; }
+.mf-records { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); gap: .1rem 2rem; margin: 0 0 1.25rem; padding: 0; }
+.mf-records > div { display: grid; grid-template-columns: minmax(7.5rem, auto) minmax(0, 1fr); gap: .75rem; padding-block: .4rem; border-top: 1px solid var(--rule); }
+.mf-records dt { color: var(--muted); }
+.mf-records dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.mf-key { margin-block: 1.5rem 2.25rem; }
+.mf-key h2 { font-size: 1.05rem; margin-bottom: .5rem; }
+.mf-key dl { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: .5rem 1.75rem; margin: 0; }
+.mf-key dl > div { min-width: 0; }
+.mf-key dt { display: flex; align-items: center; gap: .5rem; font-weight: 650; }
+.mf-key dd { margin: .15rem 0 0; color: var(--muted); font-size: .875rem; line-height: 1.45; }
+.mf-glyph { flex: none; width: 16px; height: 16px; }
+.mf-jump ul { display: flex; flex-wrap: wrap; gap: .35rem 1.4rem; margin: 0 0 1.5rem; padding: 0; list-style: none; }
+.mf-jump li { margin: 0; }
+.mf-view { margin-top: 2.75rem; min-width: 0; scroll-margin-top: 1.5rem; }
+.mf-view > h2 { margin-bottom: .35rem; }
+.mf-view > p { color: var(--muted); }
+.mf-unreported { padding: .75rem 1rem; border-left: 3px solid var(--warn); background: var(--surface); }
+.mf-figure { margin: 1rem 0 .75rem; min-width: 0; container-type: inline-size; }
+.mf-figure figcaption { max-width: 80ch; margin-top: .6rem; color: var(--muted); font-size: .875rem; line-height: 1.5; overflow-wrap: anywhere; }
+.mf-v { display: none; width: 100%; height: auto; margin-inline: auto; }
+.mf-v--w { max-width: 1280px; }
+.mf-v--m { display: block; max-width: 56rem; }
+.mf-v--n { max-width: 32rem; }
+@container (min-width: 64rem) {
+  .mf-v--m { display: none; }
+  .mf-v--w { display: block; }
+}
+@container (max-width: 35.99rem) {
+  .mf-v--m { display: none; }
+  .mf-v--n { display: block; }
+}
+.mf-alt { margin-block: .5rem 0; }
+.mf-alt summary { cursor: pointer; padding-block: .35rem; }
+.mf-alt summary:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+.mf-alt .table-wrap { margin-top: .5rem; }
+.mf-alt table { font-size: .875rem; min-width: 40rem; }
+.mf-alt td, .mf-alt th { overflow-wrap: anywhere; vertical-align: top; }
+.mf-alt ol, .mf-alt ul { max-width: 80ch; }
+#architecture-ledger { margin-top: 3.5rem; padding-top: 1.25rem; border-top: 3px solid var(--rule); }
+
+/* SVG roles. Sizes are attributes; colors and families follow the page theme. */
+.mf-svg { font-family: var(--font); }
+.mf-svg text { fill: var(--ink); }
+.mf-svg .mf-mono { font-family: var(--mono); }
+.mf-svg .mf-muted { fill: var(--muted); }
+.mf-svg .mf-brow { fill: var(--muted); font-family: var(--mono); letter-spacing: .14em; }
+.mf-svg .mf-focus-text { fill: var(--mf-focus); }
+.mf-paper { fill: var(--canvas); }
+.mf-mask { fill: var(--canvas); }
+.mf-band { fill: var(--mf-band); stroke: none; }
+.mf-seam { stroke: var(--mf-hair); stroke-width: 1; }
+.mf-frame { fill: none; stroke: var(--muted); stroke-width: 1; }
+.mf-zone { fill: var(--mf-band); stroke: var(--mf-zone); stroke-width: .8; stroke-dasharray: 4 4; }
+.mf-node { fill: var(--surface); stroke: var(--rule); stroke-width: 1; }
+.mf-tag { fill: none; stroke: var(--rule); stroke-width: .8; }
+.mf-chip { fill: var(--surface); stroke: var(--rule); stroke-width: 1; }
+.mf-chip.mf-s-built { stroke: var(--ok); }
+.mf-chip.mf-s-adopted { stroke: var(--link); }
+.mf-chip.mf-s-candidate { stroke: var(--warn); stroke-dasharray: 4 3; }
+.mf-chip.mf-s-planned { stroke: var(--muted); stroke-dasharray: 1.5 3; }
+.mf-cell-mini.mf-s-adopted { fill: var(--surface); stroke: var(--link); stroke-width: 1.2; }
+.mf-cell-mini.mf-s-candidate { fill: var(--surface); stroke: var(--warn); stroke-width: 1.2; stroke-dasharray: 3 2; }
+.mf-cell-mini.mf-s-planned { fill: var(--surface); stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 1.5 2; }
+.mf-cell-mini.mf-s-built { fill: var(--ok); stroke: var(--ok); }
+.mf-focus { fill: var(--mf-focus-tint); stroke: var(--mf-focus); stroke-width: 1.2; }
+.mf-chip.mf-focus { fill: var(--mf-focus-tint); stroke: var(--mf-focus); stroke-width: 1.2; stroke-dasharray: none; }
+.mf-g-built { fill: var(--ok); }
+.mf-g-adopted { fill: var(--link); }
+.mf-g-candidate { fill: none; stroke: var(--warn); stroke-width: 1.4; stroke-dasharray: 2.2 1.6; }
+.mf-g-planned { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 1.2 1.6; }
+.mf-g-focus { fill: var(--mf-focus-tint); stroke: var(--mf-focus); stroke-width: 1.2; }
+.mf-flow { fill: none; stroke: var(--muted); stroke-width: 1.2; }
+.mf-flow-focus { fill: none; stroke: var(--mf-focus); stroke-width: 1.4; }
+.mf-arrowhead { fill: var(--muted); }
+.mf-arrowhead-focus { fill: var(--mf-focus); }
+.mf-step { fill: var(--surface); stroke: var(--rule); stroke-width: 1; }
+.mf-step.mf-focus { fill: var(--mf-focus-tint); stroke: var(--mf-focus); }
+
+@media print {
+  .mf-v { display: none !important; }
+  .mf-v--w { display: block !important; max-width: 100%; }
+  .mf-alt { display: none; }
+}

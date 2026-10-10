@@ -347,7 +347,7 @@ def build(root: Path, state_root: Path, asset: Path | None = None, reads=None) -
             alternatives = _components(row.get("alternatives"), pointer, "dated alternative")
             layer = {
                 "key": f"{catalog}:{row['layer_id']}", "catalog": catalog, "layer_id": row["layer_id"],
-                **{key: _text(row.get(key)) for key in ("title", "requirement", "current_choice", "decision", "verdict_status", "rationale", "checked_at")},
+                **{key: _text(row.get(key)) for key in ("title", "requirement", "current_choice", "decision", "verdict_status", "rationale", "checked_at", "group")},
                 "evidence_refs": _refs(row.get("evidence_refs")), "limitations": [_text(value, 700) for value in row.get("limitations", []) if isinstance(value, str)],
                 "winners": winners, "candidates": candidates, "alternatives": alternatives,
                 "rejected": [candidate for candidate in candidates + alternatives if (candidate.get("disposition") or "").lower() in {"reject", "rejected"}],
@@ -370,6 +370,8 @@ def build(root: Path, state_root: Path, asset: Path | None = None, reads=None) -
         for component in row["winners"] + row["candidates"] + row["alternatives"]:
             if repository := _repo(component.get("repository")):
                 by_repo.setdefault(repository, set()).add(row["key"])
+    excluded = []
+    exclusion = getattr(reads, "excluded_supplement", lambda unused: None)
     for path in sorted((root / "catalogs/landscape").glob("*.json")):
         relative = path.relative_to(root).as_posix()
         if relative in documents or path == manifest_path:
@@ -377,6 +379,10 @@ def build(root: Path, state_root: Path, asset: Path | None = None, reads=None) -
         # Protected filenames are excluded from the glob before any byte access.
         if _policy.protected_path(relative):
             raise _policy.SourcePolicyError("protected supplementary catalog excluded before access")
+        # A reviewed policy exclusion is skipped before any byte access.
+        if (reason := exclusion(path)) is not None:
+            excluded.append({"path": relative, "reason": reason})
+            continue
         doc, captured = _json(path, reads, "architecture_supplement")
         sources.append({**captured, "path": relative})
         for collection in ("layers", "rows", "candidates", "components"):
@@ -422,6 +428,14 @@ def build(root: Path, state_root: Path, asset: Path | None = None, reads=None) -
     g5["current_view_utc"] = _text(cc.get("updated_utc"), 40)
     program = cc.get("adoption_program") if isinstance(cc.get("adoption_program"), dict) else {}
     adoption_program = {"global_stages": [_text(stage, 240) for stage in program.get("stages", []) if isinstance(stage, str)], "layers": [{"layer": _text(row.get("layer"), 120), "state": _text(row.get("state"), 800)} for row in program.get("layers", []) if isinstance(row, dict)], "source": str(cc_path) + "#/adoption_program", "per_tool_stage": "UNREPORTED"}
+    # Role keys only: recorded role values name sessions and hosts, so the
+    # manifest renders its own fixed vocabulary for each recorded key.
+    roles = cc.get("roles") if isinstance(cc.get("roles"), dict) else {}
+    lanes = roles.get("lanes") if isinstance(roles.get("lanes"), dict) else {}
+    command_roles = {"keys": sorted(key for key in roles if isinstance(key, str) and _label(key)),
+                     "lane_count": sum(1 for key in lanes if isinstance(key, str)),
+                     "updated_utc": _text(cc.get("updated_utc"), 40), "source": str(cc_path) + "#/roles",
+                     "status": "recorded" if roles else "UNREPORTED"}
     adoption_path = state_root / "coordination/command-center/pages/adoption-now.json"
     observation = {}
     if adoption_path.exists():
@@ -452,4 +466,4 @@ def build(root: Path, state_root: Path, asset: Path | None = None, reads=None) -
         sources.extend(immutable.get("evidence_sources", []))
         if immutable.get("verified"):
             sources.append(_receipt(Path(immutable["path"]), immutable["path"], reads, "architecture_adoption_snapshot"))
-    return {"schema": "local-architecture-sources/1", "layers": layers, "layer_count": len(layers), "sources": sources, "design": design, "g5": g5, "adoption_program": adoption_program, "adoption_observation": observation, "evidence_index": evidence_index, "notes": notes}
+    return {"schema": "local-architecture-sources/1", "layers": layers, "layer_count": len(layers), "sources": sources, "excluded_supplements": excluded, "design": design, "g5": g5, "adoption_program": adoption_program, "command_roles": command_roles, "adoption_observation": observation, "evidence_index": evidence_index, "notes": notes}

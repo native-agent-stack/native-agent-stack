@@ -21465,6 +21465,18 @@
       "filename": "adoption-now-[a-f0-9]{16}\\.json"
     }
   },
+  "architecture_supplement_exclusions": [
+    {
+      "root": "repo",
+      "path": "catalogs/landscape/grand-catalog-20261008.json",
+      "reason": "28389911-byte G5 grand catalog, above the 16 MiB bounded read both landscape globs apply; its compact rows reach the page through the retained G5 asset."
+    },
+    {
+      "root": "repo",
+      "path": "catalogs/landscape/grand-catalog-index-20261008.json",
+      "reason": "G5 compact slot index with no layers, rows, candidates or components collection, so the supplement projection would attach no record to any layer."
+    }
+  ],
   "architecture_derivation_sources": [
     {
       "root": "repo",
@@ -21499,6 +21511,20 @@
       "path": "tools/local-pages/architecture_sources.py",
       "pin": "85a067ba6b960f490f7277b451e8a8f9a74b52a4",
       "scope": "Fixed CC projections and G5 archive path, separately fixed installed-design custody; no referenced state or secret bodies were opened."
+    },
+    {
+      "root": "repo",
+      "path": "catalogs/landscape/grand-catalog-20261008.json",
+      "sha256": "afb38c9427d7a344792b5ddcfa7cab64e9613a2fda64d1cecb30e2b0eae825bb",
+      "pin": "9d4c00cd05d79b3fd5074df2e46bacab87ee67ff",
+      "scope": "Excluded from architecture_supplement: git cat-file -s reports 28389911 bytes at this pin, above the unchanged 16 MiB read bound; added by #878 and unchanged since. Only its leading asset and counts fields were read for review."
+    },
+    {
+      "root": "repo",
+      "path": "catalogs/landscape/grand-catalog-index-20261008.json",
+      "sha256": "9d9cf1c5411153a3cc4be17f26dad549d45448ceef475637b4c13c5bb6151c98",
+      "pin": "9d4c00cd05d79b3fd5074df2e46bacab87ee67ff",
+      "scope": "Excluded from architecture_supplement: its top-level keys at this pin are kind, release_state, release_tag, schema_version, slots and source_sha256, none of which the supplement projection reads; added by #878 and unchanged since."
     }
   ]
 }

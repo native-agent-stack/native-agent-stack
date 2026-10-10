@@ -181,6 +181,26 @@ gate is not MET. The four program stages come from `cc-now.json`; missing
 per-tool stage data is unreported. Readiness labels dated selections as catalog
 pins and shows observed host-version differences with their source time.
 
+Above the layer ledger, `architecture_manifest.py` projects four manifest views
+and `architecture_diagrams.py` draws them as inline SVG: the six-layer stack
+(host, agents, layer verdicts, GitHub gates, trading desk, monitoring), the
+component evidence matrix's layer verdicts grouped by catalog and recorded
+trading group, the new-WSL install plan's services and loopback ports, and the
+trading desk as a six-step data flow built from the gate ladder, the runtime
+target and the matrix winners. `MANIFEST_SOURCES` in the builder names each
+record and the exact `source_policy.json` role that already grants it; those
+reads join the custody table, the receipt's `manifest` block and the refresh
+signature. A missing record leaves its view UNREPORTED; an ungranted one still
+stops publication. Only names, identifiers, versions, integer ports, statuses,
+counts and record dates are projected, never notes or other free text. Command
+roles come from the `cc-now.json` role keys alone. Diagrams follow the
+diagram-design skill (layer stack, deployment and data-flow types) and the
+page shell follows frontend-design. Fonts are system stacks and colors are the
+page tokens, so light, dark and the theme picker all apply. Each figure ships
+1200-, 720- and 400-wide variants that a container query selects, so a 390px
+screen never scrolls sideways. `assets/architecture-manifest.css` is inlined
+into the page head, and its hash is recorded in the receipt.
+
 Inventory rows use canonical winner component-ID and candidate repository
 joins, followed by the reviewed `architecture_mapping.json` for remaining
 skills, agents, workflows and runtime automation. Each remaining unmapped item
@@ -216,7 +236,12 @@ Architecture source, projection and registered receipt selections also bind
 independent exact roles in `source_policy.json` before parsing or hashing.
 The shared bounded reader rejects leaf and ancestor symlinks. A protected or
 unapproved catalog or receipt stops publication while preserving the last
-successful output. Immutable Adoption candidates require the exact
+successful output. The one exception is an exact landscape file listed in
+`architecture_supplement_exclusions` with a reason, never also granted. Both
+landscape globs skip it before any byte access, and the receipt and custody
+section name it. Such a file is either above the unchanged 16 MiB read bound
+or carries no collection the supplement projection reads. Its pin and blob
+hash are recorded in `architecture_derivation_sources`. Immutable Adoption candidates require the exact
 `adoption-now-[a-f0-9]{16}.json` form in the reviewed snapshot directory before
 any byte read; invalid names are ignored, and symlink candidates are refused.
 An approved receipt above its existing read limit remains explicitly unmeasured

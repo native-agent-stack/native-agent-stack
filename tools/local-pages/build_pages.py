@@ -144,7 +144,8 @@ def source_scope(item: dict[str, Any], document: dict[str, Any], *, detail: bool
 
 
 def document(page: str, title: str, lede: str, scope: str, body: str,
-             refreshed: str, manifest_sha: str, source_notes: list[str], leading: str | None = None) -> bytes:
+             refreshed: str, manifest_sha: str, source_notes: list[str], leading: str | None = None,
+             head: str = "") -> bytes:
     nav = "".join(f'<a href="{name}.html"' + (' aria-current="page"' if name == page else '') + f'>{text}</a>' for name, text in PAGES.items())
     heading = leading if leading is not None else f'<header class="page-header"><h1>{esc(title)}</h1><p class="lede">{esc(lede)}</p></header>'
     source_link = "#architecture-custody" if page == "architecture" else f"sources.html#{page}"
@@ -157,7 +158,7 @@ def document(page: str, title: str, lede: str, scope: str, body: str,
   <meta name="theme-color" content="#f6f8fb">
   <title>{esc(title)} · Native engineering desk</title>
   <link rel="stylesheet" href="assets/site.css">
-  <script src="assets/site.js" defer></script>
+  <script src="assets/site.js" defer></script>{head}
 </head>
 <body data-page="{page}">
 <a class="skip-link" href="#main-content">Skip to content</a>

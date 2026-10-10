@@ -278,6 +278,33 @@ class ArchitectureReads:
         }}
         if not isinstance(self.families, dict) or any(reviewed.get(role) != record for role, record in self.families.items()):
             raise SourcePolicyError("Architecture family differs from its reviewed exact directory/form")
+        # Exact landscape JSON files that both supplement globs skip before any
+        # byte access. Each names one top-level landscape file and a reason, and
+        # never a granted path, so an unlisted file still fails closed.
+        self.supplement_exclusions = {}
+        rows = self.policy.document.get("architecture_supplement_exclusions", [])
+        if not isinstance(rows, list):
+            raise SourcePolicyError("supplement exclusions must be an exact reviewed list")
+        granted = set().union(*self.allowed.values())
+        for row in rows:
+            if not isinstance(row, dict) or set(row) != {"root", "path", "reason"} or row["root"] != "repo":
+                raise SourcePolicyError("supplement exclusion requires exactly a repo root, path and reason")
+            relative = _relative(row["path"])
+            if PurePosixPath(relative).parent != PurePosixPath("catalogs/landscape") or not relative.endswith(".json"):
+                raise SourcePolicyError("supplement exclusion must name one top-level landscape JSON file")
+            if not isinstance(row["reason"], str) or not row["reason"].strip():
+                raise SourcePolicyError("supplement exclusion requires a reason")
+            if ("repo", relative) in granted or relative in self.supplement_exclusions:
+                raise SourcePolicyError("supplement exclusion is also granted or listed twice")
+            self.supplement_exclusions[relative] = row["reason"]
+
+    def excluded_supplement(self, path):
+        """Return the reviewed reason when path is an excluded landscape file."""
+        try:
+            relative = Path(path).absolute().relative_to(self.roots["repo"]).as_posix()
+        except ValueError:
+            return None
+        return self.supplement_exclusions.get(relative)
 
     def authorize(self, role, path):
         path = Path(path).absolute()
