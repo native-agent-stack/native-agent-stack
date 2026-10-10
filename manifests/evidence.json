@@ -18907,8 +18907,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "028f69a619670c06b03c81104769533a44ed31efa2ade47306c6759cfde73d5d",
-      "bytes": 194754
+      "sha256": "36a4a0b21e9325b060778c0d084173ac943255bd16f0b84a06d984eaff2a1963",
+      "bytes": 194695
     },
     {
       "path": "docs/stack.md",
