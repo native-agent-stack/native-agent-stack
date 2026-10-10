@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "id": "data-quality-gap-reconciliation-20261010",
+  "kind": "retained_evidence_reconciliation",
+  "observed_at_utc": "2026-10-10T16:56:00Z",
+  "evidence_class": "source_review",
+  "base_commit": "0947b01289dcaa9157aa38392a94cf00f592b86d",
+  "catalog": "us-equities",
+  "layer_id": "data-quality-orchestration",
+  "claim": "Later retained native and local executions address five historical absence claims; Temporal's executable portion is evidenced while Modal stays an explicit login-dependent open residual. No new runtime acceptance or verdict/pin/host-status change.",
+  "resolution_ref": "catalogs/landscape/gap-burndown-data-quality-orchestration-20261010.json",
+  "resolution_sha256": "a2bf7dcc51806cca03abdd3e7ca8266a0a70dbc5a7a4d5aa55cfd4de15802fd7",
+  "retained_evidence_verification": {
+    "receipt_indices": [1, 2, 3, 5, 6, 7],
+    "raw_artifact_entries": 68,
+    "all_evidence_refs": 79,
+    "missing_files": 0,
+    "sha256_mismatches": 0,
+    "byte_count_mismatches": 0,
+    "paired_reports": {
+      "astra": {"status": "completed", "process_exit_code": 0, "report_sha256": "b396469ae54867014a174852e93ab042ecde68a179a2cd6444c22b2688c6573c"},
+      "claude": {"status": "completed", "process_exit_code": 0, "report_sha256": "1b65a75fbd41f65bc1c93640436908193f70fec4e75c9405508c9a6f030be179"}
+    },
+    "native_research_graph": {"status": "succeeded", "exit_code": 0, "started_at": "2026-09-19T19:41:23Z", "finished_at": "2026-09-19T19:41:50Z"},
+    "temporal_killed_worker_history": {"terminal_event": "EVENT_TYPE_WORKFLOW_EXECUTION_COMPLETED", "activity_attempt": 2, "last_failure": "activity Heartbeat timeout"},
+    "temporal_cancellation_history": {"terminal_event": "EVENT_TYPE_WORKFLOW_EXECUTION_CANCELED", "running_activity_cancellation_acknowledged": "not established"},
+    "temporal_retained_exported_spans": 32,
+    "duckdb_fixture_checks": "Ten Pandas/native DuckDB arms match the retained CSV gate controls; current gate requirements include duckdb==1.5.5."
+  },
+  "measured_count_change": {
+    "layer_open_executable_now_before": 6,
+    "layer_open_executable_now_after": 0,
+    "layer_open_total_before": 9,
+    "layer_open_total_after": 4,
+    "all_layers_open_executable_now_before": 238,
+    "all_layers_open_executable_now_after": 232,
+    "other_matrix_rows_unchanged": 31,
+    "settled_entries": [1, 2, 3, 5, 7],
+    "open_modal_login_residual": 6,
+    "untouched_other_open_entries": [0, 4, 8]
+  },
+  "regression": {
+    "command": "nice -n 10 ionice -c 2 -n 7 python3 -m unittest tests.test_component_matrix.GapCountTests.test_later_retained_receipt_replaces_stale_gap_count",
+    "before_fix_exit_code": 1,
+    "before_fix_tests": 1,
+    "before_fix_failures": 1,
+    "before_fix_observation": "AssertionError: 1 != 0; the old generator ignores the later retained receipt and reports a stale executable gap.",
+    "after_fix_exit_code": 0,
+    "additional_controls": "Historical crosswalk bytes remain unchanged; partial evidence leaves an open login residual. Changed evidence/crosswalk/text, wrong layer, missing supplement, duplicate gap and no evidence each refuse generation."
+  },
+  "local_commands": [
+    {"command": "nice -n 10 ionice -c 2 -n 7 python3 -m unittest tests.test_component_matrix", "exit_code": 0, "tests": 67, "skipped": 0},
+    {"command": "nice -n 10 ionice -c 2 -n 7 python3 scripts/component_matrix.py --write", "exit_code": 0, "rows": 32, "flip_rule_violations": 0},
+    {"command": "nice -n 10 ionice -c 2 -n 7 python3 scripts/validate.py", "exit_code": 0, "components": 70, "hashed_files": 11416, "profiles": 4, "receipts": 239, "scope": "FULL validator after source/ledger registration and before registering this new reconciliation receipt. Final precommit validation is recorded in the PR."}
+  ],
+  "limitations": [
+    "A hash-bound supplement supplies explicit catalog reconciliation and integrity checks; hashes alone do not decide semantic sufficiency.",
+    "September native executions remain historical evidence. Replaying history is not a new model, service, broker or provider run.",
+    "Temporal local dev-server execution does not qualify Modal, production persistence, multi-node upgrades or server-kill recovery.",
+    "Dagu manual-retry observations describe the fixture lacking automatic retry policy, not every Dagu workflow. Measured recovery timings are not guarantees.",
+    "Production data acceptance, off-host hosting, VM/trading-host qualification and separate adjudication bookkeeping remain open.",
+    "No live security probing, credential access, market/broker/paid call, protected-state access, source acquisition or new service installation was performed."
+  ]
+}

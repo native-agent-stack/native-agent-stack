@@ -6,7 +6,9 @@ E2E-status view.
 This never selects a winner, records a receipt or runs a lane; it only joins
 what ``catalogs/landscape/{foundation,us-equities}.json``,
 ``catalogs/foundation/decisions.json``, ``scripts/host_receipts.py`` receipts
-and ``catalogs/landscape/gap-crosswalk-92bb279.json`` (optional) already say,
+and ``catalogs/landscape/gap-crosswalk-92bb279.json`` (optional), together with
+explicit layer ``gap_resolution_ref`` supplements bound to that historical
+crosswalk and retained receipt hashes, already say,
 and writes the result deterministically to
 ``catalogs/landscape/component-evidence-matrix.json`` and
 ``docs/component-evidence-matrix.md``.
@@ -30,7 +32,9 @@ and writes them.
 from __future__ import annotations
 
 import argparse
+from copy import deepcopy
 from datetime import date
+import hashlib
 import json
 from pathlib import Path
 import re
@@ -39,14 +43,14 @@ try:
     from . import host_receipts
     from . import platform_status as platform_evidence
     from . import saturation_ledger
-    from .catalog_decisions import InvalidDecisionIndex, load, safe_file, unique_json
+    from .catalog_decisions import InvalidDecisionIndex, load, require, safe_file, unique_json
     from .landscape import ENFORCED_PLATFORMS, PLATFORM_KEYS
     from .validate import PRIVATE_CONTENT
 except ImportError:  # running as a plain script, not a package
     import host_receipts
     import platform_status as platform_evidence
     import saturation_ledger
-    from catalog_decisions import InvalidDecisionIndex, load, safe_file, unique_json
+    from catalog_decisions import InvalidDecisionIndex, load, require, safe_file, unique_json
     from landscape import ENFORCED_PLATFORMS, PLATFORM_KEYS
     from validate import PRIVATE_CONTENT
 
@@ -58,7 +62,8 @@ SCOPE = (
     "Per-component independent-review status and per-platform E2E state, joined from "
     "catalogs/landscape/{foundation,us-equities}.json winners/alternatives, "
     "catalogs/foundation/decisions.json lifecycle stage_refs, scripts/host_receipts.py receipts "
-    "and the gap crosswalk (open executable_now gaps per layer, when present), with each layer's "
+    "and the historical gap crosswalk plus explicit hash-bound later gap-resolution supplements "
+    "(open executable_now gaps per layer, when present), with each layer's "
     "convergence by layer from the saturation ledger and the newest sweep manifest. It never selects "
     "a winner or records a receipt; it is a read-only join of evidence recorded elsewhere."
 )
@@ -221,6 +226,61 @@ def open_gap_counts_by_layer(gap_crosswalk_doc: dict | None) -> dict[tuple[str, 
             counts[(layer["catalog"], layer["layer_id"])] = sum(
                 1 for gap in layer.get("gaps", []) or [] if isinstance(gap, dict) and gap.get("status") == "open")
     return counts
+
+
+def current_gap_document(root: Path, historical: dict | None, catalogs: dict) -> dict | None:
+    """Join explicit later receipts without rewriting historical judgments or verdicts."""
+    current = deepcopy(historical)
+    layers = {(r["catalog"], r["layer_id"]): r for r in (current or {}).get("layers", [])}
+    seen = set()
+    for catalog, document in catalogs.items():
+        for layer in (document or {}).get("layers", []):
+            reference = layer.get("gap_resolution_ref")
+            if reference is None:
+                continue
+            key = (catalog, layer["layer_id"])
+            require(key in layers, "gap resolution has no historical layer")
+            resolution = load(root, reference)
+            require(resolution.get("schema_version") == 1
+                    and (resolution.get("catalog"), resolution.get("layer_id")) == key,
+                    "gap resolution layer scope mismatch")
+            require(resolution.get("source_crosswalk_sha256") == hashlib.sha256(
+                safe_file(root, GAP_CROSSWALK_FILE).read_bytes()).hexdigest(),
+                "gap resolution historical crosswalk changed")
+            entries = resolution.get("gaps")
+            require(isinstance(entries, list) and entries, "gap resolution needs explicit gaps")
+            gaps = {g["index"]: g for g in layers[key]["gaps"]}
+            for entry in entries:
+                index = entry.get("index")
+                require(type(index) is int and index in gaps and (key, index) not in seen,
+                        "unknown or duplicate resolved gap")
+                seen.add((key, index))
+                gap = gaps[index]
+                source_text = gap["text"]
+                require(entry.get("source_text_sha256") == hashlib.sha256(source_text.encode()).hexdigest()
+                        and source_text in layer.get("open_gaps", []),
+                        "gap resolution source text changed")
+                require(entry.get("status") in {"settled_by_receipt", "open"}
+                        and entry.get("category") in {
+                            "executable_now", "catalog_edit", "needs_user_login", "needs_paid_entitlement",
+                            "needs_hardware", "time_gated", "needs_user_decision", "not_actionable"}
+                        and isinstance(entry.get("reason"), str) and entry["reason"].strip(),
+                        "invalid gap resolution disposition")
+                refs = entry.get("evidence_refs")
+                require(isinstance(refs, list) and refs, "gap resolution needs retained evidence")
+                for evidence in refs:
+                    path = safe_file(root, evidence.get("path"))
+                    digest = evidence.get("sha256")
+                    require(isinstance(digest, str) and bool(re.fullmatch(r"[0-9a-f]{64}", digest))
+                            and path.is_file() and hashlib.sha256(path.read_bytes()).hexdigest() == digest,
+                            "gap resolution retained evidence changed or missing")
+                if entry["status"] == "open":
+                    require(isinstance(entry.get("remaining"), str) and entry["remaining"].strip(),
+                            "partial gap resolution needs an explicit residual")
+                    gap["remaining"] = entry["remaining"]
+                gap.update(status=entry["status"], category=entry["category"],
+                           resolution_ref=reference, resolution_reason=entry["reason"])
+    return current
 
 
 def repository_to_component_id(stack_doc: dict | None) -> dict[str, str]:
@@ -867,6 +927,8 @@ def build_document(root: Path):
     decisions_doc = load_optional(root, DECISIONS_FILE)
     decisions = decisions_by_component(decisions_doc)
     gap_doc = load_optional(root, GAP_CROSSWALK_FILE)
+    landscape_docs = {catalog: load_optional(root, relative) for catalog, relative in LANDSCAPE_FILES.items()}
+    gap_doc = current_gap_document(root, gap_doc, landscape_docs)
     gap_counts = gap_counts_by_layer(gap_doc)
     open_gap_counts = open_gap_counts_by_layer(gap_doc)
     stack_doc = load_optional(root, STACK_FILE)
@@ -874,7 +936,6 @@ def build_document(root: Path):
     status_context = platform_evidence.load_context(root)
     receipts_summary = status_context.summary
 
-    landscape_docs = {catalog: load_optional(root, relative) for catalog, relative in LANDSCAPE_FILES.items()}
     winner_aliases = alias_ids_by_winner(stack_doc, landscape_docs.values())
     repo_layers = host_receipts.repository_layers({
         f"{catalog}/{layer['layer_id']}": layer for catalog, document in landscape_docs.items()
@@ -895,6 +956,8 @@ def build_document(root: Path):
                 status_context, winner_aliases, repo_layers,
             )
             row["convergence"] = build_layer_convergence(catalog, layer, row, convergence_context)
+            if layer.get("gap_resolution_ref") is not None:
+                row["gap_resolution_ref"] = layer["gap_resolution_ref"]
             rows.append(row)
             flip_violations.extend(row_flip_violations)
 
@@ -1181,8 +1244,15 @@ def render_markdown(document: dict) -> str:
         "## How to update this page",
         "",
         "This page and `catalogs/landscape/component-evidence-matrix.json` are generated, not hand-edited. "
-        "After adding host receipts, a decision, a gap-crosswalk regeneration or a landscape verdict update, "
+        "After adding host receipts, a decision, a gap-crosswalk regeneration, a hash-bound layer gap-resolution "
+        "supplement or a landscape verdict update, "
         "run `python3 scripts/component_matrix.py --write` and commit both files. "
+        "A layer's explicit `gap_resolution_ref` can reconcile later retained evidence with the historical "
+        "crosswalk without rewriting that crosswalk's judgments. Its historical gap text, crosswalk bytes and "
+        "every cited evidence file are hash-bound; changed, missing or wrong-scope evidence stops generation. "
+        "A partial resolution stays open and names its residual category, so resolved local Temporal checks "
+        "cannot hide a remaining Modal login requirement. A receipt's hash supplies integrity, not a semantic "
+        "acceptance verdict; the dated supplement must explain the actual scope and limitations. "
         f"Convergence by layer also reads `{SATURATION_LEDGER_FILE}`, the newest "
         f"`{SWEEP_MANIFEST_DIR}/manifest-YYYYMMDD.json`, `{STACK_FILE}` and `{RECEIPT_ALIASES_FILE}`, so run "
         "`--write` again after appending a sweep to the ledger or committing a sweep manifest. A missing ledger, "
