@@ -791,15 +791,18 @@ def refuse_git_repo(repo: Path):
 
 # ---------------------------------------------------------------- codex
 
-def run_codex_call(repo, schema, out_tmp, effort, prompt, model, timeout, events_path, validate):
+def run_codex_call(repo, schema, out_tmp, effort, prompt, model, timeout, events_path, validate, *,
+                   provider="native", omniroute_base_url=None):
     """Run one codex exec call, retried once. Returns (object or None, event model or None, exit codes, failure,
     leak text or None). A ``leak: true`` answer is final: it is not retried and never returns an object."""
-    cmd = codex_lane.build_command(repo, schema, out_tmp, effort, prompt, model, codex_lane.ISOLATION_ARGS)
+    transport = {"provider": provider, "omniroute_base_url": omniroute_base_url} if provider == "omniroute" else {}
+    cmd = codex_lane.build_command(repo, schema, out_tmp, effort, prompt, model, codex_lane.ISOLATION_ARGS,
+                                   **transport)
     exit_codes, event_model, failure = [], None, "no attempt ran"
     events_path.write_text("", encoding="utf-8")
     for _attempt in (1, 2):
         out_tmp.unlink(missing_ok=True)
-        result = codex_lane.run_attempt(cmd, timeout)
+        result = codex_lane.run_attempt(cmd, timeout, **transport)
         if result.get("stopped"):
             # A stop signal: no retry, and the caller writes no record (round 7, ISO-R7-3).
             return None, event_model, exit_codes, "stopped", None
@@ -837,6 +840,15 @@ def run_codex_call(repo, schema, out_tmp, effort, prompt, model, timeout, events
 def run_codex(args) -> int:
     work_dir = args.work_dir.resolve()
     repo = args.repo.resolve()
+    if args.provider == "omniroute":
+        try:
+            args.omniroute_base_url = codex_lane.omniroute_endpoint(
+                args.omniroute_base_url or os.environ.get(codex_lane.OMNIROUTE_BASE_URL_ENV)
+                or codex_lane.DEFAULT_OMNIROUTE_BASE_URL)
+        except ValueError as error:
+            print(f"adjudicate: {error}", file=sys.stderr)
+            return 2
+        args.model = args.model.removeprefix("cx/")
     if model_issue(args.model, "openai"):
         print(f"adjudicate: --model {args.model!r} does not match the openai pattern "
               f"{FAMILY_MODEL_PATTERNS['openai'].pattern}", file=sys.stderr)
@@ -893,7 +905,8 @@ def run_codex(args) -> int:
         return 2
     with contextlib.ExitStack() as stack:
         if pending:
-            issue = (codex_lane.codex_home_issue(work_dir, repo) or codex_lane.blind_path_issue()
+            home_options = {"provider": args.provider} if args.provider == "omniroute" else {}
+            issue = (codex_lane.codex_home_issue(work_dir, repo, **home_options) or codex_lane.blind_path_issue()
                      or codex_lane.codex_launch_issue())
             if issue:
                 print(f"adjudicate: {issue}", file=sys.stderr)
@@ -911,7 +924,7 @@ def run_codex(args) -> int:
             # Codex judges never load the user's global Codex instructions or user skills
             # (codex_lane.isolated_codex_home), set up only when something is to run (R4-REG-3).
             try:
-                codex_lane.CHILD_CODEX_HOME = codex_lane.isolated_codex_home(work_dir, repo)
+                codex_lane.CHILD_CODEX_HOME = codex_lane.isolated_codex_home(work_dir, repo, **home_options)
             except codex_lane.CodexHomeRefused as error:
                 print(f"adjudicate: {error}", file=sys.stderr)
                 return 2
@@ -926,6 +939,8 @@ def run_codex(args) -> int:
 
 def judge_pending(args, work_dir, repo, index, packets, items, pending, failures, out_dir, run_provenance,
                   judge_template, refute_template) -> int:
+    transport = {"provider": args.provider, "omniroute_base_url": args.omniroute_base_url} \
+        if args.provider == "omniroute" else {}
     events_dir = out_dir / "events"
     events_dir.mkdir(parents=True, exist_ok=True)
     schemas = {}
@@ -963,7 +978,7 @@ def judge_pending(args, work_dir, repo, index, packets, items, pending, failures
         judge, judge_model, judge_codes, failure, judge_leak = run_codex_call(
             repo, schemas["judge"], out_dir / f"{stem}.judge.out.tmp", args.effort,
             fill(judge_template, input_path, repo, packet_path=packets.get(name, "")), args.model, args.timeout,
-            events_dir / f"{stem}.judge.jsonl", valid_judge)
+            events_dir / f"{stem}.judge.jsonl", valid_judge, **transport)
         refuter, refute_model, refute_codes = None, None, []
         if codex_lane.STOP.is_set():
             # A stop signal: no refute stage starts and no record is written (round 7, ISO-R7-3).
@@ -975,7 +990,7 @@ def judge_pending(args, work_dir, repo, index, packets, items, pending, failures
             refuter, refute_model, refute_codes, failure, refute_leak = run_codex_call(
                 repo, schemas["refute"], out_dir / f"{stem}.refute.out.tmp", args.effort,
                 fill(refute_template, input_path, repo, judge, packets.get(name, "")), args.model, args.timeout,
-                events_dir / f"{stem}.refute.jsonl", valid_refuter)
+                events_dir / f"{stem}.refute.jsonl", valid_refuter, **transport)
             if codex_lane.STOP.is_set():
                 return
             if refute_leak is not None:
@@ -1714,6 +1729,10 @@ def parse_args(argv=None):
     codex.add_argument("--model", required=True,
                        help="Model passed to codex exec -m and recorded on each judgment; must match the openai "
                             "pattern of scripts/landscape.py FAMILY_MODEL_PATTERNS.")
+    codex.add_argument("--provider", choices=("native", "omniroute"), default="native",
+                       help="Explicit Codex transport opt-in; native remains the default.")
+    codex.add_argument("--omniroute-base-url", default=None,
+                       help="Keyless loopback /v1 endpoint; otherwise use OMNIROUTE_BASE_URL or the lane default.")
     codex.add_argument("--effort", default="max",
                        help="model_reasoning_effort for the judge and the refuter (default max, the standing GPT-6 lane setting; a judgment made at another effort is rerun).")
     codex.add_argument("--jobs", type=int, default=1)

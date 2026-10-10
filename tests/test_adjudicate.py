@@ -517,14 +517,62 @@ class CodexTests(AdjudicateFixture):
                     "CODEX_FAKE_ARGV_LOG": str(self.argv_log), "CODEX_FAKE_RETURN_FILE": str(return_file),
                     "CODEX_FAKE_EVENTS_FILE": str(events), "CODEX_FAKE_COUNTER_FILE": str(self.base / "count")}
 
-    def run_codex(self, repo=None, model="gpt-6-astra", effort=None, **env):
+    def run_codex(self, repo=None, model="gpt-6-astra", effort=None, provider=None, base_url=None, **env):
         with mock.patch.dict(os.environ, {**self.env, **env}):
             return quiet(adjudicate.main, ["codex", "--work-dir", str(self.work), "--repo", str(repo or self.repo),
                                            "--timeout", "30", "--model", model]
-                         + (["--effort", effort] if effort else []))
+                         + (["--effort", effort] if effort else [])
+                         + (["--provider", provider] if provider else [])
+                         + (["--omniroute-base-url", base_url] if base_url else []))
 
     def calls(self):
         return [json.loads(line) for line in self.argv_log.read_text(encoding="utf-8").splitlines()]
+
+    def test_omniroute_provider_reaches_both_judge_and_refuter(self):
+        # Exercise the same parsed namespace the CLI supplies, so the pre-flag runner
+        # reaches its native calls and fails on lost transport settings rather than argparse.
+        args = adjudicate.parse_args(["codex", "--work-dir", str(self.work), "--repo", str(self.repo),
+                                      "--timeout", "30", "--model", "gpt-6-astra"])
+        args.provider = "omniroute"
+        args.omniroute_base_url = "http://127.0.0.1:21128/v1"
+        with mock.patch.dict(os.environ, self.env), \
+                mock.patch.object(adjudicate.codex_lane, "run_attempt",
+                                  wraps=adjudicate.codex_lane.run_attempt) as attempts:
+            code, err = quiet(adjudicate.run_codex, args)
+        self.assertEqual(code, 0, err)
+        self.assertEqual(len(attempts.call_args_list), 4)
+        stages = []
+        for call in attempts.call_args_list:
+            argv = call.args[0]
+            stages.append(Path(argv[argv.index("--output-schema") + 1]).name)
+            self.assertEqual(call.kwargs.get("provider"), "omniroute")
+            self.assertEqual(call.kwargs.get("omniroute_base_url"), "http://127.0.0.1:21128/v1")
+            self.assertEqual(argv[argv.index("-m") + 1], "cx/gpt-6-astra")
+            self.assertIn('model_provider="omniroute"', argv)
+            self.assertIn("--ignore-user-config", argv)
+        self.assertEqual(sorted(stages), ["adjudication-judge.codex-strict.schema.json"] * 2
+                         + ["adjudication-refute.codex-strict.schema.json"] * 2)
+
+    def test_cli_omniroute_uses_the_existing_keyless_home_and_model_routing(self):
+        (self.base / "native-codex" / "auth.json").unlink()
+        with mock.patch.object(adjudicate.codex_lane, "native_auth_path",
+                               side_effect=AssertionError("OmniRoute must not look up native authentication")):
+            code, err = self.run_codex(provider="omniroute", model="cx/gpt-6-astra",
+                                      base_url="http://127.0.0.1:21128/v1/")
+        self.assertEqual(code, 0, err)
+        self.assertEqual(len(self.calls()), 4)
+        for argv in self.calls():
+            self.assertIn('model_provider="omniroute"', argv)
+            self.assertEqual(argv[argv.index("-m") + 1], "cx/gpt-6-astra")
+        record = json.loads((self.work / "adjudication-judgments" / "codex" / f"{NAME}.AB.json")
+                            .read_text(encoding="utf-8"))
+        self.assertEqual(record["model"], "gpt-6-astra")
+
+    def test_cli_omniroute_refuses_a_non_loopback_endpoint_before_a_child_starts(self):
+        code, err = self.run_codex(provider="omniroute", base_url="http://gateway.example/v1")
+        self.assertEqual(code, 2)
+        self.assertIn("keyless loopback", err)
+        self.assertFalse(self.argv_log.exists())
 
     def test_judge_and_refuter_run_isolated_per_order(self):
         code, err = self.run_codex()
@@ -533,6 +581,8 @@ class CodexTests(AdjudicateFixture):
         self.assertEqual(len(calls), 4)
         isolation = list(adjudicate.codex_lane.ISOLATION_ARGS)
         for argv in calls:
+            self.assertNotIn('model_provider="omniroute"', argv)
+            self.assertEqual(argv[argv.index("-m") + 1], "gpt-6-astra")
             self.assertTrue(any(argv[i:i + len(isolation)] == isolation for i in range(len(argv))), argv)
             self.assertEqual(argv[argv.index("--sandbox") + 1], "read-only")
             self.assertEqual(argv[argv.index("-C") + 1], str(self.repo))
