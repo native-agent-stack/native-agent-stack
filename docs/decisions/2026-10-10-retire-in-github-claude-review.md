@@ -56,7 +56,7 @@ Before this change the command center disabled the three workflows (`disabled_ma
 ## Inverse
 
 1. Revert this change (the three workflows and their tests come back as they were at
-   `9d4c00cd0e1e74e81d79fc3f9e9cfd4cfb6c42f8`, #968).
+   `9d4c00cd05d79b3fd5074df2e46bacab87ee67ff`, #968).
 2. Re-set the `claude-review` environment secret from slot `anthropic-api-3` through `credential_run.py`, with the
    value on `gh secret set`'s standard input only (the procedure in `docs/secret-storage.md`).
 3. Re-enable the three workflows (`gh workflow enable`) and keep their repository variables set.

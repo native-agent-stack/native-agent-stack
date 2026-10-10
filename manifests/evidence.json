@@ -18572,8 +18572,8 @@
     },
     {
       "path": "docs/decisions/2026-10-10-claude-federation-diagnostics.md",
-      "sha256": "a639381861c599000ff1d48608c1bb2ccd9866257dec19aef0c92c3530fea5a3",
-      "bytes": 10754
+      "sha256": "d4d68b887665a39c4ec1114faa3c648ee3b5d7b5b4e7d5475cc571f1a9d8a792",
+      "bytes": 10756
     },
     {
       "path": "docs/decisions/2026-10-10-codex-lane-omniroute.md",
@@ -18587,7 +18587,7 @@
     },
     {
       "path": "docs/decisions/2026-10-10-retire-in-github-claude-review.md",
-      "sha256": "81d42f2675a525f168e5cc0e72d002347d3b190d5555836740ec2c70db2532cd",
+      "sha256": "9bff31442dacf6d315f1a0a47bfabb40b72c0d5aca9f552288ad0b190d2026ef",
       "bytes": 6106
     },
     {
