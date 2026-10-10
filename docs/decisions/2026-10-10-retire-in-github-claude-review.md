@@ -45,12 +45,10 @@ Before this change the command center disabled the three workflows (`disabled_ma
   `pr-metadata.yml`, the supply-chain and security scans) and the landing scripts the command center is moving into
   the repository (`tools/landing`, #975).
 
-**Follow-up (dated 2026-10-10, the command center's ruling at 20:19Z).** The `claude-native-practice` skill still
-selects the retired route: its `github-action` row and the Actions part of `pr-review-pre-cue`
-(`reference/git-github-automation.md`, `reference/slots.md`, `reference/slots.json`). Sessions load the pinned personal
-copy of that skill, not this repository's folder, so editing the folder here would change nothing until the pin
-moves. cc-native-practice retires those rows, points them to the local review route and re-pins the skill in its own
-pull request right after this one lands.
+**Follow-up (dated 2026-10-10).** The `claude-native-practice` skill rows for the retired route (its
+`github-action` row and the Actions part of `pr-review-pre-cue`, in `reference/git-github-automation.md`,
+`reference/slots.md` and `reference/slots.json`) are updated in a follow-up pull request (cc-native-practice), then
+re-pinned.
 
 ## Revisit when
 

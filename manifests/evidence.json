@@ -18587,8 +18587,8 @@
     },
     {
       "path": "docs/decisions/2026-10-10-retire-in-github-claude-review.md",
-      "sha256": "057b5c3260f7ddca256da769dab2e4b5d799a48cc4d4c98b54515da08ca6359e",
-      "bytes": 6789
+      "sha256": "327989084c5fb141e7795afbf44c26356bf8a32636aec1e2f775009f25a02e1c",
+      "bytes": 6524
     },
     {
       "path": "docs/decisions/2026-10-10-retire-macos-ci.md",
