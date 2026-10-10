@@ -86,9 +86,14 @@ Python module names and ordinary operands named `codex`/`claude` do not establis
 native-client context. Markdown command spans use the matching backtick
 delimiters described by [CommonMark 0.31.2 section 6.1](https://spec.commonmark.org/0.31.2/#code-spans);
 independent command spans stay separate. Inline formatting of individual command
-tokens or a model value preserves surrounding command text. Each span is kept
-as one literal token when checking the surrounding command, using
-[CPython v3.13.16's `shlex.quote`](https://github.com/python/cpython/blob/v3.13.16/Doc/library/shlex.rst).
+tokens or a model value preserves surrounding command text. For a span that
+represents one shell token, POSIX quotes and escapes are decoded with
+[CPython v3.13.16's `shlex.split`](https://github.com/python/cpython/blob/v3.13.16/Lib/shlex.py#L305-L313)
+before that token is encoded with
+[`shlex.quote`](https://github.com/python/cpython/blob/v3.13.16/Lib/shlex.py#L323-L332)
+in the surrounding command. Full command spans retain their independent parse;
+other span text remains one literal surrounding token. Thus a quoted wrapper
+name still resolves to the wrapper, and literal punctuation remains an operand.
 A formatted executable is retained, so its ordinary operands cannot become a
 new executable. Unrelated spans in a trailing shell comment do not suppress
 the preceding model argument. Commands outside spans are also checked.

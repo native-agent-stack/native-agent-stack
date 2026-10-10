@@ -556,11 +556,21 @@ def selectors(text: str, path: Path):
                         content = content[1:-1]  # CommonMark 0.31.2 section 6.1
                     return content
                 code_spans = [span_content(match) for match in re.finditer(spans, line)]
-                # CPython v3.13.16 shlex.quote preserves each literal span as
+                def surrounding_token(match):
+                    content = span_content(match)
+                    try:
+                        tokens = shlex.split(content, comments=False, posix=True)
+                    except ValueError:
+                        tokens = []  # non-command literal span; preserve its text
+                    # Decode single-token shell syntax before encoding it.
+                    # Full command spans stay opaque here and parse separately.
+                    token = tokens[0] if len(tokens) == 1 else content
+                    return shlex.quote(token)
+                # CPython v3.13.16 shlex.split/quote preserve a decoded span as
                 # one token in the surrounding command. Never delete an
                 # executable or let a span's operand suffix become a command.
                 # Full command spans retain their separate parse below.
-                outside_command = re.sub(spans, lambda match: shlex.quote(span_content(match)), line)
+                outside_command = re.sub(spans, surrounding_token, line)
                 line = re.sub(spans, lambda match: " " + span_content(match) + " ", line)
         stripped = line.strip()
         if not stripped or stripped.startswith(("#", "//", "<!--", ";")):

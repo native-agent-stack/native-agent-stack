@@ -436,6 +436,30 @@ class ActiveModelCurrencyTests(unittest.TestCase):
                     finding, = result["findings"]
                     self.assertEqual((finding["model"], finding["line"]), ("gpt-6-sol", 1))
 
+    def test_quoted_markdown_wrapper_token_keeps_native_model_visible(self):
+        for wrapper in ("env", "nohup", "command"):
+            for quote in ("'", '"'):
+                with self.subTest(wrapper=wrapper, quote=quote):
+                    self.write("docs/launch.md", f"`{quote}{wrapper}{quote}` codex exec -m gpt-6-sol\n")
+                    result = self.check()
+                    self.assertEqual((result["status"], result["stale_count"]), ("stale", 1))
+                    finding, = result["findings"]
+                    self.assertEqual((finding["model"], finding["line"]), ("gpt-6-sol", 1))
+
+    def test_markdown_token_decoding_keeps_literal_operands_and_full_spans_separate(self):
+        commands = [
+            "`'echo'` codex -m gpt-6-sol", '`"printf"` codex -m gpt-6-sol',
+            "echo `';'` codex -m gpt-6-sol", r"echo `\;` codex -m gpt-6-sol",
+            'echo `"&&"` codex -m gpt-6-sol',
+            "Use `codex` alongside `git -C codex commit -m gpt-6-sol`.",
+        ]
+        for command in commands:
+            with self.subTest(command=command):
+                self.write("docs/launch.md", command + "\n")
+                self.assertEqual(self.check()["stale_count"], 0)
+        self.write("docs/launch.md", "Use `env codex exec -m gpt-6-sol`.\n")
+        self.assertEqual(self.check()["stale_count"], 1)
+
     def test_quoted_and_escaped_punctuation_remains_an_operand_in_command_strings(self):
         commands = ["echo ';' codex -m gpt-6-sol", r"echo \; codex -m gpt-6-sol",
                     'echo "&&" codex -m gpt-6-sol']
