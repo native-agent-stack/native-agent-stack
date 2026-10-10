@@ -53,6 +53,28 @@ close. Their historical tests had already refuted or failed to support the arms:
 - The `pull_request` payload: https://docs.github.com/en/webhooks/webhook-events-and-payloads#pull_request
 - Ruleset required checks: https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets
 
+## PR-body privacy scan (2026-10-10)
+
+The command center's correction #145 found the host account name, inside absolute home paths, in eleven places in
+this public repository's pull request descriptions and comments; it masked them all. To keep a new description from
+carrying one, the required `sota-sources` job (both byte-identical copies, `pr-metadata.yml` and
+`sota-sources-gate.yml`) also scans the current pull request body, read through the REST "Get a pull request" endpoint
+as before (<https://docs.github.com/en/rest/pulls/pulls#get-a-pull-request>, `body`; read 2026-10-10T19:54Z):
+
+- the rules are the home-path and credential rules of `scripts/validate.py`'s `PRIVATE_CONTENT` (personal home path,
+  Windows user path, encoded home path, Hugging Face, GitHub and Tavily tokens, API secrets, private keys, bearer
+  credentials), written in JavaScript; the two session-identifier rules are left out, since a pull request body may
+  cite an identifier on purpose;
+- no host name is needed: the rules match any `/home/<name>/` or `/Users/<name>/` path, and the documented exemptions
+  (`example`, `<user>`, `~/`) pass;
+- the job fails closed and its message names only the rule ids, never the matched text;
+- `tests.test_sota_sources_gate.GatePrivacyTests` runs both copies on fixtures built at run time (so the test file
+  carries no private-looking value), checks that a missing section and a private body are reported together, and runs
+  every rule against its Python original on a shared corpus. On the job before this change the new tests fail (21
+  failures).
+
+Callers of the reusable gate get the scan when they bump their pin.
+
 ## Alternatives considered
 
 - **A checklist item in the PR template only.** Rejected: nothing fails, and the rule was already implied by the core

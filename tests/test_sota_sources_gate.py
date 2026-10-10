@@ -227,6 +227,69 @@ class GateBehaviourTests(unittest.TestCase):
                 self.assertIsNone(done["failed"], done)
 
 
+# Correction #145: home paths reached public PR bodies. The fixtures assemble each private-looking value at run time,
+# so this file itself carries none of them for scripts/validate.py's own scan.
+SOURCES = "\n\n### SOTA sources\n- https://github.com/o/r at v1.2.3, src/x.py\n"
+HOME = "/" + "home/"
+PRIVACY_CASES = [
+    # (case, body, the rule ids the gate must name; [] means the body passes)
+    ("a Linux home path", "Logs are in " + HOME + "alice/state/x.log." + SOURCES, ["personal-home-path"]),
+    ("a macOS home path", "See /" + "Users/alice/notes.md." + SOURCES, ["personal-home-path"]),
+    ("a Windows profile through WSL", "From /mnt/c/" + "Users/Alice/AppData." + SOURCES,
+     ["personal-home-path", "windows-user-path"]),  # its /Users/<name>/ part is a home path as well, as in Python
+    ("an encoded scratch directory", "In /tmp/claude-1000/" + "-home-" + "alice-code-x/scratchpad." + SOURCES,
+     ["encoded-home-path"]),
+    ("an Anthropic-shaped key", "key " + "sk-" + "ant-" + "A" * 30 + SOURCES, ["api-secret"]),
+    ("a GitHub token", "token " + "gh" + "p_" + "a" * 36 + SOURCES, ["github-token"]),
+    ("a tilde path passes", "Logs are in ~/" + ".local/state/x.log." + SOURCES, []),
+    ("a masked home passes", "Logs are in " + HOME + "<user>/state/x.log." + SOURCES, []),
+    ("the documented example home passes", "e.g. " + HOME + "example/x." + SOURCES, []),
+]
+
+
+@unittest.skipUnless(NODE, "node unavailable; CI's runner images carry it")
+class GatePrivacyTests(unittest.TestCase):
+    def test_both_copies_fail_a_private_body_naming_only_the_rule(self):
+        payloads = [body(text) for _, text, _ in PRIVACY_CASES]
+        outcomes = {path.name: run_check(inline_script(sota_job(path)), payloads) for path in (VALIDATE, GATE)}
+        self.assertEqual(outcomes["pr-metadata.yml"], outcomes["sota-sources-gate.yml"])
+        for (case, text, rules), outcome in zip(PRIVACY_CASES, outcomes["sota-sources-gate.yml"]):
+            with self.subTest(case=case):
+                if not rules:
+                    self.assertIsNone(outcome["failed"], outcome)
+                    continue
+                self.assertIsNotNone(outcome["failed"])
+                self.assertIn(f"(rules: {', '.join(rules)})", outcome["failed"])
+                for token in re.findall(r"\S+", text):  # no piece of the body is echoed back
+                    if "/" in token or token.startswith(("sk-", "ghp_")) or "home-" in token:
+                        self.assertNotIn(token.strip(".,"), outcome["failed"])
+
+    def test_both_problems_are_reported_together(self):
+        (outcome,) = run_check(inline_script(sota_job(GATE)), [body("See " + HOME + "alice/x.")])
+        self.assertIn('non-empty "SOTA sources" section', outcome["failed"])
+        self.assertIn("(rules: personal-home-path)", outcome["failed"])
+
+    def test_each_rule_agrees_with_scripts_validate(self):
+        # The gate's rules are validate.py's PRIVATE_CONTENT patterns written in JavaScript; on every case each rule
+        # gives the same verdict as its Python original.
+        sys.path.insert(0, str(ROOT / "scripts"))
+        import validate
+        python = {"personal-home-path": "personal home path", "windows-user-path": "Windows user path",
+                  "encoded-home-path": "encoded home path", "hugging-face-token": "Hugging Face token",
+                  "github-token": "GitHub token", "tavily-token": "Tavily token", "api-secret": "API secret",
+                  "private-key": "private key", "bearer-credential": "bearer credential"}
+        patterns = dict(validate.PRIVATE_CONTENT)
+        corpus = [text for _, text, _ in PRIVACY_CASES] + [
+            "hf_" + "b" * 24, "tvly-" + "dev-" + "c" * 26, "-----BEGIN " + "RSA PRIVATE KEY-----",
+            "Bearer " + "d" * 40, "C:\\" + "Users\\Bob\\x", "-" + "Users-" + "bob-x", "home-" + "bob-code-x",
+            "plain text with no secret", HOME + "example/a", "x-home-" + "example-y"]
+        outcomes = run_check(inline_script(sota_job(GATE)), [body(text + SOURCES) for text in corpus])
+        for text, outcome in zip(corpus, outcomes):
+            for rule, name in python.items():
+                with self.subTest(rule=rule, case=text[:24]):
+                    self.assertEqual(rule in (outcome["failed"] or ""), bool(patterns[name].search(text + SOURCES)))
+
+
 def zizmor(path: Path, directory: Path) -> tuple:
     """zizmor offline, as tests/test_workflow_security_coverage.py runs it: (exit status, finding idents)."""
     environment = {key: value for key, value in os.environ.items()

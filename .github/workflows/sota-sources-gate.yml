@@ -45,8 +45,30 @@ jobs:
             const body = pullRequest.body || '';
             const match = body.match(/^#{2,3}[ \t]+SOTA sources[ \t]*$([\s\S]*?)(?=^#{2,3}[ \t]|(?![\s\S]))/m);
             const content = match ? match[1].replace(/<!--[\s\S]*?-->/g, '').trim() : '';
+            // Privacy (correction #145): the home-path and credential rules of scripts/validate.py's PRIVATE_CONTENT,
+            // the same patterns in JavaScript (tests/test_sota_sources_gate.py checks them against the Python ones). A
+            // failure names the rule ids only, never the matched text.
+            const privacy = [
+              ['personal-home-path', /\/(?:home|Users)\/(?!example(?:\/|\b))[A-Za-z0-9_.-]+(?:\/|\b)/],
+              ['windows-user-path', /(?:[A-Za-z]:[\/\\]+|\/mnt\/[A-Za-z]\/)Users[\/\\]+(?!example(?:[\/\\]|\b))[A-Za-z0-9_.-]+/i],
+              ['encoded-home-path', /(?<![\w-])(?:-home-|-[Uu][Ss][Ee][Rr][Ss]-|[A-Za-z]--[Uu][Ss][Ee][Rr][Ss]-|-[Mm][Nn][Tt]-[A-Za-z]-[Uu][Ss][Ee][Rr][Ss]-)(?!example(?:-|[\/\\"'\s`)\]]|$))[A-Za-z0-9_.]+(?:-|(?=[\/\\"'\s`)\]]|$))|(?<![^\W_])home-(?!example-code-)[\w.]+(?:-+[\w.]+)*-*-code-/],
+              ['hugging-face-token', /\bhf_[A-Za-z0-9]{20,}\b/],
+              ['github-token', /\b(?:gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,})\b/],
+              ['tavily-token', /\btvly-(?:(?:prod|dev)-)?[A-Za-z0-9_-]{24,}\b/],
+              ['api-secret', /\bsk-(?:proj-|ant-)?[A-Za-z0-9_-]{24,}\b/],
+              ['private-key', /-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----/],
+              ['bearer-credential', /\bBearer\s+[A-Za-z0-9._~-]{30,}/i],
+            ];
+            const hits = privacy.filter(([, pattern]) => pattern.test(body)).map(([id]) => id);
+            const problems = [];
             if (!content) {
-              core.setFailed('The PR description needs a non-empty "SOTA sources" section: the repository, pin and file, or the published reference, behind each change (AGENTS.md top rule).');
+              problems.push('The PR description needs a non-empty "SOTA sources" section: the repository, pin and file, or the published reference, behind each change (AGENTS.md top rule).');
+            }
+            if (hits.length) {
+              problems.push(`The PR description carries private content (rules: ${hits.join(', ')}): write home paths as ~/ and never paste a credential.`);
+            }
+            if (problems.length) {
+              core.setFailed(problems.join(' '));
             } else {
               core.info(`SOTA sources section present (${content.length} characters).`);
             }
