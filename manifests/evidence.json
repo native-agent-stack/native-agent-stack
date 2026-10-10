@@ -60922,8 +60922,8 @@
     },
     {
       "path": "tests/test_local_pages_policy_grants.py",
-      "sha256": "6ee5152d9bb4827c8a27e4dec46d53c04c0b8bdb39d2c697f1760c6a2507be4a",
-      "bytes": 19309
+      "sha256": "9622547a51054565483d31614115b3b4909303f79f96fa86717e53094c9414f2",
+      "bytes": 19398
     },
     {
       "path": "tests/test_managed_block.py",
