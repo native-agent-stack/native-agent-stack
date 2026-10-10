@@ -69,6 +69,9 @@ Generated economic summaries exclude native generated identifiers while retainin
 the unchanged primary-record hashes. Hash registrations use the existing
 `scripts.host_receipts.register_file` path. Scoped receipts await independent PR
 review; measurements and remaining gates are separate.
+Native text captures retain their original whitespace and newline bytes; the
+artifact directory's Git attributes disable text conversion and whitespace
+linting for those hash-bound outputs, following Git 2.53.0's gitattributes API.
 
 Sources:
 
@@ -87,6 +90,8 @@ Sources:
 - Microsoft official SDK metadata:
   <https://builds.dotnet.microsoft.com/dotnet/release-metadata/10.0/releases.json>;
   source/runtime byte commitments are in `raw/source-pins.json`.
+- Git@`v2.53.0`: `Documentation/gitattributes.adoc` (`-text` byte preservation
+  and the whitespace attribute for native capture files).
 
 Reproduce the matrix and ledger:
 
