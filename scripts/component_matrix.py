@@ -7,6 +7,8 @@ This never selects a winner, records a receipt or runs a lane; it only joins
 what ``catalogs/landscape/{foundation,us-equities}.json``,
 ``catalogs/foundation/decisions.json``, ``scripts/host_receipts.py`` receipts
 and ``catalogs/landscape/gap-crosswalk-92bb279.json`` (optional) already say,
+with verified ``catalogs/landscape/gap-burndown-*.json`` single-gap receipts
+applied without modifying the frozen crosswalk,
 and writes the result deterministically to
 ``catalogs/landscape/component-evidence-matrix.json`` and
 ``docs/component-evidence-matrix.md``.
@@ -31,6 +33,8 @@ from __future__ import annotations
 
 import argparse
 from datetime import date
+import copy
+import hashlib
 import json
 from pathlib import Path
 import re
@@ -51,14 +55,15 @@ except ImportError:  # running as a plain script, not a package
     from validate import PRIVATE_CONTENT
 
 
-# The date the scope and the JSON schema below were last checked (the convergence-by-layer fields, 2026-09-27).
+# Scope/schema checked for the optional receipt-backed gap joins on 2026-10-10.
 # It is never a build date: the generator reads no clock, and the page header derives its newest input date.
-CHECKED_AT = "2026-09-27"
+CHECKED_AT = "2026-10-10"
 SCOPE = (
     "Per-component independent-review status and per-platform E2E state, joined from "
     "catalogs/landscape/{foundation,us-equities}.json winners/alternatives, "
     "catalogs/foundation/decisions.json lifecycle stage_refs, scripts/host_receipts.py receipts "
-    "and the gap crosswalk (open executable_now gaps per layer, when present), with each layer's "
+    "and the gap crosswalk plus verified single-gap burndown receipts (open executable_now gaps per layer, "
+    "when present), with each layer's "
     "convergence by layer from the saturation ledger and the newest sweep manifest. It never selects "
     "a winner or records a receipt; it is a read-only join of evidence recorded elsewhere."
 )
@@ -66,6 +71,7 @@ SCOPE = (
 LANDSCAPE_FILES = host_receipts.LANDSCAPE_CATALOGS
 DECISIONS_FILE = "catalogs/foundation/decisions.json"
 GAP_CROSSWALK_FILE = "catalogs/landscape/gap-crosswalk-92bb279.json"
+GAP_BURNDOWN_PATTERN = "catalogs/landscape/gap-burndown-*.json"
 STACK_FILE = "manifests/stack.json"
 ADJUDICATION_TEMPLATE = "evidence/artifacts/layer-verdicts-20260922/adjudication/{catalog}-{layer_id}-20260922.json"
 
@@ -193,6 +199,65 @@ def decisions_by_component(decisions_doc: dict | None) -> dict[str, list[dict]]:
         component_id: [{"stage": stage, "status": status} for stage, status in sorted(pairs)]
         for component_id, pairs in result.items()
     }
+
+
+def apply_gap_burndown(root: Path, gap_doc: dict | None):
+    """Join verified single-gap receipts without rewriting the frozen crosswalk.
+
+    The receipt's outcome, gap text and every retained output must agree with
+    its dated ledger. Partial evidence stays open; a changed acceptance question
+    or missing/tampered artifact stops generation instead of lowering the count.
+    """
+    ledgers = sorted(root.glob(GAP_BURNDOWN_PATTERN))
+    if not ledgers:
+        return gap_doc, {}
+    effective = copy.deepcopy(gap_doc)
+    gaps = {
+        (layer["catalog"], layer["layer_id"], gap["index"]): gap
+        for layer in (effective or {}).get("layers", []) for gap in layer.get("gaps", [])
+    }
+    joins = {}
+    seen = set()
+
+    def bound_file(binding):
+        if not isinstance(binding, dict) or set(binding) != {"path", "sha256"}:
+            raise InvalidDecisionIndex("gap burndown requires a path/digest binding")
+        path = safe_file(root, binding["path"])
+        if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != binding["sha256"]:
+            raise InvalidDecisionIndex(f"gap burndown artifact missing or changed: {binding['path']}")
+        return path
+
+    for path in ledgers:
+        relative = path.relative_to(root).as_posix()
+        doc = load(root, relative)
+        if doc.get("schema_version") != 1 or not doc.get("gaps") or not parse_iso_date(doc.get("checked_at")):
+            raise InvalidDecisionIndex(f"invalid gap burndown ledger: {relative}")
+        bound_file(doc.get("review"))
+        bound_file(doc.get("verification"))
+        for entry in doc["gaps"]:
+            key = (doc.get("catalog"), doc.get("layer_id"), entry.get("index"))
+            if key in seen or key not in gaps:
+                raise InvalidDecisionIndex("duplicate or unknown gap burndown identity")
+            seen.add(key)
+            gap = gaps[key]
+            digest = hashlib.sha256(gap["text"].encode()).hexdigest()
+            receipt_path = bound_file(entry.get("receipt"))
+            receipt = load(root, receipt_path.relative_to(root).as_posix())
+            if (entry.get("gap_text_sha256") != digest or receipt.get("gap_text_sha256") != digest
+                    or receipt.get("gap_index") != key[2] or entry.get("outcome") not in {"settled", "advanced"}
+                    or entry["outcome"] != receipt.get("outcome")
+                    or receipt.get("evidence_class") not in {"native_proven", "local_integration"}
+                    or not receipt.get("raw_outputs") or not entry.get("reason")):
+                raise InvalidDecisionIndex("gap burndown receipt does not establish the declared scope")
+            for output in receipt["raw_outputs"]:
+                bound_file(output)
+            if entry["outcome"] == "settled":
+                gap["status"] = "settled_by_receipt"
+            joins.setdefault(key[:2], []).append({
+                "index": key[2], "outcome": entry["outcome"], "receipt": entry["receipt"]["path"],
+                "ledger": relative, "checked_at": doc["checked_at"], "reason": entry["reason"],
+            })
+    return effective, joins
 
 
 def gap_counts_by_layer(gap_crosswalk_doc: dict | None) -> dict[tuple[str, str], int]:
@@ -866,7 +931,7 @@ def build_convergence_summary(rows: list[dict], context: dict) -> dict:
 def build_document(root: Path):
     decisions_doc = load_optional(root, DECISIONS_FILE)
     decisions = decisions_by_component(decisions_doc)
-    gap_doc = load_optional(root, GAP_CROSSWALK_FILE)
+    gap_doc, gap_burndown = apply_gap_burndown(root, load_optional(root, GAP_CROSSWALK_FILE))
     gap_counts = gap_counts_by_layer(gap_doc)
     open_gap_counts = open_gap_counts_by_layer(gap_doc)
     stack_doc = load_optional(root, STACK_FILE)
@@ -895,6 +960,8 @@ def build_document(root: Path):
                 status_context, winner_aliases, repo_layers,
             )
             row["convergence"] = build_layer_convergence(catalog, layer, row, convergence_context)
+            if (catalog, layer["layer_id"]) in gap_burndown:
+                row["gap_burndown"] = gap_burndown[(catalog, layer["layer_id"])]
             rows.append(row)
             flip_violations.extend(row_flip_violations)
 
@@ -1175,13 +1242,25 @@ def render_markdown(document: dict) -> str:
     else:
         for entry in needs_review:
             lines.append(f"- `{entry['catalog']}/{entry['layer_id']}`: {entry['independent_review']}")
+    burndown = [(row, entry) for row in document["rows"] for entry in row.get("gap_burndown", [])]
+    if burndown:
+        lines += ["", "## Verified gap receipts", "",
+                  "Dated receipt joins preserve the frozen crosswalk. Only complete settlements lower open-gap "
+                  "counts; partial advances remain open. Receipt, exact gap text and retained output digests "
+                  "are checked during generation.", "",
+                  "| Layer / gap | Outcome | Receipt | Scope / remaining boundary |",
+                  "| --- | --- | --- | --- |"]
+        for row, entry in burndown:
+            lines.append(f"| {row['catalog']}/{row['layer_id']} / {entry['index']} | {entry['outcome']} | "
+                         f"[{entry['checked_at']}](../{entry['receipt']}) | {entry['reason']} |")
     lines += ["", *render_convergence_markdown(document)]
     lines += [
         "",
         "## How to update this page",
         "",
         "This page and `catalogs/landscape/component-evidence-matrix.json` are generated, not hand-edited. "
-        "After adding host receipts, a decision, a gap-crosswalk regeneration or a landscape verdict update, "
+        "After adding host receipts, a decision, a verified `catalogs/landscape/gap-burndown-*.json` ledger, "
+        "a gap-crosswalk regeneration or a landscape verdict update, "
         "run `python3 scripts/component_matrix.py --write` and commit both files. "
         f"Convergence by layer also reads `{SATURATION_LEDGER_FILE}`, the newest "
         f"`{SWEEP_MANIFEST_DIR}/manifest-YYYYMMDD.json`, `{STACK_FILE}` and `{RECEIPT_ALIASES_FILE}`, so run "
