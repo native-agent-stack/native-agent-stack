@@ -153,6 +153,17 @@
    "adjudicator_role_sha256": "ef8d07f15b7c219f1b5ada705cf185146088fd013974b5ca51c1d29fdeee9fc4",
    "transcript_audit_py_sha256": "af78e463833f5759dcc4d8a6d8b0738352b99ccba654792d1327ddc6a1b3c032",
    "registered_at": "2026-10-11"
+  },
+  {
+   "adjudicate_py_sha256": "9da98fd37870a56c25d1dc40a34636b540a6f1cfcca74e994c036eda2967797d",
+   "codex_lane_py_sha256": "e0cc01afa277c820b5235e665ad0d5dda6948adc91559ef6c65c81461e8e32a3",
+   "prompt_sha256": "f82b527d179cc60ed985d9266d74071f936e4fa73f29c680a3d3f7635516004e",
+   "judge_schema_sha256": "b7279c9e70070c525144390c67e7f3eb7358b173675fae4e7efe3b798e1f5014",
+   "refute_schema_sha256": "b70af9cca33eec7c47d5ae02819bebbc76820d33a13f537ee7c375d4e6f2c736",
+   "workflow_sha256": "7caa3411bc5d715c5fcd6371a3c45fd729570a1b62c3f98b1a26bcb1ebfb3464",
+   "adjudicator_role_sha256": "ef8d07f15b7c219f1b5ada705cf185146088fd013974b5ca51c1d29fdeee9fc4",
+   "transcript_audit_py_sha256": "af78e463833f5759dcc4d8a6d8b0738352b99ccba654792d1327ddc6a1b3c032",
+   "registered_at": "2026-10-11"
   }
  ],
  "claude": [
@@ -320,6 +331,11 @@
   },
   {
    "codex_lane_py_sha256": "82280d901c54a6539822ad3c9ef0efda48e0edc79c8bdb00cba6e41fb316877c",
+   "prompt_sha256": "d3ef2cc0c06d33d6a4a058f5e74a1cf5be8a3760cc2b0b5572598f0e0e4288e4",
+   "registered_at": "2026-10-11"
+  },
+  {
+   "codex_lane_py_sha256": "e0cc01afa277c820b5235e665ad0d5dda6948adc91559ef6c65c81461e8e32a3",
    "prompt_sha256": "d3ef2cc0c06d33d6a4a058f5e74a1cf5be8a3760cc2b0b5572598f0e0e4288e4",
    "registered_at": "2026-10-11"
   }

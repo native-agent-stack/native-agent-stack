@@ -18582,8 +18582,8 @@
     },
     {
       "path": "docs/decisions/2026-10-10-codex-blind-audit-command-positions.md",
-      "sha256": "0685f40686abda0d9648d1c6e9147bf884701235553afd2cef7b15a167648179",
-      "bytes": 6193
+      "sha256": "ce2eb7a1c5066c593ccd086fff71c09790f974ad30b1d45101ed9c18e6702f46",
+      "bytes": 12314
     },
     {
       "path": "docs/decisions/2026-10-10-codex-lane-omniroute.md",
@@ -60066,9 +60066,19 @@
       "bytes": 495
     },
     {
+      "path": "tests/fixtures/codex_lane_approved_packet.json",
+      "sha256": "4cf923e52a9912abf0123180c16c346c4ef145546c0150130e77639a70baface",
+      "bytes": 220
+    },
+    {
       "path": "tests/fixtures/codex_lane_blind_audit_quarantines.json",
-      "sha256": "5c5a6a23d54352d0f9e62a23e765fe84473f0bb61ec2be09bda347e7faa84dc2",
-      "bytes": 3302
+      "sha256": "8aa5891f5ad18a96ba0ecbdb50e466bacafe57c39222af396c2e70bef0c6556c",
+      "bytes": 4066
+    },
+    {
+      "path": "tests/fixtures/codex_lane_workers_native_usage.jsonl",
+      "sha256": "890024fb9b1387a0f53fddb9af5c9bb551dacbc855f46cd9dbb08c6e3ac0f13f",
+      "bytes": 521
     },
     {
       "path": "tests/fixtures/g5-merge-gdelt.json",
@@ -60597,8 +60607,8 @@
     },
     {
       "path": "tests/test_codex_lane.py",
-      "sha256": "dd4fbad105aa5ad70b78d028eb456acb0d9115e2afd5e0ab8b1d4ae24778d21d",
-      "bytes": 133683
+      "sha256": "3a433a97d3fdf2a88d2907ec9cabd17ba395831606dd5b40970cd17be65c9683",
+      "bytes": 157780
     },
     {
       "path": "tests/test_codex_quota.py",
@@ -61867,8 +61877,8 @@
     },
     {
       "path": "tools/sota-convergence/README.md",
-      "sha256": "693554627319717b90ed82d4cea969caf4aa39e25d6469c2e98e9d70433668af",
-      "bytes": 193243
+      "sha256": "c9ee8d3c9358010368eceec9f295551d325dbeeaeaba603fc48f20de9e6c196f",
+      "bytes": 197040
     },
     {
       "path": "tools/sota-convergence/adjudicate.py",
@@ -61902,8 +61912,8 @@
     },
     {
       "path": "tools/sota-convergence/codex_lane.py",
-      "sha256": "82280d901c54a6539822ad3c9ef0efda48e0edc79c8bdb00cba6e41fb316877c",
-      "bytes": 115319
+      "sha256": "e0cc01afa277c820b5235e665ad0d5dda6948adc91559ef6c65c81461e8e32a3",
+      "bytes": 140449
     },
     {
       "path": "tools/sota-convergence/compact_manifest.py",
@@ -61917,8 +61927,8 @@
     },
     {
       "path": "tools/sota-convergence/evidence/codex-blind-audit-command-positions-20261010.json",
-      "sha256": "e9faa708fdbc9a36a690988aabc545f809d3d735ca1a52fe14d0645632f4cab7",
-      "bytes": 7648
+      "sha256": "b1e85906fffaf7987599ce819ca46f2bbe5485c827c09257103acba4510d34c1",
+      "bytes": 14421
     },
     {
       "path": "tools/sota-convergence/evidence/codex-lane-omniroute-20261010.json",
@@ -62067,8 +62077,8 @@
     },
     {
       "path": "tools/sota-convergence/lane-provenance.json",
-      "sha256": "ce40739989e5b3fab739aa94a9bad0b94e96e626fee8f776361438b6f1fb8066",
-      "bytes": 20810
+      "sha256": "76a795a9b6cec32103112fbbce462f4fc3f7da134a9a44bc16d0eaad1184e545",
+      "bytes": 21833
     },
     {
       "path": "tools/sota-convergence/lane-return.schema.json",

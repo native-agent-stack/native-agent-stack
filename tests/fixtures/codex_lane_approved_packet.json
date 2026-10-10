@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "catalog": "foundation",
+  "layer_id": "workers",
+  "candidates": [
+    {
+      "adopted": true,
+      "evidence_refs": ["evidence/receipt.json", "https://example.invalid/receipt"]
+    }
+  ]
+}

@@ -1593,7 +1593,20 @@ What remains and how it is handled:
   `examples/claude-native/workflows/child-usage.mjs`; quoted Python `-c`/stdin source uses Python's `ast`.
   Literal search patterns, printed strings, a quoted heredoc's backticks and Python `'/'.join(...)` separators
   are data. A real `git log`, `ls /`, `Path('/').iterdir()` or `rg -f /etc/passwd docs` remains flagged.
-  Unknown grammar/expansion and unresolved Python reads or execution are refused. The audit flags commands that:
+  Unknown grammar/expansion and unresolved Python reads or execution are refused.
+
+  **Independent working-directory records.** Each command also needs a caller-owned native record that binds
+  its event item identity, exact logged command display and absolute cwd inside the export or packets root.
+  `blind_audit(..., cwd_records=...)` accepts those records separately from the child event stream. An item's
+  `cwd` or `workdir` field, a model assertion, or the initial `codex exec -C` directory does not supply that
+  binding. Missing, duplicate or mismatched identities and outside directories are flagged. Codex 0.162.1's
+  production exec JSONL omits cwd, and this runner has no independent native capture: commands in current raw
+  streams are **UNVERIFIED**, so a blind layer with them is quarantined. The four-command regression helper
+  supplies caller-owned synthetic cwd records; its clean parser results do not attest production streams.
+  A future native capture must preserve the mapping between native call IDs and the projector's JSONL item IDs.
+
+  The audit flags commands that:
+  - lack a valid independent working-directory record;
   - use a read operand outside the repository and packets, or read the filesystem root. Only `/dev/null` and a
     parsed executable under `/bin/`, `/sbin/`, `/usr/bin/`, `/usr/sbin/` or `/usr/local/bin/` are exempt.
     `/bin/cat /usr/local/share/prior-verdict.json` and an executable elsewhere under `/usr/` are flagged.
@@ -1608,8 +1621,8 @@ What remains and how it is handled:
     new sandbox test on the current Codex pin;
   - use a `~`, `$HOME` or `${HOME}` path, or any other `$VAR/...` or `${VAR}/...` path (for example
     `$CODEX_HOME/AGENTS.md`), whose value the event does not show;
-  - `cd` somewhere the command does not name: bare `cd`, `cd -`, `cd ~`, or `cd` to a bare variable such as
-    `$OLDPWD` or `"$OLDPWD"`;
+  - change cwd through `cd`, `pushd`, `popd`, directory-changing wrappers, Python `chdir`, or subprocess cwd
+    overrides. A recorded starting directory does not verify a subsequent change;
   - climb out with `..`;
   - execute git, sqlite3, curl or wget (including decoded shell/wrapper and Python subprocess argv), or execute
     an audited CLI by an absolute path (`/usr/local/bin/qmd`, otherwise an exempt system executable token).
@@ -1660,13 +1673,42 @@ What remains and how it is handled:
   adapter, existing helper and parser pin by their expected SHA256 values, preserving native receipt fields.
 
   In a non-blind run a flag is evidence for the coordinator to review and disclose. Codex 0.162.1's consumed
-  `command_execution` JSONL records a command display, output, exit and status; it does not expose argv or file
-  access events. This is static analysis of the recorded display, not observed syscalls or branch attestation.
+  `command_execution` JSONL records a redacted, shell-quoted command display, output, exit and status; it does
+  not expose structured argv, cwd or file access events. Static analysis of the display and a separately bound
+  cwd still does not observe syscalls or runtime branches.
   Indirect script/config reads and symlink targets remain unobserved. Dynamic reads and unsupported syntax are
-  refused rather than guessed clean. The three retained tier-1 quarantine metadata cases fail against main
-  `9d4c00cd` and pass after this change, alongside real Git/root/read controls. Historical literal URI and regex
-  false positives are now clean only in data positions; constructed read operands such as `'://'[1:]+'etc/passwd'`
-  and `'/etc/passwd$)'[:-2]` stay flagged. Existing provenance entries and collected wave receipts are preserved.
+  refused. The retained tier-1 regressions cover four text-match quarantines: a Python join separator, an `rg`
+  pattern, quoted-heredoc backticks and the workers URI skip guard. They test command parsing with synthetic
+  caller-owned cwd records, alongside real Git/root/read violations. The earlier three-case replay at main
+  `9d4c00cd` is historical evidence from before the cwd requirement. Constructed read operands such as
+  `'://'[1:]+'etc/passwd'` and `'/etc/passwd$)'[:-2]` stay flagged. Existing provenance entries and collected
+  wave receipts are preserved. See the [dated decision record](../../docs/decisions/2026-10-10-codex-blind-audit-command-positions.md)
+  for pinned event-builder, shell-command, cwd and projector sources.
+
+  **Packet-derived read operands.** For a literal `catalog__layer.json` in an approved `packets` root, the parent
+  can resolve a bounded static JSON projection from a digest-bound approved packet. The loader reads only that
+  packet and its `SHA256SUMS` (or uses a caller-supplied trusted digest), using directory descriptors with no
+  symlink following. It requires regular files with one link, uses nonblocking opens, checks descriptor/path
+  identity and digest, and caps packet bytes at 1 MiB, checksum bytes at 128 KiB, accepted JSON nodes at 20,000
+  and depth at 64. The restricted projection supports default `json.loads`, literal subscripts, Name-target
+  list/set comprehensions and `sorted`; it never opens the evidence references. Unsupported data flow,
+  relevant mutation, callbacks and reflective namespace changes remain refused. A URI skip guard filters
+  values only at a read dominated by its `continue`; earlier reads and reads inside the guard receive no
+  exemption. This resolves the fourth command's data flow when its cwd is independently bound.
+
+  **Supervisor usage contract.** Native `usage.jsonl` rows identify their layer with `layer`; lane return JSON
+  uses `layer_id`. Supervisors use `usage_row_belongs_to_layer(row, layer)` and
+  `layer_usage_suffix(original_bytes, current_bytes, layer)` from `codex_lane.py`. The latter verifies the
+  original prefix and complete JSON rows, refuses a row for another layer, and returns the appended rows. An
+  empty suffix records no completed attempt. These helpers execute no model or file read. The actual retained
+  supervisor uses this contract; its regression fixture is the exact native workers usage row from the rerun.
+
+  **Interrupted-run failure records.** `failures.json` has a valid snapshot before any child launch and is
+  updated after each completed failure observation: exhausted retry, blind-audit quarantine or changed evidence
+  tree. Concurrent updates use a shared lock. A flushed sibling temporary file is atomically replaced into
+  place, so interruption leaves the preceding complete snapshot or the new one. Selected `--layers` reruns
+  retain unselected failures from the start. An exception interruption or orderly STOP keeps a valid partial
+  snapshot, including an empty one; a successful run without STOP still removes an empty failure registry.
 - **Claude family (lane and adjudication):** its agents run Read, Glob and Grep only, and those have no path
   limit, so `transcript_audit.py` audits what they opened in the workflow run's transcripts, which Claude Code
   keeps at `~/.claude/projects/<export slug>/<session>/subagents/workflows/<run id>/agent-*.jsonl` (`transcript_audit.py

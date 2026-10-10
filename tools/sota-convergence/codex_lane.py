@@ -639,7 +639,119 @@ def argv_reasons(argv: list[str], allowed_roots, tools, *, forwarding=False) -> 
     return reasons
 
 
-def python_audit(source: str, allowed_roots, tools, depth=0) -> list[str]:
+def _packet_document_valid(document, pathname):
+    """Accept only bounded inert JSON and the packet fields used by the static projection."""
+    import math
+
+    pending = [(document, 0)]
+    count = 0
+    while pending:
+        value, level = pending.pop()
+        count += 1
+        if count > 20_000 or level > 64:
+            return False
+        if type(value) is dict:
+            pending.extend((child, level + 1) for pair in value.items() for child in pair)
+        elif type(value) is list:
+            pending.extend((child, level + 1) for child in value)
+        elif type(value) is float:
+            if not math.isfinite(value):
+                return False
+        elif type(value) not in (str, int, bool, type(None)):
+            return False
+    catalog, layer = Path(pathname).stem.split("__", 1)
+    if type(document) is not dict or type(document.get("schema_version")) is not int or document["schema_version"] != 1:
+        return False
+    if document.get("catalog") != catalog or document.get("layer_id") != layer or type(document.get("candidates")) is not list:
+        return False
+    for candidate in document["candidates"]:
+        if type(candidate) is not dict or type(candidate.get("adopted")) is not bool:
+            return False
+        refs = candidate.get("evidence_refs")
+        if type(refs) is not list or any(type(ref) is not str or len(ref) > 16_384 for ref in refs):
+            return False
+    return True
+
+
+def _load_approved_packet_json(pathname, allowed_roots, expected_sha256=None):
+    """Load a bounded, digest-bound public packet snapshot; never open its evidence references.
+
+    Only flat catalog__layer.json inputs in an approved packets directory are eligible. The
+    caller may supply a trusted digest; otherwise the approved input root's SHA256SUMS supplies it.
+    A refusal returns None. This seam also permits portable tests with an approved snapshot.
+    CPython v3.13.16 Modules/posixmodule.c:11159-11170 forwards dir_fd to openat;
+    Linux v6.12 fs/open.c:1316-1326 and fs/pipe.c:1145-1164 define no-follow,
+    directory-only, and nonblocking opens. The byte cap applies before decoding;
+    node/depth bounds apply to accepted results (CPython Doc/library/json.rst:716-727).
+    """
+    import stat
+
+    maximum = 1_048_576
+    root_fd = None
+    try:
+        path = Path(pathname)
+        forbidden = {"auth", "credential", "credentials", "secret", "secrets", "key", "keys", "config", "settings", "session"}
+        if not path.is_absolute() or ".." in path.parts or not re.fullmatch(r"[a-z][a-z0-9_-]*__[a-z][a-z0-9_-]*\.json", path.name):
+            return None
+        if forbidden.intersection(re.split(r"[_-]+", path.stem)):
+            return None
+        packet_roots = [Path(root) for root in allowed_roots if Path(root).name == "packets" and path.parent == Path(root)]
+        if len(packet_roots) != 1 or path.is_symlink() or packet_roots[0].is_symlink():
+            return None
+        root = packet_roots[0].resolve(strict=True)
+        canonical = path.resolve(strict=True)
+        if canonical.parent != root or canonical.name != path.name:
+            return None
+        if not hasattr(os, "O_NOFOLLOW") or not hasattr(os, "O_DIRECTORY"):
+            return None
+        directory_flags = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW
+        root_fd = os.open(packet_roots[0].anchor, directory_flags)
+        for component in packet_roots[0].parts[1:]:
+            if component in {".", ".."}:
+                return None
+            child_fd = os.open(component, directory_flags, dir_fd=root_fd)
+            os.close(root_fd)
+            root_fd = child_fd
+
+        def read_bounded(name, limit):
+            descriptor = os.open(name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=root_fd)
+            with os.fdopen(descriptor, "rb") as stream:
+                before = os.fstat(stream.fileno())
+                if not stat.S_ISREG(before.st_mode) or before.st_nlink != 1 or before.st_size > limit:
+                    return None
+                value = stream.read(limit + 1)
+                after = os.fstat(stream.fileno())
+                named = os.stat(name, dir_fd=root_fd, follow_symlinks=False)
+                identity = lambda info: (info.st_dev, info.st_ino, info.st_nlink, info.st_size, info.st_mtime_ns, info.st_ctime_ns)
+                return value if len(value) <= limit and identity(before) == identity(after) == identity(named) else None
+
+        if expected_sha256 is None:
+            manifest = read_bounded("SHA256SUMS", 131_072)
+            if manifest is None:
+                return None
+            matches = []
+            for line in manifest.decode("ascii").splitlines():
+                fields = line.split(None, 1)
+                if len(fields) == 2 and fields[1].lstrip('*') == path.name:
+                    matches.append(fields[0])
+            if len(matches) != 1:
+                return None
+            expected_sha256 = matches[0]
+        if not isinstance(expected_sha256, str) or not re.fullmatch(r"[0-9a-fA-F]{64}", expected_sha256):
+            return None
+        contents = read_bounded(path.name, maximum)
+        if contents is None or hashlib.sha256(contents).hexdigest() != expected_sha256.lower():
+            return None
+        document = json.loads(contents)
+        return document if _packet_document_valid(document, path) else None
+    except (OSError, ValueError, TypeError, RecursionError, UnicodeError, NotImplementedError):
+        return None
+    finally:
+        if root_fd is not None:
+            os.close(root_fd)
+
+
+def python_audit(source: str, allowed_roots, tools, depth=0, *, cwd=None) -> list[str]:
     """Statically identify Python read operands and subprocess argv with ast; never eval/exec code.
 
     Literal data (including '/'.join for JSON locations) is not a filesystem read. Dynamic/unresolved read
@@ -666,10 +778,11 @@ def python_audit(source: str, allowed_roots, tools, depth=0) -> list[str]:
     dynamic = {"eval", "exec", "__import__", "compile", "globals", "locals"}
     constructors = {"Path", "pathlib.Path", "PurePath", "pathlib.PurePath", "pathlib.PosixPath", "pathlib.PurePosixPath"}
     read_keywords.update({constructor + '.' + method: "self" for constructor in constructors for method in ("owner", "group")})
-    known = set(read_keywords) | execution | dynamic | constructors | {"getattr", "os.getenv", "os.environ.get"}
+    known = set(read_keywords) | execution | dynamic | constructors | {"getattr", "os.getenv", "os.environ.get", "json.loads"}
 
     # Bindings are lexical and conservative across branches: every possible assignment must resolve.
     scopes, parent_scope, bindings, namespace_writes = {}, {id(tree): None}, {}, []
+    parents = {id(child): node for node in nodes for child in ast.iter_child_nodes(node)}
     stack = [(tree, id(tree))]
     while stack:
         node, scope = stack.pop()
@@ -720,22 +833,29 @@ def python_audit(source: str, allowed_roots, tools, depth=0) -> list[str]:
             if isinstance(node.iter, (ast.List, ast.Tuple)):
                 for element in node.iter.elts:
                     bind(node.target, element, scope)
+            elif isinstance(node, ast.For) and isinstance(node.target, ast.Name):
+                bind(node.target, node, scope)
             else:
                 bind(node.target, None, scope)
         elif isinstance(node, (ast.Global, ast.Nonlocal)):
             reasons.append("unresolved Python namespace rebinding")
 
-    def lookup(node):
+    def binding_key(node):
         scope = scopes.get(id(node), id(tree))
         while scope is not None:
             key = (scope, node.id)
             if key in bindings:
-                return bindings[key]
+                return key
             scope = parent_scope[scope]
         return None
 
+    def lookup(node):
+        key = binding_key(node)
+        return bindings[key] if key is not None else None
+
     memo, active, path_receivers, path_receiver_active = {}, set(), {}, set()
     budget = {"work": 20_000, "characters": 1_000_000}
+    read_use = None
 
     def limited():
         if "Python static resolution limit" not in reasons:
@@ -745,7 +865,7 @@ def python_audit(source: str, allowed_roots, tools, depth=0) -> list[str]:
     def resolve(node, domain, level):
         if node is None:
             return None
-        key = (domain, id(node))
+        key = (domain, id(node), id(read_use))
         if key in memo:
             return memo[key]
         if level > 64 or budget["work"] <= 0:
@@ -857,6 +977,250 @@ def python_audit(source: str, allowed_roots, tools, depth=0) -> list[str]:
             return limited()
         return {join(a, b) for a in left for b in right}
 
+    # The only data decoder is CPython v3.13.16 json.loads' default inert decoder
+    # (Lib/json/__init__.py:339-352). AST expressions below select native values;
+    # they do not execute payloads, callbacks, imports, or evidence-reference reads.
+    class PacketSnapshot:
+        def __init__(self, document):
+            self.document = document
+
+    data_memo, data_active, packet_snapshots = {}, set(), {}
+    dependency_memo, mutation_memo = {}, {}
+    dependency_unknown = object()
+
+    def data_value(node, environment=None, level=0):
+        if node is None or level > 64 or budget["work"] <= 0:
+            limited()
+            return None
+        budget["work"] -= 1
+        key = id(node)
+        if not environment and key in data_memo:
+            return data_memo[key]
+        if not environment and key in data_active:
+            return None
+        if not environment:
+            data_active.add(key)
+        try:
+            result = data_expression(node, environment or {}, level + 1)
+            if not environment:
+                data_memo[key] = result
+            return result
+        except (KeyError, IndexError, TypeError, ValueError, RecursionError):
+            return None
+        finally:
+            if not environment:
+                data_active.remove(key)
+
+    def data_expression(node, environment, level):
+        if isinstance(node, ast.Constant) and type(node.value) in (str, int, float, bool, type(None)):
+            return node.value, frozenset()
+        if isinstance(node, ast.Name):
+            if node.id in environment:
+                return environment[node.id]
+            assigned = lookup(node)
+            if assigned is None or len(assigned) != 1 or not isinstance(assigned[0], ast.AST):
+                return None
+            value = data_value(assigned[0], level=level)
+            return (value[0], value[1] | {binding_key(node)}) if value is not None else None
+        if isinstance(node, ast.Subscript) and isinstance(node.slice, ast.Constant) and type(node.slice.value) in (str, int):
+            base = data_value(node.value, environment, level)
+            if base is not None and type(base[0]) in (dict, list, tuple):
+                return base[0][node.slice.value], base[1]
+        if isinstance(node, (ast.List, ast.Tuple, ast.Set)):
+            values = [data_value(item, environment, level) for item in node.elts]
+            if any(value is None for value in values) or len(values) > 4096:
+                return None
+            container = tuple if isinstance(node, ast.Tuple) else set if isinstance(node, ast.Set) else list
+            return container(value[0] for value in values), frozenset().union(*(value[1] for value in values))
+        if isinstance(node, (ast.ListComp, ast.SetComp)):
+            if len(node.generators) > 64:
+                return limited()
+            results, dependencies = [], set()
+
+            def project(index, current):
+                if index == len(node.generators):
+                    value = data_value(node.elt, current, level)
+                    if value is None or len(results) >= 4096:
+                        return False
+                    results.append(value[0])
+                    dependencies.update(value[1])
+                    return True
+                generator = node.generators[index]
+                if generator.is_async or not isinstance(generator.target, ast.Name):
+                    return False
+                iterable = data_value(generator.iter, current, level)
+                if iterable is None or type(iterable[0]) not in (list, tuple, set) or len(iterable[0]) > 4096:
+                    return False
+                dependencies.update(iterable[1])
+                for value in iterable[0]:
+                    nested = dict(current)
+                    nested[generator.target.id] = value, iterable[1]
+                    predicates = [data_value(condition, nested, level) for condition in generator.ifs]
+                    if any(predicate is None for predicate in predicates):
+                        return False
+                    dependencies.update(frozenset().union(*(predicate[1] for predicate in predicates)))
+                    if all(bool(predicate[0]) for predicate in predicates) and not project(index + 1, nested):
+                        return False
+                return True
+
+            if project(0, environment):
+                return (set(results) if isinstance(node, ast.SetComp) else results), frozenset(dependencies)
+        if isinstance(node, ast.UnaryOp) and isinstance(node.op, ast.Not):
+            operand = data_value(node.operand, environment, level)
+            return (not operand[0], operand[1]) if operand is not None else None
+        if isinstance(node, ast.Compare) and len(node.ops) == 1:
+            left = data_value(node.left, environment, level)
+            right = data_value(node.comparators[0], environment, level)
+            if left is not None and right is not None:
+                a, b = left[0], right[0]
+                operation = node.ops[0]
+                if isinstance(operation, ast.In):
+                    value = a in b
+                elif isinstance(operation, ast.NotIn):
+                    value = a not in b
+                elif isinstance(operation, ast.Eq):
+                    value = a == b
+                elif isinstance(operation, ast.NotEq):
+                    value = a != b
+                else:
+                    return None
+                return value, left[1] | right[1]
+        if isinstance(node, ast.Call):
+            called = labels(node.func, level)
+            if called == {"json.loads"} and len(node.args) == 1 and not node.keywords:
+                value = data_value(node.args[0], environment, level)
+                if value is not None and type(value[0]) is PacketSnapshot:
+                    return value[0].document, value[1]
+            if called == {"sorted"} and len(node.args) == 1 and not node.keywords:
+                value = data_value(node.args[0], environment, level)
+                if value is not None and type(value[0]) in (list, tuple, set) and len(value[0]) <= 4096:
+                    return sorted(value[0]), value[1]
+            if isinstance(node.func, ast.Attribute) and node.func.attr in {"read_bytes", "read_text"} and path_receiver(node.func.value, level):
+                if node.args or (node.keywords and not (node.func.attr == "read_text" and len(node.keywords) == 1
+                        and node.keywords[0].arg == "encoding" and isinstance(node.keywords[0].value, ast.Constant)
+                        and node.keywords[0].value.value in ("utf-8", "utf8"))):
+                    return None
+                paths = strings(node.func.value, level)
+                if paths is None or len(paths) != 1:
+                    return None
+                pathname = next(iter(paths))
+                path = Path(pathname)
+                if not path.is_absolute() or ".." in path.parts or not re.fullmatch(r"[a-z][a-z0-9_-]*__[a-z][a-z0-9_-]*\.json", path.name):
+                    return None
+                if not any(Path(root).name == "packets" and Path(root) == path.parent for root in allowed_roots):
+                    return None
+                if pathname not in packet_snapshots:
+                    document = _load_approved_packet_json(pathname, allowed_roots)
+                    packet_snapshots[pathname] = PacketSnapshot(document) if _packet_document_valid(document, pathname) else None
+                snapshot = packet_snapshots[pathname]
+                return (snapshot, frozenset()) if snapshot is not None else None
+        return None
+
+    def dependency_names(node, level=0):
+        if not isinstance(node, ast.AST):
+            return set()
+        if id(node) in dependency_memo:
+            return dependency_memo[id(node)]
+        if level > 64 or budget["work"] <= 0:
+            limited()
+            return {dependency_unknown}
+        budget["work"] -= 1
+        if isinstance(node, ast.Name):
+            key = binding_key(node)
+            result = {key} if key is not None else set()
+        else:
+            children = ([node.iter] if isinstance(node, ast.For) else
+                        [*node.args, *(keyword.value for keyword in node.keywords)] if isinstance(node, ast.Call) else
+                        ast.iter_child_nodes(node))
+            result = set().union(*(dependency_names(child, level + 1) for child in children))
+        dependency_memo[id(node)] = result
+        return result
+
+    def dependency_closure(expression):
+        pending, found = list(dependency_names(expression)), set()
+        while pending:
+            key = pending.pop()
+            if key is dependency_unknown:
+                return None
+            if key in found:
+                continue
+            if budget["work"] <= 0 or len(found) >= 4096:
+                limited()
+                return None
+            budget["work"] -= 1
+            found.add(key)
+            for value in bindings[key]:
+                pending.extend(dependency_names(value) - found)
+        return found
+
+    def data_safe(dependencies):
+        if not dependencies:
+            return True
+        if dependencies in mutation_memo:
+            return mutation_memo[dependencies]
+
+        def relevant(expression):
+            closure = dependency_closure(expression)
+            return closure is None or bool(closure & dependencies)
+
+        safe = True
+        for item in nodes:
+            # Reflective namespace mutation defeats an exact stdlib callable label.
+            # Refuse it lazily for packet-dependent reads, including callable aliases.
+            reflective = {"__dict__", "__setattr__", "__delattr__", "__getattribute__"}
+            if isinstance(item, ast.Attribute) and item.attr in reflective:
+                safe = False
+            targets = item.targets if isinstance(item, (ast.Assign, ast.Delete)) else [item.target] if isinstance(item, (ast.AugAssign, ast.AnnAssign)) else []
+            for target in targets:
+                if isinstance(target, (ast.Subscript, ast.Attribute)) and relevant(target.value):
+                    safe = False
+                elif isinstance(item, (ast.AugAssign, ast.Delete)) and isinstance(target, ast.Name) and relevant(target):
+                    safe = False
+            if not isinstance(item, ast.Call):
+                continue
+            called = labels(item.func)
+            if any(name.rsplit('.', 1)[-1] in {"setattr", "delattr", "vars"} | reflective for name in called):
+                safe = False
+            if called == {"getattr"} and len(item.args) > 1 and (strings(item.args[1]) or set()) & reflective:
+                safe = False
+            operands = [*item.args, *(keyword.value for keyword in item.keywords)]
+            if isinstance(item.func, ast.Attribute):
+                operands.append(item.func.value)
+            if isinstance(item.func, ast.Name):
+                assigned = lookup(item.func) or []
+                operands.extend(value for value in assigned if isinstance(value, ast.AST))
+            if not any(relevant(operand) for operand in operands):
+                continue
+            resolved = callables(item.func)
+            harmless = bool(called) and called <= constructors | set(read_keywords) | path_methods
+            harmless |= bool(resolved) and all(kind == "path" for kind, _, _ in resolved)
+            harmless |= called in ({"json.loads"}, {"json.dumps"}, {"sorted"}, {"len"}, {"str"}, {"hashlib.sha256"}) and len(item.args) == 1 and not item.keywords
+            harmless |= called == {"print"} and not item.keywords
+            harmless |= (isinstance(item.func, ast.Attribute) and item.func.attr == "hexdigest" and not item.args and not item.keywords
+                         and isinstance(item.func.value, ast.Call) and labels(item.func.value.func) == {"hashlib.sha256"})
+            if not harmless:
+                safe = False
+        mutation_memo[dependencies] = safe
+        if not safe:
+            reasons.append("unresolved Python packet mutation or callback")
+        return safe
+
+    def guarded_loop_values(loop, values):
+        current = read_use
+        while current is not None and parents.get(id(current)) is not loop:
+            current = parents.get(id(current))
+        if current not in loop.body:
+            return values
+        for statement in loop.body[:loop.body.index(current)]:
+            if not isinstance(statement, ast.If) or statement.orelse or not statement.body or not isinstance(statement.body[-1], ast.Continue):
+                continue
+            test = statement.test
+            if (isinstance(test, ast.Compare) and len(test.ops) == 1 and isinstance(test.ops[0], ast.In)
+                    and isinstance(test.left, ast.Constant) and test.left.value == "://"
+                    and isinstance(test.comparators[0], ast.Name) and binding_key(test.comparators[0]) == binding_key(loop.target)):
+                return {value for value in values if "://" not in value}
+        return values
+
     def string_values(node, level):
         if isinstance(node, ast.Constant) and isinstance(node.value, str):
             return {node.value}
@@ -873,6 +1237,16 @@ def python_audit(source: str, allowed_roots, tools, depth=0) -> list[str]:
                 if len(result) > 64:
                     return limited()
             return result
+        if isinstance(node, ast.For):
+            projection = data_value(node.iter, level=level)
+            if projection is not None and type(projection[0]) in (list, tuple, set) and all(type(value) is str for value in projection[0]) and data_safe(projection[1]):
+                return guarded_loop_values(node, set(projection[0]))
+            return None
+        if isinstance(node, ast.Subscript):
+            projection = data_value(node, level=level)
+            if projection is not None and type(projection[0]) is str and data_safe(projection[1]):
+                return {projection[0]}
+            return None
         if isinstance(node, ast.BinOp) and isinstance(node.op, (ast.Add, ast.Div)):
             return combine(strings(node.left, level), strings(node.right, level),
                            (lambda a, b: a + b) if isinstance(node.op, ast.Add) else os.path.join)
@@ -889,7 +1263,8 @@ def python_audit(source: str, allowed_roots, tools, depth=0) -> list[str]:
                     result = combine(result, strings(argument, level), os.path.join)
                 return result
             if called & {"Path.cwd", "pathlib.Path.cwd", "os.getcwd"}:
-                return {str(allowed_roots[0])} if allowed_roots and not node.args and not node.keywords else None
+                base = cwd if cwd is not None else allowed_roots[0] if allowed_roots else None
+                return {str(base)} if base is not None and not node.args and not node.keywords else None
             if isinstance(node.func, ast.Attribute):
                 method = node.func.attr
                 if method in ("resolve", "absolute"):
@@ -983,9 +1358,12 @@ def python_audit(source: str, allowed_roots, tools, depth=0) -> list[str]:
         for keyword in node.keywords:
             if keyword.arg in {"cwd", "executable"}:
                 read_operand(keyword.value)
+            if keyword.arg == "cwd":
+                reasons.append("working directory changed by Python subprocess; command unverified")
         for command in commands:
             try:
-                reasons.extend(analysis_reasons(command_analyses([command])[0], allowed_roots, tools, depth + 1))
+                reasons.extend(analysis_reasons(command_analyses([command])[0], allowed_roots, tools, depth + 1,
+                                                cwd=cwd))
             except AuditAnalysisUnavailable as error:
                 reasons.append(str(error))
 
@@ -998,6 +1376,7 @@ def python_audit(source: str, allowed_roots, tools, depth=0) -> list[str]:
             reasons.append("reads the environment: os.environ")
         if not isinstance(node, ast.Call):
             continue
+        read_use = node
         resolved = callables(node.func)
         if resolved is None:
             reasons.append("unresolved Python callable alias")
@@ -1021,6 +1400,8 @@ def python_audit(source: str, allowed_roots, tools, depth=0) -> list[str]:
                 reasons.append("unresolved dynamic Python execution or namespace")
             elif called in ("os.getenv", "os.environ.get"):
                 reasons.append("reads the environment: " + called)
+            elif called in ("os.chdir", "os.fchdir"):
+                reasons.append("working directory changed by Python; command unverified")
             elif called in read_keywords:
                 read_operand(argument(node, 0, {read_keywords[called]}),
                              default="." if called in ("os.listdir", "os.scandir") else None,
@@ -1040,7 +1421,7 @@ def python_audit(source: str, allowed_roots, tools, depth=0) -> list[str]:
     return list(dict.fromkeys(reasons))
 
 
-def analysis_reasons(analysis, allowed_roots, tools, depth=0) -> list[str]:
+def analysis_reasons(analysis, allowed_roots, tools, depth=0, *, cwd=None) -> list[str]:
     """Policy over parsed command positions, read operands, interpreter source and real shell expansions."""
     if depth > 8:
         return ["command audit nesting limit"]
@@ -1058,8 +1439,15 @@ def analysis_reasons(analysis, allowed_roots, tools, depth=0) -> list[str]:
                     for i, value in enumerate(argv[:end]) if i != code_index]
         reasons += argv_reasons(operands, allowed_roots, tools,
                                 forwarding=invocation.get("source_kind") == "wrapper")
+        if operands and isinstance(operands[0], str):
+            program = os.path.basename(operands[0])
+            if program in {"cd", "pushd", "popd", "chroot", "nsenter", "unshare"} or program == "env" and any(
+                    isinstance(word, str) and (word in {"-C", "--chdir"} or word.startswith("--chdir=")
+                                              or word.startswith("-C") and len(word) > 2)
+                    for word in operands[1:]):
+                reasons.append(f"working directory changed by {program}; command unverified")
     for source in analysis.get("python_sources", []):
-        reasons += python_audit(source, allowed_roots, tools, depth)
+        reasons += python_audit(source, allowed_roots, tools, depth, cwd=cwd)
     for source in analysis.get("expansions", []):
         if COMMAND_SUBSTITUTION.search(source) or source.startswith("<(") or source.startswith(">("):
             reasons.append("command substitution")
@@ -1073,7 +1461,26 @@ def analysis_reasons(analysis, allowed_roots, tools, depth=0) -> list[str]:
     return list(dict.fromkeys(reasons))
 
 
-def blind_audit(events_path: Path, allowed_roots, tools=AUDIT_TOOLS) -> dict:
+def recorded_command_cwd(item, cwd_records, allowed_roots) -> tuple[str | None, list[str]]:
+    """Bind a display to a caller-owned native record; stdout's cwd/workdir fields are not telemetry.
+
+    Codex 0.162.1's exec JSONL omits cwd. A separately captured record must preserve the item identity,
+    exact display and absolute working directory. The runner has no such capture and never infers it from -C.
+    """
+    identity = item.get("id")
+    record = cwd_records.get(identity) if isinstance(identity, str) and isinstance(cwd_records, dict) else None
+    if not isinstance(record, dict) or record.get("command") != item.get("command"):
+        return None, ["working directory unverified: missing or mismatched independent command record"]
+    cwd = record.get("cwd")
+    if not isinstance(cwd, str) or not cwd.startswith("/") or "\x00" in cwd:
+        return None, ["working directory unverified: independent record has no absolute cwd"]
+    cwd = os.path.normpath(cwd)
+    if cwd == "/" or not any(cwd == root or cwd.startswith(root.rstrip("/") + "/") for root in allowed_roots):
+        return None, ["working directory outside the repository and packets: " + cwd]
+    return cwd, []
+
+
+def blind_audit(events_path: Path, allowed_roots, tools=AUDIT_TOOLS, *, cwd_records=None) -> dict:
     """Reading of one child's event stream: web searches, MCP tool calls, and commands with read operands
     outside ``allowed_roots`` (the repository and the packets directory) or executables in ``tools`` (AUDIT_TOOLS; a
     non-blind run adds BLIND_UNRESOLVABLE, which its PATH may resolve). In a blind run
@@ -1082,7 +1489,8 @@ def blind_audit(events_path: Path, allowed_roots, tools=AUDIT_TOOLS) -> dict:
 
     This statically parses Codex's recorded command display. It is not syscall/branch attestation: indirect
     script/config/symlink reads are not observed. Unsupported shell source/expansion and unresolved interpreted
-    read or execution operands are refused.
+    read or execution operands are refused. Every command needs an independent cwd record; the pinned exec
+    JSONL lacks it, so current native streams are explicitly unverified rather than assuming the turn cwd.
     Executable words and interpreter read operands are distinguished from patterns and formatting data."""
     report = {"web_search": 0, "mcp_tool_calls": 0, "commands": 0, "flagged_commands": []}
     if not events_path.is_file():
@@ -1104,11 +1512,16 @@ def blind_audit(events_path: Path, allowed_roots, tools=AUDIT_TOOLS) -> dict:
         elif kind == "command_execution":
             report["commands"] += 1
             command = item.get("command") if isinstance(item.get("command"), str) else ""
-            completed.append(command)
+            completed.append((command, item))
     try:
-        analyses = command_analyses(completed) if completed else []
-        for command, analysis in zip(completed, analyses):
-            reasons = analysis_reasons(analysis, allowed_roots, tools)
+        analyses = command_analyses([command for command, _ in completed]) if completed else []
+        identities = [item.get("id") for _, item in completed]
+        for (command, item), analysis in zip(completed, analyses):
+            cwd, reasons = recorded_command_cwd(item, cwd_records, allowed_roots)
+            if item.get("id") is not None and identities.count(item.get("id")) > 1:
+                cwd = None
+                reasons.append("working directory unverified: duplicate command identity")
+            reasons += analysis_reasons(analysis, allowed_roots, tools, cwd=cwd)
             if reasons:
                 report["flagged_commands"].append({"command": command, "reasons": reasons})
     except AuditAnalysisUnavailable as error:
@@ -1621,6 +2034,30 @@ def _find_first_str(node, key: str):
     return None
 
 
+def usage_row_belongs_to_layer(row, expected_layer: str) -> bool:
+    """The native usage writer's identity field, shared by post-run supervisors."""
+    return isinstance(row, dict) and row.get("layer") == expected_layer
+
+
+def layer_usage_suffix(prefix: bytes, current: bytes, expected_layer: str) -> list[dict]:
+    """Validate append-only usage capture and select the newly completed native layer rows.
+
+    A supervisor must check native usage rows, rather than the lane return schema's layer_id field.
+    Partial/malformed JSON or another layer cannot silently pass collection. No model or filesystem call.
+    """
+    if not isinstance(prefix, bytes) or not isinstance(current, bytes) or not current.startswith(prefix):
+        raise ValueError("original usage prefix changed")
+    if prefix and not prefix.endswith(b"\n") or current and not current.endswith(b"\n"):
+        raise ValueError("incomplete native usage row")
+    try:
+        rows = [json.loads(line) for line in current[len(prefix):].splitlines() if line.strip()]
+    except (ValueError, UnicodeError) as error:
+        raise ValueError("malformed native usage row") from error
+    if any(not usage_row_belongs_to_layer(row, expected_layer) for row in rows):
+        raise ValueError("native usage rows do not belong to the selected layer")
+    return rows
+
+
 def _find_usage(node):
     if isinstance(node, dict):
         matched = {key: node[key] for key in USAGE_KEYS if key in node}
@@ -1953,13 +2390,62 @@ def main(argv=None) -> int:
             CHILD_CODEX_HOME = None
 
 
+def _write_failure_snapshot(path, failures, kept=(), keep_empty=True):
+    """Publish a complete failure snapshot without exposing a partially written JSON file.
+
+    CC's 2026-10-10 adjudication cites native main 9d4c00cd, codex_lane.py:1538-1556:
+    the former end-only write lost earlier layer failures on interruption. Adopt same-directory
+    tempfile + os.replace (CPython v3.13.16 Doc/library/os.rst:2755-2760: atomic on success).
+    """
+    recorded = sorted(set(failures) | set(kept))
+    if not recorded and not keep_empty:
+        path.unlink(missing_ok=True)
+        return
+    text = json.dumps({"lane": LANE, "failures": [
+        {"catalog": catalog, "layer_id": layer_id, "reason": reason}
+        for catalog, layer_id, reason in recorded]}, indent=1, sort_keys=True) + "\n"
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", dir=path.parent,
+                                         prefix=f".{path.name}.", suffix=".tmp", delete=False) as handle:
+            temporary = Path(handle.name)
+            handle.write(text)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temporary, path)
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
+
+
 def run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_dir, usage_path, pending,
                 provenance) -> int:
     events_dir.mkdir(parents=True, exist_ok=True)
     strict_schema_path = write_strict_schema(schema_path, codex_dir)
     usage_lock = threading.Lock()
     audit_lock = threading.Lock()
+    failures_lock = threading.Lock()
     failures: list = []
+    failures_path = codex_dir / FAILURES_NAME
+    # Preserve failures outside --layers before replacing the initial snapshot, rather than
+    # waiting until the end (native main 9d4c00cd:1538-1556, CC 2026-10-10 follow-up).
+    kept = []
+    if args.layers and failures_path.is_file():
+        selected = {item.strip() for item in args.layers.split(",") if item.strip()}
+        try:
+            earlier = json.loads(failures_path.read_text(encoding="utf-8")).get("failures") or []
+        except (ValueError, AttributeError):
+            earlier = []
+        kept = [(entry.get("catalog"), entry.get("layer_id"), entry.get("reason")) for entry in earlier
+                if isinstance(entry, dict) and entry.get("layer_id") not in selected
+                and f"{entry.get('catalog')}__{entry.get('layer_id')}" not in selected]
+    _write_failure_snapshot(failures_path, failures, kept)
+
+    def record_failure(catalog, layer_id, reason):
+        with failures_lock:
+            failures.append((catalog, layer_id, reason))
+            _write_failure_snapshot(failures_path, failures, kept)
+
     blind = not args.allow_git_history
     roots = [str(repo), str((work_dir / "packets").resolve())]
     # A non-blind child inherits the caller's PATH, where the retrieval CLIs may resolve (BLIND_UNRESOLVABLE).
@@ -2071,8 +2557,8 @@ def run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_d
                 out_path.with_name(out_path.name + ".audit-flagged").write_text(
                     json.dumps(final, indent=1, sort_keys=True) + "\n", encoding="utf-8")
                 last_failure = None
-                failures.append((catalog, layer_id, "the blind audit flagged this layer's calls (web, MCP or a read "
-                                                     "outside the export and packets)"))
+                record_failure(catalog, layer_id, "the blind audit flagged this layer's calls (web, MCP or a read "
+                                                "outside the export and packets)")
                 return
             if STOP.is_set():
                 return
@@ -2085,7 +2571,7 @@ def run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_d
             # not survive, so record_verdicts.py records this `failed` reason.
             record_audit(name, blind_audit(events_path, roots, tools))
             out_path.unlink(missing_ok=True)
-            failures.append((catalog, layer_id, f"failed after retry: {last_failure}"))
+            record_failure(catalog, layer_id, f"failed after retry: {last_failure}")
 
     if args.jobs > 1:
         executor = ThreadPoolExecutor(max_workers=args.jobs)
@@ -2108,33 +2594,15 @@ def run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_d
         for catalog, layer_id, _packet_path, _packet_sha256, out_path in pending:
             if out_path.is_file():
                 out_path.replace(out_path.with_name(out_path.name + ".tree-changed"))
-            failures.append((catalog, layer_id, "the evidence tree changed during the run; rerun on a fixed export"))
+            record_failure(catalog, layer_id, "the evidence tree changed during the run; rerun on a fixed export")
 
     flagged = sorted(name for name, entry in audit_layers.items() if isinstance(entry, dict) and audit_is_flagged(entry))
     if flagged:
         print(f"codex_lane: blind audit flags {len(flagged)} layer(s) for review in {audit_path}: "
               + ", ".join(flagged), file=sys.stderr)
 
-    failures_path = codex_dir / FAILURES_NAME
-    # A --layers rerun keeps the recorded failures of the layers it did not select, so record_verdicts still seals
-    # their reasons (Codex review of #145 at a4dfd99e).
-    kept = []
-    if args.layers and failures_path.is_file():
-        selected = {item.strip() for item in args.layers.split(",") if item.strip()}
-        try:
-            earlier = json.loads(failures_path.read_text(encoding="utf-8")).get("failures") or []
-        except (ValueError, AttributeError):
-            earlier = []
-        kept = [(entry.get("catalog"), entry.get("layer_id"), entry.get("reason")) for entry in earlier
-                if isinstance(entry, dict) and entry.get("layer_id") not in selected
-                and f"{entry.get('catalog')}__{entry.get('layer_id')}" not in selected]
-    recorded = sorted(set(failures) | set(kept))
-    if recorded:
-        failures_path.write_text(json.dumps({"lane": LANE, "failures": [
-            {"catalog": catalog, "layer_id": layer_id, "reason": reason}
-            for catalog, layer_id, reason in recorded]}, indent=1, sort_keys=True) + "\n", encoding="utf-8")
-    else:
-        failures_path.unlink(missing_ok=True)
+    with failures_lock:
+        _write_failure_snapshot(failures_path, failures, kept, keep_empty=STOP.is_set())
     for catalog, layer_id, reason in sorted(failures):
         print(f"codex_lane: {catalog}__{layer_id}: {reason}", file=sys.stderr)
     return 1 if failures else 0
