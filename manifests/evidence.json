@@ -18612,8 +18612,8 @@
     },
     {
       "path": "docs/decisions/2026-10-10-shared-gap-closeouts.md",
-      "sha256": "63ff9077afc1b2c689f6fbd7692e609a570a155c80c16b4bc54a6f76b9761d12",
-      "bytes": 3691
+      "sha256": "2fcba66639a38392fcb7e0f4507897c7e14169be801cb5704bf719dbc2470d1e",
+      "bytes": 4502
     },
     {
       "path": "docs/decisions/2026-10-10-skills-claude-native-practice-row.md",
@@ -50351,6 +50351,21 @@
       "bytes": 6435
     },
     {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/advisory-before.log",
+      "sha256": "5be371b1f413a0c4f0a48ae927d0aa362d6edb70ef7ecc927bd9eaa4e2ec3d1d",
+      "bytes": 42048
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/advisory-ci-correction.json",
+      "sha256": "a8b1e8ea309d488b9068310aea48695c7138227ff424b89c70a083ee4102ebcb",
+      "bytes": 3576
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/advisory-tests.log",
+      "sha256": "9803953c0db1ee2b3f82a0975748d00c52dca8b6bcbc90c889861077c41f02d4",
+      "bytes": 110615
+    },
+    {
       "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/before.log",
       "sha256": "f0dde5d856c768b4a9bb3eaf7ef123b742f77df05da735b59321ec66617b0771",
       "bytes": 2441
@@ -61142,8 +61157,8 @@
     },
     {
       "path": "tests/test_runtime_worker_openhands_push_gate.py",
-      "sha256": "d001a02fa54a16fe8afc749238cdc963310543bce055ff48d328f8d394339ef3",
-      "bytes": 162082
+      "sha256": "271a23437ead972213db0630e66d722d02f0e30d897eb61b4bdf3159e1cb3430",
+      "bytes": 162626
     },
     {
       "path": "tests/test_runtime_worker_openhands_resolver.py",

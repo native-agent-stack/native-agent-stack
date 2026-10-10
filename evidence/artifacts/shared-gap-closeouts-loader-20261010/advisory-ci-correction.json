@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "kind": "shared-closeouts-advisory-inventory-correction",
+  "recorded_at_utc": "2026-10-10T18:33:37Z",
+  "source_main": "9d4c00cd05d79b3fd5074df2e46bacab87ee67ff",
+  "source": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/9d4c00cd05d79b3fd5074df2e46bacab87ee67ff/blueprints/runtime-workers/openhands/resolver/gate_reads.py#L913",
+  "evidence_class": "local_integration",
+  "scope": "Update the existing test's bounded advisory expectation for the loader's input reads; no loader/schema/worker-policy or historical-data change.",
+  "inputs": [
+    {"path": "tests/test_runtime_worker_openhands_push_gate.py", "sha256": "4c495785c02f0f11214f319962d40129d39b59f32b86ed493f23389a7162b756"},
+    {"path": "docs/decisions/2026-10-10-shared-gap-closeouts.md", "sha256": "2fcba66639a38392fcb7e0f4507897c7e14169be801cb5704bf719dbc2470d1e"}
+  ],
+  "native_measured_delta": {
+    "script": "scripts/component_matrix.py",
+    "additional_advisory_locations": 8,
+    "additional_shape": ["* *"],
+    "removed_locations_or_shapes": 0,
+    "other_script_count_changes": 0,
+    "historical_inventory_receipt": "unchanged",
+    "every_other_script_shape_bounded_coverage_and_enforcement_assertion": "preserved"
+  },
+  "hosted_failure": {
+    "job_url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/38074864639/job/114279624110",
+    "raw_job_log_sha256": "0a014c18b2c2b6c17960abb6eae1478a1dc9be18f308bc6d1ba54e887cc08f20",
+    "tests": 2018,
+    "failures": 1,
+    "skipped": 233,
+    "test": "tests.test_runtime_worker_openhands_push_gate.RepositoryWorkflowTests.test_advisory_baseline_and_explicit_categories_stay_bounded_on_this_repository"
+  },
+  "local_fail_before": {
+    "command": "nice -n 10 ionice -c 3 <ci-env>/bin/python -m unittest tests.test_runtime_worker_openhands_push_gate.RepositoryWorkflowTests.test_advisory_baseline_and_explicit_categories_stay_bounded_on_this_repository",
+    "exit_code": 1,
+    "tests": 1,
+    "failures": 1,
+    "log": "advisory-before.log",
+    "sha256": "5be371b1f413a0c4f0a48ae927d0aa362d6edb70ef7ecc927bd9eaa4e2ec3d1d"
+  },
+  "local_final_module": {
+    "command": "env PATH=<ci-env>/bin:<existing-PATH> nice -n 10 ionice -c 3 <ci-env>/bin/python -m unittest tests.test_runtime_worker_openhands_push_gate",
+    "exit_code": 0,
+    "tests": 125,
+    "skipped": 1,
+    "skip_reason": "Existing optional PyYAML reader comparison; PyYAML is not in the pinned CI environment.",
+    "log": "advisory-tests.log",
+    "sha256": "9803953c0db1ee2b3f82a0975748d00c52dca8b6bcbc90c889861077c41f02d4"
+  },
+  "environment_correction": {
+    "install": "uv pip install --python <ci-env>/bin/python --require-hashes -r .github/requirements-ci.txt",
+    "install_exit_code": 0,
+    "pinned_zizmor": "1.30.1",
+    "cause": "The first two module runs selected the host shim rather than the installed pinned CI binary; the shim could report its version in the parent shell but failed under the hermetic fixture tool environment.",
+    "control": "The isolated installed-tool fixture passes with the explicit CI-environment bin PATH, followed by the full touched module.",
+    "failed_runs": "Both failed 125-test module outputs remain retained in coordination; no test or gate implementation was relaxed."
+  },
+  "log_normalization": "Native fail-before assertions and results are unchanged; personal worktree prefixes use <WORKTREE>.",
+  "remaining_at_capture": ["Final registered-tree FULL validation", "PR-range gitleaks", "Current-head hosted CI and designated reads", "CC landing"]
+}

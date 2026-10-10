@@ -1258,10 +1258,17 @@ class RepositoryWorkflowTests(unittest.TestCase):
         baseline_scripts = scripts(baseline["unclassified"])
         self.assertEqual(baseline_scripts.pop("tests/test_catalogs.py"), 8)
         self.assertEqual(derived.files.get("tests/test_catalogs.py"), "ci_discovered")
+        # The shared closeout loader adds eight advisory read locations and one
+        # dynamically assembled shape. The unchanged native derivation at the
+        # 2026-10-10 loader change measures only this script's delta; retain the
+        # historical receipt and every other script/shape/enforcement expectation.
+        closeout_read_count = 8
+        baseline_scripts["scripts/component_matrix.py"] += closeout_read_count
+        baseline_shapes = shapes_by_script(baseline["unclassified_shapes"])
+        baseline_shapes[("scripts/component_matrix.py", ("* *",))] += 1
         self.assertEqual(scripts(advisory.unclassified), baseline_scripts)
-        self.assertEqual(shapes_by_script(advisory.unclassified_shapes),
-                         shapes_by_script(baseline["unclassified_shapes"]))
-        self.assertEqual(len(advisory.unclassified), baseline["count"] - 8)
+        self.assertEqual(shapes_by_script(advisory.unclassified_shapes), baseline_shapes)
+        self.assertEqual(len(advisory.unclassified), baseline["count"] - 8 + closeout_read_count)
         self.assertNotIn("", derived.prefixes)
         self.assertTrue(all(self.g.gate_reads.static_dir(pattern) for pattern in derived.globs), derived.globs)
         protected = self.g.Protected([derived], self.g.policy_tests(tree))

@@ -49,3 +49,13 @@ unsupported vendor path, a native validation mismatch, or review credit that can
 be earned without both retained independent reports would overturn this choice.
 Runtime qualification, host acceptance, broker authority and production-data
 boundaries continue to require their own evidence.
+
+Hosted CI also reproduced the existing worker gate's stale advisory inventory
+expectation after the loader added input reads. The unchanged native
+[GateReads implementation](https://github.com/seathatflowsinourveins/native-agent-stack/blob/9d4c00cd05d79b3fd5074df2e46bacab87ee67ff/blueprints/runtime-workers/openhands/resolver/gate_reads.py#L913)
+reports exactly eight additional `scripts/component_matrix.py` locations and one
+additional dynamic shape, with no other script-count or shape changes. The
+existing test now accounts for this measured source delta alongside its already
+recorded test-discovery correction. The historical inventory receipt remains
+unchanged, and every other script, shape, bounded coverage and enforcement
+assertion remains intact. The old assertion failed before this correction.
