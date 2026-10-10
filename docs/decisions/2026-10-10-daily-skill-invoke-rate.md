@@ -144,13 +144,13 @@ security skills. The smallest supported change without mutating pinned vendor
 bytes is an authored description that names vulnerability/injection review and
 directs an immediate `security-audit` Skill call before code exploration.
 Native visibility settings cannot override vendor description text. This
-project skill is therefore a proposed invocation cue, not a replacement of the
-vendor skill. Expanded BEFORE/AFTER measurements can reject or refine it.
+project skill is an authored invocation cue, not a replacement of the vendor
+skill. The final hermetic comparison below establishes its measured scope;
+future observations can reject or refine it.
 
-The settled CC security-audit BEFORE observation is 16/23 invoked (Wilson 95%
-0.49–0.84) and 6/23 in turn one, compared with 17/18 in turn one for the six
-other initial targets. A six-turn repeat set invokes 8/10. Preserve those
-definitions: loading after exploration differs from loading before it.
+Earlier non-hermetic observations motivated the wording change but are not
+used as the final matched comparison. Loading after exploration differs from
+loading before it; the hermetic table reports both invocation and turn one.
 The explicit trigger/exclusion phrasing follows the sibling descriptions at
 `openai/skills@49f948faa9258a0c61caceaf225e179651397431`:
 [security-best-practices](https://github.com/openai/skills/blob/49f948faa9258a0c61caceaf225e179651397431/skills/.curated/security-best-practices/SKILL.md#L3)
@@ -171,57 +171,88 @@ not semantic selection. Native CC-owned AFTER observations are recorded below;
 the expanded case file remains unchanged for reruns. Optional post-install
 personal profile read-back remains explicitly unmeasured here.
 
-## Native v4 comparison and secure-defaults exclusion
+## Final hermetic trigger comparison
 
-cc-native-practice ran the unchanged 24-case v4 file at three repeats per case,
-72 runs per arm, on native Claude Code 2.1.296. BEFORE used main
-`60004bb1dd581e00e3303c54d93435bb72f76952`; AFTER used PR head
-`47fdceea7fc4444c0faae90c6cd7d2c8435dcb67`. The case SHA-256 remains
-`61fc5e5a2f61778afc6b43cb9b50f2f9a4f4f1a1b79ce3bfb83e679a5d14c1ab`.
-The native receipt bytes were independently hashed:
+The final comparison is the CC-owned native run completed 2026-10-10
+17:59–18:13Z: 64 sessions per arm, 192 total, Claude Code 2.1.296 and
+claude-opus-5-5, three turns per session. The three arms are no cue at
+60004bb1dd581e00e3303c54d93435bb72f76952, the original cue at
+47fdceea7fc4444c0faae90c6cd7d2c8435dcb67, and the cue with the exclusion at
+ef43fdc1f64e444922676b0b1788dcabaf2dd30e. The native runner's process-tree
+memory-hook isolation left host files/settings, plugins, skills and other
+hooks unchanged.
 
-- BEFORE receipts:
-  `ff5061ba24d30e4d2f8075fc538f94e0bf7c95233f0b0db235e40d893455e4ae`.
-- AFTER receipts:
-  `56c8221fad821f6efe6d3bab15e38f4295ef45d9c361071133acb1ea0102c8b2`.
+Primary state-root citations, independently rehashed before publication:
 
-| Native observation | BEFORE | AFTER at 47fdceea |
-| --- | ---: | ---: |
-| security-audit invoked across five phrasings | 10/15 | 14/15 |
-| security-audit invoked in turn one | 8/15 | 14/15 |
-| Real repository-path request invokes security-audit | 2/3 | 3/3 |
-| Original security-audit request invokes target | 1/3 | 3/3 |
-| Near-miss negatives invoke any target | 0/21 | 0/21 |
-| Other six skills invoked, aggregate | 33/36 | 33/36 |
-| Other six invoked in turn one, aggregate | 29/36 | 29/36 |
-| security-best-practices-indirect invokes its target | 2/3 | 0/3 |
-| security-best-practices-positive invokes its target | 3/3 | 3/3 |
+- ~/.local/state/native-agent-stack/research/cc-native-practice-20261009/trigger-cases-20261010/HERMETIC-TABLE.md:
+  3541 bytes, SHA-256
+  af2337937bc4157460064bc986c3c77cfa985ae0ce3201d972d26912efd13115.
+- ~/.local/state/native-agent-stack/research/cc-native-practice-20261009/trigger-cases-20261010/AFTER-RESULT-e2cb8810.md,
+  section "Final: the hermetic three-arm run (17:59-18:13Z, the CC's method default)":
+  25027 bytes, SHA-256
+  e2cb8810b47df696ca0015269550d78da099bf34e6eed0ff3e671171a3d671f4.
 
-The turn-one security-audit comparison has Fisher two-sided p=0.035. Overall
-invocation is p=0.17 at this sample size, so the 10/15 to 14/15 movement does
-not establish a general invocation-rate gain. The original request alone has
-p=0.4. Threat-model prompts were not captured by the cue.
+All twelve receipt/summary file hashes listed in HERMETIC-TABLE.md were checked
+against their bytes. Independent inspection of the six receipt arrays verifies
+192/192 hermetic sessions, zero memory markers, zero other-case prompt leaks,
+and identical 11006-character SessionStart output. No transcript or hook
+content is copied here.
 
-The indirect secure-defaults request is the measured fail-before regression:
-all three AFTER runs selected security-audit instead of security-best-practices,
-while its explicit best-practices request remained 3/3. Aggregate stability
-therefore conceals a per-case wrong-skill choice. Add only
-`secure-defaults or best-practices guidance for a design or endpoint (security-best-practices)`
-to the cue's do-not-trigger sentence. The audit, penetration-test and
-exploitability triggers remain exact. This follows the sibling's pinned
-secure-by-default scope and Anthropic's description guidance cited above.
+| Hermetic observation | No cue | Original cue | Cue with exclusion |
+| --- | ---: | ---: | ---: |
+| security-audit, five phrasings, invoked | 13/20 | 20/20 | 20/20 |
+| security-audit, five phrasings, turn one | 10/20 | 20/20 | 20/20 |
+| security-best-practices indirect, invoked | 9/12 | 10/12 | 12/12 |
+| security-best-practices indirect, turn one | 3/12 | 5/12 | 12/12 |
+| security-audit on the indirect sibling request | 0/12 | 2/12 | 0/12 |
+| Explicit sibling request, invoked and turn one | 4/4 | 4/4 | 4/4 |
+| Near-miss negatives, any skill invoked | 0/28 | 0/28 | 0/28 |
 
-The tested cue costs 267 Unicode characters in every project-scoped session's
-listing, above the manifest budget. The new description is 362 characters,
-95 more than the measured cue. It changes no vendor skill,
-positive body instruction, other route, case file or worker grant. The profile
-fixture checks positive dispatch separately from sibling names in exclusions.
+Security-audit turn-one Fisher two-sided p is 0.0004 for no cue versus either
+cue and 1.0 for original versus excluded cue. Invocation p is 0.008 for no cue
+versus either cue. The exclusion preserves the full observed gain in these
+sessions. The indirect sibling's turn-one comparison is p=0.0003 for new versus
+no cue and p=0.005 for new versus original.
 
-The narrowed description is a proposed correction, not a proven semantic fix.
-cc-native-practice owns the same-flag rerun of both security-best-practices
-cases and all five security-audit cases on the new head. Its ten-repeat
-settling run is independent and remains pending; no lane model call occurs.
+The Final section also pools every measurement set of the indirect sibling
+request: original-cue capture is 5/25 versus no-cue 0/25, Fisher p=0.050, and
+exclusion capture is 0/22 versus original-cue p=0.052. The sibling is invoked
+in turn one in 22/22 exclusion runs. This pool includes the earlier
+non-hermetic sets; it is separate from the hermetic 2/12 versus 0/12 capture
+comparison above. Taken as measured, the original cue captured about one in
+five of those pooled requests and the exclusion removes that observed capture.
+These finite counts do not establish a zero population risk or a precise
+organic capture rate. The initial 3/3 and settling 0/10 interpretations are
+superseded by the final comparison and explicitly labeled pool.
 
-The CC installs/enables the timer and applies the parent routing skill after
-landing. Real Claude probes, accounts and credentials are never read by this
-lane. The task's designated GPT read and CC landing remain separate gates.
+The exclusion is therefore supported on this evidence, rather than described
+only as a precaution. Its sentence names secure-defaults/best-practices
+guidance for a design or endpoint and preserves audit, penetration-test and
+exploitability triggers. No further executable change is needed. Naming
+security-best-practices in the always-listed description is a possible
+explanation for the sibling's first-turn improvement, not a tested mechanism.
+
+These are explicit-task synthetic prompts that mirror descriptions, an upper
+bound on organic triggering. They measure the model's first move and target
+choice within three turns, not real-work invocation frequency or security
+review quality. The six other skills' positive rows were not rerun
+hermetically; their earlier non-hermetic aggregate cannot support a matched
+three-arm claim. All seven near-miss negative rows were included. Daily
+organic-use measurement remains a separate source.
+
+The earlier v4 memory exposure was unequal: BEFORE 66/72 and AFTER 39/72.
+The previous equal-exposure assertion was wrong, and the earlier v4 arms are
+not cited as comparable evidence. Intermediate non-hermetic tables, the
+settling result and their changing interpretations remain in the native
+research record for audit history; the table above supplies this decision's
+primary comparison.
+
+Listing cost remains 267 Unicode characters for the original cue and 362 for
+the excluded cue, an increase of 95. This project-scoped description is listed
+in each session and sits outside the selected vendor manifest's description
+budget. Vendor bytes, the positive dispatch body, worker grants and immutable
+v4 cases remain unchanged.
+
+The CC installs/enables the timer and applies any optional personal profile
+after landing. This lane performed no model run, credential/account read or
+host apply. The next step is the designated review and cued landing rebase.
