@@ -106,7 +106,7 @@ class SnapshotLabelTests(unittest.TestCase):
 
     def test_each_listed_difference_holds_in_the_current_source(self):
         listed = self.current["differs_from_this_snapshot_in"]
-        self.assertEqual(sorted(listed), ["alternatives", "rejections", "route"])
+        self.assertEqual(sorted(listed), ["alternatives", "default", "evidence", "overturn_when", "rejections", "route", "status"])
         for field, slot_ids in listed.items():
             for slot_id in slot_ids:
                 with self.subTest(field=field, slot=slot_id):
