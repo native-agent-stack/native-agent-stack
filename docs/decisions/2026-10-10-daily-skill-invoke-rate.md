@@ -167,9 +167,60 @@ Fixture tests verify native plugin namespace/age, unchanged plugin hashes,
 profile discovery and preservation, native collector command lines, private
 count projection, Fleet rendering and unit rendering. Namespace, profile and
 page regressions failed before the fixes. They establish wiring contracts,
-not semantic AFTER selection. Seven native plugin-eval cases and the expanded
-CC case file are prepared. cc-native-practice's AFTER result and the optional
-post-install personal profile read-back remain explicitly unmeasured here.
+not semantic selection. Native CC-owned AFTER observations are recorded below;
+the expanded case file remains unchanged for reruns. Optional post-install
+personal profile read-back remains explicitly unmeasured here.
+
+## Native v4 comparison and secure-defaults exclusion
+
+cc-native-practice ran the unchanged 24-case v4 file at three repeats per case,
+72 runs per arm, on native Claude Code 2.1.296. BEFORE used main
+`60004bb1dd581e00e3303c54d93435bb72f76952`; AFTER used PR head
+`47fdceea7fc4444c0faae90c6cd7d2c8435dcb67`. The case SHA-256 remains
+`61fc5e5a2f61778afc6b43cb9b50f2f9a4f4f1a1b79ce3bfb83e679a5d14c1ab`.
+The native receipt bytes were independently hashed:
+
+- BEFORE receipts:
+  `ff5061ba24d30e4d2f8075fc538f94e0bf7c95233f0b0db235e40d893455e4ae`.
+- AFTER receipts:
+  `56c8221fad821f6efe6d3bab15e38f4295ef45d9c361071133acb1ea0102c8b2`.
+
+| Native observation | BEFORE | AFTER at 47fdceea |
+| --- | ---: | ---: |
+| security-audit invoked across five phrasings | 10/15 | 14/15 |
+| security-audit invoked in turn one | 8/15 | 14/15 |
+| Real repository-path request invokes security-audit | 2/3 | 3/3 |
+| Original security-audit request invokes target | 1/3 | 3/3 |
+| Near-miss negatives invoke any target | 0/21 | 0/21 |
+| Other six skills invoked, aggregate | 33/36 | 33/36 |
+| Other six invoked in turn one, aggregate | 29/36 | 29/36 |
+| security-best-practices-indirect invokes its target | 2/3 | 0/3 |
+| security-best-practices-positive invokes its target | 3/3 | 3/3 |
+
+The turn-one security-audit comparison has Fisher two-sided p=0.035. Overall
+invocation is p=0.17 at this sample size, so the 10/15 to 14/15 movement does
+not establish a general invocation-rate gain. The original request alone has
+p=0.4. Threat-model prompts were not captured by the cue.
+
+The indirect secure-defaults request is the measured fail-before regression:
+all three AFTER runs selected security-audit instead of security-best-practices,
+while its explicit best-practices request remained 3/3. Aggregate stability
+therefore conceals a per-case wrong-skill choice. Add only
+`secure-defaults or best-practices guidance for a design or endpoint (security-best-practices)`
+to the cue's do-not-trigger sentence. The audit, penetration-test and
+exploitability triggers remain exact. This follows the sibling's pinned
+secure-by-default scope and Anthropic's description guidance cited above.
+
+The tested cue costs 267 Unicode characters in every project-scoped session's
+listing, above the manifest budget. The new description is 362 characters,
+95 more than the measured cue. It changes no vendor skill,
+positive body instruction, other route, case file or worker grant. The profile
+fixture checks positive dispatch separately from sibling names in exclusions.
+
+The narrowed description is a proposed correction, not a proven semantic fix.
+cc-native-practice owns the same-flag rerun of both security-best-practices
+cases and all five security-audit cases on the new head. Its ten-repeat
+settling run is independent and remains pending; no lane model call occurs.
 
 The CC installs/enables the timer and applies the parent routing skill after
 landing. Real Claude probes, accounts and credentials are never read by this

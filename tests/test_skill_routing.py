@@ -67,7 +67,8 @@ class ParentRoutingTests(unittest.TestCase):
             self.assertIn("Skill", text)
             self.assertIn("security-audit", text)
             for name in TARGETS - {"security-audit"}:
-                self.assertNotIn(name, text)
+                # A sibling can be named as an exclusion without being routed.
+                self.assertNotIn(f"tool with `{name}`", text)
             self.assertNotIn("disable-model-invocation: true", text)
             path.write_text("local edit")
             with self.assertRaises(profile.InstallError):
