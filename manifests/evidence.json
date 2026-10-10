@@ -17257,8 +17257,8 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "2967d34a793e338dc4839d9abbcfad9cac8779cbc86e044909eb6bc31778c4f1",
-      "bytes": 190262
+      "sha256": "d90c64bca7748ba0e9b1bf00b52a3734eafdcd69407599f53bfa07bae6dea3d1",
+      "bytes": 190320
     },
     {
       "path": "catalogs/landscape/README.md",
