@@ -209,9 +209,11 @@ RETIRED_ENVIRONMENT = "claude-review"
 
 
 def job_environments(text):
-    """{job_id: environment name or None}: a job's `environment:` as a scalar, or its mapping's `name` in flow or block
-    form, quoted or not, with comments. A text reading, so it needs no YAML library; PyYAML cross-checks it when
-    installed (InGitHubClaudeReviewRetiredTests)."""
+    """{job_id: environment name or None}: a job's `environment:` as a scalar, or its mapping's `name` in a one-line flow
+    or a block form, quoted or not, with a comment after the key. A text reading, so it needs no YAML library. It does
+    not read a comment line before `name:` at the job's own indentation or a flow mapping spread over several lines;
+    test_the_environment_reading_matches_yaml_when_available compares it with PyYAML on every job; the hosted runner
+    has PyYAML, so CI runs that comparison (it passed, not skipped, in validate run 38084944806)."""
     names = {}
     for job_id, block in jobs(text).items():
         lines = block.split("\n")
