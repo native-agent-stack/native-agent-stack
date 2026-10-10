@@ -5366,8 +5366,8 @@
     },
     {
       "path": "adoption/credential-inventory.json",
-      "sha256": "65ba72f1a088fb953f66aa4a0abfa39b1703a9d2f215c0cd55f43a76eca9cdbd",
-      "bytes": 31151
+      "sha256": "17ec6ff151488223f47a0ccf1ef7f3bacf30138d2c1ac651c4a1c5836d612978",
+      "bytes": 31278
     },
     {
       "path": "adoption/hardware-profiles.json",
@@ -18907,8 +18907,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "c83bde7f25ae7877096e69bebcf44961b49c0b73d8dd65e87278cf431b82cb8e",
-      "bytes": 194667
+      "sha256": "028f69a619670c06b03c81104769533a44ed31efa2ade47306c6759cfde73d5d",
+      "bytes": 194754
     },
     {
       "path": "docs/stack.md",
