@@ -2375,8 +2375,8 @@
       "decision": "retain",
       "verdict_status": "recorded",
       "independent_review": "dual_lane_adjudicated",
-      "open_executable_now_gaps": 6,
-      "open_gaps": 9,
+      "open_executable_now_gaps": 0,
+      "open_gaps": 4,
       "winners": [
         {
           "component_id": "dagu",

@@ -110,7 +110,7 @@ Locally-run model weights a host receipt recorded qualifying on a runtime compon
 |  |  | `foundation-socraticode` | v1.14.0 | native_proven | accepted, bootstrap 1.15.0 | untested, bootstrap 1.14.0 | semantic-rag, macos-arm64-foundation, token-efficiency |  |
 | Backtesting engine | keep_but_compare | `nautilustrader` | 2.0.0rc5 (tag v2.0.0rc5; source pin from evidence/receipts/native-nautilus-v2-20260920.json — commit 1b0a49d2792a9432a3aca3fcb617ce7a630d905e) | native_proven | host_verified | untested | trading-nautilus | 8 / 12 |
 |  |  | `lean` | 985ef30ad3ac774218c5ac516b4cb0aa2655730f | native_proven | host_verified | untested | research-runtime |  |
-| Data quality and orchestration | retain | `dagu` | v2.16.6 (behind v2.17.0) | synthetic | host_verified | untested | research-runtime | 6 / 9 |
+| Data quality and orchestration | retain | `dagu` | v2.16.6 (behind v2.17.0) | synthetic | host_verified | untested | research-runtime | 0 / 4 |
 |  |  | `data-pandera` | v0.33.1; source 62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6 | synthetic | host_verified | untested | — |  |
 | Evaluation and experiments | retain | `foundation-agent-retrieval-bench` | v0.2.1 | source_review | not_established | untested | — | 8 / 10 |
 |  |  | `inspect-ai` | inspect-ai0.3.266; source ec4dfc6953784dc45b79de3147530c89868c6e26 | source_review | host_verified | untested | — |  |
