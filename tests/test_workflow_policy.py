@@ -108,8 +108,7 @@ EXEMPTIONS = {
         "catalog-freshness.yml": "job-scoped group on propose, its only writer; freshness reads only and may overlap "
                                  "(tests/test_catalog_freshness_propose.py)",
     },
-    # bootstrap-macos no longer runs on pull_request (macOS CI advisory, docs/decisions/2026-10-05-macos-ci-advisory.md),
-    # so its former exemption is gone; test_each_exemption_is_still_needed keeps this table honest.
+    # No pull-request cache exemptions; the adoption macOS jobs retired on 2026-10-10.
     "pull-request-cache-mode": {},
     # The federation exemption of 2026-10-08 is withdrawn: the owner's ruling of 2026-10-10 moved CI Claude review to
     # an API key (docs/decisions/2026-10-08-claude-actions-pr-review.md), so no job holds id-token for it.
