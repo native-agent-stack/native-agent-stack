@@ -5211,8 +5211,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "61a9ed511b422382bcf4433167aa6627e51eb390b6a6a4efd9aa5cc377e99a66",
-      "bytes": 35456
+      "sha256": "2227f9b199214354d20637fc5e4a17adc9801228c7f7c71b7b9b04b80203a4d1",
+      "bytes": 35714
     },
     {
       "path": ".gitignore",
@@ -5221,8 +5221,8 @@
     },
     {
       "path": ".gitleaks.toml",
-      "sha256": "5d27274ab0beee758ea4431e6847031bc72899cd0a8852c2a2478f7af0bc3056",
-      "bytes": 32997
+      "sha256": "f9abe05a349ba68f75a0c326d86536226a9f3b1276e36f89971a2d02a67aef76",
+      "bytes": 33070
     },
     {
       "path": ".gitleaksignore",
@@ -18581,6 +18581,11 @@
       "bytes": 2956
     },
     {
+      "path": "docs/decisions/2026-10-10-secret-scan-large-targets.md",
+      "sha256": "faa1e0cec57b8bf63b06bb66574ccdbc974e7f2627f2a3847540f8202d5c76e7",
+      "bytes": 5377
+    },
+    {
       "path": "docs/decisions/2026-10-10-skills-claude-native-practice-row.md",
       "sha256": "5d09bcc37df78410545b831c8f73952d6206356695be9cadfaba2bcca381fff6",
       "bytes": 5864
@@ -18722,8 +18727,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "ef1654f0bdcb863754793425243647eb56879837ebbc2af3d81535ce407c4fd0",
-      "bytes": 106604
+      "sha256": "50c2e1498bc50f7a6733a082cd797a077160895f1f30dc8aaeca7172c534cbe8",
+      "bytes": 106805
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -50296,6 +50301,11 @@
       "bytes": 248046
     },
     {
+      "path": "evidence/artifacts/secret-scan-large-targets-20261010/measurements.json",
+      "sha256": "2b220549599f2fb33a8f39a1b1e85446423abb5b97ac4a490abc9177f31237e2",
+      "bytes": 10253
+    },
+    {
       "path": "evidence/artifacts/security-audit-host-install-20260928/README.md",
       "sha256": "d966c5ee27bb53eec21003ea1533b3e11636290c32ab9bad231c95291d8fd323",
       "bytes": 3663
@@ -61086,6 +61096,11 @@
       "bytes": 391697
     },
     {
+      "path": "tests/test_secret_scan_size.py",
+      "sha256": "dec506c7fb35dd8d36a9c3cdeee248d36f57fa315ff97eed369675e23039730c",
+      "bytes": 6911
+    },
+    {
       "path": "tests/test_security_identity.py",
       "sha256": "cdd357d5cc1521959509ce41b519787790d046b51f91a2c29275f3842b667fee",
       "bytes": 22857
@@ -61277,8 +61292,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "86e4dc0183af8234ff78840354d8526d43b3e09bec0ea7c11dd54e5fc8233a88",
-      "bytes": 178463
+      "sha256": "1f8bc68ada43ed589f4166d44cdc86932a21b0602ed371c7f5648de06a230a34",
+      "bytes": 179846
     },
     {
       "path": "tests/test_workflow_policy.py",
