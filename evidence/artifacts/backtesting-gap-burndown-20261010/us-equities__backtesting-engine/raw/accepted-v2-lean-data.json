@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "id": "accepted-v2-lean-data",
+  "command": [
+    "~/.local/share/mise/installs/python/3.13.16/bin/python3",
+    "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/blueprints/us-equities/engine-nautilus/spy-parity/compare.py",
+    "--receipt",
+    "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/blueprints/us-equities/engine-nautilus/spy-parity/receipt-v2.json",
+    "--verdict",
+    "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-lean-data.verdict.json",
+    "--lean-data",
+    "~/.local/share/codex-ecosystem/lean-985ef30-spy-frozen/Data"
+  ],
+  "started_utc": "2026-10-10T16:43:07.546109+00:00",
+  "finished_utc": "2026-10-10T16:43:07.841950+00:00",
+  "duration_seconds": 0.296,
+  "launched": true,
+  "observed_exit_code": 0,
+  "expected_exit_code": 0,
+  "expectation_met": true,
+  "input_hashes": [
+    {
+      "path": "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/blueprints/us-equities/engine-nautilus/spy-parity/receipt-v2.json",
+      "sha256": "f881ee3208317c9f954639c5229a7c1e2c785b196d6ea7cfbac1e1d3088f041c",
+      "bytes": 48161
+    },
+    {
+      "path": "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/blueprints/us-equities/engine-nautilus/spy-parity/compare.py",
+      "sha256": "c70386f869e45bcdc54602100991235a450d2a5854445d98ffe45b849454a5ec",
+      "bytes": 67588
+    }
+  ],
+  "captured_outputs": [
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-lean-data.stdout.txt",
+      "raw_sha256": "30ead7944782705cdadeabc70c07fff989aa6e30196acd619c581172fecab03f",
+      "raw_bytes": 24731,
+      "sha256": "30ead7944782705cdadeabc70c07fff989aa6e30196acd619c581172fecab03f",
+      "bytes": 24731,
+      "home_and_pytest_components_exported": true
+    },
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-lean-data.stderr.txt",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "home_and_pytest_components_exported": true
+    }
+  ],
+  "output_hashes": [
+    {
+      "path": "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-lean-data.verdict.json",
+      "sha256": "8d6b96cc44f333c7f7d1216b23b5eb654100439566bcda0344034d4b215760f4",
+      "bytes": 49245
+    }
+  ],
+  "input_bytes_unchanged": true,
+  "scope": "observed command result only; no automatic evidence-class or gap-status promotion"
+}

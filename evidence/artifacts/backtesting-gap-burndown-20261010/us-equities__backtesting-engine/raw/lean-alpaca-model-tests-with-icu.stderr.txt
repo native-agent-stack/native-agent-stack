@@ -1,0 +1,6 @@
+The active test run was aborted. Reason: Test host process crashed : 20261010 16:55:52.103 ERROR:: LocalDiskMapFileProvider.GetMapFileResolver(sgx): The specified directory does not exist: ../../../Data/equity/sgx/map_files
+Unhandled exception. System.InvalidOperationException: GIL must always be released, and it must be released from the same thread that acquired it.
+   at Python.Runtime.Py.GILState.Finalize()
+   at System.GC.RunFinalizers()
+
+Test Run Aborted.

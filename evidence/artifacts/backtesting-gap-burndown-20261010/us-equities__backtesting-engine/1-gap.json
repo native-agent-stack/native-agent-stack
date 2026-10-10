@@ -1,0 +1,43 @@
+{
+  "id": "backtesting-gap-burndown-20261010/backtesting-engine/1",
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+  "gap_refs": [
+    1
+  ],
+  "gap_index": 1,
+  "gap_text_sha256": "af57d3a526310f0826a65869555e234ea5ae2afa6e13820f5fbb7b359e4b64d6",
+  "outcome": "deferred",
+  "settles_gap": "deferred",
+  "review_status": "pending independent PR review",
+  "evidence_class": "source_review",
+  "result": "No retained authorized Alpaca action-window directory or quote payload on this host; no lane credential/acquisition authority. Upstream examples directory has no unchanged equity example. The requested acquisition/unchanged-example gate is not closed.",
+  "raw_outputs": [
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/lean-model-summary.json",
+      "sha256": "fdca1e993c4a00980de9021ae30bee821378198d372bd17359abcf96b7d0c2f2"
+    },
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/native-mechanics-summary.json",
+      "sha256": "c89516382696f481ed16eb65b87242aa602d2f30cadadc64a035c21fb80df1e9"
+    },
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/native-replay-economic-summary.json",
+      "sha256": "f16fa2bf3f24eca7c935951e98e4bde297fff0c90458df4e32310473cbd15800"
+    },
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/review-excerpt-integrity.json",
+      "sha256": "6ac8e184b77a8818d9d4d981e9cb1738ba90120c102bb22f48933d97e8de6ef0"
+    },
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/source-pins.json",
+      "sha256": "630b960079377d5da7c392e7802b69cdd848cd5859e807fe1775f9c7347f8314"
+    }
+  ],
+  "checked_at": "2026-10-10",
+  "model_calls": [],
+  "broker_requests": 0,
+  "limitations": [
+    "Historical source-revision gap accounting; no automatic strategy, paper, platform or live promotion.",
+    "New gate-owner review/first-run acceptance is not fabricated."
+  ]
+}

@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "id": "native-fee-margin-mechanics-2",
+  "command": [
+    "bwrap",
+    "--unshare-all",
+    "--die-with-parent",
+    "--new-session",
+    "--clearenv",
+    "--ro-bind",
+    "/usr",
+    "/usr",
+    "--symlink",
+    "usr/bin",
+    "/bin",
+    "--symlink",
+    "usr/lib",
+    "/lib",
+    "--symlink",
+    "usr/lib64",
+    "/lib64",
+    "--proc",
+    "/proc",
+    "--dev",
+    "/dev",
+    "--tmpfs",
+    "/tmp",
+    "--ro-bind",
+    "~/.local/share/uv/python/cpython-3.12-linux-x86_64-gnu",
+    "~/.local/share/uv/python/cpython-3.12-linux-x86_64-gnu",
+    "--ro-bind",
+    "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010",
+    "/repo",
+    "--ro-bind",
+    "~/.local/share/codex-ecosystem/lean-985ef30-spy-frozen/Data",
+    "/data",
+    "--bind",
+    "~/.cache/native-agent-stack/backtesting-gaps-20261010/mechanics-2",
+    "/out",
+    "--chdir",
+    "/repo",
+    "--setenv",
+    "LANG",
+    "C.UTF-8",
+    "--setenv",
+    "PATH",
+    "/usr/bin:/bin",
+    "--setenv",
+    "PYTHONDONTWRITEBYTECODE",
+    "1",
+    "--setenv",
+    "OPENBLAS_NUM_THREADS",
+    "1",
+    "--setenv",
+    "OMP_NUM_THREADS",
+    "1",
+    "/repo/.venv/bin/python",
+    "-I",
+    "/repo/blueprints/us-equities/backtesting-gap-burndown-20261010/native_mechanics.py",
+    "--data",
+    "/data",
+    "--output",
+    "/out/native"
+  ],
+  "started_utc": "2026-10-10T16:56:09.004522+00:00",
+  "finished_utc": "2026-10-10T16:56:12.990077+00:00",
+  "duration_seconds": 3.986,
+  "launched": true,
+  "observed_exit_code": 0,
+  "expected_exit_code": 0,
+  "expectation_met": true,
+  "input_hashes": [
+    {
+      "path": "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/blueprints/us-equities/backtesting-gap-burndown-20261010/native_mechanics.py",
+      "sha256": "92118c505ec2f962ffa9e86d4a647db09250dea548c818b3839e46d40a206cd0",
+      "bytes": 4512
+    },
+    {
+      "path": "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/blueprints/us-equities/engine-nautilus/spy-parity/run.py",
+      "sha256": "c3917c2f6446ffb1bcfe411cc2339ffc1f804a87904ed3a1f1a67e51817ad2f2",
+      "bytes": 51307
+    }
+  ],
+  "captured_outputs": [
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/native-fee-margin-mechanics-2.stdout.txt",
+      "raw_sha256": "4ead4cb47cdf7334020cdf166a9651926a5163a3527d7c664d7bbacb0f45c331",
+      "raw_bytes": 107,
+      "sha256": "4ead4cb47cdf7334020cdf166a9651926a5163a3527d7c664d7bbacb0f45c331",
+      "bytes": 107,
+      "home_and_pytest_components_exported": true
+    },
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/native-fee-margin-mechanics-2.stderr.txt",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "home_and_pytest_components_exported": true
+    }
+  ],
+  "output_hashes": [
+    {
+      "path": "~/.cache/native-agent-stack/backtesting-gaps-20261010/mechanics-2/native/results.json",
+      "sha256": "7c5841a3aa4e4cecdf19812127457daa2daab2e7af86ec6139dac6ae3e63df37",
+      "bytes": 31035
+    }
+  ],
+  "input_bytes_unchanged": true,
+  "scope": "observed command result only; no automatic evidence-class or gap-status promotion"
+}

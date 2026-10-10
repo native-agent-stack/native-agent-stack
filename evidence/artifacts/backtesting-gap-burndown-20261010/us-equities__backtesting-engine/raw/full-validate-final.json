@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "id": "full-validate-final",
+  "command": [
+    "python3",
+    "scripts/validate.py"
+  ],
+  "started_utc": "2026-10-10T17:08:04.656719+00:00",
+  "finished_utc": "2026-10-10T17:10:02.594227+00:00",
+  "duration_seconds": 117.938,
+  "launched": true,
+  "observed_exit_code": 0,
+  "expected_exit_code": 0,
+  "expectation_met": true,
+  "input_hashes": [
+    {
+      "path": "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/scripts/validate.py",
+      "sha256": "1bfad8a033d0b10af7591dba642a11bfc13ca419bd0c25837e87749e4c27bd82",
+      "bytes": 42239
+    }
+  ],
+  "captured_outputs": [
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/full-validate-final.stdout.txt",
+      "raw_sha256": "f4f313db7bb64ccf4eb66057c2936a46eecdc9085e0f61a671458db7ec528a17",
+      "raw_bytes": 162,
+      "sha256": "f4f313db7bb64ccf4eb66057c2936a46eecdc9085e0f61a671458db7ec528a17",
+      "bytes": 162,
+      "home_and_pytest_components_exported": true
+    },
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/full-validate-final.stderr.txt",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "home_and_pytest_components_exported": true
+    }
+  ],
+  "output_hashes": [],
+  "input_bytes_unchanged": true,
+  "scope": "observed command result only; no automatic evidence-class or gap-status promotion"
+}

@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "id": "lean-restore",
+  "command": [
+    ".runtime/dotnet-10.0.401/dotnet",
+    "restore",
+    ".runtime/lean-985ef30/Tests/QuantConnect.Tests.csproj",
+    "--disable-parallel",
+    "--verbosity",
+    "minimal"
+  ],
+  "started_utc": "2026-10-10T16:42:22.481673+00:00",
+  "finished_utc": "2026-10-10T16:42:23.500927+00:00",
+  "duration_seconds": 1.019,
+  "launched": true,
+  "observed_exit_code": -6,
+  "expected_exit_code": 0,
+  "expectation_met": false,
+  "input_hashes": [
+    {
+      "path": "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/lean-985ef30/Tests/QuantConnect.Tests.csproj",
+      "sha256": "dbca07b368b16f2f089861a6a0692c04ee67c03edef6d0f7d3a75924915fb8b3",
+      "bytes": 31880
+    }
+  ],
+  "captured_outputs": [
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/lean-restore.stdout.txt",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "home_and_pytest_components_exported": true
+    },
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/lean-restore.stderr.txt",
+      "raw_sha256": "5720ca4b46a6e6a56891b98551154a52d5b26a58d6175d4df9b68fb412b3a860",
+      "raw_bytes": 1243,
+      "sha256": "5720ca4b46a6e6a56891b98551154a52d5b26a58d6175d4df9b68fb412b3a860",
+      "bytes": 1243,
+      "home_and_pytest_components_exported": true
+    }
+  ],
+  "output_hashes": [],
+  "input_bytes_unchanged": true,
+  "scope": "observed command result only; no automatic evidence-class or gap-status promotion"
+}

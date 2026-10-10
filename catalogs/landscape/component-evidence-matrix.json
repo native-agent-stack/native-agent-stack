@@ -6991,8 +6991,8 @@
       },
       "independent_review": "dual_lane_same_winner",
       "layer_id": "backtesting-engine",
-      "open_executable_now_gaps": 8,
-      "open_gaps": 12,
+      "open_executable_now_gaps": 5,
+      "open_gaps": 9,
       "title": "Backtesting engine",
       "verdict_status": "recorded",
       "winners": [
@@ -9273,7 +9273,7 @@
     }
   ],
   "schema_version": 1,
-  "scope": "Per-component independent-review status and per-platform E2E state, joined from catalogs/landscape/{foundation,us-equities}.json winners/alternatives, catalogs/foundation/decisions.json lifecycle stage_refs, scripts/host_receipts.py receipts and the gap crosswalk (open executable_now gaps per layer, when present), with each layer's convergence by layer from the saturation ledger and the newest sweep manifest. It never selects a winner or records a receipt; it is a read-only join of evidence recorded elsewhere.",
+  "scope": "Per-component independent-review status and per-platform E2E state, joined from catalogs/landscape/{foundation,us-equities}.json winners/alternatives, catalogs/foundation/decisions.json lifecycle stage_refs, scripts/host_receipts.py receipts and the gap crosswalk (open executable_now gaps per layer, when present), subtracting hash-verified single-gap settlements from the 2026-10-10 backtesting wave, with each layer's convergence by layer from the saturation ledger and the newest sweep manifest. It never selects a winner or records a receipt; it is a read-only join of evidence recorded elsewhere.",
   "summary": {
     "convergence": {
       "catalogs": {

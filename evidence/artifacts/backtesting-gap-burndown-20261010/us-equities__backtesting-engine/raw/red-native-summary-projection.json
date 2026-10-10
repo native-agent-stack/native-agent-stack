@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "id": "red-native-summary-projection",
+  "command": [
+    "python3",
+    "-m",
+    "unittest",
+    "tests.test_backtesting_gap_burndown"
+  ],
+  "started_utc": "2026-10-10T16:55:43.446361+00:00",
+  "finished_utc": "2026-10-10T16:55:43.557588+00:00",
+  "duration_seconds": 0.111,
+  "launched": true,
+  "observed_exit_code": 1,
+  "expected_exit_code": 1,
+  "expectation_met": true,
+  "input_hashes": [
+    {
+      "path": "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/tests/test_backtesting_gap_burndown.py",
+      "sha256": "d0e3ac66f6ae7e05112331279a1164ce436bbd1b580dcd04f5f65248bd897e33",
+      "bytes": 1341
+    }
+  ],
+  "captured_outputs": [
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/red-native-summary-projection.stdout.txt",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "home_and_pytest_components_exported": true
+    },
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/red-native-summary-projection.stderr.txt",
+      "raw_sha256": "2e990a7b371086d31475e979955698c1eabab403a52f24beb7296f53506ad2b0",
+      "raw_bytes": 856,
+      "sha256": "d8f0340836f81135e22b20b9e52290a4666b0a5d92a3f9fba6533134b1335d92",
+      "bytes": 846,
+      "home_and_pytest_components_exported": true
+    }
+  ],
+  "output_hashes": [],
+  "input_bytes_unchanged": true,
+  "scope": "observed command result only; no automatic evidence-class or gap-status promotion"
+}

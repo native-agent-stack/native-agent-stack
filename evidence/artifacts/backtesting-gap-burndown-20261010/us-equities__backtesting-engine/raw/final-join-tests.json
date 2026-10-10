@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "id": "final-join-tests",
+  "command": [
+    "python3",
+    "-m",
+    "unittest",
+    "tests.test_component_matrix",
+    "tests.test_gap_wave_ledger",
+    "tests.test_backtesting_gap_burndown"
+  ],
+  "started_utc": "2026-10-10T17:02:37.653704+00:00",
+  "finished_utc": "2026-10-10T17:02:42.224723+00:00",
+  "duration_seconds": 4.571,
+  "launched": true,
+  "observed_exit_code": 0,
+  "expected_exit_code": 0,
+  "expectation_met": true,
+  "input_hashes": [
+    {
+      "path": "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/scripts/component_matrix.py",
+      "sha256": "b158fb5d3a399ec719d9a8f7599a16b64b52f76320877c0d2e5ffbd1f0a3123b",
+      "bytes": 75438
+    },
+    {
+      "path": "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/tools/sota-convergence/gap_wave_ledger.py",
+      "sha256": "226123af8ac78859c80f5f9cade0b054ed8141904b7643967df311b9b3f35cff",
+      "bytes": 14032
+    },
+    {
+      "path": "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/tests/test_component_matrix.py",
+      "sha256": "dc4411c9af39359c392e6e7cd471e2b57eacdba0838dfa78b49d208e10cdba63",
+      "bytes": 87077
+    }
+  ],
+  "captured_outputs": [
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/final-join-tests.stdout.txt",
+      "raw_sha256": "72533484b64fb8ebf5b984f1f72aad59a87ec6c31487cc745a447ac3320f5654",
+      "raw_bytes": 161,
+      "sha256": "72533484b64fb8ebf5b984f1f72aad59a87ec6c31487cc745a447ac3320f5654",
+      "bytes": 161,
+      "home_and_pytest_components_exported": true
+    },
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/final-join-tests.stderr.txt",
+      "raw_sha256": "35cf94f586c485f0141c9afe9716f3f36d656c86c9d97500ab0367dd7fbd8f4e",
+      "raw_bytes": 176,
+      "sha256": "35cf94f586c485f0141c9afe9716f3f36d656c86c9d97500ab0367dd7fbd8f4e",
+      "bytes": 176,
+      "home_and_pytest_components_exported": true
+    }
+  ],
+  "output_hashes": [],
+  "input_bytes_unchanged": true,
+  "scope": "observed command result only; no automatic evidence-class or gap-status promotion"
+}

@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "id": "lean-alpaca-model-tests-py312",
+  "command": [
+    ".runtime/dotnet-10.0.401/dotnet",
+    "test",
+    ".runtime/lean-985ef30/Tests/QuantConnect.Tests.csproj",
+    "--filter",
+    "FullyQualifiedName~AlpacaBrokerageModelTests",
+    "--logger",
+    "trx;LogFileName=alpaca-model-py312.trx",
+    "--results-directory",
+    ".runtime/lean-985ef30/TestResults",
+    "--no-build",
+    "--no-restore",
+    "--verbosity",
+    "minimal",
+    "-m:1"
+  ],
+  "started_utc": "2026-10-10T16:58:15.869950+00:00",
+  "finished_utc": "2026-10-10T16:58:26.765761+00:00",
+  "duration_seconds": 10.896,
+  "launched": true,
+  "observed_exit_code": 0,
+  "expected_exit_code": 0,
+  "expectation_met": true,
+  "input_hashes": [
+    {
+      "path": "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/lean-985ef30/Tests/Common/Brokerages/AlpacaBrokerageModelTests.cs",
+      "sha256": "4d82ec021cb1f9031bd9cee4827af3b491f3f3b95fb0e828f1b45be83837e1fe",
+      "bytes": 3828
+    }
+  ],
+  "captured_outputs": [
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/lean-alpaca-model-tests-py312.stdout.txt",
+      "raw_sha256": "d47c1f23ef8abcc0e09452a83ba252e118acb235e3f16b8009800570f0447f01",
+      "raw_bytes": 521,
+      "sha256": "27a8d8dae2607e7108ea0121f7ee2c6a17b9a536f3f9d130c926e332100f4ce4",
+      "bytes": 501,
+      "home_and_pytest_components_exported": true
+    },
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/lean-alpaca-model-tests-py312.stderr.txt",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "home_and_pytest_components_exported": true
+    }
+  ],
+  "output_hashes": [
+    {
+      "path": "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/lean-985ef30/TestResults/alpaca-model-py312.trx",
+      "sha256": "88238817949532ec4de8990fabe8141096dd40c568a00a4bd07ceecfc71129d9",
+      "bytes": 25466
+    }
+  ],
+  "input_bytes_unchanged": true,
+  "scope": "observed command result only; no automatic evidence-class or gap-status promotion"
+}

@@ -1,0 +1,15 @@
+..E
+======================================================================
+ERROR: test_verified_single_gap_wave_receipts_reduce_effective_open_counts (tests.test_component_matrix.GapCountTests.test_verified_single_gap_wave_receipts_reduce_effective_open_counts)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/tests/test_component_matrix.py", line 202, in test_verified_single_gap_wave_receipts_reduce_effective_open_counts
+    closures = cm.gap_receipt_closures(root)
+  File "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/scripts/component_matrix.py", line 215, in gap_receipt_closures
+    raise ValueError("gap wave source revision mismatch")
+ValueError: gap wave source revision mismatch
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.003s
+
+FAILED (errors=1)

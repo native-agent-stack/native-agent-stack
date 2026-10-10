@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "id": "green-matrix-wave-join-2",
+  "command": [
+    "python3",
+    "-m",
+    "unittest",
+    "tests.test_component_matrix.GapCountTests"
+  ],
+  "started_utc": "2026-10-10T16:52:55.647334+00:00",
+  "finished_utc": "2026-10-10T16:52:55.843696+00:00",
+  "duration_seconds": 0.196,
+  "launched": true,
+  "observed_exit_code": 0,
+  "expected_exit_code": 0,
+  "expectation_met": true,
+  "input_hashes": [
+    {
+      "path": "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/tests/test_component_matrix.py",
+      "sha256": "748f73d66b1b455880ea9fe0085b1a2047be3069f8a0e6f888fb8f0637bf934b",
+      "bytes": 86742
+    },
+    {
+      "path": "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/scripts/component_matrix.py",
+      "sha256": "cffd65e84f5b298ad14d9273ac9d7d9127887b026cb1b5777056b05050ab92e3",
+      "bytes": 75249
+    }
+  ],
+  "captured_outputs": [
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/green-matrix-wave-join-2.stdout.txt",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "home_and_pytest_components_exported": true
+    },
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/green-matrix-wave-join-2.stderr.txt",
+      "raw_sha256": "2c37d50a88147ca2ebd5197d74ee37d462dab650d793512e849814c28d5a38f0",
+      "raw_bytes": 101,
+      "sha256": "2c37d50a88147ca2ebd5197d74ee37d462dab650d793512e849814c28d5a38f0",
+      "bytes": 101,
+      "home_and_pytest_components_exported": true
+    }
+  ],
+  "output_hashes": [],
+  "input_bytes_unchanged": true,
+  "scope": "observed command result only; no automatic evidence-class or gap-status promotion"
+}

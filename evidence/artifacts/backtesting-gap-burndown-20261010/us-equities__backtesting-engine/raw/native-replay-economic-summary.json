@@ -1,0 +1,25 @@
+{
+  "primary_sha256": "fc3c04eaa92fffa9c2b25edbdb77b5beb92e6e346e1ea6eaeac4bbd583120aa5",
+  "native_end_cash": "90734.08",
+  "dividend_cash": "428.64",
+  "bars": 725,
+  "equal_runs": true,
+  "fills": [
+    {
+      "fee": "0.00",
+      "price": "323.5800",
+      "quantity": 304,
+      "side": "BUY",
+      "utc_seconds": 1577977200
+    },
+    {
+      "fee": "0.00",
+      "price": "291.6900",
+      "quantity": -304,
+      "side": "SELL",
+      "utc_seconds": 1588255200
+    }
+  ],
+  "new_gate_qualification": false,
+  "review_boundary": "fresh comparator fails reviewed-first-run condition; 106 native checks pass"
+}

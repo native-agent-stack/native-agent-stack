@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "id": "red-matrix-wave-join",
+  "command": [
+    "python3",
+    "-m",
+    "unittest",
+    "tests.test_component_matrix.GapCountTests.test_verified_single_gap_wave_receipts_reduce_effective_open_counts"
+  ],
+  "started_utc": "2026-10-10T16:51:08.483294+00:00",
+  "finished_utc": "2026-10-10T16:51:08.831384+00:00",
+  "duration_seconds": 0.348,
+  "launched": true,
+  "observed_exit_code": 1,
+  "expected_exit_code": 1,
+  "expectation_met": true,
+  "input_hashes": [
+    {
+      "path": "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/tests/test_component_matrix.py",
+      "sha256": "6e0997983adc3cb59b5037e007a2f5a87753827e7c5666ff5a3b6b990be56c52",
+      "bytes": 86712
+    }
+  ],
+  "captured_outputs": [
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/red-matrix-wave-join.stdout.txt",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "home_and_pytest_components_exported": true
+    },
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/red-matrix-wave-join.stderr.txt",
+      "raw_sha256": "614f33195b9d9e82005cb4d3d98054276d275187b2397cda79867bb7beee5224",
+      "raw_bytes": 859,
+      "sha256": "91a5c271a9446221a0ab97bf996eecb1058fa62b0f498e0ac41b40f018105bc1",
+      "bytes": 849,
+      "home_and_pytest_components_exported": true
+    }
+  ],
+  "output_hashes": [],
+  "input_bytes_unchanged": true,
+  "scope": "observed command result only; no automatic evidence-class or gap-status promotion"
+}

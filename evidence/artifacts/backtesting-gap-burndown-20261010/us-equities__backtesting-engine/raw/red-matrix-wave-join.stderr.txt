@@ -1,0 +1,14 @@
+E
+======================================================================
+ERROR: test_verified_single_gap_wave_receipts_reduce_effective_open_counts (tests.test_component_matrix.GapCountTests.test_verified_single_gap_wave_receipts_reduce_effective_open_counts)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/tests/test_component_matrix.py", line 202, in test_verified_single_gap_wave_receipts_reduce_effective_open_counts
+    closures = cm.gap_receipt_closures(root)
+               ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'scripts.component_matrix' has no attribute 'gap_receipt_closures'
+
+----------------------------------------------------------------------
+Ran 1 test in 0.002s
+
+FAILED (errors=1)
