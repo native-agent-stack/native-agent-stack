@@ -40,7 +40,7 @@ crw = load("claude_review_worker", TOOL / "worker.py")
 probes = load("claude_review_worker_probes", TOOL / "probes.py")  # it reuses the module loaded above
 assert probes.crw is crw
 
-KEYS = ("anthropic-api-4", "anthropic-api-5", "anthropic-api")  # the head of the fill-first order
+KEYS = ("anthropic-api-4", "anthropic-api-3", "anthropic-api-5")  # the head of the fill-first order
 GIT_ID = {"GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@example.invalid", "GIT_COMMITTER_NAME": "t",
           "GIT_COMMITTER_EMAIL": "t@example.invalid"}
 
@@ -916,11 +916,10 @@ class ReviewRunTest(unittest.TestCase):
         self.assertEqual([r["kind"] for r in h.rows()], ["debit", "void", "switch", "debit", "settle"])
         self.assertEqual(h.rows()[2]["reason"], "revoked_key (HTTP 401)")
 
-    def test_the_default_key_order_is_fill_first_without_the_ci_key(self):
-        self.assertEqual(crw.DEFAULT_KEYS, ("anthropic-api-4", "anthropic-api-5", "anthropic-api", "anthropic-api-2",
-                                            "anthropic-api-6", "anthropic-api-7", "anthropic-api-8", "anthropic-api-9",
-                                            "anthropic-api-10"))
-        self.assertNotIn("anthropic-api-3", crw.DEFAULT_KEYS)  # CI review's key
+    def test_the_default_key_order_is_fill_first_with_api_3_second(self):
+        self.assertEqual(crw.DEFAULT_KEYS, ("anthropic-api-4", "anthropic-api-3", "anthropic-api-5", "anthropic-api",
+                                            "anthropic-api-2", "anthropic-api-6", "anthropic-api-7", "anthropic-api-8",
+                                            "anthropic-api-9", "anthropic-api-10"))  # owner ~15:12Z: api-3 second
 
     def test_a_key_the_runner_refuses_is_skipped_before_any_debit(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -943,6 +942,10 @@ class ReviewRunTest(unittest.TestCase):
         counts = next(iter(settle["tokens"].values()))
         total = counts["cache_read_input_tokens"] + counts["cache_creation_input_tokens"] + counts["input_tokens"]
         self.assertEqual(settle["cache_hit_rate"], round(counts["cache_read_input_tokens"] / total, 6))
+        self.assertEqual(settle["use_case"], "PR review pub#7")  # the test repository o/pub, PR 7
+        self.assertEqual(crw.use_case_of({"repo": "seathatflowsinourveins/native-agent-stack", "pr": 953}),
+                         "PR review nas#953")
+        self.assertEqual(crw.use_case_of({"probe": "facts-control", "pr": 1}), "review-worker probe (facts-control)")
 
     def test_a_journal_priority_prefix_stays_at_the_start_of_the_line(self):
         out = io.StringIO()

@@ -78,10 +78,11 @@ RULES_LIMIT_BYTES = 65_536
 FILES_API_CAP = 3000  # GET /pulls/{n}/files lists at most 3000 files; a list that long is treated as essential
 # Fill-first (owner direction relayed by the command center, 2026-10-10 ~14:19Z): one key until Anthropic reports it out
 # of credit or revoked, then the next, never round-robin, because a prompt cache never crosses organizations
-# (anthropics/skills@dbd4588f skills/claude-api/shared/prompt-caching.md:130). anthropic-api-3 serves CI review only
-# (the main-only claude-review environment secret) and is not in the order. A slot the runner refuses is skipped.
-DEFAULT_KEYS = ("anthropic-api-4", "anthropic-api-5", "anthropic-api", "anthropic-api-2", "anthropic-api-6",
-                "anthropic-api-7", "anthropic-api-8", "anthropic-api-9", "anthropic-api-10")
+# (anthropics/skills@dbd4588f skills/claude-api/shared/prompt-caching.md:130). The owner's direction of ~15:12Z (via the
+# command center) puts anthropic-api-3 second: CI review first (the main-only claude-review environment secret), local
+# quality work second. A slot the runner refuses is skipped.
+DEFAULT_KEYS = ("anthropic-api-4", "anthropic-api-3", "anthropic-api-5", "anthropic-api", "anthropic-api-2",
+                "anthropic-api-6", "anthropic-api-7", "anthropic-api-8", "anthropic-api-9", "anthropic-api-10")
 SWITCH_CLASSES = ("credit_exhausted", "revoked_key")
 DEFAULT_CLAUDE_BIN = "~/.local/share/claude/versions/2.1.296"
 DEFAULT_STATE = "~/.local/state/native-agent-stack/claude-review-worker"
@@ -969,6 +970,17 @@ def assistant_texts(records: list) -> list:
 
 
 TOKEN_FIELDS = ("input_tokens", "output_tokens", "cache_read_input_tokens", "cache_creation_input_tokens")
+REPO_SHORT = {"seathatflowsinourveins/native-agent-stack": "nas", "seathatflowsinourveins/us-equities-trading": "uet"}
+
+
+def use_case_of(detail: dict) -> str:
+    """The settle row's human label (owner direction via the command center, ~15:12Z): "PR review nas#953", or
+    "review-worker probe (facts-control)" for a probe run. It is read from the debit's own detail."""
+    if detail.get("probe"):
+        return f"review-worker probe ({safe_name(detail['probe'])})"
+    repo = detail.get("repo") if isinstance(detail.get("repo"), str) else ""
+    short = REPO_SHORT.get(repo, repo.split("/")[-1] or "?")
+    return f"PR review {short}#{detail.get('pr')}"
 
 
 def cache_hit_rate(rows: list) -> float | None:
@@ -1363,8 +1375,9 @@ class Ledger:
                 reserved = held.get("max_usd")
                 fields = {"actual_usd": reserved if is_amount(reserved) else COST_BOUND_USD, "outcome": "unknown",
                           **fields}
-            self.append({"kind": kind, "ts": iso(now), "key": held.get("key"), "workload": WORKLOAD, "ref": ref,
-                         **fields})
+            detail = held.get("detail") if isinstance(held.get("detail"), dict) else {}
+            self.append({"kind": kind, "ts": iso(now), "key": held.get("key"), "workload": WORKLOAD,
+                         "use_case": use_case_of(detail), "ref": ref, **fields})
             return True
 
     def settle(self, ref: str, actual: float, detail: dict, now: dt.datetime, tokens: list | None = None) -> None:

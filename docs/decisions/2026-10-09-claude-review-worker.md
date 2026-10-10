@@ -90,8 +90,9 @@ requests now. It reuses the repository's own fence: main at the working director
 
    Fill-first (owner direction, relayed by the command center on 2026-10-10 at about 14:19Z; it replaces the single-key
    mode of 01:49Z). The keys are tried in the order of `CLAUDE_REVIEW_KEYS`, by default `anthropic-api-4`,
-   `anthropic-api-5`, `anthropic-api`, `anthropic-api-2`, then `anthropic-api-6` to `anthropic-api-10`.
-   `anthropic-api-3` serves CI review only (the main-only `claude-review` environment secret) and is not in the order.
+   `anthropic-api-3`, `anthropic-api-5`, `anthropic-api`, `anthropic-api-2`, then `anthropic-api-6` to
+   `anthropic-api-10`. The owner's direction of about 15:12Z (via the command center) put `anthropic-api-3` second: it
+   serves CI review first (the main-only `claude-review` environment secret) and local quality work second.
    - The worker stays on one key and moves to the next only when Anthropic reports it out of credit (HTTP 402, or 400
      with "credit balance is too low") or revoked (HTTP 401). It never round-robins: a prompt cache is per workspace and
      never crosses organizations (claude-api skill, anthropics/skills@`dbd4588f`
@@ -101,6 +102,8 @@ requests now. It reuses the repository's own fence: main at the working director
      journal line at warning priority ("this run moved from … to …; tell the command center").
    - Each settle records the run's tokens per model (input, output, cache read, cache creation) and its cache hit rate,
      cache read over cache read plus cache creation plus uncached input (`prompt-caching.md:186-192`).
+   - Each settle and void carries a short human `use_case` beside the `CRW` workload ("PR review nas#953", or
+     "review-worker probe (facts-control)"), read from its debit (owner direction via the command center, ~15:12Z).
    - Each key try is its own ledger ref. The key is still injected per command by the credential runner, never through a
      shared gateway or a lane's environment. The offline probes' O6 requires the first key to be stored and report each
      later slot as O6i, for information.
