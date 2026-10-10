@@ -157,6 +157,5 @@ typing-extensions==4.16.0 \
     --hash=sha256:dc983d19a509c94dba722ee6abd33940f7c05a89e243c47e907eb4db6f1a43e5
 
 # Official textfile exposition and atomic writer for the offline Claude usage collector.
-# https://pypi.org/pypi/prometheus-client/0.26.0/json (universal wheel)
-prometheus-client==0.26.0 \
-    --hash=sha256:fa93d06737aa02bacd05794768508bb97d2fbee28cb3bca04eaae92f0ca953d6
+# Share the runtime's reviewed universal-wheel hash.
+-r ../observability/claude-usage/requirements.txt
