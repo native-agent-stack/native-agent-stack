@@ -5096,8 +5096,8 @@
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
-      "sha256": "fd79eeb0f5da540bebf5fa0ced6682a689fba6ed627670ebac24b937ebe5bd59",
-      "bytes": 26930
+      "sha256": "98c3b78a9a729499c8ed9e7090eec32ac6b2af1cef583dd8fc6d02c6882e9bdb",
+      "bytes": 27093
     },
     {
       "path": ".github/workflows/claude-pr-review.yml",
@@ -50367,8 +50367,8 @@
     },
     {
       "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/before.log",
-      "sha256": "c85450214e008c3cec1a0d83e1767efefd8494167370beff9a70a6c2d50683d3",
-      "bytes": 2768
+      "sha256": "9573bf7b1125ae1b457913fd00154b219d9477c908efc3650c35682158fac5e1",
+      "bytes": 2767
     },
     {
       "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/cc-fix/before.log",
@@ -50431,6 +50431,21 @@
       "bytes": 111952
     },
     {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/freshness-fix/after.log",
+      "sha256": "585894909b7185a550995a1e1162a3d518234d3ec1dc2622a9b8ca6c2875913a",
+      "bytes": 276
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/freshness-fix/before.log",
+      "sha256": "ed7e1765c495de45fd44e613e6eb59c440b02d6befb1ff82c3337a380d6d477b",
+      "bytes": 1162
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/freshness-fix/receipt.json",
+      "sha256": "c440737e808412d73dd5f37a94721122741aded38feaa0b3146891a14ca6c418",
+      "bytes": 4520
+    },
+    {
       "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/matrix-check.log",
       "sha256": "08ce4f275c99b7f91a141cfca5b7384f060aacf620f23a324cde692d55e6ffcd",
       "bytes": 34
@@ -50442,7 +50457,7 @@
     },
     {
       "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/receipt.json",
-      "sha256": "97bf90f2c7dbb45b87902f7c3669722c3272091156dd4bc9673047c994ef3f47",
+      "sha256": "25d3a61c61c3cd0581d69642774c83e30f51f7dfe3f39ae47b78e0c6956720ed",
       "bytes": 5360
     },
     {

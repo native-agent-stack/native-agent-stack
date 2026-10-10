@@ -52,7 +52,10 @@ jobs:
         with:
           python-version: '3.13'
           check-latest: false
-      - name: Install hash-locked suite dependencies including closeout validation
+      - name: Install the hash-locked session calendar
+        run: |
+          python3 -m pip install --require-hashes --only-binary=:all: -r .github/requirements-calendar.txt
+      - name: Install hash-locked jsonschema for closeout validation
         run: |
           python3 -m pip install --require-hashes --only-binary=:all: --index-url https://pypi.org/simple -r .github/requirements-ci.txt
       - name: Install checksum-locked native validation dependencies
