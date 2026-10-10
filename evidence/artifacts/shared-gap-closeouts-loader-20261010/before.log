@@ -39,3 +39,8 @@ AssertionError: 1 != 0
 Ran 4 tests in 0.093s
 
 FAILED (failures=4)
+
+Source citation correction, 2026-10-10: the public-count assertion corresponding
+to this historical run is tests/test_gap_closeouts.py:212 in the reviewed source.
+The native traceback's line 200 records its earlier execution-time location;
+that historical trace is preserved, rather than presented as the current source line.

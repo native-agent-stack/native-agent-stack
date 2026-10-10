@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "kind": "shared-closeouts-claude-corrections",
+  "recorded_at_utc": "2026-10-10T19:37:19Z",
+  "source_main": "03a986ed637349403658f23da694c1833527819d",
+  "evidence_class": "local_integration",
+  "scope": "Files-only registry, effective review credit, actual closeout guard fixtures, conditional dependency installation and native worker baseline refresh. No layer disposition or vendor runtime acceptance.",
+  "inputs": [
+    {"path": "scripts/component_matrix.py", "sha256": "967c64e6caa1ecbb801329bf0b134aeee111a19d6d71faa31802e94f5aabf07e"},
+    {"path": "tests/test_gap_closeouts.py", "sha256": "4c886e2026cd80df3d19d9ae878f0822b1a00e070ea36eb727dddc213ea6486a"},
+    {"path": "tests/test_runtime_worker_openhands_push_gate.py", "sha256": "6e2d22a103404a5367cb4dd0abca30f68bf341306e32ebab5e2ad876b5dcd404"},
+    {"path": ".github/workflows/catalog-freshness.yml", "sha256": "fd79eeb0f5da540bebf5fa0ced6682a689fba6ed627670ebac24b937ebe5bd59"},
+    {"path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261004.json", "sha256": "04a245baf20ec34bfb33e76f0692bab6047331723a5c4f8da38f2da5fcf9a64c"}
+  ],
+  "registry_correction": {
+    "real_receipt_rows": 239,
+    "real_receipt_rows_with_hash_or_bytes": 0,
+    "authoritative_hash_registry": "manifests/evidence.json files[] only",
+    "prior_fixture_limitation": "The earlier equal-hash receipt mirror fixture did not model the real metadata-only receipts[] shape and cannot establish real receipt compatibility."
+  },
+  "review_ruling": "Residual/blocked entries without both passing same-head family reports record as proposed and preserve category/counts, including prior reviewed credit. Explicit settled still requires complete review credit.",
+  "before": {
+    "reviewed_code": "215935c9b2cc50ad5b74688caf92a36606d1a865",
+    "command": "<ci-env>/bin/python -m unittest <the eight named real-receipt, five guard and two review-count controls>",
+    "exit_code": 1,
+    "tests": 8,
+    "failures": 8,
+    "errors": 1,
+    "log": "before.log",
+    "sha256": "a6e3e823f17ceae741b58e75583acb4978f49521123dec6a35374bb15dd7f6b2",
+    "interpretation": "The real-receipt positive case errors. The five existing guard fixtures fail their expected-reason assertions because the earlier registry bug preempts those refusals. Isolated residual/blocked controls fail actual numeric assertions (0 != 1); an unreviewed later residual improperly reopens prior credit (1 != 0). These are separate measurements."
+  },
+  "guard_removal_controls": {
+    "method": "Compile five isolated in-memory copies of the corrected loader, removing one guard per copy; run only its named fixture. Repository source is not edited by these controls.",
+    "guards": ["self-registration", "open-gap", "filename", "calendar-date", "historical-layer"],
+    "caught": 5,
+    "total": 5,
+    "exit_code": 0,
+    "log": "guard-controls.log",
+    "sha256": "3e009bdd949beebde57c0c7cdebe03244ace2d3d2d4f372e941cdd245e456316"
+  },
+  "installed_required_modules": {
+    "command": "env PATH=<ci-env>/bin:<existing-PATH> nice -n 10 ionice -c 3 <ci-env>/bin/python -m unittest tests.test_gap_closeouts tests.test_component_matrix tests.test_runtime_worker_openhands_push_gate tests.test_start_closure_sampler tests.test_landscape_sweep_skills tests.test_saturation_ledger tests.test_lane_packets",
+    "exit_code": 0,
+    "tests": 552,
+    "skipped": 2,
+    "log": "required-modules.log",
+    "sha256": "5057383d987228210ff357ef2de68f1a7609fdf1dd8371eacc856d54462d28d3"
+  },
+  "missing_dependency_discovery": {
+    "command": "python3 -m unittest discover -s tests -p test_gap_closeouts.py",
+    "exit_code": 0,
+    "tests": 1,
+    "skipped": 1,
+    "log": "missing-jsonschema.log",
+    "sha256": "16ba752c32957f3b2943ad473825fe6f0c70e1f1be428ad10b951d3af1a90efe"
+  },
+  "dependency_floor": {
+    "installed_jsonschema_version": "4.26.0",
+    "installed_requires_python": ">=3.10",
+    "catalog_freshness_interpreter": "3.13",
+    "catalog_freshness_install": "Existing hash-pinned requirements-ci.txt before full suite discovery",
+    "compatibility": "The no-record path retains the broader 3.9 recording-script floor; hosts select a supported interpreter before processing closeouts."
+  },
+  "native_matrix_check": {"rows": 32, "exit_code": 0, "log": "matrix-check.log", "sha256": "08ce4f275c99b7f91a141cfca5b7384f060aacf620f23a324cde692d55e6ffcd"},
+  "baseline": {
+    "native_derivation": "Unchanged GitTree/derive_ci_protected on the current candidate working tree",
+    "locations": 330,
+    "shape_entries": 98,
+    "prior_snapshot": "push-gate-baseline-before.json",
+    "prior_sha256": "3fe9bc2e0d2bafec7b1c6b214be9b59c8fe19ebaa771eda72343cac87bbb9578",
+    "worker_acknowledgment": "required on the prepared exact fix commit before publication"
+  },
+  "further_validation": {
+    "freshness_workflow_modules": "261 tests ran; one publication-integrity assertion failed on eight then-stale source registrations. The same assertion passes after supported registration refresh; the other 260 tests were unchanged and passed.",
+    "publication_recheck": {"tests": 1, "exit_code": 0, "log": "publication-recheck.log"},
+    "final_full": "Recorded separately after this receipt and all current-source bindings are registered."
+  },
+  "citations": {
+    "iter_errors": "jsonschema/validators.py:349 at a7277432b0f7bcd0551f6e589d30457017125df4",
+    "original_before_log": "The public-count assertion is at reviewed source tests/test_gap_closeouts.py:212; the original native trace's execution-time line 200 is retained with an explicit correction note."
+  },
+  "normalization": "Native assertions/results are retained; personal prefixes use placeholders and retained logs use canonical trailing newlines.",
+  "remaining_at_capture": ["Final registered-tree FULL validation", "worker baseline acknowledgment", "one exact-215935c9-lease push after current-main fetch", "new-head GPT read and CC range-diff micro", "CC landing"]
+}

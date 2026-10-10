@@ -19,12 +19,15 @@ UTF-8 text as `source_text_sha256`. Required fields are:
 | `reviews` | Retained `{path, sha256, head, family}` JSON verdict references; `family` is `gpt` or `claude` |
 | `category` | Required only for `residual` and `blocked`; uses the crosswalk's existing categories |
 
-Register the closeout itself, every evidence file and every review in
-`manifests/evidence.json` with their current SHA-256 and byte length. The loader
+Register the closeout itself, every evidence file and every review in the
+`files` array of `manifests/evidence.json` with their current SHA-256 and byte length. The loader
 checks those registrations against the actual bytes and refuses changed, missing,
 unregistered or wrong-scope inputs. The schema lives in `schema.json` and uses
 Draft 2020-12; it validates through upstream `jsonschema==4.26.0`, available through
-the existing hash-pinned `.github/requirements-ci.txt`.
+the existing hash-pinned `.github/requirements-ci.txt`. Descriptive `receipts`
+rows contain no hash fields and do not participate in this registry. Reading
+closeout records requires Python 3.10 or later; the existing no-record path keeps
+the broader recording-script compatibility floor.
 
 Each retained review JSON must contain `family`, the exact reviewed `head`, and
 `verdict` (`pass` or `changes_requested`). Its family and head must match the
@@ -42,13 +45,15 @@ build. The record's disposition is explicit, so review presence does not silentl
 flip a proposed record. Hashes establish integrity; reviewers judge whether the
 run/test/receipt actually closes the stated scope.
 
-`proposed` remains open in the original category. `residual` and `blocked` remain
-open in their explicit category and reason, preserving login, host, production-data
-and other remaining boundaries. Later dated records may supersede a prior
-disposition for the same gap, including reopening it; every older record and its
+`proposed` preserves the prior category and counts. `residual` and `blocked` earn
+their explicit category only with both passing family references; otherwise they
+record as proposed and leave numeric state unchanged. A reviewed residual stays
+open with its remaining login, host, production-data or other boundary. Later
+reviewed dated records may supersede a prior disposition, including reopening it;
+every older record and its
 evidence bindings still validate. Two records cannot give duplicate indices within
 one layer/date file. Dates are real ISO calendar dates, and the latest dated entry
-for each gap governs the current count.
+with the necessary credit governs the current count.
 
 After publishing a valid record, run the existing supported commands:
 

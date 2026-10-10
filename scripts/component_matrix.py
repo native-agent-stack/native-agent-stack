@@ -232,7 +232,7 @@ def current_gap_document(root: Path, historical: dict | None) -> dict | None:
 
     Shape validation uses jsonschema 4.26.0's supported Draft202012Validator:
     python-jsonschema/jsonschema a7277432b0f7bcd0551f6e589d30457017125df4,
-    jsonschema/validators.py:307 (check_schema), :348 (iter_errors).
+    jsonschema/validators.py:307 (check_schema), :349 (iter_errors).
     Hashes establish integrity; the two retained PR verdicts supply review credit.
     """
     directory = safe_file(root, GAP_CLOSEOUT_DIR)
@@ -253,7 +253,9 @@ def current_gap_document(root: Path, historical: dict | None) -> dict | None:
                       for row in (current or {}).get("layers", [])}
     manifest = load(root, "manifests/evidence.json")
     registry = {}
-    for record in manifest.get("files", []) + manifest.get("receipts", []):
+    # receipts[] is descriptive metadata; validate.py requires each receipt path
+    # to have its actual hash/byte registration in files[].
+    for record in manifest.get("files", []):
         if isinstance(record, dict) and isinstance(record.get("path"), str):
             prior = registry.get(record["path"])
             require(prior is None or (prior.get("sha256"), prior.get("bytes"))
@@ -318,16 +320,22 @@ def current_gap_document(root: Path, historical: dict | None) -> dict | None:
                         and report.get("verdict") in ("pass", "changes_requested"),
                         "gap review metadata does not match retained verdict")
                 reviews.append((reference, report["verdict"]))
+            review_credit = (
+                {ref["family"] for ref, verdict in reviews if verdict == "pass"} == {"gpt", "claude"}
+                and all(verdict == "pass" for _ref, verdict in reviews)
+                and len({ref["head"] for ref, _verdict in reviews}) == 1
+                and len({ref["sha256"] for ref, _verdict in reviews}) >= 2
+            )
             if entry["status"] == "settled":
-                require({ref["family"] for ref, verdict in reviews if verdict == "pass"} == {"gpt", "claude"}
-                        and all(verdict == "pass" for _ref, verdict in reviews)
-                        and len({ref["head"] for ref, _verdict in reviews}) == 1
-                        and len({ref["sha256"] for ref, _verdict in reviews}) >= 2,
+                require(review_credit,
                         "settled gap needs passing GPT and Claude verdicts at the same head; use proposed or residual")
             gap = current_gaps[index]
-            gap.update(status="settled_by_closeout" if entry["status"] == "settled" else "open",
-                       category=entry.get("category", source["category"]),
-                       closeout_ref=relative, closeout_status=entry["status"], closeout_reason=entry["reason"])
+            effective_status = entry["status"] if review_credit else "proposed"
+            if effective_status != "proposed":
+                gap.update(status="settled_by_closeout" if effective_status == "settled" else "open",
+                           category=entry.get("category", source["category"]))
+            gap.update(closeout_ref=relative, closeout_status=effective_status,
+                       closeout_reason=entry["reason"])
     return current
 
 

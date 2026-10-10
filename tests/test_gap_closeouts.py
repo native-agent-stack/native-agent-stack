@@ -9,6 +9,11 @@ from pathlib import Path
 import tempfile
 import unittest
 
+try:
+    from jsonschema import Draft202012Validator
+except ImportError as error:
+    raise unittest.SkipTest("jsonschema is not installed; gap-closeout validation controls require it") from error
+
 from scripts import component_matrix as cm
 from scripts.catalog_decisions import InvalidDecisionIndex
 from scripts.host_receipts import register_file
@@ -44,6 +49,12 @@ class GapCloseoutTests(unittest.TestCase):
         self.evidence_path = "evidence/artifacts/fixture/run.json"
         evidence_hash = write_json(self.root, self.evidence_path, {"exit_code": 0})
         register_file(self.root, self.evidence_path)
+        # Real receipts[] rows carry metadata; only files[] owns hashes/bytes.
+        manifest = json.loads((self.root / "manifests/evidence.json").read_text())
+        manifest["receipts"] = [{"id": "fixture-run", "kind": "native_run",
+            "path": self.evidence_path, "component_ids": ["fixture-vendor"],
+            "claim": "Synthetic loader fixture", "limitations": ["not native acceptance"]}]
+        write_json(self.root, "manifests/evidence.json", manifest)
         self.reviews = []
         for family in ("gpt", "claude"):
             path = "evidence/artifacts/fixture/" + family + "-review.json"
@@ -105,6 +116,10 @@ class GapCloseoutTests(unittest.TestCase):
         self.assertEqual(self.historical, before)
 
     def test_proposed_and_residual_and_blocked_stay_open(self):
+        # Isolate review credit from the separately pinned real-receipt regression.
+        manifest = json.loads((self.root / "manifests/evidence.json").read_text())
+        manifest["receipts"] = []
+        write_json(self.root, "manifests/evidence.json", manifest)
         for status in ("proposed", "residual", "blocked"):
             with self.subTest(status=status):
                 self.entry["status"] = status
@@ -116,8 +131,37 @@ class GapCloseoutTests(unittest.TestCase):
                 self.save()
                 current = self.current()
                 self.assertEqual(cm.open_gap_counts_by_layer(current)[("us-equities", "fixture")], 1)
-                self.assertEqual(cm.gap_counts_by_layer(current)[("us-equities", "fixture")],
-                                 1 if status == "proposed" else 0)
+                self.assertEqual(cm.gap_counts_by_layer(current)[("us-equities", "fixture")], 1)
+                self.assertEqual(current["layers"][0]["gaps"][0]["category"], "executable_now")
+                self.assertEqual(current["layers"][0]["gaps"][0]["closeout_status"], "proposed")
+
+    def test_unreviewed_later_residual_preserves_prior_reviewed_counts(self):
+        manifest = json.loads((self.root / "manifests/evidence.json").read_text())
+        manifest["receipts"] = []
+        write_json(self.root, "manifests/evidence.json", manifest)
+        self.save()
+        self.closeout["date"] = "2026-10-11"
+        self.entry["status"] = "residual"
+        self.entry["category"] = "needs_user_login"
+        self.entry["reviews"] = []
+        self.path = DIRECTORY + "/fixture-2026-10-11.json"
+        self.save()
+        current = self.current()
+        self.assertEqual(cm.open_gap_counts_by_layer(current)[("us-equities", "fixture")], 0)
+        self.assertEqual(cm.gap_counts_by_layer(current)[("us-equities", "fixture")], 0)
+        self.assertEqual(current["layers"][0]["gaps"][0]["category"], "executable_now")
+        self.assertEqual(current["layers"][0]["gaps"][0]["closeout_status"], "proposed")
+
+    def test_reviewed_residual_and_blocked_keep_their_explicit_category(self):
+        for status in ("residual", "blocked"):
+            with self.subTest(status=status):
+                self.entry["status"] = status
+                self.entry["category"] = "needs_user_login"
+                self.save()
+                current = self.current()
+                self.assertEqual(cm.open_gap_counts_by_layer(current)[("us-equities", "fixture")], 1)
+                self.assertEqual(cm.gap_counts_by_layer(current)[("us-equities", "fixture")], 0)
+                self.assertEqual(current["layers"][0]["gaps"][0]["closeout_status"], status)
 
     def test_settled_requires_both_families_at_the_same_head(self):
         for variant in ("one_family", "different_head", "changes_requested", "false_metadata"):
@@ -157,16 +201,58 @@ class GapCloseoutTests(unittest.TestCase):
         with self.assertRaisesRegex(InvalidDecisionIndex, "source text"):
             self.current()
 
-    def test_receipt_can_be_registered_in_both_manifest_sections(self):
+    def test_receipt_metadata_uses_the_registered_file_hash(self):
         manifest = json.loads((self.root / "manifests/evidence.json").read_text())
-        record = next(r for r in manifest["files"] if r["path"] == self.evidence_path)
-        manifest["receipts"] = [{**record, "kind": "native_proven"}]
-        write_json(self.root, "manifests/evidence.json", manifest)
+        self.assertEqual(set(manifest["receipts"][0]),
+                         {"id", "kind", "path", "component_ids", "claim", "limitations"})
+        self.assertNotIn("sha256", manifest["receipts"][0])
+        self.assertNotIn("bytes", manifest["receipts"][0])
         self.save()
         self.assertEqual(cm.gap_counts_by_layer(self.current())[("us-equities", "fixture")], 0)
-        manifest["receipts"][0]["sha256"] = "0" * 64
+
+    def test_conflicting_file_hash_registration_is_refused(self):
+        manifest = json.loads((self.root / "manifests/evidence.json").read_text())
+        record = next(r for r in manifest["files"] if r["path"] == self.evidence_path)
+        manifest["files"].append({**record, "sha256": "0" * 64})
         write_json(self.root, "manifests/evidence.json", manifest)
+        self.save()
         with self.assertRaisesRegex(InvalidDecisionIndex, "conflicting evidence registration"):
+            self.current()
+
+    def test_unregistered_closeout_is_refused(self):
+        self.save()
+        manifest = json.loads((self.root / "manifests/evidence.json").read_text())
+        manifest["files"] = [r for r in manifest["files"] if r["path"] != self.path]
+        write_json(self.root, "manifests/evidence.json", manifest)
+        with self.assertRaisesRegex(InvalidDecisionIndex, "unregistered closeout"):
+            self.current()
+
+    def test_nonopen_historical_gap_is_refused(self):
+        self.historical["layers"][0]["gaps"][0]["status"] = "settled_by_receipt"
+        self.closeout["source_crosswalk_sha256"] = write_json(
+            self.root, cm.GAP_CROSSWALK_FILE, self.historical)
+        self.save()
+        with self.assertRaisesRegex(InvalidDecisionIndex, "not an open historical gap"):
+            self.current()
+
+    def test_filename_must_match_the_declared_layer_and_date(self):
+        self.path = DIRECTORY + "/fixture-2026-10-11.json"
+        self.save()
+        with self.assertRaisesRegex(InvalidDecisionIndex, "filename"):
+            self.current()
+
+    def test_calendar_date_must_exist(self):
+        self.closeout["date"] = "2026-02-30"
+        self.path = DIRECTORY + "/fixture-2026-02-30.json"
+        self.save()
+        with self.assertRaisesRegex(InvalidDecisionIndex, "invalid gap closeout date"):
+            self.current()
+
+    def test_historical_layer_must_exist(self):
+        self.closeout["layer_id"] = "absent-layer"
+        self.path = DIRECTORY + "/absent-layer-2026-10-10.json"
+        self.save()
+        with self.assertRaisesRegex(InvalidDecisionIndex, "historical layer"):
             self.current()
 
     def test_unknown_or_duplicate_gap_index_is_refused(self):

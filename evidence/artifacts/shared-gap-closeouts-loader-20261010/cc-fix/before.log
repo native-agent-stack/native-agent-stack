@@ -1,0 +1,105 @@
+EFFFFFFFF
+======================================================================
+ERROR: test_receipt_metadata_uses_the_registered_file_hash (tests.test_gap_closeouts.GapCloseoutTests.test_receipt_metadata_uses_the_registered_file_hash)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_gap_closeouts.py", line 206, in test_receipt_metadata_uses_the_registered_file_hash
+    self.assertEqual(cm.gap_counts_by_layer(self.current())[("us-equities", "fixture")], 0)
+                                            ^^^^^^^^^^^^^^
+  File "<WORKTREE>/tests/test_gap_closeouts.py", line 83, in current
+    return loader(self.root, self.historical) if loader else deepcopy(self.historical)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKTREE>/scripts/component_matrix.py", line 259, in current_gap_document
+    require(prior is None or (prior.get("sha256"), prior.get("bytes"))
+  File "<WORKTREE>/scripts/catalog_decisions.py", line 38, in require
+    raise InvalidDecisionIndex(message)
+scripts.catalog_decisions.InvalidDecisionIndex: conflicting evidence registration
+
+======================================================================
+FAIL: test_unregistered_closeout_is_refused (tests.test_gap_closeouts.GapCloseoutTests.test_unregistered_closeout_is_refused)
+----------------------------------------------------------------------
+scripts.catalog_decisions.InvalidDecisionIndex: conflicting evidence registration
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_gap_closeouts.py", line 222, in test_unregistered_closeout_is_refused
+    with self.assertRaisesRegex(InvalidDecisionIndex, "unregistered closeout"):
+AssertionError: "unregistered closeout" does not match "conflicting evidence registration"
+
+======================================================================
+FAIL: test_nonopen_historical_gap_is_refused (tests.test_gap_closeouts.GapCloseoutTests.test_nonopen_historical_gap_is_refused)
+----------------------------------------------------------------------
+scripts.catalog_decisions.InvalidDecisionIndex: conflicting evidence registration
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_gap_closeouts.py", line 230, in test_nonopen_historical_gap_is_refused
+    with self.assertRaisesRegex(InvalidDecisionIndex, "not an open historical gap"):
+AssertionError: "not an open historical gap" does not match "conflicting evidence registration"
+
+======================================================================
+FAIL: test_filename_must_match_the_declared_layer_and_date (tests.test_gap_closeouts.GapCloseoutTests.test_filename_must_match_the_declared_layer_and_date)
+----------------------------------------------------------------------
+scripts.catalog_decisions.InvalidDecisionIndex: conflicting evidence registration
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_gap_closeouts.py", line 236, in test_filename_must_match_the_declared_layer_and_date
+    with self.assertRaisesRegex(InvalidDecisionIndex, "filename"):
+AssertionError: "filename" does not match "conflicting evidence registration"
+
+======================================================================
+FAIL: test_calendar_date_must_exist (tests.test_gap_closeouts.GapCloseoutTests.test_calendar_date_must_exist)
+----------------------------------------------------------------------
+scripts.catalog_decisions.InvalidDecisionIndex: conflicting evidence registration
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_gap_closeouts.py", line 243, in test_calendar_date_must_exist
+    with self.assertRaisesRegex(InvalidDecisionIndex, "invalid gap closeout date"):
+AssertionError: "invalid gap closeout date" does not match "conflicting evidence registration"
+
+======================================================================
+FAIL: test_historical_layer_must_exist (tests.test_gap_closeouts.GapCloseoutTests.test_historical_layer_must_exist)
+----------------------------------------------------------------------
+scripts.catalog_decisions.InvalidDecisionIndex: conflicting evidence registration
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_gap_closeouts.py", line 250, in test_historical_layer_must_exist
+    with self.assertRaisesRegex(InvalidDecisionIndex, "historical layer"):
+AssertionError: "historical layer" does not match "conflicting evidence registration"
+
+======================================================================
+FAIL: test_proposed_and_residual_and_blocked_stay_open (tests.test_gap_closeouts.GapCloseoutTests.test_proposed_and_residual_and_blocked_stay_open) (status='residual')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_gap_closeouts.py", line 129, in test_proposed_and_residual_and_blocked_stay_open
+    self.assertEqual(cm.gap_counts_by_layer(current)[("us-equities", "fixture")], 1)
+AssertionError: 0 != 1
+
+======================================================================
+FAIL: test_proposed_and_residual_and_blocked_stay_open (tests.test_gap_closeouts.GapCloseoutTests.test_proposed_and_residual_and_blocked_stay_open) (status='blocked')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_gap_closeouts.py", line 129, in test_proposed_and_residual_and_blocked_stay_open
+    self.assertEqual(cm.gap_counts_by_layer(current)[("us-equities", "fixture")], 1)
+AssertionError: 0 != 1
+
+======================================================================
+FAIL: test_unreviewed_later_residual_preserves_prior_reviewed_counts (tests.test_gap_closeouts.GapCloseoutTests.test_unreviewed_later_residual_preserves_prior_reviewed_counts)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_gap_closeouts.py", line 145, in test_unreviewed_later_residual_preserves_prior_reviewed_counts
+    self.assertEqual(cm.open_gap_counts_by_layer(current)[("us-equities", "fixture")], 0)
+AssertionError: 1 != 0
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.228s
+
+FAILED (failures=8, errors=1)
