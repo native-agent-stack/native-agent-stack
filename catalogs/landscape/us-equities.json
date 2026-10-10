@@ -1151,6 +1151,7 @@
     {
       "catalog": "us-equities",
       "layer_id": "data-quality-orchestration",
+      "gap_resolution_ref": "catalogs/landscape/gap-burndown-data-quality-orchestration-20261010.json",
       "title": "Data quality and orchestration",
       "group": "agents-operations",
       "requirement": "Run bounded research with native identity and complete returned results; supervise owned processes; retain scoped telemetry, failed attempts and recoverable state without granting research workers broker execution authority.",

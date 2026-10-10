@@ -7186,10 +7186,11 @@
         ],
         "winners_without_manifest_row": []
       },
+      "gap_resolution_ref": "catalogs/landscape/gap-burndown-data-quality-orchestration-20261010.json",
       "independent_review": "dual_lane_adjudicated",
       "layer_id": "data-quality-orchestration",
-      "open_executable_now_gaps": 6,
-      "open_gaps": 9,
+      "open_executable_now_gaps": 0,
+      "open_gaps": 4,
       "title": "Data quality and orchestration",
       "verdict_status": "recorded",
       "winners": [
@@ -9273,7 +9274,7 @@
     }
   ],
   "schema_version": 1,
-  "scope": "Per-component independent-review status and per-platform E2E state, joined from catalogs/landscape/{foundation,us-equities}.json winners/alternatives, catalogs/foundation/decisions.json lifecycle stage_refs, scripts/host_receipts.py receipts and the gap crosswalk (open executable_now gaps per layer, when present), with each layer's convergence by layer from the saturation ledger and the newest sweep manifest. It never selects a winner or records a receipt; it is a read-only join of evidence recorded elsewhere.",
+  "scope": "Per-component independent-review status and per-platform E2E state, joined from catalogs/landscape/{foundation,us-equities}.json winners/alternatives, catalogs/foundation/decisions.json lifecycle stage_refs, scripts/host_receipts.py receipts and the historical gap crosswalk plus explicit hash-bound later gap-resolution supplements (open executable_now gaps per layer, when present), with each layer's convergence by layer from the saturation ledger and the newest sweep manifest. It never selects a winner or records a receipt; it is a read-only join of evidence recorded elsewhere.",
   "summary": {
     "convergence": {
       "catalogs": {

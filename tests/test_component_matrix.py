@@ -8,6 +8,7 @@ from __future__ import annotations
 import argparse
 import contextlib
 import io
+import hashlib
 import json
 import tempfile
 import unittest
@@ -197,6 +198,93 @@ class GapCountTests(unittest.TestCase):
 
     def test_absent_document_yields_empty_map(self):
         self.assertEqual(cm.gap_counts_by_layer(None), {})
+
+    def test_later_retained_receipt_replaces_stale_gap_count(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            text = "The native workflow has no retained result."
+            layer = _layer(open_gaps=[text])
+            layer["gap_resolution_ref"] = "catalogs/landscape/gap-burndown-layer-a.json"
+            _init_root(root, [layer])
+            crosswalk = {"schema_version": 1, "source_revision": "fixture", "layers": [{
+                "catalog": "foundation", "layer_id": "layer-a", "gaps": [{
+                    "index": 0, "text": text, "status": "open", "category": "executable_now"}]}]}
+            _write_json(root / cm.GAP_CROSSWALK_FILE, crosswalk)
+            receipt_path = "evidence/receipts/later-native-result.json"
+            _write_json(root / receipt_path, {"evidence_class": "native_proven", "outcome": "settled"})
+            _write_json(root / layer["gap_resolution_ref"], {
+                "schema_version": 1, "catalog": "foundation", "layer_id": "layer-a",
+                "source_crosswalk_sha256": hashlib.sha256((root / cm.GAP_CROSSWALK_FILE).read_bytes()).hexdigest(),
+                "gaps": [{"index": 0, "source_text_sha256": hashlib.sha256(text.encode()).hexdigest(),
+                          "status": "settled_by_receipt", "category": "executable_now",
+                          "reason": "The missing native run is now retained.",
+                          "evidence_refs": [{"path": receipt_path,
+                                             "sha256": hashlib.sha256((root / receipt_path).read_bytes()).hexdigest()}]}]})
+            document, violations = cm.build_document(root)
+            self.assertEqual(document["rows"][0]["open_executable_now_gaps"], 0)
+            self.assertEqual(document["rows"][0]["open_gaps"], 0)
+            self.assertEqual(document["rows"][0]["gap_resolution_ref"], layer["gap_resolution_ref"])
+            self.assertEqual(violations, [])
+            self.assertEqual(json.loads((root / cm.GAP_CROSSWALK_FILE).read_text()), crosswalk)
+
+    def _resolution_root(self, root, *, status="settled_by_receipt", category="executable_now"):
+        text = "A retained execution is missing."
+        reference = "catalogs/landscape/gap-burndown-layer-a.json"
+        layer = _layer(open_gaps=[text])
+        layer["gap_resolution_ref"] = reference
+        _init_root(root, [layer])
+        crosswalk = {"layers": [{"catalog": "foundation", "layer_id": "layer-a", "gaps": [{
+            "index": 0, "text": text, "status": "open", "category": "executable_now"}]}]}
+        _write_json(root / cm.GAP_CROSSWALK_FILE, crosswalk)
+        receipt = "evidence/receipts/retained.json"
+        _write_json(root / receipt, {"result": "pass"})
+        entry = {"index": 0, "source_text_sha256": hashlib.sha256(text.encode()).hexdigest(),
+                 "status": status, "category": category, "reason": "Verified retained native execution.",
+                 "evidence_refs": [{"path": receipt,
+                                    "sha256": hashlib.sha256((root / receipt).read_bytes()).hexdigest()}]}
+        supplement = {"schema_version": 1, "catalog": "foundation", "layer_id": "layer-a",
+                      "source_crosswalk_sha256": hashlib.sha256(
+                          (root / cm.GAP_CROSSWALK_FILE).read_bytes()).hexdigest(), "gaps": [entry]}
+        _write_json(root / reference, supplement)
+        return reference, supplement, layer, receipt
+
+    def test_partial_receipt_leaves_modal_login_residual_open(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            reference, supplement, _, _ = self._resolution_root(
+                root, status="open", category="needs_user_login")
+            supplement["gaps"][0]["remaining"] = "Modal still needs user login."
+            _write_json(root / reference, supplement)
+            document, _ = cm.build_document(root)
+            self.assertEqual(document["rows"][0]["open_executable_now_gaps"], 0)
+            self.assertEqual(document["rows"][0]["open_gaps"], 1)
+
+    def test_later_resolution_rejects_changed_evidence_or_binding(self):
+        cases = ("receipt", "crosswalk", "gap_text", "layer", "missing", "duplicate", "no_evidence")
+        for case in cases:
+            with self.subTest(case=case), tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                reference, supplement, layer, receipt = self._resolution_root(root)
+                if case == "receipt":
+                    _write_json(root / receipt, {"result": "fail"})
+                elif case == "crosswalk":
+                    with (root / cm.GAP_CROSSWALK_FILE).open("a") as stream:
+                        stream.write("\n")
+                elif case == "gap_text":
+                    layer["open_gaps"] = ["Changed scope."]
+                    _write_json(root / "catalogs/landscape/foundation.json", {"layers": [layer]})
+                elif case == "layer":
+                    supplement["layer_id"] = "another-layer"
+                elif case == "missing":
+                    (root / reference).unlink()
+                elif case == "duplicate":
+                    supplement["gaps"].append(supplement["gaps"][0])
+                elif case == "no_evidence":
+                    supplement["gaps"][0]["evidence_refs"] = []
+                if case not in {"receipt", "crosswalk", "gap_text", "missing"}:
+                    _write_json(root / reference, supplement)
+                with self.assertRaises(cm.InvalidDecisionIndex):
+                    cm.build_document(root)
 
 
 class FlipRuleTests(unittest.TestCase):

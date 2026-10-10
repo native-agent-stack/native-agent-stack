@@ -1,0 +1,400 @@
+{
+  "catalog": "us-equities",
+  "checked_at": "2026-10-10",
+  "gaps": [
+    {
+      "category": "executable_now",
+      "evidence_refs": [
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/1-paired-model-dag.json",
+          "sha256": "4c0a30c5e93f190ebcfc55f118b7b16d33b3b56f862f41e060135b2f07ca37d8"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/1-dagu-history-research-pair.json",
+          "sha256": "47d0c768426b1bb52605e1c65c6c18978d47adf548d59a976540a4e8ac30c893"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/1-dagu-status-research-pair.txt",
+          "sha256": "a52bb22dc1882369bf134bda1a5f008b6b2322fe674d7f20ee0b88d0cdc8447a"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/1-research-pair-status.jsonl.txt",
+          "sha256": "7c7c40482bf3e7b3b2d3b62e0532f8dc0bfe77bc3a6b8181784127ad2071006e"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/1-step-astra.out",
+          "sha256": "b4e5568322cad15f1bca1eac46bead46f12ca7ebe518f0ad7dcca33263e587f2"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/1-step-claude.out",
+          "sha256": "4b3a6c5297eb5693fab413e41802c2e6030fc85bb54ffbb8021776efaa54bfa1"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/0-codex-review-r1.md",
+          "sha256": "dd0283b76a5c85ea9aff1c3506538b1aa02fc7f221fd12b8f361d9576ca254f4"
+        },
+        {
+          "path": "adoption/paired/receipt.json",
+          "sha256": "9b00455d09dba24ed47cd5be8cc09b573573f122c9ca10e931f68146e7e57730"
+        },
+        {
+          "path": "adoption/paired/astra.report.json",
+          "sha256": "b396469ae54867014a174852e93ab042ecde68a179a2cd6444c22b2688c6573c"
+        },
+        {
+          "path": "adoption/paired/claude.report.json",
+          "sha256": "1b65a75fbd41f65bc1c93640436908193f70fec4e75c9405508c9a6f030be179"
+        },
+        {
+          "path": "adoption/paired/packet.json",
+          "sha256": "c9c0a26829aa4336e8339dc6da84ead9e29a0e83951c5ef2fe49adb3e2bd8490"
+        }
+      ],
+      "index": 1,
+      "reason": "The actual retained Dagu research-pair run completed both native workers inside the graph; complete returned reports and packet hashes match the adoption receipt. History replay is corroboration, not a new inference.",
+      "source_text_sha256": "15b828a624ecb469ce985ffe202b3a5ca3b9a86628699fea90255a2c5328923f",
+      "status": "settled_by_receipt"
+    },
+    {
+      "category": "executable_now",
+      "evidence_refs": [
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/2-dashboard-auth-mode.json",
+          "sha256": "b2ab60e7f14739f3a95c1f00474655169a28f61b299511a8d9214f43404fa00b"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/2-dashboard-auth-fr3.txt",
+          "sha256": "ea560b8863ccce6e00e3045348b604fe504828ec0c765d2178f158247647d4c3"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/2-dashboard-auth-fr2.txt",
+          "sha256": "6a43bc8552c24af17632d3ed255e07641c1889497c25db78a9bc01c5e623d55d"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/2-dashboard-auth-r1.txt",
+          "sha256": "58e78d0e7459793083d7a59643c69616c915de5dfc638a703d04037f0ad7f391"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/0-first-round-mtimes.txt",
+          "sha256": "fceb908f904dd1025b954ecf94a4b634a25c7b33e1ed4416253aef02f1b0d6ce"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/0-codex-review-r1.md",
+          "sha256": "dd0283b76a5c85ea9aff1c3506538b1aa02fc7f221fd12b8f361d9576ca254f4"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/2-auth-none-basic-block-fr4.txt",
+          "sha256": "dbd7cff7f8f0cbf92801b2ac15e2569fc9a564c271ae24d2ecb6b232996ceffd"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/2-auth-none-basic-block-fr4-attempt1.txt",
+          "sha256": "7488c91de4cb0bc4cb3335ce44905df98ba766ccdcc00eaf9956724b5cb81d0e"
+        }
+      ],
+      "index": 2,
+      "reason": "The later reviewed native dashboard receipt already resolves the historical disagreement. No new authentication/security probe is part of this reconciliation; current host state is not re-attested.",
+      "source_text_sha256": "282367893e05d8649871e693bef68ddf0f6745cc0216ab0f726ca4b8ff72e9d4",
+      "status": "settled_by_receipt"
+    },
+    {
+      "category": "executable_now",
+      "evidence_refs": [
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/3-dagu-2170-hosting-checks.json",
+          "sha256": "bbee2a0cae7dfe08855cfbe807e76a239565444f0b3ad11cb15c8c6218893b98"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/3-hosting-2.16.6.json",
+          "sha256": "6b09dec538907436a521d784ad77edb5b0df3446a648c6d4d5439fb7ed55b829"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/3-hosting-2.17.0.json",
+          "sha256": "68039cdd33012b03c219a91311022044a150b4dd884fa06c3166ecd162903d40"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/0-provenance-reverification.txt",
+          "sha256": "e57790c6b19c3590fb8020873e0775879bb326286c45bf44dcf72d4c5a456a8a"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/0-first-round-mtimes.txt",
+          "sha256": "fceb908f904dd1025b954ecf94a4b634a25c7b33e1ed4416253aef02f1b0d6ce"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/0-codex-review-r1.md",
+          "sha256": "dd0283b76a5c85ea9aff1c3506538b1aa02fc7f221fd12b8f361d9576ca254f4"
+        },
+        {
+          "path": "evidence/artifacts/sota-refresh-20260923/pins-runtime/dagu.json",
+          "sha256": "246f4b7ca3e672efd6bdbd86780bd093c39257b8afe2d8ef91bdf3e8947bbb8b"
+        }
+      ],
+      "index": 3,
+      "reason": "The retained two-version native failure/abort/cancel/restart-history comparison qualifies the previously untested v2.17.0 check. This does not change the held stack pin or qualify later releases.",
+      "source_text_sha256": "0cfc3d30e6a0ea8d89e54715a03fe0530a79424ffa6302ba232be3f7dca1d949",
+      "status": "settled_by_receipt"
+    },
+    {
+      "category": "executable_now",
+      "evidence_refs": [
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/5-duckdb-gate-input.json",
+          "sha256": "1dd911aafb918b2edaad5861e28a4903db92cb1c707f1ee071ebee988477ffa8"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/5-fr2-fresh-sync-and-checks.txt",
+          "sha256": "4177669954a98968414a5e8587e873c72420388068082c518bacd834a7fb7a6a"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/5-duckdb-fr2.json",
+          "sha256": "3db127002eacfb3a80553256180e353f6b449cc3e3eabe13fa0dd555225d3807"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/5-lock.diff",
+          "sha256": "019dc91883417c12c61c6f330391db927c7b6ef6cee9df6150d2bd1c09578ae1"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/5-duckdb-oldlock.json",
+          "sha256": "3db127002eacfb3a80553256180e353f6b449cc3e3eabe13fa0dd555225d3807"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/5-duckdb-newlock.json",
+          "sha256": "3db127002eacfb3a80553256180e353f6b449cc3e3eabe13fa0dd555225d3807"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/5-unittest-newlock-r1.txt",
+          "sha256": "74bc9bc17c1a333c16ce7812317ac9f150786482c16d3d3fc0904f5dcc9e1e91"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/5-unittest-detection-no-duckdb-r1.txt",
+          "sha256": "8b73cc554e52784e2ca2f1726f3c4e5b8c29ba8d831c9dc944461ee87b5f7cc4"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/5-unittest-local-skip-r1.txt",
+          "sha256": "5bd74cb12b26ddf9a3db4304bfd81a151a444446270ffc6d6a5d694b9b649a8e"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/0-first-round-mtimes.txt",
+          "sha256": "fceb908f904dd1025b954ecf94a4b634a25c7b33e1ed4416253aef02f1b0d6ce"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/0-codex-review-r1.md",
+          "sha256": "dd0283b76a5c85ea9aff1c3506538b1aa02fc7f221fd12b8f361d9576ca254f4"
+        }
+      ],
+      "index": 5,
+      "reason": "The retained DuckDB-backed gate ran all five good/bad edge fixtures with both Pandas and native DuckDB typing against CSV controls, with matching check status and actual exits. It does not establish production provider quality.",
+      "source_text_sha256": "0882dce713a9ba389c7f8804ff553365cae24b045b31ebeb45444aeef129cb5e",
+      "status": "settled_by_receipt"
+    },
+    {
+      "category": "needs_user_login",
+      "evidence_refs": [
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/6-temporal-local-execution.json",
+          "sha256": "45f4c1f060a2bc1c5870fe55c5ef155938d5255ccdf5285f07b87d64ed87ea85"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-run-fr2.stdout.txt",
+          "sha256": "9abe4671e8e62aff86202108903734a1526c3b43a08969d425f77c7afa707e2a"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-drive-fr2.json",
+          "sha256": "899652c15edd68e611aa273ff904ea6b6846b8dc03a4749be6d3b53091495b42"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-history-g2-happy.json",
+          "sha256": "326fff7a4e2b0e6f1746a41338570277b0624fc1c17338f48ade1869462934a7"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-history-g2-retry.json",
+          "sha256": "ab21ce7d598d0e8f19ecbc2a8e49f8d7a4581cf0aff000f12395b027706ee2ec"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-history-g2-fail-hard.json",
+          "sha256": "470c5d7ea2088a8f68579e08441025564abe18e317aad903f9fbf9e3a089a37a"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-history-g2-cancel.json",
+          "sha256": "7da6666536126aee3d86b2575f3dad450c1d8858ac635a3e5faa0c394ba633f3"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-history-g2-kill.json",
+          "sha256": "08649f131736016b87a2c00dc287372e8ac485b95feaa79882594e75597bef21"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-history-g2-kill-after-restart.json",
+          "sha256": "08649f131736016b87a2c00dc287372e8ac485b95feaa79882594e75597bef21"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-list-before-restart.json",
+          "sha256": "5457daffa11708b03e8b3802fc4dc0eb9bb8cef61f538cac55527ee1c904ca5d"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-list-after-restart.json",
+          "sha256": "5457daffa11708b03e8b3802fc4dc0eb9bb8cef61f538cac55527ee1c904ca5d"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-spans-client.jsonl.txt",
+          "sha256": "a8de3f242270ae50ebbdc5f40399cb2ab7ad1c0f0d10f095942c8009f7a66bd4"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-spans-worker-1.jsonl.txt",
+          "sha256": "98e95cc58a44903b4825fa5cc2fc1b8dbb1d2421db607a5b986b4106b4db0da7"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-spans-worker-2.jsonl.txt",
+          "sha256": "c98fec18df19cc018151d710d9ee89353873227848bfafdfa591039fda59394b"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-server-metrics-outcomes-fr2.txt",
+          "sha256": "78bab9d6bcfd9d73405fe932b6cabd402db63201dd1870c5c6565c0fa3a97e0f"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-modal-no-login.txt",
+          "sha256": "b68c1eebcc6d1292049a2d4843c4227f0c4b1239eb49cb0c1cd69731aadf0152"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-r1-run.stdout.txt",
+          "sha256": "2eb27d6879f52d3e3035072bf940bf8d538b5e10a466f4d1ec3711301f54ebc2"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-r1-drive.json",
+          "sha256": "ba3e1645540cf0429b1e20c23fd08b06359643018a4424b6fb83efd9022f334f"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/0-provenance-reverification.txt",
+          "sha256": "e57790c6b19c3590fb8020873e0775879bb326286c45bf44dcf72d4c5a456a8a"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/0-first-round-mtimes.txt",
+          "sha256": "fceb908f904dd1025b954ecf94a4b634a25c7b33e1ed4416253aef02f1b0d6ce"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/0-codex-review-r1.md",
+          "sha256": "dd0283b76a5c85ea9aff1c3506538b1aa02fc7f221fd12b8f361d9576ca254f4"
+        }
+      ],
+      "index": 6,
+      "reason": "The Temporal local dev-server execution, retry, cancellation, worker-kill recovery, retained history and exported span checks are measured. The Modal clause remains unqualified and requires user login.",
+      "remaining": "Modal execution, failure, cancellation, recovery and telemetry require a user account login and remain unqualified. Temporal evidence is local development-server scope only.",
+      "source_text_sha256": "f3e108dec2599831cdce142c8e00ec51f12ccd64df34c639ef148cf440fa010b",
+      "status": "open"
+    },
+    {
+      "category": "executable_now",
+      "evidence_refs": [
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/7-dagu-vs-temporal-kill-compare.json",
+          "sha256": "4c907f6b99be715d91ad9ac8bf029b48062bd6f498bc45ebf398dc3fb4f8b805"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/7-dagu-kill-2.16.6.json",
+          "sha256": "3edfc40acc9eed57ae1eb1ddb5c811277ef7aea008507e0b9278f14ea8486c9b"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/7-dagu-kill-2.16.6.stdout.txt",
+          "sha256": "5f9a16085d196b5322766054aa6b681149c9b5a96f85b19efe430e5a70a79f13"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/7-dagu-kill-scheduler.log",
+          "sha256": "68921539265ad9418c931dc21cd59085c8bbe2a8bae9b7f433944d9151161caf"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/7-dagu-kill-attempt-records.txt",
+          "sha256": "162c572c2d46b6f4eb29ce8d707f5a580004f1464c146024eda9b76137745bc2"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/7-dagu-kill-2.16.6-attempt1-marker-bug.json",
+          "sha256": "1a9f44a0ffb2d3da93cf0da51725c409f6f73854e370d925243a252702313faf"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/7-dagu-kill-attempt1-scheduler.log",
+          "sha256": "905865fcfc677d88e5ee423ad5705d1bc989c45642405424ad271d6a74f0aaf2"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/3-hosting-2.16.6.json",
+          "sha256": "6b09dec538907436a521d784ad77edb5b0df3446a648c6d4d5439fb7ed55b829"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-drive-fr2.json",
+          "sha256": "899652c15edd68e611aa273ff904ea6b6846b8dc03a4749be6d3b53091495b42"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-history-g2-kill.json",
+          "sha256": "08649f131736016b87a2c00dc287372e8ac485b95feaa79882594e75597bef21"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-history-g2-fail-hard.json",
+          "sha256": "470c5d7ea2088a8f68579e08441025564abe18e317aad903f9fbf9e3a089a37a"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-history-g2-cancel.json",
+          "sha256": "7da6666536126aee3d86b2575f3dad450c1d8858ac635a3e5faa0c394ba633f3"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-history-g2-retry.json",
+          "sha256": "ab21ce7d598d0e8f19ecbc2a8e49f8d7a4581cf0aff000f12395b027706ee2ec"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-list-before-restart.json",
+          "sha256": "5457daffa11708b03e8b3802fc4dc0eb9bb8cef61f538cac55527ee1c904ca5d"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-list-after-restart.json",
+          "sha256": "5457daffa11708b03e8b3802fc4dc0eb9bb8cef61f538cac55527ee1c904ca5d"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-spans-worker-1.jsonl.txt",
+          "sha256": "98e95cc58a44903b4825fa5cc2fc1b8dbb1d2421db607a5b986b4106b4db0da7"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-spans-worker-2.jsonl.txt",
+          "sha256": "c98fec18df19cc018151d710d9ee89353873227848bfafdfa591039fda59394b"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-server-metrics-outcomes-fr2.txt",
+          "sha256": "78bab9d6bcfd9d73405fe932b6cabd402db63201dd1870c5c6565c0fa3a97e0f"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/6-temporal-r1-drive.json",
+          "sha256": "ba3e1645540cf0429b1e20c23fd08b06359643018a4424b6fb83efd9022f334f"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/0-first-round-mtimes.txt",
+          "sha256": "fceb908f904dd1025b954ecf94a4b634a25c7b33e1ed4416253aef02f1b0d6ce"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/raw/0-codex-review-r1.md",
+          "sha256": "dd0283b76a5c85ea9aff1c3506538b1aa02fc7f221fd12b8f361d9576ca254f4"
+        }
+      ],
+      "index": 7,
+      "reason": "Both actual Dagu and Temporal arms ran the same bounded two-step failure/cancel/kill comparison, including delayed Dagu zombie/manual retry and telemetry. Timings remain single-host observations, not recovery guarantees.",
+      "source_text_sha256": "96e62957e39c4a903d728a6af3062b61aad39f24f174b632bd25485aa48bae51",
+      "status": "settled_by_receipt"
+    }
+  ],
+  "id": "data-quality-gap-reconciliation-20261010",
+  "layer_id": "data-quality-orchestration",
+  "not_closing": [
+    {
+      "index": 0,
+      "reason": "Off-host hosting, VM and trading-host scope need separate host/owner qualification."
+    },
+    {
+      "index": 4,
+      "reason": "Production data, provider completeness/corporate actions/prices/leakage remain owning-lane and entitlement gates, not established by synthetic gate inputs."
+    },
+    {
+      "index": 6,
+      "reason": "Modal needs user login; only the already measured Temporal portion is credited."
+    },
+    {
+      "index": 8,
+      "reason": "Catalog disagreement/adjudication bookkeeping is outside the six executable entries assigned; retained unchanged."
+    }
+  ],
+  "schema_version": 1,
+  "scope": "Reconcile later retained native executions and reviewed corrections with historical missing-evidence gaps. This is not fresh execution, new host acceptance or a winner/pin change. Historical crosswalk judgments are unchanged.",
+  "source_crosswalk_sha256": "bb354c43a6d318c26eaeb889baa30b8006c23a0f3de2e6dfc123d999ad1726b8"
+}
