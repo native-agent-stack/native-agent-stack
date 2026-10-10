@@ -115,7 +115,8 @@ records the evidence and the alternatives.
 | `anthropic-api-4` | `72e62741` | Quality-critical work and the north star's multi-model QA; the default when work uses a single key |
 | `anthropic-api-5` | `e02c4dee` | Additional credit; next in line after `anthropic-api-3` |
 | `anthropic-api`, `anthropic-api-2` | `9b5bb5b0`, `e0da7458` | Spares |
-| `anthropic-api-6` to `anthropic-api-10` | none stored | The next keys, filled in slot order |
+| `anthropic-api-6` | `e02c4dee` (the same account as `anthropic-api-5`) | A spare: a second key of `anthropic-api-5`'s account, so it adds no credit to the fill-first order |
+| `anthropic-api-7` to `anthropic-api-10` | none stored | The next keys, filled in slot order |
 
 A prefix is the first eight characters of the id of the organization that a
 slot's key belongs to. The prefixes are the command center's reading of
@@ -208,11 +209,13 @@ individual account. Account names and credit balances are not recorded here.
     alternating between them makes each account write and hold its own copy
     of a cached prefix, while filling one account first keeps one cache
     warm. The same page also isolates caches per workspace within an
-    organization on the Claude API. Each switch is to be a ledger row and a
-    command-center alert; the launcher that implements this is an
-    api-actions follow-up outside this change.
+    organization on the Claude API. Each switch is a ledger row and a
+    command-center alert. The api-actions harness and the review worker
+    (#953) implement the order; `anthropic-api-6` shares
+    `anthropic-api-5`'s account, so moving to it buys no new credit.
 11. **Next key.** Add a key by opening the terminal for the next empty slot,
-    `anthropic-api-6` first.
+    `anthropic-api-7` first, and from an account that no stored slot uses, so
+    that it adds credit.
 
 <a id="using-a-key"></a>
 

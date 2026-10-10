@@ -127,8 +127,13 @@ class ProbeTests(unittest.TestCase):
         # A throttled key still names its organization in the response header.
         result = health.probe(health.read_spec(health.spec()), {NAME: key}, opener=Opener(
             (429, headers(anthropic_organization_id=organization)), (403, headers())))
-        self.assertEqual(result, {"models": {"status": 429}, "organization": {"status": 403},
+        self.assertEqual(result, {"models": {"status": 429, "retry_after": False}, "organization": {"status": 403},
                                   "organization_id_prefix": organization[:8]})
+        # Throttling sends retry-after; only its presence comes back, never its value.
+        result = health.probe(health.read_spec(health.spec()), {NAME: key}, opener=Opener(
+            (429, headers(retry_after="17")), (429, headers(retry_after="17"))))
+        self.assertEqual(result, {"models": {"status": 429, "retry_after": True}, "organization": {"status": 429},
+                                  "organization_id_prefix": None})
 
     def test_failures_report_only_the_error_type(self):
         key = fake_key()
@@ -245,8 +250,11 @@ class FakeRunner:
         return subprocess.CompletedProcess(argv, self.returncodes.get(slot, 0), stdout, self.stderr)
 
 
-def child_line(models=200, organization=200, prefix=None) -> dict:
-    return {"models": {"status": models}, "organization": {"status": organization}, "organization_id_prefix": prefix}
+def child_line(models=200, organization=200, prefix=None, retry_after=None) -> dict:
+    line = {"models": {"status": models}, "organization": {"status": organization}, "organization_id_prefix": prefix}
+    if retry_after is not None:
+        line["models"]["retry_after"] = retry_after
+    return line
 
 
 class ParentTests(unittest.TestCase):
@@ -304,14 +312,33 @@ class ParentTests(unittest.TestCase):
         self.assertEqual([argv[3:] for argv, _kwargs in runner.calls].count(["--check"]), len(SLOTS))
         self.assertEqual(len(runner.calls), len(SLOTS) + 1)
 
+    def test_a_rate_limited_slot_is_reported_and_fails_nothing(self):
+        runner = FakeRunner({"anthropic-api-4": "ok", "anthropic-api-3": "ok"},
+                            {"anthropic-api-4": child_line(429, 429, retry_after=True),
+                             "anthropic-api-3": child_line(prefix="abcd1234")})
+        code, out, _err = self.run_main(runner, "--slot", "anthropic-api-4", "--slot", "anthropic-api-3")
+        self.assertEqual(code, 0, out)
+        self.assertIn("anthropic-api-4: stored; rate_limited (GET /v1/models 429, 4xx)", out)
+        # A 429 without retry-after is the spend cap: no usable credit until the next month, so it fails.
+        for line in (child_line(429, 429, retry_after=False), child_line(429, 429)):
+            runner = FakeRunner({"anthropic-api-4": "ok"}, {"anthropic-api-4": line})
+            code, out, _err = self.run_main(runner, "--slot", "anthropic-api-4")
+            self.assertEqual(code, 1, out)
+            self.assertIn("anthropic-api-4: stored; spend_capped (GET /v1/models 429, 4xx)", out)
+        runner = FakeRunner({"anthropic-api-4": "ok"}, {"anthropic-api-4": child_line(500, 500)})
+        code, _out, _err = self.run_main(runner, "--slot", "anthropic-api-4")
+        self.assertEqual(code, 1)  # a server error still fails
+
     def test_validity_follows_the_status_class(self):
         expected = {200: ("valid", "2xx"), 204: ("valid", "2xx"), 401: ("invalid", "4xx"),
-                    403: ("forbidden", "4xx"), 429: ("rate_limited", "4xx"), 404: ("unexpected", "4xx"),
+                    403: ("forbidden", "4xx"), 429: ("spend_capped", "4xx"), 404: ("unexpected", "4xx"),
                     302: ("unexpected", "3xx"), 500: ("server_error", "5xx"), 529: ("server_error", "5xx"),
                     None: ("unreachable", "none")}
         for status, (word, cls) in expected.items():
             with self.subTest(status=status):
                 self.assertEqual((health.validity(status), health.status_class(status)), (word, cls))
+        self.assertEqual(health.validity(429, retry_after=True), "rate_limited")
+        self.assertEqual(health.validity(429, retry_after="yes"), "spend_capped")  # only a real True passes
 
     def test_json_report(self):
         prefix = fake_organization()[:8]

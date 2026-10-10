@@ -17413,7 +17413,7 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "7ffbbacca1721baeee78d1c9ad8f86a20037eee660f254973ae50557381e6e5d",
+      "sha256": "16b03ce11cd189441479878407c88244dc28d92fd9072acfed3316a24e005b6d",
       "bytes": 190328
     },
     {
@@ -18948,8 +18948,8 @@
     },
     {
       "path": "docs/decisions/2026-10-10-anthropic-key-slots-and-practice.md",
-      "sha256": "3c4f235d14968e11f23bd703d4d9d0dfbbcb822c6059a56f5a6ad84fbad0a0de",
-      "bytes": 14140
+      "sha256": "1d6baffb6ccaacda4fc1e445066dd675998f5ad8e0cf5b2d57fdb41308ee945a",
+      "bytes": 15962
     },
     {
       "path": "docs/decisions/2026-10-10-claude-federation-diagnostics.md",
@@ -19498,8 +19498,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "fb6982179a79cdb8cfafd2dbec391b1269ea9e780632f8ba3758dd42f9b4364a",
-      "bytes": 207300
+      "sha256": "989ec3a7443044e2a5f39026be14c26ad47b5c6553a4b3b4274433e9d79da74f",
+      "bytes": 207629
     },
     {
       "path": "docs/stack.md",
@@ -62103,8 +62103,8 @@
     },
     {
       "path": "tests/test_anthropic_key_health.py",
-      "sha256": "e938aefc8708c94dd8bc450a9705a4ade5a4bac031ceccec1d9398847a823bc1",
-      "bytes": 29484
+      "sha256": "ddbfb4cb00427e5245938619e9e90e24b8e52682f3e2c9c2effc682dc8af7158",
+      "bytes": 31552
     },
     {
       "path": "tests/test_apply_claude_settings.py",
@@ -63703,8 +63703,8 @@
     },
     {
       "path": "tools/credentials/anthropic_key_health.py",
-      "sha256": "441c894893d22b695f913b97c5d98d808be188d31bd82bf6f613a3361e073e22",
-      "bytes": 19715
+      "sha256": "458d96980463d28f108e0f3fab48acf931ba31321da09727ec1d426768c50f94",
+      "bytes": 21004
     },
     {
       "path": "tools/credentials/canary_lane_consumer.sh",

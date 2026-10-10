@@ -120,8 +120,9 @@ checked in both the HTML and the markdown:
 
 Command-center inputs, used as leads and not re-measured here: the
 practice record `key-practice-20261010.md` (finalized 2026-10-10T14:15Z and
-refreshed to the 15:12Z order,
-`sha256:4759614646ac94c32633fa046f6841e504dc4d85a693e9e02f6ce23b4b8d0f21`) and
+refreshed to the 15:12Z order and then for the `anthropic-api-6` and
+`anthropic-api-7` rows,
+`sha256:ee25fc918f7e38e0bdb511ebfee0d4689ebdabd1014ec0bd34abce80d7de8254`) and
 `cc-tools/anthropic_key_health.sh`
 (`sha256:713453037a589118f575f7500783291968ecc1ab497838a5017b6b82a8d922d1`).
 Both live in the command center's private state directory. They supplied
@@ -192,6 +193,25 @@ Restore `anthropic-api-3`'s label, rotation and notes and
 bindings. Then run the affected modules and `scripts/validate.py`. Deleting
 stores, revoking keys or removing the environment secret are separate owner
 actions.
+
+## Follow-up after the command center's read (2026-10-10, taken up 2026-10-12)
+
+The command center's read of #969 at 28c99ca9 passed with three quality notes. Two are taken up here (2026-10-12);
+the third, a planned CI fallback to `anthropic-api-4` on credit exhaustion, lapsed when Claude review inside GitHub
+was retired (#981, [2026-10-10-retire-in-github-claude-review.md](2026-10-10-retire-in-github-claude-review.md)):
+
+- `anthropic-api-6` holds a second key of `anthropic-api-5`'s account (organization prefix `e02c4dee`), so it adds no
+  credit; the slot table says so, and the next key goes in `anthropic-api-7`, from a new account. The command center
+  removed an invalid short value from the `anthropic-api-7` slot (16:04Z), which now reads missing.
+- `anthropic_key_health.py` reports a 429 that carries `retry-after` as `rate_limited` and exits 0 for it, so a daily
+  timer does not alarm on a throttled check. Anthropic's docs give the same status a second meaning, which the note did
+  not: the tier's spend cap answers 429 "until access resumes" (https://docs.anthropic.com/en/api/errors.md, read
+  2026-10-12T20:27:51Z, sha256 `45b370216e463bac22090d9f5823d9e410de5a05e69fac111dd8795628db4181`, line 25), with no
+  `retry-after` ("Not sent with the spend-cap 429", https://docs.anthropic.com/en/api/rate-limits.md, read
+  2026-10-12T20:28:08Z, sha256 `447a6f223f60445f056cf237d7f690a113abc5fcd908d9bc0fb37e25c6bbbacc`, line 293; usage
+  pauses until the next month, line 47). So a 429 without that header is reported as `spend_capped` and fails, as does
+  every other non-2xx answer; only the header's presence is kept, never its value
+  (`test_a_rate_limited_slot_is_reported_and_fails_nothing`, which fails on the tool before this change).
 
 ## SOTA sources
 
