@@ -1,0 +1,21 @@
+~/.cache/ns2604-catalyst-market-data-gaps/sdk/lib/python3.13/site-packages/websockets/legacy/__init__.py:6: DeprecationWarning: websockets.legacy is deprecated; see https://websockets.readthedocs.io/en/stable/howto/upgrade.html for upgrade instructions
+  warnings.warn(  # deprecated in 14.0 - 2024-11-09
+F
+======================================================================
+FAIL: test_native_get_retains_exact_bytes_and_disables_redirect_retry (tests.test_alpaca_historical.AlpacaHistoricalTests.test_native_get_retains_exact_bytes_and_disables_redirect_retry)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<mutation-worktree>/tests/test_alpaca_historical.py", line 289, in test_native_get_retains_exact_bytes_and_disables_redirect_retry
+    self.assertEqual(len(captures), before + 1, "native retry or redirect added an HTTP attempt")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 4 != 3 : native retry or redirect added an HTTP attempt
+
+----------------------------------------------------------------------
+Ran 1 test in 3.965s
+
+FAILED (failures=1)
+
+mutant_exit=1
+source_sha256=9e9eb3a410f104827dc59cb494295a0d2baba9148ac256e5e3f6de85322ff9c3
+mutant_sha256=07c81085f5c78e8f7d14b472f30042d7b06e337874723fada1ab2d87d40bb6dd
+assertion_kill_without_setup_errors=true

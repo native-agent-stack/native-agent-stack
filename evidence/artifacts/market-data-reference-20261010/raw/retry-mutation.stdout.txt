@@ -1,0 +1,10 @@
+0
+    module = __import__(module_name)
+ModuleNotFoundError: No module named 'tests.test_alpaca_historical'
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.000s
+
+FAILED (errors=1)
+mutant_exit=1

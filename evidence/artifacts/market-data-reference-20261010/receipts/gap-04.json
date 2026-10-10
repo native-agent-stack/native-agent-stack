@@ -1,0 +1,138 @@
+{
+  "artifacts": [
+    {
+      "path": "catalogs/us-equities/market-data-reference-gap-review-20261010.json",
+      "sha256": "2d78f8735cb1365e398f41b3e8daf78c37bf0cacca6304b40178674d5e849718"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/4-alpaca-py-latest-seams.json",
+      "sha256": "fdfec6a7e154955cbaf85c6fc15f9d5bb9f4e1d737bfcc4709835de5ae763560"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/4-alpaca-latest-tests.txt",
+      "sha256": "681d5d8c60703917bcf4829e693d37d5a3b9992e7a23b08f7a8a39296eccaa2d"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/4-alpaca-master-retry-mutant.txt",
+      "sha256": "2b024a325813ac4b8566e0a31f4546d12b688b66da96bc7e9912b02a554691ed"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/4-alpaca-master-tests.txt",
+      "sha256": "c968c934ce2a4d54ce7c21667d8dbedbf9e21ebcf1bff2f2ee1f920f4c4047c4"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/4-alpaca-py-ls-remote.txt",
+      "sha256": "5f74468b29065dd2eced7f3dea199187c4a17b2bc95c07fa5e002cd546e96458"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/4-pypi-alpaca-py.json",
+      "sha256": "307ab2dec1484d06935a61f7a08ee302a51f12e0e560b13ec8491ede623e9a20"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/4-sdk-0440-vs-master-diff.txt",
+      "sha256": "361935c34aebc7b5cd9f71f62e198908c9297ea6ba7ef710498b001c59c15597"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/REDACTIONS.json",
+      "sha256": "7d08a65951826ef4a8d0bd6fd9a21aa747305527b3e2b1daa42173cffe090c69"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/install-alpaca-install.log",
+      "sha256": "d5c07e3ee98ccea3f28dbd3260722b7737a42ffa0071c231aa8d5dafd982e29d"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/install-alpaca-master-install.log",
+      "sha256": "e760613696b3bca8ae84ac668065ca01988bf94f7ce406651d24859282912fa7"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/comparison-and-closeout-tests.stderr.txt",
+      "sha256": "317309f65b12fc55b82658f515409f99fccae3f73108ddc2cad27d348edd12f7"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/comparison-and-closeout-tests.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/feast-packages.stderr.txt",
+      "sha256": "b03c46b26c837386a8a174ae5382c070e7d722e9f436159749771e3514b9dc84"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/feast-packages.stdout.txt",
+      "sha256": "28369982095abc2807cec2521f6e435f3aaf3eec33c4abf4eee893cd3dc18a0d"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/feast-pit.stderr.txt",
+      "sha256": "1f86321193d1e36a164b95b8e099731efae3756e52eaf6231adc2237ae6236c6"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/feast-pit.stdout.txt",
+      "sha256": "476cfc1a02342f15ebe95ef8dc428a0ad51a5ed7ffc1cc2dc1813bec465d44e2"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/retry-mutation.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/retry-mutation.stdout.txt",
+      "sha256": "26671436738a3f39dae425706e238075fcd79c5ed40d67aeb92ddc1b77f1e429"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/sdk-packages.stderr.txt",
+      "sha256": "570c8451e3b1de15180e0d531f7b98a7850138d82bafb69f69b553bb47bf9b40"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/sdk-packages.stdout.txt",
+      "sha256": "98cc9741e43e7eb1939405ff40da2b8aa24a69a0ef883303384aa17d8f43dc45"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/sdk-seams.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/sdk-seams.stdout.txt",
+      "sha256": "1bd662b52bd60f9191a9826912e022e3aa7598b18055a82bcfd6a217eeebcffe"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/sdk-source-binding.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/sdk-source-binding.stdout.txt",
+      "sha256": "ed74daab81575caf115d0f7d6c0cf930af58af2ee23f13afdbc6efe71bc9020f"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/sdk-tests.stderr.txt",
+      "sha256": "57e995c3dcc0180f0d4deea149fb687bb86914ba6a2b57a56810933af40b52db"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/sdk-tests.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/retained-integrity.json",
+      "sha256": "38939ce8159db334b136e9a04f20fb01bcc14ccdca10120f026dfa1715186445"
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/run.json",
+      "sha256": "7200a89a6507304c1cea3834d06588c06edfec613710cb9f4cb7b864ed53ac17"
+    }
+  ],
+  "base_commit": "0947b01289dcaa9157aa38392a94cf00f592b86d",
+  "catalog": "us-equities",
+  "claim": "Latest released Alpaca 0.44.0 is installed in a fresh prefix; 23 real SDK tests pass with zero skips and the retry mutation is caught by its assertion with zero setup errors.",
+  "evidence_class": "local_integration",
+  "gap_index": 4,
+  "gap_text_sha256": "98e7761edcb65ff0fca2004b608392f1707449d2fbb8eec12f5d9d1c8e8a0a00",
+  "id": "market-data-reference-20261010-gap-4",
+  "layer_id": "market-data-reference",
+  "limitations": [
+    "SDK transports and comparison controls are synthetic; Feast is a native local tool over synthetic data.",
+    "The September private market-data inputs are unavailable here. Their retained aggregate results are dated observations, not a fresh data acquisition or a replay on this host.",
+    "No provider ranking, entitlement, host qualification, strategy number, order or historical as-known universe is established."
+  ],
+  "observed_at_utc": "2026-10-10T17:03:01.201214+00:00",
+  "outcome": "settled",
+  "residuals": [],
+  "schema_version": 1,
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f"
+}

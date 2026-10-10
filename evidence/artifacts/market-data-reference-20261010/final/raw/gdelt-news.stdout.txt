@@ -1,0 +1,1 @@
+{"gdeltdoc": "1.12.0", "status": "unavailable", "error_type": "RateLimitError", "source": "https://api.gdeltproject.org/api/v2/doc/doc", "query": "\"stock market\" &startdatetime=20261008000000&enddatetime=20261010000000&maxrecords=10"}

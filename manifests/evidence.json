@@ -4891,6 +4891,21 @@
         "No catalogue/workflow/credential/configuration/frozen native evidence or N2 gate changed."
       ],
       "path": "evidence/receipts/srt-source-citations-20261008.json"
+    },
+    {
+      "id": "market-data-reference-gap-burndown-20261010",
+      "kind": "artifact_measurement",
+      "component_ids": [
+        "alpaca-py"
+      ],
+      "claim": "Four of eight assigned executable-now gaps close through current SDK compatibility, the promoted measured comparator and two indexed source dispositions. Four residual gaps remain open. The matrix joins hash-bound later receipts without changing the historical crosswalk.",
+      "limitations": [
+        "Dividend currency, account/source data rights and missing news/macro/stream/server evidence remain unresolved.",
+        "Local fixture execution is separate from native provider data; a GDELT rate-limit refusal is retained without qualifying news.",
+        "Historical native-data comparison output is reused by hash; absent private input paths prevent a current replay. No strategy or order authority follows.",
+        "The first mutation helpers produced setup errors, which are not counted as kills. The accepted correction requires the native retry assertion with zero errors."
+      ],
+      "path": "evidence/receipts/market-data-reference-gap-burndown-20261010.json"
     }
   ],
   "files": [
@@ -14277,13 +14292,18 @@
     },
     {
       "path": "blueprints/us-equities/authenticated-data/README.md",
-      "sha256": "76d2439e456aacca301013d1993bde75e42fd6ffa0f77990eb2e60686a961666",
-      "bytes": 8763
+      "sha256": "264cb0900bfd528ff127ca6d1ae16a6cdfddb7c1619f6f934035494cda4a5af3",
+      "bytes": 10591
     },
     {
       "path": "blueprints/us-equities/authenticated-data/compare.py",
       "sha256": "7a2b258624d0219daf2c3bf8582f974a91ec84c8e190db73ed190e4312b37439",
       "bytes": 6025
+    },
+    {
+      "path": "blueprints/us-equities/authenticated-data/compare_providers.py",
+      "sha256": "2ef455406bd90744b00273df561955b8a9eee4af7b7569ee37710c20ed6ef3b9",
+      "bytes": 849
     },
     {
       "path": "blueprints/us-equities/authenticated-data/native-receipt.json",
@@ -15966,6 +15986,36 @@
       "bytes": 7982
     },
     {
+      "path": "blueprints/us-equities/market-data-reference/README.md",
+      "sha256": "43efdb58b6d14223054df18288c0557a3589df0b98ef500bbe6a62308fe2e96b",
+      "bytes": 6071
+    },
+    {
+      "path": "blueprints/us-equities/market-data-reference/closeouts.py",
+      "sha256": "e8e3a1afc33e390c91cc433cf4ae6b0429d3c1c9f1c577615d44816aa03e54a2",
+      "bytes": 10014
+    },
+    {
+      "path": "blueprints/us-equities/market-data-reference/native_news.py",
+      "sha256": "6786a14a567fbc77121776c1f4210bcc98d84ba591edd2a7663691dd0f151ecf",
+      "bytes": 1949
+    },
+    {
+      "path": "blueprints/us-equities/market-data-reference/retry_probe.py",
+      "sha256": "1ce8d21fb25d29f972189a547978f5c941793fcccb99fec0f16c0dda47fa03e5",
+      "bytes": 2686
+    },
+    {
+      "path": "blueprints/us-equities/market-data-reference/run.py",
+      "sha256": "c2093c785432920b472858e957711fcbce324c32666b302d04de7b79b6d05329",
+      "bytes": 10467
+    },
+    {
+      "path": "blueprints/us-equities/market-data-reference/vendor_binding.py",
+      "sha256": "0a73abfcac920ec4471ccd8e6079dedb904b2af0695948954cd760a01d1b596f",
+      "bytes": 1662
+    },
+    {
       "path": "blueprints/us-equities/memory-lifecycle/README.md",
       "sha256": "309fc735617e7b939a91866301614707a713bd9e38d1b4f241722ecd5925a6cf",
       "bytes": 4321
@@ -17112,13 +17162,18 @@
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "sha256": "7c68cc6e9e0001e4953ad08c6dec86cca462a5ca9787e5d1035a90f515f27885",
-      "bytes": 315225
+      "sha256": "ed5d83be8ae239ca932a088b56a7eaafdbb358b6b8d0563ca65821bf05a88010",
+      "bytes": 318715
     },
     {
       "path": "catalogs/landscape/foundation.json",
       "sha256": "868d193a31080ab913400725140bd0d01e0afe97e28564fd12777f737d22951a",
       "bytes": 479154
+    },
+    {
+      "path": "catalogs/landscape/gap-closeouts/market-data-reference-20261010.json",
+      "sha256": "622c802d4fb3b9ddd053bcd307a8dd46b609e5e6fb18bf7b98a590310560c2e8",
+      "bytes": 1830
     },
     {
       "path": "catalogs/landscape/gap-crosswalk-92bb279.json",
@@ -17427,8 +17482,8 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "c203bd694384f31dca4f75333ef6f3e1ac4bfa0f04972290581d5c9f6b259459",
-      "bytes": 778605
+      "sha256": "4e5e2694b1dfc4b6180f1e7e77a448349254c1200a635e11b7e77969057f4339",
+      "bytes": 779964
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
@@ -17482,8 +17537,13 @@
     },
     {
       "path": "catalogs/us-equities/manifest.json",
-      "sha256": "75bb7c9df961e59f920b63993bc964e6c09f46607fcf5f49dde6456d3598b9d5",
+      "sha256": "c0e4bf507f26395528ba8bc4d79da513af82b32ff948411e4997295a2e44cc47",
       "bytes": 3215
+    },
+    {
+      "path": "catalogs/us-equities/market-data-reference-gap-review-20261010.json",
+      "sha256": "2d78f8735cb1365e398f41b3e8daf78c37bf0cacca6304b40178674d5e849718",
+      "bytes": 6478
     },
     {
       "path": "catalogs/us-equities/model-followup.json",
@@ -17707,8 +17767,8 @@
     },
     {
       "path": "docs/component-evidence-matrix.md",
-      "sha256": "0fad007a8e9568b4271e2ac2b1996a57dd1fa52883f902b8c784eeca07e968a7",
-      "bytes": 32981
+      "sha256": "fb0f81e3bd60eb0f7bdaf584a5c457c5a8c508afffe5cb95fd14af3a1554f7f2",
+      "bytes": 35948
     },
     {
       "path": "docs/contributing-evidence.md",
@@ -38446,6 +38506,471 @@
       "bytes": 15432
     },
     {
+      "path": "evidence/artifacts/market-data-reference-20261010/accepted/raw/comparison-and-closeout-tests.stderr.txt",
+      "sha256": "7e03a0a615bb574590348bd04faff1ad80bbfaf654c4916e5de29806402380dd",
+      "bytes": 1868
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/accepted/raw/comparison-and-closeout-tests.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/accepted/raw/feast-packages.stderr.txt",
+      "sha256": "b03c46b26c837386a8a174ae5382c070e7d722e9f436159749771e3514b9dc84",
+      "bytes": 84
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/accepted/raw/feast-packages.stdout.txt",
+      "sha256": "28369982095abc2807cec2521f6e435f3aaf3eec33c4abf4eee893cd3dc18a0d",
+      "bytes": 1112
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/accepted/raw/feast-pit.stderr.txt",
+      "sha256": "1f86321193d1e36a164b95b8e099731efae3756e52eaf6231adc2237ae6236c6",
+      "bytes": 330
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/accepted/raw/feast-pit.stdout.txt",
+      "sha256": "476cfc1a02342f15ebe95ef8dc428a0ad51a5ed7ffc1cc2dc1813bec465d44e2",
+      "bytes": 1027
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/accepted/raw/retry-mutation.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/accepted/raw/retry-mutation.stdout.txt",
+      "sha256": "6d25cb9ad39d84d408b6bce713989770f854bacce8223fb7eb232c7c65bb222b",
+      "bytes": 1406
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/accepted/raw/sdk-packages.stderr.txt",
+      "sha256": "570c8451e3b1de15180e0d531f7b98a7850138d82bafb69f69b553bb47bf9b40",
+      "bytes": 83
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/accepted/raw/sdk-packages.stdout.txt",
+      "sha256": "98cc9741e43e7eb1939405ff40da2b8aa24a69a0ef883303384aa17d8f43dc45",
+      "bytes": 383
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/accepted/raw/sdk-seams.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/accepted/raw/sdk-seams.stdout.txt",
+      "sha256": "1bd662b52bd60f9191a9826912e022e3aa7598b18055a82bcfd6a217eeebcffe",
+      "bytes": 813
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/accepted/raw/sdk-tests.stderr.txt",
+      "sha256": "b42ce6ffa129ebeccedd55e9b6d9edda008dbb47665ba21b7f5caaeb657349fb",
+      "bytes": 4428
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/accepted/raw/sdk-tests.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/accepted/retained-integrity.json",
+      "sha256": "38939ce8159db334b136e9a04f20fb01bcc14ccdca10120f026dfa1715186445",
+      "bytes": 18280
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/accepted/run.json",
+      "sha256": "c150fe18145f905bd7044155847f91afcadddb2f5c50ee8fe2503730082c9b68",
+      "bytes": 9487
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/accepted/sources/public-observations.json",
+      "sha256": "e1afec36bc7dff6fd9263d1582a5278d39be043cb7901fca05500aac3171ed0c",
+      "bytes": 4086
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/accepted/sources/quantlab-README.md.base64",
+      "sha256": "a13172ba3a176c29dc2a0c92e39191d4dc0f25ab6cb90a3a775f75ba72b52361",
+      "bytes": 51073
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/accepted/sources/sec-api-python-README.md.base64",
+      "sha256": "34efd6453362146929d106d981377073b06ad5db1466de349cd93addb5440441",
+      "bytes": 158905
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/final/raw/comparison-and-closeout-tests.stderr.txt",
+      "sha256": "bbb1683ff72580458e052a85877053bb3298ade3d00c5cbdc08e9f261268994a",
+      "bytes": 1652
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/final/raw/comparison-and-closeout-tests.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/final/raw/feast-packages.stderr.txt",
+      "sha256": "b03c46b26c837386a8a174ae5382c070e7d722e9f436159749771e3514b9dc84",
+      "bytes": 84
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/final/raw/feast-packages.stdout.txt",
+      "sha256": "28369982095abc2807cec2521f6e435f3aaf3eec33c4abf4eee893cd3dc18a0d",
+      "bytes": 1112
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/final/raw/feast-pit.stderr.txt",
+      "sha256": "1f86321193d1e36a164b95b8e099731efae3756e52eaf6231adc2237ae6236c6",
+      "bytes": 330
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/final/raw/feast-pit.stdout.txt",
+      "sha256": "476cfc1a02342f15ebe95ef8dc428a0ad51a5ed7ffc1cc2dc1813bec465d44e2",
+      "bytes": 1027
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/final/raw/gdelt-news.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/final/raw/gdelt-news.stdout.txt",
+      "sha256": "f1e8ec219a404d4bd831f41e25e4a3a672f38b13729897491f90a166843da9e9",
+      "bytes": 237
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/final/raw/retry-mutation.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/final/raw/retry-mutation.stdout.txt",
+      "sha256": "e4ffd2e96426be8b88c5ae11d0d3988c7fc00df96a21e9c3053172b58fd7dc20",
+      "bytes": 1533
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/final/raw/sdk-packages.stderr.txt",
+      "sha256": "570c8451e3b1de15180e0d531f7b98a7850138d82bafb69f69b553bb47bf9b40",
+      "bytes": 83
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/final/raw/sdk-packages.stdout.txt",
+      "sha256": "98cc9741e43e7eb1939405ff40da2b8aa24a69a0ef883303384aa17d8f43dc45",
+      "bytes": 383
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/final/raw/sdk-seams.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/final/raw/sdk-seams.stdout.txt",
+      "sha256": "1bd662b52bd60f9191a9826912e022e3aa7598b18055a82bcfd6a217eeebcffe",
+      "bytes": 813
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/final/raw/sdk-tests.stderr.txt",
+      "sha256": "bd879bcf5b0215f7ac6f478a50fa9e12af5e8a0885e0a63b835ad4dd618b6ede",
+      "bytes": 4428
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/final/raw/sdk-tests.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/final/retained-integrity.json",
+      "sha256": "38939ce8159db334b136e9a04f20fb01bcc14ccdca10120f026dfa1715186445",
+      "bytes": 18280
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/final/run.json",
+      "sha256": "906aaac4644b3a59582076ef926c089f115cc596050bee452822a0190cc1caed",
+      "bytes": 9685
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/final/sources/public-observations.json",
+      "sha256": "a54dcd3228da7c8d1c53da796c5a80d8618078e29364f16af596a0c56624cac4",
+      "bytes": 4080
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/final/sources/quantlab-README.md.base64",
+      "sha256": "a13172ba3a176c29dc2a0c92e39191d4dc0f25ab6cb90a3a775f75ba72b52361",
+      "bytes": 51073
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/final/sources/sec-api-python-README.md.base64",
+      "sha256": "34efd6453362146929d106d981377073b06ad5db1466de349cd93addb5440441",
+      "bytes": 158905
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/comparison-and-closeout-tests.stderr.txt",
+      "sha256": "317309f65b12fc55b82658f515409f99fccae3f73108ddc2cad27d348edd12f7",
+      "bytes": 1868
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/comparison-and-closeout-tests.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/feast-packages.stderr.txt",
+      "sha256": "b03c46b26c837386a8a174ae5382c070e7d722e9f436159749771e3514b9dc84",
+      "bytes": 84
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/feast-packages.stdout.txt",
+      "sha256": "28369982095abc2807cec2521f6e435f3aaf3eec33c4abf4eee893cd3dc18a0d",
+      "bytes": 1112
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/feast-pit.stderr.txt",
+      "sha256": "1f86321193d1e36a164b95b8e099731efae3756e52eaf6231adc2237ae6236c6",
+      "bytes": 330
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/feast-pit.stdout.txt",
+      "sha256": "476cfc1a02342f15ebe95ef8dc428a0ad51a5ed7ffc1cc2dc1813bec465d44e2",
+      "bytes": 1027
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/retry-mutation.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/retry-mutation.stdout.txt",
+      "sha256": "26671436738a3f39dae425706e238075fcd79c5ed40d67aeb92ddc1b77f1e429",
+      "bytes": 1406
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/sdk-packages.stderr.txt",
+      "sha256": "570c8451e3b1de15180e0d531f7b98a7850138d82bafb69f69b553bb47bf9b40",
+      "bytes": 83
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/sdk-packages.stdout.txt",
+      "sha256": "98cc9741e43e7eb1939405ff40da2b8aa24a69a0ef883303384aa17d8f43dc45",
+      "bytes": 383
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/sdk-seams.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/sdk-seams.stdout.txt",
+      "sha256": "1bd662b52bd60f9191a9826912e022e3aa7598b18055a82bcfd6a217eeebcffe",
+      "bytes": 813
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/sdk-source-binding.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/sdk-source-binding.stdout.txt",
+      "sha256": "ed74daab81575caf115d0f7d6c0cf930af58af2ee23f13afdbc6efe71bc9020f",
+      "bytes": 1086
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/sdk-tests.stderr.txt",
+      "sha256": "57e995c3dcc0180f0d4deea149fb687bb86914ba6a2b57a56810933af40b52db",
+      "bytes": 4428
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/raw/sdk-tests.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/retained-integrity.json",
+      "sha256": "38939ce8159db334b136e9a04f20fb01bcc14ccdca10120f026dfa1715186445",
+      "bytes": 18280
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/run.json",
+      "sha256": "7200a89a6507304c1cea3834d06588c06edfec613710cb9f4cb7b864ed53ac17",
+      "bytes": 10619
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/sources/public-observations.json",
+      "sha256": "49afe9e7ef7408c64ea80a253b30ccab7be7e8bcd425c24d018c19a170383d2d",
+      "bytes": 4088
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/sources/quantlab-README.md.base64",
+      "sha256": "a13172ba3a176c29dc2a0c92e39191d4dc0f25ab6cb90a3a775f75ba72b52361",
+      "bytes": 51073
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/published/sources/sec-api-python-README.md.base64",
+      "sha256": "34efd6453362146929d106d981377073b06ad5db1466de349cd93addb5440441",
+      "bytes": 158905
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/raw/affected-tests.txt",
+      "sha256": "0ce2f2b3769284a4646b17985662377fa2dc5e7c9a71108f69e22715805af2f2",
+      "bytes": 470
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/raw/catalog-validation.txt",
+      "sha256": "0d60aad237538b7a797b2951d22d13c51782378fad881b8284290c517205d0bf",
+      "bytes": 341
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/raw/comparison-and-closeout-tests.stderr.txt",
+      "sha256": "d17bb2c39c9b2c79e682b190f0c57ba46eceb6cc2b25e015a0835e68e7b94b1e",
+      "bytes": 1652
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/raw/comparison-and-closeout-tests.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/raw/feast-packages.stderr.txt",
+      "sha256": "b03c46b26c837386a8a174ae5382c070e7d722e9f436159749771e3514b9dc84",
+      "bytes": 84
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/raw/feast-packages.stdout.txt",
+      "sha256": "28369982095abc2807cec2521f6e435f3aaf3eec33c4abf4eee893cd3dc18a0d",
+      "bytes": 1112
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/raw/feast-pit.stderr.txt",
+      "sha256": "1f86321193d1e36a164b95b8e099731efae3756e52eaf6231adc2237ae6236c6",
+      "bytes": 330
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/raw/feast-pit.stdout.txt",
+      "sha256": "476cfc1a02342f15ebe95ef8dc428a0ad51a5ed7ffc1cc2dc1813bec465d44e2",
+      "bytes": 1027
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/raw/full-validation-before-schema-fix.txt",
+      "sha256": "795854de40b068eb0858365c6bccae88f3d6672aee2885f8839feb12425d25f2",
+      "bytes": 359
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/raw/gdelt-news.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/raw/gdelt-news.stdout.txt",
+      "sha256": "f1e8ec219a404d4bd831f41e25e4a3a672f38b13729897491f90a166843da9e9",
+      "bytes": 237
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/raw/retry-mutation.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/raw/retry-mutation.stdout.txt",
+      "sha256": "f289719b2c0d4c1bdf1533b8166796645f13516413f08aba0c1db674d20ff32e",
+      "bytes": 234
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/raw/sdk-packages.stderr.txt",
+      "sha256": "570c8451e3b1de15180e0d531f7b98a7850138d82bafb69f69b553bb47bf9b40",
+      "bytes": 83
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/raw/sdk-packages.stdout.txt",
+      "sha256": "98cc9741e43e7eb1939405ff40da2b8aa24a69a0ef883303384aa17d8f43dc45",
+      "bytes": 383
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/raw/sdk-seams.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/raw/sdk-seams.stdout.txt",
+      "sha256": "1bd662b52bd60f9191a9826912e022e3aa7598b18055a82bcfd6a217eeebcffe",
+      "bytes": 813
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/raw/sdk-tests.stderr.txt",
+      "sha256": "97ad26c58d96dc68cfaf36de258799137ad142f4ba8f5866d430324e4458e74d",
+      "bytes": 4428
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/raw/sdk-tests.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/receipts/gap-01.json",
+      "sha256": "658b97bf4ee27ef70601d0594e211a8de24da8ea4f25bb3e7854125f198b8b5b",
+      "bytes": 5876
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/receipts/gap-04.json",
+      "sha256": "fbc94b77f2cd9f4a4aae427c0cd84c92facbe218edfbb9c004437db9c03cb633",
+      "bytes": 7151
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/receipts/gap-05.json",
+      "sha256": "f9ba68054302d2c2ee15825320728ee14ddf0264fe91f247fa2369b68fa06367",
+      "bytes": 5958
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/receipts/gap-07.json",
+      "sha256": "108d79c046834bdc9ab073b7463ff7745f4daabd8bb902c0ee76956bb53be987",
+      "bytes": 8637
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/receipts/gap-08.json",
+      "sha256": "bd8eb25cb9adcbd3cbe940ce14e33e525ea47db0a0711e11bd9d4804a1f00d31",
+      "bytes": 7337
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/receipts/gap-12.json",
+      "sha256": "be678d6baf528e269789d84b8f27b5309930dc68ddea033f606f38f04b9da294",
+      "bytes": 5493
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/receipts/gap-17.json",
+      "sha256": "4701d397cda0f8510e92b7a8f262300a2a01658ae50dcddd3e4fc19064c1fa7c",
+      "bytes": 7979
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/receipts/gap-18.json",
+      "sha256": "86ef91bf9a615473167e1de25d5698d9713e591a42faede2ff238c6b5f662625",
+      "bytes": 8905
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/retained-integrity.json",
+      "sha256": "38939ce8159db334b136e9a04f20fb01bcc14ccdca10120f026dfa1715186445",
+      "bytes": 18280
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/run.json",
+      "sha256": "5da9ea196a297abd174c1357e1f149be1e6e403cefa05860a3b7652840e025ef",
+      "bytes": 9563
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/sources/public-observations.json",
+      "sha256": "74e2c1f2d15e72c1a5a8c6c3bf681f1910656b35dd56f13a5043cf650e2abaf8",
+      "bytes": 4068
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/sources/quantlab-README.md.base64",
+      "sha256": "a13172ba3a176c29dc2a0c92e39191d4dc0f25ab6cb90a3a775f75ba72b52361",
+      "bytes": 51073
+    },
+    {
+      "path": "evidence/artifacts/market-data-reference-20261010/sources/sec-api-python-README.md.base64",
+      "sha256": "34efd6453362146929d106d981377073b06ad5db1466de349cd93addb5440441",
+      "bytes": 158905
+    },
+    {
       "path": "evidence/artifacts/mcp-surfaces-trials-20261009/README.md",
       "sha256": "8fed5eec0043423fb86b1da77b97c01255954b57bf6bc5f79382e4c40e19d27d",
       "bytes": 2774
@@ -58031,6 +58556,11 @@
       "bytes": 4446
     },
     {
+      "path": "evidence/receipts/market-data-reference-gap-burndown-20261010.json",
+      "sha256": "91bb8f0a35fc339f6a95db9d415adcf908889e5a3f7484cf214cb25eb300a3c4",
+      "bytes": 13043
+    },
+    {
       "path": "evidence/receipts/markitdown-018-qualification-20260925.json",
       "sha256": "d9a1a3484c229f7d530009143672ef1ee6756dafff8ad72aeca1dba86cef3b2f",
       "bytes": 18417
@@ -59622,8 +60152,8 @@
     },
     {
       "path": "scripts/component_matrix.py",
-      "sha256": "ab4cbdd0521d2a42108395509589b12a82e83afef76e6377574177ff54c5d899",
-      "bytes": 72137
+      "sha256": "6ed8b74e6f4efb5b5918b4f64bd95e8043fc7a13edd0d173c80de913253adc12",
+      "bytes": 77249
     },
     {
       "path": "scripts/credential_boot_receipt.py",
@@ -60704,6 +61234,11 @@
       "path": "tests/test_managed_block.py",
       "sha256": "1509fe2be743a0d318f9e09f0b21c9251774bda2bdcea55b5351e80699621165",
       "bytes": 34229
+    },
+    {
+      "path": "tests/test_market_data_gap_integration.py",
+      "sha256": "2b4dfe54b7fd3b547fca560fcd917dfad858e8aee637da00932ac62e93f122e2",
+      "bytes": 11125
     },
     {
       "path": "tests/test_memory_lifecycle.py",

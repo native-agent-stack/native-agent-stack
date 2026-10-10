@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-10-10",
+  "scope": "Source dispositions and bounded currency/rights residuals for the market-data-reference executable-now gap cluster. No provider winner, host status, strategy gate or data entitlement changes.",
+  "entries": [
+    {
+      "id": "market-data-sec-api-python-20261010",
+      "repository": "https://github.com/SEC-API-io/sec-api-python",
+      "version_or_commit": "v1.0.36; source 891443361734c8f09de96750c679e82bd251936d",
+      "decision": "conditional",
+      "disposition": "keep_but_compare",
+      "evidence_level": "source_review",
+      "rationale": "A maintained MIT Python client for SEC-API.io's hosted filing/data interfaces. The official service has a 100-call total free trial and metered plans; an API key is required, but a paid key is not mandatory for every request. Its hosted datasets could warrant a bounded comparison if direct EDGAR cannot supply a required filing set within fair-access limits. No hosted query, install, data-rights acceptance or acquisition comparison was run. The selected official EdgarTools/direct SEC path remains selected.",
+      "overturn_when": "A native matched acquisition comparison demonstrates a required coverage or latency advantage, and the provider's actual agreement permits the intended storage and research use.",
+      "sources": [
+        "https://github.com/SEC-API-io/sec-api-python/blob/891443361734c8f09de96750c679e82bd251936d/README.md#L20",
+        "https://github.com/SEC-API-io/sec-api-python/releases/tag/v1.0.36",
+        "https://sec-api.io/pricing"
+      ],
+      "evidence_refs": [
+        "evidence/artifacts/market-data-reference-20261010/sources/public-observations.json",
+        "evidence/artifacts/market-data-reference-20261010/sources/sec-api-python-README.md.base64",
+        "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/17-sec-api-python-disposition.json"
+      ]
+    },
+    {
+      "id": "market-data-quantlab-20261010",
+      "repository": "https://github.com/Rossod4/quantlab",
+      "version_or_commit": "883d893b5f41bec6c1ffa67c88420f5068376e09; no published releases",
+      "decision": "reject",
+      "disposition": "not_adopted",
+      "evidence_level": "source_review",
+      "rationale": "The current README describes a substantial point-in-time and bias-audited EOD research platform; the September claim that its README is missing is obsolete. The current complete Git tree contains no license, COPYING or NOTICE file, and GitHub reports no license or published release. The README's limits acknowledge Yahoo/yfinance prices and reconstructed community membership. Self-reported PIT and bias-audit results were not reproduced here and do not establish licensed all-equities observations, original historical availability or a capability that the selected data path lacks. Source inspection is not permission to reuse the code.",
+      "overturn_when": "An explicit software license permits adoption, and a native matched run supplies a missing data-reference capability with identifiable source rights and as-known availability.",
+      "sources": [
+        "https://github.com/Rossod4/quantlab/blob/883d893b5f41bec6c1ffa67c88420f5068376e09/README.md#L419",
+        "https://api.github.com/repos/Rossod4/quantlab/git/trees/883d893b5f41bec6c1ffa67c88420f5068376e09?recursive=1"
+      ],
+      "evidence_refs": [
+        "evidence/artifacts/market-data-reference-20261010/sources/public-observations.json",
+        "evidence/artifacts/market-data-reference-20261010/sources/quantlab-README.md.base64",
+        "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/18-rossod4-quantlab-disposition.json"
+      ]
+    }
+  ],
+  "currency_policy": {
+    "decision": "preserve_unknown",
+    "scope": "Retained AAPL cash-dividend sample; this is a validation boundary, not a default currency assignment.",
+    "rationale": "Alpaca's REST currency field is optional. Its documented empty-value meanings are USD, non-applicable or unknown, and a value can later change. The pinned alpaca-py CashDividend model omits that field. Neither a missing response key, an empty value nor a US listing establishes USD. Numeric agreement remains distinct from cash-unit reconciliation; explicit action-specific currency evidence is still needed.",
+    "sources": [
+      "https://docs.alpaca.markets/us/reference/corporateactions-1#/components/schemas/currency",
+      "https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/alpaca/data/models/corporate_actions.py#L62"
+    ],
+    "evidence_refs": [
+      "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/1-alpaca-corporateactions-docs.excerpt.json",
+      "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/1-ca-currency-probe.json"
+    ]
+  },
+  "rights_boundary": {
+    "decision": "account_and_source_rights_unestablished",
+    "scope": "Public terms review only; the actual acquiring account's applicable agreements were not accessed.",
+    "rationale": "Alpaca Customer Agreement section 30 and public terms restrict distribution/commercial exploitation without consent; NYSE display agreement section 5 restricts furnishing data to others, and Nasdaq subscriber terms distinguish permitted private use. SEC public information may be copied with citation, subject to its declared-user-agent and fair-access rules. These clauses do not grant storage, redistribution, derived-data or real-time entitlements to this account, or qualify LEAN's third-party sample-data rights. SDK authentication and an MIT software license cannot establish data rights.",
+    "sources": [
+      "https://files.alpaca.markets/disclosures/library/AcctAppMarginAndCustAgmt.pdf",
+      "https://files.alpaca.markets/disclosures/library/TermsAndConditions.pdf",
+      "https://files.alpaca.markets/disclosures/library/NYSE+Market+Data+Display+Services+Agreement.pdf",
+      "https://files.alpaca.markets/disclosures/library/NASDAQ+OMX+Global+Subscriber+Agreement.pdf",
+      "https://www.sec.gov/about/privacy-information",
+      "https://www.sec.gov/search-filings/edgar-search-assistance/accessing-edgar-data"
+    ],
+    "evidence_refs": [
+      "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/7-data-licensing-clauses.json",
+      "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/7-license-clauses.json"
+    ]
+  }
+}

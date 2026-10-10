@@ -1,0 +1,23 @@
+{
+ "alpaca_py": "0.44.0",
+ "clients": {
+  "CorporateActionsClient": {
+   "_retry_after_ctor_retry_attempts_0": null,
+   "_session_is_requests_Session": true,
+   "ctor_accepts_retry_attempts": false,
+   "default__retry": 3,
+   "get_signature": "(path: str, data: Union[dict, str, NoneType] = None, **kwargs) -> Union[dict, List[dict], Any]",
+   "has__retry": true
+  },
+  "StockHistoricalDataClient": {
+   "_retry_after_ctor_retry_attempts_0": null,
+   "_session_is_requests_Session": true,
+   "ctor_accepts_retry_attempts": false,
+   "default__retry": 3,
+   "get_signature": "(path: str, data: Union[dict, str, NoneType] = None, **kwargs) -> Union[dict, List[dict], Any]",
+   "has__retry": true
+  }
+ },
+ "requests": "2.34.2",
+ "rest_py_sha256": "887753b055a4b8e8a07468b4702cfad1fa3aa66ac73427fe0c62971aa3b165c5"
+}

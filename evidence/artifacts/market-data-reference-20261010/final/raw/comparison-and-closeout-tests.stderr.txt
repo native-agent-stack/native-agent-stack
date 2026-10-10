@@ -1,0 +1,13 @@
+test_advanced_and_deferred_receipts_keep_residual_gaps_open (tests.test_market_data_gap_integration.LaterGapEvidenceTests.test_advanced_and_deferred_receipts_keep_residual_gaps_open) ... ok
+test_changed_artifact_or_receipt_cannot_remove_a_gap (tests.test_market_data_gap_integration.LaterGapEvidenceTests.test_changed_artifact_or_receipt_cannot_remove_a_gap) ... ok
+test_settled_receipt_updates_counts_without_mutating_the_frozen_source (tests.test_market_data_gap_integration.LaterGapEvidenceTests.test_settled_receipt_updates_counts_without_mutating_the_frozen_source) ... ok
+test_wrong_text_duplicate_gap_and_unexplained_partial_are_refused (tests.test_market_data_gap_integration.LaterGapEvidenceTests.test_wrong_text_duplicate_gap_and_unexplained_partial_are_refused) ... ok
+test_absent_or_failed_reference_never_reports_equal (tests.test_market_data_gap_integration.ProviderComparisonTests.test_absent_or_failed_reference_never_reports_equal) ... ok
+test_bounded_aapl_result_keeps_the_original_comparison_contract (tests.test_market_data_gap_integration.ProviderComparisonTests.test_bounded_aapl_result_keeps_the_original_comparison_contract) ... ok
+test_cli_scores_multiple_symbols_and_selects_the_requested_sessions (tests.test_market_data_gap_integration.ProviderComparisonTests.test_cli_scores_multiple_symbols_and_selects_the_requested_sessions) ... ok
+test_unknown_dividend_currency_cannot_establish_cash_units (tests.test_market_data_gap_integration.ProviderComparisonTests.test_unknown_dividend_currency_cannot_establish_cash_units) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.034s
+
+OK

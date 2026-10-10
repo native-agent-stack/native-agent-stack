@@ -1,0 +1,4 @@
+Command: python3 scripts/validate_catalogs.py
+Observed exit: 0
+{"beyond_star_catalog_repositories": 102, "models": 20, "public_stars": 357, "repository_entries": 154, "starred_catalog_repositories": 46, "unique_catalog_repositories": 148}
+Catalog structure and evidence classes validated; source claims and native executions were not rerun.

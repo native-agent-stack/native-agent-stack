@@ -8013,10 +8013,84 @@
         ],
         "winners_without_manifest_row": []
       },
+      "gap_closeouts": [
+        {
+          "evidence_class": "source_review",
+          "index": 1,
+          "outcome": "advanced",
+          "receipt": "evidence/artifacts/market-data-reference-20261010/receipts/gap-01.json",
+          "receipt_sha256": "658b97bf4ee27ef70601d0594e211a8de24da8ea4f25bb3e7854125f198b8b5b",
+          "residuals": [
+            "Explicit action-specific currency is still absent; numerical agreement does not reconcile cash units."
+          ]
+        },
+        {
+          "evidence_class": "local_integration",
+          "index": 4,
+          "outcome": "settled",
+          "receipt": "evidence/artifacts/market-data-reference-20261010/receipts/gap-04.json",
+          "receipt_sha256": "fbc94b77f2cd9f4a4aae427c0cd84c92facbe218edfbb9c004437db9c03cb633",
+          "residuals": []
+        },
+        {
+          "evidence_class": "local_integration",
+          "index": 5,
+          "outcome": "settled",
+          "receipt": "evidence/artifacts/market-data-reference-20261010/receipts/gap-05.json",
+          "receipt_sha256": "f9ba68054302d2c2ee15825320728ee14ddf0264fe91f247fa2369b68fa06367",
+          "residuals": []
+        },
+        {
+          "evidence_class": "source_review",
+          "index": 7,
+          "outcome": "advanced",
+          "receipt": "evidence/artifacts/market-data-reference-20261010/receipts/gap-07.json",
+          "receipt_sha256": "108d79c046834bdc9ab073b7463ff7745f4daabd8bb902c0ee76956bb53be987",
+          "residuals": [
+            "The acquiring account's applicable agreements, storage/derived-data rights and LEAN third-party sample-data rights are unestablished; the owner/account lane must supply them."
+          ]
+        },
+        {
+          "evidence_class": "local_integration",
+          "index": 8,
+          "outcome": "advanced",
+          "receipt": "evidence/artifacts/market-data-reference-20261010/receipts/gap-08.json",
+          "receipt_sha256": "bd8eb25cb9adcbd3cbe940ce14e33e525ea47db0a0711e11bd9d4804a1f00d31",
+          "residuals": [
+            "News is unavailable in the native attempt; macro vintages, a real stream and a server store remain unqualified. The Feast source is synthetic and does not reconstruct original historical availability."
+          ]
+        },
+        {
+          "evidence_class": "source_review",
+          "index": 12,
+          "outcome": "advanced",
+          "receipt": "evidence/artifacts/market-data-reference-20261010/receipts/gap-12.json",
+          "receipt_sha256": "be678d6baf528e269789d84b8f27b5309930dc68ddea033f606f38f04b9da294",
+          "residuals": [
+            "Explicit action-specific currency is still absent; this duplicate does not provide an independent currency observation."
+          ]
+        },
+        {
+          "evidence_class": "source_review",
+          "index": 17,
+          "outcome": "settled",
+          "receipt": "evidence/artifacts/market-data-reference-20261010/receipts/gap-17.json",
+          "receipt_sha256": "4701d397cda0f8510e92b7a8f262300a2a01658ae50dcddd3e4fc19064c1fa7c",
+          "residuals": []
+        },
+        {
+          "evidence_class": "source_review",
+          "index": 18,
+          "outcome": "settled",
+          "receipt": "evidence/artifacts/market-data-reference-20261010/receipts/gap-18.json",
+          "receipt_sha256": "86ef91bf9a615473167e1de25d5698d9713e591a42faede2ff238c6b5f662625",
+          "residuals": []
+        }
+      ],
       "independent_review": "dual_lane_same_winner",
       "layer_id": "market-data-reference",
-      "open_executable_now_gaps": 8,
-      "open_gaps": 17,
+      "open_executable_now_gaps": 4,
+      "open_gaps": 13,
       "title": "Market data and reference",
       "verdict_status": "recorded",
       "winners": [
@@ -9273,7 +9347,7 @@
     }
   ],
   "schema_version": 1,
-  "scope": "Per-component independent-review status and per-platform E2E state, joined from catalogs/landscape/{foundation,us-equities}.json winners/alternatives, catalogs/foundation/decisions.json lifecycle stage_refs, scripts/host_receipts.py receipts and the gap crosswalk (open executable_now gaps per layer, when present), with each layer's convergence by layer from the saturation ledger and the newest sweep manifest. It never selects a winner or records a receipt; it is a read-only join of evidence recorded elsewhere.",
+  "scope": "Per-component independent-review status and per-platform E2E state, joined from catalogs/landscape/{foundation,us-equities}.json winners/alternatives, catalogs/foundation/decisions.json lifecycle stage_refs, scripts/host_receipts.py receipts and the gap crosswalk plus hash-bound later gap-closeout receipts (open executable_now gaps per layer, when present), with each layer's convergence by layer from the saturation ledger and the newest sweep manifest. It never selects a winner or records a receipt; it is a read-only join of evidence recorded elsewhere.",
   "summary": {
     "convergence": {
       "catalogs": {

@@ -1,0 +1,9 @@
+Command: python3 -m unittest tests.test_component_matrix tests.test_gap_crosswalk tests.test_gap_wave_ledger tests.test_market_data_gap_integration -q
+Observed exit: 0
+Ran 92 tests in 3.125s
+OK
+crosswalk up to date
+{"status": "checked", "counts": {"advanced": 52, "not_run": 3, "not_settled": 5, "settled": 9}}
+{"status": "checked", "counts": {"advanced": 59, "settled": 10}}
+
+This is the final affected-module run after the matrix scope and source-binding corrections.

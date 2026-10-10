@@ -1,0 +1,36 @@
+{
+  "repository": "https://github.com/alpacahq/alpaca-py",
+  "source_pin": "cc4cb3b7ba50ae250e621983c2779047fb16bb28",
+  "version": "0.44.0",
+  "sources": [
+    {
+      "file": "alpaca/common/rest.py",
+      "upstream_sha256": "887753b055a4b8e8a07468b4702cfad1fa3aa66ac73427fe0c62971aa3b165c5",
+      "installed_sha256": "887753b055a4b8e8a07468b4702cfad1fa3aa66ac73427fe0c62971aa3b165c5",
+      "same_bytes": true
+    },
+    {
+      "file": "alpaca/data/models/corporate_actions.py",
+      "upstream_sha256": "1b9f18c3e665c1c328ef3c8cdde6e32b695182fe8ca0a82411bf5ed62a005632",
+      "installed_sha256": "1b9f18c3e665c1c328ef3c8cdde6e32b695182fe8ca0a82411bf5ed62a005632",
+      "same_bytes": true
+    }
+  ],
+  "cash_dividend_fields": [
+    "corporate_action_type",
+    "cusip",
+    "due_bill_off_date",
+    "due_bill_on_date",
+    "ex_date",
+    "foreign",
+    "id",
+    "payable_date",
+    "process_date",
+    "rate",
+    "record_date",
+    "special",
+    "symbol"
+  ],
+  "currency_field_present": false,
+  "source_binding": "exact catalog source commit; no local tag ref is assumed"
+}
