@@ -404,6 +404,8 @@ jobs:
           # explorer HTML path. There is no size cap: large manifests/catalogs stay covered.
           # GNU time measures this full command; fixture measurements stay separate.
           # The helper supplies verified event options; local full-history scans stay prohibited.
+          # Source: gitleaks/gitleaks-action@bcfb9cce, src/gitleaks.js:103-115.
+          # The 2026-10-09 full-history scan reached 72,638,124 KiB anon-rss and was OOM-killed.
           # Git's merge-diff handling stays native; the dir scan checks the merge result.
           status=0
           /usr/bin/time --quiet --format '{"elapsed_seconds":%e,"peak_rss_kib":%M,"exit_status":%x}' --output "$RUNNER_TEMP/gitleaks/full-git.time.json" "$RUNNER_TEMP/gitleaks/gitleaks" git . --config .gitleaks.toml \
@@ -578,6 +580,8 @@ jobs:
         run: python3 -m unittest tests.test_secret_scan_size.BetterleaksLargeFileTests -v
       - name: Scan git history for secrets with betterleaks (findings do not fail this job)
         if: ${{ !cancelled() && steps.install.outcome == 'success' && steps.scan_range.outcome == 'success' }}
+        # Git mode has no size cap; keep its HEAD backstop within a native step budget.
+        timeout-minutes: 10
         env:
           SCAN_LOG_OPTS: ${{ steps.scan_range.outputs.log_opts }}
         run: |
