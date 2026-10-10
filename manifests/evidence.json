@@ -5356,8 +5356,8 @@
     },
     {
       "path": "adoption/credential-inventory.json",
-      "sha256": "b2f3bf36e7482922fd8bdd4c7c53d4090adbfa3fe1e61cba16c34b8ce7ee38a2",
-      "bytes": 40761
+      "sha256": "9674b743d92dd571f485b17945b6da4ee27665abedb9d06d545de1ac0064e814",
+      "bytes": 41512
     },
     {
       "path": "adoption/hardware-profiles.json",
@@ -17257,7 +17257,7 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "c8867a8c7875719180881f79ecd0299b2d51fa322a2dbf8f97d38a51b986be31",
+      "sha256": "f7729987d74fe43dc01c18d92fe0f94afdcaea0bcae026bb235dec35a2660017",
       "bytes": 190328
     },
     {
@@ -18786,6 +18786,11 @@
       "bytes": 11618
     },
     {
+      "path": "docs/decisions/2026-10-10-anthropic-key-slots-and-practice.md",
+      "sha256": "90d3e709bfef6700aec3e0f72d666c07b4ce6686e4ec0c86b2e4f6e4f6761def",
+      "bytes": 11240
+    },
+    {
       "path": "docs/decisions/2026-10-10-claude-federation-diagnostics.md",
       "sha256": "d4d68b887665a39c4ec1114faa3c648ee3b5d7b5b4e7d5475cc571f1a9d8a792",
       "bytes": 10756
@@ -19027,8 +19032,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "9c95d4852c3b4282d1717f603a7efffff95a361d86821b8a792475d8f15ef294",
-      "bytes": 263694
+      "sha256": "0dafb261cf09f2a4c382f4adfe6b232f71bd20e8bb0753b01e5ebf423c2ebca3",
+      "bytes": 263815
     },
     {
       "path": "docs/harness-rule-enforcement.md",
@@ -19207,8 +19212,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "c4d0444cc8be7ab1c2552404fe62b3e238b482cef92eb56d7fb18bd31e21932a",
-      "bytes": 195169
+      "sha256": "f4924506e42b73f36d58fcac69798f708770a469ac53bb8e73660b9daa3ec107",
+      "bytes": 203640
     },
     {
       "path": "docs/stack.md",
