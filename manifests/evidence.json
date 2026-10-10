@@ -17112,13 +17112,18 @@
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "sha256": "7c68cc6e9e0001e4953ad08c6dec86cca462a5ca9787e5d1035a90f515f27885",
-      "bytes": 315225
+      "sha256": "77394ada98fcd4878682e2effdd0da3e70578b82f75f4c89a96f9b4858c7a597",
+      "bytes": 319170
     },
     {
       "path": "catalogs/landscape/foundation.json",
       "sha256": "868d193a31080ab913400725140bd0d01e0afe97e28564fd12777f737d22951a",
       "bytes": 479154
+    },
+    {
+      "path": "catalogs/landscape/gap-burndown-20261010-evaluation-experiments.json",
+      "sha256": "acd35c426db5e73d3e2f4bdc9a7a1a3161f6ad4aa42d6194e06d259e6143a418",
+      "bytes": 4971
     },
     {
       "path": "catalogs/landscape/gap-crosswalk-92bb279.json",
@@ -17707,8 +17712,8 @@
     },
     {
       "path": "docs/component-evidence-matrix.md",
-      "sha256": "0fad007a8e9568b4271e2ac2b1996a57dd1fa52883f902b8c784eeca07e968a7",
-      "bytes": 32981
+      "sha256": "e1b609308e39b8ca212e35952e7dec6d8f42997ba03b4e3ced87cfec2fe87933",
+      "bytes": 35871
     },
     {
       "path": "docs/contributing-evidence.md",
@@ -18574,6 +18579,11 @@
       "path": "docs/decisions/2026-10-10-codex-lane-omniroute.md",
       "sha256": "4158df8208e2beb10694778866f9f3e94dcbaed0df5df82842e53ec9f197a709",
       "bytes": 9146
+    },
+    {
+      "path": "docs/decisions/2026-10-10-evaluation-gap-burndown.md",
+      "sha256": "016bda3e63bc573c4905323f23cdccba800a5863d69e1c62c3d20d627ee2a0cf",
+      "bytes": 7419
     },
     {
       "path": "docs/decisions/2026-10-10-openhands-shard-discovery-protection.md",
@@ -21049,6 +21059,16 @@
       "path": "evidence/artifacts/eval-native-reports-20260926/promptfoo/results.json",
       "sha256": "aa034a15dd95f221dae9974a96622d235763d82d6ae34a2c4ebd8eaed1d69288",
       "bytes": 26706
+    },
+    {
+      "path": "evidence/artifacts/evaluation-gap-burndown-20261010/inspect-native.json",
+      "sha256": "652896f23ad704c2fd1453e7165637dbf4eb8cf9837b35d240977c1356e38cbe",
+      "bytes": 2642
+    },
+    {
+      "path": "evidence/artifacts/evaluation-gap-burndown-20261010/verification.json",
+      "sha256": "12656285e0b766cc8ba8dd97572518b5097b2a011758e8327fe03792952085a8",
+      "bytes": 4572
     },
     {
       "path": "evidence/artifacts/final-architecture-round2-20261004/integration-resolutions.json",
@@ -59622,8 +59642,8 @@
     },
     {
       "path": "scripts/component_matrix.py",
-      "sha256": "ab4cbdd0521d2a42108395509589b12a82e83afef76e6377574177ff54c5d899",
-      "bytes": 72137
+      "sha256": "d1253663138ea8b1174d967e0bde606586a177023120048860be0faaa55504c1",
+      "bytes": 76591
     },
     {
       "path": "scripts/credential_boot_receipt.py",
@@ -60454,6 +60474,11 @@
       "path": "tests/test_env_freshness.py",
       "sha256": "0eb7bb209a38fd5b680776b67b99e448f50b1f1c29b2c550b33483b2404919f3",
       "bytes": 3446
+    },
+    {
+      "path": "tests/test_evaluation_gap_burndown.py",
+      "sha256": "cab584ab9d3f4de24c58cc1144343b138fcf92d0d3680534e1a5de4aa53a7110",
+      "bytes": 6496
     },
     {
       "path": "tests/test_execution_realism.py",

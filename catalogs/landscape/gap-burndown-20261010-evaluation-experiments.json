@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "catalog": "us-equities",
+  "layer_id": "evaluation-experiments",
+  "checked_at": "2026-10-10",
+  "owner": "overlap-token",
+  "scope": "Exact historical gap identities and retained native evidence; complete settlements only reduce counts.",
+  "review": {
+    "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/raw/review-codex-round1.md",
+    "sha256": "c0943010fd29ccbbae40c6f8f37d10032b641fb085f8e0d68918f9f4169ba726"
+  },
+  "verification": {
+    "path": "evidence/artifacts/evaluation-gap-burndown-20261010/verification.json",
+    "sha256": "12656285e0b766cc8ba8dd97572518b5097b2a011758e8327fe03792952085a8"
+  },
+  "gaps": [
+    {
+      "index": 0,
+      "gap_text_sha256": "5a655b079b32df47121484b0da94fdb99843be24a7927e4d8621c961cd694159",
+      "outcome": "settled",
+      "receipt": {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/0-promptfoo-inspect-two-arm.json",
+        "sha256": "341d43958237a9b0cbf25bd4db9a31ec02b2e5fd4c22605a90407f50724d418b"
+      },
+      "reason": "Matched deterministic two-arm, retained faults and native interrupt/resume are verified; no model-quality claim."
+    },
+    {
+      "index": 1,
+      "gap_text_sha256": "c271f8c9c0e12cc07cadc78bc08b8d97705c1eff76b4fc43bd506628a151d4ce",
+      "outcome": "settled",
+      "receipt": {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/1-five-package-installs.json",
+        "sha256": "7969d56954860d3f9c987470a2a00495c8da1df34e2556c0c75c2609971c8cfa"
+      },
+      "reason": "Five pinned packages have retained native execution; the fresh Inspect fixture run is separately dated. Minimal run scopes remain explicit."
+    },
+    {
+      "index": 2,
+      "gap_text_sha256": "24b6acc97b1d3449bb11df339c8450c6348d4251d0ba27171877464cc5d4dc59",
+      "outcome": "settled",
+      "receipt": {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/2-matched-promptfoo-inspect-comparison.json",
+        "sha256": "30d805e4e93a7bf28c8b5c640af41f52311249796d86a3a4e649dbe7dd260df8"
+      },
+      "reason": "Matched eight-case comparison reproduces exactly, including failure logs and reused interrupted state; harness properties only."
+    },
+    {
+      "index": 3,
+      "gap_text_sha256": "d44f22cda08a594c3e94090832c936bccba8ecd2874a153337c3700ef07e9001",
+      "outcome": "settled",
+      "receipt": {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/3-inspect-fixture-authored-frozen.json",
+        "sha256": "d5b0c1f7687d84e36f839424eef9630b1061285abedd7a42cbf558870e95c141"
+      },
+      "reason": "Frozen Inspect fixture hashes match and a fresh pinned native mock run scores all eight cases."
+    },
+    {
+      "index": 4,
+      "gap_text_sha256": "e244db74d2c9685bef0e553d67f4351eb31bc8f24d362e4c57d577fa113208f9",
+      "outcome": "advanced",
+      "receipt": {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/4-arb-trace2code-host-rerun.json",
+        "sha256": "891fcea57690bbcc578eeb1438b83d32a2c188f07697443e07d04bfe981388ba"
+      },
+      "reason": "Linux host rerun exists; financial-document judgments, answer quality and trading performance remain unestablished."
+    },
+    {
+      "index": 5,
+      "gap_text_sha256": "1839faa7e29b58606bd8b87544e11fa24a2b254ad2392a8cc5def50a70dfddd8",
+      "outcome": "advanced",
+      "receipt": {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/5-fixture-abstention-bootstrap.json",
+        "sha256": "59faa74da7fdf4983768397f6b364a6fd65ba6762b96aedca3e04d6d2a5b4680"
+      },
+      "reason": "Abstention and paired bootstrap reproduce exactly; the authored public-document fixture is not an independent holdout."
+    },
+    {
+      "index": 7,
+      "gap_text_sha256": "98cbff30c8450ee30390a648f13b719f8509586da8cc510379c7137e9a7e42d8",
+      "outcome": "settled",
+      "receipt": {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/7-river-delayed-progressive-validation.json",
+        "sha256": "90662d13b244732660447b7b5ff4759af37e8063d74a1e4eb856c83bd6cdddce"
+      },
+      "reason": "Native River delayed validation has zero early labels, immediate control has 1797; correction/restart and trading claims remain outside scope."
+    },
+    {
+      "index": 8,
+      "gap_text_sha256": "f52679ff2d826b229c8a09cf091f9dc7d8e5a71bd421ccb1f9645a625457bc73",
+      "outcome": "advanced",
+      "receipt": {
+        "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/8-research-evaluation-mlflow-binding.json",
+        "sha256": "6bd34af28160121c7e056b13b6ff6bd684b8a87297c5952b9324a35e8824df0e"
+      },
+      "reason": "MLflow params, metrics and input hashes read back correctly; evaluation logic still contains project-local rules."
+    }
+  ]
+}

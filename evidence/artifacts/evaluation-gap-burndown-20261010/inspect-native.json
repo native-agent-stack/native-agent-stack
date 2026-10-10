@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "kind": "native-inspect-fixture-run",
+  "checked_at": "2026-10-10T16:44:02Z",
+  "version": "0.3.266",
+  "source_pin": "ec4dfc6953784dc45b79de3147530c89868c6e26",
+  "command": "unshare -rn <inspect-prefix>/bin/inspect eval catalog_task.py --max-samples 1 --max-connections 1 --retry-on-error 1 --log-format json --log-dir <owned-log-directory>",
+  "scope_memory_max_bytes": 1073741824,
+  "host_free_gib_before_start": 14.98,
+  "exit_code": 0,
+  "status": "success",
+  "sample_count": 8,
+  "model": "mockllm/model",
+  "model_usage": {
+    "mockllm/model": {
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "total_tokens": 0
+    }
+  },
+  "retained_log": {
+    "outside_repository": true,
+    "raw_bytes": 165807,
+    "raw_sha256": "93a6aa02c205117d71428ed341c669d8210e6d06ed3e84957ecbd048104950ee",
+    "bytes": 165807,
+    "sha256": "93a6aa02c205117d71428ed341c669d8210e6d06ed3e84957ecbd048104950ee",
+    "transformation": "Expanded home paths are normalized to ~; host names to <user>. Native outcomes and fixture hashes are unchanged."
+  },
+  "samples": [
+    {
+      "id": "C1",
+      "score": "I",
+      "source_sha256": "85eb14433d6e4b61fbe60670647f61c65ef4db1ce75408b853860f8a4f26ddc3"
+    },
+    {
+      "id": "C2",
+      "score": "C",
+      "source_sha256": "85eb14433d6e4b61fbe60670647f61c65ef4db1ce75408b853860f8a4f26ddc3"
+    },
+    {
+      "id": "C3",
+      "score": "I",
+      "source_sha256": "46573cdc7d0087f64fcf0ce70410841ec9d40b1cda9d6e55d194447f3bb024c9"
+    },
+    {
+      "id": "C4",
+      "score": "C",
+      "source_sha256": "46573cdc7d0087f64fcf0ce70410841ec9d40b1cda9d6e55d194447f3bb024c9"
+    },
+    {
+      "id": "C5",
+      "score": "I",
+      "source_sha256": "8762e22a8e3b2289e37bb111a581d22ff98261432888979be216f645c7cc122f"
+    },
+    {
+      "id": "C6",
+      "score": "I",
+      "source_sha256": "8762e22a8e3b2289e37bb111a581d22ff98261432888979be216f645c7cc122f"
+    },
+    {
+      "id": "C7",
+      "score": "I",
+      "source_sha256": "c2fe5e37ce52ba7ac4aed208497d97295017c98d6ced4954b75629496e8579df"
+    },
+    {
+      "id": "C8",
+      "score": "C",
+      "source_sha256": "c2fe5e37ce52ba7ac4aed208497d97295017c98d6ced4954b75629496e8579df"
+    }
+  ],
+  "mock_provider_source_sha256": "7b4038e930b8669389f51bc40b2353ba18ca561fc1c79ac6bf7d88f250dbdb2c",
+  "mock_provider_bytes_match_pinned_mirror": true,
+  "limits": [
+    "Deterministic exact-text baseline; three correct and five incorrect labels are the expected measured result, not a semantic quality benchmark.",
+    "Fresh clean run only; interrupt/retry evidence comes from the verified dated two-arm run."
+  ]
+}

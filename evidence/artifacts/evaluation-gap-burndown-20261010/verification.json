@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "kind": "evaluation-gap-receipt-verification",
+  "checked_at": "2026-10-10T16:44:02Z",
+  "host": "linux-wsl2-x86_64",
+  "base": "0947b01289dcaa9157aa38392a94cf00f592b86d",
+  "retained_wave": "gap-wave2-20260923",
+  "historical_results_are_not_fresh_runs": true,
+  "node_contract": {
+    "command": "node --test test-contract.cjs",
+    "working_directory": "blueprints/native-skill-practice",
+    "exit_code": 0,
+    "tests": 6,
+    "passed": 6
+  },
+  "comparison_replay": {
+    "command": "python3 blueprints/gap-wave2-20260923/us-equities__evaluation-experiments/compare_two_arm.py <retained-run> <repository>",
+    "exit_code": 0,
+    "equal_retained_comparison": true,
+    "failure_before_fix": "Published cfg-home error log was omitted by the old native-home-only reader.",
+    "label_matches": {
+      "promptfoo": 3,
+      "inspect": 3,
+      "cases": 8
+    },
+    "scorer_reproducibility": true,
+    "native_resume_samples": {
+      "promptfoo": 8,
+      "inspect": 8
+    }
+  },
+  "abstention_replay": {
+    "upstream_pin": "b487f3866cc13dd971819cb902517a6a50282404",
+    "command": "PYTHONPATH=<pinned-arb-mirror>/src python3 blueprints/gap-wave2-20260923/us-equities__evaluation-experiments/fixture_abstention_bootstrap.py <repository>",
+    "exit_code": 0,
+    "equal_retained_report": true,
+    "queries": 32,
+    "positive": 20,
+    "unanswerable": 12,
+    "bootstrap_resamples": 10000,
+    "seed": 20260923,
+    "default_promotion_claim_follows": false
+  },
+  "regressions": {
+    "command": "python3 -m unittest tests.test_evaluation_gap_burndown -v",
+    "before": {
+      "exit_code": 1,
+      "failures": 1,
+      "errors": 8,
+      "tests": 5
+    },
+    "after": {
+      "exit_code": 0,
+      "tests": 5
+    },
+    "negative_binding_controls": 5,
+    "public_matrix_fail_before": {
+      "base": "0947b01289dcaa9157aa38392a94cf00f592b86d",
+      "tests": 1,
+      "failures": 1,
+      "errors": 0,
+      "failure": "original public matrix builder reports 10 open instead of the 5 remaining gaps"
+    }
+  },
+  "receipts": [
+    {
+      "index": 0,
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/0-promptfoo-inspect-two-arm.json",
+      "sha256": "341d43958237a9b0cbf25bd4db9a31ec02b2e5fd4c22605a90407f50724d418b",
+      "raw_output_bindings_verified": 28,
+      "outcome": "settled"
+    },
+    {
+      "index": 1,
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/1-five-package-installs.json",
+      "sha256": "7969d56954860d3f9c987470a2a00495c8da1df34e2556c0c75c2609971c8cfa",
+      "raw_output_bindings_verified": 15,
+      "outcome": "settled"
+    },
+    {
+      "index": 2,
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/2-matched-promptfoo-inspect-comparison.json",
+      "sha256": "30d805e4e93a7bf28c8b5c640af41f52311249796d86a3a4e649dbe7dd260df8",
+      "raw_output_bindings_verified": 3,
+      "outcome": "settled"
+    },
+    {
+      "index": 3,
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/3-inspect-fixture-authored-frozen.json",
+      "sha256": "d5b0c1f7687d84e36f839424eef9630b1061285abedd7a42cbf558870e95c141",
+      "raw_output_bindings_verified": 3,
+      "outcome": "settled"
+    },
+    {
+      "index": 4,
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/4-arb-trace2code-host-rerun.json",
+      "sha256": "891fcea57690bbcc578eeb1438b83d32a2c188f07697443e07d04bfe981388ba",
+      "raw_output_bindings_verified": 11,
+      "outcome": "advanced"
+    },
+    {
+      "index": 5,
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/5-fixture-abstention-bootstrap.json",
+      "sha256": "59faa74da7fdf4983768397f6b364a6fd65ba6762b96aedca3e04d6d2a5b4680",
+      "raw_output_bindings_verified": 1,
+      "outcome": "advanced"
+    },
+    {
+      "index": 7,
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/7-river-delayed-progressive-validation.json",
+      "sha256": "90662d13b244732660447b7b5ff4759af37e8063d74a1e4eb856c83bd6cdddce",
+      "raw_output_bindings_verified": 2,
+      "outcome": "settled"
+    },
+    {
+      "index": 8,
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/8-research-evaluation-mlflow-binding.json",
+      "sha256": "6bd34af28160121c7e056b13b6ff6bd684b8a87297c5952b9324a35e8824df0e",
+      "raw_output_bindings_verified": 14,
+      "outcome": "advanced"
+    }
+  ]
+}

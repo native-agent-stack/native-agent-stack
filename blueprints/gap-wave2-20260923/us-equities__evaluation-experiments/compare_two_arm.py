@@ -95,7 +95,9 @@ def fidelity(rows):
 pf_first_db = json.loads((RUN / "pf-fault/db-after-first.json").read_text())
 pf_retry_db = json.loads((RUN / "pf-fault/db-after-retry.json").read_text())
 _, pf_fault_final = pf_rows(RUN / "pf-fault/results.json")
-err_logs = sorted((RUN / "pf-fault" / "home" / "logs").glob("promptfoo-error-*.log"))
+# collect_raw.py publishes the isolated config directory as cfg-home.
+# Match both native and published layouts; the error bytes remain unchanged.
+err_logs = sorted((RUN / "pf-fault").glob("*/logs/promptfoo-error-*.log"))
 d_inf, in_fault = in_rows(one("in-fault/logs/*.json")[0])
 d_nr, in_noretry = in_rows(one("in-fault-noretry/logs/*.json")[0])
 out["failure_log_fidelity"] = {
