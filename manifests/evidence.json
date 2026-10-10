@@ -20047,8 +20047,8 @@
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/primary-source-reading.json",
-      "sha256": "0d6807c6a7dd4e51a46fffd641123a0203749db613bba4d30b60cc6ac1c40eea",
-      "bytes": 445981
+      "sha256": "f0def4209d628725ce790e3dcdfdd576d6e82867235ee4ff9ce96b945caaf15a",
+      "bytes": 447037
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/probes-20261009.json",
@@ -60982,8 +60982,8 @@
     },
     {
       "path": "tests/test_primary_source_reading_counts.py",
-      "sha256": "d5adf976f213cdff48d0c1ec245d58596203760d9f3ffb3253baedbfbc228b88",
-      "bytes": 20294
+      "sha256": "217a4ac2ad8e2e82cb12d051ca771d77d7950905c3f2c7879b622f1e88659290",
+      "bytes": 23507
     },
     {
       "path": "tests/test_promotion_gate.py",

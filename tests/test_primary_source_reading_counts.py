@@ -203,6 +203,10 @@ class ReadingCountsTests(unittest.TestCase):
             with self.subTest(model=model):  # the 5-minute and 1-hour cache writes are priced apart and add up to the total
                 self.assertEqual(tokens["cache_creation_5m_input_tokens"] + tokens["cache_creation_1h_input_tokens"],
                                  tokens["cache_creation_input_tokens"])
+        for model, tokens in usage["advisor_by_model"].items():
+            with self.subTest(advisor=model):
+                self.assertEqual(tokens["cache_creation_5m_input_tokens"] + tokens["cache_creation_1h_input_tokens"],
+                                 tokens["cache_creation_input_tokens"])
         (executor_model,), (advisor_model,) = usage["by_resolved_model"], usage["advisor_by_model"]
         self.assertIn(f"Spend: ${spend['total']} at API list price: ${spend['executor']} for the {model_name(executor_model)} "
                       f"executors and ${spend['advisor']} for the answered {model_name(advisor_model)} advisor calls", record_text())
@@ -250,6 +254,43 @@ class ReadingCountsTests(unittest.TestCase):
                     f"in {advisor['children']} children) and {calls['refused_too_many_requests']} refused as too_many_requests")
         self.assertIn(sentence, self.reading["run"])
         self.assertIn(f"a {sentence}.", record_text())
+
+    def test_only_the_answered_calls_are_billed_and_the_run_text_says_so(self):
+        # The command center's micro of #958 at 7b216145, P3 a: the run text said the 34 refused calls were "all billed at the
+        # advisor's rates", though a refused call carries no usage; only the answered ones bill.
+        run = self.reading["run"]
+        calls = self.reading["usage"]["advisor_calls"]
+        self.assertIn(f"{calls['refused_too_many_requests']} refused as too_many_requests; the answered calls bill at the "
+                      "advisor's rates outside the executors' usage, the refused calls carry no usage and cost nothing", run)
+        self.assertNotIn("all billed", run)
+        ((_, advisor),) = self.reading["usage"]["advisor_by_model"].items()
+        self.assertEqual(advisor["calls"], calls["answered"])  # the billed tokens are the answered calls' only
+
+    def test_the_pricing_read_time_is_a_clock_reading_on_the_date_the_addendum_names(self):
+        # P3 b: a time typed into a script is not a measurement; the field is written by the code that re-read the pages and
+        # checked their hashes, in the same second-resolution form as the other fetch times of the reading.
+        pricing = self.reading["usage"]["pricing"]
+        self.assertRegex(pricing["read_utc"], r"^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ$")
+        self.assertIn(f"rates read {pricing['read_utc'][:10]} from the pricing page", record_text())
+        self.assertIn("re-fetched by the script that wrote this field", pricing["read_note"])
+
+    def test_the_list_price_states_the_speed_it_assumes(self):
+        # P3 d: 24 executor messages record no speed and an advisor iteration records neither speed nor service tier.
+        usage = self.reading["usage"]
+        assumptions = usage["pricing"]["assumptions"]
+        ((_, advisor),) = usage["advisor_by_model"].items()
+        without = assumptions["executor_messages_without_speed"]
+        self.assertGreater(assumptions["executor_messages_with_speed_standard"], 0)
+        self.assertGreater(without, 0)
+        self.assertEqual(assumptions["advisor_iterations_without_speed_or_tier"], advisor["calls"])
+        self.assertLessEqual(Decimal(str(assumptions["executor_messages_without_speed_usd_at_standard_list"])),
+                             published_spend(usage)["executor"])
+        self.assertIn(f"{assumptions['executor_messages_with_speed_standard']} executor messages record speed standard; {without} "
+                      f"record no speed", assumptions["speed"])
+        self.assertIn(f"{assumptions['executor_messages_without_speed_usd_at_standard_list']:.2f} USD of the executors' spend at "
+                      f"standard list", assumptions["speed"])
+        self.assertIn(f"the {assumptions['advisor_iterations_without_speed_or_tier']} advisor iterations record neither speed nor "
+                      f"service tier", assumptions["speed"])
 
     def test_the_addendum_and_the_run_text_state_the_recorded_reader_and_refuter(self):
         recorded = recorded_settings(self.reading["usage"])

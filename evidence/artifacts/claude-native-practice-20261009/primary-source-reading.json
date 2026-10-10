@@ -1,6 +1,6 @@
 {
  "schema": "claude-native-practice-primary-reading/1",
- "run": "wf_bee0b670-035 (2026-10-09 13:48-14:12Z): per source an Opus 5.5 xhigh reader extracted the code and workflow quality practices it states and mapped each to a role slot and client; an Opus 5.5 max refuter re-read the page and refuted each practice by default; kept = not refuted; the children could call the advisor tool, a Fable 5.1 advisor: 63 calls, 29 answered (8 by readers, 21 by refuters, in 28 children) and 34 refused as too_many_requests, all billed at the advisor's rates outside the executors' usage",
+ "run": "wf_bee0b670-035 (2026-10-09 13:48-14:12Z): per source an Opus 5.5 xhigh reader extracted the code and workflow quality practices it states and mapped each to a role slot and client; an Opus 5.5 max refuter re-read the page and refuted each practice by default; kept = not refuted; the children could call the advisor tool, a Fable 5.1 advisor: 63 calls, 29 answered (8 by readers, 21 by refuters, in 28 children) and 34 refused as too_many_requests; the answered calls bill at the advisor's rates outside the executors' usage, the refused calls carry no usage and cost nothing",
  "counts": {
   "sources": 31,
   "practices": 248,
@@ -76,7 +76,7 @@
   },
   "pricing": {
    "source": "https://platform.claude.com/docs/en/about-claude/pricing",
-   "read_utc": "2026-10-10T14:23Z",
+   "read_utc": "2026-10-10T15:24:32Z",
    "page_sha256": "67904e280b595d31f373c857844ed380072ae79d280d8f385640b5992d337ca9",
    "advisor_billing_source": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/advisor-tool (Usage and billing: advisor calls are billed at the advisor model's rates; the top-level usage fields reflect executor tokens only and do not roll the advisor's tokens in)",
    "advisor_page_sha256": "81a97b998b6d8043032a656214e34ffb474b3f4fa37d2724155df396ffefaf5a",
@@ -96,7 +96,16 @@
      "output": 20
     }
    },
-   "method": "tokens times the table's rate per million tokens, summed over the five token classes of each model and rounded to cents after summing; the executor's cache creation is all 5-minute (the record's per-message split)"
+   "method": "tokens times the table's rate per million tokens, summed over the five token classes of each model and rounded to cents after summing; the executor's cache creation is all 5-minute (the record's per-message split)",
+   "read_note": "both pages re-fetched by the script that wrote this field, at this time, and hashed to the values above; the first read, at about 14:23Z, gave the same hashes",
+   "assumptions": {
+    "speed": "standard list rates throughout. 677 executor messages record speed standard; 24 record no speed (service tier standard; 0.85 USD of the executors' spend at standard list) and the 29 advisor iterations record neither speed nor service tier, which the API does not report for an advisor iteration, so the figure assumes standard speed and routing for those",
+    "executor_messages_with_speed_standard": 677,
+    "executor_messages_without_speed": 24,
+    "executor_messages_without_speed_usd_at_standard_list": 0.85,
+    "advisor_iterations_without_speed_or_tier": 29,
+    "modifiers_not_applied": "none recorded: no fast mode and no web tools in the run; cache hits at 0.05x (Opus 5.5) and 0.025x (Fable 5.1) of the base input price are the table's own cache-hit column"
+   }
   },
   "priced_usd_executor_api_list": 63.87,
   "priced_usd_advisor_api_list": 27.64,
