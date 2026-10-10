@@ -4941,8 +4941,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/cross-client.md",
-      "sha256": "24ce9c3d0b3ce48104176d3737a441402524a548fbd2c57af034e93e490460df",
-      "bytes": 2041
+      "sha256": "15d35bfbe868fe724f980dad143a86814df5881a21dd830a990c60a59f3c674c",
+      "bytes": 4483
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/git-github-automation.md",
@@ -60794,6 +60794,11 @@
       "path": "tests/test_native_nautilus_ci.py",
       "sha256": "8997b51d8400a77eb8a182254cd22e348a7cfde967b367373819d5c3af879eea",
       "bytes": 5702
+    },
+    {
+      "path": "tests/test_native_practice_cross_client_sources.py",
+      "sha256": "9577495a5bd7b5c66e5fcb5470c4a99163fc01c84baae0268b08e74790fd0100",
+      "bytes": 4904
     },
     {
       "path": "tests/test_native_practice_doc_corrections.py",
