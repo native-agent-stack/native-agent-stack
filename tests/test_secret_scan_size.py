@@ -25,6 +25,7 @@ from tests.test_gitleaks_config import GH_PAT_SHAPED_VALUE
 
 ROOT = Path(__file__).resolve().parents[1]
 WORKFLOW = ROOT / ".github/workflows/validate.yml"
+DECISION = ROOT / "docs/decisions/2026-10-10-secret-scan-large-targets.md"
 CANARY = GH_PAT_SHAPED_VALUE
 SIZES = (2_000_001, 3_000_000)
 GITLEAKS = shutil.which("gitleaks")
@@ -117,7 +118,7 @@ def scan_fixture(binary, job, mode, size, path="manifests/large-shape.json"):
 class ScannerMechanismSourcesTests(unittest.TestCase):
     def test_decision_cites_betterleaks_native_path_prefilter_and_source_callback(self):
         # betterleaks v1.8.1: translation96-108 -> SkipFunc436-451 -> source callbacks.
-        decision = (ROOT / "docs/decisions/2026-10-10-secret-scan-large-targets.md").read_text()
+        decision = DECISION.read_text()
         prefix = "https://github.com/betterleaks/betterleaks/blob/5eab48332cc48565864514e3bc6de89df091a7c4/"
         for locator in ("config/translate_filters.go#L96", "detect/detect.go#L436",
                         "sources/common.go#L55", "sources/files.go#L117"):
@@ -128,9 +129,62 @@ class ScannerMechanismSourcesTests(unittest.TestCase):
 
     def test_decision_pins_the_gitleaks_path_allowlist_definition(self):
         # gitleaks v8.30.1 defines PathAllowed at136, after the comment at135.
-        decision = (ROOT / "docs/decisions/2026-10-10-secret-scan-large-targets.md").read_text()
+        decision = DECISION.read_text()
         self.assertTrue("https://github.com/gitleaks/gitleaks/blob/83d9cd684c87d95d656c1458ef04895a7f1cbd8e/config/allowlist.go#L136" in decision,
                         "Gitleaks PathAllowed starts at136;135 is its comment")
+
+    def test_decision_distinguishes_git_path_skipping_from_archive_blob_callback(self):
+        # betterleaks v1.8.1 git.go:423 sets Path, :436 skips the entry,
+        # :449-461 handles the archive blob and passes ShouldSkip to File at460.
+        paragraphs = [line for line in DECISION.read_text().splitlines()
+                      if line.startswith("- Betterleaks v1.8.1 translates")]
+        self.assertEqual(len(paragraphs), 1, "Require one explicit pinned Git-source explanation")
+        paragraph = paragraphs[0]
+        self.assertIn("https://github.com/betterleaks/betterleaks/blob/5eab48332cc48565864514e3bc6de89df091a7c4/sources/git.go#L436",
+                      paragraph)
+        self.assertRegex(paragraph,
+            r"callback at :460 is propagated into the archive-blob `File` branch at :449[–-]461; "
+            r"it is not the text-diff path",
+            "Line460 is the archive File callback, not ordinary diff scanning")
+        self.assertIn("sets the changed path at :423", paragraph)
+        self.assertIn("applies `ShouldSkip` to its commit attributes", paragraph)
+
+    def betterleaks_header(self):
+        header = jobs(WORKFLOW.read_text())["secret-scan-betterleaks"].split("\n    steps:\n", 1)[0]
+        return " ".join(line.strip().removeprefix("#").strip()
+                        for line in header.splitlines() if line.lstrip().startswith("#"))
+
+    def test_betterleaks_header_includes_resource_writer_failure_after_successful_scan(self):
+        header = self.betterleaks_header()
+        self.assertIn("verification, scanning or a test run errors", header)
+        self.assertIn("required large-target regression fails", header)
+        self.assertIn("resource-receipt writer fails after a successful scan", header,
+                      "A successful scanner cannot hide a failed resource receipt writer")
+
+    def test_betterleaks_header_binds_hosted_figures_to_the_named_historical_scope(self):
+        header = self.betterleaks_header()
+        self.assertNotIn("hosted-runner figures are pending", header,
+                         "The retained hosted measurement has already completed")
+        self.assertIn("Native hosted full git scan at run38053675250:19.01 s/1,074,456 KiB peak", header)
+        self.assertRegex(header, r"took\s*64 s of\s*1,200 s, including verification/regressions/post steps")
+        self.assertIn("The decision retains scope", header)
+        decision = " ".join(DECISION.read_text().split())
+        self.assertIn("[run38053675250](https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/38053675250)",
+                      decision)
+        self.assertIn("attempt 1, `pull_request`, `refs/pull/964/merge`, exact checkout", decision)
+        self.assertIn("`f2f10412c68a859800b2bcad034c8ab639fd6f2e`", decision,
+                      "The checkout identifies measurement provenance, not a dependency pin")
+        self.assertIn("| betterleaks 1.8.1 git, HEAD ancestry | 19.01 | 1074456 |", decision)
+        self.assertIn("completed SUCCESS in 64 seconds of its 1,200-second limit", decision)
+
+    def test_decision_labels_original_branch_point_and_published_landing_base(self):
+        decision = " ".join(DECISION.read_text().split())
+        self.assertFalse("The current base is main `c8a29c3ee9b4337564165d9e588b3fe81e8ba817`" in decision,
+                         "The original branch point must not be described as the current base")
+        self.assertTrue("The original branch point was main `c8a29c3ee9b4337564165d9e588b3fe81e8ba817`" in decision,
+                        "Retain the original branch point with its historical label")
+        self.assertTrue("The first published landing revision used main `0947b01289dcaa9157aa38392a94cf00f592b86d`" in decision,
+                        "Record the published landing preparation's main base")
 
 
 @unittest.skipUnless(GITLEAKS, "native gitleaks is needed for timer fallback controls")

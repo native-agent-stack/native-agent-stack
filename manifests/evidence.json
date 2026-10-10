@@ -18582,8 +18582,8 @@
     },
     {
       "path": "docs/decisions/2026-10-10-secret-scan-large-targets.md",
-      "sha256": "0996a9cb5686a8a0735d56ae2d25bf8401632dcec7bae9cfdf53b708dc5ba9e2",
-      "bytes": 11810
+      "sha256": "35da27177c245d8030a586831d747489cbbb070c1e100e2d4e808cfe65640950",
+      "bytes": 11911
     },
     {
       "path": "docs/decisions/2026-10-10-skills-claude-native-practice-row.md",
@@ -61107,8 +61107,8 @@
     },
     {
       "path": "tests/test_secret_scan_size.py",
-      "sha256": "12cd68819dad9adc9c15072eea535edb6cbacca81a60b82642b5b81440f0ef66",
-      "bytes": 13809
+      "sha256": "d1d2ba30337805d1717c5916417701e46989a8641efcfe5859d8f6c1e62d3cc1",
+      "bytes": 17626
     },
     {
       "path": "tests/test_security_identity.py",

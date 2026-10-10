@@ -141,8 +141,10 @@ for `platform.system()`'s Linux/Darwin labels. Native Linux step execution
 reproduces GNU format/output/quiet/status behavior; the BSD controls are
 simulations at the external command boundary.
 
-The current base is main `c8a29c3ee9b4337564165d9e588b3fe81e8ba817`. It carries
+The original branch point was main `c8a29c3ee9b4337564165d9e588b3fe81e8ba817`. It carries
 the landed large G5 catalog, strengthening the need to scan large current files.
+The first published landing revision used main
+`0947b01289dcaa9157aa38392a94cf00f592b86d`.
 Scanner versions, event/history scope, archive-depth0, reviewed fingerprints,
 redaction, report-only betterleaks status, permissions and action pins retain
 their existing contract. This change does not perform credential validation or
