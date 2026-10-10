@@ -211,7 +211,8 @@ def build(root: Path, state_root: Path, output_dir: Path, receipt: Path,
               "invocation_source": {key: (model.get("adoption_observation") or {}).get(key) for key in ("path", "sha256", "generated_utc", "window_hours")},
               "role_attribution_sources": [attribution["source"]], "role_attribution": attribution,
                 "modules": [{"path": str(HERE / (name + ".py")), "sha256": hashlib.sha256(policy_module._read_regular(HERE / (name + ".py"), 8 * 1024 * 1024)).hexdigest()} for name in MODULES if (HERE / (name + ".py")).exists()],
-              "sources": model.get("sources"), "inventory_sources": inventory.get("sources"),
+              "sources": model.get("sources"), "excluded_supplements": model.get("excluded_supplements", []),
+              "inventory_sources": inventory.get("sources"),
               "source_policy": dict(reads.policy.receipt),
               "inventory_coverage": inventory.get("coverage"),
               "unapproved_inventory_counts": inventory.get("unapproved_counts", {"total": 0, "by_kind_root": []}),
@@ -241,6 +242,8 @@ def refresh_if_changed(root: Path, state_root: Path, output_dir: Path, receipt: 
         relative = path.relative_to(root).as_posix()
         if policy.protected_path(relative):
             raise policy.SourcePolicyError("protected supplementary catalog excluded before cache access")
+        if reads.excluded_supplement(path) is not None:
+            continue  # reviewed policy exclusion; never opened, so never an input
         role = "architecture_manifest" if path == manifest else "architecture_catalog" if relative in canonical else "architecture_supplement"
         selections.append((path, role))
     selections += [

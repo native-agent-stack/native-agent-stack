@@ -236,7 +236,12 @@ Architecture source, projection and registered receipt selections also bind
 independent exact roles in `source_policy.json` before parsing or hashing.
 The shared bounded reader rejects leaf and ancestor symlinks. A protected or
 unapproved catalog or receipt stops publication while preserving the last
-successful output. Immutable Adoption candidates require the exact
+successful output. The one exception is an exact landscape file listed in
+`architecture_supplement_exclusions` with a reason, never also granted. Both
+landscape globs skip it before any byte access, and the receipt and custody
+section name it. Such a file is either above the unchanged 16 MiB read bound
+or carries no collection the supplement projection reads. Its pin and blob
+hash are recorded in `architecture_derivation_sources`. Immutable Adoption candidates require the exact
 `adoption-now-[a-f0-9]{16}.json` form in the reviewed snapshot directory before
 any byte read; invalid names are ignored, and symlink candidates are refused.
 An approved receipt above its existing read limit remains explicitly unmeasured

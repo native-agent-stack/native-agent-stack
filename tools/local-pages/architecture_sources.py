@@ -370,6 +370,8 @@ def build(root: Path, state_root: Path, asset: Path | None = None, reads=None) -
         for component in row["winners"] + row["candidates"] + row["alternatives"]:
             if repository := _repo(component.get("repository")):
                 by_repo.setdefault(repository, set()).add(row["key"])
+    excluded = []
+    exclusion = getattr(reads, "excluded_supplement", lambda unused: None)
     for path in sorted((root / "catalogs/landscape").glob("*.json")):
         relative = path.relative_to(root).as_posix()
         if relative in documents or path == manifest_path:
@@ -377,6 +379,10 @@ def build(root: Path, state_root: Path, asset: Path | None = None, reads=None) -
         # Protected filenames are excluded from the glob before any byte access.
         if _policy.protected_path(relative):
             raise _policy.SourcePolicyError("protected supplementary catalog excluded before access")
+        # A reviewed policy exclusion is skipped before any byte access.
+        if (reason := exclusion(path)) is not None:
+            excluded.append({"path": relative, "reason": reason})
+            continue
         doc, captured = _json(path, reads, "architecture_supplement")
         sources.append({**captured, "path": relative})
         for collection in ("layers", "rows", "candidates", "components"):
@@ -460,4 +466,4 @@ def build(root: Path, state_root: Path, asset: Path | None = None, reads=None) -
         sources.extend(immutable.get("evidence_sources", []))
         if immutable.get("verified"):
             sources.append(_receipt(Path(immutable["path"]), immutable["path"], reads, "architecture_adoption_snapshot"))
-    return {"schema": "local-architecture-sources/1", "layers": layers, "layer_count": len(layers), "sources": sources, "design": design, "g5": g5, "adoption_program": adoption_program, "command_roles": command_roles, "adoption_observation": observation, "evidence_index": evidence_index, "notes": notes}
+    return {"schema": "local-architecture-sources/1", "layers": layers, "layer_count": len(layers), "sources": sources, "excluded_supplements": excluded, "design": design, "g5": g5, "adoption_program": adoption_program, "command_roles": command_roles, "adoption_observation": observation, "evidence_index": evidence_index, "notes": notes}

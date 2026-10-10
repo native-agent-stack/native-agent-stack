@@ -332,7 +332,9 @@ def render(model: dict, inventory: dict, first_layer: str | None = None,
         for row in unapproved.get("by_kind_root", []) if isinstance(row, dict)
     ) + '</ul>'
     body += '<section id="architecture-unapproved"><h2>Unapproved discoveries</h2><p>' + esc(value(unapproved_total)) + ' unapproved inventory entries; individual names and paths withheld, metadata and content unread. Unavailable directory inventories remain UNREPORTED.</p>' + counts_list + '</section>'
-    custody_detail = '<p>Installed frontend-design metadata: <code>' + design_text + '</code></p>' + _closed("Architecture input custody", len(sources), custody)
+    excluded = [row for row in model.get("excluded_supplements") or [] if isinstance(row, dict)]
+    exclusions = ('<p>Landscape files excluded by the source policy and never opened: ' + "; ".join(f'<code>{esc(row.get("path"))}</code> ({esc(row.get("reason"))})' for row in excluded) + '.</p>') if excluded else ''
+    custody_detail = '<p>Installed frontend-design metadata: <code>' + design_text + '</code></p>' + exclusions + _closed("Architecture input custody", len(sources), custody)
     body += '<section id="architecture-custody"><h2>Builder sources and design provenance</h2>' + _deferred("custody", f'Source custody · {len(sources)} records', custody_detail, detail_outputs) + '</section>'
     receipt = {"canonical_layer_count": len(all_layers), "rendered_layer_count": len(selected), "layer_keys": [row["key"] for row in selected], "mapped_inventory_occurrences": sum(len(items) for items in mapped.values()), "unmapped_inventory_items": len(unmapped), "unapproved_inventory_items": unapproved_total}
     return body, receipt
