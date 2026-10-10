@@ -5201,8 +5201,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "49615d53400ad1938f66dc699bfcce743d994d7ae83a6fbc6766feeed6a81602",
-      "bytes": 41010
+      "sha256": "ca60986ebc5f1f4f55aba9fa619455106764da63a8ded6c3274abe22975070fd",
+      "bytes": 41018
     },
     {
       "path": ".gitignore",
@@ -60952,8 +60952,8 @@
     },
     {
       "path": "scripts/ci_secret_scan_range.py",
-      "sha256": "9683416cc2e8d72137655e69f6cfac347c0f6c8fadbec341403bfbd3f455caf9",
-      "bytes": 6522
+      "sha256": "b3065c95d2cb12d2e073d37ba276481df0c1d9f32c984de2088653b07b7f1000",
+      "bytes": 8149
     },
     {
       "path": "scripts/codex_quota.py",
@@ -61757,8 +61757,8 @@
     },
     {
       "path": "tests/test_ci_secret_scan_range.py",
-      "sha256": "141ff2ad9b4a12a3b299d52b73014db5d51cb90c4bfda4c692d2278ea1f003d7",
-      "bytes": 11095
+      "sha256": "bfc239b9b68c7ba88d6727dfc342594d1bfb93c87f4b0fc9e687aca80bb677ff",
+      "bytes": 13268
     },
     {
       "path": "tests/test_claude_federation_diagnostics.py",
@@ -62007,8 +62007,8 @@
     },
     {
       "path": "tests/test_gitleaks_config.py",
-      "sha256": "048d0f4e35e88f4882abcc9ed99adfffbedba5ce7a18e2aae1ca63a1ea3b8898",
-      "bytes": 80756
+      "sha256": "0357049999e9c662ab6be29d8e828bc7f916ce4c1d9ae3175254383dff925905",
+      "bytes": 83859
     },
     {
       "path": "tests/test_gitleaks_guarded_macos.py",
@@ -62917,8 +62917,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "a2f56fc2eab76e24eaa960116c66c7ae484f2926a10d782e5e1a1019eaf933d3",
-      "bytes": 148549
+      "sha256": "d10e6cfa943d124649d5af3622547dd5b063057fe72e568a1c14c394509dba45",
+      "bytes": 149796
     },
     {
       "path": "tests/test_workflow_policy.py",
