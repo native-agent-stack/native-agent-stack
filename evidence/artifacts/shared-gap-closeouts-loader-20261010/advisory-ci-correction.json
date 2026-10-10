@@ -33,7 +33,7 @@
     "tests": 1,
     "failures": 1,
     "log": "advisory-before.log",
-    "sha256": "5be371b1f413a0c4f0a48ae927d0aa362d6edb70ef7ecc927bd9eaa4e2ec3d1d"
+    "sha256": "a5990dc467c5b27ada0a3333fe085b8e89fe2491c60347a8033c5fb7ac4ab90a"
   },
   "local_final_module": {
     "command": "env PATH=<ci-env>/bin:<existing-PATH> nice -n 10 ionice -c 3 <ci-env>/bin/python -m unittest tests.test_runtime_worker_openhands_push_gate",
@@ -42,7 +42,7 @@
     "skipped": 1,
     "skip_reason": "Existing optional PyYAML reader comparison; PyYAML is not in the pinned CI environment.",
     "log": "advisory-tests.log",
-    "sha256": "9803953c0db1ee2b3f82a0975748d00c52dca8b6bcbc90c889861077c41f02d4"
+    "sha256": "1361383bdb225301ac59d359a6e643e9a11fa6b5d0bb8b7bf3de3f23f28f1165"
   },
   "environment_correction": {
     "install": "uv pip install --python <ci-env>/bin/python --require-hashes -r .github/requirements-ci.txt",
@@ -52,6 +52,11 @@
     "control": "The isolated installed-tool fixture passes with the explicit CI-environment bin PATH, followed by the full touched module.",
     "failed_runs": "Both failed 125-test module outputs remain retained in coordination; no test or gate implementation was relaxed."
   },
-  "log_normalization": "Native fail-before assertions and results are unchanged; personal worktree prefixes use <WORKTREE>.",
+  "log_normalization": "Native assertions and results are unchanged; personal worktree prefixes use <WORKTREE>, and one final blank line in each retained log is removed for the repository whitespace contract.",
+  "format_corrected_at_utc": "2026-10-10T18:38:06Z",
+  "previous_log_bindings": [
+    {"path": "advisory-before.log", "sha256": "5be371b1f413a0c4f0a48ae927d0aa362d6edb70ef7ecc927bd9eaa4e2ec3d1d"},
+    {"path": "advisory-tests.log", "sha256": "9803953c0db1ee2b3f82a0975748d00c52dca8b6bcbc90c889861077c41f02d4"}
+  ],
   "remaining_at_capture": ["Final registered-tree FULL validation", "PR-range gitleaks", "Current-head hosted CI and designated reads", "CC landing"]
 }

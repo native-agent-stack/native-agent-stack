@@ -50352,18 +50352,18 @@
     },
     {
       "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/advisory-before.log",
-      "sha256": "5be371b1f413a0c4f0a48ae927d0aa362d6edb70ef7ecc927bd9eaa4e2ec3d1d",
-      "bytes": 42048
+      "sha256": "a5990dc467c5b27ada0a3333fe085b8e89fe2491c60347a8033c5fb7ac4ab90a",
+      "bytes": 42047
     },
     {
       "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/advisory-ci-correction.json",
-      "sha256": "a8b1e8ea309d488b9068310aea48695c7138227ff424b89c70a083ee4102ebcb",
-      "bytes": 3576
+      "sha256": "5bcac0b88076aa9253367756c57b11f54bf424b28ee1dd71b30c054121e185bc",
+      "bytes": 3976
     },
     {
       "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/advisory-tests.log",
-      "sha256": "9803953c0db1ee2b3f82a0975748d00c52dca8b6bcbc90c889861077c41f02d4",
-      "bytes": 110615
+      "sha256": "1361383bdb225301ac59d359a6e643e9a11fa6b5d0bb8b7bf3de3f23f28f1165",
+      "bytes": 110614
     },
     {
       "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/before.log",
