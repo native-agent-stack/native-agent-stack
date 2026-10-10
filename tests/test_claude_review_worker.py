@@ -77,6 +77,9 @@ with open(os.environ["FAKE_GH_LOG"], "a") as log:
 if path in fx["fail"]:
     sys.stderr.write("gh: HTTP 502\n")
     sys.exit(1)
+if path in fx.get("missing", []):
+    sys.stderr.write("gh: Not Found (HTTP 404)\n")
+    sys.exit(1)
 state_path = os.environ["FAKE_GH_STATE"]
 state = json.load(open(state_path)) if os.path.exists(state_path) else {"statuses": {}, "comments": {}, "next": 1,
                                                                          "reads": {}}
@@ -784,6 +787,30 @@ class ReviewRunTest(unittest.TestCase):
         self.assertNotIn("verify", post)
         self.assertIs(post["superseded"]["comment_marked"], True)
         self.assertEqual(len(h.posts()), 2)  # one status, one comment: nothing posted twice
+
+    def test_a_superseding_patch_ends_on_a_deleted_comment_and_after_its_retry_cap(self):
+        h = Harness(self)
+        repo, sha = self.private(h)
+        h.fixtures.update(heads={"o/priv#3": [sha, sha, self.MOVED]}, missing=["repos/o/priv/issues/comments/2"])
+        h.queue([run_of(REPORT)])
+        h.worker([repo], post=True).tick()
+        self.assertEqual(self.post_states(h, repo, sha)["superseded"]["comment_marked"], "deleted")
+        h.pulls("o/priv", [])
+        h.worker([repo], post=True).tick()
+        self.assertEqual(len([c for c in h.gh_calls() if c["method"] == "PATCH"]), 1)  # no retry of a deleted one
+
+        h2 = Harness(self)
+        repo2, sha2 = self.private(h2)
+        h2.fixtures.update(heads={"o/priv#3": [sha2, sha2, self.MOVED]}, fail=["repos/o/priv/issues/comments/2"])
+        h2.queue([run_of(REPORT)])
+        h2.worker([repo2], post=True).tick()
+        h2.pulls("o/priv", [])
+        for _ in range(crw.PATCH_TRIES + 2):
+            h2.worker([repo2], post=True).tick()
+        superseded = self.post_states(h2, repo2, sha2)["superseded"]
+        self.assertEqual((superseded["comment_marked"], superseded["patch_failures"]), ("gave_up", crw.PATCH_TRIES))
+        self.assertEqual(len([c for c in h2.gh_calls() if c["method"] == "PATCH"]), crw.PATCH_TRIES)
+        self.assertTrue(any("<4>WARNING" in line and "could not be added" in line for line in h2.logs))
 
     def test_a_comment_that_never_reached_github_is_closed_when_its_head_moves(self):
         h = Harness(self)

@@ -105,6 +105,7 @@ DEFAULT_SRT = "~/.local/share/claude-review-worker/srt"
 DEFAULT_NODE = "~/.local/share/mise/installs/node/24.21.0/bin/node"  # the host's mise install (command center)
 NET_DIR_CHARS = 70  # srt puts claude-http-<16 hex>.sock in its TMPDIR; a unix socket path has at most 107 bytes
 BOUNDARY_SECONDS = 90
+PATCH_TRIES = 24  # a superseding PATCH that keeps failing is given up after this many ticks (6 hours at 15 minutes)
 HEAD_LIMIT_BYTES = 600_000_000
 HEAD_LIMIT_FILES = 40_000
 ALLOWED_TOOLS = ("Read", "Glob", "Grep")
@@ -735,7 +736,8 @@ class Boundary:
             shutil.rmtree(net, ignore_errors=True)  # srt 0.0.79 leaves its socket files in TMPDIR
 
     def prefix(self, net: Path) -> list:
-        """env (HOME, TMPDIR and PATH for srt only; the key and the rest pass through) -> node srt --settings -- ..."""
+        """env (HOME, TMPDIR and PATH for srt only) -> node srt --settings -- ... The chain has no key at this point:
+        srt's command is the runner, which injects it below srt (SandboxLauncher.command)."""
         return ["/usr/bin/env", f"HOME={net / 'home'}", f"TMPDIR={net / 't'}", f"PATH={self.node.parent}:{self.search}",
                 str(self.node), str(self.cli), "--settings", str(net / "srt.json"), "--"]
 
@@ -2244,7 +2246,17 @@ class Worker:
             else:
                 superseded["comment_marked"] = "none"
         except (ApiError, OSError, ValueError) as error:
-            self.log(f"{repo.name}#{pr}: the superseded comment is not settled yet ({error}); the next tick retries")
+            if isinstance(error, ApiError) and "HTTP 404" in str(error):
+                superseded["comment_marked"] = "deleted"  # the comment is gone (deleted by hand): nothing to mark
+            else:
+                superseded["patch_failures"] = superseded.get("patch_failures", 0) + 1
+                if superseded["patch_failures"] >= PATCH_TRIES:
+                    superseded["comment_marked"] = "gave_up"
+                    self.log(f"<4>WARNING {repo.name}#{pr}: the superseded line could not be added after "
+                             f"{PATCH_TRIES} tries ({error}); left unmarked; tell the command center")
+                else:
+                    self.log(f"{repo.name}#{pr}: the superseded comment is not settled yet ({error}); the next tick "
+                             "retries")
         post["superseded"] = superseded
         attempt["post"] = post
         self.attempts.save(repo, record)

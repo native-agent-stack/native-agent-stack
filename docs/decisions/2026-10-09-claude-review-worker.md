@@ -145,8 +145,9 @@ requests now. It reuses the repository's own fence: main at the working director
     same lock; the key and the unknown amount come from that debit. A second close, a close with no debit, or a close
     of another workload's debit is refused.
 
-    The reference is the api-actions harness's `common.py`, which is not in git. It is pinned by content: sha256
-    `362cb74c3178a8715a28c97ae5e98dfefe044dfd68f5f09d00a85eb062e99a71`, with `_append` at line 221, `_ledger_lock` at
+    The reference is the api-actions harness's `common.py`, in the harness's local git repository (the coordination
+    record's `harness/`, put under git on 2026-10-10 at commit `d97aad49156570517d9de1dafb3c8e0187bc4812`). It is
+    pinned by that commit and by content: sha256 `362cb74c3178a8715a28c97ae5e98dfefe044dfd68f5f09d00a85eb062e99a71`, with `_append` at line 221, `_ledger_lock` at
     232, `_open_debit` at 257, `settle` at 295, `settle_unknown` at 302 and `void` at 314. A read-only copy of exactly
     that file is kept in the coordination record at `readers/ledger-compat-20261010/common.py.pinned`. Measured on
     2026-10-10 at 10:02Z against this commit's worker (`readers/ledger-compat-20261010/compat.json`; script
@@ -437,11 +438,17 @@ unchanged bwrap fence in srt, Anthropic's sandbox runtime, the runtime Claude Co
 
 - **R1, same-user access to the key.** During a run the key sits in the environment of the sandboxed processes. Any
   host process of the same user can read it there, through `/proc/<pid>/environ`. `credential_run.py` declares same-user
-  processes out of scope, and this worker does not change that. The holders are the runner, the inner bwrap and the
-  client. srt's node process, its shells and its socat bridges start before the key exists and never hold it (the
-  chain order under the network boundary, measured). With no `credentials` block in its settings, srt's credential
-  handling is off (`sandbox-config.ts:1142`, `sandbox-manager.ts:447,463,475,1157-1169` at the pin), and with no
-  `tlsTerminate` its proxy only tunnels, so it never sees a request header or body. (The first srt chain, at
+  processes out of scope, and this worker does not change that. The runner holds the key in its memory (it builds
+  its child's environment and does not set its own); the inner bwrap and the client hold it in their environment,
+  and every child process the client starts inherits it. Claude Code 2.1.296 ships `CLAUDE_CODE_SUBPROCESS_ENV_SCRUB`
+  (the name is in the binary), but what it scrubs for this client's children was not measured, so the worker relies on
+  the fence instead: no Bash, and only Read, Glob and Grep. srt's node process, its shells and its socat bridges start
+  before the key exists and never hold it (the chain order under the network boundary, measured). With no
+  `credentials` block in its settings, srt's credential handling is off (`sandbox-config.ts:1142`,
+  `sandbox-manager.ts:447,463,475,1157-1169` at the pin), and with no `tlsTerminate` its proxy only tunnels, so it
+  never sees a request header or body. srt's own credential masking was weighed and not used: it substitutes the key
+  only over TLS that srt terminates (`sandbox-config.ts:1484-1490`), so its proxy would read every request and header.
+  The runner already masks the key in the client's output. (The first srt chain, at
   d784fe0e, injected the key before srt, so node, srt's shell and its bridges held it; the GPT read at d784fe0e
   found that, and the order was changed.)
 - **R2, shared network: closed by the network boundary below.** Measured before it, on 2026-10-10 at 05:26Z with no
@@ -499,7 +506,8 @@ unchanged bwrap fence in srt, Anthropic's sandbox runtime, the runtime Claude Co
     login. A lost reply or a stopped tick therefore never posts twice. A head move leaves open work in the attempt
     marker (`comment_marked: false`) until GitHub's side is settled: a comment whose POST may have reached GitHub is
     looked up by its marker even though its head moved, and a comment that exists gets the superseded line, retried on
-    later ticks until the PATCH is confirmed (`true`); `none` means GitHub holds no comment of that review. Each tick
+    later ticks until the PATCH is confirmed (`true`); `none` means GitHub holds no comment of that review, `deleted`
+    that the PATCH found the comment gone (HTTP 404), and `gave_up` that 24 tries failed (logged at warning priority). Each tick
     finds open posting work from the stored attempt markers, not from the listed heads, since a moved head is no
     longer listed. Before any POST the attempt is marked `verify: pending`, and only a head read after posting clears
     it (an unchanged head, or the supersession work recorded); a failed final read or a stopped tick leaves it for a
@@ -554,7 +562,7 @@ unchanged bwrap fence in srt, Anthropic's sandbox runtime, the runtime Claude Co
 
 ## Evidence class
 
-- The 87 local tests are `synthetic`: a stand-in gh, a stand-in claude, temporary git origins and mirrors. One test
+- The 88 local tests are `synthetic`: a stand-in gh, a stand-in claude, temporary git origins and mirrors. One test
   drives the real `credential_run.py` and bubblewrap with a fake key in a temporary store. It skips where bubblewrap
   cannot create a user namespace or the host pipes crash dumps, which is the case on GitHub-hosted runners. A second,
   `RealBoundaryChainTest`, adds srt to that chain; it also skips unless `CRW_TEST_SRT` and `CRW_TEST_NODE` name an
@@ -605,9 +613,11 @@ The GPT read of #953 at d784fe0e asked for changes with four P2 findings, fixed 
 - **The ledger reference was not pinned.** It is now pinned by content, with line locators and a read-only copy, and
   the worker was run against it (run step 10). A close of another workload's debit is now refused as well.
 
-**How the guards are tested.** The code guards of both rounds each have a test that fails on a weakened copy: 25
-weakened copies, all failing their named tests (script `readers/crw-mutants-20261010/mutants3.py`, run in a scratch
-copy of the tool and its tests). They cover the code fixes only. The records rule is covered by `RecordRuleTest` and
+**How the guards are tested.** The code guards of the first two rounds have 21 weakened copies, each run against
+its named tests: 25 test runs, all failing (some copies have two named tests; script
+`readers/crw-mutants-20261010/mutants3.py`, run in a scratch copy of the tool and its tests). They cover the code fixes
+only. The later fixes were checked against the worker before them instead: the two final-read regressions and the
+retry-cap test fail on the previous pushed worker, and a line-bound quotation detector fails the wrapped cases. The records rule is covered by `RecordRuleTest` and
 the prior-form check above. The key order is covered by `RealBoundaryChainTest`, shown failing with the runner outside
 srt. The ledger reference is covered by the compatibility run, which is a measurement against the pinned file, not a
 unit test.
