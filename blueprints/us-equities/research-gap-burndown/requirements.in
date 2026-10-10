@@ -1,0 +1,7 @@
+alphalens-reloaded==0.4.6
+arch==8.0.0
+pandas==2.3.3
+pytest==9.1.1
+skfolio==1.8.1
+statsforecast==2.1.1
+statsmodels==0.15.0

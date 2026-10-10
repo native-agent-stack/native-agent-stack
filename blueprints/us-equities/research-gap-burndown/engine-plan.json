@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "engine": "QuantConnect/Lean",
+  "source_commit": "80e7843f645673bcbeaab963049f76f20f6785e1",
+  "algorithm": "FrozenResearchTargets",
+  "period": ["2015-01-02", "2020-12-31"],
+  "selection": "Existing evaluate.py chooser on each six-session-purged WalkForward training fold; same original candidates and episode decisions. No reserved-segment selection.",
+  "portfolio_semantics": "Replay selected exposure targets, with net rebalancing when consecutive episodes coincide. This is a portfolio replay, not the independent reset-to-cash raw-price episode arithmetic.",
+  "timing": "Weights and integer sizing frozen at completed decision-day close; native MarketOnOpenOrder uses a later session's bundled daily open. No opening-auction quality acceptance.",
+  "normalization": "Raw; native factor-file distributions credit cash separately, without double-counting adjusted prices.",
+  "capital_usd": "100000",
+  "sizing_buffer": "0.98",
+  "maximum_target_gross": "1",
+  "cases": [
+    {"id": "zero", "fee_usd": "0", "slippage": "0"},
+    {"id": "stress", "fee_usd": "1", "slippage": "0.002"}
+  ],
+  "pass": "Native completed status, no runtime error or failed data request, every fill bound to an intent at a strictly earlier UTC time, all positions flat, cash = initial - signed fill notional - native fees + native distributions within one cent.",
+  "excluded": ["paper/broker calls", "PIT equity universe", "financing calibration", "participation/depth/capacity", "predictive or alpha acceptance"]
+}

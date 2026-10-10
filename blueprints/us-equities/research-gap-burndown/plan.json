@@ -1,0 +1,234 @@
+{
+  "schema_version": 1,
+  "id": "research-factors-ml-executable-gaps-20261010",
+  "layer": "us-equities/research-factors-ml",
+  "baseline_main": "7a6bfbcf0a4f7201c64e5410c2ccbed1b224b511",
+  "frozen_before_scoring": true,
+  "experiment_class": "non-confirmatory engineering comparison on already-inspected bundled ETFs",
+  "input_plan": "blueprints/us-equities/research-evaluation/plan.json",
+  "input_data_role": "existing QuantConnect bundled SPY/QQQ/IWM prices, dates, volumes and factors; no acquisition, PIT universe or original availability acceptance",
+  "seeds": [
+    260410
+  ],
+  "threads": 2,
+  "assets": [
+    "SPY",
+    "QQQ",
+    "IWM"
+  ],
+  "folds": {
+    "train_size": 252,
+    "test_size": 63,
+    "purge": 6,
+    "reduce_test": true,
+    "selection_boundary": "Training label exit at t+6 must precede first evaluation decision; additionally censor evaluation labels past their own fold boundary.",
+    "forecast_origin": "Each fold's final available training close; forecast purge + 5 sessions and score only first 5 test closes.",
+    "comparison_rows": "Same asset/fold test dates for every candidate and naive. No reserved 2021Q1 inference or retuning.",
+    "cpcv_sensitivity": {
+      "n_folds": 10,
+      "n_test_folds": 2,
+      "purged_size": 6,
+      "embargo_size": 6
+    }
+  },
+  "forecast": {
+    "candidates": [
+      "statsforecast-AutoARIMA",
+      "statsmodels-ARIMA-1-1-0",
+      "chronos-bolt-small",
+      "kronos-small",
+      "last-close-naive"
+    ],
+    "horizon": 5,
+    "context": 252,
+    "error": [
+      "MAE",
+      "MASE using mean absolute training first differences"
+    ],
+    "interval": "Mean paired fold-level absolute-error differences; arch StationaryBootstrap block size 3, 999 reps, seed260410, 95% percentile interval. No independent-fold or superiority assumption.",
+    "chronos": "Native CPU pipeline median quantile; all model training provenance remains unknown.",
+    "kronos": {
+      "T": 1,
+      "top_p": 0.9,
+      "sample_count": 1,
+      "device": "cpu",
+      "max_context": 512
+    }
+  },
+  "candidate_runs": {
+    "alphalens": "Native factor cleaning and five-session raw forward returns with filter_zscore=None, no look-ahead zscore clipping; 3 quantiles for 3 ETFs; per-date factor IC and before-training-boundary slices.",
+    "arch": "Native constant-mean GARCH(1,1) fit on percent daily returns; forecast variance and fixed block bootstrap interval.",
+    "statsmodels": "Native ARIMA(1,1,0) fit/forecast at exact same origin.",
+    "statsforecast": "Native AutoARIMA forecast at exact same origin, n_jobs=1.",
+    "skfolio": "Original1.2.9 WalkForward comparison zero/horizon purge and current1.8.1 CPCV purge/embargo sensitivity.",
+    "claude_trading_skills": "Upstream supplied backtest-expert CLI and its own tests, seeded summary red flags/clean controls. The numeric CLI cannot inspect latent look-ahead input data; record missed defects rather than claim it detects them."
+  },
+  "source_pins": [
+    {
+      "repository": "skfolio/skfolio",
+      "tag": "v1.8.1",
+      "commit": "120880d7fd1cf525a43c46e0c180c45c9b21e4b0",
+      "lookup_attempts": [
+        {
+          "tag": "1.8.1",
+          "exit_code": 1
+        },
+        {
+          "tag": "v1.8.1",
+          "exit_code": 0
+        }
+      ]
+    },
+    {
+      "repository": "bashtage/arch",
+      "tag": "v8.0.0",
+      "commit": "038d78b709e75f2590890757af32705817a6fad8",
+      "lookup_attempts": [
+        {
+          "tag": "8.0.0",
+          "exit_code": 1
+        },
+        {
+          "tag": "v8.0.0",
+          "exit_code": 0
+        }
+      ]
+    },
+    {
+      "repository": "stefan-jansen/alphalens-reloaded",
+      "tag": "0.4.6",
+      "commit": "450a4b28056e1051c5b44a4e1826b8e75dd61e9d",
+      "lookup_attempts": [
+        {
+          "tag": "0.4.6",
+          "exit_code": 0
+        }
+      ]
+    },
+    {
+      "repository": "Nixtla/statsforecast",
+      "tag": "v2.1.1",
+      "commit": "264166ec0ddbfd481ee8e0b71e5ca42d2c0676fc",
+      "lookup_attempts": [
+        {
+          "tag": "v2.1.1",
+          "exit_code": 0
+        }
+      ]
+    },
+    {
+      "repository": "statsmodels/statsmodels",
+      "tag": "v0.15.0",
+      "commit": "278ff9950636cdd4939b4055e339a8e681d79cab",
+      "lookup_attempts": [
+        {
+          "tag": "v0.15.0",
+          "exit_code": 0
+        }
+      ]
+    },
+    {
+      "repository": "amazon-science/chronos-forecasting",
+      "tag": "v2.3.2",
+      "commit": "0aba28e9360b6355d5a919596c90b16c25939f02",
+      "lookup_attempts": [
+        {
+          "tag": "v2.3.2",
+          "exit_code": 0
+        }
+      ]
+    }
+  ],
+  "model_pins": [
+    {
+      "model": "amazon/chronos-bolt-small",
+      "command": [
+        "hf",
+        "models",
+        "info",
+        "amazon/chronos-bolt-small",
+        "--expand",
+        "sha,gated,private,siblings",
+        "--format",
+        "json"
+      ],
+      "exit_code": 0,
+      "sha": "772f3d25d38aec6d914c8949dab4462e2d46f5d8",
+      "gated": false,
+      "private": false,
+      "files": [
+        ".gitattributes",
+        "README.md",
+        "config.json",
+        "model.safetensors"
+      ]
+    },
+    {
+      "model": "NeoQuasar/Kronos-small",
+      "command": [
+        "hf",
+        "models",
+        "info",
+        "NeoQuasar/Kronos-small",
+        "--expand",
+        "sha,gated,private,siblings",
+        "--format",
+        "json"
+      ],
+      "exit_code": 0,
+      "sha": "901c26c1332695a2a8f243eb2f37243a37bea320",
+      "gated": false,
+      "private": false,
+      "files": [
+        ".gitattributes",
+        "README.md",
+        "config.json",
+        "model.safetensors"
+      ]
+    },
+    {
+      "model": "NeoQuasar/Kronos-Tokenizer-base",
+      "command": [
+        "hf",
+        "models",
+        "info",
+        "NeoQuasar/Kronos-Tokenizer-base",
+        "--expand",
+        "sha,gated,private,siblings",
+        "--format",
+        "json"
+      ],
+      "exit_code": 0,
+      "sha": "0e0117387f39004a9016484a186a908917e22426",
+      "gated": false,
+      "private": false,
+      "files": [
+        ".gitattributes",
+        "README.md",
+        "config.json",
+        "model.safetensors"
+      ]
+    }
+  ],
+  "kronos_source": {
+    "repository": "shiyu-coder/Kronos",
+    "commit": "67b630e67f6a18c9e9be918d9b4337c960db1e9a",
+    "path": "model/kronos.py and README.md supported predictor"
+  },
+  "skill_source": {
+    "repository": "tradermonty/claude-trading-skills",
+    "commit": "10c39d2e7c89fce323a0a3d41ab8cbf65caaa255",
+    "path": "skills/backtest-expert/SKILL.md and scripts/evaluate_backtest.py"
+  },
+  "gap_boundaries": {
+    "0": "Genuine dividends/cash engine run required; selected-ETF PIT-universe portion stays open.",
+    "1": "Scope to reproduced chronology and embargo controls, never statistical independence.",
+    "5": "Only actual vendor calls credited; fifteen-candidate statement stays open until all required executions exist.",
+    "6": "Executed same-input candidate comparison, no assumed ranking.",
+    "7": "c13/c16 require real native invocation, source read is insufficient.",
+    "9": "Execution-broker/account owner only; no broker operation in this lane.",
+    "10": "Dividend, fees, financing/capacity portions remain explicit; no synthetic accounting substituted.",
+    "13": "Retain loss intervals and negative/inconclusive outcomes; no manufactured superiority.",
+    "14": "Retain c13 found and missed seeded defects and c16 naive comparison."
+  }
+}

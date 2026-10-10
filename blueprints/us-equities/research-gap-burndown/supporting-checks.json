@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-10",
+  "scope": "Observed installation, native harness and regression results for this isolated research work. Synthetic acceptance fixtures, source review, native executions and unmeasured boundaries remain distinct.",
+  "commands": [
+    {
+      "command": "uv pip sync --python \"$RESEARCH_STATE/envs/.venv-r-gap/bin/python\" --require-hashes blueprints/us-equities/research-gap-burndown/requirements.lock",
+      "exit_code": 0,
+      "observed": "68 packages checked; dependency set unchanged",
+      "upstream": "astral-sh/uv 0.12.22 native pip sync"
+    },
+    {
+      "command": "uv pip sync --python \"$RESEARCH_STATE/envs/.venv-r-gap/bin/python\" --require-hashes -r blueprints/us-equities/research-gap-burndown/requirements.lock",
+      "exit_code": 2,
+      "observed": "unsupported -r for pip sync; corrected with its positional SRC_FILE contract"
+    },
+    {
+      "command": "\"$RESEARCH_STATE/envs/.venv-r-gap/bin/python\" -m pytest -q -p no:cacheprovider skills/backtest-expert/scripts/tests/test_evaluate_backtest.py",
+      "cwd": "$UPSTREAM_ROOT/tradermonty/claude-trading-skills",
+      "exit_code": 0,
+      "observed": "49 passed in 0.21s; PYTHONDONTWRITEBYTECODE=1, no cache provider",
+      "source_pin": "10c39d2e7c89fce323a0a3d41ab8cbf65caaa255"
+    },
+    {
+      "command": "\"$RESEARCH_STATE/sdk/dotnet\" restore Launcher/QuantConnect.Lean.Launcher.csproj --configfile ../NuGet.Config --disable-parallel --verbosity quiet",
+      "exit_code": 134,
+      "observed": "first attempt failed before restore: system ICU missing",
+      "correction": "Native distro package libicu78 78.2-2ubuntu1 was downloaded with apt-get download and extracted into the private SDK prefix using dpkg-deb -x; native DOTNET_ICU_VERSION_OVERRIDE=78 and LD_LIBRARY_PATH select it. No host package installation."
+    },
+    {
+      "command": "apt-get download libicu74",
+      "exit_code": 100,
+      "observed": "package unavailable in this distro; apt-cache search selects libicu78"
+    },
+    {
+      "command": "apt-get download libicu78",
+      "exit_code": 0,
+      "observed": "11.5 MB fetched; private dpkg-deb extraction"
+    },
+    {
+      "command": "\"$RESEARCH_STATE/sdk/dotnet\" restore Launcher/QuantConnect.Lean.Launcher.csproj --configfile ../NuGet.Config --disable-parallel --verbosity quiet",
+      "exit_code": 0,
+      "observed": "with the private ICU78 prefix; public nuget.org is the only configured source",
+      "limits": "Native restore reported package advisories inherited from unmodified upstream. This is no security-only remediation or deployment approval."
+    },
+    {
+      "command": "\"$RESEARCH_STATE/sdk/dotnet\" build Launcher/QuantConnect.Lean.Launcher.csproj --no-restore --disable-build-servers -m:2 --verbosity quiet -p:RunAnalyzers=false",
+      "exit_code": 0,
+      "observed": "500 warnings, zero errors, elapsed 66.18 seconds; native launcher present",
+      "limits": "Compiler analyzers disabled for this isolated engineering build; compiler/NuGet warnings retained separately. Build success alone is not a backtest."
+    },
+    {
+      "command": "python3 -m unittest tests.test_research_gap_burndown -q",
+      "exit_code": 1,
+      "observed": "Default unprovisioned interpreter lacks pandas/numpy; nine import errors, no acceptance credit",
+      "correction": "Use the hash-locked numerical environment; hosted CI already installs pandas/numpy through requirements-calendar.txt."
+    },
+    {
+      "command": "python3 -m unittest tests.test_architecture_pin_source -q",
+      "exit_code": 1,
+      "observed": "Three pin-source locators shifted by three lines when the research layer added three evidence-reference lines. The test detected all three.",
+      "correction": "Advance the three existing location ranges by three; no source pin, verdict, winner or category changes."
+    },
+    {
+      "command": "python3 -m unittest tests.test_architecture_pin_source -q",
+      "exit_code": 0,
+      "observed": "4 passing tests after the three mechanical locator repairs."
+    }
+  ],
+  "failure_notes": [
+    {
+      "kind": "retained_in_runs",
+      "scope": "chronology-frozen-1 pandas3 implicit int-to-float assignment, models-1 missing skfolio, docling-slim missing docling_parse, Ray missing serve extras and overlength Unix socket path, Ray batch interruption without a receipt, engine initialization/fee-currency/data-monitor correction attempts; each actual native failure remains in runs.json"
+    },
+    {
+      "kind": "earlier_session_observation",
+      "scope": "The initial generic PyPI torch installation was interrupted (exit130) when it began CUDA dependencies; model environments then used official CPU wheels. Installing full Docling later resolved CUDA runtime packages in candidate-utils, although its HTML conversion, numerical candidates and Ray did not invoke a GPU. No GPU performance/resource claim follows."
+    },
+    {
+      "kind": "earlier_session_observation",
+      "scope": "An initial candidate-utils resolve from the repository inherited an incompatible scikit-learn constraint; native installation from the external task directory succeeded. The final installed set is recorded without claiming that the failed resolve produced a runnable environment."
+    }
+  ],
+  "regression_source": "blueprints/us-equities/research-gap-burndown/regressions.json",
+  "model_verification": "blueprints/us-equities/research-gap-burndown/sources.json",
+  "canonical_gap_settlement": "Pending the real two-family PR reviews and the separate shared closeout loader. No local script invents review credit."
+}
