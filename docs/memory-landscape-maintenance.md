@@ -116,6 +116,8 @@ ai-memory install-hooks --agent claude-code --capture-assistant --capture-mode a
 ai-memory install-hooks --agent codex --capture-assistant --capture-mode allowlist --config-file CODEX_HOOKS --server-url MEMORY_URL --apply
 ```
 
+**Correction, 2026-10-10 (CC correction #144).** On the current host (ai-memory 2.6.0), `<data_dir>/capture-mode` was absent, so lifecycle capture ran in the default denylist mode and captured every directory, including scratch and test worktrees. The installer writes that file only under `--apply` (ai-memory v2.6.0 `install_hooks.rs:703-710`; the mode is read per event, `hook.rs:1340-1356`). The repair keeps this stack's convention of an untracked, per-checkout marker (`.gitignore:73`): the main checkout carries `.ai-memory.toml` with workspace and project explicit, the one adopted project; lane worktrees, scratch copies and GPT read snapshots carry none and are not captured; the trading repository has no marker, because its research memory goes to Hindsight's `trading-research` bank with exposure tags; then `ai-memory install-hooks --agent claude-code --capture-mode allowlist --server-url MEMORY_URL --apply` with the existing data directory. Codex hooks read the same mode file and need no re-render. Verify with `ai-memory hook --check-capture` in a marked and an unmarked directory, and `ai-memory status` (`capture_mode`).
+
 `CLAUDE_SETTINGS`, `CODEX_HOOKS` and `MEMORY_URL` are host-specific placeholders.
 The upstream installer preserves unrelated hooks and writes a backup. Claude's
 pre-existing prompt-capture opt-out remains off. Both clients' assistant Stop

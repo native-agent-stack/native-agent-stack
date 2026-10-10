@@ -18792,8 +18792,8 @@
     },
     {
       "path": "docs/memory-landscape-maintenance.md",
-      "sha256": "656958c2f7a373052514a8929e880ef7fa933d4e09838e6b90868704f6f73804",
-      "bytes": 13119
+      "sha256": "aabac2066f46a9c5dadf9ca8f75c1b3326c7088e14f9fdeeef89b39235aea60f",
+      "bytes": 14262
     },
     {
       "path": "docs/memory-rag-native-practice.md",
