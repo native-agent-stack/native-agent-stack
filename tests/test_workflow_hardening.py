@@ -1905,6 +1905,34 @@ class AdoptionBootstrapLinuxPolicyTests(unittest.TestCase):
     text = ADOPTION_BOOTSTRAP.read_text(encoding="utf-8")
     job_map = jobs(text)
 
+    def test_restored_macos_job_fails_this_tests_own_assertions(self):
+        mutant = self.text + """
+  bootstrap-macos:
+    runs-on: macos-15
+    permissions: {}
+    steps:
+      - run: echo restored
+"""
+        control = type(self)(
+            "test_bootstrap_linux_stays_path_gated_on_pull_request_and_still_runs_off_it")
+        control.text = mutant
+        control.job_map = jobs(mutant)
+        with self.assertRaises(AssertionError):
+            control.test_bootstrap_linux_stays_path_gated_on_pull_request_and_still_runs_off_it()
+
+    def test_restored_macos_output_fails_this_tests_own_assertions(self):
+        mutant = self.text.replace(
+            "      bootstrap: ${{ steps.filter.outputs.bootstrap }}\n",
+            "      bootstrap: ${{ steps.filter.outputs.bootstrap }}\n"
+            "      macos: ${{ steps.filter.outputs.macos }}\n", 1)
+        self.assertNotEqual(mutant, self.text, "the output mutation must take effect")
+        control = type(self)(
+            "test_bootstrap_linux_stays_path_gated_on_pull_request_and_still_runs_off_it")
+        control.text = mutant
+        control.job_map = jobs(mutant)
+        with self.assertRaises(AssertionError):
+            control.test_bootstrap_linux_stays_path_gated_on_pull_request_and_still_runs_off_it()
+
     def test_pull_request_trigger_has_no_path_filter(self):
         trigger = self.text.split("\non:\n", 1)[1].split("\n\njobs:", 1)[0]
         pull_request = trigger.split("\n  pull_request:", 1)[1].split("\n  schedule:", 1)[0]
@@ -1919,6 +1947,13 @@ class AdoptionBootstrapLinuxPolicyTests(unittest.TestCase):
         self.assertRegex(trigger, r"(?m)^  workflow_dispatch:\s*$")
 
     def test_bootstrap_linux_stays_path_gated_on_pull_request_and_still_runs_off_it(self):
+        self.assertEqual(set(self.job_map), {"changes", "bootstrap-linux"},
+                         "2026-10-10 retirement permits only the detector and Linux bootstrap")
+        outputs = re.search(r"(?m)^    outputs:[ \t]*\n((?:      [^\n]*\n)+)",
+                            self.job_map["changes"])
+        self.assertIsNotNone(outputs, "the detector must declare its bootstrap output")
+        self.assertEqual(set(re.findall(r"(?m)^      ([A-Za-z0-9_-]+):", outputs.group(1))),
+                         {"bootstrap"}, "retired macOS selector outputs must not return")
         # Regression for "bootstrap jobs are skipped on push, schedule and dispatch"
         # (independent review of this branch, 2026-09-25): `needs: changes` alone applies
         # an implicit `success()`, and `changes` itself only runs `if:
@@ -1988,11 +2023,11 @@ class AdoptionBootstrapLinuxPolicyTests(unittest.TestCase):
         self.assertEqual(sorted(normalize(path) for path in push_paths), sorted(job_patterns))
 
     def test_changes_job_fails_safe_on_missing_shas_and_git_diff_errors(self):
-        # Item 2/3 of the independent review: a missing payload SHA or a failed `git
-        # diff` must still write bootstrap=true (never leave the job to fail and skip
-        # the three bootstrap-* jobs through `needs:`), and the diff must be NUL-delimited
-        # so a non-ASCII quoted filename still matches a PATTERNS glob. Since 2026-10-03 every
-        # failure path calls fail_safe, which also writes macos=true for the historical full-mode classifier.
+        # The 2026-09-25 review required fail-open behavior for the three then-active
+        # bootstrap jobs. Since the 2026-10-10 retirement, a missing payload SHA or
+        # failed git diff must still write bootstrap=true for the remaining Linux job.
+        # The NUL-delimited diff keeps non-ASCII filenames matching PATTERNS globs;
+        # every failure path calls fail_safe and writes only the bootstrap output.
         job = self.job_map["changes"]
         script = step_block(job, CHANGES_STEP)
         (set_flags,) = re.findall(r"(?m)^\s+set (-\S+)(?: |$)", script)

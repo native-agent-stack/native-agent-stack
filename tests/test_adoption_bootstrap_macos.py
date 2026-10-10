@@ -753,11 +753,11 @@ class ScriptStructureTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_bootstrap_re_verifies_any_cached_file_via_fetch(self):
-        # Confirms the invariant the step ordering above depends on:
+        # Retained installer invariant after the 2026-10-10 macOS CI retirement:
         # install_embed_model (called unconditionally by bootstrap-macos.sh)
         # routes through fetch(), whose own existing-destination check is a
-        # checksum match, not a bare existence check -- so a cache restore
-        # that lands a WRONG file at the destination is transparently
+        # checksum match, not a bare existence check -- so a cached download
+        # that leaves a WRONG file at the destination is transparently
         # re-downloaded and re-verified, on the exact same path a genuine
         # cache miss already takes, never silently trusted.
         text = SCRIPT_PATH.read_text()
@@ -3801,6 +3801,58 @@ class PlatformPageTests(unittest.TestCase):
                          "docs/decisions/2026-10-10-retire-macos-ci.md")
         self.assertTrue((ROOT / smoke["receipt"]).is_file())
         self.assertTrue(smoke["run_id"])
+
+    def test_grand_catalog_marks_the_hosted_smoke_as_historical(self):
+        handbook = (ROOT / "docs/grand-catalog-handbook.md").read_text(encoding="utf-8")
+        row = next(line for line in handbook.splitlines() if line.startswith("| macOS arm64 |"))
+        self.assertIn("retained historical hosted-runner smoke run", row)
+        self.assertIn("2026-10-10", row)
+        self.assertIn("decisions/2026-10-10-retire-macos-ci.md", row)
+        self.assertNotIn("the current", row)
+
+    def test_retirement_notes_bound_detector_and_capability_guard_claims(self):
+        # These source explanations must distinguish the retired CI consumer from
+        # the portable behavior that remains; executable tests cover that behavior.
+        scopes = {
+            ".github/workflows/adoption-bootstrap.yml": ("# Keep in sync", "PATTERNS=("),
+            "tests/test_workflow_hardening.py": (
+                "    def test_changes_job_fails_safe_on_missing_shas_and_git_diff_errors", "        job ="),
+            "tests/test_adoption_bootstrap_macos.py": (
+                "    def test_bootstrap_re_verifies_any_cached_file_via_fetch", "        text ="),
+            "blueprints/runtime-workers/openhands/resolver/push_gate.py": (
+                "def pattern_lists(code):", "    - the script has no"),
+            "tools/adoption/embed_acceptance.py": ("Never claims Metal vs CPU", "Usage:"),
+            "tests/test_codex_broker_reaper.py": ("# This suite needs /proc", "LINUX_ONLY ="),
+        }
+        for relative, (start, end) in scopes.items():
+            with self.subTest(source=relative):
+                source = (ROOT / relative).read_text(encoding="utf-8")
+                note = source.split(start, 1)[1].split(end, 1)[0]
+                self.assertIn("2026-10-10", note, "retirement explanation needs its as-of date")
+                for stale in ("all bootstraps on main", "the three bootstrap-* jobs",
+                              "also writes macos=true", "step ordering above",
+                              "PATTERNS and\n    MACOS_PATTERNS"):
+                    self.assertNotIn(stale, note)
+        for name in ("test_claude_harness_audit_bounds.py", "test_claude_pr_review_workflow.py",
+                     "test_claude_pr_toolkit_review_workflow.py"):
+            path = ROOT / "tests" / name
+            if path.is_file():
+                with self.subTest(source=name):
+                    note = path.read_text(encoding="utf-8").split("except ImportError:", 1)[1].split("yaml = None", 1)[0]
+                    self.assertIn("2026-10-10", note)
+                    self.assertNotIn("the macOS job installs", note)
+
+    def test_retirement_decision_provides_a_bounded_pinned_inverse(self):
+        decision = (ROOT / "docs/decisions/2026-10-10-retire-macos-ci.md").read_text(encoding="utf-8")
+        self.assertIn("## Executable inverse", decision)
+        inverse = decision.split("## Executable inverse", 1)[1].split("## Validation", 1)[0]
+        for required in ("a56f85e8397751d36fdbdc03910f15ac877ad00c",
+                         "git worktree add", "git restore --source=", "ChangesModeComputationTests",
+                         "test_runtime_worker_openhands_push_gate", "test_runtime_worker_openhands_resolver",
+                         "test_adoption_bootstrap_macos", "evidence_manifest.py --write",
+                         "scripts/validate.py", "native macOS"):
+            self.assertIn(required, inverse)
+        self.assertNotIn("git push", inverse, "restoration rehearsal must stay local")
 
     def test_retired_recording_smoke_keeps_a_portable_python_39_syntax_guard(self):
         # CPython v3.13.16 Lib/ast.py parse and Doc/library/ast.rst:

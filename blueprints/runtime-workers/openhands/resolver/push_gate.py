@@ -540,9 +540,10 @@ def _literal_list_end(code, start):
 def pattern_lists(code):
     """Spans of the bash array literals a script uses only as `case` patterns.
 
-    Such a list names paths to compare with other paths, as the `changes` step of
-    adoption-bootstrap.yml compares `git diff --name-only` output with its PATTERNS and
-    MACOS_PATTERNS globs; the step neither runs nor reads the listed files. A list
+    Such a list names paths to compare with other paths. Since the 2026-10-10 macOS
+    CI retirement, adoption-bootstrap.yml's Linux `changes` step compares NUL-delimited
+    `git diff --name-only` output with PATTERNS; the former MACOS_PATTERNS classifier
+    is historical. The step neither runs nor reads the listed files. A list
     qualifies only when every condition below holds; otherwise its words stay names, so
     the derivation keeps failing closed:
     - the script has no `eval`, no indirect expansion (`${!`) and no nameref;

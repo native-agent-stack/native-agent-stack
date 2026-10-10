@@ -295,7 +295,7 @@ than repeating commands.
 | Platform | Status | What exists |
 | --- | --- | --- |
 | Linux / WSL2 x86_64 | Accepted | [Platform page](../adoption/platforms/linux-wsl2.md), pinned `bootstrap-linux.sh` that fails closed on unpinned components, nightly (06:47 UTC) hosted bootstrap lane |
-| macOS arm64 | Drafted, not accepted | [Platform page](../adoption/platforms/macos-arm64.md), `bootstrap-macos.sh`, the current [hosted-runner smoke run](../evidence/receipts/adoption-macos-hosted-smoke-20260923.json) (run `35875188590`: pinned install, `qdrant`/`llama-embed` LaunchAgents, embedding acceptance, recording smoke); nothing ran on a Mac workstation |
+| macOS arm64 | Drafted, not accepted | [Platform page](../adoption/platforms/macos-arm64.md), `bootstrap-macos.sh`, the [retained historical hosted-runner smoke run](../evidence/receipts/adoption-macos-hosted-smoke-20260923.json) (run `35875188590`: pinned install, `qdrant`/`llama-embed` LaunchAgents, embedding acceptance, recording smoke); CI [retired on 2026-10-10](decisions/2026-10-10-retire-macos-ci.md); nothing ran on a Mac workstation |
 
 The macOS profile targets Apple Silicon with 24 GB of unified memory. Its
 embedding backend is llama.cpp Metal serving embeddinggemma-300M. Moving to

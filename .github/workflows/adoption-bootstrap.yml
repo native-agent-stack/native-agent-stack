@@ -79,8 +79,8 @@ jobs:
           # GitHub runs `shell: bash` as `bash --noprofile --norc -eo pipefail`,
           # so errexit is on unless disabled here. `set +e` turns it off: every
           # failure path below must still reach fail_safe instead of exiting
-          # before writing an output, which is what left the three bootstrap-*
-          # jobs silently skipped (dispatch run 36085789483, recorded in
+          # before writing an output. Historically, on 2026-09-25, the three
+          # bootstrap-* jobs were silently skipped (dispatch run 36085789483, recorded in
           # docs/decisions/2026-09-22-github-automation-closure.md, "validate-macos required (2026-09-25)").
           set +e
           set -uo pipefail
@@ -93,8 +93,9 @@ jobs:
             } >> "$GITHUB_OUTPUT"
             echo "Linux bootstrap selection: run (the changes job failed safe; see its warning)." >> "$summary"
           }
-          # Keep in sync with the push trigger's `paths:` list above (also this
-          # job's own file, so an edit re-runs Linux on PRs and all bootstraps on main pushes).
+          # Keep in sync with the push trigger's `paths:` list above. Since the
+          # 2026-10-10 macOS CI retirement, this detector selects only Linux, including
+          # edits to this workflow on PRs and matching main pushes.
           PATTERNS=(
             'adoption/*'
             'tools/adoption/*'

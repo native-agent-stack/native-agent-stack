@@ -1022,6 +1022,22 @@
       "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
       "evidence_class": "local_integration",
       "scope": "Current-main generated-byte identity after receipt-history merge and retirement doc/name/anchor fixes; no host/model acceptance."
+    },
+    {
+      "recorded_at_utc": "2026-10-10T20:16:20Z",
+      "source_main": "c4f4990737c4e2ed8f0452d069e25a460f897bb5",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "check_command": "python3 scripts/build_new_wsl_handbook.py --check",
+      "check_exit_code": 0,
+      "current_outputs": {
+        "docs/new-wsl-handbook.md": "8b695aa00184b67851ecf1d8e7ed59e03014fa9a48dd90fb9698ef4f8728732b",
+        "docs/new-wsl-handbook.json": "6ad52e89172f10ad0411d6e2c31126c4ff9e749a99bda992cdd0415359be164f"
+      },
+      "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
+      "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
+      "evidence_class": "local_integration",
+      "scope": "CC19:51 landing repair on current main; native write/check confirm unchanged generated hashes. Both main and retirement receipt histories retained; no host/model acceptance."
     }
   ],
   "previous_outputs": [
