@@ -5051,8 +5051,8 @@
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "a870ebb6cf9dc41f93d97754f6565705d4274d5a1fb4a66ce9a6df22fe573e1c",
-      "bytes": 16029
+      "sha256": "e03f249bf55fc44645806a884791604c8c74e6eb40f8e8a031fe4cefde7ef0bb",
+      "bytes": 16283
     },
     {
       "path": ".github/osv-scanner.toml",
@@ -16411,6 +16411,91 @@
       "bytes": 39492
     },
     {
+      "path": "blueprints/us-equities/research-gap-burndown/FrozenResearchTargets.cs",
+      "sha256": "cee40ecca1bfe8f5e66cef45cdbf1d296296b37481a6e68c180e07f80cce6752",
+      "bytes": 5107
+    },
+    {
+      "path": "blueprints/us-equities/research-gap-burndown/README.md",
+      "sha256": "b1aace149fd416d20420c297107876a4e0ec58cc07f83239801f2c627d6be064",
+      "bytes": 11776
+    },
+    {
+      "path": "blueprints/us-equities/research-gap-burndown/candidate_smoke.py",
+      "sha256": "7b0c5ab5caadcf6153f90d86315473b16e9f554c312922ea0b92e43c4dbfb48c",
+      "bytes": 16075
+    },
+    {
+      "path": "blueprints/us-equities/research-gap-burndown/engine-plan.json",
+      "sha256": "088cd67db4bacd6dbde0ae6501558d1047f6a523715fe38146afdfd245e2d5e8",
+      "bytes": 1528
+    },
+    {
+      "path": "blueprints/us-equities/research-gap-burndown/engine_run.py",
+      "sha256": "274c1029a003e7eb17b9b26b19590d0adea4184e2b4829d708be56230a02f78d",
+      "bytes": 14142
+    },
+    {
+      "path": "blueprints/us-equities/research-gap-burndown/environment-versions.json",
+      "sha256": "d0d900b8e7b14292602a9af34046bcba4c6b6d58a3b4261cc39411169bc9b8f2",
+      "bytes": 13964
+    },
+    {
+      "path": "blueprints/us-equities/research-gap-burndown/plan.json",
+      "sha256": "12bf9dc138c7cd8947bd2ef549c3530ae3bf2afe256b0d3fdd2b4f03cf4d3097",
+      "bytes": 7481
+    },
+    {
+      "path": "blueprints/us-equities/research-gap-burndown/publish.py",
+      "sha256": "2dd64e9250c03609e44793d029cca7f780b42a6e3f484ebaa682cd00401f377b",
+      "bytes": 4451
+    },
+    {
+      "path": "blueprints/us-equities/research-gap-burndown/registry-correction.json",
+      "sha256": "c705851a6f632ad1710a97b29a0669b4dafe629fcb21e7148aae4fc28ec845f9",
+      "bytes": 9819
+    },
+    {
+      "path": "blueprints/us-equities/research-gap-burndown/regressions.json",
+      "sha256": "2e00f9c7fdd23fd21d1fb5c26a8748d2a4e3f99ca11ac239b0079acf4671f1ea",
+      "bytes": 9315
+    },
+    {
+      "path": "blueprints/us-equities/research-gap-burndown/requirements.in",
+      "sha256": "d7d8194b68ca6eaae87f1f0e5ce472b65e279663d7b3ccf37851fe1269365edc",
+      "bytes": 122
+    },
+    {
+      "path": "blueprints/us-equities/research-gap-burndown/requirements.lock",
+      "sha256": "85a2fae3b160b620fb6afb57b8124fe68c8ebda5482ce0fa88a74cf7433b2d89",
+      "bytes": 116368
+    },
+    {
+      "path": "blueprints/us-equities/research-gap-burndown/run.py",
+      "sha256": "dcd9e778c1a8f7ba22de84cfd5fea20d89c3ef941aa0ad495d05155522191bbb",
+      "bytes": 25505
+    },
+    {
+      "path": "blueprints/us-equities/research-gap-burndown/runs.json",
+      "sha256": "058c36d351ca4733b6fb630b23b2c6a4a9440c5e26d53b17935bad35cc9e458f",
+      "bytes": 3964059
+    },
+    {
+      "path": "blueprints/us-equities/research-gap-burndown/source-history.json",
+      "sha256": "98a410ed84a91ae95c09167f0d13824f1d6af3ad8623ac94e4d1d0016ee649bc",
+      "bytes": 36669
+    },
+    {
+      "path": "blueprints/us-equities/research-gap-burndown/sources.json",
+      "sha256": "8fad2b1041425a34b8f4711d474a2bed384429fb90e4db847a5158ecd047273f",
+      "bytes": 8982
+    },
+    {
+      "path": "blueprints/us-equities/research-gap-burndown/supporting-checks.json",
+      "sha256": "668d6998eb3b8099d908dd47248c6796e848bf28c1441619c40058117a8d07a2",
+      "bytes": 5645
+    },
+    {
       "path": "blueprints/us-equities/research-runtime/README.md",
       "sha256": "26941ae2c64ec137c3a9dc97e8d766d93cf6bdcb103ee290f871fd0a181f2757",
       "bytes": 9587
@@ -17062,7 +17147,7 @@
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
-      "sha256": "d1ed06b8db2a6de06b4e3e3ff9e7455ffd9a10cafee3cbb0ed0196a6da8c8c9c",
+      "sha256": "3ca25805719a7369c343134195a14607f4dc97cbb0190f594e887218760c0b55",
       "bytes": 326276
     },
     {
@@ -17119,6 +17204,11 @@
       "path": "catalogs/landscape/foundation.json",
       "sha256": "868d193a31080ab913400725140bd0d01e0afe97e28564fd12777f737d22951a",
       "bytes": 479154
+    },
+    {
+      "path": "catalogs/landscape/gap-closeouts/research-factors-ml-2026-10-10.json",
+      "sha256": "b70c9587e6b54429293ead0d25276dc21fc4fbd11b4eac461f33ed938713b1e0",
+      "bytes": 24977
     },
     {
       "path": "catalogs/landscape/gap-crosswalk-92bb279.json",
@@ -17197,8 +17287,8 @@
     },
     {
       "path": "catalogs/landscape/us-equities.json",
-      "sha256": "6aff6411e711dcf3f0a487f343bb0e45c319a0a9235763a54eae9316e1597b0e",
-      "bytes": 457364
+      "sha256": "3016f87f586c9d7e78306c8f100195532f9b37f9c7680bf59b5f5f65a7cf32b6",
+      "bytes": 457576
     },
     {
       "path": "catalogs/saturation/README.md",
@@ -18867,12 +18957,12 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "9a30d61e035bf73abd81aafe34260ab1bb3b6b9fa61247cdbe5ee98d178157ed",
+      "sha256": "92d56b00a7533c6e55263a732c32370b1b1abe18a43b70e703d0b39ac787da1e",
       "bytes": 699356
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "e2212ffd84fbdc7b23fec7d46ed85e557b3550546fc6128be94a416f2e9d999d",
+      "sha256": "6b7f5e7cd635a3f9606c29968dca77ccfe5b61d9ac273c506069113f8212e3be",
       "bytes": 369789
     },
     {
@@ -61026,6 +61116,11 @@
       "bytes": 5563
     },
     {
+      "path": "tests/test_research_gap_burndown.py",
+      "sha256": "38f116ed02f849855e406ed8cfa0571ec6b781727f462c9f7192e28212c5d89b",
+      "bytes": 8702
+    },
+    {
       "path": "tests/test_research_routing_guard.py",
       "sha256": "c6765e7b41d75984e903a4401d01781ee4261f5cab73cc1fcabd159e2470d303",
       "bytes": 12393
@@ -61597,8 +61692,8 @@
     },
     {
       "path": "tools/sota-convergence/blind_checkout.py",
-      "sha256": "780a2b931ecbff453ce4caeeb153614d1dcef98d77b4318687aa592e066f88ce",
-      "bytes": 56215
+      "sha256": "60829099d03922f46d9fe661a07516bab44cadf80936e87869808af889619e15",
+      "bytes": 63860
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",

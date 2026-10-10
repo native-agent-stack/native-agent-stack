@@ -1544,7 +1544,10 @@
         "blueprints/us-equities/engine-nautilus/equity-replay/receipt.json",
         "blueprints/us-equities/historical-simulation/receipt.json",
         "blueprints/us-equities/paper-e2e-20260921/paper-receipt.json",
-        "blueprints/us-equities/research-evaluation/receipt.json"
+        "blueprints/us-equities/research-evaluation/receipt.json",
+        "blueprints/us-equities/research-gap-burndown/README.md",
+        "blueprints/us-equities/research-gap-burndown/runs.json",
+        "catalogs/landscape/gap-closeouts/research-factors-ml-2026-10-10.json"
       ],
       "limitations": [
         "Nautilus 2.0.0rc5 is a prerelease. The old September 19 Nautilus alternative and LEAN default cards remain historical; runtime-target.json governs the current destination.",

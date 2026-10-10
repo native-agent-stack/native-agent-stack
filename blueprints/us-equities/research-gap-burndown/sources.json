@@ -1,0 +1,201 @@
+{
+  "schema_version": 1,
+  "source_role": "Primary release/source identities verified before invocation; installed distributions and public model revisions are recorded independently. Shared mirrors without local tags were not relabelled as a release.",
+  "libraries": [
+    {
+      "candidate_id": "c2",
+      "repository": "https://github.com/man-group/ArcticDB",
+      "version": "6.26.0",
+      "commit": "e620d8572a1e62c9ec07df8cbc8f5c432cd84325",
+      "supported_path": "python/arcticdb/arctic.py; native Arctic.create_library/write/read"
+    },
+    {
+      "candidate_id": "c3",
+      "repository": "https://github.com/sktime/sktime",
+      "version": "1.1.0",
+      "commit": "918fa838d99eb3703fe9bc963891619608aa35b4",
+      "supported_path": "sktime/forecasting/naive.py; NaiveForecaster.fit/predict"
+    },
+    {
+      "candidate_id": "c4",
+      "repository": "https://github.com/stefan-jansen/alphalens-reloaded",
+      "version": "0.4.6",
+      "commit": "450a4b28056e1051c5b44a4e1826b8e75dd61e9d",
+      "supported_path": "alphalens/utils.py and performance.py; factor cleaning and Spearman IC"
+    },
+    {
+      "candidate_id": "c5",
+      "repository": "https://github.com/amazon-science/chronos-forecasting",
+      "version": "2.3.2",
+      "commit": "0aba28e9360b6355d5a919596c90b16c25939f02",
+      "supported_path": "src/chronos/chronos_bolt.py; ChronosBoltPipeline"
+    },
+    {
+      "candidate_id": "c6",
+      "repository": "https://github.com/blue-yonder/tsfresh",
+      "version": "0.21.2",
+      "commit": "6aa24fdef7e3c3f48b19482535693f5796f2b598",
+      "supported_path": "tsfresh/feature_extraction/extraction.py; extract_features with MinimalFCParameters"
+    },
+    {
+      "candidate_id": "c9",
+      "repository": "https://github.com/deepset-ai/haystack",
+      "version": "3.1.1",
+      "commit": "d60cce01a778bc3498a02866fe288b3c07398649",
+      "supported_path": "haystack/components/retrievers/in_memory/bm25_retriever.py; run"
+    },
+    {
+      "candidate_id": "c10",
+      "repository": "https://github.com/online-ml/river",
+      "version": "0.26.1",
+      "commit": "64285b9dd6c606804753235fe992bcf25b9856ee",
+      "supported_path": "river/linear_model/lin_reg.py and preprocessing/scale.py; predict_one then learn_one"
+    },
+    {
+      "candidate_id": "c12",
+      "repository": "https://github.com/Nixtla/statsforecast",
+      "version": "2.1.1",
+      "commit": "264166ec0ddbfd481ee8e0b71e5ca42d2c0676fc",
+      "supported_path": "python/statsforecast/core.py and models.py; StatsForecast.forecast/AutoARIMA"
+    },
+    {
+      "candidate_id": "c13",
+      "repository": "https://github.com/tradermonty/claude-trading-skills",
+      "version": null,
+      "commit": "10c39d2e7c89fce323a0a3d41ab8cbf65caaa255",
+      "supported_path": "skills/backtest-expert/SKILL.md; scripts/evaluate_backtest.py and scripts/tests/test_evaluate_backtest.py"
+    },
+    {
+      "candidate_id": "c14",
+      "repository": "https://github.com/docling-project/docling",
+      "version": "2.129.0",
+      "commit": "890dd42d017497c955a56a1d2cfc3f0af5bc2aa9",
+      "supported_path": "docling/document_converter.py; DocumentConverter HTML/export_to_markdown"
+    },
+    {
+      "candidate_id": "c15",
+      "repository": "https://github.com/bashtage/arch",
+      "version": "8.0.0",
+      "commit": "038d78b709e75f2590890757af32705817a6fad8",
+      "supported_path": "arch/univariate/mean.py; arch/bootstrap/base.py StationaryBootstrap.conf_int"
+    },
+    {
+      "candidate_id": "c16",
+      "repository": "https://github.com/shiyu-coder/Kronos",
+      "version": null,
+      "commit": "67b630e67f6a18c9e9be918d9b4337c960db1e9a",
+      "supported_path": "model/kronos.py and README.md; KronosTokenizer/Kronos/KronosPredictor"
+    },
+    {
+      "candidate_id": "c17",
+      "repository": "https://github.com/ray-project/ray",
+      "version": "2.58.0",
+      "commit": "01b49e4fa77b30bc28c69ed702dfe523fd6421d8",
+      "supported_path": "python/ray/serve/api.py; serve.deployment/start/run/handle and shutdown"
+    },
+    {
+      "candidate_id": "c18",
+      "repository": "https://github.com/google-research/timesfm",
+      "version": "3.0.0",
+      "commit": "331c6d33cb1ac2611de3056d0ac7164aab6301eb",
+      "supported_path": "README.md:150-177; timesfm3 ModelConfig/TimesFM3Evaluator.predict_batch"
+    },
+    {
+      "candidate_id": "c20",
+      "repository": "https://github.com/statsmodels/statsmodels",
+      "version": "0.15.0",
+      "commit": "278ff9950636cdd4939b4055e339a8e681d79cab",
+      "supported_path": "statsmodels/tsa/arima/model.py; ARIMA.fit/forecast"
+    },
+    {
+      "candidate_id": "c21",
+      "repository": "https://github.com/huggingface/sentence-transformers",
+      "version": "6.1.0",
+      "commit": "b0bf39968ba461c34b29372144794eff1be06f6d",
+      "supported_path": "README.md; sentence_transformers/sentence_transformer/model.py encode/similarity"
+    },
+    {
+      "candidate_id": "c23",
+      "repository": "https://github.com/skfolio/skfolio",
+      "version": "1.8.1",
+      "commit": "120880d7fd1cf525a43c46e0c180c45c9b21e4b0",
+      "supported_path": "src/skfolio/model_selection/_walk_forward.py and _combinatorial.py"
+    },
+    {
+      "candidate_id": "c24",
+      "repository": "https://github.com/microsoft/qlib",
+      "version": "0.9.7",
+      "commit": "da920b7f954f48ab1bb64117c976710de198373e",
+      "supported_path": "qlib/data/dataset/processor.py; CSRankNorm"
+    }
+  ],
+  "additional_sources": [
+    {
+      "repository": "https://github.com/skfolio/skfolio",
+      "version": "1.2.9",
+      "commit": "c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
+      "files": "src/skfolio/model_selection/_walk_forward.py and _combinatorial.py; the original hash-locked splitter arm"
+    },
+    {
+      "repository": "https://github.com/pandas-dev/pandas",
+      "version": "3.0.6",
+      "commit": "2905718b126579d2cf0fe5bae05bd75facb67d77",
+      "files": "pandas/core/indexing.py and pandas/core/internals/blocks.py; explicit DataFrame.astype fixes forbidden implicit int-to-float assignment",
+      "reference": "https://pandas.pydata.org/pdeps/0006-ban-upcasting.html"
+    },
+    {
+      "repository": "https://github.com/QuantConnect/Lean",
+      "commit": "80e7843f645673bcbeaab963049f76f20f6785e1",
+      "files": "readme.md; Launcher/QuantConnect.Lean.Launcher.csproj; Common/Orders/Fills/EquityFillModel.cs:482; Common/Orders/Fees/OrderFee.cs:73; Common/Orders/OrderTypes.cs:47; Common/Securities/SecurityPortfolioManager.cs:789; Common/Data/DataMonitor.cs:33,99,195",
+      "scope": "Unmodified vendor source build plus local offline algorithm integration; not a selected engine change"
+    },
+    {
+      "reference": "https://builds.dotnet.microsoft.com/dotnet/release-metadata/10.0/releases.json",
+      "version": "10.0.401",
+      "sdk_sha512": "51c8b999af9e8dd9998c9edc5944e19a90788862068acd38694e098889054ce8c23d4f0c5cccfa16bf187d044562359e5ee69a9f8ad0bbe913ba90311fbce25b",
+      "scope": "Official Linux x64 archive verified before extraction; ICU78 from the distro package was extracted into the private prefix"
+    },
+    {
+      "reference": "https://doi.org/10.1080/01621459.1994.10476870",
+      "authors": "Politis and Romano",
+      "year": 1994,
+      "title": "The Stationary Bootstrap",
+      "verification": "Publisher Crossref DOI metadata matched title/authors/year; computation uses arch's shipped implementation",
+      "scope": "Descriptive dependent-fold uncertainty; no theorem of independence or confirmatory significance"
+    }
+  ],
+  "model_artifacts": [
+    {
+      "model": "amazon/chronos-bolt-small",
+      "revision": "772f3d25d38aec6d914c8949dab4462e2d46f5d8",
+      "required_files_checked": 2
+    },
+    {
+      "model": "NeoQuasar/Kronos-small",
+      "revision": "901c26c1332695a2a8f243eb2f37243a37bea320",
+      "required_files_checked": 2
+    },
+    {
+      "model": "NeoQuasar/Kronos-Tokenizer-base",
+      "revision": "0e0117387f39004a9016484a186a908917e22426",
+      "required_files_checked": 2
+    },
+    {
+      "model": "google/timesfm-3.0-pytorch",
+      "revision": "43046b85ec22d584a13f8098c2ed39c889e129c2",
+      "required_files_checked": 2
+    },
+    {
+      "model": "sentence-transformers/all-MiniLM-L6-v2",
+      "revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+      "required_files_checked": 10
+    }
+  ],
+  "model_verification": {
+    "supported_command": "hf download <model> <explicit files> --revision <immutable revision>; hf cache verify <model> --revision <revision>",
+    "credential_scope": "Fresh task HF_HOME; implicit token disabled; no authentication commands. Inference loads local files on CPU.",
+    "full_repository_verified": false,
+    "missing_files_note": "Verify returned 0 for selected required files and warned about intentionally absent README/alternative-format files.",
+    "pretraining_contamination": "Unknown for all pretrained checkpoints. No fresh out-of-sample or causal alpha inference."
+  }
+}

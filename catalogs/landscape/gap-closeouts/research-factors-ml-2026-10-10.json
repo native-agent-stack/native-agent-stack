@@ -1,0 +1,531 @@
+{
+  "schema_version": 1,
+  "catalog": "us-equities",
+  "layer_id": "research-factors-ml",
+  "date": "2026-10-10",
+  "source_crosswalk_sha256": "bb354c43a6d318c26eaeb889baa30b8006c23a0f3de2e6dfc123d999ad1726b8",
+  "gaps": [
+    {
+      "index": 0,
+      "status": "residual",
+      "reason": "The new LEAN selected-target replay has native raw fills plus separately credited distributions and zero cash residuals in both cost cases. The selected-ETF study still has no point-in-time equity universe; independent episode raw labels are not relabelled total-return performance. These remaining requirements keep the gap residual.",
+      "evidence": [
+        {
+          "path": "blueprints/us-equities/research-gap-burndown/runs.json",
+          "sha256": "058c36d351ca4733b6fb630b23b2c6a4a9440c5e26d53b17935bad35cc9e458f"
+        },
+        {
+          "path": "blueprints/us-equities/research-gap-burndown/engine-plan.json",
+          "sha256": "088cd67db4bacd6dbde0ae6501558d1047f6a523715fe38146afdfd245e2d5e8"
+        }
+      ],
+      "vendor_paths": [
+        {
+          "repository": "https://github.com/QuantConnect/Lean",
+          "pin": "80e7843f645673bcbeaab963049f76f20f6785e1",
+          "path": "Common/Orders/Fills/EquityFillModel.cs:482; Common/Securities/SecurityPortfolioManager.cs:789; Common/Data/DataMonitor.cs:33,99"
+        }
+      ],
+      "source_text_sha256": "f06338eacf83aaa6f0df20983c7752628ddf91c7e5c25fad68ea44ce434c7ae2",
+      "reviews": [],
+      "category": "needs_user_decision"
+    },
+    {
+      "index": 1,
+      "status": "proposed",
+      "reason": "Both native skfolio versions reproduce 24 crossings and selector refusal with zero purge, zero crossings with six-session purge and identical selected arms. Actual fold-boundary labels retain 25 censored episodes. Native CPCV supplies the nonzero-embargo sensitivity because WalkForward has no embargo parameter. This proposes the engineering chronology check; statistical independence remains unestablished.",
+      "evidence": [
+        {
+          "path": "blueprints/us-equities/research-gap-burndown/runs.json",
+          "sha256": "058c36d351ca4733b6fb630b23b2c6a4a9440c5e26d53b17935bad35cc9e458f"
+        },
+        {
+          "path": "blueprints/us-equities/research-gap-burndown/regressions.json",
+          "sha256": "2e00f9c7fdd23fd21d1fb5c26a8748d2a4e3f99ca11ac239b0079acf4671f1ea"
+        },
+        {
+          "path": "blueprints/us-equities/research-gap-burndown/plan.json",
+          "sha256": "12bf9dc138c7cd8947bd2ef549c3530ae3bf2afe256b0d3fdd2b4f03cf4d3097"
+        }
+      ],
+      "vendor_paths": [
+        {
+          "repository": "https://github.com/skfolio/skfolio",
+          "pin": "120880d7fd1cf525a43c46e0c180c45c9b21e4b0",
+          "path": "src/skfolio/model_selection/_walk_forward.py and _combinatorial.py"
+        },
+        {
+          "repository": "https://github.com/skfolio/skfolio",
+          "pin": "c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
+          "path": "src/skfolio/model_selection/_walk_forward.py"
+        }
+      ],
+      "source_text_sha256": "5bb5458c48d3bb9240d42517d174b8f71b27d1e5cf1252df57835eb2590477b9",
+      "reviews": []
+    },
+    {
+      "index": 2,
+      "status": "residual",
+      "reason": "This is a truthful wrapper/upstream attribution statement, not missing executable evidence. Local orchestration owns audit fields; numerical engines and splitters remain vendor-owned.",
+      "evidence": [
+        {
+          "path": "blueprints/us-equities/research-gap-burndown/sources.json",
+          "sha256": "8fad2b1041425a34b8f4711d474a2bed384429fb90e4db847a5158ecd047273f"
+        }
+      ],
+      "vendor_paths": [
+        {
+          "repository": "https://github.com/skfolio/skfolio",
+          "pin": "120880d7fd1cf525a43c46e0c180c45c9b21e4b0",
+          "path": "src/skfolio/model_selection/_walk_forward.py and _combinatorial.py"
+        },
+        {
+          "repository": "https://github.com/skfolio/skfolio",
+          "pin": "c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
+          "path": "src/skfolio/model_selection/_walk_forward.py"
+        }
+      ],
+      "source_text_sha256": "5a93874c915086512a462e6bde468e56298bb1062edad4600ce6e45145d7bcc4",
+      "reviews": [],
+      "category": "not_actionable"
+    },
+    {
+      "index": 3,
+      "status": "blocked",
+      "reason": "An authorized original-as-known historical SEC filing corpus and monitored SEC request identity are absent from this assignment. No new SEC acquisition or contact/credential read occurs.",
+      "evidence": [
+        {
+          "path": "blueprints/us-equities/research-gap-burndown/plan.json",
+          "sha256": "12bf9dc138c7cd8947bd2ef549c3530ae3bf2afe256b0d3fdd2b4f03cf4d3097"
+        }
+      ],
+      "vendor_paths": [
+        {
+          "repository": "https://github.com/dgunning/edgartools",
+          "pin": "1e7a61b3a142dbf5d19bc82444f85239c1786348",
+          "path": "edgar/_filings.py; SEC access policy and filing-availability boundary (source-reviewed, no new acquisition)"
+        }
+      ],
+      "source_text_sha256": "ac7365d98615ee5b631616f7e31fa045d7a58b91586334a5375f064e355f61af",
+      "reviews": [],
+      "category": "needs_user_decision"
+    },
+    {
+      "index": 4,
+      "status": "residual",
+      "reason": "The retained broad-universe negative result remains negative. Current bundled ETF engineering checks cannot establish a signal or retrospectively change its candidate credits.",
+      "evidence": [
+        {
+          "path": "blueprints/us-equities/research-gap-burndown/plan.json",
+          "sha256": "12bf9dc138c7cd8947bd2ef549c3530ae3bf2afe256b0d3fdd2b4f03cf4d3097"
+        }
+      ],
+      "vendor_paths": [
+        {
+          "repository": "https://github.com/skfolio/skfolio",
+          "pin": "120880d7fd1cf525a43c46e0c180c45c9b21e4b0",
+          "path": "src/skfolio/model_selection/_walk_forward.py and _combinatorial.py"
+        },
+        {
+          "repository": "https://github.com/skfolio/skfolio",
+          "pin": "c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
+          "path": "src/skfolio/model_selection/_walk_forward.py"
+        }
+      ],
+      "source_text_sha256": "448c80508ff00f549983395f4595d0e9899acd97a76d85d8f38f861dcae37322",
+      "reviews": [],
+      "category": "not_actionable"
+    },
+    {
+      "index": 5,
+      "status": "proposed",
+      "reason": "All fifteen named candidates have genuine native API executions, including actual model inference/serve handle calls rather than imports. Numerical probes use frozen development inputs; retrieval/conversion/embedding fixtures are explicitly synthetic. This proposes closure of absent-execution claims only. Full Qlib/financial-NLP/serving acceptance and older Haystack/Qlib failed criteria remain unqualified.",
+      "evidence": [
+        {
+          "path": "blueprints/us-equities/research-gap-burndown/runs.json",
+          "sha256": "058c36d351ca4733b6fb630b23b2c6a4a9440c5e26d53b17935bad35cc9e458f"
+        },
+        {
+          "path": "blueprints/us-equities/research-gap-burndown/sources.json",
+          "sha256": "8fad2b1041425a34b8f4711d474a2bed384429fb90e4db847a5158ecd047273f"
+        },
+        {
+          "path": "blueprints/us-equities/research-gap-burndown/plan.json",
+          "sha256": "12bf9dc138c7cd8947bd2ef549c3530ae3bf2afe256b0d3fdd2b4f03cf4d3097"
+        }
+      ],
+      "vendor_paths": [
+        {
+          "repository": "https://github.com/man-group/ArcticDB",
+          "pin": "e620d8572a1e62c9ec07df8cbc8f5c432cd84325",
+          "path": "python/arcticdb/arctic.py; native Arctic.create_library/write/read"
+        },
+        {
+          "repository": "https://github.com/sktime/sktime",
+          "pin": "918fa838d99eb3703fe9bc963891619608aa35b4",
+          "path": "sktime/forecasting/naive.py; NaiveForecaster.fit/predict"
+        },
+        {
+          "repository": "https://github.com/stefan-jansen/alphalens-reloaded",
+          "pin": "450a4b28056e1051c5b44a4e1826b8e75dd61e9d",
+          "path": "alphalens/utils.py and performance.py; factor cleaning and Spearman IC"
+        },
+        {
+          "repository": "https://github.com/amazon-science/chronos-forecasting",
+          "pin": "0aba28e9360b6355d5a919596c90b16c25939f02",
+          "path": "src/chronos/chronos_bolt.py; ChronosBoltPipeline"
+        },
+        {
+          "repository": "https://github.com/blue-yonder/tsfresh",
+          "pin": "6aa24fdef7e3c3f48b19482535693f5796f2b598",
+          "path": "tsfresh/feature_extraction/extraction.py; extract_features with MinimalFCParameters"
+        },
+        {
+          "repository": "https://github.com/deepset-ai/haystack",
+          "pin": "d60cce01a778bc3498a02866fe288b3c07398649",
+          "path": "haystack/components/retrievers/in_memory/bm25_retriever.py; run"
+        },
+        {
+          "repository": "https://github.com/online-ml/river",
+          "pin": "64285b9dd6c606804753235fe992bcf25b9856ee",
+          "path": "river/linear_model/lin_reg.py and preprocessing/scale.py; predict_one then learn_one"
+        },
+        {
+          "repository": "https://github.com/Nixtla/statsforecast",
+          "pin": "264166ec0ddbfd481ee8e0b71e5ca42d2c0676fc",
+          "path": "python/statsforecast/core.py and models.py; StatsForecast.forecast/AutoARIMA"
+        },
+        {
+          "repository": "https://github.com/docling-project/docling",
+          "pin": "890dd42d017497c955a56a1d2cfc3f0af5bc2aa9",
+          "path": "docling/document_converter.py; DocumentConverter HTML/export_to_markdown"
+        },
+        {
+          "repository": "https://github.com/bashtage/arch",
+          "pin": "038d78b709e75f2590890757af32705817a6fad8",
+          "path": "arch/univariate/mean.py; arch/bootstrap/base.py StationaryBootstrap.conf_int"
+        },
+        {
+          "repository": "https://github.com/ray-project/ray",
+          "pin": "01b49e4fa77b30bc28c69ed702dfe523fd6421d8",
+          "path": "python/ray/serve/api.py; serve.deployment/start/run/handle and shutdown"
+        },
+        {
+          "repository": "https://github.com/google-research/timesfm",
+          "pin": "331c6d33cb1ac2611de3056d0ac7164aab6301eb",
+          "path": "README.md:150-177; timesfm3 ModelConfig/TimesFM3Evaluator.predict_batch"
+        },
+        {
+          "repository": "https://github.com/statsmodels/statsmodels",
+          "pin": "278ff9950636cdd4939b4055e339a8e681d79cab",
+          "path": "statsmodels/tsa/arima/model.py; ARIMA.fit/forecast"
+        },
+        {
+          "repository": "https://github.com/huggingface/sentence-transformers",
+          "pin": "b0bf39968ba461c34b29372144794eff1be06f6d",
+          "path": "README.md; sentence_transformers/sentence_transformer/model.py encode/similarity"
+        },
+        {
+          "repository": "https://github.com/microsoft/qlib",
+          "pin": "da920b7f954f48ab1bb64117c976710de198373e",
+          "path": "qlib/data/dataset/processor.py; CSRankNorm"
+        }
+      ],
+      "source_text_sha256": "cb253e9ae7a83153b5e4dd9ad3d9acfe7636e0454c2dd19d9a7feb91fe4af07d",
+      "reviews": []
+    },
+    {
+      "index": 6,
+      "status": "proposed",
+      "reason": "Five same-input native forecast arms have 60 matching cases each, per-fold MAE/MASE and descriptive native block intervals. Chronos, StatsForecast and statsmodels execute at the same origins; observations, dates, scales, model set and exported metric integrity are checked. No ranking/platform/winner flip follows.",
+      "evidence": [
+        {
+          "path": "blueprints/us-equities/research-gap-burndown/runs.json",
+          "sha256": "058c36d351ca4733b6fb630b23b2c6a4a9440c5e26d53b17935bad35cc9e458f"
+        },
+        {
+          "path": "blueprints/us-equities/research-gap-burndown/plan.json",
+          "sha256": "12bf9dc138c7cd8947bd2ef549c3530ae3bf2afe256b0d3fdd2b4f03cf4d3097"
+        },
+        {
+          "path": "blueprints/us-equities/research-gap-burndown/regressions.json",
+          "sha256": "2e00f9c7fdd23fd21d1fb5c26a8748d2a4e3f99ca11ac239b0079acf4671f1ea"
+        }
+      ],
+      "vendor_paths": [
+        {
+          "repository": "https://github.com/Nixtla/statsforecast",
+          "pin": "264166ec0ddbfd481ee8e0b71e5ca42d2c0676fc",
+          "path": "python/statsforecast/core.py; StatsForecast.forecast"
+        },
+        {
+          "repository": "https://github.com/amazon-science/chronos-forecasting",
+          "pin": "0aba28e9360b6355d5a919596c90b16c25939f02",
+          "path": "src/chronos/chronos_bolt.py; ChronosBoltPipeline.predict"
+        },
+        {
+          "repository": "https://github.com/statsmodels/statsmodels",
+          "pin": "278ff9950636cdd4939b4055e339a8e681d79cab",
+          "path": "statsmodels/tsa/arima/model.py; ARIMA.fit/forecast"
+        },
+        {
+          "repository": "https://github.com/bashtage/arch",
+          "pin": "038d78b709e75f2590890757af32705817a6fad8",
+          "path": "arch/bootstrap/base.py; StationaryBootstrap.conf_int"
+        }
+      ],
+      "source_text_sha256": "33eac3c44e6ecbd7fc3422661d822a5f8c1d4204b955e264bd494c9c0eed9c7c",
+      "reviews": []
+    },
+    {
+      "index": 7,
+      "status": "proposed",
+      "reason": "Actual c13 vendor quantitative CLI control/refusal outputs and actual c16 CPU model/naive comparison are retained as current evidence references. c13 is no generative skill review; c16 is worse than naive on this fixture and challenger_preferred is unchanged.",
+      "evidence": [
+        {
+          "path": "blueprints/us-equities/research-gap-burndown/runs.json",
+          "sha256": "058c36d351ca4733b6fb630b23b2c6a4a9440c5e26d53b17935bad35cc9e458f"
+        },
+        {
+          "path": "blueprints/us-equities/research-gap-burndown/sources.json",
+          "sha256": "8fad2b1041425a34b8f4711d474a2bed384429fb90e4db847a5158ecd047273f"
+        },
+        {
+          "path": "blueprints/us-equities/research-gap-burndown/supporting-checks.json",
+          "sha256": "668d6998eb3b8099d908dd47248c6796e848bf28c1441619c40058117a8d07a2"
+        }
+      ],
+      "vendor_paths": [
+        {
+          "repository": "https://github.com/tradermonty/claude-trading-skills",
+          "pin": "10c39d2e7c89fce323a0a3d41ab8cbf65caaa255",
+          "path": "skills/backtest-expert/scripts/evaluate_backtest.py; vendor quantitative CLI/tests"
+        },
+        {
+          "repository": "https://github.com/shiyu-coder/Kronos",
+          "pin": "67b630e67f6a18c9e9be918d9b4337c960db1e9a",
+          "path": "model/kronos.py; KronosTokenizer/Kronos/KronosPredictor"
+        }
+      ],
+      "source_text_sha256": "58a7b8b4b48b61066e1be6b13cf131828451d6b35c4b3ca4eedc082ac3fe5615",
+      "reviews": []
+    },
+    {
+      "index": 8,
+      "status": "residual",
+      "reason": "The old packet citation/version mismatch is a separate catalog source edit. Current release executions are recorded without rewriting the frozen packet or taking portfolio-risk ownership.",
+      "evidence": [
+        {
+          "path": "blueprints/us-equities/research-gap-burndown/sources.json",
+          "sha256": "8fad2b1041425a34b8f4711d474a2bed384429fb90e4db847a5158ecd047273f"
+        }
+      ],
+      "vendor_paths": [
+        {
+          "repository": "https://github.com/skfolio/skfolio",
+          "pin": "120880d7fd1cf525a43c46e0c180c45c9b21e4b0",
+          "path": "src/skfolio/model_selection/_walk_forward.py and _combinatorial.py"
+        },
+        {
+          "repository": "https://github.com/skfolio/skfolio",
+          "pin": "c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
+          "path": "src/skfolio/model_selection/_walk_forward.py"
+        }
+      ],
+      "source_text_sha256": "89c8203a67e291611d906e76bbd9edb7e17cccdbfbaf5cff4f2065b7cfd74d28",
+      "reviews": [],
+      "category": "catalog_edit"
+    },
+    {
+      "index": 9,
+      "status": "blocked",
+      "reason": "Approved execution/account boundary: this research lane cannot route orders or reconcile the owning broker account. Native Nautilus/IBKR and the separately qualified Alpaca path require that execution owner's authority and retained risk/fill/account receipts. No unsupported adapter or broker call is introduced.",
+      "evidence": [
+        {
+          "path": "blueprints/us-equities/research-gap-burndown/plan.json",
+          "sha256": "12bf9dc138c7cd8947bd2ef549c3530ae3bf2afe256b0d3fdd2b4f03cf4d3097"
+        }
+      ],
+      "vendor_paths": [
+        {
+          "repository": "https://github.com/nautechsystems/nautilus_trader",
+          "pin": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+          "path": "nautilus_trader/adapters/interactive_brokers; native RiskEngine and execution/account reconciliation owner boundary"
+        }
+      ],
+      "source_text_sha256": "88ad71754edf15f1de8dbaa9627274a68a658f06d85a692e7b47c3e12031cc49",
+      "reviews": [],
+      "category": "needs_user_decision"
+    },
+    {
+      "index": 10,
+      "status": "residual",
+      "reason": "Native LEAN target replays reconcile distributions, fees, signed fills, flat cash and exported native order identity. Realistic financing, participation/capacity/depth and market-fill calibration remain unmeasured; illustrative costs and three bundled ETFs cannot settle them.",
+      "evidence": [
+        {
+          "path": "blueprints/us-equities/research-gap-burndown/runs.json",
+          "sha256": "058c36d351ca4733b6fb630b23b2c6a4a9440c5e26d53b17935bad35cc9e458f"
+        },
+        {
+          "path": "blueprints/us-equities/research-gap-burndown/engine-plan.json",
+          "sha256": "088cd67db4bacd6dbde0ae6501558d1047f6a523715fe38146afdfd245e2d5e8"
+        }
+      ],
+      "vendor_paths": [
+        {
+          "repository": "https://github.com/QuantConnect/Lean",
+          "pin": "80e7843f645673bcbeaab963049f76f20f6785e1",
+          "path": "Common/Orders/Fills/EquityFillModel.cs:482; Common/Securities/SecurityPortfolioManager.cs:789; Common/Data/DataMonitor.cs:33,99"
+        }
+      ],
+      "source_text_sha256": "e65e53caf1a8b9f99c1a0d168b6f20d9d60df59a5b904fe0c97b89ec5f876284",
+      "reviews": [],
+      "category": "needs_user_decision"
+    },
+    {
+      "index": 11,
+      "status": "residual",
+      "reason": "The inspected 2021Q1 segment cannot become a fresh holdout. Its historical selected momentum diagnostic remains negative; the new run stops at development_end and makes no holdout-restoration claim.",
+      "evidence": [
+        {
+          "path": "blueprints/us-equities/research-gap-burndown/plan.json",
+          "sha256": "12bf9dc138c7cd8947bd2ef549c3530ae3bf2afe256b0d3fdd2b4f03cf4d3097"
+        }
+      ],
+      "vendor_paths": [
+        {
+          "repository": "https://github.com/skfolio/skfolio",
+          "pin": "120880d7fd1cf525a43c46e0c180c45c9b21e4b0",
+          "path": "src/skfolio/model_selection/_walk_forward.py and _combinatorial.py"
+        },
+        {
+          "repository": "https://github.com/skfolio/skfolio",
+          "pin": "c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
+          "path": "src/skfolio/model_selection/_walk_forward.py"
+        }
+      ],
+      "source_text_sha256": "118ccf4da584736d7bd19a9ef42a36353c3ba8916705de37de8e6c72043d9668",
+      "reviews": [],
+      "category": "not_actionable"
+    },
+    {
+      "index": 12,
+      "status": "blocked",
+      "reason": "Original historical filing availability, fuller narratives and a PIT universe need an authorized data/corpus study outside this lane's current input scope. Synthetic text conversion/retrieval probes are no substitute.",
+      "evidence": [
+        {
+          "path": "blueprints/us-equities/research-gap-burndown/plan.json",
+          "sha256": "12bf9dc138c7cd8947bd2ef549c3530ae3bf2afe256b0d3fdd2b4f03cf4d3097"
+        }
+      ],
+      "vendor_paths": [
+        {
+          "repository": "https://github.com/dgunning/edgartools",
+          "pin": "1e7a61b3a142dbf5d19bc82444f85239c1786348",
+          "path": "edgar/_filings.py; SEC access policy and filing-availability boundary (source-reviewed, no new acquisition)"
+        }
+      ],
+      "source_text_sha256": "f74f5f2416f806f83c14143439399c7df70e27efaff52d0e2f4f874ee501ab61",
+      "reviews": [],
+      "category": "needs_user_decision"
+    },
+    {
+      "index": 13,
+      "status": "proposed",
+      "reason": "The prescribed common-input StatsForecast/Chronos/statsmodels arm now retains per-fold losses and native uncertainty intervals. Results are non-confirmatory and checkpoint pretraining contamination is unknown. The proposal credits an executed comparison, including Kronos's negative result, without asserting predictive superiority or qualifying the unmeasured feature/NLP families.",
+      "evidence": [
+        {
+          "path": "blueprints/us-equities/research-gap-burndown/runs.json",
+          "sha256": "058c36d351ca4733b6fb630b23b2c6a4a9440c5e26d53b17935bad35cc9e458f"
+        },
+        {
+          "path": "blueprints/us-equities/research-gap-burndown/plan.json",
+          "sha256": "12bf9dc138c7cd8947bd2ef549c3530ae3bf2afe256b0d3fdd2b4f03cf4d3097"
+        },
+        {
+          "path": "blueprints/us-equities/research-gap-burndown/sources.json",
+          "sha256": "8fad2b1041425a34b8f4711d474a2bed384429fb90e4db847a5158ecd047273f"
+        }
+      ],
+      "vendor_paths": [
+        {
+          "repository": "https://github.com/Nixtla/statsforecast",
+          "pin": "264166ec0ddbfd481ee8e0b71e5ca42d2c0676fc",
+          "path": "python/statsforecast/core.py; StatsForecast.forecast"
+        },
+        {
+          "repository": "https://github.com/amazon-science/chronos-forecasting",
+          "pin": "0aba28e9360b6355d5a919596c90b16c25939f02",
+          "path": "src/chronos/chronos_bolt.py; ChronosBoltPipeline.predict"
+        },
+        {
+          "repository": "https://github.com/statsmodels/statsmodels",
+          "pin": "278ff9950636cdd4939b4055e339a8e681d79cab",
+          "path": "statsmodels/tsa/arima/model.py; ARIMA.fit/forecast"
+        },
+        {
+          "repository": "https://github.com/bashtage/arch",
+          "pin": "038d78b709e75f2590890757af32705817a6fad8",
+          "path": "arch/bootstrap/base.py; StationaryBootstrap.conf_int"
+        }
+      ],
+      "source_text_sha256": "46cd03b3e1994fc37fe7575e0d461c10537ebee351d049f6ab0606786325e15b",
+      "reviews": []
+    },
+    {
+      "index": 14,
+      "status": "proposed",
+      "reason": "c13's supported CLI distinguishes four seeded summary defects from a clean control (27 vs 91), refuses invalid metrics and passes its 49 upstream tests; c16 completes the matched native forecast/naive comparison. The CLI cannot inspect latent label timestamps and grants no deployment authority. This proposes executed control/comparison evidence, not a superior strategy or LLM review.",
+      "evidence": [
+        {
+          "path": "blueprints/us-equities/research-gap-burndown/runs.json",
+          "sha256": "058c36d351ca4733b6fb630b23b2c6a4a9440c5e26d53b17935bad35cc9e458f"
+        },
+        {
+          "path": "blueprints/us-equities/research-gap-burndown/supporting-checks.json",
+          "sha256": "668d6998eb3b8099d908dd47248c6796e848bf28c1441619c40058117a8d07a2"
+        }
+      ],
+      "vendor_paths": [
+        {
+          "repository": "https://github.com/tradermonty/claude-trading-skills",
+          "pin": "10c39d2e7c89fce323a0a3d41ab8cbf65caaa255",
+          "path": "skills/backtest-expert/scripts/evaluate_backtest.py; vendor quantitative CLI/tests"
+        },
+        {
+          "repository": "https://github.com/shiyu-coder/Kronos",
+          "pin": "67b630e67f6a18c9e9be918d9b4337c960db1e9a",
+          "path": "model/kronos.py; KronosTokenizer/Kronos/KronosPredictor"
+        }
+      ],
+      "source_text_sha256": "c7f732efea015062698050c0e3da7940d285b7795981336d6d7a306e63cf2879",
+      "reviews": []
+    },
+    {
+      "index": 15,
+      "status": "residual",
+      "reason": "The original protocol boundary remains in force: a future candidate needs frozen common data/costs, causal availability and independent evidence; it is not a missing executable check that can be declared successful by this smoke.",
+      "evidence": [
+        {
+          "path": "blueprints/us-equities/research-gap-burndown/plan.json",
+          "sha256": "12bf9dc138c7cd8947bd2ef549c3530ae3bf2afe256b0d3fdd2b4f03cf4d3097"
+        }
+      ],
+      "vendor_paths": [
+        {
+          "repository": "https://github.com/skfolio/skfolio",
+          "pin": "120880d7fd1cf525a43c46e0c180c45c9b21e4b0",
+          "path": "src/skfolio/model_selection/_walk_forward.py and _combinatorial.py"
+        },
+        {
+          "repository": "https://github.com/skfolio/skfolio",
+          "pin": "c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
+          "path": "src/skfolio/model_selection/_walk_forward.py"
+        }
+      ],
+      "source_text_sha256": "f9b6d537e4669910ff7afd671744bb85245f00cd4f3c5b412480f68280369798",
+      "reviews": [],
+      "category": "not_actionable"
+    }
+  ]
+}

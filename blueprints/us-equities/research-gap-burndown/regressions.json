@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "command_scope": "Observed native red controls against the retained old comparison wrapper, and the historical pandas assignment restored for the dtype case; no implementation files were reverted.",
+  "native_runs": [
+    {
+      "schema_version": 1,
+      "python": "3.12.3",
+      "scope": "Separate native regressions against the retained pre-contract wrapper; dtype case restores the failed historical pandas assignment.",
+      "cases": [
+        {
+          "case": "test_entire_missing_arm_cannot_silently_change_the_plan",
+          "expected": "one AssertionError before fix",
+          "failures": 1,
+          "errors": 0,
+          "exit_code": 1,
+          "observed": "F\n======================================================================\nFAIL: test_entire_missing_arm_cannot_silently_change_the_plan (gap_controls.MatchedForecastTests.test_entire_missing_arm_cannot_silently_change_the_plan)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"~/code/native-agent-stack.codex-ns2604-research-factors-ml-gaps-20261010/tests/test_research_gap_burndown.py\", line 57, in test_entire_missing_arm_cannot_silently_change_the_plan\n    with self.assertRaisesRegex(ValueError, \"prespecified\"):\nAssertionError: ValueError not raised\n\n----------------------------------------------------------------------\nRan 1 test in 3.591s\n\nFAILED (failures=1)\n"
+        },
+        {
+          "case": "test_same_prices_on_different_dates_are_not_common_targets",
+          "expected": "one AssertionError before fix",
+          "failures": 1,
+          "errors": 0,
+          "exit_code": 1,
+          "observed": "F\n======================================================================\nFAIL: test_same_prices_on_different_dates_are_not_common_targets (gap_controls.MatchedForecastTests.test_same_prices_on_different_dates_are_not_common_targets)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"~/code/native-agent-stack.codex-ns2604-research-factors-ml-gaps-20261010/tests/test_research_gap_burndown.py\", line 63, in test_same_prices_on_different_dates_are_not_common_targets\n    with self.assertRaisesRegex(ValueError, \"input|chronology\"):\nAssertionError: ValueError not raised\n\n----------------------------------------------------------------------\nRan 1 test in 0.194s\n\nFAILED (failures=1)\n"
+        },
+        {
+          "case": "test_different_training_scale_is_refused",
+          "expected": "one AssertionError before fix",
+          "failures": 1,
+          "errors": 0,
+          "exit_code": 1,
+          "observed": "F\n======================================================================\nFAIL: test_different_training_scale_is_refused (gap_controls.MatchedForecastTests.test_different_training_scale_is_refused)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"~/code/native-agent-stack.codex-ns2604-research-factors-ml-gaps-20261010/tests/test_research_gap_burndown.py\", line 69, in test_different_training_scale_is_refused\n    with self.assertRaisesRegex(ValueError, \"scale|metric\"):\nAssertionError: ValueError not raised\n\n----------------------------------------------------------------------\nRan 1 test in 0.225s\n\nFAILED (failures=1)\n"
+        },
+        {
+          "case": "test_corrupted_exported_score_is_refused",
+          "expected": "one AssertionError before fix",
+          "failures": 1,
+          "errors": 0,
+          "exit_code": 1,
+          "observed": "F\n======================================================================\nFAIL: test_corrupted_exported_score_is_refused (gap_controls.MatchedForecastTests.test_corrupted_exported_score_is_refused)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"~/code/native-agent-stack.codex-ns2604-research-factors-ml-gaps-20261010/tests/test_research_gap_burndown.py\", line 75, in test_corrupted_exported_score_is_refused\n    with self.assertRaisesRegex(ValueError, \"metric\"):\nAssertionError: ValueError not raised\n\n----------------------------------------------------------------------\nRan 1 test in 0.229s\n\nFAILED (failures=1)\n"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "python": "3.13.16",
+      "scope": "Separate native regressions against the retained pre-contract wrapper; dtype case restores the failed historical pandas assignment.",
+      "cases": [
+        {
+          "case": "pandas3 historical integer-assignment negative control",
+          "exit_code": 1,
+          "failures": 0,
+          "errors": 1,
+          "observed": "E\n======================================================================\nERROR: test_pandas_integer_price_columns_are_explicitly_converted (gap_controls.ChronologyTests.test_pandas_integer_price_columns_are_explicitly_converted)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"~/.local/state/native-agent-stack/coordination/ns2604-coop/lanes/tradingview-rd-gap-work/envs/.venv-r-frozen/lib/python3.13/site-packages/pandas/core/indexing.py\", line 2144, in _setitem_single_column\n    self.obj._mgr.column_setitem(\n    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^\n        loc, plane_indexer, value, inplace_only=True\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"~/.local/state/native-agent-stack/coordination/ns2604-coop/lanes/tradingview-rd-gap-work/envs/.venv-r-frozen/lib/python3.13/site-packages/pandas/core/internals/managers.py\", line 1539, in column_setitem\n    col_mgr.setitem_inplace(idx, value)\n    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^\n  File \"~/.local/state/native-agent-stack/coordination/ns2604-coop/lanes/tradingview-rd-gap-work/envs/.venv-r-frozen/lib/python3.13/site-packages/pandas/core/internals/managers.py\", line 2241, in setitem_inplace\n    value = np_can_hold_element(arr.dtype, value)\n  File \"~/.local/state/native-agent-stack/coordination/ns2604-coop/lanes/tradingview-rd-gap-work/envs/.venv-r-frozen/lib/python3.13/site-packages/pandas/core/dtypes/cast.py\", line 1725, in np_can_hold_element\n    raise LossySetitemError\npandas.errors.LossySetitemError\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \"~/code/native-agent-stack.codex-ns2604-research-factors-ml-gaps-20261010/tests/test_research_gap_burndown.py\", line 113, in test_pandas_integer_price_columns_are_explicitly_converted\n    result = RUN.convert_price_units(frame)\n  File \"~/.local/state/native-agent-stack/coordination/ns2604-coop/lanes/tradingview-rd-gap-work/regression_proofs.py\", line 40, in old_price_assignment\n    frame.loc[:, fields] = frame.loc[:, fields] / 10000\n    ~~~~~~~~~^^^^^^^^^^^\n  File \"~/.local/state/native-agent-stack/coordination/ns2604-coop/lanes/tradingview-rd-gap-work/envs/.venv-r-frozen/lib/python3.13/site-packages/pandas/core/indexing.py\", line 938, in __setitem__\n    iloc._setitem_with_indexer(indexer, value, self.name)\n    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~/.local/state/native-agent-stack/coordination/ns2604-coop/lanes/tradingview-rd-gap-work/envs/.venv-r-frozen/lib/python3.13/site-packages/pandas/core/indexing.py\", line 1953, in _setitem_with_indexer\n    self._setitem_with_indexer_split_path(indexer, value, name)\n    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^\n  File \"~/.local/state/native-agent-stack/coordination/ns2604-coop/lanes/tradingview-rd-gap-work/envs/.venv-r-frozen/lib/python3.13/site-packages/pandas/core/indexing.py\", line 1988, in _setitem_with_indexer_split_path\n    self._setitem_with_indexer_frame_value(indexer, value, name)\n    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^\n  File \"~/.local/state/native-agent-stack/coordination/ns2604-coop/lanes/tradingview-rd-gap-work/envs/.venv-r-frozen/lib/python3.13/site-packages/pandas/core/indexing.py\", line 2120, in _setitem_with_indexer_frame_value\n    self._setitem_single_column(loc, val, pi)\n    ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^\n  File \"~/.local/state/native-agent-stack/coordination/ns2604-coop/lanes/tradingview-rd-gap-work/envs/.venv-r-frozen/lib/python3.13/site-packages/pandas/core/indexing.py\", line 2163, in _setitem_single_column\n    raise TypeError(\n        f\"Invalid value '{value}' for dtype '{dtype}'\"\n    ) from exc\nTypeError: Invalid value '0    10.0001\n1    10.0002\nName: open, dtype: float64' for dtype 'int64'\n\n----------------------------------------------------------------------\nRan 1 test in 0.869s\n\nFAILED (errors=1)\n"
+        }
+      ]
+    }
+  ],
+  "green_observed": {
+    "command": "\"$RESEARCH_STATE/envs/.venv-r-gap/bin/python\" -m unittest tests.test_research_gap_burndown tests.test_research_evaluation -q",
+    "exit_code": 0,
+    "tests": 28,
+    "source_role": "actual changed module plus reused evaluator helper module",
+    "pandas3_command": "\"$RESEARCH_STATE/envs/.venv-r-frozen/bin/python\" -m unittest tests.test_research_gap_burndown -q",
+    "pandas3_exit_code": 0,
+    "pandas3_tests": 16
+  }
+}
