@@ -5100,16 +5100,6 @@
       "bytes": 27093
     },
     {
-      "path": ".github/workflows/claude-pr-review.yml",
-      "sha256": "4af34f6f3ef8e0d4cf3d3411cfe9673c4e2c13d6c0ef488ff8fca031ca4159fb",
-      "bytes": 38394
-    },
-    {
-      "path": ".github/workflows/claude-pr-toolkit-review.yml",
-      "sha256": "cf5687fcf020602454a9325babd17eb0efb8c3dea024d2ac51e81b297cdd62d5",
-      "bytes": 33998
-    },
-    {
       "path": ".github/workflows/dependency-review.yml",
       "sha256": "861a5e0eb2dd6e1d253e43c67602fcada04f80cac0ac379b0268db480812e889",
       "bytes": 1549
@@ -5123,11 +5113,6 @@
       "path": ".github/workflows/hardware-profile-smoke.yml",
       "sha256": "17264678834e8c4ef47f0bc0820a980310eb71676db5f07500358119b53b3753",
       "bytes": 5951
-    },
-    {
-      "path": ".github/workflows/harness-audit.yml",
-      "sha256": "d6164e93308aacab059ddc87dc2c1e8400f6d6b610a5621ed08eb8334731bb82",
-      "bytes": 18984
     },
     {
       "path": ".github/workflows/native-foundation-e2e.yml",
@@ -18467,13 +18452,13 @@
     },
     {
       "path": "docs/decisions/2026-10-08-claude-actions-harness-audit-bounds.md",
-      "sha256": "ef673655372a73f343ca49820170813323d819428f01b5fb524c9ebecaad8371",
-      "bytes": 64003
+      "sha256": "58c59a2015fe41eca86f7165524c30a6f99aeaeabf9cd3e2387c50b2e422d874",
+      "bytes": 64238
     },
     {
       "path": "docs/decisions/2026-10-08-claude-actions-pr-review.md",
-      "sha256": "0716dfb6e389ccc5df9bd95027ed8ae718712f446cffacf02bb8aad4fc0103c9",
-      "bytes": 64811
+      "sha256": "3016f89d0d0aa2a1dca4364f48095ca987021b0b673c0e9a4ac4aa612248748d",
+      "bytes": 65046
     },
     {
       "path": "docs/decisions/2026-10-08-coordinator-research-routing.md",
@@ -18482,8 +18467,8 @@
     },
     {
       "path": "docs/decisions/2026-10-08-decision-record-index.md",
-      "sha256": "28e2f6152faeee1fa1e3dc8f845b7d0f6a4624c4e60197b4ab26e25dc685afcb",
-      "bytes": 23340
+      "sha256": "ec71e9950b00eb41ee13d463b43efcb8e75a36141ffa6103ab7d500a91c34dd1",
+      "bytes": 23664
     },
     {
       "path": "docs/decisions/2026-10-08-dependabot-frozen-evidence-ignore.md",
@@ -18537,8 +18522,8 @@
     },
     {
       "path": "docs/decisions/2026-10-09-claude-actions-pr-toolkit-review.md",
-      "sha256": "5d731fdf84182f4d59d712c2929a444a64eac3d1d99a2d95f8d8fa4ffdf7e63a",
-      "bytes": 50213
+      "sha256": "2d0ca5c7a3343feb138bdff3c1394563fad33ed7fcf7563655f92ca80a065cb6",
+      "bytes": 50448
     },
     {
       "path": "docs/decisions/2026-10-09-claude-code-floor.md",
@@ -18587,8 +18572,8 @@
     },
     {
       "path": "docs/decisions/2026-10-10-claude-federation-diagnostics.md",
-      "sha256": "6ea3a1e4141991834586a4c5ae798d2a8f54888e4e601ce481b1829cd256babc",
-      "bytes": 10511
+      "sha256": "0a04e1b45c967eed92d4060c6c98b9a42885fbc93b649bb7409036aa89b00a8d",
+      "bytes": 10746
     },
     {
       "path": "docs/decisions/2026-10-10-codex-lane-omniroute.md",
@@ -18599,6 +18584,11 @@
       "path": "docs/decisions/2026-10-10-openhands-shard-discovery-protection.md",
       "sha256": "634ea007962339fed50e933bdc7d407da28041b0cb21c610215f47a4455138e6",
       "bytes": 2956
+    },
+    {
+      "path": "docs/decisions/2026-10-10-retire-in-github-claude-review.md",
+      "sha256": "7c7891c87e3d3e8b5616ea4c8d4295852bfeb937f6fa3634f91d1c85add9dbec",
+      "bytes": 5554
     },
     {
       "path": "docs/decisions/2026-10-10-retire-macos-ci.md",
@@ -18757,8 +18747,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "7d71f56538d3ce5092a6c359f40dd2bd92c85e008c170c5a213feebc959880aa",
-      "bytes": 106792
+      "sha256": "f97421f868c773a79f34152d0aba632d18060fa2dcfef11d898f458ccc694fac",
+      "bytes": 102811
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -60231,6 +60221,11 @@
       "bytes": 304
     },
     {
+      "path": "tests/local_pages_architecture_policy_fixture.py",
+      "sha256": "903c8e73e8596f943a3073312539a7f721a5613b9d22a8c35e385677c27e9271",
+      "bytes": 4506
+    },
+    {
       "path": "tests/test_active_recovery_plans.py",
       "sha256": "ac2228a5a5bed963bb60e1af589eecb7bea87acdd57b48b57a66abeb25a7d42f",
       "bytes": 3143
@@ -60522,23 +60517,8 @@
     },
     {
       "path": "tests/test_claude_federation_diagnostics.py",
-      "sha256": "6613ea97a1783efa3382caae809583e695c19d4a8e8a10e40623cadd24946f22",
-      "bytes": 9225
-    },
-    {
-      "path": "tests/test_claude_harness_audit_bounds.py",
-      "sha256": "3988534938485b505a56046e0c445b5697f7bbf2a69a36faab4a71ccbdc08bc8",
-      "bytes": 32827
-    },
-    {
-      "path": "tests/test_claude_pr_review_workflow.py",
-      "sha256": "1a2f3a896e2dada0b6dba3b302ac3c33c651f014749e6dd8b135f24dd37ee93c",
-      "bytes": 60732
-    },
-    {
-      "path": "tests/test_claude_pr_toolkit_review_workflow.py",
-      "sha256": "90d16ab529144877130d7469de05b4bf72cf97ce68d04bf65a4cf808111bd132",
-      "bytes": 76486
+      "sha256": "39a3f0dc6bed95370c93eac56449fa3e61c54d66edd8de35293a81991c63fdf1",
+      "bytes": 4234
     },
     {
       "path": "tests/test_claude_recovery.py",
@@ -60924,6 +60904,11 @@
       "path": "tests/test_local_inference_latest_20260926.py",
       "sha256": "de493d86ef8944dbf5f31c5792a2f112752c02a505c22f89332322e72dabfce6",
       "bytes": 74274
+    },
+    {
+      "path": "tests/test_local_pages_architecture_inventory.py",
+      "sha256": "1a2773d02b7e08c26a31174fd057fd9063d5eb6c9f666d5acf6120d4bb471e6a",
+      "bytes": 30478
     },
     {
       "path": "tests/test_local_pages_architecture_landscape_exclusions.py",
@@ -61527,8 +61512,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "35bb090e23ca13f4f0cd20ce830761a9623be7f598a702c03999e50ee4c281e1",
-      "bytes": 136317
+      "sha256": "b40717ecd89db4618ecaa05aa47311f32ad0e1a51c48754f372254d463451dda",
+      "bytes": 134063
     },
     {
       "path": "tests/test_workflow_policy.py",
@@ -61542,8 +61527,8 @@
     },
     {
       "path": "tests/test_workflow_security_coverage.py",
-      "sha256": "4e11c6592c56636c1e557eb93ffb745a2703a4ee87565259568418e51d7bde29",
-      "bytes": 13398
+      "sha256": "8f1b6e166d31f368e123f0befe807d1f60f5a38cf529e0399750fc7651ddcc22",
+      "bytes": 11617
     },
     {
       "path": "tests/test_wsl_memory_maintenance.py",
@@ -61781,9 +61766,14 @@
       "bytes": 5161
     },
     {
+      "path": "tools/local-pages/architecture_mapping.json",
+      "sha256": "0f214a70422673e880515633c5d50f994c85264e4cf68f854ea7abd44601de0b",
+      "bytes": 24486
+    },
+    {
       "path": "tools/local-pages/source_policy.json",
-      "sha256": "af2b24cf4047d75a058e20e83f8417e4aedf039b6f51f1d75dff53e7796ca32a",
-      "bytes": 757349
+      "sha256": "93e75fc0d22f91dadbb680b05c9753a002b7c5b730566c18106583489382f558",
+      "bytes": 757058
     },
     {
       "path": "tools/omniroute/gateway_record.py",

@@ -124,13 +124,13 @@
     },
     {
       "kinds": ["workflow"],
-      "names": ["action-compatibility", "adoption-bootstrap", "catalog-freshness", "dependency-review", "frozen-evidence-risk", "hardware-profile-smoke", "harness-audit", "native-foundation-e2e", "native-offhost-app-state", "native-offhost-restore", "native-service-reboot", "native-token-e2e", "practice-references-freshness", "publish-catalog", "receipt-staleness", "runtime-worker-skills-freshness", "saturation-tracking", "scorecard", "security-scan", "sota-sources-gate", "supply-chain", "token-report", "validate"],
+      "names": ["action-compatibility", "adoption-bootstrap", "catalog-freshness", "dependency-review", "frozen-evidence-risk", "hardware-profile-smoke", "native-foundation-e2e", "native-offhost-app-state", "native-offhost-restore", "native-service-reboot", "native-token-e2e", "practice-references-freshness", "publish-catalog", "receipt-staleness", "runtime-worker-skills-freshness", "saturation-tracking", "scorecard", "security-scan", "sota-sources-gate", "supply-chain", "token-report", "validate"],
       "layer_keys": ["foundation/ci-supply-chain"],
       "reason": "These exact GitHub workflow filenames are repository CI surfaces; workflow presence and pinned actions do not establish a passing run.",
       "source_refs": ["catalogs/landscape/foundation.json#/layers/11", ".github/workflows"]
     },
     {
-      "kinds": ["workflow"], "names": ["native-foundation-e2e", "native-token-e2e", "harness-audit", "action-compatibility"],
+      "kinds": ["workflow"], "names": ["native-foundation-e2e", "native-token-e2e", "action-compatibility"],
       "layer_keys": ["foundation/quality-evaluation"],
       "reason": "The named workflows provide evaluation and compatibility checks.",
       "source_refs": ["catalogs/landscape/foundation.json#/layers/10"]
