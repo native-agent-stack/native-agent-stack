@@ -161,12 +161,17 @@ are fetched fresh at preflight time, not read from a stored file), and
 `config.json` itself cannot be the gated "snapshot": `promotion_gate.py`
 only accepts `.parquet`/`.csv`/`duckdb://` input, so pointing it at a JSON
 config always fails closed with `unsupported_input_format`. Instead,
-`runner.py`'s `main()` registers `--gate-result <path>` and `--snapshot
-<path>` CLI arguments; for the `paper` command (not `preflight`, not
-`recover`, which resumes a trial admitted by an earlier `paper` invocation)
-it calls `validate_preflight(..., mode="paper", gate_result_path=args.gate_result,
-snapshot_path=args.snapshot)`. The gate result must satisfy the full
-contract -- every required key present, every named check passing,
+`runner.py`'s `main()` registers optional `--gate-result <path>` and
+`--snapshot <path>` CLI arguments. For the `paper` command (not `preflight`,
+not `recover`, which resumes a trial admitted by an earlier `paper`
+invocation), supplying either argument requests validation: `main()` calls
+`validate_preflight(..., mode="paper", gate_result_path=args.gate_result,
+snapshot_path=args.snapshot)`. Without either argument, `paper` runs the same
+readiness checks with `mode=None`, as the mover runner does
+([README-paper-exploration.md](../adaptive-paper/README-paper-exploration.md)).
+The paper receipt's `preflight` block records `promotion_gate` as `validated`
+or `not_supplied`. When validation is requested, the gate result must satisfy
+the full contract -- every required key present, every named check passing,
 `row_count > 0`, a top-level `status: "pass"`, and an `input_sha256` matching
 a `--snapshot` file the gate itself could accept (`.csv`/`.parquet`) -- or the
 runtime raises `SafetyError` with kind `promotion_gate_missing` (no result
@@ -177,7 +182,8 @@ named check reports `status: "fail"` despite a "pass" top-level status),
 `promotion_gate_empty` (`row_count <= 0` despite a "pass" top-level status),
 `promotion_gate_failed` (top-level `status != "pass"`), or
 `promotion_gate_mismatch` (hash does not match the current file). `mode=None`
-(the `preflight` and `recover` call sites) is unaffected. `--snapshot` must
+(the `preflight` and `recover` call sites, and `paper` without either
+argument) skips this check. `--snapshot` must
 name an actual bars/universe input file that
 was run through `promotion_gate.py`. [`ingest_snapshot.py`](ingest_snapshot.py)
 (added in #84) writes one: a bounded, read-only Alpaca daily-bar snapshot of

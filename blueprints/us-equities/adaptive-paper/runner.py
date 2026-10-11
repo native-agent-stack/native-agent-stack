@@ -645,8 +645,9 @@ def validate_preflight(observation, config, *, require_open, allow_existing=Fals
                        allow_existing_positions=None, session_policy=None,
                        mode=None, gate_result_path=None, snapshot_path=None):
     """``mode="paper"`` additionally requires a passing, hash-matched promotion
-    gate (see ``_check_promotion_gate``); ``mode=None`` (the default) preserves
-    prior behavior exactly for existing preflight/recover call sites.
+    gate (see ``_check_promotion_gate``); ``mode=None`` (the default) skips it
+    for the preflight/recover call sites and for paper without either proof
+    argument.
 
     ``allow_existing`` (recovery mode, only set by ``--command recover``)
     relaxes the cash/equity floor, the full-universe/benchmark-quote checks
@@ -2223,13 +2224,13 @@ def main():
     parser.add_argument("--trial", default="adaptive-20260921")
     parser.add_argument("--state-root", type=Path, default=DEFAULT_STOP.parent)
     parser.add_argument("--gate-result", type=Path, default=None,
-                         help="promotion-gate result JSON from "
+                         help="optional qualification result JSON from "
                               "blueprints/us-equities/data/promotion_gate.py; "
-                              "required (status pass, hash-matched) for `paper`")
+                              "supply with --snapshot to validate a frozen qualification")
     parser.add_argument("--snapshot", type=Path, default=None,
                          help="the exact bars/universe input file the promotion "
                               "gate validated (its hash must match --gate-result's "
-                              "input_sha256); required for `paper`")
+                              "input_sha256); required only with --gate-result")
     parser.add_argument("--live-dir", type=Path, default=None,
                          help="optional directory for a live record of this run: events.jsonl "
                               "(decisions and intents as they happen) and NautilusTrader's own "
@@ -2307,7 +2308,15 @@ def main():
         save(args.output, summary)
         print(json.dumps({k: summary[k] for k in ("status", "orders_submitted")}, default=str))
         return 0 if summary["status"] == "ready" else 2
-    gate_mode = "paper" if args.command == "paper" else None
+    gate_mode = "paper" if (
+        args.command == "paper"
+        and (args.gate_result is not None or args.snapshot is not None)
+    ) else None
+    # The paper receipt's preflight block states whether qualification proofs
+    # were validated, as mover_runner.py's paper command records it. recover
+    # adds no marker: the paper receipt that admitted the trial carries it.
+    if args.command == "paper":
+        summary["promotion_gate"] = "validated" if gate_mode else "not_supplied"
     # Rebase review D1: overnight_holds relaxes the flat-account/no-open-orders
     # gate only to resume a trial this engine itself left "held_overnight".
     # A first trial (or any other prior phase) still requires a flat account,
