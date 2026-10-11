@@ -66,6 +66,23 @@ SAME_LABEL_REASON = "no result entry; a later complete attempt with the same lab
 EXPLICIT_REASON = "completed attempt superseded by the proven later same-label changed-key rerun"
 
 
+def measured_at_required_effort(attempt: dict, required: str = "max") -> bool:
+    """Affirmative per-request measurement, never an effort set with unknown requests hidden in it."""
+    return (isinstance(attempt, dict) and attempt.get("efforts") == [required]
+            and type(attempt.get("requests")) is int and attempt["requests"] > 0
+            and type(attempt.get("unknown_effort_requests")) is int and attempt["unknown_effort_requests"] == 0)
+
+
+def known_attempt_effort(attempt: dict) -> bool:
+    """A completed attempt needs effort measurements; an interrupted zero-request attempt has none to lose."""
+    efforts = attempt.get("efforts")
+    return (type(attempt.get("unknown_effort_requests")) is int and attempt["unknown_effort_requests"] == 0
+            and type(attempt.get("requests")) is int and attempt["requests"] >= 0
+            and (attempt["requests"] > 0 and isinstance(efforts, list) and bool(efforts)
+                 and all(isinstance(effort, str) and bool(effort.strip()) for effort in efforts) or
+                 attempt.get("complete") is False and attempt["requests"] == 0))
+
+
 def proven_supersessions(output: dict, proof_path: Path, contract_path: Path, journal_path: Path,
                         required: str) -> tuple:
     """Validate the caller-supplied post-run proof against its contract, journal and measured children.
@@ -150,6 +167,8 @@ def proven_supersessions(output: dict, proof_path: Path, contract_path: Path, jo
         if (old_index >= new_index or original.get("complete") is not True or replacement.get("complete") is not True
                 or original.get("label") != label or replacement.get("label") != label):
             raise ValueError("supersession needs measured complete same-label children and a later rerun")
+        if not known_attempt_effort(original):
+            raise ValueError("supersession original has missing or unknown request effort measurements")
     # A proved repair may supersede a completed mixed-effort replacement. Every edge stays explicit; only the
     # terminal child establishes required-effort coverage, and repeated labels must resolve to one terminal.
     for pair in pairs:
@@ -160,7 +179,7 @@ def proven_supersessions(output: dict, proof_path: Path, contract_path: Path, jo
             seen.add(target)
             target = replacements[target]
         terminal = by_id[target][1]
-        if terminal.get("efforts") != [required]:
+        if not measured_at_required_effort(terminal, required):
             raise ValueError("supersession chain does not end at measured required effort")
         label = pair["label"]
         if label in terminal_by_label and terminal_by_label[label] != target:
@@ -184,6 +203,14 @@ def superseded_at_required_effort(attempt: dict, output: dict, required: str = "
     if not label:
         return False
     attempts = [*(output.get("children") or []), *(output.get("superseded_attempts") or [])]
+    # Native mismatch rows name a label, not a source identity. Resolve them to retained measured attempts
+    # before deciding coverage; a bare mismatch's effort set is not request accounting.
+    sources = ([attempt] if attempt.get("agent_id") else
+               [c for c in attempts if isinstance(c, dict) and c.get("label") == label
+                and c.get("efforts") == attempt.get("efforts")
+                and c.get("superseded_by") == attempt.get("superseded_by")])
+    if not sources or not all(known_attempt_effort(c) for c in sources):
+        return False
     by_id = {c["agent_id"]: c for c in attempts if isinstance(c, dict) and c.get("agent_id")}
     seen = {attempt.get("agent_id")}
     target_id = attempt.get("superseded_by")
@@ -193,10 +220,12 @@ def superseded_at_required_effort(attempt: dict, output: dict, required: str = "
         if not target or (target.get("label") or target.get("agent_id")) != label:
             return False
         if target.get("superseded_by"):
+            if not known_attempt_effort(target):
+                return False
             target_id = target["superseded_by"]
             continue
         if target.get("complete") is True:
-            return target.get("efforts") == [required]
+            return measured_at_required_effort(target, required)
         target_id = target.get("superseded_by")
     return False
 
@@ -357,7 +386,7 @@ def main(argv=None) -> int:
     children = usage.get("children") or []
     mismatches = usage.get("effort_mismatches") or []
     attempts = [*children, *(usage.get("superseded_attempts") or [])]
-    off = any(isinstance(c, dict) and c.get("efforts") != [args.require_effort]
+    off = any(isinstance(c, dict) and not measured_at_required_effort(c, args.require_effort)
               and not superseded_at_required_effort(c, usage, args.require_effort) for c in attempts)
     processing = document["measurement"]["post_processing"]
     recovered = processing["linked_attempts"] or processing["effort_mismatches_covered"]

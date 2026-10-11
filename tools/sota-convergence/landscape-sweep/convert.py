@@ -77,13 +77,14 @@ import os
 import re
 import sys
 from pathlib import Path
+from urllib.parse import unquote
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from sweep_common import (REPO_ROOT, RedactionKeyCollision, canon, deviation_rounds, host_replacements, json_text,  # noqa: E402
                           ledger_module, load_json, pointer_token, private_content, private_findings,
                           rewrite_strings, sanitize, slug)
-from usage_record import superseded_at_required_effort  # noqa: E402
+from usage_record import measured_at_required_effort, superseded_at_required_effort  # noqa: E402
 
 # The Claude judgment roles all run on Opus (sweep.js WORKER, adoption/agents/claude/landscape-sweep-worker.md): the
 # facts refuter verifies, and the global model rule keeps Sonnet for command wrappers and mechanical extraction.
@@ -194,7 +195,7 @@ def effort_deviations(usage: dict | None) -> list:
     child_usage = as_dict(as_dict(usage).get("child_usage"))
     out = []
     for child in [*(child_usage.get("children") or []), *(child_usage.get("superseded_attempts") or [])]:
-        if (isinstance(child, dict) and child.get("efforts") != [REQUIRED_EFFORT]
+        if (isinstance(child, dict) and not measured_at_required_effort(child, REQUIRED_EFFORT)
                 and not superseded_at_required_effort(child, child_usage, REQUIRED_EFFORT)):
             item = {"child": child.get("label") or child.get("agent_id"), "efforts": child.get("efforts")}
             if child.get("superseded_by"):
@@ -779,6 +780,17 @@ def main(argv=None) -> int:
         for name in ("returns", "lanes", "layers", "survivors", "summary"):
             value = summary if name == "summary" else out[name]
             documents[name] = redact_project_dirs(sanitize(value, replacements), work, repo_root)
+        # Percent-encoding is representation, not anonymity. Check values AND keys after all URL decoding
+        # layers, without publishing that view or changing source citations. Collisions also refuse.
+        def url_decoded(text):
+            while True:
+                decoded = unquote(text)
+                if decoded == text:
+                    return text
+                text = decoded
+        decoded_documents = {}
+        for name, document in documents.items():
+            decoded_documents[name] = rewrite_strings(document, url_decoded)
     except RedactionKeyCollision as error:
         pointer = "/" + "/".join(pointer_token(part) for part in error.path)
         location = "printed summary" if name == "summary" else f"{name}.json"
@@ -790,6 +802,9 @@ def main(argv=None) -> int:
         location = "printed summary" if name == "summary" else f"{name}.json"
         decoded = private_findings(document, patterns)
         findings.extend((f"{location}#{pointer}", kind) for pointer, kind in decoded)
+        findings.extend((f"{location}#{pointer}", kind + " (URL-decoded)")
+                        for pointer, kind in private_findings(decoded_documents[name], patterns)
+                        if (pointer, kind) not in decoded)
         for kind, pattern in patterns:
             if pattern.search(emitted[name]) and not any(description in (kind, f"{kind} (in a key)")
                                                         for _, description in decoded):

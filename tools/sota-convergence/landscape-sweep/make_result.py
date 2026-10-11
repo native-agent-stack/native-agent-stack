@@ -59,7 +59,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from sweep_common import (REPO_ROOT, canon, deviation_rounds, ledger_module, load_json, pointer_token,  # noqa: E402
                           private_content, private_findings, slug)
-from usage_record import superseded_at_required_effort  # noqa: E402
+from usage_record import measured_at_required_effort, superseded_at_required_effort  # noqa: E402
 
 PLACEHOLDER = "@RETURNS@"
 HEX40, HEX64 = re.compile(r"[0-9a-f]{40}"), re.compile(r"[0-9a-f]{64}")
@@ -124,7 +124,7 @@ def check_usage(usage: dict, usage_ref: str, returns: dict | None = None, layer_
                          "complete usage (record a stopped run by hand, recipe section 4)")
     attempts = [*(child_usage.get("children") or []), *(child_usage.get("superseded_attempts") or [])]
     off = [worker_item(child) for child in attempts
-           if isinstance(child, dict) and child.get("efforts") != [REQUIRED_EFFORT]
+           if isinstance(child, dict) and not measured_at_required_effort(child, REQUIRED_EFFORT)
            and not superseded_at_required_effort(child, child_usage, REQUIRED_EFFORT)]
     listed = [worker_item(item) for item in child_usage.get("effort_mismatches") or []
               if not superseded_at_required_effort(item, child_usage, REQUIRED_EFFORT)]

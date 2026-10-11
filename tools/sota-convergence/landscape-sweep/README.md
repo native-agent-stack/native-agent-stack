@@ -680,13 +680,21 @@ Uncovered effort deviations and capped WebSearch calls still retain their failur
 these details, including when only some attempts link and the status stays incomplete. `multi_model_children`
 reflects the remaining children. The printed `raw_exit_code` names the tool's result; `exit_code` names the wrapper's.
 
-Offline source review extended agent-lab's `summarizeRun` and `effortMismatches` in the unchanged
-vendored tool. **Completed changed-key reruns are a separate, explicit operation.** Pass all three
+Offline source review extends the maintained adapter's `summarizeRun` and `effortMismatches`.
+**Completed changed-key reruns are a separate, explicit operation.** Pass all three
 `--supersession-proof`, `--supersession-contract` and `--supersession-journal` to `usage_record.py` only after the
 post-run proof has been independently accepted. The proof's `supersessionPairs` must match its contract, measured
 child identities and the exact native journal (both started and result keys, labels and order). Each explicit
 replacement chain must end at a complete measured max-only child. A completed mixed-effort intermediate stays
 retained and requires its own proved edge to that terminal; cycles and ambiguous same-label terminals refuse.
+The adapter reports `unknown_effort_requests` over the same deduplicated usage-bearing requests as `requests`.
+Coverage requires an affirmative zero unknown count and a nonzero request count at the terminal; a nonempty
+`efforts` set alone proves neither. Completed originals with absent/empty effort measurements or unknown
+requests refuse. Earlier receipts without the new count must be remeasured from retained transcripts with
+this checkout's supported adapter; do not fill the count manually. An interrupted attempt with affirmatively
+zero requests and zero unknowns has no request effort to lose. Other unmeasured attempts remain uncovered,
+retained and reopened by conversion and the result builder. URL-decoded string values and keys are also
+checked for private identifiers before any artifact write or summary print; encoded residual UUIDs refuse.
 Repeated completed labels alone never select a winner. The record
 retains every original under `superseded_attempts`, every aggregate counter, raw exit/hash, and transformation
 provenance with proof, contract, journal and processor hashes. A malformed or unbound proof, non-max replacement

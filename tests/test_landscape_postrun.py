@@ -3,6 +3,7 @@
 import copy
 import hashlib
 import json
+import shutil
 from pathlib import Path
 import subprocess
 import sys
@@ -37,7 +38,8 @@ class CompletedSupersessionTests(unittest.TestCase):
         raw["children"] = originals + [dict(c, agent_id=f"other{i}") for i, c in enumerate(others)] + reruns
         raw["by_resolved_model"] = {"fixture": {"children": 126, "output_tokens": 4321}}
         raw["superseded_attempts"] = [{"label": "other:0", "agent_id": f"killed{i}", "complete": False,
-                                       "efforts": ["max"], "superseded_by": "other0"} for i in range(8)]
+                                       "efforts": ["max"], "requests": 1, "unknown_effort_requests": 0,
+                                       "superseded_by": "other0"} for i in range(8)]
         raw["effort_mismatches"] = [{"child": labels[i], "efforts": ["max", "low"]} for i in range(2)]
         self.raw = raw
         self.write("raw.json", raw)
@@ -72,6 +74,49 @@ class CompletedSupersessionTests(unittest.TestCase):
             args += ["--require-effort", required]
         return subprocess.run(args, capture_output=True, text=True)
 
+    @unittest.skipUnless(shutil.which("node"), "node not installed")
+    def test_native_unknown_request_effort_cannot_cover_a_completed_attempt(self):
+        adapter = HARNESS.parents[2] / "examples/claude-native/workflows/child-usage.mjs"
+        program = """
+import { summarizeChild } from ADAPTER;
+const rows = EFFORTS.map((effort, i) => ({type: 'assistant', effort,
+  message: {id: 'msg' + i, model: 'claude-opus-5-5', usage: {input_tokens: 2, output_tokens: 3}}}));
+console.log(JSON.stringify(summarizeChild({agentId: 'fixture', label: 'fixture'},
+  {result: {ok: true}}, {model: 'opus'}, rows)));
+"""
+        def native(efforts):
+            done = subprocess.run([shutil.which("node"), "--input-type=module", "-e",
+                                   program.replace("ADAPTER", json.dumps(adapter.as_uri()))
+                                   .replace("EFFORTS", json.dumps(efforts))], capture_output=True, text=True)
+            self.assertEqual(done.returncode, 0, done.stderr)
+            return json.loads(done.stdout)
+
+        # Actual adapter output at the public CLI, with a successful measured-max control.
+        for case, efforts in (("all_measured", ["max", "max"]),
+                              ("unknown_terminal", ["max", None]), ("unknown_original", [None])):
+            with self.subTest(case=case):
+                raw = copy.deepcopy(self.raw)
+                index = 0 if case == "unknown_original" else -12
+                raw["children"][index].update(native(efforts))
+                raw["children"][index].update(agent_id="old0" if index == 0 else "new0",
+                                               label=self.raw["children"][0]["label"])
+                if case == "unknown_original":
+                    raw["effort_mismatches"][0]["efforts"] = []
+                self.write("raw.json", raw)
+                (self.work / "usage.json").unlink(missing_ok=True)
+                done = self.run_usage(explicit=True)
+                if case == "all_measured":
+                    self.assertEqual(done.returncode, 0, done.stderr)
+                    receipt = json.loads((self.work / "usage.json").read_text())
+                    self.assertEqual(next(c for c in receipt["child_usage"]["children"]
+                                          if c["agent_id"] == "new0")["unknown_effort_requests"], 0)
+                    self.assertEqual(receipt["measurement"]["raw_output_sha256"], self.sha("raw.json"))
+                    self.assertEqual(receipt["child_usage"]["by_resolved_model"], raw["by_resolved_model"])
+                else:
+                    self.assertEqual(done.returncode, 2, done.stderr)
+                    self.assertIn("effort", done.stderr)
+                    self.assertFalse((self.work / "usage.json").exists())
+
     def test_completed_changed_key_attempts_need_proven_pairs_and_keep_all_counters(self):
         baseline = self.run_usage()
         self.assertEqual(baseline.returncode, 1, baseline.stderr)
@@ -98,6 +143,22 @@ class CompletedSupersessionTests(unittest.TestCase):
             retained.pop("superseded_by")
             retained.pop("reason")
             self.assertEqual(retained, child)
+
+    def test_terminal_effort_needs_affirmative_request_accounting(self):
+        for field, value in (("unknown_effort_requests", None), ("unknown_effort_requests", False),
+                             ("unknown_effort_requests", 1), ("requests", 0), ("requests", True)):
+            with self.subTest(field=field, value=value):
+                raw = copy.deepcopy(self.raw)
+                terminal = raw["children"][-12]
+                if value is None:
+                    terminal.pop(field)
+                else:
+                    terminal[field] = value
+                self.write("raw.json", raw)
+                done = self.run_usage(explicit=True)
+                self.assertEqual(done.returncode, 2, done.stderr)
+                self.assertIn("supersession chain does not end at measured required effort", done.stderr)
+                self.assertFalse((self.work / "usage.json").exists())
 
     def test_completed_mixed_effort_chain_is_covered_only_by_its_proven_max_terminal(self):
         raw = copy.deepcopy(self.raw)
@@ -168,11 +229,23 @@ class CompletedSupersessionTests(unittest.TestCase):
         self.write("raw.json", raw)
         done = self.run_usage(explicit=True, required="high")
         self.assertEqual(done.returncode, 2, done.stderr)
+        self.assertIn("the bound supersession contract requires max effort", done.stderr)
         self.assertFalse((self.work / "usage.json").exists())
+        self.write("raw.json", self.raw)
+        control = self.run_usage(explicit=True)
+        self.assertEqual(control.returncode, 0, control.stderr)
 
     def test_unbound_or_invalid_supersession_is_refused_before_writing(self):
-        cases = ("contract_hash", "journal_hash", "run", "key", "duplicate", "effort", "mixed_effort", "label", "missing_result")
-        for case in cases:
+        cases = {"contract_hash": "supersession proof contract or journal hash mismatch",
+                 "journal_hash": "supersession proof contract or journal hash mismatch",
+                 "run": "supersession proof does not establish this completed resumed run",
+                 "key": "supersession pair is absent from the contract or proved reruns",
+                 "duplicate": "supersession pairs repeat an identity or do not change the call key",
+                 "effort": "supersession chain does not end at measured required effort",
+                 "mixed_effort": "supersession chain does not end at measured required effort",
+                 "label": "supersession needs measured complete same-label children and a later rerun",
+                 "missing_result": "supersession pair is absent from the contract or proved reruns"}
+        for case, diagnostic in cases.items():
             with self.subTest(case=case):
                 proof, raw = copy.deepcopy(self.proof), copy.deepcopy(self.raw)
                 if case == "contract_hash":
@@ -198,6 +271,7 @@ class CompletedSupersessionTests(unittest.TestCase):
                 (self.work / "usage.json").unlink(missing_ok=True)
                 done = self.run_usage(explicit=True)
                 self.assertEqual(done.returncode, 2, done.stderr)
+                self.assertIn(diagnostic, done.stderr)
                 self.assertFalse((self.work / "usage.json").exists())
 
 

@@ -261,7 +261,8 @@ def scope_for(layers=(("foundation", "alpha"), ("us-equities", "beta"), ("founda
 def child_usage_raw(run_id, labels, status="complete", transcript_root="/home/example/.claude/projects/p/s"):
     children = [{"label": label, "requested_model": "sonnet" if label.startswith("gpt6-") else "opus",
                  "resolved_models": ["claude-sonnet-5" if label.startswith("gpt6-") else "claude-opus-5-5"],
-                 "efforts": ["max"], "web_search": {"calls": 0, "capped": 0, "first_capped_at": None},
+                  "efforts": ["max"], "requests": 1, "unknown_effort_requests": 0,
+                  "web_search": {"calls": 0, "capped": 0, "first_capped_at": None},
                  "complete": True} for label in labels]
     return json.dumps({"transcript_dir": f"{transcript_root}/subagents/workflows/{run_id}", "status": status,
                        "reason": "fixture", "web_search": {"calls": 0, "capped": 0, "capped_children": []},
@@ -3807,7 +3808,8 @@ class ConvertTests(unittest.TestCase):
         # A record listing a re-run call's earlier attempt among its children (child-usage.mjs before
         # superseded_attempts): the vote names the attempt that returned, and <synthetic> is never a model.
         failed = {"label": "refute-fit:alpha", "agent_id": "x1", "requested_model": "opus",
-                  "resolved_models": ["claude-opus-5-5", "<synthetic>"], "efforts": ["max"], "complete": False}
+                  "resolved_models": ["claude-opus-5-5", "<synthetic>"], "efforts": ["max"],
+                  "requests": 1, "unknown_effort_requests": 0, "complete": False}
         raw = json.loads(child_usage_raw("wf_fixture-1", SYNTHETIC_LABELS))
         raw["children"].insert(0, failed)
         document = usage_record.record(json.dumps(raw).encode("utf-8"), 1, "cmd", ROOT)
@@ -3952,7 +3954,8 @@ class ConvertTests(unittest.TestCase):
     def test_cli_redacts_session_segments_only_in_native_scratchpad_paths(self):
         identifier = "-".join(["0123abcd", "4567", "89ab", "cdef", "0123456789ab"])
         encoded = "-".join(("", "home", "fixtureuser", "code", "project"))
-        for prefix in ("~/.claude/projects/", "/tmp/claude-1000/"):
+        from urllib.parse import unquote
+        for prefix in ("~/.claude/projects/", "/tmp/claude-1000/", "file:///tmp/claude-1000/"):
             with self.subTest(prefix=prefix):
                 work = temp_dir(self)
                 res = healthy_result()
@@ -3968,6 +3971,7 @@ class ConvertTests(unittest.TestCase):
                 self.assertNotIn(identifier, done.stdout)
                 for file in (work / "out").glob("*.json"):
                     self.assertNotIn(identifier, file.read_text())
+                    self.assertNotIn(identifier, unquote(file.read_text()))
         # A bare session id remains a publication refusal; the rule must not redact arbitrary evidence ids.
         work = temp_dir(self)
         res = healthy_result()
@@ -3975,6 +3979,68 @@ class ConvertTests(unittest.TestCase):
         done = self.cli(work, res)
         self.assertEqual(done.returncode, 3)
         self.assertFalse((work / "out").exists())
+
+    def test_cli_refuses_decoded_session_identifiers_before_any_publication(self):
+        from urllib.parse import unquote
+        identifier = "-".join(["0123abcd", "4567", "89ab", "cdef", "0123456789ab"])
+        raw = "/tmp/claude-1000/project/" + identifier + "/scratchpad/worker/notes.md"
+        spellings = [identifier.replace("-", "%2D"), identifier.replace("-", "%2d", 1),
+                     identifier.replace("0", "%30", 1), identifier.replace("-", "%252D")]
+        for encoded_id in spellings:
+            decoded = encoded_id
+            while unquote(decoded) != decoded:
+                decoded = unquote(decoded)
+            self.assertEqual(decoded, identifier)
+            for location in ("key", "value", "limit", "filename", "query"):
+                with self.subTest(spelling=encoded_id, location=location):
+                    work = temp_dir(self)
+                    res = healthy_result()
+                    url = "file:///tmp/claude-1000/project/" + encoded_id + "/scratchpad/worker/notes.md"
+                    if location == "filename":
+                        url = "file://" + raw + "/" + encoded_id + ".md"
+                    elif location == "query":
+                        url = "file://" + raw + "?session=" + encoded_id
+                    notes = {raw: ["read " + raw]}
+                    args = []
+                    if location == "key":
+                        notes[url] = "source"
+                    elif location == "limit":
+                        args = ["--limit", "read " + raw + " and " + url]
+                    else:
+                        notes[raw].append({"nested": "source " + url})
+                    res["first"][0]["claude_discover"]["notes"] = notes
+                    done = self.cli(work, res, *args)
+                    self.assertEqual(done.returncode, 3, done.stderr)
+                    self.assertIn("refusing to publish", done.stderr)
+                    self.assertEqual(done.stdout, "")
+                    self.assertFalse((work / "out").exists())
+
+    def test_cli_keeps_unknown_effort_uncovered_through_supersession(self):
+        for condition in ("unknown_terminal", "unmeasured_terminal", "empty_original"):
+            with self.subTest(condition=condition):
+                work = temp_dir(self)
+                raw = json.loads(child_usage_raw("wf_fixture-1", SYNTHETIC_LABELS))
+                terminal = next(c for c in raw["children"] if c["label"] == "critic")
+                terminal["agent_id"] = "terminal"
+                original = dict(terminal, agent_id="original", efforts=["max", "low"], superseded_by="terminal")
+                raw["superseded_attempts"] = [original]
+                if condition == "unknown_terminal":
+                    terminal.update(requests=2, unknown_effort_requests=1)
+                elif condition == "unmeasured_terminal":
+                    terminal.pop("unknown_effort_requests")
+                else:
+                    original.update(efforts=[], unknown_effort_requests=1)
+                usage = write_json(work / "usage.json", {"child_usage": raw, "measurement": {"exit_code": 0}})
+                done = self.cli(work, healthy_two_layers(), "--usage", str(usage))
+                self.assertEqual(done.returncode, 0, done.stderr)
+                summary = json.loads(done.stdout)
+                self.assertTrue(summary["effort_deviations"])
+                returns = json.loads((work / "out/returns.json").read_text())
+                self.assertFalse(any(returns["superseded_retained"].values()))
+                self.assertEqual(set(summary["reopened_layers"]), {"alpha", "beta"})
+                with self.assertRaisesRegex(ValueError, "effort_deviation retained failure"):
+                    make_result.check_usage({"child_usage": raw, "measurement": {"exit_code": 0}}, "fixture",
+                                            layer_ids=("alpha", "beta"))
 
     def test_cli_redacts_dash_encoded_project_directory_in_notes(self):
         encoded = "-".join(("", "home", "fixtureuser", "code", "project"))
@@ -4846,7 +4912,7 @@ class UsageRecordTests(unittest.TestCase):
         retry = next(c for c in raw["children"] if c["label"] == "critic" and c["complete"])
         same_key_target = next(c for c in raw["children"] if c["label"] == "discover:alpha")
         raw["superseded_attempts"] = [dict(same_key_target, agent_id="same-key-killed", complete=False,
-                                           efforts=[], superseded_by=same_key_target["agent_id"])]
+                                           efforts=[], requests=0, superseded_by=same_key_target["agent_id"])]
         raw["effort_mismatches"].append({"child": "discover:alpha", "efforts": [],
                                          "superseded_by": same_key_target["agent_id"]})
         raw["reason"] += "; 1 earlier attempt re-run under the same call key"

@@ -3320,6 +3320,9 @@ export function summarizeChild(started, result, meta, transcript, transcriptFoun
   for (const m of new Set(messages.map((r) => r.message.model || '(unresolved)'))) usageByModel[m] = sum(messages.filter((r) => (r.message.model || '(unresolved)') === m))
   const resolved = [...new Set(messages.map((r) => r.message.model).filter(Boolean))]
   const efforts = [...new Set(messages.map((r) => r.effort).filter(Boolean))]
+  // The effort set omits absent values. Count them over the same deduplicated provider requests so
+  // a nonempty set cannot be mistaken for affirmative measurement of every request.
+  const unknownEffortRequests = messages.filter((r) => typeof r.effort !== 'string' || !r.effort.trim()).length
   const requested = meta && typeof meta.model === 'string' && meta.model ? meta.model : null
   const issues = []
   // Usage-integrity failures: provider usage that by_resolved_model cannot count or attribute. They are issues of any
@@ -3362,7 +3365,7 @@ export function summarizeChild(started, result, meta, transcript, transcriptFoun
     agent_id: started.agentId, label: started.label ?? null, phase: started.phase ?? null,
     agent_type: meta ? meta.agentType ?? null : null,
     requested_model: requested, resolved_models: resolved, efforts, web_search: webSearch(transcript),
-    requests: messages.length, usage, usage_by_model: usageByModel,
+    requests: messages.length, unknown_effort_requests: unknownEffortRequests, usage, usage_by_model: usageByModel,
     // Provider-returned cache read on the first request: evidence that the shared
     // prefix was served from cache for this child. Zero is not proof of a miss policy.
     first_request_cache_read: messages.length ? messages[0].message.usage.cache_read_input_tokens || 0 : null,

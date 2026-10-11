@@ -19,6 +19,15 @@ const dup = summarizeChild(started, done, { model: 'sonnet', agentType: 'workflo
 expect('streamed duplicates of one message id count once with the largest output', dup.requests === 2 && dup.usage.output_tokens === 50 && dup.usage.input_tokens === 4 && dup.usage.cache_read_input_tokens === 1400)
 expect('first request cache read and effort are reported', dup.first_request_cache_read === 500 && dup.efforts.join() === 'medium' && dup.complete)
 expect('first request prompt size is input plus cache read plus cache creation', dup.first_request_prompt_tokens === 502)
+expect('all provider request efforts are affirmatively measured', dup.unknown_effort_requests === 0)
+const unknownEffort = summarizeChild(started, done, { model: 'sonnet' },
+  [msg('m1', 'claude-sonnet-5', 5, 0, 0, 'max'), msg('m2', 'claude-sonnet-5', 6, 0, 0, null)])
+expect('a filtered effort set does not hide an unknown provider request', unknownEffort.complete
+  && unknownEffort.requests === 2 && unknownEffort.efforts.join() === 'max' && unknownEffort.unknown_effort_requests === 1)
+const duplicateUnknown = summarizeChild(started, done, { model: 'sonnet' },
+  [msg('m1', 'claude-sonnet-5', 5, 0, 0, null), msg('m1', 'claude-sonnet-5', 6, 0, 0, null)])
+expect('unknown efforts follow the same deduplicated requests as usage', duplicateUnknown.requests === 1
+  && duplicateUnknown.unknown_effort_requests === 1)
 expect('null result is incomplete', !summarizeChild(started, { ...done, result: null }, { model: 'sonnet' }, [msg('m1', 'claude-sonnet-5', 5)]).complete)
 expect('missing journal result is incomplete', !summarizeChild(started, null, { model: 'sonnet' }, [msg('m1', 'claude-sonnet-5', 5)]).complete)
 // PR-A item 6 (#381 AA-PLAN: "a final text that is a wait notice or empty is not counted as complete"; U2 design section 6). The journal

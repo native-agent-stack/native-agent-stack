@@ -23,7 +23,7 @@ unrelated evidence identifiers.
   keys and three dynamic keys recomputed from actual replacement discovery, with result equality. Its limitation
   explicitly delegates actual request effort to `usage_record.py`. The proof is trusted caller input, bound to
   its contract and native journal; the CLI does not establish an independent authority's acceptance by itself.
-- The unchanged native usage adapter is the maintained
+- The original native usage adapter, before the correction below, is the maintained
   [native-agent-stack child-usage.mjs at 8c32a84b246da66e43a6188c973741b09329e223](https://github.com/seathatflowsinourveins/native-agent-stack/blob/8c32a84b246da66e43a6188c973741b09329e223/examples/claude-native/workflows/child-usage.mjs),
   SHA-256 `3e5189342734135e88a2295c1c2152275d9e26c0c7731ed5cbc8905bbccd98a4`.
   Its measured children, effort mismatches, usage and native same-key supersession remain the source data.
@@ -136,3 +136,57 @@ The template proposal records the lower-effort skill exclusion rule for the next
 run's frozen inputs or upstream skill declarations. Catalog-owner publication, evidence retention/registration
 and the final ledger append remain separate README11–12 owner actions. Old blind Claude finals remain excluded
 from recording until their post-#993 rerun, and adjudication still waits for #992.
+
+## Review correction: request effort and encoded identifiers
+
+The first GPT read identified three P2 boundaries at `a3d79fd0`: the effort set drops missing request
+measurements, percent-encoded session identifiers can survive scratchpad redaction, and two refusal tests
+accept an unsupported-option parser error. The correction is one direct-child commit, with no history rewrite.
+
+Primary-source comparison on 2026-10-11 found the maintained repository's `main` and pinned
+`8c32a84b246da66e43a6188c973741b09329e223` adapter identical (Git blob
+`be2c895785bc543104778a366ecc414f57d1b171`, SHA-256 above). `summarizeChild` at that pin, lines 3304–3322,
+deduplicates usage-bearing assistant messages, then computes `efforts` with `filter(Boolean)`. Its offline
+fixture interface at `test-child-usage.mjs:14` uses assistant rows with top-level effort and provider counters.
+The correction extends that maintained adapter directly: `unknown_effort_requests` counts absent, blank or
+non-string effort on the same deduplicated requests. Existing usage counters and request totals do not change.
+The wrapper, converter and result builder require zero affirmatively measured unknown requests and a positive
+terminal request count. Completed originals with missing effort measurements refuse; interrupted zero-request
+attempts retain their separate zero-request treatment. Native raw bytes/hash and counters remain retained.
+
+For URL representations, installed CPython **3.13.16** supplies
+[`urllib.parse.unquote`](https://docs.python.org/3.13/library/urllib.parse.html#urllib.parse.unquote), whose
+[pinned source](https://github.com/python/cpython/blob/v3.13.16/Lib/urllib/parse.py) decodes percent escapes.
+The converter applies it until stable to a separate validation view of every string and key, including
+summaries and limits. Any remaining decoded private identifier refuses before writes or stdout. The emitted
+citations remain unchanged by decoding; ordinary literal native scratchpad citations still retain their suffix.
+Both redaction collisions and collisions in decoded validation keys refuse.
+
+Failure-first evidence is retained in the private `pr995-review-fix-20261011` packet. Final tests transplanted
+onto genuine detached `a3d79fd0` production run four public runtime tests with **25 failing subtests**, including
+both actual adapter-produced unknown-effort cases and fifteen encoded-publication cases. The two strengthened
+refusal tests transplanted onto pre-feature `eb31d233` run two tests with **10 failing subtests**: diagnostics
+must name the actual bound-max or identity/hash/effort refusal, so unsupported options no longer pass. A valid
+max-input control also succeeds at the correction. These are offline synthetic/local integration results.
+
+### Actual retained-run correction: publication held
+
+Read-only remeasurement of the retained native run, using the supported updated adapter and the unchanged
+thirteen-pair proof/contract/journal, preserves all **127** attempt identities, **106 active +21 superseded**,
+all original child fields, and identical aggregate model/WebSearch counters. It newly exposes **8 unknown
+request efforts in 8 interrupted superseded attempts**. None of the covering terminals has unknown effort;
+the two mixed-effort completed attempts remain covered. The wrapper now correctly returns **1**, preserving
+native raw **1**, and the eight unknown attempts remain uncovered. This supersedes the earlier clean-effort
+acceptance in this decision for publication purposes; the historical receipts remain intact.
+
+The new private raw output is SHA-256 `9c63e6f2cd1d2d4969659922b8672647bc24d86a69d9f21bb104adac951b76e2`;
+the final corrected usage receipt is SHA-256 `c07326d18ac7a9758ff5c21b729aacd05a2ecac8b566eb68a7a97011c1698dcd`.
+README11–12 publication and ledger registration must account for these uncovered attempts before using a
+clean-effort claim. No additional model call, native journal change, manual measurement fill, catalog edit or
+ledger append was performed. The frozen owner handoff remains historical, not silently replaced.
+
+Final correction validation: all **304** tests in `tests.test_landscape_postrun`,
+`tests.test_landscape_sweep_harness`, and `tests.test_evidence_manifest` pass (three optional skips: context-mode
+JavaScript security integration, shellcheck, Bash 3.2). The maintained adapter's supported
+`node examples/claude-native/workflows/test-child-usage.mjs` command passes **222/222** offline checks.
+The correction adapter SHA-256 is `8e37a032b189467c7f8ddba81adb3b6fe06e7064ca4b61123852533d1d711caa`.
