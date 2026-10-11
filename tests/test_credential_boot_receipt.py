@@ -286,6 +286,7 @@ class BootReceiptTests(unittest.TestCase):
         # leaves, and in a native sign-in store. None of them, raw, encoded or hashed, reaches the receipt, the
         # printed line, stderr or compare's output, and neither does any host path.
         for name, variable in (("alpaca-paper.env", "APCA_API_KEY_ID"), ("alpaca-paper-2.env", "APCA_API_KEY_ID"),
+                               ("alpaca-paper-c.env", "APCA_API_KEY_ID"),
                                ("sec-contact.env", "SEC_USER_AGENT"), ("tavily.env", "TAVILY_API_KEY"),
                                ("omniroute.env", "OMNIROUTE_API_KEY"), ("databento.env", "DATABENTO_API_KEY"),
                                ("stray.env", "STRAY_API_KEY"),
@@ -306,14 +307,14 @@ class BootReceiptTests(unittest.TestCase):
         found = key_paths(receipt)
         self.assertLessEqual(found, ALLOWED_KEYS, f"keys outside the allowlist: {sorted(found - ALLOWED_KEYS)}")
         fingerprints = [row["fingerprint"] for row in receipt["rows"] if row.get("fingerprint") is not None]
-        self.assertGreaterEqual(len(fingerprints), 7)
+        self.assertGreaterEqual(len(fingerprints), 8)
         for fingerprint in fingerprints:
             self.assertEqual(set(fingerprint), FINGERPRINT_KEYS)
         compare = self.run_cli("compare")
         self.assertEqual(compare.returncode, 0, compare.stderr)
         outputs = {"receipt": text, "printed line": result.stdout, "stderr": result.stderr,
                    "compare": compare.stdout + compare.stderr}
-        self.assertEqual(len(self.canaries), 9)
+        self.assertEqual(len(self.canaries), 10)
         for name, (canary, content) in self.canaries.items():
             for form, encoded in encoded_forms(canary, content).items():
                 for label, output in outputs.items():
