@@ -204,10 +204,12 @@ class FamilyStrategy(Strategy):
         from importlib import import_module
 
         try:
-            # Restore/rearm before any startup refusal can stop notifications.
-            import_module("blueprints.us-equities.strategies.halt_notice").restore(
-                self, arm=True
-            )
+            # Recover before other startup refusals, but never consume a
+            # durable delivery schedule without its required notice port.
+            if self.spec.evidence_class == "synthetic" or callable(self.notice_sink):
+                import_module("blueprints.us-equities.strategies.halt_notice").restore(
+                    self, arm=True
+                )
         except Exception as error:
             self._freeze("startup_held_notice_read_failed_requires_reconciliation")
             self._fault("on_start", error)

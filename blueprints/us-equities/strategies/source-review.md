@@ -764,3 +764,57 @@ supported acceptance/matrix regeneration and final checks are retained in
 Earlier census results above bind their named prior correction and are not
 represented as a rerun on this new production change. Broker/data/paper
 qualification boundaries remain unchanged.
+
+## PR994 restart notification-port ordering at f4dd6355
+
+The subsequent Astra read (SHA256
+`c1dd3e415eac3b11abe7d1d64b0b559754b043ef74a1dd0dce95e02015b1fae6`)
+accepts both connector fixes and identifies a restart variant: notice recovery
+ran before the new port admission gate. A future record armed a timer and an
+overdue record immediately consumed a delivery attempt, even when the later
+gate refused the missing/non-callable sink. The retained earlier review had
+checked named witness corrections; the widened startup side-effect scan found
+this additional ordering dependency.
+
+Recovery now runs only for synthetic fixtures or a callable notice port.
+The existing durable-ledger, post-cutoff and notice admission gates retain
+their refusal precedence. This follows [F-1 decision 2, lines 19–25](https://github.com/seathatflowsinourveins/us-equities-trading/blob/f8c607bc1f1f0205fdc87095f47df150d2f78117/docs/decisions/2026-10-10-halt-exit-policy.md#L19-L25),
+the selected rc5 [startup dispatch](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/trading/src/python/strategy.rs#L336-L341)
+and [nanosecond alert API](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/common/src/python/clock.rs#L158-L177).
+The record stays in the existing [Ledger metadata/transaction boundary](https://github.com/seathatflowsinourveins/native-agent-stack/blob/3cb302ab4dab7ecfe605786723758f99c9b78605/blueprints/us-equities/adaptive-paper/safety.py#L427-L527).
+
+Before changing production, the native rc5/SQLite regression fails four
+subcases with zero errors/skips: omitted/non-callable notice ports after
+close/reopen at +100 s and overdue +2,000 s. Each silently advances the durable
+record despite refusing order admission. After the guard, those cases preserve
+the entire record, arm no notice timer and emit no delivery rows or orders.
+The callable positives pin exact original-deadline and overdue/coalesced
+delivery timestamps and two/three actual sink calls. Correctly wired later
+restarts recover each refused record. Existing fresh admission precedence and
+synthetic recovery tests remain in the native control and supported full suite.
+
+The matching trading-cc micro (SHA256
+`b39c39fa880f749db702f665373dcc2978ab900119a6d7f0a108d9c082b5f9fb`)
+also finds replay-guard coverage gaps. The native boundary test now includes
+identical accepted True and None replays, plus a halt with a newer event stamp
+and older init stamp; that fixture preserves `ts_event <= ts_init`. Native
+entry logic remains enabled so a weakened veto can demonstrably submit BUY.
+Its four exact reader mutations R1/R2/R12/R13 pass the earlier test, then fail
+two/one/one/one assertions after the added cases, with zero errors/skips.
+No replay production change is needed. A separate native recovery sequence
+refuses an invalid overdue-port restart at +2,000 s, then actually delivers
+immediately with a corrected port at +2,060 s, avoiding the silent attempt's
+540-second delay. Skipping invalid-port recovery records the admission refusal;
+it does not manufacture a delivery-error row for a callback never attempted.
+
+The discretionary pre-existing async-port, failure-port and duck-typed ledger
+validation variants in the same read remain separate unqualified boundaries.
+This correction closes the overlapping recovery ordering P2 and the four
+required replay witnesses; it does not claim acceptance of those variants.
+
+The packet is
+`~/.local/state/native-agent-stack/coordination/ns2604-coop/lanes/strategies-pr994-recovery-port-fix-20261011/`.
+It retains the pinned-parent reversal, native before/after controls, source
+verification and supported receipt/check results. Development labels on these
+synthetic fixtures prove startup/recovery behavior only; no market-data,
+broker, paper or performance qualification is added.

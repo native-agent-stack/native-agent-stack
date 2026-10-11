@@ -567,6 +567,141 @@ class PortableRecoveryTests(unittest.TestCase):
 
 @unittest.skipUnless(NATIVE, "requires the exact locked Nautilus rc5 runtime")
 class LifecycleTests(unittest.TestCase):
+    def test_development_restart_does_not_consume_notice_without_callable_port(self):
+        notices = importlib.import_module("blueprints.us-equities.strategies.halt_notice")
+        base = simulation.BASE_NS
+        development = {
+            "evidence_class": "development",
+            "qualified_data": ("released_development", "horizon_qualified"),
+            "exit_policy": "regular-close-v1",
+            "exit_evidence_sha256": "f" * 64,
+        }
+
+        class ObserveStartup(families.GapPremarketStrategy):
+            def on_start(self):
+                super().on_start()
+                self.startup_notice_armed = "t22-halt-hold" in self.clock.timer_names()
+
+        for binding in ("omitted", "noncallable", "callable"):
+            for offset in (100_000_000_000, 2000_000_000_000):
+                with self.subTest(binding=binding, offset=offset), tempfile.TemporaryDirectory() as directory:
+                    path = Path(directory) / "restart.sqlite3"
+                    ledger = safety.Ledger(path)
+                    try:
+                        original = run_strategy(
+                            ledger=ledger, faults=[], bids=("10", "10", "9", "8", "8"),
+                            halt_after_ns=base + 3_000_000_000,
+                            notice_sink=lambda reason: None,
+                            post_cutoff_fill_sink=lambda *args: None,
+                            overrides=dict(development, exit_deadline_ns=base + 2_000_000_000),
+                        )
+                        before = notices.load(ledger, original.spec.instrument_id, original.client_id_prefix)
+                        self.assertIsNotNone(before)
+                        self.assertEqual(before["last_notice_ns"], base + 3_000_000_000)
+                        ledger.close()
+                        ledger = safety.Ledger(path)
+                        faults, deliveries = [], []
+                        dependencies = {} if binding == "omitted" else {
+                            "notice_sink": 7 if binding == "noncallable" else deliveries.append
+                        }
+                        restarted = run_strategy(
+                            ledger=ledger, faults=faults, bids=("8",) * 3,
+                            start_ns=base + offset, initial_snapshot_age_ns=0,
+                            quote_offsets_ns=(0, 604_000_000_000, 1204_000_000_000),
+                            post_cutoff_fill_sink=lambda *args: None,
+                            strategy_type=ObserveStartup, overrides=development, **dependencies,
+                        )
+                        after = notices.load(ledger, original.spec.instrument_id, original.client_id_prefix)
+                        rows = [r for r in restarted.trace if r["event"] == "halt_hold_notice"]
+                        self.assertEqual(restarted.client_id_prefix, original.client_id_prefix)
+                        self.assertFalse(any(r["event"] in ("submit", "cancel_requested") for r in restarted.trace))
+                        self.assertTrue(restarted.faulted)
+                        self.assertFalse(restarted.enabled)
+                        self.assertEqual(restarted.quantity, 0)
+                        if binding == "callable":
+                            due = base + (603_000_000_000 if offset == 100_000_000_000 else offset)
+                            expected = [due + i * 600_000_000_000 for i in range(2 if offset == 100_000_000_000 else 3)]
+                            self.assertTrue(restarted.startup_notice_armed)
+                            self.assertNotIn("startup_notice_sink_required", faults)
+                            self.assertEqual([r["now_ns"] for r in rows], expected)
+                            self.assertEqual(deliveries, [before["reason"]] * len(expected))
+                            self.assertEqual(after["last_notice_ns"], expected[-1])
+                            self.assertEqual(after["next_due_ns"], expected[-1] + 600_000_000_000)
+                        else:
+                            self.assertEqual(after, before)  # Preserve the complete recovery record.
+                            self.assertFalse(restarted.startup_notice_armed)
+                            self.assertEqual(rows, [])
+                            self.assertEqual(deliveries, [])
+                            self.assertEqual(faults, ["startup_notice_sink_required"])
+                            self.assertFalse(restarted.callback_faults)
+                            # A correctly wired later restart can consume the
+                            # preserved record; refusal cannot discard custody.
+                            ledger.close()
+                            ledger = safety.Ledger(path)
+                            recovered_deliveries = []
+                            run_strategy(
+                                ledger=ledger, faults=[], bids=("8",),
+                                start_ns=base + offset + 1300_000_000_000,
+                                initial_snapshot_age_ns=0,
+                                notice_sink=recovered_deliveries.append,
+                                post_cutoff_fill_sink=lambda *args: None,
+                                overrides=development,
+                            )
+                            self.assertEqual(recovered_deliveries, [before["reason"]])
+                            recovered = notices.load(ledger, original.spec.instrument_id, original.client_id_prefix)
+                            self.assertEqual(recovered["last_notice_ns"], base + offset + 1300_000_000_000)
+                    finally:
+                        ledger.close()
+
+    def test_corrected_notice_port_restart_notifies_overdue_record_immediately(self):
+        notices = importlib.import_module("blueprints.us-equities.strategies.halt_notice")
+        base = simulation.BASE_NS
+        development = {
+            "evidence_class": "development",
+            "qualified_data": ("released_development", "horizon_qualified"),
+            "exit_policy": "regular-close-v1",
+            "exit_evidence_sha256": "f" * 64,
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "corrected-port.sqlite3"
+            ledger = safety.Ledger(path)
+            try:
+                original = run_strategy(
+                    ledger=ledger, faults=[], bids=("10", "10", "9", "8", "8"),
+                    halt_after_ns=base + 3_000_000_000,
+                    notice_sink=lambda reason: None, post_cutoff_fill_sink=lambda *args: None,
+                    overrides=dict(development, exit_deadline_ns=base + 2_000_000_000),
+                )
+                before = notices.load(ledger, original.spec.instrument_id, original.client_id_prefix)
+                ledger.close()
+                ledger = safety.Ledger(path)
+                faults = []
+                refused = run_strategy(
+                    ledger=ledger, faults=faults, bids=("8",),
+                    start_ns=base + 2000_000_000_000, initial_snapshot_age_ns=0,
+                    post_cutoff_fill_sink=lambda *args: None, overrides=development,
+                )
+                self.assertEqual(faults, ["startup_notice_sink_required"])
+                self.assertFalse(any(r["event"] == "halt_hold_notice" for r in refused.trace))
+                self.assertEqual(notices.load(ledger, original.spec.instrument_id, original.client_id_prefix), before)
+                ledger.close()
+                ledger = safety.Ledger(path)
+                delivered = []
+                corrected = run_strategy(
+                    ledger=ledger, faults=[], bids=("8",),
+                    start_ns=base + 2060_000_000_000, initial_snapshot_age_ns=0,
+                    notice_sink=delivered.append, post_cutoff_fill_sink=lambda *args: None,
+                    overrides=development,
+                )
+                self.assertEqual(delivered, ["held_halted"])
+                self.assertEqual(
+                    [r["now_ns"] for r in corrected.trace if r["event"] == "halt_hold_notice"],
+                    [base + 2060_000_000_000],
+                )
+                self.assertFalse(any(r["event"] in ("submit", "cancel_requested") for r in corrected.trace))
+            finally:
+                ledger.close()
+
     def test_equal_accepted_snapshot_replay_clears_late_halt_before_native_entry(self):
         observed = []
 
@@ -601,22 +736,45 @@ class LifecycleTests(unittest.TestCase):
     def test_snapshot_replay_keeps_conflict_future_and_native_halt_vetoes(self):
         from nautilus_trader.model import InstrumentStatus, MarketStatusAction
 
-        for boundary in ("conflicting", "future", "older", "native_halt"):
+        for boundary in (
+            "conflicting", "future", "older", "native_halt",
+            "accepted_true_replay", "accepted_none_replay", "newer_event_halt",
+        ):
             with self.subTest(boundary=boundary):
                 observed = []
 
                 class RefuseReplay(families.GapPremarketStrategy):
-                    def entry_condition(self, snapshot):
-                        return False
+                    def on_data(self, data, boundary=boundary):
+                        value = getattr(data, "data", data)
+                        if (
+                            boundary == "newer_event_halt"
+                            and self.snapshot is None
+                            and isinstance(value, contracts.FactorSnapshot)
+                        ):
+                            # Leave room for a newer event with an older init;
+                            # every fixture still respects ts_event <= ts_init.
+                            value = replace(value, ts_event=value.ts_init - 10_000_000_000)
+                        return super().on_data(value)
 
                     def on_quote(self, quote, boundary=boundary, observed=observed):
                         if not observed and self.snapshot is not None:
                             accepted = self.snapshot
-                            self.on_data(replace(
-                                accepted, halted=True,
-                                ts_event=accepted.ts_event - 1_000_000_000,
-                                ts_init=accepted.ts_init - 1_000_000_000,
-                            ))
+                            if boundary in ("accepted_true_replay", "accepted_none_replay"):
+                                self.on_data(replace(
+                                    accepted,
+                                    halted=True if boundary == "accepted_true_replay" else None,
+                                    ts_event=accepted.ts_event + 1_000_000_000,
+                                    ts_init=accepted.ts_init + 1_000_000_000,
+                                ))
+                                accepted = self.snapshot
+                            else:
+                                self.on_data(replace(
+                                    accepted, halted=True,
+                                    ts_event=accepted.ts_event + 1_000_000_000
+                                    if boundary == "newer_event_halt"
+                                    else accepted.ts_event - 1_000_000_000,
+                                    ts_init=accepted.ts_init - 1_000_000_000,
+                                ))
                             replay = accepted
                             if boundary == "conflicting":
                                 replay = replace(accepted, valid_until_ns=accepted.valid_until_ns + 1)
@@ -627,7 +785,7 @@ class LifecycleTests(unittest.TestCase):
                                     accepted, ts_event=accepted.ts_event - 2_000_000_000,
                                     ts_init=accepted.ts_init - 2_000_000_000,
                                 )
-                            else:
+                            elif boundary == "native_halt":
                                 self.on_instrument_status(InstrumentStatus(
                                     self.instrument_id, MarketStatusAction.HALT,
                                     quote.ts_event, quote.ts_event,
@@ -641,10 +799,12 @@ class LifecycleTests(unittest.TestCase):
                 strategy = run_strategy(ledger=None, faults=[], strategy_type=RefuseReplay)
                 self.assertEqual(len(observed), 1)
                 reason, frozen, retained, latch, native_halt = observed[0]
-                self.assertEqual(reason, "held_halted")
+                self.assertEqual(reason, "held_halt_state_unknown"
+                                 if boundary == "accepted_none_replay" else "held_halted")
                 self.assertTrue(retained)
                 self.assertEqual(frozen, boundary == "conflicting")
-                self.assertEqual(latch, boundary != "native_halt")
+                self.assertIs(latch, None if boundary == "accepted_none_replay"
+                              else boundary != "native_halt")
                 self.assertEqual(native_halt, boundary == "native_halt")
                 self.assertFalse(any(row["event"] == "submit" for row in strategy.trace))
                 self.assertFalse(strategy.callback_faults)

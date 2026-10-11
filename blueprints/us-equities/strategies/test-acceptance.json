@@ -41,8 +41,10 @@
     "test_clock_ahead_and_stale_native_halts_cancel_at_delivery",
     "test_clock_ahead_halt_requires_available_ordered_resumption",
     "test_clock_leading_halted_snapshot_cancels_at_delivery",
+    "test_corrected_notice_port_restart_notifies_overdue_record_immediately",
     "test_delayed_first_buy_callback_uses_native_fill_event_time",
     "test_delayed_native_fill_keeps_original_session_calendar_deadline",
+    "test_development_restart_does_not_consume_notice_without_callable_port",
     "test_development_startup_requires_callable_notice_sink",
     "test_development_startup_requires_durable_ledger_before_entry",
     "test_development_startup_requires_post_cutoff_risk_sink",
@@ -131,18 +133,18 @@
     "blueprints/us-equities/strategies/__init__.py": "a6e37c81a6492dde3adf9d050ab4c7b99278f9821e224b5b9f8c3200496e91ff",
     "blueprints/us-equities/strategies/acceptance.py": "090273ec96f4bce0762ac7aadb39c71dcc9be50d4c0ffc5a1cf28c10d5c5d122",
     "blueprints/us-equities/strategies/contracts.py": "9a185e04467207af711e96a60594579e6446919a727b93629a9dc11d07ae3426",
-    "blueprints/us-equities/strategies/families.py": "fb4ef4b47e11514c64d8100a17ee6294d8ab675650ec82d18b4479db8e643e03",
+    "blueprints/us-equities/strategies/families.py": "31e0b994c50ceb5f41ac0f3accc422d70dc4eee310bd84f60f4ef8a1fcb16b05",
     "blueprints/us-equities/strategies/halt_notice.py": "d8f27828d55be839de26c98bc6ada8cf56fc2e02b7c9743af035b96accf495f0",
     "blueprints/us-equities/strategies/presets.py": "c8163295938ed9f303903d3f9f07d1a6060e81b7ae9cd74e6bf4a8a7166e2be7",
     "blueprints/us-equities/strategies/registry.json": "091868499c161b5b485f1dbf831f67320af72133b17bfda1804ab60d97e27711",
     "blueprints/us-equities/strategies/simulation.py": "f85076053e2281eb01d29d890c756e53f38d39c1ac00ac48afa7e24533984834",
     "tests/test_adaptive_paper_native.py": "728458624788243abcaf653f6a20a5a6201cfa9ec3328e8d7eb3fd58fdfa94b0",
     "tests/test_us_equities_strategies.py": "5da0d609528bbea10b3ee6d71e6db10934f017b011277485d5765978391599c6",
-    "tests/test_us_equities_strategy_lifecycle.py": "1b83c4eba04a5e1028174be4df21d32e8f6096176ff0530ef4e053d3153e49a4"
+    "tests/test_us_equities_strategy_lifecycle.py": "c875d07c170da35df2a78aaefc8faf2ae0ab0faef2641d6baf548b73132e1e67"
   },
   "status": "passed",
-  "stderr_sha256": "03e5ae77bc5f2c3c21d3558123d25779761b7d4502a73a167c7b68ef42b6df4d",
-  "stdout_sha256": "7c160c97190084fbcaa6bd24e7420514d78e835c19d2b545ea06bdbadadb2e9b",
+  "stderr_sha256": "02c0de965bddeb1d37420a4a20392ac5f645722f4ba12648d51c68569f72452b",
+  "stdout_sha256": "10e9fd8d95f35c198440aefcbfe125eb98b1103f20337084a3d6868b0c62bb09",
   "strategy_performance": "NOT_CITED",
-  "tests_run": 109
+  "tests_run": 111
 }
