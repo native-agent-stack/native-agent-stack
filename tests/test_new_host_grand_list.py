@@ -338,6 +338,66 @@ class RealRepoQualifiedModelsShapeTests(unittest.TestCase):
         self.assertIsInstance(data["qualified_models"], list)
 
 
+class NewestSweepManifestTests(unittest.TestCase):
+    """The pin data and the rendered provenance come from the newest committed sweep manifest, chosen as the
+    component matrix chooses it (scripts/component_matrix.py newest_sweep_manifest: latest ISO ``checked_at``), not
+    from a file name written into this script. The older manifest has the winner's pin current, the newer one has it
+    behind upstream. The older one is named manifest-20260923.json, the file this script used to hard-code, so the
+    unfixed script reads it instead of failing to find it."""
+
+    OLDER = "catalogs/sota-convergence/manifest-20260923.json"
+    NEWER = "catalogs/sota-convergence/manifest-20261009.json"
+    REPOSITORY = "https://github.com/acme/widget"
+
+    def _manifest(self, checked_at, latest, behind):
+        return {"checked_at": checked_at, "trading": [], "foundation": [{"layer": "layer-a", "components": [{
+            "id": "widget", "pin": "1.0.0", "repository": self.REPOSITORY,
+            "upstream": {"latest": latest}, "pin_behind_upstream": behind,
+        }]}]}
+
+    def _two_manifests(self):
+        return {self.OLDER: self._manifest("2026-09-23", "1.0.0", False),
+                self.NEWER: self._manifest("2026-10-09", "2.0.0", True)}
+
+    def _build(self, manifests):
+        """g.build() over a temp root that holds the inputs it loads plus the given sweep manifests."""
+        matrix = {"rows": [{"catalog": "foundation", "layer_id": "layer-a", "title": "Layer A", "winners": [{
+            "component_id": "widget", "repository": self.REPOSITORY, "pin": "1.0.0", "evidence_class": "native_proven",
+        }]}], "summary": {"needs_host": {}}}
+        files = {
+            "catalogs/landscape/component-evidence-matrix.json": matrix,
+            **{relative: {"layers": []} for relative in g.LEDGERS.values()},
+            "adoption/manifest.json": {"profiles": [], "recipe_map": {}},
+            **{relative: {"tools": []} for relative in g.PIN_FILES.values()},
+            "adoption/hardware-profiles.json": {"hosts": []},
+            **manifests,
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            for relative, document in files.items():
+                (root / relative).parent.mkdir(parents=True, exist_ok=True)
+                (root / relative).write_text(json.dumps(document), encoding="utf-8")
+            with mock.patch.object(g, "ROOT", root):
+                return g.build()
+
+    def test_pin_data_comes_from_the_manifest_with_the_latest_checked_at(self):
+        data = self._build(self._two_manifests())
+        winner = data["layers"][0]["winners"][0]
+        self.assertEqual((winner["upstream_latest"], winner["pin_behind_upstream"]), ("2.0.0", True))
+        self.assertEqual(data["summary"]["pins_behind_upstream"], ["widget"])
+        self.assertEqual(data["sources"]["manifest"], self.NEWER)
+
+    def test_rendered_markdown_names_the_manifest_it_was_built_from(self):
+        md = g.render_md(self._build(self._two_manifests()))
+        self.assertIn(f"`{self.NEWER}`", md)
+        self.assertNotIn(self.OLDER, md)
+
+    def test_no_committed_sweep_manifest_stops_the_build(self):
+        with self.assertRaises(SystemExit) as stopped:
+            self._build({})
+        self.assertIn("sweep manifest", str(stopped.exception))
+
+
 if __name__ == "__main__":
     unittest.main()
 

@@ -17192,8 +17192,8 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "45da8044fb6c582b08b59dc3e7ba835bf5cb89251048d8f13bd47940d3a0a278",
-      "bytes": 287577
+      "sha256": "9a2163cd9acf14a564864050fde0f123d75bff5584f0024015d90d553ce29bf1",
+      "bytes": 287743
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -18897,8 +18897,8 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "e8d75bcab6363af4946da59220a8adc9110c50fe42622d0bfeec8a7154162956",
-      "bytes": 18484
+      "sha256": "e17e52d608c0c6fd51c8d8cf0f349bc06faeb877811c94aacdef399e0a268571",
+      "bytes": 18723
     },
     {
       "path": "docs/new-workstation-runtime-profile-20260922.md",
@@ -61072,8 +61072,8 @@
     },
     {
       "path": "tests/test_new_host_grand_list.py",
-      "sha256": "8e24fa3326e9a4f3c5df3269eb81f8472a46963aa357609e2c8e9bff98057e0b",
-      "bytes": 18369
+      "sha256": "8112e85cff9b6e665dea1ee5e659a19ab178e32b78b6f621396918d0a5080d21",
+      "bytes": 21695
     },
     {
       "path": "tests/test_new_wsl_client_config.py",
