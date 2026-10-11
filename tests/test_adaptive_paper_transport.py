@@ -447,6 +447,28 @@ class HTTPBoundary(unittest.TestCase):
         self.assertEqual(result["clock"]["received_at_ns"], received_at_ns)
         self.assertEqual([c.args[0] for c in self.budget.call_args_list], ["read"] * 5 + ["data_read"])
 
+    def _assert_preflight_rejects_non_list_response(self, endpoint, collection):
+        payloads = {"/v2/account": {"id": "fixture-account-id", "cash": "1000", "equity": "1000", "buying_power": "1000"},
+                    "/v2/clock": {"is_open": True, "timestamp": "2026-09-21T15:00:00Z", "next_close": "2026-09-21T20:00:00Z", "next_open": "2026-09-22T13:30:00Z"},
+                    "/v2/positions": [], "/v2/orders": [],
+                    "/v2/assets/SPY": {"symbol": "SPY", "tradable": True, "fractionable": True},
+                    "/v2/stocks/quotes/latest": {"quotes": {"SPY": {"bp": 100, "ap": 100.01, "bs": 1, "as": 1, "t": "2026-09-21T15:00:00Z"}}}}
+        def request(method, url, **kwargs):
+            self.assertEqual(method, "GET")
+            return response(payloads[t.urlsplit(url).path], status=200)
+        for payload in ({}, ""):
+            with self.subTest(endpoint=endpoint, payload=payload):
+                payloads[endpoint] = payload
+                with patch("requests.Session.request", side_effect=request):
+                    with self.assertRaisesRegex(t.TransportError, f"{collection} response must be a list"):
+                        t.preflight("fixture-key", "fixture-secret", ["SPY"], before_request=self.budget)
+
+    def test_preflight_refuses_non_list_positions_in_success_response(self):
+        self._assert_preflight_rejects_non_list_response("/v2/positions", "positions")
+
+    def test_preflight_refuses_non_list_orders_in_success_response(self):
+        self._assert_preflight_rejects_non_list_response("/v2/orders", "orders")
+
     def _preflight_clients(self):
         trading, data = Mock(), Mock()
         trading.get_account.return_value = {"id": "fixture-account", "cash": "1000",

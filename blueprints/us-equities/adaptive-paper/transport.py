@@ -998,12 +998,17 @@ def preflight(api_key, secret_key, symbols, *, feed="iex", before_request, reque
         identity = hashlib.sha256(str(raw_account["id"]).encode()).hexdigest()
         clock = trading.get_clock()
         clock_received_at_ns = time.time_ns()
+        raw_positions = trading.get_all_positions()
+        if type(raw_positions) is not list:
+            raise TransportError("positions response must be a list")
         positions = [{"symbol": p["symbol"], "qty": decimal_string(p["qty"]),
                       "avg_entry_price": decimal_string(p["avg_entry_price"])}
-                     for p in trading.get_all_positions()]
+                     for p in raw_positions]
         # Preflight admits only a flat account with no open orders. A full page is
         # explicitly incomplete and therefore cannot establish that condition.
         raw_orders = trading.get("/orders", {"status": "open", "limit": 500, "nested": False})
+        if type(raw_orders) is not list:
+            raise TransportError("orders response must be a list")
         orders = [normalize_order(raw) for raw in raw_orders]
         assets = []
         for symbol in symbols:

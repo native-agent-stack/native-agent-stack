@@ -201,6 +201,11 @@ broker state; the caller reconciles concurrent stream observations. Synchronous
 assets and quotes on the configured feed. Its SHA-256 account identity supports
 a private account lock without returning the raw account ID. `open_orders_complete=False` on a
 full 500-order page prevents claiming an empty account from a truncated list.
+Positions and open-order responses must be JSON arrays: a successful HTTP status
+with `{}` or `""` is refused before it can be reported as an empty account.
+This checks the collection contract left to callers by alpaca-py 0.44.0's
+[`get_all_positions` raw-data branch](https://github.com/alpacahq/alpaca-py/blob/v0.44.0/alpaca/trading/client.py#L246)
+and [`RESTClient._one_request` JSON decoder](https://github.com/alpacahq/alpaca-py/blob/v0.44.0/alpaca/common/rest.py#L211).
 Missing or invalid per-symbol quotes are returned as sanitized `quote_errors`
 alongside the valid quotes, preserving clock/account/asset readiness evidence
 after hours. The caller still requires valid fresh benchmark and execution quotes
