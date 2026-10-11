@@ -240,10 +240,14 @@ Why the roles are split this way:
   - Sonnet still runs the two GPT-6 wrappers, which only run commands and return the raw result.
 - The GPT-6 lanes add a second family to discovery and to the fit judgment, where single-family bias matters most.
 - The Claude judgment roles run as the **`landscape-sweep-worker`** agent type (`adoption/agents/claude/landscape-sweep-worker.md`): Opus at effort max, with `disallowedTools: WebFetch`.
-  - The type keeps every other inherited tool, including Skill and context-mode's `ctx_*`. So pages come in through `ctx_fetch_and_index` and `ctx_search` as the page's own text, not as a smaller model's answer about the page.
+  - Correction #138 (2026-10-10) replaces tool inheritance with the native role `tools` allowlist: Read, Glob, Grep, WebSearch, ToolSearch and context-mode's `ctx_fetch_and_index`, `ctx_index`, `ctx_search`. Pages and public GitHub REST GET responses are indexed primary source text. Large local inputs use `ctx_index` followed by bounded `ctx_search`.
+  - Workers apply the named skills by reading their installed SKILL.md source. The native Skill tool is excluded: its dynamic shell context executed a foreign-file delete despite the shell being absent from the tool list in a native 2.1.296 regression. Merely keeping Skill while excluding Bash does not establish this boundary.
+  - The SubagentStart and SessionStart token-lanes hooks inject no carrier for this role: its body already supplies web, indexing and source-reading skill guidance through the admitted tools. Hosts that opted into either held-out carrier must refresh it with the explicit hook prerequisite below.
+  - Scratch preparation and cleanup belong to the coordinator and command-only GPT wrappers. Judgment workers have no shell, file-writing, arbitrary-code MCP or further-agent tools, so they cannot delete shared scratch files. This does not restrict the command-only wrappers or impose an OS sandbox on the coordinator.
+  - The supported seam is Claude Code 2.1.296's [subagent tool allowlist](https://code.claude.com/docs/en/sub-agents#available-tools). The [decision and native regression](../../../docs/decisions/2026-10-10-landscape-scratch-ownership.md) record why a Bash-only delete hook was insufficient.
   - The worker prompts no longer mention WebFetch.
   - Why: in the 2026-09-27 smoke 2, with WebFetch available and the token-lanes guidance injected, all 15 Claude page fetches used WebFetch and none used context-mode (counted per agent by the token lane).
-  - The built-in `stack-researcher` type also excludes WebFetch, but it has no Skill tool, so the pinned skills the templates name would be lost.
+  - The `stack-researcher` type grants Bash and context-mode code-execution tools. This sweep uses a narrower native tool list while preserving named skill instructions through SKILL.md reads.
 
 The role split is the design of the 2026-09-26 prototype, with these 2026-09-27 changes. No measured comparison has tested it. Moving the facts role to GPT-6 would change a vote's family, which the survival rule and the copy check key on, so it needs its own comparison first.
 
@@ -548,7 +552,7 @@ provides it.
 
 The prerequisites:
 - a Claude Code coordinator session with the Workflow tool (this repository's `.claude/settings.json` turns Ultracode on);
-- the `landscape-sweep-worker` agent installed (`python3 tools/adoption/install_claude_profile.py --only agents`);
+- the `landscape-sweep-worker` agent installed (`python3 tools/adoption/install_claude_profile.py --only agents`); hosts that opted into the held-out token-lanes carriers also refresh both with `python3 tools/adoption/install_claude_profile.py --only guard --hook token-lanes-subagent-start.py --hook token-lanes-session-start.py` (these carriers remain opt-in);
 - `gh` signed in;
 - `codex` on PATH, signed in natively;
 - node and python3.

@@ -5271,8 +5271,8 @@
     },
     {
       "path": "adoption/agents/claude/landscape-sweep-worker.md",
-      "sha256": "bb7e436080483adf0eb14e69e3d73b4feb9c7c4b55baff31e8b70f30733e369c",
-      "bytes": 1871
+      "sha256": "3d5d46c2c96f03a710ec9455d19ae196a6ca81804398c31eafb5c8eefe5d11cc",
+      "bytes": 2746
     },
     {
       "path": "adoption/agents/claude/security-reviewer.md",
@@ -5366,7 +5366,7 @@
     },
     {
       "path": "adoption/hooks/claude/SHA256SUMS",
-      "sha256": "9db7433fa8c7d1c37a55b027e8eb3b66ed400ad375403abfa9808aa86fb82c66",
+      "sha256": "7980c6bc7ebd2759f6dc6337f0d3b753f6cbbb94b2be0d4d5b475acf6b6462e7",
       "bytes": 1229
     },
     {
@@ -5411,13 +5411,13 @@
     },
     {
       "path": "adoption/hooks/claude/token-lanes-session-start.py",
-      "sha256": "e6e3151d27e439a9392e1f3673f1168b6fb60a9c8b8616af01fff2b163757839",
-      "bytes": 1653
+      "sha256": "4df357c44a4cdff5999ce46044a9a7655553289d178529e958126fea6dc38fcb",
+      "bytes": 1657
     },
     {
       "path": "adoption/hooks/claude/token-lanes-subagent-start.py",
-      "sha256": "81e28a7c2f5429301d3306dc5ee0ecf809c67ccded62a43a98281baa8f92fedd",
-      "bytes": 2082
+      "sha256": "3864ea000bccfacee61ea7b4bc0b601870fe6b9496b1f8ab82f0807dc52775bb",
+      "bytes": 2114
     },
     {
       "path": "adoption/host-receipt.schema.json",
@@ -18621,6 +18621,11 @@
       "bytes": 9146
     },
     {
+      "path": "docs/decisions/2026-10-10-landscape-scratch-ownership.md",
+      "sha256": "909c48edba8f935c8102656f463a840950a3e885657d2fd2da973c8dbfb3c2a9",
+      "bytes": 12263
+    },
+    {
       "path": "docs/decisions/2026-10-10-openhands-shard-discovery-protection.md",
       "sha256": "634ea007962339fed50e933bdc7d407da28041b0cb21c610215f47a4455138e6",
       "bytes": 2956
@@ -19067,8 +19072,8 @@
     },
     {
       "path": "docs/token-session-handbook.md",
-      "sha256": "aec069f49d6fa9692b0b17444b5b209004d3bfd7d8c98d3ab06dcff25954e554",
-      "bytes": 113465
+      "sha256": "43c1f0618319542a5b4fd339fb84aba82379f836244348389854e88cde1c260a",
+      "bytes": 113488
     },
     {
       "path": "docs/ultracode-token-routing-20260921.md",
@@ -61647,13 +61652,18 @@
     },
     {
       "path": "tests/test_landscape_sweep_harness.py",
-      "sha256": "4df2042eacd155c074698dfc7b05d8e5c7c86c697989b5552db08042e983a73d",
-      "bytes": 378707
+      "sha256": "cc5e8c995159db8f1226d08709b23edfd16e1d65a7bbd05c06110e07befe3a8e",
+      "bytes": 379232
     },
     {
       "path": "tests/test_landscape_sweep_skills.py",
       "sha256": "88308af6ecf78cdf9850b4739933ed4a17fb45db1d2296bc0bc23010e2fb768d",
       "bytes": 183846
+    },
+    {
+      "path": "tests/test_landscape_sweep_worker_boundary.py",
+      "sha256": "59c6dd453374e9fff0dfedd9dc432f14ef1644e8d58b2279f558df9bb6b53c3d",
+      "bytes": 19315
     },
     {
       "path": "tests/test_lane_packets.py",
@@ -62227,8 +62237,8 @@
     },
     {
       "path": "tests/test_token_lanes_subagent_start.py",
-      "sha256": "7c98878632be2ca51e0f1fb6e90f4ce8f91a83359f2451477566f646288aca6c",
-      "bytes": 32021
+      "sha256": "a299bf39525e7fea1e1530121fb18554efa5174eeb4d08e98f3c2fbc3fea75a8",
+      "bytes": 32120
     },
     {
       "path": "tests/test_token_measurement.py",
@@ -62697,8 +62707,8 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/README.md",
-      "sha256": "08d84a2e57f9c45293636d4e5f8f41865ff855cba29bc54673ca05ca4e44bc3d",
-      "bytes": 112744
+      "sha256": "dcb2832a1face75a46d74ae76b886ea9eb76ffb5a7e57e1717e4a09795a8bb67",
+      "bytes": 114402
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/build_args.py",
@@ -62787,8 +62797,8 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/sweep.js",
-      "sha256": "58bbaf3c1ab2015c67d1566afec8cbae44ca0a6465729b4c470369389471f626",
-      "bytes": 19206
+      "sha256": "0d10c95f36baa6d3f9148161f64f7b59aa2c250483bb571455d8aca51a4bfa76",
+      "bytes": 19522
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/sweep_common.py",
@@ -62797,8 +62807,8 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/templates.json",
-      "sha256": "738af1b178ed50fa7504c28458c996dfad7f29c2e3037d2d6800815e38270ff4",
-      "bytes": 29737
+      "sha256": "9a806fa9ef484c1ca1bfe3e5111769b0afcf69172663c25876aef578ec3b3fdc",
+      "bytes": 30107
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/usage_record.py",
