@@ -528,7 +528,7 @@ class ActiveModelCurrencyTests(unittest.TestCase):
         self.assertEqual((result["status"], rc), ("current", 0))
         self.assertEqual(result["errors"], [])
 
-    def test_parse_failures_with_raw_or_escaped_model_candidates_stay_unknown(self):
+    def test_non_prose_command_parse_failures_with_model_candidates_stay_unknown(self):
         for identifier in ("gpt-6-sol", r"gpt\-6-sol"):
             with self.subTest(identifier=identifier):
                 self.write("tools/launch.sh", f"codex exec -m {identifier} 'unclosed\n")
@@ -536,6 +536,34 @@ class ActiveModelCurrencyTests(unittest.TestCase):
                 result = json.loads(out)
                 self.assertEqual((result["status"], rc), ("unknown", 2))
                 self.assertTrue(result["errors"])
+
+    def test_docs_sh_fence_parse_failure_matches_the_documented_prose_scope(self):
+        self.write("docs/launch.md", "```sh\ncodex exec -m gpt-6.1-sol 'unclosed\n```\n")
+        rc, out, _ = self.cli("check")
+        result = json.loads(out)
+        self.assertEqual((result["status"], rc), ("current", 0))
+        self.assertEqual(result["errors"], [])
+        # The behavior predates this correction; the regression is the docs'
+        # contradictory guarantee for this concrete command, not the runtime.
+        doc = Path(mc.__file__).resolve().parents[1] / "docs/active-model-currency.md"
+        self.assertIn("Prose command lines, including docs `sh` fences, fall back to sentence matching of the raw line.",
+                      " ".join(doc.read_text().split()))
+
+    def test_documented_parse_failure_scope_matches_field_and_non_prose_controls(self):
+        for name, text in (("docs/value.md", "model: 'gpt-6.1-sol\n"),
+                           ("tools/launch.sh", "codex exec -m gpt-6.1-sol 'unclosed\n")):
+            with self.subTest(name=name):
+                path = self.write(name, text)
+                try:
+                    rc, out, _ = self.cli("check")
+                    result = json.loads(out)
+                    self.assertEqual((result["status"], rc), ("unknown", 2))
+                    self.assertTrue(result["errors"])
+                finally:
+                    path.unlink()
+        doc = Path(mc.__file__).resolve().parents[1] / "docs/active-model-currency.md"
+        self.assertIn("Field and non-prose command parse failures with a model-ID candidate keep coverage unknown",
+                      " ".join(doc.read_text().split()))
 
     def test_quoted_and_escaped_punctuation_remains_an_operand_in_command_strings(self):
         commands = ["echo ';' codex -m gpt-6-sol", r"echo \; codex -m gpt-6-sol",

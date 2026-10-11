@@ -112,9 +112,13 @@ Quoted or escaped punctuation remains data in command strings too, following
 [CPython v3.13.16's lexer states](https://github.com/python/cpython/blob/v3.13.16/Lib/shlex.py#L163-L218).
 Each readable text selector field contributes only its first lexical value;
 its explanatory tail is not scanned for further values. The first value still
-needs complete POSIX quoting. A field or command parse failure on a line without
-a model-ID candidate is skipped; potentially escaped IDs count as candidates,
-and parse failures on those lines keep coverage unknown. This follows
+needs complete POSIX quoting. Field and non-prose command parse failures with
+a model-ID candidate keep coverage unknown (raw or potentially escaped).
+Prose command lines, including docs `sh` fences, fall back to sentence matching
+of the raw line. A field or non-prose line without such a candidate can be skipped
+after parsing fails. These scopes follow the
+[field error path](https://github.com/seathatflowsinourveins/native-agent-stack/blob/7e4a0c94fd42879d3b41adae1042a048fff5c6a4/scripts/active_model_currency.py#L614-L617)
+and [prose/non-prose command paths](https://github.com/seathatflowsinourveins/native-agent-stack/blob/7e4a0c94fd42879d3b41adae1042a048fff5c6a4/scripts/active_model_currency.py#L633-L639), preserving
 [CPython v3.13.16's incomplete-quote refusal](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Lib/shlex.py#L185-L191).
 Structured JSON selector lists and command/argv values retain their own
 traversal rules. It covers active lane configuration too; `.md` and `lanes/`
