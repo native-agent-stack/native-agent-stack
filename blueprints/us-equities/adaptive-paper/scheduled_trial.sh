@@ -13,7 +13,7 @@ here="$(cd "$(dirname "$0")" && pwd)"
 data="$(cd "$here/../data" && pwd)"
 : "${TRIAL:?}" "${ENV_FILE:?}" "${STATE_ROOT:?}" "${OUT_DIR:?}"
 CONFIG="${CONFIG:-$here/config-sip.json}"
-PY="${PY:-$HOME/.local/share/codex-ecosystem/tools/adaptive-paper-20260921/bin/python}"
+PY="${PY:-$HOME/projects/us-equities-runtime/.venv/bin/python}"
 GATE_PY="${GATE_PY:-$HOME/.local/share/codex-ecosystem/tools/promotion-gate-20260922/.venv/bin/python3}"
 mkdir -p "$OUT_DIR"
 live=()
