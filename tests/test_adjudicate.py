@@ -621,6 +621,7 @@ class CodexTests(AdjudicateFixture):
         self.assertEqual(self.run_codex(provider="omniroute", base_url="http://127.0.0.1:21128/v1")[0], 0)
         self.collect_native_claude_judgments()
         mutations = [(("provider",), {}), (("pass_through",), {}), (("provider", "pass_through"), {}),
+                     (("provider", "provider_base_url", "pass_through"), {}),
                      ((), {"provider": "native"}), ((), {"pass_through": "attested"}),
                      ((), {"pass_through": self.PASS_THROUGH + " "}),
                      (("provider_base_url",), {}), ((), {"provider_base_url": "http://gateway.example/v1"}),
@@ -653,6 +654,126 @@ class CodexTests(AdjudicateFixture):
                         self.assertNotEqual(counted[0]["claude_position"], adjudicate.claude_position(entry, order))
                     finally:
                         adjudicate.write_json(self.judgment_file(order), original)
+
+    def test_all_transport_fields_missing_must_not_count_as_native(self):
+        # The retained cb68e66f GPT reproducer starts with unanimous votes, so
+        # losing the complete disclosure cannot silently turn a winner native.
+        self.assertEqual(self.run_codex(provider="omniroute", base_url="http://127.0.0.1:21128/v1")[0], 0)
+        self.collect_native_claude_judgments()
+        entry = next(e for e in adjudicate.load_index(self.work)["layers"] if e["layer"] == NAME)
+        for order in adjudicate.ORDERS:
+            data = json.loads(self.judgment_file(order).read_text(encoding="utf-8"))
+            data["judge"]["preferred"] = "B" if adjudicate.claude_position(entry, order) == "A" else "A"
+            adjudicate.write_json(self.judgment_file(order), data)
+        code, err, before = self.assemble()
+        self.assertEqual(code, 0, err)
+        self.assertEqual(before["winner_lane"], "codex")
+        self.assertEqual(before["disclosure"]["provider"], "omniroute")
+        for order in adjudicate.ORDERS:
+            data = json.loads(self.judgment_file(order).read_text(encoding="utf-8"))
+            for field in self.TRANSPORT:
+                data.pop(field)
+            adjudicate.write_json(self.judgment_file(order), data)
+        code, err, after = self.assemble()
+        self.assertEqual(code, 0, err)
+        self.assertIsNone(after["winner_lane"], "undisclosed OmniRoute judgments must not elect a winner")
+        self.assertEqual(after["missing_families"], ["openai"])
+        self.assertEqual(len(after["judgments"]), 2)
+        self.assertTrue(all(item["judge"]["family"] == "anthropic" for item in after["judgments"]))
+        for order in adjudicate.ORDERS:
+            self.assertIn(f"openai {order}", err)
+
+    def test_all_transport_fields_missing_must_not_resume_as_native(self):
+        self.assertEqual(self.run_codex(provider="omniroute", base_url="http://127.0.0.1:21128/v1")[0], 0)
+        self.assertEqual(len(self.calls()), 4)
+        for order in adjudicate.ORDERS:
+            data = json.loads(self.judgment_file(order).read_text(encoding="utf-8"))
+            for field in self.TRANSPORT:
+                data.pop(field)
+            adjudicate.write_json(self.judgment_file(order), data)
+        code, err = self.run_codex()
+        self.assertEqual(code, 0, err)
+        self.assertEqual(len(self.calls()), 8, "changing transport must rerun both judge/refuter pairs")
+        for order in adjudicate.ORDERS:
+            data = json.loads(self.judgment_file(order).read_text(encoding="utf-8"))
+            self.assertFalse(set(self.TRANSPORT) & set(data))
+        self.assertEqual(self.run_codex()[0], 0)
+        self.assertEqual(len(self.calls()), 8, "the replacement native judgments must resume")
+
+    def test_native_events_keep_the_child_bytes_without_a_transport_frame(self):
+        self.assertEqual(self.run_codex()[0], 0)
+        expected = Path(self.env["CODEX_FAKE_EVENTS_FILE"]).read_bytes()
+        for order in adjudicate.ORDERS:
+            data = json.loads(self.judgment_file(order).read_text(encoding="utf-8"))
+            for stage in ("judge", "refute"):
+                with self.subTest(order=order, stage=stage):
+                    self.assertEqual(Path(data["events"][stage]["path"]).read_bytes(), expected)
+
+    def test_assembly_refuses_invalid_or_inconsistent_bound_transport(self):
+        self.assertEqual(self.run_codex(provider="omniroute", base_url="http://127.0.0.1:21128/v1")[0], 0)
+        self.collect_native_claude_judgments()
+        original = json.loads(self.judgment_file("AB").read_text(encoding="utf-8"))
+        frame = {"type": "native_agent_stack.transport", "schema_version": 1,
+                 "transport": {field: original[field] for field in self.TRANSPORT}}
+        other = json.loads(json.dumps(frame))
+        other["transport"]["provider_base_url"] = "http://127.0.0.1:21129/v1"
+        extra_transport = json.loads(json.dumps(frame))
+        extra_transport["transport"]["extra"] = True
+        original_events = {stage: Path(original["events"][stage]["path"]).read_bytes()
+                           for stage in ("judge", "refute")}
+        child_events = {stage: b"".join(line for line in payload.splitlines(keepends=True)
+                                       if json.loads(line).get("type") != "native_agent_stack.transport")
+                        for stage, payload in original_events.items()}
+        cases = [
+            ("missing-frame", [], [frame], True),
+            ("duplicate-frame", [frame, frame], [frame], True),
+            ("wrong-schema", [{**frame, "schema_version": 2}], [frame], True),
+            ("extra-frame-key", [{**frame, "extra": True}], [frame], True),
+            ("extra-transport-key", [extra_transport], [frame], True),
+            ("stage-disagreement", [frame], [other], True),
+            ("changed-without-new-digest", [other], [frame], False),
+        ]
+        for case, judge_frames, refute_frames, update_digest in cases:
+            with self.subTest(binding=case):
+                modified = json.loads(json.dumps(original))
+                try:
+                    for stage, frames in (("judge", judge_frames), ("refute", refute_frames)):
+                        path = Path(original["events"][stage]["path"])
+                        payload = b"".join((json.dumps(item, sort_keys=True) + "\n").encode("utf-8")
+                                           for item in frames) + child_events[stage]
+                        path.write_bytes(payload)
+                        if update_digest:
+                            modified["events"][stage]["sha256"] = hashlib.sha256(payload).hexdigest()
+                    adjudicate.write_json(self.judgment_file("AB"), modified)
+                    code, err, record = self.assemble()
+                    self.assertEqual(code, 0, err)
+                    self.assertIn("openai AB", err)
+                    self.assertEqual(len(record["judgments"]), 3)
+                    self.assertEqual(record["missing_families"], ["openai"])
+                    self.assertIsNone(record["winner_lane"])
+                finally:
+                    for stage, payload in original_events.items():
+                        Path(original["events"][stage]["path"]).write_bytes(payload)
+                    adjudicate.write_json(self.judgment_file("AB"), original)
+
+    def test_resume_reruns_legacy_omniroute_judgments_without_bound_transport(self):
+        options = {"provider": "omniroute", "base_url": "http://127.0.0.1:21128/v1"}
+        self.assertEqual(self.run_codex(**options)[0], 0)
+        self.assertEqual(len(self.calls()), 4)
+        for order in adjudicate.ORDERS:
+            data = json.loads(self.judgment_file(order).read_text(encoding="utf-8"))
+            for stage in ("judge", "refute"):
+                path = Path(data["events"][stage]["path"])
+                payload = b"".join(line for line in path.read_bytes().splitlines(keepends=True)
+                                    if json.loads(line).get("type") != "native_agent_stack.transport")
+                path.write_bytes(payload)
+                data["events"][stage]["sha256"] = hashlib.sha256(payload).hexdigest()
+            adjudicate.write_json(self.judgment_file(order), data)
+        code, err = self.run_codex(**options)
+        self.assertEqual(code, 0, err)
+        self.assertEqual(len(self.calls()), 8, "unbound legacy OmniRoute stages must rerun")
+        self.assertEqual(self.run_codex(**options)[0], 0)
+        self.assertEqual(len(self.calls()), 8, "replacement bound OmniRoute stages must resume")
 
     def test_native_assembly_keeps_its_serialized_contract_without_disclosure(self):
         # The full native artifact, including its serialization, is the pre-disclosure contract at fc86624c.

@@ -761,22 +761,85 @@ def codex_events_issue(data: dict, entry=None):
     """None when every stage a counted Codex judgment ran left the events file its record names, unchanged, and
     those events still audit clean against the call's repository, input and packet snapshot (independent review
     of #145, BIND-R4-6)."""
-    events = data.get("events")
-    if not isinstance(events, dict):
-        return "no audited events recorded for this judgment"
+    transport, issue = codex_events_transport(data)
+    if issue:
+        return issue
+    if {key: data[key] for key in TRANSPORT_FIELDS if key in data} != transport:
+        return "missing or invalid OmniRoute transport disclosure"
+    events = data["events"]
     roots = [str(data["repo"])] if isinstance(data.get("repo"), str) else []
     if isinstance(data.get("input_path"), str):
         roots.append(str(Path(data["input_path"]).resolve()))
     if isinstance((entry or {}).get("packet_path"), str):
         roots.append(str(Path(entry["packet_path"]).resolve()))
     for stage in ("judge", "refute"):
-        item = events.get(stage)
-        path = Path(item["path"]) if isinstance(item, dict) and isinstance(item.get("path"), str) else None
-        if path is None or not path.is_file() or sha256_file(path) != item.get("sha256"):
-            return f"the {stage} call's audited events are missing or changed"
+        path = Path(events[stage]["path"])
         if audit_flagged(codex_lane.blind_audit(path, roots)):
             return AUDIT_FLAGGED
     return None
+
+
+def codex_event_transport(path: Path, expected_sha256):
+    """Read runner-owned transport only from the bytes authenticated by the existing events digest.
+
+    Native streams stay byte-identical and have no frame. OmniRoute writes its frame before child stdout;
+    model output and the removable judgment disclosure cannot select the expected transport.
+    """
+    path = Path(path)
+    if not path.is_file():
+        return None, "audited events are missing or changed"
+    try:
+        raw = path.read_bytes()
+    except OSError:
+        return None, "audited events are missing or changed"
+    if hashlib.sha256(raw).hexdigest() != expected_sha256:
+        return None, "audited events are missing or changed"
+    bindings = []
+    for line in raw.splitlines():
+        try:
+            event = json.loads(line)
+        except (ValueError, UnicodeError):
+            continue  # Preserve the existing native parser's handling of unrelated non-JSON output.
+        if not isinstance(event, dict) or event.get("type") != TRANSPORT_EVENT_TYPE:
+            continue
+        if bindings:
+            return None, "transport binding is duplicated"
+        if (set(event) != {"type", "schema_version", "transport"}
+                or type(event.get("schema_version")) is not int or event["schema_version"] != 1):
+            return None, "transport binding is malformed"
+        transport = event.get("transport")
+        if (not isinstance(transport, dict) or set(transport) != set(TRANSPORT_FIELDS)
+                or transport.get("provider") != "omniroute"
+                or transport.get("pass_through") != codex_lane.OMNIROUTE_PASS_THROUGH
+                or type(transport.get("provider_base_url")) is not str):
+            return None, "transport binding is malformed"
+        try:
+            endpoint = codex_lane.omniroute_endpoint(transport["provider_base_url"])
+        except ValueError:
+            return None, "transport binding has an invalid provider endpoint"
+        if transport["provider_base_url"] != endpoint:
+            return None, "transport binding has a noncanonical provider endpoint"
+        bindings.append(transport)
+    return (bindings[0] if bindings else {}), None
+
+
+def codex_events_transport(data: dict):
+    """Independent transport for both hash-verified saved stages; a disagreement never counts or resumes."""
+    events = data.get("events")
+    if not isinstance(events, dict):
+        return None, "no audited events recorded for this judgment"
+    transports = []
+    for stage in ("judge", "refute"):
+        item = events.get(stage)
+        if not isinstance(item, dict) or not isinstance(item.get("path"), str):
+            return None, f"the {stage} call's audited events are missing or changed"
+        transport, issue = codex_event_transport(Path(item["path"]), item.get("sha256"))
+        if issue:
+            return None, f"the {stage} call's {issue}"
+        transports.append(transport)
+    if transports[0] != transports[1]:
+        return None, "the judge and refute calls' transports differ"
+    return transports[0], None
 
 
 def split_prompt(text: str):
@@ -809,6 +872,7 @@ def refuse_git_repo(repo: Path):
 # carries none (CC 2026-10-10T23:17Z ruling, extending the 07:51Z disclosure ruling and the 09:38Z native contract in
 # docs/decisions/2026-10-10-codex-lane-omniroute.md).
 TRANSPORT_FIELDS = ("provider", "provider_base_url", "pass_through")
+TRANSPORT_EVENT_TYPE = "native_agent_stack.transport"
 
 
 def judgment_transport(args) -> dict:
@@ -816,7 +880,7 @@ def judgment_transport(args) -> dict:
     canonical endpoint and the exact not-attested disclosure."""
     if args.provider != "omniroute":
         return {}
-    return {"provider": args.provider, "provider_base_url": args.omniroute_base_url,
+    return {"provider": args.provider, "provider_base_url": codex_lane.omniroute_endpoint(args.omniroute_base_url),
             "pass_through": codex_lane.OMNIROUTE_PASS_THROUGH}
 
 
@@ -828,7 +892,13 @@ def run_codex_call(repo, schema, out_tmp, effort, prompt, model, timeout, events
     cmd = codex_lane.build_command(repo, schema, out_tmp, effort, prompt, model, codex_lane.ISOLATION_ARGS,
                                    **transport)
     exit_codes, event_model, failure = [], None, "no attempt ran"
-    events_path.write_text("", encoding="utf-8")
+    initial_events = ""
+    if provider == "omniroute":
+        binding = {"provider": provider, "provider_base_url": codex_lane.omniroute_endpoint(omniroute_base_url),
+                   "pass_through": codex_lane.OMNIROUTE_PASS_THROUGH}
+        initial_events = json.dumps({"type": TRANSPORT_EVENT_TYPE, "schema_version": 1,
+                                    "transport": binding}, sort_keys=True) + "\n"
+    events_path.write_text(initial_events, encoding="utf-8")
     for _attempt in (1, 2):
         out_tmp.unlink(missing_ok=True)
         result = codex_lane.run_attempt(cmd, timeout, **transport)
@@ -927,11 +997,12 @@ def run_codex(args) -> int:
             # Resume skips only a judgment made with the configured model and effort, under this run's
             # provenance: the same code, prompt, schemas, role and evidence tree (Codex review of #145). A change
             # of transport, endpoint or disclosure reruns it, as in codex_lane (CC 2026-10-10T23:17Z ruling).
-            if (usable_judgment(existing, "openai", order, packet_sha256,
+            saved_transport, transport_issue = codex_events_transport(existing)
+            if (transport_issue is None and usable_judgment(existing, "openai", order, packet_sha256,
                                 entry=entries_by_layer.get(name)) is None
                     and existing.get("model") == args.model and existing.get("effort") == args.effort
                     and existing.get("provenance") == run_provenance
-                    and {key: existing[key] for key in TRANSPORT_FIELDS if key in existing} == run_transport):
+                    and saved_transport == run_transport):
                 continue
         except (OSError, ValueError, AttributeError):
             pass
@@ -975,6 +1046,7 @@ def run_codex(args) -> int:
 
 def judge_pending(args, work_dir, repo, index, packets, items, pending, failures, out_dir, run_provenance,
                   judge_template, refute_template) -> int:
+    run_transport = judgment_transport(args)
     transport = {"provider": args.provider, "omniroute_base_url": args.omniroute_base_url} \
         if args.provider == "omniroute" else {}
     events_dir = out_dir / "events"
@@ -1052,9 +1124,14 @@ def judge_pending(args, work_dir, repo, index, packets, items, pending, failures
         # the run is interrupted before the end-of-run audit, and a resume never counts it.
         call_roots = [str(repo), str(Path(input_path).resolve()), str(Path(packets.get(name, "")).resolve())]
         # Only the stages this call ran are audited; a stage that ran but left no events file is flagged.
-        flagged_calls = [stage for stage in ran
-                         if not (events_dir / f"{stem}.{stage}.jsonl").is_file()
-                         or audit_flagged(codex_lane.blind_audit(events_dir / f"{stem}.{stage}.jsonl", call_roots))]
+        flagged_calls = []
+        for stage in ran:
+            events_path = events_dir / f"{stem}.{stage}.jsonl"
+            bound, binding_issue = codex_event_transport(events_path, sha256_file(events_path)
+                                                        if events_path.is_file() else None)
+            if (binding_issue or bound != run_transport
+                    or audit_flagged(codex_lane.blind_audit(events_path, call_roots))):
+                flagged_calls.append(stage)
         audit_clean = not flagged_calls
         if flagged_calls:
             judge, refuter, leak, failure = None, None, None, AUDIT_FLAGGED
@@ -1127,9 +1204,13 @@ def judge_pending(args, work_dir, repo, index, packets, items, pending, failures
             continue  # only this run's calls (BIND-R4-3); earlier runs' judgments carry their own audit_clean
         roots_by_call[call] = [str(repo)] + [str(Path(path).resolve()) for path in call_files.get(stem, []) if path]
         audit[call] = codex_lane.blind_audit(events, roots_by_call[call])
+        bound, binding_issue = codex_event_transport(events, sha256_file(events))
+        if binding_issue or bound != run_transport:
+            audit[call]["transport_binding_issue"] = binding_issue or "transport differs from this run's configuration"
     write_json(out_dir / "blind-audit.json", {"schema_version": 2, "allowed_roots": roots_by_call, "calls": audit})
     flagged = sorted(key for key, entry in audit.items()
-                     if entry["web_search"] or entry["mcp_tool_calls"] or entry["flagged_commands"])
+                     if entry["web_search"] or entry["mcp_tool_calls"] or entry["flagged_commands"]
+                     or entry.get("transport_binding_issue"))
     if flagged:
         print(f"adjudicate: blind audit flags {len(flagged)} call(s): {', '.join(flagged)}", file=sys.stderr)
     # A flagged call (web search, an MCP tool, or a command reaching outside the repository, its input and its

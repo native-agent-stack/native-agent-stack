@@ -1785,7 +1785,12 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
   loopback `/v1` endpoint. OmniRoute judgments record `provider`, canonical `provider_base_url` and the
   exact `pass_through` disclosure from the [transport decision](../../docs/decisions/2026-10-10-codex-lane-omniroute.md).
   Assembly requires that disclosure and carries `provider` and `pass_through` in the verdict's
-  `disclosure` block, outside the common family provenance. `--model` is required and must match the openai pattern in `scripts/landscape.py`
+  `disclosure` block, outside the common family provenance. Each OmniRoute stage also retains a
+  runner-owned transport frame under the existing event hash. Assembly and resume verify that
+  independent binding before trusting the removable judgment fields; deleting all three fields
+  refuses the vote, and changing transport reruns both stages. Native event bytes and record fields
+  remain unchanged. See the [binding correction](../../docs/decisions/2026-10-11-adjudication-omniroute-transport-binding.md).
+  `--model` is required and must match the openai pattern in `scripts/landscape.py`
   `FAMILY_MODEL_PATTERNS` (exit 2 otherwise). It is passed to `codex exec -m` and recorded on each judgment
   ahead of the event-stream model name, the same order `codex_lane.py` uses. Resume skips a judgment only when
   it is usable and was made with this `--model`, provider, endpoint, disclosure and code provenance.
