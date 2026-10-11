@@ -362,9 +362,10 @@ current view.” Unverified, undated, equal-time and newer observations are not
 marked superseded; a recorded state disagreement without an older source date
 says “differs from the current view.” Sources and
 long per-input date lists are on `sources.html`, linked from each page.
-The index's page list also links `northstar.html`. This builder does not
-generate it: the command center's own hourly generator writes it into the same
-served directory, so the link has no target on a host without that generator.
+The index's page list links `northstar.html` only when that page already
+exists as a regular file in the served directory at build time. This builder
+does not generate it; the command center's own hourly generator writes it
+there, so a host without that generator shows no link.
 
 `workstation.py` uses the installed Prometheus HTTP API at
 `http://127.0.0.1:21090` to read exact available-memory and swap metrics when

@@ -637,13 +637,26 @@ class LocalPagesTests(unittest.TestCase):
         self.assertIn('id="fleet"', (self.output / "sources.html").read_text())
         self.assertEqual(receipt["fleet"]["lanes_live"], self.fleet_result["lanes_live"])
 
-    def test_index_overview_links_north_star_grand_page_after_readiness(self) -> None:
+    def test_index_overview_links_served_north_star_grand_page_after_readiness(self) -> None:
+        self.output.mkdir(parents=True)
+        (self.output / "northstar.html").write_text("<!doctype html><title>North star</title>\n")
         self.refresh()
         index = (self.output / "index.html").read_text()
         overview = index[index.index('<ul class="page-index">'):]
         overview = overview[:overview.index("</ul>")]
         self.assertIn('<li><a href="northstar.html">North-star grand page</a>', overview)
         self.assertLess(overview.index('href="readiness.html"'), overview.index('href="northstar.html"'))
+
+    def test_index_overview_omits_north_star_link_without_a_served_page(self) -> None:
+        elsewhere = self.base / "elsewhere/northstar.html"
+        elsewhere.parent.mkdir()
+        elsewhere.write_text("<!doctype html><title>Not served</title>\n")
+        for case in ("missing", "symlink"):
+            with self.subTest(case=case):
+                if case == "symlink":
+                    (self.output / "northstar.html").symlink_to(elsewhere)
+                self.refresh()
+                self.assertNotIn('href="northstar.html"', (self.output / "index.html").read_text())
 
     def test_partial_fleet_observation_does_not_claim_zero_workers(self) -> None:
         for source in (None, "", "not reported"):
