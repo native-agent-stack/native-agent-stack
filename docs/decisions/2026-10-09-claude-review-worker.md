@@ -47,9 +47,10 @@ pull requests. The implementation is [`tools/claude-review-worker/`](../../tools
 
 ## Why
 
-The cloud path (`claude-pr-review.yml`, anthropics/claude-code-action on workload identity federation) still waits on
-the Console federation fix, and no hosted run has been made. A local worker on the stored keys can gate essential pull
-requests now. It reuses the repository's own fence: main at the working directory root, the head as data under
+When this record was written, the cloud path (`claude-pr-review.yml`, anthropics/claude-code-action on workload
+identity federation) waited on the Console federation fix, and no hosted run had been made. That path is now retired:
+#981 (`8bffa2c4`) removed it after the API refused the action's attribution on every stored Console key. A local
+worker on the stored keys can gate essential pull requests now. It reuses the repository's own fence: main at the working directory root, the head as data under
 `pr-head/`, Read, Glob and Grep only, and bounds read from the stream.
 
 ## The run
@@ -92,7 +93,8 @@ requests now. It reuses the repository's own fence: main at the working director
    mode of 01:49Z). The keys are tried in the order of `CLAUDE_REVIEW_KEYS`, by default `anthropic-api-4`,
    `anthropic-api-3`, `anthropic-api-5`, `anthropic-api`, `anthropic-api-2`, then `anthropic-api-6` to
    `anthropic-api-10`. The owner's direction of about 15:12Z (via the command center) put `anthropic-api-3` second: it
-   serves CI review first (the main-only `claude-review` environment secret) and local quality work second.
+   served CI review first (the main-only `claude-review` environment secret) and local quality work second. #981
+   (`8bffa2c4`) removed the in-GitHub Claude workflows, so no workflow on main uses that environment now.
    - The worker stays on one key and moves to the next only when Anthropic reports it out of credit (HTTP 402, or 400
      with "credit balance is too low") or revoked (HTTP 401). It never round-robins: a prompt cache is per workspace and
      never crosses organizations (claude-api skill, anthropics/skills@`dbd4588f`
@@ -484,7 +486,7 @@ unchanged bwrap fence in srt, Anthropic's sandbox runtime, the runtime Claude Co
    `/opt/claude-review/claude`), so the model never sees a host path. A preflight starts the binary in the same
    sandbox each tick, and no review runs without it.
 2. `--restricted`, `--permission-prompts none` and `--setting-sources user` come from `claude-pr-review.yml`, the
-   repository's own pattern; `--disable-slash-commands` and `--no-session-persistence` come from the installed help.
+   repository's own pattern until #981 removed it; `--disable-slash-commands` and `--no-session-persistence` come from the installed help.
    O7 shows why: without the fence, main's committed `.claude/settings.json` loads (on `native-agent-stack` it turns
    Ultracode on).
 3. More settings: `enabledPlugins` false for the two built-in plugins, and the deny rules `Read(./.git)` and
@@ -551,8 +553,8 @@ unchanged bwrap fence in srt, Anthropic's sandbox runtime, the runtime Claude Co
 ## Alternatives considered
 
 - **Upstream `/code-review`.** Rejected: it needs Bash and gh and reads the live head, which the fence excludes.
-- **anthropics/claude-code-action (`claude-pr-review.yml`).** It needs the Console federation fix and stays the optional
-  cloud path.
+- **anthropics/claude-code-action (`claude-pr-review.yml`).** It needed the Console federation fix. It is no longer an
+  optional cloud path: #981 (`8bffa2c4`) retired it.
 - **The two-agent pr-review-toolkit read.** Rejected: it costs 7 to 14 USD per read, measured.
 - **A transient systemd unit as the sandbox.** Rejected by the measurement above.
 - **`claudeMdExcludes` as the instruction fence.** Replaced by `CLAUDE_CODE_DISABLE_CLAUDE_MDS` (command center); L1
@@ -567,7 +569,7 @@ unchanged bwrap fence in srt, Anthropic's sandbox runtime, the runtime Claude Co
 
 - The first three real runs' costs: re-derive the 11 USD bound (and with it the 55 USD ceiling's room).
 - Any live probe FAIL: do not enable the timer; fix the fence first.
-- The federation fix landing: the cloud path becomes available and the two are compared.
+- An owner decision to bring back a cloud Claude review (retired in #981): compare the two.
 - A move of the client pin: re-run `probes.py offline` and `live`. A new built-in plugin fails the plugins bound closed
   until `BUILTIN_PLUGINS` names it.
 - A host change that stops bubblewrap from creating a user namespace: no review runs until the preflight passes again.
@@ -674,13 +676,15 @@ for 261 s).
   - Python's [tarfile extraction filters](https://docs.python.org/3/library/tarfile.html#extraction-filters), exercised by
     the tests.
 - **This repository, read:**
-  - `.github/workflows/claude-pr-review.yml` (the head-as-data layout, the settings and the numbers step);
+  - `.github/workflows/claude-pr-review.yml` (the head-as-data layout, the settings and the numbers step), as it stood
+    before #981 removed it (at `65cf2730`);
   - `tools/credentials/credential_run.py` (environment-only injection, masking, exit codes);
   - `tools/local-pages/sanitization.py` (the identity rule);
   - `tools/local-pages/fleet_data.py` (the ledger sums);
   - `docs/lanes.md` (the trading paths);
   - `adoption/templates/systemd/stack-currency.service` (the unit template convention);
-  - the reference stand-in `FAKE_GH` of `tests/test_claude_pr_review_workflow.py` on the gate branch.
+  - the reference stand-in `FAKE_GH` of `tests/test_claude_pr_review_workflow.py` on the gate branch (#981 has since
+    removed that test module).
 - **Command center, outside the repository:**
   - read on the host: the api-actions harness's `common.py` (ledger lock and append), `cc_mock.py` (the loopback
     stand-in this probe follows) and `claudemd_probe.sh` with its receipts `readers/claudemd-probe-20261010/`;

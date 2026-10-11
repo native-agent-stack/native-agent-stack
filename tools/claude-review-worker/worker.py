@@ -24,9 +24,9 @@ input directory (read-only), a temporary CLAUDE_CONFIG_DIR (writable) and the pi
 loaded (CLAUDE_CODE_DISABLE_CLAUDE_MDS=1). A trading head (by repository or by changed path) gets the owner's
 upstream-alignment rule in its prompt, with the upstream files its diff cites at a pin exported from the local mirrors
 into the input directory. Bounds come from the stream, as the numbers step of .github/workflows/claude-pr-review.yml
-does; the verdict is parsed without a model; a commit status (and on the private repository one sanitized comment) is
-posted through the ambient gh login by this process, never by the sandboxed one. Nothing is posted unless
-CLAUDE_REVIEW_POST=1.
+did until #981 removed it; the verdict is parsed without a model; a commit status (and on the private repository one
+sanitized comment) is posted through the ambient gh login by this process, never by the sandboxed one. Nothing is
+posted unless CLAUDE_REVIEW_POST=1.
 
 Environment: API_ACTIONS_LEDGER (required), CLAUDE_REVIEW_POST, CLAUDE_REVIEW_KEYS, CLAUDE_BIN, CLAUDE_REVIEW_STATE,
 CLAUDE_REVIEW_TIMEOUT_SECONDS, CLAUDE_REVIEW_UPSTREAM. No key is ever read, logged or written by this file.
@@ -66,7 +66,7 @@ MODEL = "claude-opus-5-5"
 EFFORT = "max"
 BUDGET_USD = 10
 # The client checks its budget after a turn, so a run can end above it: the accepted bound is the budget times 1.10,
-# the factor the claude-pr-review workflow uses. Re-derive it after the first three real runs (decision record).
+# the factor the claude-pr-review workflow used before #981. Re-derive it after the first three real runs (record).
 COST_BOUND_USD = 11.0
 DAILY_CEILING_USD = 55.0
 MAX_ATTEMPTS = 2
@@ -79,8 +79,8 @@ FILES_API_CAP = 3000  # GET /pulls/{n}/files lists at most 3000 files; a list th
 # Fill-first (owner direction relayed by the command center, 2026-10-10 ~14:19Z): one key until Anthropic reports it out
 # of credit or revoked, then the next, never round-robin, because a prompt cache never crosses organizations
 # (anthropics/skills@dbd4588f skills/claude-api/shared/prompt-caching.md:130). The owner's direction of ~15:12Z (via the
-# command center) puts anthropic-api-3 second: CI review first (the main-only claude-review environment secret), local
-# quality work second. A slot the runner refuses is skipped.
+# command center) puts anthropic-api-3 second; its CI-review purpose (the main-only claude-review environment secret)
+# ended when #981 removed the in-GitHub Claude workflows. A slot the runner refuses is skipped.
 DEFAULT_KEYS = ("anthropic-api-4", "anthropic-api-3", "anthropic-api-5", "anthropic-api", "anthropic-api-2",
                 "anthropic-api-6", "anthropic-api-7", "anthropic-api-8", "anthropic-api-9", "anthropic-api-10")
 SWITCH_CLASSES = ("credit_exhausted", "revoked_key")

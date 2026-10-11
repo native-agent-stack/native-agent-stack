@@ -106,7 +106,7 @@ prompt says the check covers citation presence only.
    CLAUDE_REVIEW_POST=0                                    # 1 posts statuses and comments; 0 writes everything, posts nothing
    # CLAUDE_REVIEW_KEYS=anthropic-api-4,anthropic-api-3,anthropic-api-5,anthropic-api,anthropic-api-2,anthropic-api-6,...
    #   fill-first: the next key only when one is out of credit or revoked; a switch is a ledger row and a warning;
-   #   anthropic-api-3 serves CI review first and local quality work second
+   #   anthropic-api-3 is second (its CI-review purpose ended with #981, which removed the in-GitHub Claude workflows)
    # CLAUDE_BIN=~/.local/share/claude/versions/2.1.296                  # the pinned native binary
    # CLAUDE_REVIEW_STATE=~/.local/state/native-agent-stack/claude-review-worker
    # CLAUDE_REVIEW_TIMEOUT_SECONDS=2700
@@ -142,8 +142,8 @@ prompt says the check covers citation presence only.
   - `repos/`, `work/`: the bare clones and the main worktrees; `essential/`: the per-head path decisions;
     `skipped/`: heads with nothing to review.
 - Review a head again: move its attempt marker out of `attempts/`; the next tick treats the head as new.
-- A head refused for its diff size or its own size needs a paths-limited review by other means (for example the
-  `paths` input of `claude-pr-review.yml`); the worker has no paths option.
+- A head refused for its diff size or its own size needs a paths-limited review by other means; the worker has no
+  paths option. (The `paths` input of `claude-pr-review.yml` was one such means until #981 removed that workflow.)
 
 ## Posting
 
