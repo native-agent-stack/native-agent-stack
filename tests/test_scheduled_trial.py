@@ -19,7 +19,7 @@ REQUIREMENTS = ROOT / "blueprints/us-equities/adaptive-paper/requirements.txt"
 
 class ScheduledTrialInterpreter(unittest.TestCase):
     def test_default_follows_the_supported_installer_project_environment(self):
-        project = re.search(r'^readonly project="\$HOME/([a-zA-Z0-9_./-]+)"$', INSTALLER.read_text(), re.M)
+        project = re.search(r'\brealpath --canonicalize-missing -- "\$HOME/([a-zA-Z0-9_./-]+)"', INSTALLER.read_text())
         default = re.search(r'^PY="\$\{PY:-\$HOME/([a-zA-Z0-9_./-]+)\}"$', SCRIPT.read_text(), re.M)
         self.assertIsNotNone(project)
         self.assertIsNotNone(default)
@@ -251,8 +251,12 @@ class ScheduledTrialRuntimeLock(unittest.TestCase):
             'rm -f -- "$project/.trading-2604-complete"')
         completion = source[source.index("step=completion-marker\n"):source.index("result=PASS\n", source.index("step=completion-marker\n"))]
         installer = root / "scratch-installer.sh"
+        assignment = next(line for line in source.splitlines()
+                          if line.startswith(('readonly project=', 'project=$(realpath')))
+        assignment = assignment.replace('$HOME/projects/us-equities-runtime', '$TASK_RUNTIME')
         installer.write_text('#!/usr/bin/env bash\nset -euo pipefail\n'
-            'project="$TASK_RUNTIME"; owner=native-stack-trading-2604-v1; '
+            'die() { echo "$1" >&2; exit "$2"; }\n' + assignment + '\n'
+            'owner=native-stack-trading-2604-v1; '
             'completion=native-stack-trading-2604-no-dvc-r4; temporary=""\n'
             'die() { echo "$1" >&2; exit "$2"; }\n'
             'blocked() { echo "$1" >&2; exit "$2"; }\n' + block +
@@ -438,7 +442,8 @@ class ScheduledTrialRuntimeLock(unittest.TestCase):
             (runtime / name).mkdir(parents=True, exist_ok=True)
         (runtime / ".upstream/nautilus-quickstart.py").write_text("scratch source\n")
         source = ACCEPTANCE.read_text()
-        begin = source.index('[[ ! -L "$HOME/projects"')
+        normalization = 'project=$(realpath --canonicalize-missing'
+        begin = source.index(normalization) if normalization in source else source.index('[[ ! -L "$HOME/projects"')
         end = source.index('# Read only the context endpoint', begin)
         block = source[begin:end].replace("$HOME/projects", "$TASK_PROJECTS")
         accept = root / "scratch-accept.sh"

@@ -20,6 +20,15 @@ or `.run-once` when installation is active. Manual runner/mover CLI entries lock
 before runtime-package imports, and their programmatic `main` calls hold shared
 through return or exception. The lock file is never replaced or removed.
 
+Each lock-selecting entry resolves the runtime directory first and derives the
+lock location from its physical parent, so trailing slashes, `/.` and directory
+symlinks share one inode. Native `realpath --canonicalize-missing` also covers
+fresh installation paths. Standalone managed sync invalidates old completion
+under exclusive before any uv command; failure leaves it absent. Successful
+standalone sync atomically restores only a previously valid completion value
+after all three commands pass. Nested sync never certifies the installer early;
+missing/stale completion is never promoted by standalone sync.
+
 This uses [util-linux flock(1) v2.41.3](https://github.com/util-linux/util-linux/blob/v2.41.3/sys-utils/flock.1.adoc#L52-L81)
 and its descriptor lifetime semantics; Python readers use the same native
 [CPython v3.12.3 flock(2) call](https://github.com/python/cpython/blob/v3.12.3/Modules/fcntlmodule.c#L273-L299).

@@ -13,8 +13,11 @@ sync_trading_2604() {
     # supplies its already-locked descriptor; standalone callers keep a newly
     # opened descriptor only through the sync. CI's isolated project is independent.
     local sync_owned_lock_fd='' sync_lock_fd='' sync_result=0
-    if [[ "$project" == "$HOME/projects/us-equities-runtime" ]]; then
-        runtime_lock="$HOME/projects/.us-equities-runtime.lock"
+    local sync_directory managed_directory sync_completion='' sync_completion_tmp=''
+    sync_directory=$(realpath --canonicalize-missing -- "$project") || return 73
+    managed_directory=$(realpath --canonicalize-missing -- "$HOME/projects/us-equities-runtime") || return 73
+    if [[ "$sync_directory" == "$managed_directory" ]]; then
+        runtime_lock="${sync_directory%/*}/.us-equities-runtime.lock"
         [[ ! -L "$runtime_lock" && ( ! -e "$runtime_lock" ||
             ( -f "$runtime_lock" && -O "$runtime_lock" ) ) ]] || return 73
         if [[ -n ${runtime_lock_fd:-} ]]; then
@@ -31,8 +34,30 @@ sync_trading_2604() {
             [[ -z $sync_owned_lock_fd ]] || exec {sync_owned_lock_fd}>&-
             return 69
         }
+        # Only preserve an already-certified standalone runtime on success.
+        # The installer owns its broader certification and publishes its own
+        # marker later; nested sync must never publish completion early.
+        if [[ -n $sync_owned_lock_fd && -f "$sync_directory/.trading-2604-complete" &&
+              ! -L "$sync_directory/.trading-2604-complete" ]]; then
+            IFS= read -r sync_completion < "$sync_directory/.trading-2604-complete" || sync_completion=''
+            [[ "$sync_completion" == native-stack-trading-2604-no-dvc-r4 ]] || sync_completion=''
+        fi
+        rm -f -- "$sync_directory/.trading-2604-complete" || {
+            [[ -z $sync_owned_lock_fd ]] || exec {sync_owned_lock_fd}>&-
+            return 73
+        }
     fi
     _sync_trading_2604_commands || sync_result=$?
+    if ((sync_result == 0)) && [[ -n $sync_owned_lock_fd && -n $sync_completion ]]; then
+        sync_completion_tmp=$(mktemp "$sync_directory/.trading-2604-complete.XXXXXX") || sync_result=73
+        if ((sync_result == 0)); then
+            if ! printf '%s\n' "$sync_completion" > "$sync_completion_tmp" ||
+               ! mv -- "$sync_completion_tmp" "$sync_directory/.trading-2604-complete"; then
+                rm -f -- "$sync_completion_tmp"
+                sync_result=73
+            fi
+        fi
+    fi
     [[ -z $sync_owned_lock_fd ]] || exec {sync_owned_lock_fd}>&-
     return "$sync_result"
 }

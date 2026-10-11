@@ -43,7 +43,7 @@ blocked() {
 }
 [[ ${WSL_DISTRO_NAME:-} == NativeStack2604 ]] || blocked 'Run inside NativeStack2604.' 64 wrong-distribution
 (( EUID != 0 )) || blocked 'Run as the user, without sudo.' 64 root-user
-for tool in flock uv git curl sha256sum docker env timeout mkdir mktemp mv uname cp rm dirname bash; do
+for tool in realpath flock uv git curl sha256sum docker env timeout mkdir mktemp mv uname cp rm dirname bash; do
     command -v "$tool" >/dev/null || blocked "Missing prerequisite: $tool" 69 "missing-$tool"
 done
 
@@ -73,7 +73,8 @@ esac
 exec 3>&1 1>&2
 status_fd=3
 
-readonly project="$HOME/projects/us-equities-runtime"
+project=$(realpath --canonicalize-missing -- "$HOME/projects/us-equities-runtime") || die 'Runtime directory cannot be resolved.' 73
+readonly project
 # Both the pinned adapter requirements and accepted rc5 receipt use Python 3.12.
 # https://github.com/seathatflowsinourveins/native-agent-stack/blob/dfeea13377cfb15936f856d9ed8df3c6575a7895/blueprints/us-equities/adaptive-paper/requirements.txt
 # https://github.com/seathatflowsinourveins/native-agent-stack/blob/d323b53437e025be3d054b9b5e4d292fe396c75e/evidence/receipts/native-nautilus-v2-20260920.json
@@ -81,7 +82,7 @@ readonly owner='native-stack-trading-2604-v1'
 readonly completion='native-stack-trading-2604-no-dvc-r4'
 script_directory=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
 readonly script_directory
-readonly sync_vector_hash=6d0bc4c13363031547bcb2dcafa43cc5bf0d93ca088a1f8b18ee3331739b22ed
+readonly sync_vector_hash=8b8aa38e0f1c2de11de8db96d19914f69e7381b41add9584ec51c1b19e1612e6
 [[ ! -L "$script_directory/sync-trading-2604.sh" && -f "$script_directory/sync-trading-2604.sh" ]] || die 'Shared sync vector is missing or symlinked.' 65
 printf '%s  %s\n' "$sync_vector_hash" "$script_directory/sync-trading-2604.sh" | sha256sum --check --status
 # BEGIN shared-sync-source
@@ -122,7 +123,7 @@ step=project-ownership
 # outside the project so acquiring it cannot make a fresh project "unowned".
 # Hold the descriptor until exit, including completion-marker publication.
 mkdir -p "$HOME/projects"
-runtime_lock="$HOME/projects/.us-equities-runtime.lock"
+runtime_lock="${project%/*}/.us-equities-runtime.lock"
 [[ ! -L "$runtime_lock" && ( ! -e "$runtime_lock" ||
     ( -f "$runtime_lock" && -O "$runtime_lock" ) ) ]] || die 'Runtime lock is unavailable.' 73
 exec {runtime_lock_fd}>>"$runtime_lock" || die 'Runtime lock is unavailable.' 73

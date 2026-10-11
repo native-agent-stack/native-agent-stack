@@ -14,14 +14,14 @@ class RuntimeLockError(RuntimeError):
 @contextmanager
 def runtime_read_lock():
     """Hold a shared lock while this process uses the canonical managed venv."""
-    project = Path.home() / "projects/us-equities-runtime"
+    project = (Path.home() / "projects/us-equities-runtime").resolve()
     if Path(sys.prefix).resolve() != (project / ".venv").resolve():
         yield
         return
     import fcntl
     descriptor = None
     try:
-        if project.parent.is_symlink() or project.is_symlink():
+        if not project.is_dir() or project.stat().st_uid != os.getuid():
             raise RuntimeLockError("canonical_runtime_lock_unavailable")
         lock = project.parent / ".us-equities-runtime.lock"
         descriptor = os.open(lock, os.O_RDWR | os.O_CREAT | os.O_NOFOLLOW, 0o600)

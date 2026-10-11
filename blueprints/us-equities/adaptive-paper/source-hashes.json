@@ -28,9 +28,9 @@
   "blueprints/us-equities/adaptive-paper/registry.json": "60da73b985e718bd1dece7a3350f34636bda0fb38e766a44ae71c5a8c532282a",
   "blueprints/us-equities/adaptive-paper/requirements.txt": "6859f3c7362730fb1e1f023777863dc70650607c90873836b99c4e7d63982216",
   "blueprints/us-equities/adaptive-paper/runner.py": "6dcfa404111dd5b85e056c8d3b664857879cdfc03f98b3e6abc0e2c836c55dc7",
-  "blueprints/us-equities/adaptive-paper/runtime_lock.py": "ee3ffdc5d36b484d14d91c2fb0394b40e8bd2910a57f9fdbd1b27aa5935f4d79",
+  "blueprints/us-equities/adaptive-paper/runtime_lock.py": "fa785cf3b5d43da95a68a11cb71385e355c7b2cdc4de82a5fd0b19a744fea9a2",
   "blueprints/us-equities/adaptive-paper/safety.py": "bfec57e021b65aee058c8d2e7c0cbafad46f6203edbe9396eec739c8546b0fd9",
-  "blueprints/us-equities/adaptive-paper/scheduled_trial.sh": "7b95427b274bf6c6b54542ee836c1103544ebe7347ab71a17c7d0425a459980b",
+  "blueprints/us-equities/adaptive-paper/scheduled_trial.sh": "8ed83e48dcc8106eda5e7cf3863b48cc2c6d68a79c029e17c461470564b1a475",
   "blueprints/us-equities/adaptive-paper/selector.py": "28de8ebf66b6e7135979554f73692ede772167682007d8c6ba41da6fb6fb39b3",
   "blueprints/us-equities/adaptive-paper/sessions.py": "fb906b56c50c8e16168656b1b7fcbd3a4b1bfca0a8e6465e8dae2c93d3c8e315",
   "blueprints/us-equities/adaptive-paper/simulation.py": "0119e0efe3b498be3c415eee9c1a0be922c9b5b17e3b774aa7528668c4eb0b30",
@@ -64,5 +64,6 @@
   "tests/test_adaptive_paper_sessions.py": "ea8b0dc3013119879354da3c0dce8bffcf8e874ee07017a243a67597bd18b418",
   "tests/test_adaptive_paper_strategies.py": "f0814b36909f2fc6b4c4213b4142ffc13339740f0397c99ad9c7c81982e2033a",
   "tests/test_adaptive_paper_transport.py": "915973f08c21091abc73585f704b0ae6235f7f8fb1ff59760815f6542c99d52d",
-  "tests/test_scheduled_trial.py": "b427a58172628f710445830b9a5a2a6944602fc79fd77c9e4df060dee576f09b"
+  "tests/test_runtime_directory_identity.py": "9a5db043d9d2837d3319a95a69bfe6c514a5ef99057bd4c7a0e7a171fd348814",
+  "tests/test_scheduled_trial.py": "85cac37a4230533135eb2c680430a814278ad578b90bc4e7a3f3ea5f02acf9ce"
 }

@@ -23,6 +23,9 @@ done
 # executable, so executable checks alone cannot establish default readiness.
 # Explicit alternate interpreters remain the owning caller's choice.
 runtime="$HOME/projects/us-equities-runtime"
+runtime=$(realpath --canonicalize-missing -- "$runtime") || {
+  echo "refused: canonical runtime directory unavailable" >&2; exit 2;
+}
 # Lock the managed runtime when either stage uses its interpreter, including
 # executable file aliases. Alternate runtimes retain their existing overrides.
 if [[ "$PY" == "$runtime/.venv/bin/python" || "$PY" -ef "$runtime/.venv/bin/python" ||
@@ -32,7 +35,7 @@ if [[ "$PY" == "$runtime/.venv/bin/python" || "$PY" -ef "$runtime/.venv/bin/pyth
      ! -L "$runtime/.venv" && -d "$runtime/.venv" ]] || refuse_runtime
   # A stable lock beside the runtime also covers a fresh installer. Never
   # unlink/replace it: both scripts must coordinate on the same inode.
-  runtime_lock="$HOME/projects/.us-equities-runtime.lock"
+  runtime_lock="${runtime%/*}/.us-equities-runtime.lock"
   command -v flock >/dev/null || refuse_runtime
   [[ ! -L "$runtime_lock" && ( ! -e "$runtime_lock" ||
       ( -f "$runtime_lock" && -O "$runtime_lock" ) ) ]] || refuse_runtime
