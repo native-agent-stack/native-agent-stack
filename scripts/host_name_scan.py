@@ -21,6 +21,7 @@ from pathlib import Path
 OVERRIDE = "NATIVE_AGENT_HOST_NAMES_JSON"
 PROFILE_ROOT = Path("/mnt/c/Users")
 PIN = "1.9.0"
+PUBLICATION_ENTRY_LIMIT = 25000  # Betterleaks@81aff7a6 sources/common.go:20; short reads are allowed.
 INVALID_UTF8_BYTES = dict.fromkeys(range(0xDC80, 0xDD00), 0xFFFD)
 # Microsoft defines these as a shared folder, template, or compatibility
 # junction, not a personal profile. Id/email sources are never filtered by it.
@@ -155,7 +156,7 @@ def _config(names: tuple[str, ...], *, framed: bool = True, reject_email: bool =
         # Generated-view email policy follows architecture_sources.py:29 at
         # native-agent-stack@4d6cee1582f024d27319ee005117da5f15ebe269. Use the
         # upstream Betterleaks 1.9.0 custom-rule/decoder path, not a local decoder.
-        # Exclude the framing sentinels from the native rule's character classes.
+        # The email rule is used for native JSON publication-entry scans.
         email = r"([\p{L}\p{N}.!#$%&'*+/=?^_`{|}~-]+@[\p{L}\p{N}.-]+\.[A-Za-z]{2,})"
         lines.extend(("[[rules]]", 'id = "private-email"', 'description = "generated private email"',
                       "regex = " + json.dumps(email), "secretGroup = 1",
@@ -193,9 +194,17 @@ def _scan_entries(entries: Iterable[tuple[Path, str]], *, root: Path,
         # CC-selected publication route: native cmd/stdin.go:47-49 and
         # sources/stdin.go:18-25 at Betterleaks@81aff7a6. Each entry goes
         # separately, unchanged, through the vendor's reader and decoder.
-        # No repository markers, overlap or publication size limit.
+        # No repository markers or overlap. Below the native lookahead,
+        # even a short initial pipe read reaches EOF in the same fragment.
         findings = set()
         for path, text in entries:
+            if not text.startswith("{") or len(text.encode("utf-8")) >= PUBLICATION_ENTRY_LIMIT:
+                raise HostNameScanError("publication entry exceeds native input contract")
+            try:
+                if not isinstance(json.loads(text), dict):
+                    raise ValueError
+            except (ValueError, TypeError):
+                raise HostNameScanError("publication entry is not a JSON object") from None
             origins = {line: (path, line) for line in range(1, text.count("\n") + 2)}
             findings.update(_native_scan(text, origins, binary=binary, root=root,
                                          names=names, framed=False, reject_email=True))

@@ -374,7 +374,9 @@ class PinTests(unittest.TestCase):
                          {"pin_parsed": {"version": None, "commit": COMMIT_A}})
         self.assertEqual(fs.record_pin("1.0.0", COMMIT_A), {"pin_parsed": {"version": "1.0.0", "commit": COMMIT_A}})
         self.assertEqual(fs.record_pin("1.0.0 @ " + COMMIT_A, COMMIT_B), {"pin_parse": "unparsed"})
-        self.assertEqual(fs.record_pin("1.0.0", "v1.0.0"), {"pin_parsed": {"version": "1.0.0", "commit": None}})
+        self.assertEqual(fs.record_pin("1.0.0", "v1.0.0"), {
+            "pin_parsed": {"version": "1.0.0", "commit": None},
+            "source_pin": "v1.0.0", "source_pin_kind": "tag"})
 
     def test_compare_pins_is_three_valued(self):
         parsed = fs.parse_pin
@@ -687,21 +689,59 @@ class CheckTests(FixtureTestCase):
             encoded = "".join("%" + format(byte, "02X") for byte in encoded.encode())
         self._assert_private_text_is_refused_before_publication(" " * 3900 + encoded, spy_publication=False)
 
+    @unittest.skipUnless(shutil.which("betterleaks"), "native fragment plants require Betterleaks 1.9.0")
+    def test_native_fragment_crossing_plants_are_refused_before_publication(self):
+        name = "fixture-private-account"
+        email = "a" * 64 + "@" + "b" * 63 + ".example.invalid"
+        encode = lambda value: "".join("%" + format(byte, "02X") for byte in value.encode())
+        for payload in (name, encode(email), encode(encode(name))):
+            with self.subTest(encoded_bytes=len(payload)):
+                root = self.root()
+                layers = [_layer(f"cut-{index:02}", winners=[_winner("widget")]) for index in range(20)]
+                for layer in layers:
+                    layer["title"] = "clean"
+                layers[-1]["title"] = "CUT_PLANT_MARKER"
+                _fixture(root, foundation=layers)
+                offset = fs.serialize(fs.build_document(root)).index("CUT_PLANT_MARKER")
+                padding = 90536 - len(payload) // 2 - offset
+                self.assertGreaterEqual(padding, 0)
+                quotient, remainder = divmod(padding, len(layers) - 1)
+                for index, layer in enumerate(layers[:-1]):
+                    layer["title"] += " " * (quotient + (index < remainder))
+                _write_json(root / "catalogs/landscape/foundation.json",
+                            {"schema_version": 2, "layers": layers})
+                self.assertEqual(self.run_main(root, "--write")[0], 0)
+                before = ((root / fs.OUTPUT).read_bytes(), (root / "manifests/evidence.json").read_bytes())
+                layers[-1]["title"] = payload
+                _write_json(root / "catalogs/landscape/foundation.json",
+                            {"schema_version": 2, "layers": layers})
+                text = fs.serialize(fs.build_document(root))
+                self.assertEqual(text.index(payload), 90536 - len(payload) // 2)
+                with self.assertRaises(SystemExit):
+                    self.run_main(root, "--write", native_scan=True, private_names=(name,))
+                self.assertEqual(((root / fs.OUTPUT).read_bytes(),
+                                  (root / "manifests/evidence.json").read_bytes()), before)
+
+
     @unittest.skipUnless(shutil.which("betterleaks"), "native publication contract requires Betterleaks 1.9.0")
     def test_benign_entry_accepted_by_native_stdin_remains_publishable(self):
         root = self.fixture_root()
         catalog = root / "catalogs/landscape/foundation.json"
         source = json.loads(catalog.read_bytes())
-        source["layers"][0]["title"] = "x" * 24001
+        source["layers"][0]["title"] = "x" * 23000
         _write_json(catalog, source)
         try:
             exit_code, output = self.run_main(root, "--write", native_scan=True)
         except SystemExit as error:
             self.fail(f"Native-clean entry unexpectedly refused: {error}")
         self.assertEqual(exit_code, 0, output)
-        self.assertEqual(json.loads((root / fs.OUTPUT).read_bytes())["layers"][0]["title"], "x" * 24001)
+        self.assertEqual(json.loads((root / fs.OUTPUT).read_bytes())["layers"][0]["title"], "x" * 23000)
         registered = json.loads((root / "manifests/evidence.json").read_bytes())["files"]
         self.assertEqual(registered[0]["sha256"], hashlib.sha256((root / fs.OUTPUT).read_bytes()).hexdigest())
+
+    @unittest.skipUnless(shutil.which("betterleaks"), "native entry guard requires Betterleaks 1.9.0")
+    def test_oversized_actual_record_refuses_and_preserves_publication(self):
+        self._assert_private_text_is_refused_before_publication("x" * 25000, spy_publication=False)
 
     @unittest.skipUnless(shutil.which("betterleaks"), "native write privacy plant requires Betterleaks 1.9.0")
     def test_explicit_private_account_is_refused_before_write_or_registration(self):
@@ -750,9 +790,12 @@ class CheckTests(FixtureTestCase):
             events.append("scan")
             self.assertEqual(names, ("fixture-private-account",))
             self.assertTrue(reject_email)
-            self.assertEqual(len(paths), 1)
-            self.assertNotEqual(paths[0], root / fs.OUTPUT)
-            self.assertEqual(json.loads(paths[0].read_bytes())["layers"][0]["title"], "Title for layer-a")
+            self.assertGreater(len(paths), 1)
+            entries = [json.loads(path.read_bytes()) for path in paths]
+            self.assertTrue(all(path != root / fs.OUTPUT for path in paths))
+            self.assertIn("Title for layer-a", [entry.get("title") for entry in entries])
+            self.assertTrue(all(path.read_bytes().startswith(b"{") and len(path.read_bytes()) < 25000
+                                for path in paths))
             return []
 
         with mock.patch.object(host_name_scan, "scan_paths", side_effect=scan), \
@@ -860,6 +903,17 @@ class CheckTests(FixtureTestCase):
 
 
 class RepositoryTests(unittest.TestCase):
+    def test_real_noncommit_source_pins_are_retained_in_declared_runs(self):
+        stack = json.loads((REPO_ROOT / fs.STACK).read_bytes())
+        document = fs.build_document(REPO_ROOT)
+        expected = {"postgresql": "sha256", "poppler": "sha256", "restic": "tag", "dagu": "tag"}
+        for component in stack["components"]:
+            if component["id"] in expected:
+                with self.subTest(component=component["id"]):
+                    run = fs.run_pin(document, component["id"])
+                    self.assertEqual(run.get("source_pin"), component["source_pin"])
+                    self.assertEqual(run.get("source_pin_kind"), expected[component["id"]])
+
     def test_committed_check_ignores_common_account_context(self):
         for account in ("root", "ubuntu", "node", "dev"):
             with self.subTest(account=account), mock.patch.dict("os.environ", {

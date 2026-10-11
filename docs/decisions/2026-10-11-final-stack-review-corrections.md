@@ -346,6 +346,11 @@ handoff; no model run or hosted-green result is inferred from these local checks
 
 ## Terminal native per-entry correction
 
+Historical correction at `bdb4231a`: the adapter scanned native input per file,
+but its caller still passed the whole report as one file. The NEW P1 correction
+below supersedes this input contract; its earlier unlimited-record claim is
+not current acceptance.
+
 The complete 22,476-byte GPT confirmation verdict at `e5b7d884` has SHA256
 `2f7cdbfad9a7ba43dc0ec74a1e9109b113e51c105d704bd1a80b1f3f41c4b247`.
 Its one blocker reproduces the defect introduced by the prior repair: a
@@ -427,3 +432,74 @@ controls are red at `7ceedc64`; the benign native-clean control is red at
 `e5b7d884` (one failure, zero errors). All are green on the selected native route.
 The final released commit and exact lease are recorded in the co-op handoff;
 no further fix round is authorized except a new P1.
+
+## NEW P1: actual publication records and source-pin fidelity
+
+The CC's 17:27Z adjudication (`adjudication-pr1007-bdb4231a-20261011.md`, 3,013
+bytes, SHA256 `14460c5bcc37647d35559b5aa466991da035c929ffbcb86938f166fef6c7975f`)
+authorizes ONE correction after a mechanical rebase onto main `bcf55c45`.
+Its new evidence shows that the whole 300 KB file was still one stdin entry;
+the pinned vendor's nonoverlapping fragments can cut private tokens. This
+correction follows the adjudicated native mechanism and input contract.
+
+Primary source: the local Betterleaks mirror at
+`81aff7a638638aae3a659845d089043e1d8fe9ac`, read with no lazy fetch/optional
+locks. `sources/file.go:283` reads up to 100,000 bytes but permits a short
+read; `sources/common.go:72-141` adds at most 25,000 lookahead bytes. Therefore
+the nominal buffer size alone is not a safe per-record bound. A JSON record
+strictly below 25,000 serialized UTF-8 bytes reaches EOF within the first
+read plus lookahead. A record at or above that bound fails closed; there is
+no repository byte splitting, overlap, sentinel or synthetic newline framing.
+
+The writer now enumerates actual layer and run objects, individual normalized
+repository/component index mappings, and the remaining report metadata entries.
+Each is serialized as a JSON object and scanned in its own native stdin call.
+The scanner verifies `{` at byte zero, a parsed JSON object, and the strict
+byte bound before invoking native detection. All report string values and keys
+are retained in these records. Whole oversized records refuse rather than
+splitting their tokens. Native depth-5 decoding and Expr boundaries are unchanged.
+The old benign-title regression now uses a 23,000-character title whose entire
+record fits the new contract; a separate oversized-layer test proves refusal
+and byte preservation. This is the new explicit guard from the P1 ruling.
+
+Failing-first evidence on rebased, otherwise unchanged `bdb4231a` code:
+
+- The full native writer has 20 small layers padded so each of a bare account,
+  the original percent-encoded email and the original twice-percent account
+  crosses byte 90,536. The exact output offset is asserted. One test reports
+  three failures, zero errors (`SystemExit not raised`); all three published.
+  After actual-record scanning, the same controls refuse and preserve both
+  existing output and registry bytes.
+- Native adapter prefix/size controls report three failures before guards:
+  an oversized JSON object and PDF/RTF prefix inputs were accepted. The guards
+  now refuse them; below/equal/above 25,000-byte cases distinguish the bound.
+- One real-data test reports four failing subcases: restic/dagu tags and
+  PostgreSQL/Poppler artifact SHA256 source pins were absent from their runs.
+  `record_pin` now retains raw noncommit `source_pin` and `source_pin_kind`
+  (`tag` or `sha256`) without inventing a Git commit. The four real rows pass.
+  The canonical meaning is defined in `docs/foundation-layer-map-20261008.md:34-36`.
+  The old unit assertion that discarded a tag is reconciled to this corrected
+  contract; version/commit parsing and precedence remain unchanged.
+
+Rebase evidence: earlier five substantive patches compare `=` with native
+range-diff after explicitly excluding mechanical evidence/count files and the
+append-only table plus main-updated exclusion-fixture context. Full range-diff
+is retained too; it displays `!` for those mechanical/context changes and is
+not relabeled as literal `=`. All 281 anti-pattern rows from the old branch and
+all 281 rows from main were individually verified present byte-unchanged before
+the new row above. The authorized CC recomputation tool handles supported hash
+pairs/counts but refuses insertion-shaped registry conflicts or no-count-conflict
+stages. Those stages preserve the current merged registry and recompute owned
+bindings through the existing `host_receipts.register_file` hot-file protocol.
+An initial shell sequence continued after the helper failed; that entire rebase
+was aborted and restarted from the preserved reviewed head, with each subsequent
+step checked. No failed attempt was pushed or counted as acceptance.
+
+The first post-fix full generator run reports 71 tests with one stale expected
+tag-discard assertion; new privacy and real-pin controls pass. The initial
+scanner run reports one oversized aggregate-neighbor fixture; it now supplies
+individual JSON entries under the same contract. These failed intermediate
+conditions remain distinct from the final gates. The cheap stale email-rule
+comment is corrected. Scope-locked follow-ups remain the old conflicting-
+platform predicate, non-atomic registration, upstream-execution evidence and
+framed non-publication callers. Only another NEW P1 can reopen this correction.

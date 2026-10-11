@@ -308,6 +308,11 @@ def record_pin(text, commit=None) -> dict:
     """parse_pin(text) with a separately recorded commit field (a 40-hex source_pin or commit) merged in. A commit
     that contradicts the one in the text leaves the pin unparsed."""
     parsed = parse_pin(text)
+    if isinstance(commit, str) and commit and not COMMIT_PATTERN.fullmatch(commit):
+        # source_pin includes artifact SHA256 and upstream tags, not just Git
+        # commits (foundation-layer-map-20261008.md:34-36). Retain its meaning.
+        kind = "sha256" if re.fullmatch(r"[0-9a-fA-F]{64}", commit) else "tag"
+        return {**parsed, "source_pin": commit, "source_pin_kind": kind}
     if isinstance(commit, str) and COMMIT_PATTERN.fullmatch(commit):
         current = parsed.get("pin_parsed")
         if current is None:
@@ -958,6 +963,24 @@ def parse_args(argv=None):
     return parser.parse_args(argv)
 
 
+def publication_entries(document: dict):
+    """Actual report records, with each repository/component index mapping separate.
+
+    No byte splitting: a record too large for the native fragment contract is
+    refused by the shared scanner. Every serialized key/value remains covered.
+    """
+    for key, value in document.items():
+        if key == "index":
+            for index_key, mappings in value.items():
+                for identity, references in mappings.items():
+                    yield {key: {index_key: {identity: references}}}
+        elif isinstance(value, list):
+            for entry in value:
+                yield entry if isinstance(entry, dict) else {key: entry}
+        else:
+            yield {key: value}
+
+
 def main(argv=None) -> int:
     args = parse_args(argv)
     root = args.root.resolve()
@@ -979,9 +1002,12 @@ def main(argv=None) -> int:
         # former substring matcher; never publish native text or diagnostics.
         try:
             with tempfile.TemporaryDirectory(prefix="final-stack-publication-") as temporary:
-                candidate = Path(temporary) / "candidate.json"
-                candidate.write_bytes(text.encode("utf-8"))
-                findings = host_name_scan.scan_paths([candidate], root=root, names=private_names, reject_email=True)
+                candidates = []
+                for index, entry in enumerate(publication_entries(document)):
+                    candidate = Path(temporary) / f"entry-{index:05}.json"
+                    candidate.write_bytes(json.dumps(entry, ensure_ascii=True, separators=(",", ":")).encode("utf-8"))
+                    candidates.append(candidate)
+                findings = host_name_scan.scan_paths(candidates, root=root, names=private_names, reject_email=True)
         except (host_name_scan.HostNameScanError, OSError):
             raise SystemExit("final_stack: private publication scanner unavailable; aborting") from None
         if findings:

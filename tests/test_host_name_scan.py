@@ -205,6 +205,13 @@ class HostNameSourceTests(unittest.TestCase):
 
 @unittest.skipUnless(shutil.which("betterleaks"), "native Betterleaks unavailable")
 class NativeHostNameScanTests(unittest.TestCase):
+    def test_publication_entries_must_be_json_below_native_lookahead(self):
+        for content in ('{"value":"' + "x" * 25000 + '"}', '%PDF-1.7\nfixtureagent', '{\\rtf1\nfixtureagent'):
+            with self.subTest(prefix=content[:8]):
+                self.target.write_text(content, encoding="utf-8")
+                with self.assertRaises(host_name_scan.HostNameScanError):
+                    host_name_scan.scan_paths([self.target], root=self.root, names=self.names, reject_email=True)
+
     def test_native_publication_entries_keep_encoded_tokens_at_every_old_cut(self):
         name = "fixture-private-account"
         email = "a" * 64 + "@" + "b" * 63 + ".example.invalid"
@@ -220,7 +227,7 @@ class NativeHostNameScanTests(unittest.TestCase):
                  for offset in (0, 3900, 3980, 4090, 4110, 8000)]
         paths = [self.root / f"entry-{index:02}.txt" for index in range(len(lines))]
         for path, text in zip(paths, lines):
-            path.write_text(text, encoding="utf-8")
+            path.write_text(json.dumps({"value": text}), encoding="utf-8")
         self.assertEqual(host_name_scan.scan_paths(paths, root=self.root, names=(name,), reject_email=True),
                          [(path, 1) for path in paths])
 
@@ -233,19 +240,27 @@ class NativeHostNameScanTests(unittest.TestCase):
                     text = "".join("%" + format(byte, "02X") for byte in text.encode())
                     plants.append(text)
         lines = [" " * offset + plant for plant in plants for offset in (0, 3900, 8000)]
-        self.target.write_text("\n".join(lines), encoding="utf-8")
-        self.assertEqual(host_name_scan.scan_paths([self.target], root=self.root, names=(name,),
-                                                  reject_email=True), [])
+        paths = [self.root / f"neighbor-{index:02}.json" for index in range(len(lines))]
+        for path, value in zip(paths, lines):
+            path.write_text(json.dumps({"value": value}), encoding="utf-8")
+        self.assertEqual(host_name_scan.scan_paths(paths, root=self.root, names=(name,), reject_email=True), [])
 
-    def test_native_publication_has_no_repository_line_size_limit(self):
-        for content in ("x" * 24001, "中" * 8001, "x" * 240001):
-            with self.subTest(bytes=len(content.encode())):
-                self.target.write_text(content, encoding="utf-8")
-                self.assertEqual(host_name_scan.scan_paths([self.target], root=self.root, reject_email=True), [])
+    def test_native_publication_guard_counts_serialized_utf8_bytes(self):
+        prefix, suffix = '{"value":"', '"}'
+        for size in (24999, 25000, 25001):
+            content = prefix + "x" * (size - len(prefix) - len(suffix)) + suffix
+            self.target.write_text(content, encoding="utf-8")
+            with self.subTest(bytes=size):
+                if size < 25000:
+                    self.assertEqual(host_name_scan.scan_paths([self.target], root=self.root, reject_email=True), [])
+                else:
+                    with self.assertRaises(host_name_scan.HostNameScanError):
+                        host_name_scan.scan_paths([self.target], root=self.root, reject_email=True)
 
     def test_native_publication_scans_each_entry_without_changing_its_text(self):
         other = self.root / "other.txt"
-        contents = ["safe\x1e text\n" + "x" * 24001, "other\x1f text\nclean"]
+        contents = [json.dumps({"value": "safe\x1e text\n" + "x" * 24001}),
+                    json.dumps({"value": "other\x1f text\nclean"})]
         self.target.write_text(contents[0], encoding="utf-8")
         other.write_text(contents[1], encoding="utf-8")
         original = host_name_scan.subprocess.run
@@ -265,10 +280,12 @@ class NativeHostNameScanTests(unittest.TestCase):
                    "".join("%" + format(byte, "02X") for byte in email.encode()),
                    "".join(r"\u" + format(ord(char), "04x") for char in email),
                    base64.b64encode(email.encode()).decode()]
-        self.target.write_text("\n".join(encoded), encoding="utf-8")
-        self.assertEqual(host_name_scan.scan_paths([self.target], root=self.root, reject_email=True),
-                         [(self.target, line) for line in range(1, len(encoded) + 1)])
-        self.assertEqual(host_name_scan.scan_paths([self.target], root=self.root), [])
+        for value in encoded:
+            with self.subTest(encoded_bytes=len(value)):
+                self.target.write_text(json.dumps({"value": value}), encoding="utf-8")
+                self.assertEqual(host_name_scan.scan_paths([self.target], root=self.root, reject_email=True),
+                                 [(self.target, 1)])
+                self.assertEqual(host_name_scan.scan_paths([self.target], root=self.root), [])
 
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory()

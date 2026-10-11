@@ -9590,7 +9590,9 @@
       },
       "platforms": [],
       "repository": "github.com/dagucloud/dagu",
-      "source": "manifests/stack.json#/components/44"
+      "source": "manifests/stack.json#/components/44",
+      "source_pin": "v2.16.6",
+      "source_pin_kind": "tag"
     },
     {
       "conflicts": [],
@@ -10044,7 +10046,9 @@
       },
       "platforms": [],
       "repository": "github.com/tsdgeos/poppler_mirror",
-      "source": "manifests/stack.json#/components/63"
+      "source": "manifests/stack.json#/components/63",
+      "source_pin": "8059eadb6805340768f138c465b57f8164c92b4a0773c37ef031ea6c0d987b2e",
+      "source_pin_kind": "sha256"
     },
     {
       "conflicts": [],
@@ -10056,7 +10060,9 @@
       },
       "platforms": [],
       "repository": "github.com/postgres/postgres",
-      "source": "manifests/stack.json#/components/62"
+      "source": "manifests/stack.json#/components/62",
+      "source_pin": "555610c24d53e4316da5b7d3fc25c279d96856d5e0e23ee308c328c5fa881d9f",
+      "source_pin_kind": "sha256"
     },
     {
       "conflicts": [],
@@ -10160,7 +10166,9 @@
       },
       "platforms": [],
       "repository": "github.com/restic/restic",
-      "source": "manifests/stack.json#/components/43"
+      "source": "manifests/stack.json#/components/43",
+      "source_pin": "v0.19.1",
+      "source_pin_kind": "tag"
     },
     {
       "conflicts": [],
