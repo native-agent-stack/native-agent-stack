@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-10-11T03:24:56Z",
+  "status": "synthetic_transport_binding_regressions_pass_live_unmeasured",
+  "parent_commit": "cb68e66f3e2e47b1f6ffd6e28898cbcbdb554002",
+  "parent_adjudicate_py_sha256": "569759b151c7b39b6b71acc410f42ac7bb74a9f49101c86d578f59116844487a",
+  "adjudicate_py_sha256": "9da98fd37870a56c25d1dc40a34636b540a6f1cfcca74e994c036eda2967797d",
+  "test_adjudicate_py_sha256": "3974779b52fe2856ab35135c3a03dea23f93bda5415f5f8e43f062deb18eea3f",
+  "frame": {
+    "type": "native_agent_stack.transport",
+    "schema_version": 1,
+    "writer": "run_codex_call; OmniRoute only, before appending child stdout",
+    "fields": ["provider", "provider_base_url", "pass_through"],
+    "binding": "The existing events[stage].sha256 covers the frame and retained stdout; parse the same bytes only after verifying their digest.",
+    "policy": "Exact keys/version/disclosure and validated canonical loopback endpoint; reject duplicate/malformed frames and judge/refute disagreement. Removable record fields must equal independently bound transport."
+  },
+  "focused_regressions": {
+    "class": "synthetic",
+    "method": "Compile exact unchanged parent implementation in memory; run the same existing-runner-seam tests with controlled local fixtures. Current source and tests remain unchanged during final GREEN.",
+    "before": {"tests": 8, "failed_assertions": 11, "errors": 0, "log_sha256": "24e5365c9036b755d5d87c3da59fe3b49d1e491efb52a27a125f9d2d3b41cf56"},
+    "after": {"tests": 8, "failures": 0, "errors": 0, "elapsed_seconds": 1.734, "log_sha256": "07fd2d2f2f91f63e538225a157a956eb87f19b08a227bd16f94f446153e43bc9"},
+    "coverage": ["complete field deletion AB", "complete field deletion BA", "both unanimous OmniRoute votes stripped", "native resume makes four new calls then no calls on unchanged resume", "legacy unframed OmniRoute reruns", "missing/duplicate/malformed/extra-key frame", "stage endpoint disagreement", "changed frame with unchanged event digest", "native raw event bytes and serialized artifact controls"]
+  },
+  "supplied_reproducer": {
+    "class": "synthetic",
+    "file": "test_missing_transport.py",
+    "sha256": "c8ff6893a69724bc7824436975b6ae7a10fe78e2f821826133fe0a692737c96b",
+    "method": "Unmodified supplied test bytes; controlled imports use the actual worktree fixture helpers. Complete stdout retained.",
+    "before": {"tests": 2, "failures": 2, "errors": 0, "log_sha256": "f0c02b6ac4b922c5103c37a9fa38a0bcef8333f78571b0a8595cbae225d7e7e3"},
+    "after": {"tests": 2, "failures": 0, "errors": 0, "elapsed_seconds": 0.378, "log_sha256": "b1e839537c6691c69b6842d8ea6b2fd5fbf19bae0612c1d0fb3092623ed85387"}
+  },
+  "intermediate_diagnostic": "First GREEN attempt raised NameError because judge_pending had not initialized run_transport; original error logs remain retained separately. Corrected focused and supplied-reproducer runs pass at the recorded final source.",
+  "native_compatibility": {
+    "event_bytes_unchanged": true,
+    "judgment_record_body_unchanged": true,
+    "assemble_layer_body_unchanged": true,
+    "family_provenance_fields_unchanged": true,
+    "transport_outside_family_provenance": true
+  },
+  "sources": {
+    "installed_codex": "0.162.1",
+    "codex_pin": "092d3acd6bec3e3a14bdc7e7a2810ab628ab759d",
+    "codex_file": "codex-rs/exec/src/exec_events.rs ThreadEvent/ThreadStartedEvent/TurnCompletedEvent",
+    "installed_python": "3.13.16",
+    "python_pin": "cbc944f4bc59639a444dd971c737788ba2283a91",
+    "python_file": "Doc/library/json.rst standard dumps/loads; hashlib.sha256 retained-byte digests",
+    "existing_mechanism": "adjudicate.py at cb68e66f:708-720,743-779,824-842,930-934,1079-1081,1581-1584",
+    "disclosure_decision": "docs/decisions/2026-10-10-codex-lane-omniroute.md"
+  },
+  "final_commit_checks": "Required modules and FULL validation run on the single final correction commit; exact HEAD/results are retained externally in runtime-workers-pr992-binding-20261011 and the PR body.",
+  "limitations": ["No live provider/model call; gateway prompt preservation and upstream model-family identity remain unmeasured.", "Legacy OmniRoute records declaring transport but lacking a binding are stale. An older record already missing every transport field and binding cannot be retrospectively identified from that file alone; new code provenance invalidates its resume.", "The existing retained-event hash is the trust boundary; this is not a signature over arbitrary replacement of both events and their recorded digest."],
+  "live_provider_calls": 0,
+  "upstream_model_turns": 0,
+  "rebase": false
+}
