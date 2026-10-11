@@ -5381,7 +5381,7 @@
     },
     {
       "path": "adoption/hooks/claude/SHA256SUMS",
-      "sha256": "9db7433fa8c7d1c37a55b027e8eb3b66ed400ad375403abfa9808aa86fb82c66",
+      "sha256": "e4cab95c2061295dfc3ca3b73a0a1a7c88b2770ed95051ca3218898361920e1a",
       "bytes": 1229
     },
     {
@@ -5431,8 +5431,8 @@
     },
     {
       "path": "adoption/hooks/claude/token-lanes-subagent-start.py",
-      "sha256": "81e28a7c2f5429301d3306dc5ee0ecf809c67ccded62a43a98281baa8f92fedd",
-      "bytes": 2082
+      "sha256": "3864ea000bccfacee61ea7b4bc0b601870fe6b9496b1f8ab82f0807dc52775bb",
+      "bytes": 2114
     },
     {
       "path": "adoption/host-receipt.schema.json",
@@ -18577,8 +18577,8 @@
     },
     {
       "path": "docs/decisions/2026-10-10-landscape-scratch-ownership.md",
-      "sha256": "f84dc6bbac7df8cb0877c5bd90da2e2c78f6685c2072507ee1d6c71b21f3446a",
-      "bytes": 7067
+      "sha256": "9edab4d478d3fcca052b42e6bb3dc87ee800726e60a32df0fe9c97f80ee9869d",
+      "bytes": 9258
     },
     {
       "path": "docs/decisions/2026-10-10-openhands-shard-discovery-protection.md",
@@ -61207,8 +61207,8 @@
     },
     {
       "path": "tests/test_token_lanes_subagent_start.py",
-      "sha256": "7c98878632be2ca51e0f1fb6e90f4ce8f91a83359f2451477566f646288aca6c",
-      "bytes": 32021
+      "sha256": "a299bf39525e7fea1e1530121fb18554efa5174eeb4d08e98f3c2fbc3fea75a8",
+      "bytes": 32120
     },
     {
       "path": "tests/test_token_measurement.py",
@@ -61662,8 +61662,8 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/README.md",
-      "sha256": "65be0fd5c8c461152dd8600e9a01712e425f21504fb64af37c446fd7a9107eed",
-      "bytes": 113810
+      "sha256": "3f22eb967b05da00c64e671e2d9adabfdda0f415d8b38f02e95e7ca963a7cc9d",
+      "bytes": 114032
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/build_args.py",

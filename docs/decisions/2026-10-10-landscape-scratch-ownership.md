@@ -33,6 +33,35 @@ The first tool-list candidate excluded Bash but retained Skill. An additional na
 
 The final native suite checks wildcard and interpreter deletion, all three context execution entry points, an unlisted MCP mutator, an attempted deferred-tool load, Skill permission grants, and Skill dynamic context. Positive controls require actual dispatch for native Read and context fetch/index/search, and reading SKILL.md without executing its dynamic text. Every negative case checks file hashes and native error/dispatch results. The deferred check does not claim ToolSearch is active when the native client eagerly exposes the three exact MCP definitions instead.
 
+## Review correction (2026-10-11)
+
+The first GPT read of #987 at `4a1e5b7d079c7a2d327f022dc0f702963a190bb5` found that
+`adoption/hooks/claude/token-lanes-subagent-start.py` still sent this restricted role the default carrier.
+That carrier requested ungranted memory, code-execution and shell tools. The unchanged full token-lanes
+module reproduced two failures: the ungranted-tool assertion and the restricted-role count (`11 != 10`).
+
+The role body already supplies primary-page fetch/index/search, bounded local source reads and installed
+SKILL.md reading. The hook now classifies the exact `landscape-sweep-worker` name as silent, supplying no
+additional carrier. This follows Claude Code 2.1.296's supported [SubagentStart context
+output](https://code.claude.com/docs/en/hooks#subagentstart) and preserves the native `tools` allowlist;
+hook guidance does not grant tools. The official hook and [available-tools
+documentation](https://code.claude.com/docs/en/sub-agents#available-tools) were rechecked on 2026-10-11,
+and the installed client still reports 2.1.296. A separate carrier would duplicate guidance already in
+the role body.
+
+The regression now requires zero injection for this worker, removes it from the default-context cases,
+keeps exact-name controls, and checks all eleven shipped restricted roles. With those expectations
+changed before the hook fix, the full 23-test module failed three assertions, including the worker's
+zero-injection case. These hook subprocess checks are **local_integration**; they use no paid model call.
+The README also corrects the `stack-researcher` comparison: its Bash and code-execution grants distinguish
+it from this worker. Both roles can read installed skill source without the native Skill tool.
+
+After the hook fix, `python3 -m unittest tests.test_token_lanes_subagent_start
+tests.test_landscape_sweep_worker_boundary` passed all **34 tests** (23 hook tests and 11 native boundary
+tests) in 19.932 seconds. The native boundary suite still uses the installed 2.1.296 executable with
+SHA256 `24972e3bc859fab2b46ed4c1e51f7d6130f06d3bd550811a114640de3370d0de` and synthetic loopback responses;
+no authenticated provider call participates.
+
 ## Alternatives and practical limits
 
 - Cleanup-only prose leaves the unsafe tool available; the original native regression demonstrates the consequence.

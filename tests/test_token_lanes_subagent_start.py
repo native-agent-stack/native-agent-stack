@@ -28,7 +28,7 @@ JCODEMUNCH_CLAUSE = 'jcodemunch route(task, repo: ".") (no execute), order(actio
 JCODEMUNCH_RESTRICTED_CLAUSE = ('jcodemunch on indexed repos: first order(action="jcodemunch_guide",args={}); '
                                'then route(task=...,model=<actual caller model>) (no execute); '
                                'then granted read-only order actions with own args.')
-# Exact agent_type -> sibling block; every other non-blind type receives BLOCK.
+# Exact agent_type -> sibling block; unmapped, non-silent, non-blind types receive BLOCK.
 ROLE_BLOCKS = {
     "stack-researcher": "token-lanes-block.researcher.md",
     "stack-verifier": "token-lanes-block.verifier.md",
@@ -37,7 +37,7 @@ ROLE_BLOCKS = {
     "isolated-builder": "token-lanes-block.builder.md",
     "source-scout": "token-lanes-block.scout.md",
 }
-SILENT_ROLES = ("semantic-evidence-reviewer",)
+SILENT_ROLES = ("semantic-evidence-reviewer", "landscape-sweep-worker")
 BLOCK_FILES = (BLOCK,) + tuple(HOOK.with_name(name) for name in sorted(set(ROLE_BLOCKS.values())))
 KEY_PHRASES = (  # the default block only; role blocks carry ROLE_KEY_PHRASES
     "ToolSearch", "ctx_batch_execute", "rtk", "find_referencing_symbols",
@@ -346,7 +346,7 @@ class TokenLanesHookTests(unittest.TestCase):
     def test_each_agent_type_receives_one_exact_context_object(self):
         payloads = [{"agent_type": role} for role in
                     ("general-purpose", "workflow-subagent", "teammate", "future-role", "Explore",
-                     "landscape-sweep-worker", *ROLE_BLOCKS)]
+                     *ROLE_BLOCKS)]
         payloads += [{}] + [{"agent_type": value} for value in
                             ("", None, 7, False, [], ["blind-judge"], {"name": "blind-judge"},
                              ["stack-verifier"], {"stack-verifier": 1})]
@@ -373,7 +373,8 @@ class TokenLanesHookTests(unittest.TestCase):
         # The hook never builds a path from agent_type; near-misses and plugin-scoped names get the default.
         for agent_type in ("stack-verifier ", "Stack-Verifier", "my-plugin:stack-verifier", "verifier",
                            "token-lanes-block.verifier.md", "../token-lanes-block.verifier",
-                           "semantic-evidence-reviewer ", "my-plugin:semantic-evidence-reviewer"):
+                           "semantic-evidence-reviewer ", "my-plugin:semantic-evidence-reviewer",
+                           "landscape-sweep-worker ", "my-plugin:landscape-sweep-worker"):
             with self.subTest(agent_type=agent_type):
                 self.assertEqual(self.injected(agent_type), BLOCK.read_text(encoding="utf-8"))
 
@@ -415,7 +416,7 @@ class TokenLanesHookTests(unittest.TestCase):
                     if skill in context:
                         self.assertTrue("Skill" in tools or skill in skills,
                                         f"{name} is told to follow {skill} without Skill or a preload")
-        self.assertEqual(checked, 10)
+        self.assertEqual(checked, 11)
 
     def test_malformed_stdin_is_silent(self):
         for stdin in ("not JSON", "", "{", "[]", "null", '"string"', "42"):
