@@ -5,7 +5,8 @@ with a harness that cuts the decision text out of each script and evaluates it i
 This module is that harness's offline subset, kept beside the one copy of the scripts:
 
   * verdict files and the GPT_VERDICT block (lg_verdict_file_ok: the harness's 28 synthetic files and six more) and the GATES_DONE rule;
-  * the trading-cc-read gate (tcc_read_gate): the description form, the record's last verdict line, the status states;
+  * the trading-cc-read gate (tcc_read_gate): the description form, the record's last verdict line, the status states, a status behind
+    100 newer statuses of other contexts and replies that cannot be read (#975, Codex P1 at nas:234: the combined status, every page);
   * change identity (lg_change_id, lg_same_change) against scratch repositories: binary bytes, mode, names, `--` and `++` lines;
   * the CI line: uet's lg_ci_state on synthetic rollups and nas's check-run line, and both against every member of GitHub's
     CheckConclusionState in a captured schema excerpt (tests/fixtures/landing/check-conclusion-state.json) and null, and uet's
@@ -93,7 +94,12 @@ def q(path):
 # ---------------------------------------------------------------------------------------------- fake commands
 # GitHub-side data are JSON files named by FAKE_STATUSES, FAKE_CHECKRUNS and FAKE_PRVIEW; the scripts' own --jq programs are
 # evaluated on them by jq, so the real programs run. Every call is appended to FAKE_LOG. FAKE_STATUSES lists the statuses as REST does,
-# newest first (github/rest-api-description@58b1e0c0 api.github.com.json:55724).
+# newest first (github/rest-api-description@58b1e0c0 api.github.com.json:55724); a read of that list gets its page 1, the first per_page
+# (default 30, :344577-344585). #975 (Codex P1 at nas:234): the combined status (.../status, :55664-55667) is built from FAKE_STATUSES as
+# GitHub gave it when measured on 2026-10-11: each context once with its newest status, in pages of per_page contexts. #975 (Codex P2 at
+# nas:289): FAKE_CHECKRUNS is one page or a list of pages. `gh api --paginate --slurp` prints every page in one array (cli v2.102.0
+# pkg/cmd/api/api.go:362-371), which the scripts give to jq themselves, and a call without them gets page 1, as a request without
+# pagination does.
 # #975 P2-2: FAKE_FAIL (a glob on the arguments) makes the matching calls fail from the FAKE_FAIL_FROM-th (default 1) on: exit 1,
 # FAKE_FAIL_STDERR on stderr and FAKE_FAIL_STDOUT on stdout. As gh does (cli v2.102.0), `gh api` puts an error response's body on
 # stdout and "gh: <message>" on stderr (pkg/cmd/api/api.go:546, :557), every other command prints its error only to stderr
@@ -120,8 +126,19 @@ done
 case "$1 $2" in
   "api repos/"*)
     case "$2" in
-      *"/statuses"*) exec jq -r "$prog" "$FAKE_STATUSES" ;;
-      *"/check-runs"*) exec jq -r "$prog" "$FAKE_CHECKRUNS" ;;
+      *"/statuses"*|*"/status?"*)
+        pp=$(printf '%s\n' "$2" | sed -n 's/.*[?&]per_page=\([0-9][0-9]*\).*/\1/p'); pp=${pp:-30}
+        if [[ "$2" == *"/statuses"* ]]; then jq --argjson pp "$pp" '.[:$pp]' "$FAKE_STATUSES" | jq -r "$prog"; exit; fi
+        # the combined status: each context once, its newest status (the first listed), in pages of per_page contexts; FAKE_COMBINED_RAW,
+        # when set (empty included), is the reply instead, with exit 0
+        if [ -n "${FAKE_COMBINED_RAW+set}" ]; then printf '%s' "$FAKE_COMBINED_RAW"; exit 0; fi
+        pages=$(jq -c --argjson pp "$pp" 'reduce .[] as $s ([]; if any(.[]; .context == $s.context) then . else . + [$s] end) as $c
+                 | [range(0; [($c | length), 1] | max; $pp) as $i | {total_count: ($c | length), statuses: $c[$i:$i + $pp]}]' "$FAKE_STATUSES") || exit 1
+        if [[ " $* " == *" --paginate "* && " $* " == *" --slurp "* ]]; then printf '%s\n' "$pages"; exit 0; fi
+        printf '%s\n' "$pages" | jq '.[0]' | jq -r "$prog" ;;
+      *"/check-runs"*)  # one page (an object) or a list of pages; --paginate --slurp gets them all in one array, any other call page 1
+        if [[ " $* " == *" --paginate "* && " $* " == *" --slurp "* ]]; then exec jq -c 'if type == "array" then . else [.] end' "$FAKE_CHECKRUNS"; fi
+        jq 'if type == "array" then .[0] else . end' "$FAKE_CHECKRUNS" | jq -r "$prog" ;;
       *"/commits/"*) printf '{"commit":{"author":{"email":"%s"}}}' "${FAKE_COMMIT_EMAIL-4242424+seathatflowsinourveins@users.noreply.github.com}" | jq -r "$prog" ;;
       *) exit 1 ;;
     esac ;;
@@ -298,10 +315,10 @@ class LandingCase(unittest.TestCase):
         prelude = f"R=x/y; N=1; E={head}; GPT_VERDICT={q(path)}\n{self.uet.block}\n"
         return self.bash(prelude, f"{self.uet.gpt}\ngpt_substitute")
 
-    def record_gate(self, script, head, coord, statuses):
+    def record_gate(self, script, head, coord, statuses, **extra):
         feed = self.write("statuses.json", json.dumps(statuses))
         prelude = f"R=x/y; N=1; E={head}\nCOORD={q(coord)}\nexport FAKE_STATUSES={q(feed)}\n{script.block}\n{script.tcc}\n"
-        return self.bash(prelude, 'tcc_read_gate "$E"')
+        return self.bash(prelude, 'tcc_read_gate "$E"', **extra)
 
     def change_prelude(self, script, repo):
         if script.key == "uet":
@@ -945,6 +962,53 @@ class TccReadGateTests(LandingCase):
                 with self.subTest(case=name, site=script.key):
                     self.assertEqual(self.record_gate(script, head, coord, statuses)[0], expected)
 
+    def test_a_status_behind_100_newer_statuses_of_other_contexts_still_gates(self):
+        # #975 (Codex P1 at nas:234): the statuses list is newest first across every context and its page 1 held 100, so a trading-cc-read
+        # status behind 100 newer statuses of other contexts was not on it and gave "no status" (exit 0, nothing printed, at 3e6e7e46). The
+        # combined status holds each context once, and every page of it is read (here the 101st context is on page 2).
+        head, records = synthetic_records()
+        coord = self.dir / f"coord-{next(self.counter)}"
+        (coord / "trading-cc/reads").mkdir(parents=True)
+        (coord / "trading-cc/reads/good.md").write_text(records["ack-verdict"][0], encoding="utf-8")
+        good = "PASS: trading-cc/reads/good.md"
+
+        def behind(state, contexts):
+            newer = [self.status("success", "ok", "2026-10-10T02:00:00Z", context=context) for context in contexts]
+            return newer + [self.status(state, good, "2026-10-10T01:00:00Z")]
+
+        others = [f"ci/check-{n:03}" for n in range(1, 101)]
+        cases = [("a failure behind 100 newer statuses of 100 other contexts", behind("failure", others), 2, "trading-cc-read is failure at"),
+                 ("a failure behind 100 newer statuses of one other context", behind("failure", ["ci/other"] * 100), 2, "trading-cc-read is failure at"),
+                 ("a pending status behind them", behind("pending", others), 2, "trading-cc-read is pending at"),
+                 ("a success behind them is read and its record checked", behind("success", others), 0, "record verified")]
+        for name, statuses, expected, phrase in cases:
+            for script in (self.uet, self.nas):
+                with self.subTest(case=name, site=script.key):
+                    code, out = self.record_gate(script, head, coord, statuses)
+                    self.assertEqual(code, expected, out)
+                    self.assertIn(phrase, out)
+
+    def test_a_combined_status_reply_that_cannot_be_read_stops(self):
+        # #975 (Codex P1 at nas:234): with gh exit 0, a reply that is not an array of pages with statuses stops (exit 2) and prints nothing
+        # of it; "no status" is only a combined status without the context. jq -n fails at `input` on an empty reply.
+        head = "aabbccdd11223344556677889900aabbccddeeff"
+        coord = self.dir / f"coord-{next(self.counter)}"
+        (coord / "trading-cc/reads").mkdir(parents=True)
+        replies = [("an empty reply", ""), ("whitespace", " \n"), ("no page", "[]"), ("an object", json.dumps({"message": ADDRESS})),
+                   ("a page without statuses", json.dumps([{"message": ADDRESS}])), ("not JSON", f"<{ADDRESS}>")]
+        for name, reply in replies:
+            for script in (self.uet, self.nas):
+                with self.subTest(case=name, site=script.key):
+                    code, out = self.record_gate(script, head, coord, [], FAKE_COMBINED_RAW=reply)
+                    self.assertEqual(code, 2, out)
+                    self.assertIn("trading-cc-read statuses unreadable at aabbccdd (not a combined status, output withheld): stop", out)
+                    self.assertNotIn(ADDRESS[:8], out)
+        for name, pages in (("one page without the context", [{"total_count": 1, "statuses": [self.status("failure", "x", context="other")]}]),
+                            ("one page without statuses", [{"total_count": 0, "statuses": []}])):
+            for script in (self.uet, self.nas):
+                with self.subTest(case=name, site=script.key):
+                    self.assertEqual(self.record_gate(script, head, coord, [], FAKE_COMBINED_RAW=json.dumps(pages)), (0, ""))
+
     def test_a_head_that_is_not_hexadecimal_is_refused_with_its_reason(self):
         coord = self.dir / f"coord-{next(self.counter)}"
         (coord / "trading-cc/reads").mkdir(parents=True)
@@ -1211,25 +1275,84 @@ def nas_run(name, started, status="completed", conclusion="success", completed=.
 
 
 def ci_reference_nas(runs):
-    """#975 round 4 (the CC's P3-1) and final round (Astra's follow-up 1 at 5b8ba3b2): a name is incomplete while any of its runs is not
-    completed, while a completed run has no completed_at, or while the completed runs with the greatest completed_at disagree on the
-    conclusion; it is failing or validated by its completed run with the greatest completed_at (the first such run, as jq takes it)."""
+    """#975 round 4 (the CC's P3-1), final round (Astra's follow-up 1 at 5b8ba3b2) and A1 (the CC's Claude micro at 3e6e7e46): a name is
+    incomplete while any of its runs is not completed or a completed run has no completed_at; it is failing while one of its completed runs
+    ended other than success, neutral or skipped and no run of the name both started and completed after it (a run without either time
+    supersedes nothing and is superseded by nothing); validate counts when it is complete, not failing, and a run with its greatest
+    completed_at succeeded."""
     names = {}
     for run in runs:
         names.setdefault(run["name"], []).append(run)
     passing = [conclusion.lower() for conclusion in PASSING_CONCLUSIONS]  # REST spells the conclusions in lower case
+
+    def superseded(run, done):
+        if run["started_at"] is None or run["completed_at"] is None:
+            return False
+        return any(other["started_at"] is not None and other["completed_at"] is not None and other["started_at"] > run["started_at"]
+                   and other["completed_at"] > run["completed_at"] for other in done)
+
     incomplete = failing = validated = 0
     for name, group in names.items():
         done = [r for r in group if r["status"] == "completed"]
         stamps = [r["completed_at"] for r in done if r["completed_at"] is not None]
         newest = [r for r in done if r["completed_at"] == (max(stamps) if stamps else None)]
-        busy = (any(r["status"] != "completed" for r in group) or any(r["completed_at"] is None for r in done)
-                or len({r["conclusion"] for r in newest}) > 1)
-        latest = newest[0] if newest else None
+        busy = any(r["status"] != "completed" for r in group) or any(r["completed_at"] is None for r in done)
+        fails = any(r["conclusion"] not in passing and not superseded(r, done) for r in done)
         incomplete += busy
-        failing += latest is not None and latest["conclusion"] not in passing
-        validated += name == "validate" and not busy and latest is not None and latest["conclusion"] == "success"
+        failing += fails
+        validated += name == "validate" and not busy and not fails and any(r["conclusion"] == "success" for r in newest)
     return incomplete, failing, len(names), validated
+
+
+def nas_dominance_cases():
+    """#975 A1 (the CC's Claude micro at 3e6e7e46): (case, runs, the counts) for overlapping runs of one name, ties and missing times.
+    F passed at 3e6e7e46 (its newest completion is the success) and G at 5b8ba3b2 (its newest start is the success)."""
+    def run(name, started, completed, conclusion="success"):
+        return nas_run(name, started and f"2026-10-10T{started}Z", conclusion=conclusion, completed=completed and f"2026-10-10T{completed}Z")
+
+    v = run("validate", "09:00:00", "09:05:00")
+    return [
+        ("F: a failure that started later and finished first, inside a success of its name that finished last",
+         [v, run("x", "10:00:00", "10:30:00"), run("x", "10:05:00", "10:06:00", "failure")], (0, 1, 2, 1)),
+        ("G: a failure that started first and finished last, around a success of its name",
+         [v, run("x", "10:00:00", "10:30:00", "failure"), run("x", "10:05:00", "10:06:00")], (0, 1, 2, 1)),
+        ("#886: a cancelled run is superseded by a run that started and completed after it",
+         [v, run("x", "10:00:00", "10:02:05", "cancelled"), run("x", "10:02:00", "10:30:00")], (0, 0, 2, 1)),
+        ("a failure re-run to success", [v, run("x", "10:00:00", "10:01:00", "failure"), run("x", "10:10:00", "10:12:00")], (0, 0, 2, 1)),
+        ("a failure re-run to another failure",
+         [v, run("x", "10:00:00", "10:01:00", "failure"), run("x", "10:10:00", "10:12:00", "failure")], (0, 1, 2, 1)),
+        ("a failing run with no start is superseded by nothing",
+         [v, run("x", None, "10:06:00", "failure"), run("x", "10:10:00", "10:12:00")], (0, 1, 2, 1)),
+        ("a run with no start supersedes nothing", [v, run("x", "10:00:00", "10:01:00", "failure"), run("x", None, "10:12:00")], (0, 1, 2, 1)),
+        ("a success and a failure at one completed_at fail (P3-1: incomplete, exit 6 after the timeout)",
+         [v, run("x", "10:00:00", "10:07:00"), run("x", "10:01:00", "10:07:00", "failure")], (0, 1, 2, 1)),
+        ("a success and a neutral at one completed_at pass (P3-2: incomplete, exit 6 after the timeout)",
+         [v, run("x", "10:00:00", "10:07:00"), run("x", "10:01:00", "10:07:00", "neutral")], (0, 0, 2, 1)),
+        ("validate's neutral and success at one completed_at, the neutral listed first, validate it",
+         [run("validate", "10:01:00", "10:07:00", "neutral"), run("validate", "10:00:00", "10:07:00")], (0, 0, 1, 1)),
+        ("validate's failure inside its success that finished last does not validate",
+         [run("validate", "10:00:00", "10:30:00"), run("validate", "10:05:00", "10:06:00", "failure")], (0, 1, 1, 0)),
+        ("the live overlap: a success and a skipped run that completed a second before it started",
+         [v, run("x", "02:34:14", "02:34:34"), run("x", "02:34:33", "02:34:32", "skipped")], (0, 0, 2, 1)),
+    ]
+
+
+def nas_page_cases():
+    """#975 (Codex P2 at nas:289): (case, pages, the counts). Page 1 holds 100 runs, as with per_page=100, and nas_checks read only it."""
+    t = "2026-10-10T10:00:00Z"
+    full = [nas_run("validate", t)] + [nas_run(f"check-{n:03}", t) for n in range(1, 100)]
+    rerun = [nas_run("validate", t)] + [nas_run(f"check-{n:03}", t) for n in range(1, 99)] + [nas_run("flaky", "2026-10-10T10:10:00Z")]
+    return [
+        ("a failing run on page 2", [full, [nas_run("late", t, conclusion="failure")]], (0, 1, 101, 1)),
+        ("a run still in progress on page 2", [full, [nas_run("late", t, status="in_progress", conclusion=None)]], (1, 0, 101, 1)),
+        ("a failure on page 2 superseded by its re-run on page 1", [rerun, [nas_run("flaky", t, conclusion="failure")]], (0, 0, 100, 1)),
+    ]
+
+
+def check_run_pages(pages):
+    """The pages as REST serves them: each an object whose total_count is the count over every page."""
+    total = sum(len(page) for page in pages)
+    return [{"total_count": total, "check_runs": page} for page in pages]
 
 
 class CiLineTests(LandingCase):
@@ -1287,15 +1410,34 @@ class CiLineTests(LandingCase):
                                                                               nas_run("audit", "2026-10-10T12:00:00Z"),
                                                                               nas_run("audit", None, conclusion="failure", completed="2026-10-10T12:10:00Z")]),
             ("a completed run with no completed_at is incomplete", [nas_run("validate", t), nas_run("lint", t, completed=None)]),
-            ("two completed runs at one completed_at with different conclusions are incomplete",
+            # #975 A1 (the CC's Claude micro at 3e6e7e46): a tie with a failing run was incomplete (exit 6 after the timeout, P3-1); it fails
+            ("two completed runs at one completed_at, one failing, fail",
              [nas_run("validate", t), nas_run("lint", t, completed="2026-10-10T10:07:00Z"), nas_run("lint", "2026-10-10T10:01:00Z", conclusion="failure", completed="2026-10-10T10:07:00Z")]),
             ("two completed runs at one completed_at with one conclusion", [nas_run("validate", t), nas_run("validate", "2026-10-10T10:01:00Z", completed=t)]),
+            *[(name, runs) for name, runs, _ in nas_dominance_cases()],
         ]
         for name, runs in cases:
             with self.subTest(case=name):
                 code, out = self.ci_line(self.nas, {"check_runs": runs})
                 incomplete, failing, total, validated = ci_reference_nas(runs)
                 self.assertEqual((code, out.replace("\t", " ")), (0, f"{incomplete} {failing} {total} {validated}"))
+
+    def test_nas_a_failing_run_stands_unless_a_run_of_its_name_started_and_completed_after_it(self):
+        # #975 A1 (the CC's Claude micro at 3e6e7e46): the counts are written out, and the reference model must agree with them
+        for name, runs, counts in nas_dominance_cases():
+            with self.subTest(case=name):
+                self.assertEqual(ci_reference_nas(runs), counts)
+                code, out = self.ci_line(self.nas, {"check_runs": runs})
+                self.assertEqual((code, out.split("\t")), (0, [str(n) for n in counts]))
+
+    def test_nas_reads_every_page_of_check_runs(self):
+        # #975 (Codex P2 at nas:289): the call read page 1 only, so a check failing or running on page 2 was not seen (the most on 70 live
+        # heads on 2026-10-11 was 43 runs, one page); a name with runs on both pages is judged on all of them
+        for name, pages, counts in nas_page_cases():
+            with self.subTest(case=name):
+                self.assertEqual(ci_reference_nas([run for page in pages for run in page]), counts)
+                code, out = self.ci_line(self.nas, check_run_pages(pages))
+                self.assertEqual((code, out.split("\t")), (0, [str(n) for n in counts]))
 
     def test_the_conclusion_fixture_is_the_schema_excerpt_it_names(self):
         fixture = json.loads(CONCLUSIONS.read_text(encoding="utf-8"))
@@ -1801,9 +1943,10 @@ class EndToEndTests(LandingCase):
         cls.home = cls.dir / "home"
         cls.home.mkdir()
 
-    def land(self, script, *, args=None, via=None, head=None, merge_state="CLEAN", rollup=None, checkruns=None, statuses=None,
+    def land(self, script, *, args=None, via=None, head=None, merge_state="CLEAN", rollup=None, checkruns=None, pages=None, statuses=None,
              verdict=None, draft=False, merge_commit="f" * 40, **extra):
-        """Run a landing; returns (exit code, stdout+stderr, the fake commands' log lines)."""
+        """Run a landing; returns (exit code, stdout+stderr, the fake commands' log lines). pages, a list of lists of check runs, stands
+        for checkruns (one page)."""
         run = self.dir / f"run-{next(self.counter)}"
         run.mkdir()
         gate = [check_run("ci-gate")] if rollup is None else rollup
@@ -1811,7 +1954,8 @@ class EndToEndTests(LandingCase):
             "headRefOid": head or self.head, "isDraft": draft, "mergeStateStatus": merge_state, "statusCheckRollup": gate,
             "state": "MERGED", "mergeCommit": None if merge_commit is None else {"oid": merge_commit}, "mergedAt": "2026-10-10T00:00:00Z"}))
         (run / "statuses.json").write_text(json.dumps(statuses or []))
-        (run / "checkruns.json").write_text(json.dumps({"check_runs": checkruns if checkruns is not None else [nas_run("validate", "2026-10-10T10:00:00Z")]}))
+        (run / "checkruns.json").write_text(json.dumps(check_run_pages(pages) if pages is not None else
+                                                       {"check_runs": checkruns if checkruns is not None else [nas_run("validate", "2026-10-10T10:00:00Z")]}))
         verdict_file = run / "verdict.md"
         verdict_file.write_text(verdict if verdict is not None else f"# Read\n\nVerdict: PASS at {self.head[:8]}\n", encoding="utf-8")
         extra.setdefault("TMPDIR", str(run))  # a failed merge leaves its merge-fail-XXXXXX file here, not in /tmp
@@ -1957,8 +2101,8 @@ class EndToEndTests(LandingCase):
         # state when it was a body); the final gate's reads are sites of their own.
         sites = {
             "uet": [
-                ("the statuses API", "api repos/*/statuses*", 1, {}, 2, 0, "trading-cc-read statuses unreadable at"),
-                ("the statuses API at the final gate", "api repos/*/statuses*", 2, {}, 2, 0, "trading-cc-read statuses unreadable at"),
+                ("the statuses API", "api repos/*/status*", 1, {}, 2, 0, "trading-cc-read statuses unreadable at"),
+                ("the statuses API at the final gate", "api repos/*/status*", 2, {}, 2, 0, "trading-cc-read statuses unreadable at"),
                 ("the head, first read", head, 1, {}, 3, 0, "is neither the read head nor a pure rebase"),
                 ("the head, read after update-branch", head, 2, {}, 4, 0, "CHANGE DIFFERS"),
                 ("the head at the final gate", head, 3, {}, 3, 0, "head moved to ? at the final gate"),
@@ -1973,8 +2117,8 @@ class EndToEndTests(LandingCase):
                 ("the merge commit's author", "api repos/*/commits/ffffffff*", 1, {}, 12, 1, "is NOT the no-reply form"),
             ],
             "nas": [
-                ("the statuses API", "api repos/*/statuses*", 1, {}, 2, 0, "trading-cc-read statuses unreadable at"),
-                ("the statuses API at the final gate", "api repos/*/statuses*", 2, {}, 2, 0, "trading-cc-read statuses unreadable at"),
+                ("the statuses API", "api repos/*/status*", 1, {}, 2, 0, "trading-cc-read statuses unreadable at"),
+                ("the statuses API at the final gate", "api repos/*/status*", 2, {}, 2, 0, "trading-cc-read statuses unreadable at"),
                 ("the head, first read", head, 1, {}, 3, 0, "is neither the read head"),
                 ("the head, read after update-branch", head, 2, {"merge_state": "BEHIND"}, 4, 0, "CHANGE DIFFERS after update-branch"),
                 ("the head, read in the CI loop", head, 2, {}, 3, 0, "head moved to ?"),
@@ -2337,6 +2481,13 @@ class EndToEndTests(LandingCase):
                 self.assertIn(phrase, out)
                 for text in ("example.invalid", "integer expected", "unbound variable", str(script.path)):
                     self.assertNotIn(text, out)
+        with self.subTest(script="nas", reply="check runs that jq cannot judge, an address in them"):
+            # #975 (Codex P2 at nas:289): nas_checks runs jq on the pages itself, and jq's error quotes the start of the value it failed on
+            code, out, log = self.land(self.nas, checkruns=ADDRESS)
+            self.assertEqual((code, self.merge_calls(log)), (6, []), out)
+            self.assertIn("CI timeout", out)
+            for text in (ADDRESS[:8], "jq:", "Cannot iterate", "integer expected"):
+                self.assertNotIn(text, out)
 
     def test_local_failures_print_no_path_and_no_diagnostic(self):
         # GPT P2-C and Claude P3-4: a missing gate, a gate that fails before its handler runs or prints something else, a clone that does
@@ -2394,14 +2545,14 @@ class EndToEndTests(LandingCase):
                 kind = "head"
             elif re.match(r"git (-C \S+ )?(-c \S+ )*(merge-base|diff|patch-id) ", line):
                 kind = "change"
-            elif re.match(rf"gh api repos/{repo}/commits/[0-9a-f]{{40}}/statuses\?per_page=100 ", line):
-                kind = "trading-cc-read"
+            elif re.fullmatch(rf"gh api repos/{repo}/commits/[0-9a-f]{{40}}/status\?per_page=100 --paginate --slurp", line):
+                kind = "trading-cc-read"  # #975 (Codex P1 at nas:234): the combined status, every page
             elif line.startswith("python3 -I ") and line.endswith(f"/codex_gate.py {repo} {PR} {self.head}"):
                 kind = "codex"
             elif script.key == "uet" and re.match(r"gh pr view \S+ -R \S+ --json headRefOid,statusCheckRollup,mergeStateStatus ", line):
                 kind = "ci"
-            elif script.key == "nas" and re.match(rf"gh api repos/{repo}/commits/[0-9a-f]{{40}}/check-runs\?filter=latest&per_page=100 ", line):
-                kind = "ci"
+            elif script.key == "nas" and re.fullmatch(rf"gh api repos/{repo}/commits/[0-9a-f]{{40}}/check-runs\?filter=latest&per_page=100 --paginate --slurp", line):
+                kind = "ci"  # #975 (Codex P2 at nas:289): every page
             elif re.fullmatch(r"git -C \S+ ls-remote origin refs/heads/main", line):
                 kind = "main"
             else:
@@ -2458,6 +2609,11 @@ class EndToEndTests(LandingCase):
                   else rewrite("FAKE_CHECKRUNS", f".check_runs += {json.dumps([nas_run('validate', None, status='queued', conclusion=None)])}"))
         # #975 final round (Astra's follow-up 1 at 5b8ba3b2): a completed failing re-run with no start, newer than the success by completion
         rerun = rewrite("FAKE_CHECKRUNS", f".check_runs += {json.dumps([nas_run('validate', None, conclusion='failure', completed='2026-10-10T10:10:00Z')])}")
+
+        def overlap(first, second):  # #975 A1 (the CC's Claude micro at 3e6e7e46): two runs of one name, 10:00 to 10:30 and 10:05 to 10:06
+            runs = [nas_run("x", "2026-10-10T10:00:00Z", conclusion=first, completed="2026-10-10T10:30:00Z"),
+                    nas_run("x", "2026-10-10T10:05:00Z", conclusion=second, completed="2026-10-10T10:06:00Z")]
+            return rewrite("FAKE_CHECKRUNS", f".check_runs += {json.dumps(runs)}")
         cases = [
             ("a verdict file gains CHANGES_REQUESTED", {**files(verdict), **at_lookup(f"printf '\\nVerdict: CHANGES_REQUESTED at {h8}\\n' >> {q(verdict)}")}, 2,
              f"is CHANGES_REQUESTED"),
@@ -2467,7 +2623,7 @@ class EndToEndTests(LandingCase):
             # #975 B1 (the CC's micro at 5b8ba3b2): the failure has the success's updated_at; sort_by(.updated_at)|last kept the success
             ("trading-cc-read gains a failure in the same second, listed first", {"statuses": ok_status,
              **at_lookup(f'printf "%s" {q(same_second)} > "$FAKE_STATUSES"')}, 2, f"trading-cc-read is failure at {h8}"),
-            ("the trading-cc-read read fails with empty stdout", {"statuses": ok_status, "FAKE_FAIL": "api repos/*/statuses*", "FAKE_FAIL_FROM": "2",
+            ("the trading-cc-read read fails with empty stdout", {"statuses": ok_status, "FAKE_FAIL": "api repos/*/status*", "FAKE_FAIL_FROM": "2",
                                                                  "FAKE_FAIL_STDOUT": "", "FAKE_FAIL_STDERR": "HTTP 502"}, 2, "statuses unreadable"),
             ("the trading-cc-read record gains CHANGES_REQUESTED", {"statuses": ok_status, **at_lookup(f"printf '\\nVerdict: CHANGES_REQUESTED at {h8}\\n' >> {q(record)}")}, 2,
              "does not name it with a last PASS/ACK Verdict line"),
@@ -2478,6 +2634,10 @@ class EndToEndTests(LandingCase):
         ]
         if script.key == "nas":
             cases.append(("a completed failing re-run with no start, newer by completion", rerun, 5, "is no longer complete and green at the final gate"))
+            cases.append(("F: a failure that started later and finished first, inside a success of its name", overlap("success", "failure"), 5,
+                          "is no longer complete and green at the final gate"))
+            cases.append(("G: a failure that started first and finished last, around a success of its name", overlap("failure", "success"), 5,
+                          "is no longer complete and green at the final gate"))
             cases.append(("origin/main moves after the validation read it", {"FAKE_GIT_HOOK_ON": "*ls-remote origin refs/heads/main*",
                           "FAKE_GIT_HOOK": f"git --git-dir={q(self.dir / 'origin.git')} update-ref refs/heads/main {self.main_again}"}, 13,
                           f"origin/main moved after the validation on {self.main[:8]} (final gate)"))
@@ -2486,7 +2646,8 @@ class EndToEndTests(LandingCase):
     def test_each_gate_flipped_before_the_final_gate_stops_the_landing_with_no_merge(self):
         # The CC's micro at 761810d7 (P2-2, P2-3, P2-4, P3-1), the GPT micro (P1, P2) and Codex's four P1 threads: each gate is flipped after
         # its first read; the final gate reads it again and stops with that gate's code, and nothing is merged. At 761810d7 the verdict file,
-        # GATES_DONE, the failed read, nas's Codex, the queued re-run, the head and nas's main reached the merge (exit 0, one merge).
+        # GATES_DONE, the failed read, nas's Codex, the queued re-run, the head and nas's main reached the merge (exit 0, one merge). #975 A1
+        # (the CC's Claude micro at 3e6e7e46): the overlap F merged at 3e6e7e46 and its mirror G at 5b8ba3b2.
         origin = self.dir / "origin.git"
         for script in (self.uet, self.nas):
             for name, options, code, phrase in self.flips(script):
@@ -2552,6 +2713,24 @@ class EndToEndTests(LandingCase):
                 self.assertEqual((got, self.merge_calls(log)), (code, []), out)
                 self.assertIn(phrase, out)
 
+    def test_a_failing_run_no_run_of_its_name_supersedes_stops_nas_and_every_page_of_check_runs_is_read(self):
+        # #975 A1 (the CC's Claude micro at 3e6e7e46): F merged at 3e6e7e46 (exit 0, one merge) and G at 5b8ba3b2; a success and a failure
+        # at one completed_at (P3-1), and a success and a neutral (P3-2), waited for the timeout (exit 6). #975 (Codex P2 at nas:289): a
+        # failure on page 2 merged, because page 1 was all that was read. The CI wait polls on while a check is incomplete (exit 6), stops
+        # with 5 on a failing one, and goes on to the merge once validate succeeded.
+        cases = [(name, {"checkruns": runs}, counts) for name, runs, counts in nas_dominance_cases()]
+        cases += [(name, {"pages": pages}, counts) for name, pages, counts in nas_page_cases()]
+        for name, options, (incomplete, failing, total, validated) in cases:
+            with self.subTest(case=name):
+                got, out, log = self.land(self.nas, **options)
+                if failing and not incomplete:
+                    self.assertEqual((got, self.merge_calls(log)), (5, []), out)
+                    self.assertIn(f"CI failing={failing} of {total}", out)
+                elif validated and not incomplete:
+                    self.assertEqual((got, len(self.merge_calls(log))), (0, 1), out)
+                else:
+                    self.assertEqual((got, "CI timeout" in out, self.merge_calls(log)), (6, True, []), out)
+
     def test_a_trading_cc_read_failure_in_the_same_second_as_a_success_stops_at_the_first_read(self):
         # #975 B1 (the CC's micro at 5b8ba3b2): REST lists the newest status first; tcc_read_gate took sort_by(.updated_at)|last, and the
         # stable sort kept the older success of two posted in the same second (record verified, exit 0 and one merge at 5b8ba3b2).
@@ -2566,13 +2745,24 @@ class EndToEndTests(LandingCase):
                 self.assertEqual((code, self.merge_calls(log), self.gate_calls(log)), (2, [], []), out)
                 self.assertIn(f"trading-cc-read is failure at {self.head[:8]}", out)
 
+    def test_a_trading_cc_read_failure_behind_100_newer_statuses_of_other_contexts_stops_both_scripts(self):
+        # #975 (Codex P1 at nas:234): page 1 of the newest-first statuses list held only the 100 newer statuses of other contexts, so the
+        # failure was never read and both scripts landed (exit 0, one merge at 3e6e7e46). The combined status is read, every page of it.
+        newer = [{"context": f"ci/check-{n:03}", "state": "success", "description": "ok", "updated_at": "2026-10-10T02:00:00Z"} for n in range(1, 101)]
+        failed = {"context": "trading-cc-read", "state": "failure", "description": "PASS: trading-cc/reads/none.md", "updated_at": "2026-10-10T01:00:00Z"}
+        for script in (self.uet, self.nas):
+            with self.subTest(script=script.key):
+                code, out, log = self.land(script, statuses=newer + [failed])
+                self.assertEqual((code, self.merge_calls(log), self.gate_calls(log)), (2, [], []), out)
+                self.assertIn(f"trading-cc-read is failure at {self.head[:8]}", out)
+
     def test_a_trading_cc_read_lookup_that_fails_with_empty_stdout_stops_with_2(self):
         # Codex P1 (uet:171), the CC's P2-3 and GPT P2 at 761810d7: `[ -n "$s" ] || return 0` took a failed call with nothing on stdout (a
         # refused connection) for "no status", at the first read and at the final one (exit 0, one merge). gh's exit code is kept apart now.
         for script in (self.uet, self.nas):
             for first, where in (("1", "the first read and every later one"), ("2", "the final gate's read only")):
                 with self.subTest(script=script.key, failing=where):
-                    code, out, log = self.land(script, FAKE_FAIL="api repos/*/statuses*", FAKE_FAIL_FROM=first, FAKE_FAIL_STDOUT="",
+                    code, out, log = self.land(script, FAKE_FAIL="api repos/*/status*", FAKE_FAIL_FROM=first, FAKE_FAIL_STDOUT="",
                                                FAKE_FAIL_STDERR="gh: connection refused")
                     self.assertEqual((code, self.merge_calls(log)), (2, []), out)
                     self.assertIn("trading-cc-read statuses unreadable at", out)

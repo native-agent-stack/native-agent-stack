@@ -226,15 +226,24 @@ same_change() { lg_same_change "$1" "$2"; }
 # "<VERDICT>: trading-cc/reads/<record>.md" (for example "PASS: …"). A failure blocks. A success counts only when that record exists and names
 # the head with PASS or ACK, because a status carries no app identity (any holder of the owner token can post one).
 tcc_read_gate() {
-  local s sr st d rec why
-  # #975 B1 (the CC's micro at 5b8ba3b2): the newest status of the context is the first one listed ("Statuses are returned in reverse
-  # chronological order. The first status in the list will be the latest one", github/rest-api-description@58b1e0c0 api.github.com.json:55724).
-  # sort_by(.updated_at)|last kept the OLDER of two with the same updated_at (jq's sort keeps equal keys in input order, jq 1.8.1
-  # src/jv_aux.c:669-674), so a failure posted in the same second as an earlier success passed.
-  s=$(gh api "repos/$R/commits/$1/statuses?per_page=100" --jq '[.[]|select(.context=="trading-cc-read")]|first|select(.!=null)|"\(.state)\t\(.description)"' 2>/dev/null); sr=$?
-  # #975 round 4 (Codex P1 at 761810d7, the CC's P2-3): gh's exit code is kept apart from its output. A failed call stops, whatever it printed
-  # (an error response's body reaches stdout, a refused connection prints nothing there); only exit 0 with no output is "no status".
+  local p s sr st d rec why
+  # #975 (Codex P1 at nas:234, in A1's correction): the statuses LIST is newest first across every context ("Statuses are returned in
+  # reverse chronological order. The first status in the list will be the latest one", github/rest-api-description@58b1e0c0
+  # api.github.com.json:55724), and its page 1 held 100, so a trading-cc-read failure behind 100 newer statuses of other contexts was not
+  # on it and passed as "no status". The COMBINED status, "a combined view of commit statuses for a given ref" whose state is success "if
+  # the latest status for all contexts is `success`" (:55664-55667), holds one entry per context, its newest (measured on 2026-10-11 on the
+  # 12 of 80 heads of ours that have statuses and on 8 public heads of up to 35 statuses in 15 contexts: each context once, each entry the
+  # list's first of its context), so which of two statuses posted in one second is the newer (#975 B1 at 5b8ba3b2) is GitHub's answer,
+  # not a sort's. It is paged by context (per_page and page, :55687, :55690; a first page with more contexts than per_page carried a Link
+  # rel="next", measured), so every page is read with gh api --paginate --slurp, as for nas's check runs, and jq finds the context on any.
+  p=$(gh api "repos/$R/commits/$1/status?per_page=100" --paginate --slurp 2>/dev/null); sr=$?
+  # #975 round 4 (Codex P1 at 761810d7, the CC's P2-3): gh's exit code is kept apart from its output. A failed call stops, whatever it
+  # printed (an error response's body reaches stdout, a refused connection prints nothing there), and so does a reply that is not an array
+  # of pages with statuses, an empty one included (jq -n fails at `input` when there is none); only a combined status with no
+  # trading-cc-read entry on any page is "no status".
   [ "$sr" = 0 ] || { echo "#$N trading-cc-read statuses unreadable at ${1:0:8} (gh exit $sr, output withheld): stop"; exit 2; }
+  s=$(printf '%s' "$p" | jq -n -r 'input|if type == "array" and length > 0 then [.[].statuses[]|select(.context=="trading-cc-read")]|first|select(.!=null)|"\(.state)\t\(.description)" else error("not a combined status") end' 2>/dev/null) \
+    || { echo "#$N trading-cc-read statuses unreadable at ${1:0:8} (not a combined status, output withheld): stop"; exit 2; }
   [ -n "$s" ] || return 0
   st=${s%%$'\t'*}; d=${s#*$'\t'}
   [ "$st" = success ] || { case "$st" in error|failure|pending) ;; *) st=unknown ;; esac; echo "#$N trading-cc-read is $st at ${1:0:8} (description withheld, #975 P2-2): stop"; exit 2; }
@@ -271,22 +280,34 @@ verdict_gate() {
 # #975 P2-3 (2026-10-11): a completed check fails unless its conclusion is success, neutral or skipped (fail closed). GitHub's GraphQL
 # CheckConclusionState (schema.docs.graphql sha256 3ed09565…, lines 3974-4018) also has stale and startup_failure, which REST
 # rest-api-description@58b1e0c0 omits from its check-run enum; the old list counted those, and action_required on uet, as passing.
-# #975 round 4 (Codex P1 at 761810d7, the CC's P3-1): a check name is incomplete while ANY of its runs is not completed, and its failure is
-# judged on its latest COMPLETED run (2026-10-09 #886: superseded, concurrency-cancelled runs must not fail it). Before, the latest run per
-# name was max_by(.started_at), and a queued re-run has started_at null (rest-api-description@58b1e0c0 check-run.started_at "nullable": true),
-# which sorts first, so an old success hid it.
+# #975 round 4 (Codex P1 at 761810d7, the CC's P3-1): a check name is incomplete while ANY of its runs is not completed, and its failure
+# was judged on its latest COMPLETED run until A1, below (2026-10-09 #886: superseded, concurrency-cancelled runs must not fail it).
+# Before, the latest run per name was max_by(.started_at), and a queued re-run has started_at null (rest-api-description@58b1e0c0
+# check-run.started_at "nullable": true), which sorts first, so an old success hid it.
 # #975 final round (Astra's follow-up 1 at 5b8ba3b2, ruled FIX-NOW): max_by([.started_at // "", .id // 0]) still let a COMPLETED failing
-# re-run with started_at null lose to an older success. A run's recency is its completion, as the endpoint orders it: the runs are read
-# with filter=latest ("Filters check runs by their `completed_at` timestamp. `latest` returns the most recent check runs",
-# rest-api-description@58b1e0c0 api.github.com.json:55504-55514), and a name is judged on its completed run with the greatest completed_at.
-# Both timestamps are nullable (:146097-146107), so a name fails closed, counted incomplete, when a completed run has no completed_at or
-# two completed runs share the greatest completed_at with different conclusions.
+# re-run with started_at null lose to an older success. The runs are read with filter=latest ("Filters check runs by their `completed_at`
+# timestamp. `latest` returns the most recent check runs", rest-api-description@58b1e0c0 api.github.com.json:55504-55514). Both
+# timestamps are nullable (:146097-146107), so a name fails closed, counted incomplete, when a completed run has no completed_at.
+# #975 A1 (the CC's Claude micro at 3e6e7e46): a name judged on its newest completion alone passed when a failing run that started later
+# and finished first overlapped a success that finished last (input F; start order passed the mirror, input G, at 5b8ba3b2). A name fails
+# when one of its completed runs ended other than success, neutral or skipped and no run of that name both started and completed after it
+# (#886's superseded cancellations still pass). A run without started_at or completed_at supersedes nothing, since jq orders null
+# before every string (jq 1.8.1 docs/content/manual/v1.8/manual.yml:1544-1552, :2425-2433), and a failing run without them is
+# superseded by nothing. Runs that share a completed_at pass when each passes (the micro's P3-2: success and neutral waited for the
+# timeout) and fail at once when one fails (P3-1). validate counts when it is complete, not failing, and a run with its greatest
+# completed_at succeeded.
+# #975 (Codex P2 at nas:289): every page is read. gh api --paginate follows the Link header's rel="next" and keeps the per_page given
+# (cli v2.102.0 pkg/cmd/api/pagination.go:17-24, :94-110; api.go:431-470); --slurp puts the pages in one array and refuses --jq
+# (api.go:260-273, :362-371), so jq itself judges the flattened runs (the jq the tests run; gh's --jq is go-gh's gojq, go.mod:21, :141).
+# gh's exit code is checked before jq reads: a failed page's body lands in the array too (api.go:546, :553-565).
 # #975 P2-B (GPT micro at af9d1901): a failed call's stdout can be an error body (above), which the old line word-split into the counts:
 # bash then printed a body word in "integer expected", and a one-word body ended the script on an unbound $4. Now a failed call, or a
 # reply that is not exactly four counts, counts as one check still running, so the loop polls on (exit 6 at the timeout).
 nas_checks() {  # <head>
-  local c
-  c=$(gh api "repos/$R/commits/$1/check-runs?filter=latest&per_page=100" --jq '[.check_runs[]|{name,status,conclusion,completed_at}]|group_by(.name)|map([.[]|select(.status == "completed")] as $done|($done|map(.completed_at)|max) as $t|{name: .[0].name, incomplete: (any(.[]; .status != "completed") or any($done[]; .completed_at == null) or ([$done[]|select(.completed_at == $t)|.conclusion]|unique|length) > 1), latest: ([$done[]|select(.completed_at == $t)]|first)})|[([.[]|select(.incomplete)]|length), ([.[]|select(.latest != null and ((.latest.conclusion=="success" or .latest.conclusion=="neutral" or .latest.conclusion=="skipped")|not))]|length), length, ([.[]|select(.name=="validate" and (.incomplete|not) and .latest.conclusion=="success")]|length)]|@tsv' 2>/dev/null) && [[ "$c" =~ ^[0-9]+$'\t'[0-9]+$'\t'[0-9]+$'\t'[0-9]+$ ]] || c=$'1\t0\t0\t0'
+  local p c
+  p=$(gh api "repos/$R/commits/$1/check-runs?filter=latest&per_page=100" --paginate --slurp 2>/dev/null) \
+    && c=$(printf '%s' "$p" | jq -r '[.[].check_runs[]|{name,status,conclusion,started_at,completed_at}]|group_by(.name)|map([.[]|select(.status == "completed")] as $done|($done|map(.completed_at)|max) as $t|{name: .[0].name, incomplete: (any(.[]; .status != "completed") or any($done[]; .completed_at == null)), failing: any($done[]; . as $f|((.conclusion=="success" or .conclusion=="neutral" or .conclusion=="skipped")|not) and ((.started_at != null and .completed_at != null and any($done[]; .started_at > $f.started_at and .completed_at > $f.completed_at))|not)), newest: [$done[]|select(.completed_at == $t)|.conclusion]})|[([.[]|select(.incomplete)]|length), ([.[]|select(.failing)]|length), length, ([.[]|select(.name=="validate" and (.incomplete|not) and (.failing|not) and any(.newest[]; . == "success"))]|length)]|@tsv' 2>/dev/null) \
+    && [[ "$c" =~ ^[0-9]+$'\t'[0-9]+$'\t'[0-9]+$'\t'[0-9]+$ ]] || c=$'1\t0\t0\t0'
   echo "$c"
 }
 # Early refusals, cheap first reads: the head, the trading-cc-read gate, the verdict files.

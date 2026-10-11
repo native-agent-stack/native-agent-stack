@@ -225,15 +225,24 @@ E=$full
 # "<VERDICT>: trading-cc/reads/<record>.md" (for example "PASS: …"). A failure blocks. A success counts only when that record exists and names
 # the read head with PASS or ACK, because a status carries no app identity (any holder of the owner token can post one).
 tcc_read_gate() {
-  local s sr st d rec why
-  # #975 B1 (the CC's micro at 5b8ba3b2): the newest status of the context is the first one listed ("Statuses are returned in reverse
-  # chronological order. The first status in the list will be the latest one", github/rest-api-description@58b1e0c0 api.github.com.json:55724).
-  # sort_by(.updated_at)|last kept the OLDER of two with the same updated_at (jq's sort keeps equal keys in input order, jq 1.8.1
-  # src/jv_aux.c:669-674), so a failure posted in the same second as an earlier success passed.
-  s=$(gh api "repos/$R/commits/$1/statuses?per_page=100" --jq '[.[]|select(.context=="trading-cc-read")]|first|select(.!=null)|"\(.state)\t\(.description)"' 2>/dev/null); sr=$?
-  # #975 round 4 (Codex P1 at 761810d7, the CC's P2-3): gh's exit code is kept apart from its output. A failed call stops, whatever it printed
-  # (an error response's body reaches stdout, a refused connection prints nothing there); only exit 0 with no output is "no status".
+  local p s sr st d rec why
+  # #975 (Codex P1 at nas:234, in A1's correction): the statuses LIST is newest first across every context ("Statuses are returned in
+  # reverse chronological order. The first status in the list will be the latest one", github/rest-api-description@58b1e0c0
+  # api.github.com.json:55724), and its page 1 held 100, so a trading-cc-read failure behind 100 newer statuses of other contexts was not
+  # on it and passed as "no status". The COMBINED status, "a combined view of commit statuses for a given ref" whose state is success "if
+  # the latest status for all contexts is `success`" (:55664-55667), holds one entry per context, its newest (measured on 2026-10-11 on the
+  # 12 of 80 heads of ours that have statuses and on 8 public heads of up to 35 statuses in 15 contexts: each context once, each entry the
+  # list's first of its context), so which of two statuses posted in one second is the newer (#975 B1 at 5b8ba3b2) is GitHub's answer,
+  # not a sort's. It is paged by context (per_page and page, :55687, :55690; a first page with more contexts than per_page carried a Link
+  # rel="next", measured), so every page is read with gh api --paginate --slurp, as for nas's check runs, and jq finds the context on any.
+  p=$(gh api "repos/$R/commits/$1/status?per_page=100" --paginate --slurp 2>/dev/null); sr=$?
+  # #975 round 4 (Codex P1 at 761810d7, the CC's P2-3): gh's exit code is kept apart from its output. A failed call stops, whatever it
+  # printed (an error response's body reaches stdout, a refused connection prints nothing there), and so does a reply that is not an array
+  # of pages with statuses, an empty one included (jq -n fails at `input` when there is none); only a combined status with no
+  # trading-cc-read entry on any page is "no status".
   [ "$sr" = 0 ] || { echo "#$N trading-cc-read statuses unreadable at ${1:0:8} (gh exit $sr, output withheld): stop"; exit 2; }
+  s=$(printf '%s' "$p" | jq -n -r 'input|if type == "array" and length > 0 then [.[].statuses[]|select(.context=="trading-cc-read")]|first|select(.!=null)|"\(.state)\t\(.description)" else error("not a combined status") end' 2>/dev/null) \
+    || { echo "#$N trading-cc-read statuses unreadable at ${1:0:8} (not a combined status, output withheld): stop"; exit 2; }
   [ -n "$s" ] || return 0
   st=${s%%$'\t'*}; d=${s#*$'\t'}
   [ "$st" = success ] || { case "$st" in error|failure|pending) ;; *) st=unknown ;; esac; echo "#$N trading-cc-read is $st at ${1:0:8} (description withheld, #975 P2-2): stop"; exit 2; }
