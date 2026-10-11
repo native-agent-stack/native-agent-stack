@@ -57,7 +57,7 @@ OPERATOR_STATUSES = {"required", "optional", "user_only_paid"}
 BARE_VALUE = re.compile(r"^[A-Za-z0-9._+/=:@-]+$")          # no ~ (a sourcing shell would expand it)
 QUOTED_VALUE = re.compile(r'^[\x20-\x7e]+$')                 # printable ASCII only
 QUOTED_FORBIDDEN = set('"$`\\')
-KEY_PREFIX_HINT = {"alpaca-paper": "PK", "alpaca-paper-2": "PK"}
+KEY_PREFIX_HINT = {"alpaca-paper": "PK", "alpaca-paper-2": "PK", "alpaca-paper-c": "PK"}
 
 
 class Refused(Exception):

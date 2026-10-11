@@ -36,8 +36,8 @@ sys.path.insert(0, str(TOOLS))
 import credential_run as run_mod  # noqa: E402
 import set_credential as writer  # noqa: E402
 
-INJECTABLE_IDS = {"alpaca-paper", "alpaca-paper-2", "sec-contact", "databento", "typesafe", "omniroute", "tavily",
-                  "claude-oauth-token", "canary-e2e", "anthropic-api", "anthropic-api-2",
+INJECTABLE_IDS = {"alpaca-paper", "alpaca-paper-2", "alpaca-paper-c", "sec-contact", "databento", "typesafe",
+                  "omniroute", "tavily", "claude-oauth-token", "canary-e2e", "anthropic-api", "anthropic-api-2",
                   "anthropic-api-3", "anthropic-api-4"}
 NOT_INJECTABLE_IDS = ("grafana-admin", "nativestack-generation-key", "openhands-session", "claude-native",
                       "codex-native", "gh-native", "huggingface-native", "huggingface-native-stored", "ibkr-gateway",
@@ -472,6 +472,7 @@ class InjectionTests(RunnerCase):
         # it must not load another entry's file through one.
         pointers = {"PAPER_ENV_FILE": "/nonexistent/p.env", "ENV_FILE": "/nonexistent/e.env",
                     "PIT_ALPACA_ENV_PATH": "/nonexistent/a.env", "PAPER_ENV_FILE_2": "/nonexistent/p2.env",
+                    "PAPER_ENV_FILE_C": "/nonexistent/pc.env",
                     "SEC_CONTACT_ENV": "/nonexistent/s.env", "PIT_SEC_ENV_PATH": "/nonexistent/t.env",
                     "HF_TOKEN_PATH": "/nonexistent/hf"}
         stray = {"TAVILY_API_KEY": fake("tvly-"), "APCA_API_KEY_ID": fake("PK"), "APCA_API_SECRET_KEY": fake(),
@@ -2156,6 +2157,7 @@ class InventoryAndGrammarTests(unittest.TestCase):
         # Every optional variable of an injectable entry, classified; a new one must be reviewed here.
         self.assertEqual(classified, {("alpaca-paper", "APCA_API_BASE_URL"): "public",
                                       ("alpaca-paper-2", "APCA_API_BASE_URL"): "public",
+                                      ("alpaca-paper-c", "APCA_API_BASE_URL"): "public",
                                       ("sec-contact", "EDGAR_IDENTITY"): "masked",
                                       ("sec-contact", "EDGAR_RATE_LIMIT_PER_SEC"): "public"})
 

@@ -109,8 +109,8 @@ class CredentialStatusTests(unittest.TestCase):
     def test_real_inventory_is_valid(self):
         self.assertEqual(cs.inventory_errors(self.inventory, ROOT), [])
         ids = {e["id"] for e in self.inventory["entries"]}
-        self.assertTrue({"alpaca-paper", "alpaca-paper-2", "sec-contact", "claude-native", "codex-native", "gh-native",
-                         "huggingface-native", "huggingface-native-stored"} <= ids)
+        self.assertTrue({"alpaca-paper", "alpaca-paper-2", "alpaca-paper-c", "sec-contact", "claude-native",
+                         "codex-native", "gh-native", "huggingface-native", "huggingface-native-stored"} <= ids)
         self.assertIn("HUGGING_FACE_HUB_TOKEN", self.inventory["must_not_be_set"])
         self.assertIn("HF_TOKEN", self.inventory["must_not_be_set"])
 
@@ -126,6 +126,24 @@ class CredentialStatusTests(unittest.TestCase):
         self.assertEqual(second["pointer_variables"], ["PAPER_ENV_FILE_2"])
         self.assertFalse(set(second["pointer_variables"]) & set(first["pointer_variables"]))
 
+    def test_account_c_paper_row_mirrors_the_first(self):
+        # alpaca-paper-c is paper account C's slot (2026-10-11), for the agent-run paper lane C: the same class, store
+        # kind and variables as account 1, its own lane, file and pointer, optional, and no loader or consumer until the
+        # change that activates account C names one. No other row shares its pointer.
+        rows = {e["id"]: e for e in self.inventory["entries"]}
+        first, account_c = rows["alpaca-paper"], rows["alpaca-paper-c"]
+        for key in ("class", "variables", "optional_variables", "public_variables"):
+            self.assertEqual(account_c[key], first[key], key)
+        self.assertEqual(account_c["store"]["kind"], first["store"]["kind"])
+        self.assertEqual(account_c["store"]["path_template"],
+                         first["store"]["path_template"].replace("alpaca-paper.env", "alpaca-paper-c.env"))
+        self.assertEqual((account_c["status"], account_c["lane"]), ("optional", "us-equities-paper-c"))
+        self.assertEqual(account_c["pointer_variables"], ["PAPER_ENV_FILE_C"])
+        self.assertEqual((account_c["loaders"], account_c["environment_only_consumers"]), ([], []))
+        others = {name for e in self.inventory["entries"] if e["id"] != "alpaca-paper-c"
+                  for name in e["pointer_variables"]}
+        self.assertFalse(set(account_c["pointer_variables"]) & others)
+
     def test_public_variables_classify_every_optional_stored_variable(self):
         # 2026-09-29 (tools/credentials/credential_run.py): the key runner masks every variable it injects except the
         # names in the entry's optional public_variables, which may name only optional variables that are not secret,
@@ -133,6 +151,7 @@ class CredentialStatusTests(unittest.TestCase):
         rows = {e["id"]: e for e in self.inventory["entries"]}
         self.assertEqual(rows["alpaca-paper"]["public_variables"], ["APCA_API_BASE_URL"])
         self.assertEqual(rows["alpaca-paper-2"]["public_variables"], ["APCA_API_BASE_URL"])
+        self.assertEqual(rows["alpaca-paper-c"]["public_variables"], ["APCA_API_BASE_URL"])
         self.assertEqual(rows["sec-contact"]["variables"], ["SEC_USER_AGENT"])
         self.assertEqual(rows["sec-contact"]["optional_variables"], ["EDGAR_IDENTITY", "EDGAR_RATE_LIMIT_PER_SEC"])
         self.assertEqual(rows["sec-contact"]["public_variables"], ["EDGAR_RATE_LIMIT_PER_SEC"])

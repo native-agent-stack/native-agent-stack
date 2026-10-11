@@ -81,6 +81,18 @@ class StoreTests(unittest.TestCase):
         self.assertEqual(code, 0)
         self.assertNotIn("warning", output)
 
+    def test_account_c_paper_slot_gets_the_same_prefix_hint(self):
+        # alpaca-paper-c (2026-10-11) holds paper keys only, so a live-shaped key id (AK) is flagged as for accounts 1 and 2.
+        key_value = fake_token("AK")
+        code, output = self.run_store("alpaca-paper-c", [key_value, fake_token(), ""])
+        self.assertEqual(code, 0)
+        self.assertIn("does not start with PK", output)
+        self.assertNotIn(key_value, output)
+        self.assertTrue((self.store / "alpaca-paper-c.env").is_file())
+        code, output = self.run_store("alpaca-paper-c", ["replace", fake_token("PK"), fake_token(), ""])
+        self.assertEqual(code, 0)
+        self.assertNotIn("warning", output)
+
     def test_replacing_needs_the_hidden_word_replace(self):
         self.run_store("alpaca-paper", [fake_token("PK"), fake_token(), ""])
         path = self.store / "alpaca-paper.env"
@@ -206,7 +218,7 @@ class StoreFromEnvTests(unittest.TestCase):
         # optional variable counts too (sec-contact declares SEC_USER_AGENT and EDGAR_IDENTITY).
         self.env.update({"APCA_API_KEY_ID": fake_token("PK"), "APCA_API_SECRET_KEY": fake_token(),
                          "SEC_USER_AGENT": "name a@b.example"})
-        for entry in ("alpaca-paper", "alpaca-paper-2", "sec-contact"):
+        for entry in ("alpaca-paper", "alpaca-paper-2", "alpaca-paper-c", "sec-contact"):
             with self.subTest(entry=entry), self.assertRaisesRegex(store_mod.Refused, "exactly one variable"):
                 self.store_from_env(entry)
         self.assertFalse(self.store.exists())

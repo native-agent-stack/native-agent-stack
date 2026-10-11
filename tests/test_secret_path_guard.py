@@ -393,6 +393,21 @@ BLOCKED = {
     "set -o xtrace; source \"${PAPER_ENV_FILE_2}\"": "trace_while_sourcing",
     ". \"$PAPER_ENV_FILE_2\"; declare -p APCA_API_KEY_ID": "environment_dump_after_source",
     "( . \"$PAPER_ENV_FILE_2\"; python3 -c 'import os; print(dict(os.environ))' )": "environment_dump_after_source",
+    # A lettered pointer (PAPER_ENV_FILE_C is paper account C's, the agent-native paper lane, 2026-10-11): only a numeric
+    # suffix was read, so the word boundary after PAPER_ENV_FILE failed before `_C` and each of these passed the guard
+    # (checked against the previous guard) while the account-1 and account-2 forms were blocked. One letter now counts as
+    # a number does, so `_B`, until then a recorded gap, is blocked too.
+    "cat \"$PAPER_ENV_FILE_C\"": "credential_file_read",
+    "cat \"${PAPER_ENV_FILE_C}\"": "credential_file_read",
+    "head -n 3 \"$PAPER_ENV_FILE_C\"": "credential_file_read",
+    "while read -r l; do :; done < \"$PAPER_ENV_FILE_C\"": "credential_file_read",
+    "cat \"$PAPER_ENV_FILE_B\"": "credential_file_read",
+    "cat \"$SEC_CONTACT_ENV_C\"": "credential_file_read",
+    "set -x; . \"$PAPER_ENV_FILE_C\"": "trace_while_sourcing",
+    "set -o xtrace; source \"${PAPER_ENV_FILE_C}\"": "trace_while_sourcing",
+    ". \"$PAPER_ENV_FILE_C\"; declare -p APCA_API_KEY_ID": "environment_dump_after_source",
+    # (Not the os.environ dump of the account-2 rows: K4's INLINE-ENV already refuses it as environment_dump.)
+    ". \"$PAPER_ENV_FILE_C\"; perl -e 'print %ENV'": "environment_dump_after_source",
     # Shell tracing or verbose mode while sourcing a credential file prints its assignments.
     "set -x; . \"$PAPER_ENV_FILE\"": "trace_while_sourcing",
     "set -euxo pipefail; set -a; . \"$SEC_CONTACT_ENV\"; set +a": "trace_while_sourcing",
@@ -1035,13 +1050,20 @@ ALLOWED = [
     "python3 -I tools/credentials/alpaca_rate_limit_probe.py --env-file \"$PAPER_ENV_FILE_2\" --out rate-limit.json",
     "wc -c \"$PAPER_ENV_FILE_2\"",
     "stat -c '%a %U' \"$PAPER_ENV_FILE_2\"",
+    # Paper account C (2026-10-11): its pointer handed to a loader or a size check, as account 2's is, so reading a lettered
+    # pointer as a credential pointer never blocks its loader.
+    "python3 runner.py preflight --env-file \"$PAPER_ENV_FILE_C\" --output out.json",
+    "python3 -I tools/credentials/alpaca_rate_limit_probe.py --env-file \"$PAPER_ENV_FILE_C\" --out rate-limit.json",
+    "wc -c \"$PAPER_ENV_FILE_C\"",
+    "stat -c '%a %U' \"$PAPER_ENV_FILE_C\"",
     # The trading lane's loader path (2026-09-29): a unit started with systemd-run --user whose bash -ic hands the pointer to a
-    # loader as --env-file. It must keep passing for both accounts, so closing the numbered-pointer hole never blocks a unit.
+    # loader as --env-file. It must keep passing for every account, so closing the numbered-pointer hole never blocks a unit.
     "systemd-run --user --unit=overnight-volume-watch --collect /bin/bash -ic "
     "'exec python3 blueprints/us-equities/adaptive-paper/runner.py run --env-file \"$PAPER_ENV_FILE\"'",
     "systemd-run --user --unit=paper-series-2 --collect /bin/bash -ic "
     "'exec python3 blueprints/us-equities/adaptive-paper/runner.py run --env-file \"$PAPER_ENV_FILE_2\"'",
     "systemd-run --user --unit=x --collect /bin/bash -ic \"exec python3 X --env-file \\\"$PAPER_ENV_FILE_2\\\" --output out.json\"",
+    "systemd-run --user --unit=paper-agent-c --collect /bin/bash -ic \"exec python3 X --env-file \\\"$PAPER_ENV_FILE_C\\\"\"",
     # systemd-run as a modelled launcher (2026-09-29) reads what it starts, so an ordinary unit still passes: no options, non-secret
     # -E/-p settings, a loader handed its pointer directly, and a variable that only carries a secret name as its VALUE (the rule
     # reads the name being set, not text that happens to spell one).
@@ -1409,9 +1431,10 @@ SAFE_CORPUS = [
 
 # Known heuristic gaps, asserted so a change that closes one is noticed.
 EXPECTED_PASS_THROUGH = [
-    # A pointer with a NON-numeric suffix is not recognised (only PAPER_ENV_FILE_<digits> is, 2026-09-29): a new pointer name
-    # goes into the inventory and POINTER_VARIABLE together, and test_inventory_pointer_variables_are_guarded enforces it.
-    "cat \"$PAPER_ENV_FILE_B\"",
+    # A pointer whose suffix is neither a number nor one letter is not recognised (only PAPER_ENV_FILE_<digits> and
+    # PAPER_ENV_FILE_<letter> are, 2026-10-11; one letter since paper account C): a new pointer name goes into the inventory and
+    # POINTER_VARIABLE together, and test_inventory_pointer_variables_are_guarded enforces it.
+    "cat \"$PAPER_ENV_FILE_AB\"",
     # An unquoted here-document expands `$(...)` in its body even between single quotes; the guard reads the body as command lines, where
     # single quotes hide it, as the base guard did.
     "cat <<EOF\nvalue: '$(printenv)' and \\$HOME\nEOF",

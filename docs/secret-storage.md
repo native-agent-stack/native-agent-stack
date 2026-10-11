@@ -15,6 +15,7 @@ against it.
 | --- | --- | --- | --- | --- |
 | `alpaca-paper` | Alpaca paper broker key pair | required now | `<store>/alpaca-paper.env` | `APCA_API_KEY_ID`, `APCA_API_SECRET_KEY` (optional, not secret: `APCA_API_BASE_URL`) |
 | `alpaca-paper-2` | Alpaca paper broker key pair, second paper account (isolated incentive-monitor study) | optional | `<store>/alpaca-paper-2.env`, pointer `PAPER_ENV_FILE_2` | `APCA_API_KEY_ID`, `APCA_API_SECRET_KEY` (optional, not secret: `APCA_API_BASE_URL`) |
+| `alpaca-paper-c` | Alpaca paper broker key pair, account C (agent-native paper lane C). Paper keys only; the owner enters them from their own terminal, and the change that activates account C names its loader | optional | `<store>/alpaca-paper-c.env`, pointer `PAPER_ENV_FILE_C` | `APCA_API_KEY_ID`, `APCA_API_SECRET_KEY` (optional, not secret: `APCA_API_BASE_URL`) |
 | `sec-contact` | SEC/EDGAR contact string. This is private personal data, not an auth secret | required now | `<store>/sec-contact.env` | `SEC_USER_AGENT` (optional private contact: `EDGAR_IDENTITY`; optional public cap: `EDGAR_RATE_LIMIT_PER_SEC`) |
 | `databento` | Databento API key | only when you buy it | `<store>/databento.env` | `DATABENTO_API_KEY` |
 | `typesafe` | Typesafe key, for the live-judge mode of `gap_crosswalk.py`, the native-skill-practice Jev provider in `blueprints/native-skill-practice/promptfooconfig.yaml`, and, by the owner's 2026-10-10 decision, the trading lane's research work and Jev harness; start each through `tools/credentials/credential_run.py typesafe -- <command>`. | only when you pay for it | `<store>/typesafe.env` | `TYPESAFE_API_KEY` |
@@ -328,6 +329,7 @@ Put the file paths, never the values, in your shell startup file once:
 _nas_store="${XDG_CONFIG_HOME:-$HOME/.config}/native-agent-stack"
 export PAPER_ENV_FILE="$_nas_store/alpaca-paper.env"
 export PAPER_ENV_FILE_2="$_nas_store/alpaca-paper-2.env"   # second paper account, where this host holds one
+export PAPER_ENV_FILE_C="$_nas_store/alpaca-paper-c.env"   # paper account C, where this host holds one
 export SEC_CONTACT_ENV="$_nas_store/sec-contact.env"
 export PIT_ALPACA_ENV_PATH="$PAPER_ENV_FILE" PIT_SEC_ENV_PATH="$SEC_CONTACT_ENV"
 unset _nas_store
