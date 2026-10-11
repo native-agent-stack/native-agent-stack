@@ -455,8 +455,9 @@ The writer now enumerates actual layer and run objects, individual normalized
 repository/component index mappings, and the remaining report metadata entries.
 Each is serialized as a JSON object and scanned in its own native stdin call.
 The scanner verifies `{` at byte zero, a parsed JSON object, and the strict
-byte bound before invoking native detection. All report string values and keys
-are retained in these records. Whole oversized records refuse rather than
+byte bound before invoking native detection. All report string values and variable
+keys are retained; the three constant top-level list keys `definitions`, `layers`
+and `runs` are omitted from their individual object records. Whole oversized records refuse rather than
 splitting their tokens. Native depth-5 decoding and Expr boundaries are unchanged.
 The old benign-title regression now uses a 23,000-character title whose entire
 record fits the new contract; a separate oversized-layer test proves refusal
@@ -503,3 +504,75 @@ conditions remain distinct from the final gates. The cheap stale email-rule
 comment is corrected. Scope-locked follow-ups remain the old conflicting-
 platform predicate, non-atomic registration, upstream-execution evidence and
 framed non-publication callers. Only another NEW P1 can reopen this correction.
+
+## NEW P1: classified temporary publication reads
+
+The CC's 19:30Z ruling (3,953 bytes, SHA256
+`529ed056eae11c1397713901888e3828dcfb35474289a46dbb5c43aedcec95a5`)
+identifies a new required-CI-gate failure at `d147cc47`. The native read
+derivation sees three unclassified `entry-*.json` reads, increasing its
+monitoring count from the unchanged baseline 330 to 333. The exact existing
+`RepositoryWorkflowTests.test_advisory_baseline_and_explicit_categories_stay_bounded_on_this_repository`
+fails first at that head: one test in 14.725s, one failure, zero errors.
+
+The supported first-party classification and native derivation remain the
+authority; no baseline or gate policy is loosened. The writer reuses the
+previously classified literal `candidate.json` in its owned temporary directory:
+serialize one record, scan that complete record natively, then reuse the path
+for the next record. Every native entry remains separate, below the established
+bound and unframed. All scans still finish before final output/registration.
+A per-entry subdirectory attempt retained three unclassified reads and was
+discarded. Literal-path reuse leaves no final-stack unclassified reads; the
+native total follows main's #978 monitoring baseline of 332.
+
+Because this preparation is held before a commit, the native gate's immutable
+HEAD still identifies `d147cc47`. Local green configures the existing GitTree
+test fixture with the exact prospective index tree and runs the unchanged
+gate assertion against the native derivation. A direct tree-OID constructor
+attempt failed because GitTree's constructor accepts commits only; configuring
+its reader fixture to the native tree object succeeded. This is local fixture
+integration evidence, not a new committed-head or hosted-CI pass. The actual
+HEAD test is rerun after the combined correction is released and committed.
+
+Folded claim corrections: `record_pin` now documents retained noncommit pins;
+the generated definitions explain `runs[].source_pin` and `source_pin_kind`;
+coverage wording names the omitted constant top-level list keys `definitions`,
+`layers` and `runs`, while all variable keys/string values remain in records.
+Oversized records now raise a typed size-refusal exception and report
+`publication entry too large` instead of scanner unavailability. The complete
+writer's size-message control fails on the exact reviewed caller (one failure,
+zero errors in 6.236s) and passes locally with byte preservation. Actual scanner
+availability/errors keep the existing fail-closed diagnostic.
+
+The CC routes retained-source conflict comparison (zero live instances), atomic
+output/registry recovery, residual `ustar`/`DICM` filetype matches (zero current
+entries), upstream-execution evidence and measured publication cost to follow-ups.
+Both Codex follow-up threads have disposition replies/resolutions; no matching,
+pin-comparison or atomic-writer change is folded into this gate correction.
+The standalone reviewed-module probe initially lacked its dataclass module
+registration; that setup failure was corrected before the reported red result.
+Preparation was held for Astra's same-head verdict and the co-op's release.
+Her complete 18,686-byte fix4 verdict has SHA256
+`18b35d12cc2890fe231084bdc324f1ca3f51e0fc7cae24be1d587de6f06d2953` and
+reports the same monitoring-baseline blocker, with no additional blocker.
+The 20:17:42Z release selects the CC's existing classified-temp first choice.
+The held correction was preserved with native Git stash, the six reviewed
+patches rebased onto main `8c95a50d`, then restored for ONE combined commit.
+The updated CC recomputation tool was read at SHA256
+`cc75b488675edfbec1aed7fe35988825217a26dae7d303b9a0a0f91530c212c6`.
+It resolves supported hash/count conflicts; an insertion-shaped registry
+conflict uses the existing native registration fallback without dropping main
+bindings. Main's `starred_convergence.py` grant and this branch's `sweep_policy.py`
+grant are both retained, yielding the mechanically recomputed count 95.
+All old/main anti-pattern rows remain byte-unchanged. The retained range-diff
+identifies only registry/count and that grant-insertion context; all six prior
+substantive patches are unchanged. Actual committed-HEAD push-gate and FULL
+validation results follow the released commit in the co-op handoff.
+
+The full unchanged push-gate test module returns 125 tests/zero skips/rc 0 in
+59.052s with that prospective immutable-tree derivation fixture. This local
+configuration does not promote the old committed HEAD to a passing result.
+The supported native writer regenerated the new source-pin definitions and
+completed in measured wall time 158.749s; that is current host execution cost,
+separate from the CC's roughly 150s observation at the previous head. No new
+vendor test or provider execution is claimed.

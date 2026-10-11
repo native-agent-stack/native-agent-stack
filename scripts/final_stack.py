@@ -144,6 +144,10 @@ DEFINITIONS = (
      "Precedence: " + RUN_PIN_SOURCES_TEXT + "; the first source is the run pin and every other source whose parsed "
      "pin differs is listed under conflicts. Fields absent from that first source are compared between lower "
      "sources too. platforms lists the adoption pin files that install the same pin."),
+    ("runs[].source_pin and runs[].source_pin_kind",
+     "When the chosen source supplies a nonempty noncommit source pin, source_pin retains its original text. "
+     "source_pin_kind is sha256 for a 64-hex artifact digest and tag for other retained values. A 40-hex Git "
+     "source pin is merged into pin_parsed.commit instead. No missing source pin is invented."),
     ("winners[].run",
      "The runs[] id whose repository is the winner's (a run without a repository joins only by the same id), or "
      "null with run_reason held (the layer's current_adoption_status is held), external (scripts/final_stack.py "
@@ -305,8 +309,11 @@ def parse_pin(text) -> dict:
 
 
 def record_pin(text, commit=None) -> dict:
-    """parse_pin(text) with a separately recorded commit field (a 40-hex source_pin or commit) merged in. A commit
-    that contradicts the one in the text leaves the pin unparsed."""
+    """Parse the release pin and retain its separately recorded source pin.
+
+    A 40-hex Git commit merges into pin_parsed; a contradictory commit leaves
+    the pin unparsed. Noncommit pins retain raw source_pin and its kind.
+    """
     parsed = parse_pin(text)
     if isinstance(commit, str) and commit and not COMMIT_PATTERN.fullmatch(commit):
         # source_pin includes artifact SHA256 and upstream tags, not just Git
@@ -967,7 +974,8 @@ def publication_entries(document: dict):
     """Actual report records, with each repository/component index mapping separate.
 
     No byte splitting: a record too large for the native fragment contract is
-    refused by the shared scanner. Every serialized key/value remains covered.
+    refused by the shared scanner. All string values and variable keys remain
+    covered; the constant list keys definitions, layers and runs are omitted.
     """
     for key, value in document.items():
         if key == "index":
@@ -1002,12 +1010,14 @@ def main(argv=None) -> int:
         # former substring matcher; never publish native text or diagnostics.
         try:
             with tempfile.TemporaryDirectory(prefix="final-stack-publication-") as temporary:
-                candidates = []
-                for index, entry in enumerate(publication_entries(document)):
-                    candidate = Path(temporary) / f"entry-{index:05}.json"
+                candidate = Path(temporary) / "candidate.json"
+                findings = []
+                for entry in publication_entries(document):
                     candidate.write_bytes(json.dumps(entry, ensure_ascii=True, separators=(",", ":")).encode("utf-8"))
-                    candidates.append(candidate)
-                findings = host_name_scan.scan_paths(candidates, root=root, names=private_names, reject_email=True)
+                    findings.extend(host_name_scan.scan_paths([candidate], root=root, names=private_names,
+                                                              reject_email=True))
+        except host_name_scan.PublicationEntryTooLarge:
+            raise SystemExit("final_stack: publication entry too large; aborting") from None
         except (host_name_scan.HostNameScanError, OSError):
             raise SystemExit("final_stack: private publication scanner unavailable; aborting") from None
         if findings:

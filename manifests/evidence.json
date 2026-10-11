@@ -17167,8 +17167,8 @@
     },
     {
       "path": "catalogs/landscape/final-stack.json",
-      "sha256": "60bf9e0cfb30dd7732497c5aa1a1f9a01e6a07407ea8b9e27b8aea82806dd5b0",
-      "bytes": 300945
+      "sha256": "2dd68f39d3a0ab12894cf49343f49ff9e22c2fdef9a0d6d4e751ef88ef1f1eab",
+      "bytes": 301336
     },
     {
       "path": "catalogs/landscape/foundation.json",
@@ -18722,8 +18722,8 @@
     },
     {
       "path": "docs/decisions/2026-10-11-final-stack-review-corrections.md",
-      "sha256": "33b6307a18b407819b96a198c949a2936bc8eca93176114332b10fe0f830f293",
-      "bytes": 38929
+      "sha256": "24336fd04475b1c417f4e6c9ec5ea132ed2e46c5b7d42e82c72f8b8f772caf37",
+      "bytes": 43874
     },
     {
       "path": "docs/decisions/2026-10-11-layer-resolution-protocol.md",
@@ -18887,8 +18887,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "4b43c4066a145f9ebbb4592d57e0133156290680baf413677e92ec55bc7abaa0",
-      "bytes": 262926
+      "sha256": "9c95d4852c3b4282d1717f603a7efffff95a361d86821b8a792475d8f15ef294",
+      "bytes": 263694
     },
     {
       "path": "docs/harness-rule-enforcement.md",
@@ -60692,8 +60692,8 @@
     },
     {
       "path": "scripts/final_stack.py",
-      "sha256": "8089dd61e901dc6acfde2182555f2c9de9935c5310590018a7d4ba7a3b97e6ca",
-      "bytes": 57429
+      "sha256": "82742dea85a9d2f9c7579a1069947975b4033265cf55f1e1baa232d10767a317",
+      "bytes": 58071
     },
     {
       "path": "scripts/freshness_propose.py",
@@ -60727,8 +60727,8 @@
     },
     {
       "path": "scripts/host_name_scan.py",
-      "sha256": "f58542f6b36567160578226ce511b601815721e384594c5b38a82a040a4e19e2",
-      "bytes": 21140
+      "sha256": "a09a351de8fcd334938c7dd3f938e01b4e54cfd535c4f965e8ebe8b96f2c24ec",
+      "bytes": 21365
     },
     {
       "path": "scripts/host_receipts.py",
@@ -61582,8 +61582,8 @@
     },
     {
       "path": "tests/test_final_stack.py",
-      "sha256": "c93e8b59bc48bf49035bebd61f3d1051a4884d40dc1a3e5caf5d822f6b51ae01",
-      "bytes": 59030
+      "sha256": "7c19adf52dca4edbe006132bd740480c66c32fb26377c437c6f44253e3231dba",
+      "bytes": 60117
     },
     {
       "path": "tests/test_financial_data.py",

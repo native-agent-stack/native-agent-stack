@@ -631,7 +631,7 @@ class CheckTests(FixtureTestCase):
         self.assertFalse((root / fs.OUTPUT).exists())
 
     def _assert_private_text_is_refused_before_publication(self, payload, private_name="fixture-private-account",
-                                                         spy_publication=True):
+                                                         spy_publication=True, expected_message=None):
         root = self.fixture_root()
         self.assertEqual(self.run_main(root, "--write")[0], 0)
         output_before = (root / fs.OUTPUT).read_bytes()
@@ -652,6 +652,8 @@ class CheckTests(FixtureTestCase):
                 write.assert_not_called()
                 register.assert_not_called()
         self.assertNotIn(payload, str(refused.exception))
+        if expected_message:
+            self.assertIn(expected_message, str(refused.exception))
         self.assertEqual((root / fs.OUTPUT).read_bytes(), output_before)
         self.assertEqual((root / "manifests/evidence.json").read_bytes(), registry_before)
 
@@ -741,7 +743,18 @@ class CheckTests(FixtureTestCase):
 
     @unittest.skipUnless(shutil.which("betterleaks"), "native entry guard requires Betterleaks 1.9.0")
     def test_oversized_actual_record_refuses_and_preserves_publication(self):
-        self._assert_private_text_is_refused_before_publication("x" * 25000, spy_publication=False)
+        self._assert_private_text_is_refused_before_publication(
+            "x" * 25000, spy_publication=False, expected_message="publication entry too large")
+
+    def test_oversized_record_reports_size_refusal_and_preserves_bytes(self):
+        root = self.fixture_root()
+        self.assertEqual(self.run_main(root, "--write")[0], 0)
+        before = ((root / fs.OUTPUT).read_bytes(), (root / "manifests/evidence.json").read_bytes())
+        with mock.patch.object(host_name_scan, "scan_paths", side_effect=
+                               host_name_scan.PublicationEntryTooLarge("publication entry too large")):
+            with self.assertRaisesRegex(SystemExit, "publication entry too large; aborting"):
+                self.run_main(root, "--write", native_scan=True)
+        self.assertEqual(((root / fs.OUTPUT).read_bytes(), (root / "manifests/evidence.json").read_bytes()), before)
 
     @unittest.skipUnless(shutil.which("betterleaks"), "native write privacy plant requires Betterleaks 1.9.0")
     def test_explicit_private_account_is_refused_before_write_or_registration(self):
@@ -785,15 +798,17 @@ class CheckTests(FixtureTestCase):
     def test_native_scan_precedes_output_write_and_registration(self):
         root = self.fixture_root()
         events = []
+        scanned = []
 
         def scan(paths, *, root, names, reject_email=False):
             events.append("scan")
             self.assertEqual(names, ("fixture-private-account",))
             self.assertTrue(reject_email)
-            self.assertGreater(len(paths), 1)
+            self.assertEqual(len(paths), 1)
             entries = [json.loads(path.read_bytes()) for path in paths]
+            scanned.extend(entries)
             self.assertTrue(all(path != root / fs.OUTPUT for path in paths))
-            self.assertIn("Title for layer-a", [entry.get("title") for entry in entries])
+            self.assertEqual(paths[0].name, "candidate.json")
             self.assertTrue(all(path.read_bytes().startswith(b"{") and len(path.read_bytes()) < 25000
                                 for path in paths))
             return []
@@ -803,7 +818,9 @@ class CheckTests(FixtureTestCase):
                 mock.patch.object(hr, "register_file", side_effect=lambda *a: events.append("register")):
             exit_code, output = self.run_main(root, "--write", native_scan=True)
         self.assertEqual(exit_code, 0, output)
-        self.assertEqual(events, ["scan", "write", "register"])
+        self.assertGreater(len(scanned), 1)
+        self.assertIn("Title for layer-a", [entry.get("title") for entry in scanned])
+        self.assertEqual(events, ["scan"] * len(scanned) + ["write", "register"])
 
     @unittest.skipUnless(shutil.which("betterleaks"), "native write privacy control requires Betterleaks 1.9.0")
     def test_native_write_scanner_preserves_unicode_alphanumeric_boundaries(self):

@@ -32,6 +32,10 @@ class HostNameScanError(Exception):
     """A value-free failure message safe to show to the caller."""
 
 
+class PublicationEntryTooLarge(HostNameScanError):
+    """The serialized record exceeds the proven native single-fragment bound."""
+
+
 def _command(argv: list[str], *, root: Path,
              environment: dict[str, str] | None = None, timeout: int = 10) -> subprocess.CompletedProcess:
     try:
@@ -198,8 +202,10 @@ def _scan_entries(entries: Iterable[tuple[Path, str]], *, root: Path,
         # even a short initial pipe read reaches EOF in the same fragment.
         findings = set()
         for path, text in entries:
-            if not text.startswith("{") or len(text.encode("utf-8")) >= PUBLICATION_ENTRY_LIMIT:
-                raise HostNameScanError("publication entry exceeds native input contract")
+            if len(text.encode("utf-8")) >= PUBLICATION_ENTRY_LIMIT:
+                raise PublicationEntryTooLarge("publication entry too large")
+            if not text.startswith("{"):
+                raise HostNameScanError("publication entry must start with a JSON object")
             try:
                 if not isinstance(json.loads(text), dict):
                     raise ValueError

@@ -152,6 +152,10 @@
       "term": "runs"
     },
     {
+      "definition": "When the chosen source supplies a nonempty noncommit source pin, source_pin retains its original text. source_pin_kind is sha256 for a 64-hex artifact digest and tag for other retained values. A 40-hex Git source pin is merged into pin_parsed.commit instead. No missing source pin is invented.",
+      "term": "runs[].source_pin and runs[].source_pin_kind"
+    },
+    {
       "definition": "The runs[] id whose repository is the winner's (a run without a repository joins only by the same id), or null with run_reason held (the layer's current_adoption_status is held), external (scripts/final_stack.py EXTERNAL_RUN_PINS), unpinned (the verdict pin is 'unpinned') or unresolved.",
       "term": "winners[].run"
     },
