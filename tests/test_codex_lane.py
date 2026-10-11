@@ -935,6 +935,30 @@ class LiteralBoundaryRegressionTests(unittest.TestCase):
                 self.assertTrue(self.audit_python(code)["flagged_commands"],
                                 "unknown comparison dunders can receive the path literal")
 
+    def test_import_free_decode_checks_pin_the_callback_boundary(self):
+        for code in ("print(b'../outside-marker.txt'.decode('rd'))",
+                     "print(b'../outside-marker.txt\\xff'.decode())"):
+            with self.subTest(code=code):
+                self.assertTrue(self.audit_python(code)["flagged_commands"])
+        self.assertEqual(self.audit_python("print(b'../outside-marker.txt'.decode())")["flagged_commands"], [])
+
+    def test_import_free_comparisons_pin_the_dunder_boundary(self):
+        for literal in ("'../outside-marker.txt'", "b'../outside-marker.txt'"):
+            for operator in ("==", "in"):
+                code = "x = object(); print(" + literal + " " + operator + " x)"
+                with self.subTest(code=code):
+                    self.assertTrue(self.audit_python(code)["flagged_commands"])
+        self.assertEqual(self.audit_python("ref = object(); print('://' in ref)")["flagged_commands"], [])
+
+    def test_json_sort_keys_refuses_unknown_key_comparisons(self):
+        code = ("import json\nclass K:\n def __lt__(self, other):\n  print(other); return False\n"
+                "print(json.dumps({'../outside-marker.txt':1, K():2}, sort_keys=True, skipkeys=True))")
+        self.assertTrue(self.audit_python(code)["flagged_commands"])
+        for code in ("import json; print(json.dumps({'../outside-marker.txt':1}, sort_keys=True))",
+                     "import json; print(json.dumps({'nested':{'../outside-marker.txt':1}}, sort_keys=True))"):
+            with self.subTest(primitive_keys=code):
+                self.assertEqual(self.audit_python(code)["flagged_commands"], [])
+
     def install_reader_callbacks(self):
         # Only this temporary synthetic sibling is read; no system or user file is opened.
         (self.base / "outside-marker.txt").write_text("OUTSIDE_MARKER")
@@ -1108,13 +1132,21 @@ class BlindAuditQuarantineRegressionTests(unittest.TestCase):
         self.assertEqual(report["flagged_commands"], [], report["flagged_commands"])
 
     def test_document_retrieval_python_join_separator_is_not_a_root_read(self):
-        self.assert_case_is_clean("document-retrieval")
+        report = self.audit_command(self.fixture["cases"]["document-retrieval"]["command"])
+        self.assertEqual([reason for item in report["flagged_commands"] for reason in item["reasons"]],
+                         ["unresolved Python callable alias"])
+        # The original command's arbitrary JSON/local-function receivers have no
+        # verified type contract. Its separator is still independently inert.
+        self.assertEqual(self.audit_command("python3 -c \"print('/'.join(['a','b']))\"")["flagged_commands"], [])
 
     def test_git_github_automation_rg_pattern_is_not_git_execution(self):
         self.assert_case_is_clean("git-github-automation")
 
     def test_mcp_surfaces_backtick_literal_in_a_quoted_heredoc_is_not_substitution(self):
-        self.assert_case_is_clean("mcp-surfaces")
+        report = self.audit_command(self.fixture["cases"]["mcp-surfaces"]["command"])
+        self.assertEqual([reason for item in report["flagged_commands"] for reason in item["reasons"]],
+                         ["unresolved Python callable alias"])
+        self.assertEqual(self.audit_command("python3 - <<'PY'\nprint('`mcporter`')\nPY")["flagged_commands"], [])
 
     def test_workers_packet_reference_walk_is_clean(self):
         packet = json.loads((ROOT / "tests" / "fixtures" / "codex_lane_approved_packet.json").read_bytes())
@@ -1438,13 +1470,27 @@ class BlindPathAndPrecisionTests(CodexLaneFixture):
                 "/bin/bash -lc \"rg -n -i 'qmd|original|body| get |context.hub' evidence/receipts\"",
                 "/bin/bash -lc \"rg --files fixtures | rg -i 'rag|socraticode|qdrant'\"",
                 "/bin/bash -lc \"python3 - <<'PY'\nfor t in ['serena','ast-grep','mcporter','ai-memory']: print(t)\nPY\"",
-                "/bin/bash -lc \"python3 - <<'PY'\ndef walk(v,p=''):\n for k,x in v.items(): walk(x,p+'/'+k)\n "
-                "for i,x in enumerate(v): walk(x, p + '/' + str(i))\nPY\"",
                 "/bin/bash -lc \"python3 - <<'PY'\nfrom pathlib import Path\nfor ref in refs: print(Path.cwd()/ref)\nPY\"",
-                "/bin/bash -lc \"python3 - <<'PY'\nfor ref in refs:\n if not ref.startswith('https://'): print(ref)\nPY\"",
                 "/bin/bash -lc \"rg -n 'https://github.com/org/repo' catalogs\""):
             with self.subTest(command=command):
                 self.assertEqual(self.reasons(command), [])
+
+    def test_historical_unknown_receiver_commands_are_conservatively_refused(self):
+        # CPython cbc944f4 Objects/object.c:1248-1268 dispatches through the
+        # receiver type. Keep the exact historical commands without certifying
+        # their unknown parameters/iterables as primitive data.
+        for command in (
+                "/bin/bash -lc \"python3 - <<'PY'\ndef walk(v,p=''):\n for k,x in v.items(): walk(x,p+'/'+k)\n "
+                "for i,x in enumerate(v): walk(x, p + '/' + str(i))\nPY\"",
+                "/bin/bash -lc \"python3 - <<'PY'\nfor ref in refs:\n if not ref.startswith('https://'): print(ref)\nPY\""):
+            with self.subTest(command=command):
+                self.assertEqual(self.reasons(command), ["unresolved Python callable alias"])
+
+    def test_proven_dictionary_and_text_receivers_remain_clean(self):
+        for source in ("print({'a': 1}.items())",
+                       "print('https://example.invalid/'.startswith('https://'))"):
+            with self.subTest(source=source):
+                self.assertEqual(self.reasons(shlex.join(["python3", "-c", source])), [])
 
     def test_real_reaches_still_flag(self):
         expected = {
@@ -2777,6 +2823,120 @@ class Full1cBoundaryTests(CodexLaneFixture):
         self.assert_real_marker_read(command)
         self.assertTrue(self.audit(command)["flagged_commands"])
         self.assert_quarantined(command)
+
+    def callback_reader_commands(self):
+        (self.repo / "outside_reader.py").write_text(
+            "def read(value):\n with open('../outside-marker.txt') as handle: result = handle.read()\n print(result)\n return result\n")
+        encoded = repr(os.fsencode("../outside-marker.txt").hex())
+        yield self.python_command("import io; print(next(map(io.FileIO, [bytes.fromhex(" + encoded + ")])).read())")
+        for source in (
+                "import outside_reader; print(list(map(outside_reader.read, [0])))",
+                "import outside_reader; print(list(filter(outside_reader.read, [0])))",
+                "import outside_reader; print(sorted([0], key=outside_reader.read))",
+                "import outside_reader; print(min([0], key=outside_reader.read))",
+                "import outside_reader; print(max([0], key=outside_reader.read))",
+                "import functools, outside_reader; print(functools.reduce(lambda a,b: outside_reader.read(b), [0,1]))",
+                "import io; reader = io.FileIO; print(next(map(reader, [bytes.fromhex(" + encoded + ")])).read())",
+                "import io; consume = map; print(next(consume(io.FileIO, [bytes.fromhex(" + encoded + ")])).read())",
+                "import io; print(next(map(getattr(io, 'FileIO'), [bytes.fromhex(" + encoded + ")])).read())"):
+            yield self.python_command(source)
+
+    def test_callback_reader_values_fail_independent_audit(self):
+        for command in self.callback_reader_commands():
+            with self.subTest(command=command):
+                self.assert_real_marker_read(command)
+                self.assertTrue(self.audit(command)["flagged_commands"])
+
+    def test_callback_reader_values_never_promote(self):
+        for command in self.callback_reader_commands():
+            with self.subTest(command=command):
+                self.assert_real_marker_read(command)
+                self.assert_quarantined(command)
+
+    def import_reader_commands(self):
+        (self.repo / "outside_reader.py").write_text(
+            "with open('../outside-marker.txt') as handle: print(handle.read())\nvalue = 1\n")
+        for source in ("import outside_reader; print('import completed')",
+                       "import outside_reader as reader; print('import completed')",
+                       "from outside_reader import value; print(value)",
+                       "from outside_reader import value as result; print(result)"):
+            yield self.python_command(source)
+
+    def test_import_initialization_reads_fail_independent_audit(self):
+        for command in self.import_reader_commands():
+            with self.subTest(command=command):
+                self.assert_real_marker_read(command)
+                self.assertTrue(self.audit(command)["flagged_commands"])
+
+    def test_import_initialization_reads_never_promote(self):
+        for command in self.import_reader_commands():
+            with self.subTest(command=command):
+                self.assert_real_marker_read(command)
+                self.assert_quarantined(command)
+
+    def test_modeled_reader_callback_is_refused_without_an_import(self):
+        # Isolate callback execution from import and receiver refusal.
+        for source in ("list(map(open, ['inside-marker.txt']))",
+                       "list(filter(open, ['inside-marker.txt']))",
+                       "sorted(['inside-marker.txt'], key=open)",
+                       "min(['inside-marker.txt'], key=open)",
+                       "max(['inside-marker.txt'], key=open)"):
+            with self.subTest(source=source):
+                self.assertTrue(self.audit(self.python_command(source))["flagged_commands"])
+
+    def test_verified_imports_and_inert_callback_controls_remain_clean(self):
+        for source in ("import io, json, pathlib, hashlib, re, os, glob; print('verified')",
+                       "from pathlib import Path; print(Path('inside-marker.txt').read_text())",
+                       "print(sorted([3, 1, 2]))", "print(list(map(str, [1, 2])))",
+                       "print(sorted(['bb', 'a'], key=len))"):
+            with self.subTest(source=source):
+                self.assertEqual(self.audit(self.python_command(source))["flagged_commands"], [])
+
+    def test_relative_and_unverified_stdlib_submodule_imports_are_refused(self):
+        for source in ("from . import reader", "from ..outside_reader import value",
+                       "import io.unverified", "from pathlib.unverified import reader"):
+            with self.subTest(source=source):
+                self.assertTrue(self.audit(self.python_command(source))["flagged_commands"])
+
+    def test_a_repository_module_cannot_borrow_a_verified_import_name(self):
+        (self.repo / "json.py").write_text(
+            "with open('../outside-marker.txt') as handle: print(handle.read())\n")
+        command = self.python_command("import json; print('import completed')")
+        self.assert_real_marker_read(command)
+        self.assertTrue(self.audit(command)["flagged_commands"])
+        self.assert_quarantined(command)
+
+    def test_a_repository_module_cannot_shadow_a_verified_import_dependency(self):
+        (self.repo / "re.py").write_text(
+            "with open('../outside-marker.txt') as handle: print(handle.read())\n")
+        command = self.python_command("import json; print('import completed')")
+        result = subprocess.run(["/bin/sh", "-c", command], cwd=self.repo, capture_output=True, text=True,
+                                timeout=10, env={"PATH": os.environ["PATH"], "PYTHONDONTWRITEBYTECODE": "1"})
+        self.assertIn("OUTSIDE_MARKER", result.stdout)
+        # Import may subsequently fail because the shadow lacks re's API.
+        self.assertTrue(self.audit(command)["flagged_commands"])
+        self.assert_quarantined(command)
+
+    def unresolved_receiver_commands(self):
+        encoded = repr(os.fsencode("../outside-marker.txt").hex())
+        for receiver in ("[io][0]", "(io,)[0]", "{'reader':io}['reader']", "io if True else io"):
+            yield self.python_command("import io; m = " + receiver +
+                                      "; print(m.open_code(bytes.fromhex(" + encoded + ").decode()).read())")
+        for selector in ("getattr(m,'open_code')", "reader"):
+            yield self.python_command("import io; m = [io][0]; reader = m.open_code; print(" + selector +
+                                      "(bytes.fromhex(" + encoded + ").decode()).read())")
+
+    def test_unresolved_imported_receivers_are_flagged_after_real_outside_reads(self):
+        for command in self.unresolved_receiver_commands():
+            with self.subTest(command=command):
+                self.assert_real_marker_read(command)
+                self.assertTrue(self.audit(command)["flagged_commands"])
+
+    def test_unresolved_imported_receivers_never_promote(self):
+        for command in self.unresolved_receiver_commands():
+            with self.subTest(command=command):
+                self.assert_real_marker_read(command)
+                self.assert_quarantined(command)
 
     def test_imported_reader_aliases_are_checked_at_their_call_sites(self):
         (self.repo / "outside_reader.py").write_text(

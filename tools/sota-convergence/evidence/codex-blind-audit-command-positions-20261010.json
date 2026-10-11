@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "checked_at": "2026-10-11T02:31:11Z",
+  "checked_at": "2026-10-11T10:52:45Z",
   "historical_pre_bytes_checked_at": "2026-10-11T01:17:39Z",
   "historical_pre_review_checked_at": "2026-10-10T21:02:00Z",
   "base_commit": "1d1164e8c34df8250973a5c632e9747a1ef79533",
@@ -9,17 +9,17 @@
   "pre_landing_published_head": "fd86ad20e04cdb4d9b9798354604ec782575f230",
   "historical_landing_base": "c4f4990737c4e2ed8f0452d069e25a460f897bb5",
   "original_branch_base": "9d4c00cd05d79b3fd5074df2e46bacab87ee67ff",
-  "status": "bytes_correction_regressions_pass_final_head_qualification_recorded_externally_live_unmeasured",
+  "status": "micro_corrections_locally_prepared_awaiting_Astra_precision_disposition_and_baseline_ACK",
   "fix_parent_commit": "9ffdbff728ca422eeeb39b05e8d9d5a3fa53b06c",
   "historical_pre_review_codex_lane_py_sha256": "e0cc01afa277c820b5235e665ad0d5dda6948adc91559ef6c65c81461e8e32a3",
   "intermediate_native_capture_codex_lane_py_sha256": "7710b726fafaa4bfa7e7076cc452a6e4fb9a822c7d164db2c36410eb1133e8fc",
-  "codex_lane_py_sha256": "72fd40bcecfe1bc2f286be954e8b6695107f7d5d03f3ac8ec2c6b4dd4d07dac8",
+  "codex_lane_py_sha256": "f4e6ec831a8fc45b8147cd479b1e0be43d73729102f9f172794ee63bc257ad2d",
   "frozen_source_identity": {
-    "codex_lane_py_sha256": "72fd40bcecfe1bc2f286be954e8b6695107f7d5d03f3ac8ec2c6b4dd4d07dac8",
-    "test_codex_lane_sha256": "b01ae1e80e395a2dce4dd92381d8de6df12cfec3a053232485b2c8d73e52ba3f",
+    "codex_lane_py_sha256": "f4e6ec831a8fc45b8147cd479b1e0be43d73729102f9f172794ee63bc257ad2d",
+    "test_codex_lane_sha256": "f7a73a32d240ab779b5c69f94541608523c8dfaa7f3b05bfac30b3ce60d5c74d",
     "native_fixture": "tests/fixtures/codex-lane/bin/codex",
-    "native_fixture_sha256": "f9dbe5e6f4988c865780b1ff4ddbfca56c6df1e500ba578ac27cd631a1df793e",
-    "verification_status": "five-method literal boundary class passes; FULL validate and eight native shards run after commit and are recorded by exact final HEAD in coordination and the PR body"
+    "native_fixture_sha256": "0b4bb46e6ad2c264e354024b64ac4038f56b82dab2a52ea3ecc13afc4cc9a8dd",
+    "verification_status": "Current combined Claude/Astra correction source; exact-head qualification is separately retained after the single forward commit."
   },
   "historical_pre_bytes_frozen_source_identity": {
     "codex_lane_py_sha256": "e08169635a1a60f5765d7cc6bf71e170da6c52a6ee107690b779d212264efebd",
@@ -354,23 +354,64 @@
     "rebased_parent": "65cf2730068429a1c48c8c18fb24aadef8120817",
     "selection": "tests.test_codex_lane.LiteralBoundaryRegressionTests",
     "method": "Compile the exact reviewed runner source from Git in memory and apply the same two new test methods without altering its code; analyze payloads without executing them. Then run the entire five-method class with the corrected runner.",
-    "codex_lane_py_sha256": "72fd40bcecfe1bc2f286be954e8b6695107f7d5d03f3ac8ec2c6b4dd4d07dac8",
+    "codex_lane_py_sha256": "5dd2132df28c987784187ef863bcf9573208bbc1b734322be3b8d8c028d19f46",
     "test_codex_lane_sha256": "b01ae1e80e395a2dce4dd92381d8de6df12cfec3a053232485b2c8d73e52ba3f",
-    "before": {"tests": 2, "failed_subtests": 7, "errors": 0, "exit_code": 1, "log_sha256": "9b1626955ce4869c0b0e6d6ef24f669b4e48a0a966a704e8f3ce025e802e96c4"},
-    "after": {"tests": 5, "failures": 0, "errors": 0, "skips": 0, "exit_code": 0, "elapsed_seconds": 26.225, "log_sha256": "f241d4ba389509fcad5cd0eecd996d6106c6ffcd78199aa473445d098bc53089"},
-    "cases": ["io.FileIO bytes sibling path", "os.path.getsize bytes absolute path", "shutil.copyfile bytes source and str destination", "sqlite3.connect bytes absolute path", "shutil.copyfile str source and bytes destination", "bytearray wrapping outside bytes constant", "memoryview wrapping outside bytes constant"],
-    "positive_controls": ["print an outside-looking bytes value", "print a bytes separator join", "print decoded bytes", "print hex-formatted bytes", "compare bytes URI data"],
+    "before": {
+      "tests": 2,
+      "failed_subtests": 7,
+      "errors": 0,
+      "exit_code": 1,
+      "log_sha256": "9b1626955ce4869c0b0e6d6ef24f669b4e48a0a966a704e8f3ce025e802e96c4"
+    },
+    "after": {
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "exit_code": 0,
+      "elapsed_seconds": 26.225,
+      "log_sha256": "f241d4ba389509fcad5cd0eecd996d6106c6ffcd78199aa473445d098bc53089"
+    },
+    "cases": [
+      "io.FileIO bytes sibling path",
+      "os.path.getsize bytes absolute path",
+      "shutil.copyfile bytes source and str destination",
+      "sqlite3.connect bytes absolute path",
+      "shutil.copyfile str source and bytes destination",
+      "bytearray wrapping outside bytes constant",
+      "memoryview wrapping outside bytes constant"
+    ],
+    "positive_controls": [
+      "print an outside-looking bytes value",
+      "print a bytes separator join",
+      "print decoded bytes",
+      "print hex-formatted bytes",
+      "compare bytes URI data"
+    ],
     "correction": "Use os.fsdecode for exact str/bytes constants without changing AST types. Formatting reaches only verified data sinks. decode is followed only with no positional/keyword arguments and valid strict-UTF-8 literal bytes; arbitrary codec/error callbacks are not formatting.",
     "installed_python": "3.13.16",
     "python_pin": "cbc944f4bc59639a444dd971c737788ba2283a91",
-    "sources": ["Lib/os.py:840-866", "Doc/library/os.rst fsdecode", "Doc/library/sys.rst:781-795", "Modules/_io/fileio.c:302-305", "Objects/unicodeobject.c:4030-4038", "Modules/_sqlite/connection.c:247-268", "Lib/genericpath.py:84-86", "Modules/posixmodule.c:1303-1329", "Lib/shutil.py:260-262"],
+    "sources": [
+      "Lib/os.py:840-866",
+      "Doc/library/os.rst fsdecode",
+      "Doc/library/sys.rst:781-795",
+      "Modules/_io/fileio.c:302-305",
+      "Objects/unicodeobject.c:4030-4038",
+      "Modules/_sqlite/connection.c:247-268",
+      "Lib/genericpath.py:84-86",
+      "Modules/posixmodule.c:1303-1329",
+      "Lib/shutil.py:260-262"
+    ],
     "synthetic_native_api_probe": {
       "class": "local_integration",
       "log_sha256": "5fd653bd699611ae197237086f4e2b2bac6a023bf51250dada6016c601f1ceef",
       "result": "All four APIs accept bytes and str; copyfile accepts mixed src/dst types; direct bytearray and memoryview are rejected. Filesystem decoding round-trips an invalid UTF-8 filename byte to the same inode. Bytearray and memoryview have no independent literal syntax; their constructor forms contain the scanned bytes constant. Mixed bytes/str concatenation and joins are not coerced."
     },
     "primary_source_record_sha256": "40368bed8b679d5ddd3a09d38a13761b62ad78bf56337fa2f67ae6d000ca543b",
-    "intermediate_run": {"result": "fsdecode-only correction refused risky bytes but failed the benign bytes-join control; final formatting data-flow correction passes it", "log_sha256": "c81dadc1cb0e288827ad0b7429e4748d1811f57f2f0aebbc6a2aca11553a4eb3"},
+    "intermediate_run": {
+      "result": "fsdecode-only correction refused risky bytes but failed the benign bytes-join control; final formatting data-flow correction passes it",
+      "log_sha256": "c81dadc1cb0e288827ad0b7429e4748d1811f57f2f0aebbc6a2aca11553a4eb3"
+    },
     "protected_worker_baseline_sha256": "b8ff44c24b73981c63edcc0e956c9b8e59bf0b6f199d97ee1baa7e7b3389d9d6",
     "protected_worker_baseline_changed": false,
     "final_head_qualification": "Run after the single correction commit; exact HEAD, FULL validation and all eight native shard reports/aggregate are retained externally in runtime-workers-pr990-bytes-20261011 and the PR body. Historical required_tests above is scoped to its recorded older tree.",
@@ -390,7 +431,7 @@
     "authorization": "CC 2026-10-11T03:23Z, after #992 binding fix",
     "retirement_source": "main bd59f5561 / #957; preserve retired adoption macOS workflow and hardening test bytes, retain catalog parser provisioning and remove the obsolete macOS-only parser control",
     "runtime_and_codex_tests_unchanged_from_fd86ad20": true,
-    "baseline_candidate": "7a7ff0675c65f9cc555ca29d622ab3375defc8b4",
+    "baseline_candidate": "89f0915634275f9d308223f3592ab4e8b37aea46",
     "baseline_path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261011-pr990-landing.json",
     "baseline_sha256": "6ce1f97ef323f2a34769380aabbd523cccb41ae26dccb40b61abf830178a4a73",
     "baseline_sites": 432,
@@ -405,7 +446,7 @@
   },
   "callback_correction_regressions": {
     "class": "synthetic",
-    "reviewed_revision": "7071510b79a457afd1567142b344919ff27e9631",
+    "reviewed_revision": "89f0915634275f9d308223f3592ab4e8b37aea46",
     "before": {
       "tests": 2,
       "failures": 6,
@@ -442,8 +483,8 @@
     "class": "local_integration",
     "authorization": "CC 2026-10-11T07:02Z: ONE push includes rebase plus both families fixes; push waits for Astra full1c",
     "main_at_start": "9b3a39c43363f32ac61e74c674e4ba069593fe08",
-    "previous_published_head": "7071510b79a457afd1567142b344919ff27e9631",
-    "rebased_series_head": "7a7ff0675c65f9cc555ca29d622ab3375defc8b4",
+    "reviewed_equivalent_of_previous_head": "89f0915634275f9d308223f3592ab4e8b37aea46",
+    "rebased_series_head": "89f0915634275f9d308223f3592ab4e8b37aea46",
     "registry_derivation": "adjudicate.adjudication_provenance() and codex_lane.lane_provenance(codex_lane.DEFAULT_PROMPT); retain target registry, derive each replayed tuple, then remove only the three CC-specified unused intermediates and append current tuples",
     "evidence_registration": "scripts.host_receipts.register_file for every owned changed path; FULLvalidate before each replay commit",
     "baseline_metadata": "Reachable rebased-series ancestor replaces previous off-branch candidate; counters/shapes remain unchanged. Original pre-rebase validation results retain their historical scope."
@@ -469,7 +510,7 @@
   },
   "completion_read_corrections_20261011": {
     "class": "synthetic",
-    "reviewed_revision": "7071510b79a457afd1567142b344919ff27e9631",
+    "reviewed_revision": "89f0915634275f9d308223f3592ab4e8b37aea46",
     "completion_verdict_sha256": "e73e528e05519f408facaf83fd59b6bc0ddd64d07f43e2dcde06c111ebd737dc",
     "fixes": [
       "model io.FileIO and refuse unverified potentially effectful imported calls",
@@ -569,7 +610,7 @@
       },
       {
         "repository": "seathatflowsinourveins/native-agent-stack",
-        "commit": "7071510b79a457afd1567142b344919ff27e9631",
+        "commit": "89f0915634275f9d308223f3592ab4e8b37aea46",
         "paths": [
           "tools/sota-convergence/codex_lane.py:2787-2842"
         ]
@@ -670,5 +711,159 @@
     "Unsupported wrapper grammar is refused even for a benign utility; supported env/nice/timeout forms retain position decoding.",
     "Fixture replay does not rerun any quarantined model verdict or prove the family judgments correct.",
     "Supervisor helper regressions verify a callable API only. The retained supervisor is outside this diff; integration is UNCALLED until that caller wires the helpers."
-  ]
+  ],
+  "micro_citation_correction_20261011": {
+    "reachable_reviewed_equivalent": "89f0915634275f9d308223f3592ab4e8b37aea46",
+    "source_equivalence": "The reviewed pre-fix source is byte-identical at the reachable rebased equivalent. Historical RED/GREEN captures retain their original byte hashes and source scope.",
+    "metadata_correction": "Discarded rebase metadata is replaced with this reachable ancestor; the advisory payload is derived independently from the actual working/final tree.",
+    "publication_state": "Combined corrections prepared for one leased forward commit; exact-head receipts follow separately."
+  },
+  "micro_correction_preparation_20261011_cc1027": {
+    "class": "synthetic_local_integration",
+    "reviewed_reachable_head": "150798d3b2c78f6768f7d189e52b095f50990408",
+    "working_source_identity": {
+      "codex_lane_py_sha256": "f4e6ec831a8fc45b8147cd479b1e0be43d73729102f9f172794ee63bc257ad2d",
+      "test_codex_lane_sha256": "f7a73a32d240ab779b5c69f94541608523c8dfaa7f3b05bfac30b3ce60d5c74d",
+      "native_fixture": "tests/fixtures/codex-lane/bin/codex",
+      "native_fixture_sha256": "0b4bb46e6ad2c264e354024b64ac4038f56b82dab2a52ea3ecc13afc4cc9a8dd",
+      "verification_status": "Current combined Claude/Astra correction source; exact-head qualification is separately retained after the single forward commit."
+    },
+    "receiver_red": {
+      "file": "exact150-receiver-red.log",
+      "sha256": "56b8a5b8621146f74ea2115482bec7c628add5445ce1f8ed51404eb58ae384a8",
+      "tests": 2,
+      "failures": 12,
+      "errors": 0,
+      "mechanism": "Six real neutral outside-marker reads audit clean and promote on the reviewed source; two regression methods refuse that behavior."
+    },
+    "focused_green": {
+      "file": "focused-current-green.log",
+      "sha256": "87618cf27445e783522dffc71ab838a6f9d767810c32aa73513877bdf55d8d20",
+      "tests": 12,
+      "failures": 0,
+      "errors": 0
+    },
+    "sort_red": {
+      "file": "exact150-sort-red.log",
+      "sha256": "c3a86b7f34ace49a520e0961bca8c045973da63fb031824f137a7871a3ef0027"
+    },
+    "callback_mutants": {
+      "file": "callback-mutants-current.log",
+      "sha256": "61624c2d7a4a65a9e86ac77698711cd7fccdee506e391c13870ef1b84a03d073"
+    },
+    "native_baseline": {
+      "base_commit": "89f0915634275f9d308223f3592ab4e8b37aea46",
+      "bytes": 29769,
+      "codex_sites": 153,
+      "count": 446,
+      "head": "HEAD",
+      "native_api": "derive_ci_protected(WorkingTree) -> advisory_gate_reads([derived])",
+      "selected_snapshot_exact": true,
+      "sha256": "f253799fbe57ccf173ed333d2769ca0a7881fbfd44b7a204cab446b93fe4389c",
+      "shape_locations": 102,
+      "source_sha256": "f4e6ec831a8fc45b8147cd479b1e0be43d73729102f9f172794ee63bc257ad2d",
+      "unresolved": 0
+    },
+    "site_proof": {
+      "file": "astra-site-proof.json",
+      "sha256": "bcf404bf402cd0e0592a88792d5909d59eb5b8ba175c382065a6cb7b5ff32ca2"
+    },
+    "primary_sources": [
+      {
+        "repository": "python/cpython",
+        "pin": "cbc944f4bc59639a444dd971c737788ba2283a91",
+        "path": "Objects/object.c",
+        "lines": "1248-1268"
+      },
+      {
+        "repository": "python/cpython",
+        "pin": "cbc944f4bc59639a444dd971c737788ba2283a91",
+        "path": "Lib/json/encoder.py",
+        "lines": "354-375"
+      }
+    ],
+    "retired_unused_source_rows": [
+      "72fd40bcecfe1bc2f286be954e8b6695107f7d5d03f3ac8ec2c6b4dd4d07dac8",
+      "8d17b6794155a08ea9798d936e98919bfc8a49a61b046bdfd86f977e81dfe9ef"
+    ],
+    "eligibility_scope": "Both hashes appear only in synthetic source/evidence identity and registry/manifest records; no retained production run uses them. They precede the reproduced receiver fix.",
+    "limitations": "Earlier receiver/sort/codec captures retain their original source scope. The combined corrections use conservative refusal for unknown historical receivers; original commands remain, with independent supported primitive controls. Native/provider execution and syscall/race attestation are not claimed. Seven historical capture gaps remain explicit. Baseline digest submitted for CC re-ACK; exact-head qualification is separately retained."
+  },
+  "astra_micro_corrections_20261011": {
+    "reviewed_head": "150798d3b2c78f6768f7d189e52b095f50990408",
+    "review_verdict_sha256": "7898804f13aa8323c97e5960e494c587bd7f9243e691a2a221e479ab36606de6",
+    "source_identity": {
+      "codex_lane_py_sha256": "f4e6ec831a8fc45b8147cd479b1e0be43d73729102f9f172794ee63bc257ad2d",
+      "test_codex_lane_sha256": "f7a73a32d240ab779b5c69f94541608523c8dfaa7f3b05bfac30b3ce60d5c74d",
+      "native_fixture": "tests/fixtures/codex-lane/bin/codex",
+      "native_fixture_sha256": "0b4bb46e6ad2c264e354024b64ac4038f56b82dab2a52ea3ecc13afc4cc9a8dd",
+      "verification_status": "Current combined Claude/Astra correction source; exact-head qualification is separately retained after the single forward commit."
+    },
+    "callback_contract": "Effectful callable values passed to callback-bearing interfaces or unverified consumers are refused; supported builtin transforms require primitive input trees.",
+    "import_contract": "Only exact modeled standard-library namespaces are admitted; relative/repository/third-party initialization and repository shadows of standard-library names/dependencies are refused.",
+    "precision_scope": "Four historical command cases remain byte-for-byte, with explicit conservative unresolved-callable refusal and separate supported literal join/backtick/dict/text controls. Broader schema/interprocedural modeling is not claimed.",
+    "fail_before": {
+      "exact_reviewed_runner_tests": 6,
+      "failures": 36,
+      "errors": 0,
+      "adjacent_shadow_tests": 2,
+      "adjacent_shadow_failures": 2,
+      "precision_tests": 4,
+      "precision_failures": 4
+    },
+    "native_baseline": {
+      "base_commit": "89f0915634275f9d308223f3592ab4e8b37aea46",
+      "bytes": 29769,
+      "codex_sites": 153,
+      "count": 446,
+      "head": "HEAD",
+      "native_api": "derive_ci_protected(WorkingTree) -> advisory_gate_reads([derived])",
+      "selected_snapshot_exact": true,
+      "sha256": "f253799fbe57ccf173ed333d2769ca0a7881fbfd44b7a204cab446b93fe4389c",
+      "shape_locations": 102,
+      "source_sha256": "f4e6ec831a8fc45b8147cd479b1e0be43d73729102f9f172794ee63bc257ad2d",
+      "unresolved": 0
+    },
+    "primary_sources": [
+      {
+        "repository": "python/cpython",
+        "pin": "cbc944f4bc59639a444dd971c737788ba2283a91",
+        "path": "Python/bltinmodule.c",
+        "lines": "1391-1445"
+      },
+      {
+        "repository": "python/cpython",
+        "pin": "cbc944f4bc59639a444dd971c737788ba2283a91",
+        "path": "Doc/reference/import.rst",
+        "lines": "428-441;720-784"
+      }
+    ],
+    "captures": {
+      "exact150-astra-red.log": {
+        "sha256": "401fdf3730d0f2728d49a9c55b16be869a0a2e00786e9f117c940e8f26836d32"
+      },
+      "shadow-red.log": {
+        "sha256": "904a7cc604ef2e697d2f383129806f733517ac466e428f03ecc6d2301ae6fc4b"
+      },
+      "shadow-green.log": {
+        "sha256": "6c16cfe9a8d278692c2da81b149a1e1a0ee63506414bacfaeae631449887f510"
+      },
+      "exact150-precision-red.log": {
+        "sha256": "4ed144a20c8652b37500f923f3fdbeed9ff91e08564cc075f6f837cf9699dfd6"
+      },
+      "astra-callback-mutants.log": {
+        "sha256": "91d76f28261b0d0aa77af010e8ef80697ece1aa706483b259ffc575a9fb8da25"
+      },
+      "astra-consumer-modules.log": {
+        "sha256": "f16220ae7557ba232454c706782aca6d859f24ec259cb7d7555938d83c9b8d60"
+      },
+      "astra-policy-modules.log": {
+        "sha256": "ed4a8b2f8f4a33ccd0fb9cd96998356e004a3715d1e5cfd40c3b6b4f65bbd28f"
+      },
+      "astra-full-module-green.log": {
+        "sha256": "5063905c24da03534608f8350dc8f2a12a8f0653314a047cb644f1ff7b932b01"
+      }
+    },
+    "qualification_boundary": "Real neutral-marker reads and simulated native-journal verdict promotion are separate checks. Initial full-module precision diagnostic and pre-registration policy failures remain retained; only subsequent passing captures qualify the corrected state. No provider/model run or broader arbitrary-Python execution attestation."
+  }
 }

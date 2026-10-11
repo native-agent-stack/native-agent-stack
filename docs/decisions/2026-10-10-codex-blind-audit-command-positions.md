@@ -280,17 +280,18 @@ retains catalog-freshness parser provisioning and removes the obsolete macOS-onl
 and mutation control. The runtime source and Codex test bytes remain identical to `fd86ad20`.
 Evidence manifests were taken from pinned main and regenerated through native registration.
 
-The native advisory API for the source retained at `7a7ff0675c65f9cc555ca29d622ab3375defc8b4` measures
+The native advisory API for the reviewed-equivalent source retained at `89f0915634275f9d308223f3592ab4e8b37aea46` measures
 432 unclassified sites, 139 Codex sites, 102 shape locations and zero unresolved. The only normalized
 delta from the prior ACKed 424/139/101 snapshot is `scripts/component_matrix.py`: sites 6 to 14 and
 shapes 1 to 2, matching main's [#982 shared closeout loader](https://github.com/seathatflowsinourveins/native-agent-stack/commit/878f2891a).
 The CC independently compared and ACKed these exact candidate bytes at 04:01Z. The snapshot is
 retained as `unclassified-gate-reads-20261011-pr990-landing.json`, SHA256
-`2bdc389b35857c74a680f14a8aea676213acc93d83e7971eace218e3d909b2a6` in the published `7071510b`
+`2bdc389b35857c74a680f14a8aea676213acc93d83e7971eace218e3d909b2a6` in the reachable `89f09156`
 tree. The 06:24Z citation correction changes only its source metadata to the published head;
 the current digest is in the evidence record and the existing native baseline test still selects it.
-The later authorized rebase onto main `9b3a39c4` binds this metadata to reachable PR ancestor
-`7a7ff0675c65f9cc555ca29d622ab3375defc8b4`; the counter/shapes payload remains unchanged.
+The discarded intermediate rebase ancestor was not reachable from the published branch.
+The 10:27Z micro correction binds metadata to reachable reviewed-equivalent PR ancestor
+`89f0915634275f9d308223f3592ab4e8b37aea46`; the metadata correction changes no classification.
 The previous b8ff snapshot remains byte-exact historical evidence; worker
 enforcement classifications are unchanged.
 
@@ -302,7 +303,7 @@ scoped to their original trees. No live provider/model call or additional rebase
 
 The 06:24Z review found that treating arbitrary bytes `decode` calls as builtin formatting was
 incorrect. Three synthetic codec/error callbacks actually read a temporary sibling packet; reflected
-string/bytes equality and containment callbacks do the same. The two new tests fail at `7071510b`
+string/bytes equality and containment callbacks do the same. The two new tests fail against the unchanged source retained at `89f09156`
 with six assertion failures and zero errors after verifying each real fixture read. The callbacks live
 in a synthetic imported helper so the test exercises the literal transfer across the interface, rather
 than an independently detectable open call in the command's source.
@@ -352,7 +353,7 @@ has 12 tests and 19 assertion failures with zero errors before the fixes, spanni
 and runner-promotion checks. The same 12 tests pass after the first integration. Supplemental controls
 then exercise supported/unsupported URL forms, sed source constructs and clean promotion cleanup.
 Real dummy reads and simulated native-journal promotion are reported separately.
-The final extended 16-test suite also runs against verbatim `7071510b` source compiled in memory:
+The final extended 16-test suite also runs against the old source compiled in memory, byte-identical to reachable `89f09156`:
 23 assertion failures, zero errors. Both review families' callback reproductions use only the neutral
 `outside-marker.txt` / `OUTSIDE_MARKER` fixture; the two Claude tests separately fail six assertions
 on that exact source and the corrected eight-test literal/separator bundle passes.
@@ -403,7 +404,7 @@ No external provider or live survivor adjudication is part of these measurements
 - [CPython pathlib resolve implementation at the same pin:664-672](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Lib/pathlib/_local.py#L664-L672)
   resolves filesystem targets; [os.path.realpath:388-412](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Lib/posixpath.py#L388-L412)
   supplies the POSIX link semantics. These checks are post-run policy, not prevention of a race or syscall attestation.
-- [Existing failure snapshot at published `7071510b`, codex_lane.py:2787-2842](https://github.com/seathatflowsinourveins/native-agent-stack/blob/7071510b79a457afd1567142b344919ff27e9631/tools/sota-convergence/codex_lane.py#L2787-L2842)
+- [Existing failure snapshot at reachable `89f09156`, codex_lane.py:2787-2842](https://github.com/seathatflowsinourveins/native-agent-stack/blob/89f0915634275f9d308223f3592ab4e8b37aea46/tools/sota-convergence/codex_lane.py#L2787-L2842)
   uses the atomic native snapshot writer. Extend it to pending/in-flight state;
   [record_verdicts at landed `9b3a39c4`, missing_outcome](https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b3a39c43363f32ac61e74c674e4ba069593fe08/tools/sota-convergence/record_verdicts.py#L1059-L1065)
   classifies absent returns through the recorded reason.
@@ -421,7 +422,7 @@ pending layers retained old outputs when STOP preceded process(). A neutral two-
 assertions before correction. All pending stale outputs are now invalidated immediately after the durable
 unfinished snapshot, before launching or checking STOP; all five incremental-failure controls pass.
 Pinned source for this transition is the earlier pending/stale-return lifecycle at
-[7071510b codex_lane.py:2822-2863](https://github.com/seathatflowsinourveins/native-agent-stack/blob/7071510b79a457afd1567142b344919ff27e9631/tools/sota-convergence/codex_lane.py#L2822-L2863).
+[89f09156 codex_lane.py:2822-2863](https://github.com/seathatflowsinourveins/native-agent-stack/blob/89f0915634275f9d308223f3592ab4e8b37aea46/tools/sota-convergence/codex_lane.py#L2822-L2863).
 
 Unmodified cited sources/captures and the call-site/transition ledger are retained in the hashed read
 attachment directory named in FIX-PUSHED. A missing historical capture remains an explicit verification
@@ -438,14 +439,62 @@ invoke object hooks; [encoder.py:159-161](https://github.com/python/cpython/blob
 sets the default and [440-443](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Lib/json/encoder.py#L440-L443)
 invokes it. Full pinned blobs are retained with the attachment manifest.
 
-### Final baseline ACK and landing
+### Historical baseline ACK and forward corrections
 
-The final landing uses main `1d1164e8c34df8250973a5c632e9747a1ef79533`; the rebased equivalent of
+The previous rebase started from main `1d1164e8c34df8250973a5c632e9747a1ef79533`; the rebased equivalent of
 the reviewed head is `89f0915634275f9d308223f3592ab4e8b37aea46`. The CC accepted the exact final
 monitoring-only snapshot on 2026-10-11T09:24Z: 436 sites / 143 Codex sites / 102 shapes / zero unresolved,
 29,287 bytes, SHA256 `fc481c58f7300e5e3dcc4fe698669b0d6042b07777ab32304bc27f0587e1fe21`.
-It supersedes the uncopied 434 candidate. Native derivation at the final source regenerates these bytes;
-metadata retains the accepted source ancestor `7a7ff067`, and no classification policy changes.
-All 139 previous Codex sites map to unchanged source lines; only namespace extraction at 882-883 and
-JSON callback guards at 1642/1644 are added. All other per-file counts and shapes stay equal.
-The seven historical missing captures remain explicit gaps in the attachment ledger.
+It superseded the uncopied 434 candidate. Native derivation at that reviewed source regenerated those bytes;
+metadata was subsequently corrected to reachable reviewed-equivalent ancestor `89f09156`, and no classification policy changes.
+
+The CC's 10:27Z micro found that an unresolvable imported receiver lost its module label and acquired
+a bare attribute name. The local correction returns an unresolved alias unless a receiver has an
+explicit modeled data contract. Direct calls, bound aliases and `getattr` share the same resolver;
+list, tuple, dict and conditional module containers plus the alias/reflection paths are covered by
+real neutral-marker reads followed by complete runner quarantine checks. The six forms fail against
+the exact source retained at `150798d3` and pass the locally corrected audit and failure-consumer checks.
+The mechanism is [CPython cbc944f4 Objects/object.c:1248-1268](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Objects/object.c#L1248-L1268),
+where attribute dispatch uses the actual receiver's type.
+
+Import-free decode and str/bytes comparison assertions now pin their individual callback rules.
+JSON sorting additionally requires a proven primitive tree when sorting may be enabled: a custom
+key can receive a path literal before `skipkeys` acts, including in a nested dict. The encoder's
+[sorted items before key filtering, cbc944f4 Lib/json/encoder.py:354-375](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Lib/json/encoder.py#L354-L375)
+is the pinned mechanism. The custom-key regression fails before this correction; primitive and
+nested primitive-key controls pass. Exact AST dict projection is bounded and evaluates no user code.
+
+The completed Astra micro additionally reproduced two execution forms: a reader supplied to a
+callback interface, and module initialization during an import with no explicit reader call.
+The conservative correction admits only the exact modeled standard-library import namespaces;
+relative, repository and third-party initialization remains unverified. A repository module with
+a standard-library name also defeats that contract, including a shadow of an initialization
+dependency, so those import origins are refused. The pinned mechanisms are
+[CPython cbc944f4 import.rst:428-441](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Doc/reference/import.rst#L428-L441)
+and [path lookup:720-784](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Doc/reference/import.rst#L720-L784).
+
+Callable values passed to `map`, `filter`, `sorted`/`min`/`max` keys or an unverified consumer require
+a supported callback contract. The supported builtin transforms require primitive input trees;
+reader, imported, local and unresolved callback escapes are refused. This follows
+[bltinmodule.c:1391-1445](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Python/bltinmodule.c#L1391-L1445),
+where `map` stores and later invokes the supplied callable. Alias and `getattr` forms, imported
+map/filter/key/reduce helpers and the import-only/from-import forms execute neutral scratch reads
+in regressions. Audit and complete simulated runner quarantine/failure-consumer assertions are
+separate from those actual reads; no model/provider run is inferred.
+
+The receiver correction conservatively refuses four historical command subcases whose JSON,
+function-parameter or loop receivers have no supported immutable primitive proof. Their original
+command bytes remain in the tests with explicit unresolved-callable assertions. Independent literal
+join/backtick/dictionary/text controls continue to test the inert behaviors. This narrows the previous
+whole-command clean claims; it does not add an exemption for an unknown method or claim general
+schema/interprocedural type inference. Existing positive stream, path-text, hash and approved-packet
+controls remain part of the full module.
+
+The regenerated monitoring-only snapshot uses reachable ancestor `89f09156`: 446 sites, 153 Codex
+sites, 102 shapes, zero unresolved, 29,769 bytes, SHA256
+`f253799fbe57ccf173ed333d2769ca0a7881fbfd44b7a204cab446b93fe4389c`.
+All 143 sites from the reviewed `150798d3` snapshot map to unchanged retained source; the ten
+additions are import/callback/JSON-sort guards. Other files' site inventories are exact. This digest
+has been submitted for the CC's re-ACK. Historical accepted snapshots and captures retain their
+original scope; the seven historical missing captures remain explicit gaps. The evidence record and
+sealed supplemental captures report qualification against the actual source and final head.

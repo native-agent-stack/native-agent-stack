@@ -881,6 +881,33 @@ def python_audit(source: str, allowed_roots, tools, depth=0, *, cwd=None) -> lis
                      "os.path.basename", "os.path.normpath", "os.fsdecode", "os.fsencode", "hashlib.sha256"}
     imported = {alias.name.split('.')[0] for node in nodes if isinstance(node, ast.Import) for alias in node.names}
     imported.update(node.module.split('.')[0] for node in nodes if isinstance(node, ast.ImportFrom) and node.module)
+    # CPython cbc944f4 Doc/reference/import.rst:428-441: importing executes
+    # module initialization, even when the audited source never calls a reader.
+    # Only the exact standard-library namespaces with contracts below are admitted.
+    verified_imports = {"builtins", "io", "os", "os.path", "pathlib", "glob", "urllib.request",
+                        "json", "re", "hashlib", "subprocess"}
+    import_shadow = True
+    try:
+        import_root = Path(cwd or allowed_roots[0])
+        import_shadow = any(entry.name.split('.')[0] in sys.stdlib_module_names
+                            for entry in import_root.iterdir())
+    except FileNotFoundError:
+        # A nonexistent synthetic root cannot supply a shadow.
+        import_shadow = False
+    except (OSError, IndexError, TypeError):
+        pass  # An unreadable or unknown real root cannot verify import origin.
+    for node in nodes:
+        if isinstance(node, ast.Import):
+            modules = [alias.name for alias in node.names]
+        elif isinstance(node, ast.ImportFrom):
+            modules = [node.module] if not node.level else [None]
+        else:
+            continue
+        for module in modules:
+            if module not in verified_imports:
+                reasons.append("unverified Python import initialization: " + (module or "relative import"))
+            elif import_shadow:
+                reasons.append("unverified Python import origin: repository shadows standard library")
 
     # Bindings are lexical and conservative across branches: every possible assignment must resolve.
     scopes, parent_scope, bindings, namespace_writes = {}, {id(tree): None}, {}, []
@@ -1003,7 +1030,9 @@ def python_audit(source: str, allowed_roots, tools, depth=0, *, cwd=None) -> lis
         return {label for kind, label, _ in values if kind == "named"} if values is not None else set()
 
     def attributes(receiver, attribute, level):
-        prefixes = labels(receiver, level)
+        resolved = callables(receiver, level)
+        prefixes = ({label for _, label, _ in resolved} if resolved is not None
+                    and all(kind == "named" for kind, _, _ in resolved) else set())
         named = {prefix + '.' + attribute for prefix in prefixes}
         if named & known or named & {"os.environ", "os.getcwd"}:
             return {("named", value, None) for value in named}
@@ -1013,7 +1042,44 @@ def python_audit(source: str, allowed_roots, tools, depth=0, *, cwd=None) -> lis
             return {("path", attribute, receiver)}
         if attribute != "get" and attribute in {value.rsplit('.', 1)[-1] for value in known}:
             return None
-        return {("named", value, None) for value in named} if named else {("named", attribute, None)}
+        if not named:
+            # CPython cbc944f4 Objects/object.c:1250-1268 dispatches attributes
+            # through the receiver's type; losing its label cannot certify a call.
+            # Retain only modeled methods on a proven primitive data receiver.
+            methods = {"join", "strip", "lstrip", "rstrip", "replace", "split", "rsplit", "partition", "rpartition",
+                       "lower", "upper", "casefold", "startswith", "endswith", "decode", "hex", "splitlines"}
+            projected = data_value(receiver, level=level)
+            primitive = (isinstance(receiver, ast.Constant) and type(receiver.value) is bytes or
+                         projected is not None and type(projected[0]) in (str, bytes) and data_safe(projected[1])
+                         or primitive_data(receiver))
+            if attribute in methods and primitive:
+                return {("named", attribute, None)}
+            if (attribute in {"get", "keys", "values", "items"} and projected is not None
+                    and type(projected[0]) is dict and data_safe(projected[1])):
+                return {("data", attribute, receiver)}
+            # Reads on an exact modeled IO constructor retain its read contract;
+            # the constructor's operand is independently confined at its call.
+            if attribute in {"read", "readline", "readlines"} and modeled_stream(receiver, level):
+                return {("data", attribute, receiver)}
+            if (attribute == "hexdigest" and isinstance(receiver, ast.Call)
+                    and labels(receiver.func, level) == {"hashlib.sha256"}):
+                return {("data", attribute, receiver)}
+            if (attribute in methods - {"decode"} and isinstance(receiver, ast.Call)
+                    and isinstance(receiver.func, ast.Attribute) and receiver.func.attr == "read_text"
+                    and path_receiver(receiver.func.value, level)):
+                return {("data", attribute, receiver)}
+            return None
+        return {("named", value, None) for value in named}
+
+    def modeled_stream(receiver, level):
+        if level > 64:
+            return False
+        if isinstance(receiver, ast.Name):
+            values = lookup(receiver)
+            return bool(values) and all(isinstance(value, ast.AST) and modeled_stream(value, level + 1) for value in values)
+        return (isinstance(receiver, ast.Call) and not any(keyword.arg in {None, "opener"} for keyword in receiver.keywords)
+                and bool(labels(receiver.func, level)) and labels(receiver.func, level) <= {
+                    "open", "builtins.open", "io.open", "io.FileIO", "urllib.request.urlopen"})
 
     def path_receiver(node, level):
         key = id(node)
@@ -1134,6 +1200,15 @@ def python_audit(source: str, allowed_roots, tools, depth=0, *, cwd=None) -> lis
                 return None
             container = tuple if isinstance(node, ast.Tuple) else set if isinstance(node, ast.Set) else list
             return container(value[0] for value in values), frozenset().union(*(value[1] for value in values))
+        if isinstance(node, ast.Dict):
+            if len(node.keys) > 4096 or any(key is None for key in node.keys):
+                return None
+            keys = [data_value(key, environment, level) for key in node.keys]
+            values = [data_value(value, environment, level) for value in node.values]
+            if any(value is None for value in [*keys, *values]):
+                return None
+            return dict(zip((key[0] for key in keys), (value[0] for value in values))), frozenset().union(
+                *(value[1] for value in [*keys, *values]))
         if isinstance(node, (ast.ListComp, ast.SetComp)):
             if len(node.generators) > 64:
                 return limited()
@@ -1479,14 +1554,6 @@ def python_audit(source: str, allowed_roots, tools, depth=0, *, cwd=None) -> lis
 
     # A fixed list of readers cannot certify every library call. A risky literal
     # needs a positive data-use proof; names such as connect/getline are not IO guesses.
-    reflective_data = any(
-        isinstance(item, ast.Call) and any(name.rsplit('.', 1)[-1] in
-            {"setattr", "delattr", "vars", "globals", "locals"} for name in labels(item.func))
-        or isinstance(item, ast.Attribute) and item.attr in
-            {"__dict__", "__setattr__", "__delattr__", "__getattribute__"}
-        for item in nodes
-    )
-
     def primitive_data(expression, level=0):
         if level > 64:
             return False
@@ -1509,6 +1576,14 @@ def python_audit(source: str, allowed_roots, tools, depth=0, *, cwd=None) -> lis
                     return False
             return True
         return False
+
+    reflective_data = any(
+        isinstance(item, ast.Call) and any(name.rsplit('.', 1)[-1] in
+            {"setattr", "delattr", "vars", "globals", "locals"} for name in labels(item.func))
+        or isinstance(item, ast.Attribute) and item.attr in
+            {"__dict__", "__setattr__", "__delattr__", "__getattribute__"}
+        for item in nodes
+    )
 
     def literal_is_data(literal):
         # CPython v3.13.16 compound_stmts.rst: a definition does not execute its
@@ -1612,6 +1687,8 @@ def python_audit(source: str, allowed_roots, tools, depth=0, *, cwd=None) -> lis
             if not reflective_data and names == {"json.dumps"} and all(keyword.arg in {
                     "indent", "sort_keys", "ensure_ascii", "separators", "allow_nan", "skipkeys", "check_circular"
                     } for keyword in parent.keywords):
+                if not json_sort_safe(parent):
+                    return False
                 current = parent
                 continue
             if isinstance(parent.func, ast.Attribute) and parent.func.attr in {
@@ -1623,6 +1700,52 @@ def python_audit(source: str, allowed_roots, tools, depth=0, *, cwd=None) -> lis
                     continue
             return False
         return False
+
+    def json_sort_safe(call):
+        # CPython cbc944f4 Lib/json/encoder.py:354-375 sorts before skipkeys.
+        # An unknown flag may enable comparisons. Proving the entire primitive
+        # tree also covers keys of nested dicts and excludes subclass overrides.
+        sorting = next((keyword.value for keyword in call.keywords if keyword.arg == "sort_keys"), None)
+        return (sorting is None or isinstance(sorting, ast.Constant) and sorting.value is False
+                or primitive_data(argument(call, 0, {"obj"})))
+
+    def callback_safe(callback, operands):
+        # The admitted builtins only consume exact primitive input trees here.
+        # Unknown iterables or callback aliases cannot establish this contract.
+        return (labels(callback) in ({"str"}, {"bytes"}, {"int"}, {"float"}, {"bool"}, {"len"}, {"abs"})
+                and bool(operands) and all(primitive_data(value) for value in operands))
+
+    def callable_escape(value):
+        resolved = callables(value)
+        if resolved and any(kind == "local" or kind == "path" or name in known
+                            or name.split('.')[0] in imported for kind, name, _ in resolved):
+            return True
+        if isinstance(value, (ast.List, ast.Tuple, ast.Set)):
+            return any(callable_escape(element) for element in value.elts)
+        if isinstance(value, ast.Dict):
+            return any(callable_escape(element) for element in [*value.keys, *value.values] if element is not None)
+        if isinstance(value, ast.Starred):
+            return callable_escape(value.value)
+        return isinstance(value, ast.Lambda)
+
+    def check_callbacks(node, resolved):
+        # CPython cbc944f4 Python/bltinmodule.c:1391-1392,1415-1445 stores
+        # and invokes map's callback. Treat passing a callable as execution.
+        names = {name for kind, name, _ in resolved if kind == "named"}
+        if names & {"map", "filter"}:
+            callback = argument(node, 0, set())
+            if not callback_safe(callback, node.args[1:]) or node.keywords:
+                reasons.append("unverified Python callback execution")
+            return
+        if names & {"sorted", "min", "max"}:
+            for keyword in node.keywords:
+                if keyword.arg is None or (keyword.arg == "key"
+                        and not (isinstance(keyword.value, ast.Constant) and keyword.value.value is None)
+                        and not callback_safe(keyword.value, node.args)):
+                    reasons.append("unverified Python key callback execution")
+            # Callable values in the iterable must not escape through an unknown consumer.
+        if any(callable_escape(value) for value in [*node.args, *(keyword.value for keyword in node.keywords)]):
+            reasons.append("unverified Python callable escape")
 
     for expression in namespace_writes:
         if expression is not None and not isinstance(expression, (ast.Constant, ast.List, ast.Tuple, ast.Dict, ast.Set)) and strings(expression) is None:
@@ -1638,11 +1761,14 @@ def python_audit(source: str, allowed_roots, tools, depth=0, *, cwd=None) -> lis
         if resolved is None:
             reasons.append("unresolved Python callable alias")
             continue
+        check_callbacks(node, resolved)
         for kind, called, receiver in resolved:
             if called == "json.loads" and any(keyword.arg not in {"s"} for keyword in node.keywords):
                 reasons.append("unverified Python JSON decoder callback or override")
             if called == "json.dumps" and any(keyword.arg in {None, "default", "cls"} for keyword in node.keywords):
                 reasons.append("unverified Python JSON encoder callback or override")
+            if called == "json.dumps" and not json_sort_safe(node):
+                reasons.append("unverified Python JSON key comparison callback")
             if kind == "path":
                 read_operand(receiver)
                 if called == "samefile":
