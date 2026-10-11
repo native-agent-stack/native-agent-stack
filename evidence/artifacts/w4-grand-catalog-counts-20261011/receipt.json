@@ -1,0 +1,145 @@
+{
+  "schema_version": 1,
+  "kind": "w4-grand-catalog-counts-export",
+  "observed_at": "2026-10-11T04:43:25Z",
+  "evidence_class": "local_integration",
+  "base": "8bffa2c41692ef483e91b68e3b15aeb331423d2c",
+  "source": {
+    "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+    "pin": "8bffa2c41692ef483e91b68e3b15aeb331423d2c",
+    "reader": "tools/local-pages/architecture_sources.py:24-27,94-106,261-319",
+    "policy": "tools/local-pages/source_policy.py:ArchitectureReads.open,excluded_supplement",
+    "identity": "scripts/host_receipts.py:normalize_repository",
+    "asset_binding": "evidence/artifacts/g5-start-closure-1-20261009/class-gates.json#/asset",
+    "asset_sha256": "1359fb196f46d0983c0d180fa982ceb1e4decaa58fc0aee96e19ffefaca0a1eb",
+    "asset_bytes": 28981260,
+    "rows_member": "compact/rows.json",
+    "rows_sha256": "e7abe385adc1e1456ee3658299bf67705f2079c773b45653358d70a87ca54a10"
+  },
+  "snapshot": {
+    "path": "catalogs/landscape/grand-catalog-counts.json",
+    "sha256": "e2489ca29c1377a688e4167846031f282f412489187f39cff18cae3dc3e294fe",
+    "bytes": 214642,
+    "rows": 4606,
+    "by_disposition": {
+      "NO-GAP": 48,
+      "OUT-OF-SCOPE": 10,
+      "PENDING": 4058,
+      "REJECT": 6,
+      "TRIAL": 83,
+      "WATCH": 401
+    },
+    "layers": 45,
+    "repositories": 2974,
+    "rows_without_repository": 34,
+    "disposition_total": 4606,
+    "layer_total": 4606,
+    "timestamps_in_snapshot": false,
+    "repository_identity": "github.com/owner/repository",
+    "multiple_dispositions": "all observed values retained; no last-row winner"
+  },
+  "actual_host_commands": [
+    {
+      "command": "python3 scripts/grand_catalog_counts.py --write",
+      "exit_code": 0,
+      "elapsed_seconds": 4.143,
+      "output_sha256": "e2489ca29c1377a688e4167846031f282f412489187f39cff18cae3dc3e294fe",
+      "stdout": "{\"by_disposition\": {\"NO-GAP\": 48, \"OUT-OF-SCOPE\": 10, \"PENDING\": 4058, \"REJECT\": 6, \"TRIAL\": 83, \"WATCH\": 401}, \"rows\": 4606, \"status\": \"written\"}",
+      "stderr": ""
+    },
+    {
+      "command": "python3 scripts/grand_catalog_counts.py --write",
+      "exit_code": 0,
+      "elapsed_seconds": 4.134,
+      "output_sha256": "e2489ca29c1377a688e4167846031f282f412489187f39cff18cae3dc3e294fe",
+      "stdout": "{\"by_disposition\": {\"NO-GAP\": 48, \"OUT-OF-SCOPE\": 10, \"PENDING\": 4058, \"REJECT\": 6, \"TRIAL\": 83, \"WATCH\": 401}, \"rows\": 4606, \"status\": \"written\"}",
+      "stderr": ""
+    },
+    {
+      "command": "python3 scripts/grand_catalog_counts.py --check",
+      "exit_code": 0,
+      "elapsed_seconds": 4.391,
+      "output_sha256": "e2489ca29c1377a688e4167846031f282f412489187f39cff18cae3dc3e294fe",
+      "stdout": "{\"by_disposition\": {\"NO-GAP\": 48, \"OUT-OF-SCOPE\": 10, \"PENDING\": 4058, \"REJECT\": 6, \"TRIAL\": 83, \"WATCH\": 401}, \"rows\": 4606, \"status\": \"checked\"}",
+      "stderr": ""
+    }
+  ],
+  "byte_identical_double_run": true,
+  "tests": {
+    "command": "python3 -m unittest -v tests.test_grand_catalog_counts tests.test_local_pages_architecture_sources tests.test_local_pages_architecture_policy",
+    "runtime": "Python 3.13.16",
+    "exit_code": 0,
+    "tests": 49,
+    "seconds": 5.577,
+    "returned_summary": "Ran 49 tests in 5.577s; OK",
+    "scope": "native repository unittest harness; new temp-root synthetic exporter fixtures and unchanged reader/policy controls, plus the new supplement exclusion regression; not upstream acceptance"
+  },
+  "failed_attempts": [
+    {
+      "condition": "exporter module absent",
+      "test": "GrandCatalogCountsTests.test_repository_index_preserves_conflicting_dispositions",
+      "test_exit_code": 1,
+      "cli_exit_code": 2,
+      "returned_diagnostic": "scripts/grand_catalog_counts.py does not exist"
+    },
+    {
+      "condition": "first real export compared the retained host asset to the historical catalog archive",
+      "command": "python3 scripts/grand_catalog_counts.py --write",
+      "exit_code": 1,
+      "elapsed_seconds": 1.929,
+      "returned_diagnostic": "grand catalog asset differs from its pinned sha256 or size; no snapshot written",
+      "correction": "native observation matches the already committed class-gates.json asset and original_rows_sha256; old catalog metadata preserved",
+      "regression": "GrandCatalogCountsTests.test_host_asset_uses_sealed_binding_not_historical_catalog_archive",
+      "regression_failed_before_fix": true
+    },
+    {
+      "condition": "second real export enforced historical by_slot values against the retained member",
+      "command": "python3 scripts/grand_catalog_counts.py --write",
+      "exit_code": 1,
+      "elapsed_seconds": 1.868,
+      "returned_diagnostic": "grand catalog layer counts do not reconcile to the pinned catalog; no snapshot written",
+      "historical_slot_counts": {"instructions-skills": 40, "agent-sdks": 61},
+      "retained_slot_counts": {"instructions-skills": 39, "agent-sdks": 62},
+      "correction": "derive each layer from the pinned member and reconcile to 4606; historical catalog still supplies total/disposition expectations",
+      "regression": "GrandCatalogCountsTests.test_layer_counts_come_from_retained_rows_not_historical_slot_totals",
+      "regression_failed_before_fix": true
+    },
+    {
+      "condition": "new derived counts file was discovered by the architecture supplement glob",
+      "test": "ArchitectureSourcesTests.test_derived_grand_counts_are_excluded_before_supplement_access",
+      "test_exit_code": 1,
+      "returned_diagnostic": "Architecture role/path has no independent approval: architecture_supplement",
+      "correction": "use the supported exact supplement exclusion before content access; no grant added"
+    },
+    {
+      "condition": "first index keys used bare repository slugs instead of final-stack identity",
+      "test": "GrandCatalogCountsTests.test_index_keys_use_the_final_stack_repository_identity",
+      "test_exit_code": 1,
+      "returned_diagnostic": "github.com/example/duplicate not found in the index",
+      "correction": "use native host_receipts.normalize_repository after the reader identifies the repository"
+    }
+  ],
+  "completeness_critic": {
+    "closed": [
+      "both deterministic host exports and the host drift check",
+      "all six dispositions, exact 4606/4058 fixture and actual-source reconciliation",
+      "45 layer totals derived from the exact retained member",
+      "duplicate repository dispositions preserved under the consumer's native identity",
+      "missing, altered, unapproved and drifted inputs fail without replacing the snapshot",
+      "architecture supplement exclusion preserves the existing source read boundary"
+    ],
+    "remaining": [
+      "34 records have no repository recognized by the native reader; their rows remain counted and no identity is invented",
+      "W4 PR 2 and W1b consume the committed file through their own integration; that hookup is not run here",
+      "designated GPT and Claude reviews, exact-head hosted CI and CC landing remain separate"
+    ],
+    "graph_coverage": "unknown: codebase-memory transport closed; exact source and AST fallback used"
+  },
+  "limits": [
+    "Host asset and source-policy grant remain host-only; no archive upload or extraction.",
+    "Counts are retained source dispositions, not installations, candidate acceptance, grants, model runs or release readiness.",
+    "No credential, authentication store, provider, broker, paper/N2/STOP or protected bundle operation.",
+    "Both exporter modes require the host asset. CI consumers read only the committed snapshot; fixtures create their own temp-root asset."
+  ],
+  "usage": {"provider_tokens": null, "model_runs": 0}
+}

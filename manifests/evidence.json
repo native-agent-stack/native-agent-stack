@@ -17151,6 +17151,11 @@
       "bytes": 28389911
     },
     {
+      "path": "catalogs/landscape/grand-catalog-counts.json",
+      "sha256": "e2489ca29c1377a688e4167846031f282f412489187f39cff18cae3dc3e294fe",
+      "bytes": 214642
+    },
+    {
       "path": "catalogs/landscape/grand-catalog-index-20261008.json",
       "sha256": "9d9cf1c5411153a3cc4be17f26dad549d45448ceef475637b4c13c5bb6151c98",
       "bytes": 97426
@@ -18751,14 +18756,19 @@
       "bytes": 102555
     },
     {
+      "path": "docs/grand-catalog-counts.md",
+      "sha256": "aedf8b869ba102699ec047fd9d5c2e12e4ba47b21ecf65fe09e4200a2b2825de",
+      "bytes": 3995
+    },
+    {
       "path": "docs/grand-catalog-handbook.md",
       "sha256": "295919abdb9dd6d4d33390cc24beedf1073765df741670a0a5bae4f1e10d8477",
       "bytes": 426643
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "f11a74b3ed6b2f26ecdb119103684929c5b1013e264b3ea0ae4b5e6027553002",
-      "bytes": 255950
+      "sha256": "98673d525e05f1401a76b03a0312c4f959ebcf35e0af13ed33481afab14b9b33",
+      "bytes": 257253
     },
     {
       "path": "docs/harness-rule-enforcement.md",
@@ -56281,6 +56291,11 @@
       "bytes": 8660
     },
     {
+      "path": "evidence/artifacts/w4-grand-catalog-counts-20261011/receipt.json",
+      "sha256": "565a101bb3e034565e2613973dc510bb787063ccfe0b41b95a90374003d0cdb1",
+      "bytes": 7730
+    },
+    {
       "path": "evidence/artifacts/workstation-lane-20260925/nemotron-qualification/model_card_check.py",
       "sha256": "c6ecc30a169b4af802f7e8497c7ebfc7c9373114bdd8589ef4ee4db102e516c3",
       "bytes": 8384
@@ -59866,6 +59881,11 @@
       "bytes": 7548
     },
     {
+      "path": "scripts/grand_catalog_counts.py",
+      "sha256": "6713cbaaefdf5f29b4b7a5910e6c103e89f56a434defac5a3c41452e76ed1edf",
+      "bytes": 7589
+    },
+    {
       "path": "scripts/hardware_profile.py",
       "sha256": "4b1201497c2afc17cb9932902cebf33cdc18b19d02c49ee10d66c99f36589973",
       "bytes": 25054
@@ -60756,6 +60776,11 @@
       "bytes": 4753
     },
     {
+      "path": "tests/test_grand_catalog_counts.py",
+      "sha256": "d61f1d4c22b288e3fca2246b0ecefab00ee24c6bb616f5a0cc207572a0b96d1c",
+      "bytes": 11794
+    },
+    {
       "path": "tests/test_grand_dashboard.py",
       "sha256": "96521dbee17e59f10fb1b6d657f3f62d8cdab2cebddbee4be51457da43392055",
       "bytes": 22863
@@ -60914,6 +60939,11 @@
       "path": "tests/test_local_pages_architecture_landscape_exclusions.py",
       "sha256": "1745816be2626185bbb451e6fb94c961e75c508406f21e58b32203114bb0c030",
       "bytes": 11637
+    },
+    {
+      "path": "tests/test_local_pages_architecture_sources.py",
+      "sha256": "293f8b0ef6717b891ef30235212795969309fd52a3d94493e59d84a019b3fdaf",
+      "bytes": 25991
     },
     {
       "path": "tests/test_local_pages_fleet_regressions.py",
@@ -61771,9 +61801,14 @@
       "bytes": 24486
     },
     {
+      "path": "tools/local-pages/architecture_sources.py",
+      "sha256": "b5556f5686bdeb1797cc91a267e213207afc4b1b829642c1daa5c3c51d3a76bc",
+      "bytes": 27364
+    },
+    {
       "path": "tools/local-pages/source_policy.json",
-      "sha256": "93e75fc0d22f91dadbb680b05c9753a002b7c5b730566c18106583489382f558",
-      "bytes": 757058
+      "sha256": "bcb2019d176c2d9f3c6319816bf685a87dabeab31799e91062a15a92be9816d8",
+      "bytes": 757307
     },
     {
       "path": "tools/omniroute/gateway_record.py",

@@ -21460,6 +21460,11 @@
   "architecture_supplement_exclusions": [
     {
       "root": "repo",
+      "path": "catalogs/landscape/grand-catalog-counts.json",
+      "reason": "Derived grand-catalog counts and disposition index, not source layer or candidate collections; W4/W1b consume this snapshot directly."
+    },
+    {
+      "root": "repo",
       "path": "catalogs/landscape/grand-catalog-20261008.json",
       "reason": "28389911-byte G5 grand catalog, above the 16 MiB bounded read both landscape globs apply; its compact rows reach the page through the retained G5 asset."
     },
