@@ -363,8 +363,8 @@ in the generated WSL handbook. Its existing stale-output regression failed
 after those changes. The supported
 `python3 scripts/build_new_wsl_handbook.py --write` command regenerates both
 outputs; its native `digest` function supplies their updated receipt hashes.
-The source is `scripts/build_new_wsl_handbook.py` at 90fab198, built from
-`scripts/build_ecosystem.py` at 20ea4ae23a18565676823b9e3a23541c2100bb39.
+The supported generator and native replay are version-bound in the correction
+source table below, using the cued main commit rather than a PR-branch pin.
 This refresh changes source-digest metadata, not handbook recommendations.
 
 The focused local replay at 90fab198 reproduced nine failures across eight
@@ -386,37 +386,69 @@ native model measurements.
 | ArchitecturePinSourceTests.test_all_line_citations_identify_the_winners_pin_fields, openai/skills | fail | pass |
 | ArchitecturePinSourceTests.test_all_line_citations_identify_the_winners_pin_fields, typesafe-ai/skills | fail | pass |
 
+## Correction source bindings and maintained regressions
+
+These bindings use the exact final source locations, derived from Python's
+syntax tree and the native callable's source metadata. Files unchanged by
+this PR are compared byte-for-byte with main
+`878f2891aaa9027b10b7af3e4321ef5e882eedd0` and cited at that main commit.
+Files added or changed by this PR are cited by repository path and line in
+this PR, without a PR-branch SHA. Historical input-commit IDs in measurement
+records identify their measured inputs, not durable code-source citations.
+
+| Corrected mechanism | Primary source and supported entry point | Reproduced before and after result |
+| --- | --- | --- |
+| Description-budget accounting and dated ceiling | [`scripts/skills_status.py:543`](../../scripts/skills_status.py#L543) (this PR; no branch-SHA pin); `budget_report(manifest, skills_root="<skills-root>")` | The native sum is 11791 characters. The ceiling-decision regression fails with 90fab198's missing pointer and passes with the current dated rationale. The increase from main's 11000 ceiling is explicit policy, not an existing client limit. |
+| Zero-call reading | [`tools/local-pages/fleet_view.py:243`](../../tools/local-pages/fleet_view.py#L243) (this PR; no branch-SHA pin); `_skill_usage` through the maintained fleet-view suite | The revised zero-call checks fail four assertions on the prior renderer and pass after; zero calls ask to check wiring for every receipt label. |
+| Exhaustive runtime-worker adoption | [`tests/test_runtime_worker_skills.py:32`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/878f2891aaa9027b10b7af3e4321ef5e882eedd0/tests/test_runtime_worker_skills.py#L32) (main `878f2891`); `adoption_contract_problems` and its three repository contracts | Three original failures report claude-api neither reused nor excluded; all three pass with the explicit adoption_ref exclusion and overturn condition. |
+| Exhaustive lifecycle task map | [`tests/test_landscape_sweep_skills.py:133`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/878f2891aaa9027b10b7af3e4321ef5e882eedd0/tests/test_landscape_sweep_skills.py#L133) (main `878f2891`); `CatalogTests.test_every_pinned_skill_serves_exactly_one_task` | The original missing claude-api task fails; the corrected map passes with exactly one implementation task. |
+| Identity-bound architecture locators | [`tests/test_architecture_pin_source.py:49`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/878f2891aaa9027b10b7af3e4321ef5e882eedd0/tests/test_architecture_pin_source.py#L49) (main `878f2891`); `expected_ranges` | Both original OpenAI/TypeSafe locator subtests fail before and pass after native identity-based derivation. |
+| Identity-bound surface-watch locator | [`tests/test_upstream_surface_watch.py:2034`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/878f2891aaa9027b10b7af3e4321ef5e882eedd0/tests/test_upstream_surface_watch.py#L2034) (main `878f2891`); `DispositionCitationTests.has_token` and its repository citation contract | The original PostToolUseFailure locator fails before and passes after native token-based derivation. |
+| Exact reviewed inventory proposal | [`scripts/local_pages_policy_grants.py:109`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/878f2891aaa9027b10b7af3e4321ef5e882eedd0/scripts/local_pages_policy_grants.py#L109) (main `878f2891`); `proposal` / the test's `inventory_paths` selector | The integrated expected and actual sets each contain 94 paths, with no missing or extra path. |
+| Push-gate accounting | [`blueprints/runtime-workers/openhands/resolver/push_gate.py:665`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/878f2891aaa9027b10b7af3e4321ef5e882eedd0/blueprints/runtime-workers/openhands/resolver/push_gate.py#L665) (main `878f2891`); `derive_ci_protected` through `RepositoryWorkflowTests.derived()` | The original unclassified-read guard fails before; the regenerated delta preserves exact script, shape, total and protection comparisons against the new main baseline. |
+| Handbook output provenance | [`scripts/build_new_wsl_handbook.py:1340`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/878f2891aaa9027b10b7af3e4321ef5e882eedd0/scripts/build_new_wsl_handbook.py#L1340) (main `878f2891`); supported `--write`, `render` and `digest` APIs | The stale-output/receipt guard fails before regeneration and passes after native regeneration. |
+
+The maintained public, count-only checks in
+`tests/test_skill_correction_claims.py` load the published record and
+manifest, without opening private transcripts or receipts. A native unittest
+replay supplies exact public record/manifest snapshots from 90fab198 to those
+same checks: each fails independently, with three failures and no errors or
+skips. Each passes against the corrected files.
+
+| Maintained claim check | Previous public inputs (90fab198) | Corrected public inputs |
+| --- | --- | --- |
+| `test_same_head_ablation_is_the_primary_comparison` | fail: no explicit same-HEAD primary comparison | pass: ablation identity/hash and two equal-size count-only arms |
+| `test_ceiling_decision_resolves_to_its_dated_rationale` | fail: missing decision pointer | pass: confined dated pointer resolves to rationale naming the current ceiling and native listed sum |
+| `test_registered_claude_api_keeps_a_supported_bundled_baseline` | fail: no explicit bundled baseline | pass: separate registration retains the bundled baseline, immutable official changelog reference and supported releases |
+
 ## 2026-10-11 landing integration
 
-The CC-cued landing base is `16f0a1f751e24934dd3351386a84c302656c1848`. The
-earlier 93-grant proposal at 90fab198 is historical: main's
-`scripts/secret_scan_metrics.py` and this PR's
-`.claude/skills/native-skill-routing/SKILL.md` both belong in the
-integrated selector. The policy test's own `inventory_paths` derivation
-now returns 94 paths, exactly equal to the 94 reviewed repository
-grants with no missing or extra path. The fixed count assertion follows that
-native derivation.
+The superseding CC-cued main base is `878f2891aaa9027b10b7af3e4321ef5e882eedd0`.
+The earlier 93-path proposal on input 90fab198 is historical. Main's
+`scripts/secret_scan_metrics.py` and this PR's routing skill both appear
+in the integrated native inventory. The test's own `inventory_paths`
+derivation returns 94 expected paths, exactly equal to
+94 actual reviewed repository grants, with no missing or
+extra path. No grant count is copied from the earlier landing target.
 
-After the single rebase, the push-gate tool was rerun at
-`d96a26575a1bdddf810734d045f12c26abe7f304`, the completed rebased source snapshot,
-retained locally as `backup/pr970-d96a2657-native-derivation-20261011`.
-The delta's `source_commit` and source citation now name that snapshot.
-Native `RepositoryWorkflowTests.derived()` / `derive_ci_protected`
-again returns 332 unclassified reads, with
-10 added
-`scripts/skills_status.py` reads and
-1 added shape against the retained
-baseline; the unchanged counts are reproduced results, not a copied
-expectation. The last rebased commit folds in the regenerated accounting
-and registry metadata; the source snapshot remains available for replay.
+Main's regenerated push-gate baseline already separates test modules.
+The merged guard preserves that baseline and the PR's exact script/shape
+accounting, without the obsolete eight-location subtraction. A fresh native
+derivation on completed rebased input
+`9fbac9b05f65b84418b8139a04f71f6f7a46c0fe` generates the current delta:
+340 unclassified reads, ten added skills_status reads and one added shape,
+with no removals. It binds the current baseline hash
+`8752740817bb41c1a582e33fa475e4ce4064f2ccfecadb706bce40ecb4512157`.
+The forward correction commit retains that input commit as its parent;
+production gate inputs are unchanged by its source-citation and public
+claim-test additions. The earlier 332-read accounting is historical.
 
-The native handbook `--write`, `render` and `digest` APIs regenerate
-the integrated outputs and receipt. Native `register_file` and
-`evidence_manifest --write` preserve the cued main's registrations and
-non-files fields while registering this PR's final bytes. No generated
-value is entered by hand. The earlier wording that inferred demand from
-zero calls is corrected throughout this record: zero calls require checking
-wiring and do not establish absence of demand.
+The handbook and receipt are regenerated through the supported native
+APIs above. Native `register_file` and `evidence_manifest --write`
+start from the cued main's registry, preserve its existing paths and
+non-files fields, and register this PR's current files. Generated values
+are produced by their native tools. Zero observed calls require a wiring
+check and do not establish absence of demand.
 
 Listing cost remains 267 Unicode characters for the original cue and 362 for
 the excluded cue, an increase of 95. This project-scoped description is listed
@@ -426,4 +458,4 @@ v4 cases remain unchanged.
 
 The CC installs/enables the timer and applies any optional personal profile
 after landing. This lane performed no model run, credential/account read or
-host apply. The next step is the designated review and cued landing rebase.
+host apply. The CC owns both families' range-diff micros and landing.
