@@ -2,6 +2,8 @@
 reconciliation, against a local synthetic port (evidence class SYN). Never a broker,
 network or credential; not paper or live acceptance."""
 import asyncio
+from contextlib import nullcontext
+from dataclasses import replace
 from datetime import datetime, timezone
 from decimal import Decimal as D
 import json
@@ -11,7 +13,7 @@ import sys
 import tempfile
 import time
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 SOURCE = Path(__file__).resolve().parents[1] / "blueprints/us-equities/adaptive-paper"
 sys.path.insert(0, str(SOURCE))
@@ -675,6 +677,61 @@ class MoverPaperCommandWiring(unittest.TestCase):
 
     def trial_json(self, root):
         return json.loads((Path(root) / "state" / self.FINGERPRINT / "mover" / "trial.json").read_text())
+
+    def test_paper_main_preserves_extended_session_window_at_controller_construction(self):
+        import transport
+        from zoneinfo import ZoneInfo
+        ny = ZoneInfo("America/New_York")
+        for hour, expected_open in ((5, True), (11, True), (17, True), (21, False)):
+            with self.subTest(hour_et=hour), tempfile.TemporaryDirectory() as root:
+                now = datetime(2026, 3, 10, hour, 0, tzinfo=ny).timestamp()
+                data = json.loads(CONFIG.read_text())
+                data["mover"]["session_scope"] = "any_session"
+                config_path, scan_path = Path(root) / "config.json", Path(root) / "scan.json"
+                config_path.write_text(json.dumps(data))
+                scan_path.write_bytes(scan_raw([row("AAA", 1, "10.00")]))
+                _, _, settings = mover.load_mover_config(config_path)
+                scan = mover.load_scan(scan_path.read_bytes(), settings, now=SCAN_TIME + 20)
+                scan = replace(scan, session_date=mover_runner.session_at(
+                    datetime.fromtimestamp(now, timezone.utc)).session_date)
+                observation = self.observation(["AAA", "SPY"])
+                observation["clock"]["timestamp_ns"] = int(now * 1e9)
+                ledger = Mock()
+                ledger.positions.return_value = ledger.unresolved.return_value = []
+                ledger.fees.return_value = []
+                ledger.accounting.return_value = Mock(cash_delta_usd=D(0), realized_pnl_usd=D(0), drawdown_usd=D(0))
+                plan = Mock()
+                plan.symbol_names.return_value = ("AAA",)
+                captured = RuntimeError("captured_mover_controller")
+                # Bypass earlier scan/start gates to protect the production caller's
+                # own window. The helper stays real; credentials, state and broker
+                # operations are fixtures, and execution stops at construction.
+                with patch.object(mover_runner, "credentials", return_value=("fixture", "fixture")), \
+                     patch.object(transport, "preflight", return_value=observation), \
+                     patch.object(transport, "fee_checkpoint", return_value={
+                         "account": {"cash": "100000"}, "fees": []}), \
+                     patch.object(mover_runner, "public_preflight", return_value={}), \
+                     patch.object(mover_runner, "validate_preflight", return_value=now + 3600), \
+                     patch.object(mover_runner, "load_scan", return_value=scan), \
+                     patch.object(mover_runner, "build_plan", return_value=plan), \
+                     patch.object(mover_runner, "account_lock_fingerprint", return_value=nullcontext()), \
+                     patch.object(mover_runner, "Ledger", return_value=ledger), \
+                     patch.object(mover_runner, "save"), \
+                     patch.object(mover_runner, "MoverController", side_effect=captured) as controller, \
+                     patch.object(transport, "AlpacaPaperTransport", side_effect=AssertionError("broker transport")), \
+                     patch.object(mover_runner, "run_mover", side_effect=AssertionError("native execution")), \
+                     patch.object(mover_runner.time, "time", return_value=now):
+                    with self.assertRaises(RuntimeError) as caught:
+                        mover_runner.main([
+                            "paper", "--env-file", str(Path(root) / "unused.env"),
+                            "--config", str(config_path), "--scan", str(scan_path),
+                            "--trial", "window", "--output", str(Path(root) / "output.json"),
+                            "--state-root", str(Path(root) / "state")])
+                self.assertIs(caught.exception, captured)
+                controller.assert_called_once()
+                self.assertIs(controller.call_args.kwargs["market_open"], expected_open)
+                ledger.close.assert_called_once()
+                self.assertFalse((Path(root) / "state").exists())
 
     def test_paper_command_counts_sessions_persists_state_and_guards_a_shared_account(self):
         with tempfile.TemporaryDirectory() as root:

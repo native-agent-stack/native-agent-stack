@@ -1,7 +1,10 @@
 """Synthetic T15 overnight session/feed/status checks; no broker acceptance."""
 from datetime import date, datetime
+import hashlib
 import importlib.util
+import json
 from pathlib import Path
+import re
 import sys
 import unittest
 from types import SimpleNamespace
@@ -291,3 +294,53 @@ class OvernightCallerTests(unittest.TestCase):
                                      datetime(2026, 3, 13, 0, 1, tzinfo=NY))]
         self.assertEqual(projections[0], projections[1])
         self.assertEqual(projections[0], projections[2])
+
+
+class OvernightCitationCorrections(unittest.TestCase):
+    """Bounded retained-source checks; no network or private-file access in CI."""
+
+    FIXTURES = Path(__file__).resolve().parent / "fixtures/adaptive_paper_citations"
+
+    @classmethod
+    def setUpClass(cls):
+        cls.sources = json.loads((cls.FIXTURES / "sources.json").read_text())
+
+    def citation(self, url):
+        readme = (SOURCE / "README-overnight.md").read_text()
+        bullets = re.findall(r"(?ms)^- .+?(?=^- |^## |\Z)", readme)
+        matches = [bullet for bullet in bullets if url in re.findall(r"\]\(([^)\s]+)\)", bullet)]
+        self.assertEqual(len(matches), 1, f"expected one citation bullet for {url}")
+        return matches[0]
+
+    def test_f1_names_the_landed_pin_and_retained_source(self):
+        source = self.sources["f1"]["required"]
+        pin = "f8c607bc1f1f0205fdc87095f47df150d2f78117"
+        self.assertEqual(source["commit"], pin)
+        self.assertEqual(source["sha256"], "ef1cf212b22c6f891da8fb322eb0b5838f1b685c307aa7eec3bf143423809887")
+        self.assertEqual(source["decision_2_sha256"], "c68cb552a9de1f7a5c5339d80ede035d032a6a15f4856de3b0a4feda38cac074")
+        url = ("https://github.com/seathatflowsinourveins/us-equities-trading/blob/"
+               + pin + "/docs/decisions/2026-10-10-halt-exit-policy.md")
+        self.assertEqual(source["url"], url)
+        citation = self.citation(url)
+        self.assertIn("remains resting", citation)
+        self.assertIn("At DAY expiry", citation)
+        self.assertIn("freezes for handoff", citation)
+
+    def test_asset_attributes_claim_cites_the_matching_vendor_capture(self):
+        source = self.sources["asset_attributes"]
+        data = (self.FIXTURES / source["capture"]).read_bytes()
+        self.assertEqual(hashlib.sha256(data).hexdigest(), source["fixture_sha256"])
+        self.assertEqual(source["url"], "https://docs.alpaca.markets/us/reference/get-v2-assets-symbol_or_asset_id.md")
+        self.assertIn(source["sha256"], self.citation(source["url"]))
+        captured = json.loads(data)
+        self.assertIn("overnight_tradable", captured["AssetAttribute"]["enum"])
+        self.assertIn("overnight_halted", captured["AssetAttribute"]["enum"])
+        self.assertEqual(captured["Assets.attributes"]["items"]["$ref"], "#/components/schemas/AssetAttribute")
+
+    def test_delayed_feed_claim_cites_the_matching_vendor_capture(self):
+        source = self.sources["derived_overnight_feed"]
+        data = (self.FIXTURES / source["capture"]).read_bytes()
+        self.assertEqual(hashlib.sha256(data).hexdigest(), source["sha256"])
+        self.assertEqual(source["url"], "https://docs.alpaca.markets/us/docs/historical-stock-data-1.md")
+        self.assertIn(source["sha256"], self.citation(source["url"]))
+        self.assertIn(b"The trades are 15 minutes delayed", data)

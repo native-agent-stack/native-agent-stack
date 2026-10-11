@@ -104,6 +104,21 @@ Eastern OVERNIGHT. The native BUY LIMIT/DAY must be denied with
 broker port, fill or reserved intent. Paper acceptance remains **NOT_RUN** until its actual run
 and retained receipt.
 
+`IntegratedRunner.test_main_preserves_extended_session_window_at_controller_construction`
+drives `runner.main()` through Controller construction.
+`MoverPaperCommandWiring.test_paper_main_preserves_extended_session_window_at_controller_construction`
+drives `mover_runner.main()` through MoverController construction. Both use
+PRE/RTH/POST controls and an OVERNIGHT clock. Scripted preflight isolates each
+constructor's own window; credentials, account state and broker operations are
+fixtures. Bypassing either production `_controller_session` call fails its
+OVERNIGHT assertion.
+
+`OvernightCitationCorrections` binds the three corrected citations to
+`tests/fixtures/adaptive_paper_citations/`: two bounded public vendor fixtures
+and F-1 pin/source metadata. Full source captures remain in the review packet.
+The recorded old/new Decision 2 hashes differ in wording; they do not claim byte
+equality. These checks use no network or private files in CI.
+
 ## Primary sources
 
 - Alpaca [24/5 Trading](https://docs.alpaca.markets/us/docs/245-trading.md),
