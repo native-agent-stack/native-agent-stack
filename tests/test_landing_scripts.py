@@ -132,7 +132,7 @@ case "$1 $2" in
         # the combined status: each context once, its newest status (the first listed), in pages of per_page contexts; FAKE_COMBINED_RAW,
         # when set (empty included), is the reply instead, with exit 0
         if [ -n "${FAKE_COMBINED_RAW+set}" ]; then printf '%s' "$FAKE_COMBINED_RAW"; exit 0; fi
-        pages=$(jq -c --argjson pp "$pp" 'reduce .[] as $s ([]; if any(.[]; .context == $s.context) then . else . + [$s] end) as $c
+        pages=$(jq -c --argjson pp "$pp" '(reduce .[] as $s ([]; if any(.[]; .context == $s.context) then . else . + [$s] end)) as $c
                  | [range(0; [($c | length), 1] | max; $pp) as $i | {total_count: ($c | length), statuses: $c[$i:$i + $pp]}]' "$FAKE_STATUSES") || exit 1
         if [[ " $* " == *" --paginate "* && " $* " == *" --slurp "* ]]; then printf '%s\n' "$pages"; exit 0; fi
         printf '%s\n' "$pages" | jq '.[0]' | jq -r "$prog" ;;

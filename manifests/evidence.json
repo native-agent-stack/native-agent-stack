@@ -60882,8 +60882,8 @@
     },
     {
       "path": "tests/test_landing_scripts.py",
-      "sha256": "cf819cefe8433d96ed4c21b575b4ee647b74ee591da02ffbc0aa8b2510317192",
-      "bytes": 216125
+      "sha256": "721f53ca409dd56cea5556bf992a5e027b4ee80e1b8c1f4ebd9fed330d6a8d90",
+      "bytes": 216127
     },
     {
       "path": "tests/test_landscape.py",
