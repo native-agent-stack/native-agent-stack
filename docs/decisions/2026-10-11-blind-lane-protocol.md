@@ -25,6 +25,9 @@ review; this change governs subsequent runs and does not rebuild or replace that
   the installed executable and CLI help establish the controls used here.
 - Claude Code 2.1.296's embedded journal parser at byte 228289997 records `started`, `result` and `failed` rows
   with `key` and `agentId`; the actual tier-1 journal additionally records `label` on each `started` row.
+  Its native restore source immediately before the journal class (byte 228286338) declares
+  `Vr=_({type:"restoring"})` and `Jr=_({type:"restored"})`; these two serialized control rows
+  are accepted without granting any agent identity. A focused regression failed before this follow-up fix.
   The native transcript records advisor availability as an attachment with
   `{"type":"advisor_tool","available":true,"model":"...","toolChange":true}`.
   The audit now refuses that availability even without a call, and still refuses every advisor call.
@@ -73,7 +76,7 @@ eight historical finals still flag under the new advisor policy (65 availability
 the audited final-item scope). Their previous CC acceptance remains a separate historical ruling.
 This is a local integration over retained native evidence, not a newly executed blind model run.
 
-Touched and shared-adjudication regression modules passed: transcript audit 20, Claude collection 23, launch
-commands 2, adjudication 116 (**161 tests**). The first FULL `python3 scripts/validate.py` failed solely because
+Touched and shared-adjudication regression modules passed: transcript audit 21, Claude collection 23, launch
+commands 2, adjudication 116 (**162 tests**). The first FULL `python3 scripts/validate.py` failed solely because
 the edited recipe's registered hash and byte count needed updating; the recipe entry is updated separately.
 No judge or refuter was launched. The #992 landing hold remains in force.

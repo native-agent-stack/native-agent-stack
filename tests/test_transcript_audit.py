@@ -327,6 +327,17 @@ class TranscriptAuditTests(unittest.TestCase):
         self.assertIn("agent-old.jsonl", report["run_issue"])
         self.assertEqual(report["flagged_items"], ["foundation__layer"])
 
+    def test_native_journal_restore_markers_are_control_rows(self):
+        self.agent("final", [])
+        label = "propose:foundation/layer"
+        self.record(workflowProgress=[{"type": "workflow_agent", "agentId": "final", "label": label}])
+        rows = [{"type": "restoring"}, {"type": "launched"},
+                {"type": "started", "key": "v2:" + "a" * 64, "agentId": "final", "label": label},
+                {"type": "result", "key": "v2:" + "a" * 64, "agentId": "final", "result": {}},
+                {"type": "restored"}]
+        (self.run / "journal.jsonl").write_text("".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8")
+        self.assertEqual(self.flagged(), [])
+
     def test_every_unaccounted_transcript_is_named(self):
         self.agent("final", [])
         for index in range(20):

@@ -110,7 +110,8 @@ def journal_agents(directory) -> tuple:
             if not line.strip():
                 continue
             row = json.loads(line)
-            if not isinstance(row, dict) or row.get("type") not in {"launched", "started", "result", "failed"}:
+            if not isinstance(row, dict) or row.get("type") not in {
+                    "launched", "started", "result", "failed", "restoring", "restored"}:
                 return {}, "the workflow journal has an unrecognized row"
             if row["type"] != "started":
                 continue
