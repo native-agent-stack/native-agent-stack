@@ -16,12 +16,14 @@ review evidence. These are dated CC directions, not verbatim owner chat.
 
 ## One convergence cycle
 
-1. Read the layer's recorded candidate/verdict, latest retained sweep and
-   pending intake observations. Include observations whose snapshot succeeded
-   but journal append failed; the published snapshot alone is insufficient.
-   Read prior resolutions in the compounding manifest before reopening work.
-2. Discover the unresolved delta from categorized stars, mirrored awesome
-   lists and the existing landscape sweep. Reuse the grand catalog and source
+1. Read the layer's recorded candidate/verdict and latest retained sweep.
+   Recovery of pending intake observations, including snapshot-success with
+   journal-append failure, is pending on #978. Until it lands, disclose that
+   intake gap; do not treat the snapshot as the complete pending set. Read
+   prior resolutions in the compounding manifest before reopening work.
+2. Discover the unresolved delta from mirrored awesome lists and the existing
+   landscape sweep. Categorized-star intake is pending on #978 and WS1;
+   consume its qualified output after those dependencies complete. Reuse the grand catalog and source
    reviews. Verify actual source and version before deciding; stars, recency
    and agreement are intake signals, not evidence of superiority.
 3. Preregister scope, pins, roles, prompts, comparison rule and native effort
@@ -30,9 +32,10 @@ review evidence. These are dated CC directions, not verbatim owner chat.
    superseded attempts and their usage; unknown measurements stay unknown.
 4. Refute candidates through the existing blind adjudication and layer-verdict
    lane. A research answer or sweep survivor is an input, not an accepted
-   verdict. Audit complete journal/transcript identity, provenance and cache
-   bindings before a judgment can count. An advisor-contaminated or incomplete
-   collection refuses until the gated corrective collection qualifies.
+   verdict. Complete journal/transcript identity, provenance/cache binding and
+   advisor-contamination enforcement are pending on #993; this record does not
+   enable or qualify those unlanded behaviours. Its gated corrective collection
+   must qualify before any affected judgment can count.
 5. Record the qualified verdict, evidence class, wave and `next_review`; then
    use the upstream's supported install/test path at the selected run pin.
    Qualify the actual caller, task oracle, terminal result and measured invoke
@@ -43,9 +46,9 @@ review evidence. These are dated CC directions, not verbatim owner chat.
    an owned, dated comparison or Follow-up; close the resolved workstream with
    its explicit reopen condition.
 
-Discovery uses the existing star/category decision pipeline and weekly new-star
-intake, mirrored awesome-list inputs, `tools/sota-convergence` sweep and the
-grand-catalog publication route. The CC executes unstars from the landed WS1
+Discovery currently uses mirrored awesome-list inputs, the `tools/sota-convergence`
+sweep and grand-catalog publication. The weekly new-star intake, pending-observation
+recovery and category decision pipeline are pending on #978 and WS1. The CC executes unstars from the landed WS1
 list; license is never an unstar reason. Protected dependencies, decision
 citations and existing mirrors remain protected. No parallel star or skill
 catalog is created. Grand-catalog retains catalog and ledger publication custody.
@@ -80,87 +83,66 @@ distinct installations, caller requirements and DEFER gates. The
 [G2 record](2026-10-04-2604-e2e-fix-wave-g2-mcp-workers.md) preserves earlier
 native acceptance and its exact scope. They remain evidence leads, not permission
 to promote an installed tool or unmeasured route. Additional SDK candidates go
-to the research queue before implementation; native-stack-research gathers,
+to the canonical [research queue](../../catalogs/landscape/research-state.json)
+with a layer id before implementation ([continuation authority](../landscape-continuation.md):8).
+The co-op's `research-queue.tsv` is intake that flushes into that queue.
+native-stack-research gathers,
 OpenHands performs a bounded coding job and the OmniRoute adapter hosts an
 authorized native SDK task. Their task roles determine invocation.
 
 ## Terminal architecture-layer states
 
 WS2 begins after #1008 and then #1007 land. The co-op's W6 wave, layer-verdict
-lane, landscape-live-foundation and convergence-practice record one state per
-layer in the final-stack manifest. Its required evidence joins are:
-
-- **FINAL:** recorded verdict with evidence class/wave/`next_review`, selected
-  winner with a run pin, upstream E2E receipt at that run pin, and measured
-  invoke evidence or a recorded reason for non-invocation. A verdict-pin receipt
-  cannot stand in for a different run pin's E2E receipt.
-- **SCHEDULED:** evidence cannot settle the layer and ONE comparison has an ID,
-  preregistration hash, run date and fixed decision rule. Run that comparison
-  and apply its rule; a missed date is a defect to resolve, not a new research loop.
-- **RETIRED:** the role carries a recorded retirement reason. Preserve its
-  historical evidence and the relevant dependency/restore conditions.
-
-Pending, reopened, unswept and `no_selection` without a scheduled comparison
-are non-terminal. The FINAL-layer reopen condition is new primary evidence:
-a winner-changing upstream release or reproduced failure. Practice closure
-and per-layer FINAL qualification are separate: this record supplies the
-process; the W6 owners supply the measured layer dispositions and run-pin joins.
+lane, landscape-live-foundation and convergence-practice use the single authority
+in #1008's [layer-resolution protocol](https://github.com/seathatflowsinourveins/native-agent-stack/blob/a0641a04cc211fd803b4971dd86a85654685d733/docs/decisions/2026-10-11-layer-resolution-protocol.md#terminal-states-and-evidence),
+`docs/decisions/2026-10-11-layer-resolution-protocol.md:75–104` at
+`a0641a04cc211fd803b4971dd86a85654685d733` (pending landing).
+That authority defines FINAL, SCHEDULED, RETIRED, their evidence joins and
+non-terminal cases; this record adds no second definition. The same protocol's
+reopen section governs layer reopening. Practice closure below is a distinct
+workstream result and supplies no architecture-layer qualification.
 
 ## Review and publication rules 1–9
 
-1. **Scope lock:** blockers are reproduced P1/P2 defects in added/changed lines
-   or a claim false at the head. One-step-wider and pre-existing findings become
-   one-line Follow-ups in the PR body and compounding manifest. P1 safety,
-   privacy, money and order findings always block.
-2. **One wave per head:** Claude, GPT and Codex report on the same head, then
-   the author makes ONE commit combining all blockers. Push only after all
-   three reports or explicit CC release; a family over 45 minutes late lets
-   the CC release, not the author infer permission.
-3. **Two fix rounds:** the CC adjudicates every remaining item once as fix now,
-   follow-up or restructure. Then land or close/replace; no open-ended third round.
-4. **Upstream first:** a parser, vendor/server feature or protocol class recurring
-   in two rounds is replaced by its upstream-supported mechanism, with the
-   pinned vendor/mirror path and line, rather than another bespoke patch.
-5. **P2 evidence:** reproduce the failure on the PR's own code. Wording,
-   completeness and optional hardening without a reproduced failure are P3
-   and never block.
-6. **Compounding memory:** each landing records resolutions and Follow-ups in
-   readiness/evidence manifests, then the final-stack manifest after #1007.
-   Reopen a settled resolution only on new primary evidence, not reader preference.
-7. **Paper priority:** #1009 and its dependent paper path get every family's
-   read first, in every queue; existing pending adjudications retain their priority.
-8. **Research before implementation:** convergence sessions finalize/record
-   candidates. A review-proposed candidate/library/design change returns to
-   the research queue with its layer ID; the PR continues its recorded candidate
-   unless an in-scope P1 requires intervention.
-9. **Pinned mirror source:** read `MIRRORS.json`/`MIRRORS.lock.json` sources at
-   their recorded ref with `GIT_NO_LAZY_FETCH=1` and `GIT_OPTIONAL_LOCKS=0`.
-   Cite path:line. Use web fallback only for an absent mirror and register the
-   mirror gap the same day through upstream-sync.
+The single authority for all nine rules is the CC's
+`command-center/research-cc-role-20261008/ruling-pr-wave-convergence-20261011.md`,
+including the 13:43:25Z addendum. Read and apply that complete authority before
+author/reviewer work; its full source and hash accompany the review packet.
+The numbered rules are not copied here. Source pin/line citations use the
+registered central mirrors and the flags required by that authority. Changed
+candidate proposals enter `catalogs/landscape/research-state.json` with a layer
+id; `research-queue.tsv` remains the co-op's intake, not the canonical queue.
 
 ## Matching skill rows and closure custody
 
 | Existing row or surface | Update in this decision | Publishing owner |
 | --- | --- | --- |
-| `native-stack-research` | Read this process and latest verdict/sweep/pending inputs for ecosystem convergence; dispatch only the delta; gather sources before blind judgment; preserve failures and terminal qualification. The tracked `config/research-harnesses-skill.md` carries the change. | convergence-practice authors; native client owners publish through the existing install-plan path |
-| Claude research/refutation/worker practice rows | Point the matching existing rows at this accepted record, retain their source pins, caller qualification and reopen condition; reuse the native research/worker skills. | cc-native-practice, via the CC |
-| Codex research/refutation/SDK practice rows | Apply the same process to matching existing Codex rows, retain native SDK/caller/provenance gates and reopen condition. | co-op |
+| Install-plan slot `research-harnesses` / skill `native-stack-research` | Publish the changed `config/research-harnesses-skill.md` through its existing install-plan route, retaining actual launcher qualification and this record pointer. | convergence-practice authors; native client owners publish |
+| Lifecycle task `agent-docs`, layer id `skills-agent-docs` / `claude-native-practice` | CC owner records the exact matching Claude practice slot ids and record pointers; this lifecycle task identifies the existing skill, not a new slot catalog. | cc-native-practice, via the CC |
+| Additional Claude/Codex research, refutation and SDK practice slots | Owners return exact slot ids and source refs for any matching existing rows, or the bounded no-matching-row receipt below. | cc-native-practice and co-op respectively |
 
 The owner handoff accompanies this PR and names the exact tracked skill template.
-Closure requires recorded Claude/Codex row-update receipts alongside CC acceptance;
-queued updates are not reported as installed. This record does not overwrite
+Closure requires CC acceptance and, for each owner, row-update receipts or a
+**no matching row** receipt. The latter names the client, catalog path and
+source pin, searched slot-id/skill-name selectors and zero matching row ids;
+it does not claim an installed update or create a parallel catalog. Row-update
+receipts name each slot id, old/new source ref and installed-template/qualification
+receipt. Queued requests satisfy neither outcome. This record does not overwrite
 peer-owned slot catalogs, canonical manifests or live client instructions.
 
 | Practice workstream | Closure result | REOPEN CONDITION |
 | --- | --- | --- |
-| Discovery | CLOSED with categorized star/awesome-list intake, retained sweep and pending-observation delta | New practice-tool release or measured intake/retention failure |
-| Refutation | CLOSED with the existing blind layer-verdict lane and qualified provenance/usage | New practice-tool release or measured isolation, accounting or judgment failure |
-| Research gathering | CLOSED with the existing GPT Researcher/DeerFlow vendor routes and source/result oracle | New practice-tool release or measured retrieval, citation, lifecycle or route failure |
-| Coding workers and SDKs | CLOSED with supported owned-workspace dispatch and explicit per-route qualification | New practice-tool release or measured sandbox, caller, task-oracle or lifecycle failure |
-| Review/publication | CLOSED with rules 1–9, owner skill-row receipts and compounding resolution memory | New practice-tool release or measured review/publication/manifest failure |
+| Discovery | CLOSED only after #978 lands, WS1 categories are published and the pending-observation recovery qualifies; retained sweep/awesome-list inputs remain available meanwhile | `scripts/public_starred.py` at #978 `2b5c9abe0d7b0f4cf56d8502f887261a0c8cc851`: a new release, or a forced snapshot-success/append-failure replay loses an unresolved repository id from the recovered set |
+| Refutation | CLOSED only after #993 lands and its gated blind collection/recording qualifies | `tools/sota-convergence/transcript_audit.py` at #993 `d82361cd1766caba5ae8790d79434b4fc39a32f8`, with Claude Code2.1.296/SHA24972e3b: a new release, or an orphan completion/missing-transcript/advisor-contaminated fixture produces an accepted judgment |
+| Research gathering | CLOSED with qualified existing vendor routes and owner source/result receipts | GPT Researcher3.7.0/0957c301 and DeerFlow2.1.0/345f08be: a new release, or a completed public-research oracle yields fewer than five GPT report references or no cited DeerFlow answer/native retrieval evidence |
+| Coding workers and SDKs | CLOSED with supported owned-workspace dispatch and explicit per-route qualification receipts | OpenHands1.53.0/54daf056 and Codex SDK0.160.0/a956835d: a new release, or the declared job oracle fails, requests-to-model is zero, terminal completion is absent or a foreign scratch sentinel changes |
+| Review/publication | CLOSED with the canonical ruling, qualified owner-row receipts and compounding resolution memory | `scripts/validate.py` and native manifest/recording tools at base `f1f6c0c20e214f1cee9aba3c5f0c1430d66e75ed`: a new release, or the native validator/manifest check fails on the published bytes or a required owner-row receipt is absent |
 
 These closure results take effect on the accepted record's publication and owner
-row receipts. Until then this PR is IN_REVIEW. Known route/qualification boundaries
+row receipts and each row's named dependencies. Until then this PR is IN_REVIEW.
+The measurement cells define failure predicates to replay when evidence warrants;
+they are not claims that new live failures or native acceptance runs occurred here.
+Known route/qualification boundaries
 remain with their owners; they cannot be turned into FINAL by changing wording.
 The comparison that would replace this choice is a preregistered, task-matched
 upstream-supported alternative whose measured failure/coverage/usage results
@@ -172,16 +154,21 @@ Primary source checks on 2026-10-11: clean installed GPT Researcher v3.7.0 and
 DeerFlow v2.1.0 source checkouts match the commits above. OpenHands source is at
 v1.53.0 with local modifications, so cited source lines were read from the exact
 Git object; its installed worker package is 1.53.0. Neither observation is a new
-model task or vendor-suite acceptance. The pinned 0.160.0 Codex commit is absent
-from the current partial central mirror; its retained source-bound adapter and
+model task or vendor-suite acceptance. The pinned 0.160.0 Codex source is now
+registered in its dedicated central mirror; its source-bound adapter and
 [official SDK lifecycle documentation](https://developers.openai.com/codex/sdk)
 are separate inputs, not a new source/CLI equality or gateway qualification.
 
-GPT Researcher, DeerFlow and OpenHands source checkouts exist in the selected
-tool installation but are absent from the central MIRRORS list. The PR handoff
-registers those three repositories and the missing Codex ref with upstream-sync
-through the co-op for same-day mirror coverage. Reviewers retain this disclosed
-boundary instead of treating an unavailable mirror as a completed source check.
+All four source mirrors are **registered** in `MIRRORS.json` and synced in
+`MIRRORS.lock.json` at 2026-10-11T15:28:41Z–15:28:49Z (reported by the CC at15:29Z):
+`upstream/assafelovic/gpt-researcher` v3.7.0/0957c301,
+`upstream/bytedance/deer-flow` v2.1.0/345f08be,
+`upstream/OpenHands/software-agent-sdk` v1.53.0/54daf056 and
+`upstream/openai/codex@a956835d-sdk0160` at the full SDK commit above.
+Exact pinned commit availability was checked with lazy fetch off. Source lines
+are the mirror-relative paths named in the role table; Codex's vendor
+`sdk/python/README.md:20–29` supplies the thread/result lifecycle. Registration
+and source checks qualify mirror availability, not a model run or host install.
 All private authority/source/measurement captures have a manifest in the review
 packet. The repository graph excludes the scripts/tools/examples/docs used here;
 bounded direct source reads supply these claims, without a completeness assertion.
