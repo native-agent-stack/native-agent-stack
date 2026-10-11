@@ -11,7 +11,7 @@ bootstrap script or evidence artifact changes in this PR. The one guard test add
 | --- | --- | --- |
 | A. OSV, frozen macOS lock | 99-107 | Dismiss `won't fix` after landing |
 | B1. Scorecard `$/` action reference | 108, 109 | Dismiss `false positive` after landing |
-| B2. Scorecard `npm install` of a verified tarball | 91 | Dismiss `false positive` after landing |
+| B2. Scorecard `npm install` of a verified tarball | 91 | Dismiss `won't fix` after landing; `npm ci` from committed locks is a separate follow-up PR |
 | C. Scorecard on retained evidence scripts | 88, 89, 92, 97, 98 | Dismiss `won't fix` after landing |
 | D. Scorecard repository-level checks | 14, 18, 20, 21, 22 | Recorded here; 14, 18, 20 and 22 dismissed `won't fix` after landing, 21 left open (clears 2026-12-18) |
 
@@ -37,9 +37,16 @@ The nine alerts sit in `evidence/artifacts/macos-application-20260924/variant/pn
 
 Disposition: dismiss each alert `won't fix`. The reason: retained, hash-bound evidence that no workflow installs,
 builds or serves; the maintained application lock pins next 16.3.8 and sits in the ordinary scan. Evidence:
-`evidence/receipts/osv-frozen-macos-next-1638-20261007.json` and `tests/test_frozen_macos_variant_no_use.py`. A
-dismissal is the durable disposition the 2026-10-07 record asks for; it hides nothing from the SARIF, which the
-workflow keeps publishing. Re-open the alerts if the lock gains a consumer or its bytes change.
+`evidence/receipts/osv-frozen-macos-next-1638-20261007.json` and `tests/test_frozen_macos_variant_no_use.py`. The
+2026-10-07 record (`docs/decisions/2026-10-07-frozen-evidence-osv-reporting.md:75-86`) asks for a command-center
+ledger row naming each advisory's disposition within 24 hours of the report attempt, not for a dismissal; the
+dismissal of 99-107 after landing is a separate ruling (the command center, 2026-10-11T02:12Z). The ledger row is the
+command center's own record and this PR does not write it. The row to add: alerts 99-107 (the nine advisories above),
+input hash `f1c707b8295e85bd396e49b990de92dc82bc0d58eca1e4e4bef31262d9898cd2`, disposition "retained inactive evidence,
+no consumer; dismissed `won't fix` after #996 landed", review due per the report attempt. The frozen review issue links
+`is:open` alerts, so a dismissal also removes them from that link; the ledger row is what then records them. A
+dismissal hides nothing from the SARIF, which the workflow keeps publishing. Re-open the alerts if the lock gains a
+consumer or its bytes change.
 
 ## B1. Alerts 108 and 109: `uses: $/.github/actions/setup-host-name-scanner`
 
@@ -53,7 +60,7 @@ with GitHub's self-repository syntax.
   and logged the step as `seathatflowsinourveins/native-agent-stack/.github/actions/setup-host-name-scanner@eb31d233...`,
   the running commit. So the reference is already bound to the workflow's own commit and cannot carry a separate hash.
 
-- Scorecard v5.5.0 (`ossf/scorecard@fac1a1678517b7185cd1fa24699a16423fd841d2`,
+- Scorecard v5.5.0 (`ossf/scorecard@c395761df6afe1a69e476bc60a013a94bcbc153f`,
   `checks/raw/pinned_dependencies.go:800`) treats only a `./` prefix as same-repository and reports every other `uses`
   as a third-party action.
 - Scorecard `main` (`5fc5c0007101ff4d51ba45da3792463b4a7ba7e7`) recognises `$/` (`pinned_dependencies.go:806`, change
@@ -71,16 +78,33 @@ Scorecard with `bbcee3303`; the alerts then close on their own. The guard test k
 
 ## B2. Alert 91: `adoption/bootstrap-linux.sh:772`
 
-`npm install "${npm_install_args[@]}" "$archive"` installs a tarball, not a registry spec.
+`npm install "${npm_install_args[@]}" "$archive" >/dev/null` installs a tarball, not a registry spec.
 
 - Scorecard v5.5.0 `checks/raw/shell_download_validate.go:464-490` (`isNpmUnpinnedDownload`) calls every
-  `npm install` unpinned except `npm ci` and a `git+...#<commit>` URL, so no argument form can satisfy it.
-- `install_npm` fetches `$archive` through `fetch "$url" "$sha256" "$archive"` (`bootstrap-linux.sh:737`), and `fetch`
-  (`:357-367`) exits on a sha256 mismatch before the file is renamed into place. The platform dependency is also checked
-  against its npm integrity hash (`:526-536`).
+  `npm install` unpinned except `npm ci` (:466-468) and a `git+...#<commit>` URL, so no argument form of this command
+  can satisfy it.
+- The tarball itself is pinned: `install_npm` fetches `$archive` through `fetch "$url" "$sha256" "$archive"`
+  (`bootstrap-linux.sh:737`), and `fetch` (`:357-367`) exits on a sha256 mismatch before the file is renamed into place.
+  The platform dependency is also checked against its npm integrity hash (`:526-536`).
+- The tarball's runtime dependencies are not pinned. `npm install <tarball>` resolves them from the registry by version
+  range at install time. Reproduced here at 2026-10-11T02:42Z on the sha256-verified context-hub 0.1.4 tarball
+  (`ca9fb94a...888f`, the pin in `adoption/pins-linux-x86_64.json`): the tarball holds no `npm-shrinkwrap.json`, and
+  `npm install --global --ignore-scripts --no-audit --no-fund --dry-run <tarball>` reports "added 108 packages". The
+  command center's read reports the same absence of a shrinkwrap for the other npm pins (13 runtime dependencies for qmd,
+  10 mcporter, 8 context-mode, 28 repomix, 34 socraticode); those counts were not reproduced here. The repository already records this: `docs/decisions/2026-09-25-workstation-sota-refresh.md:376-378`
+  ("The package ships no shrinkwrap, and undici 6.29.0 and @lumis-sh/wasm-eex 0.26.2 were published inside its ranges
+  after the tag. The bootstrap's `install_npm` passes no `--before`") and `docs/decisions/2026-10-03-currency-wave-w1.md:448`
+  ("The npm tarball hash is artifact evidence and does not pin the transitive dependency tree").
 
-Disposition: `false positive`, dismissed after landing. The guard test fails if that argument stops being the
-verified archive (for example `name@version`).
+So the alert is right that the install is not fully pinned, and "false positive" is wrong for it. Disposition:
+`won't fix` for this PR, naming the unpinned transitive dependency tree as the reason. The supported fix is `npm ci`
+from a committed lockfile per package, which Scorecard accepts; it changes the bootstrap and its pins, so it is a separate
+follow-up PR, planned by the command center, and the alert closes with it.
+
+The guard test pins the full install argv (the argument array, the single `npm install` line and the fetch before it),
+not only the last argument, so an added package, flag or registry override fails it. Against the first version of this
+guard (last argument only), the mutants "extra package before the archive" and "registry override flag" both passed; both
+fail now.
 
 ## C. Alerts 88, 89, 92, 97, 98: retained evidence scripts
 
@@ -90,9 +114,12 @@ and the two `.sh.txt` files under `evidence/artifacts/omniroute-post-terminal-dr
 
 - These are captured, hash-bound evidence. Editing them would break `manifests/evidence.json`, so they cannot be
   pinned.
-- Scorecard v5.5.0 has no path exclusion. Its maintainer annotations (`config/annotations.go`, a `scorecard.yml` in the
-  repository root) are shown only with `--show-annotations`; they do not change SARIF results or code-scanning alerts.
-  A `scorecard.yml` would not close these alerts, so none is added.
+- Scorecard v5.5.0 has no path exclusion. It always loads a `scorecard.yml` from the repository root
+  (`pkg/scorecard/scorecard.go:179-190`), and the SARIF writer skips every annotated check
+  (`pkg/scorecard/sarif.go:673-676`, reached from `scorecard-action` v2.4.4 `internal/scorecard/format.go:71`), so an
+  annotation for `Pinned-Dependencies` would close these alerts. An annotation names a check and a reason
+  (`config/annotations.go`), never a path, so it would also hide every future Pinned-Dependencies finding in live files.
+  No annotation is added for that reason.
 
 Disposition: `won't fix`, dismissed after landing: retained evidence, executed on the recorded host only, not run by any
 workflow in this repository.
@@ -108,17 +135,21 @@ choice here. Quoted warnings are Scorecard's text at 2026-10-11.
   `require_last_push_approval: false`, `strict_required_status_checks_policy: false`). The ruleset instead requires
   squash-only linear history, resolved review threads, and the seven status checks it lists. One GitHub account
   authors and merges every change, so a required human approval would block landing without adding a second reviewer.
-  The review gate is the required `verdict-review-gate` check. Disposition: `won't fix`, until the review-App identity
-  below ships and the approval count can be raised.
-- **CodeReview (20, score 0).** Scorecard counts GitHub approvals on merged changesets (0 of 30). The two-family reads
-  happen off GitHub, in the co-op's review records, and the landing scripts check the record. The native fix is #947,
-  `docs/decisions/2026-10-09-review-verdict-app-identity.md`: review verdicts move to check runs posted by a dedicated
-  GitHub App, so the verdict carries a reviewer identity that Scorecard and the ruleset can see. Disposition:
-  `won't fix` for now, with this record as the decision; revisit when the App is registered and live.
+  The review gate is the required `verdict-review-gate` check. Disposition: `won't fix`; revisit
+  with CodeReview below, when a second identity that can approve exists and `required_approving_review_count` can be raised.
+- **CodeReview (20, score 0).** Scorecard counts a changeset as reviewed only when it has an `APPROVED` review, or a
+  merge, by someone other than the author (`checks/raw/code_review.go:55-62`, `probes/codeApproved/impl.go:116-126`);
+  it reads no check runs (0 of 30). The two-family reads happen off GitHub, in the co-op's review records, and the
+  landing scripts check the record. The review-App decision (#947,
+  `docs/decisions/2026-10-09-review-verdict-app-identity.md`) moves review verdicts to check runs posted by a dedicated
+  GitHub App; that App reads pull requests and posts check runs, so it cannot approve, and it does not change this
+  score. Disposition: `won't fix`. Revisit only if a second identity can submit `APPROVED` reviews or merge, which
+  a repository with one authoring account does not have; alert 20 does not clear when the App goes live.
 - **Fuzzing (18, score 0).** Scorecard v5.5.0 (`docs/checks.md`, "Fuzzing") looks for OSS-Fuzz membership, ClusterFuzzLite,
   or language fuzz functions (Go fuzzing and property-based libraries for Haskell, JavaScript/TypeScript, Erlang, C#/F#).
-  This repository is Python, shell and workflow files and uses none of those. Adding a fuzz harness only to raise a score
-  is not a decision this record makes. Disposition: `won't fix`; revisit if a parser or a Go/TypeScript component
+  It also detects Python through `import atheris` (`checks/raw/fuzzing.go:131-136`). The repository is mostly Python,
+  shell and workflow files, with 16 Go, TypeScript, C# and Rust files outside `evidence/` (`git ls-files`); none is a
+  fuzz target. Adding a fuzz harness only to raise a score is not a decision this record makes. Disposition: `won't fix`; revisit if a parser or a Go/TypeScript component
   becomes a fuzzing target of its own.
 - **CIIBestPractices (22, score 0).** The check reads the OpenSSF Best Practices badge API by Git URL
   (`docs/checks.md`, "CII-Best-Practices"). Earning a badge needs the maintainer to enrol the project at
@@ -130,13 +161,16 @@ choice here. Quoted warnings are Scorecard's text at 2026-10-11.
 
 ## What this PR changes
 
-This record and `tests/test_code_scanning_dispositions.py` only; no workflow, bootstrap script or artifact changes, so
-there is no fix whose failure before the change could be shown. The test pins the facts the dismissals rest on, and
+This record and `tests/test_code_scanning_dispositions.py` only; no workflow, bootstrap script or artifact changes. The
+one regression that fails before its fix is the install-argv guard: the first version passed an extra package before
+`"$archive"` and a registry override flag, the current one fails both. The test pins the facts the dismissals rest on, and
 fails when:
 
 1. the disposition table above does not list the 22 alerts exactly once each;
-2. `install_npm` in `adoption/bootstrap-linux.sh` stops installing only the archive that `fetch()` checked against a
-   sha256 (a mutant installing `name@version` is caught), or `fetch()` stops exiting on a mismatch;
+2. `install_npm` in `adoption/bootstrap-linux.sh` stops running exactly one `npm install` with the reviewed argv after
+   the `fetch()` that checked `"$archive"` against a sha256 (six mutants are caught: a registry spec, an extra package,
+   a registry flag, an extra array element, a second install, an install without the fetch), or `fetch()` stops exiting on
+   a mismatch;
 3. a `$/` reference in `validate.yml` or `publish-catalog.yml` names an action directory that does not exist.
 
 Third-party action pinning is already enforced by `tests/test_workflow_hardening.py` (every third-party action is
@@ -146,18 +180,24 @@ the `tests.test_osv_lockfile_coverage.FrozenScanTests` methods named under group
 ## After the PR lands
 
 Dismiss through `PATCH /repos/{owner}/{repo}/code-scanning/alerts/{n}` (`state=dismissed`), each comment citing this
-PR and the record section: 99-107 `won't fix` (A); 108, 109 and 91 `false positive` (B1, B2); 88, 89, 92, 97, 98
+PR and the record section: 99-107 `won't fix` (A); 108, 109 `false positive` (B1); 91 `won't fix` (B2); 88, 89, 92, 97, 98
 `won't fix` (C); 14, 18, 20, 22 `won't fix` (D). Alert 21 stays open. Nothing is dismissed before the PR lands, so the
 reviewers read the reasons first.
 
 ## SOTA sources
 
-- `ossf/scorecard@fac1a1678517b7185cd1fa24699a16423fd841d2` (v5.5.0): `checks/raw/pinned_dependencies.go:800`,
-  `checks/raw/shell_download_validate.go:464-490`, `config/annotations.go`, `README.md` ("Showing Maintainers
-  Annotations").
+- `ossf/scorecard@c395761df6afe1a69e476bc60a013a94bcbc153f` (the commit of tag v5.5.0; the tag object is
+  `fac1a1678517b7185cd1fa24699a16423fd841d2`): `checks/raw/pinned_dependencies.go:800`,
+  `checks/raw/shell_download_validate.go:464-490`, `config/annotations.go`, `pkg/scorecard/scorecard.go:179-190`,
+  `pkg/scorecard/sarif.go:673-676`, `checks/raw/code_review.go:55-62`, `probes/codeApproved/impl.go:116-126`,
+  `checks/raw/fuzzing.go:131-136`, `docs/checks.md`, `README.md` ("Showing Maintainers Annotations").
 - `ossf/scorecard@5fc5c0007101ff4d51ba45da3792463b4a7ba7e7` (`main`, 2026-10-11): `pinned_dependencies.go:806`;
-  `ossf/scorecard@bbcee3303` (#5191, 2026-09-28), the fix not yet in a release.
-- `ossf/scorecard-action` v2.4.4 (2026-07-23), whose `go.mod` requires Scorecard v5.5.0.
+  `ossf/scorecard@bbcee3303b5a8a733d2ffe92fdf4364b2b7c0293` (#5191, 2026-09-28), the fix not yet in a release.
+- `ossf/scorecard-action@55891bbd73f2425e97637d96e306fc9d491d0b21` (v2.4.4, 2026-07-23): `go.mod` requires Scorecard v5.5.0;
+  `internal/scorecard/format.go:71` writes SARIF through `result.AsSARIF`, which applies the annotation filter.
+- This repository's own records: `docs/decisions/2026-09-25-workstation-sota-refresh.md:376-378` (the install "ships no
+  shrinkwrap" and ranges resolved after the tag) and `docs/decisions/2026-10-03-currency-wave-w1.md:448` ("does not pin the
+  transitive dependency tree").
 - GitHub, [self-repository action syntax](https://github.blog/changelog/2026-07-30-reference-same-repository-actions-with-self-repository-syntax/)
   (fetched 2026-10-11) and [finding and customizing actions](https://docs.github.com/actions/how-tos/write-workflows/choose-what-workflows-do/find-and-customize-actions),
   as cited in `docs/decisions/2026-10-09-host-name-scan.md`.

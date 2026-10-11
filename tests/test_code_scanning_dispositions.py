@@ -4,8 +4,10 @@ That record dismisses code-scanning alerts as false positives or won't-fix on th
 repository. These tests fail when a fact stops holding, so a dismissal cannot outlive its reason:
 
 - the record's disposition table names every alert it disposes of, each exactly once;
-- adoption/bootstrap-linux.sh's install_npm installs only the archive that fetch() verified against a sha256
-  (alert 91: Scorecard calls any `npm install` unpinned, v5.5.0 checks/raw/shell_download_validate.go:464-490);
+- adoption/bootstrap-linux.sh's install_npm runs exactly one `npm install`, with the full argv pinned below, whose
+  only package is the archive that fetch() verified against a sha256 (alert 91: Scorecard calls any `npm install`
+  unpinned, v5.5.0 checks/raw/shell_download_validate.go:464-490; the tarball's own runtime dependencies are still
+  resolved from the registry by range, which is why 91 is won't-fix and not a false positive);
 - every `$/` self-repository `uses:` in validate.yml and publish-catalog.yml names an action directory that exists
   at the same commit (alerts 108, 109: Scorecard v5.5.0 checks/raw/pinned_dependencies.go:800 knows only `./`).
 """
@@ -29,6 +31,11 @@ ALERTS = sorted(
     + list(range(99, 108))  # OSV, frozen macOS lock
 )
 INSTALL_LINE = re.compile(r"^\s*npm install .*$", re.M)
+# The whole install: the argument array, then the verified archive, nothing else. Any added package, flag or
+# registry override changes one of these lines.
+INSTALL_ARGV_DEFINITION = 'local npm_install_args=(--global --no-audit --no-fund --prefix "$prefix")'
+INSTALL_ARGV_SCRIPTS_FLAG = "npm_install_args+=(--ignore-scripts)"
+INSTALL_COMMAND = 'npm install "${npm_install_args[@]}" "$archive" >/dev/null'
 
 
 def expand(cell: str) -> list[int]:
@@ -62,12 +69,16 @@ def function_body(text: str, name: str) -> str:
 
 
 def installs_only_verified_archive(body: str) -> bool:
-    """One `npm install` whose last argument is "$archive", after the fetch() that verified it."""
-    installs = INSTALL_LINE.findall(body)
+    """One `npm install` with the exact reviewed argv, after the fetch() that verified "$archive"."""
+    installs = [line.strip() for line in INSTALL_LINE.findall(body)]
     fetch_at = body.find('fetch "$url" "$sha256" "$archive"')
-    if len(installs) != 1 or fetch_at < 0 or fetch_at > body.index(installs[0]):
-        return False
-    return installs[0].split(">")[0].rstrip().endswith('"$archive"')
+    return (
+        installs == [INSTALL_COMMAND]
+        and body.count(INSTALL_ARGV_DEFINITION) == 1
+        and body.count("npm_install_args+=(") == 1
+        and INSTALL_ARGV_SCRIPTS_FLAG in body
+        and 0 <= fetch_at < body.index(INSTALL_COMMAND)
+    )
 
 
 class DispositionRecordTests(unittest.TestCase):
@@ -93,11 +104,21 @@ class NpmInstallIsVerifiedTests(unittest.TestCase):
         self.assertIn("verify_sha256", body)
         self.assertLess(body.index("exit 1"), body.index('mv -- "$destination.partial" "$destination"'))
 
-    def test_a_registry_spec_is_caught(self) -> None:
+    def test_each_mutant_of_the_install_is_caught(self) -> None:
         body = function_body(self.text, "install_npm")
-        mutant = body.replace('"${npm_install_args[@]}" "$archive"', '"${npm_install_args[@]}" "$id@$version"')
-        self.assertNotEqual(mutant, body)
-        self.assertFalse(installs_only_verified_archive(mutant))
+        argv = '"${npm_install_args[@]}" "$archive"'
+        mutants = {
+            "registry spec": body.replace(argv, '"${npm_install_args[@]}" "$id@$version"'),
+            "extra package before the archive": body.replace(argv, '"${npm_install_args[@]}" left-pad@1.3.0 "$archive"'),
+            "registry override flag": body.replace(argv, '--registry=https://example.invalid "${npm_install_args[@]}" "$archive"'),
+            "extra array element": body.replace("--no-fund --prefix", "--no-fund left-pad@1.3.0 --prefix"),
+            "second install": body + '  npm install "${npm_install_args[@]}" "$archive" >/dev/null\n',
+            "install before the fetch": body.replace('fetch "$url" "$sha256" "$archive"', "true"),
+        }
+        for name, mutant in mutants.items():
+            with self.subTest(name):
+                self.assertNotEqual(mutant, body)
+                self.assertFalse(installs_only_verified_archive(mutant))
 
 
 class SelfRepositoryReferencesTests(unittest.TestCase):
