@@ -2,9 +2,9 @@
   "schema_version": 1,
   "kind": "gate_read_accounting_delta",
   "date": "2026-10-11",
-  "source_commit": "9794477a7855dbe30173ba884d1dcb38b0eb8a9e",
+  "source_commit": "82bb95d1b868872d012426cd77aca2888d23aa8a",
   "baseline_path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261004.json",
-  "baseline_sha256": "8752740817bb41c1a582e33fa475e4ce4064f2ccfecadb706bce40ecb4512157",
+  "baseline_sha256": "5ea8e4db0ab15115e5b1eec6c1939450514dc227e0f9308d865f661507c6c93d",
   "mode": "monitoring_only",
   "added_by_script": {
     "scripts/skills_status.py": 10
@@ -21,17 +21,6 @@
   ],
   "removed_shapes": [],
   "added_locations": [
-    "scripts/component_matrix.py:1020",
-    "scripts/component_matrix.py:301",
-    "scripts/component_matrix.py:302",
-    "scripts/component_matrix.py:306",
-    "scripts/component_matrix.py:307",
-    "scripts/component_matrix.py:313",
-    "scripts/component_matrix.py:671",
-    "scripts/component_matrix.py:672",
-    "scripts/component_matrix.py:674",
-    "scripts/component_matrix.py:679",
-    "scripts/component_matrix.py:680",
     "scripts/skills_status.py:223",
     "scripts/skills_status.py:346",
     "scripts/skills_status.py:347",
@@ -46,11 +35,104 @@
     "tools/adoption/install_skills.py:631",
     "tools/adoption/install_skills.py:632"
   ],
-  "derived_count": 340,
+  "derived_count": 342,
   "derivation": {
-    "source": "blueprints/runtime-workers/openhands/resolver/push_gate.py:derive_ci_protected; input commit 9794477a7855dbe30173ba884d1dcb38b0eb8a9e",
+    "source": "blueprints/runtime-workers/openhands/resolver/push_gate.py:derive_ci_protected; input commit 82bb95d1b868872d012426cd77aca2888d23aa8a",
     "replay": "python3 -m unittest discover -s tests -p test_runtime_worker_openhands_push_gate.py",
     "method": "RepositoryWorkflowTests.derived() uses GitTree(HEAD) and derive_ci_protected. Compare script counts and shape multiplicities with the current main baseline, which already separates test modules.",
     "interpretation": "Monitoring accounting only; no permission or execution authority is added."
-  }
+  },
+  "read_classifications": [
+    {
+      "location": "scripts/skills_status.py:223",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "read-only skill/configuration status; no worker execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/skills_status.py:346",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "read-only skill/configuration status; no worker execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/skills_status.py:347",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "read-only skill/configuration status; no worker execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/skills_status.py:348",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "read-only skill/configuration status; no worker execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/skills_status.py:352",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "read-only skill/configuration status; no worker execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/skills_status.py:604",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "read-only skill/configuration status; no worker execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/skills_status.py:612",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "read-only skill/configuration status; no worker execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/skills_status.py:614",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "read-only skill/configuration status; no worker execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/skills_status.py:682",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "read-only skill/configuration status; no worker execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/skills_status.py:785",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "read-only skill/configuration status; no worker execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/install_skills.py:604",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "unchanged installer read multiplicity; location moved",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/install_skills.py:631",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "unchanged installer read multiplicity; location moved",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/install_skills.py:632",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "unchanged installer read multiplicity; location moved",
+      "permission_change": false
+    }
+  ]
 }

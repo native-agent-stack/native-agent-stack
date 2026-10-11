@@ -405,7 +405,7 @@ records identify their measured inputs, not durable code-source citations.
 | Exhaustive lifecycle task map | [`tests/test_landscape_sweep_skills.py:133`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/878f2891aaa9027b10b7af3e4321ef5e882eedd0/tests/test_landscape_sweep_skills.py#L133) (main `878f2891`); `CatalogTests.test_every_pinned_skill_serves_exactly_one_task` | The original missing claude-api task fails; the corrected map passes with exactly one implementation task. |
 | Identity-bound architecture locators | [`tests/test_architecture_pin_source.py:49`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/878f2891aaa9027b10b7af3e4321ef5e882eedd0/tests/test_architecture_pin_source.py#L49) (main `878f2891`); `expected_ranges` | Both original OpenAI/TypeSafe locator subtests fail before and pass after native identity-based derivation. |
 | Identity-bound surface-watch locator | [`tests/test_upstream_surface_watch.py:2034`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/878f2891aaa9027b10b7af3e4321ef5e882eedd0/tests/test_upstream_surface_watch.py#L2034) (main `878f2891`); `DispositionCitationTests.has_token` and its repository citation contract | The original PostToolUseFailure locator fails before and passes after native token-based derivation. |
-| Exact reviewed inventory proposal | [`scripts/local_pages_policy_grants.py:109`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/878f2891aaa9027b10b7af3e4321ef5e882eedd0/scripts/local_pages_policy_grants.py#L109) (main `878f2891`); `proposal` / the test's `inventory_paths` selector | The integrated expected and actual sets each contain 92 paths, with no missing or extra path. |
+| Exact reviewed inventory proposal | [`scripts/local_pages_policy_grants.py:109`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/878f2891aaa9027b10b7af3e4321ef5e882eedd0/scripts/local_pages_policy_grants.py#L109) (main `878f2891`); `proposal` / the test's `inventory_paths` selector | The integrated expected and actual sets each contain 94 paths, derived on the measured merged input below, with no missing or extra path. |
 | Push-gate accounting | [`blueprints/runtime-workers/openhands/resolver/push_gate.py:665`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/878f2891aaa9027b10b7af3e4321ef5e882eedd0/blueprints/runtime-workers/openhands/resolver/push_gate.py#L665) (main `878f2891`); `derive_ci_protected` through `RepositoryWorkflowTests.derived()` | The original unclassified-read guard fails before; the regenerated delta preserves exact script, shape, total and protection comparisons against the new main baseline. |
 | Handbook output provenance | [`scripts/build_new_wsl_handbook.py:1340`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/878f2891aaa9027b10b7af3e4321ef5e882eedd0/scripts/build_new_wsl_handbook.py#L1340) (main `878f2891`); supported `--write`, `render` and `digest` APIs | The stale-output/receipt guard fails before regeneration and passes after native regeneration. |
 
@@ -424,9 +424,9 @@ skips. Each passes against the corrected files.
 
 ## 2026-10-11 landing integration
 
-The final CC-cued main base is `bcf55c457d057c71faceeab068bdd02017c43342`.
-The test's own `inventory_paths` derivation returns 92 expected paths,
-exactly equal to 92 actual reviewed repository grants, with no missing or
+The final CC-cued main base is `4424aa8d0fd9c2e8ecd13a813b386954986bc58b`.
+The test's own `inventory_paths` derivation returns 94 expected paths,
+exactly equal to 94 actual reviewed repository grants, with no missing or
 extra path. Main's three retired workflow grants remain retired; this PR's
 routing skill is the reviewed addition. No grant count is copied from an
 earlier landing target. The `878f2891` source bindings above remain valid
@@ -437,16 +437,29 @@ The merged guard preserves that baseline and the PR's exact script/shape
 accounting, without the obsolete eight-location subtraction. A fresh native
 derivation on the completed rebased input generates the current delta. The
 measured parent/source input is
-`9794477a7855dbe30173ba884d1dcb38b0eb8a9e`:
-340 unclassified reads, ten added skills_status reads and one added shape,
+`82bb95d1b868872d012426cd77aca2888d23aa8a`:
+342 unclassified reads, ten added skills_status reads and one added shape,
 with no removals. It binds the current baseline hash
-`8752740817bb41c1a582e33fa475e4ce4064f2ccfecadb706bce40ecb4512157`.
-The last correction commit has that rebased final-adjudication commit as its
-parent. Both full SHAs above were read from Git after the final rebase,
+`5ea8e4db0ab15115e5b1eec6c1939450514dc227e0f9308d865f661507c6c93d`.
+The landing-gate correction commit has that merged input commit as its
+parent. Both full SHAs above were read from Git on the merged input,
 using `git merge-base HEAD origin/main` and `git rev-parse HEAD`, before
-creating the last correction commit. The delta's `source_commit` independently
-identifies the measured input. Script/shape accounting and its baseline
-remain unchanged.
+creating the landing-gate correction commit. The delta's `source_commit` independently
+identifies the measured input. Current main's native 332-read baseline is
+retained unchanged. The delta is re-derived through the native mechanism;
+exact script counts, shape multiplicities and total comparisons remain.
+
+Each native location-difference identifier is classified in the delta's
+`read_classifications`: ten `scripts/skills_status.py` observations belong
+to skill/configuration status inspection, and three installer identifiers
+are source-line moves with unchanged read multiplicity. The native bucket
+remains `unclassified` and monitoring-only; these labels grant no worker
+execution or read authority. The maintained native gate test checks complete
+location coverage, the ten-read script counter, the allowed classifications
+and `permission_change: false`, in addition to its existing exact script,
+shape and total comparisons. The refreshed delta binds the current main
+baseline rather than silently replacing its 332-read snapshot. This uses
+the unchanged `GitTree` / `derive_ci_protected` route used by #982.
 
 Historical observations: the earlier proposal on input `90fab198` held 93
 paths and recorded 332 reads. The earlier landing at `878f2891` held 94
@@ -456,6 +469,9 @@ The later `8bffa2c4` landing and its `1e4f4654` source input are historical
 too; the final main base and measured parent above supersede them.
 The later `1e6a49ff` landing, its `561361c4` measured input and its
 91-grant inventory are historical after main's #1004/#979 landings.
+The later bcf55c45/9794477a input with 92 grants and 340 reads is historical
+after the merge. The current 94-grant/342-read values above are measured,
+not copied from an earlier landing or inferred from moving remote main.
 
 The maintained `test_landing_record_matches_native_grants_and_measured_source`
 in `tests/test_skill_correction_claims.py` derives the current reviewed sets

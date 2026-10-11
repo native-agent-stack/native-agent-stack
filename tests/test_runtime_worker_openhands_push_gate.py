@@ -1278,6 +1278,15 @@ class RepositoryWorkflowTests(unittest.TestCase):
                           - sum(delta["removed_by_script"].values()))
         self.assertEqual(len(advisory.unclassified), expected_count)
         self.assertEqual(expected_count, delta["derived_count"])
+        classifications = delta["read_classifications"]
+        self.assertEqual({row["location"] for row in classifications}, set(delta["added_locations"]))
+        self.assertTrue(all(row["native_bucket"] == "unclassified" and row["permission_change"] is False
+                            for row in classifications))
+        new_reads = Counter(row["location"].rsplit(":", 1)[0] for row in classifications
+                            if row["classification"] == "user_status_observation")
+        self.assertEqual(new_reads, Counter(delta["added_by_script"]))
+        self.assertTrue(all(row["classification"] in {"user_status_observation", "source_line_move_only"}
+                            and row["scope"] for row in classifications))
         self.assertNotIn("", derived.prefixes)
         self.assertTrue(all(self.g.gate_reads.static_dir(pattern) for pattern in derived.globs), derived.globs)
         protected = self.g.Protected([derived], self.g.policy_tests(tree))
