@@ -8,6 +8,20 @@ Default behavior never submits an order; `paper` is an explicit bounded trial.
 """
 from __future__ import annotations
 
+from runtime_lock import RuntimeLockError, runtime_read_lock, runtime_read_locked
+
+# Acquire before importing runtime packages when invoked as a manual CLI.
+# The context's descriptor stays open until process exit; main's decorator
+# also protects imported/programmatic calls through their complete lifetime.
+if __name__ == "__main__":
+    try:
+        _runtime_cli_guard = runtime_read_lock()
+        _runtime_cli_guard.__enter__()
+    except RuntimeLockError:
+        import sys
+        print("refused: canonical runtime lock unavailable", file=sys.stderr)
+        raise SystemExit(2)
+
 import argparse
 import ast
 import asyncio
@@ -2272,6 +2286,7 @@ def _controller_session(close, now, session_policy):
     return close, market_open
 
 
+@runtime_read_locked
 def main():
     global LAST_OUTPUT
     parser = argparse.ArgumentParser(description=__doc__)

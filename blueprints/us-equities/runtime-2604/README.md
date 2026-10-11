@@ -8,6 +8,25 @@ pytest **9.1.1** dev group (pluggy **1.6.0**, iniconfig **2.3.1**). CPython
 **3.12.3**, NautilusTrader **2.0.0rc5**, the adapter pins and their gates stay fixed.
 The lock/manifest were copied from the measured native pair without relocking.
 
+Runtime users coordinate on `$HOME/projects/.us-equities-runtime.lock`, outside
+the venv, project adoption directory and trial output directories. The installer
+holds an exclusive lock before removing completion and through its final marker
+publication; it waits at most one second and refuses with exit **69** if a reader
+or another installer remains active. Direct canonical `sync_trading_2604` calls
+also hold exclusive, reusing the installer's descriptor or releasing their own
+descriptor when the function returns. Scheduler and offline acceptance use
+nonblocking shared locks. The scheduler refuses with exit **2** before OUT_DIR
+or `.run-once` when installation is active. Manual runner/mover CLI entries lock
+before runtime-package imports, and their programmatic `main` calls hold shared
+through return or exception. The lock file is never replaced or removed.
+
+This uses [util-linux flock(1) v2.41.3](https://github.com/util-linux/util-linux/blob/v2.41.3/sys-utils/flock.1.adoc#L52-L81)
+and its descriptor lifetime semantics; Python readers use the same native
+[CPython v3.12.3 flock(2) call](https://github.com/python/cpython/blob/v3.12.3/Modules/fcntlmodule.c#L273-L299).
+Scratch concurrent-script regressions establish coordination, including held
+ingest/gate/runner phases, refusal without marker/output mutation and exit/signal
+release. They do not establish a fresh runtime install or paper acceptance.
+
 The [imported final-lock verification](../../../evidence/receipts/runtime-final-lock-binding-20261008.json)
 reuses the native **14:09:06Z** receipt: locked dev sync **with `--inexact`** and `uv pip check` returned
 **rc 0**, with the lock unchanged. An independent **15:29:03Z** coordinator

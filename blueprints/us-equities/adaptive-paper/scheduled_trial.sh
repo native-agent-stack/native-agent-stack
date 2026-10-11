@@ -22,11 +22,26 @@ done
 # ownership/completion and metadata identity. A failed sync leaves Python
 # executable, so executable checks alone cannot establish default readiness.
 # Explicit alternate interpreters remain the owning caller's choice.
-if [[ "$PY" == "$HOME/projects/us-equities-runtime/.venv/bin/python" ]]; then
-  runtime="${PY%/.venv/bin/python}"
+runtime="$HOME/projects/us-equities-runtime"
+# Lock the managed runtime when either stage uses its interpreter, including
+# executable file aliases. Alternate runtimes retain their existing overrides.
+if [[ "$PY" == "$runtime/.venv/bin/python" || "$PY" -ef "$runtime/.venv/bin/python" ||
+      "$GATE_PY" == "$runtime/.venv/bin/python" || "$GATE_PY" -ef "$runtime/.venv/bin/python" ]]; then
   refuse_runtime() { echo "refused: canonical runtime incomplete or metadata differs" >&2; exit 2; }
   [[ ! -L "$HOME/projects" && ! -L "$runtime" && -d "$runtime" && -O "$runtime" &&
      ! -L "$runtime/.venv" && -d "$runtime/.venv" ]] || refuse_runtime
+  # A stable lock beside the runtime also covers a fresh installer. Never
+  # unlink/replace it: both scripts must coordinate on the same inode.
+  runtime_lock="$HOME/projects/.us-equities-runtime.lock"
+  command -v flock >/dev/null || refuse_runtime
+  [[ ! -L "$runtime_lock" && ( ! -e "$runtime_lock" ||
+      ( -f "$runtime_lock" && -O "$runtime_lock" ) ) ]] || refuse_runtime
+  exec {runtime_lock_fd}>>"$runtime_lock" || refuse_runtime
+  flock --shared --nonblock "$runtime_lock_fd" || {
+    echo "refused: canonical runtime in use by installer" >&2; exit 2;
+  }
+  # Keep runtime_lock_fd open through ingestion, gate and runner. Marker and
+  # metadata checks occur only after the shared lock has been acquired.
   for marker in .trading-2604-owner .trading-2604-complete; do
     [[ -f "$runtime/$marker" && ! -L "$runtime/$marker" ]] || refuse_runtime
   done

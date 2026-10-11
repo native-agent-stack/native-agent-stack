@@ -56,8 +56,15 @@ blocked() {
     exit 1
 }
 [[ ${WSL_DISTRO_NAME:-} == NativeStack2604 && $EUID != 0 ]] || blocked 64
-for tool in bwrap timeout docker env mkdir mktemp sha256sum; do command -v "$tool" >/dev/null || blocked 69 "missing $tool"; done
+for tool in flock bwrap timeout docker env mkdir mktemp sha256sum; do command -v "$tool" >/dev/null || blocked 69 "missing $tool"; done
 [[ ! -L "$HOME/projects" && ! -L "$project" && -O "$project" && -x "$python" ]] || blocked 69
+# Hold a shared runtime lock before reading metadata/completion and through
+# every offline check. Installer/sync writers hold this same inode exclusively.
+runtime_lock="$HOME/projects/.us-equities-runtime.lock"
+[[ ! -L "$runtime_lock" && ( ! -e "$runtime_lock" ||
+    ( -f "$runtime_lock" && -O "$runtime_lock" ) ) ]] || blocked 73
+exec {runtime_lock_fd}>>"$runtime_lock" || blocked 73
+flock --shared --nonblock "$runtime_lock_fd" || blocked 69 'runtime is in use by installer'
 for entry in "pyproject.toml|$project_hash" "uv.lock|$lock_hash"; do
     IFS='|' read -r filename expected_hash <<< "$entry"
     [[ ! -L "$project/$filename" && -f "$project/$filename" ]] || blocked 73 'runtime metadata is unavailable'
