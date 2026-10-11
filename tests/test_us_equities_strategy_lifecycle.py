@@ -451,9 +451,218 @@ class PortableRecoveryTests(unittest.TestCase):
             finally:
                 ledger.close()
 
+    def test_notice_persistence_runtime_error_keeps_cancel_delivery_and_next_alert(self):
+        with tempfile.TemporaryDirectory() as directory:
+            ledger = self.safety.Ledger(Path(directory) / "ledger.sqlite3")
+            try:
+                s = self.fixture(ledger=ledger, halted=True, quantity="3")
+                original = s.pending
+                with patch.object(ledger, "_set", side_effect=RuntimeError("synthetic write failure")):
+                    s._drive()
+                self.assertEqual(s.cancels, [original.client_order_id])
+                self.assertIs(s.pending, original)
+                self.assertTrue(s.cancel_requested)
+                self.assertEqual(s.submits, [])
+                self.assertEqual(s.notified, ["held_halted"])
+                self.assertIn("held_notice_persistence_failed", s.flags)
+                rows = [row for row in s.trace if row["event"] == "halt_hold_notice"]
+                self.assertEqual(len(rows), 1)
+                self.assertEqual(rows[0]["persist_error"], "RuntimeError")
+                self.assertEqual(rows[0]["client_order_id"], original.client_order_id)
+                self.assertEqual(s.clock.alerts["t22-halt-hold"][0], 603_000_000_000)
+                self.assertIsNone(self.notices.load(ledger, s.spec.instrument_id, s.client_id_prefix))
+                self.assertEqual(s.callback_faults, [])
+            finally:
+                ledger.close()
+
+    def test_routine_notice_keeps_an_existing_freeze_without_repeating_the_stop(self):
+        with tempfile.TemporaryDirectory() as directory:
+            ledger = self.safety.Ledger(Path(directory) / "ledger.sqlite3")
+            try:
+                s = self.fixture(ledger=ledger, halted=True, role="exit", quantity="7")
+                s.pending = None
+                stops, notices = [], []
+                s.fault_sink, s.notice_sink = stops.append, notices.append
+                s._freeze("held_quote_stale")
+                self.assertEqual(ledger.halted_reason(), "held_quote_stale")
+                s._notify_halt_hold(s.clock.timestamp_ns(), "held_halted")
+                self.assertEqual(stops, ["held_quote_stale"])
+                self.assertEqual(notices, ["held_halted"])
+                self.assertEqual(ledger.halted_reason(), "held_quote_stale")
+                self.assertEqual(
+                    [row["reason"] for row in s.trace if row["event"] == "safety_freeze"],
+                    ["held_quote_stale"],
+                )
+                self.assertTrue(s.faulted)
+                self.assertEqual(s.submits + s.cancels, [])
+                self.assertEqual(s.clock.alerts["t22-halt-hold"][0], 603_000_000_000)
+                self.assertEqual(
+                    self.notices.load(ledger, s.spec.instrument_id, s.client_id_prefix)["reason"],
+                    "held_halted",
+                )
+            finally:
+                ledger.close()
+
+    def test_recreated_actor_retains_notice_without_adopting_exposure_or_sending_orders(self):
+        with tempfile.TemporaryDirectory() as directory:
+            s, ledger = self.recovered(Path(directory) / "ledger.sqlite3", 100_000_000_000)
+            try:
+                # Preserve the real startup freeze. Each recovery/clear fence
+                # alone is redundant; the property catches only their pair.
+                with ledger._transaction():
+                    ledger.db.execute("UPDATE positions SET qty='0',cost_basis='0' WHERE symbol='SPY'")
+                s.snapshot_halted, s.snapshot_halt_valid_until_ns = False, 200_000_000_000
+                original = self.notices.load(ledger, s.spec.instrument_id, s.client_id_prefix)
+                self.assertTrue(s.faulted)
+                self.assertFalse(s.enabled)
+                s._drive()
+                self.assertEqual(self.notices.load(ledger, s.spec.instrument_id, s.client_id_prefix), original)
+                self.assertEqual(s.quantity, 0)
+                self.assertIsNone(s.pending)
+                self.assertEqual(s.cancels + s.submits, [])
+                self.assertTrue(s.faulted)
+                self.assertFalse(s.enabled)
+            finally:
+                ledger.close()
+
+    def test_each_reconciliation_refusal_signal_retains_the_durable_notice(self):
+        # Each case has exactly one refusal signal; another guard cannot hide
+        # deletion of the signal under test. Ledger position has its own real
+        # close/reopen regression above.
+        for signal in ("quantity", "pending", "ledger_unresolved", "cache_order", "cache_position"):
+            with self.subTest(signal=signal), tempfile.TemporaryDirectory() as directory:
+                ledger = self.safety.Ledger(Path(directory) / "ledger.sqlite3")
+                try:
+                    s = self.fixture(ledger=ledger, halted=True, role="exit", quantity="7")
+                    s._drive()
+                    s.quantity, s.pending = self.D(0), None
+                    original = self.notices.load(ledger, s.spec.instrument_id, s.client_id_prefix)
+                    s.faulted = True
+                    due = s.clock.alerts["t22-halt-hold"][0]
+                    if signal == "quantity":
+                        s.quantity = self.D(7)
+                    elif signal == "pending":
+                        s.pending = SimpleNamespace(client_order_id=original["client_order_id"])
+                    elif signal == "ledger_unresolved":
+                        with ledger._transaction():
+                            ledger.db.execute(
+                                "INSERT INTO intents(client_id,symbol,side,qty,limit_price,status,updated_at) VALUES (?,?,?,?,?,?,?)",
+                                (original["client_order_id"], "SPY", "SELL", "7", "10", "reserved", 0),
+                            )
+                        self.assertEqual(len(ledger.unresolved()), 1)
+                    elif signal == "cache_order":
+                        s.cache.orders_open = lambda **kw: [SimpleNamespace()]
+                    else:
+                        s.cache.positions_open = lambda **kw: [SimpleNamespace()]
+                    with self.assertRaisesRegex(ValueError, "held_exposure_not_resolved"):
+                        s.reconcile_held_notice_resolved()
+                    self.assertEqual(self.notices.load(ledger, s.spec.instrument_id, s.client_id_prefix), original)
+                    self.assertEqual(s.clock.alerts["t22-halt-hold"][0], due)
+                    self.assertEqual(s.active_halt_notice, original)
+                    self.assertTrue(s.faulted)
+                    self.assertEqual(s.submits + s.cancels, [])
+                finally:
+                    ledger.close()
+
 
 @unittest.skipUnless(NATIVE, "requires the exact locked Nautilus rc5 runtime")
 class LifecycleTests(unittest.TestCase):
+    def test_expiry_first_observes_unknown_state_and_persists_notice_before_return(self):
+        start = simulation.BASE_NS
+        notices, faults, observed = [], [], []
+        notice_state = importlib.import_module(
+            "blueprints.us-equities.strategies.halt_notice"
+        )
+
+        class Expire(families.GapPremarketStrategy):
+            def on_data(self, data):
+                value = getattr(data, "data", data)
+                if isinstance(value, contracts.FactorSnapshot):
+                    value = replace(value, valid_until_ns=start + 2_400_000_000)
+                return super().on_data(value)
+
+            def on_quote(self, quote):
+                if (
+                    not observed
+                    and quote.ts_event >= start + 2_500_000_000
+                    and self.pending_role == "exit"
+                ):
+                    # Inject the terminal callback before the next drive first
+                    # observes expired producer state. No earlier hold notice
+                    # can mask loss of the expiry callback's independent port.
+                    original_id = str(self.pending.client_order_id)
+                    self.on_order_expired(
+                        SimpleNamespace(client_order_id=self.pending.client_order_id)
+                    )
+                    observed.append(
+                        (
+                            list(notices),
+                            notice_state.load(
+                                self.ledger, self.spec.instrument_id, self.client_id_prefix
+                            ),
+                            original_id,
+                            self.clock.timestamp_ns(),
+                            self.faulted,
+                            self.pending,
+                            self.quantity,
+                            set(self.flags),
+                        )
+                    )
+                    return  # Inspect the callback before any subsequent drive.
+                return super().on_quote(quote)
+
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "ledger.sqlite3"
+            ledger = safety.Ledger(path)
+            try:
+                strategy = run_strategy(
+                    ledger=ledger,
+                    faults=faults,
+                    notice_sink=notices.append,
+                    strategy_type=Expire,
+                    bids=("10", "10", "9", "8", "8"),
+                    quote_offsets_ns=(
+                        0, 1_000_000_000, 2_000_000_000, 2_200_000_000, 2_500_000_000
+                    ),
+                    overrides={"exit_deadline_ns": start + 2_000_000_000},
+                )
+            finally:
+                ledger.close()
+            self.assertEqual(len(observed), 1)
+            delivered, state, original_id, now, frozen, pending, quantity, flags = observed[0]
+            self.assertEqual(delivered, ["held_halt_state_unknown"])
+            self.assertIsNotNone(state)
+            self.assertEqual(
+                state,
+                {
+                    "schema_version": 1,
+                    "instrument_id": strategy.spec.instrument_id,
+                    "client_id_prefix": strategy.client_id_prefix,
+                    "client_order_id": original_id,
+                    "reason": "held_halt_state_unknown",
+                    "last_notice_ns": now,
+                    "next_due_ns": now + 600_000_000_000,
+                    "active": True,
+                },
+            )
+            reopened = safety.Ledger(path)
+            try:
+                self.assertEqual(
+                    notice_state.load(
+                        reopened, strategy.spec.instrument_id, strategy.client_id_prefix
+                    ),
+                    state,
+                )
+            finally:
+                reopened.close()
+        self.assertTrue(frozen)
+        self.assertIsNone(pending)
+        self.assertGreater(quantity, 0)
+        self.assertIn("held_halt_state_unknown", flags)
+        self.assertIn("halted_day_expiry_requires_handoff", flags)
+        self.assertIn("halted_day_expiry_requires_handoff", faults)
+        self.assertFalse(strategy.callback_faults)
+
     def test_partial_native_fill_is_cancelled_before_a_raising_notice(self):
         from nautilus_trader.execution import DefaultFillModel
 
@@ -1299,9 +1508,10 @@ class LifecycleTests(unittest.TestCase):
                         else start + restart_offset
                     )
                     next_due = due + 600_000_000_000
+                    restart_faults = []
                     restarted = run_strategy(
                         ledger=reopened,
-                        faults=[],
+                        faults=restart_faults,
                         bids=("8",) * 3,
                         start_ns=start + restart_offset,
                         initial_snapshot_age_ns=0,
@@ -1324,6 +1534,21 @@ class LifecycleTests(unittest.TestCase):
                         all(row["client_order_id"] == original_id for row in notices)
                     )
                     self.assertTrue(restarted.faulted)
+                    startup_faults = [
+                        "startup_held_notice_requires_reconciliation",
+                        "startup_position_requires_reconciliation",
+                    ]
+                    if restart_offset >= 603_000_000_000:
+                        # An overdue first delivery freezes the new actor
+                        # before startup reconciliation, then sets the durable
+                        # ledger halt. Later routine notices cannot repeat it.
+                        startup_faults = [
+                            "held_halted",
+                            "startup_held_notice_requires_reconciliation",
+                            "startup_ledger_halted_requires_reconciliation",
+                            "startup_position_requires_reconciliation",
+                        ]
+                    self.assertEqual(restart_faults, startup_faults)
                     self.assertEqual(restarted.quantity, 0)  # No implicit adoption.
                     self.assertFalse(
                         [

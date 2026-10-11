@@ -660,3 +660,66 @@ may equal either raw fence dimension while satisfying the separate snapshot
 revision check. Its three native cases pass and reject the stricter `<=` mutant.
 Broker/session reconciliation and
 T15's seven paper assertions remain unqualified.
+
+## PR994 witness coverage at 1762d7b3
+
+The expiry callback can first observe an expired producer. The native regression
+now injects that callback while a real exit is working and inspects the result
+before another drive: the separate notice, instrument/instance/original-order
+identity, last-notice and next-due timestamps, active record, retained quantity,
+terminal pending state and handoff freeze. A SQLite close/reopen also verifies
+the exact persisted record. This follows [F-1 decision 2, lines 19–25](https://github.com/seathatflowsinourveins/us-equities-trading/blob/f8c607bc1f1f0205fdc87095f47df150d2f78117/docs/decisions/2026-10-10-halt-exit-policy.md#L19-L25)
+and the selected rc5 [expiry callback](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/python/nautilus_trader/trading/__init__.pyi#L659),
+with the existing metadata/transaction boundary cited above. It is an injected
+native callback witness; venue-driven DAY expiry remains unqualified.
+
+The real-ledger native restart test records every failure-sink invocation.
+At +100 s it receives only the two startup reconciliation freezes; routine
+notices at +603 s and +1203 s do not call it again. At an overdue +2,000 s
+restart, the immediate first notice precedes startup reconciliation and its
+freeze; the +2,600 s routine notice adds no stop. The native E06 negative
+control fails one assertion and N17 fails both restart subcases, with no errors
+or skips; both native methods pass with production unchanged.
+
+Four additional SDK-free tests execute exact production methods with the
+actual SQLite Ledger and synthetic clocks/command ports. They isolate a
+RuntimeError from metadata persistence while pinning cancellation, delivery,
+lost-durability flag/trace and re-arm; retained recovery metadata after actual
+startup freezing and a subsequent flat journal/non-halted state; each individual
+reconciliation refusal signal; and preservation of an existing durable freeze
+without another failure-sink call. The existing real-ledger position refusal
+completes all six reconciliation signals. These are local logic/integration
+checks, not native engine or broker reconciliation acceptance.
+
+The final trading-cc read at 1762d7b3 (SHA256
+`b834c967cedb01e4b1a540ec4afc2880a294335e6d7d245e6983fa6eacb84883`)
+withdraws the single-site restored-passive F5 finding: startup freezes the
+recreated actor, and F6 separately protects its retained record. The recovery
+property follows its validated witness (SHA256
+`b7f3b20622607d10ade83f813f9c063e970472c3156ff3c2c6061c658c66f2c5`).
+F5 and F6 individually pass; removing both fails the retained-record assertion.
+An earlier unfrozen synthetic recovery fixture and its F5 kill are superseded
+because they did not preserve the recreated actor's actual startup invariant.
+
+The unchanged engine and ledger implementations remain the selected sources;
+this follow-up changes tests, source-bound acceptance and documentation only.
+The supported generator runs 106 tests without skips: 86 SDK-dependent native
+tests and 20 contract/portable checks. System Python separately runs ten
+portable tests and skips 69 SDK-dependent lifecycle tests.
+Reader inputs, native positive/negative controls and both mutation censuses are
+retained in `~/.local/state/native-agent-stack/coordination/ns2604-coop/lanes/strategies-pr994-witness-fix-20261011/`.
+The earlier first-read counts above remain evidence for their named correction.
+Notice containment applies to errors derived from `Exception`; a
+`BaseException` interruption is outside that guarantee. Native-carrier
+equal-stamp coverage, corrupted/inactive-record variants, failures while
+clearing metadata and re-entrant native stop remain disclosed boundaries.
+
+The cumulative reviewer micro (SHA256
+`450484c2d964f082a82e9caeea957fa5549ea49f7b3070cb4214d662a39934b0`)
+supplies a synthetic LiveNode restart probe using the unchanged FakePort
+fixture, real SQLite and `fault_sink=session.fail`. Reproduced at final source,
+the head delivers its notice at +3 s, calls the failure sink only for the two
+startup freezes and stays active until the requested +8 s stop. N17 adds
+`held_halted` to that sink and stops at about +3.1 s. This closes the earlier
+startup-stop qualification doubt for that fixture; broker/session readiness
+and paper acceptance remain separate. No performance claim changes.

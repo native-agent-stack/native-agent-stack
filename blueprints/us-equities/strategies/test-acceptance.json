@@ -53,6 +53,7 @@
     "test_exit_lost_inside_a_throttled_halt_hold_freezes_once_for_handoff",
     "test_expired_halt_state_blocks_exit_and_notifies",
     "test_expired_halt_state_keeps_working_exit_and_notifies",
+    "test_expiry_first_observes_unknown_state_and_persists_notice_before_return",
     "test_expiry_freezes_a_held_exit_only_for_its_own_order_inside_a_halt",
     "test_explicit_deadline_and_timeout_races_use_armed_cutoff",
     "test_explicit_nontrading_status_cancels_entry_without_halt_action",
@@ -105,11 +106,15 @@
     "test_unprocessed_halt_cancel_uses_entry_deadline_in_all_three_fill_windows",
     "test_unsupported_session_names_block_entry_and_durably_hold_exit",
     "test_working_exit_is_flagged_and_notified_every_ten_minutes",
+    "test_each_reconciliation_refusal_signal_retains_the_durable_notice",
+    "test_notice_persistence_runtime_error_keeps_cancel_delivery_and_next_alert",
     "test_observed_halt_still_dispatches_entry_cancel",
     "test_overdue_notices_coalesce_once_then_use_actual_delivery_time",
     "test_real_ledger_reopen_preserves_original_boundary_and_order_identity",
     "test_real_metadata_is_scoped_to_one_strategy_identity",
     "test_reconciliation_cannot_clear_an_unresolved_held_position",
+    "test_recreated_actor_retains_notice_without_adopting_exposure_or_sending_orders",
+    "test_routine_notice_keeps_an_existing_freeze_without_repeating_the_stop",
     "test_unknown_state_cancels_only_entries_and_refuses_exit_replacement_commands"
   ],
   "runtime_install": "T13 unchanged uv sync --locked from ee3883699870d972058516192b1ee1c6e3ffb762",
@@ -130,11 +135,11 @@
     "blueprints/us-equities/strategies/simulation.py": "f85076053e2281eb01d29d890c756e53f38d39c1ac00ac48afa7e24533984834",
     "tests/test_adaptive_paper_native.py": "728458624788243abcaf653f6a20a5a6201cfa9ec3328e8d7eb3fd58fdfa94b0",
     "tests/test_us_equities_strategies.py": "5da0d609528bbea10b3ee6d71e6db10934f017b011277485d5765978391599c6",
-    "tests/test_us_equities_strategy_lifecycle.py": "b5f096e403f8fd06003ab13aa9e5b7d643165743bb7e09dd267fbace57efd5b2"
+    "tests/test_us_equities_strategy_lifecycle.py": "a01f7e21f20b9ea3fb7ea535f63dc886218f3f2a1c5b555367ef6a8beeb8448a"
   },
   "status": "passed",
-  "stderr_sha256": "8ce231a3d7b532f1d18df18dd49e43329913a21213793ab520e478f439252294",
-  "stdout_sha256": "19a657cdd51288f366f5640a4d832d1f08bd9bc0ffcce5037f922eaeff5dd9b6",
+  "stderr_sha256": "45bc8bd28f605d598577161b0121db21da6f8e30e125d34e439fd2421c274924",
+  "stdout_sha256": "0052d5d45e1ebce217e92cc53513b4bdaba71bce0e73e9d8e4d93fad5ecedeed",
   "strategy_performance": "NOT_CITED",
-  "tests_run": 101
+  "tests_run": 106
 }

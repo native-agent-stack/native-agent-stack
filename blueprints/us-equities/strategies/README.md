@@ -256,10 +256,10 @@ Pending exits intentionally keep their working order and original identity
 through a halt or unknown state. The position is flagged `held_halted` for a
 halt, and the separate notice sink is called at observation and every ten
 minutes through a native nanosecond alert. A partially filled entry is cancelled
-before a held-position notice is attempted. Notice exceptions are caught and
-recorded as `stop_error`; they cannot prevent that cancellation or the next
-alert. The failure sink remains bound to freezes, including an unprotected
-held position. The entry cancellation rule does not cancel exits; elapsed
+before a held-position notice is attempted. Notice delivery errors derived from
+`Exception` are caught and recorded as `stop_error`; they cannot prevent that
+cancellation or the next alert. The failure sink remains bound to freezes,
+including an unprotected held position. The entry cancellation rule does not cancel exits; elapsed
 timeouts and deadlines act on the next drive after an accepted resumption.
 A held exit's expiry callback flags/notifies and freezes the instance for
 handoff before returning. A freeze's reason flag survives resumption.
