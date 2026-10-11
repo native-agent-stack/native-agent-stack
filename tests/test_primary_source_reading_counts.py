@@ -261,7 +261,9 @@ class ReadingCountsTests(unittest.TestCase):
         run = self.reading["run"]
         calls = self.reading["usage"]["advisor_calls"]
         self.assertIn(f"{calls['refused_too_many_requests']} refused as too_many_requests; the answered calls bill at the "
-                      "advisor's rates outside the executors' usage, the refused calls carry no usage and cost nothing", run)
+                      "advisor's rates outside the executors' usage, the refused calls carry no usage and add no advisor charge "
+                      "(the executor tokens that issue a refused call stay in the executors' spend)", run)
+        self.assertNotIn("cost nothing", run)  # the claim that no page line prices; the measured part is that a refused call carries no usage
         self.assertNotIn("all billed", run)
         ((_, advisor),) = self.reading["usage"]["advisor_by_model"].items()
         self.assertEqual(advisor["calls"], calls["answered"])  # the billed tokens are the answered calls' only
@@ -273,6 +275,10 @@ class ReadingCountsTests(unittest.TestCase):
         self.assertRegex(pricing["read_utc"], r"^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ$")
         self.assertIn(f"rates read {pricing['read_utc'][:10]} from the pricing page", record_text())
         self.assertIn("re-fetched by the script that wrote this field", pricing["read_note"])
+        # The command center's read of #986 at cc454f7f, P3: the hashes are of the .md bytes the script fetched, so the record names those URLs and the script with its hash.
+        self.assertEqual(pricing["hashed_urls"]["page_sha256"], pricing["source"] + ".md")
+        self.assertEqual(pricing["hashed_urls"]["advisor_page_sha256"], pricing["advisor_billing_source"].split(" ", 1)[0] + ".md")
+        self.assertRegex(pricing["read_note"], r"\(p958_p3_fix\.py, sha256 [0-9a-f]{64}, kept in the research directory\)")
 
     def test_the_list_price_states_the_speed_it_assumes(self):
         # P3 d: 24 executor messages record no speed and an advisor iteration records neither speed nor service tier.

@@ -20047,8 +20047,8 @@
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/primary-source-reading.json",
-      "sha256": "f0def4209d628725ce790e3dcdfdd576d6e82867235ee4ff9ce96b945caaf15a",
-      "bytes": 447037
+      "sha256": "1113e5cdefa53d9e18bbb6a9b7c568eedd5949d4d2a1e7bbc0e12696a3101b71",
+      "bytes": 447581
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/probes-20261009.json",
@@ -60797,8 +60797,8 @@
     },
     {
       "path": "tests/test_native_practice_cross_client_sources.py",
-      "sha256": "19da11ea2f6e00d3605d06799bf1f7162081de4babcc3366a5dedbc0c56b1358",
-      "bytes": 10481
+      "sha256": "e6a0c5e637748744009c3789b77128d6350467289d5d1ac0a41b4550fa968623",
+      "bytes": 13837
     },
     {
       "path": "tests/test_native_practice_doc_corrections.py",
@@ -60987,8 +60987,8 @@
     },
     {
       "path": "tests/test_primary_source_reading_counts.py",
-      "sha256": "217a4ac2ad8e2e82cb12d051ca771d77d7950905c3f2c7879b622f1e88659290",
-      "bytes": 23507
+      "sha256": "fe4e5e9125f0a3e6927ef1ab74ea62bbc16abbd64faf32aa88fe790b6e35041d",
+      "bytes": 24282
     },
     {
       "path": "tests/test_promotion_gate.py",
