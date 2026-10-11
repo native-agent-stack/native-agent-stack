@@ -158,3 +158,60 @@ class AdaptiveSellAgeNativeRegressionTests(unittest.TestCase):
                 self.assertEqual(len(strategy.submitted), expected)
                 strategy.positions = lambda: {"AAPL": {"qty": "1"}}
                 self.assertEqual(strategy._operational_status(1000).state_fresh, bool(expected))
+
+
+@unittest.skipUnless(NATIVE, "requires installed native engine; gap-stop input is synthetic")
+class AdaptiveGapStopSellAgeRegressionTests(unittest.TestCase):
+    """CC B1: the armed sell trigger uses exit age; its references use entry age."""
+
+    def strategy(self, exit_age=30):
+        from .test_adaptive_paper_sessions import StaleQuoteGapRiskTests
+        helper = StaleQuoteGapRiskTests()
+        strategy = helper.strategy()
+        limits, config = load_policy(exit_age)
+        strategy.policy.config = replace(config, gap_stop_enabled=True)
+        strategy.ledger.limits = limits
+        return strategy, helper
+
+    def quote(self, strategy, bid, at):
+        from .test_adaptive_paper_sessions import _FakeQuote
+        strategy.policy.latest["SPY"] = _FakeQuote(bid, bid+.05, at)
+
+    def test_armed_gap_stop_fires_through_sell_ceiling_and_refuses_above_it(self):
+        for age, expected in ((2, {"SPY"}), (3, {"SPY"}), (4, {"SPY"}),
+                              (10, {"SPY"}), (20, {"SPY"}), (30, {"SPY"}), (31, set())):
+            with self.subTest(age=age):
+                strategy, helper = self.strategy()
+                at = helper.arm(strategy)+60
+                self.quote(strategy, 70, at-age)
+                self.assertEqual(strategy._gap_risk_stop_symbols(at, {"SPY": Decimal("1")}), expected)
+
+    def test_arming_waits_for_entry_fresh_reference_then_uses_sell_age_to_trigger(self):
+        from .test_adaptive_paper_sessions import DeferredArmingOnStaleQuoteTests, ny
+        for stale_age in (4, 30):
+            with self.subTest(arming_age=stale_age):
+                strategy, _ = self.strategy()
+                DeferredArmingOnStaleQuoteTests().prime_prior_close(strategy)
+                at = ny(2026, 3, 11, 9, 35).timestamp()
+                self.quote(strategy, 80, at-stale_age)
+                self.assertEqual(strategy._gap_risk_stop_symbols(at, {"SPY": Decimal("1")}), set())
+                self.assertNotIn("SPY", strategy._gap_risk_stop_price)
+                self.assertIn("SPY", strategy._gap_arm_pending)
+                at += 10
+                self.quote(strategy, 80, at-3)  # inclusive ENTRY ceiling for arming
+                strategy._gap_risk_stop_symbols(at, {"SPY": Decimal("1")})
+                self.assertIn("SPY", strategy._gap_risk_stop_price)
+                self.assertNotIn("SPY", strategy._gap_arm_pending)
+                at += 30
+                self.quote(strategy, 70, at-20)  # sell trigger, not reference arming
+                self.assertEqual(strategy._gap_risk_stop_symbols(at, {"SPY": Decimal("1")}), {"SPY"})
+
+    def test_absent_and_null_keep_legacy_gap_trigger_while_explicit_exit_age_widens_it(self):
+        for setting in (ABSENT, None, 30):
+            for age in (2, 3, 4, 10, 20, 30, 31):
+                with self.subTest(setting="absent" if setting is ABSENT else setting, age=age):
+                    strategy, helper = self.strategy(setting)
+                    at = helper.arm(strategy)+60
+                    self.quote(strategy, 70, at-age)
+                    expected = {"SPY"} if age <= (30 if setting == 30 else 3) else set()
+                    self.assertEqual(strategy._gap_risk_stop_symbols(at, {"SPY": Decimal("1")}), expected)

@@ -617,13 +617,11 @@ class AdaptiveStrategy(Strategy):
                                      "expected_session_date": str(expected_prior_date) if expected_prior_date else None})
                     continue
                 quote = self.policy.latest.get(symbol)
-                # D2 (round 4): the quote used to DERIVE the armed stop
-                # price was never age-checked at all. Apply the same
-                # freshness window every other order path in this file
-                # uses; a symbol with only a stale/future-stamped quote at
-                # this tick simply stays pending and is retried on the
-                # next RTH tick, not silently skipped for the rest of the
-                # session.
+                # Arming derives a stop reference price and retains the
+                # ENTRY quote-age window, independently of the sell trigger.
+                # A symbol with only a stale/future-stamped reference at
+                # this tick stays pending and is retried on the next RTH
+                # tick, not silently skipped for the rest of the session.
                 if (quote is None or now - quote.timestamp > self.policy.config.quote_age_seconds
                         or now < quote.timestamp - QUOTE_FUTURE_TOLERANCE_SECONDS):
                     continue
@@ -674,15 +672,14 @@ class AdaptiveStrategy(Strategy):
                     continue
                 stop_price = self._gap_risk_stop_price.get(symbol)
                 quote = self.policy.latest.get(symbol)
-                # D2 (round 3): the trigger used to read policy.latest with
-                # no quote-age guard at all, unlike every other order path
-                # in this file (rebalance()'s own action loop, replace_exit,
-                # _submit_replacement_exit) -- a stale quote could still
-                # trip the gap stop. Apply the identical freshness window
-                # (same QUOTE_FUTURE_TOLERANCE_SECONDS/quote_age_seconds
-                # those paths use) here too.
+                # The trigger is a sell decision and uses the effective
+                # sell quote-age bound, like the native action and cancel-ack
+                # replacement guards. Absent an exit age it inherits entry.
+                # This does not widen the entry-age reference windows used
+                # to arm a stop or capture a prior close. The future-clock
+                # tolerance is unchanged for both default and explicit ages.
                 if (stop_price is None or quote is None
-                        or now - quote.timestamp > self.policy.config.quote_age_seconds
+                        or now - quote.timestamp > sell_quote_age_seconds(self.policy.config)
                         or now < quote.timestamp - QUOTE_FUTURE_TOLERANCE_SECONDS):
                     continue
                 if Decimal(str(quote.bid)) <= stop_price:
@@ -712,13 +709,11 @@ class AdaptiveStrategy(Strategy):
                     self._prior_close_capture_pending.discard(symbol)
                     continue
                 quote = self.policy.latest.get(symbol)
-                # D3 (round 4)/D2 (round 5): guard the capture itself with
-                # the same freshness window -- an unguarded/stale/
-                # future-stamped quote used to be captured (and persisted)
-                # as "the" prior close unconditionally. A symbol whose
-                # quote is still stale simply stays pending and is retried
-                # on the next non-RTH tick, instead of never being
-                # captured for this crossing at all.
+                # Prior-close capture retains the ENTRY-age reference
+                # window and future tolerance, independently of the sell
+                # trigger. A stale reference stays pending and is retried
+                # on the next non-RTH tick rather than being persisted as
+                # the prior close or abandoned for this crossing.
                 if (quote is None or now - quote.timestamp > self.policy.config.quote_age_seconds
                         or now < quote.timestamp - QUOTE_FUTURE_TOLERANCE_SECONDS):
                     continue

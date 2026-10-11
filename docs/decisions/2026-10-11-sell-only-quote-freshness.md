@@ -54,12 +54,17 @@ paths are:
 
 - `blueprints/us-equities/adaptive-paper/safety.py:158-291,692-704,819-940`:
   bounded RiskLimits, frozen JSON, reservation and pre-submit revalidation.
-- `blueprints/us-equities/adaptive-paper/mover.py:343-357,1154-1156,1223-1248`:
-  config-to-limits derivation and the separate entry/exit pricing paths.
 - `blueprints/us-equities/adaptive-paper/transport.py:1203-1235,1401-1407`:
   validated constructor and final pre-POST check, including delayed budget waits.
 - `blueprints/us-equities/adaptive-paper/recovery.py:171-174`: quote freshness for
   deterministic owned-position recovery.
+
+The mover reference is re-anchored after the exit-chain merge to
+native-agent-stack main `569bbc59db2b5f7c8a932357726efb7acca90b91`:
+`blueprints/us-equities/adaptive-paper/mover.py:366-380,1201-1203,1261-1299`
+contains config-to-limits derivation, the quote-freshness primitive and the
+exit-chain management/pricing path. These ranges were checked against the
+pinned main bytes; the PR adds its sell-specific bound on top of that source.
 
 The sell-specific bound is propagated to the ledger and the final wire check;
 a ledger-approved old quote cannot bypass the final nanosecond check after a
@@ -84,9 +89,19 @@ older sells before reaching the ledger or transport. The correction passes
 `RiskLimits.effective_exit_quote_max_age_seconds` into the policy's optional
 `exit_quote_age_seconds` and shares its effective sell-age selection with those
 native sell guards. Entry features/orders, held-entry admission marks,
-mark-to-market, gap-reference sampling and gap-trigger signal freshness keep
-the entry age. The sell override does not authorize older reference prices or
-older inputs to a gap-risk signal.
+mark-to-market and gap-reference sampling keep the entry age. The sell override
+does not authorize older stop-arming or prior-close reference prices.
+
+The CC's B1 ruling switches the armed RTH gap-risk stop trigger from the entry
+age to `sell_quote_age_seconds(self.policy.config)`: **SWITCHED**. This closes
+the remaining sell-decision carve-out at the preceding head
+`1bb44890efaacd4c87b650e204c32282a7dec5ec`. Stop arming and prior-close capture
+remain on the entry age; the future tolerance and fire-once-on-submit behavior
+are unchanged. Three SYN workflow regressions first fail at that head with ten
+assertion failures and zero errors. They admit armed-trigger ages 4/10/20/30
+seconds with exit age 30, refuse 31 seconds, retain entry-fresh arming, and keep
+absent/null defaults on 3 seconds. The arming/default assertions already pass
+there; each workflow's configured bounded-sell assertion discriminates the fix.
 
 The native interface is NautilusTrader `v2.0.0rc5`, upstream
 `nautechsystems/nautilus_trader` at
