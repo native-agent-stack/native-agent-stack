@@ -101,10 +101,12 @@ So the alert is right that the install is not fully pinned, and "false positive"
 from a committed lockfile per package, which Scorecard accepts; it changes the bootstrap and its pins, so it is a separate
 follow-up PR, planned by the command center, and the alert closes with it.
 
-The guard test pins the full install argv (the argument array, the single `npm install` line and the fetch before it),
-not only the last argument, so an added package, flag or registry override fails it. Against the first version of this
-guard (last argument only), the mutants "extra package before the archive" and "registry override flag" both passed; both
-fail now.
+The guard executes the extracted bootstrap with the repository's existing offline download/npm stubs
+(`tests/test_adoption_bootstrap.py:865`, `run_install_pin`) and compares npm's complete observed argv, invocation
+count and the archive bytes at npm invocation time. It tests both ignore-scripts branches and paths containing spaces.
+Literal argv checks previously accepted archive reassignment and an indexed array append; both now fail,
+along with the original six mutations. Separately, the actual `fetch` function is exercised with valid and invalid
+cached/downloaded bytes; replacing the downloaded-file verifier with `true` makes the checksum guard fail.
 
 ## C. Alerts 88, 89, 92, 97, 98: retained evidence scripts
 
@@ -162,16 +164,18 @@ choice here. Quoted warnings are Scorecard's text at 2026-10-11.
 ## What this PR changes
 
 This record and `tests/test_code_scanning_dispositions.py` only; no workflow, bootstrap script or artifact changes. The
-one regression that fails before its fix is the install-argv guard: the first version passed an extra package before
-`"$archive"` and a registry override flag, the current one fails both. The test pins the facts the dismissals rest on, and
-fails when:
+regressions fail before their fixes for checksum-verifier bypass, archive reassignment/indexed array append,
+and quoted or comment-suffixed missing self-action targets. The tests exercise the existing offline bootstrap
+harness and reuse the repository's supported fail-closed workflow loader
+(`tests/test_workflow_policy.py:403`, `load_workflow`) instead of introducing another YAML scanner.
+They pin the facts the dismissals rest on and fail when:
 
 1. the disposition table above does not list the 22 alerts exactly once each;
 2. `install_npm` in `adoption/bootstrap-linux.sh` stops running exactly one `npm install` with the reviewed argv after
-   the `fetch()` that checked `"$archive"` against a sha256 (six mutants are caught: a registry spec, an extra package,
-   a registry flag, an extra array element, a second install, an install without the fetch), or `fetch()` stops exiting on
-   a mismatch;
-3. a `$/` reference in `validate.yml` or `publish-catalog.yml` names an action directory that does not exist.
+   the `fetch()` that checked `"$archive"` against a sha256 (the six original mutants plus archive reassignment and
+   indexed array append, plus a fetch moved after installation, are caught), or `fetch()` promotes a checksum-mismatched download;
+3. a decoded `$/` reference in `validate.yml` or `publish-catalog.yml` names an action directory that does not exist,
+   including single-quoted, double-quoted and comment-suffixed scalars.
 
 Third-party action pinning is already enforced by `tests/test_workflow_hardening.py` (every third-party action is
 pinned by a full commit SHA); this PR adds no duplicate. The macOS lock's placement in the frozen group is enforced by
@@ -185,6 +189,11 @@ PR and the record section: 99-107 `won't fix` (A); 108, 109 `false positive` (B1
 reviewers read the reasons first.
 
 ## SOTA sources
+
+- The existing repository harness at `fbec98e1cba60aa9851c8eca03d194743e3774bd`:
+  `tests/test_adoption_bootstrap.py:865` executes the actual Bash functions with local stubs and captures npm argv;
+  `tests/test_workflow_policy.py:403` decodes supported workflow YAML and rejects unsupported constructs.
+  This correction reuses both implementations without changing the bootstrap or the shared loader.
 
 - `ossf/scorecard@c395761df6afe1a69e476bc60a013a94bcbc153f` (the commit of tag v5.5.0; the tag object is
   `fac1a1678517b7185cd1fa24699a16423fd841d2`): `checks/raw/pinned_dependencies.go:800`,
