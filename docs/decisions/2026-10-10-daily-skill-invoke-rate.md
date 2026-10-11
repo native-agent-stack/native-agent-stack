@@ -364,7 +364,8 @@ after those changes. The supported
 `python3 scripts/build_new_wsl_handbook.py --write` command regenerates both
 outputs; its native `digest` function supplies their updated receipt hashes.
 The supported generator and native replay are version-bound in the correction
-source table below, using the cued main commit rather than a PR-branch pin.
+source table below, using unchanged main source bindings rather than a
+PR-branch pin. Those source bindings are distinct from the final landing base.
 This refresh changes source-digest metadata, not handbook recommendations.
 
 The focused local replay at 90fab198 reproduced nine failures across eight
@@ -404,7 +405,7 @@ records identify their measured inputs, not durable code-source citations.
 | Exhaustive lifecycle task map | [`tests/test_landscape_sweep_skills.py:133`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/878f2891aaa9027b10b7af3e4321ef5e882eedd0/tests/test_landscape_sweep_skills.py#L133) (main `878f2891`); `CatalogTests.test_every_pinned_skill_serves_exactly_one_task` | The original missing claude-api task fails; the corrected map passes with exactly one implementation task. |
 | Identity-bound architecture locators | [`tests/test_architecture_pin_source.py:49`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/878f2891aaa9027b10b7af3e4321ef5e882eedd0/tests/test_architecture_pin_source.py#L49) (main `878f2891`); `expected_ranges` | Both original OpenAI/TypeSafe locator subtests fail before and pass after native identity-based derivation. |
 | Identity-bound surface-watch locator | [`tests/test_upstream_surface_watch.py:2034`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/878f2891aaa9027b10b7af3e4321ef5e882eedd0/tests/test_upstream_surface_watch.py#L2034) (main `878f2891`); `DispositionCitationTests.has_token` and its repository citation contract | The original PostToolUseFailure locator fails before and passes after native token-based derivation. |
-| Exact reviewed inventory proposal | [`scripts/local_pages_policy_grants.py:109`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/878f2891aaa9027b10b7af3e4321ef5e882eedd0/scripts/local_pages_policy_grants.py#L109) (main `878f2891`); `proposal` / the test's `inventory_paths` selector | The integrated expected and actual sets each contain 94 paths, with no missing or extra path. |
+| Exact reviewed inventory proposal | [`scripts/local_pages_policy_grants.py:109`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/878f2891aaa9027b10b7af3e4321ef5e882eedd0/scripts/local_pages_policy_grants.py#L109) (main `878f2891`); `proposal` / the test's `inventory_paths` selector | The integrated expected and actual sets each contain 91 paths, with no missing or extra path. |
 | Push-gate accounting | [`blueprints/runtime-workers/openhands/resolver/push_gate.py:665`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/878f2891aaa9027b10b7af3e4321ef5e882eedd0/blueprints/runtime-workers/openhands/resolver/push_gate.py#L665) (main `878f2891`); `derive_ci_protected` through `RepositoryWorkflowTests.derived()` | The original unclassified-read guard fails before; the regenerated delta preserves exact script, shape, total and protection comparisons against the new main baseline. |
 | Handbook output provenance | [`scripts/build_new_wsl_handbook.py:1340`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/878f2891aaa9027b10b7af3e4321ef5e882eedd0/scripts/build_new_wsl_handbook.py#L1340) (main `878f2891`); supported `--write`, `render` and `digest` APIs | The stale-output/receipt guard fails before regeneration and passes after native regeneration. |
 
@@ -423,25 +424,82 @@ skips. Each passes against the corrected files.
 
 ## 2026-10-11 landing integration
 
-The superseding CC-cued main base is `878f2891aaa9027b10b7af3e4321ef5e882eedd0`.
-The earlier 93-path proposal on input 90fab198 is historical. Main's
-`scripts/secret_scan_metrics.py` and this PR's routing skill both appear
-in the integrated native inventory. The test's own `inventory_paths`
-derivation returns 94 expected paths, exactly equal to
-94 actual reviewed repository grants, with no missing or
-extra path. No grant count is copied from the earlier landing target.
+The final CC-cued main base is `1e6a49ffe8652918479e59bcb3751c0eb418e6d3`.
+The test's own `inventory_paths` derivation returns 91 expected paths,
+exactly equal to 91 actual reviewed repository grants, with no missing or
+extra path. Main's three retired workflow grants remain retired; this PR's
+routing skill is the reviewed addition. No grant count is copied from an
+earlier landing target. The `878f2891` source bindings above remain valid
+for the unchanged code; they do not identify the final landing base.
 
 Main's regenerated push-gate baseline already separates test modules.
 The merged guard preserves that baseline and the PR's exact script/shape
 accounting, without the obsolete eight-location subtraction. A fresh native
-derivation on completed rebased input
-`9fbac9b05f65b84418b8139a04f71f6f7a46c0fe` generates the current delta:
+derivation on the completed rebased input generates the current delta. The
+measured parent/source input is
+`561361c4818a13ad52d2a5be785a066c84128730`:
 340 unclassified reads, ten added skills_status reads and one added shape,
 with no removals. It binds the current baseline hash
 `8752740817bb41c1a582e33fa475e4ce4064f2ccfecadb706bce40ecb4512157`.
-The forward correction commit retains that input commit as its parent;
-production gate inputs are unchanged by its source-citation and public
-claim-test additions. The earlier 332-read accounting is historical.
+The final correction commit has that rebased source-binding commit as its
+parent. Both full SHAs above were read from Git after the final rebase,
+using `git merge-base HEAD origin/main` and `git rev-parse HEAD^`, before
+amending the correction commit. The delta's `source_commit` independently
+identifies the measured input. Script/shape accounting and its baseline
+remain unchanged.
+
+Historical observations: the earlier proposal on input `90fab198` held 93
+paths and recorded 332 reads. The earlier landing at `878f2891` held 94
+expected and actual paths, with `9fbac9b0` as its measured parent/source
+input. These observations describe earlier targets, not this integration.
+The later `8bffa2c4` landing and its `1e4f4654` source input are historical
+too; the final main base and measured parent above supersede them.
+
+The maintained `test_landing_record_matches_native_grants_and_measured_source`
+in `tests/test_skill_correction_claims.py` derives the current reviewed sets
+through the native selector cited above and checks the landing provenance
+against the delta's measured input. It fails on the reviewed `52cbf6ac`
+record with `94 != 91` and passes after this correction. The original three
+claim regressions retain their separate historical replay results above.
+
+### Final adjudication corrections and fail-first checks
+
+The daily adapter now requires the native host report's Codex measurement
+flag, a configured root and at least one scanned rollout before projecting
+Codex invocation counts. The upstream native metadata is exposed by
+[`tools/skill-usage/skill_usage.py:702`](../../tools/skill-usage/skill_usage.py#L702).
+This follows the unavailable-root boundary in the existing Claude collector,
+[`child-usage.mjs:3537`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/1e6a49ffe8652918479e59bcb3751c0eb418e6d3/examples/claude-native/workflows/child-usage.mjs#L3537)
+at the final main base. With no scanned rollout, the daily report emits
+unmeasured/UNKNOWN Codex counts and no zero-use candidates. A scanned
+rollout with zero uses remains a measured zero. This changes the daily
+projection; the legacy host report's root semantics remain a follow-up.
+
+The native-plugin policy remains registration of an already-installed
+plugin, as recorded above at the bundled-baseline paragraph and in the
+pinned upstream marketplace entry. The installer does not install it.
+A normal or dry run reports an absent native plugin as `not-installed`
+without failing bootstrap; explicit `--check-only` still fails absence,
+and installed pin/hash drift still fails. Native installation remains a
+separate CC-owned step. This is not counted as a newly installed plugin.
+
+The native status check receives `os.environ`, so a fixture plugin under
+`CLAUDE_CONFIG_DIR` is resolved identically by the installer and status
+checker. The retained reference is
+[`scripts/skills_status.py:250`](../../scripts/skills_status.py#L250), the
+existing config-directory resolver, plus the pinned Claude Code
+[CHANGELOG.md:1138](https://github.com/anthropics/claude-code/blob/2301018b1f61073c501a8e7a4813ef48c239163b/CHANGELOG.md#L1138)
+and the official environment-variable documentation cited above. No client
+settings or credentials are read by the fixture regressions.
+
+Each correction has a fail-first maintained check: the landing regression
+fails the old `94 != 91` record and, after rebasing, its old measured-source
+claim; the absent-root projection fails with `True is not false`; fresh
+normal/dry plugin runs fail with `0 != 1`; the custom config-directory
+check also fails with `0 != 1`. The latter three methods produce four
+failures before the code changes, with no errors. They pass after, retaining
+positive controls for measured zero, explicit absence refusal and default
+registry lookup. These are fixture checks, not fresh model measurements.
 
 The handbook and receipt are regenerated through the supported native
 APIs above. Native `register_file` and `evidence_manifest --write`

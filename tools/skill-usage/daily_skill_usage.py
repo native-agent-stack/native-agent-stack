@@ -35,6 +35,12 @@ def counts(value):
 
 def project_reports(host, codex, claude, *, now, window):
     """Project native aggregates, preserving client/group and measurement meaning."""
+    use_groups = host.get("codex_use_groups", {}).get(str(window), {}) if isinstance(host, dict) and isinstance(host.get("codex_use_groups"), dict) else {}
+    codex_state = host.get("codex", {}) if isinstance(host, dict) else {}
+    codex_measured = (isinstance(codex, dict) and codex.get("kind") == KINDS[1] and bool(use_groups)
+                      and isinstance(codex_state, dict) and codex_state.get("measured") is True
+                      and (count(codex_state.get("roots_count")) or 0) > 0
+                      and (count(codex_state.get("files_scanned")) or 0) > 0)
     host_rows = None
     baseline = json.loads((ROOT / "adoption/skills/claude-routing/trigger-baseline.json").read_text())
     wiring = {row["name"]: row for row in baseline.get("skills", [])}
@@ -48,15 +54,16 @@ def project_reports(host, codex, claude, *, now, window):
             days = x.get("counts", {}).get(str(window), {})
             host_rows.append({"name": row["name"], "claude_uses_lifetime": count(c.get("uses")),
                               "wiring": wiring.get(row["name"], {}).get("status"),
-                              "codex_use": count(x.get("use_counts", {}).get(str(window))),
-                              "codex_skill_md_reads": count(days.get("skill_md_reads")),
-                              "codex_name_mentions": count(days.get("name_mentions"))})
+                              "codex_use": count(x.get("use_counts", {}).get(str(window))) if codex_measured else None,
+                              "codex_skill_md_reads": count(days.get("skill_md_reads")) if codex_measured else None,
+                              "codex_name_mentions": count(days.get("name_mentions")) if codex_measured else None})
     lanes = []
-    use_groups = host.get("codex_use_groups", {}).get(str(window), {}) if isinstance(host, dict) and isinstance(host.get("codex_use_groups"), dict) else {}
     def lane(client, name, aggregate, field, use=None):
         if NAME.fullmatch(name) and isinstance(aggregate, dict):
             rows = counts(aggregate.get(field))
             if client == "codex":
+                if not codex_measured:
+                    use = None
                 raw = {row["name"]: row["count"] for row in rows}
                 rows = [{"name": skill, "count": count(use.get(skill, 0)) if isinstance(use, dict) else None,
                          "raw_reads": raw.get(skill, 0)} for skill in sorted(set(raw) | set(use or {}))
@@ -84,7 +91,7 @@ def project_reports(host, codex, claude, *, now, window):
                          "claude_host_lifetime": [row["name"] for row in host_rows or [] if row["claude_uses_lifetime"] == 0]},
             "codex_bulk_scan_limit": host.get("codex_use_policy", {}).get("max_distinct_skill_reads") if isinstance(host, dict) and isinstance(host.get("codex_use_policy"), dict) else None,
             "measured": {"host": host_rows is not None and host.get("claude", {}).get("measured") is True,
-                         "codex": isinstance(codex, dict) and codex.get("kind") == KINDS[1] and bool(use_groups),
+                         "codex": codex_measured,
                          "claude": isinstance(claude, dict) and claude.get("kind") == KINDS[2]}}
 
 

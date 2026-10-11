@@ -21,6 +21,50 @@ TARGETS = {"security-audit", "gh-fix-ci", "gh-address-comments", "frontend-desig
 
 
 class NativePluginTests(unittest.TestCase):
+    def test_fresh_native_plugin_is_not_installed_without_failing_default_run(self):
+        with tempfile.TemporaryDirectory() as temp:
+            home = Path(temp)
+            skill = {"name": "claude-api", "native_plugin": "claude-api@fixture",
+                     "path": "skills/claude-api", "ref": "a" * 40, "skill_md_sha256": "b" * 64}
+            manifest = home / "plugin-manifest.json"
+            manifest.write_text(json.dumps({"skills": [skill], "cli": {"version": "1.7.0"}}))
+            with patch.dict("os.environ", {}, clear=True), patch.object(
+                    install_skills, "verify_skills_bin", side_effect=AssertionError("Vercel CLI must not run")):
+                for mode in ([], ["--dry-run"]):
+                    with self.subTest(mode=mode), contextlib.redirect_stdout(io.StringIO()) as output:
+                        rc = install_skills.main(["--manifest", str(manifest), "--home", str(home), "--json", *mode])
+                        result = json.loads(output.getvalue())
+                        self.assertEqual(0, rc, "Tracking a separately installed native plugin must not break bootstrap")
+                        self.assertEqual("not-installed", result["skills"]["claude-api"])
+                with contextlib.redirect_stdout(io.StringIO()):
+                    self.assertEqual(1, install_skills.main(["--manifest", str(manifest), "--home", str(home),
+                                                          "--check-only", "--only", "claude-api"]))
+            self.assertFalse((home / ".agents/skills/claude-api").exists())
+
+    def test_native_plugin_check_only_honors_custom_claude_config_directory(self):
+        with tempfile.TemporaryDirectory() as temp:
+            home = Path(temp)
+            config = home / "custom-claude"
+            root = config / "plugins/cache/fixture/claude-api/pinned"
+            path = root / "skills/claude-api/SKILL.md"
+            path.parent.mkdir(parents=True)
+            raw = b"---\nname: claude-api\ndescription: fixture\n---\n"
+            path.write_bytes(raw)
+            skill = {"name": "claude-api", "native_plugin": "claude-api@fixture", "path": "skills/claude-api",
+                     "ref": "a" * 40, "skill_md_sha256": hashlib.sha256(raw).hexdigest()}
+            (config / "plugins/installed_plugins.json").write_text(json.dumps({"version": 2,
+                "plugins": {"claude-api@fixture": [{"scope": "user", "installPath": str(root),
+                    "gitCommitSha": "a" * 40, "installedAt": "2026-10-10T00:00:00Z"}]}}))
+            manifest = home / "plugin-manifest.json"
+            manifest.write_text(json.dumps({"skills": [skill], "cli": {"version": "1.7.0"}}))
+            env = {"CLAUDE_CONFIG_DIR": str(config)}
+            self.assertEqual("ok", skills_status.native_plugin_status(skill, home, env)["state"])
+            with patch.dict("os.environ", env, clear=True), contextlib.redirect_stdout(io.StringIO()) as output:
+                rc = install_skills.main(["--manifest", str(manifest), "--home", str(home), "--json",
+                                          "--check-only", "--only", "claude-api"])
+            self.assertEqual(0, rc, "Installer and native status must use the same environment")
+            self.assertEqual("ok", json.loads(output.getvalue())["skills"]["claude-api"])
+
     def test_plugin_pin_uses_native_metadata_and_never_the_skills_cli(self):
         with tempfile.TemporaryDirectory() as temp:
             home = Path(temp)

@@ -166,8 +166,8 @@ SKIPPED_STATUSES = ("pruned", "held")
 # Real-run and --dry-run each have their own notion of "nothing left to fix":
 # a dry run never executes `add`/`remove`, so 'planned' (not 'installed') is
 # its success outcome, but a real local-modified refusal is still a refusal.
-OK_STATUSES_REAL = {"ok", "installed"}
-OK_STATUSES_DRY_RUN = {"ok", "planned"}
+OK_STATUSES_REAL = {"ok", "installed", "not-installed"}
+OK_STATUSES_DRY_RUN = {"ok", "planned", "not-installed"}
 
 
 class InstallError(ValueError):
@@ -470,10 +470,15 @@ def process_skill(skill: dict, home: Path, skills_bin: str, dry_run: bool, force
         # a Vercel skills copy that shadows it; installation remains CC-owned.
         sys.path.insert(0, str(ROOT))
         from scripts.skills_status import native_plugin_status
-        status = native_plugin_status(skill, home, {})
+        status = native_plugin_status(skill, home, os.environ)
         if status["state"] == "ok":
             note(f"{name}: ok (native plugin at the pinned revision)")
             return "ok"
+        if status["state"] == "missing" and not check_only:
+            # The decision registers an already-installed plugin for tracking;
+            # its native installation remains a separate, CC-owned operation.
+            note(f"{name}: not installed (separate native plugin installation)")
+            return "not-installed"
         note(f"{name}: native plugin {status['state']}; use the reviewed Claude plugin install path")
         return "missing-or-drifted"
 

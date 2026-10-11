@@ -74,9 +74,30 @@ class CodexUseTests(unittest.TestCase):
 
 
 class DailyProjectionTests(unittest.TestCase):
+    def test_absent_codex_root_is_unknown_in_projection(self):
+        daily = daily_module()
+        host = {"kind": "skill_invoke_rate_report", "codex": {
+                    "measured": True, "roots_count": 1, "files_scanned": 0},
+                "skills": [{"name": "gh-fix-ci", "codex": {"use_counts": {"7": 0},
+                           "counts": {"7": {"skill_md_reads": 0, "name_mentions": 0}}}}],
+                "codex_use_groups": {"7": {"workers": {"gh-fix-ci": 0}}}}
+        codex = {"kind": "codex_lane_usage_report", "roots_count": 1, "files_scanned": 0,
+                 "groups": {"workers": {"sessions": 0, "skill_md_reads": {"gh-fix-ci": 0}}}}
+        report = daily.project_reports(host, codex, None, now="2026-10-11T00:00:00Z", window=7)
+        self.assertFalse(report["measured"]["codex"])
+        self.assertIsNone(report["host"][0]["codex_use"])
+        self.assertIsNone(report["lanes"][0]["skills"][0]["count"])
+        self.assertEqual([], report["zero_use"]["codex"])
+        host["codex"]["files_scanned"] = 1
+        report = daily.project_reports(host, codex, None, now="2026-10-11T00:00:00Z", window=7)
+        self.assertTrue(report["measured"]["codex"])
+        self.assertEqual(0, report["host"][0]["codex_use"])
+        self.assertEqual(["gh-fix-ci"], report["zero_use"]["codex"])
+
     def test_groups_keep_names_and_counts_and_unknown_is_not_zero(self):
         daily = daily_module()
-        host = {"kind": "skill_invoke_rate_report", "skills": [{"name": "gh-fix-ci", "claude": {"uses": 0},
+        host = {"kind": "skill_invoke_rate_report", "codex": {"measured": True, "roots_count": 1, "files_scanned": 1},
+                "skills": [{"name": "gh-fix-ci", "claude": {"uses": 0},
                 "codex": {"counts": {"7": {"skill_md_reads": 4, "name_mentions": 1}}, "use_counts": {"7": 1}}, "prompt": "PRIVATE"}],
                 "codex_use_groups": {"7": {"workers": {"gh-fix-ci": 1}, "workers_by_role": {"worker": {"gh-fix-ci": 1}}}}}
         codex = {"kind": "codex_lane_usage_report", "groups": {"workers": {"sessions": 2,

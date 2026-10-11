@@ -8,7 +8,10 @@ CPython's unittest, json, pathlib and re APIs own execution and parsing.
 import json
 from pathlib import Path
 import re
+import subprocess
 import unittest
+
+from tests.test_local_pages_policy_grants import grants
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -27,6 +30,43 @@ def sections(text):
 
 
 class SkillCorrectionClaimsTests(unittest.TestCase):
+    def test_landing_record_matches_native_grants_and_measured_source(self):
+        tracked = subprocess.run(["git", "ls-files", "-z"], cwd=ROOT, check=True,
+                                 capture_output=True, text=True).stdout.split("\0")
+        catalog = json.loads((ROOT / "catalogs/landscape/manifest.json").read_text())
+        expected = set(grants.inventory_paths([path for path in tracked if path], catalog["catalogs"]))
+        policy = json.loads((ROOT / "tools/local-pages/source_policy.json").read_text())
+        actual = {row["path"] for row in policy["architecture"]["architecture_inventory"]
+                  if row["root"] == "repo"}
+        self.assertEqual(expected, actual)
+
+        text = (ROOT / DECISION).read_text()
+        table = next(body for title, body in sections(text)
+                     if title == "Correction source bindings and maintained regressions")
+        row = next(line for line in table.splitlines()
+                   if line.startswith("| Exact reviewed inventory proposal |"))
+        table_count = re.search(r"sets each contain (\d+) paths", row)
+        self.assertIsNotNone(table_count)
+        self.assertEqual(int(table_count.group(1)), len(expected),
+                         "The correction table must report the native integrated inventory")
+
+        landing = next(body for title, body in sections(text)
+                       if title == "2026-10-11 landing integration")
+        expected_count = re.search(r"returns (\d+) expected paths", landing)
+        actual_count = re.search(r"(\d+) actual reviewed repository grants", landing)
+        self.assertIsNotNone(expected_count)
+        self.assertIsNotNone(actual_count)
+        self.assertEqual(int(expected_count.group(1)), len(expected))
+        self.assertEqual(int(actual_count.group(1)), len(actual))
+
+        delta = json.loads((ROOT / "blueprints/runtime-workers/openhands/evidence/"
+                            "unclassified-gate-reads-20261011-skill-use-delta.json").read_text())
+        source = re.search(r"measured parent/source input is\s+`([0-9a-f]{40})`", landing)
+        self.assertIsNotNone(source, "Identify the measured input separately from future correction commits")
+        self.assertEqual(source.group(1), delta["source_commit"])
+        # Historical integration base captured with Git at the reviewed head.
+        self.assertIn("The final CC-cued main base is `1e6a49ffe8652918479e59bcb3751c0eb418e6d3`.", landing)
+
     def test_same_head_ablation_is_the_primary_comparison(self):
         primary = [(title, body) for title, body in sections((ROOT / DECISION).read_text())
                    if re.search(r"\bprimary\b", title, re.I)]
