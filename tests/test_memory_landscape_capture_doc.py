@@ -19,7 +19,9 @@ DOC = Path(__file__).resolve().parents[1] / "docs" / "memory-landscape-maintenan
 
 
 def section_from(text, heading):
-    start = text.index(heading)
+    start = text.find(heading)
+    if start == -1:
+        raise AssertionError(f"docs/memory-landscape-maintenance.md lacks the correction heading {heading}")
     ends = [i for i in (text.find("\n\n**Correction, ", start + len(heading)), text.find("\n\n`CLAUDE_SETTINGS`", start)) if i != -1]
     return text[start:min(ends) if ends else len(text)]
 
@@ -58,7 +60,6 @@ class EnrollmentStatementTests(unittest.TestCase):
 class CaptureAssistantCorrectionTests(unittest.TestCase):
     def test_correction_149_states_the_opt_in_was_not_in_force_and_its_current_state(self):
         text = DOC.read_text(encoding="utf-8")
-        self.assertIn("(CC correction #149)", text, "the doc must carry the dated #149 correction")
         section = correction_149_section(text)
         self.assertIn("2026-10-11", section)
         self.assertIn("--capture-assistant", section)
