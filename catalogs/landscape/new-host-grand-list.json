@@ -646,7 +646,7 @@
           "pin": "0.1.7",
           "evidence_class": "local_integration",
           "upstream_latest": "v0.1.8",
-          "pin_behind_upstream": false,
+          "pin_behind_upstream": true,
           "manifest_joined": true,
           "install_profiles": [
             "token-efficiency"
@@ -771,7 +771,7 @@
           "pin": "0.79.0",
           "evidence_class": "source_review",
           "upstream_latest": "v0.80.0",
-          "pin_behind_upstream": false,
+          "pin_behind_upstream": true,
           "manifest_joined": true,
           "install_profiles": [],
           "recipe": "recipes/README.md",
@@ -1092,7 +1092,7 @@
           "pin": "0.79.0",
           "evidence_class": "native_proven",
           "upstream_latest": "v0.80.0",
-          "pin_behind_upstream": false,
+          "pin_behind_upstream": true,
           "manifest_joined": true,
           "install_profiles": [],
           "recipe": "recipes/README.md",
@@ -1125,7 +1125,7 @@
           "pin": "0.0.77",
           "evidence_class": "native_proven",
           "upstream_latest": "v0.0.79",
-          "pin_behind_upstream": false,
+          "pin_behind_upstream": true,
           "manifest_joined": true,
           "install_profiles": [],
           "recipe": "recipes/README.md",
@@ -1170,7 +1170,7 @@
           "pin": "0.13.13",
           "evidence_class": "native_proven",
           "upstream_latest": "v0.14.2",
-          "pin_behind_upstream": false,
+          "pin_behind_upstream": true,
           "manifest_joined": true,
           "install_profiles": [
             "foundation-cpu",
@@ -1250,7 +1250,7 @@
           "pin": "2.1.278",
           "evidence_class": "native_proven",
           "upstream_latest": "v2.1.295",
-          "pin_behind_upstream": false,
+          "pin_behind_upstream": true,
           "manifest_joined": true,
           "install_profiles": [
             "new-wsl-clean-foundation",
@@ -1342,7 +1342,7 @@
           "pin": "0.161.0",
           "evidence_class": "synthetic",
           "upstream_latest": "v0.162.0",
-          "pin_behind_upstream": false,
+          "pin_behind_upstream": true,
           "manifest_joined": true,
           "install_profiles": [
             "observability"
@@ -1375,7 +1375,7 @@
           "pin": "3.14.0",
           "evidence_class": "synthetic",
           "upstream_latest": "v3.15.0",
-          "pin_behind_upstream": false,
+          "pin_behind_upstream": true,
           "manifest_joined": true,
           "install_profiles": [
             "observability"
@@ -1862,7 +1862,7 @@
           "pin": "0.49.0",
           "evidence_class": "synthetic",
           "upstream_latest": "v0.51.0",
-          "pin_behind_upstream": false,
+          "pin_behind_upstream": true,
           "manifest_joined": true,
           "install_profiles": [
             "foundation-cpu",
@@ -1895,7 +1895,7 @@
           "pin": "0.37.0",
           "evidence_class": "synthetic",
           "upstream_latest": "v0.40.0",
-          "pin_behind_upstream": false,
+          "pin_behind_upstream": true,
           "manifest_joined": true,
           "install_profiles": [
             "token-efficiency"
@@ -1927,7 +1927,7 @@
           "pin": "20.0.24",
           "evidence_class": "synthetic",
           "upstream_latest": "v20.0.26",
-          "pin_behind_upstream": false,
+          "pin_behind_upstream": true,
           "manifest_joined": true,
           "install_profiles": [
             "token-efficiency"
@@ -2008,7 +2008,7 @@
           "pin": "0.38.1",
           "evidence_class": "local_integration",
           "upstream_latest": "v0.38.2",
-          "pin_behind_upstream": false,
+          "pin_behind_upstream": true,
           "manifest_joined": true,
           "install_profiles": [],
           "recipe": "recipes/README.md",
@@ -2094,7 +2094,7 @@
           "pin": "2.1.278",
           "evidence_class": "local_integration",
           "upstream_latest": "v2.1.295",
-          "pin_behind_upstream": false,
+          "pin_behind_upstream": true,
           "manifest_joined": true,
           "install_profiles": [
             "new-wsl-clean-foundation",
@@ -2133,7 +2133,7 @@
           "pin": "0.79.0",
           "evidence_class": "local_integration",
           "upstream_latest": "v0.80.0",
-          "pin_behind_upstream": false,
+          "pin_behind_upstream": true,
           "manifest_joined": true,
           "install_profiles": [],
           "recipe": "recipes/README.md",
@@ -3088,7 +3088,10 @@
     "winner_count_unit": "layer-winner pairs (a component that wins several layers counts once per layer)",
     "distinct_components": 55,
     "pins_behind_upstream": [
+      "agent-browser",
       "ai-memory",
+      "ccusage",
+      "claude-code",
       "codex",
       "codex-native-sdk",
       "dagu",
@@ -3098,16 +3101,24 @@
       "edgartools",
       "fastapi",
       "grype",
+      "headroom",
+      "markitdown",
       "mcp-inspector",
+      "mcporter",
       "nautilus-trader",
       "nextjs",
       "openresearch",
+      "opentelemetry-collector-contrib",
       "playwright-test",
+      "prometheus",
       "qdrant",
+      "rtk",
+      "sandbox-runtime",
       "skfolio",
       "socraticode",
       "syft",
-      "vllm"
+      "vllm",
+      "worktrunk"
     ],
     "not_joined_to_manifest": [
       "candidate:actions-attest",

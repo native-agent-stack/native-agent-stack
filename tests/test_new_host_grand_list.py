@@ -359,10 +359,10 @@ class NewestSweepManifestTests(unittest.TestCase):
         return {self.OLDER: self._manifest("2026-09-23", "1.0.0", False),
                 self.NEWER: self._manifest("2026-10-09", "2.0.0", True)}
 
-    def _build(self, manifests, *, refuse_write=False):
+    def _build(self, manifests, *, refuse_write=False, winner_pin="1.0.0"):
         """g.build() over a temp root that holds the inputs it loads plus the given sweep manifests."""
         matrix = {"rows": [{"catalog": "foundation", "layer_id": "layer-a", "title": "Layer A", "winners": [{
-            "component_id": "widget", "repository": self.REPOSITORY, "pin": "1.0.0", "evidence_class": "native_proven",
+            "component_id": "widget", "repository": self.REPOSITORY, "pin": winner_pin, "evidence_class": "native_proven",
         }]}], "summary": {"needs_host": {}}}
         files = {
             "catalogs/landscape/component-evidence-matrix.json": matrix,
@@ -407,6 +407,19 @@ class NewestSweepManifestTests(unittest.TestCase):
         md = g.render_md(self._build(self._two_manifests()))
         self.assertIn(f"`{self.NEWER}`", md)
         self.assertNotIn(self.OLDER, md)
+
+    def test_currency_uses_the_displayed_winner_pin_not_the_sweep_pin(self):
+        manifests = self._two_manifests()
+        manifests[self.NEWER]["foundation"][0]["components"][0].update(pin="2.0.0", pin_behind_upstream=False)
+        for pin, behind in (("1.0.0", True), ("2.0.0", False), ("2.0.0.dev0 (abcdef)", None)):
+            with self.subTest(pin=pin):
+                data = self._build(manifests, winner_pin=pin)
+                winner = data["layers"][0]["winners"][0]
+                self.assertEqual((winner["pin"], winner["upstream_latest"], winner["pin_behind_upstream"]),
+                                 (pin, "2.0.0", behind))
+                self.assertEqual(data["summary"]["pins_behind_upstream"], ["widget"] if behind else [])
+                if behind:
+                    self.assertIn("(behind 2.0.0)", g.render_md(data))
 
     def test_no_committed_sweep_manifest_stops_the_build(self):
         with self.assertRaises(SystemExit) as stopped:

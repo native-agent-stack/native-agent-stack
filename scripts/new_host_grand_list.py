@@ -28,10 +28,12 @@ difference from the checked-in files; ``--write`` writes them.
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import re
 import sys
 from datetime import datetime, timezone
+from functools import cache
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -281,6 +283,21 @@ def build_hosts(hw: dict) -> list[dict]:
     return hosts
 
 
+@cache
+def sweep_pin_policy():
+    """Use the maintained producer's comparison API, including its null/exclusion policy.
+
+    Source: tools/sota-convergence/build_manifest.py@65cf2730:147-176,1366-1372.
+    Load by exact source path as that producer does for its release-stream helper
+    (:113-123); input ROOT may be a fixture and does not choose executable code.
+    """
+    path = Path(__file__).resolve().parents[1] / "tools/sota-convergence/build_manifest.py"
+    spec = importlib.util.spec_from_file_location("grand_list_sweep_pin_policy", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 def build() -> dict:
     matrix = load("catalogs/landscape/component-evidence-matrix.json")
     manifest_path, manifest = component_matrix.newest_sweep_manifest(ROOT)
@@ -289,6 +306,7 @@ def build() -> dict:
                          "compared with the newest one")
     validate_selected_manifest(manifest_path, manifest, matrix)
     mindex = manifest_index(manifest)
+    pin_policy = sweep_pin_policy()
     adoption = load("adoption/manifest.json")
     profiles = profile_index(adoption)
     recipes = adoption.get("recipe_map", {})
@@ -306,6 +324,12 @@ def build() -> dict:
             bare = strip_candidate(cid)
             m = (mindex.get((row["layer_id"], "id", cid)) or mindex.get((row["layer_id"], "id", bare))
                  or mindex.get((row["layer_id"], "repo", repo_key(winner.get("repository")))) or {})
+            # The page displays the winner's pin, which may differ from the sweep
+            # pin. Reuse BOTH producer helpers rather than borrowing its flag or
+            # rebuilding the version/exclusion rules in this consumer.
+            comparison = pin_policy.pin_comparison_fields(pin_policy.classify_pin(
+                winner.get("pin"), winner.get("repository"), m.get("upstream_latest"),
+                component_id=adoption_id(cid))) if m else {}
             platforms = {}
             for platform in PLATFORMS:
                 state = (winner.get("platforms") or {}).get(platform) or {}
@@ -325,7 +349,7 @@ def build() -> dict:
                 "pin": winner.get("pin"),
                 "evidence_class": winner.get("evidence_class"),
                 "upstream_latest": m.get("upstream_latest"),
-                "pin_behind_upstream": m.get("pin_behind_upstream"),
+                "pin_behind_upstream": comparison.get("pin_behind_upstream"),
                 "manifest_joined": bool(m),
                 "install_profiles": [p["profile"] for p in profiles.get(adoption_id(cid), [])],
                 "recipe": recipes.get(adoption_id(cid)),
@@ -545,6 +569,8 @@ def render_md(data: dict) -> str:
     lines += ["", "\"bootstrap X\" means the platform's bootstrap installs version X from a pinned, checksummed artifact; "
               "it can differ from the ledger pin in the Pin column (the ledger records what a verdict was measured on, the "
               "bootstrap what a new host installs). "
+               "Currency compares the displayed Pin with the newest sweep's upstream release using the sweep "
+               "producer's classify_pin policy; it does not borrow the sweep's own-pin flag. "
               "An E2E state of `accepted` is scoped to the recorded host; a new host proves its own."]
     counts = {}
     for layer in data["layers"]:
