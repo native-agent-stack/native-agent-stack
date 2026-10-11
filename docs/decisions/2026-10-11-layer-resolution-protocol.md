@@ -72,7 +72,7 @@ unresolved survivor set: adjudicate it, include it in the frozen comparison, or
 record the reason its role is retired. A later sweep's omission cannot provide
 that disposition.
 
-A layer is FINAL only when all of the following hold:
+A layer is FINAL only when all of the following hold for each of its winners:
 
 1. A recorded verdict with its evidence class, verdict wave and `next_review`.
 2. A winner with a run pin in `catalogs/landscape/final-stack.json` `runs[]`.

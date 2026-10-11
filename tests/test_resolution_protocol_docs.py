@@ -5,6 +5,7 @@ layer FINAL, or enforce the future final-stack generator's lifecycle checks.
 """
 
 from pathlib import Path
+import re
 import unittest
 
 
@@ -64,7 +65,7 @@ class ResolutionProtocolDocsTests(unittest.TestCase):
     def test_final_requires_all_four_evidence_conditions(self):
         final = self.record().partition("## Terminal states and evidence")[2].partition("**SCHEDULED:**")[0]
         self.assert_phrases((
-            "A layer is FINAL only when all of the following hold",
+            "A layer is FINAL only when all of the following hold for each of its winners:",
             "evidence class, verdict wave and `next_review`",
             "run pin in `catalogs/landscape/final-stack.json` `runs[]`",
             "upstream's own install and test path, at that pin",
@@ -95,6 +96,32 @@ class ResolutionProtocolDocsTests(unittest.TestCase):
             "No-winner without a scheduled comparison is not allowed",
             "still undecided cannot be a terminal state",
         ), non_terminal)
+
+    def test_terminal_labels_and_complete_rules_are_pinned(self):
+        terminal = self.record().partition("## Terminal states and evidence")[2].partition("## Alternatives")[0]
+        self.assertEqual(re.findall(r"\*\*([^*]+:)\*\*", terminal), [
+            "Terminal states:", "SCHEDULED:", "RETIRED:", "Non-terminal:",
+        ])
+        self.assert_phrases((
+            "**Terminal states:** FINAL, SCHEDULED, RETIRED.",
+            "Before choosing a terminal state, record the disposition of the cumulative "
+            "unresolved survivor set: adjudicate it, include it in the frozen comparison, "
+            "or record the reason its role is retired.",
+            "A later sweep's omission cannot provide that disposition.",
+            "A zero-call tool is a wiring defect to fix, or a role to retire; "
+            "installation alone is not invoke evidence.",
+            "**SCHEDULED:** no winner because evidence cannot settle the layer; commit to "
+            "ONE preregistered comparison with a date and a fixed decision rule.",
+            "Retain its comparison id, preregistration hash, run date and fixed decision "
+            "rule, plus the frozen scope, before the run.",
+            "SCHEDULED is terminal for the wave: its decision procedure is fixed, so "
+            "the layer waits for the run rather than being relaunched.",
+            "It becomes FINAL or RETIRED when the comparison runs and its rule applies.",
+            "A comparison that misses its date is a defect to fix, not a reason to re-research.",
+            "**RETIRED:** the role is retired with a recorded reason (condition 4); "
+            "retirement does not claim a qualified winner or an E2E adoption.",
+            "A catalog status alone is not a terminal state.",
+        ), terminal)
 
     def test_record_dates_the_authority_and_names_existing_harnesses(self):
         self.assert_phrases((

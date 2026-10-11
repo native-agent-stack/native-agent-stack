@@ -18622,8 +18622,8 @@
     },
     {
       "path": "docs/decisions/2026-10-11-layer-resolution-protocol.md",
-      "sha256": "2efc386a9d5adaa799485daa65dd6a133e1c016f81c210d64377d42bb77623e0",
-      "bytes": 8782
+      "sha256": "1394f47c51eea58ef7bda731bbc7cdec340985709bc88b2b462db01252460149",
+      "bytes": 8806
     },
     {
       "path": "docs/direct-results.md",
@@ -61302,8 +61302,8 @@
     },
     {
       "path": "tests/test_resolution_protocol_docs.py",
-      "sha256": "2d7797a06a478e3e30fa1ffa66ee98eacb6ffc9462fb74fa1bfa1b234a776952",
-      "bytes": 5526
+      "sha256": "fd70bb2841624f42c1f29ca610798a4a7c99cba470ee75f894b543ae80beb4cf",
+      "bytes": 7364
     },
     {
       "path": "tests/test_retrieval_quality_v2.py",
