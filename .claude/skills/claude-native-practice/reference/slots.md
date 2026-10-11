@@ -6,7 +6,7 @@ Selection rule: One default per role slot; overlaps become ranked alternatives o
 
 Open the layer page a row links to for the slot's route, alternatives, rejections, evidence and notes. Claim ids such as `hooks-O9` resolve, with their locators, in the record's claims file ([claims.json](https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/evidence/artifacts/claude-native-practice-20261009/claims.json)).
 
-A **retired** row has no default to follow: its Default cell says what replaced the route, and its layer page keeps the former default as a dated snapshot that no current row selects.
+A **retired** row has no default to follow: its Default cell says what replaced the route, and its layer page keeps the former default as a dated snapshot that no current row selects. The tests that guard the retirement read one physical line at a time: a physical line that names a retired route says it is retired on that same line; keep the name and the retirement on one line.
 
 Codex lanes follow the same practice through their own native mechanisms: [cross-client.md](cross-client.md).
 

@@ -117,7 +117,8 @@ class SnapshotLabelTests(unittest.TestCase):
         # check the description says runs was skipped (OK, skipped=1). A change to the slots file now has to carry its label.
         self.assertEqual(sha256(self.slots_raw), self.current["sha256_when_labeled"],
                          "reference/slots.json changed after the snapshot was labeled: set current_decision_source.sha256_when_labeled to its sha256 and make "
-                         "differs_from_this_snapshot_in the differences the next test reports")
+                         "differs_from_this_snapshot_in the differences the next test reports, then run scripts/evidence_manifest.py --write and register the changed files with scripts/host_receipts.register_file "
+                         "(validate.py checks both)")
 
     def test_no_other_exported_field_differs(self):
         listed = {(field, slot_id) for field, slot_ids in self.current["differs_from_this_snapshot_in"].items()

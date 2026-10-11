@@ -6,8 +6,8 @@ Client 2.1.295, checked 2026-10-09. Index: [slots.md](slots.md).
 
 **Status:** default. **Default:** systemd --user timers with oneshot services for durable host-local runs (a bounded headless command, `claude -p` with explicit settings when a model is needed)
 
-- **Route:** Session `/loop` and the Cron tools only for temporary in-session polling (7-day expiry, no catch-up); GitHub Actions schedules only for repository jobs that run no model (Claude runs inside GitHub are retired: see github-action)
-- **Alternatives, ranked:** 1. Session `/loop` and Cron tools; 2. Cloud routines; 3. dagucloud/dagu for multi-step local workflows; 4. GitHub Actions schedule (jobs that run no model)
+- **Route:** Session `/loop` and the Cron tools only for temporary in-session polling (7-day expiry, no catch-up); GitHub Actions schedules repository jobs (Claude runs inside GitHub are retired, 2026-10-10, so a scheduled Claude task runs locally: see github-action)
+- **Alternatives, ranked:** 1. Session `/loop` and Cron tools; 2. Cloud routines; 3. dagucloud/dagu for multi-step local workflows; 4. GitHub Actions schedule (repository jobs; a scheduled Claude task runs locally)
 - **Rejected:** Session tasks as the durable scheduler; Saved scheduled tasks as reboot-durable state; 'Recurring tasks last 3 days'
 - **Evidence:** scheduled-tasks docs; scheduling-O7, O8, O10
 - **Notes:** Adjudicated: systemd stands (refuter pending at writing). Owed: a `claude -p` run started by a systemd timer across a WSL restart. Verified: on WSL2 the timers outlast sessions and terminal closes but not the distro; after a shutdown nothing fires until the distro starts, and missed runs catch up only with `Persistent=true` (token-report-refresh lacks it).

@@ -1613,12 +1613,12 @@
    "layer_id": "scheduling-supervision",
    "status": "default",
    "default": "systemd --user timers with oneshot services for durable host-local runs (a bounded headless command, `claude -p` with explicit settings when a model is needed)",
-   "route": "Session `/loop` and the Cron tools only for temporary in-session polling (7-day expiry, no catch-up); GitHub Actions schedules only for repository jobs that run no model (Claude runs inside GitHub are retired: see github-action)",
+   "route": "Session `/loop` and the Cron tools only for temporary in-session polling (7-day expiry, no catch-up); GitHub Actions schedules repository jobs (Claude runs inside GitHub are retired, 2026-10-10, so a scheduled Claude task runs locally: see github-action)",
    "alternatives": [
     "Session `/loop` and Cron tools",
     "Cloud routines",
     "dagucloud/dagu for multi-step local workflows",
-    "GitHub Actions schedule (jobs that run no model)"
+    "GitHub Actions schedule (repository jobs; a scheduled Claude task runs locally)"
    ],
    "rejections": [
     "Session tasks as the durable scheduler",

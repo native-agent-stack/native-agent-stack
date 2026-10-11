@@ -9,10 +9,16 @@ What counts as selecting a retired route, on the three surfaces a session reads 
 - only the dated snapshots are not read: the `retired` block of a slot, what a slot's `primary_sources` quote from their pages, the Primary sources bullet of a page and the Former default bullet of a retired slot's page.
   A source's `native_mechanism` is the repository's own mapping of that source, on every slot (a retired slot's too, which has to say retired), and is read.
 Every parser keeps duplicates (a stale second row or section is a violation) and reads every line, not only the labelled bullets. Repository-text checks only: no workflow or client runs here.
+
+Prose is judged one physical line at a time, a bare line break ends a unit, and a full stop or a semicolon ends one too (the command center's ruling at ef3f3e7bf, correction #160: joining wrapped lines made
+"Retired 2026-10-10" followed by a line that says the current default is claude-code-action pass on four surfaces). So a physical line that names a retired route says it is retired on that same line (a retirement sentence stays on
+one line, or every line of it says so); the messages of the line-judged surfaces say so. The description line of SKILL.md names the topic that invokes the skill ("Claude GitHub Actions setup"); it is pinned to
+the text the routing was measured with (DESCRIPTION_SHA256) and read as a topic, not as a route.
 """
 
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 import tempfile
@@ -32,35 +38,50 @@ WORKFLOWS = ("claude-pr-review.yml", "claude-pr-toolkit-review.yml", "harness-au
 NAMES = ("claude-code-action", "claude-pr-review", "claude-pr-toolkit-review", "harness-audit", "claude-code-github-action")
 PATTERNS = {name: re.compile(re.escape(name), re.I) for name in NAMES}
 PATTERNS.update({
-    "in Actions": re.compile(r"\bin (?:GitHub )?Actions\b", re.I),
-    "through Actions": re.compile(r"\bthrough (?:GitHub )?Actions\b", re.I),
+    "in Actions": re.compile(r"\bin (?:an? |the )?(?:GitHub Actions?|Actions)\b", re.I),
+    "through Actions": re.compile(r"\b(?:through|via|using|with|on|inside) (?:an? |the )?(?:GitHub Actions?|Actions)\b", re.I),
     "through #909": re.compile(r"through #909"),
     "under WIF": re.compile(r"\bunder WIF\b", re.I),
     "the managed Code Review app": re.compile(r"managed (?:Claude )?Code Review|Code Review GitHub App", re.I),
     # The Codex review in GitHub of #1001 at 6e97620cd (P2, slots.json:1616) and the CC's Claude read of the same head (P2-2, P3-1): a live source mapping said `claude -p` runs "in a GitHub workflow ... plus a nightly
     # cron", and the Claude Code GitHub Action, its /install-github-app command and its @claude mention are the same route under other names. claude-code-security-review is left out: it is a documented rejection.
     "in a GitHub workflow": re.compile(r"\b(?:in|from|via|through|using|as) (?:an? |the )?GitHub(?: Actions)? workflows?\b", re.I),
-    "the Claude Code GitHub Action": re.compile(r"\bclaude(?: code)? (?:github )?action\b", re.I),
+    "the Claude Code GitHub Action": re.compile(r"\bclaude(?: code)? (?:github actions?|action)\b", re.I),
     "install-github-app": re.compile(r"install-github-app", re.I),
     "an @claude mention": re.compile(r"(?<!\w)@claude\b", re.I),
+    # The CC's Claude micro at ef3f3e7bf (P3-1) and Codex on the same head (:43, P2): the documentation page's own title is "Claude Code GitHub Actions", its text installs "the Claude GitHub App", the action has a mirror
+    # (claude-code-base-action), and a row can describe the carrier first: "Use the GitHub Action for Claude reviews".
+    "the Claude GitHub App": re.compile(r"\bclaude(?: code)? github app\b", re.I),
+    "claude-code-base-action": re.compile(r"claude-code-base-action", re.I),
+    "a GitHub Action": re.compile(r"\bGitHub Action\b", re.I),
 })
-# "in Actions", "through Actions" and "under WIF" name the retired route only when the field or sentence is about Claude: the record keeps GitHub's required checks, Codex's GitHub review and the
-# scheduled trackers, and those run in GitHub Actions (the Codex review in GitHub of #1001 at ba6ab3a5c, P2, line 33). The named workflows, "through #909" and the managed app are specific and count everywhere.
-GENERIC = ("in Actions", "through Actions", "under WIF", "in a GitHub workflow")
+# "in Actions", "through Actions" (also via, using, with, on, inside), "under WIF", "in a GitHub workflow" and "a GitHub Action" name the retired route only when the field or sentence is about Claude: the record keeps GitHub's required
+# checks, Codex's GitHub review and the scheduled trackers, and those run in GitHub Actions (the Codex review in GitHub of #1001 at ba6ab3a5c, P2, line 33). The named workflows, "through #909" and the managed app are specific and count everywhere.
+GENERIC = ("in Actions", "through Actions", "under WIF", "in a GitHub workflow", "a GitHub Action")
 CLAUDE_ROUTE = re.compile(r"\bclaude\b|\banthropic\b|\bconsole\b|pr-review-toolkit|#909", re.I)
+# The description line of SKILL.md ("... or Claude GitHub Actions setup.") names the topic that invokes the skill; the routing of the skill was measured with exactly this text and the retirement rows answer it. It is pinned here
+# and not read as a route; a changed description is read like any other line, and the pin fails with it.
+DESCRIPTION_SHA256 = "e1d990f026879244108c6cbaae9f72612ca0d5d022593b8ad6db26a2b4bf64cc"
+RULE = "a physical line that names a retired route says it is retired on that same line; keep the name and the retirement on one line"
 SELECTING = ("default", "alternatives")
 SKIPPED_KEYS = ("id", "layer_id", "status", "retired", "primary_sources_total")
 RETIRED_KEYS = ("on", "record", "correction", "scope", "workflows", "former_default", "revisit_when")
 STATUS_CELL = {"default-scoped": "default (scoped)", "recommendation": "recommendation (owner's choice)"}
 SAYS_RETIRED = re.compile(r"\bretire(?:d|ment)\b", re.I)
+# The guard is a tripwire for stale text, not a proof of meaning. A unit passes when it says retired, except where it negates the retirement outright ("not retired", "never retired", "no longer retired", "isn't retired",
+# "unretired"). It still passes when it says retired and then reverses that in the same sentence ("was retired, but is now current"): that is the boundary the command center ruled (its reads of #1001 at 6e97620cd,
+# P3-3, and at ef3f3e7bf, P3-5); the other half of the answer is review, which reads the text the guard accepts. Codex's review of #1001 at ef3f3e7bf (:122) raised both forms.
+NEGATED_RETIREMENT = re.compile(r"\b(?:not|never|no longer|\w+n't)\s+(?:yet\s+|been\s+|really\s+)*retire(?:d|ment)\b|\bun-?retire(?:d)?\b", re.I)
+
+
+def says_retired(unit: str) -> bool:
+    return SAYS_RETIRED.search(unit) is not None and NEGATED_RETIREMENT.search(unit) is None
 # A unit ends at a full stop or a semicolon followed by white space, whatever follows: a lowercase clause is a clause (the Codex review in GitHub of #1001 at ba6ab3a5c, P2, line 41: the
 # first version split only before a capital letter, a backtick, a bracket, a parenthesis or a hyphen, so "retired; the current default is claude-code-action" was one unit that said retired).
 # A line break ends a unit too. A comma, a colon or a dash does not: "Retired 2026-10-10: the workflows that ran claude-code-action are removed" is one claim.
 # "e.g." and "i.e." do not end a unit (the CC's Claude read of #1001 at 6e97620cd, P3-2): "retired (e.g. the workflows that ran claude-code-action are removed)" is one claim.
 SENTENCE = re.compile(r"(?<![Ee]\.g\.)(?<![Ii]\.e\.)(?<=[.;])\s+|\s*\n\s*")
-# A markdown block starts at a blank line, a list item, a heading, a table row, a quote, a fence or a rule; any other line wraps the block before it.
-BLOCK_START = re.compile(r"\s*(?:[-*+] |\d{1,9}[.)] |#{1,6} |\||>|```|~~~|-{3,}\s*$)")
-ROW = re.compile(r"^\| \[([a-z0-9-]+)\]\([^)]*\) \| (.+)$")
+ROW = re.compile(r"^\| \[([a-z0-9-]+)\]\(([^)]*)\) \| (.+)$")
 BULLET = re.compile(r"^- \*\*(.+?):\*\* (.*)$")
 
 
@@ -85,20 +106,6 @@ def leaves(value) -> list[str]:
     return []
 
 
-def paragraphs(text: str) -> list[str]:
-    """The blocks of a markdown text, a wrapped line joined to the line before it (the CC's Claude read of #1001 at 6e97620cd, P3-2: a retirement sentence wrapped over two lines of SKILL.md was judged line by line)."""
-    blocks, current = [], None
-    for line in text.splitlines():
-        if not line.strip():
-            current = None
-        elif current is None or BLOCK_START.match(line):
-            current = [line.strip()]
-            blocks.append(current)
-        else:
-            current.append(line.strip())
-    return [" ".join(block) for block in blocks]
-
-
 def units(value) -> list[str]:
     """The claims of a field: each item of a list and each sentence of a string."""
     if isinstance(value, dict):
@@ -119,7 +126,7 @@ def judge(label: str, kind: str, value) -> list[str]:
         return found
     for unit in units(value):
         for name, pattern in PATTERNS.items():
-            if pattern.search(unit) and not SAYS_RETIRED.search(unit) and (name not in GENERIC or CLAUDE_ROUTE.search(unit)):
+            if pattern.search(unit) and not says_retired(unit) and (name not in GENERIC or CLAUDE_ROUTE.search(unit)):
                 found.append(f"{label} names the retired route {name!r} in a unit that does not say it is retired: {unit[:80]!r}")
     return found
 
@@ -173,9 +180,19 @@ def index_parts(text: str):
         if match is None:
             other.append(line)
             continue
-        status, default, overturn = match.group(2).split(" | ", 2)
+        status, default, overturn = match.group(3).split(" | ", 2)
         rows.append((match.group(1), status, default, overturn[:-2] if overturn.endswith(" |") else overturn))
     return rows, other
+
+
+def index_links(text: str) -> list[tuple[str, str]]:
+    """(slot id, link target) of every table row of slots.md, duplicates kept (the CC's Claude micro at ef3f3e7bf, P3-4, and Codex on the same head, :63: the target was dropped, so a row could link to another page and anchor)."""
+    return [(match.group(1), match.group(2)) for match in map(ROW.match, text.splitlines()) if match]
+
+
+def index_link_violations(text: str, pages: dict[str, str]) -> list[str]:
+    """`pages` maps a section id to the layer page that holds it; every row has to link to <page>#<id>."""
+    return [f"slots.md links {slot_id} to {href!r}, not to {pages[slot_id]}#{slot_id}" for slot_id, href in index_links(text) if slot_id in pages and href != f"{pages[slot_id]}#{slot_id}"]
 
 
 def index_violations(text: str) -> list[str]:
@@ -186,7 +203,7 @@ def index_violations(text: str) -> list[str]:
     for slot_id, _status, default, overturn in rows:
         found += judge(f"{slot_id} index, Default", "select", default)
         found += judge(f"{slot_id} index, Overturn when", "explain", overturn)
-    found += judge("slots.md text", "explain", paragraphs("\n".join(other)))
+    found += with_rule(judge("slots.md text", "explain", [line for line in other if line.strip()]))
     return found
 
 
@@ -212,10 +229,17 @@ def section_fields(section: str) -> dict[str, str]:
     return fields
 
 
+def with_rule(messages: list[str]) -> list[str]:
+    return [f"{message} ({RULE})" for message in messages]
+
+
 def section_violations(slot_id: str, section: str) -> list[str]:
-    """Every line of a section except the dated snapshots (the Primary sources and Former default bullets with their indented lines)."""
+    """Every line of a section except the dated snapshots (the Primary sources and Former default bullets with their indented lines). A label that occurs twice is a violation: section_fields keeps the first bullet
+    of a label, so a conflicting second Route or Overturn when bullet was never compared (the Codex review of #1001 at ef3f3e7bf, :211, and the CC's micro, P3-3)."""
     retired = section_fields(section)["Status"] == "retired"
-    found, snapshot = [], False
+    labels = [match.group(1) for match in map(BULLET.match, section.splitlines()) if match]
+    found = [f"{slot_id} page has more than one {label!r} bullet" for label in dict.fromkeys(labels) if labels.count(label) > 1]
+    snapshot = False
     for line in section.splitlines()[1:]:
         if line.startswith("- **Primary sources**") or (retired and line.startswith("- **Former default")):  # only a retired slot's page keeps a dated snapshot of its former default (P3-4)
             snapshot = True
@@ -232,12 +256,20 @@ def section_violations(slot_id: str, section: str) -> list[str]:
         bullet = BULLET.match(line)
         label, text = (bullet.group(1), bullet.group(2)) if bullet else ("line", line)
         selecting = label == "Alternatives, ranked" or (label == "Route" and not retired)
-        found += judge(f"{slot_id} page, {label}", "select" if selecting else "explain", text)
+        judged = judge(f"{slot_id} page, {label}", "select" if selecting else "explain", text)
+        found += with_rule(judged) if label == "line" else judged
     return found
 
 
 def prose_violations(name: str, text: str) -> list[str]:
-    return judge(name, "explain", paragraphs(text))
+    """One physical line at a time (the command center's ruling at ef3f3e7bf, correction #160): the lines of a wrapped sentence are judged separately and the message names the rule."""
+    return with_rule(judge(name, "explain", [line for line in text.splitlines() if line.strip()]))
+
+
+def entry_point_violations(text: str) -> list[str]:
+    """SKILL.md: the description line is the pinned topic text and is not read as a route; every other line is."""
+    lines = text.splitlines()
+    return prose_violations("SKILL.md", "\n".join(line for line in lines if not (line.startswith("description:") and hashlib.sha256(line.encode("utf-8")).hexdigest() == DESCRIPTION_SHA256)))
 
 
 def folder_prose_violations(skill_dir: Path) -> list[str]:
@@ -250,7 +282,7 @@ def folder_prose_violations(skill_dir: Path) -> list[str]:
         elif page.name != "slots.md":
             preamble = page.read_text(encoding="utf-8").split("\n## ", 1)[0]
             found += prose_violations(f"{page.name} preamble", preamble)
-    return found + prose_violations("SKILL.md", (skill_dir / "SKILL.md").read_text(encoding="utf-8"))
+    return found + entry_point_violations((skill_dir / "SKILL.md").read_text(encoding="utf-8"))
 
 
 # The rows as the skill carried them on 2026-10-09, before the retirement: the control that the checks see what they are meant to see.
@@ -319,6 +351,17 @@ class SlotsJsonTests(unittest.TestCase):
         self.assertEqual(slot["retired"]["record"], RECORD)
         self.assertIn("anthropics/claude-code-action", slot["retired"]["former_default"])
         self.assertEqual(slot["alternatives"], [])
+
+    def test_the_scheduled_tasks_route_retires_the_claude_routes_and_not_every_model_backed_job(self):
+        # Codex on #1005 at 425240f6e (P2, scheduling-supervision.md:9) and the command center's ruling: the record retires Claude review inside GitHub and keeps Codex's GitHub review, so a GitHub schedule is not
+        # limited to jobs that run no model; a scheduled Claude task runs locally.
+        slot = self.by_id["scheduled-tasks"]
+        self.assertNotIn("no model", slot["route"] + " ".join(slot["alternatives"]))
+        self.assertIn("GitHub Actions schedules repository jobs (Claude runs inside GitHub are retired, 2026-10-10, so a scheduled Claude task runs locally: see github-action)", slot["route"])
+        self.assertIn("GitHub Actions schedule (repository jobs; a scheduled Claude task runs locally)", slot["alternatives"])
+        page = (REFERENCE / "scheduling-supervision.md").read_text(encoding="utf-8")
+        self.assertIn(slot["route"], page)
+        self.assertIn("GitHub Actions schedule (repository jobs; a scheduled Claude task runs locally)", page)
 
     def test_the_retired_default_is_not_bound_to_one_repository(self):
         # The decision covers the owner's repositories; a default worded "in this repository" sent a session in another repository to conclude that the
@@ -407,8 +450,20 @@ class SurfaceTests(unittest.TestCase):
             (skill / "SKILL.md").write_text("---\nname: x\n---\n3. **Follow the default.** The anthropics/claude-code-action route was retired on 2026-10-10.\n", encoding="utf-8")
             self.assertEqual(folder_prose_violations(skill), [])
 
+    def test_each_index_row_links_to_the_layer_page_section_of_its_slot(self):
+        # Codex on #1001 at ef3f3e7bf (:63): the link target was dropped, so a row could point at another existing page and anchor.
+        pages = {section_id: page for page, section_id, _ in self.sections}
+        self.assertEqual(index_link_violations(self.index_text, pages), [])
+        self.assertEqual(sorted(slot_id for slot_id, _ in index_links(self.index_text)), sorted(slot["id"] for slot in self.slots))
+        row = "| [github-action](git-github-automation.md#github-action) | retired |"
+        for wrong in ("ci-supply-chain.md#github-action", "git-github-automation.md#release-tracking", "git-github-automation.md", "#github-action", "git-github-automation.md#github-action "):
+            with self.subTest(href=wrong):
+                self.assertEqual(len(index_link_violations(row.replace("git-github-automation.md#github-action", wrong), {"github-action": "git-github-automation.md"})), 1)
+        self.assertEqual(index_link_violations(row, {"github-action": "git-github-automation.md"}), [])
+
     def test_the_index_says_what_a_retired_row_is(self):
         self.assertRegex(self.index_text, r"A \*\*retired\*\* row has no default to follow")
+        self.assertIn(RULE, self.index_text, "the one-line rule is stated where a maintainer of the rows reads")
 
 
 class CheckSeesTheRowsOfBeforeTests(unittest.TestCase):
@@ -522,7 +577,7 @@ class CheckSeesTheRowsOfBeforeTests(unittest.TestCase):
         self.assertEqual(section_violations("x", section), [
             "x page, Default selects the retired route 'claude-pr-review'",
             "x page, Notes names the retired route 'claude-code-action' in a unit that does not say it is retired: 'Names claude-code-action.'",
-            "x page, line names the retired route 'harness-audit' in a unit that does not say it is retired: '  continued: and harness-audit again'",
+            f"x page, line names the retired route 'harness-audit' in a unit that does not say it is retired: '  continued: and harness-audit again' ({RULE})",
             "x page, Former default (snapshot) names the retired route 'claude-code-action' in a unit that does not say it is retired: 'claude-code-action'"])
         retired = section.replace("**Status:** default.", "**Status:** retired.")
         self.assertEqual(len(section_violations("x", retired)), 3, "a retired slot's page keeps its dated snapshot of the former default")
@@ -543,8 +598,8 @@ class CheckSeesTheRowsOfBeforeTests(unittest.TestCase):
         for text in ("The Claude review runs in a GitHub workflow.", "Claude Code runs from a GitHub workflow.", "The Claude job is run via a GitHub Actions workflow.", "Claude, using the GitHub workflow of the repository, reviews it.",
                      "Claude runs as a GitHub workflow."):
             with self.subTest(flagged=text):
-                self.assertEqual(len(judge("x.notes", "explain", text)), 1)
-                self.assertEqual(len(judge("x.default", "select", text)), 1)
+                self.assertNotEqual(judge("x.notes", "explain", text), [])
+                self.assertNotEqual(judge("x.default", "select", text), [])
         for text in ("Catalog freshness runs in a GitHub workflow.", "The non-model artifact gate is a GitHub workflow.", "Codex's review is requested from a GitHub workflow comment trigger and no model of ours runs."):
             with self.subTest(allowed=text):
                 self.assertEqual(judge("x.notes", "explain", text), [])
@@ -558,32 +613,83 @@ class CheckSeesTheRowsOfBeforeTests(unittest.TestCase):
         for text in ("Set up the Claude Code GitHub Action for review.", "Run /install-github-app to add it.", "Ask for a fix with an @claude mention on the review comment.", "The Claude GitHub action reviews each PR.",
                      "claude code action is the default."):
             with self.subTest(flagged=text):
-                self.assertEqual(len(judge("x.notes", "explain", text)), 1)
-                self.assertEqual(len(judge("x.default", "select", text)), 1)
+                self.assertNotEqual(judge("x.notes", "explain", text), [])
+                self.assertNotEqual(judge("x.default", "select", text), [])
                 self.assertEqual(judge("x.notes", "explain", text.rstrip(".") + ", retired on 2026-10-10."), [])
         # anthropics/claude-code-security-review is a documented rejection and appears in the Rejected rows of the pages; it is not the retired route
         self.assertEqual(judge("x.rejections", "explain", "anthropics/claude-code-security-review is rejected: it needs the same GitHub workflow."), [])
         self.assertEqual(judge("x.notes", "explain", "Write to the maintainers at name@claude.example."), [], "an address is not a mention")
 
-    def test_an_abbreviation_does_not_end_a_claim_and_a_wrapped_paragraph_is_one_claim(self):
-        # The CC's Claude read of #1001 at 6e97620cd (P3-2): both false positives were new with the forward commit of that head.
+    def test_an_abbreviation_does_not_end_a_claim(self):
+        # The CC's Claude read of #1001 at 6e97620cd (P3-2): "e.g." and "i.e." do not end a unit.
         for text in ("The route was retired (e.g. the workflows that ran claude-code-action are removed).", "claude-code-action was retired, i.e. its workflows are removed."):
             with self.subTest(text=text):
                 self.assertEqual(len(units(text)), 1)
                 self.assertEqual(judge("x.notes", "explain", text), [])
         self.assertEqual(len(judge("x.notes", "explain", "It was retired e.g. last week. The default is claude-code-action.")), 1, "the sentence after an abbreviation still ends where it ends")
-        wrapped = "---\nname: x\n---\n3. **Follow the default.** The anthropics/claude-code-action route\n   was retired on 2026-10-10 and no row selects it.\n4. **Record.** Next step.\n"
-        self.assertEqual(paragraphs(wrapped), ["--- name: x", "---", "3. **Follow the default.** The anthropics/claude-code-action route was retired on 2026-10-10 and no row selects it.", "4. **Record.** Next step."])
-        self.assertEqual(prose_violations("SKILL.md", wrapped), [])
-        self.assertEqual(len(prose_violations("SKILL.md", wrapped.replace("was retired on 2026-10-10 and no row selects it", "is the current default"))), 1)
-        self.assertEqual(len(prose_violations("SKILL.md", wrapped.replace("   was retired", "\n   Use it. It was retired"))), 1, "a blank line ends the paragraph; the sentence before it does not borrow the next one's retired")
-        for marker, follow in (("# Retired routes", ""), ("- retired", ""), ("1. retired", ""), ("1) retired", ""), ("| retired |", ""), ("> retired", ""), ("```", "retired"), ("~~~", "retired"), ("---", "retired")):
-            with self.subTest(block_start=marker):
-                # a line that starts a block does not wrap the line before it, so the word retired there does not excuse the unit above
-                self.assertEqual(len(prose_violations("x.md", f"Use claude-code-action for review\n{marker}\n{follow}")), 1)
-        index = "Notes on the index.\nThe anthropics/claude-code-action route\nwas retired on 2026-10-10.\n"
-        self.assertEqual(index_violations(index), [], "the prose of slots.md is read as paragraphs too")
-        self.assertEqual(len(index_violations(index.replace("was retired on 2026-10-10", "is the current default"))), 1)
+
+    def test_a_bare_line_break_ends_a_unit_on_every_surface_and_the_rule_is_in_the_message(self):
+        # The command center's ruling at ef3f3e7bf (correction #160) and its micro (P2-1): the run-on below passed on four prose surfaces when wrapped lines were joined. It fails on all of them again, as do the "." and ";" forms;
+        # a retirement sentence on one line passes, and one wrapped without punctuation fails with a message that names the one-line rule.
+        run_on = "Retired 2026-10-10\nthe current default is claude-code-action."
+        for form in (run_on, "Retired 2026-10-10.\nthe current default is claude-code-action.", "Retired 2026-10-10;\nthe current default is claude-code-action."):
+            with self.subTest(form=form):
+                self.assertEqual(len(prose_violations("x.md", form)), 1)
+                self.assertEqual(len(index_violations(form)), 1, "slots.md prose")
+                self.assertEqual(len(section_violations("x", "x\n\n**Status:** default. **Default:** d\n\n- **Notes:** n\n" + form.replace("\n", "\n  "))), 1, "a continuation line of a layer-page bullet")
+                with tempfile.TemporaryDirectory() as tmp:
+                    skill = Path(tmp)
+                    (skill / "reference").mkdir()
+                    (skill / "reference" / "cross-client.md").write_text(form + "\n", encoding="utf-8")
+                    (skill / "reference" / "x.md").write_text(form + "\n\n## x\n", encoding="utf-8")
+                    (skill / "SKILL.md").write_text("---\nname: x\n---\n" + form + "\n", encoding="utf-8")
+                    names = [message.split(" names ")[0] for message in folder_prose_violations(skill)]
+                    self.assertEqual(sorted(names), ["SKILL.md", "cross-client.md", "x.md preamble"])
+        self.assertEqual(prose_violations("x.md", "The claude-code-action route was retired on 2026-10-10 and no row selects it.\n"), [])
+        wrapped = prose_violations("x.md", "The claude-code-action route\nwas retired on 2026-10-10 and no row selects it.\n")
+        self.assertEqual(len(wrapped), 1)
+        self.assertIn("says it is retired on that same line", wrapped[0])
+        self.assertEqual(prose_violations("x.md", "The claude-code-action route was\nretired on 2026-10-10 and no row selects it.\n").__len__(), 1)
+        self.assertEqual(prose_violations("x.md", "The claude-code-action route was retired on 2026-10-10,\nand no row selects it.\n"), [], "every line that names the route says retired")
+
+    def test_the_description_line_is_the_measured_topic_text_and_is_not_read_as_a_route(self):
+        entry = (SKILL_DIR / "SKILL.md").read_text(encoding="utf-8")
+        description = next(line for line in entry.splitlines() if line.startswith("description:"))
+        self.assertEqual(hashlib.sha256(description.encode("utf-8")).hexdigest(), DESCRIPTION_SHA256, "the description is the text the routing was measured with; a change needs a new measurement")
+        self.assertIn("Claude GitHub Actions setup", description)
+        self.assertEqual(entry_point_violations(entry), [])
+        changed = entry.replace("Claude GitHub Actions setup", "Claude GitHub Actions setup with the claude-code-action workflow")
+        self.assertNotEqual(entry_point_violations(changed), [], "a changed description is read like any other line")
+
+    def test_the_other_names_the_documentation_page_uses_are_flagged(self):
+        # Lines of the page the guard's names come from (https://code.claude.com/docs/en/github-actions.md, sha256 87b99aefc0a9f438…, retained): its title, line 9, line 33 and line 63, and the carrier named first.
+        for text in ("Claude Code GitHub Actions", "Claude Code GitHub Actions is a GitHub Action that runs Claude Code inside your repository's workflows.", "Claude Code installs the Claude GitHub App, then sets up an authentication secret.",
+                     "Install the Claude GitHub App", "Use the GitHub Action for Claude reviews", "Use anthropics/claude-code-base-action for Claude reviews.", "Claude reviews run in a GitHub Action.",
+                     "Claude reviews run on GitHub Actions.", "Claude reviews run with GitHub Actions.", "The Claude review is a GitHub Action."):
+            with self.subTest(flagged=text):
+                self.assertNotEqual(judge("x.notes", "explain", text), [])
+                self.assertNotEqual(judge("x.default", "select", text), [])
+        for text in ("Pin every GitHub Action to a full commit SHA.", "The catalog check runs on GitHub Actions."):
+            with self.subTest(allowed=text):
+                self.assertEqual(judge("x.notes", "explain", text), [])
+        # the wording of the scheduled-tasks row (the command center's ruling, from Codex's thread on scheduling-supervision.md:9: the record retires Claude routes, not every model-backed job)
+        self.assertEqual(judge("x.alternatives", "select", ["GitHub Actions schedule (repository jobs; a scheduled Claude task runs locally)"]), [])
+        self.assertEqual(judge("scheduled-tasks.route", "select", "GitHub Actions schedules repository jobs (Claude runs inside GitHub are retired, 2026-10-10, so a scheduled Claude task runs locally: see github-action)"), [])
+
+    def test_explicit_negations_of_the_retirement_do_not_count_as_saying_retired_and_the_reversal_boundary_is_pinned(self):
+        # Codex on #1001 at ef3f3e7bf (:122). Explicit negations fail; the reversal ("retired, but now current") is the boundary the command center ruled and stays accepted, as the comment at SAYS_RETIRED says.
+        for text in ("The claude-code-action is not retired and handles PRs.", "claude-code-action was never retired.", "claude-code-action is no longer retired.", "claude-code-action isn't retired.", "claude-code-action is unretired."):
+            with self.subTest(negated=text):
+                self.assertEqual(len(judge("x.notes", "explain", text)), 1)
+        for text in ("claude-code-action was retired on 2026-10-10.", "The retirement of claude-code-action is recorded.", "claude-code-action was retired, not removed from the history."):
+            with self.subTest(affirmed=text):
+                self.assertEqual(judge("x.notes", "explain", text), [])
+        self.assertEqual(judge("x.notes", "explain", "The claude-code-action was retired, but is now current."), [], "the ruled boundary: a reversal in the same sentence passes")
+
+    def test_a_second_bullet_with_the_same_label_in_a_layer_page_section_is_flagged(self):
+        section = "x\n\n**Status:** default. **Default:** d\n\n- **Route:** one\n- **Notes:** n\n- **Route:** two, which contradicts the first\n- **Overturn when:** a\n- **Overturn when:** b\n"
+        self.assertEqual(section_violations("x", section), ["x page has more than one 'Route' bullet", "x page has more than one 'Overturn when' bullet"])
+        self.assertEqual(section_violations("x", section.replace("- **Route:** two, which contradicts the first\n", "").replace("- **Overturn when:** b\n", "")), [])
 
     def test_a_duplicate_row_and_an_overturn_cell_that_names_the_action_are_flagged(self):
         row = "| [github-action](git-github-automation.md#github-action) | retired | None | {} |"
