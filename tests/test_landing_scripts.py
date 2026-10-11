@@ -7,18 +7,24 @@ This module is that harness's offline subset, kept beside the one copy of the sc
   * verdict files and the GPT_VERDICT block (lg_verdict_file_ok: the harness's 28 synthetic files and six more) and the GATES_DONE rule;
   * the trading-cc-read gate (tcc_read_gate): the description form, the record's last verdict line, the status states;
   * change identity (lg_change_id, lg_same_change) against scratch repositories: binary bytes, mode, names, `--` and `++` lines;
-  * the CI line: uet's lg_ci_state on synthetic rollups and nas's check-run line;
+  * the CI line: uet's lg_ci_state on synthetic rollups and nas's check-run line, and both against every member of GitHub's
+    CheckConclusionState in a captured schema excerpt (tests/fixtures/landing/check-conclusion-state.json) and null;
   * codex_gate.py: its exit-code precedence on canned API data (subprocess.run and datetime.now are patched);
   * each script end to end with a fake gh, python3 and sleep: the variables and their defaults, the gate path through a symlink and
-    a wrapper, and the order in which the gates stop a landing.
+    a wrapper, the order in which the gates stop a landing, and a failed merge that must not print gh's output;
+  * the files under tools/landing: no home path and no form of the running account's name (#975 P2-1).
 
 A decision site is cut out by the same start and end lines the harness used, so an edit that moves a site fails here loudly instead
-of leaving it untested. Everything is synthetic: no network, no gh, no cache files. `jq` is required (the runners have it); when it
-is missing the module fails in CI and is skipped elsewhere. The scripts are Linux tools (GNU sha256sum and readlink -f).
+of leaving it untested. Everything but the captured schema excerpt is synthetic: no network, no gh, no cache files. `jq` is required
+(the runners have it); when it is missing the module fails in CI and is skipped elsewhere. The scripts are Linux tools (GNU sha256sum
+and readlink -f).
 """
 from __future__ import annotations
 
+import base64
 import contextlib
+import getpass
+import hashlib
 import importlib.util
 import io
 import itertools
@@ -31,6 +37,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import urllib.parse
 from pathlib import Path
 from unittest import mock
 
@@ -45,6 +52,9 @@ NOREPLY = "4242424+seathatflowsinourveins@users.noreply.github.com"  # the fake 
 PR = str(90000000 + os.getpid())  # per process: the nas script makes /var/tmp/nas-land-<pr>-XXXXXX worktrees, which parallel runs must not share
 UET_REPO = "seathatflowsinourveins/us-equities-trading"
 NAS_REPO = "seathatflowsinourveins/native-agent-stack"
+# #975 P2-3: GitHub's CheckConclusionState as captured from its published GraphQL schema, with the REST description's check-run enum
+CONCLUSIONS = ROOT / "tests/fixtures/landing/check-conclusion-state.json"
+PASSING_CONCLUSIONS = ("SUCCESS", "NEUTRAL", "SKIPPED")  # the scripts' allow-list; any other completed conclusion, null included, fails
 
 
 def setUpModule():
@@ -94,7 +104,8 @@ case "$1 $2" in
     exec jq -r "$prog" "$FAKE_PRVIEW" ;;
   "pr ready") exit 0 ;;
   "pr update-branch") exit "${FAKE_UPDATE_RC:-0}" ;;
-  "pr merge") echo "merged"; exit "${FAKE_MERGE_RC:-0}" ;;
+  "pr merge") printf '%s\n' "${FAKE_MERGE_STDOUT-merged}"; [ -z "${FAKE_MERGE_STDERR:-}" ] || printf '%s\n' "$FAKE_MERGE_STDERR" >&2
+              exit "${FAKE_MERGE_RC:-0}" ;;
   *) exit 1 ;;
 esac
 '''
@@ -235,12 +246,120 @@ def accept(code, reject_code=2):
 
 
 # ---------------------------------------------------------------------------------------------- 1. the script text
+# #975 P2-1: no file under tools/landing names the host. The scan reads every file there, bytecode excepted (a .pyc records the
+# absolute path of its source; the tests importing codex_gate.py create one), for home-path syntax and for the name of the account
+# that runs the tests, taken from the OS at test time and never written into the repository. Only (file, form) pairs are reported,
+# never the matched text, so a failure cannot print the name.
+HOME_PATH = re.compile(rb"/(?:home|Users)/[A-Za-z0-9_.-]|[A-Za-z]:[\\/]+Users[\\/]|/root/")
+
+
+# Generic CI and container accounts: their names are ordinary words ("runner" on GitHub-hosted runners) that may appear in
+# prose, so the name scan would fail CI on a word, not a leak. The home-path scan still runs for them.
+GENERIC_ACCOUNTS = frozenset({"runner", "root", "ubuntu", "user", "admin", "vscode", "codespace", "ec2-user", "node", "docker"})
+NO_NAME_SCAN = "zqx-no-account-name-scan"
+
+
+def scan_name(name):
+    """The name the privacy scan looks for: the account name, or a sentinel for generic or very short names."""
+    return NO_NAME_SCAN if name.lower() in GENERIC_ACCOUNTS or len(name) < 4 else name
+
+
+def account_name():
+    """The name of the account running the tests, from the password database (getpass when the uid has no entry)."""
+    import pwd  # Unix only, like the scripts
+    try:
+        return pwd.getpwuid(os.getuid()).pw_name
+    except KeyError:
+        return getpass.getuser()
+
+
+def name_patterns(name):
+    """Bytes patterns for the name in its usual spellings: as a token (bare, or hyphenated as in project-<name>-tools), as hex digits
+    and inside base64 at each of the three byte alignments, cut to the characters that do not depend on the bytes around the name."""
+    spellings = [spelling.encode("utf-8") for spelling in sorted({name, name.lower(), name.upper(), name.capitalize()})]
+    encoded = set()
+    for value in spellings:
+        for offset, skip in ((0, 0), (1, 2), (2, 3)):
+            for encode in (base64.b64encode, base64.urlsafe_b64encode):
+                encoded.add(encode(b"\0" * offset + value)[skip:8 * (offset + len(value)) // 6])
+
+    def either(values):
+        return b"|".join(re.escape(value) for value in sorted(values))
+
+    return {"token": re.compile(rb"(?<![A-Za-z0-9])(?:" + either(spellings) + rb")(?![A-Za-z0-9])", re.I),
+            "hex": re.compile(either(value.hex().encode() for value in spellings), re.I),
+            "base64": re.compile(either(encoded))}
+
+
+def privacy_findings(root, name):
+    """(path under root, form) for every file under root, __pycache__ and *.pyc excepted, that holds a home path or a form of name.
+    Hex counts with or without \\x escapes; a percent-encoded form counts where decoding the %XX escapes reveals more matches."""
+    patterns = name_patterns(name)
+    found = []
+    for path in sorted(root.rglob("*")):
+        relative = path.relative_to(root)
+        if not path.is_file() or "__pycache__" in relative.parts or path.suffix == ".pyc":
+            continue
+        data = path.read_bytes()
+        decoded = urllib.parse.unquote_to_bytes(data)
+        hits = {
+            "home path": bool(HOME_PATH.search(data)),
+            "home path, percent-encoded": len(HOME_PATH.findall(decoded)) > len(HOME_PATH.findall(data)),
+            "name": bool(patterns["token"].search(data)),
+            "name, percent-encoded": len(patterns["token"].findall(decoded)) > len(patterns["token"].findall(data)),
+            "name, hex": bool(patterns["hex"].search(data.replace(b"\\x", b""))),
+            "name, base64": bool(patterns["base64"].search(data)),
+        }
+        found += [(relative.as_posix(), form) for form, hit in hits.items() if hit]
+    return found
+
+
+def legacy_findings(root):
+    """The check before #975 P2-1, kept as the planted-tree test's fail-before witness: home-path syntax in top-level files only."""
+    pattern = re.compile(r"/(?:home|Users)/[A-Za-z0-9_.-]|[A-Za-z]:[\\/]+Users[\\/]|/root/")
+    return [path.name for path in sorted(root.iterdir()) if path.is_file() and pattern.findall(path.read_text(encoding="utf-8"))]
+
+
 class ScriptTextTests(LandingCase):
     def test_no_home_literal_or_user_name_in_tools_landing(self):
-        pattern = re.compile(r"/(?:home|Users)/[A-Za-z0-9_.-]|[A-Za-z]:[\\/]+Users[\\/]|/root/")
-        for path in sorted(item for item in LANDING.iterdir() if item.is_file()):  # not __pycache__, which the tests importing codex_gate.py create
-            with self.subTest(file=path.name):
-                self.assertEqual(pattern.findall(path.read_text(encoding="utf-8")), [])
+        self.assertEqual(privacy_findings(LANDING, scan_name(account_name())), [],
+                         "a home path, or a form of the name of the account running these tests, in tools/landing")
+
+    def test_generic_or_short_account_names_scan_for_a_sentinel_not_a_word(self):
+        for name in ("runner", "Runner", "root", "ec2-user", "abc"):
+            self.assertEqual(scan_name(name), NO_NAME_SCAN, name)
+        self.assertEqual(scan_name("zqxsynth"), "zqxsynth")
+
+    def test_the_privacy_scan_finds_each_form_of_the_name_planted_in_subdirectories(self):
+        # The fail-before of #975 P2-1: the old check (legacy_findings) passes every plant below. The account's own name and a
+        # synthetic one; neither is ever a subTest parameter or part of a message.
+        for label, name in (("the account's name", account_name()), ("a synthetic name", "zqxsynth")):
+            raw = name.encode("utf-8")
+            plants = {
+                "a/bare.txt": (raw + b"\n", ["name"]),
+                "a/b/hyphenated.sh": (b"dir=project-" + raw + b"-tools\n", ["name"]),
+                "a/b/c/url-encoded.md": (b"<https://example.invalid/?u=" + "".join(f"%{byte:02X}" for byte in raw).encode() + b">\n",
+                                         ["name, percent-encoded"]),
+                "d/hex.txt": (b"blob " + raw.hex().encode() + b"\n", ["name, hex"]),
+                "d/e/escaped-hex.py": (b"s = '" + "".join(f"\\x{byte:02x}" for byte in raw).encode() + b"'\n", ["name, hex"]),
+                "f/base64-at-0.txt": (base64.b64encode(raw) + b"\n", ["name, base64"]),
+                "f/base64-at-1.txt": (base64.b64encode(b"u" + raw + b";") + b"\n", ["name, base64"]),
+                "f/g/base64-url-at-2.txt": (base64.urlsafe_b64encode(b"u=" + raw + b";") + b"\n", ["name, base64"]),
+                "h/home.txt": (b"cd /home/example/project\n", ["home path"]),
+                "h/home-url-encoded.txt": (b"file=%2Fhome%2Fexample%2Fproject\n", ["home path, percent-encoded"]),
+                "clean.txt": (b"nothing to report\n", []),
+                "__pycache__/gate.cpython-313.pyc": (raw, []),
+                "i/__pycache__/notes.txt": (raw, []),
+                "i/stale.pyc": (raw, []),
+            }
+            root = self.dir / f"privacy-{next(self.counter)}"
+            for relative, (content, _) in plants.items():
+                (root / relative).parent.mkdir(parents=True, exist_ok=True)
+                (root / relative).write_bytes(content)
+            with self.subTest(case=label):
+                expected = sorted((relative, form) for relative, (_, forms) in plants.items() for form in forms)
+                self.assertEqual(privacy_findings(root, name), expected)
+                self.assertEqual(legacy_findings(root), [], "the old check finds none of the plants")
 
     def test_scripts_parse_and_have_the_expected_modes(self):
         for script in (self.uet, self.nas):
@@ -757,6 +876,12 @@ def status_context(context, state):
     return {"__typename": "StatusContext", "context": context, "state": state}
 
 
+def conclusion_states():
+    """Every member of GitHub's GraphQL CheckConclusionState, parsed from the schema excerpt in the fixture."""
+    excerpt = json.loads(CONCLUSIONS.read_text(encoding="utf-8"))["graphql"]["excerpt"]
+    return [line.strip() for line in excerpt if re.fullmatch(r"  [A-Z_]+", line)]
+
+
 def ci_reference_uet(entries):
     """What the CI line must say: incomplete, failing, total and ci-gate successes (the rule, in Python)."""
     incomplete = failing = 0
@@ -765,7 +890,7 @@ def ci_reference_uet(entries):
         if kind == "CheckRun":
             if entry.get("status") != "COMPLETED":
                 incomplete += 1
-            elif entry.get("conclusion") in ("FAILURE", "CANCELLED", "TIMED_OUT"):
+            elif entry.get("conclusion") not in PASSING_CONCLUSIONS:
                 failing += 1
         elif kind == "StatusContext":
             if entry.get("state") in ("PENDING", "EXPECTED"):
@@ -789,7 +914,8 @@ def ci_reference_nas(runs):
             latest[run["name"]] = run
     kept = list(latest.values())
     incomplete = sum(1 for r in kept if r["status"] != "completed")
-    failing = sum(1 for r in kept if r["status"] == "completed" and r["conclusion"] in ("failure", "cancelled", "timed_out", "action_required"))
+    passing = [conclusion.lower() for conclusion in PASSING_CONCLUSIONS]  # REST spells the conclusions in lower case
+    failing = sum(1 for r in kept if r["status"] == "completed" and r["conclusion"] not in passing)
     validated = sum(1 for r in kept if r["name"] == "validate" and r["conclusion"] == "success")
     return incomplete, failing, len(kept), validated
 
@@ -840,6 +966,37 @@ class CiLineTests(LandingCase):
                 code, out = self.ci_line(self.nas, {"check_runs": runs})
                 incomplete, failing, total, validated = ci_reference_nas(runs)
                 self.assertEqual((code, out.replace("\t", " ")), (0, f"{incomplete} {failing} {total} {validated}"))
+
+    def test_the_conclusion_fixture_is_the_schema_excerpt_it_names(self):
+        fixture = json.loads(CONCLUSIONS.read_text(encoding="utf-8"))
+        graphql, rest = fixture["graphql"], fixture["rest"]
+        first, last = graphql["lines"]
+        self.assertEqual(len(graphql["excerpt"]), last - first + 1)
+        self.assertTrue(graphql["excerpt"][0].startswith("enum CheckConclusionState "))
+        text = "\n".join(graphql["excerpt"]) + "\n"  # the bytes of `sed -n '3974,4018p' schema.docs.graphql`
+        self.assertEqual(hashlib.sha256(text.encode("utf-8")).hexdigest(), graphql["excerpt_sha256"])
+        states = conclusion_states()
+        self.assertEqual(len(states), 9)
+        self.assertLess(set(PASSING_CONCLUSIONS), set(states))
+        # REST's check-run enum is nullable and leaves out two members that its check-suite enum has, so only an allow-list is complete
+        self.assertTrue(rest["check_run_conclusion"]["nullable"])
+        self.assertEqual(set(states) - {value.upper() for value in rest["check_run_conclusion"]["enum"]}, {"STALE", "STARTUP_FAILURE"})
+        self.assertLessEqual({"stale", "startup_failure"}, set(rest["check_suite_conclusion"]["enum"]))
+
+    def test_every_conclusion_but_success_neutral_and_skipped_fails_both_ci_lines(self):
+        # #975 P2-3, next to a passing aggregate check: every member of the captured CheckConclusionState, and null. The old lists let
+        # ACTION_REQUIRED, STALE, STARTUP_FAILURE and null pass in uet, and stale, startup_failure and null in nas.
+        t = "2026-10-10T10:00:00Z"
+        for conclusion in [*conclusion_states(), None]:
+            failing = "0" if conclusion in PASSING_CONCLUSIONS else "1"
+            with self.subTest(script="uet", conclusion=conclusion):
+                rollup = [check_run("ci-gate"), check_run("other", "COMPLETED", conclusion)]
+                code, out = self.ci_line(self.uet, {"headRefOid": "H" * 40, "statusCheckRollup": rollup, "mergeStateStatus": "CLEAN"})
+                self.assertEqual((code, out.split("\t")[1:5]), (0, ["0", failing, "2", "1"]))
+            rest = None if conclusion is None else conclusion.lower()
+            with self.subTest(script="nas", conclusion=rest):
+                code, out = self.ci_line(self.nas, {"check_runs": [nas_run("validate", t), nas_run("other", t, conclusion=rest)]})
+                self.assertEqual((code, out.split("\t")), (0, ["0", failing, "2", "1"]))
 
 
 # ---------------------------------------------------------------------------------------------- 6. codex_gate.py
@@ -1051,6 +1208,7 @@ class EndToEndTests(LandingCase):
         (run / "checkruns.json").write_text(json.dumps({"check_runs": checkruns if checkruns is not None else [nas_run("validate", "2026-10-10T10:00:00Z")]}))
         verdict_file = run / "verdict.md"
         verdict_file.write_text(verdict if verdict is not None else f"# Read\n\nVerdict: PASS at {self.head[:8]}\n", encoding="utf-8")
+        extra.setdefault("TMPDIR", str(run))  # a failed merge leaves its merge-fail-XXXXXX file here, not in /tmp
         environment = self.env(HOME=str(self.home), FAKE_LOG=str(run / "log"), FAKE_PRVIEW=str(run / "prview.json"),
                                FAKE_STATUSES=str(run / "statuses.json"), FAKE_CHECKRUNS=str(run / "checkruns.json"),
                                LANDING_UET_REPO=str(self.repo), LANDING_NAS_REPO=str(self.repo),
@@ -1301,6 +1459,45 @@ class EndToEndTests(LandingCase):
         code, out, log = self.land(self.nas, merge_state="BLOCKED")
         self.assertEqual(code, 8, out)
         self.assertEqual(self.merge_calls(log), [])
+
+    def test_a_check_ending_other_than_success_neutral_or_skipped_stops_with_5_before_any_merge(self):
+        # #975 P2-3: the aggregate check passes (uet ci-gate SUCCESS, nas validate success) and a second check completes with each
+        # member of the captured CheckConclusionState, or null; only SUCCESS, NEUTRAL and SKIPPED reach the merge.
+        t = "2026-10-10T10:00:00Z"
+        for conclusion in [*conclusion_states(), None]:
+            rest = None if conclusion is None else conclusion.lower()
+            for script, checks in ((self.uet, {"rollup": [check_run("ci-gate"), check_run("other", "COMPLETED", conclusion)]}),
+                                   (self.nas, {"checkruns": [nas_run("validate", t), nas_run("other", t, conclusion=rest)]})):
+                with self.subTest(script=script.key, conclusion=conclusion):
+                    code, out, log = self.land(script, **checks)
+                    if conclusion in PASSING_CONCLUSIONS:
+                        self.assertEqual((code, len(self.merge_calls(log))), (0, 1), out)
+                    else:
+                        self.assertEqual((code, self.merge_calls(log)), (5, []), out)
+                        self.assertIn("CI failing=1 of 2", out)
+
+    def test_a_failed_merge_prints_a_class_not_the_gh_output_which_stays_in_a_0600_file(self):
+        # #975 P2-2: gh's merge diagnostic can carry an address. The script prints a fixed message with a class from a fixed list and
+        # keeps the raw output only in a mktemp file under TMPDIR.
+        out_address, err_address = "merge-out-7f3a@example.invalid", "merge-err-91c2@example.invalid"
+        stderr = f"GraphQL: refused; contact {err_address}"
+        cases = (("a known phrase", f"X Pull request is not mergeable; ask {out_address}", "not_mergeable"),
+                 ("no known phrase", f"X failed; ask {out_address}", "other"))
+        for script in (self.uet, self.nas):
+            for name, stdout, expected in cases:
+                with self.subTest(script=script.key, case=name):
+                    tmp = self.dir / f"tmp-{next(self.counter)}"
+                    tmp.mkdir()
+                    code, out, log = self.land(script, FAKE_MERGE_RC="1", FAKE_MERGE_STDOUT=stdout, FAKE_MERGE_STDERR=stderr, TMPDIR=str(tmp))
+                    self.assertEqual((code, len(self.merge_calls(log))), (7, 1), out)
+                    self.assertNotIn(out_address, out)
+                    self.assertNotIn(err_address, out)
+                    kept = sorted(tmp.glob("merge-fail-*"))
+                    self.assertEqual(len(kept), 1, out)
+                    self.assertEqual(stat.S_IMODE(kept[0].stat().st_mode), 0o600)
+                    self.assertEqual(kept[0].read_text(encoding="utf-8"), f"{stdout}\n{stderr}\n")
+                    self.assertIn(f"#{PR} merge failed (class: {expected}); gh output kept only in local file {kept[0].name} in the temp directory (0600)", out)
+                    self.assertNotIn(str(kept[0].parent), out, "the temp directory may hold the account name; print only the file name")
 
     def test_nas_stops_with_10_when_the_merge_with_current_main_fails_validation(self):
         code, out, log = self.land(self.nas, FAKE_VALIDATE_RC="1")

@@ -119,11 +119,12 @@ lg_author_check() {  # <owner/repo> <pr> <no-reply address> : after the merge, t
   echo "#$2 author address on ${mc:0:8} is NOT the no-reply form (correction #148)"; return 1
 }
 # The CI state of a pull request as one tab-separated line: head, incomplete, failing, total, ci-gate successes, mergeStateStatus.
-# A CheckRun is complete when .status is COMPLETED and failing on FAILURE, CANCELLED or TIMED_OUT; a commit status (StatusContext, such as
+# A CheckRun is complete when .status is COMPLETED and failing on any conclusion other than SUCCESS, NEUTRAL or SKIPPED (fail closed, #975 P2-3: GraphQL CheckConclusionState also has
+# ACTION_REQUIRED, STALE and STARTUP_FAILURE; schema.docs.graphql sha256 3ed09565…, lines 3974-4018); a commit status (StatusContext, such as
 # trading-cc-read) has .state and no .status: PENDING or EXPECTED is running, FAILURE or ERROR is failing, SUCCESS is complete. A rollup
 # entry of any other type counts as running (fail closed). ci-gate is matched on CheckRuns only.
 lg_ci_state() {  # <pr>
-  gh pr view "$1" -R $R --json headRefOid,statusCheckRollup,mergeStateStatus --jq '[.headRefOid, ([.statusCheckRollup[]|select((.__typename=="CheckRun" and .status!="COMPLETED") or (.__typename=="StatusContext" and (.state=="PENDING" or .state=="EXPECTED")) or (.__typename!="CheckRun" and .__typename!="StatusContext"))]|length), ([.statusCheckRollup[]|select((.__typename=="CheckRun" and .status=="COMPLETED" and (.conclusion=="FAILURE" or .conclusion=="CANCELLED" or .conclusion=="TIMED_OUT")) or (.__typename=="StatusContext" and (.state=="FAILURE" or .state=="ERROR")))]|length), (.statusCheckRollup|length), ([.statusCheckRollup[]|select(.__typename=="CheckRun" and .name=="ci-gate" and .conclusion=="SUCCESS")]|length), .mergeStateStatus]|@tsv' 2>/dev/null
+  gh pr view "$1" -R $R --json headRefOid,statusCheckRollup,mergeStateStatus --jq '[.headRefOid, ([.statusCheckRollup[]|select((.__typename=="CheckRun" and .status!="COMPLETED") or (.__typename=="StatusContext" and (.state=="PENDING" or .state=="EXPECTED")) or (.__typename!="CheckRun" and .__typename!="StatusContext"))]|length), ([.statusCheckRollup[]|select((.__typename=="CheckRun" and .status=="COMPLETED" and ((.conclusion=="SUCCESS" or .conclusion=="NEUTRAL" or .conclusion=="SKIPPED")|not)) or (.__typename=="StatusContext" and (.state=="FAILURE" or .state=="ERROR")))]|length), (.statusCheckRollup|length), ([.statusCheckRollup[]|select(.__typename=="CheckRun" and .name=="ci-gate" and .conclusion=="SUCCESS")]|length), .mergeStateStatus]|@tsv' 2>/dev/null
 }
 # <<< land-gate-fns
 # trading-cc posts a `trading-cc-read` commit status on its read head (from 2026-10-09T22:50Z), described
@@ -219,7 +220,7 @@ for i in $(seq 1 25); do
     fi
     g=$(python3 -I "$GATE" "$R" "$N" 2>&1); gr=$?; { [ $gr = 0 ] || [ $gr = 5 ]; } || { echo "#$N $g just before the merge: stop"; exit 9; }
     ae=$(lg_author_email "$R") || { echo "#$N cannot form the no-reply author address (correction #148): stop, nothing merged"; exit 11; }
-    out=$(gh pr merge "$N" -R $R --squash --match-head-commit "$H" -A "$ae" 2>&1) || { echo "#$N merge failed: $out"; exit 7; }
+    out=$(gh pr merge "$N" -R $R --squash --match-head-commit "$H" -A "$ae" 2>&1) || { mf=$(mktemp "${TMPDIR:-/tmp}/merge-fail-XXXXXX"); printf '%s\n' "$out" > "$mf"; cls=$(printf '%s' "$out" | grep -o -i -E 'not mergeable|head branch was modified|required status check|review|draft|merge conflict|protected branch|rate limit|authentication|not found' | head -1 | tr 'A-Z ' 'a-z_'); echo "#$N merge failed (class: ${cls:-other}); gh output kept only in local file ${mf##*/} in the temp directory (0600), never echoed (#975 P2-2)"; exit 7; }
     sleep 4
     echo "#$N $(gh pr view "$N" -R $R --json state,mergeCommit,mergedAt --jq '"\(.state) \(.mergeCommit.oid) \(.mergedAt)"') (CI $4 ok)"
     lg_author_check "$R" "$N" "$ae" || exit 12

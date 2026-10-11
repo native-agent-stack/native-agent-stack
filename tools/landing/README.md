@@ -38,6 +38,23 @@ one, which published the owner's personal address on every landing. Both scripts
 never an address, and reads the merge commit up to five times). The owner's setting "Keep my email addresses private" fixes the
 source and also covers merges made in the web UI; this is the script-side guarantee.
 
+**The CI gate (#975 P2-3).** A completed check fails unless its conclusion is success, neutral or skipped; any other conclusion, null
+included, stops a landing with exit 5 even when the aggregate check (`ci-gate` in `uet_land.sh`, `validate` in `nas_land.sh`)
+succeeded. The rule is an allow-list, which fails closed on a conclusion it does not know, because the sources disagree on the list:
+GitHub's GraphQL enum `CheckConclusionState` has nine members, ACTION_REQUIRED, CANCELLED, FAILURE, NEUTRAL, SKIPPED, STALE,
+STARTUP_FAILURE, SUCCESS and TIMED_OUT (https://docs.github.com/public/fpt/schema.docs.graphql, sha256 `3ed09565…`, lines
+3974-4018, captured 2026-10-11), while the REST description's check-run conclusion (`github/rest-api-description@58b1e0c00b39`,
+`descriptions/api.github.com/api.github.com.json`, `components.schemas.check-run.properties.conclusion`) lists seven values and is
+nullable: it leaves out `stale` and `startup_failure`, which its check-suite conclusion lists. Before this rule `uet_land.sh` counted
+FAILURE, CANCELLED and TIMED_OUT as failing and `nas_land.sh` also `action_required`, so a check that ended any other way did not
+stop a landing by itself. `tests/fixtures/landing/check-conclusion-state.json` holds the captured excerpt, and the tests run each of
+its members, and null, through both scripts.
+
+**A failed merge (#975 P2-2).** `gh pr merge` can print an address in its diagnostic, so neither script echoes it: exit 7 prints a
+fixed message with a class taken from a fixed list of phrases (for example `not_mergeable` or `head_branch_was_modified`, otherwise
+`other`), and the raw output goes only to a file made by `mktemp "${TMPDIR:-/tmp}/merge-fail-XXXXXX"` (mode 0600), whose path the
+message names.
+
 ## Variables
 
 | Variable | Default | Used by | Meaning |
@@ -49,6 +66,7 @@ source and also covers merges made in the web UI; this is the script-side guaran
 | `VERDICT_FILES` | none | `uet_land.sh` | space-separated verdict files that each must name the read head |
 | `GATES_DONE` | none | both | receipt naming the read head; required when a verdict file states a landing gate |
 | `GPT_VERDICT` | none | `uet_land.sh` | the co-op's verdict file accepted instead of Codex when `codex_gate.py` exits 5 |
+| `TMPDIR` | `/tmp` | both | where a failed merge keeps gh's output (`merge-fail-XXXXXX`, mode 0600) |
 
 The scripts also need `gh` 2.48.0 or later (`gh api --paginate --slurp`; authenticated for the repository), `git` 2.39.0 or
 later (`git patch-id --verbatim`), `jq`, `python3` 3.7 or later, GNU `grep`, `sha256sum` and `readlink -f`. They run under
@@ -83,30 +101,31 @@ CHANGES_REQUESTED on line 1 or as that last word rejects, and a PASS or ACK anyw
 ## Provenance and digests
 
 The files were moved from the CC's tools directory on 2026-10-10 and synced on 2026-10-11 to the live copies the CC installed at
-00:02Z (the head-following function of uet#58 and correction #148). They are the live copies with only host literals changed:
-three lines per shell script (the repository default and `COORD` on one line, the record path, the gate path), the same line
-counts, and `codex_gate.py` byte for byte. Expanding the three expressions to the CC host's paths gives the live digests below.
+00:02Z (the head-following function of uet#58 and correction #148); #975's fix commit then took the CC's live patch of
+2026-10-11T03:37Z (P2-3 and P2-2, above). The shell scripts are the live copies with only host paths changed: the three lines of the
+move (the repository default and `COORD` on one line, the record path, the gate path), the same line counts, and `codex_gate.py`
+byte for byte. Expanding the three expressions to the CC host's paths gave the digests of the "after #148" column. The patched live
+copies also differ in the merge-failure line, whose file the CC keeps in its own tools directory until it takes this line's
+`${TMPDIR:-/tmp}` after review (2026-10-11).
 
-| File | Before correction #136 | Live copy, after #148 | Here |
-| --- | --- | --- | --- |
-| `uet_land.sh` | `b794e3a46772c0a598dff9eee972ad449e5d63f0c81b60b9db1d5cb4944747bb` (115 lines) | `301fb5b07274b28fde0f2061356bf9682883eca352c8bcb7a3119e8934920c7d` (232 lines) | `2aeef175407ba58a463d461a6d0e9ad93eeec71b7731d6824e1acefc8cd5f9cb` (232 lines) |
-| `nas_land.sh` | `2fefe070b95229de3dcad14052cf5c031b70c202bf4a34f4452e6e0cb5832936` (135 lines) | `96144670bc301036604fc39e57e3ab4e4a2e43a6b9d6b8b645ef7b02482f4017` (243 lines) | `6b86ef7c01df0068b5161aa46369ca9ff8f67fafabfa2e18e6398b908c20eb91` (243 lines) |
-| `codex_gate.py` | (unchanged) | `31524d2871cde79ecb2c5b9bc56b6175ce9fafab9ad4d2e2e3eb3594e1cb2422` (108 lines) | the same |
+| File | Before correction #136 | Live copy, after #148 | Live copy, after #975 P2 | Here |
+| --- | --- | --- | --- | --- |
+| `uet_land.sh` | `b794e3a46772c0a598dff9eee972ad449e5d63f0c81b60b9db1d5cb4944747bb` (115 lines) | `301fb5b07274b28fde0f2061356bf9682883eca352c8bcb7a3119e8934920c7d` (232 lines) | `1bc1f53b3ddd7563a6d3a0ea1a4db296767df64197c00b1bc0ff6e23c528476c` (233 lines) | `bcdbb66a486d974d5b59f5363e0146544900bb4f03fb47729a21dfa4dbdaa18e` (233 lines) |
+| `nas_land.sh` | `2fefe070b95229de3dcad14052cf5c031b70c202bf4a34f4452e6e0cb5832936` (135 lines) | `96144670bc301036604fc39e57e3ab4e4a2e43a6b9d6b8b645ef7b02482f4017` (243 lines) | `287f2e7e162a0dd8df28803c72eeb96591a2d936c513d981bcac24512139e0bd` (246 lines) | `2d7e598e8bde9df71e67499fcd14021cd52eb2dc35bc021844faaadc448efbf0` (246 lines) |
+| `codex_gate.py` | (unchanged) | `31524d2871cde79ecb2c5b9bc56b6175ce9fafab9ad4d2e2e3eb3594e1cb2422` (108 lines) | the same | the same |
 
 Corrections the scripts carry: #118 (every gate before the merge, in order), #121 (a verdict file that states a landing gate needs
 a receipt), #122 and #123 (a Codex review must have finished; uet#40 and uet#47 merged while one was running), #136
 (verdict and record acceptance, change identity and the CI line: the three loose decision points the shared
 `# >>> land-gate-fns` block replaced), the head-following of 2026-10-10 (uet#58: an update-branch rebase does not reach every API view at
-once, so a head that moves during CI and carries the read head's change is followed, at most three times) and #148 (the author address). The block is identical in both scripts, apart from `lg_ci_state`, which only
-`uet_land.sh` has.
+once, so a head that moves during CI and carries the read head's change is followed, at most three times), #148 (the author address)
+and #975's P2-3 (the CI allow-list) and P2-2 (a failed merge prints no gh output). The block is identical in both scripts, apart
+from `lg_ci_state`, which only `uet_land.sh` has.
 
 ## Known gaps, left as they were
 
 The files are the live copies with host literals replaced, so these stay until a change with its own tests fixes them:
 
-- `uet_land.sh`'s CI line counts the check-run conclusions FAILURE, CANCELLED and TIMED_OUT as failing. GitHub's schema also
-  lists ACTION_REQUIRED, STARTUP_FAILURE and STALE (`nas_land.sh` counts `action_required`); in `uet_land.sh` a check that ends
-  that way is neither running nor failing, so it does not stop a landing by itself (`ci-gate` must still be SUCCESS).
 - `U` and `G` are expanded unquoted: a clone path with whitespace breaks both scripts.
 - `nas_land.sh`'s header leaves out exit code 4, and its validation merge needs a git identity (above).
 
@@ -116,5 +135,9 @@ The files are the live copies with host literals replaced, so these stay until a
 start and end lines the correction's harness used) and runs it in bash with a fake `gh`, against synthetic verdict files,
 records, scratch repositories and rollups; it runs `codex_gate.py` on canned API data; and it runs both scripts end to end with
 a fake `gh`, `python3` and `sleep`, including the gate path through a symlink and a wrapper, a head that moves during CI (followed
-three times, then exit 3) and the author address (the merge argv, exits 11 and 12, no address in the output). It is offline, needs `jq`, and is
-Linux-only. A script edit that moves a decision site fails the module instead of leaving it untested.
+three times, then exit 3) and the author address (the merge argv, exits 11 and 12, no address in the output). It also runs every
+`CheckConclusionState` member of the fixture, and null, through both CI gates (exit 5 before any merge unless success, neutral or
+skipped), a failed merge (exit 7 with a class and no gh output, which stays in a 0600 file), and a scan of every file under
+`tools/landing`, bytecode excepted, for home paths and for the running account's name, bare, hyphenated, percent-encoded, hex or
+base64 (#975 P2-1). It is offline, needs `jq`, and is Linux-only. A script edit that moves a decision site fails the module
+instead of leaving it untested.

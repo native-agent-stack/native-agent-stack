@@ -216,7 +216,10 @@ for i in $(seq 1 25); do
   ms=$(gh pr view "$N" -R $R --json mergeStateStatus --jq .mergeStateStatus)
   # 2026-10-10: the aggregate `validate` check must have SUCCEEDED at this head. A DIRTY PR runs only CodeQL and Socket,
   # so "every check green" alone could pass on a handful of early checks (trading-cc on #940).
-  c=$(gh api "repos/$R/commits/$hd/check-runs?per_page=100" --jq '[.check_runs[]|{name,status,conclusion,started_at}]|group_by(.name)|map(max_by(.started_at))|[([.[]|select(.status!="completed")]|length), ([.[]|select(.status=="completed" and (.conclusion=="failure" or .conclusion=="cancelled" or .conclusion=="timed_out" or .conclusion=="action_required"))]|length), length, ([.[]|select(.name=="validate" and .conclusion=="success")]|length)]|@tsv')
+  # #975 P2-3 (2026-10-11): a completed check fails unless its conclusion is success, neutral or skipped (fail closed). GitHub's GraphQL
+  # CheckConclusionState (schema.docs.graphql sha256 3ed09565…, lines 3974-4018) also has stale and startup_failure, which REST
+  # rest-api-description@58b1e0c0 omits from its check-run enum; the old list counted those, and action_required on uet, as passing.
+  c=$(gh api "repos/$R/commits/$hd/check-runs?per_page=100" --jq '[.check_runs[]|{name,status,conclusion,started_at}]|group_by(.name)|map(max_by(.started_at))|[([.[]|select(.status!="completed")]|length), ([.[]|select(.status=="completed" and ((.conclusion=="success" or .conclusion=="neutral" or .conclusion=="skipped")|not))]|length), length, ([.[]|select(.name=="validate" and .conclusion=="success")]|length)]|@tsv')
   set -- "$hd" $c "$ms"
   vok=${5:-0}; ms=${6:-}; set -- "$1" "$2" "$3" "$4" "$ms"
   if [ "${1:-}" != "$cur" ]; then
@@ -230,7 +233,7 @@ for i in $(seq 1 25); do
     g=$(python3 -I "$GATE" "$R" "$N" 2>&1); gr=$?; { [ $gr = 0 ] || [ $gr = 5 ]; } || { echo "#$N $g just before the merge: stop"; exit 9; }
     merge_validate "$cur" || exit 10
     ae=$(lg_author_email "$R") || { echo "#$N cannot form the no-reply author address (correction #148): stop, nothing merged"; exit 11; }
-    out=$(gh pr merge "$N" -R $R --squash --match-head-commit "$cur" -A "$ae" 2>&1) || { echo "#$N merge failed: $out"; exit 7; }
+    out=$(gh pr merge "$N" -R $R --squash --match-head-commit "$cur" -A "$ae" 2>&1) || { mf=$(mktemp "${TMPDIR:-/tmp}/merge-fail-XXXXXX"); printf '%s\n' "$out" > "$mf"; cls=$(printf '%s' "$out" | grep -o -i -E 'not mergeable|head branch was modified|required status check|review|draft|merge conflict|protected branch|rate limit|authentication|not found' | head -1 | tr 'A-Z ' 'a-z_'); echo "#$N merge failed (class: ${cls:-other}); gh output kept only in local file ${mf##*/} in the temp directory (0600), never echoed (#975 P2-2)"; exit 7; }
     sleep 4
     echo "#$N $(gh pr view "$N" -R $R --json state,mergeCommit,mergedAt --jq '"\(.state) \(.mergeCommit.oid) \(.mergedAt)"') (CI $4 ok)"
     lg_author_check "$R" "$N" "$ae" || exit 12
