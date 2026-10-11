@@ -50,6 +50,13 @@ def validate_verdict(name, path):
         raise ValueError("unexpected_comparator_check_set:" + name)
     if verdict["execution_checks"] != EXPECTED_EXECUTION[name]:
         raise ValueError("comparator_execution_incomplete:" + name)
+    # Use the supported comparator's partition/count rule verbatim:
+    # spy-parity/compare.py:1064-1074 at 8bffa2c41692ef483e91b68e3b15aeb331423d2c.
+    execution = [row for row in checks if not row["id"].startswith("precondition_")]
+    observed_counts = {status.lower(): sum(row["status"] == status for row in execution)
+                       for status in ("PASS", "FAIL", "SKIPPED")}
+    if observed_counts != verdict["execution_checks"]:
+        raise ValueError("comparator_execution_rows_mismatch:" + name)
     if name == "accepted-v2-lean-data":
         if (verdict["verdict"] != "PASS" or not verdict["complete"] or
                 verdict["execution_checks"] != {"pass": 106, "fail": 0, "skipped": 0}):

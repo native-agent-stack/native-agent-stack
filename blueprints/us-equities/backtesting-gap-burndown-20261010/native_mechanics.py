@@ -8,6 +8,7 @@ No distribution/fill/fee is patched after the native run.
 
 import argparse
 from decimal import Decimal
+import hashlib
 import importlib.util
 import json
 from pathlib import Path
@@ -16,6 +17,44 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[3]
 PARITY = ROOT / "blueprints/us-equities/engine-nautilus/spy-parity"
+
+
+def expected_economics(target, commission):
+    """Recompute the fixed diagnostic from independently accepted fixture inputs.
+
+    Source: spy-parity/fixture_strategy.py:118-122 and historical-simulation/plan.json
+    at 8bffa2c41692ef483e91b68e3b15aeb331423d2c; the accepted LEAN comparator's
+    expected prices/dividend cash are pinned below, never taken from this run.
+    This is the configured zero-slippage diagnostic, not the frozen stress case.
+    """
+    reference_path = ROOT / ("evidence/artifacts/backtesting-gap-burndown-20261010/"
+                             "us-equities__backtesting-engine/raw/accepted-v2-lean-data.verdict.json")
+    reference_bytes = reference_path.read_bytes()
+    plan_bytes = (ROOT / "blueprints/us-equities/historical-simulation/plan.json").read_bytes()
+    if (hashlib.sha256(reference_bytes).hexdigest() !=
+            "8d6b96cc44f333c7f7d1216b23b5eb654100439566bcda0344034d4b215760f4" or
+            hashlib.sha256(plan_bytes).hexdigest() !=
+            "60959a050a3b004abf5346d376930b3b2f563096c725dc96e5427703ea203632"):
+        raise ValueError("mechanics_reference_inputs_changed")
+    reference = json.loads(reference_bytes)
+    plan = json.loads(plan_bytes)
+    def expected(identifier, field):
+        rows = [row for row in reference["checks"] if row["id"] == identifier and row["field"] == field]
+        if len(rows) != 1 or rows[0]["status"] != "PASS":
+            raise ValueError("mechanics_reference_check_missing")
+        return Decimal(rows[0]["expected"])
+    spec = importlib.util.spec_from_file_location("mechanics_fixture", PARITY / "fixture_strategy.py")
+    fixture = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(fixture)
+    initial = Decimal(plan["initial_cash_usd"])
+    quantity = fixture.target_quantity(initial, Decimal(target),
+        Decimal(plan["requested_target_sizing_multiplier"]), expected("entry_oco", "reference_close"))
+    entry = expected("entry_fill", "fill_price_usd")
+    exit_price = expected("exit_fill", "fill_price_usd")
+    dividend_per_share = (expected("distributions_total", "dividend_cash_usd") /
+                          expected("entry_fill", "signed_quantity"))
+    end_cash = initial + quantity * (exit_price - entry + dividend_per_share) - commission * 2
+    return quantity, entry, exit_price, end_cash
 
 
 def project_result(name, target, account, result):
@@ -49,6 +88,17 @@ def project_result(name, target, account, result):
                 Decimal(result["cash_ledger"][-1]["cash"]) != Decimal(result["native_end_cash_usd"]) or
                 Decimal(result["native_end_cash_usd"]) == Decimal("100000")):
             raise ValueError("native_economic_transition_missing")
+        configuration = {"one-fixed-fee": ("1", "CASH"), "two-margin-zero": ("2", "MARGIN"),
+                         "two-margin-fixed-fee": ("2", "MARGIN")}
+        if (target, account) != configuration[name]:
+            raise ValueError("mechanics_case_configuration_changed")
+        quantity, entry_price, exit_price, end_cash = expected_economics(target, commission)
+        if [Decimal(str(fill["quantity"])) for fill in fills] != [quantity, -quantity]:
+            raise ValueError("mechanics_target_quantity_mismatch")
+        if [Decimal(fill["price"]) for fill in fills] != [entry_price, exit_price]:
+            raise ValueError("mechanics_fill_price_mismatch")
+        if Decimal(result["native_end_cash_usd"]) != end_cash:
+            raise ValueError("mechanics_expected_end_cash_mismatch")
     return {"id": name, "status": status, "target": target, "account_type": account,
             "native_fills": result["fills"], "native_account_events": result["native_account_event_rows"],
             "native_end_cash": result["native_end_cash_usd"], "native_fees": result["fees_usd"],

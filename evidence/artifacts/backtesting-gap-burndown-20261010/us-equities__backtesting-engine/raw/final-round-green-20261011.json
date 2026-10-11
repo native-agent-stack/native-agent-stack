@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "id": "final-round-green-20261011",
+  "command": [
+    "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.venv/bin/python",
+    "-m",
+    "unittest",
+    "tests.test_backtesting_gap_burndown",
+    "tests.test_gap_closeouts",
+    "tests.test_component_matrix",
+    "tests.test_gap_wave_ledger",
+    "tests.test_new_host_grand_list",
+    "tests.test_host_receipts.OutputDigestBasisTests",
+    "tests.test_spy_parity",
+    "tests.test_nautilus_equity_replay"
+  ],
+  "started_utc": "2026-10-11T15:13:45Z",
+  "finished_utc": "2026-10-11T15:13:48Z",
+  "duration_seconds": 3.277,
+  "observed_exit_code": 0,
+  "input_hashes": [
+    {
+      "path": "tests/test_backtesting_gap_burndown.py",
+      "sha256": "76cd67fcb74ceadfbbc72a8490daba91554aef63517f2c4f8344696c14bbd78c"
+    },
+    {
+      "path": "blueprints/us-equities/backtesting-gap-burndown-20261010/execute_comparators.py",
+      "sha256": "e68c5eb4d024c12f91614365008fdda33d26beafb17fedf1cfec2e6dcd0f0bbc"
+    },
+    {
+      "path": "blueprints/us-equities/backtesting-gap-burndown-20261010/native_mechanics.py",
+      "sha256": "7909db7e8611c25ba98fee87000c79aea5c527301c0743c716bc706286b61096"
+    }
+  ],
+  "output": "{\"status\": \"checked\", \"counts\": {\"advanced\": 52, \"not_run\": 3, \"not_settled\": 5, \"settled\": 9}}\n{\"status\": \"checked\", \"counts\": {\"advanced\": 59, \"settled\": 10}}\n{\"evidence\": \"evidence/artifacts/hw-profiles/recorded-host-20260101/profile.json\", \"host_id\": \"recorded-host-20260101\", \"status\": \"recorded\"}\n{\"evidence\": \"evidence/artifacts/hw-profiles/recorded-host-20260101/profile.json\", \"host_id\": \"recorded-host-20260101\", \"status\": \"recorded\"}\n...............................................................................................................................................................................................................................................................................................................................................................................\n----------------------------------------------------------------------\nRan 367 tests in 2.951s\n\nOK\n",
+  "output_sha256": "a4991139ce30b41f65f8774689c3a4ec5a7fa4c5d48787d390c2c0dab248ca09",
+  "scope": "Final registered/citation-refreshed touched boundary/artifact and shared-loader/matrix/ledger tests, supported output-digest tests and adjacent existing parity/runner suites; native run has its own receipt."
+}

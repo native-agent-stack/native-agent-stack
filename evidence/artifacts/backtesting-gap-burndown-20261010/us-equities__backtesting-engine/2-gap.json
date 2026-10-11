@@ -14,7 +14,7 @@
   "raw_outputs": [
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/latest-nonprerelease.json",
-      "sha256": "c808a7306fb7067aca18e4efa51109a37e7441e32b9a268e3ebeff8586c7518b"
+      "sha256": "03dceaeb71662d5b6af1bb3f565d992b9ef49ec04c9ff517d00533ac19583ec5"
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/latest-nonprerelease.stderr.txt",
@@ -30,7 +30,7 @@
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/stable-release-tag.json",
-      "sha256": "71482011236b0a7f6c8751d9c965462c211fb1641facb99a58ab3c3822ef7a63"
+      "sha256": "c33fd600ae54845a359e7ebddc8defcbee0ed70d62e29164a9ba0978782aacbf"
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/stable-release-tag.stderr.txt",

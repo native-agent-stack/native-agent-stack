@@ -50,10 +50,13 @@
   ],
   "output_hashes": [
     {
-      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/published/lean-alpaca-model-tests-with-icu-alpaca-model.trx",
-      "sha256": "1084869e45d2ef0d2bc5686517c7643733da7e9ef72c0b5ec9001e7dc969f7f7",
-      "bytes": 2599,
-      "digest_basis": "published_bytes"
+      "path": "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/lean-985ef30/TestResults/alpaca-model.trx",
+      "digest_basis": "published_bytes",
+      "published_copy": {
+        "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/published/lean-alpaca-model-tests-with-icu-alpaca-model.trx",
+        "sha256": "093cd19a4973c17a169e903a6f2e4904fecd5e8284a609f4039a0a49b86213e7",
+        "bytes": 2539
+      }
     }
   ],
   "input_bytes_unchanged": true,

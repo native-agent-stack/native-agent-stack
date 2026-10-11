@@ -13,6 +13,8 @@ import re
 import subprocess
 from types import SimpleNamespace
 import unittest
+import copy
+import xml.etree.ElementTree as ET
 from unittest import mock
 
 
@@ -107,6 +109,85 @@ class PublishedOutputDigestTests(unittest.TestCase):
                 self.assertFalse(inverse in digests, "masked-home inverse matched a public digest")
             checked += 1
         self.assertGreater(checked, 0, "inverse probe must exercise published masked text")
+
+
+class FinalRoundRegressionTests(unittest.TestCase):
+    def test_published_trx_machine_fields_are_structurally_masked(self):
+        paths = list((BASE / "raw/published").glob("*.trx"))
+        self.assertEqual(len(paths), 4)
+        checked = 0
+        for path in paths:
+            for element in ET.parse(path).iter():
+                tag = element.tag.rsplit("}", 1)[-1]
+                for attribute, value in element.attrib.items():
+                    if attribute == "computerName" or (tag, attribute) in {
+                            ("TestRun", "name"), ("Deployment", "runDeploymentRoot")}:
+                        # Never include the original value in a failing diagnostic.
+                        self.assertTrue(value == "[MACHINE]", "unmasked TRX machine field")
+                        checked += 1
+        self.assertEqual(checked, 45)
+
+    def test_original_paths_and_published_copy_bindings_are_preserved(self):
+        entries = json.loads((BASE / "raw/final-path-provenance.json").read_text())["entries"]
+        self.assertEqual(sum(e["kind"] == "dedup" for e in entries), 26)
+        self.assertEqual(sum(e["kind"] == "private" for e in entries), 18)
+        for entry in entries:
+            document = json.loads((BASE / "raw" / entry["receipt"]).read_text())
+            node = document
+            for part in entry["pointer"].strip("/").split("/"):
+                node = node[int(part)] if isinstance(node, list) else node[part]
+            with self.subTest(receipt=entry["receipt"], pointer=entry["pointer"]):
+                self.assertEqual(node["path"], entry["original_path"])
+                if entry["kind"] == "private":
+                    self.assertNotIn("sha256", node, "original private bytes must not have a public commitment")
+                    published = node["published_copy"]
+                    self.assertEqual(published["path"], entry["published_path"])
+                    self.assertEqual(published["sha256"], hashlib.sha256(
+                        (ROOT / published["path"]).read_bytes()).hexdigest())
+
+    def test_dll_commitment_is_kept_out_of_public_inputs(self):
+        receipt = json.loads((BASE / "raw/lean-model-explicit-environment.json").read_text())
+        self.assertFalse(any(item["path"].endswith("QuantConnect.Tests.dll")
+                             for item in receipt["input_hashes"]), "private DLL commitment is published")
+        private = [item for item in receipt.get("private_outputs", [])
+                   if item["path"].endswith("QuantConnect.Tests.dll")]
+        self.assertEqual(len(private), 1)
+        self.assertNotIn("sha256", private[0], "private digest must stay in local evidence")
+
+    def test_truncated_rows_cannot_borrow_an_execution_summary(self):
+        module = load("execute_comparators")
+        for name in ("accepted-v2-bars", "accepted-v2-no-attribution", "fresh-native-v2"):
+            verdict = json.loads((BASE / "raw" / (name + ".verdict.json")).read_text())
+            verdict["checks"] = [row for row in verdict["checks"] if row["status"] != "PASS"]
+            path = SimpleNamespace(read_text=lambda: json.dumps(verdict))
+            with self.subTest(mode=name), self.assertRaisesRegex(ValueError, "execution"):
+                module.validate_verdict(name, path)
+
+    def test_case_specific_quantity_prices_and_cash_are_checked(self):
+        module = load("native_mechanics")
+        for name, target, account, quantity, fee, cash in (
+                ("one-fixed-fee", "1", "CASH", 304, "1", "90732.08"),
+                ("two-margin-zero", "2", "MARGIN", 608, "0", "81468.16"),
+                ("two-margin-fixed-fee", "2", "MARGIN", 608, "1", "81466.16")):
+            valid = {"fills": [{"side": "BUY", "quantity": quantity, "price": "323.5800", "fee": fee},
+                               {"side": "SELL", "quantity": -quantity, "price": "291.6900", "fee": fee}],
+                     "native_end_cash_usd": cash, "native_account_event_rows": [],
+                     "distribution_module": {"emissions": []}, "order_events": [],
+                     "cash_ledger": [{"cash": cash}], "engine_log_scan": {"error_lines": 0},
+                     "fees_usd": str(int(fee) * 2)}
+            self.assertEqual(module.project_result(name, target, account, valid)["status"], "completed")
+            for fault in ("quantity", "cash", "price", "target", "account"):
+                wrong = copy.deepcopy(valid)
+                if fault == "quantity":
+                    wrong["fills"][0]["quantity"], wrong["fills"][1]["quantity"] = 1, -1
+                elif fault == "cash":
+                    wrong["native_end_cash_usd"] = wrong["cash_ledger"][-1]["cash"] = "99999"
+                elif fault == "price":
+                    wrong["fills"][0]["price"] = "300"
+                with self.subTest(case=name, fault=fault), self.assertRaises(ValueError):
+                    module.project_result(name, "4" if fault == "target" else target,
+                                          "MARGIN" if fault == "account" and account == "CASH" else
+                                          "CASH" if fault == "account" else account, wrong)
 
 
 class FailureBoundaryTests(unittest.TestCase):
@@ -436,13 +517,13 @@ class NativeSummaryTests(unittest.TestCase):
         spec.loader.exec_module(module)
         # Schema from spy-parity/run.py:663-698. The runner publishes an end
         # balance and event rows, never a native_account_totals summary field.
-        observed = {"fills": [{"side": "BUY", "quantity": 1, "fee": "1"},
-                               {"side": "SELL", "quantity": -1, "fee": "1"}],
-                    "native_end_cash_usd": "99998.00", "native_account_event_rows": [],
+        observed = {"fills": [{"side": "BUY", "quantity": 304, "price": "323.5800", "fee": "1"},
+                               {"side": "SELL", "quantity": -304, "price": "291.6900", "fee": "1"}],
+                    "native_end_cash_usd": "90732.08", "native_account_event_rows": [],
                     "distribution_module": {"emissions": []}, "order_events": [],
-                    "cash_ledger": [{"cash": "99998.00"}], "engine_log_scan": {"error_lines": 0}, "fees_usd": "2"}
+                    "cash_ledger": [{"cash": "90732.08"}], "engine_log_scan": {"error_lines": 0}, "fees_usd": "2"}
         projected = module.project_result("one-fixed-fee", "1", "CASH", observed)
-        self.assertEqual(projected["native_end_cash"], "99998.00")
+        self.assertEqual(projected["native_end_cash"], "90732.08")
         self.assertEqual(projected["native_account_events"], [])
         self.assertFalse(projected["qualifies_frozen_stress_case"])
 

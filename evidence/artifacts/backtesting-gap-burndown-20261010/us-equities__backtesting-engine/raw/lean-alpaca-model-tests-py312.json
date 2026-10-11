@@ -40,7 +40,7 @@
       "digest_basis": "published_bytes"
     },
     {
-      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/red-matrix-wave-join.stdout.txt",
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/lean-alpaca-model-tests-py312.stderr.txt",
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "bytes": 0,
       "home_and_pytest_components_exported": true,
@@ -49,10 +49,13 @@
   ],
   "output_hashes": [
     {
-      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/published/lean-alpaca-model-tests-py312-alpaca-model-py312.trx",
-      "sha256": "c76e89f04739e7a4e37ba0749226154228058d5d2b2545e68c7e4590e3091274",
-      "bytes": 21983,
-      "digest_basis": "published_bytes"
+      "path": "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/lean-985ef30/TestResults/alpaca-model-py312.trx",
+      "digest_basis": "published_bytes",
+      "published_copy": {
+        "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/published/lean-alpaca-model-tests-py312-alpaca-model-py312.trx",
+        "sha256": "62d7fb105c9a02e4092f110bfe2098c2520ce4030c6cce8faddd7aaf4ffaec3f",
+        "bytes": 21857
+      }
     }
   ],
   "input_bytes_unchanged": true,

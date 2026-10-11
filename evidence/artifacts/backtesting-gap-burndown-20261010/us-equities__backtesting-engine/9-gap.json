@@ -17,8 +17,8 @@
       "sha256": "630b960079377d5da7c392e7802b69cdd848cd5859e807fe1775f9c7347f8314"
     },
     {
-      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/native-fee-margin-mechanics-fill-validated-20261011.json",
-      "sha256": "987a7f43c8dc7c2280df027eb5957ac20d117972766c6beb06382e48940143db"
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/native-fee-margin-mechanics-final-20261011.json",
+      "sha256": "7a80a3558b0a5092b13da5d7d35ad332fbf9729ae4912771c6f2cc2a47a30646"
     }
   ],
   "checked_at": "2026-10-10",

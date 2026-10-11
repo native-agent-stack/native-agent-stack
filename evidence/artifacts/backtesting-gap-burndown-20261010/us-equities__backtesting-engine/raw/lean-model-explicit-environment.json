@@ -74,11 +74,6 @@
       "bytes": 3828
     },
     {
-      "path": "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/lean-985ef30/Tests/bin/Debug/QuantConnect.Tests.dll",
-      "sha256": "56353bd69bc66d80dd7431101d53f48289192ba789d96a53423bbadaf9fb400d",
-      "bytes": 6062592
-    },
-    {
       "path": "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/dotnet-10.0.401/dotnet",
       "sha256": "01d89e0a0191052bfea616cd4ce624c8faf13b05bbddf7f64499c23e2a9d9269",
       "bytes": 71808
@@ -105,10 +100,16 @@
       "digest_basis": "published_bytes"
     }
   ],
-  "trx_sha256": "88d778130a35e0912ccf4f0ffdba6f75a837a1b04f629901aa2afebdd99e378d",
+  "trx_sha256": "0122eb01fc3b3c5e8dcb2a32a6cdfe802b731421b4279eaf74a74b24b96f8f5c",
   "scope": "12 TestCaseSource cases of CanSubmitOrderWhenOutsideRegularTradingHours; no paper adapter initialization or broker requests",
   "source_repository": "https://github.com/QuantConnect/Lean",
   "source_pin": "985ef30ad3ac774218c5ac516b4cb0aa2655730f",
   "trx_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/published/lean-model-explicit-environment-alpaca-model-cc979-env.trx",
-  "trx_digest_basis": "published_sanitized_bytes"
+  "trx_digest_basis": "published_sanitized_bytes",
+  "private_outputs": [
+    {
+      "path": "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/lean-985ef30/Tests/bin/Debug/QuantConnect.Tests.dll",
+      "scope": "Private original DLL; its digest and bytes are retained only in private local evidence because the binary embeds a private home path."
+    }
+  ]
 }

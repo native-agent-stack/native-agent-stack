@@ -39,7 +39,7 @@
       "digest_basis": "published_bytes"
     },
     {
-      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/red-matrix-wave-join.stdout.txt",
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/fresh-native-v2.stderr.txt",
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "bytes": 0,
       "home_and_pytest_components_exported": true,
@@ -48,10 +48,13 @@
   ],
   "output_hashes": [
     {
-      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/fresh-native-v2.verdict.json",
-      "sha256": "5bc6896cf67e942bfcd65cf479c1793d167bcf98dd4e6d4a478321465f612599",
-      "bytes": 49446,
-      "digest_basis": "published_bytes"
+      "path": "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/fresh-native-v2.verdict.json",
+      "digest_basis": "published_bytes",
+      "published_copy": {
+        "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/fresh-native-v2.verdict.json",
+        "sha256": "5bc6896cf67e942bfcd65cf479c1793d167bcf98dd4e6d4a478321465f612599",
+        "bytes": 49446
+      }
     }
   ],
   "input_bytes_unchanged": true,

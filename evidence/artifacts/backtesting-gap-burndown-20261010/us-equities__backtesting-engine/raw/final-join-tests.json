@@ -35,7 +35,7 @@
   ],
   "captured_outputs": [
     {
-      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/current-tool-tests.stdout.txt",
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/final-join-tests.stdout.txt",
       "sha256": "72533484b64fb8ebf5b984f1f72aad59a87ec6c31487cc745a447ac3320f5654",
       "bytes": 161,
       "home_and_pytest_components_exported": true,

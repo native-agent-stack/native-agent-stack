@@ -1,0 +1,314 @@
+{
+  "schema_version": 1,
+  "scope": "Path-only provenance inventory, derived from the 106faae8 predecessor and 5a2eb0ee; no original digests or identifiers.",
+  "entries": [
+    {
+      "receipt": "accepted-v2-bars.json",
+      "pointer": "/captured_outputs/1",
+      "original_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-bars.stderr.txt",
+      "published_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/red-matrix-wave-join.stdout.txt",
+      "kind": "dedup"
+    },
+    {
+      "receipt": "accepted-v2-bars.json",
+      "pointer": "/output_hashes/0",
+      "original_path": "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-bars.verdict.json",
+      "published_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-bars.verdict.json",
+      "kind": "private"
+    },
+    {
+      "receipt": "accepted-v2-lean-data.json",
+      "pointer": "/captured_outputs/1",
+      "original_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-lean-data.stderr.txt",
+      "published_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/red-matrix-wave-join.stdout.txt",
+      "kind": "dedup"
+    },
+    {
+      "receipt": "accepted-v2-lean-data.json",
+      "pointer": "/output_hashes/0",
+      "original_path": "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-lean-data.verdict.json",
+      "published_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-lean-data.verdict.json",
+      "kind": "private"
+    },
+    {
+      "receipt": "accepted-v2-no-attribution.json",
+      "pointer": "/captured_outputs/1",
+      "original_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-no-attribution.stderr.txt",
+      "published_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/red-matrix-wave-join.stdout.txt",
+      "kind": "dedup"
+    },
+    {
+      "receipt": "accepted-v2-no-attribution.json",
+      "pointer": "/output_hashes/0",
+      "original_path": "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-no-attribution.verdict.json",
+      "published_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-no-attribution.verdict.json",
+      "kind": "private"
+    },
+    {
+      "receipt": "cc-micro-comparators.json",
+      "pointer": "/outputs/0",
+      "original_path": "~/.cache/native-agent-stack/backtesting-gaps-20261011/cc-micro-comparators/accepted-v2-bars.verdict.json",
+      "published_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-bars.verdict.json",
+      "kind": "private"
+    },
+    {
+      "receipt": "cc-micro-comparators.json",
+      "pointer": "/outputs/1",
+      "original_path": "~/.cache/native-agent-stack/backtesting-gaps-20261011/cc-micro-comparators/accepted-v2-lean-data.verdict.json",
+      "published_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-lean-data.verdict.json",
+      "kind": "private"
+    },
+    {
+      "receipt": "cc-micro-comparators.json",
+      "pointer": "/outputs/2",
+      "original_path": "~/.cache/native-agent-stack/backtesting-gaps-20261011/cc-micro-comparators/accepted-v2-no-attribution.verdict.json",
+      "published_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-no-attribution.verdict.json",
+      "kind": "private"
+    },
+    {
+      "receipt": "cc-micro-comparators.json",
+      "pointer": "/outputs/3",
+      "original_path": "~/.cache/native-agent-stack/backtesting-gaps-20261011/cc-micro-comparators/fresh-native-v2.verdict.json",
+      "published_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/fresh-native-v2.verdict.json",
+      "kind": "private"
+    },
+    {
+      "receipt": "cc-micro-comparators.json",
+      "pointer": "/captured_outputs/0",
+      "original_path": "~/.cache/native-agent-stack/backtesting-gaps-20261011/cc-micro-comparators.stdout.txt",
+      "published_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/published/cc-micro-comparators-cc-micro-comparators.stdout.txt",
+      "kind": "private"
+    },
+    {
+      "receipt": "cc-micro-comparators.json",
+      "pointer": "/captured_outputs/1",
+      "original_path": "~/.cache/native-agent-stack/backtesting-gaps-20261011/cc-micro-comparators.stderr.txt",
+      "published_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/red-matrix-wave-join.stdout.txt",
+      "kind": "private"
+    },
+    {
+      "receipt": "codex-p2-comparators-reproduced.json",
+      "pointer": "/outputs/0",
+      "original_path": "~/.cache/native-agent-stack/backtesting-gaps-20261011/codex-p2-comparators-2/accepted-v2-bars.verdict.json",
+      "published_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-bars.verdict.json",
+      "kind": "private"
+    },
+    {
+      "receipt": "codex-p2-comparators-reproduced.json",
+      "pointer": "/outputs/1",
+      "original_path": "~/.cache/native-agent-stack/backtesting-gaps-20261011/codex-p2-comparators-2/accepted-v2-lean-data.verdict.json",
+      "published_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-lean-data.verdict.json",
+      "kind": "private"
+    },
+    {
+      "receipt": "codex-p2-comparators-reproduced.json",
+      "pointer": "/outputs/2",
+      "original_path": "~/.cache/native-agent-stack/backtesting-gaps-20261011/codex-p2-comparators-2/accepted-v2-no-attribution.verdict.json",
+      "published_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-no-attribution.verdict.json",
+      "kind": "private"
+    },
+    {
+      "receipt": "codex-p2-comparators-reproduced.json",
+      "pointer": "/outputs/3",
+      "original_path": "~/.cache/native-agent-stack/backtesting-gaps-20261011/codex-p2-comparators-2/fresh-native-v2.verdict.json",
+      "published_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/fresh-native-v2.verdict.json",
+      "kind": "private"
+    },
+    {
+      "receipt": "codex-p2-comparators-reproduced.json",
+      "pointer": "/captured_outputs/0",
+      "original_path": "~/.cache/native-agent-stack/backtesting-gaps-20261011/codex-p2-comparators-2.stdout.txt",
+      "published_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/published/codex-p2-comparators-reproduced-codex-p2-comparators-2.stdout.txt",
+      "kind": "private"
+    },
+    {
+      "receipt": "codex-p2-comparators-reproduced.json",
+      "pointer": "/captured_outputs/1",
+      "original_path": "~/.cache/native-agent-stack/backtesting-gaps-20261011/codex-p2-comparators-2.stderr.txt",
+      "published_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/red-matrix-wave-join.stdout.txt",
+      "kind": "private"
+    },
+    {
+      "receipt": "dotnet-sdk-download.json",
+      "pointer": "/captured_outputs/0",
+      "original_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/dotnet-sdk-download.stdout.txt",
+      "published_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/red-matrix-wave-join.stdout.txt",
+      "kind": "dedup"
+    },
+    {
+      "receipt": "dotnet-sdk-download.json",
+      "pointer": "/captured_outputs/1",
+      "original_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/dotnet-sdk-download.stderr.txt",
+      "published_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/red-matrix-wave-join.stdout.txt",
+      "kind": "dedup"
+    },
+    {
+      "receipt": "final-join-tests.json",
+      "pointer": "/captured_outputs/0",
+      "original_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/final-join-tests.stdout.txt",
+      "published_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/current-tool-tests.stdout.txt",
+      "kind": "dedup"
+    },
+    {
+      "receipt": "fresh-native-v2.json",
+      "pointer": "/captured_outputs/1",
+      "original_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/fresh-native-v2.stderr.txt",
+      "published_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/red-matrix-wave-join.stdout.txt",
+      "kind": "dedup"
+    },
+    {
+      "receipt": "fresh-native-v2.json",
+      "pointer": "/output_hashes/0",
+      "original_path": "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/fresh-native-v2.verdict.json",
+      "published_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/fresh-native-v2.verdict.json",
+      "kind": "private"
+    },
+    {
+      "receipt": "full-validate-final.json",
+      "pointer": "/captured_outputs/1",
+      "original_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/full-validate-final.stderr.txt",
+      "published_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/red-matrix-wave-join.stdout.txt",
+      "kind": "dedup"
+    },
+    {
+      "receipt": "full-validate.json",
+      "pointer": "/captured_outputs/1",
+      "original_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/full-validate.stderr.txt",
+      "published_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/red-matrix-wave-join.stdout.txt",
+      "kind": "dedup"
+    },
+    {
+      "receipt": "green-matrix-wave-join-2.json",
+      "pointer": "/captured_outputs/0",
+      "original_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/green-matrix-wave-join-2.stdout.txt",
+      "published_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/red-matrix-wave-join.stdout.txt",
+      "kind": "dedup"
+    },
+    {
+      "receipt": "green-matrix-wave-join.json",
+      "pointer": "/captured_outputs/0",
+      "original_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/green-matrix-wave-join.stdout.txt",
+      "published_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/red-matrix-wave-join.stdout.txt",
+      "kind": "dedup"
+    },
+    {
+      "receipt": "green-native-summary-projection.json",
+      "pointer": "/captured_outputs/0",
+      "original_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/green-native-summary-projection.stdout.txt",
+      "published_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/red-matrix-wave-join.stdout.txt",
+      "kind": "dedup"
+    },
+    {
+      "receipt": "latest-nonprerelease.json",
+      "pointer": "/captured_outputs/1",
+      "original_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/latest-nonprerelease.stderr.txt",
+      "published_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/red-matrix-wave-join.stdout.txt",
+      "kind": "dedup"
+    },
+    {
+      "receipt": "lean-alpaca-model-tests-py312.json",
+      "pointer": "/captured_outputs/1",
+      "original_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/lean-alpaca-model-tests-py312.stderr.txt",
+      "published_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/red-matrix-wave-join.stdout.txt",
+      "kind": "dedup"
+    },
+    {
+      "receipt": "lean-alpaca-model-tests-py312.json",
+      "pointer": "/output_hashes/0",
+      "original_path": "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/lean-985ef30/TestResults/alpaca-model-py312.trx",
+      "published_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/published/lean-alpaca-model-tests-py312-alpaca-model-py312.trx",
+      "kind": "private"
+    },
+    {
+      "receipt": "lean-alpaca-model-tests-with-icu.json",
+      "pointer": "/output_hashes/0",
+      "original_path": "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/lean-985ef30/TestResults/alpaca-model.trx",
+      "published_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/published/lean-alpaca-model-tests-with-icu-alpaca-model.trx",
+      "kind": "private"
+    },
+    {
+      "receipt": "lean-alpaca-model-tests.json",
+      "pointer": "/captured_outputs/0",
+      "original_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/lean-alpaca-model-tests.stdout.txt",
+      "published_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/red-matrix-wave-join.stdout.txt",
+      "kind": "dedup"
+    },
+    {
+      "receipt": "lean-restore-with-icu.json",
+      "pointer": "/captured_outputs/1",
+      "original_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/lean-restore-with-icu.stderr.txt",
+      "published_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/red-matrix-wave-join.stdout.txt",
+      "kind": "dedup"
+    },
+    {
+      "receipt": "lean-restore.json",
+      "pointer": "/captured_outputs/0",
+      "original_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/lean-restore.stdout.txt",
+      "published_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/red-matrix-wave-join.stdout.txt",
+      "kind": "dedup"
+    },
+    {
+      "receipt": "lean-restore.json",
+      "pointer": "/captured_outputs/1",
+      "original_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/lean-restore.stderr.txt",
+      "published_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/lean-alpaca-model-tests.stderr.txt",
+      "kind": "dedup"
+    },
+    {
+      "receipt": "local-parity-boundaries.json",
+      "pointer": "/captured_outputs/0",
+      "original_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/local-parity-boundaries.stdout.txt",
+      "published_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/red-matrix-wave-join.stdout.txt",
+      "kind": "dedup"
+    },
+    {
+      "receipt": "native-fee-margin-mechanics-2.json",
+      "pointer": "/captured_outputs/1",
+      "original_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/native-fee-margin-mechanics-2.stderr.txt",
+      "published_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/red-matrix-wave-join.stdout.txt",
+      "kind": "dedup"
+    },
+    {
+      "receipt": "native-fee-margin-mechanics.json",
+      "pointer": "/captured_outputs/1",
+      "original_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/native-fee-margin-mechanics.stderr.txt",
+      "published_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/red-matrix-wave-join.stdout.txt",
+      "kind": "dedup"
+    },
+    {
+      "receipt": "native-spy-replay-2.json",
+      "pointer": "/captured_outputs/1",
+      "original_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/native-spy-replay-2.stderr.txt",
+      "published_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/red-matrix-wave-join.stdout.txt",
+      "kind": "dedup"
+    },
+    {
+      "receipt": "native-spy-replay.json",
+      "pointer": "/captured_outputs/0",
+      "original_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/native-spy-replay.stdout.txt",
+      "published_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/red-matrix-wave-join.stdout.txt",
+      "kind": "dedup"
+    },
+    {
+      "receipt": "pandas-install.json",
+      "pointer": "/captured_outputs/0",
+      "original_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/pandas-install.stdout.txt",
+      "published_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/red-matrix-wave-join.stdout.txt",
+      "kind": "dedup"
+    },
+    {
+      "receipt": "red-native-summary-projection.json",
+      "pointer": "/captured_outputs/0",
+      "original_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/red-native-summary-projection.stdout.txt",
+      "published_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/red-matrix-wave-join.stdout.txt",
+      "kind": "dedup"
+    },
+    {
+      "receipt": "stable-release-tag.json",
+      "pointer": "/captured_outputs/1",
+      "original_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/stable-release-tag.stderr.txt",
+      "published_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/red-matrix-wave-join.stdout.txt",
+      "kind": "dedup"
+    }
+  ]
+}

@@ -52,13 +52,23 @@ native denial events and no fills. Gap 0/9 citations use this rerun; older captu
 and projections remain historical evidence. Unmodified primary results and
 per-case outputs are retained in the cited packet rather than only by hash.
 
-The latest source-bound native run is
+The earlier fill-validated source-bound native run is
 `raw/native-fee-margin-mechanics-fill-validated-20261011.json`, using harness
 `e844bde8aee6dd224751c0238dce0b4e07d63f7ff931020ade261b0caebe277a`.
 Each completed case has two nonzero round-trip fills, expected configured fees,
 reconciled native cash and zero denials/errors; the refusal has zero fills and
-two denials. Gap 0/9 cite this latest run. Earlier runs retain their actual source
+two denials. Earlier runs retain their actual source
 identity and cannot establish execution of a later harness.
+
+The final-round current-source run is `raw/native-fee-margin-mechanics-final-20261011.json`,
+binding harness `7909db7e8611c25ba98fee87000c79aea5c527301c0743c716bc706286b61096`. Gap 0/9 cite this run.
+It validates each case's declared target/account, target-sized quantity (304 or 608),
+reference entry/exit prices and expected ending cash, independently of the observed
+balance. Expected values use the frozen historical plan, the independently accepted
+LEAN comparator's expected prices/dividends and the existing fixture's
+`target_quantity` function. Both reference JSON inputs are hash-pinned in the harness.
+The actual empty-network rerun reproduces three completed cases and the denial-backed
+cash refusal, with zero engine errors. No stress/adaptive or strategy acceptance follows.
 
 LEAN source 985ef30ad3ac774218c5ac516b4cb0aa2655730f was exported into an ignored
 build directory. Microsoft .NET SDK 10.0.401 was downloaded from official metadata
@@ -81,7 +91,14 @@ output or the retained published capture bytes. Unsanitized-output hashes,
 unretained stream hashes, derivative original-receipt commitments and embedded
 copies of those commitments are removed from publication. Raw originals stay
 in private local evidence. Public TRX exports are sanitized and hash-bound;
-their counters and actual command exits are unchanged. A masked-home candidate
+their counters and actual command exits are unchanged. All 45 machine fields in
+the four published TRX copies (`TestRun@name`, `Deployment@runDeploymentRoot` and
+every `computerName`, including `RunInfo`) are structurally masked as `[MACHINE]`.
+Original command/output locations keep their `~` paths; a separate `published_copy`
+binds sanitized repository bytes and their derived digests. Capture deduplication
+does not rewrite the original 26 capture paths. The test DLL's original digest stays
+only in private local evidence, and its public `private_outputs` entry has no digest.
+A masked-home candidate
 cannot reproduce the public output digests; the regression checks embedded text,
 retained files and every public digest string, including nested historical traces.
 
@@ -113,6 +130,14 @@ and checkout paths are refused before any comparator launches. All four retained
 verdicts remain unchanged. An actual driver reproduction executes all four modes
 into fresh output: accepted lean-data passes, and the other three refuse exactly
 their designed checks (`raw/codex-p2-comparators-reproduced.json`).
+
+Execution summaries are recomputed from non-precondition rows with the supported
+partition/count rule at `spy-parity/compare.py:1064-1074`, pinned at
+`8bffa2c41692ef483e91b68e3b15aeb331423d2c`; copied summaries cannot conceal truncated
+rows. `raw/final-round-regressions-red-20261011.json` observes five new tests failing
+with 64 assertions and zero errors on unchanged 5a2eb0ee source/evidence. Its exact
+test bytes are retained at `raw/sources/final-round-test-source.py`. The same regression
+source is used by CI, and structural failures never print an original machine value.
 
 Adjacent checks cover all four modes' output/failure transitions, fresh directory
 creation, stale-output refusal, missing/wrong verdicts, native projection errors,
@@ -146,8 +171,23 @@ packets and original commitments are private evidence and are not included under
 the new public packet's manifest. Sanitization preserves observations while
 removing identifiers and confirmation oracles; it is not a new native run.
 
+The final-round public packet is
+`~/.local/state/native-agent-stack/coordination/ns2604-coop/lanes/engine-qual.final-public-20261011/`.
+It contains current public artifacts, exact final source/tests, bound source extracts,
+native primary results and confirmation captures. Private DLL/original-output
+commitments are outside it. Failed pre-registration and pre-citation runs are retained
+as failed observations; the final focused/adjacent set passes 367 tests.
+
 Sources:
 
+- CPython v3.12.4 `xml.etree.ElementTree` at
+  `8e8a4baf652f6e1cee7acde9d78c4b6154539748`, `Lib/xml/etree/ElementTree.py`:
+  the structural CI regression uses the supported `parse` and `iter` APIs and
+  attribute dictionaries; no XML parser is reimplemented. The original TRX trees
+  were compared with only the three authorized machine fields masked, preserving
+  every other XML attribute, counter and text value. This source was fetched from
+  the pinned official repository because the local CPython mirror lacks that ref;
+  the mirror gap is recorded for the upstream-sync follow-up.
 - CPython v3.12.4 at `8e8a4baf652f6e1cee7acde9d78c4b6154539748`:
   <https://github.com/python/cpython/blob/8e8a4baf652f6e1cee7acde9d78c4b6154539748/Lib/tempfile.py>
   (`gettempdir`:313 and `mkdtemp`:360), Lib/pathlib.py:690,1228

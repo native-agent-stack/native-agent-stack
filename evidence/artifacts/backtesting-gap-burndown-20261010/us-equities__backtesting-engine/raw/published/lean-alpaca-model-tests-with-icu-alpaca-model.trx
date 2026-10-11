@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TestRun id="[redacted]" name="@nativestack2604 2026-10-10 12:55:52" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+<TestRun id="[redacted]" name="[MACHINE]" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
   <Times creation="2026-10-10T12:55:52.3699737-04:00" queuing="2026-10-10T12:55:52.3699737-04:00" start="2026-10-10T12:55:46.2037141-04:00" finish="2026-10-10T12:55:52.3709062-04:00" />
   <TestSettings name="default" id="[redacted]">
-    <Deployment runDeploymentRoot="_nativestack2604_2026-10-10_12_55_52" />
+    <Deployment runDeploymentRoot="[MACHINE]" />
   </TestSettings>
   <TestLists>
     <TestList name="Results Not in a List" id="[redacted]" />
@@ -23,7 +23,7 @@ Unhandled exception. System.InvalidOperationException: GIL must always be releas
 </StdOut>
     </Output>
     <RunInfos>
-      <RunInfo computerName="nativestack2604" outcome="Error" timestamp="2026-10-10T12:55:52.3171989-04:00">
+      <RunInfo computerName="[MACHINE]" outcome="Error" timestamp="2026-10-10T12:55:52.3171989-04:00">
         <Text>The active test run was aborted. Reason: Test host process crashed : 20261010 16:55:52.103 ERROR:: LocalDiskMapFileProvider.GetMapFileResolver(sgx): The specified directory does not exist: ../../../Data/equity/sgx/map_files
 Unhandled exception. System.InvalidOperationException: GIL must always be released, and it must be released from the same thread that acquired it.
    at Python.Runtime.Py.GILState.Finalize()

@@ -14,7 +14,7 @@
   "raw_outputs": [
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-bars.json",
-      "sha256": "0945c90cb65aad2c0b139627abe5e7c76b72a2486be5ec38e329a0eec17bb523"
+      "sha256": "bfce474d33696af933b590263c973db23eda4f3a622f66a5091639361ac9e193"
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-bars.stderr.txt",
@@ -30,7 +30,7 @@
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-lean-data.json",
-      "sha256": "a75de00a4d20d47c1e0052d535031cef85b354693e91cfa96722931bc1766eed"
+      "sha256": "50cbfaf051740c3e66f879a4d3eae2287258ceb1a1986247b0ad833a599f32a4"
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-lean-data.stderr.txt",
@@ -46,7 +46,7 @@
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-no-attribution.json",
-      "sha256": "fce2419f6224756e572aa132a22b09c118b8308fd3c416267e553042a1e16f0a"
+      "sha256": "e465019c893384ec2342df0b6de2664b86344276f007b6db747854826024c6ea"
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-no-attribution.stderr.txt",
@@ -62,7 +62,7 @@
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/local-parity-boundaries.json",
-      "sha256": "a2d60698fe2e054a8dcbe81d51b8aac578b7a91a27753276b7e3a5468bc1f6df"
+      "sha256": "17fe906d28ee4c0277b548b5f2e93a90fea3ae6a285005eda4d29dce435c7d24"
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/local-parity-boundaries.stderr.txt",
