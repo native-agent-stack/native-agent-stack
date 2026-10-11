@@ -14,11 +14,11 @@ buy before the ledger reserves it. The ledger's per-order cap
 (``max_order_notional_usd``) bounds every order, exit sells included, so config
 load requires it to be at least ``EXIT_HEADROOM_FACTOR`` times the entry cap.
 
-Protocol constants (the sizing formula, the drawdown ladder, the X1-X4
-parameters and the exit headroom factor) are fixed below rather than
-configurable, so a config cannot drift from the protocol. The config selects the
-rule, the exit, the rung schedule, the entry/exit limit caps and timeouts, the
-entry cap and the engine's own risk caps.
+The sizing formula, drawdown ladder, X1 calendar offset and exit headroom
+factor remain fixed. X2-X4 parameters and the enabled exit chain are explicit
+config inputs; their defaults preserve the original protocol. The config also
+selects the rung schedule, entry/exit limit caps and timeouts, entry cap and
+the engine's own risk caps.
 """
 from __future__ import annotations
 
@@ -46,6 +46,8 @@ ZERO = D(0)
 PROTOCOL_ID = "mover-early-entry-v1-20260924"
 PAPER_ENDPOINT = "https://paper-api.alpaca.markets"
 EXIT_RULES = ("X1", "X2", "X3", "X4")
+# Adaptive exit precedence (exits.py DEFAULT_RULES): force, stop/TP, trail, time.
+EXIT_CHAIN_ORDER = ("X1", "X4", "X3", "X2")
 SESSION_SCOPES = ("pre_market_only", "any_session")
 EVIDENCE_CLASSES = ("PAPER", "SYN")
 
@@ -77,6 +79,17 @@ X2_HOLD_SECONDS = 3600
 X3_TRAIL_FRACTION = D("0.85")
 X4_STOP_FRACTION = D("0.85")
 X4_TARGET_FRACTION = D("1.50")
+
+# [C] SIM-MOVER-1-GRID-2, preregistered before replay: us-equities-trading
+# ebdc4d69b5c71b258485ee94aa1789b8c5646d01,
+# docs/sim-backtest/north-star-20261011/SIM-MOVER-1/GRID-2-AMENDMENT.json,
+# SHA256 2f67ad1c0ecd6b09df3bb098e43ef769310f29c5568aebca2c25da0f0ab06738.
+# X4 converts the registered bps intervals to entry-price ratios; these are
+# admissible research ranges, not a claim that the grid selected a preset.
+X2_HOLD_RANGE = (900, 3600)
+X3_TRAIL_RANGE = (D("0.80"), D("0.97"))
+X4_STOP_RANGE = (D("0.85"), D("0.90"))
+X4_TARGET_RANGE = (D("1.25"), D("1.50"))
 
 # Exit budget: at most max_exit_orders_per_symbol exit orders per leg, counted from the
 # latest grant (trial start, then once more when a force reason latches). A sell the
@@ -234,7 +247,7 @@ class MoverSettings:
     rule: Rule
     session_scope: str
     trial_end_et: dtime
-    exit_rule: str
+    exit_rule: str | tuple[str, ...]
     entry_cap_bps: Decimal
     entry_timeout_seconds: int
     entry_window_seconds: int
@@ -250,6 +263,10 @@ class MoverSettings:
     stream_quote_timeout_seconds: int
     rung_schedule: tuple
     benchmarks: tuple
+    x2_hold_seconds: int = X2_HOLD_SECONDS
+    x3_trail_fraction: Decimal = X3_TRAIL_FRACTION
+    x4_stop_fraction: Decimal = X4_STOP_FRACTION
+    x4_target_fraction: Decimal = X4_TARGET_FRACTION
 
 
 def _require_key(config, key):
@@ -273,6 +290,12 @@ def _decimal_setting(block, key, low, high, default=None, *, low_inclusive=True)
     if value is None or value > high or value < low or (not low_inclusive and value == low):
         raise ValueError("invalid_mover_setting:" + key)
     return value
+
+
+def _exit_decimal_setting(block, key, bounds, default):
+    value = _decimal_setting(block, key, *bounds, text(default))
+    # Equal default values retain the original Decimal scale in receipt bytes.
+    return default if value == default else value
 
 
 def _rung_schedule(raw):
@@ -372,7 +395,8 @@ def load_mover_config(path):
         raise ValueError("invalid_mover_block")
     allowed = {"rule", "session_scope", "trial_end_et", "exit", "entry", "exit_orders", "flatten_reserve_seconds",
                "max_scan_age_seconds", "max_symbols", "max_entry_notional_usd", "appreciation_allowance",
-               "gross_guard_fraction", "stream_quote_timeout_seconds", "rung_schedule"}
+               "gross_guard_fraction", "stream_quote_timeout_seconds", "rung_schedule",
+               "x2_hold_seconds", "x3_trail_fraction", "x4_stop_fraction", "x4_target_fraction"}
     if set(block) - allowed:
         raise ValueError("invalid_mover_block")
     rule = parse_rule(block.get("rule"))
@@ -381,20 +405,26 @@ def load_mover_config(path):
         raise ValueError("invalid_mover_setting:session_scope")
     trial_end = parse_hhmm(block.get("trial_end_et"), "invalid_mover_setting:trial_end_et")
     exit_rule = block.get("exit")
-    if exit_rule not in EXIT_RULES:
+    if isinstance(exit_rule, list):
+        if (not exit_rule or len(exit_rule) > len(EXIT_RULES)
+                or any(type(item) is not str or item not in EXIT_RULES for item in exit_rule)
+                or len(set(exit_rule)) != len(exit_rule)):
+            raise ValueError("invalid_mover_setting:exit")
+        exit_rule = tuple(item for item in EXIT_CHAIN_ORDER if item in exit_rule)
+    elif type(exit_rule) is not str or exit_rule not in EXIT_RULES:
         raise ValueError("invalid_mover_setting:exit")
     if scope == "pre_market_only":
         if not session_policy["extended_hours"]:
             raise ValueError("mover_pre_market_requires_extended_hours")
         if not PRE_MARKET_OPEN_ET < trial_end <= RTH_OPEN_ET or not rule.at_et < RTH_OPEN_ET:
             raise ValueError("mover_pre_market_window_invalid")
-        if exit_rule == "X1":
+        if "X1" in exit_rule:
             raise ValueError("mover_x1_requires_regular_session")
     else:
         latest = POST_CLOSE_ET if session_policy["extended_hours"] else RTH_CLOSE_ET
         if not PRE_MARKET_OPEN_ET < trial_end <= latest:
             raise ValueError("mover_trial_end_outside_session")
-        if exit_rule == "X1":
+        if "X1" in exit_rule:
             # Otherwise the hard flatten at trial_end_et, or run_mover's session_close latch at the
             # controller close (16:00, or 20:00 with extended hours) less cleanup_seconds, flattens
             # every leg at or before 15:58 and X1 can never fire.
@@ -426,7 +456,14 @@ def load_mover_config(path):
         stream_quote_timeout_seconds=(quote_age if "stream_quote_timeout_seconds" not in block else
                                       _int_setting(block, "stream_quote_timeout_seconds", quote_age, 30)),
         rung_schedule=_rung_schedule(block.get("rung_schedule")),
-        benchmarks=benchmarks)
+        benchmarks=benchmarks,
+        x2_hold_seconds=_int_setting(block, "x2_hold_seconds", *X2_HOLD_RANGE, X2_HOLD_SECONDS),
+        x3_trail_fraction=_exit_decimal_setting(block, "x3_trail_fraction", X3_TRAIL_RANGE,
+                                                X3_TRAIL_FRACTION),
+        x4_stop_fraction=_exit_decimal_setting(block, "x4_stop_fraction", X4_STOP_RANGE,
+                                               X4_STOP_FRACTION),
+        x4_target_fraction=_exit_decimal_setting(block, "x4_target_fraction", X4_TARGET_RANGE,
+                                                 X4_TARGET_FRACTION))
     if limits.max_held_symbols < settings.max_symbols or limits.max_outstanding_orders < 2 * settings.max_symbols:
         raise ValueError("mover_symbol_or_order_caps_below_scan_size")
     if limits.max_order_notional_usd < settings.max_entry_notional_usd * EXIT_HEADROOM_FACTOR:
@@ -797,7 +834,7 @@ def plan_timing(settings, limits, *, t0, session_date):
     if hard_flatten <= entry_deadline + settings.entry_timeout_seconds:
         raise MoverRefusal("mover_window_too_short")
     x1_at = None
-    if settings.exit_rule == "X1":
+    if "X1" in settings.exit_rule:
         # C26: the study's close is the session's regular close (13:00 on early closes); X1 fires two
         # minutes before it, and a plan whose hard flatten comes first can never reach X1.
         day = date.fromisoformat(session_date) if isinstance(session_date, str) else session_date
@@ -808,7 +845,7 @@ def plan_timing(settings, limits, *, t0, session_date):
         if hard_flatten <= x1_at:
             raise MoverRefusal("mover_x1_unreachable")
     return Timing(t0, entry_deadline, float(settings.entry_timeout_seconds), float(settings.exit_timeout_seconds),
-                  hard_flatten, sell_window_end, x1_at, float(X2_HOLD_SECONDS))
+                  hard_flatten, sell_window_end, x1_at, float(settings.x2_hold_seconds))
 
 
 @dataclass(frozen=True)
@@ -816,7 +853,7 @@ class MoverPlan:
     trial_id: str
     evidence_class: str
     rule: Rule
-    exit_rule: str
+    exit_rule: str | tuple[str, ...]
     entry_cap_bps: Decimal
     exit_cap_bps: Decimal
     max_exit_orders_per_symbol: int
@@ -835,6 +872,10 @@ class MoverPlan:
     scan_sha256: str
     scan_time: float
     symbols: tuple
+    x2_hold_seconds: int = X2_HOLD_SECONDS
+    x3_trail_fraction: Decimal = X3_TRAIL_FRACTION
+    x4_stop_fraction: Decimal = X4_STOP_FRACTION
+    x4_target_fraction: Decimal = X4_TARGET_FRACTION
 
     def symbol_names(self):
         return tuple(s.scan.symbol for s in self.symbols)
@@ -868,7 +909,9 @@ def build_plan(settings, limits, scan, session, *, trial_id, evidence_class, t0,
                      settings.exit_cap_bps, settings.max_exit_orders_per_symbol, settings.max_entry_notional_usd,
                      limits.max_order_notional_usd, settings.appreciation_allowance,
                      guard, timing, session, scan.regime_factor, scan.regime_source, leverage,
-                     D(engine_leverage_multiple), equity, budget, scan.sha256, scan.scan_time, sizing)
+                     D(engine_leverage_multiple), equity, budget, scan.sha256, scan.scan_time, sizing,
+                     settings.x2_hold_seconds, settings.x3_trail_fraction,
+                     settings.x4_stop_fraction, settings.x4_target_fraction)
 
 
 # ---------------------------------------------------------------------------
@@ -933,24 +976,28 @@ def spread_bps(bid, ask):
 # Exit rules
 # ---------------------------------------------------------------------------
 
-def rule_exit_reason(exit_rule, *, now, bid, entry_price, running_high, first_fill_at, timing):
-    """The protocol exit that fires now, or None. X1: the official-close flatten time.
-    X2: 60 minutes after the first entry fill. X3: the bid at or below 0.85 x the
-    running high since entry. X4: the bid at or below 0.85 x or at or above 1.50 x the
-    entry price."""
-    if exit_rule == "X1":
-        return "x1_close" if timing.x1_at is not None and now >= timing.x1_at else None
-    if exit_rule == "X2":
-        return "x2_time" if first_fill_at is not None and now >= first_fill_at + timing.x2_hold_seconds else None
-    if bid is None:
-        return None
-    if exit_rule == "X3":
-        return "x3_trail" if running_high is not None and D(bid) <= X3_TRAIL_FRACTION * D(running_high) else None
-    if exit_rule == "X4" and entry_price is not None:
-        if D(bid) <= X4_STOP_FRACTION * D(entry_price):
+def rule_exit_reason(exit_rule, *, now, bid, entry_price, running_high, first_fill_at, timing,
+                     x3_trail_fraction=X3_TRAIL_FRACTION, x4_stop_fraction=X4_STOP_FRACTION,
+                     x4_target_fraction=X4_TARGET_FRACTION):
+    """First enabled exit in adaptive priority: X1, X4 stop/TP, X3, X2.
+
+    Legacy single exits keep their default 60-minute hold and 0.85 trail/stop,
+    1.50 target. A chain is OR-composed; input order cannot demote protection.
+    The book's running high remains seeded by entry fills, not bids alone.
+    """
+    rules = (exit_rule,) if isinstance(exit_rule, str) else exit_rule
+    if "X1" in rules and timing.x1_at is not None and now >= timing.x1_at:
+        return "x1_close"
+    if "X4" in rules and bid is not None and entry_price is not None:
+        if D(bid) <= x4_stop_fraction * D(entry_price):
             return "x4_stop"
-        if D(bid) >= X4_TARGET_FRACTION * D(entry_price):
+        if D(bid) >= x4_target_fraction * D(entry_price):
             return "x4_target"
+    if ("X3" in rules and bid is not None and running_high is not None
+            and D(bid) <= x3_trail_fraction * D(running_high)):
+        return "x3_trail"
+    if "X2" in rules and first_fill_at is not None and now >= first_fill_at + timing.x2_hold_seconds:
+        return "x2_time"
     return None
 
 
@@ -1233,7 +1280,10 @@ class MoverBook:
                 if reason is None and fresh and position is not None:
                     reason = rule_exit_reason(self.plan.exit_rule, now=now, bid=D(quote.bid),
                                               entry_price=position.average_cost, running_high=leg.running_high,
-                                              first_fill_at=leg.first_fill_at, timing=self.plan.timing)
+                                              first_fill_at=leg.first_fill_at, timing=self.plan.timing,
+                                              x3_trail_fraction=self.plan.x3_trail_fraction,
+                                              x4_stop_fraction=self.plan.x4_stop_fraction,
+                                              x4_target_fraction=self.plan.x4_target_fraction)
                 if reason is not None:
                     leg.exit_reason, leg.exit_triggered_at = reason, now
                     self.events({"type": "mover_exit_triggered", "symbol": symbol, "reason": reason, "at": now})

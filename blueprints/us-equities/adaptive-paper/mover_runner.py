@@ -494,8 +494,8 @@ def plan_receipt(plan):
                    "ledger_max_order_notional_usd": text(plan.ledger_max_order_notional_usd),
                    "exit_headroom_factor": text(EXIT_HEADROOM_FACTOR)},
         "exit_parameters": {"rule": plan.exit_rule, "x1_flatten_at_et": X1_FLATTEN_AT_ET.strftime("%H:%M"),
-                            "x2_hold_seconds": X2_HOLD_SECONDS, "x3_trail_fraction": text(X3_TRAIL_FRACTION),
-                            "x4_stop_fraction": text(X4_STOP_FRACTION), "x4_target_fraction": text(X4_TARGET_FRACTION)},
+                            "x2_hold_seconds": plan.x2_hold_seconds, "x3_trail_fraction": text(plan.x3_trail_fraction),
+                            "x4_stop_fraction": text(plan.x4_stop_fraction), "x4_target_fraction": text(plan.x4_target_fraction)},
     }
 
 
@@ -985,7 +985,7 @@ def synthetic_path(plan, hold_seconds):
 def synthetic_timing(t0, *, hold_seconds, exit_rule):
     return Timing(trial_start=t0, entry_deadline=t0 + 2, entry_timeout_seconds=2.0, exit_timeout_seconds=1.0,
                   hard_flatten_at=t0 + hold_seconds + 6, sell_window_end=t0 + hold_seconds + 14,
-                  x1_at=t0 + hold_seconds if exit_rule == "X1" else None, x2_hold_seconds=float(hold_seconds))
+                  x1_at=t0 + hold_seconds if "X1" in exit_rule else None, x2_hold_seconds=float(hold_seconds))
 
 
 def synthetic_config(config):
