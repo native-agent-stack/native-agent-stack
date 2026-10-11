@@ -528,6 +528,86 @@ class CodexTests(AdjudicateFixture):
     def calls(self):
         return [json.loads(line) for line in self.argv_log.read_text(encoding="utf-8").splitlines()]
 
+    # The CC's 2026-10-10T07:51Z disclosure, word for word (docs/decisions/2026-10-10-codex-lane-omniroute.md).
+    PASS_THROUGH = ("not_attested (deployed settings unreadable by policy; OmniRoute@c1e30b76 chatCore.ts:3156, "
+                    "systemPrompt.ts:210-217/278-283, strategySelector.ts:234-249)")
+    TRANSPORT = ("provider", "provider_base_url", "pass_through")
+
+    def judgment_file(self, order):
+        return self.work / "adjudication-judgments" / "codex" / f"{NAME}.{order}.json"
+
+    def test_every_omniroute_judgment_discloses_its_transport_outside_provenance(self):
+        # CC 2026-10-10T23:17Z ruling: each OmniRoute record, a failed call's included, names provider=omniroute, its
+        # canonical endpoint and the exact not-attested disclosure at the top level; provenance stays the one both
+        # families share, and a native record carries none of the three (the 09:38Z native contract).
+        code, err = self.run_codex(provider="omniroute", base_url="http://localhost:21128/v1/",
+                                   CODEX_FAKE_FAIL_ATTEMPTS="1,2")
+        self.assertEqual(code, 1)
+        self.assertIn("judge failed after retry", err)
+        records = {order: json.loads(self.judgment_file(order).read_text(encoding="utf-8"))
+                   for order in adjudicate.ORDERS}
+        self.assertEqual(records["AB"]["exit_codes"]["judge"], [1, 1])
+        self.assertIsNone(adjudicate.usable_judgment(records["BA"], "openai", "BA", self.sha))
+        for order, data in records.items():
+            with self.subTest(order=order):
+                self.assertEqual({key: data.get(key) for key in self.TRANSPORT},
+                                 {"provider": "omniroute", "provider_base_url": "http://localhost:21128/v1",
+                                  "pass_through": self.PASS_THROUGH})
+                self.assertEqual(data["provenance"], adjudicate.adjudication_provenance(repo=self.repo))
+        self.assertEqual(self.run_codex()[0], 0)
+        for order in adjudicate.ORDERS:
+            with self.subTest(native=order):
+                data = json.loads(self.judgment_file(order).read_text(encoding="utf-8"))
+                self.assertFalse({key for key in self.TRANSPORT if key in data}, data)
+
+    def test_resume_reruns_a_judgment_after_a_transport_endpoint_or_disclosure_change(self):
+        # CC 2026-10-10T23:17Z ruling: a change of transport or disclosure invalidates resume, the codex_lane rule.
+        def total_calls(**options):
+            code, err = self.run_codex(**options)
+            self.assertEqual(code, 0, err)
+            return len(self.calls())
+        gateway, other = "http://127.0.0.1:21128/v1", "http://127.0.0.1:21129/v1"
+        self.assertEqual(total_calls(), 4)
+        self.assertEqual(total_calls(provider="omniroute", base_url=gateway), 8, "native to OmniRoute reruns")
+        self.assertEqual(total_calls(provider="omniroute", base_url=gateway), 8, "the same transport resumes")
+        self.assertEqual(total_calls(provider="omniroute", base_url=other), 12, "another endpoint reruns")
+        changed = json.loads(self.judgment_file("AB").read_text(encoding="utf-8"))
+        self.judgment_file("AB").write_text(json.dumps({**changed, "pass_through": "attested"}), encoding="utf-8")
+        dropped = json.loads(self.judgment_file("BA").read_text(encoding="utf-8"))
+        dropped.pop("pass_through")
+        self.judgment_file("BA").write_text(json.dumps(dropped), encoding="utf-8")
+        self.assertEqual(total_calls(provider="omniroute", base_url=other), 16, "a changed or missing disclosure reruns")
+        for order in adjudicate.ORDERS:
+            data = json.loads(self.judgment_file(order).read_text(encoding="utf-8"))
+            self.assertEqual(data.get("pass_through"), self.PASS_THROUGH)
+        self.assertEqual(total_calls(), 20, "OmniRoute to native reruns")
+
+    def test_native_refuses_an_omniroute_base_url_before_a_child_starts(self):
+        # As codex_lane.py refuses it (the CC's read of #992 at 3251a960, P3): never a silently ignored endpoint.
+        for provider in (None, "native"):
+            with self.subTest(provider=provider):
+                code, err = self.run_codex(provider=provider, base_url="http://127.0.0.1:21128/v1")
+                self.assertEqual(code, 2)
+                self.assertIn("--omniroute-base-url requires --provider omniroute", err)
+        self.assertFalse(self.argv_log.exists())
+
+    def test_an_omniroute_codex_judgment_assembles_with_a_native_claude_judgment(self):
+        # The disclosure stays outside provenance, so both families' judgments still assemble under one provenance.
+        self.assertEqual(self.run_codex(provider="omniroute", base_url="http://127.0.0.1:21128/v1")[0], 0)
+        entry = next(e for e in adjudicate.load_index(self.work)["layers"] if e["layer"] == NAME)
+        codex_side = {order: "B" if adjudicate.claude_position(entry, order) == "A" else "A" for order in adjudicate.ORDERS}
+        adjudicate.claude_args(self.work, self.repo)
+        result = {"snapshot_id": self.snapshot_id(), "items": [{"name": NAME, "order": order, "packet_sha256": self.sha,
+                             "judge": {"preferred": codex_side[order], "why": WHY,
+                                       "evidence_refs": ["evidence/receipt.json"]},
+                             "refuter": {"refuted": False, "reason": "holds", "evidence_refs": []}}
+                            for order in adjudicate.ORDERS]}
+        self.assertEqual(adjudicate.collect_claude(self.work, self.as_workflow(result), "claude-opus-5-5"), [])
+        code, err, record = self.assemble()
+        self.assertEqual(code, 0, err)
+        self.assertEqual(self.assert_valid(record)["tally"], {"claude": 1, "codex": 3})
+        self.assertEqual(record["provenance"], adjudicate.adjudication_provenance(repo=self.repo))
+
     def test_omniroute_provider_reaches_both_judge_and_refuter(self):
         # Exercise the same parsed namespace the CLI supplies, so the pre-flag runner
         # reaches its native calls and fails on lost transport settings rather than argparse.

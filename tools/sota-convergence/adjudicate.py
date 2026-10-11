@@ -791,6 +791,22 @@ def refuse_git_repo(repo: Path):
 
 # ---------------------------------------------------------------- codex
 
+# The transport fields codex_lane.lane_provenance adds for OmniRoute only. A Codex judgment carries them at the top
+# level, outside ``provenance``, so both families' provenance stays equal for assemble_layer; a native judgment
+# carries none (CC 2026-10-10T23:17Z ruling, extending the 07:51Z disclosure ruling and the 09:38Z native contract in
+# docs/decisions/2026-10-10-codex-lane-omniroute.md).
+TRANSPORT_FIELDS = ("provider", "provider_base_url", "pass_through")
+
+
+def judgment_transport(args) -> dict:
+    """What this run's Codex judgments record as their transport: nothing for native, else the provider, its
+    canonical endpoint and the exact not-attested disclosure."""
+    if args.provider != "omniroute":
+        return {}
+    return {"provider": args.provider, "provider_base_url": args.omniroute_base_url,
+            "pass_through": codex_lane.OMNIROUTE_PASS_THROUGH}
+
+
 def run_codex_call(repo, schema, out_tmp, effort, prompt, model, timeout, events_path, validate, *,
                    provider="native", omniroute_base_url=None):
     """Run one codex exec call, retried once. Returns (object or None, event model or None, exit codes, failure,
@@ -849,6 +865,10 @@ def run_codex(args) -> int:
             print(f"adjudicate: {error}", file=sys.stderr)
             return 2
         args.model = args.model.removeprefix("cx/")
+    elif args.omniroute_base_url is not None:
+        # As codex_lane.main does: a native run never silently ignores a gateway endpoint.
+        print("adjudicate: --omniroute-base-url requires --provider omniroute", file=sys.stderr)
+        return 2
     if model_issue(args.model, "openai"):
         print(f"adjudicate: --model {args.model!r} does not match the openai pattern "
               f"{FAMILY_MODEL_PATTERNS['openai'].pattern}", file=sys.stderr)
@@ -874,6 +894,7 @@ def run_codex(args) -> int:
     except ValueError as error:  # an escaping symlink: not a blind export
         print(f"adjudicate: {error}", file=sys.stderr)
         return 2
+    run_transport = judgment_transport(args)
     pending, failures = [], []
     for name, order, input_path, packet_sha256 in items:
         out_path = out_dir / f"{name}.{order}.json"
@@ -891,11 +912,13 @@ def run_codex(args) -> int:
         try:
             existing = load_json(out_path)
             # Resume skips only a judgment made with the configured model and effort, under this run's
-            # provenance: the same code, prompt, schemas, role and evidence tree (Codex review of #145).
+            # provenance: the same code, prompt, schemas, role and evidence tree (Codex review of #145). A change
+            # of transport, endpoint or disclosure reruns it, as in codex_lane (CC 2026-10-10T23:17Z ruling).
             if (usable_judgment(existing, "openai", order, packet_sha256,
                                 entry=entries_by_layer.get(name)) is None
                     and existing.get("model") == args.model and existing.get("effort") == args.effort
-                    and existing.get("provenance") == run_provenance):
+                    and existing.get("provenance") == run_provenance
+                    and {key: existing[key] for key in TRANSPORT_FIELDS if key in existing} == run_transport):
                 continue
         except (OSError, ValueError, AttributeError):
             pass
@@ -1035,6 +1058,8 @@ def judge_pending(args, work_dir, repo, index, packets, items, pending, failures
             "openai", name, order, input_path, packet_sha256, model, repo, None if leak else judge,
             refuter, failure, {"judge": judge_codes, "refuter": refute_codes}, leak, judged_sha256, args.effort,
             run_provenance)
+        # Every OmniRoute record, a failed or leaked call's included, discloses its transport outside provenance.
+        record.update(judgment_transport(args))
         record["audit_clean"] = audit_clean
         # The audited events each stage left, by digest (independent review of #145, BIND-R4-6): usable_judgment
         # re-audits them, so audit_clean is not an unbound boolean.
@@ -1732,7 +1757,8 @@ def parse_args(argv=None):
     codex.add_argument("--provider", choices=("native", "omniroute"), default="native",
                        help="Explicit Codex transport opt-in; native remains the default.")
     codex.add_argument("--omniroute-base-url", default=None,
-                       help="Keyless loopback /v1 endpoint; otherwise use OMNIROUTE_BASE_URL or the lane default.")
+                       help="Keyless loopback /v1 endpoint for --provider omniroute; otherwise use OMNIROUTE_BASE_URL "
+                            "or the lane default.")
     codex.add_argument("--effort", default="max",
                        help="model_reasoning_effort for the judge and the refuter (default max, the standing GPT-6 lane setting; a judgment made at another effort is rerun).")
     codex.add_argument("--jobs", type=int, default=1)
