@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "kind": "w6_frozen_comparison",
+  "comparison_id": "w6-foundation-web-research-20261011",
+  "registered_at": "2026-10-11T23:15:50Z",
+  "phase": "preregistered; no run and no terminal state recorded",
+  "catalog": "foundation",
+  "layer_id": "web-research",
+  "requirement_sha256": "c7d96e92b662770b358299b4ef22df82ac3000cb996a56fda1467b8d8201aa43",
+  "catalog_ref": "catalogs/landscape/foundation.json#/layers/8",
+  "catalog_sha256": "868d193a31080ab913400725140bd0d01e0afe97e28564fd12777f737d22951a",
+  "harnesses": [
+    "Existing W5 landscape-sweep comparison path (without discovery)",
+    "Existing native paired-task practice",
+    "Existing token-e2e freeze/usage evidence"
+  ],
+  "new_harness": false,
+  "arms": [
+    {
+      "repository": "https://github.com/tavily-ai/tavily-cli",
+      "pin": "fd745230e6756933e3a190bfdc61ea1eb2db3993",
+      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
+      "upstream_role_ref": "README.md:3",
+      "upstream_install_ref": "README.md:28",
+      "upstream_test_ref": "pyproject.toml:52"
+    },
+    {
+      "repository": "https://github.com/vercel-labs/agent-browser",
+      "pin": "aff6125c023b810ea3f2e5deec5379e9a4270bdc",
+      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
+      "upstream_role_ref": "README.md:1",
+      "upstream_install_ref": "README.md:20",
+      "upstream_test_ref": "package.json:33"
+    },
+    {
+      "repository": "https://github.com/alphaXiv/OpenResearch",
+      "pin": "24e404ecbe19cb9184ea8177e8e9f90d4f3205b0",
+      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
+      "upstream_role_ref": "README.md:5",
+      "upstream_install_ref": "README.md:36",
+      "upstream_test_ref": null
+    },
+    {
+      "repository": "https://github.com/exa-labs/exa-mcp-server",
+      "pin": "e9c3b0126a3373eb1aeaca162e84d0791ff4c7f7",
+      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
+      "upstream_role_ref": "README.md:4",
+      "upstream_install_ref": "package.json:41",
+      "upstream_test_ref": "package.json:48"
+    },
+    {
+      "repository": "https://github.com/adbar/trafilatura",
+      "pin": "e2f85c965662c7df26b73290ef175b2c2a5fdca6",
+      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
+      "upstream_role_ref": "README.md:1",
+      "upstream_install_ref": "CONTRIBUTING.md:30",
+      "upstream_test_ref": "CONTRIBUTING.md:31"
+    },
+    {
+      "repository": "https://github.com/openai/codex",
+      "pin": "092d3acd6bec3e3a14bdc7e7a2810ab628ab759d",
+      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
+      "upstream_role_ref": "README.md:64",
+      "upstream_install_ref": "README.md:19",
+      "upstream_test_ref": "justfile:47"
+    },
+    {
+      "repository": "https://github.com/webrecorder/browsertrix-crawler",
+      "pin": "b8c38c4da141e855212d65ac714bfe663d178557",
+      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
+      "upstream_role_ref": "README.md:1",
+      "upstream_install_ref": null,
+      "upstream_test_ref": "package.json:15"
+    }
+  ],
+  "fixture_seal": [
+    {
+      "path": "fixtures/greeting.html",
+      "sha256": "f0654d8d0af3a2db6adc9fc3c35c24438faef9ab49680d08ea071e3a1a8dcbc2"
+    },
+    {
+      "path": "fixtures/rag-note.md",
+      "sha256": "27680cf43a65121fc1affbde0dba8021ea21180bb8db0a9c0f80a09b831257cc"
+    }
+  ],
+  "cases": [
+    "local greeting form: Ready then Hello, W6!",
+    "extract the sealed public RAG note served from disposable loopback server",
+    "invalid page retained as failure",
+    "close owned browser/crawler session"
+  ],
+  "mandatory_checks": [
+    "exact browser status text",
+    "all per-step failures retained",
+    "owned session closed",
+    "exact attributable extraction of frozen source",
+    "complete usage and elapsed time retained"
+  ],
+  "scope_limit": "These retained fixtures establish only bounded task/lifecycle correctness. A synthetic case score does not establish general SOTA, representative workload quality, or an upstream E2E. FINAL still requires all four protocol conditions at the run pin.",
+  "readiness_trigger": {
+    "all_of": [
+      "Exact arm binaries and their source pins verified in disposable environments through their own supported install paths",
+      "Each arm has its upstream-owned test/E2E recipe and a pinned receipt, or a retained substantive reason its scoped role is retired",
+      "Fixture hashes and complete usage instrumentation reproduce before the first arm",
+      "An isolated native runner is available without modifying the paper units, sealed bundles, Monday recorders or other lanes",
+      "Co-op relay that #1007 has LANDED and final-stack runs[] is available"
+    ],
+    "already_present": [
+      "retained fixture bytes",
+      "frozen arm source pins"
+    ],
+    "missing_at_registration": [
+      "arm runtime/E2E receipts at the frozen pins",
+      "#1007 LANDED relay"
+    ],
+    "start_rule": "Start as soon as all named inputs exist; no calendar date is a trigger. A comparison ready but not run is a defect."
+  },
+  "execution_rule": {
+    "repetitions": 3,
+    "order": "Canonical repository order on first repetition, reverse on second, rotate first arm to last on third; same case order and fresh isolated stores",
+    "model": "Preserve the native account and configured default model/effort; record exact identity in the freeze. No new paid route or model download is authorized by this artifact.",
+    "preflight": "Record unsupported role, license/model conflicts, absent test recipes and failed installation as unqualified arms with the source-backed reason; never silently omit a survivor",
+    "cost": "Record complete provider usage and elapsed time separately from tool-output/token estimates; never infer provider savings",
+    "protected_window": "Heavy E2E during the CC's Monday window uses systemd-run --user --scope -p CPUWeight=idle; a full suite additionally needs SUITE-REQUEST and SUITE-GO."
+  },
+  "fixed_decision_rule": {
+    "eligibility": "Only arms passing every applicable mandatory check in all three repetitions with complete usage and upstream E2E at the run pin may qualify for their declared role",
+    "rank": "For each role, maximize exact grounded-correct cases, then minimize total provider cost, then median elapsed time, then peak RSS. Compare only arms covering that same role; dependency components keep their own qualification receipts.",
+    "tie": "Retain the existing qualified incumbent for that role if tied. Otherwise retain all exactly tied qualified arms with their measured equality; do not claim superiority.",
+    "none_qualify": "Record RETIRED for the unsupported role with all failure/retirement reasons; do not promote an unqualified arm.",
+    "terminal": "Record FINAL only once the four protocol conditions hold for each selected role's winner; otherwise record the concrete unmet condition without claiming FINAL.",
+    "amendments": "No new candidates or changed metrics after first run. Any necessary input correction requires a separately reviewed, hashed amendment before affected scoring."
+  }
+}

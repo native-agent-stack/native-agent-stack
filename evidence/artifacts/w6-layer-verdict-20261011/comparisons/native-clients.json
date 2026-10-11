@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "kind": "w6_frozen_comparison",
+  "comparison_id": "w6-foundation-native-clients-20261011",
+  "registered_at": "2026-10-11T23:15:50Z",
+  "phase": "preregistered; no run and no terminal state recorded",
+  "catalog": "foundation",
+  "layer_id": "native-clients",
+  "requirement_sha256": "79b17443825138cf97e2dea1f67a29c581730bb1a1e25e780bd695a8a45b38d2",
+  "catalog_ref": "catalogs/landscape/foundation.json#/layers/0",
+  "catalog_sha256": "868d193a31080ab913400725140bd0d01e0afe97e28564fd12777f737d22951a",
+  "harnesses": [
+    "Existing W5 landscape-sweep comparison path (without discovery)",
+    "Existing native paired-task practice",
+    "Existing token-e2e freeze/usage evidence"
+  ],
+  "new_harness": false,
+  "arms": [
+    {
+      "repository": "https://github.com/anthropics/claude-code",
+      "pin": "3deb873687379f0c199a69fdaccc65f0865f7a29",
+      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
+      "upstream_role_ref": "README.md:7",
+      "upstream_install_ref": "README.md:23",
+      "upstream_test_ref": null
+    },
+    {
+      "repository": "https://github.com/openai/codex",
+      "pin": "092d3acd6bec3e3a14bdc7e7a2810ab628ab759d",
+      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
+      "upstream_role_ref": "README.md:64",
+      "upstream_install_ref": "README.md:19",
+      "upstream_test_ref": "justfile:47"
+    },
+    {
+      "repository": "https://github.com/earendil-works/pi",
+      "pin": "04566631c2b51fb688486bc1f040f60d1518c126",
+      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
+      "upstream_role_ref": "README.md:15",
+      "upstream_install_ref": "README.md:28",
+      "upstream_test_ref": "package.json:39"
+    }
+  ],
+  "fixture_seal": [
+    {
+      "path": "blueprints/convergence-practice/native-recovery/receipt.json",
+      "sha256": "b0b4a55ca5d74684285087f30599ac2e4557de84a7d4e79b7068b3fbb066b14e"
+    },
+    {
+      "path": "blueprints/convergence-practice/native-recovery/claude/receipt.json",
+      "sha256": "f0d4bc0f1ec408c51b2297e16365fa59aa8317f6035415e2151d360d17e2b491"
+    }
+  ],
+  "cases": [
+    "checkpoint",
+    "interrupt pending wait",
+    "resume into finalize",
+    "bounded source read with attributable returned results"
+  ],
+  "mandatory_checks": [
+    "unchanged checkpoint",
+    "checkpoint executes exactly once",
+    "same native session/thread after interrupt and resume",
+    "returned tool results have no tool-result errors",
+    "account and default model/effort preserved"
+  ],
+  "scope_limit": "These retained fixtures establish only bounded task/lifecycle correctness. A synthetic case score does not establish general SOTA, representative workload quality, or an upstream E2E. FINAL still requires all four protocol conditions at the run pin.",
+  "readiness_trigger": {
+    "all_of": [
+      "Exact arm binaries and their source pins verified in disposable environments through their own supported install paths",
+      "Each arm has its upstream-owned test/E2E recipe and a pinned receipt, or a retained substantive reason its scoped role is retired",
+      "Fixture hashes and complete usage instrumentation reproduce before the first arm",
+      "An isolated native runner is available without modifying the paper units, sealed bundles, Monday recorders or other lanes",
+      "Co-op relay that #1007 has LANDED and final-stack runs[] is available"
+    ],
+    "already_present": [
+      "retained fixture bytes",
+      "frozen arm source pins"
+    ],
+    "missing_at_registration": [
+      "arm runtime/E2E receipts at the frozen pins",
+      "#1007 LANDED relay"
+    ],
+    "start_rule": "Start as soon as all named inputs exist; no calendar date is a trigger. A comparison ready but not run is a defect."
+  },
+  "execution_rule": {
+    "repetitions": 3,
+    "order": "Canonical repository order on first repetition, reverse on second, rotate first arm to last on third; same case order and fresh isolated stores",
+    "model": "Preserve the native account and configured default model/effort; record exact identity in the freeze. No new paid route or model download is authorized by this artifact.",
+    "preflight": "Record unsupported role, license/model conflicts, absent test recipes and failed installation as unqualified arms with the source-backed reason; never silently omit a survivor",
+    "cost": "Record complete provider usage and elapsed time separately from tool-output/token estimates; never infer provider savings",
+    "protected_window": "Heavy E2E during the CC's Monday window uses systemd-run --user --scope -p CPUWeight=idle; a full suite additionally needs SUITE-REQUEST and SUITE-GO."
+  },
+  "fixed_decision_rule": {
+    "eligibility": "Only arms passing every applicable mandatory check in all three repetitions with complete usage and upstream E2E at the run pin may qualify for their declared role",
+    "rank": "For each role, maximize exact grounded-correct cases, then minimize total provider cost, then median elapsed time, then peak RSS. Compare only arms covering that same role; dependency components keep their own qualification receipts.",
+    "tie": "Retain the existing qualified incumbent for that role if tied. Otherwise retain all exactly tied qualified arms with their measured equality; do not claim superiority.",
+    "none_qualify": "Record RETIRED for the unsupported role with all failure/retirement reasons; do not promote an unqualified arm.",
+    "terminal": "Record FINAL only once the four protocol conditions hold for each selected role's winner; otherwise record the concrete unmet condition without claiming FINAL.",
+    "amendments": "No new candidates or changed metrics after first run. Any necessary input correction requires a separately reviewed, hashed amendment before affected scoring."
+  }
+}

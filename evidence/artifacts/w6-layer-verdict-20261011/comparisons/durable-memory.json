@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "kind": "w6_frozen_comparison",
+  "comparison_id": "w6-foundation-durable-memory-20261011",
+  "registered_at": "2026-10-11T23:15:50Z",
+  "phase": "preregistered; no run and no terminal state recorded",
+  "catalog": "foundation",
+  "layer_id": "durable-memory",
+  "requirement_sha256": "7ad9f64302a5916b859c6ff0157249db6cb10b5ba21cdf3a57b57d3ea578b01b",
+  "catalog_ref": "catalogs/landscape/foundation.json#/layers/7",
+  "catalog_sha256": "868d193a31080ab913400725140bd0d01e0afe97e28564fd12777f737d22951a",
+  "harnesses": [
+    "Existing W5 landscape-sweep comparison path (without discovery)",
+    "Existing native paired-task practice",
+    "Existing token-e2e freeze/usage evidence"
+  ],
+  "new_harness": false,
+  "arms": [
+    {
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "pin": "89bd8ded3c1ab8b769cf99417d038ed0364403c8",
+      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
+      "upstream_role_ref": "README.md:8",
+      "upstream_install_ref": "CONTRIBUTING.md:8",
+      "upstream_test_ref": "CONTRIBUTING.md:9"
+    },
+    {
+      "repository": "https://github.com/vshulcz/deja-vu",
+      "pin": "aa521f3f1abb9aa5449e7812652be371f3f23be9",
+      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
+      "upstream_role_ref": "README.md:12",
+      "upstream_install_ref": "README.md:21",
+      "upstream_test_ref": "README.md:274"
+    },
+    {
+      "repository": "https://github.com/vbcherepanov/total-agent-memory",
+      "pin": "f2f124fec90dc977f4610a1ea90aa05f5b916e56",
+      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
+      "upstream_role_ref": "README.md:10",
+      "upstream_install_ref": "README.md:50",
+      "upstream_test_ref": "README.md:160"
+    },
+    {
+      "repository": "https://github.com/tigerless-labs/agent-memory",
+      "pin": "aca58578ab386e4d422a97bcf32c2af2f3e57316",
+      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
+      "upstream_role_ref": "README.md:3",
+      "upstream_install_ref": "README.md:147",
+      "upstream_test_ref": "README.md:390"
+    }
+  ],
+  "fixture_seal": [
+    {
+      "path": "blueprints/memory-lifecycle-probe/corpus.json",
+      "sha256": "ae0625d292eb66a2d67de0e696b57830f9e621c75da41d60d97569d3901755f5"
+    }
+  ],
+  "cases": [
+    "three positive queries from frozen corpus",
+    "overwrite Orchard Pump: violet/19 replaces amber/17",
+    "delete Harbor Lantern: Juniper absent",
+    "second-project isolation",
+    "restart and clean-target restore"
+  ],
+  "mandatory_checks": [
+    "capture and source-grounded full read",
+    "supersession and abstention correctness",
+    "deletion and project isolation",
+    "restart and clean-target restore",
+    "complete usage and latency retained"
+  ],
+  "scope_limit": "These retained fixtures establish only bounded task/lifecycle correctness. A synthetic case score does not establish general SOTA, representative workload quality, or an upstream E2E. FINAL still requires all four protocol conditions at the run pin.",
+  "readiness_trigger": {
+    "all_of": [
+      "Exact arm binaries and their source pins verified in disposable environments through their own supported install paths",
+      "Each arm has its upstream-owned test/E2E recipe and a pinned receipt, or a retained substantive reason its scoped role is retired",
+      "Fixture hashes and complete usage instrumentation reproduce before the first arm",
+      "An isolated native runner is available without modifying the paper units, sealed bundles, Monday recorders or other lanes",
+      "Co-op relay that #1007 has LANDED and final-stack runs[] is available"
+    ],
+    "already_present": [
+      "retained fixture bytes",
+      "frozen arm source pins"
+    ],
+    "missing_at_registration": [
+      "arm runtime/E2E receipts at the frozen pins",
+      "#1007 LANDED relay"
+    ],
+    "start_rule": "Start as soon as all named inputs exist; no calendar date is a trigger. A comparison ready but not run is a defect."
+  },
+  "execution_rule": {
+    "repetitions": 3,
+    "order": "Canonical repository order on first repetition, reverse on second, rotate first arm to last on third; same case order and fresh isolated stores",
+    "model": "Preserve the native account and configured default model/effort; record exact identity in the freeze. No new paid route or model download is authorized by this artifact.",
+    "preflight": "Record unsupported role, license/model conflicts, absent test recipes and failed installation as unqualified arms with the source-backed reason; never silently omit a survivor",
+    "cost": "Record complete provider usage and elapsed time separately from tool-output/token estimates; never infer provider savings",
+    "protected_window": "Heavy E2E during the CC's Monday window uses systemd-run --user --scope -p CPUWeight=idle; a full suite additionally needs SUITE-REQUEST and SUITE-GO."
+  },
+  "fixed_decision_rule": {
+    "eligibility": "Only arms passing every applicable mandatory check in all three repetitions with complete usage and upstream E2E at the run pin may qualify for their declared role",
+    "rank": "For each role, maximize exact grounded-correct cases, then minimize total provider cost, then median elapsed time, then peak RSS. Compare only arms covering that same role; dependency components keep their own qualification receipts.",
+    "tie": "Retain the existing qualified incumbent for that role if tied. Otherwise retain all exactly tied qualified arms with their measured equality; do not claim superiority.",
+    "none_qualify": "Record RETIRED for the unsupported role with all failure/retirement reasons; do not promote an unqualified arm.",
+    "terminal": "Record FINAL only once the four protocol conditions hold for each selected role's winner; otherwise record the concrete unmet condition without claiming FINAL.",
+    "amendments": "No new candidates or changed metrics after first run. Any necessary input correction requires a separately reviewed, hashed amendment before affected scoring."
+  }
+}

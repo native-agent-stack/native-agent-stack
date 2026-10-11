@@ -19316,6 +19316,11 @@
       "bytes": 20312
     },
     {
+      "path": "docs/w6-layer-verdict-delta-20261011.md",
+      "sha256": "72ad3c0bc0d64194149cf05c5ac145681e59f2f0d9e20ca02a0d437b8dbf9624",
+      "bytes": 6863
+    },
+    {
       "path": "evidence/artifacts/actionlint-successor-parity-20260927/README.md",
       "sha256": "c282b2ce2ba53dc42867e8e78cf8e69b3b79fa59bffce27660ca46e8ffeb8f78",
       "bytes": 10531
@@ -57264,6 +57269,46 @@
       "path": "evidence/artifacts/w4-grand-catalog-counts-20261011/receipt.json",
       "sha256": "3de4cb7155fa30296f1c1e05923131f44a0479bb3a0021a96900ea31af84b262",
       "bytes": 14901
+    },
+    {
+      "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/code-navigation.json",
+      "sha256": "9f560c450c03c6c5f8315afa5d995b6e0de4591f59dbb3b5716a1f738309a84a",
+      "bytes": 6401
+    },
+    {
+      "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/document-retrieval.json",
+      "sha256": "2b6e26e8da25204c63acc1b5c3aff730d419665c7852c2128dedb9f270a4877f",
+      "bytes": 11968
+    },
+    {
+      "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/durable-memory.json",
+      "sha256": "bd42f3d21c96df47a1b134673b0b52670769b55a6b6e4bc6d273f58f78d9c55d",
+      "bytes": 6458
+    },
+    {
+      "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/native-clients.json",
+      "sha256": "218bf9847e57c5a4ec80b306b9a58bea38b64ade614456b536c1531b284f6c37",
+      "bytes": 6114
+    },
+    {
+      "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/semantic-rag.json",
+      "sha256": "b2a379a1709fbc4498312c968780e21c622618f05c223721cd4fd8f9a1b854ed",
+      "bytes": 8300
+    },
+    {
+      "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/web-research.json",
+      "sha256": "348d09fb50a0a78b976d35f33d0971f66f747be10d8e96357bde2770016a750a",
+      "bytes": 7816
+    },
+    {
+      "path": "evidence/artifacts/w6-layer-verdict-20261011/primary-sources.json",
+      "sha256": "91a7a67a808f38acb5b459267a01a036e257296f340d202f2b64d494d0226ba7",
+      "bytes": 24458
+    },
+    {
+      "path": "evidence/artifacts/w6-layer-verdict-20261011/resolution-delta.json",
+      "sha256": "c0edef512232a944625bc031846ea535d4d73ced9bcbc954463ddfe7bca8fee5",
+      "bytes": 58047
     },
     {
       "path": "evidence/artifacts/workstation-lane-20260925/nemotron-qualification/model_card_check.py",

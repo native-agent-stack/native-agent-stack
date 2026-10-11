@@ -1,0 +1,715 @@
+{
+  "schema_version": 1,
+  "kind": "w6_mirror_primary_sources",
+  "recorded_at": "2026-10-11T23:15:50Z",
+  "mirror_root": "~/code/upstream",
+  "read_command": "GIT_NO_LAZY_FETCH=1 GIT_OPTIONAL_LOCKS=0 git show HEAD:<path>",
+  "scope": "Source review at actual HEAD, checked against MIRRORS.lock.json. Mirror pins are frozen comparison/source-review inputs; neither installed-run pins nor reused historical E2E qualifications.",
+  "missing_test_ref": "null means the reviewed primary files do not yet supply a supported test/E2E path; it is an explicit qualification gap, not a claim the upstream has no tests.",
+  "sources": [
+    {
+      "repository": "https://github.com/abhigyanpatwari/GitNexus",
+      "pin": "191a954bf67583447dac5c71cc8d679aabd101d8",
+      "manifest_ref": "191a954bf67583447dac5c71cc8d679aabd101d8",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:31",
+      "install_ref": "README.md:68",
+      "test_ref": null,
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "4ccfd0f9cf1e1ade7df6a8b2bd51eb761a40cabe404a3bd3ed0cbc0981a537bd"
+        }
+      ],
+      "evidence_class": "source_review"
+    },
+    {
+      "repository": "https://github.com/anthropics/claude-plugins-official",
+      "pin": "f359d43b406057f1a8cdbc4ea93b827642c162e6",
+      "manifest_ref": "f359d43b406057f1a8cdbc4ea93b827642c162e6",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:5",
+      "install_ref": null,
+      "test_ref": null,
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "f34b8730d2b61617045c61ea2d9bf3ab08561305bfac77ea061e755bf46aeac2"
+        }
+      ],
+      "evidence_class": "source_review"
+    },
+    {
+      "repository": "https://github.com/mibayy/token-savior",
+      "pin": "0a4a2e126530ff1222b7f9c62c290e517a738328",
+      "manifest_ref": "0a4a2e126530ff1222b7f9c62c290e517a738328",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:7",
+      "install_ref": "README.md:116",
+      "test_ref": "README.md:187",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "48b46aa50dd7803bc30a7ae85c6e8c4f560e6b765973698d8ddced3b6e3ad378"
+        }
+      ],
+      "evidence_class": "source_review"
+    },
+    {
+      "repository": "https://github.com/datalab-to/marker",
+      "pin": "e7c67f1d239ea6a805cbf4ed6c6b2056d435e22d",
+      "manifest_ref": "e7c67f1d239ea6a805cbf4ed6c6b2056d435e22d",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:23",
+      "install_ref": "README.md:78",
+      "test_ref": "pyproject.toml:64",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "1b874b82efc709d55d3a251cc631c13f695ed08935241fb4cce995e964fd00e4"
+        }
+      ],
+      "evidence_class": "source_review"
+    },
+    {
+      "repository": "https://github.com/opendatalab/MinerU",
+      "pin": "b7f3dd0c5f6e6d66a298239ffd02b328b873918e",
+      "manifest_ref": "b7f3dd0c5f6e6d66a298239ffd02b328b873918e",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:3",
+      "install_ref": "README.md:74",
+      "test_ref": "pyproject.toml:90",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "69c967e98536be101b5dc3420703d28cc1e0250eeca3b5bf156b060ac4ccfacb"
+        }
+      ],
+      "evidence_class": "source_review"
+    },
+    {
+      "repository": "https://github.com/docling-project/docling",
+      "pin": "21588f5261d0a5a051102356d9babb35e790f33e",
+      "manifest_ref": "21588f5261d0a5a051102356d9babb35e790f33e",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:31",
+      "install_ref": "README.md:70",
+      "test_ref": "CONTRIBUTING.md:79",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "ce605634509dc87d79182131ad001e5fddf6053963b9045b971c6e87e6b9bfa1"
+        }
+      ],
+      "evidence_class": "source_review"
+    },
+    {
+      "repository": "https://github.com/Cinnamon/kotaemon",
+      "pin": "9ad3e4e49aa35b8acddd235918a5d9753c1cfdf9",
+      "manifest_ref": "9ad3e4e49aa35b8acddd235918a5d9753c1cfdf9",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:5",
+      "install_ref": "README.md:157",
+      "test_ref": "CONTRIBUTING.md:50",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "2809854945c054792099f9db34c8af8f4360e296ac8f091d120c37351b3c399e"
+        }
+      ],
+      "evidence_class": "source_review"
+    },
+    {
+      "repository": "https://github.com/huggingface/sentence-transformers",
+      "pin": "ff69486771998c07008ebd3c7e05e827f03df46f",
+      "manifest_ref": "ff69486771998c07008ebd3c7e05e827f03df46f",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:13",
+      "install_ref": "README.md:26",
+      "test_ref": "CONTRIBUTING.md:62",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "2922b78ede32eb1ad2c77d65bfbfa14de467c172ccd11f132efd36800b5c836b"
+        }
+      ],
+      "evidence_class": "source_review"
+    },
+    {
+      "repository": "https://github.com/arabold/docs-mcp-server",
+      "pin": "b8447383cfe5f9933da0a2f16a84c1a663e2d216",
+      "manifest_ref": "b8447383cfe5f9933da0a2f16a84c1a663e2d216",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:1",
+      "install_ref": "CONTRIBUTING.md:26",
+      "test_ref": "CONTRIBUTING.md:32",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "10ea967ead5cbd120c5dde8e46c85441d80655d5f34928f6a671c12cc33e7c2b"
+        }
+      ],
+      "evidence_class": "source_review"
+    },
+    {
+      "repository": "https://github.com/VectifyAI/PageIndex",
+      "pin": "1a060dfc5c512ece03aeaa9cb80d76dbb5358bdf",
+      "manifest_ref": "1a060dfc5c512ece03aeaa9cb80d76dbb5358bdf",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:33",
+      "install_ref": "README.md:33",
+      "test_ref": "pyproject.toml:57",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "fc08d3fad45b28810d578c1fe71859619abc06e7849daf9025982c0168a42308"
+        }
+      ],
+      "evidence_class": "source_review"
+    },
+    {
+      "repository": "https://github.com/xberg-io/xberg",
+      "pin": "b4bdf0b9346188c8b540698f80b359fb9ff60ed0",
+      "manifest_ref": "b4bdf0b9346188c8b540698f80b359fb9ff60ed0",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:103",
+      "install_ref": "README.md:150",
+      "test_ref": "pyproject.toml:10",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "e7695c59610cbdc9b4f8602abbc6486c9565288aeee2e8feda19e74502cef112"
+        }
+      ],
+      "evidence_class": "source_review"
+    },
+    {
+      "repository": "https://github.com/pymupdf/pymupdf4llm",
+      "pin": "ed515362c37554244a20a0fd3ef12d53760249a8",
+      "manifest_ref": "ed515362c37554244a20a0fd3ef12d53760249a8",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:26",
+      "install_ref": "README.md:58",
+      "test_ref": null,
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "0fc7f7b768e0782dc32dfaf91190bc64eb4be00696426b5d512c2a9e968513c7"
+        }
+      ],
+      "evidence_class": "source_review"
+    },
+    {
+      "repository": "https://github.com/datalab-to/surya",
+      "pin": "a2363d3311773a2b6145a40458043211c50c52f4",
+      "manifest_ref": "a2363d3311773a2b6145a40458043211c50c52f4",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:31",
+      "install_ref": "README.md:76",
+      "test_ref": "pyproject.toml:51",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "edb0368b5ad6ad33dbd705decd1c2d42dc11c9f011fe55be1e39ddb4550798f5"
+        }
+      ],
+      "evidence_class": "source_review"
+    },
+    {
+      "repository": "https://github.com/alibaba/Logics-Parsing",
+      "pin": "d75d42dbd92c518a4def19ac5895792828138d35",
+      "manifest_ref": "d75d42dbd92c518a4def19ac5895792828138d35",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:11",
+      "install_ref": "README.md:137",
+      "test_ref": null,
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "5fc2e3d1d459c252385627bce39a7c3204437eb3eaf5153806c418dcb0a6d77c"
+        }
+      ],
+      "evidence_class": "source_review"
+    },
+    {
+      "repository": "https://github.com/baidu/Unlimited-OCR",
+      "pin": "d49ff64afffc1f47ab563dc1c589bc2f78808fa4",
+      "manifest_ref": "d49ff64afffc1f47ab563dc1c589bc2f78808fa4",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:85",
+      "install_ref": "README.md:159",
+      "test_ref": null,
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "08e531fef07276bb5bb036d675c991d3fbf39dc3cc985a8dda1b4c468bacdb9f"
+        }
+      ],
+      "evidence_class": "source_review"
+    },
+    {
+      "repository": "https://github.com/datalab-to/chandra",
+      "pin": "d4f7467435aa4137d9539f000ddf0b7ced3eb43f",
+      "manifest_ref": "d4f7467435aa4137d9539f000ddf0b7ced3eb43f",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:23",
+      "install_ref": "README.md:58",
+      "test_ref": "pyproject.toml:58",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "edf170f70a20673559d6551e621bb5d5969a0b439d82125eca5ad6bec599b9fa"
+        }
+      ],
+      "evidence_class": "source_review"
+    },
+    {
+      "repository": "https://github.com/ollama/ollama",
+      "pin": "eab97e9f92b9a25c2d52d2cc6c1b1c99bd9fae21",
+      "manifest_ref": "eab97e9f92b9a25c2d52d2cc6c1b1c99bd9fae21",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:58",
+      "install_ref": "README.md:16",
+      "test_ref": null,
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "bda5d9ac28354e3effc6cb7059672425b87fdbc760051918d17022a0b7aeeeec"
+        }
+      ],
+      "evidence_class": "source_review"
+    },
+    {
+      "repository": "https://github.com/OSU-NLP-Group/HippoRAG",
+      "pin": "d5c8329422e0a0b834a15874545cb6a74b4f9b26",
+      "manifest_ref": "d5c8329422e0a0b834a15874545cb6a74b4f9b26",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:6",
+      "install_ref": "README.md:48",
+      "test_ref": null,
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "5b6affb7fd746390990c63467f424501a3a67946461aa2e6244561130c3bc60b"
+        }
+      ],
+      "evidence_class": "source_review"
+    },
+    {
+      "repository": "https://github.com/lightonai/next-plaid",
+      "pin": "c6c091d7ee14c81206bb28af90d8ff506fd0235e",
+      "manifest_ref": "c6c091d7ee14c81206bb28af90d8ff506fd0235e",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:22",
+      "install_ref": "README.md:35",
+      "test_ref": "Makefile:15",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "0feb0aea9d954e1b39ebfe46fe7a6c343d798bc155537b5526e73b610105cb03"
+        }
+      ],
+      "evidence_class": "source_review"
+    },
+    {
+      "repository": "https://github.com/minishlab/semble",
+      "pin": "0e5e02832ae0340c0feb637d2b7213fe065571fd",
+      "manifest_ref": "0e5e02832ae0340c0feb637d2b7213fe065571fd",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:3",
+      "install_ref": "README.md:41",
+      "test_ref": "pyproject.toml:52",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "270ae3977387ccbdaf11e625cdeced259ec0fcc5b3e56bcc2696d381227518f5"
+        }
+      ],
+      "evidence_class": "source_review"
+    },
+    {
+      "repository": "https://github.com/langchain-ai/langmem",
+      "pin": "48e3c11f5bb527282c7d5339c6a87a0b35abccfc",
+      "manifest_ref": "48e3c11f5bb527282c7d5339c6a87a0b35abccfc",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:3",
+      "install_ref": "README.md:21",
+      "test_ref": "pyproject.toml:32",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "e1edd000d263bfea842c34273add82421340c2caf2d7b87edd285daf02156ca3"
+        }
+      ],
+      "evidence_class": "source_review"
+    },
+    {
+      "repository": "https://github.com/rohitg00/agentmemory",
+      "pin": "7ee162844956626d8b00ba459df169d542d4af9d",
+      "manifest_ref": "7ee162844956626d8b00ba459df169d542d4af9d",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:7",
+      "install_ref": "README.md:143",
+      "test_ref": "README.md:922",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "8802e3a1a402f994ee847fbb541fef75e955f4bcdb9377887d1ad875db6eefa7"
+        }
+      ],
+      "evidence_class": "source_review"
+    },
+    {
+      "repository": "https://github.com/MemPalace/MemPalace",
+      "pin": "1f0803a31958b30320418356b2db88c4ed9c27f9",
+      "manifest_ref": "1f0803a31958b30320418356b2db88c4ed9c27f9",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:7",
+      "install_ref": "README.md:80",
+      "test_ref": "CONTRIBUTING.md:33",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "3f6c55d2af94d8d1e4ef2876df4fc97eda55bbadb8ad3ae0fb0b6626e1c2e048"
+        }
+      ],
+      "evidence_class": "source_review"
+    },
+    {
+      "repository": "https://github.com/vshulcz/deja-vu",
+      "pin": "aa521f3f1abb9aa5449e7812652be371f3f23be9",
+      "manifest_ref": "aa521f3f1abb9aa5449e7812652be371f3f23be9",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:12",
+      "install_ref": "README.md:21",
+      "test_ref": "README.md:274",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "bf91e7f924919337e9bc66538c5f987f0913b8557dead28cec8b10debf07faa7"
+        }
+      ],
+      "evidence_class": "source_review"
+    },
+    {
+      "repository": "https://github.com/vbcherepanov/total-agent-memory",
+      "pin": "f2f124fec90dc977f4610a1ea90aa05f5b916e56",
+      "manifest_ref": "f2f124fec90dc977f4610a1ea90aa05f5b916e56",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:10",
+      "install_ref": "README.md:50",
+      "test_ref": "README.md:160",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "3b248aa2f8aa104ab6302779257ce0b6c894c52dcc1ddb817ae5d6ea0f61a295"
+        }
+      ],
+      "evidence_class": "source_review"
+    },
+    {
+      "repository": "https://github.com/vectorize-io/hindsight",
+      "pin": "a9eeed77f9bce99d8f97d39a30d3281747300824",
+      "manifest_ref": "a9eeed77f9bce99d8f97d39a30d3281747300824",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:5",
+      "install_ref": "README.md:98",
+      "test_ref": "CONTRIBUTING.md:94",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "a3e2745dedec4f9e0d4452857ef054699e60414740f5d8f12d41bd42711d476a"
+        }
+      ],
+      "evidence_class": "source_review"
+    },
+    {
+      "repository": "https://github.com/tigerless-labs/agent-memory",
+      "pin": "aca58578ab386e4d422a97bcf32c2af2f3e57316",
+      "manifest_ref": "aca58578ab386e4d422a97bcf32c2af2f3e57316",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:3",
+      "install_ref": "README.md:147",
+      "test_ref": "README.md:390",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "e70caf56126ebd4264c9d8d0f4ffd4932e6c28f1106d75855f5887b65cd8dc06"
+        }
+      ],
+      "evidence_class": "source_review"
+    },
+    {
+      "repository": "https://github.com/exa-labs/exa-mcp-server",
+      "pin": "e9c3b0126a3373eb1aeaca162e84d0791ff4c7f7",
+      "manifest_ref": "e9c3b0126a3373eb1aeaca162e84d0791ff4c7f7",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:4",
+      "install_ref": "package.json:41",
+      "test_ref": "package.json:48",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "08a2ffb7efbfd07dbadac74435f8cabb2a265cc3389dfcc4a3303b42c21a934f"
+        }
+      ],
+      "evidence_class": "source_review"
+    },
+    {
+      "repository": "https://github.com/webrecorder/browsertrix-crawler",
+      "pin": "b8c38c4da141e855212d65ac714bfe663d178557",
+      "manifest_ref": "b8c38c4da141e855212d65ac714bfe663d178557",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:1",
+      "install_ref": null,
+      "test_ref": "package.json:15",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "0ba57ddc578ad97f6f310c1025cd7b95b8c9d199ef56e8a589c444cf28c1af19"
+        }
+      ],
+      "evidence_class": "source_review"
+    },
+    {
+      "repository": "https://github.com/adbar/trafilatura",
+      "pin": "e2f85c965662c7df26b73290ef175b2c2a5fdca6",
+      "manifest_ref": "e2f85c965662c7df26b73290ef175b2c2a5fdca6",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:1",
+      "install_ref": "CONTRIBUTING.md:30",
+      "test_ref": "CONTRIBUTING.md:31",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "42962884fec6a66270f58a71f2b7494e294cf0b0881691eb79e50bbec55bc25a"
+        }
+      ],
+      "evidence_class": "source_review"
+    },
+    {
+      "repository": "https://github.com/earendil-works/pi",
+      "pin": "04566631c2b51fb688486bc1f040f60d1518c126",
+      "manifest_ref": "04566631c2b51fb688486bc1f040f60d1518c126",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:15",
+      "install_ref": "README.md:28",
+      "test_ref": "package.json:39",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "d4f05a91fe0de78d1b99d8b8d69c66e7522c493814cc4bd2ed344e4d60b10ce1"
+        }
+      ],
+      "evidence_class": "source_review"
+    },
+    {
+      "repository": "https://github.com/anthropics/claude-code",
+      "pin": "3deb873687379f0c199a69fdaccc65f0865f7a29",
+      "manifest_ref": "HEAD",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:7",
+      "install_ref": "README.md:23",
+      "test_ref": null,
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "aa0d8b80ac083e1591be0789273f447058cc9187b4331634a5614155da27778d"
+        }
+      ],
+      "evidence_class": "source_review"
+    },
+    {
+      "repository": "https://github.com/openai/codex",
+      "pin": "092d3acd6bec3e3a14bdc7e7a2810ab628ab759d",
+      "manifest_ref": "rust-v0.162.1",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:64",
+      "install_ref": "README.md:19",
+      "test_ref": "justfile:47",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "ba4e1f69ff48386e72a9c5e1edaf76aad64a475c2d51af79ccba6d1128261ba7"
+        }
+      ],
+      "evidence_class": "source_review"
+    },
+    {
+      "repository": "https://github.com/oraios/serena",
+      "pin": "1de556f71569f3acfc0743e526dd60aca40a545e",
+      "manifest_ref": "HEAD",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:7",
+      "install_ref": "README.md:229",
+      "test_ref": "pyproject.toml:76",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "9b0d78749517f0b91427ae433ab49ec7e77e46620ca367c75d2a082c5f30a4a5"
+        }
+      ],
+      "evidence_class": "source_review"
+    },
+    {
+      "repository": "https://github.com/tobi/qmd",
+      "pin": "facd35e01359e59d938bc9418e93fb9318addee3",
+      "manifest_ref": "v2.8.3",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:1",
+      "install_ref": "README.md:32",
+      "test_ref": "package.json:31",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "24c049f59408d3d021fbee70d4cd5dd744cdb51f5caea956b417f4dfe7e26880"
+        }
+      ],
+      "evidence_class": "source_review"
+    },
+    {
+      "repository": "https://github.com/microsoft/markitdown",
+      "pin": "fd239d5d2be43d9b68329730206b9312c7d5a388",
+      "manifest_ref": "v0.1.7",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:8",
+      "install_ref": "README.md:51",
+      "test_ref": null,
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "4f6246f3064d5cf0b4c61652822dd743c69a3fe72fef925279d22a6a68b3fca4"
+        }
+      ],
+      "evidence_class": "source_review"
+    },
+    {
+      "repository": "https://github.com/tsdgeos/poppler_mirror",
+      "pin": "5b97e475790a11012ec6095d9a47c23f7f229cb9",
+      "manifest_ref": "HEAD",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:16",
+      "install_ref": null,
+      "test_ref": null,
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "3a6d2dfa541596d6aac3eb0ea67cdfba1d015681e4c8283e6989c7bfb48f9d8a"
+        }
+      ],
+      "evidence_class": "source_review"
+    },
+    {
+      "repository": "https://github.com/giancarloerra/SocratiCode",
+      "pin": "2218f25153d0f3f4a76ee240a5643dbc873e80be",
+      "manifest_ref": "v1.14.0",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:36",
+      "install_ref": "README.md:793",
+      "test_ref": "README.md:1355",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "280f3c7b8415953c00885f489cb59bab10d6e3bc8637a32f7196165cc4cb700d"
+        }
+      ],
+      "evidence_class": "source_review"
+    },
+    {
+      "repository": "https://github.com/qdrant/qdrant",
+      "pin": "6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de",
+      "manifest_ref": "v1.19.1",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:22",
+      "install_ref": null,
+      "test_ref": null,
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "f1455d12252bf40235ad0128d8e98b2cd6d42583e441ac832b01f4daf08df2e4"
+        }
+      ],
+      "evidence_class": "source_review"
+    },
+    {
+      "repository": "https://github.com/vllm-project/vllm",
+      "pin": "db9527a46873454610df6dbedf79a36d6bf1a7f6",
+      "manifest_ref": "v0.31.0",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:14",
+      "install_ref": "README.md:69",
+      "test_ref": "pyproject.toml:63",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "8d2e7cd8d120bcd91ddfa85ef957f7246021b4a3f46f2e1f4ccf084ec6c20026"
+        }
+      ],
+      "evidence_class": "source_review"
+    },
+    {
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "pin": "89bd8ded3c1ab8b769cf99417d038ed0364403c8",
+      "manifest_ref": "v2.6.0",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:8",
+      "install_ref": "CONTRIBUTING.md:8",
+      "test_ref": "CONTRIBUTING.md:9",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "6f6222b85efdf86a745d17a3b1be61905dea76edd3c18ec5a555678ff73e03f7"
+        }
+      ],
+      "evidence_class": "source_review"
+    },
+    {
+      "repository": "https://github.com/tavily-ai/tavily-cli",
+      "pin": "fd745230e6756933e3a190bfdc61ea1eb2db3993",
+      "manifest_ref": "HEAD",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:3",
+      "install_ref": "README.md:28",
+      "test_ref": "pyproject.toml:52",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "fc5f51750e1b412a9101052a3bf178e156c5dbb2910cec41bbfca973e4232650"
+        }
+      ],
+      "evidence_class": "source_review"
+    },
+    {
+      "repository": "https://github.com/vercel-labs/agent-browser",
+      "pin": "aff6125c023b810ea3f2e5deec5379e9a4270bdc",
+      "manifest_ref": "v0.38.1",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:1",
+      "install_ref": "README.md:20",
+      "test_ref": "package.json:33",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "f8ae1265daec0e982a1f08791538d4ede5f98aa4892f2609ab0da3acf074f02c"
+        }
+      ],
+      "evidence_class": "source_review"
+    },
+    {
+      "repository": "https://github.com/alphaXiv/OpenResearch",
+      "pin": "24e404ecbe19cb9184ea8177e8e9f90d4f3205b0",
+      "manifest_ref": "v0.2.7",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:5",
+      "install_ref": "README.md:36",
+      "test_ref": null,
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "b427e53ca86a1f8ade399de72713c749a5e44475866ce6a2068a0536fc8a427d"
+        }
+      ],
+      "evidence_class": "source_review"
+    }
+  ]
+}

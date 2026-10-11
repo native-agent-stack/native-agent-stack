@@ -1,0 +1,211 @@
+{
+  "schema_version": 1,
+  "kind": "w6_frozen_comparison",
+  "comparison_id": "w6-foundation-document-retrieval-20261011",
+  "registered_at": "2026-10-11T23:15:50Z",
+  "phase": "preregistered; no run and no terminal state recorded",
+  "catalog": "foundation",
+  "layer_id": "document-retrieval",
+  "requirement_sha256": "fb292e216c7c4c66253e0e9395dca36c2ab16492ba8b6a69dabede9901d574bb",
+  "catalog_ref": "catalogs/landscape/foundation.json#/layers/5",
+  "catalog_sha256": "868d193a31080ab913400725140bd0d01e0afe97e28564fd12777f737d22951a",
+  "harnesses": [
+    "Existing W5 landscape-sweep comparison path (without discovery)",
+    "Existing native paired-task practice",
+    "Existing token-e2e freeze/usage evidence"
+  ],
+  "new_harness": false,
+  "arms": [
+    {
+      "repository": "https://github.com/tobi/qmd",
+      "pin": "facd35e01359e59d938bc9418e93fb9318addee3",
+      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
+      "upstream_role_ref": "README.md:1",
+      "upstream_install_ref": "README.md:32",
+      "upstream_test_ref": "package.json:31"
+    },
+    {
+      "repository": "https://github.com/microsoft/markitdown",
+      "pin": "fd239d5d2be43d9b68329730206b9312c7d5a388",
+      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
+      "upstream_role_ref": "README.md:8",
+      "upstream_install_ref": "README.md:51",
+      "upstream_test_ref": null
+    },
+    {
+      "repository": "https://github.com/tsdgeos/poppler_mirror",
+      "pin": "5b97e475790a11012ec6095d9a47c23f7f229cb9",
+      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
+      "upstream_role_ref": "README.md:16",
+      "upstream_install_ref": null,
+      "upstream_test_ref": null
+    },
+    {
+      "repository": "https://github.com/datalab-to/marker",
+      "pin": "e7c67f1d239ea6a805cbf4ed6c6b2056d435e22d",
+      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
+      "upstream_role_ref": "README.md:23",
+      "upstream_install_ref": "README.md:78",
+      "upstream_test_ref": "pyproject.toml:64"
+    },
+    {
+      "repository": "https://github.com/opendatalab/MinerU",
+      "pin": "b7f3dd0c5f6e6d66a298239ffd02b328b873918e",
+      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
+      "upstream_role_ref": "README.md:3",
+      "upstream_install_ref": "README.md:74",
+      "upstream_test_ref": "pyproject.toml:90"
+    },
+    {
+      "repository": "https://github.com/docling-project/docling",
+      "pin": "21588f5261d0a5a051102356d9babb35e790f33e",
+      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
+      "upstream_role_ref": "README.md:31",
+      "upstream_install_ref": "README.md:70",
+      "upstream_test_ref": "CONTRIBUTING.md:79"
+    },
+    {
+      "repository": "https://github.com/Cinnamon/kotaemon",
+      "pin": "9ad3e4e49aa35b8acddd235918a5d9753c1cfdf9",
+      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
+      "upstream_role_ref": "README.md:5",
+      "upstream_install_ref": "README.md:157",
+      "upstream_test_ref": "CONTRIBUTING.md:50"
+    },
+    {
+      "repository": "https://github.com/huggingface/sentence-transformers",
+      "pin": "ff69486771998c07008ebd3c7e05e827f03df46f",
+      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
+      "upstream_role_ref": "README.md:13",
+      "upstream_install_ref": "README.md:26",
+      "upstream_test_ref": "CONTRIBUTING.md:62"
+    },
+    {
+      "repository": "https://github.com/arabold/docs-mcp-server",
+      "pin": "b8447383cfe5f9933da0a2f16a84c1a663e2d216",
+      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
+      "upstream_role_ref": "README.md:1",
+      "upstream_install_ref": "CONTRIBUTING.md:26",
+      "upstream_test_ref": "CONTRIBUTING.md:32"
+    },
+    {
+      "repository": "https://github.com/VectifyAI/PageIndex",
+      "pin": "1a060dfc5c512ece03aeaa9cb80d76dbb5358bdf",
+      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
+      "upstream_role_ref": "README.md:33",
+      "upstream_install_ref": "README.md:33",
+      "upstream_test_ref": "pyproject.toml:57"
+    },
+    {
+      "repository": "https://github.com/xberg-io/xberg",
+      "pin": "b4bdf0b9346188c8b540698f80b359fb9ff60ed0",
+      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
+      "upstream_role_ref": "README.md:103",
+      "upstream_install_ref": "README.md:150",
+      "upstream_test_ref": "pyproject.toml:10"
+    },
+    {
+      "repository": "https://github.com/pymupdf/pymupdf4llm",
+      "pin": "ed515362c37554244a20a0fd3ef12d53760249a8",
+      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
+      "upstream_role_ref": "README.md:26",
+      "upstream_install_ref": "README.md:58",
+      "upstream_test_ref": null
+    },
+    {
+      "repository": "https://github.com/datalab-to/surya",
+      "pin": "a2363d3311773a2b6145a40458043211c50c52f4",
+      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
+      "upstream_role_ref": "README.md:31",
+      "upstream_install_ref": "README.md:76",
+      "upstream_test_ref": "pyproject.toml:51"
+    },
+    {
+      "repository": "https://github.com/alibaba/Logics-Parsing",
+      "pin": "d75d42dbd92c518a4def19ac5895792828138d35",
+      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
+      "upstream_role_ref": "README.md:11",
+      "upstream_install_ref": "README.md:137",
+      "upstream_test_ref": null
+    },
+    {
+      "repository": "https://github.com/baidu/Unlimited-OCR",
+      "pin": "d49ff64afffc1f47ab563dc1c589bc2f78808fa4",
+      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
+      "upstream_role_ref": "README.md:85",
+      "upstream_install_ref": "README.md:159",
+      "upstream_test_ref": null
+    },
+    {
+      "repository": "https://github.com/datalab-to/chandra",
+      "pin": "d4f7467435aa4137d9539f000ddf0b7ced3eb43f",
+      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
+      "upstream_role_ref": "README.md:23",
+      "upstream_install_ref": "README.md:58",
+      "upstream_test_ref": "pyproject.toml:58"
+    }
+  ],
+  "fixture_seal": [
+    {
+      "path": "blueprints/convergence-practice/document-ingestion/corpus/authored-source.json",
+      "sha256": "9b294753d91abcbd8ebdd87460513014f179068796febfa9500ed25a5051ed34"
+    },
+    {
+      "path": "blueprints/convergence-practice/document-ingestion/corpus/lumen-qualification.pdf",
+      "sha256": "ca2b455ba16c76abdb26e198d95b27302cf4a0b8d00dd66c9a1f9d8be68d65f5"
+    },
+    {
+      "path": "blueprints/convergence-practice/document-ingestion/corpus/w3c-dummy.pdf",
+      "sha256": "3df79d34abbca99308e79cb94461c1893582604d68329a41fd4bec1885e6adb4"
+    }
+  ],
+  "cases": [
+    "parse born-digital PDF",
+    "retrieve authored positive facts with page citation",
+    "negative answer absent from sealed PDFs",
+    "invalid input",
+    "search-then-get exact body"
+  ],
+  "mandatory_checks": [
+    "exact page text and table cells against authored-source oracle",
+    "source/page citations",
+    "correct abstention on negative queries",
+    "invalid input rejected",
+    "search-then-get body equality"
+  ],
+  "scope_limit": "These retained fixtures establish only bounded task/lifecycle correctness. A synthetic case score does not establish general SOTA, representative workload quality, or an upstream E2E. FINAL still requires all four protocol conditions at the run pin.",
+  "readiness_trigger": {
+    "all_of": [
+      "Exact arm binaries and their source pins verified in disposable environments through their own supported install paths",
+      "Each arm has its upstream-owned test/E2E recipe and a pinned receipt, or a retained substantive reason its scoped role is retired",
+      "Fixture hashes and complete usage instrumentation reproduce before the first arm",
+      "An isolated native runner is available without modifying the paper units, sealed bundles, Monday recorders or other lanes",
+      "Co-op relay that #1007 has LANDED and final-stack runs[] is available"
+    ],
+    "already_present": [
+      "retained fixture bytes",
+      "frozen arm source pins"
+    ],
+    "missing_at_registration": [
+      "arm runtime/E2E receipts at the frozen pins",
+      "#1007 LANDED relay"
+    ],
+    "start_rule": "Start as soon as all named inputs exist; no calendar date is a trigger. A comparison ready but not run is a defect."
+  },
+  "execution_rule": {
+    "repetitions": 3,
+    "order": "Canonical repository order on first repetition, reverse on second, rotate first arm to last on third; same case order and fresh isolated stores",
+    "model": "Preserve the native account and configured default model/effort; record exact identity in the freeze. No new paid route or model download is authorized by this artifact.",
+    "preflight": "Record unsupported role, license/model conflicts, absent test recipes and failed installation as unqualified arms with the source-backed reason; never silently omit a survivor",
+    "cost": "Record complete provider usage and elapsed time separately from tool-output/token estimates; never infer provider savings",
+    "protected_window": "Heavy E2E during the CC's Monday window uses systemd-run --user --scope -p CPUWeight=idle; a full suite additionally needs SUITE-REQUEST and SUITE-GO."
+  },
+  "fixed_decision_rule": {
+    "eligibility": "Only arms passing every applicable mandatory check in all three repetitions with complete usage and upstream E2E at the run pin may qualify for their declared role",
+    "rank": "For each role, maximize exact grounded-correct cases, then minimize total provider cost, then median elapsed time, then peak RSS. Compare only arms covering that same role; dependency components keep their own qualification receipts.",
+    "tie": "Retain the existing qualified incumbent for that role if tied. Otherwise retain all exactly tied qualified arms with their measured equality; do not claim superiority.",
+    "none_qualify": "Record RETIRED for the unsupported role with all failure/retirement reasons; do not promote an unqualified arm.",
+    "terminal": "Record FINAL only once the four protocol conditions hold for each selected role's winner; otherwise record the concrete unmet condition without claiming FINAL.",
+    "amendments": "No new candidates or changed metrics after first run. Any necessary input correction requires a separately reviewed, hashed amendment before affected scoring."
+  }
+}
