@@ -256,14 +256,11 @@ _NAMES = "|".join(SECRET_NAMES)
 SECRET_NAME = re.compile(r"\b(?:" + _NAMES + r")\b")
 SECRET_EXPANSION = re.compile(r"\$\{?!?(?:" + _NAMES + r")\b")
 SECRET_LOOKUP = re.compile(r"(?:environ|getenv|process\.env|ENV\[)[^;\n]{0,40}\b(?:" + _NAMES + r")\b")
-# Every inventory `pointer_variables` name (tests/test_secret_path_guard.py checks each), with an optional suffix of a number
-# or one letter: a further paper account's pointer is PAPER_ENV_FILE_2, and paper account C's is PAPER_ENV_FILE_C. Without the
-# suffix group the word boundary after PAPER_ENV_FILE failed before `_2`, so a reader, a redirect or a `source` on
-# "$PAPER_ENV_FILE_2" passed while the account-1 forms were blocked; `_` is a word character (Doc/library/re.rst, `\b` and
-# `\w`), and until 2026-10-11 the group took digits only, so "$PAPER_ENV_FILE_C" passed the same way.
+# Every inventory `pointer_variables` name (tests/test_secret_path_guard.py checks each), with an optional suffix of a number or one letter:
+# PAPER_ENV_FILE_2 (a further paper account) or PAPER_ENV_FILE_C (paper account C). `_` is a word character (CPython Doc/library/re.rst, `\b`),
+# so without the group (until 2026-09-29) or with digits only (until 2026-10-11) a reader or a `source` on such a pointer passed the guard.
 POINTER_VARIABLE = re.compile(
-    r"\$\{?(?:PAPER_ENV_FILE|ENV_FILE|SEC_CONTACT_ENV|PIT_ALPACA_ENV_PATH|PIT_SEC_ENV_PATH|HF_TOKEN_PATH)"
-    r"(?:_(?:[0-9]+|[A-Z]))?\b")
+    r"\$\{?(?:PAPER_ENV_FILE|ENV_FILE|SEC_CONTACT_ENV|PIT_ALPACA_ENV_PATH|PIT_SEC_ENV_PATH|HF_TOKEN_PATH)(?:_(?:[0-9]+|[A-Z]))?\b")
 # The Hugging Face home itself (or everything in it) as a reader's operand: a recursive search or a
 # copy of it includes both token files. Its subdirectories such as hub/ stay readable.
 HF_HOME_ROOT = re.compile(r"(?:(?:\.cache|XDG_CACHE_HOME)\}?/huggingface\}?|^\$\{?HF_HOME\}?)(?:/\**)?$")
