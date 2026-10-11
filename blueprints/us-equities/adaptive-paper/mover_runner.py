@@ -15,6 +15,17 @@ adaptive lane. Receipts carry no account id, balance or credential.
 """
 from __future__ import annotations
 
+from runtime_lock import RuntimeLockError, runtime_read_lock, runtime_read_locked
+
+if __name__ == "__main__":
+    try:
+        _runtime_cli_guard = runtime_read_lock()
+        _runtime_cli_guard.__enter__()
+    except RuntimeLockError:
+        import sys
+        print("refused: canonical runtime lock unavailable", file=sys.stderr)
+        raise SystemExit(2)
+
 import argparse
 import asyncio
 from collections import Counter
@@ -1069,6 +1080,7 @@ def build_parser():
     return parser
 
 
+@runtime_read_locked
 def main(argv=None):
     global LAST_OUTPUT
     args = build_parser().parse_args(argv)
