@@ -705,6 +705,19 @@ def usable_judgment(data, family, order, packet_sha256, leaked_inputs=None, entr
         return LEAK
     if data.get("family") != family or data.get("order") != order:
         return "family or order does not match its file name"
+    if {"provider", "provider_base_url", "pass_through"} & set(data):
+        # CC 2026-10-11T00:19Z: the transport decision's sealer rule also applies to
+        # adjudication (docs/decisions/2026-10-10-codex-lane-omniroute.md:4-13).
+        # Native records omit all transport fields; a partial OmniRoute record is not native.
+        if (family != "openai" or data.get("provider") != "omniroute"
+                or data.get("pass_through") != codex_lane.OMNIROUTE_PASS_THROUGH):
+            return "missing or invalid OmniRoute transport disclosure"
+        try:
+            endpoint = codex_lane.omniroute_endpoint(data.get("provider_base_url"))
+        except ValueError:
+            return "invalid OmniRoute provider endpoint"
+        if data.get("provider_base_url") != endpoint:
+            return "noncanonical OmniRoute provider endpoint"
     if entry is not None and (data.get("layer") != entry.get("layer")
                               or data.get("input_path") != (entry.get("inputs") or {}).get(order)
                               or data.get("input_sha256") != (entry.get("input_sha256") or {}).get(order)):
@@ -1529,6 +1542,7 @@ def assemble_layer(work_dir: Path, entry: dict, leaked_inputs=frozenset()):
     count. Every judgment of an input whose current content has a recorded leak (either family) is dropped."""
     name, packet_sha256 = entry["layer"], entry["packet_sha256"]
     judgments, whys, refs, notes, provenances, repos = [], [], set(), [], [], set()
+    disclosure = None
     content_positions = positions_from_content(work_dir, entry)
     leaked_orders = [order for order in ORDERS
                      if input_key((entry.get("inputs") or {}).get(order)) in leaked_inputs]
@@ -1564,6 +1578,10 @@ def assemble_layer(work_dir: Path, entry: dict, leaked_inputs=frozenset()):
                 "refuting_votes": 1 if refuter["refuted"] else 0,
                 "judge": {"model": data.get("model"), "family": family},
                 "stripped_packet_sha256": packet_sha256})
+            if data.get("provider") == "omniroute":
+                # Each counted judgment passed the exact disclosure check above. Carry it
+                # outside provenance, which must remain equal between native Claude and Codex.
+                disclosure = {field: data[field] for field in ("provider", "pass_through")}
             whys.append(f"{family} {order}: {' '.join(judge['why'].split())}"
                         + (f" [refuted: {' '.join(refuter['reason'].split())}]" if refuter["refuted"] else ""))
             refs.update(relative_ref(ref, data.get("repo")) for ref in judge["evidence_refs"] + refuter["evidence_refs"])
@@ -1588,6 +1606,8 @@ def assemble_layer(work_dir: Path, entry: dict, leaked_inputs=frozenset()):
                 f"; no judgment of a leaked input counts")
     record = {"winner_lane": winner, "why": head + ". " + " | ".join(whys) if whys else head,
               "evidence_refs": sorted(refs), "judgments": judgments}
+    if disclosure is not None:
+        record["disclosure"] = disclosure
     record["_repos"] = sorted(repos)
     # Every counted judgment must have run under one recorded provenance; assemble stamps it on the record.
     distinct = {json.dumps(item, sort_keys=True) for item in provenances}

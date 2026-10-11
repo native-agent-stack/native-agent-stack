@@ -1780,10 +1780,15 @@ python3 tools/sota-convergence/adjudicate.py assemble --work-dir W --out W/adjud
 - **`codex`:** runs one judge and one refuter per input through `codex exec` with `codex_lane.ISOLATION_ARGS`
   (no user config, hooks or web search) and the strict schemas `adjudication-judge.schema.json` and
   `adjudication-refute.schema.json`. It refuses a repository under any `.git`, retries once, resumes, and
-  writes a blind audit. `--model` is required and must match the openai pattern in `scripts/landscape.py`
+  writes a blind audit. `--provider native` is the default; explicit `--provider omniroute` reuses the
+  verdict lane's keyless transport, with optional `--omniroute-base-url` restricted to its validated
+  loopback `/v1` endpoint. OmniRoute judgments record `provider`, canonical `provider_base_url` and the
+  exact `pass_through` disclosure from the [transport decision](../../docs/decisions/2026-10-10-codex-lane-omniroute.md).
+  Assembly requires that disclosure and carries `provider` and `pass_through` in the verdict's
+  `disclosure` block, outside the common family provenance. `--model` is required and must match the openai pattern in `scripts/landscape.py`
   `FAMILY_MODEL_PATTERNS` (exit 2 otherwise). It is passed to `codex exec -m` and recorded on each judgment
   ahead of the event-stream model name, the same order `codex_lane.py` uses. Resume skips a judgment only when
-  it is usable and was made with this `--model`.
+  it is usable and was made with this `--model`, provider, endpoint, disclosure and code provenance.
 - **`adjudication-lane.js`:** the Claude family's judge and refuter, one pair per input. Both run as the
   `blind-adjudicator` role, vendored from agent-lab e070125 as `examples/claude-native/agents/blind-adjudicator.md`
   and installed user-level by the recipe's step-3 copy of `adoption/agents/claude/blind-adjudicator.md`.

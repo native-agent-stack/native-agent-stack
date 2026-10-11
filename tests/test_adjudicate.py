@@ -536,6 +536,17 @@ class CodexTests(AdjudicateFixture):
     def judgment_file(self, order):
         return self.work / "adjudication-judgments" / "codex" / f"{NAME}.{order}.json"
 
+    def collect_native_claude_judgments(self):
+        entry = next(e for e in adjudicate.load_index(self.work)["layers"] if e["layer"] == NAME)
+        codex_side = {order: "B" if adjudicate.claude_position(entry, order) == "A" else "A" for order in adjudicate.ORDERS}
+        adjudicate.claude_args(self.work, self.repo)
+        result = {"snapshot_id": self.snapshot_id(), "items": [{"name": NAME, "order": order, "packet_sha256": self.sha,
+                             "judge": {"preferred": codex_side[order], "why": WHY,
+                                       "evidence_refs": ["evidence/receipt.json"]},
+                             "refuter": {"refuted": False, "reason": "holds", "evidence_refs": []}}
+                            for order in adjudicate.ORDERS]}
+        self.assertEqual(adjudicate.collect_claude(self.work, self.as_workflow(result), "claude-opus-5-5"), [])
+
     def test_every_omniroute_judgment_discloses_its_transport_outside_provenance(self):
         # CC 2026-10-10T23:17Z ruling: each OmniRoute record, a failed call's included, names provider=omniroute, its
         # canonical endpoint and the exact not-attested disclosure at the top level; provenance stays the one both
@@ -592,21 +603,85 @@ class CodexTests(AdjudicateFixture):
         self.assertFalse(self.argv_log.exists())
 
     def test_an_omniroute_codex_judgment_assembles_with_a_native_claude_judgment(self):
-        # The disclosure stays outside provenance, so both families' judgments still assemble under one provenance.
+        # CC 2026-10-11T00:19Z: accepted transport disclosure survives assembly outside the shared provenance.
+        for endpoint in ("http://127.0.0.1:21128/v1", "http://localhost:21128/v1", "http://[::1]:21128/v1"):
+            with self.subTest(endpoint=endpoint):
+                self.assertEqual(adjudicate.codex_lane.omniroute_endpoint(endpoint), endpoint)
+                self.assertEqual(self.run_codex(provider="omniroute", base_url=endpoint)[0], 0)
+                self.collect_native_claude_judgments()
+                code, err, record = self.assemble()
+                self.assertEqual(code, 0, err)
+                self.assertEqual(self.assert_valid(record)["tally"], {"claude": 1, "codex": 3})
+                self.assertEqual(record.get("disclosure"), {"provider": "omniroute",
+                                                           "pass_through": adjudicate.codex_lane.OMNIROUTE_PASS_THROUGH})
+                self.assertEqual(record["provenance"], adjudicate.adjudication_provenance(repo=self.repo))
+
+    def test_assembly_refuses_an_omniroute_judgment_without_its_exact_disclosure(self):
+        # CC 2026-10-11T00:19Z: judge/refuter returns without the exact disclosure cannot count at assembly.
         self.assertEqual(self.run_codex(provider="omniroute", base_url="http://127.0.0.1:21128/v1")[0], 0)
-        entry = next(e for e in adjudicate.load_index(self.work)["layers"] if e["layer"] == NAME)
-        codex_side = {order: "B" if adjudicate.claude_position(entry, order) == "A" else "A" for order in adjudicate.ORDERS}
-        adjudicate.claude_args(self.work, self.repo)
-        result = {"snapshot_id": self.snapshot_id(), "items": [{"name": NAME, "order": order, "packet_sha256": self.sha,
-                             "judge": {"preferred": codex_side[order], "why": WHY,
-                                       "evidence_refs": ["evidence/receipt.json"]},
-                             "refuter": {"refuted": False, "reason": "holds", "evidence_refs": []}}
-                            for order in adjudicate.ORDERS]}
-        self.assertEqual(adjudicate.collect_claude(self.work, self.as_workflow(result), "claude-opus-5-5"), [])
+        self.collect_native_claude_judgments()
+        mutations = [(("provider",), {}), (("pass_through",), {}), (("provider", "pass_through"), {}),
+                     ((), {"provider": "native"}), ((), {"pass_through": "attested"}),
+                     ((), {"pass_through": self.PASS_THROUGH + " "}),
+                     (("provider_base_url",), {}), ((), {"provider_base_url": "http://gateway.example/v1"}),
+                     ((), {"provider_base_url": "http://127.0.0.1:21128/v1/"}),
+                     ((), {"provider_base_url": "HTTP://LOCALHOST:21128/v1"})]
+        for order in adjudicate.ORDERS:
+            original = json.loads(self.judgment_file(order).read_text(encoding="utf-8"))
+            for removed, changed in mutations:
+                with self.subTest(order=order, removed=removed, changed=changed):
+                    modified = {key: value for key, value in original.items() if key not in removed}
+                    modified.update(changed)
+                    # The bound endpoint independently marks this as an OmniRoute return even if both
+                    # disclosure fields were dropped; no provider or model is contacted by these fixtures.
+                    if "provider_base_url" not in removed and "provider_base_url" not in changed:
+                        self.assertEqual(modified["provider_base_url"], "http://127.0.0.1:21128/v1")
+                    adjudicate.write_json(self.judgment_file(order), modified)
+                    try:
+                        code, err, record = self.assemble()
+                        # Assembly retains its usual split record for a missing presentation order;
+                        # the invalid judgment itself must be refused and must never supply a vote.
+                        self.assertEqual(code, 0, err)
+                        self.assertIn(f"openai {order}", err)
+                        self.assertIn("OmniRoute", err)
+                        self.assertIsNone(record["winner_lane"])
+                        self.assertEqual(record["missing_families"], ["openai"])
+                        self.assertEqual(len(record["judgments"]), 3)
+                        counted = [item for item in record["judgments"] if item["judge"]["family"] == "openai"]
+                        self.assertEqual(len(counted), 1)
+                        entry = next(e for e in adjudicate.load_index(self.work)["layers"] if e["layer"] == NAME)
+                        self.assertNotEqual(counted[0]["claude_position"], adjudicate.claude_position(entry, order))
+                    finally:
+                        adjudicate.write_json(self.judgment_file(order), original)
+
+    def test_native_assembly_keeps_its_serialized_contract_without_disclosure(self):
+        # The full native artifact, including its serialization, is the pre-disclosure contract at fc86624c.
+        self.assertEqual(self.run_codex()[0], 0)
+        self.collect_native_claude_judgments()
         code, err, record = self.assemble()
         self.assertEqual(code, 0, err)
-        self.assertEqual(self.assert_valid(record)["tally"], {"claude": 1, "codex": 3})
-        self.assertEqual(record["provenance"], adjudicate.adjudication_provenance(repo=self.repo))
+        self.assertNotIn("disclosure", record)
+        entry = next(e for e in adjudicate.load_index(self.work)["layers"] if e["layer"] == NAME)
+        positions = {order: adjudicate.claude_position(entry, order) for order in ("AB", "BA")}
+        expected_judgments = []
+        for family, model in (("anthropic", "claude-opus-5-5"), ("openai", "gpt-6-astra")):
+            for order in ("AB", "BA"):
+                preferred = ("B" if positions[order] == "A" else "A") if family == "anthropic" else "B"
+                expected_judgments.append({
+                    "claude_position": positions[order], "preferred_position": preferred,
+                    "preferred_lane": "claude" if preferred == positions[order] else "codex",
+                    "refuting_votes": 0, "judge": {"model": model, "family": family},
+                    "stripped_packet_sha256": self.sha})
+        expected = {
+            "winner_lane": None,
+            "why": "split: the judgments chose different lanes. " + " | ".join(
+                f"{family} {order}: {WHY}" for family in ("anthropic", "openai") for order in ("AB", "BA")),
+            "evidence_refs": ["evidence/receipt.json"], "judgments": expected_judgments,
+            "lane_returns_sha256": entry["lane_returns_sha256"],
+            "provenance": adjudicate.adjudication_provenance(repo=self.repo),
+        }
+        artifact = self.base / "adjudications" / f"{NAME}.json"
+        self.assertEqual(artifact.read_bytes(), (json.dumps(expected, indent=1, sort_keys=True) + "\n").encode("utf-8"))
 
     def test_omniroute_provider_reaches_both_judge_and_refuter(self):
         # Exercise the same parsed namespace the CLI supplies, so the pre-flag runner
