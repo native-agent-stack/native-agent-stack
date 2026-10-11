@@ -63,12 +63,16 @@ and the grammar that names a tag are deferred to phase B by the plan owner's rul
 verification also remains deferred; phase A reports it explicitly as not-checked, never as a GitHub code citation.
 
 Budgets: at most 64 recognized citation occurrences are checked per body (excess rows are not-checked), and at most
-256 HTTP requests per run, including redirect hops and PR retrieval. The first rate limit stops all further requests;
+256 data rows plus one exact omission row are reported. Entry text and other row display fields retain at most
+1024 characters each, with an ellipsis and note; spans refer to the original input. Omitted rows are indeterminate
+and are not verified. At most 256 HTTP requests are sent per run, including redirect hops and PR retrieval.
+The first rate limit stops all further requests;
 remaining rows are unavailable. Raw contents are discarded after counting lines and computing the blob, so cached
 files retain only those measurements and headers. The JSON report records the limits.
 
 Output. A JSON report (stdout, or --report) with one row per recognized citation occurrence, one diagnostic per
-unrecognized candidate (including repository/package pins), and one per entry with no candidate, and a Markdown
+unrecognized candidate (including repository/package pins), and one per entry with no candidate within the row
+budget, followed by an exact omission count when needed, and a Markdown
 summary appended to $GITHUB_STEP_SUMMARY when it is set (and written to --summary). --mode report always exits 0.
 --mode enforce exits 1 on any failure status, 3 when nothing failed but something is unavailable, and 0 otherwise.
 A missing or empty section is reported (section.present false) and exits 0, because the required sota-sources job
@@ -109,6 +113,11 @@ MAX_JSON_BYTES = 32 * 1024 * 1024
 MAX_ERROR_BYTES = 64 * 1024
 MAX_CITATIONS = 64
 MAX_REQUESTS = 256
+# Bounds on report data, separate from the HTTP/recognized-occurrence budget.
+# At most MAX_ROWS data rows plus one exact omission row are serialized.
+MAX_ROWS = 256
+MAX_ENTRY_CHARS = 1024
+MAX_ROW_FIELD_CHARS = 1024
 # A raw file has at most one line per byte. Bound numeric tokens before int(): CPython's default conversion
 # limit is 4300 digits, python/cpython@f6650f9ad73359051f3e558c2431a109bc016664:Include/internal/pycore_long.h:L29
 # (_PY_LONG_DEFAULT_MAX_STR_DIGITS). Zero padding is removed before this local file-size bound is applied.
@@ -812,19 +821,42 @@ def unchecked_kind(text):
     return "no code citation"
 
 
+def bound_row_text(row):
+    """Bound repeated display strings; spans and verification refer to the original input."""
+    truncated = False
+    for key, value in row.items():
+        limit = MAX_ENTRY_CHARS if key == "entry" else MAX_ROW_FIELD_CHARS
+        if isinstance(value, str) and len(value) > limit:
+            row[key] = value[:limit - 1] + "…"
+            truncated = True
+    row["notes"] = [note[:MAX_ROW_FIELD_CHARS - 1] + "…" if len(note) > MAX_ROW_FIELD_CHARS else note
+                    for note in row["notes"]]
+    if truncated:
+        row["notes"].append("display text truncated; spans refer to original input")
+    return row
+
+
 def verify_body(body, github):
     """(section content, rows): each recognized occurrence, each unrecognized candidate, and candidate-free entries.
 
-    The per-body cap counts recognized occurrences, including repetitions; excess occurrences retain a row.
+    The citation budget counts recognized occurrences, including repetitions. The separate report budget
+    counts every data row; excess rows are counted in one indeterminate omission row and never checked.
     """
     content = sota_section_content(body)
     rows = []
     checked = 0
+    omitted = 0
     for entry in parse_entries(content):
         candidates = citation_candidates(entry.text)
         if not candidates:
+            if len(rows) >= MAX_ROWS:
+                omitted += 1
+                continue
             rows.append(settle(new_row(entry), NOT_CHECKED, f"not checked in phase A: {unchecked_kind(entry.text)}"))
         for span, citation, candidate in candidates:
+            if len(rows) >= MAX_ROWS:
+                omitted += 1
+                continue
             if citation is None:
                 row = new_row(entry)
                 row["citation"] = candidate
@@ -842,7 +874,11 @@ def verify_body(body, github):
             else:
                 checked += 1
                 rows.append(verify_citation(row, citation, github))
-    return content, rows
+    if omitted:
+        row = new_row(Entry("", "unknown"))
+        row["omitted_rows"] = omitted
+        rows.append(settle(row, UNAVAILABLE, f"report row limit ({MAX_ROWS} data rows): {omitted} rows omitted"))
+    return content, [bound_row_text(row) for row in rows]
 
 
 def exit_code(rows, mode, error=None, error_transient=False):
@@ -893,12 +929,23 @@ def code_cell(text, limit=160):
 
 def markdown(report):
     counts = report["counts"]
-    checked = sum(n for status, n in counts.items() if status != NOT_CHECKED)
-    tally = ", ".join(f"{n} {status}" for status, n in counts.items() if status != NOT_CHECKED) or "none"
+    code_counts = dict(counts)
+    code_counts[UNAVAILABLE] = code_counts.get(UNAVAILABLE, 0) - sum(
+        bool(row.get("omitted_rows")) for row in report["rows"])
+    checked = sum(n for status, n in code_counts.items() if status != NOT_CHECKED)
+    tally = ", ".join(f"{n} {status}" for status, n in sorted(code_counts.items())
+                      if status != NOT_CHECKED and n) or "none"
     lines = ["## SOTA sources: code citations (W1b phase A)", "",
              f"Mode `{report['mode']}`, exit {report['exit_code']}. {checked} code citations ({tally}); "
              f"{counts.get(NOT_CHECKED, 0)} entries not checked in phase A. {report['requests']} GitHub REST requests.",
              ""]
+    if report.get("omitted_rows"):
+        lines += [f"Report limited: {report['omitted_rows']} rows omitted; their outcomes are indeterminate.", ""]
+    limits = report.get("limits", {})
+    if "rows" in limits:
+        lines += [f"Report bounds: {limits['rows']} data rows plus one omission row; "
+                  f"{limits['entry_characters']} entry characters and {limits['row_field_characters']} "
+                  "characters per other display field. Spans refer to the original input.", ""]
     if report["error"]:
         lines += [f"The description could not be read: {cell(report['error'])}.", ""]
     elif not report["section"]["present"]:
@@ -958,7 +1005,10 @@ def main(argv=None, fetch=None):
         "checked_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "api_version": API_VERSION,
         "requests": github.requests,
-        "limits": {"citations": MAX_CITATIONS, "requests": github.max_requests},
+        "limits": {"citations": MAX_CITATIONS, "requests": github.max_requests,
+                   "rows": MAX_ROWS, "omission_rows": 1, "entry_characters": MAX_ENTRY_CHARS,
+                   "row_field_characters": MAX_ROW_FIELD_CHARS},
+        "omitted_rows": sum(row.get("omitted_rows", 0) for row in rows),
         "error": error,
         "section": {"present": bool(content), "characters": len(content)},
         "counts": dict(sorted(collections.Counter(row["status"] for row in rows).items())),
@@ -980,7 +1030,7 @@ def main(argv=None, fetch=None):
             handle.write(summary)
     if error:
         print(f"verify_sources: {error}", file=sys.stderr)
-    print(f"verify_sources: {sum(row['status'] != NOT_CHECKED for row in rows)} code citations "
+    print(f"verify_sources: {sum(row['status'] != NOT_CHECKED and not row.get('omitted_rows') for row in rows)} code citations "
           f"{report['counts']}; mode {mode}, exit {code}", file=sys.stderr)
     return code
 

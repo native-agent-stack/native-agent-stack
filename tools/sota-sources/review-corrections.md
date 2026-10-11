@@ -228,10 +228,13 @@ full_name, existing keys migrate to that id; later aliases reuse the first metad
 and tip snapshot. No undocumented id-based request route is used: numeric ids are
 internal cache identities, and requests keep documented owner/name endpoints.
 The case and moving-rename controls fail on 20eac579 with intended ancestry and
-snapshot assertions. The original learned-cache-key alias control instead failed
-through an unrouted metadata request; the prior "no router errors" claim was wrong.
-Its current fixture routes both metadata spellings as well as all endpoint spellings,
-so the replay reaches the intended nine-requests-versus-five assertion at 20eac579.
+snapshot assertions. Exact replay of both the original 17e6789c learned-cache-key
+fixture and the 82c86da6 fixture against 20eac579 reaches the intended **9 != 5**
+request-count assertion, one failure and zero errors. The intervening statement
+that the original failed through an unrouted metadata request was incorrect.
+The separate case/URL-form preservation test (then test_verify_sources_micro.py:296)
+instead fails at 20eac579 through an unrouted mixed-case commit request. It is a
+post-fix preservation control, not claimed as an intended ancestry/cache fail-before.
 Existing same-origin/foreign-origin redirect and hop controls still apply.
 The public lychee metadata and .git-suffix recheck are retained: canonical200,
 suffix metadata404 and suffix blob404. Thus .git is not stripped or conflated absent
@@ -299,3 +302,39 @@ Current proof packet:
 It retains all cited sources byte-exact under `prior-packet/`, new troubleshooting
 capture, original CC micro, current threads, fail-before replay and precise baseline
 table scopes, with a complete `MANIFEST.sha256`. Prior sealed packets are unchanged.
+
+## Final adjudicated repair at 82c86da6: bounded report rows
+
+Codex 4241763767 and the CC's final-round ruling identify repeated paragraph text
+in unlimited diagnostics and recognized-occurrence rows. MAX_ROWS now permits
+256 data rows plus one exact omitted-count row, covering diagnostics and
+candidate-free entries as well as recognized occurrences. Omitted rows cannot
+send requests and are indeterminate: report mode remains advisory, while enforce
+returns 3 unless an established failure already requires 1. MAX_ENTRY_CHARS and
+MAX_ROW_FIELD_CHARS retain at most 1,024 characters per display string with an
+ellipsis/note. Spans describe the original input; display truncation never changes
+verification or the 64 recognized-occurrence/256-request budgets.
+
+The encoder mechanism is python/cpython v3.13.16 at
+cbc944f4bc59639a444dd971c737788ba2283a91:Lib/json/encoder.py
+(_iterencode_list and _iterencode_dict). It serializes each repeated row value;
+the local report budgets prevent that amplification before serialization rather
+than claiming a vendor-defined row limit. JSON records every limit and the exact
+omitted count; Markdown exposes those limits and separates omissions from checked
+citations. No grammar, HTTP classification, compare or cache mechanism is replaced.
+
+Seven permanent row-budget methods replayed on exact 82c86da6 produce six intended
+assertion failures and zero errors; the exact-boundary preservation method passes.
+The actual CLI's 1,000-token malformed paragraph serializes 6,557,147 bytes before
+the fix and violates the 30,000-byte test ceiling. The corrected fixed-budget
+controls cover diagnostics, repetitions, candidate-free entries, display strings,
+the existing citation budget and actual CLI limit metadata. They also establish
+that omitted work remains indeterminate and sends no additional requests.
+
+The first local harness invocation had a wrong keyword for run_main and produced
+one test-harness error; it is excluded from defect evidence. The corrected replay
+above uses the helper's supported environment argument and artificial empty tokens.
+The receipt-only correction above follows exact original/current fixture replay;
+no manufactured Markdown-wording test is claimed. Wider joiners, the compare clause
+and optional occurrence-wording refinements remain PR-body Follow-ups under the
+CC's final adjudication.

@@ -294,6 +294,9 @@ class MicroTests(unittest.TestCase):
         self.assertEqual(sum(key[0].endswith("/commits/master") for key, _, _ in fake.calls), 1)
 
     def test_case_and_url_forms_share_keys_but_ref_path_and_git_suffix_do_not(self):
+        # Preservation control. At 20eac579 this fixture stops on an unrouted
+        # mixed-case commit lookup, so it is not an intended identity fail-before.
+        # The separately routed case-alias and learned-key tests prove that fix.
         rows, fake = verify([AT_FORM, URL_FORM.replace("lycheeverse/lychee", "Lycheeverse/Lychee"),
                              URL_FORM.replace("https://github.com", "http://www.GitHub.com")])
         self.assertEqual([r["status"] for r in rows], ["ok"] * 3)

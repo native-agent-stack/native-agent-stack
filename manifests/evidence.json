@@ -61537,13 +61537,18 @@
     },
     {
       "path": "tests/test_verify_sources_micro.py",
-      "sha256": "27f2ca00e03f0d3d36cc7eb55b89dc84116e361edfb9bb40abc87153899ba997",
-      "bytes": 19138
+      "sha256": "8b3c803d7ea3d281a01431937482dd25e4690b7170c82b902c713f220083c691",
+      "bytes": 19380
     },
     {
       "path": "tests/test_verify_sources_review.py",
       "sha256": "9bc99ee901e6ac95d4e000e402434d6bc3e570b09d4147a228107421fa9fc4a2",
       "bytes": 10525
+    },
+    {
+      "path": "tests/test_verify_sources_row_limits.py",
+      "sha256": "d49f34160c9bc266a6c0ef0e9970e2f14f8fcce9e5b4777011ff036363c78d1a",
+      "bytes": 4042
     },
     {
       "path": "tests/test_windows_terminal_defaults.py",
@@ -62097,13 +62102,13 @@
     },
     {
       "path": "tools/sota-sources/review-corrections.md",
-      "sha256": "7eaf23677dcc5b26c15ece2a67cbde55f391055acf020392451ffdd0f7ed0679",
-      "bytes": 20403
+      "sha256": "9a78acff1862b0d4dd31e8359b0072c012715b1c9e98b894c86121b9717bde19",
+      "bytes": 23007
     },
     {
       "path": "tools/sota-sources/verify_sources.py",
-      "sha256": "588d13fb8d68dd8dbc78474cc9372d88890eb24020e73e31f474ec8600bd250c",
-      "bytes": 49340
+      "sha256": "304a2a9ba0f6e2b7974fa1d4595822306481b752470ee24879883aefa5ea7082",
+      "bytes": 52071
     },
     {
       "path": "tools/token-e2e/README.md",
