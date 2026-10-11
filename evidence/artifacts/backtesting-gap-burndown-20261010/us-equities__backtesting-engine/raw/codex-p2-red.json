@@ -1,18 +1,16 @@
 {
+  "schema_version": 1,
   "source_head": "6f7de645e66666792d5d5180c917582a1cc5bf5c",
-  "command": [
-    ".runtime/cc979-ci/bin/python",
-    "-m",
-    "unittest",
-    "tests.test_backtesting_gap_burndown.FailureBoundaryTests.test_clean_checkout_driver_invokes_all_modes_without_mutating_captures",
-    "tests.test_backtesting_gap_burndown.CloseoutRegressionTests.test_mechanics_citations_bind_native_execution_of_current_harness",
-    "-v"
-  ],
+  "committed_test_head": "663349f68191e0c74aeac88e5d929bf9f096ee1d",
+  "test_source_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/sources/codex-p2-red-committed-tests.py",
+  "test_source_sha256": "f88867d4a0a1e0229fa02e65fbe69b634c7837041d497698f41475aea73e0c16",
+  "command": "Run the two selected committed tests over git-show production modules and gap 0/9 receipts at 6f7de645; source identity is the corrected 663349f6 mechanics bytes as that test expects. In-memory adapters preserve main() signatures; no filesystem checkout or mutation.",
+  "observed_utc": "2026-10-11T09:52:11Z",
   "observed_exit_code": 1,
-  "observed_utc": "2026-10-11T08:50:08Z",
-  "test_source_sha256": "c6f1f90d90b3bd3ac5fa7382e806681ee4193f581b9157220ff29724e22525dc",
-  "output": "test_clean_checkout_driver_invokes_all_modes_without_mutating_captures (tests.test_backtesting_gap_burndown.FailureBoundaryTests.test_clean_checkout_driver_invokes_all_modes_without_mutating_captures) ... FAIL\ntest_mechanics_citations_bind_native_execution_of_current_harness (tests.test_backtesting_gap_burndown.CloseoutRegressionTests.test_mechanics_citations_bind_native_execution_of_current_harness) ... FAIL\n\n======================================================================\nFAIL: test_clean_checkout_driver_invokes_all_modes_without_mutating_captures (tests.test_backtesting_gap_burndown.FailureBoundaryTests.test_clean_checkout_driver_invokes_all_modes_without_mutating_captures)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/tests/test_backtesting_gap_burndown.py\", line 44, in test_clean_checkout_driver_invokes_all_modes_without_mutating_captures\n    self.assertEqual(module.main(), 0, \"tracked verdicts must not prevent fresh comparator execution\")\nAssertionError: 1 != 0 : tracked verdicts must not prevent fresh comparator execution\n\n======================================================================\nFAIL: test_mechanics_citations_bind_native_execution_of_current_harness (tests.test_backtesting_gap_burndown.CloseoutRegressionTests.test_mechanics_citations_bind_native_execution_of_current_harness)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/tests/test_backtesting_gap_burndown.py\", line 138, in test_mechanics_citations_bind_native_execution_of_current_harness\n    self.assertTrue(any(r.get(\"observed_exit_code\") == 0 and any(\nAssertionError: False is not true : gap citations need native execution of the current harness, not only an old-run projection\n\n----------------------------------------------------------------------\nRan 2 tests in 0.006s\n\nFAILED (failures=2)\n",
-  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-  "stderr_sha256": "a94accdce9beb0a0edcd4edbf7f2c963b59e5f026c300e160363b27ca8d84acb",
-  "evidence_class": "synthetic defect assertions; no native execution"
+  "failures": 2,
+  "errors": 0,
+  "output": "test_clean_checkout_driver_invokes_all_modes_without_mutating_captures (committed_red.FailureBoundaryTests.test_clean_checkout_driver_invokes_all_modes_without_mutating_captures) ... FAIL\ntest_mechanics_citations_bind_native_execution_of_current_harness (committed_red.CloseoutRegressionTests.test_mechanics_citations_bind_native_execution_of_current_harness) ... FAIL\n\n======================================================================\nFAIL: test_clean_checkout_driver_invokes_all_modes_without_mutating_captures (committed_red.FailureBoundaryTests.test_clean_checkout_driver_invokes_all_modes_without_mutating_captures)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/tests/test_backtesting_gap_burndown.py\", line 44, in test_clean_checkout_driver_invokes_all_modes_without_mutating_captures\n    def test_relative_inputs_are_resolved_in_callers_directory(self):\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 1 != 0 : tracked verdicts must not prevent fresh comparator execution\n\n======================================================================\nFAIL: test_mechanics_citations_bind_native_execution_of_current_harness (committed_red.CloseoutRegressionTests.test_mechanics_citations_bind_native_execution_of_current_harness)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/tests/test_backtesting_gap_burndown.py\", line 174, in test_mechanics_citations_bind_native_execution_of_current_harness\n    name = path.name.removesuffix(\".verdict.json\")\n    ...<2 lines>...\n    return SimpleNamespace(returncode=0 if name == \"accepted-v2-lean-data\" else 1)\nAssertionError: False is not true : gap citations need native execution of the current harness, not only an old-run projection\n\n----------------------------------------------------------------------\nRan 2 tests in 0.020s\n\nFAILED (failures=2)\n",
+  "output_sha256": "ef224daa13641a9a3fe000be6247fcdbed3a455cc081575bbd2814a71501c33b",
+  "supersedes_draft_receipt_sha256": "c83b1d2e39f0c521d1c77b09fd86a0f4870d9d1a834c6c0dd5818d6cfb473151",
+  "scope": "Re-recorded fail-before using exact committed test bytes; draft capture remains in the immutable previous packet."
 }

@@ -52,6 +52,14 @@ native denial events and no fills. Gap 0/9 citations use this rerun; older captu
 and projections remain historical evidence. Unmodified primary results and
 per-case outputs are retained in the cited packet rather than only by hash.
 
+The latest source-bound native run is
+`raw/native-fee-margin-mechanics-fill-validated-20261011.json`, using harness
+`e844bde8aee6dd224751c0238dce0b4e07d63f7ff931020ade261b0caebe277a`.
+Each completed case has two nonzero round-trip fills, expected configured fees,
+reconciled native cash and zero denials/errors; the refusal has zero fills and
+two denials. Gap 0/9 cite this latest run. Earlier runs retain their actual source
+identity and cannot establish execution of a later harness.
+
 LEAN source 985ef30ad3ac774218c5ac516b4cb0aa2655730f was exported into an ignored
 build directory. Microsoft .NET SDK 10.0.401 was downloaded from official metadata
 and SHA-512 checked. The initial upstream test command lacked ICU, then encountered
@@ -107,11 +115,32 @@ with `MANIFEST.sha256`: pinned vendor/repository blobs, historical captures,
 original full failed build output, actual replay/mechanics primaries, LEAN TRX
 and fresh comparator outputs unchanged. Registered repository hashes bind
 committed evidence; the attachment manifest authenticates local primaries.
+The updated correction packet is
+`~/.local/state/native-agent-stack/coordination/ns2604-coop/lanes/engine-qual.pr979-final-corrections-20261011/`,
+with its own MANIFEST.sha256 and the immutable prior packet under base/.
+Historical recorder bytes are registered at raw/sources/record-6705aa5c.py;
+all 28 references bind the Git blob and SHA-256, surviving a squash. Four
+unrecoverable-input receipts are explicitly historical drafts. codex-p2-red.json
+is re-recorded with retained committed test bytes f88867d4 from 663349f6; the
+draft receipt remains in the prior packet. New correction-test bytes are retained
+with their own red receipt, and the checkout inverse reproduces actual hash drift.
 Native text captures retain byte hashes under the artifact directory's Git
 attributes (`-text`, whitespace lint disabled); the bounded build tail is explicitly
 marked as a projection, with its original commitment retained.
 
 Sources:
+
+- CPython v3.12.4 at `8e8a4baf652f6e1cee7acde9d78c4b6154539748`:
+  <https://github.com/python/cpython/blob/8e8a4baf652f6e1cee7acde9d78c4b6154539748/Lib/tempfile.py>
+  (`gettempdir`:313 and `mkdtemp`:360), Lib/pathlib.py:690,1228
+  (`is_relative_to` and `resolve`), Doc/library/tempfile.rst and pathlib.rst.
+  These pinned sources are retained unchanged in the current packet. Both default
+  and explicit output parents are resolved and checked before creation; caller-relative
+  input paths are resolved before the child's cwd changes. Every refusal mode also
+  requires its retained execution counts. Completed native cases require two
+  nonzero round-trip fills, the configured commission per fill and a reconciled
+  economic cash transition; empty/flat cases refuse. Cross-checkout regression
+  uses Git's native autocrlf checkout and an absent-attribute control showing drift.
 
 - nautechsystems/nautilus_trader@`1b0a49d2792a9432a3aca3fcb617ce7a630d905e`:
   `crates/backtest/src/exchange.rs:686,1639`,

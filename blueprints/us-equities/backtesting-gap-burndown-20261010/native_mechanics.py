@@ -30,6 +30,25 @@ def project_result(name, target, account, result):
         raise ValueError("unexpected_native_denial")
     if result["engine_log_scan"].get("error_lines") != 0:
         raise ValueError("native_engine_errors")
+    if status == "completed":
+        # The unchanged fixture is a two-fill round trip. Empty/flat runs do not
+        # exercise venue models (spy-parity/fixture_strategy.py:245 and run.py:544).
+        commission = {"one-fixed-fee": Decimal("1"), "two-margin-zero": Decimal("0"),
+                      "two-margin-fixed-fee": Decimal("1")}.get(name)
+        if commission is None:
+            raise ValueError("unknown_mechanics_case")
+        fills = result["fills"]
+        if (len(fills) != 2 or [f["side"] for f in fills] != ["BUY", "SELL"] or
+                Decimal(str(fills[0]["quantity"])) <= 0 or
+                Decimal(str(fills[0]["quantity"])) + Decimal(str(fills[1]["quantity"])) != 0):
+            raise ValueError("expected_native_fills_not_exercised")
+        if (Decimal(result["fees_usd"]) != commission * len(fills) or
+                any(Decimal(f["fee"]) != commission for f in fills)):
+            raise ValueError("expected_native_fees_not_charged")
+        if (not result["cash_ledger"] or
+                Decimal(result["cash_ledger"][-1]["cash"]) != Decimal(result["native_end_cash_usd"]) or
+                Decimal(result["native_end_cash_usd"]) == Decimal("100000")):
+            raise ValueError("native_economic_transition_missing")
     return {"id": name, "status": status, "target": target, "account_type": account,
             "native_fills": result["fills"], "native_account_events": result["native_account_event_rows"],
             "native_end_cash": result["native_end_cash_usd"], "native_fees": result["fees_usd"],

@@ -1,0 +1,12 @@
+{
+  "command": "Run actual core.autocrlf=true add/checkout-index with the pre-fix empty attribute rule in a temporary Git repository; no production file changed.",
+  "observed_utc": "2026-10-11T09:52:13Z",
+  "observed_exit_code": 1,
+  "failures": 1,
+  "errors": 0,
+  "test_source_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/sources/cross-checkout-tests-40deacdd.py",
+  "test_source_sha256": "40deacdd8427ae07f14817318eb7e9d143f74dd12e6d1377ed30cb738d05d35b",
+  "output": "test_cross_checkout_preserves_captured_bytes_with_autocrlf (tests.test_backtesting_gap_burndown.CloseoutRegressionTests.test_cross_checkout_preserves_captured_bytes_with_autocrlf) ... FAIL\n\n======================================================================\nFAIL: test_cross_checkout_preserves_captured_bytes_with_autocrlf (tests.test_backtesting_gap_burndown.CloseoutRegressionTests.test_cross_checkout_preserves_captured_bytes_with_autocrlf)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/tests/test_backtesting_gap_burndown.py\", line 274, in test_cross_checkout_preserves_captured_bytes_with_autocrlf\n    self.assertEqual(hashlib.sha256(checked_out(attributes)).hexdigest(), hashlib.sha256(capture).hexdigest())\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 'a0f9ae852ed0b38c7d3c64fd4128d77a57b8ea943a5956417ccc94591f89df36' != '4ead4cb47cdf7334020cdf166a9651926a5163a3527d7c664d7bbacb0f45c331'\n- a0f9ae852ed0b38c7d3c64fd4128d77a57b8ea943a5956417ccc94591f89df36\n+ 4ead4cb47cdf7334020cdf166a9651926a5163a3527d7c664d7bbacb0f45c331\n\n\n----------------------------------------------------------------------\nRan 1 test in 0.020s\n\nFAILED (failures=1)\n",
+  "output_sha256": "5ead59be154930e2595bbb3a2f0959f16ee7355f9a631a5642f6b8c230b7c891",
+  "scope": "Native Git checkout inverse; verifies checkout-dependent hash drift on the actual capture bytes."
+}

@@ -46,7 +46,10 @@
     "recorder_source": {
       "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
       "pin": "e957df3367ef32289254d5c946415fd92c02960c",
-      "path": "blueprints/us-equities/backtesting-gap-burndown-20261010/record.py:50-60"
+      "path": "blueprints/us-equities/backtesting-gap-burndown-20261010/record.py:50-60",
+      "blob_sha1": "6705aa5cf2fae8e01f937ca05e080affa22b0b28",
+      "sha256": "28b1e441b55bc0f9f247bd665f3ddb0c68cfba7b32048ffa0d61ab3332b2bd19",
+      "retained_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/sources/record-6705aa5c.py"
     },
     "omitted_variable_names": [
       "PATH",

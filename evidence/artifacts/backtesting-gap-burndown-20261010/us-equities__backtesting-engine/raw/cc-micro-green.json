@@ -1,0 +1,35 @@
+{
+  "observed_utc": "2026-10-11T09:56:20Z",
+  "base_head": "663349f68191e0c74aeac88e5d929bf9f096ee1d",
+  "test_source_sha256": "40deacdd8427ae07f14817318eb7e9d143f74dd12e6d1377ed30cb738d05d35b",
+  "runs": [
+    {
+      "command": ".runtime/cc979-ci/bin/python -m unittest tests.test_backtesting_gap_burndown tests.test_gap_closeouts tests.test_component_matrix tests.test_new_host_grand_list",
+      "observed_exit_code": 0,
+      "tests_passed": 156,
+      "stdout_sha256": "0aa3a55b2784ae774b8d6182a5a70f3bd3e18df0404c1feb3faa393ea66bda6a",
+      "stderr_sha256": "b039c24b310f992f9dd30d95038eaea0754da0c65bb0d589d6350fa7909246f2"
+    },
+    {
+      "command": ".runtime/cc979-ci/bin/python -m unittest tests.test_spy_parity tests.test_nautilus_equity_replay",
+      "observed_exit_code": 0,
+      "tests_passed": 187,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "eeaec50879395e6584b4574ec0a7b4c206dce6490ab179ecffcf0214a97e9cff"
+    },
+    {
+      "command": ".runtime/cc979-ci/bin/python scripts/component_matrix.py --check",
+      "observed_exit_code": 0,
+      "rows": 32,
+      "stdout_sha256": "08ce4f275c99b7f91a141cfca5b7384f060aacf620f23a324cde692d55e6ffcd"
+    },
+    {
+      "command": ".runtime/cc979-ci/bin/python scripts/new_host_grand_list.py --check",
+      "observed_exit_code": 0,
+      "layers": 32,
+      "winners": 66,
+      "stdout_sha256": "63d8d8221f6c7c051149b1405ef5de7623dbb2d37257fad49a8a774b02d49226"
+    }
+  ],
+  "scope": "Observed focused tests and supported generator checks; full discovery remains with hosted CI."
+}

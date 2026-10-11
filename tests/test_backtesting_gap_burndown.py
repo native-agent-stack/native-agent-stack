@@ -8,6 +8,8 @@ import hashlib
 from pathlib import Path
 import sys
 import tempfile
+import os
+import subprocess
 from types import SimpleNamespace
 import unittest
 from unittest import mock
@@ -26,6 +28,71 @@ def load(name):
 
 
 class FailureBoundaryTests(unittest.TestCase):
+    def test_default_inside_checkout_is_refused_before_launch(self):
+        module = load("execute_comparators")
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "checkout"
+            root.mkdir()
+            with mock.patch.object(module, "ROOT", root), mock.patch.dict(os.environ, {"TMPDIR": str(root)}), \
+                 mock.patch.object(module.tempfile, "tempdir", None), \
+                 mock.patch.object(module.subprocess, "run") as process, \
+                 mock.patch.object(sys, "argv", ["comparators", "--data", tmp, "--fresh", tmp]), \
+                 contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+                self.assertEqual(module.main(), 1)
+                process.assert_not_called()
+            self.assertEqual(list(root.iterdir()), [], "refusal must precede creation inside the checkout")
+
+    def test_relative_inputs_are_resolved_in_callers_directory(self):
+        module = load("execute_comparators")
+        with tempfile.TemporaryDirectory() as tmp:
+            caller = Path(tmp)
+            calls = []
+            def run(command, **kwargs):
+                calls.append(command)
+                p = Path(command[command.index("--verdict") + 1])
+                p.write_bytes((BASE / "raw" / p.name).read_bytes())
+                return SimpleNamespace(returncode=0 if p.name.startswith("accepted-v2-lean-data") else 1)
+            previous = Path.cwd()
+            try:
+                os.chdir(caller)
+                with mock.patch.object(module.subprocess, "run", side_effect=run), \
+                     mock.patch.object(sys, "argv", ["comparators", "--data", "data", "--fresh", "fresh", "--output", "output"]), \
+                     contextlib.redirect_stdout(io.StringIO()):
+                    self.assertEqual(module.main(), 0)
+            finally:
+                os.chdir(previous)
+            self.assertEqual(Path(calls[0][calls[0].index("--lean-data") + 1]), caller / "data")
+            self.assertEqual(Path(calls[2][calls[2].index("--bars") + 1]), caller / "fresh/converted-rows.private.json")
+            self.assertEqual(Path(calls[3][calls[3].index("--receipt") + 1]), caller / "fresh/receipt.json")
+
+    def test_each_refusal_requires_its_full_execution_counts(self):
+        module = load("execute_comparators")
+        for name in ("accepted-v2-bars", "accepted-v2-no-attribution"):
+            original = json.loads((BASE / "raw" / (name + ".verdict.json")).read_text())
+            with tempfile.TemporaryDirectory() as tmp:
+                for counts in (None, {"pass": 0, "fail": 0, "skipped": 0}):
+                    verdict = dict(original)
+                    if counts is None:
+                        verdict.pop("execution_checks")
+                    else:
+                        verdict["execution_checks"] = counts
+                    p = Path(tmp) / "verdict.json"
+                    p.write_text(json.dumps(verdict))
+                    with self.assertRaises((KeyError, ValueError)):
+                        module.validate_verdict(name, p)
+
+    def test_every_completed_case_requires_fills_and_charged_fees(self):
+        module = load("native_mechanics")
+        observed = {"fills": [], "native_end_cash_usd": "100000.00", "native_account_event_rows": [],
+                    "distribution_module": {"emissions": []}, "order_events": [],
+                    "cash_ledger": [], "engine_log_scan": {"error_lines": 0}, "fees_usd": "0"}
+        for name, target, account in (("one-fixed-fee", "1", "CASH"), ("two-margin-zero", "2", "MARGIN"),
+                                      ("two-margin-fixed-fee", "2", "MARGIN")):
+            with self.assertRaisesRegex(ValueError, "native_fills"):
+                module.project_result(name, target, account, observed)
+        observed["fills"] = [{"side": "BUY", "quantity": 1, "fee": "0"}, {"side": "SELL", "quantity": -1, "fee": "0"}]
+        with self.assertRaisesRegex(ValueError, "native_fees"):
+            module.project_result("one-fixed-fee", "1", "CASH", observed)
     def test_clean_checkout_driver_invokes_all_modes_without_mutating_captures(self):
         module = load("execute_comparators")
         before = {p: hashlib.sha256(p.read_bytes()).hexdigest() for p in (BASE / "raw").glob("*.verdict.json")}
@@ -163,6 +230,49 @@ class FailureBoundaryTests(unittest.TestCase):
 
 
 class CloseoutRegressionTests(unittest.TestCase):
+    def test_path_semantics_cite_pinned_cpython(self):
+        readme = (BLUEPRINT / "README.md").read_text()
+        self.assertIn("https://github.com/python/cpython", readme)
+        self.assertIn("8e8a4baf652f6e1cee7acde9d78c4b6154539748", readme)
+
+    def test_recorder_sources_have_retained_bytes_and_blob_identity(self):
+        for p in (BASE / "raw").glob("*.json"):
+            receipt = json.loads(p.read_text())
+            source = receipt.get("environment_record", {}).get("recorder_source")
+            if source is None:
+                continue
+            self.assertIn("blob_sha1", source, "a transient PR commit alone is not durable source provenance")
+            data = (ROOT / source["retained_path"]).read_bytes()
+            self.assertEqual(hashlib.sha256(data).hexdigest(), source["sha256"])
+            self.assertEqual(hashlib.sha1(b"blob " + str(len(data)).encode() + b"\0" + data).hexdigest(), source["blob_sha1"])
+
+    def test_unrecoverable_input_receipts_are_historical_drafts(self):
+        for name in ("green-matrix-wave-join", "green-matrix-wave-join-2", "red-matrix-wave-join", "native-fee-margin-mechanics"):
+            receipt = json.loads((BASE / "raw" / (name + ".json")).read_text())
+            self.assertEqual(receipt.get("provenance_status"), "historical_draft")
+
+    def test_cited_red_test_bytes_are_retained(self):
+        receipt = json.loads((BASE / "raw/codex-p2-red.json").read_text())
+        self.assertIn("test_source_path", receipt, "a draft test hash must have retained bytes")
+        self.assertEqual(hashlib.sha256((ROOT / receipt["test_source_path"]).read_bytes()).hexdigest(),
+                         receipt["test_source_sha256"])
+
+    def test_cross_checkout_preserves_captured_bytes_with_autocrlf(self):
+        attributes = (BASE / ".gitattributes").read_bytes()
+        capture = (BASE / "raw/native-fee-margin-mechanics-2.stdout.txt").read_bytes()
+        def checked_out(rule):
+            with tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                subprocess.run(["git", "init", "-q", str(root)], check=True, capture_output=True)
+                (root / ".gitattributes").write_bytes(rule)
+                (root / "capture.txt").write_bytes(capture)
+                subprocess.run(["git", "-C", str(root), "-c", "core.attributesFile=/dev/null", "-c", "core.autocrlf=true", "add", "--", ".gitattributes", "capture.txt"], check=True, capture_output=True)
+                (root / "capture.txt").unlink()
+                subprocess.run(["git", "-C", str(root), "-c", "core.attributesFile=/dev/null", "-c", "core.autocrlf=true", "checkout-index", "--", "capture.txt"], check=True, capture_output=True)
+                return (root / "capture.txt").read_bytes()
+        self.assertNotEqual(hashlib.sha256(checked_out(b"")).hexdigest(), hashlib.sha256(capture).hexdigest(),
+                            "control must demonstrate pre-fix checkout drift")
+        self.assertEqual(hashlib.sha256(checked_out(attributes)).hexdigest(), hashlib.sha256(capture).hexdigest())
     def test_mechanics_citations_bind_native_execution_of_current_harness(self):
         current = hashlib.sha256((BLUEPRINT / "native_mechanics.py").read_bytes()).hexdigest()
         for index in (0, 9):
@@ -244,11 +354,13 @@ class NativeSummaryTests(unittest.TestCase):
         spec.loader.exec_module(module)
         # Schema from spy-parity/run.py:663-698. The runner publishes an end
         # balance and event rows, never a native_account_totals summary field.
-        observed = {"fills": [], "native_end_cash_usd": "100000.00", "native_account_event_rows": [],
+        observed = {"fills": [{"side": "BUY", "quantity": 1, "fee": "1"},
+                               {"side": "SELL", "quantity": -1, "fee": "1"}],
+                    "native_end_cash_usd": "99998.00", "native_account_event_rows": [],
                     "distribution_module": {"emissions": []}, "order_events": [],
-                    "cash_ledger": [], "engine_log_scan": {"error_lines": 0}, "fees_usd": "0"}
-        projected = module.project_result("cash-refusal", "4", "CASH", observed)
-        self.assertEqual(projected["native_end_cash"], "100000.00")
+                    "cash_ledger": [{"cash": "99998.00"}], "engine_log_scan": {"error_lines": 0}, "fees_usd": "2"}
+        projected = module.project_result("one-fixed-fee", "1", "CASH", observed)
+        self.assertEqual(projected["native_end_cash"], "99998.00")
         self.assertEqual(projected["native_account_events"], [])
         self.assertFalse(projected["qualifies_frozen_stress_case"])
 

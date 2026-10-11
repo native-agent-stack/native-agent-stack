@@ -14,7 +14,7 @@
   "raw_outputs": [
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/lean-alpaca-model-tests-py312.json",
-      "sha256": "86ad713a8aa2dbcc0d9f8384e553184976338f6c700a430fdef8fedb785c1558"
+      "sha256": "c84ba7e3249e1ef0c3bf3874bcf3040e03e881b2260566829f65910d78fd54c4"
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/lean-alpaca-model-tests-py312.stderr.txt",

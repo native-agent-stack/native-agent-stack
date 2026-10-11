@@ -10,11 +10,11 @@
   "settles_gap": "partially",
   "review_status": "proposed; shared closeout record governs review credit",
   "evidence_class": "local_integration",
-  "result": "Accepted one_zero comparator and fresh native execution reproduce; frozen stress/margin/adaptive mappings remain blocked. Corrected current harness rerun on 2026-10-11 exits 0, with three completed cases and one native denial-backed expected refusal; primary results retained in the hashed attachment packet.",
+  "result": "Accepted one_zero comparator and fresh native execution reproduce; frozen stress/margin/adaptive mappings remain blocked. Corrected current harness rerun on 2026-10-11 exits 0, with three completed cases and one native denial-backed expected refusal; primary results retained in the hashed attachment packet. Latest rerun also requires nonempty round-trip fills, per-fill configured fees and native cash reconciliation; all three completed cases satisfy them.",
   "raw_outputs": [
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-lean-data.json",
-      "sha256": "95ae9cdbee66db1c6c33825a8d1ccccea4b303e5b7571824d9f097cbd5d01791"
+      "sha256": "ae136766ef3e790d0eae2c66ff3907797bb98dc0ee5c9745e289b83faa106065"
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-lean-data.stderr.txt",
@@ -30,7 +30,7 @@
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/fresh-native-v2.json",
-      "sha256": "7c441ab96bfaf1e383b5f2ad7a2a184d060d5d26720c7ee576414b6881d64178"
+      "sha256": "dce2cd2004cb3af27f0195ca770ca089153a298d36cf94911a24226aff1f3a28"
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/fresh-native-v2.stderr.txt",
@@ -53,8 +53,8 @@
       "sha256": "630b960079377d5da7c392e7802b69cdd848cd5859e807fe1775f9c7347f8314"
     },
     {
-      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/native-fee-margin-mechanics-corrected-20261011.json",
-      "sha256": "519e1a29e784ca5e0a48b3ebf50511797392811751d3f51c2e81b6280919fd87"
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/native-fee-margin-mechanics-fill-validated-20261011.json",
+      "sha256": "987a7f43c8dc7c2280df027eb5957ac20d117972766c6beb06382e48940143db"
     }
   ],
   "checked_at": "2026-10-10",

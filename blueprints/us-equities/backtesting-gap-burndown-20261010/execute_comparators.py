@@ -4,6 +4,8 @@ The fresh replay is diagnostic: it cannot reset the reviewed-first-run gate.
 Reference: spy-parity/compare.py at native-agent-stack 8bffa2c41692ef483e91b68e3b15aeb331423d2c.
 This execution driver grants no gap credit. Use scripts/host_receipts.py for
 command recording and the shared gap-closeouts loader for dispositions.
+Path/temp semantics: CPython v3.12.4 at 8e8a4baf652f6e1cee7acde9d78c4b6154539748,
+Lib/tempfile.py:313,360 and Lib/pathlib.py:690,1228 (retained with the packet).
 """
 
 import argparse
@@ -26,6 +28,12 @@ EXPECTED_CHECKS = {
     "accepted-v2-bars": {("precondition_hashes", "inputs_at_comparison", "SKIPPED")},
     "fresh-native-v2": {("precondition_review", "no_prior_replay_ran_the_reviewed_harness", "FAIL")},
 }
+EXPECTED_EXECUTION = {
+    "accepted-v2-lean-data": {"pass": 106, "fail": 0, "skipped": 0},
+    "accepted-v2-bars": {"pass": 106, "fail": 0, "skipped": 0},
+    "accepted-v2-no-attribution": {"pass": 92, "fail": 0, "skipped": 3},
+    "fresh-native-v2": {"pass": 106, "fail": 0, "skipped": 0},
+}
 
 
 def validate_verdict(name, path):
@@ -40,6 +48,8 @@ def validate_verdict(name, path):
     failures = {(check["id"], check["field"], check["status"]) for check in checks if check["status"] != "PASS"}
     if failures != EXPECTED_CHECKS[name]:
         raise ValueError("unexpected_comparator_check_set:" + name)
+    if verdict["execution_checks"] != EXPECTED_EXECUTION[name]:
+        raise ValueError("comparator_execution_incomplete:" + name)
     if name == "accepted-v2-lean-data":
         if (verdict["verdict"] != "PASS" or not verdict["complete"] or
                 verdict["execution_checks"] != {"pass": 106, "fail": 0, "skipped": 0}):
@@ -58,11 +68,19 @@ def main():
     parser.add_argument("--output", type=Path,
                         help="New output directory outside the checkout; defaults to a fresh temporary directory")
     args = parser.parse_args()
+    # Resolve caller-relative inputs before any child changes to ROOT.
+    args.data = args.data.expanduser().resolve()
+    args.fresh = args.fresh.expanduser().resolve()
+    checkout = ROOT.resolve()
     if args.output is None:
-        output = Path(tempfile.mkdtemp(prefix="backtesting-comparators-"))
+        parent = Path(tempfile.gettempdir()).resolve()
+        if parent.is_relative_to(checkout):
+            print("comparator temporary parent must be outside the checkout", file=sys.stderr)
+            return 1
+        output = Path(tempfile.mkdtemp(prefix="backtesting-comparators-", dir=parent)).resolve()
     else:
-        output = args.output.resolve()
-        if output.is_relative_to(ROOT):
+        output = args.output.expanduser().resolve()
+        if output.is_relative_to(checkout):
             print("comparator output must be outside the checkout", file=sys.stderr)
             return 1
         try:
