@@ -100,3 +100,39 @@ effort gate. Judge/refuter remain held for #992; the single landscape repair is 
 Alternatives rejected: inferring completed supersession from repeated labels, hiding counters or mismatches,
 redacting every UUID indiscriminately, and treating requested max as measured max-only effort. Revisit this choice
 only against a future client's primary source and a reproduced run, preserving the full original evidence.
+
+## Completed native repair and final effort acceptance
+
+The ONE CC-authorized repair completed at 2026-10-11T02:23Z. Re-execution proves all 118 prior completed calls
+replayed and only the approved fit call appended. The 245-line prefix is byte-equal; the final journal has exactly
+247 lines (one new started/result pair), SHA-256
+`4b34a664f56145c3a285b013f6ca2abd2f4c59d257825a49b842c580164efe47`.
+The new key is `v2:56c965af13485b93c3a4c1ee72e748f7b17810161d8f9ebf8b442f9642a1077c`, new agent
+`aab7e4ff6c231f5ee`, superseding mixed-effort `ab5674e67ae285517`. Its native first prompt matches the approved
+prompt, and the replayed result equals the final native result. Extended proof SHA-256:
+`4d28bec0326f9493fc278e07291363485582cce924f3bd814c93af5ba8f05f3d`.
+The thirteen-pair contract hashes to `89faaeceb995aad15a7069a295e6b38c2d4530fca1431bd726ca662e37ffa2a5`.
+
+The unchanged native usage tool measures the new child as claude-opus-5-5, 42 requests, efforts `[max]`.
+`usage_record.py` exits **0**, preserving native raw exit **1**, with 106 active children and 21 superseded
+attempts: all 127 native attempts remain. The old mixed child's 33 requests and `[max, low]` effort remain intact
+and point to the new max terminal, including in converted `superseded_retained`.
+
+An independent check against a fresh execution of the unchanged native tool exits **0**: every original child
+field is preserved, aggregate model/WebSearch counters are identical to native raw output, raw output hash and
+exit match, both non-max attempts are covered, and none is uncovered. This checks the input proof graph and native
+measurements independently of the wrapper's traversal. Effort-gate receipt SHA-256:
+`322f152f72045e454cc6abd5a15a44c2f8a7c0e206e0f7fe2007cf7eff44973a`.
+The final usage receipt hashes to `bf6c257a5213960e6cf8a16019fcd6fea7d8ff9282fb1b44834650fe86edf373`.
+Native workflow summary counters and full per-child usage are separate counters; they are preserved separately.
+
+Final conversion exits **0** with thirteen layers, 151 proposals, 53 survivor pairs, all 42 GPT-6 copy checks
+matching, and no effort deviations, retained failures or reopened layers. The survivor set is unchanged. The
+supported manifest builder and source-review tool have produced the final external manifest and 52 refreshed
+source reviews. The supported `make_result.check_usage` accepts the actual final usage/returns/layer data.
+These are real retained-run integrations; the 89 focused regressions remain synthetic/local checks.
+
+The template proposal records the lower-effort skill exclusion rule for the next sweep without editing this
+run's frozen inputs or upstream skill declarations. Catalog-owner publication, evidence retention/registration
+and the final ledger append remain separate README11–12 owner actions. Old blind Claude finals remain excluded
+from recording until their post-#993 rerun, and adjudication still waits for #992.
