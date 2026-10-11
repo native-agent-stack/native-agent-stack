@@ -5221,8 +5221,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "e60cc9b27a4badd27215c471d32d8faada3a1deb02b1613e11ecf2c002e83d74",
-      "bytes": 3028
+      "sha256": "76e7349b74dc670fb516b347015e1e6fb64be05ea92cea93d5055f1cbb26d9be",
+      "bytes": 3186
     },
     {
       "path": "CLAUDE.md",
@@ -18709,6 +18709,11 @@
       "path": "docs/decisions/2026-10-11-adjudication-omniroute-transport-binding.md",
       "sha256": "a57c702e99f5f3249ad7b2fb2e6db929ed15bf2545a20bae79bcc6502622f1a8",
       "bytes": 5659
+    },
+    {
+      "path": "docs/decisions/2026-10-11-layer-resolution-protocol.md",
+      "sha256": "a3bab6504f8c3a1ec800998b81f562496e85a1b5d1ca0de070a51352c06936b7",
+      "bytes": 9899
     },
     {
       "path": "docs/direct-results.md",
@@ -62184,6 +62189,11 @@
       "path": "tests/test_research_workflow.py",
       "sha256": "8a723e997644fd795031eb770e788a130d782f5af88792d99771146c5dddb8fe",
       "bytes": 11664
+    },
+    {
+      "path": "tests/test_resolution_protocol_docs.py",
+      "sha256": "28f8b4da676038d6cb9a00a56c613d4ee1a7cbad380700e2014ee6a6dc201f6d",
+      "bytes": 7191
     },
     {
       "path": "tests/test_retrieval_quality_v2.py",
