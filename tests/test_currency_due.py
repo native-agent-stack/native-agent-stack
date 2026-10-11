@@ -188,6 +188,7 @@ class Checkout:
         self.script = self.root / "scripts/currency_due.py"
         self.script.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(ROOT / "scripts/currency_due.py", self.script)
+        shutil.copyfile(ROOT / "scripts/sweep_policy.py", self.script.parent / "sweep_policy.py")
         self.set(STALENESS, staleness_report())
         self.set(PINNED, pinned_report())
         self.set(SATURATION, saturation_report([("foundation/workers", False, "sweep-a")]))

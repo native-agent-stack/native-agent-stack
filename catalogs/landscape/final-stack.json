@@ -4644,7 +4644,7 @@
   },
   "intake": {
     "grand": {
-      "reason": "the committed grand-catalog counts snapshot is W4 PR 3; v1 does not read it",
+      "reason": "future integration path for the grand-catalog counts snapshot (W4 PR 3); v1 does not read it",
       "source": "catalogs/landscape/grand-catalog-counts.json",
       "status": "UNREPORTED"
     },
@@ -4671,7 +4671,7 @@
       "unmatched": []
     },
     "stars": {
-      "reason": "the starred-seeds intake lands with #978; v1 does not read it",
+      "reason": "future integration path for the starred-seeds intake (#978); v1 does not read it",
       "source": "catalogs/convergence-practice/starred-seeds-20261010.json",
       "status": "UNREPORTED"
     }

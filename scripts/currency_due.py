@@ -99,6 +99,11 @@ import tempfile
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
+try:
+    from .sweep_policy import DEFAULT_SWEEP_CADENCE_DAYS
+except ImportError:  # running as a plain script, not a package
+    from sweep_policy import DEFAULT_SWEEP_CADENCE_DAYS
+
 ROOT = Path(__file__).resolve().parents[1]
 STATE_NAME = "native-agent-stack"
 DUE_FILE = "currency-due.json"
@@ -160,9 +165,6 @@ MIN_COUNTS_ROOM = len("1 pin behind")
 XDG_POINTER = f'cat "$XDG_STATE_HOME"/{STATE_NAME}/{DUE_FILE}'
 DETAILS_SCRIPT = "scripts/currency_due.py"
 DETAILS_COMMAND = f"python3 {DETAILS_SCRIPT} --dry-run"
-# recipes/saturation-sweep.md: "Sweep only the due layers, at most monthly"; 30 days is also
-# scripts/receipt_staleness.py's DEFAULT_MAX_AGE_DAYS.
-DEFAULT_SWEEP_CADENCE_DAYS = 30
 # The notice repeats a non-default --sweep-cadence-days in its command; the bound (a hundred years) keeps that short.
 MAX_SWEEP_CADENCE_DAYS = 36500
 # tools/adoption/runtime_skill_freshness.py compare_skill() (:77-81) gives each skill one state. main() (:152) counts

@@ -16,10 +16,11 @@ from unittest import mock
 from scripts import component_matrix as cm
 from scripts import final_stack as fs
 from scripts import host_receipts as hr
+from scripts import host_name_scan
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-COMMIT_A = "a" * 40
-COMMIT_B = "b" * 40
+COMMIT_A = "1" * 40
+COMMIT_B = "2" * 40
 
 
 def _write(path: Path, text: str) -> None:
@@ -145,7 +146,8 @@ class FixtureTestCase(unittest.TestCase):
     @staticmethod
     def run_main(root: Path, *args) -> tuple[int, str]:
         buffer = io.StringIO()
-        with contextlib.redirect_stdout(buffer):
+        with contextlib.redirect_stdout(buffer), mock.patch.dict("os.environ", {
+                host_name_scan.OVERRIDE: '["fixture-private-account"]'}):
             exit_code = fs.main(["--root", str(root), *args])
         return exit_code, buffer.getvalue()
 
@@ -189,6 +191,17 @@ class StatusTests(FixtureTestCase):
         self.assertEqual(layer["status"], "no-winner")
         self.assertIsNone(layer["verdict"]["next_review"])
 
+    def test_reviewed_no_selection_and_empty_recorded_winners_keep_the_review_date(self):
+        for status in ("no_selection", "recorded"):
+            with self.subTest(verdict_status=status):
+                document = self.build(foundation=[_layer("empty", verdict_status=status)],
+                                      sweeps=[_sweep("covered", "2026-09-22", [("foundation", "empty")])])
+                layer = self.layer(document, "empty")
+                self.assertEqual((layer["status"], layer["verdict"]["next_review"]),
+                                 ("no-winner", "2026-10-22"))
+                self.assertEqual(layer["verdict"]["wave_doc"],
+                                 {"path": "catalogs/sota-convergence/layer-verdicts-20260922.json", "sha256": "c" * 64})
+
     def test_a_planned_layer_is_unswept(self):
         document = self.build(foundation=[_layer("layer-a", winners=[_winner("widget")])], planned=[_planned()],
                               sweeps=[_sweep("sweep-0923", "2026-09-23", [("foundation", "layer-a")])])
@@ -227,6 +240,22 @@ class StatusTests(FixtureTestCase):
         self.assertEqual(document["index"]["by_repository"]["github.com/example/kept"],
                          [{"catalog": "foundation", "layer_id": "layer-a", "role": "survivor"}])
 
+    def test_trialled_funnel_deduplicates_positive_measured_evidence_across_roles(self):
+        repository = "https://github.com/example/widget"
+        document = self.build(foundation=[_layer("layer-a",
+            winners=[dict(_winner("widget"), evidence_class="measured_comparison")],
+            alternatives=[{"repository": repository + "/", "evidence_kind": "measured_comparison"}],
+            candidates=[{"repository": repository, "disposition": "measured_tradeoff"}])],
+            stack=[{"id": "widget", "repository": repository, "version": "1.0.0"}])
+        self.assertEqual(self.layer(document, "layer-a")["funnel"],
+                         {"found": 1, "refuted": 0, "surviving": 0, "trialled": 1, "adopted": 1})
+
+    def test_skills_coverage_records_the_completed_lifecycle_sweep(self):
+        document = self.build(sweeps=[_sweep("skills-covered", "2026-09-22", [(fs.SKILLS, "skills-demo")])])
+        coverage = document["coverage"]["skills"]
+        self.assertEqual([(row["layer_id"], row["lifecycle_task"], row["swept"]) for row in coverage],
+                         [("skills-demo", "demo", True)])
+
 
 class DefinitiveTests(FixtureTestCase):
     def setUp(self):
@@ -259,10 +288,16 @@ class DefinitiveTests(FixtureTestCase):
 
     def test_the_layer_argument_narrows_the_question(self):
         answer = fs.is_definitive(self.document, "widget", date(2026, 9, 30), layer="foundation/reopened-layer")
-        self.assertEqual(answer.reason, "untracked")
+        self.assertEqual((bool(answer), answer.reason, answer.layers),
+                         (False, "not-winner", ("foundation/current-layer",)))
+        missing = fs.is_definitive(self.document, "missing", date(2026, 9, 30), layer="foundation/reopened-layer")
+        self.assertEqual((missing.reason, missing.layers), ("untracked", ()))
 
 
 class PinTests(unittest.TestCase):
+    def test_package_names_follow_pep_503_normalization(self):
+        self.assertEqual(fs.canonical_package("Widget_Lib.Name--CLI"), "widget-lib-name-cli")
+
     def test_parse_pin_accepts_only_the_declared_forms(self):
         cases = {
             "2.1.278": {"pin_parsed": {"version": "2.1.278", "commit": None}},
@@ -300,8 +335,55 @@ class PinTests(unittest.TestCase):
         self.assertEqual(fs.compare_pins(parsed(COMMIT_A), parsed("0.44.0")), "unknown")
         self.assertEqual(fs.compare_pins(parsed("unpinned"), parsed("0.44.0")), "unknown")
 
+    def test_identical_commit_pins_compare_equal_through_native_normalization(self):
+        parsed = fs.parse_pin(COMMIT_A)
+        self.assertEqual(hr.normalize_pin(COMMIT_A), COMMIT_A)
+        self.assertEqual(fs.compare_pins(parsed, parsed), "same")
+
 
 class RunTests(FixtureTestCase):
+    def test_unreported_intake_names_future_paths_without_reading_them(self):
+        document = self.build(foundation=[_layer("seeded")])
+        self.assertEqual(document["intake"]["seeds"], {
+            "path": "tools/sota-convergence/landscape-sweep/seeds-20260926.json", "date": "2026-09-26",
+            "total": 1, "by_layer": {"foundation/seeded": 1}, "unmatched": []})
+        for name, source in (("stars", fs.STARS_FILE), ("grand", fs.GRAND_COUNTS_FILE)):
+            with self.subTest(intake=name):
+                entry = document["intake"][name]
+                self.assertEqual((entry["status"], entry["source"]), ("UNREPORTED", source))
+                self.assertIn("future integration path", entry["reason"])
+                self.assertNotIn(source, document["sources"])
+
+    def test_a_subpath_editable_or_virtual_package_is_not_the_lock_root(self):
+        for kind in ("editable", "virtual"):
+            with self.subTest(source_kind=kind):
+                root = self.root()
+                _fixture(root)
+                _write(root / fs.LOCKFILE, _lock({}).replace('virtual = "."', kind + ' = "packages/child"'))
+                with self.assertRaisesRegex(fs.FinalStackError, "expected one root package, found 0"):
+                    fs.build_document(root)
+
+    def test_the_lock_root_accepts_dot_and_ignores_an_editable_child(self):
+        for kind in ("editable", "virtual"):
+            with self.subTest(source_kind=kind):
+                root = self.root()
+                _fixture(root, lock={"helper": "0.1.0"})
+                text = _lock({"helper": "0.1.0"}).replace('virtual = "."', kind + ' = "."')
+                text += '\n[[package]]\nname = "child"\nversion = "0.1.0"\nsource = { editable = "packages/child" }\n'
+                _write(root / fs.LOCKFILE, text)
+                document = fs.build_document(root)
+                self.assertEqual(fs.run_pin(document, "helper")["pin"], "0.1.0")
+                self.assertIsNone(fs.run_pin(document, "child"))
+
+    def test_run_precedence_uses_rank_even_when_records_arrive_out_of_order(self):
+        root = self.root()
+        _fixture(root, stack=[{"id": "widget", "repository": "https://github.com/example/widget", "version": "1.0.0"}],
+                 lock={"widget": "2.0.0"})
+        records = fs.run_records(fs.Sources(root))
+        run = next(run for run in fs.build_runs(list(reversed(records))) if run["id"] == "widget")
+        self.assertEqual((run["pin"], run["source"]), ("2.0.0", fs.LOCKFILE + "#/package/1"))
+        self.assertEqual(run["conflicts"], [{"source": fs.STACK + "#/components/0", "pin": "1.0.0"}])
+
     def test_a_lockfile_pin_beats_the_stack_and_the_conflict_is_listed(self):
         document = self.build(
             us_equities=[_layer("engines", catalog="us-equities", winners=[_winner("data-widget", repository=(
@@ -319,6 +401,20 @@ class RunTests(FixtureTestCase):
         # A requirement with no stack id or declared repository is still a run, keyed by its name.
         self.assertEqual(fs.run_pin(document, "helper")["repository"], None)
         self.assertIsNone(fs.run_pin(document, "nothing-runs-this"))
+
+    def test_same_lock_and_verdict_version_has_no_drift(self):
+        document = self.build(foundation=[_layer("layer-a", winners=[_winner("widget", pin="1.0.0")])],
+                              stack=[{"id": "widget", "repository": "https://github.com/example/widget", "version": "1.0.0"}],
+                              lock={"widget": "1.0.0"})
+        winner = self.layer(document, "layer-a")["winners"][0]
+        self.assertEqual((winner["run"], winner["pin_drift"]), ("widget", "same"))
+        self.assertEqual(fs.run_pin(document, "widget")["source"], fs.LOCKFILE + "#/package/1")
+
+    def test_a_repositoryless_winner_joins_a_repositoryless_run_by_component_id(self):
+        winner = {"component_id": "helper", "repository": None, "pin": "0.1.0"}
+        document = self.build(foundation=[_layer("layer-a", winners=[winner])], lock={"helper": "0.1.0"})
+        joined = self.layer(document, "layer-a")["winners"][0]
+        self.assertEqual((joined["run"], joined["pin_drift"]), ("helper", "same"))
 
     def test_the_linux_pin_file_leads_and_a_differing_macos_pin_is_a_conflict(self):
         document = self.build(
@@ -350,6 +446,17 @@ class RunTests(FixtureTestCase):
         self.assertNotIn("pin_parsed", sdk)
         self.assertEqual((sdk["pin_parse"], sdk["run"], sdk["pin_drift"]), ("unparsed", "sdk", "unknown"))
         self.assertEqual(document["summary"]["pin_parse"], {"parsed": 0, "unpinned": 1, "unparsed": 1})
+
+    def test_unknown_drift_report_names_the_layer_component_and_both_pins(self):
+        root = self.root()
+        verdict = "1.2.9; WalkForward source " + COMMIT_A
+        _fixture(root, foundation=[_layer("layer-a", winners=[_winner("widget", pin=verdict)])],
+                 stack=[{"id": "widget", "repository": "https://github.com/example/widget", "version": "1.7.0"}])
+        self.assertEqual(self.run_main(root, "--write")[0], 0)
+        exit_code, output = self.run_main(root, "--check")
+        self.assertEqual(exit_code, 0, output)
+        self.assertIn("1 winner(s) whose pin drift is unknown", output)
+        self.assertIn("foundation/layer-a widget: verdict " + verdict + ", run 1.7.0", output)
 
     def test_held_external_and_unresolved_reasons(self):
         fixture = dict(foundation=[_layer("layer-a", winners=[_winner("orphan")])], us_equities=[
@@ -415,6 +522,9 @@ class CheckTests(FixtureTestCase):
     def test_a_layer_without_exactly_one_row_fails(self):
         layers = [_layer("layer-a", winners=[_winner("widget")]), _layer("layer-b")]
         cases = {
+            "research-state.json has 2 rows for foundation/layer-a": dict(research=[
+                {"catalog": "foundation", "layer_id": layer_id, "status": "comparison_required"}
+                for layer_id in ("layer-a", "layer-a", "layer-b")]),
             "research-state.json has 0 rows for foundation/layer-b": dict(research=[
                 {"catalog": "foundation", "layer_id": "layer-a", "status": "comparison_required"}]),
             "has no landscape row": dict(research=[
@@ -454,6 +564,50 @@ class CheckTests(FixtureTestCase):
             self.run_main(root, "--write")
         self.assertIn("personal home path", str(raised.exception))
         self.assertFalse((root / fs.OUTPUT).exists())
+
+    def _assert_private_text_is_refused_before_publication(self, payload):
+        root = self.fixture_root()
+        self.assertEqual(self.run_main(root, "--write")[0], 0)
+        output_before = (root / fs.OUTPUT).read_bytes()
+        registry_before = (root / "manifests/evidence.json").read_bytes()
+        catalog = root / "catalogs/landscape/foundation.json"
+        source = json.loads(catalog.read_text(encoding="utf-8"))
+        source["layers"][0]["title"] = "Private note: " + payload
+        _write_json(catalog, source)
+        # These are publication I/O spies; no private output is persisted even
+        # when running the pre-fix generator as a failing-first control.
+        with mock.patch.object(Path, "write_text") as write, mock.patch.object(hr, "register_file") as register:
+            with self.assertRaises(SystemExit) as refused:
+                self.run_main(root, "--write")
+            write.assert_not_called()
+            register.assert_not_called()
+        self.assertNotIn(payload, str(refused.exception))
+        self.assertEqual((root / fs.OUTPUT).read_bytes(), output_before)
+        self.assertEqual((root / "manifests/evidence.json").read_bytes(), registry_before)
+
+    def test_private_email_is_refused_before_write_or_registration(self):
+        self._assert_private_text_is_refused_before_publication("fixture-private@example.invalid")
+
+    def test_explicit_private_account_is_refused_before_write_or_registration(self):
+        self._assert_private_text_is_refused_before_publication("fixture-private-account")
+
+    def test_private_context_failure_preserves_output_and_registration(self):
+        root = self.fixture_root()
+        self.assertEqual(self.run_main(root, "--write")[0], 0)
+        before = ((root / fs.OUTPUT).read_bytes(), (root / "manifests/evidence.json").read_bytes())
+        with mock.patch.object(Path, "write_text") as write, mock.patch.object(hr, "register_file") as register, \
+                mock.patch.object(host_name_scan, "host_names", side_effect=host_name_scan.HostNameScanError("unavailable")):
+            with self.assertRaisesRegex(SystemExit, "private identity context unavailable"):
+                self.run_main(root, "--write")
+            write.assert_not_called()
+            register.assert_not_called()
+        self.assertEqual(((root / fs.OUTPUT).read_bytes(), (root / "manifests/evidence.json").read_bytes()), before)
+
+    def test_builder_does_not_collect_private_host_context(self):
+        root = self.fixture_root()
+        with mock.patch.object(host_name_scan, "host_names", side_effect=AssertionError("host context accessed")):
+            document = fs.build_document(root)
+        self.assertEqual(len(document["layers"]), 1)
 
     def test_inconsistent_documents_are_named(self):
         root = self.fixture_root()
@@ -524,6 +678,30 @@ class CheckTests(FixtureTestCase):
 
 
 class RepositoryTests(unittest.TestCase):
+    def test_serializer_is_the_shared_first_party_callable(self):
+        self.assertIs(fs.serialize, cm.serialize)
+        self.assertEqual(fs.serialize({"z": 1, "a": []}), '{\n  "a": [],\n  "z": 1\n}\n')
+
+    def test_review_days_uses_the_imported_shared_sweep_policy(self):
+        import importlib
+        from scripts import currency_due, sweep_policy
+        try:
+            with mock.patch.object(sweep_policy, "DEFAULT_SWEEP_CADENCE_DAYS", 45):
+                importlib.reload(currency_due)
+                importlib.reload(fs)
+                self.assertEqual((currency_due.DEFAULT_SWEEP_CADENCE_DAYS, fs.REVIEW_DAYS), (45, 45))
+        finally:
+            importlib.reload(currency_due)
+            importlib.reload(fs)
+
+    def test_evidence_contribution_and_hot_file_guides_refresh_and_check_final_stack(self):
+        for relative, writes in (("docs/contributing-evidence.md", 2), ("docs/lanes.md", 1)):
+            with self.subTest(document=relative):
+                document = " ".join((REPO_ROOT / relative).read_text(encoding="utf-8").split())
+                self.assertGreaterEqual(document.count("python3 scripts/final_stack.py --write"), writes)
+                self.assertIn("python3 scripts/final_stack.py --check", document)
+                self.assertIn("catalogs/landscape/final-stack.json", document)
+
     def test_review_days_is_the_sweep_cadence(self):
         from scripts import currency_due
         self.assertEqual(fs.REVIEW_DAYS, currency_due.DEFAULT_SWEEP_CADENCE_DAYS)

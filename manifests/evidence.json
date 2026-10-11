@@ -17167,8 +17167,8 @@
     },
     {
       "path": "catalogs/landscape/final-stack.json",
-      "sha256": "bec35c4130522b9ac8169cc4b040ce87bc9ea3645f602aad9c07607745cfbadb",
-      "bytes": 300325
+      "sha256": "ef551e1690b27af678eade3328c59c97b0f16d76e871b34652dba07b4db9f498",
+      "bytes": 300361
     },
     {
       "path": "catalogs/landscape/foundation.json",
@@ -17797,8 +17797,8 @@
     },
     {
       "path": "docs/contributing-evidence.md",
-      "sha256": "e03014e62d9eaceb179e50870b2e0b4882cf2d0da3ea3d4b52e7c7c62888d269",
-      "bytes": 32926
+      "sha256": "dcf7b0356787c145d8481bf2db7669040f6ba9878f6919317d24b698419967b3",
+      "bytes": 33339
     },
     {
       "path": "docs/convergence-architecture.md",
@@ -18721,6 +18721,11 @@
       "bytes": 5659
     },
     {
+      "path": "docs/decisions/2026-10-11-final-stack-review-corrections.md",
+      "sha256": "eecfeafa1128fd415088d9fb15ad2407adf43706365dbf8623301dc8515f8fdb",
+      "bytes": 12135
+    },
+    {
       "path": "docs/decisions/2026-10-11-layer-resolution-protocol.md",
       "sha256": "a3bab6504f8c3a1ec800998b81f562496e85a1b5d1ca0de070a51352c06936b7",
       "bytes": 9899
@@ -18877,8 +18882,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "ac7d4e04cc111f4b4c335a65faaa69d5ce3925842cb00b44809b99263993ad21",
-      "bytes": 258821
+      "sha256": "09b0a3ecd3bbc4e2dee314739a51d8319718b95724a17acf3696892630b79cd1",
+      "bytes": 260516
     },
     {
       "path": "docs/harness-rule-enforcement.md",
@@ -18927,8 +18932,8 @@
     },
     {
       "path": "docs/lanes.md",
-      "sha256": "36a2c7a6bb52252e04fd836ecd0684fc50a412f0b9226ff179c74e46fe4e31b8",
-      "bytes": 13410
+      "sha256": "a13844c6f680f394357240cd609c1aafb4cd513b7e9674b1ebd4635a842b56cb",
+      "bytes": 13529
     },
     {
       "path": "docs/memory-landscape-maintenance.md",
@@ -60657,8 +60662,8 @@
     },
     {
       "path": "scripts/component_matrix.py",
-      "sha256": "1c77250ae326b2cf7a8ed2dfc05ff8e83914e632960d1c426ae452cd1717642a",
-      "bytes": 80147
+      "sha256": "00294f6b37d4b2dea8828ca574463e6d6dd4ee541351bb6e820594b1709a1cc0",
+      "bytes": 81104
     },
     {
       "path": "scripts/credential_boot_receipt.py",
@@ -60672,8 +60677,8 @@
     },
     {
       "path": "scripts/currency_due.py",
-      "sha256": "ad7aefd8a4ba8c073c133df06796ecd83ee5333f5929f220d21a84fa6bc14e47",
-      "bytes": 57353
+      "sha256": "4a97f4f396c44a42ea8e16862435601a1d446ce2a65e0a7b63306e28d47834e9",
+      "bytes": 57356
     },
     {
       "path": "scripts/env_freshness.py",
@@ -60682,8 +60687,8 @@
     },
     {
       "path": "scripts/final_stack.py",
-      "sha256": "1c78d9da00185981e9d73390b4192427c0fa348a595702e4fbe75ba9fc2ed25d",
-      "bytes": 52913
+      "sha256": "cf337a95c0c6a0c316d00a0421774d6f26ccd57ccb0c01fc936d87dea5d17fc1",
+      "bytes": 53938
     },
     {
       "path": "scripts/freshness_propose.py",
@@ -60794,6 +60799,11 @@
       "path": "scripts/starred_convergence.py",
       "sha256": "37f3b8f5f5409408e20bbadb730adac77d0ed9bb75b22a952d36e6343bb62b24",
       "bytes": 11294
+    },
+    {
+      "path": "scripts/sweep_policy.py",
+      "sha256": "1c8eb192b6b5bf33d1d7b03f34baac6b2193789be87db897fa43239d622d1e18",
+      "bytes": 258
     },
     {
       "path": "scripts/trading_gates.py",
@@ -61522,8 +61532,8 @@
     },
     {
       "path": "tests/test_currency_due.py",
-      "sha256": "6735fe966e1f42f5a32fcffb32a7e311e71a6528c09458f7d6f14a0844db9878",
-      "bytes": 103935
+      "sha256": "ce3848b2b311cfafadde5be1ae6073b319bbcfd28497740199807cd7ca8253aa",
+      "bytes": 104033
     },
     {
       "path": "tests/test_delisting_coverage.py",
@@ -61567,8 +61577,8 @@
     },
     {
       "path": "tests/test_final_stack.py",
-      "sha256": "d18f70d1b7c9b8dc4080d3518aac49afe141a36373b21717bfc3b1867da051ee",
-      "bytes": 32236
+      "sha256": "140f5121d4f514500dde717898c4a480044e0bc27189bba335aa9d8f810ccb15",
+      "bytes": 43656
     },
     {
       "path": "tests/test_financial_data.py",
@@ -61822,8 +61832,8 @@
     },
     {
       "path": "tests/test_local_pages_architecture_landscape_exclusions.py",
-      "sha256": "f380199e1d1d8cfc199ecedc21d03a98d7366c224be4c47eb10861e3c6404e4c",
-      "bytes": 11906
+      "sha256": "8e81ced59b9da8c72a9e3f62cba579713d940c0155a1f8772c74b4c7f6b91f21",
+      "bytes": 13218
     },
     {
       "path": "tests/test_local_pages_architecture_sources.py",
@@ -62777,8 +62787,8 @@
     },
     {
       "path": "tools/local-pages/source_policy.json",
-      "sha256": "566b5794e102e94ed04dd195d6b2c35634d62f89adbedd6beca40bb8701b40c9",
-      "bytes": 758521
+      "sha256": "eaca18ba6743356ddfef880d839ce51c883a3434bb4147a22062e7f9b7f4398c",
+      "bytes": 759323
     },
     {
       "path": "tools/omniroute/gateway_record.py",

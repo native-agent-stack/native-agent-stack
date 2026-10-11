@@ -34,13 +34,16 @@ import sys
 import tomllib
 
 try:
-    from . import component_matrix, host_receipts, saturation_ledger
+    from . import component_matrix, host_receipts, host_name_scan, saturation_ledger
     from .catalog_decisions import InvalidDecisionIndex, safe_file, unique_json
+    from .sweep_policy import DEFAULT_SWEEP_CADENCE_DAYS
 except ImportError:  # running as a plain script, not a package
     import component_matrix
     import host_receipts
+    import host_name_scan
     import saturation_ledger
     from catalog_decisions import InvalidDecisionIndex, safe_file, unique_json
+    from sweep_policy import DEFAULT_SWEEP_CADENCE_DAYS
 
 ROOT = Path(__file__).resolve().parents[1]
 TOOL_DIR = ROOT / "tools" / "sota-convergence"
@@ -73,10 +76,8 @@ SEEDS_DIR = "tools/sota-convergence/landscape-sweep"
 SEEDS_NAME = re.compile(r"seeds-(\d{4})(\d{2})(\d{2})\.json")
 STARS_FILE = "catalogs/convergence-practice/starred-seeds-20261010.json"
 GRAND_COUNTS_FILE = "catalogs/landscape/grand-catalog-counts.json"
-# recipes/saturation-sweep.md sweeps a layer at most monthly: scripts/currency_due.py:156 DEFAULT_SWEEP_CADENCE_DAYS,
-# copied rather than imported so this CI gate does not pull that module's host reads into its closure
-# (tests/test_final_stack.py keeps the two equal).
-REVIEW_DAYS = 30
+# Import the shared policy without pulling currency_due's host-oriented closure into this generator.
+REVIEW_DAYS = DEFAULT_SWEEP_CADENCE_DAYS
 
 # First matching rule wins (see DEFINITIONS); this is also the order of the summary counts.
 STATUS_ORDER = ("unswept", "no-winner", "reopened", "converged", "current")
@@ -338,8 +339,11 @@ def run_records(sources: Sources) -> list[dict]:
 
     lock = sources.toml(LOCKFILE)
     packages = _dicts(lock.get("package"))
+    # uv 0.12.17 (635500036e1705961315e86447f0fab0a8ddb309),
+    # crates/uv-lock/src/lock/mod.rs:3600-3607: editable/virtual roots have the empty
+    # workspace-relative path, serialized as "." in uv.lock; a child path is not the root.
     roots = [package for package in packages if isinstance(package.get("source"), dict)
-             and ("virtual" in package["source"] or "editable" in package["source"])]
+             and any(package["source"].get(kind) == "." for kind in ("virtual", "editable"))]
     if len(roots) != 1:
         raise FinalStackError(f"{LOCKFILE}: expected one root package, found {len(roots)}")
     requirements = sorted({canonical_package(requirement["name"])
@@ -395,6 +399,7 @@ def build_runs(records: list[dict]) -> list[dict]:
     stack_rank = 1 + len(PIN_FILES)
     runs, ids = [], set()
     for members in groups.values():
+        members.sort(key=lambda record: record["rank"])
         chosen = members[0]
         stack_ids = [record["id"] for record in members if record["rank"] == stack_rank]
         run_id = stack_ids[0] if stack_ids else chosen["id"]
@@ -682,9 +687,9 @@ def build_intake(sources: Sources, layers: list[dict]) -> dict:
     return {
         "seeds": seeds,
         "stars": {"status": "UNREPORTED", "source": STARS_FILE,
-                  "reason": "the starred-seeds intake lands with #978; v1 does not read it"},
+                  "reason": "future integration path for the starred-seeds intake (#978); v1 does not read it"},
         "grand": {"status": "UNREPORTED", "source": GRAND_COUNTS_FILE,
-                  "reason": "the committed grand-catalog counts snapshot is W4 PR 3; v1 does not read it"},
+                  "reason": "future integration path for the grand-catalog counts snapshot (W4 PR 3); v1 does not read it"},
     }
 
 
@@ -807,9 +812,13 @@ def is_definitive(document: dict, ident: str, today, *, layer: str | None = None
     next_review on ``today``? True iff it is a winner in a layer whose status is current or converged and today is
     on or before next_review. ``layer`` ("<catalog>/<layer_id>") narrows the question to one layer."""
     today = date.fromisoformat(today) if isinstance(today, str) else today
-    entries = [entry for entry in index_entries(document, ident)
+    tracked = index_entries(document, ident)
+    entries = [entry for entry in tracked
                if layer is None or layer_key(entry["catalog"], entry["layer_id"]) == layer]
     if not entries:
+        if tracked:
+            return Definitive(False, "not-winner",
+                              tuple(sorted({layer_key(entry["catalog"], entry["layer_id"]) for entry in tracked})))
         return Definitive(False, "untracked", ())
     winner_keys = sorted({(entry["catalog"], entry["layer_id"]) for entry in entries if entry["role"] == "winner"})
     if not winner_keys:
@@ -865,7 +874,9 @@ def flags(document: dict, today: date | None) -> dict:
         "pin_drift": [f"{key} {winner['component_id']}: verdict {winner['verdict_pin']}, run "
                       f"{run_pin(document, winner['run'])['pin']}" for key, winner in winners
                       if winner["pin_drift"] == "differs"],
-        "pin_drift_unknown": sum(1 for _key, winner in winners if winner["pin_drift"] == "unknown"),
+        "pin_drift_unknown": [f"{key} {winner['component_id']}: verdict {winner['verdict_pin']}, run "
+                              f"{run_pin(document, winner['run'])['pin']}" for key, winner in winners
+                              if winner["pin_drift"] == "unknown"],
         "past_next_review": stale,
         "today": today.isoformat() if today else None,
     }
@@ -878,8 +889,9 @@ def render_flags(found: dict) -> list[str]:
                          for reason, items in without.items()),
              f"flag (report-only): {len(found['pin_drift'])} winner(s) whose run pin differs from the verdict pin"
              + (": " + "; ".join(found["pin_drift"]) if found["pin_drift"] else ""),
-             f"flag (report-only): {found['pin_drift_unknown']} winner(s) whose pin drift is unknown "
-             "(an unpinned or unparsed pin, or no shared field)"]
+             f"flag (report-only): {len(found['pin_drift_unknown'])} winner(s) whose pin drift is unknown "
+             "(an unpinned or unparsed pin, or no shared field)"
+             + (": " + "; ".join(found["pin_drift_unknown"]) if found["pin_drift_unknown"] else "")]
     if found["past_next_review"] is None:
         lines.append("flag (report-only): next_review not evaluated; pass --today YYYY-MM-DD")
     else:
@@ -890,8 +902,7 @@ def render_flags(found: dict) -> list[str]:
     return lines
 
 
-def serialize(document: dict) -> str:
-    return json.dumps(document, indent=2, sort_keys=True) + "\n"
+serialize = component_matrix.serialize
 
 
 def check_problems(root: Path, document: dict, text: str) -> list[str]:
@@ -938,7 +949,11 @@ def main(argv=None) -> int:
         print(f"final_stack: {error}")
         return 1
     text = serialize(document)
-    component_matrix.assert_no_private_content(text)
+    try:
+        private_names = host_name_scan.host_names(root)
+    except host_name_scan.HostNameScanError:
+        raise SystemExit("final_stack: private identity context unavailable; aborting") from None
+    component_matrix.assert_no_private_content(text, private_names=private_names, reject_email=True)
     status = {"layers": len(document["layers"]), "status_counts": document["summary"]["status"]}
     if args.write:
         (root / OUTPUT).write_text(text, encoding="utf-8")
