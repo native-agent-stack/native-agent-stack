@@ -82,6 +82,14 @@ class ArchitectureSourcesTests(unittest.TestCase):
         self.assertEqual(model["layer_count"], 2)
         self.assertEqual([row["key"] for row in model["layers"]], ["foundation:instructions-skills", "us-equities:market-data-reference"])
 
+    def test_derived_grand_counts_are_excluded_before_supplement_access(self):
+        self.write(self.root, "catalogs/landscape/grand-catalog-counts.json",
+                   {"schema_version": 1, "counts": {"rows": 4606}})
+        result = self.build()
+        self.assertEqual(result["layer_count"], 2)
+        self.assertIn("catalogs/landscape/grand-catalog-counts.json",
+                      [row["path"] for row in result["excluded_supplements"]])
+
     def test_dated_choices_keep_reasons_pins_and_rejections(self):
         self.cc["adoption_program"]["layers"][0]["state"] = "replace every tool"
         self.write(self.state, "coordination/command-center/pages/cc-now.json", self.cc)

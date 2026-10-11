@@ -74,11 +74,14 @@ class CommittedLandscapeSetTests(unittest.TestCase):
     def test_committed_exclusions_name_files_above_the_read_bound_or_without_projected_records(self):
         policy = json.loads(POLICY_PATH.read_text())
         rows = {row["path"]: row for row in policy["architecture_supplement_exclusions"]}
-        self.assertEqual(set(rows), {"catalogs/landscape/grand-catalog-20261008.json",
+        self.assertEqual(set(rows), {"catalogs/landscape/grand-catalog-counts.json",
+                                     "catalogs/landscape/grand-catalog-20261008.json",
                                      "catalogs/landscape/grand-catalog-index-20261008.json"})
         self.assertGreater((ROOT / "catalogs/landscape/grand-catalog-20261008.json").stat().st_size, SOURCES._DOC_LIMIT)
         index = json.loads((ROOT / "catalogs/landscape/grand-catalog-index-20261008.json").read_text())
         self.assertFalse({"layers", "rows", "candidates", "components"} & set(index))
+        counts = json.loads((ROOT / "catalogs/landscape/grand-catalog-counts.json").read_text())
+        self.assertFalse({"layers", "rows", "candidates", "components"} & set(counts))
         provenance = {row["path"]: row for row in policy["architecture_derivation_sources"]}
         for relative in rows:
             self.assertRegex(provenance[relative]["pin"], r"\A[0-9a-f]{40}\Z")
