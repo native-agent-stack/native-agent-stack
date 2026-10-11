@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "kind": "skills_trial_manifest",
-  "checked_at": "2026-10-10",
+  "checked_at": "2026-10-11",
   "decision_record": "docs/decisions/2026-09-25-skills-trial-and-usage.md",
   "cli": {
     "package": "skills",
@@ -755,12 +755,12 @@
     {
       "name": "claude-native-practice",
       "source": "seathatflowsinourveins/native-agent-stack",
-      "url": "https://github.com/seathatflowsinourveins/native-agent-stack/tree/7a6bfbcf0a4f7201c64e5410c2ccbed1b224b511/.claude/skills/claude-native-practice",
-      "ref": "7a6bfbcf0a4f7201c64e5410c2ccbed1b224b511",
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack/tree/c59655c7c85a014b86699240754c382c75a475a6/.claude/skills/claude-native-practice",
+      "ref": "c59655c7c85a014b86699240754c382c75a475a6",
       "path": ".claude/skills/claude-native-practice",
-      "tree_sha": "3a485d2a4bbe63dc1ae54e23101c472d21450b8c",
-      "skill_md_sha256": "a52a24bc7691fa18b3e4c532c6cbd15b79968d82a54acb4202c9fcced2ad8bcb",
-      "skill_md_bytes": 2224,
+      "tree_sha": "f08d0d241b774112bbc1e1f43558e7604e4916b6",
+      "skill_md_sha256": "005288455c9d6a0bd70772847e2bb2411554d90eeabc0aa135af5d12fe99b353",
+      "skill_md_bytes": 2290,
       "description_chars": 349,
       "upstream_disable_model_invocation": false,
       "license": "MIT",

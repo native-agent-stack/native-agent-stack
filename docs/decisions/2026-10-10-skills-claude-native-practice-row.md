@@ -76,3 +76,11 @@ Revisit the 11,000 ceiling when the verdicts of the 2026-10-10 wave's thirteen s
 the on-listed sum then fits, which needs at least 223 characters of listed descriptions retired, and otherwise
 record the margin that remains. The same review keeps or removes this row from the skill's measured use, as the 2026-09-30
 record's measured-invocation rule says.
+
+## Re-pin (2026-10-11)
+
+The row follows the skill to the commit that holds the results of the retirement of the Claude routes in GitHub (#1001), the cross-client source table (#986) and the paired-run results (#1005): `c59655c7c` (a commit of main). Only the
+measured pin fields change, from the commit's own bytes: the ref and the tree URL, tree `f08d0d241b774112bbc1e1f43558e7604e4916b6` (was `3a485d2a4bbe63dc1ae54e23101c472d21450b8c`), `SKILL.md` sha256
+`005288455c9d6a0bd70772847e2bb2411554d90eeabc0aa135af5d12fe99b353` (2,290 bytes, was 2,224). The description is unchanged at 349 characters, so the listing check above and its sums are unchanged, and the row's other fields
+(first-party flag, listing, Codex enablement, audit text, gap text) equal the measured ones. `catalogs/landscape/skills-lifecycle.json` follows the pin of this repository. The skill is not installed by this change: the designated host shell
+installs it by `adoption/skills/lifecycle.md` after the pull request lands, from the new pin (an installed copy at the old pin is stale until then).

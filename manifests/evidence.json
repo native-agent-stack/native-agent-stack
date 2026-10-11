@@ -5621,7 +5621,7 @@
     },
     {
       "path": "adoption/skills/manifest.json",
-      "sha256": "57aa527012ecac84827156a72696d700b812143cd965ea53526e639e91d09ef0",
+      "sha256": "ee097ddab8488079a0e176c8c789dd51473089cc8a3938d95f878a58a2f212a7",
       "bytes": 62359
     },
     {
@@ -17267,7 +17267,7 @@
     },
     {
       "path": "catalogs/landscape/skills-lifecycle.json",
-      "sha256": "7293ca6d2a0aeb348c7021472b163318003132ba7f3cf4f267958be8b157f9f8",
+      "sha256": "b7bf21a3720cd2a546429449faf589402ea6e36c9f7558dbcea909c56d9bfcd8",
       "bytes": 27054
     },
     {
@@ -18707,8 +18707,8 @@
     },
     {
       "path": "docs/decisions/2026-10-10-skills-claude-native-practice-row.md",
-      "sha256": "5d09bcc37df78410545b831c8f73952d6206356695be9cadfaba2bcca381fff6",
-      "bytes": 5864
+      "sha256": "7c7587e0f2ee29ea1bf90976fdbea05fab3a5e41798478b8d91c228664ebf2ca",
+      "bytes": 6936
     },
     {
       "path": "docs/decisions/2026-10-10-starred-repository-convergence.md",
