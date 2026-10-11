@@ -299,8 +299,7 @@
         "Top-level npm packages were version pinned; transitive dependencies resolved at installation time.",
         "Only the named subset was installed. Scoped MCP services, RAG models, persistent memory, terminal interaction and broker integrations need their own host qualification.",
         "Skill repeat installation intentionally returned existing-destination refusal; filesystem linkage does not establish runtime discovery.",
-        "Home paths in this receipt use tilde placeholders; the three historical public client/skill capture files retain synthetic example-account placeholders and their original hashes. No credential values were captured.",
-        "Receipt path placeholders and privacy wording corrected 2026-10-11 to avoid an absolute-home-prefix literal. Original receipt at native-agent-stack 8bffa2c41692ef483e91b68e3b15aeb331423d2c has SHA-256 9d138ccc152d7e110b71e957f55d17a4464fbb29862bc9b2050e4e9df8bbc662. Observed commands, results and all native artifact bytes/hashes are unchanged."
+        "Home paths in three public client/skill logs are normalized to /home/example; no credential values were captured."
       ],
       "path": "evidence/receipts/portable-userspace-install-20260921.json"
     },
@@ -59203,8 +59202,8 @@
     },
     {
       "path": "evidence/receipts/portable-userspace-install-20260921.json",
-      "sha256": "87f64751a0e5dea4ca2f6b83b5c88bfc71f46b86e07213a207fe98d4eb23e301",
-      "bytes": 13145
+      "sha256": "9d138ccc152d7e110b71e957f55d17a4464fbb29862bc9b2050e4e9df8bbc662",
+      "bytes": 12703
     },
     {
       "path": "evidence/receipts/pr765-bindings-amendment-20261006.json",
