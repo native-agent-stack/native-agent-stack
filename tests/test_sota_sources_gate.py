@@ -231,6 +231,7 @@ class GateBehaviourTests(unittest.TestCase):
 # so this file itself carries none of them for scripts/validate.py's own scan.
 SOURCES = "\n\n### SOTA sources\n- https://github.com/o/r at v1.2.3, src/x.py\n"
 HOME = "/" + "home/"
+GRAPH_ID = "home-" + "alice-code-project"  # a graph project id, in the form without a leading dash
 MAX_BODY = 262144  # the gate's own bound, in code points
 PRIVACY_CASES = [
     # (case, body, the rule ids the gate must name; [] means the body passes)
@@ -286,6 +287,19 @@ PRIVACY_CASES = [
      ["windows-user-path", "macos-user-path"]),  # file: ends in a drive-letter shape, as in Python
     ("redundant leading slashes", "///" + "users/alice/x" + SOURCES, ["macos-user-path"]),
     ("a doubled slash inside a URL path passes", "https://example.org/a//" + "users/alice" + SOURCES, []),
+    # The co-op's GPT read of fc60da90: the URL exemption is for a public code host's URL path only. A graph id behind a
+    # loopback, localhost, private or unlisted host, in userinfo or a query, or under an upper-case host is still read.
+    ("a graph id in a loopback URL", "http://127.0.0.1:8788/p/" + GRAPH_ID + SOURCES, ["encoded-home-path"]),
+    ("a graph id in a localhost URL", "https://localhost/p/" + GRAPH_ID + SOURCES, ["encoded-home-path"]),
+    ("a graph id in an IPv6 loopback URL", "http://[::1]/p/" + GRAPH_ID + SOURCES, ["encoded-home-path"]),
+    ("a graph id under a .localhost name", "http://pages.localhost/p/" + GRAPH_ID + SOURCES, ["encoded-home-path"]),
+    ("a graph id in a private-address URL", "http://192.168.1.5:8788/" + GRAPH_ID + SOURCES, ["encoded-home-path"]),
+    ("a graph id on an unlisted public host", "https://example.org/p/" + GRAPH_ID + SOURCES, ["encoded-home-path"]),
+    ("a graph id behind a code host in userinfo", "https://github.com@127.0.0.1/" + GRAPH_ID + SOURCES,
+     ["encoded-home-path"]),
+    ("a graph id in a code host URL's query", "https://github.com/a?u=" + GRAPH_ID + SOURCES, ["encoded-home-path"]),
+    ("a graph id under an upper-case code host", "https://GITHUB.COM/acme/" + GRAPH_ID + SOURCES, ["encoded-home-path"]),
+    ("a repository on a code host's subdomain passes", "https://gist.github.com/acme/" + GRAPH_ID + SOURCES, []),
 ]
 
 # Cases the gate judges beyond validate.py's patterns: decoded or rendered forms, the gate-only macOS rule, and the
@@ -294,6 +308,7 @@ GATE_ONLY_CASES = {"a percent-encoded home path", "a JSON-escaped slash", "a JSO
                    "HTML character references", "a name split by a Markdown link", "a name split by emphasis", "a path split by an inline tag",
                    "a mixed-case macOS home", "a lower-case macOS home", "character references around emphasis",
                    "percent escapes around a link-split name", "a repository named like a graph project passes",
+                   "a repository on a code host's subdomain passes",
                    "a lower-case macOS home in a file URL", "redundant leading slashes"}
 
 
@@ -366,10 +381,15 @@ class GatePrivacyTests(unittest.TestCase):
         dict(validate.PRIVATE_CONTENT)["encoded home path"].search(run)
         self.assertLess(time.monotonic() - start, 5)
         mixed = ("home-a.b-c_d-%2F&#47;**a**\\/" * (MAX_BODY // 27 + 1))[:MAX_BODY - len(SOURCES)]
+        # The co-op's GPT read of fc60da90: a link label that may hold '[' rescans to the end of the body from every
+        # unmatched '[', so 262,144 of them gave no verdict within 125 s.
+        brackets = ["[" * (MAX_BODY - len(SOURCES)), ("![" * MAX_BODY)[:MAX_BODY - len(SOURCES)],
+                    ("[a][" * MAX_BODY)[:MAX_BODY - len(SOURCES)]]
         start = time.monotonic()
-        outcomes = run_check(inline_script(sota_job(GATE)), [body(run + SOURCES), body(mixed + SOURCES)])
+        outcomes = run_check(inline_script(sota_job(GATE)),
+                             [body(text + SOURCES) for text in [run, mixed] + brackets])
         self.assertLess(time.monotonic() - start, 20)
-        self.assertEqual([outcome["failed"] for outcome in outcomes], [None, None])
+        self.assertEqual([outcome["failed"] for outcome in outcomes], [None] * 5)
 
     def test_credential_lengths_agree_with_scripts_validate_at_each_minimum(self):
         # (P2-2) one below, at and one above each rule's minimum length, alone and glued to Unicode word characters.

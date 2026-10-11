@@ -203,10 +203,11 @@ jobs:
             const privacy = [
               ['personal-home-path', rule(String.raw`\/(?:home|Users)\/(?!example(?:\/|${b}))[A-Za-z0-9_.\-]+(?:\/|${b})`)],
               ['windows-user-path', rule(String.raw`(?:[${AZ}]:[\/\\]+|\/[Mm][Nn][Tt]\/[${AZ}]\/)${users}[\/\\]+(?!${example}(?:[\/\\]|${b}))[${AZ}0-9_.\-]+`)],
-              // Only here: the graph-id form (home-<name>-code-, no leading dash) is not read within 256 characters after an
-              // http(s) scheme, where it names a public repository or page, such as github.com/<owner>/home-<name>-code-review.
-              // The check runs only where home- occurs, so it stays linear.
-              ['encoded-home-path', rule(String.raw`(?<![${W}\-])(?:-home-|-${users}-|[${AZ}]--${users}-|-[Mm][Nn][Tt]-[${AZ}]-${users}-)(?!example(?:-|[\/\\"'${S}\x60)\]]|${end}))[A-Za-z0-9_.]+(?:-|(?=[\/\\"'${S}\x60)\]]|${end}))|(?<![\p{L}\p{Nd}\p{Nl}\p{No}])home-(?<!https?:\/\/[^${S}<>"'\x60]{0,256}home-)(?!example-code-)[${W}.][${W}.\-]{0,255}-code-`)],
+              // Only here: the graph-id form (home-<name>-code-, no leading dash) is not read in a public code host's URL path,
+              // within 256 characters of the host, where it names a repository: github.com/<owner>/home-<name>-code-review.
+              // The hosts are listed in lower case, so a loopback, private or unlisted host is still read; the path stops at
+              // : @ ? #, so userinfo and query strings are read too. The check runs only where home- occurs, so it stays linear.
+              ['encoded-home-path', rule(String.raw`(?<![${W}\-])(?:-home-|-${users}-|[${AZ}]--${users}-|-[Mm][Nn][Tt]-[${AZ}]-${users}-)(?!example(?:-|[\/\\"'${S}\x60)\]]|${end}))[A-Za-z0-9_.]+(?:-|(?=[\/\\"'${S}\x60)\]]|${end}))|(?<![\p{L}\p{Nd}\p{Nl}\p{No}])home-(?<!https?:\/\/(?:[a-z0-9\-]{1,63}\.){0,4}(?:github\.com|githubusercontent\.com|gitlab\.com|bitbucket\.org|codeberg\.org|huggingface\.co|sr\.ht)\/[^${S}<>"'\x60:@?#]{0,256}home-)(?!example-code-)[${W}.][${W}.\-]{0,255}-code-`)],
               ['hugging-face-token', rule(String.raw`${b}hf_[A-Za-z0-9]{20,}${b}`)],
               ['github-token', rule(String.raw`${b}(?:gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,})${b}`)],
               ['tavily-token', rule(String.raw`${b}tvly-(?:(?:prod|dev)-)?[A-Za-z0-9_\-]{24,}${b}`)],
@@ -230,7 +231,8 @@ jobs:
             const percentRun = (run) => {
               try { return decodeURIComponent(run); } catch { return run.replace(/%([0-9A-Fa-f]{2})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16))); }
             };
-            const links = /!?\[([^\]\n]*)\]\(\s*<?([^\s()<>]*)>?(?:\s+(?:"[^"\n]*"|'[^'\n]*'|\([^()\n]*\)))?\s*\)/g;
+            // A link label holds no '[', so an unmatched '[' is passed over once, not rescanned to the end of the body.
+            const links = /!?\[([^\[\]\n]*)\]\(\s*<?([^\s()<>]*)>?(?:\s+(?:"[^"\n]*"|'[^'\n]*'|\([^()\n]*\)))?\s*\)/g;
             // Only the inline elements GitHub renders are removed; any other <word>, such as a <user> placeholder, stays as text.
             const inlineTags = /<\/?(?:a|abbr|b|bdi|bdo|br|cite|code|del|dfn|em|i|img|ins|kbd|mark|q|rp|rt|ruby|s|samp|small|span|strike|strong|sub|sup|time|tt|u|var|wbr)\b[^<>\n]*>/gi;
             const decoders = [
@@ -238,7 +240,7 @@ jobs:
               (text) => text.replace(/\\u([0-9A-Fa-f]{4})|\\\//g, (_, hex) => (hex ? String.fromCharCode(parseInt(hex, 16)) : '/')),
               (text) => text.replace(/&(?:#([0-9]{1,7})|#[xX]([0-9A-Fa-f]{1,6})|([A-Za-z]{2,8}));/g,
                 (whole, decimal, hex, name) => (decimal ? fromCode(Number(decimal)) : hex ? fromCode(parseInt(hex, 16)) : named.get(name) ?? whole)),
-              (text) => text.replace(links, '$1').replace(/!?\[([^\]\n]*)\]\[[^\]\n]*\]/g, '$1').replace(/<((?:https?|file|mailto):[^<>\s]*)>/g, '$1')
+              (text) => text.replace(links, '$1').replace(/!?\[([^\[\]\n]*)\]\[[^\[\]\n]*\]/g, '$1').replace(/<((?:https?|file|mailto):[^<>\s]*)>/g, '$1')
                 .replace(inlineTags, '').replace(/\\([!-\/:-@\[-`{-~])/g, '$1').replace(/`/g, '')
                 .replace(/(\*{1,3}|~{1,2}|_{1,3})([\p{L}\p{N}][^\s*~_\/\\]*?)\1/gu, '$2'),
             ];

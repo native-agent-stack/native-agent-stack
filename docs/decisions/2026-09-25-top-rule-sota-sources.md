@@ -88,7 +88,7 @@ The co-op's GPT read at `07595323` found three gaps, now closed in both copies o
 - **Escaped and rendered forms are judged too.** The rules run over the body as written and over four forms, each
   decoded once from it, never to a fixed point. They are percent escapes, JSON `\uXXXX` and `\/` escapes, HTML
   numeric references and a short list of named ones, and Markdown's rendered text. The rendered form keeps link and
-  image text and autolinks, resolves backslash escapes, and drops backticks, the inline HTML elements GitHub renders
+  image text (a label without brackets in it) and autolinks, resolves backslash escapes, and drops backticks, the inline HTML elements GitHub renders
   (any other `<word>` stays, so a `<name>` placeholder is not read as a tag) and emphasis markers in pairs around a
   word with no separator inside (so a glob such as `Users/*/` keeps its star). Link destinations stay in the body
   itself.
@@ -161,8 +161,8 @@ copies of the job. The seventh, about publication order, is answered without a c
 
   The bound is therefore the gate's own: 262,144 code points, so an astral character counts once. A code point takes
   at least one UTF-8 byte, so no description the update stores reaches the bound. It is also about 3.5 times the
-  longest description seen here. On Node 24.21 a body at the bound is scanned within 0.3 s, including
-  the adversarial bodies below.
+  longest description seen here. On Node 24.21 a body at the bound is scanned within 0.3 s. That includes the
+  adversarial bodies below and, since the second GPT read, runs of unmatched brackets (see that section).
 - **The decoders compose.** Each decoder still runs at most once along a chain, never to a fixed point. The rules
   now see every order of every subset of the four decoders: 65 forms, counting the body. A slash written as a
   character reference around a name in emphasis is therefore read as GitHub displays it. Codex suggested a pinned
@@ -176,12 +176,16 @@ copies of the job. The seventh, about publication order, is answered without a c
   `PGP PRIVATE KEY BLOCK` headers are caught; `PUBLIC KEY` is not. Over this branch's tracked tree the wider rule adds no
   match.
 - **A repository named like a graph id passes the gate.** The graph-id form of `encoded-home-path` (`home-<name>-code-`
-  with no leading dash) failed a cited URL such as `github.com/<owner>/home-<name>-code-review`. In the gate only, that
-  form is not read within 256 characters after an `http://` or `https://` scheme. The check runs only where `home-`
-  occurs. The first form tried scanned back from every position: 13.7 s on a 262,144-character run of `home-a`,
-  against 0.1 s without it. Still caught:
+  with no leading dash) failed a cited URL such as `github.com/<owner>/home-<name>-code-review`. In the gate only,
+  that form is not read in the path of a public code host's URL, within 256 characters of the host. The hosts are
+  `github.com`, `githubusercontent.com`, `gitlab.com`, `bitbucket.org`, `codeberg.org`, `huggingface.co` and `sr.ht`,
+  with up to four subdomain labels, in lower case. (At `fc60da90` any `http(s)` URL was exempt; the second GPT read
+  corrected that.) The check runs only where `home-` occurs. The first form tried scanned back from every position:
+  13.7 s on a 262,144-character run of `home-a`, against 0.1 s without it. Still caught:
   - a graph id in a cache path (`~/.cache/codebase-memory-mcp/home-<name>-code-<project>.db`);
-  - the dashed form in any URL.
+  - the dashed form in any URL;
+  - the graph-id form in any other URL: a loopback, `localhost`, `*.localhost`, private-address or unlisted host,
+    userinfo or a query string after a code host, or a code host written in upper case.
 
   `validate.py` keeps the URL case, because Python's lookbehinds are fixed-width.
 - **The graph-id form is bounded.** It searched from every `home-` to the end of its run. A 262,144-character run of
@@ -216,6 +220,47 @@ against later drift. Eleven weakened copies of the new job and rules were run, a
 
 The new gate was also run over the live description of every open pull request at 2026-10-11T13:56Z (88), with only
 rule ids printed. Each gets the same outcome as under the `de4eed8f` gate.
+
+### After the second GPT read (2026-10-11)
+
+The co-op's GPT read at `fc60da90` (Astra, CHANGES_REQUESTED) reproduced two P2 regressions in the new lines. Both
+are fixed in both copies of the job, on a rebase onto main `0f153784`:
+
+- **A graph id in a local URL passed.** The URL exemption at `fc60da90` skipped the graph-id form after any `http(s)`
+  scheme, so `http://127.0.0.1:8788/p/home-<name>-code-<project>` and the same id under `https://localhost/` passed
+  both copies, while `validate.py` refused both. The exemption is now limited to the path of a public code host's URL
+  (above), an allowlist rather than a list of local hosts, so private addresses and intranet names stay caught too.
+  New cases cover loopback, `localhost`, `[::1]`, `*.localhost`, a private address, an unlisted public host, userinfo,
+  a query string and an upper-case host; each agrees with `validate.py`. The public-repository control, now also on a
+  code host's subdomain, passes.
+- **Unmatched brackets ran past the job's limit.** The link and reference-link labels admitted `[`, so from every
+  unmatched `[` the decoder scanned to the end of the body, and composition repeats that decoder. The reader's run of
+  262,144 `[` gave no verdict within 125 s, against the job's 2-minute limit; here, 4,096 took 0.87 s and 8,192 took
+  3.26 s. A label now holds no bracket, as in CommonMark, in all three classes. That run now takes 0.16 s, and 21
+  adversarial shapes at the bound (bracket, parenthesis, tag, entity, percent, emphasis, backslash, backtick and
+  graph-id runs) take at most 0.26 s each. The bounded-time test adds three bracket runs. The 41 earlier privacy-case
+  outcomes are unchanged, including a name split by a Markdown link.
+
+The new tests fail on the rebased previous head `ee2070f0` (18 failures, 1 error). Thirteen weakened copies were run,
+and twelve fail the tests:
+
+- the exemption for any host;
+- `localhost` or a private address added to the allowlist;
+- userinfo and query strings allowed in the path;
+- no subdomain;
+- `[` allowed in the inline-link label or in the reference-link label;
+- five earlier guards: composition off, UTF-16 size, one leading slash, the graph-id bound, and a rule the gate does
+  not carry.
+
+The thirteenth allows `[` in the reference target and survives. It is equivalent for run time: a match needs
+`[label][`, and the target scan stops at the next `]`, so it cannot rescan. It differs only on a target containing
+`[`, which CommonMark does not accept as a reference.
+
+The reader's P3 follow-ups are not in this change: two live line locators that the diff moved
+(`blueprints/runtime-workers/openhands/resolver.py:456` and `blueprints/native-skill-practice/p1/README.md:14`); pinned
+captures for the handwritten Markdown approximation, the URL exemption, the 256-character bound and the POSIX
+leading-slash rule; the repeated-decoding boundary, already stated above; and existing hostname references in the
+manifest.
 
 ## Alternatives considered
 
