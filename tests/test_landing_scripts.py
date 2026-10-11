@@ -13,8 +13,11 @@ This module is that harness's offline subset, kept beside the one copy of the sc
   * codex_gate.py: its exit-code precedence on canned API data (subprocess.run and datetime.now are patched), and the script run as
     the landing scripts run it, where a failure prints one fixed line and exits 4;
   * each script end to end with a fake gh, python3 and sleep: the variables and their defaults, the gate path through a symlink and
-    a wrapper, the order in which the gates stop a landing, and a failed merge that must not print gh's output;
-  * the files under tools/landing: no home path and no form of the running account's name (#975 P2-1), and the README's digests.
+    a wrapper, the order in which the gates stop a landing, a failed merge and a failing gh call at each call site (#975 P2-2), none
+    of which may print what gh or its API returned;
+  * the files under tools/landing: no home path and no form of an identity that must not appear, which is the running account (a
+    generic CI account may stand as a bare word) and every name in LANDING_PROHIBITED_NAMES, none skipped for its length (#975 P2-1),
+    and the README's digests.
 
 A decision site is cut out by the same start and end lines the harness used, so an edit that moves a site fails here loudly instead
 of leaving it untested. Everything but the captured schema excerpt is synthetic: no network, no gh, no cache files. `jq` is required
@@ -25,6 +28,7 @@ from __future__ import annotations
 
 import base64
 import contextlib
+import fnmatch
 import getpass
 import hashlib
 import importlib.util
@@ -61,6 +65,7 @@ PASSING_CONCLUSIONS = ("SUCCESS", "NEUTRAL", "SKIPPED")  # the scripts' allow-li
 STATUSES = ROOT / "tests/fixtures/landing/status-state.json"
 RUNNING_STATES = ("PENDING", "EXPECTED")
 UNLISTED_STATE = "FUTURE_STATE"  # synthetic: a state GitHub may add to StatusState later; the script must fail closed on it
+ADDRESS = "api-text-4e9b@example.invalid"  # synthetic: stands for an address that a status description or a gh or API diagnostic could carry
 
 
 def setUpModule():
@@ -84,8 +89,20 @@ def q(path):
 # ---------------------------------------------------------------------------------------------- fake commands
 # GitHub-side data are JSON files named by FAKE_STATUSES, FAKE_CHECKRUNS and FAKE_PRVIEW; the scripts' own --jq programs are
 # evaluated on them by jq, so the real programs run. Every call is appended to FAKE_LOG.
+# #975 P2-2: FAKE_FAIL (a glob on the arguments) makes the matching calls fail from the FAKE_FAIL_FROM-th (default 1) on: exit 1,
+# FAKE_FAIL_STDERR on stderr and FAKE_FAIL_STDOUT on stdout. As gh does (cli v2.102.0), `gh api` puts an error response's body on
+# stdout and "gh: <message>" on stderr (pkg/cmd/api/api.go:546, :557), every other command prints its error only to stderr
+# (internal/ghcmd/cmd.go:214, :285); a test sets FAKE_FAIL_STDOUT for `api` calls only.
 FAKE_GH = r'''#!/usr/bin/env bash
 [ -n "${FAKE_LOG:-}" ] && printf 'gh %s\n' "$*" >> "$FAKE_LOG"
+if [ -n "${FAKE_FAIL:-}" ] && [ -n "${FAKE_LOG:-}" ] && [[ "$*" == $FAKE_FAIL ]]; then
+  failed=$(cat "$FAKE_LOG.fail" 2>/dev/null || echo 0); failed=$((failed + 1)); echo "$failed" > "$FAKE_LOG.fail"
+  if [ "$failed" -ge "${FAKE_FAIL_FROM:-1}" ]; then
+    [ -z "${FAKE_FAIL_STDOUT:-}" ] || printf '%s\n' "$FAKE_FAIL_STDOUT"
+    [ -z "${FAKE_FAIL_STDERR:-}" ] || printf '%s\n' "$FAKE_FAIL_STDERR" >&2
+    exit 1
+  fi
+fi
 prog=
 args=("$@")
 for ((i = 0; i < ${#args[@]}; i++)); do
@@ -160,7 +177,7 @@ class Script:
         if key == "uet":
             self.ci = self.cut(r'^  s=\$\(lg_ci_state "\$N"\)$', r'^  s=\$\(lg_ci_state "\$N"\)$')
         else:
-            self.ci = self.cut(r'^  c=\$\(gh api "repos/\$R/commits/\$hd/check-runs', r"@tsv'\)$")
+            self.ci = self.cut(r'^  c=\$\(gh api "repos/\$R/commits/\$hd/check-runs', r"@tsv'( 2>/dev/null)?\)$")
         found = re.findall(r"^# >>> land-gate-fns$.*?^# <<< land-gate-fns$", self.text, re.S | re.M)
         if len(found) != 1:
             raise AssertionError(f"{key}_land.sh needs exactly one land-gate-fns block, it has {len(found)}")
@@ -255,21 +272,26 @@ def accept(code, reject_code=2):
 
 # ---------------------------------------------------------------------------------------------- 1. the script text
 # #975 P2-1: no file under tools/landing names the host. The scan reads every file there, bytecode excepted (a .pyc records the
-# absolute path of its source; the tests importing codex_gate.py create one), for home-path syntax and for the name of the account
-# that runs the tests, taken from the OS at test time and never written into the repository. Only (file, form) pairs are reported,
-# never the matched text, so a failure cannot print the name.
+# absolute path of its source; the tests importing codex_gate.py create one), for home-path syntax and for the identities that must
+# not appear: the account that runs the tests, taken from the OS at test time, and every explicitly prohibited name, taken from the
+# environment (LANDING_PROHIBITED_NAMES). Neither is ever written into the repository. Only (file, form) pairs are reported, never
+# the matched text, so a failure cannot print a name. No name is skipped for its length (the GPT micro on 754a194f: a real account
+# `sam` was never checked).
 HOME_PATH = re.compile(rb"/(?:home|Users)/[A-Za-z0-9_.-]|[A-Za-z]:[\\/]+Users[\\/]|/root/")
+PROHIBITED_NAMES_VARIABLE = "LANDING_PROHIBITED_NAMES"  # not NATIVE_AGENT_HOST_NAMES_JSON: setting that replaces the host-name scanner's own sources
+JOINERS = rb"[-_./\\@:~=]"  # what joins a name to other text in an identifier or a path: project-<name>-tools, <name>@host, /<name>/, ~<name>
 
 
-# Generic CI and container accounts: their names are ordinary words ("runner" on GitHub-hosted runners) that may appear in
-# prose, so the name scan would fail CI on a word, not a leak. The home-path scan still runs for them.
+# Generic CI and container accounts. Their names are ordinary words ("runner" on GitHub-hosted runners) that may stand in prose, so
+# the running account, and only that account, may appear in the files as a bare word when it is one of these. Its identifier, path
+# and encoded forms, home paths, and every explicitly prohibited name (whatever it is, generic or not) are still reported.
 GENERIC_ACCOUNTS = frozenset({"runner", "root", "ubuntu", "user", "admin", "vscode", "codespace", "ec2-user", "node", "docker"})
-NO_NAME_SCAN = "zqx-no-account-name-scan"
 
 
-def scan_name(name):
-    """The name the privacy scan looks for: the account name, or a sentinel for generic or very short names."""
-    return NO_NAME_SCAN if name.lower() in GENERIC_ACCOUNTS or len(name) < 4 else name
+def prohibited_names():
+    """The explicitly prohibited identities: the comma-separated names in LANDING_PROHIBITED_NAMES, read when the test runs. Each is
+    scanned in every form, whatever its length and whether or not it is a generic word."""
+    return tuple(name for name in (part.strip() for part in os.environ.get(PROHIBITED_NAMES_VARIABLE, "").split(",")) if name)
 
 
 def account_name():
@@ -282,8 +304,10 @@ def account_name():
 
 
 def name_patterns(name):
-    """Bytes patterns for the name in its usual spellings: as a token (bare, or hyphenated as in project-<name>-tools), as hex digits
-    and inside base64 at each of the three byte alignments, cut to the characters that do not depend on the bytes around the name."""
+    """Bytes patterns for the name in its usual spellings: as a token (a run that touches no letter or digit), told apart as the bare
+    word ("the runner reports") and the identifier or path form (joined to other text by one of JOINERS, as in project-<name>-tools),
+    as hex digits and inside base64 at each of the three byte alignments, cut to the characters that do not depend on the bytes
+    around the name. "bare" and "identifier" split "token": every token is one or both."""
     spellings = [spelling.encode("utf-8") for spelling in sorted({name, name.lower(), name.upper(), name.capitalize()})]
     encoded = set()
     for value in spellings:
@@ -294,13 +318,17 @@ def name_patterns(name):
     def either(values):
         return b"|".join(re.escape(value) for value in sorted(values))
 
-    return {"token": re.compile(rb"(?<![A-Za-z0-9])(?:" + either(spellings) + rb")(?![A-Za-z0-9])", re.I),
+    word = either(spellings)
+    return {"token": re.compile(rb"(?<![A-Za-z0-9])(?:" + word + rb")(?![A-Za-z0-9])", re.I),
+            "bare": re.compile(rb"(?<![A-Za-z0-9])(?<!" + JOINERS + rb")(?:" + word + rb")(?![A-Za-z0-9])(?!" + JOINERS + rb"[A-Za-z0-9])", re.I),
+            "identifier": re.compile(rb"(?<=" + JOINERS + rb")(?:" + word + rb")(?![A-Za-z0-9])|(?<![A-Za-z0-9])(?:" + word + rb")(?=" + JOINERS + rb"[A-Za-z0-9])", re.I),
             "hex": re.compile(either(value.hex().encode() for value in spellings), re.I),
             "base64": re.compile(either(encoded))}
 
 
-def privacy_findings(root, name):
-    """(path under root, form) for every file under root, __pycache__ and *.pyc excepted, that holds a home path or a form of name.
+def privacy_findings(root, name, bare_word_ok=False):
+    """(path under root, form) for every file under root, __pycache__ and *.pyc excepted, that holds a home path or a form of name: the
+    bare word, an identifier or path form, a percent-encoded form, hex digits or base64. bare_word_ok leaves out the bare word alone.
     Hex counts with or without \\x escapes; a percent-encoded form counts where decoding the %XX escapes reveals more matches."""
     patterns = name_patterns(name)
     found = []
@@ -313,13 +341,26 @@ def privacy_findings(root, name):
         hits = {
             "home path": bool(HOME_PATH.search(data)),
             "home path, percent-encoded": len(HOME_PATH.findall(decoded)) > len(HOME_PATH.findall(data)),
-            "name": bool(patterns["token"].search(data)),
+            "name": not bare_word_ok and bool(patterns["bare"].search(data)),
+            "name, identifier": bool(patterns["identifier"].search(data)),
             "name, percent-encoded": len(patterns["token"].findall(decoded)) > len(patterns["token"].findall(data)),
             "name, hex": bool(patterns["hex"].search(data.replace(b"\\x", b""))),
             "name, base64": bool(patterns["base64"].search(data)),
         }
         found += [(relative.as_posix(), form) for form, hit in hits.items() if hit]
     return found
+
+
+def identity_findings(root, account, prohibited=()):
+    """The sorted (path, form) pairs for every home path and every form of an identity under root. Each prohibited name is scanned in
+    full. So is the running account, except that a generic one (GENERIC_ACCOUNTS, whatever its case) may stand as a bare word. An empty
+    name would match everything and is refused."""
+    if any(not name.strip() for name in (account, *prohibited)):
+        raise ValueError("an empty identity matches everything")
+    found = set(privacy_findings(root, account, bare_word_ok=account.lower() in GENERIC_ACCOUNTS))
+    for name in prohibited:
+        found.update(privacy_findings(root, name))
+    return sorted(found)
 
 
 def legacy_findings(root):
@@ -330,13 +371,76 @@ def legacy_findings(root):
 
 class ScriptTextTests(LandingCase):
     def test_no_home_literal_or_user_name_in_tools_landing(self):
-        self.assertEqual(privacy_findings(LANDING, scan_name(account_name())), [],
-                         "a home path, or a form of the name of the account running these tests, in tools/landing")
+        self.assertEqual(identity_findings(LANDING, account_name(), prohibited_names()), [],
+                         "a home path, or a form of an identity that must not appear (the account running these tests, or a name in "
+                         f"{PROHIBITED_NAMES_VARIABLE}), in tools/landing")
 
-    def test_generic_or_short_account_names_scan_for_a_sentinel_not_a_word(self):
-        for name in ("runner", "Runner", "root", "ec2-user", "abc"):
-            self.assertEqual(scan_name(name), NO_NAME_SCAN, name)
-        self.assertEqual(scan_name("zqxsynth"), "zqxsynth")
+    def assertion_fails(self, files, *, account, prohibited=""):
+        """Run test_no_home_literal_or_user_name_in_tools_landing itself, as the account `account` and with `prohibited` in
+        LANDING_PROHIBITED_NAMES, on a scratch tools/landing holding `files` ({relative path: text}); True when it raises."""
+        root = self.dir / f"assertion-{next(self.counter)}"
+        for relative, text in files.items():
+            (root / relative).parent.mkdir(parents=True, exist_ok=True)
+            (root / relative).write_text(text, encoding="utf-8")
+        case = type(self)("test_no_home_literal_or_user_name_in_tools_landing")
+        with mock.patch.multiple(sys.modules[__name__], LANDING=root, account_name=lambda: account), \
+                mock.patch.dict(os.environ, {"LANDING_PROHIBITED_NAMES": prohibited}):
+            try:
+                case.test_no_home_literal_or_user_name_in_tools_landing()
+            except AssertionError:
+                return True
+        return False
+
+    def test_the_repository_assertion_checks_an_account_name_of_any_length(self):
+        # #975 P2-1 (GPT micro on 754a194f): scan_name() put a sentinel in place of every name under four characters, so a real account
+        # `sam` was never checked, not even in an unambiguous project-sam-tools. These run the repository assertion on a real nested
+        # file with a mocked account lookup, as the review's probe did.
+        for account in ("zqxsynth", "sam", "ab"):
+            for form, text in (("an identifier", f"dir=project-{account}-tools\n"), ("a bare word", f"the {account} reports\n")):
+                with self.subTest(account=account, form=form):
+                    self.assertTrue(self.assertion_fails({"nested/sample.txt": text}, account=account))
+            with self.subTest(account=account, form="nothing to report"):
+                self.assertFalse(self.assertion_fails({"nested/sample.txt": "nothing to report\n"}, account=account))
+
+    def test_a_generic_running_account_may_stand_as_a_bare_word_and_in_no_other_form(self):
+        # #975 P2-1: the exception for generic CI accounts is the running account's alone and covers its bare word only: its identifier,
+        # path and encoded forms, and any home path, are still reported.
+        for account, text in (("runner", "the runner reports\n"), ("runner", "a hosted runner.\n"), ("Runner", "the runner reports\n"),
+                              ("ec2-user", "the `ec2-user` account\n"), ("node", 'c["node"]\n')):
+            with self.subTest(account=account, allowed=text):
+                self.assertFalse(self.assertion_fails({"a/prose.md": text}, account=account))
+        raw = b"runner"
+        refused = {"an identifier": "dir=project-runner-tools\n", "a suffix": "runner-1\n", "a prefix": "ci-runner\n",
+                   "an underscore": "runner_home\n", "a dotted name": "runner.example\n", "an address": "runner@example.invalid\n",
+                   "a path": "/srv/runner/work\n", "a home directory": "~runner\n", "a flag": "--runner\n",
+                   "a home path": "cd /home/example/work\n", "percent-encoded": "u=" + "".join(f"%{byte:02X}" for byte in raw) + "\n",
+                   "hex": "blob " + raw.hex() + "\n", "base64": base64.b64encode(raw).decode() + "\n"}
+        for form, text in refused.items():
+            with self.subTest(account="runner", refused=form):
+                self.assertTrue(self.assertion_fails({"a/b/c.txt": text}, account="runner"))
+
+    def test_an_explicitly_prohibited_name_is_scanned_in_every_form_whatever_it_is(self):
+        # #975 P2-1: a prohibited identity is never replaced by a sentinel, however short, and never excused as a generic word.
+        for prohibited in ("runner", "user", "ab", "zqxsynth"):
+            for form, text in (("a bare word", f"the {prohibited} reports\n"), ("an identifier", f"dir=project-{prohibited}-tools\n")):
+                with self.subTest(prohibited=prohibited, form=form):
+                    self.assertTrue(self.assertion_fails({"nested/sample.txt": text}, account="unrelated", prohibited=prohibited))
+        word = {"x.md": "the runner reports\n"}
+        with self.subTest("one of several names, with spaces"):
+            self.assertTrue(self.assertion_fails(word, account="unrelated", prohibited=" other , runner "))
+        with self.subTest("the running account is that name too"):
+            self.assertTrue(self.assertion_fails(word, account="runner", prohibited="runner"))
+        with self.subTest("a generic word that is neither prohibited nor the running account"):
+            self.assertFalse(self.assertion_fails(word, account="unrelated", prohibited="other"))
+
+    def test_an_empty_identity_is_refused_and_empty_prohibited_entries_are_dropped(self):
+        with mock.patch.dict(os.environ, {"LANDING_PROHIBITED_NAMES": " , a ,, b "}):
+            self.assertEqual(prohibited_names(), ("a", "b"))
+        with mock.patch.dict(os.environ, {"LANDING_PROHIBITED_NAMES": ""}):
+            self.assertEqual(prohibited_names(), ())
+        for account, prohibited in (("", ()), (" ", ()), ("unrelated", ("",))):
+            with self.subTest(account=account, prohibited=prohibited), self.assertRaises(ValueError):
+                identity_findings(self.dir, account, prohibited)
 
     def test_the_privacy_scan_finds_each_form_of_the_name_planted_in_subdirectories(self):
         # The fail-before of #975 P2-1: the old check (legacy_findings) passes every plant below. The account's own name and a
@@ -345,7 +449,7 @@ class ScriptTextTests(LandingCase):
             raw = name.encode("utf-8")
             plants = {
                 "a/bare.txt": (raw + b"\n", ["name"]),
-                "a/b/hyphenated.sh": (b"dir=project-" + raw + b"-tools\n", ["name"]),
+                "a/b/hyphenated.sh": (b"dir=project-" + raw + b"-tools\n", ["name, identifier"]),
                 "a/b/c/url-encoded.md": (b"<https://example.invalid/?u=" + "".join(f"%{byte:02X}" for byte in raw).encode() + b">\n",
                                          ["name, percent-encoded"]),
                 "d/hex.txt": (b"blob " + raw.hex().encode() + b"\n", ["name, hex"]),
@@ -428,16 +532,24 @@ class ScriptTextTests(LandingCase):
                 data = (LANDING / name).read_bytes()
                 self.assertEqual((cell.group(1), int(cell.group(2))), (hashlib.sha256(data).hexdigest(), data.count(b"\n")))
 
-    def test_readme_states_the_failed_merge_message_the_gate_error_and_the_name_scan_exemption(self):
+    def test_readme_states_the_failed_merge_message_the_gate_error_the_gh_rule_and_the_privacy_scan(self):
         # #975 (review of the P2 fix commit): the README said the failed-merge message names the file's path (it names the file only), listed
-        # no exit 4 for a failing gate, and did not say which accounts skip the name scan or why.
+        # no exit 4 for a failing gate, and did not say which accounts skip the name scan or why. #975 (GPT micro on 754a194f): it stated
+        # an exemption for names under four characters and for generic accounts, which the scan no longer has; it states the rule now.
         flat = " ".join((LANDING / "README.md").read_text(encoding="utf-8").split())
         self.assertIn("names only that file, not its path", flat)
         self.assertNotIn("whose path the message names", flat)
         self.assertIn("one fixed line naming only the error class", flat)
-        self.assertIn("fewer than 4 characters, and the home-path scan still runs", flat)
-        for name in sorted(GENERIC_ACCOUNTS):
-            self.assertIn(f"`{name}`", flat)
+        self.assertIn("Nothing `gh` or its API returned is printed", flat)
+        self.assertIn("and never the description", flat)
+        self.assertIn("An explicitly prohibited identity is a name in `LANDING_PROHIBITED_NAMES`", flat)
+        self.assertIn("It is scanned in every form, whatever its length and even when it is an ordinary word", flat)
+        self.assertIn("its bare word may stand in prose", flat)
+        self.assertIn("its identifier, path and encoded forms are still reported", flat)
+        self.assertIn("No name is skipped for its length", flat)
+        self.assertNotIn("fewer than 4 characters", flat)
+        self.assertNotIn("The account-name scan is skipped", flat)
+        self.assertIn("`GENERIC_ACCOUNTS`", flat)
 
     def evaluate(self, lines, names, arg0="landing.sh", **extra):
         script = "set -u\n" + "\n".join(lines) + "\n" + "".join(f'printf "%s\\n" "${name}"\n' for name in names)
@@ -1416,6 +1528,68 @@ class EndToEndTests(LandingCase):
                 self.assertEqual(code, 2, out)
                 self.assertIn("trading-cc-read is failure", out)
                 self.assertEqual((self.gate_calls(log), self.merge_calls(log)), ([], []))
+
+    def test_a_failing_trading_cc_read_status_prints_its_state_never_its_description(self):
+        # #975 P2-2 (GPT micro on 754a194f): the failure line interpolated the status description, which can carry an address. It names the
+        # state when that is error, failure or pending, anything else as unknown, and never the description.
+        for case, state, shown in (("failure", "failure", "failure"), ("error", "error", "error"), ("pending", "pending", "pending"),
+                                   ("a state GraphQL has and REST has not", "expected", "unknown"),
+                                   ("a state that is text from the API", f"odd {ADDRESS}", "unknown")):
+            status = [{"context": "trading-cc-read", "state": state, "description": f"contact {ADDRESS}", "updated_at": "2026-10-10T00:00:00Z"}]
+            for script in (self.uet, self.nas):
+                with self.subTest(script=script.key, state=case):
+                    code, out, log = self.land(script, statuses=status)
+                    self.assertEqual((code, self.merge_calls(log), self.gate_calls(log)), (2, [], []), out)
+                    self.assertIn(f"trading-cc-read is {shown} at {self.head[:8]} (description withheld", out)
+                    self.assertNotIn("example.invalid", out)
+
+    def test_a_failing_gh_call_prints_nothing_it_returned_and_ends_in_its_steps_own_code(self):
+        # #975 P2-2 (GPT micro on 754a194f): several gh calls left stderr inherited (nas_land.sh 128, 215, 216, 222; uet_land.sh 162, 199,
+        # 218 at that head), and a value read from `gh api` can be an error response's body, which gh writes to stdout. Each call fails in
+        # turn with the synthetic address on stderr and, for `gh api`, on stdout too (pkg/cmd/api/api.go:546, :557 of cli v2.102.0):
+        # the landing ends in the code its step always had and prints nothing of it. Calls whose failure never stopped a landing (the
+        # draft flag, nas's mergeStateStatus, the merged state) still do not.
+        body = f'{{"message":"Server Error: contact {ADDRESS}"}}'
+        stderr = f"gh: Server Error: contact {ADDRESS} (HTTP 500)"
+        head = "pr view * --json headRefOid --jq .headRefOid"
+        # site, the failing call (a glob on gh's arguments), the first failing call, land() options, exit code, merge calls, a phrase
+        sites = {
+            "uet": [
+                ("the statuses API", "api repos/*/statuses*", 1, {}, 2, 0, "trading-cc-read is unknown at"),
+                ("the head, first read", head, 1, {}, 3, 0, "is neither the read head nor a pure rebase"),
+                ("the head, read after update-branch", head, 2, {}, 4, 0, "CHANGE DIFFERS"),
+                ("the draft flag", "pr view * --json isDraft *", 1, {}, 0, 1, " ok)"),
+                ("the CI state", "pr view * --json headRefOid,statusCheckRollup,mergeStateStatus *", 1, {}, 3, 0, "head moved to ? during CI"),
+                ("the open review threads", "api graphql*", 1, {"merge_state": "BLOCKED"}, 8, 0, "unresolved review threads: unknown"),
+                ("the merged state", "pr view * --json state,mergeCommit,mergedAt *", 1, {}, 0, 1, " ok)"),
+                ("the author id", "api users/*", 1, {}, 11, 0, "cannot form the no-reply author address"),
+                ("the merge commit", "pr view * --json mergeCommit *", 1, {}, 12, 1, "author address NOT CHECKED"),
+                ("the merge commit's author", "api repos/*/commits/ffffffff*", 1, {}, 12, 1, "is NOT the no-reply form"),
+            ],
+            "nas": [
+                ("the statuses API", "api repos/*/statuses*", 1, {}, 2, 0, "trading-cc-read is unknown at"),
+                ("the head, first read", head, 1, {}, 3, 0, "is neither the read head"),
+                ("the head, read after update-branch", head, 2, {"merge_state": "BEHIND"}, 4, 0, "CHANGE DIFFERS after update-branch"),
+                ("the head, read in the CI loop", head, 2, {}, 3, 0, "head moved to ?"),
+                ("the merge state", "pr view * --json mergeStateStatus *", 1, {}, 0, 1, " ok)"),
+                ("the draft flag", "pr view * --json isDraft *", 1, {}, 0, 1, " ok)"),
+                ("the check runs", "api repos/*/check-runs*", 1, {}, 6, 0, "CI timeout"),
+                ("the merged state", "pr view * --json state,mergeCommit,mergedAt *", 1, {}, 0, 1, " ok)"),
+                ("the author id", "api users/*", 1, {}, 11, 0, "cannot form the no-reply author address"),
+                ("the merge commit", "pr view * --json mergeCommit *", 1, {}, 12, 1, "author address NOT CHECKED"),
+                ("the merge commit's author", "api repos/*/commits/ffffffff*", 1, {}, 12, 1, "is NOT the no-reply form"),
+            ],
+        }
+        for script in (self.uet, self.nas):
+            for site, call, first, options, code, merges, phrase in sites[script.key]:
+                with self.subTest(script=script.key, call=site):
+                    got, out, log = self.land(script, FAKE_FAIL=call, FAKE_FAIL_FROM=str(first), FAKE_FAIL_STDERR=stderr,
+                                              FAKE_FAIL_STDOUT=body if call.startswith("api ") else "", **options)
+                    self.assertEqual((got, len(self.merge_calls(log))), (code, merges), out)
+                    self.assertGreaterEqual(sum(fnmatch.fnmatchcase(line[3:], call) for line in log), first, "the failing call was made")
+                    self.assertIn(phrase, out)
+                    self.assertNotIn("example.invalid", out)
+                    self.assertNotIn("Server Error", out)
 
     def test_a_pure_rebase_of_the_read_head_lands_pinned_to_the_new_head(self):
         for script, repo in ((self.uet, UET_REPO), (self.nas, NAS_REPO)):

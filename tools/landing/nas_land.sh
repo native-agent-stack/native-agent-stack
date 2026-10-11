@@ -8,6 +8,8 @@
 # 10 the merge onto CURRENT origin/main fails scripts/validate.py or does not merge cleanly (2026-10-10).
 # 11 the no-reply author address could not be formed (nothing merged), 12 merged, but the merge commit's author is not that address (correction #148).
 # Correction #136 (2026-10-10): verdict/record acceptance and change identity use the lg_* functions below (land-patches-20261010).
+# #975 P2-2 (2026-10-11): no text from gh or its API is printed. Every gh call drops its stderr, a failure ends in its step's fixed message and exit code, and gh api
+# writes an error response's body to stdout (cli v2.102.0 pkg/cmd/api/api.go:546), so a value read from it is shown only as a state word or a count.
 set -u
 # Parsed whole before it runs: an edit while a landing runs cannot shift what the running copy executes (2026-10-09).
 {
@@ -125,16 +127,16 @@ lg_author_check() {  # <owner/repo> <pr> <no-reply address> : after the merge, t
 # excluded (LG_EXCLUDE); an empty change is refused, and a change that is empty only because everything in it is excluded is identified by its file names.
 change() { lg_change_id "$1"; }
 same_change() { lg_same_change "$1" "$2"; }
-cur=$(gh pr view "$N" -R $R --json headRefOid --jq .headRefOid)
+cur=$(gh pr view "$N" -R $R --json headRefOid --jq .headRefOid 2>/dev/null)
 $G cat-file -e "$cur" 2>/dev/null || $G fetch -q origin "$cur"
 if [ "$cur" != "$EF" ]; then
   same_change "$EF" "$cur" || { echo "#$N head ${cur:0:8} is neither the read head ${EF:0:8} nor the same change: stop"; exit 3; }
   echo "#$N head ${cur:0:8} carries the read head ${EF:0:8} (same change)"
 fi
-if [ "$(gh pr view "$N" -R $R --json mergeStateStatus --jq .mergeStateStatus)" = BEHIND ]; then
+if [ "$(gh pr view "$N" -R $R --json mergeStateStatus --jq .mergeStateStatus 2>/dev/null)" = BEHIND ]; then
   gh pr update-branch "$N" -R $R >/dev/null 2>&1 || { echo "#$N update-branch refused (conflict?): a native rebase is needed: stop"; exit 4; }
   sleep 8; $G fetch -q origin main "pull/$N/head"
-  cur=$(gh pr view "$N" -R $R --json headRefOid --jq .headRefOid); $G cat-file -e "$cur" 2>/dev/null || $G fetch -q origin "$cur"
+  cur=$(gh pr view "$N" -R $R --json headRefOid --jq .headRefOid 2>/dev/null); $G cat-file -e "$cur" 2>/dev/null || $G fetch -q origin "$cur"
   same_change "$EF" "$cur" || { echo "#$N CHANGE DIFFERS after update-branch (${cur:0:8}): stop"; exit 4; }
   echo "#$N updated to ${cur:0:8} on main (same change)"
 fi
@@ -146,7 +148,7 @@ tcc_read_gate() {
   s=$(gh api "repos/$R/commits/$1/statuses?per_page=100" --jq '[.[]|select(.context=="trading-cc-read")]|sort_by(.updated_at)|last|select(.!=null)|"\(.state)\t\(.description)"' 2>/dev/null)
   [ -n "$s" ] || return 0
   st=${s%%$'\t'*}; d=${s#*$'\t'}
-  [ "$st" = success ] || { echo "#$N trading-cc-read is $st at ${1:0:8} ($d): stop"; exit 2; }
+  [ "$st" = success ] || { case "$st" in error|failure|pending) ;; *) st=unknown ;; esac; echo "#$N trading-cc-read is $st at ${1:0:8} (description withheld, #975 P2-2): stop"; exit 2; }
   # Correction #136: the description's verdict word must be PASS or ACK, and the record's LAST Verdict line naming the head must carry
   # PASS or ACK (not just "the head somewhere and a PASS anywhere").
   [[ "$d" =~ ^(PASS|ACK):\ (trading-cc/reads/[A-Za-z0-9._-]+\.md)$ ]] || { echo "#$N trading-cc-read description not in the agreed form (PASS|ACK: trading-cc/reads/<record>.md): stop"; exit 2; }
@@ -182,7 +184,7 @@ codex_wait() {
     echo "#$N $g: stop, land after Codex finishes"; exit 9
   done
 }
-if [ "$(gh pr view "$N" -R $R --json isDraft --jq .isDraft)" = true ]; then
+if [ "$(gh pr view "$N" -R $R --json isDraft --jq .isDraft 2>/dev/null)" = true ]; then
   gh pr ready "$N" -R $R >/dev/null 2>&1 || { echo "#$N could not be marked ready"; exit 7; }
   echo "#$N marked ready at $(date -u +%FT%TZ)"; sleep 20
 fi
@@ -212,14 +214,14 @@ follows=0
 for i in $(seq 1 25); do
   # Judge the LATEST check run per name at this head: superseded runs (concurrency-cancelled duplicates) must not
   # count as failures (2026-10-09 #886: 10 CANCELLED plus 1 FAILURE from a superseded run while mergeState was CLEAN).
-  hd=$(gh pr view "$N" -R $R --json headRefOid --jq .headRefOid)
-  ms=$(gh pr view "$N" -R $R --json mergeStateStatus --jq .mergeStateStatus)
+  hd=$(gh pr view "$N" -R $R --json headRefOid --jq .headRefOid 2>/dev/null)
+  ms=$(gh pr view "$N" -R $R --json mergeStateStatus --jq .mergeStateStatus 2>/dev/null)
   # 2026-10-10: the aggregate `validate` check must have SUCCEEDED at this head. A DIRTY PR runs only CodeQL and Socket,
   # so "every check green" alone could pass on a handful of early checks (trading-cc on #940).
   # #975 P2-3 (2026-10-11): a completed check fails unless its conclusion is success, neutral or skipped (fail closed). GitHub's GraphQL
   # CheckConclusionState (schema.docs.graphql sha256 3ed09565…, lines 3974-4018) also has stale and startup_failure, which REST
   # rest-api-description@58b1e0c0 omits from its check-run enum; the old list counted those, and action_required on uet, as passing.
-  c=$(gh api "repos/$R/commits/$hd/check-runs?per_page=100" --jq '[.check_runs[]|{name,status,conclusion,started_at}]|group_by(.name)|map(max_by(.started_at))|[([.[]|select(.status!="completed")]|length), ([.[]|select(.status=="completed" and ((.conclusion=="success" or .conclusion=="neutral" or .conclusion=="skipped")|not))]|length), length, ([.[]|select(.name=="validate" and .conclusion=="success")]|length)]|@tsv')
+  c=$(gh api "repos/$R/commits/$hd/check-runs?per_page=100" --jq '[.check_runs[]|{name,status,conclusion,started_at}]|group_by(.name)|map(max_by(.started_at))|[([.[]|select(.status!="completed")]|length), ([.[]|select(.status=="completed" and ((.conclusion=="success" or .conclusion=="neutral" or .conclusion=="skipped")|not))]|length), length, ([.[]|select(.name=="validate" and .conclusion=="success")]|length)]|@tsv' 2>/dev/null)
   set -- "$hd" $c "$ms"
   vok=${5:-0}; ms=${6:-}; set -- "$1" "$2" "$3" "$4" "$ms"
   if [ "${1:-}" != "$cur" ]; then
@@ -235,7 +237,7 @@ for i in $(seq 1 25); do
     ae=$(lg_author_email "$R") || { echo "#$N cannot form the no-reply author address (correction #148): stop, nothing merged"; exit 11; }
     out=$(gh pr merge "$N" -R $R --squash --match-head-commit "$cur" -A "$ae" 2>&1) || { mf=$(mktemp "${TMPDIR:-/tmp}/merge-fail-XXXXXX"); printf '%s\n' "$out" > "$mf"; cls=$(printf '%s' "$out" | grep -o -i -E 'not mergeable|head branch was modified|required status check|review|draft|merge conflict|protected branch|rate limit|authentication|not found' | head -1 | tr 'A-Z ' 'a-z_'); echo "#$N merge failed (class: ${cls:-other}); gh output kept only in local file ${mf##*/} in the temp directory (0600), never echoed (#975 P2-2)"; exit 7; }
     sleep 4
-    echo "#$N $(gh pr view "$N" -R $R --json state,mergeCommit,mergedAt --jq '"\(.state) \(.mergeCommit.oid) \(.mergedAt)"') (CI $4 ok)"
+    echo "#$N $(gh pr view "$N" -R $R --json state,mergeCommit,mergedAt --jq '"\(.state) \(.mergeCommit.oid) \(.mergedAt)"' 2>/dev/null) (CI $4 ok)"
     lg_author_check "$R" "$N" "$ae" || exit 12
     exit 0
   fi

@@ -9,6 +9,8 @@
 # 9 Codex review running, not finished since its latest trigger, or ended other than Completed (codex_gate.py).
 # 11 the no-reply author address could not be formed (nothing merged), 12 merged, but the merge commit's author is not that address (correction #148).
 # Correction #136 (2026-10-10): verdict/record acceptance, change identity and the CI state use the lg_* functions below (land-patches-20261010).
+# #975 P2-2 (2026-10-11): no text from gh or its API is printed. Every gh call drops its stderr, a failure ends in its step's fixed message and exit code, and gh api
+# writes an error response's body to stdout (cli v2.102.0 pkg/cmd/api/api.go:546), so a value read from it is shown only as a state word or a count.
 set -u
 # Parsed whole before it runs: an edit while a landing runs cannot shift what the running copy executes (2026-10-09).
 {
@@ -136,7 +138,7 @@ tcc_read_gate() {
   s=$(gh api "repos/$R/commits/$1/statuses?per_page=100" --jq '[.[]|select(.context=="trading-cc-read")]|sort_by(.updated_at)|last|select(.!=null)|"\(.state)\t\(.description)"' 2>/dev/null)
   [ -n "$s" ] || return 0
   st=${s%%$'\t'*}; d=${s#*$'\t'}
-  [ "$st" = success ] || { echo "#$N trading-cc-read is $st at ${1:0:8} ($d): stop"; exit 2; }
+  [ "$st" = success ] || { case "$st" in error|failure|pending) ;; *) st=unknown ;; esac; echo "#$N trading-cc-read is $st at ${1:0:8} (description withheld, #975 P2-2): stop"; exit 2; }
   # Correction #136: the description's verdict word must be PASS or ACK, and the record's LAST Verdict line naming the head must carry
   # PASS or ACK (not just "the head somewhere and a PASS anywhere").
   [[ "$d" =~ ^(PASS|ACK):\ (trading-cc/reads/[A-Za-z0-9._-]+\.md)$ ]] || { echo "#$N trading-cc-read description not in the agreed form (PASS|ACK: trading-cc/reads/<record>.md): stop"; exit 2; }
@@ -160,7 +162,7 @@ done
 # Correction #136: the identity of a change is git patch-id (verbatim, -U0, --binary) of its whole diff against its own merge base; an empty change is refused.
 change() { lg_change_id "$1"; }
 same_change() { lg_same_change "$1" "$2"; }
-cur=$(gh pr view "$N" -R $R --json headRefOid --jq .headRefOid)
+cur=$(gh pr view "$N" -R $R --json headRefOid --jq .headRefOid 2>/dev/null)
 git -C $U cat-file -e "$cur" 2>/dev/null || git -C $U fetch -q origin "$cur"
 if [ "$cur" != "$E" ]; then
   same_change "$E" "$cur" || { echo "#$N head $cur is neither the read head nor a pure rebase of it"; exit 3; }
@@ -181,7 +183,7 @@ codex_wait() {
   done
 }
 GATE=${LANDING_GATE:-$(dirname "$(readlink -f -- "$0")")/codex_gate.py}
-if [ "$(gh pr view "$N" -R $R --json isDraft --jq .isDraft)" = true ]; then
+if [ "$(gh pr view "$N" -R $R --json isDraft --jq .isDraft 2>/dev/null)" = true ]; then
   gh pr ready "$N" -R $R >/dev/null 2>&1 || { echo "#$N could not be marked ready"; exit 7; }
   echo "#$N marked ready at $(date -u +%FT%TZ)"; sleep 20
 fi
@@ -197,7 +199,7 @@ fi
 gh pr update-branch "$N" -R $R --rebase >/dev/null 2>&1 || true
 sleep 6
 git -C $U fetch -q origin main "pull/$N/head"
-H=$(gh pr view "$N" -R $R --json headRefOid --jq .headRefOid)
+H=$(gh pr view "$N" -R $R --json headRefOid --jq .headRefOid 2>/dev/null)
 git -C $U cat-file -e "$H" 2>/dev/null || git -C $U fetch -q origin "$H"
 same_change "$E" "$H" || { echo "#$N CHANGE DIFFERS between read head ${E:0:8} and head ${H:0:8}: stop"; exit 4; }
 echo "#$N read ${E:0:12} -> head ${H:0:12}: same change (file set and per-file changed lines)"
@@ -216,14 +218,15 @@ for i in $(seq 1 25); do
   if [ "${2:-1}" = 0 ] && [ "${4:-0}" -gt 0 ] && { [ "${5:-0}" -gt 0 ] || [ "${3:-0}" -gt 0 ]; }; then
     [ "$3" = 0 ] || { echo "#$N CI failing=$3 of $4: stop"; exit 5; }
     if [ "${6:-}" = BLOCKED ]; then
-      open=$(gh api graphql -f query='query($n:Int!){repository(owner:"seathatflowsinourveins",name:"us-equities-trading"){pullRequest(number:$n){reviewThreads(first:100){nodes{isResolved}}}}}' -F n="$N" --jq '[.data.repository.pullRequest.reviewThreads.nodes[]|select(.isResolved==false)]|length')
+      open=$(gh api graphql -f query='query($n:Int!){repository(owner:"seathatflowsinourveins",name:"us-equities-trading"){pullRequest(number:$n){reviewThreads(first:100){nodes{isResolved}}}}}' -F n="$N" --jq '[.data.repository.pullRequest.reviewThreads.nodes[]|select(.isResolved==false)]|length' 2>/dev/null)
+      case "$open" in ''|*[!0-9]*) open=unknown ;; esac
       echo "#$N BLOCKED by branch policy with CI green; unresolved review threads: $open. Not forcing."; exit 8
     fi
     g=$(python3 -I "$GATE" "$R" "$N" 2>&1); gr=$?; { [ $gr = 0 ] || [ $gr = 5 ]; } || { echo "#$N $g just before the merge: stop"; exit 9; }
     ae=$(lg_author_email "$R") || { echo "#$N cannot form the no-reply author address (correction #148): stop, nothing merged"; exit 11; }
     out=$(gh pr merge "$N" -R $R --squash --match-head-commit "$H" -A "$ae" 2>&1) || { mf=$(mktemp "${TMPDIR:-/tmp}/merge-fail-XXXXXX"); printf '%s\n' "$out" > "$mf"; cls=$(printf '%s' "$out" | grep -o -i -E 'not mergeable|head branch was modified|required status check|review|draft|merge conflict|protected branch|rate limit|authentication|not found' | head -1 | tr 'A-Z ' 'a-z_'); echo "#$N merge failed (class: ${cls:-other}); gh output kept only in local file ${mf##*/} in the temp directory (0600), never echoed (#975 P2-2)"; exit 7; }
     sleep 4
-    echo "#$N $(gh pr view "$N" -R $R --json state,mergeCommit,mergedAt --jq '"\(.state) \(.mergeCommit.oid) \(.mergedAt)"') (CI $4 ok)"
+    echo "#$N $(gh pr view "$N" -R $R --json state,mergeCommit,mergedAt --jq '"\(.state) \(.mergeCommit.oid) \(.mergedAt)"' 2>/dev/null) (CI $4 ok)"
     lg_author_check "$R" "$N" "$ae" || exit 12
     exit 0
   fi
