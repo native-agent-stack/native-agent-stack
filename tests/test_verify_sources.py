@@ -66,6 +66,10 @@ RULES = (
      "LineRangeTests.test_a_range_inside_the_file_passes"),
     ("not-on-default-branch", "AncestryTests.test_behind_diverged_or_another_merge_base_is_not_on_default_branch",
      "AncestryTests.test_ahead_or_identical_with_the_cited_merge_base_passes"),
+    ("not-on-default-branch:behind", "AncestryTests.test_behind_diverged_or_another_merge_base_is_not_on_default_branch",
+     "AncestryTests.test_ahead_or_identical_with_the_cited_merge_base_passes"),
+    ("not-on-default-branch:diverged", "AncestryTests.test_behind_diverged_or_another_merge_base_is_not_on_default_branch",
+     "AncestryTests.test_ahead_or_identical_with_the_cited_merge_base_passes"),
     ("unavailable", "UnavailableTests.test_timeout_429_503_and_rate_limits_are_unavailable_not_failures",
      "UnavailableTests.test_a_plain_403_is_a_failure_not_unavailable"),
     ("symlink note", "ContentsTests.test_a_symlink_to_a_file_is_checked_against_its_target_with_a_note",
@@ -111,13 +115,20 @@ def contents_key(path, sha=TAG):
 
 
 def compare_key(sha=TAG):
-    return f"{LYCHEE}/compare/{sha}...master?per_page=1", V.JSON_MEDIA
+    return f"{LYCHEE}/compare/{sha}...{MASTER}?per_page=1&page=2", V.JSON_MEDIA
 
 
 def recorded_routes():
     """lycheeverse/lychee@2bba271688c1:lychee-lib/src/quirks/mod.rs, every response as recorded: all checks pass."""
-    return {route(label): replay(label) for label in
-            ("commit-sha-12", "commit-sha-40", "git-commit", "contents-file", "repository", "compare-ahead")}
+    routes = {route(label): replay(label) for label in
+              ("commit-sha-12", "commit-sha-40", "git-commit", "contents-file", "repository")}
+    # Synthetic replay of the recorded comparison against its recorded tip, now on page 2.
+    routes[compare_key()] = replay("compare-ahead")
+    routes[(f"{LYCHEE}/commits/master", V.SHA_MEDIA)] = V.Response(200, {}, MASTER.encode())
+    for namespace in ("heads", "tags"):
+        for spelling in (TAG[:12], TAG[:12].upper()):
+            routes[(f"{LYCHEE}/git/ref/{namespace}/{spelling}", V.JSON_MEDIA)] = json_response(404, {"message": "Not Found"})
+    return routes
 
 
 def routes_at(sha, compare, commit_label=None, git_label=None, repository=LYCHEE, path=MOD_RS, body=None):
@@ -125,7 +136,9 @@ def routes_at(sha, compare, commit_label=None, git_label=None, repository=LYCHEE
     not named by a recorded label are synthetic, in the recorded shapes."""
     resolved = replay(commit_label) if commit_label else V.Response(
         200, {"content-type": "application/vnd.github.sha; charset=utf-8"}, sha.encode())
-    return {(f"{repository}/commits/{sha[:12]}", V.SHA_MEDIA): resolved,
+    return {(f"{repository}/git/ref/heads/{sha[:12]}", V.JSON_MEDIA): json_response(404, {"message": "Not Found"}),
+            (f"{repository}/git/ref/tags/{sha[:12]}", V.JSON_MEDIA): json_response(404, {"message": "Not Found"}),
+            (f"{repository}/commits/{sha[:12]}", V.SHA_MEDIA): resolved,
             (f"{repository}/commits/{sha}", V.SHA_MEDIA): resolved,
             (f"{repository}/git/commits/{sha}", V.JSON_MEDIA):
                 replay(git_label) if git_label else json_response(200, {"sha": sha}),
@@ -133,7 +146,8 @@ def routes_at(sha, compare, commit_label=None, git_label=None, repository=LYCHEE
                 raw_file(numbered_lines(LINES) if body is None else body),
             (repository, V.JSON_MEDIA):
                 replay("repository") if repository == LYCHEE else json_response(200, {"default_branch": "master"}),
-            (f"{repository}/compare/{sha}...master?per_page=1", V.JSON_MEDIA): compare}
+            (f"{repository}/commits/master", V.SHA_MEDIA): V.Response(200, {}, MASTER.encode()),
+            (f"{repository}/compare/{sha}...{MASTER}?per_page=1&page=2", V.JSON_MEDIA): compare}
 
 
 class Fake:
@@ -323,7 +337,7 @@ class ShaPolicyTests(unittest.TestCase):
     def test_a_twelve_hex_ref_resolves_and_records_the_full_sha(self):
         rows, fake = verify(AT_FORM)
         self.assertEqual((rows[0]["status"], rows[0]["sha"], rows[0]["ref"]), ("ok", TAG, TAG[:12]))
-        self.assertEqual(fake.calls[0][0], (f"{LYCHEE}/commits/{TAG[:12]}", V.SHA_MEDIA))
+        self.assertIn((f"{LYCHEE}/commits/{TAG[:12]}", V.SHA_MEDIA), [key for key, _, _ in fake.calls])
         upper, _ = verify(f"lycheeverse/lychee@{TAG[:12].upper()}:{MOD_RS}:L23-L24")
         self.assertEqual((upper[0]["status"], upper[0]["sha"]), ("ok", TAG))
 
@@ -332,7 +346,8 @@ class ShaPolicyTests(unittest.TestCase):
         self.assertEqual((rows[0]["status"], rows[0]["sha"]), ("ok", TAG))
         self.assertEqual([key for key, _, _ in fake.calls],
                          [(f"{LYCHEE}/commits/{TAG}", V.SHA_MEDIA), (f"{LYCHEE}/git/commits/{TAG}", V.JSON_MEDIA),
-                          contents_key(MOD_RS), (LYCHEE, V.JSON_MEDIA), compare_key()])
+                          contents_key(MOD_RS), (LYCHEE, V.JSON_MEDIA),
+                          (f"{LYCHEE}/commits/master", V.SHA_MEDIA), compare_key()])
 
     def test_a_branch_or_tag_ref_is_unpinned_without_a_request(self):
         for ref in ("master", "lychee-v0.24.2", "release/1.x", TAG + "0"):
@@ -346,17 +361,19 @@ class ShaPolicyTests(unittest.TestCase):
         routes[route("commit-sha-12")] = V.Response(200, {"content-type": "application/vnd.github.sha"},
                                                     MASTER.encode())
         rows, fake = verify(AT_FORM, routes)
-        self.assertEqual((rows[0]["status"], rows[0]["sha"], len(fake.calls)), ("unpinned", None, 1))
+        self.assertEqual((rows[0]["status"], rows[0]["sha"], len(fake.calls)), ("unpinned", None, 3))
         self.assertIn(f"resolves to {MASTER}", rows[0]["reason"])
 
 
 class CommitTests(unittest.TestCase):
     def test_a_ref_or_commit_github_cannot_find_is_commit_not_found(self):
         missing = "0123456789ab"
-        routes = {route("commit-sha-missing"): replay("commit-sha-missing")}
+        routes = {route("commit-sha-missing"): replay("commit-sha-missing"),
+                  (f"{LYCHEE}/git/ref/heads/{missing}", V.JSON_MEDIA): json_response(404, {}),
+                  (f"{LYCHEE}/git/ref/tags/{missing}", V.JSON_MEDIA): json_response(404, {})}
         rows, _ = verify(f"lycheeverse/lychee@{missing}:{MOD_RS}:L1", routes)
-        self.assertEqual((rows[0]["status"], rows[0]["http_status"]), ("commit-not-found", 422))
-        self.assertIn("No commit found for SHA", rows[0]["reason"])
+        self.assertEqual((rows[0]["status"], rows[0]["http_status"]), ("sha-unresolved", 422))
+        self.assertIn("cite the full SHA", rows[0]["reason"])
         routes = recorded_routes()
         routes[route("git-commit")] = replay("git-commit-missing")
         rows, _ = verify(AT_FORM, routes)
@@ -499,7 +516,8 @@ class AncestryTests(unittest.TestCase):
             with self.subTest(sha=sha, state=state):
                 rows, _ = verify(f"lycheeverse/lychee@{sha[:12]}:{MOD_RS}:L23-L24", routes)
                 self.assertEqual((rows[0]["status"], rows[0]["sha"], rows[0]["compare_status"]),
-                                 ("not-on-default-branch", sha, state))
+                                 ("not-on-default-branch:" + state if state in ("behind", "diverged")
+                                  else "not-on-default-branch", sha, state))
 
 
 class UnavailableTests(unittest.TestCase):
@@ -599,7 +617,7 @@ class OutputTests(unittest.TestCase):
         self.assertEqual(report["roles"], {"mechanism": 1, "adopt": 1, "unknown": 1})
         self.assertEqual(set(report["rows"][0]), {
             "entry", "role", "role_ref", "citation", "repo", "path", "lines", "ref", "sha", "status", "reason",
-            "http_status", "notes", "line_count", "blob_sha", "default_branch", "compare_status"})
+            "http_status", "notes", "line_count", "blob_sha", "default_branch", "default_branch_sha", "compare_status"})
         self.assertEqual(report["rows"][0]["lines"], [23, 24])
         self.assertTrue(written["step.md"].startswith("earlier step\n## SOTA sources: code citations"))
         self.assertEqual(written["step.md"], "earlier step\n" + written["summary.md"])

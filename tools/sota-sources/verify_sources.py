@@ -13,15 +13,17 @@ listed as "not checked in phase A".
 Grammar. The section is found exactly as pr-metadata.yml's sota-sources job finds it (SOTA_SECTION). Each list item,
 or each paragraph outside a list, is an entry. An entry may start with a role tag, [mechanism], [adopt], [reference],
 [trial:<id>] or [exception:<record>]; an untagged entry has the role "unknown", which is reported and never failed in
-phase A. A code citation takes one of two forms, modelled on SWHID (ISO/IEC 18670:2025: an anchor revision, a path and
-a line range):
+phase A. A code citation names a commit, path and line range, in one of two forms:
 
     https://github.com/OWNER/REPO/blob/REF/PATH#Lx    or #Lx-Ly   (?plain=1 and Cn column suffixes are accepted)
     OWNER/REPO@REF:PATH:Lx                            or :Lx-Ly
 
 SHA policy. A ref of 12 to 40 hex characters is resolved with GET /repos/{o}/{r}/commits/{ref} (the
-application/vnd.github.sha media type returns only the SHA), and the SHA it returns must start with the ref, so a
-branch named like hex is refused as "unpinned"; the full SHA is recorded. A shorter hex ref is "short-sha" and any
+application/vnd.github.sha media type returns only the SHA). For abbreviated refs, exact git/ref/heads and
+git/ref/tags lookups must establish that no same-named mutable ref exists; lookup failures are unavailable.
+The resolved SHA must also start with the ref. A branch named like hex is "unpinned"; the full SHA is recorded.
+An unresolved prefix is "sha-unresolved"
+(indeterminate, cite the full SHA), distinct from a missing full SHA. A shorter hex ref containing a-f is "short-sha" and any
 other ref, a branch or a tag, is "unpinned": GitHub's permalinks accept all of these, so the checker refuses them
 itself. The 12-character floor is the Linux kernel's rule for a Fixes: tag
 (torvalds/linux@a5ebb76233b79db01e82e061173cb73c6d2b5c6b:Documentation/process/submitting-patches.rst:L145-L147),
@@ -35,11 +37,13 @@ Checks, in order; the first that fails sets the row's status:
      comes back as application/json: path-is-directory. A body over 100 MiB, or a too_large refusal:
      unverifiable-size.
   3. 1 <= x <= y <= the file's line count                                     else line-range-out-of-bounds
-  4. GET /repos/{o}/{r}/compare/{sha}...{default branch}?per_page=1 returns status ahead or identical with
+  4. Resolve and record the default branch tip SHA once per repository, then
+     GET /repos/{o}/{r}/compare/{sha}...{tip SHA}?per_page=1&page=2 returns status ahead or identical with
      merge_base_commit.sha equal to the cited SHA                             else not-on-default-branch
      compare and git/commits both accept a SHA from a fork in the same repository network, so this is the check
      that puts the commit on the upstream's own history.
-A timeout, a connection error, a 5xx, a rate-limited 403, a 429 or a rejected token is "unavailable", with the HTTP
+A compare limitation, incomplete/oversize JSON, a 400, a timeout, a connection error, a 5xx,
+a 408 request timeout, a rate-limited 403, a 429 or a rejected token is "unavailable", with the HTTP
 code when there was one. It is never a failure status, and no failure is reported as "unavailable". lychee cannot do
 the line check: it deletes GitHub #L fragments before the request
 (lycheeverse/lychee@2bba271688c1abb1503097a064e6c3bc1d1b6a9b:lychee-lib/src/quirks/mod.rs:L23-L24).
@@ -51,13 +55,21 @@ SHA, so that mismatch is recorded as a note, never a status. Untested boundaries
 the link text as a one-line file, which one raw request cannot tell apart from a file; no file over 100 MB was
 observed, so both unverifiable-size signals follow the documentation only. Measured limit of check 4: a release
 commit on a maintenance branch is not on the default branch (CPython's v3.12.3 commit compares "diverged" with main),
-so citing such a release fails as not-on-default-branch.
+so citing such a release is counted separately as not-on-default-branch:diverged (or :behind). Release-tag heads
+and the grammar that names a tag are deferred to phase B by the plan owner's ruling. SWHID anchor/path/lines
+verification also remains deferred; phase A reports it explicitly as not-checked, never as a GitHub code citation.
+
+Budgets: at most 64 citations are checked per body (excess rows are not-checked: over the per-body cap), and at most
+256 HTTP requests per run, including redirect hops and PR retrieval. The first rate limit stops all further requests;
+remaining rows are unavailable. Raw contents are discarded after counting lines and computing the blob, so cached
+files retain only those measurements and headers. The JSON report records the limits.
 
 Output. A JSON report (stdout, or --report) with one row per citation and one per unchecked entry, and a Markdown
 summary appended to $GITHUB_STEP_SUMMARY when it is set (and written to --summary). --mode report always exits 0.
 --mode enforce exits 1 on any failure status, 3 when nothing failed but something is unavailable, and 0 otherwise.
 A missing or empty section is reported (section.present false) and exits 0, because the required sota-sources job
-owns presence. GITHUB_TOKEN, when set, is sent to api.github.com as a bearer token, never across a redirect, and is
+owns presence. GITHUB_TOKEN, when set, is sent to api.github.com as a bearer token; a redirect retains it only between
+HTTPS api.github.com URLs without userinfo or a nonstandard port. It is
 never printed or written.
 """
 from __future__ import annotations
@@ -91,10 +103,16 @@ JSON_MEDIA = "application/vnd.github+json"
 MAX_CONTENT_BYTES = 100 * 1024 * 1024
 MAX_JSON_BYTES = 32 * 1024 * 1024
 MAX_ERROR_BYTES = 64 * 1024
+MAX_CITATIONS = 64
+MAX_REQUESTS = 256
+# A raw file has at most one line per byte. Reject huge numeric tokens before int() (CPython's conversion limit).
+MAX_LINE_NUMBER = MAX_CONTENT_BYTES
 
 FAILURES = frozenset({"short-sha", "unpinned", "commit-not-found", "path-not-found", "path-is-directory",
-                      "unverifiable-size", "line-range-out-of-bounds", "not-on-default-branch"})
+                      "unverifiable-size", "line-range-out-of-bounds", "not-on-default-branch",
+                      "not-on-default-branch:diverged", "not-on-default-branch:behind"})
 UNAVAILABLE = "unavailable"
+SHA_UNRESOLVED = "sha-unresolved"
 NOT_CHECKED = "not-checked"
 ROLES = ("mechanism", "adopt", "reference", "trial", "exception", "unknown")
 
@@ -109,20 +127,24 @@ JS_LINE_BREAKS = re.compile("\r\n|[\r  ]")
 JS_TRIM = ("\t\n\v\f\r              "
            "    　﻿")
 
-LIST_ITEM = re.compile(r"[ \t]*(?:[-*+]|\d{1,9}[.)])(?:[ \t]+|$)")
+LIST_ITEM = re.compile(r"[ \t]*(?:[-*+]|[0-9]{1,9}[.)])(?:[ \t]+|$)")
 ROLE_TAG = re.compile(r"\[(?:(mechanism|adopt|reference)|(trial|exception):([^\]\s]+))\](?![(\[])")
 BLOB_URL = re.compile(
-    r"https?://(?:www\.)?github\.com/(?P<owner>[A-Za-z0-9-]+)/(?P<repo>[A-Za-z0-9._-]+)/blob/"
-    r"(?P<ref>[^/\s?#]+)/(?P<path>[^\s?#<>()\[\]`'\"]+)(?:\?[^\s#<>()\[\]`'\"]*)?"
-    r"#L(?P<start>\d+)(?:C\d+)?(?:-L?(?P<end>\d+)(?:C\d+)?)?(?![\w-])")
+    r"(?i:https?://(?:www\.)?github\.com)/(?P<owner>[A-Za-z0-9-]+)/(?P<repo>[A-Za-z0-9._-]+)/blob/"
+    r"(?P<ref>[^/\s?#]+)/(?P<path>[^\s?#<>\[\]`'\"]+)(?:\?[^\s#<>\[\]`'\"]*)?"
+    r"#L(?P<start>[0-9]+)(?:C[0-9]+)?(?:-L?(?P<end>[0-9]+)(?:C[0-9]+)?)?(?![^\W_]|-)")
 AT_REF = re.compile(
     r"(?<![\w./@-])(?P<owner>[A-Za-z0-9-]+)/(?P<repo>[A-Za-z0-9._-]+)@(?P<ref>[^\s:@<>()\[\]`'\"]+)"
-    r":(?P<path>[^\s:<>()\[\]`'\"]+):L(?P<start>\d+)(?:-L?(?P<end>\d+))?(?![\w-])")
-ANY_BLOB_URL = re.compile(r"https?://(?:www\.)?github\.com/[^/\s]+/[^/\s]+/blob/")
-ANY_URL = re.compile(r"https?://")
+    r":(?P<path>[^\s:<>\[\]`'\"]+):L(?P<start>[0-9]+)(?:-L?(?P<end>[0-9]+))?(?![^\W_]|-)")
+ANY_BLOB_URL = re.compile(r"https?://(?:www\.)?github\.com/[^/\s]+/[^/\s]+/blob/", re.I)
+ANY_URL = re.compile(r"https?://", re.I)
 HEX = re.compile(r"[0-9A-Fa-f]+")
 FULL_SHA = re.compile(r"[0-9a-f]{40}")
 REPO_ARGUMENT = re.compile(r"[A-Za-z0-9-]+/[A-Za-z0-9._-]+")
+CANDIDATE = re.compile(
+    r"(?i:https?://(?:www\.)?github\.com)/[^/\s<>`'\"\[\]]+/[^/\s<>`'\"\[\]]+/blob/[^\s<>`'\"\[\]]*"
+    r"|(?<![\w./@-])[A-Za-z0-9-]+/[A-Za-z0-9._-]+@[^\s<>`'\"\[\]]+"
+    r"|swh:1:[^\s<>`'\"\[\]]+")
 
 # The smoke's two public citations (the W1b primary-source review): lychee's line-fragment quirk at the
 # lychee-v0.24.2 commit, and a range that straddles that file's last line (it has 318 lines).
@@ -156,8 +178,10 @@ class Citation:
     repo: str
     ref: str
     path: str
-    start: int
-    end: int
+    start: int | None
+    end: int | None
+    span: tuple | None = None
+    parse_error: str | None = None
 
 
 def parse_entries(content):
@@ -188,7 +212,14 @@ def parse_entries(content):
     return entries
 
 
-def find_citations(text):
+def bounded_line(token):
+    if len(token) > len(str(MAX_LINE_NUMBER)):
+        return None
+    value = int(token)
+    return value if value <= MAX_LINE_NUMBER else None
+
+
+def find_citations(text, deduplicate=True):
     """The entry's code citations in the order they appear, each (repository, ref, path, lines) once."""
     found = []
     for match in BLOB_URL.finditer(text):
@@ -197,14 +228,39 @@ def find_citations(text):
         found.append((match.start(), match, match.group("path")))
     citations, seen = [], set()
     for _, match, path in sorted(found, key=lambda item: item[0]):
-        start = int(match.group("start"))
-        end = int(match.group("end")) if match.group("end") else start
+        start = bounded_line(match.group("start"))
+        end = bounded_line(match.group("end")) if match.group("end") else start
         key = (match.group("owner").lower(), match.group("repo").lower(), match.group("ref"), path, start, end)
-        if key not in seen:
+        if not deduplicate or key not in seen:
             seen.add(key)
             citations.append(Citation(match.group(0), match.group("owner"), match.group("repo"), match.group("ref"),
-                                      path, start, end))
+                                      path, start, end, match.span(),
+                                      "line number exceeds the supported file-size bound" if start is None or end is None else None))
     return citations
+
+
+def citation_candidates(text):
+    """Keep spans for all candidates; matching one citation must not swallow an unrecognized neighbour."""
+    recognized = find_citations(text, deduplicate=False)
+    by_start = {citation.span[0]: citation for citation in recognized}
+    found = []
+    seen = set()
+    for match in CANDIDATE.finditer(text):
+        candidate = match.group(0).rstrip(".,;)*_")
+        citation = by_start.get(match.start())
+        if citation is not None and text[citation.span[1]:match.end()].strip(".,;)*_"):
+            citation = None  # a recognizer only consumed a prefix of a malformed candidate
+        if citation is not None:
+            key = (citation.owner.lower(), citation.repo.lower(), citation.ref, citation.path, citation.start,
+                   citation.end, citation.parse_error)
+            if key not in seen:
+                seen.add(key)
+                found.append((match.span(), citation, None))
+        elif any(c.span[0] == match.start() for c in recognized):
+            found.append((match.span(), None, candidate))
+        else:
+            found.append((match.span(), None, candidate))
+    return found
 
 
 def classify_ref(ref):
@@ -212,6 +268,8 @@ def classify_ref(ref):
     if not HEX.fullmatch(ref):
         return "unpinned", f"ref {ref!r} is a branch or tag name; cite a commit SHA of at least 12 hex characters"
     if len(ref) < 12:
+        if ref.isdecimal():
+            return "unpinned", f"ref {ref!r} is a numeric branch or tag name; cite a commit SHA"
         return "short-sha", f"{len(ref)} hex characters; cite at least 12 (the kernel's Fixes: rule)"
     if len(ref) > 40:
         return "unpinned", f"{len(ref)} hex characters is no SHA-1: a branch or tag name"
@@ -224,6 +282,7 @@ class Response:
     headers: dict
     body: bytes = b""
     oversize: bool = False
+    content: dict | None = None
 
 
 @dataclasses.dataclass
@@ -232,11 +291,46 @@ class Unreachable:
     reason: str
 
 
-def urllib_fetch(url, headers, timeout, limit, opener=None):
+def api_origin(url):
+    parsed = urllib.parse.urlsplit(url)
+    return parsed.scheme == "https" and parsed.netloc.lower() in ("api.github.com", "api.github.com:443")
+
+
+class APIRedirectHandler(urllib.request.HTTPRedirectHandler):
+    """CPython's redirect policy plus same-API unredirected auth (request.py at f6650f9a:675-679)."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        redirected = super().redirect_request(req, fp, code, msg, headers, newurl)
+        if redirected is not None and api_origin(req.full_url) and api_origin(newurl):
+            auth = req.get_header("Authorization")
+            if auth:
+                redirected.add_unredirected_header("Authorization", auth)
+        return redirected
+
+
+class RequestCounter(urllib.request.BaseHandler):
+    """Run before each HTTP request, including CPython's recursively opened redirects."""
+    handler_order = 400
+
+    def __init__(self, before_request):
+        self.before_request = before_request
+
+    def http_request(self, request):
+        self.before_request()
+        return request
+
+    https_request = http_request
+
+
+class RequestBudgetExceeded(OSError):
+    pass
+
+
+def urllib_fetch(url, headers, timeout, limit, opener=None, before_request=None):
     """GET url and return a Response; a transport failure raises OSError or http.client.HTTPException.
 
     The token goes in an unredirected header: urllib's redirect_request copies req.headers, never
-    unredirected_hdrs, so a redirect cannot carry it to another host
+    unredirected_hdrs; APIRedirectHandler restores it only for same-API HTTPS redirects
     (python/cpython@f6650f9ad73359051f3e558c2431a109bc016664:Lib/urllib/request.py:L401-L403 and L675-L679).
     """
     public = {name: value for name, value in headers.items() if name.lower() != "authorization"}
@@ -244,7 +338,10 @@ def urllib_fetch(url, headers, timeout, limit, opener=None):
     for name, value in headers.items():
         if name.lower() == "authorization":
             request.add_unredirected_header("Authorization", value)
-    opener = opener or urllib.request.build_opener()
+    handlers = [APIRedirectHandler()]
+    if before_request is not None:
+        handlers.append(RequestCounter(before_request))
+    opener = opener or urllib.request.build_opener(*handlers)
     try:
         response = opener.open(request, timeout=timeout)
     except urllib.error.HTTPError as error:
@@ -270,23 +367,51 @@ class GitHub:
     """GitHub REST GETs through an injectable fetcher, each URL and media type fetched once per run."""
 
     def __init__(self, fetch=None, token=None, timeout=TIMEOUT):
-        self.fetch = fetch or urllib_fetch
-        self.token = token
+        self.fetch = fetch
+        self.token = token.strip() if token else None
         self.timeout = timeout
         self.cache = {}
+        self._requests = 0
+        self.max_requests = MAX_REQUESTS
+        self.stopped = None
+        if self.token and (any(ord(char) < 32 or ord(char) == 127 or ord(char) > 255 for char in self.token)):
+            self.stopped = "invalid authorization header configuration"
 
     @property
     def requests(self):
-        return len(self.cache)
+        return self._requests
+
+    def before_request(self):
+        if self.requests >= self.max_requests:
+            self.stopped = f"over the per-run request cap ({self.max_requests})"
+            raise RequestBudgetExceeded()
+        self._requests += 1
 
     def get(self, path, accept=JSON_MEDIA, limit=MAX_JSON_BYTES):
         key = (path, accept)
+        if self.stopped:
+            return Unreachable(self.stopped)
         if key not in self.cache:
             headers = {"Accept": accept, "X-GitHub-Api-Version": API_VERSION, "User-Agent": USER_AGENT}
             if self.token:
                 headers["Authorization"] = f"Bearer {self.token}"
             try:
-                self.cache[key] = self.fetch(API + path, headers, self.timeout, limit)
+                if self.fetch is None:
+                    response = urllib_fetch(API + path, headers, self.timeout, limit, before_request=self.before_request)
+                else:
+                    self.before_request()
+                    response = self.fetch(API + path, headers, self.timeout, limit)
+                why = transient(response)
+                if isinstance(response, Response) and why and "rate limited" in why:
+                    self.stopped = f"requests stopped after {why}"
+                if isinstance(response, Response) and accept == RAW_MEDIA:
+                    response = compact_contents(response)
+                self.cache[key] = response
+            except RequestBudgetExceeded:
+                self.cache[key] = Unreachable(self.stopped)
+            except ValueError:
+                # http.client at f6650f9a:1311-1314 can include a header value in its exception.
+                self.cache[key] = Unreachable("invalid request header")
             except (OSError, http.client.HTTPException) as error:
                 self.cache[key] = Unreachable(transport_reason(error))
         return self.cache[key]
@@ -331,6 +456,10 @@ def transient(response):
         return "HTTP 403 (rate limited)"
     if response.status == 401:
         return "HTTP 401 (the token was refused)"
+    if response.status == 400:
+        return "HTTP 400 (request unavailable)"
+    if response.status == 408:
+        return "HTTP 408 (request timed out)"
     return None
 
 
@@ -340,6 +469,8 @@ def http_reason(response, what):
 
 
 def too_large(response):
+    if response.status < 400:
+        return False  # successful raw source JSON is never an API error envelope
     data = json_body(response)
     errors = data.get("errors") if isinstance(data, dict) else None
     return isinstance(errors, list) and any(isinstance(item, dict) and item.get("code") == "too_large"
@@ -357,6 +488,24 @@ def git_blob_sha(content):
     return hashlib.sha1(b"blob %d\0" % len(content) + content, usedforsecurity=False).hexdigest()
 
 
+def compact_contents(response):
+    """Keep file measurements, never the up-to-100-MiB body; directory JSON becomes small metadata."""
+    if response.status != 200 or response.oversize:
+        return dataclasses.replace(response, body=response.body[:MAX_ERROR_BYTES])
+    media = response.headers.get("content-type", "").split(";")[0].strip().lower()
+    if media == "application/json":
+        data = json_body(response)
+        if isinstance(data, list):
+            info = {"kind": "dir", "entries": len(data)}
+        elif isinstance(data, dict):
+            info = {"kind": data.get("type"), "target": data.get("target")}
+        else:
+            info = {"kind": None}
+    else:
+        info = {"kind": "file", "lines": line_count(response.body), "blob": git_blob_sha(response.body)}
+    return dataclasses.replace(response, body=b"", content=info)
+
+
 def invalid_path(path):
     return not path or path.startswith("/") or any(part in ("", ".", "..") for part in path.split("/"))
 
@@ -364,7 +513,8 @@ def invalid_path(path):
 def new_row(entry, citation=None):
     row = {"entry": entry.text, "role": entry.role, "role_ref": entry.role_ref, "citation": None, "repo": None,
            "path": None, "lines": None, "ref": None, "sha": None, "status": None, "reason": "", "http_status": None,
-           "notes": [], "line_count": None, "blob_sha": None, "default_branch": None, "compare_status": None}
+           "notes": [], "line_count": None, "blob_sha": None, "default_branch": None,
+           "default_branch_sha": None, "compare_status": None}
     if citation is not None:
         row.update(citation=citation.text, repo=f"{citation.owner}/{citation.repo}", path=citation.path,
                    lines=[citation.start, citation.end], ref=citation.ref)
@@ -380,6 +530,8 @@ def settle(row, status, reason, response=None):
 
 def verify_citation(row, citation, github):
     """Run the SHA policy and the four checks in order; the first failure settles the row."""
+    if citation.parse_error:
+        return settle(row, "line-range-out-of-bounds", citation.parse_error)
     status, reason = classify_ref(citation.ref)
     if status:
         return settle(row, status, reason)
@@ -387,12 +539,30 @@ def verify_citation(row, citation, github):
         return settle(row, "commit-not-found", f"{citation.repo!r} is not a repository name")
     repository = f"/repos/{citation.owner}/{citation.repo}"
     ref = citation.ref.lower()
+    if len(ref) < 40:
+        # REST git/refs, API 2026-03-10: GET a reference is exact; absent heads and tags return 404.
+        # A matching prefix alone is insufficient: a same-named mutable ref can point at that very SHA.
+        for namespace, spelling in ((ns, spelling) for spelling in dict.fromkeys((citation.ref, ref)) for ns in ("heads", "tags")):
+            name = f"refs/{namespace}/{spelling}"
+            named = github.get(f"{repository}/git/ref/{namespace}/{spelling}")
+            why = transient(named)
+            if why:
+                return settle(row, UNAVAILABLE, f"{name}: {why}", named)
+            if named.status == 404:
+                continue
+            data = json_body(named) if named.status == 200 and not named.oversize else None
+            if isinstance(data, dict) and data.get("ref") == name:
+                return settle(row, "unpinned", f"{citation.ref} names a mutable {namespace} ref; cite the full SHA", named)
+            return settle(row, UNAVAILABLE, f"{name}: could not rule out a mutable named ref", named)
     step = f"commits/{ref}"
     resolved = github.get(f"{repository}/{step}", SHA_MEDIA)
     why = transient(resolved)
     if why:
         return settle(row, UNAVAILABLE, f"{step}: {why}", resolved)
     if resolved.status != 200:
+        if resolved.status == 422 and len(ref) < 40:
+            return settle(row, SHA_UNRESOLVED,
+                          "not found or ambiguous in the repository network; cite the full SHA", resolved)
         return settle(row, "commit-not-found", http_reason(resolved, step), resolved)
     sha = resolved.body.decode("ascii", "replace").strip().lower()
     if not FULL_SHA.fullmatch(sha):
@@ -424,17 +594,15 @@ def verify_citation(row, citation, github):
         return settle(row, "path-not-found", http_reason(contents, step), contents)
     media = contents.headers.get("content-type", "").split(";")[0].strip().lower()
     if media == "application/json":
-        listing = json_body(contents)
-        kind = listing.get("type") if isinstance(listing, dict) else None
-        if isinstance(listing, list):
-            return settle(row, "path-is-directory", f"{step}: a directory of {len(listing)} entries", contents)
+        listing = contents.content or {}
+        kind = listing.get("kind")
         if kind in ("dir", "submodule"):
             return settle(row, "path-is-directory", f"{step}: a {kind}", contents)
         if kind == "symlink":
             return settle(row, "path-not-found", f"{step}: a symlink to {listing.get('target')!r}, not a file",
                           contents)
         return settle(row, "path-not-found", f"{step}: not a file", contents)
-    count, blob = line_count(contents.body), git_blob_sha(contents.body)
+    count, blob = contents.content["lines"], contents.content["blob"]
     row["line_count"], row["blob_sha"] = count, blob
     etag = contents.headers.get("etag", "").removeprefix("W/").strip('"').lower()
     if FULL_SHA.fullmatch(etag) and etag != blob:
@@ -453,24 +621,37 @@ def verify_citation(row, citation, github):
     data = json_body(meta) if meta.status == 200 else None
     branch = data.get("default_branch") if isinstance(data, dict) else None
     if not isinstance(branch, str) or not branch:
-        return settle(row, "not-on-default-branch", http_reason(meta, f"{step}: no default branch"), meta)
+        return settle(row, UNAVAILABLE, http_reason(meta, f"{step}: no default branch"), meta)
     row["default_branch"] = branch
+    tip = github.get(f"{repository}/commits/{urllib.parse.quote(branch, safe='')}", SHA_MEDIA)
+    why = transient(tip)
+    if why:
+        return settle(row, UNAVAILABLE, f"default branch tip: {why}", tip)
+    tip_sha = tip.body.decode("ascii", "replace").strip().lower()
+    if tip.status != 200 or tip.oversize or not FULL_SHA.fullmatch(tip_sha):
+        return settle(row, UNAVAILABLE, "default branch tip could not be resolved", tip)
+    row["default_branch_sha"] = tip_sha
     step = f"compare/{sha[:12]}...{branch}"
-    compare = github.get(f"{repository}/compare/{sha}...{urllib.parse.quote(branch, safe='/')}?per_page=1")
+    # GitHub REST 2026-03-10, Compare two commits: changed files appear only on page 1.
+    compare = github.get(f"{repository}/compare/{sha}...{tip_sha}?per_page=1&page=2")
     why = transient(compare)
     if why:
         return settle(row, UNAVAILABLE, f"{step}: {why}", compare)
     if compare.status != 200:
-        return settle(row, "not-on-default-branch", http_reason(compare, step), compare)
+        status = "not-on-default-branch" if compare.status == 404 else UNAVAILABLE
+        return settle(row, status, http_reason(compare, step), compare)
     data = json_body(compare)
     data = data if isinstance(data, dict) else {}
     state = data.get("status")
     base = data.get("merge_base_commit")
     base = base.get("sha") if isinstance(base, dict) else None
     row["compare_status"] = state
+    if compare.oversize or state not in ("ahead", "identical", "behind", "diverged") or not isinstance(base, str) or not FULL_SHA.fullmatch(base):
+        return settle(row, UNAVAILABLE, f"{step}: incomplete or oversize comparison", compare)
     if state in ("ahead", "identical") and base == sha:
         return settle(row, "ok", f"on {branch} ({step}: {state})")
-    return settle(row, "not-on-default-branch", f"{step}: status {state}, merge base {str(base)[:12]}", compare)
+    status = "not-on-default-branch:" + state if state in ("behind", "diverged") else "not-on-default-branch"
+    return settle(row, status, f"{step}: status {state}, merge base {str(base)[:12]}", compare)
 
 
 def unchecked_kind(text):
@@ -487,12 +668,27 @@ def verify_body(body, github):
     """(section content, rows): one row per code citation and one per entry without one."""
     content = sota_section_content(body)
     rows = []
+    checked = 0
     for entry in parse_entries(content):
-        citations = find_citations(entry.text)
-        if not citations:
+        candidates = citation_candidates(entry.text)
+        if not candidates:
             rows.append(settle(new_row(entry), NOT_CHECKED, f"not checked in phase A: {unchecked_kind(entry.text)}"))
-        for citation in citations:
-            rows.append(verify_citation(new_row(entry, citation), citation, github))
+        for span, citation, candidate in candidates:
+            if citation is None:
+                row = new_row(entry)
+                row["citation"] = candidate
+                row["candidate_span"] = list(span)
+                kind = unchecked_kind(candidate)
+                if "#L" in candidate or ("@" in candidate and not ANY_URL.search(candidate)):
+                    kind = "unrecognized code citation (invalid or unsupported syntax)"
+                rows.append(settle(row, NOT_CHECKED, f"not checked in phase A: {kind}"))
+                continue
+            row = new_row(entry, citation)
+            if checked >= MAX_CITATIONS:
+                rows.append(settle(row, NOT_CHECKED, f"over the per-body cap ({MAX_CITATIONS} citations)"))
+            else:
+                checked += 1
+                rows.append(verify_citation(row, citation, github))
     return content, rows
 
 
@@ -502,7 +698,7 @@ def exit_code(rows, mode, error=None, error_transient=False):
     statuses = {row["status"] for row in rows}
     if statuses & FAILURES or (error and not error_transient):
         return 1
-    if UNAVAILABLE in statuses or error:
+    if statuses & {UNAVAILABLE, SHA_UNRESOLVED} or error:
         return 3
     return 0
 
@@ -609,6 +805,7 @@ def main(argv=None, fetch=None):
         "checked_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "api_version": API_VERSION,
         "requests": github.requests,
+        "limits": {"citations": MAX_CITATIONS, "requests": github.max_requests},
         "error": error,
         "section": {"present": bool(content), "characters": len(content)},
         "counts": dict(sorted(collections.Counter(row["status"] for row in rows).items())),

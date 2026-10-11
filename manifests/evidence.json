@@ -60231,6 +60231,11 @@
       "bytes": 9627
     },
     {
+      "path": "tests/fixtures/verify_sources/review-corrections.json",
+      "sha256": "276036c784700b4e05abcccb779821f07d209b3f47aaedfa3f57fb32f520dfbf",
+      "bytes": 1130
+    },
+    {
       "path": "tests/fixtures/workflow-security/unsafe.yml.txt",
       "sha256": "9e1c6130a396200387a0b9f1d445a33dbf154370db5460a3b50e086321bb737a",
       "bytes": 304
@@ -61522,8 +61527,18 @@
     },
     {
       "path": "tests/test_verify_sources.py",
-      "sha256": "a61058c1436885732b27b24ed10da748c31d37d9e242ed3eb14cbf4ccba14196",
-      "bytes": 42559
+      "sha256": "71208b940f6f471cef104538c5fe70e214929516c3b5201874917d1c4244a6a2",
+      "bytes": 44165
+    },
+    {
+      "path": "tests/test_verify_sources_family_findings.py",
+      "sha256": "81f1686331ec6041f5313c9e1c22602e2a9979ef09ae30f524489d62c45d93b2",
+      "bytes": 9548
+    },
+    {
+      "path": "tests/test_verify_sources_review.py",
+      "sha256": "77a856026f63254bd34a7d4085de54ead86bc8aa3516d391cae44e271ff427d4",
+      "bytes": 10375
     },
     {
       "path": "tests/test_windows_terminal_defaults.py",
@@ -62076,9 +62091,14 @@
       "bytes": 41767
     },
     {
+      "path": "tools/sota-sources/review-corrections.md",
+      "sha256": "d72eeb5b38a41ceca75dd1a8d48a51702e18aec27392aaf90bc79b1befebc0a5",
+      "bytes": 9770
+    },
+    {
       "path": "tools/sota-sources/verify_sources.py",
-      "sha256": "e2af0f19bb4af505fa8edd1ca76f265e4fc0ee920f6ab4c2763f8e5107be6f5f",
-      "bytes": 30479
+      "sha256": "c566f56592f4038e5766cd0f05d43ecdee2993c977e62132a40f06a72eafb3cc",
+      "bytes": 40969
     },
     {
       "path": "tools/token-e2e/README.md",
