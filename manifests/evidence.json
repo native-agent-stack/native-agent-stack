@@ -61021,6 +61021,16 @@
       "bytes": 1029
     },
     {
+      "path": "tests/fixtures/verify_sources/github-rest-recorded.json",
+      "sha256": "e3c38676b2ba3c35ab6f6afa609373fb49f09f2b3fb43c438afc918bbbb9082e",
+      "bytes": 9627
+    },
+    {
+      "path": "tests/fixtures/verify_sources/review-corrections.json",
+      "sha256": "276036c784700b4e05abcccb779821f07d209b3f47aaedfa3f57fb32f520dfbf",
+      "bytes": 1130
+    },
+    {
       "path": "tests/fixtures/workflow-security/unsafe.yml.txt",
       "sha256": "9e1c6130a396200387a0b9f1d445a33dbf154370db5460a3b50e086321bb737a",
       "bytes": 304
@@ -62366,6 +62376,31 @@
       "bytes": 116272
     },
     {
+      "path": "tests/test_verify_sources.py",
+      "sha256": "92d23acb809409d1b440ef6e7190cfea19daf81c37c5403052a977098ed86f14",
+      "bytes": 44160
+    },
+    {
+      "path": "tests/test_verify_sources_family_findings.py",
+      "sha256": "81f1686331ec6041f5313c9e1c22602e2a9979ef09ae30f524489d62c45d93b2",
+      "bytes": 9548
+    },
+    {
+      "path": "tests/test_verify_sources_micro.py",
+      "sha256": "8b3c803d7ea3d281a01431937482dd25e4690b7170c82b902c713f220083c691",
+      "bytes": 19380
+    },
+    {
+      "path": "tests/test_verify_sources_review.py",
+      "sha256": "9bc99ee901e6ac95d4e000e402434d6bc3e570b09d4147a228107421fa9fc4a2",
+      "bytes": 10525
+    },
+    {
+      "path": "tests/test_verify_sources_row_limits.py",
+      "sha256": "d49f34160c9bc266a6c0ef0e9970e2f14f8fcce9e5b4777011ff036363c78d1a",
+      "bytes": 4042
+    },
+    {
       "path": "tests/test_windows_terminal_defaults.py",
       "sha256": "f4b2c8ebe16f54782204f32fd674debc4b8f3a01f5ca1d0b00b788c175ed0502",
       "bytes": 51736
@@ -62929,6 +62964,16 @@
       "path": "tools/sota-convergence/start_closure_sampler.py",
       "sha256": "6255be2d5c8bd7e766ba717df4a0bfc87649e13179c940f1fa97568a7ac7ee3a",
       "bytes": 41767
+    },
+    {
+      "path": "tools/sota-sources/review-corrections.md",
+      "sha256": "9a78acff1862b0d4dd31e8359b0072c012715b1c9e98b894c86121b9717bde19",
+      "bytes": 23007
+    },
+    {
+      "path": "tools/sota-sources/verify_sources.py",
+      "sha256": "304a2a9ba0f6e2b7974fa1d4595822306481b752470ee24879883aefa5ea7082",
+      "bytes": 52071
     },
     {
       "path": "tools/starred-maintenance/README.md",
