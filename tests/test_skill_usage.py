@@ -5,6 +5,7 @@ from __future__ import annotations
 import collections
 import contextlib
 import importlib.util
+import inspect
 import io
 import json
 import ntpath
@@ -516,6 +517,14 @@ class ManagedMcpDefaultLocations(unittest.TestCase):
             with self.subTest(path=posix):
                 self.assertEqual(ntpath.abspath(posix), windows)
                 self.assertEqual(ntpath.splitdrive(ntpath.abspath(posix))[0], "")
+
+    def test_the_comment_of_the_windows_path_test_states_what_abspath_does(self):
+        # Pins the correction of #973's comment, which said ntpath.abspath adds a drive to a POSIX string; CPython's `_abspath_fallback` does not
+        # (v3.12.4 Lib/ntpath.py:564-578). The bracket in the pattern keeps this test from matching its own text.
+        comment = inspect.getsource(self.test_the_windows_path_rules_count_the_windows_string_and_not_the_posix_ones)
+        self.assertNotRegex(comment, r"abspath adds a dri[v]e")
+        self.assertIn("adds no drive on a POSIX host", comment)
+        self.assertIn("CPython v3.12.4 Lib/ntpath.py:564-578", comment)
 
     def test_the_windows_path_rules_count_the_windows_string_and_not_the_posix_ones(self):
         # os.path is posixpath on a POSIX host, so the Windows side of the check was only argued from ntpath's functions
