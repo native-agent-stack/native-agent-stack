@@ -1,6 +1,7 @@
 """Regression cases use synthetic receipts, never private execution logs."""
 
 import hashlib
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -18,6 +19,11 @@ from scripts.validate import PRIVATE_CONTENT, InvalidPublication, scan_file_for_
 
 ROOT = Path(__file__).resolve().parents[1]
 VALIDATE_SCRIPT = ROOT / "scripts/validate.py"
+
+
+def address(local, domain):
+    """Fixtures join at run time, so this file holds no contiguous address for the email rule."""
+    return local + "@" + domain
 
 
 class PublicationValidationTests(unittest.TestCase):
@@ -162,6 +168,31 @@ class PublicationValidationTests(unittest.TestCase):
                 self.save()
                 with patch.dict(validator_module.PUBLIC_VENDOR_UUID_SNAPSHOTS, {relative: digest}):
                     self.assert_invalid(label)
+
+    def add(self, relative, content):
+        self.write(relative, content)
+        raw = content.encode()
+        self.evidence["files"].append({"path": relative, "sha256": hashlib.sha256(raw).hexdigest(), "bytes": len(raw)})
+        self.save()
+
+    def test_an_address_in_evidence_is_refused_without_echoing_it(self):
+        value = address("first.last", "mail-host.com")
+        self.add("evidence/artifacts/session-notes.txt", f"author: {value}\n")
+        with self.assertRaises(InvalidPublication) as refused:
+            validate(self.root)
+        self.assertIn("evidence/artifacts/session-notes.txt: contains possible email address", str(refused.exception))
+        self.assertNotIn(value, str(refused.exception))
+
+    def test_a_public_path_waives_the_email_rule_only(self):
+        from scripts import validate as validator_module
+        relative = "evidence/artifacts/upstream-page.html"
+        self.add(relative, "contact " + address("press", "upstream-vendor.com") + "\n")
+        with patch.dict(validator_module.PUBLIC_EMAIL_PATHS, {relative: "fixture: an upstream page's contact"}):
+            self.assertEqual(validate(self.root)["hashed_files"], 3)
+        self.evidence["files"].pop()
+        self.add(relative, "contact " + address("press", "upstream-vendor.com") + "\n/" + "home/fixture/file\n")
+        with patch.dict(validator_module.PUBLIC_EMAIL_PATHS, {relative: "fixture: an upstream page's contact"}):
+            self.assert_invalid("personal home path")
 
     def test_changed_artifact_fails_hash_even_when_length_unchanged(self):
         self.write("evidence/artifacts/output.txt", "example 9.0.0\n")
@@ -998,6 +1029,105 @@ class ScanFileForPrivateContentTests(unittest.TestCase):
         self.assertNotIn("findings", report)
         self.assertEqual(report["source"], "synthetic")
         self.assertNotIn(name, result.stdout + result.stderr)
+
+
+class EmailAddressRuleTests(unittest.TestCase):
+    """The repository scan refuses an email address outside a reviewed public path. Claude Code puts the account's
+    address in every session's context, so a session can carry it into a public evidence file."""
+
+    FLAGGED = {
+        "plain": address("first.last", "mail-host.com"),
+        "angle brackets": "Name <" + address("first.last", "mail-host.com") + ">",
+        "mailto": "mailto:" + address("someone", "mail-host.com"),
+        "upper case": address("FIRST", "MAIL-HOST.COM"),
+        "plus tag": address("first+tag", "mail-host.com"),
+        "subdomain": address("someone", "dept.uni.edu"),
+        "JSON value": '{"email": "' + address("someone", "mail-host.org") + '"}',
+        "glued to a JSON escape": '"\\n' + address("someone", "mail-host.org") + '"',
+        "a prefix of an exempt address": address("xnoreply", "anthropic.com"),
+        "an exempt address as a subdomain": address("noreply", "anthropic.com.mail-host.org"),
+        "example as a subdomain label": address("someone", "example.com.mail-host.org"),
+        "example as a word part": address("someone", "notexample.com"),
+        "noreply domain as a subdomain": address("1+someone", "users.noreply.github.com.mail-host.org"),
+        "a unit type as a domain label": address("someone", "tty1.service.com"),
+        "git as a local-part prefix": address("gitlab-user", "mail-host.com"),
+        "a Moldovan domain": address("someone", "mail-host.md"),
+        "an import after an escaped newline": "\\n" + "@" + "RTK.md",
+    }
+    EXEMPT = {
+        "GitHub noreply": address("123+someone", "users.noreply.github.com"),
+        "GitHub noreply, upper case": address("SOMEONE", "USERS.NOREPLY.GITHUB.COM"),
+        "Anthropic commit trailer": "<" + address("noreply", "anthropic.com") + ">",
+        "GitHub web-flow committer": address("noreply", "github.com"),
+        "example.com": address("someone", "example.com"),
+        "example.org subdomain": address("someone", "mail.example.org"),
+        "example under a country code": address("someone", "example.co.uk"),
+        ".test": address("someone", "host.test"),
+        ".example": address("someone", "host.example"),
+        ".invalid": address("someone", "host.invalid"),
+        ".localhost": address("someone", "a.localhost"),
+        "git SSH user": "ssh -T " + address("git", "github.com"),
+        "systemd getty instance": address("getty", "tty1.service"),
+        "systemd user manager": address("user", "1000.service"),
+        "systemd timer instance": address("job", "daily.timer"),
+        "Claude Code import": "\n" + "@" + "RTK.md",
+        "decorator call": "\\n" + "@" + "app.get(",
+        "no TLD": address("someone", "localhost"),
+        "numeric last label": address("package", "1.2.3"),
+    }
+
+    def rule(self):
+        rules = dict(PRIVATE_CONTENT)
+        self.assertIn("email address", rules, "scripts/validate.py has no email-address rule")
+        return rules["email address"]
+
+    def test_an_address_is_refused(self):
+        rule = self.rule()
+        for case, text in self.FLAGGED.items():
+            with self.subTest(case=case):
+                self.assertIsNotNone(rule.search(text))
+
+    def test_reserved_noreply_and_non_address_forms_pass(self):
+        rule = self.rule()
+        for case, text in self.EXEMPT.items():
+            with self.subTest(case=case):
+                self.assertIsNone(rule.search(text))
+
+    def test_the_finding_names_the_rule_and_never_the_address(self):
+        self.rule()
+        with tempfile.TemporaryDirectory() as temporary:
+            target = Path(temporary) / "page.html"
+            value = address("first.last", "mail-host.com")
+            target.write_text(f"<p>{value}</p>", encoding="utf-8")
+            findings = scan_file_for_private_content(target)
+        self.assertEqual(len(findings), 1)
+        self.assertIn("email address", findings[0])
+        self.assertNotIn(value, findings[0])
+
+    def test_a_copy_without_the_data_file_waives_nothing(self):
+        # The landscape sweep loads a selected checkout's validate.py, which may come without its data file.
+        with tempfile.TemporaryDirectory() as temporary:
+            copy = Path(temporary) / "validate.py"
+            shutil.copyfile(VALIDATE_SCRIPT, copy)
+            spec = importlib.util.spec_from_file_location("validate_copy", copy)
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+        self.assertEqual(module.PUBLIC_EMAIL_PATHS, {})
+        self.assertIn("email address", dict(module.PRIVATE_CONTENT))
+
+    def test_every_public_path_exists_and_still_carries_an_address(self):
+        # An entry whose file no longer matches is dead and would waive a later address unreviewed.
+        from scripts.validate import PUBLIC_EMAIL_PATHS
+        rule = self.rule()
+        listing = subprocess.run(["git", "ls-files", "-z"], cwd=ROOT, capture_output=True, check=False)
+        if listing.returncode:
+            self.skipTest("not a Git checkout")
+        listed = set(listing.stdout.decode().split("\0"))
+        for relative, reason in PUBLIC_EMAIL_PATHS.items():
+            with self.subTest(path=relative):
+                self.assertTrue(reason.strip())
+                self.assertIn(relative, listed)
+                self.assertIsNotNone(rule.search((ROOT / relative).read_bytes().decode("utf-8", "replace")))
 
 
 if __name__ == "__main__":

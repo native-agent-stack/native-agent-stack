@@ -33,10 +33,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 try:
-    from .validate import PRIVATE_CONTENT
+    from .validate import PRIVATE_CONTENT, PUBLIC_EMAIL_PATHS
     from .catalog_decisions import InvalidDecisionIndex, safe_file, unique_json
 except ImportError:  # running as a plain script, not a package
-    from validate import PRIVATE_CONTENT
+    from validate import PRIVATE_CONTENT, PUBLIC_EMAIL_PATHS
     from catalog_decisions import InvalidDecisionIndex, safe_file, unique_json
 
 
@@ -1431,7 +1431,10 @@ def validate_receipt_cross_references(root: Path, host_dir_name: str, path: Path
         content = path.read_text(encoding="utf-8")
     except UnicodeError:
         content = path.read_bytes().decode("latin-1")
-    for description, pattern in PRIVATE_CONTENT:
+    # validate.py's reviewed public paths waive its email rule only, as its publication scan does.
+    rules = [(description, pattern) for description, pattern in PRIVATE_CONTENT
+             if not (description == "email address" and relative_receipt_path in PUBLIC_EMAIL_PATHS)]
+    for description, pattern in rules:
         if pattern.search(content):
             errors.append(f"{label}: contains possible {description}")
     # The raw-text scan above misses content a JSON escape hides (for example / in
@@ -1439,7 +1442,7 @@ def validate_receipt_cross_references(root: Path, host_dir_name: str, path: Path
     # recursively, from the parsed receipt as well.
     if isinstance(receipt, dict):
         for decoded_string in iter_receipt_strings(receipt):
-            for description, pattern in PRIVATE_CONTENT:
+            for description, pattern in rules:
                 if pattern.search(decoded_string):
                     errors.append(f"{label}: contains possible {description} (decoded JSON value or key)")
 

@@ -35,6 +35,22 @@ PUBLIC_VENDOR_UUID_SNAPSHOTS = {
     "evidence/artifacts/claude-federation-docs-20261010/platform.claude.com_workload-identity-federation.md":
         "d929e36810bcfdcc7a9bf5de39df8b08fbfde60a6d4c138b097f0940feb13bb7",
 }
+# Files that may carry an email address, reviewed when the rule was added (2026-10-11): each holds a public
+# upstream or vendor address, or text the rule reads as one, never an operator's. This waives only the email
+# rule, never another private-content pattern; a new file with an address needs its own reviewed entry. The
+# list is data beside this script, so its paths are not Python string literals here. A copy of this script
+# without the file (a tool loading a selected checkout's rules) waives nothing, so the rule applies everywhere.
+
+
+def load_public_email_paths(path: Path) -> dict[str, str]:
+    try:
+        groups = json.loads(path.read_text(encoding="utf-8"))["groups"]
+    except FileNotFoundError:
+        return {}
+    return {entry: group["reason"] for group in groups for entry in group["paths"]}
+
+
+PUBLIC_EMAIL_PATHS = load_public_email_paths(Path(__file__).resolve().parent / "public_email_paths.json")
 PRIVATE_CONTENT = (
     # Historical prose can glue a UUID to a word; word boundaries miss it.
     ("local session identifier", re.compile(r"[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}", re.I)),
@@ -58,6 +74,17 @@ PRIVATE_CONTENT = (
     ("API secret", re.compile(r"\bsk-(?:proj-|ant-)?[A-Za-z0-9_-]{24,}\b")),
     ("private key", re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----")),
     ("bearer credential", re.compile(r"\bBearer\s+[A-Za-z0-9._~-]{30,}", re.I)),
+    # An addr-spec (RFC 5322 3.4.1) in dot-atom characters. Exempt: GitHub's users.noreply.github.com addresses,
+    # the noreply commit trailers of Anthropic and GitHub, the RFC 2606 reserved names (example.* and the .test,
+    # .example, .invalid and .localhost TLDs, with example.* under any TLD), the `git@` SSH user of Git hosts, a
+    # systemd instance unit (systemd.unit(5): name@instance.service, the suffix a unit type) and a decorator
+    # call. DNS names ignore case (RFC 4343), so the rule does; Python lookbehinds are fixed-width.
+    ("email address", re.compile(
+        r"(?<![\w.%+-])(?!git@|noreply@(?:anthropic|github)\.com(?![\w-]|\.\w))[A-Za-z0-9._%+-]+@"
+        r"(?!(?:[A-Za-z0-9-]+\.)*(?:users\.noreply\.github\.com|example(?:\.[A-Za-z]{2,})+"
+        r"|[A-Za-z0-9-]+\.(?:test|example|invalid|localhost))(?![\w-]|\.\w))"
+        r"(?:[A-Za-z0-9-]+\.)+(?!(?:service|socket|target|device|mount|automount|swap|path|timer|slice|scope)"
+        r"(?![\w-]|\.\w))[A-Za-z]{2,}(?![\w-]|\.\w|\()", re.I)),
 )
 
 
@@ -562,6 +589,8 @@ class Validator:
                     if (description == "local session identifier" and name in files
                         and files[name].get("sha256") == digest
                         and PUBLIC_VENDOR_UUID_SNAPSHOTS.get(name) == digest):
+                        continue
+                    if description == "email address" and name in PUBLIC_EMAIL_PATHS:
                         continue
                     # Never echo matched credentials or personal paths.
                     self.error(f"{relative}: contains possible {description}")

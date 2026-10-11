@@ -18861,6 +18861,11 @@
       "bytes": 18762
     },
     {
+      "path": "docs/decisions/2026-10-11-email-address-publication-rule.md",
+      "sha256": "debbd3da6aac81ea49136c2bdcd8c0019381486b9027cac417fe9acaaceecfb6",
+      "bytes": 8449
+    },
+    {
       "path": "docs/decisions/2026-10-11-final-stack-review-corrections.md",
       "sha256": "24336fd04475b1c417f4e6c9ec5ea132ed2e46c5b7d42e82c72f8b8f772caf37",
       "bytes": 43874
@@ -60882,8 +60887,8 @@
     },
     {
       "path": "scripts/host_receipts.py",
-      "sha256": "c3dc47cdab33e2ed2f1473700774a006a34c6218d6cd7ceb36f33d7f71f0fd6f",
-      "bytes": 111077
+      "sha256": "be1353c37c7b79edb70f0da02b3b381f4c7bbcbb0aab5fe6eed2ac9387c5e521",
+      "bytes": 111378
     },
     {
       "path": "scripts/kernel_keyring.py",
@@ -60914,6 +60919,11 @@
       "path": "scripts/platform_status.py",
       "sha256": "57f6519d66adc82d645f733cebda9c61c493bc2503e88f0985a8ce1cba97473b",
       "bytes": 15668
+    },
+    {
+      "path": "scripts/public_email_paths.json",
+      "sha256": "17ec878bd1398d2dd2b15214101c7dcc3b2a1f67f5a9213ea5fc6cc1276a9072",
+      "bytes": 8564
     },
     {
       "path": "scripts/public_starred.py",
@@ -60972,8 +60982,8 @@
     },
     {
       "path": "scripts/validate.py",
-      "sha256": "3f916684e81286af40aba000b8519cc54e6c5851e27f21f3d6115ffff2a3b882",
-      "bytes": 43199
+      "sha256": "fba2c15f814af243c2a5107a3fc39b607d350bd3e0f24e64e7e86b7defb9fdd1",
+      "bytes": 45271
     },
     {
       "path": "scripts/validate_catalogs.py",
@@ -62697,8 +62707,8 @@
     },
     {
       "path": "tests/test_validate.py",
-      "sha256": "2fadd21151974c7ffbd0141a8c45ad3c2a833090d4d615476c3cd2318cf8bcaf",
-      "bytes": 53117
+      "sha256": "f6b92afeb7b7f1dccf8b3773b7fef4cba29a84ab069c6cc69b64ae2c713b6e6b",
+      "bytes": 60225
     },
     {
       "path": "tests/test_validate_shards.py",
