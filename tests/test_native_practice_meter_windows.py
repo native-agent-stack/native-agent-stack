@@ -92,7 +92,7 @@ class MeterWindowsTests(unittest.TestCase):
         self.assertEqual(rates, {"input": 10.0, "cache_write_5m": 12.5, "cache_write_1h": 20.0, "cache_read": 0.25, "output": 50.0})
         for window in self.artifact["windows"]:
             with self.subTest(window=window["end_utc"]):
-                self.assertAlmostEqual(window["counter_usd_by_model"]["claude-fable-5-1"], fable_dollars_from_tokens(window, rates), delta=0.015)
+                self.assertAlmostEqual(window["counter_usd_by_model"]["claude-fable-5-1"], fable_dollars_from_tokens(window, rates), delta=0.01)
 
     def test_the_events_equal_the_counter_on_none_of_the_three_models_in_either_window(self):
         for window in self.artifact["windows"]:

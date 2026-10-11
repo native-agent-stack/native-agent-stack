@@ -2232,7 +2232,7 @@
    "cost_ratio_sonnet_over_opus": 0.1686,
    "cost_bound": 0.6,
    "strict_pass_chance_if_identical": 0.0201,
-   "tolerant_pass_chance_if_identical": 0.6204,
+   "tolerant_pass_chance_if_identical": 0.5551,
    "tolerant_reading_holds": true,
    "pooled_mean_detection_rate": 0.2708,
    "pooled_recall": {
@@ -2246,7 +2246,10 @@
    "trial_1_alone": {
     "verdict": "SONNET TAKES",
     "strict_pass_chance_if_identical": 0.0828
-   }
+   },
+   "tolerant_per_finding_clause_pass_chance_if_identical": 0.6204,
+   "strict_pass_chance_if_identical_per_finding_rates": 0.7305,
+   "two_trial_verdict_basis": "a ruled extension: trial 1 met the registered rule (Sonnet takes review micros) and the command center added trial 2 after seeing that result (addendum 3 of the run's papers); the rule for two trials was fixed before any run (addendum 1) but the decision to run them was not, so the two-trial verdict is not a preregistered outcome, and an extension after a pass can only move the verdict toward Opus"
   },
   "beside_the_rule": {
    "real_new_p1_p2": {
@@ -2288,9 +2291,10 @@
    "by": "the command center",
    "date": "2026-10-11",
    "path": "research-cc-role-20261008/ruling-routing-run5-two-trial-20261011.md (the command center's private research directory)",
-   "sha256": "08aac8fd72bed920e62c75fc268018d4878eb8d19918ac547e0f28c4546f15d7",
+   "sha256": "a6beedb039e6c9690c15d81d31b9084b354ae46ecbf8fb2a36416a88211f2863",
    "decision": "the strict reading stands, so Opus stays the default for Claude review micros",
-   "routing": "Opus for every Claude read of trading code or gate code and for any micro that is the only Claude-family read of a gate; Sonnet at medium only for non-gate foundation changes (docs, pages, catalogs, generated reports); no slot row, default or skill text changes from the ruling alone"
+   "routing": "Opus for every Claude read of trading code or gate code and for any micro that is the only Claude-family read of a gate; Sonnet at medium only for non-gate foundation changes (docs, pages, catalogs, generated reports) where the change is mechanical or a second Claude-family read exists; no slot row, default or skill text changes from the ruling alone",
+   "revised": "the file was edited by the command center on 2026-10-11 after this record first cited it (a wording change at about 09:32Z); the text first cited, sha256 prefix 08aac8fd72be, is not retained"
   },
   "papers": {
    "preregistration": {
@@ -2340,8 +2344,13 @@
    },
    "ruling": {
     "path": "research-cc-role-20261008/ruling-routing-run5-two-trial-20261011.md",
-    "bytes": 2311,
-    "sha256": "08aac8fd72bed920e62c75fc268018d4878eb8d19918ac547e0f28c4546f15d7"
+    "bytes": 2581,
+    "sha256": "a6beedb039e6c9690c15d81d31b9084b354ae46ecbf8fb2a36416a88211f2863"
+   },
+   "correction": {
+    "path": "paired-routing/CORRECTION-tolerant-floor-20261011.md",
+    "bytes": 2352,
+    "sha256": "f80215104fe6820567acf8c8857e2fffd0b2c5dfb3db759a2b7816fbffb86119"
    }
   }
  }
