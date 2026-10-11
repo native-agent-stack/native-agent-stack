@@ -48,9 +48,10 @@ pull requests. The implementation is [`tools/claude-review-worker/`](../../tools
 ## Why
 
 When this record was written, the cloud path (`claude-pr-review.yml`, anthropics/claude-code-action on workload
-identity federation) waited on the Console federation fix, and no hosted run had been made. That path is now retired:
-#981 (`8bffa2c4`) removed it after the API refused the action's attribution on every stored Console key. A local
-worker on the stored keys can gate essential pull requests now. It reuses the repository's own fence: main at the working directory root, the head as data under
+identity federation) waited on the Console federation fix, and no hosted run had succeeded: scheduled run 37988961127
+on main (2026-10-09T20:44:12Z) had failed. That path is now retired: #981 (`8bffa2c4`) removed it after the API
+refused the action's attribution on every stored Console key. A local worker on the stored keys can gate essential
+pull requests now. It reuses the repository's own fence: main at the working directory root, the head as data under
 `pr-head/`, Read, Glob and Grep only, and bounds read from the stream.
 
 ## The run
@@ -91,15 +92,25 @@ worker on the stored keys can gate essential pull requests now. It reuses the re
 
    Fill-first (owner direction, relayed by the command center on 2026-10-10 at about 14:19Z; it replaces the single-key
    mode of 01:49Z). The keys are tried in the order of `CLAUDE_REVIEW_KEYS`, by default `anthropic-api-4`,
-   `anthropic-api-3`, `anthropic-api-5`, `anthropic-api`, `anthropic-api-2`, then `anthropic-api-6` to
+   `anthropic-api-3`, `anthropic-api-2`, `anthropic-api-5`, `anthropic-api`, then `anthropic-api-6` to
    `anthropic-api-10`. The owner's direction of about 15:12Z (via the command center) put `anthropic-api-3` second: it
    served CI review first (the main-only `claude-review` environment secret) and local quality work second. #981
-   (`8bffa2c4`) removed the in-GitHub Claude workflows, so no workflow on main uses that environment now.
+   (`8bffa2c4`) removed the in-GitHub Claude workflows, so no workflow on main uses that environment now. The owner's
+   direction of 2026-10-11 at about 22:33Z (via the command center) put `anthropic-api-2` third.
    - The worker stays on one key and moves to the next only when Anthropic reports it out of credit (HTTP 402, or 400
      with "credit balance is too low") or revoked (HTTP 401). It never round-robins: a prompt cache is per workspace and
      never crosses organizations (claude-api skill, anthropics/skills@`dbd4588f`
      `skills/claude-api/shared/prompt-caching.md:130`), so filling one key keeps its account's cache warm.
    - A slot the credential runner refuses (`--check`, for instance one not stored yet) is skipped before any debit.
+     When it refuses every slot, nothing is debited or started and the API has said nothing about credit, so the run
+     is its own outcome, `key_check_refused`. The head gets one error status saying so ("the credential check refused
+     every configured key; no review ran") and an uncounted, non-final attempt. Later ticks post nothing more for it,
+     and the first tick with a usable key reviews it as usual. Before the command center's micro at `a3881b19`, each
+     tick posted "every configured key is out of credit" again: a loop that only skipped still ends in the `for`
+     statement's `else` suite when its keys run out (CPython 3.13.16 `Doc/reference/compound_stmts.rst:165` and
+     `:173`, at `cbc944f4`), and that suite classed the run as a credit refusal. The co-op's GPT read at `1a610ba7`
+     reproduced the same defect. (`credential_run.py --check` refuses every slot on a host whose core_pattern pipes
+     crash dumps, for instance.)
    - Each move writes a ledger row (`kind: switch`; from, to, reason, time; the api-actions harness's schema) and a
      journal line at warning priority ("this run moved from … to …; tell the command center").
    - Each settle records the run's tokens per model (input, output, cache read, cache creation) and its cache hit rate,
@@ -181,6 +192,26 @@ worker on the stored keys can gate essential pull requests now. It reuses the re
       leftover CLAUDE_CONFIG_DIR and archive). Recovery rechecks each ref under the lock and leaves one that another
       writer closed meanwhile;
     - or a void at 0.0, for a refusal with no usage or a run whose stream is empty or absent.
+
+## Prompt caching (command center, 2026-10-11)
+
+- **The stable part first.** Prompt caching is a prefix match, and stable content must physically precede volatile
+  content (anthropics/skills@`dbd4588f` `skills/claude-api/shared/prompt-caching.md:7` and `:27`; the render order is
+  tools, then system, then messages, `:11`). The review prompt therefore puts the read-only note, the repository's
+  rules from main, the task, the upstream-alignment rule of a trading head and the answer shape first. The trading
+  head's citation counts and the pull request's own line (number, repository, commit) come last. Before, the pull
+  request's line came first, so no two heads shared any of the prompt. A test holds two heads of one repository to a shared prefix that holds the rules, the task and the answer
+  shape. Not measured here: whether the client writes a cache breakpoint at the end of that shared part, which a later
+  head needs in order to read it (`:9`; the client places its own breakpoints). The cache hit rate recorded with each
+  settle measures it on real runs.
+- **A one-hour cache.** The worker's settings set `promptCacheTtl` to `"1h"` (anthropics/claude-code@`3deb873`
+  `CHANGELOG.md:2970`, 2.1.243: "so API-key and cloud-provider users can keep a 1-hour prompt cache on the main
+  conversation while subagents stay at 5 minutes"; the 2.1.296 binary's schema accepts `"5m"` or `"1h"`, and on an
+  API key the unset default is 5 minutes). Ticks run every 15 minutes and at most two reviews run per tick, so heads
+  of one repository usually start more than 5 minutes apart: the 5-60 minute window where the skill says the 1-hour
+  TTL pays off (`:148-153`). The trade, from the skill's economics (`:144`): a 1-hour cache write costs more than a
+  5-minute one, a cache read costs a fraction of the base input price, and the 1-hour TTL needs more reads to break
+  even. `subagentPromptCacheTtl` stays unset, since the review runs no subagent.
 
 ## The instruction fence (command center, 2026-10-10 00:05Z)
 
@@ -576,7 +607,7 @@ unchanged bwrap fence in srt, Anthropic's sandbox runtime, the runtime Claude Co
 
 ## Evidence class
 
-- The 88 local tests are `synthetic`: a stand-in gh, a stand-in claude, temporary git origins and mirrors. One test
+- The 94 local tests are `synthetic`: a stand-in gh, a stand-in claude, temporary git origins and mirrors. One test
   drives the real `credential_run.py` and bubblewrap with a fake key in a temporary store. It skips where bubblewrap
   cannot create a user namespace or the host pipes crash dumps, which is the case on GitHub-hosted runners. A second,
   `RealBoundaryChainTest`, adds srt to that chain; it also skips unless `CRW_TEST_SRT` and `CRW_TEST_NODE` name an

@@ -40,7 +40,7 @@ crw = load("claude_review_worker", TOOL / "worker.py")
 probes = load("claude_review_worker_probes", TOOL / "probes.py")  # it reuses the module loaded above
 assert probes.crw is crw
 
-KEYS = ("anthropic-api-4", "anthropic-api-3", "anthropic-api-5")  # the head of the fill-first order
+KEYS = ("anthropic-api-4", "anthropic-api-3", "anthropic-api-2")  # the head of the fill-first order
 GIT_ID = {"GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@example.invalid", "GIT_COMMITTER_NAME": "t",
           "GIT_COMMITTER_EMAIL": "t@example.invalid"}
 
@@ -916,10 +916,11 @@ class ReviewRunTest(unittest.TestCase):
         self.assertEqual([r["kind"] for r in h.rows()], ["debit", "void", "switch", "debit", "settle"])
         self.assertEqual(h.rows()[2]["reason"], "revoked_key (HTTP 401)")
 
-    def test_the_default_key_order_is_fill_first_with_api_3_second(self):
-        self.assertEqual(crw.DEFAULT_KEYS, ("anthropic-api-4", "anthropic-api-3", "anthropic-api-5", "anthropic-api",
-                                            "anthropic-api-2", "anthropic-api-6", "anthropic-api-7", "anthropic-api-8",
-                                            "anthropic-api-9", "anthropic-api-10"))  # owner ~15:12Z: api-3 second
+    def test_the_default_key_order_is_fill_first_with_api_3_second_and_api_2_third(self):
+        # The owner's directions: api-3 second (2026-10-10 ~15:12Z), api-2 third (2026-10-11 ~22:33Z).
+        self.assertEqual(crw.DEFAULT_KEYS, ("anthropic-api-4", "anthropic-api-3", "anthropic-api-2", "anthropic-api-5",
+                                            "anthropic-api", "anthropic-api-6", "anthropic-api-7", "anthropic-api-8",
+                                            "anthropic-api-9", "anthropic-api-10"))
 
     def test_a_key_the_runner_refuses_is_skipped_before_any_debit(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -964,6 +965,66 @@ class ReviewRunTest(unittest.TestCase):
         attempt = h.record(repo, 3, sha)["attempts"][0]
         self.assertEqual((attempt["outcome"], attempt["final"]), ("api_refused", True))
         self.assertEqual(h.posts()[0]["body"]["description"], "Claude local review: the API refused the request (HTTP 403)")
+
+    def test_the_prompt_puts_the_stable_part_first_and_the_pull_request_last(self):
+        # Two heads of one repository share the prompt up to the pull request's own line, so their shared prefix holds
+        # the rules, the task and the answer shape (prompt-caching.md:7 and :27 at anthropics/skills@dbd4588f).
+        h = Harness(self)
+        repo, sha = self.private(h)
+        main = h.base / "main-rules"
+        (main).mkdir()
+        (main / "AGENTS.md").write_text("Rules of the repository.\n")
+        first = crw.build_prompt(repo, 3, "a" * 40, main, crw.SANDBOX_MAIN, crw.SANDBOX_INPUT)
+        second = crw.build_prompt(repo, 4, "b" * 40, main, crw.SANDBOX_MAIN, crw.SANDBOX_INPUT)
+        shared = os.path.commonprefix([first, second])
+        for stable in ("The repository's own rules follow", "Answer in exactly this shape", "Give paths relative"):
+            self.assertIn(stable, shared)
+        self.assertNotIn("#3", shared)
+        self.assertTrue(first.rstrip().endswith(f"The pull request is #3 of {repo.name} at commit {'a' * 40}."))
+
+    def refusing_runner(self, h, repo):
+        """key_usable through the runner's own --check, answered by a fixture runner that refuses every slot."""
+        runner = h.base / "fixture_credential_run.py"
+        runner.write_text('import sys\nassert sys.argv[-1] == "--check"\nsys.exit(1)\n')
+        launcher = crw.SandboxLauncher(Path("/fixture/claude"), "/usr/bin/true", credential_run=runner)
+        return crw.Worker([], h.worker([repo]).settings, {"PATH": "/usr/bin:/bin", "HOME": str(h.home)},
+                          launcher=launcher, log=lambda line: None, bwrap="").key_usable
+
+    def test_a_check_that_refuses_every_key_posts_one_status_and_records_one_attempt(self):
+        # The CC's micro at a3881b19 (B4), and the co-op's GPT read at 1a610ba7 through the same --check path: when
+        # every slot was refused, each tick published "every configured key is out of credit" again, though no request
+        # was made, and recorded no attempt. Each tick here is a fresh worker reading the saved state.
+        h = Harness(self)
+        repo, sha = self.private(h)
+        key_usable = self.refusing_runner(h, repo)
+        for _ in range(2):
+            worker = h.worker([repo], post=True)
+            worker.key_usable = key_usable
+            self.assertEqual(worker.tick(), 0)
+            self.assertEqual(h.launcher.calls, [])
+        self.assertEqual([key_usable(key) for key in KEYS], [False] * len(KEYS))
+        statuses = [p for p in h.posts() if "/statuses/" in p["path"]]
+        refused = "Claude local review: the credential check refused every configured key; no review ran"
+        self.assertEqual([(p["body"]["state"], p["body"]["description"]) for p in statuses], [("error", refused)])
+        self.assertFalse(any("credit" in p["body"]["description"] for p in statuses))
+        attempts = h.record(repo, 3, sha)["attempts"]
+        self.assertEqual([(a["outcome"], a["counted"], a["final"]) for a in attempts],
+                         [("key_check_refused", False, False)])
+        self.assertEqual(h.rows(), [])  # nothing debited
+
+    def test_a_key_usable_on_a_later_tick_reviews_the_head_as_usual(self):
+        h = Harness(self)
+        repo, sha = self.private(h)
+        worker = h.worker([repo], post=True)
+        worker.key_usable = self.refusing_runner(h, repo)
+        worker.tick()
+        h.queue([run_of(PASS_REPORT)])
+        h.worker([repo], post=True).tick()  # the stand-in launcher's keys are usable
+        attempts = h.record(repo, 3, sha)["attempts"]
+        self.assertEqual([(a["outcome"], a["counted"]) for a in attempts],
+                         [("key_check_refused", False), ("completed", True)])
+        self.assertEqual([c["key"] for c in h.launcher.calls], [KEYS[0]])
+        self.assertEqual([r["kind"] for r in h.rows()], ["debit", "settle"])
 
     def test_every_key_out_of_credit_is_a_final_refusal(self):
         h = Harness(self)
@@ -1433,6 +1494,9 @@ class InvocationTest(unittest.TestCase):
         self.assertEqual(allowed, ["Read(./**)", "Glob(./**)", "Grep(./**)", "Read(//review/input/**)"])
         settings = json.loads(flags[flags.index("--settings") + 1])
         self.assertIs(settings["disableAllHooks"], True)
+        # The main conversation's cache outlives the gap between heads; there is no subagent.
+        self.assertEqual(settings["promptCacheTtl"], "1h")
+        self.assertNotIn("subagentPromptCacheTtl", settings)
         self.assertNotIn("claudeMdExcludes", settings)  # replaced by CLAUDE_CODE_DISABLE_CLAUDE_MDS in the sandbox
         self.assertIs(settings["permissions"]["blockReadsOutsideWorkingDirectories"], True)
         for rule in ("Read(./.git/**)", "Read(./**/.env)", "Read(//proc/**)", "Bash", "WebFetch", "WebSearch",
@@ -1482,7 +1546,16 @@ class InvocationTest(unittest.TestCase):
                                                           "XDG_CONFIG_HOME": "/h/.c", "PATH": "/usr/bin:/bin",
                                                           "LANG": "C.UTF-8"})
 
-    def fake_boundary(self, base: Path, version="v24.21.0", integrity=None, search="/usr/bin:/bin"):
+    @staticmethod
+    def stand_in_socat(base: Path) -> str:
+        """A search path whose socat is a stand-in: CI's ubuntu-24.04 runner has none (the CC's micro at a3881b19)."""
+        (base / "socat-bin").mkdir(parents=True)
+        (base / "socat-bin" / "socat").write_text("#!/bin/sh\nexit 0\n")
+        (base / "socat-bin" / "socat").chmod(0o755)
+        return f"{base / 'socat-bin'}:/usr/bin:/bin"
+
+    def fake_boundary(self, base: Path, version="v24.21.0", integrity=None, search=None):
+        search = self.stand_in_socat(base) if search is None else search
         node = base / "node"
         node.write_text(f"#!/bin/sh\necho {version}\n")
         node.chmod(0o755)
@@ -1505,7 +1578,8 @@ class InvocationTest(unittest.TestCase):
                 argv = launcher.command("anthropic-api-4", plan, net, "/h")
                 # srt first, started without the key; the runner, which injects it, is srt's command.
                 self.assertEqual(argv[0:9], ["/usr/bin/env", f"HOME={net / 'home'}", f"TMPDIR={net / 't'}",
-                                             f"PATH={base}:/usr/bin:/bin", str(base / "node"), str(boundary.cli),
+                                             f"PATH={base}:{base / 'socat-bin'}:/usr/bin:/bin", str(base / "node"),
+                                             str(boundary.cli),
                                              "--settings", str(net / "srt.json"), "--"])
                 self.assertEqual(argv[9:14], ["/usr/bin/env", "-u", "TMPDIR", "HOME=/h", "PATH=/usr/bin:/bin"])
                 self.assertEqual(argv[16:20], ["-S", str(crw.CREDENTIAL_RUN), "anthropic-api-4", "--"])
@@ -1536,7 +1610,8 @@ class InvocationTest(unittest.TestCase):
                 with self.subTest(needle=needle):
                     problems = self.fake_boundary(base, **options).problems()
                     self.assertTrue(any(needle in problem for problem in problems), problems)
-            missing = crw.Boundary(Path(temporary) / "none", Path(temporary) / "none", Path("/tmp"))
+            missing = crw.Boundary(Path(temporary) / "none", Path(temporary) / "none", Path("/tmp"),
+                                   search=self.stand_in_socat(Path(temporary) / "m"))
             self.assertEqual(len(missing.problems()), 2)  # no node, no srt
             deep = crw.Boundary(Path(temporary) / "none", Path(temporary) / "none", Path("/" + "x" * 60))
             self.assertTrue(any("too long" in problem for problem in deep.problems()))
