@@ -53,6 +53,20 @@ import xml.etree.ElementTree as ET
 
 
 ROOT = Path(__file__).resolve().parents[1]
+# Run.clean's redactions: scripts/validate.py's PRIVATE_CONTENT rules by name, each with its placeholder. The copies
+# stay here so this script runs without importing validate.py; tests/test_native_token_ci.py holds each one equal to
+# its original, pattern and flags.
+REDACTIONS = (
+    ("local session identifier", re.compile(r"[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}", re.I), "<UUID>"),
+    ("personal home path", re.compile(r"/(?:home|Users)/(?!example(?:/|\b))[A-Za-z0-9_.-]+(?:/|\b)"),
+     "<HOME-EXAMPLE>"),
+    ("email address", re.compile(
+        r"(?<![\w.%+-])(?!noreply@(?:anthropic|github)\.com(?![\w-]|\.\w))[A-Za-z0-9._%+-]+@"
+        r"(?!(?:[A-Za-z0-9-]+\.)*(?:users\.noreply\.github\.com|example(?:\.[A-Za-z]{2,})+"
+        r"|[A-Za-z0-9-]+\.(?:test|example|invalid|localhost))(?![\w-]|\.\w))"
+        r"(?:[A-Za-z0-9-]+\.)+(?!(?:service|socket|target|device|mount|automount|swap|path|timer|slice|scope)"
+        r"(?![\w-]|\.\w))(?:[A-Za-z]{2,}|xn--[A-Za-z0-9-]{0,58}[A-Za-z0-9])(?![\w-]|\.\w|\()", re.I), "<EMAIL>"),
+)
 # Serena declares 2.0.0.dev0 for every commit, so its manifest version names the commit after " @ "
 # and the commit is its identity (adoption/pins-linux-x86_64.json, kind uv-tool-from-git).
 SERENA_COMMIT = "c6fbd1c5932df2494ffa0020af5a9fbe80b82143"
@@ -675,11 +689,8 @@ class Run:
             replacements.append((os.environ["HOME"], "<NATIVE_HOME>"))
         for source, target in sorted(replacements, key=lambda item: len(item[0]), reverse=True):
             value = value.replace(source, target)
-        # Source: scripts/validate.py:PRIVATE_CONTENT. Keep these two patterns and
-        # their flags in sync if that tuple changes.
-        value = re.sub(r"[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}", "<UUID>", value, flags=re.I)
-        value = re.sub(r"/(?:home|Users)/(?!example(?:/|\b))[A-Za-z0-9_.-]+(?:/|\b)",
-                       "<HOME-EXAMPLE>", value)
+        for _, pattern, placeholder in REDACTIONS:
+            value = pattern.sub(placeholder, value)
         return value
 
     def flush(self) -> None:

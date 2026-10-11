@@ -1,0 +1,89 @@
+{
+  "schema_version": 2,
+  "groups": [
+    {
+      "reason": "a release-signing key or package-maintainer identity, as a signature check or package install printed it",
+      "matches": [
+        "aacid@kde.org",
+        "alexander@bumpern.de",
+        "alexander@debian.org",
+        "alexander@lochraster.org",
+        "cdimage@ubuntu.com",
+        "ftpmaster@ubuntu.com",
+        "keyless@projectsigstore.iam.gserviceaccount.com",
+        "security@anthropic.com"
+      ]
+    },
+    {
+      "reason": "an upstream page, package, repository, tag, advisory or paper capture naming its own public contact or author",
+      "matches": [
+        "alexgshaw64@gmail.com",
+        "arwgard@icloud.com",
+        "bd-ops@alpaca.markets",
+        "cna@python.org",
+        "compliance@alpaca.markets",
+        "dataops@nasdaqomx.com",
+        "edgartrademark@sec.gov",
+        "gsservices@nyse.com",
+        "i@izs.me",
+        "info@arcticdb.io",
+        "janlukasschroeder@protonmail.com",
+        "jared@quantconnect.com",
+        "josh.king@theice.com",
+        "listingmanager@nyse.com",
+        "nbren@cs.wm.edu",
+        "neoconnect@cboe.ca",
+        "npm-oidc-no-reply@github.com",
+        "nvd@nist.gov",
+        "package-announce@lists.fedoraproject.org",
+        "rahul.chowdhury@alpaca.markets",
+        "responsible.disclosure@vercel.com",
+        "rmteam@nyse.com",
+        "sean.wooden@kattenlaw.com",
+        "security-advisories@github.com",
+        "security-announce@python.org",
+        "sethmichaellarson@gmail.com",
+        "steipete@gmail.com",
+        "structureddata@sec.gov",
+        "subscriber@nasdaq.com",
+        "support@alpaca.markets",
+        "support@nautilustrader.io",
+        "support@sec-api.io",
+        "tobiasfunke93@gmail.com",
+        "tradingservices@nasdaqomx.com",
+        "u003cjfajersk@redhat.com",
+        "u003edatasales@cboe.com",
+        "webmaster@sec.gov",
+        "wrds-support@wharton.upenn.edu"
+      ]
+    },
+    {
+      "reason": "a placeholder, an upstream test identity, the git SSH user of a public Git host, an SSH algorithm name, an escaped exempt address or a Claude Code @path import after an escaped newline, which the rule reads as an address",
+      "matches": [
+        "git@github.com",
+        "n@fenced.md",
+        "n@mcp.tool",
+        "n@reference.md",
+        "n@rtk.md",
+        "n@tilde-fenced.md",
+        "n@unloaded.md",
+        "namespace@your.domain",
+        "plugins.context-mode@context-mode.enabled",
+        "sk-ssh-ed25519@openssh.com",
+        "t@e.com",
+        "u003cnoreply@anthropic.com",
+        "xfe@rtk.md",
+        "your@email.com"
+      ]
+    },
+    {
+      "reason": "a URL's user information or an agency's public contact in a test fixture, or an upstream bot's commit identity",
+      "matches": [
+        "openhands@all-hands.dev",
+        "pw@data.alpaca.markets",
+        "secret@github.com",
+        "user@paper-api.alpaca.markets"
+      ]
+    }
+  ]
+}

@@ -412,6 +412,30 @@ class NativeTokenCIContracts(unittest.TestCase):
         work.mkdir()
         return ci.Run(output, work)
 
+    def test_redactions_copy_scripts_validate(self):
+        # Codex's review of nas#1002: each copy in REDACTIONS stays equal to its scripts/validate.py original.
+        spec = importlib.util.spec_from_file_location("validate_for_redactions", SCRIPT.parent / "validate.py")
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        rules = dict(module.PRIVATE_CONTENT)
+        self.assertIn("email address", [name for name, _, _ in ci.REDACTIONS])
+        for name, pattern, _ in ci.REDACTIONS:
+            with self.subTest(rule=name):
+                self.assertEqual((pattern.pattern, pattern.flags), (rules[name].pattern, rules[name].flags))
+
+    def test_clean_redacts_email_addresses(self):
+        # Codex's review of nas#1002: a measured CLI that prints the signed-in account no longer publishes it.
+        operator = "@".join(("operator", "company.com"))
+        with tempfile.TemporaryDirectory() as directory:
+            run = self._new_run(Path(directory))
+            for value, expected in ((f"signed in as {operator}", "signed in as <EMAIL>"),
+                                    (f"<{operator.upper()}>", "<<EMAIL>>"),
+                                    ("Co-Authored-By: <" + "@".join(("noreply", "anthropic.com")) + ">",
+                                     "Co-Authored-By: <" + "@".join(("noreply", "anthropic.com")) + ">"),
+                                    ("package@1.2.3", "package@1.2.3")):
+                with self.subTest(expected=expected.replace("<EMAIL>", "<redacted>")):
+                    self.assertEqual(run.clean(value), expected)
+
     def test_clean_redacts_uuid_text(self):
         # Source: scripts/validate.py:PRIVATE_CONTENT, including case and embedded matches.
         # Assemble fabricated identifiers so the test source contains no private-content match.

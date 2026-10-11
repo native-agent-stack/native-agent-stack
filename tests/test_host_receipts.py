@@ -486,6 +486,30 @@ class ValidateFixtureTests(_ReceiptFixtureCase):
         self.assertEqual(exit_code, 1, output)
         self.assertIn("personal home path", output)
 
+    def test_json_escaped_email_address_in_value_is_rejected(self):
+        # A JSON \u0040 escape decodes to '@', hiding an address from the raw scan; the reviewed-match waiver judges
+        # the decoded value on its own, so the raw bytes holding no unreviewed match do not waive it.
+        backslash = chr(92)
+        an_address = "operator" + "@" + "company.com"
+        data = json.loads((FIXTURES / "valid.json").read_text(encoding="utf-8"))
+        data["catalog_revision"] = self.commit
+        data["claim"] = "MARKER"
+        text = json.dumps(data, indent=2) + "\n"
+        text = text.replace("MARKER", "operator" + backslash + "u0040" + "company.com")
+        self.assertNotIn(an_address, text)
+        self.assertIn(an_address, json.loads(text)["claim"])
+
+        host_dir = self.root / "evidence" / "hosts" / data["host"]["host_id"]
+        host_dir.mkdir(parents=True, exist_ok=True)
+        path = host_dir / f"{data['id']}.json"
+        path.write_text(text, encoding="utf-8")
+        _register(self.root, path.relative_to(self.root).as_posix())
+
+        exit_code, output = self._validate()
+        self.assertEqual(exit_code, 1, output)
+        self.assertIn("email address (decoded JSON value or key)", output)
+        self.assertNotIn(an_address, output)
+
     def test_json_escaped_personal_home_path_in_key_is_rejected(self):
         # The same JSON-escape hiding technique, but in an object *key* (tool_versions is an
         # open object per the schema); the privacy scan must walk keys, not only values.

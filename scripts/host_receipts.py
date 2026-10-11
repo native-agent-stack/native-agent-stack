@@ -33,10 +33,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 try:
-    from .validate import PRIVATE_CONTENT, PUBLIC_EMAIL_PATHS
+    from .validate import PRIVATE_CONTENT, unreviewed_email
     from .catalog_decisions import InvalidDecisionIndex, safe_file, unique_json
 except ImportError:  # running as a plain script, not a package
-    from validate import PRIVATE_CONTENT, PUBLIC_EMAIL_PATHS
+    from validate import PRIVATE_CONTENT, unreviewed_email
     from catalog_decisions import InvalidDecisionIndex, safe_file, unique_json
 
 
@@ -1431,20 +1431,21 @@ def validate_receipt_cross_references(root: Path, host_dir_name: str, path: Path
         content = path.read_text(encoding="utf-8")
     except UnicodeError:
         content = path.read_bytes().decode("latin-1")
-    # validate.py's reviewed public paths waive its email rule only, as its publication scan does.
-    rules = [(description, pattern) for description, pattern in PRIVATE_CONTENT
-             if not (description == "email address" and relative_receipt_path in PUBLIC_EMAIL_PATHS)]
-    for description, pattern in rules:
-        if pattern.search(content):
-            errors.append(f"{label}: contains possible {description}")
+    def private(text: str) -> list[str]:
+        # validate.py's reviewed public matches waive its email rule only, as its publication scan does; each text is
+        # judged on its own, so an address a JSON escape hides is not waived by the raw bytes.
+        return [description for description, pattern in PRIVATE_CONTENT if pattern.search(text)
+                and not (description == "email address" and not unreviewed_email(text))]
+
+    for description in private(content):
+        errors.append(f"{label}: contains possible {description}")
     # The raw-text scan above misses content a JSON escape hides (for example / in
     # place of a literal '/', or \/ ): scan every decoded string value AND every key,
     # recursively, from the parsed receipt as well.
     if isinstance(receipt, dict):
         for decoded_string in iter_receipt_strings(receipt):
-            for description, pattern in rules:
-                if pattern.search(decoded_string):
-                    errors.append(f"{label}: contains possible {description} (decoded JSON value or key)")
+            for description in private(decoded_string):
+                errors.append(f"{label}: contains possible {description} (decoded JSON value or key)")
 
 
 def grandfather_file_expected(root: Path, relative_path: str) -> bool:

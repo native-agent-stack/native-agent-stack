@@ -183,16 +183,30 @@ class PublicationValidationTests(unittest.TestCase):
         self.assertIn("evidence/artifacts/session-notes.txt: contains possible email address", str(refused.exception))
         self.assertNotIn(value, str(refused.exception))
 
-    def test_a_public_path_waives_the_email_rule_only(self):
+    def test_a_reviewed_match_waives_the_email_rule_only(self):
         from scripts import validate as validator_module
         relative = "evidence/artifacts/upstream-page.html"
-        self.add(relative, "contact " + address("press", "upstream-vendor.com") + "\n")
-        with patch.dict(validator_module.PUBLIC_EMAIL_PATHS, {relative: "fixture: an upstream page's contact"}):
+        reviewed = {address("press", "upstream-vendor.com"): "fixture: an upstream page's contact"}
+        self.add(relative, "contact " + address("Press", "Upstream-Vendor.com") + "\n")
+        with patch.dict(validator_module.PUBLIC_EMAIL_MATCHES, reviewed):
             self.assertEqual(validate(self.root)["hashed_files"], 3)
         self.evidence["files"].pop()
         self.add(relative, "contact " + address("press", "upstream-vendor.com") + "\n/" + "home/fixture/file\n")
-        with patch.dict(validator_module.PUBLIC_EMAIL_PATHS, {relative: "fixture: an upstream page's contact"}):
+        with patch.dict(validator_module.PUBLIC_EMAIL_MATCHES, reviewed):
             self.assert_invalid("personal home path")
+
+    def test_an_unreviewed_address_beside_a_reviewed_one_is_refused(self):
+        # Codex's review of 308033f6: a reviewed file no longer waives a later address added to it.
+        from scripts import validate as validator_module
+        relative = "evidence/artifacts/upstream-page.html"
+        operator = address("first.last", "mail-host.com")
+        self.add(relative, "contact " + address("press", "upstream-vendor.com") + "\nsigned in as " + operator + "\n")
+        with patch.dict(validator_module.PUBLIC_EMAIL_MATCHES,
+                        {address("press", "upstream-vendor.com"): "fixture: an upstream page's contact"}):
+            with self.assertRaises(InvalidPublication) as refused:
+                validate(self.root)
+        self.assertIn(relative + ": contains possible email address", str(refused.exception))
+        self.assertNotIn(operator, str(refused.exception))
 
     def test_changed_artifact_fails_hash_even_when_length_unchanged(self):
         self.write("evidence/artifacts/output.txt", "example 9.0.0\n")
@@ -1052,6 +1066,11 @@ class EmailAddressRuleTests(unittest.TestCase):
         "a unit type as a domain label": address("someone", "tty1.service.com"),
         "git as a local-part prefix": address("gitlab-user", "mail-host.com"),
         "a Moldovan domain": address("someone", "mail-host.md"),
+        "git at a company host": address("git", "private-company.com"),
+        "git SSH user of a public host": "ssh -T " + address("git", "github.com"),
+        "an IDNA top-level domain": address("someone", "company.xn--p1ai"),
+        "an IDNA top-level domain, upper case": address("SOMEONE", "COMPANY.XN--P1AI"),
+        "an IDNA label of 59 characters": address("someone", "host.xn--" + "a" * 59),
         "an import after an escaped newline": "\\n" + "@" + "RTK.md",
     }
     EXEMPT = {
@@ -1066,7 +1085,8 @@ class EmailAddressRuleTests(unittest.TestCase):
         ".example": address("someone", "host.example"),
         ".invalid": address("someone", "host.invalid"),
         ".localhost": address("someone", "a.localhost"),
-        "git SSH user": "ssh -T " + address("git", "github.com"),
+        "an IDNA label of 60 characters": address("someone", "host.xn--" + "a" * 60),
+        "an IDNA label ending in a hyphen": address("someone", "host.xn--p1ai-"),
         "systemd getty instance": address("getty", "tty1.service"),
         "systemd user manager": address("user", "1000.service"),
         "systemd timer instance": address("job", "daily.timer"),
@@ -1112,22 +1132,40 @@ class EmailAddressRuleTests(unittest.TestCase):
             spec = importlib.util.spec_from_file_location("validate_copy", copy)
             module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(module)
-        self.assertEqual(module.PUBLIC_EMAIL_PATHS, {})
+        self.assertEqual(module.PUBLIC_EMAIL_MATCHES, {})
         self.assertIn("email address", dict(module.PRIVATE_CONTENT))
 
-    def test_every_public_path_exists_and_still_carries_an_address(self):
-        # An entry whose file no longer matches is dead and would waive a later address unreviewed.
-        from scripts.validate import PUBLIC_EMAIL_PATHS
+    def test_an_entry_must_be_lower_case_and_listed_once(self):
+        from scripts.validate import load_public_email_matches
+        with tempfile.TemporaryDirectory() as temporary:
+            data = Path(temporary) / "public_email_matches.json"
+            for groups in ([{"reason": "r", "matches": [address("Press", "vendor.com")]}],
+                           [{"reason": "r", "matches": [address("press", "vendor.com")]},
+                            {"reason": "s", "matches": [address("press", "vendor.com")]}]):
+                with self.subTest(groups=len(groups)):
+                    data.write_text(json.dumps({"schema_version": 2, "groups": groups}), encoding="utf-8")
+                    with self.assertRaises(ValueError):
+                        load_public_email_matches(data)
+
+    def test_every_reviewed_match_still_occurs_in_the_tree(self):
+        # An entry no tracked file carries is dead and would waive a later address unreviewed; the publication scan
+        # already refuses any match the list lacks, so together the list and the tree agree exactly.
+        from scripts.validate import PUBLIC_EMAIL_MATCHES
         rule = self.rule()
         listing = subprocess.run(["git", "ls-files", "-z"], cwd=ROOT, capture_output=True, check=False)
         if listing.returncode:
             self.skipTest("not a Git checkout")
-        listed = set(listing.stdout.decode().split("\0"))
-        for relative, reason in PUBLIC_EMAIL_PATHS.items():
-            with self.subTest(path=relative):
-                self.assertTrue(reason.strip())
-                self.assertIn(relative, listed)
-                self.assertIsNotNone(rule.search((ROOT / relative).read_bytes().decode("utf-8", "replace")))
+        found = set()
+        for relative in filter(None, listing.stdout.decode().split("\0")):
+            try:
+                raw = (ROOT / relative).read_bytes()
+            except OSError:
+                continue
+            if b"@" in raw:
+                found.update(match.group(0).lower() for match in rule.finditer(raw.decode("utf-8", "replace")))
+        for reason in PUBLIC_EMAIL_MATCHES.values():
+            self.assertTrue(reason.strip())
+        self.assertEqual(sorted(set(PUBLIC_EMAIL_MATCHES) - found), [], "listed matches no tracked file carries")
 
 
 if __name__ == "__main__":
