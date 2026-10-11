@@ -96,6 +96,12 @@ Scorecard with `bbcee3303`; the alerts then close on their own. The guard test k
   after the tag. The bootstrap's `install_npm` passes no `--before`") and `docs/decisions/2026-10-03-currency-wave-w1.md:448`
   ("The npm tarball hash is artifact evidence and does not pin the transitive dependency tree").
 
+The Claude delta read independently reproduced the context-hub tarball hash and "added 108 packages" result at
+2026-10-11T19:09:10Z using npm 11.19.0 and Node v24.21.0 with a scratch prefix/cache and empty userconfig.
+Its unchanged `npm-dryrun.log` capture is retained in the PR's final attachment packet with SHA256
+`8fe5d46577f269b1776a1acccc7468797409d8c7ef0bceacf46a1dd26d76b863`.
+This authenticates the later reproduction; the original 02:42 capture remains unavailable.
+
 So the alert is right that the install is not fully pinned, and "false positive" is wrong for it. Disposition:
 `won't fix` for this PR, naming the unpinned transitive dependency tree as the reason. The supported fix is `npm ci`
 from a committed lockfile per package, which Scorecard accepts; it changes the bootstrap and its pins, so it is a separate
@@ -112,12 +118,15 @@ cached/downloaded bytes; replacing the downloaded-file verifier with `true` make
 
 Paths: `evidence/artifacts/new-wsl-local-models-20261002/scripts/a2/a2_run_bfcl.sh:33`,
 `.../scripts/steps/M11p-precheck.sh:7`, `evidence/artifacts/new-wsl-install-plan-20261002/config/omniroute-canary-install.sh:82`,
-and the two `.sh.txt` files under `evidence/artifacts/omniroute-post-terminal-drain-20261005/`.
+and `evidence/artifacts/omniroute-post-terminal-drain-20261005/scripts/preflight-race-repro.sh.txt:64` (97)
+and `.../superseded/preflight-race-repro-v1.sh.txt:61` (98).
 
 - These are captured, hash-bound evidence. Editing them would break `manifests/evidence.json`, so they cannot be
   pinned.
-- Scorecard v5.5.0 has no path exclusion. It always loads a `scorecard.yml` from the repository root
-  (`pkg/scorecard/scorecard.go:179-190`), and the SARIF writer skips every annotated check
+- Scorecard v5.5.0 has no path exclusion. Its `findConfigFile` tries `scorecard.yml`, `scorecard.yaml`,
+  `.scorecard.yml`, `.scorecard.yaml`, `.github/scorecard.yml` and `.github/scorecard.yaml`, returning the first
+  readable file regardless of validity (`pkg/scorecard/scorecard.go:200-219`); the caller parses it if present
+  (`:179-190`). The SARIF writer skips every annotated check
   (`pkg/scorecard/sarif.go:673-676`, reached from `scorecard-action` v2.4.4 `internal/scorecard/format.go:71`), so an
   annotation for `Pinned-Dependencies` would close these alerts. An annotation names a check and a reason
   (`config/annotations.go`), never a path, so it would also hide every future Pinned-Dependencies finding in live files.
@@ -150,7 +159,9 @@ choice here. Quoted warnings are Scorecard's text at 2026-10-11.
 - **Fuzzing (18, score 0).** Scorecard v5.5.0 (`docs/checks.md`, "Fuzzing") looks for OSS-Fuzz membership, ClusterFuzzLite,
   or language fuzz functions (Go fuzzing and property-based libraries for Haskell, JavaScript/TypeScript, Erlang, C#/F#).
   It also detects Python through `import atheris` (`checks/raw/fuzzing.go:131-136`). The repository is mostly Python,
-  shell and workflow files, with 16 Go, TypeScript, C# and Rust files outside `evidence/` (`git ls-files`); none is a
+  shell and workflow files, with 18 Go, TypeScript, C# and Rust files outside `evidence/` (`git ls-files`), including
+  the two TSX files: the TypeScript spec scans both `*.ts` and `*.tsx` (`checks/raw/fuzzing.go:123-124` at
+  `c395761df6afe1a69e476bc60a013a94bcbc153f`); none is a
   fuzz target. Adding a fuzz harness only to raise a score is not a decision this record makes. Disposition: `won't fix`; revisit if a parser or a Go/TypeScript component
   becomes a fuzzing target of its own.
 - **CIIBestPractices (22, score 0).** The check reads the OpenSSF Best Practices badge API by Git URL
@@ -168,12 +179,18 @@ regressions fail before their fixes for checksum-verifier bypass, archive reassi
 and quoted or comment-suffixed missing self-action targets. The tests exercise the existing offline bootstrap
 harness and reuse the repository's supported fail-closed workflow loader
 (`tests/test_workflow_policy.py:403`, `load_workflow`) instead of introducing another YAML scanner.
-They pin the facts the dismissals rest on and fail when:
+The following guards cover the specific exercised premises; retained-script non-consumption is a separate follow-up.
+They fail when:
 
 1. the disposition table above does not list the 22 alerts exactly once each;
-2. `install_npm` in `adoption/bootstrap-linux.sh` stops running exactly one `npm install` with the reviewed argv after
-   the `fetch()` that checked `"$archive"` against a sha256 (the six original mutants plus archive reassignment and
-   indexed array append, plus a fetch moved after installation, are caught), or `fetch()` promotes a checksum-mismatched download;
+2. the non-platform socraticode fixture on a fresh cache, with either ignore-scripts setting, stops producing one
+   `npm install` with the reviewed argv and the expected archive bytes at invocation time. The six original mutants,
+   archive reassignment, indexed array append and a fetch moved after installation are caught. The tampered-cache
+   case supplies a cached archive and replacement whose hashes both mismatch the pin: shipped `fetch()` refuses
+   before npm, while `[[ -f "$archive" ]] || fetch` fails this guard. Separate direct-fetch fixtures cover valid/invalid
+   cache and download combinations. `tests.test_adoption_bootstrap_linux_platform` covers the platform-dependency
+   branch and catches Codex's mutant that fetches only when `has_platform_dependency == 0`; this module does not
+   claim to exercise that branch;
 3. a decoded `$/` reference in `validate.yml` or `publish-catalog.yml` names an action directory that does not exist,
    including single-quoted, double-quoted and comment-suffixed scalars.
 
@@ -199,7 +216,8 @@ reviewers read the reasons first.
   `fac1a1678517b7185cd1fa24699a16423fd841d2`): `checks/raw/pinned_dependencies.go:800`,
   `checks/raw/shell_download_validate.go:464-490`, `config/annotations.go`, `pkg/scorecard/scorecard.go:179-190`,
   `pkg/scorecard/sarif.go:673-676`, `checks/raw/code_review.go:55-62`, `probes/codeApproved/impl.go:116-126`,
-  `checks/raw/fuzzing.go:131-136`, `docs/checks.md`, `README.md` ("Showing Maintainers Annotations").
+  `checks/raw/fuzzing.go:123-136`, `pkg/scorecard/scorecard.go:200-219` (`findConfigFile`),
+  `docs/checks.md`, `README.md` ("Showing Maintainers Annotations").
 - `ossf/scorecard@5fc5c0007101ff4d51ba45da3792463b4a7ba7e7` (`main`, 2026-10-11): `pinned_dependencies.go:806`;
   `ossf/scorecard@bbcee3303b5a8a733d2ffe92fdf4364b2b7c0293` (#5191, 2026-09-28), the fix not yet in a release.
 - `ossf/scorecard-action@55891bbd73f2425e97637d96e306fc9d491d0b21` (v2.4.4, 2026-07-23): `go.mod` requires Scorecard v5.5.0;

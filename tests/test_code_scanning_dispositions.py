@@ -1,11 +1,14 @@
 """Guards behind docs/decisions/2026-10-11-code-scanning-repo-level.md.
 
 That record dismisses code-scanning alerts as false positives or won't-fix on the strength of facts about the
-repository. These tests fail when a fact stops holding, so a dismissal cannot outlive its reason:
+repository. This module guards the specific table, non-platform npm fixtures and self-action references below;
+it does not guard every disposition premise or every bootstrap branch:
 
 - the record's disposition table names every alert it disposes of, each exactly once;
-- adoption/bootstrap-linux.sh's install_npm runs exactly one `npm install`, with the full argv pinned below, whose
-  only package is the archive that fetch() verified against a sha256 (alert 91: Scorecard calls any `npm install`
+- adoption/bootstrap-linux.sh's non-platform socraticode fixture runs exactly one `npm install` with the reviewed
+  argv and verified archive bytes, for both ignore-scripts settings on a fresh cache. A separate bad-cache/bad-download
+  case refuses before npm. tests.test_adoption_bootstrap_linux_platform exercises the platform-dependency branch
+  and catches Codex's conditional-fetch mutant (alert 91: Scorecard calls any `npm install`
   unpinned, v5.5.0 checks/raw/shell_download_validate.go:464-490; the tarball's own runtime dependencies are still
   resolved from the registry by range, which is why 91 is won't-fix and not a false positive);
 - every `$/` self-repository `uses:` in validate.yml and publish-catalog.yml names an action directory that exists
@@ -127,6 +130,40 @@ class NpmInstallIsVerifiedTests(unittest.TestCase):
 
     def test_install_npm_installs_only_the_verified_archive(self) -> None:
         self.assertTrue(installs_only_verified_archive(function_body(self.text, "install_npm")))
+
+    def test_tampered_cached_archive_never_reaches_npm(self) -> None:
+        """A bad cache and bad replacement must refuse before invoking npm."""
+        pin = {**bootstrap.shipped_pin("socraticode"),
+               "sha256": hashlib.sha256(b"expected archive\n").hexdigest()}
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            script = root / "bootstrap.sh"
+            script.write_text(self.text, encoding="utf-8")
+            archive = root / f"eco/downloads/{pin['id']}-{pin['version']}.tgz"
+            functions = bootstrap.shell_functions
+            def with_tampered_cache(source, *names):
+                return (functions(source, *names) + "\nprintf '%s\\n' 'tampered cache' > "
+                        + shlex.quote(str(archive)) + "\n")
+            with patch.object(bootstrap, "SCRIPT_PATH", script), \
+                    patch.object(bootstrap, "shell_functions", side_effect=with_tampered_cache):
+                result, urls, npm_calls, uv_calls, _ = bootstrap.run_install_pin(
+                    self, root, pin, b"invalid replacement archive\n")
+            self.assertEqual(npm_calls, [], "tampered cached bytes reached npm")
+            self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+            self.assertEqual(uv_calls, [])
+            self.assertEqual(urls, [pin["url"]])
+            self.assertEqual(archive.read_bytes(), b"tampered cache\n")
+
+    def test_tampered_cache_guard_rejects_cache_trusting_install(self) -> None:
+        body = function_body(self.text, "install_npm")
+        fetch = 'fetch "$url" "$sha256" "$archive"'
+        mutant = body.replace(fetch, '[[ -f "$archive" ]] || ' + fetch, 1)
+        self.assertNotEqual(mutant, body)
+        case = type(self)("test_tampered_cached_archive_never_reaches_npm")
+        case.text = self.text.replace(body, mutant, 1)
+        result = unittest.TestResult()
+        case.run(result)
+        self.assertTrue(result.failures, "cache-trusting install passed the tampered-cache guard")
 
     def test_fetch_exits_on_a_checksum_mismatch_before_the_file_is_kept(self) -> None:
         valid, invalid = b"verified archive\n", b"wrong archive\n"
