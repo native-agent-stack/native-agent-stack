@@ -134,12 +134,16 @@ esac
 '''
 # codex_gate.py and scripts/validate.py both run as `python3 ...` in the scripts; the log shows which path each call got.
 # FAKE_REAL_PYTHON, when set, runs the real codex_gate.py with that interpreter instead of the canned answer (its gh is the fake gh).
+# #975 round 3: FAKE_GATE_HOOK runs before each gate call's answer and FAKE_VALIDATE_HOOK before each validation's, so a test can change
+# GitHub-side data (a status, a record, origin's main) while a landing waits; FAKE_VALIDATE_OUT is the validation's output.
 FAKE_PYTHON3 = r'''#!/usr/bin/env bash
 printf 'python3 %s\n' "$*" >> "$FAKE_LOG"
 case "$*" in
   *scripts/validate.py*) printf 'validate-tree %s\n' "$(git ls-files | tr '\n' ' ')" >> "$FAKE_LOG"
-                         echo "validate stub"; exit "${FAKE_VALIDATE_RC:-0}" ;;
-  *codex_gate.py*) [ -z "${FAKE_REAL_PYTHON:-}" ] || exec "$FAKE_REAL_PYTHON" "$@" ;;
+                         [ -z "${FAKE_VALIDATE_HOOK:-}" ] || sh -c "$FAKE_VALIDATE_HOOK"
+                         echo "${FAKE_VALIDATE_OUT:-validate stub}"; exit "${FAKE_VALIDATE_RC:-0}" ;;
+  *codex_gate.py*) [ -z "${FAKE_GATE_HOOK:-}" ] || sh -c "$FAKE_GATE_HOOK"
+                   [ -z "${FAKE_REAL_PYTHON:-}" ] || exec "$FAKE_REAL_PYTHON" "$@" ;;
 esac
 rc=${FAKE_GATE_RC:-0}
 if [ -n "${FAKE_GATE_SEQ:-}" ]; then
@@ -172,12 +176,13 @@ class Script:
         self.lines = self.text.split("\n")
         self.tcc = self.cut(r"^tcc_read_gate\(\) \{$", r"^\}$")
         self.verdict_loop = self.cut(r"^for v in (\$\{VERDICT_FILES:-\}|\"\$@\"); do$", r"^done$")
-        self.gpt = self.cut(r'^if \[ "\$\{CODEX_STATE:-0\}" = 5 \]; then$', r"^fi$") if key == "uet" else None
+        # #975 (Codex P1 at af9d1901): the GPT_VERDICT block is a function, called on a 5 at both gate calls
+        self.gpt = self.cut(r"^gpt_substitute\(\) \{$", r"^\}$") if key == "uet" else None
         self.change = self.cut(r"^change\(\) \{", r"^same_change\(\) \{")
         if key == "uet":
             self.ci = self.cut(r'^  s=\$\(lg_ci_state "\$N"\)$', r'^  s=\$\(lg_ci_state "\$N"\)$')
-        else:
-            self.ci = self.cut(r'^  c=\$\(gh api "repos/\$R/commits/\$hd/check-runs', r"@tsv'( 2>/dev/null)?\)$")
+        else:  # the check-run line and, on it, the typed-shape check of #975 P2-B
+            self.ci = self.cut(r'^  c=\$\(gh api "repos/\$R/commits/\$hd/check-runs', r"@tsv'( 2>/dev/null)?\)( && .*)?$")
         found = re.findall(r"^# >>> land-gate-fns$.*?^# <<< land-gate-fns$", self.text, re.S | re.M)
         if len(found) != 1:
             raise AssertionError(f"{key}_land.sh needs exactly one land-gate-fns block, it has {len(found)}")
@@ -239,9 +244,14 @@ class LandingCase(unittest.TestCase):
         prelude += f"VERDICT_FILES={q(path)}\n" if script.key == "uet" else f"set -- {q(path)}\n"
         return self.bash(prelude, script.verdict_loop)
 
+    def receipt_loop(self, path, read, head, gates_done):
+        """nas's verdict loop when the caller gave the read head as `read` (a prefix) and it resolved to `head`."""
+        prelude = f"R=x/y; N=1; E={read}; EF={head}\nGATES_DONE={q(gates_done)}\n{self.nas.block}\nset -- {q(path)}\n"
+        return self.bash(prelude, self.nas.verdict_loop)
+
     def gpt_block(self, path, head):
-        prelude = f"R=x/y; N=1; E={head}; CODEX_STATE=5; GPT_VERDICT={q(path)}\n{self.uet.block}\n"
-        return self.bash(prelude, self.uet.gpt)
+        prelude = f"R=x/y; N=1; E={head}; GPT_VERDICT={q(path)}\n{self.uet.block}\n"
+        return self.bash(prelude, f"{self.uet.gpt}\ngpt_substitute")
 
     def record_gate(self, script, head, coord, statuses):
         feed = self.write("statuses.json", json.dumps(statuses))
@@ -277,7 +287,9 @@ def accept(code, reject_code=2):
 # environment (LANDING_PROHIBITED_NAMES). Neither is ever written into the repository. Only (file, form) pairs are reported, never
 # the matched text, so a failure cannot print a name. No name is skipped for its length (the GPT micro on 754a194f: a real account
 # `sam` was never checked).
-HOME_PATH = re.compile(rb"/(?:home|Users)/[A-Za-z0-9_.-]|[A-Za-z]:[\\/]+Users[\\/]|/root/")
+# #975 P3-7: in any letter case (an upper-case drive-letter Users path, an upper-case /home); case-insensitive file systems accept those
+# spellings. legacy_findings keeps the old pattern.
+HOME_PATH = re.compile(rb"/(?:home|Users)/[A-Za-z0-9_.-]|[A-Za-z]:[\\/]+Users[\\/]|/root/", re.I)
 PROHIBITED_NAMES_VARIABLE = "LANDING_PROHIBITED_NAMES"  # not NATIVE_AGENT_HOST_NAMES_JSON: setting that replaces the host-name scanner's own sources
 JOINERS = rb"[-_./\\@:~=]"  # what joins a name to other text in an identifier or a path: project-<name>-tools, <name>@host, /<name>/, ~<name>
 
@@ -329,7 +341,8 @@ def name_patterns(name):
 def privacy_findings(root, name, bare_word_ok=False):
     """(path under root, form) for every file under root, __pycache__ and *.pyc excepted, that holds a home path or a form of name: the
     bare word, an identifier or path form, a percent-encoded form, hex digits or base64. bare_word_ok leaves out the bare word alone.
-    Hex counts with or without \\x escapes; a percent-encoded form counts where decoding the %XX escapes reveals more matches."""
+    Hex counts with or without \\x escapes; a percent-encoded form counts where decoding the %XX escapes reveals more matches, as a
+    token or as an identifier (#975 P2-D: `runner%40example.invalid` decodes to an address while its token count stays the same)."""
     patterns = name_patterns(name)
     found = []
     for path in sorted(root.rglob("*")):
@@ -343,7 +356,8 @@ def privacy_findings(root, name, bare_word_ok=False):
             "home path, percent-encoded": len(HOME_PATH.findall(decoded)) > len(HOME_PATH.findall(data)),
             "name": not bare_word_ok and bool(patterns["bare"].search(data)),
             "name, identifier": bool(patterns["identifier"].search(data)),
-            "name, percent-encoded": len(patterns["token"].findall(decoded)) > len(patterns["token"].findall(data)),
+            "name, percent-encoded": len(patterns["token"].findall(decoded)) > len(patterns["token"].findall(data))
+                                     or len(patterns["identifier"].findall(decoded)) > len(patterns["identifier"].findall(data)),
             "name, hex": bool(patterns["hex"].search(data.replace(b"\\x", b""))),
             "name, base64": bool(patterns["base64"].search(data)),
         }
@@ -353,11 +367,11 @@ def privacy_findings(root, name, bare_word_ok=False):
 
 def identity_findings(root, account, prohibited=()):
     """The sorted (path, form) pairs for every home path and every form of an identity under root. Each prohibited name is scanned in
-    full. So is the running account, except that a generic one (GENERIC_ACCOUNTS, whatever its case) may stand as a bare word. An empty
-    name would match everything and is refused."""
+    full. So is the running account, except that in CI a generic one (GENERIC_ACCOUNTS, whatever its case) may stand as a bare word
+    (#975 P3-8: outside CI no account is excused). An empty name would match everything and is refused."""
     if any(not name.strip() for name in (account, *prohibited)):
         raise ValueError("an empty identity matches everything")
-    found = set(privacy_findings(root, account, bare_word_ok=account.lower() in GENERIC_ACCOUNTS))
+    found = set(privacy_findings(root, account, bare_word_ok=IN_CI and account.lower() in GENERIC_ACCOUNTS))
     for name in prohibited:
         found.update(privacy_findings(root, name))
     return sorted(found)
@@ -375,15 +389,17 @@ class ScriptTextTests(LandingCase):
                          "a home path, or a form of an identity that must not appear (the account running these tests, or a name in "
                          f"{PROHIBITED_NAMES_VARIABLE}), in tools/landing")
 
-    def assertion_fails(self, files, *, account, prohibited=""):
-        """Run test_no_home_literal_or_user_name_in_tools_landing itself, as the account `account` and with `prohibited` in
-        LANDING_PROHIBITED_NAMES, on a scratch tools/landing holding `files` ({relative path: text}); True when it raises."""
-        root = self.dir / f"assertion-{next(self.counter)}"
-        for relative, text in files.items():
-            (root / relative).parent.mkdir(parents=True, exist_ok=True)
-            (root / relative).write_text(text, encoding="utf-8")
+    def assertion_fails(self, files, *, account, prohibited="", in_ci=True, root=None):
+        """Run test_no_home_literal_or_user_name_in_tools_landing itself, as the account `account`, with `prohibited` in
+        LANDING_PROHIBITED_NAMES and IN_CI as given, on a scratch tools/landing holding `files` ({relative path: text}), or on `root`;
+        True when it raises."""
+        if root is None:
+            root = self.dir / f"assertion-{next(self.counter)}"
+            for relative, text in files.items():
+                (root / relative).parent.mkdir(parents=True, exist_ok=True)
+                (root / relative).write_text(text, encoding="utf-8")
         case = type(self)("test_no_home_literal_or_user_name_in_tools_landing")
-        with mock.patch.multiple(sys.modules[__name__], LANDING=root, account_name=lambda: account), \
+        with mock.patch.multiple(sys.modules[__name__], LANDING=root, account_name=lambda: account, IN_CI=in_ci), \
                 mock.patch.dict(os.environ, {"LANDING_PROHIBITED_NAMES": prohibited}):
             try:
                 case.test_no_home_literal_or_user_name_in_tools_landing()
@@ -410,7 +426,7 @@ class ScriptTextTests(LandingCase):
             with self.subTest(account=account, allowed=text):
                 self.assertFalse(self.assertion_fails({"a/prose.md": text}, account=account))
         raw = b"runner"
-        refused = {"an identifier": "dir=project-runner-tools\n", "a suffix": "runner-1\n", "a prefix": "ci-runner\n",
+        refused = {"an identifier": "dir=project-runner-tools\n", "a suffix": "runner-1\n", "a prefix": "ci-runner\n", "a field name": "runner_id\n",
                    "an underscore": "runner_home\n", "a dotted name": "runner.example\n", "an address": "runner@example.invalid\n",
                    "a path": "/srv/runner/work\n", "a home directory": "~runner\n", "a flag": "--runner\n",
                    "a home path": "cd /home/example/work\n", "percent-encoded": "u=" + "".join(f"%{byte:02X}" for byte in raw) + "\n",
@@ -418,6 +434,45 @@ class ScriptTextTests(LandingCase):
         for form, text in refused.items():
             with self.subTest(account="runner", refused=form):
                 self.assertTrue(self.assertion_fails({"a/b/c.txt": text}, account="runner"))
+
+    def test_a_percent_encoded_joiner_is_an_identifier_form_too(self):
+        # #975 P2-D (GPT micro at af9d1901): the encoded form counted only new tokens, so `runner%40example.invalid` (the bare token
+        # `runner` before and after decoding, an address once decoded) passed for a generic running account.
+        for joiner in "@-/_.:~=\\":
+            text = f"contact runner%{ord(joiner):02X}example\n"
+            with self.subTest(joiner=joiner):
+                self.assertTrue(self.assertion_fails({"a/b.md": text}, account="runner"))
+                self.assertIn(("b.md", "name, percent-encoded"), privacy_findings(self.write_tree({"b.md": text}), "runner", bare_word_ok=True))
+        for text in ("the runner reports\n", "a runner%20reports\n", "runner%2C and more\n"):  # the bare word, also after decoding
+            with self.subTest(allowed=text):
+                self.assertFalse(self.assertion_fails({"a/b.md": text}, account="runner"))
+
+    def write_tree(self, files):
+        root = self.dir / f"tree-{next(self.counter)}"
+        for relative, text in files.items():
+            (root / relative).parent.mkdir(parents=True, exist_ok=True)
+            (root / relative).write_text(text, encoding="utf-8")
+        return root
+
+    def test_a_generic_account_is_excused_its_bare_word_in_ci_only(self):
+        # #975 P3-8 (Claude micro at af9d1901): the exemption applied on any machine; an account named `runner` outside CI was never
+        # checked for its bare word.
+        for in_ci, expected in ((True, False), (False, True)):
+            with self.subTest(in_ci=in_ci):
+                self.assertEqual(self.assertion_fails({"a/prose.md": "the runner reports\n"}, account="runner", in_ci=in_ci), expected)
+
+    def test_a_clean_checkout_passes_for_every_generic_account_in_ci(self):
+        # #975 P2-E (GPT micro at af9d1901): the hyphenated adjective "user-owned" in uet_land.sh line 2 is the identifier form of the
+        # supported generic account `user`, so the production assertion failed a clean checkout run by `user` in CI.
+        for account in sorted(GENERIC_ACCOUNTS):
+            with self.subTest(account=account):
+                self.assertFalse(self.assertion_fails({}, account=account, prohibited=os.environ.get(PROHIBITED_NAMES_VARIABLE, ""), root=LANDING))
+
+    def test_a_home_path_is_found_in_any_case(self):
+        # #975 P3-7 (Claude micro at af9d1901): the pattern was case-sensitive, so these spellings were not reported.
+        for text in ("C:/USERS/example\n", "c:\\users\\example\n", "/HOME/example\n", "/Root/example\n"):
+            with self.subTest(text=text):
+                self.assertIn(("p.txt", "home path"), privacy_findings(self.write_tree({"p.txt": text}), "zqxsynth"))
 
     def test_an_explicitly_prohibited_name_is_scanned_in_every_form_whatever_it_is(self):
         # #975 P2-1: a prohibited identity is never replaced by a sentinel, however short, and never excused as a generic word.
@@ -502,7 +557,10 @@ class ScriptTextTests(LandingCase):
     def test_scripts_run_the_gate_isolated_and_through_the_variable(self):
         for script in (self.uet, self.nas):
             with self.subTest(script=script.key):
-                self.assertEqual(script.text.count('python3 -I "$GATE" "$R" "$N"'), 2, "before the wait and before the merge")
+                # #975 P2-C: both calls go through lg_gate, which runs `python3 -I` and echoes only the gate's own status lines
+                self.assertEqual(script.text.count('lg_gate "$GATE" "$R" "$N"'), 2, "before the wait and before the merge")
+                self.assertEqual(script.text.count("python3 -I"), 1)
+                self.assertIn('g=$(python3 -I "$1" "$2" "$3" 2>&1)', script.block)
                 self.assertEqual(len(re.findall(r"^GATE=", script.text, re.M)), 1)
 
     def test_readme_names_every_variable_and_exit_code_the_scripts_use(self):
@@ -711,6 +769,19 @@ class VerdictFileTests(LandingCase):
         for script in (self.uet, self.nas):
             with self.subTest(site=script.key, phrase="none"):
                 self.assertEqual(self.verdict_files(script, plain, HEAD)[0], 0)
+
+    def test_nas_binds_the_receipt_to_the_resolved_head_not_the_callers_shorter_prefix(self):
+        # #975 (Codex P2 at af9d1901): nas checked the receipt for ${E:0:8}, the caller's prefix, while the verdicts are checked for the
+        # resolved ${EF:0:8}; given a seven-character prefix, a receipt naming only those seven characters passed (exit 0 at af9d1901).
+        path = self.write("gate.md", f"# GPT verdict on PR x#44 at {HEAD}: ACK\n\nThis is a landing gate.\n")
+        short = self.write("short-receipt.txt", f"gates done at {HEAD[:7]}g\n")
+        full = self.write("receipt.txt", f"gates done at {HEAD[:8]}\n")
+        for name, receipt, expected in (("a receipt naming only the caller's seven characters", short, 2), ("a receipt naming the resolved head", full, 0)):
+            with self.subTest(case=name):
+                code, out = self.receipt_loop(path, HEAD[:7], HEAD, receipt)
+                self.assertEqual(code, expected, out)
+                if expected:
+                    self.assertIn(f"set GATES_DONE=<receipt naming {HEAD[:8]}>", out)
 
 
 # ---------------------------------------------------------------------------------------------- 3. the trading-cc-read gate
@@ -1179,16 +1250,33 @@ BOT = "chatgpt-codex-connector[bot]"
 CREATED = "2026-10-10T12:00:00Z"
 
 
+COMMENT_IDS = itertools.count(6100000000)  # REST comment ids; GraphQL calls the same number databaseId
+
+
 def comment(login, when, body=""):
-    return {"user": {"login": login}, "created_at": when, "body": body}
+    return {"id": next(COMMENT_IDS), "user": {"login": login}, "created_at": when, "body": body}
 
 
-def summary(*rows):
-    return comment(BOT, "2026-10-10T12:00:30Z", "<!-- codex-pull-request-review-summary -->\n| # | Status |\n| --- | --- |\n" + "\n".join(rows))
+STARTED = "2026-10-10T12:00:10Z"  # when the review a summary row reports went Running, unless a test says otherwise
 
 
-def row(status, when):
-    return f'| 1 | **{status}** <relative-time datetime="{when}">at {when}</relative-time> |'
+def summary_body(*rows):
+    return "<!-- codex-pull-request-review-summary -->\n| # | Status |\n| --- | --- |\n" + "\n".join(rows)
+
+
+def summary(*rows, started=STARTED, history=None):
+    """The connector's summary comment with these rows, and its revisions (GraphQL userContentEdits, newest first, as GitHub returns
+    them). By default each row that is not Running was Running since `started` in an earlier revision (#975: the connector edits
+    one comment in place, measured on nas#974, #975, #979 and #994); `history` gives the earlier revisions' bodies instead."""
+    body = summary_body(*rows)
+    if history is None:
+        history = [summary_body(*(row("Running since", started, review=r) for r in range(1, len(rows) + 1)))] if started else []
+    edits = [{"editedAt": f"2026-10-10T12:00:{index:02d}Z", "diff": text} for index, text in enumerate([*history, body])]
+    return {**comment(BOT, "2026-10-10T12:00:30Z", body), "edits": edits[::-1] if history else []}
+
+
+def row(status, when, review=1):
+    return f'| {review} | **{status}** <relative-time datetime="{when}">at {when}</relative-time> |'
 
 
 def pending_review():
@@ -1217,10 +1305,18 @@ class CodexGateTests(unittest.TestCase):
 
         def fake_run(cmd, capture_output=False, text=False, check=False):
             self.assertEqual(cmd[:2], ["gh", "api"], "codex_gate.py reaches GitHub only through gh api")
-            if fail == "all" or (fail == "head" and "--paginate" not in cmd) or (fail == "lists" and "--paginate" in cmd):
+            if fail == "all" or (fail == "head" and "--paginate" not in cmd) or (fail == "lists" and "--paginate" in cmd) \
+                    or (fail == "graphql" and cmd[2] == "graphql"):
                 if check:
                     raise subprocess.CalledProcessError(1, cmd, "", "HTTP 502")
                 return subprocess.CompletedProcess(cmd, 1, "", "HTTP 502")
+            if cmd[2] == "graphql":  # the comments' revisions, as `gh api graphql --paginate --slurp` gives them: a list of pages
+                self.assertEqual(cmd[3:5], ["--paginate", "--slurp"])
+                self.assertIn("$endCursor: String", cmd[6])
+                self.assertEqual(cmd[7:], ["-f", "owner=o", "-f", "repo=r", "-F", "pr=7"])
+                nodes = [{"databaseId": c["id"], "userContentEdits": {"nodes": c.get("edits", [])}} for c in comments]
+                page = {"data": {"repository": {"pullRequest": {"comments": {"pageInfo": {"hasNextPage": False, "endCursor": None}, "nodes": nodes}}}}}
+                return subprocess.CompletedProcess(cmd, 0, json.dumps([page]), "")
             path = cmd[-1]
             if "--paginate" not in cmd:
                 self.assertTrue(path.endswith("/pulls/7"), path)
@@ -1256,13 +1352,15 @@ class CodexGateTests(unittest.TestCase):
             ("no bot activity for 10 minutes", dict(now="2026-10-10T12:10:00Z"), 5, "no connector activity in 10 min"),
             ("no bot activity for 9 minutes 59 seconds", dict(now="2026-10-10T12:09:59Z"), 3, "no Codex review finished"),
             ("some bot activity (not a notice) keeps waiting past 10 minutes", dict(comments=[comment(BOT, "2026-10-10T12:02:00Z", "Looking into it.")], now="2026-10-10T12:30:00Z"), 3, "no Codex review finished"),
-            ("a +1 reaction after the trigger", dict(reactions=[{"user": {"login": BOT}, "content": "+1", "created_at": "2026-10-10T12:03:00Z"}]), 0, "finished at 2026-10-10T12:03:00Z"),
+            # #975 (Codex P1 at af9d1901): a +1, a connector review or the no-findings comment names no request, so alone it is no
+            # completion (before, each gave 0); a +1 counts once a review has started since the trigger (test_completion_is_bound...).
+            ("a +1 reaction alone is no completion", dict(reactions=[{"user": {"login": BOT}, "content": "+1", "created_at": "2026-10-10T12:03:00Z"}]), 3, "no Codex review finished"),
             ("a +1 reaction by a person does not count", dict(reactions=[{"user": {"login": "someone"}, "content": "+1", "created_at": "2026-10-10T12:03:00Z"}]), 3, "no Codex review"),
             ("a different reaction by the bot is activity, not completion", dict(reactions=[{"user": {"login": BOT}, "content": "eyes", "created_at": "2026-10-10T12:03:00Z"}], now="2026-10-10T12:30:00Z"), 3, "no Codex review"),
-            ("a connector review after the trigger", dict(reviews=[{"user": {"login": BOT}, "submitted_at": "2026-10-10T12:04:00Z"}]), 0, "finished at 2026-10-10T12:04:00Z"),
+            ("a connector review alone is no completion", dict(reviews=[{"user": {"login": BOT}, "submitted_at": "2026-10-10T12:04:00Z"}]), 3, "no Codex review finished"),
             ("a review by a person does not count", dict(reviews=[{"user": {"login": "someone"}, "submitted_at": "2026-10-10T12:04:00Z"}]), 3, "no Codex review"),
-            ("the no-findings comment after the trigger", dict(comments=[comment(BOT, "2026-10-10T12:04:00Z", "Codex Review: Didn't find any major issues. Nice work!")]), 0, "finished at 2026-10-10T12:04:00Z"),
-            ("a Completed row at exactly the trigger time", dict(comments=[summary(row("Completed", CREATED))]), 0, "finished"),
+            ("the no-findings comment alone is no completion", dict(comments=[comment(BOT, "2026-10-10T12:04:00Z", "Codex Review: Didn't find any major issues. Nice work!")]), 3, "no Codex review finished"),
+            ("a Completed row whose review started at exactly the trigger time", dict(comments=[summary(row("Completed", "2026-10-10T12:01:00Z"), started=CREATED)]), 0, "finished"),
             ("an account notice in other capitals", dict(comments=[comment(BOT, "2026-10-10T12:01:00Z", "Create a Codex Account first.")]), 5, "usage-limit or account notice"),
             ("a bot comment without the summary marker is not a summary", dict(comments=[comment(BOT, "2026-10-10T12:01:00Z", row("Completed", "2026-10-10T12:01:00Z"))]), 3, "no Codex review"),
             ("a pending connector review (no submission time) is not a finish", dict(reviews=[pending_review()]), 3, "no Codex review"),
@@ -1313,10 +1411,45 @@ class CodexGateTests(unittest.TestCase):
                 got, line = self.run_gate(**{"now": "2026-10-10T12:12:00Z", **kwargs})
                 self.assertEqual((got, text in line), (code, True), line)
 
+    def test_completion_is_bound_to_a_review_that_started_after_the_latest_trigger(self):
+        # #975 (Codex P1 at af9d1901, 2026-10-11): a review running when the latest trigger came (12:10) and finishing after it is not the
+        # requested review. Its completion time alone passed the gate (exit 0 at af9d1901), in the gap before the new review's Running row
+        # appeared. The start is read from the summary comment's own revisions: the latest earlier one that shows the same row Running.
+        trigger = comment("someone", "2026-10-10T12:10:00Z", "@codex security review")
+        plus_one = {"user": {"login": BOT}, "content": "+1", "created_at": "2026-10-10T12:12:05Z"}
+        later = "2026-10-10T12:13:00Z"
+        first_review = [summary_body(row("Running since", "2026-10-10T12:05:00Z"))]
+        cases = [
+            ("a review that started before the trigger and finished after it (the overlap)",
+             dict(comments=[summary(row("Completed", "2026-10-10T12:12:00Z"), started="2026-10-10T12:05:00Z"), trigger]), 3, "did not start after it"),
+            ("the same, with the connector's +1 after it", dict(comments=[summary(row("Completed", "2026-10-10T12:12:00Z"), started="2026-10-10T12:05:00Z"), trigger],
+                                                             reactions=[plus_one]), 3, "did not start after it"),
+            ("a review that started after the trigger and finished", dict(comments=[summary(row("Completed", "2026-10-10T12:12:00Z"), started="2026-10-10T12:10:20Z"), trigger]), 0, "finished at 2026-10-10T12:12:00Z"),
+            ("two reviews of one row: the second started after the trigger",
+             dict(comments=[summary(row("Completed", "2026-10-10T12:12:00Z"), history=[*first_review, summary_body(row("Completed", "2026-10-10T12:08:00Z")),
+                                                                                      summary_body(row("Running since", "2026-10-10T12:10:20Z"))]), trigger]), 0, "finished at 2026-10-10T12:12:00Z"),
+            ("two reviews of one row: the row went Running only before the trigger",
+             dict(comments=[summary(row("Completed", "2026-10-10T12:12:00Z"), history=first_review), trigger]), 3, "did not start after it"),
+            ("another row went Running after the trigger, this one only before it",
+             dict(comments=[summary(row("Completed", "2026-10-10T12:12:00Z"), history=[*first_review, summary_body(row("Running since", "2026-10-10T12:10:20Z", review=2))]), trigger]),
+             3, "did not start after it"),
+            ("a Completed row with no recorded revision is not attributed", dict(comments=[summary(row("Completed", "2026-10-10T12:12:00Z"), started=None), trigger]), 3, "did not start after it"),
+            ("the +1 after a review that started since the trigger is the all-reviews-finished signal",
+             dict(comments=[summary(row("Cancelled", "2026-10-10T12:12:00Z"), started="2026-10-10T12:10:20Z"), trigger], reactions=[plus_one]), 0, "finished at 2026-10-10T12:12:05Z"),
+            ("a review that started after the trigger and ended Cancelled", dict(comments=[summary(row("Cancelled", "2026-10-10T12:12:00Z"), started="2026-10-10T12:10:20Z"), trigger]), 4, "ended 'Cancelled'"),
+            ("the new review's Running row", dict(comments=[summary(row("Running since", "2026-10-10T12:10:20Z")), trigger]), 3, "running since 2026-10-10T12:10:20Z"),
+        ]
+        for name, kwargs, code, text in cases:
+            with self.subTest(case=name):
+                got, line = self.run_gate(**{"now": later, **kwargs})
+                self.assertEqual((got, text in line), (code, True), line)
+
     def test_a_failing_gh_call_is_an_error_not_a_verdict(self):
         for fail in ("all", "head", "lists"):
             with self.subTest(failing=fail), self.assertRaises(subprocess.CalledProcessError):
                 self.run_gate(fail=fail)
+        with self.subTest(failing="the summary's revisions"), self.assertRaises(subprocess.CalledProcessError):
+            self.run_gate(comments=[summary(row("Completed", "2026-10-10T12:01:00Z"))], fail="graphql")
 
     def test_a_failing_gate_prints_one_fixed_line_naming_the_error_class_and_exits_4(self):
         # #975 P2: the landing scripts run `python3 -I codex_gate.py <repo> <pr> 2>&1` and echo the output, and an uncaught exception
@@ -1392,6 +1525,13 @@ class EndToEndTests(LandingCase):
         git(cls.repo, "add", "--", "moved.txt")
         git(cls.repo, "commit", "-q", "-m", "main moves")
         git(cls.repo, "push", "-q", "origin", "main")
+        cls.main = git(cls.repo, "rev-parse", "HEAD")
+        git(cls.repo, "checkout", "-q", "-b", "main-moves-again", "main")  # #975: a main that moves during the validation (origin has the commit)
+        (cls.repo / "moved-again.txt").write_text("main moved again\n")
+        git(cls.repo, "add", "--", "moved-again.txt")
+        git(cls.repo, "commit", "-q", "-m", "main moves again")
+        cls.main_again = git(cls.repo, "rev-parse", "HEAD")
+        git(cls.repo, "push", "-q", "origin", "main-moves-again")
         git(cls.repo, "checkout", "-q", "-b", "rebased", "main")
         git(cls.repo, "cherry-pick", cls.head)
         cls.rebased = git(cls.repo, "rev-parse", "HEAD")
@@ -1418,12 +1558,12 @@ class EndToEndTests(LandingCase):
         verdict_file = run / "verdict.md"
         verdict_file.write_text(verdict if verdict is not None else f"# Read\n\nVerdict: PASS at {self.head[:8]}\n", encoding="utf-8")
         extra.setdefault("TMPDIR", str(run))  # a failed merge leaves its merge-fail-XXXXXX file here, not in /tmp
-        environment = self.env(HOME=str(self.home), FAKE_LOG=str(run / "log"), FAKE_PRVIEW=str(run / "prview.json"),
-                               FAKE_STATUSES=str(run / "statuses.json"), FAKE_CHECKRUNS=str(run / "checkruns.json"),
-                               LANDING_UET_REPO=str(self.repo), LANDING_NAS_REPO=str(self.repo),
-                               LANDING_COORD=str(self.dir / "coord"), GIT_AUTHOR_NAME="landing-test",
-                               GIT_AUTHOR_EMAIL="landing@example.invalid", GIT_COMMITTER_NAME="landing-test",
-                               GIT_COMMITTER_EMAIL="landing@example.invalid", **extra)
+        environment = self.env(**{"HOME": str(self.home), "FAKE_LOG": str(run / "log"), "FAKE_PRVIEW": str(run / "prview.json"),
+                                  "FAKE_STATUSES": str(run / "statuses.json"), "FAKE_CHECKRUNS": str(run / "checkruns.json"),
+                                  "LANDING_UET_REPO": str(self.repo), "LANDING_NAS_REPO": str(self.repo),
+                                  "LANDING_COORD": str(self.dir / "coord"), "GIT_AUTHOR_NAME": "landing-test",
+                                  "GIT_AUTHOR_EMAIL": "landing@example.invalid", "GIT_COMMITTER_NAME": "landing-test",
+                                  "GIT_COMMITTER_EMAIL": "landing@example.invalid", **extra})
         if args is None:
             args = [PR, self.head[:12]] + ([str(verdict_file)] if script.key == "nas" else [])
         done = subprocess.run([str(via or script.path), *args], capture_output=True, text=True, env=environment, cwd=self.dir, timeout=240)
@@ -1468,8 +1608,11 @@ class EndToEndTests(LandingCase):
             wrapper.write_text(f'#!/bin/sh\nexec {q(script.path)} "$@"\n', encoding="utf-8")
             wrapper.chmod(0o755)
             expected = f"{os.path.realpath(LANDING)}/codex_gate.py"
+            elsewhere = link_dir / "elsewhere/gate.py"  # #975 P3-4: the scripts stop on a gate file that does not exist
+            elsewhere.parent.mkdir()
+            elsewhere.write_text("# a gate the fake python3 answers for\n", encoding="utf-8")
             for name, via, extra, gate in (("symlink", link, {}, expected), ("wrapper", wrapper, {}, expected),
-                                           ("LANDING_GATE", link, {"LANDING_GATE": "/elsewhere/gate.py"}, "/elsewhere/gate.py")):
+                                           ("LANDING_GATE", link, {"LANDING_GATE": str(elsewhere)}, str(elsewhere))):
                 with self.subTest(script=script.key, via=name):
                     code, out, log = self.land(script, via=via, **extra)
                     self.assertEqual(code, 0, out)
@@ -1822,6 +1965,152 @@ class EndToEndTests(LandingCase):
         self.assertEqual(code, 4, out)  # a code the script's header does not list
         self.assertIn("update-branch refused", out)
         self.assertEqual((self.gate_calls(log), self.merge_calls(log)), ([], []))
+
+    # ------------------------------------------------------------------------------------------ #975 round 3 (findings at af9d1901)
+    def test_a_gate_that_turns_unavailable_just_before_the_merge_needs_the_gpt_verdict_in_uet(self):
+        # Codex P1 and GPT P2-A: the wait gives 0, an "@codex review" during CI meets the usage limit, and the gate gives 5 just before
+        # the merge. uet merged without GPT_VERDICT (exit 0, one merge at af9d1901); nas proceeds on a 5 by its documented policy.
+        late = {"FAKE_GATE_SEQ": "0 5", "FAKE_GATE_LINE": "Codex unavailable: usage-limit or account notice"}
+        accepted = self.dir / f"gpt-{next(self.counter)}.md"
+        accepted.write_text(f"# GPT verdict on PR x#1 at {self.head}: ACK\n", encoding="utf-8")
+        wrong = self.dir / f"gpt-{next(self.counter)}.md"
+        wrong.write_text(f"# GPT verdict on PR x#1 at {self.other}: ACK\n", encoding="utf-8")
+        for name, verdict, expected, merges in (("no GPT_VERDICT", None, 9, 0), ("a GPT_VERDICT naming another head", wrong, 9, 0),
+                                                ("an accepted GPT_VERDICT", accepted, 0, 1)):
+            with self.subTest(script="uet", case=name):
+                code, out, log = self.land(self.uet, **late, **({} if verdict is None else {"GPT_VERDICT": str(verdict)}))
+                self.assertEqual((code, len(self.merge_calls(log)), len(self.gate_calls(log))), (expected, merges, 2), out)
+                self.assertIn("just before the merge", out)
+                self.assertIn("Codex unavailable: set GPT_VERDICT" if expected else "substitute GPT verdict", out)
+        with self.subTest(script="nas", case="no GPT_VERDICT"):
+            code, out, log = self.land(self.nas, **late)
+            self.assertEqual((code, len(self.merge_calls(log))), (0, 1), out)
+
+    def test_a_trading_cc_read_verdict_that_changes_during_the_wait_stops_the_merge_with_2(self):
+        # Codex P1: tcc_read_gate ran only at the start. A status that turns from success to failure, or a record that gains a later
+        # CHANGES_REQUESTED, while the landing waits (here: at the first Codex gate call) merged at af9d1901 (exit 0).
+        record_dir = self.dir / "coord/trading-cc/reads"
+        record_dir.mkdir(parents=True, exist_ok=True)
+        for script in (self.uet, self.nas):
+            for change in ("the status turns to failure", "the record gains a later CHANGES_REQUESTED"):
+                with self.subTest(script=script.key, change=change):
+                    name = f"changing-{next(self.counter)}.md"
+                    record = record_dir / name
+                    record.write_text(f"# r\n\nVerdict: PASS at {self.head[:8]}\n", encoding="utf-8")
+                    status = {"context": "trading-cc-read", "description": f"PASS: trading-cc/reads/{name}", "updated_at": "2026-10-10T00:00:00Z"}
+                    if change.startswith("the status"):
+                        later = json.dumps([{**status, "state": "failure", "updated_at": "2026-10-10T01:00:00Z"}, {**status, "state": "success"}])
+                        hook = f'printf "%s" {q(later)} > "$FAKE_STATUSES"'
+                        phrase = f"trading-cc-read is failure at {self.head[:8]}"
+                    else:
+                        hook = f"printf '\\nVerdict: CHANGES_REQUESTED at {self.head[:8]}\\n' >> {q(record)}"
+                        phrase = "does not name it with a last PASS/ACK Verdict line"
+                    code, out, log = self.land(script, statuses=[{**status, "state": "success"}], FAKE_GATE_HOOK=hook)
+                    self.assertEqual((code, self.merge_calls(log), len(self.gate_calls(log))), (2, [], 2), out)
+                    self.assertIn("record verified", out, "the first read passed")
+                    self.assertIn(phrase, out)
+
+    def test_nas_validates_again_when_main_moves_after_the_validation_and_stops_with_13_when_it_keeps_moving(self):
+        # Codex P2: --match-head-commit pins only the head, so a main that moved after merge_validate took a merge validated on the old
+        # main (one validation, then the merge, at af9d1901). The hook moves origin's main while validate.py runs.
+        origin = self.dir / "origin.git"
+        once = f'[ -e "$FAKE_LOG.moved" ] || {{ touch "$FAKE_LOG.moved"; git --git-dir={q(origin)} update-ref refs/heads/main {self.main_again}; }}'
+        every = (f'if [ "$(git --git-dir={q(origin)} rev-parse refs/heads/main)" = {self.main} ]; then git --git-dir={q(origin)} update-ref refs/heads/main {self.main_again}; '
+                 f'else git --git-dir={q(origin)} update-ref refs/heads/main {self.main}; fi')
+        try:
+            with self.subTest(case="main moves once"):
+                code, out, log = self.land(self.nas, FAKE_VALIDATE_HOOK=once)
+                self.assertEqual((code, len(self.merge_calls(log))), (0, 1), out)
+                trees = [sorted(line.split()[1:]) for line in log if line.startswith("validate-tree ")]
+                self.assertEqual(len(trees), 2, out)
+                self.assertNotIn("moved-again.txt", trees[0])
+                self.assertIn("moved-again.txt", trees[1], "the second validation ran on the main that moved")
+                self.assertIn(f"origin/main moved after the validation on {self.main[:8]}: validating again", out)
+            git(origin, "update-ref", "refs/heads/main", self.main)
+            with self.subTest(case="main moves after every validation"):
+                code, out, log = self.land(self.nas, FAKE_VALIDATE_HOOK=every)
+                self.assertEqual((code, self.merge_calls(log)), (13, []), out)
+                self.assertEqual(sum(1 for line in log if line.startswith("validate-tree ")), 3)
+                self.assertIn("origin/main moved after each of 3 validations: stop, nothing merged", out)
+        finally:
+            git(origin, "update-ref", "refs/heads/main", self.main)
+            git(self.repo, "update-ref", "refs/remotes/origin/main", self.main)
+
+    def test_nas_keeps_validate_output_outside_the_worktree_in_a_0600_file_and_never_prints_it(self):
+        # Codex P2 and GPT P2-C: validate.py's output went to $wt.validate.err and its last 300 bytes into the exit-10 line (free text: the
+        # stub's address and home path were printed at af9d1901). It is kept in a mktemp file under TMPDIR that outlives the worktree.
+        tmp = self.dir / f"tmp-{next(self.counter)}"
+        tmp.mkdir()
+        text = f"Publication validation failed: {ADDRESS} /home/example/secret"
+        code, out, log = self.land(self.nas, FAKE_VALIDATE_RC="1", FAKE_VALIDATE_OUT=text, TMPDIR=str(tmp))
+        self.assertEqual((code, self.merge_calls(log)), (10, []), out)
+        kept = sorted(tmp.glob("nas-validate-*"))
+        self.assertEqual(len(kept), 1, out)
+        self.assertEqual(stat.S_IMODE(kept[0].stat().st_mode), 0o600)
+        self.assertEqual(kept[0].read_text(encoding="utf-8"), f"{text}\n")
+        self.assertIn(f"validate.py on the merge with current main exited 1; its output is kept only in local file {kept[0].name} in the temp directory (0600)", out)
+        self.assertNotIn("example.invalid", out)
+        self.assertNotIn("/home/example", out)
+        self.assertEqual(sorted(Path("/var/tmp").glob(f"nas-land-{PR}-*")), [], "the worktree is removed; the kept file is not in it")
+
+    def test_a_failed_or_malformed_ci_reply_is_never_parsed_into_the_output(self):
+        # GPT P2-B: nas word-split a failed check-run call's stdout into its counts. At af9d1901 a body "0 0 <address> 1" printed the address
+        # in bash's "integer expected" on every poll, and a body "0" ended the script with an unbound $4 and its path (exit 1). uet printed a
+        # CI line's head field, so a reply "<address> 0 0 1 1 CLEAN" printed the address as the head that moved.
+        cases = [(self.nas, "api repos/*/check-runs*", f"0 0 {ADDRESS} 1", 6, "CI timeout"),
+                 (self.nas, "api repos/*/check-runs*", "0", 6, "CI timeout"),
+                 (self.nas, "api repos/*/check-runs*", "", 6, "CI timeout"),
+                 (self.uet, "pr view * --json headRefOid,statusCheckRollup,mergeStateStatus *", f"{ADDRESS}\t0\t0\t1\t1\tCLEAN", 3, "head moved to ? during CI")]
+        for script, call, stdout, expected, phrase in cases:
+            with self.subTest(script=script.key, reply=stdout.replace(ADDRESS, "<address>")):
+                code, out, log = self.land(script, FAKE_FAIL=call, FAKE_FAIL_STDOUT=stdout, FAKE_FAIL_STDERR="gh: HTTP 500")
+                self.assertEqual((code, self.merge_calls(log)), (expected, []), out)
+                self.assertIn(phrase, out)
+                for text in ("example.invalid", "integer expected", "unbound variable", str(script.path)):
+                    self.assertNotIn(text, out)
+
+    def test_local_failures_print_no_path_and_no_diagnostic(self):
+        # GPT P2-C and Claude P3-4: a missing gate, a gate that fails before its handler runs or prints something else, a clone that does
+        # not exist and a missing verdict file printed their paths at af9d1901 (python3's or git's diagnostic, or the file's full path).
+        home = self.dir / f"home-{next(self.counter)}/home/example"
+        (home / "tools").mkdir(parents=True)
+        broken = home / "tools/codex_gate.py"
+        broken.write_text("def (:\n", encoding="utf-8")  # a syntax error: python3 prints a traceback naming the file and exits 1
+        chatty = home / "chatty/codex_gate.py"
+        chatty.parent.mkdir()
+        chatty.write_text(f"print('see {home}/log')\n", encoding="utf-8")  # exit 0, but not one of the gate's status lines
+        missing_verdict = home / "verdicts/missing.md"
+        for script in (self.uet, self.nas):
+            cases = [("a missing gate", {"LANDING_GATE": str(home / "absent/codex_gate.py")}, 9, "codex_gate.py not found (path withheld)", 0),
+                     ("a gate with a syntax error", {"LANDING_GATE": str(broken), "FAKE_REAL_PYTHON": sys.executable}, 9, "Codex gate failed with exit 1; details withheld", 1),
+                     ("a gate that prints another line", {"LANDING_GATE": str(chatty), "FAKE_REAL_PYTHON": sys.executable}, 9, "Codex gate printed no status line of its own", 1),
+                     ("a clone that does not exist", {"LANDING_UET_REPO": str(home / "absent-clone"), "LANDING_NAS_REPO": str(home / "absent-clone")}, 3, "not resolvable", 0)]
+            if script.key == "uet":
+                cases.append(("a missing verdict file", {"VERDICT_FILES": str(missing_verdict)}, 2, "verdict file missing: missing.md", 0))
+            for name, extra, expected, phrase, gate_calls in cases:
+                with self.subTest(script=script.key, case=name):
+                    code, out, log = self.land(script, **extra)
+                    self.assertEqual((code, self.merge_calls(log), len(self.gate_calls(log))), (expected, [], gate_calls), out)
+                    self.assertIn(phrase, out)
+                    self.assertNotIn("/home/example", out)
+                    self.assertNotIn("Traceback", out)
+        with self.subTest(script="nas", case="a missing verdict file"):
+            code, out, log = self.land(self.nas, args=[PR, self.head[:12], str(missing_verdict)])
+            self.assertEqual((code, self.merge_calls(log)), (2, []), out)
+            self.assertIn("verdict file missing: missing.md", out)
+            self.assertNotIn("/home/example", out)
+
+    def test_a_failed_merge_with_an_unusable_temp_directory_prints_a_fixed_line_and_no_path(self):
+        # Claude P3-3: mktemp failed on a TMPDIR that does not exist, printed the template's path (under a home directory here), and the
+        # message named an empty file (at af9d1901). Exit 7 is kept, with a fixed message.
+        for script in (self.uet, self.nas):
+            with self.subTest(script=script.key):
+                tmp = self.dir / f"home-{next(self.counter)}/home/example/no-such-dir"
+                code, out, log = self.land(script, FAKE_MERGE_RC="1", FAKE_MERGE_STDOUT=f"X failed; ask {ADDRESS}", TMPDIR=str(tmp))
+                self.assertEqual((code, len(self.merge_calls(log))), (7, 1), out)
+                self.assertIn(f"#{PR} merge failed (class: other); gh output could not be kept, and is not echoed", out)
+                for text in ("/home/example", "merge-fail-", "example.invalid", "mktemp"):
+                    self.assertNotIn(text, out)
 
 
 if __name__ == "__main__":

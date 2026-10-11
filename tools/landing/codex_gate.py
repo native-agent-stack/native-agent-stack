@@ -2,8 +2,8 @@
 """Codex review gate for the CC landing scripts (corrections #122 and #123, 2026-10-09).
 
 Prints one status line. Exit codes:
-  0  the connector finished a review at or after the PR's latest review trigger, and no review is running;
-  3  a review is running, or none has finished since the latest trigger (poll again);
+  0  the connector finished a review that STARTED at or after the PR's latest review trigger, and no review is running;
+  3  a review is running, or none that started since the latest trigger has finished (poll again);
   4  the latest review ended in a state other than Completed (a person decides), or the gate itself failed: any exception
      prints one fixed line naming only its class, never a traceback (which prints file paths) or gh's output (#975 P2);
   5  Codex is unavailable: since the latest trigger it posted a usage-limit or account notice, or showed no
@@ -20,6 +20,16 @@ Sources (the connector's own summary comment, read on uet#47 and nas#939 on 2026
   - the connector reacts +1 once all reviews finish with no findings, and comments when it has suggestions.
 Why: uet#40 (correction #122) and uet#47 (correction #123) merged while a Codex review was running.
 
+#975 (Codex P1 at af9d1901, 2026-10-11): a completion is counted only for a review that started at or after the latest trigger.
+A review that was running when the trigger came and finished after it is not the requested review, and before, its completion
+time alone passed the gate in the gap before the new review's Running row appeared. The connector edits ONE summary comment in
+place (measured 2026-10-11 on nas#974, #975, #979 and #994: a row "Running since <start>" | commit | trigger kind becomes
+"Completed <end>", and the next review rewrites the row), so a Completed row carries no start. The start comes from the comment's
+own revisions (GraphQL IssueComment.userContentEdits, whose `diff` held the whole body of each revision on those PRs): the latest
+earlier revision that shows the same row (its other cells: review kind, commit, trigger kind) Running. The +1 reaction counts only
+at or after such a start; a connector review or its no-findings comment names no request and counts for nothing. Without such a
+revision nothing is attributed (fail closed: exit 3, or 5 when the connector shows no activity).
+
 usage: codex_gate.py <owner/repo> <pr>
 """
 import json
@@ -30,9 +40,14 @@ from datetime import datetime, timezone
 
 BOT = "chatgpt-codex-connector[bot]"
 NOSTART_MINUTES = 10
+SUMMARY = "codex-pull-request-review-summary"
 UNAVAILABLE = re.compile(r"reached your Codex usage limits|create a Codex account", re.I)
 ROW = re.compile(r"\*\*(?P<status>[A-Za-z][A-Za-z ]*)\*\*[^|]*?datetime=\"(?P<time>[^\"]+)\"")
 TRIGGER = re.compile(r"^\s*@codex (security )?review\b")
+# The revisions of the PR's comments, every page of comments (gh api --paginate: a GraphQL query takes $endCursor and fetches pageInfo),
+# each comment's 100 newest revisions (GitHub returns them newest first; a review takes two), keyed by databaseId, the REST comment's id.
+EDITS = ("query($owner: String!, $repo: String!, $pr: Int!, $endCursor: String) { repository(owner: $owner, name: $repo) { pullRequest(number: $pr) { "
+         "comments(first: 100, after: $endCursor) { pageInfo { hasNextPage endCursor } nodes { databaseId userContentEdits(first: 100) { nodes { editedAt diff } } } } } } }")
 
 
 def gh(path):
@@ -44,6 +59,37 @@ def gh(path):
 
 def when(text):
     return datetime.fromisoformat(text.replace("Z", "+00:00"))
+
+
+def rows(body):
+    """(row, status, time) for each summary-table row; row is the row's other cells (review kind, commit, trigger kind)."""
+    found = []
+    for line in (body or "").splitlines():
+        cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+        for i, cell in enumerate(cells):
+            m = ROW.search(cell)
+            if m:
+                found.append((tuple(cells[:i] + cells[i + 1:]), m["status"].strip(), when(m["time"])))
+                break
+    return found
+
+
+def revisions(repo, pr):
+    """{REST comment id: its recorded bodies, oldest first} for the PR's comments."""
+    owner, name = repo.split("/", 1)
+    out = subprocess.run(["gh", "api", "graphql", "--paginate", "--slurp", "-f", f"query={EDITS}",
+                          "-f", f"owner={owner}", "-f", f"repo={name}", "-F", f"pr={pr}"],
+                         capture_output=True, text=True, check=True).stdout
+    found = {}
+    for page in json.loads(out):
+        for c in page["data"]["repository"]["pullRequest"]["comments"]["nodes"]:
+            edits = sorted(((when(n["editedAt"]), n.get("diff") or "") for n in c["userContentEdits"]["nodes"]), key=lambda edit: edit[0])
+            found[c["databaseId"]] = [body for _, body in edits]
+    return found
+
+
+def running(status):
+    return status.lower().startswith("running")
 
 
 def main(repo, pr):
@@ -58,30 +104,31 @@ def main(repo, pr):
                  if c["user"]["login"] != BOT and TRIGGER.match(c.get("body") or "")]
     trigger = max(triggers)
 
-    rows = []
-    for c in comments:
-        if c["user"]["login"] == BOT and "codex-pull-request-review-summary" in (c.get("body") or ""):
-            rows += [(m["status"].strip(), when(m["time"])) for m in ROW.finditer(c["body"])]
-    running = [t for s, t in rows if s.lower().startswith("running")]
-    if running:
-        print(f"Codex review running since {max(running):%Y-%m-%dT%H:%M:%SZ}")
+    summaries = [c for c in comments if c["user"]["login"] == BOT and SUMMARY in (c.get("body") or "")]
+    current = [r for c in summaries for r in rows(c["body"])]
+    now_running = [t for _, s, t in current if running(s)]
+    if now_running:
+        print(f"Codex review running since {max(now_running):%Y-%m-%dT%H:%M:%SZ}")
         return 3
-    done = [t for s, t in rows if s.lower().startswith("completed") and t >= trigger]
-    # Without a summary row: a connector review, a +1 reaction or its no-findings comment after the trigger.
-    done += [when(r["submitted_at"]) for r in gh(f"repos/{repo}/pulls/{pr}/reviews?per_page=100")
-             if r["user"]["login"] == BOT and r.get("submitted_at") and when(r["submitted_at"]) >= trigger]
-    done += [when(r["created_at"]) for r in gh(f"repos/{repo}/issues/{pr}/reactions?per_page=100")
-             if r["user"]["login"] == BOT and r["content"] == "+1" and when(r["created_at"]) >= trigger]
-    done += [when(c["created_at"]) for c in comments
-             if c["user"]["login"] == BOT and "find any major issues" in (c.get("body") or "")
-             and when(c["created_at"]) >= trigger]
+    reviews, begun = [], []  # (status, time, start) of each current row; every start at or after the trigger
+    recorded = revisions(repo, pr) if summaries else {}
+    for c in summaries:
+        bodies = recorded.get(c["id"], []) + [c["body"]]
+        starts = [(row, t) for body in bodies for row, s, t in rows(body) if running(s)]
+        begun += [t for _, t in starts if t >= trigger]
+        for row, s, t in rows(c["body"]):
+            reviews.append((s, t, next((start for r, start in reversed(starts) if r == row), None)))
+    ours = [(s, t) for s, t, start in reviews if start is not None and start >= trigger]
+    done = [t for s, t in ours if s.lower().startswith("completed")]
+    if begun:  # the all-reviews-finished +1, once a review for this trigger has started
+        done += [when(r["created_at"]) for r in gh(f"repos/{repo}/issues/{pr}/reactions?per_page=100")
+                 if r["user"]["login"] == BOT and r["content"] == "+1" and when(r["created_at"]) >= min(begun)]
     if done:
         print(f"Codex review finished at {max(done):%Y-%m-%dT%H:%M:%SZ} after the latest trigger "
               f"{trigger:%Y-%m-%dT%H:%M:%SZ}")
         return 0
-    other = [(s, t) for s, t in rows if t >= trigger]
-    if other:
-        s, t = max(other, key=lambda x: x[1])
+    if ours:
+        s, t = max(ours, key=lambda x: x[1])
         print(f"Codex review ended '{s}' at {t:%Y-%m-%dT%H:%M:%SZ}; not Completed")
         return 4
     notices = [when(c["created_at"]) for c in comments
@@ -99,6 +146,11 @@ def main(repo, pr):
         print(f"Codex unavailable: no connector activity in {idle:.0f} min since the trigger "
               f"{trigger:%Y-%m-%dT%H:%M:%SZ}; proceeding on the other reviews")
         return 5
+    earlier = [t for s, t, start in reviews if t >= trigger and (start is None or start < trigger)]
+    if earlier:
+        print(f"no Codex review finished since the latest trigger {trigger:%Y-%m-%dT%H:%M:%SZ} (the review that ended at "
+              f"{max(earlier):%Y-%m-%dT%H:%M:%SZ} did not start after it)")
+        return 3
     print(f"no Codex review finished since the latest trigger {trigger:%Y-%m-%dT%H:%M:%SZ}")
     return 3
 

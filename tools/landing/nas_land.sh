@@ -7,9 +7,13 @@
 # 9 Codex review running, not finished since its latest trigger, or ended other than Completed (codex_gate.py),
 # 10 the merge onto CURRENT origin/main fails scripts/validate.py or does not merge cleanly (2026-10-10).
 # 11 the no-reply author address could not be formed (nothing merged), 12 merged, but the merge commit's author is not that address (correction #148).
+# 13 origin/main moved after each of three validations (nothing merged; #975, 2026-10-11).
 # Correction #136 (2026-10-10): verdict/record acceptance and change identity use the lg_* functions below (land-patches-20261010).
 # #975 P2-2 (2026-10-11): no text from gh or its API is printed. Every gh call drops its stderr, a failure ends in its step's fixed message and exit code, and gh api
 # writes an error response's body to stdout (cli v2.102.0 pkg/cmd/api/api.go:546), so a value read from it is shown only as a state word or a count.
+# #975 round 3 (2026-10-11, Codex P1/P2 and GPT P2 at af9d1901): the merge onto main is validated again when main moved after it, the
+# trading-cc-read gate runs again just before the merge, values from gh are used only in their typed shape, git's stderr and validate.py's
+# output are not printed, and the gate's output is echoed only when it is one of its own status lines (lg_gate).
 set -u
 # Parsed whole before it runs: an edit while a landing runs cannot shift what the running copy executes (2026-10-09).
 {
@@ -21,7 +25,7 @@ N=${1:?pr}; E=${2:?read head}; shift 2
 # a BEHIND branch is updated server-side (gh pr update-branch, merge method) instead of waiting for a lane push.
 G="git -C ${LANDING_NAS_REPO:-$HOME/code/native-agent-stack}"; COORD=${LANDING_COORD:-${XDG_STATE_HOME:-$HOME/.local/state}/native-agent-stack/coordination}
 $G fetch -q origin main "pull/$N/head" 2>/dev/null
-EF=$($G rev-parse --verify -q "$E^{commit}" 2>/dev/null) || { $G fetch -q origin "$E" 2>/dev/null; EF=$($G rev-parse --verify -q "$E^{commit}"); }
+EF=$($G rev-parse --verify -q "$E^{commit}" 2>/dev/null) || { $G fetch -q origin "$E" 2>/dev/null; EF=$($G rev-parse --verify -q "$E^{commit}" 2>/dev/null); }
 [ -n "$EF" ] || { echo "#$N read head $E not resolvable: stop"; exit 3; }
 LG_GIT=$G; LG_EXCLUDE=':!manifests/evidence.json'
 # >>> land-gate-fns
@@ -83,10 +87,10 @@ lg_record_ok() {  # <record file> <8-hex head prefix>
 # has no identity (rc 1) and is refused; a change that is empty only because everything in it is excluded is identified by its file names.
 lg_change_id() {  # <commit>
   local c=$1 b id names
-  b=$(${LG_GIT:-git} merge-base "$c" origin/main) || return 1
-  id=$(${LG_GIT:-git} -c core.quotePath=false -c diff.noprefix=false -c diff.mnemonicPrefix=false diff --no-color --no-ext-diff --no-textconv --no-renames -U0 --binary "$b" "$c" -- . ${LG_EXCLUDE:+"$LG_EXCLUDE"} | git patch-id --verbatim | cut -d' ' -f1)
+  b=$(${LG_GIT:-git} merge-base "$c" origin/main 2>/dev/null) || return 1
+  id=$(${LG_GIT:-git} -c core.quotePath=false -c diff.noprefix=false -c diff.mnemonicPrefix=false diff --no-color --no-ext-diff --no-textconv --no-renames -U0 --binary "$b" "$c" -- . ${LG_EXCLUDE:+"$LG_EXCLUDE"} 2>/dev/null | git patch-id --verbatim | cut -d' ' -f1)
   if [ -n "$id" ]; then echo "$id"; return 0; fi
-  names=$(${LG_GIT:-git} -c core.quotePath=false diff --no-renames --name-only "$b" "$c")
+  names=$(${LG_GIT:-git} -c core.quotePath=false diff --no-renames --name-only "$b" "$c" 2>/dev/null)
   [ -n "$names" ] || return 1
   echo "names:$(printf '%s\n' "$names" | sha256sum | cut -c1-40)"
 }
@@ -122,21 +126,50 @@ lg_author_check() {  # <owner/repo> <pr> <no-reply address> : after the merge, t
   [ "$ok" = true ] && { echo "#$2 author address on ${mc:0:8}: the no-reply form"; return 0; }
   echo "#$2 author address on ${mc:0:8} is NOT the no-reply form (correction #148)"; return 1
 }
+# #975 (GPT P2-B and P2-C at af9d1901, 2026-10-11): what gh, git and the gate return is used only in its typed shape, and nothing else they
+# print reaches the output. A head is 40 lower-case hex digits, anything else is no head; lg_have fetches a commit the clone lacks, silently.
+lg_hex40() { [[ "$1" =~ ^[0-9a-f]{40}$ ]]; }
+lg_have() {  # <commit>
+  lg_hex40 "$1" || return 1
+  ${LG_GIT:-git} cat-file -e "$1^{commit}" 2>/dev/null || ${LG_GIT:-git} fetch -q origin "$1" 2>/dev/null
+}
+# codex_gate.py's output is echoed only when it is one of the gate's own status lines: one line that starts "Codex review ", "Codex
+# unavailable: ", "no Codex review " or "Codex gate error: ", in the characters those lines use, with exit code 0, 3, 4 or 5. Anything
+# else is one fixed line and 4: for a gate file that is missing or unreadable python3 prints "can't open file '<path>'" and exits 2
+# (CPython v3.13.16 Modules/main.c:403-410), and an exception outside the gate's handler, such as a syntax error, prints a traceback
+# and exits 1 (:437-441, :118-123; Doc/library/sys.rst:394-399).
+lg_gate() {  # <gate> <owner/repo> <pr> : prints one line; returns 0, 3, 4 or 5
+  local g gr q="'" re
+  re="^(Codex review |Codex unavailable: |no Codex review |Codex gate error: )[A-Za-z0-9 :;,.()_+${q}-]*\$"
+  g=$(python3 -I "$1" "$2" "$3" 2>&1); gr=$?
+  case "$gr" in 0|3|4|5) ;; *) echo "Codex gate failed with exit $gr; details withheld"; return 4 ;; esac
+  [[ "$g" =~ $re ]] || { echo "Codex gate printed no status line of its own; details withheld"; return 4; }
+  echo "$g"; return "$gr"
+}
+# Text that must not be printed (gh's merge diagnostic) is kept in a new file that mktemp makes under TMPDIR (mode 0600, sources in the
+# README), and only the file's name is printed; rc 1 and nothing printed when the file cannot be made or written (#975 P3-3: before, a
+# failed mktemp printed the template's path and the message named an empty file).
+lg_keep() {  # <file name prefix> <text>
+  local f
+  f=$(mktemp "${TMPDIR:-/tmp}/$1-XXXXXX" 2>/dev/null) || return 1
+  { printf '%s\n' "$2" > "$f"; } 2>/dev/null || { rm -f -- "$f" 2>/dev/null; return 1; }
+  echo "${f##*/}"
+}
 # <<< land-gate-fns
 # Correction #136: the identity of a change is git patch-id (verbatim, -U0, --binary) of its whole diff against its own merge base, manifests/evidence.json
 # excluded (LG_EXCLUDE); an empty change is refused, and a change that is empty only because everything in it is excluded is identified by its file names.
 change() { lg_change_id "$1"; }
 same_change() { lg_same_change "$1" "$2"; }
-cur=$(gh pr view "$N" -R $R --json headRefOid --jq .headRefOid 2>/dev/null)
-$G cat-file -e "$cur" 2>/dev/null || $G fetch -q origin "$cur"
+cur=$(gh pr view "$N" -R $R --json headRefOid --jq .headRefOid 2>/dev/null); lg_hex40 "$cur" || cur=
+lg_have "$cur"
 if [ "$cur" != "$EF" ]; then
   same_change "$EF" "$cur" || { echo "#$N head ${cur:0:8} is neither the read head ${EF:0:8} nor the same change: stop"; exit 3; }
   echo "#$N head ${cur:0:8} carries the read head ${EF:0:8} (same change)"
 fi
 if [ "$(gh pr view "$N" -R $R --json mergeStateStatus --jq .mergeStateStatus 2>/dev/null)" = BEHIND ]; then
   gh pr update-branch "$N" -R $R >/dev/null 2>&1 || { echo "#$N update-branch refused (conflict?): a native rebase is needed: stop"; exit 4; }
-  sleep 8; $G fetch -q origin main "pull/$N/head"
-  cur=$(gh pr view "$N" -R $R --json headRefOid --jq .headRefOid 2>/dev/null); $G cat-file -e "$cur" 2>/dev/null || $G fetch -q origin "$cur"
+  sleep 8; $G fetch -q origin main "pull/$N/head" 2>/dev/null
+  cur=$(gh pr view "$N" -R $R --json headRefOid --jq .headRefOid 2>/dev/null); lg_hex40 "$cur" || cur=; lg_have "$cur"
   same_change "$EF" "$cur" || { echo "#$N CHANGE DIFFERS after update-branch (${cur:0:8}): stop"; exit 4; }
   echo "#$N updated to ${cur:0:8} on main (same change)"
 fi
@@ -159,14 +192,16 @@ tcc_read_gate() {
 }
 tcc_read_gate "$EF"
 for v in "$@"; do
-  [ -f "$v" ] || { echo "#$N verdict file missing: $v"; exit 2; }
+  # #975 P2-C: a verdict file is named by its file name only (its directory can be under a home directory).
+  [ -f "$v" ] || { echo "#$N verdict file missing: ${v##*/}"; exit 2; }
   # Correction #136: line 1 "...${EF:0:8}...: ACK|PASS" (the Astra layout) or a Gate line/Verdict line "PASS|ACK at ${EF:0:8}"; CHANGES_REQUESTED on either rejects,
   # and a PASS/ACK anywhere else in the file counts for nothing.
-  why=$(lg_verdict_file_ok "$v" "${EF:0:8}") || { echo "#$N verdict $v is not an accepted PASS/ACK verdict for ${EF:0:8} ($why): stop"; exit 2; }
-  # Correction #121: a record that states a landing gate needs a receipt for it (GATES_DONE=<receipt naming the head>).
+  why=$(lg_verdict_file_ok "$v" "${EF:0:8}") || { echo "#$N verdict ${v##*/} is not an accepted PASS/ACK verdict for ${EF:0:8} ($why): stop"; exit 2; }
+  # Correction #121: a record that states a landing gate needs a receipt for it (GATES_DONE=<receipt naming the head>). #975 (Codex P2 at
+  # af9d1901): the receipt names the RESOLVED head's eight characters, as the verdicts do; ${E:0:8} was the caller's prefix, which can be shorter.
   if grep -q -i -E 'landing gate|path to PASS|before landing|landing condition' "$v"; then
-    [ -n "${GATES_DONE:-}" ] && [ -f "$GATES_DONE" ] && grep -q -E "${E:0:8}" "$GATES_DONE" \
-      || { echo "#$N verdict $v states a landing gate: set GATES_DONE=<receipt naming ${E:0:8}> after running it"; exit 2; }
+    [ -n "${GATES_DONE:-}" ] && [ -f "$GATES_DONE" ] && grep -q -E "${EF:0:8}" "$GATES_DONE" \
+      || { echo "#$N verdict ${v##*/} states a landing gate: set GATES_DONE=<receipt naming ${EF:0:8}> after running it"; exit 2; }
   fi
 done
 # Corrections #122 and #123 (GHA audit T9): a Codex review starts when a PR opens, when a draft is marked ready (by
@@ -178,12 +213,14 @@ GATE=${LANDING_GATE:-$(dirname "$(readlink -f -- "$0")")/codex_gate.py}
 codex_wait() {
   local j g gr
   for j in $(seq 1 21); do
-    g=$(python3 -I "$GATE" "$R" "$N" 2>&1); gr=$?
+    g=$(lg_gate "$GATE" "$R" "$N"); gr=$?
     { [ $gr = 0 ] || [ $gr = 5 ]; } && { echo "#$N $g"; return 0; }
     [ $gr = 3 ] && [ $j -lt 21 ] && { sleep 60; continue; }
     echo "#$N $g: stop, land after Codex finishes"; exit 9
   done
 }
+# #975 P3-4: a missing gate is one fixed line (python3 would print its path), before anything is marked ready.
+[ -f "$GATE" ] || { echo "#$N codex_gate.py not found (path withheld): stop"; exit 9; }
 if [ "$(gh pr view "$N" -R $R --json isDraft --jq .isDraft 2>/dev/null)" = true ]; then
   gh pr ready "$N" -R $R >/dev/null 2>&1 || { echo "#$N could not be marked ready"; exit 7; }
   echo "#$N marked ready at $(date -u +%FT%TZ)"; sleep 20
@@ -193,35 +230,45 @@ codex_wait
 # manifests/evidence.json registration and turn main red (#923 after #937). Just before the merge: a temporary detached
 # worktree at the CURRENT origin/main, a no-commit merge of the head, and scripts/validate.py must exit 0 there (the 5f
 # landing rule of 10-09). Exit 10 otherwise: a native rebase with re-registration is needed.
+# #975 (Codex P2 and GPT P2-C at af9d1901, 2026-10-11): validate.py's output is free text, so it is not printed. It goes to a file that mktemp
+# makes under TMPDIR (mode 0600), outside the worktree, so it outlives the worktree's removal, and exit 10 names that file and the exit code.
+# VBASE is the main the validation ran on.
 merge_validate() {
   local wt rc err
-  $G fetch -q origin main "pull/$N/head" || { echo "#$N fetch failed: stop"; return 1; }
-  wt=$(mktemp -d /var/tmp/nas-land-$N-XXXXXX) || return 1
-  err=$wt.validate.err
+  VBASE=
+  $G fetch -q origin main "pull/$N/head" 2>/dev/null || { echo "#$N fetch failed: stop"; return 1; }
+  wt=$(mktemp -d /var/tmp/nas-land-$N-XXXXXX 2>/dev/null) || { echo "#$N no temporary directory for the validation worktree: stop"; return 1; }
   $G worktree add -q --detach "$wt" origin/main >/dev/null 2>&1 || { echo "#$N worktree add failed: stop"; rmdir "$wt" 2>/dev/null; return 1; }
+  VBASE=$(git -C "$wt" rev-parse HEAD 2>/dev/null)
   if ! git -C "$wt" merge -q --no-commit --no-ff "$1" >/dev/null 2>&1; then
-    echo "#$N does not merge cleanly onto main $(git -C "$wt" rev-parse --short HEAD): a native rebase is needed: stop"
+    echo "#$N does not merge cleanly onto main $(git -C "$wt" rev-parse --short HEAD 2>/dev/null): a native rebase is needed: stop"
     git -C "$wt" merge --abort >/dev/null 2>&1; $G worktree remove --force "$wt" >/dev/null 2>&1; return 1
   fi
-  (cd "$wt" && python3 -E -s -B scripts/validate.py >"$err" 2>&1); rc=$?
+  err=$(mktemp "${TMPDIR:-/tmp}/nas-validate-XXXXXX" 2>/dev/null) || err=/dev/null
+  (cd "$wt" 2>/dev/null && python3 -E -s -B scripts/validate.py >"$err" 2>&1); rc=$?
   git -C "$wt" merge --abort >/dev/null 2>&1; $G worktree remove --force "$wt" >/dev/null 2>&1
   if [ "$rc" != 0 ]; then
-    echo "#$N validate.py on the merge with current main exited $rc ($(tail -c 300 "$err" | tr '\n' ' ')): stop"; rm -f "$err"; return 1
+    [ "$err" = /dev/null ] && { echo "#$N validate.py on the merge with current main exited $rc; its output could not be kept, and is not echoed: stop"; return 1; }
+    echo "#$N validate.py on the merge with current main exited $rc; its output is kept only in local file ${err##*/} in the temp directory (0600), never echoed: stop"; return 1
   fi
-  rm -f "$err"; echo "#$N the merge onto current main validates (rc 0)"; return 0
+  [ "$err" = /dev/null ] || rm -f -- "$err"
+  echo "#$N the merge onto current main validates (rc 0)"; return 0
 }
 follows=0
 for i in $(seq 1 25); do
   # Judge the LATEST check run per name at this head: superseded runs (concurrency-cancelled duplicates) must not
   # count as failures (2026-10-09 #886: 10 CANCELLED plus 1 FAILURE from a superseded run while mergeState was CLEAN).
-  hd=$(gh pr view "$N" -R $R --json headRefOid --jq .headRefOid 2>/dev/null)
-  ms=$(gh pr view "$N" -R $R --json mergeStateStatus --jq .mergeStateStatus 2>/dev/null)
+  hd=$(gh pr view "$N" -R $R --json headRefOid --jq .headRefOid 2>/dev/null); lg_hex40 "$hd" || hd=
+  ms=$(gh pr view "$N" -R $R --json mergeStateStatus --jq .mergeStateStatus 2>/dev/null); [[ "$ms" =~ ^[A-Z_]+$ ]] || ms=
   # 2026-10-10: the aggregate `validate` check must have SUCCEEDED at this head. A DIRTY PR runs only CodeQL and Socket,
   # so "every check green" alone could pass on a handful of early checks (trading-cc on #940).
   # #975 P2-3 (2026-10-11): a completed check fails unless its conclusion is success, neutral or skipped (fail closed). GitHub's GraphQL
   # CheckConclusionState (schema.docs.graphql sha256 3ed09565…, lines 3974-4018) also has stale and startup_failure, which REST
   # rest-api-description@58b1e0c0 omits from its check-run enum; the old list counted those, and action_required on uet, as passing.
-  c=$(gh api "repos/$R/commits/$hd/check-runs?per_page=100" --jq '[.check_runs[]|{name,status,conclusion,started_at}]|group_by(.name)|map(max_by(.started_at))|[([.[]|select(.status!="completed")]|length), ([.[]|select(.status=="completed" and ((.conclusion=="success" or .conclusion=="neutral" or .conclusion=="skipped")|not))]|length), length, ([.[]|select(.name=="validate" and .conclusion=="success")]|length)]|@tsv' 2>/dev/null)
+  # #975 P2-B (GPT micro at af9d1901): a failed call's stdout can be an error body (above), which the old line word-split into the counts:
+  # bash then printed a body word in "integer expected", and a one-word body ended the script on an unbound $4. Now a failed call, or a
+  # reply that is not exactly four counts, counts as one check still running, so the loop polls on (exit 6 at the timeout).
+  c=$(gh api "repos/$R/commits/$hd/check-runs?per_page=100" --jq '[.check_runs[]|{name,status,conclusion,started_at}]|group_by(.name)|map(max_by(.started_at))|[([.[]|select(.status!="completed")]|length), ([.[]|select(.status=="completed" and ((.conclusion=="success" or .conclusion=="neutral" or .conclusion=="skipped")|not))]|length), length, ([.[]|select(.name=="validate" and .conclusion=="success")]|length)]|@tsv' 2>/dev/null) && [[ "$c" =~ ^[0-9]+$'\t'[0-9]+$'\t'[0-9]+$'\t'[0-9]+$ ]] || c=$'1\t0\t0\t0'
   set -- "$hd" $c "$ms"
   vok=${5:-0}; ms=${6:-}; set -- "$1" "$2" "$3" "$4" "$ms"
   if [ "${1:-}" != "$cur" ]; then
@@ -232,10 +279,22 @@ for i in $(seq 1 25); do
   if [ "${2:-1}" = 0 ] && [ "${4:-0}" -gt 0 ] && { [ "${vok:-0}" -gt 0 ] || [ "${3:-0}" -gt 0 ]; }; then
     [ "$3" = 0 ] || { echo "#$N CI failing=$3 of $4: stop"; exit 5; }
     [ "${5:-}" = BLOCKED ] && { echo "#$N BLOCKED by policy with CI green (open threads or required review): stop"; exit 8; }
-    g=$(python3 -I "$GATE" "$R" "$N" 2>&1); gr=$?; { [ $gr = 0 ] || [ $gr = 5 ]; } || { echo "#$N $g just before the merge: stop"; exit 9; }
-    merge_validate "$cur" || exit 10
+    g=$(lg_gate "$GATE" "$R" "$N"); gr=$?; { [ $gr = 0 ] || [ $gr = 5 ]; } || { echo "#$N $g just before the merge: stop"; exit 9; }
     ae=$(lg_author_email "$R") || { echo "#$N cannot form the no-reply author address (correction #148): stop, nothing merged"; exit 11; }
-    out=$(gh pr merge "$N" -R $R --squash --match-head-commit "$cur" -A "$ae" 2>&1) || { mf=$(mktemp "${TMPDIR:-/tmp}/merge-fail-XXXXXX"); printf '%s\n' "$out" > "$mf"; cls=$(printf '%s' "$out" | grep -o -i -E 'not mergeable|head branch was modified|required status check|review|draft|merge conflict|protected branch|rate limit|authentication|not found' | head -1 | tr 'A-Z ' 'a-z_'); echo "#$N merge failed (class: ${cls:-other}); gh output kept only in local file ${mf##*/} in the temp directory (0600), never echoed (#975 P2-2)"; exit 7; }
+    # #975 (Codex P2 at af9d1901, 2026-10-11): --match-head-commit pins only the head ("Commit SHA that the pull request head must match to
+    # allow merge", gh pr merge manual; GraphQL MergePullRequestInput.expectedHeadOid), so a main that moved after the validation would take a
+    # merge validated on the old one. main is read again (git ls-remote) as the last step before the merge; a move validates again, at most
+    # three validations in all (exit 13 after that). #975 (Codex P1 at af9d1901): the trading-cc-read status and its record can change during
+    # the waits (a newer status supersedes an older one, the record is append-only), so both are read again after each validation (exit 2).
+    for v in 1 2 3; do
+      merge_validate "$cur" || exit 10
+      tcc_read_gate "$EF"
+      now=$($G ls-remote origin refs/heads/main 2>/dev/null | cut -f1)
+      lg_hex40 "$VBASE" && [ "$now" = "$VBASE" ] && break
+      [ "$v" -lt 3 ] || { echo "#$N origin/main moved after each of 3 validations: stop, nothing merged"; exit 13; }
+      echo "#$N origin/main moved after the validation on ${VBASE:0:8}: validating again on the current main"
+    done
+    out=$(gh pr merge "$N" -R $R --squash --match-head-commit "$cur" -A "$ae" 2>&1) || { cls=$(printf '%s' "$out" | grep -o -i -E 'not mergeable|head branch was modified|required status check|review|draft|merge conflict|protected branch|rate limit|authentication|not found' | head -1 | tr 'A-Z ' 'a-z_'); mf=$(lg_keep merge-fail "$out") && kept="gh output kept only in local file $mf in the temp directory (0600), never echoed" || kept="gh output could not be kept, and is not echoed"; echo "#$N merge failed (class: ${cls:-other}); $kept (#975 P2-2)"; exit 7; }
     sleep 4
     echo "#$N $(gh pr view "$N" -R $R --json state,mergeCommit,mergedAt --jq '"\(.state) \(.mergeCommit.oid) \(.mergedAt)"' 2>/dev/null) (CI $4 ok)"
     lg_author_check "$R" "$N" "$ae" || exit 12

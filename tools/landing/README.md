@@ -20,17 +20,32 @@ is pinned to the head with `--match-head-commit` and names the account's no-repl
 with the verdict files as arguments (at least one) and these differences: `manifests/evidence.json` is left out of the change
 identity (CI arbitrates the registry), a BEHIND branch is updated server-side (merge method), the aggregate `validate` check
 must have succeeded at the head (the latest run per check name counts), and just before the merge the head is merged into the
-current `origin/main` in a temporary worktree under `/var/tmp` where `scripts/validate.py` must exit 0 (exit 10 otherwise).
+current `origin/main` in a temporary worktree under `/var/tmp` where `scripts/validate.py` must exit 0 (exit 10 otherwise). Its output
+is never printed: it goes to a file made by `mktemp "${TMPDIR:-/tmp}/nas-validate-XXXXXX"` (mode 0600) outside the worktree, and exit 10
+names that file and the exit code. `gh pr merge --match-head-commit` pins only the head ("Commit SHA that the pull request head must match
+to allow merge", sources below), so `origin/main` is read again with `git ls-remote` as the last step before the merge: when it moved
+after the validation, the merge onto the new main is validated again, at most three validations in all (exit 13 when it moved after
+each; #975, Codex P2 at af9d1901).
 
-**`codex_gate.py <owner/repo> <pr>`** prints one status line about the connector's review and exits 0 (a review finished at or
-after the latest trigger and none is running), 3 (running, or none finished since the latest trigger: poll again), 4 (the latest
-review ended other than Completed, or the gate itself failed: any exception, a failed `gh` call included, prints one fixed line
-naming only the error class, never a traceback, which would print file paths, or `gh`'s output; #975 P2), or 5 (Codex is
-unavailable: a usage-limit or account notice since the trigger, or no connector activity for 10 minutes). Both scripts stop with
+**`codex_gate.py <owner/repo> <pr>`** prints one status line about the connector's review and exits 0 (a review that started at or
+after the latest trigger finished, and none is running), 3 (running, or none that started since the latest trigger finished: poll
+again), 4 (such a review ended other than Completed, or the gate itself failed: any exception, a failed `gh` call included, prints
+one fixed line naming only the error class, never a traceback, which would print file paths, or `gh`'s output; #975 P2), or 5 (Codex
+is unavailable: a usage-limit or account notice since the trigger, or no connector activity for 10 minutes). Both scripts stop with
 exit 9 on a 4, at the wait and just before the merge. A trigger is the pull request's creation, a ready-for-review event, or a
-comment by anyone but the connector that starts with `@codex review` or `@codex security review`; a push is not a trigger. Any
-completion evidence since the trigger (a Completed row, a connector review, a +1 reaction, its no-findings comment) gives 0 even
-when a later row says Cancelled; a Running row always gives 3.
+comment by anyone but the connector that starts with `@codex review` or `@codex security review`; a push is not a trigger. A
+Running row always gives 3.
+
+**Which review a completion belongs to (#975, Codex P1 at af9d1901).** A review that was running when the latest trigger came and
+finished after it is not the requested review, but its completion time alone passed the gate, so a landing could merge in the gap
+before the new review's Running row appeared. The connector keeps one summary comment per pull request and edits it in place: a row
+`Running since <start>` (with the review kind, the commit and the trigger kind in its other cells) becomes `Completed <end>`, and the
+next review rewrites the row (measured 2026-10-11 on nas#974, #975, #979 and #994 through GraphQL `userContentEdits`, whose `diff`
+held the whole body of each revision, newest first). So a Completed row counts only when the latest earlier revision that shows the
+same row Running started at or after the trigger; the connector's +1 reaction (its all-reviews-finished signal) counts only at or
+after such a start; a connector review and its no-findings comment name no request and no longer count. A Completed row with no
+such revision is not attributed (fail closed: 3, or 5 without connector activity). Completion evidence after such a start wins
+over a later Cancelled row, as before.
 
 **The author address (CC correction #148).** GitHub authors a squash merge with the account's primary email unless the merge names
 one, which published the owner's personal address on every landing. Both scripts form the no-reply address
@@ -76,6 +91,26 @@ maps the state as above, and `uet_land.sh` prints the number of unresolved revie
 The tests fail each call site in turn with a synthetic address on both streams and check the exit code, that nothing was merged where
 the step stops a landing, and that the address is not in the output (sources below).
 
+**Typed values and local diagnostics (#975 round 3, GPT P2-B and P2-C at af9d1901).** Dropping stderr did not cover a value that is
+parsed: `nas_land.sh` word-split a failed check-run call's stdout into its counts, so a body `0 0 <address> 1` reached bash's "integer
+expected" diagnostic on every poll and a body `0` ended the script on an unbound `$4`, with its path. Every value from `gh` is now used
+only in its typed shape: a head is 40 lower-case hex digits (`lg_hex40`), the CI line is a head, four counts and a state word, the
+check-run reply exactly four counts (a failed call or another shape counts as one check still running, so the loop polls on to exit 6),
+and `mergeStateStatus` a capitalised word. The local commands print nothing of their own: every `git` call drops its stderr (git's
+`die` writes "fatal: ..." with the path it was given to stderr), `codex_gate.py`'s output is echoed only when it is one of its own
+status lines with exit 0, 3, 4 or 5 (`lg_gate`; otherwise one fixed line and exit 9, which covers python3's "can't open file
+'<path>'", exit 2, and a traceback, exit 1, that the gate's own handler never sees), a missing gate file is one fixed line before
+anything is marked ready (exit 9), a verdict file is named by its file name only, `validate.py`'s output stays in its file (above), and
+a failed merge whose diagnostic cannot be kept (an unusable `TMPDIR`) says so in a fixed line (exit 7; before, `mktemp` printed the
+template's path and the message named an empty file).
+
+**Gates read again just before the merge (#975, Codex P1 at af9d1901).** The `trading-cc-read` status and its record are mutable: a newer
+status for the context supersedes an older one (the statuses list is "in reverse chronological order. The first status in the list will
+be the latest one"), and the record is append-only. Both scripts ran `tcc_read_gate` only at the start, before tens of minutes of Codex
+and CI waits; they run it again as the last gate before the merge (exit 2). In `uet_land.sh` a gate result of 5 needs `GPT_VERDICT` at
+both gate calls: the wait could give 0 and the call just before the merge 5 (an `@codex review` during CI that met the usage limit), and
+that landing merged with neither a finished review nor the substitute. `nas_land.sh` proceeds on a 5 by its own policy, unchanged.
+
 ## Variables
 
 | Variable | Default | Used by | Meaning |
@@ -87,7 +122,7 @@ the step stops a landing, and that the address is not in the output (sources bel
 | `VERDICT_FILES` | none | `uet_land.sh` | space-separated verdict files that each must name the read head |
 | `GATES_DONE` | none | both | receipt naming the read head; required when a verdict file states a landing gate |
 | `GPT_VERDICT` | none | `uet_land.sh` | the co-op's verdict file accepted instead of Codex when `codex_gate.py` exits 5 |
-| `TMPDIR` | `/tmp` | both | where a failed merge keeps gh's output (`merge-fail-XXXXXX`, mode 0600) |
+| `TMPDIR` | `/tmp` | both | where a failed merge keeps gh's output (`merge-fail-XXXXXX`, mode 0600), and `nas_land.sh` the validation's output (`nas-validate-XXXXXX`, kept when it fails) |
 | `LANDING_PROHIBITED_NAMES` | none | the tests only | comma-separated identities that must not appear in any form under `tools/landing` (see Tests) |
 
 The scripts also need `gh` 2.48.0 or later (`gh api --paginate --slurp`; authenticated for the repository), `git` 2.39.0 or
@@ -101,7 +136,8 @@ one, and the script then reports exit 10, "does not merge cleanly".
 From the script headers. `uet_land.sh`: 2 verdict gate, 3 head moved, 4 change differs, 5 CI failed, 6 timeout, 7 merge failed,
 8 blocked, 9 Codex review running, not finished since its latest trigger, or ended other than Completed (`codex_gate.py`).
 `nas_land.sh`: 2 verdict gate, 3 head moved, 5 CI failing, 6 timeout, 7 merge failed, 8 blocked by policy, 9 as above, 10 the
-merge onto current `origin/main` fails `scripts/validate.py` or does not merge cleanly. Its header omits one code it also uses:
+merge onto current `origin/main` fails `scripts/validate.py` or does not merge cleanly, 13 origin/main moved after each of three
+validations, so nothing is merged (#975, new in round 3). Its header omits one code it also uses:
 4 when `update-branch` is refused or the change differs after it. Both scripts also exit 11 when the no-reply author address cannot
 be formed (nothing is merged) and 12 when the merge landed but its commit's author is not that address or the commit could not be
 read (CC correction #148). `codex_gate.py`: 0, 3, 4 and 5 as above; a gate that fails itself exits 4, which both scripts stop on
@@ -135,14 +171,19 @@ not yet in the live copies: `codex_gate.py` catches any exception and exits 4 wi
 of 754a194f (the GPT micro, CHANGES_REQUESTED) led to a third round, also made here: the status-gate failure line is the one the
 CC's live copies already carry, and the rest is new to them: every other `gh` call drops its stderr, `uet_land.sh` prints the count
 of unresolved review threads as a number or `unknown`, and each script has two more header comment lines (#975 P2-2, above). The
-tests also scan for every prohibited identity (#975 P2-1, below). The "Here" column is each file as committed: its sha256 and line
-count.
+tests also scan for every prohibited identity (#975 P2-1, below). The review of af9d1901 (six Codex threads, the GPT micro's
+CHANGES_REQUESTED and four P3s of the CC's Claude micro) led to a fourth round, also made here and new to the live copies, which should
+therefore be replaced whole (the repository copy with the three host paths filled in): `codex_gate.py` binds a completion to a review
+that started after the latest trigger, both scripts read the trading-cc-read gate again just before the merge, run the gate through
+`lg_gate`, use values from `gh` only in their typed shape, drop git's stderr and stop on a missing gate file, `uet_land.sh` requires
+`GPT_VERDICT` on a 5 at either gate call, and `nas_land.sh` checks the receipt against the resolved head, keeps validate.py's output out
+of its messages and validates again when main moved (exit 13). The "Here" column is each file as committed: its sha256 and line count.
 
 | File | Before correction #136 | Live copy, after #148 | Live copy, after #975 P2 | Here |
 | --- | --- | --- | --- | --- |
-| `uet_land.sh` | `b794e3a46772c0a598dff9eee972ad449e5d63f0c81b60b9db1d5cb4944747bb` (115 lines) | `301fb5b07274b28fde0f2061356bf9682883eca352c8bcb7a3119e8934920c7d` (232 lines) | `1bc1f53b3ddd7563a6d3a0ea1a4db296767df64197c00b1bc0ff6e23c528476c` (233 lines) | `acfadc93870babd1e9fa3f4d6b6733e701ea8a6d3d5ce52059b9fad71105501e` (237 lines) |
-| `nas_land.sh` | `2fefe070b95229de3dcad14052cf5c031b70c202bf4a34f4452e6e0cb5832936` (135 lines) | `96144670bc301036604fc39e57e3ab4e4a2e43a6b9d6b8b645ef7b02482f4017` (243 lines) | `287f2e7e162a0dd8df28803c72eeb96591a2d936c513d981bcac24512139e0bd` (246 lines) | `3d119f50b2bb063fce23e1e81438458e1c3538f87874d7f4346549a1cbed6b4f` (248 lines) |
-| `codex_gate.py` | (unchanged) | `31524d2871cde79ecb2c5b9bc56b6175ce9fafab9ad4d2e2e3eb3594e1cb2422` (108 lines) | the same | `cc96f69b411b76652b1d024988d3bb374444a40dca6f175dd6559aa4de9e7a33` (114 lines) |
+| `uet_land.sh` | `b794e3a46772c0a598dff9eee972ad449e5d63f0c81b60b9db1d5cb4944747bb` (115 lines) | `301fb5b07274b28fde0f2061356bf9682883eca352c8bcb7a3119e8934920c7d` (232 lines) | `1bc1f53b3ddd7563a6d3a0ea1a4db296767df64197c00b1bc0ff6e23c528476c` (233 lines) | `5280b70817bd45a5ea42bf1aae3a2d5380e1879dfebbb99ff3fa56b5d35ab4b0` (281 lines) |
+| `nas_land.sh` | `2fefe070b95229de3dcad14052cf5c031b70c202bf4a34f4452e6e0cb5832936` (135 lines) | `96144670bc301036604fc39e57e3ab4e4a2e43a6b9d6b8b645ef7b02482f4017` (243 lines) | `287f2e7e162a0dd8df28803c72eeb96591a2d936c513d981bcac24512139e0bd` (246 lines) | `2e0c2e2d9bddc2863b1c65c0f9552cb9debbb9c9e28a43c3a5be15631e604730` (307 lines) |
+| `codex_gate.py` | (unchanged) | `31524d2871cde79ecb2c5b9bc56b6175ce9fafab9ad4d2e2e3eb3594e1cb2422` (108 lines) | the same | `ff95a0eb1d71c92eeadf8149f9d98702299854a9aa0cf8b95b22787b8531de72` (166 lines) |
 
 Corrections the scripts carry: #118 (every gate before the merge, in order), #121 (a verdict file that states a landing gate needs
 a receipt), #122 and #123 (a Codex review must have finished; uet#40 and uet#47 merged while one was running), #136
@@ -151,24 +192,27 @@ a receipt), #122 and #123 (a Codex review must have finished; uet#40 and uet#47 
 once, so a head that moves during CI and carries the read head's change is followed, at most three times), #148 (the author address)
 and #975's P2-3 (the CI allow-list), P2-2 (no text from `gh` or its API is printed: a failed merge, a failing status, every other `gh`
 call), the gate error (P2: exit 4 and one fixed line, no traceback), the commit-status allow-list (P3) and P2-1 (the privacy scan
-checks every prohibited identity). The block is identical in both scripts, apart from `lg_ci_state`, which only `uet_land.sh` has.
+checks every prohibited identity), and round 3 (above: the completion bound to the latest request, the gates read again before the merge,
+typed values, no local diagnostics, the base re-read). The block is identical in both scripts, apart from `lg_ci_state`, which only
+`uet_land.sh` has.
 
 ## Known gaps, left as they were
 
 The files began as the live copies with host literals replaced and now also differ from them where the provenance section above says
-so (the merge-failure line, the gate's exit 4, the commit-status allow-list, the dropped stderr and the review-thread count). These
-stay until a change with its own tests fixes them:
+so (the merge-failure line, the gate's exit 4, the commit-status allow-list, the dropped stderr, the review-thread count and round 3).
+These stay until a change with its own tests fixes them:
 
 - `U` and `G` are expanded unquoted: a clone path with whitespace breaks both scripts.
 - `nas_land.sh`'s header leaves out exit code 4, and its validation merge needs a git identity (above).
-- Only `gh` is covered by the rule that nothing it returned is printed: the `git` commands (`fetch`, `cat-file`, `worktree`) still
-  inherit stderr, and `scripts/validate.py`'s last 300 bytes are printed when the validation merge fails (exit 10).
 - A call whose failure never stopped a landing still does not: an unreadable draft flag (both scripts) leaves a draft unmarked, and
   an unreadable `mergeStateStatus` (`nas_land.sh`) skips the BEHIND update and the BLOCKED stop, so the merge call itself is the check
   (exit 7 when GitHub refuses it).
-- A running account named `user` fails the privacy scan on the hyphenated adjective in the second line of `uet_land.sh`: a generic
-  name may stand as a bare word only, and joined to other text by a hyphen it is an identifier form (below). No other generic name
-  is reported on these files.
+- The base re-read narrows the window to the time between `git ls-remote` and the merge call, and does not close it: GitHub's merge
+  takes an expected head and no expected base (`MergePullRequestInput.expectedHeadOid` is the only pin), and a main that moves in
+  those seconds takes the merge validated on the main before it.
+- The completion attribution reads the connector's summary rows, which carry no review id: if the connector ever replaced a newer
+  Running row with an older review's completion in the same row (same kind, commit and trigger kind), the gate could not tell (not
+  observed). It reads each comment's 100 newest revisions (about two per review).
 
 ## Tests
 
@@ -185,26 +229,38 @@ state outside it and none through `uet_land.sh` (SUCCESS merges, PENDING and EXP
 (exit 2, only its state printed), each `gh` call failing in turn with an address on stderr and, for `gh api`, on stdout (the step's
 own exit code, nothing printed; #975 P2-2), a check that the "Here" digests above are those of the committed files, and a scan of
 every file under `tools/landing`, bytecode excepted, for home paths and for the identities that must not appear (#975 P2-1, below).
-It is offline, needs `jq`, and is Linux-only. A script edit that moves a decision site fails the module instead of leaving it
+Round 3 adds, each failing at af9d1901: a review that started before the latest trigger and finished after it (exit 3, not 0), the
+gate giving 0 then 5 in `uet_land.sh` without, with a wrong and with an accepted `GPT_VERDICT`, a status or record that changes during
+the wait (exit 2), a main that moves after the validation (validated again; exit 13 when it keeps moving), the validation's output kept
+in its file and not printed, failed or malformed CI replies, a missing, broken or chatty gate, a missing clone and a missing verdict
+file under a home-like path (no path printed), an unusable `TMPDIR` on a failed merge, and a receipt naming only the caller's shorter
+prefix. It is offline, needs `jq`, and is Linux-only. A script edit that moves a decision site fails the module instead of leaving it
 untested.
 
 **The privacy scan (#975 P2-1).** Two kinds of identity are scanned for, each in these forms: the bare word, an identifier or path
 form (joined to other text by `-`, `_`, `.`, `/`, `\`, `@`, `:`, `~` or `=`, as in `project-<name>-tools` or `<name>@host`), a
-percent-encoded form, hex digits and base64 at each alignment. An explicitly prohibited identity is a name in
+percent-encoded form (decoding that reveals the name as a new token, or as a new identifier, as `<name>%40host` does: #975 P2-D),
+hex digits and base64 at each alignment. A home path counts in any letter case (#975 P3-7: the pattern was case-sensitive). An explicitly
+prohibited identity is a name in
 `LANDING_PROHIBITED_NAMES` (comma-separated, read when the tests run, so no real name is written into the repository; not
 `NATIVE_AGENT_HOST_NAMES_JSON`, whose setting replaces the host-name scanner's own sources). It is scanned in every form, whatever its
-length and even when it is an ordinary word. The account that runs the tests is scanned the same way, with one exception: when it is a
-generic CI or container account (`GENERIC_ACCOUNTS` in the test module, such as `runner` on GitHub-hosted runners), its bare word may
-stand in prose, because such names are ordinary words; its identifier, path and encoded forms are still reported. A home path is
-reported for every account. No name is skipped for its length (before, one under four characters was, so a real account `sam` was
-never checked). The repository assertion itself is run on a scratch tree with a mocked account lookup for a three-character account,
-for a generic account in each form, and for a prohibited name that is also a generic word.
+length and even when it is an ordinary word. The account that runs the tests is scanned the same way, with one exception: in CI
+(`GITHUB_ACTIONS` or `CI` is `true`), when it is a generic CI or container account (`GENERIC_ACCOUNTS` in the test module, such as
+`runner` on GitHub-hosted runners), its bare word may stand in prose, because such names are ordinary words; its identifier, path and
+encoded forms are still reported. Outside CI no account is excused (#975 P3-8). A home path is reported for every account. No name is
+skipped for its length (before, one under four characters was, so a real account `sam` was never checked). The repository assertion
+itself is run on a scratch tree with a mocked account lookup for a three-character account, for a generic account in each form, in
+and outside CI, and for a prohibited name that is also a generic word, and on the files here for every generic account in CI: none is
+reported (#975 P2-E: the second line of `uet_land.sh` joined `user` to the next word with a hyphen, which is its identifier form, and now
+reads "owned by one account").
 
 ## Upstream sources for the #975 corrections
 
 Each source was fetched on 2026-10-11 with `curl -fsSL https://raw.githubusercontent.com/<owner>/<repo>/<tag>/<path>` and read at the
-lines given (the sha256 is that of the fetched file). Installed: `gh` 2.102.0, `mktemp` from uutils coreutils 0.10.0, Python 3.13.16.
-The GNU `mktemp` of the CI runners is not cited.
+lines given (the sha256 is that of the fetched file). Installed: `gh` 2.102.0, `mktemp` from uutils coreutils 0.10.0, Python 3.13.16,
+git 2.53.0. The GNU `mktemp` of the CI runners is not cited. The round-3 rows follow the first table; the gh manual page was fetched
+from `https://cli.github.com/manual/gh_pr_merge` and the GraphQL schema from `https://docs.github.com/public/fpt/schema.docs.graphql`
+(the same bytes as the fixtures, sha256 `3ed09565…`).
 
 | Mechanism | Source at the pin, sha256 | Lines read and what they say |
 | --- | --- | --- |
@@ -215,3 +271,17 @@ The GNU `mktemp` of the CI runners is not cited.
 | Recursive traversal and reading (P2-1) | `python/cpython@v3.13.16:Lib/pathlib/_local.py`, `0530b4186ec5845e000bedf5817ff1ac970b9a39a6891ba6789a1776abdea42b`; `Lib/pathlib/_abc.py`, `75e6bc728013d11446126d535f92b8907fb6dae7404df3d0268ac7b6865a2090` | `_local.py:611-620` `Path.rglob(pattern)` yields every existing file of any kind, directories included, anywhere in the subtree (it globs `'**' / pattern`), and `:581` `recurse_symlinks=False` is the default; `_abc.py:476-488` `is_file()` is also true for a symlink to a regular file, `:621-626` `read_bytes()` reads the whole file. The scan uses these, not `os.walk` |
 | The decoded forms (P2-1) | `python/cpython@v3.13.16:Lib/urllib/parse.py`, `491b233e8d87a2ab73964afff029717177d53ad8def328ed9b00575db983da27`; `Lib/base64.py`, `a80fc2454f7a0ad644f02259184de5b52084392ddb8b41c1ce372e50a09f3993`; `Objects/bytesobject.c`, `fd5e3799c5a70a7560460badf84a1a3e14c5b8b40a40352840477e267019cf20` | `parse.py:649-651` `unquote_to_bytes('abc%20def') -> b'abc def'`, `:673-680` a `%XX` pair becomes its byte and anything else stays as written; `base64.py:51-62` `b64encode`, `:112-119` `urlsafe_b64encode` (`-` and `_` for `+` and `/`); `bytesobject.c:2583-2592` `bytes.hex()` "Create a string of hexadecimal numbers from a bytes object" |
 | Lookaround assertions behind the bare-word and identifier forms (P2-1) | `python/cpython@v3.13.16:Doc/library/re.rst`, `455ed7abc1d74b6af12c9205e76af0873bbb9d4297f73c8a2d6306a7ec658042` | `:459-469` `(?=…)` and `(?!…)`, `:473-479` `(?<=…)`, whose contained pattern must match a fixed length (the joiner class is one character), `:500-504` `(?<!…)` |
+
+Round 3 (the review of af9d1901):
+
+| Mechanism | Source at the pin, sha256 | Lines read and what they say |
+| --- | --- | --- |
+| The merge pins only the head (Codex P2, nas base move) | `cli/cli@v2.102.0:pkg/cmd/pr/merge/merge.go`, `ca3849b4d224ac0384bcc90102f77bd0612e2c0ba67fc1ee44bb48abe87c5942`; the manual page `gh_pr_merge`, `b21ef4350f050611af8a268632579c019c2dcb33feea7c0abffd4ca2b2520f0b`; the GraphQL schema, `3ed09565…` | `merge.go:184` `--match-head-commit`: "Commit `SHA` that the pull request head must match to allow merge", `:294` it becomes the mutation's `expectedHeadOid`; the manual repeats the flag text; `schema.docs.graphql:26068-26103` `input MergePullRequestInput`, whose only pin is `:26090-26092` `expectedHeadOid` "OID that the pull request head ref must match to allow merge; if omitted, no check is performed" (no base) |
+| Reading the current main (Codex P2) | `git/git@v2.53.0:Documentation/git-ls-remote.adoc`, `9739be01b44da924ebec94ee658d5c080627ee65a2cd7d711fd83d6a081ba4da` | `:6` "List references in a remote repository", `:93-97` only references matching the given patterns are displayed (`refs/heads/main`) |
+| A review's start, from the summary comment's revisions (Codex P1, the gate) | the GraphQL schema, `3ed09565…`; `cli/cli@v2.102.0:pkg/cmd/api/api.go`, `030eda84…`; `github/rest-api-description@58b1e0c00b39:descriptions/api.github.com/api.github.com.json`, `da3d22e4…` | `schema.docs.graphql:21203` `type IssueComment`, `:21380-21404` `userContentEdits(after, before, first, last): UserContentEditConnection`, "A list of edits to this content", `:21248-21250` `databaseId: Int`, "the primary key from the database"; `:74077-74101` `type UserContentEdit`: `diff: String` (`:74096`, "A summary of the changes for this edit") and `editedAt: DateTime!` (`:74101`); `api.go:121-122` fields other than `query` are GraphQL variables, `:112-115` `-F` converts integers, `:134-139` `--paginate` needs `$endCursor: String` and `pageInfo{ hasNextPage, endCursor }`, `--slurp` wraps the pages in an array; the REST `issue-comment` schema's `id` is the integer the gate matches to `databaseId`. That each `diff` held the whole body of its revision, newest first, is measured (nas#974, #975, #979, #994 on 2026-10-11), not documented |
+| A newer status supersedes (Codex P1, the gate read again) | `github/rest-api-description@58b1e0c00b39:descriptions/api.github.com/api.github.com.json`, `da3d22e417611cca9a4131dceea89d4d61c3be021b0917f32d9e4422e4fe60f1` | `:55724` `repos/list-commit-statuses-for-ref`: "Statuses are returned in reverse chronological order. The first status in the list will be the latest one" |
+| A shorter prefix names the same commit (Codex P2, the receipt) | `git/git@v2.53.0:Documentation/revisions.adoc`, `3835ec561d9f4052783c79541d86d16e644f7d8d0b8fb1bd1d3067ad021c38a7` | `:14-18` a SHA-1 is "the full SHA-1 object name (40-byte hexadecimal string), or a leading substring that is unique within the repository", so the caller's prefix can be shorter than the eight characters a receipt must name |
+| What python3 prints when the gate cannot run, and what the gate's handler covers (GPT P2-C and P3) | `python/cpython@v3.13.16:Modules/main.c`, `9507f8a42e30531ed11721339f32a2e2b5d02e721e4c166414fa574269fd19e7`; `Doc/library/sys.rst`, `91825c95030c506eb3840249a9f7bc12a0ff7eeb2f66b980608d5bc5d1cdb568` | `main.c:403-410` a file that cannot be opened prints "%S: can't open file %R: [Errno %d] %s" (the path) to stderr and returns 2; `:437-441` code that ends in an uncaught exception returns `pymain_exit_err_print()`, which `:118-123` exits 1 after printing the error; `sys.rst:394-399` for an uncaught exception other than `SystemExit` the interpreter calls `sys.excepthook`, which "prints out a given traceback and exception to `sys.stderr`". So `codex_gate.py`'s `except Exception` handler covers exceptions raised while `main` runs; a file that cannot be opened or compiled never reaches it, which `lg_gate` covers |
+| git's diagnostics go to stderr (GPT P2-C) | `git/git@v2.53.0:usage.c`, `d878ba9b46081d1e902cafeddc35d368ad3d9eaf5cb5c5c99ab4ea692c7054f6` | `:40-43` `vreportf` writes to `stderr`, `:82` `die_builtin` reports through it ("fatal: ..."), so `2>/dev/null` drops a message such as "cannot change to '<path>'" |
+| Case-insensitive home paths (Claude P3-7) | `python/cpython@v3.13.16:Doc/library/re.rst`, `455ed7ab…` | `:769-773` `re.I`/`IGNORECASE`: "Perform case-insensitive matching" |
+| CI detection for the generic-account exemption (Claude P3-8) | `github/docs@be38ec5d78e24172587e61b3c6ff40ace1865c71:content/actions/reference/workflows-and-actions/variables.md`, `38a4ba0d8cbd440e1cdde96c0c6384d8ee60bf844b7c934ab1516d9206669922` | `:32` `CI` "Always set to `true`", `:36` `GITHUB_ACTIONS` "Always set to `true` when GitHub Actions is running the workflow" |
