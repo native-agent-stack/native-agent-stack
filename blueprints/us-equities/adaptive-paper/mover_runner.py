@@ -832,6 +832,8 @@ def command_paper(args):
                     sink_status=controller.trading_status,
                     request_observer=responses.append, quote_timeout=settings.stream_quote_timeout_seconds,
                     order_quote_max_age_seconds=config["quote_max_age_seconds"],
+                    **({"exit_quote_max_age_seconds": limits.exit_quote_max_age_seconds}
+                       if limits.exit_quote_max_age_seconds is not None else {}),
                     feed=config["feed"],
                     required_quote_symbols=list(settings.benchmarks),
                     # As runner.main: from the lane's first trial, so reconcile sees every owned intent.
@@ -948,6 +950,8 @@ def command_recover(args):
                 sink_status=controller.trading_status,
                 request_observer=responses.append, quote_timeout=settings.stream_quote_timeout_seconds,
                 order_quote_max_age_seconds=config["quote_max_age_seconds"],
+                **({"exit_quote_max_age_seconds": limits.exit_quote_max_age_seconds}
+                   if limits.exit_quote_max_age_seconds is not None else {}),
                 feed=config["feed"], required_quote_symbols=list(settings.benchmarks),
                 history_start=datetime.fromtimestamp(metadata["started_at"], timezone.utc),
                 fee_history_start=fee_window,

@@ -373,6 +373,7 @@ def load_mover_config(path):
                         max_rest_per_minute=config["max_api_requests_per_minute"],
                         max_submits_per_minute=config["max_submit_requests_per_minute"],
                         quote_max_age_seconds=config["quote_max_age_seconds"],
+                        exit_quote_max_age_seconds=config.get("exit_quote_max_age_seconds"),
                         trial_seconds=config["duration_seconds"], cleanup_seconds=config["cleanup_seconds"],
                         min_entry_close_seconds=config["min_entry_close_seconds"],
                         overnight_gross_multiple=session_policy["overnight_gross_multiple"],
@@ -1198,9 +1199,11 @@ class MoverBook:
             record.cancel_requested = False
 
     # -- evaluation --------------------------------------------------------
-    def _fresh(self, quote, now):
+    def _fresh(self, quote, now, *, side="buy"):
+        max_age = (self.limits.effective_exit_quote_max_age_seconds if side == "sell"
+                   else self.limits.quote_max_age_seconds)
         return (quote is not None
-                and -CLOCK_TOLERANCE_SECONDS <= now - quote.timestamp <= self.limits.quote_max_age_seconds)
+                and -CLOCK_TOLERANCE_SECONDS <= now - quote.timestamp <= max_age)
 
     def _next_client_id(self):
         self.sequence += 1
@@ -1267,7 +1270,7 @@ class MoverBook:
         actions = []
         force = self.force_reason
         quote = self._quote(symbol)
-        fresh = self._fresh(quote, now)
+        fresh = self._fresh(quote, now, side="sell")
         position = positions.get(symbol)
         held = position.qty if position is not None and position.qty > 0 else ZERO
         if held > 0 and leg.first_fill_at is not None and fresh:

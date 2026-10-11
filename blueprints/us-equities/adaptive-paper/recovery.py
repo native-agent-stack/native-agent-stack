@@ -170,8 +170,11 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
 
     def fresh(symbol):
         value = controller.quotes.get(symbol)
+        configured_age = config.get("exit_quote_max_age_seconds")
+        if configured_age is None:
+            configured_age = config["quote_max_age_seconds"]
         return value is not None and -0.25 <= controller.clock() - value.timestamp <= min(
-            float(config["quote_max_age_seconds"]), ledger.limits.quote_max_age_seconds)
+            float(configured_age), ledger.limits.effective_exit_quote_max_age_seconds)
 
     def guard_observation_integrity():
         # Reconnect/stale-quote admission freezes can coexist with an owned exit

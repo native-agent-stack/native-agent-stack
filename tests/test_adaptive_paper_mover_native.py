@@ -625,7 +625,9 @@ class MoverPaperCommandWiring(unittest.TestCase):
             self.ports.append(port)
             self.port_kwargs.append((list(symbols), kwargs.get("required_quote_symbols")))
             self.transport_timeouts.append({name: kwargs.get(name) for name in
-                                            ("quote_timeout", "order_quote_max_age_seconds")})
+                                            ("quote_timeout", "order_quote_max_age_seconds")} |
+                                          ({"exit_quote_max_age_seconds": kwargs["exit_quote_max_age_seconds"]}
+                                           if "exit_quote_max_age_seconds" in kwargs else {}))
             self.broker = port
             return port
 

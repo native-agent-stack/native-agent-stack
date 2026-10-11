@@ -222,6 +222,23 @@ class CashContinuity(unittest.TestCase):
             self.assertEqual(self.wiring.transport_timeouts,
                              [{"quote_timeout": 30, "order_quote_max_age_seconds": 3}] * 2)
 
+    def test_sell_age_reaches_paper_and_forced_recovery_without_widening_entries(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            config = self.wiring.fast_config(root)
+            data = json.loads(config.read_text())
+            data["mover"]["stream_quote_timeout_seconds"] = 30
+            data["exit_quote_max_age_seconds"] = 30
+            data["max_api_requests_per_minute"] = 150
+            data["max_submit_requests_per_minute"] = 130
+            config.write_text(json.dumps(data))
+            (root / "scan.json").write_bytes(native.scan_raw([native.row("AAA", 1, "10.00")]))
+            self.wiring.sell_blocked_ports = 1
+            self.wiring.run_paper(root, "sell-age", config=config)
+            self.assertEqual(self.wiring.transport_timeouts,
+                [{"quote_timeout": 30, "order_quote_max_age_seconds": 3,
+                  "exit_quote_max_age_seconds": 30}] * 2)
+
 
 class RecoveryFixture:
     def seed(self, root, binding="match", *, watchdog=30):

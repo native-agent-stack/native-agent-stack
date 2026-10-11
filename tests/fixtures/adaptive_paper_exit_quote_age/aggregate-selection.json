@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "scope": "Aggregate-derived synthetic age controls, not original quote reconstruction. Prices, holdings and order state are synthetic; only minute-level age medians and aggregate admission counts are measured. No raw pages or symbol/account identifiers.",
+  "manifest_sha256": "8812730b70e8bb1f82ff5a4b08409bd36275f1491fa540ac800f0fee15eb3b50",
+  "source_files": [
+    {
+      "file": "minute-aggregates.csv",
+      "sha256": "b7223642951bda11cbfe725e9ee69a4e6b1ef8477fd42e951b1db7093b9a96b1",
+      "bytes": 747994
+    },
+    {
+      "file": "pooled-minute-aggregates.csv",
+      "sha256": "c093f0ec70eee8fd527fce2e05f78669b67a4b61bcd0e482992cbf771d99b016",
+      "bytes": 57753
+    },
+    {
+      "file": "recorded-date-minute-aggregates.csv",
+      "sha256": "31ffe1595ae4c2ee38227d111ecd406ed0f0816eb6d0af10519e25dc75c94ead",
+      "bytes": 463437
+    },
+    {
+      "file": "pull-summary.json",
+      "sha256": "f43fda7829f1ac47392f5bc922f785806404b09a083fe8d5b353ee88b3ee5b68",
+      "bytes": 14513
+    }
+  ],
+  "exit_ceiling_seconds": 30,
+  "ceiling_basis": "30 seconds is the largest measured aggregate age threshold; choose it as a strict optional sell ceiling, while entries retain <=3 seconds.",
+  "pooled_0400": {
+    "candidate_count": "370",
+    "pass_spread_100bps_age_3s": "39",
+    "pass_spread_100bps_age_10s": "55",
+    "pass_spread_100bps_age_30s": "59"
+  },
+  "stale_minute_median_cases": [
+    {
+      "date": "2026-09-28",
+      "minute_ET": "06:35",
+      "candidate_count": "6",
+      "latest_quote_known": "6",
+      "latest_quote_age_gt_3s": "4",
+      "age_seconds_p50": "3.387340623",
+      "pass_spread_100bps_age_3s": "1",
+      "pass_spread_100bps_age_10s": "2",
+      "pass_spread_100bps_age_30s": "2"
+    },
+    {
+      "date": "2026-09-28",
+      "minute_ET": "06:42",
+      "candidate_count": "6",
+      "latest_quote_known": "6",
+      "latest_quote_age_gt_3s": "4",
+      "age_seconds_p50": "8.690767098",
+      "pass_spread_100bps_age_3s": "1",
+      "pass_spread_100bps_age_10s": "2",
+      "pass_spread_100bps_age_30s": "2"
+    },
+    {
+      "date": "2026-09-28",
+      "minute_ET": "06:44",
+      "candidate_count": "6",
+      "latest_quote_known": "6",
+      "latest_quote_age_gt_3s": "4",
+      "age_seconds_p50": "20.355535887",
+      "pass_spread_100bps_age_3s": "1",
+      "pass_spread_100bps_age_10s": "1",
+      "pass_spread_100bps_age_30s": "2"
+    }
+  ]
+}
