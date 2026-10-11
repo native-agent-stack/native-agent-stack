@@ -2,6 +2,7 @@
 
 from datetime import datetime, timedelta, timezone
 import json
+import os
 from pathlib import Path
 import subprocess
 import tempfile
@@ -103,6 +104,20 @@ class PublicStarredTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, r"failed \(exit 1\)") as raised:
                 stars.refresh_public_stars(self.root, output=stars.STARS, now=NOW)
         self.assertNotIn("UNALLOWLISTED", str(raised.exception))
+
+    def test_missing_cli_reports_gh_without_replacing_snapshots_or_notifications(self):
+        original = self.canonical.read_bytes()
+        questions = self.questions.read_bytes()
+        for arguments in ({"output": stars.STARS},
+                          {"state_dir": self.state, "questions": self.questions}):
+            with self.subTest(mode=next(iter(arguments))):
+                with patch.dict(os.environ, {"PATH": str(self.base / "empty-cli-path")}):
+                    with self.assertRaisesRegex(ValueError, r"GitHub CLI \(gh\) was not found on PATH"):
+                        stars.refresh_public_stars(self.root, now=NOW, **arguments)
+                self.assertEqual(self.canonical.read_bytes(), original)
+                self.assertEqual(self.questions.read_bytes(), questions)
+                self.assertFalse((self.state / stars.SNAPSHOT_NAME).exists())
+                self.assertFalse((self.state / stars.JOURNAL_NAME).exists())
 
     def test_public_endpoint_cannot_redirect_cli_or_change_api_surface(self):
         for endpoint in ("https://example.invalid/users/example/starred?per_page=100",

@@ -171,12 +171,15 @@ def _endpoint(snapshot):
 
 
 def _fetch(endpoint):
-    result = subprocess.run(
-        ["gh", "api", endpoint, "--hostname", "github.com", "--method", "GET",
-         "--paginate", "--slurp", "--header", "Accept: application/vnd.github+json",
-         "--header", "X-GitHub-Api-Version: 2022-11-28"],
-        capture_output=True, text=True, check=False,
-    )
+    try:
+        result = subprocess.run(
+            ["gh", "api", endpoint, "--hostname", "github.com", "--method", "GET",
+             "--paginate", "--slurp", "--header", "Accept: application/vnd.github+json",
+             "--header", "X-GitHub-Api-Version: 2022-11-28"],
+            capture_output=True, text=True, check=False,
+        )
+    except FileNotFoundError as error:
+        raise ValueError("GitHub CLI (gh) was not found on PATH") from error
     if result.returncode:
         # Raw stderr can carry data outside the public allowlist; do not echo it.
         raise ValueError(f"GitHub public-stars request failed (exit {result.returncode})")

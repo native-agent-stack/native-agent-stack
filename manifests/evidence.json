@@ -18672,8 +18672,8 @@
     },
     {
       "path": "docs/decisions/2026-10-10-starred-repository-convergence.md",
-      "sha256": "6abcc150ff3944650125edef7b10dcca3d8353818249f4335c0399bbbbba7bef",
-      "bytes": 8559
+      "sha256": "aa43ab648cd9a33bff4a318c83a3594a1043c8515b9b61a2a460fe8974e17015",
+      "bytes": 10821
     },
     {
       "path": "docs/decisions/2026-10-11-adjudication-omniroute-transport-binding.md",
@@ -60687,8 +60687,8 @@
     },
     {
       "path": "scripts/public_starred.py",
-      "sha256": "75dcceea00c67548307433eb3933ee481f9d0f7e8ed6724898a57ed3d12665cd",
-      "bytes": 18704
+      "sha256": "4d4df18828842909ec5d0f41bb5870bd87ab3d1f40719b3b24c2fcb200fcc2ff",
+      "bytes": 18853
     },
     {
       "path": "scripts/receipt_staleness.py",
@@ -62047,8 +62047,8 @@
     },
     {
       "path": "tests/test_public_starred.py",
-      "sha256": "6b730ccf688caac05b08edcd695b2f4b2bd1a6d6b76c3199f12632642876625b",
-      "bytes": 19886
+      "sha256": "7ca8986fbee35662b56b52e21ba81f5fc3ad1fdcf74007099fd0835a43e02e22",
+      "bytes": 20852
     },
     {
       "path": "tests/test_r3_verify.py",
@@ -62242,8 +62242,8 @@
     },
     {
       "path": "tests/test_starred_maintenance.py",
-      "sha256": "c6262fabb7a58b1d7837c9ace0c24e2f501c2835702744911888e428fd90497a",
-      "bytes": 12487
+      "sha256": "63b48e34aeff84937feda86776a94fb1e09edea41ab77afd1d5406ce59d4ec17",
+      "bytes": 12560
     },
     {
       "path": "tests/test_start_closure_sampler.py",
@@ -62927,8 +62927,8 @@
     },
     {
       "path": "tools/starred-maintenance/systemd/native-agent-newstars.service.in",
-      "sha256": "4d972baac1d5073dc9012246ce109cb8c740fa0034a8d06f7f3761f25e409d34",
-      "bytes": 632
+      "sha256": "e161a85ea3d5f66a0cb4e89e0215abfc72c5f05ca9d49ef59dc02319683b4172",
+      "bytes": 736
     },
     {
       "path": "tools/starred-maintenance/systemd/native-agent-newstars.timer.in",

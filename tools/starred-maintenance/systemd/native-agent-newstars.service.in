@@ -9,7 +9,8 @@ Type=oneshot
 UMask=0077
 NoNewPrivileges=true
 TimeoutStartSec=600
-# The public-stars builder invokes gh; match stack-currency.service's user CLI path.
-Environment=PATH=%h/.local/share/codex-ecosystem/bin:%h/.local/bin:/usr/local/bin:/usr/bin:/bin
+# The public-stars builder invokes gh through mise's documented default shims.
+# jdx/mise v2026.10.3 docs/dev-tools/shims.md (33a839a4), `mise activate --shims`.
+Environment=PATH=%h/.local/share/codex-ecosystem/bin:%h/.local/share/mise/shims:%h/.local/bin:/usr/local/bin:/usr/bin:/bin
 Environment=PYTHONDONTWRITEBYTECODE=1
 ExecStart=@EXEC_START@

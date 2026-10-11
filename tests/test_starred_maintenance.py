@@ -44,6 +44,13 @@ class StarredMaintenanceTests(unittest.TestCase):
         for setting in ["OnCalendar=weekly", "Persistent=true", "Unit=" + renderer.SERVICE]:
             self.assertIn(setting, timer.splitlines())
 
+    def test_render_includes_mise_shims_for_noninteractive_cli_lookup(self):
+        service = renderer.render_units(self.repo, self.state, self.questions)[renderer.SERVICE]
+        paths = [line.removeprefix("Environment=PATH=").split(":")
+                 for line in service.splitlines() if line.startswith("Environment=PATH=")]
+        self.assertEqual(len(paths), 1)
+        self.assertIn("%h/.local/share/mise/shims", paths[0])
+
     def test_invalid_runtime_paths_are_rejected(self):
         for value in ["relative", "~/unexpanded", "/tmp/new\nline", "/tmp/tab\tpath", "/tmp/null\0path"]:
             with self.subTest(value=repr(value)):
@@ -144,15 +151,13 @@ class StarredMaintenanceTests(unittest.TestCase):
         self.assertFalse((output / renderer.SERVICE).exists())
         self.assertFalse((self.repo / "units").exists())
 
-    @unittest.skipUnless(shutil.which("systemd-analyze") and Path("/usr/bin/python3").is_file(),
-                         "requires installed systemd-analyze and /usr/bin/python3")
+    @unittest.skipUnless(shutil.which("systemd-analyze") and shutil.which("gh")
+                         and Path("/usr/bin/python3").is_file(),
+                         "requires installed systemd-analyze, gh and /usr/bin/python3")
     def test_native_environment_finds_gh_without_interactive_shell_path(self):
-        home = self.scratch / "native home"
+        home = Path.home()
         ecosystem_bin = home / ".local" / "share" / "codex-ecosystem" / "bin"
-        ecosystem_bin.mkdir(parents=True)
-        cli = ecosystem_bin / "gh"
-        cli.write_text("#!/bin/sh\nprintf 'fixture-gh\\n'\n", encoding="utf-8")
-        cli.chmod(0o700)
+        mise_shims = home / ".local" / "share" / "mise" / "shims"
         output = self.scratch / "native environment review"
         output.mkdir()
         units = renderer.render_units(self.repo, self.state, self.questions)
@@ -173,14 +178,11 @@ class StarredMaintenanceTests(unittest.TestCase):
                  for line in (result.stdout + result.stderr).splitlines() if "Environment: PATH=" in line]
         self.assertEqual(len(paths), 1, "the rendered service must declare its own CLI PATH")
         self.assertEqual(paths[0].split(":")[0], str(ecosystem_bin))
-        sibling_path = next(line for line in (ROOT / "adoption" / "templates" / "systemd" /
-                                             "stack-currency.service").read_text(encoding="utf-8").splitlines()
-                            if line.startswith("Environment=PATH="))
-        self.assertIn(sibling_path, units[renderer.SERVICE].splitlines())
+        self.assertIn(str(mise_shims), paths[0].split(":"))
         command = subprocess.run(["gh", "--version"], capture_output=True, text=True, timeout=5,
                                  env={"PATH": paths[0], "HOME": str(home)})
         self.assertEqual(command.returncode, 0, command.stderr)
-        self.assertEqual(command.stdout, "fixture-gh\n")
+        self.assertRegex(command.stdout, r"^gh version \d+\.")
 
     @unittest.skipUnless(shutil.which("systemd-analyze") and Path("/usr/bin/python3").is_file(),
                          "requires installed systemd-analyze and /usr/bin/python3")
