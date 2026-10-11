@@ -14,6 +14,12 @@ Prose is judged one physical line at a time, a bare line break ends a unit, and 
 "Retired 2026-10-10" followed by a line that says the current default is claude-code-action pass on four surfaces). So a physical line that names a retired route says it is retired on that same line (a retirement sentence stays on
 one line, or every line of it says so); the messages of the line-judged surfaces say so. The description line of SKILL.md names the topic that invokes the skill ("Claude GitHub Actions setup"); it is pinned to
 the text the routing was measured with (DESCRIPTION_SHA256) and read as a topic, not as a route.
+
+Scope of the name patterns (the command center's adjudication of 2026-10-11, final fix round, rule 4 of its convergence ruling): the guard pins the NAMED retired artifacts and the retired slot rows, namely
+claude-code-action and anthropics/claude-code-action, claude-code-base-action, install-github-app, the @claude mention, "Claude Code GitHub Action(s)" and "Claude GitHub App", with the carrier phrases it
+already flags when the field or unit is about Claude ("in Actions", "through Actions", "under WIF", "in a GitHub workflow", "a GitHub Action"). Generic phrasing of a Claude run in a GitHub workflow that names
+none of them ("A GitHub workflow runs Claude Code to review every pull request") cannot be enumerated and is out of this guard's scope: the retirement record governs it, and review reads what the guard
+accepts. The patterns do not grow in further rounds.
 """
 
 from __future__ import annotations
@@ -80,7 +86,10 @@ def says_retired(unit: str) -> bool:
 # first version split only before a capital letter, a backtick, a bracket, a parenthesis or a hyphen, so "retired; the current default is claude-code-action" was one unit that said retired).
 # A line break ends a unit too. A comma, a colon or a dash does not: "Retired 2026-10-10: the workflows that ran claude-code-action are removed" is one claim.
 # "e.g." and "i.e." do not end a unit (the CC's Claude read of #1001 at 6e97620cd, P3-2): "retired (e.g. the workflows that ran claude-code-action are removed)" is one claim.
-SENTENCE = re.compile(r"(?<![Ee]\.g\.)(?<![Ii]\.e\.)(?<=[.;])\s+|\s*\n\s*")
+# A closing quote, parenthesis or bracket between the full stop and the white space belongs to the unit that ends (the Codex review in GitHub of #1001 at efaa077ef, P2, line 83: `The route was "retired." The
+# current default is claude-code-action.` was one unit that said retired); the curly quotes are built with chr() so that this file stays ASCII.
+CLOSERS = "\"')]" + chr(0x201D) + chr(0x2019)
+SENTENCE = re.compile(r"(?<![Ee]\.g\.)(?<![Ii]\.e\.)(?<=[.;])[" + re.escape(CLOSERS) + r"]*\s+|\s*\n\s*")
 ROW = re.compile(r"^\| \[([a-z0-9-]+)\]\(([^)]*)\) \| (.+)$")
 BULLET = re.compile(r"^- \*\*(.+?):\*\* (.*)$")
 
@@ -202,7 +211,7 @@ def index_violations(text: str) -> list[str]:
     found += [f"slots.md has more than one row for {slot_id}" for slot_id in sorted({i for i in ids if ids.count(i) > 1})]
     for slot_id, _status, default, overturn in rows:
         found += judge(f"{slot_id} index, Default", "select", default)
-        found += judge(f"{slot_id} index, Overturn when", "explain", overturn)
+        found += with_rule(judge(f"{slot_id} index, Overturn when", "explain", overturn))  # a row is one physical line: its Overturn when cell states the rule too
     found += with_rule(judge("slots.md text", "explain", [line for line in other if line.strip()]))
     return found
 
@@ -257,7 +266,7 @@ def section_violations(slot_id: str, section: str) -> list[str]:
         label, text = (bullet.group(1), bullet.group(2)) if bullet else ("line", line)
         selecting = label == "Alternatives, ranked" or (label == "Route" and not retired)
         judged = judge(f"{slot_id} page, {label}", "select" if selecting else "explain", text)
-        found += with_rule(judged) if label == "line" else judged
+        found += judged if selecting else with_rule(judged)  # every explaining unit states the rule; a selecting field does not name a unit (the command center's micro at efaa077ef, B2)
     return found
 
 
@@ -362,6 +371,12 @@ class SlotsJsonTests(unittest.TestCase):
         page = (REFERENCE / "scheduling-supervision.md").read_text(encoding="utf-8")
         self.assertIn(slot["route"], page)
         self.assertIn("GitHub Actions schedule (repository jobs; a scheduled Claude task runs locally)", page)
+        # Codex on #1001 at efaa077ef (P2, claude-native-slot-manifest.json:47): the manifest's note on the differences from its snapshot still said the route was narrowed to jobs that run no model, which
+        # the shipped route does not say; the note and the route agree.
+        manifest = json.loads((ROOT / "evidence/artifacts/claude-native-practice-20261009/claude-native-slot-manifest.json").read_text(encoding="utf-8"))
+        note = manifest["snapshot"]["current_decision_source"]["note"]
+        self.assertNotIn("jobs that run no model", note)
+        self.assertIn("GitHub Actions schedules repository jobs, Claude runs inside GitHub are retired (2026-10-10), so a scheduled Claude task runs locally", note)
 
     def test_the_retired_default_is_not_bound_to_one_repository(self):
         # The decision covers the owner's repositories; a default worded "in this repository" sent a session in another repository to conclude that the
@@ -576,9 +591,9 @@ class CheckSeesTheRowsOfBeforeTests(unittest.TestCase):
                    "- **Primary sources** (read)\n  - a source naming claude-code-action\n")
         self.assertEqual(section_violations("x", section), [
             "x page, Default selects the retired route 'claude-pr-review'",
-            "x page, Notes names the retired route 'claude-code-action' in a unit that does not say it is retired: 'Names claude-code-action.'",
+            f"x page, Notes names the retired route 'claude-code-action' in a unit that does not say it is retired: 'Names claude-code-action.' ({RULE})",
             f"x page, line names the retired route 'harness-audit' in a unit that does not say it is retired: '  continued: and harness-audit again' ({RULE})",
-            "x page, Former default (snapshot) names the retired route 'claude-code-action' in a unit that does not say it is retired: 'claude-code-action'"])
+            f"x page, Former default (snapshot) names the retired route 'claude-code-action' in a unit that does not say it is retired: 'claude-code-action' ({RULE})"])
         retired = section.replace("**Status:** default.", "**Status:** retired.")
         self.assertEqual(len(section_violations("x", retired)), 3, "a retired slot's page keeps its dated snapshot of the former default")
 
@@ -627,6 +642,45 @@ class CheckSeesTheRowsOfBeforeTests(unittest.TestCase):
                 self.assertEqual(len(units(text)), 1)
                 self.assertEqual(judge("x.notes", "explain", text), [])
         self.assertEqual(len(judge("x.notes", "explain", "It was retired e.g. last week. The default is claude-code-action.")), 1, "the sentence after an abbreviation still ends where it ends")
+
+    def test_a_closing_quote_parenthesis_or_bracket_after_the_full_stop_does_not_join_two_claims(self):
+        # The Codex review in GitHub of #1001 at efaa077ef (P2, line 83): the pattern demanded white space right after the full stop, so a closing delimiter kept the sentence that said retired
+        # and the sentence that reintroduces the route in one unit.
+        left, right = chr(0x201C), chr(0x201D)
+        for text in ('The route was "retired." The current default is claude-code-action.', "The route was (retired.) The current default is claude-code-action.",
+                     "The route was [retired.] The current default is claude-code-action.", f"The route was {left}retired.{right} The current default is claude-code-action.",
+                     "The route was 'retired.' The current default is claude-code-action.", 'The route was "retired;" the current default is claude-code-action.'):
+            with self.subTest(text=text):
+                self.assertEqual(len(units(text)), 2)
+                found = judge("x.notes", "explain", text)
+                self.assertEqual(len(found), 1, found)
+                self.assertIn("claude-code-action", found[0])
+        for text in ('The claude-code-action route was "retired." It is not selected by any row.', "claude-code-action was retired (see the record.) No row selects it."):
+            with self.subTest(accepted=text):
+                self.assertEqual(judge("x.notes", "explain", text), [])
+        self.assertEqual(len(units('retired (e.g. "the workflows that ran claude-code-action are removed.") Nothing else.')), 2)
+
+    def test_every_explaining_unit_of_a_layer_page_and_of_the_index_states_the_rule_and_a_selecting_field_does_not(self):
+        # The command center's Claude micro of #1001 at efaa077ef (B2): the module claims that the message of every line-judged surface states the rule, and the labelled bullets of a layer page and the Overturn when cell of an
+        # index row did not. A selecting field (Default, Alternatives, a live slot's Route) names no unit and states nothing.
+        section = "x\n\n**Status:** default. **Default:** d\n\n- **Notes:** Names claude-code-action.\n- **Route:** Use claude-code-action.\n"
+        found = section_violations("x", section)
+        self.assertEqual(found, [f"x page, Notes names the retired route 'claude-code-action' in a unit that does not say it is retired: 'Names claude-code-action.' ({RULE})",
+                                 "x page, Route selects the retired route 'claude-code-action'"])
+        row = "| [github-action](git-github-automation.md#github-action) | default | d | Use claude-code-action again |"
+        found = index_violations(row)
+        self.assertEqual(len(found), 1, found)
+        self.assertTrue(found[0].endswith(f"({RULE})"), found)
+
+    def test_generic_workflow_phrasing_is_out_of_scope_and_the_module_says_so(self):
+        # The command center's adjudication of 2026-10-11 on the Codex review in GitHub of #1001 at efaa077ef (P2, line 48): workflow-first phrasing that names none of the retired artifacts is a follow-up
+        # and the class closes (rule 4 of its convergence ruling). The boundary is pinned so that a later pattern round has to reopen it deliberately, with new primary evidence.
+        for text in ("A GitHub workflow runs Claude Code to review every pull request.", "The GitHub Actions workflow invokes Claude for PR review"):
+            with self.subTest(text=text):
+                self.assertEqual(judge("x.default", "select", text), [])
+                self.assertEqual(judge("x.notes", "explain", text), [])
+        self.assertIn("is out of this guard's scope", " ".join(__doc__.split()))
+        self.assertIn("The patterns do not grow in further rounds.", " ".join(__doc__.split()))
 
     def test_a_bare_line_break_ends_a_unit_on_every_surface_and_the_rule_is_in_the_message(self):
         # The command center's ruling at ef3f3e7bf (correction #160) and its micro (P2-1): the run-on below passed on four prose surfaces when wrapped lines were joined. It fails on all of them again, as do the "." and ";" forms;

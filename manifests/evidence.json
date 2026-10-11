@@ -20052,8 +20052,8 @@
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/claude-native-slot-manifest.json",
-      "sha256": "f29c9706d5d0a863b6c43b2e5df05cd400857f81abd6b4817748c5a10aab58ae",
-      "bytes": 237763
+      "sha256": "3e42e2c0a65845eccd91fc323df4ad490319d51960cb85c332d549b9348131a6",
+      "bytes": 237873
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/fresh-session.json",
@@ -61027,8 +61027,8 @@
     },
     {
       "path": "tests/test_native_practice_retired_routes.py",
-      "sha256": "8216518fe53b81541c7887e87a7c85ebd15b5759e82fd2cc8941b1b6367d9724",
-      "bytes": 57023
+      "sha256": "0c16e824c79fdacb055617f62a8e0f1172840e346cc251687132f6a0872b9741",
+      "bytes": 63074
     },
     {
       "path": "tests/test_native_practice_snapshot_provenance.py",
