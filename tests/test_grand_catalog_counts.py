@@ -9,9 +9,12 @@ import hashlib
 import io
 import json
 from pathlib import Path
+from collections import Counter, defaultdict
 import subprocess
 import tarfile
 import tempfile
+import os
+import sys
 import unittest
 
 from tests.local_pages_architecture_policy_fixture import G5
@@ -108,6 +111,58 @@ class GrandCatalogCountsTests(unittest.TestCase):
         self.assertEqual(self.output.read_bytes(), original)
         checked = self.run_exporter("--check")
         self.assertEqual(checked.returncode, 0, checked.stderr)
+
+    @unittest.skipUnless(os.name == "posix", "real partial-write injection requires POSIX RLIMIT_FSIZE")
+    def test_real_partial_write_failure_preserves_previous_snapshot_and_cleans_temp_file(self):
+        written = self.run_exporter("--write")
+        self.assertEqual(written.returncode, 0, written.stderr)
+        original = self.output.read_bytes()
+        previous_entries = set(self.output.parent.iterdir())
+        child = (
+            "import resource,signal,runpy,sys; "
+            "signal.signal(signal.SIGXFSZ, signal.SIG_IGN); "
+            "resource.setrlimit(resource.RLIMIT_FSIZE,(512,512)); "
+            "sys.argv=sys.argv[1:]; runpy.run_path(sys.argv[0],run_name='__main__')"
+        )
+        result = subprocess.run([sys.executable, "-c", child, str(SCRIPT), "--root", str(self.root),
+                                 "--state-root", str(self.state), "--write"],
+                                capture_output=True, text=True, timeout=30)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("no snapshot written", result.stderr)
+        self.assertEqual(self.output.read_bytes(), original)
+        self.assertEqual(set(self.output.parent.iterdir()), previous_entries)
+        self.assertEqual(json.loads(self.output.read_bytes())["counts"]["rows"], 3)
+        self.assertNotIn(str(self.state), result.stderr)
+
+    def test_replace_failure_preserves_snapshot_and_cleans_completed_temporary_file(self):
+        result = self.run_exporter("--write")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        original = self.output.read_bytes()
+        previous_entries = set(self.output.parent.iterdir())
+        child = (
+            "import runpy,sys,os; from unittest.mock import patch; "
+            "sys.argv=sys.argv[1:]; "
+            "guard=patch.object(os,'replace',side_effect=OSError('private-fixture-location')); "
+            "guard.start(); runpy.run_path(sys.argv[0],run_name='__main__')"
+        )
+        result = subprocess.run([sys.executable, "-c", child, str(SCRIPT), "--root", str(self.root),
+                                 "--state-root", str(self.state), "--write"],
+                                capture_output=True, text=True, timeout=30)
+        self.assertEqual(result.returncode, 1)
+        self.assertEqual(self.output.read_bytes(), original)
+        self.assertEqual(set(self.output.parent.iterdir()), previous_entries)
+        self.assertNotIn("private-fixture-location", result.stderr)
+
+    def test_corrupt_decoder_error_is_redacted_and_preserves_previous_snapshot(self):
+        result = self.run_exporter("--write")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        previous = self.output.read_bytes()
+        self.asset.write_bytes(b"not a zstd stream")
+        result = self.run_exporter("--write")
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("grand catalog source could not be read", result.stderr)
+        self.assertNotIn(str(self.state), result.stderr)
+        self.assertEqual(self.output.read_bytes(), previous)
 
     def test_index_keys_use_the_final_stack_repository_identity(self):
         result = self.run_exporter("--write")
@@ -218,6 +273,52 @@ class GrandCatalogCountsTests(unittest.TestCase):
         self.assertIn("source-policy grant", result.stderr)
         self.assertNotIn(str(other), result.stderr)
         self.assertFalse(self.output.exists())
+
+
+class CommittedSnapshotTests(unittest.TestCase):
+    def test_committed_snapshot_semantics_match_historical_rows_with_the_documented_layer_delta(self):
+        from scripts import grand_catalog_counts as producer
+        catalog_bytes = (ROOT / SOURCE).read_bytes()
+        catalog = json.loads(catalog_bytes)
+        snapshot = json.loads((ROOT / OUTPUT).read_bytes())
+        rows = catalog["rows"]
+        totals = Counter(row["disposition"] for row in rows)
+        self.assertEqual(len(rows), 4606)
+        self.assertEqual(snapshot["counts"]["by_disposition"], dict(totals))
+        self.assertEqual(snapshot["counts"]["rows"], len(rows))
+        self.assertEqual(snapshot["source"]["catalog_sha256"], hashlib.sha256(catalog_bytes).hexdigest())
+        self.assertEqual(snapshot["source"]["asset_binding_sha256"],
+                         hashlib.sha256((ROOT / ASSET_SOURCE).read_bytes()).hexdigest())
+        by_layer = defaultdict(Counter)
+        repositories = defaultdict(set)
+        missing = 0
+        for row in rows:
+            by_layer[row["slot"]][row["disposition"]] += 1
+            pin = row.get("pin") if isinstance(row.get("pin"), dict) else {}
+            repository = (producer._reader._repo(row.get("repository_or_entry"))
+                          or producer._reader._repo(pin.get("repository_or_source")))
+            if repository:
+                repositories[producer.normalize_repository("https://github.com/" + repository)].add(row["disposition"])
+            else:
+                missing += 1
+        self.assertEqual(snapshot["by_repository"], {key: sorted(values) for key, values in repositories.items()})
+        self.assertEqual((snapshot["counts"]["repositories"], snapshot["counts"]["rows_without_repository"]),
+                         (2974, missing))
+        self.assertEqual(missing, 34)
+        self.assertEqual(sum(len(values) > 1 for values in repositories.values()), 208)
+        self.assertEqual(sum("PENDING" in values for values in repositories.values()), 2718)
+        by_layer["agent-sdks"]["TRIAL"] += 1
+        by_layer["instructions-skills"]["TRIAL"] -= 1
+        expected_layers = {key: {"rows": sum(values.values()),
+                                 "by_disposition": {d: values[d] for d in DISPOSITIONS}}
+                           for key, values in by_layer.items()}
+        self.assertEqual(snapshot["counts"]["by_layer"], expected_layers)
+        self.assertEqual(sum(row["rows"] for row in expected_layers.values()), 4606)
+
+    def test_snapshot_exclusion_provenance_hash_is_bound_to_committed_bytes(self):
+        policy = json.loads((ROOT / "tools/local-pages/source_policy.json").read_bytes())
+        entry = next(row for row in policy["architecture_derivation_sources"] if row["path"] == OUTPUT)
+        self.assertEqual(entry["sha256"], hashlib.sha256((ROOT / OUTPUT).read_bytes()).hexdigest())
 
 
 if __name__ == "__main__":

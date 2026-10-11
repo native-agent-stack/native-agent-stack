@@ -18757,8 +18757,8 @@
     },
     {
       "path": "docs/grand-catalog-counts.md",
-      "sha256": "2e7b51d3845cfb1b938d577606775a250e4fe51356c0b7d8545220c63f5eeb37",
-      "bytes": 4305
+      "sha256": "958304dcb7a5f9eb26327d4a55bbafbdba3d1fbea7311ce30fe7b3fb4ee9b098",
+      "bytes": 5836
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -18767,8 +18767,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "769a0439d785db37c70775f302186f2bdde674e07d5b72ee99a7e3d836a6b4dd",
-      "bytes": 258086
+      "sha256": "ac7d4e04cc111f4b4c335a65faaa69d5ce3925842cb00b44809b99263993ad21",
+      "bytes": 258821
     },
     {
       "path": "docs/harness-rule-enforcement.md",
@@ -56292,8 +56292,8 @@
     },
     {
       "path": "evidence/artifacts/w4-grand-catalog-counts-20261011/receipt.json",
-      "sha256": "e07f2ae96f36e3575f87034c0f4a4af4494154cf04537c2677e56504b67d2f46",
-      "bytes": 12169
+      "sha256": "3de4cb7155fa30296f1c1e05923131f44a0479bb3a0021a96900ea31af84b262",
+      "bytes": 14901
     },
     {
       "path": "evidence/artifacts/workstation-lane-20260925/nemotron-qualification/model_card_check.py",
@@ -59882,8 +59882,8 @@
     },
     {
       "path": "scripts/grand_catalog_counts.py",
-      "sha256": "6713cbaaefdf5f29b4b7a5910e6c103e89f56a434defac5a3c41452e76ed1edf",
-      "bytes": 7589
+      "sha256": "4441b4c4dcc09626550aea587a7f6b1b73e4356bfa58dfe8a91d01f8b7b48778",
+      "bytes": 8358
     },
     {
       "path": "scripts/hardware_profile.py",
@@ -60777,8 +60777,8 @@
     },
     {
       "path": "tests/test_grand_catalog_counts.py",
-      "sha256": "d61f1d4c22b288e3fca2246b0ecefab00ee24c6bb616f5a0cc207572a0b96d1c",
-      "bytes": 11794
+      "sha256": "1f72ebd0a2a75238d59d36f20a96841c3dcd2370b5ab9d37ea71e180d4a2d308",
+      "bytes": 17791
     },
     {
       "path": "tests/test_grand_dashboard.py",

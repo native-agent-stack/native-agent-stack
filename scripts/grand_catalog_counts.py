@@ -13,10 +13,12 @@ from collections import Counter, defaultdict
 import hashlib
 import importlib.util
 import json
+import os
 from pathlib import Path
 import re
 import subprocess
 import sys
+import tempfile
 from tarfile import TarError
 
 
@@ -120,7 +122,20 @@ def main(argv=None) -> int:
         path = args.root / OUTPUT
         if args.write:
             path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_text(text, encoding="utf-8")
+            temporary_path = None
+            try:
+                with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", dir=path.parent,
+                                                 prefix="." + path.name + ".", suffix=".tmp", delete=False) as temporary:
+                    temporary_path = Path(temporary.name)
+                    temporary.write(text)
+                    temporary.flush()
+                    os.fsync(temporary.fileno())
+                # CPython v3.13.16 Doc/library/os.rst, os.replace: successful
+                # replacement is atomic; a sibling keeps both paths on one filesystem.
+                os.replace(temporary_path, path)
+            finally:
+                if temporary_path is not None:
+                    temporary_path.unlink(missing_ok=True)
         elif not path.is_file() or path.read_bytes() != text.encode("utf-8"):
             print(f"{OUTPUT} differs; run python3 scripts/grand_catalog_counts.py --write on the host", file=sys.stderr)
             return 1

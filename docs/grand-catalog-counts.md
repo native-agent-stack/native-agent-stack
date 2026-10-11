@@ -15,13 +15,14 @@ python3 scripts/grand_catalog_counts.py --check
 The asset defaults to `_FINAL_ASSET` under
 `~/.local/state/native-agent-stack`. `--state-root` and `--asset` can select an
 equivalent retained location inside the existing policy; neither adds a grant.
-CI verifies the committed snapshot's evidence binding. It does not need the
+CI verifies the committed snapshot's evidence binding and offline historical-row
+reconciliation, including the documented two-layer TRIAL delta. It does not need the
 host archive or run either producer mode against private state. The unit tests
 use temporary roots and synthetic archives.
 
 The existing architecture supplement policy excludes this derived file before
 content access, with pinned SHA256 provenance in `architecture_derivation_sources`.
-The native `scripts/local_pages_policy_grants.py` proposal at
+The native [`inventory_paths` (:46) / `proposal` (:109-135)](https://github.com/seathatflowsinourveins/native-agent-stack/blob/a62abff1f6137eb5e81e2e775365980d704fe338/scripts/local_pages_policy_grants.py#L46-L135) at
 `a62abff1f6137eb5e81e2e775365980d704fe338` adds one exact repository
 inventory grant for `scripts/grand_catalog_counts.py`, taking the reviewed set
 from 90 to 91. It adds no host asset or supplement read grant and does not treat
@@ -70,3 +71,22 @@ changed, unreadable or unapproved assets and reconciliation failures return
 nonzero without replacing the previous snapshot. Re-register the snapshot and
 changed owned files through `scripts/host_receipts.py::register_file` before
 running FULL `python3 scripts/validate.py`.
+
+Writes use a unique temporary sibling, flush the Python file buffer, call
+`os.fsync`, close the completed file and then `os.replace` the destination.
+The temporary file is removed on failure, preserving the previous snapshot.
+This follows the installed CPython 3.13.16 contract:
+[`fsync`](https://docs.python.org/release/3.13.16/library/os.html#os.fsync) and
+[`replace`](https://docs.python.org/release/3.13.16/library/os.html#os.replace),
+also pinned at `python/cpython@cbc944f4bc59639a444dd971c737788ba2283a91`,
+`Doc/library/os.rst:1108-1115,2754-2760`. The sibling path keeps replacement on
+one filesystem. A real POSIX file-size-limit regression forces a partial write;
+the previous bytes survive and no temporary output remains. A separate failed
+replace and corrupt-decoder control cover adjacent cleanup/redaction behavior.
+
+One step wider, the only new production writer in this PR is this exporter;
+the optional `_g5` callback remains a read-only stream consumer. Fixture writers
+target temporary test roots. Native evidence registration is an unchanged
+repository helper, not another modified production writer in this PR. The
+final-stack v1 generator currently records grand-count intake as UNREPORTED;
+consumers integrate this file through their own acceptance contracts.

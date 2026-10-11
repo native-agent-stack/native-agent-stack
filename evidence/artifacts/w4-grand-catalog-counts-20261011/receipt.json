@@ -216,5 +216,44 @@
       ]
     },
     "usage": {"provider_tokens": null, "model_runs": 0}
+  },
+  "atomic_snapshot_correction": {
+    "reviewed_head": "7b94cc96976e2175541617412e1083fc705d669f",
+    "review_verdict_sha256": "931e11add013cbf4c2c87b24561ae6b8ff1e6050a2a9ca1918cfc964d31c7b45",
+    "source": {
+      "repository": "https://github.com/python/cpython",
+      "version": "v3.13.16",
+      "pin": "cbc944f4bc59639a444dd971c737788ba2283a91",
+      "file": "Doc/library/os.rst:1108-1115,2754-2760",
+      "official_documentation": "https://docs.python.org/release/3.13.16/library/os.html#os.replace"
+    },
+    "failed_first": {
+      "command": "python3 -B -m unittest -v tests.test_grand_catalog_counts.GrandCatalogCountsTests.test_real_partial_write_failure_preserves_previous_snapshot_and_cleans_temp_file",
+      "exit_code": 1,
+      "returned_summary": "Ran 1 test in 0.423s; FAILED (failures=1)",
+      "condition": "real child RLIMIT_FSIZE=512 with SIGXFSZ ignored truncates the previous snapshot on direct write"
+    },
+    "fixed_control": {
+      "exit_code": 0,
+      "returned_summary": "Ran 1 test in 0.421s; OK",
+      "observed": "previous snapshot byte-identical, valid JSON and directory entries unchanged"
+    },
+    "tests": {
+      "command": "python3 -B -m unittest -v tests.test_grand_catalog_counts",
+      "exit_code": 0,
+      "returned_summary": "Ran 17 tests in 5.382s; OK",
+      "skips": 0,
+      "scope": "synthetic retained-asset controls, real kernel write failure, replacement error and corrupt decoder; offline committed historical rows/provenance assertions"
+    },
+    "snapshot_bytes_unchanged": true,
+    "scoped_dependency_gate": {
+      "command": "python3 -B -m unittest tests.test_grand_catalog_counts tests.test_local_pages_policy_grants tests.test_evidence_manifest tests.test_adoption_docs_consistency tests.test_upstream_surface_watch plus all 15 tests.test_local_pages_architecture_* modules",
+      "exit_code": 0,
+      "returned_summary": "Ran 378 tests in 40.851s; OK (skipped=7)",
+      "skips": "existing optional documentation/upstream-surface fixtures; atomic and offline snapshot controls ran"
+    },
+    "adjacent_writer_check": "Only new production writer is the exporter; the changed reader callback does not overwrite files. Other PR writes are temporary fixture setup or unchanged native evidence registration.",
+    "completeness_critic": "Partial write and failed replacement preserve the last valid snapshot and clean temporary files; successful repeat exports and drift refusal retain existing controls. Offline CI semantics explicitly account for the one TRIAL row's historical two-layer delta. Filesystem atomic replacement is distinct from power-loss durability of the parent directory.",
+    "usage": {"provider_tokens": null, "model_runs": 0}
   }
 }
