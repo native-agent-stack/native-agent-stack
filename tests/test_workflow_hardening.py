@@ -206,12 +206,20 @@ class HardenRunnerTests(unittest.TestCase):
 
 RETIRED_CLAUDE_WORKFLOWS = ("claude-pr-review.yml", "claude-pr-toolkit-review.yml", "harness-audit.yml")
 RETIRED_ENVIRONMENT = "claude-review"
+# What a job's environment can be, by the sources (read 2026-10-11T00:44Z):
+# - GitHub, Workflow syntax, `jobs.<job_id>.environment`
+#   (https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#jobsjob_idenvironment):
+#   "only the environment `name`, or ... an environment object with the `name` and `url`", so a scalar or a mapping's
+#   `name`.
+# - YAML 1.2.2 (https://yaml.org/spec/1.2.2/): a mapping in block style (8.2.2 Block Mappings) or flow style (7.4.2 Flow
+#   Mappings), a key plain or quoted (7.3 Flow Scalar Styles), and a comment after a value (6.6 Comments). These are
+#   the forms ENVIRONMENT_FORMS covers; PyYAML 6.0.3, the parser the cross-check uses, reads each the same way.
 
 
 def job_environments(text):
-    """{job_id: environment name or None}: a job's `environment:` as a scalar, or its mapping's `name` in a one-line flow
-    or a block form, quoted or not, with a comment after the key. A text reading, so it needs no YAML library. It does
-    not read a comment line before `name:` at the job's own indentation or a flow mapping spread over several lines;
+    """{job_id: environment name or None}: a job's `environment:` as a scalar, or its mapping's `name` in a one-line
+    flow or a block form, quoted or not, with a comment after the key. A text reading, so it needs no YAML library.
+    It does not read a comment line before `name:` at the job's own indentation or a flow mapping spread over lines;
     test_the_environment_reading_matches_yaml_when_available compares it with PyYAML on every job; the hosted runner
     has PyYAML, so CI runs that comparison (it passed, not skipped, in validate run 38084944806)."""
     names = {}
@@ -308,6 +316,54 @@ class InGitHubClaudeReviewRetiredTests(unittest.TestCase):
                 name = parsed.get("name") if isinstance(parsed, dict) else parsed
                 with self.subTest(workflow=path.name, job=job_id):
                     self.assertEqual(job_environments(text).get(job_id), name)
+
+RETIREMENT_RECORD = ROOT / "docs/decisions/2026-10-10-retire-in-github-claude-review.md"
+
+
+def git(*args):
+    return subprocess.run(["git", *args], cwd=ROOT, capture_output=True, text=True, check=False)
+
+
+def inverse_pin(text):
+    """The commit the retirement record's inverse restores the workflows from (its step 1)."""
+    inverse = text.split("## Inverse", 1)[1].split("\n## ", 1)[0]
+    pins = re.findall(r"`([0-9a-f]{40})`", inverse)
+    return pins[0] if len(pins) == 1 else None
+
+
+class RetirementInversePinTests(unittest.TestCase):
+    """The record's inverse must name #968's merge commit, the last commit with the three workflows. Needs the
+    repository's history: it is skipped, with the reason, in a checkout without it (CI clones with fetch-depth 0)."""
+
+    def setUp(self):
+        if git("rev-parse", "--is-inside-work-tree").stdout.strip() != "true":
+            self.skipTest("not a git worktree")
+        if git("rev-parse", "--is-shallow-repository").stdout.strip() == "true":
+            self.skipTest("shallow clone: #968's commit may be absent")
+
+    def pin_holds(self, sha):
+        """None when sha is #968's merge commit holding the three retired workflows, else what is wrong."""
+        if git("cat-file", "-e", f"{sha}^{{commit}}").returncode != 0:
+            return "no such commit"
+        if "(#968)" not in git("log", "-1", "--format=%s", sha).stdout:
+            return "not #968's merge commit"
+        missing = [name for name in RETIRED_CLAUDE_WORKFLOWS
+                   if git("cat-file", "-e", f"{sha}:.github/workflows/{name}").returncode != 0]
+        return f"missing {missing}" if missing else None
+
+    def test_the_inverse_names_968s_merge_commit_with_the_three_workflows(self):
+        sha = inverse_pin(RETIREMENT_RECORD.read_text(encoding="utf-8"))
+        self.assertIsNotNone(sha, "the inverse names exactly one full commit")
+        self.assertIsNone(self.pin_holds(sha))
+
+    def test_the_former_pin_is_refused(self):
+        # The record's first inverse named a commit that does not exist (the command center's micro at 48e4bd35).
+        self.assertEqual(self.pin_holds("9d4c00cd0e1e74e81d79fc3f9e9cfd4cfb6c42f8"), "no such commit")
+        record = RETIREMENT_RECORD.read_text(encoding="utf-8")
+        with_former = record.replace("9d4c00cd05d79b3fd5074df2e46bacab87ee67ff",
+                                     "9d4c00cd0e1e74e81d79fc3f9e9cfd4cfb6c42f8")
+        self.assertIsNotNone(self.pin_holds(inverse_pin(with_former)))
+
 
 class ScorecardTests(unittest.TestCase):
     text = (WORKFLOWS / "scorecard.yml").read_text(encoding="utf-8")

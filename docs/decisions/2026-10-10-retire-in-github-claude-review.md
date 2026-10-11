@@ -88,6 +88,15 @@ Any revisit trigger above, with a measured successful hosted run.
 
 ## SOTA sources
 
+- GitHub Docs, Workflow syntax for GitHub Actions, `jobs.<job_id>.environment`,
+  <https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#jobsjob_idenvironment> (read 2026-10-11T00:44Z; page sha256
+  `a5f79ab5ead969939f973c1ab3a8dc4c39e41733d53935557dd8e3c771185dd8`, 2,095,606 bytes): a job's environment is "only
+  the environment `name`, or ... an environment object with the `name` and `url`". The retirement guard reads both.
+- YAML 1.2.2, <https://yaml.org/spec/1.2.2/> (read 2026-10-11T00:44Z; page sha256
+  `2fe1bf40792df22ef8b8a5972a34c48e639969222e0bbae605aa9bb2ca85e9ab`, 383,078 bytes): 8.2.2 Block Mappings, 7.4.2 Flow
+  Mappings, 7.3 Flow Scalar Styles (quoted keys) and 6.6 Comments, the forms of the guard's regression cases; PyYAML
+  6.0.3 is the parser its cross-check uses.
+
 - anthropics/claude-code-action at `2dca132ff0e0c4094ce6048b422c6915a071210b` (v1.0.247),
   `base-action/src/parse-sdk-options.ts:283-284`: "Set the entrypoint for Claude Code to identify this as the GitHub
   Action" and `env.CLAUDE_CODE_ENTRYPOINT = "claude-code-github-action"`.

@@ -18587,8 +18587,8 @@
     },
     {
       "path": "docs/decisions/2026-10-10-retire-in-github-claude-review.md",
-      "sha256": "327989084c5fb141e7795afbf44c26356bf8a32636aec1e2f775009f25a02e1c",
-      "bytes": 6524
+      "sha256": "87b570e15761a534b54a37ca101a03837cff31b641f0a9a998161d05d2c630d0",
+      "bytes": 7346
     },
     {
       "path": "docs/decisions/2026-10-10-retire-macos-ci.md",
@@ -61512,8 +61512,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "7b25377ac005733d351ef5a7942e97b3e3a8cf52b21e4c7b74f403cd088f4b85",
-      "bytes": 139130
+      "sha256": "2d6fafd9110ebffae6d95db2005d5914e332ccf600cd0ed0e6d58001adf99e21",
+      "bytes": 142341
     },
     {
       "path": "tests/test_workflow_policy.py",
