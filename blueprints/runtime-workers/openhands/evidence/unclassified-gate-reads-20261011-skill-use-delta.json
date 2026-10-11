@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "kind": "gate_read_accounting_delta",
+  "date": "2026-10-11",
+  "source_commit": "d96a26575a1bdddf810734d045f12c26abe7f304",
+  "baseline_path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261004.json",
+  "baseline_sha256": "3fe9bc2e0d2bafec7b1c6b214be9b59c8fe19ebaa771eda72343cac87bbb9578",
+  "mode": "monitoring_only",
+  "added_by_script": {
+    "scripts/skills_status.py": 10
+  },
+  "removed_by_script": {},
+  "added_shapes": [
+    {
+      "script": "scripts/skills_status.py",
+      "shape": [
+        "/*"
+      ],
+      "count": 1
+    }
+  ],
+  "removed_shapes": [],
+  "added_locations": [
+    "scripts/skills_status.py:223",
+    "scripts/skills_status.py:346",
+    "scripts/skills_status.py:347",
+    "scripts/skills_status.py:348",
+    "scripts/skills_status.py:352",
+    "scripts/skills_status.py:604",
+    "scripts/skills_status.py:612",
+    "scripts/skills_status.py:614",
+    "scripts/skills_status.py:682",
+    "scripts/skills_status.py:785"
+  ],
+  "derived_count": 332,
+  "derivation": {
+    "source": "blueprints/runtime-workers/openhands/resolver/push_gate.py:derive_ci_protected at d96a26575a1bdddf810734d045f12c26abe7f304",
+    "replay": "python3 -m unittest discover -s tests -p test_runtime_worker_openhands_push_gate.py",
+    "method": "RepositoryWorkflowTests.derived() uses GitTree(HEAD) and derive_ci_protected. Compare unclassified locations by script and shapes by (script, shape), as the regression guard does. Retain the historical test_catalogs.py correction and original receipt.",
+    "interpretation": "Monitoring accounting only. No protection, permission, execution or worker deployment is added by this delta."
+  }
+}

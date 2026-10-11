@@ -240,7 +240,7 @@ def _skill_usage(data):
     host = report.get("host")
     host_rows = []
     for row in host if isinstance(host, list) else []:
-        wiring = "wired, no demand" if row.get("wiring") == "wired" and row.get("claude_uses_lifetime") == 0 else row.get("wiring")
+        wiring = "zero calls; check wiring" if row.get("claude_uses_lifetime") == 0 else row.get("wiring")
         host_rows.append('<tr><th scope="row">' + text(row.get("name")) + '</th>' +
                          ''.join('<td>' + number(row.get(key)) + '</td>' for key in
                                  ("claude_uses_lifetime", "codex_use", "codex_skill_md_reads", "codex_name_mentions")) +

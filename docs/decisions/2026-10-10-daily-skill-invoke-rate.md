@@ -133,8 +133,9 @@ typesafe-ai, security-best-practices and security-threat-model each invoked
 names/counts and dispositions. The private summary's SHA-256 is
 `36b7e6b39df077def1d5ce2408fc079d6d313f3d01a4fc8d7bb184f01f0662dc`.
 It is a real native trigger observation for explicit task prompts, not a
-general success-rate estimate. The page labels zero baseline use on the six
-as wired, no demand; their descriptions and routes are unchanged.
+general success-rate estimate. Zero baseline use on the six means zero
+observed calls and a reason to check wiring; it does not establish absence
+of demand. Their descriptions and routes are unchanged.
 
 The original [Cloudflare description](https://github.com/cloudflare/security-audit-skill/blob/c1c8a8c1471069fb0e188eeaff69b8e8db6564a8/skills/security-audit/SKILL.md#L3)
 is pinned at `c1c8a8c1471069fb0e188eeaff69b8e8db6564a8`.
@@ -145,12 +146,12 @@ bytes is an authored description that names vulnerability/injection review and
 directs an immediate `security-audit` Skill call before code exploration.
 Native visibility settings cannot override vendor description text. This
 project skill is an authored invocation cue, not a replacement of the vendor
-skill. The final hermetic comparison below establishes its measured scope;
-future observations can reject or refine it.
+skill. The same-checkout hermetic ablation below supplies its primary measured
+effect size; future observations can reject or refine it.
 
 Earlier non-hermetic observations motivated the wording change but are not
-used as the final matched comparison. Loading after exploration differs from
-loading before it; the hermetic table reports both invocation and turn one.
+used as the primary matched comparison. Loading after exploration differs from
+loading before it; the ablation reports both invocation and turn one.
 The explicit trigger/exclusion phrasing follows the sibling descriptions at
 `openai/skills@49f948faa9258a0c61caceaf225e179651397431`:
 [security-best-practices](https://github.com/openai/skills/blob/49f948faa9258a0c61caceaf225e179651397431/skills/.curated/security-best-practices/SKILL.md#L3)
@@ -171,9 +172,58 @@ not semantic selection. Native CC-owned AFTER observations are recorded below;
 the expanded case file remains unchanged for reruns. Optional post-install
 personal profile read-back remains explicitly unmeasured here.
 
-## Final hermetic trigger comparison
+## Primary effect size: same-checkout hermetic ablation
 
-The final comparison is the CC-owned native run completed 2026-10-10
+The primary effect size comes from the CC-owned one-switch ablation: 128
+sessions, 64 per arm, on one checkout and one HEAD, with only the inline
+skillOverrides.native-skill-routing setting changing between on and off.
+Claude Code 2.1.296/claude-opus-5-5 used the same explicit-task synthetic
+v4 prompts and three turns per session. The cue was listed in 64/64 on
+sessions and 0/64 off sessions; all eight retained receipt/summary hashes
+were independently checked against their files. The 128 receipts are
+hermetic with no memory markers or other-case prompt leaks.
+
+Primary state-root citation, rehashed for this method correction:
+
+- ~/.local/state/native-agent-stack/research/cc-native-practice-20261009/trigger-cases-20261010/ABLATION-TABLE.md:
+  2724 bytes, SHA-256
+  770555cb65e58c0143991faf6220bf3c29e78cec671e2e274e48effd5304e179.
+
+| Same-HEAD observation | Cue hidden | Cue with exclusion listed |
+| --- | ---: | ---: |
+| security-audit, five phrasings, turn one | 13/20 | 20/20 |
+| security-audit, five phrasings, invoked within three turns | 17/20 | 20/20 |
+| security-best-practices indirect, turn one | 8/12 | 12/12 |
+| security-best-practices indirect, invoked | 12/12 | 12/12 |
+| security-audit capture of the indirect sibling request | 0/12 | 0/12 |
+| Explicit sibling request, invoked and turn one | 4/4 | 4/4 |
+| Near-miss negatives, any skill invoked | 0/28 | 0/28 |
+
+The primary security-audit turn-one effect is 13/20 to 20/20, a 35 percentage
+point observed increase, Fisher two-sided p=0.008. Invocation within three
+turns rises from 17/20 to 20/20, Fisher two-sided p=0.23. The indirect sibling's
+turn-one result is 8/12 to 12/12, Fisher two-sided p=0.09; it is a small-sample
+observation rather than a precise estimate. The cue with the exclusion and its measured
+conclusion stand: all twenty audit positives invoke in turn one, the sibling
+is not captured on these indirect requests, and no near-miss fires.
+
+The CC's 2026-10-10 21:22Z method ruling identifies HEAD-subject priming in
+the git-status context. Its reported stale-tree control fired 7/8 under a
+retirement-related subject versus 2/11 under its own subjects. These control
+counts explain the method correction; they are not the cue's effect estimate.
+The earlier three-arm study has different HEAD subjects, so its effect size
+is overstated and it is retained only as supporting evidence below. Hermetic
+memory isolation alone does not control this source of priming.
+
+Future A/B measurements must be hermetic and share one HEAD, toggling
+skillOverrides on the same checkout. If a tree-switch control requires an
+empty commit, use the same subject in both arms; never let differing commit
+subjects enter the git-status context. Record HEAD/subject equivalence with
+the invocation receipts.
+
+## Supporting three-arm comparison: HEAD-subject confound
+
+The supporting comparison is the CC-owned native run completed 2026-10-10
 17:59–18:13Z: 64 sessions per arm, 192 total, Claude Code 2.1.296 and
 claude-opus-5-5, three turns per session. The three arms are no cue at
 60004bb1dd581e00e3303c54d93435bb72f76952, the original cue at
@@ -182,7 +232,7 @@ ef43fdc1f64e444922676b0b1788dcabaf2dd30e. The native runner's process-tree
 memory-hook isolation left host files/settings, plugins, skills and other
 hooks unchanged.
 
-Primary state-root citations, independently rehashed before publication:
+Supporting state-root citations, independently rehashed before publication:
 
 - ~/.local/state/native-agent-stack/research/cc-native-practice-20261009/trigger-cases-20261010/HERMETIC-TABLE.md:
   3541 bytes, SHA-256
@@ -208,25 +258,26 @@ content is copied here.
 | Explicit sibling request, invoked and turn one | 4/4 | 4/4 | 4/4 |
 | Near-miss negatives, any skill invoked | 0/28 | 0/28 | 0/28 |
 
-Security-audit turn-one Fisher two-sided p is 0.0004 for no cue versus either
-cue and 1.0 for original versus excluded cue. Invocation p is 0.008 for no cue
-versus either cue. The exclusion preserves the full observed gain in these
-sessions. The indirect sibling's turn-one comparison is p=0.0003 for new versus
-no cue and p=0.005 for new versus original.
+These counts remain supporting observations. The arms differ by HEAD subject,
+so the three-arm gain and its statistical comparisons do not supply the primary
+effect size. The same-checkout ablation above controls that context and is the
+comparison used for the 13/20 to 20/20 turn-one estimate.
 
 The Final section also pools every measurement set of the indirect sibling
 request: original-cue capture is 5/25 versus no-cue 0/25, Fisher p=0.050, and
 exclusion capture is 0/22 versus original-cue p=0.052. The sibling is invoked
 in turn one in 22/22 exclusion runs. This pool includes the earlier
 non-hermetic sets; it is separate from the hermetic 2/12 versus 0/12 capture
-comparison above. Taken as measured, the original cue captured about one in
-five of those pooled requests and the exclusion removes that observed capture.
-These finite counts do not establish a zero population risk or a precise
-organic capture rate. The initial 3/3 and settling 0/10 interpretations are
-superseded by the final comparison and explicitly labeled pool.
+comparison above. The original cue captured about one in five of those pooled
+requests and no capture was observed in the exclusion runs. The pool is
+descriptive support across measurement sets with context confounds, not a
+same-HEAD estimate of the exclusion's isolated effect. These finite counts do
+not establish a zero population risk or a precise organic capture rate. The
+initial 3/3 and settling 0/10 interpretations are superseded by the primary
+ablation and the explicitly qualified supporting results.
 
-The exclusion is therefore supported on this evidence, rather than described
-only as a precaution. Its sentence names secure-defaults/best-practices
+The cue and exclusion remain supported on the stated evidence. The exclusion
+sentence names secure-defaults/best-practices
 guidance for a design or endpoint and preserves audit, penetration-test and
 exploitability triggers. No further executable change is needed. Naming
 security-best-practices in the always-listed description is a possible
@@ -244,8 +295,128 @@ The earlier v4 memory exposure was unequal: BEFORE 66/72 and AFTER 39/72.
 The previous equal-exposure assertion was wrong, and the earlier v4 arms are
 not cited as comparable evidence. Intermediate non-hermetic tables, the
 settling result and their changing interpretations remain in the native
-research record for audit history; the table above supplies this decision's
-primary comparison.
+research record for audit history. The same-checkout ablation supplies this
+decision's primary effect size; the three-arm table is supporting only.
+
+## 2026-10-11 policy and integration correction
+
+The previous on-listed ceiling was 11000 characters. This decision explicitly
+raises both `trial.on_description_char_cap` and `budget.claude_on_cap` to
+12000; describing that value as already existing was incorrect.
+The repository's `scripts.skills_status.budget_report` derives
+11791 Unicode description characters with the installed official
+claude-api row, 1068 more than the 10723
+characters for the other selected rows. The old ceiling cannot contain that
+measured sum. The new ceiling retains the directive to list model-invocable
+skills while accounting for the separately tracked native plugin. It is a
+repository policy ceiling, not a measured client context budget; the Claude
+listing fraction remains the existing 0.05. The trial now links to this dated
+decision. A future increase requires another dated rationale and recalculation
+with `budget_report`, not an unexplained edit to the ceiling.
+
+The bundled claude-api duplicate reason remains applicable. The pinned
+[Claude Code changelog](https://github.com/anthropics/claude-code/blob/2301018b1f61073c501a8e7a4813ef48c239163b/CHANGELOG.md)
+adds `/claude-api` in 2.1.69 and updates it for Managed Agents in 2.1.290.
+Registering the already-installed marketplace plugin supplies identity, age
+and invocation measurement for the trial; it does not prove an advantage over
+that bundled skill. A future capability decision needs a matched same-HEAD
+comparison with the bundled baseline. The manifest retains that duplicate
+rationale instead of treating registration as evidence that the duplicate
+ceased to exist.
+
+A lifetime count of zero is zero observed calls and a reason to check wiring.
+The fleet view now says “zero calls; check wiring” for that count regardless of
+a prior wiring-receipt label. Missing counts remain unknown and positive
+counts retain their receipt status. Neither zero use nor a synthetic wiring
+receipt with an unreported hermetic condition establishes absence of demand.
+The revised display regression failed before the renderer change.
+
+The central claude-api selection now serves the skills-implement sweep task
+exactly once, with a native-client comparison requirement. It is explicitly
+excluded from the frozen runtime-worker deployment through an
+`adoption_ref`, a dated reason and an overturn condition. Existing worker
+grants and source pins are preserved.
+
+All shifted registrations were derived, not guessed. The architecture pin
+locators use `tests.test_architecture_pin_source.expected_ranges`; the surface
+watch locator uses its `DispositionCitationTests.has_token` identity check.
+The pinned `scripts.local_pages_policy_grants.proposal` at
+`90fab198098ef103b95c409c287f03ce5bd22f52` derives 93 exact
+repository grants and one addition:
+`.claude/skills/native-skill-routing/SKILL.md`. The policy grants only that
+reviewed path, retaining exact set equality.
+
+The native push-gate derivation at that same source commit adds
+10 unclassified
+`scripts/skills_status.py` reads and
+1 read shape.
+The dated accounting delta
+`blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261011-skill-use-delta.json`
+records the actual locations, script and shape changes, source commit and
+original receipt hash. The original receipt remains intact. The guard still
+compares every script count, every read-shape multiplicity and the total
+(332), as well as its existing protection bounds.
+This is monitoring accounting; it grants no new read or execution authority.
+
+The architecture locator changes also invalidate the source digest embedded
+in the generated WSL handbook. Its existing stale-output regression failed
+after those changes. The supported
+`python3 scripts/build_new_wsl_handbook.py --write` command regenerates both
+outputs; its native `digest` function supplies their updated receipt hashes.
+The source is `scripts/build_new_wsl_handbook.py` at 90fab198, built from
+`scripts/build_ecosystem.py` at 20ea4ae23a18565676823b9e3a23541c2100bb39.
+This refresh changes source-digest metadata, not handbook recommendations.
+
+The focused local replay at 90fab198 reproduced nine failures across eight
+test methods with no import errors. The same methods pass on the repaired
+tree, together with all 13 fleet-view tests (21 methods in the combined
+replay). The two architecture rows below are independent failing subtests
+of the same method. These are local repository regression checks, not new
+native model measurements.
+
+| Regression method or subtest | 90fab198 | Repaired tree |
+| --- | --- | --- |
+| RuntimeWorkerManifestTests.test_contract_rejects_a_future_main_skill_in_neither_set | fail | pass |
+| RuntimeWorkerManifestTests.test_contract_survives_main_reordering_its_skills | fail | pass |
+| RuntimeWorkerManifestTests.test_every_adoption_skill_is_reused_or_explicitly_excluded | fail | pass |
+| CatalogTests.test_every_pinned_skill_serves_exactly_one_task | fail | pass |
+| RepositoryWorkflowTests.test_advisory_baseline_and_explicit_categories_stay_bounded_on_this_repository | fail | pass |
+| PolicyGrantDerivation.test_committed_repository_grants_match_current_git_inventory_paths | fail | pass |
+| DispositionCitationTests.test_every_cited_line_names_the_key, PostToolUseFailure | fail | pass |
+| ArchitecturePinSourceTests.test_all_line_citations_identify_the_winners_pin_fields, openai/skills | fail | pass |
+| ArchitecturePinSourceTests.test_all_line_citations_identify_the_winners_pin_fields, typesafe-ai/skills | fail | pass |
+
+## 2026-10-11 landing integration
+
+The CC-cued landing base is `16f0a1f751e24934dd3351386a84c302656c1848`. The
+earlier 93-grant proposal at 90fab198 is historical: main's
+`scripts/secret_scan_metrics.py` and this PR's
+`.claude/skills/native-skill-routing/SKILL.md` both belong in the
+integrated selector. The policy test's own `inventory_paths` derivation
+now returns 94 paths, exactly equal to the 94 reviewed repository
+grants with no missing or extra path. The fixed count assertion follows that
+native derivation.
+
+After the single rebase, the push-gate tool was rerun at
+`d96a26575a1bdddf810734d045f12c26abe7f304`, the completed rebased source snapshot,
+retained locally as `backup/pr970-d96a2657-native-derivation-20261011`.
+The delta's `source_commit` and source citation now name that snapshot.
+Native `RepositoryWorkflowTests.derived()` / `derive_ci_protected`
+again returns 332 unclassified reads, with
+10 added
+`scripts/skills_status.py` reads and
+1 added shape against the retained
+baseline; the unchanged counts are reproduced results, not a copied
+expectation. The last rebased commit folds in the regenerated accounting
+and registry metadata; the source snapshot remains available for replay.
+
+The native handbook `--write`, `render` and `digest` APIs regenerate
+the integrated outputs and receipt. Native `register_file` and
+`evidence_manifest --write` preserve the cued main's registrations and
+non-files fields while registering this PR's final bytes. No generated
+value is entered by hand. The earlier wording that inferred demand from
+zero calls is corrected throughout this record: zero calls require checking
+wiring and do not establish absence of demand.
 
 Listing cost remains 267 Unicode characters for the original cue and 362 for
 the excluded cue, an increase of 95. This project-scoped description is listed

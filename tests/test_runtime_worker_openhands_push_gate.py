@@ -9,6 +9,7 @@ not upstream acceptance, and nothing reaches GitHub. Owner names and paths are f
 
 import contextlib
 from collections import Counter
+from hashlib import sha256
 import fnmatch
 import importlib.util
 import inspect
@@ -1245,6 +1246,11 @@ class RepositoryWorkflowTests(unittest.TestCase):
         print(json.dumps({"advisory_gate_reads": self.g.advisory_gate_reads([derived])}, sort_keys=True))
         baseline = json.loads((ROOT / "blueprints/runtime-workers/openhands/evidence/"
                                "unclassified-gate-reads-20261004.json").read_text())
+        delta = json.loads((ROOT / "blueprints/runtime-workers/openhands/evidence/"
+                            "unclassified-gate-reads-20261011-skill-use-delta.json").read_text())
+        self.assertEqual(sha256((ROOT / delta["baseline_path"]).read_bytes()).hexdigest(),
+                         delta["baseline_sha256"])
+        self.assertEqual(delta["mode"], "monitoring_only")
         def scripts(locations):
             return Counter(location.rsplit(":", 1)[0] for location in locations)
 
@@ -1256,10 +1262,22 @@ class RepositoryWorkflowTests(unittest.TestCase):
         baseline_scripts = scripts(baseline["unclassified"])
         self.assertNotIn("tests/test_catalogs.py", baseline_scripts)
         self.assertEqual(derived.files.get("tests/test_catalogs.py"), "ci_discovered")
+        # The dated delta comes from the same native derivation at its recorded
+        # source commit. Preserve exact script, read-shape and total comparisons;
+        # line movement alone still does not change this monitoring contract.
+        baseline_scripts.update(delta["added_by_script"])
+        baseline_scripts.subtract(delta["removed_by_script"])
+        baseline_shapes = shapes_by_script(baseline["unclassified_shapes"])
+        def delta_shapes(rows):
+            return Counter({(row["script"], tuple(row["shape"])): row["count"] for row in rows})
+        baseline_shapes.update(delta_shapes(delta["added_shapes"]))
+        baseline_shapes.subtract(delta_shapes(delta["removed_shapes"]))
         self.assertEqual(scripts(advisory.unclassified), baseline_scripts)
-        self.assertEqual(shapes_by_script(advisory.unclassified_shapes),
-                         shapes_by_script(baseline["unclassified_shapes"]))
-        self.assertEqual(len(advisory.unclassified), baseline["count"])
+        self.assertEqual(shapes_by_script(advisory.unclassified_shapes), baseline_shapes)
+        expected_count = (baseline["count"] + sum(delta["added_by_script"].values())
+                          - sum(delta["removed_by_script"].values()))
+        self.assertEqual(len(advisory.unclassified), expected_count)
+        self.assertEqual(expected_count, delta["derived_count"])
         self.assertNotIn("", derived.prefixes)
         self.assertTrue(all(self.g.gate_reads.static_dir(pattern) for pattern in derived.globs), derived.globs)
         protected = self.g.Protected([derived], self.g.policy_tests(tree))

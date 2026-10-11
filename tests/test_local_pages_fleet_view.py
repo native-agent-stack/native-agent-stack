@@ -30,8 +30,28 @@ class FleetViewTests(unittest.TestCase):
         self.assertIn("Claude uses (lifetime)", html)
         self.assertIn("Codex SKILL.md reads", html)
         self.assertIn("Native Skill calls", html)
-        self.assertIn("wired, no demand", html)
+        self.assertIn("zero calls; check wiring", html)
         self.assertIn("UNKNOWN", html)
+
+    def test_zero_skill_calls_require_a_wiring_check_for_every_receipt_status(self):
+        for wiring in ("wired", "untested", None):
+            with self.subTest(wiring=wiring):
+                data = fixture()
+                data["skill_usage"] = {"host": [{"name": "gh-fix-ci", "claude_uses_lifetime": 0,
+                                                "wiring": wiring}]}
+                html = view.render(data)
+                self.assertIn("zero calls; check wiring", html)
+                self.assertNotIn("no demand", html)
+
+    def test_nonzero_and_unmeasured_skill_calls_preserve_the_receipt_status(self):
+        for uses in (1, None):
+            with self.subTest(uses=uses):
+                data = fixture()
+                data["skill_usage"] = {"host": [{"name": "gh-fix-ci", "claude_uses_lifetime": uses,
+                                                "wiring": "wired"}]}
+                html = view.render(data)
+                self.assertIn("<td>wired</td>", html)
+                self.assertNotIn("zero calls; check wiring", html)
 
     def test_unknown_fast_map_preserves_running_tier_without_default_inference(self):
         data = fixture()

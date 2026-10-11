@@ -27,6 +27,7 @@
     "window_days": 30,
     "review_after": "2026-10-25",
     "on_description_char_cap": 12000,
+    "on_description_char_cap_decision": "docs/decisions/2026-10-10-daily-skill-invoke-rate.md#2026-10-11-policy-and-integration-correction",
     "prune_rule": "A trial skill installed for at least window_days with zero invocations in the last window_days is a prune candidate: the review keeps it or removes it through a dated decision record. Zero use no longer demotes a listing: under the user's 2026-09-30 directive every model-invocable skill stays listed so the model can invoke it. Kept verdict winners change status only through a verdict re-record, and their listing only through a dated decision record.",
     "confound": "name-only and user-invocable-only listings depress proactive invocation; compare only within a listing state.",
     "measurement": {
@@ -880,7 +881,7 @@
     {
       "skills": "pdf, docx, xlsx, pptx",
       "source": "anthropics/skills",
-      "reason": "Document skill duplicates; the official claude-api plugin is now registered separately at its installed immutable pin for the 30-day trial.",
+      "reason": "Document skill duplicates; the bundled claude-api skill remains the duplicate-capability baseline (anthropics/claude-code@2301018b1f61073c501a8e7a4813ef48c239163b CHANGELOG.md, releases 2.1.69 and 2.1.290). The installed marketplace claude-api plugin is separately tracked at its immutable pin for the 30-day trial; its registration is a measurement exception, not evidence of an advantage over the bundled skill.",
       "overturn": "Never while the native copies exist."
     },
     {
