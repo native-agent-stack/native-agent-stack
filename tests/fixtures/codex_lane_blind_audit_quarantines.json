@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "source": "wave-20261010/tier1/codex-lane-collect-20261010/work/codex/blind-audit.json",
+  "allowed_roots": [
+    "/tmp/ns2604-tier1-codex-ready-20261010-OWFxvw/staged/export/foundation",
+    "/tmp/ns2604-tier1-codex-ready-20261010-OWFxvw/work/packets"
+  ],
+  "cases": {
+    "document-retrieval": {
+      "command": "/bin/bash -lc \"python3 - <<'PY'\nimport json\nfrom pathlib import Path\nfor p in [\\\"evidence/receipts/component-history.json\\\",\\\"blueprints/us-equities/retrieval-evaluation/fixture.json\\\"]:\n    if not Path(p).is_file():print('MISSING',p);continue\n    d=json.loads(Path(p).read_text());print('\\\\nFILE',p)\n    if p.endswith('component-history.json'):\n        def walk(v,parts):\n            if isinstance(v,dict):\n                cid=str(v.get('component',''))+' '+str(v.get('component_id',''))+' '+str(v.get('id',''))+' '+str(v.get('name',''))\n                if any(x in cid.lower() for x in ['context-hub','context hub']):\n                    print('/'.join(parts),json.dumps(v,indent=2));return\n                for k,w in v.items():\n                    if 'context-hub' in k.lower() or 'context hub' in k.lower():\n                        print('/'.join(parts+[k]),json.dumps(w,indent=2))\n                    else:walk(w,parts+[k])\n            elif isinstance(v,list):\n                for i,w in enumerate(v):walk(w,parts+[str(i)])\n        print('TOP FIELDS',list(d.keys()));walk(d,[])\n    else:print(json.dumps(d,indent=2))\np='evidence/artifacts/landscape-sweep-foundation-tier1-20261010/child-usage.json'\nd=json.loads(Path(p).read_text());print('\\\\nFILE',p)\nprint('MEASUREMENT',json.dumps({k:d.get('measurement',{}).get(k) for k in ['tool','exit_code','note']}))\nu=d.get('child_usage',{})\nprint('STATUS',u.get('status'))\nfor child in u.get('children',[]):\n    if 'document-retrieval' in child.get('label',''):\n        print('DOCUMENT CHILD',json.dumps({k:child.get(k) for k in ['label','complete','web_search','lanes'] if k\"'!='\"'lanes'}))\nPY\"",
+      "original_reasons": ["names the filesystem root /"]
+    },
+    "git-github-automation": {
+      "command": "/bin/bash -lc \"rg --files blueprints evidence/artifacts evidence/receipts | rg '(git|diff|worktrunk|portable|wsl-native-tools|foundation-rd)'\"",
+      "original_reasons": ["runs git"]
+    },
+    "mcp-surfaces": {
+      "command": "/bin/bash -lc \"python3 - <<'PY'\nimport pathlib,json\nf='evidence/artifacts/landscape-sweep-foundation-tier1-20261010/child-usage.json'\nd=json.loads(pathlib.Path(f).read_text())\nprint('PATH:',f)\nprint(json.dumps({'measurement':d['measurement'],'child_usage':{k:d['child_usage'][k] for k in ['status','reason']}},indent=2))\nprint('MCP-surface child usage metadata:')\nfor x in d['child_usage'].get('children',[]):\n if 'mcp-surfaces' in x.get('label',''):\n  print(json.dumps({k:x.get(k) for k in ['label','requested_model','resolved_models','efforts','requests','complete','return_quality']},indent=2))\np=pathlib.Path('recipes/README.md')\nlines=p.read_text().splitlines()\nprint('PATH:',str(p))\nfor i,s in enumerate(lines):\n if 'awesome-mcp' in s.lower() or 'mcp-inspector' in s.lower() or ('| \"'`mcporter`'\"' in s): print(str(i+1)+': '+s)\nPY\"",
+      "original_reasons": ["command substitution"]
+    },
+    "workers": {
+      "command": "/bin/bash -lc \"python3 - <<'PY'\nimport json, hashlib\nfrom pathlib import Path\npacket=Path('/tmp/ns2604-tier1-codex-ready-20261010-OWFxvw/work/packets/foundation__workers.json')\ndata=packet.read_bytes()\np=json.loads(data)\nprint('packet_sha256',hashlib.sha256(data).hexdigest())\nrefs={r for c in p['candidates'] if c['adopted'] for r in c['evidence_refs']}\nfor ref in sorted(refs):\n    if '://' in ref:\n        print('EXTERNAL',ref)\n        continue\n    path=Path(ref)\n    print(path.stat().st_size if path.exists() else 'MISSING',ref)\nPY\"",
+      "command_sha256": "e0a1545f442ee7e61efce64a9a7371073e1d22489cd7cf25e346e55e9be58a58",
+      "original_reasons": ["path outside the repository and packets: //"]
+    }
+  }
+}

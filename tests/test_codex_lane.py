@@ -20,6 +20,7 @@ import re
 import shlex
 import shutil
 import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -75,6 +76,20 @@ def canned_return(**overrides):
     }
     row.update(overrides)
     return row
+
+
+def audit_with_fixture_cwd(events_path, allowed_roots, tools=codex_lane.AUDIT_TOOLS):
+    """Command-only fixture oracle with independent synthetic cwd records; never restamp real streams."""
+    rows = [json.loads(line) for line in events_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    records = {}
+    for index, row in enumerate(rows):
+        item = row.get("item", {})
+        if row.get("type") == "item.completed" and item.get("type") == "command_execution":
+            identity = f"synthetic-cwd-{index}"
+            item["id"] = identity
+            records[identity] = {"command": item["command"], "cwd": str(allowed_roots[0])}
+    events_path.write_text("".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8")
+    return codex_lane.blind_audit(events_path, allowed_roots, tools, cwd_records=records)
 
 
 CANNED_EVENTS = "\n".join([
@@ -191,7 +206,8 @@ class CodexLaneTests(CodexLaneFixture):
         self.assertIn("--sandbox", printed)
         self.assertIn("read-only", printed)
         self.assertIn("--skip-git-repo-check", printed)
-        self.assertIn("--ephemeral", printed)
+        # Verdict runs retain native command cwd history in their fresh scratch home.
+        self.assertNotIn("--ephemeral", printed)
         self.assertIn("--output-schema", printed)
         self.assertIn("model_reasoning_effort=max", printed)
         # Nothing written: not even the codex/ directory.
@@ -426,8 +442,12 @@ class CodexLaneTests(CodexLaneFixture):
         events_path = self.work_dir / "codex" / "events" / "foundation__native-clients.jsonl"
         self.assertTrue(events_path.exists())
         captured = events_path.read_text(encoding="utf-8")
-        first_event = CANNED_EVENTS.strip().splitlines()[0]
-        self.assertIn(first_event, captured, "partial output of a timed-out attempt must be kept, not discarded")
+        partial_payload = CANNED_EVENTS.strip().splitlines()[2]
+        self.assertIn(partial_payload, captured, "partial output of a timed-out attempt must be kept, not discarded")
+        threads = [event["thread_id"] for event in codex_lane.parse_events(captured)
+                   if event.get("type") == "thread.started"]
+        self.assertEqual(len(threads), 2)
+        self.assertEqual(len(set(threads)), 2, "each timed-out child retains its own native thread identity")
 
     def test_layers_filter_only_runs_the_selected_layer(self):
         self.write_packet("foundation", "layer-a")
@@ -720,8 +740,10 @@ class BlindIsolationTests(CodexLaneFixture):
         entry = audit["layers"]["foundation__native-clients"]
         self.assertEqual((entry["web_search"], entry["mcp_tool_calls"], entry["commands"]), (1, 1, 9))
         flagged = {item["command"]: item["reasons"] for item in entry["flagged_commands"]}
-        self.assertEqual(len(flagged), 7, flagged)
-        self.assertFalse(any("catalogs/landscape/foundation.json" in command for command in flagged), flagged)
+        # Exec JSONL does not retain native cwd; even otherwise approved operands require that evidence.
+        self.assertEqual(len(flagged), 9, flagged)
+        self.assertTrue(all(any("working directory unverified" in reason for reason in reasons)
+                            for reasons in flagged.values()), flagged)
         joined = " ".join(reason for reasons in flagged.values() for reason in reasons)
         for expected in ("home-relative path: ~/code/agent-lab/docs/tasks", "home-relative path: $HOME/code/agent-lab/docs/x.md",
                          "path climbs out of the working directory: ../../agent-lab/docs", "runs sqlite3",
@@ -736,7 +758,7 @@ class BlindIsolationTests(CodexLaneFixture):
         events = self.work_dir / "audit-events.jsonl"
         events.write_text("".join(json.dumps({"type": "item.completed", "item": {
             "type": "command_execution", "command": command}}) + "\n" for command in commands), encoding="utf-8")
-        report = codex_lane.blind_audit(events, [str(self.repo), str(self.work_dir / "packets")])
+        report = audit_with_fixture_cwd(events, [str(self.repo), str(self.work_dir / "packets")])
         return {item["command"]: [reason.split(": ", 1)[1] for reason in item["reasons"]
                                   if reason.startswith("path outside")]
                 for item in report["flagged_commands"]}
@@ -767,7 +789,7 @@ class BlindIsolationTests(CodexLaneFixture):
         events = self.work_dir / "audit-events.jsonl"
         events.write_text(json.dumps({"type": "item.completed", "item": {
             "type": "command_execution", "command": command}}) + "\n", encoding="utf-8")
-        report = codex_lane.blind_audit(events, [str(self.repo), str(self.work_dir / "packets")])
+        report = audit_with_fixture_cwd(events, [str(self.repo), str(self.work_dir / "packets")])
         return [reason for item in report["flagged_commands"] for reason in item["reasons"]]
 
     def test_round_two_audit_gaps_are_flagged(self):
@@ -789,10 +811,645 @@ class BlindIsolationTests(CodexLaneFixture):
         }
         for command, reason in expected.items():
             self.assertIn(reason, self.audit_reasons(command), command)
-        for command in ("/bin/bash -lc 'cd catalogs && ls'", "/usr/local/bin/rg -n x catalogs",
-                        "/usr/sbin/tool x", "/sbin/tool x", "/bin/bash -lc 'for f in a b; do cat $f; done'"):
+        self.assertIn("working directory changed by cd; command unverified",
+                      self.audit_reasons("/bin/bash -lc 'cd catalogs && ls'"))
+        for command in ("/usr/local/bin/rg -n x catalogs",
+                        "/usr/sbin/tool x", "/sbin/tool x", "/bin/bash -lc 'cat a; cat b'"):
             self.assertEqual(self.audit_reasons(command), [], command)
+        # The parser cannot resolve an iteration variable into a bounded read operand.
+        self.assertTrue(self.audit_reasons("/bin/bash -lc 'for f in a b; do cat $f; done'"))
 
+
+
+class LiteralBoundaryRegressionTests(unittest.TestCase):
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        self.base = Path(temporary.name).resolve()
+        self.repo = self.base / "export"
+        self.packets = self.base / "packets"
+        self.repo.mkdir()
+        self.packets.mkdir()
+
+    def audit_python(self, code):
+        self.assertIsNone(codex_lane.audit_analysis_issue(), "literal tests require the verified parser")
+        command = shlex.join(["/bin/bash", "-lc", "python3 -c " + shlex.quote(code)])
+        events = self.base / "literal-events.jsonl"
+        events.write_text(json.dumps({"type": "item.completed", "item": {
+            "type": "command_execution", "command": command}}) + "\n", encoding="utf-8")
+        return audit_with_fixture_cwd(events, [str(self.repo), str(self.packets)])
+
+    def test_outside_literals_at_read_interfaces_do_not_depend_on_a_fixed_call_list(self):
+        cases = {
+            "linecache": "import linecache;linecache.getline('../codex/foundation__x.json',1)",
+            "sqlite": "import sqlite3;sqlite3.connect('/var/lib/x')",
+            "fileio": "import io;io.FileIO('/etc/passwd')",
+            "fileinput": "import fileinput;fileinput.input(files='/etc/passwd')",
+            "copyfile": "import shutil;shutil.copyfile('/etc/passwd','evidence/copy')",
+            "getsize": "import os;os.path.getsize('/etc/passwd')",
+            "pandas": "import pandas;pandas.read_json('/srv/x')",
+            "walk_root": "import os;list(os.walk('/'))",
+        }
+        for interface, code in cases.items():
+            with self.subTest(interface=interface):
+                self.assertTrue(self.audit_python(code)["flagged_commands"], "an unproven outside literal must be refused")
+
+    def test_proven_print_formatting_and_comparison_literals_remain_data(self):
+        cases = [
+            "print('/etc/passwd')",
+            "print('/'.join(['a','b']))",
+            "import json;print(json.dumps({'reference':'/etc/passwd'},indent=2))",
+            "if '://' in 'file:///outside/file':\n print('external')",
+        ]
+        for code in cases:
+            with self.subTest(data_use=code):
+                self.assertEqual(self.audit_python(code)["flagged_commands"], [])
+
+    def test_data_operations_do_not_prove_unknown_or_mutated_calls_safe(self):
+        cases = [
+            "import sqlite3;sqlite3.connect('/'.join(['','var','lib','x']))",
+            "print=open;print('/etc/passwd')",
+            "def print(value):\n return value\nprint('/etc/passwd')",
+            "import json;setattr(json,'dumps',open);print(json.dumps('/etc/passwd'))",
+            "import sqlite3;path='/var/lib/x';sqlite3.connect(path)",
+        ]
+        for code in cases:
+            with self.subTest(unproven_use=code):
+                self.assertTrue(self.audit_python(code)["flagged_commands"], "data must not launder an outside literal")
+
+    def test_bytes_literals_at_read_interfaces_remain_subject_to_the_boundary(self):
+        # CPython v3.13.16 filesystem APIs accept bytes paths. The command auditor
+        # must inspect their AST constants before any payload could execute.
+        cases = {
+            "fileio": "import io;io.FileIO(b'../codex/foundation__x.json')",
+            "getsize": "import os;os.path.getsize(b'/etc/passwd')",
+            "copyfile": "import shutil;shutil.copyfile(b'/etc/passwd','evidence/copy')",
+            "sqlite": "import sqlite3;sqlite3.connect(b'/var/lib/x.db')",
+            "mixed_str_bytes": "import shutil;shutil.copyfile('evidence/input',b'/etc/passwd')",
+            # These native APIs reject the wrappers, but an unsupported wrapper
+            # must not hide its outside byte literal from conservative analysis.
+            "bytearray": "import io;io.FileIO(bytearray(b'../codex/foundation__x.json'))",
+            "memoryview": "import os;os.path.getsize(memoryview(b'/etc/passwd'))",
+        }
+        for interface, code in cases.items():
+            with self.subTest(interface=interface):
+                self.assertTrue(self.audit_python(code)["flagged_commands"],
+                                "an outside byte literal must not bypass the command boundary")
+
+    def test_printed_and_joined_bytes_literals_remain_data(self):
+        for code in ("print(b'/etc/passwd')", "print(b'/'.join([b'evidence',b'receipt']))",
+                     "print(b'/etc/passwd'.decode())", "print(b'/etc/passwd'.hex())",
+                     "if b'://' in b'file:///synthetic/outside': print('external')"):
+            with self.subTest(data_use=code):
+                self.assertEqual(self.audit_python(code)["flagged_commands"], [])
+
+    def test_bytes_decode_cannot_send_boundary_literals_to_codec_callbacks(self):
+        self.install_reader_callbacks()
+        cases = {
+            "codec_search": "import codecs\nfrom reader_codec import search\n"
+                            "codecs.register(search)\nprint(b'../outside-marker.txt'.decode('rd'))",
+            "custom_error": "import codecs\nfrom reader_codec import handler\ncodecs.register_error('rd',handler)\n"
+                            "print(b'../outside-marker.txt\\xff'.decode('utf-8','rd'))",
+            "overridden_strict": "import codecs\nfrom reader_codec import handler\ncodecs.register_error('strict',handler)\n"
+                                 "print(b'../outside-marker.txt\\xff'.decode())",
+        }
+        for case, code in cases.items():
+            with self.subTest(callback=case):
+                self.assert_callback_reads_fixture(code)
+                self.assertTrue(self.audit_python(code)["flagged_commands"],
+                                "decode must not carry outside bytes into registered codec callbacks")
+
+    def test_unknown_comparison_dunders_do_not_receive_boundary_literals(self):
+        self.install_reader_callbacks()
+        cases = {
+            "str_eq": "from reader_codec import P\n"
+                      "print('../outside-marker.txt' == P())",
+            "bytes_eq": "from reader_codec import P\n"
+                        "print(b'../outside-marker.txt' == P())",
+            "contains": "from reader_codec import P\n"
+                        "print('../outside-marker.txt' in P())",
+        }
+        for case, code in cases.items():
+            with self.subTest(callback=case):
+                self.assert_callback_reads_fixture(code)
+                self.assertTrue(self.audit_python(code)["flagged_commands"],
+                                "unknown comparison dunders can receive the path literal")
+
+    def test_import_free_decode_checks_pin_the_callback_boundary(self):
+        for code in ("print(b'../outside-marker.txt'.decode('rd'))",
+                     "print(b'../outside-marker.txt\\xff'.decode())"):
+            with self.subTest(code=code):
+                self.assertTrue(self.audit_python(code)["flagged_commands"])
+        self.assertEqual(self.audit_python("print(b'../outside-marker.txt'.decode())")["flagged_commands"], [])
+
+    def test_import_free_comparisons_pin_the_dunder_boundary(self):
+        for literal in ("'../outside-marker.txt'", "b'../outside-marker.txt'"):
+            for operator in ("==", "in"):
+                code = "x = object(); print(" + literal + " " + operator + " x)"
+                with self.subTest(code=code):
+                    self.assertTrue(self.audit_python(code)["flagged_commands"])
+        self.assertEqual(self.audit_python("ref = object(); print('://' in ref)")["flagged_commands"], [])
+
+    def test_json_sort_keys_refuses_unknown_key_comparisons(self):
+        code = ("import json\nclass K:\n def __lt__(self, other):\n  print(other); return False\n"
+                "print(json.dumps({'../outside-marker.txt':1, K():2}, sort_keys=True, skipkeys=True))")
+        self.assertTrue(self.audit_python(code)["flagged_commands"])
+        for code in ("import json; print(json.dumps({'../outside-marker.txt':1}, sort_keys=True))",
+                     "import json; print(json.dumps({'nested':{'../outside-marker.txt':1}}, sort_keys=True))"):
+            with self.subTest(primitive_keys=code):
+                self.assertEqual(self.audit_python(code)["flagged_commands"], [])
+
+    def install_reader_callbacks(self):
+        # Only this temporary synthetic sibling is read; no system or user file is opened.
+        (self.base / "outside-marker.txt").write_text("OUTSIDE_MARKER")
+        (self.repo / "reader_codec.py").write_text(
+            "import codecs\n"
+            "def read(path):\n with open(path) as handle: print(handle.read())\n"
+            "def decode(raw, errors='strict'):\n read(bytes(raw)); return ('read',len(raw))\n"
+            "def search(name):\n return codecs.CodecInfo(name='rd',encode=None,decode=decode) if name=='rd' else None\n"
+            "def handler(error):\n read(error.object[:-1]); return ('',len(error.object))\n"
+            "class P:\n"
+            " def __eq__(self,path):\n  read(path); return True\n"
+            " def __contains__(self,path):\n  read(path); return True\n")
+
+    def assert_callback_reads_fixture(self, code):
+        result = subprocess.run([sys.executable, "-E", "-s", "-B", "-c", code], cwd=self.repo,
+                                capture_output=True, text=True, timeout=10)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("OUTSIDE_MARKER", result.stdout)
+
+
+class NativeUsageSuffixTests(unittest.TestCase):
+    def setUp(self):
+        self.prefix = b'{"catalog":"foundation","layer":"previous","attempt":1,"exit_code":0}\n'
+        self.native_bytes = (ROOT / "tests" / "fixtures" / "codex_lane_workers_native_usage.jsonl").read_bytes()
+        self.native = json.loads(self.native_bytes)
+
+    def test_the_real_native_workers_row_uses_layer_and_keeps_recorded_attempt_metadata(self):
+        self.assertEqual(hashlib.sha256(self.native_bytes).hexdigest(),
+                         "890024fb9b1387a0f53fddb9af5c9bb551dacbc855f46cd9dbb08c6e3ac0f13f")
+        with self.subTest(boundary="native-layer-predicate"):
+            self.assertTrue(codex_lane.usage_row_belongs_to_layer(self.native, "workers"))
+        with self.subTest(boundary="appended-native-usage"):
+            rows = codex_lane.layer_usage_suffix(self.prefix, self.prefix + self.native_bytes, "workers")
+            self.assertEqual(rows, [self.native])
+            self.assertEqual(rows[0]["seconds"], 358.707)
+            self.assertEqual(rows[0]["exit_code"], 0)
+            self.assertEqual(rows[0]["input_tokens"], 871007)
+            self.assertEqual(rows[0]["cached_input_tokens"], 749568)
+            self.assertEqual(rows[0]["output_tokens"], 16500)
+            self.assertEqual(rows[0]["reasoning_output_tokens"], 6793)
+
+    def test_a_changed_prefix_or_invalid_native_suffix_is_refused(self):
+        invalid = {
+            "changed-prefix": b"changed\n" + self.native_bytes,
+            "legacy-layer-id-only": self.prefix + b'{"layer_id":"workers"}\n',
+            "another-layer": self.prefix + b'{"layer":"other"}\n',
+            "non-object": self.prefix + b'[]\n',
+            "malformed-json": self.prefix + b'{invalid}\n',
+            "partial-final-row": self.prefix + self.native_bytes.rstrip(b"\n"),
+        }
+        for case, current in invalid.items():
+            with self.subTest(case=case):
+                with self.assertRaises(ValueError):
+                    codex_lane.layer_usage_suffix(self.prefix, current, "workers")
+        self.assertFalse(codex_lane.usage_row_belongs_to_layer({"layer_id": "workers"}, "workers"))
+        self.assertFalse(codex_lane.usage_row_belongs_to_layer({"layer": "other"}, "workers"))
+
+    def test_no_new_usage_rows_is_a_valid_stopped_run_observation(self):
+        self.assertEqual(codex_lane.layer_usage_suffix(self.prefix, self.prefix, "workers"), [])
+
+
+class ApprovedPacketSnapshotTests(unittest.TestCase):
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        self.base = Path(temporary.name).resolve()
+        self.packets = self.base / "packets"
+        self.packets.mkdir()
+        self.path = self.packets / "foundation__workers.json"
+        self.packet_bytes = (ROOT / "tests" / "fixtures" / "codex_lane_approved_packet.json").read_bytes()
+        self.packet = json.loads(self.packet_bytes)
+        self.path.write_bytes(self.packet_bytes)
+        self.recorded_hash(self.packet_bytes)
+
+    def recorded_hash(self, data):
+        (self.packets / "SHA256SUMS").write_text(hashlib.sha256(data).hexdigest() + "  foundation__workers.json\n",
+                                                encoding="utf-8")
+
+    def load(self, path=None, expected_sha256=None):
+        return codex_lane._load_approved_packet_json(str(path or self.path), [str(self.packets)], expected_sha256)
+
+    def test_a_snapshot_needs_a_recorded_or_explicit_matching_digest(self):
+        self.assertEqual(self.load(), self.packet)
+        (self.packets / "SHA256SUMS").unlink()
+        self.assertIsNone(self.load())
+        self.assertEqual(self.load(expected_sha256=hashlib.sha256(self.packet_bytes).hexdigest()), self.packet)
+        self.assertIsNone(self.load(expected_sha256="0" * 64))
+
+    def test_malformed_or_wrong_shaped_data_remains_unapproved(self):
+        wrong = {**self.packet, "candidates": [{"adopted": "true", "evidence_refs": ["evidence/receipt.json"]}]}
+        for data in (b"not-json", json.dumps(wrong).encode("utf-8")):
+            with self.subTest(data_kind="malformed" if data == b"not-json" else "wrong-shape"):
+                self.path.write_bytes(data)
+                self.recorded_hash(data)
+                self.assertIsNone(self.load())
+
+    def test_an_oversized_valid_packet_remains_unapproved_even_with_a_matching_digest(self):
+        data = json.dumps({**self.packet, "padding": "x" * (1024 * 1024)}).encode("utf-8")
+        self.assertGreater(len(data), 1024 * 1024)
+        self.path.write_bytes(data)
+        self.recorded_hash(data)
+        self.assertIsNone(self.load())
+
+    def test_outside_symlinked_or_nonpacket_paths_remain_unapproved(self):
+        outside = self.base / "foundation__workers.json"
+        outside.write_bytes(self.packet_bytes)
+        expected = hashlib.sha256(self.packet_bytes).hexdigest()
+        self.assertIsNone(self.load(outside, expected))
+        nonpacket = self.packets / "ordinary.json"
+        nonpacket.write_bytes(self.packet_bytes)
+        self.assertIsNone(self.load(nonpacket, expected))
+        self.path.unlink()
+        self.path.symlink_to(outside)
+        self.assertIsNone(self.load(expected_sha256=expected))
+
+    def test_checksum_and_ancestor_symlinks_do_not_approve_packet_data(self):
+        expected = hashlib.sha256(self.packet_bytes).hexdigest()
+        recorded = self.packets / "SHA256SUMS"
+        outside_sums = self.base / "outside-sums"
+        outside_sums.write_text(expected + "  foundation__workers.json\n", encoding="utf-8")
+        recorded.unlink()
+        recorded.symlink_to(outside_sums)
+        self.assertIsNone(self.load())
+        alias = self.base / "alias"
+        alias.symlink_to(self.base, target_is_directory=True)
+        alias_root = alias / "packets"
+        self.assertIsNone(codex_lane._load_approved_packet_json(str(alias_root / self.path.name),
+                                                              [str(alias_root)], expected))
+
+    @unittest.skipUnless(hasattr(os, "mkfifo"), "FIFO safety applies to POSIX packet descriptors")
+    def test_fifo_or_hard_linked_packet_inputs_remain_unapproved(self):
+        import sys
+
+        expected = hashlib.sha256(self.packet_bytes).hexdigest()
+        os.link(self.path, self.base / "linked-packet")
+        self.assertIsNone(self.load(expected_sha256=expected))
+        self.path.unlink()
+        os.mkfifo(self.path)
+        # Bound the probe so removing nonblocking opens produces a test failure rather than a hung suite.
+        code = (
+            "import importlib.util,sys;"
+            "spec=importlib.util.spec_from_file_location('packet_loader_probe',sys.argv[1]);"
+            "m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m);"
+            "result=m._load_approved_packet_json(sys.argv[2],[sys.argv[3]],sys.argv[4]);"
+            "print('refused' if result is None else 'approved')"
+        )
+        done = subprocess.run([sys.executable, "-B", "-c", code, str(TOOL_DIR / "codex_lane.py"), str(self.path),
+                               str(self.packets), expected], capture_output=True, text=True, timeout=5)
+        self.assertEqual(done.returncode, 0, "the bounded FIFO refusal probe failed")
+        self.assertEqual(done.stdout.strip(), "refused")
+
+
+class BlindAuditQuarantineRegressionTests(unittest.TestCase):
+    """Replay only retained tool command metadata from the three tier-1 quarantines; execute no command."""
+
+    def setUp(self):
+        self.fixture = json.loads((ROOT / "tests" / "fixtures" / "codex_lane_blind_audit_quarantines.json")
+                                  .read_text(encoding="utf-8"))
+
+    def audit_command(self, command):
+        self.assertIsNone(codex_lane.audit_analysis_issue(), "regression cases require a verified audit parser")
+        with tempfile.TemporaryDirectory() as temporary:
+            events = Path(temporary) / "events.jsonl"
+            events.write_text(json.dumps({"type": "item.completed", "item": {
+                "type": "command_execution", "command": command}}) + "\n", encoding="utf-8")
+            return audit_with_fixture_cwd(events, self.fixture["allowed_roots"])
+
+    def assert_case_is_clean(self, layer):
+        report = self.audit_command(self.fixture["cases"][layer]["command"])
+        self.assertEqual((report["commands"], report["web_search"], report["mcp_tool_calls"]), (1, 0, 0))
+        self.assertEqual(report["flagged_commands"], [], report["flagged_commands"])
+
+    def test_document_retrieval_python_join_separator_is_not_a_root_read(self):
+        report = self.audit_command(self.fixture["cases"]["document-retrieval"]["command"])
+        self.assertEqual([reason for item in report["flagged_commands"] for reason in item["reasons"]],
+                         ["unresolved Python callable alias"])
+        # The original command's arbitrary JSON/local-function receivers have no
+        # verified type contract. Its separator is still independently inert.
+        self.assertEqual(self.audit_command("python3 -c \"print('/'.join(['a','b']))\"")["flagged_commands"], [])
+
+    def test_git_github_automation_rg_pattern_is_not_git_execution(self):
+        self.assert_case_is_clean("git-github-automation")
+
+    def test_mcp_surfaces_backtick_literal_in_a_quoted_heredoc_is_not_substitution(self):
+        report = self.audit_command(self.fixture["cases"]["mcp-surfaces"]["command"])
+        self.assertEqual([reason for item in report["flagged_commands"] for reason in item["reasons"]],
+                         ["unresolved Python callable alias"])
+        self.assertEqual(self.audit_command("python3 - <<'PY'\nprint('`mcporter`')\nPY")["flagged_commands"], [])
+
+    def test_workers_packet_reference_walk_is_clean(self):
+        packet = json.loads((ROOT / "tests" / "fixtures" / "codex_lane_approved_packet.json").read_bytes())
+        with mock.patch.object(codex_lane, "_load_approved_packet_json", return_value=packet, create=True):
+            self.assert_case_is_clean("workers")
+
+    def test_workers_reference_walk_rejects_outside_or_unapproved_json_paths(self):
+        packet = json.loads((ROOT / "tests" / "fixtures" / "codex_lane_approved_packet.json").read_bytes())
+        command = self.fixture["cases"]["workers"]["command"]
+        for ref in ("/outside/file", "../outside"):
+            unsafe = {**packet, "candidates": [{"adopted": True, "evidence_refs": [ref]}]}
+            with self.subTest(outside_reference=ref), \
+                    mock.patch.object(codex_lane, "_load_approved_packet_json", return_value=unsafe, create=True):
+                self.assertTrue(self.audit_command(command)["flagged_commands"], "approved JSON cannot authorize outside reads")
+        malformed = {**packet, "candidates": [{"adopted": True, "evidence_refs": [{"path": "/outside/file"}]}]}
+        for unapproved in (None, malformed):
+            with self.subTest(unapproved_data=unapproved is not None), \
+                    mock.patch.object(codex_lane, "_load_approved_packet_json", return_value=unapproved, create=True):
+                self.assertTrue(self.audit_command(command)["flagged_commands"], "an unapproved snapshot must remain unresolved")
+        original = "/tmp/ns2604-tier1-codex-ready-20261010-OWFxvw/work/packets/foundation__workers.json"
+        with mock.patch.object(codex_lane, "_load_approved_packet_json", return_value=packet, create=True):
+            outside_packet = command.replace(original, "/outside/foundation__workers.json")
+            self.assertTrue(self.audit_command(outside_packet)["flagged_commands"], "outside packet input must remain refused")
+
+    def test_approved_json_uri_guards_and_aliases_do_not_authorize_other_reads(self):
+        packet = json.loads((ROOT / "tests" / "fixtures" / "codex_lane_approved_packet.json").read_bytes())
+        literal = "/tmp/ns2604-tier1-codex-ready-20261010-OWFxvw/work/packets/foundation__workers.json"
+        prelude = "import json\nfrom pathlib import Path\np=json.loads(Path(" + repr(literal) + ").read_bytes())\n"
+        cases = {
+            "unguarded_local_uri": (
+                {**packet, "candidates": [{"adopted": True, "evidence_refs": ["file:///outside/file"]}]},
+                "for ref in p['candidates'][0]['evidence_refs']:\n    Path(ref).read_text()\n",
+            ),
+            "read_before_uri_guard": (
+                {**packet, "candidates": [{"adopted": True, "evidence_refs": ["file:///outside/file"]}]},
+                "for ref in p['candidates'][0]['evidence_refs']:\n"
+                "    Path(ref).read_text()\n    if '://' in ref:\n        continue\n",
+            ),
+            "read_inside_uri_guard": (
+                {**packet, "candidates": [{"adopted": True, "evidence_refs": ["file:///outside/file"]}]},
+                "for ref in p['candidates'][0]['evidence_refs']:\n"
+                "    if '://' in ref:\n        Path(ref).read_text()\n",
+            ),
+            "reference_rebound_after_guard": (
+                packet,
+                "for ref in p['candidates'][0]['evidence_refs']:\n"
+                "    if '://' in ref:\n        continue\n"
+                "    ref='/outside/file'\n    Path(ref).read_text()\n",
+            ),
+            "packet_alias_mutation": (
+                packet,
+                "q=p\nq['candidates'][0]['evidence_refs']=['/outside/file']\n"
+                "for ref in p['candidates'][0]['evidence_refs']:\n    Path(ref).read_text()\n",
+            ),
+            "bound_callback_alias_mutation": (
+                packet,
+                "getter=p.get\nq=getter('candidates')\nq[0]['evidence_refs']=['/outside/file']\n"
+                "for ref in p['candidates'][0]['evidence_refs']:\n    Path(ref).read_text()\n",
+            ),
+            "reference_set_mutation": (
+                packet,
+                "refs={r for c in p['candidates'] if c['adopted'] for r in c['evidence_refs']}\n"
+                "refs.add('/outside/file')\nfor ref in refs:\n    Path(ref).read_text()\n",
+            ),
+            "unknown_packet_callback": (
+                packet,
+                "mutate(p)\nfor ref in p['candidates'][0]['evidence_refs']:\n    Path(ref).read_text()\n",
+            ),
+            "local_return_alias_mutation": (
+                packet,
+                "def escape():\n    return p\nq=escape()\nq['candidates'][0]['evidence_refs']=['/outside/file']\n"
+                "for ref in p['candidates'][0]['evidence_refs']:\n    Path(ref).read_text()\n",
+            ),
+            "stdlib_decoder_rebound_before_packet_load": (
+                packet,
+                "setattr(json,'loads',lambda _: {'candidates':[{'adopted':True,'evidence_refs':['/outside/file']}]})\n"
+                "p=json.loads(Path(" + repr(literal) + ").read_bytes())\n"
+                "for ref in p['candidates'][0]['evidence_refs']:\n    Path(ref).read_text()\n",
+            ),
+        }
+        for case, (snapshot, body) in cases.items():
+            with self.subTest(case=case), \
+                    mock.patch.object(codex_lane, "_load_approved_packet_json", return_value=snapshot, create=True):
+                initial = "import json\nfrom pathlib import Path\n" if case == "stdlib_decoder_rebound_before_packet_load" else prelude
+                script = "python3 - <<'PY'\n" + initial + body + "PY"
+                command = shlex.join(["/bin/bash", "-lc", script])
+                self.assertTrue(self.audit_command(command)["flagged_commands"], "approved input must not authorize an outside read")
+        guarded = {**packet, "candidates": [{"adopted": True,
+                                            "evidence_refs": ["evidence/receipt.json", "file:///outside/file"]}]}
+        body = ("for ref in p['candidates'][0]['evidence_refs']:\n"
+                "    path=Path(ref)\n    if '://' in ref:\n        continue\n    path.stat()\n")
+        with mock.patch.object(codex_lane, "_load_approved_packet_json", return_value=guarded, create=True):
+            command = shlex.join(["/bin/bash", "-lc", "python3 - <<'PY'\n" + prelude + body + "PY"])
+            self.assertEqual(self.audit_command(command)["flagged_commands"], [],
+                             "the dominated read uses only local values even when its alias precedes the guard")
+
+    def test_an_actual_python_root_read_remains_flagged(self):
+        report = self.audit_command("/bin/bash -lc \"python3 - <<'PY'\nfrom pathlib import Path\n"
+                                    "print(list(Path('/').iterdir()))\nPY\"")
+        self.assertTrue(report["flagged_commands"])
+        self.assertTrue(any("filesystem root" in reason for row in report["flagged_commands"]
+                            for reason in row["reasons"]), report["flagged_commands"])
+
+    def test_python_alias_keyword_attribute_and_indirect_reads_remain_flagged(self):
+        cases = {
+            "open_alias": "reader=open;reader('/etc/passwd')",
+            "rebound_print": "print=open;print('/etc/passwd')",
+            "open_keyword": "open(file='/etc/passwd')",
+            "listdir_keyword": "import os;os.listdir(path='/')",
+            "urlopen_keyword": "from urllib.request import urlopen;urlopen(url='file:///etc/passwd')",
+            "path_parent_glob": "from pathlib import Path;Path('/etc/passwd').parent.glob('*')",
+            "path_getattr": "from pathlib import Path;getattr(Path('/etc/passwd'),'read_text')()",
+            "readlink": "import os;os.readlink('/etc/passwd')",
+        }
+        for name, code in cases.items():
+            with self.subTest(operation=name):
+                shell = "python3 -c " + shlex.quote(code)
+                command = shlex.join(["/bin/bash", "-lc", shell])
+                report = self.audit_command(command)
+                self.assertTrue(report["flagged_commands"], "an outside read must be flagged")
+
+    def test_pattern_and_filter_file_options_audit_the_file_argument(self):
+        for tool, long_option in (("rg", "--file"), ("grep", "--file"), ("jq", "--from-file")):
+            for option, attached in (("-f", False), ("-f", True), (long_option, False), (long_option, True)):
+                with self.subTest(tool=tool, option=option, attached=attached):
+                    if attached:
+                        arguments = [option + ("=" if option.startswith("--") else "") + "/etc/passwd"]
+                    else:
+                        arguments = [option, "/etc/passwd"]
+                    argv = [tool, *arguments, "evidence/input.json"]
+                    command = shlex.join(["/bin/bash", "-lc", shlex.join(argv)])
+                    self.assertTrue(self.audit_command(command)["flagged_commands"],
+                                    "a pattern/filter file outside the export must be flagged")
+                    safe_argv = [argument.replace("/etc/passwd", "evidence/filter.txt") for argument in argv]
+                    safe = shlex.join(["/bin/bash", "-lc", shlex.join(safe_argv)])
+                    self.assertEqual(self.audit_command(safe)["flagged_commands"], [])
+
+    def test_nested_python_subprocess_wrappers_audit_the_executed_command(self):
+        cases = [
+            (["sh", "-c", "git log"], ["sh", "-c", "rg -n x evidence"]),
+            (["bash", "-lc", "printenv"], ["bash", "-lc", "printf '%s\\n' literal"]),
+            (["nice", "git", "log"], ["nice", "rg", "-n", "x", "evidence"]),
+        ]
+        for unsafe_argv, safe_argv in cases:
+            with self.subTest(argv=unsafe_argv):
+                code = "import subprocess;subprocess.run(" + repr(unsafe_argv) + ")"
+                unsafe = shlex.join(["/bin/bash", "-lc", "python3 -c " + shlex.quote(code)])
+                self.assertTrue(self.audit_command(unsafe)["flagged_commands"],
+                                "nested shell/wrapper execution must retain the blind audit")
+                code = "import subprocess;subprocess.run(" + repr(safe_argv) + ")"
+                safe = shlex.join(["/bin/bash", "-lc", "python3 -c " + shlex.quote(code)])
+                self.assertEqual(self.audit_command(safe)["flagged_commands"], [])
+
+    def test_python_os_open_parent_glob_and_alias_concat_read_paths(self):
+        cases = {
+            "os_open": "import os;os.open('/etc/passwd',os.O_RDONLY)",
+            "parent_glob": "from pathlib import Path;list(Path('.').glob('../outside'))",
+            "alias_concat": "reader=open;prefix='/etc/';reader(prefix+'passwd')",
+        }
+        for name, code in cases.items():
+            with self.subTest(operation=name):
+                command = shlex.join(["/bin/bash", "-lc", "python3 -c " + shlex.quote(code)])
+                self.assertTrue(self.audit_command(command)["flagged_commands"], "an outside read must be flagged")
+        safe_code = "reader=open;prefix='evidence/';reader(prefix+'receipt.json')"
+        safe = shlex.join(["/bin/bash", "-lc", "python3 -c " + shlex.quote(safe_code)])
+        self.assertEqual(self.audit_command(safe)["flagged_commands"], [])
+
+    def test_git_through_stdio_lock_and_session_wrappers_remains_flagged(self):
+        # These executing wrappers are outside the supported grammar; both payloads must fail closed.
+        wrappers = [["stdbuf", "-oL"], ["flock", "local.lock"], ["setsid"]]
+        for wrapper in wrappers:
+            with self.subTest(wrapper=wrapper[0]):
+                command = shlex.join(["/bin/bash", "-lc", shlex.join([*wrapper, "git", "log"])])
+                self.assertTrue(self.audit_command(command)["flagged_commands"], "the wrapper must retain git refusal")
+                safe = shlex.join(["/bin/bash", "-lc", shlex.join([*wrapper, "rg", "-n", "x", "evidence"])])
+                self.assertTrue(self.audit_command(safe)["flagged_commands"], "unsupported wrappers must fail closed")
+        bare = shlex.join(["/bin/bash", "-lc", "rg -n x evidence"])
+        self.assertEqual(self.audit_command(bare)["flagged_commands"], [])
+
+    def test_python_end_of_options_stdin_retains_path_read_auditing(self):
+        unsafe_script = "python3 -- - <<'PY'\nopen('/outside/file').read()\nPY"
+        command = shlex.join(["/bin/bash", "-lc", unsafe_script])
+        self.assertTrue(self.audit_command(command)["flagged_commands"], "Python stdin must retain outside-read refusal")
+        safe_script = "python3 -- - <<'PY'\nopen('evidence/receipt.json').read()\nPY"
+        safe = shlex.join(["/bin/bash", "-lc", safe_script])
+        self.assertEqual(self.audit_command(safe)["flagged_commands"], [])
+
+    def test_a_quoted_heredoc_piped_to_a_shell_audits_the_executed_body(self):
+        unsafe_script = "cat <<'SH' | sh\ngit log\nSH"
+        command = shlex.join(["/bin/bash", "-lc", unsafe_script])
+        self.assertTrue(self.audit_command(command)["flagged_commands"], "the receiving shell executes the heredoc")
+        safe_script = "cat <<'SH'\ngit log\nSH"
+        safe = shlex.join(["/bin/bash", "-lc", safe_script])
+        self.assertEqual(self.audit_command(safe)["flagged_commands"], [])
+
+    def test_python_namespace_read_aliases_and_path_metadata_reads_remain_flagged(self):
+        cases = {
+            "module_attribute_alias": "import os;os.reader=open;os.reader('/outside/file')",
+            "namespace_attribute_alias": ("from types import SimpleNamespace;ns=SimpleNamespace();"
+                                          "ns.reader=open;ns.reader('/outside/file')"),
+            "path_is_symlink": "from pathlib import Path;Path('/outside/file').is_symlink()",
+            "path_samefile_argument": ("from pathlib import Path;"
+                                       "Path('evidence/receipt.json').samefile('/outside/file')"),
+        }
+        for name, code in cases.items():
+            with self.subTest(operation=name):
+                command = shlex.join(["/bin/bash", "-lc", "python3 -c " + shlex.quote(code)])
+                self.assertTrue(self.audit_command(command)["flagged_commands"], "an outside read must be flagged")
+        for code in ("from pathlib import Path;Path('evidence/receipt.json').is_symlink()",
+                     "from pathlib import Path;Path('evidence/receipt.json').samefile('evidence/other.json')"):
+            with self.subTest(local_metadata=code):
+                safe = shlex.join(["/bin/bash", "-lc", "python3 -c " + shlex.quote(code)])
+                self.assertEqual(self.audit_command(safe)["flagged_commands"], [])
+
+    def test_opaque_interpreter_and_find_execution_remain_refused(self):
+        cases = {
+            "shell_stdin_pipe": "printf '%s\\n' 'git log' | sh",
+            "node_code": shlex.join(["node", "-e", "require('child_process').execSync('git log')"]),
+            "find_exec": shlex.join(["find", "evidence", "-exec", "git", "log", "{}", ";"]),
+        }
+        for name, script in cases.items():
+            with self.subTest(operation=name):
+                command = shlex.join(["/bin/bash", "-lc", script])
+                self.assertTrue(self.audit_command(command)["flagged_commands"], "opaque command execution must fail closed")
+        for script in ("printf '%s\\n' 'git log'", "find evidence -name 'git*'"):
+            with self.subTest(literal_data=script):
+                safe = shlex.join(["/bin/bash", "-lc", script])
+                self.assertEqual(self.audit_command(safe)["flagged_commands"], [])
+
+
+class CommandWorkingDirectoryTests(CodexLaneFixture):
+    def audit_item(self, command, *, records=None, **fields):
+        item = {"id": "fixture-command", "type": "command_execution", "command": command, **fields}
+        self.events_file.write_text(json.dumps({"type": "item.completed", "item": item}) + "\n",
+                                    encoding="utf-8")
+        kwargs = {"cwd_records": records} if records is not None else {}
+        return codex_lane.blind_audit(self.events_file, [str(self.repo), str(self.work_dir / "packets")], **kwargs)
+
+    def test_missing_working_directory_is_unverified(self):
+        report = self.audit_item("/bin/bash -lc 'cat catalogs/landscape/foundation.json'")
+        self.assertTrue(codex_lane.audit_is_flagged(report))
+        self.assertIn("working directory unverified", " ".join(report["flagged_commands"][0]["reasons"]))
+
+    def test_model_chosen_outside_working_directory_is_refused(self):
+        report = self.audit_item("/bin/bash -lc 'cat receipt.json'", cwd=str(self.repo.parent))
+        self.assertTrue(codex_lane.audit_is_flagged(report))
+        self.assertIn("working directory unverified", " ".join(report["flagged_commands"][0]["reasons"]))
+
+    def test_recorded_approved_working_directory_binds_python_cwd(self):
+        nested = self.repo / "nested"
+        nested.mkdir()
+        command = "/bin/bash -lc " + shlex.quote("python3 -c \"from pathlib import Path; (Path.cwd().parent / 'receipt.json').read_text()\"")
+        records = {"fixture-command": {"command": command, "cwd": str(nested)}}
+        report = self.audit_item(command, records=records)
+        self.assertEqual(report["flagged_commands"], [])
+
+    def test_outside_or_mismatched_independent_record_is_refused(self):
+        command = "/bin/bash -lc 'cat receipt.json'"
+        for record in ({"command": command, "cwd": str(self.repo.parent)},
+                       {"command": "cat harmless.json", "cwd": str(self.repo)}):
+            with self.subTest(record=record):
+                report = self.audit_item(command, records={"fixture-command": record})
+                self.assertTrue(codex_lane.audit_is_flagged(report))
+
+    def test_shell_directory_change_requires_a_new_binding(self):
+        command = "/bin/bash -lc " + shlex.quote("cd '" + str(self.repo) + "'; cat receipt.json")
+        records = {"fixture-command": {"command": command, "cwd": str(self.repo)}}
+        report = self.audit_item(command, records=records)
+        self.assertTrue(codex_lane.audit_is_flagged(report))
+        self.assertIn("working directory changed", " ".join(report["flagged_commands"][0]["reasons"]))
+
+    def test_python_subprocess_cwd_override_is_unverified(self):
+        source = "import subprocess; subprocess.run(['cat', 'receipt.json'], cwd=" + repr(str(self.repo)) + ")"
+        command = "/bin/bash -lc " + shlex.quote("python3 -c " + shlex.quote(source))
+        records = {"fixture-command": {"command": command, "cwd": str(self.repo)}}
+        report = self.audit_item(command, records=records)
+        self.assertTrue(codex_lane.audit_is_flagged(report))
+        self.assertIn("working directory changed", " ".join(report["flagged_commands"][0]["reasons"]))
+
+    def test_relative_or_conflicting_working_directory_is_unverified(self):
+        for fields in ({"cwd": "nested"}, {"cwd": str(self.repo), "workdir": str(self.repo.parent)}):
+            with self.subTest(fields=fields):
+                report = self.audit_item("/bin/bash -lc 'cat receipt.json'", **fields)
+                self.assertTrue(codex_lane.audit_is_flagged(report))
+
+
+class BlindAuditBackendPreflightTests(CodexLaneFixture):
+    def test_missing_or_changed_parser_dependencies_refuse_before_a_child_or_home(self):
+        self.write_packet("foundation", "native-clients")
+        cases = [("missing", None), ("digest-mismatch", "modified fixture adapter\n")]
+        for name, content in cases:
+            dependency = self.work_dir.parent / f"{name}-parser.mjs"
+            if content is not None:
+                dependency.write_text(content, encoding="utf-8")
+            with self.subTest(dependency=name), \
+                    mock.patch.object(codex_lane, "AUDIT_DEPENDENCIES", {dependency: "0" * 64}), \
+                    contextlib.redirect_stderr(io.StringIO()) as err:
+                self.assertEqual(self.run_lane(), 2)
+                self.assertIn("blind audit dependency missing or digest mismatch", err.getvalue())
+                self.assertEqual(self.argv_calls(), [])
+                self.assertFalse(codex_lane.codex_home_base().exists())
+                self.assertFalse((self.work_dir / "codex").exists())
+                self.assertIsNone(codex_lane.CHILD_CODEX_HOME)
 
 
 class BlindPathAndPrecisionTests(CodexLaneFixture):
@@ -805,7 +1462,7 @@ class BlindPathAndPrecisionTests(CodexLaneFixture):
         events = self.work_dir / "audit-events.jsonl"
         events.write_text(json.dumps({"type": "item.completed", "item": {
             "type": "command_execution", "command": command}}) + "\n", encoding="utf-8")
-        report = codex_lane.blind_audit(events, [str(self.repo), str(self.work_dir / "packets")], tools)
+        report = audit_with_fixture_cwd(events, [str(self.repo), str(self.work_dir / "packets")], tools)
         return [reason for item in report["flagged_commands"] for reason in item["reasons"]]
 
     def test_the_voided_re_record_commands_are_clean(self):
@@ -813,13 +1470,27 @@ class BlindPathAndPrecisionTests(CodexLaneFixture):
                 "/bin/bash -lc \"rg -n -i 'qmd|original|body| get |context.hub' evidence/receipts\"",
                 "/bin/bash -lc \"rg --files fixtures | rg -i 'rag|socraticode|qdrant'\"",
                 "/bin/bash -lc \"python3 - <<'PY'\nfor t in ['serena','ast-grep','mcporter','ai-memory']: print(t)\nPY\"",
-                "/bin/bash -lc \"python3 - <<'PY'\ndef walk(v,p=''):\n for k,x in v.items(): walk(x,p+'/'+k)\n "
-                "for i,x in enumerate(v): walk(x, p + '/' + str(i))\nPY\"",
                 "/bin/bash -lc \"python3 - <<'PY'\nfrom pathlib import Path\nfor ref in refs: print(Path.cwd()/ref)\nPY\"",
-                "/bin/bash -lc \"python3 - <<'PY'\nfor ref in refs:\n if not ref.startswith('https://'): print(ref)\nPY\"",
                 "/bin/bash -lc \"rg -n 'https://github.com/org/repo' catalogs\""):
             with self.subTest(command=command):
                 self.assertEqual(self.reasons(command), [])
+
+    def test_historical_unknown_receiver_commands_are_conservatively_refused(self):
+        # CPython cbc944f4 Objects/object.c:1248-1268 dispatches through the
+        # receiver type. Keep the exact historical commands without certifying
+        # their unknown parameters/iterables as primitive data.
+        for command in (
+                "/bin/bash -lc \"python3 - <<'PY'\ndef walk(v,p=''):\n for k,x in v.items(): walk(x,p+'/'+k)\n "
+                "for i,x in enumerate(v): walk(x, p + '/' + str(i))\nPY\"",
+                "/bin/bash -lc \"python3 - <<'PY'\nfor ref in refs:\n if not ref.startswith('https://'): print(ref)\nPY\""):
+            with self.subTest(command=command):
+                self.assertEqual(self.reasons(command), ["unresolved Python callable alias"])
+
+    def test_proven_dictionary_and_text_receivers_remain_clean(self):
+        for source in ("print({'a': 1}.items())",
+                       "print('https://example.invalid/'.startswith('https://'))"):
+            with self.subTest(source=source):
+                self.assertEqual(self.reasons(shlex.join(["python3", "-c", source])), [])
 
     def test_real_reaches_still_flag(self):
         expected = {
@@ -881,12 +1552,15 @@ class BlindPathAndPrecisionTests(CodexLaneFixture):
         audit = json.loads((self.work_dir / "codex" / codex_lane.AUDIT_NAME).read_text(encoding="utf-8"))
         reasons = [r for item in audit["layers"]["foundation__native-clients"]["flagged_commands"] for r in item["reasons"]]
         self.assertIn("runs qmd", reasons)
-        # The same events in a blind run: qmd cannot resolve on the child's PATH, so the name is not flagged.
+        # qmd cannot resolve on a blind child's PATH; missing native cwd still makes the event unverified.
         (self.work_dir / "codex" / "foundation__native-clients.json").unlink()
         with contextlib.redirect_stderr(io.StringIO()):
-            self.assertEqual(self.run_lane(), 0)
+            self.assertEqual(self.run_lane(), 1)
         audit = json.loads((self.work_dir / "codex" / codex_lane.AUDIT_NAME).read_text(encoding="utf-8"))
-        self.assertEqual(audit["layers"]["foundation__native-clients"]["flagged_commands"], [])
+        reasons = [r for item in audit["layers"]["foundation__native-clients"]["flagged_commands"]
+                   for r in item["reasons"]]
+        self.assertNotIn("runs qmd", reasons)
+        self.assertTrue(any("working directory unverified" in reason for reason in reasons))
 
     def test_an_env_style_launcher_runs_with_the_callers_interpreter(self):
         # Codex review of #206 (P1): npm's codex is `#!/usr/bin/env node`, and a blind child's PATH has no node.
@@ -940,22 +1614,17 @@ class BlindPathAndPrecisionTests(CodexLaneFixture):
                 self.assertEqual(self.reasons(command), [])
 
     def test_independent_review_of_206_reaches_still_flag(self):
-        # C2: a '/' joined on one side only builds an absolute path; C1: file:/// and https:/// are no network authority.
+        # C2: root-prefixed concatenation remains an outside read; C1: file:/// and https:/// have no network authority.
         expected = {
             "/bin/bash -lc \"python3 -c \\\"print(open('/'+'etc/passwd').read())\\\"\"": "names the filesystem root /",
             "/bin/bash -lc \"python3 -c \\\"x = 'etc' ; print(open('/' + x))\\\"\"": "names the filesystem root /",
             "/bin/bash -lc \"python3 -c \\\"print(open(''+'/'+'etc/passwd').read())\\\"\"": "names the filesystem root /",
             "/bin/bash -lc 'python3 - <<\"PY\"\nprint(open(\"/\"+\"etc\"))\nPY'": "names the filesystem root /",
-            "/bin/bash -lc \"python3 -c \\\"x='a'; print(open(x+'/'+'etc'))\\\"\"": "names the filesystem root /",
             "/bin/bash -lc \"python3 -c \\\"x='etc'; print(open(''+'/'+x))\\\"\"": "names the filesystem root /",
             "/bin/bash -lc 'cat https:///etc/passwd'": "path outside the repository and packets: ///etc/passwd",
             "/bin/bash -lc \"python3 -c \\\"import urllib.request as u; u.urlopen('FILE://localhost/etc/passwd')\\\"\"":
                 "path outside the repository and packets: //localhost/etc/passwd",
             "/bin/bash -lc 'unzip -p jar:file:///etc/x.jar'": "path outside the repository and packets: ///etc/x.jar",
-            "/bin/bash -lc \"python3 -c \\\"print('http+unix://%2Frun%2Fuser%2F1000%2Fx.sock/v1')\\\"\"":
-                "path outside the repository and packets: //%2Frun%2Fuser%2F1000%2Fx.sock/v1",
-            "/bin/bash -lc \"python3 -c \\\"print('local://etc/passwd')\\\"\"":
-                "path outside the repository and packets: //etc/passwd",
             "/bin/bash -lc 'cat LOCAL://etc/passwd'": "path outside the repository and packets: //etc/passwd",
             "/bin/bash -lc 'cat HTTP+UNIX://socket/v1'": "path outside the repository and packets: //socket/v1",
             "/bin/bash -lc '/bin/sh -c file:///usr/local/bin/qmd; /usr/local/bin/qmd x'":
@@ -964,6 +1633,17 @@ class BlindPathAndPrecisionTests(CodexLaneFixture):
         for command, reason in expected.items():
             with self.subTest(command=command):
                 self.assertIn(reason, self.reasons(command))
+        for prefix, outside in (("a", False), ("", True)):
+            code = f"x={prefix!r};print(open(x+'/'+'etc'))"
+            command = shlex.join(["/bin/bash", "-lc", "python3 -c " + shlex.quote(code)])
+            with self.subTest(bounded_prefix=prefix):
+                self.assertEqual(bool(self.reasons(command)), outside)
+        # Printed URI text does not read the resource; the cat/local-URI controls above still do.
+        for code in ("print('http+unix://%2Frun%2Fuser%2F1000%2Fx.sock/v1')", "print('local://etc/passwd')",
+                     "print('local://qmd')", "print('http+unix://qmd')"):
+            command = shlex.join(["/bin/bash", "-lc", "python3 -c " + shlex.quote(code)])
+            with self.subTest(printed_uri=code):
+                self.assertEqual(self.reasons(command), [])
 
     def test_separator_and_anchor_exemptions_do_not_hide_constructed_reads(self):
         # PR #216's broad exemptions hide these command-text paths at both audit call sites.
@@ -973,31 +1653,41 @@ class BlindPathAndPrecisionTests(CodexLaneFixture):
             "/bin/bash -lc \"python3 -c \\\"print(open('/etc/passwd$)'[:-2]).read())\\\"\"": "/etc/passwd$",
             "/bin/bash -lc \"python3 -c \\\"print(open('/etc/passwd$|'.rstrip('$|')).read())\\\"\"": "/etc/passwd$",
             "/bin/bash -lc \"rg x $(python3 -c \\\"print('|/etc/passwd$|'[1:-2])\\\")\"": "/etc/passwd$",
-            "/bin/bash -lc \"cat /etc/passwd$''\"": "/etc/passwd$",
-            "/bin/bash -lc \"rg -n '/runner.py$' x\"": "/runner.py$",
+            "/bin/bash -lc \"cat /etc/passwd$''\"": "/etc/passwd",
             "/bin/bash -lc 'cat ://x'": "//x",
             "/bin/bash -lc 'ls //'": "//",
-            "/bin/bash -lc 'rg -n \"://|file\" docs'": "//",
-            "/bin/bash -lc \"python3 -c \\\"print(':'+'//etc')\\\"\"": "//etc",
+            "/bin/bash -lc 'cat /runner.py'": "/runner.py",
         }
         for command, path in expected.items():
             with self.subTest(command=command):
-                self.assertIn(f"path outside the repository and packets: {path}", self.reasons(command))
-        # Local authorities must also reach the CLI-by-path comprehension, not just outside_paths.
+                reasons = self.reasons(command)
+                if "$(" in command or "python3 -c" in command:
+                    self.assertTrue(reasons, "a computed read or substitution must remain refused")
+                else:
+                    self.assertIn(f"path outside the repository and packets: {path}", reasons)
+        for command in ("/bin/bash -lc \"rg -n '/runner.py$' x\"", "/bin/bash -lc 'rg -n \"://|file\" docs'",
+                        shlex.join(["/bin/bash", "-lc", "python3 -c " + shlex.quote("print(':'+'//etc')")])):
+            with self.subTest(literal_data=command):
+                self.assertEqual(self.reasons(command), [])
+        # URI text is data; an actual qmd executable invocation remains forbidden.
         for scheme in ("local", "http+unix"):
-            command = f"/bin/bash -lc '{scheme}://qmd search x'"
+            code = f"print({scheme + '://qmd'!r})"
+            command = shlex.join(["/bin/bash", "-lc", "python3 -c " + shlex.quote(code)])
             with self.subTest(scheme=scheme):
-                self.assertIn("runs qmd by path: //qmd", self.reasons(command))
+                self.assertEqual(self.reasons(command), [])
+        self.assertIn("runs qmd by path: /usr/bin/qmd", self.reasons("/bin/bash -lc '/usr/bin/qmd search x'"))
 
     def test_wave_20260924_separator_and_regex_residuals(self):
-        # Exact historical shapes from 3f456ec286: both remain flagged when the unsafe exemptions are dropped.
-        expected = {
-            "/bin/bash -lc \"python3 - <<'PY'\nfor ref in refs:\n print(ref, 'EXTERNAL' if '://' in ref else ref)\nPY\"": "//",
-            "/bin/bash -lc \"rg --files tests | rg '(test_adaptive_paper_(recovery|safety)\\\\.py$|/runner.py$)'\"": "/runner.py$",
-        }
-        for command, path in expected.items():
+        # The historical separator and regex are literal data, paired with actual reads outside the export.
+        script = "python3 - <<'PY'\nfor ref in refs:\n print(ref, 'EXTERNAL' if '://' in ref else ref)\nPY"
+        clean = [shlex.join(["/bin/bash", "-lc", script]),
+                 "/bin/bash -lc \"rg --files tests | rg '(test_adaptive_paper_(recovery|safety)\\\\.py$|/runner.py$)'\""]
+        for command in clean:
             with self.subTest(command=command):
-                self.assertIn(f"path outside the repository and packets: {path}", self.reasons(command))
+                self.assertEqual(self.reasons(command), [])
+        for command in ("/bin/bash -lc 'cat /runner.py'", "/bin/bash -lc 'cat file:///etc/passwd'"):
+            with self.subTest(actual_read=command):
+                self.assertTrue(self.reasons(command))
 
     def test_env_shell_shims_are_measured_under_the_blind_path(self):
         bin_dir = self.work_dir / "env-shims"
@@ -1328,7 +2018,9 @@ class EvidenceTreeProvenanceTests(CodexLaneFixture):
     def test_a_tree_changed_during_the_run_sets_the_returns_aside(self):
         self.write_packet("foundation", "native-clients")
         trees = iter(["a" * 64, "b" * 64])
-        with mock.patch.object(codex_lane, "tree_sha256", side_effect=lambda repo, *rest, **named: next(trees)), \
+        original_tree = codex_lane.tree_sha256
+        with mock.patch.object(codex_lane, "tree_sha256", side_effect=lambda repo, *rest, **named:
+                               next(trees) if Path(repo) == self.repo else original_tree(repo, *rest, **named)), \
                 contextlib.redirect_stderr(io.StringIO()) as err:
             self.assertEqual(self.run_lane(), 1)
         out_path = self.out_path("foundation", "native-clients")
@@ -1621,7 +2313,7 @@ class OmniRouteProviderTests(CodexLaneFixture):
             with self.subTest(command=command):
                 events.write_text(json.dumps({"type": "item.completed", "item": {
                     "type": "command_execution", "command": command}}) + "\n", encoding="utf-8")
-                report = codex_lane.blind_audit(events, [str(self.repo)])
+                report = audit_with_fixture_cwd(events, [str(self.repo)])
                 self.assertTrue(report["flagged_commands"])
 
     def test_the_client_boundary_canary_preserves_prompt_utf8_bytes(self):
@@ -1877,7 +2569,7 @@ class IsolatedCodexHomeTests(CodexLaneFixture):
         for command, flagged in commands.items():
             events.write_text(json.dumps({"type": "item.completed", "item": {
                 "type": "command_execution", "command": command}}) + "\n", encoding="utf-8")
-            report = codex_lane.blind_audit(events, [str(self.repo)])
+            report = audit_with_fixture_cwd(events, [str(self.repo)])
             self.assertEqual(bool(report["flagged_commands"]), flagged, command)
 
     def test_round7_a_proxy_with_credentials_is_refused_for_a_blind_run(self):
@@ -1952,6 +2644,569 @@ class ExactProvenanceResumeTests(CodexLaneFixture):
         out_path.write_text(json.dumps(existing), encoding="utf-8")
         self.assertTrue(codex_lane.existing_output_is_valid(out_path, "foundation", "native-clients",
                                                              packet_sha256, current))
+
+
+class IncrementalFailuresTests(unittest.TestCase):
+    """An interrupted runner keeps the failure observations already made, without launching children."""
+
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        self.base = Path(temporary.name).resolve()
+        self.repo = self.base / "repo"
+        self.work_dir = self.base / "work"
+        self.codex_dir = self.work_dir / "codex"
+        self.repo.mkdir()
+        (self.work_dir / "packets").mkdir(parents=True)
+        self.codex_dir.mkdir()
+        self.failures_path = self.codex_dir / codex_lane.FAILURES_NAME
+        self.provenance = {"repo_tree_sha256": "a" * 64}
+        codex_lane.STOP.clear()
+        self.addCleanup(codex_lane.STOP.clear)
+
+    def pending(self, *layers):
+        return [("foundation", layer, self.work_dir / "packets" / f"foundation__{layer}.json", "b" * 64,
+                 self.codex_dir / f"foundation__{layer}.json") for layer in layers]
+
+    def run_pending(self, pending, attempts, layers=None):
+        args = codex_lane.argparse.Namespace(allow_git_history=True, jobs=1, layers=layers,
+                                            effort="high", model=None, provider="native",
+                                            omniroute_base_url=None, timeout=1)
+        clean_audit = {"commands": 0, "web_search": 0, "mcp_tool_calls": 0, "flagged_commands": []}
+        with mock.patch.object(codex_lane, "run_attempt", side_effect=attempts), \
+                mock.patch.object(codex_lane, "write_strict_schema", return_value=FIXTURE_SCHEMA), \
+                mock.patch.object(codex_lane, "fill_prompt", return_value="fixture prompt"), \
+                mock.patch.object(codex_lane, "build_command", return_value=["mocked-codex"]), \
+                mock.patch.object(codex_lane, "blind_audit", return_value=clean_audit), \
+                mock.patch.object(codex_lane, "tree_sha256", return_value=self.provenance["repo_tree_sha256"]), \
+                contextlib.redirect_stderr(io.StringIO()):
+            return codex_lane.run_pending(args, self.work_dir, self.repo, "fixture prompt", FIXTURE_SCHEMA,
+                                          self.codex_dir, self.codex_dir / "events", self.codex_dir / "usage.jsonl",
+                                          pending, self.provenance)
+
+    def test_completed_failure_survives_interruption_before_the_next_layer(self):
+        # CC's 2026-10-10 adjudication cites the end-only write at upstream main
+        # 9d4c00cd tools/sota-convergence/codex_lane.py:1538-1556.
+        failed = {"exit_code": 7, "timed_out": False, "stdout": "", "elapsed": 0.01}
+        with self.assertRaises(SystemExit) as stopped:
+            self.run_pending(self.pending("a-layer", "b-layer"), [failed, failed, SystemExit(143)])
+        self.assertEqual(stopped.exception.code, 143)
+        self.assertTrue(self.failures_path.is_file(), "the completed failure must be durable before b-layer starts")
+        self.assertEqual(json.loads(self.failures_path.read_text(encoding="utf-8")), {
+            "lane": "codex", "failures": [{"catalog": "foundation", "layer_id": "a-layer",
+                                             "reason": "failed after retry: codex exec exited 7"},
+                                            {"catalog": "foundation", "layer_id": "b-layer",
+                                             "reason": "execution or audit interrupted: SystemExit"}]})
+        self.assertFalse((self.codex_dir / "foundation__b-layer.json").exists())
+
+    def test_pending_layers_are_durable_before_the_first_launch(self):
+        def interrupted_before_child(*_args, **_kwargs):
+            self.assertTrue(self.failures_path.is_file(), "the initial snapshot must precede child launch")
+            saved = json.loads(self.failures_path.read_text(encoding="utf-8"))
+            self.assertEqual([(entry["catalog"], entry["layer_id"]) for entry in saved["failures"]],
+                             [("foundation", "a-layer")])
+            self.assertIn("unfinished layer", saved["failures"][0]["reason"])
+            raise SystemExit(143)
+
+        with self.assertRaises(SystemExit):
+            self.run_pending(self.pending("a-layer"), interrupted_before_child)
+
+    def test_a_clean_signal_stop_keeps_the_unfinished_layer_snapshot(self):
+        def signal_stop(*_args, **_kwargs):
+            codex_lane.STOP.set()
+            return {"exit_code": None, "timed_out": False, "stdout": "", "stderr": "",
+                    "elapsed": 0.01, "stopped": True}
+
+        self.run_pending(self.pending("a-layer"), signal_stop)
+        self.assertTrue(self.failures_path.is_file(), "signal cleanup must retain the partial snapshot")
+        saved = json.loads(self.failures_path.read_text(encoding="utf-8"))
+        self.assertEqual(saved["failures"][0]["layer_id"], "a-layer")
+        self.assertIn("unfinished layer", saved["failures"][0]["reason"])
+
+    def test_a_selected_rerun_retains_unselected_failures_when_interrupted(self):
+        kept = {"catalog": "foundation", "layer_id": "workers", "reason": "failed after retry: timed out"}
+        selected = {"catalog": "foundation", "layer_id": "a-layer", "reason": "old selected failure"}
+        self.failures_path.write_text(json.dumps({"lane": "codex", "failures": [selected, kept]}), encoding="utf-8")
+
+        def interrupted_before_child(*_args, **_kwargs):
+            saved = json.loads(self.failures_path.read_text(encoding="utf-8"))["failures"]
+            self.assertIn(kept, saved)
+            pending = next(entry for entry in saved if entry["layer_id"] == "a-layer")
+            self.assertIn("unfinished layer", pending["reason"])
+            raise SystemExit(143)
+
+        with self.assertRaises(SystemExit):
+            self.run_pending(self.pending("a-layer"), interrupted_before_child, layers="foundation__a-layer")
+
+    def test_preexecution_stop_cannot_leave_a_stale_pending_return(self):
+        pending = self.pending("a-layer", "b-layer")
+        for _catalog, _layer, _packet, _sha, out_path in pending:
+            out_path.write_text('{"old": "stale"}')
+        codex_lane.STOP.set()
+        self.run_pending(pending, AssertionError("no child should start after stop"))
+        for _catalog, layer, _packet, _sha, out_path in pending:
+            with self.subTest(layer=layer):
+                self.assertFalse(out_path.exists(), "queued pending returns must be invalidated before execution")
+        recorder = load_module("record_verdicts_stopped_pending", "record_verdicts.py")
+        failures = recorder.load_lane_failures(self.work_dir)
+        self.assertEqual(recorder.missing_outcome(failures, "codex", "foundation", "a-layer")["outcome"], "failed")
+
+
+class Full1cBoundaryTests(CodexLaneFixture):
+    """Neutral local markers and native-journal simulation; never read a user/system file."""
+
+    def setUp(self):
+        super().setUp()
+        self.write_packet("foundation", "native-clients")
+        self.marker = self.repo.parent / "outside-marker.txt"
+        self.marker.write_text("OUTSIDE_MARKER\n", encoding="utf-8")
+        (self.repo / "inside-marker.txt").write_text("INSIDE_MARKER\n", encoding="utf-8")
+        self.options = ["--provider", "omniroute", "--omniroute-base-url", "http://127.0.0.1:21128/v1"]
+
+    def python_command(self, source):
+        return shlex.join(["python3", "-B", "-c", source])
+
+    def set_command(self, command):
+        outer = shlex.join(["/bin/bash", "-lc", command])
+        self.events_file.write_text(CANNED_EVENTS + "\n" + json.dumps({"type": "item.completed", "item": {
+            "id": "item_0", "type": "command_execution", "command": outer,
+            "aggregated_output": "OUTSIDE_MARKER\n", "exit_code": 0, "status": "completed"}}) + "\n")
+        return outer
+
+    def audit(self, command):
+        path = self.work_dir / "probe-events.jsonl"
+        path.write_text(json.dumps({"type": "item.completed", "item": {
+            "id": "probe", "type": "command_execution", "command": command,
+            "aggregated_output": "OUTSIDE_MARKER\n", "exit_code": 0, "status": "completed"}}) + "\n")
+        return audit_with_fixture_cwd(path, [str(self.repo), str(self.work_dir / "packets")])
+
+    def assert_real_marker_read(self, command):
+        result = subprocess.run(["/bin/sh", "-c", command], cwd=self.repo, capture_output=True, text=True,
+                                timeout=10, env={"PATH": os.environ["PATH"], "PYTHONDONTWRITEBYTECODE": "1"})
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("OUTSIDE_MARKER", result.stdout)
+
+    def assert_quarantined(self, command):
+        self.set_command(command)
+        with contextlib.redirect_stderr(io.StringIO()):
+            code = self.run_lane(self.options)
+        self.assertEqual(code, 1)
+        out = self.out_path("foundation", "native-clients")
+        self.assertFalse(out.exists(), "a boundary violation must never be promoted")
+        self.assertTrue(out.with_name(out.name + ".audit-flagged").exists())
+        recorder = load_module("record_verdicts_full1c", "record_verdicts.py")
+        failures = recorder.load_lane_failures(self.work_dir)
+        self.assertEqual(recorder.missing_outcome(failures, "codex", "foundation", "native-clients")["outcome"],
+                         "failed")
+
+    def computed_readers(self):
+        encoded = os.fsencode("../outside-marker.txt").hex()
+        return [self.python_command("import io; print(io.FileIO(bytes.fromhex(" + repr(encoded) + ")).read())"),
+                self.python_command("import io; print(io.FileIO(chr(46)+chr(46)+chr(47)+'outside-marker.txt').read())")]
+
+    def test_computed_unmodeled_readers_fail_audit_and_promotion(self):
+        for command in self.computed_readers():
+            with self.subTest(command=command):
+                self.assert_real_marker_read(command)
+                self.assertTrue(self.audit(command)["flagged_commands"])
+
+    def test_computed_unmodeled_readers_never_promote(self):
+        for command in self.computed_readers():
+            with self.subTest(command=command):
+                self.assert_quarantined(command)
+
+    def test_unverified_imported_reader_calls_are_not_assumed_pure(self):
+        (self.repo / "outside_reader.py").write_text(
+            "def read(path):\n with open(path) as handle: return handle.read()\n")
+        command = self.python_command("import outside_reader; print(outside_reader.read(bytes.fromhex(" +
+                                      repr(os.fsencode("../outside-marker.txt").hex()) + ")))")
+        self.assert_real_marker_read(command)
+        self.assertTrue(self.audit(command)["flagged_commands"])
+        self.assert_quarantined(command)
+
+    def callback_reader_commands(self):
+        (self.repo / "outside_reader.py").write_text(
+            "def read(value):\n with open('../outside-marker.txt') as handle: result = handle.read()\n print(result)\n return result\n")
+        encoded = repr(os.fsencode("../outside-marker.txt").hex())
+        yield self.python_command("import io; print(next(map(io.FileIO, [bytes.fromhex(" + encoded + ")])).read())")
+        for source in (
+                "import outside_reader; print(list(map(outside_reader.read, [0])))",
+                "import outside_reader; print(list(filter(outside_reader.read, [0])))",
+                "import outside_reader; print(sorted([0], key=outside_reader.read))",
+                "import outside_reader; print(min([0], key=outside_reader.read))",
+                "import outside_reader; print(max([0], key=outside_reader.read))",
+                "import functools, outside_reader; print(functools.reduce(lambda a,b: outside_reader.read(b), [0,1]))",
+                "import io; reader = io.FileIO; print(next(map(reader, [bytes.fromhex(" + encoded + ")])).read())",
+                "import io; consume = map; print(next(consume(io.FileIO, [bytes.fromhex(" + encoded + ")])).read())",
+                "import io; print(next(map(getattr(io, 'FileIO'), [bytes.fromhex(" + encoded + ")])).read())"):
+            yield self.python_command(source)
+
+    def test_callback_reader_values_fail_independent_audit(self):
+        for command in self.callback_reader_commands():
+            with self.subTest(command=command):
+                self.assert_real_marker_read(command)
+                self.assertTrue(self.audit(command)["flagged_commands"])
+
+    def test_callback_reader_values_never_promote(self):
+        for command in self.callback_reader_commands():
+            with self.subTest(command=command):
+                self.assert_real_marker_read(command)
+                self.assert_quarantined(command)
+
+    def import_reader_commands(self):
+        (self.repo / "outside_reader.py").write_text(
+            "with open('../outside-marker.txt') as handle: print(handle.read())\nvalue = 1\n")
+        for source in ("import outside_reader; print('import completed')",
+                       "import outside_reader as reader; print('import completed')",
+                       "from outside_reader import value; print(value)",
+                       "from outside_reader import value as result; print(result)"):
+            yield self.python_command(source)
+
+    def test_import_initialization_reads_fail_independent_audit(self):
+        for command in self.import_reader_commands():
+            with self.subTest(command=command):
+                self.assert_real_marker_read(command)
+                self.assertTrue(self.audit(command)["flagged_commands"])
+
+    def test_import_initialization_reads_never_promote(self):
+        for command in self.import_reader_commands():
+            with self.subTest(command=command):
+                self.assert_real_marker_read(command)
+                self.assert_quarantined(command)
+
+    def test_modeled_reader_callback_is_refused_without_an_import(self):
+        # Isolate callback execution from import and receiver refusal.
+        for source in ("list(map(open, ['inside-marker.txt']))",
+                       "list(filter(open, ['inside-marker.txt']))",
+                       "sorted(['inside-marker.txt'], key=open)",
+                       "min(['inside-marker.txt'], key=open)",
+                       "max(['inside-marker.txt'], key=open)"):
+            with self.subTest(source=source):
+                self.assertTrue(self.audit(self.python_command(source))["flagged_commands"])
+
+    def test_verified_imports_and_inert_callback_controls_remain_clean(self):
+        for source in ("import io, json, pathlib, hashlib, re, os, glob; print('verified')",
+                       "from pathlib import Path; print(Path('inside-marker.txt').read_text())",
+                       "print(sorted([3, 1, 2]))", "print(list(map(str, [1, 2])))",
+                       "print(sorted(['bb', 'a'], key=len))"):
+            with self.subTest(source=source):
+                self.assertEqual(self.audit(self.python_command(source))["flagged_commands"], [])
+
+    def test_relative_and_unverified_stdlib_submodule_imports_are_refused(self):
+        for source in ("from . import reader", "from ..outside_reader import value",
+                       "import io.unverified", "from pathlib.unverified import reader"):
+            with self.subTest(source=source):
+                self.assertTrue(self.audit(self.python_command(source))["flagged_commands"])
+
+    def test_a_repository_module_cannot_borrow_a_verified_import_name(self):
+        (self.repo / "json.py").write_text(
+            "with open('../outside-marker.txt') as handle: print(handle.read())\n")
+        command = self.python_command("import json; print('import completed')")
+        self.assert_real_marker_read(command)
+        self.assertTrue(self.audit(command)["flagged_commands"])
+        self.assert_quarantined(command)
+
+    def test_a_repository_module_cannot_shadow_a_verified_import_dependency(self):
+        (self.repo / "re.py").write_text(
+            "with open('../outside-marker.txt') as handle: print(handle.read())\n")
+        command = self.python_command("import json; print('import completed')")
+        result = subprocess.run(["/bin/sh", "-c", command], cwd=self.repo, capture_output=True, text=True,
+                                timeout=10, env={"PATH": os.environ["PATH"], "PYTHONDONTWRITEBYTECODE": "1"})
+        self.assertIn("OUTSIDE_MARKER", result.stdout)
+        # Import may subsequently fail because the shadow lacks re's API.
+        self.assertTrue(self.audit(command)["flagged_commands"])
+        self.assert_quarantined(command)
+
+    def unresolved_receiver_commands(self):
+        encoded = repr(os.fsencode("../outside-marker.txt").hex())
+        for receiver in ("[io][0]", "(io,)[0]", "{'reader':io}['reader']", "io if True else io"):
+            yield self.python_command("import io; m = " + receiver +
+                                      "; print(m.open_code(bytes.fromhex(" + encoded + ").decode()).read())")
+        for selector in ("getattr(m,'open_code')", "reader"):
+            yield self.python_command("import io; m = [io][0]; reader = m.open_code; print(" + selector +
+                                      "(bytes.fromhex(" + encoded + ").decode()).read())")
+
+    def test_unresolved_imported_receivers_are_flagged_after_real_outside_reads(self):
+        for command in self.unresolved_receiver_commands():
+            with self.subTest(command=command):
+                self.assert_real_marker_read(command)
+                self.assertTrue(self.audit(command)["flagged_commands"])
+
+    def test_unresolved_imported_receivers_never_promote(self):
+        for command in self.unresolved_receiver_commands():
+            with self.subTest(command=command):
+                self.assert_real_marker_read(command)
+                self.assert_quarantined(command)
+
+    def test_imported_reader_aliases_are_checked_at_their_call_sites(self):
+        (self.repo / "outside_reader.py").write_text(
+            "def read(path):\n with open(path) as handle: return handle.read()\n")
+        encoded = repr(os.fsencode("../outside-marker.txt").hex())
+        for source in ("from io import FileIO as reader; print(reader(bytes.fromhex(" + encoded + ")).read())",
+                       "from outside_reader import read as reader; print(reader(bytes.fromhex(" + encoded + ")))"):
+            with self.subTest(alias=source):
+                command = self.python_command(source)
+                self.assert_real_marker_read(command)
+                self.assertTrue(self.audit(command)["flagged_commands"])
+                self.assert_quarantined(command)
+
+    def test_imported_json_callback_paths_are_not_treated_as_pure_data(self):
+        (self.repo / "outside_reader.py").write_text(
+            "def hook(value):\n with open('../outside-marker.txt') as handle: return handle.read()\n")
+        for source in ("import json, outside_reader; print(json.loads('{}', object_hook=outside_reader.hook))",
+                       "import json, outside_reader; print(json.dumps(object(), default=outside_reader.hook))"):
+            with self.subTest(callback=source):
+                command = self.python_command(source)
+                self.assert_real_marker_read(command)
+                self.assertTrue(self.audit(command)["flagged_commands"])
+                self.assert_quarantined(command)
+
+    def encoded_urls(self):
+        from urllib.parse import quote
+        return ["file:" + quote(str(self.marker), safe=""),
+                "file:" + str(self.repo) + "/%2e%2e/outside-marker.txt"]
+
+    def test_encoded_local_urls_fail_audit_and_promotion(self):
+        for url in self.encoded_urls():
+            with self.subTest(url=url):
+                command = self.python_command("import urllib.request; print(urllib.request.urlopen(" + repr(url) +
+                                              ").read())")
+                self.assert_real_marker_read(command)
+                self.assertTrue(self.audit(command)["flagged_commands"])
+
+    def test_encoded_local_urls_never_promote(self):
+        for url in self.encoded_urls():
+            with self.subTest(url=url):
+                self.assert_quarantined(self.python_command(
+                    "import urllib.request; print(urllib.request.urlopen(" + repr(url) + ").read())"))
+
+    def test_local_url_authority_and_encoding_forms_fail_closed(self):
+        for url in ("file://remote-host/inside-marker.txt", "file:///tmp/%zz", "file:inside-marker.txt",
+                    "file:///tmp/%00", "local:///tmp/inside-marker.txt", "file:///tmp/inside-marker.txt?x=1"):
+            with self.subTest(url=url):
+                self.assertTrue(self.audit(self.python_command(
+                    "import urllib.request; print(urllib.request.urlopen(" + repr(url) + ").read())"))["flagged_commands"])
+
+    def test_encoded_in_tree_file_url_remains_approved(self):
+        from urllib.parse import quote
+        url = "file:" + quote(str(self.repo / "inside-marker.txt"), safe="")
+        command = self.python_command("import urllib.request; print(urllib.request.urlopen(" + repr(url) + ").read())")
+        self.assertEqual(self.audit(command)["flagged_commands"], [])
+
+    def sed_commands(self):
+        (self.repo.parent / "outside-program.txt").write_text("r../outside-marker.txt\n")
+        return ["sed -n 'r../outside-marker.txt' inside-marker.txt",
+                "sed -n 'R../outside-marker.txt' inside-marker.txt",
+                shlex.join(["sed", "-n", "r" + str(self.marker), "inside-marker.txt"]),
+                "sed -n -f../outside-program.txt inside-marker.txt",
+                "sed -n --file=../outside-program.txt inside-marker.txt"]
+
+    def test_sed_source_and_script_files_fail_audit_and_promotion(self):
+        for command in self.sed_commands():
+            with self.subTest(command=command):
+                self.assert_real_marker_read(command)
+                self.assertTrue(self.audit(command)["flagged_commands"])
+
+    def test_sed_source_and_script_files_never_promote(self):
+        for command in self.sed_commands():
+            with self.subTest(command=command):
+                self.assert_quarantined(command)
+
+    def test_sed_unmodeled_source_and_attached_script_reads_are_refused(self):
+        for command in ("sed '1e cat ../outside-marker.txt' inside-marker.txt",
+                        "sed -n 's/a/b/e' inside-marker.txt", "sed -n -finside-marker.txt inside-marker.txt",
+                        "sed -n 'p;r../outside-marker.txt' inside-marker.txt"):
+            with self.subTest(command=command):
+                self.assertTrue(self.audit(command)["flagged_commands"])
+
+    def test_packet_symlink_read_is_refused_before_promotion(self):
+        link = self.work_dir / "packets" / "marker-link"
+        link.symlink_to(self.marker)
+        command = shlex.join(["cat", str(link)])
+        self.assert_real_marker_read(command)
+        self.assertTrue(self.audit(command)["flagged_commands"])
+
+    def test_packet_symlink_never_promotes_a_verdict(self):
+        link = self.work_dir / "packets" / "marker-link"
+        link.symlink_to(self.marker)
+        command = shlex.join(["cat", str(link)])
+        self.set_command(command)
+        with contextlib.redirect_stderr(io.StringIO()):
+            code = self.run_lane(self.options)
+        self.assertNotEqual(code, 0)
+        self.assertFalse(self.out_path("foundation", "native-clients").exists())
+
+    def test_confined_packet_file_read_remains_approved(self):
+        command = shlex.join(["cat", str(self.work_dir / "packets" / "foundation__native-clients.json")])
+        self.assertEqual(self.audit(command)["flagged_commands"], [])
+
+    def test_repository_symlink_remains_a_prelaunch_refusal(self):
+        (self.repo / "marker-link").symlink_to(self.marker)
+        self.set_command("cat marker-link")
+        with contextlib.redirect_stderr(io.StringIO()):
+            self.assertEqual(self.run_lane(self.options), 2)
+        self.assertEqual(self.argv_calls(), [])
+
+    def test_audit_interruption_is_durable_failed_at_the_consumer(self):
+        self.set_command("cat inside-marker.txt")
+        with mock.patch.object(codex_lane, "blind_audit", side_effect=RuntimeError("neutral audit interruption")), \
+                contextlib.redirect_stderr(io.StringIO()), self.assertRaises(RuntimeError):
+            self.run_lane(self.options)
+        self.assertFalse(self.out_path("foundation", "native-clients").exists())
+        recorder = load_module("record_verdicts_interrupted", "record_verdicts.py")
+        failures = recorder.load_lane_failures(self.work_dir)
+        outcome = recorder.missing_outcome(failures, "codex", "foundation", "native-clients")
+        self.assertEqual(outcome["outcome"], "failed")
+        self.assertIn("RuntimeError", " ".join(outcome["reasons"]))
+
+    def test_failure_snapshot_interruption_after_promotion_removes_the_return(self):
+        self.set_command("cat inside-marker.txt")
+        write = codex_lane._write_failure_snapshot
+        def interrupted_clear(path, failures, *args, **kwargs):
+            if not failures and self.out_path("foundation", "native-clients").exists():
+                raise RuntimeError("neutral snapshot interruption")
+            return write(path, failures, *args, **kwargs)
+        with mock.patch.object(codex_lane, "_write_failure_snapshot", side_effect=interrupted_clear), \
+                contextlib.redirect_stderr(io.StringIO()), self.assertRaises(RuntimeError):
+            self.run_lane(self.options)
+        self.assertFalse(self.out_path("foundation", "native-clients").exists())
+        recorder = load_module("record_verdicts_snapshot_interrupted", "record_verdicts.py")
+        outcome = recorder.missing_outcome(recorder.load_lane_failures(self.work_dir),
+                                         "codex", "foundation", "native-clients")
+        self.assertEqual(outcome["outcome"], "failed")
+        self.assertIn("RuntimeError", " ".join(outcome["reasons"]))
+
+    def test_harmless_sed_and_in_tree_python_reads_still_promote(self):
+        for command in ["sed -n '1,2p' inside-marker.txt",
+                        self.python_command("import io; print(io.FileIO('inside-marker.txt').read())")]:
+            with self.subTest(command=command):
+                self.assertEqual(self.audit(command)["flagged_commands"], [])
+                self.set_command(command)
+                with contextlib.redirect_stderr(io.StringIO()):
+                    self.assertEqual(self.run_lane(self.options), 0)
+                self.assertFalse((self.work_dir / "codex" / codex_lane.FAILURES_NAME).exists(),
+                                 "successful audited promotion clears durable unfinished entries")
+
+
+class NativeCwdCaptureTests(CodexLaneFixture):
+    """Native command history binds cwd for live and resumed verdict attempts; no model is called."""
+
+    def setUp(self):
+        super().setUp()
+        self.write_packet("foundation", "native-clients")
+        command = shlex.join(["/bin/bash", "-lc", "cat evidence/receipt.json"])
+        self.events_file.write_text(CANNED_EVENTS + "\n" + json.dumps({"type": "item.completed", "item": {
+            "id": "item_0", "type": "command_execution", "command": command,
+            "cwd": str(self.repo), "workdir": str(self.repo),
+            "aggregated_output": "fixture receipt\n", "exit_code": 0, "status": "completed"}}) + "\n",
+            encoding="utf-8")
+        self.options = ["--provider", "omniroute", "--omniroute-base-url", "http://127.0.0.1:21128/v1"]
+
+    def run_native_fixture(self):
+        with contextlib.redirect_stderr(io.StringIO()):
+            return self.run_lane(self.options)
+
+    def test_launch_root_is_accepted_with_native_cwd_and_resumes_without_another_child(self):
+        self.assertEqual(self.run_native_fixture(), 0, "a native-recorded launch cwd must bind the relative read")
+        calls = self.argv_calls()
+        self.assertEqual(len(calls), 1)
+        self.assertNotIn("--ephemeral", calls[0])
+        self.assertTrue(self.out_path("foundation", "native-clients").is_file())
+        self.assertEqual(self.run_native_fixture(), 0)
+        self.assertEqual(self.argv_calls(), calls, "resume must rebind retained native evidence without another child")
+
+    def test_missing_or_mismatched_native_evidence_never_uses_model_cwd(self):
+        for mode in ("missing", "mismatched_argv", "mismatched_thread", "legacy", "ambiguous", "malformed",
+                     "mismatched_session"):
+            with self.subTest(mode=mode):
+                os.environ["CODEX_FAKE_NATIVE_JOURNAL_MODE"] = mode
+                self.assertEqual(self.run_native_fixture(), 1)
+                self.assertFalse(self.out_path("foundation", "native-clients").exists())
+                audit = json.loads((self.work_dir / "codex" / codex_lane.AUDIT_NAME).read_text(encoding="utf-8"))
+                self.assertTrue(audit["layers"]["foundation__native-clients"]["flagged_commands"])
+
+    def test_native_workdir_outside_the_launch_root_is_refused(self):
+        os.environ["CODEX_FAKE_NATIVE_CWD"] = "/outside"
+        self.assertEqual(self.run_native_fixture(), 1)
+        self.assertFalse(self.out_path("foundation", "native-clients").exists())
+        audit = json.loads((self.work_dir / "codex" / codex_lane.AUDIT_NAME).read_text(encoding="utf-8"))
+        reasons = [reason for item in audit["layers"]["foundation__native-clients"]["flagged_commands"]
+                   for reason in item["reasons"]]
+        self.assertTrue(any("working directory outside" in reason for reason in reasons), reasons)
+
+    def test_resume_with_missing_or_corrupt_native_capture_reruns_the_child(self):
+        capture = self.work_dir / "codex" / "events" / "foundation__native-clients.native-cwd.json"
+        for damage in ("missing", "invalid_json", "changed_events", "changed_capture"):
+            with self.subTest(damage=damage):
+                self.assertEqual(self.run_native_fixture(), 0)
+                before = len(self.argv_calls())
+                if damage == "missing":
+                    capture.unlink()
+                elif damage == "invalid_json":
+                    capture.write_text("{", encoding="utf-8")
+                else:
+                    data = json.loads(capture.read_text(encoding="utf-8"))
+                    if damage == "changed_events":
+                        data["events_sha256"] = "0" * 64
+                    else:
+                        data["captures"][0]["snapshot"]["commands"][0]["cwd"] = "file:///outside"
+                    capture.write_text(json.dumps(data), encoding="utf-8")
+                self.assertEqual(self.run_native_fixture(), 0)
+                self.assertEqual(len(self.argv_calls()), before + 1,
+                                 "a kept return without intact independent cwd evidence must rerun")
+
+    def test_retry_keeps_an_unsafe_cwd_from_the_first_failed_attempt(self):
+        os.environ["CODEX_FAKE_FAIL_ATTEMPTS"] = "1"
+        os.environ["CODEX_FAKE_NATIVE_CWD_MAP"] = json.dumps({"1": "/outside"})
+        self.assertEqual(self.run_native_fixture(), 1)
+        self.assertEqual(len(self.argv_calls()), 2)
+        self.assertFalse(self.out_path("foundation", "native-clients").exists())
+        audit = json.loads((self.work_dir / "codex" / codex_lane.AUDIT_NAME).read_text(encoding="utf-8"))
+        reasons = [reason for item in audit["layers"]["foundation__native-clients"]["flagged_commands"]
+                   for reason in item["reasons"]]
+        self.assertTrue(any("working directory outside" in reason for reason in reasons), reasons)
+
+    def test_unfinished_command_start_is_unverified_and_a_completed_pair_counts_once(self):
+        path = self.work_dir / "unfinished.jsonl"
+        item = {"id": "item_0", "type": "command_execution", "status": "in_progress",
+                "command": shlex.join(["/bin/bash", "-lc", "cat /srv/outside.txt"])}
+        rows = [{"type": "thread.started", "thread_id": "fixture-thread"},
+                {"type": "item.started", "item": item}]
+        roots = [str(self.repo), str(self.work_dir / "packets")]
+        path.write_text("".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8")
+        audit = codex_lane.blind_audit(path, roots)
+        self.assertEqual(audit["commands"], 1)
+        self.assertTrue(audit["flagged_commands"], "an unfinished command has no completed native cwd evidence")
+
+        item["command"] = shlex.join(["/bin/bash", "-lc", "cat evidence/receipt.json"])
+        rows.append({"type": "item.completed", "item": {**item, "status": "completed"}})
+        path.write_text("".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8")
+        audit = codex_lane.blind_audit(path, roots, cwd_records={
+            "item_0": {"command": item["command"], "cwd": str(self.repo)}})
+        self.assertEqual(audit["commands"], 1)
+        self.assertEqual(audit["flagged_commands"], [])
+
+    def test_retry_keeps_an_unfinished_command_from_the_first_failed_attempt(self):
+        os.environ["CODEX_FAKE_FAIL_ATTEMPTS"] = "1"
+        os.environ["CODEX_FAKE_UNFINISHED_ATTEMPTS"] = "1"
+        os.environ["CODEX_FAKE_UNFINISHED_COMMAND"] = shlex.join(["/bin/bash", "-lc", "cat /srv/outside.txt"])
+        self.assertEqual(self.run_native_fixture(), 1)
+        self.assertEqual(len(self.argv_calls()), 2)
+        self.assertFalse(self.out_path("foundation", "native-clients").exists())
+        audit = json.loads((self.work_dir / "codex" / codex_lane.AUDIT_NAME).read_text(encoding="utf-8"))
+        layer = audit["layers"]["foundation__native-clients"]
+        self.assertEqual(layer["commands"], 2)
+        self.assertTrue(any("unfinished" in reason for item in layer["flagged_commands"] for reason in item["reasons"]))
+
+    def test_retry_threads_can_reuse_exec_item_ids_without_cwd_collision(self):
+        os.environ["CODEX_FAKE_FAIL_ATTEMPTS"] = "1"
+        self.assertEqual(self.run_native_fixture(), 0)
+        self.assertEqual(len(self.argv_calls()), 2)
+        events = codex_lane.parse_events((self.work_dir / "codex" / "events" / "foundation__native-clients.jsonl").read_text())
+        threads = [event["thread_id"] for event in events if event.get("type") == "thread.started"]
+        self.assertEqual(len(set(threads)), 2)
+        audit = json.loads((self.work_dir / "codex" / codex_lane.AUDIT_NAME).read_text(encoding="utf-8"))
+        self.assertEqual(audit["layers"]["foundation__native-clients"]["flagged_commands"], [])
 
 
 if __name__ == "__main__":

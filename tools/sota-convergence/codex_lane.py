@@ -6,7 +6,7 @@ without a valid ``<work-dir>/codex/<catalog>__<layer_id>.json`` already on
 disk, fill the shared lane prompt (``lane-prompt.md``) with that packet's
 absolute path, the repository root and ``LANE=codex``, then run
 
-    codex exec --sandbox read-only --skip-git-repo-check --ephemeral \
+    codex exec --sandbox read-only --skip-git-repo-check \
         -C <repo> --output-schema <schema> -o <out.tmp> --json \
         -c model_reasoning_effort=<effort> \
         --ignore-user-config -c features.hooks=false -c features.plugin_hooks=false \
@@ -43,12 +43,13 @@ fields the contract assigns to it.
 
 ``--dry-run`` prints the exact command it would run for every pending layer,
 one per line, and writes nothing -- no directories, no events, no usage rows,
-no output files. Stdlib only; this script is a subprocess/text pipeline, not
-a landscape-schema validator, so it does not import scripts/landscape.py.
+no output files. The Python runner uses the standard library; its host-side command audit uses the existing
+verified Node/tree-sitter Bash parser. It is not a landscape-schema validator and does not import scripts/landscape.py.
 """
 from __future__ import annotations
 
 import argparse
+import ast
 import contextlib
 import hashlib
 import errno
@@ -57,14 +58,16 @@ import os
 import re
 import shlex
 import shutil
+import stat
 import subprocess
 import tempfile
 import sys
 import threading
 import time
+import uuid
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
-from urllib.parse import urlsplit
+from urllib.parse import unquote, urlsplit
 
 HERE = Path(__file__).resolve().parent
 DEFAULT_PROMPT = HERE / "lane-prompt.md"
@@ -257,7 +260,8 @@ def existing_output_is_valid(out_path: Path, catalog: str, layer_id: str, packet
         events_path = out_path.parent / "events" / f"{out_path.stem}.jsonl"
         # A child always emits events: an empty stream is a truncated one (round 8, NEW-1), never a clean audit.
         if not events_path.is_file() or not parse_events(events_path.read_text(encoding="utf-8", errors="replace")) \
-                or audit_is_flagged(blind_audit(events_path, audit_roots)):
+                or audit_is_flagged(blind_audit(events_path, audit_roots,
+                                               cwd_records=load_native_cwd_records(events_path))):
             return False
     try:
         data = load_json(out_path)
@@ -298,7 +302,8 @@ def fill_prompt(template: str, packet_path: Path, repo_root: Path) -> str:
 
 
 def build_command(repo_root: Path, schema_path: Path, out_tmp: Path, effort: str, prompt_text: str,
-                  model: str = None, isolation=(), *, provider="native", omniroute_base_url=None) -> list:
+                  model: str = None, isolation=(), *, provider="native", omniroute_base_url=None,
+                  ephemeral=True) -> list:
     provider_args = omniroute_config(omniroute_base_url) if provider == "omniroute" else []
     if provider == "omniroute":
         model = model or DEFAULT_OMNIROUTE_MODEL
@@ -308,7 +313,7 @@ def build_command(repo_root: Path, schema_path: Path, out_tmp: Path, effort: str
         *(["-m", model] if model else []),
         "--sandbox", "read-only",
         "--skip-git-repo-check",
-        "--ephemeral",
+        *(["--ephemeral"] if ephemeral else []),
         "-C", str(repo_root),
         "--output-schema", str(schema_path),
         "-o", str(out_tmp),
@@ -349,6 +354,16 @@ ISOLATION_ARGS = ("--ignore-user-config", "-c", "features.hooks=false", "-c", "f
                   "-c", 'web_search="disabled"', "-c", 'cli_auth_credentials_store="file"')
 
 AUDIT_NAME = "blind-audit.json"
+# Bind the existing verified Bash parser and its thin adapter into this runner's digest.
+# Codex@092d3acd exec_events.rs:159-166 records a command display, not syscall paths.
+AUDIT_ADAPTER = HERE / "blind-command-analysis.mjs"
+AUDIT_DEPENDENCIES = {
+    AUDIT_ADAPTER: "bcb1b9d483901259aee4cdafa3d779a2c2ee2feec71cb997257035b4549939dd",
+    HERE.parents[1] / "examples/claude-native/workflows/child-usage.mjs":
+        "3e5189342734135e88a2295c1c2152275d9e26c0c7731ed5cbc8905bbccd98a4",
+    HERE.parents[1] / "examples/claude-native/workflows/shell-parser.pin.json":
+        "961f4555c9067f17ae5fc2666d20ee797fbd2cd7abcbff80aa4963e912bf64d0",
+}
 # CLIs that reach memory stores, code indexes or session history, and the agent CLIs (a nested ``codex exec`` would
 # find the linked credential and run without the isolation flags). A blind child's PATH resolves none of them
 # (BLIND_CHILD_PATH; blind_path_issue refuses a host where one would), so its audit no longer looks for their names:
@@ -356,7 +371,7 @@ AUDIT_NAME = "blind-audit.json"
 # of candidate ids voided 11 of 32 layers with no read outside the export. A non-blind run keeps looking for them.
 BLIND_UNRESOLVABLE = ("ai-memory", "agentsview", "mcporter", "qmd", "socraticode", "jcodemunch", "serena", "codex",
                       "claude")
-# System tools a blind child's PATH keeps (git history, a database, the network): a command naming one is flagged.
+# System tools a blind child's PATH keeps (git history, a database, the network): executing one is flagged.
 AUDIT_TOOLS = ("git", "sqlite3", "curl", "wget")
 # A blind child's PATH: the system executable directories only. The caller's PATH carried the retrieval CLIs
 # (~/.local/share/codex-ecosystem/bin on this WSL host); codex itself is launched by the absolute path the caller's
@@ -384,9 +399,8 @@ CODEX_HOME_REFERENCE = re.compile(r"\$\{?CODEX_HOME\b[^\s'\"]*")
 # round 7, ISO-R7-9). The bare word in a search (``rg -n CODEX_HOME docs``) is not one (round 8, REG8-3).
 ENVIRONMENT_READ = re.compile(r"(?:^|[\s;&|(`'\"])(printenv|env|export\s+-p|declare\s+-p)(?=$|[\s;&|)`'\"])")
 COMMAND_SUBSTITUTION = re.compile(r"\$\(|`")
-# All of these match the raw command text (round 8, REG8-1): a stricter reading of which spans bash expands let
-# double-quoted apostrophes, escaped quotes, heredocs and nested shells hide reads. A literal backtick in a
-# single-quoted search pattern is voided too (REG7-3, a known low: a benign void is cheaper than a missed read).
+# Match only expansion spans supplied by the Bash grammar. Quoted literal data and quoted heredoc bodies
+# are not shell expansion; nested shell code is parsed separately.
 PARAMETER_EXPANSION = re.compile(r"\$\{(?:![^}]*|[^}]*[%#:/^,@*?\[][^}]*)\}")
 # A ``cd`` that leaves the working directory for somewhere the command does not name: bare ``cd`` (home),
 # ``cd -``, ``cd ~`` and ``cd $OLDPWD`` / ``cd "${OLDPWD}"`` (the previous directory), or any other bare variable.
@@ -479,28 +493,1633 @@ def unnamed_cd_targets(command: str) -> list:
     return found
 
 
-def blind_audit(events_path: Path, allowed_roots, tools=AUDIT_TOOLS) -> dict:
-    """Reading of one child's event stream: web searches, MCP tool calls, and commands that name an absolute path
-    outside ``allowed_roots`` (the repository and the packets directory) or name a CLI in ``tools`` (AUDIT_TOOLS; a
+class AuditAnalysisUnavailable(ValueError):
+    """An audit dependency cannot establish command structure; never a clean audit."""
+
+
+def command_analyses(commands: list[str]) -> list[dict]:
+    """Parse recorded command displays with the repository's pinned Bash grammar; execute no payload."""
+    for path, expected in AUDIT_DEPENDENCIES.items():
+        if not path.is_file() or sha256_file(path) != expected:
+            raise AuditAnalysisUnavailable(f"blind audit dependency missing or digest mismatch: {path.name}")
+    node = shutil.which("node")
+    if node is None:
+        raise AuditAnalysisUnavailable("blind audit needs Node and the pinned shell parser")
+    try:
+        result = subprocess.run([node, str(AUDIT_ADAPTER)], input=json.dumps(commands),
+                                capture_output=True, text=True, timeout=30)
+        data = json.loads(result.stdout)
+    except (OSError, ValueError, subprocess.TimeoutExpired) as error:
+        raise AuditAnalysisUnavailable("blind audit command parser unavailable") from error
+    if result.returncode or not isinstance(data, list) or len(data) != len(commands) or \
+            any(not isinstance(item, dict) for item in data):
+        raise AuditAnalysisUnavailable("blind audit pinned shell parser unavailable or invalid")
+    return data
+
+
+def audit_analysis_issue() -> str | None:
+    """Setup refusal before a pending real run spends a model turn; previews still write nothing."""
+    try:
+        command_analyses([])
+    except AuditAnalysisUnavailable as error:
+        return str(error)
+    return None
+
+
+def operand_reasons(value: str, allowed_roots) -> list[str]:
+    """Apply the existing boundary policy to a read operand, rather than unrelated command data."""
+    text = "operand " + repr(value)
+    reasons = [f"path outside the repository and packets: {p}" for p in outside_paths(text, allowed_roots)]
+    if names_root(text):
+        reasons.append("names the filesystem root /")
+    reasons += [f"home-relative path: {p}" for p in HOME_PATH.findall(text)]
+    reasons += [f"variable path: {p}" for p in VARIABLE_PATH.findall(text)]
+    reasons += [f"path climbs out of the working directory: {p}" for p in PARENT_PATH.findall(text)]
+    return reasons
+
+
+def resolved_read_reasons(value, allowed_roots, *, cwd=None):
+    """Check the filesystem target as well as its display, including links under every approved root."""
+    if not isinstance(value, str) or "\x00" in value:
+        return ["unverified filesystem read operand"]
+    if value == "/dev/null":
+        return []  # Preserve the existing explicit system-device exemption.
+    try:
+        roots = [Path(root) for root in allowed_roots]
+        if any(root.is_symlink() for root in roots):
+            return ["unverified symlinked allowed read root"]
+        path = Path(value)
+        if not path.is_absolute():
+            base = cwd or (str(roots[0]) if roots else None)
+            if base is None:
+                return ["unverified relative read working directory"]
+            path = Path(base) / path
+        resolved = path.resolve(strict=False)
+        for root in roots:
+            canonical = root.resolve(strict=False)
+            if resolved == canonical or not root.is_file() and canonical in resolved.parents:
+                return []
+        return ["resolved read path outside the repository and packets: " + str(resolved)]
+    except (OSError, ValueError, RuntimeError):
+        return ["unverified filesystem read target"]
+
+
+def sed_operands(words):
+    """Model numeric previews and r/R reads; refuse other interpreter source and unverified script files.
+
+    GNU sed@7e2e575a sed/compile.c read_filename and execute.c r/R dispatch are the reference.
+    This is a bounded source allowlist, not a replacement sed parser.
+    """
+    files, scripts, reasons = [], [], []
+    index, positional_script, options = 0, False, True
+    while index < len(words):
+        word = words[index]
+        index += 1
+        if options and word == "--":
+            options = False
+            continue
+        if options and word in {"-n", "--quiet", "--silent", "-E", "-r", "--regexp-extended", "--sandbox"}:
+            continue
+        if options and word in {"-e", "--expression", "-f", "--file"}:
+            if index == len(words):
+                reasons.append("missing sed script operand")
+                continue
+            value = words[index]
+            index += 1
+            if word in {"-f", "--file"}:
+                files.append(value)
+                reasons.append("unverified sed script-file source")
+            else:
+                scripts.append(value)
+            positional_script = True
+            continue
+        if options and (word.startswith("-f") or word.startswith("--file=")):
+            files.append(word[2:] if word.startswith("-f") else word.partition("=")[2])
+            reasons.append("unverified sed script-file source")
+            positional_script = True
+            continue
+        if options and (word.startswith("-e") or word.startswith("--expression=")):
+            scripts.append(word[2:] if word.startswith("-e") else word.partition("=")[2])
+            positional_script = True
+            continue
+        if options and word.startswith("-"):
+            reasons.append("unsupported sed option/source form")
+            continue
+        if not positional_script:
+            scripts.append(word)
+            positional_script = True
+        else:
+            files.append(word)
+    address = r"(?:\d+|\$)(?:,(?:\d+|\$))?"
+    for source in scripts:
+        if "\\" in source or "\x00" in source or "\r" in source:
+            reasons.append("unsupported sed interpreter source")
+            continue
+        for line in source.splitlines():
+            # r/R filenames consume the remaining line, including semicolons (GNU read_filename).
+            read = re.fullmatch(r"\s*(?:" + address + r")?\s*[rR][ \t]*(.+)", line)
+            if read:
+                files.append(read[1])
+            elif any(part.strip() and not re.fullmatch(r"\s*(?:" + address + r")?\s*[pqd]\s*", part)
+                     for part in line.split(";")):
+                reasons.append("unsupported sed interpreter source")
+    return files, reasons
+
+
+def search_operands(program: str, words: list[str]) -> tuple[list[str], list[str]]:
+    """Separate search/filter data from files, including pattern files and jq variable files.
+
+    An unrecognized option is refused instead of guessing which later word is data. In particular -f never
+    consumes a file silently as the positional pattern. Shell expansions are handled before this function.
+    """
+    files, reasons = [], []
+    pattern_given = "--files" in words
+    positional, index = False, 0
+    file_options = {"-f", "--file", "--from-file", "--ignore-file", "--exclude-from"}
+    pattern_options = {"-e", "--regexp"} if program != "jq" else set()
+    data_options = {"-g", "--glob", "--iglob", "--include", "--exclude", "--exclude-dir", "-t", "--type",
+                    "-T", "--type-not", "--type-add", "--type-clear", "--encoding", "-E", "--engine",
+                    "--color", "--colors", "--sort", "--sortr", "--path-separator", "--field-context-separator",
+                    "--field-match-separator", "-r", "--replace", "-A", "--after-context", "-B",
+                    "--before-context", "-C", "--context", "-m", "--max-count", "-M", "--max-columns",
+                    "-j", "--threads", "--maxdepth", "--max-filesize", "--dfa-size-limit", "--regex-size-limit",
+                    "--context-separator", "--label", "--binary-files", "--directories", "--devices",
+                    "--tab", "--indent"}
+    if program != "rg":
+        # The same short spelling can mean a flag in grep/jq and take a value in rg.
+        data_options -= {"-E", "-r", "-j", "-M", "-t", "-T", "-g"}
+    if program == "jq":
+        data_options = {"--indent"}
+        file_options.add("-L")
+    flags = {"--files", "--hidden", "--no-ignore", "--no-ignore-vcs", "--no-ignore-parent", "--no-ignore-global",
+             "--no-ignore-dot", "--no-messages", "--no-heading", "--heading", "--line-number", "--no-line-number",
+             "--column", "--with-filename", "--no-filename", "--files-with-matches", "--files-without-match",
+             "--fixed-strings", "--ignore-case", "--smart-case", "--invert-match", "--word-regexp", "--line-regexp",
+             "--only-matching", "--count", "--count-matches", "--quiet", "--null", "--null-data", "--text",
+             "--multiline", "--multiline-dotall", "--pcre2", "--pcre2-unicode", "--crlf", "--json", "--stats",
+             "--follow", "--no-follow", "--help", "--version", "--extended-regexp", "--basic-regexp",
+             "--recursive", "--dereference-recursive", "--raw-input", "--raw-output", "--join-output", "--compact-output",
+             "--slurp", "--null-input", "--sort-keys", "--monochrome-output", "--color-output", "--exit-status"}
+    short_flags = "inlLHhvwxcqoszZaPUuNFSErR" if program != "jq" else "rRscnjSMCe"
+    while index < len(words):
+        word = words[index]
+        index += 1
+        if word == "--" and not positional:
+            positional = True
+            continue
+        if not positional and word.startswith("-") and word != "-":
+            option, separator, attached = word.partition("=")
+            if word.startswith(("-f", "-e")) and not word.startswith("--") and len(word) > 2:
+                option, separator, attached = word[:2], "=", word[2:]
+            if option in file_options | pattern_options | data_options:
+                if not separator:
+                    if index == len(words):
+                        reasons.append("unresolved search/filter option operand: " + option)
+                        continue
+                    attached = words[index]
+                    index += 1
+                if option in file_options:
+                    files.append(attached)
+                if option in file_options & {"-f", "--file", "--from-file"} or option in pattern_options:
+                    pattern_given = True
+                continue
+            if program == "jq" and option in {"--arg", "--argjson", "--rawfile", "--slurpfile"}:
+                if separator or index + 1 >= len(words):
+                    reasons.append("unresolved jq variable option: " + option)
+                    continue
+                if option in {"--rawfile", "--slurpfile"}:
+                    files.append(words[index + 1])
+                index += 2
+                continue
+            if word in flags or re.fullmatch(r"-[" + short_flags + r"]+", word) or \
+                    re.fullmatch(r"-(?:[ABCmjM]|[0-9])[0-9]+", word):
+                continue
+            reasons.append("unresolved search/filter option: " + word)
+            files.append(word)
+            continue
+        if pattern_given:
+            files.append(word)
+        else:
+            pattern_given = True
+    return files, reasons
+
+
+def argv_reasons(argv: list[str], allowed_roots, tools, *, forwarding=False, cwd=None) -> list[str]:
+    """Executable position is distinct from pattern/filter arguments; inspect file operands separately."""
+    if not argv or any(not isinstance(word, str) for word in argv):
+        return ["unresolved executable or argument"]
+    program = os.path.basename(argv[0])
+    reasons = [f"runs {program}"] if program in tools else []
+    if argv[0].startswith("/"):
+        if not argv[0].startswith(SYSTEM_EXECUTABLE_PREFIXES):
+            reasons += operand_reasons(argv[0], allowed_roots)
+        if program in AUDIT_TOOLS + BLIND_UNRESOLVABLE and program not in tools:
+            reasons.append(f"runs {program} by path: {argv[0]}")
+    if program == "printenv" or program == "env" and not forwarding or \
+            program in ("export", "declare") and "-p" in argv[1:]:
+        reasons.append(f"reads the environment: {program}")
+    if program == "cd" and (len(argv) == 1 or UNNAMED_CD_TARGETS.fullmatch(argv[1])):
+        reasons.append(f"cd leaves for an unnamed directory: cd {argv[1] if len(argv) > 1 else '(home)'}")
+    operands = argv[1:]
+    if program in ("echo", "printf", "true", "false"):
+        operands = []
+    elif program in ("rg", "grep", "egrep", "fgrep", "jq"):
+        operands, option_reasons = search_operands(program, operands)
+        reasons += option_reasons
+    elif program == "sed":
+        operands, source_reasons = sed_operands(operands)
+        reasons += source_reasons
+    for word in operands:
+        reasons += operand_reasons(word, allowed_roots)
+        reasons += resolved_read_reasons(word, allowed_roots, cwd=cwd)
+    return reasons
+
+
+def _packet_document_valid(document, pathname):
+    """Accept only bounded inert JSON and the packet fields used by the static projection."""
+    import math
+
+    pending = [(document, 0)]
+    count = 0
+    while pending:
+        value, level = pending.pop()
+        count += 1
+        if count > 20_000 or level > 64:
+            return False
+        if type(value) is dict:
+            pending.extend((child, level + 1) for pair in value.items() for child in pair)
+        elif type(value) is list:
+            pending.extend((child, level + 1) for child in value)
+        elif type(value) is float:
+            if not math.isfinite(value):
+                return False
+        elif type(value) not in (str, int, bool, type(None)):
+            return False
+    catalog, layer = Path(pathname).stem.split("__", 1)
+    if type(document) is not dict or type(document.get("schema_version")) is not int or document["schema_version"] != 1:
+        return False
+    if document.get("catalog") != catalog or document.get("layer_id") != layer or type(document.get("candidates")) is not list:
+        return False
+    for candidate in document["candidates"]:
+        if type(candidate) is not dict or type(candidate.get("adopted")) is not bool:
+            return False
+        refs = candidate.get("evidence_refs")
+        if type(refs) is not list or any(type(ref) is not str or len(ref) > 16_384 for ref in refs):
+            return False
+    return True
+
+
+def _load_approved_packet_json(pathname, allowed_roots, expected_sha256=None):
+    """Load a bounded, digest-bound public packet snapshot; never open its evidence references.
+
+    Only flat catalog__layer.json inputs in an approved packets directory are eligible. The
+    caller may supply a trusted digest; otherwise the approved input root's SHA256SUMS supplies it.
+    A refusal returns None. This seam also permits portable tests with an approved snapshot.
+    CPython v3.13.16 Modules/posixmodule.c:11159-11170 forwards dir_fd to openat;
+    Linux v6.12 fs/open.c:1316-1326 and fs/pipe.c:1145-1164 define no-follow,
+    directory-only, and nonblocking opens. The byte cap applies before decoding;
+    node/depth bounds apply to accepted results (CPython Doc/library/json.rst:716-727).
+    """
+    import stat
+
+    maximum = 1_048_576
+    root_fd = None
+    try:
+        path = Path(pathname)
+        forbidden = {"auth", "credential", "credentials", "secret", "secrets", "key", "keys", "config", "settings", "session"}
+        if not path.is_absolute() or ".." in path.parts or not re.fullmatch(r"[a-z][a-z0-9_-]*__[a-z][a-z0-9_-]*\.json", path.name):
+            return None
+        if forbidden.intersection(re.split(r"[_-]+", path.stem)):
+            return None
+        packet_roots = [Path(root) for root in allowed_roots if Path(root).name == "packets" and path.parent == Path(root)]
+        if len(packet_roots) != 1 or path.is_symlink() or packet_roots[0].is_symlink():
+            return None
+        root = packet_roots[0].resolve(strict=True)
+        canonical = path.resolve(strict=True)
+        if canonical.parent != root or canonical.name != path.name:
+            return None
+        if not hasattr(os, "O_NOFOLLOW") or not hasattr(os, "O_DIRECTORY"):
+            return None
+        directory_flags = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW
+        root_fd = os.open(packet_roots[0].anchor, directory_flags)
+        for component in packet_roots[0].parts[1:]:
+            if component in {".", ".."}:
+                return None
+            child_fd = os.open(component, directory_flags, dir_fd=root_fd)
+            os.close(root_fd)
+            root_fd = child_fd
+
+        def read_bounded(name, limit):
+            descriptor = os.open(name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=root_fd)
+            with os.fdopen(descriptor, "rb") as stream:
+                before = os.fstat(stream.fileno())
+                if not stat.S_ISREG(before.st_mode) or before.st_nlink != 1 or before.st_size > limit:
+                    return None
+                value = stream.read(limit + 1)
+                after = os.fstat(stream.fileno())
+                named = os.stat(name, dir_fd=root_fd, follow_symlinks=False)
+                identity = lambda info: (info.st_dev, info.st_ino, info.st_nlink, info.st_size, info.st_mtime_ns, info.st_ctime_ns)
+                return value if len(value) <= limit and identity(before) == identity(after) == identity(named) else None
+
+        if expected_sha256 is None:
+            manifest = read_bounded("SHA256SUMS", 131_072)
+            if manifest is None:
+                return None
+            matches = []
+            for line in manifest.decode("ascii").splitlines():
+                fields = line.split(None, 1)
+                if len(fields) == 2 and fields[1].lstrip('*') == path.name:
+                    matches.append(fields[0])
+            if len(matches) != 1:
+                return None
+            expected_sha256 = matches[0]
+        if not isinstance(expected_sha256, str) or not re.fullmatch(r"[0-9a-fA-F]{64}", expected_sha256):
+            return None
+        contents = read_bounded(path.name, maximum)
+        if contents is None or hashlib.sha256(contents).hexdigest() != expected_sha256.lower():
+            return None
+        document = json.loads(contents)
+        return document if _packet_document_valid(document, path) else None
+    except (OSError, ValueError, TypeError, RecursionError, UnicodeError, NotImplementedError):
+        return None
+    finally:
+        if root_fd is not None:
+            os.close(root_fd)
+
+
+def python_audit(source: str, allowed_roots, tools, depth=0, *, cwd=None) -> list[str]:
+    """Statically identify Python read operands and subprocess argv with ast; never eval/exec code.
+
+    Literal data (including '/'.join for JSON locations) is not a filesystem read. Dynamic/unresolved read
+    operands and execution stay refused. This is command analysis, not syscall or branch attestation.
+    """
+    if depth > 8 or len(source) > 250_000:
+        return ["Python audit nesting or source limit"]
+    try:
+        tree = ast.parse(source)
+    except (SyntaxError, ValueError, RecursionError):
+        return ["unresolved Python interpreter source"]
+    nodes = list(ast.walk(tree))
+    if len(nodes) > 50_000:
+        return ["Python audit node limit"]
+    reasons = []
+    read_keywords = {"open": "file", "io.open": "file", "io.FileIO": "file", "builtins.open": "file", "os.open": "path",
+                     "os.listdir": "path", "os.scandir": "path", "os.walk": "top", "os.stat": "path",
+                     "os.lstat": "path", "os.readlink": "path", "os.chdir": "path", "glob.glob": "pathname",
+                     "glob.iglob": "pathname", "urllib.request.urlopen": "url", "os.path.samefile": "f1"}
+    path_methods = {"read_text", "read_bytes", "open", "iterdir", "glob", "rglob", "stat", "lstat",
+                    "is_file", "is_dir", "exists", "is_symlink", "readlink", "samefile"}
+    execution = {"subprocess.run", "subprocess.Popen", "subprocess.call", "subprocess.check_call",
+                 "subprocess.check_output", "subprocess.getoutput", "subprocess.getstatusoutput", "os.system", "os.popen"}
+    dynamic = {"eval", "exec", "__import__", "compile", "globals", "locals"}
+    constructors = {"Path", "pathlib.Path", "PurePath", "pathlib.PurePath", "pathlib.PosixPath", "pathlib.PurePosixPath"}
+    read_keywords.update({constructor + '.' + method: "self" for constructor in constructors for method in ("owner", "group")})
+    known = set(read_keywords) | execution | dynamic | constructors | {"getattr", "os.getenv", "os.environ.get", "json.loads"}
+    # Standard data/path transforms already modeled below. Other imported calls are not evidence of purity.
+    pure_imported = {"json.loads", "json.dumps", "re.compile", "re.search", "re.match", "re.fullmatch",
+                     "re.findall", "re.finditer", "re.escape", "os.path.join", "os.path.dirname",
+                     "os.path.basename", "os.path.normpath", "os.fsdecode", "os.fsencode", "hashlib.sha256"}
+    imported = {alias.name.split('.')[0] for node in nodes if isinstance(node, ast.Import) for alias in node.names}
+    imported.update(node.module.split('.')[0] for node in nodes if isinstance(node, ast.ImportFrom) and node.module)
+    # CPython cbc944f4 Doc/reference/import.rst:428-441: importing executes
+    # module initialization, even when the audited source never calls a reader.
+    # Only the exact standard-library namespaces with contracts below are admitted.
+    verified_imports = {"builtins", "io", "os", "os.path", "pathlib", "glob", "urllib.request",
+                        "json", "re", "hashlib", "subprocess"}
+    import_shadow = True
+    try:
+        import_root = Path(cwd or allowed_roots[0])
+        import_shadow = any(entry.name.split('.')[0] in sys.stdlib_module_names
+                            for entry in import_root.iterdir())
+    except FileNotFoundError:
+        # A nonexistent synthetic root cannot supply a shadow.
+        import_shadow = False
+    except (OSError, IndexError, TypeError):
+        pass  # An unreadable or unknown real root cannot verify import origin.
+    for node in nodes:
+        if isinstance(node, ast.Import):
+            modules = [alias.name for alias in node.names]
+        elif isinstance(node, ast.ImportFrom):
+            modules = [node.module] if not node.level else [None]
+        else:
+            continue
+        for module in modules:
+            if module not in verified_imports:
+                reasons.append("unverified Python import initialization: " + (module or "relative import"))
+            elif import_shadow:
+                reasons.append("unverified Python import origin: repository shadows standard library")
+
+    # Bindings are lexical and conservative across branches: every possible assignment must resolve.
+    scopes, parent_scope, bindings, namespace_writes = {}, {id(tree): None}, {}, []
+    parents = {id(child): node for node in nodes for child in ast.iter_child_nodes(node)}
+    stack = [(tree, id(tree))]
+    while stack:
+        node, scope = stack.pop()
+        scopes[id(node)] = scope
+        child_scope = scope
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef, ast.Lambda)):
+            if not isinstance(node, ast.Lambda):
+                bindings.setdefault((scope, node.name), []).append(node)
+            child_scope = id(node)
+            parent_scope[child_scope] = scope
+            if hasattr(node, "args"):
+                parameters = [*node.args.posonlyargs, *node.args.args, *node.args.kwonlyargs]
+                parameters += [arg for arg in (node.args.vararg, node.args.kwarg) if arg]
+                for arg in parameters:
+                    bindings[(child_scope, arg.arg)] = [None]
+        stack.extend((child, child_scope) for child in ast.iter_child_nodes(node))
+
+    def bind(target, value, scope):
+        if isinstance(target, ast.Name):
+            bindings.setdefault((scope, target.id), []).append(value)
+        elif isinstance(target, (ast.List, ast.Tuple)):
+            parts = value.elts if isinstance(value, (ast.List, ast.Tuple)) and len(value.elts) == len(target.elts) else [None] * len(target.elts)
+            for element, part in zip(target.elts, parts):
+                bind(element, part, scope)
+        elif isinstance(target, (ast.Attribute, ast.Subscript)):
+            namespace_writes.append(value)
+
+    for node in nodes:
+        scope = scopes[id(node)]
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                bind(ast.Name(id=alias.asname or alias.name.split('.')[0]),
+                     alias.name if alias.asname else alias.name.split('.')[0], scope)
+        elif isinstance(node, ast.ImportFrom) and node.module:
+            for alias in node.names:
+                if alias.name == "*":
+                    reasons.append("unresolved Python imported namespace")
+                else:
+                    bind(ast.Name(id=alias.asname or alias.name), node.module + '.' + alias.name, scope)
+        elif isinstance(node, ast.Assign):
+            for target in node.targets:
+                bind(target, node.value, scope)
+        elif isinstance(node, (ast.AnnAssign, ast.NamedExpr)):
+            bind(node.target, node.value, scope)
+        elif isinstance(node, ast.AugAssign):
+            bind(node.target, None, scope)
+        elif isinstance(node, (ast.For, ast.AsyncFor)):
+            if isinstance(node.iter, (ast.List, ast.Tuple)):
+                for element in node.iter.elts:
+                    bind(node.target, element, scope)
+            elif isinstance(node, ast.For) and isinstance(node.target, ast.Name):
+                bind(node.target, node, scope)
+            else:
+                bind(node.target, None, scope)
+        elif isinstance(node, (ast.Global, ast.Nonlocal)):
+            reasons.append("unresolved Python namespace rebinding")
+
+    def binding_key(node):
+        scope = scopes.get(id(node), id(tree))
+        while scope is not None:
+            key = (scope, node.id)
+            if key in bindings:
+                return key
+            scope = parent_scope[scope]
+        return None
+
+    def lookup(node):
+        key = binding_key(node)
+        return bindings[key] if key is not None else None
+
+    memo, active, path_receivers, path_receiver_active = {}, set(), {}, set()
+    budget = {"work": 20_000, "characters": 1_000_000}
+    read_use = None
+
+    def limited():
+        if "Python static resolution limit" not in reasons:
+            reasons.append("Python static resolution limit")
+        return None
+
+    def resolve(node, domain, level):
+        if node is None:
+            return None
+        key = (domain, id(node), id(read_use))
+        if key in memo:
+            return memo[key]
+        if level > 64 or budget["work"] <= 0:
+            return limited()
+        if key in active:
+            return None
+        budget["work"] -= 1
+        active.add(key)
+        try:
+            result = string_values(node, level + 1) if domain == "strings" else callable_values(node, level + 1)
+            if result is not None:
+                if len(result) > 64:
+                    result = limited()
+                elif domain == "strings":
+                    size = sum(len(value) for value in result)
+                    if any(len(value) > 16_384 for value in result) or size > budget["characters"]:
+                        result = limited()
+                    else:
+                        budget["characters"] -= size
+            memo[key] = result
+            return result
+        finally:
+            active.remove(key)
+
+    def strings(node, level=0):
+        return resolve(node, "strings", level)
+
+    def callables(node, level=0):
+        return resolve(node, "callables", level)
+
+    def labels(node, level=0):
+        values = callables(node, level)
+        return {label for kind, label, _ in values if kind == "named"} if values is not None else set()
+
+    def attributes(receiver, attribute, level):
+        resolved = callables(receiver, level)
+        prefixes = ({label for _, label, _ in resolved} if resolved is not None
+                    and all(kind == "named" for kind, _, _ in resolved) else set())
+        named = {prefix + '.' + attribute for prefix in prefixes}
+        if named & known or named & {"os.environ", "os.getcwd"}:
+            return {("named", value, None) for value in named}
+        if attribute in path_methods:
+            return {("path", attribute, receiver)}
+        if attribute in {"owner", "group"} and path_receiver(receiver, level):
+            return {("path", attribute, receiver)}
+        if attribute != "get" and attribute in {value.rsplit('.', 1)[-1] for value in known}:
+            return None
+        if not named:
+            # CPython cbc944f4 Objects/object.c:1250-1268 dispatches attributes
+            # through the receiver's type; losing its label cannot certify a call.
+            # Retain only modeled methods on a proven primitive data receiver.
+            methods = {"join", "strip", "lstrip", "rstrip", "replace", "split", "rsplit", "partition", "rpartition",
+                       "lower", "upper", "casefold", "startswith", "endswith", "decode", "hex", "splitlines"}
+            projected = data_value(receiver, level=level)
+            primitive = (isinstance(receiver, ast.Constant) and type(receiver.value) is bytes or
+                         projected is not None and type(projected[0]) in (str, bytes) and data_safe(projected[1])
+                         or primitive_data(receiver))
+            if attribute in methods and primitive:
+                return {("named", attribute, None)}
+            if (attribute in {"get", "keys", "values", "items"} and projected is not None
+                    and type(projected[0]) is dict and data_safe(projected[1])):
+                return {("data", attribute, receiver)}
+            # Reads on an exact modeled IO constructor retain its read contract;
+            # the constructor's operand is independently confined at its call.
+            if attribute in {"read", "readline", "readlines"} and modeled_stream(receiver, level):
+                return {("data", attribute, receiver)}
+            if (attribute == "hexdigest" and isinstance(receiver, ast.Call)
+                    and labels(receiver.func, level) == {"hashlib.sha256"}):
+                return {("data", attribute, receiver)}
+            if (attribute in methods - {"decode"} and isinstance(receiver, ast.Call)
+                    and isinstance(receiver.func, ast.Attribute) and receiver.func.attr == "read_text"
+                    and path_receiver(receiver.func.value, level)):
+                return {("data", attribute, receiver)}
+            return None
+        return {("named", value, None) for value in named}
+
+    def modeled_stream(receiver, level):
+        if level > 64:
+            return False
+        if isinstance(receiver, ast.Name):
+            values = lookup(receiver)
+            return bool(values) and all(isinstance(value, ast.AST) and modeled_stream(value, level + 1) for value in values)
+        return (isinstance(receiver, ast.Call) and not any(keyword.arg in {None, "opener"} for keyword in receiver.keywords)
+                and bool(labels(receiver.func, level)) and labels(receiver.func, level) <= {
+                    "open", "builtins.open", "io.open", "io.FileIO", "urllib.request.urlopen"})
+
+    def path_receiver(node, level):
+        key = id(node)
+        if key in path_receivers:
+            return path_receivers[key]
+        if level > 64 or budget["work"] <= 0:
+            limited()
+            return False
+        if key in path_receiver_active:
+            reasons.append("unresolved Python path receiver")
+            return False
+        budget["work"] -= 1
+        path_receiver_active.add(key)
+        try:
+            value = False
+            if isinstance(node, ast.Name):
+                values = lookup(node)
+                value = bool(values) and all(isinstance(item, ast.AST) and path_receiver(item, level + 1) for item in values)
+            elif isinstance(node, ast.Attribute) and node.attr == "parent":
+                value = path_receiver(node.value, level + 1)
+            elif isinstance(node, ast.BinOp) and isinstance(node.op, ast.Div):
+                value = path_receiver(node.left, level + 1)
+            elif isinstance(node, ast.Call):
+                value = bool(labels(node.func, level) & (constructors | {"Path.cwd", "pathlib.Path.cwd"})) or (
+                    isinstance(node.func, ast.Attribute) and node.func.attr in {"resolve", "absolute", "joinpath"}
+                    and path_receiver(node.func.value, level + 1))
+            path_receivers[key] = value
+            return value
+        finally:
+            path_receiver_active.remove(key)
+
+    def callable_values(node, level):
+        if isinstance(node, ast.Name):
+            assigned = lookup(node)
+            if assigned is None:
+                return {("named", node.id, None)}
+            result = set()
+            for value in assigned:
+                part = {("named", value, None)} if isinstance(value, str) else callables(value, level)
+                if part is None:
+                    return None
+                result.update(part)
+            return result
+        if isinstance(node, ast.Attribute):
+            return attributes(node.value, node.attr, level)
+        if isinstance(node, ast.Call) and labels(node.func, level) == {"getattr"}:
+            if len(node.args) != 2 or node.keywords:
+                return None
+            names = strings(node.args[1], level)
+            if names is None or len(names) != 1:
+                return None
+            return attributes(node.args[0], next(iter(names)), level)
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            return {("local", node.name, None)}
+        return None
+
+    def combine(left, right, join):
+        if left is None or right is None:
+            return None
+        if len(left) * len(right) > 64:
+            return limited()
+        if any(len(a) + len(b) > 16_384 for a in left for b in right):
+            return limited()
+        return {join(a, b) for a in left for b in right}
+
+    # The only data decoder is CPython v3.13.16 json.loads' default inert decoder
+    # (Lib/json/__init__.py:339-352). AST expressions below select native values;
+    # they do not execute payloads, callbacks, imports, or evidence-reference reads.
+    class PacketSnapshot:
+        def __init__(self, document):
+            self.document = document
+
+    data_memo, data_active, packet_snapshots = {}, set(), {}
+    dependency_memo, mutation_memo = {}, {}
+    dependency_unknown = object()
+
+    def data_value(node, environment=None, level=0):
+        if node is None or level > 64 or budget["work"] <= 0:
+            limited()
+            return None
+        budget["work"] -= 1
+        key = id(node)
+        if not environment and key in data_memo:
+            return data_memo[key]
+        if not environment and key in data_active:
+            return None
+        if not environment:
+            data_active.add(key)
+        try:
+            result = data_expression(node, environment or {}, level + 1)
+            if not environment:
+                data_memo[key] = result
+            return result
+        except (KeyError, IndexError, TypeError, ValueError, RecursionError):
+            return None
+        finally:
+            if not environment:
+                data_active.remove(key)
+
+    def data_expression(node, environment, level):
+        if isinstance(node, ast.Constant) and type(node.value) in (str, int, float, bool, type(None)):
+            return node.value, frozenset()
+        if isinstance(node, ast.Name):
+            if node.id in environment:
+                return environment[node.id]
+            assigned = lookup(node)
+            if assigned is None or len(assigned) != 1 or not isinstance(assigned[0], ast.AST):
+                return None
+            value = data_value(assigned[0], level=level)
+            return (value[0], value[1] | {binding_key(node)}) if value is not None else None
+        if isinstance(node, ast.Subscript) and isinstance(node.slice, ast.Constant) and type(node.slice.value) in (str, int):
+            base = data_value(node.value, environment, level)
+            if base is not None and type(base[0]) in (dict, list, tuple):
+                return base[0][node.slice.value], base[1]
+        if isinstance(node, (ast.List, ast.Tuple, ast.Set)):
+            values = [data_value(item, environment, level) for item in node.elts]
+            if any(value is None for value in values) or len(values) > 4096:
+                return None
+            container = tuple if isinstance(node, ast.Tuple) else set if isinstance(node, ast.Set) else list
+            return container(value[0] for value in values), frozenset().union(*(value[1] for value in values))
+        if isinstance(node, ast.Dict):
+            if len(node.keys) > 4096 or any(key is None for key in node.keys):
+                return None
+            keys = [data_value(key, environment, level) for key in node.keys]
+            values = [data_value(value, environment, level) for value in node.values]
+            if any(value is None for value in [*keys, *values]):
+                return None
+            return dict(zip((key[0] for key in keys), (value[0] for value in values))), frozenset().union(
+                *(value[1] for value in [*keys, *values]))
+        if isinstance(node, (ast.ListComp, ast.SetComp)):
+            if len(node.generators) > 64:
+                return limited()
+            results, dependencies = [], set()
+
+            def project(index, current):
+                if index == len(node.generators):
+                    value = data_value(node.elt, current, level)
+                    if value is None or len(results) >= 4096:
+                        return False
+                    results.append(value[0])
+                    dependencies.update(value[1])
+                    return True
+                generator = node.generators[index]
+                if generator.is_async or not isinstance(generator.target, ast.Name):
+                    return False
+                iterable = data_value(generator.iter, current, level)
+                if iterable is None or type(iterable[0]) not in (list, tuple, set) or len(iterable[0]) > 4096:
+                    return False
+                dependencies.update(iterable[1])
+                for value in iterable[0]:
+                    nested = dict(current)
+                    nested[generator.target.id] = value, iterable[1]
+                    predicates = [data_value(condition, nested, level) for condition in generator.ifs]
+                    if any(predicate is None for predicate in predicates):
+                        return False
+                    dependencies.update(frozenset().union(*(predicate[1] for predicate in predicates)))
+                    if all(bool(predicate[0]) for predicate in predicates) and not project(index + 1, nested):
+                        return False
+                return True
+
+            if project(0, environment):
+                return (set(results) if isinstance(node, ast.SetComp) else results), frozenset(dependencies)
+        if isinstance(node, ast.UnaryOp) and isinstance(node.op, ast.Not):
+            operand = data_value(node.operand, environment, level)
+            return (not operand[0], operand[1]) if operand is not None else None
+        if isinstance(node, ast.Compare) and len(node.ops) == 1:
+            left = data_value(node.left, environment, level)
+            right = data_value(node.comparators[0], environment, level)
+            if left is not None and right is not None:
+                a, b = left[0], right[0]
+                operation = node.ops[0]
+                if isinstance(operation, ast.In):
+                    value = a in b
+                elif isinstance(operation, ast.NotIn):
+                    value = a not in b
+                elif isinstance(operation, ast.Eq):
+                    value = a == b
+                elif isinstance(operation, ast.NotEq):
+                    value = a != b
+                else:
+                    return None
+                return value, left[1] | right[1]
+        if isinstance(node, ast.Call):
+            called = labels(node.func, level)
+            if called == {"json.loads"} and len(node.args) == 1 and not node.keywords:
+                value = data_value(node.args[0], environment, level)
+                if value is not None and type(value[0]) is PacketSnapshot:
+                    return value[0].document, value[1]
+            if called == {"sorted"} and len(node.args) == 1 and not node.keywords:
+                value = data_value(node.args[0], environment, level)
+                if value is not None and type(value[0]) in (list, tuple, set) and len(value[0]) <= 4096:
+                    return sorted(value[0]), value[1]
+            if isinstance(node.func, ast.Attribute) and node.func.attr in {"read_bytes", "read_text"} and path_receiver(node.func.value, level):
+                if node.args or (node.keywords and not (node.func.attr == "read_text" and len(node.keywords) == 1
+                        and node.keywords[0].arg == "encoding" and isinstance(node.keywords[0].value, ast.Constant)
+                        and node.keywords[0].value.value in ("utf-8", "utf8"))):
+                    return None
+                paths = strings(node.func.value, level)
+                if paths is None or len(paths) != 1:
+                    return None
+                pathname = next(iter(paths))
+                path = Path(pathname)
+                if not path.is_absolute() or ".." in path.parts or not re.fullmatch(r"[a-z][a-z0-9_-]*__[a-z][a-z0-9_-]*\.json", path.name):
+                    return None
+                if not any(Path(root).name == "packets" and Path(root) == path.parent for root in allowed_roots):
+                    return None
+                if pathname not in packet_snapshots:
+                    document = _load_approved_packet_json(pathname, allowed_roots)
+                    packet_snapshots[pathname] = PacketSnapshot(document) if _packet_document_valid(document, pathname) else None
+                snapshot = packet_snapshots[pathname]
+                return (snapshot, frozenset()) if snapshot is not None else None
+        return None
+
+    def dependency_names(node, level=0):
+        if not isinstance(node, ast.AST):
+            return set()
+        if id(node) in dependency_memo:
+            return dependency_memo[id(node)]
+        if level > 64 or budget["work"] <= 0:
+            limited()
+            return {dependency_unknown}
+        budget["work"] -= 1
+        if isinstance(node, ast.Name):
+            key = binding_key(node)
+            result = {key} if key is not None else set()
+        else:
+            children = ([node.iter] if isinstance(node, ast.For) else
+                        [*node.args, *(keyword.value for keyword in node.keywords)] if isinstance(node, ast.Call) else
+                        ast.iter_child_nodes(node))
+            result = set().union(*(dependency_names(child, level + 1) for child in children))
+        dependency_memo[id(node)] = result
+        return result
+
+    def dependency_closure(expression):
+        pending, found = list(dependency_names(expression)), set()
+        while pending:
+            key = pending.pop()
+            if key is dependency_unknown:
+                return None
+            if key in found:
+                continue
+            if budget["work"] <= 0 or len(found) >= 4096:
+                limited()
+                return None
+            budget["work"] -= 1
+            found.add(key)
+            for value in bindings[key]:
+                pending.extend(dependency_names(value) - found)
+        return found
+
+    def data_safe(dependencies):
+        if not dependencies:
+            return True
+        if dependencies in mutation_memo:
+            return mutation_memo[dependencies]
+
+        def relevant(expression):
+            closure = dependency_closure(expression)
+            return closure is None or bool(closure & dependencies)
+
+        safe = True
+        for item in nodes:
+            # Reflective namespace mutation defeats an exact stdlib callable label.
+            # Refuse it lazily for packet-dependent reads, including callable aliases.
+            reflective = {"__dict__", "__setattr__", "__delattr__", "__getattribute__"}
+            if isinstance(item, ast.Attribute) and item.attr in reflective:
+                safe = False
+            targets = item.targets if isinstance(item, (ast.Assign, ast.Delete)) else [item.target] if isinstance(item, (ast.AugAssign, ast.AnnAssign)) else []
+            for target in targets:
+                if isinstance(target, (ast.Subscript, ast.Attribute)) and relevant(target.value):
+                    safe = False
+                elif isinstance(item, (ast.AugAssign, ast.Delete)) and isinstance(target, ast.Name) and relevant(target):
+                    safe = False
+            if not isinstance(item, ast.Call):
+                continue
+            called = labels(item.func)
+            if any(name.rsplit('.', 1)[-1] in {"setattr", "delattr", "vars"} | reflective for name in called):
+                safe = False
+            if called == {"getattr"} and len(item.args) > 1 and (strings(item.args[1]) or set()) & reflective:
+                safe = False
+            operands = [*item.args, *(keyword.value for keyword in item.keywords)]
+            if isinstance(item.func, ast.Attribute):
+                operands.append(item.func.value)
+            if isinstance(item.func, ast.Name):
+                assigned = lookup(item.func) or []
+                operands.extend(value for value in assigned if isinstance(value, ast.AST))
+            if not any(relevant(operand) for operand in operands):
+                continue
+            resolved = callables(item.func)
+            harmless = bool(called) and called <= constructors | set(read_keywords) | path_methods
+            harmless |= bool(resolved) and all(kind == "path" for kind, _, _ in resolved)
+            harmless |= called in ({"json.loads"}, {"json.dumps"}, {"sorted"}, {"len"}, {"str"}, {"hashlib.sha256"}) and len(item.args) == 1 and not item.keywords
+            harmless |= called == {"print"} and not item.keywords
+            harmless |= (isinstance(item.func, ast.Attribute) and item.func.attr == "hexdigest" and not item.args and not item.keywords
+                         and isinstance(item.func.value, ast.Call) and labels(item.func.value.func) == {"hashlib.sha256"})
+            if not harmless:
+                safe = False
+        mutation_memo[dependencies] = safe
+        if not safe:
+            reasons.append("unresolved Python packet mutation or callback")
+        return safe
+
+    def guarded_loop_values(loop, values):
+        current = read_use
+        while current is not None and parents.get(id(current)) is not loop:
+            current = parents.get(id(current))
+        if current not in loop.body:
+            return values
+        for statement in loop.body[:loop.body.index(current)]:
+            if not isinstance(statement, ast.If) or statement.orelse or not statement.body or not isinstance(statement.body[-1], ast.Continue):
+                continue
+            test = statement.test
+            if (isinstance(test, ast.Compare) and len(test.ops) == 1 and isinstance(test.ops[0], ast.In)
+                    and isinstance(test.left, ast.Constant) and test.left.value == "://"
+                    and isinstance(test.comparators[0], ast.Name) and binding_key(test.comparators[0]) == binding_key(loop.target)):
+                return {value for value in values if "://" not in value}
+        return values
+
+    def string_values(node, level):
+        if isinstance(node, ast.Constant) and isinstance(node.value, str):
+            return {node.value}
+        if isinstance(node, ast.Name):
+            assigned = lookup(node)
+            if assigned is None:
+                return None
+            result = set()
+            for value in assigned:
+                part = strings(value, level) if isinstance(value, ast.AST) else None
+                if part is None:
+                    return None
+                result.update(part)
+                if len(result) > 64:
+                    return limited()
+            return result
+        if isinstance(node, ast.For):
+            projection = data_value(node.iter, level=level)
+            if projection is not None and type(projection[0]) in (list, tuple, set) and all(type(value) is str for value in projection[0]) and data_safe(projection[1]):
+                return guarded_loop_values(node, set(projection[0]))
+            return None
+        if isinstance(node, ast.Subscript):
+            projection = data_value(node, level=level)
+            if projection is not None and type(projection[0]) is str and data_safe(projection[1]):
+                return {projection[0]}
+            return None
+        if isinstance(node, ast.BinOp) and isinstance(node.op, (ast.Add, ast.Div)):
+            return combine(strings(node.left, level), strings(node.right, level),
+                           (lambda a, b: a + b) if isinstance(node.op, ast.Add) else os.path.join)
+        if isinstance(node, ast.Attribute) and node.attr == "parent":
+            base = strings(node.value, level)
+            return {os.path.dirname(value.rstrip('/')) or ("/" if value.startswith('/') else ".") for value in base} if base is not None else None
+        if isinstance(node, ast.Call):
+            called = labels(node.func, level)
+            if called and called <= constructors | {"os.path.join"}:
+                if node.keywords:
+                    return None
+                result = {"."} if not node.args else {""}
+                for argument in node.args:
+                    result = combine(result, strings(argument, level), os.path.join)
+                return result
+            if called & {"Path.cwd", "pathlib.Path.cwd", "os.getcwd"}:
+                base = cwd if cwd is not None else allowed_roots[0] if allowed_roots else None
+                return {str(base)} if base is not None and not node.args and not node.keywords else None
+            if isinstance(node.func, ast.Attribute):
+                method = node.func.attr
+                if method in ("resolve", "absolute"):
+                    return strings(node.func.value, level)
+                if method == "joinpath":
+                    result = strings(node.func.value, level)
+                    for argument in node.args:
+                        result = combine(result, strings(argument, level), os.path.join)
+                    return result if not node.keywords else None
+                if method in ("rstrip", "lstrip", "strip"):
+                    base = strings(node.func.value, level)
+                    chars = strings(node.args[0], level) if node.args else {None}
+                    if base is not None and chars is not None and len(base) * len(chars) <= 64:
+                        return {getattr(value, method)(char) for value in base for char in chars}
+        return None
+
+    def argument(node, position, keywords):
+        if len(node.args) > position:
+            return node.args[position]
+        return next((keyword.value for keyword in node.keywords if keyword.arg in keywords), None)
+
+    def read_operand(operand, default=None, network=False):
+        if operand is None and default is not None:
+            resolved = {default}
+        else:
+            resolved = strings(operand)
+        if resolved is None:
+            expression = ast.get_source_segment(source, operand) if operand is not None else None
+            if expression:
+                reasons.extend(operand_reasons(expression, allowed_roots))
+            reasons.append("unresolved Python read operand")
+            return
+        for value in resolved:
+            original = value
+            try:
+                parsed = urlsplit(value)
+            except ValueError:
+                reasons.append("unresolved Python read URL")
+                continue
+            if network:
+                if (parsed.scheme != "file" or parsed.netloc not in {"", "localhost"}
+                        or parsed.query or parsed.fragment or re.search(r"%(?![0-9a-fA-F]{2})", parsed.path)):
+                    reasons.append("unsupported Python read URL or network authority")
+                    continue
+                # CPython@cbc944f4 urllib/request.py FileHandler.open_local_file / url2pathname.
+                from urllib.request import url2pathname
+                value = url2pathname(parsed.path)
+                if not os.path.isabs(value) or "\x00" in value:
+                    reasons.append("unsupported local file URL path")
+                    continue
+            path_reasons = operand_reasons(value, allowed_roots)
+            path_reasons += resolved_read_reasons(value, allowed_roots, cwd=cwd)
+            reasons.extend(path_reasons)
+            if path_reasons:
+                if value != original:
+                    reasons.extend(operand_reasons(original, allowed_roots))
+                if os.path.isabs(value) and operand is not None:
+                    expression = ast.get_source_segment(source, operand) or ""
+                    if names_root(expression):
+                        reasons.append("names the filesystem root /")
+
+    def sequence(node):
+        if isinstance(node, (ast.List, ast.Tuple)):
+            return node.elts
+        if isinstance(node, ast.Name):
+            assigned = lookup(node)
+            if assigned is not None and len(assigned) == 1 and isinstance(assigned[0], (ast.List, ast.Tuple)):
+                return assigned[0].elts
+        return None
+
+    def analyze_execution(node, called):
+        operand = argument(node, 0, {"args", "command", "cmd"})
+        elements = sequence(operand)
+        shell_keyword = next((keyword.value for keyword in node.keywords if keyword.arg == "shell"), None)
+        shell = called in {"os.system", "os.popen", "subprocess.getoutput", "subprocess.getstatusoutput"}
+        if shell_keyword is not None:
+            if not isinstance(shell_keyword, ast.Constant) or not isinstance(shell_keyword.value, bool):
+                reasons.append("unresolved Python shell execution mode")
+                return
+            shell = shell_keyword.value
+        if elements is not None:
+            argv = []
+            for element in elements:
+                candidates = strings(element)
+                if candidates is None or len(candidates) != 1:
+                    reasons.append("unresolved Python executable argv")
+                    return
+                argv.append(next(iter(candidates)))
+            if not argv:
+                reasons.append("unresolved Python executable argv")
+                return
+            commands = [shlex.join(["/bin/sh", "-c", *argv] if shell else argv)]
+        else:
+            candidates = strings(operand)
+            if candidates is None:
+                reasons.append("unresolved Python executable source")
+                return
+            commands = [value if shell else shlex.join([value]) for value in candidates]
+        for keyword in node.keywords:
+            if keyword.arg in {"cwd", "executable"}:
+                read_operand(keyword.value)
+            if keyword.arg == "cwd":
+                reasons.append("working directory changed by Python subprocess; command unverified")
+        for command in commands:
+            try:
+                reasons.extend(analysis_reasons(command_analyses([command])[0], allowed_roots, tools, depth + 1,
+                                                cwd=cwd))
+            except AuditAnalysisUnavailable as error:
+                reasons.append(str(error))
+
+    # A fixed list of readers cannot certify every library call. A risky literal
+    # needs a positive data-use proof; names such as connect/getline are not IO guesses.
+    def primitive_data(expression, level=0):
+        if level > 64:
+            return False
+        if isinstance(expression, ast.Constant) and type(expression.value) is bytes:
+            return True
+        if isinstance(expression, ast.BinOp) and isinstance(expression.op, ast.Add):
+            return (strings(expression) is not None and primitive_data(expression.left, level + 1)
+                    and primitive_data(expression.right, level + 1))
+        projected = data_value(expression)
+        if projected is not None and type(projected[0]) in (str, int, float, bool, type(None), list, tuple, set, dict):
+            return data_safe(projected[1])
+        # The approved packet loop has known builtin strings even though a For
+        # statement is not itself a scalar expression in the projection evaluator.
+        assigned = lookup(expression) if isinstance(expression, ast.Name) else None
+        if assigned and all(isinstance(value, ast.For) for value in assigned):
+            for value in assigned:
+                projected = data_value(value.iter)
+                if projected is None or type(projected[0]) not in (list, tuple, set) or not all(
+                        type(item) is str for item in projected[0]) or not data_safe(projected[1]):
+                    return False
+            return True
+        return False
+
+    reflective_data = any(
+        isinstance(item, ast.Call) and any(name.rsplit('.', 1)[-1] in
+            {"setattr", "delattr", "vars", "globals", "locals"} for name in labels(item.func))
+        or isinstance(item, ast.Attribute) and item.attr in
+            {"__dict__", "__setattr__", "__delattr__", "__getattribute__"}
+        for item in nodes
+    )
+
+    def literal_is_data(literal):
+        # CPython v3.13.16 compound_stmts.rst: a definition does not execute its
+        # body. A separator in a self-recursive helper is dormant only when no
+        # reference or call outside that body's statements can invoke the helper.
+        dormant = None
+        ancestor = literal
+        for _ in range(64):
+            parent = parents.get(id(ancestor))
+            if parent is None:
+                break
+            if isinstance(parent, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                if (literal.value == "/" and not reflective_data and ancestor in parent.body
+                        and not parent.decorator_list and isinstance(parents.get(id(parent)), ast.Module)):
+                    dormant = parent
+                break
+            ancestor = parent
+
+        def in_dormant_body(node):
+            for _ in range(64):
+                parent = parents.get(id(node))
+                if parent is dormant:
+                    return node in dormant.body
+                if parent is None:
+                    break
+                node = parent
+            return False
+
+        if dormant is not None:
+            key = (scopes[id(dormant)], dormant.name)
+            if any((isinstance(node, ast.Name) and isinstance(node.ctx, ast.Load)
+                    and binding_key(node) == key or isinstance(node, ast.Call))
+                   and not in_dormant_body(node) for node in nodes):
+                dormant = None
+        current = literal
+        for _ in range(64):
+            parent = parents.get(id(current))
+            if parent is None:
+                return False
+            if isinstance(parent, ast.Compare):
+                if all(primitive_data(value) for value in [parent.left, *parent.comparators]):
+                    return True
+                # CPython v3.13.16 object.c:1016 / abstract.c:2277 hand literals to
+                # reflected equality or containment callbacks. Preserve non-path separators.
+                if literal.value not in ("://", b"://") and operand_reasons(os.fsdecode(literal.value), allowed_roots):
+                    return False
+                current = parent
+                continue
+            if isinstance(parent, ast.IfExp):
+                current = parent
+                continue
+            if isinstance(parent, (ast.List, ast.Tuple, ast.Set, ast.Dict, ast.keyword)):
+                current = parent
+                continue
+            if isinstance(parent, ast.BinOp) and isinstance(parent.op, ast.Add):
+                if dormant is None and (not primitive_data(parent.left) or not primitive_data(parent.right)):
+                    return False
+                current = parent
+                continue
+            if isinstance(parent, ast.Attribute) and parent.value is current:
+                current = parent
+                continue
+            if not isinstance(parent, ast.Call):
+                return False
+            if (not reflective_data and isinstance(parent.func, ast.Attribute)
+                    and isinstance(parent.func.value, ast.Constant) and type(parent.func.value.value) is bytes
+                    and parent.func.attr in {"join", "strip", "lstrip", "rstrip", "replace", "split", "rsplit", "decode", "hex",
+                                             "partition", "rpartition", "lower", "upper", "startswith", "endswith"}):
+                # bytes.decode may invoke registered codec/error callbacks (CPython
+                # v3.13.16 codecs.c:180-183,625-633; unicodeobject.c:5102-5103).
+                # Only argument-free decode of valid UTF-8 bypasses those callbacks.
+                if parent.func.attr == "decode":
+                    if parent.args or parent.keywords:
+                        return False
+                    try:
+                        parent.func.value.value.decode("utf-8", "strict")
+                    except UnicodeDecodeError:
+                        return False
+                # Follow the resulting primitive data to the verified sink, retaining AST types.
+                current = parent
+                continue
+            called = callables(parent.func)
+            names = {name for kind, name, _ in called or () if kind == "named"}
+            if not called:
+                return False
+            if len(names) != len(called):
+                return (dormant is not None and isinstance(parent.func, ast.Name)
+                        and lookup(parent.func) == [dormant]
+                        and all(kind == "local" and name == dormant.name for kind, name, _ in called))
+            operand = current.value if isinstance(current, ast.keyword) else current
+            if names <= set(read_keywords) and all(
+                    argument(parent, 0, {read_keywords[name]}) is operand for name in names):
+                values = strings(operand)
+                if values is not None and all(not operand_reasons(value, allowed_roots) for value in values):
+                    return True
+            if not reflective_data and names <= {"print", "builtins.print"} and all(
+                    keyword.arg in {"sep", "end", "flush"} or keyword.arg == "file"
+                    and isinstance(keyword.value, ast.Constant) and keyword.value.value is None
+                    for keyword in parent.keywords):
+                return True
+            if not reflective_data and names == {"json.dumps"} and all(keyword.arg in {
+                    "indent", "sort_keys", "ensure_ascii", "separators", "allow_nan", "skipkeys", "check_circular"
+                    } for keyword in parent.keywords):
+                if not json_sort_safe(parent):
+                    return False
+                current = parent
+                continue
+            if isinstance(parent.func, ast.Attribute) and parent.func.attr in {
+                    "join", "strip", "lstrip", "rstrip", "replace", "split", "rsplit", "partition", "rpartition",
+                    "lower", "upper", "casefold", "startswith", "endswith"}:
+                receiver = data_value(parent.func.value)
+                if receiver is not None and type(receiver[0]) is str and data_safe(receiver[1]):
+                    current = parent
+                    continue
+            return False
+        return False
+
+    def json_sort_safe(call):
+        # CPython cbc944f4 Lib/json/encoder.py:354-375 sorts before skipkeys.
+        # An unknown flag may enable comparisons. Proving the entire primitive
+        # tree also covers keys of nested dicts and excludes subclass overrides.
+        sorting = next((keyword.value for keyword in call.keywords if keyword.arg == "sort_keys"), None)
+        return (sorting is None or isinstance(sorting, ast.Constant) and sorting.value is False
+                or primitive_data(argument(call, 0, {"obj"})))
+
+    def callback_safe(callback, operands):
+        # The admitted builtins only consume exact primitive input trees here.
+        # Unknown iterables or callback aliases cannot establish this contract.
+        return (labels(callback) in ({"str"}, {"bytes"}, {"int"}, {"float"}, {"bool"}, {"len"}, {"abs"})
+                and bool(operands) and all(primitive_data(value) for value in operands))
+
+    def callable_escape(value):
+        resolved = callables(value)
+        if resolved and any(kind == "local" or kind == "path" or name in known
+                            or name.split('.')[0] in imported for kind, name, _ in resolved):
+            return True
+        if isinstance(value, (ast.List, ast.Tuple, ast.Set)):
+            return any(callable_escape(element) for element in value.elts)
+        if isinstance(value, ast.Dict):
+            return any(callable_escape(element) for element in [*value.keys, *value.values] if element is not None)
+        if isinstance(value, ast.Starred):
+            return callable_escape(value.value)
+        return isinstance(value, ast.Lambda)
+
+    def check_callbacks(node, resolved):
+        # CPython cbc944f4 Python/bltinmodule.c:1391-1392,1415-1445 stores
+        # and invokes map's callback. Treat passing a callable as execution.
+        names = {name for kind, name, _ in resolved if kind == "named"}
+        if names & {"map", "filter"}:
+            callback = argument(node, 0, set())
+            if not callback_safe(callback, node.args[1:]) or node.keywords:
+                reasons.append("unverified Python callback execution")
+            return
+        if names & {"sorted", "min", "max"}:
+            for keyword in node.keywords:
+                if keyword.arg is None or (keyword.arg == "key"
+                        and not (isinstance(keyword.value, ast.Constant) and keyword.value.value is None)
+                        and not callback_safe(keyword.value, node.args)):
+                    reasons.append("unverified Python key callback execution")
+            # Callable values in the iterable must not escape through an unknown consumer.
+        if any(callable_escape(value) for value in [*node.args, *(keyword.value for keyword in node.keywords)]):
+            reasons.append("unverified Python callable escape")
+
+    for expression in namespace_writes:
+        if expression is not None and not isinstance(expression, (ast.Constant, ast.List, ast.Tuple, ast.Dict, ast.Set)) and strings(expression) is None:
+            reasons.append("unresolved Python callable namespace write")
+
+    for node in nodes:
+        if isinstance(node, ast.Attribute) and "os.environ" in labels(node):
+            reasons.append("reads the environment: os.environ")
+        if not isinstance(node, ast.Call):
+            continue
+        read_use = node
+        resolved = callables(node.func)
+        if resolved is None:
+            reasons.append("unresolved Python callable alias")
+            continue
+        check_callbacks(node, resolved)
+        for kind, called, receiver in resolved:
+            if called == "json.loads" and any(keyword.arg not in {"s"} for keyword in node.keywords):
+                reasons.append("unverified Python JSON decoder callback or override")
+            if called == "json.dumps" and any(keyword.arg in {None, "default", "cls"} for keyword in node.keywords):
+                reasons.append("unverified Python JSON encoder callback or override")
+            if called == "json.dumps" and not json_sort_safe(node):
+                reasons.append("unverified Python JSON key comparison callback")
+            if kind == "path":
+                read_operand(receiver)
+                if called == "samefile":
+                    read_operand(argument(node, 0, {"other_path"}))
+                if called in ("glob", "rglob"):
+                    pattern = argument(node, 0, {"pattern"})
+                    read_operand(pattern)
+                    bases, patterns = strings(receiver), strings(pattern)
+                    joined = combine(bases, patterns, os.path.join)
+                    if joined is None:
+                        reasons.append("unresolved Python glob operand")
+                    else:
+                        for value in joined:
+                            reasons.extend(operand_reasons(value, allowed_roots))
+            elif called in dynamic:
+                reasons.append("unresolved dynamic Python execution or namespace")
+            elif called in ("os.getenv", "os.environ.get"):
+                reasons.append("reads the environment: " + called)
+            elif called in ("os.chdir", "os.fchdir"):
+                reasons.append("working directory changed by Python; command unverified")
+            elif called in read_keywords:
+                read_operand(argument(node, 0, {read_keywords[called]}),
+                             default="." if called in ("os.listdir", "os.scandir") else None,
+                             network=called == "urllib.request.urlopen")
+                if called == "os.path.samefile":
+                    read_operand(argument(node, 1, {"f2"}))
+            elif called in execution:
+                analyze_execution(node, called)
+            elif called.startswith(("os.exec", "os.spawn")):
+                reasons.append("unresolved Python executable interface")
+            elif (kind == "named" and called.split('.')[0] in imported
+                  and called not in constructors and called not in pure_imported
+                  and called not in {"Path.cwd", "pathlib.Path.cwd"}):
+                reasons.append("unverified potentially effectful Python imported call: " + called)
+            if kind == "path" or called in read_keywords:
+                for keyword in node.keywords:
+                    if keyword.arg in {"root_dir", "cwd"}:
+                        read_operand(keyword.value)
+                    elif keyword.arg == "dir_fd" and not (isinstance(keyword.value, ast.Constant) and keyword.value.value is None):
+                        reasons.append("unresolved Python read directory descriptor")
+    for literal in nodes:
+        if isinstance(literal, ast.Constant) and type(literal.value) in (str, bytes):
+            # CPython v3.13.16 Lib/os.py:856-866: use the filesystem encoding/error
+            # handler for byte paths; retain the original AST type for data-flow checks.
+            boundary = operand_reasons(os.fsdecode(literal.value), allowed_roots)
+            if boundary and not literal_is_data(literal):
+                reasons.extend(boundary)
+                reasons.append("unproven Python boundary literal")
+    return list(dict.fromkeys(reasons))
+
+
+def analysis_reasons(analysis, allowed_roots, tools, depth=0, *, cwd=None) -> list[str]:
+    """Policy over parsed command positions, read operands, interpreter source and real shell expansions."""
+    if depth > 8:
+        return ["command audit nesting limit"]
+    reasons = ["unresolved shell command: " + str(error) for error in analysis.get("errors", [])]
+    if not analysis.get("ok") and not reasons:
+        reasons.append("unresolved shell command")
+    for invocation in analysis.get("invocations", []):
+        argv = invocation.get("argv", [])
+        end = invocation.get("wrapped_program_index", len(argv))
+        code_index = invocation.get("code_arg_index")
+        raw = invocation.get("raw_argv", [])
+        # An unresolved shell word remains refused. Its source span can still preserve a specific home/variable
+        # path or cd reason; it is never expanded or used to infer a clean command.
+        operands = [value if value is not None else raw[i].strip("'\"") if i < len(raw) else None
+                    for i, value in enumerate(argv[:end]) if i != code_index]
+        reasons += argv_reasons(operands, allowed_roots, tools,
+                                forwarding=invocation.get("source_kind") == "wrapper", cwd=cwd)
+        if operands and isinstance(operands[0], str):
+            program = os.path.basename(operands[0])
+            if program in {"cd", "pushd", "popd", "chroot", "nsenter", "unshare"} or program == "env" and any(
+                    isinstance(word, str) and (word in {"-C", "--chdir"} or word.startswith("--chdir=")
+                                              or word.startswith("-C") and len(word) > 2)
+                    for word in operands[1:]):
+                reasons.append(f"working directory changed by {program}; command unverified")
+    for source in analysis.get("python_sources", []):
+        reasons += python_audit(source, allowed_roots, tools, depth, cwd=cwd)
+    for source in analysis.get("expansions", []):
+        if COMMAND_SUBSTITUTION.search(source) or source.startswith("<(") or source.startswith(">("):
+            reasons.append("command substitution")
+        reasons += [f"parameter expansion: {m}" for m in PARAMETER_EXPANSION.findall(source)]
+        reasons += [f"inherited directory variable: {m}" for m in INHERITED_DIRECTORY.findall(source)]
+        reasons += [f"names the Codex home: {m}" for m in CODEX_HOME_REFERENCE.findall(source)]
+        reasons += [f"home-relative path: {m}" for m in HOME_PATH.findall(source)]
+        reasons += [f"variable path: {m}" for m in VARIABLE_PATH.findall(source)]
+    for value in analysis.get("redirect_paths", []):
+        reasons += operand_reasons(value, allowed_roots)
+    return list(dict.fromkeys(reasons))
+
+
+NATIVE_CWD_MAX_BYTES = 8 * 1024 * 1024
+NATIVE_CWD_VERSION = "0.162.1"
+
+
+def _native_cwd_digest(value):
+    return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+
+
+def native_cwd_path(events_path):
+    return Path(events_path).with_suffix(".native-cwd.json")
+
+
+def _native_cwd_bytes(path, root):
+    """Bounded regular-file read beneath the caller's scratch root; never follow a credential link."""
+    parts = Path(path).relative_to(root).parts
+    if not parts or any(part in ("", ".", "..") for part in parts):
+        raise ValueError("invalid native capture path")
+    descriptor = os.open(root, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    try:
+        for part in parts[:-1]:
+            child = os.open(part, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=descriptor)
+            os.close(descriptor)
+            descriptor = child
+        child = os.open(parts[-1], os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=descriptor)
+        try:
+            before = os.fstat(child)
+            if not stat.S_ISREG(before.st_mode) or before.st_nlink != 1 or before.st_size > NATIVE_CWD_MAX_BYTES:
+                raise ValueError("invalid or oversized native capture")
+            chunks, size = [], 0
+            while chunk := os.read(child, min(65536, NATIVE_CWD_MAX_BYTES + 1 - size)):
+                chunks.append(chunk)
+                size += len(chunk)
+                if size > NATIVE_CWD_MAX_BYTES:
+                    raise ValueError("oversized native capture")
+            after = os.fstat(child)
+            if (before.st_dev, before.st_ino, before.st_size, before.st_mtime_ns, before.st_ctime_ns) != (
+                    after.st_dev, after.st_ino, after.st_size, after.st_mtime_ns, after.st_ctime_ns):
+                raise ValueError("native capture changed during read")
+            return b"".join(chunks)
+        finally:
+            os.close(child)
+    finally:
+        os.close(descriptor)
+
+
+def _native_cwd_value(uri):
+    if not isinstance(uri, str):
+        raise ValueError("native cwd is not a URI")
+    parsed = urlsplit(uri)
+    if parsed.scheme != "file" or parsed.netloc or parsed.query or parsed.fragment or \
+            re.search(r"%(?![0-9a-fA-F]{2})", parsed.path):
+        raise ValueError("native cwd is not a local file URI")
+    value = unquote(parsed.path, encoding="utf-8", errors="strict")
+    if not value.startswith("/") or "\x00" in value:
+        raise ValueError("native cwd is not absolute")
+    return os.path.normpath(value)
+
+
+def _bind_native_cwd(events, snapshot):
+    """Join native argv and outcomes uniquely; exec item_N IDs do not preserve native call IDs.
+
+    openai/codex@092d3acd, exec/src/event_processor_with_jsonl_output.rs:100-102,162-180,327-365.
+    Persisted output over 64 KiB may be truncated (rollout/src/policy.rs:249-263); mismatches stay unverified.
+    """
+    commands = [event["item"] for event in events if event.get("type") == "item.completed"
+                and isinstance(event.get("item"), dict) and event["item"].get("type") == "command_execution"]
+    native = snapshot["commands"]
+    analyses = command_analyses([item.get("command") for item in commands]) if commands else []
+    bindings, seen, used = [], set(), set()
+    for item, analysis in zip(commands, analyses):
+        identity = item.get("id")
+        invocations = analysis.get("invocations", [])
+        argv = invocations[0].get("argv") if invocations else None
+        if not isinstance(identity, str) or not identity or identity in seen or not argv or \
+                not isinstance(item.get("command"), str):
+            raise ValueError("native cwd command identity or argv is unverified")
+        seen.add(identity)
+        matches = [record for record in native if record["command"] == argv
+                   and record["status"] == item.get("status") and record["exit_code"] == item.get("exit_code")
+                   and record["aggregated_output"] == item.get("aggregated_output")]
+        if len(matches) != 1 or matches[0]["id"] in used:
+            raise ValueError("native cwd command match is missing or ambiguous")
+        used.add(matches[0]["id"])
+        bindings.append({"item_id": identity, "native_id": matches[0]["id"]})
+    if len(used) != len(native):
+        raise ValueError("native cwd history has unmatched commands")
+    return bindings
+
+
+def capture_native_cwd(events, scratch_home):
+    """Capture only this attempt's paginated native rollout in the fresh caller-supplied home.
+
+    openai/codex@092d3acd: exec/src/lib.rs:1459-1461; protocol/src/items.rs:243-280;
+    protocol/src/protocol.rs:1964-1975,3152-3212,3551-3557; rollout/src/recorder.rs:1745-1759.
+    No real Codex home, model cwd assertion, session-root fallback, or whole-home copy is used.
+    """
+    try:
+        threads = [event.get("thread_id") for event in events if event.get("type") == "thread.started"]
+        if scratch_home is None or len(threads) != 1 or not isinstance(threads[0], str) or \
+                str(uuid.UUID(threads[0])) != threads[0]:
+            raise ValueError("native cwd thread is unverified")
+        thread = threads[0]
+        home = Path(scratch_home)
+        paths = list(home.glob(f"sessions/*/*/*/rollout-*-{thread}.jsonl"))
+        if len(paths) != 1:
+            raise ValueError("native cwd rollout is missing or ambiguous")
+        raw = _native_cwd_bytes(paths[0], home)
+        if not raw.endswith(b"\n"):
+            raise ValueError("native cwd rollout is incomplete")
+        rows = [json.loads(line) for line in raw.decode("utf-8").splitlines() if line.strip()]
+        if not rows or not all(isinstance(row, dict) for row in rows):
+            raise ValueError("native cwd rollout is malformed")
+        headers = [row.get("payload") for row in rows if row.get("type") == "session_meta"]
+        if rows[0].get("type") != "session_meta" or len(headers) != 1 or not isinstance(headers[0], dict):
+            raise ValueError("native cwd metadata is missing or ambiguous")
+        meta = headers[0]
+        # SessionMetaLine defaults a missing legacy session_id from id; a fresh root exec's present value agrees.
+        # openai/codex@092d3acd, protocol/src/protocol.rs:3159-3161,3288-3293.
+        if meta.get("id") != thread or meta.get("session_id", thread) != thread or meta.get("history_mode") != "paginated" or \
+                meta.get("cli_version") != NATIVE_CWD_VERSION or meta.get("source") != "exec":
+            raise ValueError("native cwd metadata does not match the attempt")
+        native, identities = [], set()
+        for row in rows:
+            payload = row.get("payload")
+            if row.get("type") != "event_msg" or not isinstance(payload, dict) or payload.get("type") != "item_completed":
+                continue
+            item = payload.get("item")
+            if not isinstance(item, dict) or item.get("type") != "CommandExecution":
+                continue
+            identity, argv, output, code = (item.get(key) for key in ("id", "command", "aggregated_output", "exit_code"))
+            if payload.get("thread_id") != thread or not isinstance(payload.get("turn_id"), str) or \
+                    not isinstance(identity, str) or not identity or identity in identities or \
+                    not isinstance(argv, list) or not argv or any(not isinstance(word, str) or "\x00" in word for word in argv) or \
+                    not isinstance(item.get("parsed_cmd"), list) or item.get("source") not in {
+                        "agent", "user_shell", "unified_exec_startup", "unified_exec_interaction"} or \
+                    item.get("status") not in {"in_progress", "completed", "failed", "declined"} or \
+                    not (output is None or isinstance(output, str)) or not (code is None or type(code) is int):
+                raise ValueError("native cwd command record is malformed")
+            _native_cwd_value(item.get("cwd"))
+            identities.add(identity)
+            native.append({"id": identity, "command": argv, "cwd": item["cwd"], "status": item["status"],
+                           "aggregated_output": output or "", "exit_code": code})
+        snapshot = {"thread_id": thread, "history_mode": "paginated", "cli_version": NATIVE_CWD_VERSION,
+                    "commands": native}
+        return {"snapshot": snapshot, "snapshot_sha256": _native_cwd_digest(snapshot),
+                "rollout_sha256": hashlib.sha256(raw).hexdigest(), "bindings": _bind_native_cwd(events, snapshot)}
+    except (OSError, ValueError, TypeError, KeyError, RecursionError, AuditAnalysisUnavailable):
+        return {"error": "working directory unverified: native capture missing, malformed or ambiguous"}
+
+
+def write_native_cwd_capture(events_path, captures):
+    path = native_cwd_path(events_path)
+    data = {"schema_version": 1, "events_sha256": sha256_file(events_path), "captures": captures}
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", prefix=path.name + ".", dir=path.parent,
+                                         delete=False) as handle:
+            temporary = Path(handle.name)
+            json.dump(data, handle, sort_keys=True)
+            handle.write("\n")
+        temporary.replace(path)
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
+
+
+def load_native_cwd_records(events_path):
+    """Revalidate parent-captured native evidence before live audit or resume, including every retry."""
+    try:
+        path = native_cwd_path(events_path)
+        data = json.loads(_native_cwd_bytes(path, path.parent).decode("utf-8"))
+        if data.get("schema_version") != 1 or data.get("events_sha256") != sha256_file(events_path):
+            return {}
+        groups = []
+        for event in parse_events(Path(events_path).read_text(encoding="utf-8")):
+            if event.get("type") == "thread.started":
+                groups.append([])
+            if not groups:
+                return {}
+            groups[-1].append(event)
+        captures = data["captures"]
+        if not isinstance(captures, list) or len(captures) != len(groups):
+            return {}
+        records, threads = {}, set()
+        for events, capture in zip(groups, captures):
+            snapshot = capture["snapshot"]
+            thread = snapshot["thread_id"]
+            if thread in threads or events[0].get("thread_id") != thread or \
+                    snapshot.get("history_mode") != "paginated" or snapshot.get("cli_version") != NATIVE_CWD_VERSION or \
+                    capture.get("snapshot_sha256") != _native_cwd_digest(snapshot) or \
+                    capture.get("bindings") != _bind_native_cwd(events, snapshot):
+                return {}
+            threads.add(thread)
+            native = {item["id"]: item for item in snapshot["commands"]}
+            stdout = {event["item"]["id"]: event["item"] for event in events
+                      if event.get("type") == "item.completed" and isinstance(event.get("item"), dict)
+                      and event["item"].get("type") == "command_execution"}
+            for binding in capture["bindings"]:
+                records[(thread, binding["item_id"])] = {"command": stdout[binding["item_id"]]["command"],
+                    "cwd": _native_cwd_value(native[binding["native_id"]]["cwd"])}
+        return records
+    except (OSError, ValueError, TypeError, KeyError, AttributeError, RecursionError, AuditAnalysisUnavailable):
+        return {}
+
+
+def recorded_command_cwd(item, cwd_records, allowed_roots, *, thread_id=None) -> tuple[str | None, list[str]]:
+    """Bind a display to a caller-owned native record; stdout's cwd/workdir fields are not telemetry.
+
+    Codex 0.162.1's exec JSONL omits cwd. A separately captured record must preserve the item identity,
+    exact display and absolute working directory. Native captures bind a thread and remapped exec item together;
+    direct callers may supply a flat identity only when it occurs once in the whole stream. Never infer cwd from -C.
+    """
+    identity = item.get("id")
+    key = (thread_id, identity) if thread_id is not None else identity
+    record = cwd_records.get(key) if isinstance(identity, str) and isinstance(cwd_records, dict) else None
+    if not isinstance(record, dict) or record.get("command") != item.get("command"):
+        return None, ["working directory unverified: missing or mismatched independent command record"]
+    cwd = record.get("cwd")
+    if not isinstance(cwd, str) or not cwd.startswith("/") or "\x00" in cwd:
+        return None, ["working directory unverified: independent record has no absolute cwd"]
+    cwd = os.path.normpath(cwd)
+    if cwd == "/" or not any(cwd == root or cwd.startswith(root.rstrip("/") + "/") for root in allowed_roots):
+        return None, ["working directory outside the repository and packets: " + cwd]
+    return cwd, []
+
+
+def blind_audit(events_path: Path, allowed_roots, tools=AUDIT_TOOLS, *, cwd_records=None) -> dict:
+    """Reading of one child's event stream: web searches, MCP tool calls, and commands with read operands
+    outside ``allowed_roots`` (the repository and the packets directory) or executables in ``tools`` (AUDIT_TOOLS; a
     non-blind run adds BLIND_UNRESOLVABLE, which its PATH may resolve). In a blind run
     a flagged layer is void: its return is set aside before it is written, and a resume re-audits a kept return
     (round 7, REG7-1); in a non-blind run the report is for review and disclosure.
 
-    This is a heuristic lower bound, not a boundary: it reads command text only, so a path a program
-    computes (``python3 -c`` joining parts, a glob, a variable set earlier) and anything a command reads
-    indirectly (a script's own reads, a config it loads, a symlink under the repository) are not seen."""
+    This statically parses Codex's recorded command display. It is not syscall/branch attestation: indirect
+    script/config/symlink reads are not observed. Unsupported shell source/expansion and unresolved interpreted
+    read or execution operands are refused. Every command needs an independent cwd record; the pinned exec
+    JSONL lacks it, so the verdict runner binds its separate paginated native capture, never the turn cwd.
+    Executable words and interpreter read operands are distinguished from patterns and formatting data."""
     report = {"web_search": 0, "mcp_tool_calls": 0, "commands": 0, "flagged_commands": []}
     if not events_path.is_file():
         return report
+    completed, unfinished, thread = [], [], None
     for line in events_path.read_text(encoding="utf-8", errors="replace").splitlines():
         try:
             event = json.loads(line)
         except ValueError:
             continue
-        if not isinstance(event, dict) or event.get("type") != "item.completed":
+        if not isinstance(event, dict):
+            continue
+        if event.get("type") == "thread.started":
+            thread = event.get("thread_id") if isinstance(event.get("thread_id"), str) else None
+        if event.get("type") not in ("item.started", "item.completed"):
             continue
         item = event.get("item") if isinstance(event.get("item"), dict) else {}
         kind = item.get("type")
+        if event.get("type") == "item.started":
+            if kind == "command_execution":
+                command = item.get("command") if isinstance(item.get("command"), str) else ""
+                unfinished.append((thread, command, item.get("id")))
+            continue
         if kind == "web_search":
             report["web_search"] += 1
         elif kind == "mcp_tool_call":
@@ -508,36 +2127,35 @@ def blind_audit(events_path: Path, allowed_roots, tools=AUDIT_TOOLS) -> dict:
         elif kind == "command_execution":
             report["commands"] += 1
             command = item.get("command") if isinstance(item.get("command"), str) else ""
-            reasons = [f"path outside the repository and packets: {path}"
-                       for path in outside_paths(command, allowed_roots)]
-            reasons += ["names the filesystem root /"] if names_root(command) else []
-            reasons += [f"home-relative path: {path}" for path in HOME_PATH.findall(command)]
-            reasons += [f"variable path: {path}" for path in VARIABLE_PATH.findall(command)]
-            # Parameter expansion (${CODEX_HOME%/*}, ${X:-/path}) builds a path the event does not show
-            # (independent review of #145, BIND-R4-7).
-            reasons += [f"parameter expansion: {match}" for match in PARAMETER_EXPANSION.findall(command)]
-            reasons += [f"inherited directory variable: {match}" for match in INHERITED_DIRECTORY.findall(command)]
-            # A blind child never needs its CODEX_HOME or the environment, and a command substitution builds a path
-            # the event does not show (round 6, ISO-R6-2).
-            reasons += [f"names the Codex home: {match}" for match in CODEX_HOME_REFERENCE.findall(command)]
-            reasons += [f"reads the environment: {match}" for match in ENVIRONMENT_READ.findall(command)]
-            reasons += ["command substitution" for _ in COMMAND_SUBSTITUTION.findall(command)][:1]
-            reasons += [f"cd leaves for an unnamed directory: cd {target}" for target in unnamed_cd_targets(command)]
-            reasons += [f"path climbs out of the working directory: {path}" for path in PARENT_PATH.findall(command)]
-            words = set(re.findall(r"[A-Za-z][\w.-]*", command))
-            reasons += [f"runs {tool}" for tool in tools if tool in words]
-            # A CLI named by an absolute path runs whatever PATH says (``/usr/local/bin/qmd``, an exempt system
-            # executable token otherwise), so its basename is checked against every audited CLI (Codex review of
-            # #206, P2); a bare search word is not a path.
-            # A network URL ending in a CLI's name (``https://github.com/tobi/qmd``) is a search term (Codex review of
-            # #206 at 882ba4b9).
-            reasons += [f"runs {name} by path: {path}" for match in ABSOLUTE_PATH.finditer(command)
-                        if not network_authority(command, match)
-                        for path in [match.group(1)] for name in [os.path.basename(path.rstrip("/"))]
-                        if name in AUDIT_TOOLS + BLIND_UNRESOLVABLE and name not in tools
-                        and not any(path == root or path.startswith(root.rstrip("/") + "/") for root in allowed_roots)]
+            completed.append((thread, command, item))
+            if isinstance(item.get("id"), str):
+                for index, start in enumerate(unfinished):
+                    if start == (thread, command, item["id"]):
+                        unfinished.pop(index)
+                        break
+    # Started commands can execute before a killed attempt produces a completion/native cwd record.
+    # openai/codex@092d3acd, exec/src/event_processor_with_jsonl_output.rs:343-349.
+    report["commands"] += len(unfinished)
+    report["flagged_commands"].extend({"command": command, "reasons": [
+        "working directory unverified: unfinished command has no completed native cwd record"]}
+        for _, command, _ in unfinished)
+    try:
+        analyses = command_analyses([command for _, command, _ in completed]) if completed else []
+        identities = [(scope, item.get("id")) for scope, _, item in completed]
+        flat_ids = [item.get("id") for _, _, item in completed]
+        for (scope, command, item), analysis in zip(completed, analyses):
+            identity = item.get("id")
+            scoped = isinstance(identity, str) and isinstance(cwd_records, dict) and (scope, identity) in cwd_records
+            binding_scope = scope if scoped or flat_ids.count(identity) > 1 else None
+            cwd, reasons = recorded_command_cwd(item, cwd_records, allowed_roots, thread_id=binding_scope)
+            if identity is not None and identities.count((scope, identity)) > 1:
+                cwd = None
+                reasons.append("working directory unverified: duplicate command identity")
+            reasons += analysis_reasons(analysis, allowed_roots, tools, cwd=cwd)
             if reasons:
                 report["flagged_commands"].append({"command": command, "reasons": reasons})
+    except AuditAnalysisUnavailable as error:
+        report["flagged_commands"].append({"command": "", "reasons": [str(error)]})
     return report
 
 
@@ -1046,6 +2664,30 @@ def _find_first_str(node, key: str):
     return None
 
 
+def usage_row_belongs_to_layer(row, expected_layer: str) -> bool:
+    """The native usage writer's identity field, shared by post-run supervisors."""
+    return isinstance(row, dict) and row.get("layer") == expected_layer
+
+
+def layer_usage_suffix(prefix: bytes, current: bytes, expected_layer: str) -> list[dict]:
+    """Validate append-only usage capture and select the newly completed native layer rows.
+
+    A supervisor must check native usage rows, rather than the lane return schema's layer_id field.
+    Partial/malformed JSON or another layer cannot silently pass collection. No model or filesystem call.
+    """
+    if not isinstance(prefix, bytes) or not isinstance(current, bytes) or not current.startswith(prefix):
+        raise ValueError("original usage prefix changed")
+    if prefix and not prefix.endswith(b"\n") or current and not current.endswith(b"\n"):
+        raise ValueError("incomplete native usage row")
+    try:
+        rows = [json.loads(line) for line in current[len(prefix):].splitlines() if line.strip()]
+    except (ValueError, UnicodeError) as error:
+        raise ValueError("malformed native usage row") from error
+    if any(not usage_row_belongs_to_layer(row, expected_layer) for row in rows):
+        raise ValueError("native usage rows do not belong to the selected layer")
+    return rows
+
+
 def _find_usage(node):
     if isinstance(node, dict):
         matched = {key: node[key] for key in USAGE_KEYS if key in node}
@@ -1285,6 +2927,16 @@ def main(argv=None) -> int:
         layers_filter = {item.strip() for item in args.layers.split(",") if item.strip()}
 
     packets = discover_packets(work_dir, layers_filter)
+    if not args.allow_git_history:
+        try:
+            packet_root = work_dir / "packets"
+            if packet_root.is_symlink():
+                raise ValueError("the packets read root is symlinked")
+            # Apply the existing no-escaping-link export invariant to the other allowed read root.
+            tree_sha256(packet_root)
+        except (OSError, ValueError) as error:
+            print(f"codex_lane: unconfined packets root: {error}", file=sys.stderr)
+            return 2
     codex_dir = work_dir / "codex"
     events_dir = codex_dir / "events"
     usage_path = codex_dir / "usage.jsonl"
@@ -1335,7 +2987,8 @@ def main(argv=None) -> int:
             prompt_text = fill_prompt(template, packet_path.resolve(), repo)
             tmp_out = codex_dir / f"{catalog}__{layer_id}.out.tmp"
             cmd = build_command(repo, strict_display, tmp_out, args.effort, prompt_text, args.model, ISOLATION_ARGS,
-                                provider=args.provider, omniroute_base_url=args.omniroute_base_url)
+                                provider=args.provider, omniroute_base_url=args.omniroute_base_url,
+                                ephemeral=not isolated)
             # The child's PATH has no codex, so the printed command names the one this PATH resolves.
             print(shlex.join(env_prefix + (blind_child_argv(cmd) if isolated else cmd)))
         return 0
@@ -1345,6 +2998,11 @@ def main(argv=None) -> int:
         print("codex_lane: the codex CLI is not on PATH; install it and sign in natively "
               "(see adoption/) before running the Codex lane", file=sys.stderr)
         return 2
+    if pending and blind:
+        issue = audit_analysis_issue()
+        if issue:
+            print(f"codex_lane: {issue}", file=sys.stderr)
+            return 2
     with contextlib.ExitStack() as stack:
         if pending:
             try:
@@ -1373,13 +3031,69 @@ def main(argv=None) -> int:
             CHILD_CODEX_HOME = None
 
 
+def _write_failure_snapshot(path, failures, kept=(), keep_empty=True):
+    """Publish a complete failure snapshot without exposing a partially written JSON file.
+
+    CC's 2026-10-10 adjudication cites native main 9d4c00cd, codex_lane.py:1538-1556:
+    the former end-only write lost earlier layer failures on interruption. Adopt same-directory
+    tempfile + os.replace (CPython v3.13.16 Doc/library/os.rst:2755-2760: atomic on success).
+    """
+    recorded = sorted(set(failures) | set(kept))
+    if not recorded and not keep_empty:
+        path.unlink(missing_ok=True)
+        return
+    text = json.dumps({"lane": LANE, "failures": [
+        {"catalog": catalog, "layer_id": layer_id, "reason": reason}
+        for catalog, layer_id, reason in recorded]}, indent=1, sort_keys=True) + "\n"
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", dir=path.parent,
+                                         prefix=f".{path.name}.", suffix=".tmp", delete=False) as handle:
+            temporary = Path(handle.name)
+            handle.write(text)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temporary, path)
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
+
+
 def run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_dir, usage_path, pending,
                 provenance) -> int:
     events_dir.mkdir(parents=True, exist_ok=True)
     strict_schema_path = write_strict_schema(schema_path, codex_dir)
     usage_lock = threading.Lock()
     audit_lock = threading.Lock()
-    failures: list = []
+    failures_lock = threading.Lock()
+    unfinished = "unfinished layer: execution or audit did not reach verified promotion"
+    failures: list = [(catalog, layer_id, unfinished)
+                      for catalog, layer_id, _packet, _sha, _out in pending]
+    failures_path = codex_dir / FAILURES_NAME
+    # Preserve failures outside --layers before replacing the initial snapshot, rather than
+    # waiting until the end (native main 9d4c00cd:1538-1556, CC 2026-10-10 follow-up).
+    kept = []
+    if args.layers and failures_path.is_file():
+        selected = {item.strip() for item in args.layers.split(",") if item.strip()}
+        try:
+            earlier = json.loads(failures_path.read_text(encoding="utf-8")).get("failures") or []
+        except (ValueError, AttributeError):
+            earlier = []
+        kept = [(entry.get("catalog"), entry.get("layer_id"), entry.get("reason")) for entry in earlier
+                if isinstance(entry, dict) and entry.get("layer_id") not in selected
+                and f"{entry.get('catalog')}__{entry.get('layer_id')}" not in selected]
+    _write_failure_snapshot(failures_path, failures, kept)
+    # Pending means the prior return is already ineligible, including queued calls stopped before process().
+    # Invalidate every stale return after the durable unfinished snapshot and before any launch/stop check.
+    for _catalog, _layer, _packet, _sha, out_path in pending:
+        out_path.unlink(missing_ok=True)
+
+    def record_failure(catalog, layer_id, reason):
+        with failures_lock:
+            failures[:] = [row for row in failures if row[:2] != (catalog, layer_id)]
+            failures.append((catalog, layer_id, reason))
+            _write_failure_snapshot(failures_path, failures, kept)
+
     blind = not args.allow_git_history
     roots = [str(repo), str((work_dir / "packets").resolve())]
     # A non-blind child inherits the caller's PATH, where the retrieval CLIs may resolve (BLIND_UNRESOLVABLE).
@@ -1398,13 +3112,14 @@ def run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_d
             audit_path.write_text(json.dumps({"schema_version": 1, "allowed_roots": roots, "layers": audit_layers},
                                              indent=1, sort_keys=True) + "\n", encoding="utf-8")
 
-    def process(item):
+    def process_layer(item):
         catalog, layer_id, packet_path, packet_sha256, out_path = item
         name = f"{catalog}__{layer_id}"
         prompt_text = fill_prompt(template, packet_path.resolve(), repo)
         tmp_out = codex_dir / f"{name}.out.tmp"
         cmd = build_command(repo, strict_schema_path.resolve(), tmp_out, args.effort, prompt_text, args.model,
-                            ISOLATION_ARGS, provider=args.provider, omniroute_base_url=args.omniroute_base_url)
+                            ISOLATION_ARGS, provider=args.provider, omniroute_base_url=args.omniroute_base_url,
+                            ephemeral=CHILD_CODEX_HOME is None)
         events_path = events_dir / f"{name}.jsonl"
         if STOP.is_set():
             return
@@ -1412,6 +3127,8 @@ def run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_d
         # interrupted rerun never leaves it beside a truncated, clean-looking stream (round 8, NEW-1).
         out_path.unlink(missing_ok=True)
         events_path.write_text("", encoding="utf-8")
+        native_cwd_path(events_path).unlink(missing_ok=True)
+        captures = []
 
         succeeded = False
         last_model_name = None
@@ -1434,6 +3151,8 @@ def run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_d
                 for line in result["stdout"].splitlines():
                     if line.strip():
                         handle.write(line + "\n")
+            captures.append(capture_native_cwd(events, CHILD_CODEX_HOME))
+            write_native_cwd_capture(events_path, captures)
 
             model_name, usage = extract_events_summary(events)
             if model_name:
@@ -1484,28 +3203,41 @@ def run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_d
             # flagged layer (a read outside the export and packets, web search or an MCP tool) is void, as an
             # adjudication judgment is, since it may have read the packet keys or another lane's return (Codex review
             # of #145). Its return is kept only as <name>.json.audit-flagged, and the layer is recorded as failed.
-            report = blind_audit(events_path, roots, tools)
+            report = blind_audit(events_path, roots, tools, cwd_records=load_native_cwd_records(events_path))
             record_audit(name, report)
             if blind and audit_is_flagged(report):
                 out_path.unlink(missing_ok=True)
                 out_path.with_name(out_path.name + ".audit-flagged").write_text(
                     json.dumps(final, indent=1, sort_keys=True) + "\n", encoding="utf-8")
                 last_failure = None
-                failures.append((catalog, layer_id, "the blind audit flagged this layer's calls (web, MCP or a read "
-                                                     "outside the export and packets)"))
+                record_failure(catalog, layer_id, "the blind audit flagged this layer's calls (web, MCP or a read "
+                                                "outside the export and packets)")
                 return
             if STOP.is_set():
                 return
             out_path.write_text(json.dumps(final, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+            with failures_lock:
+                failures[:] = [row for row in failures if row[:2] != (catalog, layer_id)]
+                _write_failure_snapshot(failures_path, failures, kept)
             succeeded = True
             break
 
         if not succeeded:
             # A stale return (e.g. one rejected for an older packet hash) must
             # not survive, so record_verdicts.py records this `failed` reason.
-            record_audit(name, blind_audit(events_path, roots, tools))
+            record_audit(name, blind_audit(events_path, roots, tools,
+                                          cwd_records=load_native_cwd_records(events_path)))
             out_path.unlink(missing_ok=True)
-            failures.append((catalog, layer_id, f"failed after retry: {last_failure}"))
+            record_failure(catalog, layer_id, f"failed after retry: {last_failure}")
+
+    def process(item):
+        try:
+            return process_layer(item)
+        except BaseException as error:
+            catalog, layer_id, _packet, _sha, out_path = item
+            out_path.unlink(missing_ok=True)
+            record_failure(catalog, layer_id, "execution or audit interrupted: " + type(error).__name__)
+            raise
 
     if args.jobs > 1:
         executor = ThreadPoolExecutor(max_workers=args.jobs)
@@ -1528,33 +3260,15 @@ def run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_d
         for catalog, layer_id, _packet_path, _packet_sha256, out_path in pending:
             if out_path.is_file():
                 out_path.replace(out_path.with_name(out_path.name + ".tree-changed"))
-            failures.append((catalog, layer_id, "the evidence tree changed during the run; rerun on a fixed export"))
+            record_failure(catalog, layer_id, "the evidence tree changed during the run; rerun on a fixed export")
 
     flagged = sorted(name for name, entry in audit_layers.items() if isinstance(entry, dict) and audit_is_flagged(entry))
     if flagged:
         print(f"codex_lane: blind audit flags {len(flagged)} layer(s) for review in {audit_path}: "
               + ", ".join(flagged), file=sys.stderr)
 
-    failures_path = codex_dir / FAILURES_NAME
-    # A --layers rerun keeps the recorded failures of the layers it did not select, so record_verdicts still seals
-    # their reasons (Codex review of #145 at a4dfd99e).
-    kept = []
-    if args.layers and failures_path.is_file():
-        selected = {item.strip() for item in args.layers.split(",") if item.strip()}
-        try:
-            earlier = json.loads(failures_path.read_text(encoding="utf-8")).get("failures") or []
-        except (ValueError, AttributeError):
-            earlier = []
-        kept = [(entry.get("catalog"), entry.get("layer_id"), entry.get("reason")) for entry in earlier
-                if isinstance(entry, dict) and entry.get("layer_id") not in selected
-                and f"{entry.get('catalog')}__{entry.get('layer_id')}" not in selected]
-    recorded = sorted(set(failures) | set(kept))
-    if recorded:
-        failures_path.write_text(json.dumps({"lane": LANE, "failures": [
-            {"catalog": catalog, "layer_id": layer_id, "reason": reason}
-            for catalog, layer_id, reason in recorded]}, indent=1, sort_keys=True) + "\n", encoding="utf-8")
-    else:
-        failures_path.unlink(missing_ok=True)
+    with failures_lock:
+        _write_failure_snapshot(failures_path, failures, kept, keep_empty=STOP.is_set())
     for catalog, layer_id, reason in sorted(failures):
         print(f"codex_lane: {catalog}__{layer_id}: {reason}", file=sys.stderr)
     return 1 if failures else 0
