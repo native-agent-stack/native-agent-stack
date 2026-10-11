@@ -79,13 +79,11 @@ Callers of the reusable gate get the scan when they bump their pin.
 
 The co-op's GPT read at `07595323` found three gaps, now closed in both copies of the job:
 
-- **The body is judged before it is read.** A description that is not text, is longer than 65,536 characters, holds a
+- **The body is judged before it is read.** A description that is not text, is longer than the gate's bound, holds a
   lone surrogate, or holds a control character other than tab, LF or CR fails with one fixed rule id (`body-type`,
-  `body-size`, `body-encoding`, `body-control`), and nothing else is reported. GitHub's REST docs state no length
-  limit for `body`. The 65,536 figure is the API's own refusal text, "body is too long (maximum is 65536 characters)",
-  as quoted in <https://github.com/w3c/webref/pull/245> (read 2026-10-11T04:51Z; page sha256
-  `6d7e066850b61ad0b9d674ad939fa84c557c2afd3113349fbf4fd26452504470`). It is a reported vendor message, not a
-  documented limit, and no body that long was sent to GitHub. `String.prototype.isWellFormed` reports lone surrogates
+  `body-size`, `body-encoding`, `body-control`), and nothing else is reported. The bound was first 65,536 UTF-16 code
+  units, on the premise that GitHub refuses a longer body; that premise was wrong, and the bound is now the gate's own
+  (correction in the next section). `String.prototype.isWellFormed` reports lone surrogates
   (MDN, read 04:51Z, sha256 `cd0a2f9794cc85917bcb6aaa48c28c21bfd42810f5f9cf0398a31c6e26f3b8cd`).
 - **Escaped and rendered forms are judged too.** The rules run over the body as written and over four forms, each
   decoded once from it, never to a fixed point. They are percent escapes, JSON `\uXXXX` and `\/` escapes, HTML
@@ -137,6 +135,87 @@ were run:
 The new gate was also run over the live description of every open pull request at 2026-10-11T05:00Z (89), with only
 rule ids printed. Every one gets the same outcome as on `07595323`: 88 pass and one lacks its SOTA sources section.
 Before the rendered form was narrowed, one description failed through a `<name>` placeholder read as a tag.
+
+### After Codex's review (2026-10-11)
+
+Codex's GitHub review of `de4eed8f` (requested at 08:19Z) raised four P1 and three P2 findings. Six are fixed in both
+copies of the job. The seventh, about publication order, is answered without a code change:
+
+- **Correction: GitHub does not refuse a description over 65,536 characters.** The first fix took that limit from a
+  refusal message quoted in another repository's pull request, and counted it in UTF-16 code units. Probes went
+  through the REST update of this pull request's own description (2026-10-11T13:34Z to 14:19Z). Each probe was
+  restored at once, and the description read back equal to the original. These were stored whole, each with an entry
+  in the edit history:
+  - 65,537 ASCII characters;
+  - 65,536 astral characters (131,033 UTF-16 code units, 262,027 UTF-8 bytes);
+  - 32,788 code points that are 65,537 UTF-16 code units;
+  - 65,539 code points of combining sequences;
+  - 262,144 ASCII characters.
+
+  Three probes kept nothing: 262,145 ASCII characters, 262,199 UTF-8 bytes of astral text (65,579 code points) and
+  1,048,577 characters. The REST update thus keeps at most 262,144 UTF-8 bytes. Over that, it still answers 200 and
+  echoes the body, while a GET returns the original and the edit history records nothing. A first version of this
+  note, pushed as `d81969dd`, said the 1,048,577-character body was stored, on the strength of that 200 answer; a GET
+  read-back corrected it. Creating a pull request was not probed. This repository has also carried a
+  75,726-character description (#786).
+
+  The bound is therefore the gate's own: 262,144 code points, so an astral character counts once. A code point takes
+  at least one UTF-8 byte, so no description the update stores reaches the bound. It is also about 3.5 times the
+  longest description seen here. On Node 24.21 a body at the bound is scanned within 0.3 s, including
+  the adversarial bodies below.
+- **The decoders compose.** Each decoder still runs at most once along a chain, never to a fixed point. The rules
+  now see every order of every subset of the four decoders: 65 forms, counting the body. A slash written as a
+  character reference around a name in emphasis is therefore read as GitHub displays it. Codex suggested a pinned
+  GitHub-compatible renderer. The job runs inline in `actions/github-script` with no dependency install, so the
+  rendered form stays the handwritten approximation described above. A Markdown construct it does not model, such as a
+  reference definition or nested emphasis, can still hide a name from it.
+- **Any private-key label.** In `validate.py` and the gate, the private-key rule now takes gitleaks's header form,
+  `-----BEGIN[ A-Z0-9_-]{0,100}PRIVATE KEY(?: BLOCK)?-----`
+  ([gitleaks `config/gitleaks.toml`, rule `private-key`](https://github.com/gitleaks/gitleaks/blob/83d9cd684c87d95d656c1458ef04895a7f1cbd8e/config/gitleaks.toml#L2784-L2788)).
+  The rule drops gitleaks's `(?i)` and stays case-sensitive as before. PKCS #8 `ENCRYPTED PRIVATE KEY` and OpenPGP
+  `PGP PRIVATE KEY BLOCK` headers are caught; `PUBLIC KEY` is not. Over this branch's tracked tree the wider rule adds no
+  match.
+- **A repository named like a graph id passes the gate.** The graph-id form of `encoded-home-path` (`home-<name>-code-`
+  with no leading dash) failed a cited URL such as `github.com/<owner>/home-<name>-code-review`. In the gate only, that
+  form is not read within 256 characters after an `http://` or `https://` scheme. The check runs only where `home-`
+  occurs. The first form tried scanned back from every position: 13.7 s on a 262,144-character run of `home-a`,
+  against 0.1 s without it. Still caught:
+  - a graph id in a cache path (`~/.cache/codebase-memory-mcp/home-<name>-code-<project>.db`);
+  - the dashed form in any URL.
+
+  `validate.py` keeps the URL case, because Python's lookbehinds are fixed-width.
+- **The graph-id form is bounded.** It searched from every `home-` to the end of its run. A 262,144-character run of
+  `home-a.b-c_d-` took 21 to 28 s per form in the gate and 93 s in `validate.py`, so a body whose forms differ could
+  run past the job's 2-minute limit. In both, the name now runs at most 256 characters to `-code-` (`[\w.][\w.-]{0,255}`). On 200,000
+  random strings of short pieces the old and new rules agree; they differ only for a name over 256 characters. The
+  same run now takes 0.05 s in Python. A regression test holds both the gate and `validate.py` to a time limit at the
+  bound.
+- **Redundant leading slashes.** `macos-user-path` now accepts any number of leading slashes, so `///users/<name>` is
+  caught (POSIX resolves three or more leading slashes to one). A `file:///users/<name>` URL is caught too, by this rule
+  and, as in Python, by `windows-user-path`. A doubled slash inside a URL path still passes.
+- **Every rule is carried.** A new test fails when the two scans drift: when `validate.py`'s `PRIVATE_CONTENT` gains or
+  renames a rule the gate does not carry (the two session rules aside), or when the gate's rule ids differ from that
+  mapping plus `macos-user-path`. A carried email rule must therefore join the gate when `validate.py` adds it.
+- **Publication comes first (no change).** GitHub stores a description before any check runs, so a failing check
+  detects a leak but cannot withdraw it. The gate is the backstop: it keeps such a pull request from landing and names
+  the rule. Prevention happens before sending, for example by scanning the text with
+  `python3 scripts/validate.py --scan-file <body.md>` before `gh pr create` or `gh pr edit`. That scan runs
+  `validate.py`'s rules without the gate's decoded forms.
+
+The new tests fail on the job at `de4eed8f` (22 failures: seven of the new privacy cases, the body guards at the new
+bound and in code points, and the bounded-time test). The coverage test passes there by design, since it guards
+against later drift. Eleven weakened copies of the new job and rules were run, and each fails the tests:
+
+- the decoders not composed;
+- the bound in UTF-16 code units, or 65,536 again;
+- the old private-key labels in both scans, or in the gate only;
+- the URL exemption removed, or unbounded (34.6 s at the bound);
+- one leading slash only;
+- the graph-id bound removed in both scans, or 255 in the gate only;
+- a `validate.py` rule the gate does not carry.
+
+The new gate was also run over the live description of every open pull request at 2026-10-11T13:56Z (88), with only
+rule ids printed. Each gets the same outcome as under the `de4eed8f` gate.
 
 ## Alternatives considered
 

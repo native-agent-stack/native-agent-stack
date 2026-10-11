@@ -50,13 +50,16 @@ PRIVATE_CONTENT = (
         r"(?!example(?:-|[/\\\"'\s`)\]]|$))[A-Za-z0-9_.]+(?:-|(?=[/\\\"'\s`)\]]|$))"
         # Graph project IDs omit the leading dash. Every punctuation wrapper,
         # including '_' and '-', is a boundary; Unicode alphanumerics are not.
-        # '<user>', '%u' and the complete 'example' placeholder remain exempt.
-        r"|(?<![^\W_])home-(?!example-code-)[\w.]+(?:-+[\w.]+)*-*-code-")),
+        # '<user>', '%u' and the complete 'example' placeholder remain exempt. The name
+        # runs at most 256 characters to -code-, so each home- is checked in bounded time.
+        r"|(?<![^\W_])home-(?!example-code-)[\w.][\w.-]{0,255}-code-")),
     ("Hugging Face token", re.compile(r"\bhf_[A-Za-z0-9]{20,}\b")),
     ("GitHub token", re.compile(r"\b(?:gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,})\b")),
     ("Tavily token", re.compile(r"\btvly-(?:(?:prod|dev)-)?[A-Za-z0-9_-]{24,}\b")),
     ("API secret", re.compile(r"\bsk-(?:proj-|ant-)?[A-Za-z0-9_-]{24,}\b")),
-    ("private key", re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----")),
+    # gitleaks's private-key header (config/gitleaks.toml, rule private-key, at 83d9cd684c87), without its (?i):
+    # any PEM label, so PKCS #8 ENCRYPTED and OpenPGP "PRIVATE KEY BLOCK" headers too.
+    ("private key", re.compile(r"-----BEGIN[ A-Z0-9_-]{0,100}PRIVATE KEY(?: BLOCK)?-----")),
     ("bearer credential", re.compile(r"\bBearer\s+[A-Za-z0-9._~-]{30,}", re.I)),
 )
 

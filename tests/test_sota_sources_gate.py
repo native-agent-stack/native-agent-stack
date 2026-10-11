@@ -231,6 +231,7 @@ class GateBehaviourTests(unittest.TestCase):
 # so this file itself carries none of them for scripts/validate.py's own scan.
 SOURCES = "\n\n### SOTA sources\n- https://github.com/o/r at v1.2.3, src/x.py\n"
 HOME = "/" + "home/"
+MAX_BODY = 262144  # the gate's own bound, in code points
 PRIVACY_CASES = [
     # (case, body, the rule ids the gate must name; [] means the body passes)
     ("a Linux home path", "Logs are in " + HOME + "alice/state/x.log." + SOURCES, ["personal-home-path"]),
@@ -266,12 +267,34 @@ PRIVACY_CASES = [
     # (P2-2) Python's Unicode \w, not JavaScript's: an accented name is a word, and so is an accent before a token.
     ("an accented encoded name", "home-" + chr(0xE9) + "-code-x" + SOURCES, ["encoded-home-path"]),
     ("an accent glued to a token passes", chr(0xE9) + "hf_" + "a" * 20 + SOURCES, []),
+    # Codex's review of de4eed8f: decoders compose, PKCS #8 and OpenPGP key labels, a repository named like a graph
+    # project, and redundant leading slashes.
+    ("character references around emphasis", "&#47;" + "home&#47;**alice**&#47;x" + SOURCES, ["personal-home-path"]),
+    ("percent escapes around a link-split name", "%2F" + "home%2F[al](https://example.org)ice%2Fx" + SOURCES,
+     ["personal-home-path"]),
+    ("an escaped masked home around emphasis passes", "&#47;" + "home&#47;**<user>**&#47;x" + SOURCES, []),
+    ("an encrypted PKCS #8 key", "-----BEGIN " + "ENCRYPTED PRIVATE KEY-----" + SOURCES, ["private-key"]),
+    ("an OpenPGP private key block", "-----BEGIN " + "PGP PRIVATE KEY BLOCK-----" + SOURCES, ["private-key"]),
+    ("a public key passes", "-----BEGIN " + "PUBLIC KEY-----" + SOURCES, []),
+    ("a repository named like a graph project passes", "https://github.com/acme/" + "home-" + "assistant-code-review" + SOURCES,
+     []),
+    ("a graph project id in a cache path", "~/.cache/codebase-memory-mcp/" + "home-" + "alice-code-x.db" + SOURCES,
+     ["encoded-home-path"]),
+    ("an encoded home in a local URL", "http://127.0.0.1:8788/p/" + "-home-" + "alice-code-x/" + SOURCES,
+     ["encoded-home-path"]),
+    ("a lower-case macOS home in a file URL", "file:///" + "users/alice/x" + SOURCES,
+     ["windows-user-path", "macos-user-path"]),  # file: ends in a drive-letter shape, as in Python
+    ("redundant leading slashes", "///" + "users/alice/x" + SOURCES, ["macos-user-path"]),
+    ("a doubled slash inside a URL path passes", "https://example.org/a//" + "users/alice" + SOURCES, []),
 ]
 
-# Cases the gate judges beyond validate.py's patterns: decoded or rendered forms, and the gate-only macOS rule.
+# Cases the gate judges beyond validate.py's patterns: decoded or rendered forms, the gate-only macOS rule, and the
+# gate-only exemption of graph-shaped names inside http(s) URLs.
 GATE_ONLY_CASES = {"a percent-encoded home path", "a JSON-escaped slash", "a JSON unicode escape",
                    "HTML character references", "a name split by a Markdown link", "a name split by emphasis", "a path split by an inline tag",
-                   "a mixed-case macOS home", "a lower-case macOS home"}
+                   "a mixed-case macOS home", "a lower-case macOS home", "character references around emphasis",
+                   "percent escapes around a link-split name", "a repository named like a graph project passes",
+                   "a lower-case macOS home in a file URL", "redundant leading slashes"}
 
 
 @unittest.skipUnless(NODE, "node unavailable; CI's runner images carry it")
@@ -297,13 +320,18 @@ class GatePrivacyTests(unittest.TestCase):
         self.assertIn("(rules: personal-home-path)", outcome["failed"])
 
     def test_the_body_is_refused_before_it_is_read(self):
-        # (P2-3) A non-text, oversized, malformed or control-character body fails with a fixed id, in both copies;
-        # 65,536 characters is the API's own limit ("Body is too long (maximum is 65536 characters)").
-        at_limit = "x" * (65536 - len(SOURCES)) + SOURCES
+        # (P2-3) A non-text, oversized, malformed or control-character body fails with a fixed id, in both copies.
+        # The size bound is the gate's own, in code points: GitHub's REST update keeps at most 262,144 UTF-8 bytes
+        # (measured 2026-10-11), and #786's description has 75,726 characters.
+        at_limit = "x" * (MAX_BODY - len(SOURCES)) + SOURCES
+        astral = chr(0x1F600) * (MAX_BODY - len(SOURCES)) + SOURCES  # twice as many UTF-16 code units
         cases = [
             ("at the limit", body(at_limit), None),
             ("one over the limit", body(at_limit + "x"), "body-size"),
-            ("far over the limit", body("a" * 1_000_000 + SOURCES), "body-size"),
+            ("astral characters at the limit", body(astral), None),
+            ("one astral character over the limit", body(astral + chr(0x1F600)), "body-size"),
+            ("a description as long as #786's", body("x" * (75_726 - len(SOURCES)) + SOURCES), None),
+            ("far over the limit", body("a" * 4 * MAX_BODY + SOURCES), "body-size"),
             ("a NUL", body("abc\x00def" + SOURCES), "body-control"),
             ("an escape character", body("\x1b[31m" + SOURCES), "body-control"),
             ("a C1 control", body("\x85" + SOURCES), "body-control"),
@@ -323,8 +351,25 @@ class GatePrivacyTests(unittest.TestCase):
                     self.assertIsNone(outcome["failed"], outcome)
                 else:
                     self.assertEqual(outcome["failed"], f"The PR description cannot be checked (rule: {refused}): it "
-                                     "must be text of at most 65536 characters, with no control characters other "
-                                     "than tabs and line breaks.")
+                                     f"must be text of at most {MAX_BODY} characters, with no control characters "
+                                     "other than tabs and line breaks.")
+
+    def test_a_body_at_the_bound_is_scanned_in_bounded_time(self):
+        # The graph-id rule searched from every home- to the end of its run, quadratic in the run's length: a
+        # 262,144-character run of "home-a.b-c_d-" took 21 s in the gate per form and 93 s in validate.py. The name now
+        # runs at most 256 characters to -code-.
+        sys.path.insert(0, str(ROOT / "scripts"))
+        import time
+        import validate
+        run = ("home-a.b-c_d-" * (MAX_BODY // 13 + 1))[:MAX_BODY - len(SOURCES)]
+        start = time.monotonic()
+        dict(validate.PRIVATE_CONTENT)["encoded home path"].search(run)
+        self.assertLess(time.monotonic() - start, 5)
+        mixed = ("home-a.b-c_d-%2F&#47;**a**\\/" * (MAX_BODY // 27 + 1))[:MAX_BODY - len(SOURCES)]
+        start = time.monotonic()
+        outcomes = run_check(inline_script(sota_job(GATE)), [body(run + SOURCES), body(mixed + SOURCES)])
+        self.assertLess(time.monotonic() - start, 20)
+        self.assertEqual([outcome["failed"] for outcome in outcomes], [None, None])
 
     def test_credential_lengths_agree_with_scripts_validate_at_each_minimum(self):
         # (P2-2) one below, at and one above each rule's minimum length, alone and glued to Unicode word characters.
@@ -352,18 +397,16 @@ class GatePrivacyTests(unittest.TestCase):
         # gives the same verdict as its Python original.
         sys.path.insert(0, str(ROOT / "scripts"))
         import validate
-        python = {"personal-home-path": "personal home path", "windows-user-path": "Windows user path",
-                  "encoded-home-path": "encoded home path", "hugging-face-token": "Hugging Face token",
-                  "github-token": "GitHub token", "tavily-token": "Tavily token", "api-secret": "API secret",
-                  "private-key": "private key", "bearer-credential": "bearer credential"}
         patterns = dict(validate.PRIVATE_CONTENT)
         corpus = [text for case, text, _ in PRIVACY_CASES if case not in GATE_ONLY_CASES] + [
             "hf_" + "b" * 24, "tvly-" + "dev-" + "c" * 26, "-----BEGIN " + "RSA PRIVATE KEY-----",
+            "-----BEGIN " + "EC PRIVATE KEY-----", "-----BEGIN " + "PRIVATE KEY BLOCK-----",
             "Bearer " + "d" * 40, "C:\\" + "Users\\Bob\\x", "-" + "Users-" + "bob-x", "home-" + "bob-code-x",
-            "plain text with no secret", HOME + "example/a", "x-home-" + "example-y"]
+            "plain text with no secret", HOME + "example/a", "x-home-" + "example-y",
+            "home-" + "a" * 256 + "-code-x", "home-" + "a" * 257 + "-code-x", "home-" + "a.b-" * 64 + "-code-x"]
         outcomes = run_check(inline_script(sota_job(GATE)), [body(text + SOURCES) for text in corpus])
         for text, outcome in zip(corpus, outcomes):
-            for rule, name in python.items():
+            for rule, name in PYTHON_NAMES.items():
                 with self.subTest(rule=rule, case=text[:24]):
                     self.assertEqual(rule in (outcome["failed"] or ""), bool(patterns[name].search(text + SOURCES)))
 
@@ -374,6 +417,9 @@ PYTHON_NAMES = {"personal-home-path": "personal home path", "windows-user-path":
                 "encoded-home-path": "encoded home path", "hugging-face-token": "Hugging Face token",
                 "github-token": "GitHub token", "tavily-token": "Tavily token", "api-secret": "API secret",
                 "private-key": "private key", "bearer-credential": "bearer credential"}
+# validate.py rules the gate leaves out (a pull request body may cite an identifier on purpose), and gate-only rules.
+SESSION_RULES = {"local session identifier", "local companion task handle"}
+GATE_ONLY_RULES = {"macos-user-path"}
 X = "\x01"  # where each code point goes
 TEMPLATES = {
     "personal-home-path": ["/home/" + X, X + "/home" + "/al", "/home" + "/al" + X, "/home/example" + X, "/Users/" + X + "/a",
@@ -387,7 +433,9 @@ TEMPLATES = {
     "github-token": [X + "ghp_" + "a" * 30, "ghp_" + "a" * 30 + X, "github_pat_" + "a" * 29 + X],
     "tavily-token": [X + "tvly-" + "a" * 24, "tvly-" + "a" * 24 + X, "tvly-dev-" + "a" * 23 + X],
     "api-secret": [X + "sk-" + "a" * 24, "sk-" + "a" * 24 + X, "sk-ant-" + "a" * 23 + X],
-    "private-key": ["-----BEGIN " + X + "PRIVATE KEY-----"],
+    "private-key": ["-----BEGIN " + X + "PRIVATE KEY-----", "-----BEGIN" + X + "PRIVATE KEY-----",
+                    "-----BEGIN ENCRYPTED" + X + "PRIVATE KEY-----", "-----BEGIN PGP PRIVATE KEY" + X + "BLOCK-----",
+                    "-----BEGIN PRIVATE KEY" + X + "-----"],
     "bearer-credential": [X + "Bearer " + "a" * 30, "Bearer" + X + "a" * 30, "Bearer " + "a" * 29 + X,
                           "Bearer " + X + "a" * 29],
 }
@@ -449,6 +497,17 @@ class GateUnicodeParityTests(unittest.TestCase):
         for rule, flags in json.loads(result.stdout)["flags"].items():
             with self.subTest(rule=rule):
                 self.assertIn("u", flags)
+
+    def test_every_scripts_validate_rule_has_its_gate_rule(self):
+        # Codex's review of de4eed8f: a rule added to or renamed in validate.py's PRIVATE_CONTENT fails here until
+        # the gate carries it, so the two scans cannot drift apart unnoticed.
+        sys.path.insert(0, str(ROOT / "scripts"))
+        import validate
+        self.assertEqual(set(PYTHON_NAMES.values()), {name for name, _ in validate.PRIVATE_CONTENT} - SESSION_RULES)
+        result = subprocess.run([NODE, "-e", ORACLE], input=json.dumps(
+            {"rules": privacy_rules(inline_script(sota_job(GATE))), "templates": {}, "ranges": []}),
+            capture_output=True, text=True, timeout=60, check=True)
+        self.assertEqual(set(json.loads(result.stdout)["flags"]), set(PYTHON_NAMES) | GATE_ONLY_RULES)
 
     def test_each_rule_agrees_with_python_on_every_code_point(self):
         sys.path.insert(0, str(ROOT / "scripts"))

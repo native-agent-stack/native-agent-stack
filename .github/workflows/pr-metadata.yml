@@ -167,12 +167,13 @@ jobs:
               repo: context.repo.repo,
               pull_number: context.issue.number
             });
-            // The body is judged before it is parsed: GitHub's API refuses a longer description ("Body is too long (maximum is
-            // 65536 characters)"), so a longer, non-text or malformed one fails with a fixed rule id and is not read further.
-            const MAX_BODY = 65536;
+            // The body is judged before it is parsed: a non-text, malformed or overlong one fails with a fixed rule id and is
+            // not read further. The length bound is the gate's own, in code points. GitHub's REST update keeps a description of
+            // at most 262,144 UTF-8 bytes (measured 2026-10-11), so no stored one reaches it; one here has carried 75,726 (#786).
+            const MAX_BODY = 262144;
             const raw = pullRequest.body ?? '';
             const refused = typeof raw !== 'string' ? 'body-type'
-              : raw.length > MAX_BODY ? 'body-size'
+              : [...raw].length > MAX_BODY ? 'body-size'
               : !raw.isWellFormed() ? 'body-encoding'
               : /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]/.test(raw) ? 'body-control' : null;
             if (refused) {
@@ -202,22 +203,26 @@ jobs:
             const privacy = [
               ['personal-home-path', rule(String.raw`\/(?:home|Users)\/(?!example(?:\/|${b}))[A-Za-z0-9_.\-]+(?:\/|${b})`)],
               ['windows-user-path', rule(String.raw`(?:[${AZ}]:[\/\\]+|\/[Mm][Nn][Tt]\/[${AZ}]\/)${users}[\/\\]+(?!${example}(?:[\/\\]|${b}))[${AZ}0-9_.\-]+`)],
-              ['encoded-home-path', rule(String.raw`(?<![${W}\-])(?:-home-|-${users}-|[${AZ}]--${users}-|-[Mm][Nn][Tt]-[${AZ}]-${users}-)(?!example(?:-|[\/\\"'${S}\x60)\]]|${end}))[A-Za-z0-9_.]+(?:-|(?=[\/\\"'${S}\x60)\]]|${end}))|(?<![\p{L}\p{Nd}\p{Nl}\p{No}])home-(?!example-code-)[${W}.]+(?:-+[${W}.]+)*-*-code-`)],
+              // Only here: the graph-id form (home-<name>-code-, no leading dash) is not read within 256 characters after an
+              // http(s) scheme, where it names a public repository or page, such as github.com/<owner>/home-<name>-code-review.
+              // The check runs only where home- occurs, so it stays linear.
+              ['encoded-home-path', rule(String.raw`(?<![${W}\-])(?:-home-|-${users}-|[${AZ}]--${users}-|-[Mm][Nn][Tt]-[${AZ}]-${users}-)(?!example(?:-|[\/\\"'${S}\x60)\]]|${end}))[A-Za-z0-9_.]+(?:-|(?=[\/\\"'${S}\x60)\]]|${end}))|(?<![\p{L}\p{Nd}\p{Nl}\p{No}])home-(?<!https?:\/\/[^${S}<>"'\x60]{0,256}home-)(?!example-code-)[${W}.][${W}.\-]{0,255}-code-`)],
               ['hugging-face-token', rule(String.raw`${b}hf_[A-Za-z0-9]{20,}${b}`)],
               ['github-token', rule(String.raw`${b}(?:gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,})${b}`)],
               ['tavily-token', rule(String.raw`${b}tvly-(?:(?:prod|dev)-)?[A-Za-z0-9_\-]{24,}${b}`)],
               ['api-secret', rule(String.raw`${b}sk-(?:proj-|ant-)?[A-Za-z0-9_\-]{24,}${b}`)],
-              ['private-key', rule(String.raw`-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----`)],
+              ['private-key', rule(String.raw`-----BEGIN[ A-Z0-9_\-]{0,100}PRIVATE KEY(?: BLOCK)?-----`)],
               ['bearer-credential', rule(String.raw`${b}[Bb][Ee][Aa][Rr][Ee][Rr][${S}]+[${AZ}0-9._~\-]{30,}`)],
-              // Only here: a macOS home in any case at the start of a path (macOS volumes are case-insensitive by default).
-              // validate.py keeps the exact /Users/ because API routes in tracked evidence spell /users/ the same way.
-              ['macos-user-path', rule(String.raw`(?<![${W}.~\/\-])\/(?!Users\/)[Uu][Ss][Ee][Rr][Ss]\/(?!example(?:\/|${b}))[A-Za-z0-9_.\-]+`)],
+              // Only here: a macOS home in any case at the start of a path (macOS volumes are case-insensitive by default),
+              // however many slashes begin it (POSIX resolves three or more as one). validate.py keeps the exact /Users/
+              // because API routes in tracked evidence spell /users/ the same way.
+              ['macos-user-path', rule(String.raw`(?<![${W}.~\/\-])\/+(?!Users\/)[Uu][Ss][Ee][Rr][Ss]\/(?!example(?:\/|${b}))[A-Za-z0-9_.\-]+`)],
             ];
             // privacy-rules-end
-            // Each form below is decoded once from the body, never to a fixed point, so a home path or credential is caught as
-            // written and as it reads: percent escapes, JSON escapes, HTML character references, and Markdown's rendered text
-            // (the body itself keeps link destinations). Emphasis goes only in pairs around a word without a separator in it,
-            // so a glob such as Users/*/ keeps its star.
+            // Each decoder below undoes one way of writing text, so a home path or credential is caught as written and as it
+            // reads: percent escapes, JSON escapes, HTML character references, and Markdown's rendered text (the body itself
+            // keeps link destinations). Emphasis goes only in pairs around a word without a separator in it, so a glob such as
+            // Users/*/ keeps its star.
             const fromCode = (code) => (code <= 0x10FFFF && !(code >= 0xD800 && code <= 0xDFFF) ? String.fromCodePoint(code) : '');
             const named = new Map([['amp', '&'], ['lt', '<'], ['gt', '>'], ['quot', '"'], ['apos', "'"], ['sol', '/'],
               ['bsol', '\\'], ['colon', ':'], ['period', '.'], ['lowbar', '_'], ['hyphen', '-'], ['dash', '-'], ['tilde', '~'],
@@ -228,17 +233,26 @@ jobs:
             const links = /!?\[([^\]\n]*)\]\(\s*<?([^\s()<>]*)>?(?:\s+(?:"[^"\n]*"|'[^'\n]*'|\([^()\n]*\)))?\s*\)/g;
             // Only the inline elements GitHub renders are removed; any other <word>, such as a <user> placeholder, stays as text.
             const inlineTags = /<\/?(?:a|abbr|b|bdi|bdo|br|cite|code|del|dfn|em|i|img|ins|kbd|mark|q|rp|rt|ruby|s|samp|small|span|strike|strong|sub|sup|time|tt|u|var|wbr)\b[^<>\n]*>/gi;
-            const forms = [
-              body,
-              body.replace(/(?:%[0-9A-Fa-f]{2})+/g, percentRun),
-              body.replace(/\\u([0-9A-Fa-f]{4})|\\\//g, (_, hex) => (hex ? String.fromCharCode(parseInt(hex, 16)) : '/')),
-              body.replace(/&(?:#([0-9]{1,7})|#[xX]([0-9A-Fa-f]{1,6})|([A-Za-z]{2,8}));/g,
+            const decoders = [
+              (text) => text.replace(/(?:%[0-9A-Fa-f]{2})+/g, percentRun),
+              (text) => text.replace(/\\u([0-9A-Fa-f]{4})|\\\//g, (_, hex) => (hex ? String.fromCharCode(parseInt(hex, 16)) : '/')),
+              (text) => text.replace(/&(?:#([0-9]{1,7})|#[xX]([0-9A-Fa-f]{1,6})|([A-Za-z]{2,8}));/g,
                 (whole, decimal, hex, name) => (decimal ? fromCode(Number(decimal)) : hex ? fromCode(parseInt(hex, 16)) : named.get(name) ?? whole)),
-              body.replace(links, '$1').replace(/!?\[([^\]\n]*)\]\[[^\]\n]*\]/g, '$1').replace(/<((?:https?|file|mailto):[^<>\s]*)>/g, '$1')
+              (text) => text.replace(links, '$1').replace(/!?\[([^\]\n]*)\]\[[^\]\n]*\]/g, '$1').replace(/<((?:https?|file|mailto):[^<>\s]*)>/g, '$1')
                 .replace(inlineTags, '').replace(/\\([!-\/:-@\[-`{-~])/g, '$1').replace(/`/g, '')
                 .replace(/(\*{1,3}|~{1,2}|_{1,3})([\p{L}\p{N}][^\s*~_\/\\]*?)\1/gu, '$2'),
             ];
-            const hits = privacy.filter(([, pattern]) => forms.some((form) => pattern.test(form))).map(([id]) => id);
+            // The decoders compose: the rules see the body after every order of every subset of them, each decoder at most
+            // once along a chain and never to a fixed point (65 forms with the body), so a value written with several of
+            // these at once, such as character references around emphasis, is judged as it reads too.
+            const forms = new Set([body]);
+            const compose = (text, rest) => rest.forEach((decoder, index) => {
+              const next = decoder(text);
+              forms.add(next);
+              compose(next, rest.filter((_, other) => other !== index));
+            });
+            compose(body, decoders);
+            const hits = privacy.filter(([, pattern]) => [...forms].some((form) => pattern.test(form))).map(([id]) => id);
             const problems = [];
             if (!content) {
               problems.push('The PR description needs a non-empty "SOTA sources" section: the repository, pin and file, or the published reference, behind each change (AGENTS.md top rule).');
