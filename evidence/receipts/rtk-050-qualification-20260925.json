@@ -506,7 +506,7 @@
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260925/rtk/results.json",
-      "sha256": "ee63903cef7492c8d16ea0d721fcd62596f74c6cae0d592149ed7a3936763c65",
+      "sha256": "bfcd619da8e46acf4305f37d46a3bef9383b6a801fcb0594ee145bbed64a8664",
       "byte_identical_to_run_copy": false
     }
   ],

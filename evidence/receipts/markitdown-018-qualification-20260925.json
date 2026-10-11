@@ -282,7 +282,7 @@
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260925/markitdown/results.json",
-      "sha256": "1a08f26480efd121c4f0299a19d8b1e0c34477265b2aa0ed98252846e41b5632",
+      "sha256": "e267a03c4a18acff7f29db83cd35b2aab6098035234f0cf87b85f7c92147e768",
       "byte_identical_to_run_copy": false
     }
   ]

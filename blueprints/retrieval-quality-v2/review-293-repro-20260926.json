@@ -18,7 +18,7 @@
         "role": "driver: ran every reproduction and wrote the receipt",
         "sha256": "7aba596a37ea3dadf6054e66f8d704d4a37735f6d4aa838f0344614efa245bfc",
         "bytes": 10251,
-        "as_run_sha256": "de8e61a9dfca01b722e53248b73d27a965e42a3179db76fc99890c67ef123400",
+        "as_run_sha256": "7aba596a37ea3dadf6054e66f8d704d4a37735f6d4aa838f0344614efa245bfc",
         "as_run_bytes": 10250,
         "sanitization": [
           "host user name -> <user>"
@@ -531,6 +531,18 @@
       ],
       "unchanged": "Every other key and value, including each finding's argv, exit_code, stderr_tail and observed, is as recorded.",
       "reconstruct": "Delete the added keys, set evidence_class back to local_integration, and write json.dumps(document, indent=2) followed by a newline. The result is the as-recorded file, byte for byte."
+    },
+    {
+      "recorded_at_utc": "2026-10-11T13:44:14Z",
+      "reason": "The 2026-10-11 masked-digest audit of main at 7b76a88c (correction #161) found that inputs.files[0].as_run_sha256 was an offline oracle. The committed driver differs from the file that ran only by the host user name, replaced by <user>, so anyone could put a guessed name back, hash the result and compare it with as_run_sha256, which confirms the guess. The value is now the sha256 of the published bytes, the basis scripts/host_receipts.py record has used for output_sha256 since #492. Git history keeps the earlier value. This entry records no as_recorded_sha256: the file before it held the oracle digest, so its own sha256 would confirm a guess the same way.",
+      "changed": [
+        "inputs.files[0].as_run_sha256: the sha256 of the file that ran -> the sha256 of the committed copy, the same value as inputs.files[0].sha256"
+      ],
+      "added": [
+        "corrections[1]"
+      ],
+      "unchanged": "Every other key and value. inputs.files[0].as_run_bytes still gives the size of the file that ran, so for that entry inputs.note's 'as_run_sha256 and as_run_bytes the file that ran' now holds for as_run_bytes only.",
+      "reconstruct": "Set inputs.files[0].as_run_sha256 back to its value at commit 7b76a88c, delete this entry, and write json.dumps(document, indent=2) followed by a newline. The result is the file before this correction, byte for byte."
     }
   ]
 }

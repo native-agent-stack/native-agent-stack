@@ -4,9 +4,22 @@
 recording of the superseding vLLM use receipt for host
 `nativestack-5975wx-20260925` (observed 2026-09-25T14:37:37Z, `catalog_revision`
 `66fd7e96`). It was withdrawn from `evidence/hosts/` before merge. The file is
-byte-for-byte what it was after its independent review: the recorder's self
-`agree` and one `independent_session` `needs_changes`. It no longer counts
-toward any status.
+byte-for-byte what it was after its independent review (the recorder's self
+`agree` and one `independent_session` `needs_changes`), except for two digests
+re-derived on 2026-10-11 (below). It no longer counts toward any status.
+
+## Digests re-derived on 2026-10-11
+
+`commands[1].output_sha256` and `commands[4].output_sha256` were the sha256 of
+the raw command output. That output differed from the published
+`output_excerpt` only by the home directory, which is replaced by `~`, so
+anyone could put a guessed home directory back, hash the result and compare.
+Both are now the sha256 of `output_excerpt` as published (UTF-8), the basis
+`scripts/host_receipts.py record` has used since #492. No other byte of the
+file changed. Git history keeps the earlier values. Receipts recorded before
+2026-09-29 keep their raw-output digests, so the same two commands in the
+registered receipts under `evidence/hosts/nativestack-5975wx-20260925/` still
+carry them.
 
 ## Why it was withdrawn
 

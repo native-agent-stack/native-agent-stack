@@ -69,7 +69,7 @@
       "sha256": "98299a10cee552c8c60ac6b3bf387269e9c462f48ef4c8750070765b6266a488",
       "bytes": 919,
       "byte_identical_to_run_copy": false,
-      "run_copy_sha256": "c18a803d4330bc300ba6961b6e5c873c2697bf645b8bf3cf0d7ea34baa948ba6",
+      "run_copy_sha256": "98299a10cee552c8c60ac6b3bf387269e9c462f48ef4c8750070765b6266a488",
       "run_copy": "$IMPL/install.log"
     },
     {
@@ -290,7 +290,7 @@
       "sha256": "6134751a81da70ebc08659a50a4c1feaf8499df553870f10901164940c171fa4",
       "bytes": 1426,
       "byte_identical_to_run_copy": false,
-      "run_copy_sha256": "d87b4a641c38a8782fe43f8c8189f4c5e6f644adc2f7505e88a1a55e1b0f31d4",
+      "run_copy_sha256": "6134751a81da70ebc08659a50a4c1feaf8499df553870f10901164940c171fa4",
       "publication_edit": "The home directory is replaced by ~; no other byte changed.",
       "run_copy": "$IMPL/verify/legs-baseline.log"
     },
@@ -904,6 +904,13 @@
       "corrected": "run-candidate/, run-baseline/ and run-postswitch2/ are now retained; each pdf.err has the home directory replaced by ~, and every other file is byte-identical. run_arm.py never saved the checker's raw stdout (not_retained[1]). out/checker-rerun-20260926.out is the retained byte-identical check_outputs.py re-run on those directories, and verify/run-candidate/checker.out and verify/run-baseline/checker.out are the independent verifier's raw checker output from its own 2026-09-25 legs run (verify/legs_record.sh, verify/legs-*.log).",
       "by": "2026-09-26 post-merge cross-family review (Codex) of #291, needs_changes; retained by the writing worker",
       "reason": "The review found the checker summaries without the directories and raw output behind them."
+    },
+    {
+      "field": "files[].run_copy_sha256 for out/install.log and verify/legs-baseline.log",
+      "original": "The sha256 of the unsanitized run copy, as the sanitization note describes for files that are not byte-identical to their run copy.",
+      "corrected": "The sha256 of the published file, the same value as the entry's sha256: the basis scripts/host_receipts.py record has used for output_sha256 since #492. byte_identical_to_run_copy stays false, because the run copy still differs. For these two entries the sanitization note's 'run_copy_sha256 is the digest of the unsanitized run copy' no longer holds.",
+      "by": "2026-10-11 masked-digest audit of main at 7b76a88c (correction #161); the values were re-derived from the committed files",
+      "reason": "The home directory, replaced by ~, was the only difference, so anyone could put a guessed home directory back, hash the result and compare it with run_copy_sha256, which confirms the guess offline. Git history keeps the earlier values."
     }
   ],
   "not_retained": [
