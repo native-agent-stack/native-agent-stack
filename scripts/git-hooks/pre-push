@@ -12,6 +12,12 @@
 # The runtime host-name deny rule scans tracked bytes in each committed tip,
 # plus the pushed history and commit identities for every ref's old/new range,
 # before the registry tests. An unavailable or failed scanner also refuses.
+# After them, the published-digest guard (tests/test_published_digest_privacy.py,
+# correction #161) checks each tip with the same runtime names
+# (scripts/host_name_scan.py host_names(), selected by
+# PUBLISHED_DIGEST_GUARD_HOST_NAMES=1): a digest that a guessed home directory or
+# name would confirm, outside its frozen list, refuses. CI has no host names and
+# runs only its name-free tests.
 #
 # githooks(5), pre-push: stdin carries "<local ref> <local oid> <remote ref>
 # <remote oid>" lines, and a non-zero exit aborts the push. The all-zero oid and
@@ -143,6 +149,14 @@ EOF
     tests.test_workflow_security_coverage.NewWorkflowSecurityCoverageTests.test_all_published_workflows_are_listed_and_covered \
     </dev/null); then
     echo "pre-push: the registry tests failed or skipped on $commit. Push refused; \`git push --no-verify\` overrides." >&2
+    status=1
+  fi
+  # The runner refuses a skip, so names must come from host_names(); an unavailable source errors.
+  if ! (unset $git_local_env; cd "$tree" && TMPDIR="$scratch/tmp" PYTHONDONTWRITEBYTECODE=1 \
+    PUBLISHED_DIGEST_GUARD_HOST_NAMES=1 python3 -c "$runner" \
+    tests.test_published_digest_privacy.PublishedDigestPrivacyTests.test_no_unlisted_published_digest_hashes_unmasked_bytes \
+    </dev/null); then
+    echo "pre-push: the published-digest guard failed or skipped on $commit. Push refused; \`git push --no-verify\` overrides." >&2
     status=1
   fi
   git worktree remove --force "$tree"

@@ -3543,7 +3543,7 @@
                   "locator": "/kind",
                   "path": "evidence/receipts/markitdown-018-qualification-20260925.json",
                   "root": "repo",
-                  "sha256": "d9a1a3484c229f7d530009143672ef1ee6756dafff8ad72aeca1dba86cef3b2f"
+                  "sha256": "74d066a17f0ea04cd0ad5e08bf0a3b756f140a8d886cd0d8b5196a694454a037"
                 },
                 "status": "RECORDED",
                 "value": "native_cli_e2e"
@@ -3552,7 +3552,7 @@
                 "locator": "",
                 "path": "evidence/receipts/markitdown-018-qualification-20260925.json",
                 "root": "repo",
-                "sha256": "d9a1a3484c229f7d530009143672ef1ee6756dafff8ad72aeca1dba86cef3b2f"
+                "sha256": "74d066a17f0ea04cd0ad5e08bf0a3b756f140a8d886cd0d8b5196a694454a037"
               }
             }
           ]
@@ -7337,7 +7337,7 @@
                   "locator": "/kind",
                   "path": "evidence/receipts/mcporter-0141-qualification-20260925.json",
                   "root": "repo",
-                  "sha256": "5379b1e326d99eeb09a72b88fa447c6020e76211b3d918ac96d8daa09241ce32"
+                  "sha256": "9b69956eb0a8bdd9ce560d6393dbf66a20e0138204a2b4604a3448d50a009bbb"
                 },
                 "status": "RECORDED",
                 "value": "native_cli_e2e"
@@ -7346,7 +7346,7 @@
                 "locator": "",
                 "path": "evidence/receipts/mcporter-0141-qualification-20260925.json",
                 "root": "repo",
-                "sha256": "5379b1e326d99eeb09a72b88fa447c6020e76211b3d918ac96d8daa09241ce32"
+                "sha256": "9b69956eb0a8bdd9ce560d6393dbf66a20e0138204a2b4604a3448d50a009bbb"
               }
             },
             {
@@ -14973,7 +14973,7 @@
                   "locator": "/kind",
                   "path": "evidence/receipts/rtk-050-qualification-20260925.json",
                   "root": "repo",
-                  "sha256": "9de293b6df651c53d4792b72901df4f234bec31983183a4e722d9dcea8529879"
+                  "sha256": "b47326a1661984e46370767916610ee9293d81d41af1f67f2a118b20f8f9723a"
                 },
                 "status": "RECORDED",
                 "value": "native_cli_e2e"
@@ -14982,7 +14982,7 @@
                 "locator": "",
                 "path": "evidence/receipts/rtk-050-qualification-20260925.json",
                 "root": "repo",
-                "sha256": "9de293b6df651c53d4792b72901df4f234bec31983183a4e722d9dcea8529879"
+                "sha256": "b47326a1661984e46370767916610ee9293d81d41af1f67f2a118b20f8f9723a"
               }
             },
             {
@@ -19726,12 +19726,12 @@
       "sha256": "b8d09fda1ad56976d57d938af0eb7076223c79e39b2261ef4521413b15d8a0f1",
       "status": "RECORDED"
     },
-    "repo:evidence/receipts/markitdown-018-qualification-20260925.json@d9a1a3484c229f7d530009143672ef1ee6756dafff8ad72aeca1dba86cef3b2f": {
+    "repo:evidence/receipts/markitdown-018-qualification-20260925.json@74d066a17f0ea04cd0ad5e08bf0a3b756f140a8d886cd0d8b5196a694454a037": {
       "bytes": 18417,
-      "expected_sha256": "d9a1a3484c229f7d530009143672ef1ee6756dafff8ad72aeca1dba86cef3b2f",
+      "expected_sha256": "74d066a17f0ea04cd0ad5e08bf0a3b756f140a8d886cd0d8b5196a694454a037",
       "path": "evidence/receipts/markitdown-018-qualification-20260925.json",
       "root": "repo",
-      "sha256": "d9a1a3484c229f7d530009143672ef1ee6756dafff8ad72aeca1dba86cef3b2f",
+      "sha256": "74d066a17f0ea04cd0ad5e08bf0a3b756f140a8d886cd0d8b5196a694454a037",
       "status": "RECORDED"
     },
     "repo:evidence/receipts/mcp-inspector-280-qualification-20260926.json@f2d8fdc6179b535c515aa96c47650db5d6556f931daef9a4dfec23f45b73bb81": {
@@ -19750,12 +19750,12 @@
       "sha256": "ea5909301508d3ef61ef5c79a920da793e4904a5d219e20a9c32c2fd83f45ba3",
       "status": "RECORDED"
     },
-    "repo:evidence/receipts/mcporter-0141-qualification-20260925.json@5379b1e326d99eeb09a72b88fa447c6020e76211b3d918ac96d8daa09241ce32": {
+    "repo:evidence/receipts/mcporter-0141-qualification-20260925.json@9b69956eb0a8bdd9ce560d6393dbf66a20e0138204a2b4604a3448d50a009bbb": {
       "bytes": 15000,
-      "expected_sha256": "5379b1e326d99eeb09a72b88fa447c6020e76211b3d918ac96d8daa09241ce32",
+      "expected_sha256": "9b69956eb0a8bdd9ce560d6393dbf66a20e0138204a2b4604a3448d50a009bbb",
       "path": "evidence/receipts/mcporter-0141-qualification-20260925.json",
       "root": "repo",
-      "sha256": "5379b1e326d99eeb09a72b88fa447c6020e76211b3d918ac96d8daa09241ce32",
+      "sha256": "9b69956eb0a8bdd9ce560d6393dbf66a20e0138204a2b4604a3448d50a009bbb",
       "status": "RECORDED"
     },
     "repo:evidence/receipts/mcporter-0142-qualification-20261004.json@9399c393875decb817d49a1ed59e1629ff445070453c2a2ba819e98d17a24cd1": {
@@ -20062,12 +20062,12 @@
       "sha256": "8687b8fd444c6673ab03f28e02d9599d64030a8c1438e2280d6e8c56b6548452",
       "status": "RECORDED"
     },
-    "repo:evidence/receipts/rtk-050-qualification-20260925.json@9de293b6df651c53d4792b72901df4f234bec31983183a4e722d9dcea8529879": {
+    "repo:evidence/receipts/rtk-050-qualification-20260925.json@b47326a1661984e46370767916610ee9293d81d41af1f67f2a118b20f8f9723a": {
       "bytes": 32488,
-      "expected_sha256": "9de293b6df651c53d4792b72901df4f234bec31983183a4e722d9dcea8529879",
+      "expected_sha256": "b47326a1661984e46370767916610ee9293d81d41af1f67f2a118b20f8f9723a",
       "path": "evidence/receipts/rtk-050-qualification-20260925.json",
       "root": "repo",
-      "sha256": "9de293b6df651c53d4792b72901df4f234bec31983183a4e722d9dcea8529879",
+      "sha256": "b47326a1661984e46370767916610ee9293d81d41af1f67f2a118b20f8f9723a",
       "status": "RECORDED"
     },
     "repo:evidence/receipts/rtk-051-qualification-20261004.json@f35ef95e65d1a8c621c62102eba41f6c05bd39c8c79fc64e6550a04190912d6e": {

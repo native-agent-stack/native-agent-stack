@@ -6,20 +6,26 @@ account name offline: put the guess back in place of the mask, hash, compare. sc
 the published excerpt since #492 (the comment at line 1012, the hash at line 1029).
 
 findings() walks every JSON file under SCANNED. For each 64-hex string value it collects, from the value's own object and the
-object that encloses it, the strings that carry a mask (HOME_MASKS, USER_MASKS) and the files named under FILE_KEYS (resolved
-against the JSON file's directory first, then the checkout root). A finding is a digest that hashes none of those texts or files
-as published but does hash one of them once masks are put back. Each mask is either left alone or put back everywhere: a home
-mask as /home/<name> or /Users/<name>, an account mask as <name>. Texts are also tried with a trailing newline. A finding is
-reported as path, key and the digest's first 8 hex digits, never a name, a home path or a candidate.
+object that encloses it, the strings that carry a mask and the files named under FILE_KEYS (resolved against the JSON file's
+directory first, then the checkout root). A finding is a digest that hashes none of those texts or files as published but does
+hash one of them once masks are put back. Each mask is either left alone or put back everywhere (every subset of up to four
+masks; beyond four, all of them or one at a time): a home mask as /home/<name> or /Users/<name>, %USERPROFILE% as C:\\Users\\<name>,
+C:/Users/<name> or /mnt/c/Users/<name>, and an account or host mask as <name>. Texts are also tried with a trailing newline. A
+finding is reported as path, key and the digest's first 8 hex digits, never a name, a home path or a candidate. Forms this
+detector does not reach (content-addressed tables, nested or non-JSON digests, keys outside FILE_KEYS) are follow-up F3 of #1010.
 
-The names come from LANDING_PROHIBITED_NAMES, comma-separated, set on the host and never written into the repository. CI has no
-such names, so the repository check skips there: it is a local and pre-push guard. The allowlist bookkeeping, the regression for
-the sites fixed with this test and the synthetic cases run everywhere.
+The names are scripts/host_name_scan.py host_names() (#934; docs/decisions/2026-10-09-host-name-scan.md) when
+PUBLISHED_DIGEST_GUARD_HOST_NAMES=1, which scripts/git-hooks/pre-push sets: they stay in this process, an unavailable source
+fails the check, and NATIVE_AGENT_HOST_NAMES_JSON replaces them in fixtures. Otherwise they are the comma-separated
+LANDING_PROHIBITED_NAMES, and without either the repository check skips, as in CI. So it is a local and pre-push guard. The
+allowlist bookkeeping, the regression for the sites fixed with this test, the readiness pin check and the synthetic cases need no
+names and run everywhere.
 
 LEGACY_SITES freezes the sites left at the freeze. LEGACY_HOST_RECEIPTS holds 96 output_sha256 values in evidence/hosts receipts
 recorded before 2026-09-29, which #492 left append-only. OUTSIDE_THE_AUDIT holds 10 sites that the 2026-10-11 audit's probe, which
-put back only ~ and <user> and read only files named in the digest's own object, did not reach. The repository check fails on a
-site missing from the list and on a listed site that is gone, so a fixed site leaves the list and the list only shrinks.
+put back only ~ and <user> and read only files named in the digest's own object, did not reach. An unlisted site fails. A listed
+site these names do not reproduce is only reported, because another clone's names differ; test_the_frozen_list_only_shrinks
+fails, without names, once a listed digest is gone from its file, so a fixed site leaves the list and the list only shrinks.
 """
 
 from __future__ import annotations
@@ -30,6 +36,8 @@ import itertools
 import json
 import os
 import re
+import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -39,12 +47,21 @@ from unittest import mock
 ROOT = Path(__file__).resolve().parents[1]
 SCANNED = ("evidence", "blueprints", "manifests")
 NAMES_VARIABLE = "LANDING_PROHIBITED_NAMES"
+HOST_NAMES_SWITCH = "PUBLISHED_DIGEST_GUARD_HOST_NAMES"
 DIGEST = re.compile(r"[0-9a-f]{64}")
 FILE_KEYS = frozenset({"path", "file", "log", "output_path", "raw_path", "capture"})
-HOME_MASKS = ("~", "<home>", "<HOME>", "<host-home>", "$HOME", "${HOME}")
-USER_MASKS = ("<user>", "<USER>", "$USER")
+HOME_MASKS = ("~", "<home>", "<HOME>", "<host-home>", "<user-home>", "<SCRATCH_HOME>", "$HOME", "${HOME}")
+WINDOWS_HOME_MASKS = ("%USERPROFILE%",)
+USER_MASKS = ("<user>", "<USER>", "$USER", "<WSL_USER>", "<hostname>")
+MASKS = (*HOME_MASKS, *WINDOWS_HOME_MASKS, *USER_MASKS)
 HOME_PREFIXES = ("/home/", "/Users/")
+WINDOWS_HOME_PREFIXES = ("C:\\Users\\", "C:/Users/", "/mnt/c/Users/")
+ALL_SUBSETS_UP_TO = 4
 MAX_FILE_BYTES = 64 * 1024 * 1024
+MASK_BYTES = tuple(mask.encode() for mask in MASKS)
+MASK_STARTS = "".join(sorted({mask[0] for mask in MASKS}))
+READINESS = "catalogs/north-star/readiness.json"
+READINESS_BINDING = re.compile(r"repo:(.+)@([0-9a-f]{64})")
 
 HOSTS = "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--"
 LEGACY_HOST_RECEIPTS = frozenset((f"{HOSTS}{stem}.json", "output_sha256", prefix) for stem, prefix in (
@@ -179,7 +196,11 @@ FIXED_SITES = (
 
 
 def prohibited_names() -> tuple[str, ...]:
-    """The comma-separated names in LANDING_PROHIBITED_NAMES, read when the test runs; blank entries are dropped."""
+    """host_names() under PUBLISHED_DIGEST_GUARD_HOST_NAMES=1 (raising when a source is unavailable), else the comma-separated
+    LANDING_PROHIBITED_NAMES; read when the test runs, blank entries dropped, never printed."""
+    if os.environ.get(HOST_NAMES_SWITCH) == "1":
+        from scripts import host_name_scan
+        return tuple(dict.fromkeys(name for name in host_name_scan.host_names(ROOT) if name))
     return tuple(name for name in (part.strip() for part in os.environ.get(NAMES_VARIABLE, "").split(",")) if name)
 
 
@@ -196,17 +217,28 @@ def encoded(text: str) -> bytes | None:
 
 
 def carries_mask(data: bytes) -> bool:
-    return any(mask.encode() in data for mask in (*HOME_MASKS, *USER_MASKS))
+    return any(mask in data for mask in MASK_BYTES)
+
+
+def text_carries_mask(text: str) -> bool:
+    """carries_mask for a JSON string; most strings hold none of the masks' first characters and are skipped unencoded."""
+    return any(start in text for start in MASK_STARTS) and any(mask in text for mask in MASKS)
 
 
 def unmasked(data: bytes, names: tuple[str, ...]) -> set[bytes]:
-    """``data`` with each mask it carries left alone or put back everywhere, for each name; never ``data`` itself."""
-    present = sorted((mask for mask in (*HOME_MASKS, *USER_MASKS) if mask.encode() in data), key=len, reverse=True)
+    """``data`` with the masks it carries left alone or put back everywhere, for each name; never ``data`` itself."""
+    present = sorted((mask for mask in MASKS if mask.encode() in data), key=len, reverse=True)
+    if len(present) <= ALL_SUBSETS_UP_TO:
+        choices = list(itertools.product((False, True), repeat=len(present)))
+    else:
+        choices = [(True,) * len(present), *(tuple(i == j for j in range(len(present))) for i in range(len(present)))]
+    windows = WINDOWS_HOME_PREFIXES if any(mask in WINDOWS_HOME_MASKS for mask in present) else ("",)
     variants = set()
     for name in names:
-        for prefix in HOME_PREFIXES:
-            values = {mask: (prefix + name if mask in HOME_MASKS else name).encode() for mask in present}
-            for chosen in itertools.product((False, True), repeat=len(present)):
+        for prefix, windows_prefix in itertools.product(HOME_PREFIXES, windows):
+            values = {mask: (prefix + name if mask in HOME_MASKS else windows_prefix + name if mask in WINDOWS_HOME_MASKS
+                             else name).encode() for mask in present}
+            for chosen in choices:
                 variant = data
                 for mask, put_back in zip(present, chosen):
                     if put_back:
@@ -214,6 +246,15 @@ def unmasked(data: bytes, names: tuple[str, ...]) -> set[bytes]:
                 variants.add(variant)
     variants.discard(data)
     return variants
+
+
+@functools.lru_cache(maxsize=None)
+def text_digests(text: str, names: tuple[str, ...]) -> tuple[str, frozenset[str]] | None:
+    """(digest of the published text, digests of its unmasked variants with and without a trailing newline)."""
+    data = encoded(text)
+    if data is None:
+        return None
+    return sha256(data), frozenset(sha256(variant + ending) for variant in unmasked(data, names) for ending in (b"", b"\n"))
 
 
 @functools.lru_cache(maxsize=None)
@@ -231,11 +272,12 @@ def file_digests(path: str, names: tuple[str, ...]) -> tuple[str, frozenset[str]
     return sha256(data), frozenset(sha256(variant) for variant in unmasked(data, names))
 
 
-def resolve(ref: str, directory: Path, root: Path) -> str | None:
+@functools.lru_cache(maxsize=None)
+def resolve(ref: str, directory: str, root: str) -> str | None:
     """``ref`` as an existing file under ``root``, against the JSON file's directory first, then the checkout root."""
     for base in (directory, root):
         candidate = os.path.normpath(os.path.join(base, ref))
-        if Path(candidate).is_relative_to(root) and os.path.isfile(candidate):
+        if (candidate == root or candidate.startswith(root + os.sep)) and os.path.isfile(candidate):
             return candidate
     return None
 
@@ -245,12 +287,12 @@ def is_oracle(digest: str, texts: list[str], refs: list[str], *, root: Path, dir
     """True when ``digest`` hashes no published text or named file but does hash one of them unmasked."""
     published, hidden = set(), set()
     for text in texts:
-        data = encoded(text)
-        if data is not None:
-            published.add(sha256(data))
-            hidden.update(sha256(variant + ending) for variant in unmasked(data, names) for ending in (b"", b"\n"))
+        digests = text_digests(text, names)
+        if digests is not None:
+            published.add(digests[0])
+            hidden.update(digests[1])
     for ref in refs:
-        candidate = resolve(ref, directory, root)
+        candidate = resolve(ref, str(directory), str(root))
         digests = file_digests(candidate, names) if candidate else None
         if digests is not None:
             published.add(digests[0])
@@ -265,7 +307,7 @@ def findings(root: Path, names: tuple[str, ...], subdirs: tuple[str, ...] = SCAN
 
     def walk(value, enclosing, relative, directory):
         if isinstance(value, dict):
-            texts = [item for item in value.values() if isinstance(item, str) and carries_mask(item.encode())]
+            texts = [item for item in value.values() if isinstance(item, str) and text_carries_mask(item)]
             refs = [item for key, item in value.items() if isinstance(item, str) and key.lower() in FILE_KEYS]
             candidates = (texts + enclosing[0], refs + enclosing[1])
             for key, item in value.items():
@@ -315,18 +357,75 @@ def listed(sites) -> list[str]:
     return sorted(" ".join(site) for site in sites)
 
 
+def readiness_receipt_pins(document) -> list[tuple[str, str]]:
+    """(path, digest) for each repo:<receipt>@<digest> binding in readiness.json: the key, its entry's sha256 and expected_sha256,
+    and every repo-rooted object under a "receipt" key that names one of those receipts."""
+    keyed, nested = [], []
+
+    def walk(value, parent_key):
+        if isinstance(value, dict):
+            if parent_key == "receipt" and value.get("root") == "repo" and isinstance(value.get("path"), str) \
+                    and isinstance(value.get("sha256"), str):
+                nested.append((value["path"], value["sha256"]))
+            for key, item in value.items():
+                match = READINESS_BINDING.fullmatch(key)
+                if match:
+                    keyed.append(match.groups())
+                    if isinstance(item, dict):
+                        keyed.extend((match.group(1), item[field]) for field in ("sha256", "expected_sha256")
+                                     if isinstance(item.get(field), str))
+                walk(item, key)
+        elif isinstance(value, list):
+            for item in value:
+                walk(item, parent_key)
+
+    walk(document, None)
+    receipts = {path for path, _ in keyed}
+    return keyed + [pin for pin in nested if pin[0] in receipts]
+
+
+def changed_since_merge_base(root: Path) -> set[str] | None:
+    """Tracked paths that differ between the merge base of HEAD and origin/main and the working tree, or None without history."""
+    try:
+        base = subprocess.run(["git", "merge-base", "HEAD", "refs/remotes/origin/main"], cwd=root, capture_output=True,
+                              text=True, check=True).stdout.strip()
+        listing = subprocess.run(["git", "diff", "--name-only", "-z", base, "--"], cwd=root, capture_output=True,
+                                 check=True).stdout
+    except (OSError, subprocess.CalledProcessError):
+        return None
+    return {path.decode("utf-8", "surrogateescape") for path in listing.split(b"\0") if path}
+
+
+def stale_readiness_pins(root: Path, changed: set[str]) -> list[str]:
+    """``path prefix`` for each readiness binding of a changed receipt whose digest is not the receipt's current sha256."""
+    document = json.loads((root / READINESS).read_text(encoding="utf-8"))
+    current = {}
+    stale = []
+    for path, digest in readiness_receipt_pins(document):
+        if path not in changed:
+            continue
+        if path not in current:
+            current[path] = sha256((root / path).read_bytes()) if (root / path).is_file() else None
+        if digest != current[path]:
+            stale.append(f"{path} {digest[:8]}")
+    return sorted(stale)
+
+
 class PublishedDigestPrivacyTests(unittest.TestCase):
     maxDiff = None  # the messages are path, key and an 8-hex prefix only
 
-    def test_no_published_digest_hashes_unmasked_bytes_outside_the_frozen_list(self):
+    def test_no_unlisted_published_digest_hashes_unmasked_bytes(self):
         names = prohibited_names()
         if not names:
-            self.skipTest(f"{NAMES_VARIABLE} is not set: this is a local and pre-push guard (CI has no host names)")
+            self.skipTest(f"neither {HOST_NAMES_SWITCH}=1 nor {NAMES_VARIABLE} is set: this is a local and pre-push guard "
+                          "(CI has no host names)")
         found = findings(ROOT, names)
         self.assertEqual(listed(found - LEGACY_SITES), [],
                          "a new published digest hashes its text or file with a masked home directory or name put back")
-        self.assertEqual(listed(LEGACY_SITES - found), [],
-                         "a frozen site no longer hashes unmasked bytes: remove it and lower LEGACY_COUNT")
+        missing = LEGACY_SITES - found
+        if missing:  # another clone's names: reported, never a failure (test_the_frozen_list_only_shrinks needs no names)
+            print(f"published-digest guard: {len(missing)} of {len(LEGACY_SITES)} frozen sites not reproduced with these names",
+                  file=sys.stderr)
 
     def test_the_frozen_list_only_shrinks(self):
         self.assertEqual(len(LEGACY_SITES), LEGACY_COUNT)
@@ -349,6 +448,27 @@ class PublishedDigestPrivacyTests(unittest.TestCase):
                 self.assertEqual(entry[key], published)
 
 
+class ReadinessPinTests(unittest.TestCase):
+    """A receipt that changes must not leave its old sha256 in readiness.json: rebuilt from a guess, the old receipt would
+    confirm the guess against that pin (#1010 B1). Needs no names; skips without origin/main."""
+
+    def test_readiness_pins_of_receipts_changed_since_the_merge_base_hash_their_current_bytes(self):
+        changed = changed_since_merge_base(ROOT)
+        if changed is None:
+            self.skipTest("needs HEAD and refs/remotes/origin/main to find the merge base")
+        self.assertEqual(stale_readiness_pins(ROOT, changed), [],
+                         f"{READINESS} still pins an earlier sha256 of a receipt this branch changes")
+
+    def test_every_binding_form_is_read(self):
+        digest, other = "a" * 64, "b" * 64
+        document = {"receipts": {f"repo:evidence/receipts/r.json@{digest}": {"sha256": digest, "expected_sha256": digest},
+                                 "evidence": {"path": "manifests/evidence.json", "root": "repo", "sha256": other}},
+                    "gates": [{"kind": {"receipt": {"path": "evidence/receipts/r.json", "root": "repo", "sha256": other}},
+                               "receipt": {"path": "evidence/receipts/r.json", "root": "repo", "sha256": digest}}]}
+        self.assertEqual(sorted(readiness_receipt_pins(document)),
+                         sorted([("evidence/receipts/r.json", digest)] * 4 + [("evidence/receipts/r.json", other)]))
+
+
 class SyntheticOracleTests(unittest.TestCase):
     """The detector on scratch trees with a synthetic account; these run in CI too."""
 
@@ -365,7 +485,8 @@ class SyntheticOracleTests(unittest.TestCase):
                     (root / relative).write_bytes(content)
                 else:
                     (root / relative).write_text(json.dumps(content, indent=2) + "\n", encoding="utf-8")
-            file_digests.cache_clear()
+            for cached in (file_digests, text_digests, resolve):
+                cached.cache_clear()
             return listed(findings(root, (self.NAME,), subdirs))
 
     def raw(self, text: str) -> str:
@@ -418,11 +539,29 @@ class SyntheticOracleTests(unittest.TestCase):
         self.assertEqual(self.scan({"docs/r.json": self.receipt(digest)}), [])
         self.assertEqual(len(self.scan({"docs/r.json": self.receipt(digest)}, ("docs",))), 1)
 
+    def test_windows_profile_account_and_host_masks_are_put_back(self):
+        for mask, value in (("%USERPROFILE%", "C:\\Users\\" + self.NAME), ("%USERPROFILE%", "/mnt/c/Users/" + self.NAME),
+                            ("<WSL_USER>", self.NAME), ("<hostname>", self.NAME), ("<user-home>", self.HOME),
+                            ("<SCRATCH_HOME>", self.HOME)):
+            with self.subTest(mask=mask, value=value.replace(self.NAME, "<name>")):
+                excerpt = f"profile {mask}/cache\n"
+                digest = sha256(excerpt.replace(mask, value).encode())
+                self.assertEqual(len(self.scan({"evidence/artifacts/r.json": self.receipt(digest, excerpt)})), 1)
+
     def test_names_are_comma_separated_with_blank_entries_dropped(self):
-        with mock.patch.dict(os.environ, {NAMES_VARIABLE: " , a ,, b "}):
+        with mock.patch.dict(os.environ, {NAMES_VARIABLE: " , a ,, b ", HOST_NAMES_SWITCH: "0"}):
             self.assertEqual(prohibited_names(), ("a", "b"))
-        with mock.patch.dict(os.environ, {NAMES_VARIABLE: ""}):
+        with mock.patch.dict(os.environ, {NAMES_VARIABLE: "", HOST_NAMES_SWITCH: "0"}):
             self.assertEqual(prohibited_names(), ())
+
+    def test_the_host_names_switch_reads_the_repository_source(self):
+        from scripts import host_name_scan
+        fixture = {HOST_NAMES_SWITCH: "1", NAMES_VARIABLE: "ignored"}
+        with mock.patch.dict(os.environ, {**fixture, host_name_scan.OVERRIDE: '["fixture_a", "fixture_b", "fixture_a"]'}):
+            self.assertEqual(prohibited_names(), ("fixture_a", "fixture_b"))
+        with mock.patch.dict(os.environ, {**fixture, host_name_scan.OVERRIDE: "invalid-json"}):
+            with self.assertRaises(host_name_scan.HostNameScanError):
+                prohibited_names()
 
 
 if __name__ == "__main__":

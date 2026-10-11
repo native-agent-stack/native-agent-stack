@@ -59872,8 +59872,8 @@
     },
     {
       "path": "scripts/git-hooks/pre-push",
-      "sha256": "a45b2074ecdd5b5ae858ae54a240fa1e8811544b479c3c64bfbfc6b9e739837e",
-      "bytes": 7548
+      "sha256": "4f0931d30b5e6b10b3e89724a845e050aeb4bea7c9dc7cb1b0bab383d452ecee",
+      "bytes": 8498
     },
     {
       "path": "scripts/hardware_profile.py",
@@ -61232,8 +61232,8 @@
     },
     {
       "path": "tests/test_pre_push_gate.py",
-      "sha256": "b4cd12d2659c733b494a5dbe2adb57596dc3c836c64ff4bebab176df29bb030c",
-      "bytes": 29598
+      "sha256": "394e07edcff95f934319a9db5ec75e4861aae614b29373609ce8b3490643baae",
+      "bytes": 31017
     },
     {
       "path": "tests/test_primary_source_reading_counts.py",
