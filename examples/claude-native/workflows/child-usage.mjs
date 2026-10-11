@@ -3437,9 +3437,14 @@ export function summarizeRun(dir, lanesOptions = {}) {
   }
 }
 
-// Children and superseded attempts whose resolved efforts are not exactly [required] (none recorded counts as a mismatch).
+// Required effort is affirmative request accounting, not only a set that filters out absent efforts.
 export function effortMismatches(run, required) {
-  return [...run.children, ...(run.superseded_attempts || [])].filter((c) => c.efforts.length !== 1 || c.efforts[0] !== required).map((c) => ({ child: c.label || c.agent_id, efforts: c.efforts, ...(c.superseded_by ? { superseded_by: c.superseded_by } : {}) }))
+  return [...run.children, ...(run.superseded_attempts || [])]
+    .filter((c) => !Array.isArray(c.efforts) || c.efforts.length !== 1 || c.efforts[0] !== required
+      || !Number.isInteger(c.requests) || c.requests <= 0 || c.unknown_effort_requests !== 0)
+    .map((c) => ({ child: c.label || c.agent_id, efforts: c.efforts,
+      ...(c.unknown_effort_requests ? { unknown_effort_requests: c.unknown_effort_requests } : {}),
+      ...(c.superseded_by ? { superseded_by: c.superseded_by } : {}) }))
 }
 
 // Newest native Workflow transcript directory for a working directory. The projects

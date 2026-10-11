@@ -114,6 +114,9 @@ def proven_supersessions(output: dict, proof_path: Path, contract_path: Path, jo
     if required != "max" and any(call.get("require_actual_later_complete_max_child") is True for call in calls):
         raise ValueError("the bound supersession contract requires max effort")
     children = output.get("children") or []
+    measured_ids = [c.get("agent_id") for c in children if isinstance(c, dict) and c.get("agent_id")]
+    if len(set(measured_ids)) != len(measured_ids):
+        raise ValueError("supersession summary repeats a measured child identity")
     by_id = {c.get("agent_id"): (i, c) for i, c in enumerate(children) if isinstance(c, dict)}
     starts, results = {}, {}
     for index, line in enumerate(journal_bytes.decode("utf-8").splitlines()):
@@ -128,7 +131,13 @@ def proven_supersessions(output: dict, proof_path: Path, contract_path: Path, jo
                 raise ValueError("supersession journal repeats a started agent identity")
             starts[row.get("agentId")] = identity
         elif row.get("type") == "result":
-            results[(row.get("agentId"), row.get("key"))] = index
+            agent_id, key = row.get("agentId"), row.get("key")
+            start = starts.get(agent_id)
+            if start is None or start[0] != key or start[2] >= index:
+                raise ValueError("supersession result did not follow its started identity")
+            if (agent_id, key) in results:
+                raise ValueError("supersession journal repeats a result identity")
+            results[(agent_id, key)] = index
     old_ids, new_ids = set(), set()
     replacements, terminal_by_label = {}, {}
     for pair in pairs:
@@ -158,6 +167,8 @@ def proven_supersessions(output: dict, proof_path: Path, contract_path: Path, jo
             start = starts.get(agent_id)
             if start is None or start[:2] != (key, label) or (agent_id, key) not in results:
                 raise ValueError("supersession pair does not bind native started and result identities")
+            if start[2] >= results[(agent_id, key)]:
+                raise ValueError("supersession result did not follow its started identity")
         if results[(old, old_key)] >= starts[new][2]:
             raise ValueError("supersession rerun did not start after its completed original")
         if old not in by_id or new not in by_id:
@@ -185,6 +196,16 @@ def proven_supersessions(output: dict, proof_path: Path, contract_path: Path, jo
         if label in terminal_by_label and terminal_by_label[label] != target:
             raise ValueError("same-label supersession pairs have ambiguous terminals")
         terminal_by_label[label] = target
+    for label, terminal_id in terminal_by_label.items():
+        authorized = {pair[field] for pair in pairs if pair["label"] == label
+                      for field in ("superseded_agent_id", "superseded_by_agent_id")}
+        completed = [child for child in children if isinstance(child, dict)
+                     and child.get("complete") is True and child.get("label") == label]
+        if any(child.get("agent_id") not in authorized for child in completed):
+            raise ValueError("completed same-label child is outside the proven supersession chain")
+        active = [child["agent_id"] for child in completed if child["agent_id"] not in old_ids]
+        if active != [terminal_id]:
+            raise ValueError("supersession label does not have exactly one authorized active terminal")
     return pairs, {"proof_sha256": sha256_bytes(proof_bytes), "contract_sha256": sha256_bytes(contract_bytes),
                    "journal_sha256": sha256_bytes(journal_bytes), "processor_sha256": sha256_bytes(Path(__file__).read_bytes()),
                    "pairs": pairs}

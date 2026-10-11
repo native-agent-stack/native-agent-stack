@@ -75,6 +75,33 @@ class CompletedSupersessionTests(unittest.TestCase):
         return subprocess.run(args, capture_output=True, text=True)
 
     @unittest.skipUnless(shutil.which("node"), "node not installed")
+    def test_native_cli_requires_every_request_effort_to_be_known(self):
+        run = self.work / "native"
+        run.mkdir()
+        (run / "journal.jsonl").write_text("\n".join(json.dumps(row) for row in [
+            {"type": "started", "agentId": "native", "label": "fixture", "key": "v2:fixture"},
+            {"type": "result", "agentId": "native", "key": "v2:fixture", "result": {"ok": True}}]) + "\n")
+        (run / "agent-native.meta.json").write_text(json.dumps({"model": "opus"}))
+        adapter = HARNESS.parents[2] / "examples/claude-native/workflows/child-usage.mjs"
+        for effort in ("max", None, "", " "):
+            with self.subTest(effort=effort):
+                rows = [{"type": "assistant", "effort": value, "message": {
+                    "id": f"message-{i}", "model": "claude-opus-5-5",
+                    "usage": {"input_tokens": 2, "output_tokens": 3}}}
+                        for i, value in enumerate(("max", effort))]
+                (run / "agent-native.jsonl").write_text("".join(json.dumps(row) + "\n" for row in rows))
+                done = subprocess.run([shutil.which("node"), str(adapter), str(run), "--require-effort", "max"],
+                                      capture_output=True, text=True)
+                report = json.loads(done.stdout)
+                child = report["children"][0]
+                self.assertEqual(done.returncode, 0 if effort == "max" else 1, done.stderr)
+                self.assertEqual(child["requests"], 2)
+                self.assertEqual(child["usage"]["input_tokens"], 4)
+                self.assertEqual(child["usage"]["output_tokens"], 6)
+                self.assertEqual(child["unknown_effort_requests"], 0 if effort == "max" else 1)
+                self.assertEqual(bool(report["effort_mismatches"]), effort != "max")
+
+    @unittest.skipUnless(shutil.which("node"), "node not installed")
     def test_native_unknown_request_effort_cannot_cover_a_completed_attempt(self):
         adapter = HARNESS.parents[2] / "examples/claude-native/workflows/child-usage.mjs"
         program = """
@@ -143,6 +170,100 @@ console.log(JSON.stringify(summarizeChild({agentId: 'fixture', label: 'fixture'}
             retained.pop("superseded_by")
             retained.pop("reason")
             self.assertEqual(retained, child)
+
+    def test_bound_results_must_follow_their_own_starts(self):
+        original = (self.work / "journal.jsonl").read_text()
+        self.assertEqual(self.run_usage(explicit=True).returncode, 0)
+        prior_receipt = (self.work / "usage.json").read_bytes()
+        for agent_id in ("old0", "new0"):
+            for existing_receipt in (False, True):
+                with self.subTest(agent_id=agent_id, existing_receipt=existing_receipt):
+                    rows = [json.loads(line) for line in original.splitlines()]
+                    start = next(i for i, row in enumerate(rows) if row.get("agentId") == agent_id and row["type"] == "started")
+                    result = next(i for i, row in enumerate(rows) if row.get("agentId") == agent_id and row["type"] == "result")
+                    rows[start], rows[result] = rows[result], rows[start]
+                    (self.work / "journal.jsonl").write_text("".join(json.dumps(row) + "\n" for row in rows))
+                    proof = copy.deepcopy(self.proof)
+                    proof["finalJournalSha256"] = self.sha("journal.jsonl")
+                    self.write("proof.json", proof)
+                    if existing_receipt:
+                        (self.work / "usage.json").write_bytes(prior_receipt)
+                    else:
+                        (self.work / "usage.json").unlink(missing_ok=True)
+                    done = self.run_usage(explicit=True)
+                    self.assertEqual(done.returncode, 2, done.stderr)
+                    self.assertIn("supersession result did not follow its started identity", done.stderr)
+                    if existing_receipt:
+                        self.assertEqual((self.work / "usage.json").read_bytes(), prior_receipt)
+                    else:
+                        self.assertFalse((self.work / "usage.json").exists())
+
+    def test_completed_same_label_children_must_belong_to_the_explicit_chain(self):
+        from tests.test_landscape_sweep_harness import convert
+        self.assertEqual(self.run_usage(explicit=True).returncode, 0)
+        receipt = json.loads((self.work / "usage.json").read_text())
+        label = self.raw["children"][0]["label"]
+        self.assertEqual(convert.usage_children(receipt)[label]["agent_id"], "new0")
+        original_journal = (self.work / "journal.jsonl").read_text()
+        for position in ("before_terminal", "after_terminal"):
+            with self.subTest(position=position):
+                raw = copy.deepcopy(self.raw)
+                child = dict(raw["children"][-12], agent_id="unpaired")
+                if position == "before_terminal":
+                    raw["children"].insert(len(raw["children"]) - 12, child)
+                else:
+                    raw["children"].append(child)
+                self.write("raw.json", raw)
+                rows = [{"type": "started", "agentId": "unpaired", "key": "v2:" + "f" * 64, "label": label},
+                        {"type": "result", "agentId": "unpaired", "key": "v2:" + "f" * 64, "result": {"ok": True}}]
+                (self.work / "journal.jsonl").write_text(original_journal + "".join(json.dumps(row) + "\n" for row in rows))
+                proof = copy.deepcopy(self.proof)
+                proof["finalJournalSha256"] = self.sha("journal.jsonl")
+                self.write("proof.json", proof)
+                (self.work / "usage.json").unlink()
+                done = self.run_usage(explicit=True)
+                self.assertEqual(done.returncode, 2, done.stderr)
+                self.assertIn("completed same-label child is outside the proven supersession chain", done.stderr)
+                self.assertFalse((self.work / "usage.json").exists())
+                # Reset a previous valid artifact to verify that refusal leaves it untouched as well.
+                self.write("usage.json", receipt)
+                previous = (self.work / "usage.json").read_bytes()
+                done = self.run_usage(explicit=True)
+                self.assertEqual(done.returncode, 2, done.stderr)
+                self.assertEqual((self.work / "usage.json").read_bytes(), previous)
+
+    def test_duplicate_or_unbound_journal_and_summary_identities_are_refused(self):
+        original = (self.work / "journal.jsonl").read_text()
+        self.assertEqual(self.run_usage(explicit=True).returncode, 0)
+        previous = (self.work / "usage.json").read_bytes()
+        cases = {"duplicate_result": "supersession journal repeats a result identity",
+                 "orphan_result": "supersession result did not follow its started identity",
+                 "wrong_key": "supersession result did not follow its started identity",
+                 "overlap": "supersession rerun did not start after its completed original",
+                 "duplicate_summary": "supersession summary repeats a measured child identity"}
+        for case, diagnostic in cases.items():
+            with self.subTest(case=case):
+                rows = [json.loads(line) for line in original.splitlines()]
+                raw = copy.deepcopy(self.raw)
+                if case == "duplicate_result":
+                    rows.append(copy.deepcopy(rows[2]))
+                elif case == "orphan_result":
+                    rows.append(dict(rows[2], agentId="orphan"))
+                elif case == "wrong_key":
+                    rows[2]["key"] = "v2:" + "f" * 64
+                elif case == "overlap":
+                    rows[2], rows[3] = rows[3], rows[2]
+                else:
+                    raw["children"].append(copy.deepcopy(raw["children"][-12]))
+                (self.work / "journal.jsonl").write_text("".join(json.dumps(row) + "\n" for row in rows))
+                proof = copy.deepcopy(self.proof)
+                proof["finalJournalSha256"] = self.sha("journal.jsonl")
+                self.write("proof.json", proof)
+                self.write("raw.json", raw)
+                done = self.run_usage(explicit=True)
+                self.assertEqual(done.returncode, 2, done.stderr)
+                self.assertIn(diagnostic, done.stderr)
+                self.assertEqual((self.work / "usage.json").read_bytes(), previous)
 
     def test_terminal_effort_needs_affirmative_request_accounting(self):
         for field, value in (("unknown_effort_requests", None), ("unknown_effort_requests", False),

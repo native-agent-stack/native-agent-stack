@@ -190,3 +190,87 @@ Final correction validation: all **304** tests in `tests.test_landscape_postrun`
 JavaScript security integration, shellcheck, Bash 3.2). The maintained adapter's supported
 `node examples/claude-native/workflows/test-child-usage.mjs` command passes **222/222** offline checks.
 The correction adapter SHA-256 is `8e37a032b189467c7f8ddba81adb3b6fe06e7064ca4b61123852533d1d711caa`.
+
+## Astra micro correction: native gate, ordering, pairing and path components
+
+The micro at `17eb102daf272738e2e508984788863bb469a916` independently reproduced four connector leads and
+one catalog locator defect. The native adapter's existing `effortMismatches` consumer still used only its filtered
+effort set. That direct CLI path now requires a positive integer request count and an affirmative zero unknown
+count, preserving all original per-child and aggregate counters. Public native CLI cases with known/unknown,
+empty and blank effort plus an all-known control establish its actual exit behavior. This extends the maintained
+adapter directly, using the pinned deduplicated request semantics already cited above, rather than inferring
+effort from requested options.
+
+The explicit proof validator now enforces each result after its own matching start, in addition to requiring
+the original to finish before the rerun starts. Orphan, wrong-key and repeated results, duplicate measured
+identities, and overlapping completed replacement ordering refuse before writing. Every completed child of a
+superseded label must belong to the explicit chain, with exactly one authorized active terminal. Extra completed
+same-label children before or after that terminal refuse; the valid case selects the proved terminal's usage.
+The unchanged native journal/source is retained for these chronology claims; hashes do not legalize malformed
+ordering. An incomplete attempt or another label does not gain completion by sharing a label or a proof file.
+
+The scratchpad matcher requires the actual `scratchpad` component ending in a slash or the text/path end.
+Hyphenated/dotted sibling names refuse. One-step-wider tests also found and corrected prefix substring matches:
+`not.claude/projects` and nested `/other/tmp/claude-*` are not the recognized native prefix. The actual `.claude`
+component and absolute temporary prefix (including file URLs) remain controls; suffix bytes are preserved.
+This follows the native path shape already captured, with the selected checkout's UUID/privacy grammar and
+the supported CPython percent-decoding validation unchanged.
+
+The six-line README insertion moved the current workflow stagger policy paragraph to line1095. Both the
+catalog disposition's source and its reason now cite that exact line; its existing test fails at1089 and passes
+after correction. The README gate clarification preserves its line count. Changed registered hashes/bytes are
+refreshed. The catalog edit is only this enforced citation repair; sweep publication/ledger work is still separate.
+
+Final tests transplanted onto a genuine detached prior17eb102d tree reproduce all five findings: ten tests,
+27 failing subtests, zero errors. Wider prefix controls separately fail two subtests before their correction.
+The old289-test pre-feature module transplanted against corrected production reproduces13 failures/12 errors:
+all require affirmative synthetic request fields, absent from the old fixture helper. With ONLY those fixture
+measurements supplied (the helper plus two hand-written attempts, no assertions or production changes), all289
+tests pass with the same three optional skips. This distinguishes the intentional refusal of unmeasured input
+from a product regression. The exact fixture-only patch and both outcomes are retained for independent review.
+
+### Per-attempt unknown-effort disclosure provisos
+
+The CC's05:58Z pre-ruling directs disclosure rather than a paid rerun, conditioned separately for each interrupted
+identity on a completed known preregistered-effort replacement and no interrupted output reaching recorded
+returns. Read-only mechanical checks pass both provisos for all eight identities. The preregistered source is
+the hash-bound repair script `1e00814482abdfc828fa9b7edc256c5961ee911a9d2c8f64e34bd0b70fac765c`: its GPT
+fit wrapper at line174 and Claude fit call at231 request max. Each replacement has known `[max]`, zero unknown
+requests, positive measured requests, and a matching native start/result key. None of the eight has a native
+result row or appears in the final native result; historical converted references are accounting-only entries.
+
+| Interrupted identity: request effort unknown | Completed known-max replacement | Replacement requests | Both provisos |
+| --- | --- | ---: | --- |
+| a1059eda8b0081153 | a6781da863de29df4 | 15 | pass |
+| a2af921049befa9d0 | a4f94b35fdc8792bb | 12 | pass |
+| a94921f08e239b168 | ad7cbd59fe029a3cf | 23 | pass |
+| a9c53926fb38ab0a9 | afda306197fe30e22 | 7 | pass |
+| ad08fceb9c6562401 | adc61c15af0e9efa0 | 39 | pass |
+| adc926f50ace50cca | af0be170d84807901 | 12 | pass |
+| adcd3dcb76b572aca | a2c1dd81987c62f73 | 6 | pass |
+| ae3dc39bf44926156 | a4511b892126cfb11 | 13 | pass |
+
+Every identity remains counted in127 native attempts (106 active+21 superseded). The disclosure's original raw
+source hash stays `9c63e6f2cd1d2d4969659922b8672647bc24d86a69d9f21bb104adac951b76e2`. The stricter native
+gate adds eight unknown-effort mismatch rows; a fresh raw output hashes to
+`4474dec20397e0eb084e618a2fd67b5d479d206da37e24f77e9b3904fe3ee038`. Its child/superseded arrays and
+aggregate model/WebSearch counters are exactly equal to the original strict measurement. The wrapper retains
+raw1/wrapper1; all unknowns remain visible. No counter rewrite or clean-effort waiver is made. README11–12
+and catalog-owner publication must disclose these eight rows and original source hash when that gated work
+proceeds. The checks are scoped to the retained native journal/final result and historical converted returns;
+they do not claim publication has occurred or unprovided external job files have been independently replayed.
+
+The corrected adapter's supported offline suite passes224/224. The four full named Python modules (postrun,
+complete sweep harness,evidence manifest and upstream surface watch) pass424 tests at both the correction
+source and an isolated merge with main7b76a88c (nine explicit optional skips). The full114-test surface watcher
+passes with six skips; its citation class passes6/6. FULL validation passes at head11427 and merged11477
+hashed files. The original pre-cue failures remain retained alongside the fixture-only controlled comparison.
+
+Fresh supported conversion over the retained native run and actual work-directory GPT outputs returns0:
+13 layers,151 proposals,53 survivor pairs,and42 GPT-6 copy matches. It now retains eight unknown-effort
+failures and reopens seven affected layers; no earlier clean-effort artifact is overwritten. The supported result
+usage validator accepts these properly retained failures. The49 captured GPT last.json files and scope input
+include all42 selected copy-check dependencies. This is a retained-run integration,not a new inference run or
+catalog/ledger publication. The earlier245-line journal prefix is captured unchanged from the final journal and
+rehashes exactly to the historically cited849ee994 digest; the earlier effort-gate and original red/green logs
+are attached as well. Private capture manifests distinguish exact originals from masked transport copies.

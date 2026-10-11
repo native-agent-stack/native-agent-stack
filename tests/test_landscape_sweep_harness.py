@@ -3980,6 +3980,59 @@ class ConvertTests(unittest.TestCase):
         self.assertEqual(done.returncode, 3)
         self.assertFalse((work / "out").exists())
 
+    def test_cli_refuses_scratchpad_prefixed_sibling_paths_without_overwrite(self):
+        identifier = "-".join(["0123abcd", "4567", "89ab", "cdef", "0123456789ab"])
+        for prefix in ("~/.claude/projects/", "/tmp/claude-1000/", "file:///tmp/claude-1000/"):
+            work = temp_dir(self)
+            result = healthy_result()
+            valid = prefix + "project/" + identifier + "/scratchpad/worker/note.md"
+            result["first"][0]["claude_discover"]["notes"] = valid
+            done = self.cli(work, result)
+            self.assertEqual(done.returncode, 0, done.stderr)
+            previous = {path.name: path.read_bytes() for path in (work / "out").iterdir()}
+            for sibling in ("scratchpad-secret/worker/note.md", "scratchpad.txt", "scratchpadX/worker/note.md",
+                            "scratchpad_foo/worker/note.md"):
+                for location in ("key", "value", "limit"):
+                    with self.subTest(prefix=prefix, sibling=sibling, location=location):
+                        for name, raw in previous.items():
+                            (work / "out" / name).write_bytes(raw)
+                        candidate = copy.deepcopy(result)
+                        path = prefix + "project/" + identifier + "/" + sibling
+                        args = []
+                        if location == "key":
+                            candidate["first"][0]["claude_discover"]["notes"] = {path: "source"}
+                        elif location == "limit":
+                            args = ["--limit", path]
+                        else:
+                            candidate["first"][0]["claude_discover"]["notes"] = path
+                        done = self.cli(work, candidate, *args)
+                        self.assertEqual(done.returncode, 3, done.stderr)
+                        self.assertEqual(done.stdout, "")
+                        self.assertEqual({f.name: f.read_bytes() for f in (work / "out").iterdir()}, previous)
+
+    def test_cli_redaction_requires_native_directory_prefix_components(self):
+        identifier = "-".join(["0123abcd", "4567", "89ab", "cdef", "0123456789ab"])
+        for prefix in ("~/.claude/projects/", "/tmp/claude-1000/", "file:///tmp/claude-1000/"):
+            for suffix in ("scratchpad", "scratchpad/", "scratchpad/worker/note.md"):
+                with self.subTest(prefix=prefix, suffix=suffix):
+                    work = temp_dir(self)
+                    result = healthy_result()
+                    result["first"][0]["claude_discover"]["notes"] = prefix + "project/" + identifier + "/" + suffix
+                    done = self.cli(work, result)
+                    self.assertEqual(done.returncode, 0, done.stderr)
+                    for path in (work / "out").glob("*.json"):
+                        self.assertNotIn(identifier, path.read_text())
+        for prefix in ("~/not.claude/projects/", "~/.claude/projectsX/", "/tmp/claudeX-1000/",
+                       "/other/tmp/claude-1000/"):
+            with self.subTest(prefix=prefix):
+                work = temp_dir(self)
+                result = healthy_result()
+                result["first"][0]["claude_discover"]["notes"] = prefix + "project/" + identifier + "/scratchpad/worker/note.md"
+                done = self.cli(work, result)
+                self.assertEqual(done.returncode, 3, done.stderr)
+                self.assertEqual(done.stdout, "")
+                self.assertFalse((work / "out").exists())
+
     def test_cli_refuses_decoded_session_identifiers_before_any_publication(self):
         from urllib.parse import unquote
         identifier = "-".join(["0123abcd", "4567", "89ab", "cdef", "0123456789ab"])

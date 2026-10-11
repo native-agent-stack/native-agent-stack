@@ -17257,7 +17257,7 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "a059b0383088b94e3088e6666a6bb496d5dc4ef49973eaccb62ecfc04bc4bd3d",
+      "sha256": "91e30c0609a1b97516ca0ca6cec00d7944554d0a2b40ac5a7404676368b496f9",
       "bytes": 190328
     },
     {
@@ -18859,6 +18859,11 @@
       "path": "docs/decisions/2026-10-11-final-stack-review-corrections.md",
       "sha256": "24336fd04475b1c417f4e6c9ec5ea132ed2e46c5b7d42e82c72f8b8f772caf37",
       "bytes": 43874
+    },
+    {
+      "path": "docs/decisions/2026-10-11-landscape-postrun-accounting.md",
+      "sha256": "842487c6135bf2d227f2afd6655d53845453c5139bf9aca5bf84cf18c6296a21",
+      "bytes": 23410
     },
     {
       "path": "docs/decisions/2026-10-11-layer-resolution-protocol.md",
@@ -59992,8 +59997,8 @@
     },
     {
       "path": "examples/claude-native/workflows/README.md",
-      "sha256": "95ab8dc5a0c4c35b507ec230dc66bfa14018efd32284b51af9252f6e46bad23e",
-      "bytes": 113722
+      "sha256": "b85e83f514dd7baf5902dde96ed1dde0b2d1e270c758a110d3acf3c65e2081ef",
+      "bytes": 113734
     },
     {
       "path": "examples/claude-native/workflows/SHA256SUMS",
@@ -60007,8 +60012,8 @@
     },
     {
       "path": "examples/claude-native/workflows/child-usage.mjs",
-      "sha256": "8e37a032b189467c7f8ddba81adb3b6fe06e7064ca4b61123852533d1d711caa",
-      "bytes": 264731
+      "sha256": "e8659b58ab0813a840695f2ac9d9e413705585497ba4c470dc692e675dc5e9e5",
+      "bytes": 264947
     },
     {
       "path": "examples/claude-native/workflows/codex-cross-review.mjs",
@@ -60037,8 +60042,8 @@
     },
     {
       "path": "examples/claude-native/workflows/test-child-usage.mjs",
-      "sha256": "3c3bce34b7cecec6fb566709c602e87916edc68d55b39b1dfd0e14dd71d7b134",
-      "bytes": 118165
+      "sha256": "8e3d5968a00da638cd47eb168a5a53859e54bd18ae56800a791e9c3aa61049dc",
+      "bytes": 118651
     },
     {
       "path": "examples/claude-native/workflows/test-codex-envelope.mjs",
@@ -61981,9 +61986,14 @@
       "bytes": 86746
     },
     {
+      "path": "tests/test_landscape_postrun.py",
+      "sha256": "834eedd364aed2d1ba6534fb6d327265ed15bace72d414642f6826b874bf5345",
+      "bytes": 25268
+    },
+    {
       "path": "tests/test_landscape_sweep_harness.py",
-      "sha256": "ff4a241338e93b27c1dc7e91e6e8c52ba6e4f522f8edb7f05334d8e045167f4d",
-      "bytes": 385096
+      "sha256": "7a92a56228508783a172ebcfa200078e3ee803d5bfd241440ea7c10479e5995a",
+      "bytes": 388558
     },
     {
       "path": "tests/test_landscape_sweep_skills.py",
@@ -63247,8 +63257,8 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/convert.py",
-      "sha256": "0e1294646ed23e954f3a2f4dac5516eda7a565cc4b8474bdebd2605d154ff504",
-      "bytes": 56666
+      "sha256": "133f458fef507ddbe9237b4ccca259365718ecd4970dc7117a79eb3f951c145a",
+      "bytes": 56700
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/make_prompt.py",
@@ -63327,8 +63337,8 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/usage_record.py",
-      "sha256": "265703f1fb60332793fbf384866b16d8ec046150a7854d7bfc45b833387d842e",
-      "bytes": 27721
+      "sha256": "6e7183faec892269b4ffc8056ed0b336c63abe2d74cf94c840396825be784076",
+      "bytes": 29275
     },
     {
       "path": "tools/sota-convergence/lane-prompt.md",

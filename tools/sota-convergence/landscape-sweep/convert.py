@@ -118,8 +118,8 @@ ENCODED_USER_PROFILE = re.compile(
 # Claude Code's native scratchpad is <project directory>/<session UUID>/scratchpad/... . Redact this structural
 # session segment only, using scripts/validate.py's UUID grammar; a UUID elsewhere still refuses publication.
 SCRATCHPAD_SESSION = re.compile(
-    r"((?:\.claude/projects/|/tmp/claude-[^/\s]+/)[^/\s]+/)"
-    r"[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}(?=/scratchpad(?:/|\b))", re.I)
+    r"((?:(?<![^\s/])\.claude/projects/|(?<![\w/.-])(?:file://)?/tmp/claude-[^/\s]+/)[^/\s]+/)"
+    r"[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}(?=/scratchpad(?:/|$))", re.I)
 
 
 def method_limits(models: dict, gpt6_model: str = GPT6_DEFAULT["model"], skills: bool = False) -> list[str]:
