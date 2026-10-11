@@ -681,6 +681,26 @@ these details, including when only some attempts link and the status stays incom
 reflects the remaining children. The printed `raw_exit_code` names the tool's result; `exit_code` names the wrapper's.
 
 Offline source review extended agent-lab's `summarizeRun` and `effortMismatches` in the unchanged
+vendored tool. **Completed changed-key reruns are a separate, explicit operation.** Pass all three
+`--supersession-proof`, `--supersession-contract` and `--supersession-journal` to `usage_record.py` only after the
+post-run proof has been independently accepted. The proof's `supersessionPairs` must match its contract, measured
+child identities and the exact native journal (both started and result keys, labels and order). Every replacement
+must be complete at measured effort max only. Repeated completed labels alone never select a winner. The record
+retains every original under `superseded_attempts`, every aggregate counter, raw exit/hash, and transformation
+provenance with proof, contract, journal and processor hashes. A malformed or unbound proof, non-max replacement
+or missing native result refuses before writing (exit 2). This does not rerun workers or edit native state.
+
+Requested `effort: max` is not measured max-only effort: a loaded skill may change subsequent request effort.
+The October 10 proof established call options and cache/prompt/result identity, but its quality-evaluation fit
+replacement still measured `[max, low]`. The exact contract therefore refuses; retain that failure or obtain a
+separately authorized repair and fresh proof. Never discard it to make step 7 succeed.
+
+`convert.py` also replaces a session UUID only in the native
+`<project directory>/<session UUID>/scratchpad/...` path under `.claude/projects` or `/tmp/claude-*`, preserving
+the scratch file suffix as a citation. Other session identifiers still refuse publication; key collisions still
+refuse before any artifact is written. This repair was reproduced against the three retained native notes.
+
+The source review of the ordinary recovery remains in the unchanged
 [vendored child-usage.mjs](../../../examples/claude-native/workflows/child-usage.mjs), as retained at
 native-agent-stack `8c32a84b246da66e43a6188c973741b09329e223`, SHA256
 `3e5189342734135e88a2295c1c2152275d9e26c0c7731ed5cbc8905bbccd98a4`.

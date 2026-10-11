@@ -114,6 +114,11 @@ ENCODED_USER_PROFILE = re.compile(
     + r"(?=[A-Za-z0-9_.])(?:[\w.-]*[\w-]|\.+)"
     + r"|(?<![^\W_])home-(?!example-code-)[\w.]+(?:-+[\w.]+)*-*-code-"
     + r"(?:[\w.-]*[\w-])?")
+# Claude Code's native scratchpad is <project directory>/<session UUID>/scratchpad/... . Redact this structural
+# session segment only, using scripts/validate.py's UUID grammar; a UUID elsewhere still refuses publication.
+SCRATCHPAD_SESSION = re.compile(
+    r"((?:\.claude/projects/|/tmp/claude-[^/\s]+/)[^/\s]+/)"
+    r"[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}(?=/scratchpad(?:/|\b))", re.I)
 
 
 def method_limits(models: dict, gpt6_model: str = GPT6_DEFAULT["model"], skills: bool = False) -> list[str]:
@@ -732,7 +737,8 @@ def redact_project_dirs(value, work: Path | None = None, repo_root: Path | None 
     def fix(text):
         if local:
             text = local.sub("<project-dir>", text)
-        return ENCODED_USER_PROFILE.sub("<project-dir>", text)
+        text = ENCODED_USER_PROFILE.sub("<project-dir>", text)
+        return SCRATCHPAD_SESSION.sub(lambda match: match[1] + "<session-id>", text)
 
     return rewrite_strings(value, fix)
 

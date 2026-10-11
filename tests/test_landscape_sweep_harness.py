@@ -3949,6 +3949,33 @@ class ConvertTests(unittest.TestCase):
         self.assertEqual(done.stdout, "")
         self.assertEqual({path.name: path.read_bytes() for path in (work / "out").iterdir()}, previous)
 
+    def test_cli_redacts_session_segments_only_in_native_scratchpad_paths(self):
+        identifier = "-".join(["0123abcd", "4567", "89ab", "cdef", "0123456789ab"])
+        encoded = "-".join(("", "home", "fixtureuser", "code", "project"))
+        for prefix in ("~/.claude/projects/", "/tmp/claude-1000/"):
+            with self.subTest(prefix=prefix):
+                work = temp_dir(self)
+                res = healthy_result()
+                path = prefix + encoded + "/" + identifier + "/scratchpad/worker/notes.md"
+                notes = {path: ["read " + path]}
+                res["first"][0]["claude_discover"]["notes"] = notes
+                done = self.cli(work, res, "--limit", "source " + path)
+                self.assertEqual(done.returncode, 0, done.stderr)
+                returns = json.loads((work / "out/returns.json").read_text())
+                expected = prefix + "<project-dir>/<session-id>/scratchpad/worker/notes.md"
+                self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                                 {expected: ["read " + expected]})
+                self.assertNotIn(identifier, done.stdout)
+                for file in (work / "out").glob("*.json"):
+                    self.assertNotIn(identifier, file.read_text())
+        # A bare session id remains a publication refusal; the rule must not redact arbitrary evidence ids.
+        work = temp_dir(self)
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = "session " + identifier
+        done = self.cli(work, res)
+        self.assertEqual(done.returncode, 3)
+        self.assertFalse((work / "out").exists())
+
     def test_cli_redacts_dash_encoded_project_directory_in_notes(self):
         encoded = "-".join(("", "home", "fixtureuser", "code", "project"))
         for prefix in ("~/.claude/projects/", "/tmp/claude-1000/"):

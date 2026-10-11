@@ -61982,8 +61982,8 @@
     },
     {
       "path": "tests/test_landscape_sweep_harness.py",
-      "sha256": "cc5e8c995159db8f1226d08709b23edfd16e1d65a7bbd05c06110e07befe3a8e",
-      "bytes": 379232
+      "sha256": "47b1a376bb7a5cebd0c01e3ac3fa099435c091828beff8dfb1a4e00967ae75ce",
+      "bytes": 380903
     },
     {
       "path": "tests/test_landscape_sweep_skills.py",
@@ -63222,8 +63222,8 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/README.md",
-      "sha256": "dcb2832a1face75a46d74ae76b886ea9eb76ffb5a7e57e1717e4a09795a8bb67",
-      "bytes": 114402
+      "sha256": "549fea405ace0d1c1b8580f65b2c0b2740f67bf94b508bc04d57af47c0c12f51",
+      "bytes": 116171
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/build_args.py",
@@ -63247,8 +63247,8 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/convert.py",
-      "sha256": "24d12829eb50e123a09531eca837e7d0cf53d4dcd9a481371c9fabbb376a7dd7",
-      "bytes": 55319
+      "sha256": "e2a57d45bff34460e501b6b282c4afe4c9f1aaf406b2921086b8fabd3cc96ad7",
+      "bytes": 55801
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/make_prompt.py",
@@ -63327,8 +63327,8 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/usage_record.py",
-      "sha256": "e41116e16f3c864a232645fc0123dfc315ec7d6de7bc04b54158b4e467952baf",
-      "bytes": 15753
+      "sha256": "b63cd5dab6e0a9a337d121cd0fb055c48831d2c15d404ec1c14429d53c66ece8",
+      "bytes": 24532
     },
     {
       "path": "tools/sota-convergence/lane-prompt.md",
