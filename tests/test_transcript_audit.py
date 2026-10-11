@@ -338,6 +338,30 @@ class TranscriptAuditTests(unittest.TestCase):
         (self.run / "journal.jsonl").write_text("".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8")
         self.assertEqual(self.flagged(), [])
 
+    def test_every_journaled_started_attempt_needs_its_transcript(self):
+        self.agent("old", [("Read", {"file_path": "/outside/fixture"})])
+        self.agent("earlier-clean", [])
+        self.agent("final", [])
+        label = "refute:evidence:foundation/layer"
+        self.record(workflowProgress=[{"type": "workflow_agent", "agentId": "final", "label": label}])
+        rows = [{"type": "restoring", "agentId": "restore-control"},
+                *[{"type": "started", "key": "v2:" + char * 64, "agentId": identity, "label": label}
+                  for identity, char in (("old", "a"), ("earlier-clean", "b"), ("final", "c"))],
+                {"type": "restored", "agentId": "restored-control"}]
+        (self.run / "journal.jsonl").write_text("".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8")
+        report = transcript_audit.audit(self.run, self.items, export=self.export, result=RESULT)
+        self.assertIsNone(report["run_issue"])
+        self.assertIn("outside", "\n".join(report["items"]["foundation__layer"]["flagged"]))
+        # Deleting the evidence of the forbidden read must fail the run, and report every missing identity.
+        for identity in ("old", "earlier-clean"):
+            (self.run / f"agent-{identity}.jsonl").unlink()
+        report = transcript_audit.audit(self.run, self.items, export=self.export, result=RESULT)
+        self.assertIsNotNone(report["run_issue"])
+        self.assertIn("earlier-clean", report["run_issue"])
+        self.assertIn("old", report["run_issue"])
+        self.assertNotIn("restore-control", report["run_issue"])
+        self.assertEqual(report["flagged_items"], ["foundation__layer"])
+
     def test_every_unaccounted_transcript_is_named(self):
         self.agent("final", [])
         for index in range(20):

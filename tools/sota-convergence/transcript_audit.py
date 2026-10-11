@@ -268,6 +268,11 @@ def audit(directory, items: dict, marker_prefix: str = None, export=None, result
     journal, journal_issue = journal_agents(directory)
     if journal_issue and not report["run_issue"]:
         report["run_issue"] = journal_issue
+    if journal is not None:
+        missing = sorted(set(journal) - {_agent_id(path) for path in files})
+        if missing:
+            issue = f"journaled started agents have no transcript: missing {missing}"
+            report["run_issue"] = f"{report['run_issue']}; {issue}" if report["run_issue"] else issue
     parsed = {path: _parse(path) for path in files}
     mapped = {path: [key for key, item in items.items() if item["marker"] and item["marker"] in parsed[path][0]]
               for path in files}

@@ -29,7 +29,9 @@ review; this change governs subsequent runs and does not rebuild or replace that
   `Vr=_({type:"restoring"})` and `Jr=_({type:"restored"})`; these two serialized control rows
   are accepted without granting any agent identity. A focused regression failed before this follow-up fix.
   The native transcript records advisor availability as an attachment with
-  `{"type":"advisor_tool","available":true,"model":"...","toolChange":true}`.
+  `{"type":"advisor_tool","available":true,"model":"...","toolChange":"add"}`.
+  The pinned executable emits `toolChange:"add"` near zero-based byte224081124 and
+  `available:false, toolChange:"remove"` near byte224080488; the fixture follows those native strings.
   The audit now refuses that availability even without a call, and still refuses every advisor call.
 - The native saved workflow is
   [seathatflowsinourveins/agent-lab at e070125dae03b4e44484ccb78d2d65057ad38f40](https://github.com/seathatflowsinourveins/agent-lab/tree/e070125dae03b4e44484ccb78d2d65057ad38f40),
@@ -80,3 +82,55 @@ Touched and shared-adjudication regression modules passed: transcript audit 21, 
 commands 2, adjudication 116 (**162 tests**). The first FULL `python3 scripts/validate.py` failed solely because
 the edited recipe's registered hash and byte count needed updating; the recipe entry is updated separately.
 No judge or refuter was launched. The #992 landing hold remains in force.
+
+## First-read corrections: registered keys and complete journal evidence
+
+The first GPT read of `a2e3265087aa63711fca32cc7ae1a15fc42fb80b` found two P2 boundaries and an advisor-fixture
+fidelity P3. The prior four-module command selection passed162 tests but omitted
+`tests.test_verdict_lane_vendoring`. `python3 scripts/validate.py` verified file integrity and scope; it did not
+establish the missing lane registry keys. The native vendoring module reproduces14 tests with five failures.
+
+The corrected auditor requires a transcript for **every started identity in a present native journal**, even
+when workflowProgress lists only the final attempt or this invocation audits a subset of items. Every missing
+identity is named in the run issue and the collector's summary. A run issue voids its audited items; collection
+does not emit a canonical accepted return. Restoring/restored control rows continue to grant no identities,
+including when they carry agent-like fields. Legacy runs without a journal keep their bounded retry handling.
+This conservative full-run rule avoids inferring an absent transcript's item or excusing lost earlier evidence.
+
+The maintained native source remains Claude Code **2.1.296**, executable SHA-256 above: `Fo()` indexes started
+rows next to the native v2 restore definitions near byte228286338; `Qr()` at byte228289997 validates the native
+started identity. The journal proves the earlier attempt existed, and a lost file cannot establish its permitted
+reads. The supported collector/auditor boundary is exercised by two synthetic regressions: an earlier attempt
+reads `/outside/fixture`, then its transcript is deleted while its started identity remains. Before the fix,
+the audit reports no run issue and collection writes a canonical return. Both regressions fail before the fix
+and pass afterward. A second deleted earlier identity is also reported; restore controls remain excluded.
+
+The advisor example and availability fixture now use native `toolChange:"add"`. The existing collection test
+first failed on the old boolean field, then passed with the native string and corrected decision example.
+A removal-only `available:false, toolChange:"remove"` control is accepted; removal after prior availability
+does not erase the availability violation. These are fixture fidelity and local integration checks, not new
+advisor/model execution.
+
+The append-only registry preserves every earlier row from both the held PR and maintained main. Two complete
+Claude keys are appended, one per supported workflow path, including the lane-prompt.md hash and corrected
+auditor SHA-256 `c7d6232d7df922bcdc85e3c445b3bf88312f206842b39945489726d65355a5c1`. Current adjudication keys
+are derived by executing `adjudicate.adjudication_provenance()` on the held PR source and an isolated merged
+snapshot after #992 landed at main `9b3a39c43363f32ac61e74c674e4ba069593fe08`. Their adjudicate.py digests are
+respectively `81645780e37d87756f10c5a023068105b9a4f32de8fcf3ca858ef60683caaad5` and
+`9da98fd37870a56c25d1dc40a34636b540a6f1cfcca74e994c036eda2967797d`; both full keys are registered.
+Main's four intervening historical adjudication registrations are retained byte-for-byte before these appends.
+No history rewrite or landing rebase was performed. The actual landing must re-derive keys if its source moves.
+
+Exact successful command, on both source snapshots:
+
+```text
+python3 -B -m unittest tests.test_transcript_audit tests.test_claude_lane tests.test_blind_lane_launch tests.test_adjudicate tests.test_verdict_lane_vendoring
+```
+
+The held PR with the correction passes179 tests; the merged snapshot with landed #992 passes193 tests, both
+with zero skips. The explicit `python3 -B -m unittest tests.test_verdict_lane_vendoring` command separately
+passes14/14 on both. The merged snapshot was built in a new detached worktree from9b3a39c4, merged with the
+held PR without committing, then supplied the same correction source and the refreshed registry manifest
+entry. It is a rehearsal; the PR's required ONE forward commit retains its exact a2e32650 parent/lease.
+Receipts are retained under the private `pr993-review-fix-20261011` packet. No paid call, native journal change,
+old collection rewrite, instruction/config change, blind key/export write or #995 change occurred.

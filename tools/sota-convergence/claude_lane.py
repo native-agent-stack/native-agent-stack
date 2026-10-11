@@ -350,6 +350,7 @@ def main(argv=None) -> int:
         failures_path.unlink(missing_ok=True)
     print(json.dumps({"written": len(written), "without_final": without_final,
                       "lost": list(result.get("lost") or []), "provenance": provenance,
+                      "run_issue": report["run_issue"],
                       "unaccounted_transcripts": report["unaccounted_transcripts"]}, sort_keys=True))
     return 0
 

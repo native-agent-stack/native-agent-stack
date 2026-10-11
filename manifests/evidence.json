@@ -62022,8 +62022,8 @@
     },
     {
       "path": "tools/sota-convergence/lane-provenance.json",
-      "sha256": "f097b8c982e613d59e80e7213ae55a500dd615302dcedb65eb5deae8546f13fa",
-      "bytes": 19787
+      "sha256": "56fa627d76e316d573e03bc381fe8e117240d1b6cc2f4f5a02d328dfc27418d9",
+      "bytes": 22496
     },
     {
       "path": "tools/sota-convergence/lane-return.schema.json",

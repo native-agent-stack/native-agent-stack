@@ -132,15 +132,31 @@ class ClaudeLaneWriterTests(unittest.TestCase):
 
     def test_collect_refuses_an_available_advisor_even_without_a_call(self):
         # Claude Code 2.1.296 records tool availability as an advisor_tool attachment.
+        attachment = {"type": "advisor_tool", "available": True, "model": "fixture-advisor", "toolChange": "add"}
+        self.assertEqual(attachment["toolChange"], "add", "pinned native advisor availability uses toolChange:add")
+        decision = (ROOT / "docs/decisions/2026-10-11-blind-lane-protocol.md").read_text(encoding="utf-8")
+        self.assertIn('"toolChange":"add"', decision)
         path = self.transcripts / "agent-l1.jsonl"
         with path.open("a", encoding="utf-8") as stream:
+            stream.write(json.dumps({"type": "attachment", "attachment": attachment}) + "\n")
             stream.write(json.dumps({"type": "attachment", "attachment": {
-                "type": "advisor_tool", "available": True, "model": "fixture-advisor", "toolChange": True}}) + "\n")
+                "type": "advisor_tool", "available": False, "model": "fixture-advisor", "toolChange": "remove"}})
+                         + "\n")
         with contextlib.redirect_stdout(io.StringIO()):
             self.assertEqual(self.run_main("--resolved-model", "claude-opus-5-5"), 0)
         self.assertFalse((self.work / "claude" / "foundation__l1.json").exists())
         report = json.loads((self.work / "claude" / "transcript-audit.json").read_text(encoding="utf-8"))
         self.assertIn("advisor available", "\n".join(report["items"]["foundation__l1"]["flagged"]))
+
+    def test_collect_accepts_removal_without_prior_advisor_availability(self):
+        path = self.transcripts / "agent-l1.jsonl"
+        with path.open("a", encoding="utf-8") as stream:
+            stream.write(json.dumps({"type": "attachment", "attachment": {
+                "type": "advisor_tool", "available": False, "model": "fixture-advisor", "toolChange": "remove"}})
+                         + "\n")
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(self.run_main("--resolved-model", "claude-opus-5-5"), 0)
+        self.assertTrue((self.work / "claude/foundation__l1.json").exists())
 
     def test_collect_prints_every_unaccounted_name(self):
         for index in range(20):
@@ -150,6 +166,34 @@ class ClaudeLaneWriterTests(unittest.TestCase):
             self.assertEqual(self.run_main("--resolved-model", "claude-opus-5-5"), 0)
         for index in range(20):
             self.assertIn(f"agent-unaccounted-{index:02}.jsonl", out.getvalue())
+
+    def test_collect_refuses_a_deleted_journaled_earlier_attempt(self):
+        final = self.transcripts / "agent-l1.jsonl"
+        old = self.transcripts / "agent-old.jsonl"
+        old.write_text(final.read_text(encoding="utf-8") + json.dumps({"type": "assistant", "message": {
+            "content": [{"type": "tool_use", "name": "Read", "input": {"file_path": "/outside/fixture"}}]}})
+                       + "\n", encoding="utf-8")
+        record_path = self.transcripts.parents[2] / "workflows" / "wf_test.json"
+        record = json.loads(record_path.read_text(encoding="utf-8"))
+        label = "refute:evidence:foundation/l1"
+        record["workflowProgress"][0]["label"] = label
+        record_path.write_text(json.dumps(record), encoding="utf-8")
+        rows = [{"type": "restoring"},
+                {"type": "started", "agentId": "old", "key": "v2:" + "a" * 64, "label": label},
+                {"type": "started", "agentId": "l1", "key": "v2:" + "b" * 64, "label": label},
+                {"type": "restored"}]
+        (self.transcripts / "journal.jsonl").write_text("".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8")
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(self.run_main("--resolved-model", "claude-opus-5-5"), 0)
+        self.assertFalse((self.work / "claude/foundation__l1.json").exists())
+        old.unlink()
+        with contextlib.redirect_stdout(io.StringIO()) as output:
+            self.assertEqual(self.run_main("--resolved-model", "claude-opus-5-5"), 0)
+        self.assertFalse((self.work / "claude/foundation__l1.json").exists())
+        report = json.loads((self.work / "claude/transcript-audit.json").read_text(encoding="utf-8"))
+        self.assertIn("old", report["run_issue"])
+        self.assertIn("old", output.getvalue())
+        self.assertTrue((self.work / "claude/foundation__l1.json.audit-flagged").exists())
 
     def test_another_runs_transcripts_void_every_layer(self):
         # Round 9 focus: transcripts are bound to the run that returned the collected result.
