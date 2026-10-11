@@ -11276,6 +11276,11 @@
       "bytes": 24455
     },
     {
+      "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261011-pr990-landing.json",
+      "sha256": "2bdc389b35857c74a680f14a8aea676213acc93d83e7971eace218e3d909b2a6",
+      "bytes": 29093
+    },
+    {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261011-pr990.json",
       "sha256": "b8ff44c24b73981c63edcc0e956c9b8e59bf0b6f199d97ee1baa7e7b3389d9d6",
       "bytes": 28719
@@ -18587,8 +18592,8 @@
     },
     {
       "path": "docs/decisions/2026-10-10-codex-blind-audit-command-positions.md",
-      "sha256": "6b7860d349315f8b6b8736cf4a96a4306fd128b20c56ab2c539cea9d9013004f",
-      "bytes": 20033
+      "sha256": "f89bf203d8d19e347d130e1ba898d5c2f10b878ce44512edbd35a2383d91cf10",
+      "bytes": 25787
     },
     {
       "path": "docs/decisions/2026-10-10-codex-lane-omniroute.md",
@@ -60617,8 +60622,8 @@
     },
     {
       "path": "tests/test_codex_lane.py",
-      "sha256": "7485f82f1393abec62ac5bc9e0127ce0f9e76b9a6366b8dd266dead1db758ad6",
-      "bytes": 168909
+      "sha256": "b01ae1e80e395a2dce4dd92381d8de6df12cfec3a053232485b2c8d73e52ba3f",
+      "bytes": 170653
     },
     {
       "path": "tests/test_codex_quota.py",
@@ -61337,8 +61342,8 @@
     },
     {
       "path": "tests/test_runtime_worker_openhands_push_gate.py",
-      "sha256": "06f1e5bdfabf081fad40f6b8f4ad77b40c3a043bef4a129d44401a706bf49d0d",
-      "bytes": 161897
+      "sha256": "aad5c67f07918e9f0f15f39be608bb6de4aaa9627b0abdb445414391a6531540",
+      "bytes": 161905
     },
     {
       "path": "tests/test_runtime_worker_openhands_resolver.py",
@@ -61922,8 +61927,8 @@
     },
     {
       "path": "tools/sota-convergence/codex_lane.py",
-      "sha256": "e08169635a1a60f5765d7cc6bf71e170da6c52a6ee107690b779d212264efebd",
-      "bytes": 161365
+      "sha256": "72fd40bcecfe1bc2f286be954e8b6695107f7d5d03f3ac8ec2c6b4dd4d07dac8",
+      "bytes": 162343
     },
     {
       "path": "tools/sota-convergence/compact_manifest.py",
@@ -61937,8 +61942,8 @@
     },
     {
       "path": "tools/sota-convergence/evidence/codex-blind-audit-command-positions-20261010.json",
-      "sha256": "e024592f3f8ee4c90b12540acc766be31a93dd7b9f5f0240d7f8ee41f2804982",
-      "bytes": 35457
+      "sha256": "51f05f188dd0edbc7ea092c815f9e44705362290d2acefe8164f811db5545915",
+      "bytes": 42366
     },
     {
       "path": "tools/sota-convergence/evidence/codex-lane-omniroute-20261010.json",
@@ -62087,8 +62092,8 @@
     },
     {
       "path": "tools/sota-convergence/lane-provenance.json",
-      "sha256": "f06984a55a9b8b2bf34c349782863f003d1d381c67fe5d3d55a9ce0907504ded",
-      "bytes": 22856
+      "sha256": "3cdea75f3c91442ce161251a491fa1690115c31979928f88558481586fe58f4a",
+      "bytes": 23879
     },
     {
       "path": "tools/sota-convergence/lane-return.schema.json",

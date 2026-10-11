@@ -1,7 +1,9 @@
 # Codex blind audit: command positions and read operands
 
 Date: 2026-10-10; review correction: 2026-10-11. Initial base: `9d4c00cd05d79b3fd5074df2e46bacab87ee67ff`.
-One authorized landing rebase: `c4f4990737c4e2ed8f0452d069e25a460f897bb5`.
+Historical landing base: `c4f4990737c4e2ed8f0452d069e25a460f897bb5`.
+Prior bytes-correction landing base: `eb31d233234cdc552fc81672087ac8769e3696e0`.
+Current CC-authorized landing base: `65cf2730068429a1c48c8c18fb24aadef8120817`.
 
 The tier-1 run produced four text-match quarantines: document-retrieval's Python `'/'.join(...)` separator,
 git-github-automation's `rg '(git|diff|...)'` pattern, mcp-surfaces' backtick string inside a quoted Python
@@ -217,3 +219,77 @@ observations.
 [rg]: https://github.com/BurntSushi/ripgrep/tree/15.1.0
 [grep]: https://www.gnu.org/software/grep/manual/grep.html
 [jq]: https://github.com/jqlang/jq/tree/jq-1.8.1
+
+## 2026-10-11 bytes-path correction
+
+The CC's micro at `078aeb6d` reproduced a remaining P1: the final boundary-literal pass inspected
+only `str` constants, although the filesystem APIs also accept `bytes`. The same exact old runner
+produces seven assertion failures and zero errors in the two new offline tests: four named read
+interfaces, reversed mixed `copyfile` arguments, and two unsupported wrapper controls. No command
+payload is executed. Benign printed bytes, bytes separator data, decode/hex formatting and bytes
+comparisons are separate positive controls.
+
+The pass now presents both literal types to the same boundary policy through `os.fsdecode`, retaining
+the original AST type for data-flow analysis. A literal bytes receiver's builtin formatting methods
+follow the existing verified data-sink rule. This preserves expression type semantics; mixed bytes
+and strings are not coerced into a valid concatenation or join.
+
+The installed interpreter is CPython 3.13.16, official pin
+[`cbc944f4bc59639a444dd971c737788ba2283a91`](https://github.com/python/cpython/tree/cbc944f4bc59639a444dd971c737788ba2283a91).
+`Lib/os.py:840-866` uses the filesystem encoding and error handler; `Doc/library/os.rst`'s
+`fsdecode` section and `Doc/library/sys.rst:781-795` specify that contract. The synthetic API probe
+confirms UTF-8/surrogateescape here: an invalid filename byte round-trips to the same inode.
+`Modules/_io/fileio.c:302-305`, `Objects/unicodeobject.c:4030-4038`,
+`Modules/_sqlite/connection.c:247-268`, `Lib/genericpath.py:84-86`,
+`Modules/posixmodule.c:1303-1329` and `Lib/shutil.py:260-262` confirm str/bytes paths.
+All four named APIs reject direct `bytearray` and `memoryview` arguments with TypeError in the
+installed interpreter. Those types have no AST literal syntax: their constructor forms still
+contain the bytes constant, which the audit conservatively scans. API refusal and conservative
+audit refusal are distinct results.
+
+The first bytes-correction landing rebase targeted `eb31d233234cdc552fc81672087ac8769e3696e0`.
+The only conflict was `manifests/evidence.json`: main's copy was taken and all owned files were
+re-registered through `host_receipts.register_file`. The ACKed monitoring snapshot remains
+byte-exact SHA256 `b8ff44c24b73981c63edcc0e956c9b8e59bf0b6f199d97ee1baa7e7b3389d9d6`;
+the native rebased-head qualifier confirms 424 sites, 139 runner sites and 101 shape locations.
+Final-head FULL validation and the target's eight native shards are recorded separately in the
+coordination results and PR body; historical qualification above remains scoped to its original tree.
+
+### Why the full scratch rollouts are retained
+
+Dropping `--ephemeral` intentionally preserves native rollouts in the newly created run-specific
+`CODEX_HOME`, whose mode is 0700. This follows the existing `isolated_codex_home` forensic contract
+at source pin `f9e785901d58a6e852bd8f7144a164c888168071` (`:1646-1653,1670-1673`): sessions and logs
+remain available for inspection. The original native bytes permit comparison with captured rollout
+digests and diagnosis of incomplete or ambiguous history. The minimal captured evidence is retained
+separately; original rollouts are not copied into published verdicts or evidence manifests.
+
+The existing `release_codex_home` lifecycle (`:1683-1691`) stops children, removes the authentication
+symlink and releases the lock. Retention remains local to that owner-only scratch home; capture and
+retention read no real Codex home contents and copy no real Codex home. Native setup retains its
+existing authentication-path metadata checks and symlink. This correction documents forensic retention rather than
+adding a cleanup operation that would discard its source evidence.
+
+## Landing rebase after the binding correction
+
+The CC's 2026-10-11T03:23Z cue authorizes one further landing rebase after the separate adjudication
+binding fix. Main at start was `65cf2730068429a1c48c8c18fb24aadef8120817`. Main's
+[`bd59f5561` / #957](https://github.com/seathatflowsinourveins/native-agent-stack/commit/bd59f5561)
+retired adoption macOS CI. The rebase preserves that workflow and its hardening tests byte-for-byte,
+retains catalog-freshness parser provisioning and removes the obsolete macOS-only parser exception
+and mutation control. The runtime source and Codex test bytes remain identical to `fd86ad20`.
+Evidence manifests were taken from pinned main and regenerated through native registration.
+
+The native advisory API at immutable candidate `1cfcdbad8821a2446b52233024a601794264de24` measures
+432 unclassified sites, 139 Codex sites, 102 shape locations and zero unresolved. The only normalized
+delta from the prior ACKed 424/139/101 snapshot is `scripts/component_matrix.py`: sites 6 to 14 and
+shapes 1 to 2, matching main's [#982 shared closeout loader](https://github.com/seathatflowsinourveins/native-agent-stack/commit/878f2891a).
+The CC independently compared and ACKed these exact candidate bytes at 04:01Z. The snapshot is
+retained as `unclassified-gate-reads-20261011-pr990-landing.json`, SHA256
+`2bdc389b35857c74a680f14a8aea676213acc93d83e7971eace218e3d909b2a6`, and selected by the existing
+native baseline test. The previous b8ff snapshot remains byte-exact historical evidence; worker
+enforcement classifications are unchanged.
+
+Both verbatim change-ids, the range-diff, per-hunk resolution notes and final committed-head checks
+are retained in the landing artifacts and PR body. Historical test and baseline results above stay
+scoped to their original trees. No live provider/model call or additional rebase is part of this cue.

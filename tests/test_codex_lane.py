@@ -876,6 +876,32 @@ class LiteralBoundaryRegressionTests(unittest.TestCase):
             with self.subTest(unproven_use=code):
                 self.assertTrue(self.audit_python(code)["flagged_commands"], "data must not launder an outside literal")
 
+    def test_bytes_literals_at_read_interfaces_remain_subject_to_the_boundary(self):
+        # CPython v3.13.16 filesystem APIs accept bytes paths. The command auditor
+        # must inspect their AST constants before any payload could execute.
+        cases = {
+            "fileio": "import io;io.FileIO(b'../codex/foundation__x.json')",
+            "getsize": "import os;os.path.getsize(b'/etc/passwd')",
+            "copyfile": "import shutil;shutil.copyfile(b'/etc/passwd','evidence/copy')",
+            "sqlite": "import sqlite3;sqlite3.connect(b'/var/lib/x.db')",
+            "mixed_str_bytes": "import shutil;shutil.copyfile('evidence/input',b'/etc/passwd')",
+            # These native APIs reject the wrappers, but an unsupported wrapper
+            # must not hide its outside byte literal from conservative analysis.
+            "bytearray": "import io;io.FileIO(bytearray(b'../codex/foundation__x.json'))",
+            "memoryview": "import os;os.path.getsize(memoryview(b'/etc/passwd'))",
+        }
+        for interface, code in cases.items():
+            with self.subTest(interface=interface):
+                self.assertTrue(self.audit_python(code)["flagged_commands"],
+                                "an outside byte literal must not bypass the command boundary")
+
+    def test_printed_and_joined_bytes_literals_remain_data(self):
+        for code in ("print(b'/etc/passwd')", "print(b'/'.join([b'evidence',b'receipt']))",
+                     "print(b'/etc/passwd'.decode())", "print(b'/etc/passwd'.hex())",
+                     "if b'://' in b'file:///synthetic/outside': print('external')"):
+            with self.subTest(data_use=code):
+                self.assertEqual(self.audit_python(code)["flagged_commands"], [])
+
 
 class NativeUsageSuffixTests(unittest.TestCase):
     def setUp(self):

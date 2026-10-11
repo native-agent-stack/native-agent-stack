@@ -1384,6 +1384,8 @@ def python_audit(source: str, allowed_roots, tools, depth=0, *, cwd=None) -> lis
     def primitive_data(expression, level=0):
         if level > 64:
             return False
+        if isinstance(expression, ast.Constant) and type(expression.value) is bytes:
+            return True
         if isinstance(expression, ast.BinOp) and isinstance(expression.op, ast.Add):
             return (strings(expression) is not None and primitive_data(expression.left, level + 1)
                     and primitive_data(expression.right, level + 1))
@@ -1463,6 +1465,14 @@ def python_audit(source: str, allowed_roots, tools, depth=0, *, cwd=None) -> lis
                 continue
             if not isinstance(parent, ast.Call):
                 return False
+            if (not reflective_data and isinstance(parent.func, ast.Attribute)
+                    and isinstance(parent.func.value, ast.Constant) and type(parent.func.value.value) is bytes
+                    and parent.func.attr in {"join", "strip", "lstrip", "rstrip", "replace", "split", "rsplit", "decode", "hex",
+                                             "partition", "rpartition", "lower", "upper", "startswith", "endswith"}):
+                # A literal bytes receiver has builtin formatting methods; follow their
+                # result to the same verified data sink without coercing expression types.
+                current = parent
+                continue
             called = callables(parent.func)
             names = {name for kind, name, _ in called or () if kind == "named"}
             if not called:
@@ -1549,8 +1559,10 @@ def python_audit(source: str, allowed_roots, tools, depth=0, *, cwd=None) -> lis
                     elif keyword.arg == "dir_fd" and not (isinstance(keyword.value, ast.Constant) and keyword.value.value is None):
                         reasons.append("unresolved Python read directory descriptor")
     for literal in nodes:
-        if isinstance(literal, ast.Constant) and type(literal.value) is str:
-            boundary = operand_reasons(literal.value, allowed_roots)
+        if isinstance(literal, ast.Constant) and type(literal.value) in (str, bytes):
+            # CPython v3.13.16 Lib/os.py:856-866: use the filesystem encoding/error
+            # handler for byte paths; retain the original AST type for data-flow checks.
+            boundary = operand_reasons(os.fsdecode(literal.value), allowed_roots)
             if boundary and not literal_is_data(literal):
                 reasons.extend(boundary)
                 reasons.append("unproven Python boundary literal")
