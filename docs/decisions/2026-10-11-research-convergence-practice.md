@@ -18,12 +18,12 @@ review evidence. These are dated CC directions, not verbatim owner chat.
 
 1. Read the layer's recorded candidate/verdict and latest retained sweep.
    Recovery of pending intake observations, including snapshot-success with
-   journal-append failure, is pending on #978. Until it lands, disclose that
-   intake gap; do not treat the snapshot as the complete pending set. Read
+   journal-append failure, landed in #978 (`333ec47b`). Disclose unresolved
+   WS1 inputs; do not treat a snapshot alone as the complete pending set. Read
    prior resolutions in the compounding manifest before reopening work.
 2. Discover the unresolved delta from mirrored awesome lists and the existing
-   landscape sweep. Categorized-star intake is pending on #978 and WS1;
-   consume its qualified output after those dependencies complete. Reuse the grand catalog and source
+   landscape sweep. Categorized-star intake landed in #978 (`333ec47b`);
+   WS1 categories remain pending. Consume their qualified output after WS1 completes. Reuse the grand catalog and source
    reviews. Verify actual source and version before deciding; stars, recency
    and agreement are intake signals, not evidence of superiority.
 3. Preregister scope, pins, roles, prompts, comparison rule and native effort
@@ -43,12 +43,12 @@ review evidence. These are dated CC directions, not verbatim owner chat.
 6. Publish through the existing recording/build/ledger owners. Preserve source
    and transport hashes separately, disclose masks and missing evidence, and
    check the bytes actually supplied to each reader. Carry unresolved work as
-   an owned, dated comparison or Follow-up; close the resolved workstream with
+   a comparison pending its named inputs or Follow-up; close the resolved workstream with
    its explicit reopen condition.
 
 Discovery currently uses mirrored awesome-list inputs, the `tools/sota-convergence`
-sweep and grand-catalog publication. The weekly new-star intake, pending-observation
-recovery and category decision pipeline are pending on #978 and WS1. The CC executes unstars from the landed WS1
+sweep and grand-catalog publication. The weekly new-star intake and pending-observation
+recovery landed in #978 (`333ec47b`); the category decision pipeline remains pending on WS1. The CC executes unstars from the landed WS1
 list; license is never an unstar reason. Protected dependencies, decision
 citations and existing mirrors remain protected. No parallel star or skill
 catalog is created. Grand-catalog retains catalog and ledger publication custody.
@@ -94,9 +94,9 @@ authorized native SDK task. Their task roles determine invocation.
 
 WS2 begins after #1008 and then #1007 land. The co-op's W6 wave, layer-verdict
 lane, landscape-live-foundation and convergence-practice use the single authority
-in #1008's [layer-resolution protocol](https://github.com/seathatflowsinourveins/native-agent-stack/blob/a0641a04cc211fd803b4971dd86a85654685d733/docs/decisions/2026-10-11-layer-resolution-protocol.md#terminal-states-and-evidence),
-`docs/decisions/2026-10-11-layer-resolution-protocol.md:75–104` at
-`a0641a04cc211fd803b4971dd86a85654685d733` (pending landing).
+in #1008's landed [layer-resolution protocol](https://github.com/seathatflowsinourveins/native-agent-stack/blob/569bbc59db2b5f7c8a932357726efb7acca90b91/docs/decisions/2026-10-11-layer-resolution-protocol.md#terminal-states-and-evidence),
+`docs/decisions/2026-10-11-layer-resolution-protocol.md:69–122` at squash commit
+`569bbc59db2b5f7c8a932357726efb7acca90b91` on main (landed 2026-10-11T21:34:23Z).
 That authority defines FINAL, SCHEDULED, RETIRED, their evidence joins and
 non-terminal cases; this record adds no second definition. The same protocol's
 reopen section governs layer reopening. Practice closure below is a distinct
@@ -132,10 +132,10 @@ peer-owned slot catalogs, canonical manifests or live client instructions.
 
 | Practice workstream | Closure result | REOPEN CONDITION |
 | --- | --- | --- |
-| Discovery | CLOSED only after #978 lands, WS1 categories are published and the pending-observation recovery qualifies; retained sweep/awesome-list inputs remain available meanwhile | `scripts/public_starred.py` at #978 `2b5c9abe0d7b0f4cf56d8502f887261a0c8cc851`: a new release, or a forced snapshot-success/append-failure replay loses an unresolved repository id from the recovered set |
-| Refutation | CLOSED only after #993 lands and its gated blind collection/recording qualifies | `tools/sota-convergence/transcript_audit.py` at #993 `d82361cd1766caba5ae8790d79434b4fc39a32f8`, with Claude Code2.1.296/SHA24972e3b: a new release, or an orphan completion/missing-transcript/advisor-contaminated fixture produces an accepted judgment |
-| Research gathering | CLOSED with qualified existing vendor routes and owner source/result receipts | GPT Researcher3.7.0/0957c301 and DeerFlow2.1.0/345f08be: a new release, or a completed public-research oracle yields fewer than five GPT report references or no cited DeerFlow answer/native retrieval evidence |
-| Coding workers and SDKs | CLOSED with supported owned-workspace dispatch and explicit per-route qualification receipts | OpenHands1.53.0/54daf056 and Codex SDK0.160.0/a956835d: a new release, or the declared job oracle fails, requests-to-model is zero, terminal completion is absent or a foreign scratch sentinel changes |
+| Discovery | CLOSED only after WS1 categories and their qualified output are published; #978 landed and retained sweep/awesome-list inputs remain available meanwhile | `scripts/public_starred.py` at #978 squash `333ec47b94e49991271a7ce6b5ed591e24a444d6`: a new release, or a forced snapshot-success/append-failure replay loses an unresolved repository id from the recovered set |
+| Refutation | CLOSED only after #993 lands and its gated blind collection/recording qualifies | `tools/sota-convergence/transcript_audit.py` at #993 `d82361cd1766caba5ae8790d79434b4fc39a32f8`, with Claude Code 2.1.296/SHA 24972e3b: a new release, or an orphan completion/missing-transcript/advisor-contaminated fixture produces an accepted judgment |
+| Research gathering | CLOSED with qualified existing vendor routes and owner source/result receipts | GPT Researcher 3.7.0/0957c301 and DeerFlow 2.1.0/345f08be: a new release, or a completed public-research oracle yields fewer than five GPT report references or no cited DeerFlow answer/native retrieval evidence |
+| Coding workers and SDKs | CLOSED with supported owned-workspace dispatch and explicit per-route qualification receipts | OpenHands 1.53.0/54daf056 and Codex SDK 0.160.0/a956835d: a new release, or the declared job oracle fails, requests-to-model is zero, terminal completion is absent or a foreign scratch sentinel changes |
 | Review/publication | CLOSED with the canonical ruling, qualified owner-row receipts and compounding resolution memory | `scripts/validate.py` and native manifest/recording tools at base `f1f6c0c20e214f1cee9aba3c5f0c1430d66e75ed`: a new release, or the native validator/manifest check fails on the published bytes or a required owner-row receipt is absent |
 
 These closure results take effect on the accepted record's publication and owner
@@ -159,8 +159,10 @@ registered in its dedicated central mirror; its source-bound adapter and
 [official SDK lifecycle documentation](https://developers.openai.com/codex/sdk)
 are separate inputs, not a new source/CLI equality or gateway qualification.
 
-All four source mirrors are **registered** in `MIRRORS.json` and synced in
-`MIRRORS.lock.json` at 2026-10-11T15:28:41Z–15:28:49Z (reported by the CC at15:29Z):
+All four source mirrors are **registered** in `MIRRORS.json` and first synced
+at 2026-10-11T15:28:41Z–15:28:49Z (reported by the CC at 15:29Z);
+Later resyncs include 22:34Z; the 2026-10-11 source check also retained
+`MIRRORS.lock.json` resyncs at 23:14:43Z–23:14:44Z, with the four pins unchanged:
 `upstream/assafelovic/gpt-researcher` v3.7.0/0957c301,
 `upstream/bytedance/deer-flow` v2.1.0/345f08be,
 `upstream/OpenHands/software-agent-sdk` v1.53.0/54daf056 and

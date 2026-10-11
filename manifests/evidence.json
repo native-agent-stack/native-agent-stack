@@ -18737,8 +18737,8 @@
     },
     {
       "path": "docs/decisions/2026-10-11-research-convergence-practice.md",
-      "sha256": "6999a5ef5e7b4164d113222d717ec9b1ac757fd6eabbea5222df975483ff7652",
-      "bytes": 14572
+      "sha256": "18c527a058b4e9cb85d0d00221109c52e3dff54137674ff06357126c2f4f4198",
+      "bytes": 14811
     },
     {
       "path": "docs/direct-results.md",
@@ -62224,6 +62224,11 @@
       "path": "tests/test_render_config.py",
       "sha256": "03d31001eef58ba1d6cf1498d9a7e9c6d6fe391d5ff9a4d02a9174bdc89dc136",
       "bytes": 47826
+    },
+    {
+      "path": "tests/test_research_convergence_practice.py",
+      "sha256": "53a1200f7455f9a26e3d9a81110b0b238ea843582b5c3cd1075acc8a40c9478a",
+      "bytes": 884
     },
     {
       "path": "tests/test_research_dispatch.py",
