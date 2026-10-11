@@ -16,9 +16,10 @@ running llama-server's /v1/embeddings endpoint, and checks:
     reference's own ``embedding`` is at least the reference's own
     ``acceptance.threshold`` (0.99).
 
-Never claims Metal vs CPU by itself: the caller (a real Mac, or the hosted
-macOS CI step) must record which backend llama-server's own log reports;
-this script only checks the response, over plain HTTP to a local port.
+Never claims Metal vs CPU by itself: the caller on a real Mac must record
+which backend llama-server's own log reports. The hosted macOS CI consumer
+was retired on 2026-10-10; the manual acceptance check remains available.
+This script only checks the response, over plain HTTP to a local port.
 
 Usage:
     python3 tools/adoption/embed_acceptance.py <url> <reference.json>

@@ -251,8 +251,9 @@ class RunSkillDoctor(unittest.TestCase):
     def test_the_default_paths_are_the_documented_system_paths(self):
         # https://code.claude.com/docs/en/managed-mcp, configuration summary (read 2026-10-10): /Library/Application
         # Support/ClaudeCode/ on macOS, /etc/claude-code/ on Linux (WSL included), C:\Program Files\ClaudeCode\ on Windows.
-        # All three are checked on every system and only an absolute path counts, so the module has no platform branch
-        # for the macOS drift guard (tests.test_workflow_hardening.MacosPatternsTests) to flag.
+        # All three are checked on every system and only an absolute path counts;
+        # this portable lookup has no platform-specific branch. The adoption macOS
+        # CI selector and its former drift-guard class were retired on 2026-10-10.
         self.assertEqual(REAL_MANAGED_MCP_CONFIG_PATHS, (
             "/Library/Application Support/ClaudeCode/managed-mcp.json",
             "/etc/claude-code/managed-mcp.json",

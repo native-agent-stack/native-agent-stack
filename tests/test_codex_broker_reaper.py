@@ -70,10 +70,9 @@ ROOT = Path(__file__).resolve().parents[1]
 TOOL_PATH = ROOT / "adoption/tools/codex-broker-reaper"
 
 # This suite needs /proc (cmdline, comm, cwd, stat, uptime) and
-# prctl(PR_SET_NAME); both are Linux-only, like the tool under test. Without
-# this guard the advisory validate-macos CI job (.github/workflows/
-# adoption-bootstrap.yml, on matching main pushes, nightly schedules and
-# dispatches) would run this whole module on macos-15 and fail every class.
+# prctl(PR_SET_NAME); both are Linux-only, like the tool under test. The advisory
+# validate-macos CI job was retired on 2026-10-10. This capability guard remains
+# necessary for manual Darwin runs and any future runner that lacks Linux /proc.
 LINUX_ONLY = unittest.skipUnless(
     sys.platform.startswith("linux"),
     "codex-broker-reaper and this suite read /proc directly and are Linux-only",

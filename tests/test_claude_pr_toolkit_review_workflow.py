@@ -22,7 +22,7 @@ from tests.test_workflow_policy import load_workflow
 
 try:
     import yaml
-except ImportError:  # the macOS job installs no package; the hosted validate job has PyYAML
+except ImportError:  # Optional YAML support remains after the 2026-10-10 macOS CI retirement.
     yaml = None
 
 ROOT = Path(__file__).resolve().parents[1]
