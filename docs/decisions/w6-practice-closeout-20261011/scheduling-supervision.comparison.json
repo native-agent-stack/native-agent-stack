@@ -1,0 +1,48 @@
+{
+  "comparison_id": "w6-scheduling-supervision-20261011",
+  "scope_status": "preregistered_comparison_pending_named_inputs",
+  "catalog": "foundation",
+  "layer_id": "scheduling-supervision",
+  "requirement": {
+    "ref": "catalogs/landscape/foundation.json#/layers/12",
+    "source_sha256": "868d193a31080ab913400725140bd0d01e0afe97e28564fd12777f737d22951a"
+  },
+  "unresolved_repositories": [
+    "https://github.com/dagucloud/dagu",
+    "https://github.com/microsoft/pg_durable",
+    "https://github.com/restatedev/restate",
+    "https://github.com/conductor-oss/conductor"
+  ],
+  "harness": "Existing W5 paired runs and blueprints/convergence-practice/job-recovery plus upstream-supported durable-runtime test paths.",
+  "scenarios": [
+    {
+      "role": "owned-checkpoint-recovery",
+      "case_scope": {
+        "source": "blueprints/convergence-practice/job-recovery/plan.json and blueprints/convergence-practice/native-worker/seed/test_planner.py",
+        "oracle": "Same accepted deterministic checkpoint/oracle and explicit stop/retry/finalize cases; preserve the original workload's no-external-effects limit."
+      },
+      "arms": [
+        "dagu@58fed633d58c1dd1319091fdb2c2f6158ecfa053 with existing systemd boundary",
+        "pg_durable",
+        "restate",
+        "conductor"
+      ],
+      "rule": "Reject lost accepted checkpoints, duplicate effects in the declared scope, ineffective cancellation or failed recovery. Among passing equal-scope arms compare operational/resource cost; exact ties retain the qualified current pair. Do not promote synthetic checkpoint recovery to real host-loss or exactly-once external-effects acceptance."
+    }
+  ],
+  "readiness": [
+    "Three retained alternative source pins and upstream-supported test paths are recovered",
+    "Existing shared recovery workload and its input/oracle hashes are sealed for all arms",
+    "Owning runtime/client moved-pin receipts and execution capacity gate are satisfied"
+  ],
+  "deltas": [
+    "Apply only pin/evidence changes and surviving alternatives, preserving later substantive refutations of Temporal and Absurd."
+  ],
+  "execution_constraints": [
+    "No new discovery; only retained 09-29/10-08 candidates and explicitly dispatched review-and-landing arms.",
+    "Seal exact case/oracle/source-pin bytes before execution; do not tune acceptance after results.",
+    "Retain failures, errors, cancellations and complete effort/cost; upstream tests and native invoke evidence remain distinct.",
+    "Heavy suites in Monday 08:00Z\u201320:00Z require T2 idle wrapper; full suites also require SUITE-GO.",
+    "Terminal classification authority is the co-op #1007 LANDED relay and c2dee173 final-stack contract. A winner requires all four conditions before FINAL."
+  ]
+}

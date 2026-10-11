@@ -1,0 +1,95 @@
+{
+  "comparison_id": "w6-git-github-automation-20261011",
+  "scope_status": "preregistered_comparison_pending_named_inputs",
+  "catalog": "foundation",
+  "layer_id": "git-github-automation",
+  "requirement": {
+    "ref": "catalogs/landscape/foundation.json#/layers/19",
+    "source_sha256": "868d193a31080ab913400725140bd0d01e0afe97e28564fd12777f737d22951a"
+  },
+  "unresolved_repositories": [
+    "https://github.com/ataraxy-labs/sem"
+  ],
+  "harness": "Existing W1 known-finding replay, promptfoo scoring for sem, native gh lifecycle and existing pin_moved receipt mechanisms; no new harness.",
+  "scenarios": [
+    {
+      "role": "review-and-landing",
+      "case_scope": {
+        "pull_requests": [
+          974,
+          978,
+          970,
+          989,
+          982,
+          992
+        ],
+        "oracle": "The archived known P1/P2 findings at their defective heads plus independently labeled safe changes; immutable head/oracle packet required before replay."
+      },
+      "arms": [
+        [
+          "in-use",
+          "anthropics/claude-code@3deb873; claude-agent-sdk-python@v0.2.165; sandbox-runtime@v0.0.79 (#953); openai/codex@a956835d; co-op GPT kit; #975 scripts; committed rulesets; #947 App"
+        ],
+        [
+          "https://github.com/github/gh-aw",
+          "c16656ef90fa17dfe6e91fa8fb3d11f54632a74d"
+        ],
+        [
+          "https://github.com/openai/codex-action",
+          "a8d8be6ee028bea4525bc722d16f36687b408c81"
+        ],
+        [
+          "https://github.com/reviewdog/reviewdog",
+          "cfb9ce1577e1e86f66bdfef6113d27340340923e"
+        ],
+        [
+          "https://github.com/mergifyio/mergify-cli",
+          "6307ed10e8628c6fefe408e398ea48af16c94cfd"
+        ],
+        [
+          "https://github.com/coderabbitai/skills",
+          "928c3b61f71b578b1bcfbacc289f1446244dd9dd"
+        ],
+        [
+          "https://github.com/OpenHands/OpenHands",
+          "c65ab872ccb2974ae0b1f5965813bb50c4199132"
+        ],
+        [
+          "https://github.com/SWE-agent/SWE-agent",
+          "3ea751c087f32b16e039a2233dd6eefecef325d5"
+        ]
+      ],
+      "rule": "Reject any arm that fails to block any known P1 or P2; among all complete arms, choose fewest false blockers, then lowest complete measured provider cost; exact ties retain the qualified current path. Retain failures, incomplete reads and costs."
+    },
+    {
+      "role": "structural-diff",
+      "case_scope": {
+        "source": "docs/decisions/2026-10-02-github-automation-practice.md:56-60",
+        "oracle": "Difftastic's sample files plus a frozen set of this repository's PR diffs; independent change questions and expected answers are sealed before scoring."
+      },
+      "arms": [
+        "sem@225e7721c6ce7e220f0e60783af8cd74c1881ed9",
+        "difftastic@0.71.0",
+        "plain git diff at retained host pin"
+      ],
+      "rule": "Score agent-answer quality with promptfoo using the same independently sealed change questions and exact-match expected answers for every arm. The better preregistered mean score becomes the slot's pick; a tie goes to the user, as the existing P2 decision requires."
+    }
+  ],
+  "readiness": [
+    "#953 and #975 land for the review-and-landing replay",
+    "Archived W1 defective-head/oracle packet and P2 labeled case packet are retained with immutable hashes",
+    "Exact runtime pins, primary source and native acceptance boundaries are captured"
+  ],
+  "deltas": [
+    "Pin gh runtime 2.102.0 and bind release source fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd; qualify the lifecycle stage from actual commands.",
+    "Re-run Codex linux-wsl2 and macos pin_moved receipts through their owning native receipt paths.",
+    "Close github-ci-finalize HARNESS-WIF-FIX-PROPOSAL as superseded by #981; do not change another lane's proposal file."
+  ],
+  "execution_constraints": [
+    "No new discovery; only retained 09-29/10-08 candidates and explicitly dispatched review-and-landing arms.",
+    "Seal exact case/oracle/source-pin bytes before execution; do not tune acceptance after results.",
+    "Retain failures, errors, cancellations and complete effort/cost; upstream tests and native invoke evidence remain distinct.",
+    "Heavy suites in Monday 08:00Z\u201320:00Z require T2 idle wrapper; full suites also require SUITE-GO.",
+    "Terminal classification authority is the co-op #1007 LANDED relay and c2dee173 final-stack contract. A winner requires all four conditions before FINAL."
+  ]
+}

@@ -18876,6 +18876,76 @@
       "bytes": 8417
     },
     {
+      "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
+      "sha256": "601e3ae790ea22f3bec6c1e15a4d9e716b2a2e299a2dcc29b04cdcac715a495f",
+      "bytes": 12044
+    },
+    {
+      "path": "docs/decisions/w6-practice-closeout-20261011/comparison-preregistrations.json",
+      "sha256": "e038fb0c6efdbfe9230e57296570190acb19a209eab0e026ece3c29f984f836e",
+      "bytes": 2230
+    },
+    {
+      "path": "docs/decisions/w6-practice-closeout-20261011/final-stack-run-assessment.json",
+      "sha256": "41eebae9a1063f7f61a99702c11251bb076f0c72a32e4e943606d7fee4c366a5",
+      "bytes": 27981
+    },
+    {
+      "path": "docs/decisions/w6-practice-closeout-20261011/git-github-automation.comparison.json",
+      "sha256": "cd2cf214d5e0d625bd1119d7b2d833b7886e5a319f0428ca860b9eb19d82230d",
+      "bytes": 4483
+    },
+    {
+      "path": "docs/decisions/w6-practice-closeout-20261011/inputs-and-dispositions.json",
+      "sha256": "8c82ca30e5d3eb7d1e778b8d4949aa6904681230ea1de15542aa50e7e3076abc",
+      "bytes": 63934
+    },
+    {
+      "path": "docs/decisions/w6-practice-closeout-20261011/instructions-skills.comparison.json",
+      "sha256": "b8c61150368204bc7f381bc8e250fd8cef3880e32cd178ec03471c132865d03d",
+      "bytes": 2437
+    },
+    {
+      "path": "docs/decisions/w6-practice-closeout-20261011/observation-inference.comparison.json",
+      "sha256": "c7e0fff63c3695472be8dbfb366bdede2b65bb3ee22fb39d879e257591bee9df",
+      "bytes": 3241
+    },
+    {
+      "path": "docs/decisions/w6-practice-closeout-20261011/ollama-source-recovery-20261011.json",
+      "sha256": "b70f2a78b5654cbbe9cf92fc6f459bd8d098af21081805e898a23c9d6c66104f",
+      "bytes": 1051
+    },
+    {
+      "path": "docs/decisions/w6-practice-closeout-20261011/primary-source-refs.json",
+      "sha256": "86b8c3f392363ae84cad912ab9d696505a678d4cdbf0dceeccaaac512fa6bac7",
+      "bytes": 21240
+    },
+    {
+      "path": "docs/decisions/w6-practice-closeout-20261011/quality-evaluation.comparison.json",
+      "sha256": "a2f7d85167bec0bcc2f08eab35397a436dce0c1bf8c0657163d7cc5610c14dd6",
+      "bytes": 3186
+    },
+    {
+      "path": "docs/decisions/w6-practice-closeout-20261011/recovery-portability.comparison.json",
+      "sha256": "6596dbfba2fbb158b05f3d801a090937d7d8cd20a8cde3dd538fd47df8bda167",
+      "bytes": 2526
+    },
+    {
+      "path": "docs/decisions/w6-practice-closeout-20261011/scheduling-supervision.comparison.json",
+      "sha256": "c534d3ad24a3312219ea4107ae9f18a42af12bfa70acf8676263d5adbcaa7135",
+      "bytes": 2773
+    },
+    {
+      "path": "docs/decisions/w6-practice-closeout-20261011/terminal-states.json",
+      "sha256": "b7201663557bc62819d8b4a769941881f11725abf6114aef1c3f89cd553ab1bb",
+      "bytes": 36835
+    },
+    {
+      "path": "docs/decisions/w6-practice-closeout-20261011/token-efficiency.comparison.json",
+      "sha256": "3948be402612b61940ff3b00cb6be5e308d48d798700aa417118cb7538480761",
+      "bytes": 2730
+    },
+    {
       "path": "docs/direct-results.md",
       "sha256": "12a511fee11f22c90b9b622701d5485be9c8247167102b5768d694244f939a5b",
       "bytes": 4022

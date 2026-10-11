@@ -1,0 +1,1469 @@
+{
+  "schema_version": 1,
+  "base_commit": "77185991ec9627e59473df5b4d7a11ca87b0461d",
+  "scope": "W6 protocol steps 1-3 and recorded SCHEDULED terminal states after #1007 landing; no FINAL winner acceptance.",
+  "authority": {
+    "protocol": "569bbc59:docs/decisions/2026-10-11-layer-resolution-protocol.md",
+    "dispatch_sha256": "a13204da949ba7f1b883332ea601790a2570ccd6066e9bb1bbc150b7b2e03304"
+  },
+  "inputs": {
+    "catalogs/landscape/foundation.json": {
+      "sha256": "868d193a31080ab913400725140bd0d01e0afe97e28564fd12777f737d22951a",
+      "bytes": 479154
+    },
+    "catalogs/sota-convergence/layer-verdict-waves.json": {
+      "sha256": "7f7056066fec1d5ea6e6cc5e243a668e509b1d74add94ec3d74cbd3025ebc756",
+      "bytes": 651
+    },
+    "catalogs/sota-convergence/layer-verdicts-20260922.json": {
+      "sha256": "2fef6da7468a8e97a319fdc6f75f73374cd34b412bf93de90fd0c2a7504159de",
+      "bytes": 609126
+    },
+    "catalogs/saturation/ledger.json": {
+      "sha256": "b6ca3220516a515bd6dec13f122f48acdd8ef738565f9c0145839d99dd0c21f2",
+      "bytes": 413173
+    },
+    "catalogs/sota-convergence/manifest-20260929.json": {
+      "sha256": "af4e0314b28acafe2b5e8a0bce71d1ced2efe911a3c3757557b23bd71c63c9ee",
+      "bytes": 1149103
+    },
+    "evidence/artifacts/landscape-sweep-20260929/returns.json": {
+      "sha256": "2f93067652c0f1e8e4f3d726895d2017eafef018412e47e9bc9b48e7ef931a9c",
+      "bytes": 2378440
+    },
+    "evidence/artifacts/landscape-sweep-20260926/returns.json": {
+      "sha256": "ea7e8ed285639a247df91d0c64d9378e080bc820170e9fc773434488397f4600",
+      "bytes": 3114964
+    },
+    "catalogs/landscape/grand-catalog-20261008.json": {
+      "sha256": "afb38c9427d7a344792b5ddcfa7cab64e9613a2fda64d1cecb30e2b0eae825bb",
+      "bytes": 28389911
+    },
+    "catalogs/landscape/grand-catalog-index-20261008.json": {
+      "sha256": "9d9cf1c5411153a3cc4be17f26dad549d45448ceef475637b4c13c5bb6151c98",
+      "bytes": 97426
+    },
+    "catalogs/landscape/research-state.json": {
+      "sha256": "fe142c1b8b8ec8b92d69ec5971d68028225899c101ffc43cea618883b119332a",
+      "bytes": 21449
+    }
+  },
+  "layers": [
+    {
+      "catalog": "foundation",
+      "layer_id": "git-github-automation",
+      "verdict_ref": "catalogs/landscape/foundation.json#/layers/19",
+      "wave_ref": "catalogs/sota-convergence/layer-verdict-waves.json#/waves/0",
+      "verdict_detail_ref": "catalogs/sota-convergence/layer-verdicts-20260922.json#/catalogs/foundation/5",
+      "verdict_status": "recorded",
+      "prior_winners": [
+        {
+          "component_id": "worktrunk",
+          "repository": "https://github.com/max-sixty/worktrunk",
+          "pin": "0.79.0",
+          "evidence_class": "source_review"
+        },
+        {
+          "component_id": "candidate:cli-cli",
+          "repository": "https://github.com/cli/cli",
+          "pin": "unpinned",
+          "evidence_class": "source_review"
+        },
+        {
+          "component_id": "difftastic",
+          "repository": "https://github.com/Wilfred/difftastic",
+          "pin": "0.71.0",
+          "evidence_class": "source_review"
+        }
+      ],
+      "latest_sweep": {
+        "id": "landscape-sweep-20260929",
+        "manifest_ref": "catalogs/sota-convergence/manifest-20260929.json",
+        "returns_ref": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+        "ledger_ref": "catalogs/saturation/ledger.json#/sweeps/4/layers/19"
+      },
+      "reopen": [
+        {
+          "trigger": "pin_moved",
+          "ref": "receipt_staleness:linux-wsl2-x86_64/codex"
+        },
+        {
+          "trigger": "pin_moved",
+          "ref": "receipt_staleness:macos-arm64/codex"
+        }
+      ],
+      "retained_failure_ref": null,
+      "grand_catalog_slot_ref": "catalogs/landscape/grand-catalog-index-20261008.json#/slots/19",
+      "grand_inventory_memberships": 569,
+      "survivor_count": 2,
+      "missing_vote_pending_count": 0,
+      "unresolved": [
+        {
+          "repository": "https://github.com/anthropics/claude-code-action",
+          "unresolved_kind": "survived",
+          "latest_sweep": "landscape-sweep-20260923",
+          "latest_vote_refs": {
+            "repo": "https://github.com/anthropics/claude-code-action",
+            "source_review": "evidence/artifacts/landscape-sweep-20260923/anthropics-claude-code-action.json",
+            "lens_votes": [
+              {
+                "lens": 0,
+                "vote": "not_refuted",
+                "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/19/candidates/0/adversarial_verification/votes/0"
+              },
+              {
+                "lens": 1,
+                "vote": "not_refuted",
+                "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/19/candidates/0/adversarial_verification/votes/1"
+              }
+            ]
+          },
+          "history": [
+            {
+              "sweep_id": "landscape-sweep-20260923",
+              "ledger_bucket": "survived",
+              "vote_refs": {
+                "repo": "https://github.com/anthropics/claude-code-action",
+                "source_review": "evidence/artifacts/landscape-sweep-20260923/anthropics-claude-code-action.json",
+                "lens_votes": [
+                  {
+                    "lens": 0,
+                    "vote": "not_refuted",
+                    "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/19/candidates/0/adversarial_verification/votes/0"
+                  },
+                  {
+                    "lens": 1,
+                    "vote": "not_refuted",
+                    "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/19/candidates/0/adversarial_verification/votes/1"
+                  }
+                ]
+              }
+            }
+          ],
+          "primary_source": {
+            "mirror": "anthropics/claude-code-action",
+            "commit": "2dca132ff0e0c4094ce6048b422c6915a071210b",
+            "ref": "2dca132ff0e0c4094ce6048b422c6915a071210b"
+          },
+          "disposition": {
+            "action": "retire_role",
+            "role": "in-GitHub Claude OIDC execution",
+            "reason": "Superseded by #981 retirement, merge 8bffa2c4; review-and-landing alternatives remain in the separate frozen comparison.",
+            "authority": "CC ruling-w6-wave-dispatch-20261011.md section 3(a)"
+          }
+        },
+        {
+          "repository": "https://github.com/ataraxy-labs/sem",
+          "unresolved_kind": "survived",
+          "latest_sweep": "landscape-sweep-20260929",
+          "latest_vote_refs": {
+            "repo": "https://github.com/ataraxy-labs/sem",
+            "facts": {
+              "vote": "not_refuted",
+              "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/git-github-automation/0/facts"
+            },
+            "fit": {
+              "vote": "not_refuted",
+              "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/git-github-automation/0/fit"
+            },
+            "source_review": "evidence/artifacts/landscape-sweep-20260929/ataraxy-labs-sem.json"
+          },
+          "history": [
+            {
+              "sweep_id": "landscape-sweep-20260926",
+              "ledger_bucket": "survived",
+              "vote_refs": {
+                "repo": "https://github.com/ataraxy-labs/sem",
+                "facts": {
+                  "vote": "not_refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/git-github-automation/0/facts"
+                },
+                "fit": {
+                  "vote": "not_refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/git-github-automation/0/fit"
+                },
+                "source_review": "evidence/artifacts/landscape-sweep-20260926/ataraxy-labs-sem.json"
+              }
+            },
+            {
+              "sweep_id": "landscape-sweep-20260929",
+              "ledger_bucket": "survived",
+              "vote_refs": {
+                "repo": "https://github.com/ataraxy-labs/sem",
+                "facts": {
+                  "vote": "not_refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/git-github-automation/0/facts"
+                },
+                "fit": {
+                  "vote": "not_refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/git-github-automation/0/fit"
+                },
+                "source_review": "evidence/artifacts/landscape-sweep-20260929/ataraxy-labs-sem.json"
+              }
+            }
+          ],
+          "primary_source": {
+            "mirror": "ataraxy-labs/sem",
+            "commit": "225e7721c6ce7e220f0e60783af8cd74c1881ed9",
+            "ref": "HEAD"
+          },
+          "disposition": {
+            "action": "include_in_frozen_comparison",
+            "comparison_id": "w6-git-github-automation-20261011"
+          }
+        }
+      ],
+      "terminal_state": "SCHEDULED",
+      "terminal_readiness_trigger": {
+        "event": "The existing native harness owner retains the hash-bound w6-git-github-automation-20261011 input packet with all named inputs below; for review-and-landing, #953 and #975 must also be landed.",
+        "required_inputs": [
+          "#953 and #975 land for the review-and-landing replay",
+          "Archived W1 defective-head/oracle packet and P2 labeled case packet are retained with immutable hashes",
+          "Exact runtime pins, primary source and native acceptance boundaries are captured"
+        ],
+        "met_at_closeout": false
+      },
+      "terminal_state_ref": "docs/decisions/w6-practice-closeout-20261011/terminal-states.json#/layers/0"
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "quality-evaluation",
+      "verdict_ref": "catalogs/landscape/foundation.json#/layers/10",
+      "wave_ref": "catalogs/sota-convergence/layer-verdict-waves.json#/waves/0",
+      "verdict_detail_ref": "catalogs/sota-convergence/layer-verdicts-20260922.json#/catalogs/foundation/12",
+      "verdict_status": "recorded",
+      "prior_winners": [
+        {
+          "component_id": "promptfoo",
+          "repository": "https://github.com/promptfoo/promptfoo",
+          "pin": "0.123.1",
+          "evidence_class": "local_integration"
+        },
+        {
+          "component_id": "playwright-test",
+          "repository": "https://github.com/microsoft/playwright",
+          "pin": "1.63.0",
+          "evidence_class": "local_integration"
+        }
+      ],
+      "latest_sweep": {
+        "id": "landscape-sweep-20260929",
+        "manifest_ref": "catalogs/sota-convergence/manifest-20260929.json",
+        "returns_ref": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+        "ledger_ref": "catalogs/saturation/ledger.json#/sweeps/4/layers/10"
+      },
+      "reopen": [],
+      "retained_failure_ref": null,
+      "grand_catalog_slot_ref": "catalogs/landscape/grand-catalog-index-20261008.json#/slots/10",
+      "grand_inventory_memberships": 1437,
+      "survivor_count": 2,
+      "missing_vote_pending_count": 0,
+      "unresolved": [
+        {
+          "repository": "https://github.com/ukgovernmentbeis/inspect_ai",
+          "unresolved_kind": "survived",
+          "latest_sweep": "landscape-sweep-20260929",
+          "latest_vote_refs": {
+            "repo": "https://github.com/ukgovernmentbeis/inspect_ai",
+            "facts": {
+              "vote": "not_refuted",
+              "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/quality-evaluation/0/facts"
+            },
+            "fit": {
+              "vote": "not_refuted",
+              "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/quality-evaluation/0/fit"
+            },
+            "source_review": "evidence/artifacts/landscape-sweep-20260929/ukgovernmentbeis-inspect-ai.json"
+          },
+          "history": [
+            {
+              "sweep_id": "landscape-sweep-20260926",
+              "ledger_bucket": "survived",
+              "vote_refs": {
+                "repo": "https://github.com/ukgovernmentbeis/inspect_ai",
+                "facts": {
+                  "vote": "not_refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/quality-evaluation/0/facts"
+                },
+                "fit": {
+                  "vote": "not_refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/quality-evaluation/0/fit"
+                },
+                "source_review": "evidence/artifacts/landscape-sweep-20260926/ukgovernmentbeis-inspect-ai.json"
+              }
+            },
+            {
+              "sweep_id": "landscape-sweep-20260929",
+              "ledger_bucket": "survived",
+              "vote_refs": {
+                "repo": "https://github.com/ukgovernmentbeis/inspect_ai",
+                "facts": {
+                  "vote": "not_refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/quality-evaluation/0/facts"
+                },
+                "fit": {
+                  "vote": "not_refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/quality-evaluation/0/fit"
+                },
+                "source_review": "evidence/artifacts/landscape-sweep-20260929/ukgovernmentbeis-inspect-ai.json"
+              }
+            }
+          ],
+          "primary_source": {
+            "mirror": "UKGovernmentBEIS/inspect_ai",
+            "commit": "a1dbea8db3cc85e04ff532760d0eaaeb64df6d3a",
+            "ref": "HEAD"
+          },
+          "disposition": {
+            "action": "include_in_frozen_comparison",
+            "comparison_id": "w6-quality-evaluation-20261011"
+          }
+        },
+        {
+          "repository": "https://github.com/embeddings-benchmark/mteb",
+          "unresolved_kind": "survived",
+          "latest_sweep": "landscape-sweep-20260926",
+          "latest_vote_refs": {
+            "repo": "https://github.com/embeddings-benchmark/mteb",
+            "facts": {
+              "vote": "not_refuted",
+              "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/quality-evaluation/7/facts"
+            },
+            "fit": {
+              "vote": "not_refuted",
+              "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/quality-evaluation/7/fit"
+            },
+            "source_review": "evidence/artifacts/landscape-sweep-20260926/embeddings-benchmark-mteb.json"
+          },
+          "history": [
+            {
+              "sweep_id": "landscape-sweep-20260926",
+              "ledger_bucket": "survived",
+              "vote_refs": {
+                "repo": "https://github.com/embeddings-benchmark/mteb",
+                "facts": {
+                  "vote": "not_refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/quality-evaluation/7/facts"
+                },
+                "fit": {
+                  "vote": "not_refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/quality-evaluation/7/fit"
+                },
+                "source_review": "evidence/artifacts/landscape-sweep-20260926/embeddings-benchmark-mteb.json"
+              }
+            }
+          ],
+          "primary_source": {
+            "mirror": null,
+            "gap": "Central mirror and current source pin not registered; recover only this retained candidate source."
+          },
+          "disposition": {
+            "action": "include_in_frozen_comparison",
+            "comparison_id": "w6-quality-evaluation-20261011"
+          }
+        }
+      ],
+      "terminal_state": "SCHEDULED",
+      "terminal_readiness_trigger": {
+        "event": "The existing native harness owner retains the hash-bound w6-quality-evaluation-20261011 input packet with all named inputs below; for review-and-landing, #953 and #975 must also be landed.",
+        "required_inputs": [
+          "60-case advice packet has an independent label seal and immutable case hash",
+          "MTEB retained source and matching embedding-evaluation case packet are recovered",
+          "Upstream install/test paths at the selected source pins are available"
+        ],
+        "met_at_closeout": false
+      },
+      "terminal_state_ref": "docs/decisions/w6-practice-closeout-20261011/terminal-states.json#/layers/3"
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "instructions-skills",
+      "verdict_ref": "catalogs/landscape/foundation.json#/layers/1",
+      "wave_ref": "catalogs/sota-convergence/layer-verdict-waves.json#/waves/0",
+      "verdict_detail_ref": "catalogs/sota-convergence/layer-verdicts-20260922.json#/catalogs/foundation/7",
+      "verdict_status": "recorded",
+      "prior_winners": [
+        {
+          "component_id": "affaan-m/ECC",
+          "repository": "https://github.com/affaan-m/ECC",
+          "pin": "dd6ee538aee0f548d4a6b520118f875431fd749e",
+          "evidence_class": "local_integration"
+        },
+        {
+          "component_id": "candidate:typesafe-ai-skills",
+          "repository": "https://github.com/typesafe-ai/skills",
+          "pin": "unpinned",
+          "evidence_class": "local_integration"
+        },
+        {
+          "component_id": "candidate:openai-skills",
+          "repository": "https://github.com/openai/skills",
+          "pin": "unpinned",
+          "evidence_class": "local_integration"
+        }
+      ],
+      "latest_sweep": {
+        "id": "landscape-sweep-20260929",
+        "manifest_ref": "catalogs/sota-convergence/manifest-20260929.json",
+        "returns_ref": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+        "ledger_ref": "catalogs/saturation/ledger.json#/sweeps/4/layers/1"
+      },
+      "reopen": [
+        {
+          "trigger": "pin_moved",
+          "ref": "receipt_staleness:linux-wsl2-x86_64/ai-memory"
+        },
+        {
+          "trigger": "pin_moved",
+          "ref": "receipt_staleness:linux-wsl2-x86_64/codex"
+        },
+        {
+          "trigger": "pin_moved",
+          "ref": "receipt_staleness:macos-arm64/ai-memory"
+        },
+        {
+          "trigger": "pin_moved",
+          "ref": "receipt_staleness:macos-arm64/claude-code"
+        },
+        {
+          "trigger": "pin_moved",
+          "ref": "receipt_staleness:macos-arm64/codex"
+        }
+      ],
+      "retained_failure_ref": null,
+      "grand_catalog_slot_ref": "catalogs/landscape/grand-catalog-index-20261008.json#/slots/1",
+      "grand_inventory_memberships": 580,
+      "survivor_count": 1,
+      "missing_vote_pending_count": 0,
+      "unresolved": [
+        {
+          "repository": "https://github.com/mattpocock/skills",
+          "unresolved_kind": "survived",
+          "latest_sweep": "landscape-sweep-20260929",
+          "latest_vote_refs": {
+            "repo": "https://github.com/mattpocock/skills",
+            "facts": {
+              "vote": "not_refuted",
+              "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/instructions-skills/2/facts"
+            },
+            "fit": {
+              "vote": "not_refuted",
+              "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/instructions-skills/2/fit"
+            },
+            "source_review": "evidence/artifacts/landscape-sweep-20260929/mattpocock-skills.json"
+          },
+          "history": [
+            {
+              "sweep_id": "landscape-sweep-20260926",
+              "ledger_bucket": "refuted",
+              "vote_refs": {
+                "repo": "https://github.com/mattpocock/skills",
+                "facts": {
+                  "vote": "not_refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/instructions-skills/0/facts"
+                },
+                "fit": {
+                  "vote": "refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/instructions-skills/0/fit"
+                }
+              }
+            },
+            {
+              "sweep_id": "landscape-sweep-20260929",
+              "ledger_bucket": "survived",
+              "vote_refs": {
+                "repo": "https://github.com/mattpocock/skills",
+                "facts": {
+                  "vote": "not_refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/instructions-skills/2/facts"
+                },
+                "fit": {
+                  "vote": "not_refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/instructions-skills/2/fit"
+                },
+                "source_review": "evidence/artifacts/landscape-sweep-20260929/mattpocock-skills.json"
+              }
+            }
+          ],
+          "primary_source": {
+            "mirror": null,
+            "gap": "Central mirror and current source pin not registered; recover only this retained candidate source."
+          },
+          "disposition": {
+            "action": "include_in_frozen_comparison",
+            "comparison_id": "w6-instructions-skills-20261011"
+          }
+        }
+      ],
+      "terminal_state": "SCHEDULED",
+      "terminal_readiness_trigger": {
+        "event": "The existing native harness owner retains the hash-bound w6-instructions-skills-20261011 input packet with all named inputs below; for review-and-landing, #953 and #975 must also be landed.",
+        "required_inputs": [
+          "Selected-file source pin/digests and owner trial task/oracle seals are retained",
+          "cc-native-practice and co-op provide client-specific row/launcher qualification receipts",
+          "The moved client/memory pins are reconciled through owning receipt paths"
+        ],
+        "met_at_closeout": false
+      },
+      "terminal_state_ref": "docs/decisions/w6-practice-closeout-20261011/terminal-states.json#/layers/1"
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "token-efficiency",
+      "verdict_ref": "catalogs/landscape/foundation.json#/layers/9",
+      "wave_ref": "catalogs/sota-convergence/layer-verdict-waves.json#/waves/0",
+      "verdict_detail_ref": "catalogs/sota-convergence/layer-verdicts-20260922.json#/catalogs/foundation/17",
+      "verdict_status": "recorded",
+      "prior_winners": [
+        {
+          "component_id": "rtk",
+          "repository": "https://github.com/rtk-ai/rtk",
+          "pin": "0.49.0",
+          "evidence_class": "synthetic"
+        },
+        {
+          "component_id": "headroom",
+          "repository": "https://github.com/headroomlabs-ai/headroom",
+          "pin": "0.37.0",
+          "evidence_class": "synthetic"
+        },
+        {
+          "component_id": "ccusage",
+          "repository": "https://github.com/ccusage/ccusage",
+          "pin": "20.0.24",
+          "evidence_class": "synthetic"
+        }
+      ],
+      "latest_sweep": {
+        "id": "landscape-sweep-20260929",
+        "manifest_ref": "catalogs/sota-convergence/manifest-20260929.json",
+        "returns_ref": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+        "ledger_ref": "catalogs/saturation/ledger.json#/sweeps/4/layers/9"
+      },
+      "reopen": [
+        {
+          "trigger": "retained_failure",
+          "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/failures/token-efficiency"
+        }
+      ],
+      "retained_failure_ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/failures/token-efficiency",
+      "grand_catalog_slot_ref": "catalogs/landscape/grand-catalog-index-20261008.json#/slots/9",
+      "grand_inventory_memberships": 1175,
+      "survivor_count": 3,
+      "missing_vote_pending_count": 2,
+      "unresolved": [
+        {
+          "repository": "https://github.com/ojuschugh1/sqz",
+          "unresolved_kind": "survived",
+          "latest_sweep": "landscape-sweep-20260929",
+          "latest_vote_refs": {
+            "repo": "https://github.com/ojuschugh1/sqz",
+            "facts": {
+              "vote": "not_refuted",
+              "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/token-efficiency/1/facts"
+            },
+            "fit": {
+              "vote": "not_refuted",
+              "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/token-efficiency/1/fit"
+            },
+            "source_review": "evidence/artifacts/landscape-sweep-20260929/ojuschugh1-sqz.json"
+          },
+          "history": [
+            {
+              "sweep_id": "landscape-sweep-20260929",
+              "ledger_bucket": "survived",
+              "vote_refs": {
+                "repo": "https://github.com/ojuschugh1/sqz",
+                "facts": {
+                  "vote": "not_refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/token-efficiency/1/facts"
+                },
+                "fit": {
+                  "vote": "not_refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/token-efficiency/1/fit"
+                },
+                "source_review": "evidence/artifacts/landscape-sweep-20260929/ojuschugh1-sqz.json"
+              }
+            }
+          ],
+          "primary_source": {
+            "mirror": null,
+            "gap": "Central mirror and current source pin not registered; recover only this retained candidate source."
+          },
+          "disposition": {
+            "action": "include_in_frozen_comparison",
+            "comparison_id": "w6-token-efficiency-20261011"
+          }
+        },
+        {
+          "repository": "https://github.com/paritok-official/paritok-4b-v1",
+          "unresolved_kind": "survived",
+          "latest_sweep": "landscape-sweep-20260929",
+          "latest_vote_refs": {
+            "repo": "https://github.com/paritok-official/paritok-4b-v1",
+            "facts": {
+              "vote": "not_refuted",
+              "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/token-efficiency/4/facts"
+            },
+            "fit": {
+              "vote": "not_refuted",
+              "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/token-efficiency/4/fit"
+            },
+            "source_review": "evidence/artifacts/landscape-sweep-20260929/paritok-official-paritok-4b-v1.json"
+          },
+          "history": [
+            {
+              "sweep_id": "landscape-sweep-20260929",
+              "ledger_bucket": "survived",
+              "vote_refs": {
+                "repo": "https://github.com/paritok-official/paritok-4b-v1",
+                "facts": {
+                  "vote": "not_refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/token-efficiency/4/facts"
+                },
+                "fit": {
+                  "vote": "not_refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/token-efficiency/4/fit"
+                },
+                "source_review": "evidence/artifacts/landscape-sweep-20260929/paritok-official-paritok-4b-v1.json"
+              }
+            }
+          ],
+          "primary_source": {
+            "mirror": null,
+            "gap": "Central mirror and current source pin not registered; recover only this retained candidate source."
+          },
+          "disposition": {
+            "action": "include_in_frozen_comparison",
+            "comparison_id": "w6-token-efficiency-20261011"
+          }
+        },
+        {
+          "repository": "https://github.com/lockedinlabs-ai/agent-console",
+          "unresolved_kind": "survived",
+          "latest_sweep": "landscape-sweep-20260929",
+          "latest_vote_refs": {
+            "repo": "https://github.com/lockedinlabs-ai/agent-console",
+            "facts": {
+              "vote": "not_refuted",
+              "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/token-efficiency/5/facts"
+            },
+            "fit": {
+              "vote": "not_refuted",
+              "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/token-efficiency/5/fit"
+            },
+            "source_review": "evidence/artifacts/landscape-sweep-20260929/lockedinlabs-ai-agent-console.json"
+          },
+          "history": [
+            {
+              "sweep_id": "landscape-sweep-20260929",
+              "ledger_bucket": "survived",
+              "vote_refs": {
+                "repo": "https://github.com/lockedinlabs-ai/agent-console",
+                "facts": {
+                  "vote": "not_refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/token-efficiency/5/facts"
+                },
+                "fit": {
+                  "vote": "not_refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/token-efficiency/5/fit"
+                },
+                "source_review": "evidence/artifacts/landscape-sweep-20260929/lockedinlabs-ai-agent-console.json"
+              }
+            }
+          ],
+          "primary_source": {
+            "mirror": null,
+            "gap": "Central mirror and current source pin not registered; recover only this retained candidate source."
+          },
+          "disposition": {
+            "action": "include_in_frozen_comparison",
+            "comparison_id": "w6-token-efficiency-20261011"
+          }
+        },
+        {
+          "repository": "https://github.com/atlassian-labs/mcp-compressor",
+          "unresolved_kind": "missing_vote_only",
+          "latest_sweep": "landscape-sweep-20260929",
+          "latest_vote_refs": {
+            "repo": "https://github.com/atlassian-labs/mcp-compressor",
+            "source_review": null,
+            "fit_ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/token-efficiency/8/fit"
+          },
+          "history": [
+            {
+              "sweep_id": "landscape-sweep-20260929",
+              "ledger_bucket": "refuted",
+              "vote_refs": {
+                "repo": "https://github.com/atlassian-labs/mcp-compressor",
+                "facts": {
+                  "vote": "not_refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/token-efficiency/8/facts"
+                },
+                "fit": {
+                  "vote": "refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/token-efficiency/8/fit"
+                }
+              }
+            }
+          ],
+          "primary_source": {
+            "mirror": null,
+            "gap": "Central mirror and current source pin not registered; recover only this retained candidate source."
+          },
+          "disposition": {
+            "action": "include_in_frozen_comparison",
+            "comparison_id": "w6-token-efficiency-20261011"
+          }
+        },
+        {
+          "repository": "https://github.com/klavis-ai/klavis",
+          "unresolved_kind": "missing_vote_only",
+          "latest_sweep": "landscape-sweep-20260929",
+          "latest_vote_refs": {
+            "repo": "https://github.com/klavis-ai/klavis",
+            "source_review": null,
+            "fit_ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/token-efficiency/9/fit"
+          },
+          "history": [
+            {
+              "sweep_id": "landscape-sweep-20260929",
+              "ledger_bucket": "refuted",
+              "vote_refs": {
+                "repo": "https://github.com/klavis-ai/klavis",
+                "facts": {
+                  "vote": "not_refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/token-efficiency/9/facts"
+                },
+                "fit": {
+                  "vote": "refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/token-efficiency/9/fit"
+                }
+              }
+            }
+          ],
+          "primary_source": {
+            "mirror": null,
+            "gap": "Central mirror and current source pin not registered; recover only this retained candidate source."
+          },
+          "disposition": {
+            "action": "include_in_frozen_comparison",
+            "comparison_id": "w6-token-efficiency-20261011"
+          }
+        }
+      ],
+      "terminal_state": "SCHEDULED",
+      "terminal_readiness_trigger": {
+        "event": "The existing native harness owner retains the hash-bound w6-token-efficiency-20261011 input packet with all named inputs below; for review-and-landing, #953 and #975 must also be landed.",
+        "required_inputs": [
+          "All five retained candidate primary sources and immutable pins are recovered",
+          "Matched-task input/oracle and original-context packet is sealed by its existing evidence owner",
+          "Existing usage path captures complete provider totals and retained failures"
+        ],
+        "met_at_closeout": false
+      },
+      "terminal_state_ref": "docs/decisions/w6-practice-closeout-20261011/terminal-states.json#/layers/6"
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "observation-inference",
+      "verdict_ref": "catalogs/landscape/foundation.json#/layers/15",
+      "wave_ref": "catalogs/sota-convergence/layer-verdict-waves.json#/waves/0",
+      "verdict_detail_ref": "catalogs/sota-convergence/layer-verdicts-20260922.json#/catalogs/foundation/11",
+      "verdict_status": "recorded",
+      "prior_winners": [
+        {
+          "component_id": "opentelemetry-collector-contrib",
+          "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+          "pin": "0.161.0",
+          "evidence_class": "synthetic"
+        },
+        {
+          "component_id": "prometheus",
+          "repository": "https://github.com/prometheus/prometheus",
+          "pin": "3.14.0",
+          "evidence_class": "synthetic"
+        },
+        {
+          "component_id": "loki",
+          "repository": "https://github.com/grafana/loki",
+          "pin": "3.7.8",
+          "evidence_class": "synthetic"
+        }
+      ],
+      "latest_sweep": {
+        "id": "landscape-sweep-20260929",
+        "manifest_ref": "catalogs/sota-convergence/manifest-20260929.json",
+        "returns_ref": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+        "ledger_ref": "catalogs/saturation/ledger.json#/sweeps/4/layers/15"
+      },
+      "reopen": [
+        {
+          "trigger": "retained_failure",
+          "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/failures/observation-inference"
+        },
+        {
+          "trigger": "pin_moved",
+          "ref": "receipt_staleness:linux-wsl2-x86_64/llama-cpp"
+        },
+        {
+          "trigger": "pin_moved",
+          "ref": "receipt_staleness:linux-wsl2-x86_64/vllm"
+        },
+        {
+          "trigger": "pin_moved",
+          "ref": "receipt_staleness:macos-arm64/claude-code"
+        }
+      ],
+      "retained_failure_ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/failures/observation-inference",
+      "grand_catalog_slot_ref": "catalogs/landscape/grand-catalog-index-20261008.json#/slots/15",
+      "grand_inventory_memberships": 1302,
+      "survivor_count": 4,
+      "missing_vote_pending_count": 2,
+      "unresolved": [
+        {
+          "repository": "https://github.com/traceloop/openllmetry",
+          "unresolved_kind": "survived",
+          "latest_sweep": "landscape-sweep-20260926",
+          "latest_vote_refs": {
+            "repo": "https://github.com/traceloop/openllmetry",
+            "facts": {
+              "vote": "not_refuted",
+              "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/observation-inference/2/facts"
+            },
+            "fit": {
+              "vote": "not_refuted",
+              "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/observation-inference/2/fit"
+            },
+            "source_review": "evidence/artifacts/landscape-sweep-20260926/traceloop-openllmetry.json"
+          },
+          "history": [
+            {
+              "sweep_id": "landscape-sweep-20260926",
+              "ledger_bucket": "survived",
+              "vote_refs": {
+                "repo": "https://github.com/traceloop/openllmetry",
+                "facts": {
+                  "vote": "not_refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/observation-inference/2/facts"
+                },
+                "fit": {
+                  "vote": "not_refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/observation-inference/2/fit"
+                },
+                "source_review": "evidence/artifacts/landscape-sweep-20260926/traceloop-openllmetry.json"
+              }
+            }
+          ],
+          "primary_source": {
+            "mirror": null,
+            "gap": "Central mirror and current source pin not registered; recover only this retained candidate source."
+          },
+          "disposition": {
+            "action": "include_in_frozen_comparison",
+            "comparison_id": "w6-observation-inference-20261011"
+          }
+        },
+        {
+          "repository": "https://github.com/ollama/ollama",
+          "unresolved_kind": "survived",
+          "latest_sweep": "landscape-sweep-20260926",
+          "latest_vote_refs": {
+            "repo": "https://github.com/ollama/ollama",
+            "facts": {
+              "vote": "not_refuted",
+              "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/observation-inference/6/facts"
+            },
+            "fit": {
+              "vote": "not_refuted",
+              "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/observation-inference/6/fit"
+            },
+            "source_review": "evidence/artifacts/landscape-sweep-20260926/ollama-ollama.json"
+          },
+          "history": [
+            {
+              "sweep_id": "landscape-sweep-20260926",
+              "ledger_bucket": "survived",
+              "vote_refs": {
+                "repo": "https://github.com/ollama/ollama",
+                "facts": {
+                  "vote": "not_refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/observation-inference/6/facts"
+                },
+                "fit": {
+                  "vote": "not_refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/observation-inference/6/fit"
+                },
+                "source_review": "evidence/artifacts/landscape-sweep-20260926/ollama-ollama.json"
+              }
+            }
+          ],
+          "primary_source": {
+            "mirror": "ollama/ollama",
+            "commit": "eab97e9f92b9a25c2d52d2cc6c1b1c99bd9fae21",
+            "ref": "eab97e9f92b9a25c2d52d2cc6c1b1c99bd9fae21",
+            "source_check_ref": "docs/decisions/w6-practice-closeout-20261011/ollama-source-recovery-20261011.json"
+          },
+          "disposition": {
+            "action": "include_in_frozen_comparison",
+            "comparison_id": "w6-observation-inference-20261011"
+          }
+        },
+        {
+          "repository": "https://github.com/utkuozdemir/nvidia_gpu_exporter",
+          "unresolved_kind": "survived",
+          "latest_sweep": "landscape-sweep-20260926",
+          "latest_vote_refs": {
+            "repo": "https://github.com/utkuozdemir/nvidia_gpu_exporter",
+            "facts": {
+              "vote": "not_refuted",
+              "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/observation-inference/8/facts"
+            },
+            "fit": {
+              "vote": "not_refuted",
+              "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/observation-inference/8/fit"
+            },
+            "source_review": "evidence/artifacts/landscape-sweep-20260926/utkuozdemir-nvidia-gpu-exporter.json"
+          },
+          "history": [
+            {
+              "sweep_id": "landscape-sweep-20260926",
+              "ledger_bucket": "survived",
+              "vote_refs": {
+                "repo": "https://github.com/utkuozdemir/nvidia_gpu_exporter",
+                "facts": {
+                  "vote": "not_refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/observation-inference/8/facts"
+                },
+                "fit": {
+                  "vote": "not_refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/observation-inference/8/fit"
+                },
+                "source_review": "evidence/artifacts/landscape-sweep-20260926/utkuozdemir-nvidia-gpu-exporter.json"
+              }
+            }
+          ],
+          "primary_source": {
+            "mirror": null,
+            "gap": "Central mirror and current source pin not registered; recover only this retained candidate source."
+          },
+          "disposition": {
+            "action": "include_in_frozen_comparison",
+            "comparison_id": "w6-observation-inference-20261011"
+          }
+        },
+        {
+          "repository": "https://github.com/nvidia/dcgm-exporter",
+          "unresolved_kind": "survived",
+          "latest_sweep": "landscape-sweep-20260926",
+          "latest_vote_refs": {
+            "repo": "https://github.com/nvidia/dcgm-exporter",
+            "facts": {
+              "vote": "not_refuted",
+              "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/observation-inference/10/facts"
+            },
+            "fit": {
+              "vote": "not_refuted",
+              "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/observation-inference/10/fit"
+            },
+            "source_review": "evidence/artifacts/landscape-sweep-20260926/nvidia-dcgm-exporter.json"
+          },
+          "history": [
+            {
+              "sweep_id": "landscape-sweep-20260926",
+              "ledger_bucket": "survived",
+              "vote_refs": {
+                "repo": "https://github.com/nvidia/dcgm-exporter",
+                "facts": {
+                  "vote": "not_refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/observation-inference/10/facts"
+                },
+                "fit": {
+                  "vote": "not_refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/observation-inference/10/fit"
+                },
+                "source_review": "evidence/artifacts/landscape-sweep-20260926/nvidia-dcgm-exporter.json"
+              }
+            }
+          ],
+          "primary_source": {
+            "mirror": null,
+            "gap": "Central mirror and current source pin not registered; recover only this retained candidate source."
+          },
+          "disposition": {
+            "action": "include_in_frozen_comparison",
+            "comparison_id": "w6-observation-inference-20261011"
+          }
+        },
+        {
+          "repository": "https://github.com/ml-explore/mlx-lm",
+          "unresolved_kind": "missing_vote_only",
+          "latest_sweep": "landscape-sweep-20260929",
+          "latest_vote_refs": {
+            "repo": "https://github.com/ml-explore/mlx-lm",
+            "source_review": null,
+            "fit_ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/observation-inference/8/fit"
+          },
+          "history": [
+            {
+              "sweep_id": "landscape-sweep-20260929",
+              "ledger_bucket": "refuted",
+              "vote_refs": {
+                "repo": "https://github.com/ml-explore/mlx-lm",
+                "facts": {
+                  "vote": "not_refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/observation-inference/8/facts"
+                },
+                "fit": {
+                  "vote": "refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/observation-inference/8/fit"
+                }
+              }
+            }
+          ],
+          "primary_source": {
+            "mirror": null,
+            "gap": "Central mirror and current source pin not registered; recover only this retained candidate source."
+          },
+          "disposition": {
+            "action": "include_in_frozen_comparison",
+            "comparison_id": "w6-observation-inference-20261011"
+          }
+        },
+        {
+          "repository": "https://github.com/mostlygeek/llama-swap",
+          "unresolved_kind": "missing_vote_only",
+          "latest_sweep": "landscape-sweep-20260929",
+          "latest_vote_refs": {
+            "repo": "https://github.com/mostlygeek/llama-swap",
+            "source_review": null,
+            "fit_ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/observation-inference/11/fit"
+          },
+          "history": [
+            {
+              "sweep_id": "landscape-sweep-20260929",
+              "ledger_bucket": "refuted",
+              "vote_refs": {
+                "repo": "https://github.com/mostlygeek/llama-swap",
+                "facts": {
+                  "vote": "not_refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/observation-inference/11/facts"
+                },
+                "fit": {
+                  "vote": "refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/observation-inference/11/fit"
+                }
+              }
+            }
+          ],
+          "primary_source": {
+            "mirror": null,
+            "gap": "Central mirror and current source pin not registered; recover only this retained candidate source."
+          },
+          "disposition": {
+            "action": "include_in_frozen_comparison",
+            "comparison_id": "w6-observation-inference-20261011"
+          }
+        }
+      ],
+      "terminal_state": "SCHEDULED",
+      "terminal_readiness_trigger": {
+        "event": "The existing native harness owner retains the hash-bound w6-observation-inference-20261011 input packet with all named inputs below; for review-and-landing, #953 and #975 must also be landed.",
+        "required_inputs": [
+          "All six retained candidate primary sources and exact pins are recovered",
+          "Native task/counter and inference task/model/hardware case seals are retained",
+          "Existing inference account/hardware and Monday paper execution gates permit the scoped run"
+        ],
+        "met_at_closeout": false
+      },
+      "terminal_state_ref": "docs/decisions/w6-practice-closeout-20261011/terminal-states.json#/layers/2"
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "scheduling-supervision",
+      "verdict_ref": "catalogs/landscape/foundation.json#/layers/12",
+      "wave_ref": "catalogs/sota-convergence/layer-verdict-waves.json#/waves/0",
+      "verdict_detail_ref": "catalogs/sota-convergence/layer-verdicts-20260922.json#/catalogs/foundation/14",
+      "verdict_status": "recorded",
+      "prior_winners": [
+        {
+          "component_id": "dagu",
+          "repository": "https://github.com/dagucloud/dagu",
+          "pin": "2.16.6",
+          "evidence_class": "local_integration"
+        },
+        {
+          "component_id": "systemd",
+          "repository": "https://github.com/systemd/systemd",
+          "pin": "255.4-1ubuntu8.17",
+          "evidence_class": "local_integration"
+        }
+      ],
+      "latest_sweep": {
+        "id": "landscape-sweep-20260929",
+        "manifest_ref": "catalogs/sota-convergence/manifest-20260929.json",
+        "returns_ref": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+        "ledger_ref": "catalogs/saturation/ledger.json#/sweeps/4/layers/12"
+      },
+      "reopen": [
+        {
+          "trigger": "pin_moved",
+          "ref": "receipt_staleness:linux-wsl2-x86_64/codex"
+        },
+        {
+          "trigger": "pin_moved",
+          "ref": "receipt_staleness:macos-arm64/claude-code"
+        },
+        {
+          "trigger": "pin_moved",
+          "ref": "receipt_staleness:macos-arm64/codex"
+        }
+      ],
+      "retained_failure_ref": null,
+      "grand_catalog_slot_ref": "catalogs/landscape/grand-catalog-index-20261008.json#/slots/12",
+      "grand_inventory_memberships": 742,
+      "survivor_count": 4,
+      "missing_vote_pending_count": 0,
+      "unresolved": [
+        {
+          "repository": "https://github.com/dagucloud/dagu",
+          "unresolved_kind": "survived",
+          "latest_sweep": "landscape-sweep-20260929",
+          "latest_vote_refs": {
+            "repo": "https://github.com/dagucloud/dagu",
+            "facts": {
+              "vote": "not_refuted",
+              "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/scheduling-supervision/0/facts"
+            },
+            "fit": {
+              "vote": "not_refuted",
+              "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/scheduling-supervision/0/fit"
+            },
+            "source_review": "evidence/artifacts/landscape-sweep-20260929/dagucloud-dagu.json"
+          },
+          "history": [
+            {
+              "sweep_id": "landscape-sweep-20260926",
+              "ledger_bucket": "survived",
+              "vote_refs": {
+                "repo": "https://github.com/dagucloud/dagu",
+                "facts": {
+                  "vote": "not_refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/scheduling-supervision/3/facts"
+                },
+                "fit": {
+                  "vote": "not_refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/scheduling-supervision/3/fit"
+                },
+                "source_review": "evidence/artifacts/landscape-sweep-20260926/dagucloud-dagu.json"
+              }
+            },
+            {
+              "sweep_id": "landscape-sweep-20260929",
+              "ledger_bucket": "survived",
+              "vote_refs": {
+                "repo": "https://github.com/dagucloud/dagu",
+                "facts": {
+                  "vote": "not_refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/scheduling-supervision/0/facts"
+                },
+                "fit": {
+                  "vote": "not_refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/scheduling-supervision/0/fit"
+                },
+                "source_review": "evidence/artifacts/landscape-sweep-20260929/dagucloud-dagu.json"
+              }
+            }
+          ],
+          "primary_source": {
+            "mirror": "dagucloud/dagu",
+            "commit": "58fed633d58c1dd1319091fdb2c2f6158ecfa053",
+            "ref": "v2.16.6"
+          },
+          "disposition": {
+            "action": "include_in_frozen_comparison",
+            "comparison_id": "w6-scheduling-supervision-20261011"
+          }
+        },
+        {
+          "repository": "https://github.com/microsoft/pg_durable",
+          "unresolved_kind": "survived",
+          "latest_sweep": "landscape-sweep-20260929",
+          "latest_vote_refs": {
+            "repo": "https://github.com/microsoft/pg_durable",
+            "facts": {
+              "vote": "not_refuted",
+              "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/scheduling-supervision/6/facts"
+            },
+            "fit": {
+              "vote": "not_refuted",
+              "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/scheduling-supervision/6/fit"
+            },
+            "source_review": "evidence/artifacts/landscape-sweep-20260929/microsoft-pg-durable.json"
+          },
+          "history": [
+            {
+              "sweep_id": "landscape-sweep-20260926",
+              "ledger_bucket": "survived",
+              "vote_refs": {
+                "repo": "https://github.com/microsoft/pg_durable",
+                "facts": {
+                  "vote": "not_refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/scheduling-supervision/6/facts"
+                },
+                "fit": {
+                  "vote": "not_refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/scheduling-supervision/6/fit"
+                },
+                "source_review": "evidence/artifacts/landscape-sweep-20260926/microsoft-pg-durable.json"
+              }
+            },
+            {
+              "sweep_id": "landscape-sweep-20260929",
+              "ledger_bucket": "survived",
+              "vote_refs": {
+                "repo": "https://github.com/microsoft/pg_durable",
+                "facts": {
+                  "vote": "not_refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/scheduling-supervision/6/facts"
+                },
+                "fit": {
+                  "vote": "not_refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/scheduling-supervision/6/fit"
+                },
+                "source_review": "evidence/artifacts/landscape-sweep-20260929/microsoft-pg-durable.json"
+              }
+            }
+          ],
+          "primary_source": {
+            "mirror": null,
+            "gap": "Central mirror and current source pin not registered; recover only this retained candidate source."
+          },
+          "disposition": {
+            "action": "include_in_frozen_comparison",
+            "comparison_id": "w6-scheduling-supervision-20261011"
+          }
+        },
+        {
+          "repository": "https://github.com/restatedev/restate",
+          "unresolved_kind": "survived",
+          "latest_sweep": "landscape-sweep-20260929",
+          "latest_vote_refs": {
+            "repo": "https://github.com/restatedev/restate",
+            "facts": {
+              "vote": "not_refuted",
+              "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/scheduling-supervision/4/facts"
+            },
+            "fit": {
+              "vote": "not_refuted",
+              "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/scheduling-supervision/4/fit"
+            },
+            "source_review": "evidence/artifacts/landscape-sweep-20260929/restatedev-restate.json"
+          },
+          "history": [
+            {
+              "sweep_id": "landscape-sweep-20260926",
+              "ledger_bucket": "refuted",
+              "vote_refs": {
+                "repo": "https://github.com/restatedev/restate",
+                "facts": {
+                  "vote": "not_refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/scheduling-supervision/2/facts"
+                },
+                "fit": {
+                  "vote": "refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/scheduling-supervision/2/fit"
+                }
+              }
+            },
+            {
+              "sweep_id": "landscape-sweep-20260929",
+              "ledger_bucket": "survived",
+              "vote_refs": {
+                "repo": "https://github.com/restatedev/restate",
+                "facts": {
+                  "vote": "not_refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/scheduling-supervision/4/facts"
+                },
+                "fit": {
+                  "vote": "not_refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/scheduling-supervision/4/fit"
+                },
+                "source_review": "evidence/artifacts/landscape-sweep-20260929/restatedev-restate.json"
+              }
+            }
+          ],
+          "primary_source": {
+            "mirror": null,
+            "gap": "Central mirror and current source pin not registered; recover only this retained candidate source."
+          },
+          "disposition": {
+            "action": "include_in_frozen_comparison",
+            "comparison_id": "w6-scheduling-supervision-20261011"
+          }
+        },
+        {
+          "repository": "https://github.com/conductor-oss/conductor",
+          "unresolved_kind": "survived",
+          "latest_sweep": "landscape-sweep-20260929",
+          "latest_vote_refs": {
+            "repo": "https://github.com/conductor-oss/conductor",
+            "facts": {
+              "vote": "not_refuted",
+              "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/scheduling-supervision/5/facts"
+            },
+            "fit": {
+              "vote": "not_refuted",
+              "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/scheduling-supervision/5/fit"
+            },
+            "source_review": "evidence/artifacts/landscape-sweep-20260929/conductor-oss-conductor.json"
+          },
+          "history": [
+            {
+              "sweep_id": "landscape-sweep-20260929",
+              "ledger_bucket": "survived",
+              "vote_refs": {
+                "repo": "https://github.com/conductor-oss/conductor",
+                "facts": {
+                  "vote": "not_refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/scheduling-supervision/5/facts"
+                },
+                "fit": {
+                  "vote": "not_refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/scheduling-supervision/5/fit"
+                },
+                "source_review": "evidence/artifacts/landscape-sweep-20260929/conductor-oss-conductor.json"
+              }
+            }
+          ],
+          "primary_source": {
+            "mirror": null,
+            "gap": "Central mirror and current source pin not registered; recover only this retained candidate source."
+          },
+          "disposition": {
+            "action": "include_in_frozen_comparison",
+            "comparison_id": "w6-scheduling-supervision-20261011"
+          }
+        }
+      ],
+      "terminal_state": "SCHEDULED",
+      "terminal_readiness_trigger": {
+        "event": "The existing native harness owner retains the hash-bound w6-scheduling-supervision-20261011 input packet with all named inputs below; for review-and-landing, #953 and #975 must also be landed.",
+        "required_inputs": [
+          "Three retained alternative source pins and upstream-supported test paths are recovered",
+          "Existing shared recovery workload and its input/oracle hashes are sealed for all arms",
+          "Owning runtime/client moved-pin receipts and execution capacity gate are satisfied"
+        ],
+        "met_at_closeout": false
+      },
+      "terminal_state_ref": "docs/decisions/w6-practice-closeout-20261011/terminal-states.json#/layers/5"
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "recovery-portability",
+      "verdict_ref": "catalogs/landscape/foundation.json#/layers/14",
+      "wave_ref": "catalogs/sota-convergence/layer-verdict-waves.json#/waves/0",
+      "verdict_detail_ref": "catalogs/sota-convergence/layer-verdicts-20260922.json#/catalogs/foundation/13",
+      "verdict_status": "recorded",
+      "prior_winners": [
+        {
+          "component_id": "restic",
+          "repository": "https://github.com/restic/restic",
+          "pin": "0.19.1",
+          "evidence_class": "synthetic"
+        },
+        {
+          "component_id": "candidate:astral-sh-uv",
+          "repository": "https://github.com/astral-sh/uv",
+          "pin": "unpinned",
+          "evidence_class": "synthetic"
+        }
+      ],
+      "latest_sweep": {
+        "id": "landscape-sweep-20260929",
+        "manifest_ref": "catalogs/sota-convergence/manifest-20260929.json",
+        "returns_ref": "evidence/artifacts/landscape-sweep-20260929/returns.json",
+        "ledger_ref": "catalogs/saturation/ledger.json#/sweeps/4/layers/14"
+      },
+      "reopen": [
+        {
+          "trigger": "retained_failure",
+          "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/failures/recovery-portability"
+        },
+        {
+          "trigger": "pin_moved",
+          "ref": "receipt_staleness:linux-wsl2-x86_64/ai-memory"
+        },
+        {
+          "trigger": "pin_moved",
+          "ref": "receipt_staleness:linux-wsl2-x86_64/codex"
+        },
+        {
+          "trigger": "pin_moved",
+          "ref": "receipt_staleness:macos-arm64/ai-memory"
+        },
+        {
+          "trigger": "pin_moved",
+          "ref": "receipt_staleness:macos-arm64/claude-code"
+        },
+        {
+          "trigger": "pin_moved",
+          "ref": "receipt_staleness:macos-arm64/codex"
+        }
+      ],
+      "retained_failure_ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/failures/recovery-portability",
+      "grand_catalog_slot_ref": "catalogs/landscape/grand-catalog-index-20261008.json#/slots/14",
+      "grand_inventory_memberships": 225,
+      "survivor_count": 0,
+      "missing_vote_pending_count": 1,
+      "unresolved": [
+        {
+          "repository": "https://github.com/microsoft/wsl",
+          "unresolved_kind": "missing_vote_only",
+          "latest_sweep": "landscape-sweep-20260929",
+          "latest_vote_refs": {
+            "repo": "https://github.com/microsoft/wsl",
+            "source_review": null,
+            "fit_ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/recovery-portability/12/fit"
+          },
+          "history": [
+            {
+              "sweep_id": "landscape-sweep-20260929",
+              "ledger_bucket": "refuted",
+              "vote_refs": {
+                "repo": "https://github.com/microsoft/wsl",
+                "facts": {
+                  "vote": "not_refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/recovery-portability/12/facts"
+                },
+                "fit": {
+                  "vote": "refuted",
+                  "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/votes/recovery-portability/12/fit"
+                }
+              }
+            }
+          ],
+          "primary_source": {
+            "mirror": null,
+            "gap": "Central mirror and current source pin not registered; recover only this retained candidate source."
+          },
+          "disposition": {
+            "action": "include_in_frozen_comparison",
+            "comparison_id": "w6-recovery-portability-20261011"
+          }
+        }
+      ],
+      "terminal_state": "SCHEDULED",
+      "terminal_readiness_trigger": {
+        "event": "The existing native harness owner retains the hash-bound w6-recovery-portability-20261011 input packet with all named inputs below; for review-and-landing, #953 and #975 must also be landed.",
+        "required_inputs": [
+          "WSL retained primary source and missing GPT-fit outcome are recovered or substantively adjudicated",
+          "The declared restoration profile and synthetic input/oracle seal are retained",
+          "A destination host and its normal native sign-ins exist before any genuine destination-host acceptance"
+        ],
+        "met_at_closeout": false
+      },
+      "terminal_state_ref": "docs/decisions/w6-practice-closeout-20261011/terminal-states.json#/layers/4"
+    }
+  ]
+}

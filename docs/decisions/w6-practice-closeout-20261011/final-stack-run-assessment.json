@@ -1,0 +1,875 @@
+{
+  "authority_commit": "c2dee173da1f792ffd9cce958dd2ca84f47e8c16",
+  "reader": "scripts.final_stack.Sources.json and scripts.final_stack.run_pin at the authority commit",
+  "source_sha256": "2dd68f39d3a0ab12894cf49343f49ff9e22c2fdef9a0d6d4e751ef88ef1f1eab",
+  "script_sha256": "82742dea85a9d2f9c7579a1069947975b4033265cf55f1e1baa232d10767a317",
+  "layers": [
+    {
+      "layer_id": "git-github-automation",
+      "generated_status": "reopened",
+      "verdict": {
+        "adjudication_ref": null,
+        "agreement": "same_winner",
+        "comparison_id": null,
+        "date": "2026-09-22",
+        "next_review": "2026-10-22",
+        "reopened_by": [
+          {
+            "date": "2026-09-23",
+            "sweep_id": "landscape-sweep-20260923"
+          },
+          {
+            "date": "2026-09-26",
+            "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
+          }
+        ],
+        "status": "recorded",
+        "wave": "20260922",
+        "wave_doc": {
+          "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
+          "sha256": "2fef6da7468a8e97a319fdc6f75f73374cd34b412bf93de90fd0c2a7504159de"
+        }
+      },
+      "research": {
+        "next_action": "Qualify gh CLI's own lifecycle evidence and a changed codex-for-claude review-bridge version before extending acceptance beyond worktrunk, gh and difftastic.",
+        "status": "on_requirement_change"
+      },
+      "open_gaps": 12,
+      "winners": [
+        {
+          "winner": {
+            "component_id": "worktrunk",
+            "evidence_class": "source_review",
+            "factors": [
+              {
+                "converged": false,
+                "host_e2e": "true",
+                "id": "worktrunk",
+                "pin_current": "true",
+                "verdict_winner": "true"
+              }
+            ],
+            "pin_drift": "differs",
+            "pin_parsed": {
+              "commit": null,
+              "version": "0.79.0"
+            },
+            "repository": "https://github.com/max-sixty/worktrunk",
+            "run": "worktrunk",
+            "run_reason": null,
+            "verdict_pin": "0.79.0"
+          },
+          "native_reader_run": {
+            "conflicts": [],
+            "id": "worktrunk",
+            "pin": "0.80.0",
+            "pin_parsed": {
+              "commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+              "version": "0.80.0"
+            },
+            "platforms": [],
+            "repository": "github.com/max-sixty/worktrunk",
+            "source": "manifests/stack.json#/components/35"
+          }
+        },
+        {
+          "winner": {
+            "component_id": "candidate:cli-cli",
+            "evidence_class": "source_review",
+            "factors": [],
+            "pin_drift": "unknown",
+            "pin_parse": "unpinned",
+            "repository": "https://github.com/cli/cli",
+            "run": "gh",
+            "run_reason": null,
+            "verdict_pin": "unpinned"
+          },
+          "native_reader_run": {
+            "conflicts": [],
+            "id": "gh",
+            "pin": "2.101.0",
+            "pin_parsed": {
+              "commit": null,
+              "version": "2.101.0"
+            },
+            "platforms": [
+              "linux-x86_64",
+              "macos-arm64"
+            ],
+            "repository": "github.com/cli/cli",
+            "source": "adoption/pins-linux-x86_64.json#/tools/2"
+          }
+        },
+        {
+          "winner": {
+            "component_id": "difftastic",
+            "evidence_class": "source_review",
+            "factors": [
+              {
+                "converged": false,
+                "host_e2e": "true",
+                "id": "difftastic",
+                "pin_current": "true",
+                "verdict_winner": "true"
+              }
+            ],
+            "pin_drift": "same",
+            "pin_parsed": {
+              "commit": null,
+              "version": "0.71.0"
+            },
+            "repository": "https://github.com/Wilfred/difftastic",
+            "run": "difftastic",
+            "run_reason": null,
+            "verdict_pin": "0.71.0"
+          },
+          "native_reader_run": {
+            "conflicts": [],
+            "id": "difftastic",
+            "pin": "0.71.0",
+            "pin_parsed": {
+              "commit": null,
+              "version": "0.71.0"
+            },
+            "platforms": [],
+            "repository": "github.com/wilfred/difftastic",
+            "source": "manifests/stack.json#/components/14"
+          }
+        }
+      ]
+    },
+    {
+      "layer_id": "instructions-skills",
+      "generated_status": "reopened",
+      "verdict": {
+        "adjudication_ref": "evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-instructions-skills-20260922.json",
+        "agreement": "disagree",
+        "comparison_id": null,
+        "date": "2026-09-22",
+        "next_review": "2026-10-22",
+        "reopened_by": [
+          {
+            "date": "2026-09-23",
+            "sweep_id": "landscape-sweep-20260923"
+          },
+          {
+            "date": "2026-09-26",
+            "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
+          }
+        ],
+        "status": "recorded",
+        "wave": "20260922",
+        "wave_doc": {
+          "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
+          "sha256": "2fef6da7468a8e97a319fdc6f75f73374cd34b412bf93de90fd0c2a7504159de"
+        }
+      },
+      "research": {
+        "next_action": "Use a selected pinned skill on its matching task; retain discovery, loaded sections, concrete findings and baseline conflict/effort before adding another pack.",
+        "status": "on_requirement_change"
+      },
+      "open_gaps": 12,
+      "winners": [
+        {
+          "winner": {
+            "component_id": "affaan-m/ECC",
+            "evidence_class": "local_integration",
+            "factors": [
+              {
+                "converged": false,
+                "host_e2e": "false",
+                "id": "affaan-m/ECC",
+                "pin_current": "unknown",
+                "verdict_winner": "true"
+              }
+            ],
+            "pin_drift": "same",
+            "pin_parsed": {
+              "commit": "dd6ee538aee0f548d4a6b520118f875431fd749e",
+              "version": null
+            },
+            "repository": "https://github.com/affaan-m/ECC",
+            "run": "affaan-m/ECC",
+            "run_reason": null,
+            "verdict_pin": "dd6ee538aee0f548d4a6b520118f875431fd749e"
+          },
+          "native_reader_run": {
+            "conflicts": [],
+            "id": "affaan-m/ECC",
+            "pin": "dd6ee538aee0f548d4a6b520118f875431fd749e",
+            "pin_parsed": {
+              "commit": "dd6ee538aee0f548d4a6b520118f875431fd749e",
+              "version": null
+            },
+            "platforms": [],
+            "repository": "github.com/affaan-m/ecc",
+            "source": "manifests/stack.json#/components/0"
+          }
+        },
+        {
+          "winner": {
+            "component_id": "candidate:typesafe-ai-skills",
+            "evidence_class": "local_integration",
+            "factors": [],
+            "pin_drift": null,
+            "pin_parse": "unpinned",
+            "repository": "https://github.com/typesafe-ai/skills",
+            "run": null,
+            "run_reason": "unpinned",
+            "verdict_pin": "unpinned"
+          },
+          "native_reader_run": null
+        },
+        {
+          "winner": {
+            "component_id": "candidate:openai-skills",
+            "evidence_class": "local_integration",
+            "factors": [],
+            "pin_drift": null,
+            "pin_parse": "unpinned",
+            "repository": "https://github.com/openai/skills",
+            "run": null,
+            "run_reason": "unpinned",
+            "verdict_pin": "unpinned"
+          },
+          "native_reader_run": null
+        }
+      ]
+    },
+    {
+      "layer_id": "observation-inference",
+      "generated_status": "reopened",
+      "verdict": {
+        "adjudication_ref": "evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-observation-inference-20260922.json",
+        "agreement": "disagree",
+        "comparison_id": null,
+        "date": "2026-09-22",
+        "next_review": "2026-10-22",
+        "reopened_by": [
+          {
+            "date": "2026-09-23",
+            "sweep_id": "landscape-sweep-20260923"
+          },
+          {
+            "date": "2026-09-26",
+            "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
+          }
+        ],
+        "status": "recorded",
+        "wave": "20260922",
+        "wave_doc": {
+          "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
+          "sha256": "2fef6da7468a8e97a319fdc6f75f73374cd34b412bf93de90fd0c2a7504159de"
+        }
+      },
+      "research": {
+        "next_action": "Reconcile one real task across native counters and telemetry; qualify any new model route on actual output, privacy, latency and recovery without duplicate capture.",
+        "status": "on_requirement_change"
+      },
+      "open_gaps": 11,
+      "winners": [
+        {
+          "winner": {
+            "component_id": "opentelemetry-collector-contrib",
+            "evidence_class": "synthetic",
+            "factors": [
+              {
+                "converged": false,
+                "host_e2e": "true",
+                "id": "opentelemetry-collector-contrib",
+                "pin_current": "true",
+                "verdict_winner": "true"
+              }
+            ],
+            "pin_drift": "differs",
+            "pin_parsed": {
+              "commit": null,
+              "version": "0.161.0"
+            },
+            "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+            "run": "opentelemetry-collector-contrib",
+            "run_reason": null,
+            "verdict_pin": "0.161.0"
+          },
+          "native_reader_run": {
+            "conflicts": [],
+            "id": "opentelemetry-collector-contrib",
+            "pin": "0.162.0",
+            "pin_parsed": {
+              "commit": null,
+              "version": "0.162.0"
+            },
+            "platforms": [],
+            "repository": "github.com/open-telemetry/opentelemetry-collector-contrib",
+            "source": "manifests/stack.json#/components/36"
+          }
+        },
+        {
+          "winner": {
+            "component_id": "prometheus",
+            "evidence_class": "synthetic",
+            "factors": [
+              {
+                "converged": false,
+                "host_e2e": "true",
+                "id": "prometheus",
+                "pin_current": "true",
+                "verdict_winner": "true"
+              }
+            ],
+            "pin_drift": "differs",
+            "pin_parsed": {
+              "commit": null,
+              "version": "3.14.0"
+            },
+            "repository": "https://github.com/prometheus/prometheus",
+            "run": "prometheus",
+            "run_reason": null,
+            "verdict_pin": "3.14.0"
+          },
+          "native_reader_run": {
+            "conflicts": [],
+            "id": "prometheus",
+            "pin": "3.15.0",
+            "pin_parsed": {
+              "commit": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+              "version": "3.15.0"
+            },
+            "platforms": [],
+            "repository": "github.com/prometheus/prometheus",
+            "source": "manifests/stack.json#/components/37"
+          }
+        },
+        {
+          "winner": {
+            "component_id": "loki",
+            "evidence_class": "synthetic",
+            "factors": [
+              {
+                "converged": false,
+                "host_e2e": "true",
+                "id": "loki",
+                "pin_current": "true",
+                "verdict_winner": "true"
+              }
+            ],
+            "pin_drift": "same",
+            "pin_parsed": {
+              "commit": null,
+              "version": "3.7.8"
+            },
+            "repository": "https://github.com/grafana/loki",
+            "run": "loki",
+            "run_reason": null,
+            "verdict_pin": "3.7.8"
+          },
+          "native_reader_run": {
+            "conflicts": [],
+            "id": "loki",
+            "pin": "3.7.8",
+            "pin_parsed": {
+              "commit": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
+              "version": "3.7.8"
+            },
+            "platforms": [],
+            "repository": "github.com/grafana/loki",
+            "source": "manifests/stack.json#/components/38"
+          }
+        }
+      ]
+    },
+    {
+      "layer_id": "quality-evaluation",
+      "generated_status": "reopened",
+      "verdict": {
+        "adjudication_ref": null,
+        "agreement": "same_winner",
+        "comparison_id": null,
+        "date": "2026-09-22",
+        "next_review": "2026-10-22",
+        "reopened_by": [
+          {
+            "date": "2026-09-23",
+            "sweep_id": "landscape-sweep-20260923"
+          },
+          {
+            "date": "2026-09-26",
+            "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
+          }
+        ],
+        "status": "recorded",
+        "wave": "20260922",
+        "wave_doc": {
+          "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
+          "sha256": "2fef6da7468a8e97a319fdc6f75f73374cd34b412bf93de90fd0c2a7504159de"
+        }
+      },
+      "research": {
+        "next_action": "Evaluate semantic advice on fresh independently labeled task cases, retain uncertain disagreements and a safe negative control; do not tune on the existing eight-case diagnostic.",
+        "status": "comparison_required"
+      },
+      "open_gaps": 11,
+      "winners": [
+        {
+          "winner": {
+            "component_id": "promptfoo",
+            "evidence_class": "local_integration",
+            "factors": [
+              {
+                "converged": false,
+                "host_e2e": "true",
+                "id": "promptfoo",
+                "pin_current": "true",
+                "verdict_winner": "true"
+              }
+            ],
+            "pin_drift": "same",
+            "pin_parsed": {
+              "commit": null,
+              "version": "0.123.1"
+            },
+            "repository": "https://github.com/promptfoo/promptfoo",
+            "run": "promptfoo",
+            "run_reason": null,
+            "verdict_pin": "0.123.1"
+          },
+          "native_reader_run": {
+            "conflicts": [],
+            "id": "promptfoo",
+            "pin": "0.123.1",
+            "pin_parsed": {
+              "commit": null,
+              "version": "0.123.1"
+            },
+            "platforms": [],
+            "repository": "github.com/promptfoo/promptfoo",
+            "source": "manifests/stack.json#/components/23"
+          }
+        },
+        {
+          "winner": {
+            "component_id": "playwright-test",
+            "evidence_class": "local_integration",
+            "factors": [
+              {
+                "converged": false,
+                "host_e2e": "false",
+                "id": "playwright-test",
+                "pin_current": "false",
+                "verdict_winner": "true"
+              }
+            ],
+            "pin_drift": "same",
+            "pin_parsed": {
+              "commit": null,
+              "version": "1.63.0"
+            },
+            "repository": "https://github.com/microsoft/playwright",
+            "run": "playwright-test",
+            "run_reason": null,
+            "verdict_pin": "1.63.0"
+          },
+          "native_reader_run": {
+            "conflicts": [],
+            "id": "playwright-test",
+            "pin": "1.63.0",
+            "pin_parsed": {
+              "commit": "1b025d7e20a026371cd5f98ba0cdce48892737c8",
+              "version": "1.63.0"
+            },
+            "platforms": [],
+            "repository": "github.com/microsoft/playwright",
+            "source": "manifests/stack.json#/components/65"
+          }
+        }
+      ]
+    },
+    {
+      "layer_id": "recovery-portability",
+      "generated_status": "reopened",
+      "verdict": {
+        "adjudication_ref": null,
+        "agreement": "same_winner",
+        "comparison_id": null,
+        "date": "2026-09-22",
+        "next_review": "2026-10-22",
+        "reopened_by": [
+          {
+            "date": "2026-09-23",
+            "sweep_id": "landscape-sweep-20260923"
+          },
+          {
+            "date": "2026-09-26",
+            "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
+          }
+        ],
+        "status": "recorded",
+        "wave": "20260922",
+        "wave_doc": {
+          "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
+          "sha256": "2fef6da7468a8e97a319fdc6f75f73374cd34b412bf93de90fd0c2a7504159de"
+        }
+      },
+      "research": {
+        "next_action": "On the destination PC, select a small profile; establish native sign-ins, scoped tool calls and useful tasks, then independently restore selected application state and keys.",
+        "status": "new_host_required"
+      },
+      "open_gaps": 12,
+      "winners": [
+        {
+          "winner": {
+            "component_id": "restic",
+            "evidence_class": "synthetic",
+            "factors": [
+              {
+                "converged": false,
+                "host_e2e": "true",
+                "id": "restic",
+                "pin_current": "true",
+                "verdict_winner": "true"
+              }
+            ],
+            "pin_drift": "same",
+            "pin_parsed": {
+              "commit": null,
+              "version": "0.19.1"
+            },
+            "repository": "https://github.com/restic/restic",
+            "run": "restic",
+            "run_reason": null,
+            "verdict_pin": "0.19.1"
+          },
+          "native_reader_run": {
+            "conflicts": [],
+            "id": "restic",
+            "pin": "0.19.1",
+            "pin_parsed": {
+              "commit": null,
+              "version": "0.19.1"
+            },
+            "platforms": [],
+            "repository": "github.com/restic/restic",
+            "source": "manifests/stack.json#/components/43",
+            "source_pin": "v0.19.1",
+            "source_pin_kind": "tag"
+          }
+        },
+        {
+          "winner": {
+            "component_id": "candidate:astral-sh-uv",
+            "evidence_class": "synthetic",
+            "factors": [],
+            "pin_drift": "unknown",
+            "pin_parse": "unpinned",
+            "repository": "https://github.com/astral-sh/uv",
+            "run": "uv",
+            "run_reason": null,
+            "verdict_pin": "unpinned"
+          },
+          "native_reader_run": {
+            "conflicts": [],
+            "id": "uv",
+            "pin": "0.12.17",
+            "pin_parsed": {
+              "commit": null,
+              "version": "0.12.17"
+            },
+            "platforms": [
+              "linux-x86_64",
+              "macos-arm64"
+            ],
+            "repository": "github.com/astral-sh/uv",
+            "source": "adoption/pins-linux-x86_64.json#/tools/1"
+          }
+        }
+      ]
+    },
+    {
+      "layer_id": "scheduling-supervision",
+      "generated_status": "reopened",
+      "verdict": {
+        "adjudication_ref": null,
+        "agreement": "same_winner",
+        "comparison_id": null,
+        "date": "2026-09-22",
+        "next_review": "2026-10-22",
+        "reopened_by": [
+          {
+            "date": "2026-09-23",
+            "sweep_id": "landscape-sweep-20260923"
+          },
+          {
+            "date": "2026-09-26",
+            "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
+          }
+        ],
+        "status": "recorded",
+        "wave": "20260922",
+        "wave_doc": {
+          "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
+          "sha256": "2fef6da7468a8e97a319fdc6f75f73374cd34b412bf93de90fd0c2a7504159de"
+        }
+      },
+      "research": {
+        "next_action": "If jobs must survive host loss or long waits, qualify one durable scheduler against explicit effect/retry/cancellation/recovery cases and operating cost.",
+        "status": "on_requirement_change"
+      },
+      "open_gaps": 13,
+      "winners": [
+        {
+          "winner": {
+            "component_id": "dagu",
+            "evidence_class": "local_integration",
+            "factors": [
+              {
+                "converged": false,
+                "host_e2e": "true",
+                "id": "dagu",
+                "pin_current": "false",
+                "verdict_winner": "true"
+              }
+            ],
+            "pin_drift": "same",
+            "pin_parsed": {
+              "commit": null,
+              "version": "2.16.6"
+            },
+            "repository": "https://github.com/dagucloud/dagu",
+            "run": "dagu",
+            "run_reason": null,
+            "verdict_pin": "2.16.6"
+          },
+          "native_reader_run": {
+            "conflicts": [],
+            "id": "dagu",
+            "pin": "2.16.6",
+            "pin_parsed": {
+              "commit": null,
+              "version": "2.16.6"
+            },
+            "platforms": [],
+            "repository": "github.com/dagucloud/dagu",
+            "source": "manifests/stack.json#/components/44",
+            "source_pin": "v2.16.6",
+            "source_pin_kind": "tag"
+          }
+        },
+        {
+          "winner": {
+            "component_id": "systemd",
+            "evidence_class": "local_integration",
+            "factors": [
+              {
+                "converged": false,
+                "host_e2e": "true",
+                "id": "systemd",
+                "pin_current": "unknown",
+                "verdict_winner": "true"
+              }
+            ],
+            "pin_drift": "same",
+            "pin_parsed": {
+              "commit": null,
+              "version": "255.4-1ubuntu8.17"
+            },
+            "repository": "https://github.com/systemd/systemd",
+            "run": "systemd",
+            "run_reason": null,
+            "verdict_pin": "255.4-1ubuntu8.17"
+          },
+          "native_reader_run": {
+            "conflicts": [],
+            "id": "systemd",
+            "pin": "255.4-1ubuntu8.17",
+            "pin_parsed": {
+              "commit": null,
+              "version": "255.4-1ubuntu8.17"
+            },
+            "platforms": [],
+            "repository": "github.com/systemd/systemd",
+            "source": "manifests/stack.json#/components/48"
+          }
+        }
+      ]
+    },
+    {
+      "layer_id": "token-efficiency",
+      "generated_status": "reopened",
+      "verdict": {
+        "adjudication_ref": "evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-token-efficiency-20260922.json",
+        "agreement": "disagree",
+        "comparison_id": null,
+        "date": "2026-09-22",
+        "next_review": "2026-10-22",
+        "reopened_by": [
+          {
+            "date": "2026-09-23",
+            "sweep_id": "landscape-sweep-20260923"
+          },
+          {
+            "date": "2026-09-26",
+            "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-09-29",
+            "sweep_id": "landscape-sweep-20260929"
+          }
+        ],
+        "status": "recorded",
+        "wave": "20260922",
+        "wave_doc": {
+          "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
+          "sha256": "2fef6da7468a8e97a319fdc6f75f73374cd34b412bf93de90fd0c2a7504159de"
+        }
+      },
+      "research": {
+        "next_action": "Repeat a matched task at equal quality with original-context recovery; include failed attempts and separate complete provider use from cache subsets and artifact estimates.",
+        "status": "comparison_required"
+      },
+      "open_gaps": 6,
+      "winners": [
+        {
+          "winner": {
+            "component_id": "rtk",
+            "evidence_class": "synthetic",
+            "factors": [
+              {
+                "converged": false,
+                "host_e2e": "true",
+                "id": "rtk",
+                "pin_current": "true",
+                "verdict_winner": "true"
+              }
+            ],
+            "pin_drift": "differs",
+            "pin_parsed": {
+              "commit": null,
+              "version": "0.49.0"
+            },
+            "repository": "https://github.com/rtk-ai/rtk",
+            "run": "rtk",
+            "run_reason": null,
+            "verdict_pin": "0.49.0"
+          },
+          "native_reader_run": {
+            "conflicts": [],
+            "id": "rtk",
+            "pin": "0.51.0",
+            "pin_parsed": {
+              "commit": null,
+              "version": "0.51.0"
+            },
+            "platforms": [
+              "linux-x86_64",
+              "macos-arm64"
+            ],
+            "repository": "github.com/rtk-ai/rtk",
+            "source": "adoption/pins-linux-x86_64.json#/tools/6"
+          }
+        },
+        {
+          "winner": {
+            "component_id": "headroom",
+            "evidence_class": "synthetic",
+            "factors": [
+              {
+                "converged": false,
+                "host_e2e": "true",
+                "id": "headroom",
+                "pin_current": "true",
+                "verdict_winner": "true"
+              }
+            ],
+            "pin_drift": "differs",
+            "pin_parsed": {
+              "commit": null,
+              "version": "0.37.0"
+            },
+            "repository": "https://github.com/headroomlabs-ai/headroom",
+            "run": "headroom",
+            "run_reason": null,
+            "verdict_pin": "0.37.0"
+          },
+          "native_reader_run": {
+            "conflicts": [],
+            "id": "headroom",
+            "pin": "0.40.0",
+            "pin_parsed": {
+              "commit": null,
+              "version": "0.40.0"
+            },
+            "platforms": [
+              "linux-x86_64",
+              "macos-arm64"
+            ],
+            "repository": "github.com/headroomlabs-ai/headroom",
+            "source": "adoption/pins-linux-x86_64.json#/tools/18"
+          }
+        },
+        {
+          "winner": {
+            "component_id": "ccusage",
+            "evidence_class": "synthetic",
+            "factors": [
+              {
+                "converged": false,
+                "host_e2e": "true",
+                "id": "ccusage",
+                "pin_current": "true",
+                "verdict_winner": "true"
+              }
+            ],
+            "pin_drift": "differs",
+            "pin_parsed": {
+              "commit": null,
+              "version": "20.0.24"
+            },
+            "repository": "https://github.com/ccusage/ccusage",
+            "run": "ccusage",
+            "run_reason": null,
+            "verdict_pin": "20.0.24"
+          },
+          "native_reader_run": {
+            "conflicts": [],
+            "id": "ccusage",
+            "pin": "20.0.26",
+            "pin_parsed": {
+              "commit": null,
+              "version": "20.0.26"
+            },
+            "platforms": [
+              "linux-x86_64",
+              "macos-arm64"
+            ],
+            "repository": "github.com/ccusage/ccusage",
+            "source": "adoption/pins-linux-x86_64.json#/tools/17"
+          }
+        }
+      ]
+    }
+  ]
+}

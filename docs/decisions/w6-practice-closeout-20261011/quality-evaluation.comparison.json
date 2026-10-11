@@ -1,0 +1,55 @@
+{
+  "comparison_id": "w6-quality-evaluation-20261011",
+  "scope_status": "preregistered_comparison_pending_named_inputs",
+  "catalog": "foundation",
+  "layer_id": "quality-evaluation",
+  "requirement": {
+    "ref": "catalogs/landscape/foundation.json#/layers/10",
+    "source_sha256": "868d193a31080ab913400725140bd0d01e0afe97e28564fd12777f737d22951a"
+  },
+  "unresolved_repositories": [
+    "https://github.com/ukgovernmentbeis/inspect_ai",
+    "https://github.com/embeddings-benchmark/mteb"
+  ],
+  "harness": "Existing promptfoo and Inspect upstream-supported evaluation paths; do not add another harness.",
+  "scenarios": [
+    {
+      "role": "semantic-advice-evaluation",
+      "case_scope": {
+        "cases": 60,
+        "oracle": "Same frozen independently labeled advice cases, including safe negative controls, retained uncertain disagreements and errors; do not tune on the historical eight-case diagnostic."
+      },
+      "arms": [
+        "promptfoo@34f74d34e140b5e17d23770dfb2340057b1936b8",
+        "inspect_ai@a1dbea8db3cc85e04ff532760d0eaaeb64df6d3a"
+      ],
+      "rule": "Reject an arm that loses a case or hides an error/cancellation; compare grading disagreements against the same sealed labels, then false positive count, then complete provider cost. Exact ties retain the qualified incumbent. No adoption from runtime/installation alone."
+    },
+    {
+      "role": "embedding-evaluation",
+      "case_scope": {
+        "oracle": "Existing embedding/retrieval task questions and labels retained by the semantic-rag evidence owner; identical inputs across arms."
+      },
+      "arms": [
+        "MTEB at its recovered immutable source pin",
+        "existing selected embedding-evaluation path at its retained run pin"
+      ],
+      "rule": "Reject missing/error or mismatched inputs; use identical retrieval relevance labels and existing task acceptance thresholds, then lowest complete execution cost among equal-quality arms. This auxiliary role does not substitute for the Promptfoo-versus-Inspect decision."
+    }
+  ],
+  "readiness": [
+    "60-case advice packet has an independent label seal and immutable case hash",
+    "MTEB retained source and matching embedding-evaluation case packet are recovered",
+    "Upstream install/test paths at the selected source pins are available"
+  ],
+  "deltas": [
+    "Consume the named Inspect survivor and carry MTEB explicitly; retain earlier substantive refutations of mutmut, cosmic-ray and opik rather than silently treating their omission as resolution."
+  ],
+  "execution_constraints": [
+    "No new discovery; only retained 09-29/10-08 candidates and explicitly dispatched review-and-landing arms.",
+    "Seal exact case/oracle/source-pin bytes before execution; do not tune acceptance after results.",
+    "Retain failures, errors, cancellations and complete effort/cost; upstream tests and native invoke evidence remain distinct.",
+    "Heavy suites in Monday 08:00Z\u201320:00Z require T2 idle wrapper; full suites also require SUITE-GO.",
+    "Terminal classification authority is the co-op #1007 LANDED relay and c2dee173 final-stack contract. A winner requires all four conditions before FINAL."
+  ]
+}

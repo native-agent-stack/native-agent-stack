@@ -1,0 +1,35 @@
+{
+  "repository": "https://github.com/ollama/ollama",
+  "commit": "eab97e9f92b9a25c2d52d2cc6c1b1c99bd9fae21",
+  "mirror_lock_sha256": "aae979c9d3fe7d2efce68e5ef8d8ce3d2ce82f507be28ca7a7afc52f3bb393ff",
+  "mirror_lock_ref": "eab97e9f92b9a25c2d52d2cc6c1b1c99bd9fae21",
+  "synced_at_utc": "2026-10-11T23:14:33Z",
+  "mirror_head_matches": true,
+  "lazy_fetch_disabled": true,
+  "optional_locks_disabled": true,
+  "source": {
+    "path": "README.md",
+    "sha256": "bda5d9ac28354e3effc6cb7059672425b87fdbc760051918d17022a0b7aeeeec",
+    "bytes": 19273,
+    "sections": [
+      {
+        "line": 11,
+        "title": "## Download"
+      },
+      {
+        "line": 52,
+        "title": "## Get started"
+      },
+      {
+        "line": 90,
+        "title": "## REST API"
+      },
+      {
+        "line": 141,
+        "title": "## Supported backends"
+      }
+    ]
+  },
+  "evidence_class": "source_review",
+  "boundary": "Retained candidate source recovered in the central mirror; no model pull, host install, GPU execution, E2E or native task acceptance."
+}

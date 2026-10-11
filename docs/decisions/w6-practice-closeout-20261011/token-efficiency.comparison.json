@@ -1,0 +1,50 @@
+{
+  "comparison_id": "w6-token-efficiency-20261011",
+  "scope_status": "preregistered_comparison_pending_named_inputs",
+  "catalog": "foundation",
+  "layer_id": "token-efficiency",
+  "requirement": {
+    "ref": "catalogs/landscape/foundation.json#/layers/9",
+    "source_sha256": "868d193a31080ab913400725140bd0d01e0afe97e28564fd12777f737d22951a"
+  },
+  "unresolved_repositories": [
+    "https://github.com/ojuschugh1/sqz",
+    "https://github.com/paritok-official/paritok-4b-v1",
+    "https://github.com/lockedinlabs-ai/agent-console",
+    "https://github.com/atlassian-labs/mcp-compressor",
+    "https://github.com/klavis-ai/klavis"
+  ],
+  "harness": "Existing token-e2e/cc-native-practice paired-task paths with exact original-context recovery; no new proxy or capture path.",
+  "scenarios": [
+    {
+      "role": "context-and-usage",
+      "case_scope": {
+        "oracle": "Existing matched-task workload with original output/context bytes, independent task correctness and fidelity oracles, including retained failure/growth cases."
+      },
+      "arms": [
+        "existing task-selected native context path",
+        "sqz",
+        "paritok-4b-v1",
+        "agent-console",
+        "mcp-compressor",
+        "klavis"
+      ],
+      "rule": "Reject loss of task correctness, unavailable exact original recovery, duplicate/missing provider accounting or privacy failure. Among equal-quality complete arms choose lower total provider tokens/cost including recovery and failures. Artifact token estimates and cache subsets never substitute for provider totals; ties retain the qualified current path."
+    }
+  ],
+  "readiness": [
+    "All five retained candidate primary sources and immutable pins are recovered",
+    "Matched-task input/oracle and original-context packet is sealed by its existing evidence owner",
+    "Existing usage path captures complete provider totals and retained failures"
+  ],
+  "deltas": [
+    "Recover the GPT-fit missing votes for mcp-compressor and klavis or settle their roles from primary evidence; missing returns do not refute either."
+  ],
+  "execution_constraints": [
+    "No new discovery; only retained 09-29/10-08 candidates and explicitly dispatched review-and-landing arms.",
+    "Seal exact case/oracle/source-pin bytes before execution; do not tune acceptance after results.",
+    "Retain failures, errors, cancellations and complete effort/cost; upstream tests and native invoke evidence remain distinct.",
+    "Heavy suites in Monday 08:00Z\u201320:00Z require T2 idle wrapper; full suites also require SUITE-GO.",
+    "Terminal classification authority is the co-op #1007 LANDED relay and c2dee173 final-stack contract. A winner requires all four conditions before FINAL."
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "comparison_id": "w6-observation-inference-20261011",
+  "scope_status": "preregistered_comparison_pending_named_inputs",
+  "catalog": "foundation",
+  "layer_id": "observation-inference",
+  "requirement": {
+    "ref": "catalogs/landscape/foundation.json#/layers/15",
+    "source_sha256": "868d193a31080ab913400725140bd0d01e0afe97e28564fd12777f737d22951a"
+  },
+  "unresolved_repositories": [
+    "https://github.com/traceloop/openllmetry",
+    "https://github.com/ollama/ollama",
+    "https://github.com/utkuozdemir/nvidia_gpu_exporter",
+    "https://github.com/nvidia/dcgm-exporter",
+    "https://github.com/ml-explore/mlx-lm",
+    "https://github.com/mostlygeek/llama-swap"
+  ],
+  "harness": "Existing native telemetry reconciliation, gateway qualification and inference comparisons; preserve their hardware, model and paper gates.",
+  "scenarios": [
+    {
+      "role": "telemetry",
+      "case_scope": {
+        "oracle": "One identical native task with retained native counters and a known request count; separate content/privacy checks and duplicate capture controls."
+      },
+      "arms": [
+        "existing OTel/Prometheus/Loki path",
+        "openllmetry",
+        "nvidia_gpu_exporter",
+        "dcgm-exporter"
+      ],
+      "rule": "Reject lost/double-counted requests, sensitive-content capture or incomplete source attribution. Compare reconciled counts/fidelity first, then measured collection overhead; exact ties retain the qualified current route."
+    },
+    {
+      "role": "local-inference",
+      "case_scope": {
+        "oracle": "Existing independently frozen task/output pool at identical model/quantization and hardware scope; no cross-model or cross-host performance inference."
+      },
+      "arms": [
+        "existing qualified runtime",
+        "ollama",
+        "mlx-lm",
+        "llama-swap"
+      ],
+      "rule": "Require all existing correctness/privacy/recovery oracles, then compare measured latency and resource cost under identical workload constraints. Any unsupported host/model combination is retained as a bounded non-result, not a winner."
+    }
+  ],
+  "readiness": [
+    "All six retained candidate primary sources and exact pins are recovered",
+    "Native task/counter and inference task/model/hardware case seals are retained",
+    "Existing inference account/hardware and Monday paper execution gates permit the scoped run"
+  ],
+  "deltas": [
+    "Reconcile llama-cpp/vllm/Claude pin_moved receipts and retained failures through owners.",
+    "Recover missing GPT-fit votes for mlx-lm and llama-swap or adjudicate substantively."
+  ],
+  "execution_constraints": [
+    "No new discovery; only retained 09-29/10-08 candidates and explicitly dispatched review-and-landing arms.",
+    "Seal exact case/oracle/source-pin bytes before execution; do not tune acceptance after results.",
+    "Retain failures, errors, cancellations and complete effort/cost; upstream tests and native invoke evidence remain distinct.",
+    "Heavy suites in Monday 08:00Z\u201320:00Z require T2 idle wrapper; full suites also require SUITE-GO.",
+    "Terminal classification authority is the co-op #1007 LANDED relay and c2dee173 final-stack contract. A winner requires all four conditions before FINAL."
+  ]
+}

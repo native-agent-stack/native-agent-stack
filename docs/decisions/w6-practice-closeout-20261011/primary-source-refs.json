@@ -1,0 +1,686 @@
+{
+  "mirror_lock_sha256": "be5a213cacf1873b4e7a44e8ed37c08b7a05bb7aebed672bd6a3cb162dabb729",
+  "sources": [
+    {
+      "repository": "https://github.com/anthropics/claude-code-action",
+      "commit": "2dca132ff0e0c4094ce6048b422c6915a071210b",
+      "mirror_lock_ref": "2dca132ff0e0c4094ce6048b422c6915a071210b",
+      "mirror_head_matches": true,
+      "files": [
+        {
+          "path": "README.md",
+          "sha256": "a381c47399445c97480d025a406f485644fdd5f4f7ffd880be0567ac2f7b4640",
+          "bytes": 4896,
+          "sections": [
+            {
+              "line": 24,
+              "text": "## Quickstart"
+            }
+          ]
+        },
+        {
+          "path": "package.json",
+          "sha256": "075875f3170a5dea5ba2b6cc5270ff5200a1db2d91c52e8a3fc77a595a642ef9",
+          "bytes": 880,
+          "sections": []
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "sha256": "ffdc5bd634142434ca45de92ee37ed840cf7216e9bde718e23a4b85b61e4a69a",
+          "bytes": 2262,
+          "sections": [
+            {
+              "line": 1,
+              "text": "# Contributing to Claude Code Action"
+            },
+            {
+              "line": 5,
+              "text": "## Getting Started"
+            },
+            {
+              "line": 34,
+              "text": "## Development"
+            },
+            {
+              "line": 43,
+              "text": "## Testing"
+            },
+            {
+              "line": 45,
+              "text": "### Running Tests Locally"
+            },
+            {
+              "line": 86,
+              "text": "## Action Development"
+            }
+          ]
+        }
+      ],
+      "evidence_class": "source_review",
+      "boundary": "Source availability/documentation only; no fresh host installation, E2E or model execution."
+    },
+    {
+      "repository": "https://github.com/ataraxy-labs/sem",
+      "commit": "225e7721c6ce7e220f0e60783af8cd74c1881ed9",
+      "mirror_lock_ref": "HEAD",
+      "mirror_head_matches": true,
+      "files": [
+        {
+          "path": "README.md",
+          "sha256": "e4d08a00c7bb85cb20e0fbba1441b4e65d06eebf5620baf556223cdc6e684dce",
+          "bytes": 34375,
+          "sections": [
+            {
+              "line": 123,
+              "text": "## Install"
+            },
+            {
+              "line": 200,
+              "text": "# Option 3: if installed via Homebrew"
+            },
+            {
+              "line": 736,
+              "text": "## Contributing"
+            }
+          ]
+        },
+        {
+          "path": "package.json",
+          "sha256": "fc4b3df992a145a96e4d4cfaf29c84912823f0331f1199b5dda685c8b66167a5",
+          "bytes": 1162,
+          "sections": []
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "sha256": "8e1b758099cf2d4fc9d154d3655d4c81aca64215b1ea7e119c3b4632901eefe5",
+          "bytes": 7458,
+          "sections": [
+            {
+              "line": 1,
+              "text": "# Contributing to sem"
+            },
+            {
+              "line": 107,
+              "text": "### Step 6: Add a test"
+            },
+            {
+              "line": 112,
+              "text": "#[test]"
+            },
+            {
+              "line": 140,
+              "text": "### Step 7: Run tests"
+            }
+          ]
+        }
+      ],
+      "evidence_class": "source_review",
+      "boundary": "Source availability/documentation only; no fresh host installation, E2E or model execution."
+    },
+    {
+      "repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
+      "commit": "a1dbea8db3cc85e04ff532760d0eaaeb64df6d3a",
+      "mirror_lock_ref": "HEAD",
+      "mirror_head_matches": true,
+      "files": [
+        {
+          "path": "README.md",
+          "sha256": "a9a1e07b955d869137d8ad109f1c238268f361dcdfac30cfcc94983a51a99b17",
+          "bytes": 3099,
+          "sections": [
+            {
+              "line": 48,
+              "text": "### Frontend development (TypeScript)"
+            }
+          ]
+        },
+        {
+          "path": "Makefile",
+          "sha256": "5af9ec1c6ac93667e4b111a1cddeddff68f86bdd6e59265893e9706fc984851d",
+          "bytes": 629,
+          "sections": []
+        },
+        {
+          "path": "pyproject.toml",
+          "sha256": "89e990d6f630eb2d77bb8fbefb70d1b201c782bdc2c2bf986cd25101a3057be8",
+          "bytes": 5631,
+          "sections": [
+            {
+              "line": 104,
+              "text": "# worksteal lets an idle worker take pending tests back off a straggler."
+            },
+            {
+              "line": 135,
+              "text": "# imports correctly in test files. For example, imports such as"
+            },
+            {
+              "line": 136,
+              "text": "# `from test_helpers.utils import ...` fail mypy without this configuration,"
+            },
+            {
+              "line": 137,
+              "text": "# despite actually working when running tests."
+            }
+          ]
+        }
+      ],
+      "evidence_class": "source_review",
+      "boundary": "Source availability/documentation only; no fresh host installation, E2E or model execution."
+    },
+    {
+      "repository": "https://github.com/promptfoo/promptfoo",
+      "commit": "34f74d34e140b5e17d23770dfb2340057b1936b8",
+      "mirror_lock_ref": "0.123.1",
+      "mirror_head_matches": true,
+      "files": [
+        {
+          "path": "README.md",
+          "sha256": "426270e1b7c45d0bf456b1284cdc1af055218db73869864b9590b1e0bdaab5cb",
+          "bytes": 4844,
+          "sections": [
+            {
+              "line": 25,
+              "text": "## Quick Start"
+            },
+            {
+              "line": 93,
+              "text": "## Contributing"
+            }
+          ]
+        },
+        {
+          "path": "package.json",
+          "sha256": "208ce88e9e2a9e7518f0c29d384a30250a7708c19267b2db0971afafdadc86e3",
+          "bytes": 14821,
+          "sections": []
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "sha256": "5d4d9f23dc55742ba5c9b4f200ca55de580964eb74da4aa7a423802ef88f580d",
+          "bytes": 573,
+          "sections": [
+            {
+              "line": 1,
+              "text": "# Contributing to promptfoo"
+            }
+          ]
+        }
+      ],
+      "evidence_class": "source_review",
+      "boundary": "Source availability/documentation only; no fresh host installation, E2E or model execution."
+    },
+    {
+      "repository": "https://github.com/github/gh-aw",
+      "commit": "c16656ef90fa17dfe6e91fa8fb3d11f54632a74d",
+      "mirror_lock_ref": "HEAD",
+      "mirror_head_matches": true,
+      "files": [
+        {
+          "path": "README.md",
+          "sha256": "b5b618079cdee29961066e365875c9b441c476cb3b3ab94abae06d5a49cc9e1e",
+          "bytes": 49701,
+          "sections": [
+            {
+              "line": 37,
+              "text": "## Quick Start"
+            },
+            {
+              "line": 69,
+              "text": "## Contributing"
+            },
+            {
+              "line": 85,
+              "text": "## 🌍 Community Contributions"
+            }
+          ]
+        },
+        {
+          "path": "Makefile",
+          "sha256": "8078a858b95798aaa7a40e7b48420a566fed0c8135af6541bd39b907257a1286",
+          "bytes": 71090,
+          "sections": [
+            {
+              "line": 68,
+              "text": "# Build WebAssembly module for browser usage"
+            },
+            {
+              "line": 86,
+              "text": "# Test the code (runs both unlabelled unit tests and integration tests and long tests)"
+            },
+            {
+              "line": 90,
+              "text": "# Test all Go unit tests only (excludes labelled integration tests and long tests)"
+            },
+            {
+              "line": 95,
+              "text": "# Run concurrency-heavy package tests with the Go race detector"
+            },
+            {
+              "line": 100,
+              "text": "# Test impacted Go unit tests first for faster feedback (target budget: ~30s)"
+            },
+            {
+              "line": 114,
+              "text": "# Update golden test files"
+            }
+          ]
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "sha256": "2b30ece0dc9ea265587682214db6130e80a97f300658f1e0813de4c58b4e307b",
+          "bytes": 34966,
+          "sections": [
+            {
+              "line": 1,
+              "text": "# Contributing to GitHub Agentic Workflows"
+            },
+            {
+              "line": 25,
+              "text": "## 🤖 How Development Works"
+            },
+            {
+              "line": 43,
+              "text": "## 🚀 Quick Start for Community Contributors"
+            },
+            {
+              "line": 128,
+              "text": "## 📝 How to Contribute as a Community Member"
+            },
+            {
+              "line": 327,
+              "text": "## 🔄 Pull Request Process for Community Contributions"
+            },
+            {
+              "line": 531,
+              "text": "## 🧪 Testing"
+            }
+          ]
+        }
+      ],
+      "evidence_class": "source_review",
+      "boundary": "Source availability/documentation only; no fresh host installation, E2E or model execution."
+    },
+    {
+      "repository": "https://github.com/openai/codex-action",
+      "commit": "a8d8be6ee028bea4525bc722d16f36687b408c81",
+      "mirror_lock_ref": "HEAD",
+      "mirror_head_matches": true,
+      "files": [
+        {
+          "path": "README.md",
+          "sha256": "00083d3f3b7ab6b887e1efa198c79a3791e53c5aae534588c9eba6c7b056b741",
+          "bytes": 17938,
+          "sections": []
+        },
+        {
+          "path": "package.json",
+          "sha256": "1482b37e5b62a4daaacf05025a0a79b18c15375dbc202ca6c372e57b871f89f3",
+          "bytes": 911,
+          "sections": []
+        }
+      ],
+      "evidence_class": "source_review",
+      "boundary": "Source availability/documentation only; no fresh host installation, E2E or model execution."
+    },
+    {
+      "repository": "https://github.com/reviewdog/reviewdog",
+      "commit": "cfb9ce1577e1e86f66bdfef6113d27340340923e",
+      "mirror_lock_ref": "HEAD",
+      "mirror_head_matches": true,
+      "files": [
+        {
+          "path": "README.md",
+          "sha256": "1c638e40f19eefc75e4bb1812f849583e21c0dc08d84ae3eb74422ccbd185b22",
+          "bytes": 46042,
+          "sections": [
+            {
+              "line": 112,
+              "text": "## Installation"
+            },
+            {
+              "line": 115,
+              "text": "# Install the latest version. (Install it into ./bin/ by default)."
+            },
+            {
+              "line": 118,
+              "text": "# Specify installation directory ($(go env GOPATH)/bin/) and version."
+            },
+            {
+              "line": 157,
+              "text": "### Build with go install"
+            },
+            {
+              "line": 438,
+              "text": "#### Option 2) Install reviewdog GitHub Apps"
+            },
+            {
+              "line": 971,
+              "text": "## Contributors"
+            }
+          ]
+        },
+        {
+          "path": "package.json",
+          "sha256": "4226c45fd7526a784bb82b43329f76493fd0157cc9ba569a08fc001e53fe8fbb",
+          "bytes": 268,
+          "sections": []
+        }
+      ],
+      "evidence_class": "source_review",
+      "boundary": "Source availability/documentation only; no fresh host installation, E2E or model execution."
+    },
+    {
+      "repository": "https://github.com/mergifyio/mergify-cli",
+      "commit": "6307ed10e8628c6fefe408e398ea48af16c94cfd",
+      "mirror_lock_ref": "HEAD",
+      "mirror_head_matches": true,
+      "files": [
+        {
+          "path": "README.md",
+          "sha256": "2216e4678e8b1d42ca312a872c46e198e6fedb5370eef01465c629e7b30ef10a",
+          "bytes": 11878,
+          "sections": [
+            {
+              "line": 27,
+              "text": "## Installation"
+            },
+            {
+              "line": 40,
+              "text": "### Install script (recommended for Linux; also macOS — x86_64 and aarch64)"
+            },
+            {
+              "line": 136,
+              "text": "## Quick start"
+            },
+            {
+              "line": 264,
+              "text": "## Contributing"
+            }
+          ]
+        }
+      ],
+      "evidence_class": "source_review",
+      "boundary": "Source availability/documentation only; no fresh host installation, E2E or model execution."
+    },
+    {
+      "repository": "https://github.com/coderabbitai/skills",
+      "commit": "928c3b61f71b578b1bcfbacc289f1446244dd9dd",
+      "mirror_lock_ref": "HEAD",
+      "mirror_head_matches": true,
+      "files": [
+        {
+          "path": "README.md",
+          "sha256": "0fcb5d9e60911032d366904be2700456abd3b5b599f869cb0fff37dcaacfa925",
+          "bytes": 14238,
+          "sections": [
+            {
+              "line": 13,
+              "text": "## Quickstart"
+            },
+            {
+              "line": 19,
+              "text": "## Installation"
+            },
+            {
+              "line": 21,
+              "text": "### 1. Install the CodeRabbit CLI"
+            },
+            {
+              "line": 26,
+              "text": "### 2. Install the agent integration"
+            },
+            {
+              "line": 30,
+              "text": "#### Skills installer"
+            },
+            {
+              "line": 136,
+              "text": "## Usage"
+            }
+          ]
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "sha256": "31d64a83f235de1353b76a2fc0f684da279515e80769e13d3269655e9c5a18d2",
+          "bytes": 3100,
+          "sections": [
+            {
+              "line": 1,
+              "text": "# Contributing"
+            }
+          ]
+        }
+      ],
+      "evidence_class": "source_review",
+      "boundary": "Source availability/documentation only; no fresh host installation, E2E or model execution."
+    },
+    {
+      "repository": "https://github.com/OpenHands/OpenHands",
+      "commit": "c65ab872ccb2974ae0b1f5965813bb50c4199132",
+      "mirror_lock_ref": "HEAD",
+      "mirror_head_matches": true,
+      "files": [
+        {
+          "path": "README.md",
+          "sha256": "4ebc158da53d17f88de7ee175bb4fbe56f6442b81314f089682e11412cc34d31",
+          "bytes": 12877,
+          "sections": [
+            {
+              "line": 50,
+              "text": "## Quickstart"
+            }
+          ]
+        },
+        {
+          "path": "package.json",
+          "sha256": "805c0f7e44d58a2e2a6ff3b4bb5294fe8b466fcb88e5a6645fa503360f87cfc5",
+          "bytes": 9662,
+          "sections": []
+        }
+      ],
+      "evidence_class": "source_review",
+      "boundary": "Source availability/documentation only; no fresh host installation, E2E or model execution."
+    },
+    {
+      "repository": "https://github.com/SWE-agent/SWE-agent",
+      "commit": "3ea751c087f32b16e039a2233dd6eefecef325d5",
+      "mirror_lock_ref": "HEAD",
+      "mirror_head_matches": true,
+      "files": [
+        {
+          "path": "README.md",
+          "sha256": "dcd880557720efbab0f5c0e68f2bc742309efecfce83244c9e670ec1f1adf76f",
+          "bytes": 8158,
+          "sections": [
+            {
+              "line": 89,
+              "text": "## Contributions <a name=\"contributions\"></a>"
+            }
+          ]
+        },
+        {
+          "path": "pyproject.toml",
+          "sha256": "c15229fac40a10716b53fda2cf6ba756d62cb59d682e7d10d7d62b640dfccef9",
+          "bytes": 6487,
+          "sections": [
+            {
+              "line": 2,
+              "text": "# https://packaging.python.org/en/latest/guides/writing-pyproject-toml/"
+            },
+            {
+              "line": 4,
+              "text": "# https://packaging.python.org/en/latest/specifications/pyproject-toml/"
+            }
+          ]
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "sha256": "3fb789fb097384f37b6869f8548d55c7275783cb0f85d34e432f7f135866e812",
+          "bytes": 1049,
+          "sections": [
+            {
+              "line": 1,
+              "text": "# Contribution guidelines"
+            }
+          ]
+        }
+      ],
+      "evidence_class": "source_review",
+      "boundary": "Source availability/documentation only; no fresh host installation, E2E or model execution."
+    },
+    {
+      "repository": "https://github.com/dagucloud/dagu",
+      "commit": "58fed633d58c1dd1319091fdb2c2f6158ecfa053",
+      "mirror_lock_ref": "v2.16.6",
+      "mirror_head_matches": true,
+      "files": [
+        {
+          "path": "README.md",
+          "sha256": "153ec405b99603e6d52772eb152f00505c24c02ec24b463691dcbd7cb4fc2658",
+          "bytes": 50594,
+          "sections": [
+            {
+              "line": 34,
+              "text": "## Quick Look"
+            },
+            {
+              "line": 98,
+              "text": "## Quick Start"
+            },
+            {
+              "line": 100,
+              "text": "### Install"
+            },
+            {
+              "line": 1019,
+              "text": "## Development"
+            },
+            {
+              "line": 1073,
+              "text": "## Contributing"
+            }
+          ]
+        },
+        {
+          "path": "Makefile",
+          "sha256": "9d5f356610f91f32096459193337fec853876495add242934c73b21eaedd823e",
+          "bytes": 20197,
+          "sections": [
+            {
+              "line": 47,
+              "text": "# Arguments for the tests"
+            },
+            {
+              "line": 87,
+              "text": "# Certificates for the development environment"
+            },
+            {
+              "line": 106,
+              "text": "# Variables for installing protoc"
+            },
+            {
+              "line": 165,
+              "text": "# test runs Go tests except conformance tests."
+            },
+            {
+              "line": 173,
+              "text": "# conformance runs binary-level conformance tests."
+            },
+            {
+              "line": 181,
+              "text": "# test-coverage runs Go tests except conformance tests with coverage by default."
+            }
+          ]
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "sha256": "6f188b79a8203da2d2ad2d616bc1eee16b718c455086c23009d3391947381486",
+          "bytes": 4417,
+          "sections": [
+            {
+              "line": 1,
+              "text": "# Contributing to Dagu"
+            },
+            {
+              "line": 22,
+              "text": "## How to Contribute"
+            },
+            {
+              "line": 34,
+              "text": "## Development"
+            },
+            {
+              "line": 55,
+              "text": "## Running Tests"
+            }
+          ]
+        }
+      ],
+      "evidence_class": "source_review",
+      "boundary": "Source availability/documentation only; no fresh host installation, E2E or model execution."
+    },
+    {
+      "repository": "https://github.com/cli/cli",
+      "commit": "ec5b512045db67e5a2a4ff4a1b02660b2fb24390",
+      "mirror_lock_ref": "HEAD",
+      "mirror_head_matches": true,
+      "files": [
+        {
+          "path": "README.md",
+          "sha256": "5816da6f27253e6e5544e9c8d7b0f652e03200a0345fae1693e50d72fabb8cc4",
+          "bytes": 6284,
+          "sections": [
+            {
+              "line": 21,
+              "text": "# Install the skill (user scope recommended)"
+            },
+            {
+              "line": 28,
+              "text": "## Contributing"
+            },
+            {
+              "line": 35,
+              "text": "## Installation"
+            },
+            {
+              "line": 37,
+              "text": "### [macOS](docs/install_macos.md)"
+            },
+            {
+              "line": 44,
+              "text": "### [Linux & Unix](docs/install_linux.md)"
+            },
+            {
+              "line": 52,
+              "text": "### [Windows](docs/install_windows.md)"
+            }
+          ]
+        },
+        {
+          "path": "Makefile",
+          "sha256": "992035f8f75939024cb8403dff1669032e059498841c9b4f01b0c309fff5d26f",
+          "bytes": 3940,
+          "sections": [
+            {
+              "line": 49,
+              "text": "# just convenience tasks around `go test`"
+            },
+            {
+              "line": 82,
+              "text": "## Install/uninstall tasks are here for use on *nix platform. On Windows, there is no equivalent."
+            }
+          ]
+        }
+      ],
+      "evidence_class": "source_review",
+      "boundary": "Source availability/documentation only; no fresh host installation, E2E or model execution."
+    }
+  ],
+  "gh_runtime": {
+    "observed_version": "2.102.0",
+    "official_tag_commit": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+    "primary_lookup": "gh api repos/cli/cli/git/ref/tags/v2.102.0",
+    "central_mirror_head": "ec5b512045db67e5a2a4ff4a1b02660b2fb24390",
+    "gap": "The runtime release pin differs from central HEAD; retain release-tag source before qualifying lifecycle/E2E at that pin."
+  }
+}

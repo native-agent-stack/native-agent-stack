@@ -1,0 +1,43 @@
+{
+  "comparison_id": "w6-instructions-skills-20261011",
+  "scope_status": "preregistered_comparison_pending_named_inputs",
+  "catalog": "foundation",
+  "layer_id": "instructions-skills",
+  "requirement": {
+    "ref": "catalogs/landscape/foundation.json#/layers/1",
+    "source_sha256": "868d193a31080ab913400725140bd0d01e0afe97e28564fd12777f737d22951a"
+  },
+  "unresolved_repositories": [
+    "https://github.com/mattpocock/skills"
+  ],
+  "harness": "Existing cc-native-practice paired runs and skills trial evidence; native per-client discovery/usage receipts remain separate.",
+  "scenarios": [
+    {
+      "role": "selected-skills",
+      "case_scope": {
+        "oracle": "Existing adopted trial tasks and independently frozen task oracles; paired identical task inputs without versus with selected mattpocock skill files, retaining all attempts."
+      },
+      "arms": [
+        "baseline native instructions",
+        "selected mattpocock/skills files at recovered immutable pin"
+      ],
+      "rule": "Require every baseline correctness/safety oracle to remain satisfied. Prefer fewer task errors, then lower complete provider tokens/cost at equal quality; an exact tie or an unmeasured gain does not expand adoption. Whole-pack installation is not an arm."
+    }
+  ],
+  "readiness": [
+    "Selected-file source pin/digests and owner trial task/oracle seals are retained",
+    "cc-native-practice and co-op provide client-specific row/launcher qualification receipts",
+    "The moved client/memory pins are reconciled through owning receipt paths"
+  ],
+  "deltas": [
+    "Retain contradictory historical winner/discovery evidence as qualified observations.",
+    "Consume the 09-29 substantive mattpocock survival; do not count its older missing vote as a new refutation."
+  ],
+  "execution_constraints": [
+    "No new discovery; only retained 09-29/10-08 candidates and explicitly dispatched review-and-landing arms.",
+    "Seal exact case/oracle/source-pin bytes before execution; do not tune acceptance after results.",
+    "Retain failures, errors, cancellations and complete effort/cost; upstream tests and native invoke evidence remain distinct.",
+    "Heavy suites in Monday 08:00Z\u201320:00Z require T2 idle wrapper; full suites also require SUITE-GO.",
+    "Terminal classification authority is the co-op #1007 LANDED relay and c2dee173 final-stack contract. A winner requires all four conditions before FINAL."
+  ]
+}

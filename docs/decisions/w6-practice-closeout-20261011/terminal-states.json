@@ -1,0 +1,729 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-11T23:39:55Z",
+  "authority": {
+    "protocol_commit": "569bbc59db2b5f7c8a932357726efb7acca90b91",
+    "protocol_path": "docs/decisions/2026-10-11-layer-resolution-protocol.md",
+    "final_stack_commit": "c2dee173da1f792ffd9cce958dd2ca84f47e8c16",
+    "final_stack_sha256": "2dd68f39d3a0ab12894cf49343f49ff9e22c2fdef9a0d6d4e751ef88ef1f1eab",
+    "final_stack_reader_script_sha256": "82742dea85a9d2f9c7579a1069947975b4033265cf55f1e1baa232d10767a317",
+    "landed_at_utc": "2026-10-11T23:34:58Z",
+    "coop_relay_received_at_utc": "2026-10-11T23:35:33Z"
+  },
+  "acceptance_state": "Recorded closeout for review; no qualified winner adoption or live configuration change.",
+  "terminal_counts": {
+    "FINAL": 0,
+    "SCHEDULED": 7,
+    "RETIRED": 0
+  },
+  "role_retirements": [
+    {
+      "repository": "https://github.com/anthropics/claude-code-action",
+      "role": "in-GitHub Claude OIDC review",
+      "reason": "Retired by #981; HARNESS-WIF-FIX-PROPOSAL is superseded.",
+      "authority_commit": "8bffa2c41692ef483e91b68e3b15aeb331423d2c",
+      "boundary": "This retires a role, not the entire git-github-automation layer or the local review-and-landing path."
+    }
+  ],
+  "layers": [
+    {
+      "catalog": "foundation",
+      "layer_id": "git-github-automation",
+      "terminal_state": "SCHEDULED",
+      "comparison_id": "w6-git-github-automation-20261011",
+      "preregistration_ref": "docs/decisions/w6-practice-closeout-20261011/git-github-automation.comparison.json",
+      "preregistration_sha256": "cd2cf214d5e0d625bd1119d7b2d833b7886e5a319f0428ca860b9eb19d82230d",
+      "readiness_trigger": {
+        "event": "The existing native harness owner retains the hash-bound w6-git-github-automation-20261011 input packet with all named inputs below; for review-and-landing, #953 and #975 must also be landed.",
+        "required_inputs": [
+          "#953 and #975 land for the review-and-landing replay",
+          "Archived W1 defective-head/oracle packet and P2 labeled case packet are retained with immutable hashes",
+          "Exact runtime pins, primary source and native acceptance boundaries are captured"
+        ],
+        "met_at_closeout": false
+      },
+      "decision_rule": [
+        {
+          "role": "review-and-landing",
+          "rule": "Reject any arm that fails to block any known P1 or P2; among all complete arms, choose fewest false blockers, then lowest complete measured provider cost; exact ties retain the qualified current path. Retain failures, incomplete reads and costs."
+        },
+        {
+          "role": "structural-diff",
+          "rule": "Score agent-answer quality with promptfoo using the same independently sealed change questions and exact-match expected answers for every arm. The better preregistered mean score becomes the slot's pick; a tie goes to the user, as the existing P2 decision requires."
+        }
+      ],
+      "frozen_scope_ref": "docs/decisions/w6-practice-closeout-20261011/git-github-automation.comparison.json",
+      "survivor_disposition_ref": "docs/decisions/w6-practice-closeout-20261011/inputs-and-dispositions.json",
+      "four_condition_assessment": {
+        "verdict": {
+          "available": true,
+          "record": {
+            "adjudication_ref": null,
+            "agreement": "same_winner",
+            "comparison_id": null,
+            "date": "2026-09-22",
+            "next_review": "2026-10-22",
+            "reopened_by": [
+              {
+                "date": "2026-09-23",
+                "sweep_id": "landscape-sweep-20260923"
+              },
+              {
+                "date": "2026-09-26",
+                "sweep_id": "landscape-sweep-20260926"
+              },
+              {
+                "date": "2026-09-29",
+                "sweep_id": "landscape-sweep-20260929"
+              }
+            ],
+            "status": "recorded",
+            "wave": "20260922",
+            "wave_doc": {
+              "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
+              "sha256": "2fef6da7468a8e97a319fdc6f75f73374cd34b412bf93de90fd0c2a7504159de"
+            }
+          },
+          "boundary": "Historical recorded verdict, reopened by retained sweeps; no new W6 winner judgment or run-pin acceptance is inferred."
+        },
+        "run_pins": {
+          "authority_commit": "c2dee173da1f792ffd9cce958dd2ca84f47e8c16",
+          "reader": "scripts.final_stack.Sources.json and scripts.final_stack.run_pin at the authority commit",
+          "winners": [
+            {
+              "component_id": "worktrunk",
+              "verdict_pin": "0.79.0",
+              "run_id": "worktrunk",
+              "run_pin": "0.80.0",
+              "run_pin_source": "manifests/stack.json#/components/35",
+              "pin_drift": "differs",
+              "run_reason": null
+            },
+            {
+              "component_id": "candidate:cli-cli",
+              "verdict_pin": "unpinned",
+              "run_id": "gh",
+              "run_pin": "2.101.0",
+              "run_pin_source": "adoption/pins-linux-x86_64.json#/tools/2",
+              "pin_drift": "unknown",
+              "run_reason": null
+            },
+            {
+              "component_id": "difftastic",
+              "verdict_pin": "0.71.0",
+              "run_id": "difftastic",
+              "run_pin": "0.71.0",
+              "run_pin_source": "manifests/stack.json#/components/14",
+              "pin_drift": "same",
+              "run_reason": null
+            }
+          ]
+        },
+        "upstream_e2e": {
+          "qualified_join": false,
+          "reason": "This closeout does not supply an upstream-owned install/test E2E receipt joined to every recorded run pin. Existing matrix host_e2e factors and earlier scoped receipts are retained in final-stack-run-assessment.json without promotion."
+        },
+        "invoke": {
+          "qualified_join": false,
+          "reason": "No complete per-winner adoption-window invoke join is supplied by this closeout; existing execution receipts retain their measured scopes. This is not a claim that the tools have zero calls."
+        },
+        "all_four_joined": false
+      },
+      "why_not_final": "Unresolved candidate roles are included in the preregistered comparison, and this closeout does not join all four FINAL conditions for every winner.",
+      "execution_policy": "Run when named inputs exist; do not re-research or delay to a calendar date. Existing W5 harnesses only. Monday heavy runs use T2 and the full-suite queue."
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "instructions-skills",
+      "terminal_state": "SCHEDULED",
+      "comparison_id": "w6-instructions-skills-20261011",
+      "preregistration_ref": "docs/decisions/w6-practice-closeout-20261011/instructions-skills.comparison.json",
+      "preregistration_sha256": "b8c61150368204bc7f381bc8e250fd8cef3880e32cd178ec03471c132865d03d",
+      "readiness_trigger": {
+        "event": "The existing native harness owner retains the hash-bound w6-instructions-skills-20261011 input packet with all named inputs below; for review-and-landing, #953 and #975 must also be landed.",
+        "required_inputs": [
+          "Selected-file source pin/digests and owner trial task/oracle seals are retained",
+          "cc-native-practice and co-op provide client-specific row/launcher qualification receipts",
+          "The moved client/memory pins are reconciled through owning receipt paths"
+        ],
+        "met_at_closeout": false
+      },
+      "decision_rule": [
+        {
+          "role": "selected-skills",
+          "rule": "Require every baseline correctness/safety oracle to remain satisfied. Prefer fewer task errors, then lower complete provider tokens/cost at equal quality; an exact tie or an unmeasured gain does not expand adoption. Whole-pack installation is not an arm."
+        }
+      ],
+      "frozen_scope_ref": "docs/decisions/w6-practice-closeout-20261011/instructions-skills.comparison.json",
+      "survivor_disposition_ref": "docs/decisions/w6-practice-closeout-20261011/inputs-and-dispositions.json",
+      "four_condition_assessment": {
+        "verdict": {
+          "available": true,
+          "record": {
+            "adjudication_ref": "evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-instructions-skills-20260922.json",
+            "agreement": "disagree",
+            "comparison_id": null,
+            "date": "2026-09-22",
+            "next_review": "2026-10-22",
+            "reopened_by": [
+              {
+                "date": "2026-09-23",
+                "sweep_id": "landscape-sweep-20260923"
+              },
+              {
+                "date": "2026-09-26",
+                "sweep_id": "landscape-sweep-20260926"
+              },
+              {
+                "date": "2026-09-29",
+                "sweep_id": "landscape-sweep-20260929"
+              }
+            ],
+            "status": "recorded",
+            "wave": "20260922",
+            "wave_doc": {
+              "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
+              "sha256": "2fef6da7468a8e97a319fdc6f75f73374cd34b412bf93de90fd0c2a7504159de"
+            }
+          },
+          "boundary": "Historical recorded verdict, reopened by retained sweeps; no new W6 winner judgment or run-pin acceptance is inferred."
+        },
+        "run_pins": {
+          "authority_commit": "c2dee173da1f792ffd9cce958dd2ca84f47e8c16",
+          "reader": "scripts.final_stack.Sources.json and scripts.final_stack.run_pin at the authority commit",
+          "winners": [
+            {
+              "component_id": "affaan-m/ECC",
+              "verdict_pin": "dd6ee538aee0f548d4a6b520118f875431fd749e",
+              "run_id": "affaan-m/ECC",
+              "run_pin": "dd6ee538aee0f548d4a6b520118f875431fd749e",
+              "run_pin_source": "manifests/stack.json#/components/0",
+              "pin_drift": "same",
+              "run_reason": null
+            },
+            {
+              "component_id": "candidate:typesafe-ai-skills",
+              "verdict_pin": "unpinned",
+              "run_id": null,
+              "run_pin": null,
+              "run_pin_source": null,
+              "pin_drift": null,
+              "run_reason": "unpinned"
+            },
+            {
+              "component_id": "candidate:openai-skills",
+              "verdict_pin": "unpinned",
+              "run_id": null,
+              "run_pin": null,
+              "run_pin_source": null,
+              "pin_drift": null,
+              "run_reason": "unpinned"
+            }
+          ]
+        },
+        "upstream_e2e": {
+          "qualified_join": false,
+          "reason": "This closeout does not supply an upstream-owned install/test E2E receipt joined to every recorded run pin. Existing matrix host_e2e factors and earlier scoped receipts are retained in final-stack-run-assessment.json without promotion."
+        },
+        "invoke": {
+          "qualified_join": false,
+          "reason": "No complete per-winner adoption-window invoke join is supplied by this closeout; existing execution receipts retain their measured scopes. This is not a claim that the tools have zero calls."
+        },
+        "all_four_joined": false
+      },
+      "why_not_final": "Unresolved candidate roles are included in the preregistered comparison, and this closeout does not join all four FINAL conditions for every winner.",
+      "execution_policy": "Run when named inputs exist; do not re-research or delay to a calendar date. Existing W5 harnesses only. Monday heavy runs use T2 and the full-suite queue."
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "observation-inference",
+      "terminal_state": "SCHEDULED",
+      "comparison_id": "w6-observation-inference-20261011",
+      "preregistration_ref": "docs/decisions/w6-practice-closeout-20261011/observation-inference.comparison.json",
+      "preregistration_sha256": "c7e0fff63c3695472be8dbfb366bdede2b65bb3ee22fb39d879e257591bee9df",
+      "readiness_trigger": {
+        "event": "The existing native harness owner retains the hash-bound w6-observation-inference-20261011 input packet with all named inputs below; for review-and-landing, #953 and #975 must also be landed.",
+        "required_inputs": [
+          "All six retained candidate primary sources and exact pins are recovered",
+          "Native task/counter and inference task/model/hardware case seals are retained",
+          "Existing inference account/hardware and Monday paper execution gates permit the scoped run"
+        ],
+        "met_at_closeout": false
+      },
+      "decision_rule": [
+        {
+          "role": "telemetry",
+          "rule": "Reject lost/double-counted requests, sensitive-content capture or incomplete source attribution. Compare reconciled counts/fidelity first, then measured collection overhead; exact ties retain the qualified current route."
+        },
+        {
+          "role": "local-inference",
+          "rule": "Require all existing correctness/privacy/recovery oracles, then compare measured latency and resource cost under identical workload constraints. Any unsupported host/model combination is retained as a bounded non-result, not a winner."
+        }
+      ],
+      "frozen_scope_ref": "docs/decisions/w6-practice-closeout-20261011/observation-inference.comparison.json",
+      "survivor_disposition_ref": "docs/decisions/w6-practice-closeout-20261011/inputs-and-dispositions.json",
+      "four_condition_assessment": {
+        "verdict": {
+          "available": true,
+          "record": {
+            "adjudication_ref": "evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-observation-inference-20260922.json",
+            "agreement": "disagree",
+            "comparison_id": null,
+            "date": "2026-09-22",
+            "next_review": "2026-10-22",
+            "reopened_by": [
+              {
+                "date": "2026-09-23",
+                "sweep_id": "landscape-sweep-20260923"
+              },
+              {
+                "date": "2026-09-26",
+                "sweep_id": "landscape-sweep-20260926"
+              },
+              {
+                "date": "2026-09-29",
+                "sweep_id": "landscape-sweep-20260929"
+              }
+            ],
+            "status": "recorded",
+            "wave": "20260922",
+            "wave_doc": {
+              "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
+              "sha256": "2fef6da7468a8e97a319fdc6f75f73374cd34b412bf93de90fd0c2a7504159de"
+            }
+          },
+          "boundary": "Historical recorded verdict, reopened by retained sweeps; no new W6 winner judgment or run-pin acceptance is inferred."
+        },
+        "run_pins": {
+          "authority_commit": "c2dee173da1f792ffd9cce958dd2ca84f47e8c16",
+          "reader": "scripts.final_stack.Sources.json and scripts.final_stack.run_pin at the authority commit",
+          "winners": [
+            {
+              "component_id": "opentelemetry-collector-contrib",
+              "verdict_pin": "0.161.0",
+              "run_id": "opentelemetry-collector-contrib",
+              "run_pin": "0.162.0",
+              "run_pin_source": "manifests/stack.json#/components/36",
+              "pin_drift": "differs",
+              "run_reason": null
+            },
+            {
+              "component_id": "prometheus",
+              "verdict_pin": "3.14.0",
+              "run_id": "prometheus",
+              "run_pin": "3.15.0",
+              "run_pin_source": "manifests/stack.json#/components/37",
+              "pin_drift": "differs",
+              "run_reason": null
+            },
+            {
+              "component_id": "loki",
+              "verdict_pin": "3.7.8",
+              "run_id": "loki",
+              "run_pin": "3.7.8",
+              "run_pin_source": "manifests/stack.json#/components/38",
+              "pin_drift": "same",
+              "run_reason": null
+            }
+          ]
+        },
+        "upstream_e2e": {
+          "qualified_join": false,
+          "reason": "This closeout does not supply an upstream-owned install/test E2E receipt joined to every recorded run pin. Existing matrix host_e2e factors and earlier scoped receipts are retained in final-stack-run-assessment.json without promotion."
+        },
+        "invoke": {
+          "qualified_join": false,
+          "reason": "No complete per-winner adoption-window invoke join is supplied by this closeout; existing execution receipts retain their measured scopes. This is not a claim that the tools have zero calls."
+        },
+        "all_four_joined": false
+      },
+      "why_not_final": "Unresolved candidate roles are included in the preregistered comparison, and this closeout does not join all four FINAL conditions for every winner.",
+      "execution_policy": "Run when named inputs exist; do not re-research or delay to a calendar date. Existing W5 harnesses only. Monday heavy runs use T2 and the full-suite queue."
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "quality-evaluation",
+      "terminal_state": "SCHEDULED",
+      "comparison_id": "w6-quality-evaluation-20261011",
+      "preregistration_ref": "docs/decisions/w6-practice-closeout-20261011/quality-evaluation.comparison.json",
+      "preregistration_sha256": "a2f7d85167bec0bcc2f08eab35397a436dce0c1bf8c0657163d7cc5610c14dd6",
+      "readiness_trigger": {
+        "event": "The existing native harness owner retains the hash-bound w6-quality-evaluation-20261011 input packet with all named inputs below; for review-and-landing, #953 and #975 must also be landed.",
+        "required_inputs": [
+          "60-case advice packet has an independent label seal and immutable case hash",
+          "MTEB retained source and matching embedding-evaluation case packet are recovered",
+          "Upstream install/test paths at the selected source pins are available"
+        ],
+        "met_at_closeout": false
+      },
+      "decision_rule": [
+        {
+          "role": "semantic-advice-evaluation",
+          "rule": "Reject an arm that loses a case or hides an error/cancellation; compare grading disagreements against the same sealed labels, then false positive count, then complete provider cost. Exact ties retain the qualified incumbent. No adoption from runtime/installation alone."
+        },
+        {
+          "role": "embedding-evaluation",
+          "rule": "Reject missing/error or mismatched inputs; use identical retrieval relevance labels and existing task acceptance thresholds, then lowest complete execution cost among equal-quality arms. This auxiliary role does not substitute for the Promptfoo-versus-Inspect decision."
+        }
+      ],
+      "frozen_scope_ref": "docs/decisions/w6-practice-closeout-20261011/quality-evaluation.comparison.json",
+      "survivor_disposition_ref": "docs/decisions/w6-practice-closeout-20261011/inputs-and-dispositions.json",
+      "four_condition_assessment": {
+        "verdict": {
+          "available": true,
+          "record": {
+            "adjudication_ref": null,
+            "agreement": "same_winner",
+            "comparison_id": null,
+            "date": "2026-09-22",
+            "next_review": "2026-10-22",
+            "reopened_by": [
+              {
+                "date": "2026-09-23",
+                "sweep_id": "landscape-sweep-20260923"
+              },
+              {
+                "date": "2026-09-26",
+                "sweep_id": "landscape-sweep-20260926"
+              },
+              {
+                "date": "2026-09-29",
+                "sweep_id": "landscape-sweep-20260929"
+              }
+            ],
+            "status": "recorded",
+            "wave": "20260922",
+            "wave_doc": {
+              "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
+              "sha256": "2fef6da7468a8e97a319fdc6f75f73374cd34b412bf93de90fd0c2a7504159de"
+            }
+          },
+          "boundary": "Historical recorded verdict, reopened by retained sweeps; no new W6 winner judgment or run-pin acceptance is inferred."
+        },
+        "run_pins": {
+          "authority_commit": "c2dee173da1f792ffd9cce958dd2ca84f47e8c16",
+          "reader": "scripts.final_stack.Sources.json and scripts.final_stack.run_pin at the authority commit",
+          "winners": [
+            {
+              "component_id": "promptfoo",
+              "verdict_pin": "0.123.1",
+              "run_id": "promptfoo",
+              "run_pin": "0.123.1",
+              "run_pin_source": "manifests/stack.json#/components/23",
+              "pin_drift": "same",
+              "run_reason": null
+            },
+            {
+              "component_id": "playwright-test",
+              "verdict_pin": "1.63.0",
+              "run_id": "playwright-test",
+              "run_pin": "1.63.0",
+              "run_pin_source": "manifests/stack.json#/components/65",
+              "pin_drift": "same",
+              "run_reason": null
+            }
+          ]
+        },
+        "upstream_e2e": {
+          "qualified_join": false,
+          "reason": "This closeout does not supply an upstream-owned install/test E2E receipt joined to every recorded run pin. Existing matrix host_e2e factors and earlier scoped receipts are retained in final-stack-run-assessment.json without promotion."
+        },
+        "invoke": {
+          "qualified_join": false,
+          "reason": "No complete per-winner adoption-window invoke join is supplied by this closeout; existing execution receipts retain their measured scopes. This is not a claim that the tools have zero calls."
+        },
+        "all_four_joined": false
+      },
+      "why_not_final": "Unresolved candidate roles are included in the preregistered comparison, and this closeout does not join all four FINAL conditions for every winner.",
+      "execution_policy": "Run when named inputs exist; do not re-research or delay to a calendar date. Existing W5 harnesses only. Monday heavy runs use T2 and the full-suite queue."
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "recovery-portability",
+      "terminal_state": "SCHEDULED",
+      "comparison_id": "w6-recovery-portability-20261011",
+      "preregistration_ref": "docs/decisions/w6-practice-closeout-20261011/recovery-portability.comparison.json",
+      "preregistration_sha256": "6596dbfba2fbb158b05f3d801a090937d7d8cd20a8cde3dd538fd47df8bda167",
+      "readiness_trigger": {
+        "event": "The existing native harness owner retains the hash-bound w6-recovery-portability-20261011 input packet with all named inputs below; for review-and-landing, #953 and #975 must also be landed.",
+        "required_inputs": [
+          "WSL retained primary source and missing GPT-fit outcome are recovered or substantively adjudicated",
+          "The declared restoration profile and synthetic input/oracle seal are retained",
+          "A destination host and its normal native sign-ins exist before any genuine destination-host acceptance"
+        ],
+        "met_at_closeout": false
+      },
+      "decision_rule": [
+        {
+          "role": "portable-owned-recovery",
+          "rule": "Reject a route that cannot restore the same declared paths/types/bytes/modes or isolate the declared scope, or that requires copying credential contents. Compare only equal restoration scopes, then recovery effort/cost; exact ties retain the smaller qualified current path. Full-distro export cannot prove selective profile portability."
+        }
+      ],
+      "frozen_scope_ref": "docs/decisions/w6-practice-closeout-20261011/recovery-portability.comparison.json",
+      "survivor_disposition_ref": "docs/decisions/w6-practice-closeout-20261011/inputs-and-dispositions.json",
+      "four_condition_assessment": {
+        "verdict": {
+          "available": true,
+          "record": {
+            "adjudication_ref": null,
+            "agreement": "same_winner",
+            "comparison_id": null,
+            "date": "2026-09-22",
+            "next_review": "2026-10-22",
+            "reopened_by": [
+              {
+                "date": "2026-09-23",
+                "sweep_id": "landscape-sweep-20260923"
+              },
+              {
+                "date": "2026-09-26",
+                "sweep_id": "landscape-sweep-20260926"
+              },
+              {
+                "date": "2026-09-29",
+                "sweep_id": "landscape-sweep-20260929"
+              }
+            ],
+            "status": "recorded",
+            "wave": "20260922",
+            "wave_doc": {
+              "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
+              "sha256": "2fef6da7468a8e97a319fdc6f75f73374cd34b412bf93de90fd0c2a7504159de"
+            }
+          },
+          "boundary": "Historical recorded verdict, reopened by retained sweeps; no new W6 winner judgment or run-pin acceptance is inferred."
+        },
+        "run_pins": {
+          "authority_commit": "c2dee173da1f792ffd9cce958dd2ca84f47e8c16",
+          "reader": "scripts.final_stack.Sources.json and scripts.final_stack.run_pin at the authority commit",
+          "winners": [
+            {
+              "component_id": "restic",
+              "verdict_pin": "0.19.1",
+              "run_id": "restic",
+              "run_pin": "0.19.1",
+              "run_pin_source": "manifests/stack.json#/components/43",
+              "pin_drift": "same",
+              "run_reason": null
+            },
+            {
+              "component_id": "candidate:astral-sh-uv",
+              "verdict_pin": "unpinned",
+              "run_id": "uv",
+              "run_pin": "0.12.17",
+              "run_pin_source": "adoption/pins-linux-x86_64.json#/tools/1",
+              "pin_drift": "unknown",
+              "run_reason": null
+            }
+          ]
+        },
+        "upstream_e2e": {
+          "qualified_join": false,
+          "reason": "This closeout does not supply an upstream-owned install/test E2E receipt joined to every recorded run pin. Existing matrix host_e2e factors and earlier scoped receipts are retained in final-stack-run-assessment.json without promotion."
+        },
+        "invoke": {
+          "qualified_join": false,
+          "reason": "No complete per-winner adoption-window invoke join is supplied by this closeout; existing execution receipts retain their measured scopes. This is not a claim that the tools have zero calls."
+        },
+        "all_four_joined": false
+      },
+      "why_not_final": "Unresolved candidate roles are included in the preregistered comparison, and this closeout does not join all four FINAL conditions for every winner.",
+      "execution_policy": "Run when named inputs exist; do not re-research or delay to a calendar date. Existing W5 harnesses only. Monday heavy runs use T2 and the full-suite queue."
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "scheduling-supervision",
+      "terminal_state": "SCHEDULED",
+      "comparison_id": "w6-scheduling-supervision-20261011",
+      "preregistration_ref": "docs/decisions/w6-practice-closeout-20261011/scheduling-supervision.comparison.json",
+      "preregistration_sha256": "c534d3ad24a3312219ea4107ae9f18a42af12bfa70acf8676263d5adbcaa7135",
+      "readiness_trigger": {
+        "event": "The existing native harness owner retains the hash-bound w6-scheduling-supervision-20261011 input packet with all named inputs below; for review-and-landing, #953 and #975 must also be landed.",
+        "required_inputs": [
+          "Three retained alternative source pins and upstream-supported test paths are recovered",
+          "Existing shared recovery workload and its input/oracle hashes are sealed for all arms",
+          "Owning runtime/client moved-pin receipts and execution capacity gate are satisfied"
+        ],
+        "met_at_closeout": false
+      },
+      "decision_rule": [
+        {
+          "role": "owned-checkpoint-recovery",
+          "rule": "Reject lost accepted checkpoints, duplicate effects in the declared scope, ineffective cancellation or failed recovery. Among passing equal-scope arms compare operational/resource cost; exact ties retain the qualified current pair. Do not promote synthetic checkpoint recovery to real host-loss or exactly-once external-effects acceptance."
+        }
+      ],
+      "frozen_scope_ref": "docs/decisions/w6-practice-closeout-20261011/scheduling-supervision.comparison.json",
+      "survivor_disposition_ref": "docs/decisions/w6-practice-closeout-20261011/inputs-and-dispositions.json",
+      "four_condition_assessment": {
+        "verdict": {
+          "available": true,
+          "record": {
+            "adjudication_ref": null,
+            "agreement": "same_winner",
+            "comparison_id": null,
+            "date": "2026-09-22",
+            "next_review": "2026-10-22",
+            "reopened_by": [
+              {
+                "date": "2026-09-23",
+                "sweep_id": "landscape-sweep-20260923"
+              },
+              {
+                "date": "2026-09-26",
+                "sweep_id": "landscape-sweep-20260926"
+              },
+              {
+                "date": "2026-09-29",
+                "sweep_id": "landscape-sweep-20260929"
+              }
+            ],
+            "status": "recorded",
+            "wave": "20260922",
+            "wave_doc": {
+              "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
+              "sha256": "2fef6da7468a8e97a319fdc6f75f73374cd34b412bf93de90fd0c2a7504159de"
+            }
+          },
+          "boundary": "Historical recorded verdict, reopened by retained sweeps; no new W6 winner judgment or run-pin acceptance is inferred."
+        },
+        "run_pins": {
+          "authority_commit": "c2dee173da1f792ffd9cce958dd2ca84f47e8c16",
+          "reader": "scripts.final_stack.Sources.json and scripts.final_stack.run_pin at the authority commit",
+          "winners": [
+            {
+              "component_id": "dagu",
+              "verdict_pin": "2.16.6",
+              "run_id": "dagu",
+              "run_pin": "2.16.6",
+              "run_pin_source": "manifests/stack.json#/components/44",
+              "pin_drift": "same",
+              "run_reason": null
+            },
+            {
+              "component_id": "systemd",
+              "verdict_pin": "255.4-1ubuntu8.17",
+              "run_id": "systemd",
+              "run_pin": "255.4-1ubuntu8.17",
+              "run_pin_source": "manifests/stack.json#/components/48",
+              "pin_drift": "same",
+              "run_reason": null
+            }
+          ]
+        },
+        "upstream_e2e": {
+          "qualified_join": false,
+          "reason": "This closeout does not supply an upstream-owned install/test E2E receipt joined to every recorded run pin. Existing matrix host_e2e factors and earlier scoped receipts are retained in final-stack-run-assessment.json without promotion."
+        },
+        "invoke": {
+          "qualified_join": false,
+          "reason": "No complete per-winner adoption-window invoke join is supplied by this closeout; existing execution receipts retain their measured scopes. This is not a claim that the tools have zero calls."
+        },
+        "all_four_joined": false
+      },
+      "why_not_final": "Unresolved candidate roles are included in the preregistered comparison, and this closeout does not join all four FINAL conditions for every winner.",
+      "execution_policy": "Run when named inputs exist; do not re-research or delay to a calendar date. Existing W5 harnesses only. Monday heavy runs use T2 and the full-suite queue."
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "token-efficiency",
+      "terminal_state": "SCHEDULED",
+      "comparison_id": "w6-token-efficiency-20261011",
+      "preregistration_ref": "docs/decisions/w6-practice-closeout-20261011/token-efficiency.comparison.json",
+      "preregistration_sha256": "3948be402612b61940ff3b00cb6be5e308d48d798700aa417118cb7538480761",
+      "readiness_trigger": {
+        "event": "The existing native harness owner retains the hash-bound w6-token-efficiency-20261011 input packet with all named inputs below; for review-and-landing, #953 and #975 must also be landed.",
+        "required_inputs": [
+          "All five retained candidate primary sources and immutable pins are recovered",
+          "Matched-task input/oracle and original-context packet is sealed by its existing evidence owner",
+          "Existing usage path captures complete provider totals and retained failures"
+        ],
+        "met_at_closeout": false
+      },
+      "decision_rule": [
+        {
+          "role": "context-and-usage",
+          "rule": "Reject loss of task correctness, unavailable exact original recovery, duplicate/missing provider accounting or privacy failure. Among equal-quality complete arms choose lower total provider tokens/cost including recovery and failures. Artifact token estimates and cache subsets never substitute for provider totals; ties retain the qualified current path."
+        }
+      ],
+      "frozen_scope_ref": "docs/decisions/w6-practice-closeout-20261011/token-efficiency.comparison.json",
+      "survivor_disposition_ref": "docs/decisions/w6-practice-closeout-20261011/inputs-and-dispositions.json",
+      "four_condition_assessment": {
+        "verdict": {
+          "available": true,
+          "record": {
+            "adjudication_ref": "evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-token-efficiency-20260922.json",
+            "agreement": "disagree",
+            "comparison_id": null,
+            "date": "2026-09-22",
+            "next_review": "2026-10-22",
+            "reopened_by": [
+              {
+                "date": "2026-09-23",
+                "sweep_id": "landscape-sweep-20260923"
+              },
+              {
+                "date": "2026-09-26",
+                "sweep_id": "landscape-sweep-20260926"
+              },
+              {
+                "date": "2026-09-29",
+                "sweep_id": "landscape-sweep-20260929"
+              }
+            ],
+            "status": "recorded",
+            "wave": "20260922",
+            "wave_doc": {
+              "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
+              "sha256": "2fef6da7468a8e97a319fdc6f75f73374cd34b412bf93de90fd0c2a7504159de"
+            }
+          },
+          "boundary": "Historical recorded verdict, reopened by retained sweeps; no new W6 winner judgment or run-pin acceptance is inferred."
+        },
+        "run_pins": {
+          "authority_commit": "c2dee173da1f792ffd9cce958dd2ca84f47e8c16",
+          "reader": "scripts.final_stack.Sources.json and scripts.final_stack.run_pin at the authority commit",
+          "winners": [
+            {
+              "component_id": "rtk",
+              "verdict_pin": "0.49.0",
+              "run_id": "rtk",
+              "run_pin": "0.51.0",
+              "run_pin_source": "adoption/pins-linux-x86_64.json#/tools/6",
+              "pin_drift": "differs",
+              "run_reason": null
+            },
+            {
+              "component_id": "headroom",
+              "verdict_pin": "0.37.0",
+              "run_id": "headroom",
+              "run_pin": "0.40.0",
+              "run_pin_source": "adoption/pins-linux-x86_64.json#/tools/18",
+              "pin_drift": "differs",
+              "run_reason": null
+            },
+            {
+              "component_id": "ccusage",
+              "verdict_pin": "20.0.24",
+              "run_id": "ccusage",
+              "run_pin": "20.0.26",
+              "run_pin_source": "adoption/pins-linux-x86_64.json#/tools/17",
+              "pin_drift": "differs",
+              "run_reason": null
+            }
+          ]
+        },
+        "upstream_e2e": {
+          "qualified_join": false,
+          "reason": "This closeout does not supply an upstream-owned install/test E2E receipt joined to every recorded run pin. Existing matrix host_e2e factors and earlier scoped receipts are retained in final-stack-run-assessment.json without promotion."
+        },
+        "invoke": {
+          "qualified_join": false,
+          "reason": "No complete per-winner adoption-window invoke join is supplied by this closeout; existing execution receipts retain their measured scopes. This is not a claim that the tools have zero calls."
+        },
+        "all_four_joined": false
+      },
+      "why_not_final": "Unresolved candidate roles are included in the preregistered comparison, and this closeout does not join all four FINAL conditions for every winner.",
+      "execution_policy": "Run when named inputs exist; do not re-research or delay to a calendar date. Existing W5 harnesses only. Monday heavy runs use T2 and the full-suite queue."
+    }
+  ]
+}
