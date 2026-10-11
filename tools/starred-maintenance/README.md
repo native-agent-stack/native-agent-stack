@@ -14,9 +14,16 @@ absent from a later live response. Each notification also lists those identities
 Canonical dispositions clear work; reopening a review advances its retained
 generation, so a previous notification cannot suppress the new review. A retry
 reuses the same identity. A previously written snapshot recovers intake if a
-process stops before preparing its journal; an append failure replays the prepared
-notification before the next acquisition. The latest snapshot remains a record
-of the actual live response, while the journal holds unresolved review work.
+legacy process stopped before preparing its journal. Current runs first save
+`newstars-prepared.json`, one atomic recovery record containing both the live
+snapshot and pending review observations, then publish the journal and snapshot.
+Retry completes both publications before posting a notification or fetching
+another response. Consecutive journal or snapshot failures leave that recovery
+record available with the original first-observed dates. The record is marked
+posted only after the notification and posted journal succeed; an append or final
+marker failure replays the same notification identity once. The latest snapshot
+remains a record of the actual live response, while the journal holds unresolved
+review work. Retain the prepared record alongside both files during recovery.
 
 Render the units with the actual live clone path. The example uses shell-expanded
 home paths; set `stars_repo` to the CC's live clone before running it.

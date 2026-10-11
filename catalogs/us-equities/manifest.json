@@ -59,6 +59,6 @@
   "broader_reference_union": 171,
   "star_audit_file": "catalogs/us-equities/star-audit.json",
   "grand_index_repositories": 901,
-  "grand_index_beyond_stars": 544,
+  "grand_index_beyond_stars": 528,
   "decision_index_file": "catalogs/us-equities/decision-index.json"
 }

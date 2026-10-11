@@ -82,7 +82,8 @@ The broader catalog's workflow-assignment fields are excluded. A complete pair
 of tier verdicts requires the awaiting follow-up to be removed from both the
 manifest and snapshot.
 
-The review packet retains all cited upstream files, resolved release tags,
+The review packet retains the five new repositories' cited upstream files,
+implementation sources, resolved release tags,
 the original new-five metadata/pin record, the master seed, and the historical
 baseline index/audit/templates in a separate `sources` directory with
 `MANIFEST.sha256`. All twelve new-repository file hashes and Git blob identities
@@ -91,3 +92,73 @@ capture with the 2022-11-28 selector. The original raw public API response was
 deliberately never retained; the allowlisted catalog and its native writer
 reproduction are the acquisition evidence. Reacquired source bytes and tag
 resolutions are distinct from the retained 2026-10-10 metadata observations.
+Historical citations embedded in the master capture are discovery witnesses;
+their transitive sources are not all retained or independently verified here.
+
+## Consecutive publication-failure correction, 2026-10-11
+
+At `3bbc426cab79ac57146c67022b3cce2a3e9665b7`, two successive journal-write
+failures could overwrite the only recovery snapshot with an API response that
+omitted unresolved work. The next successful run lost the identity and its
+first-observed date. A separate adjacent regression also showed that retry
+fetched another response before completing a failed snapshot publication.
+
+The installed CPython 3.13.16 source,
+[`Doc/library/os.rst:2754-2760` at `cbc944f4`](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Doc/library/os.rst#L2754-L2760),
+documents atomic replacement of one file. It supplies no transaction across
+the snapshot and notification journal. The existing `_write_json` mechanism is
+therefore reused to save one `newstars-prepared.json` record containing both
+documents before publishing either. Recovery republishes the journal and saved
+snapshot before notification or another acquisition. The record remains prepared
+until the posted journal and notification complete, so all later failures can
+retry with the same identities, generations and first-observation dates.
+
+Two regression checks failed before this correction: consecutive journal failures
+lost `example/new`, and consecutive snapshot failures fetched again before
+recovery. Both pass with the correction. The original reviewer regression also
+passes. Further checks cover final-marker failure, preparation failure preserving
+previous state, legacy prepared journals, append failure, omitted responses,
+canonical clearance and reopened review work. These are actual local executions
+with synthetic API responses and injected filesystem failures; power-loss
+durability and live weekly network delivery are not measured by these checks.
+
+The alternative was to make the latest snapshot itself contain live metadata and
+pending work. A separate prepared record preserves the existing snapshot and
+journal interfaces and the live-response meaning of the snapshot. A maintained
+upstream facility supporting the same public allowlist, canonical review queue
+and reproduced recovery windows would overturn this repository glue.
+
+The same correction addresses five adjacent review findings through the existing
+repository interfaces at `3bbc426cab79ac57146c67022b3cce2a3e9665b7`:
+`scripts/catalog_decisions.py:157-221,251-284` defines typed source registration
+and derived review fields; `scripts/build_ecosystem.py:783-839,885-921,1264-1271`
+defines tracked reads and input hashes; `scripts/starred_convergence.py:35-50,86-100`
+resolves source pointers. Their exact pre-fix files are retained with the pinned
+CPython capture in the correction packet's checksum manifest.
+
+Convergence references now retain `source_review` for the five pinned new
+repositories and `metadata_review` for the other 368. The native decision-index
+writer registers the current public-star snapshot as its sanctioned `public_star`
+source when that file exists. Current membership comes from that collection;
+older coverage references remain available as historical evidence. Without a
+canonical snapshot, legacy fixtures keep their existing membership behavior.
+The registered current snapshot is mandatory where present, preventing a stale
+index from silently falling back to historical flags. The derived union remains
+901 repositories with 373 current stars and 528 beyond current stars.
+
+The convergence validator accepts the builder's tracked reader for every local
+document it resolves, binding dynamic master/projection inputs and verdict
+registries to the reported input digest. A source object declaring a repository
+must match its seed's normalized identity. This also caught four existing pointers
+from the two awesome-react discovery seeds to React component rows; those
+cross-repository pointers were removed. The committed historical master remains
+byte-identical and both seeds retain their own snapshot and master references.
+Finally, empty-queue notification identities include retained review generations,
+so initial emptiness, later clearance and reopened clearance each notify once.
+
+Six focused checks failed before these corrections and pass after them: rendered
+metadata/source flags, current snapshot membership, tracked dynamic evidence and
+digest changes, empty-queue transitions, and snapshot/non-snapshot identity joins.
+The full committed current-star set is independently compared with the canonical
+snapshot. These are offline repository integration and synthetic transition
+checks; they do not qualify upstream runtime execution or live weekly delivery.

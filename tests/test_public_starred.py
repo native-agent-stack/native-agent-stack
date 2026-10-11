@@ -233,6 +233,34 @@ class PublicStarredTests(unittest.TestCase):
         self.assertFalse(retry["newstars_posted"])
         self.assertEqual(self.questions.read_text().count("## NEWSTARS 1"), 2)
 
+    def test_each_queue_clearance_is_observable_and_its_retry_deduplicates(self):
+        with self.api([[api_row()]]):
+            initial = self.refresh_state()
+        with self.api([[api_row(), api_row("example/new")]]):
+            self.refresh_state()
+        self.baseline["count"] = 2
+        self.baseline["repositories"].append({"repository": "example/new",
+                                             "disposition": "OUT-OF-SCOPE: recorded review"})
+        self.save_baseline()
+        with self.api([[api_row()]]):
+            cleared = self.refresh_state()
+        self.assertNotEqual(cleared["notification_id"], initial["notification_id"])
+        self.assertEqual(self.questions.read_text().count("## NEWSTARS 0"), 2)
+        with self.api([[api_row()]]):
+            retry = self.refresh_state()
+        self.assertEqual(retry["notification_id"], cleared["notification_id"])
+        self.assertFalse(retry["newstars_posted"])
+        self.baseline["repositories"][1]["disposition"] = "NEEDS-EVIDENCE: review reopened"
+        self.save_baseline()
+        with self.api([[api_row()]]):
+            self.refresh_state()
+        self.baseline["repositories"][1]["disposition"] = "OUT-OF-SCOPE: second recorded review"
+        self.save_baseline()
+        with self.api([[api_row()]]):
+            second_clearance = self.refresh_state()
+        self.assertNotEqual(second_clearance["notification_id"], cleared["notification_id"])
+        self.assertEqual(self.questions.read_text().count("## NEWSTARS 0"), 3)
+
     def test_observation_must_not_be_newer_than_containing_snapshot(self):
         self.baseline["repositories"][0].update(disposition="PENDING",
                                                first_observed_at="2026-10-09T00:00:00Z")
@@ -275,6 +303,68 @@ class PublicStarredTests(unittest.TestCase):
         self.assertFalse(receipt["newstars_posted"])
         self.assertEqual(self.questions.read_text().count("## NEWSTARS 1"), 1)
 
+    def test_consecutive_journal_failures_retain_unresolved_identity_and_first_observation(self):
+        original_write = stars._write_json
+
+        def fail_journal(path, value):
+            if Path(path).name == stars.JOURNAL_NAME:
+                raise OSError("simulated journal write failure")
+            original_write(path, value)
+
+        for rows in ([api_row(), api_row("example/new")], [api_row()]):
+            with self.api([rows]), patch.object(stars, "_write_json", side_effect=fail_journal):
+                with self.assertRaisesRegex(OSError, "simulated journal write failure"):
+                    self.refresh_state()
+        self.assertNotIn("## NEWSTARS", self.questions.read_text())
+        with self.api([[api_row()]]):
+            report = stars.refresh_public_stars(self.root, state_dir=self.state,
+                                               questions=self.questions, now=NOW + timedelta(days=1))
+        journal = json.loads((self.state / stars.JOURNAL_NAME).read_text())
+        self.assertEqual(journal["pending_repositories"], ["example/new"])
+        self.assertEqual(journal["pending_observations"]["example/new"]["first_observed_at"],
+                         "2026-10-10T17:00:00Z")
+        self.assertEqual(report["queued_count"], 1)
+        self.assertEqual(self.questions.read_text().count("## NEWSTARS 1"), 1)
+        self.assertIn("Repositories: example/new", self.questions.read_text())
+
+    def test_prepared_snapshot_is_published_before_notification_or_next_fetch(self):
+        original_write = stars._write_json
+
+        def fail_snapshot(path, value):
+            if Path(path).name == stars.SNAPSHOT_NAME:
+                raise OSError("simulated snapshot write failure")
+            original_write(path, value)
+
+        with self.api([[api_row(), api_row("example/new")]]), patch.object(
+                stars, "_write_json", side_effect=fail_snapshot):
+            with self.assertRaisesRegex(OSError, "simulated snapshot write failure"):
+                self.refresh_state()
+        self.assertNotIn("## NEWSTARS", self.questions.read_text())
+        with self.api([[api_row()]]), patch.object(stars, "_write_json", side_effect=fail_snapshot), \
+                patch.object(stars, "_fetch", wraps=stars._fetch) as fetch, \
+                patch.object(stars, "_notify", wraps=stars._notify) as notify:
+            with self.assertRaisesRegex(OSError, "simulated snapshot write failure"):
+                self.refresh_state()
+            fetch.assert_not_called()
+            notify.assert_not_called()
+
+        original_notify = stars._notify
+
+        def require_published_snapshot(*args, **kwargs):
+            if args[5] == NOW:
+                snapshot = json.loads((self.state / stars.SNAPSHOT_NAME).read_text())
+                self.assertIn("example/new", stars._rows(snapshot))
+                self.assertEqual(snapshot["retrieved_at"], "2026-10-10T17:00:00Z")
+            return original_notify(*args, **kwargs)
+
+        with self.api([[api_row()]]), patch.object(stars, "_notify", side_effect=require_published_snapshot):
+            report = stars.refresh_public_stars(self.root, state_dir=self.state,
+                                               questions=self.questions, now=NOW + timedelta(days=1))
+        self.assertEqual(report["queued_count"], 1)
+        self.assertEqual(self.questions.read_text().count("## NEWSTARS 1"), 1)
+        snapshot = json.loads((self.state / stars.SNAPSHOT_NAME).read_text())
+        self.assertNotIn("example/new", stars._rows(snapshot))
+
     def test_missing_live_canonical_unreviewed_row_retains_legacy_observation(self):
         self.baseline["repositories"][0]["disposition"] = "NEEDS-EVIDENCE: review missing"
         self.save_baseline()
@@ -284,6 +374,60 @@ class PublicStarredTests(unittest.TestCase):
         journal = json.loads((self.state / stars.JOURNAL_NAME).read_text())
         self.assertEqual(journal["pending_observations"]["example/project"]["first_observed_at"],
                          "2026-10-01T00:00:00Z")
+
+    def test_stop_after_notification_before_publication_marker_replays_once(self):
+        original_write = stars._write_json
+
+        def stop_before_marker(path, value):
+            if Path(path).name == stars.PREPARED_NAME and value.get("publication_state") == "posted":
+                raise OSError("simulated stop before publication marker")
+            original_write(path, value)
+
+        with self.api([[api_row(), api_row("example/new")]]), patch.object(
+                stars, "_write_json", side_effect=stop_before_marker):
+            with self.assertRaisesRegex(OSError, "simulated stop before publication marker"):
+                self.refresh_state()
+        with self.api([[api_row()]]):
+            report = self.refresh_state()
+        self.assertEqual(report["queued_count"], 1)
+        self.assertFalse(report["newstars_posted"])
+        self.assertEqual(self.questions.read_text().count("## NEWSTARS 1"), 1)
+        prepared = json.loads((self.state / stars.PREPARED_NAME).read_text())
+        self.assertEqual(prepared["publication_state"], "posted")
+        self.assertEqual(prepared["journal"]["pending_repositories"], ["example/new"])
+
+    def test_preparation_failure_preserves_previous_snapshot_and_pending_observations(self):
+        with self.api([[api_row(), api_row("example/new")]]):
+            first = self.refresh_state()
+        before = {name: (self.state / name).read_bytes() for name in
+                  (stars.SNAPSHOT_NAME, stars.JOURNAL_NAME, stars.PREPARED_NAME)}
+        original_write = stars._write_json
+
+        def fail_preparation(path, value):
+            if Path(path).name == stars.PREPARED_NAME:
+                raise OSError("simulated preparation failure")
+            original_write(path, value)
+
+        with self.api([[api_row()]]), patch.object(stars, "_write_json", side_effect=fail_preparation):
+            with self.assertRaisesRegex(OSError, "simulated preparation failure"):
+                self.refresh_state()
+        for name, original in before.items():
+            self.assertEqual((self.state / name).read_bytes(), original)
+        with self.api([[api_row()]]):
+            report = self.refresh_state()
+        self.assertEqual(report["queued_count"], 1)
+        self.assertEqual(report["notification_id"], first["notification_id"])
+
+    def test_legacy_prepared_journal_without_publication_record_still_replays(self):
+        with self.api([[api_row(), api_row("example/new")]]), patch.object(
+                stars, "_notify", side_effect=OSError("simulated append failure")):
+            with self.assertRaises(OSError):
+                self.refresh_state()
+        (self.state / stars.PREPARED_NAME).unlink()
+        with self.api([[api_row()]]):
+            report = self.refresh_state()
+        self.assertEqual(report["queued_count"], 1)
+        self.assertEqual(self.questions.read_text().count("## NEWSTARS 1"), 1)
 
     def test_prepared_notification_survives_review_landing_before_retry(self):
         with self.api([[api_row(), api_row("example/new")]]), patch.object(
@@ -319,7 +463,8 @@ class PublicStarredTests(unittest.TestCase):
                     stars.refresh_public_stars(self.root, now=NOW, **kwargs)
 
     def test_state_questions_collisions_fail_before_fetch_or_directory_creation(self):
-        for index, suffix in enumerate((None, stars.SNAPSHOT_NAME, stars.JOURNAL_NAME, ".public-starred.lock")):
+        for index, suffix in enumerate((None, stars.SNAPSHOT_NAME, stars.JOURNAL_NAME,
+                                        stars.PREPARED_NAME, ".public-starred.lock")):
             with self.subTest(suffix=suffix):
                 state = self.base / f"collision-{index}"
                 questions = state if suffix is None else state / suffix
@@ -355,7 +500,8 @@ class PublicStarredTests(unittest.TestCase):
         sentinel = self.root / "harmless-review-fixture.json"
         sentinel.write_text(json.dumps(self.baseline))
         original = sentinel.read_bytes()
-        for index, filename in enumerate((stars.SNAPSHOT_NAME, stars.JOURNAL_NAME, ".public-starred.lock")):
+        for index, filename in enumerate((stars.SNAPSHOT_NAME, stars.JOURNAL_NAME,
+                                          stars.PREPARED_NAME, ".public-starred.lock")):
             with self.subTest(filename=filename):
                 state = self.base / f"redirect-{index}"
                 state.mkdir()

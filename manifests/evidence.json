@@ -17047,13 +17047,13 @@
     },
     {
       "path": "catalogs/convergence-practice/starred-convergence-20261010.json",
-      "sha256": "3bf4762851a25798da137125a23923479c6da904380454129ea19ef565275a98",
-      "bytes": 434238
+      "sha256": "e007e3fd8702859b2f4b452dbdfbc21366acbb2bcce30f684a0a8709915d2062",
+      "bytes": 434974
     },
     {
       "path": "catalogs/convergence-practice/starred-seeds-20261010.json",
-      "sha256": "fc19b5afb7ffed5da955f579644ff7e76ac40624ac12b328080b7727a5780335",
-      "bytes": 548934
+      "sha256": "4baa4afa6dcae3f373d2bbc6515a82bdbe402f9a3471392bfb025631cd96c7d0",
+      "bytes": 548582
     },
     {
       "path": "catalogs/convergence-practice/starred-source-review-20261010.json",
@@ -17492,8 +17492,8 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "16a255eaa96ec3a861cfd74f6ec69cc52b630dbf8f53e17ebc5560ccc87ee690",
-      "bytes": 980363
+      "sha256": "00254eeb9844866120b1c8ab30f14f79d1cb7d458789e64eb57fe722befba19a",
+      "bytes": 1146887
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
@@ -17547,7 +17547,7 @@
     },
     {
       "path": "catalogs/us-equities/manifest.json",
-      "sha256": "38538192317d87f45cf811f148c4f79b36bd4c65b06bf0e171e16b87978dda64",
+      "sha256": "7a9422e20a5994b7df57f84d775c8b6aba130b43761c9866d2966e77a26fb93a",
       "bytes": 3215
     },
     {
@@ -18682,8 +18682,8 @@
     },
     {
       "path": "docs/decisions/2026-10-10-starred-repository-convergence.md",
-      "sha256": "16f5f62845c37a31892855946b8ac5a4ed4a63d63780167daa39ab56ccc9466b",
-      "bytes": 14356
+      "sha256": "19535d308d7017df3590780c57ac3ba1faccd3ae049ddc4bb1ad52dc420356fe",
+      "bytes": 19187
     },
     {
       "path": "docs/decisions/2026-10-11-adjudication-omniroute-transport-binding.md",
@@ -60582,8 +60582,8 @@
     },
     {
       "path": "scripts/build_ecosystem.py",
-      "sha256": "aec5740a58da0797df4efc095918025f6527528722fd46c51b71893bc105ad40",
-      "bytes": 89659
+      "sha256": "acf147bdaf28b0dd837ff4cc776cb897fdc6edfc203966f7d51c3f18798344df",
+      "bytes": 89670
     },
     {
       "path": "scripts/build_new_wsl_handbook.py",
@@ -60592,8 +60592,8 @@
     },
     {
       "path": "scripts/catalog_decisions.py",
-      "sha256": "004a08b524c92a9ba3280f361f063ab9079797da0066998ab730149a220d8729",
-      "bytes": 13797
+      "sha256": "98ca164a332baf46b0429ac93e4272af4dedd26a2647dcf493f321bb1169d65e",
+      "bytes": 14769
     },
     {
       "path": "scripts/codex_quota.py",
@@ -60697,8 +60697,8 @@
     },
     {
       "path": "scripts/public_starred.py",
-      "sha256": "fcd88c23bd2f2c576b4f3c59677a640271e5be2ace600f9a27cb343ff42154af",
-      "bytes": 21975
+      "sha256": "6aaab9105ce2552efc83a86974c32e25fe7a810539a4ec3aa3486b2bccc92aa9",
+      "bytes": 24443
     },
     {
       "path": "scripts/receipt_staleness.py",
@@ -60732,8 +60732,8 @@
     },
     {
       "path": "scripts/starred_convergence.py",
-      "sha256": "c1771e94bf55e126f1b7eb364c1b656dfe9094d3e3cf156c66f5a8fad59dff35",
-      "bytes": 10851
+      "sha256": "37f3b8f5f5409408e20bbadb730adac77d0ed9bb75b22a952d36e6343bb62b24",
+      "bytes": 11294
     },
     {
       "path": "scripts/trading_gates.py",
@@ -61287,8 +61287,8 @@
     },
     {
       "path": "tests/test_catalog_decisions.py",
-      "sha256": "62e255a6a8e26b595dd700cce7aed2964828658508f188e98e3032c0e26ec1de",
-      "bytes": 11823
+      "sha256": "e42cacd4884cb477196b7703eade42fab8d6aeddc1738e9d0c812ada1afea98b",
+      "bytes": 13701
     },
     {
       "path": "tests/test_catalog_freshness_pins.py",
@@ -61462,8 +61462,8 @@
     },
     {
       "path": "tests/test_ecosystem_manifest.py",
-      "sha256": "d70788ced11d9da3d5ecc5ba9ce681438a44523becc7fd8efced9a205cb4c1d4",
-      "bytes": 144556
+      "sha256": "1a407834cd8f09d6a5d21e9d24d630fe05c36f383cdfd7ab8a0af8a561e65420",
+      "bytes": 147505
     },
     {
       "path": "tests/test_edgartools_pin_move.py",
@@ -62057,8 +62057,8 @@
     },
     {
       "path": "tests/test_public_starred.py",
-      "sha256": "9ef3f55c23f07bcd89c9bd27214ee3e74f6373555440ac1054848976db7739ab",
-      "bytes": 26216
+      "sha256": "42f4bf432ea5c598d5215a5300d99deead51b6428909355735c56cdb302afdf3",
+      "bytes": 34309
     },
     {
       "path": "tests/test_r3_verify.py",
@@ -62247,8 +62247,8 @@
     },
     {
       "path": "tests/test_starred_convergence.py",
-      "sha256": "729662604cae45344edd0f3d9b4db4d0870608050308c068b46d7dc67f11154f",
-      "bytes": 10780
+      "sha256": "c6bf34b100096c84012a5b4e2140d4bf320a9f7e955926a7a82052e4e145dca2",
+      "bytes": 11612
     },
     {
       "path": "tests/test_starred_maintenance.py",
@@ -62927,8 +62927,8 @@
     },
     {
       "path": "tools/starred-maintenance/README.md",
-      "sha256": "b282484927fb2f14bd6c66897b02cf88bb75fa4dcdd7424add66f160927b4334",
-      "bytes": 11351
+      "sha256": "fc9520afc4b05fbe776ced8b3d59e9b6ad4ece299fff49f4fcf4efe59b6d0724",
+      "bytes": 11902
     },
     {
       "path": "tools/starred-maintenance/render_units.py",

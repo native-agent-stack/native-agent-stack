@@ -58,6 +58,46 @@ class Page(HTMLParser):
 
 
 class EcosystemManifestTests(unittest.TestCase):
+    def test_metadata_only_starred_convergence_does_not_render_as_source_reviewed(self):
+        from scripts.build_ecosystem import build_data
+        data = build_data(ROOT)
+        by_name = {row["repository_id"]: row for row in data["repositories"]}
+        self.assertFalse(by_name["aannoo/hcom"]["source_reviewed"])
+        self.assertTrue(by_name["microsoft/pyright"]["source_reviewed"])
+
+    def test_starred_convergence_tracks_each_dynamic_source_input(self):
+        from scripts.build_ecosystem import build_data, input_digest
+        manifest = "catalogs/convergence-practice/starred-convergence-20261010.json"
+        seeds = "catalogs/convergence-practice/starred-seeds-20261010.json"
+        witness = "catalogs/convergence-practice/sources/witness.json"
+        registry = "catalogs/sota-convergence/layer-verdict-waves.json"
+        self.write("catalogs/foundation/manifest.json", {"layers": [{"id": "retrieval"}]})
+        self.write(registry, {"waves": []})
+        self.write(witness, {"rows": [{"repository": "example/search", "note": "before"}]})
+        self.write(seeds, {"schema_version": 1, "seeds": [{"repository": "example/search",
+                          "layer": "retrieval", "reason": "Discovery witness", "source_refs": [witness + "#/rows/0"],
+                          "checked_at": "2026-10-10T17:00:00Z"}]})
+        row = {"repository": "example/search", "scope": "IN-SCOPE", "reason": "Metadata discovery",
+               "layer_keys": ["retrieval"], "seed_refs": [seeds + "#/seeds/0"],
+               "evidence_refs": [witness + "#/rows/0"], "verdict_refs": [],
+               "verdict_follow_up": {"status": "AWAITING-RECORDED-TIER-VERDICT", "required_tiers": ["tier-1", "tier-2"],
+                                     "layer_keys": ["retrieval"], "registry": registry}}
+        self.write(manifest, {"schema_version": 1, "count": 1, "seed_manifest": seeds,
+                             "primary_source_review": "catalogs/convergence-practice/source-review.json",
+                             "repositories": [row]})
+        self.write("catalogs/convergence-practice/public-starred.json", {
+            "count": 1, "retrieved_at": "2026-10-10T17:00:00Z", "convergence_manifest": manifest,
+            "repositories": [dict(row, disposition_status="IN-SCOPE", disposition="IN-SCOPE: metadata",
+                                  convergence_manifest=manifest, decision_manifest=manifest)]})
+        data = build_data(self.root)
+        inputs = {item["path"]: item for item in data["inputs"]}
+        self.assertIn(witness, inputs)
+        self.assertIn(registry, inputs)
+        self.assertEqual(inputs[witness]["sha256"], hashlib.sha256((self.root / witness).read_bytes()).hexdigest())
+        before = input_digest(data, self.root)
+        self.write(witness, {"rows": [{"repository": "example/search", "note": "after"}]})
+        self.assertNotEqual(before, input_digest(build_data(self.root), self.root))
+
     def setUp(self):
         temporary = tempfile.TemporaryDirectory()
         self.addCleanup(temporary.cleanup)

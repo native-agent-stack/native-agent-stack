@@ -195,7 +195,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=document-retrieval; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/7; PDF and Office parsing into LLM-ready Markdown/JSON is a foundation document-ingestion component."
     },
     {
@@ -229,7 +229,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=code-navigation,token-efficiency,mcp-surfaces; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/8,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/9,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/10; Agent-oriented code search with retrieval and MCP topics is a code-navigation and context-efficiency candidate."
     },
     {
@@ -243,7 +243,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: AI trading terminal for financial instruments; the recorded role belongs to the trading application lane."
     },
     {
@@ -257,7 +257,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: React Native chart widget; recorded metadata establishes no agent-foundation service or practice role."
     },
     {
@@ -271,7 +271,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: TradingView market screener API; the recorded role is financial-market data acquisition."
     },
     {
@@ -285,7 +285,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: Personal wealth and investment portfolio management application; no foundation role is recorded."
     },
     {
@@ -299,7 +299,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: Algorithmic trading platform and robot framework; its recorded purpose is trading execution and strategies."
     },
     {
@@ -313,7 +313,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: Python TradingView screener package; its recorded role is financial-market screening and data access."
     },
     {
@@ -327,7 +327,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: Algorithmic trading platform; agent topics do not change its recorded trading-specific purpose."
     },
     {
@@ -341,7 +341,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: Real-time stock access from TradingView; this is market-data tooling for the trading lane."
     },
     {
@@ -372,7 +372,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=scheduling-supervision,native-clients; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/11,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/12; Cross-terminal agent messaging, watching and spawning supplies multi-client orchestration and supervision."
     },
     {
@@ -406,7 +406,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=ci-supply-chain,git-github-automation,hosting-services; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/13,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/14,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/15; Developer platform with source control, CI/CD, hosted environments and artifact registries supplies foundation delivery services."
     },
     {
@@ -434,7 +434,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=native-clients; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/16; Recorded DeepSeek agent-harness and plugin identity makes it a native-client harness candidate."
     },
     {
@@ -462,7 +462,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=recovery-portability; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/17; Managed shell configuration, tool plugins and automatic updates are a host-environment recreation practice reference."
     },
     {
@@ -493,7 +493,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=scheduling-supervision,native-clients; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/18,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/19; Desktop and mobile orchestration of multiple coding agents supplies client control and supervision."
     },
     {
@@ -525,7 +525,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=native-clients,workers; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/20,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/21; Pinned README describes a control surface for locally installed coding agents through mobile, web and desktop clients."
     },
     {
@@ -553,7 +553,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=ci-supply-chain; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/22; Reusable compiler and toolchain technologies are a foundation build-toolchain reference."
     },
     {
@@ -586,7 +586,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=ci-supply-chain,git-github-automation; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/23,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/24; Recorded G5 foundation referrals identify Claude Code Action for CI and GitHub automation."
     },
     {
@@ -601,7 +601,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: Recorded G5 role is an equities research referral, with no foundation role established."
     },
     {
@@ -632,7 +632,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills,quality-evaluation; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/25,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/26; Coding-agent skill with independent verification and machine-readable security findings is a foundation review practice."
     },
     {
@@ -660,7 +660,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=observation-inference; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/27; Model compression, quantization and speculative decoding are inference optimization candidates."
     },
     {
@@ -674,7 +674,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: Broker API SDK for financial markets; its recorded purpose belongs to the trading lane."
     },
     {
@@ -688,7 +688,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: Quantitative trading development, backtesting and deployment framework; no foundation role is recorded."
     },
     {
@@ -702,7 +702,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: AI trade decisions for a specific blockchain market pair; this is a trading application."
     },
     {
@@ -716,7 +716,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: Coding-agent skills expressly target equity investors, market analysis and trading strategies."
     },
     {
@@ -730,7 +730,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: Quantitative strategy analysis and backtesting framework; its recorded role is trading research."
     },
     {
@@ -744,7 +744,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: AI-native infrastructure expressly targets quantitative trading and portfolio strategies."
     },
     {
@@ -758,7 +758,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: Algorithmic securities backtesting and trading framework; its recorded role is trading-specific."
     },
     {
@@ -772,7 +772,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: AI trading agent manages financial positions from research through exit; no general foundation role is recorded."
     },
     {
@@ -786,7 +786,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: Trading-idea backtesting engine; its recorded role is strategy evaluation in the trading lane."
     },
     {
@@ -800,7 +800,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: Book code covers financial data sourcing and trading execution; this is trading research material."
     },
     {
@@ -814,7 +814,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: Algorithmic trading engine for financial instruments; no foundation role is recorded."
     },
     {
@@ -845,7 +845,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=hosting-services,semantic-rag; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/28,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/29; Postgres application platform with authentication, vector and embedding topics supplies foundation persistence and retrieval services."
     },
     {
@@ -879,7 +879,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=isolation,workers,quality-evaluation; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/30,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/31,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/32; Computer-use drivers, cross-OS fleets and benchmarks supply isolated worker execution and evaluation references."
     },
     {
@@ -910,7 +910,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=durable-memory,recovery-portability; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/33,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/34; Repository-held plans, handovers and review evidence support coding-agent memory and cross-session recovery."
     },
     {
@@ -941,7 +941,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=scheduling-supervision,native-clients; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/35,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/36; Remote session viewing and task delivery for coding clients supplies agent control and supervision."
     },
     {
@@ -969,7 +969,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=recovery-portability; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/37; Host cleanup, analysis and monitoring are a macOS environment-maintenance and portability reference."
     },
     {
@@ -998,7 +998,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=hosting-services; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/38; Cross-platform proxy GUI is a host-networking service reference retained in the G5 source review."
     },
     {
@@ -1027,7 +1027,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=recovery-portability; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/39; Recorded G5 review identifies the categorized macOS software list as a portability discovery reference."
     },
     {
@@ -1060,7 +1060,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=web-research,hosting-services; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/40,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/41; React ecosystem discovery reference for the recorded foundation hosting stack; compare entries in the wave before any adoption."
     },
     {
@@ -1091,7 +1091,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills,ci-supply-chain; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/42,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/43; Validated coding-agent skill registry supplies instruction discovery and skill distribution assurance."
     },
     {
@@ -1125,7 +1125,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=document-retrieval,semantic-rag,durable-memory; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/44,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/45,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/46; Document knowledge platform with RAG, semantic search and self-maintaining wiki supplies retrieval and persistent knowledge candidates."
     },
     {
@@ -1156,7 +1156,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=scheduling-supervision,mcp-surfaces; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/47,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/48; Workflow automation with AI capabilities, integrations and MCP topics supplies orchestration and connector surfaces."
     },
     {
@@ -1190,7 +1190,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=native-clients,agent-sdks,workers; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/49,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/50,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/51; Autonomous coding agent exposed as SDK, IDE extension and CLI supplies native-client and programmable worker candidates."
     },
     {
@@ -1218,7 +1218,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=web-research; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/52; Converting coding agents into research agents is a foundation research-workflow reference."
     },
     {
@@ -1249,7 +1249,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=quality-evaluation,instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/53,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/54; Deterministic and LLM-assisted code review with language rulesets supplies a foundation review practice."
     },
     {
@@ -1277,7 +1277,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=token-efficiency; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/55; Compact JSON-oriented serialization for LLM prompts supplies a token-efficiency format and benchmark reference."
     },
     {
@@ -1291,7 +1291,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: Value-investing research framework and financial-analysis agents; its recorded purpose belongs to the trading lane."
     },
     {
@@ -1322,7 +1322,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=durable-memory,observation-inference; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/56,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/57; Recorded computer history and multimodal workflow context supplies agent memory and observation candidates."
     },
     {
@@ -1350,7 +1350,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/58; Coding-agent frontend design skill is a foundation design-practice instruction source."
     },
     {
@@ -1378,7 +1378,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/59; AI skill for UI/UX design across platforms is a foundation implementation and design-practice source."
     },
     {
@@ -1412,7 +1412,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=agent-sdks,scheduling-supervision,semantic-rag; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/60,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/61,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/62; Agent workflows, RAG pipelines and model/tool support supply programmable orchestration and retrieval candidates."
     },
     {
@@ -1440,7 +1440,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=observation-inference; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/63; Hardware-tuned local inference engine for agents supplies inference-runtime and performance evaluation candidates."
     },
     {
@@ -1454,7 +1454,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: General C++ formatting library; recorded metadata supplies no concrete agent-foundation requirement or practice role."
     },
     {
@@ -1485,7 +1485,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=scheduling-supervision,durable-memory; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/64,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/65; Durable-state control plane for long-horizon agents supplies supervision and cross-session state candidates."
     },
     {
@@ -1499,7 +1499,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: Discovery list expressly covers systematic trading strategies, libraries and financial references."
     },
     {
@@ -1513,7 +1513,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: Quantitative trading system for financial instruments; its recorded purpose is trading-specific."
     },
     {
@@ -1527,7 +1527,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: Machine-learning signal generation and automated trading bot; this is a trading application."
     },
     {
@@ -1541,7 +1541,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: Python trading-strategy backtesting framework; its recorded role belongs to the trading lane."
     },
     {
@@ -1555,7 +1555,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: Trading backtesting and professional-trader MCP server; the MCP surface is domain-specific trading tooling."
     },
     {
@@ -1587,7 +1587,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=recovery-portability,scheduling-supervision; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/66,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/67; Recorded G5 review identifies project tool installation, environment configuration and task execution for reproducible host recreation."
     },
     {
@@ -1615,7 +1615,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=hosting-services; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/68; General DataFrame query engine supplies a foundation tabular-processing component candidate."
     },
     {
@@ -1646,7 +1646,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=secrets-credentials,hosting-services; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/69,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/70; Transparent bastion and privileged-access gateway supplies foundation access-control and host-connectivity services."
     },
     {
@@ -1674,7 +1674,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/71; AI-native vector design with agent teams and design-as-code is a foundation design/implementation practice reference."
     },
     {
@@ -1705,7 +1705,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=observation-inference,hosting-services; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/72,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/73; Docker configuration for a specific vLLM hardware deployment is an inference-hosting reference."
     },
     {
@@ -1736,7 +1736,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=observation-inference,hosting-services; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/74,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/75; Kubernetes inference serving and accelerator optimization supply inference-hosting candidates."
     },
     {
@@ -1764,7 +1764,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=durable-memory; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/76; Recorded coding-agent memory upgrade supplies a durable-memory candidate."
     },
     {
@@ -1795,7 +1795,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=workers,scheduling-supervision; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/77,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/78; Agent orchestration and engineering workflow automation supply worker coordination candidates."
     },
     {
@@ -1826,7 +1826,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=secrets-credentials,ci-supply-chain; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/79,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/80; Secret detection and CI topics supply foundation credential-leak prevention and delivery checks."
     },
     {
@@ -1857,7 +1857,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=semantic-rag,document-retrieval; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/81,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/82; RAG engine and agent retrieval context layer supply semantic and document retrieval candidates."
     },
     {
@@ -1888,7 +1888,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=observation-inference,hosting-services; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/83,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/84; Local model runtime supplies model serving and inference-hosting candidates."
     },
     {
@@ -1916,7 +1916,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=git-github-automation; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/85; Official GitHub CLI supplies repository and GitHub API automation."
     },
     {
@@ -1947,7 +1947,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=scheduling-supervision,observation-inference; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/86,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/87; Typed distributed orchestration of agents, ML pipelines and real-time inference supplies supervised workflow infrastructure."
     },
     {
@@ -1978,7 +1978,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=agent-sdks,workers; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/88,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/89; Realtime voice and video agent framework supplies programmable multimodal worker candidates."
     },
     {
@@ -2006,7 +2006,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/90; Coding-agent output skill supplies an instruction practice for clear, accessible task reporting."
     },
     {
@@ -2034,7 +2034,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=scheduling-supervision; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/91; Multi-agent coordination tool supplies supervision and orchestration practice."
     },
     {
@@ -2048,7 +2048,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: Opinionated Linux desktop distribution; recorded metadata supplies no specific agent-foundation or recovery practice."
     },
     {
@@ -2076,7 +2076,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=web-research; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/92; Public API discovery list is a reference surface for researching foundation service integrations."
     },
     {
@@ -2107,7 +2107,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=hosting-services,recovery-portability; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/93,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/94; Sysadmin, DevOps and SRE discovery resources support host-service operations and recovery research."
     },
     {
@@ -2139,7 +2139,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=web-research,instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/95,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/96; Recorded G5 review retains the Go ecosystem list as a skills-research discovery source, with per-entry validation required."
     },
     {
@@ -2167,7 +2167,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=hosting-services; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/97; Self-hosted network-service and web-application discovery list supplies foundation hosting research leads."
     },
     {
@@ -2198,7 +2198,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=workers,web-research; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/98,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/99; Autonomous-agent discovery list supplies worker and agent-framework research leads."
     },
     {
@@ -2212,7 +2212,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: Quantitative-finance discovery list; recorded purpose is financial-market and trading tooling."
     },
     {
@@ -2226,7 +2226,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: GitHub profile and portfolio presentation collection; no agent-foundation role is recorded."
     },
     {
@@ -2257,7 +2257,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=isolation,hosting-services; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/100,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/101; Docker deployment, security and monitoring discovery resources support isolated worker and host-service research."
     },
     {
@@ -2289,7 +2289,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=native-clients,recovery-portability; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/102,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/103; Recorded G5 review retains shell frameworks and toolkits as native-client discovery references."
     },
     {
@@ -2320,7 +2320,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills,native-clients; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/104,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/105; Copilot instructions, agents, skills and configurations supply native-client instruction references."
     },
     {
@@ -2351,7 +2351,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=isolation,hosting-services; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/106,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/107; Docker Compose samples supply container-service deployment and isolation practice references."
     },
     {
@@ -2380,7 +2380,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=web-research; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/108; Recorded G5 review identifies this C/C++ list as discovery evidence for demonstrated implementation requirements."
     },
     {
@@ -2409,7 +2409,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=web-research; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/109; Recorded G5 review maps Node.js CLI, build-tool and process-management categories to foundation tooling discovery."
     },
     {
@@ -2423,7 +2423,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: All-topic list-of-lists; recorded metadata establishes no targeted foundation discovery role."
     },
     {
@@ -2454,7 +2454,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=observation-inference,hosting-services; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/110,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/111; Private local AI server across PC, Mac and Linux supplies inference-hosting and portability candidates."
     },
     {
@@ -2482,7 +2482,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/112; Modern Go guidance explicitly targets AI coding agents and supplies a coding-practice instruction source."
     },
     {
@@ -2496,7 +2496,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: Multi-agent classroom application; recorded purpose is education delivery rather than agent-foundation infrastructure."
     },
     {
@@ -2510,7 +2510,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: Geospatial and satellite intelligence simulator; recorded purpose is a domain application."
     },
     {
@@ -2539,7 +2539,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/113; Recorded G5 review retains screenshot/design conversion to frontend code as a skills-implement practice candidate."
     },
     {
@@ -2567,7 +2567,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=hosting-services; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/114; HTML hypermedia application tooling supplies a foundation service-interface framework reference."
     },
     {
@@ -2595,7 +2595,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=quality-evaluation; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/115; Testing and mocking framework supplies a foundation correctness-evaluation harness reference."
     },
     {
@@ -2626,7 +2626,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=observation-inference,token-efficiency; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/116,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/117; Agent model routing and OpenAI-compatible gateway topics supply inference selection and cost-efficiency candidates."
     },
     {
@@ -2660,7 +2660,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=workers,durable-memory,native-clients; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/118,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/119,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/120; Agent workspace with complete action record and event-sourcing topics supplies worker runtime and persistent trace candidates."
     },
     {
@@ -2694,7 +2694,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=observation-inference,quality-evaluation,mcp-surfaces; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/121,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/122,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/123; AI observability, errors, logs, experiments and MCP control supply foundation diagnosis and measurement services."
     },
     {
@@ -2725,7 +2725,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=ci-supply-chain,git-github-automation; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/124,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/125; Repository checkout action supplies foundation CI source acquisition and GitHub workflow automation."
     },
     {
@@ -2762,7 +2762,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=workers,scheduling-supervision,isolation,durable-memory; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/126,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/127,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/128,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/129; Coding-agent office orchestration across laptops and sandboxes with memory topics supplies worker coordination candidates."
     },
     {
@@ -2793,7 +2793,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=workers,web-research; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/130,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/131; Browser-automation agents supply web research and browser-worker candidates."
     },
     {
@@ -2821,7 +2821,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/132; Agent skill for architecture and plan diagrams supplies design and documentation instruction practice."
     },
     {
@@ -2835,7 +2835,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: Science-fiction reading collection; recorded purpose is literary content, with no foundation role."
     },
     {
@@ -2866,7 +2866,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills,document-retrieval; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/133,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/134; Technical-book PDF conversion into coding-agent skills supplies document-to-instruction practice."
     },
     {
@@ -2894,7 +2894,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=document-retrieval; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/135; Video downloading, frame extraction and transcription for Claude supply multimodal source-ingestion practice."
     },
     {
@@ -2922,7 +2922,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/136; Large-scale systems design learning material is a foundation architecture-practice reference."
     },
     {
@@ -2956,7 +2956,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=durable-memory,semantic-rag,instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/137,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/138,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/139; Agent context database unifying memory, knowledge RAG and skills supplies persistent context candidates."
     },
     {
@@ -2970,7 +2970,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: Photo and video management application; self-hosting alone does not establish a foundation service role."
     },
     {
@@ -2998,7 +2998,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=observation-inference; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/140; Hardware-to-model compatibility discovery supplies local inference planning and selection practice."
     },
     {
@@ -3029,7 +3029,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=durable-memory,recovery-portability; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/141,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/142; Long-term coding-client memory and cross-vendor handoff supply durable state and recovery candidates."
     },
     {
@@ -3043,7 +3043,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: Geospatial visualization and analysis platform; recorded purpose is a GIS domain application."
     },
     {
@@ -3071,7 +3071,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=scheduling-supervision; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/143; Workplace agent management application supplies coordination and supervision candidates."
     },
     {
@@ -3102,7 +3102,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=native-clients,instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/144,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/145; Official Cursor plugin specification and plugins supply native-client extension and instruction references."
     },
     {
@@ -3130,7 +3130,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=hosting-services; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/146; Composable Node.js plugin meta-framework is an application-service construction reference."
     },
     {
@@ -3167,7 +3167,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=durable-memory,semantic-rag,code-navigation,instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/147,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/148,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/149,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/150; Team memory hub with chat memory, skills, wiki and code graph supplies shared persistent context candidates."
     },
     {
@@ -3201,7 +3201,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=code-navigation,semantic-rag,mcp-surfaces; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/151,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/152,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/153; Monorepo code querying through AI, knowledge graphs and MCP supplies semantic code-navigation candidates."
     },
     {
@@ -3232,7 +3232,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=observation-inference,token-efficiency; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/154,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/155; Cross-model/provider traffic routing with benchmarking and cost/performance optimization supplies inference-control candidates."
     },
     {
@@ -3263,7 +3263,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=workers,agent-sdks; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/156,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/157; Self-improving coding agent for long-running autonomous tasks supplies worker-runtime research."
     },
     {
@@ -3291,7 +3291,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/158; Coding-agent diagram-design instruction source supplies implementation and documentation practice."
     },
     {
@@ -3305,7 +3305,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: Personal spaced-repetition flashcard application; no agent-memory or foundation practice role is recorded."
     },
     {
@@ -3336,7 +3336,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=ci-supply-chain,git-github-automation; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/159,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/160; Creates dependency update PRs, making it a foundation supply-chain and GitHub automation candidate."
     },
     {
@@ -3367,7 +3367,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=scheduling-supervision,mcp-surfaces; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/161,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/162; Self-hosted issue and project management with MCP provides a coordination surface candidate."
     },
     {
@@ -3398,7 +3398,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=workers,quality-evaluation; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/163,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/164; Autonomous Plan-Work-Review coding cycle is a worker harness and review practice candidate."
     },
     {
@@ -3426,7 +3426,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/165; Ready-to-use DESIGN.md design system instructions provide a coding-agent practice reference."
     },
     {
@@ -3457,7 +3457,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=workers,native-clients; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/166,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/167; Visible multi-agent CLI workspace connects multiple coding clients and worker collaboration."
     },
     {
@@ -3488,7 +3488,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=document-retrieval,durable-memory; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/168,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/169; Local AI notebooks organize files and webpages into notes, providing a source and knowledge storage reference."
     },
     {
@@ -3519,7 +3519,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=web-research,mcp-surfaces; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/170,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/171; Local search, fetch, crawl, and research over MCP directly supplies the web research surface."
     },
     {
@@ -3553,7 +3553,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=durable-memory,semantic-rag,scheduling-supervision; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/172,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/173,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/174; Persistent markdown agent memory, hybrid search, and scheduled vault maintenance map to memory and supervision."
     },
     {
@@ -3567,7 +3567,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: TradingView market data, technical analysis, screening, and backtesting belong to the trading wave."
     },
     {
@@ -3598,7 +3598,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills,quality-evaluation; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/175,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/176; Structured councils and debates across coding agents provide decision and review practice references."
     },
     {
@@ -3626,7 +3626,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=quality-evaluation; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/177; Multimodal model evaluation toolkit and benchmarks supply a foundation evaluation candidate."
     },
     {
@@ -3654,7 +3654,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=observation-inference; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/178; LLM gateway failover, load balancing, cost control, and tracing supply inference routing and observation."
     },
     {
@@ -3668,7 +3668,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: TradingView chart analysis and personal trading workflow automation belong to the trading wave."
     },
     {
@@ -3699,7 +3699,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=semantic-rag,durable-memory; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/179,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/180; Local embeddings and semantic retrieval of related notes provide a knowledge retrieval reference."
     },
     {
@@ -3733,7 +3733,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills,workers,quality-evaluation; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/181,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/182,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/183; Goal-directed modify-verify-keep-or-discard agent iteration provides a reusable autonomous practice."
     },
     {
@@ -3761,7 +3761,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/184; Engineering habits packaged as runnable Claude skills provide a foundation practice candidate."
     },
     {
@@ -3792,7 +3792,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=workers,scheduling-supervision; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/185,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/186; Self-hosted agent runtime with durable approvals and verifiable records supplies supervised worker infrastructure."
     },
     {
@@ -3823,7 +3823,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=web-research,mcp-surfaces; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/187,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/188; Web scraping and search exposed to LLM clients over MCP supply a foundation research surface."
     },
     {
@@ -3851,7 +3851,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=quality-evaluation; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/189; Broad LLM evaluation across reasoning, coding, long context, and safety supplies comparative evaluation."
     },
     {
@@ -3879,7 +3879,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=git-github-automation; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/190; LLM-generated commit messages provide a Git workflow automation candidate."
     },
     {
@@ -3907,7 +3907,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/191; Hands-on prompting technique tutorials supply evidence to review foundation instruction practices."
     },
     {
@@ -3938,7 +3938,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=workers,isolation; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/192,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/193; Multi-harness agent orchestration with policies and sandboxing supplies worker and isolation candidates."
     },
     {
@@ -3969,7 +3969,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills,mcp-surfaces; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/194,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/195; Agent Skills standard library for the Stitch MCP server supplies interoperable skills and tool integration."
     },
     {
@@ -3997,7 +3997,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/196; Local coding-agent HTML editor with reusable skills supplies an application-building skills reference."
     },
     {
@@ -4028,7 +4028,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills,workers; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/197,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/198; Patterns, starters, and CLI audit/init/cost tools supply agent loop engineering practices."
     },
     {
@@ -4059,7 +4059,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=mcp-surfaces,agent-sdks; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/199,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/200; Fullstack MCP Apps and server framework supplies foundation tool-surface development infrastructure."
     },
     {
@@ -4087,7 +4087,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=native-clients; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/201; Rust coding-agent CLI harness supplies a native client candidate."
     },
     {
@@ -4124,7 +4124,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=durable-memory,document-retrieval,web-research,scheduling-supervision; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/202,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/203,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/204,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/205; Self-hosted second brain combines document and web answers, research, agents, and scheduled automation."
     },
     {
@@ -4152,7 +4152,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/206; Directory of Claude Code commands, agents, hooks, and MCP plugins supplies a practice discovery source."
     },
     {
@@ -4183,7 +4183,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=observation-inference,token-efficiency; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/207,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/208; Real-time coding-agent usage predictions and monitoring supply cost and quota observation."
     },
     {
@@ -4211,7 +4211,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/209; Setup, workflow, agent, and skill guidance supplies a coding-client practice reference."
     },
     {
@@ -4242,7 +4242,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=token-efficiency,instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/210,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/211; Drop-in CLAUDE.md response terseness rules supply a token-efficiency instruction candidate."
     },
     {
@@ -4270,7 +4270,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/212; Agentic workflow, hook, skill, and MCP templates supply foundation practice references."
     },
     {
@@ -4298,7 +4298,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=quality-evaluation; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/213; AI security and vulnerability research toolkit supplies a foundation security review candidate."
     },
     {
@@ -4329,7 +4329,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills,isolation; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/214,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/215; Coding-agent workflow skills and container execution tips supply practice and isolation references."
     },
     {
@@ -4360,7 +4360,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=workers,scheduling-supervision; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/216,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/217; Autonomous coding loop with exit detection supplies worker supervision and termination practices."
     },
     {
@@ -4388,7 +4388,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/218; Specialized commands, personas, and development methodology configuration supplies agent instruction practices."
     },
     {
@@ -4419,7 +4419,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=observation-inference,workers; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/219,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/220; Local model routing and tool orchestration control plane supplies inference and worker integration."
     },
     {
@@ -4447,7 +4447,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=agent-sdks; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/221; Deployable Claude API starter projects supply supported application integration references."
     },
     {
@@ -4475,7 +4475,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/222; Anthropic-managed Claude Code plugin directory supplies a foundation plugin discovery source."
     },
     {
@@ -4503,7 +4503,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=quality-evaluation; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/223; C++ unit, TDD, and BDD framework supplies foundation test infrastructure."
     },
     {
@@ -4531,7 +4531,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=observation-inference; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/224; Heterogeneous LLM inference and fine-tuning optimization framework supplies an inference research candidate."
     },
     {
@@ -4562,7 +4562,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=native-clients,agent-sdks; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/225,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/226; Unified LLM API, agent loop, TUI, and coding CLI supply native client and SDK candidates."
     },
     {
@@ -4590,7 +4590,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=mcp-surfaces; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/227; Local database and SQL workspace with MCP support supplies an agent-facing database tool surface."
     },
     {
@@ -4624,7 +4624,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=observation-inference,token-efficiency,mcp-surfaces; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/228,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/229,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/230; AI gateway with quota fallback, compression, and MCP supplies inference, token, and tool routing candidates."
     },
     {
@@ -4638,7 +4638,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: Recorded role is a terminal file manager; no agent, orchestration, recovery, or research component is described."
     },
     {
@@ -4666,7 +4666,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=web-research; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/231; Agent-oriented browser automation supplies a browser surface candidate for foundation research workflows."
     },
     {
@@ -4694,7 +4694,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=code-navigation; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/232; Live architecture diagrams derived from code supply code understanding and navigation references."
     },
     {
@@ -4725,7 +4725,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=code-navigation,instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/233,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/234; CLI-maintained agent documentation for a codebase supplies code understanding and instruction infrastructure."
     },
     {
@@ -4756,7 +4756,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=document-retrieval,durable-memory; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/235,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/236; Documents incrementally compiled into a persistent linked wiki supply retrieval and durable knowledge candidates."
     },
     {
@@ -4770,7 +4770,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: SEC filings and financial statement analysis are financial data acquisition for the trading wave."
     },
     {
@@ -4801,7 +4801,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=code-navigation,token-efficiency; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/237,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/238; Persistent local code graph and bounded review context supply code intelligence and token-efficiency candidates."
     },
     {
@@ -4832,7 +4832,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=workers,isolation; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/239,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/240; Parallel coding-agent fleet workspace with remote runtimes and worktree topics supplies worker execution isolation."
     },
     {
@@ -4860,7 +4860,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=observation-inference; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/241; Local Parakeet and Whisper speech inference, diarization, and summarization supply an audio inference reference."
     },
     {
@@ -4888,7 +4888,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=mcp-surfaces; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/242; Terminal control, filesystem search, and diff editing through MCP supply a foundation tool surface."
     },
     {
@@ -4902,7 +4902,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: The recorded AI hedge fund team is a financial application belonging to the trading wave."
     },
     {
@@ -4933,7 +4933,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=workers,scheduling-supervision; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/243,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/244; Background coding-agent system supplies an asynchronous worker execution candidate."
     },
     {
@@ -4964,7 +4964,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=document-retrieval,hosting-services; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/245,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/246; Offline-first knowledge server with owned hardware and local AI supplies a document-service hosting reference."
     },
     {
@@ -4992,7 +4992,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=scheduling-supervision; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/247; Resilient Python workflow and pipeline orchestration supplies foundation scheduling infrastructure."
     },
     {
@@ -5026,7 +5026,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=code-navigation,semantic-rag,token-efficiency; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/248,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/249,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/250; Hybrid code search, dependency graphs, symbol impact analysis, and bounded context supply code intelligence."
     },
     {
@@ -5057,7 +5057,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=observation-inference,token-efficiency; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/251,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/252; Real-time coding-agent session, token, context, quota, and port monitoring supplies runtime observation."
     },
     {
@@ -5088,7 +5088,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=mcp-surfaces,token-efficiency; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/253,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/254; Token-conscious multi-database MCP server supplies bounded database access for agents."
     },
     {
@@ -5119,7 +5119,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=workers,instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/255,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/256; Self-evolving agent with a skill tree and system automation supplies worker and skill evolution references."
     },
     {
@@ -5153,7 +5153,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=code-navigation,token-efficiency,mcp-surfaces; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/257,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/258,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/259; Symbol-level tree-sitter code retrieval over MCP supplies bounded code exploration."
     },
     {
@@ -5181,7 +5181,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=agent-sdks; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/260; Agentic application framework supplies a foundation SDK and application integration candidate."
     },
     {
@@ -5215,7 +5215,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=code-navigation,token-efficiency,mcp-surfaces; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/261,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/262,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/263; Persistent code knowledge graph with MCP queries supplies code intelligence and bounded retrieval."
     },
     {
@@ -5229,7 +5229,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: Personal trading agent, backtesting, and quantitative finance are trading-wave applications."
     },
     {
@@ -5261,7 +5261,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=scheduling-supervision,quality-evaluation; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/264,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/265; Reusable data transformation engineering and the recorded data-quality-orchestration role supply pipeline practice references."
     },
     {
@@ -5292,7 +5292,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=durable-memory,semantic-rag; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/266,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/267; Persistent agent memory platform with knowledge graphs and vector storage supplies durable retrieval infrastructure."
     },
     {
@@ -5320,7 +5320,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=hosting-services; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/268; SaaS, PaaS, and IaaS offering directory supplies a hosting landscape discovery source."
     },
     {
@@ -5348,7 +5348,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=web-research; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/269; Agent-oriented web crawling and clean Markdown extraction supply a foundation research ingestion candidate."
     },
     {
@@ -5376,7 +5376,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=web-research; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/270; Adaptive web scraping and full crawl framework supplies research acquisition infrastructure."
     },
     {
@@ -5404,7 +5404,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=web-research; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/271; Privacy-preserving internet metasearch supplies a self-hosted research search candidate."
     },
     {
@@ -5432,7 +5432,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=web-research; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/272; Headless browser for AI agents and scraping supplies a web acquisition surface."
     },
     {
@@ -5463,7 +5463,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills,quality-evaluation; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/273,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/274; Security research, vulnerability detection, and audit skills supply reusable foundation review practices."
     },
     {
@@ -5494,7 +5494,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=durable-memory,document-retrieval; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/275,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/276; Sources organized into an owned markdown knowledge graph supply durable agent knowledge and retrieval."
     },
     {
@@ -5525,7 +5525,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=hosting-services,durable-memory; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/277,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/278; Embedded SQLite-compatible SQL database supplies a local persistence and service infrastructure candidate."
     },
     {
@@ -5553,7 +5553,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/279; Agent Skills specification and documentation supply the skill format interoperability reference."
     },
     {
@@ -5584,7 +5584,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills,quality-evaluation; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/280,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/281; Trajectory-driven reusable skill optimization with validation gates supplies instruction quality practices."
     },
     {
@@ -5615,7 +5615,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=quality-evaluation,observation-inference; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/282,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/283; Agent and LLM debugging, evaluation, monitoring, and cost management supply quality and observation infrastructure."
     },
     {
@@ -5646,7 +5646,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=hosting-services,observation-inference; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/284,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/285; Real-time analytics database supplies a foundation analytics storage and service candidate."
     },
     {
@@ -5674,7 +5674,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=web-research; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/286; Deep research agent with BrowseComp evaluation metadata supplies a foundation research worker candidate."
     },
     {
@@ -5705,7 +5705,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=token-efficiency,instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/287,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/288; Skill and proxy that reduce coding-agent response verbosity supply a token-efficiency candidate."
     },
     {
@@ -5733,7 +5733,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=observation-inference; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/289; Speech recognition, synthesis, and multimodal generative AI framework supplies inference infrastructure."
     },
     {
@@ -5747,7 +5747,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: Autonomous deep financial research is a specialized financial workflow belonging to the trading wave."
     },
     {
@@ -5775,7 +5775,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=recovery-portability; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/290; Backup and deduplication program supplies supported foundation recovery infrastructure."
     },
     {
@@ -5803,7 +5803,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=quality-evaluation; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/291; Python unit and functional testing framework supplies foundation validation infrastructure."
     },
     {
@@ -5831,7 +5831,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=quality-evaluation; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/292; Cross-platform API client across REST, GraphQL, gRPC, and streams supplies an API verification surface."
     },
     {
@@ -5846,7 +5846,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: Recorded role is time-series forecasting and research-factors-ml, with no foundation agent or infrastructure role established."
     },
     {
@@ -5874,7 +5874,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/293; Agent skills, rules, and YAGNI engineering guidance supply foundation coding practice references."
     },
     {
@@ -5902,7 +5902,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=observation-inference; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/294; OpenTelemetry logs, metrics, traces, and agent observation supply foundation monitoring infrastructure."
     },
     {
@@ -5916,7 +5916,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: Broker trading agents and market backtesting belong to the trading wave."
     },
     {
@@ -5948,7 +5948,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=workers,hosting-services; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/295,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/296; Self-hosted AI workspace and the recorded worker-role candidate supply a foundation runtime seed."
     },
     {
@@ -5981,7 +5981,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills,quality-evaluation; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/297,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/298; Recorded plugin directory and plugin-eval source locators supply reusable instruction and evaluation surfaces."
     },
     {
@@ -6009,7 +6009,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/299; Recorded AI-tool system prompt collection supplies an instruction research reference for wave verification."
     },
     {
@@ -6023,7 +6023,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: Windows desktop productivity and customization utilities have no recorded foundation agent, service, or recovery role."
     },
     {
@@ -6051,7 +6051,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=observation-inference; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/300; LLM KV cache layer supplies inference optimization infrastructure."
     },
     {
@@ -6082,7 +6082,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=observation-inference,token-efficiency; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/301,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/302; Local coding-agent session search, analytics, and token statistics supply runtime observation."
     },
     {
@@ -6110,7 +6110,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=web-research; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/303; Agent CLI for reading and searching web and social sources supplies research acquisition surfaces."
     },
     {
@@ -6138,7 +6138,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=observation-inference; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/304; Coding-client models exposed through compatible API protocols supply an inference integration candidate."
     },
     {
@@ -6166,7 +6166,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=native-clients; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/305; Terminal coding agent with codebase understanding and Git workflows supplies a native client candidate."
     },
     {
@@ -6194,7 +6194,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=document-retrieval; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/306; Office and document conversion to Markdown supplies foundation document ingestion."
     },
     {
@@ -6225,7 +6225,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills,workers; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/307,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/308; Meta-skill generating specialized agent teams and their skills supplies worker and instruction design practices."
     },
     {
@@ -6257,7 +6257,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=document-retrieval,web-research; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/309,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/310; Open notebook assistant and the recorded research role supply a source-oriented research application seed."
     },
     {
@@ -6285,7 +6285,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/311; Agent skills and plugins for product discovery and execution supply reusable application development practices."
     },
     {
@@ -6316,7 +6316,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=observation-inference,quality-evaluation; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/312,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/313; Hardware-specific local model benchmarking and ranking supply inference selection and evaluation infrastructure."
     },
     {
@@ -6344,7 +6344,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=durable-memory; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/314; Markdown knowledge-base management supplies a local durable knowledge application reference."
     },
     {
@@ -6378,7 +6378,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=recovery-portability,durable-memory,instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/315,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/316,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/317; Portable memory, skills, and protocols across harnesses supply foundation state portability."
     },
     {
@@ -6409,7 +6409,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills,quality-evaluation; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/318,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/319; DSPy and GEPA skill, prompt, and code optimization supply agent self-improvement references."
     },
     {
@@ -6443,7 +6443,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills,durable-memory,mcp-surfaces; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/320,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/321,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/322; Directory of agent skills, memory providers, tools, and surfaces supplies foundation discovery sources."
     },
     {
@@ -6472,7 +6472,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=agent-sdks; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/323; Exact G5 agent-sdks source-review row and pinned SDK README locators establish a foundation SDK seed."
     },
     {
@@ -6503,7 +6503,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=agent-sdks,workers; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/324,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/325; Multi-agent workflow framework supplies a foundation SDK and orchestration candidate."
     },
     {
@@ -6531,7 +6531,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/326; Agent harness engineering tutorial supplies a foundation runtime practice reference."
     },
     {
@@ -6559,7 +6559,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=token-efficiency; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/327; Tool output, log, file, and RAG compression library, proxy, and MCP surface supply context efficiency."
     },
     {
@@ -6587,7 +6587,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=mcp-surfaces; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/328; MCP specification and documentation supply the foundation tool integration standard."
     },
     {
@@ -6615,7 +6615,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=mcp-surfaces; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/329; Recorded Model Context Protocol server collection supplies foundation tool-surface candidates."
     },
     {
@@ -6646,7 +6646,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=web-research,instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/330,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/331; Research skill that synthesizes recent web and social sources supplies reusable research practice."
     },
     {
@@ -6677,7 +6677,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=ci-supply-chain,secrets-credentials; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/332,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/333; Vulnerability, configuration, secret, and SBOM scanning supply foundation supply-chain and credential checks."
     },
     {
@@ -6691,7 +6691,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: Fully automated agent-native trading belongs to the trading wave."
     },
     {
@@ -6719,7 +6719,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=agent-sdks; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/334; Python type-based validation and JSON Schema topics supply typed agent integration infrastructure."
     },
     {
@@ -6747,7 +6747,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/335; Categorized registry skill directory supplies a foundation instruction discovery source."
     },
     {
@@ -6778,7 +6778,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills,document-retrieval; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/336,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/337; Documentation, repository, and PDF conversion to skills supplies instruction and document ingestion infrastructure."
     },
     {
@@ -6809,7 +6809,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=workers,instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/338,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/339; Specialized coding subagent collection supplies worker roles and reusable instruction practices."
     },
     {
@@ -6840,7 +6840,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=code-navigation,mcp-surfaces; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/340,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/341; Semantic retrieval and editing through an MCP coding toolkit map directly to code navigation and agent tool access."
     },
     {
@@ -6868,7 +6868,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/342; The recorded agent skill provides a reusable writing-quality practice for agent-generated text."
     },
     {
@@ -6896,7 +6896,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/343; The recorded scientific skills library and database integrations provide reusable research capabilities across coding agents."
     },
     {
@@ -6927,7 +6927,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=native-clients,scheduling-supervision; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/344,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/345; A CLI for configuring and monitoring Claude Code is a client setup and supervision candidate."
     },
     {
@@ -6958,7 +6958,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills,recovery-portability; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/346,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/347; Managing and syncing agent skills across coding tools is a skills distribution and portability candidate."
     },
     {
@@ -6989,7 +6989,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=semantic-rag,document-retrieval; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/348,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/349; The recorded multimodal RAG framework is a retrieval candidate for mixed document inputs."
     },
     {
@@ -7017,7 +7017,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=scheduling-supervision; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/350; The recorded agent harness and workflow topics make it an orchestration practice candidate."
     },
     {
@@ -7045,7 +7045,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=native-clients; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/351; The recorded CodexApp enhancement tool is a native-client usability candidate."
     },
     {
@@ -7076,7 +7076,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=native-clients,instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/352,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/353; The recorded cross-client assistant, provider management and skills management support client configuration practice."
     },
     {
@@ -7104,7 +7104,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=durable-memory; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/354; The recorded self-organizing vault provides persistent memory for AI coding agents."
     },
     {
@@ -7135,7 +7135,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=scheduling-supervision,quality-evaluation; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/355,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/356; Running multiple models on a task and surfacing disagreements is an orchestration and comparative-review practice candidate."
     },
     {
@@ -7166,7 +7166,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=workers,instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/357,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/358; The recorded specialized Codex subagent collection supplies worker-role and instruction discovery leads."
     },
     {
@@ -7197,7 +7197,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=isolation,git-github-automation; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/359,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/360; Git worktree management for parallel agent workflows maps to workspace isolation and Git automation."
     },
     {
@@ -7228,7 +7228,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=token-efficiency,observation-inference; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/361,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/362; Local token and cost tracking by model, project and task supports efficiency measurement and agent observability."
     },
     {
@@ -7259,7 +7259,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=native-clients,instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/363,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/364; The recorded zero-configuration Claude Code and Codex flow and workflow topics support client setup practice."
     },
     {
@@ -7290,7 +7290,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=scheduling-supervision,workers; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/365,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/366; Managing multiple terminal coding agents is a worker supervision candidate."
     },
     {
@@ -7321,7 +7321,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=native-clients,scheduling-supervision; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/367,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/368; The recorded Codex hooks, teams and HUD additions provide client workflow and supervision references."
     },
     {
@@ -7352,7 +7352,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills,document-retrieval; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/369,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/370; Skills for Obsidian CLI and open document formats provide reusable document-workflow instructions."
     },
     {
@@ -7383,7 +7383,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=native-clients,code-navigation; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/371,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/372; The recorded coding agent with IDE integration and MCP topics is a client and code-tool integration candidate."
     },
     {
@@ -7397,7 +7397,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: The recorded deterministic trading engine serves trading execution and market instruments outside the foundation consolidation."
     },
     {
@@ -7428,7 +7428,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills,native-clients; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/373,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/374; Recorded Codex commands, skills, hooks and context-engineering practices are foundation workflow references."
     },
     {
@@ -7459,7 +7459,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=observation-inference,mcp-surfaces; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/375,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/376; Speech recognition, streaming inference and OpenAI-compatible MCP serving are observation and inference-service candidates."
     },
     {
@@ -7473,7 +7473,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: The recorded voice companion and Live2D avatar application has no recorded standalone foundation component in its description or topics."
     },
     {
@@ -7501,7 +7501,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=durable-memory; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/377; The recorded local-capable memory and context engine provides an agent-memory infrastructure candidate."
     },
     {
@@ -7529,7 +7529,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/378; The recorded AI research and engineering skill library supplies reusable research practices across agent clients."
     },
     {
@@ -7560,7 +7560,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=web-research,workers; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/379,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/380; The recorded autonomous research agent and search/web-scraping topics provide a research worker candidate."
     },
     {
@@ -7594,7 +7594,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=scheduling-supervision,workers,isolation; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/381,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/382,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/383; The recorded long-horizon harness coordinates research, coding, subagents and sandboxes."
     },
     {
@@ -7625,7 +7625,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills,native-clients; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/384,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/385; Version-updated Claude Code system prompts and tool descriptions are instruction and client behavior references."
     },
     {
@@ -7656,7 +7656,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=document-retrieval,instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/386,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/387; The recorded programmatic NotebookLM API and agent skill provide document-research integration candidates."
     },
     {
@@ -7687,7 +7687,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=workers,quality-evaluation; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/388,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/389; Delegating tasks to Codex and requesting code review from Claude Code are worker and review integration candidates."
     },
     {
@@ -7715,7 +7715,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/390; The recorded cross-client agent skills collection is a skills discovery source."
     },
     {
@@ -7746,7 +7746,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=code-navigation,token-efficiency; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/391,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/392; Packing repositories into an AI-friendly artifact is a code-context preparation candidate for agent workflows."
     },
     {
@@ -7777,7 +7777,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=scheduling-supervision,workers; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/393,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/394; Teams-first multi-agent orchestration for Claude Code is a worker coordination candidate."
     },
     {
@@ -7808,7 +7808,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills,mcp-surfaces; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/395,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/396; The recorded agent-first skills selection and validation control plane includes a CLI and local MCP surface."
     },
     {
@@ -7836,7 +7836,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=scheduling-supervision; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/397; Recorded orchestration and cross-client agent topics support an agent workflow practice candidate."
     },
     {
@@ -7867,7 +7867,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=web-research,document-retrieval; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/398,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/399; Recorded local research across search engines and private documents supports research and retrieval comparison."
     },
     {
@@ -7895,7 +7895,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/400; The recorded provider-neutral agent skill and harness design practices are reusable instruction references."
     },
     {
@@ -7929,7 +7929,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills,git-github-automation; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/401,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/402; The recorded cross-client engineering plugin and G5 design-intake, PR supervision and feedback skill rows are practice seeds."
     },
     {
@@ -7960,7 +7960,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills,agent-sdks; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/403,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/404; Recorded Claude usage notebooks and recipes provide primary-vendor agent integration practice references."
     },
     {
@@ -7988,7 +7988,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=document-retrieval; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/405; Document scanning, indexing, archiving and OCR are a document ingestion and retrieval-service candidate."
     },
     {
@@ -8002,7 +8002,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: The recorded financial terminal focuses on market analytics, investment research and trading outside foundation consolidation."
     },
     {
@@ -8030,7 +8030,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/406; The recorded Claude Cowork knowledge-worker plugins provide reusable task capability references."
     },
     {
@@ -8068,7 +8068,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=scheduling-supervision,workers,isolation,git-github-automation; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/407,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/408,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/409,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/410; Recorded planning-to-merge agent supervision and G5 task-workspace, CI and review visibility evidence make it an orchestration seed."
     },
     {
@@ -8096,7 +8096,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=code-navigation; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/411; Queryable code and document knowledge graphs with deterministic AST parsing provide a code-navigation candidate."
     },
     {
@@ -8124,7 +8124,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=workers; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/412; The recorded AI-driven development CLI and agent topics identify a coding worker candidate."
     },
     {
@@ -8155,7 +8155,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=recovery-portability,instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/413,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/414; Recorded persistent plans, session recovery and completion gates provide recovery and long-running workflow practices."
     },
     {
@@ -8183,7 +8183,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=code-navigation; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/415; The recorded interactive searchable code knowledge graph provides an agent code-understanding candidate."
     },
     {
@@ -8217,7 +8217,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=mcp-surfaces,secrets-credentials,isolation; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/416,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/417,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/418; Recorded toolkits, authentication and sandboxed workbench support agent tool access and integration boundaries."
     },
     {
@@ -8251,7 +8251,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=workers,quality-evaluation,ci-supply-chain; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/419,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/420,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/421; The recorded JavaScript runtime, test runner and package manager provide worker execution and validation infrastructure."
     },
     {
@@ -8279,7 +8279,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=web-research; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/422; The recorded Chromium automation and Playwright-compatible browser provide a web-acquisition candidate; bypass claims remain untested."
     },
     {
@@ -8310,7 +8310,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=native-clients,scheduling-supervision; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/423,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/424; The recorded Rust agent harness, local-first client and orchestration topics provide a client-harness candidate."
     },
     {
@@ -8344,7 +8344,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills,web-research,quality-evaluation; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/425,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/426,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/427; Recorded research, literature-review and peer-review skills provide research workflow and review references."
     },
     {
@@ -8375,7 +8375,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=code-navigation,token-efficiency; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/428,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/429; Recorded local code knowledge graphs and automatic synchronization provide code-context and tool-efficiency candidates."
     },
     {
@@ -8406,7 +8406,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=mcp-surfaces,workers; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/430,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/431; The recorded agent-native CLI hub is a software tool-access and worker integration candidate."
     },
     {
@@ -8437,7 +8437,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills,agent-sdks; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/432,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/433; Recorded agent engineering, MCP, tutorial and course topics provide implementation-practice discovery references."
     },
     {
@@ -8465,7 +8465,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=durable-memory; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/434; The recorded persistent memory for coding agents is an agent-memory candidate; benchmark superiority is untested."
     },
     {
@@ -8493,7 +8493,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=mcp-surfaces; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/435; The recorded MCP server collection is a tool-surface discovery source."
     },
     {
@@ -8521,7 +8521,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/436; The recorded skills and workflow customization list is an instruction and capability discovery source."
     },
     {
@@ -8549,7 +8549,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/437; The recorded prompt sharing and discovery collection is a reusable prompt-engineering practice source."
     },
     {
@@ -8577,7 +8577,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/438; The recorded engineering skills for coding agents are reusable foundation practices."
     },
     {
@@ -8591,7 +8591,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: The recorded real-time price, company-insight and alert application serves stock-market users outside foundation consolidation."
     },
     {
@@ -8605,7 +8605,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: The recorded financial data interface library serves market and economic data acquisition outside foundation consolidation."
     },
     {
@@ -8619,7 +8619,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: The recorded LLM stock-analysis and market-notification system is trading-specific rather than foundation infrastructure."
     },
     {
@@ -8633,7 +8633,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: The recorded systematic-trading resource list covers market strategies and execution tools outside foundation consolidation."
     },
     {
@@ -8661,7 +8661,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=token-efficiency; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/439; The recorded development-command output proxy is a token-efficiency candidate; percentage savings are untested here."
     },
     {
@@ -8689,7 +8689,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/440; The recorded Codex CLI and API workflow skills list is a skills discovery source."
     },
     {
@@ -8717,7 +8717,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=native-clients; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/441; The recorded terminal-based agentic development environment is a native-client candidate."
     },
     {
@@ -8748,7 +8748,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=observation-inference,native-clients; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/442,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/443; The recorded Claude Code statusline provides a client runtime-status presentation reference."
     },
     {
@@ -8776,7 +8776,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/444; The recorded vendor agent skills collection is a reusable capability discovery source."
     },
     {
@@ -8807,7 +8807,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=scheduling-supervision,hosting-services; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/445,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/446; The recorded self-hostable human-and-agent teamwork platform is a collaboration and service-hosting reference."
     },
     {
@@ -8838,7 +8838,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=durable-memory,scheduling-supervision; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/447,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/448; The recorded AI coworker combines memory and collaboration with orchestration topics."
     },
     {
@@ -8872,7 +8872,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=token-efficiency,durable-memory,mcp-surfaces; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/449,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/450,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/451; Recorded output sandboxing, session memory and MCP hook routing provide context-efficiency and memory integration candidates."
     },
     {
@@ -8906,7 +8906,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=code-navigation,semantic-rag,mcp-surfaces; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/452,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/453,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/454; The recorded semantic code-search MCP and embedding topics provide retrieval-backed code-navigation candidates."
     },
     {
@@ -8920,7 +8920,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: The recorded personalized tutoring product has no recorded standalone foundation component in its description or topics."
     },
     {
@@ -8951,7 +8951,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=code-navigation,document-retrieval; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/455,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/456; The recorded repository wiki generator supports code understanding and derived documentation retrieval."
     },
     {
@@ -8985,7 +8985,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=native-clients,workers,mcp-surfaces; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/457,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/458,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/459; The recorded extensible agent executes, edits and tests with multiple LLMs and MCP integration."
     },
     {
@@ -9016,7 +9016,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=durable-memory,token-efficiency; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/460,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/461; Recorded session capture, compression and future-context injection provide persistent agent-memory and context-efficiency candidates."
     },
     {
@@ -9047,7 +9047,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=scheduling-supervision,quality-evaluation; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/462,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/463; The recorded coding harness builder and workflow-engine topics are repeatable workflow practice candidates."
     },
     {
@@ -9061,7 +9061,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: The recorded financial-market foundation model is market-specific rather than agent foundation infrastructure."
     },
     {
@@ -9089,7 +9089,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=durable-memory; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/464; The recorded persistent memory infrastructure for agents and applications is an agent-memory candidate."
     },
     {
@@ -9120,7 +9120,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=observation-inference,recovery-portability; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/465,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/466; Recorded SRE agents, alerting, root-cause analysis and remediation provide service observation and recovery references."
     },
     {
@@ -9149,7 +9149,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=durable-memory; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/467; The recorded agent brain and exact G5 agent-memory source-review row make it a persistent-memory research seed."
     },
     {
@@ -9177,7 +9177,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=durable-memory; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/468; The recorded open-source memory system and MCP topics provide an agent-memory candidate; benchmark claims are untested."
     },
     {
@@ -9206,7 +9206,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=web-research; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/469; The exact G5 source review records a searchable Python-tool discovery guide for engineering gaps, supporting foundation research leads."
     },
     {
@@ -9234,7 +9234,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/470; The recorded multi-client engineering, research and operational skills library is a reusable capability discovery source."
     },
     {
@@ -9262,7 +9262,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=observation-inference; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/471; Recorded local LLM execution and training support local inference implementation research."
     },
     {
@@ -9293,7 +9293,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills,native-clients; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/472,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/473; The recorded Claude Code skills, agents, plugins and developer-tool collection provides client-workflow discovery leads."
     },
     {
@@ -9321,7 +9321,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/474; The recorded engineering skills collection is a reusable coding-agent practice source."
     },
     {
@@ -9335,7 +9335,7 @@
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "OUT-OF-SCOPE: The recorded multi-agent financial trading framework is trading-specific outside foundation consolidation."
     },
     {
@@ -9369,7 +9369,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=semantic-rag,document-retrieval,hosting-services; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/475,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/476,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/477; Recorded enterprise search, retrieval, vector-search and self-hosting topics provide a knowledge retrieval service candidate."
     },
     {
@@ -9400,7 +9400,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills,native-clients; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/478,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/479; The recorded Claude Code guide and advanced-agent templates provide client workflow practice references."
     },
     {
@@ -9428,7 +9428,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=observation-inference; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/480; The recorded local on-device ML and generative-model gallery provides edge inference demonstration references."
     },
     {
@@ -9456,7 +9456,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=observation-inference; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/481; The recorded LLM inference framework for edge devices is a local inference-runtime candidate."
     },
     {
@@ -9487,7 +9487,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=native-clients,document-retrieval; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/482,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/483; The recorded Obsidian integration embeds coding clients into a document vault workflow."
     },
     {
@@ -9515,7 +9515,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/484; The recorded CLAUDE.md coding-pitfall guidance provides a reusable agent instruction practice reference."
     },
     {
@@ -9549,7 +9549,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=agent-sdks,semantic-rag,instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/485,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/486,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/487; The recorded agent, skills and RAG application collection provides integration implementation references."
     },
     {
@@ -9580,7 +9580,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=native-clients,scheduling-supervision; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/488,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/489; The recorded open agent harness with a built-in agent is a client and harness architecture candidate."
     },
     {
@@ -9608,7 +9608,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/490; The recorded automated Claude Code plugin index is a capability discovery source; adoption metrics do not establish quality."
     },
     {
@@ -9639,7 +9639,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=scheduling-supervision,quality-evaluation; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/491,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/492; The recorded agents automating GPU training research provide autonomous experimentation and evaluation practice references."
     },
     {
@@ -9670,7 +9670,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills,native-clients; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/493,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/494; Recorded Claude Code commands, skills and context-engineering practices provide foundation workflow references."
     },
     {
@@ -9698,7 +9698,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=code-navigation; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/495; The recorded zero-server code intelligence engine provides a local code-navigation candidate."
     },
     {
@@ -9726,7 +9726,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=durable-memory; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/496; The recorded learning agent-memory system is a persistent-memory candidate."
     },
     {
@@ -9760,7 +9760,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills,quality-evaluation,scheduling-supervision; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/497,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/498,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/499; Recorded autonomous research skills, cross-model review loops and experiment automation provide research orchestration practices."
     },
     {
@@ -9791,7 +9791,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills,workers; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/500,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/501; The recorded multi-harness agentic plugin marketplace and subagent topics provide worker and capability discovery references."
     },
     {
@@ -9822,7 +9822,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=durable-memory,recovery-portability; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/502,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/503; The recorded portable, local-first Markdown memory layer supports persistent context across apps and tools."
     },
     {
@@ -9853,7 +9853,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=quality-evaluation,ci-supply-chain; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/504,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/505; Recorded declarative agent and RAG tests, model comparison and CI integration provide an evaluation infrastructure candidate."
     },
     {
@@ -9884,7 +9884,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=agent-sdks,scheduling-supervision; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/506,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/507; The recorded agent harness and framework topics provide agent construction and orchestration references."
     },
     {
@@ -9912,7 +9912,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=native-clients; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/508; The recorded agent implementation and multi-provider coding-agent topics provide a native-client candidate."
     },
     {
@@ -9940,7 +9940,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/509; The recorded design language for AI harnesses provides reusable design instruction practices."
     },
     {
@@ -9969,7 +9969,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=document-retrieval; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/510; Exact G5 source-review evidence records curated versioned Markdown documentation for coding agents despite empty starred metadata."
     },
     {
@@ -10000,7 +10000,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=workers,instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/511,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/512; The recorded specialized agents with processes and deliverables provide worker-role and instruction references."
     },
     {
@@ -10028,7 +10028,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=web-research; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/513; The recorded headless browser for AI and automation provides a browser acquisition runtime candidate."
     },
     {
@@ -10059,7 +10059,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=quality-evaluation,scheduling-supervision; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/514,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/515; The recorded universal swarm engine and multi-agent-simulation topics provide a research reference for coordinated-agent behavior."
     },
     {
@@ -10090,7 +10090,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=agent-sdks,instructions-skills; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/516,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/517; The recorded educational coding-agent harness provides a reference implementation for agent development practices."
     },
     {
@@ -10121,7 +10121,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills,quality-evaluation; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/518,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/519; The recorded skills framework and software development methodology provide reusable coding and review practices."
     },
     {
@@ -10152,7 +10152,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=workers,scheduling-supervision; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/520,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/521; The recorded asynchronous coding agent provides a worker execution and background orchestration candidate."
     },
     {
@@ -10183,7 +10183,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=observation-inference,native-clients; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/522,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/523; Recorded context usage, active tools, agent activity and task progress provide client runtime-observability references."
     },
     {
@@ -10211,7 +10211,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=web-research; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/524; The recorded news aggregation, OSINT and monitoring dashboard provides a public research aggregation implementation reference."
     },
     {
@@ -10242,7 +10242,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=document-retrieval,semantic-rag; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/525,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/526; The recorded vectorless reasoning-based document index provides a document retrieval architecture candidate."
     },
     {
@@ -10276,7 +10276,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=scheduling-supervision,durable-memory,semantic-rag; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/527,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/528,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/529; The recorded harness coordinates agent swarms and workflows with memory and vector-RAG integration."
     },
     {
@@ -10307,7 +10307,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=quality-evaluation,observation-inference; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/530,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/531; Recorded tracing, automated evaluations and monitoring of agent and RAG workflows provide measurement infrastructure."
     },
     {
@@ -10341,7 +10341,7 @@
         ],
         "registry": "catalogs/sota-convergence/layer-verdict-waves.json"
       },
-      "review_level": "source_review",
+      "review_level": "metadata_review",
       "disposition": "IN-SCOPE layer=instructions-skills,token-efficiency,durable-memory; seed=catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/532,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/533,catalogs/convergence-practice/starred-seeds-20261010.json#/seeds/534; The recorded harness optimization system combines skills, memory and research-first development practices."
     }
   ],

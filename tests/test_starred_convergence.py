@@ -70,6 +70,19 @@ class StarredConvergenceTests(unittest.TestCase):
         self.seeds["seeds"][0]["repository"] = "other/tool"
         self.reject("seed reference repository")
 
+    def test_snapshot_source_pointer_cannot_resolve_to_a_different_repository(self):
+        path = "catalogs/convergence-practice/public-starred.json"
+        self.write(path, {"repositories": [{"repository": "other/tool"}, {"repository": "OWNER/TOOL"}]})
+        self.seeds["seeds"][0]["source_refs"] = [path + "#/repositories/0"]
+        self.reject("seed reference repository")
+        self.seeds["seeds"][0]["source_refs"] = [path + "#/repositories/1"]
+        self.sync()
+        self.assertEqual(validate_convergence(self.root, self.snapshot)["status"], "valid")
+
+    def test_non_snapshot_source_object_must_also_match_seed_repository(self):
+        self.write(EVIDENCE, {"rows": [{"repository": "other/tool"}]})
+        self.reject("seed reference repository")
+
     def test_wrong_seed_layer_fails(self):
         self.seeds["seeds"][0]["layer"] = "code-navigation"
         self.reject("seed reference layer")
@@ -117,8 +130,9 @@ class StarredConvergenceTests(unittest.TestCase):
         self.reject("same repository and explicit tier")
 
     def test_verdict_for_another_repository_fails(self):
-        self.write(EVIDENCE, {"rows": [{"repository": "other/tool", "tier": "tier-1"}]})
-        self.row["verdict_refs"] = [EVIDENCE + "#/rows/0"]
+        verdict = "catalogs/convergence-practice/verdict.json"
+        self.write(verdict, {"rows": [{"repository": "other/tool", "tier": "tier-1"}]})
+        self.row["verdict_refs"] = [verdict + "#/rows/0"]
         self.reject("same repository and explicit tier")
 
     def test_missing_follow_up_fails(self):

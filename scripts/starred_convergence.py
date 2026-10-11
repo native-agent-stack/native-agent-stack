@@ -32,7 +32,7 @@ def _public_fields(value):
             _public_fields(child)
 
 
-def _resolve(root, ref, documents):
+def _resolve(root, ref, documents, read=None):
     require(isinstance(ref, str) and bool(ref), "source reference must be text")
     if "://" in ref:
         url = urlsplit(ref)
@@ -45,17 +45,18 @@ def _resolve(root, ref, documents):
     path, separator, fragment = ref.partition("#")
     require(bool(separator) and path.endswith(".json"), "source reference needs a JSON pointer")
     if path not in documents:
-        documents[path] = load(root, path)
+        documents[path] = read(path) if read is not None else load(root, path)
         _public_fields(documents[path])
     return pointer(documents[path], fragment)
 
 
-def validate_convergence(root: Path, snapshot: dict) -> dict:
+def validate_convergence(root: Path, snapshot: dict, *, read=None) -> dict:
     """Validate a completed intake manifest, retaining compatibility with older snapshots."""
     if "convergence_manifest" not in snapshot:
         return {"status": "legacy", "count": len(snapshot.get("repositories", []))}
     manifest_path = snapshot["convergence_manifest"]
-    manifest = load(root, manifest_path)
+    load_document = read if read is not None else lambda path: load(root, path)
+    manifest = load_document(manifest_path)
     require(manifest.get("schema_version") == 1, "unsupported starred convergence schema")
     rows, stars = manifest.get("repositories"), snapshot.get("repositories")
     require(isinstance(rows, list) and isinstance(stars, list), "starred repositories must be arrays")
@@ -66,13 +67,13 @@ def validate_convergence(root: Path, snapshot: dict) -> dict:
         name = identity(star.get("repository"))
         require(name not in by_repo, "duplicate snapshot repository identity")
         by_repo[name] = star
-    layer_doc = load(root, "catalogs/foundation/manifest.json")
+    layer_doc = load_document("catalogs/foundation/manifest.json")
     layers = {row["id"] for row in layer_doc["layers"]}
     skills = "catalogs/landscape/skills-lifecycle.json"
     if safe_file(root, skills).exists():
-        layers.update(row["layer_id"] for row in load(root, skills)["tasks"])
+        layers.update(row["layer_id"] for row in load_document(skills)["tasks"])
     seeds_path = manifest.get("seed_manifest")
-    seed_doc = load(root, seeds_path)
+    seed_doc = load_document(seeds_path)
     require(seed_doc.get("schema_version") == 1 and isinstance(seed_doc.get("seeds"), list),
             "unsupported starred seed schema")
     documents = {manifest_path: manifest, seeds_path: seed_doc}
@@ -87,7 +88,10 @@ def validate_convergence(root: Path, snapshot: dict) -> dict:
         refs = seed.get("source_refs")
         require(isinstance(refs, list) and bool(refs), "seed requires source references")
         for ref in refs:
-            _resolve(root, ref, documents)
+            resolved = _resolve(root, ref, documents, read)
+            if isinstance(resolved, dict) and "repository" in resolved:
+                require(identity(resolved["repository"]) == identity(seed["repository"]),
+                        "seed reference repository disagrees with source evidence")
         if seed.get("evidence_class") == "source_review":
             require(any("://" in ref for ref in refs),
                     "source_review requires pinned upstream source bytes")
@@ -98,7 +102,7 @@ def validate_convergence(root: Path, snapshot: dict) -> dict:
                     "historical seed witness is metadata_seed_review, not pinned source_review")
             ref = witness.get("source_ref")
             require(ref in refs, "recorded seed requires a resolvable source reference")
-            source = _resolve(root, ref, documents)
+            source = _resolve(root, ref, documents, read)
             require(isinstance(source, str) and hashlib.sha256(source.encode()).hexdigest()
                     == witness.get("source_seed_sha256"), "recorded seed source hash disagrees")
             capture = ref.partition("#")[0]
@@ -145,7 +149,7 @@ def validate_convergence(root: Path, snapshot: dict) -> dict:
         for ref in refs:
             require(isinstance(ref, str) and ref.partition("#")[0] == seeds_path,
                     "seed reference must use the declared seed manifest")
-            seed = _resolve(root, ref, documents)
+            seed = _resolve(root, ref, documents, read)
             require(isinstance(seed, dict) and identity(seed.get("repository")) == name,
                     "seed reference repository disagrees with disposition")
             require(seed.get("layer") in keys, "seed reference layer disagrees with disposition")
@@ -157,7 +161,7 @@ def validate_convergence(root: Path, snapshot: dict) -> dict:
         evidence = row.get("evidence_refs")
         require(isinstance(evidence, list) and bool(evidence), "disposition requires recorded evidence")
         for ref in evidence:
-            _resolve(root, ref, documents)
+            _resolve(root, ref, documents, read)
         verdict_refs = row.get("verdict_refs")
         require(isinstance(verdict_refs, list), "verdict_refs must be an array")
         require(star.get("evidence_refs") == evidence and star.get("verdict_refs") == verdict_refs
@@ -165,7 +169,7 @@ def validate_convergence(root: Path, snapshot: dict) -> dict:
                 "snapshot evidence or verdict claims disagree with convergence manifest")
         tiers = set()
         for ref in verdict_refs:
-            verdict = _resolve(root, ref, documents)
+            verdict = _resolve(root, ref, documents, read)
             require(isinstance(verdict, dict) and identity(verdict.get("repository", verdict.get("repo"))) == name
                     and verdict.get("tier") in TIERS, "verdict reference requires the same repository and explicit tier")
             tiers.add(verdict["tier"])
@@ -175,7 +179,7 @@ def validate_convergence(root: Path, snapshot: dict) -> dict:
                     and set(follow_up.get("required_tiers", [])) == TIERS - tiers
                     and follow_up.get("layer_keys") == keys and follow_up.get("registry") == REGISTRY,
                     "in-scope disposition needs honest recorded-tier follow-up")
-            load(root, REGISTRY)
+            load_document(REGISTRY)
         elif scope == "IN-SCOPE":
             require(row.get("verdict_follow_up") is None,
                     "complete tier verdicts must not retain an awaiting follow-up")

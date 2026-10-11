@@ -38,6 +38,7 @@ REPOSITORY = re.compile(r"[A-Za-z0-9][A-Za-z0-9-]{0,38}/[A-Za-z0-9_.-]+\Z")
 ENDPOINT = re.compile(r"/users/[A-Za-z0-9][A-Za-z0-9-]{0,38}/starred\Z")
 SNAPSHOT_NAME = "public-starred.latest.json"
 JOURNAL_NAME = "newstars-journal.json"
+PREPARED_NAME = "newstars-prepared.json"
 
 
 def snapshot_time(value):
@@ -326,8 +327,9 @@ def _notify(questions, notification, count, snapshot, now, root, pending=()):
 def refresh_public_stars(root, *, output=None, state_dir=None, questions=None, now=None):
     """Refresh once into an explicit output or an external weekly review queue.
 
-    State mode never writes the checkout. It prepares a durable notification
-    journal before append and recognizes an already appended marker on retry.
+    State mode never writes the checkout. One prepared record retains both the
+    live snapshot and review journal before publishing either. Retry completes
+    both publications before append and recognizes an already appended marker.
     """
     root = Path(root).resolve()
     if (output is None) == (state_dir is None):
@@ -356,7 +358,7 @@ def refresh_public_stars(root, *, output=None, state_dir=None, questions=None, n
             raise ValueError("public-star state path must be a directory")
         if questions_path.exists() and not questions_path.is_file():
             raise ValueError("lane questions path must be a file")
-        for name in (SNAPSHOT_NAME, JOURNAL_NAME, ".public-starred.lock"):
+        for name in (SNAPSHOT_NAME, JOURNAL_NAME, PREPARED_NAME, ".public-starred.lock"):
             resource = state_path / name
             if resource.is_symlink():
                 raise ValueError("public-star state resources cannot be symlinks")
@@ -380,6 +382,25 @@ def refresh_public_stars(root, *, output=None, state_dir=None, questions=None, n
                 _observation(row, previous, current)
         journal_path = state_path / JOURNAL_NAME if state_path is not None else None
         journal = _read(journal_path) if journal_path is not None and journal_path.exists() else {}
+        prepared_path = state_path / PREPARED_NAME if state_path is not None else None
+        prepared = _read(prepared_path) if prepared_path is not None and prepared_path.exists() else None
+        recovering = False
+        if prepared is not None:
+            if prepared.get("schema_version") != 1 or prepared.get("publication_state") not in ("prepared", "posted"):
+                raise ValueError("new-stars prepared publication record is malformed")
+            recovering = prepared["publication_state"] == "prepared"
+            if recovering:
+                recovery_snapshot = prepared.get("snapshot")
+                recovery_journal = prepared.get("journal")
+                if not isinstance(recovery_snapshot, dict) or not isinstance(recovery_journal, dict):
+                    raise ValueError("new-stars prepared publication requires its snapshot and journal")
+                if (recovery_journal.get("notification_state") != "prepared"
+                        or _endpoint(recovery_snapshot) != endpoint
+                        or recovery_snapshot.get("retrieved_at") != recovery_journal.get("retrieved_at")):
+                    raise ValueError("new-stars prepared snapshot and journal disagree")
+                for row in _rows(recovery_snapshot).values():
+                    _observation(row, recovery_snapshot, current)
+                journal = recovery_journal
         replayed = False
         if journal_path is not None and journal.get("notification_state") == "prepared":
             notification = journal.get("notification_id")
@@ -391,10 +412,20 @@ def refresh_public_stars(root, *, output=None, state_dir=None, questions=None, n
             observed = snapshot_time(journal.get("retrieved_at"))
             if observed > current:
                 raise ValueError("prepared new-stars journal observation is in the future")
+            if recovering:
+                # CPython v3.13.16 os.replace is atomic for one file, not these
+                # two publications. Keep their shared recovery record until
+                # both files and the notification have completed.
+                _write_json(journal_path, journal)
+                _write_json(target, recovery_snapshot)
             replayed = _notify(questions_path, notification, count, target, observed, root,
                                journal.get("pending_repositories", []))
             journal["notification_state"] = "posted"
             _write_json(journal_path, journal)
+            if recovering:
+                prepared["publication_state"] = "posted"
+                _write_json(prepared_path, prepared)
+                previous = _read(target)
         snapshot = _build(baseline, _fetch(endpoint), current, previous)
         canonical, live = _rows(baseline), _rows(snapshot)
         added = sorted(set(live) - set(canonical))
@@ -439,20 +470,26 @@ def refresh_public_stars(root, *, output=None, state_dir=None, questions=None, n
                             "canonical_review": {field: canonical[key][field] for field in REVIEW_FIELDS
                                                  if field != "first_observed_at" and field in canonical[key]}
                             if key in canonical else None} for key in queue]
-            notification = hashlib.sha256(json.dumps(observation, sort_keys=True).encode()).hexdigest()
+            identity_material = observation if queue else {"cleared_review_generations": generations}
+            notification = hashlib.sha256(json.dumps(identity_material, sort_keys=True).encode()).hexdigest()
             journal = {"schema_version": 1, "pending_repositories": queue,
                        "pending_observations": pending, "review_generations": generations,
                        "notification_id": notification, "notification_state": "prepared",
                        "newstars_count": len(queue), "retrieved_at": _stamp(current)}
+            prepared = {"schema_version": 1, "publication_state": "prepared",
+                        "snapshot": snapshot, "journal": journal}
+            _write_json(prepared_path, prepared)
+            _write_json(journal_path, journal)
         _write_json(target, snapshot)
         report = {"status": "refreshed", "count": snapshot["count"], "new_count": len(added),
                   "retrieved_at": snapshot["retrieved_at"], "snapshot": _display_path(target, root),
                   "snapshot_sha256": hashlib.sha256(target.read_bytes()).hexdigest()}
         if journal_path is not None:
-            _write_json(journal_path, journal)
             posted = _notify(questions_path, notification, len(queue), target, current, root, queue)
             journal["notification_state"] = "posted"
             _write_json(journal_path, journal)
+            prepared["publication_state"] = "posted"
+            _write_json(prepared_path, prepared)
             report.update(queued_count=len(queue), newstars_posted=posted or replayed,
                           notification_id=notification)
         return report

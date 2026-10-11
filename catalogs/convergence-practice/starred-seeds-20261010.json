@@ -786,8 +786,6 @@
       "checked_at": "2026-10-10T16:32:37Z",
       "source_refs": [
         "catalogs/convergence-practice/public-starred.json#/repositories/44",
-        "catalogs/sota-convergence/manifest-20260922.json#/foundation/13/components/7",
-        "catalogs/sota-convergence/manifest-20260922.json#/foundation/10/components/7",
         "catalogs/convergence-practice/sources/master-seeds-20261010.json#/web-research/36"
       ],
       "evidence_class": "metadata_seed_review",
@@ -808,8 +806,6 @@
       "checked_at": "2026-10-10T16:32:37Z",
       "source_refs": [
         "catalogs/convergence-practice/public-starred.json#/repositories/44",
-        "catalogs/sota-convergence/manifest-20260922.json#/foundation/13/components/7",
-        "catalogs/sota-convergence/manifest-20260922.json#/foundation/10/components/7",
         "catalogs/convergence-practice/sources/master-seeds-20261010.json#/hosting-services/26"
       ],
       "evidence_class": "metadata_seed_review",

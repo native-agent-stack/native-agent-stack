@@ -829,7 +829,7 @@ def build_data(root):
     except ImportError:
         from starred_convergence import validate_convergence
     validate_pending_age(stars)
-    validate_convergence(root, stars)
+    validate_convergence(root, stars, read=read)
     if stars.get("convergence_manifest"):
         convergence_source = read(stars["convergence_manifest"])
         read(convergence_source["seed_manifest"])
