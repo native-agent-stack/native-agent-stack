@@ -64,9 +64,6 @@ class NewWorkflowSecurityCoverageTests(unittest.TestCase):
             "saturation-tracking.yml",
             "practice-references-freshness.yml",
             "runtime-worker-skills-freshness.yml",
-            "harness-audit.yml",
-            "claude-pr-review.yml",
-            "claude-pr-toolkit-review.yml",
             # Its offline zizmor pass/fail assertions live in tests/test_sota_sources_gate.py.
             "sota-sources-gate.yml",
             "pr-metadata.yml",
@@ -119,41 +116,6 @@ class NewWorkflowSecurityCoverageTests(unittest.TestCase):
                       f"{result.stderr[:2000]}")
         self.assertEqual(result.returncode, 0, result.stderr[:2000])
         self.assertEqual(findings, [])
-
-    def test_harness_audit_workflow_has_no_offline_findings(self):
-        with tempfile.TemporaryDirectory() as temporary:
-            result = _analyze(WORKFLOWS_DIR / "harness-audit.yml", Path(temporary))
-        try:
-            findings = json.loads(result.stdout)
-        except json.JSONDecodeError:
-            self.fail(f"zizmor did not return JSON (exit {result.returncode}): "
-                      f"{result.stderr[:2000]}")
-        self.assertEqual(result.returncode, 0, result.stderr[:2000])
-        self.assertEqual(findings, [])
-
-    def test_claude_pr_review_workflow_has_no_offline_findings(self):
-        with tempfile.TemporaryDirectory() as temporary:
-            result = _analyze(WORKFLOWS_DIR / "claude-pr-review.yml", Path(temporary))
-        try:
-            findings = json.loads(result.stdout)
-        except json.JSONDecodeError:
-            self.fail(f"zizmor did not return JSON (exit {result.returncode}): "
-                      f"{result.stderr[:2000]}")
-        self.assertEqual(result.returncode, 0, result.stderr[:2000])
-        self.assertEqual(findings, [])
-
-
-    def test_claude_pr_toolkit_review_workflow_has_no_offline_findings(self):
-        with tempfile.TemporaryDirectory() as temporary:
-            result = _analyze(WORKFLOWS_DIR / "claude-pr-toolkit-review.yml", Path(temporary))
-        try:
-            findings = json.loads(result.stdout)
-        except json.JSONDecodeError:
-            self.fail(f"zizmor did not return JSON (exit {result.returncode}): "
-                      f"{result.stderr[:2000]}")
-        self.assertEqual(result.returncode, 0, result.stderr[:2000])
-        self.assertEqual(findings, [])
-
 
 FRESHNESS_WORKFLOW = WORKFLOWS_DIR / "runtime-worker-skills-freshness.yml"
 # Since 2026-10-04 the workflow grants no scope and its one job grants `contents: read`

@@ -204,61 +204,165 @@ class HardenRunnerTests(unittest.TestCase):
             self.assertNotIn("egress-policy: block", path.read_text(encoding="utf-8"), path.name)
 
 
-CLAUDE_REVIEW_WORKFLOWS = ("claude-pr-review.yml", "claude-pr-toolkit-review.yml", "harness-audit.yml")
-FEDERATION_INPUTS = ("anthropic_federation_rule_id", "anthropic_organization_id", "anthropic_service_account_id",
-                     "anthropic_workspace_id")
+RETIRED_CLAUDE_WORKFLOWS = ("claude-pr-review.yml", "claude-pr-toolkit-review.yml", "harness-audit.yml")
+RETIRED_ENVIRONMENT = "claude-review"
+# What a job's environment can be, by the sources (read 2026-10-11T00:44Z):
+# - GitHub, Workflow syntax, `jobs.<job_id>.environment`
+#   (https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#jobsjob_idenvironment):
+#   "only the environment `name`, or ... an environment object with the `name` and `url`", so a scalar or a mapping's
+#   `name`.
+# - YAML 1.2.2 (https://yaml.org/spec/1.2.2/): a mapping in block style (8.2.2 Block Mappings) or flow style (7.4.2 Flow
+#   Mappings), a key plain or quoted (7.3 Flow Scalar Styles), and a comment after a value (6.6 Comments). These are
+#   the forms ENVIRONMENT_FORMS covers; PyYAML 6.0.3, the parser the cross-check uses, reads each the same way.
 
 
-class ClaudeApiKeyAuthTests(unittest.TestCase):
-    """The owner's ruling of 2026-10-10 (docs/decisions/2026-10-08-claude-actions-pr-review.md): CI Claude review
-    authenticates with the repository secret ANTHROPIC_API_KEY, and federation stays unconfigured."""
+def job_environments(text):
+    """{job_id: environment name or None}: a job's `environment:` as a scalar, or its mapping's `name` in a one-line
+    flow or a block form, quoted or not, with a comment after the key. A text reading, so it needs no YAML library.
+    It does not read a comment line before `name:` at the job's own indentation or a flow mapping spread over lines;
+    test_the_environment_reading_matches_yaml_when_available compares it with PyYAML on every job; the hosted runner
+    has PyYAML, so CI runs that comparison (it passed, not skipped, in validate run 38084944806)."""
+    names = {}
+    for job_id, block in jobs(text).items():
+        lines = block.split("\n")
+        name = None
+        for index, line in enumerate(lines):
+            found = re.match(r"^    environment:(.*)$", line)
+            if not found:
+                continue
+            value = re.sub(r"\s+#.*$", "", found.group(1)).strip()
+            if value.startswith("{"):
+                inline = re.search(r"[\"']?name[\"']?\s*:\s*[\"']?([^\"',}\s]+)", value)
+                name = inline.group(1) if inline else None
+            elif value:
+                name = value.strip("\"'")
+            else:
+                for nested in lines[index + 1:]:
+                    if nested.strip() and not nested.startswith("      "):
+                        break
+                    key = re.match(r"^\s+[\"']?name[\"']?\s*:\s*[\"']?([^\"'#\s]+)", nested)
+                    if key:
+                        name = key.group(1)
+                        break
+            break
+        names[job_id] = name
+    return names
 
-    def lines(self, name):
-        return [line.strip() for line in (WORKFLOWS / name).read_text(encoding="utf-8").splitlines()
-                if not line.strip().startswith("#")]
 
-    def test_each_claude_workflow_passes_the_api_key_secret_once(self):
-        for name in CLAUDE_REVIEW_WORKFLOWS:
-            with self.subTest(workflow=name):
-                lines = self.lines(name)
-                self.assertEqual(lines.count("anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}"), 1)
-                self.assertEqual([line for line in lines if line.startswith("claude_code_oauth_token:")], [])
+ENVIRONMENT_FORMS = {
+    # (job text after `    runs-on: ubuntu-24.04\n`, the environment name it declares)
+    "plain": ("    environment: claude-review\n", RETIRED_ENVIRONMENT),
+    "quoted": ("    environment: 'claude-review'\n", RETIRED_ENVIRONMENT),
+    "block name": ("    environment:\n      name: claude-review\n", RETIRED_ENVIRONMENT),
+    # The three forms the GPT read at 48e4bd35 found the earlier regex let through:
+    "flow mapping": ("    environment: {name: claude-review}\n", RETIRED_ENVIRONMENT),
+    "quoted key": ('    environment:\n      "name": claude-review\n', RETIRED_ENVIRONMENT),
+    "comment after the key": ("    environment: # deployment\n      name: claude-review\n", RETIRED_ENVIRONMENT),
+    "another environment": ("    environment:\n      name: offhost-fixture\n", "offhost-fixture"),
+    "a longer name": ("    environment: claude-review-two\n", "claude-review-two"),
+    "none": ("", None),
+}
 
-    def test_no_claude_workflow_carries_a_federation_input_or_an_id_token(self):
-        for name in CLAUDE_REVIEW_WORKFLOWS:
-            with self.subTest(workflow=name):
-                lines = self.lines(name)
-                for key in FEDERATION_INPUTS:
-                    self.assertEqual([line for line in lines if line.startswith(key + ":")], [], key)
-                self.assertEqual([line for line in lines if line.startswith("id-token:")], [])
 
-    def test_each_job_that_uses_the_key_runs_in_the_main_only_environment(self):
-        # The owner's ruling of 2026-10-10: the key is an environment secret of `claude-review` (deployment branch
-        # policy: main only), never a repository secret that any branch's workflow could read.
-        for name in CLAUDE_REVIEW_WORKFLOWS:
-            with self.subTest(workflow=name):
-                text = (WORKFLOWS / name).read_text(encoding="utf-8")
-                jobs = text.split("\njobs:\n", 1)[1]
-                blocks = re.split(r"\n(?=  [A-Za-z0-9_-]+:\n)", "\n" + jobs)
-                using = [block for block in blocks if "secrets.ANTHROPIC_API_KEY" in block]
-                self.assertEqual(len(using), 1)
-                self.assertIn("\n    environment: claude-review\n", using[0])
-                others = [block for block in blocks if block not in using]
-                self.assertFalse(any("environment:" in block for block in others))
+def environment_fixture(job_text):
+    return ("name: fixture\non:\n  workflow_dispatch:\npermissions: {}\njobs:\n  review:\n    runs-on: ubuntu-24.04\n"
+            + job_text + "    steps:\n      - run: echo ok\n")
 
-    def test_the_key_reaches_no_pull_request_run(self):
-        # A pull_request run would execute the pull request's own copy of the workflow with the secret.
-        for name in CLAUDE_REVIEW_WORKFLOWS:
-            with self.subTest(workflow=name):
-                lines = self.lines(name)
-                self.assertFalse(any(line.split(":")[0] in ("pull_request", "pull_request_target", "workflow_run")
-                                     for line in lines))
 
-    def test_no_other_workflow_names_the_secret(self):
-        for path in sorted(WORKFLOWS.glob("*.yml")):
-            if path.name not in CLAUDE_REVIEW_WORKFLOWS:
-                with self.subTest(workflow=path.name):
-                    self.assertNotIn("secrets.ANTHROPIC_API_KEY", path.read_text(encoding="utf-8"))
+class InGitHubClaudeReviewRetiredTests(unittest.TestCase):
+    """The owner's decision of 2026-10-10 (docs/decisions/2026-10-10-retire-in-github-claude-review.md): Claude review
+    runs locally, not inside GitHub, because the API refuses requests that carry the action's attribution. No workflow
+    may bring it back without a decision that reverses that one."""
+
+    def workflows(self):
+        return sorted([*WORKFLOWS.glob("*.yml"), *WORKFLOWS.glob("*.yaml")])
+
+    def test_the_retired_workflows_are_gone(self):
+        for name in RETIRED_CLAUDE_WORKFLOWS:
+            self.assertFalse((WORKFLOWS / name).exists(), name)
+
+    def test_no_workflow_runs_the_claude_action_or_names_an_anthropic_key(self):
+        for path in self.workflows():
+            text = path.read_text(encoding="utf-8")
+            with self.subTest(workflow=path.name):
+                self.assertNotIn("anthropics/claude-code-action", text)
+                self.assertNotIn("ANTHROPIC_API_KEY", text.upper())
+
+    def test_no_job_deploys_to_the_retired_environment(self):
+        for path in self.workflows():
+            with self.subTest(workflow=path.name):
+                environments = job_environments(path.read_text(encoding="utf-8"))
+                self.assertNotIn(RETIRED_ENVIRONMENT, environments.values(), environments)
+
+    def test_the_environment_reading_covers_every_form(self):
+        for form, (job_text, expected) in ENVIRONMENT_FORMS.items():
+            with self.subTest(form=form):
+                self.assertEqual(job_environments(environment_fixture(job_text)), {"review": expected})
+
+    def test_the_environment_reading_matches_yaml_when_available(self):
+        try:
+            import yaml
+        except ImportError:
+            self.skipTest("PyYAML not installed; the text reading is the only source")
+        for form, (job_text, _expected) in ENVIRONMENT_FORMS.items():
+            with self.subTest(form=form):
+                parsed = yaml.safe_load(environment_fixture(job_text))["jobs"]["review"].get("environment")
+                name = parsed.get("name") if isinstance(parsed, dict) else parsed
+                self.assertEqual(job_environments(environment_fixture(job_text))["review"], name)
+        for path in self.workflows():
+            text = path.read_text(encoding="utf-8")
+            for job_id, job in yaml.safe_load(text)["jobs"].items():
+                parsed = job.get("environment")
+                name = parsed.get("name") if isinstance(parsed, dict) else parsed
+                with self.subTest(workflow=path.name, job=job_id):
+                    self.assertEqual(job_environments(text).get(job_id), name)
+
+RETIREMENT_RECORD = ROOT / "docs/decisions/2026-10-10-retire-in-github-claude-review.md"
+
+
+def git(*args):
+    return subprocess.run(["git", *args], cwd=ROOT, capture_output=True, text=True, check=False)
+
+
+def inverse_pin(text):
+    """The commit the retirement record's inverse restores the workflows from (its step 1)."""
+    inverse = text.split("## Inverse", 1)[1].split("\n## ", 1)[0]
+    pins = re.findall(r"`([0-9a-f]{40})`", inverse)
+    return pins[0] if len(pins) == 1 else None
+
+
+class RetirementInversePinTests(unittest.TestCase):
+    """The record's inverse must name #968's merge commit, the last commit with the three workflows. Needs the
+    repository's history: it is skipped, with the reason, in a checkout without it (CI clones with fetch-depth 0)."""
+
+    def setUp(self):
+        if git("rev-parse", "--is-inside-work-tree").stdout.strip() != "true":
+            self.skipTest("not a git worktree")
+        if git("rev-parse", "--is-shallow-repository").stdout.strip() == "true":
+            self.skipTest("shallow clone: #968's commit may be absent")
+
+    def pin_holds(self, sha):
+        """None when sha is #968's merge commit holding the three retired workflows, else what is wrong."""
+        if git("cat-file", "-e", f"{sha}^{{commit}}").returncode != 0:
+            return "no such commit"
+        if "(#968)" not in git("log", "-1", "--format=%s", sha).stdout:
+            return "not #968's merge commit"
+        missing = [name for name in RETIRED_CLAUDE_WORKFLOWS
+                   if git("cat-file", "-e", f"{sha}:.github/workflows/{name}").returncode != 0]
+        return f"missing {missing}" if missing else None
+
+    def test_the_inverse_names_968s_merge_commit_with_the_three_workflows(self):
+        sha = inverse_pin(RETIREMENT_RECORD.read_text(encoding="utf-8"))
+        self.assertIsNotNone(sha, "the inverse names exactly one full commit")
+        self.assertIsNone(self.pin_holds(sha))
+
+    def test_the_former_pin_is_refused(self):
+        # The record's first inverse named a commit that does not exist (the command center's micro at 48e4bd35).
+        self.assertEqual(self.pin_holds("9d4c00cd0e1e74e81d79fc3f9e9cfd4cfb6c42f8"), "no such commit")
+        record = RETIREMENT_RECORD.read_text(encoding="utf-8")
+        with_former = record.replace("9d4c00cd05d79b3fd5074df2e46bacab87ee67ff",
+                                     "9d4c00cd0e1e74e81d79fc3f9e9cfd4cfb6c42f8")
+        self.assertIsNotNone(self.pin_holds(inverse_pin(with_former)))
 
 
 class ScorecardTests(unittest.TestCase):
@@ -2235,6 +2339,14 @@ class ActionsAllowListTests(unittest.TestCase):
                     continue
                 not_allowed.append(f"{path.name}:{line_number}: {target}")
         self.assertEqual(not_allowed, [])
+
+    def test_every_allowed_pattern_is_used_by_a_workflow(self):
+        # Least privilege: a pattern no workflow uses is removed (the Claude action's two left on 2026-10-10).
+        targets = [match.group(1) for path in sorted(WORKFLOWS.glob("*.yml"))
+                   for match in re.finditer(r"uses:\s*([^\s#]+)", path.read_text(encoding="utf-8"))]
+        for pattern in self.permissions["patterns_allowed"]:
+            with self.subTest(pattern=pattern):
+                self.assertTrue(any(fnmatch.fnmatch(target, pattern) for target in targets), pattern)
 
 
 if __name__ == "__main__":

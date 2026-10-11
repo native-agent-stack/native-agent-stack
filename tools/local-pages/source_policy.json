@@ -1820,14 +1820,6 @@
       "root": "repo",
       "path": ".github/workflows/catalog-freshness.yml"
     },
-      {
-        "root": "repo",
-        "path": ".github/workflows/claude-pr-review.yml"
-      },
-      {
-        "root": "repo",
-        "path": ".github/workflows/claude-pr-toolkit-review.yml"
-      },
     {
       "root": "repo",
       "path": ".github/workflows/dependency-review.yml"
@@ -1839,10 +1831,6 @@
     {
       "root": "repo",
       "path": ".github/workflows/hardware-profile-smoke.yml"
-    },
-    {
-      "root": "repo",
-      "path": ".github/workflows/harness-audit.yml"
     },
     {
       "root": "repo",

@@ -1,5 +1,7 @@
 # Bounded harness audit on the current Claude action pin — 2026-10-08
 
+**Superseded (2026-10-10).** Claude review inside GitHub is retired, and the workflow this record describes is removed (`docs/decisions/2026-10-10-retire-in-github-claude-review.md`). The record stays as the history of that workflow.
+
 `harness-audit.yml` moves from `anthropics/claude-code-action` v1.0.245 to v1.0.247 and becomes a bounded,
 read-only job: Claude gets Read, Glob and Grep under `--restricted`, at most 20 assistant turns (checked after the
 run) and a $5 client budget; the

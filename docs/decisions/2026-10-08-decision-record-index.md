@@ -4,6 +4,10 @@ This is the single navigation index for CC133934Z section5, extended by CC142518
 
 The13:39:56Z snapshot is47open PRs,15ready and32drafts, with132remote branches. The30-row premise was the native `gh pr list` default page. This index records that historical correction; current inventories use an explicit `--limit`. The shared API budget is5,000/hour: use native `gh api --cache` and check polling at120s or slower.
 
+**Supersession (2026-10-10).** Claude review inside GitHub is retired ([2026-10-10-retire-in-github-claude-review.md](2026-10-10-retire-in-github-claude-review.md)); the
+`harness-audit.yml` links in corrections 66 and 66a below point to a workflow that no longer exists, and the
+claude-actions records are kept as history.
+
 ## Today's published decisions
 
 | Record | Subject | Evidence boundary |

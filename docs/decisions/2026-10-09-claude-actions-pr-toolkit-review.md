@@ -1,5 +1,7 @@
 # Pre-cue read of a pull request by Anthropic's pr-review-toolkit agents, in GitHub Actions — 2026-10-09
 
+**Superseded (2026-10-10).** Claude review inside GitHub is retired, and the workflow this record describes is removed (`docs/decisions/2026-10-10-retire-in-github-claude-review.md`). The record stays as the history of that workflow.
+
 `claude-pr-toolkit-review.yml` runs two agents from Anthropic's `pr-review-toolkit` plugin, `pr-test-analyzer` and
 `silent-failure-hunter`, on one pull request head, through `anthropics/claude-code-action` v1.0.247. A maintainer
 dispatches it by hand from `main` with the pull request number and the exact head commit. Each agent reads the diff,
