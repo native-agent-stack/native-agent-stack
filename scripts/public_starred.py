@@ -147,13 +147,21 @@ def validate_pending_age(snapshot, now=None):
         raise ValueError("public-star snapshot observation date is in the future")
     expired = []
     for row in _rows(snapshot).values():
-        observed = snapshot_time(row.get("first_observed_at", snapshot.get("retrieved_at")))
-        if observed > current:
-            raise ValueError("public-star first observation date is in the future")
+        observed = _observation(row, snapshot, current)
         if _is_pending(row) and current - observed > timedelta(days=7):
             expired.append(row["repository"])
     if expired:
         raise ValueError("PENDING public-star entries older than 7 days: " + ", ".join(sorted(expired)))
+
+
+def _observation(row, snapshot, current):
+    retrieved = snapshot_time(snapshot.get("retrieved_at"))
+    observed = snapshot_time(row.get("first_observed_at", snapshot.get("retrieved_at")))
+    if retrieved > current or observed > current:
+        raise ValueError("public-star observation date is in the future")
+    if observed > retrieved:
+        raise ValueError("public-star first observation is newer than its containing snapshot")
+    return observed
 
 
 def _endpoint(snapshot):
@@ -251,9 +259,7 @@ def _build(baseline, raw_rows, now, previous=None):
         dates = [now]
         for snapshot, source_row in ((baseline, authority), (previous, retained.get(key))):
             if snapshot is not None and source_row is not None:
-                observed = snapshot_time(source_row.get("first_observed_at", snapshot.get("retrieved_at")))
-                if observed > now:
-                    raise ValueError("retained public-star observation date is in the future")
+                observed = _observation(source_row, snapshot, now)
                 dates.append(observed)
         row["first_observed_at"] = _stamp(min(dates))
     snapshot = {
@@ -299,7 +305,7 @@ def _unreviewed(row):
     return not isinstance(disposition, str) or not disposition.strip() or disposition.upper().startswith("NEEDS-EVIDENCE")
 
 
-def _notify(questions, notification, count, snapshot, now, root):
+def _notify(questions, notification, count, snapshot, now, root, pending=()):
     marker = f"<!-- public-starred-newstars:{notification} -->"
     with _open_regular(questions, "a+") as output:
         fcntl.flock(output, fcntl.LOCK_EX)
@@ -310,7 +316,8 @@ def _notify(questions, notification, count, snapshot, now, root):
         output.write(f"\n## NEWSTARS {count}\n\nas_of={_stamp(now)} "
                      f"file={_display_path(snapshot, root)}\n"
                      "Queue requires a sourced disposition PR; canonical review decisions clear it.\n"
-                     f"{marker}\n")
+                     + ("Repositories: " + ", ".join(pending) + "\n" if pending else "")
+                     + f"{marker}\n")
         output.flush()
         os.fsync(output.fileno())
     return True
@@ -331,7 +338,8 @@ def refresh_public_stars(root, *, output=None, state_dir=None, questions=None, n
     baseline_path = root / STARS
     baseline = _read(baseline_path)
     endpoint = _endpoint(baseline)
-    _rows(baseline)
+    for row in _rows(baseline).values():
+        _observation(row, baseline, current)
     state_path = Path(state_dir).resolve() if state_dir is not None else None
     questions_input = Path(questions) if questions is not None else None
     if questions_input is not None and questions_input.is_symlink():
@@ -367,6 +375,9 @@ def refresh_public_stars(root, *, output=None, state_dir=None, questions=None, n
         if state_path is not None:
             fcntl.flock(held, fcntl.LOCK_EX)
         previous = _read(target) if state_path is not None and target.exists() else None
+        if previous is not None:
+            for row in _rows(previous).values():
+                _observation(row, previous, current)
         journal_path = state_path / JOURNAL_NAME if state_path is not None else None
         journal = _read(journal_path) if journal_path is not None and journal_path.exists() else {}
         replayed = False
@@ -380,29 +391,66 @@ def refresh_public_stars(root, *, output=None, state_dir=None, questions=None, n
             observed = snapshot_time(journal.get("retrieved_at"))
             if observed > current:
                 raise ValueError("prepared new-stars journal observation is in the future")
-            replayed = _notify(questions_path, notification, count, target, observed, root)
+            replayed = _notify(questions_path, notification, count, target, observed, root,
+                               journal.get("pending_repositories", []))
             journal["notification_state"] = "posted"
             _write_json(journal_path, journal)
         snapshot = _build(baseline, _fetch(endpoint), current, previous)
         canonical, live = _rows(baseline), _rows(snapshot)
         added = sorted(set(live) - set(canonical))
+        if journal_path is not None:
+            prior_queue = journal.get("pending_repositories", [])
+            if not isinstance(prior_queue, list) or any(not isinstance(key, str) for key in prior_queue):
+                raise ValueError("new-stars notification journal queue is malformed")
+            prior_queue = {_repository_key(key) for key in prior_queue}
+            generations = journal.get("review_generations", {})
+            retained = journal.get("pending_observations", {})
+            if not isinstance(generations, dict) or any(
+                    not isinstance(key, str) or type(value) is not int or value < 1
+                    for key, value in generations.items()) or not isinstance(retained, dict):
+                raise ValueError("new-stars notification journal observations or generations are malformed")
+            generations = dict(generations)
+            prior_rows = _rows(previous) if previous is not None else {}
+            queue = sorted(key for key in set(live) | prior_queue | set(canonical) | set(prior_rows)
+                           if _unreviewed(canonical.get(key)))
+            pending = {}
+            for key in queue:
+                source = live.get(key) or retained.get(key) or prior_rows.get(key) or canonical.get(key)
+                if not isinstance(source, dict) or _repository_key(source.get("repository")) != key:
+                    raise ValueError("unresolved new-stars journal entry requires its retained observation")
+                row = {field: source[field] for field in PUBLIC_FIELDS + REVIEW_FIELDS if field in source}
+                fallback = baseline["retrieved_at"] if key in canonical else (
+                    previous["retrieved_at"] if key in prior_rows else snapshot["retrieved_at"])
+                dates = [current, snapshot_time(row.get("first_observed_at", fallback))]
+                if key in retained:
+                    dates.append(_observation(retained[key], journal, current))
+                if any(observed > current for observed in dates):
+                    raise ValueError("retained public-star observation date is in the future")
+                row["first_observed_at"] = _stamp(min(dates))
+                if key in live:
+                    live[key]["first_observed_at"] = row["first_observed_at"]
+                pending[key] = row
+                if key not in prior_queue:
+                    generations[key] = generations.get(key, 0) + 1
+                elif key not in generations:
+                    generations[key] = 1
+            observation = [{"repository": key, "first_observed_at": pending[key]["first_observed_at"],
+                            "generation": generations[key],
+                            "canonical_review": {field: canonical[key][field] for field in REVIEW_FIELDS
+                                                 if field != "first_observed_at" and field in canonical[key]}
+                            if key in canonical else None} for key in queue]
+            notification = hashlib.sha256(json.dumps(observation, sort_keys=True).encode()).hexdigest()
+            journal = {"schema_version": 1, "pending_repositories": queue,
+                       "pending_observations": pending, "review_generations": generations,
+                       "notification_id": notification, "notification_state": "prepared",
+                       "newstars_count": len(queue), "retrieved_at": _stamp(current)}
         _write_json(target, snapshot)
         report = {"status": "refreshed", "count": snapshot["count"], "new_count": len(added),
                   "retrieved_at": snapshot["retrieved_at"], "snapshot": _display_path(target, root),
                   "snapshot_sha256": hashlib.sha256(target.read_bytes()).hexdigest()}
         if journal_path is not None:
-            prior_queue = journal.get("pending_repositories", [])
-            if not isinstance(prior_queue, list) or any(not isinstance(key, str) for key in prior_queue):
-                raise ValueError("new-stars notification journal queue is malformed")
-            queue = sorted(key for key in live if _unreviewed(canonical.get(key)))
-            observation = [{"repository": key,
-                            "first_observed_at": live[key]["first_observed_at"]} for key in queue]
-            notification = hashlib.sha256(json.dumps(observation, sort_keys=True).encode()).hexdigest()
-            journal = {"schema_version": 1, "pending_repositories": queue,
-                       "notification_id": notification, "notification_state": "prepared",
-                       "newstars_count": len(queue), "retrieved_at": _stamp(current)}
             _write_json(journal_path, journal)
-            posted = _notify(questions_path, notification, len(queue), target, current, root)
+            posted = _notify(questions_path, notification, len(queue), target, current, root, queue)
             journal["notification_state"] = "posted"
             _write_json(journal_path, journal)
             report.update(queued_count=len(queue), newstars_posted=posted or replayed,

@@ -9,6 +9,15 @@ live identities with that canonical reviewed catalog and retains unresolved
 queue entries until canonical review decisions clear them. The previous valid
 external snapshot retains first-observed dates. Refreshing does not commit or push.
 
+The journal retains unresolved identities and public observations when they are
+absent from a later live response. Each notification also lists those identities.
+Canonical dispositions clear work; reopening a review advances its retained
+generation, so a previous notification cannot suppress the new review. A retry
+reuses the same identity. A previously written snapshot recovers intake if a
+process stops before preparing its journal; an append failure replays the prepared
+notification before the next acquisition. The latest snapshot remains a record
+of the actual live response, while the journal holds unresolved review work.
+
 Render the units with the actual live clone path. The example uses shell-expanded
 home paths; set `stars_repo` to the CC's live clone before running it.
 
@@ -34,9 +43,10 @@ when a weekly calendar tick was missed while the user manager was inactive.
 `weekly` means Monday at midnight in the user manager's timezone. The timer's
 explicit `Unit=` binds it to the paired service.
 
-The service copies `stack-currency.service`'s explicit `PATH`: the user's
-`~/.local/share/codex-ecosystem/bin` and `~/.local/bin`, followed by the standard
-system directories. systemd expands `%h` for the user; the builder can find `gh`
+The service extends `stack-currency.service`'s explicit `PATH`: the user's
+`~/.local/share/codex-ecosystem/bin`, `~/.local/bin` and
+`%h/.local/share/mise/shims`, followed by the standard system directories.
+systemd expands `%h` for the user; the builder can find `gh`
 without an interactive shell. A different host must review the directories that
 hold its installed CLI before installation.
 
@@ -175,13 +185,17 @@ Source references:
   [`Environment=` and specifier expansion](https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/man/systemd.exec.xml)
   and [`systemctl` enable/disable, `--now`, state inspection and `daemon-reload`](https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/man/systemctl.xml).
 
-Run `python3 -B -m unittest discover -s tests -p test_starred_maintenance.py`.
+Run `PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. python3 -B -m unittest tests.test_starred_maintenance`.
 The native checks run `systemd-analyze --user verify` against temporary units and
 an isolated temporary runtime directory, then inspect systemd's parsed command
 line. They verify syntax, supplied paths and argument preservation without
 starting a service. Synthetic tests cover invalid paths and symlink escapes.
-The PATH regression failed before the fix because the native service dump had
-no explicit PATH; it now resolves a fixture `gh` from a temporary user's
-ecosystem directory with a restricted inherited `/usr/bin:/bin` PATH.
+The current native PATH check uses the actual user home, parses systemd's
+expanded PATH, checks `%h/.local/share/mise/shims`, and runs the installed
+`gh --version` with only that parsed PATH and home. It plants no executable.
+The earlier fixture `gh` result is historical evidence only: it proved lookup
+of a planted executable and did not establish reachability of the installed CLI.
+At the pre-fix revision the real installed-CLI check failed because mise shims
+were absent. A separate renderer assertion runs even without systemd or gh.
 These checks do not measure a live weekly network refresh or an installed timer;
 those operational checks belong to the post-landing CC cue.

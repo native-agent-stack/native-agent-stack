@@ -570,8 +570,8 @@
       ],
       "evidence_refs": [
         "catalogs/convergence-practice/public-starred.json#/repositories/22",
-        "catalogs/landscape/grand-catalog-20261008.json#/rows/430",
-        "catalogs/landscape/grand-catalog-20261008.json#/rows/432"
+        "catalogs/convergence-practice/sources/grand-catalog-public-witnesses-20261011.json#/rows/17",
+        "catalogs/convergence-practice/sources/grand-catalog-public-witnesses-20261011.json#/rows/18"
       ],
       "verdict_refs": [],
       "verdict_follow_up": {
@@ -597,7 +597,7 @@
       "seed_refs": [],
       "evidence_refs": [
         "catalogs/convergence-practice/public-starred.json#/repositories/23",
-        "catalogs/landscape/grand-catalog-20261008.json#/rows/445"
+        "catalogs/convergence-practice/sources/grand-catalog-public-witnesses-20261011.json#/rows/19"
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
@@ -984,7 +984,7 @@
       ],
       "evidence_refs": [
         "catalogs/convergence-practice/public-starred.json#/repositories/42",
-        "catalogs/landscape/grand-catalog-20261008.json#/rows/871"
+        "catalogs/convergence-practice/sources/grand-catalog-public-witnesses-20261011.json#/rows/21"
       ],
       "verdict_refs": [],
       "verdict_follow_up": {
@@ -1013,7 +1013,7 @@
       ],
       "evidence_refs": [
         "catalogs/convergence-practice/public-starred.json#/repositories/43",
-        "catalogs/landscape/grand-catalog-20261008.json#/rows/1959"
+        "catalogs/convergence-practice/sources/grand-catalog-public-witnesses-20261011.json#/rows/5"
       ],
       "verdict_refs": [],
       "verdict_follow_up": {
@@ -1572,7 +1572,7 @@
       ],
       "evidence_refs": [
         "catalogs/convergence-practice/public-starred.json#/repositories/65",
-        "catalogs/landscape/grand-catalog-20261008.json#/rows/1965"
+        "catalogs/convergence-practice/sources/grand-catalog-public-witnesses-20261011.json#/rows/6"
       ],
       "verdict_refs": [],
       "verdict_follow_up": {
@@ -2124,7 +2124,7 @@
       ],
       "evidence_refs": [
         "catalogs/convergence-practice/public-starred.json#/repositories/84",
-        "catalogs/landscape/grand-catalog-20261008.json#/rows/585"
+        "catalogs/convergence-practice/sources/grand-catalog-public-witnesses-20261011.json#/rows/20"
       ],
       "verdict_refs": [],
       "verdict_follow_up": {
@@ -2274,7 +2274,7 @@
       ],
       "evidence_refs": [
         "catalogs/convergence-practice/public-starred.json#/repositories/90",
-        "catalogs/landscape/grand-catalog-20261008.json#/rows/297"
+        "catalogs/convergence-practice/sources/grand-catalog-public-witnesses-20261011.json#/rows/11"
       ],
       "verdict_refs": [],
       "verdict_follow_up": {
@@ -2366,7 +2366,7 @@
       ],
       "evidence_refs": [
         "catalogs/convergence-practice/public-starred.json#/repositories/93",
-        "catalogs/landscape/grand-catalog-20261008.json#/rows/1418"
+        "catalogs/convergence-practice/sources/grand-catalog-public-witnesses-20261011.json#/rows/1"
       ],
       "verdict_refs": [],
       "verdict_follow_up": {
@@ -2395,7 +2395,7 @@
       ],
       "evidence_refs": [
         "catalogs/convergence-practice/public-starred.json#/repositories/94",
-        "catalogs/landscape/grand-catalog-20261008.json#/rows/3635"
+        "catalogs/convergence-practice/sources/grand-catalog-public-witnesses-20261011.json#/rows/13"
       ],
       "verdict_refs": [],
       "verdict_follow_up": {
@@ -2525,7 +2525,7 @@
       ],
       "evidence_refs": [
         "catalogs/convergence-practice/public-starred.json#/repositories/100",
-        "catalogs/landscape/grand-catalog-20261008.json#/rows/181"
+        "catalogs/convergence-practice/sources/grand-catalog-public-witnesses-20261011.json#/rows/4"
       ],
       "verdict_refs": [],
       "verdict_follow_up": {
@@ -5246,7 +5246,7 @@
       ],
       "evidence_refs": [
         "catalogs/convergence-practice/public-starred.json#/repositories/195",
-        "catalogs/landscape/grand-catalog-20261008.json#/rows/1096"
+        "catalogs/convergence-practice/sources/grand-catalog-public-witnesses-20261011.json#/rows/0"
       ],
       "verdict_refs": [],
       "verdict_follow_up": {
@@ -5842,7 +5842,7 @@
       "seed_refs": [],
       "evidence_refs": [
         "catalogs/convergence-practice/public-starred.json#/repositories/216",
-        "catalogs/landscape/grand-catalog-20261008.json#/rows/1637"
+        "catalogs/convergence-practice/sources/grand-catalog-public-witnesses-20261011.json#/rows/3"
       ],
       "verdict_refs": [],
       "verdict_follow_up": null,
@@ -5933,7 +5933,7 @@
       ],
       "evidence_refs": [
         "catalogs/convergence-practice/public-starred.json#/repositories/220",
-        "catalogs/landscape/grand-catalog-20261008.json#/rows/2868"
+        "catalogs/convergence-practice/sources/grand-catalog-public-witnesses-20261011.json#/rows/8"
       ],
       "verdict_refs": [],
       "verdict_follow_up": {
@@ -5965,8 +5965,8 @@
       ],
       "evidence_refs": [
         "catalogs/convergence-practice/public-starred.json#/repositories/221",
-        "catalogs/landscape/grand-catalog-20261008.json#/rows/2965",
-        "catalogs/landscape/grand-catalog-20261008.json#/rows/2966"
+        "catalogs/convergence-practice/sources/grand-catalog-public-witnesses-20261011.json#/rows/9",
+        "catalogs/convergence-practice/sources/grand-catalog-public-witnesses-20261011.json#/rows/10"
       ],
       "verdict_refs": [],
       "verdict_follow_up": {
@@ -6242,7 +6242,7 @@
       ],
       "evidence_refs": [
         "catalogs/convergence-practice/public-starred.json#/repositories/231",
-        "catalogs/landscape/grand-catalog-20261008.json#/rows/2274"
+        "catalogs/convergence-practice/sources/grand-catalog-public-witnesses-20261011.json#/rows/7"
       ],
       "verdict_refs": [],
       "verdict_follow_up": {
@@ -6458,7 +6458,7 @@
       ],
       "evidence_refs": [
         "catalogs/convergence-practice/public-starred.json#/repositories/238",
-        "catalogs/landscape/grand-catalog-20261008.json#/rows/415"
+        "catalogs/convergence-practice/sources/grand-catalog-public-witnesses-20261011.json#/rows/16"
       ],
       "verdict_refs": [],
       "verdict_follow_up": {
@@ -7912,9 +7912,9 @@
       ],
       "evidence_refs": [
         "catalogs/convergence-practice/public-starred.json#/repositories/288",
-        "catalogs/landscape/grand-catalog-20261008.json#/rows/95",
-        "catalogs/landscape/grand-catalog-20261008.json#/rows/97",
-        "catalogs/landscape/grand-catalog-20261008.json#/rows/99"
+        "catalogs/convergence-practice/sources/grand-catalog-public-witnesses-20261011.json#/rows/22",
+        "catalogs/convergence-practice/sources/grand-catalog-public-witnesses-20261011.json#/rows/23",
+        "catalogs/convergence-practice/sources/grand-catalog-public-witnesses-20261011.json#/rows/24"
       ],
       "verdict_refs": [],
       "verdict_follow_up": {
@@ -8051,7 +8051,7 @@
       ],
       "evidence_refs": [
         "catalogs/convergence-practice/public-starred.json#/repositories/293",
-        "catalogs/landscape/grand-catalog-20261008.json#/rows/3035"
+        "catalogs/convergence-practice/sources/grand-catalog-public-witnesses-20261011.json#/rows/12"
       ],
       "verdict_refs": [],
       "verdict_follow_up": {
@@ -9135,7 +9135,7 @@
       ],
       "evidence_refs": [
         "catalogs/convergence-practice/public-starred.json#/repositories/332",
-        "catalogs/landscape/grand-catalog-20261008.json#/rows/1526"
+        "catalogs/convergence-practice/sources/grand-catalog-public-witnesses-20261011.json#/rows/2"
       ],
       "verdict_refs": [],
       "verdict_follow_up": {
@@ -9192,7 +9192,7 @@
       ],
       "evidence_refs": [
         "catalogs/convergence-practice/public-starred.json#/repositories/334",
-        "catalogs/landscape/grand-catalog-20261008.json#/rows/4148"
+        "catalogs/convergence-practice/sources/grand-catalog-public-witnesses-20261011.json#/rows/15"
       ],
       "verdict_refs": [],
       "verdict_follow_up": {
@@ -9955,7 +9955,7 @@
       ],
       "evidence_refs": [
         "catalogs/convergence-practice/public-starred.json#/repositories/360",
-        "catalogs/landscape/grand-catalog-20261008.json#/rows/393"
+        "catalogs/convergence-practice/sources/grand-catalog-public-witnesses-20261011.json#/rows/14"
       ],
       "verdict_refs": [],
       "verdict_follow_up": {

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections import Counter
 from datetime import datetime, timezone
+import hashlib
 from pathlib import Path
 import re
 from urllib.parse import urlsplit
@@ -45,6 +46,7 @@ def _resolve(root, ref, documents):
     require(bool(separator) and path.endswith(".json"), "source reference needs a JSON pointer")
     if path not in documents:
         documents[path] = load(root, path)
+        _public_fields(documents[path])
     return pointer(documents[path], fragment)
 
 
@@ -76,6 +78,7 @@ def validate_convergence(root: Path, snapshot: dict) -> dict:
     documents = {manifest_path: manifest, seeds_path: seed_doc}
     for document in (manifest, snapshot, seed_doc):
         _public_fields(document)
+    capture_hashes = {}
     for seed in seed_doc["seeds"]:
         identity(seed.get("repository"))
         require(seed.get("layer") in layers, "seed has unsupported canonical layer")
@@ -85,6 +88,27 @@ def validate_convergence(root: Path, snapshot: dict) -> dict:
         require(isinstance(refs, list) and bool(refs), "seed requires source references")
         for ref in refs:
             _resolve(root, ref, documents)
+        if seed.get("evidence_class") == "source_review":
+            require(any("://" in ref for ref in refs),
+                    "source_review requires pinned upstream source bytes")
+        witness = seed.get("recorded_seed")
+        if witness is not None:
+            require(isinstance(witness, dict), "recorded seed witness must be an object")
+            require(seed.get("evidence_class") == "metadata_seed_review",
+                    "historical seed witness is metadata_seed_review, not pinned source_review")
+            ref = witness.get("source_ref")
+            require(ref in refs, "recorded seed requires a resolvable source reference")
+            source = _resolve(root, ref, documents)
+            require(isinstance(source, str) and hashlib.sha256(source.encode()).hexdigest()
+                    == witness.get("source_seed_sha256"), "recorded seed source hash disagrees")
+            capture = ref.partition("#")[0]
+            if capture not in capture_hashes:
+                capture_hashes[capture] = hashlib.sha256(safe_file(root, capture).read_bytes()).hexdigest()
+            require(capture_hashes[capture] == witness.get("master_sha256"),
+                    "recorded master seed capture hash disagrees")
+            require(identity(source.split(";", 1)[0].split("@", 1)[0]) == identity(seed["repository"])
+                    and ref.partition("#")[2] == "/" + str(witness.get("layer")).replace("~", "~0").replace("/", "~1")
+                    + "/" + str(witness.get("index")), "recorded seed source identity or locator disagrees")
         try:
             checked_at = datetime.fromisoformat(seed["checked_at"].replace("Z", "+00:00"))
         except (KeyError, TypeError, ValueError, AttributeError):
@@ -152,6 +176,9 @@ def validate_convergence(root: Path, snapshot: dict) -> dict:
                     and follow_up.get("layer_keys") == keys and follow_up.get("registry") == REGISTRY,
                     "in-scope disposition needs honest recorded-tier follow-up")
             load(root, REGISTRY)
+        elif scope == "IN-SCOPE":
+            require(row.get("verdict_follow_up") is None,
+                    "complete tier verdicts must not retain an awaiting follow-up")
         counts[scope.lower().replace("-", "_")] += 1
     require(seen == set(by_repo), "convergence manifest must cover every starred repository")
     return {"status": "valid", "count": len(rows), "pending": 0, "seed_count": len(seed_doc["seeds"]), **counts}

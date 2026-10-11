@@ -155,6 +155,50 @@ class StarredConvergenceTests(unittest.TestCase):
         self.seeds["seeds"][0]["owner"] = {"login": "public-account"}
         self.reject("account or private fields")
 
+    def test_referenced_documents_scan_private_fields_for_every_reference_family(self):
+        for field in ("login", "email", "token", "credential"):
+            for family in ("seed", "evidence", "verdict"):
+                with self.subTest(field=field, family=family):
+                    extra = "catalogs/convergence-practice/extra.json"
+                    self.write(extra, {"rows": [{"repository": "owner/tool", "tier": "tier-1"}],
+                                       "unused": {field: "synthetic-forbidden-field"}})
+                    if family == "seed":
+                        self.seeds["seeds"][0]["source_refs"] = [extra + "#/rows/0"]
+                    elif family == "evidence":
+                        self.row["evidence_refs"] = [extra + "#/rows/0"]
+                    else:
+                        self.row["verdict_refs"] = [extra + "#/rows/0"]
+                    self.reject("account or private fields")
+                    self.seeds["seeds"][0]["source_refs"] = [EVIDENCE + "#/rows/0"]
+                    self.row["evidence_refs"] = [EVIDENCE + "#/rows/0"]
+                    self.row["verdict_refs"] = []
+
+    def test_complete_tier_verdicts_reject_stale_follow_up(self):
+        self.write(EVIDENCE, {"rows": [{"repository": "owner/tool", "tier": tier}
+                                      for tier in ("tier-1", "tier-2")]})
+        self.row["verdict_refs"] = [EVIDENCE + "#/rows/0", EVIDENCE + "#/rows/1"]
+        self.reject("complete tier verdicts.*follow-up")
+        self.row.pop("verdict_follow_up")
+        self.sync()
+        self.assertEqual(validate_convergence(self.root, self.snapshot)["status"], "valid")
+
+    def test_metadata_reference_cannot_claim_pinned_source_review(self):
+        self.seeds["seeds"][0]["evidence_class"] = "source_review"
+        self.reject("source_review requires pinned")
+
+    def test_historical_catalog_rows_have_reproducible_seed_witnesses(self):
+        root = Path(__file__).resolve().parents[1]
+        doc = json.loads((root / SEEDS).read_text())
+        historical = [seed for seed in doc["seeds"] if "recorded_seed" in seed]
+        self.assertEqual(len(historical), 528)
+        for seed in historical:
+            self.assertEqual(seed["evidence_class"], "metadata_seed_review")
+            witness = seed["recorded_seed"]
+            ref = witness["source_ref"]
+            self.assertIn(ref, seed["source_refs"])
+        snapshot = json.loads((root / "catalogs/convergence-practice/public-starred.json").read_text())
+        self.assertEqual(validate_convergence(root, snapshot)["status"], "valid")
+
 
 if __name__ == "__main__":
     unittest.main()

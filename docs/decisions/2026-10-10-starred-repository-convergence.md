@@ -40,3 +40,54 @@ Fail-before evidence: two builder regressions initially failed assertions becaus
 Native acquisition returned 373 public allowlisted repositories and exactly the five additions above. Source review remains source_review; refresh and scratch unit verification are actual local execution. Live weekly timer execution remains untested until the post-landing CC installation cue. No host unit is installed or enabled by this PR.
 
 The choice would be overturned by a maintained upstream snapshot/notification facility that natively supports the same public-only metadata, durable source-backed review links and external-state co-op intake with reproduced evidence. Until then, the supported GitHub CLI, systemd timer and existing repository builders provide the mechanisms, with small repository policy glue for the measured gaps.
+
+## Retained provenance and review corrections, 2026-10-11
+
+The pinned acquisition interface remains GitHub CLI v2.102.0. Its installed
+pagination and error boundary, systemd v259.5 unit parsing, and mise v2026.10.3
+shim directory are unchanged mechanisms. The maintenance README now documents
+the actual installed-CLI verification; the former planted executable is marked
+as historical evidence. No live timer or weekly network execution is claimed.
+
+The notification fixes extend the existing repository journal at
+`scripts/public_starred.py` in `6b91bb7166280a544280cd35f6961ccb4c571e97`.
+They use CPython v3.13.16's documented
+[SHA-256](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Doc/library/hashlib.rst),
+[sorted JSON encoding](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Doc/library/json.rst),
+[aware timestamp comparisons](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Doc/library/datetime.rst)
+and [atomic file replacement](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Doc/library/os.rst).
+The journal retains unresolved public observations even when a repository leaves
+the latest live response. Canonical review clears work; a retained per-repository
+generation and canonical review fields distinguish reopened work. Notifications
+include repository identities, and retries deduplicate the same generation.
+The previous snapshot also recovers new work if execution stops before the first
+journal write. Each containing snapshot bounds its rows' first-observation times;
+a later validation clock cannot legitimize a newer row timestamp.
+
+All 528 historical seed joins now point into the committed, byte-identical
+`sources/master-seeds-20261010.json` capture (SHA-256
+`4a62af4ca834d6170e24d511f4982dc864d1b15502534733cd3fe9cf2cc633ad`).
+Their evidence class is `metadata_seed_review`; the seven seed rows for the five
+new repositories retain `source_review` with pinned upstream URLs. Validation
+checks each historical string's hash, repository identity, layer/index locator
+and master-capture hash. It rejects metadata-only references labelled as pinned
+source reviews. This supplies reproducible historical discovery evidence without
+claiming upstream source review for all 368 older repositories.
+
+Every dynamically resolved evidence document receives the same public-field
+scan as the initial manifests. Grand Catalog discovery witnesses use a narrow
+public projection in `sources/grand-catalog-public-witnesses-20261011.json`,
+retaining repository identity, pin, source commit/hash and original row pointer.
+The broader catalog's workflow-assignment fields are excluded. A complete pair
+of tier verdicts requires the awaiting follow-up to be removed from both the
+manifest and snapshot.
+
+The review packet retains all cited upstream files, resolved release tags,
+the original new-five metadata/pin record, the master seed, and the historical
+baseline index/audit/templates in a separate `sources` directory with
+`MANIFEST.sha256`. All twelve new-repository file hashes and Git blob identities
+are verified against fetched bytes. The REST documentation is a current official
+capture with the 2022-11-28 selector. The original raw public API response was
+deliberately never retained; the allowlisted catalog and its native writer
+reproduction are the acquisition evidence. Reacquired source bytes and tag
+resolutions are distinct from the retained 2026-10-10 metadata observations.

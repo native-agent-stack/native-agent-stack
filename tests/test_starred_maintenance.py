@@ -20,6 +20,13 @@ SPEC.loader.exec_module(renderer)
 
 
 class StarredMaintenanceTests(unittest.TestCase):
+    def test_readme_documents_current_native_cli_verification(self):
+        readme = (ROOT / "tools/starred-maintenance/README.md").read_text()
+        self.assertIn("`%h/.local/share/mise/shims`", readme)
+        self.assertIn("runs the installed", readme)
+        self.assertIn("It plants no executable.", readme)
+        self.assertNotIn("it now resolves a fixture", readme)
+
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary.cleanup)

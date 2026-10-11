@@ -190,6 +190,101 @@ class PublicStarredTests(unittest.TestCase):
         self.assertEqual(receipt["queued_count"], 0)
         self.assertIn("## NEWSTARS 0", self.questions.read_text())
 
+    def test_unresolved_queue_survives_missing_live_repository_until_review(self):
+        with self.api([[api_row(), api_row("example/new")]]):
+            first = self.refresh_state()
+        for pages in ([[api_row()]], [[]]):
+            with self.api(pages):
+                receipt = self.refresh_state()
+            self.assertEqual(receipt["queued_count"], 1)
+            self.assertEqual(receipt["notification_id"], first["notification_id"])
+            journal = json.loads((self.state / stars.JOURNAL_NAME).read_text())
+            self.assertEqual(journal["pending_repositories"], ["example/new"])
+            retained = journal["pending_observations"]["example/new"]
+            self.assertEqual(retained["repository"], "example/new")
+            self.assertEqual(retained["first_observed_at"], "2026-10-10T17:00:00Z")
+        self.baseline["count"] = 2
+        self.baseline["repositories"].append({"repository": "example/new",
+                                             "disposition": "OUT-OF-SCOPE: recorded review"})
+        self.save_baseline()
+        with self.api([[]]):
+            self.assertEqual(self.refresh_state()["queued_count"], 0)
+
+    def test_reopened_canonical_review_has_fresh_notification_and_retry_deduplicates(self):
+        with self.api([[api_row(), api_row("example/new")]]):
+            first = self.refresh_state()
+        self.baseline["count"] = 2
+        self.baseline["retrieved_at"] = "2026-10-10T17:00:00Z"
+        self.baseline["repositories"].append({"repository": "example/new",
+                                             "first_observed_at": "2026-10-10T17:00:00Z",
+                                             "disposition": "OUT-OF-SCOPE: recorded review"})
+        self.save_baseline()
+        with self.api([[api_row(), api_row("example/new")]]):
+            self.assertEqual(self.refresh_state()["queued_count"], 0)
+        self.baseline["repositories"][1]["disposition"] = "NEEDS-EVIDENCE: review reopened"
+        self.save_baseline()
+        with self.api([[api_row(), api_row("example/new")]]):
+            reopened = self.refresh_state()
+        self.assertNotEqual(reopened["notification_id"], first["notification_id"])
+        self.assertTrue(reopened["newstars_posted"])
+        with self.api([[api_row(), api_row("example/new")]]):
+            retry = self.refresh_state()
+        self.assertEqual(retry["notification_id"], reopened["notification_id"])
+        self.assertFalse(retry["newstars_posted"])
+        self.assertEqual(self.questions.read_text().count("## NEWSTARS 1"), 2)
+
+    def test_observation_must_not_be_newer_than_containing_snapshot(self):
+        self.baseline["repositories"][0].update(disposition="PENDING",
+                                               first_observed_at="2026-10-09T00:00:00Z")
+        with self.assertRaisesRegex(ValueError, "newer than.*snapshot"):
+            stars.validate_pending_age(self.baseline, NOW)
+        self.save_baseline()
+        with self.api([[api_row()]]) as fetch:
+            with self.assertRaisesRegex(ValueError, "newer than.*snapshot"):
+                self.refresh_state()
+        fetch.assert_not_called()
+
+    def test_snapshot_write_failure_window_retains_new_work_when_live_row_disappears(self):
+        original_write = stars._write_json
+        def stop_before_journal(path, value):
+            if Path(path).name == stars.JOURNAL_NAME:
+                raise OSError("simulated stop before journal prepare")
+            original_write(path, value)
+        with self.api([[api_row(), api_row("example/new")]]), patch.object(
+                stars, "_write_json", side_effect=stop_before_journal):
+            with self.assertRaises(OSError):
+                self.refresh_state()
+        with self.api([[api_row()]]):
+            receipt = self.refresh_state()
+        self.assertEqual(receipt["queued_count"], 1)
+        self.assertIn("Repositories: example/new", self.questions.read_text())
+
+    def test_stop_after_append_replays_marker_once_and_retains_missing_live_work(self):
+        original_write = stars._write_json
+        def stop_after_append(path, value):
+            if Path(path).name == stars.JOURNAL_NAME and value.get("notification_state") == "posted":
+                raise OSError("simulated stop after append")
+            original_write(path, value)
+        with self.api([[api_row(), api_row("example/new")]]), patch.object(
+                stars, "_write_json", side_effect=stop_after_append):
+            with self.assertRaises(OSError):
+                self.refresh_state()
+        with self.api([[api_row()]]):
+            receipt = self.refresh_state()
+        self.assertEqual(receipt["queued_count"], 1)
+        self.assertFalse(receipt["newstars_posted"])
+        self.assertEqual(self.questions.read_text().count("## NEWSTARS 1"), 1)
+
+    def test_missing_live_canonical_unreviewed_row_retains_legacy_observation(self):
+        self.baseline["repositories"][0]["disposition"] = "NEEDS-EVIDENCE: review missing"
+        self.save_baseline()
+        with self.api([[]]):
+            receipt = self.refresh_state()
+        self.assertEqual(receipt["queued_count"], 1)
+        journal = json.loads((self.state / stars.JOURNAL_NAME).read_text())
+        self.assertEqual(journal["pending_observations"]["example/project"]["first_observed_at"],
+                         "2026-10-01T00:00:00Z")
+
     def test_prepared_notification_survives_review_landing_before_retry(self):
         with self.api([[api_row(), api_row("example/new")]]), patch.object(
                 stars, "_notify", side_effect=OSError("simulated append failure")):

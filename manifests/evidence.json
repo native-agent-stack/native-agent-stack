@@ -11272,8 +11272,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261004.json",
-      "sha256": "ee6d081b32b85f5672589873c0fc8cee607c06aba7bf72d66785dd66b34676bb",
-      "bytes": 24713
+      "sha256": "8ad35beb89ca1236fa94f88804fcbbf8e3c6bf6eaf981f7af9bcc9f1b6bbc96d",
+      "bytes": 24531
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unit-pass.txt",
@@ -17022,8 +17022,8 @@
     },
     {
       "path": "catalogs/convergence-practice/public-starred.json",
-      "sha256": "b12028c029e2cdda122657bc09ddf57d9551a32078ef825df0295b3ece367794",
-      "bytes": 765241
+      "sha256": "5844d47174a586f0ccba1a8e4d99d86f092313a516cb64858bd7c90dc28630f9",
+      "bytes": 766096
     },
     {
       "path": "catalogs/convergence-practice/source-review.json",
@@ -17036,14 +17036,24 @@
       "bytes": 6039
     },
     {
+      "path": "catalogs/convergence-practice/sources/grand-catalog-public-witnesses-20261011.json",
+      "sha256": "e463b09332fe056d463620b1cad47060a046463626c3108e5eb397bb43e87a81",
+      "bytes": 35203
+    },
+    {
+      "path": "catalogs/convergence-practice/sources/master-seeds-20261010.json",
+      "sha256": "4a62af4ca834d6170e24d511f4982dc864d1b15502534733cd3fe9cf2cc633ad",
+      "bytes": 618109
+    },
+    {
       "path": "catalogs/convergence-practice/starred-convergence-20261010.json",
-      "sha256": "7a1667228e70611434489f912103a20d36cb7205b67fcb7723b54813b472525b",
-      "bytes": 433383
+      "sha256": "3bf4762851a25798da137125a23923479c6da904380454129ea19ef565275a98",
+      "bytes": 434238
     },
     {
       "path": "catalogs/convergence-practice/starred-seeds-20261010.json",
-      "sha256": "7a26a4102710075c1a53c21cfea172380d564e46b3867d596023e7f5b5c90baf",
-      "bytes": 434080
+      "sha256": "fc19b5afb7ffed5da955f579644ff7e76ac40624ac12b328080b7727a5780335",
+      "bytes": 548934
     },
     {
       "path": "catalogs/convergence-practice/starred-source-review-20261010.json",
@@ -18672,8 +18682,8 @@
     },
     {
       "path": "docs/decisions/2026-10-10-starred-repository-convergence.md",
-      "sha256": "aa43ab648cd9a33bff4a318c83a3594a1043c8515b9b61a2a460fe8974e17015",
-      "bytes": 10821
+      "sha256": "16f5f62845c37a31892855946b8ac5a4ed4a63d63780167daa39ab56ccc9466b",
+      "bytes": 14356
     },
     {
       "path": "docs/decisions/2026-10-11-adjudication-omniroute-transport-binding.md",
@@ -60687,8 +60697,8 @@
     },
     {
       "path": "scripts/public_starred.py",
-      "sha256": "4d4df18828842909ec5d0f41bb5870bd87ab3d1f40719b3b24c2fcb200fcc2ff",
-      "bytes": 18853
+      "sha256": "fcd88c23bd2f2c576b4f3c59677a640271e5be2ace600f9a27cb343ff42154af",
+      "bytes": 21975
     },
     {
       "path": "scripts/receipt_staleness.py",
@@ -60722,8 +60732,8 @@
     },
     {
       "path": "scripts/starred_convergence.py",
-      "sha256": "47864bcd9263060105875962eacc3d8d68829296cd8540859b8ee6502818cd47",
-      "bytes": 9024
+      "sha256": "c1771e94bf55e126f1b7eb364c1b656dfe9094d3e3cf156c66f5a8fad59dff35",
+      "bytes": 10851
     },
     {
       "path": "scripts/trading_gates.py",
@@ -62047,8 +62057,8 @@
     },
     {
       "path": "tests/test_public_starred.py",
-      "sha256": "7ca8986fbee35662b56b52e21ba81f5fc3ad1fdcf74007099fd0835a43e02e22",
-      "bytes": 20852
+      "sha256": "9ef3f55c23f07bcd89c9bd27214ee3e74f6373555440ac1054848976db7739ab",
+      "bytes": 26216
     },
     {
       "path": "tests/test_r3_verify.py",
@@ -62237,13 +62247,13 @@
     },
     {
       "path": "tests/test_starred_convergence.py",
-      "sha256": "ad9e0d9a7d8ee471855680686b33355e5100d4a89be36fc0c01cd66efdfa5c97",
-      "bytes": 8188
+      "sha256": "729662604cae45344edd0f3d9b4db4d0870608050308c068b46d7dc67f11154f",
+      "bytes": 10780
     },
     {
       "path": "tests/test_starred_maintenance.py",
-      "sha256": "63b48e34aeff84937feda86776a94fb1e09edea41ab77afd1d5406ce59d4ec17",
-      "bytes": 12560
+      "sha256": "0dad5e0ba473341d4cb7db26bbd2ee953b01219607671256322450451ab5c822",
+      "bytes": 12940
     },
     {
       "path": "tests/test_start_closure_sampler.py",
@@ -62917,8 +62927,8 @@
     },
     {
       "path": "tools/starred-maintenance/README.md",
-      "sha256": "bbdbca017729db815c414cd9f39bdd2f353d224333f89b2ce248eda729f20920",
-      "bytes": 10346
+      "sha256": "b282484927fb2f14bd6c66897b02cf88bb75fa4dcdd7424add66f160927b4334",
+      "bytes": 11351
     },
     {
       "path": "tools/starred-maintenance/render_units.py",
