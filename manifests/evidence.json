@@ -59797,8 +59797,8 @@
     },
     {
       "path": "recipes/sota-convergence-practice.md",
-      "sha256": "9542727e2b64ae38edd4222a86314008397150655fec84303faba44513b1e6c7",
-      "bytes": 25561
+      "sha256": "9d9b67f2afd752449341da718bbb13379d11137ed3c6d582f9113c25a5eeaa37",
+      "bytes": 26587
     },
     {
       "path": "recipes/tavily.md",

@@ -130,6 +130,27 @@ class ClaudeLaneWriterTests(unittest.TestCase):
         failures = json.loads((claude / "failures.json").read_text(encoding="utf-8"))["failures"]
         self.assertIn("transcript audit flagged", next(f["reason"] for f in failures if f["layer_id"] == "l1"))
 
+    def test_collect_refuses_an_available_advisor_even_without_a_call(self):
+        # Claude Code 2.1.296 records tool availability as an advisor_tool attachment.
+        path = self.transcripts / "agent-l1.jsonl"
+        with path.open("a", encoding="utf-8") as stream:
+            stream.write(json.dumps({"type": "attachment", "attachment": {
+                "type": "advisor_tool", "available": True, "model": "fixture-advisor", "toolChange": True}}) + "\n")
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(self.run_main("--resolved-model", "claude-opus-5-5"), 0)
+        self.assertFalse((self.work / "claude" / "foundation__l1.json").exists())
+        report = json.loads((self.work / "claude" / "transcript-audit.json").read_text(encoding="utf-8"))
+        self.assertIn("advisor available", "\n".join(report["items"]["foundation__l1"]["flagged"]))
+
+    def test_collect_prints_every_unaccounted_name(self):
+        for index in range(20):
+            (self.transcripts / f"agent-unaccounted-{index:02}.jsonl").write_text(
+                (self.transcripts / "agent-l1.jsonl").read_text(encoding="utf-8"), encoding="utf-8")
+        with contextlib.redirect_stdout(io.StringIO()) as out:
+            self.assertEqual(self.run_main("--resolved-model", "claude-opus-5-5"), 0)
+        for index in range(20):
+            self.assertIn(f"agent-unaccounted-{index:02}.jsonl", out.getvalue())
+
     def test_another_runs_transcripts_void_every_layer(self):
         # Round 9 focus: transcripts are bound to the run that returned the collected result.
         record = self.transcripts.parents[2] / "workflows" / "wf_test.json"

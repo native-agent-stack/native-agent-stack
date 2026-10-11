@@ -86,6 +86,11 @@ class TranscriptAuditTests(unittest.TestCase):
         self.assertEqual(report["flagged_items"], [])
         self.assertEqual(report["items"]["foundation__layer"]["agents"], 2)
 
+    def test_an_advisor_call_with_nonempty_input_and_an_unknown_tool_still_flag(self):
+        for name, inputs in [("advisor", {"question": "fixture"}), ("UnknownTool", {})]:
+            with self.subTest(tool=name):
+                self.assert_flags([(name, inputs)])
+
     def test_globs_and_greps_that_reach_outside_flag(self):
         for call in [("Glob", {"pattern": "../**/*.json"}),
                      ("Glob", {"pattern": "docs/**/../../../work/*.json"}),
@@ -286,6 +291,50 @@ class TranscriptAuditTests(unittest.TestCase):
             extra("x8", f"Read the packet at {self.packet}")
             self.assertIn("x8", issue(), repr(attempt))
             (self.run / "agent-x8.jsonl").unlink()
+
+    def test_resumed_attempts_are_accounted_from_the_journal(self):
+        # Native 2.1.296 resume retains started rows with distinct v2 keys, but progress loses the old attempt.
+        self.agent("old", [("Read", {"file_path": str(self.packet)})])
+        self.agent("final", [("Read", {"file_path": str(self.packet)})])
+        label = "refute:evidence:foundation/layer"
+        self.record(workflowProgress=[{"type": "workflow_agent", "agentId": "final", "label": label}])
+        rows = [{"type": "launched"},
+                {"type": "started", "key": "v2:" + "a" * 64, "agentId": "old", "label": label},
+                {"type": "result", "key": "v2:" + "a" * 64, "agentId": "old", "result": {"refuted": False}},
+                {"type": "started", "key": "v2:" + "b" * 64, "agentId": "final", "label": label},
+                {"type": "result", "key": "v2:" + "b" * 64, "agentId": "final", "result": {"refuted": False}}]
+        (self.run / "journal.jsonl").write_text("".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8")
+        report = transcript_audit.audit(self.run, self.items, export=self.export, result=RESULT)
+        self.assertIsNone(report["run_issue"])
+        self.assertEqual(report["flagged_items"], [])
+        self.assertEqual(report["items"]["foundation__layer"]["agents"], 2)
+
+        # Journal attribution does not waive an earlier attempt's blind boundary.
+        old = self.run / "agent-old.jsonl"
+        with old.open("a", encoding="utf-8") as stream:
+            stream.write(json.dumps({"type": "assistant", "message": {"content": [
+                {"type": "tool_use", "name": "Read", "input": {"file_path": "/outside/fixture"}}]}}) + "\n")
+        report = transcript_audit.audit(self.run, self.items, export=self.export, result=RESULT)
+        self.assertIsNone(report["run_issue"])
+        self.assertIn("outside", "\n".join(report["items"]["foundation__layer"]["flagged"]))
+
+        # A planted transcript cannot spend a legacy retry allowance when an exact journal exists.
+        old.write_text((self.run / "agent-final.jsonl").read_text(encoding="utf-8"), encoding="utf-8")
+        rows = [row for row in rows if not (row.get("type") == "started" and row.get("agentId") == "old")]
+        (self.run / "journal.jsonl").write_text("".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8")
+        self.record(workflowProgress=[{"type": "workflow_agent", "agentId": "final", "label": label, "attempt": 20}])
+        report = transcript_audit.audit(self.run, self.items, export=self.export, result=RESULT)
+        self.assertIn("agent-old.jsonl", report["run_issue"])
+        self.assertEqual(report["flagged_items"], ["foundation__layer"])
+
+    def test_every_unaccounted_transcript_is_named(self):
+        self.agent("final", [])
+        for index in range(20):
+            (self.run / f"agent-unaccounted-{index:02}.jsonl").write_text(
+                (self.run / "agent-final.jsonl").read_text(encoding="utf-8"), encoding="utf-8")
+        report = transcript_audit.audit(self.run, self.items, export=self.export, result=RESULT)
+        for index in range(20):
+            self.assertIn(f"agent-unaccounted-{index:02}.jsonl", report["run_issue"])
 
     def test_entries_without_an_agent_id_name_no_transcript(self):
         # Round 10, TA10-3: an errored attempt's entry has no agentId; with a missing transcript it used to crash.
