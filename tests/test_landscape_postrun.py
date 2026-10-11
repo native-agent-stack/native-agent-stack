@@ -61,13 +61,15 @@ class CompletedSupersessionTests(unittest.TestCase):
     def sha(self, name):
         return hashlib.sha256((self.work / name).read_bytes()).hexdigest()
 
-    def run_usage(self, explicit=False):
+    def run_usage(self, explicit=False, required=None):
         args = [sys.executable, str(HARNESS / "usage_record.py"), "--raw-output", str(self.work / "raw.json"),
                 "--exit-code", "1", "--out", str(self.work / "usage.json")]
         if explicit:
             args += ["--supersession-proof", str(self.work / "proof.json"),
                      "--supersession-contract", str(self.work / "contract.json"),
                      "--supersession-journal", str(self.work / "journal.jsonl")]
+        if required:
+            args += ["--require-effort", required]
         return subprocess.run(args, capture_output=True, text=True)
 
     def test_completed_changed_key_attempts_need_proven_pairs_and_keep_all_counters(self):
@@ -97,6 +99,42 @@ class CompletedSupersessionTests(unittest.TestCase):
             retained.pop("reason")
             self.assertEqual(retained, child)
 
+    def test_completed_mixed_effort_chain_is_covered_only_by_its_proven_max_terminal(self):
+        raw = copy.deepcopy(self.raw)
+        raw["children"][-12]["efforts"] = ["max", "low"]
+        terminal = dict(raw["children"][-12], agent_id="terminal", efforts=["max"])
+        raw["children"].append(terminal)
+        raw["effort_mismatches"].append(copy.deepcopy(raw["effort_mismatches"][0]))
+        raw["by_resolved_model"] = {"fixture": {"children": 127, "output_tokens": 4338}}
+        self.write("raw.json", raw)
+        label, old_key, new_key = terminal["label"], "v2:" + f"{100:064x}", "v2:" + f"{200:064x}"
+        with (self.work / "journal.jsonl").open("a", encoding="utf-8") as stream:
+            for row in [{"type": "started", "agentId": "terminal", "key": new_key, "label": label},
+                        {"type": "result", "agentId": "terminal", "key": new_key, "result": {"fixture": True}}]:
+                stream.write(json.dumps(row) + "\n")
+        contract = json.loads((self.work / "contract.json").read_text())
+        contract["calls"].append({"label": label, "original_agent_id": "new0", "original_key": old_key,
+                                  "approved_rerun_key": new_key, "new_key_must_be_computed_from_actual_max_discovery": False})
+        self.write("contract.json", contract)
+        proof = copy.deepcopy(self.proof)
+        proof["contractSha256"], proof["finalJournalSha256"] = self.sha("contract.json"), self.sha("journal.jsonl")
+        proof["supersessionPairs"].append({"label": label, "superseded_agent_id": "new0", "superseded_key": old_key,
+                                           "superseded_by_agent_id": "terminal", "superseded_by_key": new_key})
+        proof["reruns"].append({"label": label, "agentId": "terminal", "key": new_key,
+                                "supersedesAgentId": "new0", "supersedesKey": old_key, "keyKind": "approved-equal",
+                                "transcriptPromptEqual": True, "nativeResultPresent": True})
+        self.write("proof.json", proof)
+        done = self.run_usage(explicit=True)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        document = json.loads((self.work / "usage.json").read_text())
+        usage = document["child_usage"]
+        self.assertEqual(usage["effort_mismatches"], [])
+        self.assertEqual(len(usage["children"]), 106)
+        self.assertEqual(len(usage["superseded_attempts"]), 21)
+        self.assertEqual(next(c for c in usage["superseded_attempts"] if c["agent_id"] == "new0")["efforts"],
+                         ["max", "low"])
+        self.assertEqual(usage["by_resolved_model"], raw["by_resolved_model"])
+
     def test_dynamic_rerun_keys_require_the_actual_recomputed_proof(self):
         contract = json.loads((self.work / "contract.json").read_text())
         contract["calls"][0]["approved_rerun_key"] = None
@@ -114,6 +152,23 @@ class CompletedSupersessionTests(unittest.TestCase):
         done = self.run_usage(explicit=True)
         self.assertEqual(done.returncode, 2)
         self.assertEqual((self.work / "usage.json").read_bytes(), prior)
+
+    def test_cli_effort_cannot_weaken_the_bound_contract(self):
+        contract = json.loads((self.work / "contract.json").read_text())
+        contract["calls"][0]["require_actual_later_complete_max_child"] = True
+        self.write("contract.json", contract)
+        proof = copy.deepcopy(self.proof)
+        proof["contractSha256"] = self.sha("contract.json")
+        self.write("proof.json", proof)
+        raw = copy.deepcopy(self.raw)
+        for child in [*raw["children"], *raw["superseded_attempts"]]:
+            child["efforts"] = ["high"]
+        raw["children"][0]["efforts"] = ["max", "low"]
+        raw["children"][1]["efforts"] = ["max", "low"]
+        self.write("raw.json", raw)
+        done = self.run_usage(explicit=True, required="high")
+        self.assertEqual(done.returncode, 2, done.stderr)
+        self.assertFalse((self.work / "usage.json").exists())
 
     def test_unbound_or_invalid_supersession_is_refused_before_writing(self):
         cases = ("contract_hash", "journal_hash", "run", "key", "duplicate", "effort", "mixed_effort", "label", "missing_result")

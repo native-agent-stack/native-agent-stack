@@ -684,11 +684,14 @@ Offline source review extended agent-lab's `summarizeRun` and `effortMismatches`
 vendored tool. **Completed changed-key reruns are a separate, explicit operation.** Pass all three
 `--supersession-proof`, `--supersession-contract` and `--supersession-journal` to `usage_record.py` only after the
 post-run proof has been independently accepted. The proof's `supersessionPairs` must match its contract, measured
-child identities and the exact native journal (both started and result keys, labels and order). Every replacement
-must be complete at measured effort max only. Repeated completed labels alone never select a winner. The record
+child identities and the exact native journal (both started and result keys, labels and order). Each explicit
+replacement chain must end at a complete measured max-only child. A completed mixed-effort intermediate stays
+retained and requires its own proved edge to that terminal; cycles and ambiguous same-label terminals refuse.
+Repeated completed labels alone never select a winner. The record
 retains every original under `superseded_attempts`, every aggregate counter, raw exit/hash, and transformation
 provenance with proof, contract, journal and processor hashes. A malformed or unbound proof, non-max replacement
-or missing native result refuses before writing (exit 2). This does not rerun workers or edit native state.
+terminal, cycle, ambiguous terminal or missing native result refuses before writing (exit 2). This does not rerun
+workers or edit native state.
 
 Requested `effort: max` is not measured max-only effort: a loaded skill may change subsequent request effort.
 The October 10 proof established call options and cache/prompt/result identity, but its quality-evaluation fit

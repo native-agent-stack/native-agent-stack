@@ -36,9 +36,12 @@ unrelated evidence identifiers.
 
 `usage_record.py` accepts all three explicit inputs: `--supersession-proof`, `--supersession-contract` and
 `--supersession-journal`. Every supplied pair must match a contract call, a proved rerun, exact native started and
-result identities/keys, a common label, and chronological order. The replacement must be complete and measured
-at the required effort only. Duplicate identities, chains/cycles, unbound files, non-max replacements and absent
+result identities/keys, a common label, and chronological order. An explicit chain must terminate at a complete
+child measured at the required effort only; completed intermediate replacements remain retained. Duplicate
+identities, cycles, ambiguous same-label terminals, unbound files, non-max terminals and absent
 results refuse before writing. Without these inputs, completed repeated labels keep the existing refusal.
+The CLI's optional required-effort value cannot weaken a contract that explicitly requires max; that guard
+also has a public regression observed failing before the fix.
 
 Validated originals move intact into `superseded_attempts`, with only `superseded_by` and an explicit reason added.
 Aggregate model usage and WebSearch counters are unchanged. Raw tool exit code and raw output hash are preserved.
@@ -79,9 +82,20 @@ pairs (52 unique repositories), and all 42 GPT-6 copy comparisons match. It expl
 effort deviations and reopens quality-evaluation. All 52 source reviews and an external merged preview manifest
 are prepared. This is evidence processing over retained native results, with no paid calls or new model runs.
 
+On 2026-10-11T01:33Z the CC authorized ONE targeted max-only replacement of the mixed-effort fit worker and a proof
+extension. The prepared script preserves all 118 existing calls, appends only the authorized label after the old
+sequence (editing an earlier prompt would also change subsequent chained keys), omits the lower-effort skill
+from that call's prompt and bans loading skills declaring effort below max. Offline native-key replay proves
+118 cached calls plus exactly one planned appended call. It is a simulation, not a measured repair result.
+
+That authorization requires a completed supersession chain: the original complete max worker points to the mixed
+replacement, which then points to the new max-only terminal. A new public CLI regression failed before adding
+chain validation and terminal coverage; intermediate completion no longer stops traversal early. Every edge
+must be explicit, bound and chronological, and all same-label edges resolve to one max-only terminal.
+
 README step 11 explicitly waits for the catalog owner's manifest publication; step 12 writes its ledger. Those
-owner actions and a clean max-only acceptance are not claimed. A CC ruling is required to choose between retaining
-the observed failure and a separately authorized targeted repair plus fresh proof. Judge/refuter remain held.
+owner actions and a clean max-only acceptance are not claimed before native repair completion and the extended
+effort gate. Judge/refuter remain held for #992; the single landscape repair is the separate explicit CC exception.
 
 Alternatives rejected: inferring completed supersession from repeated labels, hiding counters or mismatches,
 redacting every UUID indiscriminately, and treating requested max as measured max-only effort. Revisit this choice

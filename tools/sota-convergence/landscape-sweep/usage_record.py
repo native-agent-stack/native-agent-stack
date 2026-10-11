@@ -22,7 +22,8 @@ attempts with the same label, using the journal order that child-usage.mjs summa
 Precondition: sweep.js issues one logical call per label per run; runtime retries may produce multiple attempts.
 Without an explicit proven pair list, a label with more than one complete child remains ambiguous and is never
 linked. The optional explicit path validates the proof/contract/journal hashes, native started/result identities,
-same-label completed children, temporal order and a measured max-only replacement. Its provenance retains all
+same-label completed children, temporal order and a measured max-only terminal, including explicitly proved
+completed replacement chains. Its provenance retains all
 three input hashes and the processor hash; no native record or usage counter is changed. The ordinary record carries neither call keys
 nor timestamps, so linking observes only a missing result and a later complete same-label attempt. These attempts
 keep their superseded_by and observed reason; their usage already counts in by_resolved_model and is never added again. With no
@@ -93,6 +94,8 @@ def proven_supersessions(output: dict, proof_path: Path, contract_path: Path, jo
             or len(pairs) != len(calls) or len(pairs) != len(reruns)
             or not all(isinstance(row, dict) for row in [*pairs, *calls, *reruns])):
         raise ValueError("supersession proof needs one pair and rerun for every contract call")
+    if required != "max" and any(call.get("require_actual_later_complete_max_child") is True for call in calls):
+        raise ValueError("the bound supersession contract requires max effort")
     children = output.get("children") or []
     by_id = {c.get("agent_id"): (i, c) for i, c in enumerate(children) if isinstance(c, dict)}
     starts, results = {}, {}
@@ -109,17 +112,18 @@ def proven_supersessions(output: dict, proof_path: Path, contract_path: Path, jo
             starts[row.get("agentId")] = identity
         elif row.get("type") == "result":
             results[(row.get("agentId"), row.get("key"))] = index
-    old_ids, new_ids, labels = set(), set(), set()
+    old_ids, new_ids = set(), set()
+    replacements, terminal_by_label = {}, {}
     for pair in pairs:
         fields = ("label", "superseded_agent_id", "superseded_key", "superseded_by_agent_id", "superseded_by_key")
         if not all(isinstance(pair.get(field), str) and pair[field] for field in fields):
             raise ValueError("supersession pair lacks an identity, label or key")
         label, old, old_key, new, new_key = (pair[field] for field in fields)
-        if old in old_ids or new in new_ids or label in labels or old == new or old_key == new_key:
+        if old in old_ids or new in new_ids or old == new or old_key == new_key:
             raise ValueError("supersession pairs repeat an identity or do not change the call key")
         old_ids.add(old)
         new_ids.add(new)
-        labels.add(label)
+        replacements[old] = new
         plan = next((c for c in calls if c.get("label") == label and c.get("original_agent_id") == old
                      and c.get("original_key") == old_key), None)
         rerun = next((r for r in reruns if r.get("label") == label and r.get("agentId") == new
@@ -144,11 +148,24 @@ def proven_supersessions(output: dict, proof_path: Path, contract_path: Path, jo
         old_index, original = by_id[old]
         new_index, replacement = by_id[new]
         if (old_index >= new_index or original.get("complete") is not True or replacement.get("complete") is not True
-                or original.get("label") != label or replacement.get("label") != label
-                or replacement.get("efforts") != [required]):
-            raise ValueError("supersession needs measured complete same-label children and a later required-effort rerun")
-    if old_ids & new_ids:
-        raise ValueError("supersession pairs contain a chain or cycle")
+                or original.get("label") != label or replacement.get("label") != label):
+            raise ValueError("supersession needs measured complete same-label children and a later rerun")
+    # A proved repair may supersede a completed mixed-effort replacement. Every edge stays explicit; only the
+    # terminal child establishes required-effort coverage, and repeated labels must resolve to one terminal.
+    for pair in pairs:
+        target, seen = pair["superseded_agent_id"], set()
+        while target in replacements:
+            if target in seen:
+                raise ValueError("supersession pairs contain a cycle")
+            seen.add(target)
+            target = replacements[target]
+        terminal = by_id[target][1]
+        if terminal.get("efforts") != [required]:
+            raise ValueError("supersession chain does not end at measured required effort")
+        label = pair["label"]
+        if label in terminal_by_label and terminal_by_label[label] != target:
+            raise ValueError("same-label supersession pairs have ambiguous terminals")
+        terminal_by_label[label] = target
     return pairs, {"proof_sha256": sha256_bytes(proof_bytes), "contract_sha256": sha256_bytes(contract_bytes),
                    "journal_sha256": sha256_bytes(journal_bytes), "processor_sha256": sha256_bytes(Path(__file__).read_bytes()),
                    "pairs": pairs}
@@ -158,7 +175,8 @@ def superseded_at_required_effort(attempt: dict, output: dict, required: str = "
     """Whether this attempt's superseded_by chain ends at a complete same-label re-run at `required` effort.
 
     Follow agent ids, never just a repeated label; an absent target, another label or a cycle covers nothing.
-    child-usage.mjs can chain same-key re-runs through an intermediate attempt that also returned nothing.
+    Native same-key retries and explicit completed replacements can both chain; even a complete intermediate
+    attempt must follow its superseded_by edge before terminal required-effort coverage is established.
     """
     if not isinstance(attempt, dict):
         return False
@@ -174,6 +192,9 @@ def superseded_at_required_effort(attempt: dict, output: dict, required: str = "
         target = by_id.get(target_id)
         if not target or (target.get("label") or target.get("agent_id")) != label:
             return False
+        if target.get("superseded_by"):
+            target_id = target["superseded_by"]
+            continue
         if target.get("complete") is True:
             return target.get("efforts") == [required]
         target_id = target.get("superseded_by")
