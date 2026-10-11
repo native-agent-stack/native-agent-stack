@@ -45,14 +45,26 @@ spec = contracts.StrategySpec(
     cash_cap_usd="1000",
 )
 strategy = families.GapPremarketStrategy(
-    spec, ledger=paper_ledger, fault_sink=session_fail
+    spec,
+    ledger=paper_ledger,
+    fault_sink=session_fail,
+    notice_sink=session_notice,
 )
 ```
 
 Backtests call `engine.add_strategy(strategy)`. Hana's adapter accepts the same
 instance in `native_adapter.build_node(port, instruments, [strategy])`. Before
 adoption, the paper lane must supply its existing durable ledger, failure sink,
-qualified factor/cohort bridge and account limits, then review the PR. It retains
+non-stopping notice sink, qualified factor/cohort bridge and account limits,
+then review the PR. `notice_sink(reason)` delivers routine held-position notices;
+it defaults to `None` for synthetic fixtures and never falls back to `fault_sink`.
+Non-synthetic startup requires a callable notice sink alongside its durable
+ledger and post-cutoff accounting sink; omission or a non-callable port freezes
+before any subscription or order. That notification-port requirement also
+guards recovery: a refused non-synthetic restart neither arms a notice timer
+nor advances a saved delivery timestamp. Its record remains available to a
+correctly wired restart. Bind `fault_sink` to
+the session's freeze/stop path and `notice_sink` to its notification path. It retains
 the native risk engine and its independent final-wire governor. This lane provides
 no paper command and has placed no broker order. Passing the fake-port LiveNode
 check does not qualify the bridge or a paper session.
@@ -196,7 +208,7 @@ claimed. Identity remains pending until a native fill or terminal confirmation.
 Holding time and calendar deadlines start from the
 first buy fill's native `event.ts_event`, including delayed callback delivery.
 
-Both an accepted halted factor snapshot and native `InstrumentStatus` halt
+Both a halted factor snapshot and native `InstrumentStatus` halt
 immediately drive pending-entry cancellation. The native status subscription
 uses the upstream rc5 callback and a distinct halt latch. A non-halted snapshot
 cannot clear it; only an available, ordered native `TRADING` resumption without
@@ -205,10 +217,34 @@ halted snapshot. Quote-only, paused, suspended and unavailable native status
 actions, or an explicit non-trading flag, also block trading.
 
 Halting actions take effect at observation even when their event or init
-timestamp leads the host clock or regresses. `status_clock_ahead` records any
-lead; availability and ordering refusals apply to TRADING resumptions. The
-ordering fence retains observed history without requiring the host to wait
-for a future-dated halt before accepting a later available resumption.
+timestamp leads the host clock or regresses. `status_clock_ahead` and
+`snapshot_clock_ahead` record leads. The raw event and init stamps remain in
+each carrier's ordering fence: an available resumption stamped before an
+observed halt cannot clear it. Future factor values remain unavailable even
+when their halt signal acts immediately.
+
+The named synthetic halt producer is the instrument-scoped `t22-factors-v1`
+custom-data stream. Only explicit `halted=True`/`False` supplies known state;
+an omitted/null field defaults to unknown rather than trading. Its
+`valid_until_ns` bounds that state. An absent state or one past its validity blocks
+every new order, including reduce-only exits and replacements, at both drive
+and final submission. Native status halts remain an independent veto. A held
+position with an expired producer state is flagged/notified as
+`held_halt_state_unknown`. T15 still owns the actual paper producer, freshness
+bound and restart reconciliation; this synthetic stream does not qualify them.
+
+Missing or expired producer state conservatively cancels a resting entry,
+while keeping its identity pending until native terminal confirmation. This
+applies [F-1 decision 1, lines 16–18](https://github.com/seathatflowsinourveins/us-equities-trading/blob/f8c607bc1f1f0205fdc87095f47df150d2f78117/docs/decisions/2026-10-10-halt-exit-policy.md#L16-L18)
+to reduce an entry's remaining risk. The cancellation restriction in
+[decision 2, lines 19–25](https://github.com/seathatflowsinourveins/us-equities-trading/blob/f8c607bc1f1f0205fdc87095f47df150d2f78117/docs/decisions/2026-10-10-halt-exit-policy.md#L19-L25)
+protects working exits. An entry cancel submits no new order;
+[decision 3, lines 26–28](https://github.com/seathatflowsinourveins/us-equities-trading/blob/f8c607bc1f1f0205fdc87095f47df150d2f78117/docs/decisions/2026-10-10-halt-exit-policy.md#L26-L28)
+still blocks every entry, exit and replacement submission while state is
+unknown. The CC confirmed this interpretation on 2026-10-11 at 03:07Z.
+Native controls pin both missing and expired state, including refusal to
+replace after a native cancel confirmation. Cancel-acknowledgement failures
+retain the existing freeze/reconciliation path.
 
 The status latch is memory-only and resets on construction; it is not persisted
 across a restart. Snapshot halts and durable ledger halts remain separate. Before
@@ -223,10 +259,47 @@ handoff. OVERNIGHT is held even when a future session classifier introduces
 that enum member; this does not depend on importing an unmerged PR version.
 
 Pending exits intentionally keep their working order and original identity
-through a halt. The entry cancellation rule does not cancel them; timeout and
-deadline processing resumes after the halt clears. Follow-up F-1 remains on
-T13-runtime/T15 acceptance: decide hold-and-flag versus cancel-and-escalate
-with the applicable caps before the first non-synthetic run.
+through a halt or unknown state. The position is flagged `held_halted` for a
+halt, and the separate notice sink is called at observation and every ten
+minutes through a native nanosecond alert. A partially filled entry is cancelled
+before a held-position notice is attempted. Notice delivery errors derived from
+`Exception` are caught and recorded as `stop_error`; they cannot prevent that
+cancellation or the next alert. The failure sink remains bound to freezes,
+including an unprotected held position. The entry cancellation rule does not cancel exits; elapsed
+timeouts and deadlines act on the next drive after an accepted resumption.
+A held exit's expiry callback flags/notifies and freezes the instance for
+handoff before returning. A freeze's reason flag survives resumption.
+
+The held-notice identity, reason, last-notice time and next due time are stored in the
+existing ledger's transactional metadata. Startup restores and rearms the
+native alert before a reconciliation refusal can return. This notification
+monitor remains active while trading stays frozen; it never adopts a journal
+position as a strategy position. Restart before the deadline preserves the
+original ten-minute boundary. An overdue restart attempts one immediate notice,
+coalesces missed intervals and schedules the next notice ten minutes after
+that delivery. Minimal synthetic session ports retain only session state.
+
+An accepted resumption pauses delivery but retains the record until the owned
+exposure resolves. A confirmed final native SELL clears it. After handoff, the
+owning session may call `reconcile_held_notice_resolved` after confirmed flat
+reconciliation; it verifies that strategy, ledger and cache contain no held
+position or unresolved order, clears the notice, and keeps trading frozen.
+That actual broker/session reconciliation remains separately unqualified.
+
+[F-1's policy](https://github.com/seathatflowsinourveins/us-equities-trading/blob/f8c607bc1f1f0205fdc87095f47df150d2f78117/docs/decisions/2026-10-10-halt-exit-policy.md)
+is settled at `f8c607bc`: hold-and-flag exits, cancel entries, submit nothing
+new into a halt or unknown state. T15's seven acceptance assertions remain
+separate: venue-driven DAY expiry, partial reopening fills, in-flight exit
+outcomes, broker cancel/reconciliation behavior and the named paper producer
+are not qualified by these native synthetic/state-machine tests.
+
+An entry whose halt-driven cancel is not processed retains its original ID.
+A fill before its own earliest deadline is an ordinary entry. A fill between
+that deadline and the cancel-acknowledgement freeze is flagged, synchronously
+sunk and force-exited on a permitted drive. A fill after the freeze is flagged
+and sunk with the instance still frozen and its residual held for handoff.
+The halt-driven cancel time is not an additional F-2 cutoff; that question
+belongs to the T14 follow-up. These three outcomes are pinned natively.
 
 F-2 never depends on venue expiry. Its cutoff is the latched earliest pending-
 entry deadline: the policy boundary, explicit entry or exit deadline, or entry
