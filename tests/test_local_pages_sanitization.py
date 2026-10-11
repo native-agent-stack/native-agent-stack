@@ -202,6 +202,29 @@ class SanitizationTests(unittest.TestCase):
         self.assertEqual(helper.text("owner" + at + "timer.example.org"), "[email omitted]")
         self.assertEqual(helper.text("owner" + at + "example.services"), "[email omitted]")
 
+    def test_addresses_on_the_target_domain_are_masked(self):
+        # The micro at bdc09788, (a)1: `target` is a delegated top-level domain (public_suffix_list.dat:10339-10341),
+        # so exempting it as a systemd unit type left an address there readable in every form, short or long.
+        helper = load_helper()
+        at = "@"
+        for form in ("owner" + at + "example.target", "owner%40example.target", "owner&#64;example.target"):
+            with self.subTest(form=form):
+                self.assertEqual(helper.text("mail " + form + " now"), "mail [email omitted] now")
+                self.assertEqual(helper.text("x" * 4100 + form), "[email omitted]")
+
+    def test_exempt_unit_types_are_not_public_suffixes(self):
+        # Class guard for the same finding: a unit type exempted from the mask must not be a top-level domain in the
+        # installed public suffix list, or real addresses there would render unmasked.
+        listing = Path("/usr/share/publicsuffix/public_suffix_list.dat")
+        if not listing.is_file():
+            self.skipTest(f"{listing} is absent (Debian package publicsuffix), so exempt unit types cannot be checked against it")
+        rules = [line.strip() for line in listing.read_text(encoding="utf-8").splitlines() if line.strip() and not line.startswith("//")]
+        tlds = {rule.lstrip("!*.").rsplit(".", 1)[-1].casefold() for rule in rules}
+        self.assertIn("com", tlds)
+        exempt = re.fullmatch(r"\(\?:([a-z|]+)\)\(\?!\[A-Za-z\]\)", load_helper()._UNIT).group(1).split("|")
+        self.assertEqual(len(exempt), len(set(exempt)))
+        self.assertEqual(sorted(set(exempt) & tlds), [])
+
     def test_email_placeholder_survives_identity_projection(self):
         helper = load_helper()
         for identity in ["email", "omitted"]:

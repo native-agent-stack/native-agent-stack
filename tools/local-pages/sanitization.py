@@ -12,11 +12,15 @@ own, cited at the v3.13.16 mirror (cbc944f4bc59639a444dd971c737788ba2283a91):
 html.unescape (Lib/html/__init__.py:118 accepts a reference without its
 semicolon, :122), whose HTML5 table maps 'commat;' to '@' and 'period;' to '.'
 (Lib/html/entities.py:567, :1736), and urllib.parse.unquote (Lib/urllib/parse.py:694).
-A token over 4,096 characters is not decoded, so the mask also matches the
-encoded at-sign and dot forms in place (%40, %2540, &#64 with or without its
-semicolon, &#x40, &commat;, %2E, &#46 and &period;), as the b209afe8 page-local
-mask did for %40 and &#64;. A name ending in a systemd unit type
-(systemd.unit(5)), such as git-maintenance@daily.timer, is not an address.
+A token over 4,096 characters is not decoded, so the mask also matches these
+encoded forms in place, as the b209afe8 page-local mask did for %40 and &#64;:
+for the at sign %40, %2540, &#64 and &#x40 (each reference with or without its
+semicolon) and &commat;, and for the dot %2E, %252E, &#46, &#x2E and &period;.
+Other encodings in such a token, such as &amp;#64; or %26%2364%3B, stay as
+written. A name ending in one of ten systemd unit types (systemd.unit(5):
+service, socket, device, mount, automount, swap, path, timer, slice and scope),
+such as git-maintenance@daily.timer, is not an address. The eleventh, target, is
+also a delegated top-level domain, so a name ending in it is masked.
 """
 
 import base64
@@ -36,9 +40,11 @@ _TASK = re.compile(r"task-[a-z0-9]{8}-[a-z0-9]{6}", re.I)
 _TOKEN = re.compile(r"[^\s<>\"']+")
 _AT = r"(?:@|%(?:25)?40|&#0*64;?|&#[xX]0*40;?|&commat;)"
 _DOT = r"(?:\.|%(?:25)?2[Ee]|&#0*46;?|&#[xX]0*2[Ee];?|&period;)"
-# A systemd template-unit instance (git-maintenance@daily.timer) ends in a unit type, never a top-level domain;
-# the types are systemd.unit(5)'s at systemd 259.
-_UNIT = r"(?:service|socket|device|mount|automount|swap|target|path|timer|slice|scope)(?![A-Za-z])"
+# A systemd template-unit instance (git-maintenance@daily.timer) ends in a unit type. Ten of the eleven types in
+# systemd.unit(5) at systemd 259 are exempt. `target` is not: it is also a delegated top-level domain
+# (public_suffix_list.dat), and a test checks this list against the installed public suffix list.
+_UNIT_TYPES = ("service", "socket", "device", "mount", "automount", "swap", "path", "timer", "slice", "scope")
+_UNIT = r"(?:" + "|".join(_UNIT_TYPES) + r")(?![A-Za-z])"
 _EMAIL = re.compile(r"[A-Za-z0-9._%+-]+" + _AT + r"[A-Za-z0-9-]+(?:" + _DOT + r"[A-Za-z0-9-]+)*" + _DOT + r"(?!" + _UNIT + r")[A-Za-z]{2,}")
 _PRESERVED = re.compile(r"\$\{(?:USER_HOME|LOCAL_SESSION_ID|LOCAL_TASK_HANDLE)\}|\[personal identifier omitted\]|\[account artifact omitted\]|\[email omitted\]|native-agent-stack-1a")
 

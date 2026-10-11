@@ -272,9 +272,14 @@ The shared sanitizer omits email addresses on every page, after the same
 per-token decoding it applies to home paths and identifiers, so percent-encoded,
 double-encoded and HTML-entity forms, with or without the semicolon, are
 matched in their decoded text. A token over 4,096 characters is not decoded,
-so there the mask matches the encoded at-sign and dot forms in place. A
-systemd template-unit name such as `git-maintenance@daily.timer` ends in a unit
-type rather than a domain, so it stays readable.
+so there the mask matches these forms in place: for the at sign `%40`, `%2540`,
+`&#64` and `&#x40` (with or without the semicolon) and `&commat;`, and for the
+dot `%2E`, `%252E`, `&#46`, `&#x2E` and `&period;`. Other encodings in such a
+token, such as `&amp;#64;` or `%26%2364%3B`, stay as written. A systemd
+template-unit name that ends in `service`, `socket`, `device`, `mount`,
+`automount`, `swap`, `path`, `timer`, `slice` or `scope`, such as
+`git-maintenance@daily.timer`, stays readable. A name ending in `target` is
+masked, because `target` is also a delegated top-level domain.
 
 `token_tools_now.py` runs each installed token tool's own report command:
 `rtk gain --format json`, `headroom agent-savings --check-perf --hours 24
