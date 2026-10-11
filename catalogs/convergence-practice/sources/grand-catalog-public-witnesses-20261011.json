@@ -1,0 +1,405 @@
+{
+  "schema_version": 1,
+  "rows": [
+    {
+      "repository_or_entry": "https://github.com/dbt-labs/dbt",
+      "pin": {
+        "kind": "commit",
+        "repository_or_source": "dbt-labs/dbt",
+        "subject": "implementation",
+        "version_or_commit": "850196de95157287997f26e8c3386028e018d64c"
+      },
+      "note": "One deterministic source bundle represents serialization metadata; no primary pin is selected by recency, lane count or quality voting. Every original class, pin and literal role is retained in hash-bound source_refs. The README states that main contains dbt v2 Rust source and v1 development lives on a separate branch. Retain as a data-quality-orchestration candidate on source evidence; actual capability, comparative task value and runtime readiness require the stated measurement. Settling measurement: Compare upstream transformation and artifact tests on a frozen dataset, explicitly distinguishing the v2 source branch from retained v1 tooling. UNVERIFIED: native installation, upstream harness execution, model-family acceptance, complete catalog acceptance.",
+      "refresh_date": "2026-10-08",
+      "evidence_class": "metadata_seed_review",
+      "origin_path": "catalogs/landscape/grand-catalog-20261008.json",
+      "origin_pointer": "/rows/1096",
+      "origin_commit": "d551c403ecf8876b67e8e6a3460d493b045682eb",
+      "origin_sha256": "afb38c9427d7a344792b5ddcfa7cab64e9613a2fda64d1cecb30e2b0eae825bb",
+      "boundary": "Public discovery witness projection; no account or workflow-assignee fields, pinned upstream review, tier verdict or runtime claim."
+    },
+    {
+      "repository_or_entry": "https://github.com/fffaraz/awesome-cpp",
+      "pin": {
+        "kind": "commit",
+        "repository_or_source": "fffaraz/awesome-cpp",
+        "subject": "reference",
+        "version_or_commit": "f2ba6e37d34f96afe4ed27b727a22bf9c72cd6c6"
+      },
+      "note": "One deterministic source bundle represents serialization metadata; no primary pin is selected by recency, lane count or quality voting. Every original class, pin and literal role is retained in hash-bound source_refs. The README identifies a curated discovery list of C/C++ frameworks, libraries and resources. WATCH as a reference source for a demonstrated C/C++ requirement; a curated link list supplies leads rather than package installation or measured component quality. Settling measurement: For a named C/C++ requirement, select relevant entries, verify each maintained upstream at a fresh pin, and compare its supported native harness and requirement-specific behavior before choosing a component. UNVERIFIED: native installation, upstream harness execution, model-family acceptance, complete catalog acceptance.",
+      "refresh_date": "2026-10-08",
+      "evidence_class": "metadata_seed_review",
+      "origin_path": "catalogs/landscape/grand-catalog-20261008.json",
+      "origin_pointer": "/rows/1418",
+      "origin_commit": "d551c403ecf8876b67e8e6a3460d493b045682eb",
+      "origin_sha256": "afb38c9427d7a344792b5ddcfa7cab64e9613a2fda64d1cecb30e2b0eae825bb",
+      "boundary": "Public discovery witness projection; no account or workflow-assignee fields, pinned upstream review, tier verdict or runtime claim."
+    },
+    {
+      "repository_or_entry": "https://github.com/garrytan/gbrain",
+      "pin": {
+        "kind": "commit",
+        "repository_or_source": "https://github.com/garrytan/gbrain",
+        "subject": "implementation",
+        "version_or_commit": "1935c74a9e217b276c7bbf3075ddd3c220e96a09"
+      },
+      "note": "One deterministic source bundle represents serialization metadata; no primary pin is selected by recency, lane count or quality voting. Every original class, pin and literal role is retained in hash-bound source_refs. Exact source classes and qualifications retained. Native acceptance and designated review UNVERIFIED.",
+      "refresh_date": "2026-10-08",
+      "evidence_class": "metadata_seed_review",
+      "origin_path": "catalogs/landscape/grand-catalog-20261008.json",
+      "origin_pointer": "/rows/1526",
+      "origin_commit": "d551c403ecf8876b67e8e6a3460d493b045682eb",
+      "origin_sha256": "afb38c9427d7a344792b5ddcfa7cab64e9613a2fda64d1cecb30e2b0eae825bb",
+      "boundary": "Public discovery witness projection; no account or workflow-assignee fields, pinned upstream review, tier verdict or runtime claim."
+    },
+    {
+      "repository_or_entry": "https://github.com/google-research/timesfm",
+      "pin": {
+        "kind": "commit",
+        "repository_or_source": "google-research/timesfm",
+        "subject": "implementation",
+        "version_or_commit": "e51928e27119cb17bebc005be2696b75e0a9e688"
+      },
+      "note": "One deterministic source bundle represents serialization metadata; no primary pin is selected by recency, lane count or quality voting. Every original class, pin and literal role is retained in hash-bound source_refs. The README identifies TimesFM as a pretrained time-series forecasting foundation model developed by Google Research. WATCH for bounded forecasting research. The README states that this open version is not an officially supported Google product; neither source review nor forecast accuracy establishes a point-in-time equity dataset or deployable strategy. Settling measurement: Under co-op-scheduled acceptance, use the documented backend-specific installation and upstream evaluation path once captured. Evaluate retained time-ordered series against naive seasonal/lagged forecasts with a frozen chronological holdout; record data availability, leakage checks, forecast error, uncertainty, compute cost and model identity. Keep risk and order state deterministic. UNVERIFIED: native installation, upstream harness execution, model-family acceptance, complete catalog acceptance.",
+      "refresh_date": "2026-10-08",
+      "evidence_class": "metadata_seed_review",
+      "origin_path": "catalogs/landscape/grand-catalog-20261008.json",
+      "origin_pointer": "/rows/1637",
+      "origin_commit": "d551c403ecf8876b67e8e6a3460d493b045682eb",
+      "origin_sha256": "afb38c9427d7a344792b5ddcfa7cab64e9613a2fda64d1cecb30e2b0eae825bb",
+      "boundary": "Public discovery witness projection; no account or workflow-assignee fields, pinned upstream review, tier verdict or runtime claim."
+    },
+    {
+      "repository_or_entry": "https://github.com/abi/screenshot-to-code",
+      "pin": {
+        "kind": "commit",
+        "repository_or_source": "abi/screenshot-to-code",
+        "subject": "implementation",
+        "version_or_commit": "d026163f586dfa8c5c10d28c36edd59a9d3b0e88"
+      },
+      "note": "One deterministic source bundle represents serialization metadata; no primary pin is selected by recency, lane count or quality voting. Every original class, pin and literal role is retained in hash-bound source_refs. The README describes AI conversion of screenshots, designs and recordings into frontend code. Retain as a skills-implement candidate on source evidence; actual capability, comparative task value and runtime readiness require the stated measurement. Settling measurement: Evaluate retained screenshot-to-app tasks through upstream setup and browser verification, comparing fidelity, accessibility, correctness and total usage. UNVERIFIED: native installation, upstream harness execution, model-family acceptance, complete catalog acceptance.",
+      "refresh_date": "2026-10-08",
+      "evidence_class": "metadata_seed_review",
+      "origin_path": "catalogs/landscape/grand-catalog-20261008.json",
+      "origin_pointer": "/rows/181",
+      "origin_commit": "d551c403ecf8876b67e8e6a3460d493b045682eb",
+      "origin_sha256": "afb38c9427d7a344792b5ddcfa7cab64e9613a2fda64d1cecb30e2b0eae825bb",
+      "boundary": "Public discovery witness projection; no account or workflow-assignee fields, pinned upstream review, tier verdict or runtime claim."
+    },
+    {
+      "repository_or_entry": "https://github.com/jaywcjlove/awesome-mac",
+      "pin": {
+        "kind": "commit",
+        "repository_or_source": "jaywcjlove/awesome-mac",
+        "subject": "reference",
+        "version_or_commit": "b0fe18e4ea961da7ff357c5beaf73e1b2f1eb546"
+      },
+      "note": "One deterministic source bundle represents serialization metadata; no primary pin is selected by recency, lane count or quality voting. Every original class, pin and literal role is retained in hash-bound source_refs. The README identifies a categorized discovery list of macOS software. WATCH as a portability discovery reference. Inclusion in a software list does not prove maintained upstream identity, license suitability or native acceptance on macOS. Settling measurement: For a specified Mac workflow gap, select relevant entries, verify their maintained primary sources at fresh pins and reproduce their native installation and supported tests on the actual Mac. Record task quality, platform/backend differences and restore behavior before changing the portable profile. UNVERIFIED: native installation, upstream harness execution, model-family acceptance, complete catalog acceptance.",
+      "refresh_date": "2026-10-08",
+      "evidence_class": "metadata_seed_review",
+      "origin_path": "catalogs/landscape/grand-catalog-20261008.json",
+      "origin_pointer": "/rows/1959",
+      "origin_commit": "d551c403ecf8876b67e8e6a3460d493b045682eb",
+      "origin_sha256": "afb38c9427d7a344792b5ddcfa7cab64e9613a2fda64d1cecb30e2b0eae825bb",
+      "boundary": "Public discovery witness projection; no account or workflow-assignee fields, pinned upstream review, tier verdict or runtime claim."
+    },
+    {
+      "repository_or_entry": "https://github.com/jdx/mise",
+      "pin": {
+        "kind": "commit",
+        "repository_or_source": "jdx/mise",
+        "subject": "implementation",
+        "version_or_commit": "69cddd1f53815901b5ec25ee483f0710a270c4fb"
+      },
+      "note": "One deterministic source bundle represents serialization metadata; no primary pin is selected by recency, lane count or quality voting. Every original class, pin and literal role is retained in hash-bound source_refs. The README describes installing project tools, setting environment variables and running tasks from mise.toml, with machine bootstrap as an additional path. WATCH for reproducible developer-environment recreation. This capture contains a placeholder npm test script, which supplies no usable upstream acceptance harness; full machine/bootstrap behavior remains unverified. Settling measurement: Capture the upstream contributor harness, then under co-op scheduling recreate a small fixture project from a reviewed mise.toml on a fresh isolated host. Verify exact tool versions, per-project activation, deterministic task outputs, failed install recovery and idempotent recreation without inspecting credential values or modifying the standing machine configuration. UNVERIFIED: native installation, upstream harness execution, model-family acceptance, complete catalog acceptance.",
+      "refresh_date": "2026-10-08",
+      "evidence_class": "metadata_seed_review",
+      "origin_path": "catalogs/landscape/grand-catalog-20261008.json",
+      "origin_pointer": "/rows/1965",
+      "origin_commit": "d551c403ecf8876b67e8e6a3460d493b045682eb",
+      "origin_sha256": "afb38c9427d7a344792b5ddcfa7cab64e9613a2fda64d1cecb30e2b0eae825bb",
+      "boundary": "Public discovery witness projection; no account or workflow-assignee fields, pinned upstream review, tier verdict or runtime claim."
+    },
+    {
+      "repository_or_entry": "https://github.com/lfnovo/open-notebook",
+      "pin": null,
+      "note": "One deterministic source bundle represents serialization metadata; no primary pin is selected by recency, lane count or quality voting. Every original class, pin and literal role is retained in hash-bound source_refs. Exact source classes and qualifications retained. Native acceptance and designated review UNVERIFIED.",
+      "refresh_date": "2026-10-08",
+      "evidence_class": "metadata_seed_review",
+      "origin_path": "catalogs/landscape/grand-catalog-20261008.json",
+      "origin_pointer": "/rows/2274",
+      "origin_commit": "d551c403ecf8876b67e8e6a3460d493b045682eb",
+      "origin_sha256": "afb38c9427d7a344792b5ddcfa7cab64e9613a2fda64d1cecb30e2b0eae825bb",
+      "boundary": "Public discovery witness projection; no account or workflow-assignee fields, pinned upstream review, tier verdict or runtime claim."
+    },
+    {
+      "repository_or_entry": "https://github.com/odysseus-dev/odysseus",
+      "pin": null,
+      "note": "One deterministic source bundle represents serialization metadata; no primary pin is selected by recency, lane count or quality voting. Every original class, pin and literal role is retained in hash-bound source_refs. Exact source classes and qualifications retained. Native acceptance and designated review UNVERIFIED.",
+      "refresh_date": "2026-10-08",
+      "evidence_class": "metadata_seed_review",
+      "origin_path": "catalogs/landscape/grand-catalog-20261008.json",
+      "origin_pointer": "/rows/2868",
+      "origin_commit": "d551c403ecf8876b67e8e6a3460d493b045682eb",
+      "origin_sha256": "afb38c9427d7a344792b5ddcfa7cab64e9613a2fda64d1cecb30e2b0eae825bb",
+      "boundary": "Public discovery witness projection; no account or workflow-assignee fields, pinned upstream review, tier verdict or runtime claim."
+    },
+    {
+      "repository_or_entry": "https://github.com/openai/plugins",
+      "pin": {
+        "kind": "commit",
+        "repository_or_source": "https://github.com/openai/plugins",
+        "subject": "implementation",
+        "version_or_commit": "0722921d5542fc593105c27bd52630babd8b8c2a"
+      },
+      "note": "One deterministic source bundle represents serialization metadata; no primary pin is selected by recency, lane count or quality voting. Every original class, pin and literal role is retained in hash-bound source_refs. Exact source classes and qualifications retained. Native acceptance and designated review UNVERIFIED.",
+      "refresh_date": "2026-10-08",
+      "evidence_class": "metadata_seed_review",
+      "origin_path": "catalogs/landscape/grand-catalog-20261008.json",
+      "origin_pointer": "/rows/2965",
+      "origin_commit": "d551c403ecf8876b67e8e6a3460d493b045682eb",
+      "origin_sha256": "afb38c9427d7a344792b5ddcfa7cab64e9613a2fda64d1cecb30e2b0eae825bb",
+      "boundary": "Public discovery witness projection; no account or workflow-assignee fields, pinned upstream review, tier verdict or runtime claim."
+    },
+    {
+      "repository_or_entry": "https://github.com/openai/plugins",
+      "pin": {
+        "kind": "commit",
+        "repository_or_source": "openai/plugins",
+        "subject": "implementation",
+        "version_or_commit": "0722921d5542fc593105c27bd52630babd8b8c2a"
+      },
+      "note": "Restored historical source-supported TRIAL claim; origin provenance unresolved, native installation and trial acceptance not executed. CC A2 restores the original source-evidenced TRIAL; exact origin-pointer binding remains unresolved rather than being represented as a decision change. No executed native acceptance is asserted.",
+      "refresh_date": "2026-10-08",
+      "evidence_class": "metadata_seed_review",
+      "origin_path": "catalogs/landscape/grand-catalog-20261008.json",
+      "origin_pointer": "/rows/2966",
+      "origin_commit": "d551c403ecf8876b67e8e6a3460d493b045682eb",
+      "origin_sha256": "afb38c9427d7a344792b5ddcfa7cab64e9613a2fda64d1cecb30e2b0eae825bb",
+      "boundary": "Public discovery witness projection; no account or workflow-assignee fields, pinned upstream review, tier verdict or runtime claim."
+    },
+    {
+      "repository_or_entry": "https://github.com/alebcay/awesome-shell",
+      "pin": {
+        "kind": "commit",
+        "repository_or_source": "alebcay/awesome-shell",
+        "subject": "reference",
+        "version_or_commit": "cb355ae98ca6edc2d84de7e6376c7895066a65cb"
+      },
+      "note": "One deterministic source bundle represents serialization metadata; no primary pin is selected by recency, lane count or quality voting. Every original class, pin and literal role is retained in hash-bound source_refs. The repository curates command-line frameworks, toolkits and guides. Retain as a native-clients candidate on source evidence; actual capability, comparative task value and runtime readiness require the stated measurement. Settling measurement: Use it only to discover upstream shell candidates; each candidate requires its own maintained source pin and native host acceptance. UNVERIFIED: native installation, upstream harness execution, model-family acceptance, complete catalog acceptance.",
+      "refresh_date": "2026-10-08",
+      "evidence_class": "metadata_seed_review",
+      "origin_path": "catalogs/landscape/grand-catalog-20261008.json",
+      "origin_pointer": "/rows/297",
+      "origin_commit": "d551c403ecf8876b67e8e6a3460d493b045682eb",
+      "origin_sha256": "afb38c9427d7a344792b5ddcfa7cab64e9613a2fda64d1cecb30e2b0eae825bb",
+      "boundary": "Public discovery witness projection; no account or workflow-assignee fields, pinned upstream review, tier verdict or runtime claim."
+    },
+    {
+      "repository_or_entry": "https://github.com/orchestratorinc/agent-orchestrator",
+      "pin": {
+        "kind": "commit",
+        "repository_or_source": "orchestratorinc/agent-orchestrator",
+        "subject": "implementation",
+        "version_or_commit": "6eb6c096741877bfdf12a8e0c4a462bf2cb92df8"
+      },
+      "note": "One deterministic source bundle represents serialization metadata; no primary pin is selected by recency, lane count or quality voting. Every original class, pin and literal role is retained in hash-bound source_refs. Plans, runs and supervises coding agents with task-specific workspaces and a live view of workers, pull requests, CI and reviews. Workspace supervision is relevant, but its benefit over the current bounded worker practice needs direct operational evidence. Settling measurement: Run three independent scratch-repository tasks, interrupt one worker and resume its handoff; measure workspace isolation, artifact custody, CI/review visibility and coordinator time. UNVERIFIED: native installation, upstream harness execution, model-family acceptance, complete catalog acceptance.",
+      "refresh_date": "2026-10-08",
+      "evidence_class": "metadata_seed_review",
+      "origin_path": "catalogs/landscape/grand-catalog-20261008.json",
+      "origin_pointer": "/rows/3035",
+      "origin_commit": "d551c403ecf8876b67e8e6a3460d493b045682eb",
+      "origin_sha256": "afb38c9427d7a344792b5ddcfa7cab64e9613a2fda64d1cecb30e2b0eae825bb",
+      "boundary": "Public discovery witness projection; no account or workflow-assignee fields, pinned upstream review, tier verdict or runtime claim."
+    },
+    {
+      "repository_or_entry": "https://github.com/sindresorhus/awesome-nodejs",
+      "pin": {
+        "kind": "commit",
+        "repository_or_source": "sindresorhus/awesome-nodejs",
+        "subject": "reference",
+        "version_or_commit": "b8e1c0c3879544e32dca7d381d8275ceff267e46"
+      },
+      "note": "One deterministic source bundle represents serialization metadata; no primary pin is selected by recency, lane count or quality voting. Every original class, pin and literal role is retained in hash-bound source_refs. Indexes Node.js resources across runtime/tooling categories, including command-line apps, build tools and process management. Keep as a tooling-discovery index; category entries are not installed components and need direct upstream validation for a concrete requirement. Settling measurement: Choose five entries matching a documented Node.js tooling gap, refresh their primary sources and compare supported install/test recipes and maintenance at exact pins before proposing adoption. UNVERIFIED: native installation, upstream harness execution, model-family acceptance, complete catalog acceptance.",
+      "refresh_date": "2026-10-08",
+      "evidence_class": "metadata_seed_review",
+      "origin_path": "catalogs/landscape/grand-catalog-20261008.json",
+      "origin_pointer": "/rows/3635",
+      "origin_commit": "d551c403ecf8876b67e8e6a3460d493b045682eb",
+      "origin_sha256": "afb38c9427d7a344792b5ddcfa7cab64e9613a2fda64d1cecb30e2b0eae825bb",
+      "boundary": "Public discovery witness projection; no account or workflow-assignee fields, pinned upstream review, tier verdict or runtime claim."
+    },
+    {
+      "repository_or_entry": "https://github.com/andrewyng/context-hub",
+      "pin": {
+        "kind": "commit",
+        "repository_or_source": "andrewyng/context-hub",
+        "subject": "implementation",
+        "version_or_commit": "67dcbeb2eb42c808549f08397920ad58be7c2206"
+      },
+      "note": "One deterministic source bundle represents serialization metadata; no primary pin is selected by recency, lane count or quality voting. Every original class, pin and literal role is retained in hash-bound source_refs. The README describes curated versioned markdown documentation for coding agents. Retain as a document-retrieval candidate on source evidence; actual capability, comparative task value and runtime readiness require the stated measurement. Settling measurement: Test a frozen version-sensitive API task set for exact documentation pin selection, annotation behavior and source freshness. UNVERIFIED: native installation, upstream harness execution, model-family acceptance, complete catalog acceptance.",
+      "refresh_date": "2026-10-08",
+      "evidence_class": "metadata_seed_review",
+      "origin_path": "catalogs/landscape/grand-catalog-20261008.json",
+      "origin_pointer": "/rows/393",
+      "origin_commit": "d551c403ecf8876b67e8e6a3460d493b045682eb",
+      "origin_sha256": "afb38c9427d7a344792b5ddcfa7cab64e9613a2fda64d1cecb30e2b0eae825bb",
+      "boundary": "Public discovery witness projection; no account or workflow-assignee fields, pinned upstream review, tier verdict or runtime claim."
+    },
+    {
+      "repository_or_entry": "https://github.com/vinta/awesome-python",
+      "pin": {
+        "kind": "commit",
+        "repository_or_source": "vinta/awesome-python",
+        "subject": "reference",
+        "version_or_commit": "bb79ec0e5a192503667da329a59a6ca16ef0e750"
+      },
+      "note": "One deterministic source bundle represents serialization metadata; no primary pin is selected by recency, lane count or quality voting. Every original class, pin and literal role is retained in hash-bound source_refs. An opinionated discovery guide indexes Python frameworks, libraries and tools and provides a searchable website. Use as Python tooling leads; the guide is not an installed runtime and linked packages need their own pinned primary-source review. Settling measurement: Choose five entries tied to a current Python engineering gap, inspect current primary repositories and supported install/test recipes, then compare the smallest justified candidate on a frozen task. UNVERIFIED: native installation, upstream harness execution, model-family acceptance, complete catalog acceptance.",
+      "refresh_date": "2026-10-08",
+      "evidence_class": "metadata_seed_review",
+      "origin_path": "catalogs/landscape/grand-catalog-20261008.json",
+      "origin_pointer": "/rows/4148",
+      "origin_commit": "d551c403ecf8876b67e8e6a3460d493b045682eb",
+      "origin_sha256": "afb38c9427d7a344792b5ddcfa7cab64e9613a2fda64d1cecb30e2b0eae825bb",
+      "boundary": "Public discovery witness projection; no account or workflow-assignee fields, pinned upstream review, tier verdict or runtime claim."
+    },
+    {
+      "repository_or_entry": "https://github.com/anthropics/claude-agent-sdk-python",
+      "pin": {
+        "kind": "commit",
+        "repository_or_source": "https://github.com/anthropics/claude-agent-sdk-python",
+        "subject": "implementation",
+        "version_or_commit": "f7b0b62c2a8d110d4da0eec0aa70cf795ec3afc4"
+      },
+      "note": "One deterministic source bundle represents serialization metadata; no primary pin is selected by recency, lane count or quality voting. Every original class, pin and literal role is retained in hash-bound source_refs. Exact source classes and qualifications retained. Native acceptance and designated review UNVERIFIED.",
+      "refresh_date": "2026-10-08",
+      "evidence_class": "metadata_seed_review",
+      "origin_path": "catalogs/landscape/grand-catalog-20261008.json",
+      "origin_pointer": "/rows/415",
+      "origin_commit": "d551c403ecf8876b67e8e6a3460d493b045682eb",
+      "origin_sha256": "afb38c9427d7a344792b5ddcfa7cab64e9613a2fda64d1cecb30e2b0eae825bb",
+      "boundary": "Public discovery witness projection; no account or workflow-assignee fields, pinned upstream review, tier verdict or runtime claim."
+    },
+    {
+      "repository_or_entry": "https://github.com/anthropics/claude-code-action",
+      "pin": null,
+      "note": "One deterministic source bundle represents serialization metadata; no primary pin is selected by recency, lane count or quality voting. Every original class, pin and literal role is retained in hash-bound source_refs. Exact source classes and qualifications retained. Native acceptance and designated review UNVERIFIED.",
+      "refresh_date": "2026-10-08",
+      "evidence_class": "metadata_seed_review",
+      "origin_path": "catalogs/landscape/grand-catalog-20261008.json",
+      "origin_pointer": "/rows/430",
+      "origin_commit": "d551c403ecf8876b67e8e6a3460d493b045682eb",
+      "origin_sha256": "afb38c9427d7a344792b5ddcfa7cab64e9613a2fda64d1cecb30e2b0eae825bb",
+      "boundary": "Public discovery witness projection; no account or workflow-assignee fields, pinned upstream review, tier verdict or runtime claim."
+    },
+    {
+      "repository_or_entry": "https://github.com/anthropics/claude-code-action",
+      "pin": null,
+      "note": "One deterministic source bundle represents serialization metadata; no primary pin is selected by recency, lane count or quality voting. Every original class, pin and literal role is retained in hash-bound source_refs. Exact source classes and qualifications retained. Native acceptance and designated review UNVERIFIED.",
+      "refresh_date": "2026-10-08",
+      "evidence_class": "metadata_seed_review",
+      "origin_path": "catalogs/landscape/grand-catalog-20261008.json",
+      "origin_pointer": "/rows/432",
+      "origin_commit": "d551c403ecf8876b67e8e6a3460d493b045682eb",
+      "origin_sha256": "afb38c9427d7a344792b5ddcfa7cab64e9613a2fda64d1cecb30e2b0eae825bb",
+      "boundary": "Public discovery witness projection; no account or workflow-assignee fields, pinned upstream review, tier verdict or runtime claim."
+    },
+    {
+      "repository_or_entry": "https://github.com/anthropics/financial-services",
+      "pin": null,
+      "note": "One deterministic source bundle represents serialization metadata; no primary pin is selected by recency, lane count or quality voting. Every original class, pin and literal role is retained in hash-bound source_refs. Exact original source occurrences retained. Custody refresh does not establish current candidate behavior, implementation quality, host fit or historical strategy acceptance. Public-safe capture wrappers may project host metadata and identifiers; wrappers are not original upstream source-byte authority. Sealed original custody remains private.",
+      "refresh_date": "2026-10-08",
+      "evidence_class": "metadata_seed_review",
+      "origin_path": "catalogs/landscape/grand-catalog-20261008.json",
+      "origin_pointer": "/rows/445",
+      "origin_commit": "d551c403ecf8876b67e8e6a3460d493b045682eb",
+      "origin_sha256": "afb38c9427d7a344792b5ddcfa7cab64e9613a2fda64d1cecb30e2b0eae825bb",
+      "boundary": "Public discovery witness projection; no account or workflow-assignee fields, pinned upstream review, tier verdict or runtime claim."
+    },
+    {
+      "repository_or_entry": "https://github.com/avelino/awesome-go",
+      "pin": {
+        "kind": "commit",
+        "repository_or_source": "avelino/awesome-go",
+        "subject": "reference",
+        "version_or_commit": "6238eafa8e03d75a01c050f953c25a1a43900877"
+      },
+      "note": "One deterministic source bundle represents serialization metadata; no primary pin is selected by recency, lane count or quality voting. Every original class, pin and literal role is retained in hash-bound source_refs. The repository curates Go frameworks, libraries and software. Retain as a skills-research candidate on source evidence; actual capability, comparative task value and runtime readiness require the stated measurement. Settling measurement: Treat list entries as discovery leads; validate each relevant maintained repository at its own pin before any capability or adoption claim. UNVERIFIED: native installation, upstream harness execution, model-family acceptance, complete catalog acceptance.",
+      "refresh_date": "2026-10-08",
+      "evidence_class": "metadata_seed_review",
+      "origin_path": "catalogs/landscape/grand-catalog-20261008.json",
+      "origin_pointer": "/rows/585",
+      "origin_commit": "d551c403ecf8876b67e8e6a3460d493b045682eb",
+      "origin_sha256": "afb38c9427d7a344792b5ddcfa7cab64e9613a2fda64d1cecb30e2b0eae825bb",
+      "boundary": "Public discovery witness projection; no account or workflow-assignee fields, pinned upstream review, tier verdict or runtime claim."
+    },
+    {
+      "repository_or_entry": "https://github.com/clash-verge-rev/clash-verge-rev",
+      "pin": {
+        "kind": "commit",
+        "repository_or_source": "clash-verge-rev/clash-verge-rev",
+        "subject": "implementation",
+        "version_or_commit": "d9dc18a57b5837c5979b1be6e88a493c2768a61d"
+      },
+      "note": "One deterministic source bundle represents serialization metadata; no primary pin is selected by recency, lane count or quality voting. Every original class, pin and literal role is retained in hash-bound source_refs. The README identifies a Tauri GUI for Clash Meta. Retain as a hosting-services candidate on source evidence; actual capability, comparative task value and runtime readiness require the stated measurement. Settling measurement: Evaluate only a demonstrated host networking requirement through an isolated upstream release; do not replace current route configuration from a source review. UNVERIFIED: native installation, upstream harness execution, model-family acceptance, complete catalog acceptance.",
+      "refresh_date": "2026-10-08",
+      "evidence_class": "metadata_seed_review",
+      "origin_path": "catalogs/landscape/grand-catalog-20261008.json",
+      "origin_pointer": "/rows/871",
+      "origin_commit": "d551c403ecf8876b67e8e6a3460d493b045682eb",
+      "origin_sha256": "afb38c9427d7a344792b5ddcfa7cab64e9613a2fda64d1cecb30e2b0eae825bb",
+      "boundary": "Public discovery witness projection; no account or workflow-assignee fields, pinned upstream review, tier verdict or runtime claim."
+    },
+    {
+      "repository_or_entry": "everyinc/compound-engineering-plugin@ce-babysit-pr",
+      "pin": {
+        "kind": "commit",
+        "repository_or_source": "EveryInc/compound-engineering-plugin",
+        "subject": "implementation",
+        "version_or_commit": "030188b4ba27f2dc33fbc4d5a112d3c8cc893e8c"
+      },
+      "note": "One deterministic source bundle represents serialization metadata; no primary pin is selected by recency, lane count or quality voting. Every original class, pin and literal role is retained in hash-bound source_refs. UNVERIFIED primary-source claim imported from the exact retained discovery original. The original model label and routing metadata are documentary leads; this row does not infer current applicability, actual skill activation or native acceptance.",
+      "refresh_date": "2026-10-08",
+      "evidence_class": "metadata_seed_review",
+      "origin_path": "catalogs/landscape/grand-catalog-20261008.json",
+      "origin_pointer": "/rows/95",
+      "origin_commit": "d551c403ecf8876b67e8e6a3460d493b045682eb",
+      "origin_sha256": "afb38c9427d7a344792b5ddcfa7cab64e9613a2fda64d1cecb30e2b0eae825bb",
+      "boundary": "Public discovery witness projection; no account or workflow-assignee fields, pinned upstream review, tier verdict or runtime claim."
+    },
+    {
+      "repository_or_entry": "everyinc/compound-engineering-plugin@ce-doc-review",
+      "pin": {
+        "kind": "commit",
+        "repository_or_source": "EveryInc/compound-engineering-plugin",
+        "subject": "implementation",
+        "version_or_commit": "030188b4ba27f2dc33fbc4d5a112d3c8cc893e8c"
+      },
+      "note": "One deterministic source bundle represents serialization metadata; no primary pin is selected by recency, lane count or quality voting. Every original class, pin and literal role is retained in hash-bound source_refs. UNVERIFIED primary-source claim imported from the exact retained discovery original. The original model label and routing metadata are documentary leads; this row does not infer current applicability, actual skill activation or native acceptance. Public capture is an annotated research-metadata projection with private path/local identifiers replaced; it is not an original upstream JSON or execution witness. The sealed private original retains its original hash outside the release.",
+      "refresh_date": "2026-10-08",
+      "evidence_class": "metadata_seed_review",
+      "origin_path": "catalogs/landscape/grand-catalog-20261008.json",
+      "origin_pointer": "/rows/97",
+      "origin_commit": "d551c403ecf8876b67e8e6a3460d493b045682eb",
+      "origin_sha256": "afb38c9427d7a344792b5ddcfa7cab64e9613a2fda64d1cecb30e2b0eae825bb",
+      "boundary": "Public discovery witness projection; no account or workflow-assignee fields, pinned upstream review, tier verdict or runtime claim."
+    },
+    {
+      "repository_or_entry": "everyinc/compound-engineering-plugin@ce-resolve-pr-feedback",
+      "pin": {
+        "kind": "commit",
+        "repository_or_source": "EveryInc/compound-engineering-plugin",
+        "subject": "implementation",
+        "version_or_commit": "030188b4ba27f2dc33fbc4d5a112d3c8cc893e8c"
+      },
+      "note": "One deterministic source bundle represents serialization metadata; no primary pin is selected by recency, lane count or quality voting. Every original class, pin and literal role is retained in hash-bound source_refs. UNVERIFIED primary-source claim imported from the exact retained discovery original. The original model label and routing metadata are documentary leads; this row does not infer current applicability, actual skill activation or native acceptance.",
+      "refresh_date": "2026-10-08",
+      "evidence_class": "metadata_seed_review",
+      "origin_path": "catalogs/landscape/grand-catalog-20261008.json",
+      "origin_pointer": "/rows/99",
+      "origin_commit": "d551c403ecf8876b67e8e6a3460d493b045682eb",
+      "origin_sha256": "afb38c9427d7a344792b5ddcfa7cab64e9613a2fda64d1cecb30e2b0eae825bb",
+      "boundary": "Public discovery witness projection; no account or workflow-assignee fields, pinned upstream review, tier verdict or runtime claim."
+    }
+  ]
+}

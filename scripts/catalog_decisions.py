@@ -52,6 +52,7 @@ BASE_SOURCES = [
     source("manifests/candidates.json", "/candidates", "legacy_candidate", "url"),
     source("adoption/research.json", "/candidates", "research_supplement"),
 ]
+CURRENT_STAR_SOURCE = source("catalogs/convergence-practice/public-starred.json", "/repositories", "public_star")
 
 
 def safe_file(root: Path, relative: str) -> Path:
@@ -167,11 +168,16 @@ def checked_sources(root, specs):
         key = source_key(item)
         require(key not in seen, "duplicate source collection")
         seen.add(key)
-        if key in required:
+        if key == source_key(CURRENT_STAR_SOURCE):
+            require(item == CURRENT_STAR_SOURCE, "current public-star snapshot descriptor was changed")
+        elif key in required:
             require(item == required[key], "base source descriptor was changed")
         else:
-            require(item["kind"] == "research_supplement", "additional sources must be research supplements")
+            require(item == CURRENT_STAR_SOURCE or item["kind"] == "research_supplement",
+                    "additional sources must be research supplements or the canonical public-star snapshot")
     require(set(required) <= seen, "required base source collection is missing")
+    if safe_file(root, CURRENT_STAR_SOURCE["path"]).exists():
+        require(source_key(CURRENT_STAR_SOURCE) in seen, "current public-star snapshot must be registered")
     return sorted(specs, key=source_key)
 
 
@@ -181,15 +187,20 @@ def build_index(root: Path, sources=None):
     aliases = aliases_for(root)
     records = {}
     documents = {}
+    current_stars = None
     for spec in sources:
         path = spec["path"]
         if path not in documents:
             documents[path] = load(root, path)
         collection = pointer(documents[path], spec["collection"])
         require(isinstance(collection, list), "source collection must be an array")
+        if spec == CURRENT_STAR_SOURCE:
+            current_stars = set()
         for number, entry in enumerate(collection):
             require(isinstance(entry, dict), "source entry must be an object")
             name = canonical(identity(entry.get(spec["repository_field"])), aliases)
+            if spec == CURRENT_STAR_SOURCE:
+                current_stars.add(name)
             record = records.setdefault(name, {"repository": f"https://github.com/{name}",
                 "aliases": [], "public_star": False, "record_types": [], "references": []})
             kind = spec["kind"]
@@ -207,6 +218,8 @@ def build_index(root: Path, sources=None):
             records[target]["aliases"].append(alias)
     result = []
     for name, record in sorted(records.items()):
+        if current_stars is not None:
+            record["public_star"] = name in current_stars
         record["record_types"].sort()
         record["aliases"].sort()
         record["references"].sort(key=lambda item: (item["path"], item["pointer"], item["kind"]))
@@ -263,6 +276,8 @@ def main(argv=None):
             index_path = safe_file(root, INDEX)
             specs = load(root, INDEX).get("sources") if index_path.exists() else list(BASE_SOURCES)
             require(isinstance(specs, list), "sources must be an array")
+            if safe_file(root, CURRENT_STAR_SOURCE["path"]).exists() and CURRENT_STAR_SOURCE not in specs:
+                specs.append(dict(CURRENT_STAR_SOURCE))
             additions = [supplement(item) for item in args.supplement]
             for item in additions:
                 if item not in specs:

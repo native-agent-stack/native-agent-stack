@@ -12,6 +12,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 import zlib
+from datetime import datetime, timedelta, timezone
 
 from scripts.validate import PRIVATE_CONTENT, InvalidPublication, scan_file_for_private_content, validate
 
@@ -73,6 +74,26 @@ class PublicationValidationTests(unittest.TestCase):
 
     def test_valid_bundle_reports_counts(self):
         self.assertEqual(validate(self.root), {"components": 1, "profiles": 1, "receipts": 1, "hashed_files": 2})
+
+    def test_public_star_guard_uses_default_utc_clock_without_today_override(self):
+        current = datetime.now(timezone.utc).date().isoformat()
+        self.write_json("catalogs/convergence-practice/public-starred.json", {
+            "schema_version": 1, "retrieved_at": current, "count": 1, "repositories": [
+                {"repository": "example/tool", "disposition": "NEEDS-EVIDENCE: fixture",
+                 "first_observed_at": current}]})
+        try:
+            result = validate(self.root)
+        except InvalidPublication as error:
+            self.fail(f"Default UTC star validation refused a current snapshot: {error}")
+        self.assertEqual(result["components"], 1)
+
+    def test_full_validation_refuses_pending_age_hidden_by_fresh_snapshot(self):
+        today = datetime.now(timezone.utc).date()
+        self.write_json("catalogs/convergence-practice/public-starred.json", {
+            "schema_version": 1, "retrieved_at": today.isoformat(), "count": 1, "repositories": [
+                {"repository": "example/tool", "disposition": "PENDING",
+                 "first_observed_at": (today - timedelta(days=8)).isoformat()}]})
+        self.assert_invalid("PENDING.*older than 7 days")
 
     def test_registered_exact_vendor_document_uuid_examples_are_public_sources(self):
         folder = "evidence/artifacts/claude-federation-docs-20261010/"

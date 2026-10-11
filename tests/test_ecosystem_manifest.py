@@ -10,6 +10,8 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from datetime import datetime, timedelta, timezone
+from unittest.mock import patch
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -56,6 +58,46 @@ class Page(HTMLParser):
 
 
 class EcosystemManifestTests(unittest.TestCase):
+    def test_metadata_only_starred_convergence_does_not_render_as_source_reviewed(self):
+        from scripts.build_ecosystem import build_data
+        data = build_data(ROOT)
+        by_name = {row["repository_id"]: row for row in data["repositories"]}
+        self.assertFalse(by_name["aannoo/hcom"]["source_reviewed"])
+        self.assertTrue(by_name["microsoft/pyright"]["source_reviewed"])
+
+    def test_starred_convergence_tracks_each_dynamic_source_input(self):
+        from scripts.build_ecosystem import build_data, input_digest
+        manifest = "catalogs/convergence-practice/starred-convergence-20261010.json"
+        seeds = "catalogs/convergence-practice/starred-seeds-20261010.json"
+        witness = "catalogs/convergence-practice/sources/witness.json"
+        registry = "catalogs/sota-convergence/layer-verdict-waves.json"
+        self.write("catalogs/foundation/manifest.json", {"layers": [{"id": "retrieval"}]})
+        self.write(registry, {"waves": []})
+        self.write(witness, {"rows": [{"repository": "example/search", "note": "before"}]})
+        self.write(seeds, {"schema_version": 1, "seeds": [{"repository": "example/search",
+                          "layer": "retrieval", "reason": "Discovery witness", "source_refs": [witness + "#/rows/0"],
+                          "checked_at": "2026-10-10T17:00:00Z"}]})
+        row = {"repository": "example/search", "scope": "IN-SCOPE", "reason": "Metadata discovery",
+               "layer_keys": ["retrieval"], "seed_refs": [seeds + "#/seeds/0"],
+               "evidence_refs": [witness + "#/rows/0"], "verdict_refs": [],
+               "verdict_follow_up": {"status": "AWAITING-RECORDED-TIER-VERDICT", "required_tiers": ["tier-1", "tier-2"],
+                                     "layer_keys": ["retrieval"], "registry": registry}}
+        self.write(manifest, {"schema_version": 1, "count": 1, "seed_manifest": seeds,
+                             "primary_source_review": "catalogs/convergence-practice/source-review.json",
+                             "repositories": [row]})
+        self.write("catalogs/convergence-practice/public-starred.json", {
+            "count": 1, "retrieved_at": "2026-10-10T17:00:00Z", "convergence_manifest": manifest,
+            "repositories": [dict(row, disposition_status="IN-SCOPE", disposition="IN-SCOPE: metadata",
+                                  convergence_manifest=manifest, decision_manifest=manifest)]})
+        data = build_data(self.root)
+        inputs = {item["path"]: item for item in data["inputs"]}
+        self.assertIn(witness, inputs)
+        self.assertIn(registry, inputs)
+        self.assertEqual(inputs[witness]["sha256"], hashlib.sha256((self.root / witness).read_bytes()).hexdigest())
+        before = input_digest(data, self.root)
+        self.write(witness, {"rows": [{"repository": "example/search", "note": "after"}]})
+        self.assertNotEqual(before, input_digest(build_data(self.root), self.root))
+
     def setUp(self):
         temporary = tempfile.TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
@@ -152,6 +194,45 @@ class EcosystemManifestTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         text = (self.root / "docs/ecosystem/index.html").read_text()
         return Page(text), text
+
+    def test_pending_star_older_than_seven_days_fails_the_builder(self):
+        observed = (datetime.now(timezone.utc).date() - timedelta(days=8)).isoformat()
+        self.write("catalogs/convergence-practice/public-starred.json", {
+            "retrieved_at": observed, "count": 1, "repositories": [
+                {"repository": "example/search", "description": "Search", "topics": [],
+                 "disposition": "PENDING", "first_observed_at": observed}]})
+        result = self.run_generator("--write")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("PENDING", result.stdout)
+
+    def test_refresh_cannot_reset_the_age_of_an_undispositioned_star(self):
+        now = datetime.now(timezone.utc).date()
+        old = (now - timedelta(days=8)).isoformat()
+        self.write("catalogs/convergence-practice/public-starred.json", {
+            "retrieved_at": now.isoformat(), "count": 1, "repositories": [
+                {"repository": "example/search", "description": "Search", "topics": [],
+                 "disposition": "PENDING", "first_observed_at": old}]})
+        result = self.run_generator("--write")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("PENDING", result.stdout)
+
+    def test_older_landscape_snapshot_cannot_remove_current_public_stars(self):
+        from scripts import build_ecosystem
+
+        self.config["landscape_manifest"] = "catalogs/landscape/manifest.json"
+        self.save()
+        self.write("catalogs/landscape/manifest.json", {
+            "sources": {"freshness_snapshot": "catalogs/landscape/old-stars.json"}})
+        self.write("catalogs/landscape/old-stars.json", {"stars": {
+            "status": "checked", "repository_snapshot_checked_at": "2026-09-19T00:00:00Z",
+            "repositories": []}})
+        for path in ("catalogs/landscape/README.md", "docs/landscape-foundation-notes.md",
+                     "docs/landscape-domain-notes.md", "docs/landscape-freshness-notes.md"):
+            self.write(path, "# Recorded landscape\n")
+        with patch.object(build_ecosystem, "build_landscape", return_value=None):
+            data = build_ecosystem.build_data(self.root)
+        self.assertEqual(data["counts"]["stars"], 1)
+        self.assertEqual(data["stars_observed_at"], "2026-09-20T00:00:00Z")
 
     def check_report(self):
         result = self.run_generator("--check")

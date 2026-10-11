@@ -1,0 +1,11 @@
+# Render for review; the CC cues installation after landing.
+[Unit]
+Description=Weekly public-stars snapshot refresh
+
+[Timer]
+OnCalendar=weekly
+Persistent=true
+Unit=native-agent-newstars.service
+
+[Install]
+WantedBy=timers.target

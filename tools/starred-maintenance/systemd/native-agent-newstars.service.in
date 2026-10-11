@@ -1,0 +1,16 @@
+# Render with tools/starred-maintenance/render_units.py before review.
+# The ':' prefix disables environment expansion; quoted argv uses systemd's
+# C escapes and %% for literal percent signs. No shell interprets this command.
+[Unit]
+Description=Refresh public starred repositories and report new disposition work
+
+[Service]
+Type=oneshot
+UMask=0077
+NoNewPrivileges=true
+TimeoutStartSec=600
+# The public-stars builder invokes gh through mise's documented default shims.
+# jdx/mise v2026.10.3 docs/dev-tools/shims.md (33a839a4), `mise activate --shims`.
+Environment=PATH=%h/.local/share/codex-ecosystem/bin:%h/.local/share/mise/shims:%h/.local/bin:/usr/local/bin:/usr/bin:/bin
+Environment=PYTHONDONTWRITEBYTECODE=1
+ExecStart=@EXEC_START@

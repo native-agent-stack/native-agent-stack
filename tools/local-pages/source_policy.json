@@ -2098,6 +2098,10 @@
     },
     {
       "root": "repo",
+      "path": "scripts/public_starred.py"
+    },
+    {
+      "root": "repo",
       "path": "scripts/receipt_staleness.py"
     },
     {
@@ -2119,6 +2123,10 @@
     {
       "root": "repo",
       "path": "scripts/skills_status.py"
+    },
+    {
+      "root": "repo",
+      "path": "scripts/starred_convergence.py"
     },
     {
       "root": "repo",
