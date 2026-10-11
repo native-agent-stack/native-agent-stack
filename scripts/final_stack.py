@@ -67,6 +67,7 @@ SCOPE = (
 OUTPUT = "catalogs/landscape/final-stack.json"
 LANDSCAPE_MANIFEST = "catalogs/landscape/manifest.json"
 PLANNED_LAYERS = "catalogs/landscape/planned-layers.json"
+PLANNED_SOURCE_REVIEW = "docs/decisions/2026-10-11-planned-layers-source-review.json"
 RESEARCH_STATE = saturation_ledger.RESEARCH_STATE
 SKILLS_CATALOG = saturation_ledger.SKILLS_CATALOG
 SKILLS = saturation_ledger.SKILLS
@@ -141,7 +142,8 @@ DEFINITIONS = (
     ("runs",
      "One entry per component a run-pin source pins, keyed by normalized repository (or by id without one). "
      "Precedence: " + RUN_PIN_SOURCES_TEXT + "; the first source is the run pin and every other source whose parsed "
-     "pin differs is listed under conflicts. platforms lists the adoption pin files that install the same pin."),
+     "pin differs is listed under conflicts. Fields absent from that first source are compared between lower "
+     "sources too. platforms lists the adoption pin files that install the same pin."),
     ("winners[].run",
      "The runs[] id whose repository is the winner's (a run without a repository joins only by the same id), or "
      "null with run_reason held (the layer's current_adoption_status is held), external (scripts/final_stack.py "
@@ -241,6 +243,15 @@ def planned_rows(sources: Sources, landscape: dict) -> dict[tuple[str, str], dic
     layers = document.get("layers") if isinstance(document, dict) else None
     if not isinstance(layers, list):
         raise FinalStackError(f"{PLANNED_LAYERS}: layers must be a list")
+    if layers:
+        reference = document.get("source_review")
+        if not isinstance(reference, dict) or reference.get("path") != PLANNED_SOURCE_REVIEW:
+            raise FinalStackError("planned layers need the checked-in source review")
+        review = sources.json(PLANNED_SOURCE_REVIEW)
+        if reference.get("sha256") != sources.hashes[PLANNED_SOURCE_REVIEW]:
+            raise FinalStackError("planned layers source review hash differs")
+        if not isinstance(review, dict) or review.get("layers") != layers:
+            raise FinalStackError("planned layers differ from the checked-in source review")
     rows: dict[tuple[str, str], dict] = {}
     for index, row in enumerate(layers):
         if not isinstance(row, dict) or not isinstance(row.get("catalog"), str) or not isinstance(row.get("layer_id"), str):
@@ -407,6 +418,8 @@ def build_runs(records: list[dict]) -> list[dict]:
         if run_id in ids:
             raise FinalStackError(f"run id {run_id} names two components; give one of them a repository")
         ids.add(run_id)
+        absent_fields = [field for field in ("version", "commit")
+                         if not chosen["parsed"].get("pin_parsed", {}).get(field)]
         platforms = sorted({record["platform"] for record in members if record["platform"] is not None
                             and (record is chosen or record["pin"] == chosen["pin"]
                                  or compare_pins(record["parsed"], chosen["parsed"]) == "same")})
@@ -418,7 +431,11 @@ def build_runs(records: list[dict]) -> list[dict]:
             "source": chosen["source"],
             "platforms": platforms,
             "conflicts": [{"source": record["source"], "pin": record["pin"]} for record in members[1:]
-                          if compare_pins(record["parsed"], chosen["parsed"]) == "differs"],
+                          if compare_pins(record["parsed"], chosen["parsed"]) == "differs"
+                          or any(compare_pins({"pin_parsed": {
+                              field: record["parsed"].get("pin_parsed", {}).get(field)
+                              for field in absent_fields}}, other["parsed"]) == "differs"
+                              for other in members if other is not record)],
         })
     return sorted(runs, key=lambda run: run["id"])
 

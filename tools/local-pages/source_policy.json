@@ -21504,7 +21504,7 @@
     {
       "root": "repo",
       "path": "catalogs/landscape/final-stack.json",
-      "reason": "A derived manifest presented by landscape.html, not an independent landscape source; Architecture dated views would duplicate the source layer records."
+      "reason": "A derived manifest reserved for the planned landscape.html (W4 PR 4); that consumer is not shipped by the W4 PR 2 generator. Architecture dated views would duplicate the source layer records."
     }
   ],
   "architecture_derivation_sources": [

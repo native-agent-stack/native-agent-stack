@@ -212,8 +212,19 @@ def _scan_entries(entries: Iterable[tuple[Path, str]], *, root: Path,
         # the original line and Unicode neighbor boundary without hiding names.
         text = text.translate({0x1E: 0xFFFD, 0x1F: 0xFFFD})
         for original_line, text_line in enumerate(text.split("\n"), 1):
-            for start in range(0, max(1, len(text_line)), step):
-                end = min(start + 4096, len(text_line))
+            # Publication rules admit variable-length email and five native
+            # decode levels. A name-derived overlap cannot bound those tokens.
+            # Keep the entire original line, including both real neighbors.
+            # Betterleaks@81aff7a6 sources/common.go's 25,000-byte lookahead
+            # reaches the next double newline for a <=24,000-byte line plus
+            # sentinels, so neither our records nor native chunks cut it.
+            # Refuse larger UTF-8 lines rather than publish a partial scan.
+            if reject_email and len(text_line.encode("utf-8")) > 24000:
+                raise HostNameScanError("publication line exceeds native framing capacity")
+            width = max(1, len(text_line)) if reject_email else 4096
+            stride = width if reject_email else step
+            for start in range(0, max(1, len(text_line)), stride):
+                end = min(start + width, len(text_line))
                 prefix = "\x1ex" if start else "\x1f"
                 suffix = "x\x1e" if end < len(text_line) else "\x1f"
                 origins[line] = (path, original_line)

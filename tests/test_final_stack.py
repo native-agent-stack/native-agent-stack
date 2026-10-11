@@ -9,6 +9,7 @@ from datetime import date
 import io
 import json
 import base64
+import hashlib
 import shutil
 from pathlib import Path
 import tempfile
@@ -87,7 +88,13 @@ def _fixture(root: Path, *, foundation=(), us_equities=(), planned=(), sweeps=()
         "foundation": "catalogs/landscape/foundation.json", "us-equities": "catalogs/landscape/us-equities.json"}})
     _write_json(landscape / "foundation.json", {"schema_version": 2, "layers": list(foundation)})
     _write_json(landscape / "us-equities.json", {"schema_version": 2, "layers": list(us_equities)})
-    _write_json(landscape / "planned-layers.json", {"schema_version": 1, "layers": list(planned)})
+    planned_document = {"schema_version": 1, "layers": list(planned)}
+    if planned:
+        review_path = "docs/decisions/2026-10-11-planned-layers-source-review.json"
+        _write_json(root / review_path, {"schema_version": 1, "layers": list(planned)})
+        planned_document["source_review"] = {
+            "path": review_path, "sha256": hashlib.sha256((root / review_path).read_bytes()).hexdigest()}
+    _write_json(landscape / "planned-layers.json", planned_document)
     _write_json(landscape / "research-state.json", {"layers": research if research is not None else [
         {"catalog": row["catalog"], "layer_id": row["layer_id"], "status": "comparison_required",
          "next_action": "Compare.", "decision_ref": "catalogs/landscape/foundation.json"} for row in rows]})
@@ -215,6 +222,37 @@ class StatusTests(FixtureTestCase):
         self.assertEqual(layer["source"], "catalogs/landscape/planned-layers.json#/layers/0")
         self.assertEqual(document["summary"]["status"],
                          {"unswept": 1, "no-winner": 0, "reopened": 1, "converged": 0, "current": 0})
+
+    def test_planned_rows_require_the_reviewed_source_and_match_its_bytes(self):
+        for mutation in ("missing_ref", "changed_requirement", "changed_review", "wrong_path"):
+            with self.subTest(mutation=mutation):
+                root = self.root()
+                _fixture(root, planned=[_planned()])
+                path = root / fs.PLANNED_LAYERS
+                document = json.loads(path.read_bytes())
+                if mutation == "missing_ref":
+                    del document["source_review"]
+                elif mutation == "changed_requirement":
+                    document["layers"][0]["requirement"] = "A mistranscribed requirement."
+                elif mutation == "changed_review":
+                    review_path = root / document["source_review"]["path"]
+                    review_path.write_bytes(review_path.read_bytes() + b" ")
+                else:
+                    document["source_review"]["path"] = "auth.json"
+                _write_json(path, document)
+                with self.assertRaisesRegex(fs.FinalStackError, "planned.*source review"):
+                    fs.build_document(root)
+
+    def test_committed_planned_rows_bind_a_checked_in_review_of_the_approved_plan(self):
+        source = json.loads((REPO_ROOT / fs.PLANNED_LAYERS).read_bytes())
+        self.assertIn("source_review", source)
+        reference = source["source_review"]
+        raw = (REPO_ROOT / reference["path"]).read_bytes()
+        self.assertEqual(reference["sha256"], hashlib.sha256(raw).hexdigest())
+        review = json.loads(raw)
+        self.assertEqual(source["layers"], review["layers"])
+        self.assertEqual(review["source"]["sha256"],
+                         "fb4a95b19a00335c5831bce913cbf177f90d5bd2c17819013b6021d2dc585e5c")
 
     def test_a_completed_sweep_covering_a_planned_layer_is_no_winner(self):
         document = self.build(planned=[_planned()],
@@ -353,6 +391,20 @@ class PinTests(unittest.TestCase):
 
 
 class RunTests(FixtureTestCase):
+    def test_equal_version_only_lock_keeps_conflicting_lower_commit_sources_visible(self):
+        for lower_commit, expected in ((COMMIT_A, []), (COMMIT_B, [
+                {"source": "manifests/stack.json#/components/0", "pin": "1.0.0"},
+                {"source": fs.RUNTIME_TARGET + "#" + fs.RUNTIME_ENGINE_POINTER, "pin": "1.0.0"}])):
+            with self.subTest(lower_commit=lower_commit):
+                document = self.build(lock={"widget": "1.0.0"},
+                    stack=[{"id": "widget", "repository": "https://github.com/example/widget",
+                            "version": "1.0.0", "source_pin": COMMIT_A}],
+                    engine={"repository": "https://github.com/example/widget", "requested_version": "1.0.0",
+                            "source_commit": lower_commit})
+                run = fs.run_pin(document, "widget")
+                self.assertEqual(run["pin_parsed"], {"version": "1.0.0", "commit": None})
+                self.assertEqual(run["conflicts"], expected)
+
     def test_unreported_intake_names_future_paths_without_reading_them(self):
         document = self.build(foundation=[_layer("seeded")])
         self.assertEqual(document["intake"]["seeds"], {
@@ -576,7 +628,8 @@ class CheckTests(FixtureTestCase):
         self.assertIn("personal home path", str(raised.exception))
         self.assertFalse((root / fs.OUTPUT).exists())
 
-    def _assert_private_text_is_refused_before_publication(self, payload, private_name="fixture-private-account"):
+    def _assert_private_text_is_refused_before_publication(self, payload, private_name="fixture-private-account",
+                                                         spy_publication=True):
         root = self.fixture_root()
         self.assertEqual(self.run_main(root, "--write")[0], 0)
         output_before = (root / fs.OUTPUT).read_bytes()
@@ -585,13 +638,17 @@ class CheckTests(FixtureTestCase):
         source = json.loads(catalog.read_text(encoding="utf-8"))
         source["layers"][0]["title"] = "Private note: " + payload
         _write_json(catalog, source)
-        # These are publication I/O spies; no private output is persisted even
-        # when running the pre-fix generator as a failing-first control.
-        with mock.patch.object(Path, "write_text") as write, mock.patch.object(hr, "register_file") as register:
+        # Existing controls spy on publication I/O. Crossing regressions run
+        # the complete native writer on disposable, synthetic-only fixtures.
+        with contextlib.ExitStack() as stack:
+            if spy_publication:
+                write = stack.enter_context(mock.patch.object(Path, "write_text"))
+                register = stack.enter_context(mock.patch.object(hr, "register_file"))
             with self.assertRaises(SystemExit) as refused:
                 self.run_main(root, "--write", native_scan=True, private_names=(private_name,))
-            write.assert_not_called()
-            register.assert_not_called()
+            if spy_publication:
+                write.assert_not_called()
+                register.assert_not_called()
         self.assertNotIn(payload, str(refused.exception))
         self.assertEqual((root / fs.OUTPUT).read_bytes(), output_before)
         self.assertEqual((root / "manifests/evidence.json").read_bytes(), registry_before)
@@ -611,6 +668,28 @@ class CheckTests(FixtureTestCase):
         for form, payload in plants.items():
             with self.subTest(form=form):
                 self._assert_private_text_is_refused_before_publication(payload)
+
+    @unittest.skipUnless(shutil.which("betterleaks"), "native boundary plants require Betterleaks 1.9.0")
+    def test_long_encoded_email_crossing_the_old_frame_is_refused(self):
+        email = "a" * 64 + "@" + "b" * 63 + ".example.invalid"
+        plants = ["".join("%" + format(byte, "02X") for byte in email.encode()),
+                  "".join(r"\u" + format(ord(char), "04x") for char in email),
+                  base64.b64encode(email.encode()).decode()]
+        for encoded in plants:
+            with self.subTest(encoded_bytes=len(encoded)):
+                self._assert_private_text_is_refused_before_publication(" " * 3900 + encoded,
+                                                                        spy_publication=False)
+
+    @unittest.skipUnless(shutil.which("betterleaks"), "native boundary plants require Betterleaks 1.9.0")
+    def test_nested_encoded_account_crossing_the_old_frame_is_refused(self):
+        encoded = "fixture-private-account"
+        for _ in range(2):
+            encoded = "".join("%" + format(byte, "02X") for byte in encoded.encode())
+        self._assert_private_text_is_refused_before_publication(" " * 3900 + encoded, spy_publication=False)
+
+    @unittest.skipUnless(shutil.which("betterleaks"), "native publication bounds require Betterleaks 1.9.0")
+    def test_oversized_publication_line_refuses_before_write_or_registration(self):
+        self._assert_private_text_is_refused_before_publication(" " * 24001, spy_publication=False)
 
     @unittest.skipUnless(shutil.which("betterleaks"), "native write privacy plant requires Betterleaks 1.9.0")
     def test_explicit_private_account_is_refused_before_write_or_registration(self):

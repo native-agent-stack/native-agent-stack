@@ -261,3 +261,80 @@ approved plan/design. The original plan was located through its maintained page
 generator's PLAN declaration; its design table confirms the two planned layers.
 The source manifest records every original byte count/hash. These captures
 close missing-source packet gaps, not historical model execution gaps.
+
+## Framing micro and Codex threads at 7ceedc64
+
+The relaunched correction closes Astra's one privacy P2 and the four Codex
+threads on `7ceedc64f38a0aa1fb4c48c6fb00ed62799d7141`. Search-first quick mode
+selected the installed Betterleaks 1.9.0 native command and the reviewed
+first-party adapters. The maintained upstream release API still identifies
+`v1.9.0` as latest, and its tag resolves to
+`81aff7a638638aae3a659845d089043e1d8fe9ac`; the native binary reports 1.9.0.
+No scanner, decoder, page renderer, package or test runner is reimplemented.
+
+Primary sources, retained unmodified in the review capture packet:
+
+- [Native file reader](https://github.com/betterleaks/betterleaks/blob/81aff7a638638aae3a659845d089043e1d8fe9ac/sources/file.go)
+  and [safe-boundary helper](https://github.com/betterleaks/betterleaks/blob/81aff7a638638aae3a659845d089043e1d8fe9ac/sources/common.go):
+  100,000-byte reads, followed by at most 25,000 bytes to a double newline.
+- [Native stdin route](https://github.com/betterleaks/betterleaks/blob/81aff7a638638aae3a659845d089043e1d8fe9ac/sources/stdin.go),
+  [decoder](https://github.com/betterleaks/betterleaks/blob/81aff7a638638aae3a659845d089043e1d8fe9ac/detect/codec/decoder.go)
+  and [encoding recognition](https://github.com/betterleaks/betterleaks/blob/81aff7a638638aae3a659845d089043e1d8fe9ac/detect/codec/encodings.go):
+  the supported scanner owns recognition and nested decoding.
+- [Reviewed first-party joins and loader](https://github.com/seathatflowsinourveins/native-agent-stack/blob/7ceedc64f38a0aa1fb4c48c6fb00ed62799d7141/scripts/final_stack.py)
+  and [pin comparator](https://github.com/seathatflowsinourveins/native-agent-stack/blob/7ceedc64f38a0aa1fb4c48c6fb00ed62799d7141/scripts/host_receipts.py):
+  reuse the native safe-file/hash loader and three-valued pin comparison.
+- The approved plan's retained original is 55,018 bytes, SHA256
+  `fb4a95b19a00335c5831bce913cbf177f90d5bd2c17819013b6021d2dc585e5c`.
+  Its Design: ten layers table, lines 386-387, independently supports the
+  two projected requirements. The checked-in
+  [source-review supplement](2026-10-11-planned-layers-source-review.json)
+  preserves the reviewed projection, source identity, original hash and row
+  locators. It records no new trading selection or measured strategy result.
+
+| Finding | Failing-before observation | Corrected behavior |
+| --- | --- | --- |
+| Astra framing P2 / Codex 4241125956 | Complete synthetic writer controls with 3,900-space prefix: long fully percent-encoded email and twice-percent-encoded account both fail with `SystemExit not raised` at the exact reviewed scanner; the oversized-line control fails too. The actual native writer and registration run on temporary fixtures without publication spies. | Whole original serialized lines are kept intact; a line over 24,000 UTF-8 bytes refuses. Native depth-5 decoding and the original boundary filters decide matches. Refusal preserves both existing output and registry bytes. |
+| Codex 4241125957, planned-source binding | Two tests / five failing subcases: the committed binding was absent; missing reference, changed requirement, changed review bytes and an authentication-path reference all went unchecked. | Nonempty planned rows require the fixed checked-in review path, exact source SHA256 and equal reviewed rows. The new source is recorded in generated `sources`; the private plan path is never read by the generator. |
+| Codex 4241125963, lower commit conflict | One test fails: equal lock/stack/runtime versions with different lower commits returned an empty conflict list. The equal-commit control passes. | Existing precedence is preserved. Fields absent from the chosen pin are compared between lower sources through the unchanged native comparator; both disagreeing sources remain visible. A first broad pairwise attempt also flagged an agreeing stack in a macOS version-drift fixture; the retained failed condition led to narrowing comparisons to absent fields. All 14 run tests then pass. |
+| Codex 4241125959, Landscape consumer | The CC's author/plan-owner P3-10 ruling explicitly assigns the consumer to W4 PR 4 and forbids duplicate Architecture dated views. This is the staged generator contract, not evidence that the future page already exists. | Keep the authorized exclusion and planned-layer grant. Correct its reason to say the page is planned and is not shipped by W4 PR 2; no new page or consumer acceptance is claimed. |
+
+The original six-control red run reports six failures and zero errors; a
+follow-up using the exact unmodified reviewed scanner with the three complete
+writer controls reports three failures and zero errors. The initial combined
+focused check exceeded its 10-second tool timeout and is not acceptance.
+After the bounded fix and the two Codex corrections, both full modules return
+rc 0: 104 tests in 16.344s, zero skips. Earlier current-manifest assertions
+correctly failed until the supported `final_stack.py --write` refreshed the
+new plan binding and definition. The native refresh changes only `sources`
+and `definitions`; layers, runs, summary and indexes are byte-equivalent as
+parsed data to the reviewed manifest.
+
+Unchanged upstream harness: `GOMAXPROCS=2 mise exec go@1.25.12 -- go test
+./sources ./detect/codec` at the exact Betterleaks tag returns rc 0, both
+packages pass (0.532s and 0.006s). The first bare `go test` attempt refused
+because the mise shim had no selected Go version; it is not a test pass.
+The supported per-command mise selection resolved that condition without
+changing client configuration. These upstream tests are distinct from the
+repository's synthetic integration controls.
+
+One step wider: all callers of `_scan_entries` and `scan_paths` were checked
+through the indexed graph, coverage check and exact call sites. Only final-stack
+publication opts into email mode. General validation and author/history scans
+retain their prior contracts. The publication controls span offsets 0, 3,900,
+3,980, 4,090, 4,110 and 8,000; long percent/Unicode/base64 email, one through five
+percent decode levels, decoded alphanumeric neighbors, native chunk crossings,
+exact UTF-8 line limits, scanner/context errors and unchanged-output refusal.
+The new source loader checks containment through the native loader and refuses
+the wrong path before opening it. Equal/differing lower commits and existing
+platform/version precedence have separate controls.
+
+Completeness critic: single-encoded literals cannot bound every depth-5 token;
+publication therefore bounds the entire serialized line and refuses oversized
+inputs rather than estimating token length. Literal string newlines are JSON
+escapes; this is a bounded serialized-publication contract, not a new guarantee
+for every multiline encoding in general repository/history scans. The original
+plan is retained for independent review while only its sanitized source-review
+projection is checked in. The future page remains separate W4 work. Expanded
+gates, registered evidence and exact-head publication are recorded in the final
+handoff; no model run or hosted-green result is inferred from these local checks.

@@ -1,6 +1,10 @@
 {
   "schema_version": 1,
   "checked_at": "2026-10-11",
+  "source_review": {
+    "path": "docs/decisions/2026-10-11-planned-layers-source-review.json",
+    "sha256": "bbeafbef0f05c0b7595ebed36309d634076372f41c308a37cbb6840e2222b1bb"
+  },
   "scope": "Layers that an approved plan names but that have no row in the landscape catalogs named by catalogs/landscape/manifest.json yet. scripts/final_stack.py lists each one with status unswept until a sweep covers it and a verdict wave records its row; a planned layer that collides with a landscape row fails that generator's check. Nothing here selects a winner.",
   "layers": [
     {

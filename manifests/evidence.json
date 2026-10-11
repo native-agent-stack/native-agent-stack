@@ -17167,8 +17167,8 @@
     },
     {
       "path": "catalogs/landscape/final-stack.json",
-      "sha256": "ef551e1690b27af678eade3328c59c97b0f16d76e871b34652dba07b4db9f498",
-      "bytes": 300361
+      "sha256": "bf5815616f933c4898cc27b728aa751e4cef7dcb92d072a57d53767eb916d567",
+      "bytes": 300573
     },
     {
       "path": "catalogs/landscape/foundation.json",
@@ -17257,8 +17257,8 @@
     },
     {
       "path": "catalogs/landscape/planned-layers.json",
-      "sha256": "b970336c3345c5fd4cc2a78717c75f6c66898409dd7efbeada6f030f307463f4",
-      "bytes": 2183
+      "sha256": "b24e06efe5a029e4187af803701a56bdd74319e6b2d8fd82daa243b33294fb5d",
+      "bytes": 2365
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -18642,8 +18642,8 @@
     },
     {
       "path": "docs/decisions/2026-10-09-host-name-scan.md",
-      "sha256": "35da3d0ed9e661ac1834589d5438ab6a8e29ffdf4f5ac29da8a22393b7cfa751",
-      "bytes": 15360
+      "sha256": "72b922c0b0f7fe0f19a49aba6e10a3ce28c910049f4395118d2293c937840050",
+      "bytes": 16670
     },
     {
       "path": "docs/decisions/2026-10-09-mcp-surfaces-trials.md",
@@ -18722,13 +18722,18 @@
     },
     {
       "path": "docs/decisions/2026-10-11-final-stack-review-corrections.md",
-      "sha256": "a8d2a1cd9d99f975e17fa6fb7242458f204ce41a8a22021d478c7080bfbea43d",
-      "bytes": 20832
+      "sha256": "f4ca8124ee2eae1f57a769f394c26383649ad8fba120d2a6423b03c01cf228fc",
+      "bytes": 27981
     },
     {
       "path": "docs/decisions/2026-10-11-layer-resolution-protocol.md",
       "sha256": "a3bab6504f8c3a1ec800998b81f562496e85a1b5d1ca0de070a51352c06936b7",
       "bytes": 9899
+    },
+    {
+      "path": "docs/decisions/2026-10-11-planned-layers-source-review.json",
+      "sha256": "bbeafbef0f05c0b7595ebed36309d634076372f41c308a37cbb6840e2222b1bb",
+      "bytes": 2668
     },
     {
       "path": "docs/direct-results.md",
@@ -18882,8 +18887,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "561a140cdb9d58caf9b76f21a7caf016c0e94eb1f9763e5c33108b0d2ee51a1c",
-      "bytes": 260516
+      "sha256": "acb64935e00c2254d74c9a1c926a063f7953079a9eac56b85d23a075813f9a19",
+      "bytes": 261440
     },
     {
       "path": "docs/harness-rule-enforcement.md",
@@ -60687,8 +60692,8 @@
     },
     {
       "path": "scripts/final_stack.py",
-      "sha256": "190c1435d883571a435f3cff208d0b31636c5ac911631e36c603624da4b437a2",
-      "bytes": 54815
+      "sha256": "2bcd18da7f9fb8d9bcea5628584ae13a950df59909fab977c566c7d28219df6e",
+      "bytes": 56072
     },
     {
       "path": "scripts/freshness_propose.py",
@@ -60722,8 +60727,8 @@
     },
     {
       "path": "scripts/host_name_scan.py",
-      "sha256": "083b1fe7bb64d8942796c80a2ceed435fb023e7bcfda281d8066bbd01a3043f4",
-      "bytes": 19457
+      "sha256": "a460890a2883c0cb53c41e6bd564d0d010b595a041cec47a99d7bbfa5d280c0f",
+      "bytes": 20280
     },
     {
       "path": "scripts/host_receipts.py",
@@ -61577,8 +61582,8 @@
     },
     {
       "path": "tests/test_final_stack.py",
-      "sha256": "cd53351e2437450dd12fc8f3bc234a49445f3142f4e18b12ecc057710db011ba",
-      "bytes": 49954
+      "sha256": "5cd8382257e2abc5116e64f02019e7d8a2d413ebfc8968aa7bbeaa1bf4b7a69b",
+      "bytes": 54867
     },
     {
       "path": "tests/test_financial_data.py",
@@ -61712,8 +61717,8 @@
     },
     {
       "path": "tests/test_host_name_scan.py",
-      "sha256": "15cf7bad15600b4efc5378c6bc07c6ece7116b42b9a75c0339062cd7f83c2d46",
-      "bytes": 23277
+      "sha256": "f0aab08b9c0f78d83db40b84378a4af6da402ee0d64f6d011b25df06337e9124",
+      "bytes": 25801
     },
     {
       "path": "tests/test_host_receipts.py",
@@ -62787,8 +62792,8 @@
     },
     {
       "path": "tools/local-pages/source_policy.json",
-      "sha256": "eaca18ba6743356ddfef880d839ce51c883a3434bb4147a22062e7f9b7f4398c",
-      "bytes": 759323
+      "sha256": "9b1f0dce48050556a8340393243a1101d4d3d3e1cb6f5cde3b6498db326b3909",
+      "bytes": 759363
     },
     {
       "path": "tools/omniroute/gateway_record.py",

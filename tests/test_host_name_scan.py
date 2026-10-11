@@ -205,6 +205,47 @@ class HostNameSourceTests(unittest.TestCase):
 
 @unittest.skipUnless(shutil.which("betterleaks"), "native Betterleaks unavailable")
 class NativeHostNameScanTests(unittest.TestCase):
+    def test_complete_publication_lines_keep_encoded_tokens_at_every_old_cut(self):
+        name = "fixture-private-account"
+        email = "a" * 64 + "@" + "b" * 63 + ".example.invalid"
+        import base64
+        plants = ["".join("%" + format(byte, "02X") for byte in email.encode()),
+                  "".join(r"\u" + format(ord(char), "04x") for char in email),
+                  base64.b64encode(email.encode()).decode()]
+        encoded = name
+        for _ in range(5):
+            encoded = "".join("%" + format(byte, "02X") for byte in encoded.encode())
+            plants.append(encoded)
+        lines = [" " * offset + plant for plant in plants
+                 for offset in (0, 3900, 3980, 4090, 4110, 8000)]
+        self.target.write_text("\n".join(lines), encoding="utf-8")
+        self.assertEqual(host_name_scan.scan_paths([self.target], root=self.root, names=(name,),
+                                                  reject_email=True),
+                         [(self.target, line) for line in range(1, len(lines) + 1)])
+
+    def test_complete_publication_lines_keep_decoded_alphanumeric_neighbors(self):
+        name = "fixture-private-account"
+        plants = []
+        for neighbor in ("A", "7"):
+            for text in (neighbor + name, name + neighbor):
+                for _ in range(5):
+                    text = "".join("%" + format(byte, "02X") for byte in text.encode())
+                    plants.append(text)
+        lines = [" " * offset + plant for plant in plants for offset in (0, 3900, 8000)]
+        self.target.write_text("\n".join(lines), encoding="utf-8")
+        self.assertEqual(host_name_scan.scan_paths([self.target], root=self.root, names=(name,),
+                                                  reject_email=True), [])
+
+    def test_publication_record_bound_counts_utf8_bytes_and_refuses_without_values(self):
+        for content in (" " * 24001, "中" * 8001):
+            with self.subTest(bytes=len(content.encode())):
+                self.target.write_text(content, encoding="utf-8")
+                with self.assertRaises(host_name_scan.HostNameScanError) as caught:
+                    host_name_scan.scan_paths([self.target], root=self.root, reject_email=True)
+                self.assertEqual(str(caught.exception), "publication line exceeds native framing capacity")
+        self.target.write_text("中" * 8000 + "\n" + " " * 24000, encoding="utf-8")
+        self.assertEqual(host_name_scan.scan_paths([self.target], root=self.root, reject_email=True), [])
+
     def test_email_policy_uses_native_decoding_without_an_account_match(self):
         import base64
         email = "unlisted-contact@example.invalid"
