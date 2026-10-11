@@ -18736,6 +18736,11 @@
       "bytes": 2668
     },
     {
+      "path": "docs/decisions/2026-10-11-research-convergence-practice.md",
+      "sha256": "e9ccec51b50b2df3dcb9d74f8accd7f8c5176782b45bc1b075979c28b9778340",
+      "bytes": 14445
+    },
+    {
       "path": "docs/direct-results.md",
       "sha256": "12a511fee11f22c90b9b622701d5485be9c8247167102b5768d694244f939a5b",
       "bytes": 4022
@@ -43317,8 +43322,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/research-harnesses-skill.md",
-      "sha256": "c1687bd15def737c16898d43b6429d413c051f94e0d0964021f3e6af709f0cb8",
-      "bytes": 2275
+      "sha256": "c8ff7619888b18808d3a23b5dfb757127fca25eb82b80460028a72fc6106d2b9",
+      "bytes": 3432
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/rtk-config.toml",

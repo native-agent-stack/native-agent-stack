@@ -5,6 +5,23 @@ description: Use for current public facts, source-backed technical research, and
 
 For authorized public research, run the installed GPT Researcher route:
 
+For ecosystem discovery, upstream comparison or layer convergence, first read
+`docs/decisions/2026-10-11-research-convergence-practice.md` in the owned source
+checkout and the layer's recorded verdict and latest retained sweep, including
+pending observations. Research the unresolved delta; a CLOSED practice reopens
+on a new practice-tool release or a measured practice failure. If the source
+checkout or those inputs are unavailable, obtain their pointers from the research
+owner before dispatch. Ordinary public-fact questions use the routes below.
+
+Gathering ends with sources and retained usage/failures. Candidate decisions then
+use the existing blind layer-verdict lane; a gatherer's answer is an input to that
+lane. FINAL requires verdict, run pin, upstream E2E and measured invoke evidence
+or a recorded non-invocation reason. Unsettled layers carry one dated,
+preregistered comparison and fixed rule as SCHEDULED; RETIRED carries a reason.
+Keep PR review findings within the recorded candidate and the full current-head
+Claude/GPT/Codex wave; route other findings to one-line Follow-ups and their
+research owner under the decision's rules 1–9.
+
 ```bash
 bash "${XDG_CONFIG_HOME:-$HOME/.config}/new-wsl-native-stack/gpt-researcher.sh" "short current-month query"
 ```
