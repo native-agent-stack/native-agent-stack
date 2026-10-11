@@ -5146,8 +5146,8 @@
     },
     {
       "path": ".github/workflows/pr-metadata.yml",
-      "sha256": "8376f5e73f4e4b6d1b2218ab4298f620ceb2717eaf6727894c7fe198da7a7a59",
-      "bytes": 11723
+      "sha256": "8cb9e4af95fafb6dd7b80fc23a1fa619112017216a874a8e1ff24689d43ce2c5",
+      "bytes": 16740
     },
     {
       "path": ".github/workflows/practice-references-freshness.yml",
@@ -5186,8 +5186,8 @@
     },
     {
       "path": ".github/workflows/sota-sources-gate.yml",
-      "sha256": "7eacfda5dcd1f52b34450a796dc1dc67edede6dbe35aaedda621bd6cbe730519",
-      "bytes": 4816
+      "sha256": "6bbf6d58043602eba361f0f3fe560806e1840088d1eca8b988c33068a826a6cb",
+      "bytes": 9833
     },
     {
       "path": ".github/workflows/supply-chain.yml",
@@ -18007,8 +18007,8 @@
     },
     {
       "path": "docs/decisions/2026-09-25-top-rule-sota-sources.md",
-      "sha256": "be374d00857c3cea4bb3e456aee9be0a6aaaed7219a317d4db10c17f5b950485",
-      "bytes": 6873
+      "sha256": "d2e6419916e578088f442ffba9c855601cea48744d51c686081fb36a735237c8",
+      "bytes": 12149
     },
     {
       "path": "docs/decisions/2026-09-25-workstation-sota-refresh.md",
@@ -62657,8 +62657,8 @@
     },
     {
       "path": "tests/test_sota_sources_gate.py",
-      "sha256": "f8c4ebad2b0204150bc66b81c4b09933b3249ebde6b02a1cbd641c339e472fb9",
-      "bytes": 20557
+      "sha256": "3b074e860904f037a21ca87fc4d02df76defe5101a581132baddd93e15918893",
+      "bytes": 32747
     },
     {
       "path": "tests/test_spy_parity.py",

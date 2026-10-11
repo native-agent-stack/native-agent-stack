@@ -75,6 +75,69 @@ as before (<https://docs.github.com/en/rest/pulls/pulls#get-a-pull-request>, `bo
 
 Callers of the reusable gate get the scan when they bump their pin.
 
+### After the first review (2026-10-11)
+
+The co-op's GPT read at `07595323` found three gaps, now closed in both copies of the job:
+
+- **The body is judged before it is read.** A description that is not text, is longer than 65,536 characters, holds a
+  lone surrogate, or holds a control character other than tab, LF or CR fails with one fixed rule id (`body-type`,
+  `body-size`, `body-encoding`, `body-control`), and nothing else is reported. GitHub's REST docs state no length
+  limit for `body`. The 65,536 figure is the API's own refusal text, "body is too long (maximum is 65536 characters)",
+  as quoted in <https://github.com/w3c/webref/pull/245> (read 2026-10-11T04:51Z; page sha256
+  `6d7e066850b61ad0b9d674ad939fa84c557c2afd3113349fbf4fd26452504470`). It is a reported vendor message, not a
+  documented limit, and no body that long was sent to GitHub. `String.prototype.isWellFormed` reports lone surrogates
+  (MDN, read 04:51Z, sha256 `cd0a2f9794cc85917bcb6aaa48c28c21bfd42810f5f9cf0398a31c6e26f3b8cd`).
+- **Escaped and rendered forms are judged too.** The rules run over the body as written and over four forms, each
+  decoded once from it, never to a fixed point. They are percent escapes, JSON `\uXXXX` and `\/` escapes, HTML
+  numeric references and a short list of named ones, and Markdown's rendered text. The rendered form keeps link and
+  image text and autolinks, resolves backslash escapes, and drops backticks, the inline HTML elements GitHub renders
+  (any other `<word>` stays, so a `<name>` placeholder is not read as a tag) and emphasis markers in pairs around a
+  word with no separator inside (so a glob such as `Users/*/` keeps its star). Link destinations stay in the body
+  itself.
+  `<user>`, `example` and `~/` still pass in every form. `scripts/validate.py`'s publication scan does not decode;
+  the gate's pre-pass adds to it. A carried email rule would run over the same forms.
+- **A macOS home in any case.** The gate-only `macos-user-path` rule catches `/users/<name>` in any case except the
+  exact `/Users/` that `personal-home-path` already reports, when nothing precedes the slash but a non-word
+  character. `validate.py` keeps the exact `/Users/`. Over this branch's tracked tree at `07595323` the anchored
+  case-insensitive form matched 11 times in 5 files: API routes in trial logs and evidence, and a test fixture. The
+  unanchored form matched 889 times in 24 files.
+- **Python's classes, spelled out.** `validate.py`'s patterns are str patterns, so `\w` is a Unicode letter or
+  number or `_`, `\s` is `str.isspace()`, `$` also matches before a final newline, and `re.IGNORECASE` lets
+  `[A-Za-z]` match U+0130, U+0131, U+017F and U+212A (Python 3.13 `re` docs, read 04:51Z, sha256
+  `19195ec76056c9b8088394ba81014ff47e1d4040a8eae092e450412f75f5c378`). JavaScript's `\b` counts only ASCII word
+  characters unless the `i` and `u` flags are both set, and then also what case folding maps onto them (MDN, word
+  boundary assertion, read 04:51Z, sha256 `cf1a8e2090e46141531ff492f0e3e49dfbd2811aa530229d821cbfc2cc253878`). The
+  gate's rules therefore use the `u` flag and explicit classes (`\p{L}\p{Nd}\p{Nl}\p{No}_`, which on Python
+  3.13.16 is exactly the set `\w` matches), lookaround boundaries and spelled-out letter cases. No rule takes the
+  `i` flag: under `u`, case folding puts U+0345 in `\p{L}`, and Python's `\w` excludes it.
+
+A new test compares every rule with its Python original over 156,277 code points: all Python 3.13.16 assigns,
+except surrogates and the supplementary private-use planes. Node 24.21 carries Unicode 17.0 and Python Unicode
+15.1, so code points new since 15.1 are left out. Each code point goes into 69 templates where a class, boundary
+or folded letter decides the verdict, 10,783,113 comparisons with no difference. Further tests:
+
+- the read's probe cases: the escaped and rendered forms, the mixed-case macOS home, the Unicode pair, and the
+  oversized and NUL bodies;
+- every credential rule one below, at and one above its minimum length, alone and glued to Unicode word characters;
+- the body guards at the limit, one over and far over it, on each control and encoding case and on four non-text
+  bodies;
+- every rule carries the `u` flag.
+
+The new tests fail on the job at `07595323` (121 failures, 2 errors). Twenty-two weakened copies of the new script
+were run:
+
+- 21 fail the tests: each removed form or guard, a larger budget, the inline-tag list widened to every tag or removed,
+  emphasis removed unpaired or not at all, JavaScript's `\b`, `\w` or `\s`, `[A-Za-z]` without U+0130 and U+0131,
+  `s` without U+017F, the `i` flag restored, and the macOS rule removed.
+- An earlier form of link destinations alone survived because it is redundant (a destination is part of the body),
+  and it was removed.
+- `$` for the faithful end-of-input lookahead survives and is equivalent: in both places the class beside it already
+  holds `\n`.
+
+The new gate was also run over the live description of every open pull request at 2026-10-11T05:00Z (89), with only
+rule ids printed. Every one gets the same outcome as on `07595323`: 88 pass and one lacks its SOTA sources section.
+Before the rendered form was narrowed, one description failed through a `<name>` placeholder read as a tag.
+
 ## Alternatives considered
 
 - **A checklist item in the PR template only.** Rejected: nothing fails, and the rule was already implied by the core

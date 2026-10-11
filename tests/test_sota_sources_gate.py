@@ -244,7 +244,34 @@ PRIVACY_CASES = [
     ("a tilde path passes", "Logs are in ~/" + ".local/state/x.log." + SOURCES, []),
     ("a masked home passes", "Logs are in " + HOME + "<user>/state/x.log." + SOURCES, []),
     ("the documented example home passes", "e.g. " + HOME + "example/x." + SOURCES, []),
+    # The co-op's GPT read of 07595323 (P2-1): escaped and rendered forms are judged as they read.
+    ("a percent-encoded home path", "%2F" + "home%2Falice%2Fx" + SOURCES, ["personal-home-path"]),
+    ("a JSON-escaped slash", HOME.replace("/", "\\/") + "alice\\/x" + SOURCES, ["personal-home-path"]),
+    ("a JSON unicode escape", "\\u002f" + "home\\u002falice\\u002fx" + SOURCES, ["personal-home-path"]),
+    ("HTML character references", "&#47;" + "home&#x2F;alice&sol;x" + SOURCES, ["personal-home-path"]),
+    ("a name split by a Markdown link", HOME + "[al](https://example.org)ice/x" + SOURCES, ["personal-home-path"]),
+    ("a name split by emphasis", HOME + "**alice**/x" + SOURCES, ["personal-home-path"]),
+    ("a home path as a link destination", "[logs](file://" + HOME + "alice/x)" + SOURCES, ["personal-home-path"]),
+    ("a mixed-case macOS home", "See /" + "uSeRs/alice/x" + SOURCES, ["macos-user-path"]),
+    ("a lower-case macOS home", "See /" + "users/alice/x" + SOURCES, ["macos-user-path"]),
+    ("an API route passes", "GET https://api.github.com/" + "users/alice" + SOURCES, []),
+    ("an encoded masked home passes", "%2F" + "home%2F%3Cuser%3E%2Fx" + SOURCES, []),
+    ("an escaped example home passes", "&#47;" + "home&#47;example&#47;x" + SOURCES, []),
+    ("a rendered masked home passes", HOME + "**<user>**/x" + SOURCES, []),
+    ("a glob home passes", "Under /mnt/c/" + "Users/*/AppData and C:\\" + "Users\\*\\x" + SOURCES, []),
+    ("a glob under a home passes", HOME + "*/" + ".config" + SOURCES, []),
+    ("an underscored name", HOME + "_alice_/x" + SOURCES, ["personal-home-path"]),
+    ("a placeholder in angle brackets passes", "C:\\" + "Users\\<name>\\AppData and /mnt/c/" + "Users/<name>/x" + SOURCES, []),
+    ("a path split by an inline tag", "/" + "home<b></b>/alice/x" + SOURCES, ["personal-home-path"]),
+    # (P2-2) Python's Unicode \w, not JavaScript's: an accented name is a word, and so is an accent before a token.
+    ("an accented encoded name", "home-" + chr(0xE9) + "-code-x" + SOURCES, ["encoded-home-path"]),
+    ("an accent glued to a token passes", chr(0xE9) + "hf_" + "a" * 20 + SOURCES, []),
 ]
+
+# Cases the gate judges beyond validate.py's patterns: decoded or rendered forms, and the gate-only macOS rule.
+GATE_ONLY_CASES = {"a percent-encoded home path", "a JSON-escaped slash", "a JSON unicode escape",
+                   "HTML character references", "a name split by a Markdown link", "a name split by emphasis", "a path split by an inline tag",
+                   "a mixed-case macOS home", "a lower-case macOS home"}
 
 
 @unittest.skipUnless(NODE, "node unavailable; CI's runner images carry it")
@@ -269,6 +296,57 @@ class GatePrivacyTests(unittest.TestCase):
         self.assertIn('non-empty "SOTA sources" section', outcome["failed"])
         self.assertIn("(rules: personal-home-path)", outcome["failed"])
 
+    def test_the_body_is_refused_before_it_is_read(self):
+        # (P2-3) A non-text, oversized, malformed or control-character body fails with a fixed id, in both copies;
+        # 65,536 characters is the API's own limit ("Body is too long (maximum is 65536 characters)").
+        at_limit = "x" * (65536 - len(SOURCES)) + SOURCES
+        cases = [
+            ("at the limit", body(at_limit), None),
+            ("one over the limit", body(at_limit + "x"), "body-size"),
+            ("far over the limit", body("a" * 1_000_000 + SOURCES), "body-size"),
+            ("a NUL", body("abc\x00def" + SOURCES), "body-control"),
+            ("an escape character", body("\x1b[31m" + SOURCES), "body-control"),
+            ("a C1 control", body("\x85" + SOURCES), "body-control"),
+            ("a lone surrogate", body("\ud800" + SOURCES), "body-encoding"),
+            ("an object", body({}), "body-type"),
+            ("a list", body([]), "body-type"),
+            ("a number", body(12), "body-type"),
+            ("a boolean", body(True), "body-type"),
+            ("tabs and CRLF pass", body("a\tb\r\n" + SOURCES), None),
+        ]
+        payloads = [payload for _, payload, _ in cases]
+        outcomes = {path.name: run_check(inline_script(sota_job(path)), payloads) for path in (VALIDATE, GATE)}
+        self.assertEqual(outcomes["pr-metadata.yml"], outcomes["sota-sources-gate.yml"])
+        for (case, _, refused), outcome in zip(cases, outcomes["sota-sources-gate.yml"]):
+            with self.subTest(case=case):
+                if refused is None:
+                    self.assertIsNone(outcome["failed"], outcome)
+                else:
+                    self.assertEqual(outcome["failed"], f"The PR description cannot be checked (rule: {refused}): it "
+                                     "must be text of at most 65536 characters, with no control characters other "
+                                     "than tabs and line breaks.")
+
+    def test_credential_lengths_agree_with_scripts_validate_at_each_minimum(self):
+        # (P2-2) one below, at and one above each rule's minimum length, alone and glued to Unicode word characters.
+        sys.path.insert(0, str(ROOT / "scripts"))
+        import validate
+        patterns = dict(validate.PRIVATE_CONTENT)
+        grid = [("hugging-face-token", "Hugging Face token", ["hf_"], 20),
+                ("github-token", "GitHub token", ["gh" + c + "_" for c in "pousr"] + ["github_pat_"], 30),
+                ("tavily-token", "Tavily token", ["tvly-", "tvly-prod-", "tvly-dev-"], 24),
+                ("api-secret", "API secret", ["sk-", "sk-proj-", "sk-ant-"], 24),
+                ("bearer-credential", "bearer credential", ["Bearer ", "bearer\u3000"], 30)]
+        cases = []
+        for rule, name, prefixes, minimum in grid:
+            for prefix in prefixes:
+                for length in (minimum - 1, minimum, minimum + 1):
+                    for before, after in (("", ""), (chr(0xE9), ""), ("", chr(0xE9)), ("x", ""), ("\u0663", "")):
+                        cases.append((rule, name, before + prefix + "a" * length + after))
+        outcomes = run_check(inline_script(sota_job(GATE)), [body(text + SOURCES) for _, _, text in cases])
+        for (rule, name, text), outcome in zip(cases, outcomes):
+            with self.subTest(rule=rule, case=repr(text[:16]), length=len(text)):
+                self.assertEqual(rule in (outcome["failed"] or ""), bool(patterns[name].search(text + SOURCES)))
+
     def test_each_rule_agrees_with_scripts_validate(self):
         # The gate's rules are validate.py's PRIVATE_CONTENT patterns written in JavaScript; on every case each rule
         # gives the same verdict as its Python original.
@@ -279,7 +357,7 @@ class GatePrivacyTests(unittest.TestCase):
                   "github-token": "GitHub token", "tavily-token": "Tavily token", "api-secret": "API secret",
                   "private-key": "private key", "bearer-credential": "bearer credential"}
         patterns = dict(validate.PRIVATE_CONTENT)
-        corpus = [text for _, text, _ in PRIVACY_CASES] + [
+        corpus = [text for case, text, _ in PRIVACY_CASES if case not in GATE_ONLY_CASES] + [
             "hf_" + "b" * 24, "tvly-" + "dev-" + "c" * 26, "-----BEGIN " + "RSA PRIVATE KEY-----",
             "Bearer " + "d" * 40, "C:\\" + "Users\\Bob\\x", "-" + "Users-" + "bob-x", "home-" + "bob-code-x",
             "plain text with no secret", HOME + "example/a", "x-home-" + "example-y"]
@@ -288,6 +366,110 @@ class GatePrivacyTests(unittest.TestCase):
             for rule, name in python.items():
                 with self.subTest(rule=rule, case=text[:24]):
                     self.assertEqual(rule in (outcome["failed"] or ""), bool(patterns[name].search(text + SOURCES)))
+
+
+# (P2-2) Each rule against its Python original over every code point Python assigns (bar surrogates and the
+# supplementary private-use planes), placed where Unicode classes and boundaries decide the verdict.
+PYTHON_NAMES = {"personal-home-path": "personal home path", "windows-user-path": "Windows user path",
+                "encoded-home-path": "encoded home path", "hugging-face-token": "Hugging Face token",
+                "github-token": "GitHub token", "tavily-token": "Tavily token", "api-secret": "API secret",
+                "private-key": "private key", "bearer-credential": "bearer credential"}
+X = "\x01"  # where each code point goes
+TEMPLATES = {
+    "personal-home-path": ["/home/" + X, X + "/home" + "/al", "/home" + "/al" + X, "/home/example" + X, "/Users/" + X + "/a",
+                           "/" + X + "ome/al/"],
+    "windows-user-path": ["C:\\User" + X + "\\bo", X + ":\\Users\\bo", "C:\\Users\\" + X,
+                          "C:\\Users\\example" + X, "/mnt/" + X + "/Users" + "/bo", "c:\\" + X + "sers\\bo"],
+    "encoded-home-path": [X + "-home-" + "bo-x", "-home-" + X, "-home-" + "bo" + X, "-home-example" + X, "home-" + X + "-code-x",
+                          X + "home-bo" + "-code-", "-User" + X + "-bo-", X + "--Users-" + "bo-", "-mnt-" + X + "-Users-" + "bo-",
+                          "-home-" + "bo" + X + "x", "home-bo" + X + "-code-"],
+    "hugging-face-token": [X + "hf_" + "a" * 20, "hf_" + "a" * 20 + X, "hf_" + "a" * 19 + X],
+    "github-token": [X + "ghp_" + "a" * 30, "ghp_" + "a" * 30 + X, "github_pat_" + "a" * 29 + X],
+    "tavily-token": [X + "tvly-" + "a" * 24, "tvly-" + "a" * 24 + X, "tvly-dev-" + "a" * 23 + X],
+    "api-secret": [X + "sk-" + "a" * 24, "sk-" + "a" * 24 + X, "sk-ant-" + "a" * 23 + X],
+    "private-key": ["-----BEGIN " + X + "PRIVATE KEY-----"],
+    "bearer-credential": [X + "Bearer " + "a" * 30, "Bearer" + X + "a" * 30, "Bearer " + "a" * 29 + X,
+                          "Bearer " + X + "a" * 29],
+}
+# Every letter the Python rules match case-insensitively, replaced in turn (re.IGNORECASE folds some non-ASCII
+# letters onto ASCII ones).
+for word, prefix, suffix, rule in (("Users", "C:\\", "\\bo", "windows-user-path"),
+                                   ("mnt", "/", "/c/Users" + "/bo", "windows-user-path"),
+                                   ("example", "C:\\Users\\", "", "windows-user-path"),
+                                   ("Users", "-", "-bo-", "encoded-home-path"),
+                                   ("mnt", "-", "-c-Users-bo-", "encoded-home-path"),
+                                   ("Bearer", "", " " + "a" * 30, "bearer-credential")):
+    for index in range(len(word)):
+        TEMPLATES[rule].append(prefix + word[:index] + X + word[index + 1:] + suffix)
+ORACLE = r"""
+const fs = require('fs');
+const {rules, templates, ranges} = JSON.parse(fs.readFileSync(0, 'utf8'));
+const privacy = new Function(rules + '\nreturn privacy;')();
+const points = [];
+for (const [first, last] of ranges) for (let cp = first; cp <= last; cp++) points.push(cp);
+const out = {flags: Object.fromEntries(privacy.map(([id, pattern]) => [id, pattern.flags])), verdicts: {}};
+for (const [id, pattern] of privacy) {
+  if (!(id in templates)) continue;
+  out.verdicts[id] = templates[id].map((template) => {
+    const [head, tail] = template.split('\x01');
+    return points.map((cp) => (pattern.test(head + String.fromCodePoint(cp) + tail) ? '1' : '0')).join('');
+  });
+}
+process.stdout.write(JSON.stringify(out));
+"""
+
+
+def assigned_ranges():
+    import unicodedata
+    ranges, start, previous = [], None, None
+    for cp in range(0x110000):
+        category = unicodedata.category(chr(cp))
+        keep = category not in ("Cn", "Cs") and not (category == "Co" and cp > 0xFFFF) and cp != 1
+        if keep and start is None:
+            start = cp
+        if not keep and start is not None:
+            ranges.append((start, previous))
+            start = None
+        previous = cp
+    if start is not None:
+        ranges.append((start, previous))
+    return ranges
+
+
+def privacy_rules(script: str) -> str:
+    return script.split("// privacy-rules-begin\n", 1)[1].split("// privacy-rules-end\n", 1)[0]
+
+
+@unittest.skipUnless(NODE, "node unavailable; CI's runner images carry it")
+class GateUnicodeParityTests(unittest.TestCase):
+    def test_every_rule_is_unicode_aware(self):
+        result = subprocess.run([NODE, "-e", ORACLE], input=json.dumps(
+            {"rules": privacy_rules(inline_script(sota_job(GATE))), "templates": {}, "ranges": []}),
+            capture_output=True, text=True, timeout=60, check=True)
+        for rule, flags in json.loads(result.stdout)["flags"].items():
+            with self.subTest(rule=rule):
+                self.assertIn("u", flags)
+
+    def test_each_rule_agrees_with_python_on_every_code_point(self):
+        sys.path.insert(0, str(ROOT / "scripts"))
+        import validate
+        patterns = dict(validate.PRIVATE_CONTENT)
+        ranges = assigned_ranges()
+        points = [cp for first, last in ranges for cp in range(first, last + 1)]
+        result = subprocess.run([NODE, "-e", ORACLE], input=json.dumps(
+            {"rules": privacy_rules(inline_script(sota_job(GATE))), "templates": TEMPLATES, "ranges": ranges}),
+            capture_output=True, text=True, timeout=900, check=False)
+        self.assertEqual(result.returncode, 0, result.stderr[-2000:])
+        verdicts = json.loads(result.stdout)["verdicts"]
+        self.assertEqual(set(verdicts), set(TEMPLATES))
+        for rule, templates in TEMPLATES.items():
+            pattern = patterns[PYTHON_NAMES[rule]]
+            for template, javascript in zip(templates, verdicts[rule]):
+                head, tail = template.split(X)
+                python = "".join("1" if pattern.search(head + chr(cp) + tail) else "0" for cp in points)
+                differing = [hex(cp) for cp, left, right in zip(points, python, javascript) if left != right]
+                with self.subTest(rule=rule, template=template.replace(X, "<X>")):
+                    self.assertEqual(differing, [], f"{len(differing)} code points differ")
 
 
 def zizmor(path: Path, directory: Path) -> tuple:

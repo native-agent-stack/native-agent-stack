@@ -42,24 +42,78 @@ jobs:
               repo: context.repo.repo,
               pull_number: context.issue.number
             });
-            const body = pullRequest.body || '';
+            // The body is judged before it is parsed: GitHub's API refuses a longer description ("Body is too long (maximum is
+            // 65536 characters)"), so a longer, non-text or malformed one fails with a fixed rule id and is not read further.
+            const MAX_BODY = 65536;
+            const raw = pullRequest.body ?? '';
+            const refused = typeof raw !== 'string' ? 'body-type'
+              : raw.length > MAX_BODY ? 'body-size'
+              : !raw.isWellFormed() ? 'body-encoding'
+              : /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]/.test(raw) ? 'body-control' : null;
+            if (refused) {
+              core.setFailed(`The PR description cannot be checked (rule: ${refused}): it must be text of at most ${MAX_BODY} characters, with no control characters other than tabs and line breaks.`);
+              return;
+            }
+            const body = raw;
             const match = body.match(/^#{2,3}[ \t]+SOTA sources[ \t]*$([\s\S]*?)(?=^#{2,3}[ \t]|(?![\s\S]))/m);
             const content = match ? match[1].replace(/<!--[\s\S]*?-->/g, '').trim() : '';
-            // Privacy (correction #145): the home-path and credential rules of scripts/validate.py's PRIVATE_CONTENT,
-            // the same patterns in JavaScript (tests/test_sota_sources_gate.py checks them against the Python ones). A
-            // failure names the rule ids only, never the matched text.
+            // privacy-rules-begin
+            // Privacy (correction #145): the home-path and credential rules of scripts/validate.py's PRIVATE_CONTENT in
+            // JavaScript (tests/test_sota_sources_gate.py checks each against its Python original, over every code point). Python's
+            // str patterns use Unicode classes, and JavaScript's \w, \b and \s differ even with the u flag, so each is spelled out
+            // (Python 3.13 re docs): \w is a letter (L), a number (Nd, Nl, No) or '_'; \s is str.isspace(); $ also matches before
+            // a final newline; under re.IGNORECASE [A-Za-z] also matches U+0130, U+0131, U+017F and U+212A, and 's' matches U+017F.
+            // No rule takes the i flag: JavaScript's case folding under u puts U+0345 in \p{L}, which Python's \w excludes.
+            const W = String.raw`\p{L}\p{Nd}\p{Nl}\p{No}_`;
+            const w = `[${W}]`;
+            const b = `(?:(?<=${w})(?!${w})|(?<!${w})(?=${w}))`;
+            const S = String.raw`\t\n\v\f\r\x1C-\x20\x85\xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000`;
+            const AZ = String.raw`A-Za-z\u0130\u0131\u017F\u212A`;
+            const s17f = String.raw`[Ss\u017F]`;
+            const end = String.raw`(?=\n?(?![\s\S]))`;
+            const rule = (source, flags = '') => new RegExp(source, `u${flags}`);
+            const users = `[Uu]${s17f}[Ee][Rr]${s17f}`;
+            const example = '[Ee][Xx][Aa][Mm][Pp][Ll][Ee]';
             const privacy = [
-              ['personal-home-path', /\/(?:home|Users)\/(?!example(?:\/|\b))[A-Za-z0-9_.-]+(?:\/|\b)/],
-              ['windows-user-path', /(?:[A-Za-z]:[\/\\]+|\/mnt\/[A-Za-z]\/)Users[\/\\]+(?!example(?:[\/\\]|\b))[A-Za-z0-9_.-]+/i],
-              ['encoded-home-path', /(?<![\w-])(?:-home-|-[Uu][Ss][Ee][Rr][Ss]-|[A-Za-z]--[Uu][Ss][Ee][Rr][Ss]-|-[Mm][Nn][Tt]-[A-Za-z]-[Uu][Ss][Ee][Rr][Ss]-)(?!example(?:-|[\/\\"'\s`)\]]|$))[A-Za-z0-9_.]+(?:-|(?=[\/\\"'\s`)\]]|$))|(?<![^\W_])home-(?!example-code-)[\w.]+(?:-+[\w.]+)*-*-code-/],
-              ['hugging-face-token', /\bhf_[A-Za-z0-9]{20,}\b/],
-              ['github-token', /\b(?:gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,})\b/],
-              ['tavily-token', /\btvly-(?:(?:prod|dev)-)?[A-Za-z0-9_-]{24,}\b/],
-              ['api-secret', /\bsk-(?:proj-|ant-)?[A-Za-z0-9_-]{24,}\b/],
-              ['private-key', /-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----/],
-              ['bearer-credential', /\bBearer\s+[A-Za-z0-9._~-]{30,}/i],
+              ['personal-home-path', rule(String.raw`\/(?:home|Users)\/(?!example(?:\/|${b}))[A-Za-z0-9_.\-]+(?:\/|${b})`)],
+              ['windows-user-path', rule(String.raw`(?:[${AZ}]:[\/\\]+|\/[Mm][Nn][Tt]\/[${AZ}]\/)${users}[\/\\]+(?!${example}(?:[\/\\]|${b}))[${AZ}0-9_.\-]+`)],
+              ['encoded-home-path', rule(String.raw`(?<![${W}\-])(?:-home-|-${users}-|[${AZ}]--${users}-|-[Mm][Nn][Tt]-[${AZ}]-${users}-)(?!example(?:-|[\/\\"'${S}\x60)\]]|${end}))[A-Za-z0-9_.]+(?:-|(?=[\/\\"'${S}\x60)\]]|${end}))|(?<![\p{L}\p{Nd}\p{Nl}\p{No}])home-(?!example-code-)[${W}.]+(?:-+[${W}.]+)*-*-code-`)],
+              ['hugging-face-token', rule(String.raw`${b}hf_[A-Za-z0-9]{20,}${b}`)],
+              ['github-token', rule(String.raw`${b}(?:gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,})${b}`)],
+              ['tavily-token', rule(String.raw`${b}tvly-(?:(?:prod|dev)-)?[A-Za-z0-9_\-]{24,}${b}`)],
+              ['api-secret', rule(String.raw`${b}sk-(?:proj-|ant-)?[A-Za-z0-9_\-]{24,}${b}`)],
+              ['private-key', rule(String.raw`-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----`)],
+              ['bearer-credential', rule(String.raw`${b}[Bb][Ee][Aa][Rr][Ee][Rr][${S}]+[${AZ}0-9._~\-]{30,}`)],
+              // Only here: a macOS home in any case at the start of a path (macOS volumes are case-insensitive by default).
+              // validate.py keeps the exact /Users/ because API routes in tracked evidence spell /users/ the same way.
+              ['macos-user-path', rule(String.raw`(?<![${W}.~\/\-])\/(?!Users\/)[Uu][Ss][Ee][Rr][Ss]\/(?!example(?:\/|${b}))[A-Za-z0-9_.\-]+`)],
             ];
-            const hits = privacy.filter(([, pattern]) => pattern.test(body)).map(([id]) => id);
+            // privacy-rules-end
+            // Each form below is decoded once from the body, never to a fixed point, so a home path or credential is caught as
+            // written and as it reads: percent escapes, JSON escapes, HTML character references, and Markdown's rendered text
+            // (the body itself keeps link destinations). Emphasis goes only in pairs around a word without a separator in it,
+            // so a glob such as Users/*/ keeps its star.
+            const fromCode = (code) => (code <= 0x10FFFF && !(code >= 0xD800 && code <= 0xDFFF) ? String.fromCodePoint(code) : '');
+            const named = new Map([['amp', '&'], ['lt', '<'], ['gt', '>'], ['quot', '"'], ['apos', "'"], ['sol', '/'],
+              ['bsol', '\\'], ['colon', ':'], ['period', '.'], ['lowbar', '_'], ['hyphen', '-'], ['dash', '-'], ['tilde', '~'],
+              ['nbsp', '\u00A0'], ['Tab', '\t'], ['NewLine', '\n']]);
+            const percentRun = (run) => {
+              try { return decodeURIComponent(run); } catch { return run.replace(/%([0-9A-Fa-f]{2})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16))); }
+            };
+            const links = /!?\[([^\]\n]*)\]\(\s*<?([^\s()<>]*)>?(?:\s+(?:"[^"\n]*"|'[^'\n]*'|\([^()\n]*\)))?\s*\)/g;
+            // Only the inline elements GitHub renders are removed; any other <word>, such as a <user> placeholder, stays as text.
+            const inlineTags = /<\/?(?:a|abbr|b|bdi|bdo|br|cite|code|del|dfn|em|i|img|ins|kbd|mark|q|rp|rt|ruby|s|samp|small|span|strike|strong|sub|sup|time|tt|u|var|wbr)\b[^<>\n]*>/gi;
+            const forms = [
+              body,
+              body.replace(/(?:%[0-9A-Fa-f]{2})+/g, percentRun),
+              body.replace(/\\u([0-9A-Fa-f]{4})|\\\//g, (_, hex) => (hex ? String.fromCharCode(parseInt(hex, 16)) : '/')),
+              body.replace(/&(?:#([0-9]{1,7})|#[xX]([0-9A-Fa-f]{1,6})|([A-Za-z]{2,8}));/g,
+                (whole, decimal, hex, name) => (decimal ? fromCode(Number(decimal)) : hex ? fromCode(parseInt(hex, 16)) : named.get(name) ?? whole)),
+              body.replace(links, '$1').replace(/!?\[([^\]\n]*)\]\[[^\]\n]*\]/g, '$1').replace(/<((?:https?|file|mailto):[^<>\s]*)>/g, '$1')
+                .replace(inlineTags, '').replace(/\\([!-\/:-@\[-`{-~])/g, '$1').replace(/`/g, '')
+                .replace(/(\*{1,3}|~{1,2}|_{1,3})([\p{L}\p{N}][^\s*~_\/\\]*?)\1/gu, '$2'),
+            ];
+            const hits = privacy.filter(([, pattern]) => forms.some((form) => pattern.test(form))).map(([id]) => id);
             const problems = [];
             if (!content) {
               problems.push('The PR description needs a non-empty "SOTA sources" section: the repository, pin and file, or the published reference, behind each change (AGENTS.md top rule).');
