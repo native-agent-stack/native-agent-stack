@@ -14,9 +14,12 @@ Description=Refresh the hourly skill invoke-rate reports the command-center page
 Type=oneshot
 UMask=0077
 NoNewPrivileges=true
-Nice=10
-IOSchedulingClass=best-effort
-IOSchedulingPriority=7
+# Idle class for CPU, nice level and I/O: measurement runs yield to interactive work (the CC's host-capacity
+# T2 result). CPUWeight=idle sets cgroup v2 cpu.idle (systemd.resource-control(5), systemd 259); the user
+# manager here delegates the cpu controller. The idle I/O class takes no priority level.
+CPUWeight=idle
+Nice=19
+IOSchedulingClass=idle
 TimeoutStartSec=1800
 # claude, node and jq resolve here; skill_usage.py --run-skill-doctor runs claude.
 Environment=PATH=%h/.local/share/codex-ecosystem/bin:%h/.local/share/mise/shims:%h/.local/bin:/usr/local/bin:/usr/bin:/bin

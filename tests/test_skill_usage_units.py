@@ -75,6 +75,11 @@ class SkillUsageUnitTests(unittest.TestCase):
         # The units' three reports are granted; the only other skill inputs are #970's daily projection and the practice slots.
         self.assertLessEqual(set(render.OUTPUTS.values()), names)
         self.assertEqual(names - set(render.OUTPUTS.values()), {"skill-invoke-rate-latest.json", "slots-final.json"})
+        for name, text in (("hourly", hourly), ("daily", daily)):
+            with self.subTest(idle_class=name):
+                # The CC's host-capacity T2 result: test and measurement storms run idle-class.
+                self.assertEqual(re.findall(r"^(CPUWeight|Nice|IOSchedulingClass|IOSchedulingPriority)=(.*)$", text, re.M),
+                                 [("CPUWeight", "idle"), ("Nice", "19"), ("IOSchedulingClass", "idle")])
         self.assertIn("OnCalendar=hourly", units["native-agent-skill-usage.timer"])
         self.assertIn("OnCalendar=*-*-* 01:30:00", units["native-agent-skill-usage-codex-lanes.timer"])
 

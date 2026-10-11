@@ -172,7 +172,9 @@ python3 tools/skill-usage/render_units.py --repo "$PWD" \
   is a ceiling rather than a measurement.
 
 Each step writes a temporary file beside its destination and renames the finished report into place,
-so the page never reads a partial file. The page reads exactly these three names under
+so the page never reads a partial file. Both services run idle-class (`CPUWeight=idle`, `Nice=19`,
+`IOSchedulingClass=idle`), so a measurement run yields to interactive work. The page reads these three
+names, #970's `skill-invoke-rate-latest.json` and the practice slots under
 `tools/local-pages/source_policy.json` `command_center_skills`, and labels a report stale when it is
 older than three hours (30 for the daily report).
 
