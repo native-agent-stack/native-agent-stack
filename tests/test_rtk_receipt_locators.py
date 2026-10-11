@@ -68,8 +68,8 @@ def unavailable(sha: str | None, repo: Path = ROOT, path: str | None = None) -> 
     entry = listed.stdout.split(b"\0")[0].decode("utf-8", "replace")
     if not entry:
         return None  # the path is not in the tree at the pin: the locator is wrong and the test has to fail
-    # git 2.53.0 git-ls-tree(1), OUTPUT FORMAT: the default is "<mode> SP <type> SP <object> TAB <file>" (%(objectmode) %(objecttype) %(objectname)%x09%(path)), and -z ends each entry with a NUL, so the third
-    # field of the first entry is the object name whatever characters the path holds (the command center's Claude micro of #1005 at 425240f6e, P3-7).
+    # git 2.53.0 git-ls-tree(1), OUTPUT FORMAT: "Thus the default format is equivalent to: %(objectmode) %(objecttype) %(objectname)%x09%(path)", and -z: "\0 line termination on output and do not quote filenames", so the
+    # third field of the first entry is the object name whatever characters the path holds (the command center's Claude micro of #1005 at 425240f6e, P3-7, and at 49bb6494e, P3-3: the quote is exact).
     blob = entry.split()[2]
     if subprocess.run(["git", "-C", str(repo), "cat-file", "-e", blob], capture_output=True).returncode != 0:
         return f"this checkout holds the tree of {sha} but not the blob of {path} (a blobless partial clone)"

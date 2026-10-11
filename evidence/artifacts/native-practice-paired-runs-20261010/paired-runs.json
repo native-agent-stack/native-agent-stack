@@ -533,7 +533,10 @@
     "A_usd": 15,
     "B_and_C_usd": 30,
     "headless_session_minutes": 50,
-    "team_minutes": 45
+    "team_minutes": 45,
+    "bg_wait_ceiling_minutes": 45,
+    "bg_wait_ceiling_setting": "CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=2700000, set by the runner for every headless run (paired/orch_run.py line 137); the client's own default is 10 minutes",
+    "client_default_bg_wait_ceiling_minutes": 10
    },
    "costs": "API-list-equivalent, not billed; arm C costs are estimates priced from token counts"
   },
@@ -1490,6 +1493,27 @@
     "path": "paired-orchestration/batch.log",
     "bytes": 14000,
     "sha256": "ed7fd04db887e289fddcb62655a2758e2814f76b14d7aa1535028cb0a7740f27"
+   },
+   "runner": {
+    "path": "paired-orchestration/orch_run.py",
+    "bytes": 16229,
+    "sha256": "ad8ffbef0f48c105f083c27b98bf247ad0737938c20bced4cd914f9f9d53a890",
+    "line": 137,
+    "contains": "\"2700000\""
+   },
+   "client_env_vars_page": {
+    "path": "L1-official/captures/root/env-vars.md",
+    "bytes": 167852,
+    "sha256": "f9400917e85a9c4bb585c342ed065921dc0b1a45294fa314059d2554cf67ebbb",
+    "line": 357,
+    "contains": "CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS"
+   },
+   "client_headless_page": {
+    "path": "pr986/captures/claude-code-docs/headless.md",
+    "bytes": 34180,
+    "sha256": "25885d2e178a9746066fc2e19a07a3debc31744c721282a744be80789591e738",
+    "line": 77,
+    "contains": "CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS"
    }
   }
  },

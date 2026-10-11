@@ -401,13 +401,15 @@ class OrchestrationRunTests(unittest.TestCase):
         self.assertIn("A paired run on work where workers must message each other (the class this default is scoped to; paired run 1 measured bounded fixes, which need no messaging and fall outside it) shows teams "
                       "lose quality or cost more for the same work", teams["overturn_when"])
         self.assertIn("used only where workers must message each other", teams["default"])
-        self.assertIn(f"the verifier returned in {returned} of 6 runs ({sum(1 for w in b_wf if w['verifier_refuted'])} refuted), was cut by the 45-minute wait ceiling of `claude -p` in {cut}, and in {never} the implementer itself ran to the ceiling", workflow["notes"])
+        self.assertIn(f"the verifier returned in {returned} of 6 runs ({sum(1 for w in b_wf if w['verifier_refuted'])} refuted), was cut by the background-wait ceiling of `claude -p` in {cut} (45 minutes as the runner set it with `CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=2700000`; the client's default is 10 minutes: env-vars.md and headless.md of the pinned documentation), "
+                      f"and in {never} the implementer itself ran to that ceiling", workflow["notes"])
         self.assertEqual((returned, cut, never), (2, 3, 1))
         self.assertIn("not found by name in 6 of 6 headless runs", workflow["notes"])
         # The Codex review in GitHub of #1005 at bf864c370 (P2, workers.md:44): the measured failure matched the row's Overturn when, but the route still sent a fenced headless run to the name lookup
         # that failed in 6 of 6 runs. The route now carries the scope, with the numbers the artifact gives, and Overturn when says which measured failures the scoped route does not avoid.
         self.assertIn("Scoped to headless `claude -p` runs fenced with `--setting-sources local`: launch a saved Workflow by `scriptPath` (its name was not found in 6 of 6 runs of paired run 1, arm B)", workflow["route"])
-        self.assertIn(f"expect the 45-minute wait ceiling to cut a long verifier (it returned in {returned} of 6 runs and was cut in {cut})", workflow["route"])
+        self.assertIn(f"expect `claude -p` to stop waiting for a long verifier at its background-wait ceiling (10 minutes by default; the runner of paired run 1 set it to 45 minutes with `CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS`, "
+                      f"and the verifier returned in {returned} of 6 runs and was cut in {cut})", workflow["route"])
         self.assertIn("a measured failure mode on our runs beyond the two that paired run 1, arm B measured in fenced headless runs "
                       "(the name lookup, which `scriptPath` avoids, and the verifier's wait ceiling, which the route above tells a session to expect)", workflow["overturn_when"])
         self.assertEqual(workflow["status"], "default-scoped")
@@ -423,8 +425,8 @@ class OrchestrationRunTests(unittest.TestCase):
 
     def test_the_time_bounds_the_row_and_the_record_state_are_the_registered_ones(self):
         # The Codex review in GitHub of #1005 at 425240f6e (P2, workers.md:61): the orchestration-frameworks row and the record said "a 45-minute ceiling per run", while the registered design has two bounds, a 50-minute
-        # process cap for a headless session (arms A and B) and a 45-minute cap for the team (arm C; preregistration.md:156), and the Workflow's verifier was cut by the client's own 45-minute wait for background tasks
-        # (the stderr of the four B runs reads "Background tasks still running 45m after the last turn"), which is neither of them.
+        # process cap for a headless session (arms A and B) and a 45-minute cap for the team (arm C; preregistration.md:156), and the Workflow's verifier was cut by the background-wait ceiling of `claude -p`, which the runner
+        # set to 45 minutes (the stderr of the four B runs reads "Background tasks still running 45m after the last turn"); the client's default is 10 minutes (the command center's Claude micro of #1005 at 49bb6494e, P2-1).
         caps = self.o["design"]["caps"]
         self.assertEqual((caps["headless_session_minutes"], caps["team_minutes"]), (50, 45))
         for run in self.o["runs"]:
@@ -440,13 +442,44 @@ class OrchestrationRunTests(unittest.TestCase):
         page = (SLOTS.parent / "workers.md").read_text(encoding="utf-8")
         record = " ".join(RECORD.read_text(encoding="utf-8").split())
         self.assertIn(bounds, notes)
-        self.assertIn(f"{at_wait} of the 6 Workflow runs ended at `claude -p`'s own 45-minute wait for background tasks after the last turn, before the {caps['headless_session_minutes']}-minute cap", notes)
+        self.assertIn(f"{at_wait} of the 6 Workflow runs ended at the background-wait ceiling of `claude -p`, which the runner set to 45 minutes (`CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=2700000`; the client's default is 10 minutes), "
+                      f"before the {caps['headless_session_minutes']}-minute process cap", notes)
         self.assertIn(f"{not_done} of the 6 team runs did not reach TEAM-DONE ({stopped} stopped at the {caps['team_minutes']}-minute team cap)", notes)
         self.assertIn(notes, page, "the page mirrors the row")
         self.assertIn(bounds, record)
         self.assertIn(f"was stopped at the {caps['team_minutes']}-minute team cap in {stopped}", record)
         for text in (notes, record, page):
             self.assertNotIn("a 45-minute ceiling", text)
+        for text in (notes, record, page, self.slots["background-workflows"]["notes"], self.slots["background-workflows"]["route"], (SLOTS.parent / "workers.md").read_text(encoding="utf-8")):
+            self.assertNotIn("own 45-minute wait", text)  # the command center's Claude micro of #1005 at 49bb6494e (P2-1): the 45 minutes is the runner's setting, not a property of the client
+            self.assertNotIn("the 45-minute wait ceiling", text)
+
+    def test_the_background_wait_ceiling_is_the_runners_setting_and_the_clients_default_is_ten_minutes(self):
+        # The command center's Claude micro of #1005 at 49bb6494e (P2-1): "claude -p's own 45-minute wait" was false. The runner set CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=2700000 for every headless run (paired/orch_run.py
+        # line 137, retained and hashed in papers.runner); the client's default is 10 minutes (env-vars.md line 357, headless.md line 77 of the retained documentation, papers.client_env_vars_page and client_headless_page).
+        caps, papers = self.o["design"]["caps"], self.o["papers"]
+        self.assertEqual((caps["bg_wait_ceiling_minutes"], caps["client_default_bg_wait_ceiling_minutes"]), (45, 10))
+        self.assertIn("CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=2700000", caps["bg_wait_ceiling_setting"])
+        self.assertEqual(2700000 // 60000, caps["bg_wait_ceiling_minutes"])
+        self.assertEqual(papers["runner"]["line"], 137)
+        self.assertEqual((papers["client_env_vars_page"]["line"], papers["client_headless_page"]["line"]), (357, 77))
+        for name in ("runner", "client_env_vars_page", "client_headless_page"):
+            self.assertRegex(papers[name]["sha256"], SHA256)
+            self.assertGreater(papers[name]["bytes"], 0)
+        # the four Workflow runs that ended at the ceiling had run background work for the ceiling and a few seconds: implementer plus verifier seconds are 2,702 to 2,703, the ceiling being 2,700 seconds
+        waiting = [run["workflow"] for run in self.o["runs"] if run["arm"] == "B" and not run["workflow"]["verifier_returned"]]
+        self.assertEqual(len(waiting), 4)
+        for workflow in waiting:
+            background = workflow["implementer_seconds"] + (workflow["verifier_seconds"] or 0)
+            self.assertTrue(caps["bg_wait_ceiling_minutes"] * 60 <= background <= caps["bg_wait_ceiling_minutes"] * 60 + 10, background)
+        # the rows, the pages and the record name the setting and the default, and the page carries the rows' text
+        page = (SLOTS.parent / "workers.md").read_text(encoding="utf-8")
+        for text in (self.slots["background-workflows"]["notes"], self.slots["orchestration-frameworks"]["notes"], page, " ".join(RECORD.read_text(encoding="utf-8").split())):
+            self.assertIn("CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=2700000", text)
+            self.assertIn("default is 10", text)
+        for field in ("route", "notes"):
+            self.assertIn(self.slots["background-workflows"][field], page, f"the page carries the {field} of background-workflows")
+        self.assertIn("10 minutes by default", self.slots["background-workflows"]["route"])
 
     def test_the_record_addendum_states_the_orchestration_decision(self):
         record = " ".join(RECORD.read_text(encoding="utf-8").split())
@@ -607,7 +640,7 @@ class RoutingRunTests(unittest.TestCase):
                     walk(item, f"{trail}[{index}]")
 
         walk(self.artifact)
-        self.assertGreaterEqual(len(cited), 26)
+        self.assertGreaterEqual(len(cited), 29)
         for trail, entry in cited:
             with self.subTest(entry=trail):
                 relative = entry["path"].split(" (")[0]
@@ -617,6 +650,8 @@ class RoutingRunTests(unittest.TestCase):
                 self.assertEqual(hashlib.sha256(content).hexdigest()[:len(entry["sha256"])], entry["sha256"])
                 if "bytes" in entry:
                     self.assertEqual(len(content), entry["bytes"])
+                if "line" in entry:  # a cited line holds what the artifact says it holds
+                    self.assertIn(entry["contains"], files[0].read_text(encoding="utf-8").split("\n")[entry["line"] - 1])
         # the registered reading and null model the tolerant floor cites (Codex on #1005 at 425240f6e, P1, line 91) are at the lines the artifact names
         relative = self.r["papers"]["addendum_01"]["path"]
         lines = next(root / relative for root in roots if (root / relative).is_file()).read_text(encoding="utf-8").splitlines()
