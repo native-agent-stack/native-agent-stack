@@ -435,9 +435,9 @@ primary mechanisms remain the rc5 [InstrumentStatus timestamp/action fields](htt
 and [HALT/non-trading actions](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/model/src/enums.rs#L969-L1002).
 The correction applies negative trading signals at observation and records the
 event/init lead in `status_clock_ahead`. Only a TRADING resumption requires
-available, ordered timestamps. Halting timestamps bound the ordering fence at
-their observation time, and the fence never regresses; a future-dated halt
-therefore does not force waiting for that timestamp to accept a valid resumption.
+available, ordered timestamps. The initial correction bounded future halting
+timestamps at observation time. The F-1 follow-up below supersedes that fence:
+it preserves raw stamps and refuses a resumption stamped before an observed halt.
 Neutral metadata neither resumes trading nor moves the fence.
 
 First-hand results are retained at
@@ -500,3 +500,79 @@ rc5 fill timestamp/callback mechanism cited above. The coming T14 consumer
 name is an interface declaration, not an implemented or bound dependency in
 this repository or the selected merged UET main pin; T14 publication still
 requires a separately verified main-to-main account-writer binding.
+
+## F-1 halt-state and held-exit follow-up
+
+The policy source is us-equities-trading
+[`docs/decisions/2026-10-10-halt-exit-policy.md` at f8c607bc1f1f0205fdc87095f47df150d2f78117](https://github.com/seathatflowsinourveins/us-equities-trading/blob/f8c607bc1f1f0205fdc87095f47df150d2f78117/docs/decisions/2026-10-10-halt-exit-policy.md#decision).
+Decisions 1–3 require immediate negative halt signals, held/flagged working
+exits with a notice every ten minutes, and no new order into a halt or unknown
+state. Its reasoning and acceptance sections define the three entry-fill
+windows around the entry's own deadline and cancel-acknowledgement freeze.
+
+The upstream landscape remains the installed, unchanged NautilusTrader
+2.0.0rc5 engine at `1b0a49d2792a9432a3aca3fcb617ce7a630d905e`, with rc6 retained
+only as the separately selected regression candidate in `~/code/upstream/MIRRORS.json`.
+The following supported rc5 mechanisms were checked directly in the mirror;
+the same installed engine executes these regressions. No adapter, scheduler,
+matching engine or risk state is rebuilt.
+
+| Correction | Pinned upstream mechanism | Regression |
+| --- | --- | --- |
+| P3-A: preserve raw event/init stamps; reject an older available resumption | [InstrumentStatus fields](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/python/nautilus_trader/model/__init__.pyi#L2480-L2507), [native status callback](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/trading/src/python/strategy.rs#L756-L763) | Raw event lead and init lead independently fence stale TRADING; snapshot resumption has the same raw fence and a later positive control |
+| P3-A: absent/expired named state blocks every new order | [Instrument-scoped custom data and cached event/init stamps](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/model/src/data/custom.rs#L53-L88); the existing FactorSnapshot supplies its own validity | Expired state blocks a fresh-quote exit; final submission blocks BUY/SELL even when the caller bypasses drive; a working exit stays held and the session is notified |
+| P3-B: a leading halted snapshot acts immediately while future factors remain unavailable | The same [custom-data wrapper](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/model/src/data/custom.rs#L53-L88) and existing on_data callback | 1 ms and 400 ms init leads cancel the original entry at the 300 ms delivery; future stamps cannot silently clear the halt |
+| P3-B: flag/notify a working exit at observation and every ten minutes; preserve its identity | [Native nanosecond time alert](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/common/src/python/clock.rs#L158-L177), F-1 decision 2 | Fractional-second halt at 2.3 s produces notices at 2.3, 602.3 and 1202.3 s, with one unchanged working exit and no cancellation/replacement |
+| P3-B: a held exit's DAY-expiry callback freezes before returning | [Native order-expiry dispatch](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/trading/src/python/strategy.rs#L504-L511), F-1 decision 2 | Explicit state-machine expiry callback during a halt preserves the residual, flags/notifies and freezes; this does not qualify venue-driven expiry |
+
+First-hand logs are retained in
+`~/.local/state/native-agent-stack/coordination/ns2604-coop/lanes/strategies-halt-exit-followup-20261010/`.
+`current-main-red-v4.log` executes the new native tests with the unchanged
+production module from main-derived baseline `a7c15bd051088d0493d58bd84a3c8c35dcde6624`:
+nine test methods fail eighteen assertions, with no unexpected errors/skips.
+`focused-green-v4.log` passes those cases, the three fill windows and the
+adjusted raw-stamp/notification/calendar controls. The calendar fixture's
+synthetic halt state is deliberately valid across its one-day callback delay,
+so its execution-time anchor remains isolated from the new freshness fence.
+
+The cue's P3-1 classification was already fixed in `a9e4eeb7`, which landed
+before this follow-up baseline. It is preserved, with the record's three
+unprocessed-halt-cancel fill windows added as native controls. The historical
+production module at `0ea8aee2faaba9a7723550e1b3bca75f6db7480f` fails the late
+two windows (`P3-1-historical-red-v4.log`); current main already passes
+this classification. The historical failure is not represented as a failure
+of current main. The entry's own earliest deadline remains the cutoff; the
+halt-cancel dispatch time does not become a new cutoff.
+
+Twelve targeted single-site mutants fail thirty-four assertions, with no unexpected
+errors/skips. They independently remove raw native/snapshot fences, ignore a
+leading snapshot halt, omit producer expiry or final submission refusal,
+silence/delay the held-exit notice, omit expiry handoff, restore the historical
+policy-only cutoff, and cancel a held exit. The notice control places quotes
+after the exact ten-minute boundary so only the native alert can satisfy it.
+`reproduce.py`, the individual mutant logs and `final-regression-results-v4.json`
+are retained in the same packet; production overlays are compiled in memory
+and print their exact source hashes without editing the worktree's source.
+
+The synthetic producer is named by the instrument-scoped `t22-factors-v1`
+subscription. Its explicit boolean and `valid_until_ns` gate final submission
+as well as drive. Native status halts and snapshot halts are independent vetoes;
+neither carrier clears the other's active halt. Raw fences are memory-only,
+and paper producer/freshness/restart qualification remains T15 work. No source
+here establishes broker cancel behavior, venue-driven DAY expiry, partial
+reopening fills or the seven-assertion T15 paper acceptance. The existing T14
+account-writer binding and historical Layer 1.5 boundaries remain unqualified.
+
+The same rule 3 also closes an input-default gap: a missing `halted` JSON field
+previously defaulted to False and authorized BUY/SELL orders. The native
+`omitted-halt-native-before.log` fails both startup and held-position cases
+without callback errors. `FactorSnapshot.halted` now defaults to None, meaning
+unknown; the typed contract accepts only None or an actual boolean. An unknown
+update immediately vetoes orders and cannot clear an observed halt. Existing
+synthetic LiveNode fixtures now provide their known False state explicitly.
+The policy is decision 3 at the full F-1 pin above; the upstream
+[optional trading-state field](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/python/nautilus_trader/model/__init__.pyi#L2480-L2507)
+likewise distinguishes missing state from False. Baseline reproduction overlays
+both the input contract and families.py at the named production pin; other
+fixture dependencies use the follow-up worktree. Two additional mutants
+restore the False default or ignore an unknown update and fail these controls.

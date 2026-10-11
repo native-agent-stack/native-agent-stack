@@ -102,9 +102,14 @@ class FamilyStrategy(Strategy):
         )
         self.instrument_id = InstrumentId.from_str(spec.instrument_id)
         self.snapshot = None
+        self.snapshot_halted = None
+        self.snapshot_halt_timestamps = (0, 0)
+        self.snapshot_halt_valid_until_ns = 0
         self.instrument_status_halted = False
         self.last_instrument_status = None
         self.instrument_status_timestamps = (0, 0)
+        self.last_halt_notice_ns = None
+        self.last_halt_notice_reason = None
         self.last_quote = None
         self.trace = []
         self.flags = set()
@@ -282,6 +287,7 @@ class FamilyStrategy(Strategy):
 
     def on_stop(self):
         self._retire_pending_entry_alert()
+        self._retire_halt_notice_alert()
         if "t22-watchdog" in self.clock.timer_names():
             self.clock.cancel_timer("t22-watchdog")
         if self.quantity or self.pending is not None:
@@ -296,14 +302,42 @@ class FamilyStrategy(Strategy):
             ):
                 return
             now = self.clock.timestamp_ns()
-            if value.ts_init > now or value.ts_event > now:
-                self._record("snapshot_refused", reason="future_availability")
-                return
             if (
                 value.evidence_class != self.spec.evidence_class
                 or value.cohort_sha256 != self.spec.cohort_sha256
             ):
                 self._record("snapshot_refused", reason="cohort_or_evidence_mismatch")
+                return
+            if value.halted is not False:
+                # F-1 decision 1 at us-equities-trading@f8c607bc: a halt
+                # acts at delivery. Missing state also vetoes orders (rule 3),
+                # and cannot clear an observed halt. Future factors stay unavailable.
+                if value.halted is True or self.snapshot_halted is not True:
+                    self.snapshot_halted = value.halted
+                self.snapshot_halt_timestamps = tuple(
+                    max(previous, current)
+                    for previous, current in zip(
+                        self.snapshot_halt_timestamps,
+                        (value.ts_event, value.ts_init),
+                        strict=True,
+                    )
+                )
+                if value.ts_event > now or value.ts_init > now:
+                    self.flags.add("snapshot_clock_ahead")
+                    self._record(
+                        "snapshot_clock_ahead",
+                        event_lead_ns=max(0, value.ts_event - now),
+                        init_lead_ns=max(0, value.ts_init - now),
+                    )
+                self._drive()
+            if value.ts_init > now or value.ts_event > now:
+                self._record("snapshot_refused", reason="future_availability")
+                return
+            previous_event, previous_init = self.snapshot_halt_timestamps
+            if value.halted is False and (
+                value.ts_event < previous_event or value.ts_init < previous_init
+            ):
+                self._record("snapshot_refused", reason="out_of_order")
                 return
             if self.snapshot is not None:
                 if value.ts_init < self.snapshot.ts_init:
@@ -314,8 +348,12 @@ class FamilyStrategy(Strategy):
                         self._freeze("conflicting_snapshot_revision")
                     return
             self.snapshot = value
+            if value.halted is False:
+                self.snapshot_halted = False
+                self.snapshot_halt_timestamps = (value.ts_event, value.ts_init)
+            self.snapshot_halt_valid_until_ns = value.valid_until_ns
             self._record("snapshot", source_sha256=value.source_sha256)
-            if value.halted and self.pending_role == "entry":
+            if value.halted is not False or self.pending is not None or self.quantity:
                 self._drive()
         except Exception as error:
             self._fault("on_data", error)
@@ -368,9 +406,8 @@ class FamilyStrategy(Strategy):
                     init_lead_ns=init_lead,
                 )
             self.instrument_status_halted = True
-            # Preserve ordering without making a future-dated halt an
-            # unavailable timestamp barrier to a later valid resumption.
-            event_ns, init_ns = min(event_ns, now), min(init_ns, now)
+            # Preserve the raw stamps. An available TRADING stamped before
+            # this observed halt cannot establish a resumption (F-1 rule 3).
         elif status.action == MarketStatusAction.TRADING:
             if event_ns > now or init_ns > now:
                 self._record("instrument_status_refused", reason="future_availability")
@@ -460,14 +497,15 @@ class FamilyStrategy(Strategy):
         return session
 
     def _drive(self):
+        now = self.clock.timestamp_ns()
+        halt_reason = self._halt_reason(now)
+        halted = halt_reason is not None
+        if self.quantity and halted:
+            self._notify_halt_hold(now, halt_reason)
+        elif not halted or not self.quantity:
+            self._clear_halt_hold()
         if self.faulted or not self.enabled:
             return
-        now = self.clock.timestamp_ns()
-        halted = (
-            self.instrument_status_halted
-            or self.snapshot is None
-            or self.snapshot.halted
-        )
         if self.pending is not None:
             timeout = (
                 self.spec.entry_timeout_ns
@@ -510,10 +548,7 @@ class FamilyStrategy(Strategy):
             return
         self.flags.discard("held_quote_stale")
         if halted:
-            if self.quantity:
-                self._freeze("held_halted")
             return
-        self.flags.discard("held_halted")
         session = self._session(now)
         if session.kind.name in ("CLOSED", "OVERNIGHT"):
             if self.quantity:
@@ -525,6 +560,57 @@ class FamilyStrategy(Strategy):
             self._exit(now, bid)
         elif not self.entry_attempted:
             self._enter(now, session)
+
+    def _halt_reason(self, now):
+        # t22-factors-v1 is this class's named synthetic halt producer. Its
+        # explicit validity also gates exits; a native status halt is an
+        # independent veto, never a substitute for an absent/expired producer.
+        # T15 must qualify the paper producer and its freshness separately.
+        if self.instrument_status_halted or self.snapshot_halted is True:
+            return "held_halted"
+        if self.snapshot_halted is None or now > self.snapshot_halt_valid_until_ns:
+            return "held_halt_state_unknown"
+        return None
+
+    def _retire_halt_notice_alert(self):
+        if "t22-halt-hold" in self.clock.timer_names():
+            self.clock.cancel_timer("t22-halt-hold")
+
+    def _clear_halt_hold(self):
+        self.flags.discard("held_halted")
+        self.flags.discard("held_halt_state_unknown")
+        self.last_halt_notice_ns = None
+        self.last_halt_notice_reason = None
+        self._retire_halt_notice_alert()
+
+    def _notify_halt_hold(self, now, reason):
+        self.flags.add(reason)
+        if (
+            self.last_halt_notice_reason == reason
+            and self.last_halt_notice_ns is not None
+            and now < self.last_halt_notice_ns + 600_000_000_000
+        ):
+            if self.pending is None and not self.faulted:
+                self._freeze(reason)
+            return
+        self.last_halt_notice_ns = now
+        self.last_halt_notice_reason = reason
+        self._record(
+            "halt_hold_notice",
+            reason=reason,
+            client_order_id=None
+            if self.pending is None
+            else str(self.pending.client_order_id),
+        )
+        if self.pending is None and not self.faulted:
+            self._freeze(reason)
+        elif self.fault_sink is not None:
+            self.fault_sink(reason)
+        self._retire_halt_notice_alert()
+        # Reuse rc5's native clock, including fractional-second delivery.
+        self.clock.set_time_alert_ns(
+            "t22-halt-hold", now + 600_000_000_000, callback=self._on_watchdog
+        )
 
     def _entry_allowed(self, now, session):
         snapshot = self.snapshot
@@ -739,6 +825,13 @@ class FamilyStrategy(Strategy):
     def _submit(self, side, quantity, price, role, reason):
         if self.faulted or not self.enabled:
             return
+        now = self.clock.timestamp_ns()
+        halt_reason = self._halt_reason(now)
+        if halt_reason is not None:
+            self._record("order_refused", reason=halt_reason, role=role)
+            if self.quantity:
+                self._notify_halt_hold(now, halt_reason)
+            return
         if self.sequence >= 9_999_999:
             self._freeze("client_order_sequence_exhausted_requires_handoff")
             return
@@ -880,6 +973,17 @@ class FamilyStrategy(Strategy):
 
     @guarded_callback
     def on_order_expired(self, event):
+        if (
+            self.pending is not None
+            and event.client_order_id == self.pending.client_order_id
+            and self.pending_role == "exit"
+            and self.quantity
+        ):
+            now = self.clock.timestamp_ns()
+            reason = self._halt_reason(now)
+            if reason is not None:
+                self._notify_halt_hold(now, reason)
+                self._freeze("halted_day_expiry_requires_handoff")
         self._terminal(event)
 
     @guarded_callback

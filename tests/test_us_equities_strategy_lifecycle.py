@@ -137,6 +137,513 @@ def run_strategy(
 
 @unittest.skipUnless(NATIVE, "requires the exact locked Nautilus rc5 runtime")
 class LifecycleTests(unittest.TestCase):
+    def test_omitted_halt_field_remains_unknown_at_startup_and_while_held(self):
+        start = simulation.BASE_NS
+        for delivery in ("startup", "held"):
+
+            class OmittedHalt(families.GapPremarketStrategy):
+                def on_data(self, data, delivery=delivery):
+                    value = getattr(data, "data", data)
+                    if isinstance(value, contracts.FactorSnapshot) and (
+                        delivery == "startup" or value.ts_event >= start
+                    ):
+                        payload = value.as_dict()
+                        payload.pop("halted")
+                        value = contracts.FactorSnapshot.from_json(payload)
+                    return super().on_data(value)
+
+            faults = []
+            with self.subTest(delivery=delivery):
+                strategy = run_strategy(
+                    ledger=None,
+                    faults=faults,
+                    strategy_type=OmittedHalt,
+                    bids=("10",) * 6,
+                    advance_to_ns=start + 1_500_000_000 if delivery == "held" else None,
+                    overrides={"exit_deadline_ns": start + 2_000_000_000},
+                )
+                self.assertEqual(
+                    [row["side"] for row in strategy.trace if row["event"] == "submit"],
+                    ["BUY"] if delivery == "held" else [],
+                )
+                if delivery == "held":
+                    self.assertIn("held_halt_state_unknown", strategy.flags)
+                    self.assertIn("held_halt_state_unknown", faults)
+                    self.assertGreater(strategy.quantity, 0)
+                self.assertFalse(strategy.callback_faults)
+
+    def test_clock_leading_halted_snapshot_cancels_at_delivery(self):
+        start = simulation.BASE_NS
+        for lead in (1_000_000, 400_000_000):
+            with self.subTest(lead_ns=lead), tempfile.TemporaryDirectory() as directory:
+                observed = []
+
+                class LeadingSnapshot(families.GapPremarketStrategy):
+                    def on_data(self, data, lead=lead, observed=observed):
+                        value = getattr(data, "data", data)
+                        if isinstance(value, contracts.FactorSnapshot) and value.halted:
+                            value = replace(value, ts_init=value.ts_init + lead)
+                        result = super().on_data(value)
+                        if isinstance(value, contracts.FactorSnapshot) and value.halted:
+                            observed.append(
+                                (
+                                    self.clock.timestamp_ns(),
+                                    self.snapshot.ts_init,
+                                    self.snapshot_halted,
+                                )
+                            )
+                        return result
+
+                strategy = run_strategy(
+                    ledger=safety.Ledger(Path(directory) / "ledger.json"),
+                    faults=[],
+                    strategy_type=LeadingSnapshot,
+                    bids=("10", "10.04", "10.04", "10.04", *("9.99",) * 12),
+                    quote_offsets_ns=(
+                        0,
+                        200_000_000,
+                        400_000_000,
+                        500_000_000,
+                        *(600_000_000 + i * 100_000_000 for i in range(12)),
+                    ),
+                    halt_after_ns=start + 300_000_000,
+                    reopen_at_ns=start + 500_000_000,
+                    overrides={"entry_timeout_ns": 10_000_000_000},
+                )
+                cancels = [
+                    row for row in strategy.trace if row["event"] == "cancel_requested"
+                ]
+                self.assertEqual(
+                    [row["now_ns"] for row in cancels], [start + 300_000_000]
+                )
+                self.assertEqual(strategy.quantity, 0)
+                self.assertIsNone(strategy.pending)
+                self.assertFalse(strategy.callback_faults)
+                self.assertEqual(
+                    observed, [(start + 300_000_000, start - 600_000_000_000, True)]
+                )
+
+    def test_expired_halt_state_blocks_exit_and_notifies(self):
+        start = simulation.BASE_NS
+
+        class ExpiringState(families.GapPremarketStrategy):
+            def on_data(self, data):
+                value = getattr(data, "data", data)
+                if isinstance(value, contracts.FactorSnapshot):
+                    value = replace(value, valid_until_ns=start + 1_500_000_000)
+                return super().on_data(value)
+
+        faults = []
+        with tempfile.TemporaryDirectory() as directory:
+            strategy = run_strategy(
+                ledger=safety.Ledger(Path(directory) / "ledger.json"),
+                faults=faults,
+                strategy_type=ExpiringState,
+                bids=("10",) * 6,
+                overrides={"exit_deadline_ns": start + 2_000_000_000},
+            )
+        submits = [row for row in strategy.trace if row["event"] == "submit"]
+        self.assertEqual([row["side"] for row in submits], ["BUY"])
+        self.assertGreater(strategy.quantity, 0)
+        self.assertIn("held_halt_state_unknown", strategy.flags)
+        self.assertIn("held_halt_state_unknown", faults)
+        self.assertFalse(strategy.callback_faults)
+
+    def test_raw_native_halt_stamps_fence_older_available_resumption(self):
+        from nautilus_trader.model import InstrumentStatus, MarketStatusAction
+
+        start = simulation.BASE_NS
+        for stamp in ("event", "init"):
+            for resume in (False, True):
+
+                class LeadingStatus(families.GapPremarketStrategy):
+                    def entry_condition(self, snapshot):
+                        return self.clock.timestamp_ns() >= start + 600_000_000
+
+                    def on_instrument_status(self, status, stamp=stamp):
+                        if status.action == MarketStatusAction.HALT:
+                            status = InstrumentStatus(
+                                status.instrument_id,
+                                status.action,
+                                start + 700_000_000
+                                if stamp == "event"
+                                else status.ts_event,
+                                start + 700_000_000
+                                if stamp == "init"
+                                else status.ts_init,
+                            )
+                        return super().on_instrument_status(status)
+
+                statuses = [
+                    (300_000_000, 300_000_000, "HALT", {}),
+                    (500_000_000, 500_000_000, "TRADING", {}),
+                ]
+                if resume:
+                    statuses.append((800_000_000, 800_000_000, "TRADING", {}))
+                with self.subTest(stamp=stamp, resume=resume):
+                    strategy = run_strategy(
+                        ledger=None,
+                        faults=[],
+                        strategy_type=LeadingStatus,
+                        bids=("10",) * 6,
+                        quote_offsets_ns=(
+                            0,
+                            200_000_000,
+                            600_000_000,
+                            800_000_000,
+                            1_000_000_000,
+                            1_200_000_000,
+                        ),
+                        status_events=statuses,
+                    )
+                    buys = [
+                        row
+                        for row in strategy.trace
+                        if row["event"] == "submit" and row["side"] == "BUY"
+                    ]
+                    self.assertEqual(len(buys), int(resume))
+                    if resume:
+                        self.assertGreaterEqual(buys[0]["now_ns"], start + 800_000_000)
+                    self.assertIn(
+                        "out_of_order",
+                        [
+                            row["reason"]
+                            for row in strategy.trace
+                            if row["event"] == "instrument_status_refused"
+                        ],
+                    )
+                    self.assertFalse(strategy.callback_faults)
+
+    def test_raw_snapshot_halt_stamps_fence_older_available_resumption(self):
+        start = simulation.BASE_NS
+
+        class LeadingSnapshot(families.GapPremarketStrategy):
+            def entry_condition(self, snapshot):
+                return self.clock.timestamp_ns() >= start + 600_000_000
+
+            def on_data(self, data):
+                value = getattr(data, "data", data)
+                if isinstance(value, contracts.FactorSnapshot) and value.halted:
+                    value = replace(
+                        value, ts_event=start + 700_000_000, ts_init=start + 700_000_000
+                    )
+                return super().on_data(value)
+
+        for resume in (False, True):
+            with self.subTest(resume=resume):
+                strategy = run_strategy(
+                    ledger=None,
+                    faults=[],
+                    strategy_type=LeadingSnapshot,
+                    bids=("10",) * 6,
+                    quote_offsets_ns=(
+                        0,
+                        200_000_000,
+                        600_000_000,
+                        800_000_000,
+                        1_000_000_000,
+                        1_200_000_000,
+                    ),
+                    halt_after_ns=start + 300_000_000,
+                    reopen_at_ns=start + 500_000_000,
+                    advance_to_ns=start + 800_000_000 if resume else None,
+                    overrides={"preset": "aggressive-v1"},
+                )
+                buys = [
+                    row
+                    for row in strategy.trace
+                    if row["event"] == "submit" and row["side"] == "BUY"
+                ]
+                self.assertEqual(len(buys), int(resume))
+                if resume:
+                    self.assertGreaterEqual(buys[0]["now_ns"], start + 800_000_000)
+                self.assertFalse(strategy.callback_faults)
+
+    def test_submit_fence_blocks_every_order_role_with_expired_halt_state(self):
+        start = simulation.BASE_NS
+        for state, side in (
+            (state, side)
+            for state in ("missing", "expired")
+            for side in (families.OrderSide.BUY, families.OrderSide.SELL)
+        ):
+
+            class DirectSubmit(families.GapPremarketStrategy):
+                attempted = False
+
+                def on_data(self, data, state=state):
+                    value = getattr(data, "data", data)
+                    if isinstance(value, contracts.FactorSnapshot):
+                        if state == "missing":
+                            return
+                        value = replace(value, valid_until_ns=start + 1_500_000_000)
+                    return super().on_data(value)
+
+                def _drive(self):
+                    # Isolate the final submit fence from watchdog/drive
+                    # refusal, while retaining native order dispatch.
+                    if self.clock.timestamp_ns() < start + 1_500_000_000:
+                        return super()._drive()
+
+                def on_quote(self, quote, side=side):
+                    if self.clock.timestamp_ns() < start + 2_000_000_000:
+                        return super().on_quote(quote)
+                    if not self.attempted:
+                        self.attempted = True
+                        self._submit(
+                            side,
+                            contracts.decimal("1"),
+                            contracts.decimal("10"),
+                            "entry" if side == families.OrderSide.BUY else "exit",
+                            "time_exit",
+                        )
+
+            with self.subTest(state=state, side=str(side)):
+                strategy = run_strategy(
+                    ledger=None,
+                    faults=[],
+                    strategy_type=DirectSubmit,
+                    bids=("10",) * 6,
+                    status_events=((1_500_000_000, 1_500_000_000, "TRADING", {}),),
+                    overrides={"exit_deadline_ns": start + 7_000_000_000},
+                )
+                self.assertEqual(strategy.sequence, int(state == "expired"))
+                self.assertEqual(
+                    len([row for row in strategy.trace if row["event"] == "submit"]),
+                    int(state == "expired"),
+                )
+                self.assertFalse(strategy.callback_faults)
+
+    def test_working_exit_is_flagged_and_notified_every_ten_minutes(self):
+        start = simulation.BASE_NS
+        notices = []
+
+        class ObserveHold(families.GapPremarketStrategy):
+            def _record(self, event, **fields):
+                super()._record(event, **fields)
+                if event == "halt_hold_notice":
+                    notices.append(
+                        (
+                            self.clock.timestamp_ns(),
+                            self.pending.client_order_id,
+                            self.quantity,
+                            frozenset(self.flags),
+                        )
+                    )
+
+        faults = []
+        strategy = run_strategy(
+            ledger=None,
+            faults=faults,
+            strategy_type=ObserveHold,
+            bids=("10", "10", "9", "8", "8", "8"),
+            quote_offsets_ns=(
+                0,
+                1_000_000_000,
+                2_000_000_000,
+                2_200_000_000,
+                602_500_000_000,
+                1202_500_000_000,
+            ),
+            halt_after_ns=start + 2_300_000_000,
+            overrides={"exit_deadline_ns": start + 2_000_000_000},
+        )
+        self.assertEqual(
+            [row[0] for row in notices],
+            [start + ns for ns in (2_300_000_000, 602_300_000_000, 1202_300_000_000)],
+        )
+        self.assertEqual(faults, ["held_halted"] * 3)
+        self.assertTrue(
+            all(row[1] == strategy.pending.client_order_id for row in notices)
+        )
+        self.assertTrue(all(row[2] > 0 and "held_halted" in row[3] for row in notices))
+        self.assertEqual(strategy.sequence, 2)
+        self.assertEqual(strategy.pending_role, "exit")
+        self.assertFalse(
+            [row for row in strategy.trace if row["event"] == "cancel_requested"]
+        )
+        self.assertFalse(strategy.faulted)
+        self.assertFalse(strategy.callback_faults)
+
+    def test_expired_halt_state_keeps_working_exit_and_notifies(self):
+        start = simulation.BASE_NS
+        observed = []
+
+        class ExpiringState(families.GapPremarketStrategy):
+            def on_data(self, data):
+                value = getattr(data, "data", data)
+                if isinstance(value, contracts.FactorSnapshot):
+                    value = replace(value, valid_until_ns=start + 2_500_000_000)
+                return super().on_data(value)
+
+            def _record(self, event, **fields):
+                super()._record(event, **fields)
+                if event == "halt_hold_notice":
+                    observed.append(
+                        (self.clock.timestamp_ns(), self.pending.client_order_id)
+                    )
+
+        faults = []
+        strategy = run_strategy(
+            ledger=None,
+            faults=faults,
+            strategy_type=ExpiringState,
+            bids=("10", "10", "9", "8", "8", "8"),
+            quote_offsets_ns=(
+                0,
+                1_000_000_000,
+                2_000_000_000,
+                3_000_000_000,
+                603_000_000_000,
+                1203_000_000_000,
+            ),
+            overrides={"exit_deadline_ns": start + 2_000_000_000},
+        )
+        self.assertEqual(
+            [row[0] for row in observed],
+            [start + seconds * 1_000_000_000 for seconds in (3, 603, 1203)],
+        )
+        self.assertEqual(faults, ["held_halt_state_unknown"] * 3)
+        self.assertEqual(strategy.sequence, 2)
+        self.assertEqual(strategy.pending_role, "exit")
+        self.assertTrue(
+            all(row[1] == strategy.pending.client_order_id for row in observed)
+        )
+        self.assertFalse(
+            [row for row in strategy.trace if row["event"] == "cancel_requested"]
+        )
+        self.assertFalse(strategy.faulted)
+        self.assertFalse(strategy.callback_faults)
+
+    def test_halt_expiry_notification_freezes_before_another_drive(self):
+        start = simulation.BASE_NS
+        at_expiry = []
+
+        class ExpiryCallback(families.GapPremarketStrategy):
+            expired = False
+
+            def _drive(self):
+                if (
+                    not self.expired
+                    and self.clock.timestamp_ns() >= start + 5_000_000_000
+                    and self.pending_role == "exit"
+                ):
+                    self.expired = True
+                    # Inject the terminal callback, as the retained policy
+                    # probe does. Venue-driven DAY expiry remains T15 work.
+                    self.on_order_expired(
+                        SimpleNamespace(client_order_id=self.pending.client_order_id)
+                    )
+                    at_expiry.append(
+                        (self.faulted, self.quantity, frozenset(self.flags))
+                    )
+                return super()._drive()
+
+        faults = []
+        strategy = run_strategy(
+            ledger=None,
+            faults=faults,
+            strategy_type=ExpiryCallback,
+            bids=("10", "10", "9", "8", "8", "8", "8"),
+            halt_after_ns=start + 3_000_000_000,
+            overrides={"exit_deadline_ns": start + 2_000_000_000},
+        )
+        self.assertEqual(len(at_expiry), 1)
+        self.assertTrue(at_expiry[0][0])
+        self.assertGreater(at_expiry[0][1], 0)
+        self.assertIn("held_halted", at_expiry[0][2])
+        self.assertIn("halted_day_expiry_requires_handoff", at_expiry[0][2])
+        self.assertIn("halted_day_expiry_requires_handoff", faults)
+        self.assertEqual(strategy.sequence, 2)
+        self.assertIsNone(strategy.pending)
+        self.assertFalse(strategy.callback_faults)
+
+    def test_unprocessed_halt_cancel_uses_entry_deadline_in_all_three_fill_windows(
+        self,
+    ):
+        start = simulation.BASE_NS
+        for window, timeout, reopen, fill, flagged, frozen in (
+            (
+                "before_deadline",
+                2_000_000_000,
+                1_500_000_000,
+                1_550_000_000,
+                False,
+                False,
+            ),
+            (
+                "deadline_before_freeze",
+                2_000_000_000,
+                2_200_000_000,
+                2_250_000_000,
+                True,
+                False,
+            ),
+            ("after_freeze", 2_000_000_000, 2_400_000_000, 2_500_000_000, True, True),
+        ):
+            applied = []
+
+            def sink(strategy, event, cutoff, applied=applied):
+                applied.append(
+                    (event.ts_event, cutoff, strategy.quantity, strategy.faulted)
+                )
+
+            with (
+                self.subTest(window=window),
+                patch.object(
+                    families.FamilyStrategy,
+                    "cancel_order",
+                    new=lambda self, client_id: None,
+                ),
+            ):
+                strategy = run_strategy(
+                    ledger=None,
+                    faults=[],
+                    post_cutoff_fill_sink=sink,
+                    bids=("10", "11", "11", "10", "10", "10"),
+                    quote_offsets_ns=(
+                        0,
+                        200_000_000,
+                        400_000_000,
+                        fill,
+                        fill + 200_000_000,
+                        fill + 400_000_000,
+                    ),
+                    status_events=(
+                        (300_000_000, 300_000_000, "HALT", {}),
+                        (reopen, reopen, "TRADING", {}),
+                    ),
+                    overrides={
+                        "entry_timeout_ns": timeout,
+                        "exit_deadline_ns": start + 20_000_000_000,
+                    },
+                )
+                self.assertEqual("post_cutoff_fill" in strategy.flags, flagged)
+                self.assertEqual(strategy.faulted, frozen)
+                self.assertEqual(
+                    applied,
+                    [(start + fill, start + timeout, contracts.decimal("7"), frozen)]
+                    if flagged
+                    else [],
+                )
+                sells = [
+                    row
+                    for row in strategy.trace
+                    if row["event"] == "submit" and row["side"] == "SELL"
+                ]
+                self.assertEqual(bool(sells), flagged and not frozen)
+                if sells:
+                    self.assertEqual(sells[0]["reason"], "time_exit")
+                    self.assertEqual(sells[0]["now_ns"], start + fill)
+                freezes = [
+                    row for row in strategy.trace if row["event"] == "safety_freeze"
+                ]
+                self.assertEqual(
+                    [row["now_ns"] for row in freezes],
+                    [start + 2_400_000_000] if frozen else [],
+                )
+                self.assertEqual(strategy.quantity == 0, flagged and not frozen)
+                self.assertFalse(strategy.callback_faults)
+
     def test_clock_ahead_and_stale_native_halts_cancel_at_delivery(self):
         from nautilus_trader.model import InstrumentStatus, MarketStatusAction
 
@@ -233,7 +740,7 @@ class LifecycleTests(unittest.TestCase):
                 (150_000_000, 600_000_000, "TRADING", {}),
             ]
             if resumed:
-                statuses.append((600_000_000, 600_000_000, "TRADING", {}))
+                statuses.append((800_000_000, 800_000_000, "TRADING", {}))
             with self.subTest(halt_event_ns=halt_event, resumed=resumed):
                 strategy = run_strategy(
                     ledger=None,
@@ -259,7 +766,7 @@ class LifecycleTests(unittest.TestCase):
                 self.assertEqual(len(buys), int(resumed))
                 if resumed:
                     self.assertEqual(
-                        buys[0]["now_ns"], simulation.BASE_NS + 600_000_000
+                        buys[0]["now_ns"], simulation.BASE_NS + 800_000_000
                     )
                 else:
                     self.assertEqual(strategy.quantity, 0)
@@ -744,6 +1251,16 @@ class LifecycleTests(unittest.TestCase):
                 self.delayed_fill = None
                 self.first_fill_ns = None
                 self.callback_ns = None
+
+            def on_data(self, data):
+                value = getattr(data, "data", data)
+                if isinstance(value, contracts.FactorSnapshot):
+                    # This fixture isolates the execution-time calendar
+                    # anchor; keep its named synthetic halt state valid.
+                    value = replace(
+                        value, valid_until_ns=simulation.BASE_NS + 90000_000_000_000
+                    )
+                return super().on_data(value)
 
             def on_order_filled(self, event):
                 if event.order_side == OrderSide.BUY and self.first_fill_ns is None:
@@ -1493,7 +2010,7 @@ class LifecycleTests(unittest.TestCase):
         self.assertFalse(any(r["event"] == "cancel_requested" for r in strategy.trace))
         self.assertEqual(strategy.quantity, 0)
         self.assertEqual(strategy.sequence, 2)
-        self.assertEqual(faults, [])
+        self.assertEqual(faults, ["held_halted"])
 
     def test_delayed_first_buy_callback_uses_native_fill_event_time(self):
         from nautilus_trader.model import OrderSide
