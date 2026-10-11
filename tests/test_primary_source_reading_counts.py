@@ -16,7 +16,9 @@ from __future__ import annotations
 
 import collections
 import copy
+import hashlib
 import json
+import os
 import re
 import unittest
 from decimal import ROUND_HALF_UP, Decimal
@@ -261,12 +263,62 @@ class ReadingCountsTests(unittest.TestCase):
         run = self.reading["run"]
         calls = self.reading["usage"]["advisor_calls"]
         self.assertIn(f"{calls['refused_too_many_requests']} refused as too_many_requests; the answered calls bill at the "
-                      "advisor's rates outside the executors' usage, the refused calls carry no usage and add no advisor charge "
-                      "(the executor tokens that issue a refused call stay in the executors' spend)", run)
+                      "advisor's rates outside the executors' usage and the refused calls return an advisor_tool_result_error and have no "
+                      "advisor_message iteration in the usage record, so no advisor usage is priced for them", run)
+        self.assertNotIn("add no advisor charge", run)  # the Codex review of #986 at 23fa8ef7a (P1, :3): the page does not say how a refused call is billed
         self.assertNotIn("cost nothing", run)  # the claim that no page line prices; the measured part is that a refused call carries no usage
         self.assertNotIn("all billed", run)
         ((_, advisor),) = self.reading["usage"]["advisor_by_model"].items()
         self.assertEqual(advisor["calls"], calls["answered"])  # the billed tokens are the answered calls' only
+
+    def test_the_advisor_claims_rest_on_the_page_lines_and_the_record_counts(self):
+        # The Codex review in GitHub of #986 at 23fa8ef7a (P1 twice, primary-source-reading.json:3 and :102) and the command center's adjudication of 2026-10-11: the run text said the refused calls "add no advisor
+        # charge" and the speed note said the API "does not report" a speed or a service tier for an advisor iteration, and the advisor-tool page says less than that. The sentences say what the page says, cite its
+        # lines, and rest on the counts of the retained usage record, which usage.advisor_page records and this test compares with the rest of the reading.
+        usage = self.reading["usage"]
+        page, calls = usage["advisor_page"], usage["advisor_calls"]
+        record, assumptions = page["record"], usage["pricing"]["assumptions"]
+        ((_, advisor),) = usage["advisor_by_model"].items()
+        self.assertEqual(page["sha256"], usage["pricing"]["advisor_page_sha256"])
+        self.assertEqual(record["sha256"], usage["measurement"]["record"]["sha256"])
+        for name, (first, last) in page["lines"].items():
+            self.assertLess(first, last, name)
+        for state in page["states"]:
+            self.assertTrue(any(first <= state["line"] <= last for first, last in page["lines"].values()), state)
+        self.assertEqual([s["line"] for s in page["states"]], sorted(s["line"] for s in page["states"]))
+        # one advisor_message iteration per answered call and none for a refused one; no speed, tier or geography on any of them
+        self.assertEqual(record["advisor_message_iterations"], calls["answered"])
+        self.assertEqual(record["advisor_message_iterations"], advisor["calls"])
+        self.assertEqual(record["advisor_message_iterations"], assumptions["advisor_iterations_without_speed_or_tier"])
+        self.assertEqual(calls["made"] - record["advisor_message_iterations"], calls["refused_too_many_requests"])
+        for field in ("iterations_with_speed", "iterations_with_service_tier", "iterations_with_inference_geo"):
+            self.assertEqual(record[field], 0, field)
+        # the page's example iteration lists the token counts and neither speed nor tier
+        self.assertEqual(sorted(page["example_iteration_fields"]), sorted(["type", "model", "input_tokens", "cache_read_input_tokens", "cache_creation_input_tokens", "output_tokens"]))
+        self.assertEqual(sorted(page["does_not_state"]), sorted(["how an advisor_tool_result_error call is billed", "a speed or a service_tier on an advisor_message iteration"]))
+        # the sentences carry exactly the lines of the block
+        errors, billing, example = page["lines"]["error_results"], page["lines"]["usage_and_billing"], page["lines"]["iteration_example"]
+        self.assertIn(f"(advisor tool page, advisor-tool.md, sha256 {page['sha256'][:8]}: error results lines {errors[0]}-{errors[1]}, usage and billing lines {billing[0]}-{billing[1]}; "
+                      "the page does not say how a refused call is billed; the executor tokens that issue a refused call stay in the executors' spend)", self.reading["run"])
+        self.assertIn(f"(the page's example advisor_message iteration lists type, model and the four token counts only, advisor-tool.md lines {example[0]}-{example[1]})", assumptions["speed"])
+        for claim in ("cost nothing", "all billed", "add no advisor charge"):
+            self.assertNotIn(claim, self.reading["run"])
+
+    @unittest.skipUnless(os.environ.get("PLATFORM_DOCS_CAPTURES"), "set PLATFORM_DOCS_CAPTURES to the directory that holds the retained advisor-tool.md to check the cited lines against the page")
+    def test_the_cited_page_lines_say_what_the_block_quotes(self):
+        page = self.reading["usage"]["advisor_page"]
+        raw = (Path(os.environ["PLATFORM_DOCS_CAPTURES"]) / "advisor-tool.md").read_bytes()
+        self.assertEqual(hashlib.sha256(raw).hexdigest(), page["sha256"])
+        self.assertEqual(len(raw), page["bytes"])
+        lines = raw.decode("utf-8").split("\n")
+        for state in page["states"]:
+            self.assertIn(state["quote"], lines[state["line"] - 1], state)
+        self.assertNotIn("service_tier", "\n".join(lines))  # the page names neither field, so it cannot be cited for either
+        self.assertNotIn("speed", "\n".join(lines))
+        first, last = page["lines"]["iteration_example"]
+        example = "\n".join(lines[first - 1:last])
+        for field in page["example_iteration_fields"]:
+            self.assertIn(f'"{field}"', example, field)
 
     def test_the_pricing_read_time_is_a_clock_reading_on_the_date_the_addendum_names(self):
         # P3 b: a time typed into a script is not a measurement; the field is written by the code that re-read the pages and
@@ -295,8 +347,9 @@ class ReadingCountsTests(unittest.TestCase):
                       f"record no speed", assumptions["speed"])
         self.assertIn(f"{assumptions['executor_messages_without_speed_usd_at_standard_list']:.2f} USD of the executors' spend at "
                       f"standard list", assumptions["speed"])
-        self.assertIn(f"the {assumptions['advisor_iterations_without_speed_or_tier']} advisor iterations record neither speed nor "
+        self.assertIn(f"the {assumptions['advisor_iterations_without_speed_or_tier']} advisor iterations of the record carry neither speed nor "
                       f"service tier", assumptions["speed"])
+        self.assertNotIn("which the API does not report", assumptions["speed"])  # the Codex review of #986 at 23fa8ef7a (P1, :102): only the record is measured; the page lists no such field
 
     def test_the_addendum_and_the_run_text_state_the_recorded_reader_and_refuter(self):
         recorded = recorded_settings(self.reading["usage"])

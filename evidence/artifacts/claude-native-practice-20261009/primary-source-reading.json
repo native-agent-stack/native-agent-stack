@@ -1,6 +1,6 @@
 {
  "schema": "claude-native-practice-primary-reading/1",
- "run": "wf_bee0b670-035 (2026-10-09 13:48-14:12Z): per source an Opus 5.5 xhigh reader extracted the code and workflow quality practices it states and mapped each to a role slot and client; an Opus 5.5 max refuter re-read the page and refuted each practice by default; kept = not refuted; the children could call the advisor tool, a Fable 5.1 advisor: 63 calls, 29 answered (8 by readers, 21 by refuters, in 28 children) and 34 refused as too_many_requests; the answered calls bill at the advisor's rates outside the executors' usage, the refused calls carry no usage and add no advisor charge (the executor tokens that issue a refused call stay in the executors' spend)",
+ "run": "wf_bee0b670-035 (2026-10-09 13:48-14:12Z): per source an Opus 5.5 xhigh reader extracted the code and workflow quality practices it states and mapped each to a role slot and client; an Opus 5.5 max refuter re-read the page and refuted each practice by default; kept = not refuted; the children could call the advisor tool, a Fable 5.1 advisor: 63 calls, 29 answered (8 by readers, 21 by refuters, in 28 children) and 34 refused as too_many_requests; the answered calls bill at the advisor's rates outside the executors' usage and the refused calls return an advisor_tool_result_error and have no advisor_message iteration in the usage record, so no advisor usage is priced for them (advisor tool page, advisor-tool.md, sha256 81a97b99: error results lines 385-410, usage and billing lines 1256-1293; the page does not say how a refused call is billed; the executor tokens that issue a refused call stay in the executors' spend)",
  "counts": {
   "sources": 31,
   "practices": 248,
@@ -49,6 +49,77 @@
     }
    },
    "source": "the run's retained raw transcripts, not committed: the server_tool_use blocks named advisor, and their results, advisor_redacted_result (answered, billed) and advisor_tool_result_error with error_code too_many_requests (refused, no usage); the answered calls' tokens are the record's advisor_iterations"
+  },
+  "advisor_page": {
+   "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/advisor-tool.md",
+   "sha256": "81a97b998b6d8043032a656214e34ffb474b3f4fa37d2724155df396ffefaf5a",
+   "bytes": 100799,
+   "lines": {
+    "error_results": [
+     385,
+     410
+    ],
+    "usage_and_billing": [
+     1256,
+     1293
+    ],
+    "iteration_example": [
+     1273,
+     1280
+    ]
+   },
+   "states": [
+    {
+     "line": 385,
+     "quote": "If the advisor call fails, the result carries an error:"
+    },
+    {
+     "line": 398,
+     "quote": "The executor sees the error and continues without further advice. The request itself does not fail."
+    },
+    {
+     "line": 403,
+     "quote": "The advisor sub-inference was rate-limited."
+    },
+    {
+     "line": 1256,
+     "quote": "Advisor calls run as a separate sub-inference billed at the advisor model's rates."
+    },
+    {
+     "line": 1274,
+     "quote": "\"type\": \"advisor_message\","
+    },
+    {
+     "line": 1293,
+     "quote": "Iterations with `type: \"advisor_message\"` are billed at the advisor model's rates"
+    }
+   ],
+   "does_not_state": [
+    "how an advisor_tool_result_error call is billed",
+    "a speed or a service_tier on an advisor_message iteration"
+   ],
+   "example_iteration_fields": [
+    "type",
+    "model",
+    "input_tokens",
+    "cache_read_input_tokens",
+    "cache_creation_input_tokens",
+    "output_tokens"
+   ],
+   "record": {
+    "file": "child-usage-wf_bee0b670-035.json",
+    "sha256": "7b81e56efef8ca52ae778330f6882747f6f14fff5717cb3729b37d3258386d87",
+    "advisor_message_iterations": 29,
+    "iterations_with_speed": 0,
+    "iterations_with_service_tier": 0,
+    "iterations_with_inference_geo": 0,
+    "usage_fields_per_iteration": [
+     "input_tokens",
+     "output_tokens",
+     "cache_read_input_tokens",
+     "cache_creation_input_tokens"
+    ]
+   }
   },
   "by_phase": {
    "Read": {
@@ -99,7 +170,7 @@
    "method": "tokens times the table's rate per million tokens, summed over the five token classes of each model and rounded to cents after summing; the executor's cache creation is all 5-minute (the record's per-message split)",
    "read_note": "both pages re-fetched by the script that wrote this field (p958_p3_fix.py, sha256 d21b6dc2e3b50f5a68e4a09c0540cf20a754f307c718cce53687cac7bcb8cf4b, kept in the research directory), as the .md files named in hashed_urls, at this time, and hashed to the values above (the HTML renderings of the same pages hash differently and change with the site); the first read, at about 14:23Z, gave the same hashes",
    "assumptions": {
-    "speed": "standard list rates throughout. 677 executor messages record speed standard; 24 record no speed (service tier standard; 0.85 USD of the executors' spend at standard list) and the 29 advisor iterations record neither speed nor service tier, which the API does not report for an advisor iteration, so the figure assumes standard speed and routing for those",
+    "speed": "standard list rates throughout. 677 executor messages record speed standard; 24 record no speed (service tier standard; 0.85 USD of the executors' spend at standard list) and the 29 advisor iterations of the record carry neither speed nor service tier (the page's example advisor_message iteration lists type, model and the four token counts only, advisor-tool.md lines 1273-1280), so the figure assumes standard speed and routing for those",
     "executor_messages_with_speed_standard": 677,
     "executor_messages_without_speed": 24,
     "executor_messages_without_speed_usd_at_standard_list": 0.85,

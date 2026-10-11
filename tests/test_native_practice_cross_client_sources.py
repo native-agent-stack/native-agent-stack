@@ -57,6 +57,13 @@ both tables), and a line that looks like a delimiter row or a header row anywher
 pages of `CanonicalStructureTests` that GitHub renders differently (the source row moved to a second table, a fenced block or a tilde fence, the whole source table in a comment, a quoted copy of the table with a wrong-host row, and
 the rows that begin with an inline tag, an autolink, a backtick-fence line or `<! `) and the new tests fail on it; the other four (the source row moved into a comment, a quoted table or a list item, and a list-item copy) it rejects
 for other reasons, and the two invisible pages it passes (the table of the pages, with the counts: fail-before-canonical-structure.txt, retained beside gfm-render-regression-pages.json).
+
+The eighth version closes three bypasses that the command center's Claude micro of #986 found at 23fa8ef7a (P2-1 to P2-3), each a page that GitHub renders differently and the guard passed: a table without outer pipes inside the source
+paragraph (the paragraph lines skipped the sweep; the specification calls the leading and trailing pipe only "recommended", section 4.10, so a header line, a delimiter row and a row are a third table); a delimiter row spaced with a
+vertical tab or a form feed (whitespace to the renderer, section 2.1, and invisible to the space and tab classes of the patterns: the page now rejects both characters); and an HTML table tag anywhere (section 6.10: raw HTML "will be
+rendered in HTML without escaping"). Nine pages join the regression pages (27 in all; GitHub renders 24 of them differently and 3 are invisible; the renders: gfm-render-regression-pages-v2.json, sha256
+4d130c8063339eb3685275a3de82eaa7d06086a3fde474eb799e09d5f800a427; the first file, 18 pages, is kept). Fails before, passes after: the guard of 23fa8ef7a passes 8 of the new pages with no violation (fail-before-wave.txt, retained beside the
+renders).
 """
 
 from __future__ import annotations
@@ -110,6 +117,9 @@ HEADER_SHAPED = re.compile(r"[ \t>*+0-9.)-]*\|?[ \t]*Need[ \t]*\|")
 # A fence or raw HTML before the tables could hide them (an unclosed fence or comment runs to the end of the document), so none is allowed before the second section's header; a line that breaks the source paragraph is not plain text.
 SWALLOWING = re.compile(r" {0,3}(?:`{3,}|~{3,}|<)")
 PARAGRAPH_BREAKER = re.compile(r" {0,3}(?:>|#{1,6}(?:[ \t]|$)|[-+*](?:[ \t]|$)|\d{1,9}[.)](?:[ \t]|$)|`{3,}|~{3,}|<|\||([-*_])(?:[ \t]*\1){2,}[ \t]*$|[=-]+[ \t]*$)")
+# A raw HTML table tag anywhere (a line of prose, a cell) is a table to the renderer: "Text between < and > that looks like an HTML tag is parsed as a raw HTML tag and will be rendered in HTML without escaping"
+# (GFM 0.29-gfm section 6.10, sha256 b153d814...).
+HTML_TABLE = re.compile(r"(?i)<\s*/?\s*(?:table|thead|tbody|tfoot|tr|th|td)\b")
 SPACES = " \t"
 OUTSIDE = "the page is not canonical: "
 
@@ -127,6 +137,11 @@ def read_page(text: str) -> tuple[list[str], list[tuple[str, str]], list[str]]:
     lines = text.split("\n")
     if lines[-1] == "":
         lines.pop()
+    for index, line in enumerate(lines):
+        if "\x0b" in line or "\x0c" in line:
+            findings.append(f"line {index + 1}: a vertical tab or a form feed, which is whitespace to the renderer (GFM 0.29-gfm section 2.1) and can space a delimiter row: {line!r}")
+        if HTML_TABLE.search(line):
+            findings.append(f"line {index + 1}: an HTML table tag, which the renderer shows as a table (GFM 0.29-gfm section 6.10): {line!r}")
     headings = [i for i, line in enumerate(lines) if line == MECHANISM_HEADING]
     markers = [i for i, line in enumerate(lines) if line.startswith(SOURCES_MARKER)]
     if len(headings) != 1 or len(markers) != 1 or headings[0] > markers[0]:
@@ -161,7 +176,7 @@ def read_page(text: str) -> tuple[list[str], list[tuple[str, str]], list[str]]:
     blank = next((index for index in range(marker, len(lines)) if lines[index].strip(SPACES) == ""), None)
     for index in range(marker, len(lines) if blank is None else blank):
         shaped.add(index)
-        if index > marker and PARAGRAPH_BREAKER.match(lines[index]):
+        if index > marker and (PARAGRAPH_BREAKER.match(lines[index]) or DELIMITER_SHAPED.fullmatch(lines[index]) or HEADER_SHAPED.match(lines[index])):
             findings.append(f"line {index + 1}: a line that is not plain text inside the source paragraph: {lines[index]!r}")
     if blank is None:
         findings.append("the source paragraph is not followed by a blank line and the source table")
@@ -583,13 +598,13 @@ class CanonicalStructureTests(unittest.TestCase):
         replaced = lambda bad: self.page(self.lines[:self.gate] + [bad] + self.lines[self.gate + 1:])  # noqa: E731
         pages = {"a lone carriage return inside a row": replaced(row.replace(" | ", " |\r", 1)), "a lone carriage return at the end of a row": replaced(row + "\r"),
                  "a carriage return and a newline for every line": self.text.replace("\n", "\r\n"), "a three-space-indented row": replaced("   " + row),
-                 "a row ending in an escaped pipe": replaced(row[:-2] + " \\|"), "a row with a no-break space before the closing pipe": replaced(row[:-2] + " |")}
+                 "a row ending in an escaped pipe": replaced(row[:-2] + " \\|"), "a row with a no-break space before the closing pipe": replaced(row[:-2] + "\u00a0|")}
         for label, page in pages.items():
             with self.subTest(case=label):
                 self.assertNotEqual(self.violations_of(page), [])
 
     def test_a_character_that_python_but_not_markdown_cuts_a_line_at_does_not_hide_what_follows_it(self):
-        for separator in (" ", "\u0085", "\x0b", "\x0c", "\x1c"):
+        for separator in ("\u2028", "\u0085", "\x0b", "\x0c", "\x1c"):
             with self.subTest(separator=repr(separator)):
                 row = self.lines[self.gate].rstrip(" |") + separator + "tail |"
                 found = self.violations_of(self.page(self.lines[:self.gate] + [row] + self.lines[self.gate + 1:]))
@@ -597,7 +612,7 @@ class CanonicalStructureTests(unittest.TestCase):
 
     def test_text_that_is_not_a_space_or_a_tab_stays_in_the_cell(self):
         # the GFM specification trims "spaces" between pipes and cell content; a no-break space is content, and the cell with it is not a citation
-        for character in (" ", "​", "\x0b"):
+        for character in ("\u00a0", "\u200b", "\x0b"):
             with self.subTest(character=repr(character)):
                 row = self.lines[self.gate].rstrip(" |") + character + " |"
                 self.assertNotEqual(self.violations_of(self.page(self.lines[:self.gate] + [row] + self.lines[self.gate + 1:])), [])
@@ -651,14 +666,37 @@ class CanonicalStructureTests(unittest.TestCase):
             with self.subTest(mechanism_row=label):
                 self.assertIsNone(MECHANISM_ROW.fullmatch(line))
 
+    def test_a_table_without_outer_pipes_a_control_space_and_an_html_table_tag_are_reported_where_they_stand(self):
+        # The command center's Claude micro of #986 at 23fa8ef7a (P2-1 to P2-3): the paragraph lines skipped the sweep, so a table without outer pipes (GFM 0.29-gfm section 4.10: the leading and trailing pipe are only
+        # "recommended") passed; a vertical tab and a form feed are whitespace to the renderer (section 2.1) and space a delimiter row; raw HTML is rendered as written (section 6.10).
+        end = self.source_header - 1
+        cases = {"a table without outer pipes in the paragraph": (self.inserted(end, ["Need | Claude Code source", "--- | ---", "Completion gate | x"]), "not plain text inside the source paragraph"),
+                 "a header-shaped line in the paragraph": (self.inserted(end, ["Need | Claude Code source"]), "not plain text inside the source paragraph"),
+                 "a delimiter spaced with a vertical tab": (self.inserted(end, ["a | b", "---\x0b|\x0b---"]), "a vertical tab or a form feed"),
+                 "a delimiter spaced with a form feed": (self.inserted(end, ["a | b", "---\x0c|\x0c---"]), "a vertical tab or a form feed"),
+                 "an HTML table in the paragraph": (self.page(self.lines[:self.marker] + [self.lines[self.marker] + " <table><tr><td>x</td></tr></table>"] + self.lines[self.marker + 1:]), "an HTML table tag"),
+                 "an uppercase HTML table tag with spaces": (self.inserted(end, ["x < TD > y"]), "an HTML table tag")}
+        for label, (page, wanted) in cases.items():
+            with self.subTest(case=label):
+                self.assertTrue(any(wanted in finding for finding in read_page(page)[2]), read_page(page)[2])
+        self.assertEqual(HTML_TABLE.search("a < b and c > d"), None, "a comparison is not a tag")
+        self.assertEqual(read_page(self.text)[2], [], "the canonical page has none of them")
+
     def test_a_carriage_return_in_the_prose_hides_no_table_line(self):
         # GitHub ends a line at a lone carriage return too, so a table line can start after one inside a line that this reading sees as plain text
         for where, index in (("the head", 3), ("the source paragraph", self.marker + 1)):
             with self.subTest(placed=where):
                 self.assertNotEqual(self.violations_of(self.inserted(index, ["plain text\r| Need | Claude Code source |\r| --- | --- |\r| x | y |"])), [])
 
+    def test_the_source_of_this_module_spells_its_invisible_characters_as_escapes(self):
+        # A literal no-break space, zero-width space or line separator cannot be seen in a review, and U+2028 is a line boundary for str.splitlines() (Python 3.13, Built-in Types, str.splitlines: the boundaries
+        # include \x0b, \x0c, \x1c to \x1e, \x85, U+2028 and U+2029), the very boundary the reading under test is careful about. The cases of this class write such a character as an escape; this module is printable ASCII.
+        source = Path(__file__).read_text(encoding="utf-8")
+        hidden = sorted({f"U+{ord(c):04X}" for c in source if c != "\n" and not (c.isascii() and c.isprintable())})
+        self.assertEqual(hidden, [], "write an invisible or non-ASCII character of this module as an escape")
+
     def test_the_cell_of_a_row_keeps_every_character_that_is_not_a_space_or_a_tab(self):
-        self.assertEqual(split_cell("  x ")[0], " x")
+        self.assertEqual(split_cell(" \u00a0x ")[0], "\u00a0x")
         self.assertEqual(split_cell("\x0bx\t")[0], "\x0bx")
 
     @staticmethod
@@ -701,6 +739,7 @@ class CanonicalStructureTests(unittest.TestCase):
         bad = row.replace("code.claude.com", "invalid.example", 1)
         table = self.lines[self.source_header:self.last + 1]
         remaining = self.lines[:self.gate] + self.lines[self.gate + 1:]
+        para_end = self.source_header - 1  # the blank line after the source paragraph: lines inserted here end the paragraph
         return {
             "a wrong-host row led by <b> under the last source row": (self.inserted(self.last + 1, [bad.replace("| Completion gate |", "<b>Completion gate</b> |", 1)]), True),
             "a wrong-host row led by <span> under the last source row": (self.inserted(self.last + 1, [bad.replace("| Completion gate |", "<span>Completion gate</span> |", 1)]), True),
@@ -718,6 +757,15 @@ class CanonicalStructureTests(unittest.TestCase):
             "the Completion gate row moved into a list item table": (self.page(remaining + ["", f"- {header}", f"  {delimiter}", f"  {row}"]), True),
             "a quoted copy of the source table with a wrong-host row": (self.page(self.lines + [""] + ["> " + line.replace(row, bad) for line in table]), True),
             "a list-item copy of the source table with a wrong-host row": (self.page(self.lines + [""] + ["- " + table[0]] + ["  " + line.replace(row, bad) for line in table[1:]]), True),
+            "a pipe-less table (header, delimiter, row) at the end of the source paragraph": (self.inserted(para_end, ["Need | Claude Code source", "--- | ---", "Completion gate | [hooks](https://invalid.example/x) line 2587"]), True),
+            "a pipe-less table with another header at the end of the source paragraph": (self.inserted(para_end, ["Gate | Source", "--- | ---", "Completion gate | x"]), True),
+            "a pipe-less table with alignment colons at the end of the source paragraph": (self.inserted(para_end, ["Need | Claude Code source", ":---: | ---:", "Completion gate | x"]), True),
+            "a pipe-less table after two more lines of prose in the source paragraph": (self.inserted(para_end, ["More prose.", "Even more prose.", "Need | Claude Code source", "--- | ---", "Completion gate | x"]), True),
+            "a delimiter row spaced with a vertical tab in the source paragraph": (self.inserted(para_end, ["Need | Claude Code source", "---\x0b|\x0b---", "Completion gate | x"]), True),
+            "a delimiter row spaced with a form feed in the source paragraph": (self.inserted(para_end, ["Need | Claude Code source", "---\x0c|\x0c---", "Completion gate | x"]), True),
+            "an inline HTML table in the source paragraph": (self.page(self.lines[:self.marker] + [self.lines[self.marker] + " <table><tr><td>Completion gate</td><td>x</td></tr></table>"] + self.lines[self.marker + 1:]), True),
+            "an uppercase HTML table inside a cell of the mechanism table": (self.page(self.lines[:self.mechanism_header + 2] + [self.lines[self.mechanism_header + 2][:-2] + " <TABLE><TR><TD>x</TD></TR></TABLE> |"] + self.lines[self.mechanism_header + 3:]), True),
+            "a source-header copy inside the source paragraph (invisible, still not canonical)": (self.inserted(para_end, ["Need | Claude Code source"]), False),
             "an HTML comment under the last source row (invisible, still not canonical)": (self.inserted(self.last + 1, ["<!-- x -->"]), False),
             "one more blank line at the end of the page (invisible, still not canonical)": (self.text + "\n", False),
         }
