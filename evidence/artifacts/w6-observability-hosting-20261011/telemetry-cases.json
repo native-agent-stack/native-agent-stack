@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "kind": "w6_frozen_telemetry_cases",
+  "registered_at": "2026-10-11T23:28:28Z",
+  "evidence_class": "synthetic",
+  "scope": "Fictional native-research telemetry only; common oracle for both backends. No account identity, host identity, broker account/order, protected data or real trading path is a fixture input.",
+  "basis": {
+    "path": "fixtures/observability-check.json",
+    "sha256": "f1d66eb8d1326450331372a159917a6e391e98802f7fbc7d359deeea02a08cb1"
+  },
+  "events": [
+    {
+      "receipt_id": "w6-success-a",
+      "project": "fixture-a",
+      "worker_pool": "uet-fixture",
+      "status": "success",
+      "usage_status": "reported",
+      "native_usage": {
+        "input_tokens": 17,
+        "output_tokens": 25,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "reasoning_tokens": 0
+      },
+      "expected_total": 42
+    },
+    {
+      "receipt_id": "w6-failure-a",
+      "project": "fixture-a",
+      "worker_pool": "uet-fixture",
+      "status": "failed",
+      "exit_code": 23,
+      "usage_status": "unreported",
+      "native_usage": null
+    },
+    {
+      "receipt_id": "w6-success-b",
+      "project": "fixture-b",
+      "worker_pool": "uet-fixture",
+      "status": "success",
+      "usage_status": "reported",
+      "native_usage": {
+        "input_tokens": 7,
+        "output_tokens": 11,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "reasoning_tokens": 0
+      },
+      "expected_total": 18
+    }
+  ],
+  "cases": [
+    {
+      "id": "usage-parity",
+      "action": "Ingest all events through the arm's native OTel path; retrieve every native usage category for each receipt",
+      "oracle": {
+        "success_a_total": 42,
+        "success_b_total": 18,
+        "exact_native_usage_categories": true,
+        "failed_run_retained": true,
+        "failure_usage_status": "unreported",
+        "fabricated_failure_usage": false
+      }
+    },
+    {
+      "id": "duplicate-delivery",
+      "action": "Replay success-a twice with the identical receipt_id",
+      "oracle": {
+        "success_a_total": 42,
+        "counting_scope": "exact receipt identity",
+        "delivery_attempts_retained": true
+      }
+    },
+    {
+      "id": "collector-restart",
+      "action": "Restart only this run's owned Collector, then replay/query the frozen events",
+      "oracle": {
+        "success_a_total": 42,
+        "success_b_total": 18,
+        "original_failure_retained": true
+      }
+    },
+    {
+      "id": "backend-restart-and-persistence",
+      "action": "Restart only this run's owned backend and query persisted logs plus a pre-restart historical metric sample",
+      "oracle": {
+        "historical_sample_present": true,
+        "logs_present": true,
+        "success_a_total": 42,
+        "success_b_total": 18,
+        "original_failure_retained": true
+      }
+    },
+    {
+      "id": "project-scope-and-authority",
+      "action": "Query fixture-a and fixture-b scopes separately and exercise a research worker's denial of broker execution authority",
+      "oracle": {
+        "no_cross_project_leakage": true,
+        "no_broker_execution_authority": true,
+        "broker_client_created": false,
+        "network_order_requests": 0
+      }
+    },
+    {
+      "id": "clean-target-recovery",
+      "action": "Use common restic/rest-server dependency to back up only the owned fixture's live telemetry and fictional SQLite journal; run restic check --read-data, restore into an empty independent directory, and restore --verify",
+      "oracle": {
+        "check_exit": 0,
+        "restore_verify_exit": 0,
+        "byte_identical_live_state_and_fixture_journal": true,
+        "source_directory_not_reused": true
+      }
+    }
+  ]
+}

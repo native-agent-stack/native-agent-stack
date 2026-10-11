@@ -1,0 +1,124 @@
+{
+  "schema_version": 1,
+  "kind": "w6_frozen_comparison",
+  "comparison_id": "w6-us-equities-observability-hosting-20261011",
+  "registered_at": "2026-10-11T23:28:28Z",
+  "catalog": "us-equities",
+  "layer_id": "observability-hosting",
+  "catalog_ref": "catalogs/landscape/us-equities.json#/layers/10",
+  "catalog_sha256": "6aff6411e711dcf3f0a487f343bb0e45c319a0a9235763a54eae9316e1597b0e",
+  "requirement_sha256": "0fe225429e2d705a673dbccca452902f48f06675f5683466525d34d26ebd8732",
+  "phase": "preregistered; not run; no terminal state recorded",
+  "harness": "Existing W5 native paired-task/landscape-sweep comparison and token-e2e freeze, without discovery",
+  "new_harness": false,
+  "arms": [
+    {
+      "id": "grafana-stack",
+      "components": [
+        {
+          "repository": "https://github.com/grafana/grafana",
+          "pin": "891f7973f81c6e4e0a24bed3120cca3b3cc93ebc",
+          "install_ref": "Makefile:372",
+          "test_ref": "Makefile:544"
+        },
+        {
+          "repository": "https://github.com/grafana/loki",
+          "pin": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
+          "install_ref": "README.md:108",
+          "test_ref": "Makefile:378"
+        },
+        {
+          "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+          "pin": "3f8455d8038a985398861171e5310bc9b4e988b2",
+          "install_ref": "Makefile:107",
+          "test_ref": "Makefile:107"
+        },
+        {
+          "repository": "https://github.com/prometheus/prometheus",
+          "pin": "d7598b7141418fa35be2b5ec5d0fefb634199610",
+          "install_ref": "README.md:100",
+          "test_ref": "CONTRIBUTING.md:42"
+        }
+      ]
+    },
+    {
+      "id": "signoz",
+      "components": [
+        {
+          "repository": "https://github.com/SigNoz/signoz",
+          "pin": "6b137947280595ecabea354b54076356b78d8433",
+          "install_ref": "Makefile:57",
+          "test_ref": "Makefile:102"
+        }
+      ],
+      "transport": "The upstream-supported SigNoz OTel deployment at this source pin; transitive runtime image digests must be captured before the first replay, with no different input event or sampling rules"
+    }
+  ],
+  "common_recovery_dependencies": [
+    {
+      "repository": "https://github.com/restic/rest-server",
+      "pin": "0f256e8ea8eae5611b04d1abed9ae6c38f76e215",
+      "install_ref": "README.md:20",
+      "test_ref": ".github/workflows/tests.yml:61"
+    },
+    {
+      "repository": "https://github.com/restic/restic",
+      "pin": "6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf",
+      "install_ref": "CONTRIBUTING.md:91",
+      "test_ref": "CONTRIBUTING.md:101"
+    }
+  ],
+  "cumulative_survivor_disposition": {
+    "repository": "https://github.com/restic/rest-server",
+    "origin_sweep": "landscape-sweep-20260926",
+    "disposition": "included_in_frozen_comparison_as_common_recovery_dependency",
+    "case_id": "clean-target-recovery",
+    "reason": "A backup service is not a telemetry backend competitor. Both backend arms must prove the same recovery requirement; survivor omission is forbidden."
+  },
+  "fixture_seal": {
+    "path": "evidence/artifacts/w6-observability-hosting-20261011/telemetry-cases.json",
+    "sha256": "a18773b3bcff53d83dc526e07411ea13fe9f71fe85d8ba1bb479b99633093f0c"
+  },
+  "repetitions": 3,
+  "order": [
+    "grafana-stack then signoz",
+    "signoz then grafana-stack",
+    "grafana-stack then signoz"
+  ],
+  "fresh_store_each_repetition": true,
+  "readiness_trigger": {
+    "all_of": [
+      "Both source-pin runtimes and their upstream-owned install/test/E2E recipes are reproduced in isolated owned stores",
+      "The six-case fixture seal reproduces and transitive runtime image digests are frozen before the first replay",
+      "The existing native-usage recorder can supply an attributable source receipt for a bounded real native-client research task; replay uses identical source bytes in both arms",
+      "The private-repository/uet-runner-pool compatibility probe is bounded, read-only and uses fictional telemetry; real trading paths are never mutated or published",
+      "An isolated runner slot exists behind the cued landing and Monday priority queue",
+      "Co-op relays #1007 LANDED; final-stack runs[] is available"
+    ],
+    "present_at_registration": [
+      "source pins",
+      "six frozen telemetry cases",
+      "latest sweep and cumulative survivor"
+    ],
+    "missing_at_registration": [
+      "runtime E2E receipts at the compared pins",
+      "isolated backend deployment and image seals",
+      "bounded native-usage and private runner scope receipts",
+      "#1007 LANDED relay"
+    ],
+    "start_rule": "Start as soon as all named inputs exist; no date schedules the run and no ready comparison may remain unrun"
+  },
+  "fixed_decision_rule": {
+    "mandatory": "Each of the six frozen cases must meet every oracle field in all three repetitions. Upstream test/E2E, native-receipt parity, project scope, broker-authority denial and clean-target recovery are mandatory gates. Source review or the synthetic fixture alone cannot qualify a winner.",
+    "rank": "Among qualifying arms maximize exact case correctness, then minimize complete provider cost for the common native task, then median full-replay elapsed time, then peak RSS. Backend storage/retrieval costs are separately recorded. Do not compare tool-token estimates as provider savings.",
+    "tie": "If all ranked measurements are exactly tied and both arms qualify, select the existing Grafana-stack operational path, recording equality and no claim of superior quality.",
+    "none_qualify": "Record the role RETIRED with the scoped failure reasons; no unqualified backend is promoted and no third arm is introduced.",
+    "terminal": "After the rule selects an arm, FINAL additionally needs the catalog verdict/evidence class/wave/next_review, each selected component's final-stack runs[] pin, its upstream-owned E2E at that pin, and invoke evidence in the measured window or the recorded role reason. Otherwise name the exact unmet condition without claiming FINAL.",
+    "failure_retention": "Keep each failed installation, replay, restart, restore and missing-usage result; no silent retry, dropping or source-oracle change.",
+    "amendments": "Any input correction requires an independently reviewed, hashed amendment before affected scoring. The arms, metrics and fixed rule cannot change after first replay."
+  },
+  "protected_scope": "Only disposable owned services, stores, telemetry and fictional journals. Never modify paper units, paper configuration, the sealed bundle, Monday recorders, actual broker journals, acquisition paths or another lane's runner configuration.",
+  "monday_rule": "Inside the CC's heavy-E2E window use systemd-run --user --scope -p CPUWeight=idle. A full suite additionally needs SUITE-REQUEST and the co-op's SUITE-GO.",
+  "source_evidence_class": "source_review",
+  "fixture_evidence_class": "synthetic"
+}

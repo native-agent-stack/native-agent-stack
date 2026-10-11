@@ -19416,6 +19416,11 @@
       "bytes": 15242
     },
     {
+      "path": "docs/w6-observability-hosting-delta-20261011.md",
+      "sha256": "17e7654c9e6c4751c389611a9e194f1e4ddd0bba1282b147c4f7e8bdce7a2e37",
+      "bytes": 4007
+    },
+    {
       "path": "evidence/artifacts/actionlint-successor-parity-20260927/README.md",
       "sha256": "c282b2ce2ba53dc42867e8e78cf8e69b3b79fa59bffce27660ca46e8ffeb8f78",
       "bytes": 10531
@@ -57409,6 +57414,26 @@
       "path": "evidence/artifacts/w6-layer-verdict-20261011/resolution-delta.json",
       "sha256": "7e7622b64e46db95ba89a2e19f2dfadd3a09950d4cbe354a084029bb26fc887d",
       "bytes": 157635
+    },
+    {
+      "path": "evidence/artifacts/w6-observability-hosting-20261011/preregistration.json",
+      "sha256": "972efba72e71335940c0a1b3c949ff5921cf4d1ea8e79be4e172bd04c93551c3",
+      "bytes": 6974
+    },
+    {
+      "path": "evidence/artifacts/w6-observability-hosting-20261011/primary-sources.json",
+      "sha256": "f9e22ab94f523ef1b9b0251b159582d60e3d29fdf150a11c7d19392578c6c142",
+      "bytes": 6465
+    },
+    {
+      "path": "evidence/artifacts/w6-observability-hosting-20261011/resolution-delta.json",
+      "sha256": "8231c30682032fd3c6e6e0cdb7fbae7500b408d37ef97762c1a5bf346194e1d0",
+      "bytes": 4678
+    },
+    {
+      "path": "evidence/artifacts/w6-observability-hosting-20261011/telemetry-cases.json",
+      "sha256": "a18773b3bcff53d83dc526e07411ea13fe9f71fe85d8ba1bb479b99633093f0c",
+      "bytes": 3782
     },
     {
       "path": "evidence/artifacts/workstation-lane-20260925/nemotron-qualification/model_card_check.py",

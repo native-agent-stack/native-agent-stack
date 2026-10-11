@@ -1,0 +1,181 @@
+{
+  "schema_version": 1,
+  "kind": "w6_mirror_primary_sources",
+  "recorded_at": "2026-10-11T23:28:28Z",
+  "mirror_root": "~/code/upstream",
+  "read_command": "GIT_NO_LAZY_FETCH=1 GIT_OPTIONAL_LOCKS=0 git show HEAD:<path>",
+  "scope": "Own source at lock-matched mirror HEAD. Build/test targets are documented paths, not receipts; source review does not qualify runtime behavior.",
+  "sources": [
+    {
+      "repository": "https://github.com/SigNoz/signoz",
+      "pin": "6b137947280595ecabea354b54076356b78d8433",
+      "manifest_ref": "6b137947280595ecabea354b54076356b78d8433",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:23",
+      "install_ref": "Makefile:57",
+      "test_ref": "Makefile:102",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "25621be3e5a76e70740b3b55a36b35a9074af930c6c189df633c7e9cadbceb73"
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "sha256": "287e4bdd07fd17b1befb20aea0754a5770f6fd56e84c2aa3f81df3230a850749"
+        },
+        {
+          "path": "Makefile",
+          "sha256": "472f725c4dbddb1b34cc9120a2a2fc016592019681c1168921353826f010050b"
+        }
+      ],
+      "evidence_class": "source_review",
+      "scope": "Documented local development deployment and test target; backend E2E receipt still required"
+    },
+    {
+      "repository": "https://github.com/grafana/grafana",
+      "pin": "891f7973f81c6e4e0a24bed3120cca3b3cc93ebc",
+      "manifest_ref": "891f7973f81c6e4e0a24bed3120cca3b3cc93ebc",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:4",
+      "install_ref": "Makefile:372",
+      "test_ref": "Makefile:544",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "fc8a867bf09f319b9288746ab0148faff2e92ed39cd702252ce59161e576c019"
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "sha256": "37bbdfaad94a1fa0c0d0ad87278afad1b91e7007ef8197062a27f96e61dd5246"
+        },
+        {
+          "path": "package.json",
+          "sha256": "6f343cb932a8b29504ad7466935996b5552ebf2289c7b8be64f0d5f61cfba25d"
+        },
+        {
+          "path": "Makefile",
+          "sha256": "edabe0cde241485e2e553edc4645193060691547222f1dc362539e3ea5b14387"
+        }
+      ],
+      "evidence_class": "source_review",
+      "scope": "Upstream build and backend/integration test targets"
+    },
+    {
+      "repository": "https://github.com/grafana/loki",
+      "pin": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
+      "manifest_ref": "v3.7.8",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:23",
+      "install_ref": "README.md:108",
+      "test_ref": "Makefile:378",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "af9e356ba4d99300f4e145be9c0b5885587b2ba8dbba89e2a5f149cd3572c04a"
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "sha256": "6a8fdba4e29e3e453acdcfc941d60b2dcc8b1a5b651622db4eb52667935f9c53"
+        },
+        {
+          "path": "Makefile",
+          "sha256": "38b020ac2791318005310734854922c802f36968e5530b3e8b7d2749d04721de"
+        }
+      ],
+      "evidence_class": "source_review",
+      "scope": "Upstream build and tests"
+    },
+    {
+      "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+      "pin": "3f8455d8038a985398861171e5310bc9b4e988b2",
+      "manifest_ref": "v0.161.0",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:38",
+      "install_ref": "Makefile:107",
+      "test_ref": "Makefile:107",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "b99baaf263c2e2194880c2900524c09270c267f6a8b3ee699ecee66cc1dc5fdf"
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "sha256": "4121c3abcb05a77ed7ec2ff348efabd450143f91863689fa098c6ce5296aab8b"
+        },
+        {
+          "path": "Makefile",
+          "sha256": "7de4e102f6b5d50a0a3c466f671dd40effc2368cd67eaecea06cf430ce1c3d7f"
+        }
+      ],
+      "evidence_class": "source_review",
+      "scope": "Upstream e2e-test target owns collector/testbed build"
+    },
+    {
+      "repository": "https://github.com/prometheus/prometheus",
+      "pin": "d7598b7141418fa35be2b5ec5d0fefb634199610",
+      "manifest_ref": "v3.14.0",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:38",
+      "install_ref": "README.md:100",
+      "test_ref": "CONTRIBUTING.md:42",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "903404c4bf86f099ac03fd6cbf297c7b1e32269ec0ee7b461335a638e52c715a"
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "sha256": "89db2218935bf7c462809cc0622cce69b4b1aab29d490853d77aec94e020fc34"
+        },
+        {
+          "path": "Makefile",
+          "sha256": "0f915bddfb73f270843dd0d77c9dccbfc0176051d8fc2854b50afc7791fe2626"
+        }
+      ],
+      "evidence_class": "source_review",
+      "scope": "Upstream build and test commands"
+    },
+    {
+      "repository": "https://github.com/restic/rest-server",
+      "pin": "0f256e8ea8eae5611b04d1abed9ae6c38f76e215",
+      "manifest_ref": "0f256e8ea8eae5611b04d1abed9ae6c38f76e215",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:10",
+      "install_ref": "README.md:20",
+      "test_ref": ".github/workflows/tests.yml:61",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "78fa75d8f8669f3fc3e89d81648b5924dc9d1f878082bb4d0aa14e87259c1d64"
+        }
+      ],
+      "evidence_class": "source_review",
+      "scope": "Native build and upstream go test workflow"
+    },
+    {
+      "repository": "https://github.com/restic/restic",
+      "pin": "6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf",
+      "manifest_ref": "v0.19.1",
+      "mirror_status": "MIRRORED",
+      "role_ref": "README.md:7",
+      "install_ref": "CONTRIBUTING.md:91",
+      "test_ref": "CONTRIBUTING.md:101",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "8180046c28e55384c37588607b64a160b3e359a044d6ac59fddb94d659eab75d"
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "sha256": "6d9e8295cc7eb415fb3a094bd55ead25b54b00d988fc4e84f09a0df46f71a299"
+        },
+        {
+          "path": "Makefile",
+          "sha256": "308dc7fa5136f323440d274eb58e5980a36bf46b78c4b118c61afd9ca72cf4cc"
+        }
+      ],
+      "evidence_class": "source_review",
+      "scope": "Native build and upstream tests"
+    }
+  ]
+}

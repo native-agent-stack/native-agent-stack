@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "kind": "w6_protocol_delta",
+  "recorded_at": "2026-10-11T23:28:28Z",
+  "base_commit": "77185991ec9627e59473df5b4d7a11ca87b0461d",
+  "catalog": "us-equities",
+  "layer_id": "observability-hosting",
+  "catalog_ref": "catalogs/landscape/us-equities.json#/layers/10",
+  "catalog_sha256": "6aff6411e711dcf3f0a487f343bb0e45c319a0a9235763a54eae9316e1597b0e",
+  "row_sha256": "a6ad30665839bc6ab2f3b5ed426787d9b82404bd11810daf3805f9461520fc3a",
+  "verdict_status": "pending_lanes",
+  "winners": [],
+  "wave_ref": "catalogs/sota-convergence/layer-verdicts-20260922.json#/catalogs/us-equities/7",
+  "wave_sha256": "2fef6da7468a8e97a319fdc6f75f73374cd34b412bf93de90fd0c2a7504159de",
+  "next_review": null,
+  "next_review_gap": "No next_review in the consumed row or wave; condition 1 remains a gap.",
+  "sweeps": [
+    {
+      "id": "landscape-sweep-20260923",
+      "row_ref": "catalogs/saturation/ledger.json#/sweeps/1/layers/30",
+      "manifest_ref": "catalogs/sota-convergence/manifest-20260923.json",
+      "manifest_sha256": "304d75dd0dabb02ba46191161732c17d234c3608a194f538c6bee6b64b8069c8",
+      "returns_ref": null,
+      "returns_sha256": null,
+      "survivor_count": 0,
+      "missing_vote_note": "per-vote returns not retained; votes are the manifest's per-lens refuted flags",
+      "reopen": []
+    },
+    {
+      "id": "landscape-sweep-20260926",
+      "row_ref": "catalogs/saturation/ledger.json#/sweeps/3/layers/30",
+      "manifest_ref": "catalogs/sota-convergence/manifest-20260926.json",
+      "manifest_sha256": "a72177d162f84ba827028a7bff5ebc78ea9195c7a99ed2b411c75f7869b20e0e",
+      "returns_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json",
+      "returns_sha256": "ea7e8ed285639a247df91d0c64d9378e080bc820170e9fc773434488397f4600",
+      "survivor_count": 1,
+      "missing_vote_note": null,
+      "reopen": [
+        {
+          "trigger": "retained_failure",
+          "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/failures/observability-hosting"
+        }
+      ]
+    }
+  ],
+  "latest_covering_sweep": "landscape-sweep-20260926",
+  "cumulative_survivor_count": 1,
+  "dispositions": [
+    {
+      "repository": "https://github.com/restic/rest-server",
+      "origin_sweep": "landscape-sweep-20260926",
+      "disposition": "included_in_frozen_comparison_as_common_recovery_dependency",
+      "case_id": "clean-target-recovery",
+      "reason": "A backup service is not a telemetry backend competitor. Both backend arms must prove the same recovery requirement; survivor omission is forbidden."
+    }
+  ],
+  "comparison_id": "w6-us-equities-observability-hosting-20261011",
+  "preregistration_ref": "evidence/artifacts/w6-observability-hosting-20261011/preregistration.json",
+  "preregistration_sha256": "972efba72e71335940c0a1b3c949ff5921cf4d1ea8e79be4e172bd04c93551c3",
+  "fixture_sha256": "a18773b3bcff53d83dc526e07411ea13fe9f71fe85d8ba1bb479b99633093f0c",
+  "terminal_state": null,
+  "terminal_readiness": "#1007 LANDED relay, then the applicable evidence-defined terminal record",
+  "foundation_shared_fact_refs": [
+    {
+      "ref": "catalogs/landscape/foundation.json#/layers/15",
+      "scope": "observation-inference: Collector, Prometheus and Loki shared candidate facts at the consumed main base; synthetic historical qualification is not new acceptance"
+    },
+    {
+      "ref": "catalogs/landscape/foundation.json#/layers/14",
+      "scope": "recovery-portability: restic shared candidate facts at the consumed main base; static/synthetic backup evidence is not live-state or off-host qualification"
+    },
+    {
+      "pr": 1021,
+      "head": "4ddd4822d57be3c7ae07b5e0cf4666538166a3ad",
+      "path": "evidence/artifacts/w6-layer-verdict-20261011/primary-sources.json",
+      "scope": "Common native-client source facts and current-pin/historical receipt boundary; consume this retained foundation adjudication instead of another discovery vote"
+    }
+  ],
+  "trading_requirement_delta": [
+    "Private repository and uet runner pool remain separate native compatibility scopes; require the bounded source receipt before promotion",
+    "Only fictional telemetry and isolated stores enter the published packet; no actual trading data path or broker identity is published",
+    "Broker-authority denial and clean-target recovery of live fixture state are mandatory, not inferred from source installation",
+    "A rest-server recovery role is included in both arms and never treated as a competing backend"
+  ],
+  "source_refs": "evidence/artifacts/w6-observability-hosting-20261011/primary-sources.json",
+  "evidence_class": "source_review",
+  "no_runtime_adoption_claim": true
+}
