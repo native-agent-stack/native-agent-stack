@@ -60226,6 +60226,11 @@
       "bytes": 1029
     },
     {
+      "path": "tests/fixtures/verify_sources/github-rest-recorded.json",
+      "sha256": "e3c38676b2ba3c35ab6f6afa609373fb49f09f2b3fb43c438afc918bbbb9082e",
+      "bytes": 9627
+    },
+    {
       "path": "tests/fixtures/workflow-security/unsafe.yml.txt",
       "sha256": "9e1c6130a396200387a0b9f1d445a33dbf154370db5460a3b50e086321bb737a",
       "bytes": 304
@@ -61516,6 +61521,11 @@
       "bytes": 116272
     },
     {
+      "path": "tests/test_verify_sources.py",
+      "sha256": "a61058c1436885732b27b24ed10da748c31d37d9e242ed3eb14cbf4ccba14196",
+      "bytes": 42559
+    },
+    {
       "path": "tests/test_windows_terminal_defaults.py",
       "sha256": "f4b2c8ebe16f54782204f32fd674debc4b8f3a01f5ca1d0b00b788c175ed0502",
       "bytes": 51736
@@ -62064,6 +62074,11 @@
       "path": "tools/sota-convergence/start_closure_sampler.py",
       "sha256": "6255be2d5c8bd7e766ba717df4a0bfc87649e13179c940f1fa97568a7ac7ee3a",
       "bytes": 41767
+    },
+    {
+      "path": "tools/sota-sources/verify_sources.py",
+      "sha256": "e2af0f19bb4af505fa8edd1ca76f265e4fc0ee920f6ab4c2763f8e5107be6f5f",
+      "bytes": 30479
     },
     {
       "path": "tools/token-e2e/README.md",

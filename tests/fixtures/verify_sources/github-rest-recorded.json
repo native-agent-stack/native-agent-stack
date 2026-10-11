@@ -1,0 +1,271 @@
+{
+  "recorded_at": "2026-10-11T03:52:00Z",
+  "recorded_with": "tools/sota-sources/verify_sources.py GitHub.get over urllib_fetch, unauthenticated, X-GitHub-Api-Version 2026-03-10",
+  "trimmed": "JSON bodies keep only the fields the verifier reads; the two file bodies are replaced by synthetic_lines lines, with the response as recorded under recorded",
+  "lychee_master_at_recording": "c11d7794e9be55fc57d5ffd35543bf6221799fb3",
+  "responses": {
+    "commit-sha-12": {
+      "path": "/repos/lycheeverse/lychee/commits/2bba271688c1",
+      "accept": "application/vnd.github.sha",
+      "status": 200,
+      "headers": {
+        "content-type": "application/vnd.github.sha; charset=utf-8",
+        "etag": "\"2bba271688c1abb1503097a064e6c3bc1d1b6a9b\""
+      },
+      "text": "2bba271688c1abb1503097a064e6c3bc1d1b6a9b"
+    },
+    "commit-sha-40": {
+      "path": "/repos/lycheeverse/lychee/commits/2bba271688c1abb1503097a064e6c3bc1d1b6a9b",
+      "accept": "application/vnd.github.sha",
+      "status": 200,
+      "headers": {
+        "content-type": "application/vnd.github.sha; charset=utf-8",
+        "etag": "\"2bba271688c1abb1503097a064e6c3bc1d1b6a9b\""
+      },
+      "text": "2bba271688c1abb1503097a064e6c3bc1d1b6a9b"
+    },
+    "commit-sha-missing": {
+      "path": "/repos/lycheeverse/lychee/commits/0123456789ab",
+      "accept": "application/vnd.github.sha",
+      "status": 422,
+      "headers": {
+        "content-type": "application/json; charset=utf-8"
+      },
+      "json": {
+        "message": "No commit found for SHA: 0123456789ab",
+        "status": "422"
+      }
+    },
+    "commit-sha-fork": {
+      "path": "/repos/lycheeverse/lychee/commits/5d57da580790",
+      "accept": "application/vnd.github.sha",
+      "status": 200,
+      "headers": {
+        "content-type": "application/vnd.github.sha; charset=utf-8",
+        "etag": "\"5d57da580790e360a88d38d6af6e1e1b122f15a7\""
+      },
+      "text": "5d57da580790e360a88d38d6af6e1e1b122f15a7"
+    },
+    "git-commit": {
+      "path": "/repos/lycheeverse/lychee/git/commits/2bba271688c1abb1503097a064e6c3bc1d1b6a9b",
+      "accept": "application/vnd.github+json",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "etag": "W/\"2d67569135081bec81a731db26c0445463a02b60091ba4357e8cb3383ac3f8ae\""
+      },
+      "json": {
+        "sha": "2bba271688c1abb1503097a064e6c3bc1d1b6a9b",
+        "tree": {
+          "sha": "f0f074d9551c99856c22d39d2a1070f70c7023bd"
+        },
+        "parents": [
+          {
+            "sha": "9d3b7ab535220745c2c4cfe22cbc9fa92ea46a02"
+          }
+        ]
+      }
+    },
+    "git-commit-missing": {
+      "path": "/repos/lycheeverse/lychee/git/commits/0123456789abcdef0123456789abcdef01234567",
+      "accept": "application/vnd.github+json",
+      "status": 404,
+      "headers": {
+        "content-type": "application/json; charset=utf-8"
+      },
+      "json": {
+        "message": "Not Found",
+        "status": "404"
+      }
+    },
+    "git-commit-fork": {
+      "path": "/repos/lycheeverse/lychee/git/commits/5d57da580790e360a88d38d6af6e1e1b122f15a7",
+      "accept": "application/vnd.github+json",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "etag": "W/\"693881900f660b36c328e1c1fd9fa96e34ca29b421995fb483d62ab4a796ff99\""
+      },
+      "json": {
+        "sha": "5d57da580790e360a88d38d6af6e1e1b122f15a7",
+        "tree": {
+          "sha": "0ec47ccd4fd3abc621e962b44c67ccfc6efd0df4"
+        },
+        "parents": [
+          {
+            "sha": "c11d7794e9be55fc57d5ffd35543bf6221799fb3"
+          }
+        ]
+      }
+    },
+    "contents-file": {
+      "path": "/repos/lycheeverse/lychee/contents/lychee-lib/src/quirks/mod.rs?ref=2bba271688c1abb1503097a064e6c3bc1d1b6a9b",
+      "accept": "application/vnd.github.raw+json",
+      "status": 200,
+      "headers": {
+        "content-type": "application/vnd.github.raw+json; charset=utf-8",
+        "etag": "\"6c96684b5008003081ebc3c6bdbd3fc7d4e0dd83\""
+      },
+      "recorded": {
+        "bytes": 11686,
+        "lines": 318,
+        "etag": "\"16123f54b8b404d596ec69d7a08ea51b73064673\"",
+        "content_blob": "16123f54b8b404d596ec69d7a08ea51b73064673"
+      },
+      "synthetic_lines": 318
+    },
+    "contents-directory": {
+      "path": "/repos/lycheeverse/lychee/contents/lychee-lib/src/quirks?ref=2bba271688c1abb1503097a064e6c3bc1d1b6a9b",
+      "accept": "application/vnd.github.raw+json",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "etag": "\"f0f074d9551c99856c22d39d2a1070f70c7023bd\""
+      },
+      "json": [
+        {
+          "name": "mod.rs",
+          "path": "lychee-lib/src/quirks/mod.rs",
+          "sha": "16123f54b8b404d596ec69d7a08ea51b73064673",
+          "size": 11686,
+          "type": "file"
+        }
+      ]
+    },
+    "contents-missing": {
+      "path": "/repos/lycheeverse/lychee/contents/no/such/file.rs?ref=2bba271688c1abb1503097a064e6c3bc1d1b6a9b",
+      "accept": "application/vnd.github.raw+json",
+      "status": 404,
+      "headers": {
+        "content-type": "application/json; charset=utf-8"
+      },
+      "json": {
+        "message": "Not Found",
+        "status": "404"
+      }
+    },
+    "repository": {
+      "path": "/repos/lycheeverse/lychee",
+      "accept": "application/vnd.github+json",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "etag": "W/\"2e4be4b6b2d7c04da1af8a2e85b97c19c2ee674850e2fbc10fada75c8a386138\""
+      },
+      "json": {
+        "full_name": "lycheeverse/lychee",
+        "default_branch": "master"
+      }
+    },
+    "compare-ahead": {
+      "path": "/repos/lycheeverse/lychee/compare/2bba271688c1abb1503097a064e6c3bc1d1b6a9b...master?per_page=1",
+      "accept": "application/vnd.github+json",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "etag": "W/\"4d82ee0f51cfc792780fddd60fe0a953e1c6c24c84461377e34e856dd71b8944\""
+      },
+      "json": {
+        "status": "ahead",
+        "ahead_by": 125,
+        "behind_by": 0,
+        "total_commits": 125,
+        "base_commit": {
+          "sha": "2bba271688c1abb1503097a064e6c3bc1d1b6a9b"
+        },
+        "merge_base_commit": {
+          "sha": "2bba271688c1abb1503097a064e6c3bc1d1b6a9b"
+        }
+      }
+    },
+    "compare-identical": {
+      "path": "/repos/lycheeverse/lychee/compare/c11d7794e9be55fc57d5ffd35543bf6221799fb3...master?per_page=1",
+      "accept": "application/vnd.github+json",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "etag": "W/\"1982267c2d6b22aca1a0afb5806f292bc7b541750d6001f02076def4fa7117e2\""
+      },
+      "json": {
+        "status": "identical",
+        "ahead_by": 0,
+        "behind_by": 0,
+        "total_commits": 0,
+        "base_commit": {
+          "sha": "c11d7794e9be55fc57d5ffd35543bf6221799fb3"
+        },
+        "merge_base_commit": {
+          "sha": "c11d7794e9be55fc57d5ffd35543bf6221799fb3"
+        }
+      }
+    },
+    "compare-behind-fork": {
+      "path": "/repos/lycheeverse/lychee/compare/5d57da580790e360a88d38d6af6e1e1b122f15a7...master?per_page=1",
+      "accept": "application/vnd.github+json",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "etag": "W/\"b69e5360cffdf605272b232ec737fa895889f115252b25ad499617920e7f990e\""
+      },
+      "json": {
+        "status": "behind",
+        "ahead_by": 0,
+        "behind_by": 1,
+        "total_commits": 0,
+        "base_commit": {
+          "sha": "5d57da580790e360a88d38d6af6e1e1b122f15a7"
+        },
+        "merge_base_commit": {
+          "sha": "c11d7794e9be55fc57d5ffd35543bf6221799fb3"
+        }
+      }
+    },
+    "compare-diverged-fork": {
+      "path": "/repos/lycheeverse/lychee/compare/2677ce10d16fb8444c70fdeabbd9c7be75fe8f62...master?per_page=1",
+      "accept": "application/vnd.github+json",
+      "status": 200,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "etag": "W/\"c123d4d9244f40a0e10f0fef8a88964b6e329ef6a72d918714db56d4beff9a60\""
+      },
+      "json": {
+        "status": "diverged",
+        "ahead_by": 4,
+        "behind_by": 2,
+        "total_commits": 4,
+        "base_commit": {
+          "sha": "2677ce10d16fb8444c70fdeabbd9c7be75fe8f62"
+        },
+        "merge_base_commit": {
+          "sha": "2c1fb3ad1373b1eb5148176bb6dcd4773f2a564d"
+        }
+      }
+    },
+    "contents-symlink-to-file": {
+      "path": "/repos/Wilfred/difftastic/contents/CLAUDE.md?ref=b7d119e90ac9f972f03f69508da765dacd302c0c",
+      "accept": "application/vnd.github.raw+json",
+      "status": 200,
+      "headers": {
+        "content-type": "application/vnd.github.raw+json; charset=utf-8",
+        "etag": "\"47dc3e3d863cfb5727b87d785d09abf9743c0a72\""
+      },
+      "recorded": {
+        "bytes": 129,
+        "lines": 3,
+        "etag": "\"47dc3e3d863cfb5727b87d785d09abf9743c0a72\"",
+        "content_blob": "372bd736f2d16fea5374545137098da7369ea9db"
+      },
+      "synthetic_lines": 3
+    },
+    "contents-symlink-to-directory": {
+      "path": "/repos/Imbad0202/academic-research-skills/contents/skills/academic-paper?ref=ebc21bf2429643fe4c2495aa99e1bbacd926772b",
+      "accept": "application/vnd.github.raw+json",
+      "status": 200,
+      "headers": {
+        "content-type": "application/vnd.github.raw+json; charset=utf-8",
+        "etag": "\"3665c78ea8402cc215a4d010fe92d6c40b1cc5fe\""
+      },
+      "text": "../academic-paper"
+    }
+  }
+}
