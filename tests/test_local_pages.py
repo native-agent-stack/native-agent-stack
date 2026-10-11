@@ -637,6 +637,14 @@ class LocalPagesTests(unittest.TestCase):
         self.assertIn('id="fleet"', (self.output / "sources.html").read_text())
         self.assertEqual(receipt["fleet"]["lanes_live"], self.fleet_result["lanes_live"])
 
+    def test_index_overview_links_north_star_grand_page_after_readiness(self) -> None:
+        self.refresh()
+        index = (self.output / "index.html").read_text()
+        overview = index[index.index('<ul class="page-index">'):]
+        overview = overview[:overview.index("</ul>")]
+        self.assertIn('<li><a href="northstar.html">North-star grand page</a>', overview)
+        self.assertLess(overview.index('href="readiness.html"'), overview.index('href="northstar.html"'))
+
     def test_partial_fleet_observation_does_not_claim_zero_workers(self) -> None:
         for source in (None, "", "not reported"):
             with self.subTest(source=source):
