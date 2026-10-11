@@ -1,6 +1,6 @@
 {
  "schema": "claude-native-practice-cross-client-lines/1",
- "note": "The lines the Claude source table of reference/cross-client.md cites, with the capture each was read from. Lines are counted by newline in the capture. line_sha256 is the sha256 of the line's bytes followed by a newline, which is what `sed -n '<line>p' <capture> | sha256sum` prints. The captures are private working papers of the 2026-10-09 reading, not in this repository; their hashes and fetch times are the locators of claims.json, which the guard test checks.",
+ "note": "The lines the Claude source table of reference/cross-client.md cites, with the capture each was read from. Lines are counted by newline in the capture. line_sha256 is the sha256 of the line's bytes followed by a newline. For a line that is followed by a newline in the capture (each recorded line is), `sed -n '<line>p' <capture> | sha256sum` prints the same. The captures are private working papers of the 2026-10-09 reading, not in this repository; their hashes and fetch times are the locators of claims.json, which the guard test checks.",
  "lines": [
   {
    "url": "https://code.claude.com/docs/en/cli-reference.md",

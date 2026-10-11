@@ -36,7 +36,7 @@ Claude column sources: the Claude Code documentation pages the 2026-10-09 readin
 sha256 and the fetch time are locators of `evidence/artifacts/claude-native-practice-20261009/claims.json`, and the line (counted by newline
 in that capture) is recorded with the sha256 of its text in `evidence/artifacts/claude-native-practice-20261009/cross-client-lines.json`; a
 test checks the page against both. The captures are private working papers of the reading, not in this repository: with a capture,
-`sed -n '<line>p' <capture> | sha256sum` prints the recorded line hash. `/review-changes` is this repository's saved Workflow,
+`sed -n '<line>p' <capture> | sha256sum` prints the recorded hash of a line that is followed by a newline (each cited line is). `/review-changes` is this repository's saved Workflow,
 `examples/claude-native/workflows/review-changes.js`.
 
 | Need | Claude Code source |
