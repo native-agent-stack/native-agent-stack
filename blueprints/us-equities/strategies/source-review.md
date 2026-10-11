@@ -723,3 +723,44 @@ startup freezes and stays active until the requested +8 s stop. N17 adds
 `held_halted` to that sink and stops at about +3.1 s. This closes the earlier
 startup-stop qualification doubt for that fixture; broker/session readiness
 and paper acceptance remain separate. No performance claim changes.
+
+## PR994 connector corrections at 7956bb3a
+
+Two connector P2 threads expose gaps missed by the earlier review witnesses:
+[equal accepted-snapshot replay](https://github.com/seathatflowsinourveins/native-agent-stack/pull/994#discussion_r4240681279)
+and [non-synthetic notice-port admission](https://github.com/seathatflowsinourveins/native-agent-stack/pull/994#discussion_r4240681286).
+At the reviewed parent, the native rc5 regressions run two methods and fail
+three assertions, with no errors or skips: replay retains `held_halted`, and
+both omitted/non-callable sinks leave development startup enabled. The named
+callable positive exercises a native BUY. Synthetic factors carrying
+development labels prove admission behavior only, not qualified market data.
+
+An identical accepted False snapshot now clears the snapshot halt latch before
+its early return, after availability and raw event/init fences pass and only
+after confirming exact equality with the accepted revision. The accepted
+factor object is retained; its validity is not extended. Pending/held exposure
+is driven after the resumption. Equal conflicting revisions still freeze;
+future/older resumptions are refused, and the independent native status veto
+remains active. The native replay regression observes an accepted False
+snapshot, an older late True snapshot, then the exact False replay and a BUY.
+Separate native controls pin conflicting, future, older and native-halt cases.
+
+This follows [F-1 decisions 1–3](https://github.com/seathatflowsinourveins/us-equities-trading/blob/f8c607bc1f1f0205fdc87095f47df150d2f78117/docs/decisions/2026-10-10-halt-exit-policy.md#L16-L28)
+and rc5's [custom-data callback dispatch](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/trading/src/python/strategy.rs#L640-L645).
+The ordering/idempotence rule is local glue; upstream supplies the callback
+and [cached data timestamps](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/model/src/data/custom.rs#L53-L88),
+not this producer's halt-latch policy.
+
+Non-synthetic startup now requires a callable notice sink after its existing
+durable-ledger and post-cutoff-accounting gates, before subscriptions or orders.
+It reuses the selected rc5 [startup callback](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/trading/src/python/strategy.rs#L336-L341)
+and existing freeze/ledger boundary. Missing or non-callable notice ports freeze
+with `startup_notice_sink_required` and sequence zero; the callable control
+still submits. Synthetic fixture defaults remain explicitly permitted.
+
+Failing-before/after logs, review thread identities, pinned source verification,
+supported acceptance/matrix regeneration and final checks are retained in
+`~/.local/state/native-agent-stack/coordination/ns2604-coop/lanes/strategies-pr994-codex-fix-20261011/`.
+Earlier census results above bind their named prior correction and are not
+represented as a rerun on this new production change. Broker/data/paper
+qualification boundaries remain unchanged.

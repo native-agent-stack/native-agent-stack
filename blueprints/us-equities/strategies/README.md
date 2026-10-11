@@ -57,7 +57,10 @@ instance in `native_adapter.build_node(port, instruments, [strategy])`. Before
 adoption, the paper lane must supply its existing durable ledger, failure sink,
 non-stopping notice sink, qualified factor/cohort bridge and account limits,
 then review the PR. `notice_sink(reason)` delivers routine held-position notices;
-it defaults to `None` and never falls back to `fault_sink`. Bind `fault_sink` to
+it defaults to `None` for synthetic fixtures and never falls back to `fault_sink`.
+Non-synthetic startup requires a callable notice sink alongside its durable
+ledger and post-cutoff accounting sink; omission or a non-callable port freezes
+before any subscription or order. Bind `fault_sink` to
 the session's freeze/stop path and `notice_sink` to its notification path. It retains
 the native risk engine and its independent final-wire governor. This lane provides
 no paper command and has placed no broker order. Passing the fake-port LiveNode

@@ -235,6 +235,9 @@ class FamilyStrategy(Strategy):
         ):
             self._freeze("startup_post_cutoff_risk_sink_required")
             return
+        if self.spec.evidence_class != "synthetic" and not callable(self.notice_sink):
+            self._freeze("startup_notice_sink_required")
+            return
         try:
             if not self._restore_ledger():
                 return
@@ -374,6 +377,15 @@ class FamilyStrategy(Strategy):
                 if value.ts_init == self.snapshot.ts_init:
                     if value != self.snapshot:
                         self._freeze("conflicting_snapshot_revision")
+                    elif value.halted is False:
+                        # An identical accepted resumption can follow a late
+                        # halt. Its factors are unchanged, but its halt latch
+                        # must resume after the availability/raw-stamp fences.
+                        self.snapshot_halted = False
+                        self.snapshot_halt_timestamps = (value.ts_event, value.ts_init)
+                        self.snapshot_halt_valid_until_ns = value.valid_until_ns
+                        if self.pending is not None or self.quantity:
+                            self._drive()
                     return
             self.snapshot = value
             if value.halted is False:

@@ -567,6 +567,128 @@ class PortableRecoveryTests(unittest.TestCase):
 
 @unittest.skipUnless(NATIVE, "requires the exact locked Nautilus rc5 runtime")
 class LifecycleTests(unittest.TestCase):
+    def test_equal_accepted_snapshot_replay_clears_late_halt_before_native_entry(self):
+        observed = []
+
+        class Replay(families.GapPremarketStrategy):
+            def on_quote(self, quote):
+                if not observed and self.snapshot is not None:
+                    accepted = self.snapshot
+                    self.on_data(replace(
+                        accepted, halted=True,
+                        ts_event=accepted.ts_event - 1_000_000_000,
+                        ts_init=accepted.ts_init - 1_000_000_000,
+                    ))
+                    held = self._halt_reason(self.clock.timestamp_ns())
+                    self.on_data(accepted)
+                    observed.append((held, self._halt_reason(self.clock.timestamp_ns()),
+                                     self.snapshot is accepted, self.snapshot_halted,
+                                     self.snapshot_halt_timestamps))
+                return super().on_quote(quote)
+
+        strategy = run_strategy(ledger=None, faults=[], strategy_type=Replay)
+        self.assertEqual(len(observed), 1)
+        held, resumed, same_snapshot, latch, stamps = observed[0]
+        self.assertEqual(held, "held_halted")
+        self.assertIsNone(resumed)
+        self.assertTrue(same_snapshot)
+        self.assertIs(latch, False)
+        self.assertEqual(stamps, (strategy.snapshot.ts_event, strategy.snapshot.ts_init))
+        self.assertTrue(any(row["event"] == "submit" and row["side"] == "BUY"
+                            for row in strategy.trace))
+        self.assertFalse(strategy.callback_faults)
+
+    def test_snapshot_replay_keeps_conflict_future_and_native_halt_vetoes(self):
+        from nautilus_trader.model import InstrumentStatus, MarketStatusAction
+
+        for boundary in ("conflicting", "future", "older", "native_halt"):
+            with self.subTest(boundary=boundary):
+                observed = []
+
+                class RefuseReplay(families.GapPremarketStrategy):
+                    def entry_condition(self, snapshot):
+                        return False
+
+                    def on_quote(self, quote, boundary=boundary, observed=observed):
+                        if not observed and self.snapshot is not None:
+                            accepted = self.snapshot
+                            self.on_data(replace(
+                                accepted, halted=True,
+                                ts_event=accepted.ts_event - 1_000_000_000,
+                                ts_init=accepted.ts_init - 1_000_000_000,
+                            ))
+                            replay = accepted
+                            if boundary == "conflicting":
+                                replay = replace(accepted, valid_until_ns=accepted.valid_until_ns + 1)
+                            elif boundary == "future":
+                                replay = replace(accepted, ts_init=quote.ts_event + 1)
+                            elif boundary == "older":
+                                replay = replace(
+                                    accepted, ts_event=accepted.ts_event - 2_000_000_000,
+                                    ts_init=accepted.ts_init - 2_000_000_000,
+                                )
+                            else:
+                                self.on_instrument_status(InstrumentStatus(
+                                    self.instrument_id, MarketStatusAction.HALT,
+                                    quote.ts_event, quote.ts_event,
+                                ))
+                            self.on_data(replay)
+                            observed.append((self._halt_reason(self.clock.timestamp_ns()),
+                                             self.faulted, self.snapshot is accepted,
+                                             self.snapshot_halted, self.instrument_status_halted))
+                        return super().on_quote(quote)
+
+                strategy = run_strategy(ledger=None, faults=[], strategy_type=RefuseReplay)
+                self.assertEqual(len(observed), 1)
+                reason, frozen, retained, latch, native_halt = observed[0]
+                self.assertEqual(reason, "held_halted")
+                self.assertTrue(retained)
+                self.assertEqual(frozen, boundary == "conflicting")
+                self.assertEqual(latch, boundary != "native_halt")
+                self.assertEqual(native_halt, boundary == "native_halt")
+                self.assertFalse(any(row["event"] == "submit" for row in strategy.trace))
+                self.assertFalse(strategy.callback_faults)
+
+    def test_development_startup_requires_callable_notice_sink(self):
+        # Synthetic native data carries development labels only to exercise
+        # startup admission; this does not qualify a development dataset.
+        for binding in ("omitted", "noncallable", "callable"):
+            with self.subTest(binding=binding), tempfile.TemporaryDirectory() as directory:
+                ledger = safety.Ledger(Path(directory) / "notice-startup.sqlite3")
+                faults, notices = [], []
+                try:
+                    dependencies = {} if binding == "omitted" else {
+                        "notice_sink": 7 if binding == "noncallable" else notices.append
+                    }
+                    strategy = run_strategy(
+                        ledger=ledger, faults=faults,
+                        post_cutoff_fill_sink=lambda strategy, event, cutoff: None,
+                        overrides={
+                            "evidence_class": "development",
+                            "qualified_data": ("released_development", "horizon_qualified"),
+                            "exit_policy": "regular-close-v1",
+                            "exit_evidence_sha256": "f" * 64,
+                        },
+                        **dependencies,
+                    )
+                    submitted = [row for row in strategy.trace if row["event"] == "submit"]
+                    if binding == "callable":
+                        self.assertTrue(any(row["side"] == "BUY" for row in submitted))
+                        self.assertNotIn("startup_notice_sink_required", faults)
+                    else:
+                        self.assertTrue(strategy.faulted)
+                        self.assertFalse(strategy.enabled)
+                        self.assertEqual(faults, ["startup_notice_sink_required"])
+                        self.assertIn("startup_notice_sink_required", strategy.flags)
+                        self.assertEqual(ledger.halted_reason(), "startup_notice_sink_required")
+                        self.assertEqual(strategy.sequence, 0)
+                        self.assertIsNone(strategy.pending)
+                        self.assertEqual(submitted, [])
+                        self.assertEqual(notices, [])
+                    self.assertFalse(strategy.callback_faults)
+                finally:
+                    ledger.close()
+
     def test_expiry_first_observes_unknown_state_and_persists_notice_before_return(self):
         start = simulation.BASE_NS
         notices, faults, observed = [], [], []
@@ -2571,6 +2693,7 @@ class LifecycleTests(unittest.TestCase):
                     faults=with_ledger_faults,
                     overrides=overrides,
                     post_cutoff_fill_sink=lambda strategy, event, cutoff: None,
+                    notice_sink=lambda reason: None,
                 )
                 self.assertNotIn("startup_durable_ledger_required", supplied.flags)
                 self.assertNotIn("startup_durable_ledger_required", with_ledger_faults)
