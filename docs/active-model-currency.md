@@ -110,8 +110,12 @@ Shell operators create command boundaries in command strings; in literal argv
 they remain ordinary argument data and cannot introduce another executable.
 Quoted or escaped punctuation remains data in command strings too, following
 [CPython v3.13.16's lexer states](https://github.com/python/cpython/blob/v3.13.16/Lib/shlex.py#L163-L218).
-Each text selector field contributes only its first lexical value; its
-explanatory tail is not scanned for further values and need not be shell syntax.
+Each readable text selector field contributes only its first lexical value;
+its explanatory tail is not scanned for further values. The first value still
+needs complete POSIX quoting. A field or command parse failure on a line without
+a model-ID candidate is skipped; potentially escaped IDs count as candidates,
+and parse failures on those lines keep coverage unknown. This follows
+[CPython v3.13.16's incomplete-quote refusal](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Lib/shlex.py#L185-L191).
 Structured JSON selector lists and command/argv values retain their own
 traversal rules. It covers active lane configuration too; `.md` and `lanes/`
 are not blanket exemptions.

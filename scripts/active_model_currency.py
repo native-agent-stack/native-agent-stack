@@ -612,6 +612,8 @@ def selectors(text: str, path: Path):
                 lexer.whitespace_split = True
                 value = lexer.get_token() or ""
             except ValueError:
+                if not model_value_candidate(line):
+                    continue
                 raise CurrencyError("active selector value could not be parsed") from None
             for identifier in identifiers(value, cli, sentence=prose):
                 results.append((number, identifier))
@@ -632,6 +634,8 @@ def selectors(text: str, path: Path):
                 if prose:
                     selected = identifiers(line.split("#", 1)[0], cli, sentence=True)
                 else:
+                    if not model_value_candidate(line):
+                        continue
                     raise CurrencyError("active selector line could not be parsed") from None
             for identifier in selected:
                 results.append((number, identifier))

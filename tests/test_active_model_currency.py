@@ -507,6 +507,36 @@ class ActiveModelCurrencyTests(unittest.TestCase):
         self.assertEqual((result["status"], result["stale_count"]), ("current", 0))
         self.assertEqual(result["errors"], [])
 
+    def test_option_only_host_shell_line_is_not_an_unknown_model_source(self):
+        self.write("tools/launch.sh", 'codex exec -m "${GPT_MODEL:-gpt-6.1-sol}" \\\n')
+        rc, out, _ = self.cli("check")
+        result = json.loads(out)
+        self.assertEqual((result["status"], rc), ("current", 0))
+        self.assertEqual(result["errors"], [])
+
+    def test_option_only_shell_fence_is_not_an_unknown_model_source(self):
+        self.write("docs/launch.md", '```sh\ncodex exec -m "${GPT_MODEL:-gpt-6.1-sol}" \\\n```\n')
+        rc, out, _ = self.cli("check")
+        result = json.loads(out)
+        self.assertEqual((result["status"], rc), ("current", 0))
+        self.assertEqual(result["errors"], [])
+
+    def test_alias_and_apostrophe_prose_is_not_an_unknown_model_source(self):
+        self.write("README.md", "Use --model for the model: Claude's `sonnet` alias\n")
+        rc, out, _ = self.cli("check")
+        result = json.loads(out)
+        self.assertEqual((result["status"], rc), ("current", 0))
+        self.assertEqual(result["errors"], [])
+
+    def test_parse_failures_with_raw_or_escaped_model_candidates_stay_unknown(self):
+        for identifier in ("gpt-6-sol", r"gpt\-6-sol"):
+            with self.subTest(identifier=identifier):
+                self.write("tools/launch.sh", f"codex exec -m {identifier} 'unclosed\n")
+                rc, out, _ = self.cli("check")
+                result = json.loads(out)
+                self.assertEqual((result["status"], rc), ("unknown", 2))
+                self.assertTrue(result["errors"])
+
     def test_quoted_and_escaped_punctuation_remains_an_operand_in_command_strings(self):
         commands = ["echo ';' codex -m gpt-6-sol", r"echo \; codex -m gpt-6-sol",
                     'echo "&&" codex -m gpt-6-sol']
