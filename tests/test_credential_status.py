@@ -284,21 +284,56 @@ class CredentialStatusTests(unittest.TestCase):
         # Owner decision 2026-10-10 (inventory notes): the trading lane's research work and Jev harness may also use the
         # stored Typesafe key, each in its own process started through credential_run.py. The docs table row kept the
         # earlier sentence "A trading-lane use needs its own, separately authorized key", which contradicted the grant
-        # (review of PR #985). Both rows keep the grant and the runner command, and neither requires a separate key.
+        # (review of PR #985). A phrase blacklist then passed a revoked grant and a reworded key requirement (review of
+        # c9155c3d8), so each place keeps its dated grant and reads exactly as approved, whitespace aside. Rewording
+        # either place means updating the approved text below, with the owner's decision behind it.
         runner = "tools/credentials/credential_run.py typesafe -- <command>"
+        docs_place, notes_place = "docs/secret-storage.md row", "inventory notes"
+        approved = {  # place: (dated grant, that grant revoked, complete approved text)
+            docs_place: (
+                ", and, by the owner's 2026-10-10 decision, the trading lane's research work and Jev harness",
+                ", excluding the trading lane's research work and Jev harness",
+                "| `typesafe` | Typesafe key, for the live-judge mode of `gap_crosswalk.py`, the native-skill-practice Jev "
+                "provider in `blueprints/native-skill-practice/promptfooconfig.yaml`, and, by the owner's 2026-10-10 "
+                "decision, the trading lane's research work and Jev harness; start each through "
+                f"`{runner}`. | only when you pay for it | `<store>/typesafe.env` | `TYPESAFE_API_KEY` |"),
+            notes_place: (
+                "Owner decision 2026-10-10: the trading lane's research work and Jev harness may also use this key",
+                "Owner decision 2026-10-10: the trading lane's research work and Jev harness may not use this key",
+                "The crosswalk's live-judge mode and the native-skill-practice Jev provider (its promptfoo config reads "
+                "the variable from the environment) need it, each in its own process started through credential_run.py. "
+                "Owner decision 2026-10-10: the trading lane's research work and Jev harness may also use this key, "
+                "each in its own process started through credential_run.py; no lane environment holds it. Another "
+                "project's own Typesafe file is outside this inventory."),
+        }
+
+        def check(place, text):
+            grant, _, complete = approved[place]
+            text = " ".join(text.split())
+            self.assertIn(grant, text, f"{place} lost the dated grant")
+            self.assertEqual(text, complete, f"{place} departs from the approved text")
+
         row = next(e for e in self.inventory["entries"] if e["id"] == "typesafe")
         table = (ROOT / "docs/secret-storage.md").read_text(encoding="utf-8")
-        docs_rows = [line for line in table.splitlines() if line.startswith("| `typesafe` |")]
+        lines = (" ".join(line.split()) for line in table.splitlines())
+        docs_rows = [line for line in lines if line.startswith("| `typesafe` |")]
         self.assertEqual(len(docs_rows), 1)  # a missing row fails here instead of raising StopIteration
-        self.assertIn(runner, row["loaders"])
-        self.assertIn(f"`{runner}`", docs_rows[0])
-        self.assertIn("may also use this key", row["notes"])
-        places = {"inventory notes": row["notes"], "docs/secret-storage.md row": docs_rows[0]}
-        for place, text in places.items():
+        self.assertEqual(row["loaders"], [runner])
+        for place, text in ((docs_place, docs_rows[0]), (notes_place, row["notes"])):
             with self.subTest(place=place):
-                self.assertIn("research work and Jev harness", text)
-                for words in ("separately authorized", "needs its own", "separate key"):
-                    self.assertNotIn(words, text.lower())
+                check(place, text)
+
+        # Planted contradictions go through the very same checks. Source: unittest.TestCase.assertRaisesRegex.
+        requirements = ("A trading-lane use needs its own, separately authorized key",  # the sentence 8e9e56cd removed
+                        "A trading-lane use requires its own independently authorized key.")  # review of c9155c3d8
+        for place, (grant, revoked, complete) in approved.items():
+            check(place, complete.replace(" ", "\n"))  # whitespace alone is not a change
+            planted = {"revoked grant": (complete.replace(grant, revoked), "lost the dated grant")}
+            for sentence in requirements:
+                planted[f"appended: {sentence}"] = (f"{complete} {sentence}", "departs from the approved text")
+            for label, (text, failure) in planted.items():
+                with self.subTest(place=place, planted=label), self.assertRaisesRegex(AssertionError, failure):
+                    check(place, text)
 
     def test_keyring_row_reports_memory_only_lost_on_restart(self):
         inventory = self.keyring_inventory()
