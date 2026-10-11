@@ -74,6 +74,14 @@ for the CC after its installation cue. Keep `stars_repo`, `stars_state_root` and
 check stops the installation. The backup records only relative filenames,
 digests and timer state; keep its UTC session name for the inverse steps.
 
+The preflight lists all unit files to test manager access. A missing timer is an
+expected first-install state: filtering the list by that absent name returns 1
+and stops `set -eu`. Upstream systemd at
+[`b3d8fc43`, `src/systemctl/systemctl-list-unit-files.c:289-290`](https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/src/systemctl/systemctl-list-unit-files.c#L289-L290)
+returns `-ENOENT` for an empty result. The native regression checks the actual
+recipe preflight on an absent fixture name and separately requires a connection
+failure to stop the shell. It installs or starts no unit.
+
 ```sh
 set -eu
 umask 077
@@ -81,7 +89,7 @@ stars_units="${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user"
 stars_backup="$stars_state_root/public-stars-unit-backups/$(date -u +%Y%m%dT%H%M%SZ)"
 mkdir -p "$stars_units" "$(dirname "$stars_backup")"
 mkdir "$stars_backup"
-systemctl --user list-unit-files --no-legend native-agent-newstars.timer >/dev/null
+systemctl --user list-unit-files --no-legend >/dev/null
 stars_was_enabled=$(systemctl --user is-enabled native-agent-newstars.timer 2>/dev/null || true)
 stars_was_active=$(systemctl --user is-active native-agent-newstars.timer 2>/dev/null || true)
 case "$stars_was_enabled" in enabled|disabled|not-found) ;; *) exit 1 ;; esac

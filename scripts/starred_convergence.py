@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections import Counter
+from calendar import monthrange
 from datetime import datetime, timezone
 import hashlib
 from pathlib import Path
@@ -19,6 +20,9 @@ TIERS = {"tier-1", "tier-2"}
 REGISTRY = "catalogs/sota-convergence/layer-verdict-waves.json"
 PRIVATE_FIELDS = {"owner", "user", "login", "email", "avatar_url", "private", "password",
                   "token", "access_token", "api_key", "authorization", "credential"}
+CATEGORIES = {"research-skills", "sentiment-nlp", "north-star-runtime", "engines", "strategies",
+              "market-data", "claude-practice", "codex-practice", "mcp-tools", "memory-rag",
+              "observability", "infra-ci", "awesome-lists"}
 
 
 def _public_fields(value):
@@ -50,9 +54,88 @@ def _resolve(root, ref, documents, read=None):
     return pointer(documents[path], fragment)
 
 
+def _validate_finalization(root, manifest, read):
+    """Enforce WS1's recorded classification and removal conditions in the existing validator."""
+    config = manifest.get("finalization")
+    if config is None:
+        return
+    require(isinstance(config, dict) and config.get("schema_version") == 1,
+            "unsupported starred finalization schema")
+    documents = {}
+    protected = _resolve(root, config["protected_source"] + "#/repositories", documents, read)
+    require(isinstance(protected, dict), "finalized protected set must be recorded")
+    rows = {identity(row["repository"]): row for row in manifest["repositories"]}
+    for name, row in rows.items():
+        require(row.get("category") in CATEGORIES, "unsupported finalized category")
+        require(row.get("decision") in {"KEEP-MIRROR", "KEEP", "UNSTAR"}
+                and isinstance(row.get("decision_reason"), str) and bool(row["decision_reason"].strip()),
+                "finalized decision requires a supported action and reason")
+        signals = row.get("signals")
+        require(isinstance(signals, dict), "finalized signals are required")
+        require(signals.get("source_ref", "").partition("#")[0] == config["signals_source"],
+                "finalized signals must use the declared public capture")
+        captured = _resolve(root, signals["source_ref"], documents, read)
+        require(isinstance(captured, dict) and identity(captured.get("repository")) == name,
+                "finalized signal reference repository disagrees")
+        fields = ("archived", "pushed_at", "latest_release", "stars", "open_issues", "dependents",
+                  "observed_at", "cutoff_18_months", "release_in_18_month_window", "release_history_complete")
+        require(all(field in signals and signals[field] == captured.get(field) for field in fields),
+                "finalized signals disagree with public capture")
+        require(type(signals["archived"]) is bool and type(signals["release_history_complete"]) is bool
+                and all(type(signals[field]) is int and signals[field] >= 0 for field in ("stars", "open_issues"))
+                and (signals["dependents"] is None or type(signals["dependents"]) is int and signals["dependents"] >= 0)
+                and (signals["release_in_18_month_window"] is None
+                     or type(signals["release_in_18_month_window"]) is bool), "malformed finalized signals")
+        observed = datetime.fromisoformat(signals["observed_at"].replace("Z", "+00:00"))
+        require(observed.tzinfo is not None and observed.utcoffset() == timezone.utc.utcoffset(None),
+                "finalized observation must be UTC")
+        year, month = divmod(observed.year * 12 + observed.month - 1 - 18, 12)
+        cutoff = observed.replace(year=year, month=month + 1,
+                                  day=min(observed.day, monthrange(year, month + 1)[1]))
+        require(datetime.fromisoformat(signals["cutoff_18_months"].replace("Z", "+00:00")) == cutoff,
+                "finalized 18-month cutoff disagrees with observation")
+        require(type(row.get("protected")) is bool and row["protected"] == (name in protected),
+                "finalized protected flag disagrees with recorded protected set")
+        for ref in row.get("finalization_evidence_refs", []):
+            _resolve(root, ref, documents, read)
+        if row["decision"] == "KEEP-MIRROR":
+            pin = row.get("mirror_pin_source_ref")
+            if pin is not None:
+                source = _resolve(root, pin, documents, read)
+                require(isinstance(source, dict) and identity(source.get("repository")) == name
+                        and source.get("resolved") is True and source.get("ref") == row.get("mirror_ref")
+                        and source.get("commit") == row.get("mirror_commit"),
+                        "finalized mirror pin disagrees with source")
+            else:
+                require(any(ref.get("kind") == "upstream_mirror" and ref.get("ref") == row.get("mirror_ref")
+                            for ref in protected.get(name, [])), "finalized mirror pin needs recorded source")
+        if row["decision"] != "UNSTAR":
+            continue
+        require(name not in protected, "cannot UNSTAR a protected repository")
+        basis = row.get("unstar_basis")
+        require(basis in {"archived", "inactive_18_months", "superseded"}, "unsupported UNSTAR basis; licence is never a basis")
+        if basis == "archived":
+            require(signals["archived"], "UNSTAR archive basis requires archived evidence")
+        elif basis == "inactive_18_months":
+            pushed = datetime.fromisoformat(signals["pushed_at"].replace("Z", "+00:00"))
+            require(pushed < cutoff and signals["release_in_18_month_window"] is False
+                    and signals["release_history_complete"], "UNSTAR requires complete 18-month inactivity evidence")
+        else:
+            target = rows.get(identity(row.get("superseded_by")))
+            require(target is not None and target is not row and target["category"] == row["category"]
+                    and target["decision"] in {"KEEP", "KEEP-MIRROR"},
+                    "supersession requires a named KEEP row in the same category")
+            evidence = row.get("supersession_evidence_refs")
+            require(isinstance(evidence, list) and bool(evidence), "supersession requires recorded evidence")
+            for ref in evidence:
+                _resolve(root, ref, documents, read)
+
+
 def validate_convergence(root: Path, snapshot: dict, *, read=None) -> dict:
     """Validate a completed intake manifest, retaining compatibility with older snapshots."""
     if "convergence_manifest" not in snapshot:
+        require(snapshot.get("kind") != "public_starred",
+                "canonical public-star snapshot requires convergence_manifest")
         return {"status": "legacy", "count": len(snapshot.get("repositories", []))}
     manifest_path = snapshot["convergence_manifest"]
     load_document = read if read is not None else lambda path: load(root, path)
@@ -95,6 +178,11 @@ def validate_convergence(root: Path, snapshot: dict, *, read=None) -> dict:
         if seed.get("evidence_class") == "source_review":
             require(any("://" in ref for ref in refs),
                     "source_review requires pinned upstream source bytes")
+            for ref in refs:
+                if "://" in ref:
+                    repository = "/".join(urlsplit(ref).path.strip("/").split("/")[:2])
+                    require(identity(repository) == identity(seed["repository"]),
+                            "source URL repository disagrees with source_review seed")
         witness = seed.get("recorded_seed")
         if witness is not None:
             require(isinstance(witness, dict), "recorded seed witness must be an object")
@@ -120,6 +208,7 @@ def validate_convergence(root: Path, snapshot: dict, *, read=None) -> dict:
         require(checked_at.tzinfo is not None and checked_at.utcoffset() == timezone.utc.utcoffset(None),
                 "seed checked_at must be a UTC timestamp")
     seen, counts = set(), Counter({scope.lower().replace("-", "_"): 0 for scope in SCOPES})
+    referenced_seeds = set()
     for row in rows:
         name, scope = identity(row.get("repository")), row.get("scope")
         require(name not in seen, "duplicate convergence repository identity")
@@ -150,6 +239,7 @@ def validate_convergence(root: Path, snapshot: dict, *, read=None) -> dict:
             require(isinstance(ref, str) and ref.partition("#")[0] == seeds_path,
                     "seed reference must use the declared seed manifest")
             seed = _resolve(root, ref, documents, read)
+            referenced_seeds.add(ref)
             require(isinstance(seed, dict) and identity(seed.get("repository")) == name,
                     "seed reference repository disagrees with disposition")
             require(seed.get("layer") in keys, "seed reference layer disagrees with disposition")
@@ -185,4 +275,7 @@ def validate_convergence(root: Path, snapshot: dict, *, read=None) -> dict:
                     "complete tier verdicts must not retain an awaiting follow-up")
         counts[scope.lower().replace("-", "_")] += 1
     require(seen == set(by_repo), "convergence manifest must cover every starred repository")
+    require(referenced_seeds == {f"{seeds_path}#/seeds/{index}" for index in range(len(seed_doc["seeds"]))},
+            "every seed row must be referenced by a disposition")
+    _validate_finalization(root, manifest, read)
     return {"status": "valid", "count": len(rows), "pending": 0, "seed_count": len(seed_doc["seeds"]), **counts}

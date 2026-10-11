@@ -1,0 +1,1352 @@
+{
+  "schema_version": 1,
+  "scope": "Conservative union of registered mirrors, decision-record citations, and directly referenced dependency/runtime manifests in both repositories. Unmapped transitive package identities never authorize removal. No removal proposed in this wave.",
+  "inventories": [
+    {
+      "repository": "native-agent-stack",
+      "head": "f1dd19a423888a1f5da6221ae65120d610117753",
+      "source_count": 273
+    },
+    {
+      "repository": "us-equities-trading",
+      "head": "56e174a20d115996ed2c791e14391c8ea820bb8b",
+      "source_count": 25
+    }
+  ],
+  "mirrors_sha256": "b4750f3666486c44651c74e487f3f02f60b7877b36a11d7bca17d364e6e3da47",
+  "repositories": {
+    "nautechsystems/nautilus_trader": [
+      {
+        "kind": "upstream_mirror",
+        "source": "upstream/MIRRORS.json#/mirrors/4",
+        "ref": "v2.0.0rc5"
+      },
+      {
+        "kind": "upstream_mirror",
+        "source": "upstream/MIRRORS.json#/mirrors/29",
+        "ref": "v2.0.0rc6"
+      },
+      {
+        "kind": "dependency_or_runtime_manifest",
+        "source": "native-agent-stack:catalogs/us-equities/runtime-target.json",
+        "line": 31
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-02-new-wsl-layer-consensus.md",
+        "line": 388
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-04-trading-2604-preparation.md",
+        "line": 25
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-05-official-upstream-never-rebuild.md",
+        "line": 9
+      },
+      {
+        "kind": "dependency_or_runtime_manifest",
+        "source": "native-agent-stack:manifests/stack.json",
+        "line": 1972
+      }
+    ],
+    "quantconnect/lean": [
+      {
+        "kind": "upstream_mirror",
+        "source": "upstream/MIRRORS.json#/mirrors/5",
+        "ref": "80e7843f645673bcbeaab963049f76f20f6785e1"
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-02-new-wsl-layer-consensus.md",
+        "line": 391
+      },
+      {
+        "kind": "dependency_or_runtime_manifest",
+        "source": "native-agent-stack:manifests/stack.json",
+        "line": 1389
+      }
+    ],
+    "alpacahq/alpaca-py": [
+      {
+        "kind": "upstream_mirror",
+        "source": "upstream/MIRRORS.json#/mirrors/6",
+        "ref": "v0.44.0"
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-05-adaptive-paper-xnys-primary.md",
+        "line": 206
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-05-official-upstream-never-rebuild.md",
+        "line": 9
+      },
+      {
+        "kind": "dependency_or_runtime_manifest",
+        "source": "native-agent-stack:manifests/stack.json",
+        "line": 1441
+      }
+    ],
+    "dgunning/edgartools": [
+      {
+        "kind": "upstream_mirror",
+        "source": "upstream/MIRRORS.json#/mirrors/11",
+        "ref": "v5.61.1"
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-04-trading-2604-preparation.md",
+        "line": 162
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-07-foundation-finalization.md",
+        "line": 34
+      },
+      {
+        "kind": "dependency_or_runtime_manifest",
+        "source": "native-agent-stack:manifests/stack.json",
+        "line": 1538
+      }
+    ],
+    "anthropics/financial-services": [
+      {
+        "kind": "upstream_mirror",
+        "source": "upstream/MIRRORS.json#/mirrors/20",
+        "ref": "HEAD"
+      },
+      {
+        "kind": "decision_record",
+        "source": "us-equities-trading:docs/decisions/2026-10-10-research-plugin-model-update.md",
+        "line": 42
+      }
+    ],
+    "tradermonty/claude-trading-skills": [
+      {
+        "kind": "upstream_mirror",
+        "source": "upstream/MIRRORS.json#/mirrors/21",
+        "ref": "HEAD"
+      }
+    ],
+    "k-dense-ai/scientific-agent-skills": [
+      {
+        "kind": "upstream_mirror",
+        "source": "upstream/MIRRORS.json#/mirrors/22",
+        "ref": "HEAD"
+      }
+    ],
+    "imbad0202/academic-research-skills": [
+      {
+        "kind": "upstream_mirror",
+        "source": "upstream/MIRRORS.json#/mirrors/23",
+        "ref": "HEAD"
+      }
+    ],
+    "wilsonfreitas/awesome-quant": [
+      {
+        "kind": "upstream_mirror",
+        "source": "upstream/MIRRORS.json#/mirrors/24",
+        "ref": "HEAD"
+      }
+    ],
+    "paperswithbacktest/awesome-systematic-trading": [
+      {
+        "kind": "upstream_mirror",
+        "source": "upstream/MIRRORS.json#/mirrors/25",
+        "ref": "HEAD"
+      }
+    ],
+    "tauricresearch/tradingagents": [
+      {
+        "kind": "upstream_mirror",
+        "source": "upstream/MIRRORS.json#/mirrors/26",
+        "ref": "HEAD"
+      }
+    ],
+    "virattt/dexter": [
+      {
+        "kind": "upstream_mirror",
+        "source": "upstream/MIRRORS.json#/mirrors/27",
+        "ref": "HEAD"
+      }
+    ],
+    "hkuds/vibe-trading": [
+      {
+        "kind": "upstream_mirror",
+        "source": "upstream/MIRRORS.json#/mirrors/34",
+        "ref": "v0.1.16"
+      }
+    ],
+    "lumiwealth/lumibot": [
+      {
+        "kind": "upstream_mirror",
+        "source": "upstream/MIRRORS.json#/mirrors/35",
+        "ref": "862504052407df2586122b752a645f88ce87afa1"
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-02-new-wsl-layer-consensus.md",
+        "line": 392
+      }
+    ],
+    "shiyu-coder/kronos": [
+      {
+        "kind": "upstream_mirror",
+        "source": "upstream/MIRRORS.json#/mirrors/36",
+        "ref": "67b630e67f6a18c9e9be918d9b4337c960db1e9a"
+      }
+    ],
+    "akitaonrails/ai-memory": [
+      {
+        "kind": "upstream_mirror",
+        "source": "upstream/MIRRORS.json#/mirrors/41",
+        "ref": "v2.6.0"
+      },
+      {
+        "kind": "upstream_mirror",
+        "source": "upstream/MIRRORS.json#/mirrors/42",
+        "ref": "HEAD"
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-25-ai-memory-2-4-0-release-review.md",
+        "line": 13
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-25-workstation-sota-refresh.md",
+        "line": 181
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-27-model-currency.md",
+        "line": 54
+      },
+      {
+        "kind": "dependency_or_runtime_manifest",
+        "source": "native-agent-stack:manifests/stack.json",
+        "line": 97
+      }
+    ],
+    "anthropics/claude-code": [
+      {
+        "kind": "upstream_mirror",
+        "source": "upstream/MIRRORS.json#/mirrors/43",
+        "ref": "HEAD"
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-26-stack-agents-role-dispatch.md",
+        "line": 66
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-27-model-currency.md",
+        "line": 106
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-27-token-lanes-subagent-start.md",
+        "line": 44
+      },
+      {
+        "kind": "dependency_or_runtime_manifest",
+        "source": "native-agent-stack:manifests/stack.json",
+        "line": 193
+      }
+    ],
+    "anthropics/claude-code-action": [
+      {
+        "kind": "upstream_mirror",
+        "source": "upstream/MIRRORS.json#/mirrors/45",
+        "ref": "2dca132ff0e0c4094ce6048b422c6915a071210b"
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-28-community-sweep.md",
+        "line": 419
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-05-ns2604-acceptance-defect-repairs.md",
+        "line": 35
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-08-claude-actions-harness-audit-bounds.md",
+        "line": 701
+      }
+    ],
+    "diegosouzapw/omniroute": [
+      {
+        "kind": "upstream_mirror",
+        "source": "upstream/MIRRORS.json#/mirrors/48",
+        "ref": "HEAD"
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-27-model-currency.md",
+        "line": 441
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-27-omniroute-account-pool.md",
+        "line": 5
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-30-omniroute-rebuild.md",
+        "line": 34
+      },
+      {
+        "kind": "dependency_or_runtime_manifest",
+        "source": "native-agent-stack:manifests/stack.json",
+        "line": 1906
+      }
+    ],
+    "gitleaks/gitleaks": [
+      {
+        "kind": "upstream_mirror",
+        "source": "upstream/MIRRORS.json#/mirrors/49",
+        "ref": "v8.30.1"
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-02-github-automation-practice.md",
+        "line": 111
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-04-trading-2604-preparation.md",
+        "line": 141
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-10-secret-scan-large-targets.md",
+        "line": 11
+      },
+      {
+        "kind": "dependency_or_runtime_manifest",
+        "source": "native-agent-stack:manifests/stack.json",
+        "line": 498
+      }
+    ],
+    "cathrynlavery/diagram-design": [
+      {
+        "kind": "upstream_mirror",
+        "source": "upstream/MIRRORS.json#/mirrors/50",
+        "ref": "HEAD"
+      }
+    ],
+    "affaan-m/ecc": [
+      {
+        "kind": "upstream_mirror",
+        "source": "upstream/MIRRORS.json#/mirrors/54",
+        "ref": "HEAD"
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-28-community-sweep.md",
+        "line": 393
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-28-top-rule-templates.md",
+        "line": 198
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-30-bounded-native-decision-routing.md",
+        "line": 159
+      },
+      {
+        "kind": "dependency_or_runtime_manifest",
+        "source": "native-agent-stack:manifests/stack.json",
+        "line": 9
+      }
+    ],
+    "alphaxiv/openresearch": [
+      {
+        "kind": "upstream_mirror",
+        "source": "upstream/MIRRORS.json#/mirrors/55",
+        "ref": "v0.2.7"
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-03-currency-wave-w1.md",
+        "line": 31
+      },
+      {
+        "kind": "dependency_or_runtime_manifest",
+        "source": "native-agent-stack:manifests/stack.json",
+        "line": 659
+      }
+    ],
+    "cli/cli": [
+      {
+        "kind": "upstream_mirror",
+        "source": "upstream/MIRRORS.json#/mirrors/60",
+        "ref": "HEAD"
+      },
+      {
+        "kind": "upstream_mirror",
+        "source": "upstream/MIRRORS.json#/mirrors/105",
+        "ref": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd"
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-22-github-automation-closure.md",
+        "line": 1926
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-02-catalog-freshness-pr-metadata.md",
+        "line": 15
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-02-daily-catalog-currency.md",
+        "line": 102
+      }
+    ],
+    "giancarloerra/socraticode": [
+      {
+        "kind": "upstream_mirror",
+        "source": "upstream/MIRRORS.json#/mirrors/64",
+        "ref": "v1.14.0"
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-25-workstation-sota-refresh.md",
+        "line": 240
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-26-stack-agents-role-dispatch.md",
+        "line": 66
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-30-sol-primary-quality-defaults.md",
+        "line": 124
+      },
+      {
+        "kind": "dependency_or_runtime_manifest",
+        "source": "native-agent-stack:manifests/stack.json",
+        "line": 975
+      }
+    ],
+    "headroomlabs-ai/headroom": [
+      {
+        "kind": "upstream_mirror",
+        "source": "upstream/MIRRORS.json#/mirrors/66",
+        "ref": "v0.37.0"
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-25-workstation-sota-refresh.md",
+        "line": 495
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-03-currency-wave-w1b.md",
+        "line": 96
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-03-retire-token-stack-release-review.md",
+        "line": 86
+      },
+      {
+        "kind": "dependency_or_runtime_manifest",
+        "source": "native-agent-stack:manifests/stack.json",
+        "line": 522
+      }
+    ],
+    "max-sixty/worktrunk": [
+      {
+        "kind": "upstream_mirror",
+        "source": "upstream/MIRRORS.json#/mirrors/67",
+        "ref": "v0.79.0"
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-25-workstation-sota-refresh.md",
+        "line": 562
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-03-currency-wave-w1.md",
+        "line": 35
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-04-2604-e2e-fix-wave-g7-git.md",
+        "line": 59
+      },
+      {
+        "kind": "dependency_or_runtime_manifest",
+        "source": "native-agent-stack:manifests/stack.json",
+        "line": 1072
+      }
+    ],
+    "microsoft/markitdown": [
+      {
+        "kind": "upstream_mirror",
+        "source": "upstream/MIRRORS.json#/mirrors/68",
+        "ref": "v0.1.7"
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-25-workstation-sota-refresh.md",
+        "line": 102
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+        "line": 114
+      },
+      {
+        "kind": "dependency_or_runtime_manifest",
+        "source": "native-agent-stack:manifests/stack.json",
+        "line": 582
+      }
+    ],
+    "microsoft/playwright": [
+      {
+        "kind": "upstream_mirror",
+        "source": "upstream/MIRRORS.json#/mirrors/69",
+        "ref": "v1.63.0"
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-05-ns2604-acceptance-defect-repairs.md",
+        "line": 14
+      },
+      {
+        "kind": "dependency_or_runtime_manifest",
+        "source": "native-agent-stack:manifests/stack.json",
+        "line": 1885
+      }
+    ],
+    "mlflow/mlflow": [
+      {
+        "kind": "upstream_mirror",
+        "source": "upstream/MIRRORS.json#/mirrors/70",
+        "ref": "HEAD"
+      }
+    ],
+    "oraios/serena": [
+      {
+        "kind": "upstream_mirror",
+        "source": "upstream/MIRRORS.json#/mirrors/75",
+        "ref": "HEAD"
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-26-stack-agents-role-dispatch.md",
+        "line": 57
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-03-pr561-token-lifecycle-retirement.md",
+        "line": 40
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-03-retire-token-stack-release-review.md",
+        "line": 192
+      },
+      {
+        "kind": "dependency_or_runtime_manifest",
+        "source": "native-agent-stack:manifests/stack.json",
+        "line": 893
+      }
+    ],
+    "promptfoo/promptfoo": [
+      {
+        "kind": "upstream_mirror",
+        "source": "upstream/MIRRORS.json#/mirrors/78",
+        "ref": "0.123.1"
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-27-capability-gate-harness.md",
+        "line": 28
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-03-retire-gpt6-lane-compression-ab.md",
+        "line": 503
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-03-sweep-gpt6-route-settlement.md",
+        "line": 59
+      },
+      {
+        "kind": "dependency_or_runtime_manifest",
+        "source": "native-agent-stack:manifests/stack.json",
+        "line": 713
+      }
+    ],
+    "restic/restic": [
+      {
+        "kind": "upstream_mirror",
+        "source": "upstream/MIRRORS.json#/mirrors/80",
+        "ref": "v0.19.1"
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-05-trading-unattended-hosting-recovery.md",
+        "line": 91
+      },
+      {
+        "kind": "dependency_or_runtime_manifest",
+        "source": "native-agent-stack:manifests/stack.json",
+        "line": 1328
+      }
+    ],
+    "rtk-ai/rtk": [
+      {
+        "kind": "upstream_mirror",
+        "source": "upstream/MIRRORS.json#/mirrors/81",
+        "ref": "v0.49.0"
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-25-workstation-sota-refresh.md",
+        "line": 52
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-26-codex-worker-lane.md",
+        "line": 421
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-26-token-practice-f1-f9.md",
+        "line": 17
+      },
+      {
+        "kind": "dependency_or_runtime_manifest",
+        "source": "native-agent-stack:manifests/stack.json",
+        "line": 834
+      }
+    ],
+    "aannoo/hcom": [
+      {
+        "kind": "upstream_mirror",
+        "source": "upstream/MIRRORS.json#/mirrors/107",
+        "ref": "v0.7.28"
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-02-new-wsl-layer-consensus.md",
+        "line": 381
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-04-final-architecture-round2.md",
+        "line": 23
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-04-round2-plan-g1-messaging.md",
+        "line": 21
+      }
+    ],
+    "assafelovic/gpt-researcher": [
+      {
+        "kind": "upstream_mirror",
+        "source": "upstream/MIRRORS.json#/mirrors/108",
+        "ref": "v3.7.0"
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-02-gpt-runtime-tracking.md",
+        "line": 340
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-02-new-wsl-layer-consensus.md",
+        "line": 364
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-04-2604-e2e-fix-wave-g2-mcp-workers.md",
+        "line": 125
+      }
+    ],
+    "bytedance/deer-flow": [
+      {
+        "kind": "upstream_mirror",
+        "source": "upstream/MIRRORS.json#/mirrors/109",
+        "ref": "v2.1.0"
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-02-gpt-runtime-tracking.md",
+        "line": 341
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-02-new-wsl-layer-consensus.md",
+        "line": 366
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-04-2604-e2e-fix-wave-g2-mcp-workers.md",
+        "line": 135
+      }
+    ],
+    "obra/superpowers": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-24-community-sweep.md",
+        "line": 291
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-27-token-lanes-subagent-start.md",
+        "line": 582
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-28-community-sweep.md",
+        "line": 392
+      }
+    ],
+    "ruvnet/ruflo": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-24-community-sweep.md",
+        "line": 292
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-28-community-sweep.md",
+        "line": 400
+      }
+    ],
+    "cloudflare/security-audit-skill": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-25-skills-trial-and-usage.md",
+        "line": 579
+      }
+    ],
+    "mksglu/context-mode": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-26-codex-worker-lane.md",
+        "line": 392
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-26-token-practice-f1-f9.md",
+        "line": 78
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-27-token-lanes-subagent-start.md",
+        "line": 28
+      },
+      {
+        "kind": "dependency_or_runtime_manifest",
+        "source": "native-agent-stack:manifests/stack.json",
+        "line": 410
+      }
+    ],
+    "andrewyng/context-hub": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-26-codex-worker-lane.md",
+        "line": 451
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+        "line": 115
+      },
+      {
+        "kind": "dependency_or_runtime_manifest",
+        "source": "native-agent-stack:manifests/stack.json",
+        "line": 388
+      }
+    ],
+    "jgravelle/jcodemunch-mcp": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-26-codex-worker-lane.md",
+        "line": 555
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-26-stack-agents-role-dispatch.md",
+        "line": 64
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-27-token-lanes-subagent-start.md",
+        "line": 695
+      },
+      {
+        "kind": "dependency_or_runtime_manifest",
+        "source": "native-agent-stack:manifests/stack.json",
+        "line": 1703
+      }
+    ],
+    "rohitg00/agentmemory": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-27-mac-single-writer-staged.md",
+        "line": 3
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-07-memory-rag-source-stacks.md",
+        "line": 226
+      }
+    ],
+    "vectorize-io/hindsight": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-27-mac-single-writer-staged.md",
+        "line": 3
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-07-foundation-finalization.md",
+        "line": 32
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-07-memory-rag-source-stacks.md",
+        "line": 19
+      },
+      {
+        "kind": "dependency_or_runtime_manifest",
+        "source": "native-agent-stack:manifests/stack.json",
+        "line": 1998
+      }
+    ],
+    "shanraisshan/claude-code-best-practice": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-28-community-sweep.md",
+        "line": 394
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-08-philosophy-only-rules.md",
+        "line": 128
+      },
+      {
+        "kind": "dependency_or_runtime_manifest",
+        "source": "native-agent-stack:manifests/stack.json",
+        "line": 929
+      }
+    ],
+    "hesreallyhim/awesome-claude-code": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-28-community-sweep.md",
+        "line": 395
+      }
+    ],
+    "shareai-lab/learn-claude-code": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-28-community-sweep.md",
+        "line": 396
+      }
+    ],
+    "luongnv89/claude-howto": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-28-community-sweep.md",
+        "line": 397
+      }
+    ],
+    "yeachan-heo/oh-my-claudecode": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-28-community-sweep.md",
+        "line": 398
+      }
+    ],
+    "wshobson/agents": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-28-community-sweep.md",
+        "line": 399
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-08-skills-cc-lanes-picks.md",
+        "line": 21
+      }
+    ],
+    "thedotmack/claude-mem": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-28-community-sweep.md",
+        "line": 402
+      }
+    ],
+    "ykdojo/claude-code-tips": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-28-community-sweep.md",
+        "line": 403
+      }
+    ],
+    "florianbruniaux/claude-code-ultimate-guide": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-28-community-sweep.md",
+        "line": 404
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-08-philosophy-only-rules.md",
+        "line": 127
+      }
+    ],
+    "zebbern/claude-code-guide": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-28-community-sweep.md",
+        "line": 405
+      }
+    ],
+    "piebald-ai/claude-code-system-prompts": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-28-community-sweep.md",
+        "line": 409
+      }
+    ],
+    "juliusbrussee/caveman": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-28-community-sweep.md",
+        "line": 410
+      }
+    ],
+    "addyosmani/agent-skills": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-28-community-sweep.md",
+        "line": 411
+      }
+    ],
+    "anthropics/claude-plugins-official": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-28-community-sweep.md",
+        "line": 413
+      }
+    ],
+    "anthropics/claude-agent-sdk-python": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-28-community-sweep.md",
+        "line": 421
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-30-omniroute-runtime-workers.md",
+        "line": 31
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-02-gpt-runtime-tracking.md",
+        "line": 337
+      }
+    ],
+    "openhands/openhands": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-28-openhands-resolver-isolation.md",
+        "line": 963
+      }
+    ],
+    "mattpocock/skills": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-30-native-skill-lifecycle.md",
+        "line": 37
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-30-sota-native-finalization.md",
+        "line": 39
+      }
+    ],
+    "trailofbits/skills": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-30-native-skill-lifecycle.md",
+        "line": 45
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-09-30-sota-native-finalization.md",
+        "line": 40
+      }
+    ],
+    "earendil-works/pi": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-02-gpt-runtime-tracking.md",
+        "line": 345
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-02-new-wsl-layer-consensus.md",
+        "line": 373
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-02-two-host-north-star-architecture.md",
+        "line": 113
+      }
+    ],
+    "can1357/oh-my-pi": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-02-gpt-runtime-tracking.md",
+        "line": 345
+      }
+    ],
+    "openai/openai-agents-python": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-02-gpt-runtime-tracking.md",
+        "line": 346
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-02-two-host-north-star-architecture.md",
+        "line": 114
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-03-foundation-catalog-drift.md",
+        "line": 71
+      }
+    ],
+    "unclecode/crawl4ai": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-02-gpt-runtime-tracking.md",
+        "line": 348
+      }
+    ],
+    "langchain-ai/deepagents": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-02-gpt-runtime-tracking.md",
+        "line": 349
+      }
+    ],
+    "onyx-dot-app/onyx": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-02-new-wsl-layer-consensus.md",
+        "line": 379
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-07-memory-rag-source-stacks.md",
+        "line": 23
+      }
+    ],
+    "ollama/ollama": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-02-two-host-north-star-architecture.md",
+        "line": 112
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-05-ns2604-acceptance-defect-repairs.md",
+        "line": 172
+      }
+    ],
+    "jarrodwatts/claude-hud": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-03-currency-wave-w1.md",
+        "line": 33
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+        "line": 273
+      },
+      {
+        "kind": "dependency_or_runtime_manifest",
+        "source": "native-agent-stack:manifests/stack.json",
+        "line": 247
+      }
+    ],
+    "gastownhall/beads": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-03-currency-wave-w1b.md",
+        "line": 99
+      },
+      {
+        "kind": "dependency_or_runtime_manifest",
+        "source": "native-agent-stack:manifests/stack.json",
+        "line": 1615
+      }
+    ],
+    "kenn-io/agentsview": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-03-currency-wave-w1b.md",
+        "line": 100
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-04-2604-e2e-fix-wave.md",
+        "line": 31
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+        "line": 125
+      },
+      {
+        "kind": "dependency_or_runtime_manifest",
+        "source": "native-agent-stack:manifests/stack.json",
+        "line": 69
+      }
+    ],
+    "opendatalab/mineru": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-04-2604-e2e-fix-wave-g3-code-docs.md",
+        "line": 69
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-04-2604-e2e-fix-wave.md",
+        "line": 27
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-07-foundation-finalization.md",
+        "line": 34
+      }
+    ],
+    "jdx/mise": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-04-2604-e2e-fix-wave-g6-eval-supply.md",
+        "line": 143
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-05-dagu-mise-pin-move.md",
+        "line": 7
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-05-ns2604-acceptance-defect-repairs.md",
+        "line": 65
+      }
+    ],
+    "deusdata/codebase-memory-mcp": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+        "line": 111
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-07-foundation-finalization.md",
+        "line": 72
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-07-memory-rag-source-stacks.md",
+        "line": 20
+      },
+      {
+        "kind": "dependency_or_runtime_manifest",
+        "source": "native-agent-stack:manifests/stack.json",
+        "line": 277
+      }
+    ],
+    "yamadashy/repomix": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+        "line": 112
+      },
+      {
+        "kind": "dependency_or_runtime_manifest",
+        "source": "native-agent-stack:manifests/stack.json",
+        "line": 805
+      }
+    ],
+    "toon-format/toon": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+        "line": 113
+      },
+      {
+        "kind": "dependency_or_runtime_manifest",
+        "source": "native-agent-stack:manifests/stack.json",
+        "line": 1012
+      }
+    ],
+    "minishlab/semble": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+        "line": 132
+      }
+    ],
+    "modelcontextprotocol/modelcontextprotocol": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-06-upstream-evidence-over-local-evaluation.md",
+        "line": 201
+      }
+    ],
+    "topoteretes/cognee": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-07-foundation-finalization.md",
+        "line": 32
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-07-memory-rag-source-stacks.md",
+        "line": 225
+      }
+    ],
+    "vectifyai/pageindex": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-07-foundation-finalization.md",
+        "line": 39
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-07-memory-rag-source-stacks.md",
+        "line": 222
+      }
+    ],
+    "hkuds/rag-anything": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-07-foundation-finalization.md",
+        "line": 41
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-07-memory-rag-source-stacks.md",
+        "line": 223
+      }
+    ],
+    "comet-ml/opik": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-07-memory-rag-source-stacks.md",
+        "line": 19
+      }
+    ],
+    "mem0ai/mem0": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-07-memory-rag-source-stacks.md",
+        "line": 21
+      }
+    ],
+    "infiniflow/ragflow": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-07-memory-rag-source-stacks.md",
+        "line": 22
+      }
+    ],
+    "volcengine/openviking": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-07-memory-rag-source-stacks.md",
+        "line": 224
+      }
+    ],
+    "mempalace/mempalace": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-07-memory-rag-source-stacks.md",
+        "line": 227
+      }
+    ],
+    "supermemoryai/supermemory": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-07-memory-rag-source-stacks.md",
+        "line": 228
+      }
+    ],
+    "orchestratorinc/agent-orchestrator": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-08-ao-adoption.md",
+        "line": 4
+      },
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-08-orchestration-adoption.md",
+        "line": 207
+      }
+    ],
+    "dependabot/dependabot-core": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-08-dependabot-frozen-evidence-ignore.md",
+        "line": 23
+      }
+    ],
+    "openai/codex-plugin-cc": [
+      {
+        "kind": "decision_record",
+        "source": "native-agent-stack:docs/decisions/2026-10-09-codex-native-review-trial.md",
+        "line": 20
+      },
+      {
+        "kind": "dependency_or_runtime_manifest",
+        "source": "native-agent-stack:manifests/stack.json",
+        "line": 358
+      }
+    ],
+    "davila7/claude-code-templates": [
+      {
+        "kind": "dependency_or_runtime_manifest",
+        "source": "native-agent-stack:manifests/stack.json",
+        "line": 448
+      }
+    ],
+    "agentskills/agentskills": [
+      {
+        "kind": "dependency_or_runtime_manifest",
+        "source": "native-agent-stack:manifests/stack.json",
+        "line": 1638
+      }
+    ]
+  }
+}

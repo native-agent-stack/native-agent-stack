@@ -17186,9 +17186,24 @@
       "bytes": 618109
     },
     {
+      "path": "catalogs/convergence-practice/sources/starred-mirror-pins-20261011.json",
+      "sha256": "206588aed52d011df810b1a9c2b82918bd6213383d95b6039c272b218ca0d484",
+      "bytes": 2305
+    },
+    {
+      "path": "catalogs/convergence-practice/sources/starred-protected-20261011.json",
+      "sha256": "5dc047208faf287af741de8e4813d5796ac90eda3546f284e4d4c59eb5bb8733",
+      "bytes": 40253
+    },
+    {
+      "path": "catalogs/convergence-practice/sources/starred-signals-20261011.json",
+      "sha256": "0ab290e804ab1b1c9f044340d845759c8657febb89d0dd3c13d55d9998d4d827",
+      "bytes": 234359
+    },
+    {
       "path": "catalogs/convergence-practice/starred-convergence-20261010.json",
-      "sha256": "e007e3fd8702859b2f4b452dbdfbc21366acbb2bcce30f684a0a8709915d2062",
-      "bytes": 434974
+      "sha256": "1edede67db76c6f8102b485653f49fe257aab11e9fb760bd5fa13ae9784f27bf",
+      "bytes": 922749
     },
     {
       "path": "catalogs/convergence-practice/starred-seeds-20261010.json",
@@ -17647,8 +17662,8 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "00254eeb9844866120b1c8ab30f14f79d1cb7d458789e64eb57fe722befba19a",
-      "bytes": 1146887
+      "sha256": "852ef3b60b709e08d199067d13b45461df560273868fc6b0d9bb33a5c7ccaa5f",
+      "bytes": 1158392
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
@@ -18919,6 +18934,11 @@
       "path": "docs/decisions/2026-10-11-sell-only-quote-freshness.md",
       "sha256": "f547857a970ef0e3b5585be294db9d3edc52c25615079c7900ed38552d0a8731",
       "bytes": 8417
+    },
+    {
+      "path": "docs/decisions/2026-10-11-starred-finalization.md",
+      "sha256": "2eabeeb3724facd855a320d0c74cfab67e6f04914d95f0f29ec0796582cf2136",
+      "bytes": 9472
     },
     {
       "path": "docs/decisions/2026-10-12-mcp-template-live-reconciliation.md",
@@ -61192,8 +61212,8 @@
     },
     {
       "path": "scripts/starred_convergence.py",
-      "sha256": "37f3b8f5f5409408e20bbadb730adac77d0ed9bb75b22a952d36e6343bb62b24",
-      "bytes": 11294
+      "sha256": "b231d06f113e45638395a0496e6a712a8451f063d82f04d53129dfa17baeb76d",
+      "bytes": 17830
     },
     {
       "path": "scripts/sweep_policy.py",
@@ -62002,8 +62022,8 @@
     },
     {
       "path": "tests/test_ecosystem_manifest.py",
-      "sha256": "1a407834cd8f09d6a5d21e9d24d630fe05c36f383cdfd7ab8a0af8a561e65420",
-      "bytes": 147505
+      "sha256": "7abbcc021219b62e4ab223963008cf64834fecf88fdf27316c211945e8dde908",
+      "bytes": 148079
     },
     {
       "path": "tests/test_edgartools_pin_move.py",
@@ -62877,13 +62897,13 @@
     },
     {
       "path": "tests/test_starred_convergence.py",
-      "sha256": "c6bf34b100096c84012a5b4e2140d4bf320a9f7e955926a7a82052e4e145dca2",
-      "bytes": 11612
+      "sha256": "bd272fdf841902bb4a413e745983bcde846daf6afb76ea25d74a89c1eff2790e",
+      "bytes": 16821
     },
     {
       "path": "tests/test_starred_maintenance.py",
-      "sha256": "0dad5e0ba473341d4cb7db26bbd2ee953b01219607671256322450451ab5c822",
-      "bytes": 12940
+      "sha256": "4b1b81c92e93d7c6fddb417aa23bf8e46b34dc2d2c5c673545d6b065c34ed312",
+      "bytes": 14668
     },
     {
       "path": "tests/test_start_closure_sampler.py",
@@ -63687,8 +63707,8 @@
     },
     {
       "path": "tools/starred-maintenance/README.md",
-      "sha256": "fc9520afc4b05fbe776ced8b3d59e9b6ad4ece299fff49f4fcf4efe59b6d0724",
-      "bytes": 11902
+      "sha256": "60178e2b8dd7ff17a7b42fb81f41ce1790699dc8a3423e107c53e80337f7f2f2",
+      "bytes": 12493
     },
     {
       "path": "tools/starred-maintenance/render_units.py",
