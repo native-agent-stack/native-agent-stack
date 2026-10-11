@@ -17257,8 +17257,8 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "d90c64bca7748ba0e9b1bf00b52a3734eafdcd69407599f53bfa07bae6dea3d1",
-      "bytes": 190320
+      "sha256": "c8867a8c7875719180881f79ecd0299b2d51fa322a2dbf8f97d38a51b986be31",
+      "bytes": 190328
     },
     {
       "path": "catalogs/landscape/README.md",
@@ -62672,8 +62672,8 @@
     },
     {
       "path": "tests/test_upstream_surface_watch.py",
-      "sha256": "3a7a6b7f304a45422573ce4b8689347c7d4794e74dd533cf78a3b6c35eb3ab61",
-      "bytes": 125483
+      "sha256": "a87fccebd1ebbc31b02c665e640d7945211ff9f4a48422a95dbfb8e40ee61cff",
+      "bytes": 128671
     },
     {
       "path": "tests/test_us_equities_hosting.py",

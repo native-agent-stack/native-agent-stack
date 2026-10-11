@@ -2097,6 +2097,42 @@ class DispositionCitationTests(unittest.TestCase):
         self.assertEqual(by_key["codex:feature:plugin_hooks"]["disposition"], "not-applicable")
         self.assertIn("default null", by_key["codex:config:history.max_bytes"]["reason"])
 
+    def test_unset_workflow_agents_are_not_said_to_inherit_the_session_model(self):
+        # PR 950 review: the row and the record said that, with CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL unset, workflow
+        # agents "inherit the session model". The workflows page (Cost) and the sub-agents page (Choose a model) order
+        # a workflow agent's model as the script's, the definition's, CLAUDE_CODE_SUBAGENT_MODEL, then the session model
+        # (read 2026-10-11 against Claude Code 2.1.296), and the template sets CLAUDE_CODE_SUBAGENT_MODEL to opus.
+        # This guards the claim in the committed text; it is not a probe of the client.
+        template = json.loads((ROOT / "adoption/templates/claude.settings.template.json").read_text(encoding="utf-8"))
+        self.assertEqual(template["env"].get("CLAUDE_CODE_SUBAGENT_MODEL"), "opus")
+        reason = {row["key"]: row for row in self.rows}["claude:env:CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL"]["reason"]
+        record = (ROOT / "docs/decisions/2026-10-09-claude-code-gap-resolution.md").read_text(encoding="utf-8")
+        for where, text in (("the row reason", reason), ("the decision record", " ".join(record.split()))):
+            with self.subTest(where=where):
+                self.assertIsNone(re.search(r"inherit\w* the session model", text), f"{where} says the agents inherit")
+        self.assertIn("CLAUDE_CODE_SUBAGENT_MODEL", reason)
+
+    def test_the_record_pins_no_instruction_file_line_count_and_no_relative_base(self):
+        # PR 950 reads (Claude B1, GPT blockers 1 and 2): the record said this repository's CLAUDE.md (8 lines) imports
+        # AGENTS.md (14 lines), but AGENTS.md had 25 at the reviewed head because #944 had grown it before the rebase,
+        # and it dated a watch run "at the PR base", which every rebase moves. A count of a file other PRs edit, and a
+        # base that moves, go stale in a record that is kept. The record keeps the import, which holds at the head, and
+        # names the commit the run was made at.
+        text = (ROOT / "docs/decisions/2026-10-09-claude-code-gap-resolution.md").read_text(encoding="utf-8")
+        flat = " ".join(text.split())
+        with self.subTest(claim="no line count for CLAUDE.md or AGENTS.md"):
+            count = re.search(r"(?:CLAUDE|AGENTS)\.md`?\s+(?:\(\d+ lines?\)|(?:has|is|holds) \d+ lines?)", flat)
+            self.assertIsNone(count, f"the record pins a line count: {count and count.group(0)}")
+        with self.subTest(claim="the import the record keeps is true"):
+            self.assertIn("@AGENTS.md", (ROOT / "CLAUDE.md").read_text(encoding="utf-8").split())
+            self.assertRegex(flat, r"`CLAUDE\.md`(?: \(\d+ lines?\))? imports `AGENTS\.md`")
+        with self.subTest(claim="no run is dated at a base that moves"):
+            moving = re.search(r"\bthe PR(?:'s)? base\b", flat, re.IGNORECASE)
+            self.assertIsNone(moving, "the PR base moves with every rebase; name the commit")
+            run = [line for line in text.splitlines() if "00:04:06Z" in line]
+            self.assertEqual(len(run), 1)
+            self.assertRegex(run[0], r"`[0-9a-f]{8,40}`", "the run names the commit it was made at")
+
 
 if __name__ == "__main__":
     unittest.main()

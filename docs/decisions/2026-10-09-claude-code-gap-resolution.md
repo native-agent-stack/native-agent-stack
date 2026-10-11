@@ -1,15 +1,17 @@
 # Claude Code 2.1.296 gap resolution, 2026-10-09
 
 **Clear the upstream-surface backlog to Claude Code 2.1.296 and Codex rust-v0.162.1
-with catalog data only, and leave every host, settings and instruction change to
-the command center or the owner.** The repository already ships the machinery
-that finds new features: the
+with catalog data and two regression tests, and leave every host, settings and
+instruction change to the command center or the owner.** The repository already
+ships the machinery that finds new features: the
 [upstream-surface watch](../upstream-surface-watch.md), its
 [dispositions catalog](../../catalogs/foundation/upstream-surface-dispositions.json)
 and the `claude-native-practice` refresh loop. It had fallen behind and was not
 scheduled on this host. This record resolves the backlog it had accumulated and
-names what remains with its owners. It adds no code, instruction text, setting,
-hook, service or unit.
+names what remains with its owners. It adds no code beyond two regression tests
+(one for the workflow-agent model claim below, one for this record's own
+references to the instruction files and to a base that moves), and no instruction
+text, setting, hook, service or unit.
 
 Trigger (2026-10-09): a gap review of the 2.1.296 release, the agent-team and
 workflow practice, and the hosted features announced on 2026-10-07 to 2026-10-09
@@ -25,7 +27,7 @@ Codex rust-v0.160.0). It writes nothing.
 | --- | --- | --- | --- | --- | --- |
 | 2026-10-09 23:39:44Z | 40 | 6 | 0 | 38 | `codex:feature` unobserved: `codex --version` timed out at 60 s under host load |
 | 2026-10-09 23:51:12Z | 55 | 6 | 2 | 51 | all kinds observed |
-| 2026-10-10 00:04:06Z, at the PR base | 55 | 6 | 2 | 51 | 49 names plus two reopened instruction documents |
+| 2026-10-10 00:04:06Z, at the original PR base `a7bb4a51` | 55 | 6 | 2 | 51 | 49 names plus two reopened instruction documents |
 | 2026-10-10 00:25:49Z, after the rows and the new baseline | 0 | 0 | 0 | 0 | no document changed, all kinds observed |
 
 The 55 new names are one Claude setting, ten Claude environment variables, 29 Codex
@@ -52,11 +54,20 @@ Four rows were ruled by the command center on 2026-10-09 and are marked below.
 
 - **Workflow-agent model** (command center ruling).
   `CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL` (2.1.296) is `declined` and stays unset, so
-  workflow agents inherit the session model. Claude stays on top-quality judgment,
-  and cost savings come from routing bulk work to GPT lanes, not from lowering
-  Claude subagent models. `CLAUDE_CODE_SUBAGENT_MODEL=opus` already names children
-  ([anti-pattern log](../harness-defaults.md)); the precedence between the two is
-  undocumented. Overturn needs a frozen-packet quality-parity result and a ruling.
+  workflow agents follow the documented subagent order: a model the script names,
+  then the definition's `model`, then `CLAUDE_CODE_SUBAGENT_MODEL`, then the
+  session model ([workflows](https://code.claude.com/docs/en/workflows), Cost
+  section, and [sub-agents](https://code.claude.com/docs/en/sub-agents#choose-a-model),
+  read 2026-10-11 against Claude Code 2.1.296). That variable is `opus` in
+  `adoption/templates/claude.settings.template.json:27`, and its `enabled` row says
+  both hosts set it, so as documented an unnamed workflow agent runs `opus`. Claude
+  stays on top-quality judgment, and cost savings come from routing bulk work to GPT
+  lanes, not from lowering Claude subagent models. `CLAUDE_CODE_SUBAGENT_MODEL=opus`
+  already names children ([anti-pattern log](../harness-defaults.md)); the
+  precedence between the two variables, when both are set, is undocumented.
+  Overturn needs a frozen-packet quality-parity result and a ruling.
+  `test_unset_workflow_agents_are_not_said_to_inherit_the_session_model` in
+  `tests/test_upstream_surface_watch.py` guards this sentence and the row.
 - **Retry tuning.** The 529 backoff variables and the 429/529 watchdog cap are
   declined: retry tuning is a safety net, not the fix, and the watchdog they refine
   is off. Overturn is a measured retry exhaustion in an unattended lane.
@@ -95,7 +106,7 @@ carrier. Current guidance still preserves the distinctions it tracked:
   launch; `AGENTS.md` is read only when no `CLAUDE.md` or `CLAUDE.local.md` exists,
   and a `CLAUDE.md` that imports it loads both; auto memory loads the first 200
   lines or 25 KB; `CLAUDE.md` should stay under 200 lines. This repository's
-  `CLAUDE.md` (8 lines) imports `AGENTS.md` (14 lines).
+  `CLAUDE.md` imports `AGENTS.md`, so both load.
 - `claude:doc:skills`, digest `cf869f4c` to `3a4428d1`: an invoked skill stays in
   context, and compaction re-attaches the first 5,000 tokens of each recent
   invocation within a combined 25,000 tokens.
@@ -151,13 +162,16 @@ which it installs after #943 lands, and it reviews that service's daily report.
   checkout the gitignored local settings file turns `ultracode` off over the
   project's `true`. Owner: cc-native-practice, as input to the G6 settings-drift
   inventory; the command center applies any change only through a reviewed diff.
-- **cc-native-practice, living page** (draft #923; after it lands, client version
-  to 2.1.296): `background-workflows`, `subagent-definitions`,
-  `context-compaction`, `headless-sdk`, `agent-teams`, `output-compression`,
-  `usage-cost-monitoring` and `model-effort-routing` deltas, and a `hosted-surfaces`
-  slot for Projects, Managed Agents, routines, Remote Control, channels and agent
-  view. An exact-case search of the draft's pages on 2026-10-09 found no slot for
-  any of them.
+- **cc-native-practice, living page** (landed in #923; the skill,
+  `.claude/skills/claude-native-practice/`, pins `client_version` 2.1.295 at
+  `reference/slots.json:3`, to be updated to 2.1.296): `background-workflows`,
+  `subagent-definitions`, `context-compaction`, `headless-sdk`, `agent-teams`,
+  `output-compression`, `usage-cost-monitoring` and `model-effort-routing` deltas,
+  and a `hosted-surfaces` slot for Projects, Managed Agents, routines, Remote
+  Control, channels and agent view. An exact-case search of the skill's pages at
+  `8c95a50d` on 2026-10-11 finds no slot for Projects, Managed Agents, Remote
+  Control, channels or agent view; routines appear only as the ranked alternative
+  "Cloud routines" of the `scheduled-tasks` slot (`reference/slots.json:1625`).
 - **grand-catalog candidates:** Claude Code Projects as WATCH (public beta, Pro and
   Max, hosted only, no CLI surface); Managed Agents dynamic workflows
   (`managed-agents-2026-04-01`, beta since 2026-10-09) as TRIAL, conditional on the
@@ -183,9 +197,12 @@ Measured on this host: the watch runs above, with the new baseline written throu
 `--network --write-baseline --force` under a scratch `XDG_STATE_HOME` so the host's
 watch state directory stays absent until the units are installed;
 `--check-dispositions` (363 rows valid); the targeted unit tests (231 tests,
-6 skipped, before and after) and `python3 scripts/validate.py` (passed before and
-after). Source-reviewed: the pages, changelog, release notes and source files
-listed below. Not run: the behavior of any 2.1.296 change, the daily units, the
+6 skipped, before and after the catalog change; 233 with the two regression tests,
+`test_unset_workflow_agents_are_not_said_to_inherit_the_session_model` and
+`test_the_record_pins_no_instruction_file_line_count_and_no_relative_base`, both in
+`tests/test_upstream_surface_watch.py`) and `python3 scripts/validate.py` (passed
+before and after). Source-reviewed: the pages, changelog, release notes and source
+files listed below. Not run: the behavior of any 2.1.296 change, the daily units, the
 precedence of `CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL` over
 `CLAUDE_CODE_SUBAGENT_MODEL`, and any Managed Agents workflow.
 
@@ -210,6 +227,10 @@ that changes the named behavior, or a measured need on a lane.
   [agent teams](https://code.claude.com/docs/en/agent-teams),
   [workflows](https://code.claude.com/docs/en/workflows) and the
   [page index](https://code.claude.com/docs/llms.txt).
+- Claude Code docs read 2026-10-11, for the workflow-agent model order (sha256
+  prefixes of the markdown bodies):
+  [sub-agents](https://code.claude.com/docs/en/sub-agents#choose-a-model)
+  `dd3f22aa` and [workflows](https://code.claude.com/docs/en/workflows) `994709b9`.
 - [Claude Platform release notes](https://platform.claude.com/docs/en/release-notes/overview.md)
   (2026-10-07 Sonnet 5.5 cache-read price; 2026-10-09 Managed Agents dynamic
   workflows) and the

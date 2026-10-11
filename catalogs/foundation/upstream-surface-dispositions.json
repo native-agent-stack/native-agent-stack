@@ -3772,7 +3772,7 @@
   {
    "key": "claude:env:CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL",
    "disposition": "declined",
-   "reason": "2.1.296: pins workflow agents' model. Left unset: they inherit the session model and Claude stays on top-quality judgment (command center, 2026-10-09).",
+   "reason": "2.1.296: pins workflow agents' model. Left unset: unnamed ones follow CLAUDE_CODE_SUBAGENT_MODEL (opus on both hosts), else the session model (CC, 2026-10-09).",
    "source": "https://github.com/anthropics/claude-code/blob/2301018b1f61073c501a8e7a4813ef48c239163b/CHANGELOG.md#L7",
    "carrier": null,
    "value": null,
