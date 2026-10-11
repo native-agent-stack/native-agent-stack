@@ -94,6 +94,12 @@ before that token is encoded with
 in the surrounding command. Full command spans retain their independent parse;
 other span text remains one literal surrounding token. Thus a quoted wrapper
 name still resolves to the wrapper, and literal punctuation remains an operand.
+For supported model-bearing commands, file and line candidacy admit possible
+model-option syntax before POSIX decoding without requiring an unescaped raw ID.
+Command strings identify the model from the decoded selector argument. Literal
+argv retains its supplied bytes. Quote/escape normalization in candidacy is only
+an admission hint; executable context and model identity still come from the
+pinned lexer and the decoded selector, never from that hint.
 A formatted executable is retained, so its ordinary operands cannot become a
 new executable. Unrelated spans in a trailing shell comment do not suppress
 the preceding model argument. Commands outside spans are also checked.

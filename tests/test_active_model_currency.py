@@ -460,6 +460,53 @@ class ActiveModelCurrencyTests(unittest.TestCase):
         self.write("docs/launch.md", "Use `env codex exec -m gpt-6-sol`.\n")
         self.assertEqual(self.check()["stale_count"], 1)
 
+    def test_escaped_model_commands_are_checked_after_posix_decoding(self):
+        cases = [
+            ("docs/launch.md", r"codex exec -m `gpt\-6-sol`" + "\n"),
+            ("docs/launch.md", r"codex exec -m gpt\-6-sol" + "\n"),
+            ("docs/launch.md", r"codex exec -\m `gpt\-6-sol`" + "\n"),
+            ("docs/launch.md", "codex exec -''m `gpt'-'6-sol`\n"),
+            ("tools/launch.sh", r"codex exec -m gpt\-6-sol" + "\n"),
+            ("config/launch.json", json.dumps({"command": r"codex exec -m gpt\-6-sol"})),
+            ("config/launch.json", json.dumps({"command": "codex exec -m gpt-6-sol"}).replace("gpt-6", r"gpt\u002d6")),
+            ("config/launch.json", json.dumps({"argv": ["codex", "exec", "-m", "gpt-6-sol"]})),
+        ]
+        for name, text in cases:
+            with self.subTest(name=name, text=text):
+                path = self.write(name, text)
+                try:
+                    result = self.check()
+                    self.assertEqual((result["status"], result["stale_count"]), ("stale", 1))
+                    finding, = result["findings"]
+                    self.assertEqual(finding["model"], "gpt-6-sol")
+                    self.assertEqual(result["errors"], [])
+                finally:
+                    path.unlink()
+
+    def test_escaped_model_argv_and_ordinary_operands_remain_literal(self):
+        values = [
+            {"argv": ["codex", "exec", "-m", r"gpt\-6-sol"]},
+            {"command": r"echo codex -m gpt\-6-sol"},
+            {"command": r"echo \; codex -m gpt\-6-sol"},
+            {"command": r"codex exec -m 'gpt\-6-sol'"},
+        ]
+        for value in values:
+            with self.subTest(value=value):
+                self.write("config/launch.json", json.dumps(value))
+                result = self.check()
+                self.assertEqual((result["status"], result["stale_count"]), ("current", 0))
+                self.assertEqual(result["errors"], [])
+
+    def test_unrelated_commands_do_not_become_model_parse_failures(self):
+        self.write("config/launch.json", json.dumps({"commands": [
+            "python -m package 'unclosed unrelated text",
+            "tool --model placeholder 'unclosed unrelated text",
+            "codex exec -m gpt-6.1-sol",
+        ]}))
+        result = self.check()
+        self.assertEqual((result["status"], result["stale_count"]), ("current", 0))
+        self.assertEqual(result["errors"], [])
+
     def test_quoted_and_escaped_punctuation_remains_an_operand_in_command_strings(self):
         commands = ["echo ';' codex -m gpt-6-sol", r"echo \; codex -m gpt-6-sol",
                     'echo "&&" codex -m gpt-6-sol']

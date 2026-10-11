@@ -40,6 +40,7 @@ TEXT_SUFFIXES = {"", ".py", ".js", ".cjs", ".mjs", ".ts", ".sh", ".bash", ".ps1"
 MAX_BYTES = 2_000_000
 MAX_AGE = timedelta(hours=24)
 MODEL_FLAGS = {"--model", "--model-id", "-m"}
+MODEL_OPTION = re.compile(r"(?:--model(?:-id)?|-m)(?=[=\s\"'`,]|$)")
 COMMAND_KEYS = {"command", "commands", "argv", "args", "command_line", "exec_start"}
 
 
@@ -245,13 +246,30 @@ def identifiers(value: str, allow_cli_alias: bool = False, sentence: bool = Fals
     return found
 
 
+def model_option_candidate(text: str) -> bool:
+    """Admit possible quoted/escaped flags; the POSIX lexer decides tokens."""
+    syntax_hint = text.translate(str.maketrans("", "", "\\\"'`"))
+    if re.search(r"--model(?:-id)?(?=[=\s,]|$)", syntax_hint):
+        return True
+    return bool(MODEL_OPTION.search(syntax_hint) and re.search(r"\b(?:codex|claude)\b", syntax_hint))
+
+
+def model_value_candidate(text: str, allow_cli_alias: bool = False) -> bool:
+    """Admit potentially decoded IDs without selecting from normalized text."""
+    syntax_hint = text.translate(str.maketrans("", "", "\\\"'`"))
+    return bool(MODEL.search(text) or MODEL.search(syntax_hint) or (
+        allow_cli_alias and any(re.search(r"\b" + alias + r"\b", syntax_hint) for alias in CLI_ALIASES)))
+
+
 def command_identifiers(value: str | list[str], locate: bool = False):
     """Read POSIX command strings with CPython v3.13.16 shlex; argv stays literal."""
     text = value if isinstance(value, str) else shlex.join(value)
-    if not re.search(r"(?:--model(?:-id)?|-m)(?:[=\s\"',])", text):
+    # CPython v3.13.16 shlex.py decodes POSIX escapes. Raw model spelling
+    # cannot decide whether a command's decoded selector is recognisable.
+    if not model_option_candidate(text):
         return []
-    if not MODEL.search(text) and not any(re.search(r"\b" + alias + r"\b", text) for alias in CLI_ALIASES):
-        return []
+    if not model_value_candidate(text, True):
+        return []  # unrelated commands must not create parse/coverage failures
     try:
         if isinstance(value, str):
             punctuation = "\n;&|()"
@@ -579,13 +597,13 @@ def selectors(text: str, path: Path):
             continue
         if historical_setup or record_section or (prose and re.search(r"source/parser checked|failed attempt|recorded provider probe", line, re.I)):
             continue
-        if not MODEL.search(line) and not (cli and any(re.search(r"\b" + alias + r"\b", line) for alias in CLI_ALIASES)):
+        if not selector_candidate(line, cli):
             continue
         # Model fields/frontmatter, environment defaults and native CLI arguments.
         fields = [match for match in re.finditer(
             r"(?:^|[\s{,])([\w.-]*model(?:_id|_name)?)[\s\"']*[:=]", line, re.I)
                   if selector_key(match[1])]
-        argument = re.search(r"(?:--model(?:-id)?(?:[=\s])|\b(?:codex|claude)\b.*\s-m\s)", line)
+        argument = model_option_candidate(line)
         for field in fields:
             # Only a field's first value is a selector. Its explanatory tail
             # need not be valid shell syntax, including an owner's apostrophe.
@@ -636,6 +654,12 @@ def host_files(home: Path):
     return singles + [p for folder in folders if folder.is_dir() for p in folder.iterdir() if p.is_file()]
 
 
+def selector_candidate(text: str, allow_cli_alias: bool = False) -> bool:
+    """Conservative admission; identify models only after selector decoding."""
+    return bool(MODEL.search(text) or model_option_candidate(text) or (
+        allow_cli_alias and any(re.search(r"\b" + alias + r"\b", text) for alias in CLI_ALIASES)))
+
+
 def model_candidate(path: Path) -> bool:
     """Stream a value-free candidate test before size/UTF-8 validation.
 
@@ -646,8 +670,7 @@ def model_candidate(path: Path) -> bool:
     with path.open("rb") as stream:
         while chunk := stream.read(65536):
             text = (overlap + chunk).decode("utf-8", errors="ignore")
-            if MODEL.search(text) or ("model" in text.lower() and any(
-                    re.search(r"\b" + alias + r"\b", text) for alias in CLI_ALIASES)):
+            if selector_candidate(text, "model" in text.lower()):
                 return True
             overlap = chunk[-512:]
     return False
@@ -684,7 +707,7 @@ def check(manifest: dict, roots: list[Path], host: bool = False) -> dict:
                 errors.append(display + ": active text exceeds the check bound"); continue
             raw = path.read_bytes()
             text = raw.decode("utf-8")
-            if not MODEL.search(text) and not ("model" in text.lower() and any(re.search(r"\b" + alias + r"\b", text) for alias in CLI_ALIASES)):
+            if not selector_candidate(text, "model" in text.lower()):
                 continue
             selected = selectors(text, path)
         except (OSError, UnicodeError, CurrencyError):
