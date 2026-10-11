@@ -1757,9 +1757,12 @@ class AlpacaPaperTransport:
         async with self._operation_lock:
             def collect():
                 account = normalize_account(self._client.get_account(), include_margin=self.include_margin)
+                raw_positions = self._client.get_all_positions()
+                if type(raw_positions) is not list:
+                    raise TransportError("positions response must be a list")
                 positions = [{"symbol": p["symbol"], "qty": decimal_string(p["qty"]),
                               "avg_entry_price": decimal_string(p["avg_entry_price"])}
-                             for p in self._client.get_all_positions()]
+                             for p in raw_positions]
                 orders = self._pages("open") + self._pages("all", after=self.history_start)
                 # Last, after account cash, through the caller's fixed fee window. A fee
                 # posted between these reads can cause a cash mismatch; fail closed.

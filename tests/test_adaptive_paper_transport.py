@@ -898,6 +898,42 @@ class AsyncTransport(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(snapshot["fees"], [])
         self.assertEqual(request.call_count, 5)
 
+    async def test_snapshot_refuses_non_list_positions_in_success_response(self):
+        for payload in ({}, "", None, 7, True, {"positions": []}, {"data": []}):
+            with self.subTest(payload=payload):
+                def request(method, url, **kwargs):
+                    self.assertEqual(method, "GET")
+                    path = t.urlsplit(url).path
+                    if path == "/v2/account":
+                        return response({"cash": "1000", "equity": "1000", "buying_power": "1000"})
+                    if path == "/v2/positions":
+                        value = response(payload, status=200)
+                        value._content = json.dumps(payload).encode()  # None is JSON null, not an empty body.
+                        return value
+                    return response([], status=200)
+                with patch.object(self.port._client._session._session, "request", side_effect=request):
+                    with self.assertRaisesRegex(t.TransportError, "snapshot incomplete") as caught:
+                        await self.port.snapshot()
+                self.assertIsNone(caught.exception.__cause__)
+                self.assertTrue(caught.exception.__suppress_context__)
+                self.assertIsInstance(caught.exception.__context__, t.TransportError)
+                self.assertEqual(str(caught.exception.__context__), "positions response must be a list")
+                self.assertIn("snapshot_incomplete", self.port.health["reasons"])
+
+    async def test_snapshot_refuses_tuple_and_list_subclass_positions_from_sdk(self):
+        class PositionList(list):
+            pass
+        for positions in ((), PositionList()):
+            with self.subTest(positions_type=type(positions).__name__):
+                with patch.object(self.port._client, "get_account", return_value={
+                        "cash": "1000", "equity": "1000", "buying_power": "1000"}), \
+                     patch.object(self.port._client, "get_all_positions", return_value=positions), \
+                     patch.object(self.port._client, "get", return_value=[]):
+                    with self.assertRaisesRegex(t.TransportError, "snapshot incomplete") as caught:
+                        await self.port.snapshot()
+                self.assertEqual(str(caught.exception.__context__), "positions response must be a list")
+                self.assertIn("snapshot_incomplete", self.port.health["reasons"])
+
     async def test_late_event_cannot_undo_cumulative_fill(self):
         final = t.normalize_order(order(filled_qty="1", filled_avg_price="100", status="filled"))
         await self.port._observe(final)
