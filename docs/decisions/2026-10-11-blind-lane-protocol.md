@@ -134,3 +134,36 @@ held PR without committing, then supplied the same correction source and the ref
 entry. It is a rehearsal; the PR's required ONE forward commit retains its exact a2e32650 parent/lease.
 Receipts are retained under the private `pr993-review-fix-20261011` packet. No paid call, native journal change,
 old collection rewrite, instruction/config change, blind key/export write or #995 change occurred.
+
+## Micro correction: invalidate before the empty-directory exit
+
+The GPT micro at `a4bd61b60a1c50d81f3c8c175957731d2af2cbb0` found a remaining collector ordering gap:
+an empty transcript directory returned before the audit and left a prior accepted file and clean report intact.
+The connector identified orphan `result`/`failed` journal rows that the start-only parser silently skipped.
+Both are corrected together in one forward commit, with the old native evidence and all historical keys retained.
+
+After provenance/result validation, the collector now always runs the audit and artifact invalidation, even for
+an empty or missing transcript directory. It saves the failed audit, prints missing identities, and removes or
+quarantines affected accepted returns before preserving exit2 for the no-transcript condition. Partial evidence
+and zero-byte transcript files are audited; a clean resume after evidence restoration must pass a fresh audit.
+
+The native journal parser now binds each `result` or `failed` identity/key to one **preceding** `started` row.
+Missing, orphan, wrong-key, repeated or conflicting completion identities refuse, as do duplicate starts.
+Native resume may reuse a key with a new agent identity; it is not a duplicate identity. Restore control rows
+grant no identity. A started attempt without a completion remains subject to the completed-run record and
+transcript audits rather than gaining acceptance from journal presence. The pinned Claude Code2.1.296
+`Qr()` source at byte228289997 validates completion agent/key fields; the adjacent workflow source journals
+the child start before its return. These unchanged primary bytes are retained in the private capture directory.
+
+Four final public regressions transplanted onto exact prior `a4bd61b6` production run with19 failing subtests
+and zero errors: single/multiple all-missing recollection, missing/partial/zero-byte directories, orphaned result
+and failed collection, and the journal completion/start state matrix. Correction restores clean resume controls.
+Every missing started identity is printed; invalid reports replace earlier clean reports. Removal-only advisor
+and previous resume-boundary tests remain controls. Adjudication cache revalidation is checked one step wider:
+after all transcripts disappear, cached judgments refuse by digest and the empty recollection exception cannot
+make that judgment count. All collector/audit and adjudication collection/cache call sites were read directly.
+
+Full current Claude keys under both workflow paths and the adjudication key were freshly derived with this
+repository's own APIs, appended while preserving every historical list as an exact prefix, and hash/byte
+registered in the evidence manifest. The exact generated fields and test receipts are retained privately.
+This correction changes neither native journals/transcripts nor prompts, account/config state, paid work or #995.

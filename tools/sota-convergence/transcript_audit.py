@@ -104,7 +104,7 @@ def journal_agents(directory) -> tuple:
     path = Path(directory) / "journal.jsonl"
     if not path.exists():
         return None, None
-    started = {}
+    started, completed = {}, set()
     try:
         for line in path.read_text(encoding="utf-8").splitlines():
             if not line.strip():
@@ -113,13 +113,25 @@ def journal_agents(directory) -> tuple:
             if not isinstance(row, dict) or row.get("type") not in {
                     "launched", "started", "result", "failed", "restoring", "restored"}:
                 return {}, "the workflow journal has an unrecognized row"
-            if row["type"] != "started":
+            if row["type"] in {"launched", "restoring", "restored"}:
+                continue
+            if row["type"] in {"result", "failed"}:
+                agent_id, key = row.get("agentId"), row.get("key")
+                if not all(isinstance(value, str) and value for value in (agent_id, key)):
+                    return started, "the workflow journal has a completion row without agentId and key"
+                if agent_id not in started or started[agent_id]["key"] != key:
+                    return started, "the workflow journal has a completion without its matching preceding started identity"
+                if agent_id in completed:
+                    return started, "the workflow journal repeats a completion identity"
+                completed.add(agent_id)
                 continue
             if not all(isinstance(row.get(key), str) and row[key] for key in ("agentId", "key", "label")):
                 return {}, "the workflow journal has a started row without agentId, key and label"
             identity = {"key": row["key"], "label": row["label"]}
             if row["agentId"] in started and started[row["agentId"]] != identity:
                 return {}, "the workflow journal assigns conflicting identities to an agent"
+            if row["agentId"] in started:
+                return started, "the workflow journal repeats a started identity"
             started[row["agentId"]] = identity
     except (OSError, UnicodeError, ValueError):
         return {}, "the workflow journal is unreadable"

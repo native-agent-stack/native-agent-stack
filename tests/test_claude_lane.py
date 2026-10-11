@@ -213,6 +213,111 @@ class ClaudeLaneWriterTests(unittest.TestCase):
         self.assertIn("no agent transcripts", err.getvalue())
         self.assertFalse((self.work / "claude" / "foundation__l1.json").exists())
 
+    def test_recollection_invalidates_empty_partial_and_missing_transcript_directories(self):
+        original = (self.transcripts / "agent-l1.jsonl").read_text(encoding="utf-8")
+        record_path = self.transcripts.parents[2] / "workflows/wf_test.json"
+        record = json.loads(record_path.read_text(encoding="utf-8"))
+        label = "propose:foundation/l1"
+        identities = ("earlier-clean", "l1", "old")
+        record["workflowProgress"][0]["label"] = label
+        record_path.write_text(json.dumps(record), encoding="utf-8")
+        rows = [{"type": "restoring"}, *[{"type": "started", "agentId": identity,
+                 "label": label, "key": "v2:" + char * 64} for identity, char in zip(identities, "abc")],
+                {"type": "restored"}]
+        journal = "".join(json.dumps(row) + "\n" for row in rows)
+        for state in ("empty", "partial", "missing", "empty-files"):
+            with self.subTest(state=state):
+                self.transcripts.mkdir(parents=True, exist_ok=True)
+                (self.transcripts / "journal.jsonl").write_text(journal, encoding="utf-8")
+                for identity in identities:
+                    (self.transcripts / f"agent-{identity}.jsonl").write_text(original, encoding="utf-8")
+                with contextlib.redirect_stdout(io.StringIO()):
+                    self.assertEqual(self.run_main("--resolved-model", "claude-opus-5-5"), 0)
+                canonical = self.work / "claude/foundation__l1.json"
+                self.assertTrue(canonical.exists())
+                for identity in identities:
+                    if state == "partial" and identity == "l1":
+                        continue
+                    path = self.transcripts / f"agent-{identity}.jsonl"
+                    if state == "empty-files":
+                        path.write_text("", encoding="utf-8")
+                    else:
+                        path.unlink()
+                if state == "missing":
+                    shutil.rmtree(self.transcripts)
+                with contextlib.redirect_stdout(io.StringIO()) as out, contextlib.redirect_stderr(io.StringIO()):
+                    code = self.run_main("--resolved-model", "claude-opus-5-5")
+                self.assertIn(code, (0, 2))
+                self.assertFalse(canonical.exists(), "failed recollection must remove the accepted artifact")
+                report = json.loads((self.work / "claude/transcript-audit.json").read_text())
+                self.assertEqual(report["flagged_items"], ["foundation__l1"])
+                if state in ("empty", "partial", "missing"):
+                    self.assertIsNotNone(report["run_issue"])
+                    for identity in identities if state == "empty" else ("earlier-clean", "old"):
+                        if state != "missing":
+                            self.assertIn(identity, report["run_issue"])
+                            self.assertIn(identity, out.getvalue())
+                # Resume after invalidation must re-audit restored evidence and publish only the new clean state.
+                self.transcripts.mkdir(parents=True, exist_ok=True)
+                (self.transcripts / "journal.jsonl").write_text(journal, encoding="utf-8")
+                for identity in identities:
+                    (self.transcripts / f"agent-{identity}.jsonl").write_text(original, encoding="utf-8")
+                with contextlib.redirect_stdout(io.StringIO()):
+                    self.assertEqual(self.run_main("--resolved-model", "claude-opus-5-5"), 0)
+                self.assertTrue(canonical.exists())
+                report = json.loads((self.work / "claude/transcript-audit.json").read_text())
+                self.assertIsNone(report["run_issue"])
+                self.assertEqual(report["flagged_items"], [])
+
+    def test_empty_recollection_invalidates_a_single_journaled_identity(self):
+        label = "propose:foundation/l1"
+        record_path = self.transcripts.parents[2] / "workflows/wf_test.json"
+        record = json.loads(record_path.read_text())
+        record["workflowProgress"][0]["label"] = label
+        record_path.write_text(json.dumps(record))
+        (self.transcripts / "journal.jsonl").write_text(json.dumps(
+            {"type": "started", "agentId": "l1", "key": "v2:" + "a" * 64, "label": label}) + "\n")
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(self.run_main("--resolved-model", "claude-opus-5-5"), 0)
+        self.assertTrue((self.work / "claude/foundation__l1.json").exists())
+        (self.transcripts / "agent-l1.jsonl").unlink()
+        with contextlib.redirect_stdout(io.StringIO()) as output, contextlib.redirect_stderr(io.StringIO()):
+            self.assertEqual(self.run_main("--resolved-model", "claude-opus-5-5"), 2)
+        self.assertFalse((self.work / "claude/foundation__l1.json").exists())
+        report = json.loads((self.work / "claude/transcript-audit.json").read_text())
+        self.assertIn("l1", report["run_issue"])
+        self.assertIn("l1", output.getvalue())
+        self.assertEqual(report["flagged_items"], ["foundation__l1"])
+
+    def test_orphaned_completion_invalidates_acceptance_and_allows_clean_resume(self):
+        label, key = "propose:foundation/l1", "v2:" + "a" * 64
+        record_path = self.transcripts.parents[2] / "workflows/wf_test.json"
+        record = json.loads(record_path.read_text())
+        record["workflowProgress"][0]["label"] = label
+        record_path.write_text(json.dumps(record))
+        valid = [{"type": "started", "agentId": "l1", "key": key, "label": label},
+                 {"type": "result", "agentId": "l1", "key": key, "result": {"ok": True}}]
+        for kind in ("result", "failed"):
+            with self.subTest(kind=kind):
+                journal = self.transcripts / "journal.jsonl"
+                journal.write_text("".join(json.dumps(row) + "\n" for row in valid))
+                with contextlib.redirect_stdout(io.StringIO()):
+                    self.assertEqual(self.run_main("--resolved-model", "claude-opus-5-5"), 0)
+                self.assertTrue((self.work / "claude/foundation__l1.json").exists())
+                with journal.open("a") as stream:
+                    stream.write(json.dumps({"type": kind, "agentId": "orphan", "key": "v2:" + "b" * 64,
+                                             "result": {"ok": True}}) + "\n")
+                with contextlib.redirect_stdout(io.StringIO()) as output:
+                    self.assertEqual(self.run_main("--resolved-model", "claude-opus-5-5"), 0)
+                self.assertFalse((self.work / "claude/foundation__l1.json").exists())
+                report = json.loads((self.work / "claude/transcript-audit.json").read_text())
+                self.assertIn("matching preceding started", report["run_issue"])
+                self.assertIn("matching preceding started", output.getvalue())
+                journal.write_text("".join(json.dumps(row) + "\n" for row in valid))
+                with contextlib.redirect_stdout(io.StringIO()):
+                    self.assertEqual(self.run_main("--resolved-model", "claude-opus-5-5"), 0)
+                self.assertTrue((self.work / "claude/foundation__l1.json").exists())
+
     def test_written_return_carries_family_and_vendored_provenance(self):
         self.assertEqual(self.run_main("--resolved-model", "claude-opus-5-5"), 0)
         data = json.loads((self.work / "claude" / "foundation__l1.json").read_text(encoding="utf-8"))

@@ -60332,8 +60332,8 @@
     },
     {
       "path": "tests/test_adjudicate.py",
-      "sha256": "3974779b52fe2856ab35135c3a03dea23f93bda5415f5f8e43f062deb18eea3f",
-      "bytes": 146286
+      "sha256": "765cf5840735445870dd39092c6ed8bd9e85fd0abeecc293d786b84b304252a2",
+      "bytes": 146805
     },
     {
       "path": "tests/test_adoption_bootstrap.py",
@@ -62022,8 +62022,8 @@
     },
     {
       "path": "tools/sota-convergence/lane-provenance.json",
-      "sha256": "56fa627d76e316d573e03bc381fe8e117240d1b6cc2f4f5a02d328dfc27418d9",
-      "bytes": 22496
+      "sha256": "77c31ee062ba0aeda09e051654477e1c8758b48a950bc0102badbf17ce44016d",
+      "bytes": 24407
     },
     {
       "path": "tools/sota-convergence/lane-return.schema.json",

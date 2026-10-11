@@ -285,10 +285,8 @@ def main(argv=None) -> int:
     except ProvenanceError as error:
         print(error, file=sys.stderr)
         return 2
-    if not transcript_audit.transcript_files(args.transcripts):
-        print(f"claude_lane: --transcripts {args.transcripts} holds no agent transcripts; name the workflow run's "
-              "subagents/workflows/<run id> directory", file=sys.stderr)
-        return 2
+    # An empty/missing directory is still a recollection: audit and invalidate prior accepted artifacts first.
+    no_transcripts = not transcript_audit.transcript_files(args.transcripts)
     out_dir = args.work_dir / "claude"
     out_dir.mkdir(parents=True, exist_ok=True)
     # The blind rule, checked in what the agents opened (Codex review of #145 at 68e74f2c): Read, Glob and Grep have
@@ -352,6 +350,10 @@ def main(argv=None) -> int:
                       "lost": list(result.get("lost") or []), "provenance": provenance,
                       "run_issue": report["run_issue"],
                       "unaccounted_transcripts": report["unaccounted_transcripts"]}, sort_keys=True))
+    if no_transcripts:
+        print(f"claude_lane: --transcripts {args.transcripts} holds no agent transcripts; "
+              f"{report['run_issue']}", file=sys.stderr)
+        return 2
     return 0
 
 

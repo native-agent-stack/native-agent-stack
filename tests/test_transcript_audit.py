@@ -362,6 +362,35 @@ class TranscriptAuditTests(unittest.TestCase):
         self.assertNotIn("restore-control", report["run_issue"])
         self.assertEqual(report["flagged_items"], ["foundation__layer"])
 
+    def test_journal_completions_need_one_matching_preceding_start(self):
+        self.agent("final", [])
+        label, key = "propose:foundation/layer", "v2:" + "a" * 64
+        self.record(workflowProgress=[{"type": "workflow_agent", "agentId": "final", "label": label}])
+        start = {"type": "started", "agentId": "final", "key": key, "label": label}
+        for kind in ("result", "failed"):
+            completion = {"type": kind, "agentId": "final", "key": key, "result": {"ok": True}}
+            cases = {
+                "orphan": [start, dict(completion, agentId="orphan")],
+                "before_start": [completion, start],
+                "wrong_key": [start, dict(completion, key="v2:" + "b" * 64)],
+                "duplicate": [start, completion, completion],
+                "conflicting_completion": [start, completion, dict(completion, type="failed" if kind == "result" else "result")],
+                "duplicate_start": [start, start, completion],
+                "missing_identity": [start, {"type": kind, "key": key}],
+            }
+            for state, rows in cases.items():
+                with self.subTest(kind=kind, state=state):
+                    (self.run / "journal.jsonl").write_text("".join(json.dumps(row) + "\n" for row in rows))
+                    report = transcript_audit.audit(self.run, self.items, export=self.export, result=RESULT)
+                    self.assertIsNotNone(report["run_issue"], state)
+                    self.assertEqual(report["flagged_items"], ["foundation__layer"])
+            # Restoring/restored markers cannot authorize an orphan, and valid resumed starts remain valid.
+            valid = [{"type": "restoring", "agentId": "ignored"}, start, completion, {"type": "restored"}]
+            (self.run / "journal.jsonl").write_text("".join(json.dumps(row) + "\n" for row in valid))
+            report = transcript_audit.audit(self.run, self.items, export=self.export, result=RESULT)
+            self.assertIsNone(report["run_issue"])
+            self.assertEqual(report["flagged_items"], [])
+
     def test_every_unaccounted_transcript_is_named(self):
         self.agent("final", [])
         for index in range(20):
