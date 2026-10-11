@@ -21,7 +21,7 @@ unretained full-plan citation. The terminal definitions incorporate the CC's
 conditions 1–4. Operative requirements are retained here so future sessions
 need no access to the coordination file.
 
-The CC's 2026-10-11 17:30Z readiness ruling supersedes date-based comparison
+The CC's 2026-10-11 17:31Z readiness ruling supersedes date-based comparison
 routing below; preregistered data windows retain their original boundaries.
 
 ## Decision
@@ -78,7 +78,7 @@ that disposition.
 A layer is FINAL only when all of the following hold for each of its winners:
 
 1. A recorded verdict with its evidence class, verdict wave and `next_review`.
-2. A winner with a run pin in `catalogs/landscape/final-stack.json` `runs[]`.
+2. Each winner has a run pin in `catalogs/landscape/final-stack.json` `runs[]`.
 3. An E2E receipt through the upstream's own install and test path, at that pin.
 4. Invoke evidence in the measured window (adoption-now), or a recorded reason
    it isn't invoked. A zero-call tool is a wiring defect to fix, or a role to
@@ -92,6 +92,7 @@ procedure is fixed, so the layer waits for its named inputs rather than being re
 A readiness trigger names the inputs whose existence starts the run, with no date.
 The comparison starts as soon as those inputs exist.
 A comparison whose inputs exist and has not run is a defect.
+This is not a reason to re-research.
 The term SCHEDULED stays for compatibility and means a comparison pending its named inputs.
 It becomes FINAL or RETIRED when the comparison runs and its rule applies.
 Preregistered protocol windows, including the holdout boundary and the model seal
@@ -127,9 +128,11 @@ Leaving a no-winner row without a comparison's named inputs postpones the decisi
 indefinitely. The chosen protocol reuses the existing verdict, sweep and
 comparison pipeline, and requires only a short always-loaded AGENTS.md pointer.
 
-The doc-pinning test protects that pointer and its requirements in native
-`unittest` discovery. It proves repository-text consistency, not research
-behavior or runtime adoption.
+The doc test pins the normalized Terminal states and evidence section exactly,
+while allowing whitespace reflow. Separate checks cover the AGENTS.md pointer,
+scheduling-date vocabulary and selected Decision phrases. Widening coverage of
+the Decision phrase checks has not been measured. These are repository-text
+checks, not research behavior or runtime adoption.
 
 Change this protocol through a new reviewed decision if sweep evidence shows
 that its delta boundary loses a material candidate or its completion criteria
@@ -141,7 +144,7 @@ misclassify a layer; retain this record as superseded history.
   CC's 2026-10-11 06:12Z terminal-state ruling retained in
   `~/.local/state/native-agent-stack/coordination/command-center/research-cc-role-20261008/pr1008-claude-read-95b27707.md`,
   SHA256 `42e3e24ec9ee2e06288b6f6cba407b741e585ca93cef5e738f3f93535258c8de`.
-- Readiness amendment: the CC's 2026-10-11 17:30Z ruling retained in
+- Readiness amendment: the CC's 2026-10-11 17:31Z ruling retained in
   `~/.local/state/native-agent-stack/coordination/command-center/research-cc-role-20261008/ruling-no-schedules-proceed-when-ready-20261011.md`,
   SHA256 `dd05310efdb514b2886bb55a292176352f51f7d161345d8335e33d6285d191f2`.
 - Michael Nygard, [Documenting Architecture Decisions](https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions),
