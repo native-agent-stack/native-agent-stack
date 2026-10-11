@@ -60,10 +60,11 @@ OVERNIGHT's upcoming trade date and the following trading session are checked.
 The installed alpaca-py 0.44.0 exposes the BOATS enum but its `StockDataStream`
 constructor accepts only IEX/SIP. The native transport therefore refuses a
 BOATS construction as `boats_stream_unqualified_sdk` before constructing a
-client. `runner.load_config` refuses a `boats` configuration with the same
-reason before any broker request or trial-state write, so no command starts a
-trial that the transport would then refuse; the transport refusal remains the
-backstop. It does not substitute another feed, fork the SDK or rebuild its
+client. `runner.load_config` and `mover.load_mover_config` both use
+`feeds.require_qualified_stream` to refuse a `boats` configuration with the same
+reason before credential selection, broker requests or trial-state writes.
+This guard covers the pinned SDK's stream-feed restriction; the transport
+refusal remains the backstop. It does not substitute another feed, fork the SDK or rebuild its
 stream. A supported native BOATS path, authenticated real-time parsing,
 per-paper-account entitlement/linkage, refreshed status delivery and the
 owning T15 overnight paper/journal run are still required.

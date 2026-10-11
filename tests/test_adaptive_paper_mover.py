@@ -76,6 +76,12 @@ def scan_bytes(**changes):
 
 
 class RuleAndConfig(unittest.TestCase):
+    def test_boats_feed_is_refused_at_config_load_until_the_stream_is_qualified(self):
+        data = config_data()
+        data["feed"] = "boats"
+        with self.assertRaisesRegex(ValueError, "^boats_stream_unqualified_sdk$"):
+            load(data)
+
     def test_example_config_is_pre_market_x2_rung_one_with_conservative_caps(self):
         config, limits, settings = mover.load_mover_config(CONFIG)
         self.assertEqual(settings.session_scope, "pre_market_only")
@@ -1349,6 +1355,29 @@ class ReceiptAndCommands(unittest.TestCase):
                 code, result = self.run_main(root, scan_bytes())
             self.assertEqual((code, result["reason"]), (2, "scan_from_future"))
             self.assertFalse((Path(root) / "state").exists())
+
+    def test_paper_boats_config_is_refused_before_credentials_or_trial_state(self):
+        with tempfile.TemporaryDirectory() as root:
+            config_path, scan_path = Path(root) / "config.json", Path(root) / "scan.json"
+            state_root = Path(root) / "state"
+            data = config_data()
+            data["feed"] = "boats"
+            config_path.write_text(json.dumps(data))
+            scan_path.write_bytes(scan_bytes())
+            with patch.object(mover_runner.time, "time", return_value=SCAN_TIME + 20), \
+                 patch.object(mover_runner, "credentials", side_effect=AssertionError("credentials read")) as credentials, \
+                 patch("transport.preflight", side_effect=AssertionError("broker preflight")) as preflight, \
+                 patch("transport.AlpacaPaperTransport", side_effect=AssertionError("transport constructed")) as transport:
+                with self.assertRaisesRegex(ValueError, "^boats_stream_unqualified_sdk$"):
+                    mover_runner.main(["paper", "--env-file", str(Path(root) / "absent.env"),
+                                       "--config", str(config_path), "--scan", str(scan_path),
+                                       "--output", str(Path(root) / "out.json"), "--trial", "boats-refused",
+                                       "--state-root", str(state_root)])
+            credentials.assert_not_called()
+            preflight.assert_not_called()
+            transport.assert_not_called()
+            self.assertFalse(state_root.exists())
+            self.assertEqual(list(Path(root).rglob("trial.json")), [])
 
     def test_a_failing_read_only_preflight_is_not_started_with_its_error_type_only(self):
         import transport

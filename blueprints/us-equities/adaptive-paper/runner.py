@@ -29,13 +29,14 @@ from credential_guard import CredentialGuardError, MAX_CREDENTIAL_BYTES, REASON_
 from credential_source import (BASE_URL_VARIABLE, SOURCE_ENV_FILE, SOURCES as CREDENTIAL_SOURCES,
                                CredentialSourceError, paper_base_url_reason, select_credentials, selection_error)
 from financing import MARGIN_RATES, overnight_financing_projection
+from feeds import require_qualified_stream
 from leverage import LeveragePolicyError, next_lower_rung_ceiling, validate_leverage_policy
 from safety import (Ledger, Quote, RiskLimits, SafetyError, account_lock_fingerprint, DEFAULT_STOP,
                     execution_from_observation)
 from sessions import (DEFAULT_SESSION_POLICY, SessionKind, boundary_receipt, extended_session_close,
                      must_end_flat, next_trading_day, session_at, validate_session_policy)
 from strategies import AdaptivePolicy, PolicyConfig, RegimeSelector, SelectorConfig, limit_price
-from transport import (AlpacaPaperTransport, DATA_FEEDS, TransportError, RejectedSubmission, order_contract_status,
+from transport import (AlpacaPaperTransport, TransportError, RejectedSubmission, order_contract_status,
                        preflight, halt_statuses_supported, nasdaq_halt_seed, fee_activities, fee_checkpoint)
 
 SOURCE = Path(__file__).resolve().parent
@@ -341,12 +342,7 @@ def strategy_pool_and_selector(config, registry_entries, *, session="regular"):
 
 def load_config(path, *, registry_path=None):
     c = json.loads(Path(path).read_text())
-    if c["feed"] not in DATA_FEEDS:
-        raise ValueError("unqualified_data_feed")
-    if c["feed"] == "boats":
-        # alpaca-py 0.44.0 cc4cb3b7, data/live/stock.py:47 rejects BOATS and the transport refuses it at construction, which main() reaches only
-        # after begin_next_trial and trial.json: refuse here, before any request or state write, until a supported stream replaces the refusal.
-        raise ValueError("boats_stream_unqualified_sdk")
+    require_qualified_stream(c["feed"])
     # G-e: leverage above 1x is refused exactly as before UNLESS a
     # "leverage_policy" block is present, in which case it is deferred to
     # validate_leverage_policy below (which raises its own, more specific
