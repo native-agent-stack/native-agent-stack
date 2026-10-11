@@ -43,6 +43,15 @@ cash case can count as an expected refusal backed by native events. The economic
 and denial events are retained in `raw/native-mechanics-events.json`, projected
 from the original primary with its hash; this projection is not a native rerun.
 
+The corrected harness itself was subsequently rerun on 2026-10-11. Its source
+hash is 8f9e8db00d8c8575e1d1a1a258144aa14bbf362c90c748de53cfa7b6f5513a6c;
+`raw/native-fee-margin-mechanics-corrected-20261011.json` binds that exact source,
+the native runner/fixture/mapping inputs, empty-network command and observed
+exit 0. Three cases complete and the cash case is `expected_refusal`, with two
+native denial events and no fills. Gap 0/9 citations use this rerun; older captures
+and projections remain historical evidence. Unmodified primary results and
+per-case outputs are retained in the cited packet rather than only by hash.
+
 LEAN source 985ef30ad3ac774218c5ac516b4cb0aa2655730f was exported into an ignored
 build directory. Microsoft .NET SDK 10.0.401 was downloaded from official metadata
 and SHA-512 checked. The initial upstream test command lacked ICU, then encountered
@@ -79,6 +88,25 @@ Comparator execution requires fresh output, the expected exit and the exact
 designed non-PASS check id/field/status set. Missing/invalid output or an unrelated
 crash refuses the run. Future command capture uses scripts/host_receipts.py;
 execute_comparators.py prints its allowlisted effective environment for capture.
+It accepts `--output` naming a new directory outside the checkout; without it,
+it creates a fresh temporary directory and prints its path. Existing directories
+and checkout paths are refused before any comparator launches. All four retained
+verdicts remain unchanged. An actual driver reproduction executes all four modes
+into fresh output: accepted lean-data passes, and the other three refuse exactly
+their designed checks (`raw/codex-p2-comparators-reproduced.json`).
+
+Adjacent checks cover all four modes' output/failure transitions, fresh directory
+creation, stale-output refusal, missing/wrong verdicts, native projection errors,
+unexpected denials and source-bound gap 0/9 citations. Driver CLI/test call sites
+and mechanics main/project_result call sites were verified directly because
+graph coverage is absent for these new files.
+
+The cited-source/capture packet is
+`~/.local/state/native-agent-stack/coordination/ns2604-coop/lanes/engine-qual.pr979-codex-p2-20261011/`
+with `MANIFEST.sha256`: pinned vendor/repository blobs, historical captures,
+original full failed build output, actual replay/mechanics primaries, LEAN TRX
+and fresh comparator outputs unchanged. Registered repository hashes bind
+committed evidence; the attachment manifest authenticates local primaries.
 Native text captures retain byte hashes under the artifact directory's Git
 attributes (`-text`, whitespace lint disabled); the bounded build tail is explicitly
 marked as a projection, with its original commitment retained.

@@ -14292,13 +14292,13 @@
     },
     {
       "path": "blueprints/us-equities/backtesting-gap-burndown-20261010/README.md",
-      "sha256": "ce25ba8e660c43c73df56cd5d03519a5432ac80861b3d1634bd8f08ea0bef6cd",
-      "bytes": 8712
+      "sha256": "2d3b117a7818fe14bace99422a57ebc8c87a8a9349e56d445ec95033ed6b2333",
+      "bytes": 10624
     },
     {
       "path": "blueprints/us-equities/backtesting-gap-burndown-20261010/execute_comparators.py",
-      "sha256": "a4f494c90ec0600837ed34867e3064dfea21564462292d18c880c1880c3e7b20",
-      "bytes": 4357
+      "sha256": "fc490e7427cf9e2f45744ea234aa106430169af240b2dd8d2ce7d7adc2f12a5a",
+      "bytes": 5025
     },
     {
       "path": "blueprints/us-equities/backtesting-gap-burndown-20261010/native_mechanics.py",
@@ -17132,8 +17132,8 @@
     },
     {
       "path": "catalogs/landscape/gap-closeouts/backtesting-engine-2026-10-10.json",
-      "sha256": "aa15feee6891a383d011a2e2b8e5aa49a0a806fe4fede49720c08e155d2ed785",
-      "bytes": 25990
+      "sha256": "b1cf8256bb2f6e2b92f872739ab50092635550cb122f7f1491bb78131e2eb4a4",
+      "bytes": 25137
     },
     {
       "path": "catalogs/landscape/gap-closeouts/schema.json",
@@ -19477,8 +19477,8 @@
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/0-gap.json",
-      "sha256": "f6088f787bf23285bee6fb2a29e0ef7069a4aedf48fe62d85299167f517cf66d",
-      "bytes": 4617
+      "sha256": "bfe5e4841fb02297235de05c2a4e7d4c1eec2e0a14e6971efb9f38e60173a5f2",
+      "bytes": 3872
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/1-gap.json",
@@ -19512,8 +19512,8 @@
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/9-gap.json",
-      "sha256": "2d852b4a492f73cf53e33839317c89b6e55c07d03743772ef7e3ecb96afa73ea",
-      "bytes": 2651
+      "sha256": "c54689525e3322a666a31e2033c0acb1293e3374a40195439fcc9a937180d216",
+      "bytes": 1906
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-bars.json",
@@ -19589,6 +19589,21 @@
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/cc-original-head-boundaries-red.json",
       "sha256": "bfb73a3067a0400504750f74efb5cefd6cbe506a7625ea1af75c52a0410af910",
       "bytes": 2232
+    },
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/codex-p2-comparators-reproduced.json",
+      "sha256": "f1d34a01c0ba1068d5c93521e5ceda0db4d631133b39573fafdc8339d9f5a326",
+      "bytes": 3877
+    },
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/codex-p2-green.json",
+      "sha256": "a5012d0331bc62d612ee8a0697752263e315a0e3d05e5f7935a93794c668e895",
+      "bytes": 3411
+    },
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/codex-p2-red.json",
+      "sha256": "c83b1d2e39f0c521d1c77b09fd86a0f4870d9d1a834c6c0dd5818d6cfb473151",
+      "bytes": 2960
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/current-tool-tests.json",
@@ -19859,6 +19874,11 @@
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/native-fee-margin-mechanics-2.stdout.txt",
       "sha256": "4ead4cb47cdf7334020cdf166a9651926a5163a3527d7c664d7bbacb0f45c331",
       "bytes": 107
+    },
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/native-fee-margin-mechanics-corrected-20261011.json",
+      "sha256": "519e1a29e784ca5e0a48b3ebf50511797392811751d3f51c2e81b6280919fd87",
+      "bytes": 4094
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/native-fee-margin-mechanics.json",
@@ -60962,8 +60982,8 @@
     },
     {
       "path": "tests/test_backtesting_gap_burndown.py",
-      "sha256": "448bfa81a755a475af46cb842f05c80b20538ebd5b717039a29d527bf92798fb",
-      "bytes": 10943
+      "sha256": "f88867d4a0a1e0229fa02e65fbe69b634c7837041d497698f41475aea73e0c16",
+      "bytes": 15610
     },
     {
       "path": "tests/test_blind_checkout.py",

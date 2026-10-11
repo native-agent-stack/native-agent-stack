@@ -12,11 +12,11 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+import tempfile
 
 
 ROOT = Path(__file__).resolve().parents[3]
 PARITY = ROOT / "blueprints/us-equities/engine-nautilus/spy-parity"
-RAW = ROOT / "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw"
 EXPECTED_CHECKS = {
     "accepted-v2-lean-data": set(),
     "accepted-v2-no-attribution": {("precondition_hashes", "inputs_at_comparison", "SKIPPED"),
@@ -55,7 +55,22 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--data", required=True, type=Path)
     parser.add_argument("--fresh", required=True, type=Path)
+    parser.add_argument("--output", type=Path,
+                        help="New output directory outside the checkout; defaults to a fresh temporary directory")
     args = parser.parse_args()
+    if args.output is None:
+        output = Path(tempfile.mkdtemp(prefix="backtesting-comparators-"))
+    else:
+        output = args.output.resolve()
+        if output.is_relative_to(ROOT):
+            print("comparator output must be outside the checkout", file=sys.stderr)
+            return 1
+        try:
+            output.mkdir(parents=True, exist_ok=False)
+        except OSError:
+            print("comparator output directory must be fresh", file=sys.stderr)
+            return 1
+    print(json.dumps({"output_directory": str(output).replace(str(Path.home()), "~")}), flush=True)
     # Deliberate allowlist: never inspect arbitrary environment values.
     environment = {k: os.environ[k] for k in ("PATH", "LANG", "LC_ALL") if k in os.environ}
     environment.update({"OPENBLAS_NUM_THREADS": "1", "OMP_NUM_THREADS": "1"})
@@ -68,7 +83,7 @@ def main():
          ["--bars", str(args.fresh / "converted-rows.private.json")]),
         ("fresh-native-v2", args.fresh / "receipt.json", 1, ["--lean-data", str(args.data)]),
     ]:
-        verdict = RAW / (name + ".verdict.json")
+        verdict = output / (name + ".verdict.json")
         if verdict.exists():
             print("refusing stale verdict:" + name, file=sys.stderr)
             return 1

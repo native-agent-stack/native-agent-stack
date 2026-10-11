@@ -4,6 +4,7 @@ import importlib.util
 import contextlib
 import io
 import json
+import hashlib
 from pathlib import Path
 import sys
 import tempfile
@@ -25,6 +26,29 @@ def load(name):
 
 
 class FailureBoundaryTests(unittest.TestCase):
+    def test_clean_checkout_driver_invokes_all_modes_without_mutating_captures(self):
+        module = load("execute_comparators")
+        before = {p: hashlib.sha256(p.read_bytes()).hexdigest() for p in (BASE / "raw").glob("*.verdict.json")}
+        outputs = []
+        def run(command, **kwargs):
+            path = Path(command[command.index("--verdict") + 1])
+            self.assertFalse(path.is_relative_to(BASE), "fresh outputs must not target retained evidence")
+            path.write_bytes((BASE / "raw" / path.name).read_bytes())
+            outputs.append(path)
+            return SimpleNamespace(returncode=0 if path.name.startswith("accepted-v2-lean-data") else 1)
+        with tempfile.TemporaryDirectory() as tmp, \
+             mock.patch.object(module.subprocess, "run", side_effect=run) as process, \
+             mock.patch.object(sys, "argv", ["comparators", "--data", tmp, "--fresh", tmp]), \
+             contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+            # Do not redirect RAW: this reproduces an ordinary clean checkout.
+            self.assertEqual(module.main(), 0, "tracked verdicts must not prevent fresh comparator execution")
+            self.assertEqual(process.call_count, 4)
+        self.assertEqual(before, {p: hashlib.sha256(p.read_bytes()).hexdigest() for p in before})
+        for path in outputs:
+            path.unlink()
+        if outputs:
+            outputs[0].parent.rmdir()
+
     def test_projection_keyerror_makes_mechanics_command_fail(self):
         module = load("native_mechanics")
         # The native runner completes; the defect is projection, not import or
@@ -52,9 +76,9 @@ class FailureBoundaryTests(unittest.TestCase):
 
     def test_missing_verdict_fails_even_when_wrapper_reports_expected_exit(self):
         module = load("execute_comparators")
-        with tempfile.TemporaryDirectory() as tmp, mock.patch.object(module, "RAW", Path(tmp)), \
+        with tempfile.TemporaryDirectory() as tmp, \
              mock.patch.object(module.subprocess, "run", return_value=SimpleNamespace(returncode=0)), \
-             mock.patch.object(sys, "argv", ["comparators", "--data", tmp, "--fresh", tmp]), \
+             mock.patch.object(sys, "argv", ["comparators", "--data", tmp, "--fresh", tmp, "--output", tmp + "/output"]), \
              contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
             self.assertNotEqual(module.main(), 0, "missing verdict must fail independently of process exit")
 
@@ -66,9 +90,8 @@ class FailureBoundaryTests(unittest.TestCase):
                 path.write_text(json.dumps({"verdict": "FAIL", "checks": [
                     {"key": "unexpected_crash.crash#1", "id": "unexpected_crash", "field": "crash", "status": "FAIL"}]}))
                 return SimpleNamespace(returncode=0)
-            with mock.patch.object(module, "RAW", Path(tmp)), \
-                 mock.patch.object(module.subprocess, "run", side_effect=run), \
-                 mock.patch.object(sys, "argv", ["comparators", "--data", tmp, "--fresh", tmp]), \
+            with mock.patch.object(module.subprocess, "run", side_effect=run), \
+                 mock.patch.object(sys, "argv", ["comparators", "--data", tmp, "--fresh", tmp, "--output", tmp + "/output"]), \
                  contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
                 self.assertNotEqual(module.main(), 0, "only the declared check ids qualify as expected refusal")
 
@@ -86,12 +109,38 @@ class FailureBoundaryTests(unittest.TestCase):
                 path.write_bytes((BASE / "raw" / path.name).read_bytes())
                 self.assertEqual(kwargs["env"]["OMP_NUM_THREADS"], "1")
                 return SimpleNamespace(returncode=0 if name == "accepted-v2-lean-data" else 1)
-            with mock.patch.object(module, "RAW", Path(tmp)), \
-                 mock.patch.object(module.subprocess, "run", side_effect=run) as process, \
-                 mock.patch.object(sys, "argv", ["comparators", "--data", tmp, "--fresh", tmp]), \
+            with mock.patch.object(module.subprocess, "run", side_effect=run) as process, \
+                 mock.patch.object(sys, "argv", ["comparators", "--data", tmp, "--fresh", tmp, "--output", tmp + "/output"]), \
                  contextlib.redirect_stdout(io.StringIO()):
                 self.assertEqual(module.main(), 0)
                 self.assertEqual(process.call_count, 4)
+
+    def test_existing_or_checkout_output_is_refused_before_any_comparator(self):
+        module = load("execute_comparators")
+        with tempfile.TemporaryDirectory() as tmp:
+            for output in (tmp, str(BASE / "raw"), str(ROOT / "fresh-output")):
+                with mock.patch.object(module.subprocess, "run") as process, \
+                     mock.patch.object(sys, "argv", ["comparators", "--data", tmp, "--fresh", tmp, "--output", output]), \
+                     contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+                    self.assertEqual(module.main(), 1)
+                    process.assert_not_called()
+
+    def test_each_comparator_failure_stops_without_overwriting_retained_outputs(self):
+        module = load("execute_comparators")
+        for stop in range(4):
+            with tempfile.TemporaryDirectory() as tmp:
+                calls = []
+                def run(command, **kwargs):
+                    path = Path(command[command.index("--verdict") + 1])
+                    calls.append(path)
+                    path.write_bytes((BASE / "raw" / path.name).read_bytes())
+                    expected = 0 if path.name.startswith("accepted-v2-lean-data") else 1
+                    return SimpleNamespace(returncode=expected + 2 if len(calls) == stop + 1 else expected)
+                with mock.patch.object(module.subprocess, "run", side_effect=run), \
+                     mock.patch.object(sys, "argv", ["comparators", "--data", tmp, "--fresh", tmp, "--output", tmp + "/output"]), \
+                     contextlib.redirect_stdout(io.StringIO()):
+                    self.assertEqual(module.main(), 1)
+                    self.assertEqual(len(calls), stop + 1)
 
     def test_refusal_requires_native_denial_events(self):
         module = load("native_mechanics")
@@ -101,8 +150,32 @@ class FailureBoundaryTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "native_denial"):
             module.project_result("four-cash-refusal", "4", "CASH", result)
 
+    def test_other_mechanics_cases_refuse_denials_and_engine_errors(self):
+        module = load("native_mechanics")
+        result = {"order_events": [{"event": "OrderDenied", "reason": "unexpected"}],
+                  "engine_log_scan": {"error_lines": 0}}
+        with self.assertRaisesRegex(ValueError, "unexpected_native_denial"):
+            module.project_result("one-fixed-fee", "1", "CASH", result)
+        result["order_events"] = []
+        result["engine_log_scan"]["error_lines"] = 1
+        with self.assertRaisesRegex(ValueError, "native_engine_errors"):
+            module.project_result("two-margin-zero", "2", "MARGIN", result)
+
 
 class CloseoutRegressionTests(unittest.TestCase):
+    def test_mechanics_citations_bind_native_execution_of_current_harness(self):
+        current = hashlib.sha256((BLUEPRINT / "native_mechanics.py").read_bytes()).hexdigest()
+        for index in (0, 9):
+            gap = json.loads((BASE / f"{index}-gap.json").read_text())
+            receipts = []
+            for ref in gap["raw_outputs"]:
+                if "native-fee-margin-mechanics" in Path(ref["path"]).name and ref["path"].endswith(".json"):
+                    receipts.append(json.loads((ROOT / ref["path"]).read_text()))
+            self.assertTrue(any(r.get("observed_exit_code") == 0 and any(
+                p["path"].endswith("/native_mechanics.py") and p["sha256"] == current
+                for p in r.get("input_hashes", [])) for r in receipts),
+                "gap citations need native execution of the current harness, not only an old-run projection")
+
     def test_unreviewed_counts_stay_at_historical_eight_twelve(self):
         matrix = json.loads((ROOT / "catalogs/landscape/component-evidence-matrix.json").read_text())
         row = next(r for r in matrix["rows"] if r["layer_id"] == "backtesting-engine")
