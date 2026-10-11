@@ -15,6 +15,9 @@ data="$(cd "$here/../data" && pwd)"
 CONFIG="${CONFIG:-$here/config-sip.json}"
 PY="${PY:-$HOME/projects/us-equities-runtime/.venv/bin/python}"
 GATE_PY="${GATE_PY:-$HOME/.local/share/codex-ecosystem/tools/promotion-gate-20260922/.venv/bin/python3}"
+for p in "$PY" "$GATE_PY"; do
+  [ -x "$p" ] || { echo "refused: interpreter not executable: $p" >&2; exit 2; }
+done
 mkdir -p "$OUT_DIR"
 live=()
 if [ -n "${LIVE_DIR:-}" ]; then live=(--live-dir "$LIVE_DIR"); fi
