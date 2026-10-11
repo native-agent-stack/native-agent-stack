@@ -31,6 +31,7 @@ import argparse
 import json
 import re
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -83,6 +84,69 @@ def repo_key(url) -> str:
     if not isinstance(url, str):
         return ""
     return github_repo(url) or url.strip().rstrip("/").lower()
+
+
+def validate_selected_manifest(relative: str, manifest: dict, matrix: dict) -> None:
+    """Validate the sweep fields consumed by this report before indexing or publishing.
+
+    The maintained selector still owns date ordering and filename ties. The row
+    contract comes from tools/sota-convergence/build_manifest.py at 65cf2730:
+    :1816-1862 (sections/cards), :1971-1978 (complete layer coverage), and
+    :2021-2024 (null means not compared). Unjoined winners remain explicit.
+    """
+    def require(condition, message):
+        if not condition:
+            raise SystemExit(f"new_host_grand_list: {relative}: {message}")
+
+    day = component_matrix.parse_iso_date(manifest.get("checked_at"))
+    require(day is not None and day <= datetime.now(timezone.utc).date(),
+            "checked_at must not be in the future (UTC)")
+    for section, catalog, cards in (("foundation", "foundation", "components"),
+                                    ("trading", "us-equities", "entries")):
+        layers = manifest.get(section)
+        require(isinstance(layers, list), f"{section} must be a list")
+        present = set()
+        for position, layer in enumerate(layers):
+            where = f"{section}[{position}]"
+            require(isinstance(layer, dict), f"{where} must be an object")
+            layer_id = layer.get("layer")
+            require(isinstance(layer_id, str) and bool(layer_id.strip()), f"{where}.layer must be nonempty text")
+            present.add(layer_id)
+            require(isinstance(layer.get(cards), list), f"{where}.{cards} must be a list")
+            for field in ("components", "entries", "candidates"):
+                if field not in layer:
+                    continue
+                require(isinstance(layer[field], list), f"{where}.{field} must be a list")
+                for index, row in enumerate(layer[field]):
+                    label = f"{where}.{field}[{index}]"
+                    require(isinstance(row, dict), f"{label} must be an object")
+                    # Candidate records carry repository/disposition rather than
+                    # the selected card's pin fields; do not invent a pin for them.
+                    if field != "candidates":
+                        require(isinstance(row.get("id"), str) and bool(row["id"].strip()),
+                                f"{label}.id must be nonempty text")
+                        require(isinstance(row.get("pin"), str), f"{label}.pin must be text")
+                        require(isinstance(row.get("upstream"), dict)
+                                and "latest" in row["upstream"]
+                                and (row["upstream"]["latest"] is None or isinstance(row["upstream"]["latest"], str)),
+                                f"{label}.upstream must have latest text or null")
+                        require("pin_behind_upstream" in row
+                                and (row["pin_behind_upstream"] is None or type(row["pin_behind_upstream"]) is bool),
+                                f"{label}.pin_behind_upstream must be boolean or null")
+                    require("repository" in row and (row["repository"] is None or isinstance(row["repository"], str)),
+                            f"{label}.repository must be text or null")
+                    require(row.get("upstream") is None or isinstance(row["upstream"], dict),
+                            f"{label}.upstream must be an object or null")
+                    for key in ("id", "pin", "pin_comparison"):
+                        require(row.get(key) is None or isinstance(row[key], str),
+                                f"{label}.{key} must be text or null")
+                    require(row.get("pin_behind_upstream") is None or type(row["pin_behind_upstream"]) is bool,
+                            f"{label}.pin_behind_upstream must be boolean or null")
+                    upstream = row.get("upstream") or {}
+                    require(upstream.get("latest") is None or isinstance(upstream["latest"], str),
+                            f"{label}.upstream.latest must be text or null")
+        expected = {row["layer_id"] for row in matrix["rows"] if row["catalog"] == catalog}
+        require(expected <= present, f"{section} is missing report layers: {', '.join(sorted(expected - present))}")
 
 
 def manifest_index(manifest: dict) -> dict:
@@ -223,6 +287,7 @@ def build() -> dict:
     if manifest_path is None:
         raise SystemExit(f"new_host_grand_list: no sweep manifest ({MANIFEST_PATTERN}) is committed; the pins are "
                          "compared with the newest one")
+    validate_selected_manifest(manifest_path, manifest, matrix)
     mindex = manifest_index(manifest)
     adoption = load("adoption/manifest.json")
     profiles = profile_index(adoption)

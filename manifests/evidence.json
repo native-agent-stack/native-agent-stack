@@ -61072,8 +61072,8 @@
     },
     {
       "path": "tests/test_new_host_grand_list.py",
-      "sha256": "8112e85cff9b6e665dea1ee5e659a19ab178e32b78b6f621396918d0a5080d21",
-      "bytes": 21695
+      "sha256": "698fe800d0ed55df4a81dcc67b52a651471eb3ace5b6b9662e8b24e49747fa09",
+      "bytes": 24544
     },
     {
       "path": "tests/test_new_wsl_client_config.py",

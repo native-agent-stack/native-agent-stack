@@ -359,7 +359,7 @@ class NewestSweepManifestTests(unittest.TestCase):
         return {self.OLDER: self._manifest("2026-09-23", "1.0.0", False),
                 self.NEWER: self._manifest("2026-10-09", "2.0.0", True)}
 
-    def _build(self, manifests):
+    def _build(self, manifests, *, refuse_write=False):
         """g.build() over a temp root that holds the inputs it loads plus the given sweep manifests."""
         matrix = {"rows": [{"catalog": "foundation", "layer_id": "layer-a", "title": "Layer A", "winners": [{
             "component_id": "widget", "repository": self.REPOSITORY, "pin": "1.0.0", "evidence_class": "native_proven",
@@ -377,8 +377,24 @@ class NewestSweepManifestTests(unittest.TestCase):
             for relative, document in files.items():
                 (root / relative).parent.mkdir(parents=True, exist_ok=True)
                 (root / relative).write_text(json.dumps(document), encoding="utf-8")
-            with mock.patch.object(g, "ROOT", root):
-                return g.build()
+            # Fix the UTC date while retaining compatibility with the pre-fix module,
+            # which has no datetime dependency and therefore ignores this clock.
+            with mock.patch.object(g, "ROOT", root), mock.patch.object(g, "datetime", create=True) as clock:
+                from datetime import date
+                clock.now.return_value.date.return_value = date(2026, 10, 11)
+                if not refuse_write:
+                    return g.build()
+                (root / "docs").mkdir(exist_ok=True)
+                outputs = {relative: b"retained output\n" for relative in (g.OUT_JSON, g.OUT_MD)}
+                for relative, data in outputs.items():
+                    (root / relative).write_bytes(data)
+                with mock.patch.object(g.host_receipts, "register_file") as register:
+                    with self.assertRaises(SystemExit) as stopped:
+                        g.main(["--write"])
+                    register.assert_not_called()
+                    for relative, data in outputs.items():
+                        self.assertEqual((root / relative).read_bytes(), data)
+                return str(stopped.exception)
 
     def test_pin_data_comes_from_the_manifest_with_the_latest_checked_at(self):
         data = self._build(self._two_manifests())
@@ -396,6 +412,39 @@ class NewestSweepManifestTests(unittest.TestCase):
         with self.assertRaises(SystemExit) as stopped:
             self._build({})
         self.assertIn("sweep manifest", str(stopped.exception))
+
+    def test_partial_newest_manifest_stops_without_falling_back(self):
+        manifests = self._two_manifests()
+        invalid = "catalogs/sota-convergence/manifest-20261010.json"
+        manifests[invalid] = {"checked_at": "2026-10-10"}
+        with self.assertRaises(SystemExit) as stopped:
+            self._build(manifests)
+        self.assertIn(invalid, str(stopped.exception))
+
+    def test_malformed_component_records_stop_the_new_join(self):
+        for component in (None, "not a component", {}):
+            with self.subTest(component=component):
+                manifests = self._two_manifests()
+                manifests[self.NEWER]["foundation"][0]["components"] = [component]
+                with self.assertRaises(SystemExit) as stopped:
+                    self._build(manifests)
+                self.assertIn(self.NEWER, str(stopped.exception))
+
+    def test_complete_future_manifest_stops_without_falling_back(self):
+        manifests = self._two_manifests()
+        invalid = "catalogs/sota-convergence/manifest-20990101.json"
+        manifests[invalid] = self._manifest("2099-01-01", "99.0.0", True)
+        with self.assertRaises(SystemExit) as stopped:
+            self._build(manifests)
+        self.assertIn(invalid, str(stopped.exception))
+
+    def test_refused_manifest_preserves_outputs_and_registration(self):
+        for bad in ({"checked_at": "2026-10-10"}, self._manifest("2099-01-01", "99.0.0", True)):
+            with self.subTest(checked_at=bad["checked_at"]):
+                invalid = "catalogs/sota-convergence/manifest-20990101.json"
+                manifests = self._two_manifests()
+                manifests[invalid] = bad
+                self.assertIn(invalid, self._build(manifests, refuse_write=True))
 
 
 if __name__ == "__main__":
