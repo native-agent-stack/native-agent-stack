@@ -15,6 +15,13 @@ from scripts.catalog_decisions import (
 
 
 class CurrentDecisionRecordTests(unittest.TestCase):
+    def test_current_star_flags_match_the_entire_authoritative_snapshot(self):
+        root = Path(__file__).resolve().parents[1]
+        index = load(root, INDEX)
+        snapshot = load(root, "catalogs/convergence-practice/public-starred.json")
+        current = {identity(row["repository"]) for row in index["records"] if row["public_star"]}
+        self.assertEqual(current, {identity(row["repository"]) for row in snapshot["repositories"]})
+
     def test_current_decision_records_resolve_to_the_same_repository(self):
         root = Path(__file__).resolve().parents[1]
         checked = 0
@@ -120,6 +127,25 @@ class DecisionIndexTests(unittest.TestCase):
         references = [ref for row in generated["records"] for ref in row["references"]
                       if ref["path"] == "research/a.json"]
         self.assertEqual(references[0]["evidence_depth"], "pinned_primary_source_review")
+
+    def test_current_star_snapshot_replaces_historical_membership(self):
+        path = "catalogs/convergence-practice/public-starred.json"
+        self.write(path, {"retrieved_at": "2026-10-10T17:00:00Z", "count": 2,
+                          "repositories": [{"repository": "example/core"}, {"repository": "brand/new"}]})
+        with redirect_stdout(io.StringIO()):
+            self.assertEqual(main(["--root", str(self.root), "--write"]), 0)
+        index = load(self.root, INDEX)
+        current = {identity(row["repository"]) for row in index["records"] if row["public_star"]}
+        self.assertEqual(current, {"example/core", "brand/new"})
+        historical = next(row for row in index["records"] if identity(row["repository"]) == "new/project")
+        self.assertTrue(any(ref["path"] == f"{BASE}/coverage.json" for ref in historical["references"]))
+        self.assertEqual(validate_index(self.root)["public_star_repositories"], 2)
+        for specs in ([spec for spec in index["sources"] if spec["path"] != path],
+                      [dict(spec, kind="research_supplement") if spec["path"] == path else spec
+                       for spec in index["sources"]]):
+            with self.subTest(current_snapshot_registered=any(spec["path"] == path for spec in specs)):
+                with self.assertRaisesRegex(InvalidDecisionIndex, "current public-star snapshot"):
+                    build_index(self.root, specs)
 
     def test_repository_whitespace_and_controls_are_rejected_before_url_parsing(self):
         for malformed in ("https://github.com/example/re\tpo", "https://github.com/example/repo\n",

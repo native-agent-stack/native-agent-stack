@@ -12,8 +12,8 @@ import os
 import sys
 
 BLOCK = "token-lanes-block.main.md"
-# The SubagentStart carrier's silent set: allowlisted roles that no carrier line fits receive nothing, like blind-*.
-SILENT_ROLES = frozenset({"semantic-evidence-reviewer"})
+# Allowlisted roles whose own instructions supply the relevant guidance; no carrier injection.
+SILENT_ROLES = frozenset({"semantic-evidence-reviewer", "landscape-sweep-worker"})
 
 
 def main():

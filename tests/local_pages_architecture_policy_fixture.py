@@ -20,7 +20,7 @@ INVENTORY_EXACT = {
         ".claude/skills/unknown/SKILL.md", ".claude/skills/.system/native/SKILL.md",
         ".claude/skills/large/SKILL.md", "adoption/agents/blind-judge.md",
         "adoption/agents/codex/reviewer.toml", "adoption/agents/codex/SHA256SUMS",
-        ".github/workflows/harness-audit.yml", ".github/workflows/check.yml",
+        ".github/workflows/pr-metadata.yml", ".github/workflows/check.yml",
         "scripts/evidence_manifest.py", "scripts/approved.py",
         "adoption/agents/manifest.json",
     ],

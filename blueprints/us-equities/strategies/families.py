@@ -56,7 +56,15 @@ class FamilyStrategy(Strategy):
 
     FAMILY = "abstract"
 
-    def __new__(cls, spec, *, ledger=None, fault_sink=None, post_cutoff_fill_sink=None):
+    def __new__(
+        cls,
+        spec,
+        *,
+        ledger=None,
+        fault_sink=None,
+        post_cutoff_fill_sink=None,
+        notice_sink=None,
+    ):
         # The rc5 PyO3 allocator accepts only its native config argument;
         # Python-only injected dependencies belong to this subclass's __init__.
         return super().__new__(cls)
@@ -68,6 +76,7 @@ class FamilyStrategy(Strategy):
         ledger=None,
         fault_sink=None,
         post_cutoff_fill_sink=None,
+        notice_sink=None,
     ):
         self.spec = spec
         self.preset = preset_for(
@@ -102,9 +111,16 @@ class FamilyStrategy(Strategy):
         )
         self.instrument_id = InstrumentId.from_str(spec.instrument_id)
         self.snapshot = None
+        self.snapshot_halted = None
+        self.snapshot_halt_timestamps = (0, 0)
+        self.snapshot_halt_valid_until_ns = 0
         self.instrument_status_halted = False
         self.last_instrument_status = None
         self.instrument_status_timestamps = (0, 0)
+        self.last_halt_notice_ns = None
+        self.last_halt_notice_reason = None
+        self.active_halt_notice = None
+        self.restored_halt_notice = None
         self.last_quote = None
         self.trace = []
         self.flags = set()
@@ -112,6 +128,7 @@ class FamilyStrategy(Strategy):
         self.faulted = False
         self.enabled = True
         self.fault_sink = fault_sink
+        self.notice_sink = notice_sink
         # The account/rung writer supplies this synchronous boundary. It builds
         # the complete native post-fill account view, applies T14 state and
         # installs that state before returning; no account figures are logged.
@@ -184,6 +201,19 @@ class FamilyStrategy(Strategy):
         )
 
     def on_start(self):
+        from importlib import import_module
+
+        try:
+            # Recover before other startup refusals, but never consume a
+            # durable delivery schedule without its required notice port.
+            if self.spec.evidence_class == "synthetic" or callable(self.notice_sink):
+                import_module("blueprints.us-equities.strategies.halt_notice").restore(
+                    self, arm=True
+                )
+        except Exception as error:
+            self._freeze("startup_held_notice_read_failed_requires_reconciliation")
+            self._fault("on_start", error)
+            raise
         if self.spec.execution_profile == "native-target-v1":
             self._freeze("T15_native_order_capability_unqualified")
             self._record("capability_refused", profile=self.spec.execution_profile)
@@ -206,6 +236,9 @@ class FamilyStrategy(Strategy):
             self.post_cutoff_fill_sink
         ):
             self._freeze("startup_post_cutoff_risk_sink_required")
+            return
+        if self.spec.evidence_class != "synthetic" and not callable(self.notice_sink):
+            self._freeze("startup_notice_sink_required")
             return
         try:
             if not self._restore_ledger():
@@ -235,6 +268,9 @@ class FamilyStrategy(Strategy):
         adopted as flat. The wire governor still journals each explicit ID
         before any broker request.
         """
+        from importlib import import_module
+
+        import_module("blueprints.us-equities.strategies.halt_notice").restore(self)
         symbol = str(self.instrument_id.symbol)
         own = [
             i
@@ -260,6 +296,8 @@ class FamilyStrategy(Strategy):
         unresolved = self.ledger.unresolved()
         position = self.ledger.positions().get(symbol)
         reasons = []
+        if self.restored_halt_notice is not None:
+            reasons.append("startup_held_notice_requires_reconciliation")
         if self.ledger.halted_reason() is not None:
             reasons.append("startup_ledger_halted_requires_reconciliation")
         if any(
@@ -282,6 +320,7 @@ class FamilyStrategy(Strategy):
 
     def on_stop(self):
         self._retire_pending_entry_alert()
+        self._retire_halt_notice_alert()
         if "t22-watchdog" in self.clock.timer_names():
             self.clock.cancel_timer("t22-watchdog")
         if self.quantity or self.pending is not None:
@@ -296,14 +335,42 @@ class FamilyStrategy(Strategy):
             ):
                 return
             now = self.clock.timestamp_ns()
-            if value.ts_init > now or value.ts_event > now:
-                self._record("snapshot_refused", reason="future_availability")
-                return
             if (
                 value.evidence_class != self.spec.evidence_class
                 or value.cohort_sha256 != self.spec.cohort_sha256
             ):
                 self._record("snapshot_refused", reason="cohort_or_evidence_mismatch")
+                return
+            if value.halted is not False:
+                # F-1 decision 1 at us-equities-trading@f8c607bc: a halt
+                # acts at delivery. Missing state also vetoes orders (rule 3),
+                # and cannot clear an observed halt. Future factors stay unavailable.
+                if value.halted is True or self.snapshot_halted is not True:
+                    self.snapshot_halted = value.halted
+                self.snapshot_halt_timestamps = tuple(
+                    max(previous, current)
+                    for previous, current in zip(
+                        self.snapshot_halt_timestamps,
+                        (value.ts_event, value.ts_init),
+                        strict=True,
+                    )
+                )
+                if value.ts_event > now or value.ts_init > now:
+                    self.flags.add("snapshot_clock_ahead")
+                    self._record(
+                        "snapshot_clock_ahead",
+                        event_lead_ns=max(0, value.ts_event - now),
+                        init_lead_ns=max(0, value.ts_init - now),
+                    )
+                self._drive()
+            if value.ts_init > now or value.ts_event > now:
+                self._record("snapshot_refused", reason="future_availability")
+                return
+            previous_event, previous_init = self.snapshot_halt_timestamps
+            if value.halted is False and (
+                value.ts_event < previous_event or value.ts_init < previous_init
+            ):
+                self._record("snapshot_refused", reason="out_of_order")
                 return
             if self.snapshot is not None:
                 if value.ts_init < self.snapshot.ts_init:
@@ -312,10 +379,23 @@ class FamilyStrategy(Strategy):
                 if value.ts_init == self.snapshot.ts_init:
                     if value != self.snapshot:
                         self._freeze("conflicting_snapshot_revision")
+                    elif value.halted is False:
+                        # An identical accepted resumption can follow a late
+                        # halt. Its factors are unchanged, but its halt latch
+                        # must resume after the availability/raw-stamp fences.
+                        self.snapshot_halted = False
+                        self.snapshot_halt_timestamps = (value.ts_event, value.ts_init)
+                        self.snapshot_halt_valid_until_ns = value.valid_until_ns
+                        if self.pending is not None or self.quantity:
+                            self._drive()
                     return
             self.snapshot = value
+            if value.halted is False:
+                self.snapshot_halted = False
+                self.snapshot_halt_timestamps = (value.ts_event, value.ts_init)
+            self.snapshot_halt_valid_until_ns = value.valid_until_ns
             self._record("snapshot", source_sha256=value.source_sha256)
-            if value.halted and self.pending_role == "entry":
+            if value.halted is not False or self.pending is not None or self.quantity:
                 self._drive()
         except Exception as error:
             self._fault("on_data", error)
@@ -368,9 +448,8 @@ class FamilyStrategy(Strategy):
                     init_lead_ns=init_lead,
                 )
             self.instrument_status_halted = True
-            # Preserve ordering without making a future-dated halt an
-            # unavailable timestamp barrier to a later valid resumption.
-            event_ns, init_ns = min(event_ns, now), min(init_ns, now)
+            # Preserve the raw stamps. An available TRADING stamped before
+            # this observed halt cannot establish a resumption (F-1 rule 3).
         elif status.action == MarketStatusAction.TRADING:
             if event_ns > now or init_ns > now:
                 self._record("instrument_status_refused", reason="future_availability")
@@ -460,15 +539,16 @@ class FamilyStrategy(Strategy):
         return session
 
     def _drive(self):
-        if self.faulted or not self.enabled:
-            return
         now = self.clock.timestamp_ns()
-        halted = (
-            self.instrument_status_halted
-            or self.snapshot is None
-            or self.snapshot.halted
-        )
-        if self.pending is not None:
+        restored = getattr(self, "restored_halt_notice", None)
+        if restored is not None:
+            if restored["active"]:
+                self._notify_halt_hold(now, restored["reason"])
+            return  # Notification recovery never adopts exposure or sends orders.
+        halt_reason = self._halt_reason(now)
+        halted = halt_reason is not None
+        had_pending = self.pending is not None
+        if self.pending is not None and not self.faulted and self.enabled:
             timeout = (
                 self.spec.entry_timeout_ns
                 if self.pending_role == "entry"
@@ -477,7 +557,6 @@ class FamilyStrategy(Strategy):
             if self.cancel_requested:
                 if now - self.cancel_requested_ns >= timeout:
                     self._freeze("cancel_ack_timeout_requires_reconciliation")
-                return  # Never assume an unacknowledged cancel freed the order.
             force = (
                 self.spec.exit_deadline_ns is not None
                 and now >= self.spec.exit_deadline_ns
@@ -494,26 +573,31 @@ class FamilyStrategy(Strategy):
                     and now >= self.pending_policy_deadline_ns
                 )
             )
-            if (self.pending_role == "entry" or not halted) and (
-                now - self.pending_since_ns >= timeout or force or entry_blocked
+            if (
+                not self.cancel_requested
+                and (self.pending_role == "entry" or not halted)
+                and (now - self.pending_since_ns >= timeout or force or entry_blocked)
             ):
                 self.cancel_requested = True
                 self.cancel_requested_ns = now
                 self._record("cancel_requested", role=self.pending_role)
                 self.cancel_order(self.pending.client_order_id)
-            return  # Never replace before terminal confirmation or overlap buys/sells.
+        # A partially filled entry must be cancelled before a fallible notice.
+        if self.quantity and halted:
+            self._notify_halt_hold(now, halt_reason)
+        elif not halted or not self.quantity:
+            self._clear_halt_hold()
+        if self.faulted or not self.enabled or had_pending:
+            return  # No replacement before terminal confirmation.
         fresh = self._fresh_quote(now)
         if self.quantity and not fresh:
             self._freeze("held_quote_stale")
-            return  # Includes forced/time exits: R9 never prices from a stale quote.
+            return
         if not fresh or self.snapshot is None:
             return
         self.flags.discard("held_quote_stale")
         if halted:
-            if self.quantity:
-                self._freeze("held_halted")
             return
-        self.flags.discard("held_halted")
         session = self._session(now)
         if session.kind.name in ("CLOSED", "OVERNIGHT"):
             if self.quantity:
@@ -525,6 +609,142 @@ class FamilyStrategy(Strategy):
             self._exit(now, bid)
         elif not self.entry_attempted:
             self._enter(now, session)
+
+    def _halt_reason(self, now):
+        # t22-factors-v1 is this class's named synthetic halt producer. Its
+        # explicit validity also gates exits; a native status halt is an
+        # independent veto, never a substitute for an absent/expired producer.
+        # T15 must qualify the paper producer and its freshness separately.
+        if self.instrument_status_halted or self.snapshot_halted is True:
+            return "held_halted"
+        if self.snapshot_halted is None or now > self.snapshot_halt_valid_until_ns:
+            return "held_halt_state_unknown"
+        return None
+
+    def _retire_halt_notice_alert(self):
+        if "t22-halt-hold" in self.clock.timer_names():
+            self.clock.cancel_timer("t22-halt-hold")
+
+    def _clear_halt_hold(self):
+        if getattr(self, "restored_halt_notice", None) is not None:
+            return  # A recreated actor's zero quantity is not proof of flatness.
+        state = getattr(self, "active_halt_notice", None)
+        if state is not None:
+            from importlib import import_module
+
+            notices = import_module("blueprints.us-equities.strategies.halt_notice")
+            if self.quantity:
+                if state["active"]:
+                    state = dict(state, active=False)
+                    notices.save(self.ledger, state)
+                    self.active_halt_notice = state
+            else:
+                notices.clear(
+                    self.ledger,
+                    self.spec.instrument_id,
+                    getattr(self, "client_id_prefix", None),
+                )
+                self.active_halt_notice = None
+        if not self.faulted:
+            self.flags.discard("held_halted")
+            self.flags.discard("held_halt_state_unknown")
+        self.last_halt_notice_ns = None
+        self.last_halt_notice_reason = None
+        self._retire_halt_notice_alert()
+
+    def _notify_halt_hold(self, now, reason):
+        self.flags.add(reason)
+        if (
+            self.last_halt_notice_reason == reason
+            and self.last_halt_notice_ns is not None
+            and now < self.last_halt_notice_ns + 600_000_000_000
+        ):
+            if self.pending is None and not self.faulted:
+                self._freeze(reason)
+            return
+        previous = getattr(self, "active_halt_notice", None)
+        order_id = (
+            str(self.pending.client_order_id)
+            if self.pending is not None
+            else None
+            if previous is None
+            else previous["client_order_id"]
+        )
+        if self.pending is None and not self.faulted:
+            self._freeze(reason)
+        errors = {}
+        sink = getattr(self, "notice_sink", None)
+        if sink is not None:
+            try:
+                sink(reason)
+            except Exception as error:  # noqa: BLE001 -- notification must not abort cancellation or the next alert
+                errors["stop_error"] = type(error).__name__
+                self.callback_faults.append(
+                    {
+                        "callback": "halt_hold_notice",
+                        "reason": reason,
+                        "stop_error": type(error).__name__,
+                    }
+                )
+        from importlib import import_module
+
+        notices = import_module("blueprints.us-equities.strategies.halt_notice")
+        state = {
+            "schema_version": 1,
+            "instrument_id": self.spec.instrument_id,
+            "client_id_prefix": getattr(self, "client_id_prefix", None),
+            "client_order_id": order_id,
+            "reason": reason,
+            "last_notice_ns": now,
+            "next_due_ns": now + 600_000_000_000,
+            "active": True,
+        }
+        try:
+            notices.save(self.ledger, state)
+        except Exception as error:  # noqa: BLE001 -- retain notification/cancel progress and expose lost durability
+            errors["persist_error"] = type(error).__name__
+            self.flags.add("held_notice_persistence_failed")
+        self.last_halt_notice_ns = now
+        self.last_halt_notice_reason = reason
+        self.active_halt_notice = state
+        if getattr(self, "restored_halt_notice", None) is not None:
+            self.restored_halt_notice = state
+        self._record(
+            "halt_hold_notice", reason=reason, client_order_id=order_id, **errors
+        )
+        self._retire_halt_notice_alert()
+        # Reuse rc5's native clock, including fractional-second delivery.
+        self.clock.set_time_alert_ns(
+            "t22-halt-hold", now + 600_000_000_000, callback=self._on_watchdog
+        )
+
+    def reconcile_held_notice_resolved(self):
+        """Called by the owning session after confirmed flat reconciliation.
+
+        Clearing notification state does not unfreeze or resume this instance.
+        The broker/session reconciliation that precedes this remains T15 work.
+        """
+        symbol = str(self.instrument_id.symbol)
+        position = self.ledger.positions().get(symbol)
+        if (
+            self.quantity
+            or self.pending is not None
+            or (position is not None and decimal(str(position.qty)) != 0)
+            or any(
+                i.symbol == symbol or i.client_id.startswith(self.client_id_prefix)
+                for i in self.ledger.unresolved()
+            )
+            or self.cache.orders_open(instrument_id=self.instrument_id)
+            or self.cache.positions_open(instrument_id=self.instrument_id)
+        ):
+            raise ValueError("held_exposure_not_resolved")
+        from importlib import import_module
+
+        import_module("blueprints.us-equities.strategies.halt_notice").clear(
+            self.ledger, self.spec.instrument_id, self.client_id_prefix
+        )
+        self.active_halt_notice = self.restored_halt_notice = None
+        self._clear_halt_hold()
 
     def _entry_allowed(self, now, session):
         snapshot = self.snapshot
@@ -739,6 +959,13 @@ class FamilyStrategy(Strategy):
     def _submit(self, side, quantity, price, role, reason):
         if self.faulted or not self.enabled:
             return
+        now = self.clock.timestamp_ns()
+        halt_reason = self._halt_reason(now)
+        if halt_reason is not None:
+            self._record("order_refused", reason=halt_reason, role=role)
+            if self.quantity:
+                self._notify_halt_hold(now, halt_reason)
+            return
         if self.sequence >= 9_999_999:
             self._freeze("client_order_sequence_exhausted_requires_handoff")
             return
@@ -842,6 +1069,8 @@ class FamilyStrategy(Strategy):
                 self.flags.add("post_cutoff_risk_sink_unqualified")
         if self.pending_remaining == 0:
             self._clear_pending()
+        if event.order_side == OrderSide.SELL and self.quantity == 0:
+            self._clear_halt_hold()
 
     def _clear_pending(self):
         self._retire_pending_entry_alert()
@@ -880,6 +1109,17 @@ class FamilyStrategy(Strategy):
 
     @guarded_callback
     def on_order_expired(self, event):
+        if (
+            self.pending is not None
+            and event.client_order_id == self.pending.client_order_id
+            and self.pending_role == "exit"
+            and self.quantity
+        ):
+            now = self.clock.timestamp_ns()
+            reason = self._halt_reason(now)
+            if reason is not None:
+                self._notify_halt_hold(now, reason)
+                self._freeze("halted_day_expiry_requires_handoff")
         self._terminal(event)
 
     @guarded_callback

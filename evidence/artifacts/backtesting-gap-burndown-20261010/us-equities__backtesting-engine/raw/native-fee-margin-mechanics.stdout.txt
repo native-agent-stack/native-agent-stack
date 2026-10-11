@@ -1,0 +1,1 @@
+{"receipt": "/out/native/results.json", "cases": 4, "completed": 0, "qualifies_frozen_stress_case": false}

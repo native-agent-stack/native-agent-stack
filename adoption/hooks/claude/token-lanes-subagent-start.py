@@ -20,8 +20,8 @@ ROLE_BLOCKS = {
     "isolated-builder": "token-lanes-block.builder.md",
     "source-scout": "token-lanes-block.scout.md",
 }
-# Allowlisted roles that no carrier line fits; they receive nothing, like blind-* roles.
-SILENT_ROLES = frozenset({"semantic-evidence-reviewer"})
+# Allowlisted roles whose own instructions supply the relevant guidance; no carrier injection.
+SILENT_ROLES = frozenset({"semantic-evidence-reviewer", "landscape-sweep-worker"})
 
 
 def main():

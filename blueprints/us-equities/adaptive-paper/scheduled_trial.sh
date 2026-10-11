@@ -13,8 +13,52 @@ here="$(cd "$(dirname "$0")" && pwd)"
 data="$(cd "$here/../data" && pwd)"
 : "${TRIAL:?}" "${ENV_FILE:?}" "${STATE_ROOT:?}" "${OUT_DIR:?}"
 CONFIG="${CONFIG:-$here/config-sip.json}"
-PY="${PY:-$HOME/.local/share/codex-ecosystem/tools/adaptive-paper-20260921/bin/python}"
+PY="${PY:-$HOME/projects/us-equities-runtime/.venv/bin/python}"
 GATE_PY="${GATE_PY:-$HOME/.local/share/codex-ecosystem/tools/promotion-gate-20260922/.venv/bin/python3}"
+for p in "$PY" "$GATE_PY"; do
+  [ -f "$p" ] && [ -x "$p" ] || { echo "refused: interpreter not executable: $p" >&2; exit 2; }
+done
+# Mirror install-trading-2604.sh and accept-trading-2604.sh's published runtime
+# ownership/completion and metadata identity. A failed sync leaves Python
+# executable, so executable checks alone cannot establish default readiness.
+# Explicit alternate interpreters remain the owning caller's choice.
+runtime="$HOME/projects/us-equities-runtime"
+runtime=$(realpath --canonicalize-missing -- "$runtime") || {
+  echo "refused: canonical runtime directory unavailable" >&2; exit 2;
+}
+# Lock the managed runtime when either stage uses its interpreter, including
+# executable file aliases. Alternate runtimes retain their existing overrides.
+if [[ "$PY" == "$runtime/.venv/bin/python" || "$PY" -ef "$runtime/.venv/bin/python" ||
+      "$GATE_PY" == "$runtime/.venv/bin/python" || "$GATE_PY" -ef "$runtime/.venv/bin/python" ]]; then
+  refuse_runtime() { echo "refused: canonical runtime incomplete or metadata differs" >&2; exit 2; }
+  [[ ! -L "$HOME/projects" && ! -L "$runtime" && -d "$runtime" && -O "$runtime" &&
+     ! -L "$runtime/.venv" && -d "$runtime/.venv" ]] || refuse_runtime
+  # A stable lock beside the runtime also covers a fresh installer. Never
+  # unlink/replace it: both scripts must coordinate on the same inode.
+  runtime_lock="${runtime%/*}/.us-equities-runtime.lock"
+  command -v flock >/dev/null || refuse_runtime
+  [[ ! -L "$runtime_lock" && ( ! -e "$runtime_lock" ||
+      ( -f "$runtime_lock" && -O "$runtime_lock" ) ) ]] || refuse_runtime
+  exec {runtime_lock_fd}>>"$runtime_lock" || refuse_runtime
+  flock --shared --nonblock "$runtime_lock_fd" || {
+    echo "refused: canonical runtime in use by installer" >&2; exit 2;
+  }
+  # Keep runtime_lock_fd open through ingestion, gate and runner. Marker and
+  # metadata checks occur only after the shared lock has been acquired.
+  for marker in .trading-2604-owner .trading-2604-complete; do
+    [[ -f "$runtime/$marker" && ! -L "$runtime/$marker" ]] || refuse_runtime
+  done
+  IFS= read -r recorded_owner < "$runtime/.trading-2604-owner" || refuse_runtime
+  [[ "$recorded_owner" == native-stack-trading-2604-v1 ]] || refuse_runtime
+  for entry in 'pyproject.toml|aa370e42e29dc2419e586358254ff2e821df48a693aa9a3ee16b65d30036ee0b' \
+               'uv.lock|f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989'; do
+    IFS='|' read -r filename expected_hash <<< "$entry"
+    [[ -f "$runtime/$filename" && ! -L "$runtime/$filename" ]] || refuse_runtime
+    printf '%s  %s\n' "$expected_hash" "$runtime/$filename" | sha256sum --check --status || refuse_runtime
+  done
+  IFS= read -r recorded_completion < "$runtime/.trading-2604-complete" || refuse_runtime
+  [[ "$recorded_completion" == native-stack-trading-2604-no-dvc-r4 ]] || refuse_runtime
+fi
 mkdir -p "$OUT_DIR"
 live=()
 if [ -n "${LIVE_DIR:-}" ]; then live=(--live-dir "$LIVE_DIR"); fi

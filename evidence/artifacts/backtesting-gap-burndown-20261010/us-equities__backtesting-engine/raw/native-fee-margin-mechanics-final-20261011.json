@@ -1,0 +1,176 @@
+{
+  "schema_version": 1,
+  "id": "native-fee-margin-mechanics-final-20261011",
+  "command": [
+    "nice",
+    "-n",
+    "10",
+    "ionice",
+    "-c",
+    "2",
+    "-n",
+    "7",
+    "bwrap",
+    "--unshare-all",
+    "--die-with-parent",
+    "--new-session",
+    "--clearenv",
+    "--ro-bind",
+    "/usr",
+    "/usr",
+    "--symlink",
+    "usr/bin",
+    "/bin",
+    "--symlink",
+    "usr/lib",
+    "/lib",
+    "--symlink",
+    "usr/lib64",
+    "/lib64",
+    "--proc",
+    "/proc",
+    "--dev",
+    "/dev",
+    "--tmpfs",
+    "/tmp",
+    "--ro-bind",
+    "~/.local/share/uv/python/cpython-3.12-linux-x86_64-gnu",
+    "~/.local/share/uv/python/cpython-3.12-linux-x86_64-gnu",
+    "--ro-bind",
+    "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010",
+    "/repo",
+    "--ro-bind",
+    "~/.local/share/codex-ecosystem/lean-985ef30-spy-frozen/Data",
+    "/data",
+    "--bind",
+    "~/.cache/native-agent-stack/backtesting-gaps-20261011/final-round-mechanics",
+    "/out",
+    "--chdir",
+    "/repo",
+    "--setenv",
+    "LANG",
+    "C.UTF-8",
+    "--setenv",
+    "PATH",
+    "/usr/bin:/bin",
+    "--setenv",
+    "PYTHONDONTWRITEBYTECODE",
+    "1",
+    "--setenv",
+    "OPENBLAS_NUM_THREADS",
+    "1",
+    "--setenv",
+    "OMP_NUM_THREADS",
+    "1",
+    "/repo/.venv/bin/python",
+    "-I",
+    "/repo/blueprints/us-equities/backtesting-gap-burndown-20261010/native_mechanics.py",
+    "--data",
+    "/data",
+    "--output",
+    "/out/native"
+  ],
+  "started_utc": "2026-10-11T15:03:42Z",
+  "finished_utc": "2026-10-11T15:03:45Z",
+  "duration_seconds": 2.487,
+  "observed_exit_code": 0,
+  "input_hashes": [
+    {
+      "path": "blueprints/us-equities/backtesting-gap-burndown-20261010/native_mechanics.py",
+      "sha256": "7909db7e8611c25ba98fee87000c79aea5c527301c0743c716bc706286b61096",
+      "bytes": 9381
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/run.py",
+      "sha256": "c3917c2f6446ffb1bcfe411cc2339ffc1f804a87904ed3a1f1a67e51817ad2f2",
+      "bytes": 51307
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/fixture_strategy.py",
+      "sha256": "59649ac50f26c8b6090dc976e4ec0b3b7e2121cc214674f6c122fbbca9b143f1",
+      "bytes": 23733
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/mapping-manifest-v2.json",
+      "sha256": "1b821d7ba42ea6121002a26a5082df08ed7a79f9a50b2edc9959503e1088ac67",
+      "bytes": 37153
+    },
+    {
+      "path": "blueprints/us-equities/historical-simulation/plan.json",
+      "sha256": "60959a050a3b004abf5346d376930b3b2f563096c725dc96e5427703ea203632",
+      "bytes": 2740
+    },
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-lean-data.verdict.json",
+      "sha256": "8d6b96cc44f333c7f7d1216b23b5eb654100439566bcda0344034d4b215760f4",
+      "bytes": 49245
+    }
+  ],
+  "input_bytes_unchanged": true,
+  "captured_outputs": [
+    {
+      "name": "stdout",
+      "text": "{\"receipt\": \"/out/native/results.json\", \"cases\": 4, \"completed\": 3, \"expected_refusals\": 1, \"qualifies_frozen_stress_case\": false}\n",
+      "sha256": "34ea4f4b5b29b6076e62fbcf94b167267681ed270df50bdcd6843a7e612ceeab",
+      "bytes": 131
+    },
+    {
+      "name": "stderr",
+      "text": "",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  ],
+  "scope": "Actual final case-specific quantity/price/cash-validated source on retained bundled SPY; empty-network bwrap, no acquisition/broker/order/qualification.",
+  "primary_output": {
+    "path": "~/.cache/native-agent-stack/backtesting-gaps-20261011/final-round-mechanics/native/results.json",
+    "sha256": "722b7a8a8892aea67fecd7a054505904d959f1552e375bf328ab0783009bf50e",
+    "bytes": 31042
+  },
+  "observed_cases": [
+    {
+      "id": "one-fixed-fee",
+      "status": "completed",
+      "target": "1",
+      "native_end_cash": "90732.08",
+      "native_fees": "2.00",
+      "engine_error_lines": 0,
+      "fills": 2,
+      "denials": 0,
+      "quantity": 304
+    },
+    {
+      "id": "two-margin-zero",
+      "status": "completed",
+      "target": "2",
+      "native_end_cash": "81468.16",
+      "native_fees": "0.00",
+      "engine_error_lines": 0,
+      "fills": 2,
+      "denials": 0,
+      "quantity": 608
+    },
+    {
+      "id": "two-margin-fixed-fee",
+      "status": "completed",
+      "target": "2",
+      "native_end_cash": "81466.16",
+      "native_fees": "2.00",
+      "engine_error_lines": 0,
+      "fills": 2,
+      "denials": 0,
+      "quantity": 608
+    },
+    {
+      "id": "four-cash-refusal",
+      "status": "expected_refusal",
+      "target": "4",
+      "native_end_cash": "100000.00",
+      "native_fees": "0",
+      "engine_error_lines": 0,
+      "fills": 0,
+      "denials": 2,
+      "quantity": 0
+    }
+  ]
+}

@@ -13,7 +13,7 @@ import sys
 import tempfile
 import time
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 
 class _DeadlineExceeded(Exception):
@@ -208,6 +208,84 @@ class IntegratedRunner(unittest.TestCase):
                     load_config(path)
                 self.assertEqual(str(caught.exception), "unqualified_data_feed")
 
+    def test_boats_feed_is_refused_at_config_load_until_the_stream_is_qualified(self):
+        # main() reaches the transport's own BOATS refusal only after begin_next_trial and trial.json, which would leave the account's
+        # adaptive state in phase "starting" with no command that clears it; the vocabulary names boats, the runner must not run it.
+        with tempfile.TemporaryDirectory() as root:
+            path = Path(root) / "config.json"
+            data = json.loads((SOURCE / "config.json").read_text())
+            data["feed"] = "boats"
+            path.write_text(json.dumps(data))
+            with self.assertRaises(ValueError) as caught:
+                load_config(path)
+            self.assertEqual(str(caught.exception), "boats_stream_unqualified_sdk")
+
+    def test_controller_session_does_not_admit_overnight_or_a_closed_market(self):
+        from datetime import datetime
+        from zoneinfo import ZoneInfo
+        from runner import _controller_session
+        ny = ZoneInfo("America/New_York")
+        stamp = lambda *when: datetime(*when, tzinfo=ny).timestamp()
+        extended = {"extended_hours": True}
+        self.assertEqual(_controller_session(1.0, stamp(2026, 3, 10, 21, 0), extended), (1.0, False))  # OVERNIGHT
+        self.assertEqual(_controller_session(1.0, stamp(2026, 3, 14, 12, 0), extended), (1.0, False))  # Saturday
+        close, market_open = _controller_session(1.0, stamp(2026, 3, 10, 18, 0), extended)  # POST
+        self.assertTrue(market_open)
+        self.assertEqual(close, stamp(2026, 3, 10, 20, 0))
+        self.assertEqual(_controller_session(7.0, stamp(2026, 3, 10, 21, 0), {"extended_hours": False}), (7.0, True))
+
+    def test_main_preserves_extended_session_window_at_controller_construction(self):
+        from zoneinfo import ZoneInfo
+        ny = ZoneInfo("America/New_York")
+        for hour, expected_open in ((5, True), (11, True), (17, True), (21, False)):
+            with self.subTest(hour_et=hour), tempfile.TemporaryDirectory() as root:
+                now = datetime(2026, 3, 10, hour, 0, tzinfo=ny).timestamp()
+                expected_close = datetime(2026, 3, 10, 20, 0, tzinfo=ny).timestamp() if expected_open else now + 3600
+                config, limits, policy = load_config(SOURCE / "config.json")
+                config.update(regular_session_only=False, extended_hours_enabled=True)
+                config["sessions"]["extended_hours"] = True
+                ledger = Mock()
+                captured = RuntimeError("captured_controller")
+                # Isolate the constructor's own window from preflight's earlier
+                # start gate. Neither credentials nor account/broker state is real.
+                with patch.object(sys, "argv", [
+                        "runner.py", "paper", "--credentials", "keychain-env",
+                        "--config", str(SOURCE / "config.json"),
+                        "--output", str(Path(root) / "output.json"),
+                        "--state-root", str(Path(root) / "state")]), \
+                     patch.object(runner_module, "load_config", return_value=(config, limits, policy)), \
+                     patch.object(runner_module, "check_order_contract_boundary", return_value={}), \
+                     patch.object(runner_module, "paper_credentials", return_value=("fixture", "fixture")), \
+                     patch.object(runner_module, "preflight", return_value={"account_identity_sha256": "fixture"}), \
+                     patch.object(runner_module, "public_preflight", return_value={}), \
+                     patch.object(runner_module, "validate_preflight", return_value=now + 3600), \
+                     patch.object(runner_module, "account_lock_fingerprint", return_value=contextlib.nullcontext()), \
+                     patch.object(runner_module, "Ledger", return_value=ledger), \
+                     patch.object(runner_module, "Controller", side_effect=captured) as controller, \
+                     patch.object(runner_module, "fee_checkpoint", side_effect=AssertionError("broker checkpoint")), \
+                     patch.object(runner_module, "AlpacaPaperTransport", side_effect=AssertionError("broker transport")), \
+                     patch.object(runner_module, "run_native", side_effect=AssertionError("native execution")), \
+                     patch.object(runner_module.time, "time", return_value=now):
+                    with self.assertRaises(RuntimeError) as caught:
+                        runner_module.main()
+                self.assertIs(caught.exception, captured)
+                controller.assert_called_once()
+                self.assertIs(controller.call_args.kwargs["market_open"], expected_open)
+                self.assertEqual(controller.call_args.args[1], expected_close)
+                ledger.close.assert_called_once()
+                self.assertFalse((Path(root) / "state").exists())
+
+    def test_honest_overnight_hold_is_true_at_an_overnight_boundary(self):
+        from datetime import datetime, timezone
+        from zoneinfo import ZoneInfo
+        ny = ZoneInfo("America/New_York")
+        overnight_ts = datetime(2026, 3, 10, 21, 0, tzinfo=ny).astimezone(timezone.utc).timestamp()
+        session_policy = {"overnight_holds": True, "extended_hours": True}
+        clean_outcome = {"reconciliation": {"positions": 1, "open_orders": 0},
+                         "adapter_errors": [], "accounting": {"halted_reason": None}}
+        self.assertTrue(_honest_overnight_hold(clean_outcome, session_policy, overnight_ts))
+        self.assertFalse(_honest_overnight_hold({**clean_outcome, "adapter_errors": ["some_error"]}, session_policy, overnight_ts))
+
     def test_native_adaptive_policy_reaches_ledger_and_flat_reconciliation(self):
         config, _, _ = load_config(SOURCE / "config.json")
         config.update(duration_seconds=2, cleanup_seconds=2, order_timeout_seconds=1)
@@ -337,35 +415,37 @@ class IntegratedRunner(unittest.TestCase):
         """The validated runner policy governs exits for every transport."""
         from zoneinfo import ZoneInfo
 
-        fixed_now = datetime(2026, 3, 10, 20, tzinfo=ZoneInfo("America/New_York")).timestamp()
-        config, _, _ = load_config(SOURCE / "config.json")
-        config.update(duration_seconds=1, cleanup_seconds=2, order_timeout_seconds=1,
-                      regular_session_only=False, extended_hours_enabled=True,
-                      sessions={"extended_hours": True, "overnight_holds": True})
-        policy = PolicyConfig(symbols=("SPY", "QQQ", "IWM", "DIA", "AAPL", "MSFT"),
-                              max_positions=6)
+        for day, reason in ((14, "session_unavailable"), (10, "overnight_unqualified")):
+            with self.subTest(day=day, reason=reason):
+                fixed_now = datetime(2026, 3, day, 20, tzinfo=ZoneInfo("America/New_York")).timestamp()
+                config, _, _ = load_config(SOURCE / "config.json")
+                config.update(duration_seconds=1, cleanup_seconds=2, order_timeout_seconds=1,
+                              regular_session_only=False, extended_hours_enabled=True,
+                              sessions={"extended_hours": True, "overnight_holds": True})
+                policy = PolicyConfig(symbols=("SPY", "QQQ", "IWM", "DIA", "AAPL", "MSFT"),
+                                      max_positions=6)
 
-        with tempfile.TemporaryDirectory() as root:
-            ledger = Ledger(Path(root) / "journal.db", RiskLimits(trial_seconds=3, cleanup_seconds=2))
-            self.addCleanup(ledger.close)
-            ledger.start_trial(fixed_now)
-            controller = Controller(ledger, fixed_now + 3600, market_open=True, clock=lambda: fixed_now)
-            port = SimulatedPort(controller, policy.symbols)
-            self.assertFalse(hasattr(port, "extended_hours_allowed"))
-            port.positions["AAPL"] = {"symbol": "AAPL", "qty": Decimal(2), "avg_entry_price": "100"}
-            port.cash = Decimal("99800")
-            controller.port = port
-            with patch.object(runner_module.time, "time", return_value=fixed_now), \
-                 patch.object(runner_module.time, "time_ns", return_value=int(fixed_now * 1e9)):
-                result = asyncio.run(run_native(controller, policy, [{"symbol": s} for s in policy.symbols],
-                                                "extended-simulated", config, "99800"))
-            self.assertEqual(result["corporate_action_guard"]["pending_exit_attention_held"], ["AAPL"])
-            self.assertTrue(any(e["type"] == "exit_attention" and e["reason"] == "session_unavailable"
-                                for e in result["events"]))
-            self.assertEqual(port.submitted_at, [])
-            self.assertEqual(ledger.positions()["AAPL"].qty, Decimal(2))
-            self.assertEqual(result["status"], "needs_attention")
-            self.assertEqual(result["startup_reconciliation"]["ledger_delta"]["positions_after"], 1)
+                with tempfile.TemporaryDirectory() as root:
+                    ledger = Ledger(Path(root) / "journal.db", RiskLimits(trial_seconds=3, cleanup_seconds=2))
+                    self.addCleanup(ledger.close)
+                    ledger.start_trial(fixed_now)
+                    controller = Controller(ledger, fixed_now + 3600, market_open=True, clock=lambda: fixed_now)
+                    port = SimulatedPort(controller, policy.symbols)
+                    self.assertFalse(hasattr(port, "extended_hours_allowed"))
+                    port.positions["AAPL"] = {"symbol": "AAPL", "qty": Decimal(2), "avg_entry_price": "100"}
+                    port.cash = Decimal("99800")
+                    controller.port = port
+                    with patch.object(runner_module.time, "time", return_value=fixed_now), \
+                         patch.object(runner_module.time, "time_ns", return_value=int(fixed_now * 1e9)):
+                        result = asyncio.run(run_native(controller, policy, [{"symbol": s} for s in policy.symbols],
+                                                        "extended-simulated", config, "99800"))
+                    self.assertEqual(result["corporate_action_guard"]["pending_exit_attention_held"], ["AAPL"])
+                    self.assertTrue(any(e["type"] == "exit_attention" and e["reason"] == reason
+                                        for e in result["events"]))
+                    self.assertEqual(port.submitted_at, [])
+                    self.assertEqual(ledger.positions()["AAPL"].qty, Decimal(2))
+                    self.assertEqual(result["status"], "needs_attention")
+                    self.assertEqual(result["startup_reconciliation"]["ledger_delta"]["positions_after"], 1)
 
     def test_native_sell_dispatch_crossing_post_close_never_reaches_the_broker(self):
         """A POST owner tick cannot authorize a sell dispatched after 20:00."""
@@ -524,7 +604,7 @@ class IntegratedRunner(unittest.TestCase):
         """Repeated native cleanup ticks preserve the hold without journal spam."""
         from zoneinfo import ZoneInfo
 
-        fixed_now = datetime(2026, 3, 10, 20, tzinfo=ZoneInfo("America/New_York")).timestamp()
+        fixed_now = datetime(2026, 3, 14, 20, tzinfo=ZoneInfo("America/New_York")).timestamp()
         config, _, _ = load_config(SOURCE / "config.json")
         config.update(duration_seconds=1, cleanup_seconds=2, order_timeout_seconds=1,
                       regular_session_only=False, extended_hours_enabled=True,
@@ -2176,6 +2256,47 @@ class MainCommandGateWiring(unittest.TestCase):
                 return sentinel, code, None
             except Exception as exc:  # noqa: BLE001 -- deliberately catches the sentinel too
                 return sentinel, None, exc
+
+    def test_main_preserves_extended_session_window_at_controller_construction(self):
+        from zoneinfo import ZoneInfo
+        ny = ZoneInfo("America/New_York")
+        for hour, expected_open in ((5, True), (11, True), (17, True), (21, False)):
+            with self.subTest(hour_et=hour), tempfile.TemporaryDirectory() as root:
+                now = datetime(2026, 3, 10, hour, 0, tzinfo=ny).timestamp()
+                expected_close = datetime(2026, 3, 10, 20, 0, tzinfo=ny).timestamp() if expected_open else now + 3600
+                config, limits, policy = runner_module.load_config(SOURCE / "config.json")
+                config.update(regular_session_only=False, extended_hours_enabled=True)
+                config["sessions"]["extended_hours"] = True
+                ledger = Mock()
+                captured = RuntimeError("captured_controller")
+                # Isolate the constructor's own window from preflight's earlier
+                # start gate. Neither credentials nor account/broker state is real.
+                with patch.object(sys, "argv", [
+                        "runner.py", "paper", "--credentials", "keychain-env",
+                        "--config", str(SOURCE / "config.json"),
+                        "--output", str(Path(root) / "output.json"),
+                        "--state-root", str(Path(root) / "state")]), \
+                     patch.object(runner_module, "load_config", return_value=(config, limits, policy)), \
+                     patch.object(runner_module, "check_order_contract_boundary", return_value={}), \
+                     patch.object(runner_module, "paper_credentials", return_value=("fixture", "fixture")), \
+                     patch.object(runner_module, "preflight", return_value={"account_identity_sha256": "fixture"}), \
+                     patch.object(runner_module, "public_preflight", return_value={}), \
+                     patch.object(runner_module, "validate_preflight", return_value=now + 3600), \
+                     patch.object(runner_module, "account_lock_fingerprint", return_value=contextlib.nullcontext()), \
+                     patch.object(runner_module, "Ledger", return_value=ledger), \
+                     patch.object(runner_module, "Controller", side_effect=captured) as controller, \
+                     patch.object(runner_module, "fee_checkpoint", side_effect=AssertionError("broker checkpoint")), \
+                     patch.object(runner_module, "AlpacaPaperTransport", side_effect=AssertionError("broker transport")), \
+                     patch.object(runner_module, "run_native", side_effect=AssertionError("native execution")), \
+                     patch.object(runner_module.time, "time", return_value=now):
+                    with self.assertRaises(RuntimeError) as caught:
+                        runner_module.main()
+                self.assertIs(caught.exception, captured)
+                controller.assert_called_once()
+                self.assertIs(controller.call_args.kwargs["market_open"], expected_open)
+                self.assertEqual(controller.call_args.args[1], expected_close)
+                ledger.close.assert_called_once()
+                self.assertFalse((Path(root) / "state").exists())
 
     def test_paper_without_gate_arguments_reaches_post_gate_execution(self):
         sentinel, code, raised = self._run_main("paper")

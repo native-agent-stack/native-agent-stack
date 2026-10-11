@@ -1,5 +1,7 @@
 # On-demand, read-only pull request review by the Claude action — 2026-10-08
 
+**Superseded (2026-10-10).** Claude review inside GitHub is retired, and the workflow this record describes is removed (`docs/decisions/2026-10-10-retire-in-github-claude-review.md`). The record stays as the history of that workflow.
+
 `claude-pr-review.yml` lets a maintainer ask for a review of one pull request head. It is dispatched by hand from
 `main` with a pull request number and the exact head commit; Claude reads the diff and the files with Read, Glob and
 Grep, within a $5 client budget and at most 30 assistant turns; a model-free step copies the review to the job

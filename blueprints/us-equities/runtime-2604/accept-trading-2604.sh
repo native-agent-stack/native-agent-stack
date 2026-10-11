@@ -8,9 +8,9 @@
 # That receipt records prose, not the exact argv/mount set used below.
 set -Euo pipefail
 umask 077
-readonly project="$HOME/projects/us-equities-runtime"
-readonly python="$project/.venv/bin/python"
-readonly adapter="$project/vendor/adaptive-paper"
+project="$HOME/projects/us-equities-runtime"
+python="$project/.venv/bin/python"
+adapter="$project/vendor/adaptive-paper"
 readonly project_hash=aa370e42e29dc2419e586358254ff2e821df48a693aa9a3ee16b65d30036ee0b
 readonly lock_hash=f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989
 readonly quickstart_hash=487e6807dedd1a38062638eb671f6110799451611819542bf0f0c10646cb2c53
@@ -56,8 +56,19 @@ blocked() {
     exit 1
 }
 [[ ${WSL_DISTRO_NAME:-} == NativeStack2604 && $EUID != 0 ]] || blocked 64
-for tool in bwrap timeout docker env mkdir mktemp sha256sum; do command -v "$tool" >/dev/null || blocked 69 "missing $tool"; done
+for tool in realpath flock bwrap timeout docker env mkdir mktemp sha256sum; do command -v "$tool" >/dev/null || blocked 69 "missing $tool"; done
+project=$(realpath --canonicalize-missing -- "$project") || blocked 73 'runtime directory cannot be resolved'
+python="$project/.venv/bin/python"
+adapter="$project/vendor/adaptive-paper"
+readonly project python adapter
 [[ ! -L "$HOME/projects" && ! -L "$project" && -O "$project" && -x "$python" ]] || blocked 69
+# Hold a shared runtime lock before reading metadata/completion and through
+# every offline check. Installer/sync writers hold this same inode exclusively.
+runtime_lock="${project%/*}/.us-equities-runtime.lock"
+[[ ! -L "$runtime_lock" && ( ! -e "$runtime_lock" ||
+    ( -f "$runtime_lock" && -O "$runtime_lock" ) ) ]] || blocked 73
+exec {runtime_lock_fd}>>"$runtime_lock" || blocked 73
+flock --shared --nonblock "$runtime_lock_fd" || blocked 69 'runtime is in use by installer'
 for entry in "pyproject.toml|$project_hash" "uv.lock|$lock_hash"; do
     IFS='|' read -r filename expected_hash <<< "$entry"
     [[ ! -L "$project/$filename" && -f "$project/$filename" ]] || blocked 73 'runtime metadata is unavailable'

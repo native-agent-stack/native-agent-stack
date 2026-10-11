@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "captured_at_utc": "2026-10-11",
+  "f1": {
+    "previous": {
+      "commit": "010a5a33e329c9d2e694b3d09fd2d5a165ea3c66",
+      "sha256": "88994ed33552e98fceaf43e79e14b8c94f15ace9ee761bb53e8a94a1e4311acf",
+      "git_blob": "9d5f09aeef4af4b03bcd84e197cd2adee2e07561",
+      "decision_2_sha256": "08180e59398b6cf493a67aea27c5f9dea8049a39388f1ae3fbea49b8de368dee"
+    },
+    "required": {
+      "commit": "f8c607bc1f1f0205fdc87095f47df150d2f78117",
+      "url": "https://github.com/seathatflowsinourveins/us-equities-trading/blob/f8c607bc1f1f0205fdc87095f47df150d2f78117/docs/decisions/2026-10-10-halt-exit-policy.md",
+      "sha256": "ef1cf212b22c6f891da8fb322eb0b5838f1b685c307aa7eec3bf143423809887",
+      "git_blob": "c17cfd13053fa1edb01731c7b620b77788f2c2d8",
+      "decision_2_sha256": "c68cb552a9de1f7a5c5339d80ede035d032a6a15f4856de3b0a4feda38cac074",
+      "decision_2_extraction": {
+        "line_numbering": "1-based",
+        "first_line": 19,
+        "last_line": 25,
+        "encoding": "UTF-8",
+        "join": "LF",
+        "final_LF": true
+      }
+    },
+    "verification": "Both full captures match the private repository at the recorded pins. Decision 2 wording differs; its hold/flag/freeze policy is retained. Full private captures stay in the review packet."
+  },
+  "asset_attributes": {
+    "url": "https://docs.alpaca.markets/us/reference/get-v2-assets-symbol_or_asset_id.md",
+    "capture": "asset-attributes.json",
+    "sha256": "a379eba034acae0aee1ba85158c830264698019670324fdca30e7b8ea28694a4",
+    "fixture_sha256": "89b5ac4e7cb4c9d040f80159bbe689c2ac98777cfafdacde57aa7f477a41784d",
+    "fixture_json_pointers": ["/components/schemas/AssetAttribute", "/components/schemas/Assets/properties/attributes"],
+    "fixture_encoding": "Select the two source schema objects, then json.dumps(indent=2) plus LF. The full source capture is retained in the review packet."
+  },
+  "derived_overnight_feed": {
+    "url": "https://docs.alpaca.markets/us/docs/historical-stock-data-1.md",
+    "capture": "us_docs_historical-stock-data-1.md",
+    "sha256": "f5c481f99797985246a69fc2938871ee2e2820b8ff106b20b1e0493d7a985fad"
+  }
+}

@@ -44,11 +44,13 @@ const LABEL_RANK = { targeted_candidate: 0, keep_but_compare: 1, not_adopted: 2 
 // Layer ids become GPT-6 job ids (codex_job.py JOB_ID, at most 128 characters with their prefix and suffix).
 const LAYER_ID = /^[A-Za-z0-9][A-Za-z0-9._-]{0,99}$/
 // The Claude judgment stages (discover, refute-facts, refute-fit, critic) run as this agent type
-// (adoption/agents/claude/landscape-sweep-worker.md): Opus at effort max with WebFetch disallowed, so pages come in
-// through context-mode's ctx_fetch_and_index and ctx_search as the page's own text, while Skill and the ctx_* tools
-// stay available. The GPT-6 wrappers keep the default type: they only run commands and return the raw result.
+// (adoption/agents/claude/landscape-sweep-worker.md): Opus at effort max with a read-only tool list.
+// Pages and GitHub REST GET responses come through ctx_fetch_and_index / ctx_search; local inputs use
+// Read or ctx_index / ctx_search. Skill instructions are read as source; native Skill can run dynamic shell
+// context and is excluded. Command-only GPT-6 wrappers keep the default type.
 const WORKER = 'landscape-sweep-worker'
-const PAGES = 'find docs and changelogs with WebSearch, fetch each page with ctx_fetch_and_index and read it with ctx_search (load them via ToolSearch)'
+const PAGES = 'find docs and changelogs with WebSearch, fetch each page with ctx_fetch_and_index and read it with ctx_search (use exposed definitions directly; ToolSearch only when deferred)'
+const GITHUB = 'fetch public GitHub REST GET URLs with ctx_fetch_and_index and retrieve their original response with ctx_search (use exposed definitions directly; ToolSearch only when deferred); count each REST request against the GitHub API budget'
 
 const nonblank = (v) => typeof v === 'string' && v.length > 0
 const issues = []
@@ -93,7 +95,7 @@ function shq(s) {
 function inputPath(lid) { return `${S}/inputs/${lid}.json` }
 
 function claudeDiscoverPrompt(L, fu) {
-  const stars = A.stars ? `Also scan the user's GitHub stars, classified in ${A.stars} (star_candidates[] with repository, role, decision, layers; beyond_stars[]), for anything relevant to this layer. Use gh api (Bash) for GitHub facts; ${PAGES}.` : ''
+  const stars = A.stars ? `Also scan the user's GitHub stars, classified in ${A.stars} (star_candidates[] with repository, role, decision, layers; beyond_stars[]), for anything relevant to this layer. For GitHub facts, ${GITHUB}; ${PAGES}.` : ''
   let body = fill(T.discover, { LAYER_INPUT: `Read the layer input JSON file with the Read tool: ${inputPath(L.layer_id)}`, STARS_NOTE: stars, LAYER_ID: L.layer_id })
   if (fu) body += '\n' + fill(T.followup, { CRITIC_REASON: fu.reason, DIRECTIONS: fu.search_directions.join('; '), ALREADY: fu.already.join(', ') })
   return T.common + '\n\n' + body
@@ -188,9 +190,9 @@ async function runLayer(L, fu, phaseD, phaseR) {
   if (kept.length) {
     const props = JSON.stringify(forRefuters(kept, skills), null, 1)
     ;[facts, fitC, fitG] = await parallel([
-      () => agent(T.common + '\n\n' + fill(T.facts, { LAYER_ID: L.layer_id, REQUIREMENT: `see ${inputPath(L.layer_id)} (Read tool)`, PROPOSALS: props }) + `\nUse gh api (Bash) for GitHub facts; ${PAGES}.`,
+      () => agent(T.common + '\n\n' + fill(T.facts, { LAYER_ID: L.layer_id, REQUIREMENT: `see ${inputPath(L.layer_id)} (Read tool)`, PROPOSALS: props }) + `\nFor GitHub facts, ${GITHUB}; ${PAGES}.`,
         { label: `refute-facts:${L.layer_id}${lsuf}`, phase: phaseR, model: 'opus', effort: 'max', agentType: WORKER, schema: A.schemas.votes }),
-      () => agent(T.common + '\n\n' + fill(T.fit, { LAYER_INPUT: `Read the layer input JSON file with the Read tool: ${inputPath(L.layer_id)}`, PROPOSALS: props, LAYER_ID: L.layer_id }) + `\nUse gh api (Bash) for GitHub facts; ${PAGES}.`,
+      () => agent(T.common + '\n\n' + fill(T.fit, { LAYER_INPUT: `Read the layer input JSON file with the Read tool: ${inputPath(L.layer_id)}`, PROPOSALS: props, LAYER_ID: L.layer_id }) + `\nFor GitHub facts, ${GITHUB}; ${PAGES}.`,
         { label: `refute-fit:${L.layer_id}${lsuf}`, phase: phaseR, model: 'opus', effort: 'max', agentType: WORKER, schema: A.schemas.votes }),
       () => gpt6Fit(L, suffix, forRefuters(kept, skills), phaseR),
     ])

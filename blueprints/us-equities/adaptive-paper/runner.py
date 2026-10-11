@@ -8,6 +8,20 @@ Default behavior never submits an order; `paper` is an explicit bounded trial.
 """
 from __future__ import annotations
 
+from runtime_lock import RuntimeLockError, runtime_read_lock, runtime_read_locked
+
+# Acquire before importing runtime packages when invoked as a manual CLI.
+# The context's descriptor stays open until process exit; main's decorator
+# also protects imported/programmatic calls through their complete lifetime.
+if __name__ == "__main__":
+    try:
+        _runtime_cli_guard = runtime_read_lock()
+        _runtime_cli_guard.__enter__()
+    except RuntimeLockError:
+        import sys
+        print("refused: canonical runtime lock unavailable", file=sys.stderr)
+        raise SystemExit(2)
+
 import argparse
 import ast
 import asyncio
@@ -29,13 +43,14 @@ from credential_guard import CredentialGuardError, MAX_CREDENTIAL_BYTES, REASON_
 from credential_source import (BASE_URL_VARIABLE, SOURCE_ENV_FILE, SOURCES as CREDENTIAL_SOURCES,
                                CredentialSourceError, paper_base_url_reason, select_credentials, selection_error)
 from financing import MARGIN_RATES, overnight_financing_projection
+from feeds import require_qualified_stream
 from leverage import LeveragePolicyError, next_lower_rung_ceiling, validate_leverage_policy
 from safety import (Ledger, Quote, RiskLimits, SafetyError, account_lock_fingerprint, DEFAULT_STOP,
                     execution_from_observation)
 from sessions import (DEFAULT_SESSION_POLICY, SessionKind, boundary_receipt, extended_session_close,
                      must_end_flat, next_trading_day, session_at, validate_session_policy)
 from strategies import AdaptivePolicy, PolicyConfig, RegimeSelector, SelectorConfig, limit_price
-from transport import (AlpacaPaperTransport, DATA_FEEDS, TransportError, RejectedSubmission, order_contract_status,
+from transport import (AlpacaPaperTransport, TransportError, RejectedSubmission, order_contract_status,
                        preflight, halt_statuses_supported, nasdaq_halt_seed, fee_activities, fee_checkpoint)
 
 SOURCE = Path(__file__).resolve().parent
@@ -341,8 +356,7 @@ def strategy_pool_and_selector(config, registry_entries, *, session="regular"):
 
 def load_config(path, *, registry_path=None):
     c = json.loads(Path(path).read_text())
-    if c["feed"] not in DATA_FEEDS:
-        raise ValueError("unqualified_data_feed")
+    require_qualified_stream(c["feed"])
     # G-e: leverage above 1x is refused exactly as before UNLESS a
     # "leverage_policy" block is present, in which case it is deferred to
     # validate_leverage_policy below (which raises its own, more specific
@@ -822,6 +836,7 @@ class Controller:
         self.halted_symbols = set()
         self.last_status_ts = {}
         self.halt_states = {}      # symbol -> last applied trading status (receipts)
+        self.overnight_states = {}  # asset-status carrier only, never quote conditions
         self.status_messages = 0
         # E4: halts only the startup seed asserts, with their expiry ({"expires_ns",
         # "basis"}); a streamed status for the symbol replaces the seed's say.
@@ -858,6 +873,7 @@ class Controller:
                 intent = next((i for i in self.ledger.intents() if i.client_id == client_id), None)
                 if intent is None:
                     raise SafetyError("submit_without_intent")
+                self._check_overnight_status(intent.symbol)
                 self.ledger.validate_pending(client_id, quote=self.quotes[intent.symbol], now=self.clock(),
                                              market_open=self.market_open, session_close=self.close,
                                              **self._stop_options())
@@ -885,6 +901,7 @@ class Controller:
     def before_submit(self, order):
         from native_adapter import NativeOrderRejected
         try:
+            self._check_overnight_status(order["symbol"])
             if order["side"] == "buy" and (self.stop or not self.port.ready
                     or (self.stop_file is not None and self.stop_requested())):
                 raise SafetyError("admissions_not_ready")
@@ -911,6 +928,32 @@ class Controller:
         self.ledger.record_order(order["client_order_id"], order["id"], order["status"], order["filled_qty"],
                                  order.get("filled_avg_price"), timestamp=order["updated_at_ns"] / 1e9,
                                  execution=execution_from_observation(order))
+
+    def _check_overnight_status(self, symbol):
+        # Default RTH diagnostics retain their calendar-free admission path.
+        if (getattr(self.port, "extended_hours_allowed", False) is not True
+                and getattr(self.port, "feed", None) != "boats"):
+            return
+        now = self.clock()
+        try:
+            info = session_at(datetime.fromtimestamp(now, timezone.utc))
+        except ValueError:
+            raise SafetyError("session_classification_failed") from None
+        if info.kind != SessionKind.OVERNIGHT:
+            return
+        status = self.overnight_states.get(symbol)
+        if status is None or status.get("source") != "alpaca_assets":
+            raise SafetyError("overnight_status_unknown")
+        age = now - status["ts_ns"] / 1_000_000_000
+        if not 0 <= age <= getattr(self.port, "quote_timeout", 5):
+            raise SafetyError("overnight_status_stale")
+        if (type(status.get("overnight_tradable")) is not bool
+                or type(status.get("overnight_halted")) is not bool):
+            raise SafetyError("overnight_status_unknown")
+        if status["overnight_tradable"] is not True:
+            raise SafetyError("overnight_not_tradable")
+        if status["overnight_halted"] is not False or self.is_halted(symbol):
+            raise SafetyError("overnight_halted")
 
     def quote(self, quote):
         # The stored quote's halted flag merges the per-quote signal
@@ -984,10 +1027,28 @@ class Controller:
         symbol = status["symbol"]
         ts_ns = status.get("ts_ns")
         if type(ts_ns) is not int or ts_ns <= 0:
+            if status.get("source") == "alpaca_assets":
+                self.overnight_states.pop(symbol, None)
             self.events.append({"type": "trading_status_ignored", "symbol": symbol,
                                "reason": "missing_or_invalid_ts_ns"})
             return
         self._expire_seeded_halts()
+        if status.get("source") == "alpaca_assets":
+            previous = self.overnight_states.get(symbol)
+            if previous is not None and (ts_ns < previous["ts_ns"] or (
+                    ts_ns == previous["ts_ns"] and (
+                        previous.get("overnight_tradable") is not True
+                        and status.get("overnight_tradable") is True
+                        or previous.get("overnight_halted") is not False
+                        and status.get("overnight_halted") is False))):
+                self.events.append({"type": "overnight_status", "symbol": symbol,
+                                    "effect": "stale_ignored", "ts_ns": ts_ns})
+                return
+            self.overnight_states[symbol] = dict(status)
+            self.events.append({"type": "overnight_status", "symbol": symbol, "ts_ns": ts_ns,
+                                "overnight_tradable": status.get("overnight_tradable"),
+                                "overnight_halted": status.get("overnight_halted")})
+            return
         self.status_messages += 1
         detail = {key: status.get(key) for key in ("state", "status_code", "reason_code", "tape")}
         halted = status.get("halted")
@@ -2029,7 +2090,7 @@ def _honest_overnight_hold(outcome, session_policy, now):
         kind = session_at(datetime.fromtimestamp(now, timezone.utc)).kind
     except ValueError:
         return False
-    boundary_reached = kind in (SessionKind.POST, SessionKind.CLOSED)
+    boundary_reached = kind in (SessionKind.POST, SessionKind.OVERNIGHT, SessionKind.CLOSED)
     guard_summary = outcome.get("corporate_action_guard") or {}
     guard_clear = (not guard_summary.get("pending_must_flatten")
                   and not guard_summary.get("pending_needs_attention_held"))
@@ -2057,7 +2118,11 @@ def _modeled_financing_block(config, ledger, baseline_cash, now):
     absent, every shipped config) selects the rate plan.
     """
     positions_cost_usd = sum((p.cost_basis_usd for p in ledger.positions().values() if p.qty), Decimal("0"))
-    trade_date = session_at(datetime.fromtimestamp(now, timezone.utc)).session_date
+    info = session_at(datetime.fromtimestamp(now, timezone.utc))
+    # This projects a held RTH book, not a newly executed overnight trade.
+    from sessions import previous_trading_day
+    trade_date = (previous_trading_day(info.session_date) if info.kind == SessionKind.OVERNIGHT
+                  else info.session_date)
     plan = config.get("financing_plan", "standard")
     projection = overnight_financing_projection(positions_cost_usd, Decimal(str(baseline_cash)), trade_date, plan)
     return {**projection, "evidence_class": "modeled",
@@ -2209,6 +2274,19 @@ def trial_phase_and_exit_code(result):
     return phase, exit_code
 
 
+def _controller_session(close, now, session_policy):
+    """The controller's entry window. By default the broker's RTH close and an always-open market. Under extended hours the continuous
+    PRE->RTH->POST window while one is active; OVERNIGHT is a market session but not an admitted one (mover_runner._controller_session)."""
+    if not session_policy["extended_hours"]:
+        return close, True
+    moment = datetime.fromtimestamp(now, timezone.utc)
+    market_open = session_at(moment).kind in (SessionKind.PRE, SessionKind.RTH, SessionKind.POST)
+    if market_open:
+        close = extended_session_close(moment).astimezone(timezone.utc).timestamp()
+    return close, market_open
+
+
+@runtime_read_locked
 def main():
     global LAST_OUTPUT
     parser = argparse.ArgumentParser(description=__doc__)
@@ -2392,14 +2470,10 @@ def main():
             # continuous PRE->RTH->POST window close (20:00 ET), not the
             # broker's RTH-only close, and market_open must reflect whether
             # the session clock currently sees an active window at all.
-            controller_close, controller_market_open = close, True
-            if session_policy["extended_hours"]:
-                now_dt = datetime.fromtimestamp(now, timezone.utc)
-                info_now = session_at(now_dt)
-                controller_market_open = info_now.kind != SessionKind.CLOSED
-                if controller_market_open:
-                    controller_close = extended_session_close(now_dt).astimezone(timezone.utc).timestamp()
+            controller_close, controller_market_open = _controller_session(close, now, session_policy)
             controller = Controller(ledger, controller_close, market_open=controller_market_open)
+            for asset_status in observation.get("asset_statuses", ()):
+                controller.trading_status(asset_status)
             # E4: seed halts already in force at startup only where the stream carries
             # statuses (SIP), since only a streamed resume can clear a seeded halt.
             controller.halt_seed_fetch = nasdaq_halt_seed if halt_statuses_supported(config["feed"]) else None

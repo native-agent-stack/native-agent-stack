@@ -1,0 +1,78 @@
+{
+  "id": "backtesting-gap-burndown-20261010/backtesting-engine/7",
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+  "gap_refs": [
+    7
+  ],
+  "gap_index": 7,
+  "gap_text_sha256": "a2d912c233c144a38fa69201959cbac0fd2ce68f53903c032ab6ed99faf8423b",
+  "outcome": "advanced",
+  "settles_gap": "partially",
+  "review_status": "proposed; shared closeout record governs review credit",
+  "evidence_class": "local_integration",
+  "result": "New proposed gap-7 closure; no matrix credit until same-head GPT and Claude PASS references exist. Retained accepted v2 one_zero comparator PASS with 106 native execution checks; fresh diagnostic reproduces native end cash 90734.08, distributions 428.64 and equal runs. Ending-cash delta to frozen LEAN is zero instead of -655.12; the fresh run does not reset the review gate.",
+  "raw_outputs": [
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-lean-data.json",
+      "sha256": "50cbfaf051740c3e66f879a4d3eae2287258ceb1a1986247b0ad833a599f32a4"
+    },
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-lean-data.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-lean-data.stdout.txt",
+      "sha256": "30ead7944782705cdadeabc70c07fff989aa6e30196acd619c581172fecab03f"
+    },
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-lean-data.verdict.json",
+      "sha256": "8d6b96cc44f333c7f7d1216b23b5eb654100439566bcda0344034d4b215760f4"
+    },
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/fresh-native-v2.json",
+      "sha256": "ae6850cb6d0a884b50222eb0a0c472e5733e86543c2d5606bae20de1d2d6d919"
+    },
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/fresh-native-v2.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/fresh-native-v2.stdout.txt",
+      "sha256": "bc2037387ab65a18b83fccd2a3a1dac7a0df5f0c38a5ad84ef0c9edbbe8e1462"
+    },
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/fresh-native-v2.verdict.json",
+      "sha256": "5bc6896cf67e942bfcd65cf479c1793d167bcf98dd4e6d4a478321465f612599"
+    },
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/native-replay-economic-summary.json",
+      "sha256": "f16fa2bf3f24eca7c935951e98e4bde297fff0c90458df4e32310473cbd15800"
+    },
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/native-spy-replay-2.json",
+      "sha256": "ea7a427c2b71a34783d1945b61a92b1071b17776279f12e183dd48ef3fea22ba"
+    },
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/native-spy-replay-2.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/native-spy-replay-2.stdout.txt",
+      "sha256": "0bfc77327c14652c5aac12099fb412179c051bbd1a8c628ba06d446d65f5afe9"
+    },
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/source-pins.json",
+      "sha256": "630b960079377d5da7c392e7802b69cdd848cd5859e807fe1775f9c7347f8314"
+    }
+  ],
+  "checked_at": "2026-10-10",
+  "model_calls": [],
+  "broker_requests": 0,
+  "limitations": [
+    "Historical source-revision gap accounting; no automatic strategy, paper, platform or live promotion.",
+    "New gate-owner review/first-run acceptance is not fabricated."
+  ],
+  "correction_provenance": {
+    "note": "Scoped references and accounting corrected after CC review; native command observations are unchanged."
+  }
+}

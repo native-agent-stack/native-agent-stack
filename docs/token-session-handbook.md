@@ -254,8 +254,8 @@ line, that each lane tool its injected text names or needs (ToolSearch, Bash for
 | `evidence-reviewer`, `security-reviewer` | [`token-lanes-block.reviewer.md`](../adoption/hooks/claude/token-lanes-block.reviewer.md) | reviewer and builder bootstrap, `ctx_search`, output, reviewer and builder code line, memory line, TOON, one lane |
 | `isolated-builder` | [`token-lanes-block.builder.md`](../adoption/hooks/claude/token-lanes-block.builder.md) | reviewer and builder bootstrap, `ctx_search`, builder output, RTK, reviewer and builder code line, memory line, TOON, one lane, builder evidence |
 | `source-scout` | [`token-lanes-block.scout.md`](../adoption/hooks/claude/token-lanes-block.scout.md) | scout RTK, TOON, one lane |
-| `semantic-evidence-reviewer` and every `blind-*` type | none (0 bytes) | none |
-| any other value, or none: `general-purpose`, Workflow children without an `agentType`, `Explore`, `landscape-sweep-worker`, teammates, plugin-scoped names | [`token-lanes-block.md`](../adoption/hooks/claude/token-lanes-block.md) | every line below |
+| `semantic-evidence-reviewer`, `landscape-sweep-worker` and every `blind-*` type | none (0 bytes) | none |
+| any other value, or none: `general-purpose`, Workflow children without an `agentType`, `Explore`, teammates, plugin-scoped names | [`token-lanes-block.md`](../adoption/hooks/claude/token-lanes-block.md) | every line below |
 
 Role variants, each replacing the full-block line on the same topic:
 
@@ -353,7 +353,7 @@ context-mode's own SessionStart routing text instead of repeating it, and adds t
 [`routing.mjs` L892-907](https://github.com/mksglu/context-mode/blob/589d8214d56740a28b5f7bf63167743d586b0b40/hooks/core/routing.mjs#L892-L907)).
 The profile installer's `guard` step copies both files against their `SHA256SUMS` rows. The script fails open like
 the subagent carrier: malformed input, a missing, empty or unreadable block or any error gives exit 0 and no output,
-and a session started as a `blind-*` agent or as `semantic-evidence-reviewer` gets nothing.
+and a session started as a `blind-*` agent, `semantic-evidence-reviewer` or `landscape-sweep-worker` gets nothing.
 
 It adds no enforcement. Context Mode 1.0.169's PreToolUse Read and Grep hooks stay advisory: Read guidance comes once
 per session and again for each read over 50,000 bytes, Grep guidance once, both as context and never as a denial

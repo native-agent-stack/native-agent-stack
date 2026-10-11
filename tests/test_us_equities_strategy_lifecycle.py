@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import importlib
 import importlib.util
+import ast
 import tempfile
 import time
 import unittest
@@ -37,6 +38,12 @@ def run_strategy(
     quote_offsets_ns=None,
     status_events=(),
     post_cutoff_fill_sink=None,
+    notice_sink=None,
+    snapshot_steps=(),
+    initial_snapshot_age_ns=600_000_000_000,
+    liquidity_consumption=False,
+    quote_sizes=None,
+    fill_model=None,
 ):
     """Drive the real class through native data/clock/callback boundaries."""
     from nautilus_trader.model import (
@@ -44,9 +51,12 @@ def run_strategy(
         InstrumentStatus,
         MarketStatusAction,
         QuoteTick,
+        Quantity,
     )
 
-    engine, instrument = simulation.fixture_engine(instrument)
+    engine, instrument = simulation.fixture_engine(
+        instrument, liquidity_consumption=liquidity_consumption, fill_model=fill_model
+    )
     start_ns = simulation.BASE_NS if start_ns is None else start_ns
     fields = {
         "entry_timeout_ns": 2_000_000_000,
@@ -58,17 +68,19 @@ def run_strategy(
         contracts.StrategySpec(simulation.INSTRUMENT_ID, simulation.COHORT_SHA256),
         **fields,
     )
-    strategy = (strategy_type or families.GapPremarketStrategy)(
-        spec,
+    dependencies = dict(
         ledger=ledger,
         fault_sink=faults.append,
         post_cutoff_fill_sink=post_cutoff_fill_sink,
     )
+    if notice_sink is not None:
+        dependencies["notice_sink"] = notice_sink
+    strategy = (strategy_type or families.GapPremarketStrategy)(spec, **dependencies)
     snapshot = replace(
         simulation.fixture_snapshot(),
         evidence_class=spec.evidence_class,
-        ts_event=start_ns - 600_000_000_000,
-        ts_init=start_ns - 600_000_000_000,
+        ts_event=start_ns - initial_snapshot_age_ns,
+        ts_init=start_ns - initial_snapshot_age_ns,
         valid_until_ns=start_ns + 3600_000_000_000,
     )
     quotes = simulation.fixture_quotes(
@@ -88,6 +100,19 @@ def run_strategy(
                 start_ns + offset,
             )
             for quote, offset in zip(quotes, quote_offsets_ns, strict=True)
+        ]
+    if quote_sizes is not None:
+        quotes = [
+            QuoteTick(
+                q.instrument_id,
+                q.bid_price,
+                q.ask_price,
+                Quantity.from_int(size),
+                Quantity.from_int(size),
+                q.ts_event,
+                q.ts_init,
+            )
+            for q, size in zip(quotes, quote_sizes, strict=True)
         ]
     data = [
         CustomData(families.snapshot_data_type(simulation.INSTRUMENT_ID), snapshot),
@@ -126,6 +151,18 @@ def run_strategy(
                 replace(snapshot, ts_event=reopen_at_ns, ts_init=reopen_at_ns),
             )
         )
+    for deliver_ns, halted in snapshot_steps:
+        data.append(
+            CustomData(
+                families.snapshot_data_type(simulation.INSTRUMENT_ID),
+                replace(
+                    snapshot,
+                    ts_event=start_ns + deliver_ns,
+                    ts_init=start_ns + deliver_ns,
+                    halted=halted,
+                ),
+            )
+        )
     try:
         engine.add_strategy(strategy)
         engine.add_data(data, sort=True)
@@ -135,8 +172,2186 @@ def run_strategy(
         engine.dispose()
 
 
+class PortableRecoveryTests(unittest.TestCase):
+    """Execute production command/recovery methods without importing Nautilus.
+
+    Fake clock and wire sinks make these logic checks, not engine acceptance.
+    The persistence cases use the actual SQLite Ledger with close/reopen.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        from decimal import Decimal
+
+        cls.D = Decimal
+        if importlib.util.find_spec("exchange_calendars") is None:
+            from types import ModuleType
+
+            calendar = ModuleType("exchange_calendars")
+
+            def refuse_calendar(*args, **kwargs):
+                raise AssertionError("notice tests must not query a calendar")
+
+            calendar.get_calendar = refuse_calendar
+            # These tests exercise metadata only. Retain the actual Ledger;
+            # block its unrelated calendar port when that dependency is absent.
+            with patch.dict("sys.modules", {"exchange_calendars": calendar}):
+                cls.safety = importlib.import_module(
+                    "blueprints.us-equities.adaptive-paper.safety"
+                )
+        else:
+            cls.safety = importlib.import_module(
+                "blueprints.us-equities.adaptive-paper.safety"
+            )
+        cls.notices = importlib.import_module(
+            "blueprints.us-equities.strategies.halt_notice"
+        )
+        cls.contracts = importlib.import_module(
+            "blueprints.us-equities.strategies.contracts"
+        )
+        source = (
+            Path(__file__).resolve().parents[1]
+            / "blueprints/us-equities/strategies/families.py"
+        )
+        tree = ast.parse(source.read_text())
+        strategy = next(
+            n
+            for n in tree.body
+            if isinstance(n, ast.ClassDef) and n.name == "FamilyStrategy"
+        )
+        selected = {
+            "_drive",
+            "_halt_reason",
+            "_submit",
+            "_notify_halt_hold",
+            "_clear_halt_hold",
+            "_retire_halt_notice_alert",
+            "_record",
+            "_freeze",
+            "_on_watchdog",
+            "_restore_ledger",
+            "reconcile_held_notice_resolved",
+        }
+        methods = [
+            n
+            for n in strategy.body
+            if isinstance(n, ast.FunctionDef) and n.name in selected
+        ]
+        namespace = {"D": Decimal, "decimal": cls.contracts.decimal}
+        exec(
+            compile(
+                ast.fix_missing_locations(ast.Module(body=methods, type_ignores=[])),
+                str(source),
+                "exec",
+            ),
+            namespace,
+        )
+        cls.Methods = type(
+            "ExactRecoveryMethods", (), {name: namespace[name] for name in selected}
+        )
+
+    def fixture(
+        self,
+        *,
+        ledger=None,
+        halted=None,
+        expiry=0,
+        role="entry",
+        quantity="0",
+        now=3_000_000_000,
+    ):
+        class Clock:
+            def __init__(self, now):
+                self.now, self.alerts = now, {}
+
+            def timestamp_ns(self):
+                return self.now
+
+            def timer_names(self):
+                return list(self.alerts)
+
+            def cancel_timer(self, name):
+                self.alerts.pop(name, None)
+
+            def set_time_alert_ns(self, name, when, callback):
+                self.alerts[name] = (when, callback)
+
+            def advance(self, target):
+                while self.alerts and min(t[0] for t in self.alerts.values()) <= target:
+                    name = min(self.alerts, key=lambda key: self.alerts[key][0])
+                    self.now, callback = self.alerts.pop(name)
+                    callback(None)
+                self.now = target
+
+        s = self.Methods()
+        s.clock = Clock(now)
+        s.spec = SimpleNamespace(
+            instrument_id="SPY.ALPACA",
+            entry_timeout_ns=2_000_000_000,
+            exit_timeout_ns=2_000_000_000,
+            entry_deadline_ns=None,
+            exit_deadline_ns=None,
+        )
+        s.instrument_id = SimpleNamespace(symbol="SPY")
+        s.client_id_prefix = "t22-unit-"
+        s.instrument_status_halted = False
+        s.snapshot_halted, s.snapshot_halt_valid_until_ns = halted, expiry
+        s.quantity = self.D(quantity)
+        s.pending = SimpleNamespace(client_order_id=s.client_id_prefix + "0000001")
+        s.pending_role, s.pending_since_ns = role, 0
+        s.pending_policy_deadline_ns = None
+        s.cancel_requested, s.cancel_requested_ns = False, 0
+        s.faulted, s.enabled = False, True
+        s.flags, s.trace, s.callback_faults = set(), [], []
+        s.last_halt_notice_ns = s.last_halt_notice_reason = None
+        s.active_halt_notice = s.restored_halt_notice = None
+        s.cancels, s.submits, s.notified = [], [], []
+        s.sequence, s.entry_attempted = 0, False
+        s.cancel_order, s.submit_order = s.cancels.append, s.submits.append
+        s.fault_sink = s.notified.append
+        s.notice_sink = s.notified.append
+        s.ledger = (
+            ledger
+            if ledger is not None
+            else SimpleNamespace(
+                freeze=lambda reason: None,
+                intents=lambda: (),
+                unresolved=lambda: (),
+                positions=dict,
+                halted_reason=lambda: None,
+            )
+        )
+        s.cache = SimpleNamespace(
+            orders_open=lambda **kw: [], positions_open=lambda **kw: []
+        )
+        return s
+
+    def test_unknown_state_cancels_only_entries_and_refuses_exit_replacement_commands(
+        self,
+    ):
+        for state in (None, False):
+            for boundary in ("entry", "exit", "cancel_entry", "cancel_exit", "replace"):
+                with self.subTest(state=state, boundary=boundary):
+                    s = self.fixture(
+                        halted=state,
+                        expiry=2_000_000_000,
+                        role="entry" if boundary.endswith("entry") else "exit",
+                        quantity="0" if boundary.endswith("entry") else "7",
+                    )
+                    original = s.pending
+                    if boundary.startswith("cancel"):
+                        s._drive()
+                    elif boundary == "replace":
+                        s.pending = None  # Prior order already terminal.
+                        s._submit("SELL", self.D(7), self.D(10), "exit", "time_exit")
+                    else:
+                        s._drive()
+                    expected_cancel = boundary in ("entry", "cancel_entry")
+                    self.assertEqual(
+                        s.cancels, [original.client_order_id] if expected_cancel else []
+                    )
+                    self.assertEqual(s.submits, [])
+                    self.assertEqual(s.sequence, 0)
+                    if boundary != "replace":
+                        self.assertIs(s.pending, original)
+                    self.assertEqual(s.cancel_requested, expected_cancel)
+
+    def test_observed_halt_still_dispatches_entry_cancel(self):
+        s = self.fixture(halted=True)
+        s._drive()
+        self.assertEqual(s.cancels, ["t22-unit-0000001"])
+        self.assertTrue(s.cancel_requested)
+
+    def recovered(self, path, now):
+        ledger = self.safety.Ledger(path)
+        original = self.fixture(ledger=ledger, halted=True, role="exit", quantity="7")
+        original._drive()
+        with ledger._transaction():
+            ledger.db.execute("INSERT INTO positions VALUES ('SPY','7','70')")
+        ledger.close()
+        reopened = self.safety.Ledger(path)
+        restarted = self.fixture(ledger=reopened, now=now)
+        restarted.pending = None
+        self.notices.restore(restarted, arm=True)
+        self.assertFalse(restarted._restore_ledger())
+        return restarted, reopened
+
+    def test_real_ledger_reopen_preserves_original_boundary_and_order_identity(self):
+        with tempfile.TemporaryDirectory() as directory:
+            s, ledger = self.recovered(
+                Path(directory) / "ledger.sqlite3", 100_000_000_000
+            )
+            try:
+                self.assertEqual(s.last_halt_notice_ns, 3_000_000_000)
+                s.clock.advance(603_000_000_000 - 1)
+                self.assertNotIn("held_halted", s.notified)
+                s.clock.advance(603_000_000_000)
+                notices = [row for row in s.trace if row["event"] == "halt_hold_notice"]
+                self.assertEqual([row["now_ns"] for row in notices], [603_000_000_000])
+                self.assertEqual(notices[0]["client_order_id"], "t22-unit-0000001")
+                self.assertTrue(s.faulted)
+                self.assertEqual(s.cancels + s.submits, [])
+            finally:
+                ledger.close()
+
+    def test_overdue_notices_coalesce_once_then_use_actual_delivery_time(self):
+        with tempfile.TemporaryDirectory() as directory:
+            s, ledger = self.recovered(
+                Path(directory) / "ledger.sqlite3", 2000_000_000_000
+            )
+            try:
+                s.clock.advance(2600_000_000_000 - 1)
+                notices = [row for row in s.trace if row["event"] == "halt_hold_notice"]
+                self.assertEqual([row["now_ns"] for row in notices], [2000_000_000_000])
+                s.clock.advance(2600_000_000_000)
+                self.assertEqual(
+                    [
+                        row["now_ns"]
+                        for row in s.trace
+                        if row["event"] == "halt_hold_notice"
+                    ],
+                    [2000_000_000_000, 2600_000_000_000],
+                )
+            finally:
+                ledger.close()
+
+    def test_reconciliation_cannot_clear_an_unresolved_held_position(self):
+        with tempfile.TemporaryDirectory() as directory:
+            s, ledger = self.recovered(
+                Path(directory) / "ledger.sqlite3", 100_000_000_000
+            )
+            try:
+                with self.assertRaisesRegex(ValueError, "held_exposure_not_resolved"):
+                    s.reconcile_held_notice_resolved()
+                self.assertIsNotNone(
+                    self.notices.load(ledger, s.spec.instrument_id, s.client_id_prefix)
+                )
+                with ledger._transaction():
+                    ledger.db.execute(
+                        "UPDATE positions SET qty='0',cost_basis='0' WHERE symbol='SPY'"
+                    )
+                s.reconcile_held_notice_resolved()
+                self.assertIsNone(
+                    self.notices.load(ledger, s.spec.instrument_id, s.client_id_prefix)
+                )
+                self.assertEqual(s.clock.alerts, {})
+                self.assertTrue(s.faulted)  # Resolution does not resume trading.
+            finally:
+                ledger.close()
+
+    def test_real_metadata_is_scoped_to_one_strategy_identity(self):
+        with tempfile.TemporaryDirectory() as directory:
+            ledger = self.safety.Ledger(Path(directory) / "ledger.sqlite3")
+            try:
+                s = self.fixture(ledger=ledger, halted=True, role="exit", quantity="7")
+                s._drive()
+                self.assertIsNone(
+                    self.notices.load(ledger, s.spec.instrument_id, "t22-another-")
+                )
+            finally:
+                ledger.close()
+
+    def test_notice_persistence_runtime_error_keeps_cancel_delivery_and_next_alert(self):
+        with tempfile.TemporaryDirectory() as directory:
+            ledger = self.safety.Ledger(Path(directory) / "ledger.sqlite3")
+            try:
+                s = self.fixture(ledger=ledger, halted=True, quantity="3")
+                original = s.pending
+                with patch.object(ledger, "_set", side_effect=RuntimeError("synthetic write failure")):
+                    s._drive()
+                self.assertEqual(s.cancels, [original.client_order_id])
+                self.assertIs(s.pending, original)
+                self.assertTrue(s.cancel_requested)
+                self.assertEqual(s.submits, [])
+                self.assertEqual(s.notified, ["held_halted"])
+                self.assertIn("held_notice_persistence_failed", s.flags)
+                rows = [row for row in s.trace if row["event"] == "halt_hold_notice"]
+                self.assertEqual(len(rows), 1)
+                self.assertEqual(rows[0]["persist_error"], "RuntimeError")
+                self.assertEqual(rows[0]["client_order_id"], original.client_order_id)
+                self.assertEqual(s.clock.alerts["t22-halt-hold"][0], 603_000_000_000)
+                self.assertIsNone(self.notices.load(ledger, s.spec.instrument_id, s.client_id_prefix))
+                self.assertEqual(s.callback_faults, [])
+            finally:
+                ledger.close()
+
+    def test_routine_notice_keeps_an_existing_freeze_without_repeating_the_stop(self):
+        with tempfile.TemporaryDirectory() as directory:
+            ledger = self.safety.Ledger(Path(directory) / "ledger.sqlite3")
+            try:
+                s = self.fixture(ledger=ledger, halted=True, role="exit", quantity="7")
+                s.pending = None
+                stops, notices = [], []
+                s.fault_sink, s.notice_sink = stops.append, notices.append
+                s._freeze("held_quote_stale")
+                self.assertEqual(ledger.halted_reason(), "held_quote_stale")
+                s._notify_halt_hold(s.clock.timestamp_ns(), "held_halted")
+                self.assertEqual(stops, ["held_quote_stale"])
+                self.assertEqual(notices, ["held_halted"])
+                self.assertEqual(ledger.halted_reason(), "held_quote_stale")
+                self.assertEqual(
+                    [row["reason"] for row in s.trace if row["event"] == "safety_freeze"],
+                    ["held_quote_stale"],
+                )
+                self.assertTrue(s.faulted)
+                self.assertEqual(s.submits + s.cancels, [])
+                self.assertEqual(s.clock.alerts["t22-halt-hold"][0], 603_000_000_000)
+                self.assertEqual(
+                    self.notices.load(ledger, s.spec.instrument_id, s.client_id_prefix)["reason"],
+                    "held_halted",
+                )
+            finally:
+                ledger.close()
+
+    def test_recreated_actor_retains_notice_without_adopting_exposure_or_sending_orders(self):
+        with tempfile.TemporaryDirectory() as directory:
+            s, ledger = self.recovered(Path(directory) / "ledger.sqlite3", 100_000_000_000)
+            try:
+                # Preserve the real startup freeze. Each recovery/clear fence
+                # alone is redundant; the property catches only their pair.
+                with ledger._transaction():
+                    ledger.db.execute("UPDATE positions SET qty='0',cost_basis='0' WHERE symbol='SPY'")
+                s.snapshot_halted, s.snapshot_halt_valid_until_ns = False, 200_000_000_000
+                original = self.notices.load(ledger, s.spec.instrument_id, s.client_id_prefix)
+                self.assertTrue(s.faulted)
+                self.assertFalse(s.enabled)
+                s._drive()
+                self.assertEqual(self.notices.load(ledger, s.spec.instrument_id, s.client_id_prefix), original)
+                self.assertEqual(s.quantity, 0)
+                self.assertIsNone(s.pending)
+                self.assertEqual(s.cancels + s.submits, [])
+                self.assertTrue(s.faulted)
+                self.assertFalse(s.enabled)
+            finally:
+                ledger.close()
+
+    def test_each_reconciliation_refusal_signal_retains_the_durable_notice(self):
+        # Each case has exactly one refusal signal; another guard cannot hide
+        # deletion of the signal under test. Ledger position has its own real
+        # close/reopen regression above.
+        for signal in ("quantity", "pending", "ledger_unresolved", "cache_order", "cache_position"):
+            with self.subTest(signal=signal), tempfile.TemporaryDirectory() as directory:
+                ledger = self.safety.Ledger(Path(directory) / "ledger.sqlite3")
+                try:
+                    s = self.fixture(ledger=ledger, halted=True, role="exit", quantity="7")
+                    s._drive()
+                    s.quantity, s.pending = self.D(0), None
+                    original = self.notices.load(ledger, s.spec.instrument_id, s.client_id_prefix)
+                    s.faulted = True
+                    due = s.clock.alerts["t22-halt-hold"][0]
+                    if signal == "quantity":
+                        s.quantity = self.D(7)
+                    elif signal == "pending":
+                        s.pending = SimpleNamespace(client_order_id=original["client_order_id"])
+                    elif signal == "ledger_unresolved":
+                        with ledger._transaction():
+                            ledger.db.execute(
+                                "INSERT INTO intents(client_id,symbol,side,qty,limit_price,status,updated_at) VALUES (?,?,?,?,?,?,?)",
+                                (original["client_order_id"], "SPY", "SELL", "7", "10", "reserved", 0),
+                            )
+                        self.assertEqual(len(ledger.unresolved()), 1)
+                    elif signal == "cache_order":
+                        s.cache.orders_open = lambda **kw: [SimpleNamespace()]
+                    else:
+                        s.cache.positions_open = lambda **kw: [SimpleNamespace()]
+                    with self.assertRaisesRegex(ValueError, "held_exposure_not_resolved"):
+                        s.reconcile_held_notice_resolved()
+                    self.assertEqual(self.notices.load(ledger, s.spec.instrument_id, s.client_id_prefix), original)
+                    self.assertEqual(s.clock.alerts["t22-halt-hold"][0], due)
+                    self.assertEqual(s.active_halt_notice, original)
+                    self.assertTrue(s.faulted)
+                    self.assertEqual(s.submits + s.cancels, [])
+                finally:
+                    ledger.close()
+
+
 @unittest.skipUnless(NATIVE, "requires the exact locked Nautilus rc5 runtime")
 class LifecycleTests(unittest.TestCase):
+    def test_development_restart_does_not_consume_notice_without_callable_port(self):
+        notices = importlib.import_module("blueprints.us-equities.strategies.halt_notice")
+        base = simulation.BASE_NS
+        development = {
+            "evidence_class": "development",
+            "qualified_data": ("released_development", "horizon_qualified"),
+            "exit_policy": "regular-close-v1",
+            "exit_evidence_sha256": "f" * 64,
+        }
+
+        class ObserveStartup(families.GapPremarketStrategy):
+            def on_start(self):
+                super().on_start()
+                self.startup_notice_armed = "t22-halt-hold" in self.clock.timer_names()
+
+        for binding in ("omitted", "noncallable", "callable"):
+            for offset in (100_000_000_000, 2000_000_000_000):
+                with self.subTest(binding=binding, offset=offset), tempfile.TemporaryDirectory() as directory:
+                    path = Path(directory) / "restart.sqlite3"
+                    ledger = safety.Ledger(path)
+                    try:
+                        original = run_strategy(
+                            ledger=ledger, faults=[], bids=("10", "10", "9", "8", "8"),
+                            halt_after_ns=base + 3_000_000_000,
+                            notice_sink=lambda reason: None,
+                            post_cutoff_fill_sink=lambda *args: None,
+                            overrides=dict(development, exit_deadline_ns=base + 2_000_000_000),
+                        )
+                        before = notices.load(ledger, original.spec.instrument_id, original.client_id_prefix)
+                        self.assertIsNotNone(before)
+                        self.assertEqual(before["last_notice_ns"], base + 3_000_000_000)
+                        ledger.close()
+                        ledger = safety.Ledger(path)
+                        faults, deliveries = [], []
+                        dependencies = {} if binding == "omitted" else {
+                            "notice_sink": 7 if binding == "noncallable" else deliveries.append
+                        }
+                        restarted = run_strategy(
+                            ledger=ledger, faults=faults, bids=("8",) * 3,
+                            start_ns=base + offset, initial_snapshot_age_ns=0,
+                            quote_offsets_ns=(0, 604_000_000_000, 1204_000_000_000),
+                            post_cutoff_fill_sink=lambda *args: None,
+                            strategy_type=ObserveStartup, overrides=development, **dependencies,
+                        )
+                        after = notices.load(ledger, original.spec.instrument_id, original.client_id_prefix)
+                        rows = [r for r in restarted.trace if r["event"] == "halt_hold_notice"]
+                        self.assertEqual(restarted.client_id_prefix, original.client_id_prefix)
+                        self.assertFalse(any(r["event"] in ("submit", "cancel_requested") for r in restarted.trace))
+                        self.assertTrue(restarted.faulted)
+                        self.assertFalse(restarted.enabled)
+                        self.assertEqual(restarted.quantity, 0)
+                        if binding == "callable":
+                            due = base + (603_000_000_000 if offset == 100_000_000_000 else offset)
+                            expected = [due + i * 600_000_000_000 for i in range(2 if offset == 100_000_000_000 else 3)]
+                            self.assertTrue(restarted.startup_notice_armed)
+                            self.assertNotIn("startup_notice_sink_required", faults)
+                            self.assertEqual([r["now_ns"] for r in rows], expected)
+                            self.assertEqual(deliveries, [before["reason"]] * len(expected))
+                            self.assertEqual(after["last_notice_ns"], expected[-1])
+                            self.assertEqual(after["next_due_ns"], expected[-1] + 600_000_000_000)
+                        else:
+                            self.assertEqual(after, before)  # Preserve the complete recovery record.
+                            self.assertFalse(restarted.startup_notice_armed)
+                            self.assertEqual(rows, [])
+                            self.assertEqual(deliveries, [])
+                            self.assertEqual(faults, ["startup_notice_sink_required"])
+                            self.assertFalse(restarted.callback_faults)
+                            # A correctly wired later restart can consume the
+                            # preserved record; refusal cannot discard custody.
+                            ledger.close()
+                            ledger = safety.Ledger(path)
+                            recovered_deliveries = []
+                            run_strategy(
+                                ledger=ledger, faults=[], bids=("8",),
+                                start_ns=base + offset + 1300_000_000_000,
+                                initial_snapshot_age_ns=0,
+                                notice_sink=recovered_deliveries.append,
+                                post_cutoff_fill_sink=lambda *args: None,
+                                overrides=development,
+                            )
+                            self.assertEqual(recovered_deliveries, [before["reason"]])
+                            recovered = notices.load(ledger, original.spec.instrument_id, original.client_id_prefix)
+                            self.assertEqual(recovered["last_notice_ns"], base + offset + 1300_000_000_000)
+                    finally:
+                        ledger.close()
+
+    def test_corrected_notice_port_restart_notifies_overdue_record_immediately(self):
+        notices = importlib.import_module("blueprints.us-equities.strategies.halt_notice")
+        base = simulation.BASE_NS
+        development = {
+            "evidence_class": "development",
+            "qualified_data": ("released_development", "horizon_qualified"),
+            "exit_policy": "regular-close-v1",
+            "exit_evidence_sha256": "f" * 64,
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "corrected-port.sqlite3"
+            ledger = safety.Ledger(path)
+            try:
+                original = run_strategy(
+                    ledger=ledger, faults=[], bids=("10", "10", "9", "8", "8"),
+                    halt_after_ns=base + 3_000_000_000,
+                    notice_sink=lambda reason: None, post_cutoff_fill_sink=lambda *args: None,
+                    overrides=dict(development, exit_deadline_ns=base + 2_000_000_000),
+                )
+                before = notices.load(ledger, original.spec.instrument_id, original.client_id_prefix)
+                ledger.close()
+                ledger = safety.Ledger(path)
+                faults = []
+                refused = run_strategy(
+                    ledger=ledger, faults=faults, bids=("8",),
+                    start_ns=base + 2000_000_000_000, initial_snapshot_age_ns=0,
+                    post_cutoff_fill_sink=lambda *args: None, overrides=development,
+                )
+                self.assertEqual(faults, ["startup_notice_sink_required"])
+                self.assertFalse(any(r["event"] == "halt_hold_notice" for r in refused.trace))
+                self.assertEqual(notices.load(ledger, original.spec.instrument_id, original.client_id_prefix), before)
+                ledger.close()
+                ledger = safety.Ledger(path)
+                delivered = []
+                corrected = run_strategy(
+                    ledger=ledger, faults=[], bids=("8",),
+                    start_ns=base + 2060_000_000_000, initial_snapshot_age_ns=0,
+                    notice_sink=delivered.append, post_cutoff_fill_sink=lambda *args: None,
+                    overrides=development,
+                )
+                self.assertEqual(delivered, ["held_halted"])
+                self.assertEqual(
+                    [r["now_ns"] for r in corrected.trace if r["event"] == "halt_hold_notice"],
+                    [base + 2060_000_000_000],
+                )
+                self.assertFalse(any(r["event"] in ("submit", "cancel_requested") for r in corrected.trace))
+            finally:
+                ledger.close()
+
+    def test_equal_accepted_snapshot_replay_clears_late_halt_before_native_entry(self):
+        observed = []
+
+        class Replay(families.GapPremarketStrategy):
+            def on_quote(self, quote):
+                if not observed and self.snapshot is not None:
+                    accepted = self.snapshot
+                    self.on_data(replace(
+                        accepted, halted=True,
+                        ts_event=accepted.ts_event - 1_000_000_000,
+                        ts_init=accepted.ts_init - 1_000_000_000,
+                    ))
+                    held = self._halt_reason(self.clock.timestamp_ns())
+                    self.on_data(accepted)
+                    observed.append((held, self._halt_reason(self.clock.timestamp_ns()),
+                                     self.snapshot is accepted, self.snapshot_halted,
+                                     self.snapshot_halt_timestamps))
+                return super().on_quote(quote)
+
+        strategy = run_strategy(ledger=None, faults=[], strategy_type=Replay)
+        self.assertEqual(len(observed), 1)
+        held, resumed, same_snapshot, latch, stamps = observed[0]
+        self.assertEqual(held, "held_halted")
+        self.assertIsNone(resumed)
+        self.assertTrue(same_snapshot)
+        self.assertIs(latch, False)
+        self.assertEqual(stamps, (strategy.snapshot.ts_event, strategy.snapshot.ts_init))
+        self.assertTrue(any(row["event"] == "submit" and row["side"] == "BUY"
+                            for row in strategy.trace))
+        self.assertFalse(strategy.callback_faults)
+
+    def test_snapshot_replay_keeps_conflict_future_and_native_halt_vetoes(self):
+        from nautilus_trader.model import InstrumentStatus, MarketStatusAction
+
+        for boundary in (
+            "conflicting", "future", "older", "native_halt",
+            "accepted_true_replay", "accepted_none_replay", "newer_event_halt",
+        ):
+            with self.subTest(boundary=boundary):
+                observed = []
+
+                class RefuseReplay(families.GapPremarketStrategy):
+                    def on_data(self, data, boundary=boundary):
+                        value = getattr(data, "data", data)
+                        if (
+                            boundary == "newer_event_halt"
+                            and self.snapshot is None
+                            and isinstance(value, contracts.FactorSnapshot)
+                        ):
+                            # Leave room for a newer event with an older init;
+                            # every fixture still respects ts_event <= ts_init.
+                            value = replace(value, ts_event=value.ts_init - 10_000_000_000)
+                        return super().on_data(value)
+
+                    def on_quote(self, quote, boundary=boundary, observed=observed):
+                        if not observed and self.snapshot is not None:
+                            accepted = self.snapshot
+                            if boundary in ("accepted_true_replay", "accepted_none_replay"):
+                                self.on_data(replace(
+                                    accepted,
+                                    halted=True if boundary == "accepted_true_replay" else None,
+                                    ts_event=accepted.ts_event + 1_000_000_000,
+                                    ts_init=accepted.ts_init + 1_000_000_000,
+                                ))
+                                accepted = self.snapshot
+                            else:
+                                self.on_data(replace(
+                                    accepted, halted=True,
+                                    ts_event=accepted.ts_event + 1_000_000_000
+                                    if boundary == "newer_event_halt"
+                                    else accepted.ts_event - 1_000_000_000,
+                                    ts_init=accepted.ts_init - 1_000_000_000,
+                                ))
+                            replay = accepted
+                            if boundary == "conflicting":
+                                replay = replace(accepted, valid_until_ns=accepted.valid_until_ns + 1)
+                            elif boundary == "future":
+                                replay = replace(accepted, ts_init=quote.ts_event + 1)
+                            elif boundary == "older":
+                                replay = replace(
+                                    accepted, ts_event=accepted.ts_event - 2_000_000_000,
+                                    ts_init=accepted.ts_init - 2_000_000_000,
+                                )
+                            elif boundary == "native_halt":
+                                self.on_instrument_status(InstrumentStatus(
+                                    self.instrument_id, MarketStatusAction.HALT,
+                                    quote.ts_event, quote.ts_event,
+                                ))
+                            self.on_data(replay)
+                            observed.append((self._halt_reason(self.clock.timestamp_ns()),
+                                             self.faulted, self.snapshot is accepted,
+                                             self.snapshot_halted, self.instrument_status_halted))
+                        return super().on_quote(quote)
+
+                strategy = run_strategy(ledger=None, faults=[], strategy_type=RefuseReplay)
+                self.assertEqual(len(observed), 1)
+                reason, frozen, retained, latch, native_halt = observed[0]
+                self.assertEqual(reason, "held_halt_state_unknown"
+                                 if boundary == "accepted_none_replay" else "held_halted")
+                self.assertTrue(retained)
+                self.assertEqual(frozen, boundary == "conflicting")
+                self.assertIs(latch, None if boundary == "accepted_none_replay"
+                              else boundary != "native_halt")
+                self.assertEqual(native_halt, boundary == "native_halt")
+                self.assertFalse(any(row["event"] == "submit" for row in strategy.trace))
+                self.assertFalse(strategy.callback_faults)
+
+    def test_development_startup_requires_callable_notice_sink(self):
+        # Synthetic native data carries development labels only to exercise
+        # startup admission; this does not qualify a development dataset.
+        for binding in ("omitted", "noncallable", "callable"):
+            with self.subTest(binding=binding), tempfile.TemporaryDirectory() as directory:
+                ledger = safety.Ledger(Path(directory) / "notice-startup.sqlite3")
+                faults, notices = [], []
+                try:
+                    dependencies = {} if binding == "omitted" else {
+                        "notice_sink": 7 if binding == "noncallable" else notices.append
+                    }
+                    strategy = run_strategy(
+                        ledger=ledger, faults=faults,
+                        post_cutoff_fill_sink=lambda strategy, event, cutoff: None,
+                        overrides={
+                            "evidence_class": "development",
+                            "qualified_data": ("released_development", "horizon_qualified"),
+                            "exit_policy": "regular-close-v1",
+                            "exit_evidence_sha256": "f" * 64,
+                        },
+                        **dependencies,
+                    )
+                    submitted = [row for row in strategy.trace if row["event"] == "submit"]
+                    if binding == "callable":
+                        self.assertTrue(any(row["side"] == "BUY" for row in submitted))
+                        self.assertNotIn("startup_notice_sink_required", faults)
+                    else:
+                        self.assertTrue(strategy.faulted)
+                        self.assertFalse(strategy.enabled)
+                        self.assertEqual(faults, ["startup_notice_sink_required"])
+                        self.assertIn("startup_notice_sink_required", strategy.flags)
+                        self.assertEqual(ledger.halted_reason(), "startup_notice_sink_required")
+                        self.assertEqual(strategy.sequence, 0)
+                        self.assertIsNone(strategy.pending)
+                        self.assertEqual(submitted, [])
+                        self.assertEqual(notices, [])
+                    self.assertFalse(strategy.callback_faults)
+                finally:
+                    ledger.close()
+
+    def test_expiry_first_observes_unknown_state_and_persists_notice_before_return(self):
+        start = simulation.BASE_NS
+        notices, faults, observed = [], [], []
+        notice_state = importlib.import_module(
+            "blueprints.us-equities.strategies.halt_notice"
+        )
+
+        class Expire(families.GapPremarketStrategy):
+            def on_data(self, data):
+                value = getattr(data, "data", data)
+                if isinstance(value, contracts.FactorSnapshot):
+                    value = replace(value, valid_until_ns=start + 2_400_000_000)
+                return super().on_data(value)
+
+            def on_quote(self, quote):
+                if (
+                    not observed
+                    and quote.ts_event >= start + 2_500_000_000
+                    and self.pending_role == "exit"
+                ):
+                    # Inject the terminal callback before the next drive first
+                    # observes expired producer state. No earlier hold notice
+                    # can mask loss of the expiry callback's independent port.
+                    original_id = str(self.pending.client_order_id)
+                    self.on_order_expired(
+                        SimpleNamespace(client_order_id=self.pending.client_order_id)
+                    )
+                    observed.append(
+                        (
+                            list(notices),
+                            notice_state.load(
+                                self.ledger, self.spec.instrument_id, self.client_id_prefix
+                            ),
+                            original_id,
+                            self.clock.timestamp_ns(),
+                            self.faulted,
+                            self.pending,
+                            self.quantity,
+                            set(self.flags),
+                        )
+                    )
+                    return  # Inspect the callback before any subsequent drive.
+                return super().on_quote(quote)
+
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "ledger.sqlite3"
+            ledger = safety.Ledger(path)
+            try:
+                strategy = run_strategy(
+                    ledger=ledger,
+                    faults=faults,
+                    notice_sink=notices.append,
+                    strategy_type=Expire,
+                    bids=("10", "10", "9", "8", "8"),
+                    quote_offsets_ns=(
+                        0, 1_000_000_000, 2_000_000_000, 2_200_000_000, 2_500_000_000
+                    ),
+                    overrides={"exit_deadline_ns": start + 2_000_000_000},
+                )
+            finally:
+                ledger.close()
+            self.assertEqual(len(observed), 1)
+            delivered, state, original_id, now, frozen, pending, quantity, flags = observed[0]
+            self.assertEqual(delivered, ["held_halt_state_unknown"])
+            self.assertIsNotNone(state)
+            self.assertEqual(
+                state,
+                {
+                    "schema_version": 1,
+                    "instrument_id": strategy.spec.instrument_id,
+                    "client_id_prefix": strategy.client_id_prefix,
+                    "client_order_id": original_id,
+                    "reason": "held_halt_state_unknown",
+                    "last_notice_ns": now,
+                    "next_due_ns": now + 600_000_000_000,
+                    "active": True,
+                },
+            )
+            reopened = safety.Ledger(path)
+            try:
+                self.assertEqual(
+                    notice_state.load(
+                        reopened, strategy.spec.instrument_id, strategy.client_id_prefix
+                    ),
+                    state,
+                )
+            finally:
+                reopened.close()
+        self.assertTrue(frozen)
+        self.assertIsNone(pending)
+        self.assertGreater(quantity, 0)
+        self.assertIn("held_halt_state_unknown", flags)
+        self.assertIn("halted_day_expiry_requires_handoff", flags)
+        self.assertIn("halted_day_expiry_requires_handoff", faults)
+        self.assertFalse(strategy.callback_faults)
+
+    def test_partial_native_fill_is_cancelled_before_a_raising_notice(self):
+        from nautilus_trader.execution import DefaultFillModel
+
+        start = simulation.BASE_NS
+        observed = []
+
+        def down(reason):
+            raise RuntimeError("notice sink unavailable")
+
+        class PartialEntry(families.GapPremarketStrategy):
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, **kwargs)
+                self.fault_sink = down
+                self.notice_sink = down
+
+            def cancel_order(self, client_order_id):
+                observed.append(
+                    (self.clock.timestamp_ns(), self.quantity, self.pending_remaining)
+                )
+                return super().cancel_order(client_order_id)
+
+        strategy = run_strategy(
+            ledger=None,
+            faults=[],
+            strategy_type=PartialEntry,
+            bids=("10", "10", "11", "11"),
+            quote_offsets_ns=(0, 200_000_000, 400_000_000, 800_000_000),
+            quote_sizes=(3, 3, 3, 3),
+            liquidity_consumption=True,
+            fill_model=DefaultFillModel(
+                prob_fill_on_limit=1.0, prob_slippage=0.0, random_seed=22
+            ),
+            status_events=((300_000_000, 300_000_000, "HALT", {}),),
+            overrides={
+                "entry_timeout_ns": 60_000_000_000,
+                "exit_deadline_ns": start + 600_000_000_000,
+            },
+        )
+        self.assertEqual(
+            observed,
+            [(start + 300_000_000, contracts.decimal("3"), contracts.decimal("4"))],
+        )
+        self.assertEqual(
+            [
+                r["quantity"]
+                for r in strategy.trace
+                if r["event"] == "fill" and r["side"] == "BUY"
+            ],
+            ["3"],
+        )
+        self.assertEqual(
+            [
+                r
+                for r in strategy.callback_faults
+                if r["callback"] == "halt_hold_notice"
+            ],
+            [
+                {
+                    "callback": "halt_hold_notice",
+                    "reason": "held_halted",
+                    "stop_error": "RuntimeError",
+                }
+            ],
+        )
+        self.assertFalse(
+            [
+                r
+                for r in strategy.callback_faults
+                if r["callback"]
+                in ("on_data", "on_instrument_status", "on_order_filled")
+            ]
+        )
+        events = [r["event"] for r in strategy.trace]
+        self.assertLess(
+            events.index("cancel_requested"), events.index("halt_hold_notice")
+        )
+
+    def test_separate_notice_channel_does_not_stop_native_actor_or_resumption(self):
+        start = simulation.BASE_NS
+        for bound in (False, True):
+
+            class StopOnFault(families.GapPremarketStrategy):
+                stop_calls = []
+                notice_times = []
+
+                def on_start(self, bound=bound):
+                    def stop(reason):
+                        self.stop_calls.append(self.clock.timestamp_ns())
+                        self.stop()
+
+                    self.fault_sink = stop
+                    self.notice_sink = (
+                        (
+                            lambda reason: self.notice_times.append(
+                                self.clock.timestamp_ns()
+                            )
+                        )
+                        if bound
+                        else None
+                    )
+                    return super().on_start()
+
+            with self.subTest(notice_bound=bound):
+                strategy = run_strategy(
+                    ledger=None,
+                    faults=[],
+                    strategy_type=StopOnFault,
+                    bids=("10", "10", "9", "8", "8", "8", "8", "8"),
+                    quote_offsets_ns=(
+                        0,
+                        1_000_000_000,
+                        2_000_000_000,
+                        2_200_000_000,
+                        602_500_000_000,
+                        1202_500_000_000,
+                        1205_200_000_000,
+                        1205_400_000_000,
+                    ),
+                    halt_after_ns=start + 2_300_000_000,
+                    reopen_at_ns=start + 1205_000_000_000,
+                    overrides={"exit_deadline_ns": start + 2_000_000_000},
+                )
+                self.assertEqual(strategy.stop_calls, [])
+                self.assertEqual(
+                    strategy.notice_times,
+                    [
+                        start + ns
+                        for ns in (2_300_000_000, 602_300_000_000, 1202_300_000_000)
+                    ]
+                    if bound
+                    else [],
+                )
+                cancels = [
+                    r for r in strategy.trace if r["event"] == "cancel_requested"
+                ]
+                self.assertEqual(cancels[0]["now_ns"], start + 1205_000_000_000)
+                self.assertFalse(strategy.callback_faults)
+
+    def test_frozen_hold_reason_survives_resumption(self):
+        start = simulation.BASE_NS
+        faults = []
+        strategy = run_strategy(
+            ledger=None,
+            faults=faults,
+            bids=("10",) * 12,
+            halt_after_ns=start + 3_000_000_000,
+            reopen_at_ns=start + 5_000_000_000,
+        )
+        self.assertTrue(strategy.faulted)
+        self.assertGreater(strategy.quantity, 0)
+        self.assertIn("held_halted", strategy.flags)
+        self.assertEqual(faults, ["held_halted"])
+
+    def _halt_state_series(
+        self, steps, quote_offsets_ns=(0, 1_000_000_000, 2_000_000_000, 3_000_000_000)
+    ):
+        """What the instance would do about orders after each scripted snapshot and each quote.
+
+        ``steps`` are ``(deliver_ms, halted, event_ms, init_ms, valid_until_ms)`` offsets from the fixture
+        start. The engine delivers each snapshot at ``deliver_ms``; the strategy then rewrites its halt flag
+        and stamps, as a producer whose clock differs from the host's would. ``valid_until_ms`` None keeps the
+        fixture's. No order is ever sent, so only the halt state machine is observed."""
+        start = simulation.BASE_NS
+        ms = 1_000_000
+        script = {
+            start + deliver * ms: (halted, start + event * ms, start + init * ms, valid)
+            for deliver, halted, event, init, valid in steps
+        }
+        series = []
+
+        class Scripted(families.GapPremarketStrategy):
+            def entry_condition(self, snapshot):
+                return False
+
+            def on_data(self, data):
+                value = getattr(data, "data", data)
+                if (
+                    not isinstance(value, contracts.FactorSnapshot)
+                    or value.ts_init not in script
+                ):
+                    return super().on_data(value)
+                halted, event, init, valid = script[value.ts_init]
+                before = len(self.trace)
+                super().on_data(
+                    replace(
+                        value,
+                        halted=halted,
+                        ts_event=event,
+                        ts_init=init,
+                        valid_until_ns=value.valid_until_ns
+                        if valid is None
+                        else start + valid * ms,
+                    )
+                )
+                now = self.clock.timestamp_ns()
+                refused = tuple(
+                    row["reason"]
+                    for row in self.trace[before:]
+                    if row["event"] == "snapshot_refused"
+                )
+                series.append(
+                    ("data", (now - start) // ms, self._halt_reason(now), refused)
+                )
+
+            def on_quote(self, quote):
+                super().on_quote(quote)
+                now = self.clock.timestamp_ns()
+                series.append(
+                    ("quote", (now - start) // ms, self._halt_reason(now), ())
+                )
+
+        strategy = run_strategy(
+            ledger=None,
+            faults=[],
+            strategy_type=Scripted,
+            bids=("10",) * len(quote_offsets_ns),
+            quote_offsets_ns=quote_offsets_ns,
+            snapshot_steps=tuple(
+                (deliver * ms, halted) for deliver, halted, _, _, _ in steps
+            ),
+        )
+        self.assertFalse(strategy.callback_faults)
+        return series
+
+    def test_snapshot_halt_fence_keeps_event_and_init_stamps_apart(self):
+        held, free = "held_halted", None
+        rows = {
+            # A halt whose event stamp leads: a resumption with an older event stamp is refused even though its init stamp is newer.
+            "event stamp": (
+                (
+                    (300, True, 700, 700, None),
+                    (800, False, 500, 800, None),
+                    (900, False, 800, 900, None),
+                ),
+                [
+                    ("quote", 0, free, ()),
+                    ("data", 300, held, ("future_availability",)),
+                    ("data", 800, held, ("out_of_order",)),
+                    ("data", 900, free, ()),
+                    ("quote", 1000, free, ()),
+                    ("quote", 2000, free, ()),
+                    ("quote", 3000, free, ()),
+                ],
+            ),
+            # A halt whose init stamp leads while its event stamp does not: an older init stamp is refused, a newer one resumes.
+            "init stamp": (
+                (
+                    (300, True, 100, 700, None),
+                    (500, False, 200, 500, None),
+                    (800, False, 200, 800, None),
+                ),
+                [
+                    ("quote", 0, free, ()),
+                    ("data", 300, held, ("future_availability",)),
+                    ("data", 500, held, ("out_of_order",)),
+                    ("data", 800, free, ()),
+                    ("quote", 1000, free, ()),
+                    ("quote", 2000, free, ()),
+                    ("quote", 3000, free, ()),
+                ],
+            ),
+            # A late, older halt cannot lower the fence that a newer halt set.
+            "stale halt": (
+                (
+                    (300, True, 700, 700, None),
+                    (400, True, 50, 50, None),
+                    (500, False, 500, 500, None),
+                    (800, False, 800, 800, None),
+                ),
+                [
+                    ("quote", 0, free, ()),
+                    ("data", 300, held, ("future_availability",)),
+                    ("data", 400, held, ()),
+                    ("data", 500, held, ("out_of_order",)),
+                    ("data", 800, free, ()),
+                    ("quote", 1000, free, ()),
+                    ("quote", 2000, free, ()),
+                    ("quote", 3000, free, ()),
+                ],
+            ),
+        }
+        for label, (steps, expected) in rows.items():
+            with self.subTest(label):
+                self.assertEqual(self._halt_state_series(steps), expected)
+
+    def test_known_snapshot_fence_orders_the_event_stamp_of_each_resumption(self):
+        free = None
+        steps = (
+            (300, False, 250, 300, None),  # accepted: the fence becomes (250, 300)
+            (
+                400,
+                False,
+                200,
+                400,
+                None,
+            ),  # an older observation with a newer init stamp is refused
+            (
+                500,
+                False,
+                280,
+                500,
+                None,
+            ),  # newer in both dimensions: accepted, fence (280, 500)
+            (
+                600,
+                False,
+                300,
+                450,
+                None,
+            ),  # init older than the fence: refused (the stored snapshot's own ordering says the same)
+        )
+        self.assertEqual(
+            self._halt_state_series(steps),
+            [
+                ("quote", 0, free, ()),
+                ("data", 300, free, ()),
+                ("data", 400, free, ("out_of_order",)),
+                ("data", 500, free, ()),
+                ("data", 600, free, ("out_of_order",)),
+                ("quote", 1000, free, ()),
+                ("quote", 2000, free, ()),
+                ("quote", 3000, free, ()),
+            ],
+        )
+
+    def test_available_snapshot_resumption_accepts_equal_fence_stamps(self):
+        # A leading halt latches raw stamps but cannot install future factors.
+        # Its later available resumption can equal either fence dimension
+        # without conflicting with an already installed snapshot revision.
+        for event_ms, init_ms in ((600, 700), (600, 750), (650, 700)):
+            with self.subTest(event_ms=event_ms, init_ms=init_ms):
+                self.assertEqual(
+                    self._halt_state_series(
+                        (
+                            (300, True, 600, 700, None),
+                            (800, False, event_ms, init_ms, None),
+                        )
+                    ),
+                    [
+                        ("quote", 0, None, ()),
+                        ("data", 300, "held_halted", ("future_availability",)),
+                        ("data", 800, None, ()),
+                        ("quote", 1000, None, ()),
+                        ("quote", 2000, None, ()),
+                        ("quote", 3000, None, ()),
+                    ],
+                )
+
+    def test_reason_change_inside_a_hold_notifies_again(self):
+        start = simulation.BASE_NS
+        notices = []
+
+        class ObserveHold(families.GapPremarketStrategy):
+            def on_data(self, data):
+                value = getattr(data, "data", data)
+                if isinstance(value, contracts.FactorSnapshot):
+                    value = replace(value, valid_until_ns=start + 2_500_000_000)
+                return super().on_data(value)
+
+            def _record(self, event, **fields):
+                super()._record(event, **fields)
+                if event == "halt_hold_notice":
+                    notices.append(
+                        (self.clock.timestamp_ns() - start, fields["reason"])
+                    )
+
+        faults = []
+        run_strategy(
+            ledger=None,
+            faults=faults,
+            notice_sink=faults.append,
+            strategy_type=ObserveHold,
+            bids=("10", "10", "9", "8", "8", "8"),
+            quote_offsets_ns=(
+                0,
+                1_000_000_000,
+                2_000_000_000,
+                2_200_000_000,
+                602_500_000_000,
+                1202_500_000_000,
+            ),
+            status_events=(
+                (2_300_000_000, 2_300_000_000, "HALT", {}),
+                (3_000_000_000, 3_000_000_000, "TRADING", {}),
+            ),
+            overrides={"exit_deadline_ns": start + 2_000_000_000},
+        )
+        # A native halt holds the exit; the producer state lapses; the native resumption leaves the hold in place for a different reason,
+        # which is worth saying even though the first notice is not ten minutes old. The alerts follow each notice.
+        self.assertEqual(
+            notices,
+            [
+                (2_300_000_000, "held_halted"),
+                (3_000_000_000, "held_halt_state_unknown"),
+                (603_000_000_000, "held_halt_state_unknown"),
+            ],
+        )
+        self.assertEqual(
+            faults,
+            ["held_halted", "held_halt_state_unknown", "held_halt_state_unknown"],
+        )
+
+    def test_halted_is_an_explicit_boolean_or_unknown(self):
+        snapshot = simulation.fixture_snapshot()
+        for bad in ("false", "yes", 0, 1, "", [], {}):
+            with self.subTest(halted=bad), self.assertRaises(ValueError):
+                replace(snapshot, halted=bad)
+        for good in (True, False, None):
+            self.assertIs(replace(snapshot, halted=good).halted, good)
+
+    def test_halt_state_validity_is_the_latest_snapshots(self):
+        # A newer snapshot that is valid for less time than its predecessor shortens the state's validity.
+        series = self._halt_state_series(((300, False, 300, 300, 900),))
+        self.assertEqual(
+            series,
+            [
+                ("quote", 0, None, ()),
+                ("data", 300, None, ()),
+                ("quote", 1000, "held_halt_state_unknown", ()),
+                ("quote", 2000, "held_halt_state_unknown", ()),
+                ("quote", 3000, "held_halt_state_unknown", ()),
+            ],
+        )
+
+    def test_second_halt_after_a_resumption_notifies_again_and_the_flag_clears(self):
+        start = simulation.BASE_NS
+        notices, flags_at = [], []
+
+        class ObserveHold(families.GapPremarketStrategy):
+            def _record(self, event, **fields):
+                super()._record(event, **fields)
+                if event == "halt_hold_notice":
+                    notices.append(self.clock.timestamp_ns() - start)
+
+            def on_quote(self, quote):
+                super().on_quote(quote)
+                flags_at.append(
+                    (self.clock.timestamp_ns() - start, "held_halted" in self.flags)
+                )
+
+        faults = []
+        strategy = run_strategy(
+            ledger=None,
+            faults=faults,
+            notice_sink=faults.append,
+            strategy_type=ObserveHold,
+            bids=("10", "10", "9", "8", "8", "8", "8"),
+            quote_offsets_ns=(
+                0,
+                1_000_000_000,
+                2_000_000_000,
+                2_200_000_000,
+                3_500_000_000,
+                602_500_000_000,
+                1202_500_000_000,
+            ),
+            snapshot_steps=(
+                (2_300_000_000, True),
+                (3_000_000_000, False),
+                (4_000_000_000, True),
+            ),
+            overrides={"exit_deadline_ns": start + 2_000_000_000},
+        )
+        # The first halt notifies at once; the resumption ends that hold; the second halt, well inside ten minutes of the first, notifies at once
+        # again and its own ten-minute alert follows. Only the second hold's alert is live.
+        self.assertEqual(
+            [ns for ns in notices], [2_300_000_000, 4_000_000_000, 604_000_000_000]
+        )
+        self.assertEqual(faults, ["held_halted"] * 3)
+        self.assertEqual(
+            flags_at,
+            [
+                (0, False),
+                (1_000_000_000, False),
+                (2_000_000_000, False),
+                (2_200_000_000, False),
+                (3_500_000_000, False),
+                (602_500_000_000, True),
+                (1202_500_000_000, True),
+            ],
+        )
+        self.assertEqual(strategy.sequence, 2)
+        self.assertEqual(strategy.pending_role, "exit")
+        self.assertFalse(
+            [row for row in strategy.trace if row["event"] == "cancel_requested"]
+        )
+        self.assertFalse(strategy.faulted)
+        self.assertFalse(strategy.callback_faults)
+
+    def test_exit_lost_inside_a_throttled_halt_hold_freezes_once_for_handoff(self):
+        start = simulation.BASE_NS
+        lost = []
+
+        class LoseExit(families.GapPremarketStrategy):
+            def _drive(self):
+                if (
+                    not lost
+                    and self.clock.timestamp_ns() >= start + 5_000_000_000
+                    and self.pending_role == "exit"
+                ):
+                    # The venue cancels the held exit during the halt, inside the ten minutes since the notice.
+                    lost.append(self.clock.timestamp_ns() - start)
+                    self.on_order_canceled(
+                        SimpleNamespace(client_order_id=self.pending.client_order_id)
+                    )
+                return super()._drive()
+
+        faults = []
+        strategy = run_strategy(
+            ledger=None,
+            faults=faults,
+            notice_sink=faults.append,
+            strategy_type=LoseExit,
+            bids=("10", "10", "9", "8", "8", "8", "8", "8"),
+            quote_offsets_ns=(
+                0,
+                1_000_000_000,
+                2_000_000_000,
+                2_200_000_000,
+                5_000_000_000,
+                6_000_000_000,
+                7_000_000_000,
+                8_000_000_000,
+            ),
+            halt_after_ns=start + 2_300_000_000,
+            overrides={"exit_deadline_ns": start + 2_000_000_000},
+        )
+        self.assertEqual(len(lost), 1)
+        freezes = [row for row in strategy.trace if row["event"] == "safety_freeze"]
+        self.assertEqual(
+            [(row["now_ns"] - start, row["reason"]) for row in freezes],
+            [(5_000_000_000, "held_halted")],
+        )
+        self.assertTrue(strategy.faulted)
+        self.assertGreater(strategy.quantity, 0)
+        self.assertEqual(faults, ["held_halted", "held_halted"])
+        self.assertFalse(strategy.callback_faults)
+
+    def test_unknown_halt_state_cancels_a_resting_entry_and_never_a_held_exit(self):
+        # Pins the current reading of F-1: an entry is cancelled once its halt state lapses (nothing may fill into a state the instance cannot
+        # see), a held exit is not (test_expired_halt_state_keeps_working_exit_and_notifies). Flip both assertions if the ruling is the reverse.
+        start = simulation.BASE_NS
+        calls = []
+
+        class Expiring(families.GapPremarketStrategy):
+            def on_data(self, data):
+                value = getattr(data, "data", data)
+                if isinstance(value, contracts.FactorSnapshot):
+                    value = replace(value, valid_until_ns=start + 500_000_000)
+                return super().on_data(value)
+
+        with patch.object(
+            families.FamilyStrategy,
+            "cancel_order",
+            new=lambda self, client_id: calls.append(
+                (self.clock.timestamp_ns() - start, str(client_id))
+            ),
+        ):
+            strategy = run_strategy(
+                ledger=None,
+                faults=[],
+                strategy_type=Expiring,
+                bids=("10",) * 4,
+                quote_offsets_ns=(0, 600_000_000, 1_200_000_000, 1_800_000_000),
+                overrides={"entry_timeout_ns": 10_000_000_000},
+            )
+        self.assertEqual([ns for ns, _ in calls], [600_000_000])
+        self.assertEqual(calls[0][1], strategy.client_id_prefix + "0000001")
+        self.assertEqual(
+            [
+                (row["now_ns"] - start, row["role"])
+                for row in strategy.trace
+                if row["event"] == "cancel_requested"
+            ],
+            [(600_000_000, "entry")],
+        )
+        self.assertFalse(strategy.callback_faults)
+
+    def test_submit_fence_refuses_every_order_role_while_a_halt_is_known(self):
+        start = simulation.BASE_NS
+        for carrier in ("native status", "snapshot"):
+            for side in (families.OrderSide.BUY, families.OrderSide.SELL):
+
+                class DirectSubmit(families.GapPremarketStrategy):
+                    attempted = False
+
+                    def _drive(self):
+                        # Isolate the final submit fence from the drive-level refusal.
+                        return
+
+                    def on_quote(self, quote, carrier=carrier, side=side):
+                        if (
+                            self.attempted
+                            or self.clock.timestamp_ns() < start + 1_000_000_000
+                        ):
+                            return
+                        self.attempted = True
+                        if carrier == "snapshot":
+                            self.snapshot_halted = True
+                        else:
+                            self.instrument_status_halted = True
+                        self._submit(
+                            side,
+                            contracts.decimal("1"),
+                            contracts.decimal("10"),
+                            "entry" if side == families.OrderSide.BUY else "exit",
+                            "time_exit",
+                        )
+
+                with self.subTest(carrier=carrier, side=str(side)):
+                    strategy = run_strategy(
+                        ledger=None,
+                        faults=[],
+                        strategy_type=DirectSubmit,
+                        bids=("10",) * 4,
+                    )
+                    self.assertEqual(strategy.sequence, 0)
+                    self.assertFalse(
+                        [row for row in strategy.trace if row["event"] == "submit"]
+                    )
+                    self.assertEqual(
+                        [
+                            (row["reason"], row["role"])
+                            for row in strategy.trace
+                            if row["event"] == "order_refused"
+                        ],
+                        [
+                            (
+                                "held_halted",
+                                "entry" if side == families.OrderSide.BUY else "exit",
+                            )
+                        ],
+                    )
+                    self.assertFalse(strategy.faulted)
+                    self.assertFalse(strategy.callback_faults)
+
+    def test_expiry_freezes_a_held_exit_only_for_its_own_order_inside_a_halt(self):
+        start = simulation.BASE_NS
+        for scenario in ("own order, no halt", "another order, halted"):
+            injected = []
+
+            class Expire(families.GapPremarketStrategy):
+                def _drive(self, scenario=scenario, injected=injected):
+                    if (
+                        not injected
+                        and self.clock.timestamp_ns() >= start + 2_500_000_000
+                        and self.pending_role == "exit"
+                    ):
+                        injected.append(self.pending.client_order_id)
+                        other = "t22-not-the-pending-order-0000001"
+                        owned = self.pending.client_order_id
+                        self.on_order_expired(
+                            SimpleNamespace(
+                                client_order_id=owned
+                                if scenario == "own order, no halt"
+                                else other
+                            )
+                        )
+                    return super()._drive()
+
+            with self.subTest(scenario):
+                faults = []
+                strategy = run_strategy(
+                    ledger=None,
+                    faults=faults,
+                    notice_sink=faults.append,
+                    strategy_type=Expire,
+                    bids=("10", "10", "9", "8", "8", "8", "8"),
+                    quote_offsets_ns=(
+                        0,
+                        1_000_000_000,
+                        2_000_000_000,
+                        2_200_000_000,
+                        3_000_000_000,
+                        4_000_000_000,
+                        5_000_000_000,
+                    ),
+                    halt_after_ns=None
+                    if scenario == "own order, no halt"
+                    else start + 2_300_000_000,
+                    overrides={"exit_deadline_ns": start + 2_000_000_000},
+                )
+                self.assertEqual(len(injected), 1)
+                self.assertFalse(strategy.faulted)
+                self.assertNotIn("halted_day_expiry_requires_handoff", strategy.flags)
+                self.assertNotIn("halted_day_expiry_requires_handoff", faults)
+                self.assertFalse(strategy.callback_faults)
+
+    def test_unknown_state_blocks_replacement_after_native_cancel_confirmation(self):
+        start = simulation.BASE_NS
+        for state in ("missing", "expired"):
+
+            class CancelBeforeUnknown(families.GapPremarketStrategy):
+                requested_id = None
+                terminal_ids = []
+                wire_commands = []
+
+                def on_data(self, data, state=state):
+                    value = getattr(data, "data", data)
+                    if isinstance(value, contracts.FactorSnapshot):
+                        if state == "expired":
+                            value = replace(value, valid_until_ns=start + 2_300_000_000)
+                        elif value.ts_event >= start:
+                            value = replace(value, halted=None)
+                    return super().on_data(value)
+
+                def on_quote(self, quote):
+                    super().on_quote(quote)
+                    if self.clock.timestamp_ns() == start + 2_200_000_000:
+                        self.requested_id = str(self.pending.client_order_id)
+                        self.cancel_order(self.pending.client_order_id)
+
+                def cancel_order(self, client_order_id):
+                    self.wire_commands.append((self.clock.timestamp_ns(), "cancel"))
+                    return super().cancel_order(client_order_id)
+
+                def submit_order(self, order):
+                    self.wire_commands.append((self.clock.timestamp_ns(), "submit"))
+                    return super().submit_order(order)
+
+                def on_order_canceled(self, event):
+                    self.terminal_ids.append(str(event.client_order_id))
+                    return super().on_order_canceled(event)
+
+            with self.subTest(state=state):
+                strategy = run_strategy(
+                    ledger=None,
+                    faults=[],
+                    strategy_type=CancelBeforeUnknown,
+                    bids=("10", "10", "9", "8", "8", "8"),
+                    quote_offsets_ns=(
+                        0,
+                        1_000_000_000,
+                        2_000_000_000,
+                        2_200_000_000,
+                        2_400_000_000,
+                        3_000_000_000,
+                    ),
+                    advance_to_ns=start + 2_300_000_000 if state == "missing" else None,
+                    overrides={
+                        "exit_deadline_ns": start + 2_000_000_000,
+                        "exit_timeout_ns": 10_000_000_000,
+                    },
+                )
+                self.assertEqual(strategy.terminal_ids, [strategy.requested_id])
+                self.assertEqual(strategy.sequence, 2)
+                self.assertIsNone(strategy.pending)
+                self.assertGreater(strategy.quantity, 0)
+                self.assertFalse(
+                    [
+                        row
+                        for row in strategy.wire_commands
+                        if row[0] >= start + 2_300_000_000
+                    ]
+                )
+                self.assertIn("held_halt_state_unknown", strategy.flags)
+                self.assertFalse(strategy.callback_faults)
+
+    def test_missing_and_expired_state_cancel_pending_native_entry(self):
+        start = simulation.BASE_NS
+        for state in ("missing", "expired"):
+
+            class UnknownProducer(families.GapPremarketStrategy):
+                wire_cancels = []
+
+                def cancel_order(self, client_order_id):
+                    self.wire_cancels.append(str(client_order_id))
+                    return super().cancel_order(client_order_id)
+
+                def on_data(self, data, state=state):
+                    value = getattr(data, "data", data)
+                    if isinstance(value, contracts.FactorSnapshot):
+                        if state == "expired":
+                            value = replace(value, valid_until_ns=start + 2_000_000_000)
+                        elif value.ts_event >= start:
+                            value = replace(value, halted=None)
+                    return super().on_data(value)
+
+            with self.subTest(state=state):
+                strategy = run_strategy(
+                    ledger=None,
+                    faults=[],
+                    strategy_type=UnknownProducer,
+                    bids=("10", "11", "11", "11", "11", "11"),
+                    advance_to_ns=start + 300_000_000 if state == "missing" else None,
+                    overrides={
+                        "entry_timeout_ns": 10_000_000_000,
+                        "exit_deadline_ns": start + 20_000_000_000,
+                    },
+                )
+                cancels = [
+                    row for row in strategy.trace if row["event"] == "cancel_requested"
+                ]
+                self.assertEqual(
+                    [row["now_ns"] for row in cancels],
+                    [start + (300_000_000 if state == "missing" else 3_000_000_000)],
+                )
+                self.assertEqual(
+                    strategy.wire_cancels, [strategy.client_id_prefix + "0000001"]
+                )
+                self.assertIsNone(strategy.pending)
+                self.assertEqual(strategy.quantity, 0)
+                self.assertFalse(strategy.faulted)
+                self.assertFalse(strategy.callback_faults)
+
+    def test_real_ledger_restart_rearms_original_notice_deadline_and_coalesces_overdue(
+        self,
+    ):
+        start = simulation.BASE_NS
+        for restart_offset in (100_000_000_000, 2000_000_000_000):
+            with (
+                self.subTest(restart_offset=restart_offset),
+                tempfile.TemporaryDirectory() as directory,
+            ):
+                path = Path(directory) / "ledger.sqlite3"
+                ledger = safety.Ledger(path)
+                first = run_strategy(
+                    ledger=ledger,
+                    faults=[],
+                    bids=("10", "10", "9", "8", "8"),
+                    halt_after_ns=start + 3_000_000_000,
+                    overrides={"exit_deadline_ns": start + 2_000_000_000},
+                )
+                original_id = str(first.pending.client_order_id)
+                self.assertGreater(first.quantity, 0)
+                # Seed the journal's position view from the native synthetic
+                # fill. This is a persistence fixture, not a broker writer.
+                with ledger._transaction():
+                    ledger.db.execute(
+                        "INSERT INTO positions VALUES (?,?,?)",
+                        (
+                            str(first.instrument_id.symbol),
+                            str(first.quantity),
+                            str(first.quantity * first.entry_price),
+                        ),
+                    )
+                ledger.close()
+                reopened = safety.Ledger(path)
+                try:
+                    due = (
+                        start + 603_000_000_000
+                        if restart_offset < 603_000_000_000
+                        else start + restart_offset
+                    )
+                    next_due = due + 600_000_000_000
+                    restart_faults = []
+                    restarted = run_strategy(
+                        ledger=reopened,
+                        faults=restart_faults,
+                        bids=("8",) * 3,
+                        start_ns=start + restart_offset,
+                        initial_snapshot_age_ns=0,
+                        quote_offsets_ns=(
+                            0,
+                            due - start - restart_offset + 100_000_000,
+                            next_due - start - restart_offset + 100_000_000,
+                        ),
+                        overrides={"exit_deadline_ns": start + 2_000_000_000},
+                    )
+                    notices = [
+                        row
+                        for row in restarted.trace
+                        if row["event"] == "halt_hold_notice"
+                    ]
+                    self.assertEqual(
+                        [row["now_ns"] for row in notices], [due, next_due]
+                    )
+                    self.assertTrue(
+                        all(row["client_order_id"] == original_id for row in notices)
+                    )
+                    self.assertTrue(restarted.faulted)
+                    startup_faults = [
+                        "startup_held_notice_requires_reconciliation",
+                        "startup_position_requires_reconciliation",
+                    ]
+                    if restart_offset >= 603_000_000_000:
+                        # An overdue first delivery freezes the new actor
+                        # before startup reconciliation, then sets the durable
+                        # ledger halt. Later routine notices cannot repeat it.
+                        startup_faults = [
+                            "held_halted",
+                            "startup_held_notice_requires_reconciliation",
+                            "startup_ledger_halted_requires_reconciliation",
+                            "startup_position_requires_reconciliation",
+                        ]
+                    self.assertEqual(restart_faults, startup_faults)
+                    self.assertEqual(restarted.quantity, 0)  # No implicit adoption.
+                    self.assertFalse(
+                        [
+                            row
+                            for row in restarted.trace
+                            if row["event"] in ("submit", "cancel_requested")
+                        ]
+                    )
+                    self.assertFalse(restarted.callback_faults)
+                finally:
+                    reopened.close()
+
+    def test_omitted_halt_field_remains_unknown_at_startup_and_while_held(self):
+        start = simulation.BASE_NS
+        for delivery in ("startup", "held"):
+
+            class OmittedHalt(families.GapPremarketStrategy):
+                def on_data(self, data, delivery=delivery):
+                    value = getattr(data, "data", data)
+                    if isinstance(value, contracts.FactorSnapshot) and (
+                        delivery == "startup" or value.ts_event >= start
+                    ):
+                        payload = value.as_dict()
+                        payload.pop("halted")
+                        value = contracts.FactorSnapshot.from_json(payload)
+                    return super().on_data(value)
+
+            faults = []
+            with self.subTest(delivery=delivery):
+                strategy = run_strategy(
+                    ledger=None,
+                    faults=faults,
+                    strategy_type=OmittedHalt,
+                    bids=("10",) * 6,
+                    advance_to_ns=start + 1_500_000_000 if delivery == "held" else None,
+                    overrides={"exit_deadline_ns": start + 2_000_000_000},
+                )
+                self.assertEqual(
+                    [row["side"] for row in strategy.trace if row["event"] == "submit"],
+                    ["BUY"] if delivery == "held" else [],
+                )
+                if delivery == "held":
+                    self.assertIn("held_halt_state_unknown", strategy.flags)
+                    self.assertIn("held_halt_state_unknown", faults)
+                    self.assertGreater(strategy.quantity, 0)
+                self.assertFalse(strategy.callback_faults)
+
+    def test_clock_leading_halted_snapshot_cancels_at_delivery(self):
+        start = simulation.BASE_NS
+        for lead in (1_000_000, 400_000_000):
+            with self.subTest(lead_ns=lead), tempfile.TemporaryDirectory() as directory:
+                observed = []
+
+                class LeadingSnapshot(families.GapPremarketStrategy):
+                    def on_data(self, data, lead=lead, observed=observed):
+                        value = getattr(data, "data", data)
+                        if isinstance(value, contracts.FactorSnapshot) and value.halted:
+                            value = replace(value, ts_init=value.ts_init + lead)
+                        result = super().on_data(value)
+                        if isinstance(value, contracts.FactorSnapshot) and value.halted:
+                            observed.append(
+                                (
+                                    self.clock.timestamp_ns(),
+                                    self.snapshot.ts_init,
+                                    self.snapshot_halted,
+                                )
+                            )
+                        return result
+
+                strategy = run_strategy(
+                    ledger=safety.Ledger(Path(directory) / "ledger.json"),
+                    faults=[],
+                    strategy_type=LeadingSnapshot,
+                    bids=("10", "10.04", "10.04", "10.04", *("9.99",) * 12),
+                    quote_offsets_ns=(
+                        0,
+                        200_000_000,
+                        400_000_000,
+                        500_000_000,
+                        *(600_000_000 + i * 100_000_000 for i in range(12)),
+                    ),
+                    halt_after_ns=start + 300_000_000,
+                    reopen_at_ns=start + 500_000_000,
+                    overrides={"entry_timeout_ns": 10_000_000_000},
+                )
+                cancels = [
+                    row for row in strategy.trace if row["event"] == "cancel_requested"
+                ]
+                self.assertEqual(
+                    [row["now_ns"] for row in cancels], [start + 300_000_000]
+                )
+                self.assertEqual(strategy.quantity, 0)
+                self.assertIsNone(strategy.pending)
+                self.assertFalse(strategy.callback_faults)
+                self.assertEqual(
+                    observed, [(start + 300_000_000, start - 600_000_000_000, True)]
+                )
+
+    def test_expired_halt_state_blocks_exit_and_notifies(self):
+        start = simulation.BASE_NS
+
+        class ExpiringState(families.GapPremarketStrategy):
+            def on_data(self, data):
+                value = getattr(data, "data", data)
+                if isinstance(value, contracts.FactorSnapshot):
+                    value = replace(value, valid_until_ns=start + 1_500_000_000)
+                return super().on_data(value)
+
+        faults = []
+        with tempfile.TemporaryDirectory() as directory:
+            strategy = run_strategy(
+                ledger=safety.Ledger(Path(directory) / "ledger.json"),
+                faults=faults,
+                strategy_type=ExpiringState,
+                bids=("10",) * 6,
+                overrides={"exit_deadline_ns": start + 2_000_000_000},
+            )
+        submits = [row for row in strategy.trace if row["event"] == "submit"]
+        self.assertEqual([row["side"] for row in submits], ["BUY"])
+        self.assertGreater(strategy.quantity, 0)
+        self.assertIn("held_halt_state_unknown", strategy.flags)
+        self.assertIn("held_halt_state_unknown", faults)
+        self.assertFalse(strategy.callback_faults)
+
+    def test_raw_native_halt_stamps_fence_older_available_resumption(self):
+        from nautilus_trader.model import InstrumentStatus, MarketStatusAction
+
+        start = simulation.BASE_NS
+        for stamp in ("event", "init"):
+            for resume in (False, True):
+
+                class LeadingStatus(families.GapPremarketStrategy):
+                    def entry_condition(self, snapshot):
+                        return self.clock.timestamp_ns() >= start + 600_000_000
+
+                    def on_instrument_status(self, status, stamp=stamp):
+                        if status.action == MarketStatusAction.HALT:
+                            status = InstrumentStatus(
+                                status.instrument_id,
+                                status.action,
+                                start + 700_000_000
+                                if stamp == "event"
+                                else status.ts_event,
+                                start + 700_000_000
+                                if stamp == "init"
+                                else status.ts_init,
+                            )
+                        return super().on_instrument_status(status)
+
+                statuses = [
+                    (300_000_000, 300_000_000, "HALT", {}),
+                    (500_000_000, 500_000_000, "TRADING", {}),
+                ]
+                if resume:
+                    statuses.append((800_000_000, 800_000_000, "TRADING", {}))
+                with self.subTest(stamp=stamp, resume=resume):
+                    strategy = run_strategy(
+                        ledger=None,
+                        faults=[],
+                        strategy_type=LeadingStatus,
+                        bids=("10",) * 6,
+                        quote_offsets_ns=(
+                            0,
+                            200_000_000,
+                            600_000_000,
+                            800_000_000,
+                            1_000_000_000,
+                            1_200_000_000,
+                        ),
+                        status_events=statuses,
+                    )
+                    buys = [
+                        row
+                        for row in strategy.trace
+                        if row["event"] == "submit" and row["side"] == "BUY"
+                    ]
+                    self.assertEqual(len(buys), int(resume))
+                    if resume:
+                        self.assertGreaterEqual(buys[0]["now_ns"], start + 800_000_000)
+                    self.assertIn(
+                        "out_of_order",
+                        [
+                            row["reason"]
+                            for row in strategy.trace
+                            if row["event"] == "instrument_status_refused"
+                        ],
+                    )
+                    self.assertFalse(strategy.callback_faults)
+
+    def test_raw_snapshot_halt_stamps_fence_older_available_resumption(self):
+        start = simulation.BASE_NS
+
+        class LeadingSnapshot(families.GapPremarketStrategy):
+            def entry_condition(self, snapshot):
+                return self.clock.timestamp_ns() >= start + 600_000_000
+
+            def on_data(self, data):
+                value = getattr(data, "data", data)
+                if isinstance(value, contracts.FactorSnapshot) and value.halted:
+                    value = replace(
+                        value, ts_event=start + 700_000_000, ts_init=start + 700_000_000
+                    )
+                return super().on_data(value)
+
+        for resume in (False, True):
+            with self.subTest(resume=resume):
+                strategy = run_strategy(
+                    ledger=None,
+                    faults=[],
+                    strategy_type=LeadingSnapshot,
+                    bids=("10",) * 6,
+                    quote_offsets_ns=(
+                        0,
+                        200_000_000,
+                        600_000_000,
+                        800_000_000,
+                        1_000_000_000,
+                        1_200_000_000,
+                    ),
+                    halt_after_ns=start + 300_000_000,
+                    reopen_at_ns=start + 500_000_000,
+                    advance_to_ns=start + 800_000_000 if resume else None,
+                    overrides={"preset": "aggressive-v1"},
+                )
+                buys = [
+                    row
+                    for row in strategy.trace
+                    if row["event"] == "submit" and row["side"] == "BUY"
+                ]
+                self.assertEqual(len(buys), int(resume))
+                if resume:
+                    self.assertGreaterEqual(buys[0]["now_ns"], start + 800_000_000)
+                self.assertFalse(strategy.callback_faults)
+
+    def test_submit_fence_blocks_every_order_role_with_expired_halt_state(self):
+        start = simulation.BASE_NS
+        for state, side in (
+            (state, side)
+            for state in ("missing", "expired")
+            for side in (families.OrderSide.BUY, families.OrderSide.SELL)
+        ):
+
+            class DirectSubmit(families.GapPremarketStrategy):
+                attempted = False
+
+                def on_data(self, data, state=state):
+                    value = getattr(data, "data", data)
+                    if isinstance(value, contracts.FactorSnapshot):
+                        if state == "missing":
+                            return
+                        value = replace(value, valid_until_ns=start + 1_500_000_000)
+                    return super().on_data(value)
+
+                def _drive(self):
+                    # Isolate the final submit fence from watchdog/drive
+                    # refusal, while retaining native order dispatch.
+                    if self.clock.timestamp_ns() < start + 1_500_000_000:
+                        return super()._drive()
+
+                def on_quote(self, quote, side=side):
+                    if self.clock.timestamp_ns() < start + 2_000_000_000:
+                        return super().on_quote(quote)
+                    if not self.attempted:
+                        self.attempted = True
+                        self._submit(
+                            side,
+                            contracts.decimal("1"),
+                            contracts.decimal("10"),
+                            "entry" if side == families.OrderSide.BUY else "exit",
+                            "time_exit",
+                        )
+
+            with self.subTest(state=state, side=str(side)):
+                strategy = run_strategy(
+                    ledger=None,
+                    faults=[],
+                    strategy_type=DirectSubmit,
+                    bids=("10",) * 6,
+                    status_events=((1_500_000_000, 1_500_000_000, "TRADING", {}),),
+                    overrides={"exit_deadline_ns": start + 7_000_000_000},
+                )
+                self.assertEqual(strategy.sequence, int(state == "expired"))
+                self.assertEqual(
+                    len([row for row in strategy.trace if row["event"] == "submit"]),
+                    int(state == "expired"),
+                )
+                self.assertFalse(strategy.callback_faults)
+
+    def test_working_exit_is_flagged_and_notified_every_ten_minutes(self):
+        start = simulation.BASE_NS
+        notices = []
+
+        class ObserveHold(families.GapPremarketStrategy):
+            def _record(self, event, **fields):
+                super()._record(event, **fields)
+                if event == "halt_hold_notice":
+                    notices.append(
+                        (
+                            self.clock.timestamp_ns(),
+                            self.pending.client_order_id,
+                            self.quantity,
+                            frozenset(self.flags),
+                        )
+                    )
+
+        faults = []
+        strategy = run_strategy(
+            ledger=None,
+            faults=faults,
+            notice_sink=faults.append,
+            strategy_type=ObserveHold,
+            bids=("10", "10", "9", "8", "8", "8"),
+            quote_offsets_ns=(
+                0,
+                1_000_000_000,
+                2_000_000_000,
+                2_200_000_000,
+                602_500_000_000,
+                1202_500_000_000,
+            ),
+            halt_after_ns=start + 2_300_000_000,
+            overrides={"exit_deadline_ns": start + 2_000_000_000},
+        )
+        self.assertEqual(
+            [row[0] for row in notices],
+            [start + ns for ns in (2_300_000_000, 602_300_000_000, 1202_300_000_000)],
+        )
+        self.assertEqual(faults, ["held_halted"] * 3)
+        self.assertTrue(
+            all(row[1] == strategy.pending.client_order_id for row in notices)
+        )
+        self.assertTrue(all(row[2] > 0 and "held_halted" in row[3] for row in notices))
+        self.assertEqual(strategy.sequence, 2)
+        self.assertEqual(strategy.pending_role, "exit")
+        self.assertFalse(
+            [row for row in strategy.trace if row["event"] == "cancel_requested"]
+        )
+        self.assertFalse(strategy.faulted)
+        self.assertFalse(strategy.callback_faults)
+
+    def test_expired_halt_state_keeps_working_exit_and_notifies(self):
+        start = simulation.BASE_NS
+        observed = []
+
+        class ExpiringState(families.GapPremarketStrategy):
+            def on_data(self, data):
+                value = getattr(data, "data", data)
+                if isinstance(value, contracts.FactorSnapshot):
+                    value = replace(value, valid_until_ns=start + 2_500_000_000)
+                return super().on_data(value)
+
+            def _record(self, event, **fields):
+                super()._record(event, **fields)
+                if event == "halt_hold_notice":
+                    observed.append(
+                        (self.clock.timestamp_ns(), self.pending.client_order_id)
+                    )
+
+        faults = []
+        strategy = run_strategy(
+            ledger=None,
+            faults=faults,
+            notice_sink=faults.append,
+            strategy_type=ExpiringState,
+            bids=("10", "10", "9", "8", "8", "8"),
+            quote_offsets_ns=(
+                0,
+                1_000_000_000,
+                2_000_000_000,
+                3_000_000_000,
+                603_000_000_000,
+                1203_000_000_000,
+            ),
+            overrides={"exit_deadline_ns": start + 2_000_000_000},
+        )
+        self.assertEqual(
+            [row[0] for row in observed],
+            [start + seconds * 1_000_000_000 for seconds in (3, 603, 1203)],
+        )
+        self.assertEqual(faults, ["held_halt_state_unknown"] * 3)
+        self.assertEqual(strategy.sequence, 2)
+        self.assertEqual(strategy.pending_role, "exit")
+        self.assertTrue(
+            all(row[1] == strategy.pending.client_order_id for row in observed)
+        )
+        self.assertFalse(
+            [row for row in strategy.trace if row["event"] == "cancel_requested"]
+        )
+        self.assertFalse(strategy.faulted)
+        self.assertFalse(strategy.callback_faults)
+
+    def test_halt_expiry_notification_freezes_before_another_drive(self):
+        start = simulation.BASE_NS
+        at_expiry = []
+
+        class ExpiryCallback(families.GapPremarketStrategy):
+            expired = False
+
+            def _drive(self):
+                if (
+                    not self.expired
+                    and self.clock.timestamp_ns() >= start + 5_000_000_000
+                    and self.pending_role == "exit"
+                ):
+                    self.expired = True
+                    # Inject the terminal callback, as the retained policy
+                    # probe does. Venue-driven DAY expiry remains T15 work.
+                    self.on_order_expired(
+                        SimpleNamespace(client_order_id=self.pending.client_order_id)
+                    )
+                    at_expiry.append(
+                        (self.faulted, self.quantity, frozenset(self.flags))
+                    )
+                return super()._drive()
+
+        faults = []
+        strategy = run_strategy(
+            ledger=None,
+            faults=faults,
+            strategy_type=ExpiryCallback,
+            bids=("10", "10", "9", "8", "8", "8", "8"),
+            halt_after_ns=start + 3_000_000_000,
+            overrides={"exit_deadline_ns": start + 2_000_000_000},
+        )
+        self.assertEqual(len(at_expiry), 1)
+        self.assertTrue(at_expiry[0][0])
+        self.assertGreater(at_expiry[0][1], 0)
+        self.assertIn("held_halted", at_expiry[0][2])
+        self.assertIn("halted_day_expiry_requires_handoff", at_expiry[0][2])
+        self.assertIn("halted_day_expiry_requires_handoff", faults)
+        self.assertEqual(strategy.sequence, 2)
+        self.assertIsNone(strategy.pending)
+        self.assertFalse(strategy.callback_faults)
+
+    def test_unprocessed_halt_cancel_uses_entry_deadline_in_all_three_fill_windows(
+        self,
+    ):
+        start = simulation.BASE_NS
+        for window, timeout, reopen, fill, flagged, frozen in (
+            (
+                "before_deadline",
+                2_000_000_000,
+                1_500_000_000,
+                1_550_000_000,
+                False,
+                False,
+            ),
+            (
+                "deadline_before_freeze",
+                2_000_000_000,
+                2_200_000_000,
+                2_250_000_000,
+                True,
+                False,
+            ),
+            ("after_freeze", 2_000_000_000, 2_400_000_000, 2_500_000_000, True, True),
+        ):
+            applied = []
+
+            def sink(strategy, event, cutoff, applied=applied):
+                applied.append(
+                    (event.ts_event, cutoff, strategy.quantity, strategy.faulted)
+                )
+
+            with (
+                self.subTest(window=window),
+                patch.object(
+                    families.FamilyStrategy,
+                    "cancel_order",
+                    new=lambda self, client_id: None,
+                ),
+            ):
+                strategy = run_strategy(
+                    ledger=None,
+                    faults=[],
+                    post_cutoff_fill_sink=sink,
+                    bids=("10", "11", "11", "10", "10", "10"),
+                    quote_offsets_ns=(
+                        0,
+                        200_000_000,
+                        400_000_000,
+                        fill,
+                        fill + 200_000_000,
+                        fill + 400_000_000,
+                    ),
+                    status_events=(
+                        (300_000_000, 300_000_000, "HALT", {}),
+                        (reopen, reopen, "TRADING", {}),
+                    ),
+                    overrides={
+                        "entry_timeout_ns": timeout,
+                        "exit_deadline_ns": start + 20_000_000_000,
+                    },
+                )
+                self.assertEqual("post_cutoff_fill" in strategy.flags, flagged)
+                self.assertEqual(strategy.faulted, frozen)
+                self.assertEqual(
+                    applied,
+                    [(start + fill, start + timeout, contracts.decimal("7"), frozen)]
+                    if flagged
+                    else [],
+                )
+                sells = [
+                    row
+                    for row in strategy.trace
+                    if row["event"] == "submit" and row["side"] == "SELL"
+                ]
+                self.assertEqual(bool(sells), flagged and not frozen)
+                if sells:
+                    self.assertEqual(sells[0]["reason"], "time_exit")
+                    self.assertEqual(sells[0]["now_ns"], start + fill)
+                freezes = [
+                    row for row in strategy.trace if row["event"] == "safety_freeze"
+                ]
+                self.assertEqual(
+                    [row["now_ns"] for row in freezes],
+                    [start + 2_400_000_000] if frozen else [],
+                )
+                self.assertEqual(strategy.quantity == 0, flagged and not frozen)
+                self.assertFalse(strategy.callback_faults)
+
     def test_clock_ahead_and_stale_native_halts_cancel_at_delivery(self):
         from nautilus_trader.model import InstrumentStatus, MarketStatusAction
 
@@ -233,7 +2448,7 @@ class LifecycleTests(unittest.TestCase):
                 (150_000_000, 600_000_000, "TRADING", {}),
             ]
             if resumed:
-                statuses.append((600_000_000, 600_000_000, "TRADING", {}))
+                statuses.append((800_000_000, 800_000_000, "TRADING", {}))
             with self.subTest(halt_event_ns=halt_event, resumed=resumed):
                 strategy = run_strategy(
                     ledger=None,
@@ -259,7 +2474,7 @@ class LifecycleTests(unittest.TestCase):
                 self.assertEqual(len(buys), int(resumed))
                 if resumed:
                     self.assertEqual(
-                        buys[0]["now_ns"], simulation.BASE_NS + 600_000_000
+                        buys[0]["now_ns"], simulation.BASE_NS + 800_000_000
                     )
                 else:
                     self.assertEqual(strategy.quantity, 0)
@@ -638,6 +2853,7 @@ class LifecycleTests(unittest.TestCase):
                     faults=with_ledger_faults,
                     overrides=overrides,
                     post_cutoff_fill_sink=lambda strategy, event, cutoff: None,
+                    notice_sink=lambda reason: None,
                 )
                 self.assertNotIn("startup_durable_ledger_required", supplied.flags)
                 self.assertNotIn("startup_durable_ledger_required", with_ledger_faults)
@@ -744,6 +2960,16 @@ class LifecycleTests(unittest.TestCase):
                 self.delayed_fill = None
                 self.first_fill_ns = None
                 self.callback_ns = None
+
+            def on_data(self, data):
+                value = getattr(data, "data", data)
+                if isinstance(value, contracts.FactorSnapshot):
+                    # This fixture isolates the execution-time calendar
+                    # anchor; keep its named synthetic halt state valid.
+                    value = replace(
+                        value, valid_until_ns=simulation.BASE_NS + 90000_000_000_000
+                    )
+                return super().on_data(value)
 
             def on_order_filled(self, event):
                 if event.order_side == OrderSide.BUY and self.first_fill_ns is None:

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build/check the self-contained public explorer, without network or dependencies."""
+"""Build/check the offline public explorer, or explicitly refresh public stars with gh."""
 
 from __future__ import annotations
 
@@ -22,11 +22,13 @@ try:
     from .component_matrix import (CONVERGENCE_FACTOR_VALUES, CONVERGENCE_FACTORS, CONVERGENCE_LAYER_STATES,
                                    OUTPUT_JSON as COMPONENT_MATRIX)
     from .landscape import build_landscape
+    from .public_starred import refresh_public_stars, snapshot_time, validate_pending_age
 except ImportError:
     from catalog_decisions import InvalidDecisionIndex, canonical, load, pointer, safe_file
     from component_matrix import (CONVERGENCE_FACTOR_VALUES, CONVERGENCE_FACTORS, CONVERGENCE_LAYER_STATES,
                                   OUTPUT_JSON as COMPONENT_MATRIX)
     from landscape import build_landscape
+    from public_starred import refresh_public_stars, snapshot_time, validate_pending_age
 
 
 CONFIG = "docs/ecosystem/manifest.json"
@@ -822,6 +824,19 @@ def build_data(root):
         return f'{config["repository_url"]}/blob/{revision}/{quote(path, safe="/")}'
 
     index, stack, evidence, stars, review = (read(path) for path in (INDEX, STACK, EVIDENCE, STARS, REVIEW))
+    try:
+        from .starred_convergence import validate_convergence
+    except ImportError:
+        from starred_convergence import validate_convergence
+    validate_pending_age(stars)
+    validate_convergence(root, stars, read=read)
+    if stars.get("convergence_manifest"):
+        convergence_source = read(stars["convergence_manifest"])
+        read(convergence_source["seed_manifest"])
+        read(convergence_source["primary_source_review"])
+        current_public_paths.update({STARS, stars["convergence_manifest"],
+                                     convergence_source["seed_manifest"],
+                                     convergence_source["primary_source_review"]})
     star_map = {row["repository"].casefold(): row for row in stars["repositories"]}
     require(len(star_map) == stars["count"], "public-star count or duplicate identity mismatch")
     stars_observed_at = stars["retrieved_at"]
@@ -833,13 +848,16 @@ def build_data(root):
             current_public_paths.add(quality_source["source_snapshot"])
         current_stars = read(landscape_manifest["sources"]["freshness_snapshot"])["stars"]
         require(current_stars.get("status") == "checked", "current public-star snapshot must be checked")
-        latest_map = {}
-        for row in current_stars["repositories"]:
-            key = canonical(repository_key(row["repository"]), index.get("aliases", {}))
-            require(key not in latest_map, "duplicate current public-star identity")
-            latest_map[key] = {**star_map.get(key, {}), **row}
-        star_map = latest_map
-        stars_observed_at = current_stars["repository_snapshot_checked_at"]
+        # A dated landscape capture cannot erase stars acquired after that capture.
+        # Compare actual UTC observation times, preserving reviewed canonical fields.
+        if snapshot_time(current_stars["repository_snapshot_checked_at"]) > snapshot_time(stars_observed_at):
+            latest_map = {}
+            for row in current_stars["repositories"]:
+                key = canonical(repository_key(row["repository"]), index.get("aliases", {}))
+                require(key not in latest_map, "duplicate current public-star identity")
+                latest_map[key] = {**star_map.get(key, {}), **row}
+            star_map = latest_map
+            stars_observed_at = current_stars["repository_snapshot_checked_at"]
     receipts_by_id = {row["id"]: row for row in evidence["receipts"]}
     require(len(receipts_by_id) == len(evidence["receipts"]), "duplicate evidence receipt identity")
     receipt_ids = set(TOKEN_RECEIPTS)
@@ -1282,9 +1300,25 @@ def main(argv=None):
     mode.add_argument("--write", action="store_true", help="Rebuild the public HTML (writes it locally; not committed)")
     mode.add_argument("--check", action="store_true", help="Check deterministic rebuild (default)")
     mode.add_argument("--render-to", type=Path, help=argparse.SUPPRESS)  # used by --check for the second-process build
+    mode.add_argument("--refresh-stars", action="store_true",
+                      help="Fetch only public allowlisted star fields with gh; rendering stays offline by default")
+    parser.add_argument("--starred-output", type=Path,
+                        help="Explicit one-off snapshot target; use the canonical path for a reviewed catalog PR")
+    parser.add_argument("--starred-state-dir", type=Path,
+                        help="External weekly snapshot/journal directory; never writes the tracked catalog")
+    parser.add_argument("--newstars-questions", type=Path,
+                        help="Append NEWSTARS intake to an external co-op lane questions file")
     args = parser.parse_args(argv)
     try:
         root = args.root.resolve()
+        if not args.refresh_stars and any((args.starred_output, args.starred_state_dir, args.newstars_questions)):
+            raise ValueError("starred refresh flags require --refresh-stars")
+        if args.refresh_stars:
+            report = refresh_public_stars(root, output=args.starred_output,
+                                          state_dir=args.starred_state_dir,
+                                          questions=args.newstars_questions)
+            print(json.dumps(report, sort_keys=True))
+            return 0
         if args.render_to:
             args.render_to.write_bytes(render(root))
             return 0

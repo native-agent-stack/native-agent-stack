@@ -258,7 +258,7 @@ def _g5_row(row: dict[str, Any], source: str, gate_met: bool) -> dict[str, Any]:
     }
 
 
-def _g5(asset: Path, layers: list[dict[str, Any]], gate_met: bool, reads) -> tuple[dict[str, Any], dict[str, Any]]:
+def _g5(asset: Path, layers: list[dict[str, Any]], gate_met: bool, reads, *, on_record=None) -> tuple[dict[str, Any], dict[str, Any]]:
     # The authorized archive descriptor supplies both its digest and zstd input.
     with reads.open("architecture_g5_asset", asset, max_bytes=512 * 1024 * 1024) as handle:
         stat = os.fstat(handle.fileno())
@@ -292,6 +292,9 @@ def _g5(asset: Path, layers: list[dict[str, Any]], gate_met: bool, reads) -> tup
                             return self.decoder.decode(block, final=not block)
                     for record in _ArrayRecords(TextChunks()):
                         meta["rows"] += 1
+                        if on_record is not None:
+                            # Host projections reuse this bounded parser, including unmatched rows.
+                            on_record(record)
                         qualification = record.get("qualification") if isinstance(record.get("qualification"), dict) else {}
                         catalog, slot = qualification.get("catalog"), qualification.get("slot")
                         explicit = f"{catalog}:{slot}" if isinstance(catalog, str) and isinstance(slot, str) else None

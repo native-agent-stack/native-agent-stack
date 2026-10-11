@@ -57,10 +57,13 @@ BASH32 = os.environ.get("BASH32_BINARY") if os.environ.get("BASH32_BINARY") and 
 # Claude-Code-only skill to read and never run. Previous value: 9c34fa7211bc…f14b.
 # 2026-10-03: the Skills paragraph of common and common_v2 drops semgrep (retired) and agent-browser (held) with the
 # wave-2 skills ruling, changes 1 and 3 (build_args.TEMPLATE_SKILLS). Previous value: b61956f351f5…726d.
-PROMPTS_SHA256_CURRENT = "a57b659ddc5738728ae25848979561ce84dd24139dd6ff05858ccaffa38cf5e2"
+# 2026-10-10 correction #138: Claude workers read skills as source; native Skill's
+# dynamic shell context is outside the read-only role. Previous values stay in
+# historical frozen runs; these constants describe newly built templates only.
+PROMPTS_SHA256_CURRENT = "5007adf42c8049d792820f8c2f83a6ac2acd2f04f8150603d59d5a8199c9b05b"
 # Future U11 A/B source contract, filled with the same fixture values. This is not an activated runner's receipt.
 # 2026-10-03: the same Skills paragraph change in common_v2. Previous value: 67e3adfa24fd…e525.
-PROMPTS_SHA256_V2_CURRENT = "fab3672aac7490dd223fcadee194510055a64864fbe745fd05f9240cb8fc9191"
+PROMPTS_SHA256_V2_CURRENT = "68f78fdf1b0c4bf6d814c270fe9cf55a1c188219d86508fa3a0fbafd10a92138"
 # The same change detector for a skills run (filled with the same 2026-09-26 values and modality "skills"): discover
 # and critic are discover_skills and critic_skills, and facts and fit end in modality_skills. The skills templates name
 # the layer input's known_skills (installed and excluded skills as the manifest states them); the first value,
@@ -71,7 +74,7 @@ PROMPTS_SHA256_V2_CURRENT = "fab3672aac7490dd223fcadee194510055a64864fbe745fd05f
 # Later on 2026-09-30: common's Skills paragraph names skill-creator (see PROMPTS_SHA256_CURRENT). Previous value:
 # 2c2efbaed4d9…63d3. 2026-10-03: common's Skills paragraph drops semgrep and agent-browser (see PROMPTS_SHA256_CURRENT).
 # Previous value: a76ee858fe65…b460.
-PROMPTS_SHA256_SKILLS_CURRENT = "dabae268b07a8bc8c9b3dd1e7770a7f8dc181b40f77c06a3775591f56f280291"
+PROMPTS_SHA256_SKILLS_CURRENT = "1e81d2caabe7dfbd5f752fdc30376c17eea506f56d8d815d417ab2cc14143f47"
 # The 2026-09-26 run's own value, kept in that run's record (evidence/artifacts/landscape-sweep-20260926/README.md);
 # fixtures below use it as a historical run's recorded prompts_sha256.
 PROMPTS_SHA256_20260926 = "3adfbed7a83e85da3fd7951032e1fa3a579101772a47b211580065c6b42618d4"
@@ -5606,6 +5609,10 @@ class SweepScriptTests(unittest.TestCase):
         self.assertEqual(result["first"][1]["gpt6_discover"]["status"], "failed_exit_1")
         self.assertEqual(result["first"][0]["fit_gpt6"]["codex_version"], "codex-cli 0.0.0-fixture")
         prompts = {c["label"]: c["prompt"] for c in calls}
+        for label in ("refute-facts:alpha", "refute-fit:alpha",
+                      "refute-facts:beta:followup", "refute-fit:beta:followup"):
+            self.assertIn("public GitHub REST GET URLs", prompts[label])
+            self.assertNotIn("Use gh api (Bash)", prompts[label])
         self.assertIn(f"bash {S}/codex_call.sh start gpt6-discover-alpha {S}/prompts/gpt6-discover-alpha.txt "
                       f"{S}/schemas/discover.json", prompts["gpt6-discover:alpha"])
         self.assertIn(f"bash {S}/codex_call.sh wait gpt6-discover-alpha 540", prompts["gpt6-discover:alpha"])

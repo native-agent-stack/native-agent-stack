@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "id": "final-round-comparators-20261011",
+  "command": [
+    "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.venv/bin/python",
+    "blueprints/us-equities/backtesting-gap-burndown-20261010/execute_comparators.py",
+    "--data",
+    "~/.local/share/codex-ecosystem/lean-985ef30-spy-frozen/Data",
+    "--fresh",
+    "~/.cache/native-agent-stack/backtesting-gaps-20261010/replay-diagnostic-2/native",
+    "--output",
+    "~/.cache/native-agent-stack/backtesting-gaps-20261011/final-round-comparators-2"
+  ],
+  "started_utc": "2026-10-11T15:08:39Z",
+  "finished_utc": "2026-10-11T15:08:40Z",
+  "duration_seconds": 1.035,
+  "observed_exit_code": 0,
+  "input_hashes": [
+    {
+      "path": "blueprints/us-equities/backtesting-gap-burndown-20261010/execute_comparators.py",
+      "sha256": "e68c5eb4d024c12f91614365008fdda33d26beafb17fedf1cfec2e6dcd0f0bbc"
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/compare.py",
+      "sha256": "c70386f869e45bcdc54602100991235a450d2a5854445d98ffe45b849454a5ec"
+    }
+  ],
+  "output_excerpt": " '304'), 'sibling': ('CANCELED', '0')} delta=-            tol=exact\nPASS    exit_oco             fill_in_tested_bar         expected=1588255200000000000 observed=1588255200000000000 delta=-            tol=exact\nPASS    exit_oco             moo_proxy_no_gap           expected=>= 0.0001      observed=1.5200         delta=-            tol=exact\nPASS    exit_oco             moo_proxy_not_open         expected=291.6900       observed=291.6900       delta=-            tol=exact\nPASS    exit_oco             filled_leg_by_open_rule    expected=STOP_MARKET    observed=STOP_MARKET    delta=-            tol=exact\nPASS    runs                 count                      expected=2              observed=2              delta=-            tol=exact\nPASS    run_integrity        run-1.strategy_callback_errors expected=0              observed=0              delta=-            tol=exact\nPASS    engine_log           run-1.captured_lines       expected=> 0            observed=224            delta=-            tol=exact\nPASS    engine_log           run-1.error_lines          expected=0              observed=0              delta=-            tol=exact\nPASS    engine_log           run-1.negative_cash_lines  expected=0              observed=0              delta=-            tol=exact\nPASS    run_integrity        run-2.strategy_callback_errors expected=0              observed=0              delta=-            tol=exact\nPASS    engine_log           run-2.captured_lines       expected=> 0            observed=224            delta=-            tol=exact\nPASS    engine_log           run-2.error_lines          expected=0              observed=0              delta=-            tol=exact\nPASS    engine_log           run-2.negative_cash_lines  expected=0              observed=0              delta=-            tol=exact\nPASS    distribution_module  class                      expected=DistributionModule observed=DistributionModule delta=-            tol=exact\nPASS    distribution_module  venue_module_count         expected=1              observed=1              delta=-            tol=exact\nPASS    distribution_module  errors                     expected=0              observed=0              delta=-            tol=exact\nPASS    distribution_module  emissions                  expected=2              observed=2              delta=-            tol=exact\nPASS    distribution_1       process_called_at_ex_instant expected=1576818000000000000 observed=1576818000000000000 delta=-            tol=exact\nPASS    distribution_1       emitted_at_ns              expected=1576818000000000000 observed=1576818000000000000 delta=-            tol=exact\nPASS    distribution_1       on_time                    expected=True           observed=True           delta=-            tol=exact\nPASS    distribution_1       eligible_quantity          expected=0              observed=0              delta=-            tol=exact\nPASS    distribution_1       per_share                  expected=1.57           observed=1.57           delta=-            tol=exact\nPASS    distribution_1       amount_usd                 expected=0.00           observed=0.00           delta=0.00         tol=0\nPASS    distribution_1       acknowledged_applied       expected=True           observed=True           delta=-            tol=exact\nPASS    distribution_1       reported_account_state_delta expected=0.00           observed=0.00           delta=-            tol=exact\nPASS    distribution_2       process_called_at_ex_instant expected=1584676800000000000 observed=1584676800000000000 delta=-            tol=exact\nPASS    distribution_2       emitted_at_ns              expected=1584676800000000000 observed=1584676800000000000 delta=-            tol=exact\nPASS    distribution_2       on_time                    expected=True           observed=True           delta=-            tol=exact\nPASS    distribution_2       eligible_quantity          expected=304            observed=304            delta=-            tol=exact\nPASS    distribution_2       per_share                  expected=1.41           observed=1.41           delta=-            tol=exact\nPASS    distribution_2       amount_usd                 expected=428.64         observed=428.64         delta=0.00         tol=0\nPASS    distribution_2       acknowledged_applied       expected=True           observed=True           delta=-            tol=exact\nPASS    distribution_2       reported_account_state_delta expected=428.64         observed=428.64         delta=-            tol=exact\nPASS    distribution_module  unexplained_reported_account_states expected=[]             observed=[]             delta=-            tol=exact\nPASS    distribution_ledger  engine_posted              expected=True           observed=True           delta=-            tol=exact\nPASS    two_run_determinism  normalized_economic_sha256 expected=equal          observed=equal          delta=-            tol=exact\nVERDICT {\"attribution_evidence\": \"converted bars\", \"blocking_mappings\": [], \"case\": \"one_zero\", \"complete\": true, \"deviation_acceptance_recorded\": true, \"execution_checks\": {\"fail\": 0, \"pass\": 106, \"skipped\": 0}, \"failed\": 1, \"manifest_schema_version\": 2, \"manifest_unsupported_mappings\": [], \"native_end_cash_usd\": \"90734.08\", \"note\": \"Mapping manifest v2 declares no unsupported row for this case, so no failure can be attributed: any failing check is FAIL, and so is any skipped check or rejected attribution (a sealed falsifier). The preconditions are checks under the sealed verdict rule, so an unmet precondition fails the comparison even when every execution check passes; preregistration_qualifying and execution_checks report the two separately.\", \"preconditions\": {\"precondition_engine.environment_beyond_cleared_set#53\": \"PASS\", \"precondition_engine.environment_values#54\": \"PASS\", \"precondition_engine.extension_sha256#51\": \"PASS\", \"precondition_engine.network_interfaces#52\": \"PASS\", \"precondition_engine.pid_namespace_pid1#58\": \"PASS\", \"precondition_engine.python_isolated_flag#56\": \"PASS\", \"precondition_engine.read_only_mounts#55\": \"PASS\", \"precondition_engine.user_namespace#57\": \"PASS\", \"precondition_engine.version#50\": \"PASS\", \"precondition_hashes.inputs_at_comparison#49\": \"PASS\", \"precondition_hashes.inputs_at_run#48\": \"PASS\", \"precondition_hashes.sealed_manifest_sha256#46\": \"PASS\", \"precondition_hashes.tolerances_sha256#47\": \"PASS\", \"precondition_review.completed_before_run_started#32\": \"PASS\", \"precondition_review.deviation_acceptance.accepted_before_run_started#45\": \"PASS\", \"precondition_review.deviation_acceptance.accepted_by#42\": \"PASS\", \"precondition_review.deviation_acceptance.deviation_declared_in_receipt#41\": \"PASS\", \"precondition_review.deviation_acceptance.deviation_id#40\": \"PASS\", \"precondition_review.deviation_acceptance.fields#38\": \"PASS\", \"precondition_review.deviation_acceptance.path#36\": \"PASS\", \"precondition_review.deviation_acceptance.reviewed_harness_is_the_harness_that_ran#44\": \"PASS\", \"precondition_review.deviation_acceptance.schema_version#39\": \"PASS\", \"precondition_review.deviation_acceptance.sha256_at_comparison#37\": \"PASS\", \"precondition_review.deviation_acceptance.statement#43\": \"PASS\", \"precondition_review.no_prior_replay_ran_the_reviewed_harness#35\": \"FAIL\", \"precondition_review.record_sha256_at_comparison#29\": \"PASS\", \"precondition_review.replay_history_at_comparison#34\": \"PASS\", \"precondition_review.reviewed_files_are_the_files_that_ran#31\": \"PASS\", \"precondition_review.schema#30\": \"PASS\", \"precondition_review.unresolved_findings#33\": \"PASS\"}, \"preregistration_deviations\": [\"review_before_first_run\", \"first_v2_run_preceded_review\", \"sealed_status_fields_not_updated\", \"late_emission_refusal_is_post_run\", \"venue_module_count_not_engine_observable\", \"bars_mode_cannot_rehash_inputs\", \"isolation_partially_observed\", \"v2_output_paths\", \"manifest_evidence_class_token\", \"engine_log_level_info\", \"operator_declared_commit\"], \"preregistration_qualifying\": false, \"prior_v2_replays\": 8, \"prior_v2_replays_reviewed_before_run\": 1, \"rejected_attributions\": [], \"skipped\": [], \"unattributed_failures\": [\"precondition_review.no_prior_replay_ran_the_reviewed_harness#35\"], \"verdict\": \"FAIL\"}\n",
+  "output_sha256": "5b397d7ea8123b49bb23d675fa03252c5a3b8230357a79a49ce822125a6498eb",
+  "scope": "Actual four-mode comparison on retained data with current recomputed execution-row counts and fresh external output. Console capture is the final 8192 sanitized characters only; its digest binds this published excerpt. Full verdicts are retained and bound separately. No native replay or acquisition.",
+  "outputs": [
+    {
+      "path": "~/.cache/native-agent-stack/backtesting-gaps-20261011/final-round-comparators-2/accepted-v2-bars.verdict.json",
+      "published_copy": {
+        "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-bars.verdict.json",
+        "sha256": "46e0757187c2dfc4891fd7f3930d871524647c3e5dae699d07f2e12fd833c896",
+        "bytes": 49380
+      },
+      "execution_checks": {
+        "fail": 0,
+        "pass": 106,
+        "skipped": 0
+      }
+    },
+    {
+      "path": "~/.cache/native-agent-stack/backtesting-gaps-20261011/final-round-comparators-2/accepted-v2-lean-data.verdict.json",
+      "published_copy": {
+        "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-lean-data.verdict.json",
+        "sha256": "8d6b96cc44f333c7f7d1216b23b5eb654100439566bcda0344034d4b215760f4",
+        "bytes": 49245
+      },
+      "execution_checks": {
+        "fail": 0,
+        "pass": 106,
+        "skipped": 0
+      }
+    },
+    {
+      "path": "~/.cache/native-agent-stack/backtesting-gaps-20261011/final-round-comparators-2/accepted-v2-no-attribution.verdict.json",
+      "published_copy": {
+        "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-no-attribution.verdict.json",
+        "sha256": "85cf9b96067b1b5437f725552c3dbfa584427f16a0767376a5fe02f32db735b5",
+        "bytes": 46487
+      },
+      "execution_checks": {
+        "fail": 0,
+        "pass": 92,
+        "skipped": 3
+      }
+    },
+    {
+      "path": "~/.cache/native-agent-stack/backtesting-gaps-20261011/final-round-comparators-2/fresh-native-v2.verdict.json",
+      "published_copy": {
+        "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/fresh-native-v2.verdict.json",
+        "sha256": "5bc6896cf67e942bfcd65cf479c1793d167bcf98dd4e6d4a478321465f612599",
+        "bytes": 49446
+      },
+      "execution_checks": {
+        "fail": 0,
+        "pass": 106,
+        "skipped": 0
+      }
+    }
+  ]
+}

@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "command": [
+    ".venv/bin/python",
+    "blueprints/us-equities/backtesting-gap-burndown-20261010/execute_comparators.py",
+    "--data",
+    "~/.local/share/codex-ecosystem/lean-985ef30-spy-frozen/Data",
+    "--fresh",
+    "~/.cache/native-agent-stack/backtesting-gaps-20261010/replay-diagnostic-2/native",
+    "--output",
+    "~/.cache/native-agent-stack/backtesting-gaps-20261011/codex-p2-comparators-2"
+  ],
+  "started_utc": "2026-10-11T08:52:39Z",
+  "finished_utc": "2026-10-11T08:52:39Z",
+  "observed_exit_code": 0,
+  "input_hashes": [
+    {
+      "path": "blueprints/us-equities/backtesting-gap-burndown-20261010/execute_comparators.py",
+      "sha256": "fc490e7427cf9e2f45744ea234aa106430169af240b2dd8d2ce7d7adc2f12a5a"
+    }
+  ],
+  "outputs": [
+    {
+      "path": "~/.cache/native-agent-stack/backtesting-gaps-20261011/codex-p2-comparators-2/accepted-v2-bars.verdict.json",
+      "verdict": "FAIL",
+      "execution_checks": {
+        "fail": 0,
+        "pass": 106,
+        "skipped": 0
+      },
+      "nonpass_checks": [
+        {
+          "id": "precondition_hashes",
+          "field": "inputs_at_comparison",
+          "status": "SKIPPED"
+        }
+      ],
+      "digest_basis": "published_bytes",
+      "published_copy": {
+        "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-bars.verdict.json",
+        "sha256": "46e0757187c2dfc4891fd7f3930d871524647c3e5dae699d07f2e12fd833c896",
+        "bytes": 49380
+      }
+    },
+    {
+      "path": "~/.cache/native-agent-stack/backtesting-gaps-20261011/codex-p2-comparators-2/accepted-v2-lean-data.verdict.json",
+      "verdict": "PASS",
+      "execution_checks": {
+        "fail": 0,
+        "pass": 106,
+        "skipped": 0
+      },
+      "nonpass_checks": [],
+      "digest_basis": "published_bytes",
+      "published_copy": {
+        "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-lean-data.verdict.json",
+        "sha256": "8d6b96cc44f333c7f7d1216b23b5eb654100439566bcda0344034d4b215760f4",
+        "bytes": 49245
+      }
+    },
+    {
+      "path": "~/.cache/native-agent-stack/backtesting-gaps-20261011/codex-p2-comparators-2/accepted-v2-no-attribution.verdict.json",
+      "verdict": "FAIL",
+      "execution_checks": {
+        "fail": 0,
+        "pass": 92,
+        "skipped": 3
+      },
+      "nonpass_checks": [
+        {
+          "id": "precondition_hashes",
+          "field": "inputs_at_comparison",
+          "status": "SKIPPED"
+        },
+        {
+          "id": "entry_oco",
+          "field": "trigger_and_gap_evidence",
+          "status": "SKIPPED"
+        },
+        {
+          "id": "exit_oco",
+          "field": "trigger_and_gap_evidence",
+          "status": "SKIPPED"
+        },
+        {
+          "id": "attribution_evidence",
+          "field": "converted_bars",
+          "status": "SKIPPED"
+        }
+      ],
+      "digest_basis": "published_bytes",
+      "published_copy": {
+        "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-no-attribution.verdict.json",
+        "sha256": "85cf9b96067b1b5437f725552c3dbfa584427f16a0767376a5fe02f32db735b5",
+        "bytes": 46487
+      }
+    },
+    {
+      "path": "~/.cache/native-agent-stack/backtesting-gaps-20261011/codex-p2-comparators-2/fresh-native-v2.verdict.json",
+      "verdict": "FAIL",
+      "execution_checks": {
+        "fail": 0,
+        "pass": 106,
+        "skipped": 0
+      },
+      "nonpass_checks": [
+        {
+          "id": "precondition_review",
+          "field": "no_prior_replay_ran_the_reviewed_harness",
+          "status": "FAIL"
+        }
+      ],
+      "digest_basis": "published_bytes",
+      "published_copy": {
+        "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/fresh-native-v2.verdict.json",
+        "sha256": "5bc6896cf67e942bfcd65cf479c1793d167bcf98dd4e6d4a478321465f612599",
+        "bytes": 49446
+      }
+    }
+  ],
+  "captured_outputs": [
+    {
+      "path": "~/.cache/native-agent-stack/backtesting-gaps-20261011/codex-p2-comparators-2.stdout.txt",
+      "digest_basis": "published_bytes",
+      "published_copy": {
+        "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/published/codex-p2-comparators-reproduced-codex-p2-comparators-2.stdout.txt",
+        "sha256": "2e111441ffbda9d6493a7bca365bc1b8057383d338df9902796e411b34172e0e",
+        "bytes": 98807
+      }
+    },
+    {
+      "path": "~/.cache/native-agent-stack/backtesting-gaps-20261011/codex-p2-comparators-2.stderr.txt",
+      "digest_basis": "published_bytes",
+      "published_copy": {
+        "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/red-matrix-wave-join.stdout.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    }
+  ],
+  "retained_verdicts_unchanged": true,
+  "scope": "Actual reproduction of all four comparator modes into a fresh outside-checkout directory. Exact designed check sets validated; no native rerun or first-run gate reset."
+}

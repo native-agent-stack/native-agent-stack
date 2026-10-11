@@ -29,7 +29,7 @@ The committed target [`.github/main-ruleset.json`](../.github/main-ruleset.json)
 The adoption macOS policy below follows the [2026-10-10 retirement decision](decisions/2026-10-10-retire-macos-ci.md).
 Other settings observations retain their stated dates.
 
-The Actions allow-list and harness description below were checked against live settings and pinned sources on 2026-10-08.
+The Actions allow-list below was checked against live settings and pinned sources on 2026-10-08.
 
 - **Required checks** (job IDs from GitHub Actions, app ID 15368; strict up-to-date checks off): `validate`,
   `token-report`, `secret-scan`, `dependency-review`, `osv-scanner`, `verdict-review-gate` and
@@ -59,63 +59,23 @@ The Actions allow-list and harness description below were checked against live s
   carries the osv-scanner, zizmor and Scorecard SARIF. Dependabot version updates cover GitHub Actions only (weekly,
   7-day cooldown), and Dependabot security updates are on.
 - **Actions.** Every `uses:` is pinned to a full commit SHA, which the repository also requires. The allow-list is
-  GitHub-owned actions plus the four external patterns `step-security/harden-runner@*`, `ossf/scorecard-action@*`,
-  `anthropics/claude-code-action@*` and `oven-sh/setup-bun@*`; verified-publisher actions are not separately allowed.
-  The pinned Claude action's composite bootstrap uses `oven-sh/setup-bun` when no custom Bun executable is supplied;
-  the repository has no direct workflow reference to it. Only the catalog-freshness `propose` job holds
+  GitHub-owned actions plus the two external patterns `step-security/harden-runner@*` and `ossf/scorecard-action@*`;
+  verified-publisher actions are not separately allowed. The Claude action's two patterns left with its workflows
+  (2026-10-10). Only the catalog-freshness `propose` job holds
   `pull-requests: write`, and no workflow reviews or approves a pull
   request (`test_pull_requests_write_is_granted_only_to_the_propose_job`,
   `test_no_workflow_reviews_or_approves_a_pull_request`).
-- **Harness audit.** The weekly and manually dispatched [`harness-audit.yml`](../.github/workflows/harness-audit.yml)
-  runs only in `seathatflowsinourveins/native-agent-stack` and only on `main`, using `anthropics/claude-code-action`
-  v1.0.247 at
-  [`2dca132ff0e0c4094ce6048b422c6915a071210b`](https://github.com/anthropics/claude-code-action/blob/2dca132ff0e0c4094ce6048b422c6915a071210b/action.yml),
-  only while the repository variable `CLAUDE_HARNESS_AUDIT_ENABLED` is `true`, only on a run's first attempt, and,
-  when dispatched by hand, only when the repository owner is both `github.actor` and `github.triggering_actor`.
-  Its job grants `contents: read` over an empty workflow permission default.
-  It authenticates with `ANTHROPIC_API_KEY`, a secret of the main-only `claude-review` environment (the owner's ruling
-  of 2026-10-10, which replaced
-  workload identity federation; [decision](decisions/2026-10-08-claude-actions-pr-review.md));
-  the workflow fetches a pinned, SHA-256-verified audit prompt and asks for a project-scoped read-only audit. Claude
-  has Read, Glob and Grep only, at most 20 assistant turns (checked after the run) and a $5 client budget; a
-  model-free step copies the report to the
-  job summary and keeps the run's token and cost numbers
-  ([decision](decisions/2026-10-08-claude-actions-harness-audit-bounds.md)). Hosted acceptance remains open after
-  [run 37739403956 failed](https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/37739403956).
-  That run, and the review dispatch of 2026-10-10 (run 38056354892), were refused under federation; the likely cause
-  is a rule subject that does not match the repository's immutable OIDC subject. The API key replaces federation.
-- **Pull request review, every head and on demand.** [`claude-pr-review.yml`](../.github/workflows/claude-pr-review.yml)
-  reviews each open, non-draft, same-repository pull request head targeting main until one review of it completes
-  (a trusted completion marker, kept 90 days), from a 15-minute schedule (at
-  most 2 heads a tick, up to the daily ceiling `CLAUDE_PR_REVIEW_DAILY_USD`, default 55), and can be dispatched by
-  hand from `main` with a pull request number and the exact head commit. It runs only while the repository variable
-  `CLAUDE_PR_REVIEW_ENABLED` is `true`, and the schedule only while `CLAUDE_PR_REVIEW_EVERY_PR` is also `true`; a
-  tokenless resolve job chooses the heads, and the review is advisory. It uses the action pin v1.0.247 (`2dca132f`) and the
-  `ANTHROPIC_API_KEY` of the main-only `claude-review` environment (since 2026-10-10; no federation input). `main` is at the workspace root and the pull request head is data under `pr-head/`; Claude has Read, Glob
-  and Grep only, a $5 client budget and at most 30 assistant turns; the job grants `contents: read`, `pull-requests: read` and
-  `actions: read`. A model-free step copies the review to the job summary; nothing is posted to the pull request
-  ([decision](decisions/2026-10-08-claude-actions-pr-review.md)).
-  [Scheduled run 37988961127](https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/37988961127)
-  completed with failure on 2026-10-09 under federation; this is execution evidence, not accepted model usage.
-  All three Claude workflows retain `zero_cost_error_without_model_usage` when an error result has zero cost
-  and empty model usage, and still fail their bounds check. Raw provider messages are excluded. The class does not
-  identify a deny reason; see the [federation diagnosis](decisions/2026-10-10-claude-federation-diagnostics.md),
-  kept as the record of why the owner moved CI review to an API key.
-- **Pre-cue toolkit read** (`claude-pr-toolkit-review.yml`, added 2026-10-09): Anthropic's pr-review-toolkit agents
-  `pr-test-analyzer` and `silent-failure-hunter`, from `anthropics/claude-code` at
-  `602df92bf481ed904533e95c09f740f40aab5aed` (checked out with its three files' SHA-256 verified, loaded with
-  `--plugin-dir`, never installed from a marketplace at run time), read one pull request head in parallel and list
-  every behaviour and test change its description does not declare. Dispatched by hand from `main` by the owner, and
-  only while `CLAUDE_PR_TOOLKIT_ENABLED` is `true`; Opus 5.5 at `max` effort, Read, Glob, Grep and the Agent tool, a
-  $22 client budget and a time limit scaled by the diff's size; a model-free step copies both reports to the job
-  summary and nothing is posted to the pull request ([decision](decisions/2026-10-09-claude-actions-pr-toolkit-review.md)).
-  Its output is an input before the command center's cue, never a designated read. No hosted run has been made.
+- **Claude review inside GitHub: retired (2026-10-10).** The owner decided that AI reviews run on the local host and
+  GitHub enforces the gates ([decision](decisions/2026-10-10-retire-in-github-claude-review.md)). The three workflows that ran
+  `anthropics/claude-code-action` (`claude-pr-review.yml`, `claude-pr-toolkit-review.yml`, `harness-audit.yml`) are
+  removed: the API refused every request that carried the action's attribution, on every stored Console key, while
+  the same keys work from the CLI and the Agent SDK. Reviews now come from the local Claude review worker, the GPT
+  and trading reads, and Codex's GitHub review; the required checks and the landing scripts enforce the gates.
 - **Against the final catalog of 2026-10-01** (`docs/final-catalog-20261001.md`, #595): the picks each blind model
   family made for these layers. The clean-room definitive round announced there decides one pick per slot.
   - git-github-automation: both families picked git, gh, Worktrunk and sem (the Claude pick keeps sem only if a
     structural-diff comparison shows a gain); one picked difftastic and claude-code-action. difftastic remains the
-    selection of record; decision M45 recorded claude-code-action as unadopted. The later configured harness above
-    still awaits hosted acceptance.
+    selection of record; decision M45 recorded claude-code-action as unadopted.
   - ci-supply-chain: both families picked attest, Syft, Dependabot, actionlint (kjanat) and zizmor, all in use;
     `github/codeql-action`, picked by one, is the `upload-sarif` step above.
   - secrets-credentials: both families picked betterleaks, and one picked trufflehog. gitleaks stays the required

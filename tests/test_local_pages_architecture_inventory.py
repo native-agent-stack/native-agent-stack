@@ -183,7 +183,7 @@ class InventoryTests(unittest.TestCase):
         self.assertEqual(result["coverage"]["hash_bytes"], real.stat().st_size)
 
     def test_every_hashed_inventory_input_is_declared_once_with_computed_digest(self):
-        workflow = self.write(self.root / ".github/workflows/harness-audit.yml", "name: fixture audit\n")
+        workflow = self.write(self.root / ".github/workflows/pr-metadata.yml", "name: fixture workflow\n")
         agent = self.write(self.root / "adoption/agents/blind-judge.md", "fixture agent\n")
         script = self.write(self.root / "scripts/evidence_manifest.py", "# fixture script\n")
         skill = self.write(self.skills / "known/SKILL.md", "fixture skill\n")

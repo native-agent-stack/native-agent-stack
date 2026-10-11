@@ -1,0 +1,10 @@
+Publication validation failed:
+scripts/component_matrix.py: SHA-256 mismatch
+scripts/component_matrix.py: byte count mismatch
+tests/test_component_matrix.py: SHA-256 mismatch
+tests/test_component_matrix.py: byte count mismatch
+tools/sota-convergence/gap_wave_ledger.py: SHA-256 mismatch
+tools/sota-convergence/gap_wave_ledger.py: byte count mismatch
+evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/final-join-tests.json: evidence file is not hash-listed
+evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/final-join-tests.stderr.txt: evidence file is not hash-listed
+evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/final-join-tests.stdout.txt: evidence file is not hash-listed

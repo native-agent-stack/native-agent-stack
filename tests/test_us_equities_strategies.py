@@ -643,6 +643,7 @@ class NativeStrategyTests(unittest.TestCase):
                     now,
                     now + 10_000_000_000,
                     tuple(sorted(values.items())),
+                    halted=False,
                 )
                 original_start, original_submit = port.start, port.submit
 
@@ -828,6 +829,7 @@ class NativeStrategyTests(unittest.TestCase):
                         now,
                         now + 10_000_000_000,
                         tuple(sorted(values.items())),
+                        halted=False,
                         expiry_ns=now + 86400_000_000_000,
                     )
                     original_start = port.start

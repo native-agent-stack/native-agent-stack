@@ -1,0 +1,105 @@
+{
+  "command": [
+    "execute_comparators.py",
+    "--data",
+    "../../../.local/share/codex-ecosystem/lean-985ef30-spy-frozen/Data",
+    "--fresh",
+    "../backtesting-gaps-20261010/replay-diagnostic-2/native",
+    "--output",
+    "cc-micro-comparators"
+  ],
+  "cwd": "~/.cache/native-agent-stack/backtesting-gaps-20261011",
+  "observed_exit_code": 0,
+  "started_utc": "2026-10-11T09:54:17Z",
+  "finished_utc": "2026-10-11T09:54:18Z",
+  "observed_utc": "2026-10-11T09:54:19Z",
+  "input_hashes": [
+    {
+      "path": "blueprints/us-equities/backtesting-gap-burndown-20261010/execute_comparators.py",
+      "sha256": "441a170edc72ef61b8c5e6a5a1180865fe8e3950a1f15c6bf99cbdd39a9ee764"
+    }
+  ],
+  "outputs": [
+    {
+      "path": "~/.cache/native-agent-stack/backtesting-gaps-20261011/cc-micro-comparators/accepted-v2-bars.verdict.json",
+      "execution_checks": {
+        "fail": 0,
+        "pass": 106,
+        "skipped": 0
+      },
+      "verdict": "FAIL",
+      "digest_basis": "published_bytes",
+      "published_copy": {
+        "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-bars.verdict.json",
+        "sha256": "46e0757187c2dfc4891fd7f3930d871524647c3e5dae699d07f2e12fd833c896",
+        "bytes": 49380
+      }
+    },
+    {
+      "path": "~/.cache/native-agent-stack/backtesting-gaps-20261011/cc-micro-comparators/accepted-v2-lean-data.verdict.json",
+      "execution_checks": {
+        "fail": 0,
+        "pass": 106,
+        "skipped": 0
+      },
+      "verdict": "PASS",
+      "digest_basis": "published_bytes",
+      "published_copy": {
+        "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-lean-data.verdict.json",
+        "sha256": "8d6b96cc44f333c7f7d1216b23b5eb654100439566bcda0344034d4b215760f4",
+        "bytes": 49245
+      }
+    },
+    {
+      "path": "~/.cache/native-agent-stack/backtesting-gaps-20261011/cc-micro-comparators/accepted-v2-no-attribution.verdict.json",
+      "execution_checks": {
+        "fail": 0,
+        "pass": 92,
+        "skipped": 3
+      },
+      "verdict": "FAIL",
+      "digest_basis": "published_bytes",
+      "published_copy": {
+        "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-no-attribution.verdict.json",
+        "sha256": "85cf9b96067b1b5437f725552c3dbfa584427f16a0767376a5fe02f32db735b5",
+        "bytes": 46487
+      }
+    },
+    {
+      "path": "~/.cache/native-agent-stack/backtesting-gaps-20261011/cc-micro-comparators/fresh-native-v2.verdict.json",
+      "execution_checks": {
+        "fail": 0,
+        "pass": 106,
+        "skipped": 0
+      },
+      "verdict": "FAIL",
+      "digest_basis": "published_bytes",
+      "published_copy": {
+        "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/fresh-native-v2.verdict.json",
+        "sha256": "5bc6896cf67e942bfcd65cf479c1793d167bcf98dd4e6d4a478321465f612599",
+        "bytes": 49446
+      }
+    }
+  ],
+  "captured_outputs": [
+    {
+      "path": "~/.cache/native-agent-stack/backtesting-gaps-20261011/cc-micro-comparators.stdout.txt",
+      "digest_basis": "published_bytes",
+      "published_copy": {
+        "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/published/cc-micro-comparators-cc-micro-comparators.stdout.txt",
+        "sha256": "4be2c764be4b6e24b7a85f051f15001cec0fd7cc9f2f7712092b43e86699c057",
+        "bytes": 98805
+      }
+    },
+    {
+      "path": "~/.cache/native-agent-stack/backtesting-gaps-20261011/cc-micro-comparators.stderr.txt",
+      "digest_basis": "published_bytes",
+      "published_copy": {
+        "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/red-matrix-wave-join.stdout.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    }
+  ],
+  "scope": "Actual four-mode reproduction invoked outside ROOT with relative data/fresh/output paths; explicit validated execution counts."
+}

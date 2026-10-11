@@ -15,6 +15,17 @@ adaptive lane. Receipts carry no account id, balance or credential.
 """
 from __future__ import annotations
 
+from runtime_lock import RuntimeLockError, runtime_read_lock, runtime_read_locked
+
+if __name__ == "__main__":
+    try:
+        _runtime_cli_guard = runtime_read_lock()
+        _runtime_cli_guard.__enter__()
+    except RuntimeLockError:
+        import sys
+        print("refused: canonical runtime lock unavailable", file=sys.stderr)
+        raise SystemExit(2)
+
 import argparse
 import asyncio
 from collections import Counter
@@ -592,7 +603,7 @@ def _controller_session(close, now, session_policy):
     if not session_policy["extended_hours"]:
         return close, True
     moment = datetime.fromtimestamp(now, timezone.utc)
-    market_open = session_at(moment).kind != SessionKind.CLOSED
+    market_open = session_at(moment).kind in (SessionKind.PRE, SessionKind.RTH, SessionKind.POST)
     if market_open:
         close = extended_session_close(moment).astimezone(timezone.utc).timestamp()
     return close, market_open
@@ -1069,6 +1080,7 @@ def build_parser():
     return parser
 
 
+@runtime_read_locked
 def main(argv=None):
     global LAST_OUTPUT
     args = build_parser().parse_args(argv)
