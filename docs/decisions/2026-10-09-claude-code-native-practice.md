@@ -105,6 +105,8 @@ family reconciled (257, of which 102 changed) is in [supersession.json](../../ev
 
 ## Decided defaults
 
+**Superseded in part (2026-10-10).** The `github-action` slot is retired, and the Actions part of `pr-review-pre-cue` with it ([2026-10-10-retire-in-github-claude-review.md](2026-10-10-retire-in-github-claude-review.md)). The rows below stay as the history of 2026-10-09; the skill's rows carry the change, and its status values gain `retired`.
+
 Status values: default, default (scoped), recommendation (owner's choice), trial, pending.
 
 | Slot | Layer | Status | Default |
