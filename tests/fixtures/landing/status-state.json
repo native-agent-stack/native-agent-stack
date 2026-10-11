@@ -1,0 +1,39 @@
+{
+  "graphql": {
+    "url": "https://docs.github.com/public/fpt/schema.docs.graphql",
+    "captured_at": "2026-10-11T04:45:34Z",
+    "last_modified": "Thu, 08 Oct 2026 18:09:03 GMT",
+    "sha256": "3ed095654b22b1a8e7a88af36af2b28cb6d9613da332e9c57303e30476958d42",
+    "bytes": 1562177,
+    "lines": [65267, 65292],
+    "excerpt_sha256": "9deb956501396930ce63aef6764a99eba0fe377a5a126f141fa2bde9b79290b7",
+    "excerpt": [
+      "enum StatusState @docsCategory(name: \"commits\") {",
+      "  \"\"\"",
+      "  Status is errored.",
+      "  \"\"\"",
+      "  ERROR",
+      "",
+      "  \"\"\"",
+      "  Status is expected.",
+      "  \"\"\"",
+      "  EXPECTED",
+      "",
+      "  \"\"\"",
+      "  Status is failing.",
+      "  \"\"\"",
+      "  FAILURE",
+      "",
+      "  \"\"\"",
+      "  Status is pending.",
+      "  \"\"\"",
+      "  PENDING",
+      "",
+      "  \"\"\"",
+      "  Status is successful.",
+      "  \"\"\"",
+      "  SUCCESS",
+      "}"
+    ]
+  }
+}

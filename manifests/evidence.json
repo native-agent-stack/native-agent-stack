@@ -60151,6 +60151,11 @@
       "bytes": 2534
     },
     {
+      "path": "tests/fixtures/landing/status-state.json",
+      "sha256": "da8e555303f21d08eea960f35709d6a60664ca5c74c4eeff9fd711269199e369",
+      "bytes": 974
+    },
+    {
       "path": "tests/fixtures/skill_usage/codex_lanes/rollout-2026-10-19T04-00-00-lanes-before.jsonl.fixture",
       "sha256": "b54ff0bf58f9eaf936b995fbdd3593bec586aac7045470465a2f028a5ed8c0c9",
       "bytes": 444
@@ -60872,8 +60877,8 @@
     },
     {
       "path": "tests/test_landing_scripts.py",
-      "sha256": "df9cc481417a18e8cedadd2a2425b36f248ea01f369cba37af2708e67e0db2d7",
-      "bytes": 100835
+      "sha256": "4713d91ac5e51e5b9f7f553b495bb34cceb4122e82d62a78bf098e0089f6eb49",
+      "bytes": 111147
     },
     {
       "path": "tests/test_landscape.py",
@@ -61777,13 +61782,13 @@
     },
     {
       "path": "tools/landing/README.md",
-      "sha256": "81938d1a8574cbf5aa7a90c2355c2fe69401c34828a3cef85d91becf7e125dda",
-      "bytes": 13038
+      "sha256": "7d6c6772af775a6cac8a64cf30c84feee4214efd6870e42bef89a88b6b0e9658",
+      "bytes": 15731
     },
     {
       "path": "tools/landing/codex_gate.py",
-      "sha256": "31524d2871cde79ecb2c5b9bc56b6175ce9fafab9ad4d2e2e3eb3594e1cb2422",
-      "bytes": 5838
+      "sha256": "cc96f69b411b76652b1d024988d3bb374444a40dca6f175dd6559aa4de9e7a33",
+      "bytes": 6258
     },
     {
       "path": "tools/landing/nas_land.sh",
@@ -61792,8 +61797,8 @@
     },
     {
       "path": "tools/landing/uet_land.sh",
-      "sha256": "232638fef1fd9830f454d25485bc8a709978c5534b72b80d8ecd3302554411fa",
-      "bytes": 18680
+      "sha256": "9518ca6c0464054a40cbec8bcccdb577294a75d941c773e4461ff8f31db79b09",
+      "bytes": 18867
     },
     {
       "path": "tools/local-pages/architecture_mapping.json",

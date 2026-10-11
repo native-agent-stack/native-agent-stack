@@ -8,11 +8,13 @@ This module is that harness's offline subset, kept beside the one copy of the sc
   * the trading-cc-read gate (tcc_read_gate): the description form, the record's last verdict line, the status states;
   * change identity (lg_change_id, lg_same_change) against scratch repositories: binary bytes, mode, names, `--` and `++` lines;
   * the CI line: uet's lg_ci_state on synthetic rollups and nas's check-run line, and both against every member of GitHub's
-    CheckConclusionState in a captured schema excerpt (tests/fixtures/landing/check-conclusion-state.json) and null;
-  * codex_gate.py: its exit-code precedence on canned API data (subprocess.run and datetime.now are patched);
+    CheckConclusionState in a captured schema excerpt (tests/fixtures/landing/check-conclusion-state.json) and null, and uet's
+    commit statuses against every member of StatusState (tests/fixtures/landing/status-state.json), a state it does not list and none;
+  * codex_gate.py: its exit-code precedence on canned API data (subprocess.run and datetime.now are patched), and the script run as
+    the landing scripts run it, where a failure prints one fixed line and exits 4;
   * each script end to end with a fake gh, python3 and sleep: the variables and their defaults, the gate path through a symlink and
     a wrapper, the order in which the gates stop a landing, and a failed merge that must not print gh's output;
-  * the files under tools/landing: no home path and no form of the running account's name (#975 P2-1).
+  * the files under tools/landing: no home path and no form of the running account's name (#975 P2-1), and the README's digests.
 
 A decision site is cut out by the same start and end lines the harness used, so an edit that moves a site fails here loudly instead
 of leaving it untested. Everything but the captured schema excerpt is synthetic: no network, no gh, no cache files. `jq` is required
@@ -55,6 +57,10 @@ NAS_REPO = "seathatflowsinourveins/native-agent-stack"
 # #975 P2-3: GitHub's CheckConclusionState as captured from its published GraphQL schema, with the REST description's check-run enum
 CONCLUSIONS = ROOT / "tests/fixtures/landing/check-conclusion-state.json"
 PASSING_CONCLUSIONS = ("SUCCESS", "NEUTRAL", "SKIPPED")  # the scripts' allow-list; any other completed conclusion, null included, fails
+# #975 P3: GitHub's StatusState (uet reads commit statuses), captured the same way; only SUCCESS passes, PENDING and EXPECTED are running
+STATUSES = ROOT / "tests/fixtures/landing/status-state.json"
+RUNNING_STATES = ("PENDING", "EXPECTED")
+UNLISTED_STATE = "FUTURE_STATE"  # synthetic: a state GitHub may add to StatusState later; the script must fail closed on it
 
 
 def setUpModule():
@@ -110,11 +116,13 @@ case "$1 $2" in
 esac
 '''
 # codex_gate.py and scripts/validate.py both run as `python3 ...` in the scripts; the log shows which path each call got.
+# FAKE_REAL_PYTHON, when set, runs the real codex_gate.py with that interpreter instead of the canned answer (its gh is the fake gh).
 FAKE_PYTHON3 = r'''#!/usr/bin/env bash
 printf 'python3 %s\n' "$*" >> "$FAKE_LOG"
 case "$*" in
   *scripts/validate.py*) printf 'validate-tree %s\n' "$(git ls-files | tr '\n' ' ')" >> "$FAKE_LOG"
                          echo "validate stub"; exit "${FAKE_VALIDATE_RC:-0}" ;;
+  *codex_gate.py*) [ -z "${FAKE_REAL_PYTHON:-}" ] || exec "$FAKE_REAL_PYTHON" "$@" ;;
 esac
 rc=${FAKE_GATE_RC:-0}
 if [ -n "${FAKE_GATE_SEQ:-}" ]; then
@@ -407,6 +415,29 @@ class ScriptTextTests(LandingCase):
                 self.assertTrue(codes)
                 for code in codes:
                     self.assertRegex(section, rf"(?<![0-9]){code} [A-Za-z]", f"exit {code} is not described")
+
+    def test_the_readme_digests_each_file_as_committed(self):
+        # #975 (review of the P2 fix commit): the "Here" column held the bytes from before the review's edits. The last cell of each row is the file's
+        # sha256 and line count as committed, so an edit that leaves it behind fails here.
+        readme = (LANDING / "README.md").read_text(encoding="utf-8")
+        for name in ("uet_land.sh", "nas_land.sh", "codex_gate.py"):
+            with self.subTest(file=name):
+                row = next(line for line in readme.splitlines() if line.startswith(f"| `{name}` |"))
+                cell = re.fullmatch(r"`([0-9a-f]{64})` \((\d+) lines\)", row.rstrip(" |").rsplit("|", 1)[1].strip())
+                self.assertIsNotNone(cell, "the last cell of the row reads `<sha256>` (<n> lines)")
+                data = (LANDING / name).read_bytes()
+                self.assertEqual((cell.group(1), int(cell.group(2))), (hashlib.sha256(data).hexdigest(), data.count(b"\n")))
+
+    def test_readme_states_the_failed_merge_message_the_gate_error_and_the_name_scan_exemption(self):
+        # #975 (review of the P2 fix commit): the README said the failed-merge message names the file's path (it names the file only), listed
+        # no exit 4 for a failing gate, and did not say which accounts skip the name scan or why.
+        flat = " ".join((LANDING / "README.md").read_text(encoding="utf-8").split())
+        self.assertIn("names only that file, not its path", flat)
+        self.assertNotIn("whose path the message names", flat)
+        self.assertIn("one fixed line naming only the error class", flat)
+        self.assertIn("fewer than 4 characters, and the home-path scan still runs", flat)
+        for name in sorted(GENERIC_ACCOUNTS):
+            self.assertIn(f"`{name}`", flat)
 
     def evaluate(self, lines, names, arg0="landing.sh", **extra):
         script = "set -u\n" + "\n".join(lines) + "\n" + "".join(f'printf "%s\\n" "${name}"\n' for name in names)
@@ -882,6 +913,12 @@ def conclusion_states():
     return [line.strip() for line in excerpt if re.fullmatch(r"  [A-Z_]+", line)]
 
 
+def status_states():
+    """Every member of GitHub's GraphQL StatusState, parsed from the schema excerpt in its fixture."""
+    excerpt = json.loads(STATUSES.read_text(encoding="utf-8"))["graphql"]["excerpt"]
+    return [line.strip() for line in excerpt if re.fullmatch(r"  [A-Z_]+", line)]
+
+
 def ci_reference_uet(entries):
     """What the CI line must say: incomplete, failing, total and ci-gate successes (the rule, in Python)."""
     incomplete = failing = 0
@@ -893,9 +930,9 @@ def ci_reference_uet(entries):
             elif entry.get("conclusion") not in PASSING_CONCLUSIONS:
                 failing += 1
         elif kind == "StatusContext":
-            if entry.get("state") in ("PENDING", "EXPECTED"):
+            if entry.get("state") in RUNNING_STATES:
                 incomplete += 1
-            elif entry.get("state") in ("FAILURE", "ERROR"):
+            elif entry.get("state") != "SUCCESS":  # #975 P3: an allow-list, so a state GitHub adds later fails too
                 failing += 1
         else:
             incomplete += 1
@@ -930,6 +967,8 @@ class CiLineTests(LandingCase):
             ("all green plus an EXPECTED status", green + [status_context("other", "EXPECTED")]),
             ("all green plus a FAILURE status", green + [status_context("other", "FAILURE")]),
             ("all green plus an ERROR status", green + [status_context("other", "ERROR")]),
+            ("all green plus a status in a state GitHub does not list fails closed (synthetic)", green + [status_context("other", UNLISTED_STATE)]),
+            ("all green plus a status with no state fails closed", green + [{"__typename": "StatusContext", "context": "other"}]),
             ("an incomplete CheckRun", green + [check_run("slow", "IN_PROGRESS", "")]),
             ("a failing CheckRun", green + [check_run("bad", "COMPLETED", "FAILURE")]),
             ("a cancelled and a timed-out CheckRun", green + [check_run("c", "COMPLETED", "CANCELLED"), check_run("t", "COMPLETED", "TIMED_OUT")]),
@@ -997,6 +1036,30 @@ class CiLineTests(LandingCase):
             with self.subTest(script="nas", conclusion=rest):
                 code, out = self.ci_line(self.nas, {"check_runs": [nas_run("validate", t), nas_run("other", t, conclusion=rest)]})
                 self.assertEqual((code, out.split("\t")), (0, ["0", failing, "2", "1"]))
+
+    def test_the_status_fixture_is_the_schema_excerpt_it_names(self):
+        graphql = json.loads(STATUSES.read_text(encoding="utf-8"))["graphql"]
+        first, last = graphql["lines"]
+        self.assertEqual(len(graphql["excerpt"]), last - first + 1)
+        self.assertTrue(graphql["excerpt"][0].startswith("enum StatusState "))
+        self.assertEqual(graphql["excerpt"][-1], "}")
+        text = "\n".join(graphql["excerpt"]) + "\n"  # the bytes of `sed -n '65267,65292p' schema.docs.graphql`
+        self.assertEqual(hashlib.sha256(text.encode("utf-8")).hexdigest(), graphql["excerpt_sha256"])
+        self.assertEqual(sorted(status_states()), ["ERROR", "EXPECTED", "FAILURE", "PENDING", "SUCCESS"])
+        # one schema file for both excerpts: the same address, digest and size
+        conclusions = json.loads(CONCLUSIONS.read_text(encoding="utf-8"))["graphql"]
+        self.assertEqual({key: graphql[key] for key in ("url", "sha256", "bytes")}, {key: conclusions[key] for key in ("url", "sha256", "bytes")})
+
+    def test_every_commit_status_state_but_success_pending_and_expected_fails_the_uet_ci_line(self):
+        # #975 P3, next to a passing ci-gate: every member of the captured StatusState, a state it does not list (synthetic) and none.
+        # The old rule counted only FAILURE and ERROR as failing, so a state GitHub adds later passed.
+        for state in [*status_states(), UNLISTED_STATE, None]:
+            incomplete = "1" if state in RUNNING_STATES else "0"
+            failing = "0" if state == "SUCCESS" or state in RUNNING_STATES else "1"
+            with self.subTest(state=state):
+                rollup = [check_run("ci-gate"), status_context("other", state)]
+                code, out = self.ci_line(self.uet, {"headRefOid": "H" * 40, "statusCheckRollup": rollup, "mergeStateStatus": "CLEAN"})
+                self.assertEqual((code, out.split("\t")[1:5]), (0, [incomplete, failing, "2", "1"]))
 
 
 # ---------------------------------------------------------------------------------------------- 6. codex_gate.py
@@ -1142,6 +1205,40 @@ class CodexGateTests(unittest.TestCase):
         for fail in ("all", "head", "lists"):
             with self.subTest(failing=fail), self.assertRaises(subprocess.CalledProcessError):
                 self.run_gate(fail=fail)
+
+    def test_a_failing_gate_prints_one_fixed_line_naming_the_error_class_and_exits_4(self):
+        # #975 P2: the landing scripts run `python3 -I codex_gate.py <repo> <pr> 2>&1` and echo the output, and an uncaught exception
+        # printed its whole traceback: every frame names a file (an install under a home directory, the interpreter's library), and an
+        # exception message can carry what gh returned. Run as the scripts run it, from a path with home-path syntax, against a fake gh
+        # that fails in three ways, the gate must print one fixed line with the class alone and exit 4.
+        address = "gate-leak-4e1b@example.invalid"
+        fakes = (("gh exits 1 and writes to stderr", f"#!/bin/sh\necho 'HTTP 502 {address}' >&2\nexit 1\n", "CalledProcessError"),
+                 ("gh answers with a value the gate cannot read (its message names the value)", f'#!/bin/sh\necho \'{{"created_at": "{address}"}}\'\n', "ValueError"),
+                 ("there is no gh", None, "FileNotFoundError"))
+        for name, script, error in fakes:
+            with self.subTest(case=name), tempfile.TemporaryDirectory(prefix="gate-") as scratch:
+                scratch = Path(scratch)
+                installed = scratch / "home/example/tools"  # home-path syntax, as an install under a home directory has
+                installed.mkdir(parents=True)
+                shutil.copy(LANDING / "codex_gate.py", installed / "codex_gate.py")
+                bin_dir = scratch / "bin"
+                bin_dir.mkdir()
+                if script is not None:
+                    (bin_dir / "gh").write_text(script, encoding="utf-8")
+                    (bin_dir / "gh").chmod(0o755)
+                done = subprocess.run([sys.executable, "-I", str(installed / "codex_gate.py"), "o/r", "7"], capture_output=True, text=True,
+                                      env={"PATH": str(bin_dir), "LC_ALL": "C.UTF-8"}, timeout=30)
+                output = done.stdout + done.stderr
+                # the problems are named, never quoted: a failure here must not print a path or an address either
+                problems = [label for label, found in (
+                    ("the exit code is not 4", done.returncode != 4),
+                    ("stdout is not the one fixed line", done.stdout != f"Codex gate error: {error}; details withheld\n"),
+                    ("something is on stderr", done.stderr != ""),
+                    ("a traceback", "Traceback" in output),
+                    ("a home path", bool(HOME_PATH.search(output.encode()))),
+                    ("what gh returned", address in output),
+                ) if found]
+                self.assertEqual(problems, [])
 
     def test_command_line_needs_exactly_two_arguments(self):
         for argv in ([], ["o/r"], ["o/r", "7", "extra"]):
@@ -1403,6 +1500,23 @@ class EndToEndTests(LandingCase):
                 self.assertIn("just before the merge", out)
                 self.assertEqual((len(self.gate_calls(log)), self.merge_calls(log)), (2, []))
 
+    def test_a_gate_that_fails_stops_both_scripts_with_9_at_the_wait_and_before_the_merge(self):
+        # #975 P2: codex_gate.py exits 4 with one fixed line when it fails; both scripts treat a 4 as a stop. At the wait, through the
+        # real gate (the fake gh has no answer for the pull request, so its first call fails); before the merge, with a canned 4.
+        line = "Codex gate error: CalledProcessError; details withheld"
+        for script in (self.uet, self.nas):
+            with self.subTest(script=script.key, at="the wait, through the real gate"):
+                code, out, log = self.land(script, FAKE_REAL_PYTHON=sys.executable)
+                self.assertEqual(code, 9, out)
+                self.assertIn(f"#{PR} {line}: stop, land after Codex finishes", out)
+                self.assertNotIn("Traceback", out)
+                self.assertEqual((len(self.gate_calls(log)), self.merge_calls(log)), (1, []))
+            with self.subTest(script=script.key, at="just before the merge"):
+                code, out, log = self.land(script, FAKE_GATE_SEQ="0 4", FAKE_GATE_LINE=line)
+                self.assertEqual(code, 9, out)
+                self.assertIn(f"#{PR} {line} just before the merge: stop", out)
+                self.assertEqual((len(self.gate_calls(log)), self.merge_calls(log)), (2, []))
+
     def test_codex_gate_codes_map_to_continue_poll_or_stop(self):
         for script in (self.uet, self.nas):
             with self.subTest(script=script.key, gate="running forever (3)"):
@@ -1475,6 +1589,21 @@ class EndToEndTests(LandingCase):
                     else:
                         self.assertEqual((code, self.merge_calls(log)), (5, []), out)
                         self.assertIn("CI failing=1 of 2", out)
+
+    def test_a_commit_status_other_than_success_stops_uet_before_any_merge_unless_it_is_still_running(self):
+        # #975 P3: ci-gate passes and a commit status joins it. SUCCESS merges; PENDING and EXPECTED are running, so the wait ends at its
+        # timeout (6); every other state, one GitHub does not list (synthetic) and none included, stops with 5. The old rule let
+        # a state outside FAILURE and ERROR through to the merge.
+        for state in [*status_states(), UNLISTED_STATE, None]:
+            with self.subTest(state=state):
+                code, out, log = self.land(self.uet, rollup=[check_run("ci-gate"), status_context("other", state)])
+                if state == "SUCCESS":
+                    self.assertEqual((code, len(self.merge_calls(log))), (0, 1), out)
+                elif state in RUNNING_STATES:
+                    self.assertEqual((code, "CI timeout" in out, self.merge_calls(log)), (6, True, []), out)
+                else:
+                    self.assertEqual((code, self.merge_calls(log)), (5, []), out)
+                    self.assertIn("CI failing=1 of 2", out)
 
     def test_a_failed_merge_prints_a_class_not_the_gh_output_which_stays_in_a_0600_file(self):
         # #975 P2-2: gh's merge diagnostic can carry an address. The script prints a fixed message with a class from a fixed list and

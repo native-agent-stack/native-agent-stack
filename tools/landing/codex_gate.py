@@ -4,7 +4,8 @@
 Prints one status line. Exit codes:
   0  the connector finished a review at or after the PR's latest review trigger, and no review is running;
   3  a review is running, or none has finished since the latest trigger (poll again);
-  4  the latest review ended in a state other than Completed (a person decides);
+  4  the latest review ended in a state other than Completed (a person decides), or the gate itself failed: any exception
+     prints one fixed line naming only its class, never a traceback (which prints file paths) or gh's output (#975 P2);
   5  Codex is unavailable: since the latest trigger it posted a usage-limit or account notice, or showed no
      activity at all for NOSTART_MINUTES (the landing proceeds on its other reviews and logs this line).
      Measured 2026-10-09: the connector answered "You have reached your Codex usage limits" at 22:42:34Z (uet#51)
@@ -105,4 +106,9 @@ def main(repo, pr):
 if __name__ == "__main__":
     if len(sys.argv) != 3:
         sys.exit(__doc__)
-    sys.exit(main(sys.argv[1], sys.argv[2]))
+    try:
+        code = main(sys.argv[1], sys.argv[2])
+    except Exception as error:  # the landing scripts echo this output: a traceback prints file paths, gh's output can carry an address
+        print(f"Codex gate error: {type(error).__name__}; details withheld")
+        code = 4
+    sys.exit(code)
