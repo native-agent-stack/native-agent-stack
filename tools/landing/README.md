@@ -12,8 +12,9 @@ merge. In order: the `trading-cc-read` commit status and its record (below); eac
 when such a file states a landing gate); the head is the read head or a pure rebase of it; a draft is marked ready and
 `codex_gate.py` must report the latest review finished (polled for up to 20 minutes); when Codex reports its usage limit,
 `GPT_VERDICT` (the co-op's verdict naming the read head) stands in for it; the branch is updated by rebase and its change must
-equal the read change; CI is complete with nothing failing and `ci-gate` reported; open review threads stop it (exit 8); the
-merge is pinned to the head with `--match-head-commit`.
+equal the read change; CI is complete with nothing failing and `ci-gate` reported (a head that moves during CI is followed, at
+most three times, only when it carries the read head's change, otherwise exit 3); open review threads stop it (exit 8); the merge
+is pinned to the head with `--match-head-commit` and names the account's no-reply address as its author (below).
 
 **`nas_land.sh <pr> <read-head-prefix> <verdict-file>...`** does the same for `seathatflowsinourveins/native-agent-stack`,
 with the verdict files as arguments (at least one) and these differences: `manifests/evidence.json` is left out of the change
@@ -28,6 +29,14 @@ connector activity for 10 minutes). A trigger is the pull request's creation, a 
 the connector that starts with `@codex review` or `@codex security review`; a push is not a trigger. Any completion evidence
 since the trigger (a Completed row, a connector review, a +1 reaction, its no-findings comment) gives 0 even when a later row
 says Cancelled; a Running row always gives 3.
+
+**The author address (CC correction #148).** GitHub authors a squash merge with the account's primary email unless the merge names
+one, which published the owner's personal address on every landing. Both scripts form the no-reply address
+`<id>+<login>@users.noreply.github.com` (`lg_author_email`: the login is the repository owner, the id comes from the public
+`gh api users/<login> --jq .id`, and `gh api user` is never called; a non-numeric id is a failure), pass it to the squash merge with
+`gh pr merge -A`, and afterwards compare the merge commit's author with it (`lg_author_check`, inside `jq`; it prints text only and
+never an address, and reads the merge commit up to five times). The owner's setting "Keep my email addresses private" fixes the
+source and also covers merges made in the web UI; this is the script-side guarantee.
 
 ## Variables
 
@@ -53,7 +62,9 @@ From the script headers. `uet_land.sh`: 2 verdict gate, 3 head moved, 4 change d
 8 blocked, 9 Codex review running, not finished since its latest trigger, or ended other than Completed (`codex_gate.py`).
 `nas_land.sh`: 2 verdict gate, 3 head moved, 5 CI failing, 6 timeout, 7 merge failed, 8 blocked by policy, 9 as above, 10 the
 merge onto current `origin/main` fails `scripts/validate.py` or does not merge cleanly. Its header omits one code it also uses:
-4 when `update-branch` is refused or the change differs after it. `codex_gate.py`: 0, 3, 4 and 5 as above.
+4 when `update-branch` is refused or the change differs after it. Both scripts also exit 11 when the no-reply author address cannot
+be formed (nothing is merged) and 12 when the merge landed but its commit's author is not that address or the commit could not be
+read (CC correction #148). `codex_gate.py`: 0, 3, 4 and 5 as above.
 
 ## The record convention
 
@@ -71,20 +82,22 @@ CHANGES_REQUESTED on line 1 or as that last word rejects, and a PASS or ACK anyw
 
 ## Provenance and digests
 
-The files were moved from the CC's tools directory on 2026-10-10 and are the live copies with only host literals changed:
+The files were moved from the CC's tools directory on 2026-10-10 and synced on 2026-10-11 to the live copies the CC installed at
+00:02Z (the head-following function of uet#58 and correction #148). They are the live copies with only host literals changed:
 three lines per shell script (the repository default and `COORD` on one line, the record path, the gate path), the same line
 counts, and `codex_gate.py` byte for byte. Expanding the three expressions to the CC host's paths gives the live digests below.
 
-| File | Before correction #136 | Live copy, after #136 | Here |
+| File | Before correction #136 | Live copy, after #148 | Here |
 | --- | --- | --- | --- |
-| `uet_land.sh` | `b794e3a46772c0a598dff9eee972ad449e5d63f0c81b60b9db1d5cb4944747bb` (115 lines) | `97f6a9929f9551e48a31eb4907e8c1852fc758a0060d6be7b41a83a7d254800b` (193 lines) | `93e9f8323eb35f03e052e43394293c43789acc824b658aba66b0ff63b962f656` (193 lines) |
-| `nas_land.sh` | `2fefe070b95229de3dcad14052cf5c031b70c202bf4a34f4452e6e0cb5832936` (135 lines) | `10dfdbc2560d339ce1fd707d9dc7f1b672e6420eaca41670a80cf923f74046b7` (204 lines) | `7249ce4d8838b151efe5dd69e60e64153135028bd886d0e6f2bc2174a9bae2cb` (204 lines) |
+| `uet_land.sh` | `b794e3a46772c0a598dff9eee972ad449e5d63f0c81b60b9db1d5cb4944747bb` (115 lines) | `301fb5b07274b28fde0f2061356bf9682883eca352c8bcb7a3119e8934920c7d` (232 lines) | `2aeef175407ba58a463d461a6d0e9ad93eeec71b7731d6824e1acefc8cd5f9cb` (232 lines) |
+| `nas_land.sh` | `2fefe070b95229de3dcad14052cf5c031b70c202bf4a34f4452e6e0cb5832936` (135 lines) | `96144670bc301036604fc39e57e3ab4e4a2e43a6b9d6b8b645ef7b02482f4017` (243 lines) | `6b86ef7c01df0068b5161aa46369ca9ff8f67fafabfa2e18e6398b908c20eb91` (243 lines) |
 | `codex_gate.py` | (unchanged) | `31524d2871cde79ecb2c5b9bc56b6175ce9fafab9ad4d2e2e3eb3594e1cb2422` (108 lines) | the same |
 
 Corrections the scripts carry: #118 (every gate before the merge, in order), #121 (a verdict file that states a landing gate needs
-a receipt), #122 and #123 (a Codex review must have finished; uet#40 and uet#47 merged while one was running), and #136
+a receipt), #122 and #123 (a Codex review must have finished; uet#40 and uet#47 merged while one was running), #136
 (verdict and record acceptance, change identity and the CI line: the three loose decision points the shared
-`# >>> land-gate-fns` block replaced). The block is identical in both scripts, apart from `lg_ci_state`, which only
+`# >>> land-gate-fns` block replaced), the head-following of 2026-10-10 (uet#58: an update-branch rebase does not reach every API view at
+once, so a head that moves during CI and carries the read head's change is followed, at most three times) and #148 (the author address). The block is identical in both scripts, apart from `lg_ci_state`, which only
 `uet_land.sh` has.
 
 ## Known gaps, left as they were
@@ -102,5 +115,6 @@ The files are the live copies with host literals replaced, so these stay until a
 `tests/test_landing_scripts.py` is correction #136's regression: it cuts each decision site out of the script text (the same
 start and end lines the correction's harness used) and runs it in bash with a fake `gh`, against synthetic verdict files,
 records, scratch repositories and rollups; it runs `codex_gate.py` on canned API data; and it runs both scripts end to end with
-a fake `gh`, `python3` and `sleep`, including the gate path through a symlink and a wrapper. It is offline, needs `jq`, and is
+a fake `gh`, `python3` and `sleep`, including the gate path through a symlink and a wrapper, a head that moves during CI (followed
+three times, then exit 3) and the author address (the merge argv, exits 11 and 12, no address in the output). It is offline, needs `jq`, and is
 Linux-only. A script edit that moves a decision site fails the module instead of leaving it untested.

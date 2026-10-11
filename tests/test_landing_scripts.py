@@ -41,6 +41,7 @@ LANDING = ROOT / "tools/landing"
 IN_CI = os.environ.get("GITHUB_ACTIONS") == "true" or os.environ.get("CI", "").lower() == "true"
 HEAD = "3d8c6344a0e2150d296d84bacff48bc394180e92"
 OTHER = "9f8e7d6c5b4a39281706f5e4d3c2b1a098765432"
+NOREPLY = "4242424+seathatflowsinourveins@users.noreply.github.com"  # the fake gh serves id 4242424 for the repository owner
 PR = str(90000000 + os.getpid())  # per process: the nas script makes /var/tmp/nas-land-<pr>-XXXXXX worktrees, which parallel runs must not share
 UET_REPO = "seathatflowsinourveins/us-equities-trading"
 NAS_REPO = "seathatflowsinourveins/native-agent-stack"
@@ -79,8 +80,10 @@ case "$1 $2" in
     case "$2" in
       *"/statuses"*) exec jq -r "$prog" "$FAKE_STATUSES" ;;
       *"/check-runs"*) exec jq -r "$prog" "$FAKE_CHECKRUNS" ;;
+      *"/commits/"*) printf '{"commit":{"author":{"email":"%s"}}}' "${FAKE_COMMIT_EMAIL-4242424+seathatflowsinourveins@users.noreply.github.com}" | jq -r "$prog" ;;
       *) exit 1 ;;
     esac ;;
+  "api users/"*) [ "${FAKE_USER_RC:-0}" = 0 ] || exit "$FAKE_USER_RC"; echo "${FAKE_USER_ID-4242424}"; exit 0 ;;
   "api graphql") echo "${FAKE_OPEN_THREADS:-0}"; exit 0 ;;
   "pr view")
     if [ -n "${FAKE_HEADS:-}" ] && [[ "$*" == *headRefOid* ]]; then
@@ -235,7 +238,7 @@ def accept(code, reject_code=2):
 class ScriptTextTests(LandingCase):
     def test_no_home_literal_or_user_name_in_tools_landing(self):
         pattern = re.compile(r"/(?:home|Users)/[A-Za-z0-9_.-]|[A-Za-z]:[\\/]+Users[\\/]|/root/")
-        for path in sorted(LANDING.iterdir()):
+        for path in sorted(item for item in LANDING.iterdir() if item.is_file()):  # not __pycache__, which the tests importing codex_gate.py create
             with self.subTest(file=path.name):
                 self.assertEqual(pattern.findall(path.read_text(encoding="utf-8")), [])
 
@@ -663,6 +666,24 @@ class ChangeIdentityTests(LandingCase):
                     code, out = self.change_same(script, self.repo, a, b)
                     self.assertEqual(code, 0 if expected == "same" else 1, out)
 
+    def test_a_moved_head_is_followed_only_when_it_carries_the_read_heads_change_and_at_most_three_times(self):
+        r = self.refs
+        cases = [
+            ("the same change in a new commit, no follow yet", r["read"], r["same-again"], 0, "base", 0),
+            ("the same change, two follows so far", r["read"], r["same-again"], 2, "base", 0),
+            ("the same change as the fourth move", r["read"], r["same-again"], 3, "base", 1),
+            ("a pure rebase onto a main that moved", r["read"], r["rebased"], 1, "main2", 0),
+            ("a different change", r["read"], r["v-ordinary"], 0, "base", 1),
+            ("an empty new head", r["read"], "", 0, "base", 1),
+            ("a commit the clone does not have", r["read"], "0" * 40, 0, "base", 1),
+        ]
+        for script in (self.uet, self.nas):
+            for name, read, new, follows, main, expected in cases:
+                with self.subTest(script=script.key, case=name):
+                    self.set_main(main)
+                    code, out = self.bash(self.change_prelude(script, self.repo), f"{script.change}\nlg_follow_head {read} {q(new)} {follows}")
+                    self.assertEqual(code, expected, out)
+
     def reference_id(self, commit, exclude=None):
         """patch-id of the neutral diff between the commit and its merge base, spelled out here with every neutralizing flag."""
         env = tests.hermetic_git_environment()
@@ -1008,19 +1029,24 @@ class EndToEndTests(LandingCase):
         git(cls.repo, "checkout", "-q", "-b", "rebased", "main")
         git(cls.repo, "cherry-pick", cls.head)
         cls.rebased = git(cls.repo, "rev-parse", "HEAD")
+        cls.variants = []  # the same change in four more commits: a head that keeps moving by pure rebases
+        for number in range(1, 5):
+            git(cls.repo, "checkout", "-q", "-B", f"variant{number}", cls.rebased)
+            git(cls.repo, "commit", "-q", "--amend", "--allow-empty", "-m", f"the change, variant {number}")
+            cls.variants.append(git(cls.repo, "rev-parse", "HEAD"))
         git(cls.repo, "checkout", "-q", "--detach", cls.base)  # the clone's HEAD is not the current main: the scripts must not use it
         cls.home = cls.dir / "home"
         cls.home.mkdir()
 
     def land(self, script, *, args=None, via=None, head=None, merge_state="CLEAN", rollup=None, checkruns=None, statuses=None,
-             verdict=None, draft=False, **extra):
+             verdict=None, draft=False, merge_commit="f" * 40, **extra):
         """Run a landing; returns (exit code, stdout+stderr, the fake commands' log lines)."""
         run = self.dir / f"run-{next(self.counter)}"
         run.mkdir()
         gate = [check_run("ci-gate")] if rollup is None else rollup
         (run / "prview.json").write_text(json.dumps({
             "headRefOid": head or self.head, "isDraft": draft, "mergeStateStatus": merge_state, "statusCheckRollup": gate,
-            "state": "MERGED", "mergeCommit": {"oid": "f" * 40}, "mergedAt": "2026-10-10T00:00:00Z"}))
+            "state": "MERGED", "mergeCommit": None if merge_commit is None else {"oid": merge_commit}, "mergedAt": "2026-10-10T00:00:00Z"}))
         (run / "statuses.json").write_text(json.dumps(statuses or []))
         (run / "checkruns.json").write_text(json.dumps({"check_runs": checkruns if checkruns is not None else [nas_run("validate", "2026-10-10T10:00:00Z")]}))
         verdict_file = run / "verdict.md"
@@ -1047,7 +1073,7 @@ class EndToEndTests(LandingCase):
         code, out, log = self.land(self.uet)
         self.assertEqual(code, 0, out)
         self.assertIn("same change", out)
-        self.assertEqual(self.merge_calls(log), [f"gh pr merge {PR} -R {UET_REPO} --squash --match-head-commit {self.head}"])
+        self.assertEqual(self.merge_calls(log), [f"gh pr merge {PR} -R {UET_REPO} --squash --match-head-commit {self.head} -A {NOREPLY}"])
         gate = f"{os.path.realpath(LANDING)}/codex_gate.py"
         self.assertEqual(self.gate_calls(log), [f"python3 -I {gate} {UET_REPO} {PR}"] * 2, "before the wait and before the merge")
 
@@ -1055,7 +1081,7 @@ class EndToEndTests(LandingCase):
         code, out, log = self.land(self.nas)
         self.assertEqual(code, 0, out)
         self.assertIn("the merge onto current main validates", out)
-        self.assertEqual(self.merge_calls(log), [f"gh pr merge {PR} -R {NAS_REPO} --squash --match-head-commit {self.head}"])
+        self.assertEqual(self.merge_calls(log), [f"gh pr merge {PR} -R {NAS_REPO} --squash --match-head-commit {self.head} -A {NOREPLY}"])
         gate = f"{os.path.realpath(LANDING)}/codex_gate.py"
         self.assertEqual(self.gate_calls(log), [f"python3 -I {gate} {NAS_REPO} {PR}"] * 2)
         self.assertEqual([line for line in log if "validate.py" in line], ["python3 -E -s -B scripts/validate.py"])
@@ -1142,7 +1168,32 @@ class EndToEndTests(LandingCase):
                 code, out, log = self.land(script, head=self.rebased)
                 self.assertEqual(code, 0, out)
                 self.assertNotEqual(self.rebased, self.head)
-                self.assertEqual(self.merge_calls(log), [f"gh pr merge {PR} -R {repo} --squash --match-head-commit {self.rebased}"])
+                self.assertEqual(self.merge_calls(log), [f"gh pr merge {PR} -R {repo} --squash --match-head-commit {self.rebased} -A {NOREPLY}"])
+
+    def test_a_failed_address_lookup_stops_before_the_merge_with_11(self):
+        for script in (self.uet, self.nas):
+            with self.subTest(script=script.key):
+                for env in ({"FAKE_USER_RC": "1"}, {"FAKE_USER_ID": "null"}):
+                    code, out, log = self.land(script, **env)
+                    self.assertEqual((code, self.merge_calls(log)), (11, []), out)
+                    self.assertIn("cannot form the no-reply author address", out)
+
+    def test_a_merge_commit_with_another_author_address_exits_12_without_printing_it(self):
+        for script in (self.uet, self.nas):
+            with self.subTest(script=script.key):
+                code, out, log = self.land(script, FAKE_COMMIT_EMAIL="someone.else@example.invalid")
+                self.assertEqual(code, 12, out)
+                self.assertEqual(len(self.merge_calls(log)), 1, "the landing happened; the exit code reports the check")
+                self.assertIn("is NOT the no-reply form", out)
+                self.assertNotIn("example.invalid", out)
+                self.assertNotIn("someone.else", " ".join(log))
+
+    def test_a_landing_whose_merge_commit_is_unreadable_exits_12(self):
+        for script in (self.uet, self.nas):
+            with self.subTest(script=script.key):
+                code, out, log = self.land(script, merge_commit=None)
+                self.assertEqual(code, 12, out)
+                self.assertIn("author address NOT CHECKED", out)
 
     def test_a_draft_is_marked_ready_before_codex_is_asked(self):
         for script, repo in ((self.uet, UET_REPO), (self.nas, NAS_REPO)):
@@ -1167,6 +1218,24 @@ class EndToEndTests(LandingCase):
         self.assertEqual(code, 3, out)
         self.assertIn("head moved to", out)
         self.assertEqual(self.merge_calls(log), [])
+
+    def test_a_head_that_moves_to_a_pure_rebase_during_ci_is_followed_and_the_merge_is_pinned_to_it(self):
+        for script, repo, heads in ((self.uet, UET_REPO, f"{self.head} {self.head} {self.rebased}"), (self.nas, NAS_REPO, f"{self.head} {self.rebased}")):
+            with self.subTest(script=script.key):
+                code, out, log = self.land(script, FAKE_HEADS=heads)
+                self.assertEqual(code, 0, out)
+                self.assertIn("carries the read head's change: following it", out)
+                self.assertEqual(self.merge_calls(log), [f"gh pr merge {PR} -R {repo} --squash --match-head-commit {self.rebased} -A {NOREPLY}"])
+
+    def test_a_head_that_keeps_moving_is_followed_three_times_and_then_stops_with_3(self):
+        v = self.variants
+        for script, heads in ((self.uet, [self.head, self.head, *v]), (self.nas, [self.head, *v])):
+            with self.subTest(script=script.key):
+                code, out, log = self.land(script, FAKE_HEADS=" ".join(heads))
+                self.assertEqual(code, 3, out)
+                self.assertEqual(out.count("carries the read head's change: following it"), 3, out)
+                self.assertIn(f"head moved to {v[3]}", out)
+                self.assertEqual(self.merge_calls(log), [])
 
     def test_codex_reopening_between_the_wait_and_the_merge_stops_with_9(self):
         for script in (self.uet, self.nas):

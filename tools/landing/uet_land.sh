@@ -7,6 +7,7 @@
 # The current head may already be a rebase of the read head (an earlier update-branch); the change check decides.
 # Exit codes: 2 verdict gate, 3 head moved, 4 change differs, 5 CI failed, 6 timeout, 7 merge failed, 8 blocked,
 # 9 Codex review running, not finished since its latest trigger, or ended other than Completed (codex_gate.py).
+# 11 the no-reply author address could not be formed (nothing merged), 12 merged, but the merge commit's author is not that address (correction #148).
 # Correction #136 (2026-10-10): verdict/record acceptance, change identity and the CI state use the lg_* functions below (land-patches-20261010).
 set -u
 # Parsed whole before it runs: an edit while a landing runs cannot shift what the running copy executes (2026-10-09).
@@ -86,6 +87,37 @@ lg_change_id() {  # <commit>
   echo "names:$(printf '%s\n' "$names" | sha256sum | cut -c1-40)"
 }
 lg_same_change() { local a b; a=$(lg_change_id "$1") || return 1; b=$(lg_change_id "$2") || return 1; [ "$a" = "$b" ]; }
+# CC 2026-10-10 (uet#58): an update-branch rebase does not reach every API view at once (the REST update-branch endpoint
+# answers 202 Accepted). 6 s after it, headRefOid still gave the read head while the CI view gave the rebased head, and the
+# landing stopped on its own rebase (exit 3). A head that moves during CI is followed only when it carries the read head's
+# change, at most 3 times per landing; any other move still stops, and the merge stays pinned with --match-head-commit.
+lg_follow_head() {  # <read head> <new head> <follows so far>
+  [ -n "${2:-}" ] && [ "${3:-0}" -lt 3 ] || return 1
+  ${LG_GIT:-git} fetch -q origin main 2>/dev/null
+  ${LG_GIT:-git} cat-file -e "$2^{commit}" 2>/dev/null || ${LG_GIT:-git} fetch -q origin "$2" 2>/dev/null || return 1
+  lg_same_change "$1" "$2"
+}
+# Correction #148 (2026-10-10): GitHub authors a squash merge with the account's primary email unless the merge names one, so every landing
+# published the owner's personal address. The merge names the no-reply form <id>+<login>@users.noreply.github.com (`gh pr merge -A`, gh 2.102.0);
+# the id comes from the public users API, because `gh api user` is refused by the secret-path guard. No stored address is ever printed.
+lg_author_email() {  # <owner/repo> : the account's no-reply address; rc 1 and nothing printed when the id is not a number
+  local login=${1%%/*} id
+  id=$(gh api "users/$login" --jq .id 2>/dev/null) || return 1
+  case "$id" in ''|*[!0-9]*) return 1 ;; esac
+  printf '%s+%s@users.noreply.github.com\n' "$id" "$login"
+}
+lg_author_check() {  # <owner/repo> <pr> <no-reply address> : after the merge, the merge commit's author is that address; prints text only, never the stored address
+  local mc="" ok="" i
+  for i in 1 2 3 4 5; do
+    mc=$(gh pr view "$2" -R "$1" --json mergeCommit --jq '.mergeCommit.oid // empty' 2>/dev/null)
+    [ -n "$mc" ] && break
+    sleep 3
+  done
+  [ -n "$mc" ] || { echo "#$2 author address NOT CHECKED: the merge commit is unreadable (correction #148)"; return 1; }
+  ok=$(gh api "repos/$1/commits/$mc" --jq ".commit.author.email == \"$3\"" 2>/dev/null)
+  [ "$ok" = true ] && { echo "#$2 author address on ${mc:0:8}: the no-reply form"; return 0; }
+  echo "#$2 author address on ${mc:0:8} is NOT the no-reply form (correction #148)"; return 1
+}
 # The CI state of a pull request as one tab-separated line: head, incomplete, failing, total, ci-gate successes, mergeStateStatus.
 # A CheckRun is complete when .status is COMPLETED and failing on FAILURE, CANCELLED or TIMED_OUT; a commit status (StatusContext, such as
 # trading-cc-read) has .state and no .status: PENDING or EXPECTED is running, FAILURE or ERROR is failing, SUCCESS is complete. A rollup
@@ -167,13 +199,18 @@ H=$(gh pr view "$N" -R $R --json headRefOid --jq .headRefOid)
 git -C $U cat-file -e "$H" 2>/dev/null || git -C $U fetch -q origin "$H"
 same_change "$E" "$H" || { echo "#$N CHANGE DIFFERS between read head ${E:0:8} and head ${H:0:8}: stop"; exit 4; }
 echo "#$N read ${E:0:12} -> head ${H:0:12}: same change (file set and per-file changed lines)"
+follows=0
 for i in $(seq 1 25); do
   # The required check (ci-gate) must have reported for this head: early-registering checks alone are not "CI done"
   # (2026-10-09 #26: a merge was attempted while only fast checks had registered).
   # Correction #136: lg_ci_state counts a commit status by .state (a PENDING trading-cc-read is running, a SUCCESS one is complete), CheckRuns by .status.
   s=$(lg_ci_state "$N")
   set -- $s
-  [ "${1:-}" = "$H" ] || { echo "#$N head moved to ${1:-?} during CI: stop"; exit 3; }
+  if [ "${1:-}" != "$H" ]; then
+    lg_follow_head "$E" "${1:-}" "$follows" || { echo "#$N head moved to ${1:-?} during CI: stop"; exit 3; }
+    echo "#$N head moved to ${1:0:8} during CI and carries the read head's change: following it"
+    H=$1; follows=$((follows + 1)); sleep 20; continue
+  fi
   if [ "${2:-1}" = 0 ] && [ "${4:-0}" -gt 0 ] && { [ "${5:-0}" -gt 0 ] || [ "${3:-0}" -gt 0 ]; }; then
     [ "$3" = 0 ] || { echo "#$N CI failing=$3 of $4: stop"; exit 5; }
     if [ "${6:-}" = BLOCKED ]; then
@@ -181,9 +218,11 @@ for i in $(seq 1 25); do
       echo "#$N BLOCKED by branch policy with CI green; unresolved review threads: $open. Not forcing."; exit 8
     fi
     g=$(python3 -I "$GATE" "$R" "$N" 2>&1); gr=$?; { [ $gr = 0 ] || [ $gr = 5 ]; } || { echo "#$N $g just before the merge: stop"; exit 9; }
-    out=$(gh pr merge "$N" -R $R --squash --match-head-commit "$H" 2>&1) || { echo "#$N merge failed: $out"; exit 7; }
+    ae=$(lg_author_email "$R") || { echo "#$N cannot form the no-reply author address (correction #148): stop, nothing merged"; exit 11; }
+    out=$(gh pr merge "$N" -R $R --squash --match-head-commit "$H" -A "$ae" 2>&1) || { echo "#$N merge failed: $out"; exit 7; }
     sleep 4
     echo "#$N $(gh pr view "$N" -R $R --json state,mergeCommit,mergedAt --jq '"\(.state) \(.mergeCommit.oid) \(.mergedAt)"') (CI $4 ok)"
+    lg_author_check "$R" "$N" "$ae" || exit 12
     exit 0
   fi
   sleep 120
