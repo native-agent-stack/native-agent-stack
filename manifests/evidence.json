@@ -4926,8 +4926,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/SKILL.md",
-      "sha256": "b5c3a79c84062514c8077300570f7c6875919d912f2ad465541989e9b4320006",
-      "bytes": 2281
+      "sha256": "005288455c9d6a0bd70772847e2bb2411554d90eeabc0aa135af5d12fe99b353",
+      "bytes": 2290
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/agent-sdks.md",
@@ -4981,8 +4981,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.json",
-      "sha256": "c670b7f2f025a9b212bfb80d639ead8cc7ff41d64afb05918601a0a1cac948a0",
-      "bytes": 142752
+      "sha256": "9eccbb3cff0c88ae80f4bf13c985ba52f56468f2560765e9f5b397b18b107cc5",
+      "bytes": 142925
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.md",
@@ -20052,8 +20052,8 @@
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/claude-native-slot-manifest.json",
-      "sha256": "57c484cdd0e1230b2f549c650494ef1921ff6c35e0c7c7512fd081e6f25c45fb",
-      "bytes": 237592
+      "sha256": "0c81a93b40feff0debf83f0eb6e49d24f6188a76a2487608764e5ecb6eac19a0",
+      "bytes": 237763
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/fresh-session.json",
@@ -61027,13 +61027,13 @@
     },
     {
       "path": "tests/test_native_practice_retired_routes.py",
-      "sha256": "a8e732a7af26e63e62418c052fe8ab5af9a4a9b545030abff66803699e49f2aa",
-      "bytes": 36248
+      "sha256": "53f7d824d60ab0d8f1c3f80b836b7e55b8470cca73b902bc49202b1856047e01",
+      "bytes": 45385
     },
     {
       "path": "tests/test_native_practice_snapshot_provenance.py",
-      "sha256": "7783cb23c2ef76d64437d40b6e9f017436d8d2f01273a842fe952f2a33ea1665",
-      "bytes": 8177
+      "sha256": "71e1c5c757294d4f1ef15e597f06822ff24d5c8f2fcabd2710bbe3fd0db5566e",
+      "bytes": 8589
     },
     {
       "path": "tests/test_native_recovery.py",

@@ -945,7 +945,7 @@
      "relation": "extends",
      "evidence_kind": "asserted",
      "clients": "claude-code",
-     "native_mechanism": "Claude Code (page example): `claude -p` with --allowedTools and --output-format json per eval, in a GitHub workflow triggered on paths CLAUDE.md and .claude/** plus a nightly cron. Under our selection rule, promptfoo 0.124.0 or the skill-creator benchmark would carry the checks."
+     "native_mechanism": "Claude Code (page example): `claude -p` with --allowedTools and --output-format json per eval, triggered on paths CLAUDE.md and .claude/** plus a nightly cron. The page runs it in a GitHub workflow, a Claude run that is retired here (decision of 2026-10-10), so the checks run locally. Under our selection rule, promptfoo 0.124.0 or the skill-creator benchmark would carry the checks."
     }
    ],
    "primary_sources_total": 40
@@ -1910,7 +1910,7 @@
      "relation": "extends",
      "evidence_kind": "asserted",
      "clients": "claude-code",
-     "native_mechanism": "Claude Code: claude-code-action triggered by an @claude mention on a PR review comment, with write tools. The page also describes a custom slash command (a skill) that sweeps unresolved comments and failing checks until the PR is green."
+     "native_mechanism": "Claude Code: claude-code-action triggered by an @claude mention on a PR review comment, with write tools (retired here on 2026-10-10: the workflows that ran it are removed). The page also describes a custom slash command (a skill) that sweeps unresolved comments and failing checks until the PR is green."
     }
    ],
    "primary_sources_total": 1

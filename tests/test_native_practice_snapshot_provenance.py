@@ -112,10 +112,14 @@ class SnapshotLabelTests(unittest.TestCase):
                 with self.subTest(field=field, slot=slot_id):
                     self.assertNotEqual(manifest_fields(self.rows[slot_id])[field], slot_fields(self.slots[slot_id])[field])
 
-    def test_no_other_exported_field_differs_while_the_slots_file_has_the_labeled_bytes(self):
-        if sha256(self.slots_raw) != self.current["sha256_when_labeled"]:
-            self.skipTest("reference/slots.json changed after the snapshot was labeled; the exact list of differences "
-                          "was reconciled against the labeled bytes only")
+    def test_the_label_names_the_shipped_slots_file(self):
+        # A label on other bytes used to make the exact-difference test below skip without a failure: the forward commit of #1001 edited the selection_rule after the manifest was labeled, and the
+        # check the description says runs was skipped (OK, skipped=1). A change to the slots file now has to carry its label.
+        self.assertEqual(sha256(self.slots_raw), self.current["sha256_when_labeled"],
+                         "reference/slots.json changed after the snapshot was labeled: set current_decision_source.sha256_when_labeled to its sha256 and make "
+                         "differs_from_this_snapshot_in the differences the next test reports")
+
+    def test_no_other_exported_field_differs(self):
         listed = {(field, slot_id) for field, slot_ids in self.current["differs_from_this_snapshot_in"].items()
                   for slot_id in slot_ids}
         actual = set()
