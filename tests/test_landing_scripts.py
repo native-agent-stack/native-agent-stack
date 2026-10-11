@@ -92,7 +92,8 @@ def q(path):
 
 # ---------------------------------------------------------------------------------------------- fake commands
 # GitHub-side data are JSON files named by FAKE_STATUSES, FAKE_CHECKRUNS and FAKE_PRVIEW; the scripts' own --jq programs are
-# evaluated on them by jq, so the real programs run. Every call is appended to FAKE_LOG.
+# evaluated on them by jq, so the real programs run. Every call is appended to FAKE_LOG. FAKE_STATUSES lists the statuses as REST does,
+# newest first (github/rest-api-description@58b1e0c0 api.github.com.json:55724).
 # #975 P2-2: FAKE_FAIL (a glob on the arguments) makes the matching calls fail from the FAKE_FAIL_FROM-th (default 1) on: exit 1,
 # FAKE_FAIL_STDERR on stderr and FAKE_FAIL_STDOUT on stdout. As gh does (cli v2.102.0), `gh api` puts an error response's body on
 # stdout and "gh: <message>" on stderr (pkg/cmd/api/api.go:546, :557), every other command prints its error only to stderr
@@ -928,10 +929,17 @@ class TccReadGateTests(LandingCase):
                  ("error", [self.status("error", good)], 2),
                  ("no status at all", [], 0),
                  ("another context failing is not this gate", [self.status("failure", good, context="other")], 0),
-                 ("newer success replaces an older failure", [self.status("failure", good, "2026-10-10T00:00:00Z"),
-                                                              self.status("success", good, "2026-10-10T01:00:00Z")], 0),
-                 ("newer failure replaces an older success", [self.status("success", good, "2026-10-10T00:00:00Z"),
-                                                              self.status("failure", good, "2026-10-10T01:00:00Z")], 2)]
+                 # REST lists a ref's statuses newest first (github/rest-api-description@58b1e0c0 api.github.com.json:55724), as these do
+                 ("newer success replaces an older failure", [self.status("success", good, "2026-10-10T01:00:00Z"),
+                                                              self.status("failure", good, "2026-10-10T00:00:00Z")], 0),
+                 ("newer failure replaces an older success", [self.status("failure", good, "2026-10-10T01:00:00Z"),
+                                                              self.status("success", good, "2026-10-10T00:00:00Z")], 2),
+                 # #975 B1 (the CC's micro at 5b8ba3b2): two statuses posted in the same second; the first listed is the newest. The
+                 # stable sort_by(.updated_at)|last took the older success over the newer failure (exit 0 at 5b8ba3b2).
+                 ("a failure in the same second as an older success, listed first", [self.status("failure", good, "2026-10-10T01:00:00Z"),
+                                                                                   self.status("success", good, "2026-10-10T01:00:00Z")], 2),
+                 ("a success in the same second as an older failure, listed first", [self.status("success", good, "2026-10-10T01:00:00Z"),
+                                                                                   self.status("failure", good, "2026-10-10T01:00:00Z")], 0)]
         for name, statuses, expected in cases:
             for script in (self.uet, self.nas):
                 with self.subTest(case=name, site=script.key):
@@ -1195,22 +1203,29 @@ def ci_reference_uet(entries):
 RUN_IDS = itertools.count(1)  # REST check-run ids: a re-run gets a larger one
 
 
-def nas_run(name, started, status="completed", conclusion="success"):
-    return {"name": name, "status": status, "conclusion": conclusion, "started_at": started, "id": next(RUN_IDS)}
+def nas_run(name, started, status="completed", conclusion="success", completed=...):
+    """A REST check run. completed_at defaults to the start for a completed run and to null for any other (both are nullable)."""
+    if completed is ...:
+        completed = started if status == "completed" else None
+    return {"name": name, "status": status, "conclusion": conclusion, "started_at": started, "completed_at": completed, "id": next(RUN_IDS)}
 
 
 def ci_reference_nas(runs):
-    """#975 round 4 (the CC's P3-1): a name is incomplete while any of its runs is not completed, and failing or validated by its latest
-    completed run (latest by started_at, then id; a queued re-run has started_at null)."""
+    """#975 round 4 (the CC's P3-1) and final round (Astra's follow-up 1 at 5b8ba3b2): a name is incomplete while any of its runs is not
+    completed, while a completed run has no completed_at, or while the completed runs with the greatest completed_at disagree on the
+    conclusion; it is failing or validated by its completed run with the greatest completed_at (the first such run, as jq takes it)."""
     names = {}
     for run in runs:
         names.setdefault(run["name"], []).append(run)
     passing = [conclusion.lower() for conclusion in PASSING_CONCLUSIONS]  # REST spells the conclusions in lower case
     incomplete = failing = validated = 0
     for name, group in names.items():
-        busy = any(r["status"] != "completed" for r in group)
         done = [r for r in group if r["status"] == "completed"]
-        latest = max(done, key=lambda r: (r["started_at"] or "", r["id"])) if done else None
+        stamps = [r["completed_at"] for r in done if r["completed_at"] is not None]
+        newest = [r for r in done if r["completed_at"] == (max(stamps) if stamps else None)]
+        busy = (any(r["status"] != "completed" for r in group) or any(r["completed_at"] is None for r in done)
+                or len({r["conclusion"] for r in newest}) > 1)
+        latest = newest[0] if newest else None
         incomplete += busy
         failing += latest is not None and latest["conclusion"] not in passing
         validated += name == "validate" and not busy and latest is not None and latest["conclusion"] == "success"
@@ -1266,6 +1281,15 @@ class CiLineTests(LandingCase):
             ("a superseded run still queued keeps its name incomplete", [nas_run("validate", "2026-10-10T10:05:00Z"), nas_run("validate", None, status="queued", conclusion=None),
                                                                          nas_run("lint", t)]),
             ("the latest completed run decides a failure", [nas_run("validate", t), nas_run("x", t, conclusion="failure"), nas_run("x", "2026-10-10T10:09:00Z")]),
+            # #975 final round (Astra's follow-up 1 at 5b8ba3b2, ruled FIX-NOW): max_by([.started_at // "", .id // 0]) let a completed
+            # failing re-run with no start lose to an older success (0 failing at 5b8ba3b2); completion decides which run is the latest
+            ("a completed failing re-run with no start, newer by completion", [nas_run("validate", "2026-10-10T12:00:00Z"),
+                                                                              nas_run("audit", "2026-10-10T12:00:00Z"),
+                                                                              nas_run("audit", None, conclusion="failure", completed="2026-10-10T12:10:00Z")]),
+            ("a completed run with no completed_at is incomplete", [nas_run("validate", t), nas_run("lint", t, completed=None)]),
+            ("two completed runs at one completed_at with different conclusions are incomplete",
+             [nas_run("validate", t), nas_run("lint", t, completed="2026-10-10T10:07:00Z"), nas_run("lint", "2026-10-10T10:01:00Z", conclusion="failure", completed="2026-10-10T10:07:00Z")]),
+            ("two completed runs at one completed_at with one conclusion", [nas_run("validate", t), nas_run("validate", "2026-10-10T10:01:00Z", completed=t)]),
         ]
         for name, runs in cases:
             with self.subTest(case=name):
@@ -2376,7 +2400,7 @@ class EndToEndTests(LandingCase):
                 kind = "codex"
             elif script.key == "uet" and re.match(r"gh pr view \S+ -R \S+ --json headRefOid,statusCheckRollup,mergeStateStatus ", line):
                 kind = "ci"
-            elif script.key == "nas" and re.match(rf"gh api repos/{repo}/commits/[0-9a-f]{{40}}/check-runs\?per_page=100 ", line):
+            elif script.key == "nas" and re.match(rf"gh api repos/{repo}/commits/[0-9a-f]{{40}}/check-runs\?filter=latest&per_page=100 ", line):
                 kind = "ci"
             elif re.fullmatch(r"git -C \S+ ls-remote origin refs/heads/main", line):
                 kind = "main"
@@ -2413,6 +2437,7 @@ class EndToEndTests(LandingCase):
         status = {"context": "trading-cc-read", "description": f"PASS: trading-cc/reads/{record.name}", "updated_at": "2026-10-10T00:00:00Z"}
         ok_status = [{**status, "state": "success"}]
         failed = json.dumps([{**status, "state": "failure", "updated_at": "2026-10-10T01:00:00Z"}, {**status, "state": "success"}])
+        same_second = json.dumps([{**status, "state": "failure"}, {**status, "state": "success"}])  # one updated_at; the newer listed first
         verdict = self.dir / f"flip-{n}-verdict.md"
         verdict.write_text(f"# Read\n\nVerdict: PASS at {h8}\n", encoding="utf-8")
         gated = self.dir / f"flip-{n}-gated.md"
@@ -2431,12 +2456,17 @@ class EndToEndTests(LandingCase):
 
         queued = (rewrite("FAKE_PRVIEW", f".statusCheckRollup = {json.dumps([check_run('ci-gate', 'QUEUED', None)])}") if script.key == "uet"
                   else rewrite("FAKE_CHECKRUNS", f".check_runs += {json.dumps([nas_run('validate', None, status='queued', conclusion=None)])}"))
+        # #975 final round (Astra's follow-up 1 at 5b8ba3b2): a completed failing re-run with no start, newer than the success by completion
+        rerun = rewrite("FAKE_CHECKRUNS", f".check_runs += {json.dumps([nas_run('validate', None, conclusion='failure', completed='2026-10-10T10:10:00Z')])}")
         cases = [
             ("a verdict file gains CHANGES_REQUESTED", {**files(verdict), **at_lookup(f"printf '\\nVerdict: CHANGES_REQUESTED at {h8}\\n' >> {q(verdict)}")}, 2,
              f"is CHANGES_REQUESTED"),
             ("GATES_DONE disappears", {**files(gated), "GATES_DONE": str(receipt), **at_lookup(f"rm -f {q(receipt)}")}, 2, "states a landing gate"),
             ("trading-cc-read turns from success to failure", {"statuses": ok_status, **at_lookup(f'printf "%s" {q(failed)} > "$FAKE_STATUSES"')}, 2,
              f"trading-cc-read is failure at {h8}"),
+            # #975 B1 (the CC's micro at 5b8ba3b2): the failure has the success's updated_at; sort_by(.updated_at)|last kept the success
+            ("trading-cc-read gains a failure in the same second, listed first", {"statuses": ok_status,
+             **at_lookup(f'printf "%s" {q(same_second)} > "$FAKE_STATUSES"')}, 2, f"trading-cc-read is failure at {h8}"),
             ("the trading-cc-read read fails with empty stdout", {"statuses": ok_status, "FAKE_FAIL": "api repos/*/statuses*", "FAKE_FAIL_FROM": "2",
                                                                  "FAKE_FAIL_STDOUT": "", "FAKE_FAIL_STDERR": "HTTP 502"}, 2, "statuses unreadable"),
             ("the trading-cc-read record gains CHANGES_REQUESTED", {"statuses": ok_status, **at_lookup(f"printf '\\nVerdict: CHANGES_REQUESTED at {h8}\\n' >> {q(record)}")}, 2,
@@ -2447,6 +2477,7 @@ class EndToEndTests(LandingCase):
             ("the head moves (to a pure rebase)", rewrite("FAKE_PRVIEW", f'.headRefOid = "{self.rebased}"'), 3, f"head moved to {self.rebased} at the final gate"),
         ]
         if script.key == "nas":
+            cases.append(("a completed failing re-run with no start, newer by completion", rerun, 5, "is no longer complete and green at the final gate"))
             cases.append(("origin/main moves after the validation read it", {"FAKE_GIT_HOOK_ON": "*ls-remote origin refs/heads/main*",
                           "FAKE_GIT_HOOK": f"git --git-dir={q(self.dir / 'origin.git')} update-ref refs/heads/main {self.main_again}"}, 13,
                           f"origin/main moved after the validation on {self.main[:8]} (final gate)"))
@@ -2503,6 +2534,37 @@ class EndToEndTests(LandingCase):
                 self.assertEqual((code, self.merge_calls(log)), (13, []), out)
                 self.assertIn(phrase, out)
                 self.assertEqual(sum(1 for line in log if line.startswith("validate-tree ")), validations)
+
+    def test_a_completed_failing_rerun_with_no_start_or_a_run_with_no_completion_time_stops_nas(self):
+        # #975 final round (Astra's follow-up 1 at 5b8ba3b2, ruled FIX-NOW): audit run 100, a success started at 12:00, and run 101, a
+        # completed failure with started_at null that completed at 12:10. max_by([.started_at // "", .id // 0]) kept the success (exit 0,
+        # one merge at 5b8ba3b2 and at 761810d7). Completion decides now, and a completed run without completed_at fails closed.
+        old = nas_run("audit", "2026-10-10T12:00:00Z")
+        new = nas_run("audit", None, conclusion="failure", completed="2026-10-10T12:10:00Z")
+        old["id"], new["id"] = 100, 101
+        cases = [("Astra's replay: a completed failing re-run with no start", [nas_run("validate", "2026-10-10T12:00:00Z"), old, new], 5,
+                  "CI failing=1 of 2"),
+                 ("a completed run with no completed_at counts as incomplete", [nas_run("validate", "2026-10-10T12:00:00Z", completed=None)], 6,
+                  "CI timeout")]
+        for name, runs, code, phrase in cases:
+            with self.subTest(case=name):
+                got, out, log = self.land(self.nas, checkruns=runs)
+                self.assertEqual((got, self.merge_calls(log)), (code, []), out)
+                self.assertIn(phrase, out)
+
+    def test_a_trading_cc_read_failure_in_the_same_second_as_a_success_stops_at_the_first_read(self):
+        # #975 B1 (the CC's micro at 5b8ba3b2): REST lists the newest status first; tcc_read_gate took sort_by(.updated_at)|last, and the
+        # stable sort kept the older success of two posted in the same second (record verified, exit 0 and one merge at 5b8ba3b2).
+        reads = self.dir / "coord/trading-cc/reads"
+        reads.mkdir(parents=True, exist_ok=True)
+        record = reads / f"same-second-{next(self.counter)}.md"
+        record.write_text(f"# r\n\nVerdict: PASS at {self.head[:8]}\n", encoding="utf-8")
+        status = {"context": "trading-cc-read", "description": f"PASS: trading-cc/reads/{record.name}", "updated_at": "2026-10-10T00:00:00Z"}
+        for script in (self.uet, self.nas):
+            with self.subTest(script=script.key):
+                code, out, log = self.land(script, statuses=[{**status, "state": "failure"}, {**status, "state": "success"}])
+                self.assertEqual((code, self.merge_calls(log), self.gate_calls(log)), (2, [], []), out)
+                self.assertIn(f"trading-cc-read is failure at {self.head[:8]}", out)
 
     def test_a_trading_cc_read_lookup_that_fails_with_empty_stdout_stops_with_2(self):
         # Codex P1 (uet:171), the CC's P2-3 and GPT P2 at 761810d7: `[ -n "$s" ] || return 0` took a failed call with nothing on stdout (a

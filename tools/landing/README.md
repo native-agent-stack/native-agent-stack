@@ -20,7 +20,10 @@ the head with `--match-head-commit` and names the account's no-reply address as 
 **`nas_land.sh <pr> <read-head-prefix> <verdict-file>...`** does the same for `seathatflowsinourveins/native-agent-stack`,
 with the verdict files as arguments (at least one) and these differences: `manifests/evidence.json` is left out of the change
 identity (CI arbitrates the registry), a BEHIND branch is updated server-side (merge method), the aggregate `validate` check
-must have succeeded at the head (a check name is incomplete while any of its runs is, and judged on its latest completed run), the
+must have succeeded at the head (the check runs are read with `filter=latest`, which "Filters check runs by their `completed_at`
+timestamp"; a check name is incomplete while any of its runs is, while a completed run has no `completed_at`, or while two completed runs
+share the greatest `completed_at` with different conclusions, and otherwise it is judged on its completed run with the greatest
+`completed_at`: completion, not start, decides which run is the latest, because a completed re-run can have a null `started_at`), the
 Codex gate is asked again before the validation, and the head is then merged into the current `origin/main` in a temporary worktree
 under `/var/tmp` where `scripts/validate.py` must exit 0 (exit 10 otherwise). Its output is never printed: it goes to a file made by
 `mktemp "${TMPDIR:-/tmp}/nas-validate-XXXXXX"` (mode 0600) outside the worktree, and exit 10 names that file and the exit code. `gh pr
@@ -122,10 +125,13 @@ template's path and the message named an empty file).
 
 **Gates read again before the merge (#975, Codex P1 at af9d1901).** The `trading-cc-read` status and its record are mutable: a newer
 status for the context supersedes an older one (the statuses list is "in reverse chronological order. The first status in the list will
-be the latest one"), and the record is append-only. Both scripts ran `tcc_read_gate` only at the start, before tens of minutes of Codex
-and CI waits; they read it again before the merge (exit 2). In `uet_land.sh` a gate result of 5 needs `GPT_VERDICT` at both gate calls:
-the wait could give 0 and the call before the merge 5 (an `@codex review` during CI that met the usage limit), and that landing merged
-with neither a finished review nor the substitute. `nas_land.sh` proceeds on a 5 by its own policy, unchanged.
+be the latest one"), and the record is append-only. `tcc_read_gate` takes the newest status of the context, the first one listed (#975
+B1, the CC's micro at 5b8ba3b2: it took the last after `sort_by(.updated_at)`, and jq's sort keeps equal keys in input order, so of two
+statuses posted in the same second it kept the older one, a success over a newer failure). Both scripts ran `tcc_read_gate` only at
+the start, before tens of minutes of Codex and CI waits; they read it again before the merge (exit 2). In `uet_land.sh` a gate result
+of 5 needs `GPT_VERDICT` at both gate calls: the wait could give 0 and the call before the merge 5 (an `@codex review` during CI that
+met the usage limit), and that landing merged with neither a finished review nor the substitute. `nas_land.sh` proceeds on a 5 by its
+own policy, unchanged.
 
 **One final gate after every slow step (#975 round 4, the CC's micro at 761810d7).** Each round-3 re-read closed one gap and left the
 next: the verdict files and `GATES_DONE` were read only at the start, a failed `trading-cc-read` read with nothing on stdout passed as
@@ -143,7 +149,9 @@ the CI wait, nas's validations, the author-address lookup); `final_gate`, fast r
 6. in `nas_land.sh`, `origin/main` by `git ls-remote`, which must be the main the merge was validated on (exit 13).
 
 Nothing slow runs between `final_gate` and the merge; the tests flip each gate between its first read and `final_gate` and check the
-exit code and that no merge is called (12 of the 17 flips merged at 761810d7). A verdict file, record or receipt is read once (`lg_text`),
+exit code and that no merge is called (15 of the 20 flips merged at 761810d7, and at 5b8ba3b2 three still merged: the two in which
+`trading-cc-read` gains a failure in the same second as its success, #975 B1, and nas's completed failing re-run with no start, Astra's
+follow-up 1). A verdict file, record or receipt is read once (`lg_text`),
 and each decision about it is made on that one text, so a file removed or rewritten between two reads cannot pass on half of each, and a
 read that fails is a refusal with a fixed message that names no path (GPT P2 at 761810d7).
 
@@ -152,7 +160,9 @@ read that fails is a refusal with a fixed message that names no path (GPT P2 at 
 the script exits; a second landing of the same repository stops at once with exit 14 before any call, as does a lock that cannot be
 opened (its path is not printed). Every `git`, `gh`, `python3` and `sleep` the scripts run is called with descriptor 9 closed, so no
 child keeps the lock after the script: a `git fetch` starts automatic maintenance that detaches and keeps every descriptor but 0-2
-(sources below).
+(sources below). The script's own `$(…)` subshells do hold descriptor 9 while they wait on the `gh` or gate call they run, so after a
+signal ends the script the lock stays held until that call returns, and a landing started meanwhile stops with exit 14: it fails closed
+(the CC's P3-a at 5b8ba3b2; measured on 2026-10-11, the lock stayed held for the rest of a 4 s child after SIGTERM, then was free).
 
 **What the final gate narrows but cannot close.** A read and the merge call are separate requests, and GitHub's merge takes one pin, the
 expected head:
@@ -165,8 +175,9 @@ expected head:
   base this is the GPT micro's A5: the merge is not bound to the validated main, so a main that moves after the final `git ls-remote`
   takes a merge validated on the main before it.
 - **Measured windows:** a Codex review goes Running 7-18 s after its trigger (11 reviews, the CC's micro at 761810d7; 14.5 s in the
-  captured nas#975 summary, trigger 10:42:50Z, Running since 10:43:04.5Z), and the gate reads no trigger it has not seen, so a trigger
-  in those seconds before the final gate's call can be missed; a later call sees it.
+  captured nas#975 summary, trigger 10:42:50Z, Running since 10:43:04.5Z). A trigger made before the final gate's call is in its
+  snapshot, so the gate waits for that review (3, then exit 9) even before its Running row appears; what it can miss is a trigger made
+  after its snapshot, in the seconds before the merge call, or one the API has not served yet (the CC's P3-d at 5b8ba3b2).
 - **The closure path:** the review App and required checks of `docs/decisions/2026-10-09-review-verdict-app-identity.md` (an owner
   item), which would move the verdicts into checks GitHub enforces at the merge.
 - **What the lock closes:** concurrent landings by our tooling, so our own landings no longer move main under each other's validated
@@ -248,15 +259,18 @@ of its messages and validates again when main moved (exit 13). The review of 761
 CHANGES_REQUESTED and the CC's Claude micro) led to a fifth round, also new to the live copies, which should again be replaced whole: the
 landing lock (exit 14), one `final_gate` after every slow step, a failed `trading-cc-read` read that stops, verdict files, records and
 receipts read once, nas's latest completed check run per name, and the gate's one GraphQL snapshot, commit cell, editor, 👀 and
-activity rules (above). The live copies were last changed at 2026-10-11T05:03:28Z (the CC's patch that took the status-gate failure
+activity rules (above). The CC's adjudication of 5b8ba3b2 added the final fix: the newest `trading-cc-read` status is the first listed
+(B1), nas's latest completed check run is decided by `completed_at` (Astra's follow-up 1, ruled fix-now), with the lock-hold and
+trigger-window wording (P3-a, P3-d); Codex's change-identity finding is a declared gap (below) and its sandboxing of the validation a
+follow-up. The live copies were last changed at 2026-10-11T05:03:28Z (the CC's patch that took the status-gate failure
 line); the "Live copy" column is their sha256 (`sha256sum`) and line count as read at 2026-10-11T13:59Z, which replace the digests of the
 CC's 03:37Z patch recorded here before (`1bc1f53b…` and `287f2e7e…`, #975 P3-2). The "Here" column is each file as committed: its
 sha256 and line count.
 
 | File | Before correction #136 | Live copy, after #148 | Live copy, since 2026-10-11T05:03:28Z | Here |
 | --- | --- | --- | --- | --- |
-| `uet_land.sh` | `b794e3a46772c0a598dff9eee972ad449e5d63f0c81b60b9db1d5cb4944747bb` (115 lines) | `301fb5b07274b28fde0f2061356bf9682883eca352c8bcb7a3119e8934920c7d` (232 lines) | `bfe664bcc00fd99cbe2a0afe7a76c483d8d7896e44f665eac066972cdec2ed7a` (233 lines) | `9287d41e92912949cef30a0994fbe213b499becf4b0271979cdf3758bca3d5c2` (372 lines) |
-| `nas_land.sh` | `2fefe070b95229de3dcad14052cf5c031b70c202bf4a34f4452e6e0cb5832936` (135 lines) | `96144670bc301036604fc39e57e3ab4e4a2e43a6b9d6b8b645ef7b02482f4017` (243 lines) | `842b85b7f53048e9df027ca537ea99b6208e616e0f239ca30bb1748a5bc1f2ad` (246 lines) | `81e9b65f3062b412bde5cdc0ff41e61d2f85b4debb4e77e90f0d0ae13cd866b9` (414 lines) |
+| `uet_land.sh` | `b794e3a46772c0a598dff9eee972ad449e5d63f0c81b60b9db1d5cb4944747bb` (115 lines) | `301fb5b07274b28fde0f2061356bf9682883eca352c8bcb7a3119e8934920c7d` (232 lines) | `bfe664bcc00fd99cbe2a0afe7a76c483d8d7896e44f665eac066972cdec2ed7a` (233 lines) | `7646ed144bbd68b4bc3bfe5717c323f465f10d5655dac51d0c6ce6a4bfb3f40e` (378 lines) |
+| `nas_land.sh` | `2fefe070b95229de3dcad14052cf5c031b70c202bf4a34f4452e6e0cb5832936` (135 lines) | `96144670bc301036604fc39e57e3ab4e4a2e43a6b9d6b8b645ef7b02482f4017` (243 lines) | `842b85b7f53048e9df027ca537ea99b6208e616e0f239ca30bb1748a5bc1f2ad` (246 lines) | `c86558907a6a6ca23c9fac25098adc602f988509404be150f8504d8f0f6405af` (426 lines) |
 | `codex_gate.py` | (unchanged) | `31524d2871cde79ecb2c5b9bc56b6175ce9fafab9ad4d2e2e3eb3594e1cb2422` (108 lines) | the same | `e2132ab71b6e55fea8922b9c5b0b8c17bde87b1d37f11bf384b785bef6f96b6a` (226 lines) |
 
 Corrections the scripts carry: #118 (every gate before the merge, in order), #121 (a verdict file that states a landing gate needs
@@ -290,6 +304,13 @@ and 4). These stay until a change with its own tests fixes them:
   P2-1 at 761810d7); one query and the newest-revision check now keep the body and its revisions one state. What remains is a
   connector that wrote an older review's completion over a newer Running row within one state (not observed). It reads each comment's
   100 newest revisions (about two per review).
+- The change identity ignores where an edit is (Codex F1 at 5b8ba3b2, pre-existing since #136): `lg_change_id` takes `git patch-id` of a
+  diff at `-U0`, and a patch ID is "a sum of SHA-1 of the file diffs associated with a patch, with line numbers ignored" (git v2.53.0
+  `Documentation/git-patch-id.adoc:17-18`), so the same changed lines at another place in the same file give the same identity, and a
+  head that carries them there counts as the read change. No real landing has shown it, only a synthetic collision. Changing the anchor
+  (`-U3` context, or another) changes which rebases keep their verdicts, a recorded practice, so the choice is a research-queue item
+  (layer "landing gate change identity": `-U3` against the `-U0` status quo, measured over the last 30 landings' rebases), with no code
+  change here.
 - The attribution is by start time and commit only, not by trigger kind (C2, the CC's P3-2 at 761810d7): a Code Review row started by a
   ready event counts for a later `@codex security review` when it starts after it. No security-review row has been seen live, so its
   row strings are not measured; matching the trigger kind waits for one.
@@ -320,12 +341,14 @@ gate giving 0 then 5 in `uet_land.sh` without, with a wrong and with an accepted
 the wait (exit 2), a main that moves after the validation (validated again; exit 13 when it keeps moving), the validation's output kept
 in its file and not printed, failed or malformed CI replies, a missing, broken or chatty gate, a missing clone and a missing verdict
 file under a home-like path (no path printed), an unusable `TMPDIR` on a failed merge, and a receipt naming only the caller's shorter
-prefix. Round 4 adds, each failing at 761810d7 (12 of the 17 flips merged there; the other five stopped, four of them on the
+prefix. Round 4 adds, each failing at 761810d7 (15 of the 20 flips merged there; the other five stopped, four of them on the
 `trading-cc-read` re-read of round 3): the final gate's reads as the last calls before the merge, in their order; each gate flipped
 between its first read and the final gate (a verdict file that gains CHANGES_REQUESTED, a `GATES_DONE` that disappears, a
-`trading-cc-read` status that turns to failure, a read of it that fails with nothing on stdout, its record that gains
-CHANGES_REQUESTED, Codex giving 3 at the final call, a queued CI re-run, the head moving, nas's main moving after the validation read
-it), each with its exit code and no merge; a Codex review that starts during nas's first validation or during the retry after main
+`trading-cc-read` status that turns to failure, a failure posted in the same second as its success and listed first (#975 B1, which
+also merged at 5b8ba3b2, as did the same pair at the first read), a read of it that fails with nothing on stdout, its record that gains
+CHANGES_REQUESTED, Codex giving 3 at the final call, a queued CI re-run, nas's completed failing re-run with no start (Astra's follow-up
+1: at 5b8ba3b2 this flip merged, and so did a landing whose CI wait met that run or a completed run without `completed_at`), the head
+moving, nas's main moving after the validation read it), each with its exit code and no merge; a Codex review that starts during nas's first validation or during the retry after main
 moved; an unreadable `origin/main` (its own stop, exit 13, the CC's P3-4); a `trading-cc-read` read that fails with empty stdout at
 the first or the final read; a held landing lock (exit 14 before any call), and a child that outlives the landing, which must not keep
 it; an unreadable verdict file,
@@ -394,4 +417,7 @@ above still hold; the schema's bytes are unchanged, sha256 `3ed09565…`); insta
 | Why children run without descriptor 9 | `git/git@v2.53.0:builtin/fetch.c`, `f7dda45536864b701aa5eca8e32462e319cf068181f642b4e4a053d9556847bf`; `run-command.c`, `bc3403bcc124da68d945ab2f4306c5ca673ba317bd3852b4bbf7789966f35cb2`; `builtin/gc.c`, `9b33422c7d0c5948a470db5a340992816aedf04dabaf0da6d57e3b004471d775`; `setup.c`, `06c1942188bc86d1a1691eb97a66d0ee278c1057661a62112bf1ecbc0776b3ec`; `Documentation/config/maintenance.adoc`, `809b79c7ff781871874e92c186908cac332fc4b0fa0dff2fb9624856e2a9fa79` | `fetch.c:2725` `run_auto_maintenance(...)` after a fetch; `run-command.c:1829-1831` `maintenance.autoDetach`, then `gc.autoDetach`, default 1, `:1835-1837` `maintenance run --auto ... --detach`; `gc.c:1823-1827` a detaching run calls `daemonize()`; `setup.c:2083-2105` `daemonize` forks, the parent exits, and the child closes 0-2 only; `maintenance.adoc:6-15` detaching is the default; `run-command.c:551-555` sets close-on-exec on git's own descriptors only, so an inherited one stays open |
 | The gate's one query (P2-1, P3-5, P3-6) | the GraphQL schema, `3ed09565…` | `schema.docs.graphql:21203` `type IssueComment`, `:21215` `author: Actor`, `:21225` `body: String!`, `:21240` `createdAt: DateTime!`, `:21250` `databaseId: Int`, `:21260` `fullDatabaseId: BigInt` ("the primary key from the database as a BigInt"), `:21384-21404` `userContentEdits`; `:2674-2678` `BigInt` "may exceed the size of a 32-bit integer, it's encoded as a string"; `:74077` `type UserContentEdit`, `:74096` `diff`, `:74101` `editedAt`, `:74106` `editor: Actor`; `:2876` `type Bot`, `:2905` `login`; `:48961-48970` `ReactionContent` has `EYES` |
 | A queued re-run has no start (P3-1) and the reaction is `eyes` | `github/rest-api-description@58b1e0c00b39:descriptions/api.github.com/api.github.com.json`, `da3d22e4…`; `jqlang/jq@jq-1.8.1:docs/content/manual/v1.8/manual.yml`, `e0eb9a084b0a8ed4f07a11dbfb0d6c31006235815481cfcd8876d48ff42b5f75` | `api.github.com.json:146097-146102` `check-run.started_at` is `"nullable": true`; `:148544-148557` a reaction's `content` enum ends with `"eyes"`; `manual.yml:1544-1552` jq sorts `null` before every other value, which is why `max_by(.started_at)` ranked a queued re-run lowest; `:1334-1347` `any(generator; condition)`, `:1596-1603` `max_by`, `:2477-2486` `//` |
+| The newest `trading-cc-read` status (B1 at 5b8ba3b2) | `github/rest-api-description@58b1e0c00b39:descriptions/api.github.com/api.github.com.json`, `da3d22e4…` (the local upstream mirror at that commit, the same bytes); `jqlang/jq@jq-1.8.1:src/jv_aux.c`, `9b510dff29fede9f5e9d6a61d59b5d0d69419fc74a2bf684331295d0200829e8` | `api.github.com.json:55724` "Statuses are returned in reverse chronological order. The first status in the list will be the latest one", so `tcc_read_gate` takes `first`; `jv_aux.c:669-674` `sort_cmp` breaks ties by input index, so `sort_by(.updated_at)\|last` kept the older of two statuses with the same `updated_at` (measured with jq 1.8.1) |
+| A check run's recency is its completion (Astra's follow-up 1 at 5b8ba3b2) | `github/rest-api-description@58b1e0c00b39:descriptions/api.github.com/api.github.com.json`, `da3d22e4…` (the local upstream mirror at that commit) | `:55504-55514` the list-for-ref `filter` parameter: "Filters check runs by their `completed_at` timestamp. `latest` returns the most recent check runs" (default `latest`), so `nas_checks` asks for `filter=latest` and takes the completed run with the greatest `completed_at`; `:146097-146107` `check-run.started_at` and `completed_at` are both `"nullable": true`, so a completed run without `completed_at`, or a tie with two conclusions, counts as incomplete |
+| Where an edit is, which the change identity ignores (Codex F1 at 5b8ba3b2, declared) | `git/git@v2.53.0:Documentation/git-patch-id.adoc`, `e835ca2a7a11b54e3db93221466928c887ef9529a9b34b475d746888e43af410` (the local upstream mirror at `67ad4214`) | `:17-18` a patch ID is "a sum of SHA-1 of the file diffs associated with a patch, with line numbers ignored" |
 | The connector's own layout and footer | `tests/fixtures/landing/codex-summary-comment.json`, `3918a25359d64ea4b2bcf31ec9ac9d92ff681270c072da6af625575eab720792` (the summary comment of nas#975 with its four revisions, masked by `mask_packet.py`'s rule with nothing to replace; the body's sha256 is `1236fe482740fa1ccdaac6d50d4e1e77f6a6e961d64e8dd5377a4923a6f8d0dc`) | a row of four cells (the review kind "📝 Code Review", the status "✅ Completed" with its time, the commit 761810d in backticks, the trigger kind "Manual request"), the Running form "🔄 Running since" with its time, the newest revision equal to the body, every editor the Bot `chatgpt-codex-connector`, and the footer "Codex reacts with 👀 while any review is running, comments if it has suggestions, and reacts with 👍 once all reviews finish with no findings" |

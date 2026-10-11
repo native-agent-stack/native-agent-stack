@@ -38,7 +38,9 @@ LG_GIT=$G; LG_EXCLUDE=':!manifests/evidence.json'
 # #975 round 4: the landing lock is descriptor 9 (lg_lock). Every child that waits, detaches or can outlive the script runs without it, so the
 # lock ends with the script: a git fetch starts `git maintenance run --auto --detach` (git v2.53.0 builtin/fetch.c:2725, run-command.c:1829-1837;
 # Documentation/config/maintenance.adoc:6-15 detaching is the default), which daemonizes (builtin/gc.c:1823-1827) keeping every descriptor
-# but 0-2 (setup.c:2083-2105), and gh, python3 and sleep are waited for.
+# but 0-2 (setup.c:2083-2105), and gh, python3 and sleep are waited for. The script's own $(…) subshells hold descriptor 9 while they wait
+# on the gh or gate call they run, so after a signal ends the script the lock stays held until that call returns, and a landing started
+# meanwhile stops with exit 14 (fail closed; measured 2026-10-11: held for the rest of a 4 s child after SIGTERM, then free).
 git() { command git "$@" 9>&-; }
 gh() { command gh "$@" 9>&-; }
 python3() { command python3 "$@" 9>&-; }
@@ -225,7 +227,11 @@ same_change() { lg_same_change "$1" "$2"; }
 # the head with PASS or ACK, because a status carries no app identity (any holder of the owner token can post one).
 tcc_read_gate() {
   local s sr st d rec why
-  s=$(gh api "repos/$R/commits/$1/statuses?per_page=100" --jq '[.[]|select(.context=="trading-cc-read")]|sort_by(.updated_at)|last|select(.!=null)|"\(.state)\t\(.description)"' 2>/dev/null); sr=$?
+  # #975 B1 (the CC's micro at 5b8ba3b2): the newest status of the context is the first one listed ("Statuses are returned in reverse
+  # chronological order. The first status in the list will be the latest one", github/rest-api-description@58b1e0c0 api.github.com.json:55724).
+  # sort_by(.updated_at)|last kept the OLDER of two with the same updated_at (jq's sort keeps equal keys in input order, jq 1.8.1
+  # src/jv_aux.c:669-674), so a failure posted in the same second as an earlier success passed.
+  s=$(gh api "repos/$R/commits/$1/statuses?per_page=100" --jq '[.[]|select(.context=="trading-cc-read")]|first|select(.!=null)|"\(.state)\t\(.description)"' 2>/dev/null); sr=$?
   # #975 round 4 (Codex P1 at 761810d7, the CC's P2-3): gh's exit code is kept apart from its output. A failed call stops, whatever it printed
   # (an error response's body reaches stdout, a refused connection prints nothing there); only exit 0 with no output is "no status".
   [ "$sr" = 0 ] || { echo "#$N trading-cc-read statuses unreadable at ${1:0:8} (gh exit $sr, output withheld): stop"; exit 2; }
@@ -269,12 +275,18 @@ verdict_gate() {
 # judged on its latest COMPLETED run (2026-10-09 #886: superseded, concurrency-cancelled runs must not fail it). Before, the latest run per
 # name was max_by(.started_at), and a queued re-run has started_at null (rest-api-description@58b1e0c0 check-run.started_at "nullable": true),
 # which sorts first, so an old success hid it.
+# #975 final round (Astra's follow-up 1 at 5b8ba3b2, ruled FIX-NOW): max_by([.started_at // "", .id // 0]) still let a COMPLETED failing
+# re-run with started_at null lose to an older success. A run's recency is its completion, as the endpoint orders it: the runs are read
+# with filter=latest ("Filters check runs by their `completed_at` timestamp. `latest` returns the most recent check runs",
+# rest-api-description@58b1e0c0 api.github.com.json:55504-55514), and a name is judged on its completed run with the greatest completed_at.
+# Both timestamps are nullable (:146097-146107), so a name fails closed, counted incomplete, when a completed run has no completed_at or
+# two completed runs share the greatest completed_at with different conclusions.
 # #975 P2-B (GPT micro at af9d1901): a failed call's stdout can be an error body (above), which the old line word-split into the counts:
 # bash then printed a body word in "integer expected", and a one-word body ended the script on an unbound $4. Now a failed call, or a
 # reply that is not exactly four counts, counts as one check still running, so the loop polls on (exit 6 at the timeout).
 nas_checks() {  # <head>
   local c
-  c=$(gh api "repos/$R/commits/$1/check-runs?per_page=100" --jq '[.check_runs[]|{name,status,conclusion,started_at,id}]|group_by(.name)|map({name: .[0].name, incomplete: any(.[]; .status != "completed"), latest: ([.[]|select(.status == "completed")]|max_by([.started_at // "", .id // 0]))})|[([.[]|select(.incomplete)]|length), ([.[]|select(.latest != null and ((.latest.conclusion=="success" or .latest.conclusion=="neutral" or .latest.conclusion=="skipped")|not))]|length), length, ([.[]|select(.name=="validate" and (.incomplete|not) and .latest.conclusion=="success")]|length)]|@tsv' 2>/dev/null) && [[ "$c" =~ ^[0-9]+$'\t'[0-9]+$'\t'[0-9]+$'\t'[0-9]+$ ]] || c=$'1\t0\t0\t0'
+  c=$(gh api "repos/$R/commits/$1/check-runs?filter=latest&per_page=100" --jq '[.check_runs[]|{name,status,conclusion,completed_at}]|group_by(.name)|map([.[]|select(.status == "completed")] as $done|($done|map(.completed_at)|max) as $t|{name: .[0].name, incomplete: (any(.[]; .status != "completed") or any($done[]; .completed_at == null) or ([$done[]|select(.completed_at == $t)|.conclusion]|unique|length) > 1), latest: ([$done[]|select(.completed_at == $t)]|first)})|[([.[]|select(.incomplete)]|length), ([.[]|select(.latest != null and ((.latest.conclusion=="success" or .latest.conclusion=="neutral" or .latest.conclusion=="skipped")|not))]|length), length, ([.[]|select(.name=="validate" and (.incomplete|not) and .latest.conclusion=="success")]|length)]|@tsv' 2>/dev/null) && [[ "$c" =~ ^[0-9]+$'\t'[0-9]+$'\t'[0-9]+$'\t'[0-9]+$ ]] || c=$'1\t0\t0\t0'
   echo "$c"
 }
 # Early refusals, cheap first reads: the head, the trading-cc-read gate, the verdict files.

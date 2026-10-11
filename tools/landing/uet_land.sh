@@ -31,7 +31,9 @@ LG_GIT="git -C $U"
 # #975 round 4: the landing lock is descriptor 9 (lg_lock). Every child that waits, detaches or can outlive the script runs without it, so the
 # lock ends with the script: a git fetch starts `git maintenance run --auto --detach` (git v2.53.0 builtin/fetch.c:2725, run-command.c:1829-1837;
 # Documentation/config/maintenance.adoc:6-15 detaching is the default), which daemonizes (builtin/gc.c:1823-1827) keeping every descriptor
-# but 0-2 (setup.c:2083-2105), and gh, python3 and sleep are waited for.
+# but 0-2 (setup.c:2083-2105), and gh, python3 and sleep are waited for. The script's own $(…) subshells hold descriptor 9 while they wait
+# on the gh or gate call they run, so after a signal ends the script the lock stays held until that call returns, and a landing started
+# meanwhile stops with exit 14 (fail closed; measured 2026-10-11: held for the rest of a 4 s child after SIGTERM, then free).
 git() { command git "$@" 9>&-; }
 gh() { command gh "$@" 9>&-; }
 python3() { command python3 "$@" 9>&-; }
@@ -224,7 +226,11 @@ E=$full
 # the read head with PASS or ACK, because a status carries no app identity (any holder of the owner token can post one).
 tcc_read_gate() {
   local s sr st d rec why
-  s=$(gh api "repos/$R/commits/$1/statuses?per_page=100" --jq '[.[]|select(.context=="trading-cc-read")]|sort_by(.updated_at)|last|select(.!=null)|"\(.state)\t\(.description)"' 2>/dev/null); sr=$?
+  # #975 B1 (the CC's micro at 5b8ba3b2): the newest status of the context is the first one listed ("Statuses are returned in reverse
+  # chronological order. The first status in the list will be the latest one", github/rest-api-description@58b1e0c0 api.github.com.json:55724).
+  # sort_by(.updated_at)|last kept the OLDER of two with the same updated_at (jq's sort keeps equal keys in input order, jq 1.8.1
+  # src/jv_aux.c:669-674), so a failure posted in the same second as an earlier success passed.
+  s=$(gh api "repos/$R/commits/$1/statuses?per_page=100" --jq '[.[]|select(.context=="trading-cc-read")]|first|select(.!=null)|"\(.state)\t\(.description)"' 2>/dev/null); sr=$?
   # #975 round 4 (Codex P1 at 761810d7, the CC's P2-3): gh's exit code is kept apart from its output. A failed call stops, whatever it printed
   # (an error response's body reaches stdout, a refused connection prints nothing there); only exit 0 with no output is "no status".
   [ "$sr" = 0 ] || { echo "#$N trading-cc-read statuses unreadable at ${1:0:8} (gh exit $sr, output withheld): stop"; exit 2; }
