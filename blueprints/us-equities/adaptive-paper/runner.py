@@ -459,6 +459,7 @@ def load_config(path, *, registry_path=None):
                           max_order_notional=float(c["max_order_notional_usd"]),
                           warmup_samples=c["warmup_samples"], warmup_seconds=c["warmup_seconds"],
                           minimum_edge_bps=c["minimum_edge_bps"], quote_age_seconds=c["quote_max_age_seconds"],
+                          exit_quote_age_seconds=risk.effective_exit_quote_max_age_seconds,
                           min_hold_seconds=c["min_hold_seconds"], max_hold_seconds=c["max_hold_seconds"],
                           stop_bps=c["stop_bps"], take_profit_bps=c["take_profit_bps"], trailing_bps=c["trailing_bps"],
                           gap_stop_enabled=gap_stop_enabled, exit_replace_enabled=exit_replace_enabled,

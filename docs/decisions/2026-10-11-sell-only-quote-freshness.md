@@ -74,6 +74,42 @@ default. An owning deployment can opt into 30 with
 `"exit_quote_max_age_seconds": 30` in its config and a matching fresh ledger.
 No deployed config or existing ledger is rewritten here.
 
+### Ordinary adaptive sell propagation correction
+
+At this PR's first head `c90efda95b1cce6d97dce8f0a77cfbf6436502c8`, the
+ordinary runner accepted the optional sell age but still constructed
+`PolicyConfig` with only the entry age. Policy exit decisions, native forced
+exits, the action guard and cancel-ack replacement therefore rejected bounded
+older sells before reaching the ledger or transport. The correction passes
+`RiskLimits.effective_exit_quote_max_age_seconds` into the policy's optional
+`exit_quote_age_seconds` and shares its effective sell-age selection with those
+native sell guards. Entry features/orders, held-entry admission marks,
+mark-to-market, gap-reference sampling and gap-trigger signal freshness keep
+the entry age. The sell override does not authorize older reference prices or
+older inputs to a gap-risk signal.
+
+The native interface is NautilusTrader `v2.0.0rc5`, upstream
+`nautechsystems/nautilus_trader` at
+`1b0a49d2792a9432a3aca3fcb617ce7a630d905e`, inspected in its registered mirror:
+
+- `crates/trading/src/python/strategy.rs:1901-1920,2001-2018` exposes the
+  supported `submit_order` and `cancel_order` boundaries.
+- `crates/trading/src/python/strategy.rs:567-574,1029-1031` dispatches the native
+  cancellation event to Python `on_order_canceled`; the callback matrix at
+  `:5694-5804` covers that dispatch. The local replacement checks the current
+  injected clock when this acknowledgment arrives, rather than reusing the
+  cancellation request's timestamp.
+
+`tests/test_adaptive_paper_adaptive_sell_age.py` uses the real configuration
+loader, deterministic policy and installed native Strategy with synthetic
+order I/O. Four regression methods fail at the first head with 39 assertion
+failures and zero errors: ordinary policy/native stop exits, RTH/PRE/POST forced
+sells and cancel-ack replacements. They admit the retained recorded-date
+minute's synthetic age and the exact configured 10/30-second ceilings, and
+refuse ages just above each ceiling. Separate absent/null, entry-feature,
+entry-order and held-admission controls preserve the entry bound. These are
+SYN integration checks, not observed broker fills or qualification evidence.
+
 The entry ceiling also agrees with the private trading decision
 `docs/decisions/2026-10-10-paper-caps-and-leverage.md:201` at
 us-equities-trading `2f953241f9a4db7a482b65c78acd24827db6e4de`.

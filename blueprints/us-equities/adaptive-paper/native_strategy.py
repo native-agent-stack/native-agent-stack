@@ -15,6 +15,7 @@ from native_adapter import guarded_callback
 from safety import DEFAULT_STOP, SafetyError, evaluate_gap_risk
 from sessions import SessionKind, next_trading_day, previous_trading_day, session_at
 from strategies import AdaptivePolicy, OperationalStatus, QUOTE_FUTURE_TOLERANCE_SECONDS, limit_price
+from strategies_v1 import sell_quote_age_seconds
 
 
 class AdaptiveStrategy(Strategy):
@@ -858,7 +859,7 @@ class AdaptiveStrategy(Strategy):
             return None
         quote = self.policy.latest.get(symbol)
         fresh = bool(quote and
-                     now - quote.timestamp <= self.policy.config.quote_age_seconds and
+                     now - quote.timestamp <= sell_quote_age_seconds(self.policy.config) and
                      now >= quote.timestamp - QUOTE_FUTURE_TOLERANCE_SECONDS)
         return DEFAULT_PLAN.evaluate(ExitContext(
             now=now, entered_at=now, pnl_bps=0.0, trail_bps=0.0,
@@ -1075,7 +1076,9 @@ class AdaptiveStrategy(Strategy):
             if session_exit is not None and not session_exit.submit:
                 self._flag_exit_position(symbol, session_exit)
                 continue
-            if not quote or now - quote.timestamp > self.policy.config.quote_age_seconds \
+            max_age = (sell_quote_age_seconds(self.policy.config) if side == "sell"
+                       else self.policy.config.quote_age_seconds)
+            if not quote or now - quote.timestamp > max_age \
                     or now < quote.timestamp - QUOTE_FUTURE_TOLERANCE_SECONDS:
                 if side == "sell":
                     self._flag_exit_position(symbol, ExitDecision(
@@ -1340,18 +1343,19 @@ class AdaptiveStrategy(Strategy):
         symbol = replacement["symbol"]
         self._exit_replace_busy.discard(symbol)
         quote = self.policy.latest.get(symbol)
+        max_age = sell_quote_age_seconds(self.policy.config)
         session_exit = self._session_exit_decision(symbol, now, replacement["reason"])
         if session_exit is not None and not session_exit.submit:
             self._flag_exit_position(symbol, session_exit)
             self._clear_gap_stop_for_dropped_replacement(replacement)
             return
         if (self.faulted or self._halted(symbol) or not quote
-                or now - quote.timestamp > self.policy.config.quote_age_seconds
+                or now - quote.timestamp > max_age
                 or now < quote.timestamp - QUOTE_FUTURE_TOLERANCE_SECONDS):
             if self._halted(symbol):
                 self._flag_exit_position(symbol, ExitDecision(
                     "exit_halted", 0.0, "hold", submit=False, flag_position=True))
-            elif (not quote or now - quote.timestamp > self.policy.config.quote_age_seconds
+            elif (not quote or now - quote.timestamp > max_age
                     or now < quote.timestamp - QUOTE_FUTURE_TOLERANCE_SECONDS):
                 self._flag_exit_position(symbol, ExitDecision(
                     "quote_stale", 0.0, "hold", submit=False, flag_position=True))

@@ -13152,8 +13152,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/native_strategy.py",
-      "sha256": "39e649c0fda1bffe17d08416a6f379145622abe6c61ff6deeeecfd0b2ceb3140",
-      "bytes": 87033
+      "sha256": "7f326222f732bec700e3119117436bf97887dce392798515e53ea3fdc8c6968f",
+      "bytes": 87212
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/receipt.json",
@@ -13212,8 +13212,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runner.py",
-      "sha256": "b921815a8e4a7df510719c49f3d2bc0b7bf722bb39b801b51c55f83d502392c5",
-      "bytes": 160280
+      "sha256": "907d0381ffc11791e671cc25d15978403bad77790f4cfef4166030dab8e2c530",
+      "bytes": 160372
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runtime_lock.py",
@@ -13247,8 +13247,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "337272e5d5f83938b9b98246d0223bc65c928fdbd2c387dbf47d26034e324b54",
-      "bytes": 8624
+      "sha256": "400f9f101fa32f687ae8681ff93941f11d8b6a26e9bb540b01aa6f45ebc9c8de",
+      "bytes": 8744
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/strategies.py",
@@ -13257,8 +13257,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/strategies_v1.py",
-      "sha256": "6f434d001489ba605f7a737e25a259be87e97127cd1c8788db504f2313af86eb",
-      "bytes": 28488
+      "sha256": "cf31022ff31106110dbf03ed050bb3f8f0e7b7acc9875c92b3992e6b56ad5000",
+      "bytes": 29255
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/transport.py",
@@ -18742,8 +18742,8 @@
     },
     {
       "path": "docs/decisions/2026-10-11-sell-only-quote-freshness.md",
-      "sha256": "0620c181007a2215a5c6b33444583fac29d9182d9eccad78a6aae2f94f131916",
-      "bytes": 4780
+      "sha256": "9a8b332b81b4ea520184a781dc96485c943d179a2c512be6d585f9611c0956cd",
+      "bytes": 6962
     },
     {
       "path": "docs/direct-results.md",
@@ -61159,6 +61159,11 @@
       "path": "tests/test_adaptive_market_research.py",
       "sha256": "4580c2271b946425b660639548b9fea579ef945ff612797927399289431017ed",
       "bytes": 27237
+    },
+    {
+      "path": "tests/test_adaptive_paper_adaptive_sell_age.py",
+      "sha256": "fde9c77023342caad53ec578eaad41e9bd9f9a7b0956b145738ab8093b63023b",
+      "bytes": 9147
     },
     {
       "path": "tests/test_adaptive_paper_corporate_actions.py",
