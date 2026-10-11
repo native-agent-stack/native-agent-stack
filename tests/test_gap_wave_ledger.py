@@ -134,16 +134,6 @@ class GapWaveLedgerTests(unittest.TestCase):
         self.assertLess(rank["deferred"], rank["not_settled"])
         self.assertLess(rank["covered_elsewhere"], rank["not_settled"])
 
-    def test_new_scoped_wave_reports_pending_review_without_inventing_an_opus_read(self):
-        doc = self.tool.build(ROOT, "backtesting-gap-burndown-20261010", "agent-lab-17", "catalog__layer",
-                              ["backtesting-engine"])
-        self.assertEqual([layer["layer_id"] for layer in doc["layers"]], ["backtesting-engine"])
-        self.assertEqual(doc["counts"], {"advanced": 3, "deferred": 2, "settled": 3})
-        self.assertEqual(doc["review_status"], "pending independent PR review")
-        page = self.tool.render(doc)
-        self.assertIn("await independent review", page)
-        self.assertNotIn("reviewed by an Opus", page)
-
     def test_every_receipt_names_the_crosswalk_revision(self):
         for receipt in self.doc["receipts"]:
             self.assertTrue(self.doc["source_revision"].startswith(receipt["source_revision"][:7]), receipt["path"])

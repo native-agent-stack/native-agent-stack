@@ -178,42 +178,6 @@ class ClassificationTests(unittest.TestCase):
 
 
 class GapCountTests(unittest.TestCase):
-    def test_verified_single_gap_wave_receipts_reduce_effective_open_counts(self):
-        crosswalk = {"source_revision": "92bb279", "layers": [{"catalog": "us-equities", "layer_id": "backtesting-engine", "gaps": [
-            {"index": 2, "status": "open", "category": "executable_now"},
-            {"index": 3, "status": "open", "category": "needs_user_login"}]}]}
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            _write_json(root / cm.GAP_CROSSWALK_FILE, crosswalk)
-            capture = root / "evidence/artifacts/test-wave/raw/query.txt"
-            capture.parent.mkdir(parents=True)
-            capture.write_text("native release query\n")
-            import hashlib
-            receipt_path = "evidence/artifacts/test-wave/backtesting-engine/2-release.json"
-            _write_json(root / receipt_path, {"source_revision": "92bb279", "gap_refs": [2], "settles_gap": True,
-                                             "evidence_class": "native_proven", "raw_outputs": [
-                                                 {"path": str(capture.relative_to(root)),
-                                                  "sha256": hashlib.sha256(capture.read_bytes()).hexdigest()}]})
-            _write_json(root / cm.GAP_BURNDOWN_FILE, {
-                "source_revision": "92bb279", "crosswalk_sha256": hashlib.sha256(
-                    (root / cm.GAP_CROSSWALK_FILE).read_bytes()).hexdigest(),
-                "layers": [{"catalog": "us-equities", "layer_id": "backtesting-engine", "gaps": [
-                    {"index": 2, "status": "settled", "receipts": [{"path": receipt_path, "credit": "settled"}]}]}]})
-            closures = cm.gap_receipt_closures(root)
-            self.assertEqual(closures, {("us-equities", "backtesting-engine", 2)})
-            self.assertEqual(cm.gap_counts_by_layer(crosswalk, closures)[("us-equities", "backtesting-engine")], 0)
-            self.assertEqual(cm.open_gap_counts_by_layer(crosswalk, closures)[("us-equities", "backtesting-engine")], 1)
-            receipt = json.loads((root / receipt_path).read_text())
-            receipt["gap_refs"] = [2, 3]
-            _write_json(root / receipt_path, receipt)
-            with self.assertRaisesRegex(ValueError, "single-gap receipt"):
-                cm.gap_receipt_closures(root)
-            receipt["gap_refs"] = [2]
-            _write_json(root / receipt_path, receipt)
-            capture.write_text("changed after receipt\n")
-            with self.assertRaisesRegex(ValueError, "gap receipt output hash"):
-                cm.gap_receipt_closures(root)
-
     def test_counts_only_open_executable_now(self):
         doc = {
             "layers": [

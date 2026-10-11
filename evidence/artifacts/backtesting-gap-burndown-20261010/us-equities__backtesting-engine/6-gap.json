@@ -6,15 +6,15 @@
   ],
   "gap_index": 6,
   "gap_text_sha256": "3deee2ea0925dbe07d32fe371ca17ee2935a7d492691c125a52fbc5fc191f189",
-  "outcome": "settled",
-  "settles_gap": true,
-  "review_status": "pending independent PR review",
+  "outcome": "covered_elsewhere",
+  "settles_gap": "covered_elsewhere",
+  "review_status": "proposed; shared closeout record governs review credit",
   "evidence_class": "local_integration",
-  "result": "All comparator modes executed: accepted v2 lean-data PASS; bars/no-attribution refuse incomplete evidence. Historical review excerpt retained and hash-verified.",
+  "result": "Re-confirmation on receipt-v2 of the 2026-09-23 settlement; this run does not create a new closure. All comparator modes executed: accepted v2 lean-data PASS; bars/no-attribution refuse incomplete evidence. Historical review excerpt retained and hash-verified.",
   "raw_outputs": [
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-bars.json",
-      "sha256": "5fec9c5276e7fe1299241957be4ee8cf26777018d1630a998f1cf12e694c99c5"
+      "sha256": "ebf7b6c88e333d38cfdee5ce920000de35cf4b5dc3514343803f7d72a98fe7c6"
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-bars.stderr.txt",
@@ -30,7 +30,7 @@
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-lean-data.json",
-      "sha256": "844e963a070aa0c2480cb61f048224f519775083bcbdaebb03ab258e6bc9b12d"
+      "sha256": "95ae9cdbee66db1c6c33825a8d1ccccea4b303e5b7571824d9f097cbd5d01791"
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-lean-data.stderr.txt",
@@ -46,7 +46,7 @@
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-no-attribution.json",
-      "sha256": "103a8e9e1e447205e483174d43aa011b7f710433b139cd435f1be94fa733d418"
+      "sha256": "c9e490ddc47d636e101e764c768414fbd8593f0b08571dc3b86adda3b084c870"
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-no-attribution.stderr.txt",
@@ -61,12 +61,8 @@
       "sha256": "85cf9b96067b1b5437f725552c3dbfa584427f16a0767376a5fe02f32db735b5"
     },
     {
-      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/lean-model-summary.json",
-      "sha256": "fdca1e993c4a00980de9021ae30bee821378198d372bd17359abcf96b7d0c2f2"
-    },
-    {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/local-parity-boundaries.json",
-      "sha256": "c825303492156fbda7d372eee3a629a41a544661dcfd5284ebfe48e3efabdf4f"
+      "sha256": "0e1f0969c32ffea059fd63903a08c0b4f0acfa480378046a58853a81c0d22d36"
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/local-parity-boundaries.stderr.txt",
@@ -77,20 +73,12 @@
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
-      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/native-mechanics-summary.json",
-      "sha256": "c89516382696f481ed16eb65b87242aa602d2f30cadadc64a035c21fb80df1e9"
-    },
-    {
-      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/native-replay-economic-summary.json",
-      "sha256": "f16fa2bf3f24eca7c935951e98e4bde297fff0c90458df4e32310473cbd15800"
-    },
-    {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/review-excerpt-integrity.json",
       "sha256": "6ac8e184b77a8818d9d4d981e9cb1738ba90120c102bb22f48933d97e8de6ef0"
     },
     {
-      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/source-pins.json",
-      "sha256": "630b960079377d5da7c392e7802b69cdd848cd5859e807fe1775f9c7347f8314"
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/6-comparator-modes-and-review-count.json",
+      "sha256": "b8b166f0fedc19b65dd19424402911741a699f73a7028c28d6803863b8849957"
     }
   ],
   "checked_at": "2026-10-10",
@@ -99,5 +87,9 @@
   "limitations": [
     "Historical source-revision gap accounting; no automatic strategy, paper, platform or live promotion.",
     "New gate-owner review/first-run acceptance is not fabricated."
-  ]
+  ],
+  "correction_provenance": {
+    "original_receipt_sha256": "3120c3bcf863c07140e3813d7d7bbc75ba52f99aa29f0b90495c4dd64523c049",
+    "note": "Scoped references and accounting corrected after CC review; native command observations are unchanged."
+  }
 }

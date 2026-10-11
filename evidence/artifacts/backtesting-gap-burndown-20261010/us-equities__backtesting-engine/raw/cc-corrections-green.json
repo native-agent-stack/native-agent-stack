@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "observed_utc": "2026-10-11T06:50:06Z",
+  "scope": "Focused correction/shared-loader suite and existing parity fixtures; hosted CI owns full discovery",
+  "python_version": "Python 3.12.4",
+  "requirements_sha256": "33f5626de125815129498eb607a8cb7c717e016c759b3df9eb0bdd4f4b9d7d6c",
+  "input_hashes": {
+    "tests/test_backtesting_gap_burndown.py": "448bfa81a755a475af46cb842f05c80b20538ebd5b717039a29d527bf92798fb",
+    "blueprints/us-equities/backtesting-gap-burndown-20261010/native_mechanics.py": "8f9e8db00d8c8575e1d1a1a258144aa14bbf362c90c748de53cfa7b6f5513a6c",
+    "blueprints/us-equities/backtesting-gap-burndown-20261010/execute_comparators.py": "a4f494c90ec0600837ed34867e3064dfea21564462292d18c880c1880c3e7b20",
+    "catalogs/landscape/gap-closeouts/backtesting-engine-2026-10-10.json": "aa15feee6891a383d011a2e2b8e5aa49a0a806fe4fede49720c08e155d2ed785"
+  },
+  "runs": [
+    {
+      "command": [
+        ".runtime/cc979-ci/bin/python",
+        "-m",
+        "unittest",
+        "tests.test_backtesting_gap_burndown",
+        "tests.test_gap_closeouts",
+        "tests.test_component_matrix",
+        "tests.test_new_host_grand_list"
+      ],
+      "observed_exit_code": 0,
+      "stdout_sha256": "0aa3a55b2784ae774b8d6182a5a70f3bd3e18df0404c1feb3faa393ea66bda6a",
+      "stderr_sha256": "df571b29dfe30f8531d7479c9dd1da79c91c1f1ee1742222996de5f5973161b4",
+      "output": "{\"evidence\": \"evidence/artifacts/hw-profiles/recorded-host-20260101/profile.json\", \"host_id\": \"recorded-host-20260101\", \"status\": \"recorded\"}\n{\"evidence\": \"evidence/artifacts/hw-profiles/recorded-host-20260101/profile.json\", \"host_id\": \"recorded-host-20260101\", \"status\": \"recorded\"}\n..............................................................................................................................................\n----------------------------------------------------------------------\nRan 142 tests in 1.402s\n\nOK\n"
+    },
+    {
+      "command": [
+        ".runtime/cc979-ci/bin/python",
+        "-m",
+        "unittest",
+        "tests.test_spy_parity",
+        "tests.test_nautilus_equity_replay"
+      ],
+      "observed_exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "b1beb79dda74c65593293eb6c193059495968ad76a9ecc770785abea5876edf9",
+      "output": "...........................................................................................................................................................................................\n----------------------------------------------------------------------\nRan 187 tests in 0.131s\n\nOK\n"
+    }
+  ]
+}

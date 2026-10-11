@@ -35,9 +35,12 @@
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/lean-alpaca-model-tests-with-icu.stdout.txt",
       "raw_sha256": "8a4dca3485b0ce35b5bfa2e3ea628c73273d6394d0bdb34d389ff33930be83d1",
       "raw_bytes": 4183695,
-      "sha256": "4840aa1dc977abea63742ea38004c32752513b6ad5d2319eee304d8ae305b75e",
-      "bytes": 4028155,
-      "home_and_pytest_components_exported": true
+      "sha256": "38ceaa174d1c37e3e52b44275264853439d2daf48836c4582e29593368b479b0",
+      "bytes": 23713,
+      "home_and_pytest_components_exported": true,
+      "original_export_sha256": "4840aa1dc977abea63742ea38004c32752513b6ad5d2319eee304d8ae305b75e",
+      "original_export_bytes": 4028155,
+      "retention": "tail only; original raw/export digests and byte lengths retained; stderr retained in full"
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/lean-alpaca-model-tests-with-icu.stderr.txt",
@@ -56,5 +59,35 @@
     }
   ],
   "input_bytes_unchanged": true,
-  "scope": "observed command result only; no automatic evidence-class or gap-status promotion"
+  "scope": "observed command result only; no automatic evidence-class or gap-status promotion",
+  "environment_record": {
+    "status": "unavailable",
+    "reason": "The historical recorder did not retain its effective environment. Values are not reconstructed as observations. Prerequisite failures and the successful py312 captures retain observed outcomes.",
+    "recorder_source": {
+      "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+      "pin": "e957df3367ef32289254d5c946415fd92c02960c",
+      "path": "blueprints/us-equities/backtesting-gap-burndown-20261010/record.py:50-60"
+    },
+    "omitted_variable_names": [
+      "PATH",
+      "HOME",
+      "LANG",
+      "LC_ALL",
+      "OPENBLAS_NUM_THREADS",
+      "OMP_NUM_THREADS",
+      "DOTNET_CLI_TELEMETRY_OPTOUT",
+      "DOTNET_SKIP_FIRST_TIME_EXPERIENCE",
+      "DOTNET_NOLOGO",
+      "DOTNET_PROCESSOR_COUNT",
+      "DOTNET_CLI_HOME",
+      "NUGET_PACKAGES",
+      "LD_LIBRARY_PATH",
+      "PYTHONNET_PYDLL",
+      "PYTHONHOME"
+    ]
+  },
+  "correction_provenance": {
+    "original_receipt_sha256": "254a9978268bdf724b008df6ca4ba4b041182ce4eac95166bddb22ebe23e754d",
+    "note": "Observed command, timing and exit are unchanged. Environment omission is disclosed, not filled with inferred values."
+  }
 }

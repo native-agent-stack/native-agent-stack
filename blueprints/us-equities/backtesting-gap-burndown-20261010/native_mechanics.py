@@ -19,7 +19,18 @@ PARITY = ROOT / "blueprints/us-equities/engine-nautilus/spy-parity"
 
 
 def project_result(name, target, account, result):
-    return {"id": name, "status": "completed", "target": target, "account_type": account,
+    denied = [event for event in result["order_events"] if event["event"] == "OrderDenied"]
+    status = "completed"
+    if name == "four-cash-refusal":
+        if (len(denied) != 2 or result["fills"] or
+                any(not event.get("reason", "").startswith("NOTIONAL_EXCEEDS_FREE_BALANCE:") for event in denied)):
+            raise ValueError("expected_refusal_requires_native_denial_events")
+        status = "expected_refusal"
+    elif denied:
+        raise ValueError("unexpected_native_denial")
+    if result["engine_log_scan"].get("error_lines") != 0:
+        raise ValueError("native_engine_errors")
+    return {"id": name, "status": status, "target": target, "account_type": account,
             "native_fills": result["fills"], "native_account_events": result["native_account_event_rows"],
             "native_end_cash": result["native_end_cash_usd"], "native_fees": result["fees_usd"],
             "module_emissions": result["distribution_module"]["emissions"],
@@ -59,15 +70,11 @@ def main():
         replay.CASE = case
         replay.VENUE = {**replay.VENUE, "account_type": account,
                         "fee_model": FixedFeeModel(Money(Decimal(commission), usd), charge_commission_once=True)}
-        try:
-            result = replay.run_once(conversion["rows"], events, args.output / name, name)
-            results.append(project_result(name, target, account, result))
-        except Exception as error:
-            # A native risk refusal can prevent the fixed fixture's terminal
-            # assertions. Record the observed refusal, never rewrite it to pass.
-            results.append({"id": name, "status": "refused_or_fixture_incomplete", "target": target,
-                            "account_type": account, "error_type": type(error).__name__,
-                            "reason": str(error), "qualifies_frozen_stress_case": False})
+        # Unexpected runner/projection failures propagate to the command exit.
+        # A designed refusal is a completed native run with OrderDenied events,
+        # never an arbitrary Python exception (spy-parity/run.py:630-698).
+        result = replay.run_once(conversion["rows"], events, args.output / name, name)
+        results.append(project_result(name, target, account, result))
     output = {"schema_version": 1, "scope": "native configured fee/margin/refusal diagnostics on retained bundled SPY",
               "results": results, "engine_pin": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
               "slippage_fraction_mapped": False, "adaptive_state_implemented": False,
@@ -79,6 +86,7 @@ def main():
     path.write_text(json.dumps(output, indent=2, default=str) + "\n")
     print(json.dumps({"receipt": str(path), "cases": len(results),
                       "completed": sum(x["status"] == "completed" for x in results),
+                      "expected_refusals": sum(x["status"] == "expected_refusal" for x in results),
                       "qualifies_frozen_stress_case": False}))
     return 0
 

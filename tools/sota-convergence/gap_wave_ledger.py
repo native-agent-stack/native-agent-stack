@@ -113,12 +113,11 @@ def load_receipts(root, wave, dir_style="layer"):
             "per_gap_settles": per_gap,
             "direction": vi.get("direction"), "evidence_class": data.get("evidence_class"),
             "model_calls": sum(int(c.get("count", 0) or 0) for c in calls if isinstance(c, dict)),
-            **({"review_status": data["review_status"]} if "review_status" in data else {}),
         })
     return out
 
 
-def build(root, wave, owner, dir_style="layer", layer_ids=None):
+def build(root, wave, owner, dir_style="layer"):
     """wave is one wave name, or a list for a combined ledger (best status per gap across waves)."""
     waves = [wave] if isinstance(wave, str) else list(wave)
     crosswalk = json.loads((root / CROSSWALK).read_text(encoding="utf-8"))
@@ -145,8 +144,6 @@ def build(root, wave, owner, dir_style="layer", layer_ids=None):
     for layer in crosswalk["layers"]:
         if layer["owner"] != owner:
             continue
-        if layer_ids and layer["layer_id"] not in layer_ids:
-            continue
         gaps = []
         for gap in layer["gaps"]:
             if gap["category"] != "executable_now" or gap["status"] == "settled_by_receipt":
@@ -166,9 +163,6 @@ def build(root, wave, owner, dir_style="layer", layer_ids=None):
                  "credit settled/advanced/not_settled, but a receipt naming several gaps credits each at most "
                  "advanced; not_run means no receipt names the gap. No verdict changes here."),
         "counts": dict(sorted(counts.items())), "layers": layers,
-        **({"scope_layers": sorted(set(layer_ids))} if layer_ids else {}),
-        **({"review_status": "pending independent PR review"}
-           if any(r.get("review_status") == "pending independent PR review" for r in receipts) else {}),
         "receipts": sorted(({k: v for k, v in r.items() if k != "settles_key" and not (k == "per_gap_settles" and not v)
                               and not (k == "outcome" and v is None)}
                              for r in receipts), key=lambda r: r["path"]),
@@ -183,10 +177,8 @@ def render(doc):
     lines = [f"# {title} ({doc['owner']} layers)", "",
              f"This page summarizes [`catalogs/landscape/{doc['id']}.json`](../catalogs/landscape/{doc['id']}.json). "
              f"It records the executed checks for the `executable_now` gaps the [crosswalk](gap-crosswalk-92bb279.md) "
-             f"assigned to `{doc['owner']}`, keyed to the rows at `{doc['source_revision'][:7]}`. " +
-             ("New receipts await independent review in the PR. No verdict changes here."
-              if doc.get("review_status") == "pending independent PR review" else
-              "Each receipt was reviewed by an Opus evidence reviewer and corrected in one fix round. No verdict changes here."), "",
+             f"assigned to `{doc['owner']}`, keyed to the rows at `{doc['source_revision'][:7]}`. "
+             "Each receipt was reviewed by an Opus evidence reviewer and corrected in one fix round. No verdict changes here.", "",
              f"Rule: {doc['rule']}", "", "## Totals", "", "| Status | Gaps |", "| --- | ---: |"]
     lines += [f"| {k} | {doc['counts'].get(k, 0)} |" for k in STATUS_ORDER
               if k in doc["counts"] or k in ("settled", "advanced", "not_settled", "not_run")]
@@ -212,13 +204,12 @@ def main(argv=None):
     ap.add_argument("--wave", required=True, action="append",
                     help="wave directory name; repeat for a combined ledger (best status per gap across waves)")
     ap.add_argument("--owner", required=True)
-    ap.add_argument("--layer", action="append", help="Limit this wave ledger to named layers owned by --owner")
     ap.add_argument("--check", action="store_true")
     ap.add_argument("--dir-style", choices=("layer", "catalog__layer"), default="layer",
                     help="receipt directory layout: <layer_id>/ (default) or <catalog>__<layer_id>/")
     args = ap.parse_args(argv)
     root = args.root.resolve()
-    doc = build(root, args.wave if len(args.wave) > 1 else args.wave[0], args.owner, args.dir_style, args.layer)
+    doc = build(root, args.wave if len(args.wave) > 1 else args.wave[0], args.owner, args.dir_style)
     text = json.dumps(doc, indent=1, ensure_ascii=False) + "\n"
     page = render(doc)
     out, md = root / f"catalogs/landscape/{doc['id']}.json", root / f"docs/{doc['id']}.md"

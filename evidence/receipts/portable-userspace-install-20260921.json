@@ -23,7 +23,8 @@
     "Top-level npm packages were version pinned; transitive dependencies resolved at installation time.",
     "Only the named subset was installed. Scoped MCP services, RAG models, persistent memory, terminal interaction and broker integrations need their own host qualification.",
     "Skill repeat installation intentionally returned existing-destination refusal; filesystem linkage does not establish runtime discovery.",
-    "Home paths in three public client/skill logs are normalized to /home/example; no credential values were captured."
+    "Home paths in this receipt use tilde placeholders; the three historical public client/skill capture files retain synthetic example-account placeholders and their original hashes. No credential values were captured.",
+    "Receipt path placeholders and privacy wording corrected 2026-10-11 to avoid an absolute-home-prefix literal. Original receipt at native-agent-stack 8bffa2c41692ef483e91b68e3b15aeb331423d2c has SHA-256 9d138ccc152d7e110b71e957f55d17a4464fbb29862bc9b2050e4e9df8bbc662. Observed commands, results and all native artifact bytes/hashes are unchanged."
   ],
   "environment": {
     "os_userspace": "Ubuntu Base 24.04.5 LTS amd64",
@@ -38,7 +39,7 @@
     "home_path_in_new_filesystem": "The unchanged HOME pathname resolves to a fresh directory inside the owned rootfs, not the host home.",
     "source_delivery": "git archive of base_commit extracted into isolated /source",
     "uid_mapping": "UID0 only for OS/bootstrap installation; passing token checks and repeats/skills/rollback under UID1000.",
-    "namespace_command_shape": "env -i HOME=\"$HOME\" PATH=/home/example/.local/bin:/practice/native/bin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin LANG=C.UTF-8 TERM=dumb /usr/bin/bwrap --unshare-user --uid 1000 --gid 1000 --unshare-pid --unshare-ipc --unshare-uts --die-with-parent --bind <owned-stage>/rootfs / --proc /proc --dev /dev --ro-bind /etc/resolv.conf /etc/resolv.conf --bind <owned-stage>/results /results --chdir /source <upstream-command>",
+    "namespace_command_shape": "env -i HOME=\"$HOME\" PATH=~/.local/bin:/practice/native/bin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin LANG=C.UTF-8 TERM=dumb /usr/bin/bwrap --unshare-user --uid 1000 --gid 1000 --unshare-pid --unshare-ipc --unshare-uts --die-with-parent --bind <owned-stage>/rootfs / --proc /proc --dev /dev --ro-bind /etc/resolv.conf /etc/resolv.conf --bind <owned-stage>/results /results --chdir /source <upstream-command>",
     "bootstrap_packages": "ca-certificates curl git python3 xz-utils libatomic1; full resolved OS package versions in 04-node-bootstrap-rootmapped.log",
     "node": "24.21.0",
     "npm": "11.19.0",

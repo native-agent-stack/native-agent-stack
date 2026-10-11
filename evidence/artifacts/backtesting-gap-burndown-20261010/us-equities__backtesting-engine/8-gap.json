@@ -8,29 +8,17 @@
   "gap_text_sha256": "f2cd2409dd7a864b1cadb4f8e101e1fa81869c7e6bbc8c319e3e7ce0c69c8cd5",
   "outcome": "deferred",
   "settles_gap": "deferred",
-  "review_status": "pending independent PR review",
+  "review_status": "proposed; shared closeout record governs review credit",
   "evidence_class": "source_review",
   "result": "No retained authorized AAPL quotes/action-window acquisition on this host. Existing native receipt demonstrates missing split/distribution treatment; synthetic quote fills cannot replace the historical-data gate.",
   "raw_outputs": [
     {
-      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/lean-model-summary.json",
-      "sha256": "fdca1e993c4a00980de9021ae30bee821378198d372bd17359abcf96b7d0c2f2"
-    },
-    {
-      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/native-mechanics-summary.json",
-      "sha256": "c89516382696f481ed16eb65b87242aa602d2f30cadadc64a035c21fb80df1e9"
-    },
-    {
-      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/native-replay-economic-summary.json",
-      "sha256": "f16fa2bf3f24eca7c935951e98e4bde297fff0c90458df4e32310473cbd15800"
-    },
-    {
-      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/review-excerpt-integrity.json",
-      "sha256": "6ac8e184b77a8818d9d4d981e9cb1738ba90120c102bb22f48933d97e8de6ef0"
-    },
-    {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/source-pins.json",
       "sha256": "630b960079377d5da7c392e7802b69cdd848cd5859e807fe1775f9c7347f8314"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/8-aapl-action-window-replay.json",
+      "sha256": "4bfef89e0ec120257246aadc65210e58f9fc56d36e81f84b5e7b2e2ce00026b0"
     }
   ],
   "checked_at": "2026-10-10",
@@ -39,5 +27,9 @@
   "limitations": [
     "Historical source-revision gap accounting; no automatic strategy, paper, platform or live promotion.",
     "New gate-owner review/first-run acceptance is not fabricated."
-  ]
+  ],
+  "correction_provenance": {
+    "original_receipt_sha256": "0a6287d004735721cad9f641add9d3b28053feb080b78542c759c0a419e78f5c",
+    "note": "Scoped references and accounting corrected after CC review; native command observations are unchanged."
+  }
 }

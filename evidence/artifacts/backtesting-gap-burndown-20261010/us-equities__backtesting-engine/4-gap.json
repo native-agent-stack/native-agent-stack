@@ -8,13 +8,13 @@
   "gap_text_sha256": "4d9e0b7274baa32b1f95765448df6b809224841affd1ec638a317bdf4e7bdcc2",
   "outcome": "advanced",
   "settles_gap": "partially",
-  "review_status": "pending independent PR review",
+  "review_status": "proposed; shared closeout record governs review credit",
   "evidence_class": "native_proven",
-  "result": "All 12 unchanged LEAN AlpacaBrokerageModelTests pass via dotnet 10.0.401/explicit Python 3.12 after retained prerequisite failures. No keyed paper adapter initialization or vendor dataset claim.",
+  "result": "12 TestCaseSource cases of CanSubmitOrderWhenOutsideRegularTradingHours pass, covering outside-regular-hours submission decisions only. Native paper adapter initialization and an accepted vendor dataset remain open.",
   "raw_outputs": [
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/lean-alpaca-model-tests-py312.json",
-      "sha256": "4d7cb6b1505b05f6c3794d3e70a5257178a8910f131140f7aa20453aa1672560"
+      "sha256": "86ad713a8aa2dbcc0d9f8384e553184976338f6c700a430fdef8fedb785c1558"
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/lean-alpaca-model-tests-py312.stderr.txt",
@@ -26,23 +26,15 @@
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/lean-model-summary.json",
-      "sha256": "fdca1e993c4a00980de9021ae30bee821378198d372bd17359abcf96b7d0c2f2"
-    },
-    {
-      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/native-mechanics-summary.json",
-      "sha256": "c89516382696f481ed16eb65b87242aa602d2f30cadadc64a035c21fb80df1e9"
-    },
-    {
-      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/native-replay-economic-summary.json",
-      "sha256": "f16fa2bf3f24eca7c935951e98e4bde297fff0c90458df4e32310473cbd15800"
-    },
-    {
-      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/review-excerpt-integrity.json",
-      "sha256": "6ac8e184b77a8818d9d4d981e9cb1738ba90120c102bb22f48933d97e8de6ef0"
+      "sha256": "b69c447889124cee596fdfb0b58991571f6688ebb5511640f4076f9453e24e2c"
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/source-pins.json",
       "sha256": "630b960079377d5da7c392e7802b69cdd848cd5859e807fe1775f9c7347f8314"
+    },
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/lean-model-explicit-environment.json",
+      "sha256": "91d9f2f4366a48700278f836c37440bf143b317905f5c13137a2a0d68f6c894e"
     }
   ],
   "checked_at": "2026-10-10",
@@ -51,5 +43,9 @@
   "limitations": [
     "Historical source-revision gap accounting; no automatic strategy, paper, platform or live promotion.",
     "New gate-owner review/first-run acceptance is not fabricated."
-  ]
+  ],
+  "correction_provenance": {
+    "original_receipt_sha256": "391a9ae9df3bbe7462bc70a580f27934336c5f9db8c01ec04f22f96595104df3",
+    "note": "Scoped references and accounting corrected after CC review; native command observations are unchanged."
+  }
 }

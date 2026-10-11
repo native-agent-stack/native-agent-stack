@@ -8,17 +8,13 @@
   "gap_text_sha256": "62fcf6999e960825fd8e1c386485030c2e645e0cf7350b124d6522cb1067be73",
   "outcome": "advanced",
   "settles_gap": "partially",
-  "review_status": "pending independent PR review",
+  "review_status": "proposed; shared closeout record governs review credit",
   "evidence_class": "local_integration",
-  "result": "Native FixedFeeModel, MARGIN and over-capacity CASH refusal complete on retained SPY. Frozen fractional slippage/adaptive parity and calibrated depth remain unqualified, so this composite is not settled.",
+  "result": "Three configured native economic cases complete and the over-capacity CASH case has two native NOTIONAL_EXCEEDS_FREE_BALANCE OrderDenied events and no fills. Frozen fractional slippage/adaptive parity and calibrated depth remain unqualified.",
   "raw_outputs": [
     {
-      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/lean-model-summary.json",
-      "sha256": "fdca1e993c4a00980de9021ae30bee821378198d372bd17359abcf96b7d0c2f2"
-    },
-    {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/native-fee-margin-mechanics-2.json",
-      "sha256": "4b679e1cf92a8092cbc9ea4ba808b664837bfdaadb50a0b4c20f4af6c8eec082"
+      "sha256": "e8ce408365fd59e3a86b82174588b76a3aea92b7914d1c6bd07d58050edeedde"
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/native-fee-margin-mechanics-2.stderr.txt",
@@ -29,16 +25,12 @@
       "sha256": "4ead4cb47cdf7334020cdf166a9651926a5163a3527d7c664d7bbacb0f45c331"
     },
     {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/native-mechanics-events.json",
+      "sha256": "138a3eb9609e852093cd53beb4c70aa1f8e8d308546411fd99fdc199417a7c41"
+    },
+    {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/native-mechanics-summary.json",
       "sha256": "c89516382696f481ed16eb65b87242aa602d2f30cadadc64a035c21fb80df1e9"
-    },
-    {
-      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/native-replay-economic-summary.json",
-      "sha256": "f16fa2bf3f24eca7c935951e98e4bde297fff0c90458df4e32310473cbd15800"
-    },
-    {
-      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/review-excerpt-integrity.json",
-      "sha256": "6ac8e184b77a8818d9d4d981e9cb1738ba90120c102bb22f48933d97e8de6ef0"
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/source-pins.json",
@@ -51,5 +43,9 @@
   "limitations": [
     "Historical source-revision gap accounting; no automatic strategy, paper, platform or live promotion.",
     "New gate-owner review/first-run acceptance is not fabricated."
-  ]
+  ],
+  "correction_provenance": {
+    "original_receipt_sha256": "0d468d8e1b73e7c11e2051f1d6b60155525cabcf770d789ab1517aa4f1c30e8e",
+    "note": "Scoped references and accounting corrected after CC review; native command observations are unchanged."
+  }
 }
