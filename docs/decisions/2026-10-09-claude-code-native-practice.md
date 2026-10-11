@@ -221,6 +221,8 @@ since 2026-02-11 and no releases, which fails the 90-day maintenance rule.
 | Blinded skills-content comparison | skills-library | skills-lifecycle |
 | Mislabel rate on the first real triage runs before any author gate | GitHub triage | api-actions |
 | agentsview retention probe | cleanupPeriodDays recommendation | command center |
+| Paired run 4 (preregistration sha256 `33bd44ca34cb`, approved by the command center 2026-10-11 ~01:12Z; its meters passed Stage 0 at 02:14Z and Stage 1 started at 02:18Z; its result is a later record): the advisor on against off (`CLAUDE_CODE_DISABLE_ADVISOR_TOOL=1`) for Workflow subagents on the frozen fixtures, hidden tests, blind-judged diffs and cost by model, with the cost counter, the `api_request` events and the transcripts reconciled | model-effort-routing (native advisor pairing), usage-cost-monitoring | cc-native-practice |
+| Paired run 5 (preregistration sha256 `66f87a9eb2b9`, with the command center's rulings in its first addendum; started 2026-10-11 03:20Z; its result is a later record): Sonnet 5.5 against Opus 5.5 at medium effort on review micros of five pull-request heads whose findings are known, scored by blind judges on the recall of the known findings, false positives and cost from the counter, with the rule that Sonnet takes review micros only if it finds every decisive finding Opus finds at no more than 60% of Opus's cost | model-effort-routing | cc-native-practice |
 
 ## Refresh loop
 
@@ -373,3 +375,33 @@ direction against further security work, the sandbox profile was dropped and the
 directory: orchestration on six validated north-star fixtures (single session, a verify Workflow, an agent team; AO's
 bounded role in a separate PR-cycle run); planning persistence under forced compaction; and the review gate (vendor
 paths against the current reads, with the co-op). Their results follow in a later addendum.
+
+## Addendum (2026-10-10): paired-run results
+
+The compact results, with the sha256 of every private paper they rest on, are in
+[paired-runs.json](../../evidence/artifacts/native-practice-paired-runs-20261010/paired-runs.json); `tests/test_paired_runs_results.py` recomputes each decision below from it.
+
+**Planning persistence (paired run 2b).** The first design (a 12-turn cap per session) was infeasible: eight sessions of twelve turns is 96 turns before any re-reading, and its
+first two runs ended at the cap with 0 and 2 of 17 fail-to-pass; they stay as history. The variant took the cap from the calibration (30 turns, at most 8 sessions) and changed nothing
+else: fixtures F5 and F6 with two trials each, Opus 5.5 at xhigh in `claude -p` on client 2.1.296, three arms (repository state files, the native task list, and the same prompt every
+session with no state instruction), hidden tests, sessions and cost to the declared finish, and lost-work events counted by one reader and checked by a second. All 12 runs passed the
+hidden tests. Repository state files declared done in 6 and 5 sessions on F5 (3 and 2 on F6) where the task list and the loop used all 8 sessions on F5 without declaring done; the task
+list won 2 of 4 cells (both F6) and the loop none, so neither replaces the default (the preregistered rule needs a majority of the cells). Lost work: 0 events in all 12 runs, counted by two
+readers on different models. The Ralph-style loop moves from candidate to a ranked alternative, third behind repository state files and the native task list and for fallback only (the
+command center's ruling of 2026-10-10): it passed 4 of 4 with no lost work, so rejecting it would invent a failure, but it won no cell. It needs an external done check, and the
+classification is post hoc and provisional: the preregistration named no criterion, so a rerun preregisters its criterion before its first session. Limits: four cells; readers not blind
+to the arm; costs are API-list-equivalent, not billed.
+
+**Orchestration (paired run 1).** Six validated north-star fixtures, one trial per arm: A, one headless session (Opus 5.5 at xhigh); B, a saved Workflow that has an implementer write the fix and a
+fresh-context verifier at max effort try to refute it; C, an interactive agent team in tmux (a lead with an implementer and a tester-reviewer; interactive against headless is a declared confound).
+Settings were fenced to `--setting-sources local` with Ultracode off, caps $15 for A and $30 for B and C, and a 45-minute ceiling. The first counted runs exposed a grader bug (asyncio's slow-callback
+noise hid valid tests from the one-line parser); the preregistered rule voids a fixture for every arm when review finds a grader bug, so F1 and F2 are void in the primary analysis and the regraded
+results over all six fixtures are the declared sensitivity analysis. Every run passed the hidden tests in both analyses (18 of 18), so no arm resolved more fixtures than the single session. The blind
+pairwise judges (fresh Opus 5.5 sessions at max effort on stripped, order-fixed diffs, each refuted by a second session in the opposite order; 18 of 18 verdicts held) preferred the single session's diff
+to the Workflow's on 5 of 6 fixtures and to the team's on 3 of the 5 where the team's diff was captured (F3's two pairs with the team are void: its diff was not captured), the Workflow's on 1 and the team's on 1. The single session cost $5.87 on average, the Workflow 1.6x and the team
+3.0x (1.50x and 2.55x over F3 to F6, the primary fixtures; the team's costs are estimates and ceiling-bound). Neither orchestrated arm clears the rule (it needs two more
+fixtures resolved or the judges' preference on four of the fixtures that count, at no more than twice the single session's mean cost), so the routing guidance for bounded fixes on north-star code names the single session; the
+Workflow and the team stay available per task, as the owner directed. What the arms measured is limited by the ceiling: the Workflow's verifier returned in 2 of 6 runs (0 refuted), was cut by
+the 45-minute wait ceiling in 3, and never started in 1; the team reached TEAM-DONE in 2 of 6, was stopped at the ceiling in 3, hit its cap in 1, and in 1 run waited on a question to the absent
+user. Four defects of the measurement were found during the run, each recorded as a new addendum file beside the preregistration: a harness-fault detector that counted file text, a blinding scan that
+redacted a fixture's own vocabulary, a refuter that was given untranslated reasons, and a failed diff capture for the team's F3 run, which voids that fixture's two pairs with the team (none of the four changes an outcome). Limits: one module family, one trial per arm, judges of the producers' own model family, costs list-equivalent.

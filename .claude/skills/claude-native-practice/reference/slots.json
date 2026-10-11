@@ -1198,9 +1198,10 @@
    ],
    "evidence": [
     "agent-teams.md",
-    "subagents-teams-O15"
+    "subagents-teams-O15",
+    "Paired run 1, 2026-10-10 (evidence/artifacts/native-practice-paired-runs-20261010/paired-runs.json; RESULT.md sha256 e87b9cabd8c2, score.json 72dc84ef76b0): six bounded north-star fixes, one trial per arm; every mode passed 6 of 6, the single session cost $5.87 on average, the verify Workflow 1.6x and the agent team 3.0x (estimates), and the blind judges preferred the single session's diff to the Workflow's on 5 of 6 fixtures and to the team's on 3 of the 5 where the team's diff was captured"
    ],
-   "notes": "The host enables teams globally while the repository scopes them narrowly; whether that matches is the owner's call. No measurement of teams on our tasks exists. Verified: the switch sits in host user settings, so named subagents become teammates in every interactive session of every project, and teammates start in the lead's permission mode (bypass here).",
+   "notes": "The host enables teams globally while the repository scopes them narrowly; whether that matches is the owner's call. Measured 2026-10-10 on six bounded north-star fixes (paired run 1): the interactive team passed 6 of 6 but cost about 3.0x a single session (estimates priced from token counts) and won no fixture; it reached TEAM-DONE in 2 of 6 runs, hit its $30 cap in 1, was stopped at its 45-minute ceiling in 3, and in 1 run the lead stopped on a question to the absent user. A team stays for work where workers must message each other. Verified: the switch sits in host user settings, so named subagents become teammates in every interactive session of every project, and teammates start in the lead's permission mode (bypass here).",
    "overturn_when": "A paired run shows teams lose quality or cost more for the same work, or the feature leaves experimental status with changed semantics.",
    "supersedes": [
     "R50 effort clause"
@@ -1249,9 +1250,10 @@
    ],
    "evidence": [
     "workflows.md resume and limits",
-    "background-workflows-O8, O9, O10"
+    "background-workflows-O8, O9, O10",
+    "Paired run 1, 2026-10-10 (evidence/artifacts/native-practice-paired-runs-20261010/paired-runs.json; RESULT.md sha256 e87b9cabd8c2, score.json 72dc84ef76b0): six bounded north-star fixes, one trial per arm; every mode passed 6 of 6, the single session cost $5.87 on average, the verify Workflow 1.6x and the agent team 3.0x (estimates), and the blind judges preferred the single session's diff to the Workflow's on 5 of 6 fixtures and to the team's on 3 of the 5 where the team's diff was captured"
    ],
-   "notes": "Saved workflows are not yet at a native discovery location, and the adopt step names an agents/ directory that does not exist. Verified: a `-p` launch of a saved Workflow needs a launch-scoped `--allowedTools 'Workflow(<name>)'`; on WSL2 background carry-over relies on the on-demand supervisor.",
+   "notes": "Saved workflows are not yet at a native discovery location, and the adopt step names an agents/ directory that does not exist. Verified: a `-p` launch of a saved Workflow needs a launch-scoped `--allowedTools 'Workflow(<name>)'`; on WSL2 background carry-over relies on the on-demand supervisor. Measured 2026-10-10 (paired run 1, arm B): under `--setting-sources local` a saved Workflow in the repository's `.claude/workflows` was not found by name in 6 of 6 headless runs (the available list held only `deep-research`) and was launched by `scriptPath` instead; the verifier returned in 2 of 6 runs (0 refuted), was cut by the 45-minute wait ceiling of `claude -p` in 3, and in 1 the implementer itself ran to the ceiling.",
    "overturn_when": "A release changes Workflow resume or limits, or a measured failure mode on our runs.",
    "supersedes": [
     "R52 Ultracode clause"
@@ -1327,11 +1329,12 @@
    "evidence": [
     "agents.md how to choose",
     "workflows.md",
-    "L2 framework ranking (compound-engineering first on its own quality, all seven overlap native)"
+    "L2 framework ranking (compound-engineering first on its own quality, all seven overlap native)",
+    "Paired run 1, 2026-10-10 (evidence/artifacts/native-practice-paired-runs-20261010/paired-runs.json; RESULT.md sha256 e87b9cabd8c2, score.json 72dc84ef76b0): six bounded north-star fixes, one trial per arm; every mode passed 6 of 6, the single session cost $5.87 on average, the verify Workflow 1.6x and the agent team 3.0x (estimates), and the blind judges preferred the single session's diff to the Workflow's on 5 of 6 fixtures and to the team's on 3 of the 5 where the team's diff was captured"
    ],
    "overturn_when": "A paired same-task run shows a framework ahead of native composition on quality at equal or lower cost.",
    "supersedes": [],
-   "notes": "Adjudicated: native composition stands; the refuter upheld it. No framework shows a measured gain on our tasks. Scope: Claude-side composition; Codex lanes compose through hcom (2026-10-06 decision). G5 holds two rows for agent-orchestrator (OrchestratorInc and its former name, one repository id) to reconcile.",
+   "notes": "Adjudicated: native composition stands; the refuter upheld it. No framework shows a measured gain on our tasks. Scope: Claude-side composition; Codex lanes compose through hcom (2026-10-06 decision). G5 holds two rows for agent-orchestrator (OrchestratorInc and its former name, one repository id) to reconcile. Measured 2026-10-10 for bounded fixes on north-star code (paired run 1: six fixtures, one trial per arm, a 45-minute ceiling per run, client 2.1.296): the single session stays the choice. No orchestrated arm resolved more fixtures than the single session (all 18 runs passed) or was preferred on enough fixtures by the blind judges (Workflow 1 of 6, team 1 of 5 comparable), at 1.6x and 3.0x its mean cost (the team's cost is an estimate priced from token counts and ceiling-bound). Limits: one module family, one trial per arm; 4 of the 6 Workflow runs and 4 of the 6 team runs did not finish their coordination stage inside the ceiling, so the arms measure what was reachable in 45 minutes.",
    "primary_sources": [
     {
      "title": "Harness design for long-running application development",
@@ -1415,7 +1418,8 @@
    "default": "Repository-resident task state per Anthropic's multi-context-window guidance (a JSON status file, free-text progress notes and git commits, read at session start), with native plan mode for the plan",
    "route": "One recipe paragraph names the files; set `plansDirectory` at project scope to a path inside the repository (unset, plans go to ~/.claude/plans and are not repository-resident), or copy the approved plan into the state files Long autonomous builds [read 2026-10-09] start with a planning step that expands the prompt into a deliverable-level spec; execution plans with progress and decision logs are checked into the repository (harness-design post, measured; OpenAI harness-engineering post).",
    "alternatives": [
-    "Native Task tools with `CLAUDE_CODE_TASK_LIST_ID`",
+    "Native Task tools with `CLAUDE_CODE_TASK_LIST_ID`: ranked second by paired run 2b (2026-10-10), which it did not win: 4 of 4 runs passed with no lost work, it won 2 of 4 cells (both on the smaller F6 fixture) and lost both F5 cells on sessions and cost; on F5 it ran all 8 sessions without declaring TASK-DONE. In `claude -p` the task-list tools must be named in `--allowedTools`",
+    "Ralph-style headless loops (the same prompt every session, no state instruction): ranked third, for fallback only, when neither repository state files nor the native task list can be used; loops-completion states the external done check it needs and why the ranking is provisional",
     "Native plan mode with `plansDirectory`",
     "OthmanAdi/planning-with-files",
     "gastownhall/beads"
@@ -1428,11 +1432,12 @@
    ],
    "evidence": [
     "platform prompting guide, 'Workflows across multiple context windows'",
-    "Anthropic engineering, 'Effective harnesses for long-running agents'"
+    "Anthropic engineering, 'Effective harnesses for long-running agents'",
+    "Paired run 2b, 2026-10-10 (evidence/artifacts/native-practice-paired-runs-20261010/paired-runs.json; RESULT.md sha256 293fe657916a, analysis.txt d75d7876e8a5, lost_work.json e871e89e37ca): 12 runs, repository state files stay the default"
    ],
    "overturn_when": "Paired same-task runs on long multi-session tasks, with forced restarts and compaction, show an alternative ahead on quality.",
    "supersedes": [],
-   "notes": "Adjudicated: the Anthropic convention stands; the refuter upheld it.",
+   "notes": "Adjudicated: the Anthropic convention stands; the refuter upheld it. Measured 2026-10-10 (paired run 2b: 12 runs, a 30-turn cap per session, at most 8 sessions, two fixtures with two trials each): the default stands. All twelve runs passed the hidden tests; repository state files declared done in 6 and 5 sessions on F5 where the task list and the loop used all 8 sessions without declaring done, and neither alternative won a majority of the cells (task list 2 of 4, loop 0 of 4). Lost work: 0 events in all twelve runs, counted by two readers on different models. The first design (a 12-turn cap) was infeasible and is recorded as such. Limits: four cells; the readers were not blind to the arm.",
    "primary_sources": [
     {
      "title": "Harness design for long-running application development",
@@ -1518,14 +1523,15 @@
    "alternatives": [
     "`/goal`",
     "cobusgreyling/loop-engineering patterns as reference",
-    "Ralph-style headless loops: one fresh `claude -p` or `codex exec` per iteration on the same prompt file (building-c-compiler post; candidate until the planning-persistence paired run)"
+    "Ralph-style headless loops: one fresh `claude -p` or `codex exec` per iteration on the same prompt file (building-c-compiler post). A ranked alternative since 2026-10-10 (paired run 2b; the command center's ruling), third behind repository state files and the native task list, for fallback only, when neither can be used. It passed 4 of 4 runs with 0 lost work but won no cell: it tied repository state files on sessions on both F6 cells and cost more in all four. An external done check is required: on F5 it (like the task list) ran all 8 sessions without declaring TASK-DONE and its late sessions only re-read and re-ran, so pair it with a test-based or explicit done check, never with the session cap alone. The ranking is post hoc and provisional: the preregistration named no criterion, so any rerun preregisters its criterion before its first session (a suitable one: ranked if it wins at least one cell, or ties repository state files on sessions and cost in some cell; else rejected)"
    ],
    "rejections": [
     "ralph-loop plugin as the default"
    ],
    "evidence": [
     "hooks.md Stop event",
-    "goal.md"
+    "goal.md",
+    "Paired run 2b, 2026-10-10 (evidence/artifacts/native-practice-paired-runs-20261010/paired-runs.json; RESULT.md sha256 293fe657916a, analysis.txt d75d7876e8a5, lost_work.json e871e89e37ca): 12 runs; the Ralph-style loop passed 4 of 4, won no cell and ran all 8 sessions on F5 without declaring done"
    ],
    "notes": "No completion gate is configured today; the KC-19 trial was designed and never run. Verified: a command gate fails open by default (a gate that cannot start or times out lets Claude stop); `onFailure: \"block\"` (2.1.295) is not yet in hooks.md, so pick and test the failure mode; for agent-team members use TeammateIdle; for Workflow children put a Stop hook in the agent's frontmatter (runs as SubagentStop).",
    "overturn_when": "A paired run shows a loop pattern catching more real defects at equal cost, or a release changes Stop semantics.",
@@ -2061,7 +2067,7 @@
    ],
    "overturn_when": "A measured gap the native path cannot close (for example per-lane cost attribution the counters lack).",
    "supersedes": [],
-   "notes": "Adjudicated mixed: native default, with ccusage and agentsview ranked first among alternatives; the refuter upheld it. Owed: a fixed-window same-task reconciliation of native counters against ccusage. Scope verified: not covered are Actions under WIF (retired 2026-10-10; read the Console organisation's usage if it is ever re-enabled), ultrareview cloud runs (usage credits) and `--bare` workers; under the subscription `claude_code_cost_usage` is API-list-price value, not spend; the series carry effort, query_source, model, type and ecosystem_lane. Integrity preconditions: the prompt and response content gates stay off (OTEL_LOG_ASSISTANT_RESPONSES explicitly false); because the template sets OTEL_LOG_TOOL_DETAILS=1, the collector's tool-name and privacy allowlists are required; backends stay on loopback and no log or event export with values goes into the public repository.",
+   "notes": "Adjudicated mixed: native default, with ccusage and agentsview ranked first among alternatives; the refuter upheld it. Owed: a fixed-window same-task reconciliation of native counters against ccusage. Scope verified: not covered are Actions under WIF (retired 2026-10-10; read the Console organisation's usage if it is ever re-enabled), ultrareview cloud runs (usage credits) and `--bare` workers; under the subscription `claude_code_cost_usage` is API-list-price value, not spend; the series carry effort, query_source, model, type and ecosystem_lane. Integrity preconditions: the prompt and response content gates stay off (OTEL_LOG_ASSISTANT_RESPONSES explicitly false); because the template sets OTEL_LOG_TOOL_DETAILS=1, the collector's tool-name and privacy allowlists are required; backends stay on loopback and no log or event export with values goes into the public repository. Metered 2026-10-11 on this host over 24 hours: the cost counter equals the token counters at the pricing page's rates (checked on claude-fable-5-1), and the `api_request` events' `cost_usd` does not: it leaves the advisor's iterations out (they are not top-level usage) and gives Opus 5.5 about 1.9 times the counter's figure, so the events are not a spend meter; the advisor's model was about a quarter of the counter's list-equivalent total, which paired run 4 is proposed to weigh against what the advisor buys.",
    "primary_sources": [
     {
      "title": "The advisor strategy: Give agents an intelligence boost",
