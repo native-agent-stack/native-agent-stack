@@ -1,0 +1,27 @@
+{
+  "AssetAttribute": {
+    "description": "Unique characteristic of an asset. Supported values:\n- `ptp_no_exception`: Asset is a Publicly Traded Partnership (PTP) without a qualified notice; non-U.S. customers may incur 10% withholding on gross proceeds as per IRS guidance, and are blocked from being purchased by default.\n- `ptp_with_exception`: Users can open positions in these PTPs without general restrictions.\n- `ipo`: Accepting limit orders only before the stock begins trading on the secondary market.\n- `has_options`: The underlying equity has listed options available on the platform. Note: if the equity had inactive/expired contracts in the past, this will still show up.\n- `options_late_close`: Indicates the underlying asset's options contracts close at 4:15pm ET instead of the standard 4:00pm ET.\n- `fractional_eh_enabled`: Indicates the asset accepts fractional orders during extended hours sessions (pre-market, post-market, and overnight if enabled).\n- `overnight_tradable`: Asset is eligible for overnight (24x5) trading in supported venues on the platform.\n- `overnight_halted`: Asset is eligible for overnight trading but is currently halted/blocked for overnight sessions due to risk, corporate action, compliance, or venue constraints.",
+    "enum": [
+      "ptp_no_exception",
+      "ptp_with_exception",
+      "ipo",
+      "has_options",
+      "options_late_close",
+      "fractional_eh_enabled",
+      "overnight_tradable",
+      "overnight_halted"
+    ],
+    "example": "ptp_no_exception",
+    "type": "string"
+  },
+  "Assets.attributes": {
+    "example": [
+      "ptp_no_exception",
+      "ipo"
+    ],
+    "items": {
+      "$ref": "#/components/schemas/AssetAttribute"
+    },
+    "type": "array"
+  }
+}

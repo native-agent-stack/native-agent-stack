@@ -770,7 +770,9 @@ class CapacityRun:
         except ValueError:
             raise HarnessRefusal("session_calendar_unsupported") from None
         self.session_kind = info.kind.value
-        if info.kind == SessionKind.CLOSED:
+        # An allow-list: OVERNIGHT is a market session the harness does not admit (the D6/T15 acceptance is NOT_RUN); it is neither refused as
+        # closed nor flagged as extended hours below, so a `!= CLOSED` test would run it as regular hours.
+        if info.kind not in (SessionKind.PRE, SessionKind.RTH, SessionKind.POST):
             raise HarnessRefusal("market_session_closed")
         if info.kind in (SessionKind.PRE, SessionKind.POST):
             if not self.config.allow_extended_hours:

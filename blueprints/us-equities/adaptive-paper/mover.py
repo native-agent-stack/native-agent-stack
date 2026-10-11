@@ -35,7 +35,7 @@ import sys
 _HERE = str(Path(__file__).resolve().parent)
 if _HERE not in sys.path:
     sys.path.insert(0, _HERE)
-from feeds import is_qualified_feed  # noqa: E402
+from feeds import require_qualified_stream  # noqa: E402
 from leverage import validate_leverage_policy  # noqa: E402
 from safety import RiskLimits, SafetyError, symbol_name  # noqa: E402
 from sessions import NY, _rth_close_time, is_trading_day, validate_session_policy  # noqa: E402
@@ -320,8 +320,7 @@ def load_mover_config(path):
         raise ValueError("unqualified_mover_configuration")
     if "symbols" in config:
         raise ValueError("mover_universe_comes_from_scan")
-    if not is_qualified_feed(config.get("feed")):
-        raise ValueError("unqualified_data_feed")
+    require_qualified_stream(config.get("feed"))
     leverage_block = "leverage_policy" in config
     max_leverage = parse_decimal(str(_require_key(config, "max_leverage")))
     if (config.get("endpoint") != PAPER_ENDPOINT or config.get("catalyst_orders_enabled") is not False

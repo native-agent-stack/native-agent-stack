@@ -428,6 +428,17 @@ class CapacityRunTests(unittest.TestCase):
         closed = fx.FakeClock(datetime(2026, 9, 26, 15, 0, tzinfo=timezone.utc).timestamp())  # Saturday
         receipt, _, _ = run(self.tmp.name, clock=closed, broker=fx.FakeBroker(closed))
         self.assertEqual(receipt["refusal_reason"], "market_session_closed")
+        # OVERNIGHT is a market session the harness does not admit: both instants were CLOSED before the classifier knew the session, and
+        # they must still refuse, with or without the extended-hours permission and with no order sent.
+        for label, moment in (("Tuesday 21:00 ET", datetime(2026, 9, 23, 1, 0, tzinfo=timezone.utc)),
+                              ("Wednesday 02:00 ET", datetime(2026, 9, 23, 6, 0, tzinfo=timezone.utc))):
+            for allowed in (False, True):
+                with self.subTest(label=label, allow_extended_hours=allowed):
+                    overnight = fx.FakeClock(moment.timestamp())
+                    broker = fx.FakeBroker(overnight)
+                    receipt, _, _ = run(self.tmp.name, clock=overnight, broker=broker, allow_extended_hours=allowed)
+                    self.assertEqual(receipt["refusal_reason"], "market_session_closed")
+                    self.assertEqual(len(broker.orders), 0)
         pre = fx.FakeClock(datetime(2026, 9, 24, 11, 0, tzinfo=timezone.utc).timestamp())  # 07:00 ET
         broker = fx.FakeBroker(pre)
         receipt, _, _ = run(self.tmp.name, clock=pre, broker=broker)
@@ -437,6 +448,19 @@ class CapacityRunTests(unittest.TestCase):
         pre = fx.FakeClock(datetime(2026, 9, 24, 11, 0, tzinfo=timezone.utc).timestamp())
         receipt, _, _ = run(self.tmp.name, clock=pre, broker=fx.FakeBroker(pre), allow_extended_hours=False)
         self.assertEqual(receipt["refusal_reason"], "extended_hours_not_allowed")
+        for allowed in (True, False):
+            with self.subTest(label="Thursday 18:00 ET", allow_extended_hours=allowed):
+                post = fx.FakeClock(datetime(2026, 9, 24, 22, 0, tzinfo=timezone.utc).timestamp())
+                broker = fx.FakeBroker(post)
+                receipt, _, _ = run(self.tmp.name, clock=post, broker=broker, allow_extended_hours=allowed)
+                self.assertEqual(receipt["session_kind"], "POST")
+                if allowed:
+                    self.assertIsNone(receipt["refusal_reason"])
+                    self.assertEqual(broker.extended_hours_flags, {True})
+                    self.assertTrue(receipt["extended_hours_orders"])
+                else:
+                    self.assertEqual(receipt["refusal_reason"], "extended_hours_not_allowed")
+                    self.assertEqual(len(broker.orders), 0)
 
     def test_price_band_and_rejections_are_data(self):
         self.assertEqual(c.limit_price_below_bid("500.00", 500), Decimal("475.00"))
