@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "gate_read_accounting_delta",
   "date": "2026-10-11",
-  "source_commit": "82bb95d1b868872d012426cd77aca2888d23aa8a",
+  "source_commit": "cda8f6de85941787be7d331ac068ba28343978ac",
   "baseline_path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261004.json",
   "baseline_sha256": "5ea8e4db0ab15115e5b1eec6c1939450514dc227e0f9308d865f661507c6c93d",
   "mode": "monitoring_only",
@@ -134,5 +134,10 @@
       "scope": "unchanged installer read multiplicity; location moved",
       "permission_change": false
     }
+  ],
+  "removed_locations": [
+    "tools/adoption/install_skills.py:587",
+    "tools/adoption/install_skills.py:614",
+    "tools/adoption/install_skills.py:615"
   ]
 }

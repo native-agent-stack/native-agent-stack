@@ -405,7 +405,7 @@ records identify their measured inputs, not durable code-source citations.
 | Exhaustive lifecycle task map | [`tests/test_landscape_sweep_skills.py:133`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/878f2891aaa9027b10b7af3e4321ef5e882eedd0/tests/test_landscape_sweep_skills.py#L133) (main `878f2891`); `CatalogTests.test_every_pinned_skill_serves_exactly_one_task` | The original missing claude-api task fails; the corrected map passes with exactly one implementation task. |
 | Identity-bound architecture locators | [`tests/test_architecture_pin_source.py:49`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/878f2891aaa9027b10b7af3e4321ef5e882eedd0/tests/test_architecture_pin_source.py#L49) (main `878f2891`); `expected_ranges` | Both original OpenAI/TypeSafe locator subtests fail before and pass after native identity-based derivation. |
 | Identity-bound surface-watch locator | [`tests/test_upstream_surface_watch.py:2034`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/878f2891aaa9027b10b7af3e4321ef5e882eedd0/tests/test_upstream_surface_watch.py#L2034) (main `878f2891`); `DispositionCitationTests.has_token` and its repository citation contract | The original PostToolUseFailure locator fails before and passes after native token-based derivation. |
-| Exact reviewed inventory proposal | [`scripts/local_pages_policy_grants.py:109`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/878f2891aaa9027b10b7af3e4321ef5e882eedd0/scripts/local_pages_policy_grants.py#L109) (main `878f2891`); `proposal` / the test's `inventory_paths` selector | The integrated expected and actual sets each contain 94 paths, derived on the measured merged input below, with no missing or extra path. |
+| Exact reviewed inventory proposal | [`scripts/local_pages_policy_grants.py:109`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/878f2891aaa9027b10b7af3e4321ef5e882eedd0/scripts/local_pages_policy_grants.py#L109) (main `878f2891`); `proposal` / the test's `inventory_paths` selector | The integrated expected and actual sets each contain 97 paths, derived on the current carry inventory input below, with no missing or extra path. |
 | Push-gate accounting | [`blueprints/runtime-workers/openhands/resolver/push_gate.py:665`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/878f2891aaa9027b10b7af3e4321ef5e882eedd0/blueprints/runtime-workers/openhands/resolver/push_gate.py#L665) (main `878f2891`); `derive_ci_protected` through `RepositoryWorkflowTests.derived()` | The original unclassified-read guard fails before; the regenerated delta preserves exact script, shape, total and protection comparisons against the new main baseline. |
 | Handbook output provenance | [`scripts/build_new_wsl_handbook.py:1340`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/878f2891aaa9027b10b7af3e4321ef5e882eedd0/scripts/build_new_wsl_handbook.py#L1340) (main `878f2891`); supported `--write`, `render` and `digest` APIs | The stale-output/receipt guard fails before regeneration and passes after native regeneration. |
 
@@ -424,12 +424,20 @@ skips. Each passes against the corrected files.
 
 ## 2026-10-11 landing integration
 
-The final CC-cued main base is `4424aa8d0fd9c2e8ecd13a813b386954986bc58b`.
-The test's own `inventory_paths` derivation returns 94 expected paths,
-exactly equal to 94 actual reviewed repository grants, with no missing or
+Historical #1013 integration base (retained as the reviewed source binding):
+The final CC-cued main base is `ccff8765bf91aa02c0c4addad25d680d32abac89`.
+The current carry base is `c735e8b2e7d096475ceed380ce956b9191af508c`. Its inventory was re-derived
+at carry input `900a40a6b806228cfbe0ebafc16408b5bff69c82`
+through the same native selector the maintained test calls. The count
+below describes that current carry, separately from the historical
+base and advisory delta source binding.
+The test's own `inventory_paths` derivation returns 97 expected paths,
+exactly equal to 97 actual reviewed repository grants, with no missing or
 extra path. Main's three retired workflow grants remain retired; this PR's
-routing skill is the reviewed addition. No grant count is copied from an
-earlier landing target. The `878f2891` source bindings above remain valid
+routing skill is the reviewed addition. The maintained grant test uses #1013's
+policy-derived `expected_count` rather than a branch-edited literal.
+No grant count is copied from an earlier landing target.
+The `878f2891` source bindings above remain valid
 for the unchanged code; they do not identify the final landing base.
 
 Main's regenerated push-gate baseline already separates test modules.
@@ -437,14 +445,14 @@ The merged guard preserves that baseline and the PR's exact script/shape
 accounting, without the obsolete eight-location subtraction. A fresh native
 derivation on the completed rebased input generates the current delta. The
 measured parent/source input is
-`82bb95d1b868872d012426cd77aca2888d23aa8a`:
+`cda8f6de85941787be7d331ac068ba28343978ac`:
 342 unclassified reads, ten added skills_status reads and one added shape,
 with no removals. It binds the current baseline hash
 `5ea8e4db0ab15115e5b1eec6c1939450514dc227e0f9308d865f661507c6c93d`.
-The landing-gate correction commit has that merged input commit as its
-parent. Both full SHAs above were read from Git on the merged input,
+At the historical reviewed integration, the original final rebase
+integration commit had that rebased input commit as its parent. Both full SHAs above were read from Git on the rebased input,
 using `git merge-base HEAD origin/main` and `git rev-parse HEAD`, before
-creating the landing-gate correction commit. The delta's `source_commit` independently
+creating the final rebase integration commit. The delta's `source_commit` independently
 identifies the measured input. Current main's native 332-read baseline is
 retained unchanged. The delta is re-derived through the native mechanism;
 exact script counts, shape multiplicities and total comparisons remain.
@@ -470,7 +478,8 @@ too; the final main base and measured parent above supersede them.
 The later `1e6a49ff` landing, its `561361c4` measured input and its
 91-grant inventory are historical after main's #1004/#979 landings.
 The later bcf55c45/9794477a input with 92 grants and 340 reads is historical
-after the merge. The current 94-grant/342-read values above are measured,
+after the merge. The merged `82bb95d1`/`84131271` inventory with 94 grants
+is historical after main's #1013 landing. The current 97-grant/342-read values above are measured,
 not copied from an earlier landing or inferred from moving remote main.
 
 The maintained `test_landing_record_matches_native_grants_and_measured_source`
