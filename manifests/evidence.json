@@ -60412,8 +60412,8 @@
     },
     {
       "path": "tests/test_credential_status.py",
-      "sha256": "d3baaa64a16103186700f607969d20bcdcfbeb89291eedbb11cc27c568d32656",
-      "bytes": 60279
+      "sha256": "697d7c7c13deac5fb1d1df10aa2e403d42fff07bf36d8d84c5031305b3fd25fc",
+      "bytes": 61837
     },
     {
       "path": "tests/test_credential_tools.py",

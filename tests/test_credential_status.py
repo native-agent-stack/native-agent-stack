@@ -280,6 +280,26 @@ class CredentialStatusTests(unittest.TestCase):
                               "next kernel restart"):
                     self.assertIn(words, step)
 
+    def test_typesafe_row_keeps_the_research_and_jev_grant_without_a_separate_key(self):
+        # Owner decision 2026-10-10 (inventory notes): the trading lane's research work and Jev harness may also use the
+        # stored Typesafe key, each in its own process started through credential_run.py. The docs table row kept the
+        # earlier sentence "A trading-lane use needs its own, separately authorized key", which contradicted the grant
+        # (review of PR #985). Both rows keep the grant and the runner command, and neither requires a separate key.
+        runner = "tools/credentials/credential_run.py typesafe -- <command>"
+        row = next(e for e in self.inventory["entries"] if e["id"] == "typesafe")
+        table = (ROOT / "docs/secret-storage.md").read_text(encoding="utf-8")
+        docs_rows = [line for line in table.splitlines() if line.startswith("| `typesafe` |")]
+        self.assertEqual(len(docs_rows), 1)  # a missing row fails here instead of raising StopIteration
+        self.assertIn(runner, row["loaders"])
+        self.assertIn(f"`{runner}`", docs_rows[0])
+        self.assertIn("may also use this key", row["notes"])
+        places = {"inventory notes": row["notes"], "docs/secret-storage.md row": docs_rows[0]}
+        for place, text in places.items():
+            with self.subTest(place=place):
+                self.assertIn("research work and Jev harness", text)
+                for words in ("separately authorized", "needs its own", "separate key"):
+                    self.assertNotIn(words, text.lower())
+
     def test_keyring_row_reports_memory_only_lost_on_restart(self):
         inventory = self.keyring_inventory()
         report = cs.inspect(ROOT, inventory, self.env, proc_keys=self.proc_keys)
