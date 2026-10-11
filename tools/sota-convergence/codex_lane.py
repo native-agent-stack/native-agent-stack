@@ -538,6 +538,94 @@ def operand_reasons(value: str, allowed_roots) -> list[str]:
     return reasons
 
 
+def resolved_read_reasons(value, allowed_roots, *, cwd=None):
+    """Check the filesystem target as well as its display, including links under every approved root."""
+    if not isinstance(value, str) or "\x00" in value:
+        return ["unverified filesystem read operand"]
+    if value == "/dev/null":
+        return []  # Preserve the existing explicit system-device exemption.
+    try:
+        roots = [Path(root) for root in allowed_roots]
+        if any(root.is_symlink() for root in roots):
+            return ["unverified symlinked allowed read root"]
+        path = Path(value)
+        if not path.is_absolute():
+            base = cwd or (str(roots[0]) if roots else None)
+            if base is None:
+                return ["unverified relative read working directory"]
+            path = Path(base) / path
+        resolved = path.resolve(strict=False)
+        for root in roots:
+            canonical = root.resolve(strict=False)
+            if resolved == canonical or not root.is_file() and canonical in resolved.parents:
+                return []
+        return ["resolved read path outside the repository and packets: " + str(resolved)]
+    except (OSError, ValueError, RuntimeError):
+        return ["unverified filesystem read target"]
+
+
+def sed_operands(words):
+    """Model numeric previews and r/R reads; refuse other interpreter source and unverified script files.
+
+    GNU sed@7e2e575a sed/compile.c read_filename and execute.c r/R dispatch are the reference.
+    This is a bounded source allowlist, not a replacement sed parser.
+    """
+    files, scripts, reasons = [], [], []
+    index, positional_script, options = 0, False, True
+    while index < len(words):
+        word = words[index]
+        index += 1
+        if options and word == "--":
+            options = False
+            continue
+        if options and word in {"-n", "--quiet", "--silent", "-E", "-r", "--regexp-extended", "--sandbox"}:
+            continue
+        if options and word in {"-e", "--expression", "-f", "--file"}:
+            if index == len(words):
+                reasons.append("missing sed script operand")
+                continue
+            value = words[index]
+            index += 1
+            if word in {"-f", "--file"}:
+                files.append(value)
+                reasons.append("unverified sed script-file source")
+            else:
+                scripts.append(value)
+            positional_script = True
+            continue
+        if options and (word.startswith("-f") or word.startswith("--file=")):
+            files.append(word[2:] if word.startswith("-f") else word.partition("=")[2])
+            reasons.append("unverified sed script-file source")
+            positional_script = True
+            continue
+        if options and (word.startswith("-e") or word.startswith("--expression=")):
+            scripts.append(word[2:] if word.startswith("-e") else word.partition("=")[2])
+            positional_script = True
+            continue
+        if options and word.startswith("-"):
+            reasons.append("unsupported sed option/source form")
+            continue
+        if not positional_script:
+            scripts.append(word)
+            positional_script = True
+        else:
+            files.append(word)
+    address = r"(?:\d+|\$)(?:,(?:\d+|\$))?"
+    for source in scripts:
+        if "\\" in source or "\x00" in source or "\r" in source:
+            reasons.append("unsupported sed interpreter source")
+            continue
+        for line in source.splitlines():
+            # r/R filenames consume the remaining line, including semicolons (GNU read_filename).
+            read = re.fullmatch(r"\s*(?:" + address + r")?\s*[rR][ \t]*(.+)", line)
+            if read:
+                files.append(read[1])
+            elif any(part.strip() and not re.fullmatch(r"\s*(?:" + address + r")?\s*[pqd]\s*", part)
+                     for part in line.split(";")):
+                reasons.append("unsupported sed interpreter source")
+    return files, reasons
+
+
 def search_operands(program: str, words: list[str]) -> tuple[list[str], list[str]]:
     """Separate search/filter data from files, including pattern files and jq variable files.
 
@@ -616,7 +704,7 @@ def search_operands(program: str, words: list[str]) -> tuple[list[str], list[str
     return files, reasons
 
 
-def argv_reasons(argv: list[str], allowed_roots, tools, *, forwarding=False) -> list[str]:
+def argv_reasons(argv: list[str], allowed_roots, tools, *, forwarding=False, cwd=None) -> list[str]:
     """Executable position is distinct from pattern/filter arguments; inspect file operands separately."""
     if not argv or any(not isinstance(word, str) for word in argv):
         return ["unresolved executable or argument"]
@@ -638,8 +726,12 @@ def argv_reasons(argv: list[str], allowed_roots, tools, *, forwarding=False) -> 
     elif program in ("rg", "grep", "egrep", "fgrep", "jq"):
         operands, option_reasons = search_operands(program, operands)
         reasons += option_reasons
+    elif program == "sed":
+        operands, source_reasons = sed_operands(operands)
+        reasons += source_reasons
     for word in operands:
         reasons += operand_reasons(word, allowed_roots)
+        reasons += resolved_read_reasons(word, allowed_roots, cwd=cwd)
     return reasons
 
 
@@ -771,7 +863,7 @@ def python_audit(source: str, allowed_roots, tools, depth=0, *, cwd=None) -> lis
     if len(nodes) > 50_000:
         return ["Python audit node limit"]
     reasons = []
-    read_keywords = {"open": "file", "io.open": "file", "builtins.open": "file", "os.open": "path",
+    read_keywords = {"open": "file", "io.open": "file", "io.FileIO": "file", "builtins.open": "file", "os.open": "path",
                      "os.listdir": "path", "os.scandir": "path", "os.walk": "top", "os.stat": "path",
                      "os.lstat": "path", "os.readlink": "path", "os.chdir": "path", "glob.glob": "pathname",
                      "glob.iglob": "pathname", "urllib.request.urlopen": "url", "os.path.samefile": "f1"}
@@ -783,6 +875,12 @@ def python_audit(source: str, allowed_roots, tools, depth=0, *, cwd=None) -> lis
     constructors = {"Path", "pathlib.Path", "PurePath", "pathlib.PurePath", "pathlib.PosixPath", "pathlib.PurePosixPath"}
     read_keywords.update({constructor + '.' + method: "self" for constructor in constructors for method in ("owner", "group")})
     known = set(read_keywords) | execution | dynamic | constructors | {"getattr", "os.getenv", "os.environ.get", "json.loads"}
+    # Standard data/path transforms already modeled below. Other imported calls are not evidence of purity.
+    pure_imported = {"json.loads", "json.dumps", "re.compile", "re.search", "re.match", "re.fullmatch",
+                     "re.findall", "re.finditer", "re.escape", "os.path.join", "os.path.dirname",
+                     "os.path.basename", "os.path.normpath", "os.fsdecode", "os.fsencode", "hashlib.sha256"}
+    imported = {alias.name.split('.')[0] for node in nodes if isinstance(node, ast.Import) for alias in node.names}
+    imported.update(node.module.split('.')[0] for node in nodes if isinstance(node, ast.ImportFrom) and node.module)
 
     # Bindings are lexical and conservative across branches: every possible assignment must resolve.
     scopes, parent_scope, bindings, namespace_writes = {}, {id(tree): None}, {}, []
@@ -1308,11 +1406,19 @@ def python_audit(source: str, allowed_roots, tools, depth=0, *, cwd=None) -> lis
             except ValueError:
                 reasons.append("unresolved Python read URL")
                 continue
-            if parsed.scheme and local_scheme(parsed.scheme):
-                value = parsed.path or "/"
-            elif parsed.scheme and network:
-                reasons.append("Python network read")
+            if network:
+                if (parsed.scheme != "file" or parsed.netloc not in {"", "localhost"}
+                        or parsed.query or parsed.fragment or re.search(r"%(?![0-9a-fA-F]{2})", parsed.path)):
+                    reasons.append("unsupported Python read URL or network authority")
+                    continue
+                # CPython@cbc944f4 urllib/request.py FileHandler.open_local_file / url2pathname.
+                from urllib.request import url2pathname
+                value = url2pathname(parsed.path)
+                if not os.path.isabs(value) or "\x00" in value:
+                    reasons.append("unsupported local file URL path")
+                    continue
             path_reasons = operand_reasons(value, allowed_roots)
+            path_reasons += resolved_read_reasons(value, allowed_roots, cwd=cwd)
             reasons.extend(path_reasons)
             if path_reasons:
                 if value != original:
@@ -1445,8 +1551,10 @@ def python_audit(source: str, allowed_roots, tools, depth=0, *, cwd=None) -> lis
             if isinstance(parent, ast.Compare):
                 if all(primitive_data(value) for value in [parent.left, *parent.comparators]):
                     return True
-                # An unknown reference can be compared for printed classification;
-                # its comparison result must still reach a verified data sink.
+                # CPython v3.13.16 object.c:1016 / abstract.c:2277 hand literals to
+                # reflected equality or containment callbacks. Preserve non-path separators.
+                if literal.value not in ("://", b"://") and operand_reasons(os.fsdecode(literal.value), allowed_roots):
+                    return False
                 current = parent
                 continue
             if isinstance(parent, ast.IfExp):
@@ -1469,8 +1577,17 @@ def python_audit(source: str, allowed_roots, tools, depth=0, *, cwd=None) -> lis
                     and isinstance(parent.func.value, ast.Constant) and type(parent.func.value.value) is bytes
                     and parent.func.attr in {"join", "strip", "lstrip", "rstrip", "replace", "split", "rsplit", "decode", "hex",
                                              "partition", "rpartition", "lower", "upper", "startswith", "endswith"}):
-                # A literal bytes receiver has builtin formatting methods; follow their
-                # result to the same verified data sink without coercing expression types.
+                # bytes.decode may invoke registered codec/error callbacks (CPython
+                # v3.13.16 codecs.c:180-183,625-633; unicodeobject.c:5102-5103).
+                # Only argument-free decode of valid UTF-8 bypasses those callbacks.
+                if parent.func.attr == "decode":
+                    if parent.args or parent.keywords:
+                        return False
+                    try:
+                        parent.func.value.value.decode("utf-8", "strict")
+                    except UnicodeDecodeError:
+                        return False
+                # Follow the resulting primitive data to the verified sink, retaining AST types.
                 current = parent
                 continue
             called = callables(parent.func)
@@ -1522,6 +1639,10 @@ def python_audit(source: str, allowed_roots, tools, depth=0, *, cwd=None) -> lis
             reasons.append("unresolved Python callable alias")
             continue
         for kind, called, receiver in resolved:
+            if called == "json.loads" and any(keyword.arg not in {"s"} for keyword in node.keywords):
+                reasons.append("unverified Python JSON decoder callback or override")
+            if called == "json.dumps" and any(keyword.arg in {None, "default", "cls"} for keyword in node.keywords):
+                reasons.append("unverified Python JSON encoder callback or override")
             if kind == "path":
                 read_operand(receiver)
                 if called == "samefile":
@@ -1552,6 +1673,10 @@ def python_audit(source: str, allowed_roots, tools, depth=0, *, cwd=None) -> lis
                 analyze_execution(node, called)
             elif called.startswith(("os.exec", "os.spawn")):
                 reasons.append("unresolved Python executable interface")
+            elif (kind == "named" and called.split('.')[0] in imported
+                  and called not in constructors and called not in pure_imported
+                  and called not in {"Path.cwd", "pathlib.Path.cwd"}):
+                reasons.append("unverified potentially effectful Python imported call: " + called)
             if kind == "path" or called in read_keywords:
                 for keyword in node.keywords:
                     if keyword.arg in {"root_dir", "cwd"}:
@@ -1586,7 +1711,7 @@ def analysis_reasons(analysis, allowed_roots, tools, depth=0, *, cwd=None) -> li
         operands = [value if value is not None else raw[i].strip("'\"") if i < len(raw) else None
                     for i, value in enumerate(argv[:end]) if i != code_index]
         reasons += argv_reasons(operands, allowed_roots, tools,
-                                forwarding=invocation.get("source_kind") == "wrapper")
+                                forwarding=invocation.get("source_kind") == "wrapper", cwd=cwd)
         if operands and isinstance(operands[0], str):
             program = os.path.basename(operands[0])
             if program in {"cd", "pushd", "popd", "chroot", "nsenter", "unshare"} or program == "env" and any(
@@ -2676,6 +2801,16 @@ def main(argv=None) -> int:
         layers_filter = {item.strip() for item in args.layers.split(",") if item.strip()}
 
     packets = discover_packets(work_dir, layers_filter)
+    if not args.allow_git_history:
+        try:
+            packet_root = work_dir / "packets"
+            if packet_root.is_symlink():
+                raise ValueError("the packets read root is symlinked")
+            # Apply the existing no-escaping-link export invariant to the other allowed read root.
+            tree_sha256(packet_root)
+        except (OSError, ValueError) as error:
+            print(f"codex_lane: unconfined packets root: {error}", file=sys.stderr)
+            return 2
     codex_dir = work_dir / "codex"
     events_dir = codex_dir / "events"
     usage_path = codex_dir / "usage.jsonl"
@@ -2805,7 +2940,9 @@ def run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_d
     usage_lock = threading.Lock()
     audit_lock = threading.Lock()
     failures_lock = threading.Lock()
-    failures: list = []
+    unfinished = "unfinished layer: execution or audit did not reach verified promotion"
+    failures: list = [(catalog, layer_id, unfinished)
+                      for catalog, layer_id, _packet, _sha, _out in pending]
     failures_path = codex_dir / FAILURES_NAME
     # Preserve failures outside --layers before replacing the initial snapshot, rather than
     # waiting until the end (native main 9d4c00cd:1538-1556, CC 2026-10-10 follow-up).
@@ -2820,9 +2957,14 @@ def run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_d
                 if isinstance(entry, dict) and entry.get("layer_id") not in selected
                 and f"{entry.get('catalog')}__{entry.get('layer_id')}" not in selected]
     _write_failure_snapshot(failures_path, failures, kept)
+    # Pending means the prior return is already ineligible, including queued calls stopped before process().
+    # Invalidate every stale return after the durable unfinished snapshot and before any launch/stop check.
+    for _catalog, _layer, _packet, _sha, out_path in pending:
+        out_path.unlink(missing_ok=True)
 
     def record_failure(catalog, layer_id, reason):
         with failures_lock:
+            failures[:] = [row for row in failures if row[:2] != (catalog, layer_id)]
             failures.append((catalog, layer_id, reason))
             _write_failure_snapshot(failures_path, failures, kept)
 
@@ -2844,7 +2986,7 @@ def run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_d
             audit_path.write_text(json.dumps({"schema_version": 1, "allowed_roots": roots, "layers": audit_layers},
                                              indent=1, sort_keys=True) + "\n", encoding="utf-8")
 
-    def process(item):
+    def process_layer(item):
         catalog, layer_id, packet_path, packet_sha256, out_path = item
         name = f"{catalog}__{layer_id}"
         prompt_text = fill_prompt(template, packet_path.resolve(), repo)
@@ -2948,6 +3090,9 @@ def run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_d
             if STOP.is_set():
                 return
             out_path.write_text(json.dumps(final, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+            with failures_lock:
+                failures[:] = [row for row in failures if row[:2] != (catalog, layer_id)]
+                _write_failure_snapshot(failures_path, failures, kept)
             succeeded = True
             break
 
@@ -2958,6 +3103,15 @@ def run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_d
                                           cwd_records=load_native_cwd_records(events_path)))
             out_path.unlink(missing_ok=True)
             record_failure(catalog, layer_id, f"failed after retry: {last_failure}")
+
+    def process(item):
+        try:
+            return process_layer(item)
+        except BaseException as error:
+            catalog, layer_id, _packet, _sha, out_path = item
+            out_path.unlink(missing_ok=True)
+            record_failure(catalog, layer_id, "execution or audit interrupted: " + type(error).__name__)
+            raise
 
     if args.jobs > 1:
         executor = ThreadPoolExecutor(max_workers=args.jobs)

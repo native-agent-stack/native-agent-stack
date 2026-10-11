@@ -79,8 +79,10 @@ def native_journal_fixture(args, text, attempt):
     Codex 0.162.1 requests Paginated history when exec is non-ephemeral. Its native cwd comes
     from the executor, independently of fields supplied in a stdout item. Fixture controls
     CODEX_FAKE_NATIVE_JOURNAL_MODE and CODEX_FAKE_NATIVE_CWD exercise missing/mismatched input.
+    Ephemeral callers retain their canned stream byte-for-byte, with no synthetic native history.
+    openai/codex@092d3acd exec/src/lib.rs:1459-1461 requests history only when non-ephemeral.
     """
-    if "-C" not in args or not os.environ.get("CODEX_HOME"):
+    if "--ephemeral" in args or "-C" not in args or not os.environ.get("CODEX_HOME"):
         return text
     root = Path(args[args.index("-C") + 1]).resolve()
     thread_id = str(uuid.uuid4())

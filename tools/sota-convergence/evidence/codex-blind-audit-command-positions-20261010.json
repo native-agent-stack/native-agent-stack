@@ -3,8 +3,8 @@
   "checked_at": "2026-10-11T02:31:11Z",
   "historical_pre_bytes_checked_at": "2026-10-11T01:17:39Z",
   "historical_pre_review_checked_at": "2026-10-10T21:02:00Z",
-  "base_commit": "65cf2730068429a1c48c8c18fb24aadef8120817",
-  "base_commit_scope": "CC 03:23Z authorized landing rebase onto main at start, after the separate adjudication binding fix; main retirement and PR intent are preserved, with native manifest registration",
+  "base_commit": "1d1164e8c34df8250973a5c632e9747a1ef79533",
+  "base_commit_scope": "CC 07:02Z authorized local rebase onto landed #992 plus both families corrections in one publication; older qualified results retain their original explicit source/tree scope.",
   "historical_bytes_landing_base": "eb31d233234cdc552fc81672087ac8769e3696e0",
   "pre_landing_published_head": "fd86ad20e04cdb4d9b9798354604ec782575f230",
   "historical_landing_base": "c4f4990737c4e2ed8f0452d069e25a460f897bb5",
@@ -351,7 +351,7 @@
   "bytes_correction_regressions": {
     "class": "synthetic",
     "reviewed_revision": "078aeb6d2e77389db4cd7d7d910f1075a37dcbd1",
-    "rebased_parent": "271a7d87223e50f3def55c0e8f963d8c988c4e44",
+    "rebased_parent": "65cf2730068429a1c48c8c18fb24aadef8120817",
     "selection": "tests.test_codex_lane.LiteralBoundaryRegressionTests",
     "method": "Compile the exact reviewed runner source from Git in memory and apply the same two new test methods without altering its code; analyze payloads without executing them. Then run the entire five-method class with the corrected runner.",
     "codex_lane_py_sha256": "72fd40bcecfe1bc2f286be954e8b6695107f7d5d03f3ac8ec2c6b4dd4d07dac8",
@@ -360,7 +360,7 @@
     "after": {"tests": 5, "failures": 0, "errors": 0, "skips": 0, "exit_code": 0, "elapsed_seconds": 26.225, "log_sha256": "f241d4ba389509fcad5cd0eecd996d6106c6ffcd78199aa473445d098bc53089"},
     "cases": ["io.FileIO bytes sibling path", "os.path.getsize bytes absolute path", "shutil.copyfile bytes source and str destination", "sqlite3.connect bytes absolute path", "shutil.copyfile str source and bytes destination", "bytearray wrapping outside bytes constant", "memoryview wrapping outside bytes constant"],
     "positive_controls": ["print an outside-looking bytes value", "print a bytes separator join", "print decoded bytes", "print hex-formatted bytes", "compare bytes URI data"],
-    "correction": "Use os.fsdecode for exact str and bytes AST constants before the same boundary check, keeping AST types unchanged. Literal bytes formatting receivers follow only the existing verified data-sink rule.",
+    "correction": "Use os.fsdecode for exact str/bytes constants without changing AST types. Formatting reaches only verified data sinks. decode is followed only with no positional/keyword arguments and valid strict-UTF-8 literal bytes; arbitrary codec/error callbacks are not formatting.",
     "installed_python": "3.13.16",
     "python_pin": "cbc944f4bc59639a444dd971c737788ba2283a91",
     "sources": ["Lib/os.py:840-866", "Doc/library/os.rst fsdecode", "Doc/library/sys.rst:781-795", "Modules/_io/fileio.c:302-305", "Objects/unicodeobject.c:4030-4038", "Modules/_sqlite/connection.c:247-268", "Lib/genericpath.py:84-86", "Modules/posixmodule.c:1303-1329", "Lib/shutil.py:260-262"],
@@ -380,8 +380,8 @@
   "scratch_rollout_retention": {
     "class": "source_review",
     "decision": "Keep the existing fresh run-specific 0700 CODEX_HOME sessions and logs for forensic inspection and comparison with captured native rollout digests; do not copy raw rollouts into published verdicts or evidence manifests.",
-    "source_revision": "f9e785901d58a6e852bd8f7144a164c888168071",
-    "source": "tools/sota-convergence/codex_lane.py:1646-1680 isolated_codex_home and :1683-1691 release_codex_home; these functions remain byte-identical",
+    "source_revision": "65cf2730068429a1c48c8c18fb24aadef8120817",
+    "source": "tools/sota-convergence/codex_lane.py:658-665 isolated_codex_home retention contract and :695-703 release_codex_home at published main 65cf2730",
     "release": "Stop and wait for children, remove the authentication symlink, release the lock. Capture and retention read no real Codex home contents and copy no real Codex home; native setup retains its authentication-path metadata checks and symlink."
   },
   "landing_rebase": {
@@ -390,9 +390,9 @@
     "authorization": "CC 2026-10-11T03:23Z, after #992 binding fix",
     "retirement_source": "main bd59f5561 / #957; preserve retired adoption macOS workflow and hardening test bytes, retain catalog parser provisioning and remove the obsolete macOS-only parser control",
     "runtime_and_codex_tests_unchanged_from_fd86ad20": true,
-    "baseline_candidate": "1cfcdbad8821a2446b52233024a601794264de24",
+    "baseline_candidate": "7a7ff0675c65f9cc555ca29d622ab3375defc8b4",
     "baseline_path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261011-pr990-landing.json",
-    "baseline_sha256": "2bdc389b35857c74a680f14a8aea676213acc93d83e7971eace218e3d909b2a6",
+    "baseline_sha256": "6ce1f97ef323f2a34769380aabbd523cccb41ae26dccb40b61abf830178a4a73",
     "baseline_sites": 432,
     "codex_sites": 139,
     "shape_locations": 102,
@@ -402,6 +402,262 @@
     "historical_b8ff_snapshot_preserved": true,
     "worker_enforcement_classifications_changed": false,
     "proof_and_checks": "Both verbatim change-ids, exact range-diff/hunk notes and final same-HEAD checks are retained externally in runtime-workers-pr990-landing-20261011 and the PR body. Earlier qualification remains scoped to its original tree."
+  },
+  "callback_correction_regressions": {
+    "class": "synthetic",
+    "reviewed_revision": "7071510b79a457afd1567142b344919ff27e9631",
+    "before": {
+      "tests": 2,
+      "failures": 6,
+      "errors": 0
+    },
+    "after_focused": {
+      "tests": 8,
+      "failures": 0,
+      "errors": 0
+    },
+    "mechanisms": [
+      "registered codec search",
+      "registered UTF-8 error handler",
+      "overridden strict handler on invalid UTF-8",
+      "str reflected equality",
+      "bytes reflected equality",
+      "containment"
+    ],
+    "real_execution": "Every case prints the synthetic sibling sentinel under a temporary fixture; no system/user file or model/provider is accessed.",
+    "python_pin": "cbc944f4bc59639a444dd971c737788ba2283a91",
+    "sources": [
+      "Objects/bytesobject.c:2454-2459",
+      "Objects/unicodeobject.c:3572-3576,4408-4411,5072-5105",
+      "Python/codecs.c:178-184,622-636",
+      "Objects/object.c:1015-1019",
+      "Objects/abstract.c:2272-2280"
+    ],
+    "registry_correction": "Remove 82280d90/e0cc01af/e0816963 eligibility rows; repository JSON search found only this historical synthetic evidence and the registry, no retained production return.",
+    "historical_rebased_parent_scope": "Published landing base; earlier pre-landing RED/GREEN logs retain their original source hashes.",
+    "original_baseline_sha256": "2bdc389b35857c74a680f14a8aea676213acc93d83e7971eace218e3d909b2a6",
+    "baseline_metadata_correction": "CC 06:24Z P3-3: replace unavailable off-branch base_commit with the published source head. All measured counters/shapes remain unchanged; original exact bytes remain in the prior published Git tree."
+  },
+  "authorized_landing_rebase_20261011_0702": {
+    "class": "local_integration",
+    "authorization": "CC 2026-10-11T07:02Z: ONE push includes rebase plus both families fixes; push waits for Astra full1c",
+    "main_at_start": "9b3a39c43363f32ac61e74c674e4ba069593fe08",
+    "previous_published_head": "7071510b79a457afd1567142b344919ff27e9631",
+    "rebased_series_head": "7a7ff0675c65f9cc555ca29d622ab3375defc8b4",
+    "registry_derivation": "adjudicate.adjudication_provenance() and codex_lane.lane_provenance(codex_lane.DEFAULT_PROMPT); retain target registry, derive each replayed tuple, then remove only the three CC-specified unused intermediates and append current tuples",
+    "evidence_registration": "scripts.host_receipts.register_file for every owned changed path; FULLvalidate before each replay commit",
+    "baseline_metadata": "Reachable rebased-series ancestor replaces previous off-branch candidate; counters/shapes remain unchanged. Original pre-rebase validation results retain their historical scope."
+  },
+  "combined_fixture_compatibility": {
+    "class": "synthetic",
+    "trigger": "Combined landing of the new fake native-journal enrichment with the landed adjudication raw-byte control",
+    "upstream_pin": "openai/codex@092d3acd6bec3e3a14bdc7e7a2810ab628ab759d",
+    "upstream_source": "codex-rs/exec/src/lib.rs:1459-1461: paginated history requested only for non-ephemeral exec",
+    "correction": "Ephemeral fake calls return the supplied canned stream unchanged; native journal enrichment remains enabled for non-ephemeral attempts. Production adjudication is unchanged; native-cwd runtime integration stays in its separate follow-up.",
+    "red": {
+      "test": "tests.test_adjudicate.CodexTests.test_native_events_keep_the_child_bytes_without_a_transport_frame",
+      "tests": 1,
+      "failures": 4,
+      "errors": 0
+    },
+    "green_adjudication_module": {
+      "tests": 130,
+      "failures": 0,
+      "errors": 0
+    },
+    "host_tee_control": "The pre-fixture-fix nine-module run has 825 tests and five failed assertions: four raw-byte-control assertions plus the previously retained uutils tee0.10.0 panic at tee.rs:188. That one workflow test passes with the installed package-verified GNUtee9.7; failure and control logs remain distinct."
+  },
+  "completion_read_corrections_20261011": {
+    "class": "synthetic",
+    "reviewed_revision": "7071510b79a457afd1567142b344919ff27e9631",
+    "completion_verdict_sha256": "e73e528e05519f408facaf83fd59b6bc0ddd64d07f43e2dcde06c111ebd737dc",
+    "fixes": [
+      "model io.FileIO and refuse unverified potentially effectful imported calls",
+      "convert bounded file URLs with native url2pathname and confine decoded/resolved paths",
+      "bound sed source grammar and separate/attached script-file operands",
+      "resolve every read target and apply export-link invariant to packets root",
+      "durably record pending/in-flight layers and preserve interrupted failed status at consumer"
+    ],
+    "neutral_fixture": "outside-marker.txt containing OUTSIDE_MARKER; synthetic imported callback/helper files and sed program; no user/system/credential file",
+    "exact_head_red": {
+      "tests": 16,
+      "assertion_failures": 23,
+      "errors": 0,
+      "log_sha256": "83fb6708e602a9079ec72e2e678f30b4d3227a6903d90441644e8846ec48f5a7",
+      "method": "Compile verbatim reviewed source in memory and run the final tests inside the OS sandbox; native journal/promotion is fixture-simulated. Real native reader subprocesses only open scratch-local neutral markers."
+    },
+    "initial_core_green": {
+      "tests": 12,
+      "failures": 0,
+      "errors": 0,
+      "log_sha256": "3fd9ed8ad566b7d9d2afaa495657a93aec5d5ecfc53fe5a9fa814062cbc7eecf"
+    },
+    "extended_controls_green": {
+      "tests": 20,
+      "failures": 0,
+      "errors": 0,
+      "log_sha256": "e6326d201ddac5964c569e6896a11c2b52446b5975ad38d33f09849cbca103c0"
+    },
+    "claude_neutral_exact_head_red": {
+      "tests": 2,
+      "assertion_failures": 6,
+      "errors": 0,
+      "log_sha256": "4b5e622daaf63b856abf98a879e37de99a37b42ad2df336a4915a8ed77efaddd"
+    },
+    "qualified_source_checks": [
+      {
+        "modules": [
+          "tests.test_codex_lane",
+          "tests.test_adjudicate"
+        ],
+        "tests": 296,
+        "failures": 0,
+        "errors": 0,
+        "log_sha256": "01b8212b4ca700d56b6091ffe6a3e164fd6843d5f2d6d415ccbec83ec670d61e"
+      },
+      {
+        "modules": [
+          "tests.test_shell_parser_ci",
+          "tests.test_lane_packets",
+          "tests.test_verdict_lane_vendoring",
+          "tests.test_workflow_hardening",
+          "tests.test_record_verdicts",
+          "tests.test_evidence_manifest"
+        ],
+        "tests": 420,
+        "failures": 0,
+        "errors": 0,
+        "skips": 2,
+        "log_sha256": "725e56f4b5d8af64e4fc54cd4781a531e8a6d3de2f56345be87590f9d85308a6",
+        "environment": "Previously installed exact hash-locked CI requirements, including jsonschema4.26.0, mounted read-only; package-verified GNUtee9.7 only through private PATH override."
+      }
+    ],
+    "sandbox": {
+      "network": "unshared network namespace, no external or shared service connection",
+      "filesystem": "read-only target/toolchains/public Git objects and refs; host Git configuration replaced by synthetic minimal config; no user home or credentials mounted",
+      "environment": "clearenv plus explicit PATH, HOME, TMPDIR, XDG_CACHE_HOME, TZ, CHILD_USAGE_SHELL_PARSER, PYTHONDONTWRITEBYTECODE; synthetic passwd for login-shell tests",
+      "limits": {
+        "memory_bytes": 2147483648,
+        "tasks": 256,
+        "cpu_percent": 200,
+        "cpu_seconds_per_process": 600,
+        "scratch_tmpfs_bytes": 268435456,
+        "file_size_bytes": 67108864,
+        "wall_seconds": 650
+      }
+    },
+    "primary_sources": [
+      {
+        "repository": "python/cpython",
+        "commit": "cbc944f4bc59639a444dd971c737788ba2283a91",
+        "paths": [
+          "Modules/_io/fileio.c:294-305",
+          "Lib/urllib/request.py:1486-1508,1685-1691",
+          "Doc/reference/import.rst:429-441",
+          "Lib/pathlib/_local.py:664-672",
+          "Lib/posixpath.py:388-412"
+        ]
+      },
+      {
+        "repository": "mirror/sed",
+        "commit": "7e2e575a36bc88c0f3f3d6d8083c5f5b0ed44009",
+        "tag": "v4.9",
+        "paths": [
+          "sed/compile.c:360-383,1194-1218",
+          "sed/execute.c:1510-1542"
+        ]
+      },
+      {
+        "repository": "seathatflowsinourveins/native-agent-stack",
+        "commit": "7071510b79a457afd1567142b344919ff27e9631",
+        "paths": [
+          "tools/sota-convergence/codex_lane.py:2787-2842"
+        ]
+      },
+      {
+        "repository": "seathatflowsinourveins/native-agent-stack",
+        "commit": "9b3a39c43363f32ac61e74c674e4ba069593fe08",
+        "paths": [
+          "tools/sota-convergence/record_verdicts.py:1059-1065"
+        ]
+      }
+    ],
+    "boundary": "Post-run static audit with fixture-simulated native history; no claim of syscall/race attestation, production rollout compatibility, provider-body equality or live survivor adjudication. Native-cwd follow-up remains separate."
+  },
+  "adjacent_transition_verification_20261011": {
+    "class": "synthetic",
+    "rule": "CC 2026-10-11T08:39Z: check adjacent transitions/call sites and retain cited captures unmodified with a manifest",
+    "attachment_directory": "runtime-workers-pr990-full1c-20261011/read-attachments",
+    "call_site_ledger": "ADJACENT-TRANSITIONS.md",
+    "adjacent_controls": {
+      "tests": 30,
+      "failures": 0,
+      "errors": 0,
+      "log_sha256": "7dd0891ce6ec22872c7cb127e21b416e817694068b555fb9bf0e7a09b41e2a49"
+    },
+    "additional_stale_pending_stop_regression": {
+      "before_tests": 1,
+      "before_assertion_failures": 2,
+      "before_errors": 0,
+      "before_log_sha256": "e62066139bcefaf28f625ff07e7d0d50aeef9faee0e02e30e3932317a24fe89b",
+      "after_tests": 5,
+      "after_failures": 0,
+      "after_errors": 0,
+      "after_log_sha256": "c7bda652e5d33c59422b19bbc4a6fdf0f099ecdd6b6a9a561893f4f6156b93fa",
+      "correction": "Invalidate every pending stale return after the durable unfinished snapshot and before any launch/stop check; consumer remains failed on interrupted queued layers."
+    },
+    "sources_capture_policy": "Retain exact full upstream blobs and exact capture bytes; MANIFEST.sha256 authenticates attachments; historical missing bytes are explicit gaps and never replaced by reruns."
+  },
+  "adjacent_json_callback_verification_20261011": {
+    "class": "synthetic",
+    "mechanism": "Allowed JSON transforms may invoke imported callback readers; follow the changed imported-call exception one step into object_hook/default/cls",
+    "before": {
+      "tests": 1,
+      "assertion_failures": 2,
+      "errors": 0,
+      "log_sha256": "3a610a37cc4173289f00bf3c81666cbc84643786f208b8904066600f589d1d5f"
+    },
+    "after_literal_controls": {
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "log_sha256": "41bdf9170f0baa73ae15b94434732f374d5c4f7f34b89b6ef5406ee1e37dd01b"
+    },
+    "sources": [
+      "python/cpython@cbc944f4bc59639a444dd971c737788ba2283a91 Lib/json/decoder.py:157-161,214-218",
+      "python/cpython@cbc944f4bc59639a444dd971c737788ba2283a91 Lib/json/encoder.py:159-161,440-443"
+    ],
+    "capture_status": "Exact unmodified pinned decoder/encoder blobs and neutral RED/GREEN logs retained in read attachment manifest; seven older unrelated historical captures remain explicit missing-byte gaps pending collector recovery.",
+    "baseline_candidate": {
+      "count": 436,
+      "codex_sites": 143,
+      "shape_locations": 102,
+      "unresolved": 0,
+      "bytes": 29287,
+      "sha256": "fc481c58f7300e5e3dcc4fe698669b0d6042b07777ab32304bc27f0587e1fe21",
+      "status": "pending CC exact-candidate ACK; selected historical432baseline not replaced",
+      "delta": "Only Codex+4sites: imported namespace extraction882-883 and JSON callback keyword guards1642/1644; every prior site maps unchanged, other per-file counts/shapes equal."
+    }
+  },
+  "final_cc_ack_publication_20261011": {
+    "class": "local_integration",
+    "cc_ack": "2026-10-11T09:24Z exact candidate436 fc481c58; supersedes uncopied434; no classification change; seven historical capture gaps explicit",
+    "landing_base": "1d1164e8c34df8250973a5c632e9747a1ef79533",
+    "rebased_equivalent_of_reviewed_head": "89f0915634275f9d308223f3592ab4e8b37aea46",
+    "baseline_tool": "regenerate-baseline.py via bounded sandbox: native derive_ci_protected(WorkingTree) -> advisory_gate_reads([derived]); run again at final immutable HEAD and require selected_snapshot_exact",
+    "baseline_path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261011-pr990-landing.json",
+    "baseline_bytes": 29287,
+    "baseline_sha256": "fc481c58f7300e5e3dcc4fe698669b0d6042b07777ab32304bc27f0587e1fe21",
+    "count": 436,
+    "codex_sites": 143,
+    "shape_locations": 102,
+    "unresolved": 0,
+    "site_mapping": "All139oldCodex sites map to unchanged source lines. Exact additions882-883(import namespace extraction),1642/1644(JSONcallbackkeywordguard); allotherperfilecounts/shapesunchanged. Full mapping retained in final read attachments.",
+    "capture_gaps": "Seven missing historical original capture bytes remain explicit in CAPTURE-LOCATORS.json; current both-family proof and full pinned sources retained; no invented/replaced bytes.",
+    "current_source_sha256": "8d17b6794155a08ea9798d936e98919bfc8a49a61b046bdfd86f977e81dfe9ef",
+    "current_tests_sha256": "1524b337b229260b8d540cc1ff141fbe3b9575658e2b24c817865498cc9dd1d2",
+    "native_registry_derivation": "adjudicate.adjudication_provenance() and codex_lane.lane_provenance(codex_lane.DEFAULT_PROMPT); scripts.host_receipts.register_file owns evidence hashes.",
+    "qualification": "Precommit source proofs remain separately scoped; final actualHEAD checks/manifest/PRrange/range-diff in FIX-PUSHED."
   },
   "python_resolver_limits": {"source_chars": 250000, "ast_nodes": 50000, "work": 20000, "depth": 64, "alternatives": 64, "string_chars": 16384, "generated_chars": 1000000, "nested_execution_depth": 8},
   "native_receipt_fields_unchanged": true,

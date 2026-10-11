@@ -202,7 +202,7 @@ observations.
   execution on call from decorators/defaults evaluated at definition.
 - [Linux v6.12][linux]: `fs/open.c:1316–1326` defines directory/no-follow flags, and
   `fs/pipe.c:1145–1164` defines the FIFO wait avoided by nonblocking packet/checksum opens.
-- Installed [ripgrep 15.1.0][rg] `--help` (`-f PATTERNFILE`), [GNU grep 3.12][grep] `--help`
+- Installed [ripgrep 15.1.0][rg] `--help` (`-f PATTERNFILE`), GNU grep 3.12 `--help`
   (`-f/--file` versus `-E`), and [jq 1.8.1][jq] `--help` (`--from-file`, `--rawfile`, `--slurpfile`)
   are primary sources for the file-option distinction.
 
@@ -217,7 +217,6 @@ observations.
 [python]: https://github.com/python/cpython/tree/v3.13.16
 [linux]: https://github.com/torvalds/linux/tree/v6.12
 [rg]: https://github.com/BurntSushi/ripgrep/tree/15.1.0
-[grep]: https://www.gnu.org/software/grep/manual/grep.html
 [jq]: https://github.com/jqlang/jq/tree/jq-1.8.1
 
 ## 2026-10-11 bytes-path correction
@@ -230,8 +229,9 @@ payload is executed. Benign printed bytes, bytes separator data, decode/hex form
 comparisons are separate positive controls.
 
 The pass now presents both literal types to the same boundary policy through `os.fsdecode`, retaining
-the original AST type for data-flow analysis. A literal bytes receiver's builtin formatting methods
-follow the existing verified data-sink rule. This preserves expression type semantics; mixed bytes
+the original AST type for data-flow analysis. Bytes formatting follows the verified data-sink rule;
+`decode` is restricted to argument-free calls on strict-UTF-8-decodable literals, as corrected below.
+This preserves expression type semantics; mixed bytes
 and strings are not coerced into a valid concatenation or join.
 
 The installed interpreter is CPython 3.13.16, official pin
@@ -259,12 +259,12 @@ coordination results and PR body; historical qualification above remains scoped 
 
 Dropping `--ephemeral` intentionally preserves native rollouts in the newly created run-specific
 `CODEX_HOME`, whose mode is 0700. This follows the existing `isolated_codex_home` forensic contract
-at source pin `f9e785901d58a6e852bd8f7144a164c888168071` (`:1646-1653,1670-1673`): sessions and logs
+at [main `65cf2730`, codex_lane.py:658-665](https://github.com/seathatflowsinourveins/native-agent-stack/blob/65cf2730068429a1c48c8c18fb24aadef8120817/tools/sota-convergence/codex_lane.py#L658-L665): sessions and logs
 remain available for inspection. The original native bytes permit comparison with captured rollout
 digests and diagnosis of incomplete or ambiguous history. The minimal captured evidence is retained
 separately; original rollouts are not copied into published verdicts or evidence manifests.
 
-The existing `release_codex_home` lifecycle (`:1683-1691`) stops children, removes the authentication
+The existing `release_codex_home` lifecycle (same main pin, `:695-703`) stops children, removes the authentication
 symlink and releases the lock. Retention remains local to that owner-only scratch home; capture and
 retention read no real Codex home contents and copy no real Codex home. Native setup retains its
 existing authentication-path metadata checks and symlink. This correction documents forensic retention rather than
@@ -280,16 +280,172 @@ retains catalog-freshness parser provisioning and removes the obsolete macOS-onl
 and mutation control. The runtime source and Codex test bytes remain identical to `fd86ad20`.
 Evidence manifests were taken from pinned main and regenerated through native registration.
 
-The native advisory API at immutable candidate `1cfcdbad8821a2446b52233024a601794264de24` measures
+The native advisory API for the source retained at `7a7ff0675c65f9cc555ca29d622ab3375defc8b4` measures
 432 unclassified sites, 139 Codex sites, 102 shape locations and zero unresolved. The only normalized
 delta from the prior ACKed 424/139/101 snapshot is `scripts/component_matrix.py`: sites 6 to 14 and
 shapes 1 to 2, matching main's [#982 shared closeout loader](https://github.com/seathatflowsinourveins/native-agent-stack/commit/878f2891a).
 The CC independently compared and ACKed these exact candidate bytes at 04:01Z. The snapshot is
 retained as `unclassified-gate-reads-20261011-pr990-landing.json`, SHA256
-`2bdc389b35857c74a680f14a8aea676213acc93d83e7971eace218e3d909b2a6`, and selected by the existing
-native baseline test. The previous b8ff snapshot remains byte-exact historical evidence; worker
+`2bdc389b35857c74a680f14a8aea676213acc93d83e7971eace218e3d909b2a6` in the published `7071510b`
+tree. The 06:24Z citation correction changes only its source metadata to the published head;
+the current digest is in the evidence record and the existing native baseline test still selects it.
+The later authorized rebase onto main `9b3a39c4` binds this metadata to reachable PR ancestor
+`7a7ff0675c65f9cc555ca29d622ab3375defc8b4`; the counter/shapes payload remains unchanged.
+The previous b8ff snapshot remains byte-exact historical evidence; worker
 enforcement classifications are unchanged.
 
 Both verbatim change-ids, the range-diff, per-hunk resolution notes and final committed-head checks
 are retained in the landing artifacts and PR body. Historical test and baseline results above stay
 scoped to their original trees. No live provider/model call or additional rebase is part of this cue.
+
+## 2026-10-11 codec and comparison callback correction
+
+The 06:24Z review found that treating arbitrary bytes `decode` calls as builtin formatting was
+incorrect. Three synthetic codec/error callbacks actually read a temporary sibling packet; reflected
+string/bytes equality and containment callbacks do the same. The two new tests fail at `7071510b`
+with six assertion failures and zero errors after verifying each real fixture read. The callbacks live
+in a synthetic imported helper so the test exercises the literal transfer across the interface, rather
+than an independently detectable open call in the command's source.
+
+Follow `decode` only with no positional/keyword arguments and a literal that decodes as strict UTF-8.
+Unknown comparison operands receive a boundary literal conservatively; non-path URI separators
+such as `://` retain the existing classification-data behavior. The original printed/decode controls
+and the historical separator/regex residual test remain clean. These are static policy checks with
+six real local fixture reads, not model/provider calls.
+
+Pinned CPython v3.13.16 primary mechanisms:
+
+- [bytesobject.c:2454-2459](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Objects/bytesobject.c#L2454-L2459)
+  forwards bytes decoding to the Unicode decoder. [unicodeobject.c:3572-3576](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Objects/unicodeobject.c#L3572-L3576)
+  delegates non-standard codecs; [codecs.c:178-184](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Python/codecs.c#L178-L184)
+  invokes registered search callbacks.
+- [codecs.c:622-636](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Python/codecs.c#L622-L636)
+  looks up named error callbacks, including `strict`; [unicodeobject.c:4408-4411](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Objects/unicodeobject.c#L4408-L4411)
+  and [5072-5105](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Objects/unicodeobject.c#L5072-L5105)
+  dispatch invalid UTF-8 through that callback registry. A valid literal needs no error callback.
+- [object.c:1015-1019](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Objects/object.c#L1015-L1019)
+  invokes reflected rich comparison; [abstract.c:2272-2280](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Objects/abstract.c#L2272-L2280)
+  passes the tested value into containment.
+
+The three intermediate runner hashes were referenced only by synthetic correction evidence and
+registry rows in this repository, with no retained production return found. The authorized correction
+removes their eligibility rows and registers the corrected source; their historical test evidence remains.
+Off-branch implementation citations now use published main/head pins. The monitoring snapshot's
+source metadata also uses the published head; its measured counters retain the earlier accepted scope.
+
+### Combined landing fixture compatibility
+
+Rebasing onto landed adjudication exposed a fixture-only boundary: the new fake Codex journal helper
+prepended a thread UUID to ephemeral callers' canned stdout. The unchanged adjudication native-byte
+control fails four assertions on this combined source. Restrict journal fixture enrichment to
+non-ephemeral attempts; ephemeral test calls preserve the supplied stream byte-for-byte. This follows
+[openai/codex at the recorded pin, exec/src/lib.rs:1459-1461](https://github.com/openai/codex/blob/092d3acd6bec3e3a14bdc7e7a2810ab628ab759d/codex-rs/exec/src/lib.rs#L1459-L1461),
+which requests paginated history only for non-ephemeral exec. The existing raw-byte control and the
+whole 130-test adjudication module then pass. Production adjudication and its separate native-cwd
+integration are unchanged by this fixture correction.
+
+## 2026-10-11 completion-read corrections
+
+The completion review reproduced five additional gaps on the published source and combined tree.
+Neutral `outside-marker.txt` fixtures contain only `OUTSIDE_MARKER`. The initial corrected harness
+has 12 tests and 19 assertion failures with zero errors before the fixes, spanning independent audit
+and runner-promotion checks. The same 12 tests pass after the first integration. Supplemental controls
+then exercise supported/unsupported URL forms, sed source constructs and clean promotion cleanup.
+Real dummy reads and simulated native-journal promotion are reported separately.
+The final extended 16-test suite also runs against verbatim `7071510b` source compiled in memory:
+23 assertion failures, zero errors. Both review families' callback reproductions use only the neutral
+`outside-marker.txt` / `OUTSIDE_MARKER` fixture; the two Claude tests separately fail six assertions
+on that exact source and the corrected eight-test literal/separator bundle passes.
+
+1. `io.FileIO` now uses the modeled-reader unresolved-operand refusal. Other potentially effectful
+   imported calls require a modeled contract; absence of a boundary-looking individual constant no
+   longer establishes their purity. Existing verified primitive/packet transformations retain bounded
+   handling. Computed `bytes.fromhex` and `chr` operands fail closed, as does a synthetic imported reader.
+2. The modeled URL reader accepts bounded local `file:` URLs, converts the pathname with CPython's
+   `url2pathname`, and checks the decoded/resolved filesystem target. Remote authorities, malformed
+   percent escapes, queries/fragments, NULs, relative paths and unsupported local schemes are refused.
+   Encoded absolute outside paths and encoded parent traversal cannot pass promotion.
+3. Sed source is interpreted through a bounded allowlist: numeric preview addresses with `p`/`q`/`d`
+   and explicit `r`/`R` filename reads. The actual read filename is checked, consuming the rest of its
+   source line as GNU sed does. Separate/attached `-f` and `--file` operands are reads whose unmodeled
+   script contents are refused. Unsupported source, option forms and execution commands remain refused.
+   This uses upstream command semantics without introducing another full sed parser.
+4. Every displayed filesystem read is checked against its resolved target, including links under
+   the packets root. Blind launches apply the existing export tree invariant to the packets root as
+   well as the repository. The established bounded no-follow packet JSON loader remains in place.
+   Preexisting outside packet links fail before launching; repository link refusal remains covered.
+5. The durable failure snapshot now records all pending layers before child execution. A successful
+   audited promotion clears its unfinished entry; terminal failures replace it. Exceptions retain
+   their exception type without copying potentially private exception text, remove any return and
+   re-raise. The actual consumer reports an interrupted layer as failed rather than missing. Selected
+   reruns still preserve failures outside their selection.
+
+Tests run in an OS-enforced local sandbox: no network namespace access, read-only repository/toolchains,
+empty explicitly allowlisted environment, scratch-local homes/caches/temp files and a 256 MiB scratch
+tmpfs; systemd limits memory to 2 GiB, tasks to 256 and CPU to two cores, with per-process CPU/file-size
+limits and a bounded wall clock. The host user's home, configuration and credentials are not mounted.
+No external provider or live survivor adjudication is part of these measurements.
+
+### Pinned mechanism sources
+
+- [CPython v3.13.16 `cbc944f4`, Modules/_io/fileio.c:294-305](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Modules/_io/fileio.c#L294-L305)
+  converts FileIO's path through the filesystem converter. Model its operand explicitly rather than
+  infer safety from constituent strings. Imported modules execute arbitrary module code;
+  [Doc/reference/import.rst:429-441](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Doc/reference/import.rst#L429-L441)
+  describes that mechanism; the caller must supply a verified pure/read contract.
+- [Lib/urllib/request.py:1486-1508](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Lib/urllib/request.py#L1486-L1508)
+  opens the pathname returned by `url2pathname`; [1685-1691](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Lib/urllib/request.py#L1685-L1691)
+  percent-decodes using filesystem encoding/errors on POSIX. Reuse that conversion, then confinement.
+- [GNU sed v4.9 `7e2e575a`, sed/compile.c:360-383](https://github.com/mirror/sed/blob/7e2e575a36bc88c0f3f3d6d8083c5f5b0ed44009/sed/compile.c#L360-L383)
+  reads a filename to newline, including semicolons. [1194-1218](https://github.com/mirror/sed/blob/7e2e575a36bc88c0f3f3d6d8083c5f5b0ed44009/sed/compile.c#L1194-L1218)
+  compiles `r`/`R`, and [execute.c:1510-1542](https://github.com/mirror/sed/blob/7e2e575a36bc88c0f3f3d6d8083c5f5b0ed44009/sed/execute.c#L1510-L1542)
+  reads the named file. Unsupported source is refused instead of copied into an invented parser.
+- [CPython pathlib resolve implementation at the same pin:664-672](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Lib/pathlib/_local.py#L664-L672)
+  resolves filesystem targets; [os.path.realpath:388-412](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Lib/posixpath.py#L388-L412)
+  supplies the POSIX link semantics. These checks are post-run policy, not prevention of a race or syscall attestation.
+- [Existing failure snapshot at published `7071510b`, codex_lane.py:2787-2842](https://github.com/seathatflowsinourveins/native-agent-stack/blob/7071510b79a457afd1567142b344919ff27e9631/tools/sota-convergence/codex_lane.py#L2787-L2842)
+  uses the atomic native snapshot writer. Extend it to pending/in-flight state;
+  [record_verdicts at landed `9b3a39c4`, missing_outcome](https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b3a39c43363f32ac61e74c674e4ba069593fe08/tools/sota-convergence/record_verdicts.py#L1059-L1065)
+  classifies absent returns through the recorded reason.
+
+### Adjacent state and call-site checks
+
+The changed operand functions' callers in shell analysis and nested Python execution were checked,
+as were shared blind-audit consumers at verdict resume/promotion/retry and adjudication counting/
+promotion/summary. Controls cover FileIO/import aliases, both sed `r` and `R`, URL conversion,
+confined packet reads, native retry/resume/unfinished commands, selective reruns, stop with concurrent
+jobs, and exceptions during audit and snapshot clearing after promotion. Thirty focused controls pass.
+
+A wider preexecution-stop test found a stale-return transition next to the durable failure fix: queued
+pending layers retained old outputs when STOP preceded process(). A neutral two-layer test fails two
+assertions before correction. All pending stale outputs are now invalidated immediately after the durable
+unfinished snapshot, before launching or checking STOP; all five incremental-failure controls pass.
+Pinned source for this transition is the earlier pending/stale-return lifecycle at
+[7071510b codex_lane.py:2822-2863](https://github.com/seathatflowsinourveins/native-agent-stack/blob/7071510b79a457afd1567142b344919ff27e9631/tools/sota-convergence/codex_lane.py#L2822-L2863).
+
+Unmodified cited sources/captures and the call-site/transition ledger are retained in the hashed read
+attachment directory named in FIX-PUSHED. A missing historical capture remains an explicit verification
+gap until recovered; new measurements never replace or authenticate earlier missing bytes.
+
+The permitted JSON transform call sites were checked one step further into optional callbacks.
+`json.loads(object_hook=imported_reader)` and `json.dumps(default=imported_reader)` each read the
+neutral scratch marker while the audit passed; one regression fails two assertions before correction.
+Decoder override/callback keywords and encoder default/cls are refused. Standard inert literal
+formatting remains covered by the passing eight-test literal/control bundle. At CPython `cbc944f4`,
+[decoder.py:157-161](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Lib/json/decoder.py#L157-L161)
+and [214-218](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Lib/json/decoder.py#L214-L218)
+invoke object hooks; [encoder.py:159-161](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Lib/json/encoder.py#L159-L161)
+sets the default and [440-443](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Lib/json/encoder.py#L440-L443)
+invokes it. Full pinned blobs are retained with the attachment manifest.
+
+### Final baseline ACK and landing
+
+The final landing uses main `1d1164e8c34df8250973a5c632e9747a1ef79533`; the rebased equivalent of
+the reviewed head is `89f0915634275f9d308223f3592ab4e8b37aea46`. The CC accepted the exact final
+monitoring-only snapshot on 2026-10-11T09:24Z: 436 sites / 143 Codex sites / 102 shapes / zero unresolved,
+29,287 bytes, SHA256 `fc481c58f7300e5e3dcc4fe698669b0d6042b07777ab32304bc27f0587e1fe21`.
+It supersedes the uncopied 434 candidate. Native derivation at the final source regenerates these bytes;
+metadata retains the accepted source ancestor `7a7ff067`, and no classification policy changes.
+All 139 previous Codex sites map to unchanged source lines; only namespace extraction at 882-883 and
+JSON callback guards at 1642/1644 are added. All other per-file counts and shapes stay equal.
+The seven historical missing captures remain explicit gaps in the attachment ledger.
