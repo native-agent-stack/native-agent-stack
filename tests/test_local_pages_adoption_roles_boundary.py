@@ -367,7 +367,7 @@ class AdoptionRolesComposerBoundaryTests(unittest.TestCase):
         self.assertEqual(self.adoption_path.read_bytes(), source_before)
         self.assertEqual(receipt["adoption"]["sha256"], hashlib.sha256(source_before).hexdigest())
         self.assertEqual(set(receipt["outputs"]), {
-            "index.html", "readiness.html", "gaps.html", "roadmap.html", "fleet.html",
+            "index.html", "command-center.html", "readiness.html", "gaps.html", "roadmap.html", "fleet.html",
             "sources.html", "assets/site.css", "assets/site.js",
         })
 

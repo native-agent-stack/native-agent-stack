@@ -150,7 +150,7 @@ class LocalPagesTests(unittest.TestCase):
         self.write_json(self.gaps_path, self.gaps)
         self.write_json(self.road_path, self.roadmap)
         self.refresh()
-        for name in ("index", "readiness", "gaps", "roadmap", "sources"):
+        for name in ("index", "command-center", "readiness", "gaps", "roadmap", "sources"):
             html = (self.output / (name + ".html")).read_text()
             self.assertNotIn(private, html)
             self.assertNotIn(account, html)
@@ -467,8 +467,8 @@ class LocalPagesTests(unittest.TestCase):
         expected = hashlib.sha256(native.render(native.build(self.root, self.state, self.source_index))).hexdigest()
         self.assertEqual(receipt["native_readiness_manifest_sha256"], expected)
         self.assertEqual(json.loads(self.receipt.read_text()), receipt)
-        self.assertEqual(len(receipt["outputs"]), 8)
-        for name in ("index", "readiness", "gaps", "roadmap", "fleet", "sources"):
+        self.assertEqual(len(receipt["outputs"]), 9)
+        for name in ("index", "command-center", "readiness", "gaps", "roadmap", "fleet", "sources"):
             text = (self.output / (name + ".html")).read_text()
             audit = DocumentAudit()
             audit.feed(text)
@@ -553,7 +553,7 @@ class LocalPagesTests(unittest.TestCase):
                         return collector.collect(fallback, lambda *args, **kwargs: {"status": "success", "data": {"resultType": "matrix", "result": []}})
                     with patch.object(BUILDER, "collect_workstation", side_effect=observed):
                         result = self.refresh()
-                    self.assertEqual(len(result["outputs"]), 8)
+                    self.assertEqual(len(result["outputs"]), 9)
                     self.assertNotIn(field, result["workstation"])
                     self.assertEqual(result["workstation"]["optional_total_status"][field]["status"], "UNKNOWN")
                     text = (self.output / "readiness.html").read_text()

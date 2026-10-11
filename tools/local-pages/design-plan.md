@@ -68,3 +68,28 @@ The second pass found that the approved pending foreground `#996421` on the firs
 Long gap titles, milestone titles, source paths, and code identifiers can break at narrow widths instead of forcing page overflow. The system dark fallback is limited to screen media so a script-free preview still prints with the light palette. Gap filtering preserves control focus and uses a polite result-count announcement; an optional reset returns focus to search. No motion or card hover effects were added because they do not explain the evidence.
 
 The CSS expects a native first readiness gate section inside `.readiness-content .wrap`, gap rows inside `#gap-register`, and milestone dates, titles, and states with the retained class names. Source order remains the mobile reading order. Actual desktop/mobile screenshots, keyboard navigation, filter combinations, and persistence/blocked-storage behavior remain parent-lane verification gates.
+
+## Command center
+
+The command center keeps this system: one compact count strip, then six ruled
+sections in the brief's order, with no cards and no new tokens beyond one chart
+hue. Each count links to its section, so the strip doubles as the in-page
+index. The one emphasized element is the PR register's next-gate column: a
+link-colored rule runs down the column and recorded gates are bold, because
+moving each PR through its next gate is the command center's job. Section
+labels (wired, partial, missing input) reuse the status pills and always carry
+text.
+
+Form follows the Claude Code 2.1.296 bundled dataviz skill
+(`references/choosing-a-form.md`, `marks-and-anatomy.md`, `anti-patterns.md`).
+Counts are figures, not charts. Token use by lane is the only chart: one series
+in one hue, drawn as bars of at most 12px beside the numbers in the same
+table, so the table is the chart's twin and no tooltip gates a value. The RTK
+share is a native `meter` beside its stated percentage. The bar hue is the
+skill's slot-1 blue, `#2a78d6` light and `#3987e5` dark; its `validate_palette.js`
+passes band, chroma and contrast against the page surfaces `#ffffff`
+(4.42:1) and `#17283b` (4.11:1). The meter track is a lighter step of that
+ramp, `#cde2fb`, in light and a darker step, `#0d366b`, in dark (fill against
+track 3.34:1 and 3.28:1). These are calculations, not rendered measurements.
+At 390px, tables with four or more columns scroll inside their labelled region
+rather than breaking words; the page itself never scrolls sideways.

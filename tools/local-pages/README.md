@@ -8,8 +8,8 @@ the stated window, and Codex counts are SKILL.md reads. Groups overlap. Missing
 client measurements stay UNKNOWN. The section is refreshed by the existing
 page builder after the CC deploys the daily timer.
 
-`build_pages.py` presents the CC current view, native readiness receipts,
-gap board, roadmap, fleet, architecture and sources as seven complete local HTML documents. It uses the existing
+`build_pages.py` presents the CC current view, command center, native readiness receipts,
+gap board, roadmap, fleet, architecture and sources as eight complete local HTML documents. It uses the existing
 `tools/north-star/build_readiness.py` functions `build`, `render` and
 `render_fragment`; it adds presentation and refresh custody without deciding
 gate acceptance. The initial reference is repository commit
@@ -177,6 +177,68 @@ aliases follow the producer's memberships and each raw server row counts
 once. Sparse maps show zero recorded calls, while unknown values stay
 unreported. Counts describe the stated retrospective window and do not prove
 adoption acceptance, fresh-session use or workflow improvement.
+
+`command_center_view.py` renders `command-center.html`, the first entry in the
+index's page list and the second in the navigation. It adds no collector and no
+`source_policy.json` grant: its six sections reuse what each refresh already
+reads.
+
+| Section | Inputs |
+| --- | --- |
+| Sessions and lanes | Fleet `lanes_live`, `claude_sessions`, `exec_reads_in_flight`, `lanes_parked` and the hcom roster; `cc-now.json#/cc_agents/running` |
+| PR waves | `cc-now.json#/in_review` and `#/landings_today` |
+| Tokens saved | `cc-now.json#/token_efficiency` and `#/token_use_24h` |
+| SOTA skill invoke rates | Fleet tracking's per-lane `skill_invocations` family |
+| Compounding manifests | committed `catalogs/north-star/readiness.json` and `manifests/evidence.json` |
+| Waiting on you | `cc-now.json#/waiting_on_owner` |
+
+The two committed manifests are read through `ArchitectureReads` under the
+exact `architecture_readiness` and `architecture_registry` grants that already
+name them; their path, role, hash and byte count join the custody table and
+the receipt's `command_center` block. A missing or malformed section renders
+`missing input: <name>`, and an unapproved manifest renders
+`unreadable (SourcePolicyError)`; neither stops the refresh. A view failure
+publishes an UNREPORTED placeholder while the other pages refresh. Each
+section carries a wired, partial or missing-input label, also recorded per
+section in the receipt.
+
+Every value keeps its source label. Token figures are reported by the CC, never
+measured here and never summed across sources. A window comes from the source's
+`window` field or a `_24h`/`_7d` field-name suffix; otherwise it reads "not
+stated in source". The only chart is token use by lane: one series in one hue,
+bars drawn beside the numbers in the same table. A skill rate the producer does
+not qualify stays UNKNOWN, and a lower-bound zero is not a measured absence;
+only a reported zero reads as no recorded calls. Four inputs show "not wired" with their
+reason: the `tools/token-report` manifest (a private state directory with no
+grant), the `tools/skill-usage/skill_usage.py` reports under
+`coordination/command-center/skills/`, `coordination/ns2604-coop/research-queue.tsv`
+(no grant for either), and the final-stack manifest (pending #1007). After the
+shared sanitizer, this page also masks email addresses, including their
+percent-encoded and HTML-entity forms.
+
+`in_review` rows keep `pr`, `what` and `state`. The CC can add these optional
+fields; the page never requires them:
+
+| Field | Value | Rendering |
+| --- | --- | --- |
+| `head` | text, such as a short commit hash | code |
+| `round` | non-negative integer or text | as recorded |
+| `next_gate` | text | bold, on the next-gate rule |
+| `blockers` | list of text, or one text | a list; `[]` reads "none" |
+| `follow_ups` | list of text, or one text | a list; `[]` reads "none" |
+
+An absent or null field reads "not recorded"; another type reads "not recorded
+(unsupported value)". `cc_agents.running` rows are either `"name (task)"` text
+or `{"name", "task", "model"}` objects; a model appears only in object rows.
+Last activity is the hcom state age, the only recorded activity time.
+
+```json
+{"in_review": [{"pr": "#1234", "what": "fixture work", "state": "micro running",
+                "head": "abc12345", "round": 2, "next_gate": "Astra micro at abc12345",
+                "blockers": ["Codex P2: reinstall race"], "follow_ups": ["one re-pin"]}],
+ "cc_agents": {"running": [{"name": "cc-micro-1234", "task": "#1234 micro at abc12345",
+                            "model": "claude-opus-5-5"}]}}
+```
 
 `architecture_builder.py` generates `architecture.html` from the canonical
 catalogs named by `catalogs/landscape/manifest.json`, the current retained G5
@@ -460,7 +522,13 @@ nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p t
 nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_fleet_tracking.py
 nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_fleet_tracking_view.py
 nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_adoption.py
+nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest tests.test_local_pages_command_center
 ```
+
+When the comma-separated `LANDING_PROHIBITED_NAMES` is set (the variable the
+#975 landing tests read), the command-center privacy tests also scan the
+generated page and the view module for each name; no name is written into the
+repository.
 
 The fixtures use the repository's real native builder and local temporary
 receipts. They need no external network, shared service, credentials or

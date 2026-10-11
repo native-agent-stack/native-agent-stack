@@ -40,7 +40,11 @@ ROAD_REFERENCE_FILES = {
     "css_from": ("coordination/command-center/cc-tools/invoke-evidence/build_page.py",),
 }
 _SANITIZER = None
-PAGES = {"index": "Home", "readiness": "Readiness", "gaps": "Gap board", "roadmap": "Roadmap", "fleet": "Fleet", "architecture": "Architecture", "sources": "Sources"}
+PAGES = {"index": "Home", "command-center": "Command center", "readiness": "Readiness", "gaps": "Gap board", "roadmap": "Roadmap", "fleet": "Fleet", "architecture": "Architecture", "sources": "Sources"}
+# Committed manifests the command center reads under the exact roles that
+# source_policy.json already grants for Architecture; no new permission.
+COMMAND_CENTER_MANIFESTS = (("readiness", "catalogs/north-star/readiness.json", "architecture_readiness"),
+                            ("evidence", "manifests/evidence.json", "architecture_registry"))
 
 
 def utc_now() -> str:
@@ -311,6 +315,32 @@ def northstar_entry(output_dir: Path) -> str:
     return '<li><a href="northstar.html">North-star grand page</a><p>See what is next, the ten layers, the roadmap and token use.</p></li>'
 
 
+def read_command_center_manifests(root: Path, state_root: Path, output_dir: Path, inputs: dict[str, dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    """Read each committed manifest under its existing grant; a failure is a stated gap, never a stop."""
+    manifests: dict[str, dict[str, Any]] = {}
+    try:
+        reads = load_local("source_policy").ArchitectureReads(root, state_root, policy_path=SOURCE_POLICY_PATH)
+    except (OSError, ValueError, UnicodeError) as error:
+        return {name: {"status": "missing", "reason": "source policy unavailable (" + type(error).__name__ + ")"} for name, _, _ in COMMAND_CENTER_MANIFESTS}
+    for name, relative, role in COMMAND_CENTER_MANIFESTS:
+        path = root / relative
+        try:
+            if no_symlinks(path).is_relative_to(output_dir):
+                raise ValueError("manifest is inside the served root")
+            raw, metadata = reads.read(role, path)
+            document = strict_json(raw)
+            if not isinstance(document, dict):
+                raise ValueError("manifest must be a JSON object")
+        except FileNotFoundError:
+            manifests[name] = {"status": "missing", "reason": "not present in the selected checkout"}
+        except (OSError, ValueError, UnicodeError) as error:
+            manifests[name] = {"status": "missing", "reason": "unreadable (" + type(error).__name__ + ")"}
+        else:
+            inputs["command_center:" + name] = metadata
+            manifests[name] = {"status": "read", "label": "repo:" + relative, "role": role, "sha256": metadata["sha256"], "bytes": metadata["bytes"], "document": document}
+    return manifests
+
+
 def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
             sources: Path = Path("tools/north-star/sources.json"),
             gaps_source: Path | None = None, roadmap_source: Path | None = None,
@@ -402,7 +432,7 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
     current = strict_json(current_input["raw"])
     view = load_local("current_view")
     view.validate(current)
-    for name in ("current_view", "workstation", "sanitization", "fleet_data", "fleet_view", "adoption_view"):
+    for name in ("current_view", "workstation", "sanitization", "fleet_data", "fleet_view", "adoption_view", "command_center_view"):
         capture("module:" + name, Path(__file__).resolve().parent / (name + ".py"))
     workstation = collect_workstation(current["workstation"])
     fleet_cache = no_symlinks(receipt.parent / "fleet/cache")
@@ -482,7 +512,25 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
         if name.startswith("roadmap:"):
             description = "; ".join(f"{key} = {value}" for key, value in item.get("source_dates", {}).items()) or item.get("status") or "source date unspecified"
             road_notes.append('<code>' + esc(label_path(item["path"], root, state_root)) + '</code> — ' + esc(description))
-    overview = '<section class="panel"><h2>Choose a page</h2><ul class="page-index"><li><a href="readiness.html">North-star readiness</a><p>What is done, what is left and what needs a decision.</p></li>' + northstar_entry(output_dir) + '<li><a href="gaps.html">Grand Gap Board</a><p>Find open gaps and their next actions.</p></li><li><a href="roadmap.html">Roadmap</a><p>Read the dated milestones and server records.</p></li><li><a href="fleet.html">Worker fleet</a><p>See the lanes, sessions, jobs and spend.</p></li><li><a href="sources.html">Sources</a><p>Check input dates, hashes and evidence scope.</p></li></ul></section>'
+    cc_manifests = read_command_center_manifests(root, state_root, output_dir, inputs)
+    cc_view = load_local("command_center_view")
+    try:
+        cc_markup, cc_panels = cc_view.render(current, fleet, cc_manifests)
+        command_center = {"status": "RECORDED", "panels": cc_panels}
+    except (ValueError, TypeError, KeyError, AttributeError, IndexError, OverflowError, RecursionError) as error:
+        # The consolidated view is optional: a view failure publishes a stated
+        # placeholder while every other page keeps its own observation.
+        cc_markup, command_center = None, {"status": "UNREPORTED", "reason": "Command center view unavailable (" + type(error).__name__ + ")"}
+    command_center["manifests"] = {name: {key: value for key, value in item.items() if key != "document"} for name, item in cc_manifests.items()}
+    command_center["not_wired"] = dict(cc_view.NOT_WIRED, final_stack=cc_view.FINAL_STACK)
+    cc_body = '' if cc_markup is not None else '<section class="panel" id="cc-view"><h2>UNREPORTED</h2><p>' + esc(command_center["reason"]) + '. Other pages retain their own current observations.</p></section>'
+    cc_notes = [f'<code>{esc(label_path(current_input["path"], root, state_root))}</code> — in_review, landings_today, cc_agents, waiting_on_owner, token_efficiency and token_use_24h; SHA-256 <code>{current_input["sha256"]}</code>',
+                'Sessions, lanes, the hcom roster and skill-invocation rates come from the Fleet observation as of ' + esc(fleet.get("at") or "not reported") + '; its sources are listed under Fleet.']
+    for name, relative, role in COMMAND_CENTER_MANIFESTS:
+        item = cc_manifests[name]
+        cc_notes.append(f'<code>repo:{esc(relative)}</code> — ' + (f'read under the existing <code>{esc(role)}</code> grant; SHA-256 <code>{esc(item["sha256"])}</code>' if item["status"] == "read" else 'missing input: ' + esc(item["reason"])))
+    cc_notes += [esc(reason) for reason in cc_view.NOT_WIRED.values()] + [esc(cc_view.FINAL_STACK)]
+    overview = '<section class="panel"><h2>Choose a page</h2><ul class="page-index"><li><a href="command-center.html">Command center</a><p>Track lanes, PR waves, token savings, skill use, manifests and owner items.</p></li><li><a href="readiness.html">North-star readiness</a><p>What is done, what is left and what needs a decision.</p></li>' + northstar_entry(output_dir) + '<li><a href="gaps.html">Grand Gap Board</a><p>Find open gaps and their next actions.</p></li><li><a href="roadmap.html">Roadmap</a><p>Read the dated milestones and server records.</p></li><li><a href="fleet.html">Worker fleet</a><p>See the lanes, sessions, jobs and spend.</p></li><li><a href="sources.html">Sources</a><p>Check input dates, hashes and evidence scope.</p></li></ul></section>'
     current_scope = 'command-center current view snapshot; ' + view.observation_time(current["updated_utc"], plain=True)
     current_notes = [f'<code>{esc(label_path(current_input["path"], root, state_root))}</code> — {esc(current_scope)}; SHA-256 <code>{current_input["sha256"]}</code>', 'Workstation readings use an exact Prometheus metric when present, otherwise the CC-owned value and its recorded read time.']
     fleet_notes = [f'<code>{esc(key)}</code> — {esc(value or "not reported")}' for key, value in fleet.get("source_times", {}).items()]
@@ -506,7 +554,7 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
     fleet_notes.append(adoption_note)
     if role_projection:
         fleet_notes.extend('<code>' + esc(item.get("path", "UNREPORTED")) + '</code> — registry metadata SHA-256 <code>' + esc(item.get("sha256", "UNREPORTED")) + '</code>' for item in role_projection.get("sources", []) if isinstance(item, dict))
-    source_groups = {"index": current_notes, "readiness": current_notes + readiness_notes, "gaps": gap_notes, "roadmap": road_notes, "fleet": fleet_notes}
+    source_groups = {"index": current_notes, "command-center": cc_notes, "readiness": current_notes + readiness_notes, "gaps": gap_notes, "roadmap": road_notes, "fleet": fleet_notes}
     source_body = "".join(f'<section id="{key}" class="panel"><h2>{esc(PAGES[key])}</h2><ul class="source-list">' + "".join(f'<li>{note}</li>' for note in notes) + '</ul></section>' for key, notes in source_groups.items())
     custody_rows = "".join(f'<tr><td><code>{esc(label_path(item["path"], root, state_root))}</code></td><td><code>{esc(item.get("sha256") or item.get("status", "UNVERIFIED"))}</code></td></tr>' for item in inputs.values())
     source_body += f'<section id="sources" class="panel"><h2>Input identity</h2><div class="table-wrap"><table><thead><tr><th>Source</th><th>SHA-256 or status</th></tr></thead><tbody>{custody_rows}</tbody></table></div></section>'
@@ -533,6 +581,7 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
     common = (refreshed, manifest_sha)
     outputs = {
         "index.html": document("index", "North-star readiness and next steps", "", current_scope, overview, *common, [], leading=index_leading),
+        "command-center.html": document("command-center", "Command center", "One view of lanes, PR waves, token savings, skill use, manifests and owner items.", current_scope, cc_body, *common, [], leading=cc_markup),
         "readiness.html": document("readiness", "North-star readiness: what is done, what is left, what needs a decision", "", current_scope, manifest_body, *common, [], leading=view.render(current, workstation, validated=True, readings_normalized=True)),
         "gaps.html": document("gaps", "Grand Gap Board", "Find the open gaps, who owns them and what happens next.", gap_scope, gap_body(rows(gaps, "gaps", ("id", "group", "sev", "title"))), *common, []),
         "roadmap.html": document("roadmap", "Roadmap", "Read the dated milestones and server records.", road_scope, roadmap_body(roadmap), *common, []),
@@ -556,6 +605,7 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
                     "command_center_current_view": {"updated_utc": current["updated_utc"], "sha256": current_input["sha256"], "schema": current["schema"]},
                     "workstation": workstation,
                     "fleet": fleet,
+                    "command_center": command_center,
                      "adoption": {"schema": adoption["schema"], "generated_utc": adoption["generated_utc"], "window_hours": adoption["window_hours"], "sha256": adoption_input["sha256"], "status": adoption.get("status", "RECORDED"), "reason": adoption.get("reason")},
                     "adoption_role_attribution": {"window": role_projection.get("window"), "sources": role_projection.get("sources"), "source_errors": role_projection.get("source_errors"), "instances": role_projection.get("instances"), "sdk": role_projection.get("sdk")} if role_projection else ({"status": "UNREPORTED", "reason": role_projection_error} if role_projection_error else {"status": "registry unavailable; attribution unreported"}),
                    "source_scope": {"readiness": "Per-source retained dates; no combined snapshot timestamp", "gaps": gap_scope, "roadmap": road_scope},
@@ -652,7 +702,7 @@ def main(argv: list[str] | None = None) -> int:
         parser.exit(1, f"local-pages: refresh failed ({type(error).__name__})\n")
     except (OSError, ValueError, KeyError, TypeError, AttributeError, ImportError) as error:
         parser.exit(1, f"local-pages: refresh failed ({type(error).__name__}): {error}\n")
-    print(json.dumps({"output_dir": str(output), "receipt": str(receipt), "generated_utc": result["generated_utc"], "native_readiness_manifest_sha256": result["native_readiness_manifest_sha256"], "pages": 6, "API_errors": result["workstation"].get("API_errors", []) + result["fleet"].get("API_errors", [])}, sort_keys=True))
+    print(json.dumps({"output_dir": str(output), "receipt": str(receipt), "generated_utc": result["generated_utc"], "native_readiness_manifest_sha256": result["native_readiness_manifest_sha256"], "pages": sum(1 for name in result["outputs"] if name.endswith(".html") and "/" not in name), "API_errors": result["workstation"].get("API_errors", []) + result["fleet"].get("API_errors", [])}, sort_keys=True))
     return 0
 
 
