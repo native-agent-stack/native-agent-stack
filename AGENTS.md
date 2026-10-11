@@ -9,6 +9,7 @@
 
 ## This repository
 
+- **Layer resolution:** Before any research dispatch or comparison, read the layer's catalog verdict and the latest sweep's survivors; dispatch only the delta. A FINAL layer reopens only when a sweep detects a change. Follow the [resolution protocol](docs/decisions/2026-10-11-layer-resolution-protocol.md) for evidence requirements and terminal states.
 - Build each PR description from `.github/pull_request_template.md`: the required `sota-sources` check fails a PR whose description lacks a non-empty `## SOTA sources` or `### SOTA sources` section (exact, case-sensitive heading).
 - Run `python3 scripts/validate.py` before committing changed evidence or manifests.
 - **Subtree rules:** a directory with its own `AGENTS.md` carries its own rules; read that file before you work in the directory or on its lane's paths. Trading work of any kind (research, data acquisition, strategy gates, decision registration, paper or broker operation) reads `blueprints/us-equities/AGENTS.md` first, wherever it runs.
