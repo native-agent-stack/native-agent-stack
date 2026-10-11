@@ -16,8 +16,31 @@ CONFIG="${CONFIG:-$here/config-sip.json}"
 PY="${PY:-$HOME/projects/us-equities-runtime/.venv/bin/python}"
 GATE_PY="${GATE_PY:-$HOME/.local/share/codex-ecosystem/tools/promotion-gate-20260922/.venv/bin/python3}"
 for p in "$PY" "$GATE_PY"; do
-  [ -x "$p" ] || { echo "refused: interpreter not executable: $p" >&2; exit 2; }
+  [ -f "$p" ] && [ -x "$p" ] || { echo "refused: interpreter not executable: $p" >&2; exit 2; }
 done
+# Mirror install-trading-2604.sh and accept-trading-2604.sh's published runtime
+# ownership/completion and metadata identity. A failed sync leaves Python
+# executable, so executable checks alone cannot establish default readiness.
+# Explicit alternate interpreters remain the owning caller's choice.
+if [[ "$PY" == "$HOME/projects/us-equities-runtime/.venv/bin/python" ]]; then
+  runtime="${PY%/.venv/bin/python}"
+  refuse_runtime() { echo "refused: canonical runtime incomplete or metadata differs" >&2; exit 2; }
+  [[ ! -L "$HOME/projects" && ! -L "$runtime" && -d "$runtime" && -O "$runtime" &&
+     ! -L "$runtime/.venv" && -d "$runtime/.venv" ]] || refuse_runtime
+  for marker in .trading-2604-owner .trading-2604-complete; do
+    [[ -f "$runtime/$marker" && ! -L "$runtime/$marker" ]] || refuse_runtime
+  done
+  IFS= read -r recorded_owner < "$runtime/.trading-2604-owner" || refuse_runtime
+  [[ "$recorded_owner" == native-stack-trading-2604-v1 ]] || refuse_runtime
+  for entry in 'pyproject.toml|aa370e42e29dc2419e586358254ff2e821df48a693aa9a3ee16b65d30036ee0b' \
+               'uv.lock|f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989'; do
+    IFS='|' read -r filename expected_hash <<< "$entry"
+    [[ -f "$runtime/$filename" && ! -L "$runtime/$filename" ]] || refuse_runtime
+    printf '%s  %s\n' "$expected_hash" "$runtime/$filename" | sha256sum --check --status || refuse_runtime
+  done
+  IFS= read -r recorded_completion < "$runtime/.trading-2604-complete" || refuse_runtime
+  [[ "$recorded_completion" == native-stack-trading-2604-no-dvc-r4 ]] || refuse_runtime
+fi
 mkdir -p "$OUT_DIR"
 live=()
 if [ -n "${LIVE_DIR:-}" ]; then live=(--live-dir "$LIVE_DIR"); fi
