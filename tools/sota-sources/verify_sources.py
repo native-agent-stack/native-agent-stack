@@ -64,7 +64,8 @@ Budgets: at most 64 citations are checked per body (excess rows are not-checked:
 remaining rows are unavailable. Raw contents are discarded after counting lines and computing the blob, so cached
 files retain only those measurements and headers. The JSON report records the limits.
 
-Output. A JSON report (stdout, or --report) with one row per citation and one per unchecked entry, and a Markdown
+Output. A JSON report (stdout, or --report) with one row per recognized citation occurrence, one diagnostic per
+unrecognized candidate (including repository/package pins), and one per entry with no candidate, and a Markdown
 summary appended to $GITHUB_STEP_SUMMARY when it is set (and written to --summary). --mode report always exits 0.
 --mode enforce exits 1 on any failure status, 3 when nothing failed but something is unavailable, and 0 otherwise.
 A missing or empty section is reported (section.present false) and exits 0, because the required sota-sources job
@@ -105,7 +106,9 @@ MAX_JSON_BYTES = 32 * 1024 * 1024
 MAX_ERROR_BYTES = 64 * 1024
 MAX_CITATIONS = 64
 MAX_REQUESTS = 256
-# A raw file has at most one line per byte. Reject huge numeric tokens before int() (CPython's conversion limit).
+# A raw file has at most one line per byte. Bound numeric tokens before int(): CPython's default conversion
+# limit is 4300 digits, python/cpython@f6650f9ad73359051f3e558c2431a109bc016664:Include/internal/pycore_long.h:L29
+# (_PY_LONG_DEFAULT_MAX_STR_DIGITS). Zero padding is removed before this local file-size bound is applied.
 MAX_LINE_NUMBER = MAX_CONTENT_BYTES
 
 FAILURES = frozenset({"short-sha", "unpinned", "commit-not-found", "path-not-found", "path-is-directory",
@@ -132,19 +135,21 @@ ROLE_TAG = re.compile(r"\[(?:(mechanism|adopt|reference)|(trial|exception):([^\]
 BLOB_URL = re.compile(
     r"(?i:https?://(?:www\.)?github\.com)/(?P<owner>[A-Za-z0-9-]+)/(?P<repo>[A-Za-z0-9._-]+)/blob/"
     r"(?P<ref>[^/\s?#]+)/(?P<path>[^\s?#<>\[\]`'\"]+)(?:\?[^\s#<>\[\]`'\"]*)?"
-    r"#L(?P<start>[0-9]+)(?:C[0-9]+)?(?:-L?(?P<end>[0-9]+)(?:C[0-9]+)?)?(?![^\W_]|-)")
+    r"#L(?P<start>[0-9]+)(?:C[0-9]+)?(?:-L?(?P<end>[0-9]+)(?:C[0-9]+)?)?(?![^\W_])")
 AT_REF = re.compile(
-    r"(?<![\w./@-])(?P<owner>[A-Za-z0-9-]+)/(?P<repo>[A-Za-z0-9._-]+)@(?P<ref>[^\s:@<>()\[\]`'\"]+)"
-    r":(?P<path>[^\s:<>\[\]`'\"]+):L(?P<start>[0-9]+)(?:-L?(?P<end>[0-9]+))?(?![^\W_]|-)")
+    r"(?<![\w./@])(?P<owner>[A-Za-z0-9-]+)/(?P<repo>[A-Za-z0-9._-]+)@(?P<ref>[^\s:@<>()\[\]`'\"]+)"
+    r":(?P<path>[^\s:<>\[\]`'\"]+):L(?P<start>[0-9]+)(?:-L?(?P<end>[0-9]+))?(?![^\W_])")
 ANY_BLOB_URL = re.compile(r"https?://(?:www\.)?github\.com/[^/\s]+/[^/\s]+/blob/", re.I)
 ANY_URL = re.compile(r"https?://", re.I)
 HEX = re.compile(r"[0-9A-Fa-f]+")
 FULL_SHA = re.compile(r"[0-9a-f]{40}")
 REPO_ARGUMENT = re.compile(r"[A-Za-z0-9-]+/[A-Za-z0-9._-]+")
-CANDIDATE = re.compile(
-    r"(?i:https?://(?:www\.)?github\.com)/[^/\s<>`'\"\[\]]+/[^/\s<>`'\"\[\]]+/blob/[^\s<>`'\"\[\]]*"
-    r"|(?<![\w./@-])[A-Za-z0-9-]+/[A-Za-z0-9._-]+@[^\s<>`'\"\[\]]+"
-    r"|swh:1:[^\s<>`'\"\[\]]+")
+CANDIDATE_START = re.compile(
+    r"(?i:https?://(?:www\.)?github\.com)/[^/\s<>`'\"\[\]]+/[^/\s<>`'\"\[\]]+/blob/"
+    r"|(?<![\w./@])[A-Za-z0-9-]+/[A-Za-z0-9._-]+@|swh:1:")
+CANDIDATE_END = re.compile(r"[\s<>`'\"\[\]]")
+GRAMMAR_CONTINUATION = re.compile(r"^(?:#|:L|:[0-9]|/|@|_+[^\W_]|-L|-[0-9])")
+REPOSITORY_PIN = re.compile(r"[A-Za-z0-9-]+/[A-Za-z0-9._-]+@[^\s:<>`'\"\[\]]+")
 
 # The smoke's two public citations (the W1b primary-source review): lychee's line-fragment quirk at the
 # lychee-v0.24.2 commit, and a range that straddles that file's last line (it has 318 lines).
@@ -213,6 +218,7 @@ def parse_entries(content):
 
 
 def bounded_line(token):
+    token = token.lstrip("0") or "0"
     if len(token) > len(str(MAX_LINE_NUMBER)):
         return None
     value = int(token)
@@ -222,9 +228,17 @@ def bounded_line(token):
 def find_citations(text, deduplicate=True):
     """The entry's code citations in the order they appear, each (repository, ref, path, lines) once."""
     found = []
-    for match in BLOB_URL.finditer(text):
+    urls = list(BLOB_URL.finditer(text))
+    for match in urls:
         found.append((match.start(), match, urllib.parse.unquote(match.group("path"))))
-    for match in AT_REF.finditer(text):
+    # A URL's path and fragment are atomic: an AT-shaped substring there must not consume a real neighbour.
+    cursor = 0
+    at_matches = []
+    for url in urls:
+        at_matches.extend(AT_REF.finditer(text, cursor, url.start()))
+        cursor = url.end()
+    at_matches.extend(AT_REF.finditer(text, cursor))
+    for match in at_matches:
         found.append((match.start(), match, match.group("path")))
     citations, seen = [], set()
     for _, match, path in sorted(found, key=lambda item: item[0]):
@@ -241,25 +255,32 @@ def find_citations(text, deduplicate=True):
 
 def citation_candidates(text):
     """Keep spans for all candidates; matching one citation must not swallow an unrecognized neighbour."""
-    recognized = find_citations(text, deduplicate=False)
+    recognized = []
+    for citation in find_citations(text, deduplicate=False):
+        if not recognized or citation.span[0] >= recognized[-1].span[1]:
+            recognized.append(citation)  # a complete URL/path is atomic; ignore nested lookalikes
     by_start = {citation.span[0]: citation for citation in recognized}
+    starts = set(by_start)
+    cursor = 0
+    for citation in recognized:
+        starts.update(match.start() for match in CANDIDATE_START.finditer(text, cursor, citation.span[0]))
+        cursor = citation.span[1]
+    starts.update(match.start() for match in CANDIDATE_START.finditer(text, cursor))
+    starts = sorted(starts)
     found = []
-    seen = set()
-    for match in CANDIDATE.finditer(text):
-        candidate = match.group(0).rstrip(".,;)*_")
-        citation = by_start.get(match.start())
-        if citation is not None and text[citation.span[1]:match.end()].strip(".,;)*_"):
-            citation = None  # a recognizer only consumed a prefix of a malformed candidate
+    for index, start in enumerate(starts):
+        delimiter = CANDIDATE_END.search(text, start)
+        end = delimiter.start() if delimiter else len(text)
+        if index + 1 < len(starts):
+            end = min(end, starts[index + 1])
+        candidate = text[start:end].rstrip(".,;)*_")
+        citation = by_start.get(start)
+        if citation is not None and GRAMMAR_CONTINUATION.match(text[citation.span[1]:end]):
+            citation = None  # only syntax continuation invalidates an otherwise recognized citation
         if citation is not None:
-            key = (citation.owner.lower(), citation.repo.lower(), citation.ref, citation.path, citation.start,
-                   citation.end, citation.parse_error)
-            if key not in seen:
-                seen.add(key)
-                found.append((match.span(), citation, None))
-        elif any(c.span[0] == match.start() for c in recognized):
-            found.append((match.span(), None, candidate))
+            found.append((citation.span, citation, None))
         else:
-            found.append((match.span(), None, candidate))
+            found.append(((start, start + len(candidate)), None, candidate))
     return found
 
 
@@ -283,6 +304,8 @@ class Response:
     body: bytes = b""
     oversize: bool = False
     content: dict | None = None
+    json_data: object = None
+    json_parsed: bool = False
 
 
 @dataclasses.dataclass
@@ -371,6 +394,7 @@ class GitHub:
         self.token = token.strip() if token else None
         self.timeout = timeout
         self.cache = {}
+        self.repository_ids = {}
         self._requests = 0
         self.max_requests = MAX_REQUESTS
         self.stopped = None
@@ -387,8 +411,44 @@ class GitHub:
             raise RequestBudgetExceeded()
         self._requests += 1
 
+    def cache_key(self, path, accept):
+        parts = path.split("/", 4)
+        if len(parts) >= 4 and parts[1] == "repos":
+            repository = "/".join(parts[:4])
+            identity = self.repository_ids.get(repository)
+            if identity is not None:
+                suffix = "/" + parts[4] if len(parts) == 5 else ""
+                return f"/repositories/{identity}{suffix}", accept
+        return path, accept
+
+    def learn_repository_identity(self, path, response):
+        """Use the API's numeric id/full_name; aliases returned by redirects/renames share cached state."""
+        parts = path.split("/")
+        if len(parts) != 4 or parts[1] != "repos" or response.status != 200:
+            return
+        data = json_body(response)
+        identity = data.get("id") if isinstance(data, dict) else None
+        if type(identity) is not int or not 0 < identity < 2 ** 63:
+            return
+        aliases = [path]
+        full_name = data.get("full_name")
+        if isinstance(full_name, str) and REPO_ARGUMENT.fullmatch(full_name):
+            aliases.append("/repos/" + full_name.lower())
+        for alias in aliases:
+            self.repository_ids[alias] = identity
+            for old_key, value in list(self.cache.items()):
+                if old_key[0] == alias or old_key[0].startswith(alias + "/"):
+                    new_key = self.cache_key(old_key[0], old_key[1])
+                    self.cache.setdefault(new_key, value)
+                    if old_key != new_key:
+                        del self.cache[old_key]
+
     def get(self, path, accept=JSON_MEDIA, limit=MAX_JSON_BYTES):
-        key = (path, accept)
+        parts = path.split("/", 4)
+        if len(parts) >= 4 and parts[1] == "repos":
+            parts[2], parts[3] = parts[2].lower(), parts[3].lower()
+            path = "/".join(parts)
+        key = self.cache_key(path, accept)
         if self.stopped:
             return Unreachable(self.stopped)
         if key not in self.cache:
@@ -402,11 +462,17 @@ class GitHub:
                     self.before_request()
                     response = self.fetch(API + path, headers, self.timeout, limit)
                 why = transient(response)
-                if isinstance(response, Response) and why and "rate limited" in why:
+                # GitHub authentication docs, Failed login limit: repeated invalid-auth requests can
+                # temporarily reject all authentication. Stop on 401 as well as an identified rate limit.
+                if isinstance(response, Response) and why and ("rate limited" in why or response.status == 401):
                     self.stopped = f"requests stopped after {why}"
                 if isinstance(response, Response) and accept == RAW_MEDIA:
                     response = compact_contents(response)
-                self.cache[key] = response
+                elif isinstance(response, Response) and accept == JSON_MEDIA and response.status == 200:
+                    response = compact_json(response, path)
+                    self.learn_repository_identity(path, response)
+                    key = self.cache_key(path, accept)
+                self.cache.setdefault(key, response)
             except RequestBudgetExceeded:
                 self.cache[key] = Unreachable(self.stopped)
             except ValueError:
@@ -425,6 +491,8 @@ def transport_reason(error):
 
 
 def json_body(response):
+    if response.json_parsed:
+        return response.json_data
     try:
         return json.loads(response.body.decode("utf-8"))
     except (UnicodeDecodeError, ValueError):
@@ -456,6 +524,10 @@ def transient(response):
         return "HTTP 403 (rate limited)"
     if response.status == 401:
         return "HTTP 401 (the token was refused)"
+    if response.status == 403:
+        return "HTTP 403 (permission or authentication unavailable)"
+    if 300 <= response.status < 400:
+        return f"HTTP {response.status} (redirect not completed)"
     if response.status == 400:
         return "HTTP 400 (request unavailable)"
     if response.status == 408:
@@ -506,6 +578,42 @@ def compact_contents(response):
     return dataclasses.replace(response, body=b"", content=info)
 
 
+def compact_json(response, path):
+    """Drop commit messages/patches and unused metadata; all JSON consumers use json_body()."""
+    data = json_body(response) if not response.oversize else None
+    if not isinstance(data, dict):
+        return dataclasses.replace(response, body=b"", json_data=None, json_parsed=True)
+
+    def field(mapping, key, limit):
+        value = mapping.get(key)
+        return value if isinstance(value, str) and len(value) <= limit else None
+
+    parts = path.split("/", 4)
+    endpoint = parts[4] if len(parts) == 5 else ""
+    if endpoint.startswith("compare/"):
+        base = data.get("merge_base_commit")
+        kept = {"status": field(data, "status", 16),
+                "merge_base_commit": {"sha": field(base, "sha", 40) if isinstance(base, dict) else None}}
+    elif endpoint.startswith("git/ref/"):
+        kept = {"ref": field(data, "ref", 256)}
+    elif endpoint.startswith("git/commits/"):
+        kept = {"sha": field(data, "sha", 40)}
+    elif endpoint.startswith("pulls/"):
+        body = data.get("body")
+        if "body" not in data or body is not None and not isinstance(body, str):
+            return dataclasses.replace(response, body=b"", json_data=None, json_parsed=True)
+        if isinstance(body, str) and len(body) > 65536:
+            return dataclasses.replace(response, body=b"", json_data=None, json_parsed=True, oversize=True)
+        kept = {"body": body}
+    else:
+        kept = {"default_branch": field(data, "default_branch", 4096)}
+        if type(data.get("id")) is int and 0 < data["id"] < 2 ** 63:
+            kept["id"] = data["id"]
+        if isinstance(data.get("full_name"), str) and len(data["full_name"]) <= 512 and REPO_ARGUMENT.fullmatch(data["full_name"]):
+            kept["full_name"] = data["full_name"]
+    return dataclasses.replace(response, body=b"", json_data=kept, json_parsed=True)
+
+
 def invalid_path(path):
     return not path or path.startswith("/") or any(part in ("", ".", "..") for part in path.split("/"))
 
@@ -514,10 +622,11 @@ def new_row(entry, citation=None):
     row = {"entry": entry.text, "role": entry.role, "role_ref": entry.role_ref, "citation": None, "repo": None,
            "path": None, "lines": None, "ref": None, "sha": None, "status": None, "reason": "", "http_status": None,
            "notes": [], "line_count": None, "blob_sha": None, "default_branch": None,
-           "default_branch_sha": None, "compare_status": None}
+           "default_branch_sha": None, "compare_status": None, "candidate_span": None}
     if citation is not None:
         row.update(citation=citation.text, repo=f"{citation.owner}/{citation.repo}", path=citation.path,
-                   lines=[citation.start, citation.end], ref=citation.ref)
+                   lines=[citation.start, citation.end], ref=citation.ref,
+                   candidate_span=list(citation.span) if citation.span is not None else None)
     return row
 
 
@@ -530,14 +639,14 @@ def settle(row, status, reason, response=None):
 
 def verify_citation(row, citation, github):
     """Run the SHA policy and the four checks in order; the first failure settles the row."""
-    if citation.parse_error:
-        return settle(row, "line-range-out-of-bounds", citation.parse_error)
     status, reason = classify_ref(citation.ref)
     if status:
         return settle(row, status, reason)
+    if citation.parse_error:
+        return settle(row, "line-range-out-of-bounds", citation.parse_error)
     if citation.repo in (".", ".."):
         return settle(row, "commit-not-found", f"{citation.repo!r} is not a repository name")
-    repository = f"/repos/{citation.owner}/{citation.repo}"
+    repository = f"/repos/{citation.owner.lower()}/{citation.repo.lower()}"
     ref = citation.ref.lower()
     if len(ref) < 40:
         # REST git/refs, API 2026-03-10: GET a reference is exact; absent heads and tags return 404.
@@ -679,7 +788,9 @@ def verify_body(body, github):
                 row["citation"] = candidate
                 row["candidate_span"] = list(span)
                 kind = unchecked_kind(candidate)
-                if "#L" in candidate or ("@" in candidate and not ANY_URL.search(candidate)):
+                if REPOSITORY_PIN.fullmatch(candidate):
+                    kind = "repository or package pin"
+                elif "#L" in candidate or ("@" in candidate and not ANY_URL.search(candidate)):
                     kind = "unrecognized code citation (invalid or unsupported syntax)"
                 rows.append(settle(row, NOT_CHECKED, f"not checked in phase A: {kind}"))
                 continue

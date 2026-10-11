@@ -71,7 +71,7 @@ RULES = (
     ("not-on-default-branch:diverged", "AncestryTests.test_behind_diverged_or_another_merge_base_is_not_on_default_branch",
      "AncestryTests.test_ahead_or_identical_with_the_cited_merge_base_passes"),
     ("unavailable", "UnavailableTests.test_timeout_429_503_and_rate_limits_are_unavailable_not_failures",
-     "UnavailableTests.test_a_plain_403_is_a_failure_not_unavailable"),
+     "CommitTests.test_a_commit_github_finds_passes"),
     ("symlink note", "ContentsTests.test_a_symlink_to_a_file_is_checked_against_its_target_with_a_note",
      "ContentsTests.test_a_present_path_passes"),
     ("enforce exit codes", "ExitCodeTests.test_enforce_exits_1_on_a_failure_and_3_when_only_unavailable",
@@ -322,9 +322,9 @@ class GrammarTests(unittest.TestCase):
         rows, _ = verify(f"lycheeverse/lychee@{TAG[:12]}:{MOD_RS}:L23-L24")
         self.assertEqual((rows[0]["role"], rows[0]["status"]), ("unknown", "ok"))
 
-    def test_one_citation_repeated_in_an_entry_is_one_row(self):
+    def test_one_citation_repeated_in_an_entry_has_a_row_per_occurrence(self):
         rows, _ = verify(f"{AT_FORM} and again lycheeverse/lychee@{TAG[:12]}:{MOD_RS}:L23-L24")
-        self.assertEqual(len(rows), 1)
+        self.assertEqual(len(rows), 2)
 
 
 class ShaPolicyTests(unittest.TestCase):
@@ -443,7 +443,7 @@ class ContentsTests(unittest.TestCase):
         # observed. A 200 the fetcher cut off at the cap, and a refusal carrying a too_large error code.
         cut = V.Response(200, {"content-type": "application/vnd.github.raw+json",
                                "content-length": str(V.MAX_CONTENT_BYTES + 1)}, b"", oversize=True)
-        refused = json_response(403, {"message": "This API returns blobs up to 100 MB in size.",
+        refused = json_response(422, {"message": "This API returns blobs up to 100 MB in size.",
                                       "errors": [{"resource": "Blob", "field": "data", "code": "too_large"}]})
         for name, response in (("cut", cut), ("refused", refused)):
             with self.subTest(response=name):
@@ -542,12 +542,12 @@ class UnavailableTests(unittest.TestCase):
                     self.assertEqual((rows[0]["status"], rows[0]["http_status"]), (V.UNAVAILABLE, code))
                     self.assertNotIn(rows[0]["status"], V.FAILURES)
 
-    def test_a_plain_403_is_a_failure_not_unavailable(self):
+    def test_a_plain_403_is_indeterminate(self):
         forbidden = json_response(403, {"message": "Repository access blocked"})
         rows, _ = verify(AT_FORM, {**recorded_routes(), route("commit-sha-12"): forbidden})
-        self.assertEqual((rows[0]["status"], rows[0]["http_status"]), ("commit-not-found", 403))
+        self.assertEqual((rows[0]["status"], rows[0]["http_status"]), (V.UNAVAILABLE, 403))
         rows, _ = verify(AT_FORM, {**recorded_routes(), contents_key(MOD_RS): forbidden})
-        self.assertEqual(rows[0]["status"], "path-not-found")
+        self.assertEqual(rows[0]["status"], V.UNAVAILABLE)
 
     def test_transport_reasons_name_the_failure_and_nothing_else(self):
         self.assertEqual(V.transport_reason(TimeoutError()), "timed out")
@@ -617,7 +617,7 @@ class OutputTests(unittest.TestCase):
         self.assertEqual(report["roles"], {"mechanism": 1, "adopt": 1, "unknown": 1})
         self.assertEqual(set(report["rows"][0]), {
             "entry", "role", "role_ref", "citation", "repo", "path", "lines", "ref", "sha", "status", "reason",
-            "http_status", "notes", "line_count", "blob_sha", "default_branch", "default_branch_sha", "compare_status"})
+            "http_status", "notes", "line_count", "blob_sha", "default_branch", "default_branch_sha", "compare_status", "candidate_span"})
         self.assertEqual(report["rows"][0]["lines"], [23, 24])
         self.assertTrue(written["step.md"].startswith("earlier step\n## SOTA sources: code citations"))
         self.assertEqual(written["step.md"], "earlier step\n" + written["summary.md"])
