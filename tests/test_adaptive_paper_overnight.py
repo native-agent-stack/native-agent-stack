@@ -110,6 +110,13 @@ class OvernightFeedTests(unittest.TestCase):
 
 
 class OvernightStatusCarrierTests(unittest.TestCase):
+    def test_an_invalid_symbol_or_observation_time_refuses_the_carrier(self):
+        for asset, stamp in (({"symbol": "aapl", "attributes": []}, 1), ({"symbol": "", "attributes": []}, 1), ({"attributes": []}, 1),
+                             ({"symbol": "AAPL", "attributes": []}, 0), ({"symbol": "AAPL", "attributes": []}, -5),
+                             ({"symbol": "AAPL", "attributes": []}, 1.5), ({"symbol": "AAPL", "attributes": []}, True)):
+            with self.subTest(asset=asset, stamp=stamp), self.assertRaisesRegex(transport.TransportError, "invalid overnight status"):
+                transport.normalize_overnight_status(asset, stamp)
+
     def test_status_comes_from_asset_attributes_not_quote_conditions_or_top_level_flags(self):
         stamp = int(datetime(2026, 3, 9, 21, 0, tzinfo=NY).timestamp() * 1_000_000_000)
         status = transport.normalize_overnight_status(
@@ -229,6 +236,33 @@ class OvernightAdmissionTests(unittest.TestCase):
                 self.status(attributes)
                 with self.assertRaisesRegex(NativeOrderRejected, reason):
                     self.controller.before_submit(self.order)
+
+    def test_a_standing_trading_halt_refuses_even_with_an_eligible_carrier(self):
+        self.status(["overnight_tradable"])
+        self.controller.trading_status({"symbol": "AAPL", "ts_ns": int(self.now * 1_000_000_000), "state": "halted", "status_code": "H",
+                                        "reason_code": "T1", "tape": "A", "halted": True})
+        self.assertTrue(self.controller.is_halted("AAPL"))
+        for side in ("buy", "sell"):
+            with self.subTest(side=side):
+                self.order["side"] = side
+                with self.assertRaisesRegex(NativeOrderRejected, "overnight_halted"):
+                    self.controller.before_submit(self.order)
+        self.ledger.reserve_intent.assert_not_called()
+
+    def test_a_boats_port_is_checked_without_the_extended_hours_flag_and_a_plain_port_keeps_its_path(self):
+        self.controller.port = SimpleNamespace(ready=True, extended_hours_allowed=False, feed="boats", quote_timeout=5)
+        with self.assertRaisesRegex(NativeOrderRejected, "overnight_status_unknown"):
+            self.controller.before_submit(self.order)
+        self.ledger.reserve_intent.assert_not_called()
+        self.controller.port = SimpleNamespace(ready=True, extended_hours_allowed=False, quote_timeout=5)
+        self.controller.before_submit(self.order)
+        self.ledger.reserve_intent.assert_called_once()
+
+    def test_an_unclassifiable_clock_refuses_instead_of_skipping_the_check(self):
+        with mock.patch.object(runner, "session_at", side_effect=ValueError("synthetic calendar unavailable")):
+            with self.assertRaisesRegex(NativeOrderRejected, "session_classification_failed"):
+                self.controller.before_submit(self.order)
+        self.ledger.reserve_intent.assert_not_called()
 
     def test_invalid_carrier_timestamp_cannot_leave_a_prior_clear_state(self):
         self.status(["overnight_tradable"])

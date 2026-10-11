@@ -208,6 +208,43 @@ class IntegratedRunner(unittest.TestCase):
                     load_config(path)
                 self.assertEqual(str(caught.exception), "unqualified_data_feed")
 
+    def test_boats_feed_is_refused_at_config_load_until_the_stream_is_qualified(self):
+        # main() reaches the transport's own BOATS refusal only after begin_next_trial and trial.json, which would leave the account's
+        # adaptive state in phase "starting" with no command that clears it; the vocabulary names boats, the runner must not run it.
+        with tempfile.TemporaryDirectory() as root:
+            path = Path(root) / "config.json"
+            data = json.loads((SOURCE / "config.json").read_text())
+            data["feed"] = "boats"
+            path.write_text(json.dumps(data))
+            with self.assertRaises(ValueError) as caught:
+                load_config(path)
+            self.assertEqual(str(caught.exception), "boats_stream_unqualified_sdk")
+
+    def test_controller_session_does_not_admit_overnight_or_a_closed_market(self):
+        from datetime import datetime
+        from zoneinfo import ZoneInfo
+        from runner import _controller_session
+        ny = ZoneInfo("America/New_York")
+        stamp = lambda *when: datetime(*when, tzinfo=ny).timestamp()
+        extended = {"extended_hours": True}
+        self.assertEqual(_controller_session(1.0, stamp(2026, 3, 10, 21, 0), extended), (1.0, False))  # OVERNIGHT
+        self.assertEqual(_controller_session(1.0, stamp(2026, 3, 14, 12, 0), extended), (1.0, False))  # Saturday
+        close, market_open = _controller_session(1.0, stamp(2026, 3, 10, 18, 0), extended)  # POST
+        self.assertTrue(market_open)
+        self.assertEqual(close, stamp(2026, 3, 10, 20, 0))
+        self.assertEqual(_controller_session(7.0, stamp(2026, 3, 10, 21, 0), {"extended_hours": False}), (7.0, True))
+
+    def test_honest_overnight_hold_is_true_at_an_overnight_boundary(self):
+        from datetime import datetime, timezone
+        from zoneinfo import ZoneInfo
+        ny = ZoneInfo("America/New_York")
+        overnight_ts = datetime(2026, 3, 10, 21, 0, tzinfo=ny).astimezone(timezone.utc).timestamp()
+        session_policy = {"overnight_holds": True, "extended_hours": True}
+        clean_outcome = {"reconciliation": {"positions": 1, "open_orders": 0},
+                         "adapter_errors": [], "accounting": {"halted_reason": None}}
+        self.assertTrue(_honest_overnight_hold(clean_outcome, session_policy, overnight_ts))
+        self.assertFalse(_honest_overnight_hold({**clean_outcome, "adapter_errors": ["some_error"]}, session_policy, overnight_ts))
+
     def test_native_adaptive_policy_reaches_ledger_and_flat_reconciliation(self):
         config, _, _ = load_config(SOURCE / "config.json")
         config.update(duration_seconds=2, cleanup_seconds=2, order_timeout_seconds=1)

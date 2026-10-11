@@ -428,6 +428,17 @@ class CapacityRunTests(unittest.TestCase):
         closed = fx.FakeClock(datetime(2026, 9, 26, 15, 0, tzinfo=timezone.utc).timestamp())  # Saturday
         receipt, _, _ = run(self.tmp.name, clock=closed, broker=fx.FakeBroker(closed))
         self.assertEqual(receipt["refusal_reason"], "market_session_closed")
+        # OVERNIGHT is a market session the harness does not admit: both instants were CLOSED before the classifier knew the session, and
+        # they must still refuse, with or without the extended-hours permission and with no order sent.
+        for label, moment in (("Tuesday 21:00 ET", datetime(2026, 9, 23, 1, 0, tzinfo=timezone.utc)),
+                              ("Wednesday 02:00 ET", datetime(2026, 9, 23, 6, 0, tzinfo=timezone.utc))):
+            for allowed in (False, True):
+                with self.subTest(label=label, allow_extended_hours=allowed):
+                    overnight = fx.FakeClock(moment.timestamp())
+                    broker = fx.FakeBroker(overnight)
+                    receipt, _, _ = run(self.tmp.name, clock=overnight, broker=broker, allow_extended_hours=allowed)
+                    self.assertEqual(receipt["refusal_reason"], "market_session_closed")
+                    self.assertEqual(len(broker.orders), 0)
         pre = fx.FakeClock(datetime(2026, 9, 24, 11, 0, tzinfo=timezone.utc).timestamp())  # 07:00 ET
         broker = fx.FakeBroker(pre)
         receipt, _, _ = run(self.tmp.name, clock=pre, broker=broker)

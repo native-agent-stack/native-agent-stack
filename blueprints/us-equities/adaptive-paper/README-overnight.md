@@ -41,7 +41,11 @@ unknown status and halts win timestamp ties in either arrival order.
 These guards apply to recovery's transport submission path as well as native
 strategy orders. Cancellation and observation remain available.
 
-Existing extended-hours policies continue to admit PRE/RTH/POST only. Native
+Existing extended-hours policies continue to admit PRE/RTH/POST only: under
+them the runner's controller window (`runner._controller_session`) opens only
+in those three sessions. The order-throughput capacity harness (`capacity.py`)
+refuses every other session as `market_session_closed`, so it never runs
+OVERNIGHT as regular hours. Native
 dispatch and exit plans still refuse/flag OVERNIGHT. The helper for a proposed
 overnight order sets `extended_hours=True` and bounds its DAY window at the
 upcoming trade date's 20:00; this pure mapping grants no submission authority.
@@ -56,7 +60,10 @@ OVERNIGHT's upcoming trade date and the following trading session are checked.
 The installed alpaca-py 0.44.0 exposes the BOATS enum but its `StockDataStream`
 constructor accepts only IEX/SIP. The native transport therefore refuses a
 BOATS construction as `boats_stream_unqualified_sdk` before constructing a
-client. It does not substitute another feed, fork the SDK or rebuild its
+client. `runner.load_config` refuses a `boats` configuration with the same
+reason before any broker request or trial-state write, so no command starts a
+trial that the transport would then refuse; the transport refusal remains the
+backstop. It does not substitute another feed, fork the SDK or rebuild its
 stream. A supported native BOATS path, authenticated real-time parsing,
 per-paper-account entitlement/linkage, refreshed status delivery and the
 owning T15 overnight paper/journal run are still required.
@@ -73,7 +80,7 @@ pending and the deterministic refusal stays in place.
   path independent of any repricing exemption.
 - A held EXIT in a halt deliberately remains resting, as
   `native_strategy.cancel_expired` specifies (E4), consistent with
-  [uet#63 decision 2 (F-1), at 010a5a33](https://github.com/seathatflowsinourveins/us-equities-trading/blob/010a5a33e329c9d2e694b3d09fd2d5a165ea3c66/docs/decisions/2026-10-10-halt-exit-policy.md).
+  [uet#63 decision 2 (F-1), at f8c607bc](https://github.com/seathatflowsinourveins/us-equities-trading/blob/f8c607bc1f1f0205fdc87095f47df150d2f78117/docs/decisions/2026-10-10-halt-exit-policy.md).
   At DAY expiry the position is flagged, the session is notified and the
   instance freezes for handoff.
 - A broker `accepted` observation is resting, never execution. The carry
@@ -109,6 +116,16 @@ and retained receipt.
   updated 2026-05-18T07:19:29Z, fetched 2026-10-10: `v1beta1/boats` and the
   separate Trading Status channel. Fetched SHA256
   `5a1857f5d0cd4652079dadd45df0a674b370ea725e8ddf2c9f1ccb4ade211f83`.
+- Alpaca [Get an Asset by ID or Symbol](https://docs.alpaca.markets/us/reference/get-v2-assets-symbol_or_asset_id.md),
+  the endpoint behind `TradingClient.get_asset`, updated 2026-05-27T17:58:22Z,
+  fetched 2026-10-11: `attributes` is a list of strings whose values include
+  `overnight_tradable` and `overnight_halted`. Fetched SHA256
+  `a379eba034acae0aee1ba85158c830264698019670324fdca30e7b8ea28694a4`.
+- Alpaca [Historical Stock Data](https://docs.alpaca.markets/us/docs/historical-stock-data-1.md),
+  updated 2026-02-11T05:30:13Z, fetched 2026-10-11: the `overnight` feed is
+  Alpaca's feed derived from the BOATS source, with trades 15 minutes delayed
+  (the derived/delayed feed above). Fetched SHA256
+  `f5c481f99797985246a69fc2938871ee2e2820b8ff106b20b1e0493d7a985fad`.
 - [alpaca-py v0.44.0](https://github.com/alpacahq/alpaca-py/tree/cc4cb3b7ba50ae250e621983c2779047fb16bb28),
   commit `cc4cb3b7ba50ae250e621983c2779047fb16bb28`:
   `alpaca/data/enums.py:56-73` (BOATS and derived OVERNIGHT),

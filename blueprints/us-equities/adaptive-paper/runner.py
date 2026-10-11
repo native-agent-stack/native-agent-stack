@@ -343,6 +343,10 @@ def load_config(path, *, registry_path=None):
     c = json.loads(Path(path).read_text())
     if c["feed"] not in DATA_FEEDS:
         raise ValueError("unqualified_data_feed")
+    if c["feed"] == "boats":
+        # alpaca-py 0.44.0 cc4cb3b7, data/live/stock.py:47 rejects BOATS and the transport refuses it at construction, which main() reaches only
+        # after begin_next_trial and trial.json: refuse here, before any request or state write, until a supported stream replaces the refusal.
+        raise ValueError("boats_stream_unqualified_sdk")
     # G-e: leverage above 1x is refused exactly as before UNLESS a
     # "leverage_policy" block is present, in which case it is deferred to
     # validate_leverage_policy below (which raises its own, more specific
@@ -2260,6 +2264,18 @@ def trial_phase_and_exit_code(result):
     return phase, exit_code
 
 
+def _controller_session(close, now, session_policy):
+    """The controller's entry window. By default the broker's RTH close and an always-open market. Under extended hours the continuous
+    PRE->RTH->POST window while one is active; OVERNIGHT is a market session but not an admitted one (mover_runner._controller_session)."""
+    if not session_policy["extended_hours"]:
+        return close, True
+    moment = datetime.fromtimestamp(now, timezone.utc)
+    market_open = session_at(moment).kind in (SessionKind.PRE, SessionKind.RTH, SessionKind.POST)
+    if market_open:
+        close = extended_session_close(moment).astimezone(timezone.utc).timestamp()
+    return close, market_open
+
+
 def main():
     global LAST_OUTPUT
     parser = argparse.ArgumentParser(description=__doc__)
@@ -2443,13 +2459,7 @@ def main():
             # continuous PRE->RTH->POST window close (20:00 ET), not the
             # broker's RTH-only close, and market_open must reflect whether
             # the session clock currently sees an active window at all.
-            controller_close, controller_market_open = close, True
-            if session_policy["extended_hours"]:
-                now_dt = datetime.fromtimestamp(now, timezone.utc)
-                info_now = session_at(now_dt)
-                controller_market_open = info_now.kind in (SessionKind.PRE, SessionKind.RTH, SessionKind.POST)
-                if controller_market_open:
-                    controller_close = extended_session_close(now_dt).astimezone(timezone.utc).timestamp()
+            controller_close, controller_market_open = _controller_session(close, now, session_policy)
             controller = Controller(ledger, controller_close, market_open=controller_market_open)
             for asset_status in observation.get("asset_statuses", ()):
                 controller.trading_status(asset_status)

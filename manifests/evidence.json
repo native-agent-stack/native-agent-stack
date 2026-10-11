@@ -12842,8 +12842,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README-overnight.md",
-      "sha256": "abf790737f4061011c76b8e23fa83298915a427d989583a175f850bd1189563c",
-      "bytes": 8253
+      "sha256": "f49fa0f916dd22abd23587b13f324007ebc5b570db639c06a49aa9999a8e8e80",
+      "bytes": 9530
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README-paper-exploration.md",
@@ -13212,8 +13212,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runner.py",
-      "sha256": "bf2a2f5d27b588fbacf50f0f1a880f17b302a4963085c2efbcbbc12018b3603f",
-      "bytes": 159113
+      "sha256": "2f45ea6353255185acc8f908df04eded0d6da72176a97d8d75ab77d31d897f75",
+      "bytes": 159790
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/safety.py",
@@ -13237,7 +13237,7 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "bab839e63a707f7e80ba9d687eb9683e19bc611f3352f2d88c39dfedc14952e2",
+      "sha256": "35148bc61852357dfb71a361614b30045c959ac86a14b55827ae595a57090aff",
       "bytes": 7424
     },
     {
@@ -60302,8 +60302,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_overnight.py",
-      "sha256": "9438fb9e9945df5c85b771b39be7153ae1549a7213b6be5a45ebfc9f67234b7d",
-      "bytes": 14115
+      "sha256": "fe16964411e16b38ab21332edd3ad66d8bec10c08690c34c3437ee804524c519",
+      "bytes": 16546
     },
     {
       "path": "tests/test_adaptive_paper_recovery.py",
@@ -60312,8 +60312,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_runner.py",
-      "sha256": "211f5cad136eddf6d2d213733097f8c05486d05828c1e14f33cfcbcfc01564f7",
-      "bytes": 288445
+      "sha256": "f59f3e1617f22e4d265b78ef07fcea54042cc3f40eb6ec7b467a4d13f6be748b",
+      "bytes": 290897
     },
     {
       "path": "tests/test_adaptive_paper_safety.py",
@@ -61167,8 +61167,8 @@
     },
     {
       "path": "tests/test_order_throughput.py",
-      "sha256": "b39e721223e7166b0abf3bbe262b0cab9250d52fcd6cdfd38f464eafe47671f7",
-      "bytes": 73784
+      "sha256": "f821bdf0cb5bb671e2ab0f9327b8162aef12ef7b0d365ea6c03d23165582dd37",
+      "bytes": 74738
     },
     {
       "path": "tests/test_osv_lockfile_coverage.py",
