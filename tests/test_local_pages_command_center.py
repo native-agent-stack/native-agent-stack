@@ -561,7 +561,7 @@ class CommandCenterViewTests(unittest.TestCase):
     def test_skills_join_the_manifest_with_counts_and_flags(self):
         markup, statuses = self.render()
         rows = table(markup, "The 8 skills pinned in adoption/skills/manifest.json")
-        self.assertEqual(rows[0], ["Skill", "Upstream source@pin", "Claude uses, lifetime", "Claude main sessions, 7 d", "Claude subagents, 7 d", "Codex use, 7 d",
+        self.assertEqual(rows[0], ["Skill", "Upstream source@pin", "Claude uses, lifetime", "Claude calls in main sessions, 7 d", "Claude calls in subagents, 7 d", "Codex use, 7 d",
                                    "Codex SKILL.md reads, 7 d", "Codex name mentions, 7 d", "Flags"])
         rows = {row[0].split(" ")[0]: row for row in rows[1:]}
         self.assertEqual(rows["search-first"][1], "fixture/skills@0123456789ab skills/search-first")

@@ -572,7 +572,7 @@ SKILL_PRODUCERS = {
     "skills_daily": "daily_skill_usage.py (#970), one projection of all three reports",
     "skills_host": "skill_usage.py --run-skill-doctor --window 7 (Claude /skill-doctor and Codex rollouts)",
     "skills_codex_lanes": "skill_usage.py --lanes, 7 days (Codex rollout groups, refreshed daily)",
-    "skills_claude_lanes": "child-usage.mjs --lanes-sweep, 7 days (Claude main sessions and subagents)",
+    "skills_claude_lanes": "child-usage.mjs --lanes-sweep, 7 days (Claude Skill calls in main sessions and subagents)",
 }
 SKILL_COLUMNS = ("claude_lifetime", "claude_main", "claude_sub", "codex_use", "codex_reads", "codex_mentions")
 
@@ -729,7 +729,7 @@ def _skills(fleet: dict, inputs: dict, refreshed: Any) -> tuple[str, str, str, s
             table_rows.append('<tr data-cc-skill="' + esc(name) + '"><th scope="row">' + esc(name) + '<small>' + esc(skill.get("status") or "status not recorded") + '</small></th><td>' + upstream + '</td>'
                               + "".join('<td class="cc-num">' + cell + '</td>' for cell in cells) + '<td>' + (" ".join(flags) or '<span class="cc-unrecorded">not measured</span>') + '</td></tr>')
         parts.append('<h3>Per skill and client</h3>' + _table("The " + str(len(pinned)) + " skills pinned in adoption/skills/manifest.json, with counts from the repository's measurement tools",
-                                                             [label.replace(" 7 d", " 7" + chr(0xA0) + "d") for label in ("Skill", "Upstream source@pin", "Claude uses, lifetime", "Claude main sessions, 7 d", "Claude subagents, 7 d", "Codex use, 7 d", "Codex SKILL.md reads, 7 d", "Codex name mentions, 7 d", "Flags")],
+                                                             [label.replace(" 7 d", " 7" + chr(0xA0) + "d") for label in ("Skill", "Upstream source@pin", "Claude uses, lifetime", "Claude calls in main sessions, 7 d", "Claude calls in subagents, 7 d", "Codex use, 7 d", "Codex SKILL.md reads, 7 d", "Codex name mentions, 7 d", "Flags")],
                                                              table_rows, css="cc-skill-matrix", numeric=(2, 3, 4, 5, 6, 7)))
     else:
         parts.append('<h3>Per skill and client</h3>' + _input_gap(manifest_item, "skills_manifest"))
@@ -740,7 +740,7 @@ def _skills(fleet: dict, inputs: dict, refreshed: Any) -> tuple[str, str, str, s
             return _cell_count(counts.get(skill, 0)) if isinstance(counts, dict) else '<span class="cc-unrecorded">not measured</span>'
         main, sub, workers = (model["lane_counts"][key] for key in ("claude_main", "claude_sub", "codex_workers"))
         rows = ['<tr><th scope="row">' + esc(skill) + '</th><td class="cc-num">' + count_in(main, skill) + '</td><td class="cc-num">' + count_in(sub, skill) + '</td><td class="cc-num">' + count_in(workers, skill) + '</td><td><span class="pill p-warn">unpinned</span></td></tr>' for skill in unpinned]
-        parts.append(_table("Skills with recorded calls that the manifest does not pin; an installed skill that never ran is not visible to these reports", ["Skill", "Claude main sessions, 7 d", "Claude subagents, 7 d", "Codex workers, 7 d", "Flag"], rows, numeric=(1, 2, 3)) if rows else '<p>Every skill with a recorded call is pinned in the manifest.</p>')
+        parts.append(_table("Skills with recorded calls that the manifest does not pin; an installed skill that never ran is not visible to these reports", ["Skill", "Claude calls in main sessions, 7 d", "Claude calls in subagents, 7 d", "Codex workers, 7 d", "Flag"], rows, numeric=(1, 2, 3)) if rows else '<p>Every skill with a recorded call is pinned in the manifest.</p>')
     lane_rows = []
     for label, sessions, with_read, reads in model["groups"]:
         total = sum(value for value in (reads or {}).values() if _count(value) is not None) if reads is not None else None

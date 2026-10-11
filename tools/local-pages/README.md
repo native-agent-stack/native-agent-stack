@@ -225,8 +225,9 @@ UNKNOWN.
 
 The skills section has one row per skill pinned in
 `adoption/skills/manifest.json`: its source@ref (linked only for an https URL),
-its path and the counts per client, which are Claude lifetime uses, Claude main
-sessions and subagents over 7 days, and Codex use, SKILL.md reads and name
+its path and the counts per client, which are Claude lifetime uses, Claude Skill
+calls in main sessions and in subagents over 7 days (calls, not sessions:
+child-usage.mjs counts each invocation), and Codex use, SKILL.md reads and name
 mentions over 7 days. A pinned skill with zero calls in every measured 7-day
 column is flagged "wiring defect"; one with no skills-lock record and no
 `/skill-doctor` row is also "not installed", and while `/skill-doctor` itself
