@@ -2257,6 +2257,47 @@ class MainCommandGateWiring(unittest.TestCase):
             except Exception as exc:  # noqa: BLE001 -- deliberately catches the sentinel too
                 return sentinel, None, exc
 
+    def test_main_preserves_extended_session_window_at_controller_construction(self):
+        from zoneinfo import ZoneInfo
+        ny = ZoneInfo("America/New_York")
+        for hour, expected_open in ((5, True), (11, True), (17, True), (21, False)):
+            with self.subTest(hour_et=hour), tempfile.TemporaryDirectory() as root:
+                now = datetime(2026, 3, 10, hour, 0, tzinfo=ny).timestamp()
+                expected_close = datetime(2026, 3, 10, 20, 0, tzinfo=ny).timestamp() if expected_open else now + 3600
+                config, limits, policy = runner_module.load_config(SOURCE / "config.json")
+                config.update(regular_session_only=False, extended_hours_enabled=True)
+                config["sessions"]["extended_hours"] = True
+                ledger = Mock()
+                captured = RuntimeError("captured_controller")
+                # Isolate the constructor's own window from preflight's earlier
+                # start gate. Neither credentials nor account/broker state is real.
+                with patch.object(sys, "argv", [
+                        "runner.py", "paper", "--credentials", "keychain-env",
+                        "--config", str(SOURCE / "config.json"),
+                        "--output", str(Path(root) / "output.json"),
+                        "--state-root", str(Path(root) / "state")]), \
+                     patch.object(runner_module, "load_config", return_value=(config, limits, policy)), \
+                     patch.object(runner_module, "check_order_contract_boundary", return_value={}), \
+                     patch.object(runner_module, "paper_credentials", return_value=("fixture", "fixture")), \
+                     patch.object(runner_module, "preflight", return_value={"account_identity_sha256": "fixture"}), \
+                     patch.object(runner_module, "public_preflight", return_value={}), \
+                     patch.object(runner_module, "validate_preflight", return_value=now + 3600), \
+                     patch.object(runner_module, "account_lock_fingerprint", return_value=contextlib.nullcontext()), \
+                     patch.object(runner_module, "Ledger", return_value=ledger), \
+                     patch.object(runner_module, "Controller", side_effect=captured) as controller, \
+                     patch.object(runner_module, "fee_checkpoint", side_effect=AssertionError("broker checkpoint")), \
+                     patch.object(runner_module, "AlpacaPaperTransport", side_effect=AssertionError("broker transport")), \
+                     patch.object(runner_module, "run_native", side_effect=AssertionError("native execution")), \
+                     patch.object(runner_module.time, "time", return_value=now):
+                    with self.assertRaises(RuntimeError) as caught:
+                        runner_module.main()
+                self.assertIs(caught.exception, captured)
+                controller.assert_called_once()
+                self.assertIs(controller.call_args.kwargs["market_open"], expected_open)
+                self.assertEqual(controller.call_args.args[1], expected_close)
+                ledger.close.assert_called_once()
+                self.assertFalse((Path(root) / "state").exists())
+
     def test_paper_without_gate_arguments_reaches_post_gate_execution(self):
         sentinel, code, raised = self._run_main("paper")
         self.assertIsNone(code)

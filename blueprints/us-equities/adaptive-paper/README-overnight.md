@@ -104,15 +104,18 @@ Eastern OVERNIGHT. The native BUY LIMIT/DAY must be denied with
 broker port, fill or reserved intent. Paper acceptance remains **NOT_RUN** until its actual run
 and retained receipt.
 
-`IntegratedRunner.test_main_preserves_extended_session_window_at_controller_construction`
+`MainCommandGateWiring.test_main_preserves_extended_session_window_at_controller_construction`
 drives `runner.main()` through Controller construction.
-`MoverPaperCommandWiring.test_paper_main_preserves_extended_session_window_at_controller_construction`
+`MoverCommandSessionWiring.test_paper_main_preserves_extended_session_window_at_controller_construction`
 drives `mover_runner.main()` through MoverController construction. Both use
 PRE/RTH/POST controls and an OVERNIGHT clock.
-`MoverPaperCommandWiring.test_recover_main_preserves_extended_session_window_at_controller_construction`
+`MoverCommandSessionWiring.test_recover_main_preserves_extended_session_window_at_controller_construction`
 drives `mover_runner.main()`'s `recover` path through MoverController construction
 with the same controls. Scripted preflight isolates each constructor's own
 window; credentials, account state and broker operations are fixtures.
+These three tests run unconditionally in CI without NautilusTrader or alpaca-py.
+The original native-class copies remain additional local runtime coverage;
+those copies skip in CI and do not establish CI execution of these pins.
 All three tests pin `market_open` and the close passed to the controller:
 20:00 ET in PRE/RTH/POST, and the preflight close unchanged in OVERNIGHT.
 Bypassing a paper `_controller_session` call or always opening mover `recover`

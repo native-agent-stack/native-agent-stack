@@ -1,6 +1,7 @@
 """Mover trial mode, pure logic: config, scan, sizing, pricing, exits and the order state
 machine. Synthetic fixtures only (evidence class SYN); no broker, network or credentials."""
 import contextlib
+from dataclasses import replace
 from datetime import datetime, time as dtime, timezone
 from decimal import Decimal as D
 import hashlib
@@ -10,8 +11,9 @@ from pathlib import Path
 import re
 import sys
 import tempfile
+import time
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 import uuid
 
 SOURCE = Path(__file__).resolve().parents[1] / "blueprints/us-equities/adaptive-paper"
@@ -74,6 +76,139 @@ def scan_dict(**changes):
 def scan_bytes(**changes):
     return json.dumps(scan_dict(**changes)).encode()
 
+
+class MoverCommandSessionWiring(unittest.TestCase):
+    """Constructor session pins run without NautilusTrader or alpaca-py, including CI."""
+
+    SERVER = SCAN_TIME + 25
+    FINGERPRINT = "a" * 64
+    broker = None
+
+    def observation(self, symbols):
+        """The read-only preflight, reflecting the synthetic account's positions and open orders."""
+        server_ns, now_ns = int(self.SERVER * 1e9), time.time_ns()
+        cash = format(self.broker.cash, "f") if self.broker is not None else "100000"
+        positions = [] if self.broker is None else [
+            {"symbol": s, "qty": format(q, "f"), "avg_entry_price": "10"} for s, q in self.broker.positions.items() if q]
+        orders = [] if self.broker is None else [
+            self.broker._public(o) for o in self.broker.orders.values() if o["status"] in ("new", "partially_filled")]
+        return {"account": {"status": "ACTIVE", "currency": "USD", "cash": cash, "equity": cash,
+                            "buying_power": cash, "trading_blocked": False, "account_blocked": False,
+                            "trade_suspended_by_user": False},
+                "account_identity_sha256": self.FINGERPRINT,
+                "clock": {"is_open": False, "received_at_ns": server_ns, "timestamp_ns": server_ns,
+                          "next_close_ns": server_ns + 8 * 3600 * 10 ** 9, "next_open_ns": server_ns + 5400 * 10 ** 9},
+                "positions": positions, "orders": orders, "open_orders_complete": True,
+                "assets": [{"symbol": s, "status": "active", "tradable": True} for s in symbols],
+                "quotes": [{"symbol": s, "bid": "100", "ask": "100.01", "ts_ns": now_ns} for s in symbols],
+                "quote_errors": {}}
+
+    def test_paper_main_preserves_extended_session_window_at_controller_construction(self):
+        import transport
+        from zoneinfo import ZoneInfo
+        ny = ZoneInfo("America/New_York")
+        for hour, expected_open in ((5, True), (11, True), (17, True), (21, False)):
+            with self.subTest(hour_et=hour), tempfile.TemporaryDirectory() as root:
+                now = datetime(2026, 3, 10, hour, 0, tzinfo=ny).timestamp()
+                expected_close = datetime(2026, 3, 10, 20, 0, tzinfo=ny).timestamp() if expected_open else now + 3600
+                data = json.loads(CONFIG.read_text())
+                data["mover"]["session_scope"] = "any_session"
+                config_path, scan_path = Path(root) / "config.json", Path(root) / "scan.json"
+                config_path.write_text(json.dumps(data))
+                scan_path.write_bytes(scan_bytes(symbols=[{"symbol": "AAA", "rank": 1, "price_at_t": "10.00", "dollar_volume_at_t": "50000000", "entry_bar_dollar_volume": "2000000"}], regime={"factor": "1"}))
+                _, _, settings = mover.load_mover_config(config_path)
+                scan = mover.load_scan(scan_path.read_bytes(), settings, now=SCAN_TIME + 20)
+                scan = replace(scan, session_date=mover_runner.session_at(
+                    datetime.fromtimestamp(now, timezone.utc)).session_date)
+                observation = self.observation(["AAA", "SPY"])
+                observation["clock"]["timestamp_ns"] = int(now * 1e9)
+                ledger = Mock()
+                ledger.positions.return_value = ledger.unresolved.return_value = []
+                ledger.fees.return_value = []
+                ledger.accounting.return_value = Mock(cash_delta_usd=D(0), realized_pnl_usd=D(0), drawdown_usd=D(0))
+                plan = Mock()
+                plan.symbol_names.return_value = ("AAA",)
+                captured = RuntimeError("captured_mover_controller")
+                # Bypass earlier scan/start gates to protect the production caller's
+                # own window. The helper stays real; credentials, state and broker
+                # operations are fixtures, and execution stops at construction.
+                with patch.object(mover_runner, "credentials", return_value=("fixture", "fixture")), \
+                     patch.object(transport, "preflight", return_value=observation), \
+                     patch.object(transport, "fee_checkpoint", return_value={
+                         "account": {"cash": "100000"}, "fees": []}), \
+                     patch.object(mover_runner, "public_preflight", return_value={}), \
+                     patch.object(mover_runner, "validate_preflight", return_value=now + 3600), \
+                     patch.object(mover_runner, "load_scan", return_value=scan), \
+                     patch.object(mover_runner, "build_plan", return_value=plan), \
+                     patch.object(mover_runner, "account_lock_fingerprint", return_value=contextlib.nullcontext()), \
+                     patch.object(mover_runner, "Ledger", return_value=ledger), \
+                     patch.object(mover_runner, "save"), \
+                     patch.object(mover_runner, "MoverController", side_effect=captured) as controller, \
+                     patch.object(transport, "AlpacaPaperTransport", side_effect=AssertionError("broker transport")), \
+                     patch.object(mover_runner, "run_mover", side_effect=AssertionError("native execution")), \
+                     patch.object(mover_runner.time, "time", return_value=now):
+                    with self.assertRaises(RuntimeError) as caught:
+                        mover_runner.main([
+                            "paper", "--env-file", str(Path(root) / "unused.env"),
+                            "--config", str(config_path), "--scan", str(scan_path),
+                            "--trial", "window", "--output", str(Path(root) / "output.json"),
+                            "--state-root", str(Path(root) / "state")])
+                self.assertIs(caught.exception, captured)
+                controller.assert_called_once()
+                self.assertIs(controller.call_args.kwargs["market_open"], expected_open)
+                self.assertEqual(controller.call_args.args[1], expected_close)
+                ledger.close.assert_called_once()
+                self.assertFalse((Path(root) / "state").exists())
+
+    def test_recover_main_preserves_extended_session_window_at_controller_construction(self):
+        import transport
+        from zoneinfo import ZoneInfo
+        ny = ZoneInfo("America/New_York")
+        for hour, expected_open in ((5, True), (11, True), (17, True), (21, False)):
+            with self.subTest(hour_et=hour), tempfile.TemporaryDirectory() as root:
+                now = datetime(2026, 3, 10, hour, 0, tzinfo=ny).timestamp()
+                expected_close = datetime(2026, 3, 10, 20, 0, tzinfo=ny).timestamp() if expected_open else now + 3600
+                data = json.loads(CONFIG.read_text())
+                data.update(regular_session_only=False, extended_hours_enabled=True)
+                data["sessions"]["extended_hours"] = True
+                config_path = Path(root) / "config.json"
+                config_path.write_text(json.dumps(data))
+                state_dir = Path(root) / "state" / self.FINGERPRINT / "mover"
+                state_dir.mkdir(parents=True)
+                metadata_path = state_dir / "trial.json"
+                metadata_bytes = json.dumps({"config_sha256": mover_runner._sha256(config_path.read_bytes())}).encode()
+                metadata_path.write_bytes(metadata_bytes)
+                observation = self.observation(["SPY"])
+                observation["clock"]["timestamp_ns"] = int(now * 1e9)
+                ledger = Mock()
+                ledger.positions.return_value = ledger.unresolved.return_value = []
+                captured = RuntimeError("captured_recover_controller")
+                # Keep recover's production helper real, independently of the
+                # earlier preflight gate. Only private fixture metadata is read;
+                # the constructor sentinel prevents persistence and broker work.
+                with patch.object(mover_runner, "credentials", return_value=("fixture", "fixture")), \
+                     patch.object(transport, "preflight", return_value=observation), \
+                     patch.object(mover_runner, "validate_preflight", return_value=now + 3600), \
+                     patch.object(mover_runner, "account_lock_fingerprint", return_value=contextlib.nullcontext()), \
+                     patch.object(mover_runner, "Ledger", return_value=ledger), \
+                     patch.object(mover_runner, "save", side_effect=AssertionError("unexpected persistence")), \
+                     patch.object(mover_runner, "MoverController", side_effect=captured) as controller, \
+                     patch.object(transport, "AlpacaPaperTransport", side_effect=AssertionError("broker transport")), \
+                     patch.object(mover_runner, "recover_mover", side_effect=AssertionError("broker recovery")), \
+                     patch.object(mover_runner.time, "time", return_value=now):
+                    with self.assertRaises(RuntimeError) as caught:
+                        mover_runner.main([
+                            "recover", "--env-file", str(Path(root) / "unused.env"),
+                            "--config", str(config_path), "--output", str(Path(root) / "output.json"),
+                            "--state-root", str(Path(root) / "state")])
+                self.assertIs(caught.exception, captured)
+                controller.assert_called_once()
+                self.assertIs(controller.call_args.kwargs["market_open"], expected_open)
+                self.assertEqual(controller.call_args.args[1], expected_close)
+                ledger.close.assert_called_once()
+                self.assertEqual(metadata_path.read_bytes(), metadata_bytes)
+                self.assertEqual(list(state_dir.iterdir()), [metadata_path])
+                self.assertFalse((Path(root) / "output.json").exists())
 
 class RuleAndConfig(unittest.TestCase):
     def test_boats_feed_is_refused_at_config_load_until_the_stream_is_qualified(self):
