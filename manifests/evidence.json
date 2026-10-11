@@ -5071,8 +5071,8 @@
     },
     {
       "path": ".github/requirements-ci.txt",
-      "sha256": "0b37433fb0fb165c893737e8e887581a07a6469683fbdf67ada1a08288758605",
-      "bytes": 467
+      "sha256": "33f5626de125815129498eb607a8cb7c717e016c759b3df9eb0bdd4f4b9d7d6c",
+      "bytes": 12577
     },
     {
       "path": ".github/requirements-validation.txt",
@@ -5096,8 +5096,8 @@
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
-      "sha256": "673dbb816767e67d002b6dcdf866053c8408a7a47203683650af8d9f3be4b23a",
-      "bytes": 26872
+      "sha256": "98c3b78a9a729499c8ed9e7090eec32ac6b2af1cef583dd8fc6d02c6882e9bdb",
+      "bytes": 27093
     },
     {
       "path": ".github/workflows/claude-pr-review.yml",
@@ -11287,8 +11287,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261004.json",
-      "sha256": "3fe9bc2e0d2bafec7b1c6b214be9b59c8fe19ebaa771eda72343cac87bbb9578",
-      "bytes": 23703
+      "sha256": "8752740817bb41c1a582e33fa475e4ce4064f2ccfecadb706bce40ecb4512157",
+      "bytes": 24455
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unit-pass.txt",
@@ -17126,6 +17126,16 @@
       "bytes": 479154
     },
     {
+      "path": "catalogs/landscape/gap-closeouts/README.md",
+      "sha256": "e4f442c5db4aea4fab1fba274d04b2dad2f915adb18b53102d9d027f42cb4b66",
+      "bytes": 4887
+    },
+    {
+      "path": "catalogs/landscape/gap-closeouts/schema.json",
+      "sha256": "7cbe1df401f07b472b7074bfb8321297fed0a2a009623814f49eb47c683e0f27",
+      "bytes": 3073
+    },
+    {
       "path": "catalogs/landscape/gap-crosswalk-92bb279.json",
       "sha256": "bb354c43a6d318c26eaeb889baa30b8006c23a0f3de2e6dfc123d999ad1726b8",
       "bytes": 614862
@@ -18599,6 +18609,11 @@
       "path": "docs/decisions/2026-10-10-secret-scan-large-targets.md",
       "sha256": "35da27177c245d8030a586831d747489cbbb070c1e100e2d4e808cfe65640950",
       "bytes": 11911
+    },
+    {
+      "path": "docs/decisions/2026-10-10-shared-gap-closeouts.md",
+      "sha256": "b780844a1e5d895f4522ce852c2e63355435d581cf63ffb0ede0d994253f04a8",
+      "bytes": 8539
     },
     {
       "path": "docs/decisions/2026-10-10-skills-claude-native-practice-row.md",
@@ -50336,6 +50351,176 @@
       "bytes": 6435
     },
     {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/advisory-before.log",
+      "sha256": "a5990dc467c5b27ada0a3333fe085b8e89fe2491c60347a8033c5fb7ac4ab90a",
+      "bytes": 42047
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/advisory-ci-correction.json",
+      "sha256": "5bcac0b88076aa9253367756c57b11f54bf424b28ee1dd71b30c054121e185bc",
+      "bytes": 3976
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/advisory-tests.log",
+      "sha256": "1361383bdb225301ac59d359a6e643e9a11fa6b5d0bb8b7bf3de3f23f28f1165",
+      "bytes": 110614
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/before.log",
+      "sha256": "d0802241f45a28862eaa65656a3a83543b7f6507809ae7c48a795b68e39889ad",
+      "bytes": 2987
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/cc-fix/before.log",
+      "sha256": "a6e3e823f17ceae741b58e75583acb4978f49521123dec6a35374bb15dd7f6b2",
+      "bytes": 6627
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/cc-fix/guard-controls.log",
+      "sha256": "3e009bdd949beebde57c0c7cdebe03244ace2d3d2d4f372e941cdd245e456316",
+      "bytes": 4357
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/cc-fix/landing-old-baseline-control.log",
+      "sha256": "093cf8b69eb93e6f17af8c29bc5c87a658467f508c3dc414e8dc2420e0443a0f",
+      "bytes": 43462
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/cc-fix/landing-rebase.json",
+      "sha256": "0174c1477ef38e38a3299ffedbbb2950603e02fd1395f9ff5c24301108715ddc",
+      "bytes": 5498
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/cc-fix/landing-required-modules.log",
+      "sha256": "c217338fd08df5f69e749a34b307fd5c216a27608076ebc32d5d486906910e48",
+      "bytes": 111952
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/cc-fix/matrix-check.log",
+      "sha256": "08ce4f275c99b7f91a141cfca5b7384f060aacf620f23a324cde692d55e6ffcd",
+      "bytes": 34
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/cc-fix/missing-jsonschema.log",
+      "sha256": "16ba752c32957f3b2943ad473825fe6f0c70e1f1be428ad10b951d3af1a90efe",
+      "bytes": 110
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/cc-fix/pre-main-advance-worker-baseline.json",
+      "sha256": "04a245baf20ec34bfb33e76f0692bab6047331723a5c4f8da38f2da5fcf9a64c",
+      "bytes": 24293
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/cc-fix/publication-recheck.log",
+      "sha256": "b15edce4ae44aef0c0854fb01dc51f56bb5ad353dab8000579b33ab2e0da7ad8",
+      "bytes": 99
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/cc-fix/push-gate-baseline-before.json",
+      "sha256": "3fe9bc2e0d2bafec7b1c6b214be9b59c8fe19ebaa771eda72343cac87bbb9578",
+      "bytes": 23703
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/cc-fix/receipt.json",
+      "sha256": "e371c227bf5cbb0650ea4f63ca5582d3a66fc6079f20badcd2366a60314028e7",
+      "bytes": 6002
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/cc-fix/required-modules.log",
+      "sha256": "5057383d987228210ff357ef2de68f1a7609fdf1dd8371eacc856d54462d28d3",
+      "bytes": 111952
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/freshness-fix/after.log",
+      "sha256": "585894909b7185a550995a1e1162a3d518234d3ec1dc2622a9b8ca6c2875913a",
+      "bytes": 276
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/freshness-fix/before.log",
+      "sha256": "ed7e1765c495de45fd44e613e6eb59c440b02d6befb1ff82c3337a380d6d477b",
+      "bytes": 1162
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/freshness-fix/receipt.json",
+      "sha256": "c440737e808412d73dd5f37a94721122741aded38feaa0b3146891a14ca6c418",
+      "bytes": 4520
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/gpt-fix/after.log",
+      "sha256": "18ef389c5d2444ace7a5fc986945607331c907f9621282d1e1727b641e1eb78c",
+      "bytes": 1317
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/gpt-fix/before.log",
+      "sha256": "6ee07ee75c80e0e81742da5609ad81ca5de40728acbb5b910f847cebead5f60a",
+      "bytes": 6441
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/gpt-fix/modules.log",
+      "sha256": "3ad842ad45059e47bb1a759faeff0fce53ce60e812a7123d1166a28edf9b41d8",
+      "bytes": 274
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/gpt-fix/path-alias-proof.json",
+      "sha256": "1defe79604747e711a32670267f41f91630b01cd132495204ec9f8098dd98d7c",
+      "bytes": 2555
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/gpt-fix/receipt.json",
+      "sha256": "c70f3175a8ce430b5c48c38263548bca0ba9ddf32e7838bf1caa13e9ca481324",
+      "bytes": 14550
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/gpt-fix/source-proof.json",
+      "sha256": "b0eaa680cdb5d16dbacb71f9ddcd5460787fae2041142fe661e40990b33ec34d",
+      "bytes": 1613
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/gpt-fix/version-before.log",
+      "sha256": "83e8b59a54aeb8d54f747a327c85be1915861c05e769cc950213b4f57c9073a6",
+      "bytes": 151
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/gpt-fix/version-environments.log",
+      "sha256": "55aed1564442293962b8234877650b2d2738e204d07b7dc195c5300702d21ba7",
+      "bytes": 1079
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/gpt-fix/version_probe.py",
+      "sha256": "1576581e583833c54abf11a293a90fb238b3f37664bd3bfec63f06132dc75ca7",
+      "bytes": 3235
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/gpt-fix/worker-baseline-before.log",
+      "sha256": "4aef6b26db3a0266863d8b595f94810703db72d4f97ef712a79c4f2d1ab89d73",
+      "bytes": 1116
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/matrix-check.log",
+      "sha256": "08ce4f275c99b7f91a141cfca5b7384f060aacf620f23a324cde692d55e6ffcd",
+      "bytes": 34
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/pre-registration-validate.log",
+      "sha256": "58f5500a916fdbc7186e9fabfae37588ac9b059a5fbf94708011d9551c5870fe",
+      "bytes": 221
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/receipt.json",
+      "sha256": "1838872da7618d7e6e5832eef46c847a28aaeaf993e50c213dcb0958b7b38777",
+      "bytes": 5360
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/registry-before.log",
+      "sha256": "2c3cd95e41edd8330c40afe5009c496486266ba63b059862dbe1e4cafeafe66d",
+      "bytes": 1280
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/tests.log",
+      "sha256": "fefd1f619a84bf6fc5d1ed2cdc606d06e47ce7f6ad5e8798f85baa278c02d5cc",
+      "bytes": 183
+    },
+    {
       "path": "evidence/artifacts/skills-agents-layer-20260926/README.md",
       "sha256": "dc170a49e01f35c5ab30af6f51108c8a29559294467353d156b3c626e71829f3",
       "bytes": 8407
@@ -59652,8 +59837,8 @@
     },
     {
       "path": "scripts/component_matrix.py",
-      "sha256": "ab4cbdd0521d2a42108395509589b12a82e83afef76e6377574177ff54c5d899",
-      "bytes": 72137
+      "sha256": "1c77250ae326b2cf7a8ed2dfc05ff8e83914e632960d1c426ae452cd1717642a",
+      "bytes": 80147
     },
     {
       "path": "scripts/credential_boot_receipt.py",
@@ -60536,6 +60721,11 @@
       "bytes": 51421
     },
     {
+      "path": "tests/test_gap_closeouts.py",
+      "sha256": "62eb49fd3def073928310baa5c71048f28eaa0a2cd9b1954e962aae9adafc7aa",
+      "bytes": 20025
+    },
+    {
       "path": "tests/test_gap_crosswalk.py",
       "sha256": "af5b008bbe49ad5493aac73568405442ff05d5d921b9655e2ff2caa0e8801876",
       "bytes": 5678
@@ -60734,6 +60924,11 @@
       "path": "tests/test_local_inference_latest_20260926.py",
       "sha256": "de493d86ef8944dbf5f31c5792a2f112752c02a505c22f89332322e72dabfce6",
       "bytes": 74274
+    },
+    {
+      "path": "tests/test_local_pages_architecture_landscape_exclusions.py",
+      "sha256": "1745816be2626185bbb451e6fb94c961e75c508406f21e58b32203114bb0c030",
+      "bytes": 11637
     },
     {
       "path": "tests/test_local_pages_fleet_regressions.py",
@@ -61097,8 +61292,8 @@
     },
     {
       "path": "tests/test_runtime_worker_openhands_push_gate.py",
-      "sha256": "d001a02fa54a16fe8afc749238cdc963310543bce055ff48d328f8d394339ef3",
-      "bytes": 162082
+      "sha256": "9a9d2928a28883e135bceac4cd4da72839d11bfa3bfa2b7a6801c8b2940e9b98",
+      "bytes": 161891
     },
     {
       "path": "tests/test_runtime_worker_openhands_resolver.py",

@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "kind": "shared-gap-closeouts-loader",
+  "recorded_at_utc": "2026-10-10T18:07:53Z",
+  "source_main": "9d4c00cd05d79b3fd5074df2e46bacab87ee67ff",
+  "evidence_class": "local_integration",
+  "scope": "Schema/registry/review-credit fixtures and unchanged historical matrix counts; no layer closeout or vendor runtime qualification.",
+  "inputs": [
+    {"path": "scripts/component_matrix.py", "sha256": "7cab7e416cf833b69a68abe810b8d2afbea47bb5c10ae0a6b7e581be5c129a94"},
+    {"path": "tests/test_gap_closeouts.py", "sha256": "68c9cacc9d4a6e77b05e268c1d739a6e26dda2dcd7b3906d246a336548eee637"},
+    {"path": "catalogs/landscape/gap-closeouts/schema.json", "sha256": "7cbe1df401f07b472b7074bfb8321297fed0a2a009623814f49eb47c683e0f27"},
+    {"path": ".github/requirements-ci.txt", "sha256": "33f5626de125815129498eb607a8cb7c717e016c759b3df9eb0bdd4f4b9d7d6c"}
+  ],
+  "upstream": {
+    "repository": "https://github.com/python-jsonschema/jsonschema",
+    "tag": "v4.26.0",
+    "source_commit": "a7277432b0f7bcd0551f6e589d30457017125df4",
+    "installed_version": "4.26.0",
+    "installed_and_pinned_validators_sha256": "97f171b995b4b0ca05530a9366a1252fb1753f99f3cb7b1068b6d9aab1096fa5",
+    "supported_api": "Draft202012Validator.check_schema and iter_errors",
+    "install": "uv pip install --python <schema-env>/bin/python --require-hashes -r <compiled-jsonschema-requirements>",
+    "install_exit_code": 0,
+    "upstream_full_nox_suite": "not run; this receipt covers the repository's actual supported-API fixture use"
+  },
+  "runs": [
+    {
+      "command": "nice -n 10 ionice -c 3 python3 -m unittest tests.test_gap_closeouts.GapCloseoutTests.test_unregistered_evidence_is_refused tests.test_gap_closeouts.GapCloseoutTests.test_missing_reason_is_refused tests.test_gap_closeouts.GapCloseoutTests.test_unknown_status_is_refused tests.test_gap_closeouts.GapCloseoutTests.test_public_matrix_build_consumes_shared_closeouts",
+      "phase": "before implementation",
+      "native_exit_code": 1,
+      "tests": 4,
+      "failures": 4,
+      "measurement": "Three required refusals were absent; the public matrix count was 1 instead of 0.",
+      "log": "before.log",
+      "log_sha256": "d0802241f45a28862eaa65656a3a83543b7f6507809ae7c48a795b68e39889ad"
+    },
+    {
+      "command": "nice -n 10 ionice -c 3 <schema-env>/bin/python -m unittest tests.test_gap_closeouts.GapCloseoutTests.test_receipt_can_be_registered_in_both_manifest_sections",
+      "phase": "before the receipt/files compatibility correction",
+      "native_exit_code": 1,
+      "tests": 1,
+      "errors": 1,
+      "measurement": "The initial candidate refused the repository's established equal-hash receipt/files mirrors. The correction accepts matching mirrors and refuses conflicting bindings.",
+      "log": "registry-before.log",
+      "log_sha256": "2c3cd95e41edd8330c40afe5009c496486266ba63b059862dbe1e4cafeafe66d"
+    },
+    {
+      "command": "nice -n 10 ionice -c 3 <schema-env>/bin/python -m unittest tests.test_gap_closeouts tests.test_component_matrix tests.test_osv_lockfile_coverage.LockfileInventoryTests",
+      "phase": "final implementation",
+      "native_exit_code": 0,
+      "tests": 84,
+      "skipped": 0,
+      "log": "tests.log",
+      "log_sha256": "fefd1f619a84bf6fc5d1ed2cdc606d06e47ce7f6ad5e8798f85baa278c02d5cc"
+    },
+    {
+      "command": "nice -n 10 ionice -c 3 <schema-env>/bin/python scripts/component_matrix.py --check",
+      "native_exit_code": 0,
+      "rows": 32,
+      "log": "matrix-check.log",
+      "log_sha256": "08ce4f275c99b7f91a141cfca5b7384f060aacf620f23a324cde692d55e6ffcd"
+    },
+    {
+      "command": "nice -n 10 ionice -c 3 <schema-env>/bin/python scripts/validate.py",
+      "mode": "FULL",
+      "phase": "before refreshing changed source registrations",
+      "native_exit_code": 1,
+      "measurement": "The CI-requirements and component-matrix registrations had old SHA-256/byte counts; those existing registrations are refreshed before the final FULL run.",
+      "log": "pre-registration-validate.log",
+      "log_sha256": "58f5500a916fdbc7186e9fabfae37588ac9b059a5fbf94708011d9551c5870fe"
+    }
+  ],
+  "unchanged_main_files": [
+    {"path": "catalogs/landscape/gap-crosswalk-92bb279.json", "sha256": "bb354c43a6d318c26eaeb889baa30b8006c23a0f3de2e6dfc123d999ad1726b8"},
+    {"path": "catalogs/landscape/component-evidence-matrix.json", "sha256": "7c68cc6e9e0001e4953ad08c6dec86cca462a5ca9787e5d1035a90f515f27885"},
+    {"path": "docs/component-evidence-matrix.md", "sha256": "0fad007a8e9568b4271e2ac2b1996a57dd1fa52883f902b8c784eeca07e968a7"},
+    {"path": "catalogs/landscape/new-host-grand-list.json", "sha256": "45da8044fb6c582b08b59dc3e7ba835bf5cb89251048d8f13bd47940d3a0a278"},
+    {"path": "docs/new-host-grand-list.md", "sha256": "e8d75bcab6363af4946da59220a8adc9110c50fe42622d0bfeec8a7154162956"}
+  ],
+  "log_normalization": "Native fail-before tracebacks retain their assertions/results while worktree and schema-environment prefixes use placeholders.",
+  "remaining_gates": ["final registered-tree FULL validation", "PR-range gitleaks", "hosted CI", "designated two-family reads", "CC landing"],
+  "boundaries": ["No layer closeouts or review verdicts are fabricated", "No broker, provider, model, login or protected trading-state execution", "Layer PR conformity waits for this loader to land"]
+}

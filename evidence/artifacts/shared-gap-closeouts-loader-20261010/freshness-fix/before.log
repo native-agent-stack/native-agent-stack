@@ -1,0 +1,17 @@
+.........................................................s.............................E......................................................
+======================================================================
+ERROR: test_calendar_install_precedes_tests_in_every_mode (tests.test_workflow_hardening.SessionCalendarTestPrerequisites.test_calendar_install_precedes_tests_in_every_mode) (workflow='catalog-freshness.yml')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_workflow_hardening.py", line 1050, in test_calendar_install_precedes_tests_in_every_mode
+    step = step_block(job, install_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKTREE>/tests/test_workflow_hardening.py", line 87, in step_block
+    hit = next(i for i, line in enumerate(lines) if name_fragment in line and re.search(r"\bname:", line))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+StopIteration
+
+----------------------------------------------------------------------
+Ran 142 tests in 17.236s
+
+FAILED (errors=1, skipped=1)

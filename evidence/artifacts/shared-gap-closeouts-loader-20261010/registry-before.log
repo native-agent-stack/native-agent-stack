@@ -1,0 +1,21 @@
+E
+======================================================================
+ERROR: test_receipt_can_be_registered_in_both_manifest_sections (tests.test_gap_closeouts.GapCloseoutTests.test_receipt_can_be_registered_in_both_manifest_sections)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_gap_closeouts.py", line 166, in test_receipt_can_be_registered_in_both_manifest_sections
+    self.assertEqual(cm.gap_counts_by_layer(self.current())[("us-equities", "fixture")], 0)
+                                            ^^^^^^^^^^^^^^
+  File "<WORKTREE>/tests/test_gap_closeouts.py", line 77, in current
+    return loader(self.root, self.historical) if loader else deepcopy(self.historical)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKTREE>/scripts/component_matrix.py", line 258, in current_gap_document
+    require(record["path"] not in registry, "duplicate evidence registration")
+  File "<WORKTREE>/scripts/catalog_decisions.py", line 38, in require
+    raise InvalidDecisionIndex(message)
+scripts.catalog_decisions.InvalidDecisionIndex: duplicate evidence registration
+
+----------------------------------------------------------------------
+Ran 1 test in 0.094s
+
+FAILED (errors=1)

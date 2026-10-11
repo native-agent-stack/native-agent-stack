@@ -1,0 +1,14 @@
+Native assertion at local unpublished candidate 0c254892fb8b8f9541e2416c8bc3948dda9ef500, exit 1.
+The emitted inventory JSON is omitted; this is the complete failure conclusion.
+FAIL: test_advisory_baseline_and_explicit_categories_stay_bounded_on_this_repository (tests.test_runtime_worker_openhands_push_gate.RepositoryWorkflowTests.test_advisory_baseline_and_explicit_categories_stay_bounded_on_this_repository)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_runtime_worker_openhands_push_gate.py", line 1260, in test_advisory_baseline_and_explicit_categories_stay_bounded_on_this_repository
+    self.assertEqual(scripts(advisory.unclassified), baseline_scripts)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Count[232 chars]y': 18, 'tools/sota-convergence/blind_checkout[981 chars]: 1}) != Count[232 chars]y': 14, 'tools/sota-convergence/blind_checkout[981 chars]: 1})
+
+----------------------------------------------------------------------
+Ran 1 test in 5.905s
+
+FAILED (failures=1)

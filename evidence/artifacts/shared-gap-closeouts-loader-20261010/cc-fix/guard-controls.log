@@ -1,0 +1,80 @@
+self-registration caught=True failures=1 errors=0
+test_unregistered_closeout_is_refused (tests.test_gap_closeouts.GapCloseoutTests.test_unregistered_closeout_is_refused) ... FAIL
+
+======================================================================
+FAIL: test_unregistered_closeout_is_refused (tests.test_gap_closeouts.GapCloseoutTests.test_unregistered_closeout_is_refused)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_gap_closeouts.py", line 227, in test_unregistered_closeout_is_refused
+    with self.assertRaisesRegex(InvalidDecisionIndex, "unregistered closeout"):
+AssertionError: InvalidDecisionIndex not raised
+
+----------------------------------------------------------------------
+Ran 1 test in 0.021s
+
+FAILED (failures=1)
+open-gap caught=True failures=1 errors=0
+test_nonopen_historical_gap_is_refused (tests.test_gap_closeouts.GapCloseoutTests.test_nonopen_historical_gap_is_refused) ... FAIL
+
+======================================================================
+FAIL: test_nonopen_historical_gap_is_refused (tests.test_gap_closeouts.GapCloseoutTests.test_nonopen_historical_gap_is_refused)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_gap_closeouts.py", line 235, in test_nonopen_historical_gap_is_refused
+    with self.assertRaisesRegex(InvalidDecisionIndex, "not an open historical gap"):
+AssertionError: InvalidDecisionIndex not raised
+
+----------------------------------------------------------------------
+Ran 1 test in 0.016s
+
+FAILED (failures=1)
+filename caught=True failures=1 errors=0
+test_filename_must_match_the_declared_layer_and_date (tests.test_gap_closeouts.GapCloseoutTests.test_filename_must_match_the_declared_layer_and_date) ... FAIL
+
+======================================================================
+FAIL: test_filename_must_match_the_declared_layer_and_date (tests.test_gap_closeouts.GapCloseoutTests.test_filename_must_match_the_declared_layer_and_date)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_gap_closeouts.py", line 241, in test_filename_must_match_the_declared_layer_and_date
+    with self.assertRaisesRegex(InvalidDecisionIndex, "filename"):
+AssertionError: InvalidDecisionIndex not raised
+
+----------------------------------------------------------------------
+Ran 1 test in 0.017s
+
+FAILED (failures=1)
+calendar-date caught=True failures=1 errors=0
+test_calendar_date_must_exist (tests.test_gap_closeouts.GapCloseoutTests.test_calendar_date_must_exist) ... FAIL
+
+======================================================================
+FAIL: test_calendar_date_must_exist (tests.test_gap_closeouts.GapCloseoutTests.test_calendar_date_must_exist)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_gap_closeouts.py", line 248, in test_calendar_date_must_exist
+    with self.assertRaisesRegex(InvalidDecisionIndex, "invalid gap closeout date"):
+AssertionError: InvalidDecisionIndex not raised
+
+----------------------------------------------------------------------
+Ran 1 test in 0.022s
+
+FAILED (failures=1)
+historical-layer caught=True failures=0 errors=1
+test_historical_layer_must_exist (tests.test_gap_closeouts.GapCloseoutTests.test_historical_layer_must_exist) ... ERROR
+
+======================================================================
+ERROR: test_historical_layer_must_exist (tests.test_gap_closeouts.GapCloseoutTests.test_historical_layer_must_exist)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_gap_closeouts.py", line 256, in test_historical_layer_must_exist
+    self.current()
+  File "<WORKTREE>/tests/test_gap_closeouts.py", line 88, in current
+    return loader(self.root, self.historical) if loader else deepcopy(self.historical)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<component-matrix-control>", line 297, in current_gap_document
+KeyError: ('us-equities', 'absent-layer')
+
+----------------------------------------------------------------------
+Ran 1 test in 0.019s
+
+FAILED (errors=1)
+guard-removal controls: 5 of 5 caught

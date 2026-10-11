@@ -1,0 +1,288 @@
+{
+  "schema_version": 1,
+  "kind": "shared-gap-closeouts-first-gpt-correction",
+  "recorded_at_utc": "2026-10-11T01:53:34Z",
+  "reviewed_parent": "ad2e1b1ac4fc9c71a9a8a18a052813fa5f72b14c",
+  "review_verdict": {
+    "file": "GPT-VERDICT.md",
+    "bytes": 20861,
+    "sha256": "2c070d8e00c9ac5556853f804b3be83c2c7bb1d45e1ad96b2df2fc34011fe4d8",
+    "verdict": "changes_requested",
+    "findings": [
+      "P2-1 receipt/files optional mirrors",
+      "P2-2 installed jsonschema version"
+    ]
+  },
+  "scope": "Integrity and dependency refusals in the shared loader; no layer closeouts, review credit, runtime qualification, host acceptance or trading promotion.",
+  "inputs": [
+    {
+      "path": "scripts/component_matrix.py",
+      "sha256": "1c77250ae326b2cf7a8ed2dfc05ff8e83914e632960d1c426ae452cd1717642a",
+      "bytes": 80147
+    },
+    {
+      "path": "tests/test_gap_closeouts.py",
+      "sha256": "62eb49fd3def073928310baa5c71048f28eaa0a2cd9b1954e962aae9adafc7aa",
+      "bytes": 20025
+    },
+    {
+      "path": "catalogs/landscape/gap-closeouts/schema.json",
+      "sha256": "7cbe1df401f07b472b7074bfb8321297fed0a2a009623814f49eb47c683e0f27",
+      "bytes": 3073
+    },
+    {
+      "path": ".github/requirements-ci.txt",
+      "sha256": "33f5626de125815129498eb607a8cb7c717e016c759b3df9eb0bdd4f4b9d7d6c",
+      "bytes": 12577
+    }
+  ],
+  "before_loader": {
+    "git_object": "ad2e1b1ac4fc9c71a9a8a18a052813fa5f72b14c:scripts/component_matrix.py",
+    "sha256": "967c64e6caa1ecbb801329bf0b134aeee111a19d6d71faa31802e94f5aabf07e",
+    "measurement": "Working-tree production loader was byte-identical to this object while the new regression methods ran."
+  },
+  "outputs": [
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/gpt-fix/after.log",
+      "sha256": "18ef389c5d2444ace7a5fc986945607331c907f9621282d1e1727b641e1eb78c",
+      "bytes": 1317
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/gpt-fix/before.log",
+      "sha256": "6ee07ee75c80e0e81742da5609ad81ca5de40728acbb5b910f847cebead5f60a",
+      "bytes": 6441
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/gpt-fix/modules.log",
+      "sha256": "3ad842ad45059e47bb1a759faeff0fce53ce60e812a7123d1166a28edf9b41d8",
+      "bytes": 274
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/gpt-fix/path-alias-proof.json",
+      "sha256": "1defe79604747e711a32670267f41f91630b01cd132495204ec9f8098dd98d7c",
+      "bytes": 2555
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/gpt-fix/source-proof.json",
+      "sha256": "b0eaa680cdb5d16dbacb71f9ddcd5460787fae2041142fe661e40990b33ec34d",
+      "bytes": 1613
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/gpt-fix/version-before.log",
+      "sha256": "83e8b59a54aeb8d54f747a327c85be1915861c05e769cc950213b4f57c9073a6",
+      "bytes": 151
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/gpt-fix/version-environments.log",
+      "sha256": "55aed1564442293962b8234877650b2d2738e204d07b7dc195c5300702d21ba7",
+      "bytes": 1079
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/gpt-fix/version_probe.py",
+      "sha256": "1576581e583833c54abf11a293a90fb238b3f37664bd3bfec63f06132dc75ca7",
+      "bytes": 3235
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/gpt-fix/worker-baseline-before.log",
+      "sha256": "4aef6b26db3a0266863d8b595f94810703db72d4f97ef712a79c4f2d1ab89d73",
+      "bytes": 1116
+    }
+  ],
+  "sources": [
+    {
+      "bytes": 34091,
+      "installed_bytes_equal": true,
+      "path": "Lib/importlib/metadata/__init__.py",
+      "pin": "v3.13.16",
+      "repository": "python/cpython",
+      "sha256": "5476c7c22a65f9e8b5a07b799336d87fa70e792758fd95b161b53b530e3b2654",
+      "symbols": [
+        {
+          "end_line": 58,
+          "name": "PackageNotFoundError",
+          "start_line": 49
+        },
+        {
+          "end_line": 987,
+          "name": "version",
+          "start_line": 980
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/python/cpython/v3.13.16/Lib/importlib/metadata/__init__.py"
+    },
+    {
+      "bytes": 3941,
+      "installed_bytes_equal": true,
+      "metadata_version_calls": [
+        "\"removed in a future release. Use importlib.metadata directly \"",
+        "from importlib import metadata",
+        "return metadata.version(\"jsonschema\")"
+      ],
+      "path": "jsonschema/__init__.py",
+      "pin": "a7277432b0f7bcd0551f6e589d30457017125df4",
+      "repository": "python-jsonschema/jsonschema",
+      "sha256": "a7e470e134bfd0e3c76482722260d6b1d5a099de823d61cc5cbabb06e4314c67",
+      "symbols": [
+        {
+          "end_line": 105,
+          "name": "__getattr__",
+          "start_line": 27
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/python-jsonschema/jsonschema/a7277432b0f7bcd0551f6e589d30457017125df4/jsonschema/__init__.py"
+    }
+  ],
+  "supported_install": {
+    "command": "<CI_ENV>/bin/python -m pip install --only-binary=:all: --require-hashes -r .github/requirements-ci.txt",
+    "exit_code": 0,
+    "python": "3.13.16",
+    "jsonschema": "4.26.0"
+  },
+  "runs": [
+    {
+      "phase": "before",
+      "evidence_class": "synthetic",
+      "command": "nice -n 10 ionice -c 3 <CI_ENV>/bin/python -m unittest -v tests.test_gap_closeouts.GapCloseoutTests.test_conflicting_receipt_hash_mirror_is_refused tests.test_gap_closeouts.GapCloseoutTests.test_conflicting_receipt_byte_mirror_is_refused tests.test_gap_closeouts.GapCloseoutTests.test_matching_receipt_mirrors_keep_file_registration_authoritative tests.test_gap_closeouts.GapCloseoutTests.test_importable_wrong_jsonschema_version_is_refused_before_loading_documents tests.test_gap_closeouts.GapCloseoutTests.test_missing_jsonschema_distribution_is_actionable_before_loading_documents tests.test_gap_closeouts.GapCloseoutTests.test_receipt_metadata_uses_the_registered_file_hash tests.test_gap_closeouts.GapCloseoutTests.test_no_closeouts_preserve_current_historical_counts_and_bytes",
+      "exit_code": 1,
+      "tests": 7,
+      "assertion_failures": 6,
+      "errors": 0,
+      "skipped": 0,
+      "log": "evidence/artifacts/shared-gap-closeouts-loader-20261010/gpt-fix/before.log",
+      "measurement": "Hash-only and hash+length conflicts, length-only and length+hash conflicts, importable wrong-version metadata and missing metadata were accepted. Equal mirrors, metadata-only receipts and no-record behavior passed."
+    },
+    {
+      "phase": "after final source",
+      "evidence_class": "synthetic",
+      "command": "nice -n 10 ionice -c 3 <CI_ENV>/bin/python -m unittest -v tests.test_gap_closeouts.GapCloseoutTests.test_conflicting_receipt_hash_mirror_is_refused tests.test_gap_closeouts.GapCloseoutTests.test_conflicting_receipt_byte_mirror_is_refused tests.test_gap_closeouts.GapCloseoutTests.test_matching_receipt_mirrors_keep_file_registration_authoritative tests.test_gap_closeouts.GapCloseoutTests.test_importable_wrong_jsonschema_version_is_refused_before_loading_documents tests.test_gap_closeouts.GapCloseoutTests.test_missing_jsonschema_distribution_is_actionable_before_loading_documents tests.test_gap_closeouts.GapCloseoutTests.test_receipt_metadata_uses_the_registered_file_hash tests.test_gap_closeouts.GapCloseoutTests.test_no_closeouts_preserve_current_historical_counts_and_bytes",
+      "exit_code": 0,
+      "tests": 7,
+      "errors": 0,
+      "skipped": 0,
+      "log": "evidence/artifacts/shared-gap-closeouts-loader-20261010/gpt-fix/after.log",
+      "measurement": "All required refusals and compatibility controls pass. Version failure occurs before schema/document loads and returns no modified document."
+    },
+    {
+      "phase": "required modules",
+      "evidence_class": "local_integration",
+      "command": "nice -n 10 ionice -c 3 <CI_ENV>/bin/python -m unittest tests.test_gap_closeouts tests.test_component_matrix tests.test_validate",
+      "exit_code": 0,
+      "tests": 174,
+      "skipped": 0,
+      "per_module": {
+        "gap_closeouts": 26,
+        "component_matrix": 64,
+        "validate": 84
+      },
+      "log": "evidence/artifacts/shared-gap-closeouts-loader-20261010/gpt-fix/modules.log",
+      "log_scope": "Complete captured stdout/stderr, including all progress dots."
+    },
+    {
+      "phase": "actual wrong distribution before",
+      "evidence_class": "synthetic",
+      "command": [
+        "nice",
+        "-n",
+        "10",
+        "ionice",
+        "-c",
+        "3",
+        "/usr/bin/python3",
+        "-"
+      ],
+      "cwd": "<WORKTREE>",
+      "stdin": "import importlib.metadata\nimport json\nimport sys\nfrom tests.test_gap_closeouts import GapCloseoutTests\nfixture = GapCloseoutTests()\nfixture.setUp()\ntry:\n    fixture.save()\n    current = fixture.current()\n    print(json.dumps({'phase': 'before', 'parent': 'ad2e1b1ac4fc9c71a9a8a18a052813fa5f72b14c', 'python': sys.version.split()[0], 'jsonschema': importlib.metadata.version('jsonschema'), 'result': current['layers'][0]['gaps'][0]['status']}))\n    assert current['layers'][0]['gaps'][0]['status'] == 'settled_by_closeout'\nfinally:\n    fixture.doCleanups()\n",
+      "exit_code": 0,
+      "python": "3.14.4",
+      "jsonschema": "4.19.2",
+      "result": "settled_by_closeout",
+      "log": "evidence/artifacts/shared-gap-closeouts-loader-20261010/gpt-fix/version-before.log"
+    },
+    {
+      "phase": "actual installed environments after",
+      "evidence_class": "synthetic",
+      "command": "nice -n 10 ionice -c 3 <CI_ENV>/bin/python evidence/artifacts/shared-gap-closeouts-loader-20261010/gpt-fix/version_probe.py --wrong-python /usr/bin/python3 --missing-python <DEFAULT_PYTHON>",
+      "exit_code": 0,
+      "log": "evidence/artifacts/shared-gap-closeouts-loader-20261010/gpt-fix/version-environments.log",
+      "cases": [
+        {
+          "python": "3.13.16",
+          "jsonschema": "4.26.0",
+          "outcome": "accepted",
+          "child_exit_code": 0,
+          "open_count": 0
+        },
+        {
+          "python": "3.14.4",
+          "jsonschema": "4.19.2",
+          "outcome": "refused",
+          "child_exit_code": 3,
+          "document_returned": false
+        },
+        {
+          "python": "3.13.16",
+          "jsonschema": "missing",
+          "outcome": "refused",
+          "child_exit_code": 3,
+          "document_returned": false
+        },
+        {
+          "python": "3.13.16",
+          "jsonschema": "missing",
+          "records": 0,
+          "outcome": "accepted",
+          "child_exit_code": 0,
+          "open_count": 1
+        }
+      ],
+      "measurement": "The wrong and missing distributions fail with the supported hash-pinned install command; the no-record path remains usable without jsonschema. Every case preserves the historical input."
+    },
+    {
+      "phase": "native integration before receipt variable separation",
+      "evidence_class": "local_integration",
+      "source_commit": "0c254892fb8b8f9541e2416c8bc3948dda9ef500",
+      "command": "nice -n 10 ionice -c 3 <CI_ENV>/bin/python -m unittest tests.test_runtime_worker_openhands_push_gate.RepositoryWorkflowTests.test_advisory_baseline_and_explicit_categories_stay_bounded_on_this_repository",
+      "exit_code": 1,
+      "tests": 1,
+      "failures": 1,
+      "log": "evidence/artifacts/shared-gap-closeouts-loader-20261010/gpt-fix/worker-baseline-before.log",
+      "measurement": "Native derivation identified four receipt metadata statements named path as additional advisory locations; count 334 versus baseline 330, unchanged 98 shapes and zero unresolved. The emitted inventory JSON is omitted from the labelled failure excerpt."
+    },
+    {
+      "phase": "native candidate control after receipt_path separation",
+      "evidence_class": "local_integration",
+      "command": "GitTree(ROOT, c830f0fbedb7ca72da87009fe14e139f2b30a4d8) -> derive_ci_protected(tree); compare native per-script counts and shape multiplicities with the unchanged snapshot.",
+      "exit_code": 0,
+      "count": 330,
+      "shapes": 98,
+      "unresolved": 0,
+      "log": "evidence/artifacts/shared-gap-closeouts-loader-20261010/gpt-fix/path-alias-proof.json",
+      "measurement": "An unreferenced native git commit-tree object supplies the candidate source required by GitTree's commit-only interface. No branch update and no worker/baseline edit. Final committed-head assertion remains due."
+    }
+  ],
+  "implementation": "files[] alone supplies bindings. Optional receipt sha256/bytes fields only check those bindings and refuse inconsistencies. Installed distribution version is checked exactly before importing the validator and loading documents on a nonempty-closeout path.",
+  "correction_to_prior_claim": "The metadata-only receipt correction did not verify optional receipt mirrors. These negative and equal-mirror fixtures now cover that omitted contract; the old files[] duplicate test was a distinct guard.",
+  "worker_baseline": {
+    "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261004.json",
+    "sha256": "8752740817bb41c1a582e33fa475e4ce4064f2ccfecadb706bce40ecb4512157",
+    "locations": 330,
+    "shapes": 98,
+    "changed": false
+  },
+  "log_normalization": "Absolute worktree/interpreter prefixes use placeholders; trailing line whitespace and final newlines are canonicalized. Assertions and actual exits are retained. modules.log is complete captured stdout/stderr. worker-baseline-before.log is explicitly a failure conclusion with the large emitted inventory JSON omitted.",
+  "remaining_at_receipt_time": [
+    "final registered-tree FULL validate",
+    "final committed-head native worker assertion",
+    "PR-range gitleaks",
+    "exact-lease publication",
+    "GPT micro at the new head",
+    "CC disposition of prior Claude PASS",
+    "hosted CI and assigned CC landing"
+  ],
+  "boundaries": [
+    "No outcome analysis or provider/broker execution",
+    "No change to frozen crosswalk, counts, host exports or worker policy",
+    "No upstream full nox-suite claim"
+  ],
+  "integration_correction": "Use receipt_path for the receipt's string key, distinct from the existing filesystem Path iterator named path. The supported native inventory preserves 330/98 and zero unresolved without changing snapshot 87527408. The failed unpublished candidate assertion and candidate-only source derivation are retained separately."
+}

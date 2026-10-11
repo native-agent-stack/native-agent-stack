@@ -1251,17 +1251,15 @@ class RepositoryWorkflowTests(unittest.TestCase):
         def shapes_by_script(shapes):
             return Counter((location.rsplit(":", 1)[0], tuple(values)) for location, values in shapes.items())
 
-        # The historical receipt traced test_catalogs as a gate script before root
-        # shard discovery identified it as a test module. derive_ci_protected omits
-        # test modules from gate-script import tracing; retain the receipt and assert
-        # this exact eight-location correction, with every other expectation intact.
+        # The dated snapshot is regenerated through the native derivation for the
+        # current source, including discovery's separation of test modules.
         baseline_scripts = scripts(baseline["unclassified"])
-        self.assertEqual(baseline_scripts.pop("tests/test_catalogs.py"), 8)
+        self.assertNotIn("tests/test_catalogs.py", baseline_scripts)
         self.assertEqual(derived.files.get("tests/test_catalogs.py"), "ci_discovered")
         self.assertEqual(scripts(advisory.unclassified), baseline_scripts)
         self.assertEqual(shapes_by_script(advisory.unclassified_shapes),
                          shapes_by_script(baseline["unclassified_shapes"]))
-        self.assertEqual(len(advisory.unclassified), baseline["count"] - 8)
+        self.assertEqual(len(advisory.unclassified), baseline["count"])
         self.assertNotIn("", derived.prefixes)
         self.assertTrue(all(self.g.gate_reads.static_dir(pattern) for pattern in derived.globs), derived.globs)
         protected = self.g.Protected([derived], self.g.policy_tests(tree))

@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "kind": "shared-closeouts-freshness-install-correction",
+  "recorded_at_utc": "2026-10-10T21:04:26Z",
+  "evidence_class": "local_integration",
+  "reviewed_parent": "8f933e5720aa411d8426fe4fae17eedc278b2e74",
+  "scope": "Restore the pinned calendar installation and add a separate hash-pinned jsonschema installation before the freshness suite; correct the historical-log current-source citation.",
+  "upstream": [
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "pin": "c4f4990737c4e2ed8f0452d069e25a460f897bb5",
+      "path": ".github/workflows/catalog-freshness.yml",
+      "line": 55,
+      "mechanism": "Existing three-line calendar step, restored byte-for-byte"
+    },
+    {
+      "repository": "pypa/pip",
+      "tag": "26.2.1",
+      "path": "src/pip/_internal/cli/cmdoptions.py",
+      "line": 1255,
+      "mechanism": "Supported --require-hashes option; installed client and same-tag official source agree"
+    },
+    {
+      "repository": "python-jsonschema/jsonschema",
+      "pin": "a7277432b0f7bcd0551f6e589d30457017125df4",
+      "tag": "v4.26.0",
+      "path": "README.rst",
+      "line": 76,
+      "mechanism": "Supported pip install path; existing exact-version, hash-pinned requirements-ci.txt installs the schema library"
+    }
+  ],
+  "installation": {
+    "calendar_step_name": "Install the hash-locked session calendar",
+    "calendar_step_byte_identical": true,
+    "calendar_command": "python3 -m pip install --require-hashes --only-binary=:all: -r .github/requirements-calendar.txt",
+    "schema_step_name": "Install hash-locked jsonschema for closeout validation",
+    "schema_command": "python3 -m pip install --require-hashes --only-binary=:all: --index-url https://pypi.org/simple -r .github/requirements-ci.txt",
+    "requirements_file_unchanged": true,
+    "requirements_ci_sha256": "33f5626de125815129498eb607a8cb7c717e016c759b3df9eb0bdd4f4b9d7d6c"
+  },
+  "before": {
+    "command": "env PATH=<ci-env>/bin:<existing-PATH> nice -n 10 ionice -c 3 <ci-env>/bin/python -m unittest tests.test_workflow_hardening",
+    "tests": 142,
+    "errors": 1,
+    "skipped": 1,
+    "exit_code": 1,
+    "measurement": "The calendar-install regression raises StopIteration because the pinned step name is absent.",
+    "log": "before.log",
+    "sha256": "ed7e1765c495de45fd44e613e6eb59c440b02d6befb1ff82c3337a380d6d477b"
+  },
+  "after": {
+    "command": "env PATH=<ci-env>/bin:<existing-PATH> nice -n 10 ionice -c 3 <ci-env>/bin/python -m unittest tests.test_workflow_hardening tests.test_gap_closeouts",
+    "tests": 163,
+    "skipped": 1,
+    "workflow_tests": 142,
+    "closeout_tests": 21,
+    "exit_code": 0,
+    "log": "after.log",
+    "sha256": "585894909b7185a550995a1e1162a3d518234d3ec1dc2622a9b8ca6c2875913a"
+  },
+  "regression_test_file_unchanged": true,
+  "baseline_carryover": {
+    "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261004.json",
+    "bytes_unchanged": true,
+    "sha256": "8752740817bb41c1a582e33fa475e4ce4064f2ccfecadb706bce40ecb4512157",
+    "locations": 330,
+    "shape_entries": 98,
+    "native_working_workflow_overlay_locations_equal": true,
+    "native_working_workflow_overlay_shapes_equal": true,
+    "enforced_unresolved": 0,
+    "ack": "Prior runtime-workers ACK carries over under the CC's byte-preservation ruling.",
+    "snapshot_source_metadata": "The retained dated snapshot describes its earlier capture; the current modified workflow was checked separately through the unchanged native derivation."
+  },
+  "citation_correction": {
+    "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/before.log",
+    "current_assertion": "tests/test_gap_closeouts.py:298",
+    "historical_trace_line": 200,
+    "raw_failure_trace_preserved": true,
+    "sha256": "9573bf7b1125ae1b457913fd00154b219d9477c908efc3650c35682158fac5e1",
+    "linked_original_receipt_hash_refreshed": true
+  },
+  "hosted_failure": {
+    "check": "validate-shard-5",
+    "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/38084029593/job/114306634418",
+    "check_state": "FAILURE",
+    "log_download_exit_code": 1,
+    "log_capture": "Unavailable; the exact-parent local reproduction supplies the retained trace."
+  },
+  "remaining_at_capture": [
+    "Register all changed evidence/source files",
+    "FULL validator on final registered bytes",
+    "ONE forward commit and exact-8f933e57 lease push",
+    "New-head designated reads, hosted CI and CC landing"
+  ]
+}

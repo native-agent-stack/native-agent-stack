@@ -1,0 +1,50 @@
+FFFF
+======================================================================
+FAIL: test_unregistered_evidence_is_refused (tests.test_gap_closeouts.GapCloseoutTests.test_unregistered_evidence_is_refused)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_gap_closeouts.py", line 84, in test_unregistered_evidence_is_refused
+    with self.assertRaisesRegex(InvalidDecisionIndex, "unregistered"):
+         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: InvalidDecisionIndex not raised
+
+======================================================================
+FAIL: test_missing_reason_is_refused (tests.test_gap_closeouts.GapCloseoutTests.test_missing_reason_is_refused)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_gap_closeouts.py", line 90, in test_missing_reason_is_refused
+    with self.assertRaisesRegex(InvalidDecisionIndex, "reason"):
+         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: InvalidDecisionIndex not raised
+
+======================================================================
+FAIL: test_unknown_status_is_refused (tests.test_gap_closeouts.GapCloseoutTests.test_unknown_status_is_refused)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_gap_closeouts.py", line 96, in test_unknown_status_is_refused
+    with self.assertRaisesRegex(InvalidDecisionIndex, "status"):
+         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: InvalidDecisionIndex not raised
+
+======================================================================
+FAIL: test_public_matrix_build_consumes_shared_closeouts (tests.test_gap_closeouts.GapCloseoutTests.test_public_matrix_build_consumes_shared_closeouts)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_gap_closeouts.py", line 200, in test_public_matrix_build_consumes_shared_closeouts
+    self.assertEqual(document["rows"][0]["open_executable_now_gaps"], 0)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.093s
+
+FAILED (failures=4)
+
+Source citation correction, 2026-10-10: the public-count assertion corresponding
+to this historical run was tests/test_gap_closeouts.py:298 at that correction.
+The native traceback's line 200 records its earlier execution-time location;
+that historical trace is preserved, rather than presented as the current source line.
+
+Source citation correction, 2026-10-11: the same public-count assertion is now
+tests/test_gap_closeouts.py:363 after the optional-mirror and version regressions.
+The historical execution-time traceback remains unchanged.

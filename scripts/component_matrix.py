@@ -30,7 +30,9 @@ and writes them.
 from __future__ import annotations
 
 import argparse
+from copy import deepcopy
 from datetime import date
+import hashlib
 import json
 from pathlib import Path
 import re
@@ -39,14 +41,14 @@ try:
     from . import host_receipts
     from . import platform_status as platform_evidence
     from . import saturation_ledger
-    from .catalog_decisions import InvalidDecisionIndex, load, safe_file, unique_json
+    from .catalog_decisions import InvalidDecisionIndex, load, require, safe_file, unique_json
     from .landscape import ENFORCED_PLATFORMS, PLATFORM_KEYS
     from .validate import PRIVATE_CONTENT
 except ImportError:  # running as a plain script, not a package
     import host_receipts
     import platform_status as platform_evidence
     import saturation_ledger
-    from catalog_decisions import InvalidDecisionIndex, load, safe_file, unique_json
+    from catalog_decisions import InvalidDecisionIndex, load, require, safe_file, unique_json
     from landscape import ENFORCED_PLATFORMS, PLATFORM_KEYS
     from validate import PRIVATE_CONTENT
 
@@ -66,6 +68,8 @@ SCOPE = (
 LANDSCAPE_FILES = host_receipts.LANDSCAPE_CATALOGS
 DECISIONS_FILE = "catalogs/foundation/decisions.json"
 GAP_CROSSWALK_FILE = "catalogs/landscape/gap-crosswalk-92bb279.json"
+GAP_CLOSEOUT_DIR = "catalogs/landscape/gap-closeouts"
+GAP_CLOSEOUT_SCHEMA = GAP_CLOSEOUT_DIR + "/schema.json"
 STACK_FILE = "manifests/stack.json"
 ADJUDICATION_TEMPLATE = "evidence/artifacts/layer-verdicts-20260922/adjudication/{catalog}-{layer_id}-20260922.json"
 
@@ -221,6 +225,142 @@ def open_gap_counts_by_layer(gap_crosswalk_doc: dict | None) -> dict[tuple[str, 
             counts[(layer["catalog"], layer["layer_id"])] = sum(
                 1 for gap in layer.get("gaps", []) or [] if isinstance(gap, dict) and gap.get("status") == "open")
     return counts
+
+
+def current_gap_document(root: Path, historical: dict | None) -> dict | None:
+    """Apply registered, reviewed closeouts to a copy of the frozen crosswalk.
+
+    Shape validation uses jsonschema 4.26.0's supported Draft202012Validator:
+    python-jsonschema/jsonschema a7277432b0f7bcd0551f6e589d30457017125df4,
+    jsonschema/validators.py:307 (check_schema), :349 (iter_errors).
+    Hashes establish integrity; the two retained PR verdicts supply review credit.
+    """
+    directory = safe_file(root, GAP_CLOSEOUT_DIR)
+    paths = sorted(directory.glob("*.json")) if directory.is_dir() else []
+    paths = [path for path in paths if path.name != "schema.json"]
+    current = deepcopy(historical)
+    if not paths:
+        return current
+
+    # CPython v3.13.16 Lib/importlib/metadata/__init__.py:980 reads the
+    # installed version; PackageNotFoundError (:49) identifies an absent package.
+    # jsonschema a7277432b0f7bcd0551f6e589d30457017125df4 uses this same API
+    # in jsonschema/__init__.py; the exact approved pin is requirements-ci.txt.
+    from importlib.metadata import PackageNotFoundError, version
+    install = "python3 -m pip install --only-binary=:all: --require-hashes -r .github/requirements-ci.txt"
+    try:
+        installed = version("jsonschema")
+    except PackageNotFoundError as error:
+        raise InvalidDecisionIndex(f"gap closeouts require jsonschema==4.26.0; distribution missing; {install}") from error
+    require(installed == "4.26.0",
+            f"gap closeouts require jsonschema==4.26.0; installed {installed}; {install}")
+    from jsonschema import Draft202012Validator
+
+    schema = load(root, GAP_CLOSEOUT_SCHEMA)
+    Draft202012Validator.check_schema(schema)
+    validator = Draft202012Validator(schema)
+    crosswalk_sha256 = hashlib.sha256(safe_file(root, GAP_CROSSWALK_FILE).read_bytes()).hexdigest()
+    original_layers = {(row["catalog"], row["layer_id"]): row
+                       for row in (historical or {}).get("layers", [])}
+    current_layers = {(row["catalog"], row["layer_id"]): row
+                      for row in (current or {}).get("layers", [])}
+    manifest = load(root, "manifests/evidence.json")
+    registry = {}
+    # receipts[] is descriptive metadata; validate.py requires each receipt path
+    # to have its actual hash/byte registration in files[].
+    for record in manifest.get("files", []):
+        if isinstance(record, dict) and isinstance(record.get("path"), str):
+            prior = registry.get(record["path"])
+            require(prior is None or (prior.get("sha256"), prior.get("bytes"))
+                    == (record.get("sha256"), record.get("bytes")),
+                    "conflicting evidence registration")
+            registry[record["path"]] = record
+
+    # Optional receipt hash/byte mirrors must agree with files[]; metadata-only
+    # receipts remain descriptive and never create or replace a registration.
+    for receipt in manifest.get("receipts", []):
+        if not isinstance(receipt, dict) or not any(field in receipt for field in ("sha256", "bytes")):
+            continue
+        receipt_path = receipt.get("path")
+        require(isinstance(receipt_path, str) and receipt_path in registry, "unregistered receipt mirror")
+        record = registry[receipt_path]
+        require(all(receipt[field] == record.get(field) for field in ("sha256", "bytes") if field in receipt),
+                f"conflicting receipt mirror: {receipt_path}")
+
+    def verified(path, digest, label):
+        require(path in registry, f"unregistered {label}: {path}")
+        target = safe_file(root, path)
+        require(target.is_file(), f"missing {label}: {path}")
+        raw = target.read_bytes()
+        record = registry[path]
+        require(hashlib.sha256(raw).hexdigest() == digest == record.get("sha256")
+                and record.get("bytes") == len(raw), f"changed {label}: {path}")
+        return raw
+
+    records = []
+    for path in paths:
+        relative = path.relative_to(root).as_posix()
+        document = load(root, relative)
+        errors = sorted(validator.iter_errors(document), key=lambda error: str(list(error.path)))
+        require(not errors, f"invalid gap closeout {relative}: "
+                + "; ".join(f"{list(error.path)} {error.message}" for error in errors))
+        require(path.name == f"{document['layer_id']}-{document['date']}.json",
+                "gap closeout filename must name its layer and date")
+        try:
+            date.fromisoformat(document["date"])
+        except ValueError as error:
+            raise InvalidDecisionIndex("invalid gap closeout date") from error
+        verified(relative, hashlib.sha256(path.read_bytes()).hexdigest(), "closeout")
+        require(document["source_crosswalk_sha256"] == crosswalk_sha256,
+                "gap closeout historical crosswalk changed")
+        key = (document["catalog"], document["layer_id"])
+        require(key in original_layers, "gap closeout has no historical layer")
+        records.append((document["date"], relative, key, document))
+
+    for _day, relative, key, document in sorted(records):
+        original_gaps = {gap["index"]: gap for gap in original_layers[key]["gaps"]}
+        current_gaps = {gap["index"]: gap for gap in current_layers[key]["gaps"]}
+        seen = set()
+        for entry in document["gaps"]:
+            index = entry["index"]
+            require(index in original_gaps and index not in seen, "unknown or duplicate gap index")
+            seen.add(index)
+            source = original_gaps[index]
+            require(source["status"] == "open", "gap closeout source is not an open historical gap")
+            require(entry["source_text_sha256"] == hashlib.sha256(source["text"].encode()).hexdigest(),
+                    "gap closeout source text changed")
+            for evidence in entry["evidence"]:
+                verified(evidence["path"], evidence["sha256"], "evidence")
+            reviews = []
+            for reference in entry["reviews"]:
+                raw = verified(reference["path"], reference["sha256"], "review")
+                try:
+                    report = json.loads(raw, object_pairs_hook=unique_json)
+                except (UnicodeError, ValueError) as error:
+                    raise InvalidDecisionIndex("gap review must be a retained JSON verdict") from error
+                require(isinstance(report, dict)
+                        and report.get("family") == reference["family"]
+                        and report.get("head") == reference["head"]
+                        and report.get("verdict") in ("pass", "changes_requested"),
+                        "gap review metadata does not match retained verdict")
+                reviews.append((reference, report["verdict"]))
+            review_credit = (
+                {ref["family"] for ref, verdict in reviews if verdict == "pass"} == {"gpt", "claude"}
+                and all(verdict == "pass" for _ref, verdict in reviews)
+                and len({ref["head"] for ref, _verdict in reviews}) == 1
+                and len({ref["sha256"] for ref, _verdict in reviews}) >= 2
+            )
+            if entry["status"] == "settled":
+                require(review_credit,
+                        "settled gap needs passing GPT and Claude verdicts at the same head; use proposed or residual")
+            gap = current_gaps[index]
+            effective_status = entry["status"] if review_credit else "proposed"
+            if effective_status != "proposed":
+                gap.update(status="settled_by_closeout" if effective_status == "settled" else "open",
+                           category=entry.get("category", source["category"]))
+            gap.update(closeout_ref=relative, closeout_status=effective_status,
+                       closeout_reason=entry["reason"])
+    return current
 
 
 def repository_to_component_id(stack_doc: dict | None) -> dict[str, str]:
@@ -866,7 +1006,7 @@ def build_convergence_summary(rows: list[dict], context: dict) -> dict:
 def build_document(root: Path):
     decisions_doc = load_optional(root, DECISIONS_FILE)
     decisions = decisions_by_component(decisions_doc)
-    gap_doc = load_optional(root, GAP_CROSSWALK_FILE)
+    gap_doc = current_gap_document(root, load_optional(root, GAP_CROSSWALK_FILE))
     gap_counts = gap_counts_by_layer(gap_doc)
     open_gap_counts = open_gap_counts_by_layer(gap_doc)
     stack_doc = load_optional(root, STACK_FILE)

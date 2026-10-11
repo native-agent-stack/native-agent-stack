@@ -1,0 +1,122 @@
+{
+  "schema_version": 1,
+  "kind": "shared-closeouts-landing-rebase",
+  "recorded_at_utc": "2026-10-10T20:13:13Z",
+  "source_main": "c4f4990737c4e2ed8f0452d069e25a460f897bb5",
+  "evidence_class": "local_integration",
+  "scope": "Four-commit landing replay, supported registry regeneration, native worker snapshot refresh and the required source-module gate.",
+  "upstream": [
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "pin": "c4f4990737c4e2ed8f0452d069e25a460f897bb5",
+      "path": "blueprints/runtime-workers/openhands/resolver/push_gate.py",
+      "line": 664
+    },
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "pin": "c4f4990737c4e2ed8f0452d069e25a460f897bb5",
+      "path": "blueprints/runtime-workers/openhands/resolver/patch_policy.py",
+      "line": 55
+    }
+  ],
+  "inputs": [
+    {
+      "path": "scripts/component_matrix.py",
+      "sha256": "967c64e6caa1ecbb801329bf0b134aeee111a19d6d71faa31802e94f5aabf07e"
+    },
+    {
+      "path": ".github/workflows/catalog-freshness.yml",
+      "sha256": "fd79eeb0f5da540bebf5fa0ced6682a689fba6ed627670ebac24b937ebe5bd59"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/resolver/push_gate.py",
+      "sha256": "a39e0eaea70801a198c6cb5d9fac4cd8731c33a25003dc43a90c5a3d770379aa"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/resolver/gate_reads.py",
+      "sha256": "6fe148d0e60d60c097db311e7106b7e6cc2bb9952d81c54dd11979a2ff94e4e8"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/resolver/patch_policy.py",
+      "sha256": "6941086835b3dfca788ab8f6e578e8a9dd6c1fcf162a4d68a9270a32bca57219"
+    },
+    {
+      "path": "tests/test_runtime_worker_openhands_push_gate.py",
+      "sha256": "6e2d22a103404a5367cb4dd0abca30f68bf341306e32ebab5e2ad876b5dcd404"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261004.json",
+      "sha256": "8752740817bb41c1a582e33fa475e4ce4064f2ccfecadb706bce40ecb4512157"
+    }
+  ],
+  "registry": "Exact new-main manifest; own files registered by host_receipts.register_file; both supported report writers and evidence_manifest.py --write. No hand merge.",
+  "baseline": {
+    "native_derivation": "load_gate(ROOT); GitTree(HEAD); derive_ci_protected(tree).advisory",
+    "locations": 330,
+    "shape_entries": 98,
+    "sha256": "8752740817bb41c1a582e33fa475e4ce4064f2ccfecadb706bce40ecb4512157",
+    "previous_locations": 330,
+    "previous_shape_entries": 98,
+    "previous_path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/cc-fix/pre-main-advance-worker-baseline.json",
+    "previous_sha256": "04a245baf20ec34bfb33e76f0692bab6047331723a5c4f8da38f2da5fcf9a64c",
+    "delta": "Thirteen blind_checkout.py locations and associated shape keys shift by two lines; per-script location counts and shape multiplicities are unchanged.",
+    "acknowledgment": "Required on the final exact candidate; earlier request superseded."
+  },
+  "required_modules": {
+    "command": "env PATH=<ci-env>/bin:<existing-PATH> nice -n 10 ionice -c 3 <ci-env>/bin/python -m unittest tests.test_gap_closeouts tests.test_component_matrix tests.test_runtime_worker_openhands_push_gate tests.test_start_closure_sampler tests.test_landscape_sweep_skills tests.test_saturation_ledger tests.test_lane_packets",
+    "tests": 552,
+    "skipped": 2,
+    "exit_code": 0,
+    "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/cc-fix/landing-required-modules.log",
+    "sha256": "c217338fd08df5f69e749a34b307fd5c216a27608076ebc32d5d486906910e48"
+  },
+  "old_baseline_control": {
+    "method": "The native named advisory-baseline test, with only its snapshot read replaced by the retained original pre-fix snapshot. Production source remains unchanged.",
+    "tests": 1,
+    "failures": 1,
+    "errors": 0,
+    "caught": true,
+    "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/cc-fix/landing-old-baseline-control.log",
+    "sha256": "093cf8b69eb93e6f17af8c29bc5c87a658467f508c3dc414e8dc2420e0443a0f"
+  },
+  "main_byte_comparisons": [
+    {
+      "path": "catalogs/landscape/gap-crosswalk-92bb279.json",
+      "sha256": "bb354c43a6d318c26eaeb889baa30b8006c23a0f3de2e6dfc123d999ad1726b8",
+      "equals_main": true
+    },
+    {
+      "path": "catalogs/landscape/component-evidence-matrix.json",
+      "sha256": "7c68cc6e9e0001e4953ad08c6dec86cca462a5ca9787e5d1035a90f515f27885",
+      "equals_main": true
+    },
+    {
+      "path": "docs/component-evidence-matrix.md",
+      "sha256": "0fad007a8e9568b4271e2ac2b1996a57dd1fa52883f902b8c784eeca07e968a7",
+      "equals_main": true
+    },
+    {
+      "path": "catalogs/landscape/new-host-grand-list.json",
+      "sha256": "45da8044fb6c582b08b59dc3e7ba835bf5cb89251048d8f13bd47940d3a0a278",
+      "equals_main": true
+    },
+    {
+      "path": "docs/new-host-grand-list.md",
+      "sha256": "e8d75bcab6363af4946da59220a8adc9110c50fe42622d0bfeec8a7154162956",
+      "equals_main": true
+    }
+  ],
+  "base_counts": {
+    "executable_now": 238,
+    "open": 355
+  },
+  "historical_observation": "cc-fix/receipt.json describes the earlier main-based observations; its prior snapshot input bytes are now separately retained at previous_path above.",
+  "remaining_at_capture": [
+    "Final registered-tree FULL validation",
+    "exact-candidate worker ACK",
+    "PR-range Gitleaks",
+    "fresh-main fetch",
+    "one exact-published-head lease push",
+    "designated new-head reads and CC landing"
+  ]
+}

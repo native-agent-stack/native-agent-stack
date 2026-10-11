@@ -1,0 +1,12 @@
+test_conflicting_receipt_hash_mirror_is_refused (tests.test_gap_closeouts.GapCloseoutTests.test_conflicting_receipt_hash_mirror_is_refused) ... ok
+test_conflicting_receipt_byte_mirror_is_refused (tests.test_gap_closeouts.GapCloseoutTests.test_conflicting_receipt_byte_mirror_is_refused) ... ok
+test_matching_receipt_mirrors_keep_file_registration_authoritative (tests.test_gap_closeouts.GapCloseoutTests.test_matching_receipt_mirrors_keep_file_registration_authoritative) ... ok
+test_importable_wrong_jsonschema_version_is_refused_before_loading_documents (tests.test_gap_closeouts.GapCloseoutTests.test_importable_wrong_jsonschema_version_is_refused_before_loading_documents) ... ok
+test_missing_jsonschema_distribution_is_actionable_before_loading_documents (tests.test_gap_closeouts.GapCloseoutTests.test_missing_jsonschema_distribution_is_actionable_before_loading_documents) ... ok
+test_receipt_metadata_uses_the_registered_file_hash (tests.test_gap_closeouts.GapCloseoutTests.test_receipt_metadata_uses_the_registered_file_hash) ... ok
+test_no_closeouts_preserve_current_historical_counts_and_bytes (tests.test_gap_closeouts.GapCloseoutTests.test_no_closeouts_preserve_current_historical_counts_and_bytes) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.129s
+
+OK
