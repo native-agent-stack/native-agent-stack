@@ -98,7 +98,7 @@ class PolicyGrantDerivation(unittest.TestCase):
                     subprocess, "run", return_value=mock.Mock(stdout=tracked + extra.encode() + b"\0")):
                 self.test_committed_repository_grants_match_current_git_inventory_paths()
 
-    def test_inventory_check_still_refuses_missing_extra_replaced_and_duplicate_grants(self):
+    def test_inventory_check_refuses_missing_extra_replaced_and_duplicate_grants(self):
         tracked = subprocess.run(["git", "ls-files", "-z"], cwd=ROOT, check=True, capture_output=True).stdout
         manifest = json.loads((ROOT / "catalogs/landscape/manifest.json").read_text())
         original = json.loads((ROOT / "tools/local-pages/source_policy.json").read_text())
