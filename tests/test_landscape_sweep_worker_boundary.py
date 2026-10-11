@@ -86,9 +86,21 @@ class LoopbackMessages(http.server.BaseHTTPRequestHandler):
                                  for part in message.get("content", [])
                                  if isinstance(part, dict) and part.get("type") == "tool_result"],
             })
-            content = (self.server.requested_tools[len(self.server.requests) - 1]
-                       if len(self.server.requests) <= len(self.server.requested_tools) else
-                       {"type": "text", "text": "fixture completed"})
+            workflow = getattr(self.server, "workflow_script", None)
+            if workflow and "Workflow" in self.server.requests[-1]["tools"]:
+                if not self.server.workflow_started:
+                    self.server.workflow_started = True
+                    content = {"type": "tool_use", "id": "toolu_workflow", "name": "Workflow",
+                               "input": {"script": workflow}}
+                else:
+                    content = {"type": "text", "text": "fixture coordinator completed"}
+            else:
+                requests = self.server.child_requests if workflow else self.server.requests
+                if workflow:
+                    requests.append(self.server.requests[-1])
+                content = (self.server.requested_tools[len(requests) - 1]
+                           if len(requests) <= len(self.server.requested_tools) else
+                           {"type": "text", "text": "fixture completed"})
             payload = response_events(content, body["model"], len(self.server.requests))
             self.send_response(200)
             self.send_header("Content-Type", "text/event-stream")
@@ -136,7 +148,8 @@ class RoleCopiesTests(unittest.TestCase):
 
 @unittest.skipUnless(CLAUDE, "native Claude Code is not installed")
 class NativeToolAdmissionTests(unittest.TestCase):
-    def run_native(self, name, args_factory, *, mcp=False, skill=False, next_tool=None, deferred=False):
+    def run_native(self, name, args_factory, *, mcp=False, skill=False, next_tool=None,
+                   deferred=False, workflow=False):
         with tempfile.TemporaryDirectory(prefix="ns-landscape-ownership-") as directory:
             work = Path(directory)
             scratch = work / "scratchpad"
@@ -152,6 +165,13 @@ class NativeToolAdmissionTests(unittest.TestCase):
             agent_file.write_text(json.dumps(role_definition()), encoding="utf-8")
             server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), LoopbackMessages)
             server.requests = []
+            server.child_requests = []
+            server.workflow_started = False
+            server.workflow_script = (
+                'export const meta = {name:"ownership-fixture",description:"Native role boundary"};\n'
+                'return await agent("fixture tool admission",{agentType:"landscape-sweep-worker",'
+                'model:"sonnet",effort:"max"});'
+                if workflow else None)
             server.requested_tools = [{"type": "tool_use", "id": "toolu_fixture_1",
                                        "name": name, "input": args_factory(scratch)}]
             if next_tool:
@@ -182,6 +202,16 @@ class NativeToolAdmissionTests(unittest.TestCase):
                        "--output-format", "stream-json", "--no-session-persistence",
                        "--setting-sources", "", "--permission-mode", "bypassPermissions",
                        "--permission-prompts", "none", "--max-turns", "3", "fixture tool admission"]
+            if workflow:
+                position = command.index("--agent")
+                del command[position:position + 2]
+                # Production Workflow resolves the installed user-scope role.
+                # Use a verbatim copy in this isolated config, never host agents.
+                role_dir = work / "config/agents"
+                role_dir.mkdir(parents=True)
+                (role_dir / ROLE.name).write_bytes(ROLE.read_bytes())
+                command[command.index("--setting-sources") + 1] = "user"
+                command += ["--settings", '{"enableWorkflows":true,"ultracode":true}']
             if skill:
                 # Bare mode omits Skill from the native registry. This case
                 # uses only a fresh config dir and explicit empty MCP config.
@@ -189,7 +219,7 @@ class NativeToolAdmissionTests(unittest.TestCase):
                     command[command.index("--setting-sources") + 1] = "user"
                 if not mcp:
                     command += ["--mcp-config", '{"mcpServers":{}}', "--strict-mcp-config"]
-            else:
+            elif not workflow:
                 command.insert(1, "--bare")
             if mcp:
                 script = work / "mcp_fixture.py"
@@ -207,15 +237,18 @@ class NativeToolAdmissionTests(unittest.TestCase):
                 thread.join(timeout=2)
             self.assertEqual(done.returncode, 0, done.stderr[-1000:] + done.stdout[-2000:])
             self.assertGreaterEqual(len(server.requests), 2, done.stdout[-2000:])
-            results = server.requests[-1]["tool_results"]
+            requests = server.child_requests if workflow else server.requests
+            self.assertGreaterEqual(len(requests), 2, done.stdout[-2000:])
+            results = requests[-1]["tool_results"]
             self.assertTrue(results, done.stdout[-2000:])
             return {
                 "preserved": all(path.is_file() and hashlib.sha256(path.read_bytes()).hexdigest() == original[suffix]
                                  for suffix, path in foreign.items()),
                 "own_preserved": own.read_text() == "OWN_CODE\n",
-                "advertised": server.requests[0]["tools"],
+                "advertised": requests[0]["tools"],
                 "results": results,
                 "mcp_invoked": (scratch / "mcp-calls.jsonl").exists(),
+                "workflow_dispatched": server.workflow_started,
             }
 
     def test_wildcard_delete_preserves_foreign_scratch_files(self):
@@ -248,6 +281,27 @@ class NativeToolAdmissionTests(unittest.TestCase):
         self.assertTrue(observed["preserved"])
         self.assertFalse(observed["results"][0].get("is_error", False))
         self.assertIn("FOREIGN_CODE", json.dumps(observed["results"]))
+
+    def test_workflow_agent_type_preserves_the_native_role_boundary(self):
+        cases = [
+            ("Bash", lambda s: {"command": "rm -f " + shlex.quote(str(s / "foreign.py"))}),
+            (CTX + "ctx_execute", lambda s: {"language": "python", "code": "fixture delete"}),
+            ("Read", lambda s: {"file_path": str(s / "foreign.py")}),
+        ]
+        for name, arguments in cases:
+            with self.subTest(tool=name):
+                observed = self.run_native(name, arguments, mcp=True, workflow=True)
+                self.assertTrue(observed["workflow_dispatched"])
+                self.assertTrue(observed["preserved"])
+                self.assertTrue(observed["own_preserved"])
+                self.assertNotIn("Bash", observed["advertised"])
+                self.assertNotIn(CTX + "ctx_execute", observed["advertised"])
+                self.assertFalse(observed["mcp_invoked"])
+                if name == "Read":
+                    self.assertFalse(observed["results"][0].get("is_error", False))
+                    self.assertIn("FOREIGN_CODE", json.dumps(observed["results"]))
+                else:
+                    self.assertTrue(observed["results"][0].get("is_error"))
 
     def test_context_fetch_index_and_search_remain_available(self):
         for tool in ("ctx_fetch_and_index", "ctx_index", "ctx_search"):

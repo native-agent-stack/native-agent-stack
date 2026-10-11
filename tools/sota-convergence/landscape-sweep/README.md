@@ -242,7 +242,7 @@ Why the roles are split this way:
 - The Claude judgment roles run as the **`landscape-sweep-worker`** agent type (`adoption/agents/claude/landscape-sweep-worker.md`): Opus at effort max, with `disallowedTools: WebFetch`.
   - Correction #138 (2026-10-10) replaces tool inheritance with the native role `tools` allowlist: Read, Glob, Grep, WebSearch, ToolSearch and context-mode's `ctx_fetch_and_index`, `ctx_index`, `ctx_search`. Pages and public GitHub REST GET responses are indexed primary source text. Large local inputs use `ctx_index` followed by bounded `ctx_search`.
   - Workers apply the named skills by reading their installed SKILL.md source. The native Skill tool is excluded: its dynamic shell context executed a foreign-file delete despite the shell being absent from the tool list in a native 2.1.296 regression. Merely keeping Skill while excluding Bash does not establish this boundary.
-  - The SubagentStart token-lanes hook injects no carrier for this role: its body already supplies web, indexing and source-reading skill guidance through the admitted tools.
+  - The SubagentStart and SessionStart token-lanes hooks inject no carrier for this role: its body already supplies web, indexing and source-reading skill guidance through the admitted tools. Hosts that opted into either held-out carrier must refresh it with the explicit hook prerequisite below.
   - Scratch preparation and cleanup belong to the coordinator and command-only GPT wrappers. Judgment workers have no shell, file-writing, arbitrary-code MCP or further-agent tools, so they cannot delete shared scratch files. This does not restrict the command-only wrappers or impose an OS sandbox on the coordinator.
   - The supported seam is Claude Code 2.1.296's [subagent tool allowlist](https://code.claude.com/docs/en/sub-agents#available-tools). The [decision and native regression](../../../docs/decisions/2026-10-10-landscape-scratch-ownership.md) record why a Bash-only delete hook was insufficient.
   - The worker prompts no longer mention WebFetch.
@@ -552,7 +552,7 @@ provides it.
 
 The prerequisites:
 - a Claude Code coordinator session with the Workflow tool (this repository's `.claude/settings.json` turns Ultracode on);
-- the `landscape-sweep-worker` agent installed (`python3 tools/adoption/install_claude_profile.py --only agents`);
+- the `landscape-sweep-worker` agent installed (`python3 tools/adoption/install_claude_profile.py --only agents`); hosts that opted into the held-out token-lanes carriers also refresh both with `python3 tools/adoption/install_claude_profile.py --only guard --hook token-lanes-subagent-start.py --hook token-lanes-session-start.py` (these carriers remain opt-in);
 - `gh` signed in;
 - `codex` on PATH, signed in natively;
 - node and python3.

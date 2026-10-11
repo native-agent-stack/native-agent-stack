@@ -5381,7 +5381,7 @@
     },
     {
       "path": "adoption/hooks/claude/SHA256SUMS",
-      "sha256": "e4cab95c2061295dfc3ca3b73a0a1a7c88b2770ed95051ca3218898361920e1a",
+      "sha256": "7980c6bc7ebd2759f6dc6337f0d3b753f6cbbb94b2be0d4d5b475acf6b6462e7",
       "bytes": 1229
     },
     {
@@ -5426,8 +5426,8 @@
     },
     {
       "path": "adoption/hooks/claude/token-lanes-session-start.py",
-      "sha256": "e6e3151d27e439a9392e1f3673f1168b6fb60a9c8b8616af01fff2b163757839",
-      "bytes": 1653
+      "sha256": "4df357c44a4cdff5999ce46044a9a7655553289d178529e958126fea6dc38fcb",
+      "bytes": 1657
     },
     {
       "path": "adoption/hooks/claude/token-lanes-subagent-start.py",
@@ -18577,8 +18577,8 @@
     },
     {
       "path": "docs/decisions/2026-10-10-landscape-scratch-ownership.md",
-      "sha256": "9edab4d478d3fcca052b42e6bb3dc87ee800726e60a32df0fe9c97f80ee9869d",
-      "bytes": 9258
+      "sha256": "909c48edba8f935c8102656f463a840950a3e885657d2fd2da973c8dbfb3c2a9",
+      "bytes": 12263
     },
     {
       "path": "docs/decisions/2026-10-10-openhands-shard-discovery-protection.md",
@@ -18992,8 +18992,8 @@
     },
     {
       "path": "docs/token-session-handbook.md",
-      "sha256": "aec069f49d6fa9692b0b17444b5b209004d3bfd7d8c98d3ab06dcff25954e554",
-      "bytes": 113465
+      "sha256": "43c1f0618319542a5b4fd339fb84aba82379f836244348389854e88cde1c260a",
+      "bytes": 113488
     },
     {
       "path": "docs/ultracode-token-routing-20260921.md",
@@ -60672,8 +60672,8 @@
     },
     {
       "path": "tests/test_landscape_sweep_worker_boundary.py",
-      "sha256": "9b20adf13969c5e9abbbcdc8abdf4db1e18e59fd1d0217f9421ba99ae0b59611",
-      "bytes": 16122
+      "sha256": "59c6dd453374e9fff0dfedd9dc432f14ef1644e8d58b2279f558df9bb6b53c3d",
+      "bytes": 19315
     },
     {
       "path": "tests/test_lane_packets.py",
@@ -61662,8 +61662,8 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/README.md",
-      "sha256": "3f22eb967b05da00c64e671e2d9adabfdda0f415d8b38f02e95e7ca963a7cc9d",
-      "bytes": 114032
+      "sha256": "dcb2832a1face75a46d74ae76b886ea9eb76ffb5a7e57e1717e4a09795a8bb67",
+      "bytes": 114402
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/build_args.py",

@@ -74,3 +74,47 @@ Public GitHub REST GET/page retrieval replaces authenticated `gh api` in this ro
 This is the judgment worker's tool boundary, not an OS filesystem sandbox. Trusted client/MCP implementations may maintain their own caches. The coordinator, native job runners and command-only wrappers retain their existing capabilities and remain responsible for their owned writes. No host installation, active role mutation, catalog change, frozen-run rewrite or rebase is part of this PR.
 
 Reconsider this decision if an upstream supported role-scoped filesystem or read-only execution boundary passes the same foreign-file regressions, including MCP execution and dynamic Skill context, while retaining authenticated research or computation. Adopt that supported mechanism after a measured comparison.
+
+## Review correction 2: SessionStart parity — 2026-10-11
+
+The GPT micro at `1c9a61fea6925910ebe49e25736efb630d201fb3` reproduced two failures
+in the existing 14-test SessionStart module: the newly silent landscape worker still received
+main-session context and the two carriers' silent sets differed. Add the exact worker name
+to SessionStart's existing silent set, preserving both assertions and the fail-open/output
+mechanism. Refresh the hook checksum and affected evidence registrations together.
+
+Pinned Claude Code 2.1.296 executable SHA256
+`24972e3bc859fab2b46ed4c1e51f7d6130f06d3bd550811a114640de3370d0de` constructs
+the SessionStart input in `AXr`, with `source` and `agent_type`, at byte218541401
+(`hook_event_name:"SessionStart"`); exact source-window and binary-hash receipts are retained.
+The [official SessionStart schema](https://code.claude.com/docs/en/hooks#sessionstart),
+captured 2026-10-11, identifies `agent_type` for `claude --agent <name>`. Both native
+entry points therefore use the same existing silence boundary. The unchanged module fails
+two assertions before this correction and passes afterward; checks use local hook subprocesses.
+The accurate researcher comparison's additional documentation regression is a P3 Follow-up
+in the PR body under the CC scope lock and is excluded from this blocker correction.
+
+The pinned source mirror `upstream/anthropics/claude-code` at
+`2301018b1f61073c501a8e7a4813ef48c239163b`, `CHANGELOG.md:7476`, records
+SessionStart's `agent_type` when `--agent` is specified; `CHANGELOG.md:6738`
+records the subagent/`--agent` hook field, and `CHANGELOG.md:5513` records that
+print mode honors the role tool frontmatter. The correction also keeps both
+handbook carriers accurate and names the explicit opt-in hook refresh beside
+the agent prerequisite. A synthetic native Workflow `agent({agentType})` case
+now exercises denied Bash/MCP execution and an admitted Read using the same
+loopback fixtures and scratch-preservation oracle as direct dispatch.
+
+The CC's skills-modality digest and anonymous GitHub-capacity/prompt-conflict
+items remain research-queue Follow-ups. Skills-modality launches are held by
+the CC until a qualified digest path exists; this correction changes no skill
+digest mechanism, coordinator credential route or frozen sweep template.
+
+The combined second correction passes241 tests with two optional skips across
+SessionStart, SubagentStart, installation/checksums, evidence registration,
+native boundary, adoption docs and practice references. The new Workflow case
+uses the production `agent(prompt,{agentType})` signature and a verbatim role
+in a fresh user config; it passes all three tool controls. The same case against
+the exact base role fails three assertions with zero errors, including both
+foreign-file deletion controls. FULL validator, hook checksums and evidence
+order checks pass. All native task traffic in these tests is synthetic loopback;
+no paid/provider research or host installation was performed.
