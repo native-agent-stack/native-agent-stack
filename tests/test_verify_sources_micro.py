@@ -21,6 +21,119 @@ FORMS = (
 
 
 class MicroTests(unittest.TestCase):
+    def test_explicit_403_size_refusal_precedes_generic_forbidden(self):
+        response = json_response(403, {"errors": [{"code": "too_large"}]})
+        rows, _ = verify(AT_FORM, {**recorded_routes(), contents_key(MOD_RS): response})
+        self.assertEqual((rows[0]["status"], V.exit_code(rows, "enforce")), ("unverifiable-size", 1))
+
+    def test_missing_commit_in_invisible_repository_is_unavailable(self):
+        for form in (AT_FORM, URL_FORM):
+            key = (f"{LYCHEE}/commits/{TAG[:12] if form == AT_FORM else TAG}", V.SHA_MEDIA)
+            with self.subTest(form=form):
+                routes = {**recorded_routes(), key: json_response(404, {}),
+                          (LYCHEE, V.JSON_MEDIA): json_response(404, {})}
+                rows, fake = verify(form, routes)
+                self.assertEqual((rows[0]["status"], V.exit_code(rows, "enforce")), (V.UNAVAILABLE, 3))
+                self.assertIn("repository not visible to this token", rows[0]["reason"])
+                self.assertEqual(fake.calls[-1][0], (LYCHEE, V.JSON_MEDIA))
+
+    def test_non_ascii_and_joiner_ranges_are_diagnostic_in_both_forms(self):
+        for form in (AT_FORM, URL_FORM):
+            single = form.replace("L23-L24", "L300")
+            for dash in tuple(chr(i) for i in range(0x2010, 0x2016)) + ("−", ",", "~"):
+                for second in ("400", "L400"):
+                    with self.subTest(form=form, dash=dash, second=second):
+                        rows, fake = verify(single + dash + second)
+                        self.assertEqual([r["status"] for r in rows], [V.NOT_CHECKED])
+                        self.assertEqual(fake.calls, [])
+
+    def test_contents_status_and_size_envelope_precedence(self):
+        # All HTTP status codes, not just the five documented for contents. Extra codes are synthetic
+        # controls for classification order, not a claim that the endpoint produces these responses.
+        for status in range(100, 600):
+            for size_error in (False, True):
+                with self.subTest(status=status, size_error=size_error):
+                    data = {"errors": [{"code": "too_large"}]} if size_error else {}
+                    response = json_response(status, data, {"content-type": V.RAW_MEDIA})
+                    rows, _ = verify(AT_FORM.replace("L23-L24", "L1"),
+                                     {**recorded_routes(), contents_key(MOD_RS): response})
+                    expected = "unverifiable-size" if size_error and status >= 400 else (
+                        "ok" if status == 200 else V.UNAVAILABLE if
+                        300 <= status < 400 or status >= 500 or status in (400, 401, 403, 408, 429)
+                        else "path-not-found")
+                    self.assertEqual(rows[0]["status"], expected)
+
+    def test_http_status_classification_at_every_reachable_step(self):
+        routes = recorded_routes()
+        for key, original in routes.items():
+            path, media = key
+            if path.endswith(TAG) and media == V.SHA_MEDIA or TAG[:12].upper() in path:
+                continue  # AT_FORM uses the lower-case abbreviation
+            for status in range(100, 600):
+                with self.subTest(step=path, status=status):
+                    response = (json_response(200, {"ref": "refs/" + path.split("/git/ref/")[1]})
+                                if status == 200 and "/git/ref/" in path else
+                                original if status == 200 else json_response(status, {}))
+                    rows, _ = verify(AT_FORM, {**routes, key: response})
+                    if status == 200:
+                        expected = "unpinned" if "/git/ref/" in path else "ok"
+                    elif 300 <= status < 400 or status >= 500 or status in (400, 401, 403, 408, 429):
+                        expected = V.UNAVAILABLE
+                    elif "/git/ref/" in path:
+                        expected = "ok" if status == 404 else V.UNAVAILABLE
+                    elif "/commits/" in path and media == V.SHA_MEDIA and not path.endswith("/master"):
+                        expected = V.SHA_UNRESOLVED if status == 422 else "commit-not-found"
+                    elif "/git/commits/" in path:
+                        expected = "commit-not-found"
+                    elif "/contents/" in path:
+                        expected = "path-not-found"
+                    elif "/compare/" in path:
+                        expected = "not-on-default-branch" if status == 404 else V.UNAVAILABLE
+                    else:
+                        expected = V.UNAVAILABLE
+                    self.assertEqual(rows[0]["status"], expected)
+
+    def test_size_refusal_keeps_rate_limit_stop_and_transport_states(self):
+        fake = Fake({contents_key(MOD_RS): json_response(403, {"errors": [{"code": "too_large"}]},
+                                                       {"x-ratelimit-remaining": "0"})})
+        github = V.GitHub(fetch=fake)
+        response = github.get(*contents_key(MOD_RS))
+        self.assertTrue(V.too_large(response))
+        self.assertIsInstance(github.get(LYCHEE), V.Unreachable)
+        self.assertEqual(len(fake.calls), 1)
+        for outcome in (TimeoutError(), OSError(), V.Unreachable("request cap")):
+            rows, _ = verify(AT_FORM, {**recorded_routes(), contents_key(MOD_RS): outcome})
+            self.assertEqual(rows[0]["status"], V.UNAVAILABLE)
+
+    def test_missing_commit_visibility_controls(self):
+        key = (f"{LYCHEE}/commits/{TAG[:12]}", V.SHA_MEDIA)
+        for status, expected in ((200, "commit-not-found"), (404, V.UNAVAILABLE), (403, V.UNAVAILABLE),
+                                 (401, V.UNAVAILABLE), (429, V.UNAVAILABLE), (500, V.UNAVAILABLE),
+                                 (302, V.UNAVAILABLE), (422, V.UNAVAILABLE)):
+            with self.subTest(status=status):
+                meta = json_response(status, {"default_branch": "master"})
+                rows, _ = verify(AT_FORM, {**recorded_routes(), key: json_response(404, {}),
+                                          (LYCHEE, V.JSON_MEDIA): meta})
+                self.assertEqual(rows[0]["status"], expected)
+
+    def test_later_hidden_404_checks_are_also_indeterminate(self):
+        for key in ((f"{LYCHEE}/git/commits/{TAG}", V.JSON_MEDIA), contents_key(MOD_RS)):
+            with self.subTest(step=key):
+                rows, _ = verify(AT_FORM, {**recorded_routes(), key: json_response(404, {}),
+                                          (LYCHEE, V.JSON_MEDIA): json_response(404, {})})
+                self.assertEqual(rows[0]["status"], V.UNAVAILABLE)
+                self.assertIn("repository not visible to this token", rows[0]["reason"])
+
+    def test_range_like_trailing_punctuation_does_not_hide_a_neighbour(self):
+        for first in (AT_FORM, URL_FORM):
+            for second in (AT_FORM, URL_FORM):
+                for joiner in (",", "~", "—", "-", "): "):
+                    rows, _ = verify(first + joiner + second.removeprefix("[mechanism] "))
+                    self.assertEqual([r["status"] for r in rows], ["ok", "ok"])
+            # An isolated dash followed by prose/end-of-token is punctuation, not a numeric range.
+            rows, _ = verify(first + "-")
+            self.assertEqual(rows[0]["status"], "ok")
+
     def test_markdown_link_colon_preserves_citation(self):
         url = URL_FORM.removeprefix("[mechanism] ")
         rows, _ = verify(f"[reference] [label]({url}): explanation")
@@ -156,6 +269,7 @@ class MicroTests(unittest.TestCase):
                   else V.Response(200, {"content-type": V.RAW_MEDIA}, b"x\n") for suffix, media in suffixes}
         routes[(old, V.JSON_MEDIA)] = json_response(200, {"id": 123, "full_name": "o/new", "default_branch": "main"})
         routes.update({(new + suffix, media): routes[(old + suffix, media)] for suffix, media in suffixes})
+        routes[(new, V.JSON_MEDIA)] = routes[(old, V.JSON_MEDIA)]
         fake = Fake(routes)
         github = V.GitHub(fetch=fake)
         original = [github.get(old + suffix, media) for suffix, media in suffixes]

@@ -35,7 +35,9 @@ Checks, in order; the first that fails sets the row's status:
   2. GET /repos/{o}/{r}/contents/{path}?ref={sha}, raw media type             else path-not-found
      The JSON media type returns no content above 1 MB, and the endpoint serves nothing above 100 MB. A directory
      comes back as application/json: path-is-directory. A body over 100 MiB, or a too_large refusal:
-     unverifiable-size.
+     unverifiable-size, before generic unavailable classification (including ordinary HTTP 403).
+     Contents response codes: github/rest-api-description@58b1e0c00b39b9e46c24dc4a0ba6a2669c90e9c1:
+     descriptions/api.github.com/api.github.com.json:L55991-L56059. No live over-limit refusal was observed.
   3. 1 <= x <= y <= the file's line count                                     else line-range-out-of-bounds
   4. Resolve and record the default branch tip SHA once per repository, then
      GET /repos/{o}/{r}/compare/{sha}...{tip SHA}?per_page=1&page=2 returns status ahead or identical with
@@ -43,8 +45,9 @@ Checks, in order; the first that fails sets the row's status:
      compare and git/commits both accept a SHA from a fork in the same repository network, so this is the check
      that puts the commit on the upstream's own history.
 A compare limitation, incomplete/oversize JSON, a 400, a timeout, a connection error, a 5xx,
-a 408 request timeout, a rate-limited 403, a 429 or a rejected token is "unavailable", with the HTTP
-code when there was one. It is never a failure status, and no failure is reported as "unavailable". lychee cannot do
+a 408 request timeout, an ordinary/rate-limited 403, a 429 or a rejected token is "unavailable", with the HTTP
+code when there was one. A commit/content/compare 404 followed by a repository 404 is also unavailable:
+the repository is not visible to this token (GitHub REST authentication, "Failed login limit"). lychee cannot do
 the line check: it deletes GitHub #L fragments before the request
 (lycheeverse/lychee@2bba271688c1abb1503097a064e6c3bc1d1b6a9b:lychee-lib/src/quirks/mod.rs:L23-L24).
 
@@ -59,7 +62,7 @@ so citing such a release is counted separately as not-on-default-branch:diverged
 and the grammar that names a tag are deferred to phase B by the plan owner's ruling. SWHID anchor/path/lines
 verification also remains deferred; phase A reports it explicitly as not-checked, never as a GitHub code citation.
 
-Budgets: at most 64 citations are checked per body (excess rows are not-checked: over the per-body cap), and at most
+Budgets: at most 64 recognized citation occurrences are checked per body (excess rows are not-checked), and at most
 256 HTTP requests per run, including redirect hops and PR retrieval. The first rate limit stops all further requests;
 remaining rows are unavailable. Raw contents are discarded after counting lines and computing the blob, so cached
 files retain only those measurements and headers. The JSON report records the limits.
@@ -148,7 +151,7 @@ CANDIDATE_START = re.compile(
     r"(?i:https?://(?:www\.)?github\.com)/[^/\s<>`'\"\[\]]+/[^/\s<>`'\"\[\]]+/blob/"
     r"|(?<![\w./@])[A-Za-z0-9-]+/[A-Za-z0-9._-]+@|swh:1:")
 CANDIDATE_END = re.compile(r"[\s<>`'\"\[\]]")
-GRAMMAR_CONTINUATION = re.compile(r"^(?:#|:L|:[0-9]|/|@|_+[^\W_]|-L|-[0-9])")
+GRAMMAR_CONTINUATION = re.compile(r"^(?:#|:L|:[0-9]|/|@|_+[^\W_]|-L|-[0-9]|[‐-―−~,]L?[0-9])")
 REPOSITORY_PIN = re.compile(r"[A-Za-z0-9-]+/[A-Za-z0-9._-]+@[^\s:<>`'\"\[\]]+")
 
 # The smoke's two public citations (the W1b primary-source review): lychee's line-fragment quirk at the
@@ -541,7 +544,7 @@ def http_reason(response, what):
 
 
 def too_large(response):
-    if response.status < 400:
+    if not isinstance(response, Response) or response.status < 400:
         return False  # successful raw source JSON is never an API error envelope
     data = json_body(response)
     errors = data.get("errors") if isinstance(data, dict) else None
@@ -637,6 +640,23 @@ def settle(row, status, reason, response=None):
     return row
 
 
+def repository_visibility(row, repository, github):
+    """A resource 404 is definitive only after this run establishes repository visibility.
+
+    GitHub REST troubleshooting, "404 Not Found for an existing resource": private resources are hidden as
+    404 to avoid confirming their existence. Metadata is cached with the same repository identity as all checks.
+    """
+    meta = github.get(repository)
+    why = transient(meta)
+    if why:
+        return settle(row, UNAVAILABLE, f"repository visibility: {why}", meta)
+    if meta.status == 404:
+        return settle(row, UNAVAILABLE, "repository not visible to this token", meta)
+    if meta.status != 200 or not isinstance(json_body(meta), dict):
+        return settle(row, UNAVAILABLE, "repository visibility could not be established", meta)
+    return None
+
+
 def verify_citation(row, citation, github):
     """Run the SHA policy and the four checks in order; the first failure settles the row."""
     status, reason = classify_ref(citation.ref)
@@ -669,6 +689,10 @@ def verify_citation(row, citation, github):
     if why:
         return settle(row, UNAVAILABLE, f"{step}: {why}", resolved)
     if resolved.status != 200:
+        if resolved.status == 404:
+            hidden = repository_visibility(row, repository, github)
+            if hidden:
+                return hidden
         if resolved.status == 422 and len(ref) < 40:
             return settle(row, SHA_UNRESOLVED,
                           "not found or ambiguous in the repository network; cite the full SHA", resolved)
@@ -687,6 +711,10 @@ def verify_citation(row, citation, github):
     if why:
         return settle(row, UNAVAILABLE, f"{step}: {why}", commit)
     if commit.status != 200:
+        if commit.status == 404:
+            hidden = repository_visibility(row, repository, github)
+            if hidden:
+                return hidden
         return settle(row, "commit-not-found", http_reason(commit, step), commit)
 
     if invalid_path(citation.path):
@@ -694,12 +722,19 @@ def verify_citation(row, citation, github):
     step = f"contents/{citation.path}"
     contents = github.get(f"{repository}/contents/{urllib.parse.quote(citation.path, safe='/')}?ref={sha}",
                           RAW_MEDIA, MAX_CONTENT_BYTES)
+    # Contents documents 403, not 422: github/rest-api-description@58b1e0c00b39b9e46c24dc4a0ba6a2669c90e9c1:
+    # descriptions/api.github.com/api.github.com.json:L55991-L56059. An explicit size error has precedence
+    # over generic forbidden; GitHub.get still stops the run if the same response identifies a rate limit.
+    if too_large(contents) or (isinstance(contents, Response) and contents.status == 200 and contents.oversize):
+        return settle(row, "unverifiable-size", f"{step}: over the 100 MB the contents endpoint serves", contents)
     why = transient(contents)
     if why:
         return settle(row, UNAVAILABLE, f"{step}: {why}", contents)
-    if too_large(contents) or (contents.status == 200 and contents.oversize):
-        return settle(row, "unverifiable-size", f"{step}: over the 100 MB the contents endpoint serves", contents)
     if contents.status != 200:
+        if contents.status == 404:
+            hidden = repository_visibility(row, repository, github)
+            if hidden:
+                return hidden
         return settle(row, "path-not-found", http_reason(contents, step), contents)
     media = contents.headers.get("content-type", "").split(";")[0].strip().lower()
     if media == "application/json":
@@ -747,6 +782,10 @@ def verify_citation(row, citation, github):
     if why:
         return settle(row, UNAVAILABLE, f"{step}: {why}", compare)
     if compare.status != 200:
+        if compare.status == 404:
+            hidden = repository_visibility(row, repository, github)
+            if hidden:
+                return hidden
         status = "not-on-default-branch" if compare.status == 404 else UNAVAILABLE
         return settle(row, status, http_reason(compare, step), compare)
     data = json_body(compare)
@@ -774,7 +813,10 @@ def unchecked_kind(text):
 
 
 def verify_body(body, github):
-    """(section content, rows): one row per code citation and one per entry without one."""
+    """(section content, rows): each recognized occurrence, each unrecognized candidate, and candidate-free entries.
+
+    The per-body cap counts recognized occurrences, including repetitions; excess occurrences retain a row.
+    """
     content = sota_section_content(body)
     rows = []
     checked = 0

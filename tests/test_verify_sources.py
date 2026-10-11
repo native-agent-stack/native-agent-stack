@@ -443,7 +443,7 @@ class ContentsTests(unittest.TestCase):
         # observed. A 200 the fetcher cut off at the cap, and a refusal carrying a too_large error code.
         cut = V.Response(200, {"content-type": "application/vnd.github.raw+json",
                                "content-length": str(V.MAX_CONTENT_BYTES + 1)}, b"", oversize=True)
-        refused = json_response(422, {"message": "This API returns blobs up to 100 MB in size.",
+        refused = json_response(403, {"message": "This API returns blobs up to 100 MB in size.",
                                       "errors": [{"resource": "Blob", "field": "data", "code": "too_large"}]})
         for name, response in (("cut", cut), ("refused", refused)):
             with self.subTest(response=name):

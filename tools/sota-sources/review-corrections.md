@@ -169,9 +169,11 @@ The integer conversion citation is
 `#define _PY_LONG_DEFAULT_MAX_STR_DIGITS 4300`; captured header SHA256
 `84c0c7bd7ba0c2fbbfb106561e32328e478d8350afe756af6a4862c95d921a06`.
 Zero padding is normalized before the file-size bound, and SHA policy again precedes
-range classification. Unfollowed 3xx and all 403 responses are indeterminate; even
-an error-shaped 403 cannot establish a citation failure. The explicit size-error
-422 and successful transport-oversize controls remain distinct.
+range classification. Unfollowed 3xx and ordinary 403 responses are indeterminate.
+The subsequent CC micro found that explicit contents `too_large` refusals need
+precedence over generic 403 classification. The original 403 fixture is restored;
+422 is only an extra synthetic classification control, not a documented contents
+response. Successful transport-oversize controls remain distinct.
 
 Successful JSON request caches retain only fields consumed by the commit/reference,
 comparison, repository and PR-body callers; large commit messages and unused arrays
@@ -198,12 +200,19 @@ URL explicitly adapted to the recorded SHA/page-2 fixture route:
 | --- | --- | --- | --- |
 | test_verify_sources | 48 | 6 | 0 |
 | test_verify_sources_review | 15 | 35 | 1 |
-| test_verify_sources_family_findings | 12 | 28 | 8 |
+| test_verify_sources_family_findings (local comparison-route adapter) | 12 | 28 | 8 |
+| test_verify_sources_family_findings (unadapted) | 12 | 29 | 7 |
 
-The CC's micro independently reports counts of 38F/1E, 35F/1E and 29F/7E
-respectively. Those are source-review observations retained in its original record;
-they were not reproduced under our explicitly adapted native harness above and
-are not substituted for our measured results. Router/missing-field errors are not
+The CC's micro independently reports 38F/1E (unadapted), 35F/1E and 29F/7E.
+Fresh isolated replay of the exact sources gives the family module **29F/7E
+unadapted**, and **28F/8E with our explicit local comparison-route adapter**.
+The existing module gives 38F/0E unadapted and 6F/0E adapted in that replay.
+Thus the family row above is retained only with its precise adapter scope; the
+CC's report that both scopes give 29F/7E is not reproduced by this adapter.
+The complete replay uses 20eac579's test fixtures and exact a46fce0d production source.
+It and the original receipts are retained. No aggregate count authenticates
+an individual fix without an intended assertion or a separate CLI reproduction.
+Router/missing-field errors are not
 presented as an intended failing assertion for a fix; individual permanent controls
 and actual CLI proofs establish those defects. The retained packet records scope.
 
@@ -218,9 +227,12 @@ redirect/rename aliases. Once repository metadata establishes its numeric id and
 full_name, existing keys migrate to that id; later aliases reuse the first metadata
 and tip snapshot. No undocumented id-based request route is used: numeric ids are
 internal cache identities, and requests keep documented owner/name endpoints.
-All three case/alias/rename controls fail on 20eac579 with intended assertions
-(wrong ancestry, nine requests rather than five, and a changed snapshot), no router
-errors. Existing same-origin/foreign-origin redirect and hop controls still apply.
+The case and moving-rename controls fail on 20eac579 with intended ancestry and
+snapshot assertions. The original learned-cache-key alias control instead failed
+through an unrouted metadata request; the prior "no router errors" claim was wrong.
+Its current fixture routes both metadata spellings as well as all endpoint spellings,
+so the replay reaches the intended nine-requests-versus-five assertion at 20eac579.
+Existing same-origin/foreign-origin redirect and hop controls still apply.
 The public lychee metadata and .git-suffix recheck are retained: canonical200,
 suffix metadata404 and suffix blob404. Thus .git is not stripped or conflated absent
 API identity evidence; distinct repository names/ref/path case keep distinct keys.
@@ -233,3 +245,57 @@ to the two cited full commits. These are fresh mappings, not reconstructed origi
 The final combined verifier suites pass 92 tests without skips on both interpreters,
 and the surrounding harness passes 123 without skips. Historical/intermediate
 measurements above remain labelled by their exact scope and head.
+
+## CC micro at 17e6789c: size precedence and visibility
+
+The next forward repair restores the documented HTTP 403 size-refusal fixture and
+checks unsuccessful contents `errors[].code == "too_large"` before generic transient
+classification. The pinned OpenAPI is
+github/rest-api-description@58b1e0c00b39b9e46c24dc4a0ba6a2669c90e9c1:descriptions/api.github.com/api.github.com.json:L55991-L56059:
+contents lists 200, 404, 403, 302 and 304, not 422. A size refusal was not observed
+live; these remain synthetic controls. Successful error-shaped raw JSON is still
+file content. A size refusal that also identifies a rate limit preserves the run's
+stop state; remaining rows cannot send requests or reuse cached results.
+
+Commit-resolution, git-commit, contents and compare 404s now probe cached repository
+metadata before they establish failure. A second 404 means `unavailable`, with
+"repository not visible to this token". A successful visible-repository probe
+preserves the established missing-resource status; malformed metadata, auth,
+rate-limit and transport failures remain indeterminate. This also addresses Codex
+thread 4241381563 at the same head. GitHub's primary troubleshooting page, "404 Not
+Found for an existing resource", explicitly documents concealing private resources.
+Its retained original page has SHA256
+`2fd859cca1eaff6fce3d3c4f35ace570dc91acbb228a823beaa9ebbe6617f1c0`.
+No inaccessible repository or credential was inspected to test that behavior.
+
+Unsupported numeric continuations using U+2010 through U+2015, U+2212, comma or
+tilde retain an explicit diagnostic, rather than checking only the first line.
+An isolated dash or dash followed by prose remains punctuation; adjacent citations
+joined by those characters still each receive a row. The cap and docstrings now
+state that recognized occurrences, including repetitions, consume the budget.
+
+Exact fail-before replay at 17e6789c gives four methods with **41 intended assertion
+failures and zero errors**: explicit 403 size (one), initial hidden 404 (two),
+unsupported ranges (36), and later hidden 404 (two). The corrected learned-alias
+fixture at 20eac579 gives **9 != 5**, one intended assertion failure, zero errors.
+Receipt-only changes correct misleading historical scope; no manufactured test of
+Markdown wording is claimed as behavioral regression coverage.
+
+One-step-wider checks enumerate HTTP 100 through 599 at every reachable REST step,
+plus both contents envelope forms, explicit size/rate-limit stop, successful raw
+JSON, transport/request-cap states, visible/invisible metadata and parser punctuation
+and joiners. Codes outside the documented endpoint set are synthetic order controls.
+Optional 405/409/410/451 semantics and repository-pin grammar remain deferred.
+
+The production callers are `main -> verify_body -> citation_candidates/verify_citation`,
+`verify_citation -> repository_visibility/too_large/transient`, and REST/PR retrieval
+callers of `transient`. Graph coverage was checked; edited-file freshness changed,
+so exact current source/AST and the executable controls verify these relationships.
+#1006's pinned workflow still consumes CLI/Markdown without status-name mapping:
+the visibility correction changes outcomes but requires no matching head change.
+
+Current proof packet:
+`~/.local/state/native-agent-stack/coordination/ns2604-coop/lanes/currency-work/pr1003-403-fix-20261011/attachments/`.
+It retains all cited sources byte-exact under `prior-packet/`, new troubleshooting
+capture, original CC micro, current threads, fail-before replay and precise baseline
+table scopes, with a complete `MANIFEST.sha256`. Prior sealed packets are unchanged.

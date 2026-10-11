@@ -49,9 +49,10 @@ class ReviewCorrectionsTests(unittest.TestCase):
         entries = [f"o/r@{n:040x}:x:L1" for n in range(1, 6)]
         fake = Fake({(f"/repos/o/r/commits/{n:040x}", V.SHA_MEDIA):
                      json_response(404, {"message": "Not Found"}) for n in range(1, 6)})
+        fake.routes[("/repos/o/r", V.JSON_MEDIA)] = json_response(200, {"default_branch": "main"})
         with mock.patch.object(V, "MAX_CITATIONS", 2, create=True):
             _, rows = V.verify_body("## SOTA sources\n- " + "\n- ".join(entries), V.GitHub(fetch=fake))
-        self.assertEqual(len(fake.calls), 2)
+        self.assertEqual(len(fake.calls), 3)  # two resolutions and one cached visibility probe
         self.assertEqual([r["status"] for r in rows[2:]], [V.NOT_CHECKED] * 3)
         self.assertTrue(all("per-body cap" in r["reason"] for r in rows[2:]))
 
