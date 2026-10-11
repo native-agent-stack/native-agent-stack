@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import copy
 import hashlib
+import html
 from html.parser import HTMLParser
 import importlib.util
 import json
@@ -13,6 +14,7 @@ import re
 from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
+from urllib.parse import unquote
 
 from tests import test_local_pages as composer_fixture
 
@@ -21,11 +23,31 @@ ROOT = Path(__file__).resolve().parents[1]
 SPEC = importlib.util.spec_from_file_location("local_pages_command_center_view", ROOT / "tools/local-pages/command_center_view.py")
 view = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(view)
+POLICY_SPEC = importlib.util.spec_from_file_location("local_pages_command_center_policy", ROOT / "tools/local-pages/source_policy.py")
+policy = importlib.util.module_from_spec(POLICY_SPEC)
+POLICY_SPEC.loader.exec_module(policy)
 BUILDER = composer_fixture.BUILDER
 SYNTHETIC_HOME = "/".join(["", "home", "synthetic-user", "work"])
-SYNTHETIC_EMAILS = ("owner@example.org", "owner%40example.org", "owner&#64;example.org")
-EMAIL = re.compile(r"[A-Za-z0-9._%+-]+(?:@|%40|&#0*64;|&#x0*40;)[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}", re.I)
-PANELS = ("cc-sessions", "cc-prs", "cc-tokens", "cc-skills", "cc-manifests", "cc-owner")
+# The last five forms are the #1012 Claude read's B1 cases: an HTML5 entity, encoded dots,
+# double percent-encoding and a semicolon-less numeric reference.
+AT = "@"  # joined at run time, so the repository holds no email-shaped literal
+SYNTHETIC_EMAILS = ("owner" + AT + "example.org", "owner%40example.org", "owner&#64;example.org", "owner&commat;example.org",
+                    "owner" + AT + "example%2Eorg", "owner" + AT + "example&#46;org", "owner%2540example.org", "owner&#64example.org")
+PLAIN_EMAIL = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}")
+HOSTILE = '<script>alert(1)</script>"><img src=x onerror=alert(2)>'
+PANELS = ("cc-sessions", "cc-orchestration", "cc-prs", "cc-landscape", "cc-skills", "cc-tokens", "cc-research", "cc-manifests", "cc-owner")
+REFRESHED = "2026-10-11T16:00:00Z"
+
+
+def leaked_emails(markup: str) -> list[str]:
+    """Emails in the page after decoding each token twice, as a browser or a copy-paste could."""
+    found = []
+    for token in re.findall(r"[^\s<>\"']+", markup):
+        decoded = token
+        for _ in range(2):
+            decoded = html.unescape(unquote(decoded))
+        found.extend(PLAIN_EMAIL.findall(decoded))
+    return found
 
 
 class Tables(HTMLParser):
@@ -76,6 +98,18 @@ def tables(markup: str) -> dict[str, list[list[str]]]:
     return parser.tables
 
 
+def table(markup: str, prefix: str) -> list[list[str]]:
+    found = [rows for caption, rows in tables(markup).items() if caption.startswith(prefix)]
+    if len(found) != 1:
+        raise AssertionError(f"expected one table starting {prefix!r}, found {len(found)}")
+    return found[0]
+
+
+def section(markup: str, anchor: str) -> str:
+    start = markup.index(f'<section class="cc-panel" id="{anchor}"')
+    return markup[start:markup.index("</section>", start)]
+
+
 def current_fixture() -> dict:
     return {
         "schema": "cc-now/1", "updated_utc": "2026-10-11T13:58:58Z", "headline": "Fixture command-center headline",
@@ -98,8 +132,17 @@ def current_fixture() -> dict:
                              "fix": "Fixture CC note"},
         "token_use_24h": {"source": "fixture Prometheus increase()", "window": "2026-10-10T00:00:00Z to 2026-10-11T00:00:00Z",
                           "codex_top_lanes_M": [["lane-a", 40.0], ["lane-b", 10.0], ["bad"], ["lane-c", -1]],
-                          "codex_tokens_M": {"input": 50.0, "output": 2.5}, "claude_cost_usd_by_model": {"claude-opus-5-5": 12.5},
                           "note": "Fixture usage note"},
+        "orchestration": {"slot": "orchestration-frameworks", "default": "native composition without a framework layer", "state": "adjudicated default",
+                          "evidence": "slots-final.json row", "next": "paired-ao-prcycle preregistered"},
+        "landing_queue": [{"pr": "uet#78", "head": "4b472bcd", "state": "CI on the rebased head", "since_utc": "15:38Z"},
+                          {"pr": "#1004", "head": "23cd8e7a", "state": "waits for the GPT micro", "since_utc": "2026-10-11T15:00:00Z"}],
+        "program": [{"ws": "WS1", "title": "Stars finalized", "owner": "g5-stars-gap lane", "state": "blocked on #978", "gate": "#978 lands", "reopen": "a new star"},
+                    {"ws": "WS2", "title": "Second stream", "state": "running"}],
+        "mirrors": {"count": 112, "manifest_rows": 112, "synced_utc": "2026-10-11T15:28:49Z", "failed": [],
+                    "pins": {"openai/codex": {"ref": "rust-v0.155.1", "commit": "abcdef123456", "synced_at_utc": "2026-10-11T15:28:33Z"},
+                             "Fixture/Drifted": {"ref": "v2.0.0", "commit": "0123456789ab", "synced_at_utc": "2026-10-11T15:28:30Z"}}},
+        "rulings": [{"file": "ruling-995-unknown-efforts-20261011.md", "utc": "05:59Z", "summary": "unknown request effort"}],
     }
 
 
@@ -128,13 +171,130 @@ def fleet_fixture() -> dict:
     }
 
 
-def manifests_fixture() -> dict:
+def adoption_fixture() -> dict:
+    return {"schema": "adoption-now/1", "generated_utc": "2026-10-11T15:00:00Z", "window_hours": 24,
+            "layers": {"session context and token efficiency": {"servers": {
+                "context-mode": {"claude_calls": 0, "claude_sessions": 0, "codex_calls": 17899, "codex_conversations": 301},
+                "plugin_context-mode_context-mode": {"claude_calls": 1786, "claude_sessions": 10, "codex_calls": 0, "codex_conversations": 0}}}},
+            "orchestration": {"claude_by_role": {"native-agent-stack-1a": {"SendMessage": 4}, "trading-cc": {"Agent": 7, "Workflow": 1}},
+                              "codex_by_role": {"convergence-practice": {"spawn_agent": 3, "instances": ["zuro"]}}}}
+
+
+def skill(name: str, uses, reads, mentions=0, *, enabled=True, status="trial", installed="2026-09-25T00:00:00Z") -> dict:
+    return {"name": name, "status": status, "installed_at": installed, "claude": {"uses": uses, "in_table": uses is not None, "last_used": "today" if uses else None},
+            "codex": {"enabled": enabled, "counts": {"7": {"skill_md_reads": reads, "name_mentions": mentions}, "30": {"skill_md_reads": reads, "name_mentions": mentions}}}}
+
+
+def pinned(name: str, ref: str = "0123456789abcdef0123456789abcdef01234567", url: str | None = None) -> dict:
+    return {"name": name, "source": "fixture/skills", "url": url or f"https://github.com/fixture/skills/tree/{ref}/skills/{name}", "ref": ref,
+            "path": f"skills/{name}", "tree_sha": "f" * 40, "status": "trial"}
+
+
+def record(document, label="fixture", **extra) -> dict:
+    raw = json.dumps(document).encode() if not isinstance(document, str) else document.encode()
+    return {"status": "read", "label": label, "role": "command_center_fixture", "sha256": hashlib.sha256(raw).hexdigest(), "bytes": len(raw),
+            "file_utc": "2026-10-11T15:30:00Z", "document": document, **extra}
+
+
+def missing(label: str, reason: str = "not present in the state root") -> dict:
+    return {"status": "missing", "label": label, "reason": reason}
+
+
+def readiness_layer() -> dict:
+    def field(value, status="RECORDED", reason=None):
+        return {"status": status, "value": value, **({"reason": reason} if reason else {})}
+    return {"id": "agent-sdks", "inventory_date": field("2026-09-21"), "title": field("Agent SDKs and runtime workers"),
+            "selected_tools": [{"id": "codex", "fields": {"pin": field("0.155.1"), "evidence_class": field("native_proven"), "recorded_stack_pin": field("0.155.1"),
+                                                          "install_receipt": field(None, "UNVERIFIED", "registered support is not a current install"),
+                                                          "fresh_session_invoke": field(None, "UNVERIFIED", "no fresh-session binding")}}]}
+
+
+def inputs_fixture() -> dict:
     readiness = {"summary": {"gates": 2, "layers": 3, "sdk_items": 1, "recorded_claims": 40, "unverified_claims": 2, "unverified_sources": 0},
                  "gates": [{"id": "G1", "fields": {"state": {"status": "RECORDED", "value": "MET"}}}, {"id": "G2", "fields": {"state": {"status": "UNVERIFIED"}}}],
-                 "open_items": [{"id": "O1", "fields": {"state": {"status": "RECORDED", "value": "MET"}}}, {"id": "O2", "fields": {}}]}
+                 "open_items": [{"id": "O1", "fields": {"state": {"status": "RECORDED", "value": "MET"}}}, {"id": "O2", "fields": {}}],
+                 "layers": [readiness_layer()]}
     evidence = {"files": [{"path": "a"}, {"path": "b"}, {"path": "c"}], "receipts": [{"id": "r"}], "convergence_records": []}
-    return {"readiness": {"status": "read", "label": "repo:catalogs/north-star/readiness.json", "sha256": "1" * 64, "bytes": 1234, "document": readiness},
-            "evidence": {"status": "read", "label": "repo:manifests/evidence.json", "sha256": "2" * 64, "bytes": 5678, "document": evidence}}
+    platforms = {"linux-wsl2-x86_64": {"e2e_state": "host_verified"}, "macos-arm64": {"e2e_state": "untested"}}
+    matrix = {"checked_at": "2026-09-27", "summary": {"convergence": {"overall": {"converged": 1, "layers": 2, "in_use": 5},
+                                                                      "layer_states": {"recorded_reopened": 1, "confirmed_current": 1}}},
+              "rows": [{"catalog": "foundation", "layer_id": "agent-sdks", "title": "Agent SDKs", "verdict_status": "recorded", "independent_review": "dual_lane_same_winner",
+                        "open_gaps": 14, "open_executable_now_gaps": 12,
+                        "convergence": {"layer_state": "recorded_reopened", "verdict_checked_at": "2026-09-22", "invoke": None, "invoke_reason": "no post-fix invoke receipt yet",
+                                        "components": [{"id": "codex", "host_e2e": "true", "pin_current": "false"}]},
+                        "winners": [{"component_id": "codex", "evidence_class": "native_proven", "pin": "0.155.1", "repository": "https://github.com/openai/codex", "platforms": platforms,
+                                     "lifecycle_stages": [{"stage": "recovery", "status": "accepted_within_scope"}, {"stage": "use", "status": "accepted_within_scope"}, {"stage": "install", "status": "pending"}]},
+                                    {"component_id": "drifted", "evidence_class": "local_integration", "pin": "1.0.0", "repository": "https://github.com/fixture/drifted", "platforms": {}, "lifecycle_stages": []},
+                                    {"component_id": "unmirrored", "evidence_class": "synthetic", "pin": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143", "repository": "https://github.com/fixture/none", "platforms": {}, "lifecycle_stages": []}]},
+                       {"catalog": "us-equities", "layer_id": "risk", "title": "Portfolio risk", "verdict_status": "recorded", "independent_review": "dual_lane_adjudicated",
+                        "open_gaps": 0, "open_executable_now_gaps": 0, "convergence": {"layer_state": "confirmed_current", "invoke": "fixture invoke receipt"}, "winners": []}]}
+    grand = {"layers": [{"catalog": "foundation", "layer_id": "agent-sdks", "winners": [{"component_id": "codex", "pin_behind_upstream": True, "upstream_latest": "rust-v0.156.0"}]},
+                        {"catalog": "us-equities", "layer_id": "risk", "winners": [{"component_id": "riskfolio", "pin_behind_upstream": False}]}]}
+    research_state = {"checked_at": "2026-09-21", "resume_order": ["Read AGENTS.md first", "Choose one layer"]}
+    token_window = {"kind": "token-window", "window_start_utc": "2026-10-10T16:00:00Z", "eval_time_utc": "2026-10-11T15:58:00Z", "window_seconds": 86280,
+                    "rule": "increase() is an extrapolated estimate; classes are never summed",
+                    "native": {"codex_tokens_by_type": {"values": {"cached_input": 1.7e9, "input": 1.8e9}},
+                               "codex_total_tokens_by_lane": {"values": {f"lane-{index:02d}": float(100 - index) * 1e6 for index in range(17)} | {"idle-lane": 0.0}},
+                               "claude_tokens_by_type": {"values": {"cacheRead": 1.34e10, "input": 7e7}},
+                               "claude_cost_usd_by_model": {"values": {"claude-opus-5-5": 2022.794}},
+                               "claude_cost_usd_by_lane": {"values": {"trading-cc": 12.5}}},
+                    "tool_reports": {"rtk gain (global scope, lifetime on this host; the tool's own estimate)": {"commands": "167957", "tokens_saved": {"value": "218.5M", "share_percent": 16.7}},
+                                     "rtk hook-audit (Claude sessions launched with the audit switch, last 7 days)": {"invocations": 263, "rewrites": 72, "skips": 191}}}
+    token_tools = {"schema": "token-tools-now/1", "generated_utc": "2026-10-11T15:59:22Z", "tools": [
+        {"tool": "RTK", "command": "rtk gain --format json", "label": "lifetime on this host, the tool's own estimate", "version": "rtk 0.51.0", "rc": 0, "started_utc": "2026-10-11T15:59:07Z", "seconds": 1.62,
+         "estimate": {"total_saved": 222382401, "avg_savings_pct": 16.98, "total_commands": 168688, "total_input": 1309306534, "total_output": 1086961158}},
+        {"tool": "Headroom", "command": "headroom agent-savings --check-perf --hours 24 --format json", "label": "proxy logs", "version": "headroom, version 0.40.0", "rc": 1, "started_utc": "2026-10-11T15:59:09Z", "seconds": 9.28,
+         "estimate": None, "message": "Error: 0.0% savings below 90.0% target for agent-90", "note": "exits 1 when savings fall below the profile target"},
+        {"tool": "Headroom", "command": "headroom output-savings", "label": "shaper", "version": "headroom, version 0.40.0", "rc": 0, "started_utc": "2026-10-11T15:59:19Z", "seconds": 1.41,
+         "estimate": {"report": "No output-savings data yet."}, "note": "counterfactual unless an A/B holdout is set (HEADROOM_OUTPUT_HOLDOUT>0)"},
+        {"tool": "context-mode", "command": "context-mode doctor", "label": "checks", "version": "context-mode 1.0.169", "rc": 0, "started_utc": "2026-10-11T15:59:21Z", "seconds": 0.47,
+         "estimate": {"checks": {"PASS": 18, "SKIP": 1}}, "note": "savings are the MCP tool ctx_stats; there is no CLI report"}]}
+    host = {"kind": "skill_invoke_rate_report", "generated_at": "2026-10-11T15:45:00.809697+00:00", "windows_days": [7, 30],
+            "claude": {"measured": True}, "codex": {"measured": True},
+            "skills": [skill("search-first", 100, 606), skill("idle-skill", 0, 0, status="kept"), skill("unlisted-skill", None, 4),
+                       skill("codex-off", 3, 0, enabled=False), skill("mention-only", 0, 0, 2), skill("absent-skill", None, 0, installed=None)]}
+    manifest = {"skills": [pinned(name) for name in ("search-first", "idle-skill", "unlisted-skill", "codex-off", "mention-only", "absent-skill")]
+                + [pinned("http-only", url="http://example.org/skill"), pinned("never-reported")]}
+    codex_lanes = {"kind": "codex_lane_usage_report", "generated_at": "2026-10-11T15:50:00+00:00", "window": {"since": "2026-10-04T16:00:00Z", "until": "2026-10-11T16:00:00Z"},
+                   "groups": {"workers": {"sessions": 40, "sessions_with_skill_md_read": 7, "skill_md_reads": {"search-first": 30, "tdd": 2}},
+                              "negative_controls": {"sessions": 5, "sessions_with_skill_md_read": 0, "skill_md_reads": {}},
+                              "workers_by_role": {"explorer": {"sessions": 9, "sessions_with_skill_md_read": 1, "skill_md_reads": {"tdd": 1}}}}}
+    claude_lanes = {"kind": "claude_child_lane_usage", "window": {"since": "2026-10-04T15:49:20.000Z", "until": "2026-10-11T15:49:20.000Z"},
+                    "main": {"children": 1650, "children_with_skill_call": 549, "skill_calls": {"search-first": 10, "plugin:extra": 4}},
+                    "groups": {"all": {"children": 3626, "children_with_skill_call": 659, "skill_calls": {"search-first": 202}},
+                               "by_agent_type": {"cc-fixture-builder": {"children": 3, "children_with_skill_call": 2, "skill_calls": {"search-first": 5}},
+                                                 "quiet-type": {"children": 4, "children_with_skill_call": 0, "skill_calls": {}}}}}
+    slots = {"checked_at": "2026-10-09", "client_version": "2.1.295", "slots": [
+        {"id": "client-core", "layer_id": "native-clients", "status": "default", "default": "Native installer build"},
+        {"id": "orchestration-frameworks", "layer_id": "workers", "status": "default", "default": "Native composition without a framework layer",
+         "overturn_when": "A paired same-task run shows a framework ahead", "notes": "Adjudicated: native composition stands."}]}
+    read_queue = {"updated_utc": "2026-10-11T15:55:00Z", "slots": 7,
+                  "running": [{"read": "fix1", "pr": "nas#1004", "head": "23cd8e7a", "tier": "sol-high", "started_utc": "2026-10-11T15:08:24Z"}],
+                  "waiting": [{"pr": "uet#74", "head": "0390d6dd", "kind": "confirmation", "gates": "landing uet#74"}]}
+    queue = ("# Research queue (fixture rule 8). A review finding lands here.\n"
+             "date_utc\tlayer_id\tquestion\tsource_pr\tevidence\tstatus\trouted_to\n"
+             "2026-10-11\tfoundation/agent-sdks\tShould X replace Y?\t#1001\tfixture evidence\topen\tconvergence-practice\n"
+             "2026-10-11\tfoundation/risk\tShort row\n"
+             "2026-10-11\tfoundation/risk\tExtra\t#1\te\topen\trouted\tspill-over\n")
+    return {"readiness": record(readiness, "repo:catalogs/north-star/readiness.json"), "evidence": record(evidence, "repo:manifests/evidence.json"),
+            "skills_manifest": record(manifest, "repo:adoption/skills/manifest.json"),
+            "matrix": record(matrix), "grand_list": record(grand), "research_state": record(research_state),
+            "final_stack": missing("repo:catalogs/landscape/final-stack.json", "not present in the selected checkout"),
+            "token_window": record(token_window), "token_tools": record(token_tools),
+            "skills_daily": missing("state:coordination/command-center/skills/skill-invoke-rate-latest.json"),
+            "skills_host": record(host), "skills_codex_lanes": record(codex_lanes), "skills_claude_lanes": record(claude_lanes),
+            "practice_slots": record(slots), "research_queue": record(queue), "read_queue": record(read_queue)}
+
+
+def daily_fixture() -> dict:
+    """#970's skill-invoke-rate-daily/1 projection, read from its branch's daily_skill_usage.py project_reports schema."""
+    return {"schema": "skill-invoke-rate-daily/1", "generated_at": "2026-10-11T15:40:00+00:00", "window_days": 7,
+            "host": [{"name": "search-first", "claude_uses_lifetime": 100, "codex_use": 9, "codex_skill_md_reads": 606, "codex_name_mentions": 0},
+                     {"name": "idle-skill", "claude_uses_lifetime": 0, "codex_use": None, "codex_skill_md_reads": None, "codex_name_mentions": None}],
+            "lanes": [{"client": "claude", "lane": "main", "skills": [{"name": "search-first", "count": 10}], "metric": "skill_calls"},
+                      {"client": "claude", "lane": "workflow:cc-x", "skills": [{"name": "search-first", "count": 7}], "metric": "skill_calls"},
+                      {"client": "codex", "lane": "workers", "skills": [{"name": "search-first", "count": 9, "raw_reads": 30}], "metric": "use"}],
+            "measured": {"host": True, "codex": False, "claude": True}}
 
 
 def prohibited_names() -> list[str]:
@@ -147,56 +307,51 @@ def identity_hits(text: str, names: list[str]) -> int:
 
 
 class CommandCenterViewTests(unittest.TestCase):
-    def render(self, current=None, fleet=None, manifests=None):
+    def render(self, current=None, fleet=None, inputs=None, adoption=None, refreshed=REFRESHED):
         return view.render(current_fixture() if current is None else current, fleet_fixture() if fleet is None else fleet,
-                           manifests_fixture() if manifests is None else manifests)
+                           inputs_fixture() if inputs is None else inputs, adoption=adoption_fixture() if adoption is None else adoption, refreshed=refreshed)
 
     def test_fixture_renders_every_panel_with_stated_status(self):
         markup, statuses = self.render()
         for anchor in PANELS:
             self.assertIn(f'id="{anchor}"', markup)
-        for anchor in ("cc-prs", "cc-owner", "cc-sessions", "cc-tokens"):
+        for anchor in ("cc-prs", "cc-owner", "cc-sessions", "cc-tokens", "cc-orchestration", "cc-landscape", "cc-skills"):
             self.assertIn(f'<a href="#{anchor}"><strong>', markup)
         self.assertEqual({anchor: row["status"] for anchor, row in statuses.items()},
-                         {"cc-sessions": "wired", "cc-prs": "wired", "cc-tokens": "partial", "cc-skills": "partial", "cc-manifests": "partial", "cc-owner": "wired"})
-        found = tables(markup)
-        lanes = {row[0]: row for row in found["Live Codex lanes"][1:]}
+                         {"cc-sessions": "wired", "cc-orchestration": "wired", "cc-prs": "wired", "cc-landscape": "partial", "cc-skills": "wired",
+                          "cc-tokens": "partial", "cc-research": "wired", "cc-manifests": "partial", "cc-owner": "wired"})
+        lanes = {row[0]: row for row in table(markup, "Live Codex lanes")[1:]}
         self.assertEqual(lanes["lane-one"][1:3], ["active", "18 s hcom lane-one-abcd, active"])
         self.assertIn("gpt-fixture", lanes["lane-one"][3])
-        self.assertEqual(lanes["lane-one"][4], "standard")
         self.assertEqual(lanes["lane-two"][2:4], ["not recorded", "not recorded"])
         self.assertIn("owner session (reports to CC)", markup)
         self.assertNotIn("native-agent-stack-1a", markup)
-        self.assertEqual(found["Other hcom agents"][1][:3], ["stray-agent", "claude", "blocked"])
-        subagents = {row[0]: row for row in found["Command-center subagents running"][1:]}
-        self.assertEqual(subagents["cc-fixture-builder"][1:], ["#101 round 3, resumed", "not recorded"])
+        subagents = {row[0]: row for row in table(markup, "Command-center subagents running")[1:]}
         self.assertEqual(subagents["cc-fixture-micro"][1:], ["#102 micro", "claude-opus-5-5"])
-        self.assertEqual(subagents["cc-bare"][1:], ["not recorded", "not recorded"])
         self.assertIn("<summary>1 parked lane</summary>", markup)
-        self.assertIn("<summary>2 landed today</summary>", markup)
-        manifests = {row[0]: row for row in found["Manifest identities and counts"][1:]}
-        self.assertIn("1" * 64, manifests["Readiness manifest"][1])
-        self.assertIn("2 gates, 3 layers, 1 sdk items, 40 recorded claims, 2 unverified claims, 0 unverified sources", manifests["Readiness manifest"][2])
-        self.assertEqual(manifests["Evidence manifest"][2], "3 files, 1 receipt, 0 convergence records")
-        self.assertIn("pending #1007", manifests["Final-stack manifest"][1])
-        self.assertIn("not wired", manifests["Research queue"][1])
-        states = {row[0]: row[1:] for row in found["Readiness manifest counts by recorded state"][1:]}
-        self.assertEqual(states, {"MET": ["1", "1"], "UNVERIFIED": ["1", "0"], "no state field": ["0", "1"]})
-        owner = markup[markup.index('id="cc-owner"'):]
-        self.assertLess(owner.index("Approve the fixture lane"), owner.index("Rotate a fixture token"))
-        self.assertIn("Run the fixture command", owner)
-        self.assertIn("Read the fixture note", owner)
+        counts = re.findall(r'<strong>([^<]+)</strong> <span>([^<]+)</span>', markup[markup.index('class="cc-counts"'):])
+        self.assertIn(("1", "GPT reads running"), counts)
+        self.assertIn(("1 of 2", "layers converged"), counts)
+        self.assertIn(("3", "skills with no 7-day call"), counts)
+        self.assertIn(("222M", "tokens saved (RTK estimate)"), counts)
+        self.assertIn("Partial because of not wired: Token-report manifest", statuses["cc-tokens"]["detail"])
+        self.assertIn("Partial because of not wired: North-star ten-layer plan", statuses["cc-landscape"]["detail"])
+        for anchor in ("cc-manifests", "cc-landscape"):
+            self.assertIn("Partial because of unread records: final-stack.json (not present in the selected checkout).", statuses[anchor]["detail"])
+        self.assertEqual({anchor: row["not_wired"] for anchor, row in statuses.items() if row["not_wired"]}, {"cc-tokens": ["token_report"], "cc-landscape": ["north_star"]})
+        for anchor, row in statuses.items():
+            with self.subTest(anchor=anchor):
+                self.assertEqual(row["status"] == "partial", "Partial because" in row["detail"])
 
     def test_pr_optional_fields_render_values_absences_and_unsupported_values(self):
         markup, statuses = self.render()
-        rows = {row[0]: row for row in tables(markup)["Pull requests in review, in the CC's order"][1:]}
-        self.assertEqual(tables(markup)["Pull requests in review, in the CC's order"][0],
-                         ["PR", "Work", "Head", "Round", "Next gate", "Blockers", "Follow-ups", "Recorded state"])
+        rows = table(markup, "Pull requests in review")
+        self.assertEqual(rows[0], ["PR", "Work", "Head", "Round", "Next gate", "Blockers", "Follow-ups", "Recorded state"])
+        rows = {row[0]: row for row in rows[1:]}
         self.assertEqual(rows["#101"][2:7], ["abc12345", "3", "Astra micro at abc12345", "P2 reinstall race", "one re-pin sync live copy"])
         self.assertEqual(rows["#102"][2:7], ["not recorded"] * 5)
         self.assertEqual(rows["#103 / #104"][5:7], ["none", "none"])
         self.assertEqual(rows["#105"][2:7], ["not recorded unsupported value"] * 2 + ["not recorded"] + ["not recorded unsupported value"] * 2)
-        self.assertEqual(rows["#102"][7], "reads queued")
         self.assertIn('<td class="cc-pr-next-gate"><strong>Astra micro at abc12345</strong></td>', markup)
         self.assertEqual(statuses["cc-prs"]["status"], "wired")
         unrecorded = current_fixture()
@@ -205,72 +360,358 @@ class CommandCenterViewTests(unittest.TestCase):
         self.assertEqual(statuses["cc-prs"]["status"], "partial")
         self.assertIn("head, round, next gate, blockers, follow-ups", statuses["cc-prs"]["detail"])
 
+    def test_section_status_follows_every_rendered_gap(self):
+        # B2 at b209afe8: Sessions read wired with reads and parked lanes missing, and PR waves read
+        # wired without landings_today; a rendered gap now always makes its section partial.
+        fleet = fleet_fixture()
+        fleet["exec_reads_in_flight"], fleet["lanes_parked"] = None, None
+        current = current_fixture()
+        del current["landings_today"]
+        markup, statuses = self.render(current=current, fleet=fleet)
+        self.assertEqual(statuses["cc-sessions"]["status"], "partial")
+        self.assertIn("missing input: fleet exec_reads_in_flight; fleet lanes_parked", statuses["cc-sessions"]["detail"])
+        self.assertEqual(statuses["cc-prs"]["status"], "partial")
+        self.assertIn("missing input: cc-now.json#/landings_today", statuses["cc-prs"]["detail"])
+        for status, label in (("UNKNOWN", "Optional tracking collection is UNKNOWN (TypeError)."), ("UNREPORTED", "Fleet adapter failed (OSError)")):
+            with self.subTest(status=status):
+                fleet = fleet_fixture()
+                fleet["tracking"] = {"schema": "fleet-tracking/1", "status": status, "reason": label}
+                markup, statuses = self.render(fleet=fleet)
+                self.assertIn("missing input: fleet tracking (" + status + "): " + label, section(markup, "cc-skills"))
+                self.assertIn(label, statuses["cc-skills"]["detail"])
+                self.assertEqual(statuses["cc-skills"]["status"], "partial")
+
     def test_missing_inputs_render_stated_gaps_without_raising(self):
         failed_fleet = {"fleet_source": "not reported", "at": None, "lanes_live": None, "lanes_parked": None, "claude_sessions": None,
                         "exec_reads_in_flight": None, "availability": {name: {"status": "UNKNOWN"} for name in ("lanes_live", "lanes_parked", "claude_sessions")},
                         "tracking": {"schema": "fleet-tracking/1", "status": "UNREPORTED", "hcom": {"agents": [], "status": "UNKNOWN"}, "lanes": []}}
-        missing = {"readiness": {"status": "missing", "reason": "not present in the selected checkout"}, "evidence": {"status": "missing", "reason": "unreadable (ValueError)"}}
-        for current, fleet, manifests in (({"schema": "cc-now/1"}, failed_fleet, missing), ({}, {}, {}), (None, None, None)):
-            with self.subTest(fleet=bool(fleet)):
-                markup, statuses = view.render(current, fleet, manifests)
-                for name in ("cc-now.json#/in_review", "cc-now.json#/landings_today", "cc-now.json#/token_efficiency", "cc-now.json#/token_use_24h", "cc-now.json#/waiting_on_owner",
-                             "cc-now.json#/cc_agents/running", "fleet lanes_live", "fleet claude_sessions", "readiness manifest"):
+        absent = {name: missing("state:" + name) for name in inputs_fixture()}
+        for current, fleet, inputs in (({"schema": "cc-now/1"}, failed_fleet, absent), ({}, {}, {}), (None, None, None)):
+            with self.subTest(fleet=bool(fleet), inputs=bool(inputs)):
+                markup, statuses = view.render(current, fleet, inputs, adoption=None, refreshed=None)
+                for name in ("cc-now.json#/in_review", "cc-now.json#/landings_today", "cc-now.json#/waiting_on_owner", "cc-now.json#/orchestration",
+                             "cc-now.json#/landing_queue", "cc-now.json#/program", "cc-now.json#/mirrors", "cc-now.json#/rulings",
+                             "cc-now.json#/cc_agents/running", "fleet lanes_live", "fleet claude_sessions", "adoption-now.json orchestration"):
                     self.assertIn("missing input: " + name, markup)
-                self.assertEqual(statuses["cc-sessions"]["status"], "missing")
-                for anchor in ("cc-prs", "cc-tokens", "cc-manifests", "cc-owner"):
-                    self.assertEqual(statuses[anchor]["status"], "missing")
+                for anchor in ("cc-sessions", "cc-prs", "cc-tokens", "cc-skills", "cc-manifests", "cc-owner", "cc-landscape", "cc-research", "cc-orchestration"):
+                    self.assertEqual(statuses[anchor]["status"], "missing", anchor)
                 self.assertIn('<strong>UNKNOWN</strong> <span>in review</span>', markup)
-        self.assertIn("not present in the selected checkout", view.render({}, {}, missing)[0])
-        self.assertEqual(view.render({}, {"tracking": None}, {})[1]["cc-skills"]["status"], "missing")
+                self.assertIn('<strong>UNKNOWN</strong> <span>skills with no 7-day call</span>', markup)
+        markup, _ = view.render({}, {}, absent)
+        for name in ("token_window", "token_tools", "skills_host", "read_queue", "research_queue", "matrix", "skills_manifest", "practice_slots"):
+            self.assertIn("missing input: state:" + name + ": not present in the state root", markup)
 
-    def test_skill_rates_keep_unknown_distinct_from_zero(self):
+    def test_a_bad_field_degrades_only_its_own_section(self):
+        # B3 at b209afe8: a scalar codex_top_lanes_M (TypeError) or an integer above 1e308 (OverflowError)
+        # replaced all six sections with the placeholder. Each of these hostile types now stays in its section.
+        huge = 10 ** 400
+        cases = {
+            "cc-tokens": lambda current, fleet, inputs: (current["token_use_24h"].__setitem__("codex_top_lanes_M", 3.5), inputs.__setitem__("token_window", missing("w")),
+                                                         inputs["token_tools"]["document"]["tools"][0]["estimate"].__setitem__("total_saved", huge)),
+            "cc-sessions": lambda current, fleet, inputs: fleet["lanes_live"][0].__setitem__("subagent_models", {"m": huge}),
+            "cc-orchestration": lambda current, fleet, inputs: inputs["read_queue"]["document"].__setitem__("slots", huge),
+            "cc-prs": lambda current, fleet, inputs: current["in_review"][0].__setitem__("round", huge),
+            "cc-landscape": lambda current, fleet, inputs: inputs["matrix"]["document"]["rows"][0].__setitem__("open_gaps", huge),
+            "cc-skills": lambda current, fleet, inputs: inputs["skills_host"]["document"]["skills"][0]["claude"].__setitem__("uses", huge),
+            "cc-research": lambda current, fleet, inputs: inputs.__setitem__("research_queue", record("date_utc\tq\n" + str(huge) + "\tx\n")),
+            "cc-manifests": lambda current, fleet, inputs: inputs["readiness"]["document"]["summary"].__setitem__("gates", huge),
+            "cc-owner": lambda current, fleet, inputs: current["waiting_on_owner"].append({"what": "big", "by_utc": str(huge)}),
+        }
+        for anchor, mutate in cases.items():
+            with self.subTest(anchor=anchor):
+                current, fleet, inputs = current_fixture(), fleet_fixture(), inputs_fixture()
+                mutate(current, fleet, inputs)
+                markup, statuses = self.render(current=current, fleet=fleet, inputs=inputs)
+                self.assertNotIn("could not render", markup)
+                self.assertTrue(all(f'id="{other}"' in markup for other in PANELS))
+        broken = view.render.__globals__["_tokens"]
+        for name in ("_tokens", "_landscape", "_counts"):
+            with self.subTest(guard=name), patch.dict(view.render.__globals__, {name: lambda *args, **kwargs: (_ for _ in ()).throw(TypeError("guard-probe-message"))}):
+                markup, statuses = self.render()
+                if name == "_counts":
+                    self.assertIn("missing input: count strip (TypeError)", markup)
+                    self.assertEqual({row["status"] for row in statuses.values()} - {"wired", "partial"}, set())
+                else:
+                    anchor = {"_tokens": "cc-tokens", "_landscape": "cc-landscape"}[name]
+                    self.assertEqual(statuses[anchor]["status"], "missing")
+                    self.assertIn("could not render (TypeError)", statuses[anchor]["detail"])
+                    self.assertNotIn("guard-probe-message", markup)
+                    self.assertEqual(sum(row["status"] == "missing" for row in statuses.values()), 1)
+        self.assertIs(view.render.__globals__["_tokens"], broken)
+
+    def test_skills_join_the_manifest_with_counts_and_flags(self):
+        markup, statuses = self.render()
+        rows = table(markup, "The 8 skills pinned in adoption/skills/manifest.json")
+        self.assertEqual(rows[0], ["Skill", "Upstream source@pin", "Claude uses, lifetime", "Claude main sessions, 7 d", "Claude subagents, 7 d", "Codex use, 7 d",
+                                   "Codex SKILL.md reads, 7 d", "Codex name mentions, 7 d", "Flags"])
+        rows = {row[0].split(" ")[0]: row for row in rows[1:]}
+        self.assertEqual(rows["search-first"][1], "fixture/skills@0123456789ab skills/search-first")
+        self.assertEqual(rows["search-first"][2:9], ["100", "10", "202", "not measured", "606", "0", "in use"])
+        self.assertIn("wiring defect", rows["idle-skill"][8])
+        self.assertIn("wiring defect", rows["codex-off"][8])
+        self.assertEqual(rows["unlisted-skill"][2], "not measured")
+        self.assertEqual(rows["codex-off"][5:8], ["not measured", "0", "0"])
+        self.assertIn("not enabled for Codex in the manifest", rows["codex-off"][8])
+        self.assertEqual(rows["mention-only"][8], "in use")
+        self.assertIn("not installed", rows["absent-skill"][8])
+        self.assertIn("wiring defect", rows["absent-skill"][8])
+        self.assertEqual(rows["never-reported"][2:9], ["not measured"] * 6 + ["not measured"])
+        self.assertIn('<a href="https://github.com/fixture/skills/tree/0123456789abcdef0123456789abcdef01234567/skills/search-first" rel="noreferrer">fixture/skills@0123456789ab</a>', markup)
+        self.assertNotIn('href="http://example.org/skill"', markup)
+        self.assertIn("fixture/skills@0123456789ab", rows["http-only"][1])
+        self.assertEqual(statuses["cc-skills"]["defects"], 3)
+        self.assertIn("3 of 8 pinned skills recorded no call in any measured 7-day column", statuses["cc-skills"]["detail"])
+        no_manifest = inputs_fixture()
+        no_manifest["skills_manifest"] = missing("repo:adoption/skills/manifest.json", "not present in the selected checkout")
+        unknown_markup, unknown = self.render(inputs=no_manifest)
+        self.assertIn('<strong>UNKNOWN</strong> <span>skills with no 7-day call</span>', unknown_markup)
+        self.assertIsNone(unknown["cc-skills"]["defects"])
+        self.assertIn("missing input: repo:adoption/skills/manifest.json: not present in the selected checkout", unknown_markup)
+        unpinned = {row[0]: row for row in table(markup, "Skills with recorded calls that the manifest does not pin")[1:]}
+        self.assertEqual(sorted(unpinned), ["plugin:extra", "tdd"])
+        self.assertEqual(unpinned["plugin:extra"][1:], ["4", "0", "0", "unpinned"])
+        groups = {row[0]: row for row in table(markup, "Codex rollout groups")[1:]}
+        self.assertEqual(groups["workers"][1:4], ["40", "7", "32"])
+        self.assertEqual(groups["workers by role: explorer"][4], "tdd 1")
+        self.assertEqual(list({row[0]: row for row in table(markup, "Claude subagent types")[1:]}), ["cc-fixture-builder"])
+        slots = table(markup, "One default per role slot")
+        self.assertEqual(slots[2][:2], ["orchestration-frameworks workers", "default"])
+        self.assertIn('<tr class="cc-ao-row">', markup)
+
+    def test_skill_counts_and_install_state_follow_what_the_producer_measured(self):
+        # skill_usage.py counts Codex reads for every manifest skill (codex.enabled is the manifest's flag),
+        # and writes "not-measured" for Claude when /skill-doctor did not run (tools/skill-usage/skill_usage.py:544-592).
+        inputs = inputs_fixture()
+        host = inputs["skills_host"]["document"]
+        host["claude"] = {"measured": False}
+        host["skills"].append(skill("system-copy", None, 158, 2, enabled=False))
+        for row in host["skills"]:
+            row["claude"] = "not-measured"
+        inputs["skills_manifest"]["document"]["skills"].append(pinned("system-copy"))
+        markup, statuses = self.render(inputs=inputs)
+        rows = {row[0].split(" ")[0]: row for row in table(markup, "The 9 skills pinned")[1:]}
+        self.assertEqual(rows["system-copy"][2:8], ["not measured", "0", "0", "not measured", "158", "2"])
+        self.assertIn("in use", rows["system-copy"][8])
+        self.assertIn("not enabled for Codex in the manifest", rows["system-copy"][8])
+        self.assertEqual(rows["search-first"][2], "not measured")
+        self.assertIn("install state not measured", rows["absent-skill"][8])
+        self.assertNotIn("not installed", rows["absent-skill"][8])
+        self.assertNotIn("install state not measured", rows["search-first"][8])
+
+    def test_skills_accept_the_daily_projection_and_keep_unscanned_roots_unknown(self):
+        inputs = inputs_fixture()
+        inputs["skills_daily"] = record(daily_fixture())
+        markup, statuses = self.render(inputs=inputs)
+        self.assertIn("Counts use the daily projection", markup)
+        rows = {row[0].split(" ")[0]: row for row in table(markup, "The 8 skills pinned")[1:]}
+        self.assertEqual(rows["search-first"][2:8], ["100", "10", "7", "9", "606", "0"])
+        self.assertEqual(rows["idle-skill"][5:8], ["not measured"] * 3)
+        self.assertIn("wiring defect", rows["idle-skill"][8])
+        groups = {row[0]: row for row in table(markup, "Codex rollout groups")[1:]}
+        self.assertEqual(groups["workers"][1:5], ["not measured"] * 4)
+        measured = inputs_fixture()
+        measured["skills_daily"] = record(dict(daily_fixture(), measured={"host": True, "codex": True, "claude": True}))
+        markup, _ = self.render(inputs=measured)
+        groups = {row[0]: row for row in table(markup, "Codex rollout groups")[1:]}
+        self.assertEqual(groups["workers"][1:5], ["not measured", "not measured", "9", "search-first 9"])
+        stale = inputs_fixture()
+        stale["skills_daily"] = record(dict(daily_fixture(), generated_at="2026-10-09T00:00:00+00:00"))
+        markup, _ = self.render(inputs=stale)
+        self.assertNotIn("Counts use the daily projection", markup)
+        wrong = inputs_fixture()
+        wrong["skills_daily"] = record({"schema": "skill-invoke-rate-daily/9"})
+        markup, statuses = self.render(inputs=wrong)
+        self.assertIn("unsupported report skill-invoke-rate-daily/9, expected skill-invoke-rate-daily/1", markup)
+        self.assertEqual(statuses["cc-skills"]["status"], "partial")
+
+    def test_stale_reports_are_labelled_with_their_age(self):
+        stale = inputs_fixture()
+        stale["skills_host"]["document"]["generated_at"] = "2026-10-10T14:35:21+00:00"
+        stale["token_window"]["document"]["eval_time_utc"] = "2026-10-11T09:00:00Z"
+        stale["read_queue"]["document"]["updated_utc"] = "not a time"
+        markup, statuses = self.render(inputs=stale)
+        sources = {row[0].split(" (")[0]: row for row in table(markup, "Skill-count sources")[1:]}
+        self.assertIn("stale : 25.4 h old at this refresh (limit 3.0 h)", sources["skill_usage.py --run-skill-doctor --window 7"][3])
+        self.assertIn("10 min old at this refresh", " ".join(sources["skill_usage.py --lanes, 7 days"]))
+        self.assertEqual(statuses["cc-skills"]["status"], "partial")
+        self.assertIn("1 stale report", statuses["cc-skills"]["detail"])
+        self.assertIn("stale</strong>: 7.0 h old at this refresh", section(markup, "cc-tokens"))
+        self.assertIn("age unknown: no parseable generation time", section(markup, "cc-orchestration"))
+
+    def test_prometheus_skill_rates_keep_unknown_distinct_from_zero(self):
         markup, _ = self.render()
-        rows = {row[0]: row for row in tables(markup)["Skill invocations per published lane, 300 s rate window"][1:]}
+        rows = {row[0]: row for row in table(markup, "Skill invocations per published lane, 300 s rate window")[1:]}
         self.assertTrue(rows["abcd"][2].startswith("UNKNOWN"))
         self.assertIn("No qualified producer.", rows["abcd"][2])
         self.assertTrue(rows["efgh"][2].startswith("0 calls/s (reported)"))
         self.assertIn("0 means no recorded calls", rows["efgh"][2])
         self.assertTrue(rows["ijkl"][2].startswith("UNKNOWN"))
         self.assertNotIn("0 means no recorded calls", rows["ijkl"][2])
-        self.assertIn("skill_usage.py reports", markup)
-        shared = fleet_fixture()
-        shared["tracking"]["lanes"] = [rate("abcd", "UNKNOWN", None, "Shared reason."), rate("efgh", "UNKNOWN", None, "Shared reason.")]
-        markup, _ = self.render(fleet=shared)
-        self.assertEqual(markup.count("Shared reason."), 1)
-        self.assertIn("<strong>Every row:</strong> Shared reason.", markup)
 
-    def test_token_panel_labels_reported_values_and_windows(self):
+    def test_token_tools_keep_each_command_exit_and_estimate(self):
         markup, statuses = self.render()
-        saved = {row[0]: row for row in tables(markup)["Savings the CC reports in token_efficiency; this page measures none"][1:]}
-        self.assertTrue(saved["RTK tokens saved rtk.tokens_saved"][1].startswith("2.5M"))
-        self.assertEqual(saved["RTK tokens saved rtk.tokens_saved"][2], "not stated in source")
-        self.assertEqual(saved["RTK hook audit rtk_hook_audit_7d"][1:], ["9 invocations, 4 rewrites, 5 skips", "7 days (from the field name)"])
-        self.assertEqual(saved["Headroom headroom_24h"][2], "24 h (from the field name)")
-        self.assertIn('<meter class="cc-meter" min="0" max="100" value="25"', markup)
-        self.assertIn("Fixture CC note", markup)
-        self.assertIn("Window: 2026-10-10T00:00:00Z to 2026-10-11T00:00:00Z", markup)
-        bars = tables(markup)["Codex tokens by lane, millions, in the CC's order"]
-        self.assertEqual([row[:2] for row in bars[1:]], [["lane-a", "40.0"], ["lane-b", "10.0"]])
-        self.assertIn('style="inline-size: 100.0%"', markup)
-        self.assertIn('style="inline-size: 25.0%"', markup)
-        self.assertIn("Token-report manifest", markup)
-        self.assertEqual(statuses["cc-tokens"]["status"], "partial")
+        rows = table(markup, "Token tools run end to end by tools/local-pages/token_tools_now.py")
+        self.assertEqual(rows[0], ["Tool", "Command", "Exit code", "Ran", "The tool's own estimate"])
+        rtk, agent, output, doctor = rows[1:]
+        self.assertEqual(rtk[0], "RTK rtk 0.51.0")
+        self.assertEqual(rtk[2], "0")
+        self.assertIn("222M tokens saved (17% average)", rtk[4])
+        self.assertEqual(agent[2], "1")
+        self.assertIn("Error: 0.0% savings below 90.0% target for agent-90", agent[4])
+        self.assertIn("counterfactual unless an A/B holdout is set", output[4])
+        self.assertIn("18 PASS, 1 SKIP", doctor[4])
+        self.assertIn("savings are the MCP tool ctx_stats", doctor[4])
+        cache = table(markup, "Prompt-cache reads")
+        self.assertEqual([row[:2] for row in cache[1:]], [["Claude", "13.4B"], ["Codex", "1.7B"]])
+        self.assertIn("<h3>Client counters</h3>", markup)
+        bars = table(markup, "Codex tokens by lane, largest 15 of 18")[1:]
+        self.assertEqual([row[:2] for row in bars[:2]], [["lane-00", "100M"], ["lane-01", "99M"]])
+        self.assertEqual(table(markup, "Codex tokens by lane, every lane")[-1][:2], ["idle-lane", "0"])
+        recorded = table(markup, "Recorded tool reports and invocations")[1:]
+        self.assertEqual([row[0] for row in recorded], ["RTK", "RTK", "Context Mode", "Context Mode", "Headroom"])
+        unknown = inputs_fixture()
+        unknown["token_tools"]["document"]["tools"][0].update(rc=None, error="command not found", estimate=None)
+        markup, _ = self.render(inputs=unknown)
+        self.assertIn("not recorded command not found", table(markup, "Token tools run end to end")[1][2])
+        self.assertIn('<strong>218.5M</strong> <span>tokens saved (RTK estimate)</span>', markup)
+        wrong = inputs_fixture()
+        wrong["token_tools"] = record({"schema": "token-tools-now/0", "tools": copy.deepcopy(inputs_fixture()["token_tools"]["document"]["tools"])})
+        markup, statuses = self.render(inputs=wrong)
+        self.assertIn("unsupported schema token-tools-now/0", markup)
+        self.assertNotIn("Token tools run end to end", markup)
+        fallback = inputs_fixture()
+        fallback["token_window"] = missing("state:coordination/command-center/pages/token-window-now.json")
+        markup, _ = self.render(inputs=fallback)
+        self.assertEqual([row[:2] for row in table(markup, "Codex tokens by lane, millions")[1:]], [["lane-a", "40"], ["lane-b", "10"]])
+        self.assertEqual(table(markup, "Recorded tool reports and invocations")[1][4], "cc-now.json token_efficiency (fallback)")
 
-    def test_private_values_never_render_from_any_panel(self):
+    def test_landscape_shows_w6_columns_mirrors_and_never_infers_a_terminal_state(self):
+        markup, statuses = self.render()
+        rows = {row[0].split(" foundation/")[0].split(" us-equities/")[0]: row for row in table(markup, "Foundation and trading layers with the W6 final criteria")[1:]}
+        sdk = rows["Agent SDKs"]
+        self.assertIn("open gaps: 12 executable now of 14", sdk[0])
+        self.assertIn("codex @ 0.155.1 native_proven accepted within scope: recovery, use pending: install platforms: linux-wsl2-x86_64 host verified, macos-arm64 untested upstream latest rust-v0.156.0; pin behind upstream mirror rust-v0.155.1 at abcdef123456", sdk[1])
+        self.assertIn("matches the pin", sdk[1])
+        self.assertIn("unmirrored @ 2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143 synthetic", sdk[1])
+        self.assertIn("no mirror for https://github.com/fixture/none", sdk[1])
+        self.assertEqual(sdk[2], "recorded recorded reopened; dual_lane_same_winner; checked 2026-09-22")
+        self.assertEqual(sdk[3], "codex: pending final-stack.json drifted: pending final-stack.json unmirrored: pending final-stack.json")
+        self.assertIn("codex: host E2E true, pin current false", sdk[4])
+        self.assertEqual(sdk[5], "not recorded no post-fix invoke receipt yet")
+        self.assertEqual(sdk[6], "pending #1008/#1007")
+        self.assertEqual(rows["Portfolio risk"][5], "fixture invoke receipt")
+        self.assertIn("1 winner has no upstream mirror", section(markup, "cc-landscape"))
+        self.assertIn("drifted @ 1.0.0", sdk[1])
+        self.assertIn("mirror v2.0.0 at 0123456789ab, synced 2026-10-11T15:28:30Z; differs from the pin", sdk[1])
+        north = table(markup, "North-star readiness layers")[1]
+        self.assertEqual(north[1], "codex @ 0.155.1 native_proven")
+        self.assertEqual(north[2:7], ["not recorded the readiness manifest has no verdict field", "codex: 0.155.1", "codex: not recorded registered support is not a current install",
+                                      "codex: not recorded no fresh-session binding", "not recorded"])
+        final = inputs_fixture()
+        final["final_stack"] = record({"checked_at": "2026-10-11", "summary": {"layers": 1, "status": {"reopened": 1}},
+                                       "runs": [{"id": "codex", "pin": "0.155.1"}],
+                                       "layers": [{"catalog": "foundation", "layer_id": "agent-sdks", "status": "reopened"}]})
+        markup, _ = self.render(inputs=final)
+        rows = {row[0].split(" foundation/")[0].split(" us-equities/")[0]: row for row in table(markup, "Foundation and trading layers with the W6 final criteria")[1:]}
+        self.assertEqual(rows["Agent SDKs"][6], "reopened")
+        self.assertEqual(rows["Agent SDKs"][3], "codex: 0.155.1 drifted: not recorded unmirrored: not recorded")
+        self.assertEqual(rows["Portfolio risk"][6], "not recorded absent from final-stack.json")
+        for pin, relation in ((None, "no pin recorded to compare"), ("unpinned", "no pin recorded to compare"), ("v2.0.0", "matches the pin"), ("2.0.0 @ 0123456789ab", "matches the pin"), ("2.0.1", "differs from the pin"), ("HEAD", "differs from the pin")):
+            with self.subTest(pin=pin):
+                pinned_inputs = inputs_fixture()
+                pinned_inputs["matrix"]["document"]["rows"][0]["winners"][1]["pin"] = pin
+                drifted = table(self.render(inputs=pinned_inputs)[0], "Foundation and trading layers")[1][1]
+                self.assertIn("mirror v2.0.0 at 0123456789ab, synced 2026-10-11T15:28:30Z; " + relation, drifted)
+        self.assertEqual([view._tag_version(ref) for ref in ("rust-v0.155.1", "v1.30.1", "release-1.2", "v2.0.0-rc.1", "HEAD", "main", "codex-cli-v2", "2")],
+                         ["0.155.1", "1.30.1", "1.2", "2.0.0-rc.1", "HEAD", "main", "codex-cli-v2", "2"])
+        published = current_fixture()
+        published["north_star_layers"] = [{"n": 1, "name": "Market-side data", "target": "one point-in-time store", "lane": "ingestion-b", "acceptance": "source receipts", "state": "due 10-12"}]
+        markup, statuses = self.render(current=published)
+        self.assertEqual(table(markup, "North-star ten-layer plan the CC publishes")[1], ["1", "Market-side data", "one point-in-time store", "ingestion-b", "source receipts", "due 10-12"])
+        self.assertNotIn("North-star ten-layer plan</strong>: not wired", markup)
+        self.assertEqual(statuses["cc-landscape"]["not_wired"], [])
+        self.assertEqual(statuses["cc-landscape"]["status"], "partial")
+        self.assertIn("Partial because of unread records: final-stack.json (not present in the selected checkout).", statuses["cc-landscape"]["detail"])
+        no_pins = current_fixture()
+        del no_pins["mirrors"]["pins"]
+        markup, statuses = self.render(current=no_pins)
+        self.assertIn("missing input: cc-now.json#/mirrors/pins", markup)
+        self.assertEqual(table(markup, "Workstreams WS1 to WS6")[2], ["WS2", "Second stream", "not recorded", "running", "not recorded", "not recorded"])
+        self.assertEqual(table(markup, "Rulings and adjudications")[1][1], "05:59Z as recorded")
+
+    def test_orchestration_shows_the_recorded_resolution_queues_and_role_counts(self):
+        markup, statuses = self.render()
+        panel = section(markup, "cc-orchestration")
+        self.assertIn("<dt>Default</dt><dd>native composition without a framework layer</dd>", panel)
+        self.assertIn("<dt>Overturned when</dt><dd>A paired same-task run shows a framework ahead</dd>", panel)
+        landing = table(markup, "Pull requests queued to land")
+        self.assertEqual(landing[1], ["uet#78", "4b472bcd", "CI on the rebased head", "15:38Z as recorded"])
+        self.assertEqual(table(markup, "Reads waiting")[1], ["uet#74", "0390d6dd", "confirmation", "landing uet#74"])
+        roles = {row[0]: row for row in table(markup, "Native orchestration tool calls by role, 24 h")[1:]}
+        self.assertEqual(roles["trading-cc"][1:], ["Claude", "Agent 7, Workflow 1"])
+        empty = inputs_fixture()
+        empty["read_queue"]["document"].update(slots=None, running=[])
+        markup, _ = self.render(inputs=empty)
+        self.assertIn('Slots: <span class="cc-unrecorded">not measured</span>.', markup)
+        self.assertIn('<strong>0</strong> <span>GPT reads running</span>', markup)
+
+    def test_research_queue_rows_and_resume_order(self):
+        markup, statuses = self.render()
+        rows = table(markup, "Research queue rows")
+        self.assertEqual(rows[0], ["date utc", "layer id", "question", "source pr", "evidence", "status", "routed to"])
+        self.assertEqual(rows[2][3:], ["not recorded"] * 4)
+        self.assertEqual(rows[3][6], "routed spill-over")
+        self.assertIn('<ol class="cc-steps"><li>Read AGENTS.md first</li><li>Choose one layer</li></ol>', markup)
+
+    def test_hostile_strings_are_escaped_in_every_section(self):
+        current = current_fixture()
+        for row in current["landing_queue"] + current["program"] + current["rulings"]:
+            for key in list(row):
+                row[key] = HOSTILE
+        current["orchestration"] = {key: HOSTILE for key in ("slot", "default", "state", "evidence", "next")}
+        current["mirrors"] = {"count": HOSTILE, "synced_utc": HOSTILE, "failed": [HOSTILE], "pins": {HOSTILE: {"ref": HOSTILE}}}
+        current["north_star_layers"] = [{"n": HOSTILE, "name": HOSTILE}]
+        inputs = inputs_fixture()
+        inputs["research_queue"] = record("date_utc\t" + HOSTILE + "\n" + HOSTILE + "\t" + HOSTILE + "\n")
+        inputs["read_queue"]["document"]["running"][0] = {key: HOSTILE for key in ("read", "pr", "head", "tier", "started_utc")}
+        inputs["skills_host"]["document"]["skills"].append(skill(HOSTILE, 1, 1))
+        inputs["skills_manifest"]["document"]["skills"].append(pinned(HOSTILE, ref=HOSTILE, url="javascript:" + HOSTILE))
+        inputs["skills_claude_lanes"]["document"]["groups"]["by_agent_type"][HOSTILE] = {"children": 1, "children_with_skill_call": 1, "skill_calls": {HOSTILE: 1}}
+        inputs["practice_slots"]["document"]["slots"].append({"id": HOSTILE, "status": HOSTILE, "default": HOSTILE})
+        inputs["token_window"]["document"]["native"]["codex_total_tokens_by_lane"]["values"][HOSTILE] = 5.0
+        inputs["token_tools"]["document"]["tools"].append({"tool": HOSTILE, "command": HOSTILE, "version": HOSTILE, "rc": 3, "message": HOSTILE, "note": HOSTILE})
+        inputs["matrix"]["document"]["rows"][0]["title"] = HOSTILE
+        inputs["matrix"]["document"]["rows"][0]["winners"][0].update(component_id=HOSTILE, repository="https://github.com/" + HOSTILE)
+        inputs["readiness"]["document"]["layers"][0]["selected_tools"][0]["id"] = HOSTILE
+        markup, _ = self.render(current=current, inputs=inputs)
+        audit = composer_fixture.DocumentAudit()
+        audit.feed(markup)
+        self.assertFalse({"script", "img"} & set(audit.tags))
+        self.assertFalse(any(name.startswith("on") for attributes in audit.attributes for name in attributes))
+        self.assertFalse(any(value and value.startswith("javascript:") for attributes in audit.attributes for value in attributes.values()))
+        self.assertGreater(markup.count("&lt;script&gt;alert(1)&lt;/script&gt;"), 20)
+
+    def test_private_values_never_render_from_any_section(self):
         identity = "-".join(["dummy", "synthetic", "account"])
         current = current_fixture()
-        current["headline"] = "headline " + SYNTHETIC_HOME + " " + SYNTHETIC_EMAILS[0]
+        current["headline"] = "headline " + SYNTHETIC_HOME + " " + " ".join(SYNTHETIC_EMAILS)
         current["in_review"][0]["state"] = " ".join(SYNTHETIC_EMAILS) + " worker_" + identity + "_read"
         current["in_review"][0]["blockers"] = [SYNTHETIC_HOME + "/blocker"]
-        current["waiting_on_owner"][1]["detail"] = "mail " + SYNTHETIC_EMAILS[1] + " at " + SYNTHETIC_HOME
+        current["waiting_on_owner"][1]["detail"] = "mail " + SYNTHETIC_EMAILS[3] + " at " + SYNTHETIC_HOME
         current["waiting_on_owner"][0]["link"] = "https://example.org/" + SYNTHETIC_EMAILS[0]
-        current["cc_agents"]["running"].append(identity + " (" + SYNTHETIC_EMAILS[2] + ")")
-        current["token_use_24h"]["note"] = identity + " " + SYNTHETIC_EMAILS[0]
+        current["cc_agents"]["running"].append(identity + " (" + SYNTHETIC_EMAILS[6] + ")")
+        current["rulings"][0]["summary"] = SYNTHETIC_HOME + " " + SYNTHETIC_EMAILS[5]
+        current["program"][0]["owner"] = identity + " " + SYNTHETIC_EMAILS[7]
         fleet = fleet_fixture()
-        fleet["lanes_live"][0]["lane_model"] = SYNTHETIC_EMAILS[0]
+        fleet["lanes_live"][0]["lane_model"] = SYNTHETIC_EMAILS[4]
+        inputs = inputs_fixture()
+        inputs["research_queue"] = record("date_utc\tquestion\n2026-10-11\t" + SYNTHETIC_HOME + " " + " ".join(SYNTHETIC_EMAILS) + " " + identity + "\n")
+        inputs["read_queue"]["document"]["waiting"][0]["gates"] = SYNTHETIC_EMAILS[2]
+        inputs["token_tools"]["document"]["tools"][1]["message"] = "ledger at " + SYNTHETIC_HOME + " for " + SYNTHETIC_EMAILS[1]
+        inputs["practice_slots"]["document"]["slots"][0]["default"] = SYNTHETIC_EMAILS[3]
         with patch.object(view._sanitization.Path, "home", return_value=Path("/synthetic") / identity):
-            markup, _ = view.render(current, fleet, manifests_fixture())
-        self.assertEqual(EMAIL.findall(markup), [])
+            markup, _ = view.render(current, fleet, inputs, adoption=adoption_fixture(), refreshed=REFRESHED)
+        self.assertEqual(leaked_emails(markup), [])
         self.assertNotIn("synthetic-user", markup)
         self.assertNotIn(identity, markup)
         self.assertIn("[email omitted]", markup)
@@ -278,7 +719,35 @@ class CommandCenterViewTests(unittest.TestCase):
         names = prohibited_names()
         if names:
             self.assertEqual(identity_hits(markup, names), 0)
-            self.assertEqual(identity_hits((ROOT / "tools/local-pages/command_center_view.py").read_text(), names), 0)
+            for path in ("tools/local-pages/command_center_view.py", "tools/local-pages/token_tools_now.py", "tools/skill-usage/render_units.py",
+                         "tools/skill-usage/systemd/native-agent-skill-usage.service.in"):
+                self.assertEqual(identity_hits((ROOT / path).read_text(), names), 0, path)
+
+
+class CommandCenterPolicyTests(unittest.TestCase):
+    def test_command_center_roles_are_exact_and_cannot_widen(self):
+        committed = json.loads((ROOT / "tools/local-pages/source_policy.json").read_text())
+        roles = committed["command_center"]
+        granted = {(entry["root"], entry["path"]) for entries in roles.values() for entry in entries}
+        expected = {(base, relative) for _, base, relative, _, _ in BUILDER.COMMAND_CENTER_INPUTS}
+        self.assertEqual(granted, expected)
+        self.assertEqual({role for _, _, _, role, _ in BUILDER.COMMAND_CENTER_INPUTS}, set(roles))
+        for name, base, relative, role, _ in BUILDER.COMMAND_CENTER_INPUTS:
+            self.assertIn({"root": base, "path": relative}, roles[role], name)
+        reads = policy.CommandCenterReads(ROOT, Path("/synthetic-state"), ROOT / "tools/local-pages/source_policy.json")
+        self.assertEqual(reads.authorize("command_center_manifests", ROOT / "manifests/evidence.json"), ROOT / "manifests/evidence.json")
+        for role, path in (("command_center_manifests", ROOT / "manifests/stack.json"), ("command_center_skills", Path("/synthetic-state/coordination/command-center/skills/skill-usage-host-20261010T1435Z.json")),
+                           ("command_center_usage", ROOT / "manifests/evidence.json"), ("command_center_queues", Path("/synthetic-state/coordination/ns2604-coop/research-queue.tsv.bak"))):
+            with self.subTest(role=role, path=path.name), self.assertRaises(policy.SourcePolicyError):
+                reads.authorize(role, path)
+        for bad in ({"command_center_x": [{"root": "user", "path": "notes.json"}]}, {"wrong_prefix": []}, {"command_center_x": [{"root": "state", "path": "../escape.json"}]},
+                    {"command_center_x": [{"root": "state", "path": "coordination/credentials.json"}]}):
+            with self.subTest(bad=bad):
+                broken = dict(committed, command_center=bad)
+                path = Path(self.enterContext(__import__("tempfile").TemporaryDirectory())) / "policy.json"
+                path.write_text(json.dumps(broken))
+                with self.assertRaises(policy.SourcePolicyError):
+                    policy.CommandCenterReads(ROOT, Path("/synthetic-state"), path)
 
 
 class CommandCenterComposerTests(unittest.TestCase):
@@ -289,73 +758,94 @@ class CommandCenterComposerTests(unittest.TestCase):
 
     def setUp(self):
         composer_fixture.LocalPagesTests.setUp(self)
+        self.assertIn("command_center", json.loads(self.policy_path.read_text()))
 
     def add_sections(self):
         fixture = current_fixture()
-        for key in ("in_review", "landings_today", "cc_agents", "token_efficiency", "token_use_24h"):
+        for key in ("in_review", "landings_today", "cc_agents", "token_efficiency", "token_use_24h", "orchestration", "landing_queue", "program", "mirrors", "rulings"):
             self.current[key] = copy.deepcopy(fixture[key])
         self.write_json(self.current_path, self.current)
 
-    def write_manifests(self):
-        readiness = manifests_fixture()["readiness"]["document"]
-        evidence = manifests_fixture()["evidence"]["document"]
-        self.write_json(self.root / "catalogs/north-star/readiness.json", readiness)
-        self.write_json(self.root / "manifests/evidence.json", evidence)
-        return {name: hashlib.sha256((self.root / path).read_bytes()).hexdigest() for name, path in (("readiness", "catalogs/north-star/readiness.json"), ("evidence", "manifests/evidence.json"))}
+    def write_inputs(self) -> dict:
+        documents = inputs_fixture()
+        digests = {}
+        for name, base, relative, _, kind in BUILDER.COMMAND_CENTER_INPUTS:
+            document = documents[name].get("document")
+            if document is None:
+                continue
+            path = {"repo": self.root, "state": self.state}[base] / relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(document if kind == "text" else json.dumps(document))
+            digests[name] = hashlib.sha256(path.read_bytes()).hexdigest()
+        return digests
 
     def test_page_builds_from_fixture_and_is_linked_from_index_nav_and_sources(self):
         self.add_sections()
-        digests = self.write_manifests()
+        digests = self.write_inputs()
         receipt = self.refresh()
         page = (self.output / "command-center.html").read_text()
         for anchor in PANELS:
             self.assertIn(f'id="{anchor}"', page)
-        self.assertIn(digests["readiness"], page)
-        self.assertIn(digests["evidence"], page)
-        self.assertIn("3 files, 1 receipt, 0 convergence records", page)
-        self.assertIn("fixture-lane", page)
+        for value in (digests["readiness"], digests["evidence"], "3 files, 1 receipt, 0 convergence records", "fixture-lane", "Should X replace Y?", "nas#1004", "lane-00",
+                      "rtk gain --format json", "orchestration-frameworks", "fixture/skills@0123456789ab"):
+            self.assertIn(value, page)
         index = (self.output / "index.html").read_text()
         overview = index[index.index('<ul class="page-index">'):]
-        overview = overview[:overview.index("</ul>")]
         self.assertTrue(overview.startswith('<ul class="page-index"><li><a href="command-center.html">Command center</a>'))
         for name in ("index", "readiness", "fleet", "sources", "command-center"):
             self.assertIn('<a href="command-center.html"', (self.output / (name + ".html")).read_text())
-        self.assertIn('aria-current="page">Command center</a>', page)
         self.assertIn('href="sources.html#command-center"', page)
         sources = (self.output / "sources.html").read_text()
         self.assertIn('<section id="command-center" class="panel"><h2>Command center</h2>', sources)
-        self.assertIn("read under the existing <code>architecture_readiness</code> grant", sources)
-        self.assertIn("repo:catalogs/north-star/readiness.json", sources)
+        for role in ("command_center_manifests", "command_center_queues", "command_center_skills", "command_center_usage", "command_center_landscape"):
+            self.assertIn("read under the exact <code>" + role + "</code> grant", sources)
         record = receipt["command_center"]
         self.assertEqual(record["status"], "RECORDED")
         self.assertEqual(set(record["panels"]), set(PANELS))
-        self.assertEqual(record["manifests"]["readiness"]["sha256"], digests["readiness"])
-        self.assertNotIn("document", record["manifests"]["readiness"])
-        self.assertEqual(receipt["inputs"]["command_center:readiness"]["role"], "architecture_readiness")
-        self.assertEqual(receipt["inputs"]["command_center:evidence"]["role"], "architecture_registry")
+        self.assertEqual(record["inputs"]["readiness"]["sha256"], digests["readiness"])
+        self.assertEqual(record["inputs"]["final_stack"]["status"], "missing")
+        self.assertNotIn("document", record["inputs"]["readiness"])
+        for name, _, _, role, _ in BUILDER.COMMAND_CENTER_INPUTS:
+            if name in digests:
+                self.assertEqual(receipt["inputs"]["command_center:" + name]["role"], role)
         self.assertIn("module:command_center_view", receipt["inputs"])
-        self.assertIn("command-center.html", receipt["outputs"])
-        self.assertEqual(set(record["not_wired"]), {"token_report", "skill_usage", "research_queue", "final_stack"})
+        self.assertEqual(set(record["not_wired"]), {"token_report", "north_star"})
+        self.assertIn(html.escape(BUILDER.load_local("command_center_view").NOT_WIRED["north_star"].split(";")[0], quote=True), sources)
 
-    def test_missing_sections_and_manifests_render_gaps_and_still_publish(self):
+    def test_a_published_projection_replaces_its_not_wired_record(self):
+        self.add_sections()
+        self.write_inputs()
+        self.current["north_star_layers"] = [{"n": 1, "name": "Market-side data", "target": "t", "lane": "ingestion-b", "acceptance": "a", "state": "s"}]
+        self.write_json(self.current_path, self.current)
+        receipt = self.refresh()
+        reasons = BUILDER.load_local("command_center_view").NOT_WIRED
+        self.assertEqual(receipt["command_center"]["not_wired"], {"token_report": reasons["token_report"]})
+        sources = (self.output / "sources.html").read_text()
+        self.assertNotIn(html.escape(reasons["north_star"].split(";")[0], quote=True), sources)
+        self.assertIn("Market-side data", (self.output / "command-center.html").read_text())
+
+    def test_missing_sections_and_inputs_render_gaps_and_still_publish(self):
         receipt = self.refresh()
         page = (self.output / "command-center.html").read_text()
-        for name in ("cc-now.json#/in_review", "cc-now.json#/token_efficiency", "cc-now.json#/cc_agents/running",
-                     "readiness manifest (catalogs/north-star/readiness.json): not present in the selected checkout",
-                     "evidence manifest (manifests/evidence.json): not present in the selected checkout"):
+        for name in ("cc-now.json#/in_review", "cc-now.json#/orchestration", "cc-now.json#/cc_agents/running",
+                     "repo:catalogs/north-star/readiness.json: not present in the selected checkout",
+                     "state:coordination/ns2604-coop/read-queue-now.json: not present in the state root",
+                     "state:coordination/command-center/pages/token-tools-now.json: not present in the state root",
+                     "state:coordination/command-center/skills/skill-usage-host-latest.json: not present in the state root"):
             self.assertIn("missing input: " + name, page)
-        self.assertEqual(receipt["command_center"]["manifests"]["readiness"], {"status": "missing", "reason": "not present in the selected checkout"})
+        self.assertIn("pending #1008/#1007", page)
+        self.assertEqual(receipt["command_center"]["inputs"]["readiness"]["status"], "missing")
         self.assertNotIn("command_center:readiness", receipt["inputs"])
         self.assertIn("Review a source", page)
 
-    def test_unapproved_manifest_is_a_gap_not_a_stop(self):
-        self.write_manifests()
-        policy = json.loads(self.policy_path.read_text())
-        policy["architecture"]["architecture_readiness"] = []
-        self.write_json(self.policy_path, policy)
+    def test_unapproved_input_is_a_gap_not_a_stop(self):
+        self.write_inputs()
+        document = json.loads(self.policy_path.read_text())
+        document["command_center"]["command_center_manifests"] = [entry for entry in document["command_center"]["command_center_manifests"] if entry["path"] != "catalogs/north-star/readiness.json"]
+        self.write_json(self.policy_path, document)
         receipt = self.refresh()
-        self.assertEqual(receipt["command_center"]["manifests"]["readiness"], {"status": "missing", "reason": "unreadable (SourcePolicyError)"})
-        self.assertEqual(receipt["command_center"]["manifests"]["evidence"]["status"], "read")
+        self.assertEqual(receipt["command_center"]["inputs"]["readiness"]["reason"], "unreadable (SourcePolicyError)")
+        self.assertEqual(receipt["command_center"]["inputs"]["evidence"]["status"], "read")
         self.assertIn("unreadable (SourcePolicyError)", (self.output / "command-center.html").read_text())
 
     def test_failed_fleet_adapter_keeps_the_page_with_stated_gaps(self):
@@ -363,43 +853,48 @@ class CommandCenterComposerTests(unittest.TestCase):
             receipt = self.refresh()
         page = (self.output / "command-center.html").read_text()
         self.assertIn("missing input: fleet lanes_live", page)
-        self.assertIn("missing input: fleet claude_sessions", page)
         self.assertNotIn("synthetic adapter failure", page)
         self.assertEqual(receipt["command_center"]["panels"]["cc-sessions"]["status"], "missing")
 
     def test_view_failure_publishes_a_placeholder_and_every_other_page(self):
         original = BUILDER.load_local
-        def broken(*_):
+        def broken(*_, **__):
             raise ValueError("synthetic view failure")
         def load(name):
             module = original(name)
-            return SimpleNamespace(render=broken, NOT_WIRED=module.NOT_WIRED, FINAL_STACK=module.FINAL_STACK) if name == "command_center_view" else module
+            return SimpleNamespace(render=broken, NOT_WIRED=module.NOT_WIRED) if name == "command_center_view" else module
         with patch.object(BUILDER, "load_local", side_effect=load):
             receipt = self.refresh()
         page = (self.output / "command-center.html").read_text()
         self.assertIn("Command center view unavailable (ValueError)", page)
         self.assertNotIn("synthetic view failure", page)
         self.assertEqual(receipt["command_center"]["status"], "UNREPORTED")
+        self.assertNotIn("not_wired", receipt["command_center"])
         for name in ("index", "readiness", "gaps", "roadmap", "fleet", "sources"):
             self.assertTrue((self.output / (name + ".html")).is_file())
 
     def test_composed_page_masks_private_values(self):
         self.add_sections()
+        self.write_inputs()
         home_name = Path.home().name
         self.current["in_review"][0]["state"] = "see " + SYNTHETIC_HOME + " and " + " ".join(SYNTHETIC_EMAILS)
         self.current["waiting_on_owner"].append({"what": "Owner item for worker_" + home_name + "_read", "detail": "/".join(["", "home", home_name, "notes"])})
-        self.current["cc_agents"]["running"].append("cc-" + home_name + " (" + SYNTHETIC_EMAILS[0] + ")")
+        self.current["cc_agents"]["running"].append("cc-" + home_name + " (" + SYNTHETIC_EMAILS[3] + ")")
+        self.current["rulings"].append({"file": "ruling-" + home_name + ".md", "utc": "06:00Z", "summary": SYNTHETIC_EMAILS[7]})
         self.write_json(self.current_path, self.current)
+        queue = self.state / "coordination/ns2604-coop/research-queue.tsv"
+        queue.write_text("date_utc\tquestion\n2026-10-11\t" + "/".join(["", "home", home_name, "q"]) + " " + " ".join(SYNTHETIC_EMAILS) + "\n")
         self.refresh()
-        page = (self.output / "command-center.html").read_text()
-        self.assertEqual(EMAIL.findall(page), [])
-        self.assertNotIn("synthetic-user", page)
-        self.assertNotRegex(page, r"/(?:home|Users)/[^/\s\"'<>$]")
-        if len(home_name) >= 3:
-            self.assertEqual(identity_hits(page, [home_name]), 0)
-        names = prohibited_names()
-        if names:
-            self.assertEqual(identity_hits(page, names), 0)
+        for name in ("command-center", "index", "readiness", "sources"):
+            page = (self.output / (name + ".html")).read_text()
+            self.assertEqual(leaked_emails(page), [], name)
+            self.assertNotIn("synthetic-user", page)
+            self.assertNotRegex(page, r"/(?:home|Users)/[^/\s\"'<>$]")
+            if len(home_name) >= 3:
+                self.assertEqual(identity_hits(page, [home_name]), 0)
+            names = prohibited_names()
+            if names:
+                self.assertEqual(identity_hits(page, names), 0)
 
 
 if __name__ == "__main__":

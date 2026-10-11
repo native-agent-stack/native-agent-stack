@@ -463,11 +463,25 @@ td a, td code { overflow-wrap: anywhere; }
 .cc-owner-list .owner-action { font-size: .9rem; }
 .cc-owner-detail { display: block; margin-top: .2rem; color: var(--muted); font-size: .8rem; line-height: 1.4; }
 
+.cc-facts { display: grid; gap: 0; margin: .3rem 0 .9rem; max-width: 110ch; font-size: .9rem; line-height: 1.45; }
+.cc-facts > div { display: grid; grid-template-columns: minmax(7rem, .18fr) minmax(0, 1fr); gap: .2rem 1rem; padding-block: .4rem; border-top: 1px solid var(--rule); }
+.cc-facts dt { color: var(--muted); }
+.cc-facts dd { min-width: 0; margin: 0; overflow-wrap: break-word; }
+.cc-stale { color: var(--critical); }
+.cc-more { margin-block: .4rem .9rem; font-size: .875rem; }
+.cc-more summary { min-height: 44px; padding-block: .6rem; cursor: pointer; }
+.cc-steps { max-width: 92ch; font-size: .9rem; line-height: 1.5; }
+.cc-layers td small, .cc-skill-matrix th small, .cc-skill-matrix td small, .cc-tools td small, .cc-tools th small { display: block; }
+.cc-layers td ul, .cc-skill-matrix td ul { padding-left: .9rem; }
+.cc-pre { display: block; white-space: pre-wrap; font-size: .8rem; line-height: 1.45; }
+.cc-slots tr.cc-ao-row th, .cc-slots tr.cc-ao-row td { background: var(--info-bg); }
+.cc-skill-matrix { min-width: 64rem; }
+.cc-skill-matrix tbody th { min-width: 11rem; }
+.cc-skill-matrix td:nth-child(2) { min-width: 15rem; }
+.cc-skill-matrix thead .cc-num { white-space: normal; }
+.cc-layers { min-width: 72rem; }
+
 @media (min-width: 72rem) {
-  .cc-grid { grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 2.2rem 2.4rem; }
-  .cc-panel { grid-column: 1 / -1; }
-  #cc-skills { grid-column: span 5; }
-  #cc-manifests { grid-column: span 7; }
   .cc-split { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .cc-owner-list { max-width: none; columns: 2; column-gap: 2.4rem; }
   .cc-owner-list li { break-inside: avoid; }
@@ -479,6 +493,7 @@ td a, td code { overflow-wrap: anywhere; }
   .cc-table th, .cc-table td { padding: .45rem .55rem; }
   /* Wide tables scroll inside their labelled region instead of breaking words. */
   .cc-table:not(.cc-prs):has(thead th:nth-child(4)) { min-width: 36rem; }
+  .cc-facts > div { grid-template-columns: minmax(0, 1fr); }
 }
 
 @media (min-width: 72rem) {

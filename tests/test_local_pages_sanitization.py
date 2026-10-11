@@ -159,5 +159,29 @@ class SanitizationTests(unittest.TestCase):
                         self.assertEqual(helper.text(label), label)
 
 
+    def test_email_addresses_are_omitted_after_the_shared_token_decoding(self):
+        # The #1012 Claude read (B1) found a page-local mask that missed an HTML5 entity, encoded dots,
+        # double percent-encoding and a semicolon-less reference; every page now gets the shared mask.
+        helper = load_helper()
+        at = "@"
+        forms = ["owner" + at + "example.org", "owner%40example.org", "owner&#64;example.org", "owner&commat;example.org", "owner" + at + "example%2Eorg",
+                 "owner" + at + "example&#46;org", "owner%2540example.org", "owner&#64example.org", "Owner.Name+tag" + at + "sub.example.co.uk", "owner&#x40;example.org"]
+        for form in forms:
+            with self.subTest(form=form):
+                rendered = helper.text("mail " + form + " now")
+                self.assertEqual(rendered, "mail [email omitted] now")
+                self.assertEqual(helper.text(rendered), rendered)
+                self.assertEqual(helper.sanitize({"nested": [form]}), {"nested": ["[email omitted]"]})
+        for public in ["@codex review", "user" + at + "host", "a " + at + " b.org", "${USER_HOME}", "[email omitted]", "https://github.com/org/repo"]:
+            with self.subTest(public=public):
+                self.assertEqual(helper.text(public), public)
+
+    def test_email_placeholder_survives_identity_projection(self):
+        helper = load_helper()
+        for identity in ["email", "omitted"]:
+            with self.subTest(identity=identity), patch.object(helper.Path, "home", return_value=Path("/synthetic") / identity):
+                self.assertEqual(helper.text("owner" + "@" + "example.org"), "[email omitted]")
+
+
 if __name__ == "__main__":
     unittest.main()

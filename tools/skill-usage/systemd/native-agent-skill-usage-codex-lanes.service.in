@@ -1,0 +1,21 @@
+# Render with tools/skill-usage/render_units.py before review.
+# Daily: skill_usage.py --lanes measures every Codex rollout session through
+# the repository's Node kernel, one process per session; a 7-day run had not
+# finished after 25 minutes on 2026-10-11, so it runs once a day. Its completion
+# time is unmeasured: TimeoutStartSec is a ceiling, not a measurement. It writes
+# "$2.full", projects it without the per-actor rows into "$2.tmp" and renames
+# that into place. ':' disables environment expansion.
+[Unit]
+Description=Refresh the daily Codex lane skill report the command-center page reads
+
+[Service]
+Type=oneshot
+UMask=0077
+NoNewPrivileges=true
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+TimeoutStartSec=10800
+Environment=PATH=%h/.local/share/codex-ecosystem/bin:%h/.local/share/mise/shims:%h/.local/bin:/usr/local/bin:/usr/bin:/bin
+Environment=PYTHONDONTWRITEBYTECODE=1
+ExecStart=@EXEC_CODEX_LANES@

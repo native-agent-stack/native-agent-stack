@@ -41,10 +41,26 @@ ROAD_REFERENCE_FILES = {
 }
 _SANITIZER = None
 PAGES = {"index": "Home", "command-center": "Command center", "readiness": "Readiness", "gaps": "Gap board", "roadmap": "Roadmap", "fleet": "Fleet", "architecture": "Architecture", "sources": "Sources"}
-# Committed manifests the command center reads under the exact roles that
-# source_policy.json already grants for Architecture; no new permission.
-COMMAND_CENTER_MANIFESTS = (("readiness", "catalogs/north-star/readiness.json", "architecture_readiness"),
-                            ("evidence", "manifests/evidence.json", "architecture_registry"))
+# Every file the command center reads, each under its exact command_center_*
+# role in source_policy.json: (name, root, relative path, role, format).
+COMMAND_CENTER_INPUTS = (
+    ("readiness", "repo", "catalogs/north-star/readiness.json", "command_center_manifests", "json"),
+    ("evidence", "repo", "manifests/evidence.json", "command_center_manifests", "json"),
+    ("skills_manifest", "repo", "adoption/skills/manifest.json", "command_center_manifests", "json"),
+    ("matrix", "repo", "catalogs/landscape/component-evidence-matrix.json", "command_center_landscape", "json"),
+    ("grand_list", "repo", "catalogs/landscape/new-host-grand-list.json", "command_center_landscape", "json"),
+    ("research_state", "repo", "catalogs/landscape/research-state.json", "command_center_landscape", "json"),
+    ("final_stack", "repo", "catalogs/landscape/final-stack.json", "command_center_landscape", "json"),
+    ("token_window", "state", "coordination/command-center/pages/token-window-now.json", "command_center_usage", "json"),
+    ("token_tools", "state", "coordination/command-center/pages/token-tools-now.json", "command_center_usage", "json"),
+    ("skills_daily", "state", "coordination/command-center/skills/skill-invoke-rate-latest.json", "command_center_skills", "json"),
+    ("practice_slots", "state", "coordination/cc-native-practice-20261009/slots-final.json", "command_center_skills", "json"),
+    ("skills_host", "state", "coordination/command-center/skills/skill-usage-host-latest.json", "command_center_skills", "json"),
+    ("skills_codex_lanes", "state", "coordination/command-center/skills/skill-usage-codex-lanes-latest.json", "command_center_skills", "json"),
+    ("skills_claude_lanes", "state", "coordination/command-center/skills/skill-usage-claude-lanes-latest.json", "command_center_skills", "json"),
+    ("research_queue", "state", "coordination/ns2604-coop/research-queue.tsv", "command_center_queues", "text"),
+    ("read_queue", "state", "coordination/ns2604-coop/read-queue-now.json", "command_center_queues", "json"),
+)
 
 
 def utc_now() -> str:
@@ -315,30 +331,32 @@ def northstar_entry(output_dir: Path) -> str:
     return '<li><a href="northstar.html">North-star grand page</a><p>See what is next, the ten layers, the roadmap and token use.</p></li>'
 
 
-def read_command_center_manifests(root: Path, state_root: Path, output_dir: Path, inputs: dict[str, dict[str, Any]]) -> dict[str, dict[str, Any]]:
-    """Read each committed manifest under its existing grant; a failure is a stated gap, never a stop."""
-    manifests: dict[str, dict[str, Any]] = {}
+def read_command_center_inputs(root: Path, state_root: Path, output_dir: Path, inputs: dict[str, dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    """Read each command-center input under its exact grant; a failure is a stated gap, never a stop."""
+    records: dict[str, dict[str, Any]] = {}
     try:
-        reads = load_local("source_policy").ArchitectureReads(root, state_root, policy_path=SOURCE_POLICY_PATH)
+        reads = load_local("source_policy").CommandCenterReads(root, state_root, policy_path=SOURCE_POLICY_PATH)
     except (OSError, ValueError, UnicodeError) as error:
-        return {name: {"status": "missing", "reason": "source policy unavailable (" + type(error).__name__ + ")"} for name, _, _ in COMMAND_CENTER_MANIFESTS}
-    for name, relative, role in COMMAND_CENTER_MANIFESTS:
-        path = root / relative
+        return {name: {"status": "missing", "label": base + ":" + relative, "role": role, "reason": "source policy unavailable (" + type(error).__name__ + ")"}
+                for name, base, relative, role, _ in COMMAND_CENTER_INPUTS}
+    for name, base, relative, role, kind in COMMAND_CENTER_INPUTS:
+        path = {"repo": root, "state": state_root}[base] / relative
+        record: dict[str, Any] = {"label": base + ":" + relative, "role": role}
         try:
             if no_symlinks(path).is_relative_to(output_dir):
-                raise ValueError("manifest is inside the served root")
+                raise ValueError("input is inside the served root")
             raw, metadata = reads.read(role, path)
-            document = strict_json(raw)
-            if not isinstance(document, dict):
-                raise ValueError("manifest must be a JSON object")
+            document = raw.decode("utf-8") if kind == "text" else strict_json(raw)
+            if kind == "json" and not isinstance(document, dict):
+                raise ValueError("input must be a JSON object")
         except FileNotFoundError:
-            manifests[name] = {"status": "missing", "reason": "not present in the selected checkout"}
+            records[name] = dict(record, status="missing", reason="not present in the selected checkout" if base == "repo" else "not present in the state root")
         except (OSError, ValueError, UnicodeError) as error:
-            manifests[name] = {"status": "missing", "reason": "unreadable (" + type(error).__name__ + ")"}
+            records[name] = dict(record, status="missing", reason="unreadable (" + type(error).__name__ + ")")
         else:
             inputs["command_center:" + name] = metadata
-            manifests[name] = {"status": "read", "label": "repo:" + relative, "role": role, "sha256": metadata["sha256"], "bytes": metadata["bytes"], "document": document}
-    return manifests
+            records[name] = dict(record, status="read", sha256=metadata["sha256"], bytes=metadata["bytes"], file_utc=metadata["file_utc"], document=document)
+    return records
 
 
 def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
@@ -512,24 +530,24 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
         if name.startswith("roadmap:"):
             description = "; ".join(f"{key} = {value}" for key, value in item.get("source_dates", {}).items()) or item.get("status") or "source date unspecified"
             road_notes.append('<code>' + esc(label_path(item["path"], root, state_root)) + '</code> — ' + esc(description))
-    cc_manifests = read_command_center_manifests(root, state_root, output_dir, inputs)
+    cc_inputs = read_command_center_inputs(root, state_root, output_dir, inputs)
     cc_view = load_local("command_center_view")
     try:
-        cc_markup, cc_panels = cc_view.render(current, fleet, cc_manifests)
-        command_center = {"status": "RECORDED", "panels": cc_panels}
+        cc_markup, cc_panels = cc_view.render(current, fleet, cc_inputs, adoption=adoption, refreshed=refreshed)
+        # Only the not-wired inputs the page rendered; a published projection replaces its notice.
+        command_center = {"status": "RECORDED", "panels": cc_panels, "not_wired": {key: cc_view.NOT_WIRED[key] for row in cc_panels.values() for key in row.get("not_wired", [])}}
     except (ValueError, TypeError, KeyError, AttributeError, IndexError, OverflowError, RecursionError) as error:
         # The consolidated view is optional: a view failure publishes a stated
         # placeholder while every other page keeps its own observation.
         cc_markup, command_center = None, {"status": "UNREPORTED", "reason": "Command center view unavailable (" + type(error).__name__ + ")"}
-    command_center["manifests"] = {name: {key: value for key, value in item.items() if key != "document"} for name, item in cc_manifests.items()}
-    command_center["not_wired"] = dict(cc_view.NOT_WIRED, final_stack=cc_view.FINAL_STACK)
+    command_center["inputs"] = {name: {key: value for key, value in item.items() if key != "document"} for name, item in cc_inputs.items()}
     cc_body = '' if cc_markup is not None else '<section class="panel" id="cc-view"><h2>UNREPORTED</h2><p>' + esc(command_center["reason"]) + '. Other pages retain their own current observations.</p></section>'
-    cc_notes = [f'<code>{esc(label_path(current_input["path"], root, state_root))}</code> — in_review, landings_today, cc_agents, waiting_on_owner, token_efficiency and token_use_24h; SHA-256 <code>{current_input["sha256"]}</code>',
-                'Sessions, lanes, the hcom roster and skill-invocation rates come from the Fleet observation as of ' + esc(fleet.get("at") or "not reported") + '; its sources are listed under Fleet.']
-    for name, relative, role in COMMAND_CENTER_MANIFESTS:
-        item = cc_manifests[name]
-        cc_notes.append(f'<code>repo:{esc(relative)}</code> — ' + (f'read under the existing <code>{esc(role)}</code> grant; SHA-256 <code>{esc(item["sha256"])}</code>' if item["status"] == "read" else 'missing input: ' + esc(item["reason"])))
-    cc_notes += [esc(reason) for reason in cc_view.NOT_WIRED.values()] + [esc(cc_view.FINAL_STACK)]
+    cc_notes = [f'<code>{esc(label_path(current_input["path"], root, state_root))}</code> — in_review, landings_today, cc_agents, waiting_on_owner, token_efficiency, orchestration, landing_queue, program, mirrors and rulings; SHA-256 <code>{current_input["sha256"]}</code>',
+                'Sessions, lanes, the hcom roster and skill-invocation rates come from the Fleet observation as of ' + esc(fleet.get("at") or "not reported") + '; orchestration and token-tool counts reuse the Adoption snapshot. Both are listed under Fleet.']
+    for name, base, relative, role, _ in COMMAND_CENTER_INPUTS:
+        item = cc_inputs[name]
+        cc_notes.append(f'<code>{esc(base)}:{esc(relative)}</code> — ' + (f'read under the exact <code>{esc(role)}</code> grant; SHA-256 <code>{esc(item["sha256"])}</code>' if item["status"] == "read" else 'missing input: ' + esc(item["reason"])))
+    cc_notes += [esc(reason) for reason in command_center.get("not_wired", {}).values()]
     overview = '<section class="panel"><h2>Choose a page</h2><ul class="page-index"><li><a href="command-center.html">Command center</a><p>Track lanes, PR waves, token savings, skill use, manifests and owner items.</p></li><li><a href="readiness.html">North-star readiness</a><p>What is done, what is left and what needs a decision.</p></li>' + northstar_entry(output_dir) + '<li><a href="gaps.html">Grand Gap Board</a><p>Find open gaps and their next actions.</p></li><li><a href="roadmap.html">Roadmap</a><p>Read the dated milestones and server records.</p></li><li><a href="fleet.html">Worker fleet</a><p>See the lanes, sessions, jobs and spend.</p></li><li><a href="sources.html">Sources</a><p>Check input dates, hashes and evidence scope.</p></li></ul></section>'
     current_scope = 'command-center current view snapshot; ' + view.observation_time(current["updated_utc"], plain=True)
     current_notes = [f'<code>{esc(label_path(current_input["path"], root, state_root))}</code> — {esc(current_scope)}; SHA-256 <code>{current_input["sha256"]}</code>', 'Workstation readings use an exact Prometheus metric when present, otherwise the CC-owned value and its recorded read time.']

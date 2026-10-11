@@ -93,3 +93,23 @@ ramp, `#cde2fb`, in light and a darker step, `#0d366b`, in dark (fill against
 track 3.34:1 and 3.28:1). These are calculations, not rendered measurements.
 At 390px, tables with four or more columns scroll inside their labelled region
 rather than breaking words; the page itself never scrolls sideways.
+
+The landscape, orchestration, skill and research sections extend the same
+system rather than adding forms. Every section is full width, because their
+tables carry five to eight columns. Lifecycle stages fold into each winner's
+cell, grouped by status, so the 32-layer register stays scannable. Recorded
+facts such as the orchestration slot use a ruled definition list. The only new
+token is the critical ink for "stale", always paired with the word and the age.
+The one chart remains token use by lane, now from the token window: the 15
+largest lanes are open, and every lane is in a collapsed table beside them.
+
+The per-skill table (nine columns) and the W6 layer table (seven columns, each
+winner's stages, platforms and mirror folded into its cell) keep a minimum
+width and scroll inside their labelled regions, so no count wraps mid-number.
+Flags reuse the status pills with their words: "wiring defect" in critical
+ink, "not installed" and "unpinned" in warning ink. The token tools are a plain
+table with each command in code and its exit code beside it, because the
+command and exit code are the evidence. The one emphasis added is the
+orchestration-frameworks row in the practice-slot table: it carries the
+info-tinted background already in the palette, because that slot is the AO
+resolution the brief asks the page to show.

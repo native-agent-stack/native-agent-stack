@@ -63042,8 +63042,8 @@
     },
     {
       "path": "tools/local-pages/README.md",
-      "sha256": "099ee0485a967befa8154b41d55cd81812a3900eb498934cf81160ea492d3d98",
-      "bytes": 36854
+      "sha256": "f88078fb216120d69fa56f7ac4aa268db227105638dfaf281e825c9a02b6ec19",
+      "bytes": 43179
     },
     {
       "path": "tools/local-pages/architecture_mapping.json",
@@ -63067,8 +63067,8 @@
     },
     {
       "path": "tools/local-pages/source_policy.json",
-      "sha256": "88d277e33d4c062fd07fb9ce9ebd2e1614f17bb355246b9f847eab0f73651653",
-      "bytes": 759459
+      "sha256": "65ddfa0a17b9f72bbb1b26b34265dc1a9eb64a6575fd11e3c67ee4bcfcd52933",
+      "bytes": 761416
     },
     {
       "path": "tools/omniroute/gateway_record.py",
@@ -63112,8 +63112,8 @@
     },
     {
       "path": "tools/skill-usage/README.md",
-      "sha256": "4a603c06bef574515481b8794c1ae264dd2e5bff1911e96e2adb2ec1b97e3277",
-      "bytes": 57941
+      "sha256": "9e8fab716bcae767f0606cdbf4926aa34baa20d585e484bbfe76edaee0bb5403",
+      "bytes": 59672
     },
     {
       "path": "tools/skill-usage/daily_skill_usage.py",

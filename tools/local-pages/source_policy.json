@@ -1598,6 +1598,82 @@
     "SDK item versus raw identity is ambiguous in this metadata projection. Both categorical SDK roles permit this same exact reviewed file set; component identity, content, execution results and E2E acceptance remain separate native binding claims.",
     "Protected credential, environment, client-secret and mixed e2e-truth paths are denied before membership checks, including a hypothetical registration."
   ],
+  "command_center": {
+    "command_center_manifests": [
+      {
+        "root": "repo",
+        "path": "catalogs/north-star/readiness.json"
+      },
+      {
+        "root": "repo",
+        "path": "adoption/skills/manifest.json"
+      },
+      {
+        "root": "repo",
+        "path": "manifests/evidence.json"
+      }
+    ],
+    "command_center_landscape": [
+      {
+        "root": "repo",
+        "path": "catalogs/landscape/component-evidence-matrix.json"
+      },
+      {
+        "root": "repo",
+        "path": "catalogs/landscape/final-stack.json"
+      },
+      {
+        "root": "repo",
+        "path": "catalogs/landscape/new-host-grand-list.json"
+      },
+      {
+        "root": "repo",
+        "path": "catalogs/landscape/research-state.json"
+      }
+    ],
+    "command_center_usage": [
+      {
+        "root": "state",
+        "path": "coordination/command-center/pages/token-tools-now.json"
+      },
+      {
+        "root": "state",
+        "path": "coordination/command-center/pages/token-window-now.json"
+      }
+    ],
+    "command_center_skills": [
+      {
+        "root": "state",
+        "path": "coordination/cc-native-practice-20261009/slots-final.json"
+      },
+      {
+        "root": "state",
+        "path": "coordination/command-center/skills/skill-invoke-rate-latest.json"
+      },
+      {
+        "root": "state",
+        "path": "coordination/command-center/skills/skill-usage-claude-lanes-latest.json"
+      },
+      {
+        "root": "state",
+        "path": "coordination/command-center/skills/skill-usage-codex-lanes-latest.json"
+      },
+      {
+        "root": "state",
+        "path": "coordination/command-center/skills/skill-usage-host-latest.json"
+      }
+    ],
+    "command_center_queues": [
+      {
+        "root": "state",
+        "path": "coordination/ns2604-coop/read-queue-now.json"
+      },
+      {
+        "root": "state",
+        "path": "coordination/ns2604-coop/research-queue.tsv"
+      }
+    ]
+  },
   "architecture_inventory_aliases": [
     {
       "root": "user",

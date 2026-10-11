@@ -179,58 +179,139 @@ unreported. Counts describe the stated retrospective window and do not prove
 adoption acceptance, fresh-session use or workflow improvement.
 
 `command_center_view.py` renders `command-center.html`, the first entry in the
-index's page list and the second in the navigation. It adds no collector and no
-`source_policy.json` grant: its six sections reuse what each refresh already
-reads.
+index's page list and the second in the navigation. It adds no collector. Its
+nine sections reuse the Fleet and Adoption observations that every refresh
+already makes, `cc-now.json`, and sixteen files read through
+`source_policy.CommandCenterReads` under exact `command_center_*` roles in
+`source_policy.json`:
 
 | Section | Inputs |
 | --- | --- |
 | Sessions and lanes | Fleet `lanes_live`, `claude_sessions`, `exec_reads_in_flight`, `lanes_parked` and the hcom roster; `cc-now.json#/cc_agents/running` |
+| Orchestration | `cc-now.json#/orchestration` and `#/landing_queue`; `state:coordination/ns2604-coop/read-queue-now.json`; the `orchestration-frameworks` slot of `state:coordination/cc-native-practice-20261009/slots-final.json`; Adoption `orchestration` tool calls by role |
 | PR waves | `cc-now.json#/in_review` and `#/landings_today` |
-| Tokens saved | `cc-now.json#/token_efficiency` and `#/token_use_24h` |
-| SOTA skill invoke rates | Fleet tracking's per-lane `skill_invocations` family |
-| Compounding manifests | committed `catalogs/north-star/readiness.json` and `manifests/evidence.json` |
+| Resolution landscape | `repo:catalogs/landscape/component-evidence-matrix.json`, `new-host-grand-list.json` and `final-stack.json`; the layers of `repo:catalogs/north-star/readiness.json`; `cc-now.json#/program`, `#/mirrors` (with `pins`), `#/rulings` and the optional `#/north_star_layers` |
+| SOTA skill invoke rates | `repo:adoption/skills/manifest.json`; `state:coordination/command-center/skills/skill-usage-host-latest.json`, `skill-usage-codex-lanes-latest.json`, `skill-usage-claude-lanes-latest.json` and #970's `skill-invoke-rate-latest.json`; the slots in `slots-final.json`; Fleet tracking's per-lane `skill_invocations` rates |
+| Tokens saved | `state:coordination/command-center/pages/token-tools-now.json` and `token-window-now.json`; Adoption token-efficiency server counts; `cc-now.json#/token_efficiency` (and `#/token_use_24h` when the token window is missing) |
+| Research queue | `state:coordination/ns2604-coop/research-queue.tsv`; `repo:catalogs/landscape/research-state.json` `resume_order` |
+| Compounding manifests | `repo:catalogs/north-star/readiness.json`, `manifests/evidence.json` and `catalogs/landscape/final-stack.json` |
 | Waiting on you | `cc-now.json#/waiting_on_owner` |
 
-The two committed manifests are read through `ArchitectureReads` under the
-exact `architecture_readiness` and `architecture_registry` grants that already
-name them; their path, role, hash and byte count join the custody table and
-the receipt's `command_center` block. A missing or malformed section renders
-`missing input: <name>`, and an unapproved manifest renders
-`unreadable (SourcePolicyError)`; neither stops the refresh. A view failure
-publishes an UNREPORTED placeholder while the other pages refresh. Each
-section carries a wired, partial or missing-input label, also recorded per
-section in the receipt.
+`CommandCenterReads` extends the Architecture reader: the same bounded,
+no-follow, protected-name checks, with repo and state roots only. Each read's
+path, role, hash, byte count and modification time join the custody table and
+the receipt's `command_center.inputs`. A missing or malformed input renders
+`missing input: <name>`, an unapproved one `unreadable (SourcePolicyError)`;
+neither stops the refresh. A view failure publishes an UNREPORTED placeholder
+while the other pages refresh. Each section carries a wired, partial or
+missing-input label, also recorded per section in the receipt. The label
+follows what the section renders: any stated gap, not-wired input or stale
+report makes it partial, and the detail names the reason. Each section and the
+count strip render in their own guard, so a value of the wrong type degrades
+only the part that reads it.
 
-Every value keeps its source label. Token figures are reported by the CC, never
-measured here and never summed across sources. A window comes from the source's
-`window` field or a `_24h`/`_7d` field-name suffix; otherwise it reads "not
-stated in source". The only chart is token use by lane: one series in one hue,
-bars drawn beside the numbers in the same table. A skill rate the producer does
-not qualify stays UNKNOWN, and a lower-bound zero is not a measured absence;
-only a reported zero reads as no recorded calls. Four inputs show "not wired" with their
-reason: the `tools/token-report` manifest (a private state directory with no
-grant), the `tools/skill-usage/skill_usage.py` reports under
-`coordination/command-center/skills/`, `coordination/ns2604-coop/research-queue.tsv`
-(no grant for either), and the final-stack manifest (pending #1007). After the
-shared sanitizer, this page also masks email addresses, including their
-percent-encoded and HTML-entity forms.
+Every value keeps its own source and window, and nothing is summed across
+windows. A report older than its limit at the refresh reads "stale" with its
+age: three hours for the hourly skill and token reports, 30 hours for the daily
+Codex lanes report, one hour for the read queue. Times the CC records as a time
+of day (`15:38Z`) are shown as recorded, never completed with a date. Skill
+counts come from the repository's measurement tools and stay separate from
+Fleet's Prometheus rates, where a rate the producer does not qualify stays
+UNKNOWN.
 
-`in_review` rows keep `pr`, `what` and `state`. The CC can add these optional
-fields; the page never requires them:
+The skills section has one row per skill pinned in
+`adoption/skills/manifest.json`: its source@ref (linked only for an https URL),
+its path and the counts per client, which are Claude lifetime uses, Claude main
+sessions and subagents over 7 days, and Codex use, SKILL.md reads and name
+mentions over 7 days. A pinned skill with zero calls in every measured 7-day
+column is flagged "wiring defect"; one with no skills-lock record and no
+`/skill-doctor` row is also "not installed", and while `/skill-doctor` itself
+is unmeasured that install state reads "not measured"; a skill with recorded
+calls that the manifest does not pin is listed as "unpinned". Codex counts are
+shown for every pinned skill, and a skill the manifest does not enable for
+Codex carries that note. When #970's
+`daily_skill_usage.py` publishes `skills/skill-invoke-rate-latest.json`
+(`skill-invoke-rate-daily/1`) within 30 hours, its counts are used; otherwise
+the hourly reports are. A client or root that its producer did not measure
+reads "not measured" and never counts as zero.
 
-| Field | Value | Rendering |
-| --- | --- | --- |
-| `head` | text, such as a short commit hash | code |
-| `round` | non-negative integer or text | as recorded |
-| `next_gate` | text | bold, on the next-gate rule |
-| `blockers` | list of text, or one text | a list; `[]` reads "none" |
-| `follow_ups` | list of text, or one text | a list; `[]` reads "none" |
+The landscape section lists each matrix winner's component, pin, evidence
+class, lifecycle stages and platforms, then the W6 final columns: verdict, run
+pin, upstream E2E at the pin and invoke evidence, each as recorded or "not
+recorded". Each winner's github.com repository is matched, by owner/name and
+ignoring case, to `cc-now.json#/mirrors/pins`. "Matches the pin" means the
+pin's version equals the dotted version the mirror's tag names
+(`rust-v0.155.1`, `v1.30.1` and `release-1.2` name `0.155.1`, `1.30.1` and
+`1.2`; a ref without a dotted version, such as `HEAD`, `main` or
+`codex-cli-v2`, is compared as written), or a commit in the pin shares the
+mirror commit's prefix. A winner the matrix records as unpinned reads "no pin
+recorded to compare", and a winner without an entry reads "no mirror"; both
+raw values render beside the relation. Terminal layer
+states come only from `final-stack.json` and read "pending #1008/#1007" until it
+exists. The north-star readiness layers follow with the same columns, from
+their RECORDED claims.
 
-An absent or null field reads "not recorded"; another type reads "not recorded
-(unsupported value)". `cc_agents.running` rows are either `"name (task)"` text
-or `{"name", "task", "model"}` objects; a model appears only in object rows.
-Last activity is the hcom state age, the only recorded activity time.
+The tokens section shows each token tool's own report command, run by
+`token_tools_now.py` (below), with its exit code, run time, version and the
+tool's own estimate. The native counters from `token-window-now.json` are
+labelled client counters. Nothing is summed across tools, evidence classes or
+windows. The only chart is token use by lane: one series in one hue, bars
+beside the numbers in the same table. Two inputs can read "not wired" with
+their reason: the `tools/token-report` manifest, whose README keeps raw
+reports private, and the north-star ten-layer table while
+`cc-now.json#/north_star_layers` is absent, since no committed record holds
+it. The receipt's `command_center.not_wired` lists only the notices the page
+rendered.
+
+The shared sanitizer omits email addresses on every page, after the same
+per-token decoding it applies to home paths and identifiers, so percent-encoded,
+double-encoded and HTML-entity forms, with or without the semicolon, are
+matched in their decoded text.
+
+`token_tools_now.py` runs each installed token tool's own report command:
+`rtk gain --format json`, `headroom agent-savings --check-perf --hours 24
+--format json`, `headroom output-savings` and `doctor` from the context-mode
+plugin's `cli.bundle.mjs`. It writes `token-tools-now.json`
+(`token-tools-now/1`) atomically and refuses a destination inside the
+repository. Headroom runs with its update check, network use and telemetry off.
+Headroom's agent-savings exits 1 below its profile target, and its output
+savings are counterfactual unless an A/B holdout is set. Context-mode reports
+savings only through its MCP tool `ctx_stats`, so only `doctor` runs. The CC's
+hourly usage refresh calls it beside the token window:
+
+```sh
+python3 tools/local-pages/token_tools_now.py \
+  --out /path/to/native-state/coordination/command-center/pages/token-tools-now.json \
+  --context-mode-cli /path/to/context-mode/1.0.169/cli.bundle.mjs
+```
+
+The skill reports come from `tools/skill-usage/render_units.py`, which renders
+two user services and timers for review: hourly, `skill_usage.py
+--run-skill-doctor --window 7` (91 s measured on 2026-10-11, including a $0,
+zero-turn `claude -p /skill-doctor`) and `child-usage.mjs --lanes-sweep` over
+seven days (198 s, 1.9 GB peak), projected by `systemd/claude-lanes.jq` from
+181 MB to the aggregate skill counts; daily, `skill_usage.py --lanes` over
+seven days, which runs the Node kernel once per rollout session and had not
+finished after 25 minutes (completion time unmeasured), so it keeps the report
+without per-actor rows. Each step renames a finished report into place.
+
+The CC publishes these `cc-now.json` projections; all are optional and every
+absent field reads "not recorded":
+
+| Field | Shape |
+| --- | --- |
+| `in_review[]` | `pr`, `what`, `state`, plus optional `head`, `round` (non-negative integer or text), `next_gate`, `blockers` and `follow_ups` (a list of text or one text; `[]` reads "none") |
+| `cc_agents.running[]` | `"name (task)"` text or `{name, task, model}`; a model appears only in object rows |
+| `orchestration` | `{slot, default, state, evidence, next}` |
+| `landing_queue[]` | `{pr, head, state, since_utc}` |
+| `program[]` | `{ws, title, owner, state, gate, reopen}` |
+| `mirrors` | `{count, manifest_rows, synced_utc, failed: [], pins: {"owner/name": {ref, commit, synced_at_utc}}}` |
+| `rulings[]` | `{file, utc, summary}` |
+| `north_star_layers[]` | `{n, name, target, lane, acceptance, state}` |
+
+The co-op's `read-queue-now.json` is `{updated_utc, slots, running: [{read,
+pr, head, tier, started_utc}], waiting: [{pr, head, kind, gates}]}`. Another
+type in a field reads "not recorded (unsupported value)".
 
 ```json
 {"in_review": [{"pr": "#1234", "what": "fixture work", "state": "micro running",
@@ -523,6 +604,8 @@ nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p t
 nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_fleet_tracking_view.py
 nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_adoption.py
 nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest tests.test_local_pages_command_center
+nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest tests.test_local_pages_token_tools
+nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest tests.test_skill_usage_units
 ```
 
 When the comma-separated `LANDING_PROHIBITED_NAMES` is set (the variable the

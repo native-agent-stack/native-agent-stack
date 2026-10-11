@@ -1,0 +1,11 @@
+# Render for review; the CC installs it after landing.
+[Unit]
+Description=Daily Codex lane skill report refresh for the command-center page
+
+[Timer]
+OnCalendar=@ON_CALENDAR_CODEX@
+RandomizedDelaySec=600
+Unit=native-agent-skill-usage-codex-lanes.service
+
+[Install]
+WantedBy=timers.target

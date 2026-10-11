@@ -6,6 +6,12 @@ home/UUID/task substitutions and recursive value semantics are retained here
 because that nested helper is not an importable API. No native reader is loaded.
 Account filtering comes from tools/local-pages/build_pages.py ACCOUNT_URL at
 the same pin; urllib.parse supplies host/path normalization for owner links.
+Email addresses are omitted after the same per-token decoding, so percent and
+HTML-entity forms are matched in their decoded text. The decoders are CPython's
+own, cited at the v3.13.16 mirror (cbc944f4bc59639a444dd971c737788ba2283a91):
+html.unescape (Lib/html/__init__.py:118 accepts a reference without its
+semicolon, :122), whose HTML5 table maps 'commat;' to '@' and 'period;' to '.'
+(Lib/html/entities.py:567, :1736), and urllib.parse.unquote (Lib/urllib/parse.py:694).
 """
 
 import base64
@@ -23,7 +29,8 @@ _HOME = re.compile(r"/home/[^/\s\"'<>]+|/Users/[^/\s\"'<>]+")
 _SESSION = re.compile(r"[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}", re.I)
 _TASK = re.compile(r"task-[a-z0-9]{8}-[a-z0-9]{6}", re.I)
 _TOKEN = re.compile(r"[^\s<>\"']+")
-_PRESERVED = re.compile(r"\$\{(?:USER_HOME|LOCAL_SESSION_ID|LOCAL_TASK_HANDLE)\}|\[personal identifier omitted\]|\[account artifact omitted\]|native-agent-stack-1a")
+_EMAIL = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}")
+_PRESERVED = re.compile(r"\$\{(?:USER_HOME|LOCAL_SESSION_ID|LOCAL_TASK_HANDLE)\}|\[personal identifier omitted\]|\[account artifact omitted\]|\[email omitted\]|native-agent-stack-1a")
 
 
 def _home_name() -> str | None:
@@ -43,7 +50,7 @@ def _without_preserved(value: str) -> str:
 
 
 def _private(value: str, identity) -> bool:
-    return bool(_HOME.search(value) or _SESSION.search(value) or _TASK.search(value) or is_account_url(value) or identity and identity.search(_without_preserved(value)))
+    return bool(_HOME.search(value) or _SESSION.search(value) or _TASK.search(value) or _EMAIL.search(value) or is_account_url(value) or identity and identity.search(_without_preserved(value)))
 
 
 def _project_identity(value: str, identity) -> str:
@@ -83,6 +90,7 @@ def _portable_text(value: str, identity) -> str:
     value = _HOME.sub("${USER_HOME}", value)
     value = _SESSION.sub("${LOCAL_SESSION_ID}", value)
     value = _TASK.sub("${LOCAL_TASK_HANDLE}", value)
+    value = _EMAIL.sub("[email omitted]", value)
     if identity:
         value = _project_identity(value, identity)
     value = ACCOUNT_URL.sub("[account artifact omitted]", value)
