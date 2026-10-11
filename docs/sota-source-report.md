@@ -28,5 +28,20 @@ requires the sole checkout action, trusted base, disabled persisted credentials,
 read-only token and advisory job; other jobs keep the existing observer rule.
 
 Local workflow tests use a frozen fake of the verifier's exit/summary contract;
-they never execute or vendor PR #1003's unmerged implementation. Hosted API
-execution remains unrun until both PRs land and an eligible PR event occurs.
+they do not vendor the verifier. PR #1003 has landed, and the workflow runs its
+real CLI from the trusted PR base. Workflow selection and the explicit checkout
+are separate: GitHub selects workflow files from the event's associated commit
+([github/docs at be38ec5d, about-triggers:15](https://github.com/github/docs/blob/be38ec5d78e24172587e61b3c6ff40ace1865c71/data/reusables/actions/about-triggers.md#L15)).
+For `pull_request`, that commit is the merge commit on `refs/pull/N/merge`
+([event table:462](https://github.com/github/docs/blob/be38ec5d78e24172587e61b3c6ff40ace1865c71/content/actions/reference/workflows-and-actions/events-that-trigger-workflows.md#L462),
+[commit identity:473](https://github.com/github/docs/blob/be38ec5d78e24172587e61b3c6ff40ace1865c71/content/actions/reference/workflows-and-actions/events-that-trigger-workflows.md#L473),
+[merge ref/SHA:479-480](https://github.com/github/docs/blob/be38ec5d78e24172587e61b3c6ff40ace1865c71/content/actions/reference/workflows-and-actions/events-that-trigger-workflows.md#L479-L480)).
+A same-repository PR can therefore run a workflow it adds before that workflow
+lands; this job still explicitly checks out `pull_request.base.sha` for execution.
+
+Hosted [run 38180620416](https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/38180620416),
+[report job 114592212994](https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/38180620416/job/114592212994),
+ran the real verifier at PR head `6f9e1c128ecc9dfb42580516c8fd8ac1889d6858`.
+It reported four code citations, four `ok` and three `not-checked` results, with
+`mode report, exit 0`. This is one observed hosted report; the local fake remains
+a synthetic check of the invoked argument and exit/summary subset.

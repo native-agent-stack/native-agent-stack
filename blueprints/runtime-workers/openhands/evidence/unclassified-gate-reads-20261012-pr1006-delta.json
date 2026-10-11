@@ -1,0 +1,357 @@
+{
+  "added_by_script": {
+    "scripts/skills_status.py": 10,
+    "tools/sota-sources/verify_sources.py": 15
+  },
+  "added_locations": [
+    "scripts/skills_status.py:223",
+    "scripts/skills_status.py:346",
+    "scripts/skills_status.py:347",
+    "scripts/skills_status.py:348",
+    "scripts/skills_status.py:352",
+    "scripts/skills_status.py:604",
+    "scripts/skills_status.py:612",
+    "scripts/skills_status.py:614",
+    "scripts/skills_status.py:682",
+    "scripts/skills_status.py:785",
+    "tools/adoption/install_skills.py:294",
+    "tools/adoption/install_skills.py:295",
+    "tools/adoption/install_skills.py:721",
+    "tools/adoption/install_skills.py:748",
+    "tools/adoption/install_skills.py:749",
+    "tools/sota-sources/verify_sources.py:433",
+    "tools/sota-sources/verify_sources.py:448",
+    "tools/sota-sources/verify_sources.py:678",
+    "tools/sota-sources/verify_sources.py:685",
+    "tools/sota-sources/verify_sources.py:696",
+    "tools/sota-sources/verify_sources.py:702",
+    "tools/sota-sources/verify_sources.py:718",
+    "tools/sota-sources/verify_sources.py:724",
+    "tools/sota-sources/verify_sources.py:732",
+    "tools/sota-sources/verify_sources.py:744",
+    "tools/sota-sources/verify_sources.py:770",
+    "tools/sota-sources/verify_sources.py:779",
+    "tools/sota-sources/verify_sources.py:789",
+    "tools/sota-sources/verify_sources.py:795",
+    "tools/sota-sources/verify_sources.py:908"
+  ],
+  "added_shapes": [
+    {
+      "count": 1,
+      "script": "scripts/skills_status.py",
+      "shape": [
+        "/*"
+      ]
+    },
+    {
+      "count": 1,
+      "script": "tools/sota-sources/verify_sources.py",
+      "shape": [
+        "/repos/*"
+      ]
+    },
+    {
+      "count": 6,
+      "script": "tools/sota-sources/verify_sources.py",
+      "shape": [
+        "/repos/*/*"
+      ]
+    },
+    {
+      "count": 1,
+      "script": "tools/sota-sources/verify_sources.py",
+      "shape": [
+        "/repos/*/*",
+        "/repos/*/*/commits/*"
+      ]
+    },
+    {
+      "count": 1,
+      "script": "tools/sota-sources/verify_sources.py",
+      "shape": [
+        "/repos/*/*",
+        "/repos/*/*/commits/*",
+        "/repos/*/*/compare/*...*",
+        "/repos/*/*/contents/*",
+        "/repos/*/*/git/commits/*",
+        "/repos/*/*/repository"
+      ]
+    },
+    {
+      "count": 1,
+      "script": "tools/sota-sources/verify_sources.py",
+      "shape": [
+        "/repos/*/*",
+        "/repos/*/*/compare/*...*?per_page=1&page=2"
+      ]
+    },
+    {
+      "count": 1,
+      "script": "tools/sota-sources/verify_sources.py",
+      "shape": [
+        "/repos/*/*",
+        "/repos/*/*/contents/*?ref=*"
+      ]
+    },
+    {
+      "count": 1,
+      "script": "tools/sota-sources/verify_sources.py",
+      "shape": [
+        "/repos/*/*",
+        "/repos/*/*/git/commits/*"
+      ]
+    },
+    {
+      "count": 1,
+      "script": "tools/sota-sources/verify_sources.py",
+      "shape": [
+        "/repos/*/*",
+        "/repos/*/*/git/ref/heads/*",
+        "/repos/*/*/git/ref/tags/*"
+      ]
+    },
+    {
+      "count": 1,
+      "script": "tools/sota-sources/verify_sources.py",
+      "shape": [
+        "/repos/*/pulls/*"
+      ]
+    },
+    {
+      "count": 1,
+      "script": "tools/sota-sources/verify_sources.py",
+      "shape": [
+        "/repositories/*",
+        "/repositories/*/*"
+      ]
+    }
+  ],
+  "baseline_path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261004.json",
+  "baseline_sha256": "5ea8e4db0ab15115e5b1eec6c1939450514dc227e0f9308d865f661507c6c93d",
+  "date": "2026-10-12",
+  "derivation": {
+    "interpretation": "Monitoring accounting only; historical baseline bytes are preserved.",
+    "method": "Unchanged native GitTree/derive_ci_protected advisory result; exact script counters and read-shape multiplicity deltas against the immutable baseline.",
+    "replay": "python3 -m unittest tests.test_runtime_worker_openhands_push_gate",
+    "source": "blueprints/runtime-workers/openhands/resolver/push_gate.py:derive_ci_protected; pinned GitTree input edf14ca6c599969180213fa9919daf0c02a49ca8"
+  },
+  "derived_count": 357,
+  "kind": "gate_read_accounting_delta",
+  "mode": "monitoring_only",
+  "read_classifications": [
+    {
+      "classification": "user_status_observation",
+      "location": "scripts/skills_status.py:223",
+      "native_bucket": "unclassified",
+      "permission_change": false,
+      "scope": "Current workflow-named tool/status path expression, monitoring only; no worker permission or execution authority."
+    },
+    {
+      "classification": "user_status_observation",
+      "location": "scripts/skills_status.py:346",
+      "native_bucket": "unclassified",
+      "permission_change": false,
+      "scope": "Current workflow-named tool/status path expression, monitoring only; no worker permission or execution authority."
+    },
+    {
+      "classification": "user_status_observation",
+      "location": "scripts/skills_status.py:347",
+      "native_bucket": "unclassified",
+      "permission_change": false,
+      "scope": "Current workflow-named tool/status path expression, monitoring only; no worker permission or execution authority."
+    },
+    {
+      "classification": "user_status_observation",
+      "location": "scripts/skills_status.py:348",
+      "native_bucket": "unclassified",
+      "permission_change": false,
+      "scope": "Current workflow-named tool/status path expression, monitoring only; no worker permission or execution authority."
+    },
+    {
+      "classification": "user_status_observation",
+      "location": "scripts/skills_status.py:352",
+      "native_bucket": "unclassified",
+      "permission_change": false,
+      "scope": "Current workflow-named tool/status path expression, monitoring only; no worker permission or execution authority."
+    },
+    {
+      "classification": "user_status_observation",
+      "location": "scripts/skills_status.py:604",
+      "native_bucket": "unclassified",
+      "permission_change": false,
+      "scope": "Current workflow-named tool/status path expression, monitoring only; no worker permission or execution authority."
+    },
+    {
+      "classification": "user_status_observation",
+      "location": "scripts/skills_status.py:612",
+      "native_bucket": "unclassified",
+      "permission_change": false,
+      "scope": "Current workflow-named tool/status path expression, monitoring only; no worker permission or execution authority."
+    },
+    {
+      "classification": "user_status_observation",
+      "location": "scripts/skills_status.py:614",
+      "native_bucket": "unclassified",
+      "permission_change": false,
+      "scope": "Current workflow-named tool/status path expression, monitoring only; no worker permission or execution authority."
+    },
+    {
+      "classification": "user_status_observation",
+      "location": "scripts/skills_status.py:682",
+      "native_bucket": "unclassified",
+      "permission_change": false,
+      "scope": "Current workflow-named tool/status path expression, monitoring only; no worker permission or execution authority."
+    },
+    {
+      "classification": "user_status_observation",
+      "location": "scripts/skills_status.py:785",
+      "native_bucket": "unclassified",
+      "permission_change": false,
+      "scope": "Current workflow-named tool/status path expression, monitoring only; no worker permission or execution authority."
+    },
+    {
+      "classification": "source_line_move_only",
+      "location": "tools/adoption/install_skills.py:294",
+      "native_bucket": "unclassified",
+      "permission_change": false,
+      "scope": "Unchanged read multiplicity with source-line movement; monitoring only."
+    },
+    {
+      "classification": "source_line_move_only",
+      "location": "tools/adoption/install_skills.py:295",
+      "native_bucket": "unclassified",
+      "permission_change": false,
+      "scope": "Unchanged read multiplicity with source-line movement; monitoring only."
+    },
+    {
+      "classification": "source_line_move_only",
+      "location": "tools/adoption/install_skills.py:721",
+      "native_bucket": "unclassified",
+      "permission_change": false,
+      "scope": "Unchanged read multiplicity with source-line movement; monitoring only."
+    },
+    {
+      "classification": "source_line_move_only",
+      "location": "tools/adoption/install_skills.py:748",
+      "native_bucket": "unclassified",
+      "permission_change": false,
+      "scope": "Unchanged read multiplicity with source-line movement; monitoring only."
+    },
+    {
+      "classification": "source_line_move_only",
+      "location": "tools/adoption/install_skills.py:749",
+      "native_bucket": "unclassified",
+      "permission_change": false,
+      "scope": "Unchanged read multiplicity with source-line movement; monitoring only."
+    },
+    {
+      "classification": "user_status_observation",
+      "location": "tools/sota-sources/verify_sources.py:433",
+      "native_bucket": "unclassified",
+      "permission_change": false,
+      "scope": "Current workflow-named tool/status path expression, monitoring only; no worker permission or execution authority."
+    },
+    {
+      "classification": "user_status_observation",
+      "location": "tools/sota-sources/verify_sources.py:448",
+      "native_bucket": "unclassified",
+      "permission_change": false,
+      "scope": "Current workflow-named tool/status path expression, monitoring only; no worker permission or execution authority."
+    },
+    {
+      "classification": "user_status_observation",
+      "location": "tools/sota-sources/verify_sources.py:678",
+      "native_bucket": "unclassified",
+      "permission_change": false,
+      "scope": "Current workflow-named tool/status path expression, monitoring only; no worker permission or execution authority."
+    },
+    {
+      "classification": "user_status_observation",
+      "location": "tools/sota-sources/verify_sources.py:685",
+      "native_bucket": "unclassified",
+      "permission_change": false,
+      "scope": "Current workflow-named tool/status path expression, monitoring only; no worker permission or execution authority."
+    },
+    {
+      "classification": "user_status_observation",
+      "location": "tools/sota-sources/verify_sources.py:696",
+      "native_bucket": "unclassified",
+      "permission_change": false,
+      "scope": "Current workflow-named tool/status path expression, monitoring only; no worker permission or execution authority."
+    },
+    {
+      "classification": "user_status_observation",
+      "location": "tools/sota-sources/verify_sources.py:702",
+      "native_bucket": "unclassified",
+      "permission_change": false,
+      "scope": "Current workflow-named tool/status path expression, monitoring only; no worker permission or execution authority."
+    },
+    {
+      "classification": "user_status_observation",
+      "location": "tools/sota-sources/verify_sources.py:718",
+      "native_bucket": "unclassified",
+      "permission_change": false,
+      "scope": "Current workflow-named tool/status path expression, monitoring only; no worker permission or execution authority."
+    },
+    {
+      "classification": "user_status_observation",
+      "location": "tools/sota-sources/verify_sources.py:724",
+      "native_bucket": "unclassified",
+      "permission_change": false,
+      "scope": "Current workflow-named tool/status path expression, monitoring only; no worker permission or execution authority."
+    },
+    {
+      "classification": "user_status_observation",
+      "location": "tools/sota-sources/verify_sources.py:732",
+      "native_bucket": "unclassified",
+      "permission_change": false,
+      "scope": "Current workflow-named tool/status path expression, monitoring only; no worker permission or execution authority."
+    },
+    {
+      "classification": "user_status_observation",
+      "location": "tools/sota-sources/verify_sources.py:744",
+      "native_bucket": "unclassified",
+      "permission_change": false,
+      "scope": "Current workflow-named tool/status path expression, monitoring only; no worker permission or execution authority."
+    },
+    {
+      "classification": "user_status_observation",
+      "location": "tools/sota-sources/verify_sources.py:770",
+      "native_bucket": "unclassified",
+      "permission_change": false,
+      "scope": "Current workflow-named tool/status path expression, monitoring only; no worker permission or execution authority."
+    },
+    {
+      "classification": "user_status_observation",
+      "location": "tools/sota-sources/verify_sources.py:779",
+      "native_bucket": "unclassified",
+      "permission_change": false,
+      "scope": "Current workflow-named tool/status path expression, monitoring only; no worker permission or execution authority."
+    },
+    {
+      "classification": "user_status_observation",
+      "location": "tools/sota-sources/verify_sources.py:789",
+      "native_bucket": "unclassified",
+      "permission_change": false,
+      "scope": "Current workflow-named tool/status path expression, monitoring only; no worker permission or execution authority."
+    },
+    {
+      "classification": "user_status_observation",
+      "location": "tools/sota-sources/verify_sources.py:795",
+      "native_bucket": "unclassified",
+      "permission_change": false,
+      "scope": "Current workflow-named tool/status path expression, monitoring only; no worker permission or execution authority."
+    },
+    {
+      "classification": "user_status_observation",
+      "location": "tools/sota-sources/verify_sources.py:908",
+      "native_bucket": "unclassified",
+      "permission_change": false,
+      "scope": "Current workflow-named tool/status path expression, monitoring only; no worker permission or execution authority."
+    }
+  ],
+  "removed_by_script": {},
+  "removed_shapes": [],
+  "schema_version": 1,
+  "source_commit": "edf14ca6c599969180213fa9919daf0c02a49ca8"
+}
