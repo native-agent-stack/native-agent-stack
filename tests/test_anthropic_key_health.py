@@ -226,8 +226,9 @@ class FakeRunner:
     """Stands in for subprocess.run: answers credential_run.py --check for each slot state and the probe with a canned
     child line, and records every call."""
 
-    def __init__(self, states: dict, probes: dict | None = None, stderr: bytes = b""):
+    def __init__(self, states: dict, probes: dict | None = None, stderr: bytes = b"", returncodes: dict | None = None):
         self.states, self.probes, self.stderr, self.calls = states, probes or {}, stderr, []
+        self.returncodes = returncodes or {}
 
     def __call__(self, argv, **kwargs):
         self.calls.append((list(argv), kwargs))
@@ -241,7 +242,7 @@ class FakeRunner:
             return subprocess.CompletedProcess(argv, 0 if state == "ok" else 1, text.encode(), b"")
         line = self.probes[slot]
         stdout = line if isinstance(line, bytes) else (json.dumps(line) + "\n").encode()
-        return subprocess.CompletedProcess(argv, 0, stdout, self.stderr)
+        return subprocess.CompletedProcess(argv, self.returncodes.get(slot, 0), stdout, self.stderr)
 
 
 def child_line(models=200, organization=200, prefix=None) -> dict:
@@ -335,6 +336,67 @@ class ParentTests(unittest.TestCase):
                 self.assertIn("usage error", err)
                 assert_never_echoed(self, err, typed)
                 self.assertEqual(runner.calls, [])
+
+    def test_a_probe_that_failed_never_counts_as_healthy(self):
+        # Astra's read at 445c61c1 (P2-2): a child that exits 7 or is killed after printing a 200 line, or a 200 line
+        # that also reports an error, passed with exit 0.
+        cases = {"exit 7 after a 200 line": ({"anthropic-api-4": 7}, child_line(), "probe_exit_7"),
+                 "killed by a signal after a 200 line": ({"anthropic-api-4": -9}, child_line(), "probe_signal_9"),
+                 "a 200 line with an error": ({}, {**child_line(), "error": "unexpected_RuntimeError"},
+                                              "unexpected_RuntimeError")}
+        for case, (returncodes, line, reason) in cases.items():
+            with self.subTest(case=case):
+                runner = FakeRunner({"anthropic-api-4": "ok"}, {"anthropic-api-4": line}, returncodes=returncodes)
+                code, out, _err = self.run_main(runner, "--slot", "anthropic-api-4")
+                self.assertEqual(code, 1)
+                self.assertEqual(out, f"anthropic-api-4: stored; probe failed ({reason})\n")
+                code, out, _err = self.run_main(runner, "--json", "--slot", "anthropic-api-4")
+                self.assertEqual((code, json.loads(out)["slots"][0]["validity"]), (1, "probe_failed"))
+        line = {**child_line(), "models": {"status": 200, "error": "URLError"}}  # a status beside a request error
+        runner = FakeRunner({"anthropic-api-4": "ok"}, {"anthropic-api-4": line})
+        code, out, _err = self.run_main(runner, "--json", "--slot", "anthropic-api-4")
+        self.assertEqual((code, json.loads(out)["slots"][0]["validity"]), (1, "probe_failed"))
+        runner = FakeRunner({"anthropic-api-4": "ok"}, {"anthropic-api-4": child_line()},
+                            returncodes={"anthropic-api-4": 3},
+                            stderr=b"credential_run: anthropic-api-4: unsafe: mode_not_0600\n")
+        code, out, _err = self.run_main(runner, "--slot", "anthropic-api-4")
+        self.assertEqual((code, out), (1, "anthropic-api-4: stored; probe failed "
+                                          "(credential_run: anthropic-api-4: unsafe: mode_not_0600)\n"))
+
+    def test_an_inventory_that_names_no_slot_fails_before_any_check(self):
+        # Astra's read at 445c61c1 (P2-1): a parsed but invalid inventory gave an empty report with exit 0. Each case
+        # is a temporary copy of the inventory; no store is read and the runner is never called.
+        real = json.loads(health.INVENTORY.read_text(encoding="utf-8"))
+
+        def without_slots(inventory):
+            inventory["entries"] = [e for e in inventory["entries"] if not health.SLOT.fullmatch(e["id"])]
+
+        def no_variables(inventory):
+            next(e for e in inventory["entries"] if e["id"] == "anthropic-api-4")["variables"] = []
+
+        def missing_keys(inventory):
+            del next(e for e in inventory["entries"] if e["id"] == "anthropic-api-4")["store"]
+
+        cases = {"no entries": (lambda inventory: inventory.update(entries=[]), "invalid_inventory (1 errors)"),
+                 "an anthropic-api entry with no variables": (no_variables,
+                                                               "not an anthropic-api slot shape (1): anthropic-api-4"),
+                 "a malformed entry": (missing_keys, "invalid_inventory (1 errors)"),
+                 "no anthropic-api entry": (without_slots, "no anthropic-api slot")}
+        for case, (change, reason) in cases.items():
+            with self.subTest(case=case), tempfile.TemporaryDirectory() as temporary:
+                inventory = json.loads(json.dumps(real))
+                change(inventory)
+                path = Path(temporary) / "credential-inventory.json"
+                path.write_text(json.dumps(inventory), encoding="utf-8")
+                runner = FakeRunner({})
+                with mock.patch.object(health, "INVENTORY", path):
+                    for args in ((), ("--json",)):
+                        code, out, err = self.run_main(runner, *args)
+                        self.assertEqual((code, out), (1, ""))
+                        self.assertEqual(err, "anthropic_key_health: the credential inventory names no slot to check "
+                                              f"({reason}); check it with python3 scripts/credential_status.py\n")
+                self.assertEqual(runner.calls, [])
+                self.assertNotIn(temporary, err)
 
     def test_unreadable_child_output_reports_only_the_runners_own_message(self):
         runner = FakeRunner({"anthropic-api-4": "ok"}, {"anthropic-api-4": b"not json\n"},

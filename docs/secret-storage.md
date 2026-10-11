@@ -162,7 +162,11 @@ individual account. Account names and credit balances are not recorded here.
    probe's environment, through `credential_run.py`, and the request headers
    go on the probe's standard input; the report never holds a key, an
    organization name or a response body. It exits 0 when every stored slot
-   is valid, 1 otherwise, and 2 on a usage error. Run it after any add or
+   is valid, 1 otherwise, and 2 on a usage error. A probe that exits nonzero,
+   is killed or reports an error counts as failed (`probe_failed`), whatever
+   status it printed. An inventory that fails `scripts/credential_status.py`'s
+   check, or declares no `anthropic-api` slot or one in another shape, exits 1
+   before any slot is checked. Run it after any add or
    rotation, and daily; the command center adds a timer separately.
 7. **Tracking.** According to the command center, the api-actions lane's
    ledger records each charge per key and workload in dollars; per-call

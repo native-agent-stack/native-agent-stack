@@ -39,6 +39,29 @@ organization id. The key reaches only a child started through
 input, never in argv. The tool prints no key, organization name or response
 body. A timer is out of scope; the command center adds one separately.
 
+## After the GPT read at 445c61c1 (2026-10-11)
+
+The co-op's GPT read (Astra) reproduced two P2 defects in the health tool, both fixed in one commit:
+
+- **An invalid inventory gave an empty, passing report.** `slots()` filtered the inventory without checking it, so
+  `entries: []`, or an `anthropic-api` entry with no variables, produced no rows and exit 0. The tool now applies the
+  repository's own check first (`scripts/credential_status.py` `inventory_errors`, as the runner's `load_inventory`
+  does). An `anthropic-api` entry in another shape, or no `anthropic-api` entry, is a problem too. Each exits 1
+  before any slot is checked, with a message that names counts and inventory ids only.
+- **A failed probe process counted as healthy.** `probe_slot()` read the child's JSON line whatever its exit status, so
+  a child that printed a 200 line and then exited 7, or was killed, passed. A 200 line that also carried an error
+  passed too. A nonzero return code now fails the probe before its output is read: `probe_exit_<n>`, or
+  `probe_signal_<n>` for a negative code, since `CompletedProcess.returncode` is "The exit code of the process,
+  negative for signals" (CPython 3.13.16 `Lib/subprocess.py:484`, at the mirror's `cbc944f4` and in the installed
+  file, sha256 `3418c49f…`). The runner's own first message is kept when it gave one. A probe whose line reports an
+  error, at the top level or for `GET /v1/models`, is `probe_failed`, whatever status it printed. The organization
+  endpoint stays informational.
+
+The new tests fail on `445c61c1` (8 failures) and pass here. Nine weakened copies of the fix each fail them: no
+inventory check; malformed slots skipped; a slot-less inventory accepted; the return code ignored; only positive
+codes rejected; a signal named as an exit; a top-level or a models error ignored; and the inventory problem reported as
+an unreadable file. All cases use temporary inventories and a fake runner: no store is read and no request is sent.
+
 ## Evidence
 
 Measured in this change (local integration, synthetic values only):

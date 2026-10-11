@@ -19,8 +19,10 @@ ANTHROPIC_API_KEY alone in a private env file, in inventory order. For each one:
    first eight characters of the anthropic-organization-id response header of GET /v1/models.
 
 Neither request uses tokens. The report never holds a key or a piece of one, an organization name or a response body.
-Exit status: 0 when every stored slot's GET /v1/models answered 2xx; 1 when a stored slot's did not, or a slot is
-unsafe or could not be checked; 2 for a usage error. A slot that is not stored is reported and fails nothing.
+Exit status: 0 when every stored slot's GET /v1/models answered 2xx from a probe that exited 0 and reported no error;
+1 when a stored slot's did not, a slot is unsafe or could not be checked, or the inventory fails the repository's own
+check (scripts/credential_status.py), declares an anthropic-api slot in another shape, or declares none; 2 for a usage
+error. A slot that is not stored is reported and fails nothing.
 
 A port of the command center's cc-tools/anthropic_key_health.sh (2026-10-10) without its organization-name read and
 its admin-key probe (GET /v1/organizations/api_keys). The HTTP side follows tools/credentials/alpaca_rate_limit_probe.py
@@ -50,6 +52,12 @@ from datetime import datetime, timezone  # noqa: E402
 from pathlib import Path  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
+# -I keeps the script's own directory off sys.path, so the inventory check's directory is put there explicitly, as
+# credential_run.py does.
+if str(ROOT / "scripts") not in sys.path:
+    sys.path.insert(0, str(ROOT / "scripts"))
+import credential_status as cs  # noqa: E402  (the repository's own inventory check)
+
 INVENTORY = ROOT / "adoption" / "credential-inventory.json"
 RUNNER = ROOT / "tools" / "credentials" / "credential_run.py"
 SLOT = re.compile(r"anthropic-api(?:-[0-9]+)?")
@@ -83,6 +91,11 @@ class UsageError(Exception):
 
 class Refused(Exception):
     """The probe child refused its input. The message is a reason code, never a value."""
+
+
+class InventoryProblem(Exception):
+    """The inventory cannot name the slots to check. The message holds counts and inventory ids only, never a value or
+    a store path."""
 
 
 # --------------------------------------------------------------------------- the probe child (holds the key)
@@ -157,12 +170,24 @@ def probe_main(stdin, stdout, environ, *, opener=None) -> int:
 
 # --------------------------------------------------------------------------- the parent (never holds a key)
 
-def slots(inventory_path: Path = INVENTORY) -> list:
-    """The anthropic-api slots that keep ANTHROPIC_API_KEY alone in a private env file, in inventory order."""
-    inventory = json.loads(inventory_path.read_text(encoding="utf-8"))
-    return [entry["id"] for entry in inventory["entries"]
-            if SLOT.fullmatch(entry["id"]) and entry["store"]["kind"] == "private_env_file"
-            and entry["variables"] == [KEY_VARIABLE]]
+def slots(inventory_path: Path | None = None) -> list:
+    """The anthropic-api slots, in inventory order, each keeping ANTHROPIC_API_KEY alone in a private env file. The
+    inventory must first pass the repository's own check, as credential_run.py's load_inventory applies it; an
+    anthropic-api entry in any other shape, or none at all, is a problem too, never a silently shorter list."""
+    inventory = json.loads((inventory_path or INVENTORY).read_text(encoding="utf-8"))
+    errors = cs.inventory_errors(inventory, ROOT)
+    if errors:
+        raise InventoryProblem(f"invalid_inventory ({len(errors)} errors)")
+    selected, malformed = [], []
+    for entry in inventory["entries"]:
+        if SLOT.fullmatch(entry["id"]):
+            shaped = entry["store"]["kind"] == "private_env_file" and entry["variables"] == [KEY_VARIABLE]
+            (selected if shaped else malformed).append(entry["id"])
+    if malformed:
+        raise InventoryProblem(f"not an anthropic-api slot shape ({len(malformed)}): " + ", ".join(malformed))
+    if not selected:
+        raise InventoryProblem("no anthropic-api slot")
+    return selected
 
 
 def check_command(slot: str) -> list:
@@ -196,7 +221,8 @@ def status_class(status) -> str:
 
 def validity(status) -> str:
     """What GET /v1/models says about the key: valid (2xx), invalid (401: a wrong, disabled or revoked key), forbidden
-    (403), rate_limited (429), server_error (5xx), unexpected (any other status) or unreachable (no response)."""
+    (403), rate_limited (429), server_error (5xx), unexpected (any other status) or unreachable (no response). A
+    probe that reported an error is probe_failed whatever status it printed (health)."""
     if not isinstance(status, int):
         return "unreachable"
     if 200 <= status <= 299:
@@ -231,6 +257,11 @@ def probe_slot(slot: str, run) -> dict:
         done = run(probe_command(slot), input=spec(), capture_output=True, timeout=RUNNER_SECONDS)
     except subprocess.TimeoutExpired:
         return {"error": "probe_timed_out"}
+    if done.returncode != 0:
+        # A failed or killed child is never read as a result, whatever it printed. CompletedProcess.returncode is "The
+        # exit code of the process, negative for signals" (CPython 3.13.16 Lib/subprocess.py:484).
+        reason = f"probe_signal_{-done.returncode}" if done.returncode < 0 else f"probe_exit_{done.returncode}"
+        return {"error": runner_note(done.stderr) or reason}
     lines = [line for line in done.stdout.decode("utf-8", "replace").splitlines() if line.strip()]
     try:
         result = json.loads(lines[-1]) if lines else None
@@ -253,7 +284,9 @@ def health(selected: list, run=subprocess.run) -> list:
             status = models.get("status") if isinstance(models.get("status"), int) else None
             organization_status = organization.get("status") if isinstance(organization.get("status"), int) else None
             prefix = result.get("organization_id_prefix")
-            row.update({"models_status": status, "status_class": status_class(status), "validity": validity(status),
+            failed = result.get("error") is not None or models.get("error") is not None
+            row.update({"models_status": status, "status_class": status_class(status),
+                        "validity": "probe_failed" if failed else validity(status),
                         "organization_status": organization_status,
                         "organization_id_prefix": prefix if isinstance(prefix, str) and PREFIX.fullmatch(prefix)
                         else None})
@@ -322,6 +355,10 @@ def main(argv=None, *, run=subprocess.run, stdout=None) -> int:
         selected, as_json = request
         try:
             known = slots()
+        except InventoryProblem as problem:
+            print(f"anthropic_key_health: the credential inventory names no slot to check ({problem}); "
+                  "check it with python3 scripts/credential_status.py", file=sys.stderr)
+            return 1
         except (OSError, ValueError, KeyError, TypeError):
             print("anthropic_key_health: the credential inventory is unreadable; "
                   "check it with python3 scripts/credential_status.py", file=sys.stderr)
