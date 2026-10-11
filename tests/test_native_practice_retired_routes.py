@@ -16,10 +16,15 @@ one line, or every line of it says so); the messages of the line-judged surfaces
 the text the routing was measured with (DESCRIPTION_SHA256) and read as a topic, not as a route.
 
 Scope of the name patterns (the command center's adjudication of 2026-10-11, final fix round, rule 4 of its convergence ruling): the guard pins the NAMED retired artifacts and the retired slot rows, namely
-claude-code-action and anthropics/claude-code-action, claude-code-base-action, install-github-app, the @claude mention, "Claude Code GitHub Action(s)" and "Claude GitHub App", with the carrier phrases it
+claude-code-action (also as anthropics/claude-code-action), the three retired workflow names claude-pr-review, claude-pr-toolkit-review and harness-audit, the action's entry-point name claude-code-github-action,
+claude-code-base-action, install-github-app, the @claude mention, "Claude Code GitHub Action(s)", "Claude GitHub App", the managed Code Review app and "through #909", with the carrier phrases it
 already flags when the field or unit is about Claude ("in Actions", "through Actions", "under WIF", "in a GitHub workflow", "a GitHub Action"). Generic phrasing of a Claude run in a GitHub workflow that names
 none of them ("A GitHub workflow runs Claude Code to review every pull request") cannot be enumerated and is out of this guard's scope: the retirement record governs it, and review reads what the guard
-accepts. The patterns do not grow in further rounds.
+accepts. The patterns do not grow in further rounds. Reordered phrasings of a pinned artifact ("Use the GitHub App for Claude Code Review" for the managed Code Review app) are out of the guard's scope in the same way.
+
+Unit ends (the command center's correction #163, rule 4: the sentence splitter drew findings in five consecutive rounds and was patched four times, so it is not patched a fifth time): a unit ends at a full stop or a semicolon followed by white
+space (closing quotes, parentheses and brackets may stand between them and the white space) and at a line break; an exclamation mark, a question mark, a comma, a colon, a dash, "e.g." and "i.e." do not end a unit. A retirement sentence that
+relies on any other boundary is read as one unit, and review reads what the guard accepts. Replacing the splitter with a pinned upstream sentence segmenter is a research-queue item (rule 8, layer instructions-skills), not part of this change.
 """
 
 from __future__ import annotations
@@ -86,8 +91,10 @@ def says_retired(unit: str) -> bool:
 # first version split only before a capital letter, a backtick, a bracket, a parenthesis or a hyphen, so "retired; the current default is claude-code-action" was one unit that said retired).
 # A line break ends a unit too. A comma, a colon or a dash does not: "Retired 2026-10-10: the workflows that ran claude-code-action are removed" is one claim.
 # "e.g." and "i.e." do not end a unit (the CC's Claude read of #1001 at 6e97620cd, P3-2): "retired (e.g. the workflows that ran claude-code-action are removed)" is one claim.
-# A closing quote, parenthesis or bracket between the full stop and the white space belongs to the unit that ends (the Codex review in GitHub of #1001 at efaa077ef, P2, line 83: `The route was "retired." The
-# current default is claude-code-action.` was one unit that said retired); the curly quotes are built with chr() so that this file stays ASCII.
+# A closing quote, parenthesis or bracket between the full stop and the white space is part of the separator: it is dropped with the white space, so a unit keeps its text up to the full stop (the Codex review in GitHub
+# of #1001 at efaa077ef, P2, line 83: `The route was "retired." The current default is claude-code-action.` was one unit that said retired). The curly quotes are built with chr() so that this file stays ASCII,
+# which test_the_source_of_this_module_is_printable_ascii pins.
+# These are ALL the unit ends of the guard (see "Unit ends" in the module docstring); an exclamation mark and a question mark are not among them, and the splitter is not patched again (the command center's correction #163).
 CLOSERS = "\"')]" + chr(0x201D) + chr(0x2019)
 SENTENCE = re.compile(r"(?<![Ee]\.g\.)(?<![Ii]\.e\.)(?<=[.;])[" + re.escape(CLOSERS) + r"]*\s+|\s*\n\s*")
 ROW = re.compile(r"^\| \[([a-z0-9-]+)\]\(([^)]*)\) \| (.+)$")
@@ -647,7 +654,8 @@ class CheckSeesTheRowsOfBeforeTests(unittest.TestCase):
         # The Codex review in GitHub of #1001 at efaa077ef (P2, line 83): the pattern demanded white space right after the full stop, so a closing delimiter kept the sentence that said retired
         # and the sentence that reintroduces the route in one unit.
         left, right = chr(0x201C), chr(0x201D)
-        for text in ('The route was "retired." The current default is claude-code-action.', "The route was (retired.) The current default is claude-code-action.",
+        single = (chr(0x2018), chr(0x2019))
+        for text in ('The route was "retired." The current default is claude-code-action.', "The route was (retired.) The current default is claude-code-action.", f"The route was {single[0]}retired.{single[1]} The current default is claude-code-action.",
                      "The route was [retired.] The current default is claude-code-action.", f"The route was {left}retired.{right} The current default is claude-code-action.",
                      "The route was 'retired.' The current default is claude-code-action.", 'The route was "retired;" the current default is claude-code-action.'):
             with self.subTest(text=text):
@@ -671,6 +679,39 @@ class CheckSeesTheRowsOfBeforeTests(unittest.TestCase):
         found = index_violations(row)
         self.assertEqual(len(found), 1, found)
         self.assertTrue(found[0].endswith(f"({RULE})"), found)
+
+    def test_the_scope_of_the_name_patterns_names_every_pattern(self):
+        # The command center's confirmation micro of #1001 at bdf60fc62 (P3-1): the scope list named 11 of the 17 patterns, and the claim that the guard pins "the named retired artifacts" was read as exhaustive.
+        scope = " ".join(__doc__.split()).split("Scope of the name patterns", 1)[1].split("Reordered phrasings", 1)[0]  # the list itself, not the sentences after it that name an artifact again
+        for key in PATTERNS:
+            name = re.sub(r"^(?:the|an|a) ", "", key)
+            self.assertIn(name, scope, f"the scope list does not name the pattern {key!r}")
+
+    def test_the_unit_ends_and_the_scope_of_the_name_patterns_are_documented(self):
+        # The command center's correction #163 (2026-10-11T16:18Z) on the Codex review of #1001 at bdf60fc62 (P2, lines 92 and 51): the class closes the way line 48 closed. The unit ends the guard knows are the documented ones and
+        # nothing else; the sentence must be in the module docstring (this test fails on the module of bdf60fc62, where it is missing) and the behavior must be the documentation.
+        doc = " ".join(__doc__.split())
+        self.assertIn("Unit ends (the command center's correction #163, rule 4: the sentence splitter drew findings in five consecutive rounds and was patched four times, so it is not patched a fifth time): "
+                      "a unit ends at a full stop or a semicolon followed by white space (closing quotes, parentheses and brackets may stand between them and the white space) and at a line break; "
+                      "an exclamation mark, a question mark, a comma, a colon, a dash, \"e.g.\" and \"i.e.\" do not end a unit.", doc)
+        self.assertIn("Reordered phrasings of a pinned artifact (\"Use the GitHub App for Claude Code Review\" for the managed Code Review app) are out of the guard's scope in the same way.", doc)
+        right = chr(0x201D)
+        for text in ("One. Two", "One; two", 'One." Two', "One.) Two", "One.] Two", f"One.{right} Two", "One\nTwo"):
+            with self.subTest(unit_end=text):
+                self.assertEqual(len(units(text)), 2, text)
+        for text in ("One! Two", "One? Two", "One, two", "One: two", "One - two", "One e.g. two", "One i.e. two", "See page?x=1 now"):
+            with self.subTest(not_a_unit_end=text):
+                self.assertEqual(len(units(text)), 1, text)
+        # what follows from the documented set, and is the boundary: a sentence that relies on another boundary is one unit that says retired
+        self.assertEqual(judge("x.notes", "explain", "The old route is retired! The current default is claude-code-action."), [])
+        self.assertEqual(judge("x.default", "select", "Use the GitHub App for Claude Code Review."), [])
+
+    def test_the_source_of_this_module_is_printable_ascii(self):
+        # The command center's confirmation micro of #1001 at bdf60fc62 (blocker 2): the module said that it stays ASCII and held one U+2026 in a comment (added at efaa077ef). A character that a reviewer cannot tell from
+        # three full stops, or cannot see at all, is written as an escape or in plain ASCII (the same rule as the module of #986: an escape typed into a tool call is decoded to the character itself).
+        source = Path(__file__).read_text(encoding="utf-8")
+        hidden = sorted({f"U+{ord(c):04X}" for c in source if c != "\n" and not (c.isascii() and c.isprintable())})
+        self.assertEqual(hidden, [], "write a non-ASCII or invisible character of this module as an escape or in ASCII")
 
     def test_generic_workflow_phrasing_is_out_of_scope_and_the_module_says_so(self):
         # The command center's adjudication of 2026-10-11 on the Codex review in GitHub of #1001 at efaa077ef (P2, line 48): workflow-first phrasing that names none of the retired artifacts is a follow-up
@@ -716,7 +757,7 @@ class CheckSeesTheRowsOfBeforeTests(unittest.TestCase):
         self.assertNotEqual(entry_point_violations(changed), [], "a changed description is read like any other line")
 
     def test_the_other_names_the_documentation_page_uses_are_flagged(self):
-        # Lines of the page the guard's names come from (https://code.claude.com/docs/en/github-actions.md, sha256 87b99aefc0a9f438…, retained): its title, line 9, line 33 and line 63, and the carrier named first.
+        # Lines of the page the guard's names come from (https://code.claude.com/docs/en/github-actions.md, sha256 87b99aefc0a9f438..., retained): its title, line 9, line 33 and line 63, and the carrier named first.
         for text in ("Claude Code GitHub Actions", "Claude Code GitHub Actions is a GitHub Action that runs Claude Code inside your repository's workflows.", "Claude Code installs the Claude GitHub App, then sets up an authentication secret.",
                      "Install the Claude GitHub App", "Use the GitHub Action for Claude reviews", "Use anthropics/claude-code-base-action for Claude reviews.", "Claude reviews run in a GitHub Action.",
                      "Claude reviews run on GitHub Actions.", "Claude reviews run with GitHub Actions.", "The Claude review is a GitHub Action."):
