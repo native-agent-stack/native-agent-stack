@@ -77,8 +77,53 @@ class PolicyGrantDerivation(unittest.TestCase):
         expected = set(grants.inventory_paths([path for path in tracked if path], manifest["catalogs"]))
         policy = json.loads((ROOT / "tools/local-pages/source_policy.json").read_text())
         actual = {row["path"] for row in policy["architecture"]["architecture_inventory"] if row["root"] == "repo"}
-        self.assertEqual(len(actual), 94)  # derived at main b490361c with this branch: main's 93 plus this branch's active-model checker
+        expected_count = sum(row["root"] == "repo" for row in policy["architecture"]["architecture_inventory"])
+        self.assertEqual(len(actual), expected_count)
         self.assertEqual(actual, expected, "Regenerate reviewed repository grants at the landing head; runtime discovery remains names-only.")
+
+    def test_inventory_check_accepts_one_more_grant_without_changing_the_count(self):
+        tracked = subprocess.run(["git", "ls-files", "-z"], cwd=ROOT, check=True, capture_output=True).stdout
+        manifest = json.loads((ROOT / "catalogs/landscape/manifest.json").read_text())
+        policy = json.loads((ROOT / "tools/local-pages/source_policy.json").read_text())
+        extra = "scripts/grant_count_fixture.py"
+        self.assertNotIn(extra, {row["path"] for row in policy["architecture"]["architecture_inventory"]})
+        policy["architecture"]["architecture_inventory"].append({"root": "repo", "path": extra})
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "catalogs/landscape").mkdir(parents=True)
+            (root / "tools/local-pages").mkdir(parents=True)
+            (root / "catalogs/landscape/manifest.json").write_text(json.dumps(manifest))
+            (root / "tools/local-pages/source_policy.json").write_text(json.dumps(policy))
+            with mock.patch(__name__ + ".ROOT", root), mock.patch.object(
+                    subprocess, "run", return_value=mock.Mock(stdout=tracked + extra.encode() + b"\0")):
+                self.test_committed_repository_grants_match_current_git_inventory_paths()
+
+    def test_inventory_check_still_refuses_missing_extra_replaced_and_duplicate_grants(self):
+        tracked = subprocess.run(["git", "ls-files", "-z"], cwd=ROOT, check=True, capture_output=True).stdout
+        manifest = json.loads((ROOT / "catalogs/landscape/manifest.json").read_text())
+        original = json.loads((ROOT / "tools/local-pages/source_policy.json").read_text())
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "catalogs/landscape").mkdir(parents=True)
+            (root / "tools/local-pages").mkdir(parents=True)
+            (root / "catalogs/landscape/manifest.json").write_text(json.dumps(manifest))
+            for mutation in ("missing", "extra", "replaced", "duplicate"):
+                policy = copy.deepcopy(original)
+                rows = policy["architecture"]["architecture_inventory"]
+                index = next(index for index, row in enumerate(rows) if row["root"] == "repo")
+                if mutation == "missing":
+                    rows.pop(index)
+                elif mutation == "extra":
+                    rows.append({"root": "repo", "path": "scripts/ungranted_fixture.py"})
+                elif mutation == "replaced":
+                    rows[index] = {"root": "repo", "path": "scripts/ungranted_fixture.py"}
+                else:
+                    rows.append(dict(rows[index]))
+                (root / "tools/local-pages/source_policy.json").write_text(json.dumps(policy))
+                with self.subTest(mutation=mutation), mock.patch(__name__ + ".ROOT", root), \
+                     mock.patch.object(subprocess, "run", return_value=mock.Mock(stdout=tracked)), \
+                     self.assertRaises(AssertionError):
+                    self.test_committed_repository_grants_match_current_git_inventory_paths()
 
     def test_receipt_documentation_identifies_the_reviewed_union_and_ungranted_proposal(self):
         for relative in (

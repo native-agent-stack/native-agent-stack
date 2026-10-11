@@ -61817,8 +61817,8 @@
     },
     {
       "path": "tests/test_local_pages_policy_grants.py",
-      "sha256": "1525728c83c7688b2d1991c12e72481cb122186848b94c54982909b71ad1e4a5",
-      "bytes": 19405
+      "sha256": "c5ef3df3b5cf1a26f0d0f1630b843e390e0a14959eedb18bc58382f1a8a8a771",
+      "bytes": 22560
     },
     {
       "path": "tests/test_managed_block.py",
