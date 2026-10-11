@@ -22,7 +22,7 @@
       "cmd": "p=$(command -v brv) && echo \"resolves: $p -> $(readlink -f \"$p\")\" && brv --version",
       "exit": 0,
       "duration_s": 1.196,
-      "output_sha256": "d540b96fc7a92dc165e928ffad1a113375799fed6ba8b124ba4eaab55342e66a",
+      "output_sha256": "eda2537791fbed24dcd637028ce40cbc979caf5997a3dad1d45fb2313b0a040b",
       "output_excerpt": "resolves: ~/.local/share/codex-ecosystem/bin/brv -> ~/.local/share/codex-ecosystem/tools/byterover-cli-3.16.1/lib/node_modules/byterover-cli/bin/run.js\nbyterover-cli/3.16.1 wsl-x64 node-v24.21.0\n"
     },
     {

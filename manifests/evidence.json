@@ -10632,8 +10632,8 @@
     },
     {
       "path": "blueprints/retrieval-quality-v2/review-293-repro-20260926.json",
-      "sha256": "55efea5dc4e900322b7b9d42362c8b023435cfa12a63c1af0f93e93aed614623",
-      "bytes": 21219
+      "sha256": "55b02e421355afa1ce78ffc86d5e6f5e502a54dca934aa15a489de6ade4e3f90",
+      "bytes": 22671
     },
     {
       "path": "blueprints/retrieval-quality-v2/review-293-repro-20260926/repro_record.py",
@@ -11427,13 +11427,13 @@
     },
     {
       "path": "blueprints/trials-20260926/README.md",
-      "sha256": "3c63b60362ef79568d972ff5a6fbf72743be39ea79820310364451469e914f03",
-      "bytes": 20422
+      "sha256": "eb8aa4b3e0a772c7f98ab3c34f91b158613b3b643156b4816338ce2144bfeecd",
+      "bytes": 20587
     },
     {
       "path": "blueprints/trials-20260926/byterover-cli/README.md",
-      "sha256": "1a6f5134e5b89dee59f06b6890d4b01aad370a1d8511e5afb5253d776ffaf0e8",
-      "bytes": 26367
+      "sha256": "97740663215c63bf5dda2cf917bc6e99714a393b1aa3144370d69b890f796fb6",
+      "bytes": 26850
     },
     {
       "path": "blueprints/trials-20260926/byterover-cli/local-integration/connect-local-llm-safe.sh",
@@ -12137,8 +12137,8 @@
     },
     {
       "path": "blueprints/trials-20260926/byterover-cli/retained-outputs.json",
-      "sha256": "c2b15f44ff8610bb171cdedfa50831ff959333c7fe21d1ed5d9a77d2acaf4683",
-      "bytes": 159717
+      "sha256": "24f5af32e794eef23876963ea0988e5f4f28c86a51c3f94b078df52426562ffe",
+      "bytes": 160464
     },
     {
       "path": "blueprints/trials-20260926/byterover-cli/source-review.json",
@@ -12147,7 +12147,7 @@
     },
     {
       "path": "blueprints/trials-20260926/byterover-cli/withdrawn-host-receipts/nativestack-5975wx-20260925--byterover-cli--install--20260926.json",
-      "sha256": "80282697e4795068f192ee83eaabae26f2274b4bd8887d2f55e19c82e679ab18",
+      "sha256": "8487804d6ca8a30fbfac20b7f3f2bb8dd61d6169126aac9127310ffe5dc068ab",
       "bytes": 3891
     },
     {
@@ -53662,8 +53662,8 @@
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260925/markitdown/results.json",
-      "sha256": "1a08f26480efd121c4f0299a19d8b1e0c34477265b2aa0ed98252846e41b5632",
-      "bytes": 66923
+      "sha256": "e267a03c4a18acff7f29db83cd35b2aab6098035234f0cf87b85f7c92147e768",
+      "bytes": 67945
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260925/markitdown/run-baseline/8k.md",
@@ -53952,8 +53952,8 @@
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results.json",
-      "sha256": "9812876512d979f15156e56a5f01a880f82d6727844ab241d7747af6b2111e3b",
-      "bytes": 98620
+      "sha256": "67f912c1e4d3beccbe0bac459207680a293873ed4f969d76a895b9d381cca175",
+      "bytes": 99684
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260925/mcporter/scratch-config-x.sanitized.json",
@@ -54592,8 +54592,8 @@
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260925/rtk/results.json",
-      "sha256": "ee63903cef7492c8d16ea0d721fcd62596f74c6cae0d592149ed7a3936763c65",
-      "bytes": 83644
+      "sha256": "bfcd619da8e46acf4305f37d46a3bef9383b6a801fcb0594ee145bbed64a8664",
+      "bytes": 84648
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260925/rtk/rtk-hook-acceptance-v2.sh",
@@ -57107,12 +57107,12 @@
     },
     {
       "path": "evidence/artifacts/workstation-lane-20260925/nemotron-qualification/withdrawn/README.md",
-      "sha256": "b32e0cdd9b9f427305ad5b46dd74ffd42b82c1b200611901e45358fd2a12b251",
-      "bytes": 3630
+      "sha256": "40a694ded3955f1985ac834a54e4d1d5571589544c80ec44d75dabefee83c4ed",
+      "bytes": 4413
     },
     {
       "path": "evidence/artifacts/workstation-lane-20260925/nemotron-qualification/withdrawn/nativestack-5975wx-20260925--vllm--use--20260925-2.withdrawn.json",
-      "sha256": "fc3ad55896561322694eefdce4cf98eba76f22aff242501ca26992d3af5a0e37",
+      "sha256": "71e2484dcbbd3e57c56cae49ea236b0c962a8a8f22e14fa7f80317d0b3110045",
       "bytes": 14665
     },
     {
@@ -59052,7 +59052,7 @@
     },
     {
       "path": "evidence/receipts/markitdown-018-qualification-20260925.json",
-      "sha256": "d9a1a3484c229f7d530009143672ef1ee6756dafff8ad72aeca1dba86cef3b2f",
+      "sha256": "74d066a17f0ea04cd0ad5e08bf0a3b756f140a8d886cd0d8b5196a694454a037",
       "bytes": 18417
     },
     {
@@ -59067,7 +59067,7 @@
     },
     {
       "path": "evidence/receipts/mcporter-0141-qualification-20260925.json",
-      "sha256": "5379b1e326d99eeb09a72b88fa447c6020e76211b3d918ac96d8daa09241ce32",
+      "sha256": "9b69956eb0a8bdd9ce560d6393dbf66a20e0138204a2b4604a3448d50a009bbb",
       "bytes": 15000
     },
     {
@@ -59507,7 +59507,7 @@
     },
     {
       "path": "evidence/receipts/rtk-050-qualification-20260925.json",
-      "sha256": "9de293b6df651c53d4792b72901df4f234bec31983183a4e722d9dcea8529879",
+      "sha256": "b47326a1661984e46370767916610ee9293d81d41af1f67f2a118b20f8f9723a",
       "bytes": 32488
     },
     {
@@ -60682,8 +60682,8 @@
     },
     {
       "path": "scripts/git-hooks/pre-push",
-      "sha256": "a45b2074ecdd5b5ae858ae54a240fa1e8811544b479c3c64bfbfc6b9e739837e",
-      "bytes": 7548
+      "sha256": "4f0931d30b5e6b10b3e89724a845e050aeb4bea7c9dc7cb1b0bab383d452ecee",
+      "bytes": 8498
     },
     {
       "path": "scripts/grand_catalog_counts.py",
@@ -62122,8 +62122,8 @@
     },
     {
       "path": "tests/test_pre_push_gate.py",
-      "sha256": "b4cd12d2659c733b494a5dbe2adb57596dc3c836c64ff4bebab176df29bb030c",
-      "bytes": 29598
+      "sha256": "394e07edcff95f934319a9db5ec75e4861aae614b29373609ce8b3490643baae",
+      "bytes": 31017
     },
     {
       "path": "tests/test_primary_source_reading_counts.py",

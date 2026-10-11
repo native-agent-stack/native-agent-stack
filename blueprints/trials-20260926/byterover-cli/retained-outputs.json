@@ -1146,22 +1146,27 @@
     {
       "path": "withdrawn-host-receipts/nativestack-5975wx-20260925--byterover-cli--install--20260926.json",
       "evidence_class": "withdrawn_host_receipt",
-      "what": "Draft host receipt recorded by the first trial pass and withdrawn before merge; copied byte for byte. Why withdrawn: component_id 'byterover-cli' is neither a stack component nor a landscape winner (validate rejects it). Its first command resolved the host install that the cleanup removed.",
+      "what": "Draft host receipt recorded by the first trial pass and withdrawn before merge; copied byte for byte, except commands[0].output_sha256, re-derived on 2026-10-11 (sanitization). Why withdrawn: component_id 'byterover-cli' is neither a stack component nor a landscape winner (validate rejects it). Its first command resolved the host install that the cleanup removed.",
       "command": null,
       "exit_code": null,
       "observed": null,
       "private_original": {
         "name": "nativestack-5975wx-20260925--byterover-cli--install--20260926.json",
         "bytes": 3891,
-        "sha256": "80282697e4795068f192ee83eaabae26f2274b4bd8887d2f55e19c82e679ab18"
+        "sha256": "8487804d6ca8a30fbfac20b7f3f2bb8dd61d6169126aac9127310ffe5dc068ab"
       },
       "published": {
         "bytes": 3891,
-        "sha256": "80282697e4795068f192ee83eaabae26f2274b4bd8887d2f55e19c82e679ab18"
+        "sha256": "8487804d6ca8a30fbfac20b7f3f2bb8dd61d6169126aac9127310ffe5dc068ab"
       },
       "excerpt_lines": null,
-      "verbatim": true,
-      "sanitization": []
+      "verbatim": false,
+      "sanitization": [
+        {
+          "rule": "commands[0].output_sha256 was the sha256 of the raw output, which differed from the published output_excerpt only by the home directory (replaced by ~), so a guessed home directory could be put back, hashed and compared offline. The 2026-10-11 masked-digest audit of main at 7b76a88c (correction #161) re-derived it as the sha256 of output_excerpt (UTF-8), the basis scripts/host_receipts.py record has used since #492. private_original.sha256 is the sha256 of the published bytes too, because the original's own sha256 would confirm a guess the same way. Git history keeps both earlier values.",
+          "replacements": 1
+        }
+      ]
     },
     {
       "path": "withdrawn-host-receipts/nativestack-5975wx-20260925--byterover-cli--use--20260926.json",

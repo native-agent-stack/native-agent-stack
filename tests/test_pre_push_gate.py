@@ -18,6 +18,7 @@ registry test.
 """
 
 from pathlib import Path
+import hashlib
 import json
 import os
 import re
@@ -36,7 +37,9 @@ PROBE_TEXT = "# synthetic lockfile for the pre-push gate test\n"
 # Split the fixture literal so scanning the test source itself never denies it.
 FIXTURE_NAME = "fixture_" + "host_marker"
 NAME_PROBE = "pre-push-name-probe.txt"
-SCANNER_SOURCES = ("scripts/validate.py", "scripts/host_name_scan.py")
+# A receipt whose output_sha256 hashes its excerpt with the fixture home put back (correction #161).
+DIGEST_PROBE = "evidence/artifacts/pre-push-digest-probe.json"
+SCANNER_SOURCES = ("scripts/validate.py", "scripts/host_name_scan.py", "tests/test_published_digest_privacy.py")
 LOCKFILE_TEST = "tests/test_osv_lockfile_coverage.py"
 LS_FILES_ARGV = '["git", "-C", str(ROOT), "ls-files", "-z"]'
 LOCKFILE_METHOD = "    def test_every_tracked_lockfile_and_manifest_is_listed(self):\n"
@@ -188,7 +191,25 @@ class PrePushGateTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(result.stderr.count(f"pre-push: running the registry tests on {self.head}"), 1)
         self.assertIn("Ran 3 tests", result.stderr)
+        self.assertEqual(result.stderr.count(
+            "(tests.test_published_digest_privacy.PublishedDigestPrivacyTests.test_no_unlisted_published_digest_hashes_unmasked_bytes)"),
+            1)
+        self.assertIn("Ran 1 test in", result.stderr)
         self.assertNotIn("skipped", result.stderr)
+        self.assert_nothing_left()
+
+    @unittest.skipUnless(ZIZMOR, "zizmor not on PATH")
+    def test_a_published_digest_of_the_unmasked_home_is_refused_without_echoing_the_name(self):
+        excerpt = "installed to ~/.local/bin\n"
+        digest = hashlib.sha256(excerpt.replace("~", "/home/" + FIXTURE_NAME).encode()).hexdigest()
+        receipt = {"commands": [{"cmd": "c", "output_sha256": digest, "output_excerpt": excerpt}]}
+        commit = self.commit_on_head({DIGEST_PROBE: json.dumps(receipt, indent=2) + "\n"})
+        result = self.push(f"refs/heads/main {commit} refs/heads/main {self.zero}")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn(f"{DIGEST_PROBE} output_sha256 {digest[:8]}", result.stderr)
+        self.assertIn("published-digest guard failed or skipped", result.stderr)
+        self.assertIn("Ran 3 tests", result.stderr)
+        self.assertNotIn(FIXTURE_NAME, result.stdout + result.stderr)
         self.assert_nothing_left()
 
     @unittest.skipUnless(ZIZMOR, "zizmor not on PATH")

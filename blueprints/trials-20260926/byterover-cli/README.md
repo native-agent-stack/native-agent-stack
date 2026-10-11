@@ -198,7 +198,13 @@ functionality, and removing licensing notices (`#license-file`,
 ## Withdrawn receipts
 
 The first pass's two receipts are kept byte-for-byte in
-[`withdrawn-host-receipts/`](withdrawn-host-receipts/). `scripts/host_receipts.py
+[`withdrawn-host-receipts/`](withdrawn-host-receipts/), except for one digest.
+The install receipt's `commands[0].output_sha256` was the sha256 of the raw
+output, which differed from the published `output_excerpt` only by the home
+directory, so anyone could put a guessed home directory back, hash the result
+and compare. On 2026-10-11 it became the sha256 of `output_excerpt` (UTF-8), the
+basis `scripts/host_receipts.py record` has used since #492; git history keeps
+the earlier value ([`retained-outputs.json`](retained-outputs.json)). `scripts/host_receipts.py
 validate` rejects `component_id` `byterover-cli`, which is neither a
 `manifests/stack.json` component nor a landscape winner
 ([`../README.md`](../README.md#why-there-are-no-host-receipts)). The use receipt's

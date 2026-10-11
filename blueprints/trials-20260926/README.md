@@ -71,7 +71,9 @@ receipts on an older base; restored into a copy of the current tree, the
 validator rejects exactly those eight
 ([`withdrawn-host-receipts-validate.txt`](withdrawn-host-receipts-validate.txt)).
 They were therefore not re-recorded. They are kept byte-for-byte under each
-trial's `withdrawn-host-receipts/` with the reason, and the evidence they
+trial's `withdrawn-host-receipts/` with the reason (one raw-output digest in
+byterover-cli's install receipt was re-derived on 2026-10-11; see
+[`byterover-cli/README.md`](byterover-cli/README.md#withdrawn-receipts)), and the evidence they
 pointed at is retained as sanitized native output here instead. Their commands
 also depended on `/tmp/nas-*` symlinks into this session's scratch directory;
 nothing retained here depends on scratch state.

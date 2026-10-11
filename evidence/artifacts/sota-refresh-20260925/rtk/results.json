@@ -496,7 +496,7 @@
       "sha256": "388552e41b2d166e6c7226b80052afa6c69a6b71ed8c63a6e8002dc3c4817e78",
       "bytes": 67,
       "byte_identical_to_run_copy": false,
-      "run_copy_sha256": "a08e91849bc894008c400698042cff341fb0a49d17d0d77c4e0f997a12eb0d65",
+      "run_copy_sha256": "388552e41b2d166e6c7226b80052afa6c69a6b71ed8c63a6e8002dc3c4817e78",
       "run_copy": "<impl>/out/a2/raw/python-m-pytest.native.err"
     },
     {
@@ -1019,6 +1019,13 @@
       "corrected": "Reconciled with #318: the reminder stays silent only when #318's text check passes (the exact four-entry exclude_commands key, exactly once) and the installed rtk answers `rtk hook check` with 'No rewrite for: <probe>' and exit 1 for `git show HEAD:x | tail -n 5`, `git -C . show --no-color HEAD:x | tail -n 5`, `diff a missing`, `git branch -a` and `git -C . branch`, under the caller's environment; either check failing prints the reminder, and a text pass with an rtk failure adds a hint naming the probe.",
       "by": "2026-09-26 cross-family review (Codex) of #314, needs_changes (P2); the writing worker changed the check and re-tested it",
       "reason": "A TOML-valid file listing both entries can still be ignored by rtk: with `[tracking] enabled = false` and no history_days, 0.50.0 rewrote every probe (out/config-rejection-20260926.out)."
+    },
+    {
+      "field": "files[].run_copy_sha256 for out/a2/raw/python-m-pytest.native.err",
+      "original": "The sha256 of the unsanitized run copy, as the sanitization note describes for files that are not byte-identical to their run copy.",
+      "corrected": "The sha256 of the published file, the same value as the entry's sha256: the basis scripts/host_receipts.py record has used for output_sha256 since #492. byte_identical_to_run_copy stays false, because the run copy still differs. For this entry the sanitization note's 'run_copy_sha256 is the digest of the unsanitized run copy' no longer holds.",
+      "by": "2026-10-11 masked-digest audit of main at 7b76a88c (correction #161); the value was re-derived from the committed file",
+      "reason": "The home directory, replaced by ~, was the only difference, so anyone could put a guessed home directory back, hash the result and compare it with run_copy_sha256, which confirms the guess offline. Git history keeps the earlier value."
     }
   ],
   "verifier": {

@@ -260,7 +260,7 @@
    "bytes": 2961,
    "byte_identical_to_run_copy": false,
    "run_copy": "$IMPL/verify/npm-ls-0.13.13.txt",
-   "run_copy_sha256": "f84a3c2c2e00a3ffeab9afe87bd93ec8722073c61bffa16f2ce5fe9ff0694e1a"
+   "run_copy_sha256": "689a0ba431747e5a745f0b5a7d30316fb26eb3bae5bb494e243364a450b3a2ab"
   },
   {
    "path": "verify/npm-ls-0.14.1.txt",
@@ -268,7 +268,7 @@
    "bytes": 2959,
    "byte_identical_to_run_copy": false,
    "run_copy": "$IMPL/verify/npm-ls-0.14.1.txt",
-   "run_copy_sha256": "0423c8c5f25957056b897e1e5c1dfbcb8af2794637d9412ddda0cc6df8624d4e"
+   "run_copy_sha256": "b48758aae687a8653d7c73c811c976a9329a9ac4af36e3ef7d4d75fcbc5b8cb8"
   },
   {
    "path": "verify/provenance-mcporter-0.14.1.txt",
@@ -291,7 +291,7 @@
    "bytes": 67,
    "byte_identical_to_run_copy": false,
    "run_copy": "$IMPL/verify/bin-link-before.txt",
-   "run_copy_sha256": "afa017557f61a74c0cf383ca324345e9b1b1a9c499a499328b7fffc90c65923c"
+   "run_copy_sha256": "54f9f581064d76168a09abbd325cf006d81eaafb8ff847b9747afab9926587c6"
   },
   {
    "path": "verify/gh.err",
@@ -1625,5 +1625,14 @@
   "The Qdrant snapshot create/delete activity (+5 each) and the post-run upserts are attributed to other actors from timing and code search: no snapshot call sites exist in socraticode or mcporter, and the counters were unchanged at the post-run fingerprint. Qdrant telemetry does not identify clients, so this is not a per-client observation.",
   "That memory_status wrote nothing to the ai-memory store rests on the server source (a reader-path status read). The store could not be fingerprinted meaningfully, because live session hooks write to it continuously.",
   "OAuth flows were untested (all calls used --no-oauth). So were the emit-ts/generate-cli output changes, --persist, --tail-log and the chrome-devtools preload changes."
+ ],
+ "corrections": [
+  {
+   "field": "files[].run_copy_sha256 for verify/npm-ls-0.13.13.txt, verify/npm-ls-0.14.1.txt and verify/bin-link-before.txt",
+   "original": "The sha256 of the unsanitized run copy, as the sanitization note describes for files that are not byte-identical to their run copy.",
+   "corrected": "The sha256 of the published file, the same value as the entry's sha256: the basis scripts/host_receipts.py record has used for output_sha256 since #492. byte_identical_to_run_copy stays false, because the run copy still differs. For these three entries the sanitization note's 'run_copy_sha256 is the digest of the unsanitized run copy' no longer holds.",
+   "by": "2026-10-11 masked-digest audit of main at 7b76a88c (correction #161); the values were re-derived from the committed files",
+   "reason": "The home directory, replaced by ~, was the only difference, so anyone could put a guessed home directory back, hash the result and compare it with run_copy_sha256, which confirms the guess offline. Git history keeps the earlier values."
+  }
  ]
 }

@@ -139,7 +139,7 @@
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260925/mcporter/results.json",
-      "sha256": "9812876512d979f15156e56a5f01a880f82d6727844ab241d7747af6b2111e3b",
+      "sha256": "67f912c1e4d3beccbe0bac459207680a293873ed4f969d76a895b9d381cca175",
       "byte_identical_to_run_copy": false
     }
   ],

@@ -29,7 +29,7 @@
       "cmd": "curl -fsS http://127.0.0.1:18231/v1/models | python3 -c \"import json,sys;m=json.load(sys.stdin)['data'][0];print(m['id'],'max_model_len',m['max_model_len'],'root',m['root'])\" ",
       "exit": 0,
       "duration_s": 0.018,
-      "output_sha256": "ab46ba7b0e0cb6fcf7ceeb1f6cda96f234d51fa864986a869850b26e675b9bb1",
+      "output_sha256": "f24f21c265913e7083607444b6a3f604f98ea8fdbe9aa35afc7ca7b8641bbbe7",
       "output_excerpt": "nvidia/Nemotron-3-Embed-1B-BF16 max_model_len 4096 root ~/.local/share/codex-ecosystem/models/nemotron-3-embed-1b-c0c9fea\n"
     },
     {
@@ -50,7 +50,7 @@
       "cmd": "root=$(curl -fsS http://127.0.0.1:18231/v1/models | python3 -c \"import json,sys;print(json.load(sys.stdin)['data'][0]['root'])\"); HF_HUB_DISABLE_IMPLICIT_TOKEN=1 HF_HUB_DISABLE_TELEMETRY=1 hf cache verify nvidia/Nemotron-3-Embed-1B-BF16 --revision c0c9fea93ea424587517f2c59e20db9f1d6bf615 --local-dir \"$root\" --format json",
       "exit": 0,
       "duration_s": 1.604,
-      "output_sha256": "c30eaa1bb8710abcdef2fefdd341f6f46ebfedf5e2131d4602a20d3a943d7961",
+      "output_sha256": "2d37f3078aa29067ed4887f13add469c70f0cb7e0165222aa8baead878b7c023",
       "output_excerpt": "{\"repo_id\": \"nvidia/Nemotron-3-Embed-1B-BF16\", \"repo_type\": \"model\", \"checked\": 15, \"path\": \"~/.local/share/codex-ecosystem/models/nemotron-3-embed-1b-c0c9fea\"}\nWarning: 33 local file(s) do not exist on the remote repo. Use --fail-on-extra-files for details.\n"
     },
     {
