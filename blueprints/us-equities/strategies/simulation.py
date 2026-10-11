@@ -146,7 +146,7 @@ def fixture_quotes(
     return result
 
 
-def fixture_engine(instrument=None):
+def fixture_engine(instrument=None, *, liquidity_consumption=False, fill_model=None):
     """Shared native synthetic venue/instrument for acceptance regressions."""
     currency = Currency.from_str("USD")
     if instrument is None:
@@ -169,10 +169,13 @@ def fixture_engine(instrument=None):
         AccountType.CASH,
         starting_balances=[Money.from_str("10000 USD")],
         base_currency=currency if isinstance(instrument, Equity) else None,
-        fill_model=OneTickSlippageFillModel(
+        fill_model=fill_model
+        if fill_model is not None
+        else OneTickSlippageFillModel(
             prob_fill_on_limit=1.0, prob_slippage=1.0, random_seed=22
         ),
         latency_model=StaticLatencyModel(base_latency_nanos=1_000_000),
+        liquidity_consumption=liquidity_consumption,
     )
     engine.add_instrument(instrument)
     return engine, instrument

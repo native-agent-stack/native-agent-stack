@@ -51,6 +51,8 @@ class FactorSnapshot:
     fields stay missing. ``source_sha256`` binds the supplying artifact, not a
     claim that its historical provenance has passed Layer 1.5. A synthetic
     snapshot is usable only by an explicitly synthetic strategy specification.
+    An omitted/null halt flag is unknown; only an explicit boolean supplies
+    halt state. Unknown state never authorizes an order.
     """
 
     instrument_id: str
@@ -62,7 +64,7 @@ class FactorSnapshot:
     values: tuple[tuple[str, str], ...]
     evidence_class: str = "synthetic"
     cohort_member: bool = True
-    halted: bool = False
+    halted: bool | None = None
     expiry_ns: int | None = None
 
     def __post_init__(self):
@@ -82,7 +84,9 @@ class FactorSnapshot:
             and self.ts_init >= DEVELOPMENT_CUTOFF_NS
         ):
             raise ValueError("development_cutoff_exceeded")
-        if type(self.cohort_member) is not bool or type(self.halted) is not bool:
+        if type(self.cohort_member) is not bool or (
+            self.halted is not None and type(self.halted) is not bool
+        ):
             raise ValueError("explicit_boolean_state_required")
         if type(self.values) is not tuple or any(
             type(pair) is not tuple or len(pair) != 2 for pair in self.values

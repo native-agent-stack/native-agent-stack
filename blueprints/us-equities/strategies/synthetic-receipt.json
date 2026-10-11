@@ -13975,11 +13975,12 @@
   "source_sha256": {
     "__init__.py": "a6e37c81a6492dde3adf9d050ab4c7b99278f9821e224b5b9f8c3200496e91ff",
     "acceptance.py": "090273ec96f4bce0762ac7aadb39c71dcc9be50d4c0ffc5a1cf28c10d5c5d122",
-    "contracts.py": "447be2ce6a099494d87a37496d4d4a81eec4f2857cdd8647215d705e9133af1f",
-    "families.py": "b72c2060f5d15bcd03ceff548bea26cd47ffe75136fd0d5818b9d1e915790d69",
+    "contracts.py": "9a185e04467207af711e96a60594579e6446919a727b93629a9dc11d07ae3426",
+    "families.py": "31e0b994c50ceb5f41ac0f3accc422d70dc4eee310bd84f60f4ef8a1fcb16b05",
+    "halt_notice.py": "d8f27828d55be839de26c98bc6ada8cf56fc2e02b7c9743af035b96accf495f0",
     "presets.py": "c8163295938ed9f303903d3f9f07d1a6060e81b7ae9cd74e6bf4a8a7166e2be7",
     "registry.json": "091868499c161b5b485f1dbf831f67320af72133b17bfda1804ab60d97e27711",
-    "simulation.py": "a4ac2b5d7e6cdde702d48dca87f25cdb667445042286c22dcc928d3e939699b1"
+    "simulation.py": "f85076053e2281eb01d29d890c756e53f38d39c1ac00ac48afa7e24533984834"
   },
   "status": "passed",
   "strategy_performance": "NOT_CITED"

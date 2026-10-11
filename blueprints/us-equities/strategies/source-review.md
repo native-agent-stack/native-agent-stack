@@ -435,9 +435,9 @@ primary mechanisms remain the rc5 [InstrumentStatus timestamp/action fields](htt
 and [HALT/non-trading actions](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/model/src/enums.rs#L969-L1002).
 The correction applies negative trading signals at observation and records the
 event/init lead in `status_clock_ahead`. Only a TRADING resumption requires
-available, ordered timestamps. Halting timestamps bound the ordering fence at
-their observation time, and the fence never regresses; a future-dated halt
-therefore does not force waiting for that timestamp to accept a valid resumption.
+available, ordered timestamps. The initial correction bounded future halting
+timestamps at observation time. The F-1 follow-up below supersedes that fence:
+it preserves raw stamps and refuses a resumption stamped before an observed halt.
 Neutral metadata neither resumes trading nor moves the fence.
 
 First-hand results are retained at
@@ -500,3 +500,321 @@ rc5 fill timestamp/callback mechanism cited above. The coming T14 consumer
 name is an interface declaration, not an implemented or bound dependency in
 this repository or the selected merged UET main pin; T14 publication still
 requires a separately verified main-to-main account-writer binding.
+
+## F-1 halt-state and held-exit follow-up
+
+The policy source is us-equities-trading
+[`docs/decisions/2026-10-10-halt-exit-policy.md` at f8c607bc1f1f0205fdc87095f47df150d2f78117](https://github.com/seathatflowsinourveins/us-equities-trading/blob/f8c607bc1f1f0205fdc87095f47df150d2f78117/docs/decisions/2026-10-10-halt-exit-policy.md#decision).
+Decisions 1–3 require immediate negative halt signals, held/flagged working
+exits with a notice every ten minutes, and no new order into a halt or unknown
+state. Its reasoning and acceptance sections define the three entry-fill
+windows around the entry's own deadline and cancel-acknowledgement freeze.
+
+The upstream landscape remains the installed, unchanged NautilusTrader
+2.0.0rc5 engine at `1b0a49d2792a9432a3aca3fcb617ce7a630d905e`, with rc6 retained
+only as the separately selected regression candidate in `~/code/upstream/MIRRORS.json`.
+The following supported rc5 mechanisms were checked directly in the mirror;
+the same installed engine executes these regressions. No adapter, scheduler,
+matching engine or risk state is rebuilt.
+
+| Correction | Pinned upstream mechanism | Regression |
+| --- | --- | --- |
+| P3-A: preserve raw event/init stamps; reject an older available resumption | [InstrumentStatus fields](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/python/nautilus_trader/model/__init__.pyi#L2480-L2507), [native status callback](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/trading/src/python/strategy.rs#L756-L763) | Raw event lead and init lead independently fence stale TRADING; snapshot resumption has the same raw fence and a later positive control |
+| P3-A: absent/expired named state blocks every new order | [Cached custom-data event/init stamps](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/model/src/data/custom.rs#L53-L88); local `snapshot_data_type` supplies instrument scoping and FactorSnapshot supplies validity | Expired state blocks a fresh-quote exit; final submission blocks BUY/SELL even when the caller bypasses drive; a working exit stays held and the session is notified |
+| P3-B: a leading halted snapshot acts immediately while future factors remain unavailable | The same [custom-data wrapper](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/model/src/data/custom.rs#L53-L88) and existing on_data callback | 1 ms and 400 ms init leads cancel the original entry at the 300 ms delivery; future stamps cannot silently clear the halt |
+| P3-B: flag/notify a working exit at observation and every ten minutes; preserve its identity | [Native nanosecond time alert](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/common/src/python/clock.rs#L158-L177), F-1 decision 2 | Fractional-second halt at 2.3 s produces notices at 2.3, 602.3 and 1202.3 s, with one unchanged working exit and no cancellation/replacement |
+| P3-B: a held exit's DAY-expiry callback freezes before returning | [Native order-expiry dispatch](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/trading/src/python/strategy.rs#L504-L511), F-1 decision 2 | Explicit state-machine expiry callback during a halt preserves the residual, flags/notifies and freezes; this does not qualify venue-driven expiry |
+
+First-hand logs are retained in
+`~/.local/state/native-agent-stack/coordination/ns2604-coop/lanes/strategies-halt-exit-followup-20261010/`.
+`current-main-red-v4.log` executes the new native tests with the unchanged
+production module from main-derived baseline `a7c15bd051088d0493d58bd84a3c8c35dcde6624`:
+nine test methods fail eighteen assertions, with no unexpected errors/skips.
+`focused-green-v4.log` passes those cases, the three fill windows and the
+adjusted raw-stamp/notification/calendar controls. The calendar fixture's
+synthetic halt state is deliberately valid across its one-day callback delay,
+so its execution-time anchor remains isolated from the new freshness fence.
+
+The cue's P3-1 classification was already fixed in `a9e4eeb7`, which landed
+before this follow-up baseline. It is preserved, with the record's three
+unprocessed-halt-cancel fill windows added as native controls. The historical
+production module at `0ea8aee2faaba9a7723550e1b3bca75f6db7480f` fails the late
+two windows (`P3-1-historical-red-v4.log`); current main already passes
+this classification. The historical failure is not represented as a failure
+of current main. The entry's own earliest deadline remains the cutoff; the
+halt-cancel dispatch time does not become a new cutoff.
+
+Twelve targeted single-site mutants fail thirty-four assertions, with no unexpected
+errors/skips. They independently remove raw native/snapshot fences, ignore a
+leading snapshot halt, omit producer expiry or final submission refusal,
+silence/delay the held-exit notice, omit expiry handoff, restore the historical
+policy-only cutoff, and cancel a held exit. The notice control places quotes
+after the exact ten-minute boundary so only the native alert can satisfy it.
+`reproduce.py`, the individual mutant logs and `final-regression-results-v4.json`
+are retained in the same packet; production overlays are compiled in memory
+and print their exact source hashes without editing the worktree's source.
+
+The synthetic producer is named by the instrument-scoped `t22-factors-v1`
+subscription. Its explicit boolean and `valid_until_ns` gate final submission
+as well as drive. Native status halts and snapshot halts are independent vetoes;
+neither carrier clears the other's active halt. Raw fences are memory-only,
+and paper producer/freshness/restart qualification remains T15 work. No source
+here establishes broker cancel behavior, venue-driven DAY expiry, partial
+reopening fills or the seven-assertion T15 paper acceptance. The existing T14
+account-writer binding and historical Layer 1.5 boundaries remain unqualified.
+
+The same rule 3 also closes an input-default gap: a missing `halted` JSON field
+previously defaulted to False and authorized BUY/SELL orders. The native
+`omitted-halt-native-before.log` fails both startup and held-position cases
+without callback errors. `FactorSnapshot.halted` now defaults to None, meaning
+unknown; the typed contract accepts only None or an actual boolean. An unknown
+update immediately vetoes orders and cannot clear an observed halt. Existing
+synthetic LiveNode fixtures now provide their known False state explicitly.
+The policy is decision 3 at the full F-1 pin above; the upstream
+[optional trading-state field](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/python/nautilus_trader/model/__init__.pyi#L2480-L2507)
+likewise distinguishes missing state from False. Baseline reproduction overlays
+both the input contract and families.py at the named production pin; other
+fixture dependencies use the follow-up worktree. Two additional mutants
+restore the False default or ignore an unknown update and fail these controls.
+
+## PR994 first-read corrections at 3cb302ab
+
+The co-op first read (verdict SHA256
+`ce792c92731b56c7226bac49689826e7bb5af95b67ddd9011d0214a84d6807a1`)
+raised an unknown-state cancellation concern and found that held-notice timing
+disappeared on restart. The trading-cc read (`d6fc397c45eafd843a8fd64e8448d41546ece0913ac16434105ed315776ace5e`)
+and reviewer read (`b4df9cb281c0826e7eb83ce5a152d333e13d7b6a7fec61394c2b0790edcfbe5a`)
+reproduced two blocking faults: notification could prevent a partially filled
+entry's cancellation, and a routine notice sent through `session.fail` stopped
+the native actor. The reviewer also found 67 survivors in a 110-mutant census.
+
+The CC's 2026-10-11 03:07Z ruling retains conservative entry cancellation when
+producer state is missing or expired. [F-1 decision 1, lines 16–18](https://github.com/seathatflowsinourveins/us-equities-trading/blob/f8c607bc1f1f0205fdc87095f47df150d2f78117/docs/decisions/2026-10-10-halt-exit-policy.md#L16-L18)
+cancels entries; [decision 2, lines 19–25](https://github.com/seathatflowsinourveins/us-equities-trading/blob/f8c607bc1f1f0205fdc87095f47df150d2f78117/docs/decisions/2026-10-10-halt-exit-policy.md#L19-L25)
+protects working exits from cancellation/replacement while halted or unknown;
+[decision 3, lines 26–28](https://github.com/seathatflowsinourveins/us-equities-trading/blob/f8c607bc1f1f0205fdc87095f47df150d2f78117/docs/decisions/2026-10-10-halt-exit-policy.md#L26-L28)
+blocks every new submission. The upstream [native cancel command](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/trading/src/python/strategy.rs#L2001-L2016)
+reduces the resting entry's remaining risk and retains the original identity
+until confirmation. Native and SDK-free controls pin missing/expired state;
+native replacement controls confirm cancellation before refusing a new order.
+
+`_drive` now dispatches cancellation before attempting notification. The
+separate `notice_sink=None` has no fallback to the failure sink. Delivery
+exceptions record their type as `stop_error`, preserving cancellation and the
+next timer. The existing freeze path keeps its failure sink, and resumption
+retains the freeze's reason flag. A native partial-fill regression uses the
+upstream [DefaultFillModel and liquidity-consumption contract](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/docs/concepts/backtesting/fill-models.md#L28-L45)
+and [L1 passive-fill semantics](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/docs/concepts/backtesting/fill-prices-and-matching.md#L132-L150), with a quote size of
+three: the original seven-share BUY owns three and cancels its remaining four
+at the halt, even with a raising notice sink. A second native control binds a
+stopping failure sink and verifies both explicit and default-none notice ports.
+
+The notification correction adopts the existing [Ledger metadata and
+transaction boundary](https://github.com/seathatflowsinourveins/native-agent-stack/blob/3cb302ab4dab7ecfe605786723758f99c9b78605/blueprints/us-equities/adaptive-paper/safety.py#L427-L527)
+and [Python SQLite transaction control](https://docs.python.org/3.12/library/sqlite3.html#transaction-control).
+`halt_notice.py` stores a versioned, instance-scoped identity, original order
+ID, reason, active state, last-notice and next-due nanoseconds in that existing meta
+table, using its lock/transaction and FULL-synchronous WAL configuration. It
+creates no database, schema, order manager or scheduler. Minimal synthetic
+ports use an explicitly session-only view; that fallback proves no process
+durability. Real-ledger tests close the connection and recreate the strategy.
+
+Startup restores/rearms through the existing [native nanosecond alert](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/common/src/python/clock.rs#L158-L177)
+before a startup refusal can return. A frozen recovery instance delivers
+notices without adopting exposure or submitting commands. The original due
+time survives restart; overdue intervals coalesce into one immediate notice
+and a new ten-minute interval from delivery. The record survives resumption
+as inactive until exposure resolution. An owned final SELL clears it; explicit
+session reconciliation can clear it only after strategy, ledger and cache are
+flat and have no unresolved orders, and does not unfreeze trading.
+
+First-hand packet:
+`~/.local/state/native-agent-stack/coordination/ns2604-coop/lanes/strategies-pr994-gpt-fix-20261011/`.
+The unchanged review probe (SHA256
+`979e6e072f9699a3d1be9b736434f42f0ecb8dffa77655aab0ff2eea64f4d4d1`)
+has an unchanged 3cb302ab run with four tests and three assertion failures.
+The co-op's approved `notice_probe_adapter.py` (`62bb2dc9b22756880a452407216834274d6b6624ce0f63b465c62013505e504b`)
+binds only the probe's recording callback to `notice_sink`; assertions and
+probe source remain unchanged. Both cadence probes pass. The two probes
+`test_missing_producer_does_not_dispatch_cancel` and
+`test_expired_producer_does_not_dispatch_cancel` remain expected red under the
+CC's ruling; they are adjudicated policy disagreements. The real-ledger native
+regression preserves +603 s after a restart at +100 s, and attempts one notice
+at an overdue +2,000 s restart followed by the next at +2,600 s. The partial-fill,
+separate-sink and retained-freeze-flag regressions fail four assertions against
+3cb302ab and pass after correction. The ten reviewed witness tests are included
+with explicit notice-port binding where routine notices are asserted.
+
+The locked rc5 runtime runs both touched modules: 101 tests pass, zero skips;
+85 exercise SDK-dependent native integration. System Python runs the lifecycle
+module with six portable tests passing and 68 SDK-dependent tests skipped.
+These metadata-only checks retain
+the actual SQLite Ledger; when exchange-calendars is absent, its unrelated
+calendar port rejects every attempted query. No calendar behavior is inferred.
+The four review probes are additional SDK-free logic checks. Source-bound
+acceptance and matrix receipts separately identify what actually ran. The
+reviewer's mutation runner and explicit line/notice-port remapping are retained
+in the packet for before/after comparison. The equal-stamp mutation needs a
+leading halt whose factors were never installed: a later available resumption
+may equal either raw fence dimension while satisfying the separate snapshot
+revision check. Its three native cases pass and reject the stricter `<=` mutant.
+Broker/session reconciliation and
+T15's seven paper assertions remain unqualified.
+
+## PR994 witness coverage at 1762d7b3
+
+The expiry callback can first observe an expired producer. The native regression
+now injects that callback while a real exit is working and inspects the result
+before another drive: the separate notice, instrument/instance/original-order
+identity, last-notice and next-due timestamps, active record, retained quantity,
+terminal pending state and handoff freeze. A SQLite close/reopen also verifies
+the exact persisted record. This follows [F-1 decision 2, lines 19–25](https://github.com/seathatflowsinourveins/us-equities-trading/blob/f8c607bc1f1f0205fdc87095f47df150d2f78117/docs/decisions/2026-10-10-halt-exit-policy.md#L19-L25)
+and the selected rc5 [expiry callback](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/python/nautilus_trader/trading/__init__.pyi#L659),
+with the existing metadata/transaction boundary cited above. It is an injected
+native callback witness; venue-driven DAY expiry remains unqualified.
+
+The real-ledger native restart test records every failure-sink invocation.
+At +100 s it receives only the two startup reconciliation freezes; routine
+notices at +603 s and +1203 s do not call it again. At an overdue +2,000 s
+restart, the immediate first notice precedes startup reconciliation and its
+freeze; the +2,600 s routine notice adds no stop. The native E06 negative
+control fails one assertion and N17 fails both restart subcases, with no errors
+or skips; both native methods pass with production unchanged.
+
+Four additional SDK-free tests execute exact production methods with the
+actual SQLite Ledger and synthetic clocks/command ports. They isolate a
+RuntimeError from metadata persistence while pinning cancellation, delivery,
+lost-durability flag/trace and re-arm; retained recovery metadata after actual
+startup freezing and a subsequent flat journal/non-halted state; each individual
+reconciliation refusal signal; and preservation of an existing durable freeze
+without another failure-sink call. The existing real-ledger position refusal
+completes all six reconciliation signals. These are local logic/integration
+checks, not native engine or broker reconciliation acceptance.
+
+The final trading-cc read at 1762d7b3 (SHA256
+`b834c967cedb01e4b1a540ec4afc2880a294335e6d7d245e6983fa6eacb84883`)
+withdraws the single-site restored-passive F5 finding: startup freezes the
+recreated actor, and F6 separately protects its retained record. The recovery
+property follows its validated witness (SHA256
+`b7f3b20622607d10ade83f813f9c063e970472c3156ff3c2c6061c658c66f2c5`).
+F5 and F6 individually pass; removing both fails the retained-record assertion.
+An earlier unfrozen synthetic recovery fixture and its F5 kill are superseded
+because they did not preserve the recreated actor's actual startup invariant.
+
+The unchanged engine and ledger implementations remain the selected sources;
+this follow-up changes tests, source-bound acceptance and documentation only.
+The supported generator runs 106 tests without skips: 86 SDK-dependent native
+tests and 20 contract/portable checks. System Python separately runs ten
+portable tests and skips 69 SDK-dependent lifecycle tests.
+Reader inputs, native positive/negative controls and both mutation censuses are
+retained in `~/.local/state/native-agent-stack/coordination/ns2604-coop/lanes/strategies-pr994-witness-fix-20261011/`.
+The earlier first-read counts above remain evidence for their named correction.
+Notice containment applies to errors derived from `Exception`; a
+`BaseException` interruption is outside that guarantee. Native-carrier
+equal-stamp coverage, corrupted/inactive-record variants, failures while
+clearing metadata and re-entrant native stop remain disclosed boundaries.
+
+The cumulative reviewer micro (SHA256
+`450484c2d964f082a82e9caeea957fa5549ea49f7b3070cb4214d662a39934b0`)
+supplies a synthetic LiveNode restart probe using the unchanged FakePort
+fixture, real SQLite and `fault_sink=session.fail`. Reproduced at final source,
+the head delivers its notice at +3 s, calls the failure sink only for the two
+startup freezes and stays active until the requested +8 s stop. N17 adds
+`held_halted` to that sink and stops at about +3.1 s. This closes the earlier
+startup-stop qualification doubt for that fixture; broker/session readiness
+and paper acceptance remain separate. No performance claim changes.
+
+## PR994 connector corrections at 7956bb3a
+
+Two connector P2 threads expose gaps missed by the earlier review witnesses:
+[equal accepted-snapshot replay](https://github.com/seathatflowsinourveins/native-agent-stack/pull/994#discussion_r4240681279)
+and [non-synthetic notice-port admission](https://github.com/seathatflowsinourveins/native-agent-stack/pull/994#discussion_r4240681286).
+At the reviewed parent, the native rc5 regressions run two methods and fail
+three assertions, with no errors or skips: replay retains `held_halted`, and
+both omitted/non-callable sinks leave development startup enabled. The named
+callable positive exercises a native BUY. Synthetic factors carrying
+development labels prove admission behavior only, not qualified market data.
+
+An identical accepted False snapshot now clears the snapshot halt latch before
+its early return, after availability and raw event/init fences pass and only
+after confirming exact equality with the accepted revision. The accepted
+factor object is retained; its validity is not extended. Pending/held exposure
+is driven after the resumption. Equal conflicting revisions still freeze;
+future/older resumptions are refused, and the independent native status veto
+remains active. The native replay regression observes an accepted False
+snapshot, an older late True snapshot, then the exact False replay and a BUY.
+Separate native controls pin conflicting, future, older and native-halt cases.
+
+This follows [F-1 decisions 1–3](https://github.com/seathatflowsinourveins/us-equities-trading/blob/f8c607bc1f1f0205fdc87095f47df150d2f78117/docs/decisions/2026-10-10-halt-exit-policy.md#L16-L28)
+and rc5's [custom-data callback dispatch](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/trading/src/python/strategy.rs#L640-L645).
+The ordering/idempotence rule is local glue; upstream supplies the callback
+and [cached data timestamps](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/model/src/data/custom.rs#L53-L88),
+not this producer's halt-latch policy.
+
+Non-synthetic startup now requires a callable notice sink after its existing
+durable-ledger and post-cutoff-accounting gates, before subscriptions or orders.
+It reuses the selected rc5 [startup callback](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/trading/src/python/strategy.rs#L336-L341)
+and existing freeze/ledger boundary. Missing or non-callable notice ports freeze
+with `startup_notice_sink_required` and sequence zero; the callable control
+still submits. Synthetic fixture defaults remain explicitly permitted.
+
+Failing-before/after logs, review thread identities, pinned source verification,
+supported acceptance/matrix regeneration and final checks are retained in
+`~/.local/state/native-agent-stack/coordination/ns2604-coop/lanes/strategies-pr994-codex-fix-20261011/`.
+Earlier census results above bind their named prior correction and are not
+represented as a rerun on this new production change. Broker/data/paper
+qualification boundaries remain unchanged.
+
+## PR994 restart notification-port ordering at f4dd6355
+
+The subsequent Astra read (SHA256
+`c1dd3e415eac3b11abe7d1d64b0b559754b043ef74a1dd0dce95e02015b1fae6`)
+accepts both connector fixes and identifies a restart variant: notice recovery
+ran before the new port admission gate. A future record armed a timer and an
+overdue record immediately consumed a delivery attempt, even when the later
+gate refused the missing/non-callable sink. The retained earlier review had
+checked named witness corrections; the widened startup side-effect scan found
+this additional ordering dependency.
+
+Recovery now runs only for synthetic fixtures or a callable notice port.
+The existing durable-ledger, post-cutoff and notice admission gates retain
+their refusal precedence. This follows [F-1 decision 2, lines 19–25](https://github.com/seathatflowsinourveins/us-equities-trading/blob/f8c607bc1f1f0205fdc87095f47df150d2f78117/docs/decisions/2026-10-10-halt-exit-policy.md#L19-L25),
+the selected rc5 [startup dispatch](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/trading/src/python/strategy.rs#L336-L341)
+and [nanosecond alert API](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/common/src/python/clock.rs#L158-L177).
+The record stays in the existing [Ledger metadata/transaction boundary](https://github.com/seathatflowsinourveins/native-agent-stack/blob/3cb302ab4dab7ecfe605786723758f99c9b78605/blueprints/us-equities/adaptive-paper/safety.py#L427-L527).
+
+Before changing production, the native rc5/SQLite regression fails four
+subcases with zero errors/skips: omitted/non-callable notice ports after
+close/reopen at +100 s and overdue +2,000 s. Each silently advances the durable
+record despite refusing order admission. After the guard, those cases preserve
+the entire record, arm no notice timer and emit no delivery rows or orders.
+The callable positives pin exact original-deadline and overdue/coalesced
+delivery timestamps and two/three actual sink calls. Correctly wired later
+restarts recover each refused record. Existing fresh admission precedence and
+synthetic recovery tests remain in the native control and supported full suite.
+
+The matching trading-cc micro (SHA256
+`b39c39fa880f749db702f665373dcc2978ab900119a6d7f0a108d9c082b5f9fb`)
+also finds replay-guard coverage gaps. The native boundary test now includes
+identical accepted True and None replays, plus a halt with a newer event stamp
+and older init stamp; that fixture preserves `ts_event <= ts_init`. Native
+entry logic remains enabled so a weakened veto can demonstrably submit BUY.
+Its four exact reader mutations R1/R2/R12/R13 pass the earlier test, then fail
+two/one/one/one assertions after the added cases, with zero errors/skips.
+No replay production change is needed. A separate native recovery sequence
+refuses an invalid overdue-port restart at +2,000 s, then actually delivers
+immediately with a corrected port at +2,060 s, avoiding the silent attempt's
+540-second delay. Skipping invalid-port recovery records the admission refusal;
+it does not manufacture a delivery-error row for a callback never attempted.
+
+The discretionary pre-existing async-port, failure-port and duck-typed ledger
+validation variants in the same read remain separate unqualified boundaries.
+This correction closes the overlapping recovery ordering P2 and the four
+required replay witnesses; it does not claim acceptance of those variants.
+
+The packet is
+`~/.local/state/native-agent-stack/coordination/ns2604-coop/lanes/strategies-pr994-recovery-port-fix-20261011/`.
+It retains the pinned-parent reversal, native before/after controls, source
+verification and supported receipt/check results. Development labels on these
+synthetic fixtures prove startup/recovery behavior only; no market-data,
+broker, paper or performance qualification is added.
