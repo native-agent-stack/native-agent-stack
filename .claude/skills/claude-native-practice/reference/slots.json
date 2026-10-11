@@ -3,7 +3,7 @@
  "client_version": "2.1.295",
  "checked_at": "2026-10-09",
  "record": "docs/decisions/2026-10-09-claude-code-native-practice.md",
- "selection_rule": "One default per role slot; overlaps become ranked alternatives or rejections. A native Claude Code feature that covers the slot is the default unless a measured gap exists. Repository quality selects (maintenance, releases, tests, docs, upstream adoption); popularity and invoke counts never do. A token or cost saving becomes a default only with quality parity measured on paired same-task runs (promptfoo 0.124.0 or the skill-creator benchmark, blind judge plus exact checks); otherwise it stays an alternative marked pending.",
+ "selection_rule": "One default per role slot; overlaps become ranked alternatives or rejections. A native Claude Code feature that covers the slot is the default unless a measured gap exists. Repository quality selects (maintenance, releases, tests, docs, upstream adoption); popularity and invoke counts never do. A token or cost saving becomes a default only with quality parity measured on paired same-task runs (promptfoo 0.124.0 or the skill-creator benchmark, blind judge plus exact checks); otherwise it stays an alternative marked pending. A retired slot is the exception: it has no default, and its row says what replaced the route.",
  "status_values": {
   "default": "current default, evidenced",
   "default-scoped": "current default with a recorded scope limit or correction",

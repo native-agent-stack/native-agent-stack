@@ -15,12 +15,17 @@ from __future__ import annotations
 
 import json
 import re
+import tempfile
 import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-REFERENCE = ROOT / ".claude/skills/claude-native-practice/reference"
+SKILL_DIR = ROOT / ".claude/skills/claude-native-practice"
+REFERENCE = SKILL_DIR / "reference"
 RECORD = "docs/decisions/2026-10-10-retire-in-github-claude-review.md"
+# The default the command center ruled for the retired row, on all three surfaces (the co-op's GPT read at ba6ab3a5c, measured boundary `wrong-decision-date`: with the date changed on all three surfaces the
+# agreement checks and the phrase check still passed, so the whole text is pinned here).
+RETIRED_DEFAULT = "None: Claude review does not run inside GitHub (decision of 2026-10-10); AI review runs locally, see pr-review-pre-cue"
 WORKFLOWS = ("claude-pr-review.yml", "claude-pr-toolkit-review.yml", "harness-audit.yml")
 # The names the record uses for the retired route (checked against the record below), then what the retired rows and notes said without naming a file: the run "in Actions", "through #909", "under WIF", and the managed app,
 # which the command center's ruling of 2026-10-10 retired with them and the record does not name.
@@ -33,12 +38,19 @@ PATTERNS.update({
     "under WIF": re.compile(r"\bunder WIF\b", re.I),
     "the managed Code Review app": re.compile(r"managed (?:Claude )?Code Review|Code Review GitHub App", re.I),
 })
+# "in Actions", "through Actions" and "under WIF" name the retired route only when the field or sentence is about Claude: the record keeps GitHub's required checks, Codex's GitHub review and the
+# scheduled trackers, and those run in GitHub Actions (the Codex review in GitHub of #1001 at ba6ab3a5c, P2, line 33). The named workflows, "through #909" and the managed app are specific and count everywhere.
+GENERIC = ("in Actions", "through Actions", "under WIF")
+CLAUDE_ROUTE = re.compile(r"\bclaude\b|\banthropic\b|\bconsole\b|pr-review-toolkit|#909", re.I)
 SELECTING = ("default", "alternatives")
 SKIPPED_KEYS = ("id", "layer_id", "status", "retired", "primary_sources_total")
 RETIRED_KEYS = ("on", "record", "correction", "scope", "workflows", "former_default", "revisit_when")
 STATUS_CELL = {"default-scoped": "default (scoped)", "recommendation": "recommendation (owner's choice)"}
 SAYS_RETIRED = re.compile(r"\bretire(?:d|ment)\b", re.I)
-SENTENCE = re.compile(r"(?<=[.;])\s+(?=[A-Z`\[(\-])")
+# A unit ends at a full stop or a semicolon followed by white space, whatever follows: a lowercase clause is a clause (the Codex review in GitHub of #1001 at ba6ab3a5c, P2, line 41: the
+# first version split only before a capital letter, a backtick, a bracket, a parenthesis or a hyphen, so "retired; the current default is claude-code-action" was one unit that said retired).
+# A line break ends a unit too. A comma, a colon or a dash does not: "Retired 2026-10-10: the workflows that ran claude-code-action are removed" is one claim.
+SENTENCE = re.compile(r"(?<=[.;])\s+|\s*\n\s*")
 ROW = re.compile(r"^\| \[([a-z0-9-]+)\]\([^)]*\) \| (.+)$")
 BULLET = re.compile(r"^- \*\*(.+?):\*\* (.*)$")
 
@@ -51,6 +63,17 @@ def flatten(value) -> str:
     if isinstance(value, (list, tuple)):
         return " ".join(flatten(item) for item in value)
     return ""
+
+
+def leaves(value) -> list[str]:
+    """Every string of a field, each by itself (a list item is a claim of its own)."""
+    if isinstance(value, str):
+        return [value]
+    if isinstance(value, dict):
+        return [leaf for item in value.values() for leaf in leaves(item)]
+    if isinstance(value, (list, tuple)):
+        return [leaf for item in value for leaf in leaves(item)]
+    return []
 
 
 def units(value) -> list[str]:
@@ -68,12 +91,12 @@ def judge(label: str, kind: str, value) -> list[str]:
     """`select`: the field names no retired route at all. `explain`: a retired route is named only in a unit that says it is retired."""
     found = []
     if kind == "select":
-        text = flatten(value)
-        found += [f"{label} selects the retired route {name!r}" for name, pattern in PATTERNS.items() if pattern.search(text)]
+        found += [f"{label} selects the retired route {name!r}" for name, pattern in PATTERNS.items()
+                  if any(pattern.search(leaf) and (name not in GENERIC or CLAUDE_ROUTE.search(leaf)) for leaf in leaves(value))]
         return found
     for unit in units(value):
         for name, pattern in PATTERNS.items():
-            if pattern.search(unit) and not SAYS_RETIRED.search(unit):
+            if pattern.search(unit) and not SAYS_RETIRED.search(unit) and (name not in GENERIC or CLAUDE_ROUTE.search(unit)):
                 found.append(f"{label} names the retired route {name!r} in a unit that does not say it is retired: {unit[:80]!r}")
     return found
 
@@ -195,6 +218,19 @@ def prose_violations(name: str, text: str) -> list[str]:
     return judge(name, "explain", [line for line in text.splitlines() if line.strip()])
 
 
+def folder_prose_violations(skill_dir: Path) -> list[str]:
+    """The prose no slot parser reads: cross-client.md, the preamble of every layer page and the entry point SKILL.md (the Codex review in GitHub of #1001 at ba6ab3a5c, P2, line 312:
+    the first version scanned only reference/, so a stale route in the first instruction a session reads passed every check)."""
+    found = []
+    for page in sorted((skill_dir / "reference").glob("*.md")):
+        if page.name == "cross-client.md":
+            found += prose_violations(page.name, page.read_text(encoding="utf-8"))
+        elif page.name != "slots.md":
+            preamble = page.read_text(encoding="utf-8").split("\n## ", 1)[0]
+            found += prose_violations(f"{page.name} preamble", preamble)
+    return found + prose_violations("SKILL.md", (skill_dir / "SKILL.md").read_text(encoding="utf-8"))
+
+
 # The rows as the skill carried them on 2026-10-09, before the retirement: the control that the checks see what they are meant to see.
 BEFORE_ACTION = {
     "id": "github-action", "status": "default",
@@ -234,6 +270,15 @@ class SlotsJsonTests(unittest.TestCase):
         self.assertEqual([slot["id"] for slot in self.slots if slot["status"] not in self.status_values], [])
         self.assertEqual(len(self.by_id), len(self.slots), "a slot id occurs twice")
 
+    def test_the_one_default_rule_names_the_retired_exception_wherever_it_is_stated(self):
+        # The Codex review in GitHub of #1001 at ba6ab3a5c, P2, slots.json:13: the rule said one default per slot and the entry point said to follow every slot's default, while a retired row
+        # has none (its default begins with "None"), so a consumer of the declared invariant could take that prose for a selected default or reject the document.
+        rule = self.data["selection_rule"]
+        self.assertIn("A retired slot is the exception: it has no default", rule)
+        self.assertIn("Selection rule: " + rule, (REFERENCE / "slots.md").read_text(encoding="utf-8"))
+        step = re.sub(r"\s+", " ", (SKILL_DIR / "SKILL.md").read_text(encoding="utf-8").split("3. **Follow the default.**", 1)[1].split("4. **", 1)[0])
+        self.assertIn("a retired row has none and says what replaced the route", step)
+
     def test_the_markers_are_the_names_the_record_uses(self):
         self.assertEqual([name for name in NAMES + WORKFLOWS if name not in self.record], [])
 
@@ -245,6 +290,7 @@ class SlotsJsonTests(unittest.TestCase):
         slot = self.by_id["github-action"]
         self.assertEqual(slot["status"], "retired")
         self.assertEqual(retired_violations(slot, self.record), [])
+        self.assertEqual(slot["default"], RETIRED_DEFAULT)
         self.assertEqual(tuple(slot["retired"]["workflows"]), WORKFLOWS)
         self.assertEqual(slot["retired"]["record"], RECORD)
         self.assertIn("anthropics/claude-code-action", slot["retired"]["former_default"])
@@ -305,17 +351,37 @@ class SurfaceTests(unittest.TestCase):
                 different.append((slot["id"], "layer page"))
         self.assertEqual(different, [])
 
+    def test_the_index_and_the_layer_pages_show_each_slots_overturn_condition(self):
+        # One step wider than the Codex review of #1005 (C1): a row's Overturn when was edited in slots.json and on its layer page and the index cell of slots.md kept the old text.
+        different = []
+        for slot in self.slots:
+            if self.index[slot["id"]][2] != slot["overturn_when"]:
+                different.append((slot["id"], "slots.md"))
+            if section_fields(self.by_id[slot["id"]]).get("Overturn when") != slot["overturn_when"]:
+                different.append((slot["id"], "layer page"))
+        self.assertEqual(different, [])
+
     def test_no_row_line_or_section_selects_a_retired_route_or_names_one_without_saying_so(self):
         found = index_violations(self.index_text)
         for _page, section_id, section in self.sections:
             found += section_violations(section_id, section)
-        for page in sorted(REFERENCE.glob("*.md")):
-            if page.name == "cross-client.md":
-                found += prose_violations(page.name, page.read_text(encoding="utf-8"))
-            elif page.name != "slots.md":
-                preamble = page.read_text(encoding="utf-8").split("\n## ", 1)[0]
-                found += prose_violations(f"{page.name} preamble", preamble)
+        found += folder_prose_violations(SKILL_DIR)
         self.assertEqual(found, [])
+
+    def test_every_file_of_the_skill_folder_is_read_by_a_check(self):
+        read = {SKILL_DIR / "SKILL.md", REFERENCE / "slots.json"} | set(REFERENCE.glob("*.md"))
+        self.assertEqual(sorted(str(path.relative_to(SKILL_DIR)) for path in SKILL_DIR.rglob("*") if path.is_file() and path not in read), [],
+                         "a file of the skill folder that no check reads can name a retired route unseen")
+
+    def test_the_entry_point_naming_a_retired_route_as_current_is_flagged(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            skill = Path(tmp)
+            (skill / "reference").mkdir()
+            (skill / "reference" / "cross-client.md").write_text("Codex lanes follow the same practice.\n", encoding="utf-8")
+            (skill / "SKILL.md").write_text("---\nname: x\n---\n3. **Follow the default.** Set up anthropics/claude-code-action for review.\n", encoding="utf-8")
+            self.assertEqual(len(folder_prose_violations(skill)), 1)
+            (skill / "SKILL.md").write_text("---\nname: x\n---\n3. **Follow the default.** The anthropics/claude-code-action route was retired on 2026-10-10.\n", encoding="utf-8")
+            self.assertEqual(folder_prose_violations(skill), [])
 
     def test_the_index_says_what_a_retired_row_is(self):
         self.assertRegex(self.index_text, r"A \*\*retired\*\* row has no default to follow")
@@ -343,10 +409,63 @@ class CheckSeesTheRowsOfBeforeTests(unittest.TestCase):
         self.assertEqual(slot_violations(after), [])
 
     def test_variants_of_the_old_phrases_are_flagged(self):
-        for default in ("locally in J8 and in GitHub Actions", "locally in J8 and as a job through Actions", "the weekly harness-audit dispatch",
-                        "the managed Claude Code Review app", "Claude Code Review GitHub App", "with Actions under WIF"):
+        for default in ("Claude review locally in J8 and in GitHub Actions", "Claude review locally in J8 and as a job through Actions", "the weekly harness-audit dispatch",
+                        "the managed Claude Code Review app", "Claude Code Review GitHub App", "Claude with Actions under WIF"):
             with self.subTest(default=default):
                 self.assertNotEqual(judge("x", "select", default), [])
+
+    def test_the_generic_deployment_phrases_are_flagged_only_when_the_field_is_about_claude(self):
+        # The record keeps GitHub's required checks, Codex's GitHub review and the scheduled trackers, which run in GitHub Actions (the Codex review in GitHub of #1001, P2, line 33).
+        for text in ("The required checks and the scheduled trackers run in GitHub Actions.", "Federated cloud access is issued through Actions under WIF.", "The weekly job runs through Actions.",
+                     "Catalog freshness runs in GitHub Actions.", "The non-model artifact gate runs under WIF.",
+                     "The required checks (`validate`, `sota-sources`, `verdict-review-gate`) and the landing scripts run in GitHub Actions.", "Codex's GitHub review is not affected and its gates run in GitHub Actions."):
+            with self.subTest(allowed=text):
+                self.assertEqual(judge("x.default", "select", text), [])
+                self.assertEqual(judge("x.notes", "explain", text), [])
+        for text in ("Claude review runs in GitHub Actions.", "The Claude job runs through Actions.", "Anthropic access under WIF.", "pr-review-toolkit runs in Actions.", "Console usage of Actions under WIF."):
+            with self.subTest(flagged=text):
+                self.assertEqual(len(judge("x.default", "select", text)), 1)
+                self.assertEqual(len(judge("x.notes", "explain", text)), 1)
+        # a specific marker counts everywhere
+        self.assertEqual(len(judge("x.notes", "explain", "The run through #909 stays.")), 1)
+        # the former route in the same words, and the local Claude worker put back into GitHub Actions, are the regressions the guard exists for
+        for text in ("The Claude review runs in GitHub Actions under WIF.", "The local Claude review worker runs in GitHub Actions."):
+            with self.subTest(flagged=text):
+                self.assertNotEqual(judge("x.default", "select", text), [])
+        # each list item is judged by itself: a Claude item does not turn the next item's generic phrase into the retired route
+        self.assertEqual(judge("x.alternatives", "select", ["Claude plugin review", "A scheduled job that runs in GitHub Actions"]), [])
+        self.assertEqual(len(judge("x.alternatives", "select", ["Claude plugin review", "Claude job that runs in GitHub Actions"])), 1)
+
+    def test_every_route_the_decision_retains_is_accepted(self):
+        # The co-op's GPT read at ba6ab3a5c (P2, generic phrases): the decision keeps the local AI reads, Codex's GitHub review and GitHub's gates. Every bullet of its "What remains" section,
+        # with its continuation lines joined, is accepted as explanatory text and as a field, and the gates are accepted when they are described with the generic deployment phrases.
+        remains = (ROOT / RECORD).read_text(encoding="utf-8").split("\n## What remains", 1)[1].split("\n## ", 1)[0]
+        bullets, current = [], None
+        for line in remains.splitlines():
+            if line.startswith("- "):
+                current = [line]
+                bullets.append(current)
+            elif current is not None and line.startswith("  ") and line.strip():
+                current.append(line.strip())
+        bullets = [" ".join(parts) for parts in bullets]
+        self.assertGreaterEqual(len(bullets), 3)
+        for bullet in bullets:
+            with self.subTest(bullet=bullet[:60]):
+                self.assertEqual(judge("record.what_remains", "explain", bullet), [])
+                self.assertEqual(judge("record.what_remains", "select", bullet), [])
+
+    def test_a_lowercase_clause_after_a_full_stop_or_a_semicolon_is_its_own_unit(self):
+        # The Codex review in GitHub of #1001 at ba6ab3a5c, P2, line 41: the first splitter needed a capital letter, so these were one unit that said "retired".
+        for text in ("This route was retired; the current default is claude-code-action.", "It was retired. the current default is claude-code-action.",
+                     "Retired 2026-10-10.\nthe current default is claude-code-action.", "retired;\tthe current default is claude-code-action.",
+                     "Retired 2026-10-10\nthe current default is claude-code-action."):
+            with self.subTest(text=text):
+                self.assertEqual(len(judge("x.notes", "explain", text)), 1)
+                self.assertEqual(len(units(text)), 2)
+        for text in ("claude-code-action was retired; the workflows that ran it are removed.", "Retired 2026-10-10: the workflows that ran claude-code-action are removed.",
+                     "The claude-code-action route was retired, and the workflows that ran it are removed."):
+            with self.subTest(text=text):
+                self.assertEqual(judge("x.notes", "explain", text), [])
 
     def test_the_dependabot_note_and_the_usage_note_that_still_name_the_route_as_current_are_flagged(self):
         self.assertEqual(len(slot_violations(BEFORE_TRACKING)), 1)

@@ -18,8 +18,8 @@ for scripts. Codex lanes follow the same practice through their own native mecha
    (`gh api repos/anthropics/claude-code/contents/CHANGELOG.md -H "Accept: application/vnd.github.raw"`) and treat the
    row as current only if none changes the behaviour the default depends on. The newest page is
    <https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/.claude/skills/claude-native-practice/reference/slots.md>.
-3. **Follow the default.** Use the default and its route. A change to stored client configuration, hooks, hook trust or
-   permissions is the command center's act: hand it a reviewed diff.
+3. **Follow the default.** Use the default and its route; a retired row has none and says what replaced the route. A change to
+   stored client configuration, hooks, hook trust or permissions is the command center's act: hand it a reviewed diff.
 4. **Record a supersession.** When the CHANGELOG, the docs or a measured result overturns a row, name the row, the source
    at its pin and the date, and propose the dated update to the page by pull request. A token or cost saving changes a
    default only with quality parity measured on paired same-task runs.

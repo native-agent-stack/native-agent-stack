@@ -4926,8 +4926,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/SKILL.md",
-      "sha256": "a52a24bc7691fa18b3e4c532c6cbd15b79968d82a54acb4202c9fcced2ad8bcb",
-      "bytes": 2224
+      "sha256": "b5c3a79c84062514c8077300570f7c6875919d912f2ad465541989e9b4320006",
+      "bytes": 2281
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/agent-sdks.md",
@@ -4981,13 +4981,13 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.json",
-      "sha256": "628e02f31ac5b4366f96bd9b68d3ce9ce23ebd7078be68050caa4c1da594f640",
-      "bytes": 142658
+      "sha256": "c670b7f2f025a9b212bfb80d639ead8cc7ff41d64afb05918601a0a1cac948a0",
+      "bytes": 142752
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.md",
-      "sha256": "9466a5d26bffcf34c757fadab2d34ff35eb6a1ca2bd266216148e6e93c9d4116",
-      "bytes": 11991
+      "sha256": "cbe29e3224133a2e34dcf8f79e0cd3dab055e7397994c359e1fff19e190335fa",
+      "bytes": 12085
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/token-efficiency.md",
@@ -61027,8 +61027,8 @@
     },
     {
       "path": "tests/test_native_practice_retired_routes.py",
-      "sha256": "8455c7cb78e68b8f868166d12123c1841b87cca286e41389119edb6850d8b457",
-      "bytes": 25950
+      "sha256": "a8e732a7af26e63e62418c052fe8ab5af9a4a9b545030abff66803699e49f2aa",
+      "bytes": 36248
     },
     {
       "path": "tests/test_native_practice_snapshot_provenance.py",
