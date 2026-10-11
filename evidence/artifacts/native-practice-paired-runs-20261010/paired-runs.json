@@ -1,0 +1,2396 @@
+{
+ "schema": "claude-native-practice-paired-runs/1",
+ "root": "research/cc-native-practice-20261009 (private working papers on the producing host; not published)",
+ "client": "claude code 2.1.296 (pinned binary)",
+ "planning_2b": {
+  "question": "Which way of carrying state across fresh sessions (context loss forced by a 30-turn cap, at most 8 sessions) finishes the task with the fewest sessions or least cost: repository state files (A), the native task list (B), or the same prompt every session with no state instruction (C, the Ralph-style loop)?",
+  "design": {
+   "fixtures": [
+    "F5",
+    "F6"
+   ],
+   "trials": 2,
+   "arms": {
+    "A": "TASK_STATE.json, PROGRESS.md and git commits",
+    "B": "native task list, one list id per run",
+    "C": "the same prompt every session, no state instruction"
+   },
+   "model": "claude-opus-5-5 at xhigh",
+   "max_turns_per_session": 30,
+   "max_sessions": 8,
+   "usd_cap_per_session": 15,
+   "seconds_cap_per_session": 3000,
+   "client": "claude code 2.1.296",
+   "grading": "hidden tests, corrected parser (orch_run.parse_statuses)",
+   "costs": "API-list-equivalent, not billed"
+  },
+  "runs": [
+   {
+    "run": "F5-A-1",
+    "fixture": "F5",
+    "trial": 1,
+    "arm": "A",
+    "resolved": true,
+    "fail_to_pass": [
+     17,
+     17
+    ],
+    "pass_to_pass": [
+     236,
+     236
+    ],
+    "sessions_used": 6,
+    "declared_done": true,
+    "cost_usd_list_equivalent": 13.51,
+    "seconds": 3560,
+    "sessions_after_last_edit": 0,
+    "lost_work_events": 0,
+    "result_sha256": "f8ec85f59f2ba8570030dbdd55ff88ab39cc8854bed07566818fbf7c28be02bb",
+    "lost_work_readers": {
+     "first_sha256": "f3ef9976658e6d5352ebf664720fc357beca4cc0c580bbfec7e6c5150b593609",
+     "second_sha256": "9be70801cd6cf150099aaacf6d3635cdb15afb398e40cd68601f45e9236af5a5"
+    }
+   },
+   {
+    "run": "F5-B-1",
+    "fixture": "F5",
+    "trial": 1,
+    "arm": "B",
+    "resolved": true,
+    "fail_to_pass": [
+     17,
+     17
+    ],
+    "pass_to_pass": [
+     236,
+     236
+    ],
+    "sessions_used": 8,
+    "declared_done": false,
+    "cost_usd_list_equivalent": 17.75,
+    "seconds": 4214,
+    "sessions_after_last_edit": 3,
+    "lost_work_events": 0,
+    "result_sha256": "b1fbc40ac4f0d2422ccb27ea9a73b10db5603046ebb9e60ed1da54d46ecc77ef",
+    "lost_work_readers": {
+     "first_sha256": "b3cf67041d2399a0950df89c9da9caf0eca994cc9b0a4ddf4d9abd23226885a8",
+     "second_sha256": "6dd4cb1d6a98713c107dded206725300519a12d12a0765468007e44717e096d5"
+    }
+   },
+   {
+    "run": "F5-C-1",
+    "fixture": "F5",
+    "trial": 1,
+    "arm": "C",
+    "resolved": true,
+    "fail_to_pass": [
+     17,
+     17
+    ],
+    "pass_to_pass": [
+     236,
+     236
+    ],
+    "sessions_used": 8,
+    "declared_done": false,
+    "cost_usd_list_equivalent": 23.55,
+    "seconds": 4884,
+    "sessions_after_last_edit": 3,
+    "lost_work_events": 0,
+    "result_sha256": "9e6e1168fe28e1f9710e81cc28b8af2a651490920cd63292f34171bfcfce7aaa",
+    "lost_work_readers": {
+     "first_sha256": "a93448aea51da15f6e6381b7f384762457b12b88f2c7f1bb4c4268093d9ce3be",
+     "second_sha256": "a292627d207596ad4ade54d887159287afbc3ef52b651144ef648f328c21f988"
+    }
+   },
+   {
+    "run": "F6-A-1",
+    "fixture": "F6",
+    "trial": 1,
+    "arm": "A",
+    "resolved": true,
+    "fail_to_pass": [
+     45,
+     45
+    ],
+    "pass_to_pass": [
+     2,
+     2
+    ],
+    "sessions_used": 3,
+    "declared_done": true,
+    "cost_usd_list_equivalent": 8.31,
+    "seconds": 2061,
+    "sessions_after_last_edit": 0,
+    "lost_work_events": 0,
+    "result_sha256": "f1df80a3036b9a2501d610108dfe8acadf3fd995f3ff493c40e4890bc15ed04f",
+    "lost_work_readers": {
+     "first_sha256": "97dcfdc023c74c778b0aaeefc26de83925273b1ba304540b0ec3748d15e201a6",
+     "second_sha256": "9f772e33bf583bc681a863a8f1935514635de2e4f963360e81a77d824c9a8bb8"
+    }
+   },
+   {
+    "run": "F6-B-1",
+    "fixture": "F6",
+    "trial": 1,
+    "arm": "B",
+    "resolved": true,
+    "fail_to_pass": [
+     45,
+     45
+    ],
+    "pass_to_pass": [
+     2,
+     2
+    ],
+    "sessions_used": 1,
+    "declared_done": true,
+    "cost_usd_list_equivalent": 5.12,
+    "seconds": 1200,
+    "sessions_after_last_edit": 0,
+    "lost_work_events": 0,
+    "result_sha256": "13169859ce5f4cc8642233362ac394ff64638acc63b6fd8a663939160029e4ad"
+   },
+   {
+    "run": "F6-C-1",
+    "fixture": "F6",
+    "trial": 1,
+    "arm": "C",
+    "resolved": true,
+    "fail_to_pass": [
+     45,
+     45
+    ],
+    "pass_to_pass": [
+     2,
+     2
+    ],
+    "sessions_used": 3,
+    "declared_done": true,
+    "cost_usd_list_equivalent": 8.5,
+    "seconds": 2144,
+    "sessions_after_last_edit": 0,
+    "lost_work_events": 0,
+    "result_sha256": "a67b4e337d7469d593199be3545774e186b9493c96d56f0d4a850de1656d1aa8",
+    "lost_work_readers": {
+     "first_sha256": "2990f729896309bd724a1a220e93cf671d11cb2855b7c1315d98b73a63d2057e",
+     "second_sha256": "5eca974c55bc3768b8ee81fd585b8b4f5d9ce29ead17f6d5dc4d025acb9948e2"
+    }
+   },
+   {
+    "run": "F5-A-2",
+    "fixture": "F5",
+    "trial": 2,
+    "arm": "A",
+    "resolved": true,
+    "fail_to_pass": [
+     17,
+     17
+    ],
+    "pass_to_pass": [
+     236,
+     236
+    ],
+    "sessions_used": 5,
+    "declared_done": true,
+    "cost_usd_list_equivalent": 11.92,
+    "seconds": 3256,
+    "sessions_after_last_edit": 1,
+    "lost_work_events": 0,
+    "result_sha256": "0c84a30989920a9f3adf9d4738688918fbe59f84656122d2741f1440193a71bc",
+    "lost_work_readers": {
+     "first_sha256": "e8a37ae0472e7c4ed030f30b36dff69e3d5295294ead8fc615ea36631a8cea72",
+     "second_sha256": "9c77bf72613f2e01b289853022c3082389fa5773bed4b8ecb8d8f11a170648a0"
+    }
+   },
+   {
+    "run": "F5-B-2",
+    "fixture": "F5",
+    "trial": 2,
+    "arm": "B",
+    "resolved": true,
+    "fail_to_pass": [
+     17,
+     17
+    ],
+    "pass_to_pass": [
+     236,
+     236
+    ],
+    "sessions_used": 8,
+    "declared_done": false,
+    "cost_usd_list_equivalent": 20.54,
+    "seconds": 4228,
+    "sessions_after_last_edit": 3,
+    "lost_work_events": 0,
+    "result_sha256": "0d9b272d297d2e885e86320c199f3b78edec2f47509f0c74bbd15b8501cec8b6",
+    "lost_work_readers": {
+     "first_sha256": "2498fdd8cde381f9d61d2dcac2edfc8e728135eb977df8fa7e7ef07238c2b47e",
+     "second_sha256": "f74f91340651ef6ec8e2c0e38219b4c254c53a66e34c9d068fc5cab60969a36d"
+    }
+   },
+   {
+    "run": "F5-C-2",
+    "fixture": "F5",
+    "trial": 2,
+    "arm": "C",
+    "resolved": true,
+    "fail_to_pass": [
+     17,
+     17
+    ],
+    "pass_to_pass": [
+     236,
+     236
+    ],
+    "sessions_used": 8,
+    "declared_done": false,
+    "cost_usd_list_equivalent": 22.7,
+    "seconds": 5461,
+    "sessions_after_last_edit": 1,
+    "lost_work_events": 0,
+    "result_sha256": "7d91afb217a41b220476e9000a9d2936df412630291faf0541f21f946b598fdd",
+    "lost_work_readers": {
+     "first_sha256": "aaec7d293d4ba7343c5a932a0690b8cbac93627ac73c9db56994dc295f7d083f",
+     "second_sha256": "a791ce72ee61c68e0f932d321833ff38777db8e1e91a6531b2ba3dbe9b914268"
+    }
+   },
+   {
+    "run": "F6-A-2",
+    "fixture": "F6",
+    "trial": 2,
+    "arm": "A",
+    "resolved": true,
+    "fail_to_pass": [
+     45,
+     45
+    ],
+    "pass_to_pass": [
+     2,
+     2
+    ],
+    "sessions_used": 2,
+    "declared_done": true,
+    "cost_usd_list_equivalent": 6.05,
+    "seconds": 1615,
+    "sessions_after_last_edit": 1,
+    "lost_work_events": 0,
+    "result_sha256": "52acae124fa1458c8b01f45327517a5e2180f5be0019e2ec84fda20d25faffcf",
+    "lost_work_readers": {
+     "first_sha256": "328880d26825013765e774fe262e3fa6d412c0e542513ef3db672818a4c2e42f",
+     "second_sha256": "f75baa0e9e13693644db8329e566f113699a8283cfd740aa04cd11f97a6d4153"
+    }
+   },
+   {
+    "run": "F6-B-2",
+    "fixture": "F6",
+    "trial": 2,
+    "arm": "B",
+    "resolved": true,
+    "fail_to_pass": [
+     45,
+     45
+    ],
+    "pass_to_pass": [
+     2,
+     2
+    ],
+    "sessions_used": 2,
+    "declared_done": true,
+    "cost_usd_list_equivalent": 5.55,
+    "seconds": 1524,
+    "sessions_after_last_edit": 1,
+    "lost_work_events": 0,
+    "result_sha256": "65f74ac2723f34dd657c54fa1d9a957285916c26c0f75f8e30a5ba8fb2bd8f19",
+    "lost_work_readers": {
+     "first_sha256": "ba1ba25c89a42e440bcfcdf207547abe944eae9c1d7ea6c462855e87839db063",
+     "second_sha256": "0b9136a346acf9b5f81bb79e3c25c052e943ff99a25e45ee61ec79cfe779805a"
+    }
+   },
+   {
+    "run": "F6-C-2",
+    "fixture": "F6",
+    "trial": 2,
+    "arm": "C",
+    "resolved": true,
+    "fail_to_pass": [
+     45,
+     45
+    ],
+    "pass_to_pass": [
+     2,
+     2
+    ],
+    "sessions_used": 2,
+    "declared_done": true,
+    "cost_usd_list_equivalent": 6.95,
+    "seconds": 1988,
+    "sessions_after_last_edit": 0,
+    "lost_work_events": 0,
+    "result_sha256": "b451b3ffa543498e990cbcc8e9cfda3703f2a94ad90b402b187486d278acdb51",
+    "lost_work_readers": {
+     "first_sha256": "737ce07dbaeb9b45d8ecdcec6e21b8f060f573128570895cb274284764a3d3f1",
+     "second_sha256": "2d6307eb7ea72c4b898eb0e0b00b0105063793be16ef552c113a013e19cb76c6"
+    }
+   }
+  ],
+  "decision": {
+   "rule": "B or C replaces A only when it passes at least as many runs as A and uses fewer sessions or less cost in a majority of the counted fixture-trial cells, with no more lost-work events than A; a cell counts when at least one of the two compared runs passes the hidden tests",
+   "cells": [
+    {
+     "cell": "F5-t1",
+     "B": {
+      "counted": true,
+      "wins": false,
+      "fewer_sessions": false,
+      "less_cost": false
+     },
+     "C": {
+      "counted": true,
+      "wins": false,
+      "fewer_sessions": false,
+      "less_cost": false
+     }
+    },
+    {
+     "cell": "F6-t1",
+     "B": {
+      "counted": true,
+      "wins": true,
+      "fewer_sessions": true,
+      "less_cost": true
+     },
+     "C": {
+      "counted": true,
+      "wins": false,
+      "fewer_sessions": false,
+      "less_cost": false
+     }
+    },
+    {
+     "cell": "F5-t2",
+     "B": {
+      "counted": true,
+      "wins": false,
+      "fewer_sessions": false,
+      "less_cost": false
+     },
+     "C": {
+      "counted": true,
+      "wins": false,
+      "fewer_sessions": false,
+      "less_cost": false
+     }
+    },
+    {
+     "cell": "F6-t2",
+     "B": {
+      "counted": true,
+      "wins": true,
+      "fewer_sessions": false,
+      "less_cost": true
+     },
+     "C": {
+      "counted": true,
+      "wins": false,
+      "fewer_sessions": false,
+      "less_cost": false
+     }
+    }
+   ],
+   "B": {
+    "passes": 4,
+    "a_passes": 4,
+    "counted_cells": 4,
+    "cell_wins": 2,
+    "majority": false,
+    "lost_work_events": 0,
+    "a_lost_work_events": 0,
+    "replaces_a": false
+   },
+   "C": {
+    "passes": 4,
+    "a_passes": 4,
+    "counted_cells": 4,
+    "cell_wins": 0,
+    "majority": false,
+    "lost_work_events": 0,
+    "a_lost_work_events": 0,
+    "replaces_a": false
+   }
+  },
+  "outcome": "A stays the default",
+  "primary_design_cap_12": {
+   "verdict": "primary design infeasible (eight sessions of twelve turns is 96 turns before any re-reading; calibration: single sessions needed 40 to 93 turns)",
+   "runs": [
+    {
+     "run": "F5-A-1",
+     "resolved": false,
+     "fail_to_pass": [
+      0,
+      17
+     ],
+     "sessions_used": 8,
+     "cost_usd_list_equivalent": 9.95,
+     "diff_lines": 0,
+     "result_sha256": "5059e7fef42409fd3405ae5e963f140357d1ef972cd13ed579941a3debd1fb38"
+    },
+    {
+     "run": "F5-B-1",
+     "resolved": false,
+     "fail_to_pass": [
+      2,
+      17
+     ],
+     "sessions_used": 8,
+     "cost_usd_list_equivalent": 7.02,
+     "diff_lines": 42,
+     "result_sha256": "d7bbba9eeca324455d138e1b6d28cbe99710563aa6db141d6a83588ca6f5a303"
+    }
+   ]
+  },
+  "lost_work": {
+   "first_reader_model": "claude-opus-5-5",
+   "second_reader_model": "claude-fable-5-1",
+   "runs_with_one_session": [
+    "F6-B-1"
+   ],
+   "total_events": 0,
+   "protocol": {
+    "path": "paired-planning-2b/lost-work-protocol.md",
+    "bytes": 3694,
+    "sha256": "297413ee073dd0f2037089f24d283d8086d71db77e7a2d9684730464a2c3e36c"
+   },
+   "counts": {
+    "path": "paired-planning-2b/lost-work/lost_work.json",
+    "bytes": 171,
+    "sha256": "e871e89e37ca1811f1416701cb826cbfd334571fee63437aa0f78dd7c9cb95d5"
+   },
+   "table": {
+    "path": "paired-planning-2b/lost-work/COUNTS.md",
+    "bytes": 1418,
+    "sha256": "da9ca1977dc32a58b75f812654e7b0435d5307d77fb1ff01e27ac9b82ee3c3cb"
+   }
+  },
+  "papers": {
+   "preregistration": {
+    "path": "paired-planning-2b/preregistration.md",
+    "bytes": 4666,
+    "sha256": "fc2e48e57841632203f0a8eca5d32306f79a8c81e61fbfb96444198500b34c71"
+   },
+   "result": {
+    "path": "paired-planning-2b/RESULT.md",
+    "bytes": 9052,
+    "sha256": "293fe657916adb036514f2ee4ac2f1232baf0e6fe71d53ba521a956a76f88b3d"
+   },
+   "analysis": {
+    "path": "paired-planning-2b/analysis.txt",
+    "bytes": 2515,
+    "sha256": "d75d7876e8a552c7d1e95f69e3fd7a4acfac663283a7d49f9827094127c920bc"
+   }
+  }
+ },
+ "orchestration_1": {
+  "question": "On bounded north-star coding fixes, which orchestration produces the best code for its cost: one session (A), a Workflow pairing the implementer with an adversarial verifier (B), or an interactive agent team (C)?",
+  "design": {
+   "fixtures": {
+    "F1": {
+     "commit": "0c4d32868 (#809)",
+     "task": "recovery receipts carry the engine's error and context"
+    },
+    "F2": {
+     "commit": "b4e1fa6df (#812)",
+     "task": "quote-stream mute watchdog off for extended hours"
+    },
+    "F3": {
+     "commit": "2fea42376 (#667)",
+     "task": "Alpaca paper admission and recovery guards"
+    },
+    "F4": {
+     "commit": "0617f516d (#486)",
+     "task": "recovery exits each held symbol on its own fresh quote"
+    },
+    "F5": {
+     "commit": "d06362390 (#355 follow-up)",
+     "task": "replay fills in execution order per symbol, never into a short"
+    },
+    "F6": {
+     "commit": "58080c6b4 (#911)",
+     "task": "harden R3 verification before freeze"
+    }
+   },
+   "arms": {
+    "A": "one headless session",
+    "B": "headless session with a saved implementer-and-verifier Workflow",
+    "C": "interactive lead with an implementer and a tester-reviewer teammate in tmux (declared confound: interactive against headless)"
+   },
+   "model": "claude-opus-5-5 at xhigh (verifier and judges at max)",
+   "trials_per_arm": 1,
+   "runs": 18,
+   "client": "claude code 2.1.296",
+   "setting_sources": "local only, Ultracode off",
+   "caps": {
+    "A_usd": 15,
+    "B_and_C_usd": 30,
+    "headless_session_minutes": 50,
+    "team_minutes": 45,
+    "bg_wait_ceiling_minutes": 45,
+    "bg_wait_ceiling_setting": "CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=2700000, set by the runner for every headless run (paired/orch_run.py line 137); the client's own default is 10 minutes",
+    "client_default_bg_wait_ceiling_minutes": 10
+   },
+   "costs": "API-list-equivalent, not billed; arm C costs are estimates priced from token counts"
+  },
+  "grader_bug": {
+   "found_in": [
+    "F1-A-1",
+    "F2-A-1"
+   ],
+   "ruling": "the preregistered rule voids the fixture for every arm: F1 and F2 are void in the primary analysis; the regraded results are the declared sensitivity analysis over all six fixtures"
+  },
+  "runs": [
+   {
+    "run": "F1-A-1",
+    "fixture": "F1",
+    "arm": "A",
+    "resolved": true,
+    "fail_to_pass": [
+     7,
+     7
+    ],
+    "pass_to_pass": [
+     150,
+     150
+    ],
+    "cost_usd_list_equivalent": 2.48,
+    "seconds": 1507,
+    "rc": 0,
+    "diff_lines": 466,
+    "timed_out": false,
+    "regraded_from_log": true,
+    "void_in_primary": true,
+    "diff_captured": true,
+    "result_sha256": "770ed317a6f4bac77c1ff146148ddec7dc2fe8e8cf5d8f101cced1c946db1fd0"
+   },
+   {
+    "run": "F1-B-1",
+    "fixture": "F1",
+    "arm": "B",
+    "resolved": true,
+    "fail_to_pass": [
+     7,
+     7
+    ],
+    "pass_to_pass": [
+     150,
+     150
+    ],
+    "cost_usd_list_equivalent": 5.3,
+    "seconds": 2784,
+    "rc": 0,
+    "diff_lines": 542,
+    "timed_out": false,
+    "regraded_from_log": false,
+    "void_in_primary": true,
+    "diff_captured": true,
+    "result_sha256": "6216bab4f50c53853df92c70fbe4a8b15e28d824eb363989395d6e35d9df319d",
+    "workflow": {
+     "implementer_started": true,
+     "implementer_returned": true,
+     "implementer_seconds": 1937,
+     "verifier_started": true,
+     "verifier_returned": false,
+     "verifier_seconds": 766,
+     "verifier_refuted": null,
+     "journal_sha256": "bc4e095739c48b66f34209173ec93c67d57813dd1e9d295cef4b1c47522c03c9"
+    }
+   },
+   {
+    "run": "F1-C-1",
+    "fixture": "F1",
+    "arm": "C",
+    "resolved": true,
+    "fail_to_pass": [
+     7,
+     7
+    ],
+    "pass_to_pass": [
+     150,
+     150
+    ],
+    "cost_usd_list_equivalent": 7.06,
+    "seconds": 2408,
+    "rc": 0,
+    "diff_lines": 484,
+    "timed_out": false,
+    "regraded_from_log": false,
+    "void_in_primary": true,
+    "diff_captured": true,
+    "result_sha256": "3cd29019ebdded5dc2f98f4b987b0c7a83d378ef80140171a66d7221dbfe7139",
+    "cost_is_estimate": true,
+    "team_done": true,
+    "capped_at_30_usd": false,
+    "stopped_at_45_minutes": false,
+    "team": {
+     "agent_calls": 2,
+     "send_message_calls": 1,
+     "questions_asked_of_the_absent_user": 0
+    }
+   },
+   {
+    "run": "F2-A-1",
+    "fixture": "F2",
+    "arm": "A",
+    "resolved": true,
+    "fail_to_pass": [
+     6,
+     6
+    ],
+    "pass_to_pass": [
+     187,
+     187
+    ],
+    "cost_usd_list_equivalent": 5.65,
+    "seconds": 1075,
+    "rc": 0,
+    "diff_lines": 708,
+    "timed_out": false,
+    "regraded_from_log": true,
+    "void_in_primary": true,
+    "diff_captured": true,
+    "result_sha256": "617b7ee41b8c8f37a68dd6dbc9c9d8e83785fdd9f02abb98d63d6774adbb0f50"
+   },
+   {
+    "run": "F2-B-1",
+    "fixture": "F2",
+    "arm": "B",
+    "resolved": true,
+    "fail_to_pass": [
+     6,
+     6
+    ],
+    "pass_to_pass": [
+     187,
+     187
+    ],
+    "cost_usd_list_equivalent": 10.0,
+    "seconds": 2170,
+    "rc": 0,
+    "diff_lines": 863,
+    "timed_out": false,
+    "regraded_from_log": false,
+    "void_in_primary": true,
+    "diff_captured": true,
+    "result_sha256": "c222ca333be79b7b83cbeac43fc4b4f4b9821cb659dc1aa8c6d0fd7c93684321",
+    "workflow": {
+     "implementer_started": true,
+     "implementer_returned": true,
+     "implementer_seconds": 1074,
+     "verifier_started": true,
+     "verifier_returned": true,
+     "verifier_seconds": 1014,
+     "verifier_refuted": false,
+     "journal_sha256": "88dc36db6f61323acc072d966f81b990c7d74d9c21e236d1ab3d013a56694593"
+    }
+   },
+   {
+    "run": "F2-C-1",
+    "fixture": "F2",
+    "arm": "C",
+    "resolved": true,
+    "fail_to_pass": [
+     6,
+     6
+    ],
+    "pass_to_pass": [
+     187,
+     187
+    ],
+    "cost_usd_list_equivalent": 30.06,
+    "seconds": 2230,
+    "rc": 5,
+    "diff_lines": 917,
+    "timed_out": false,
+    "regraded_from_log": false,
+    "void_in_primary": true,
+    "diff_captured": true,
+    "result_sha256": "354f34d86072c366e578dd592e8fbe14861af221d6c50c6f432ac03c67cfa57c",
+    "cost_is_estimate": true,
+    "team_done": false,
+    "capped_at_30_usd": true,
+    "stopped_at_45_minutes": false,
+    "team": {
+     "agent_calls": 4,
+     "send_message_calls": 4,
+     "questions_asked_of_the_absent_user": 0
+    }
+   },
+   {
+    "run": "F3-A-1",
+    "fixture": "F3",
+    "arm": "A",
+    "resolved": true,
+    "fail_to_pass": [
+     15,
+     15
+    ],
+    "pass_to_pass": [
+     28,
+     28
+    ],
+    "cost_usd_list_equivalent": 7.34,
+    "seconds": 1735,
+    "rc": 0,
+    "diff_lines": 1086,
+    "timed_out": false,
+    "regraded_from_log": false,
+    "void_in_primary": false,
+    "diff_captured": true,
+    "result_sha256": "80190f7e038f2cb42ee705429027f180e3073421b8825a92688d5bd9f1e08ed0"
+   },
+   {
+    "run": "F3-B-1",
+    "fixture": "F3",
+    "arm": "B",
+    "resolved": true,
+    "fail_to_pass": [
+     15,
+     15
+    ],
+    "pass_to_pass": [
+     28,
+     28
+    ],
+    "cost_usd_list_equivalent": 11.63,
+    "seconds": 2782,
+    "rc": 0,
+    "diff_lines": 1294,
+    "timed_out": false,
+    "regraded_from_log": false,
+    "void_in_primary": false,
+    "diff_captured": true,
+    "result_sha256": "dd6f57d75439b662581459ab3ad56c08e5509c601e299fa4684870137fcb198f",
+    "workflow": {
+     "implementer_started": true,
+     "implementer_returned": true,
+     "implementer_seconds": 2147,
+     "verifier_started": true,
+     "verifier_returned": false,
+     "verifier_seconds": 555,
+     "verifier_refuted": null,
+     "journal_sha256": "1fd0dde63eef2a8ca264313ad5ac23516cf089ebc3a213ea54d96127aacfc26b"
+    }
+   },
+   {
+    "run": "F3-C-1",
+    "fixture": "F3",
+    "arm": "C",
+    "resolved": true,
+    "fail_to_pass": [
+     15,
+     15
+    ],
+    "pass_to_pass": [
+     28,
+     28
+    ],
+    "cost_usd_list_equivalent": 13.82,
+    "seconds": 2766,
+    "rc": 124,
+    "diff_lines": 0,
+    "timed_out": false,
+    "regraded_from_log": false,
+    "void_in_primary": false,
+    "diff_captured": false,
+    "result_sha256": "3a4b2e6558dfa351dd0a370d18a26b57fce851e914bb7d98cdd9a998e31a5667",
+    "cost_is_estimate": true,
+    "team_done": false,
+    "capped_at_30_usd": false,
+    "stopped_at_45_minutes": true,
+    "team": {
+     "agent_calls": 4,
+     "send_message_calls": 4,
+     "questions_asked_of_the_absent_user": 1
+    }
+   },
+   {
+    "run": "F4-A-1",
+    "fixture": "F4",
+    "arm": "A",
+    "resolved": true,
+    "fail_to_pass": [
+     10,
+     10
+    ],
+    "pass_to_pass": [
+     231,
+     231
+    ],
+    "cost_usd_list_equivalent": 5.87,
+    "seconds": 1729,
+    "rc": 0,
+    "diff_lines": 1155,
+    "timed_out": false,
+    "regraded_from_log": false,
+    "void_in_primary": false,
+    "diff_captured": true,
+    "result_sha256": "8779c904d5c294ecd24832f347b5a24e4429ef36d7b3a1dd242ab0f5b3d7f047"
+   },
+   {
+    "run": "F4-B-1",
+    "fixture": "F4",
+    "arm": "B",
+    "resolved": true,
+    "fail_to_pass": [
+     10,
+     10
+    ],
+    "pass_to_pass": [
+     231,
+     231
+    ],
+    "cost_usd_list_equivalent": 9.05,
+    "seconds": 2779,
+    "rc": 0,
+    "diff_lines": 1289,
+    "timed_out": false,
+    "regraded_from_log": false,
+    "void_in_primary": false,
+    "diff_captured": true,
+    "result_sha256": "b53b86c0932b28abab9d47084ea5557c96d5be78230b2efd971b7a562f9b1016",
+    "workflow": {
+     "implementer_started": true,
+     "implementer_returned": true,
+     "implementer_seconds": 2199,
+     "verifier_started": true,
+     "verifier_returned": false,
+     "verifier_seconds": 503,
+     "verifier_refuted": null,
+     "journal_sha256": "ce721723947589c70bd5900d6100fa880e5fde338903cd7bed1229fd15b9596d"
+    }
+   },
+   {
+    "run": "F4-C-1",
+    "fixture": "F4",
+    "arm": "C",
+    "resolved": true,
+    "fail_to_pass": [
+     10,
+     10
+    ],
+    "pass_to_pass": [
+     231,
+     231
+    ],
+    "cost_usd_list_equivalent": 15.9,
+    "seconds": 2772,
+    "rc": 124,
+    "diff_lines": 1134,
+    "timed_out": false,
+    "regraded_from_log": false,
+    "void_in_primary": false,
+    "diff_captured": true,
+    "result_sha256": "4f0f52b9f7929d6a68467078ec2de1747ed46990e68bba1e69ecbb31a9e8a97d",
+    "cost_is_estimate": true,
+    "team_done": false,
+    "capped_at_30_usd": false,
+    "stopped_at_45_minutes": true,
+    "team": {
+     "agent_calls": 2,
+     "send_message_calls": 4,
+     "questions_asked_of_the_absent_user": 0
+    }
+   },
+   {
+    "run": "F5-A-1",
+    "fixture": "F5",
+    "arm": "A",
+    "resolved": true,
+    "fail_to_pass": [
+     17,
+     17
+    ],
+    "pass_to_pass": [
+     236,
+     236
+    ],
+    "cost_usd_list_equivalent": 8.94,
+    "seconds": 2331,
+    "rc": 0,
+    "diff_lines": 1314,
+    "timed_out": false,
+    "regraded_from_log": false,
+    "void_in_primary": false,
+    "diff_captured": true,
+    "result_sha256": "237a57c677a1c45c7d3d6a5c4cf727ee509f97813d337bd2d9465a5744008ef1"
+   },
+   {
+    "run": "F5-B-1",
+    "fixture": "F5",
+    "arm": "B",
+    "resolved": true,
+    "fail_to_pass": [
+     17,
+     17
+    ],
+    "pass_to_pass": [
+     236,
+     236
+    ],
+    "cost_usd_list_equivalent": 10.92,
+    "seconds": 2794,
+    "rc": 0,
+    "diff_lines": 1482,
+    "timed_out": false,
+    "regraded_from_log": false,
+    "void_in_primary": false,
+    "diff_captured": true,
+    "result_sha256": "b2789dbea72f14b59ae849778d2a5adeefe8fbc335dc3ef0642836d102a95233",
+    "workflow": {
+     "implementer_started": true,
+     "implementer_returned": false,
+     "implementer_seconds": 2703,
+     "verifier_started": false,
+     "verifier_returned": false,
+     "verifier_seconds": null,
+     "verifier_refuted": null,
+     "journal_sha256": "f20631a00c7e3df144953675129a08ab1aad964d9fc6b64b18f092195b2ddce1"
+    }
+   },
+   {
+    "run": "F5-C-1",
+    "fixture": "F5",
+    "arm": "C",
+    "resolved": true,
+    "fail_to_pass": [
+     17,
+     17
+    ],
+    "pass_to_pass": [
+     236,
+     236
+    ],
+    "cost_usd_list_equivalent": 25.88,
+    "seconds": 2771,
+    "rc": 124,
+    "diff_lines": 1389,
+    "timed_out": false,
+    "regraded_from_log": false,
+    "void_in_primary": false,
+    "diff_captured": true,
+    "result_sha256": "afda2b2bc3487a4082ffe5c5bdc311520df4906e2d75f7922caf533da184f72d",
+    "cost_is_estimate": true,
+    "team_done": false,
+    "capped_at_30_usd": false,
+    "stopped_at_45_minutes": true,
+    "team": {
+     "agent_calls": 4,
+     "send_message_calls": 3,
+     "questions_asked_of_the_absent_user": 0
+    }
+   },
+   {
+    "run": "F6-A-1",
+    "fixture": "F6",
+    "arm": "A",
+    "resolved": true,
+    "fail_to_pass": [
+     45,
+     45
+    ],
+    "pass_to_pass": [
+     2,
+     2
+    ],
+    "cost_usd_list_equivalent": 4.95,
+    "seconds": 1158,
+    "rc": 0,
+    "diff_lines": 1251,
+    "timed_out": false,
+    "regraded_from_log": false,
+    "void_in_primary": false,
+    "diff_captured": true,
+    "result_sha256": "35bf69d25492c3094aa7621c1888a048bde549ca2b664a51fb9a2bc3749fccfb"
+   },
+   {
+    "run": "F6-B-1",
+    "fixture": "F6",
+    "arm": "B",
+    "resolved": true,
+    "fail_to_pass": [
+     45,
+     45
+    ],
+    "pass_to_pass": [
+     2,
+     2
+    ],
+    "cost_usd_list_equivalent": 9.02,
+    "seconds": 2471,
+    "rc": 0,
+    "diff_lines": 1388,
+    "timed_out": false,
+    "regraded_from_log": false,
+    "void_in_primary": false,
+    "diff_captured": true,
+    "result_sha256": "da123c71092edda489ac08bacd6b133c3bdf61f4df0a1f53b481112ab210c849",
+    "workflow": {
+     "implementer_started": true,
+     "implementer_returned": true,
+     "implementer_seconds": 1151,
+     "verifier_started": true,
+     "verifier_returned": true,
+     "verifier_seconds": 1175,
+     "verifier_refuted": false,
+     "journal_sha256": "bf5eec337386a932fc88a43a5520caf77a238585b3e06614728dab4e2d61850c"
+    }
+   },
+   {
+    "run": "F6-C-1",
+    "fixture": "F6",
+    "arm": "C",
+    "resolved": true,
+    "fail_to_pass": [
+     45,
+     45
+    ],
+    "pass_to_pass": [
+     2,
+     2
+    ],
+    "cost_usd_list_equivalent": 13.59,
+    "seconds": 2328,
+    "rc": 0,
+    "diff_lines": 1318,
+    "timed_out": false,
+    "regraded_from_log": false,
+    "void_in_primary": false,
+    "diff_captured": true,
+    "result_sha256": "eb8ea603c8d2da668bebcc35bdf7dfc98281e3e0bb7785f1fe05d77b101b0a86",
+    "cost_is_estimate": true,
+    "team_done": true,
+    "capped_at_30_usd": false,
+    "stopped_at_45_minutes": false,
+    "team": {
+     "agent_calls": 2,
+     "send_message_calls": 5,
+     "questions_asked_of_the_absent_user": 0
+    }
+   }
+  ],
+  "judging": {
+   "judge_model": "claude-opus-5-5 at max",
+   "pairs": [
+    {
+     "fixture": "F1",
+     "pair": "AB",
+     "x": "B",
+     "y": "A",
+     "first_judge_prefers": "A",
+     "refuter_holds": true,
+     "void": false,
+     "void_reason": null,
+     "counted_preference": "A",
+     "cost_usd_list_equivalent": 6.53,
+     "judge_sha256": "046da4ddfa97f60bfc8361176789647f821f7ac96734c2f4dffc3bc405e5e83b",
+     "refute_sha256": "b6fd3360ec4d9a97bca5a7b6a40d450c12ec43cb91e0ed5ba37168b65d082ee7"
+    },
+    {
+     "fixture": "F1",
+     "pair": "AC",
+     "x": "C",
+     "y": "A",
+     "first_judge_prefers": "A",
+     "refuter_holds": true,
+     "void": false,
+     "void_reason": null,
+     "counted_preference": "A",
+     "cost_usd_list_equivalent": 7.77,
+     "judge_sha256": "ddd69ea654db3ec58ec262643524f22e3cab3ced61581c8fc275b9e93cc2a78b",
+     "refute_sha256": "a2bb58fa811383f0fe1805c54398b23c1e77ffa246c8cd619eb8cba99ed01d25"
+    },
+    {
+     "fixture": "F1",
+     "pair": "BC",
+     "x": "C",
+     "y": "B",
+     "first_judge_prefers": "B",
+     "refuter_holds": true,
+     "void": false,
+     "void_reason": null,
+     "counted_preference": "B",
+     "cost_usd_list_equivalent": 7.2,
+     "judge_sha256": "73744f0817632ae417c8719fd0bfe79b87afb653428a3f17f2a781ee3c7f63c6",
+     "refute_sha256": "d173f7c43e144b2b858166a24510f23cf3294b54ac43eb087718d0c3d96bbd3e"
+    },
+    {
+     "fixture": "F2",
+     "pair": "AB",
+     "x": "B",
+     "y": "A",
+     "first_judge_prefers": "A",
+     "refuter_holds": true,
+     "void": false,
+     "void_reason": null,
+     "counted_preference": "A",
+     "cost_usd_list_equivalent": 6.01,
+     "judge_sha256": "53a4d907350bd655f8aec72aab1caff812f2a445d60e13d62e1b493dbc7e893d",
+     "refute_sha256": "e2c5acd115636ac8d4e71bdfe593ceb04996e4e72ea50e12f1708fe4304c54c5"
+    },
+    {
+     "fixture": "F2",
+     "pair": "AC",
+     "x": "A",
+     "y": "C",
+     "first_judge_prefers": "C",
+     "refuter_holds": true,
+     "void": false,
+     "void_reason": null,
+     "counted_preference": "C",
+     "cost_usd_list_equivalent": 9.27,
+     "judge_sha256": "59cda480d32af71fe184f3814be1aabfc68020f5d60add161732f2ce05dbdd0f",
+     "refute_sha256": "6bab4ba4f55fa486f4038ed3778edbdac06c88947452077171b33ebd93726e9f"
+    },
+    {
+     "fixture": "F2",
+     "pair": "BC",
+     "x": "B",
+     "y": "C",
+     "first_judge_prefers": "C",
+     "refuter_holds": true,
+     "void": false,
+     "void_reason": null,
+     "counted_preference": "C",
+     "cost_usd_list_equivalent": 7.8,
+     "judge_sha256": "2704be69148abb0c35dea3ad471627ab8956cbeae6aa9f8613459889aa63843d",
+     "refute_sha256": "a1a4020b569ce19fbd58d920c922e47596b9b57dcc174fe0cdeea63f3f1495dd"
+    },
+    {
+     "fixture": "F3",
+     "pair": "AB",
+     "x": "B",
+     "y": "A",
+     "first_judge_prefers": "A",
+     "refuter_holds": true,
+     "void": false,
+     "void_reason": null,
+     "counted_preference": "A",
+     "cost_usd_list_equivalent": 10.71,
+     "judge_sha256": "21a01b77dc43d9858ac6b11627351815d691fa9857e8261571766bb464c5d02c",
+     "refute_sha256": "2b0a45e218d9889e3ae1d6a3477ebb5020f3b817fdffafd4b962bbcf5d51b13d"
+    },
+    {
+     "fixture": "F3",
+     "pair": "AC",
+     "x": "A",
+     "y": "C",
+     "first_judge_prefers": "A",
+     "refuter_holds": true,
+     "void": true,
+     "void_reason": "arm C's F3 diff was not captured",
+     "counted_preference": null,
+     "cost_usd_list_equivalent": 5.47,
+     "judge_sha256": "4763570e072cdf81c1bdaef68d4012e6d9794ea0d00146e1273f4c7cffcba328",
+     "refute_sha256": "6cce536845fe80693efba5964908c66c66181b233a8eebfc8ded670e9dcc6cab"
+    },
+    {
+     "fixture": "F3",
+     "pair": "BC",
+     "x": "B",
+     "y": "C",
+     "first_judge_prefers": "B",
+     "refuter_holds": true,
+     "void": true,
+     "void_reason": "arm C's F3 diff was not captured",
+     "counted_preference": null,
+     "cost_usd_list_equivalent": 6.2,
+     "judge_sha256": "cd96e52b857ac1263ce9242be3cfd970e4c5095e18102cf7e4c9e3ea00f51d64",
+     "refute_sha256": "809e17342b6ea41563ac2961e8bc69c60df27a9de662d17cd2a082ad1e2632b1"
+    },
+    {
+     "fixture": "F4",
+     "pair": "AB",
+     "x": "A",
+     "y": "B",
+     "first_judge_prefers": "A",
+     "refuter_holds": true,
+     "void": false,
+     "void_reason": null,
+     "counted_preference": "A",
+     "cost_usd_list_equivalent": 9.72,
+     "judge_sha256": "7d7f5fb4079a05832c0dbaef33c8c5f5b22a7bcd690f0d54b1c8b34d96d477c9",
+     "refute_sha256": "d1333aa0ce4e8a3be57c322c6e0015c4b7ce3e87465b874b59a1fcc1411e70de"
+    },
+    {
+     "fixture": "F4",
+     "pair": "AC",
+     "x": "C",
+     "y": "A",
+     "first_judge_prefers": "tie",
+     "refuter_holds": true,
+     "void": false,
+     "void_reason": null,
+     "counted_preference": "tie",
+     "cost_usd_list_equivalent": 10.41,
+     "judge_sha256": "73ce8f4ad934aa965a50aae1d6ac339cb06a9397801f5a7258a70fcb48b119a1",
+     "refute_sha256": "29607a5e9fbb53eafd36f76e65243926b3923e57a056cd40293158ec43666f58"
+    },
+    {
+     "fixture": "F4",
+     "pair": "BC",
+     "x": "C",
+     "y": "B",
+     "first_judge_prefers": "C",
+     "refuter_holds": true,
+     "void": false,
+     "void_reason": null,
+     "counted_preference": "C",
+     "cost_usd_list_equivalent": 9.44,
+     "judge_sha256": "4d4a427a680179b0995f1ad153dd5d98d9326f04fa079f7c0d3cffe8524f563b",
+     "refute_sha256": "b60ff90482983618fc1360c8581e796f25bd8446c4e96e5e080e8a25a13243a8"
+    },
+    {
+     "fixture": "F5",
+     "pair": "AB",
+     "x": "A",
+     "y": "B",
+     "first_judge_prefers": "B",
+     "refuter_holds": true,
+     "void": false,
+     "void_reason": null,
+     "counted_preference": "B",
+     "cost_usd_list_equivalent": 10.99,
+     "judge_sha256": "8af4b1d9b767afb30bad5bc0b43ce896ff3d41dd4c82f26da2ec06994c358116",
+     "refute_sha256": "1059726b87856db131de04c54aa159cc000422cf7fec8506974fad9eddfa6e44"
+    },
+    {
+     "fixture": "F5",
+     "pair": "AC",
+     "x": "C",
+     "y": "A",
+     "first_judge_prefers": "A",
+     "refuter_holds": true,
+     "void": false,
+     "void_reason": null,
+     "counted_preference": "A",
+     "cost_usd_list_equivalent": 10.39,
+     "judge_sha256": "2d4879f1af6b9bf39e8c190cf395a4dad587ab9bfdb11dbce57ebb4ec7e3d961",
+     "refute_sha256": "291011404de0b6eb4c45eb749d1d84e8aa68dbac74098043ba8b6dfb29a869f9"
+    },
+    {
+     "fixture": "F5",
+     "pair": "BC",
+     "x": "B",
+     "y": "C",
+     "first_judge_prefers": "B",
+     "refuter_holds": true,
+     "void": false,
+     "void_reason": null,
+     "counted_preference": "B",
+     "cost_usd_list_equivalent": 11.54,
+     "judge_sha256": "ce2b7b903922e8379f4628ff1f381abf0576d7c27ee9c99b06f40dc0ecdc02ba",
+     "refute_sha256": "1395f02616fab0725b0938d2dbfd64749423064a93edabff51b59fe50afa018b"
+    },
+    {
+     "fixture": "F6",
+     "pair": "AB",
+     "x": "B",
+     "y": "A",
+     "first_judge_prefers": "A",
+     "refuter_holds": true,
+     "void": false,
+     "void_reason": null,
+     "counted_preference": "A",
+     "cost_usd_list_equivalent": 8.79,
+     "judge_sha256": "a2d96105871b95ff4d15f58bb946eb59da7310dfcaf105c4b40e5713deb29e26",
+     "refute_sha256": "1b95ef8f7ea2ec0d67663b11f08b41b87ebd0ec83affa66a07dc4ed493f6d913"
+    },
+    {
+     "fixture": "F6",
+     "pair": "AC",
+     "x": "C",
+     "y": "A",
+     "first_judge_prefers": "A",
+     "refuter_holds": true,
+     "void": false,
+     "void_reason": null,
+     "counted_preference": "A",
+     "cost_usd_list_equivalent": 10.58,
+     "judge_sha256": "13c0efd7814cf509b9269a1f2a3a130884618104609ccc14c196a7cb36268d10",
+     "refute_sha256": "548d86d57382e23798a0bc4f6f7833e54630544c2d392661ce53293a80535656"
+    },
+    {
+     "fixture": "F6",
+     "pair": "BC",
+     "x": "C",
+     "y": "B",
+     "first_judge_prefers": "C",
+     "refuter_holds": true,
+     "void": false,
+     "void_reason": null,
+     "counted_preference": "C",
+     "cost_usd_list_equivalent": 9.73,
+     "judge_sha256": "d3bad180cf9938cf9a9c8c7fe4ab5f66206b264351fdb19079857995fc08a884",
+     "refute_sha256": "640de8394a374042aca25d80c0cf50b6dffaada648bf0b3774ad3d5d9fffcc0f"
+    }
+   ],
+   "cost_usd_list_equivalent": 158.55
+  },
+  "analysis": {
+   "primary_f3_to_f6": {
+    "fixtures": [
+     "F3",
+     "F4",
+     "F5",
+     "F6"
+    ],
+    "resolved": {
+     "A": 4,
+     "B": 4,
+     "C": 4
+    },
+    "runs_present": {
+     "A": 4,
+     "B": 4,
+     "C": 4
+    },
+    "mean_cost_usd_list_equivalent_not_billed": {
+     "A": 6.78,
+     "B": 10.16,
+     "C": 17.3
+    },
+    "pairwise": {
+     "F3": {
+      "AB": "A",
+      "AC": null,
+      "BC": null
+     },
+     "F4": {
+      "AB": "A",
+      "AC": "tie",
+      "BC": "C"
+     },
+     "F5": {
+      "AB": "B",
+      "AC": "A",
+      "BC": "B"
+     },
+     "F6": {
+      "AB": "A",
+      "AC": "A",
+      "BC": "C"
+     }
+    },
+    "B_vs_A": {
+     "extra_resolved": 0,
+     "judge_wins": 1,
+     "cost_within_2x": true,
+     "clears_rule": false
+    },
+    "C_vs_A": {
+     "extra_resolved": 0,
+     "judge_wins": 0,
+     "cost_within_2x": false,
+     "clears_rule": false
+    }
+   },
+   "sensitivity_all_six_regraded": {
+    "fixtures": [
+     "F1",
+     "F2",
+     "F3",
+     "F4",
+     "F5",
+     "F6"
+    ],
+    "resolved": {
+     "A": 6,
+     "B": 6,
+     "C": 6
+    },
+    "runs_present": {
+     "A": 6,
+     "B": 6,
+     "C": 6
+    },
+    "mean_cost_usd_list_equivalent_not_billed": {
+     "A": 5.87,
+     "B": 9.32,
+     "C": 17.72
+    },
+    "pairwise": {
+     "F1": {
+      "AB": "A",
+      "AC": "A",
+      "BC": "B"
+     },
+     "F2": {
+      "AB": "A",
+      "AC": "C",
+      "BC": "C"
+     },
+     "F3": {
+      "AB": "A",
+      "AC": null,
+      "BC": null
+     },
+     "F4": {
+      "AB": "A",
+      "AC": "tie",
+      "BC": "C"
+     },
+     "F5": {
+      "AB": "B",
+      "AC": "A",
+      "BC": "B"
+     },
+     "F6": {
+      "AB": "A",
+      "AC": "A",
+      "BC": "C"
+     }
+    },
+    "B_vs_A": {
+     "extra_resolved": 0,
+     "judge_wins": 1,
+     "cost_within_2x": true,
+     "clears_rule": false
+    },
+    "C_vs_A": {
+     "extra_resolved": 0,
+     "judge_wins": 1,
+     "cost_within_2x": false,
+     "clears_rule": false
+    }
+   }
+  },
+  "papers": {
+   "preregistration": {
+    "path": "paired-orchestration/preregistration.md",
+    "bytes": 20458,
+    "sha256": "531758c438c27f13f8298126fa2c58134dfb523feeb372122cc51d9d326b7da1"
+   },
+   "result": {
+    "path": "paired-orchestration/RESULT.md",
+    "bytes": 11484,
+    "sha256": "e87b9cabd8c2b856c7ab0a3c3ed8c2cb9007c55bdc3f5c31d07990dd0b2cd499"
+   },
+   "score": {
+    "path": "paired-orchestration/judging/score.json",
+    "bytes": 7125,
+    "sha256": "72dc84ef76b0cdf9bcf4b02ef4e9703a80b41aa3f3311b06cc31001f9c93e8fb"
+   },
+   "detector_addendum": {
+    "path": "paired-orchestration/addendum-harness-detector-20261010.md",
+    "bytes": 2556,
+    "sha256": "f96a27d25a94ed5520f5f13df94ec4589e598e7144506b1ba328165c60f2bd64"
+   },
+   "f3c_diff_addendum": {
+    "path": "paired-orchestration/addendum-f3c-diff-capture-20261011.md",
+    "bytes": 4288,
+    "sha256": "19fb4feaef3a49ee90c7f11986b6ad509d27720f15d8e64b63dea192609dbb95"
+   },
+   "batch_log": {
+    "path": "paired-orchestration/batch.log",
+    "bytes": 14000,
+    "sha256": "ed7fd04db887e289fddcb62655a2758e2814f76b14d7aa1535028cb0a7740f27"
+   },
+   "runner": {
+    "path": "paired-orchestration/orch_run.py",
+    "bytes": 16229,
+    "sha256": "ad8ffbef0f48c105f083c27b98bf247ad0737938c20bced4cd914f9f9d53a890",
+    "line": 137,
+    "contains": "\"2700000\""
+   },
+   "client_env_vars_page": {
+    "path": "L1-official/captures/root/env-vars.md",
+    "bytes": 167852,
+    "sha256": "f9400917e85a9c4bb585c342ed065921dc0b1a45294fa314059d2554cf67ebbb",
+    "line": 357,
+    "contains": "CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS"
+   },
+   "client_headless_page": {
+    "path": "pr986/captures/claude-code-docs/headless.md",
+    "bytes": 34180,
+    "sha256": "25885d2e178a9746066fc2e19a07a3debc31744c721282a744be80789591e738",
+    "line": 77,
+    "contains": "CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS"
+   }
+  }
+ },
+ "routing_5": {
+  "question": "Can review micros (one pull-request head, the repository's own brief) move from Opus 5.5 to Sonnet 5.5 at medium effort without losing the known findings, at no more than 60% of Opus's cost?",
+  "design": {
+   "heads": [
+    {
+     "pr": 970,
+     "head": "90fab198098ef103b95c409c287f03ce5bd22f52"
+    },
+    {
+     "pr": 974,
+     "head": "0493513e2cadbf8980bf78f67ccce8d695d256c1"
+    },
+    {
+     "pr": 978,
+     "head": "c7a4603b0537345b7c3f96a1fdcbc7fe2ee176d1"
+    },
+    {
+     "pr": 982,
+     "head": "ad2e1b1ac4fc9c71a9a8a18a052813fa5f72b14c"
+    },
+    {
+     "pr": 989,
+     "head": "8fd958370b5d2eb8be2c3f3191921c3fe0ab5772"
+    }
+   ],
+   "arms": {
+    "O": "claude-opus-5-5 at medium effort",
+    "S": "claude-sonnet-5-5 at medium effort"
+   },
+   "trials": 2,
+   "runs": 20,
+   "client": "claude code 2.1.296 (pinned binary), claude -p",
+   "fence": "--tools Bash,Read,Glob,Grep with dontAsk and no allow rule; the home tree and each other run's directory denied by name; the network closed; the brief alone, no gate records or CI state",
+   "ground_truth": "22 findings known from earlier Opus and GPT reads, 12 of them decisive (reachable from the pull request, its commits, its description and an offline sandbox)",
+   "judging": "a blind first judge and a refuter, both claude-opus-5-5 at max effort on stripped packets (order fixed by a hash of head and trial, the refuter given the pair swapped)",
+   "rule": "Sonnet takes review micros only if, for every decisive finding, it found the finding in at least as many of its runs as Opus did, and the cost of its runs (the counter, main and subagent sources) is at most 60% of Opus's; otherwise Opus stays",
+   "second_trial": "run as an extension the command center decided after trial 1; the rule is applied to detection frequencies over the two trials"
+  },
+  "runs": [
+   {
+    "run": "989-O-1",
+    "pr": 989,
+    "arm": "O",
+    "trial": 1,
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "head": "8fd958370b5d2eb8be2c3f3191921c3fe0ab5772",
+    "end_state": "structured",
+    "verdict": "CHANGES_REQUESTED",
+    "findings": {
+     "P1": 0,
+     "P2": 2,
+     "P3": 1
+    },
+    "seconds": 978,
+    "tests_run": 6,
+    "shell_commands": 21,
+    "cost_usd_m2": 0.7573,
+    "cost_usd_m1": 0.7573,
+    "result_sha256": "78c19f470dc1a8104761951984504db102a8c2aa83b0632f72e8eaf347e2b714"
+   },
+   {
+    "run": "989-S-1",
+    "pr": 989,
+    "arm": "S",
+    "trial": 1,
+    "model": "claude-sonnet-5-5",
+    "effort": "medium",
+    "head": "8fd958370b5d2eb8be2c3f3191921c3fe0ab5772",
+    "end_state": "structured",
+    "verdict": "CHANGES_REQUESTED",
+    "findings": {
+     "P1": 0,
+     "P2": 2,
+     "P3": 2
+    },
+    "seconds": 714,
+    "tests_run": 5,
+    "shell_commands": 11,
+    "cost_usd_m2": 0.1958,
+    "cost_usd_m1": 0.1958,
+    "result_sha256": "adf3648ab7865e0132103953a024189d93a60cf418f12a104c1d432ff53ffe13"
+   },
+   {
+    "run": "989-O-2",
+    "pr": 989,
+    "arm": "O",
+    "trial": 2,
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "head": "8fd958370b5d2eb8be2c3f3191921c3fe0ab5772",
+    "end_state": "structured",
+    "verdict": "CHANGES_REQUESTED",
+    "findings": {
+     "P1": 0,
+     "P2": 2,
+     "P3": 1
+    },
+    "seconds": 756,
+    "tests_run": 6,
+    "shell_commands": 14,
+    "cost_usd_m2": 0.7179,
+    "cost_usd_m1": 0.7179,
+    "result_sha256": "e5732dd6bf961a42118236c4a0f7db576246826ade0f6a54e167be1fc07589c8"
+   },
+   {
+    "run": "989-S-2",
+    "pr": 989,
+    "arm": "S",
+    "trial": 2,
+    "model": "claude-sonnet-5-5",
+    "effort": "medium",
+    "head": "8fd958370b5d2eb8be2c3f3191921c3fe0ab5772",
+    "end_state": "structured",
+    "verdict": "CHANGES_REQUESTED",
+    "findings": {
+     "P1": 0,
+     "P2": 1,
+     "P3": 0
+    },
+    "seconds": 211,
+    "tests_run": 2,
+    "shell_commands": 8,
+    "cost_usd_m2": 0.1344,
+    "cost_usd_m1": 0.1344,
+    "result_sha256": "29af77695c7136ba0bb5ff8ddd3b65ff9659ebab1a7473ee239a4ebe51a45b2a"
+   },
+   {
+    "run": "974-O-1",
+    "pr": 974,
+    "arm": "O",
+    "trial": 1,
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "head": "0493513e2cadbf8980bf78f67ccce8d695d256c1",
+    "end_state": "structured",
+    "verdict": "CHANGES_REQUESTED",
+    "findings": {
+     "P1": 0,
+     "P2": 1,
+     "P3": 1
+    },
+    "seconds": 435,
+    "tests_run": 4,
+    "shell_commands": 36,
+    "cost_usd_m2": 1.8366,
+    "cost_usd_m1": 1.8366,
+    "result_sha256": "33ce2187e5b9c611874ed24887c64f82aeaedd8272878efc5382c0a6b5086884"
+   },
+   {
+    "run": "974-S-1",
+    "pr": 974,
+    "arm": "S",
+    "trial": 1,
+    "model": "claude-sonnet-5-5",
+    "effort": "medium",
+    "head": "0493513e2cadbf8980bf78f67ccce8d695d256c1",
+    "end_state": "structured",
+    "verdict": "CHANGES_REQUESTED",
+    "findings": {
+     "P1": 0,
+     "P2": 1,
+     "P3": 0
+    },
+    "seconds": 292,
+    "tests_run": 2,
+    "shell_commands": 14,
+    "cost_usd_m2": 0.3542,
+    "cost_usd_m1": 0.3542,
+    "result_sha256": "270ebc14d232656a76a02df838d11f056300f8f1488d24385c567f12216143e5"
+   },
+   {
+    "run": "974-O-2",
+    "pr": 974,
+    "arm": "O",
+    "trial": 2,
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "head": "0493513e2cadbf8980bf78f67ccce8d695d256c1",
+    "end_state": "structured",
+    "verdict": "CHANGES_REQUESTED",
+    "findings": {
+     "P1": 0,
+     "P2": 1,
+     "P3": 0
+    },
+    "seconds": 545,
+    "tests_run": 5,
+    "shell_commands": 46,
+    "cost_usd_m2": 2.0921,
+    "cost_usd_m1": 2.0921,
+    "result_sha256": "62fcab9bd7104e8ad248e0d5e9439a76619ff5fe4cb8413d59cedc245ed184cd"
+   },
+   {
+    "run": "974-S-2",
+    "pr": 974,
+    "arm": "S",
+    "trial": 2,
+    "model": "claude-sonnet-5-5",
+    "effort": "medium",
+    "head": "0493513e2cadbf8980bf78f67ccce8d695d256c1",
+    "end_state": "structured",
+    "verdict": "CHANGES_REQUESTED",
+    "findings": {
+     "P1": 0,
+     "P2": 1,
+     "P3": 1
+    },
+    "seconds": 401,
+    "tests_run": 3,
+    "shell_commands": 13,
+    "cost_usd_m2": 0.3018,
+    "cost_usd_m1": 0.3018,
+    "result_sha256": "d3e64285e9262699996a2018d853bd2087905c3c5a57e69f7d4485a353a5619b"
+   },
+   {
+    "run": "982-O-1",
+    "pr": 982,
+    "arm": "O",
+    "trial": 1,
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "head": "ad2e1b1ac4fc9c71a9a8a18a052813fa5f72b14c",
+    "end_state": "structured",
+    "verdict": "CHANGES_REQUESTED",
+    "findings": {
+     "P1": 0,
+     "P2": 1,
+     "P3": 3
+    },
+    "seconds": 1000,
+    "tests_run": 7,
+    "shell_commands": 43,
+    "cost_usd_m2": 1.7557,
+    "cost_usd_m1": 1.7557,
+    "result_sha256": "cbc86dc047b06f986975dac9c8616cb3e17d1991824acbd15431d621e483ada4"
+   },
+   {
+    "run": "982-S-1",
+    "pr": 982,
+    "arm": "S",
+    "trial": 1,
+    "model": "claude-sonnet-5-5",
+    "effort": "medium",
+    "head": "ad2e1b1ac4fc9c71a9a8a18a052813fa5f72b14c",
+    "end_state": "structured",
+    "verdict": "ACK",
+    "findings": {
+     "P1": 0,
+     "P2": 0,
+     "P3": 1
+    },
+    "seconds": 442,
+    "tests_run": 3,
+    "shell_commands": 14,
+    "cost_usd_m2": 0.2498,
+    "cost_usd_m1": 0.2498,
+    "result_sha256": "57e72f8a50ec814a0c4f3ca1a963e0ac8cdf6c0aa29841cd31dfc88aa6966174"
+   },
+   {
+    "run": "982-O-2",
+    "pr": 982,
+    "arm": "O",
+    "trial": 2,
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "head": "ad2e1b1ac4fc9c71a9a8a18a052813fa5f72b14c",
+    "end_state": "structured",
+    "verdict": "CHANGES_REQUESTED",
+    "findings": {
+     "P1": 0,
+     "P2": 3,
+     "P3": 3
+    },
+    "seconds": 659,
+    "tests_run": 6,
+    "shell_commands": 41,
+    "cost_usd_m2": 1.7615,
+    "cost_usd_m1": 1.7615,
+    "result_sha256": "3e8d1619ad0f1cb4549b12a1f5bd222cd43f64ad6950c1459aa21eeb0ea24c06"
+   },
+   {
+    "run": "982-S-2",
+    "pr": 982,
+    "arm": "S",
+    "trial": 2,
+    "model": "claude-sonnet-5-5",
+    "effort": "medium",
+    "head": "ad2e1b1ac4fc9c71a9a8a18a052813fa5f72b14c",
+    "end_state": "structured",
+    "verdict": "ACK",
+    "findings": {
+     "P1": 0,
+     "P2": 0,
+     "P3": 0
+    },
+    "seconds": 297,
+    "tests_run": 2,
+    "shell_commands": 12,
+    "cost_usd_m2": 0.2718,
+    "cost_usd_m1": 0.2718,
+    "result_sha256": "eec4a60c42f7eef46929ade370a7405833a48b01829b7962e929be91348d3386"
+   },
+   {
+    "run": "970-O-1",
+    "pr": 970,
+    "arm": "O",
+    "trial": 1,
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "head": "90fab198098ef103b95c409c287f03ce5bd22f52",
+    "end_state": "structured",
+    "verdict": "CHANGES_REQUESTED",
+    "findings": {
+     "P1": 0,
+     "P2": 2,
+     "P3": 2
+    },
+    "seconds": 558,
+    "tests_run": 7,
+    "shell_commands": 42,
+    "cost_usd_m2": 1.6771,
+    "cost_usd_m1": 1.6771,
+    "result_sha256": "e09bc9e76e54170cf23af3c8fa3fa65f8a8f121e94b9a88da97e0c89de8038c8"
+   },
+   {
+    "run": "970-S-1",
+    "pr": 970,
+    "arm": "S",
+    "trial": 1,
+    "model": "claude-sonnet-5-5",
+    "effort": "medium",
+    "head": "90fab198098ef103b95c409c287f03ce5bd22f52",
+    "end_state": "structured",
+    "verdict": "CHANGES_REQUESTED",
+    "findings": {
+     "P1": 0,
+     "P2": 1,
+     "P3": 1
+    },
+    "seconds": 433,
+    "tests_run": 5,
+    "shell_commands": 12,
+    "cost_usd_m2": 0.1995,
+    "cost_usd_m1": 0.1995,
+    "result_sha256": "ff2806679c1079363b298f4f1a5d70b9821a23c676f46e371ff49e32b2a7fe56"
+   },
+   {
+    "run": "970-O-2",
+    "pr": 970,
+    "arm": "O",
+    "trial": 2,
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "head": "90fab198098ef103b95c409c287f03ce5bd22f52",
+    "end_state": "structured",
+    "verdict": "CHANGES_REQUESTED",
+    "findings": {
+     "P1": 1,
+     "P2": 2,
+     "P3": 3
+    },
+    "seconds": 414,
+    "tests_run": 5,
+    "shell_commands": 34,
+    "cost_usd_m2": 1.4661,
+    "cost_usd_m1": 1.4661,
+    "result_sha256": "33b601786c2f5562b4ba2a198e71f54f9b29bc4acd591b164e776c4bbad4052c"
+   },
+   {
+    "run": "970-S-2",
+    "pr": 970,
+    "arm": "S",
+    "trial": 2,
+    "model": "claude-sonnet-5-5",
+    "effort": "medium",
+    "head": "90fab198098ef103b95c409c287f03ce5bd22f52",
+    "end_state": "structured",
+    "verdict": "CHANGES_REQUESTED",
+    "findings": {
+     "P1": 0,
+     "P2": 1,
+     "P3": 0
+    },
+    "seconds": 300,
+    "tests_run": 5,
+    "shell_commands": 20,
+    "cost_usd_m2": 0.3131,
+    "cost_usd_m1": 0.3131,
+    "result_sha256": "ae33ff0009d1898c28a8af74fc9a5d2990948db04465e653ed65885101b48076"
+   },
+   {
+    "run": "978-O-1",
+    "pr": 978,
+    "arm": "O",
+    "trial": 1,
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "head": "c7a4603b0537345b7c3f96a1fdcbc7fe2ee176d1",
+    "end_state": "structured",
+    "verdict": "ACK",
+    "findings": {
+     "P1": 0,
+     "P2": 0,
+     "P3": 3
+    },
+    "seconds": 572,
+    "tests_run": 5,
+    "shell_commands": 38,
+    "cost_usd_m2": 1.5686,
+    "cost_usd_m1": 1.5686,
+    "result_sha256": "95ee530bf7634216ef44119f9540ea92b133a8afdfb5746ce8cf3890b55ad3db"
+   },
+   {
+    "run": "978-S-1",
+    "pr": 978,
+    "arm": "S",
+    "trial": 1,
+    "model": "claude-sonnet-5-5",
+    "effort": "medium",
+    "head": "c7a4603b0537345b7c3f96a1fdcbc7fe2ee176d1",
+    "end_state": "structured",
+    "verdict": "ACK",
+    "findings": {
+     "P1": 0,
+     "P2": 0,
+     "P3": 0
+    },
+    "seconds": 284,
+    "tests_run": 5,
+    "shell_commands": 13,
+    "cost_usd_m2": 0.2819,
+    "cost_usd_m1": 0.2819,
+    "result_sha256": "dc148805dc2986d0229e7f116293c10f4c847d5d31349eb0c67a0006d6372481"
+   },
+   {
+    "run": "978-O-2",
+    "pr": 978,
+    "arm": "O",
+    "trial": 2,
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "head": "c7a4603b0537345b7c3f96a1fdcbc7fe2ee176d1",
+    "end_state": "structured",
+    "verdict": "CHANGES_REQUESTED",
+    "findings": {
+     "P1": 0,
+     "P2": 2,
+     "P3": 2
+    },
+    "seconds": 1504,
+    "tests_run": 7,
+    "shell_commands": 55,
+    "cost_usd_m2": 2.4723,
+    "cost_usd_m1": 2.4723,
+    "result_sha256": "bd80b7ff5e56bb34a40d8d40791b8cf4fc9dc4d7d1aeb3f9f592eb382a9741be"
+   },
+   {
+    "run": "978-S-2",
+    "pr": 978,
+    "arm": "S",
+    "trial": 2,
+    "model": "claude-sonnet-5-5",
+    "effort": "medium",
+    "head": "c7a4603b0537345b7c3f96a1fdcbc7fe2ee176d1",
+    "end_state": "structured",
+    "verdict": "CHANGES_REQUESTED",
+    "findings": {
+     "P1": 0,
+     "P2": 2,
+     "P3": 2
+    },
+    "seconds": 516,
+    "tests_run": 4,
+    "shell_commands": 16,
+    "cost_usd_m2": 0.4136,
+    "cost_usd_m1": 0.4136,
+    "result_sha256": "955b048abeb0662c812e7607db8dd140bcd7526eecdb591d2e21e2cad2506089"
+   }
+  ],
+  "findings": [
+   {
+    "id": "G1",
+    "pr": 974,
+    "severity": "P2",
+    "family": "claude",
+    "title": "README-overnight claims no command starts a trial the transport would then refuse; a boats feed is accepted at config load and refused only after the trial starts, leaving a stuck state",
+    "found": {
+     "O": [
+      "974-O-1",
+      "974-O-2"
+     ],
+     "S": [
+      "974-S-1",
+      "974-S-2"
+     ]
+    }
+   },
+   {
+    "id": "G2",
+    "pr": 978,
+    "severity": "P2",
+    "family": "claude",
+    "title": "The weekly systemd unit's PATH does not contain gh, and the fetch does not catch FileNotFoundError, so every weekly run exits 1",
+    "found": {
+     "O": [],
+     "S": []
+    }
+   },
+   {
+    "id": "G3",
+    "pr": 970,
+    "severity": "P1",
+    "family": "claude+gpt",
+    "title": "Live catalog references to lines of adoption/skills/manifest.json are displaced by the new claude-api record (test_architecture_pin_source and test_upstream_surface_watch fail)",
+    "found": {
+     "O": [],
+     "S": []
+    }
+   },
+   {
+    "id": "G4",
+    "pr": 970,
+    "severity": "P1",
+    "family": "claude+gpt",
+    "title": "claude-api has no runtime-worker disposition: three tests of test_runtime_worker_skills fail with 'claude-api: neither reused nor excluded'",
+    "found": {
+     "O": [],
+     "S": []
+    }
+   },
+   {
+    "id": "G5",
+    "pr": 970,
+    "severity": "P1",
+    "family": "claude+gpt",
+    "title": "skills-lifecycle.json omits claude-api: test_landscape_sweep_skills fails on the one-task-per-pinned-skill check",
+    "found": {
+     "O": [],
+     "S": []
+    }
+   },
+   {
+    "id": "G6",
+    "pr": 970,
+    "severity": "P1",
+    "family": "claude+gpt",
+    "title": "The new routing skill has no grant in the reviewed architecture inventory: test_local_pages_policy_grants fails",
+    "found": {
+     "O": [],
+     "S": []
+    }
+   },
+   {
+    "id": "G7",
+    "pr": 970,
+    "severity": "P1",
+    "family": "claude+gpt",
+    "title": "The gate-read accounting receipt is stale after the new skills_status import: test_runtime_worker_openhands_push_gate fails",
+    "found": {
+     "O": [],
+     "S": []
+    }
+   },
+   {
+    "id": "G8",
+    "pr": 970,
+    "severity": "P2",
+    "family": "claude",
+    "title": "The on-listed description ceiling is raised from 11000 to 12000 in manifest.json without a dated record, and the description's claim of an existing 12000 is false",
+    "found": {
+     "O": [
+      "970-O-1",
+      "970-O-2"
+     ],
+     "S": [
+      "970-S-1",
+      "970-S-2"
+     ]
+    }
+   },
+   {
+    "id": "G9",
+    "pr": 970,
+    "severity": "P2",
+    "family": "claude",
+    "title": "The 'bundled claude-api skill' duplicate reason is dropped from manifest.json:883 without evidence",
+    "found": {
+     "O": [],
+     "S": []
+    }
+   },
+   {
+    "id": "G10",
+    "pr": 989,
+    "severity": "P2",
+    "family": "claude",
+    "title": "runner.py copies the mover runner's proof selection but not its provenance marker (summary promotion_gate validated or not_supplied), so an unqualified exploratory receipt reads like a qualified one",
+    "found": {
+     "O": [
+      "989-O-2"
+     ],
+     "S": []
+    }
+   },
+   {
+    "id": "G11",
+    "pr": 989,
+    "severity": "P2",
+    "family": "claude",
+    "title": "A verbatim owner quote added by the PR's first commit stays reachable in the PR's commits after the head paraphrases it",
+    "found": {
+     "O": [
+      "989-O-1",
+      "989-O-2"
+     ],
+     "S": [
+      "989-S-1",
+      "989-S-2"
+     ]
+    }
+   },
+   {
+    "id": "G12",
+    "pr": 982,
+    "severity": "P2",
+    "family": "gpt",
+    "title": "The closeout loader does not refuse an installed jsonschema version other than the pinned 4.26.0",
+    "found": {
+     "O": [],
+     "S": []
+    }
+   }
+  ],
+  "judging": {
+   "judge_model": "claude-opus-5-5 at max",
+   "records": [
+    {
+     "pr": 989,
+     "trial": 1,
+     "judge_sha256": "e5b2e07e566a4c166c779a3e50f1f86b5b9db5c66bcf528b80dd0a755e87b87b",
+     "refute_sha256": "0463d15534bd19f3ef3633babdc47552969b537536d00137678967e955e83c8f",
+     "cost_usd": 0.8569
+    },
+    {
+     "pr": 989,
+     "trial": 2,
+     "judge_sha256": "4ec32d3ac72b35c9abd0b9460207e0e27f0e433d4e9635060d4edfdd77b474e2",
+     "refute_sha256": "e51616cba662ed5f885529d80a3978fce4ae1e193f9a6a46365ef4cb23994aa0",
+     "cost_usd": 0.7446
+    },
+    {
+     "pr": 974,
+     "trial": 1,
+     "judge_sha256": "5799a73437e078099fb07f2b62a008910dbe9054f585c8e96b0274c508219466",
+     "refute_sha256": "0cd47a77b2879381c2a8c6cb5d84cfd8f3318dbadacc9a6d4cad99eec89ed101",
+     "cost_usd": 1.1824
+    },
+    {
+     "pr": 974,
+     "trial": 2,
+     "judge_sha256": "1bddd218641362895bae17c87ddeeacb607778f96e64cad05c0b038a42292c6e",
+     "refute_sha256": "724be86b3624ea7d315309f1f7367c230429b062d0d3a5bbf52e91aa42e04f98",
+     "cost_usd": 1.116
+    },
+    {
+     "pr": 982,
+     "trial": 1,
+     "judge_sha256": "d251070215773a569453441f6f993be8a85a3affbe1d1c229772079620ce169b",
+     "refute_sha256": "e8e90ec3d6efae88179b1dbdebb790951ab5ec603034bd5f17944885c0c51ee6",
+     "cost_usd": 1.7453
+    },
+    {
+     "pr": 982,
+     "trial": 2,
+     "judge_sha256": "f45f23d239662f18b5bf5f0f6a808cff8057db56581ded3b940fb7f7b9cfb918",
+     "refute_sha256": "980b62e984b4578962336555789e98a6d6ed5730c7baddee82e19620ccbddfc1",
+     "cost_usd": 3.5716
+    },
+    {
+     "pr": 970,
+     "trial": 1,
+     "judge_sha256": "4947d387b6e9fad9eec530f8b13e346aa371ac5a1a252255371a5986f07be7c5",
+     "refute_sha256": "3f9e84bfc33c82b9315e78d54649c512aabe90800854d2284afbd16211822632",
+     "cost_usd": 1.3821
+    },
+    {
+     "pr": 970,
+     "trial": 2,
+     "judge_sha256": "41f3885e6fcc08f13be51642b094df59fb8a8d3ef98aa67a8998bd6702695f1e",
+     "refute_sha256": "45c3f7b3465cadc2f7fcbcb78596646a2feaf974213ca7b3ffbb3b871422bc9e",
+     "cost_usd": 2.0333
+    },
+    {
+     "pr": 978,
+     "trial": 1,
+     "judge_sha256": "ad99265eeaf798795643d2d81e69f9ebca74a4109849dd947ce9f4a95a541218",
+     "refute_sha256": "e46637b47558ec0f84b4f6c590dd28a574352fa476a84425277a7336416d78be",
+     "cost_usd": 0.5872
+    },
+    {
+     "pr": 978,
+     "trial": 2,
+     "judge_sha256": "37bbec128ac03d3db22a22f0eb07f09f970eabd9351c351aebf57ac062092331",
+     "refute_sha256": "b12fbf290e5913469bfd3deb33fb2024351b15a5ea3ea26d2b514e2e113d3c1c",
+     "cost_usd": 3.3209
+    }
+   ],
+   "cost_usd_list_equivalent": 16.54,
+   "contested_cells": 0,
+   "superseded": [
+    {
+     "pr": 970,
+     "trial": 1,
+     "stage": "refute",
+     "reason": "incomplete by the preregistered rule: it covered every known id and agreed with the first judge on all 22 cells but listed three P3 findings as unmatched",
+     "cost_usd": 1.3218,
+     "record_sha256": "1c6eb3181b59d53ca6000f36b1f72b57ac32e34ecde022352d786f7dba8f83ee"
+    }
+   ]
+  },
+  "decision": {
+   "verdict": "OPUS STAYS for review micros",
+   "decisive_findings": 12,
+   "detections": {
+    "O": 7,
+    "S": 6
+   },
+   "opus_found_any": 4,
+   "missed_by_sonnet": [
+    "G10"
+   ],
+   "cost_usd_list_equivalent": {
+    "O": 16.11,
+    "S": 2.72
+   },
+   "cost_ratio_sonnet_over_opus": 0.1686,
+   "cost_bound": 0.6,
+   "strict_pass_chance_if_identical": 0.0201,
+   "tolerant_pass_chance_if_identical": 0.5551,
+   "tolerant_reading_holds": true,
+   "pooled_mean_detection_rate": 0.2708,
+   "pooled_recall": {
+    "O": 0.2917,
+    "S": 0.25
+   },
+   "recall_difference_bootstrap_95": [
+    -0.0833,
+    0.0
+   ],
+   "trial_1_alone": {
+    "verdict": "SONNET TAKES",
+    "strict_pass_chance_if_identical": 0.0828
+   },
+   "tolerant_per_finding_clause_pass_chance_if_identical": 0.6204,
+   "strict_pass_chance_if_identical_per_finding_rates": 0.7305,
+   "two_trial_verdict_basis": "a ruled extension: trial 1 met the registered rule (Sonnet takes review micros); the rule for two trials was fixed before any run (addendum 1) and so was its trigger, which ends the run after a passing trial 1 (Sonnet takes review micros, no second trial); the command center ran trial 2 after seeing that result (addendum 3 of the run's papers), so the two-trial verdict is not a preregistered outcome, and an extension after a pass can only move the verdict toward Opus",
+   "two_trial_verdict_basis_source": {
+    "path": "paired-routing/addendum-03-trial-2-extension-20261011.md",
+    "bytes": 2447,
+    "sha256": "a4f8d1d2f4e9da1e5e52a90ab0a4925b42bbe24a684cd1c9b389a40973b5172f"
+   },
+   "tolerant_floor_basis": {
+    "reading_and_null_model": "the run's own, registered before any run: papers.addendum_01, lines 17-18 (the tolerant reading, and the noise floors of two identical reviewers who each find a finding with probability p in each run); no third-party source defines this registered reading, so the reference is the brute-force enumeration in tests/test_paired_runs_results.py",
+    "sum_of_independent_differences": "numpy 2.5.3, numpy.convolve documentation: the sum of two independent random variables is distributed according to the convolution of their individual distributions; the test cross-checks tolerant_floor against numpy.convolve where numpy is installed"
+   }
+  },
+  "beside_the_rule": {
+   "real_new_p1_p2": {
+    "O": 7,
+    "S": 1
+   },
+   "false_positives_p1_p2": {
+    "O": 0,
+    "S": 1
+   },
+   "p3_detections": {
+    "O": [
+     5,
+     12
+    ],
+    "S": [
+     1,
+     12
+    ]
+   },
+   "findings_reported": {
+    "O": 36,
+    "S": 16
+   },
+   "verdicts_that_differ": [
+    "#982 t1",
+    "#982 t2"
+   ]
+  },
+  "exposure": {
+   "flagged_runs": {
+    "trial_1": 4,
+    "trial_2": 5
+   },
+   "outside_data": "no flagged call returned data about the pull request, the records, the other runs or the known findings; one run received environment information only (a directory name and its PATH)",
+   "limit": "the client's persisted tool outputs sit in a directory the fence denies; runs that tried to read them were refused (3 Opus runs in trial 2, 2 in trial 1)"
+  },
+  "ruling": {
+   "by": "the command center",
+   "date": "2026-10-11",
+   "path": "research-cc-role-20261008/ruling-routing-run5-two-trial-20261011.md (the command center's private research directory)",
+   "sha256": "a6beedb039e6c9690c15d81d31b9084b354ae46ecbf8fb2a36416a88211f2863",
+   "decision": "the strict reading stands, so Opus stays the default for Claude review micros",
+   "routing": "Opus for every Claude read or micro of trading code and gate code, and for any micro that is the only Claude-family read of a gate; Sonnet at medium only for non-gate foundation changes (docs, pages, catalogs, generated reports) where the change is mechanical or a second Claude-family read exists; no slot row, default or skill text changes from the ruling alone",
+   "revised": "the file was edited by the command center on 2026-10-11 after this record first cited it (a wording change at about 09:32Z); the text first cited, sha256 prefix 08aac8fd72be, is not retained",
+   "correction_note": "the command center corrected the ruling's figure for the tolerant noise floor (0.62, the per-finding clause alone; the full reading is 0.5551) and recorded how the two-trial verdict came about in a sidecar file (papers.ruling_correction), leaving the ruling's own bytes unchanged so that this pin stays valid"
+  },
+  "papers": {
+   "preregistration": {
+    "path": "paired-routing/preregistration.md",
+    "bytes": 19438,
+    "sha256": "66f87a9eb2b9283f99cadf0461e097ff33b4cf1691b651aa54e43903275df18a"
+   },
+   "addendum_01": {
+    "path": "paired-routing/addendum-01-ruling-and-extension-20261011.md",
+    "bytes": 3861,
+    "sha256": "1917091fe507696be015a53bbf7c8e694e46fdd3a1c901b4b22d7447229b7d55"
+   },
+   "addendum_02": {
+    "path": "paired-routing/addendum-02-harness-review-20261011.md",
+    "bytes": 8204,
+    "sha256": "854a075783c22fce86ded8bc7a90c44fa64fcfd51e1a7894eb40d75699b84452"
+   },
+   "addendum_03": {
+    "path": "paired-routing/addendum-03-trial-2-extension-20261011.md",
+    "bytes": 2447,
+    "sha256": "a4f8d1d2f4e9da1e5e52a90ab0a4925b42bbe24a684cd1c9b389a40973b5172f"
+   },
+   "ground_truth": {
+    "path": "paired-routing/ground_truth.json",
+    "bytes": 18901,
+    "sha256": "56ade702ae580a561c7fe3d688a7e1df62644dfcd19f80ff2581acbf93a11007"
+   },
+   "result": {
+    "path": "paired-routing/RESULT-trials-1-2.md",
+    "bytes": 27472,
+    "sha256": "5642e6a1b9895710679e30ae43af86801bee4742d42d87e6313aa79c7f7bfce9"
+   },
+   "result_trial_1": {
+    "path": "paired-routing/RESULT.md",
+    "bytes": 16722,
+    "sha256": "f7f8daad1a11a14b51164e98637199609c8fefcffc8b4a380e73388e34a9237d"
+   },
+   "analysis": {
+    "path": "paired-routing/two-trial-frozen/analysis-afbbe18e.json",
+    "bytes": 5994,
+    "sha256": "afbbe18e65ccfe2ddbe930ea42907e53e6a3a5faf83dc36731457ad53e5721b9"
+   },
+   "exposure": {
+    "path": "paired-routing/two-trial-frozen/exposure-4deb0871.txt",
+    "bytes": 9978,
+    "sha256": "4deb087164d31d0dd683599150523d00d0fbdcaca203fb40397e8d9078ad8438"
+   },
+   "ruling": {
+    "path": "research-cc-role-20261008/ruling-routing-run5-two-trial-20261011.md",
+    "bytes": 2581,
+    "sha256": "a6beedb039e6c9690c15d81d31b9084b354ae46ecbf8fb2a36416a88211f2863"
+   },
+   "correction": {
+    "path": "paired-routing/CORRECTION-tolerant-floor-20261011.md",
+    "bytes": 2352,
+    "sha256": "f80215104fe6820567acf8c8857e2fffd0b2c5dfb3db759a2b7816fbffb86119"
+   },
+   "ruling_correction": {
+    "path": "research-cc-role-20261008/ruling-routing-run5-two-trial-20261011.correction-01.md",
+    "bytes": 1516,
+    "sha256": "338600a94e55afe618c769ea4e464738a7784bb4c96478125582aa3bc09a50dc"
+   }
+  }
+ }
+}

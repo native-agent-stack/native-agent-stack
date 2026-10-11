@@ -4971,8 +4971,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/observation-inference.md",
-      "sha256": "2e7f04536886675bec9e91b0b7f12c45ae27ad790ef488e3422e68f3dba3609e",
-      "bytes": 2709
+      "sha256": "91404b6304d2ba7daf85ac611a7d1279c34a5225f4469094a8bdaa09ed617e59",
+      "bytes": 3965
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/scheduling-supervision.md",
@@ -4981,13 +4981,13 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.json",
-      "sha256": "a54e403ea1e9079318ed833ea307b4f1e3ed126cd0273ddd0c741ebdb03ef871",
-      "bytes": 142982
+      "sha256": "76d5eff876c5ecf316b1006f0c8d2929b11d3d70ed0be3edeb67ab3aa3c1b046",
+      "bytes": 151622
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/slots.md",
-      "sha256": "9eb24d4be76bea477eb51a534816f1a7daae7d192e8ce96d4b6ca40f34b05727",
-      "bytes": 12282
+      "sha256": "947a33617736dc0a66c8802a98019639d1d71e1aca2f84ed705e9c71db5800c2",
+      "bytes": 12648
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/token-efficiency.md",
@@ -4996,8 +4996,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/workers.md",
-      "sha256": "109a9705d96cbcac8a2a3a085b9ecd2a259b5a8493b910c8f93869b4dc62b9e4",
-      "bytes": 20282
+      "sha256": "0c07dbfed9fbb0ef7f98155e63b989d47427d29cf7bb5693ed0fdf7ddf395bd3",
+      "bytes": 27627
     },
     {
       "path": ".claude/skills/omniroute-runtime-worker/SKILL.md",
@@ -18597,8 +18597,8 @@
     },
     {
       "path": "docs/decisions/2026-10-09-claude-code-native-practice.md",
-      "sha256": "ad397dd1388030ef0f77e317c6257f8c0b1fadcee642a9c4d17c7560e4f7d157",
-      "bytes": 44890
+      "sha256": "98947f11f2a3eb693c9c31b3fff6e58e1f20d476411aa49f42f66888d43c6d47",
+      "bytes": 54090
     },
     {
       "path": "docs/decisions/2026-10-09-codex-native-review-trial.md",
@@ -20817,8 +20817,8 @@
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/claude-native-slot-manifest.json",
-      "sha256": "3e42e2c0a65845eccd91fc323df4ad490319d51960cb85c332d549b9348131a6",
-      "bytes": 237873
+      "sha256": "ca47cdf806dd6fe1571a5bb0e366d8dbd6d5de86b93f00972f9ab76a5209b5d5",
+      "bytes": 238146
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/fresh-session.json",
@@ -20829,6 +20829,11 @@
       "path": "evidence/artifacts/claude-native-practice-20261009/g5-candidate-rows.json",
       "sha256": "85563a140cd6bff20f5cc5a3900a40d4b025ed264bf276eb6a06a6333dd42bdd",
       "bytes": 397482
+    },
+    {
+      "path": "evidence/artifacts/claude-native-practice-20261009/meter-windows-20261011.json",
+      "sha256": "b5ed1b202a9d60118816de820c9e7ce8822e8d4a8de51fcdd873d3ad4f2364d6",
+      "bytes": 3194
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/practice-references-candidate.json",
@@ -40941,6 +40946,11 @@
       "bytes": 7554
     },
     {
+      "path": "evidence/artifacts/native-practice-paired-runs-20261010/paired-runs.json",
+      "sha256": "86108379949cf688ae244436f81becac28d94861716ceefbbe794753ba439fa7",
+      "bytes": 65293
+    },
+    {
       "path": "evidence/artifacts/native-quality-defaults-20260920/codex-effective.json",
       "sha256": "609255c3478fa016245e1c9657aa7a3b4712e0abcc90b3e3fb4615b74d45fae7",
       "bytes": 387
@@ -59472,8 +59482,8 @@
     },
     {
       "path": "evidence/receipts/rtk-051-qualification-20261004.json",
-      "sha256": "f35ef95e65d1a8c621c62102eba41f6c05bd39c8c79fc64e6550a04190912d6e",
-      "bytes": 23051
+      "sha256": "8e513f9642c8b73686057d6f53fec47026cd331160e534f239fdc54aec147cc0",
+      "bytes": 23174
     },
     {
       "path": "evidence/receipts/rtk-fold-harbor-20261004.json",
@@ -61871,6 +61881,11 @@
       "bytes": 3900
     },
     {
+      "path": "tests/test_native_practice_meter_windows.py",
+      "sha256": "05c3dcaaa7eb0e5afebb730423c3abb883ef21fd9c695affcc77dc3e857e1ded",
+      "bytes": 9198
+    },
+    {
       "path": "tests/test_native_practice_retired_routes.py",
       "sha256": "e4c775e9388eba391dfa58ae751b5b2927b6e4c3c5c290e0708446ea490c29a6",
       "bytes": 68258
@@ -62016,6 +62031,11 @@
       "bytes": 15821
     },
     {
+      "path": "tests/test_paired_runs_results.py",
+      "sha256": "1f152a8c62d7cedb4a7fdecb263cd80a1e3a8bae2db7741f7bdafc763d8ceac8",
+      "bytes": 56366
+    },
+    {
       "path": "tests/test_path_safety.py",
       "sha256": "3ef5408df71c98eca31ddfd8e065594ee0bb09d61b37108df9d73c8e66c4acaf",
       "bytes": 7047
@@ -62126,6 +62146,11 @@
       "bytes": 58079
     },
     {
+      "path": "tests/test_rtk_receipt_locators.py",
+      "sha256": "4590794a9cf7ed00ac928190e22e42374c21b3730eccf9113e127a3ad40cc4b9",
+      "bytes": 12192
+    },
+    {
       "path": "tests/test_runtime_directory_identity.py",
       "sha256": "9a5db043d9d2837d3319a95a69bfe6c514a5ef99057bd4c7a0e7a171fd348814",
       "bytes": 10655
@@ -62227,8 +62252,8 @@
     },
     {
       "path": "tests/test_skill_usage.py",
-      "sha256": "80a2c3033eadfe119782ccd7b9096852a01d950873f98d8b3d661e80d631c0a5",
-      "bytes": 273716
+      "sha256": "418b3493d775756dd92e0d72c638cc9693d736823b058d03076029646e929fdf",
+      "bytes": 275412
     },
     {
       "path": "tests/test_skills_manifest.py",

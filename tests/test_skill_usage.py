@@ -5,6 +5,7 @@ from __future__ import annotations
 import collections
 import contextlib
 import importlib.util
+import inspect
 import io
 import json
 import ntpath
@@ -509,14 +510,31 @@ class ManagedMcpDefaultLocations(unittest.TestCase):
         with mock.patch.object(S, "MANAGED_MCP_CONFIG_PATHS", (normalised,)):
             self.assertEqual(S.skill_doctor_argv(), self.MANAGED)
 
+    @unittest.skipUnless(os.name == "posix", "on Windows ntpath.abspath asks the OS and adds the current drive")
+    def test_ntpath_abspath_adds_no_drive_to_a_posix_string(self):
+        # the behaviour the comment in the next test relies on, measured on a POSIX host under 3.12 and 3.13: the separators turn into backslashes and no drive appears
+        for posix, windows in (("/etc/claude-code/managed-mcp.json", "\\etc\\claude-code\\managed-mcp.json"), ("/Library/Application Support/ClaudeCode/managed-mcp.json", "\\Library\\Application Support\\ClaudeCode\\managed-mcp.json")):
+            with self.subTest(path=posix):
+                self.assertEqual(ntpath.abspath(posix), windows)
+                self.assertEqual(ntpath.splitdrive(ntpath.abspath(posix))[0], "")
+
+    def test_the_comment_of_the_windows_path_test_states_what_abspath_does(self):
+        # Pins the correction of #973's comment, which said ntpath.abspath adds a drive to a POSIX string; CPython's `_abspath_fallback` does not
+        # (v3.12.4 Lib/ntpath.py:564-578). The bracket in the pattern keeps this test from matching its own text.
+        comment = inspect.getsource(self.test_the_windows_path_rules_count_the_windows_string_and_not_the_posix_ones)
+        self.assertNotRegex(comment, r"abspath adds a dri[v]e")
+        self.assertIn("adds no drive on a POSIX host", comment)
+        self.assertIn("CPython v3.12.4 Lib/ntpath.py:564-578", comment)
+
     def test_the_windows_path_rules_count_the_windows_string_and_not_the_posix_ones(self):
         # os.path is posixpath on a POSIX host, so the Windows side of the check was only argued from ntpath's functions
         # (the command center's note on landing #967). This swaps the module's os for one whose path functions are ntpath's
         # and whose file checks answer yes for every candidate, so the path rule alone decides, on every host and on the
         # CI interpreter. Under Python 3.12 ntpath.isabs accepts a leading separator, so the POSIX strings pass isabs and
-        # only the normalisation equality rejects them (abspath adds a drive and turns the separators); from 3.13 isabs
+        # only the normalisation equality rejects them (abspath turns the separators into backslashes and adds no drive on a POSIX host); from 3.13 isabs
         # rejects them first. The equality clause is therefore covered here under 3.12 and the isabs clause under 3.13.
-        # ntpath.abspath is its pure-Python fallback on a POSIX host (no _getfullpathname), which is all these cases need.
+        # ntpath.abspath is its pure-Python fallback on a POSIX host (no _getfullpathname), which is all these cases need: CPython v3.12.4 Lib/ntpath.py:564-578
+        # (`_abspath_fallback` joins the working directory only when isabs is false, then normpath), measured in test_ntpath_abspath_adds_no_drive_to_a_posix_string below.
         ntos = types.SimpleNamespace(
             fspath=os.fspath, R_OK=os.R_OK, access=lambda path, mode: True,
             path=types.SimpleNamespace(isabs=ntpath.isabs, abspath=ntpath.abspath, isfile=lambda path: True))

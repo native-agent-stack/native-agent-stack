@@ -393,10 +393,10 @@
         "guidance": "rtk proxy executes an executable argv, not shell assignments or builtins. Put TMPDIR=/tmp before rtk proxy, or use rtk proxy env TMPDIR=/tmp true; run shell builtins in the calling shell without an RTK prefix."
       },
       "replay_prerequisite": {
-        "kernel_source": "examples/claude-native/workflows/child-usage.mjs:2296",
+        "kernel_source": "14048b840425c2569e0df60a6596e94e601da15b:examples/claude-native/workflows/child-usage.mjs:2296",
         "gate_sources": [
-          "tests/test_token_measurement.py:29",
-          "tests/test_skill_usage.py:33"
+          "14048b840425c2569e0df60a6596e94e601da15b:tests/test_token_measurement.py:29",
+          "14048b840425c2569e0df60a6596e94e601da15b:tests/test_skill_usage.py:33"
         ],
         "requires_self_reported_version": "rtk 0.50.0",
         "installed_self_reported_version": "rtk 0.51.0",
