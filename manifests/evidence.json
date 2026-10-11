@@ -11276,6 +11276,11 @@
       "bytes": 24455
     },
     {
+      "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261011-pr990.json",
+      "sha256": "b8ff44c24b73981c63edcc0e956c9b8e59bf0b6f199d97ee1baa7e7b3389d9d6",
+      "bytes": 28719
+    },
+    {
       "path": "blueprints/runtime-workers/openhands/evidence/unit-pass.txt",
       "sha256": "6576e0f1b0ea27a22909854a90299ffef78034239d7147629eec595f6f520de0",
       "bytes": 3013
@@ -18582,8 +18587,8 @@
     },
     {
       "path": "docs/decisions/2026-10-10-codex-blind-audit-command-positions.md",
-      "sha256": "ce2eb7a1c5066c593ccd086fff71c09790f974ad30b1d45101ed9c18e6702f46",
-      "bytes": 12314
+      "sha256": "6b7860d349315f8b6b8736cf4a96a4306fd128b20c56ab2c539cea9d9013004f",
+      "bytes": 20033
     },
     {
       "path": "docs/decisions/2026-10-10-codex-lane-omniroute.md",
@@ -60041,6 +60046,11 @@
       "bytes": 2765
     },
     {
+      "path": "tests/fixtures/codex-lane/bin/codex",
+      "sha256": "f9dbe5e6f4988c865780b1ff4ddbfca56c6df1e500ba578ac27cd631a1df793e",
+      "bytes": 12156
+    },
+    {
       "path": "tests/fixtures/codex-worker-lane/README.md",
       "sha256": "14f7463dcdc7180bc4c4c46aa8fb321a5f5494dafeb5d6e57ba2b58686ae5b63",
       "bytes": 1128
@@ -60607,8 +60617,8 @@
     },
     {
       "path": "tests/test_codex_lane.py",
-      "sha256": "3a433a97d3fdf2a88d2907ec9cabd17ba395831606dd5b40970cd17be65c9683",
-      "bytes": 157780
+      "sha256": "7485f82f1393abec62ac5bc9e0127ce0f9e76b9a6366b8dd266dead1db758ad6",
+      "bytes": 168909
     },
     {
       "path": "tests/test_codex_quota.py",
@@ -61327,8 +61337,8 @@
     },
     {
       "path": "tests/test_runtime_worker_openhands_push_gate.py",
-      "sha256": "9a9d2928a28883e135bceac4cd4da72839d11bfa3bfa2b7a6801c8b2940e9b98",
-      "bytes": 161891
+      "sha256": "06f1e5bdfabf081fad40f6b8f4ad77b40c3a043bef4a129d44401a706bf49d0d",
+      "bytes": 161897
     },
     {
       "path": "tests/test_runtime_worker_openhands_resolver.py",
@@ -61387,8 +61397,8 @@
     },
     {
       "path": "tests/test_shell_parser_ci.py",
-      "sha256": "6ee9404a6437334f2b415ed38f1135e52cd9863bcb47d14df57692888eeebde7",
-      "bytes": 43320
+      "sha256": "9bf1d2e677c65502db64d04e72c0dc120568bebafb54d3b80c159f4a8e3f291d",
+      "bytes": 43505
     },
     {
       "path": "tests/test_sim_capacity.py",
@@ -61877,8 +61887,8 @@
     },
     {
       "path": "tools/sota-convergence/README.md",
-      "sha256": "c9ee8d3c9358010368eceec9f295551d325dbeeaeaba603fc48f20de9e6c196f",
-      "bytes": 197040
+      "sha256": "8609cc5cea42dc69c67fba8a13e98ceb88c708a11c0d0c80e1d4fb0b3e322ff0",
+      "bytes": 199041
     },
     {
       "path": "tools/sota-convergence/adjudicate.py",
@@ -61912,8 +61922,8 @@
     },
     {
       "path": "tools/sota-convergence/codex_lane.py",
-      "sha256": "e0cc01afa277c820b5235e665ad0d5dda6948adc91559ef6c65c81461e8e32a3",
-      "bytes": 140449
+      "sha256": "e08169635a1a60f5765d7cc6bf71e170da6c52a6ee107690b779d212264efebd",
+      "bytes": 161365
     },
     {
       "path": "tools/sota-convergence/compact_manifest.py",
@@ -61927,8 +61937,8 @@
     },
     {
       "path": "tools/sota-convergence/evidence/codex-blind-audit-command-positions-20261010.json",
-      "sha256": "b1e85906fffaf7987599ce819ca46f2bbe5485c827c09257103acba4510d34c1",
-      "bytes": 14421
+      "sha256": "e024592f3f8ee4c90b12540acc766be31a93dd7b9f5f0240d7f8ee41f2804982",
+      "bytes": 35457
     },
     {
       "path": "tools/sota-convergence/evidence/codex-lane-omniroute-20261010.json",
@@ -62077,8 +62087,8 @@
     },
     {
       "path": "tools/sota-convergence/lane-provenance.json",
-      "sha256": "76a795a9b6cec32103112fbbce462f4fc3f7da134a9a44bc16d0eaad1184e545",
-      "bytes": 21833
+      "sha256": "f06984a55a9b8b2bf34c349782863f003d1d381c67fe5d3d55a9ce0907504ded",
+      "bytes": 22856
     },
     {
       "path": "tools/sota-convergence/lane-return.schema.json",

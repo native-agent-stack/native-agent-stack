@@ -1482,6 +1482,9 @@ codex exec --sandbox read-only --skip-git-repo-check --ephemeral \
 The five isolation settings on the last two lines are `ISOLATION_ARGS`; `tests/test_codex_lane.py` fails when
 this block or the module docstring leaves one out. A blind child runs this with only an allowlisted environment,
 a fresh run-scoped `CODEX_HOME`, an empty `HOME` and no stdin (below).
+This is the default builder shape. The blind verdict lane omits `--ephemeral` to retain the pinned client's
+paginated native command history for the independent cwd binding described below. The five isolation settings
+still apply, and adjudication retains the default ephemeral command.
 
 The transport remains native unless `codex_lane.py --provider omniroute` is supplied. This opt-in follows the
 [landscape-sweep transport/failover](landscape-sweep/README.md#automatic-native-to-omniroute-failover---gpt6-fallback-omniroute)
@@ -1593,17 +1596,33 @@ What remains and how it is handled:
   `examples/claude-native/workflows/child-usage.mjs`; quoted Python `-c`/stdin source uses Python's `ast`.
   Literal search patterns, printed strings, a quoted heredoc's backticks and Python `'/'.join(...)` separators
   are data. A real `git log`, `ls /`, `Path('/').iterdir()` or `rg -f /etc/passwd docs` remains flagged.
-  Unknown grammar/expansion and unresolved Python reads or execution are refused.
+  Unknown grammar/expansion and unresolved Python reads or execution are refused. Python string literals that
+  violate the boundary are refused unless static analysis proves they are data, so an unlisted read or
+  metadata API does not make an outside path clean. Regressions cover `linecache.getline`, `sqlite3.connect`,
+  `io.FileIO`, `fileinput.input`, `shutil.copyfile`, `os.path.getsize`, `pandas.read_json` and `os.walk('/')`.
 
   **Independent working-directory records.** Each command also needs a caller-owned native record that binds
   its event item identity, exact logged command display and absolute cwd inside the export or packets root.
   `blind_audit(..., cwd_records=...)` accepts those records separately from the child event stream. An item's
   `cwd` or `workdir` field, a model assertion, or the initial `codex exec -C` directory does not supply that
-  binding. Missing, duplicate or mismatched identities and outside directories are flagged. Codex 0.162.1's
-  production exec JSONL omits cwd, and this runner has no independent native capture: commands in current raw
-  streams are **UNVERIFIED**, so a blind layer with them is quarantined. The four-command regression helper
-  supplies caller-owned synthetic cwd records; its clean parser results do not attest production streams.
-  A future native capture must preserve the mapping between native call IDs and the projector's JSONL item IDs.
+  binding. Codex 0.162.1's exec JSONL omits cwd, but its supported non-ephemeral mode requests paginated native
+  history with completed command argv, cwd, parsed command, source, status, exit code and aggregated output.
+  The blind verdict lane retains that history under a fresh scratch `CODEX_HOME` with explicit provider
+  configuration; it never copies a real home. The default command builder used by adjudication remains
+  ephemeral.
+
+  The parent binds a completed exec item to a unique native completed command in the same thread using exact
+  decoded outer argv, status, exit code and aggregated output. Native call IDs and projected exec IDs are not
+  assumed equal. `events/<layer>.native-cwd.json` retains the events digest, per-attempt native snapshots and
+  digests, and explicit item/native bindings for retry and resume before scratch-home cleanup. Capture and
+  sidecar input are bounded at 8 MiB. Missing, duplicate, ambiguous, mismatched or incomplete native history,
+  outside directories and non-local file cwd URIs remain **UNVERIFIED**, so a blind layer with them is
+  quarantined. Upstream bounds persisted command output at 64 KiB; a truncated output that fails the exact
+  comparison cannot verify a command. The four-command parser helper still uses synthetic cwd records.
+  Native capture is source-reviewed and fixture-tested; live provider behavior is **UNMEASURED**.
+  A command start must pair with a completion in the same thread, and the pair counts once. Unfinished starts
+  stay unverified across retries even if a later attempt succeeds. A present native `session_id` must match
+  the fresh root exec thread; older metadata without it uses the native `id` fallback.
 
   The audit flags commands that:
   - lack a valid independent working-directory record;
@@ -1679,8 +1698,9 @@ What remains and how it is handled:
   Indirect script/config reads and symlink targets remain unobserved. Dynamic reads and unsupported syntax are
   refused. The retained tier-1 regressions cover four text-match quarantines: a Python join separator, an `rg`
   pattern, quoted-heredoc backticks and the workers URI skip guard. They test command parsing with synthetic
-  caller-owned cwd records, alongside real Git/root/read violations. The earlier three-case replay at main
-  `9d4c00cd` is historical evidence from before the cwd requirement. Constructed read operands such as
+  caller-owned cwd records, alongside real Git/root/read violations. Historical command-only replays against
+  main `9d4c00cd` supplied fixture-side API compatibility and must be distinguished from unmodified new-test-class
+  replays, which encounter missing-API errors on that base. Constructed read operands such as
   `'://'[1:]+'etc/passwd'` and `'/etc/passwd$)'[:-2]` stay flagged. Existing provenance entries and collected
   wave receipts are preserved. See the [dated decision record](../../docs/decisions/2026-10-10-codex-blind-audit-command-positions.md)
   for pinned event-builder, shell-command, cwd and projector sources.
@@ -1697,11 +1717,12 @@ What remains and how it is handled:
   exemption. This resolves the fourth command's data flow when its cwd is independently bound.
 
   **Supervisor usage contract.** Native `usage.jsonl` rows identify their layer with `layer`; lane return JSON
-  uses `layer_id`. Supervisors use `usage_row_belongs_to_layer(row, layer)` and
-  `layer_usage_suffix(original_bytes, current_bytes, layer)` from `codex_lane.py`. The latter verifies the
+  uses `layer_id`. `codex_lane.py` provides `usage_row_belongs_to_layer(row, layer)` and
+  `layer_usage_suffix(original_bytes, current_bytes, layer)`. The latter verifies the
   original prefix and complete JSON rows, refuses a row for another layer, and returns the appended rows. An
-  empty suffix records no completed attempt. These helpers execute no model or file read. The actual retained
-  supervisor uses this contract; its regression fixture is the exact native workers usage row from the rerun.
+  empty suffix records no completed attempt. These helpers execute no model or file read. Their regression
+  fixture is the exact native workers usage row from the rerun. The retained supervisor is outside this diff;
+  the helpers are **UNCALLED** until it imports and invokes them. The tests verify the helper contract only.
 
   **Interrupted-run failure records.** `failures.json` has a valid snapshot before any child launch and is
   updated after each completed failure observation: exhausted retry, blind-audit quarantine or changed evidence

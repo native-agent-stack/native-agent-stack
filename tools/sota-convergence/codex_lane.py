@@ -6,7 +6,7 @@ without a valid ``<work-dir>/codex/<catalog>__<layer_id>.json`` already on
 disk, fill the shared lane prompt (``lane-prompt.md``) with that packet's
 absolute path, the repository root and ``LANE=codex``, then run
 
-    codex exec --sandbox read-only --skip-git-repo-check --ephemeral \
+    codex exec --sandbox read-only --skip-git-repo-check \
         -C <repo> --output-schema <schema> -o <out.tmp> --json \
         -c model_reasoning_effort=<effort> \
         --ignore-user-config -c features.hooks=false -c features.plugin_hooks=false \
@@ -58,14 +58,16 @@ import os
 import re
 import shlex
 import shutil
+import stat
 import subprocess
 import tempfile
 import sys
 import threading
 import time
+import uuid
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
-from urllib.parse import urlsplit
+from urllib.parse import unquote, urlsplit
 
 HERE = Path(__file__).resolve().parent
 DEFAULT_PROMPT = HERE / "lane-prompt.md"
@@ -258,7 +260,8 @@ def existing_output_is_valid(out_path: Path, catalog: str, layer_id: str, packet
         events_path = out_path.parent / "events" / f"{out_path.stem}.jsonl"
         # A child always emits events: an empty stream is a truncated one (round 8, NEW-1), never a clean audit.
         if not events_path.is_file() or not parse_events(events_path.read_text(encoding="utf-8", errors="replace")) \
-                or audit_is_flagged(blind_audit(events_path, audit_roots)):
+                or audit_is_flagged(blind_audit(events_path, audit_roots,
+                                               cwd_records=load_native_cwd_records(events_path))):
             return False
     try:
         data = load_json(out_path)
@@ -299,7 +302,8 @@ def fill_prompt(template: str, packet_path: Path, repo_root: Path) -> str:
 
 
 def build_command(repo_root: Path, schema_path: Path, out_tmp: Path, effort: str, prompt_text: str,
-                  model: str = None, isolation=(), *, provider="native", omniroute_base_url=None) -> list:
+                  model: str = None, isolation=(), *, provider="native", omniroute_base_url=None,
+                  ephemeral=True) -> list:
     provider_args = omniroute_config(omniroute_base_url) if provider == "omniroute" else []
     if provider == "omniroute":
         model = model or DEFAULT_OMNIROUTE_MODEL
@@ -309,7 +313,7 @@ def build_command(repo_root: Path, schema_path: Path, out_tmp: Path, effort: str
         *(["-m", model] if model else []),
         "--sandbox", "read-only",
         "--skip-git-repo-check",
-        "--ephemeral",
+        *(["--ephemeral"] if ephemeral else []),
         "-C", str(repo_root),
         "--output-schema", str(schema_path),
         "-o", str(out_tmp),
@@ -1367,6 +1371,132 @@ def python_audit(source: str, allowed_roots, tools, depth=0, *, cwd=None) -> lis
             except AuditAnalysisUnavailable as error:
                 reasons.append(str(error))
 
+    # A fixed list of readers cannot certify every library call. A risky literal
+    # needs a positive data-use proof; names such as connect/getline are not IO guesses.
+    reflective_data = any(
+        isinstance(item, ast.Call) and any(name.rsplit('.', 1)[-1] in
+            {"setattr", "delattr", "vars", "globals", "locals"} for name in labels(item.func))
+        or isinstance(item, ast.Attribute) and item.attr in
+            {"__dict__", "__setattr__", "__delattr__", "__getattribute__"}
+        for item in nodes
+    )
+
+    def primitive_data(expression, level=0):
+        if level > 64:
+            return False
+        if isinstance(expression, ast.BinOp) and isinstance(expression.op, ast.Add):
+            return (strings(expression) is not None and primitive_data(expression.left, level + 1)
+                    and primitive_data(expression.right, level + 1))
+        projected = data_value(expression)
+        if projected is not None and type(projected[0]) in (str, int, float, bool, type(None), list, tuple, set, dict):
+            return data_safe(projected[1])
+        # The approved packet loop has known builtin strings even though a For
+        # statement is not itself a scalar expression in the projection evaluator.
+        assigned = lookup(expression) if isinstance(expression, ast.Name) else None
+        if assigned and all(isinstance(value, ast.For) for value in assigned):
+            for value in assigned:
+                projected = data_value(value.iter)
+                if projected is None or type(projected[0]) not in (list, tuple, set) or not all(
+                        type(item) is str for item in projected[0]) or not data_safe(projected[1]):
+                    return False
+            return True
+        return False
+
+    def literal_is_data(literal):
+        # CPython v3.13.16 compound_stmts.rst: a definition does not execute its
+        # body. A separator in a self-recursive helper is dormant only when no
+        # reference or call outside that body's statements can invoke the helper.
+        dormant = None
+        ancestor = literal
+        for _ in range(64):
+            parent = parents.get(id(ancestor))
+            if parent is None:
+                break
+            if isinstance(parent, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                if (literal.value == "/" and not reflective_data and ancestor in parent.body
+                        and not parent.decorator_list and isinstance(parents.get(id(parent)), ast.Module)):
+                    dormant = parent
+                break
+            ancestor = parent
+
+        def in_dormant_body(node):
+            for _ in range(64):
+                parent = parents.get(id(node))
+                if parent is dormant:
+                    return node in dormant.body
+                if parent is None:
+                    break
+                node = parent
+            return False
+
+        if dormant is not None:
+            key = (scopes[id(dormant)], dormant.name)
+            if any((isinstance(node, ast.Name) and isinstance(node.ctx, ast.Load)
+                    and binding_key(node) == key or isinstance(node, ast.Call))
+                   and not in_dormant_body(node) for node in nodes):
+                dormant = None
+        current = literal
+        for _ in range(64):
+            parent = parents.get(id(current))
+            if parent is None:
+                return False
+            if isinstance(parent, ast.Compare):
+                if all(primitive_data(value) for value in [parent.left, *parent.comparators]):
+                    return True
+                # An unknown reference can be compared for printed classification;
+                # its comparison result must still reach a verified data sink.
+                current = parent
+                continue
+            if isinstance(parent, ast.IfExp):
+                current = parent
+                continue
+            if isinstance(parent, (ast.List, ast.Tuple, ast.Set, ast.Dict, ast.keyword)):
+                current = parent
+                continue
+            if isinstance(parent, ast.BinOp) and isinstance(parent.op, ast.Add):
+                if dormant is None and (not primitive_data(parent.left) or not primitive_data(parent.right)):
+                    return False
+                current = parent
+                continue
+            if isinstance(parent, ast.Attribute) and parent.value is current:
+                current = parent
+                continue
+            if not isinstance(parent, ast.Call):
+                return False
+            called = callables(parent.func)
+            names = {name for kind, name, _ in called or () if kind == "named"}
+            if not called:
+                return False
+            if len(names) != len(called):
+                return (dormant is not None and isinstance(parent.func, ast.Name)
+                        and lookup(parent.func) == [dormant]
+                        and all(kind == "local" and name == dormant.name for kind, name, _ in called))
+            operand = current.value if isinstance(current, ast.keyword) else current
+            if names <= set(read_keywords) and all(
+                    argument(parent, 0, {read_keywords[name]}) is operand for name in names):
+                values = strings(operand)
+                if values is not None and all(not operand_reasons(value, allowed_roots) for value in values):
+                    return True
+            if not reflective_data and names <= {"print", "builtins.print"} and all(
+                    keyword.arg in {"sep", "end", "flush"} or keyword.arg == "file"
+                    and isinstance(keyword.value, ast.Constant) and keyword.value.value is None
+                    for keyword in parent.keywords):
+                return True
+            if not reflective_data and names == {"json.dumps"} and all(keyword.arg in {
+                    "indent", "sort_keys", "ensure_ascii", "separators", "allow_nan", "skipkeys", "check_circular"
+                    } for keyword in parent.keywords):
+                current = parent
+                continue
+            if isinstance(parent.func, ast.Attribute) and parent.func.attr in {
+                    "join", "strip", "lstrip", "rstrip", "replace", "split", "rsplit", "partition", "rpartition",
+                    "lower", "upper", "casefold", "startswith", "endswith"}:
+                receiver = data_value(parent.func.value)
+                if receiver is not None and type(receiver[0]) is str and data_safe(receiver[1]):
+                    current = parent
+                    continue
+            return False
+        return False
+
     for expression in namespace_writes:
         if expression is not None and not isinstance(expression, (ast.Constant, ast.List, ast.Tuple, ast.Dict, ast.Set)) and strings(expression) is None:
             reasons.append("unresolved Python callable namespace write")
@@ -1418,6 +1548,12 @@ def python_audit(source: str, allowed_roots, tools, depth=0, *, cwd=None) -> lis
                         read_operand(keyword.value)
                     elif keyword.arg == "dir_fd" and not (isinstance(keyword.value, ast.Constant) and keyword.value.value is None):
                         reasons.append("unresolved Python read directory descriptor")
+    for literal in nodes:
+        if isinstance(literal, ast.Constant) and type(literal.value) is str:
+            boundary = operand_reasons(literal.value, allowed_roots)
+            if boundary and not literal_is_data(literal):
+                reasons.extend(boundary)
+                reasons.append("unproven Python boundary literal")
     return list(dict.fromkeys(reasons))
 
 
@@ -1461,14 +1597,221 @@ def analysis_reasons(analysis, allowed_roots, tools, depth=0, *, cwd=None) -> li
     return list(dict.fromkeys(reasons))
 
 
-def recorded_command_cwd(item, cwd_records, allowed_roots) -> tuple[str | None, list[str]]:
+NATIVE_CWD_MAX_BYTES = 8 * 1024 * 1024
+NATIVE_CWD_VERSION = "0.162.1"
+
+
+def _native_cwd_digest(value):
+    return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+
+
+def native_cwd_path(events_path):
+    return Path(events_path).with_suffix(".native-cwd.json")
+
+
+def _native_cwd_bytes(path, root):
+    """Bounded regular-file read beneath the caller's scratch root; never follow a credential link."""
+    parts = Path(path).relative_to(root).parts
+    if not parts or any(part in ("", ".", "..") for part in parts):
+        raise ValueError("invalid native capture path")
+    descriptor = os.open(root, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    try:
+        for part in parts[:-1]:
+            child = os.open(part, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=descriptor)
+            os.close(descriptor)
+            descriptor = child
+        child = os.open(parts[-1], os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=descriptor)
+        try:
+            before = os.fstat(child)
+            if not stat.S_ISREG(before.st_mode) or before.st_nlink != 1 or before.st_size > NATIVE_CWD_MAX_BYTES:
+                raise ValueError("invalid or oversized native capture")
+            chunks, size = [], 0
+            while chunk := os.read(child, min(65536, NATIVE_CWD_MAX_BYTES + 1 - size)):
+                chunks.append(chunk)
+                size += len(chunk)
+                if size > NATIVE_CWD_MAX_BYTES:
+                    raise ValueError("oversized native capture")
+            after = os.fstat(child)
+            if (before.st_dev, before.st_ino, before.st_size, before.st_mtime_ns, before.st_ctime_ns) != (
+                    after.st_dev, after.st_ino, after.st_size, after.st_mtime_ns, after.st_ctime_ns):
+                raise ValueError("native capture changed during read")
+            return b"".join(chunks)
+        finally:
+            os.close(child)
+    finally:
+        os.close(descriptor)
+
+
+def _native_cwd_value(uri):
+    if not isinstance(uri, str):
+        raise ValueError("native cwd is not a URI")
+    parsed = urlsplit(uri)
+    if parsed.scheme != "file" or parsed.netloc or parsed.query or parsed.fragment or \
+            re.search(r"%(?![0-9a-fA-F]{2})", parsed.path):
+        raise ValueError("native cwd is not a local file URI")
+    value = unquote(parsed.path, encoding="utf-8", errors="strict")
+    if not value.startswith("/") or "\x00" in value:
+        raise ValueError("native cwd is not absolute")
+    return os.path.normpath(value)
+
+
+def _bind_native_cwd(events, snapshot):
+    """Join native argv and outcomes uniquely; exec item_N IDs do not preserve native call IDs.
+
+    openai/codex@092d3acd, exec/src/event_processor_with_jsonl_output.rs:100-102,162-180,327-365.
+    Persisted output over 64 KiB may be truncated (rollout/src/policy.rs:249-263); mismatches stay unverified.
+    """
+    commands = [event["item"] for event in events if event.get("type") == "item.completed"
+                and isinstance(event.get("item"), dict) and event["item"].get("type") == "command_execution"]
+    native = snapshot["commands"]
+    analyses = command_analyses([item.get("command") for item in commands]) if commands else []
+    bindings, seen, used = [], set(), set()
+    for item, analysis in zip(commands, analyses):
+        identity = item.get("id")
+        invocations = analysis.get("invocations", [])
+        argv = invocations[0].get("argv") if invocations else None
+        if not isinstance(identity, str) or not identity or identity in seen or not argv or \
+                not isinstance(item.get("command"), str):
+            raise ValueError("native cwd command identity or argv is unverified")
+        seen.add(identity)
+        matches = [record for record in native if record["command"] == argv
+                   and record["status"] == item.get("status") and record["exit_code"] == item.get("exit_code")
+                   and record["aggregated_output"] == item.get("aggregated_output")]
+        if len(matches) != 1 or matches[0]["id"] in used:
+            raise ValueError("native cwd command match is missing or ambiguous")
+        used.add(matches[0]["id"])
+        bindings.append({"item_id": identity, "native_id": matches[0]["id"]})
+    if len(used) != len(native):
+        raise ValueError("native cwd history has unmatched commands")
+    return bindings
+
+
+def capture_native_cwd(events, scratch_home):
+    """Capture only this attempt's paginated native rollout in the fresh caller-supplied home.
+
+    openai/codex@092d3acd: exec/src/lib.rs:1459-1461; protocol/src/items.rs:243-280;
+    protocol/src/protocol.rs:1964-1975,3152-3212,3551-3557; rollout/src/recorder.rs:1745-1759.
+    No real Codex home, model cwd assertion, session-root fallback, or whole-home copy is used.
+    """
+    try:
+        threads = [event.get("thread_id") for event in events if event.get("type") == "thread.started"]
+        if scratch_home is None or len(threads) != 1 or not isinstance(threads[0], str) or \
+                str(uuid.UUID(threads[0])) != threads[0]:
+            raise ValueError("native cwd thread is unverified")
+        thread = threads[0]
+        home = Path(scratch_home)
+        paths = list(home.glob(f"sessions/*/*/*/rollout-*-{thread}.jsonl"))
+        if len(paths) != 1:
+            raise ValueError("native cwd rollout is missing or ambiguous")
+        raw = _native_cwd_bytes(paths[0], home)
+        if not raw.endswith(b"\n"):
+            raise ValueError("native cwd rollout is incomplete")
+        rows = [json.loads(line) for line in raw.decode("utf-8").splitlines() if line.strip()]
+        if not rows or not all(isinstance(row, dict) for row in rows):
+            raise ValueError("native cwd rollout is malformed")
+        headers = [row.get("payload") for row in rows if row.get("type") == "session_meta"]
+        if rows[0].get("type") != "session_meta" or len(headers) != 1 or not isinstance(headers[0], dict):
+            raise ValueError("native cwd metadata is missing or ambiguous")
+        meta = headers[0]
+        # SessionMetaLine defaults a missing legacy session_id from id; a fresh root exec's present value agrees.
+        # openai/codex@092d3acd, protocol/src/protocol.rs:3159-3161,3288-3293.
+        if meta.get("id") != thread or meta.get("session_id", thread) != thread or meta.get("history_mode") != "paginated" or \
+                meta.get("cli_version") != NATIVE_CWD_VERSION or meta.get("source") != "exec":
+            raise ValueError("native cwd metadata does not match the attempt")
+        native, identities = [], set()
+        for row in rows:
+            payload = row.get("payload")
+            if row.get("type") != "event_msg" or not isinstance(payload, dict) or payload.get("type") != "item_completed":
+                continue
+            item = payload.get("item")
+            if not isinstance(item, dict) or item.get("type") != "CommandExecution":
+                continue
+            identity, argv, output, code = (item.get(key) for key in ("id", "command", "aggregated_output", "exit_code"))
+            if payload.get("thread_id") != thread or not isinstance(payload.get("turn_id"), str) or \
+                    not isinstance(identity, str) or not identity or identity in identities or \
+                    not isinstance(argv, list) or not argv or any(not isinstance(word, str) or "\x00" in word for word in argv) or \
+                    not isinstance(item.get("parsed_cmd"), list) or item.get("source") not in {
+                        "agent", "user_shell", "unified_exec_startup", "unified_exec_interaction"} or \
+                    item.get("status") not in {"in_progress", "completed", "failed", "declined"} or \
+                    not (output is None or isinstance(output, str)) or not (code is None or type(code) is int):
+                raise ValueError("native cwd command record is malformed")
+            _native_cwd_value(item.get("cwd"))
+            identities.add(identity)
+            native.append({"id": identity, "command": argv, "cwd": item["cwd"], "status": item["status"],
+                           "aggregated_output": output or "", "exit_code": code})
+        snapshot = {"thread_id": thread, "history_mode": "paginated", "cli_version": NATIVE_CWD_VERSION,
+                    "commands": native}
+        return {"snapshot": snapshot, "snapshot_sha256": _native_cwd_digest(snapshot),
+                "rollout_sha256": hashlib.sha256(raw).hexdigest(), "bindings": _bind_native_cwd(events, snapshot)}
+    except (OSError, ValueError, TypeError, KeyError, RecursionError, AuditAnalysisUnavailable):
+        return {"error": "working directory unverified: native capture missing, malformed or ambiguous"}
+
+
+def write_native_cwd_capture(events_path, captures):
+    path = native_cwd_path(events_path)
+    data = {"schema_version": 1, "events_sha256": sha256_file(events_path), "captures": captures}
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", prefix=path.name + ".", dir=path.parent,
+                                         delete=False) as handle:
+            temporary = Path(handle.name)
+            json.dump(data, handle, sort_keys=True)
+            handle.write("\n")
+        temporary.replace(path)
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
+
+
+def load_native_cwd_records(events_path):
+    """Revalidate parent-captured native evidence before live audit or resume, including every retry."""
+    try:
+        path = native_cwd_path(events_path)
+        data = json.loads(_native_cwd_bytes(path, path.parent).decode("utf-8"))
+        if data.get("schema_version") != 1 or data.get("events_sha256") != sha256_file(events_path):
+            return {}
+        groups = []
+        for event in parse_events(Path(events_path).read_text(encoding="utf-8")):
+            if event.get("type") == "thread.started":
+                groups.append([])
+            if not groups:
+                return {}
+            groups[-1].append(event)
+        captures = data["captures"]
+        if not isinstance(captures, list) or len(captures) != len(groups):
+            return {}
+        records, threads = {}, set()
+        for events, capture in zip(groups, captures):
+            snapshot = capture["snapshot"]
+            thread = snapshot["thread_id"]
+            if thread in threads or events[0].get("thread_id") != thread or \
+                    snapshot.get("history_mode") != "paginated" or snapshot.get("cli_version") != NATIVE_CWD_VERSION or \
+                    capture.get("snapshot_sha256") != _native_cwd_digest(snapshot) or \
+                    capture.get("bindings") != _bind_native_cwd(events, snapshot):
+                return {}
+            threads.add(thread)
+            native = {item["id"]: item for item in snapshot["commands"]}
+            stdout = {event["item"]["id"]: event["item"] for event in events
+                      if event.get("type") == "item.completed" and isinstance(event.get("item"), dict)
+                      and event["item"].get("type") == "command_execution"}
+            for binding in capture["bindings"]:
+                records[(thread, binding["item_id"])] = {"command": stdout[binding["item_id"]]["command"],
+                    "cwd": _native_cwd_value(native[binding["native_id"]]["cwd"])}
+        return records
+    except (OSError, ValueError, TypeError, KeyError, AttributeError, RecursionError, AuditAnalysisUnavailable):
+        return {}
+
+
+def recorded_command_cwd(item, cwd_records, allowed_roots, *, thread_id=None) -> tuple[str | None, list[str]]:
     """Bind a display to a caller-owned native record; stdout's cwd/workdir fields are not telemetry.
 
     Codex 0.162.1's exec JSONL omits cwd. A separately captured record must preserve the item identity,
-    exact display and absolute working directory. The runner has no such capture and never infers it from -C.
+    exact display and absolute working directory. Native captures bind a thread and remapped exec item together;
+    direct callers may supply a flat identity only when it occurs once in the whole stream. Never infer cwd from -C.
     """
     identity = item.get("id")
-    record = cwd_records.get(identity) if isinstance(identity, str) and isinstance(cwd_records, dict) else None
+    key = (thread_id, identity) if thread_id is not None else identity
+    record = cwd_records.get(key) if isinstance(identity, str) and isinstance(cwd_records, dict) else None
     if not isinstance(record, dict) or record.get("command") != item.get("command"):
         return None, ["working directory unverified: missing or mismatched independent command record"]
     cwd = record.get("cwd")
@@ -1490,21 +1833,30 @@ def blind_audit(events_path: Path, allowed_roots, tools=AUDIT_TOOLS, *, cwd_reco
     This statically parses Codex's recorded command display. It is not syscall/branch attestation: indirect
     script/config/symlink reads are not observed. Unsupported shell source/expansion and unresolved interpreted
     read or execution operands are refused. Every command needs an independent cwd record; the pinned exec
-    JSONL lacks it, so current native streams are explicitly unverified rather than assuming the turn cwd.
+    JSONL lacks it, so the verdict runner binds its separate paginated native capture, never the turn cwd.
     Executable words and interpreter read operands are distinguished from patterns and formatting data."""
     report = {"web_search": 0, "mcp_tool_calls": 0, "commands": 0, "flagged_commands": []}
     if not events_path.is_file():
         return report
-    completed = []
+    completed, unfinished, thread = [], [], None
     for line in events_path.read_text(encoding="utf-8", errors="replace").splitlines():
         try:
             event = json.loads(line)
         except ValueError:
             continue
-        if not isinstance(event, dict) or event.get("type") != "item.completed":
+        if not isinstance(event, dict):
+            continue
+        if event.get("type") == "thread.started":
+            thread = event.get("thread_id") if isinstance(event.get("thread_id"), str) else None
+        if event.get("type") not in ("item.started", "item.completed"):
             continue
         item = event.get("item") if isinstance(event.get("item"), dict) else {}
         kind = item.get("type")
+        if event.get("type") == "item.started":
+            if kind == "command_execution":
+                command = item.get("command") if isinstance(item.get("command"), str) else ""
+                unfinished.append((thread, command, item.get("id")))
+            continue
         if kind == "web_search":
             report["web_search"] += 1
         elif kind == "mcp_tool_call":
@@ -1512,13 +1864,28 @@ def blind_audit(events_path: Path, allowed_roots, tools=AUDIT_TOOLS, *, cwd_reco
         elif kind == "command_execution":
             report["commands"] += 1
             command = item.get("command") if isinstance(item.get("command"), str) else ""
-            completed.append((command, item))
+            completed.append((thread, command, item))
+            if isinstance(item.get("id"), str):
+                for index, start in enumerate(unfinished):
+                    if start == (thread, command, item["id"]):
+                        unfinished.pop(index)
+                        break
+    # Started commands can execute before a killed attempt produces a completion/native cwd record.
+    # openai/codex@092d3acd, exec/src/event_processor_with_jsonl_output.rs:343-349.
+    report["commands"] += len(unfinished)
+    report["flagged_commands"].extend({"command": command, "reasons": [
+        "working directory unverified: unfinished command has no completed native cwd record"]}
+        for _, command, _ in unfinished)
     try:
-        analyses = command_analyses([command for command, _ in completed]) if completed else []
-        identities = [item.get("id") for _, item in completed]
-        for (command, item), analysis in zip(completed, analyses):
-            cwd, reasons = recorded_command_cwd(item, cwd_records, allowed_roots)
-            if item.get("id") is not None and identities.count(item.get("id")) > 1:
+        analyses = command_analyses([command for _, command, _ in completed]) if completed else []
+        identities = [(scope, item.get("id")) for scope, _, item in completed]
+        flat_ids = [item.get("id") for _, _, item in completed]
+        for (scope, command, item), analysis in zip(completed, analyses):
+            identity = item.get("id")
+            scoped = isinstance(identity, str) and isinstance(cwd_records, dict) and (scope, identity) in cwd_records
+            binding_scope = scope if scoped or flat_ids.count(identity) > 1 else None
+            cwd, reasons = recorded_command_cwd(item, cwd_records, allowed_roots, thread_id=binding_scope)
+            if identity is not None and identities.count((scope, identity)) > 1:
                 cwd = None
                 reasons.append("working directory unverified: duplicate command identity")
             reasons += analysis_reasons(analysis, allowed_roots, tools, cwd=cwd)
@@ -2347,7 +2714,8 @@ def main(argv=None) -> int:
             prompt_text = fill_prompt(template, packet_path.resolve(), repo)
             tmp_out = codex_dir / f"{catalog}__{layer_id}.out.tmp"
             cmd = build_command(repo, strict_display, tmp_out, args.effort, prompt_text, args.model, ISOLATION_ARGS,
-                                provider=args.provider, omniroute_base_url=args.omniroute_base_url)
+                                provider=args.provider, omniroute_base_url=args.omniroute_base_url,
+                                ephemeral=not isolated)
             # The child's PATH has no codex, so the printed command names the one this PATH resolves.
             print(shlex.join(env_prefix + (blind_child_argv(cmd) if isolated else cmd)))
         return 0
@@ -2470,7 +2838,8 @@ def run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_d
         prompt_text = fill_prompt(template, packet_path.resolve(), repo)
         tmp_out = codex_dir / f"{name}.out.tmp"
         cmd = build_command(repo, strict_schema_path.resolve(), tmp_out, args.effort, prompt_text, args.model,
-                            ISOLATION_ARGS, provider=args.provider, omniroute_base_url=args.omniroute_base_url)
+                            ISOLATION_ARGS, provider=args.provider, omniroute_base_url=args.omniroute_base_url,
+                            ephemeral=CHILD_CODEX_HOME is None)
         events_path = events_dir / f"{name}.jsonl"
         if STOP.is_set():
             return
@@ -2478,6 +2847,8 @@ def run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_d
         # interrupted rerun never leaves it beside a truncated, clean-looking stream (round 8, NEW-1).
         out_path.unlink(missing_ok=True)
         events_path.write_text("", encoding="utf-8")
+        native_cwd_path(events_path).unlink(missing_ok=True)
+        captures = []
 
         succeeded = False
         last_model_name = None
@@ -2500,6 +2871,8 @@ def run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_d
                 for line in result["stdout"].splitlines():
                     if line.strip():
                         handle.write(line + "\n")
+            captures.append(capture_native_cwd(events, CHILD_CODEX_HOME))
+            write_native_cwd_capture(events_path, captures)
 
             model_name, usage = extract_events_summary(events)
             if model_name:
@@ -2550,7 +2923,7 @@ def run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_d
             # flagged layer (a read outside the export and packets, web search or an MCP tool) is void, as an
             # adjudication judgment is, since it may have read the packet keys or another lane's return (Codex review
             # of #145). Its return is kept only as <name>.json.audit-flagged, and the layer is recorded as failed.
-            report = blind_audit(events_path, roots, tools)
+            report = blind_audit(events_path, roots, tools, cwd_records=load_native_cwd_records(events_path))
             record_audit(name, report)
             if blind and audit_is_flagged(report):
                 out_path.unlink(missing_ok=True)
@@ -2569,7 +2942,8 @@ def run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_d
         if not succeeded:
             # A stale return (e.g. one rejected for an older packet hash) must
             # not survive, so record_verdicts.py records this `failed` reason.
-            record_audit(name, blind_audit(events_path, roots, tools))
+            record_audit(name, blind_audit(events_path, roots, tools,
+                                          cwd_records=load_native_cwd_records(events_path)))
             out_path.unlink(missing_ok=True)
             record_failure(catalog, layer_id, f"failed after retry: {last_failure}")
 

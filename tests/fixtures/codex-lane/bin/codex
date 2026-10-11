@@ -65,9 +65,80 @@ All behavior is env-var driven so a single script fixture serves every test:
 import json
 import os
 import signal
+import shlex
 import sys
 import time
+import uuid
+from datetime import datetime
 from pathlib import Path
+
+
+def native_journal_fixture(args, text, attempt):
+    """Emit vendor-shaped native history in this fixture's scratch home; execute no command payload.
+
+    Codex 0.162.1 requests Paginated history when exec is non-ephemeral. Its native cwd comes
+    from the executor, independently of fields supplied in a stdout item. Fixture controls
+    CODEX_FAKE_NATIVE_JOURNAL_MODE and CODEX_FAKE_NATIVE_CWD exercise missing/mismatched input.
+    """
+    if "-C" not in args or not os.environ.get("CODEX_HOME"):
+        return text
+    root = Path(args[args.index("-C") + 1]).resolve()
+    thread_id = str(uuid.uuid4())
+    events = [json.loads(line) for line in text.splitlines() if line.strip()]
+    if not any(event.get("type") == "thread.started" for event in events):
+        events.insert(0, {"type": "thread.started", "thread_id": thread_id})
+    for event in events:
+        if event.get("type") == "thread.started":
+            event["thread_id"] = thread_id
+    unfinished = {int(value) for value in os.environ.get("CODEX_FAKE_UNFINISHED_ATTEMPTS", "").split(",") if value}
+    if attempt in unfinished:
+        for event in events:
+            item = event.get("item", {})
+            if item.get("type") == "command_execution":
+                event["type"] = "item.started"
+                item["command"] = os.environ.get("CODEX_FAKE_UNFINISHED_COMMAND", item["command"])
+                item.update(status="in_progress", aggregated_output="", exit_code=None)
+    native_items = []
+    mode = os.environ.get("CODEX_FAKE_NATIVE_JOURNAL_MODE", "complete")
+    for event in events:
+        item = event.get("item", {})
+        if event.get("type") != "item.completed" or item.get("type") != "command_execution":
+            continue
+        item.setdefault("aggregated_output", "")
+        item.setdefault("exit_code", 0)
+        item.setdefault("status", "completed")
+        native_argv = shlex.split(item["command"])
+        if mode == "mismatched_argv":
+            native_argv.append("unmatched-native-argument")
+        cwd_map = json.loads(os.environ.get("CODEX_FAKE_NATIVE_CWD_MAP", "{}"))
+        cwd = Path(cwd_map.get(str(attempt), os.environ.get("CODEX_FAKE_NATIVE_CWD", str(root)))).resolve()
+        native = {"type": "CommandExecution", "id": f"native-{len(native_items)}-{thread_id}",
+                  "command": native_argv, "cwd": cwd.as_uri(), "parsed_cmd": [],
+                  "source": "unified_exec_startup",
+                  "status": item["status"], "exit_code": item["exit_code"],
+                  "aggregated_output": item["aggregated_output"], "process_id": None}
+        if mode == "malformed":
+            native.pop("parsed_cmd")
+        native_items.append(native)
+        if mode == "ambiguous":
+            native_items.append({**native, "id": "another-native-call"})
+    if "--ephemeral" not in args and mode != "missing":
+        stamp = datetime.now().astimezone()
+        meta_id = str(uuid.uuid4()) if mode == "mismatched_thread" else thread_id
+        rows = [{"timestamp": stamp.isoformat(), "type": "session_meta", "payload": {
+            "session_id": str(uuid.uuid4()) if mode == "mismatched_session" else meta_id,
+            "id": meta_id, "cwd": str(root), "timestamp": stamp.isoformat(),
+            "cli_version": "0.162.1", "source": "exec", "originator": "codex_exec",
+            "history_mode": "legacy" if mode == "legacy" else "paginated"}}]
+        rows.extend({"timestamp": stamp.isoformat(), "type": "event_msg", "payload": {
+            "type": "item_completed", "thread_id": meta_id, "turn_id": "fixture-turn",
+            "started_at_ms": 0, "completed_at_ms": 1, "item": item}}
+            for item in native_items)
+        folder = Path(os.environ["CODEX_HOME"]) / "sessions" / stamp.strftime("%Y/%m/%d")
+        folder.mkdir(parents=True, exist_ok=True)
+        journal = folder / f"rollout-{stamp.strftime('%Y-%m-%dT%H-%M-%S')}-{thread_id}.jsonl"
+        journal.write_text("".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8")
+    return "".join(json.dumps(event) + "\n" for event in events)
 
 
 def main() -> int:
@@ -99,11 +170,12 @@ def main() -> int:
     for needle, path in json.loads(os.environ.get("CODEX_FAKE_EVENTS_MAP") or "{}").items():
         if needle in joined:
             events_file = path
+    events_text = native_journal_fixture(sys.argv[1:], Path(events_file).read_text(encoding="utf-8"), attempt) if events_file else ""
     # CODEX_FAKE_EMIT_BEFORE_SLEEP=1 writes the events first, so a timed-out
     # attempt still leaves partial output for the runner to capture.
     emit_first = os.environ.get("CODEX_FAKE_EMIT_BEFORE_SLEEP") == "1"
     if events_file and emit_first:
-        sys.stdout.write(Path(events_file).read_text(encoding="utf-8"))
+        sys.stdout.write(events_text)
         sys.stdout.flush()
 
     sleep_seconds = float(os.environ.get("CODEX_FAKE_SLEEP_SECONDS", "0") or "0")
@@ -114,7 +186,7 @@ def main() -> int:
         time.sleep(sleep_seconds)
 
     if events_file and not emit_first:
-        sys.stdout.write(Path(events_file).read_text(encoding="utf-8"))
+        sys.stdout.write(events_text)
         sys.stdout.flush()
 
     term_match = os.environ.get("CODEX_FAKE_TERM_PARENT_MATCH")

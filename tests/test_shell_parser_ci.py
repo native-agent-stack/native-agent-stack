@@ -345,8 +345,13 @@ def provisioning_problems(text, job_id=PROVISIONING_JOB):
     lines = step.splitlines()
     if "continue-on-error" in step:
         problems.append(("enforced", "the step continues on error"))
-    if any(line.startswith(("        if:", "      - if:")) for line in lines):
-        problems.append(("enforced", "the step has a condition, so some events would skip the install"))
+    def conditions(block):
+        return [line.split("if:", 1)[1].strip() for line in uncommented(block).splitlines()
+                if line.startswith(("        if:", "      - if:"))]
+
+    # The remaining suite jobs always provision the parser; main retired macOS CI.
+    if conditions(step):
+        problems.append(("enforced", "the install step is conditional"))
     if "${{" in step:
         problems.append(("enforced", "the step expands an expression inside its script"))
     return problems

@@ -205,7 +205,8 @@ class CodexLaneTests(CodexLaneFixture):
         self.assertIn("--sandbox", printed)
         self.assertIn("read-only", printed)
         self.assertIn("--skip-git-repo-check", printed)
-        self.assertIn("--ephemeral", printed)
+        # Verdict runs retain native command cwd history in their fresh scratch home.
+        self.assertNotIn("--ephemeral", printed)
         self.assertIn("--output-schema", printed)
         self.assertIn("model_reasoning_effort=max", printed)
         # Nothing written: not even the codex/ directory.
@@ -440,8 +441,12 @@ class CodexLaneTests(CodexLaneFixture):
         events_path = self.work_dir / "codex" / "events" / "foundation__native-clients.jsonl"
         self.assertTrue(events_path.exists())
         captured = events_path.read_text(encoding="utf-8")
-        first_event = CANNED_EVENTS.strip().splitlines()[0]
-        self.assertIn(first_event, captured, "partial output of a timed-out attempt must be kept, not discarded")
+        partial_payload = CANNED_EVENTS.strip().splitlines()[2]
+        self.assertIn(partial_payload, captured, "partial output of a timed-out attempt must be kept, not discarded")
+        threads = [event["thread_id"] for event in codex_lane.parse_events(captured)
+                   if event.get("type") == "thread.started"]
+        self.assertEqual(len(threads), 2)
+        self.assertEqual(len(set(threads)), 2, "each timed-out child retains its own native thread identity")
 
     def test_layers_filter_only_runs_the_selected_layer(self):
         self.write_packet("foundation", "layer-a")
@@ -813,6 +818,63 @@ class BlindIsolationTests(CodexLaneFixture):
         # The parser cannot resolve an iteration variable into a bounded read operand.
         self.assertTrue(self.audit_reasons("/bin/bash -lc 'for f in a b; do cat $f; done'"))
 
+
+
+class LiteralBoundaryRegressionTests(unittest.TestCase):
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        self.base = Path(temporary.name).resolve()
+        self.repo = self.base / "export"
+        self.packets = self.base / "packets"
+        self.repo.mkdir()
+        self.packets.mkdir()
+
+    def audit_python(self, code):
+        self.assertIsNone(codex_lane.audit_analysis_issue(), "literal tests require the verified parser")
+        command = shlex.join(["/bin/bash", "-lc", "python3 -c " + shlex.quote(code)])
+        events = self.base / "literal-events.jsonl"
+        events.write_text(json.dumps({"type": "item.completed", "item": {
+            "type": "command_execution", "command": command}}) + "\n", encoding="utf-8")
+        return audit_with_fixture_cwd(events, [str(self.repo), str(self.packets)])
+
+    def test_outside_literals_at_read_interfaces_do_not_depend_on_a_fixed_call_list(self):
+        cases = {
+            "linecache": "import linecache;linecache.getline('../codex/foundation__x.json',1)",
+            "sqlite": "import sqlite3;sqlite3.connect('/var/lib/x')",
+            "fileio": "import io;io.FileIO('/etc/passwd')",
+            "fileinput": "import fileinput;fileinput.input(files='/etc/passwd')",
+            "copyfile": "import shutil;shutil.copyfile('/etc/passwd','evidence/copy')",
+            "getsize": "import os;os.path.getsize('/etc/passwd')",
+            "pandas": "import pandas;pandas.read_json('/srv/x')",
+            "walk_root": "import os;list(os.walk('/'))",
+        }
+        for interface, code in cases.items():
+            with self.subTest(interface=interface):
+                self.assertTrue(self.audit_python(code)["flagged_commands"], "an unproven outside literal must be refused")
+
+    def test_proven_print_formatting_and_comparison_literals_remain_data(self):
+        cases = [
+            "print('/etc/passwd')",
+            "print('/'.join(['a','b']))",
+            "import json;print(json.dumps({'reference':'/etc/passwd'},indent=2))",
+            "if '://' in 'file:///outside/file':\n print('external')",
+        ]
+        for code in cases:
+            with self.subTest(data_use=code):
+                self.assertEqual(self.audit_python(code)["flagged_commands"], [])
+
+    def test_data_operations_do_not_prove_unknown_or_mutated_calls_safe(self):
+        cases = [
+            "import sqlite3;sqlite3.connect('/'.join(['','var','lib','x']))",
+            "print=open;print('/etc/passwd')",
+            "def print(value):\n return value\nprint('/etc/passwd')",
+            "import json;setattr(json,'dumps',open);print(json.dumps('/etc/passwd'))",
+            "import sqlite3;path='/var/lib/x';sqlite3.connect(path)",
+        ]
+        for code in cases:
+            with self.subTest(unproven_use=code):
+                self.assertTrue(self.audit_python(code)["flagged_commands"], "data must not launder an outside literal")
 
 
 class NativeUsageSuffixTests(unittest.TestCase):
@@ -2542,6 +2604,127 @@ class IncrementalFailuresTests(unittest.TestCase):
 
         with self.assertRaises(SystemExit):
             self.run_pending(self.pending("a-layer"), interrupted_before_child, layers="foundation__a-layer")
+
+
+class NativeCwdCaptureTests(CodexLaneFixture):
+    """Native command history binds cwd for live and resumed verdict attempts; no model is called."""
+
+    def setUp(self):
+        super().setUp()
+        self.write_packet("foundation", "native-clients")
+        command = shlex.join(["/bin/bash", "-lc", "cat evidence/receipt.json"])
+        self.events_file.write_text(CANNED_EVENTS + "\n" + json.dumps({"type": "item.completed", "item": {
+            "id": "item_0", "type": "command_execution", "command": command,
+            "cwd": str(self.repo), "workdir": str(self.repo),
+            "aggregated_output": "fixture receipt\n", "exit_code": 0, "status": "completed"}}) + "\n",
+            encoding="utf-8")
+        self.options = ["--provider", "omniroute", "--omniroute-base-url", "http://127.0.0.1:21128/v1"]
+
+    def run_native_fixture(self):
+        with contextlib.redirect_stderr(io.StringIO()):
+            return self.run_lane(self.options)
+
+    def test_launch_root_is_accepted_with_native_cwd_and_resumes_without_another_child(self):
+        self.assertEqual(self.run_native_fixture(), 0, "a native-recorded launch cwd must bind the relative read")
+        calls = self.argv_calls()
+        self.assertEqual(len(calls), 1)
+        self.assertNotIn("--ephemeral", calls[0])
+        self.assertTrue(self.out_path("foundation", "native-clients").is_file())
+        self.assertEqual(self.run_native_fixture(), 0)
+        self.assertEqual(self.argv_calls(), calls, "resume must rebind retained native evidence without another child")
+
+    def test_missing_or_mismatched_native_evidence_never_uses_model_cwd(self):
+        for mode in ("missing", "mismatched_argv", "mismatched_thread", "legacy", "ambiguous", "malformed",
+                     "mismatched_session"):
+            with self.subTest(mode=mode):
+                os.environ["CODEX_FAKE_NATIVE_JOURNAL_MODE"] = mode
+                self.assertEqual(self.run_native_fixture(), 1)
+                self.assertFalse(self.out_path("foundation", "native-clients").exists())
+                audit = json.loads((self.work_dir / "codex" / codex_lane.AUDIT_NAME).read_text(encoding="utf-8"))
+                self.assertTrue(audit["layers"]["foundation__native-clients"]["flagged_commands"])
+
+    def test_native_workdir_outside_the_launch_root_is_refused(self):
+        os.environ["CODEX_FAKE_NATIVE_CWD"] = "/outside"
+        self.assertEqual(self.run_native_fixture(), 1)
+        self.assertFalse(self.out_path("foundation", "native-clients").exists())
+        audit = json.loads((self.work_dir / "codex" / codex_lane.AUDIT_NAME).read_text(encoding="utf-8"))
+        reasons = [reason for item in audit["layers"]["foundation__native-clients"]["flagged_commands"]
+                   for reason in item["reasons"]]
+        self.assertTrue(any("working directory outside" in reason for reason in reasons), reasons)
+
+    def test_resume_with_missing_or_corrupt_native_capture_reruns_the_child(self):
+        capture = self.work_dir / "codex" / "events" / "foundation__native-clients.native-cwd.json"
+        for damage in ("missing", "invalid_json", "changed_events", "changed_capture"):
+            with self.subTest(damage=damage):
+                self.assertEqual(self.run_native_fixture(), 0)
+                before = len(self.argv_calls())
+                if damage == "missing":
+                    capture.unlink()
+                elif damage == "invalid_json":
+                    capture.write_text("{", encoding="utf-8")
+                else:
+                    data = json.loads(capture.read_text(encoding="utf-8"))
+                    if damage == "changed_events":
+                        data["events_sha256"] = "0" * 64
+                    else:
+                        data["captures"][0]["snapshot"]["commands"][0]["cwd"] = "file:///outside"
+                    capture.write_text(json.dumps(data), encoding="utf-8")
+                self.assertEqual(self.run_native_fixture(), 0)
+                self.assertEqual(len(self.argv_calls()), before + 1,
+                                 "a kept return without intact independent cwd evidence must rerun")
+
+    def test_retry_keeps_an_unsafe_cwd_from_the_first_failed_attempt(self):
+        os.environ["CODEX_FAKE_FAIL_ATTEMPTS"] = "1"
+        os.environ["CODEX_FAKE_NATIVE_CWD_MAP"] = json.dumps({"1": "/outside"})
+        self.assertEqual(self.run_native_fixture(), 1)
+        self.assertEqual(len(self.argv_calls()), 2)
+        self.assertFalse(self.out_path("foundation", "native-clients").exists())
+        audit = json.loads((self.work_dir / "codex" / codex_lane.AUDIT_NAME).read_text(encoding="utf-8"))
+        reasons = [reason for item in audit["layers"]["foundation__native-clients"]["flagged_commands"]
+                   for reason in item["reasons"]]
+        self.assertTrue(any("working directory outside" in reason for reason in reasons), reasons)
+
+    def test_unfinished_command_start_is_unverified_and_a_completed_pair_counts_once(self):
+        path = self.work_dir / "unfinished.jsonl"
+        item = {"id": "item_0", "type": "command_execution", "status": "in_progress",
+                "command": shlex.join(["/bin/bash", "-lc", "cat /srv/outside.txt"])}
+        rows = [{"type": "thread.started", "thread_id": "fixture-thread"},
+                {"type": "item.started", "item": item}]
+        roots = [str(self.repo), str(self.work_dir / "packets")]
+        path.write_text("".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8")
+        audit = codex_lane.blind_audit(path, roots)
+        self.assertEqual(audit["commands"], 1)
+        self.assertTrue(audit["flagged_commands"], "an unfinished command has no completed native cwd evidence")
+
+        item["command"] = shlex.join(["/bin/bash", "-lc", "cat evidence/receipt.json"])
+        rows.append({"type": "item.completed", "item": {**item, "status": "completed"}})
+        path.write_text("".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8")
+        audit = codex_lane.blind_audit(path, roots, cwd_records={
+            "item_0": {"command": item["command"], "cwd": str(self.repo)}})
+        self.assertEqual(audit["commands"], 1)
+        self.assertEqual(audit["flagged_commands"], [])
+
+    def test_retry_keeps_an_unfinished_command_from_the_first_failed_attempt(self):
+        os.environ["CODEX_FAKE_FAIL_ATTEMPTS"] = "1"
+        os.environ["CODEX_FAKE_UNFINISHED_ATTEMPTS"] = "1"
+        os.environ["CODEX_FAKE_UNFINISHED_COMMAND"] = shlex.join(["/bin/bash", "-lc", "cat /srv/outside.txt"])
+        self.assertEqual(self.run_native_fixture(), 1)
+        self.assertEqual(len(self.argv_calls()), 2)
+        self.assertFalse(self.out_path("foundation", "native-clients").exists())
+        audit = json.loads((self.work_dir / "codex" / codex_lane.AUDIT_NAME).read_text(encoding="utf-8"))
+        layer = audit["layers"]["foundation__native-clients"]
+        self.assertEqual(layer["commands"], 2)
+        self.assertTrue(any("unfinished" in reason for item in layer["flagged_commands"] for reason in item["reasons"]))
+
+    def test_retry_threads_can_reuse_exec_item_ids_without_cwd_collision(self):
+        os.environ["CODEX_FAKE_FAIL_ATTEMPTS"] = "1"
+        self.assertEqual(self.run_native_fixture(), 0)
+        self.assertEqual(len(self.argv_calls()), 2)
+        events = codex_lane.parse_events((self.work_dir / "codex" / "events" / "foundation__native-clients.jsonl").read_text())
+        threads = [event["thread_id"] for event in events if event.get("type") == "thread.started"]
+        self.assertEqual(len(set(threads)), 2)
+        audit = json.loads((self.work_dir / "codex" / codex_lane.AUDIT_NAME).read_text(encoding="utf-8"))
+        self.assertEqual(audit["layers"]["foundation__native-clients"]["flagged_commands"], [])
 
 
 if __name__ == "__main__":

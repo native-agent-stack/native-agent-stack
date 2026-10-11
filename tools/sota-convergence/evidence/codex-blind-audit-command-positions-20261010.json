@@ -1,10 +1,22 @@
 {
   "schema_version": 1,
-  "checked_at": "2026-10-10T21:02:00Z",
+  "checked_at": "2026-10-11T01:17:39Z",
+  "historical_pre_review_checked_at": "2026-10-10T21:02:00Z",
   "base_commit": "c4f4990737c4e2ed8f0452d069e25a460f897bb5",
+  "base_commit_scope": "historical landing rebase; the review correction is a forward commit on fix_parent_commit",
   "original_branch_base": "9d4c00cd05d79b3fd5074df2e46bacab87ee67ff",
-  "status": "structured_audit_and_supervisor_regressions_passed_cwd_unverified",
-  "codex_lane_py_sha256": "e0cc01afa277c820b5235e665ad0d5dda6948adc91559ef6c65c81461e8e32a3",
+  "status": "required_modules_qualified_native_cwd_live_unmeasured",
+  "fix_parent_commit": "9ffdbff728ca422eeeb39b05e8d9d5a3fa53b06c",
+  "historical_pre_review_codex_lane_py_sha256": "e0cc01afa277c820b5235e665ad0d5dda6948adc91559ef6c65c81461e8e32a3",
+  "intermediate_native_capture_codex_lane_py_sha256": "7710b726fafaa4bfa7e7076cc452a6e4fb9a822c7d164db2c36410eb1133e8fc",
+  "codex_lane_py_sha256": "e08169635a1a60f5765d7cc6bf71e170da6c52a6ee107690b779d212264efebd",
+  "frozen_source_identity": {
+    "codex_lane_py_sha256": "e08169635a1a60f5765d7cc6bf71e170da6c52a6ee107690b779d212264efebd",
+    "test_codex_lane_sha256": "7485f82f1393abec62ac5bc9e0127ce0f9e76b9a6366b8dd266dead1db758ad6",
+    "native_fixture": "tests/fixtures/codex-lane/bin/codex",
+    "native_fixture_sha256": "f9dbe5e6f4988c865780b1ff4ddbfca56c6df1e500ba578ac27cd631a1df793e",
+    "verification_status": "native eight-method final replay and targeted safety classes pass; all six required modules qualified by the scoped candidate bundle and corrective parser-policy rerun"
+  },
   "adapter_sha256": "bcb1b9d483901259aee4cdafa3d779a2c2ee2feec71cb997257035b4549939dd",
   "audit_interface": {
     "class": "source_review",
@@ -14,9 +26,18 @@
     "conversion_source": "codex-rs/exec/src/event_processor_with_jsonl_output.rs:162-180",
     "consumed_command_field": "display string; no argv, cwd or read/syscall event fields",
     "method": "static executable-position, read-operand and interpreter-source parsing; execute no payload",
-    "cwd_status": "Current native exec JSONL streams are explicitly unverified. The runner supplies no independent cwd records and never infers them from -C or stdout cwd/workdir fields.",
-    "cwd_sources": ["codex-rs/app-server-protocol/src/protocol/item_builders.rs:56-60/96-142", "codex-rs/shell-command/src/parse_command.rs:10-13", "codex-rs/core/src/tools/handlers/shell_spec.rs:40-45", "codex-rs/exec/src/event_processor_with_jsonl_output.rs:327-365"],
-    "cwd_binding": "Caller-owned native records must match independent command identity, exact display and approved absolute cwd. App-server call IDs and exec item IDs require a captured native mapping; repeated, missing, mismatched or outside records refuse. Directory-changing commands remain unverified."
+    "cwd_status": "Exec JSONL alone remains unverified. The corrected blind verdict lane uses supported non-ephemeral paginated history in a fresh scratch CODEX_HOME; uniquely matching native completed commands supply independent cwd records. Live provider execution of this new capture path is UNMEASURED.",
+    "cwd_sources": ["codex-rs/app-server-protocol/src/protocol/item_builders.rs:56-60/96-142", "codex-rs/shell-command/src/parse_command.rs:10-13", "codex-rs/core/src/tools/handlers/unified_exec/exec_command.rs:192-204", "codex-rs/protocol/src/items.rs:244-281", "codex-rs/exec/src/lib.rs:1459-1462", "codex-rs/exec/src/event_processor_with_jsonl_output.rs:162-180/327-365", "codex-rs/rollout/src/policy.rs:17-19/227-280"],
+    "cwd_binding": "Bind the projected exec item identity to a unique completed native command in the same thread by exact decoded outer argv, status, exit code and aggregated output, plus an approved absolute cwd. Native call IDs and exec item IDs are not assumed equal. Repeated, missing, ambiguous, mismatched, incomplete or outside records refuse. Directory-changing commands remain unverified.",
+    "native_record_fields": ["id", "command", "cwd", "parsed_cmd", "source", "status", "aggregated_output", "exit_code"],
+    "native_rollout_metadata": "0.162.1 paginated history from source exec with native id matching the fresh root exec thread; a present session_id must also match, while older metadata without session_id uses native id fallback. Only matching scratch-home rollout files are read.",
+    "native_session_identity_source": "codex-rs/protocol/src/protocol.rs:3159-3161/3288-3293 at 092d3acd6bec3e3a14bdc7e7a2810ab628ab759d",
+    "incomplete_command_policy": "An exact start/completion pair in the same thread counts once. Unmatched command starts remain unverified across retries, including when a later attempt succeeds.",
+    "retained_binding_sidecar": "events/<layer>.native-cwd.json; full-events digest, per-attempt native snapshots/digests and explicit item/native bindings survive retry/resume",
+    "native_capture_limits": {"capture_and_sidecar_bytes": 8388608, "upstream_persisted_output_bytes": 65536},
+    "native_capture_limits_status": "verified at final frozen runner e0816963; no-follow regular single-link rollout and sidecar reads; exactly one matching scratch-home rollout",
+    "default_builder_ephemeral": true,
+    "copies_real_codex_home": false
   },
   "original_policy_sites": {
     "revision": "9d4c00cd05d79b3fd5074df2e46bacab87ee67ff",
@@ -41,6 +62,7 @@
   },
   "fail_before": {
     "class": "synthetic",
+    "record_status": "historical compatibility-adapted command-only replay; not an unmodified new-test-class replay",
     "core_revision": "9d4c00cd05d79b3fd5074df2e46bacab87ee67ff",
     "core_sha256": "3ed9524ca7523b30a1258a18a06b1c7c7cc6d5f9826c2c14edfbc91394148d7a",
     "harness": "/tmp/runtime-workers-audit-quarantine-replay-20261010/replay.py",
@@ -64,6 +86,7 @@
   },
   "fresh_same_case_replay": {
     "class": "synthetic",
+    "record_status": "historical pre-review measurement at e0cc01af; superseded for current-source validation by the scoped correction records and final required bundle",
     "method": "Compile byte-verified unchanged original main from Git; run the same four exact quarantine methods plus the actual-root control in memory. The fixture creates synthetic independent command-id/cwd records; the baseline harness drops only the unsupported cwd_records keyword and supplies a no-op parser preflight. The approved packet stub is fixture-side only. Original audit source, code object and bytecode remain unchanged. No live stream is restamped.",
     "test_file_sha256": "3a433a97d3fdf2a88d2907ec9cabd17ba395831606dd5b40970cd17be65c9683",
     "unchanged_base": {"tests": 5, "failures": 4, "errors": 0, "skips": 0, "exit_code": 1, "elapsed_seconds": 0.006},
@@ -89,7 +112,7 @@
     "lane_provenance_sha256": "2ab850e4623196676ea55c7f651df9c5beeb58ca6be7c457000b1fac91df278c",
     "covers": ["three exact real quarantines", "real Git/root/outside reads", "pattern/filter files", "shell/wrapper/interpreter indirection refusal", "Python callable aliases and keyword/chained/metadata reads", "nested subprocess argv", "bounded resolver refusal", "parser missing/tampered preflight", "native exact provenance assertion", "native no-provider-fields assertions", "unchanged isolation args and README block", "CI parser provisioning", "Bash command-position oracle", "append-only code/prompt registries"]
   },
-  "required_tests": {
+  "historical_required_tests_at_9ffdbff7": {
     "class": "local_integration",
     "fixture_input_class": "synthetic",
     "command": "nice -n 10 ionice -c 3 python3 -B -m unittest tests.test_codex_lane tests.test_shell_parser_ci tests.test_lane_packets tests.test_verdict_lane_vendoring -v",
@@ -108,30 +131,182 @@
     "log_sha256": "de8b53a6459cd51a0ade035370573f9a341fdf6100d99f26f4abdd7b65689fab",
     "covers": ["all four exact commands with synthetic independent cwd records", "real git/root/outside reads remain refused", "missing/model-supplied cwd unverified", "independent cwd binding and changed-cwd refusal", "bounded checksummed packet projection and mutation refusal", "native layer usage and immutable prefix", "atomic incremental failures and orderly signal-stop snapshot", "native exact provenance and no-provider-fields", "isolation args and README block", "CI parser provisioning", "#971 packet and vendoring guards", "landed provenance annotations preserved"]
   },
+  "review_correction_regressions": {
+    "class": "synthetic",
+    "checked_at": "2026-10-11T00:41:44Z",
+    "coordination_record": "lanes/runtime-workers-pr990-20261011/verification-summary.json",
+    "coordination_record_sha256": "f500f535f70bccd957a1ed8c558d8b56e21db5c6d841edaaeb000883fa85d94a",
+    "command": "python3 <coordination-dir>/runtime-workers-pr990-20261011/verification.command.log",
+    "original_base": "9d4c00cd05d79b3fd5074df2e46bacab87ee67ff",
+    "review_base": "9ffdbff728ca422eeeb39b05e8d9d5a3fa53b06c",
+    "measured_wip_codex_lane_sha256": "f293f539d544085392e0187a5ce3fec8eca4e81ed916d34c53a66575a8ca6728",
+    "measured_wip_test_codex_lane_sha256": "b6c76d5f644817c98a295ebfc7f53cf92461478752bccd21c78ee7e20e76e7c8",
+    "source_scope": "Intermediate WIP inputs were unchanged during these narrow replays; final native-capture implementation and required-suite source identity are recorded separately.",
+    "literal_boundary": {
+      "selection": "tests.test_codex_lane.LiteralBoundaryRegressionTests",
+      "before": {"tests": 3, "failed_subtests": 11, "errors": 0, "skips": 0, "exit_code": 1, "log": "literal-boundary-red-9ffdbff7.log", "log_sha256": "5b75248f28b541cdbc1a7f6435a0149b8f1d13e405be2ce0db5e51a1588cfc9b"},
+      "after": {"tests": 3, "failures": 0, "errors": 0, "skips": 0, "exit_code": 0, "log": "literal-boundary-green-wip.log", "log_sha256": "baab0a0eaa96c518f5a9e6231827e25be8df98ada74dcd0804d80f05ecc9c8f5"},
+      "seven_missed_interfaces": ["linecache.getline", "sqlite3.connect", "io.FileIO", "fileinput.input", "shutil.copyfile", "os.path.getsize", "pandas.read_json"],
+      "four_other_failures": ["sqlite computed join", "locally redefined print", "mutated json.dumps", "sqlite assigned path"],
+      "controls_already_passing_before_fix": ["os.walk('/')", "print rebound to open"],
+      "correction": "The root-walk control is newly retained coverage, not a reproduced baseline failure. The fixed call-name list missed the seven interfaces and four laundering or mutation cases."
+    },
+    "quarantine_command_selection": {
+      "selection": ["BlindAuditQuarantineRegressionTests.test_document_retrieval_python_join_separator_is_not_a_root_read", "BlindAuditQuarantineRegressionTests.test_git_github_automation_rg_pattern_is_not_git_execution", "BlindAuditQuarantineRegressionTests.test_mcp_surfaces_backtick_literal_in_a_quoted_heredoc_is_not_substitution", "BlindAuditQuarantineRegressionTests.test_workers_packet_reference_walk_is_clean"],
+      "unadapted_original_base": {"tests": 4, "failures": 0, "errors": 4, "error_type": "AttributeError: missing audit_analysis_issue", "skips": 0, "exit_code": 1, "log": "quarantine-unadapted-original-9d4c00cd.log", "log_sha256": "ae6bc921aa3c59ddef8cdf82c1fd057bc90d08f72635b4841dff83b2370cf5c5"},
+      "compatibility_adapted_original_base": {"tests": 4, "failures": 4, "errors": 0, "skips": 0, "exit_code": 1, "log": "quarantine-adapted-original-9d4c00cd.log", "log_sha256": "883937346a819b4e6c06558ef3d0038397155c0917f45f8c2cfcc02567d9eb63"},
+      "compatibility": "Fixture-side no-op parser preflight and removal of only the unsupported cwd_records keyword. Original auditor code identity and co_code remain unchanged.",
+      "original_auditor_code_sha256": "4b19e7ec26861419edd8587d1b0020ed767ba95e8e35a74939856a3311e134fc",
+      "separate_original_root_control": {"tests": 1, "failures": 0, "errors": 0, "skips": 0, "exit_code": 0, "log": "quarantine-root-control-adapted-original-9d4c00cd.log", "log_sha256": "a7d6c4692b4c813d2af57247b92df89096ff78e60995dc6442ad281d35bda2e8"},
+      "after": {"tests": 4, "failures": 0, "errors": 0, "skips": 0, "exit_code": 0, "log": "quarantine-green-wip.log", "log_sha256": "550481b452597bd29c303eb0706f04646d20ee5d74530b7a7dbeb3c140ea6906"},
+      "correction": "Four failures and zero errors describes the explicitly compatibility-adapted command selection only. The same four unadapted tests error on the old API. The CC's broader class-replay API-error report is not claimed as reproduced by this narrow selection."
+    },
+    "workflow_full_mode_gate": {
+      "selection": "ValidateMacosModeTests.test_every_step_after_setup_python_runs_in_full_mode_only_except_three",
+      "before": {"tests": 1, "failures": 1, "errors": 0, "skips": 0, "exit_code": 1, "log": "workflow-parser-gate-red-9ffdbff7.log", "log_sha256": "5ff5a0dab4fde3c6cc1717cc268fae7ec21b9ed09b48f4c4c7883ad28f767ee6"},
+      "after": {"tests": 1, "failures": 0, "errors": 0, "skips": 0, "exit_code": 0, "log": "workflow-parser-gate-green-wip.log", "log_sha256": "6c145e041ed212351eefa1bc415864a8aef1e0a105108d619f0041ccf976dc40"},
+      "change": "The parser install step has the full-mode condition; expected guarded steps advance from 15 to 16."
+    },
+    "payload_commands_executed": 0,
+    "upstream_model_turns": 0
+  },
+  "native_cwd_capture_regressions": {
+    "class": "local_integration",
+    "measurement_scope": "intermediate 7710b726 capture implementation; source freeze revoked for an unfinished-started-command correction; final regression and required-bundle measurements are separate",
+    "native_input_class": "synthetic",
+    "selection": "tests.test_codex_lane.NativeCwdCaptureTests",
+    "method": "Run the native-history path with the local codex fixture; no live provider or model call. Compare the same six-method class against unchanged 9ffdbff7 compiled in memory, then the frozen correction.",
+    "before_revision": "9ffdbff728ca422eeeb39b05e8d9d5a3fa53b06c",
+    "before": {"tests": 6, "failed_subtests": 8, "errors": 0, "skips": 0, "exit_code": 1, "log": "native-cwd-before.log", "log_sha256": "8af7e79a40d173a406b269bb065218acea7d9beb6ee158e18ec0637851ffc311"},
+    "after": {"tests": 6, "failures": 0, "errors": 0, "skips": 0, "exit_code": 0, "elapsed_seconds": 31.884, "log": "native-cwd-after.log", "log_sha256": "143078703e34189f982835089013d6efa5b6cb9a03e81ac935673b277ad3f76d"},
+    "codex_lane_py_sha256": "7710b726fafaa4bfa7e7076cc452a6e4fb9a822c7d164db2c36410eb1133e8fc",
+    "test_codex_lane_sha256": "81ad68fd16a37ad89d5044388db2a02dfcffcb3bea3699bd7d07564253de5ccb",
+    "fixture": "tests/fixtures/codex-lane/bin/codex",
+    "fixture_sha256": "f5f95e170d59f48d1d96cf9439f433644d7312cfe4a27e8ec55b89d38788d112",
+    "native_fixture_fields": ["command", "cwd", "parsed_cmd", "source=unified_exec_startup", "status", "aggregated_output", "exit_code"],
+    "native_fixture_metadata": ["session_id", "history_mode=paginated", "cli_version=0.162.1", "source=exec"],
+    "live_provider_behavior": "UNMEASURED",
+    "upstream_model_turns": 0
+  },
+  "final_native_cwd_capture_regressions": {
+    "class": "local_integration",
+    "native_input_class": "synthetic",
+    "selection": "tests.test_codex_lane.NativeCwdCaptureTests",
+    "before_revision": "9ffdbff728ca422eeeb39b05e8d9d5a3fa53b06c",
+    "before": {"tests": 8, "failed_subtests": 10, "errors": 0, "skips": 0, "exit_code": 1, "log": "native-cwd-final-before.log", "log_sha256": "799057f8561887ed027700cac49dc5d4708dacda4d62df1b131e41bb91a984aa"},
+    "after": {"tests": 8, "failures": 0, "errors": 0, "skips": 0, "exit_code": 0, "elapsed_seconds": 39.781, "log": "native-cwd-final-after.log", "log_sha256": "4c6849d48672bf760e9eff60fdb32802a6050a7ccc7aa36da930d31f6b7c0833"},
+    "code_test_and_fixture_inputs_unchanged_during_run": true,
+    "codex_lane_py_sha256": "e08169635a1a60f5765d7cc6bf71e170da6c52a6ee107690b779d212264efebd",
+    "test_codex_lane_sha256": "7485f82f1393abec62ac5bc9e0127ce0f9e76b9a6366b8dd266dead1db758ad6",
+    "fixture": "tests/fixtures/codex-lane/bin/codex",
+    "fixture_sha256": "f9dbe5e6f4988c865780b1ff4ddbfca56c6df1e500ba578ac27cd631a1df793e",
+    "live_provider_behavior": "UNMEASURED",
+    "upstream_model_turns": 0
+  },
+  "intermediate_native_capture_diagnostics": {
+    "class": "local_integration",
+    "native_input_class": "synthetic",
+    "codex_lane_py_sha256": "7710b726fafaa4bfa7e7076cc452a6e4fb9a822c7d164db2c36410eb1133e8fc",
+    "measurement_scope": "Intermediate diagnostic results; no final passing claim. The native six-method GREEN did not cover unfinished started commands or all preserved precision tests.",
+    "full_codex_module": {"selection": "tests.test_codex_lane", "tests": 144, "failures": 4, "errors": 0, "exit_code": 1, "elapsed_seconds": 181.081, "unittest_elapsed_seconds": 181.080, "log": "codex-lane-full.log", "log_sha256": "21487bf9da69db28ba49be8ad0e0b5c5d1115dc474de2f130a0aed0ccb5beac0"},
+    "diagnostic_interpretation": "Three preserved literal precision tests need their data roles retained under fail-closed analysis; the timeout control's fixed fixture thread ID must match the native UUID fixture. Neither result is a passing final suite.",
+    "unfinished_and_session_identity_before": {"tests": 3, "failures": 3, "errors": 0, "exit_code": 1, "log": "native-unfinished-before.log", "log_sha256": "76573fe9ce897a66ee548933fed07d156706f93b8a7014abeba4cfd937dcc73e"},
+    "unfinished_and_session_identity_scope": "Focused fail-first controls on 7710b726 for command item.started without completion and mismatched native session identity; final correction and GREEN recorded separately.",
+    "upstream_model_turns": 0
+  },
+  "final_literal_precision_regressions": {
+    "class": "local_integration",
+    "fixture_input_class": "synthetic",
+    "command": "python3 -m unittest -v tests.test_codex_lane.BlindPathAndPrecisionTests.test_independent_review_of_206_reaches_still_flag tests.test_codex_lane.BlindPathAndPrecisionTests.test_the_voided_re_record_commands_are_clean tests.test_codex_lane.BlindPathAndPrecisionTests.test_wave_20260924_separator_and_regex_residuals",
+    "before": {"tests": 3, "failures": 3, "errors": 0, "exit_code": 1, "elapsed_seconds": 16.295, "log": "literal-precision-red.log", "log_sha256": "61a6d559b7f9960379f2ebf7daf1daf7aebf3836803a9d69cb785460c5c14b46"},
+    "before_codex_lane_sha256": "9fdfa92cb29059e51f5930ecbd552c1106abd64c944d7170bcef46799d4cb0b1",
+    "before_literal_is_data_sha256": "38e8333d038b54719596798d1c79f8ff22e4535e5d35748f8cc93b351e52df35",
+    "before_scope": "Intermediate source 9fdfa92c after native-start tracking work, distinct from both the 7710b726 diagnostic module and the original 9ffdbff7 literal-boundary replay.",
+    "after": {"tests": 3, "failures": 0, "errors": 0, "exit_code": 0, "elapsed_seconds": 17.400, "log": "literal-precision-green.log", "log_sha256": "9a0e68cc001907a57c420f10455ef2373fb2d17914ccb6a817180e1f5f1e2f97"},
+    "after_codex_lane_sha256": "e08169635a1a60f5765d7cc6bf71e170da6c52a6ee107690b779d212264efebd",
+    "after_literal_is_data_sha256": "922d36567edfe80e58b0241df73bba317b5d189912a6bce2feb0e319394ebb1d",
+    "source_unchanged_during_green": true,
+    "change": "Preserve composed safe read operands, dormant uncalled recursive separator formatting, and printed comparison/conditional data roles. Unknown/read call sinks remain closed; only primitive_data/literal_is_data change.",
+    "source": "CPython v3.13.16 Parser/Python.asdl:11-16/65/114-115 and Doc/reference/compound_stmts.rst:1246-1247/1250-1266/1298-1301; a function body runs only on call, while decorators/defaults execute separately",
+    "upstream_model_turns": 0
+  },
+  "final_literal_and_quarantine_safety": {
+    "class": "local_integration",
+    "fixture_input_class": "synthetic",
+    "command": "python3 -m unittest -v tests.test_codex_lane.LiteralBoundaryRegressionTests tests.test_codex_lane.BlindAuditQuarantineRegressionTests",
+    "tests": 19, "failures": 0, "errors": 0, "exit_code": 0, "elapsed_seconds": 80.740,
+    "log": "literal-and-quarantine-green.log",
+    "log_sha256": "58095f1d09066542063239a61a770b4b08a74e48abd9a7d8cda96c0a1a59f913",
+    "codex_lane_py_sha256": "e08169635a1a60f5765d7cc6bf71e170da6c52a6ee107690b779d212264efebd",
+    "test_codex_lane_sha256": "7485f82f1393abec62ac5bc9e0127ce0f9e76b9a6366b8dd266dead1db758ad6",
+    "source_and_tests_unchanged_during_run": true,
+    "upstream_model_turns": 0
+  },
+  "review_ci_baseline_refresh": {
+    "class": "local_integration",
+    "selection": "RepositoryWorkflowTests.test_advisory_baseline_and_explicit_categories_stay_bounded_on_this_repository",
+    "before": {"tests": 1, "failures": 1, "errors": 0, "exit_code": 1, "elapsed_seconds": 6.113, "log": "push-gate-baseline-red.log", "log_sha256": "9785f182c9b2617590191346837f2204f03a3b18d303b8be980d01f70a1e8ea3"},
+    "before_scope": "Original 9ffdbff7 test module compiled in memory against immutable 9ffdbff7 HEAD: codex_lane has 121 unclassified reads versus the historical baseline's 37.",
+    "historical_snapshot_retained": {"date": "2026-10-08", "unclassified_total": 330},
+    "new_snapshot": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261011-pr990.json",
+    "snapshot_sha256": "b8ff44c24b73981c63edcc0e956c9b8e59bf0b6f199d97ee1baa7e7b3389d9d6",
+    "snapshot_api": "unchanged GitTree -> derive_ci_protected -> advisory_gate_reads",
+    "immutable_candidate": "9d2ab50af8e8a2d5939abee26c0ff20fc84d992d",
+    "immutable_candidate_tree": "b75500c1f8ccbca6bf349a4a3e1862ed41ddd840",
+    "candidate_unresolved_count_asserted_before_generation": 0,
+    "snapshot_measurement": {"date": "2026-10-11", "unclassified_total": 424, "shape_locations": 101, "codex_lane_sites": 139, "monitoring_only": true},
+    "lane_acknowledgement": {"lane": "runtime-workers", "at": "2026-10-11T01:04:17Z", "scope": "dated monitoring-only snapshot via the unchanged native API; no enforcement classification is changed", "coordination_records": ["lanes/runtime-workers.status.md", "lanes/runtime-workers.questions.md"]},
+    "candidate_green": {"candidate": "ece42fc108b8b57e36526e0bdff0ec98bd6bfb4f", "module": "tests.test_runtime_worker_openhands_push_gate", "tests": 125, "failures": 0, "errors": 0, "covered_by_log": "required-six-modules.log", "log_sha256": "6a96ce368ed232f7f477e5a335bf266b2afe34706fb48ca8eb4184f9a0447e54"},
+    "measurement_scope": "Immutable-candidate qualification only. The later published-HEAD focused check is recorded by the lane separately."
+  },
+  "required_tests": {
+    "class": "local_integration",
+    "fixture_input_class": "synthetic",
+    "qualification_method": "Immutable-candidate six-module run, followed by a corrective parser-policy module rerun; five passing modules have unchanged inputs and are not repeated.",
+    "module_selections": ["tests.test_codex_lane", "tests.test_shell_parser_ci", "tests.test_lane_packets", "tests.test_verdict_lane_vendoring", "tests.test_runtime_worker_openhands_push_gate", "tests.test_workflow_hardening"],
+    "qualified_tests_rollup": 592,
+    "module_counts": {"tests.test_codex_lane": 146, "tests.test_shell_parser_ci": 39, "tests.test_lane_packets": 126, "tests.test_verdict_lane_vendoring": 14, "tests.test_runtime_worker_openhands_push_gate": 125, "tests.test_workflow_hardening": 142},
+    "unique_skips": 4,
+    "skip_reasons": ["two jsonschema dependency guards", "one GitHub Actions-only parser runtime tripwire", "one empty hash-frozen workflow set"],
+    "initial_candidate_bundle": {"candidate": "ece42fc108b8b57e36526e0bdff0ec98bd6bfb4f", "tests": 591, "failures": 1, "errors": 0, "skips": 4, "exit_code": 1, "elapsed_seconds": 266.375, "log": "required-six-modules.log", "log_sha256": "6a96ce368ed232f7f477e5a335bf266b2afe34706fb48ca8eb4184f9a0447e54"},
+    "initial_failure": "The parser-CI provisioning_problems test helper still prohibited the CC-required full-mode condition on validate-macos. The product runner and workflow were unchanged by its correction.",
+    "unchanged_passing_five_modules": {"tests": 553, "failures": 0, "errors": 0, "skips": 3, "modules": ["tests.test_codex_lane", "tests.test_lane_packets", "tests.test_verdict_lane_vendoring", "tests.test_runtime_worker_openhands_push_gate", "tests.test_workflow_hardening"], "covered_by_log": "required-six-modules.log"},
+    "corrective_parser_policy_run": {"module": "tests.test_shell_parser_ci", "tests": 39, "failures": 0, "errors": 0, "skips": 1, "exit_code": 0, "elapsed_seconds": 2.725, "log": "parser-policy-final.log", "log_sha256": "06e8d397b639a522bb5d23630cc3ffa9c8b038c726d96e73b4f069c368fbfeaa", "test_shell_parser_ci_sha256": "127a701bc96124e1574f854dd0ac41750f19c8048940e227b8b499dd02d13482"},
+    "parser_policy_correction": "Only validate-macos requires the exact env.VALIDATE_MACOS_MODE == 'full' condition on both parser install and suite steps; other jobs remain unconditional. One added method rejects four incorrect condition mutations.",
+    "scope_correction": "592 is the qualified rollup across six modules, not a single zero-failure 592-test bundle. The 591-test bundle failed once, then the corrected 39-test parser module passed.",
+    "codex_lane_py_sha256": "e08169635a1a60f5765d7cc6bf71e170da6c52a6ee107690b779d212264efebd",
+    "test_codex_lane_sha256": "7485f82f1393abec62ac5bc9e0127ce0f9e76b9a6366b8dd266dead1db758ad6",
+    "upstream_model_turns": 0
+  },
   "schema_guards_with_dependency": {
     "class": "local_integration",
+    "measurement_scope": "historical pre-review schema-dependency rerun",
     "command": "nice -n 10 ionice -c 3 uv run --no-project --with jsonschema==4.25.1 python3 -B -m unittest tests.test_lane_packets.SchemaAndPromptConsistencyTests.test_lane_return_schema_is_a_valid_draft_2020_12_schema tests.test_lane_packets.SchemaAndPromptConsistencyTests.test_lane_return_schema_validates_a_well_formed_instance_and_rejects_bad_ones -v",
     "tests": 2, "failures": 0, "errors": 0, "skips": 0, "exit_code": 0, "elapsed_seconds": 0.117,
     "log_sha256": "31660e27cb7a553bb8d348dab94ba563456f5bc75c9f104d9ed123f17901e58f"
   },
   "supervisor_regression": {
     "class": "synthetic",
+    "measurement_scope": "historical pre-review helper-only tests; no supervisor integration measurement",
     "fixture": "tests/fixtures/codex_lane_workers_native_usage.jsonl",
     "fixture_origin": "exact nonsecret native workers usage row from the retained unchanged-runner rerun",
     "fixture_bytes": 521,
     "fixture_sha256": "890024fb9b1387a0f53fddb9af5c9bb551dacbc855f46cd9dbb08c6e3ac0f13f",
     "before": {"wrong_key": "layer_id", "tests": 2, "failed_subtests": 2, "errors": 1, "exit_code": 1},
     "after": {"native_key": "layer", "tests": 3, "failures": 0, "errors": 0, "exit_code": 0, "included_in_required_bundle": true},
-    "method": "Shared native-layer predicate and byte-preserving usage-suffix collector; private retained supervisor imports the same API. No new model turn."
+    "method": "Shared native-layer predicate and byte-preserving usage-suffix collector tested with the retained native usage row. No new model turn. Missing-helper API errors on the old base are not evidence of a repaired supervisor call site.",
+    "integration_status": "UNCALLED: retained supervisor is outside this diff and must import and invoke the helpers before supervisor integration can be claimed"
   },
   "cwd_regressions": {
     "class": "synthetic",
+    "measurement_scope": "historical pre-review independent-cwd contract tests; native capture is measured separately",
     "before_missing_cwd": {"tests": 4, "failed_subtests": 5, "errors": 0, "exit_code": 1, "log_sha256": "2613c745b32eaba5e4f1b85845e51f8b2b5ac976c1d8126c374815c3941ec300"},
     "before_subprocess_cwd": {"tests": 1, "failures": 1, "errors": 0, "exit_code": 1, "log_sha256": "318edf9f2021c7dfdb317a4fe553e588462033d8d461501eb334cd0640e1ee9d"},
     "after": {"tests": 7, "failures": 0, "errors": 0, "exit_code": 0, "included_in_required_bundle": true}
   },
   "incremental_failure_regressions": {
     "class": "synthetic",
+    "measurement_scope": "historical pre-review atomic failure-snapshot tests",
     "before_end_only_write": {"tests": 3, "failures": 3, "errors": 0, "exit_code": 1},
     "before_empty_signal_stop": {"tests": 1, "failures": 1, "errors": 0, "exit_code": 1, "log_sha256": "bfa0539ecc3e8c7e824e494a74f0615baa2011f4628a10b1cd1898136778d026"},
     "after": {"tests": 4, "failures": 0, "errors": 0, "exit_code": 0, "included_in_required_bundle": true},
@@ -147,6 +322,7 @@
   },
   "native_source_identity_check": {
     "class": "source_review",
+    "record_status": "historical pre-review source check; native-history persistence now changes the blind verdict lane while the default builder stays ephemeral",
     "base_revision": "9d4c00cd05d79b3fd5074df2e46bacab87ee67ff",
     "unchanged": ["ISOLATION_ARGS", "BLIND_CHILD_PATH", "CHILD_ENV_ALLOWLIST", "CHILD_ENV_EXTRA_PREFIXES", "build_command", "child_env", "isolated_codex_home", "lane_provenance", "finalize_lane_return"]
   },
@@ -163,13 +339,14 @@
   },
   "python_resolver_limits": {"source_chars": 250000, "ast_nodes": 50000, "work": 20000, "depth": 64, "alternatives": 64, "string_chars": 16384, "generated_chars": 1000000, "nested_execution_depth": 8},
   "native_receipt_fields_unchanged": true,
-  "isolation_arguments_and_child_environment_unchanged": true,
+  "default_isolation_arguments_and_child_environment_unchanged": true,
   "collected_returns_modified": false,
   "verdict_promotions": 0,
   "limitations": [
-    "Static parsing is not syscall, runtime branch or symlink attestation. Codex exec JSONL exposes only the command display and omits cwd; current production commands are explicitly unverified.",
+    "Static parsing is not syscall, runtime branch or symlink attestation. Exec JSONL alone omits cwd; only uniquely matching retained native completed-command history can supply the independent binding. Live provider behavior of the new capture path is UNMEASURED.",
     "Indirect script/config reads and symlink targets remain unobserved; unsupported source/expansions and unresolved interpreted reads refuse the result.",
     "Unsupported wrapper grammar is refused even for a benign utility; supported env/nice/timeout forms retain position decoding.",
-    "Fixture replay does not rerun any quarantined model verdict or prove the family judgments correct."
+    "Fixture replay does not rerun any quarantined model verdict or prove the family judgments correct.",
+    "Supervisor helper regressions verify a callable API only. The retained supervisor is outside this diff; integration is UNCALLED until that caller wires the helpers."
   ]
 }
