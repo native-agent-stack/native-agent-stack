@@ -1,7 +1,7 @@
 # Mover trial mode (protocol `mover-early-entry-v1-20260924`, paper_e2e)
 
 A bounded paper trial that enters up to five scanner-selected movers at trial start
-and exits them by one protocol rule. The historical study picks the rule and exit, so
+and exits them by a protocol rule or an enabled exit chain. The historical study picks the rule and exit, so
 the trial is parameterised by `mover.rule` and `mover.exit` in the config. Modules:
 
 | File | Role |
@@ -89,6 +89,40 @@ exits, `floor(max_order_notional_usd / bid)` whole shares.
   - X2 60 minutes after the first fill;
   - X3 when the bid is at or below 0.85 x the running high since entry;
   - X4 when the bid is at or below 0.85 x or at or above 1.50 x the entry price.
+
+  These are the legacy defaults. `mover.exit` still accepts a scalar such as
+  `"X3"`, or an array such as `["X3", "X2"]`: trail OR a first-fill time limit,
+  whichever triggers first. Simultaneous conditions follow `exits.py`'s adaptive
+  precedence, regardless of array order: X1 forced calendar close, X4 stop/TP,
+  X3 trailing, then X2 time. Chains must be non-empty, unique X1-X4 selections;
+  including X1 retains its existing session/reachability gates.
+
+  Optional fields under `mover` are bounded by candidate [C] preregistration
+  **SIM-MOVER-1-GRID-2**, us-equities-trading commit
+  `ebdc4d69b5c71b258485ee94aa1789b8c5646d01`,
+  `docs/sim-backtest/north-star-20261011/SIM-MOVER-1/GRID-2-AMENDMENT.json`,
+  SHA256 `2f67ad1c0ecd6b09df3bb098e43ef769310f29c5568aebca2c25da0f0ab06738`:
+
+  | Field | Accepted interval | Legacy default |
+  | --- | --- | --- |
+  | `x2_hold_seconds` | integer 900-3600 | 3600 |
+  | `x3_trail_fraction` | decimal string 0.80-0.97 | `"0.85"` |
+  | `x4_stop_fraction` | decimal string 0.85-0.90 | `"0.85"` |
+  | `x4_target_fraction` | decimal string 1.25-1.50 | `"1.50"` |
+
+  X4 bounds convert registered stop/TP bps to `1-stop_bps/10000` and
+  `1+take_profit_bps/10000`. Outside-range, nonfinite, non-positive and wrongly
+  typed values refuse config loading; they are never clamped. Absent or equal
+  defaults preserve the old receipt keys/types and Decimal spelling, and
+  RiskLimits/frozen ledger bytes are untouched. X3 still seeds its running high
+  from entry fills and then raises it with observed bids; the separate widened
+  T15 bid-only design is not implemented here. `exit_parameters` records the
+  configured values; `timing` records actual clocks, including the existing
+  synthetic command's explicit `--hold-seconds` accelerated timing override.
+
+  These intervals are preregistered research candidates, not a fitted winner.
+  The grid's insufficient-sample rule keeps PRE's existing X3 configuration;
+  this change supplies configuration capability without selecting a new preset.
 
   Stops never rest at the broker. Every exit, in every session, is a marketable
   limit sell at `bid x (1 - exit cap)` rounded up to the tick but never above the bid

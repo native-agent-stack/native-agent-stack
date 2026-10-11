@@ -17,8 +17,8 @@
   "blueprints/us-equities/adaptive-paper/live_manifest.py": "ca34cb59b4ff8f3a9dc763a0937a351ecab815d16164c75c319e3880a57585bd",
   "blueprints/us-equities/adaptive-paper/market_research.py": "bba9cf77c3c3c6dff32dec1cb01fa8c1957c6b012b7d5bd9693fcc268d557158",
   "blueprints/us-equities/adaptive-paper/metrics.py": "437fce8aaca350b9d8fe5d5b68212879d82e118f01d93fdcd333233709b80397",
-  "blueprints/us-equities/adaptive-paper/mover.py": "f6d7e1749e8c76e7e68895f15fc1860694192c3f9d3b7c41172589e3c565f206",
-  "blueprints/us-equities/adaptive-paper/mover_runner.py": "410595b5b8afc72b9099e13c32b9bef8836d38e627c56b76b9b222a084afd394",
+  "blueprints/us-equities/adaptive-paper/mover.py": "11048ba54d6e5e9e376d1c5e0f2ed5e3f7f1fe93266b163a003992059d20073e",
+  "blueprints/us-equities/adaptive-paper/mover_runner.py": "4835338b20ac0b5f464f83cdb6863298a0229c49dcdb1ab7a6260bb65d8a78c5",
   "blueprints/us-equities/adaptive-paper/mover_simulation.py": "8ac5955de1e814bb26fbfbca068a5719b9033b2bae0d8e50e78d7a78a546761e",
   "blueprints/us-equities/adaptive-paper/mover_strategy.py": "4730c5e535aa480030d6484669a9d8565ca25e4e1ea50ea12a45bd1892536cba",
   "blueprints/us-equities/adaptive-paper/native_adapter.py": "39db1894ac5a26805908a56cd1db6f5b90147935342dc5684b061cbd9fe73fea",
@@ -64,6 +64,7 @@
   "tests/test_adaptive_paper_sessions.py": "ea8b0dc3013119879354da3c0dce8bffcf8e874ee07017a243a67597bd18b418",
   "tests/test_adaptive_paper_strategies.py": "f0814b36909f2fc6b4c4213b4142ffc13339740f0397c99ad9c7c81982e2033a",
   "tests/test_adaptive_paper_transport.py": "915973f08c21091abc73585f704b0ae6235f7f8fb1ff59760815f6542c99d52d",
+  "tests/test_mover_exit_chain.py": "74d91bd14ffb76ab2a499072a756d0b4bfdf9af70ac88905ac075bcdd9028e7a",
   "tests/test_runtime_directory_identity.py": "9a5db043d9d2837d3319a95a69bfe6c514a5ef99057bd4c7a0e7a171fd348814",
   "tests/test_scheduled_trial.py": "85cac37a4230533135eb2c680430a814278ad578b90bc4e7a3f3ea5f02acf9ce"
 }
