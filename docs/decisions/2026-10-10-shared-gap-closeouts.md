@@ -32,6 +32,18 @@ recorded in its pinned upstream
 The broader recording-script floor remains Python 3.9 for the existing no-closeout
 path; processing a recorded closeout requires Python 3.10 or later and the pinned
 validator. Hosts use the selected Python line before adding such records. The
+nonempty-closeout path checks the installed distribution against exactly 4.26.0
+before loading the schema or any closeout document. A missing or different
+distribution refuses with the hash-pinned install command; a no-record build
+does not query distribution metadata. This uses the standard
+[distribution-version API](https://docs.python.org/3.13/library/importlib.metadata.html#distribution-versions),
+whose pinned implementation is CPython v3.13.16
+[`version` at line 980 and `PackageNotFoundError` at line 49](https://github.com/python/cpython/blob/v3.13.16/Lib/importlib/metadata/__init__.py#L980).
+The pinned jsonschema release itself
+[uses and recommends importlib.metadata](https://github.com/python-jsonschema/jsonschema/blob/a7277432b0f7bcd0551f6e589d30457017125df4/jsonschema/__init__.py#L27).
+Installed bytes match both cited primary source files, as recorded in
+`evidence/artifacts/shared-gap-closeouts-loader-20261010/gpt-fix/source-proof.json`.
+The
 catalog-freshness suite uses Python 3.13 and installs the hash-pinned CI set before
 its full discovery. The closure fixture module follows the existing sampler's
 module-level SkipTest when jsonschema is absent; installed-library controls run
@@ -53,7 +65,31 @@ The hash registry consumes `manifests/evidence.json`'s `files` only. Its real
 or byte fields; the existing validator requires their paths to be hashed files.
 The earlier synthetic hash-bearing receipt fixture did not model this contract.
 The corrected real-shape fixture reproduces that failure and verifies files-only
-registration. No metadata row can override a file's binding.
+registration. Optional receipt `sha256` and/or `bytes` mirrors must match that
+path's authoritative `files` registration; a hash-bearing receipt cannot supply
+a missing file registration. Equal mirrors and metadata-only rows stay valid.
+No metadata row can override a file's binding.
+
+The FIRST GPT read found that conflicting optional mirrors and an importable
+wrong validator version were still accepted. The new fixture controls fail on
+the reviewed loader (six assertion failures across seven tests, with zero
+errors), then all seven pass after the correction. Native interpreter controls
+also show installed 4.19.2 refusing before returning a document, the absent
+package refusing with an actionable message, and a no-record build succeeding
+without the package. These are integrity fixtures and source checks, not vendor
+runtime or host acceptance. The correction receipt retains the exact controls
+and distinguishes the metadata mock from the actual installed-version runs.
+
+The unchanged worker inventory initially reported four extra advisory locations
+for the new receipt metadata uses of `path`. Naming the metadata key
+`receipt_path` keeps it separate from the existing filesystem iterator. Native
+candidate derivation then preserves 330 locations, 98 shapes, the per-script
+counts and shape multiplicities, and zero unresolved inputs, with snapshot
+SHA-256 `8752740817bb41c1a582e33fa475e4ce4064f2ccfecadb706bce40ecb4512157`
+unchanged. The failed native assertion and candidate control are retained in
+`gpt-fix/worker-baseline-before.log` and `gpt-fix/path-alias-proof.json`.
+The final committed-head assertion remains a separate publication check; no
+worker implementation, policy, bound or baseline is changed.
 
 Four checks failed before the implementation: unregistered evidence, missing
 reason and unknown status were silently ignored, and the public matrix build

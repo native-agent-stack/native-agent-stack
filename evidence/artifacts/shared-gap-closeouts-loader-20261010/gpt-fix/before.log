@@ -1,0 +1,74 @@
+test_conflicting_receipt_hash_mirror_is_refused (tests.test_gap_closeouts.GapCloseoutTests.test_conflicting_receipt_hash_mirror_is_refused) ...
+  test_conflicting_receipt_hash_mirror_is_refused (tests.test_gap_closeouts.GapCloseoutTests.test_conflicting_receipt_hash_mirror_is_refused) (fields=['sha256']) ... FAIL
+  test_conflicting_receipt_hash_mirror_is_refused (tests.test_gap_closeouts.GapCloseoutTests.test_conflicting_receipt_hash_mirror_is_refused) (fields=['bytes', 'sha256']) ... FAIL
+test_conflicting_receipt_byte_mirror_is_refused (tests.test_gap_closeouts.GapCloseoutTests.test_conflicting_receipt_byte_mirror_is_refused) ...
+  test_conflicting_receipt_byte_mirror_is_refused (tests.test_gap_closeouts.GapCloseoutTests.test_conflicting_receipt_byte_mirror_is_refused) (fields=['bytes']) ... FAIL
+  test_conflicting_receipt_byte_mirror_is_refused (tests.test_gap_closeouts.GapCloseoutTests.test_conflicting_receipt_byte_mirror_is_refused) (fields=['bytes', 'sha256']) ... FAIL
+test_matching_receipt_mirrors_keep_file_registration_authoritative (tests.test_gap_closeouts.GapCloseoutTests.test_matching_receipt_mirrors_keep_file_registration_authoritative) ... ok
+test_importable_wrong_jsonschema_version_is_refused_before_loading_documents (tests.test_gap_closeouts.GapCloseoutTests.test_importable_wrong_jsonschema_version_is_refused_before_loading_documents) ... FAIL
+test_missing_jsonschema_distribution_is_actionable_before_loading_documents (tests.test_gap_closeouts.GapCloseoutTests.test_missing_jsonschema_distribution_is_actionable_before_loading_documents) ... FAIL
+test_receipt_metadata_uses_the_registered_file_hash (tests.test_gap_closeouts.GapCloseoutTests.test_receipt_metadata_uses_the_registered_file_hash) ... ok
+test_no_closeouts_preserve_current_historical_counts_and_bytes (tests.test_gap_closeouts.GapCloseoutTests.test_no_closeouts_preserve_current_historical_counts_and_bytes) ... ok
+
+======================================================================
+FAIL: test_conflicting_receipt_hash_mirror_is_refused (tests.test_gap_closeouts.GapCloseoutTests.test_conflicting_receipt_hash_mirror_is_refused) (fields=['sha256'])
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_gap_closeouts.py", line 233, in test_conflicting_receipt_hash_mirror_is_refused
+    with self.assertRaisesRegex(InvalidDecisionIndex, "conflicting receipt mirror"):
+         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: InvalidDecisionIndex not raised
+
+======================================================================
+FAIL: test_conflicting_receipt_hash_mirror_is_refused (tests.test_gap_closeouts.GapCloseoutTests.test_conflicting_receipt_hash_mirror_is_refused) (fields=['bytes', 'sha256'])
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_gap_closeouts.py", line 233, in test_conflicting_receipt_hash_mirror_is_refused
+    with self.assertRaisesRegex(InvalidDecisionIndex, "conflicting receipt mirror"):
+         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: InvalidDecisionIndex not raised
+
+======================================================================
+FAIL: test_conflicting_receipt_byte_mirror_is_refused (tests.test_gap_closeouts.GapCloseoutTests.test_conflicting_receipt_byte_mirror_is_refused) (fields=['bytes'])
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_gap_closeouts.py", line 247, in test_conflicting_receipt_byte_mirror_is_refused
+    with self.assertRaisesRegex(InvalidDecisionIndex, "conflicting receipt mirror"):
+         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: InvalidDecisionIndex not raised
+
+======================================================================
+FAIL: test_conflicting_receipt_byte_mirror_is_refused (tests.test_gap_closeouts.GapCloseoutTests.test_conflicting_receipt_byte_mirror_is_refused) (fields=['bytes', 'sha256'])
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_gap_closeouts.py", line 247, in test_conflicting_receipt_byte_mirror_is_refused
+    with self.assertRaisesRegex(InvalidDecisionIndex, "conflicting receipt mirror"):
+         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: InvalidDecisionIndex not raised
+
+======================================================================
+FAIL: test_importable_wrong_jsonschema_version_is_refused_before_loading_documents (tests.test_gap_closeouts.GapCloseoutTests.test_importable_wrong_jsonschema_version_is_refused_before_loading_documents)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_gap_closeouts.py", line 269, in test_importable_wrong_jsonschema_version_is_refused_before_loading_documents
+    with self.assertRaisesRegex(InvalidDecisionIndex,
+         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+                                r"jsonschema==4\.26\.0.*4\.19\.2.*requirements-ci\.txt"):
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: InvalidDecisionIndex not raised
+
+======================================================================
+FAIL: test_missing_jsonschema_distribution_is_actionable_before_loading_documents (tests.test_gap_closeouts.GapCloseoutTests.test_missing_jsonschema_distribution_is_actionable_before_loading_documents)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKTREE>/tests/test_gap_closeouts.py", line 281, in test_missing_jsonschema_distribution_is_actionable_before_loading_documents
+    with self.assertRaisesRegex(InvalidDecisionIndex,
+         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+                                r"jsonschema==4\.26\.0.*missing.*requirements-ci\.txt"):
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: InvalidDecisionIndex not raised
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.152s
+
+FAILED (failures=6)

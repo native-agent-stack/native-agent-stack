@@ -1,0 +1,49 @@
+{
+  "fetched_at_utc": "2026-10-11T01:22:21Z",
+  "official_api": "https://docs.python.org/3.13/library/importlib.metadata.html#distribution-versions",
+  "schema_version": 1,
+  "sources": [
+    {
+      "bytes": 34091,
+      "installed_bytes_equal": true,
+      "path": "Lib/importlib/metadata/__init__.py",
+      "pin": "v3.13.16",
+      "repository": "python/cpython",
+      "sha256": "5476c7c22a65f9e8b5a07b799336d87fa70e792758fd95b161b53b530e3b2654",
+      "symbols": [
+        {
+          "end_line": 58,
+          "name": "PackageNotFoundError",
+          "start_line": 49
+        },
+        {
+          "end_line": 987,
+          "name": "version",
+          "start_line": 980
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/python/cpython/v3.13.16/Lib/importlib/metadata/__init__.py"
+    },
+    {
+      "bytes": 3941,
+      "installed_bytes_equal": true,
+      "metadata_version_calls": [
+        "\"removed in a future release. Use importlib.metadata directly \"",
+        "from importlib import metadata",
+        "return metadata.version(\"jsonschema\")"
+      ],
+      "path": "jsonschema/__init__.py",
+      "pin": "a7277432b0f7bcd0551f6e589d30457017125df4",
+      "repository": "python-jsonschema/jsonschema",
+      "sha256": "a7e470e134bfd0e3c76482722260d6b1d5a099de823d61cc5cbabb06e4314c67",
+      "symbols": [
+        {
+          "end_line": 105,
+          "name": "__getattr__",
+          "start_line": 27
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/python-jsonschema/jsonschema/a7277432b0f7bcd0551f6e589d30457017125df4/jsonschema/__init__.py"
+    }
+  ]
+}

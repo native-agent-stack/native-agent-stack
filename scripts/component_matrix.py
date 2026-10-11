@@ -241,6 +241,19 @@ def current_gap_document(root: Path, historical: dict | None) -> dict | None:
     current = deepcopy(historical)
     if not paths:
         return current
+
+    # CPython v3.13.16 Lib/importlib/metadata/__init__.py:980 reads the
+    # installed version; PackageNotFoundError (:49) identifies an absent package.
+    # jsonschema a7277432b0f7bcd0551f6e589d30457017125df4 uses this same API
+    # in jsonschema/__init__.py; the exact approved pin is requirements-ci.txt.
+    from importlib.metadata import PackageNotFoundError, version
+    install = "python3 -m pip install --only-binary=:all: --require-hashes -r .github/requirements-ci.txt"
+    try:
+        installed = version("jsonschema")
+    except PackageNotFoundError as error:
+        raise InvalidDecisionIndex(f"gap closeouts require jsonschema==4.26.0; distribution missing; {install}") from error
+    require(installed == "4.26.0",
+            f"gap closeouts require jsonschema==4.26.0; installed {installed}; {install}")
     from jsonschema import Draft202012Validator
 
     schema = load(root, GAP_CLOSEOUT_SCHEMA)
@@ -262,6 +275,17 @@ def current_gap_document(root: Path, historical: dict | None) -> dict | None:
                     == (record.get("sha256"), record.get("bytes")),
                     "conflicting evidence registration")
             registry[record["path"]] = record
+
+    # Optional receipt hash/byte mirrors must agree with files[]; metadata-only
+    # receipts remain descriptive and never create or replace a registration.
+    for receipt in manifest.get("receipts", []):
+        if not isinstance(receipt, dict) or not any(field in receipt for field in ("sha256", "bytes")):
+            continue
+        receipt_path = receipt.get("path")
+        require(isinstance(receipt_path, str) and receipt_path in registry, "unregistered receipt mirror")
+        record = registry[receipt_path]
+        require(all(receipt[field] == record.get(field) for field in ("sha256", "bytes") if field in receipt),
+                f"conflicting receipt mirror: {receipt_path}")
 
     def verified(path, digest, label):
         require(path in registry, f"unregistered {label}: {path}")

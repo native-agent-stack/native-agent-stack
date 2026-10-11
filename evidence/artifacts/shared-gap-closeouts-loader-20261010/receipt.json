@@ -31,7 +31,7 @@
       "failures": 4,
       "measurement": "Three required refusals were absent; the public matrix count was 1 instead of 0.",
       "log": "before.log",
-      "log_sha256": "9573bf7b1125ae1b457913fd00154b219d9477c908efc3650c35682158fac5e1"
+      "log_sha256": "d0802241f45a28862eaa65656a3a83543b7f6507809ae7c48a795b68e39889ad"
     },
     {
       "command": "nice -n 10 ionice -c 3 <schema-env>/bin/python -m unittest tests.test_gap_closeouts.GapCloseoutTests.test_receipt_can_be_registered_in_both_manifest_sections",

@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-11T01:48:57Z",
+  "scope": "Unpublished local candidate integration control; the reviewed parent and published branch remain ad2e1b1a.",
+  "before": {
+    "candidate_commit": "0c254892fb8b8f9541e2416c8bc3948dda9ef500",
+    "source_sha256": "0fef039ddd5e308277b40fd77cdf5d3e2c5f78d672dac282805927d40eb72e1a",
+    "native_test": "tests.test_runtime_worker_openhands_push_gate.RepositoryWorkflowTests.test_advisory_baseline_and_explicit_categories_stay_bounded_on_this_repository",
+    "exit_code": 1,
+    "counts_delta": {
+      "scripts/component_matrix.py": 4
+    },
+    "new_count": 334,
+    "new_shapes": 98,
+    "old_count": 330,
+    "old_shapes": 98,
+    "shape_delta_added": [],
+    "shape_delta_removed": [],
+    "unresolved": [],
+    "new_metadata_statements": {
+      "f\"conflicting receipt mirror: {path}\")": 1,
+      "path = receipt.get(\"path\")": 1,
+      "record = registry[path]": 1,
+      "require(isinstance(path, str) and path in registry, \"unregistered receipt mirror\")": 1
+    }
+  },
+  "change": "Name the receipt's string key receipt_path, keeping it distinct from the existing filesystem Path iterator named path. No worker implementation, policy, inventory bounds or snapshot bytes change.",
+  "after": {
+    "baseline_sha256": "8752740817bb41c1a582e33fa475e4ce4064f2ccfecadb706bce40ecb4512157",
+    "branch_head_unchanged": true,
+    "candidate_source_sha256": "1c77250ae326b2cf7a8ed2dfc05ff8e83914e632960d1c426ae452cd1717642a",
+    "count": 330,
+    "per_script_counts_equal": true,
+    "probe_commit": "c830f0fbedb7ca72da87009fe14e139f2b30a4d8",
+    "probe_tree": "d4fd73d6bdf7b681f0416c45e791857bf57fa48e",
+    "shape_multiplicities_equal": true,
+    "shapes": 98,
+    "unresolved": [],
+    "evidence_class": "local_integration",
+    "qualification": "Supported GitTree requires a commit, so the staged source was measured through an unreferenced git commit-tree object. No branch updated. This is a candidate source derivation, not the final committed-head assertion."
+  },
+  "native_sources": [
+    {
+      "pin": "eb31d233234cdc552fc81672087ac8769e3696e0",
+      "path": "blueprints/runtime-workers/openhands/resolver/patch_policy.py",
+      "symbol": "GitTree"
+    },
+    {
+      "pin": "eb31d233234cdc552fc81672087ac8769e3696e0",
+      "path": "blueprints/runtime-workers/openhands/resolver/push_gate.py",
+      "symbol": "derive_ci_protected"
+    }
+  ],
+  "remaining": "Recheck the final committed head with the unchanged native assertion before the first push."
+}

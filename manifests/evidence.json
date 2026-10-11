@@ -17127,8 +17127,8 @@
     },
     {
       "path": "catalogs/landscape/gap-closeouts/README.md",
-      "sha256": "86ca10fc2b1104ee0c6da2911cce5896f6e0a1faf859a10ff3958a875520a4f2",
-      "bytes": 4598
+      "sha256": "e4f442c5db4aea4fab1fba274d04b2dad2f915adb18b53102d9d027f42cb4b66",
+      "bytes": 4887
     },
     {
       "path": "catalogs/landscape/gap-closeouts/schema.json",
@@ -18612,8 +18612,8 @@
     },
     {
       "path": "docs/decisions/2026-10-10-shared-gap-closeouts.md",
-      "sha256": "3ca32b688675a39135c34920ae8f15adcdb39513abf2a3dc9c66ffb0b6670f25",
-      "bytes": 5910
+      "sha256": "b780844a1e5d895f4522ce852c2e63355435d581cf63ffb0ede0d994253f04a8",
+      "bytes": 8539
     },
     {
       "path": "docs/decisions/2026-10-10-skills-claude-native-practice-row.md",
@@ -50367,8 +50367,8 @@
     },
     {
       "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/before.log",
-      "sha256": "9573bf7b1125ae1b457913fd00154b219d9477c908efc3650c35682158fac5e1",
-      "bytes": 2767
+      "sha256": "d0802241f45a28862eaa65656a3a83543b7f6507809ae7c48a795b68e39889ad",
+      "bytes": 2987
     },
     {
       "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/cc-fix/before.log",
@@ -50446,6 +50446,56 @@
       "bytes": 4520
     },
     {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/gpt-fix/after.log",
+      "sha256": "18ef389c5d2444ace7a5fc986945607331c907f9621282d1e1727b641e1eb78c",
+      "bytes": 1317
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/gpt-fix/before.log",
+      "sha256": "6ee07ee75c80e0e81742da5609ad81ca5de40728acbb5b910f847cebead5f60a",
+      "bytes": 6441
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/gpt-fix/modules.log",
+      "sha256": "3ad842ad45059e47bb1a759faeff0fce53ce60e812a7123d1166a28edf9b41d8",
+      "bytes": 274
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/gpt-fix/path-alias-proof.json",
+      "sha256": "1defe79604747e711a32670267f41f91630b01cd132495204ec9f8098dd98d7c",
+      "bytes": 2555
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/gpt-fix/receipt.json",
+      "sha256": "c70f3175a8ce430b5c48c38263548bca0ba9ddf32e7838bf1caa13e9ca481324",
+      "bytes": 14550
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/gpt-fix/source-proof.json",
+      "sha256": "b0eaa680cdb5d16dbacb71f9ddcd5460787fae2041142fe661e40990b33ec34d",
+      "bytes": 1613
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/gpt-fix/version-before.log",
+      "sha256": "83e8b59a54aeb8d54f747a327c85be1915861c05e769cc950213b4f57c9073a6",
+      "bytes": 151
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/gpt-fix/version-environments.log",
+      "sha256": "55aed1564442293962b8234877650b2d2738e204d07b7dc195c5300702d21ba7",
+      "bytes": 1079
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/gpt-fix/version_probe.py",
+      "sha256": "1576581e583833c54abf11a293a90fb238b3f37664bd3bfec63f06132dc75ca7",
+      "bytes": 3235
+    },
+    {
+      "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/gpt-fix/worker-baseline-before.log",
+      "sha256": "4aef6b26db3a0266863d8b595f94810703db72d4f97ef712a79c4f2d1ab89d73",
+      "bytes": 1116
+    },
+    {
       "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/matrix-check.log",
       "sha256": "08ce4f275c99b7f91a141cfca5b7384f060aacf620f23a324cde692d55e6ffcd",
       "bytes": 34
@@ -50457,7 +50507,7 @@
     },
     {
       "path": "evidence/artifacts/shared-gap-closeouts-loader-20261010/receipt.json",
-      "sha256": "25d3a61c61c3cd0581d69642774c83e30f51f7dfe3f39ae47b78e0c6956720ed",
+      "sha256": "1838872da7618d7e6e5832eef46c847a28aaeaf993e50c213dcb0958b7b38777",
       "bytes": 5360
     },
     {
@@ -59787,8 +59837,8 @@
     },
     {
       "path": "scripts/component_matrix.py",
-      "sha256": "967c64e6caa1ecbb801329bf0b134aeee111a19d6d71faa31802e94f5aabf07e",
-      "bytes": 78623
+      "sha256": "1c77250ae326b2cf7a8ed2dfc05ff8e83914e632960d1c426ae452cd1717642a",
+      "bytes": 80147
     },
     {
       "path": "scripts/credential_boot_receipt.py",
@@ -60672,8 +60722,8 @@
     },
     {
       "path": "tests/test_gap_closeouts.py",
-      "sha256": "4c886e2026cd80df3d19d9ae878f0822b1a00e070ea36eb727dddc213ea6486a",
-      "bytes": 15938
+      "sha256": "62eb49fd3def073928310baa5c71048f28eaa0a2cd9b1954e962aae9adafc7aa",
+      "bytes": 20025
     },
     {
       "path": "tests/test_gap_crosswalk.py",

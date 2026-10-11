@@ -4,10 +4,12 @@ from __future__ import annotations
 
 from copy import deepcopy
 import hashlib
+import importlib.metadata
 import json
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
 try:
     from jsonschema import Draft202012Validator
@@ -219,6 +221,69 @@ class GapCloseoutTests(unittest.TestCase):
         with self.assertRaisesRegex(InvalidDecisionIndex, "conflicting evidence registration"):
             self.current()
 
+    def test_conflicting_receipt_hash_mirror_is_refused(self):
+        manifest = json.loads((self.root / "manifests/evidence.json").read_text())
+        record = next(r for r in manifest["files"] if r["path"] == self.evidence_path)
+        for fields in ({"sha256": "0" * 64}, {"sha256": "0" * 64, "bytes": record["bytes"]}):
+            with self.subTest(fields=sorted(fields)):
+                candidate = deepcopy(manifest)
+                candidate["receipts"][0].update(fields)
+                write_json(self.root, "manifests/evidence.json", candidate)
+                self.save()
+                with self.assertRaisesRegex(InvalidDecisionIndex, "conflicting receipt mirror"):
+                    self.current()
+                self.assertEqual(cm.open_gap_counts_by_layer(self.historical)[("us-equities", "fixture")], 1)
+
+    def test_conflicting_receipt_byte_mirror_is_refused(self):
+        manifest = json.loads((self.root / "manifests/evidence.json").read_text())
+        record = next(r for r in manifest["files"] if r["path"] == self.evidence_path)
+        for fields in ({"bytes": record["bytes"] + 1},
+                       {"bytes": record["bytes"] + 1, "sha256": record["sha256"]}):
+            with self.subTest(fields=sorted(fields)):
+                candidate = deepcopy(manifest)
+                candidate["receipts"][0].update(fields)
+                write_json(self.root, "manifests/evidence.json", candidate)
+                self.save()
+                with self.assertRaisesRegex(InvalidDecisionIndex, "conflicting receipt mirror"):
+                    self.current()
+                self.assertEqual(cm.open_gap_counts_by_layer(self.historical)[("us-equities", "fixture")], 1)
+
+    def test_matching_receipt_mirrors_keep_file_registration_authoritative(self):
+        manifest = json.loads((self.root / "manifests/evidence.json").read_text())
+        record = next(r for r in manifest["files"] if r["path"] == self.evidence_path)
+        for fields in (("sha256",), ("bytes",), ("sha256", "bytes")):
+            with self.subTest(fields=fields):
+                candidate = deepcopy(manifest)
+                candidate["receipts"][0].update({field: record[field] for field in fields})
+                write_json(self.root, "manifests/evidence.json", candidate)
+                self.save()
+                self.assertEqual(cm.open_gap_counts_by_layer(self.current())[("us-equities", "fixture")], 0)
+                self.assertEqual(candidate["files"], manifest["files"])
+
+    def test_importable_wrong_jsonschema_version_is_refused_before_loading_documents(self):
+        self.save()
+        before = deepcopy(self.historical)
+        self.assertTrue(callable(Draft202012Validator))
+        with patch("importlib.metadata.version", return_value="4.19.2"), \
+                patch.object(cm, "load", wraps=cm.load) as load_document:
+            with self.assertRaisesRegex(InvalidDecisionIndex,
+                                        r"jsonschema==4\.26\.0.*4\.19\.2.*requirements-ci\.txt"):
+                self.current()
+            load_document.assert_not_called()
+        self.assertEqual(self.historical, before)
+        self.assertEqual(cm.open_gap_counts_by_layer(self.historical)[("us-equities", "fixture")], 1)
+
+    def test_missing_jsonschema_distribution_is_actionable_before_loading_documents(self):
+        self.save()
+        with patch("importlib.metadata.version",
+                   side_effect=importlib.metadata.PackageNotFoundError("jsonschema")), \
+                patch.object(cm, "load", wraps=cm.load) as load_document:
+            with self.assertRaisesRegex(InvalidDecisionIndex,
+                                        r"jsonschema==4\.26\.0.*missing.*requirements-ci\.txt"):
+                self.current()
+            load_document.assert_not_called()
+        self.assertEqual(cm.open_gap_counts_by_layer(self.historical)[("us-equities", "fixture")], 1)
+
     def test_unregistered_closeout_is_refused(self):
         self.save()
         manifest = json.loads((self.root / "manifests/evidence.json").read_text())
@@ -303,7 +368,8 @@ class GapCloseoutTests(unittest.TestCase):
         loader = getattr(cm, "current_gap_document", None)
         # Use today's real historical data in a fixture with no dated records;
         # future layer closeouts must not make this baseline contract obsolete.
-        current = loader(self.root, historical) if loader else deepcopy(historical)
+        with patch("importlib.metadata.version", side_effect=AssertionError("no-record path queried metadata")):
+            current = loader(self.root, historical) if loader else deepcopy(historical)
         self.assertEqual(current, historical)
         self.assertEqual(cm.gap_counts_by_layer(current), cm.gap_counts_by_layer(historical))
         self.assertEqual(cm.open_gap_counts_by_layer(current), cm.open_gap_counts_by_layer(historical))

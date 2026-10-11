@@ -24,8 +24,12 @@ Register the closeout itself, every evidence file and every review in the
 checks those registrations against the actual bytes and refuses changed, missing,
 unregistered or wrong-scope inputs. The schema lives in `schema.json` and uses
 Draft 2020-12; it validates through upstream `jsonschema==4.26.0`, available through
-the existing hash-pinned `.github/requirements-ci.txt`. Descriptive `receipts`
-rows contain no hash fields and do not participate in this registry. Reading
+the existing hash-pinned `.github/requirements-ci.txt`. Before loading any
+nonempty closeout set, the installed distribution must be exactly 4.26.0;
+missing or mismatched versions refuse with the supported install command.
+Descriptive `receipts` rows do not supply file registrations. If a receipt
+also carries `sha256` and/or `bytes`, each supplied mirror must agree with
+the authoritative `files` row; metadata-only rows remain valid. Reading
 closeout records requires Python 3.10 or later; the existing no-record path keeps
 the broader recording-script compatibility floor.
 
