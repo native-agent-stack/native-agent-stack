@@ -1605,7 +1605,7 @@ class OwnedPathGateTests(unittest.TestCase):
                 self.assertEqual(record["status"], "pass")
 
     def test_compiled_module_artifacts_refuse_even_when_owned(self):
-        # CI targets CPython v3.12.3 (.github/workflows/validate.yml:227-228).
+        # CI CPython v3.12.3: .github/workflows/validate.yml:201-202 at 0d822e91c95d0f3cb24a76270daff67840b4da06.
         # Its Lib/importlib/_bootstrap_external.py:1724-1732 tries extensions
         # before source. :1095-1126 loads unchecked-hash caches without checking
         # source (PEP 552); Doc/library/importlib.rst:1265-1308 maps PEP 3147 caches.

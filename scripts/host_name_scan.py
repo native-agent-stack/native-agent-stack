@@ -189,6 +189,17 @@ def _scan_entries(entries: Iterable[tuple[Path, str]], *, root: Path,
     version = _command([binary, "version"], root=root, environment={})
     if version.returncode or version.stdout.strip() not in (PIN, "betterleaks version " + PIN):
         raise HostNameScanError("Betterleaks 1.9.0 is required for host-name scan")
+    if reject_email:
+        # CC-selected publication route: native cmd/stdin.go:47-49 and
+        # sources/stdin.go:18-25 at Betterleaks@81aff7a6. Each entry goes
+        # separately, unchanged, through the vendor's reader and decoder.
+        # No repository markers, overlap or publication size limit.
+        findings = set()
+        for path, text in entries:
+            origins = {line: (path, line) for line in range(1, text.count("\n") + 2)}
+            findings.update(_native_scan(text, origins, binary=binary, root=root,
+                                         names=names, framed=False, reject_email=True))
+        return sorted(findings, key=lambda finding: (str(finding[0]), finding[1]))
     # Upstream sources/file.go reads 100KB + up to 25KB of lookahead to a
     # double-newline boundary. Each record stays below 25KB even in UTF-8.
     # The overlap contains the longest literal and both Unicode neighbors;
@@ -212,19 +223,8 @@ def _scan_entries(entries: Iterable[tuple[Path, str]], *, root: Path,
         # the original line and Unicode neighbor boundary without hiding names.
         text = text.translate({0x1E: 0xFFFD, 0x1F: 0xFFFD})
         for original_line, text_line in enumerate(text.split("\n"), 1):
-            # Publication rules admit variable-length email and five native
-            # decode levels. A name-derived overlap cannot bound those tokens.
-            # Keep the entire original line, including both real neighbors.
-            # Betterleaks@81aff7a6 sources/common.go's 25,000-byte lookahead
-            # reaches the next double newline for a <=24,000-byte line plus
-            # sentinels, so neither our records nor native chunks cut it.
-            # Refuse larger UTF-8 lines rather than publish a partial scan.
-            if reject_email and len(text_line.encode("utf-8")) > 24000:
-                raise HostNameScanError("publication line exceeds native framing capacity")
-            width = max(1, len(text_line)) if reject_email else 4096
-            stride = width if reject_email else step
-            for start in range(0, max(1, len(text_line)), stride):
-                end = min(start + width, len(text_line))
+            for start in range(0, max(1, len(text_line)), step):
+                end = min(start + 4096, len(text_line))
                 prefix = "\x1ex" if start else "\x1f"
                 suffix = "x\x1e" if end < len(text_line) else "\x1f"
                 origins[line] = (path, original_line)
@@ -232,9 +232,16 @@ def _scan_entries(entries: Iterable[tuple[Path, str]], *, root: Path,
                 line += 2
                 if end == len(text_line):
                     break
+    return _native_scan("".join(parts), origins, binary=binary, root=root,
+                        names=names, framed=True, reject_email=False)
+
+
+def _native_scan(text: str, origins: dict[int, tuple[Path, int]], *, binary: str,
+                 root: Path, names: tuple[str, ...], framed: bool,
+                 reject_email: bool) -> list[tuple[Path, int]]:
     # stdin needs only its inline config. Do not inherit competing config,
     # logging overrides, synthetic source values or unrelated credentials.
-    environment = {"BETTERLEAKS_CONFIG_TOML": _config(names, reject_email=reject_email)}
+    environment = {"BETTERLEAKS_CONFIG_TOML": _config(names, framed=framed, reject_email=reject_email)}
     try:
         completed = subprocess.run(
             [binary, "stdin", "--no-banner", "--no-color", "--log-level", "error",
@@ -242,7 +249,7 @@ def _scan_entries(entries: Iterable[tuple[Path, str]], *, root: Path,
              "--ignore-gitleaks-allow", "--gitleaks-ignore-path", os.devnull,
              "--max-decode-depth", "5", "--max-archive-depth", "0",
              "--max-target-megabytes", "0"],
-            input="".join(parts), cwd=root, env=environment, capture_output=True,
+            input=text, cwd=root, env=environment, capture_output=True,
             text=True, encoding="utf-8", errors="strict", timeout=120)
     except (OSError, UnicodeError, subprocess.SubprocessError):
         raise HostNameScanError("host-name scanner unavailable") from None

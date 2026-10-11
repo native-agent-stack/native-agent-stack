@@ -687,9 +687,21 @@ class CheckTests(FixtureTestCase):
             encoded = "".join("%" + format(byte, "02X") for byte in encoded.encode())
         self._assert_private_text_is_refused_before_publication(" " * 3900 + encoded, spy_publication=False)
 
-    @unittest.skipUnless(shutil.which("betterleaks"), "native publication bounds require Betterleaks 1.9.0")
-    def test_oversized_publication_line_refuses_before_write_or_registration(self):
-        self._assert_private_text_is_refused_before_publication(" " * 24001, spy_publication=False)
+    @unittest.skipUnless(shutil.which("betterleaks"), "native publication contract requires Betterleaks 1.9.0")
+    def test_benign_entry_accepted_by_native_stdin_remains_publishable(self):
+        root = self.fixture_root()
+        catalog = root / "catalogs/landscape/foundation.json"
+        source = json.loads(catalog.read_bytes())
+        source["layers"][0]["title"] = "x" * 24001
+        _write_json(catalog, source)
+        try:
+            exit_code, output = self.run_main(root, "--write", native_scan=True)
+        except SystemExit as error:
+            self.fail(f"Native-clean entry unexpectedly refused: {error}")
+        self.assertEqual(exit_code, 0, output)
+        self.assertEqual(json.loads((root / fs.OUTPUT).read_bytes())["layers"][0]["title"], "x" * 24001)
+        registered = json.loads((root / "manifests/evidence.json").read_bytes())["files"]
+        self.assertEqual(registered[0]["sha256"], hashlib.sha256((root / fs.OUTPUT).read_bytes()).hexdigest())
 
     @unittest.skipUnless(shutil.which("betterleaks"), "native write privacy plant requires Betterleaks 1.9.0")
     def test_explicit_private_account_is_refused_before_write_or_registration(self):

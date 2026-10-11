@@ -264,6 +264,11 @@ close missing-source packet gaps, not historical model execution gaps.
 
 ## Framing micro and Codex threads at 7ceedc64
 
+Historical round at `e5b7d884`: its whole-line bound was rejected by the CC's
+native per-entry adjudication and the confirmation micro. The terminal
+correction below supersedes that publication mechanism and its size contract;
+the source-binding and lower-pin corrections remain accepted.
+
 The relaunched correction closes Astra's one privacy P2 and the four Codex
 threads on `7ceedc64f38a0aa1fb4c48c6fb00ed62799d7141`. Search-first quick mode
 selected the installed Betterleaks 1.9.0 native command and the reviewed
@@ -338,3 +343,87 @@ plan is retained for independent review while only its sanitized source-review
 projection is checked in. The future page remains separate W4 work. Expanded
 gates, registered evidence and exact-head publication are recorded in the final
 handoff; no model run or hosted-green result is inferred from these local checks.
+
+## Terminal native per-entry correction
+
+The complete 22,476-byte GPT confirmation verdict at `e5b7d884` has SHA256
+`2f7cdbfad9a7ba43dc0ec74a1e9109b113e51c105d704bd1a80b1f3f41c4b247`.
+Its one blocker reproduces the defect introduced by the prior repair: a
+native-clean title of 24,001 ordinary `x` characters was refused by the local
+line-size bound. The CC had selected the supported native per-entry route,
+not that framing amendment. This correction implements the selected route
+without reopening candidate selection or expanding the fix scope.
+
+Primary source is Betterleaks 1.9.0 at
+`81aff7a638638aae3a659845d089043e1d8fe9ac`:
+[cmd/stdin.go:47-49](https://github.com/betterleaks/betterleaks/blob/81aff7a638638aae3a659845d089043e1d8fe9ac/cmd/stdin.go#L47)
+and [sources/stdin.go:18-25](https://github.com/betterleaks/betterleaks/blob/81aff7a638638aae3a659845d089043e1d8fe9ac/sources/stdin.go#L18).
+Their original bytes are already in the retained capture packet. Publication
+now invokes that native command separately for each entry with its original
+text, unframed native rules and no repository input-size limit. It shares the
+existing redacted report validation and subprocess isolation with the general
+scanner; no decoder or boundary matcher is added. Vendor input fragmentation
+remains the vendor's behavior, rather than another local overlap contract.
+
+The native-clean reader regression is ported into the existing CheckTests
+fixture and verifies actual output plus registration. It was red on `e5b7d884`
+before the production edit. The two existing complete-writer plants are
+retained; the exact `7ceedc64` scanner produces four failing subcases (three
+email encodings and twice-percent-encoded account), while the corrected native
+route refuses them and preserves output/registry bytes. Native adapter tests
+also observe a separate stdin invocation for each original entry, unchanged
+control characters/text, unframed configuration, native-clean large inputs and
+decoded alphanumeric neighbors. Both complete modules pass 105 tests in
+41.100s with zero skips on this host.
+
+The reader's standalone script could not start because its local cached packet
+lacks `tree/tests/test_final_stack.py`; that missing-fixture attempt is retained
+as an error, not a regression result. The equivalent regression runs through
+the repository's existing fixture and unittest harness. An earlier aggregate
+48-entry scanner fixture also failed under native reader fragmentation; it was
+reconciled to separate original entries, as the adjudicated contract requires,
+without changing the vendor or introducing framing. Failed attempts remain
+distinct from passing results.
+
+Scope-locked P3 follow-ups, carried in the hosted PR body: output/registry
+recovery on registration failure; retain complete release-response and raw
+vendor-harness execution evidence; correct the pre-existing CI-interpreter
+workflow locator through its source. General account/history nested-token and
+multiline coverage remains in the secrets/security research queue. None is
+folded into this terminal blocker correction unless expressly adjudicated below.
+
+The co-op relayed the CC's final release at 15:52:46Z. The pinned local mirror
+now resolves to `81aff7a638638aae3a659845d089043e1d8fe9ac`; its original
+`cmd/stdin.go` and `sources/stdin.go` were read with `GIT_NO_LAZY_FETCH=1` and
+`GIT_OPTIONAL_LOCKS=0` and agree with the retained sources. This is the selected
+native route, not a new scanner selection or a new upstream Go-harness run.
+
+The release permits Codex thread 4241892054 to become a follow-up if the
+platform predicate predates `7ceedc64`. It does: the `platforms` assignment is
+identical at initial generator `6fbd22d5` (lines 404-406), `f5bd15dd` (409-411),
+`7ceedc64` (410-412) and `e5b7d884` (423-425), normalized AST SHA256
+`a0cd56fb8ff0d3a9c8f0cde3a705b20861b6f64628128cb5c0a8ef33339e67e4`.
+Executing the original `build_runs` bodies at the first two pins with synthetic
+equal-version/different-commit platform records reproduces both platform names
+and a macOS conflict. This is source review plus a synthetic function probe,
+not a new upstream test. It is explicitly routed to the PR-body follow-up
+under the CC exception; the pin-selection code is unchanged in this correction.
+
+The cheap CI-interpreter comment is corrected in one line to the explicit
+historical provisioning statement at
+[0d822e91 `.github/workflows/validate.yml:201-202`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/0d822e91c95d0f3cb24a76270daff67840b4da06/.github/workflows/validate.yml#L201).
+Its original source is retained; no interpreter or fixture behavior changes.
+Atomic registration recovery and complete upstream-execution/latest-release
+evidence remain the requested P3 follow-ups.
+
+Required local gates pass: 105 tests/zero skips in both owned worktrees;
+FULL validate/evidence/final-stack pass 11,479 files on the held-head preparation
+and 11,489 files on main `1e6a49ff` plus the full prepared PR applied with native
+`git apply --3way --index`. That genuine merged worktree has no conflicts or
+synthetic registry repair. The direct validation-caller module also passes 84
+tests/zero skips. An optional nine-module expansion hit its 240-second tool
+timeout without a complete count and is not acceptance. Original privacy
+controls are red at `7ceedc64`; the benign native-clean control is red at
+`e5b7d884` (one failure, zero errors). All are green on the selected native route.
+The final released commit and exact lease are recorded in the co-op handoff;
+no further fix round is authorized except a new P1.

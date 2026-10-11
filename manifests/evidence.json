@@ -18642,8 +18642,8 @@
     },
     {
       "path": "docs/decisions/2026-10-09-host-name-scan.md",
-      "sha256": "72b922c0b0f7fe0f19a49aba6e10a3ce28c910049f4395118d2293c937840050",
-      "bytes": 16670
+      "sha256": "43d0e41dc800d749376e8e8abcbd1e0fe1a627cf4f64d9de8d193e86d1a452ef",
+      "bytes": 16507
     },
     {
       "path": "docs/decisions/2026-10-09-mcp-surfaces-trials.md",
@@ -18722,8 +18722,8 @@
     },
     {
       "path": "docs/decisions/2026-10-11-final-stack-review-corrections.md",
-      "sha256": "f4ca8124ee2eae1f57a769f394c26383649ad8fba120d2a6423b03c01cf228fc",
-      "bytes": 27981
+      "sha256": "f413a5a69b8260f3653901a181e66b4ceab063c04d18b4b972159cb3d65af8b4",
+      "bytes": 33883
     },
     {
       "path": "docs/decisions/2026-10-11-layer-resolution-protocol.md",
@@ -18887,8 +18887,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "acb64935e00c2254d74c9a1c926a063f7953079a9eac56b85d23a075813f9a19",
-      "bytes": 261440
+      "sha256": "118013afc063b6834ddef987b4c72a070d754947c9e4271bfe124dfe497f0b33",
+      "bytes": 262149
     },
     {
       "path": "docs/harness-rule-enforcement.md",
@@ -60727,8 +60727,8 @@
     },
     {
       "path": "scripts/host_name_scan.py",
-      "sha256": "a460890a2883c0cb53c41e6bd564d0d010b595a041cec47a99d7bbfa5d280c0f",
-      "bytes": 20280
+      "sha256": "813f1444d7d7ab9c307a39274b866e091c65d79274b08c1f9a3f2cc7d7ec8740",
+      "bytes": 20529
     },
     {
       "path": "scripts/host_receipts.py",
@@ -61582,8 +61582,8 @@
     },
     {
       "path": "tests/test_final_stack.py",
-      "sha256": "5cd8382257e2abc5116e64f02019e7d8a2d413ebfc8968aa7bbeaa1bf4b7a69b",
-      "bytes": 54867
+      "sha256": "fd249d56070566295bc8617d33b47cdaf761e37dde864f270c0d91b9ce4c4a83",
+      "bytes": 55557
     },
     {
       "path": "tests/test_financial_data.py",
@@ -61717,8 +61717,8 @@
     },
     {
       "path": "tests/test_host_name_scan.py",
-      "sha256": "f0aab08b9c0f78d83db40b84378a4af6da402ee0d64f6d011b25df06337e9124",
-      "bytes": 25801
+      "sha256": "e0f52b2daea969fa1810182a189d8ec239b51a623be5107810eb0c72a38973a2",
+      "bytes": 26490
     },
     {
       "path": "tests/test_host_receipts.py",
@@ -62252,8 +62252,8 @@
     },
     {
       "path": "tests/test_runtime_worker_openhands_push_gate.py",
-      "sha256": "9a9d2928a28883e135bceac4cd4da72839d11bfa3bfa2b7a6801c8b2940e9b98",
-      "bytes": 161891
+      "sha256": "9e5c753772df850caea8045545649dd035cf95d0a3a90657c657f61ee0118494",
+      "bytes": 161926
     },
     {
       "path": "tests/test_runtime_worker_openhands_resolver.py",

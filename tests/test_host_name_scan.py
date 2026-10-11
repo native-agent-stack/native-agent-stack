@@ -205,7 +205,7 @@ class HostNameSourceTests(unittest.TestCase):
 
 @unittest.skipUnless(shutil.which("betterleaks"), "native Betterleaks unavailable")
 class NativeHostNameScanTests(unittest.TestCase):
-    def test_complete_publication_lines_keep_encoded_tokens_at_every_old_cut(self):
+    def test_native_publication_entries_keep_encoded_tokens_at_every_old_cut(self):
         name = "fixture-private-account"
         email = "a" * 64 + "@" + "b" * 63 + ".example.invalid"
         import base64
@@ -218,10 +218,11 @@ class NativeHostNameScanTests(unittest.TestCase):
             plants.append(encoded)
         lines = [" " * offset + plant for plant in plants
                  for offset in (0, 3900, 3980, 4090, 4110, 8000)]
-        self.target.write_text("\n".join(lines), encoding="utf-8")
-        self.assertEqual(host_name_scan.scan_paths([self.target], root=self.root, names=(name,),
-                                                  reject_email=True),
-                         [(self.target, line) for line in range(1, len(lines) + 1)])
+        paths = [self.root / f"entry-{index:02}.txt" for index in range(len(lines))]
+        for path, text in zip(paths, lines):
+            path.write_text(text, encoding="utf-8")
+        self.assertEqual(host_name_scan.scan_paths(paths, root=self.root, names=(name,), reject_email=True),
+                         [(path, 1) for path in paths])
 
     def test_complete_publication_lines_keep_decoded_alphanumeric_neighbors(self):
         name = "fixture-private-account"
@@ -236,15 +237,26 @@ class NativeHostNameScanTests(unittest.TestCase):
         self.assertEqual(host_name_scan.scan_paths([self.target], root=self.root, names=(name,),
                                                   reject_email=True), [])
 
-    def test_publication_record_bound_counts_utf8_bytes_and_refuses_without_values(self):
-        for content in (" " * 24001, "中" * 8001):
+    def test_native_publication_has_no_repository_line_size_limit(self):
+        for content in ("x" * 24001, "中" * 8001, "x" * 240001):
             with self.subTest(bytes=len(content.encode())):
                 self.target.write_text(content, encoding="utf-8")
-                with self.assertRaises(host_name_scan.HostNameScanError) as caught:
-                    host_name_scan.scan_paths([self.target], root=self.root, reject_email=True)
-                self.assertEqual(str(caught.exception), "publication line exceeds native framing capacity")
-        self.target.write_text("中" * 8000 + "\n" + " " * 24000, encoding="utf-8")
-        self.assertEqual(host_name_scan.scan_paths([self.target], root=self.root, reject_email=True), [])
+                self.assertEqual(host_name_scan.scan_paths([self.target], root=self.root, reject_email=True), [])
+
+    def test_native_publication_scans_each_entry_without_changing_its_text(self):
+        other = self.root / "other.txt"
+        contents = ["safe\x1e text\n" + "x" * 24001, "other\x1f text\nclean"]
+        self.target.write_text(contents[0], encoding="utf-8")
+        other.write_text(contents[1], encoding="utf-8")
+        original = host_name_scan.subprocess.run
+        with mock.patch.object(host_name_scan.subprocess, "run", wraps=original) as run:
+            self.assertEqual(host_name_scan.scan_paths([self.target, other], root=self.root,
+                                                      names=self.names, reject_email=True), [])
+        scans = [call for call in run.call_args_list if call.args[0][1] == "stdin"]
+        self.assertEqual([call.kwargs["input"] for call in scans], contents)
+        self.assertTrue(all(call.kwargs["env"]["BETTERLEAKS_CONFIG_TOML"] ==
+                            host_name_scan._config(self.names, framed=False, reject_email=True)
+                            for call in scans))
 
     def test_email_policy_uses_native_decoding_without_an_account_match(self):
         import base64

@@ -52,23 +52,21 @@ Raw U+001E and U+001F are replaced with U+FFFD before framing so original conten
 cannot impersonate the internal record markers. A two-line native probe proves
 names following either raw control character still receive their original lines.
 
-Publication mode (`scan_paths(..., reject_email=True)`) keeps each complete
-original serialized line in one record instead of using the account-derived
-overlap. It refuses a line over 24,000 UTF-8 bytes before invoking the scanner;
-the bound includes original neighbor context and all encoded text, regardless
-of nesting or email length. The four bytes for record markers and double
-newlines keep the complete record below the pinned native 25,000-byte lookahead,
-so the native reader reaches the next separator without cutting a token.
-The native depth-5 decoder and Expr boundary filters remain the matcher.
-All publication strings in the generated JSON occupy a single original line;
-literal string newlines are serialized as escapes. This bounded serialized
-publication contract is distinct from the general account-only repository and
-history modes, which retain their existing framing and native git behavior.
-Long percent-, Unicode-escape- and base64-email plants and nested percent-account
-plants cross the former cuts, refuse before publication, and preserve the last
-output and evidence bytes. Original-line/UTF-8 limits and decoded alphanumeric
-neighbors have separate controls. See the
-[correction record](2026-10-11-final-stack-review-corrections.md#framing-micro-and-codex-threads-at-7ceedc64).
+Publication mode (`scan_paths(..., reject_email=True)`) sends each original
+entry separately to the supported native Betterleaks 1.9.0 `stdin` command.
+It uses unframed native rules, with no repository prefix, suffix, separator,
+overlap or size rejection. Betterleaks owns input reads and nested decoding;
+the existing native Expr alphanumeric-neighbor filters remain active.
+This follows `cmd/stdin.go:47-49` and `sources/stdin.go:18-25` at
+`81aff7a638638aae3a659845d089043e1d8fe9ac`, as selected by the CC.
+The earlier whole-line/24,000-byte adapter was rejected: it refused a benign
+24,001-character title accepted by native stdin. That fail-before regression
+now publishes and registers successfully. Both original encoded-email and
+nested-account plants still refuse before final output/registration and
+preserve the previous bytes. Tests observe separate native invocations with
+unchanged entry text and unframed configuration. General account-only
+repository/history framing remains a separately recorded research follow-up.
+See the [terminal correction](2026-10-11-final-stack-review-corrections.md#terminal-native-per-entry-correction).
 
 The native command receives only its inline configuration environment. Competing
 scanner configurations, logging overrides and unrelated credentials are not
