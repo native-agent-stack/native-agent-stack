@@ -10,8 +10,11 @@ This module is that harness's offline subset, kept beside the one copy of the sc
   * the CI line: uet's lg_ci_state on synthetic rollups and nas's check-run line, and both against every member of GitHub's
     CheckConclusionState in a captured schema excerpt (tests/fixtures/landing/check-conclusion-state.json) and null, and uet's
     commit statuses against every member of StatusState (tests/fixtures/landing/status-state.json), a state it does not list and none;
-  * codex_gate.py: its exit-code precedence on canned API data (subprocess.run and datetime.now are patched), and the script run as
+  * codex_gate.py: its exit-code precedence on canned API data (subprocess.run and datetime.now are patched), the connector's summary
+    comment of nas#975 as the gate's own query returned it (tests/fixtures/landing/codex-summary-comment.json), and the script run as
     the landing scripts run it, where a failure prints one fixed line and exits 4;
+  * #975 round 4: the final gate's reads as the last calls before the merge, each gate flipped between its first read and the final
+    gate (its exit code, no merge), the landing lock, and verdict files, records and receipts that cannot be read;
   * each script end to end with a fake gh, python3 and sleep: the variables and their defaults, the gate path through a symlink and
     a wrapper, the order in which the gates stop a landing, a failed merge and a failing gh call at each call site (#975 P2-2), none
     of which may print what gh or its API returned;
@@ -20,7 +23,7 @@ This module is that harness's offline subset, kept beside the one copy of the sc
     and the README's digests.
 
 A decision site is cut out by the same start and end lines the harness used, so an edit that moves a site fails here loudly instead
-of leaving it untested. Everything but the captured schema excerpt is synthetic: no network, no gh, no cache files. `jq` is required
+of leaving it untested. Everything but the captured schema excerpts and summary comment is synthetic: no network, no gh, no cache files. `jq` is required
 (the runners have it); when it is missing the module fails in CI and is skipped elsewhere. The scripts are Linux tools (GNU sha256sum
 and readlink -f).
 """
@@ -38,6 +41,7 @@ import json
 import os
 import re
 import shutil
+import signal
 import stat
 import subprocess
 import sys
@@ -71,7 +75,7 @@ ADDRESS = "api-text-4e9b@example.invalid"  # synthetic: stands for an address th
 def setUpModule():
     if not sys.platform.startswith("linux"):
         raise unittest.SkipTest("the landing scripts run on the CC's Linux host and need GNU sha256sum and readlink -f")
-    missing = [tool for tool in ("bash", "git", "jq", "sha256sum", "readlink", "dirname", "grep", "seq")
+    missing = [tool for tool in ("bash", "git", "jq", "sha256sum", "readlink", "dirname", "grep", "seq", "flock")
                if shutil.which(tool) is None]
     if subprocess.run(["git", "patch-id", "--verbatim"], input="", capture_output=True, text=True).returncode != 0:
         missing.append("git patch-id --verbatim")
@@ -93,8 +97,12 @@ def q(path):
 # FAKE_FAIL_STDERR on stderr and FAKE_FAIL_STDOUT on stdout. As gh does (cli v2.102.0), `gh api` puts an error response's body on
 # stdout and "gh: <message>" on stderr (pkg/cmd/api/api.go:546, :557), every other command prints its error only to stderr
 # (internal/ghcmd/cmd.go:214, :285); a test sets FAKE_FAIL_STDOUT for `api` calls only.
+# #975 round 4: FAKE_GH_HOOK runs (sh -c) before every call that matches the glob FAKE_GH_HOOK_ON, so a test can change GitHub-side or
+# local data at one step (the flip suite does it at the author-address lookup, the last slow step before final_gate). `gh api graphql`
+# answers only the review-thread count; any other query fails, as for a gate that runs against this fake.
 FAKE_GH = r'''#!/usr/bin/env bash
 [ -n "${FAKE_LOG:-}" ] && printf 'gh %s\n' "$*" >> "$FAKE_LOG"
+if [ -n "${FAKE_GH_HOOK:-}" ] && [[ "$*" == ${FAKE_GH_HOOK_ON:-} ]]; then sh -c "$FAKE_GH_HOOK"; fi
 if [ -n "${FAKE_FAIL:-}" ] && [ -n "${FAKE_LOG:-}" ] && [[ "$*" == $FAKE_FAIL ]]; then
   failed=$(cat "$FAKE_LOG.fail" 2>/dev/null || echo 0); failed=$((failed + 1)); echo "$failed" > "$FAKE_LOG.fail"
   if [ "$failed" -ge "${FAKE_FAIL_FROM:-1}" ]; then
@@ -117,7 +125,7 @@ case "$1 $2" in
       *) exit 1 ;;
     esac ;;
   "api users/"*) [ "${FAKE_USER_RC:-0}" = 0 ] || exit "$FAKE_USER_RC"; echo "${FAKE_USER_ID-4242424}"; exit 0 ;;
-  "api graphql") echo "${FAKE_OPEN_THREADS:-0}"; exit 0 ;;
+  "api graphql") [[ "$*" == *reviewThreads* ]] || exit 1; echo "${FAKE_OPEN_THREADS:-0}"; exit 0 ;;
   "pr view")
     if [ -n "${FAKE_HEADS:-}" ] && [[ "$*" == *headRefOid* ]]; then
       heads=($FAKE_HEADS); n=$(cat "$FAKE_LOG.heads" 2>/dev/null || echo 0); echo $((n + 1)) > "$FAKE_LOG.heads"
@@ -153,7 +161,35 @@ fi
 echo "${FAKE_GATE_LINE:-Codex review finished at 2026-10-10T00:00:00Z after the latest trigger 2026-10-09T00:00:00Z}"
 exit "$rc"
 '''
-FAKE_SLEEP = "#!/bin/sh\nexit 0\n"
+# #975 round 4: sleep is logged too, so the call-order test sees that nothing slow runs between the final gate and the merge.
+FAKE_SLEEP = "#!/bin/sh\n[ -z \"${FAKE_LOG:-}\" ] || printf 'sleep %s\\n' \"$*\" >> \"$FAKE_LOG\"\nexit 0\n"
+# #975 round 4: git is the real git, and every call is appended to FAKE_LOG when it is set, so the call-order test sees the final gate's
+# git reads (the change identity, git ls-remote) beside the gh calls. FAKE_GIT_HOOK runs (sh -c) once, right after the first call that
+# matches the glob FAKE_GIT_HOOK_ON has returned, and that call's exit code is kept. {git} is the real git's path.
+FAKE_GIT = r'''#!/bin/sh
+[ -z "${{FAKE_LOG:-}}" ] || printf 'git %s\n' "$*" >> "$FAKE_LOG"
+if [ -n "${{FAKE_GIT_FAIL:-}}" ]; then  # the FAKE_GIT_FAIL_FROM-th call (default 1) matching the glob FAKE_GIT_FAIL, and every later one, fails
+  case "$*" in $FAKE_GIT_FAIL)
+    n=$(cat "$FAKE_LOG.gitfail" 2>/dev/null || echo 0); n=$((n + 1)); echo "$n" > "$FAKE_LOG.gitfail"
+    [ "$n" -lt "${{FAKE_GIT_FAIL_FROM:-1}}" ] || exit 128 ;;
+  esac
+fi
+if [ -n "${{FAKE_GIT_HOOK:-}}" ] && [ ! -e "$FAKE_LOG.githook" ]; then
+  case "$*" in $FAKE_GIT_HOOK_ON) {git} "$@"; rc=$?; touch "$FAKE_LOG.githook"; sh -c "$FAKE_GIT_HOOK"; exit $rc ;; esac
+fi
+exec {git} "$@"
+'''
+# #975 round 4 (GPT P2 at 761810d7): head and grep that remove the file FAKE_VANISH when they are the second command given its path, so a
+# script that reads one file twice sees it vanish between the reads. {real} is the real command's path.
+FAKE_VANISH = r'''#!/bin/sh
+for a in "$@"; do
+  if [ -n "${{FAKE_VANISH:-}}" ] && [ "$a" = "$FAKE_VANISH" ]; then
+    n=$(cat "$FAKE_VANISH.count" 2>/dev/null || echo 0); n=$((n + 1)); echo "$n" > "$FAKE_VANISH.count"
+    [ "$n" -lt 2 ] || rm -f -- "$FAKE_VANISH"
+  fi
+done
+exec {real} "$@"
+'''
 
 
 def git(repo, *args):
@@ -175,14 +211,16 @@ class Script:
         self.text = self.path.read_text(encoding="utf-8")
         self.lines = self.text.split("\n")
         self.tcc = self.cut(r"^tcc_read_gate\(\) \{$", r"^\}$")
-        self.verdict_loop = self.cut(r"^for v in (\$\{VERDICT_FILES:-\}|\"\$@\"); do$", r"^done$")
+        # #975 round 4: the verdict loop is a function, run first and again in final_gate
+        self.verdict_gate = self.cut(r"^verdict_gate\(\) \{$", r"^\}$")
+        self.final = self.cut(r"^final_gate\(\) \{( |$)", r"^\}$")
         # #975 (Codex P1 at af9d1901): the GPT_VERDICT block is a function, called on a 5 at both gate calls
         self.gpt = self.cut(r"^gpt_substitute\(\) \{$", r"^\}$") if key == "uet" else None
         self.change = self.cut(r"^change\(\) \{", r"^same_change\(\) \{")
         if key == "uet":
             self.ci = self.cut(r'^  s=\$\(lg_ci_state "\$N"\)$', r'^  s=\$\(lg_ci_state "\$N"\)$')
-        else:  # the check-run line and, on it, the typed-shape check of #975 P2-B
-            self.ci = self.cut(r'^  c=\$\(gh api "repos/\$R/commits/\$hd/check-runs', r"@tsv'( 2>/dev/null)?\)( && .*)?$")
+        else:  # the check-run function: its line and, on it, the typed-shape check of #975 P2-B
+            self.ci = self.cut(r"^nas_checks\(\) \{( |$)", r"^\}$")
         found = re.findall(r"^# >>> land-gate-fns$.*?^# <<< land-gate-fns$", self.text, re.S | re.M)
         if len(found) != 1:
             raise AssertionError(f"{key}_land.sh needs exactly one land-gate-fns block, it has {len(found)}")
@@ -215,9 +253,15 @@ class LandingCase(unittest.TestCase):
         cls.dir = Path(scratch.name)
         cls.bin = cls.dir / "bin"
         cls.bin.mkdir()
-        for name, text in (("gh", FAKE_GH), ("python3", FAKE_PYTHON3), ("sleep", FAKE_SLEEP)):
+        cls.real_git, cls.real_sleep = shutil.which("git"), shutil.which("sleep")
+        for name, text in (("gh", FAKE_GH), ("python3", FAKE_PYTHON3), ("sleep", FAKE_SLEEP), ("git", FAKE_GIT.format(git=q(cls.real_git)))):
             (cls.bin / name).write_text(text, encoding="utf-8")
             (cls.bin / name).chmod(0o755)
+        cls.vanish_bin = cls.dir / "vanish-bin"  # put first on PATH by a test that wants FAKE_VANISH
+        cls.vanish_bin.mkdir()
+        for name in ("head", "grep"):
+            (cls.vanish_bin / name).write_text(FAKE_VANISH.format(real=q(shutil.which(name))), encoding="utf-8")
+            (cls.vanish_bin / name).chmod(0o755)
         cls.uet, cls.nas = Script("uet"), Script("nas")
         cls.counter = itertools.count(1)
 
@@ -241,13 +285,13 @@ class LandingCase(unittest.TestCase):
     def verdict_files(self, script, path, head, gates_done=None):
         gates = f"GATES_DONE={q(gates_done)}" if gates_done else "unset GATES_DONE"
         prelude = f"R=x/y; N=1; E={head}; EF={head}\n{gates}\n{script.block}\n"
-        prelude += f"VERDICT_FILES={q(path)}\n" if script.key == "uet" else f"set -- {q(path)}\n"
-        return self.bash(prelude, script.verdict_loop)
+        prelude += f"VERDICT_FILES={q(path)}\n" if script.key == "uet" else f"VF=({q(path)})\n"
+        return self.bash(prelude, f"{script.verdict_gate}\nverdict_gate")
 
     def receipt_loop(self, path, read, head, gates_done):
-        """nas's verdict loop when the caller gave the read head as `read` (a prefix) and it resolved to `head`."""
-        prelude = f"R=x/y; N=1; E={read}; EF={head}\nGATES_DONE={q(gates_done)}\n{self.nas.block}\nset -- {q(path)}\n"
-        return self.bash(prelude, self.nas.verdict_loop)
+        """nas's verdict gate when the caller gave the read head as `read` (a prefix) and it resolved to `head`."""
+        prelude = f"R=x/y; N=1; E={read}; EF={head}\nGATES_DONE={q(gates_done)}\n{self.nas.block}\nVF=({q(path)})\n"
+        return self.bash(prelude, f"{self.nas.verdict_gate}\nverdict_gate")
 
     def gpt_block(self, path, head):
         prelude = f"R=x/y; N=1; E={head}; GPT_VERDICT={q(path)}\n{self.uet.block}\n"
@@ -273,7 +317,7 @@ class LandingCase(unittest.TestCase):
         feed = self.write("ci.json", json.dumps(document))
         if script.key == "uet":
             return self.bash(f"R=x/y; N=1\nexport FAKE_PRVIEW={q(feed)}\n{script.block}\n", f'{script.ci}\necho "$s"')
-        return self.bash(f"R=x/y; N=1; hd=abc\nexport FAKE_CHECKRUNS={q(feed)}\n", f'{script.ci}\necho "$c"')
+        return self.bash(f"R=x/y; N=1\nexport FAKE_CHECKRUNS={q(feed)}\n", f'{script.ci}\nnas_checks abc')
 
 
 def accept(code, reject_code=2):
@@ -555,13 +599,38 @@ class ScriptTextTests(LandingCase):
         self.assertEqual(uet_without_ci, self.nas.block)
 
     def test_scripts_run_the_gate_isolated_and_through_the_variable(self):
+        # #975 P2-C: every call goes through lg_gate, which runs `python3 -I` and echoes only the gate's own status lines. #975 round 4:
+        # the read head is the gate's third argument; uet asks at the wait and in final_gate, nas also before the validation.
+        for script, read, calls in ((self.uet, "$E", 2), (self.nas, "$EF", 3)):
+            with self.subTest(script=script.key):
+                self.assertEqual(script.text.count(f'lg_gate "$GATE" "$R" "$N" "{read}"'), calls)
+                self.assertEqual(script.text.count("lg_gate \"$GATE\""), calls)
+                self.assertIn(f'g=$(lg_gate "$GATE" "$R" "$N" "{read}"); gr=$?', script.final)
+                self.assertEqual(script.text.count("python3 -I"), 1)
+                self.assertIn('g=$(python3 -I "$1" "$2" "$3" "$4" 2>&1)', script.block)
+                self.assertEqual(len(re.findall(r"^GATE=", script.text, re.M)), 1)
+
+    def test_every_child_that_waits_or_detaches_runs_without_the_lock_descriptor(self):
+        # #975 round 4: the landing lock is descriptor 9; git (whose maintenance detaches keeping every descriptor but 0-2), gh, python3
+        # and sleep run with it closed, so the lock ends with the script. The wrappers are in the shared block, before any call.
         for script in (self.uet, self.nas):
             with self.subTest(script=script.key):
-                # #975 P2-C: both calls go through lg_gate, which runs `python3 -I` and echoes only the gate's own status lines
-                self.assertEqual(script.text.count('lg_gate "$GATE" "$R" "$N"'), 2, "before the wait and before the merge")
-                self.assertEqual(script.text.count("python3 -I"), 1)
-                self.assertIn('g=$(python3 -I "$1" "$2" "$3" 2>&1)', script.block)
-                self.assertEqual(len(re.findall(r"^GATE=", script.text, re.M)), 1)
+                for command in ("git", "gh", "python3", "sleep"):
+                    self.assertIn(f'{command}() {{ command {command} "$@" 9>&-; }}', script.block)
+                lock = script.lines.index('lg_lock "${LANDING_LOCK_DIR:-$COORD/command-center/landing-locks}" || exit 14')
+                first = min(i for i, line in enumerate(script.lines) if re.match(r"^(git|gh|\$G) ", line))
+                self.assertLess(lock, first, "the lock is taken before the first git or gh call")
+                self.assertLess(script.lines.index("# <<< land-gate-fns"), lock)
+
+    def test_the_final_gate_runs_after_the_last_slow_step_and_right_before_the_merge(self):
+        # #975 round 4: the author lookup is the last slow step, final_gate the only thing between it and the pinned merge.
+        for script, pinned in ((self.uet, '"$H"'), (self.nas, '"$cur"')):
+            with self.subTest(script=script.key):
+                merge = next(i for i, line in enumerate(script.lines) if line.startswith("out=$(gh pr merge "))
+                self.assertEqual(script.lines[merge - 1], f"final_gate {pinned}")
+                self.assertTrue(script.lines[merge - 2].startswith('ae=$(lg_author_email "$R")'))
+                self.assertIn(f"--match-head-commit {pinned}", script.lines[merge])
+                self.assertEqual(script.text.count("\nfinal_gate "), 1)
 
     def test_readme_names_every_variable_and_exit_code_the_scripts_use(self):
         readme = (LANDING / "README.md").read_text(encoding="utf-8")
@@ -1123,21 +1192,29 @@ def ci_reference_uet(entries):
     return incomplete, failing, len(entries), gate
 
 
+RUN_IDS = itertools.count(1)  # REST check-run ids: a re-run gets a larger one
+
+
 def nas_run(name, started, status="completed", conclusion="success"):
-    return {"name": name, "status": status, "conclusion": conclusion, "started_at": started}
+    return {"name": name, "status": status, "conclusion": conclusion, "started_at": started, "id": next(RUN_IDS)}
 
 
 def ci_reference_nas(runs):
-    latest = {}
+    """#975 round 4 (the CC's P3-1): a name is incomplete while any of its runs is not completed, and failing or validated by its latest
+    completed run (latest by started_at, then id; a queued re-run has started_at null)."""
+    names = {}
     for run in runs:
-        if run["name"] not in latest or run["started_at"] > latest[run["name"]]["started_at"]:
-            latest[run["name"]] = run
-    kept = list(latest.values())
-    incomplete = sum(1 for r in kept if r["status"] != "completed")
+        names.setdefault(run["name"], []).append(run)
     passing = [conclusion.lower() for conclusion in PASSING_CONCLUSIONS]  # REST spells the conclusions in lower case
-    failing = sum(1 for r in kept if r["status"] == "completed" and r["conclusion"] not in passing)
-    validated = sum(1 for r in kept if r["name"] == "validate" and r["conclusion"] == "success")
-    return incomplete, failing, len(kept), validated
+    incomplete = failing = validated = 0
+    for name, group in names.items():
+        busy = any(r["status"] != "completed" for r in group)
+        done = [r for r in group if r["status"] == "completed"]
+        latest = max(done, key=lambda r: (r["started_at"] or "", r["id"])) if done else None
+        incomplete += busy
+        failing += latest is not None and latest["conclusion"] not in passing
+        validated += name == "validate" and not busy and latest is not None and latest["conclusion"] == "success"
+    return incomplete, failing, len(names), validated
 
 
 class CiLineTests(LandingCase):
@@ -1182,6 +1259,13 @@ class CiLineTests(LandingCase):
             ("action_required counts as failing", [nas_run("validate", t), nas_run("x", t, conclusion="action_required")]),
             ("a latest cancelled run counts as failing", [nas_run("validate", t), nas_run("x", t, conclusion="cancelled")]),
             ("a latest timed_out run counts as failing", [nas_run("validate", t), nas_run("x", t, conclusion="timed_out")]),
+            # #975 round 4 (Codex P1 at 761810d7, the CC's P3-1): max_by(.started_at) sorted a queued re-run's null first, so the old success
+            # stood for the name (0 incomplete, validate counted: the landing went on while the re-run had not started)
+            ("an old success and a queued re-run with no start", [nas_run("validate", t), nas_run("validate", None, status="queued", conclusion=None)]),
+            ("an old success and a re-run in progress", [nas_run("validate", t), nas_run("lint", t), nas_run("lint", "2026-10-10T10:06:00Z", status="in_progress", conclusion=None)]),
+            ("a superseded run still queued keeps its name incomplete", [nas_run("validate", "2026-10-10T10:05:00Z"), nas_run("validate", None, status="queued", conclusion=None),
+                                                                         nas_run("lint", t)]),
+            ("the latest completed run decides a failure", [nas_run("validate", t), nas_run("x", t, conclusion="failure"), nas_run("x", "2026-10-10T10:09:00Z")]),
         ]
         for name, runs in cases:
             with self.subTest(case=name):
@@ -1260,8 +1344,23 @@ def comment(login, when, body=""):
 STARTED = "2026-10-10T12:00:10Z"  # when the review a summary row reports went Running, unless a test says otherwise
 
 
+GATE_HEAD = "5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f"  # the pull request's head that the fake serves (pulls/<pr> head.sha)
+SUMMARY_FIXTURE = ROOT / "tests/fixtures/landing/codex-summary-comment.json"  # #975 round 4: nas#975's summary comment, captured live
+
+
 def summary_body(*rows):
-    return "<!-- codex-pull-request-review-summary -->\n| # | Status |\n| --- | --- |\n" + "\n".join(rows)
+    return "<!-- codex-pull-request-review-summary -->\n| # | Status | Commit | Review trigger |\n| --- | --- | --- | --- |\n" + "\n".join(rows)
+
+
+def graphql_node(c, int32=False):
+    """A test comment (REST shape) as the GraphQL IssueComment node the gate reads: the author as an Actor (the connector a Bot whose
+    login has no [bot] suffix), each revision's editor (the author unless the test names one), and the id as fullDatabaseId (BigInt, a
+    string) and databaseId (Int). int32 serves databaseId as the schema's Int can hold it: null above 2^31 - 1."""
+    login = c["user"]["login"]
+    author = {"__typename": "Bot", "login": login[:-5]} if login.endswith("[bot]") else {"__typename": "User", "login": login}
+    edits = [{"editedAt": e["editedAt"], "diff": e["diff"], "editor": e.get("editor", author)} for e in c.get("edits", [])]
+    return {"databaseId": None if int32 and c["id"] >= 2 ** 31 else c["id"], "fullDatabaseId": str(c["id"]), "author": author,
+            "createdAt": c["created_at"], "body": c["body"], "userContentEdits": {"nodes": edits}}
 
 
 def summary(*rows, started=STARTED, history=None):
@@ -1269,14 +1368,16 @@ def summary(*rows, started=STARTED, history=None):
     them). By default each row that is not Running was Running since `started` in an earlier revision (#975: the connector edits
     one comment in place, measured on nas#974, #975, #979 and #994); `history` gives the earlier revisions' bodies instead."""
     body = summary_body(*rows)
-    if history is None:
-        history = [summary_body(*(row("Running since", started, review=r) for r in range(1, len(rows) + 1)))] if started else []
+    if history is None:  # #975 round 4: each row Running with its own other cells (kind, commit, trigger kind), as the connector writes it
+        history = [summary_body(*(re.sub(r"\*\*[^*]+\*\* <relative-time datetime=\"[^\"]+\">at [^<]+</relative-time>",
+                                         f'**Running since** <relative-time datetime="{started}">at {started}</relative-time>', r) for r in rows))] if started else []
     edits = [{"editedAt": f"2026-10-10T12:00:{index:02d}Z", "diff": text} for index, text in enumerate([*history, body])]
     return {**comment(BOT, "2026-10-10T12:00:30Z", body), "edits": edits[::-1] if history else []}
 
 
-def row(status, when, review=1):
-    return f'| {review} | **{status}** <relative-time datetime="{when}">at {when}</relative-time> |'
+def row(status, when, review=1, commit=GATE_HEAD[:7]):
+    """A summary-table row in the connector's layout (tests/fixtures/landing/codex-summary-comment.json): kind, status, commit, trigger."""
+    return f'| {review} | **{status}** <relative-time datetime="{when}">at {when}</relative-time> | `{commit}` | Manual request |'
 
 
 def pending_review():
@@ -1294,7 +1395,10 @@ class CodexGateTests(unittest.TestCase):
         cls.gate = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(cls.gate)
 
-    def run_gate(self, comments=(), timeline=(), reviews=(), reactions=(), created=CREATED, now="2026-10-10T12:05:00Z", fail=None):
+    def run_gate(self, comments=(), timeline=(), reviews=(), reactions=(), created=CREATED, now="2026-10-10T12:05:00Z", fail=None,
+                 graphql=None, read=None, head=GATE_HEAD, int32=False, nodes=None):
+        """The gate on canned API data. GraphQL serves `graphql` (default: `comments`) as IssueComment nodes, or `nodes` as given; REST
+        serves `comments` (the gate read them there before #975 round 4), so two different lists model an edit between two reads."""
         real = self.gate.datetime
         frozen = real.fromisoformat(now.replace("Z", "+00:00"))
 
@@ -1305,22 +1409,22 @@ class CodexGateTests(unittest.TestCase):
 
         def fake_run(cmd, capture_output=False, text=False, check=False):
             self.assertEqual(cmd[:2], ["gh", "api"], "codex_gate.py reaches GitHub only through gh api")
-            if fail == "all" or (fail == "head" and "--paginate" not in cmd) or (fail == "lists" and "--paginate" in cmd) \
+            if fail == "all" or (fail == "head" and "--paginate" not in cmd) or (fail == "lists" and "--paginate" in cmd and cmd[2] != "graphql") \
                     or (fail == "graphql" and cmd[2] == "graphql"):
                 if check:
                     raise subprocess.CalledProcessError(1, cmd, "", "HTTP 502")
                 return subprocess.CompletedProcess(cmd, 1, "", "HTTP 502")
-            if cmd[2] == "graphql":  # the comments' revisions, as `gh api graphql --paginate --slurp` gives them: a list of pages
+            if cmd[2] == "graphql":  # the comments with their revisions, as `gh api graphql --paginate --slurp` gives them: a list of pages
                 self.assertEqual(cmd[3:5], ["--paginate", "--slurp"])
                 self.assertIn("$endCursor: String", cmd[6])
                 self.assertEqual(cmd[7:], ["-f", "owner=o", "-f", "repo=r", "-F", "pr=7"])
-                nodes = [{"databaseId": c["id"], "userContentEdits": {"nodes": c.get("edits", [])}} for c in comments]
-                page = {"data": {"repository": {"pullRequest": {"comments": {"pageInfo": {"hasNextPage": False, "endCursor": None}, "nodes": nodes}}}}}
+                served = nodes if nodes is not None else [graphql_node(c, int32) for c in (comments if graphql is None else graphql)]
+                page = {"data": {"repository": {"pullRequest": {"comments": {"pageInfo": {"hasNextPage": False, "endCursor": None}, "nodes": served}}}}}
                 return subprocess.CompletedProcess(cmd, 0, json.dumps([page]), "")
             path = cmd[-1]
             if "--paginate" not in cmd:
                 self.assertTrue(path.endswith("/pulls/7"), path)
-                return subprocess.CompletedProcess(cmd, 0, json.dumps({"created_at": created}), "")
+                return subprocess.CompletedProcess(cmd, 0, json.dumps({"created_at": created, "head": {"sha": head}}), "")
             self.assertIn("--slurp", cmd)
             lists = {"/issues/7/comments": comments, "/issues/7/timeline": timeline, "/pulls/7/reviews": reviews,
                      "/issues/7/reactions": reactions}
@@ -1330,7 +1434,7 @@ class CodexGateTests(unittest.TestCase):
         out = io.StringIO()
         with mock.patch.object(self.gate.subprocess, "run", fake_run), mock.patch.object(self.gate, "datetime", Frozen), \
                 contextlib.redirect_stdout(out):
-            code = self.gate.main("o/r", "7")
+            code = self.gate.main("o/r", "7", *([read] if read else []))
         return code, out.getvalue().strip()
 
     def test_exit_code_precedence_on_canned_api_data(self):
@@ -1356,7 +1460,9 @@ class CodexGateTests(unittest.TestCase):
             # completion (before, each gave 0); a +1 counts once a review has started since the trigger (test_completion_is_bound...).
             ("a +1 reaction alone is no completion", dict(reactions=[{"user": {"login": BOT}, "content": "+1", "created_at": "2026-10-10T12:03:00Z"}]), 3, "no Codex review finished"),
             ("a +1 reaction by a person does not count", dict(reactions=[{"user": {"login": "someone"}, "content": "+1", "created_at": "2026-10-10T12:03:00Z"}]), 3, "no Codex review"),
-            ("a different reaction by the bot is activity, not completion", dict(reactions=[{"user": {"login": BOT}, "content": "eyes", "created_at": "2026-10-10T12:03:00Z"}], now="2026-10-10T12:30:00Z"), 3, "no Codex review"),
+            ("a different reaction by the bot is activity, not completion", dict(reactions=[{"user": {"login": BOT}, "content": "rocket", "created_at": "2026-10-10T12:03:00Z"}], now="2026-10-10T12:30:00Z"), 3, "no Codex review"),
+            # #975 round 4: "Codex reacts with 👀 while any review is running" (the connector's footer, tests/fixtures/landing/codex-summary-comment.json)
+            ("the connector's eyes reaction is a review running", dict(reactions=[{"user": {"login": BOT}, "content": "eyes", "created_at": "2026-10-10T12:03:00Z"}], now="2026-10-10T12:30:00Z"), 3, "eyes reaction"),
             ("a connector review alone is no completion", dict(reviews=[{"user": {"login": BOT}, "submitted_at": "2026-10-10T12:04:00Z"}]), 3, "no Codex review finished"),
             ("a review by a person does not count", dict(reviews=[{"user": {"login": "someone"}, "submitted_at": "2026-10-10T12:04:00Z"}]), 3, "no Codex review"),
             ("the no-findings comment alone is no completion", dict(comments=[comment(BOT, "2026-10-10T12:04:00Z", "Codex Review: Didn't find any major issues. Nice work!")]), 3, "no Codex review finished"),
@@ -1401,8 +1507,11 @@ class CodexGateTests(unittest.TestCase):
              dict(comments=[comment(BOT, "2026-10-10T12:01:00Z", "Looking into it."), comment("someone", "2026-10-10T12:02:00Z", "@codex review")],
                   now="2026-10-10T12:13:00Z"), 5, "no connector activity"),
             ("a reaction from before the latest trigger is not activity either",
-             dict(reactions=[{"user": {"login": BOT}, "content": "eyes", "created_at": "2026-10-10T12:01:00Z"}],
+             dict(reactions=[{"user": {"login": BOT}, "content": "rocket", "created_at": "2026-10-10T12:01:00Z"}],
                   comments=[comment("someone", "2026-10-10T12:02:00Z", "@codex review")], now="2026-10-10T12:13:00Z"), 5, "no connector activity"),
+            ("an eyes reaction from before the latest trigger is still a review running",
+             dict(reactions=[{"user": {"login": BOT}, "content": "eyes", "created_at": "2026-10-10T12:01:00Z"}],
+                  comments=[comment("someone", "2026-10-10T12:02:00Z", "@codex review")], now="2026-10-10T12:13:00Z"), 3, "eyes reaction"),
             ("a summary comment by a person is ignored", dict(comments=[comment("someone", "2026-10-10T12:05:00Z", "<!-- codex-pull-request-review-summary -->\n" + row("Completed", "2026-10-10T12:05:00Z"))],
                                                          now="2026-10-10T12:06:00Z"), 3, "no Codex review"),
         ]
@@ -1444,6 +1553,126 @@ class CodexGateTests(unittest.TestCase):
                 got, line = self.run_gate(**{"now": later, **kwargs})
                 self.assertEqual((got, text in line), (code, True), line)
 
+    # ------------------------------------------------------------------------------------------ #975 round 4 (findings at 761810d7)
+    def test_a_completion_and_a_start_from_two_reads_are_never_paired(self):
+        # The CC's P2-1 and GPT P1: the body came from REST and the revisions from a later GraphQL call, and a completion was paired with the
+        # newest Running revision of its row, also one that started after it. The connector edits the summary between the two reads: exit 0 at
+        # 761810d7 for a review that finished at 12:08 against a 12:10 trigger. The gate now reads body and revisions in one query and
+        # gives 3 when the newest revision is not the body, so no timestamp order alone can pair two generations (the second case: a
+        # completion at 12:12 is later than the newer start at 12:11).
+        trigger = comment("someone", "2026-10-10T12:10:00Z", "@codex review")
+        before = summary(row("Completed", "2026-10-10T12:08:00Z"), started="2026-10-10T12:05:00Z")
+        after = {**before, "body": summary_body(row("Running since", "2026-10-10T12:10:20Z")),
+                 "edits": [{"editedAt": "2026-10-10T12:10:20Z", "diff": summary_body(row("Running since", "2026-10-10T12:10:20Z"))}, *before["edits"]]}
+        completed = summary_body(row("Completed", "2026-10-10T12:12:00Z"))
+        stale = {**comment(BOT, "2026-10-10T12:00:30Z", completed),
+                 "edits": [{"editedAt": "2026-10-10T12:11:01Z", "diff": summary_body(row("Running since", "2026-10-10T12:11:00Z"))},
+                           {"editedAt": "2026-10-10T12:05:01Z", "diff": summary_body(row("Running since", "2026-10-10T12:05:00Z"))}]}
+        cases = [("an edit between the REST and GraphQL reads", dict(comments=[before, trigger], graphql=[after, trigger], now="2026-10-10T12:10:21Z"), 3, "running since 2026-10-10T12:10:20Z"),
+                 ("one reply whose newest revision is not its body", dict(comments=[stale, trigger], now="2026-10-10T12:12:30Z"), 3, "is not its body"),
+                 ("the same summary once its body caught up", dict(comments=[{**stale, "edits": [{"editedAt": "2026-10-10T12:12:01Z", "diff": completed}, *stale["edits"]]}, trigger],
+                                                                   now="2026-10-10T12:12:30Z"), 0, "finished at 2026-10-10T12:12:00Z")]
+        for name, kwargs, code, text in cases:
+            with self.subTest(case=name):
+                got, line = self.run_gate(**kwargs)
+                self.assertEqual((got, text in line), (code, True), line)
+
+    def test_the_attributed_review_must_be_of_the_read_head_or_the_current_head(self):
+        # The CC's P3-3 (R1): the row's commit cell was unused, so a review of bfbcdcb counted after a force-push to another head (a
+        # replay of nas#1009 gave 0 at 761810d7). Now the cell must be a prefix of the read head (the third argument) or the current head.
+        trigger = comment("someone", "2026-10-10T12:10:00Z", "@codex review")
+        other = "bfbcdcb" + "1" * 33
+        done = summary(row("Completed", "2026-10-10T12:12:00Z", commit=other[:7]), started="2026-10-10T12:10:20Z")
+        cases = [("a review of another commit", dict(comments=[done, trigger]), 3, f"was of commit {other[:7]}"),
+                 ("the same review when it is of the read head", dict(comments=[done, trigger], read=other), 0, "finished at 2026-10-10T12:12:00Z"),
+                 ("the same review when it is of the current head", dict(comments=[done, trigger], head=other), 0, "finished at 2026-10-10T12:12:00Z"),
+                 ("a +1 after a review of another commit is no completion either", dict(comments=[done, trigger],
+                  reactions=[{"user": {"login": BOT}, "content": "+1", "created_at": "2026-10-10T12:12:05Z"}]), 3, f"was of commit {other[:7]}")]
+        for name, kwargs, code, text in cases:
+            with self.subTest(case=name):
+                got, line = self.run_gate(now="2026-10-10T12:13:00Z", **kwargs)
+                self.assertEqual((got, text in line), (code, True), line)
+
+    def test_only_the_connectors_revisions_count_and_a_summary_another_account_edited_stops(self):
+        # The CC's P3-6: UserContentEdit.editor was never read, so a Running revision a person wrote counted as a start, and a summary a
+        # person edited last was believed (both 0 at 761810d7).
+        trigger = comment("someone", "2026-10-10T12:10:00Z", "@codex review")
+        person = {"__typename": "User", "login": "someone"}
+        done = summary_body(row("Completed", "2026-10-10T12:12:00Z"))
+        planted = {**comment(BOT, "2026-10-10T12:00:30Z", done),
+                   "edits": [{"editedAt": "2026-10-10T12:12:01Z", "diff": done},
+                             {"editedAt": "2026-10-10T12:10:21Z", "diff": summary_body(row("Running since", "2026-10-10T12:10:20Z")), "editor": person},
+                             {"editedAt": "2026-10-10T12:05:01Z", "diff": summary_body(row("Running since", "2026-10-10T12:05:00Z"))}]}
+        edited = {**comment(BOT, "2026-10-10T12:00:30Z", done),
+                  "edits": [{"editedAt": "2026-10-10T12:12:30Z", "diff": done, "editor": person},
+                            {"editedAt": "2026-10-10T12:10:21Z", "diff": summary_body(row("Running since", "2026-10-10T12:10:20Z"))}]}
+        cases = [("a Running revision written by a person is no start", planted, 3, "did not start after it"),
+                 ("a summary last edited by a person", edited, 4, "by an account other than the connector")]
+        for name, summary_comment, code, text in cases:
+            with self.subTest(case=name):
+                got, line = self.run_gate(comments=[summary_comment, trigger], now="2026-10-10T12:13:00Z")
+                self.assertEqual((got, text in line), (code, True), line)
+
+    def test_the_connectors_eyes_reaction_holds_a_finished_review(self):
+        # "Codex reacts with 👀 while any review is running" (the footer): a finished review and a second one running that has no row yet
+        # (exit 0 at 761810d7, which counted eyes as activity only).
+        trigger = comment("someone", "2026-10-10T12:10:00Z", "@codex review")
+        done = summary(row("Completed", "2026-10-10T12:12:00Z"), started="2026-10-10T12:10:20Z")
+        got, line = self.run_gate(comments=[done, trigger], reactions=[{"user": {"login": BOT}, "content": "eyes", "created_at": "2026-10-10T12:12:30Z"}],
+                                  now="2026-10-10T12:13:00Z")
+        self.assertEqual((got, "eyes reaction is on the pull request since 2026-10-10T12:12:30Z" in line), (3, True), line)
+
+    def test_a_comment_id_beyond_32_bits_still_finds_its_revisions(self):
+        # The CC's P3-5: the gate keyed revisions by databaseId, an Int (32 bits) in the schema, and the ids are about 6.1e9; GitHub serves
+        # them today, a server that keeps to the schema's Int would not (null here), and no revision matched (3 at 761810d7).
+        done = summary(row("Completed", "2026-10-10T12:01:00Z"))
+        self.assertGreaterEqual(done["id"], 2 ** 31)
+        got, line = self.run_gate(comments=[done], int32=True)
+        self.assertEqual((got, "finished at 2026-10-10T12:01:00Z" in line), (0, True), line)
+
+    def test_visible_connector_activity_is_never_unavailable(self):
+        # GPT P2 at 761810d7: activity counted only comment and reaction creation, so the same unattributable completion was refused (3) at
+        # 12:13 and passed as "no connector activity" (5) at 12:21. An edit of a summary, or a row's time, after the trigger is activity too.
+        trigger = comment("someone", "2026-10-10T12:10:00Z", "@codex review")
+        unattributed = summary(row("Completed", "2026-10-10T12:12:00Z"), started=None)
+        late_edit = {**comment(BOT, "2026-10-10T12:00:30Z", summary_body(row("Cancelled", "2026-10-10T12:09:00Z"))),
+                     "edits": [{"editedAt": "2026-10-10T12:11:00Z", "diff": summary_body(row("Cancelled", "2026-10-10T12:09:00Z"))},
+                               {"editedAt": "2026-10-10T12:05:01Z", "diff": summary_body(row("Running since", "2026-10-10T12:05:00Z"))}]}
+        for name, summary_comment in (("a completion with no attributable start", unattributed), ("an edit after the trigger, of an older row", late_edit)):
+            for now in ("2026-10-10T12:13:00Z", "2026-10-10T12:21:00Z"):
+                with self.subTest(case=name, now=now):
+                    got, line = self.run_gate(comments=[summary_comment, trigger], now=now)
+                    self.assertEqual((got, "Codex unavailable" in line), (3, False), line)
+        with self.subTest(case="no connector activity at all is still unavailable"):
+            self.assertEqual(self.run_gate(comments=[trigger], now="2026-10-10T12:21:00Z")[0], 5)
+
+    def test_the_captured_summary_comment_of_nas975(self):
+        # The connector's real layout and revisions, as the gate's own query returned them on 2026-10-11 (masked; nothing needed it): the
+        # 10:42:50Z "@codex review" on nas#975 started a review of 761810d at 10:43:04Z that completed at 10:55:31Z.
+        capture = json.loads(SUMMARY_FIXTURE.read_text(encoding="utf-8"))["graphql"]
+        node = capture["node"]
+        self.assertEqual(hashlib.sha256(node["body"].encode("utf-8")).hexdigest(), capture["body_sha256"])
+        self.assertIn(capture["footer"], node["body"])
+        self.assertEqual(node["userContentEdits"]["nodes"][0]["diff"], node["body"], "the newest revision is the body")
+        head = "761810d703bae174331d03ffc922316dd92d1712"
+        rest = {"id": int(node["fullDatabaseId"]), "user": {"login": BOT}, "created_at": node["createdAt"], "body": node["body"]}
+        trigger = comment("someone", "2026-10-11T10:42:50Z", "@codex review")
+
+        def gate(trigger, now, **kwargs):
+            served = [{**node, "databaseId": rest["id"]}, graphql_node(trigger)]
+            return self.run_gate(comments=[rest, trigger], nodes=served, created="2026-10-10T16:59:48Z", now=now, **kwargs)
+
+        cases = [("the completed review of the head", trigger, "2026-10-11T10:56:00Z", dict(head=head), 0,
+                  "finished at 2026-10-11T10:55:31Z after the latest trigger 2026-10-11T10:42:50Z"),
+                 ("the same after a newer trigger", comment("someone", "2026-10-11T10:56:10Z", "@codex review"), "2026-10-11T10:56:30Z", dict(head=head), 3,
+                  "no Codex review finished since the latest trigger 2026-10-11T10:56:10Z"),
+                 ("the same once the head moved on, without the read head", trigger, "2026-10-11T10:56:00Z", dict(head="0" * 40), 3, "was of commit 761810d"),
+                 ("the same once the head moved on, given the read head", trigger, "2026-10-11T10:56:00Z", dict(head="0" * 40, read=head), 0, "finished")]
+        for name, request, now, kwargs, code, text in cases:
+            with self.subTest(case=name):
+                got, line = gate(request, now, **kwargs)
+                self.assertEqual((got, text in line), (code, True), line)
+
     def test_a_failing_gh_call_is_an_error_not_a_verdict(self):
         for fail in ("all", "head", "lists"):
             with self.subTest(failing=fail), self.assertRaises(subprocess.CalledProcessError):
@@ -1458,7 +1687,10 @@ class CodexGateTests(unittest.TestCase):
         # that fails in three ways, the gate must print one fixed line with the class alone and exit 4.
         address = "gate-leak-4e1b@example.invalid"
         fakes = (("gh exits 1 and writes to stderr", f"#!/bin/sh\necho 'HTTP 502 {address}' >&2\nexit 1\n", "CalledProcessError"),
-                 ("gh answers with a value the gate cannot read (its message names the value)", f'#!/bin/sh\necho \'{{"created_at": "{address}"}}\'\n', "ValueError"),
+                 # the comments and lists read fine; the pull request's time is the address (#975 round 4: GraphQL is read first)
+                 ("gh answers with a value the gate cannot read (its message names the value)",
+                  '#!/bin/sh\ncase "$2" in\n  graphql) echo \'[{"data":{"repository":{"pullRequest":{"comments":{"pageInfo":{"hasNextPage":false,"endCursor":null},"nodes":[]}}}}}]\' ;;\n'
+                  f'  --paginate) echo \'[[]]\' ;;\n  *) echo \'{{"created_at": "{address}", "head": {{"sha": "abc"}}}}\' ;;\nesac\n', "ValueError"),
                  ("there is no gh", None, "FileNotFoundError"))
         for name, script, error in fakes:
             with self.subTest(case=name), tempfile.TemporaryDirectory(prefix="gate-") as scratch:
@@ -1485,12 +1717,13 @@ class CodexGateTests(unittest.TestCase):
                 ) if found]
                 self.assertEqual(problems, [])
 
-    def test_command_line_needs_exactly_two_arguments(self):
-        for argv in ([], ["o/r"], ["o/r", "7", "extra"]):
+    def test_command_line_needs_two_or_three_arguments(self):
+        # #975 round 4: the third is the read head (the scripts pass it), whose review counts as well as the current head's.
+        for argv in ([], ["o/r"], ["o/r", "7", "abc", "extra"]):
             with self.subTest(argv=argv):
                 done = subprocess.run([sys.executable, "-I", str(LANDING / "codex_gate.py"), *argv], capture_output=True, text=True, timeout=30)
                 self.assertEqual(done.returncode, 1)
-                self.assertIn("usage: codex_gate.py <owner/repo> <pr>", done.stderr)
+                self.assertIn("usage: codex_gate.py <owner/repo> <pr> [<read head>]", done.stderr)
 
 
 # ---------------------------------------------------------------------------------------------- 7. the scripts end to end
@@ -1582,7 +1815,7 @@ class EndToEndTests(LandingCase):
         self.assertIn("same change", out)
         self.assertEqual(self.merge_calls(log), [f"gh pr merge {PR} -R {UET_REPO} --squash --match-head-commit {self.head} -A {NOREPLY}"])
         gate = f"{os.path.realpath(LANDING)}/codex_gate.py"
-        self.assertEqual(self.gate_calls(log), [f"python3 -I {gate} {UET_REPO} {PR}"] * 2, "before the wait and before the merge")
+        self.assertEqual(self.gate_calls(log), [f"python3 -I {gate} {UET_REPO} {PR} {self.head}"] * 2, "at the wait and in the final gate")
 
     def test_nas_lands_when_every_gate_passes_after_validating_the_merge(self):
         code, out, log = self.land(self.nas)
@@ -1590,7 +1823,7 @@ class EndToEndTests(LandingCase):
         self.assertIn("the merge onto current main validates", out)
         self.assertEqual(self.merge_calls(log), [f"gh pr merge {PR} -R {NAS_REPO} --squash --match-head-commit {self.head} -A {NOREPLY}"])
         gate = f"{os.path.realpath(LANDING)}/codex_gate.py"
-        self.assertEqual(self.gate_calls(log), [f"python3 -I {gate} {NAS_REPO} {PR}"] * 2)
+        self.assertEqual(self.gate_calls(log), [f"python3 -I {gate} {NAS_REPO} {PR} {self.head}"] * 3, "at the wait, before the validation and in the final gate")
         self.assertEqual([line for line in log if "validate.py" in line], ["python3 -E -s -B scripts/validate.py"])
         trees = [line for line in log if line.startswith("validate-tree ")]
         self.assertEqual(len(trees), 1)
@@ -1616,8 +1849,8 @@ class EndToEndTests(LandingCase):
                 with self.subTest(script=script.key, via=name):
                     code, out, log = self.land(script, via=via, **extra)
                     self.assertEqual(code, 0, out)
-                    repo = UET_REPO if script.key == "uet" else NAS_REPO
-                    self.assertEqual(self.gate_calls(log), [f"python3 -I {gate} {repo} {PR}"] * 2)
+                    repo, calls = (UET_REPO, 2) if script.key == "uet" else (NAS_REPO, 3)
+                    self.assertEqual(self.gate_calls(log), [f"python3 -I {gate} {repo} {PR} {self.head}"] * calls)
 
     def test_arguments_and_the_read_head_are_checked_first(self):
         code, out, log = self.land(self.nas, args=[PR, self.head[:12]])
@@ -1696,13 +1929,19 @@ class EndToEndTests(LandingCase):
         stderr = f"gh: Server Error: contact {ADDRESS} (HTTP 500)"
         head = "pr view * --json headRefOid --jq .headRefOid"
         # site, the failing call (a glob on gh's arguments), the first failing call, land() options, exit code, merge calls, a phrase
+        # #975 round 4: a failed statuses call stops as unreadable (it was read as "no status" when its stdout was empty, and as an unknown
+        # state when it was a body); the final gate's reads are sites of their own.
         sites = {
             "uet": [
-                ("the statuses API", "api repos/*/statuses*", 1, {}, 2, 0, "trading-cc-read is unknown at"),
+                ("the statuses API", "api repos/*/statuses*", 1, {}, 2, 0, "trading-cc-read statuses unreadable at"),
+                ("the statuses API at the final gate", "api repos/*/statuses*", 2, {}, 2, 0, "trading-cc-read statuses unreadable at"),
                 ("the head, first read", head, 1, {}, 3, 0, "is neither the read head nor a pure rebase"),
                 ("the head, read after update-branch", head, 2, {}, 4, 0, "CHANGE DIFFERS"),
+                ("the head at the final gate", head, 3, {}, 3, 0, "head moved to ? at the final gate"),
                 ("the draft flag", "pr view * --json isDraft *", 1, {}, 0, 1, " ok)"),
                 ("the CI state", "pr view * --json headRefOid,statusCheckRollup,mergeStateStatus *", 1, {}, 3, 0, "head moved to ? during CI"),
+                ("the CI state at the final gate", "pr view * --json headRefOid,statusCheckRollup,mergeStateStatus *", 2, {}, 3, 0,
+                 "head moved to ? in the CI read at the final gate"),
                 ("the open review threads", "api graphql*", 1, {"merge_state": "BLOCKED"}, 8, 0, "unresolved review threads: unknown"),
                 ("the merged state", "pr view * --json state,mergeCommit,mergedAt *", 1, {}, 0, 1, " ok)"),
                 ("the author id", "api users/*", 1, {}, 11, 0, "cannot form the no-reply author address"),
@@ -1710,13 +1949,16 @@ class EndToEndTests(LandingCase):
                 ("the merge commit's author", "api repos/*/commits/ffffffff*", 1, {}, 12, 1, "is NOT the no-reply form"),
             ],
             "nas": [
-                ("the statuses API", "api repos/*/statuses*", 1, {}, 2, 0, "trading-cc-read is unknown at"),
+                ("the statuses API", "api repos/*/statuses*", 1, {}, 2, 0, "trading-cc-read statuses unreadable at"),
+                ("the statuses API at the final gate", "api repos/*/statuses*", 2, {}, 2, 0, "trading-cc-read statuses unreadable at"),
                 ("the head, first read", head, 1, {}, 3, 0, "is neither the read head"),
                 ("the head, read after update-branch", head, 2, {"merge_state": "BEHIND"}, 4, 0, "CHANGE DIFFERS after update-branch"),
                 ("the head, read in the CI loop", head, 2, {}, 3, 0, "head moved to ?"),
+                ("the head at the final gate", head, 3, {}, 3, 0, "head moved to ? at the final gate"),
                 ("the merge state", "pr view * --json mergeStateStatus *", 1, {}, 0, 1, " ok)"),
                 ("the draft flag", "pr view * --json isDraft *", 1, {}, 0, 1, " ok)"),
                 ("the check runs", "api repos/*/check-runs*", 1, {}, 6, 0, "CI timeout"),
+                ("the check runs at the final gate", "api repos/*/check-runs*", 2, {}, 5, 0, "is no longer complete and green at the final gate"),
                 ("the merged state", "pr view * --json state,mergeCommit,mergedAt *", 1, {}, 0, 1, " ok)"),
                 ("the author id", "api users/*", 1, {}, 11, 0, "cannot form the no-reply author address"),
                 ("the merge commit", "pr view * --json mergeCommit *", 1, {}, 12, 1, "author address NOT CHECKED"),
@@ -1810,11 +2052,12 @@ class EndToEndTests(LandingCase):
                 self.assertEqual(self.merge_calls(log), [])
 
     def test_codex_reopening_between_the_wait_and_the_merge_stops_with_9(self):
-        for script in (self.uet, self.nas):
+        # #975 round 4: the second call is the final gate in uet_land.sh and the call before the validation in nas_land.sh
+        for script, where in ((self.uet, "at the final gate"), (self.nas, "before the validation")):
             with self.subTest(script=script.key):
                 code, out, log = self.land(script, FAKE_GATE_SEQ="0 3", FAKE_GATE_LINE="Codex review running since 2026-10-10T00:00:00Z")
                 self.assertEqual(code, 9, out)
-                self.assertIn("just before the merge", out)
+                self.assertIn(where, out)
                 self.assertEqual((len(self.gate_calls(log)), self.merge_calls(log)), (2, []))
 
     def test_a_gate_that_fails_stops_both_scripts_with_9_at_the_wait_and_before_the_merge(self):
@@ -1828,10 +2071,11 @@ class EndToEndTests(LandingCase):
                 self.assertIn(f"#{PR} {line}: stop, land after Codex finishes", out)
                 self.assertNotIn("Traceback", out)
                 self.assertEqual((len(self.gate_calls(log)), self.merge_calls(log)), (1, []))
-            with self.subTest(script=script.key, at="just before the merge"):
+            with self.subTest(script=script.key, at="the second call"):
                 code, out, log = self.land(script, FAKE_GATE_SEQ="0 4", FAKE_GATE_LINE=line)
                 self.assertEqual(code, 9, out)
-                self.assertIn(f"#{PR} {line} just before the merge: stop", out)
+                where = "at the final gate" if script.key == "uet" else "before the validation"
+                self.assertIn(f"#{PR} {line} {where}: stop", out)
                 self.assertEqual((len(self.gate_calls(log)), self.merge_calls(log)), (2, []))
 
     def test_codex_gate_codes_map_to_continue_poll_or_stop(self):
@@ -1980,7 +2224,7 @@ class EndToEndTests(LandingCase):
             with self.subTest(script="uet", case=name):
                 code, out, log = self.land(self.uet, **late, **({} if verdict is None else {"GPT_VERDICT": str(verdict)}))
                 self.assertEqual((code, len(self.merge_calls(log)), len(self.gate_calls(log))), (expected, merges, 2), out)
-                self.assertIn("just before the merge", out)
+                self.assertIn("at the final gate", out)
                 self.assertIn("Codex unavailable: set GPT_VERDICT" if expected else "substitute GPT verdict", out)
         with self.subTest(script="nas", case="no GPT_VERDICT"):
             code, out, log = self.land(self.nas, **late)
@@ -2006,7 +2250,8 @@ class EndToEndTests(LandingCase):
                         hook = f"printf '\\nVerdict: CHANGES_REQUESTED at {self.head[:8]}\\n' >> {q(record)}"
                         phrase = "does not name it with a last PASS/ACK Verdict line"
                     code, out, log = self.land(script, statuses=[{**status, "state": "success"}], FAKE_GATE_HOOK=hook)
-                    self.assertEqual((code, self.merge_calls(log), len(self.gate_calls(log))), (2, [], 2), out)
+                    # #975 round 4: the final gate reads trading-cc-read before it asks the Codex gate, which nas also asks before the validation
+                    self.assertEqual((code, self.merge_calls(log), len(self.gate_calls(log))), (2, [], 1 if script.key == "uet" else 2), out)
                     self.assertIn("record verified", out, "the first read passed")
                     self.assertIn(phrase, out)
 
@@ -2111,6 +2356,274 @@ class EndToEndTests(LandingCase):
                 self.assertIn(f"#{PR} merge failed (class: other); gh output could not be kept, and is not echoed", out)
                 for text in ("/home/example", "merge-fail-", "example.invalid", "mktemp"):
                     self.assertNotIn(text, out)
+
+    # ------------------------------------------------------------------------------------------ #975 round 4 (findings at 761810d7)
+    def final_reads(self, script, log):
+        """The calls between the author-address lookup (the last slow step) and the merge, each named by its kind; the git calls of one
+        change-identity check count as one."""
+        repo = UET_REPO if script.key == "uet" else NAS_REPO
+        start = max(i for i, line in enumerate(log) if line.startswith("gh api users/"))
+        end = log.index(self.merge_calls(log)[0])
+        kinds = []
+        for line in log[start + 1:end]:
+            if re.fullmatch(r"gh pr view \S+ -R \S+ --json headRefOid --jq \.headRefOid", line):
+                kind = "head"
+            elif re.match(r"git (-C \S+ )?(-c \S+ )*(merge-base|diff|patch-id) ", line):
+                kind = "change"
+            elif re.match(rf"gh api repos/{repo}/commits/[0-9a-f]{{40}}/statuses\?per_page=100 ", line):
+                kind = "trading-cc-read"
+            elif line.startswith("python3 -I ") and line.endswith(f"/codex_gate.py {repo} {PR} {self.head}"):
+                kind = "codex"
+            elif script.key == "uet" and re.match(r"gh pr view \S+ -R \S+ --json headRefOid,statusCheckRollup,mergeStateStatus ", line):
+                kind = "ci"
+            elif script.key == "nas" and re.match(rf"gh api repos/{repo}/commits/[0-9a-f]{{40}}/check-runs\?per_page=100 ", line):
+                kind = "ci"
+            elif re.fullmatch(r"git -C \S+ ls-remote origin refs/heads/main", line):
+                kind = "main"
+            else:
+                kind = line
+            if not (kinds and kind == "change" and kinds[-1] == "change"):
+                kinds.append(kind)
+        return kinds
+
+    def test_the_final_gates_reads_are_the_last_calls_before_the_merge(self):
+        # The CC's micro at 761810d7: the gates were read at different points, and slow steps (nas: up to three validations, 56 s each) ran
+        # after the last read of some of them. Between the author lookup, the last slow step, and the merge there are now only the final
+        # gate's reads, in its order. At 761810d7 uet read only trading-cc-read there and nas nothing (its validations followed the lookup).
+        expected = {"uet": ["head", "change", "trading-cc-read", "codex", "ci"], "nas": ["head", "change", "trading-cc-read", "codex", "ci", "main"]}
+        for script in (self.uet, self.nas):
+            with self.subTest(script=script.key):
+                code, out, log = self.land(script)
+                self.assertEqual((code, len(self.merge_calls(log))), (0, 1), out)
+                self.assertEqual(self.final_reads(script, log), expected[script.key])
+                lookup = max(i for i, line in enumerate(log) if line.startswith("gh api users/"))
+                merge = log.index(self.merge_calls(log)[0])
+                slow = [i for i, line in enumerate(log[:merge]) if line.startswith(("sleep ", "validate-tree ", "gh pr update-branch ", "gh pr ready "))]
+                self.assertLess(max(slow), lookup, "every slow step runs before the author lookup")
+
+    def flips(self, script):
+        """(name, land() options, exit code, a phrase of the stop): each gate flipped after its first read and before the final gate, at the
+        author-address lookup (the last slow step), or for origin/main right after the validation's read of it."""
+        h8 = self.head[:8]
+        n = next(self.counter)
+        reads = self.dir / "coord/trading-cc/reads"
+        reads.mkdir(parents=True, exist_ok=True)
+        record = reads / f"flip-{n}.md"
+        record.write_text(f"# r\n\nVerdict: PASS at {h8}\n", encoding="utf-8")
+        status = {"context": "trading-cc-read", "description": f"PASS: trading-cc/reads/{record.name}", "updated_at": "2026-10-10T00:00:00Z"}
+        ok_status = [{**status, "state": "success"}]
+        failed = json.dumps([{**status, "state": "failure", "updated_at": "2026-10-10T01:00:00Z"}, {**status, "state": "success"}])
+        verdict = self.dir / f"flip-{n}-verdict.md"
+        verdict.write_text(f"# Read\n\nVerdict: PASS at {h8}\n", encoding="utf-8")
+        gated = self.dir / f"flip-{n}-gated.md"
+        gated.write_text(f"# Read\n\nThis is a landing gate.\n\nVerdict: PASS at {h8}\n", encoding="utf-8")
+        receipt = self.dir / f"flip-{n}-receipt.txt"
+        receipt.write_text(f"gates done at {h8}\n", encoding="utf-8")
+
+        def files(path):
+            return {"VERDICT_FILES": str(path)} if script.key == "uet" else {"args": [PR, self.head[:12], str(path)]}
+
+        def at_lookup(hook):
+            return {"FAKE_GH_HOOK_ON": "api users/*", "FAKE_GH_HOOK": hook}
+
+        def rewrite(feed, program):
+            return at_lookup(f'jq {q(program)} "${feed}" > "${feed}.new" && mv "${feed}.new" "${feed}"')
+
+        queued = (rewrite("FAKE_PRVIEW", f".statusCheckRollup = {json.dumps([check_run('ci-gate', 'QUEUED', None)])}") if script.key == "uet"
+                  else rewrite("FAKE_CHECKRUNS", f".check_runs += {json.dumps([nas_run('validate', None, status='queued', conclusion=None)])}"))
+        cases = [
+            ("a verdict file gains CHANGES_REQUESTED", {**files(verdict), **at_lookup(f"printf '\\nVerdict: CHANGES_REQUESTED at {h8}\\n' >> {q(verdict)}")}, 2,
+             f"is CHANGES_REQUESTED"),
+            ("GATES_DONE disappears", {**files(gated), "GATES_DONE": str(receipt), **at_lookup(f"rm -f {q(receipt)}")}, 2, "states a landing gate"),
+            ("trading-cc-read turns from success to failure", {"statuses": ok_status, **at_lookup(f'printf "%s" {q(failed)} > "$FAKE_STATUSES"')}, 2,
+             f"trading-cc-read is failure at {h8}"),
+            ("the trading-cc-read read fails with empty stdout", {"statuses": ok_status, "FAKE_FAIL": "api repos/*/statuses*", "FAKE_FAIL_FROM": "2",
+                                                                 "FAKE_FAIL_STDOUT": "", "FAKE_FAIL_STDERR": "HTTP 502"}, 2, "statuses unreadable"),
+            ("the trading-cc-read record gains CHANGES_REQUESTED", {"statuses": ok_status, **at_lookup(f"printf '\\nVerdict: CHANGES_REQUESTED at {h8}\\n' >> {q(record)}")}, 2,
+             "does not name it with a last PASS/ACK Verdict line"),
+            ("Codex gives 3 at the final call", {"FAKE_GATE_SEQ": "0 3" if script.key == "uet" else "0 0 3",
+                                                 "FAKE_GATE_LINE": "Codex review running since 2026-10-10T00:00:00Z"}, 9, "at the final gate: stop"),
+            ("a CI re-run is queued (started_at null)", queued, 5, "is no longer complete and green at the final gate"),
+            ("the head moves (to a pure rebase)", rewrite("FAKE_PRVIEW", f'.headRefOid = "{self.rebased}"'), 3, f"head moved to {self.rebased} at the final gate"),
+        ]
+        if script.key == "nas":
+            cases.append(("origin/main moves after the validation read it", {"FAKE_GIT_HOOK_ON": "*ls-remote origin refs/heads/main*",
+                          "FAKE_GIT_HOOK": f"git --git-dir={q(self.dir / 'origin.git')} update-ref refs/heads/main {self.main_again}"}, 13,
+                          f"origin/main moved after the validation on {self.main[:8]} (final gate)"))
+        return cases
+
+    def test_each_gate_flipped_before_the_final_gate_stops_the_landing_with_no_merge(self):
+        # The CC's micro at 761810d7 (P2-2, P2-3, P2-4, P3-1), the GPT micro (P1, P2) and Codex's four P1 threads: each gate is flipped after
+        # its first read; the final gate reads it again and stops with that gate's code, and nothing is merged. At 761810d7 the verdict file,
+        # GATES_DONE, the failed read, nas's Codex, the queued re-run, the head and nas's main reached the merge (exit 0, one merge).
+        origin = self.dir / "origin.git"
+        for script in (self.uet, self.nas):
+            for name, options, code, phrase in self.flips(script):
+                with self.subTest(script=script.key, flip=name):
+                    try:
+                        got, out, log = self.land(script, **options)
+                    finally:
+                        git(origin, "update-ref", "refs/heads/main", self.main)
+                        git(self.repo, "update-ref", "refs/remotes/origin/main", self.main)
+                    self.assertEqual((got, self.merge_calls(log)), (code, []), out)
+                    self.assertIn(phrase, out)
+                    if "statuses" in options:
+                        self.assertIn("record verified", out, "the first read passed")
+
+    def test_a_codex_review_that_starts_during_a_validation_or_its_retry_stops_nas_with_9(self):
+        # Codex P1 (nas:290), the CC's P2-4 and GPT P1 at 761810d7: nas asked Codex before one to three validations and never after, so a
+        # review that started during them was not seen (exit 0, one merge). The validation hook makes the gate's next answer 3: during
+        # the first validation, and during the retry that a main which moved during the first one starts.
+        origin = self.dir / "origin.git"
+        later = 'printf 3 > "$FAKE_LOG.gate"'
+        retry = (f'if [ -e "$FAKE_LOG.moved" ]; then {later}; else touch "$FAKE_LOG.moved"; '
+                 f'git --git-dir={q(origin)} update-ref refs/heads/main {self.main_again}; fi')
+        for name, hook, validations in (("during the first validation", later, 1), ("during the retry after main moved", retry, 2)):
+            with self.subTest(case=name):
+                try:
+                    code, out, log = self.land(self.nas, FAKE_GATE_SEQ="0 0 0 3", FAKE_VALIDATE_HOOK=hook,
+                                               FAKE_GATE_LINE="Codex review running since 2026-10-10T00:00:00Z")
+                finally:
+                    git(origin, "update-ref", "refs/heads/main", self.main)
+                    git(self.repo, "update-ref", "refs/remotes/origin/main", self.main)
+                self.assertEqual((code, self.merge_calls(log)), (9, []), out)
+                self.assertEqual(sum(1 for line in log if line.startswith("validate-tree ")), validations)
+                self.assertIn("at the final gate: stop", out)
+        with self.subTest(case="the same answers without a review starting: the landing merges"):
+            code, out, log = self.land(self.nas, FAKE_GATE_SEQ="0 0 0 3")
+            self.assertEqual((code, len(self.merge_calls(log))), (0, 1), out)
+
+    def test_an_unreadable_origin_main_stops_nas_with_its_own_message(self):
+        # The CC's P3-4 at 761810d7: a failed git ls-remote was reported as "main moved" and validated again three times (exit 13 with the
+        # wrong reason). It is its own stop now, after the validation and at the final gate.
+        for first, phrase, validations in (("1", "origin/main is unreadable (git ls-remote failed) after the validation: stop", 1),
+                                           ("2", "origin/main is unreadable (git ls-remote failed) at the final gate: stop", 1)):
+            with self.subTest(failing_read=first):
+                code, out, log = self.land(self.nas, FAKE_GIT_FAIL="*ls-remote origin refs/heads/main*", FAKE_GIT_FAIL_FROM=first)
+                self.assertEqual((code, self.merge_calls(log)), (13, []), out)
+                self.assertIn(phrase, out)
+                self.assertEqual(sum(1 for line in log if line.startswith("validate-tree ")), validations)
+
+    def test_a_trading_cc_read_lookup_that_fails_with_empty_stdout_stops_with_2(self):
+        # Codex P1 (uet:171), the CC's P2-3 and GPT P2 at 761810d7: `[ -n "$s" ] || return 0` took a failed call with nothing on stdout (a
+        # refused connection) for "no status", at the first read and at the final one (exit 0, one merge). gh's exit code is kept apart now.
+        for script in (self.uet, self.nas):
+            for first, where in (("1", "the first read and every later one"), ("2", "the final gate's read only")):
+                with self.subTest(script=script.key, failing=where):
+                    code, out, log = self.land(script, FAKE_FAIL="api repos/*/statuses*", FAKE_FAIL_FROM=first, FAKE_FAIL_STDOUT="",
+                                               FAKE_FAIL_STDERR="gh: connection refused")
+                    self.assertEqual((code, self.merge_calls(log)), (2, []), out)
+                    self.assertIn("trading-cc-read statuses unreadable at", out)
+                    self.assertNotIn("connection refused", out)
+
+    def lock_path(self, script):
+        return self.dir / "coord/command-center/landing-locks" / ("us-equities-trading.lock" if script.key == "uet" else "native-agent-stack.lock")
+
+    def test_a_second_landing_of_the_same_repository_stops_at_once_with_14(self):
+        # The CC's brief for round 4: one landing per repository at a time, so our own landings cannot move main under each other's
+        # validated base. A held lock stops the second at once, before any call (at 761810d7 there was no lock: it merged).
+        import fcntl
+        for script in (self.uet, self.nas):
+            with self.subTest(script=script.key, lock="held"):
+                path = self.lock_path(script)
+                path.parent.mkdir(parents=True, exist_ok=True)
+                with open(path, "a", encoding="utf-8") as held:
+                    fcntl.flock(held, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                    code, out, log = self.land(script)
+                self.assertEqual((code, log), (14, []), out)
+                self.assertIn(f"another landing of {path.stem} holds the landing lock: stop, nothing merged", out)
+            with self.subTest(script=script.key, lock="released"):
+                code, out, log = self.land(script)
+                self.assertEqual((code, len(self.merge_calls(log))), (0, 1), out)
+            with self.subTest(script=script.key, lock="cannot be opened"):
+                blocker = self.dir / f"home-{next(self.counter)}/home/example/file"
+                blocker.parent.mkdir(parents=True)
+                blocker.write_text("not a directory\n", encoding="utf-8")
+                code, out, log = self.land(script, LANDING_LOCK_DIR=str(blocker / "locks"))
+                self.assertEqual((code, log), (14, []), out)
+                self.assertIn("the landing lock cannot be opened (path withheld): stop, nothing merged", out)
+                self.assertNotIn("/home/example", out)
+
+    def test_a_child_that_outlives_the_landing_does_not_keep_the_lock(self):
+        # The lock is descriptor 9, and every child that can outlive the script runs with it closed (git's detached maintenance keeps
+        # every other descriptor). Here gh starts a child that is still running when the landing ends; the lock must be free then.
+        import fcntl
+        for script in (self.uet, self.nas):
+            with self.subTest(script=script.key):
+                pid = self.dir / f"child-{next(self.counter)}.pid"
+                code, out, log = self.land(script, FAKE_GH_HOOK_ON="api users/*",
+                                           FAKE_GH_HOOK=f"{q(self.real_sleep)} 30 >/dev/null 2>&1 & echo $! > {q(pid)}")
+                try:
+                    self.assertEqual(code, 0, out)
+                    with open(self.lock_path(script), "a", encoding="utf-8") as lock:
+                        try:
+                            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                        except BlockingIOError:
+                            self.fail("a child of the landing still holds the landing lock")
+                finally:
+                    with contextlib.suppress(ProcessLookupError, ValueError, FileNotFoundError):
+                        os.kill(int(pid.read_text(encoding="utf-8")), signal.SIGTERM)
+
+    def test_a_verdict_record_or_receipt_that_cannot_be_read_stops_and_prints_no_path(self):
+        # GPT P2 at 761810d7: head and grep read a verdict file one after the other and printed their diagnostics, which name the path, and
+        # a grep that failed was taken as "no verdict line". Unreadable: each consumer refused but printed the path. Removed after its
+        # first line was read: line 1's ACK passed over the later CHANGES_REQUESTED (exit 0, one merge). Each file is now read once.
+        h8 = self.head[:8]
+        reads = self.dir / "coord/trading-cc/reads"
+        reads.mkdir(parents=True, exist_ok=True)
+        two_verdicts = f"# GPT verdict on PR x#1 at {self.head}: ACK\n\nVerdict: CHANGES_REQUESTED at {h8}\n"
+        unavailable = {"FAKE_GATE_RC": "5", "FAKE_GATE_LINE": "Codex unavailable: usage-limit or account notice"}
+
+        def consumer(name, script, path):
+            n = next(self.counter)
+            if name == "verdict file":
+                return ({"VERDICT_FILES": str(path)} if script.key == "uet" else {"args": [PR, self.head[:12], str(path)]}), 2
+            if name == "GPT_VERDICT":
+                return {"GPT_VERDICT": str(path), **unavailable}, 9
+            if name == "trading-cc-read record":
+                status = {"context": "trading-cc-read", "state": "success", "description": f"PASS: trading-cc/reads/{path.name}",
+                          "updated_at": "2026-10-10T00:00:00Z"}
+                return {"statuses": [status]}, 2
+            gated = self.dir / f"gated-{n}.md"  # GATES_DONE
+            gated.write_text(f"# Read\n\nThis is a landing gate.\n\nVerdict: PASS at {h8}\n", encoding="utf-8")
+            return {**({"VERDICT_FILES": str(gated)} if script.key == "uet" else {"args": [PR, self.head[:12], str(gated)]}), "GATES_DONE": str(path)}, 2
+
+        def place(name):
+            n = next(self.counter)
+            if name == "trading-cc-read record":
+                return reads / f"unreadable-{n}.md"
+            path = self.dir / f"home-{n}/home/example/reads/{name.replace(' ', '-')}.md"
+            path.parent.mkdir(parents=True)
+            return path
+
+        cases = []
+        for script in (self.uet, self.nas):
+            for name in ("verdict file", "trading-cc-read record", "GATES_DONE") + (("GPT_VERDICT",) if script.key == "uet" else ()):
+                cases.append((script, name, "unreadable"))
+                if name in ("verdict file", "GPT_VERDICT"):
+                    cases.append((script, name, "removed after its first line is read"))
+        for script, name, mode in cases:
+            with self.subTest(script=script.key, file=name, mode=mode):
+                if mode == "unreadable" and os.geteuid() == 0:
+                    self.skipTest("root reads a file with mode 000")
+                path = place(name)
+                content = f"gates done at {h8}\n" if name == "GATES_DONE" else (
+                    f"# r\n\nVerdict: PASS at {h8}\n" if name == "trading-cc-read record" else
+                    two_verdicts if mode != "unreadable" else f"# GPT verdict on PR x#1 at {self.head}: ACK\n")
+                path.write_text(content, encoding="utf-8")
+                options, expected = consumer(name, script, path)
+                if mode == "unreadable":
+                    path.chmod(0)
+                else:
+                    options.update(FAKE_VANISH=str(path), PATH=f"{self.vanish_bin}{os.pathsep}{self.bin}{os.pathsep}{os.environ['PATH']}")
+                try:
+                    code, out, log = self.land(script, **options)
+                finally:
+                    with contextlib.suppress(FileNotFoundError):
+                        path.chmod(0o600)
+                self.assertEqual((code, self.merge_calls(log)), (expected, []), out)
+                self.assertNotIn(str(self.dir), out, "no path is printed")
+                self.assertNotIn("/home/example", out)
 
 
 if __name__ == "__main__":

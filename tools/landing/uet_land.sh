@@ -1,31 +1,59 @@
 #!/usr/bin/env bash
 # CC landing for us-equities-trading (private, owned by one account, no merge queue; strict up-to-date + linear + squash).
-# usage: [VERDICT_FILES="…"] [GATES_DONE=<receipt>] uet_land.sh <pr> <read-head-sha-prefix>
-# Steps: verdict checks -> ready -> update-branch --rebase -> the PR's change must equal the read head's change
-# (same file set, and per file the same added and removed lines; hunk offsets and context may differ after a rebase)
-# -> CI complete with no failure and ci-gate reported -> not BLOCKED by open threads -> squash merge pinned to the head.
+# usage: [VERDICT_FILES="…"] [GATES_DONE=<receipt>] [GPT_VERDICT=<verdict>] uet_land.sh <pr> <read-head-sha-prefix>
+# Order (#975 round 4): the landing lock -> early refusals (trading-cc-read, the verdict files, the head carries the read head's change) ->
+# slow steps (ready, the Codex wait, update-branch --rebase and the change check, the CI wait, the author address) -> final_gate, fast reads
+# only (the head and its change, the verdict files, trading-cc-read, the Codex gate, CI) -> the squash merge pinned to the head -> its author.
+# The PR's change must equal the read head's change (git patch-id of the whole diff; hunk offsets and context may differ after a rebase).
 # The current head may already be a rebase of the read head (an earlier update-branch); the change check decides.
-# Exit codes: 2 verdict gate, 3 head moved, 4 change differs, 5 CI failed, 6 timeout, 7 merge failed, 8 blocked,
-# 9 Codex review running, not finished since its latest trigger, or ended other than Completed (codex_gate.py).
-# 11 the no-reply author address could not be formed (nothing merged), 12 merged, but the merge commit's author is not that address (correction #148).
+# Exit codes: 2 verdict gate (a verdict file, GATES_DONE or trading-cc-read; a file, record or status that cannot be read included), 3 head
+# moved, 4 change differs, 5 CI failed (at the final gate also: no longer complete and green), 6 timeout, 7 merge failed, 8 blocked,
+# 9 the Codex gate (codex_gate.py) gave neither 0 nor 5: a review running or not finished since its latest trigger (its 3, after the
+# 20-minute wait or at the final gate), a review that ended other than Completed or a summary last edited by another account (its 4), a
+# gate that failed or is missing; or it gave 5 without an accepted GPT_VERDICT, 11 the no-reply author address could not be formed
+# (nothing merged), 12 merged, but the merge commit's author is not that address (correction #148), 14 another landing of this repository
+# holds the landing lock, or the lock cannot be taken (nothing merged; #975 round 4).
 # Correction #136 (2026-10-10): verdict/record acceptance, change identity and the CI state use the lg_* functions below (land-patches-20261010).
 # #975 P2-2 (2026-10-11): no text from gh or its API is printed. Every gh call drops its stderr, a failure ends in its step's fixed message and exit code, and gh api
-# writes an error response's body to stdout (cli v2.102.0 pkg/cmd/api/api.go:546), so a value read from it is shown only as a state word or a count.
-# #975 round 3 (2026-10-11, Codex P1/P2 and GPT P2 at af9d1901): a gate result of 5 needs GPT_VERDICT at both gate calls, the trading-cc-read gate
-# runs again just before the merge, values from gh are used only in their typed shape, git's stderr is dropped, and the gate's output is echoed
-# only when it is one of its own status lines (lg_gate).
+# writes an error response's body to stdout (cli v2.102.0 pkg/cmd/api/api.go:538-539 and :546), so a value read from it is shown only as a state word or a count.
+# #975 round 3 (2026-10-11, Codex P1/P2 and GPT P2 at af9d1901): a gate result of 5 needs GPT_VERDICT at both gate calls, values from gh
+# are used only in their typed shape, git's stderr is dropped, and the gate's output is echoed only when it is one of its own status lines (lg_gate).
+# #975 round 4 (2026-10-11, the CC's micro and Codex P1 at 761810d7): one landing per repository at a time (lg_lock), and one final_gate
+# after every slow step that reads each gate again, with nothing but the merge after it; a failed trading-cc-read read stops (exit 2).
 set -u
 # Parsed whole before it runs: an edit while a landing runs cannot shift what the running copy executes (2026-10-09).
 {
 R=seathatflowsinourveins/us-equities-trading
 N=${1:?pr}; E=${2:?read head}
 U=${LANDING_UET_REPO:-$HOME/code/us-equities-trading}; COORD=${LANDING_COORD:-${XDG_STATE_HOME:-$HOME/.local/state}/native-agent-stack/coordination}
-git -C $U fetch -q origin main "pull/$N/head" 2>/dev/null
-full=$(git -C $U rev-parse --verify -q "$E^{commit}" 2>/dev/null) || { git -C $U fetch -q origin "$E" 2>/dev/null; full=$(git -C $U rev-parse --verify -q "$E^{commit}" 2>/dev/null); }
-[ -n "$full" ] || { echo "#$N read head $E not resolvable"; exit 3; }
-E=$full
 LG_GIT="git -C $U"
 # >>> land-gate-fns
+# #975 round 4: the landing lock is descriptor 9 (lg_lock). Every child that waits, detaches or can outlive the script runs without it, so the
+# lock ends with the script: a git fetch starts `git maintenance run --auto --detach` (git v2.53.0 builtin/fetch.c:2725, run-command.c:1829-1837;
+# Documentation/config/maintenance.adoc:6-15 detaching is the default), which daemonizes (builtin/gc.c:1823-1827) keeping every descriptor
+# but 0-2 (setup.c:2083-2105), and gh, python3 and sleep are waited for.
+git() { command git "$@" 9>&-; }
+gh() { command gh "$@" 9>&-; }
+python3() { command python3 "$@" 9>&-; }
+sleep() { command sleep "$@" 9>&-; }
+# One landing per repository at a time (#975 round 4, the CC's micro at 761810d7): the CC is the only lander, so serialized landings
+# close the base-move window against our own tooling; a merge made out of band (the owner, in the web UI) is not covered. lg_lock opens
+# <dir>/<repository name>.lock on descriptor 9 and takes an exclusive flock(1) without waiting (util-linux v2.41.3 flock.1.adoc:124-125,
+# the `exec 4<>file; flock -n 4` form; :68-69 -n; flock.c:189 exclusive by default, :351-363 a held lock exits 1 and prints nothing,
+# :392-399 any other failure names the descriptor, not the path; flock.1.adoc:78 the lock is dropped when the file is closed). The lock
+# is held until the script exits. Prints the reason and returns 14 when the lock is held or cannot be taken; nothing has run then.
+lg_lock() {  # <lock directory>
+  local lr
+  mkdir -p -- "$1" 2>/dev/null
+  { exec 9<>"$1/${R#*/}.lock"; } 2>/dev/null || { echo "#$N the landing lock cannot be opened (path withheld): stop, nothing merged"; return 14; }
+  flock -n 9 2>/dev/null; lr=$?
+  case "$lr" in
+    0) return 0 ;;
+    1) echo "#$N another landing of ${R#*/} holds the landing lock: stop, nothing merged" ;;
+    *) echo "#$N flock could not take the landing lock (exit $lr): stop, nothing merged" ;;
+  esac
+  return 14
+}
 # Correction #136 (2026-10-10), tested by trading-cc/land-patches-20261010/harness/run.py. Three decision points were loose or blind:
 # (1) a verdict file or record was accepted on "the head prefix anywhere AND PASS/ACK anywhere", which accepts a CHANGES_REQUESTED
 #     verdict that mentions ACK elsewhere (19 of 39 real Astra CHANGES_REQUESTED files) and a record whose PASS belongs to another head;
@@ -33,19 +61,27 @@ LG_GIT="git -C $U"
 #     non-ASCII character, a removed line starting "--" and an added line starting "++" (git patch-id sees all of them);
 # (3) the CI wait counted a commit status (trading-cc-read) as never completed (a commit status has .state, not .status).
 lg_hex8() { [[ "$1" =~ ^[0-9a-f]{8}$ ]]; }
+# #975 round 4 (GPT P2 at 761810d7): a verdict file, record or receipt is read ONCE (lg_text), and every decision about it is made on that
+# one text. Before, `head` read line 1 and `grep` the last verdict line, each from the file: a file removed between the two reads made grep
+# fail, `|| true` took that for "no verdict line", and line 1's ACK passed over a later CHANGES_REQUESTED; and head's and grep's
+# diagnostics, which name the path, were printed. A read that fails is now a refusal of its own, with a fixed reason. tr drops NUL bytes,
+# which bash reports (naming the script) when they reach a command substitution.
+lg_text() {  # <file> : prints the file's text; rc 1, and nothing printed, when it cannot be read
+  { tr -d '\000' < "$1"; } 2>/dev/null
+}
 # The verdict word of the LAST line that gives a verdict for the head, or nothing. A line gives one in these layouts only:
 #   "Gate line: PASS at <head>..."  /  "Verdict: ACK (by closure) at <head>..."     (CC and co-op layouts; the word is PASS|ACK|CHANGES_REQUESTED + [A-Z_0-9]*, then at most one parenthetical, then " at <head>")
 #   "...Verdict ... <head>...: PASS ..."  (records, kind=records: the head stands before the first colon, the word right after it)
 # Anything else (a pointer line, prose that mentions the head, a PASS elsewhere on the line) gives no verdict.
-lg_last_verdict() {  # <file> <8-hex head> <files|records>
-  local f=$1 h=$2 kind=$3 w r12 r3 line
+lg_last_verdict() {  # <text> <8-hex head> <files|records>
+  local t=$1 h=$2 kind=$3 w r12 r3 line
   w='((PASS|ACK|CHANGES_REQUESTED)[A-Z_0-9]*)'
   r12='^(Gate line|Verdict): '$w'( \([^)]*\))? at '$h
   r3='(^|[^A-Za-z])([Vv]erdict|VERDICT)[^:]*[^0-9a-f]'$h'[^:]*: *[*_` ]*'$w
   if [ "$kind" = records ]; then
-    line=$({ grep -E "$r12|$r3" -- "$f" || true; } | tail -n 1)
+    line=$(printf '%s\n' "$t" | grep -E "$r12|$r3" | tail -n 1)
   else
-    line=$({ grep -E "$r12" -- "$f" || true; } | tail -n 1)
+    line=$(printf '%s\n' "$t" | grep -E "$r12" | tail -n 1)
   fi
   if [[ "$line" =~ $r12 ]]; then echo "${BASH_REMATCH[2]}"
   elif [ "$kind" = records ] && [[ "$line" =~ $r3 ]]; then echo "${BASH_REMATCH[3]}"
@@ -53,27 +89,42 @@ lg_last_verdict() {  # <file> <8-hex head> <files|records>
 }
 # A verdict file is accepted by (a) its line 1 in the Astra layout "... <head>...: ACK|PASS ..." or (b) its last Gate line/Verdict line naming
 # the head with PASS|ACK[A-Z_0-9]*. CHANGES_REQUESTED anywhere on line 1, or as the word of that last line, rejects; a PASS/ACK anywhere
-# else in the file counts for nothing. Prints the reason on stdout when it rejects.
-lg_verdict_file_ok() {  # <file> <8-hex head prefix>
-  local f=$1 h=$2 l1 w re
+# else in the file counts for nothing. Prints the reason on stdout when it rejects. lg_verdict_text_ok decides on a text that was read
+# once; lg_verdict_file_ok reads the file once and decides on that.
+lg_verdict_text_ok() {  # <text> <8-hex head prefix>
+  local t=$1 h=$2 l1 w re
   lg_hex8 "$h" || { echo "head prefix '$h' is not 8 lower-case hex characters"; return 1; }
-  [ -f "$f" ] || { echo "file missing"; return 1; }
-  l1=$(head -n 1 -- "$f" | tr -d '\r')
+  l1=${t%%$'\n'*}; l1=${l1//$'\r'/}
   [[ "$l1" == *CHANGES_REQUESTED* ]] && { echo "line 1 carries CHANGES_REQUESTED"; return 1; }
-  w=$(lg_last_verdict "$f" "$h" files)
+  w=$(lg_last_verdict "$t" "$h" files)
   [[ "$w" == CHANGES_REQUESTED* ]] && { echo "the last Gate line/Verdict line naming $h is $w"; return 1; }
   re='(^|[^0-9a-f])'$h'[0-9a-f]*[^:]*: *(ACK|PASS)([^A-Za-z0-9_]|$)'
   [[ "$l1" =~ $re ]] && return 0
   [[ "$w" == PASS* || "$w" == ACK* ]] && return 0
   echo "no accepted verdict naming $h: line 1 must read '...$h...: ACK|PASS' or a Gate line/Verdict line must read 'PASS|ACK at $h'"; return 1
 }
+lg_verdict_file_ok() {  # <file> <8-hex head prefix>
+  local t
+  lg_hex8 "$2" || { echo "head prefix '$2' is not 8 lower-case hex characters"; return 1; }
+  [ -f "$1" ] || { echo "file missing"; return 1; }
+  t=$(lg_text "$1") || { echo "file unreadable"; return 1; }
+  lg_verdict_text_ok "$t" "$2"
+}
+# A receipt (GATES_DONE) is accepted when it names the head, from one read as above; rc 1, and nothing printed, otherwise.
+lg_receipt_ok() {  # <receipt file> <8-hex head prefix>
+  local t
+  [ -n "$1" ] && [ -f "$1" ] || return 1
+  t=$(lg_text "$1") || return 1
+  [[ "$t" == *"$2"* ]]
+}
 # A record (append-only, many heads) is accepted for a head when the LAST line that gives a verdict for it carries PASS or ACK (a section that
 # changes a verdict should end with "Gate line: <PASS|ACK|CHANGES_REQUESTED> at <head>"). Prints the reason on stdout when it rejects.
 lg_record_ok() {  # <record file> <8-hex head prefix>
-  local f=$1 h=$2 w
+  local f=$1 h=$2 t w
   lg_hex8 "$h" || { echo "head prefix '$h' is not 8 lower-case hex characters"; return 1; }
   [ -f "$f" ] || { echo "record missing"; return 1; }
-  w=$(lg_last_verdict "$f" "$h" records)
+  t=$(lg_text "$f") || { echo "record unreadable"; return 1; }
+  w=$(lg_last_verdict "$t" "$h" records)
   [ -n "$w" ] || { echo "no Verdict/Gate line gives a verdict for $h"; return 1; }
   [[ "$w" == PASS* || "$w" == ACK* ]] && return 0
   echo "the last verdict line for $h is $w"; return 1
@@ -134,11 +185,12 @@ lg_have() {  # <commit>
 # unavailable: ", "no Codex review " or "Codex gate error: ", in the characters those lines use, with exit code 0, 3, 4 or 5. Anything
 # else is one fixed line and 4: for a gate file that is missing or unreadable python3 prints "can't open file '<path>'" and exits 2
 # (CPython v3.13.16 Modules/main.c:403-410), and an exception outside the gate's handler, such as a syntax error, prints a traceback
-# and exits 1 (:437-441, :118-123; Doc/library/sys.rst:394-399).
-lg_gate() {  # <gate> <owner/repo> <pr> : prints one line; returns 0, 3, 4 or 5
+# and exits 1 (:437-441, :118-123; Doc/library/sys.rst:394-399). The read head goes to the gate, which counts only a review of it or of
+# the current head (#975 round 4).
+lg_gate() {  # <gate> <owner/repo> <pr> <read head> : prints one line; returns 0, 3, 4 or 5
   local g gr q="'" re
   re="^(Codex review |Codex unavailable: |no Codex review |Codex gate error: )[A-Za-z0-9 :;,.()_+${q}-]*\$"
-  g=$(python3 -I "$1" "$2" "$3" 2>&1); gr=$?
+  g=$(python3 -I "$1" "$2" "$3" "$4" 2>&1); gr=$?
   case "$gr" in 0|3|4|5) ;; *) echo "Codex gate failed with exit $gr; details withheld"; return 4 ;; esac
   [[ "$g" =~ $re ]] || { echo "Codex gate printed no status line of its own; details withheld"; return 4; }
   echo "$g"; return "$gr"
@@ -162,12 +214,20 @@ lg_ci_state() {  # <pr>
   gh pr view "$1" -R $R --json headRefOid,statusCheckRollup,mergeStateStatus --jq '[.headRefOid, ([.statusCheckRollup[]|select((.__typename=="CheckRun" and .status!="COMPLETED") or (.__typename=="StatusContext" and (.state=="PENDING" or .state=="EXPECTED")) or (.__typename!="CheckRun" and .__typename!="StatusContext"))]|length), ([.statusCheckRollup[]|select((.__typename=="CheckRun" and .status=="COMPLETED" and ((.conclusion=="SUCCESS" or .conclusion=="NEUTRAL" or .conclusion=="SKIPPED")|not)) or (.__typename=="StatusContext" and ((.state=="SUCCESS" or .state=="PENDING" or .state=="EXPECTED")|not)))]|length), (.statusCheckRollup|length), ([.statusCheckRollup[]|select(.__typename=="CheckRun" and .name=="ci-gate" and .conclusion=="SUCCESS")]|length), .mergeStateStatus]|@tsv' 2>/dev/null
 }
 # <<< land-gate-fns
+lg_lock "${LANDING_LOCK_DIR:-$COORD/command-center/landing-locks}" || exit 14
+git -C $U fetch -q origin main "pull/$N/head" 2>/dev/null
+full=$(git -C $U rev-parse --verify -q "$E^{commit}" 2>/dev/null) || { git -C $U fetch -q origin "$E" 2>/dev/null; full=$(git -C $U rev-parse --verify -q "$E^{commit}" 2>/dev/null); }
+[ -n "$full" ] || { echo "#$N read head $E not resolvable"; exit 3; }
+E=$full
 # trading-cc posts a `trading-cc-read` commit status on its read head (from 2026-10-09T22:50Z), described
 # "<VERDICT>: trading-cc/reads/<record>.md" (for example "PASS: …"). A failure blocks. A success counts only when that record exists and names
 # the read head with PASS or ACK, because a status carries no app identity (any holder of the owner token can post one).
 tcc_read_gate() {
-  local s st d rec why
-  s=$(gh api "repos/$R/commits/$1/statuses?per_page=100" --jq '[.[]|select(.context=="trading-cc-read")]|sort_by(.updated_at)|last|select(.!=null)|"\(.state)\t\(.description)"' 2>/dev/null)
+  local s sr st d rec why
+  s=$(gh api "repos/$R/commits/$1/statuses?per_page=100" --jq '[.[]|select(.context=="trading-cc-read")]|sort_by(.updated_at)|last|select(.!=null)|"\(.state)\t\(.description)"' 2>/dev/null); sr=$?
+  # #975 round 4 (Codex P1 at 761810d7, the CC's P2-3): gh's exit code is kept apart from its output. A failed call stops, whatever it printed
+  # (an error response's body reaches stdout, a refused connection prints nothing there); only exit 0 with no output is "no status".
+  [ "$sr" = 0 ] || { echo "#$N trading-cc-read statuses unreadable at ${1:0:8} (gh exit $sr, output withheld): stop"; exit 2; }
   [ -n "$s" ] || return 0
   st=${s%%$'\t'*}; d=${s#*$'\t'}
   [ "$st" = success ] || { case "$st" in error|failure|pending) ;; *) st=unknown ;; esac; echo "#$N trading-cc-read is $st at ${1:0:8} (description withheld, #975 P2-2): stop"; exit 2; }
@@ -179,19 +239,26 @@ tcc_read_gate() {
     || { echo "#$N trading-cc-read success at ${1:0:8}, but ${BASH_REMATCH[2]} does not name it with a last PASS/ACK Verdict line ($why): stop"; exit 2; }
   echo "#$N trading-cc-read success at ${1:0:8}; record verified"
 }
-tcc_read_gate "$E"
 # Correction #121: VERDICT_FILES are checked; each names the read head with PASS/ACK, and a stated landing gate needs
-# GATES_DONE=<receipt naming the read head>.
-for v in ${VERDICT_FILES:-}; do
-  # #975 P2-C: a verdict file is named by its file name only (its directory can be under a home directory).
-  [ -f "$v" ] || { echo "#$N verdict file missing: ${v##*/}"; exit 2; }
-  # Correction #136: line 1 "... ${E:0:8}...: ACK|PASS" (the Astra layout) or a Gate line/Verdict line "PASS|ACK at ${E:0:8}"; CHANGES_REQUESTED rejects.
-  why=$(lg_verdict_file_ok "$v" "${E:0:8}") || { echo "#$N verdict ${v##*/} has no PASS/ACK naming ${E:0:8} ($why)"; exit 2; }
-  if grep -q -i -E 'landing gate|path to PASS|before landing|landing condition' "$v"; then
-    [ -n "${GATES_DONE:-}" ] && [ -f "$GATES_DONE" ] && grep -q -E "${E:0:8}" "$GATES_DONE" \
-      || { echo "#$N verdict ${v##*/} states a landing gate: set GATES_DONE=<receipt naming ${E:0:8}>"; exit 2; }
-  fi
-done
+# GATES_DONE=<receipt naming the read head>. #975 round 4 (Codex P1 at 761810d7): the files are mutable, so final_gate runs this again.
+verdict_gate() {
+  local v t why re='landing gate|path to pass|before landing|landing condition'
+  for v in ${VERDICT_FILES:-}; do
+    # #975 P2-C: a verdict file is named by its file name only (its directory can be under a home directory).
+    [ -f "$v" ] || { echo "#$N verdict file missing: ${v##*/}"; exit 2; }
+    # #975 round 4 (GPT P2 at 761810d7): the file is read once, and its verdict and its landing-gate phrases are both decided on that text.
+    t=$(lg_text "$v") || { echo "#$N verdict ${v##*/} is unreadable: stop"; exit 2; }
+    # Correction #136: line 1 "... ${E:0:8}...: ACK|PASS" (the Astra layout) or a Gate line/Verdict line "PASS|ACK at ${E:0:8}"; CHANGES_REQUESTED rejects.
+    why=$(lg_verdict_text_ok "$t" "${E:0:8}") || { echo "#$N verdict ${v##*/} has no PASS/ACK naming ${E:0:8} ($why)"; exit 2; }
+    if [[ "${t,,}" =~ $re ]]; then
+      lg_receipt_ok "${GATES_DONE:-}" "${E:0:8}" \
+        || { echo "#$N verdict ${v##*/} states a landing gate: set GATES_DONE=<receipt naming ${E:0:8}>"; exit 2; }
+    fi
+  done
+}
+# Early refusals, cheap first reads: the trading-cc-read gate, the verdict files, and the head.
+tcc_read_gate "$E"
+verdict_gate
 # Correction #136: the identity of a change is git patch-id (verbatim, -U0, --binary) of its whole diff against its own merge base; an empty change is refused.
 change() { lg_change_id "$1"; }
 same_change() { lg_same_change "$1" "$2"; }
@@ -205,10 +272,10 @@ fi
 # another session 23 s before this script ran, merged while its review was Running (4 P2 threads came after). So a
 # draft is marked ready first, then codex_gate.py must report the latest review finished (exit 0); running or not yet
 # started is polled for up to 20 minutes (exit 9 after that, or when a review ends other than Completed). Findings
-# become threads, which BLOCK below. The gate runs again just before the merge.
+# become threads, which BLOCK below. final_gate asks the gate again.
 # 2026-10-10 (trading-cc proposal, CC ruling): while the Codex connector reports its usage limit, the cross-family pass at
 # the head is the co-op's Astra GPT verdict instead. Set GPT_VERDICT=<verdict file naming the read head with ACK/PASS>.
-# #975 (Codex P1 and GPT P2-A at af9d1901, 2026-10-11): the gate can first give 5 just before the merge (an "@codex review" during CI that
+# #975 (Codex P1 and GPT P2-A at af9d1901, 2026-10-11): the gate can first give 5 at the final gate (an "@codex review" during CI that
 # meets the usage limit), so a 5 at either gate call needs the substitute; before, only the wait checked it, and "0 then 5" merged without one.
 gpt_substitute() {
   local why=""
@@ -220,7 +287,7 @@ gpt_substitute() {
 codex_wait() {
   local j g gr
   for j in $(seq 1 21); do
-    g=$(lg_gate "$GATE" "$R" "$N"); gr=$?
+    g=$(lg_gate "$GATE" "$R" "$N" "$E"); gr=$?
     { [ $gr = 0 ] || [ $gr = 5 ]; } && { echo "#$N $g"; [ $gr = 0 ] || gpt_substitute; return 0; }
     [ $gr = 3 ] && [ $j -lt 21 ] && { sleep 60; continue; }
     echo "#$N $g: stop, land after Codex finishes"; exit 9
@@ -229,6 +296,34 @@ codex_wait() {
 GATE=${LANDING_GATE:-$(dirname "$(readlink -f -- "$0")")/codex_gate.py}
 # #975 P3-4: a missing gate is one fixed line (python3 would print its path), before anything is marked ready.
 [ -f "$GATE" ] || { echo "#$N codex_gate.py not found (path withheld): stop"; exit 9; }
+# #975 round 4 (the CC's micro at 761810d7: each gate could change between its last read and the merge, and each round-3 fix left the next
+# gap): after every slow step, final_gate reads every gate again, fast reads only and in this order, and nothing but the merge follows it:
+# the head (the pinned head, carrying the read head's change), the verdict files and GATES_DONE, trading-cc-read (a failed read stops),
+# the Codex gate (a 5 needs GPT_VERDICT), and CI at the head (complete, green, ci-gate reported, not BLOCKED). Any failure stops with
+# that gate's exit code. What the reads cannot close is in the README ("What the final gate can and cannot close").
+final_gate() {  # <pinned head>
+  local hd s g gr open
+  hd=$(gh pr view "$N" -R $R --json headRefOid --jq .headRefOid 2>/dev/null); lg_hex40 "$hd" || hd=
+  [ "$hd" = "$1" ] || { echo "#$N head moved to ${hd:-?} at the final gate: stop"; exit 3; }
+  same_change "$E" "$hd" || { echo "#$N CHANGE DIFFERS between read head ${E:0:8} and head ${hd:0:8} at the final gate: stop"; exit 4; }
+  verdict_gate
+  tcc_read_gate "$E"
+  g=$(lg_gate "$GATE" "$R" "$N" "$E"); gr=$?
+  { [ $gr = 0 ] || [ $gr = 5 ]; } || { echo "#$N $g at the final gate: stop"; exit 9; }
+  [ $gr = 0 ] || { echo "#$N $g at the final gate"; gpt_substitute; }
+  s=$(lg_ci_state "$N"); [[ "$s" =~ ^[0-9a-f]{40}$'\t'[0-9]+$'\t'[0-9]+$'\t'[0-9]+$'\t'[0-9]+$'\t'[A-Z_]*$ ]] || s=
+  set -- $s
+  [ "${1:-}" = "$hd" ] || { echo "#$N head moved to ${1:-?} in the CI read at the final gate: stop"; exit 3; }
+  [ "$2" = 0 ] && [ "$3" = 0 ] && [ "$4" -gt 0 ] && [ "$5" -gt 0 ] \
+    || { echo "#$N CI at ${hd:0:8} is no longer complete and green at the final gate (incomplete=$2, failing=$3 of $4, ci-gate successes $5): stop"; exit 5; }
+  if [ "${6:-}" = BLOCKED ]; then
+    open=$(gh api graphql -f query='query($n:Int!){repository(owner:"seathatflowsinourveins",name:"us-equities-trading"){pullRequest(number:$n){reviewThreads(first:100){nodes{isResolved}}}}}' -F n="$N" --jq '[.data.repository.pullRequest.reviewThreads.nodes[]|select(.isResolved==false)]|length' 2>/dev/null)
+    case "$open" in ''|*[!0-9]*) open=unknown ;; esac
+    echo "#$N BLOCKED by branch policy at the final gate; unresolved review threads: $open. Not forcing."; exit 8
+  fi
+  echo "#$N final gate at ${hd:0:8}: head, change, verdict files, trading-cc-read, Codex and CI read again (CI $4 ok)"
+}
+# Slow steps: ready, the Codex wait, update-branch, the CI wait, the author address.
 if [ "$(gh pr view "$N" -R $R --json isDraft --jq .isDraft 2>/dev/null)" = true ]; then
   gh pr ready "$N" -R $R >/dev/null 2>&1 || { echo "#$N could not be marked ready"; exit 7; }
   echo "#$N marked ready at $(date -u +%FT%TZ)"; sleep 20
@@ -241,7 +336,7 @@ H=$(gh pr view "$N" -R $R --json headRefOid --jq .headRefOid 2>/dev/null); lg_he
 lg_have "$H"
 same_change "$E" "$H" || { echo "#$N CHANGE DIFFERS between read head ${E:0:8} and head ${H:0:8}: stop"; exit 4; }
 echo "#$N read ${E:0:12} -> head ${H:0:12}: same change (file set and per-file changed lines)"
-follows=0
+follows=0; ci=
 for i in $(seq 1 25); do
   # The required check (ci-gate) must have reported for this head: early-registering checks alone are not "CI done"
   # (2026-10-09 #26: a merge was attempted while only fast checks had registered).
@@ -262,20 +357,16 @@ for i in $(seq 1 25); do
       case "$open" in ''|*[!0-9]*) open=unknown ;; esac
       echo "#$N BLOCKED by branch policy with CI green; unresolved review threads: $open. Not forcing."; exit 8
     fi
-    g=$(lg_gate "$GATE" "$R" "$N"); gr=$?; { [ $gr = 0 ] || [ $gr = 5 ]; } || { echo "#$N $g just before the merge: stop"; exit 9; }
-    [ $gr = 0 ] || { echo "#$N $g just before the merge"; gpt_substitute; }
-    ae=$(lg_author_email "$R") || { echo "#$N cannot form the no-reply author address (correction #148): stop, nothing merged"; exit 11; }
-    # #975 (Codex P1 at af9d1901, 2026-10-11): the trading-cc-read status and its record can change during the Codex and CI waits (a newer
-    # status supersedes an older one, and the record is append-only), so both are read again last, just before the merge (exit 2).
-    tcc_read_gate "$E"
-    out=$(gh pr merge "$N" -R $R --squash --match-head-commit "$H" -A "$ae" 2>&1) || { cls=$(printf '%s' "$out" | grep -o -i -E 'not mergeable|head branch was modified|required status check|review|draft|merge conflict|protected branch|rate limit|authentication|not found' | head -1 | tr 'A-Z ' 'a-z_'); mf=$(lg_keep merge-fail "$out") && kept="gh output kept only in local file $mf in the temp directory (0600), never echoed" || kept="gh output could not be kept, and is not echoed"; echo "#$N merge failed (class: ${cls:-other}); $kept (#975 P2-2)"; exit 7; }
-    sleep 4
-    echo "#$N $(gh pr view "$N" -R $R --json state,mergeCommit,mergedAt --jq '"\(.state) \(.mergeCommit.oid) \(.mergedAt)"' 2>/dev/null) (CI $4 ok)"
-    lg_author_check "$R" "$N" "$ae" || exit 12
-    exit 0
+    ci=$4; break
   fi
   sleep 120
 done
-echo "#$N CI timeout"; exit 6
-exit
+[ -n "$ci" ] || { echo "#$N CI timeout"; exit 6; }
+ae=$(lg_author_email "$R") || { echo "#$N cannot form the no-reply author address (correction #148): stop, nothing merged"; exit 11; }
+final_gate "$H"
+out=$(gh pr merge "$N" -R $R --squash --match-head-commit "$H" -A "$ae" 2>&1) || { cls=$(printf '%s' "$out" | grep -o -i -E 'not mergeable|head branch was modified|required status check|review|draft|merge conflict|protected branch|rate limit|authentication|not found' | head -1 | tr 'A-Z ' 'a-z_'); mf=$(lg_keep merge-fail "$out") && kept="gh output kept only in local file $mf in the temp directory (0600), never echoed" || kept="gh output could not be kept, and is not echoed"; echo "#$N merge failed (class: ${cls:-other}); $kept (#975 P2-2)"; exit 7; }
+sleep 4
+echo "#$N $(gh pr view "$N" -R $R --json state,mergeCommit,mergedAt --jq '"\(.state) \(.mergeCommit.oid) \(.mergedAt)"' 2>/dev/null) (CI $ci ok)"
+lg_author_check "$R" "$N" "$ae" || exit 12
+exit 0
 }
