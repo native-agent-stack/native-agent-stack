@@ -2113,14 +2113,11 @@ class PromotionGatePreflight(unittest.TestCase):
 
 
 class MainCommandGateWiring(unittest.TestCase):
-    """Regression: review found `python3 runner.py paper ...` bypassed the
-    promotion gate entirely -- `main()` registered no `--gate-result`/
-    `--snapshot` arguments and its `paper`/`recover` call site omitted the
-    new `mode`/`gate_result_path`/`snapshot_path` kwargs, so `validate_preflight`
-    always ran with `mode=None`. These tests drive `runner.main()` itself
-    (mocking only the network-touching `preflight` call and the
-    native-runtime entry past the gate check) to prove the CLI wiring, not
-    just the already-covered `validate_preflight` unit behavior."""
+    """Paper may omit both qualification arguments; supplying either
+    requests the complete promotion check. Drive `runner.main()` with
+    fixture credentials and a network preflight observation, stopping at
+    native-runtime entry to check CLI behavior independently of the broker.
+    Direct `validate_preflight` proof validation is covered separately."""
 
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
@@ -2155,12 +2152,24 @@ class MainCommandGateWiring(unittest.TestCase):
         "gate check raised/returned" without needing the pinned native
         runtime or an SQLite ledger. Returns `(sentinel, code, raised)`:
         `code` is `main()`'s return value (`None` if it raised instead), and
-        `raised` is the exception instance if one propagated out of `main()`."""
+        `raised` is the exception instance if one propagated out of `main()`.
+        `self.preflight_summaries` keeps each summary `public_preflight`
+        returned; `main()` mutates it in place and a trial receipt carries it
+        as its `preflight` block."""
         sentinel = RuntimeError("reached_post_gate_execution")
+        self.preflight_summaries = []
+        real_public_preflight = runner_module.public_preflight
+
+        def capture_public_preflight(*args, **kwargs):
+            summary = real_public_preflight(*args, **kwargs)
+            self.preflight_summaries.append(summary)
+            return summary
+
         with patch.object(sys, "argv", self._argv(command, extra)), \
              patch.object(runner_module, "load_config", return_value=(self.config, None, None)), \
              patch.object(runner_module, "credentials", return_value=("fixture-key", "fixture-secret")), \
              patch.object(runner_module, "preflight", return_value=self.observation), \
+             patch.object(runner_module, "public_preflight", capture_public_preflight), \
              patch.object(runner_module, "account_lock_fingerprint", side_effect=sentinel):
             try:
                 code = runner_module.main()
@@ -2168,13 +2177,31 @@ class MainCommandGateWiring(unittest.TestCase):
             except Exception as exc:  # noqa: BLE001 -- deliberately catches the sentinel too
                 return sentinel, None, exc
 
-    def test_paper_without_gate_arguments_is_blocked_before_execution_continues(self):
+    def test_paper_without_gate_arguments_reaches_post_gate_execution(self):
+        sentinel, code, raised = self._run_main("paper")
+        self.assertIsNone(code)
+        self.assertIs(raised, sentinel)
+        (summary,) = self.preflight_summaries
+        self.assertEqual(summary.get("promotion_gate"), "not_supplied")
+
+    def test_paper_without_gate_arguments_still_requires_ready_account(self):
+        self.observation["account"]["trading_blocked"] = True
         sentinel, code, raised = self._run_main("paper")
         self.assertIsNone(raised)
         self.assertEqual(code, 2)
         result = json.loads(self.output.read_text())
-        self.assertEqual(result["status"], "not_started")
-        self.assertEqual(result["reason"], "promotion_gate_missing")
+        self.assertEqual(result["reason"], "account_not_ready")
+        self.assertEqual(result.get("promotion_gate"), "not_supplied")
+
+    def test_paper_with_either_gate_argument_alone_requires_the_complete_pair(self):
+        gate_path = self.root / "gate-result.json"
+        gate_path.write_text(json.dumps(_full_gate_result(input_sha256=self.snapshot_hash)))
+        for argument, path in (("--gate-result", gate_path), ("--snapshot", self.snapshot)):
+            with self.subTest(argument=argument):
+                sentinel, code, raised = self._run_main("paper", [argument, str(path)])
+                self.assertIsNone(raised)
+                self.assertEqual(code, 2)
+                self.assertEqual(json.loads(self.output.read_text())["reason"], "promotion_gate_missing")
 
     def test_paper_with_failing_gate_result_is_blocked_before_execution_continues(self):
         gate_path = self.root / "gate-result.json"
@@ -2224,14 +2251,19 @@ class MainCommandGateWiring(unittest.TestCase):
         sentinel, code, raised = self._run_main("paper", ["--gate-result", str(gate_path), "--snapshot", str(self.snapshot)])
         self.assertIsNone(code)
         self.assertIs(raised, sentinel)
+        (summary,) = self.preflight_summaries
+        self.assertEqual(summary.get("promotion_gate"), "validated")
 
     def test_recover_command_is_unaffected_by_missing_gate_arguments(self):
         """`recover` resumes a trial already admitted by an earlier `paper`
-        run; it must not additionally require --gate-result/--snapshot."""
+        run; it must not additionally require --gate-result/--snapshot, and
+        it adds no promotion marker: the admitting paper receipt holds it."""
         self.observation["positions"] = [{"symbol": "SPY", "qty": "1"}]
         sentinel, code, raised = self._run_main("recover")
         self.assertIsNone(code)
         self.assertIs(raised, sentinel)
+        (summary,) = self.preflight_summaries
+        self.assertNotIn("promotion_gate", summary)
 
     def test_preflight_command_is_unaffected_by_missing_gate_arguments(self):
         sentinel, code, raised = self._run_main("preflight")
