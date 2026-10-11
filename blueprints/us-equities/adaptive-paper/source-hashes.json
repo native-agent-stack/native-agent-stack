@@ -29,7 +29,7 @@
   "blueprints/us-equities/adaptive-paper/requirements.txt": "6859f3c7362730fb1e1f023777863dc70650607c90873836b99c4e7d63982216",
   "blueprints/us-equities/adaptive-paper/runner.py": "907d0381ffc11791e671cc25d15978403bad77790f4cfef4166030dab8e2c530",
   "blueprints/us-equities/adaptive-paper/runtime_lock.py": "fa785cf3b5d43da95a68a11cb71385e355c7b2cdc4de82a5fd0b19a744fea9a2",
-  "blueprints/us-equities/adaptive-paper/safety.py": "87f2549a9a4a0c5e438c7f87980b40b1187c568e4841aa732f2769ce06cb2e6e",
+  "blueprints/us-equities/adaptive-paper/safety.py": "792422744f1b7b9897c8ad44844f633d7753545414e8d6f9b95dd0144e6242ef",
   "blueprints/us-equities/adaptive-paper/scheduled_trial.sh": "8ed83e48dcc8106eda5e7cf3863b48cc2c6d68a79c029e17c461470564b1a475",
   "blueprints/us-equities/adaptive-paper/selector.py": "28de8ebf66b6e7135979554f73692ede772167682007d8c6ba41da6fb6fb39b3",
   "blueprints/us-equities/adaptive-paper/sessions.py": "fb906b56c50c8e16168656b1b7fcbd3a4b1bfca0a8e6465e8dae2c93d3c8e315",

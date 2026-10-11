@@ -709,8 +709,8 @@ class Ledger:
                    else self.limits.quote_max_age_seconds)
         if not -0.25 <= now - quote.timestamp <= max_age:
             raise SafetyError("quote_not_fresh")
-        # Spread/halt gates remain entry-only. The explicit side independently
-        # selects the sell-age budget; mark-to-market keeps the default entry age.
+        # Spread/halt gates remain entry-only. The explicit side selects sell age;
+        # mark_to_market() keeps the default entry age when it calls this check.
         if check_spread and quote.halted:
             raise SafetyError("quote_halted")
         if check_spread and (quote.ask - quote.bid) * 10000 / ((quote.ask + quote.bid) / 2) > self.limits.max_spread_bps:

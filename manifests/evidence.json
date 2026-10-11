@@ -13222,8 +13222,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/safety.py",
-      "sha256": "87f2549a9a4a0c5e438c7f87980b40b1187c568e4841aa732f2769ce06cb2e6e",
-      "bytes": 89416
+      "sha256": "792422744f1b7b9897c8ad44844f633d7753545414e8d6f9b95dd0144e6242ef",
+      "bytes": 89418
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/scheduled_trial.sh",
@@ -13247,7 +13247,7 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "5f56ef8d57a10968b06bf5d44e0fa7a1abd43a427914d52dee538414672b695d",
+      "sha256": "b56175b9083f530afb56781d03ed0fce58b89f8cb4587f00a30479f67fb30cbb",
       "bytes": 8744
     },
     {
@@ -18742,8 +18742,8 @@
     },
     {
       "path": "docs/decisions/2026-10-11-sell-only-quote-freshness.md",
-      "sha256": "64cb46c58ec91adb02ad0898a3255304afde091bf14ebc0fb2c282bb2337c3ff",
-      "bytes": 7981
+      "sha256": "f547857a970ef0e3b5585be294db9d3edc52c25615079c7900ed38552d0a8731",
+      "bytes": 8417
     },
     {
       "path": "docs/direct-results.md",

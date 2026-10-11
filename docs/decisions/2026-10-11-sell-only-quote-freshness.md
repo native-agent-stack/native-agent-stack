@@ -3,7 +3,8 @@
 The paper exit path may explicitly configure `exit_quote_max_age_seconds` as an
 integer from 1 through 30. When absent or null, its effective bound is the existing
 entry bound. `quote_max_age_seconds` still has its code ceiling of 3 seconds;
-entry pricing, held-position admission marks and mark-to-market keep that bound.
+Entry pricing and held-position admission marks retain that bound; the
+`mark_to_market()` method also uses it.
 The future-quote tolerance remains 0.25 seconds for both sides.
 
 This adopts the CC's 2026-10-11 measured-pull decision for the Monday paper path.
@@ -88,9 +89,16 @@ exits, the action guard and cancel-ack replacement therefore rejected bounded
 older sells before reaching the ledger or transport. The correction passes
 `RiskLimits.effective_exit_quote_max_age_seconds` into the policy's optional
 `exit_quote_age_seconds` and shares its effective sell-age selection with those
-native sell guards. Entry features/orders, held-entry admission marks,
-mark-to-market and gap-reference sampling keep the entry age. The sell override
+native sell guards. Entry features/orders and held-entry admission marks retain
+the entry age. The `mark_to_market()` method and gap-reference sampling also
+use the entry age. The sell override
 does not authorize older stop-arming or prior-close reference prices.
+
+A sell quote within the sell age may refresh the ledger's mark when it is newer
+than the stored mark. It keeps its own timestamp, so it never makes a mark fresh
+for an entry, and entry admission is unchanged. It may move unrealized P&L, the
+peak and drawdown, and latch a risk halt (which sets force_exit,
+runner.py:1776-1778) on a quote up to the sell age old.
 
 The CC's B1 ruling switches the armed RTH gap-risk stop trigger from the entry
 age to `sell_quote_age_seconds(self.policy.config)`: **SWITCHED**. This closes
