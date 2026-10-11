@@ -1599,8 +1599,8 @@ class CiSecretScanWorkflowRangeTests(unittest.TestCase):
                         self.assertEqual(ranges[0], "$SCAN_LOG_OPTS",
                                          "event modes must come from the verified resolver, never hardcoded HEAD")
                         self.assertNotIn("--all", options, "full CI backstops must be selected by the resolver")
-                        self.assertIn("--max-target-megabytes", options)
-                        self.assertEqual(options[options.index("--max-target-megabytes") + 1], "2")
+                        self.assertNotIn("--max-target-megabytes", options,
+                                         "#964 keeps large targets covered with an exact explorer exclusion")
         self.assertEqual(found, {("secret-scan", "gitleaks"),
                                  ("secret-scan-betterleaks", "betterleaks")},
                          "both gate and parity git scanners must remain covered")
@@ -1653,7 +1653,7 @@ class CiSecretScanWorkflowRangeTests(unittest.TestCase):
                     self.assertEqual(fixture["env"]["GITLEAKS_HISTORY_MODE"],
                                      "${{ steps.scan_range.outputs.mode }}")
 
-    def test_failed_or_missing_range_outputs_disable_every_real_history_scan(self):
+    def test_every_history_step_pins_the_native_success_guard(self):
         workflow = self.parsed_workflow()
         for job_id in ("secret-scan", "secret-scan-betterleaks"):
             guarded = [step for step in workflow["jobs"][job_id]["steps"]
@@ -1662,15 +1662,12 @@ class CiSecretScanWorkflowRangeTests(unittest.TestCase):
             self.assertGreater(len(guarded), 0)
             for step in guarded:
                 expression = step.get("if", "")
-                context = {"cancelled()": False, "steps.install.outcome": "success",
-                           "steps.scan_range.outcome": "success"}
-                with self.subTest(job=job_id, step=step["name"], outcome="success"):
-                    self.assertTrue(evaluate_expression(expression, context))
-                for outcome in ("failure", "skipped", "cancelled", ""):
-                    with self.subTest(job=job_id, step=step["name"], outcome=outcome):
-                        context["steps.scan_range.outcome"] = outcome
-                        self.assertFalse(evaluate_expression(expression, context),
-                                         "a broken or absent range must never enable a scanner")
+                # Pin GitHub's native expression instead of restoring the retired
+                # in-GitHub reviewer test's bespoke expression evaluator.
+                installed = "steps.install.outcome == 'success' && " if job_id == "secret-scan-betterleaks" else ""
+                expected = "${{ !cancelled() && " + installed + "steps.scan_range.outcome == 'success' }}"
+                with self.subTest(job=job_id, step=step["name"]):
+                    self.assertEqual(" ".join(expression.split()), expected)
 
     def test_betterleaks_history_scan_has_its_own_ten_minute_budget(self):
         job = self.parsed_workflow()["jobs"]["secret-scan-betterleaks"]

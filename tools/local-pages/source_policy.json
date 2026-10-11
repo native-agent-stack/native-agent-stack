@@ -2022,6 +2022,10 @@
     },
     {
       "root": "repo",
+      "path": "scripts/ci_secret_scan_range.py"
+    },
+    {
+      "root": "repo",
       "path": "scripts/codex_quota.py"
     },
     {

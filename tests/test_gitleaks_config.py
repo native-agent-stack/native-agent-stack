@@ -908,6 +908,8 @@ class GitleaksIgnoreFingerprintTests(unittest.TestCase):
                        check=True, capture_output=True)
         target_file = worktree / target_path
         target_file.parent.mkdir(parents=True, exist_ok=True)
+        if not (ROOT / target_path).is_file():
+            self.skipTest("repository narrative receipt absent from isolated fixture")
         shutil.copyfile(ROOT / target_path, target_file)
         subprocess.run(["git", "add", target_path], cwd=str(worktree), check=True, capture_output=True)
         seed = _commit_synthetic_fixture(worktree, "test: seed real narrative snapshot for fingerprint fixture")

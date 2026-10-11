@@ -504,9 +504,10 @@ failed PR #117). PR and push scans now use their event scopes rather than
 each run's entire ancestry. Local scans use `--log-opts="<merge-base>..HEAD"`
 only; full-history and all-ref scans remain prohibited locally.
 
-The existing `--max-target-megabytes 2` is a per-target skip threshold, not an
-aggregate memory cap. Gitleaks applies it to individual fragments;
-betterleaks 1.8.1 applies it to directory files but not its Git-history source.
+The former `--max-target-megabytes 2` was a per-target skip threshold, not an
+aggregate memory cap. The current commands retain the exact generated-explorer
+path exclusion without a blanket size cap, keeping large manifests and catalogs
+covered while applying the verified event scope.
 The betterleaks history step has a 10-minute timeout, including its CI-only
 ancestry backstop. The redacted JSON report is uploaded with `if: always()` so a
 failed scan still leaves the report retrievable; it never prints a matched

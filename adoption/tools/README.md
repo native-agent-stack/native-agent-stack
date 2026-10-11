@@ -304,9 +304,10 @@ CI scans a verified PR-owned range and, on normal pushes, uses
 `before` selects `-1`, scanning the head commit only. Scheduled and manually
 dispatched CI backstops use `--log-opts=HEAD`, limited to the checked-out
 commit's ancestry, never all fetched refs. These backstops are permitted only
-on CI runners. The existing `--max-target-megabytes 2` option is a per-target
-skip threshold, not a process-memory limit; betterleaks 1.8.1 does not apply
-it to its Git-history source. See
+on CI runners. The former `--max-target-megabytes 2` option was a per-target
+skip threshold, not a process-memory limit. The current CI commands retain
+the exact generated-explorer path exclusion without a blanket size cap, so
+large manifests and catalogs remain covered. See
 [the current scanning policy](../../docs/github-automation.md#secret-and-supply-chain-scanning-2026-09-22).
 
 ## What the tests establish

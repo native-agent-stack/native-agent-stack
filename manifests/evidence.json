@@ -5841,8 +5841,8 @@
     },
     {
       "path": "adoption/tools/README.md",
-      "sha256": "bd53361db6d9fb8c9793a083931b8ea091b89d2eefeed7fc12cf4324e6ed1558",
-      "bytes": 42055
+      "sha256": "38676c51fe191baba6508c827a0900afd0dd9f2c6844cf726bd8055f656c439a",
+      "bytes": 42142
     },
     {
       "path": "adoption/tools/ecosystem-bounded-run",
@@ -11397,8 +11397,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261004.json",
-      "sha256": "5ea8e4db0ab15115e5b1eec6c1939450514dc227e0f9308d865f661507c6c93d",
-      "bytes": 24531
+      "sha256": "7333a344d98538c6a3303811e987ac2f7c14105ae4a5acc193d7a97f1ce8a35c",
+      "bytes": 24821
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261011-skill-use-delta.json",
@@ -19117,8 +19117,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "4c6965bc8d4e0d8960d3a696073766cb3b8c2af4bd319785192c784c36febfbe",
-      "bytes": 105648
+      "sha256": "6a8e43e9c2993e92f61969704b69afd2a3d14772e92709a36e0f4769d493c4fe",
+      "bytes": 105708
     },
     {
       "path": "docs/grand-catalog-counts.md",
@@ -62007,8 +62007,8 @@
     },
     {
       "path": "tests/test_gitleaks_config.py",
-      "sha256": "c0c9ffacd95cd189fe6e6383d4125bbf5a2f3ec075543cf6adeb9b13dcf2e040",
-      "bytes": 87364
+      "sha256": "febb6a1a1b825fed8a864087051e6d9ce0883920f4092fa6f0356bca57226e79",
+      "bytes": 87498
     },
     {
       "path": "tests/test_gitleaks_guarded_macos.py",
@@ -62672,8 +62672,8 @@
     },
     {
       "path": "tests/test_secret_scan_size.py",
-      "sha256": "d1d2ba30337805d1717c5916417701e46989a8641efcfe5859d8f6c1e62d3cc1",
-      "bytes": 17626
+      "sha256": "6682a07928fd04d0fc128672540b05996a817caa5a75e0dff38e6b07a821928f",
+      "bytes": 22357
     },
     {
       "path": "tests/test_security_identity.py",
@@ -62917,8 +62917,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "de70386ca3e781a6046875e25d6a561287c247c5aec50ccffb1b24c27d84856b",
-      "bytes": 150324
+      "sha256": "4292ab812135ee019dc13348c2deae44410b9ccbfc9f7b224537a8d8be0e6670",
+      "bytes": 150121
     },
     {
       "path": "tests/test_workflow_policy.py",
@@ -63252,8 +63252,8 @@
     },
     {
       "path": "tools/local-pages/source_policy.json",
-      "sha256": "88d277e33d4c062fd07fb9ce9ebd2e1614f17bb355246b9f847eab0f73651653",
-      "bytes": 759459
+      "sha256": "78a4c1a3cd052d6a3a389894616cdffdfcde251e120ab673310a85c62b0dfa9e",
+      "bytes": 759542
     },
     {
       "path": "tools/omniroute/gateway_record.py",
