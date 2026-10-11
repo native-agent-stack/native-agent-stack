@@ -1,5 +1,5 @@
 {
-  "primary_trx_sha256": "88238817949532ec4de8990fabe8141096dd40c568a00a4bd07ceecfc71129d9",
+  "primary_trx_sha256": "c76e89f04739e7a4e37ba0749226154228058d5d2b2545e68c7e4590e3091274",
   "counters": {
     "total": "12",
     "executed": "12",
@@ -23,5 +23,7 @@
   "broker_requests": 0,
   "limitations": [
     "Outside-regular-hours order-submission decisions only; no claim of all brokerage behavior or paper adapter initialization."
-  ]
+  ],
+  "primary_trx_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/published/lean-model-summary-alpaca-model-py312.trx",
+  "trx_digest_basis": "published_sanitized_bytes"
 }

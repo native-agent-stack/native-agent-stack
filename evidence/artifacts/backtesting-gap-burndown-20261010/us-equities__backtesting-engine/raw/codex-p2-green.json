@@ -18,9 +18,9 @@
         "tests.test_new_host_grand_list"
       ],
       "observed_exit_code": 0,
-      "stdout_sha256": "0aa3a55b2784ae774b8d6182a5a70f3bd3e18df0404c1feb3faa393ea66bda6a",
-      "stderr_sha256": "453f0ab87fafd4cdeb085e66a470914bf5fb08987965478dcdb9dab29fa05758",
-      "output": "{\"evidence\": \"evidence/artifacts/hw-profiles/recorded-host-20260101/profile.json\", \"host_id\": \"recorded-host-20260101\", \"status\": \"recorded\"}\n{\"evidence\": \"evidence/artifacts/hw-profiles/recorded-host-20260101/profile.json\", \"host_id\": \"recorded-host-20260101\", \"status\": \"recorded\"}\n...................................................................................................................................................\n----------------------------------------------------------------------\nRan 147 tests in 1.766s\n\nOK\n"
+      "output": "{\"evidence\": \"evidence/artifacts/hw-profiles/recorded-host-20260101/profile.json\", \"host_id\": \"recorded-host-20260101\", \"status\": \"recorded\"}\n{\"evidence\": \"evidence/artifacts/hw-profiles/recorded-host-20260101/profile.json\", \"host_id\": \"recorded-host-20260101\", \"status\": \"recorded\"}\n...................................................................................................................................................\n----------------------------------------------------------------------\nRan 147 tests in 1.766s\n\nOK\n",
+      "output_sha256": "02ee9bd689af5951d070beb274a6e0576d83ca85c63aad3c6ecbd56b154a84e0",
+      "output_digest_basis": "published_bytes"
     },
     {
       "command": [
@@ -31,9 +31,9 @@
         "tests.test_nautilus_equity_replay"
       ],
       "observed_exit_code": 0,
-      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "stderr_sha256": "29492d9f3521792d89509debdb7ca150c3434ae1b8abe97c15fd332cf7d8748e",
-      "output": "...........................................................................................................................................................................................\n----------------------------------------------------------------------\nRan 187 tests in 0.170s\n\nOK\n"
+      "output": "...........................................................................................................................................................................................\n----------------------------------------------------------------------\nRan 187 tests in 0.170s\n\nOK\n",
+      "output_sha256": "29492d9f3521792d89509debdb7ca150c3434ae1b8abe97c15fd332cf7d8748e",
+      "output_digest_basis": "published_bytes"
     },
     {
       "command": [
@@ -42,9 +42,9 @@
         "--check"
       ],
       "observed_exit_code": 0,
-      "stdout_sha256": "08ce4f275c99b7f91a141cfca5b7384f060aacf620f23a324cde692d55e6ffcd",
-      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "output": "{\"rows\": 32, \"status\": \"checked\"}\n"
+      "output": "{\"rows\": 32, \"status\": \"checked\"}\n",
+      "output_sha256": "08ce4f275c99b7f91a141cfca5b7384f060aacf620f23a324cde692d55e6ffcd",
+      "output_digest_basis": "published_bytes"
     },
     {
       "command": [
@@ -53,9 +53,9 @@
         "--check"
       ],
       "observed_exit_code": 0,
-      "stdout_sha256": "63d8d8221f6c7c051149b1405ef5de7623dbb2d37257fad49a8a774b02d49226",
-      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "output": "{\"status\": \"passed\", \"layers\": 32, \"winners\": 66}\n"
+      "output": "{\"status\": \"passed\", \"layers\": 32, \"winners\": 66}\n",
+      "output_sha256": "63d8d8221f6c7c051149b1405ef5de7623dbb2d37257fad49a8a774b02d49226",
+      "output_digest_basis": "published_bytes"
     }
   ],
   "scope": "Focused touched/shared loader tests, existing parity fixtures and supported generator checks; no full test discovery"

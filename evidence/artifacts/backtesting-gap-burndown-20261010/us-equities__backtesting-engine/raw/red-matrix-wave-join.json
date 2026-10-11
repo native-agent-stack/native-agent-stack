@@ -24,19 +24,17 @@
   "captured_outputs": [
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/red-matrix-wave-join.stdout.txt",
-      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "raw_bytes": 0,
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "bytes": 0,
-      "home_and_pytest_components_exported": true
+      "home_and_pytest_components_exported": true,
+      "digest_basis": "published_bytes"
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/red-matrix-wave-join.stderr.txt",
-      "raw_sha256": "614f33195b9d9e82005cb4d3d98054276d275187b2397cda79867bb7beee5224",
-      "raw_bytes": 859,
       "sha256": "91a5c271a9446221a0ab97bf996eecb1058fa62b0f498e0ac41b40f018105bc1",
       "bytes": 849,
-      "home_and_pytest_components_exported": true
+      "home_and_pytest_components_exported": true,
+      "digest_basis": "published_bytes"
     }
   ],
   "output_hashes": [],
@@ -72,7 +70,6 @@
     ]
   },
   "correction_provenance": {
-    "original_receipt_sha256": "5c3516e7a630520bd8d27c2a36200dbe0815b31a7bf91ad2580d5db15ad2b7ee",
     "note": "Observed command, timing and exit are unchanged. Environment omission is disclosed, not filled with inferred values."
   },
   "provenance_status": "historical_draft"

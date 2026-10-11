@@ -14,7 +14,7 @@
   "raw_outputs": [
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/lean-alpaca-model-tests-py312.json",
-      "sha256": "c84ba7e3249e1ef0c3bf3874bcf3040e03e881b2260566829f65910d78fd54c4"
+      "sha256": "25494f79eb1ee010266e0b2bdb77c0f2205c10aab48448e00a5293d7cbed4484"
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/lean-alpaca-model-tests-py312.stderr.txt",
@@ -26,7 +26,7 @@
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/lean-model-summary.json",
-      "sha256": "b69c447889124cee596fdfb0b58991571f6688ebb5511640f4076f9453e24e2c"
+      "sha256": "c14e80739c12f3324572160dcebf58c77068b39be935ed533c258717c2e785a4"
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/source-pins.json",
@@ -34,7 +34,7 @@
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/lean-model-explicit-environment.json",
-      "sha256": "91d9f2f4366a48700278f836c37440bf143b317905f5c13137a2a0d68f6c894e"
+      "sha256": "651f63e2c1d0f6c9b84b1b3e037b32eee972c3fb414db18906210db6fc95a1f2"
     }
   ],
   "checked_at": "2026-10-10",
@@ -45,7 +45,6 @@
     "New gate-owner review/first-run acceptance is not fabricated."
   ],
   "correction_provenance": {
-    "original_receipt_sha256": "391a9ae9df3bbe7462bc70a580f27934336c5f9db8c01ec04f22f96595104df3",
     "note": "Scoped references and accounting corrected after CC review; native command observations are unchanged."
   }
 }

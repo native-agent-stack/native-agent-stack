@@ -14,7 +14,7 @@
   "raw_outputs": [
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/latest-nonprerelease.json",
-      "sha256": "13077c614c5c6c1b42e1ea1a179eba893746ebac201ea8502ed6274854f50239"
+      "sha256": "c808a7306fb7067aca18e4efa51109a37e7441e32b9a268e3ebeff8586c7518b"
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/latest-nonprerelease.stderr.txt",
@@ -30,7 +30,7 @@
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/stable-release-tag.json",
-      "sha256": "a8a7af30555db7537a54f53e6ecf3060a1f667af95d0c3839988e82f2b13dd18"
+      "sha256": "71482011236b0a7f6c8751d9c965462c211fb1641facb99a58ab3c3822ef7a63"
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/stable-release-tag.stderr.txt",
@@ -53,7 +53,6 @@
     "New gate-owner review/first-run acceptance is not fabricated."
   ],
   "correction_provenance": {
-    "original_receipt_sha256": "d6bb8a491c346b816bb36d84599dd75a3588684bbafa3f9b85189c6dc62a69ee",
     "note": "Scoped references and accounting corrected after CC review; native command observations are unchanged."
   }
 }

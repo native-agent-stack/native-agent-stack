@@ -14,7 +14,7 @@
   "raw_outputs": [
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-bars.json",
-      "sha256": "b9246eecdd942007680078af9cd7ef05c8e10cf635e4cc14b6106900b95e2ea8"
+      "sha256": "0945c90cb65aad2c0b139627abe5e7c76b72a2486be5ec38e329a0eec17bb523"
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-bars.stderr.txt",
@@ -30,7 +30,7 @@
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-lean-data.json",
-      "sha256": "ae136766ef3e790d0eae2c66ff3907797bb98dc0ee5c9745e289b83faa106065"
+      "sha256": "a75de00a4d20d47c1e0052d535031cef85b354693e91cfa96722931bc1766eed"
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-lean-data.stderr.txt",
@@ -46,7 +46,7 @@
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-no-attribution.json",
-      "sha256": "295b4611b63f3e0e7d16d0740e6435eb968d254d4094016f89a7eeeadce6b5e5"
+      "sha256": "fce2419f6224756e572aa132a22b09c118b8308fd3c416267e553042a1e16f0a"
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-no-attribution.stderr.txt",
@@ -62,7 +62,7 @@
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/local-parity-boundaries.json",
-      "sha256": "0fea834600b74c53599d80b3ef6338b9bf2519267dc2d20291da4fbe8632b8d7"
+      "sha256": "a2d60698fe2e054a8dcbe81d51b8aac578b7a91a27753276b7e3a5468bc1f6df"
     },
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/local-parity-boundaries.stderr.txt",
@@ -89,7 +89,6 @@
     "New gate-owner review/first-run acceptance is not fabricated."
   ],
   "correction_provenance": {
-    "original_receipt_sha256": "3120c3bcf863c07140e3813d7d7bbc75ba52f99aa29f0b90495c4dd64523c049",
     "note": "Scoped references and accounting corrected after CC review; native command observations are unchanged."
   }
 }

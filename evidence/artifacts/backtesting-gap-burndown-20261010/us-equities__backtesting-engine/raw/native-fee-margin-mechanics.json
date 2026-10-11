@@ -84,28 +84,20 @@
   "captured_outputs": [
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/native-fee-margin-mechanics.stdout.txt",
-      "raw_sha256": "b0fb4ebb5ba0712ecdc97420f1a166cbb3fd9ca53232685cd11b7c419a0006f2",
-      "raw_bytes": 107,
       "sha256": "b0fb4ebb5ba0712ecdc97420f1a166cbb3fd9ca53232685cd11b7c419a0006f2",
       "bytes": 107,
-      "home_and_pytest_components_exported": true
+      "home_and_pytest_components_exported": true,
+      "digest_basis": "published_bytes"
     },
     {
-      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/native-fee-margin-mechanics.stderr.txt",
-      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "raw_bytes": 0,
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/red-matrix-wave-join.stdout.txt",
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "bytes": 0,
-      "home_and_pytest_components_exported": true
+      "home_and_pytest_components_exported": true,
+      "digest_basis": "published_bytes"
     }
   ],
-  "output_hashes": [
-    {
-      "path": "~/.cache/native-agent-stack/backtesting-gaps-20261010/mechanics/native/results.json",
-      "sha256": "bd69b3622a831a8127faa4a3a43ec2f3f9e3be81d858adac6c2c2cd183fd8efd",
-      "bytes": 1663
-    }
-  ],
+  "output_hashes": [],
   "input_bytes_unchanged": true,
   "scope": "Historical draft capture only: at least one recorded source-input hash has no retained matching bytes. Observed command/output/exit are retained; this is not qualifying or reproducible closure evidence.",
   "environment_record": {
@@ -138,7 +130,6 @@
     ]
   },
   "correction_provenance": {
-    "original_receipt_sha256": "ab6e54cabc6f9869d2e2f5f9c6bf88b9a4cae9e5782a83e2ee3fcf51376d3efc",
     "note": "Observed command, timing and exit are unchanged. Environment omission is disclosed, not filled with inferred values."
   },
   "process_exit_expectation_met": true,
@@ -148,5 +139,11 @@
     "requested_cases": 4,
     "reason": "Projection KeyError was swallowed by the original command. Observed exit 0 did not establish a successful native mechanics run. Corrected execution propagates unexpected exceptions."
   },
-  "provenance_status": "historical_draft"
+  "provenance_status": "historical_draft",
+  "private_outputs": [
+    {
+      "path": "~/.cache/native-agent-stack/backtesting-gaps-20261010/mechanics/native/results.json",
+      "scope": "private original artifact; public output digest omitted"
+    }
+  ]
 }

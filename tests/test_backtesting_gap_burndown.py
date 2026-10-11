@@ -9,6 +9,7 @@ from pathlib import Path
 import sys
 import tempfile
 import os
+import re
 import subprocess
 from types import SimpleNamespace
 import unittest
@@ -25,6 +26,87 @@ def load(name):
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
+
+
+def evidence_nodes():
+    def walk(value, pointer=""):
+        if isinstance(value, dict):
+            yield pointer, value
+            for key, item in value.items():
+                yield from walk(item, pointer + "/" + key)
+        elif isinstance(value, list):
+            for index, item in enumerate(value):
+                yield from walk(item, pointer + "/" + str(index))
+    for path in BASE.rglob("*.json"):
+        for pointer, node in walk(json.loads(path.read_text())):
+            yield path, pointer, node
+
+
+class PublishedOutputDigestTests(unittest.TestCase):
+    def test_embedded_outputs_bind_only_published_bytes(self):
+        checked = 0
+        for path, pointer, node in evidence_nodes():
+            if isinstance(node.get("text"), str) and "sha256" in node:
+                with self.subTest(file=path.name, pointer=pointer + "/sha256"):
+                    self.assertEqual(node["sha256"], hashlib.sha256(
+                        node["text"].encode("utf8", "surrogateescape")).hexdigest())
+                    checked += 1
+            if "output_sha256" not in node:
+                continue
+            with self.subTest(file=path.name, pointer=pointer):
+                output = node.get("output", node.get("output_excerpt"))
+                self.assertIsInstance(output, str, "a public output digest requires retained published text")
+                self.assertEqual(node["output_sha256"], hashlib.sha256(
+                    output.encode("utf8", "surrogateescape")).hexdigest())
+                checked += 1
+        self.assertGreater(checked, 0)
+
+    def test_no_presanitization_output_commitments_are_published(self):
+        forbidden = {"raw_sha256", "raw_log_sha256", "original_receipt_sha256",
+                     "supersedes_draft_receipt_sha256", "original_export_sha256"}
+        for path, pointer, node in evidence_nodes():
+            with self.subTest(file=path.name, pointer=pointer):
+                self.assertFalse(forbidden & node.keys(), "original commitments belong only in private evidence")
+
+    def test_output_files_bind_published_repository_bytes(self):
+        checked = 0
+        for path, pointer, node in evidence_nodes():
+            if "path" not in node or "sha256" not in node or not any(
+                    "/" + group + "/" in pointer for group in ("captured_outputs", "output_hashes", "outputs", "captures")):
+                continue
+            with self.subTest(file=path.name, pointer=pointer):
+                self.assertFalse(Path(node["path"]).is_absolute() or node["path"].startswith("~"),
+                                 "published output must have retained repository bytes")
+                output = ROOT / node["path"]
+                self.assertTrue(output.is_file())
+                self.assertEqual(node["sha256"], hashlib.sha256(output.read_bytes()).hexdigest())
+                checked += 1
+        self.assertGreater(checked, 0)
+
+    def test_home_candidate_cannot_confirm_a_public_output_digest(self):
+        # Keep the candidate internal; failures emit only a Boolean and locator.
+        candidate = str(Path.home()).encode()
+        digests = {digest for _, _, node in evidence_nodes() for value in node.values()
+                   if isinstance(value, str) for digest in re.findall(r"(?<![0-9a-f])[0-9a-f]{64}(?![0-9a-f])", value)}
+        checked = 0
+        for path, pointer, node in evidence_nodes():
+            data = None
+            if isinstance(node.get("output"), str):
+                data = node["output"].encode("utf8", "surrogateescape")
+            elif isinstance(node.get("text"), str):
+                data = node["text"].encode("utf8", "surrogateescape")
+            elif isinstance(node.get("path"), str) and "sha256" in node and any(
+                    "/" + group + "/" in pointer for group in ("captured_outputs", "output_hashes", "outputs", "captures")):
+                output = ROOT / node["path"]
+                if output.is_file():
+                    data = output.read_bytes()
+            if data is None or b"~" not in data:
+                continue
+            inverse = hashlib.sha256(data.replace(b"~", candidate)).hexdigest()
+            with self.subTest(file=path.name, pointer=pointer):
+                self.assertFalse(inverse in digests, "masked-home inverse matched a public digest")
+            checked += 1
+        self.assertGreater(checked, 0, "inverse probe must exercise published masked text")
 
 
 class FailureBoundaryTests(unittest.TestCase):

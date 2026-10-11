@@ -34,26 +34,25 @@
   "captured_outputs": [
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/lean-alpaca-model-tests-py312.stdout.txt",
-      "raw_sha256": "d47c1f23ef8abcc0e09452a83ba252e118acb235e3f16b8009800570f0447f01",
-      "raw_bytes": 521,
       "sha256": "27a8d8dae2607e7108ea0121f7ee2c6a17b9a536f3f9d130c926e332100f4ce4",
       "bytes": 501,
-      "home_and_pytest_components_exported": true
+      "home_and_pytest_components_exported": true,
+      "digest_basis": "published_bytes"
     },
     {
-      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/lean-alpaca-model-tests-py312.stderr.txt",
-      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "raw_bytes": 0,
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/red-matrix-wave-join.stdout.txt",
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "bytes": 0,
-      "home_and_pytest_components_exported": true
+      "home_and_pytest_components_exported": true,
+      "digest_basis": "published_bytes"
     }
   ],
   "output_hashes": [
     {
-      "path": "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/lean-985ef30/TestResults/alpaca-model-py312.trx",
-      "sha256": "88238817949532ec4de8990fabe8141096dd40c568a00a4bd07ceecfc71129d9",
-      "bytes": 25466
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/published/lean-alpaca-model-tests-py312-alpaca-model-py312.trx",
+      "sha256": "c76e89f04739e7a4e37ba0749226154228058d5d2b2545e68c7e4590e3091274",
+      "bytes": 21983,
+      "digest_basis": "published_bytes"
     }
   ],
   "input_bytes_unchanged": true,
@@ -88,7 +87,6 @@
     ]
   },
   "correction_provenance": {
-    "original_receipt_sha256": "4d7cb6b1505b05f6c3794d3e70a5257178a8910f131140f7aa20453aa1672560",
     "note": "Observed command, timing and exit are unchanged. Environment omission is disclosed, not filled with inferred values."
   }
 }

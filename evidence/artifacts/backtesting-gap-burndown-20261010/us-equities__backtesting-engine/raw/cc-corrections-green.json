@@ -22,9 +22,9 @@
         "tests.test_new_host_grand_list"
       ],
       "observed_exit_code": 0,
-      "stdout_sha256": "0aa3a55b2784ae774b8d6182a5a70f3bd3e18df0404c1feb3faa393ea66bda6a",
-      "stderr_sha256": "df571b29dfe30f8531d7479c9dd1da79c91c1f1ee1742222996de5f5973161b4",
-      "output": "{\"evidence\": \"evidence/artifacts/hw-profiles/recorded-host-20260101/profile.json\", \"host_id\": \"recorded-host-20260101\", \"status\": \"recorded\"}\n{\"evidence\": \"evidence/artifacts/hw-profiles/recorded-host-20260101/profile.json\", \"host_id\": \"recorded-host-20260101\", \"status\": \"recorded\"}\n..............................................................................................................................................\n----------------------------------------------------------------------\nRan 142 tests in 1.402s\n\nOK\n"
+      "output": "{\"evidence\": \"evidence/artifacts/hw-profiles/recorded-host-20260101/profile.json\", \"host_id\": \"recorded-host-20260101\", \"status\": \"recorded\"}\n{\"evidence\": \"evidence/artifacts/hw-profiles/recorded-host-20260101/profile.json\", \"host_id\": \"recorded-host-20260101\", \"status\": \"recorded\"}\n..............................................................................................................................................\n----------------------------------------------------------------------\nRan 142 tests in 1.402s\n\nOK\n",
+      "output_sha256": "c762dd28eeb1a28c0ae1bda866c901e25bd4424c15225dcb44cb6c5fc55b862d",
+      "output_digest_basis": "published_bytes"
     },
     {
       "command": [
@@ -35,9 +35,9 @@
         "tests.test_nautilus_equity_replay"
       ],
       "observed_exit_code": 0,
-      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "stderr_sha256": "b1beb79dda74c65593293eb6c193059495968ad76a9ecc770785abea5876edf9",
-      "output": "...........................................................................................................................................................................................\n----------------------------------------------------------------------\nRan 187 tests in 0.131s\n\nOK\n"
+      "output": "...........................................................................................................................................................................................\n----------------------------------------------------------------------\nRan 187 tests in 0.131s\n\nOK\n",
+      "output_sha256": "b1beb79dda74c65593293eb6c193059495968ad76a9ecc770785abea5876edf9",
+      "output_digest_basis": "published_bytes"
     }
   ]
 }

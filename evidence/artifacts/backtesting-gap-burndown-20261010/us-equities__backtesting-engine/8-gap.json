@@ -29,7 +29,6 @@
     "New gate-owner review/first-run acceptance is not fabricated."
   ],
   "correction_provenance": {
-    "original_receipt_sha256": "0a6287d004735721cad9f641add9d3b28053feb080b78542c759c0a419e78f5c",
     "note": "Scoped references and accounting corrected after CC review; native command observations are unchanged."
   }
 }

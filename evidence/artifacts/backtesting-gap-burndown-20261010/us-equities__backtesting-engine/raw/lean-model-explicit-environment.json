@@ -92,19 +92,23 @@
   "outputs": [
     {
       "name": "stdout",
-      "raw_sha256": "2bba17cf05f0d6e030a9465a269674d6f6b678e94de824bc1031b7da05ddf62f",
-      "raw_bytes": 525,
-      "text": "Test run for ~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/lean-985ef30/Tests/bin/Debug/QuantConnect.Tests.dll (.NETCoreApp,Version=v10.0)\nA total of 1 test files matched the specified pattern.\nResults File: ~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/lean-985ef30/TestResults/alpaca-model-cc979-env.trx\n\nPassed!  - Failed:     0, Passed:    12, Skipped:     0, Total:    12, Duration: 22 ms - QuantConnect.Tests.dll (net10.0)\n"
+      "text": "Test run for ~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/lean-985ef30/Tests/bin/Debug/QuantConnect.Tests.dll (.NETCoreApp,Version=v10.0)\nA total of 1 test files matched the specified pattern.\nResults File: ~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/lean-985ef30/TestResults/alpaca-model-cc979-env.trx\n\nPassed!  - Failed:     0, Passed:    12, Skipped:     0, Total:    12, Duration: 22 ms - QuantConnect.Tests.dll (net10.0)\n",
+      "sha256": "efb41e43d6d79a223be71922c5902692b849aa8f54dd9d4b2d3a374d16dbb213",
+      "bytes": 505,
+      "digest_basis": "published_bytes"
     },
     {
       "name": "stderr",
-      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "raw_bytes": 0,
-      "text": ""
+      "text": "",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "digest_basis": "published_bytes"
     }
   ],
-  "trx_sha256": "0d9c77ec51db25d506f0b149d1cb5f7e5494d16feb286b2cd8fa9a497cf5536d",
+  "trx_sha256": "88d778130a35e0912ccf4f0ffdba6f75a837a1b04f629901aa2afebdd99e378d",
   "scope": "12 TestCaseSource cases of CanSubmitOrderWhenOutsideRegularTradingHours; no paper adapter initialization or broker requests",
   "source_repository": "https://github.com/QuantConnect/Lean",
-  "source_pin": "985ef30ad3ac774218c5ac516b4cb0aa2655730f"
+  "source_pin": "985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+  "trx_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/published/lean-model-explicit-environment-alpaca-model-cc979-env.trx",
+  "trx_digest_basis": "published_sanitized_bytes"
 }

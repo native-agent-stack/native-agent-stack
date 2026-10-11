@@ -88,28 +88,20 @@
   "captured_outputs": [
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/native-spy-replay-2.stdout.txt",
-      "raw_sha256": "0bfc77327c14652c5aac12099fb412179c051bbd1a8c628ba06d446d65f5afe9",
-      "raw_bytes": 317,
       "sha256": "0bfc77327c14652c5aac12099fb412179c051bbd1a8c628ba06d446d65f5afe9",
       "bytes": 317,
-      "home_and_pytest_components_exported": true
+      "home_and_pytest_components_exported": true,
+      "digest_basis": "published_bytes"
     },
     {
-      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/native-spy-replay-2.stderr.txt",
-      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "raw_bytes": 0,
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/red-matrix-wave-join.stdout.txt",
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "bytes": 0,
-      "home_and_pytest_components_exported": true
+      "home_and_pytest_components_exported": true,
+      "digest_basis": "published_bytes"
     }
   ],
-  "output_hashes": [
-    {
-      "path": "~/.cache/native-agent-stack/backtesting-gaps-20261010/replay-diagnostic-2/native/receipt.json",
-      "sha256": "fc3c04eaa92fffa9c2b25edbdb77b5beb92e6e346e1ea6eaeac4bbd583120aa5",
-      "bytes": 52470
-    }
-  ],
+  "output_hashes": [],
   "input_bytes_unchanged": true,
   "scope": "observed command result only; no automatic evidence-class or gap-status promotion",
   "environment_record": {
@@ -142,7 +134,12 @@
     ]
   },
   "correction_provenance": {
-    "original_receipt_sha256": "ff554b461a134252a823e6440d36bc6014d40b89b5ff138c0faee59746d02be3",
     "note": "Observed command, timing and exit are unchanged. Environment omission is disclosed, not filled with inferred values."
-  }
+  },
+  "private_outputs": [
+    {
+      "path": "~/.cache/native-agent-stack/backtesting-gaps-20261010/replay-diagnostic-2/native/receipt.json",
+      "scope": "private original artifact; public output digest omitted"
+    }
+  ]
 }

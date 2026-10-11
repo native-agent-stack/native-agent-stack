@@ -74,6 +74,17 @@ new environment-bound evidence rather than reconstructing historical values.
 The failed 4 MB build capture is reduced to a tail, preserving original raw/export hashes and byte lengths in
 its receipt, with stderr retained in full.
 
+Public output digests now follow the supported host recorder's published-byte
+convention: `scripts/host_receipts.py:1012,1029` at
+`8bffa2c41692ef483e91b68e3b15aeb331423d2c`. They hash the final sanitized UTF-8
+output or the retained published capture bytes. Unsanitized-output hashes,
+unretained stream hashes, derivative original-receipt commitments and embedded
+copies of those commitments are removed from publication. Raw originals stay
+in private local evidence. Public TRX exports are sanitized and hash-bound;
+their counters and actual command exits are unchanged. A masked-home candidate
+cannot reproduce the public output digests; the regression checks embedded text,
+retained files and every public digest string, including nested historical traces.
+
 The sole current disposition route is
 `catalogs/landscape/gap-closeouts/backtesting-engine-2026-10-10.json`, following
 main's #982 schema and loader. Gaps 2/6/7 are proposed, 0/4/9 residual, 1/8 blocked;
@@ -127,6 +138,13 @@ with their own red receipt, and the checkout inverse reproduces actual hash drif
 Native text captures retain byte hashes under the artifact directory's Git
 attributes (`-text`, whitespace lint disabled); the bounded build tail is explicitly
 marked as a projection, with its original commitment retained.
+
+That earlier commitment is retained privately. The current public review packet
+is `~/.local/state/native-agent-stack/coordination/ns2604-coop/lanes/engine-qual.privacy-public-20261011/`
+with a new MANIFEST.sha256 containing only published/sanitized bytes. Earlier
+packets and original commitments are private evidence and are not included under
+the new public packet's manifest. Sanitization preserves observations while
+removing identifiers and confirmation oracles; it is not a new native run.
 
 Sources:
 

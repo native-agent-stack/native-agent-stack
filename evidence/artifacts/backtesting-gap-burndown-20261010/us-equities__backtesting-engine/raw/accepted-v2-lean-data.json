@@ -33,26 +33,25 @@
   "captured_outputs": [
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-lean-data.stdout.txt",
-      "raw_sha256": "30ead7944782705cdadeabc70c07fff989aa6e30196acd619c581172fecab03f",
-      "raw_bytes": 24731,
       "sha256": "30ead7944782705cdadeabc70c07fff989aa6e30196acd619c581172fecab03f",
       "bytes": 24731,
-      "home_and_pytest_components_exported": true
+      "home_and_pytest_components_exported": true,
+      "digest_basis": "published_bytes"
     },
     {
-      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-lean-data.stderr.txt",
-      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "raw_bytes": 0,
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/red-matrix-wave-join.stdout.txt",
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "bytes": 0,
-      "home_and_pytest_components_exported": true
+      "home_and_pytest_components_exported": true,
+      "digest_basis": "published_bytes"
     }
   ],
   "output_hashes": [
     {
-      "path": "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-lean-data.verdict.json",
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-lean-data.verdict.json",
       "sha256": "8d6b96cc44f333c7f7d1216b23b5eb654100439566bcda0344034d4b215760f4",
-      "bytes": 49245
+      "bytes": 49245,
+      "digest_basis": "published_bytes"
     }
   ],
   "input_bytes_unchanged": true,
@@ -87,7 +86,6 @@
     ]
   },
   "correction_provenance": {
-    "original_receipt_sha256": "844e963a070aa0c2480cb61f048224f519775083bcbdaebb03ab258e6bc9b12d",
     "note": "Observed command, timing and exit are unchanged. Environment omission is disclosed, not filled with inferred values."
   }
 }

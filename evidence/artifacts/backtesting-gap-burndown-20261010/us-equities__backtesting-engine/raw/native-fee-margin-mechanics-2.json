@@ -84,28 +84,20 @@
   "captured_outputs": [
     {
       "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/native-fee-margin-mechanics-2.stdout.txt",
-      "raw_sha256": "4ead4cb47cdf7334020cdf166a9651926a5163a3527d7c664d7bbacb0f45c331",
-      "raw_bytes": 107,
       "sha256": "4ead4cb47cdf7334020cdf166a9651926a5163a3527d7c664d7bbacb0f45c331",
       "bytes": 107,
-      "home_and_pytest_components_exported": true
+      "home_and_pytest_components_exported": true,
+      "digest_basis": "published_bytes"
     },
     {
-      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/native-fee-margin-mechanics-2.stderr.txt",
-      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "raw_bytes": 0,
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/red-matrix-wave-join.stdout.txt",
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "bytes": 0,
-      "home_and_pytest_components_exported": true
+      "home_and_pytest_components_exported": true,
+      "digest_basis": "published_bytes"
     }
   ],
-  "output_hashes": [
-    {
-      "path": "~/.cache/native-agent-stack/backtesting-gaps-20261010/mechanics-2/native/results.json",
-      "sha256": "7c5841a3aa4e4cecdf19812127457daa2daab2e7af86ec6139dac6ae3e63df37",
-      "bytes": 31035
-    }
-  ],
+  "output_hashes": [],
   "input_bytes_unchanged": true,
   "scope": "observed command result only; no automatic evidence-class or gap-status promotion",
   "environment_record": {
@@ -138,7 +130,12 @@
     ]
   },
   "correction_provenance": {
-    "original_receipt_sha256": "4b679e1cf92a8092cbc9ea4ba808b664837bfdaadb50a0b4c20f4af6c8eec082",
     "note": "Observed command, timing and exit are unchanged. Environment omission is disclosed, not filled with inferred values."
-  }
+  },
+  "private_outputs": [
+    {
+      "path": "~/.cache/native-agent-stack/backtesting-gaps-20261010/mechanics-2/native/results.json",
+      "scope": "private original artifact; public output digest omitted"
+    }
+  ]
 }

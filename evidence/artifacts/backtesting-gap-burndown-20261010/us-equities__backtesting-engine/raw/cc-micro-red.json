@@ -53,6 +53,5 @@
     }
   ],
   "errors": [],
-  "stdout_sha256": "2b395f210b1b74633fd06b611a3794db281b740100ba86f7ab7423add34458f7",
   "scope": "Fail-before assertions on current production code/receipts; exact test bytes retained rather than an unbound draft hash."
 }

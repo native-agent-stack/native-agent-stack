@@ -30,6 +30,5 @@
     }
   ],
   "errors": [],
-  "output_sha256": "8008a0535c323fa39347acfc04e3c82bdacb5579162c2effe030e8284d4821b5",
   "evidence_class": "synthetic boundary tests; original production defect reproduced"
 }
