@@ -167,3 +167,51 @@ Full current Claude keys under both workflow paths and the adjudication key were
 repository's own APIs, appended while preserving every historical list as an exact prefix, and hash/byte
 registered in the evidence manifest. The exact generated fields and test receipts are retained privately.
 This correction changes neither native journals/transcripts nor prompts, account/config state, paid work or #995.
+
+## Capture-chain correction for the a191a1ca micro
+
+The Astra micro at `a191a1ca1fe654258f4ba16dc6e7030517c90afd` verified the corrected
+runtime but found that its review attachment carried the earlier capture seal and omitted the
+current micro receipts. Retention on the lane host did not establish attachment to the reader.
+This correction supplies the private attachments and makes their required bindings explicit.
+
+The current `cited-captures-20261011/MANIFEST.sha256` is
+`981aeb71fa758f6ab0f60fb7b540c3eb7abcca3e7b9cf47699d9c7c5dcb27740`, binding 449 files.
+It supersedes original seal `d574beaca0c7692ed6f392adefb635e9748504dc1195ec65b809829f2c255653`.
+Include `REDACTION-NOTES.md`: the unavailable original contents-API response hash
+`9ea862224026dc640573c28f2a5e8aef2c8f6efc1637153ad390515a41dcdfe3` maps to the
+redacted response `909c82810092811938b4771fbf60909cf917276ce798e4b940acbc3ee2389154`.
+The authenticated workflow content and Git blob remain unchanged. The old seal identifies
+historical bytes and must not be used to reconstruct or attach the removed access metadata.
+
+The current `pr993-micro-fix-20261011/MANIFEST.sha256` is
+`dc8305cc1d1b02557b1808fa7eca30883832c1ef4370b43c365d1637fa7eb5ac`, binding 63 files.
+It supersedes original seal `f14b4567a3206cf31a7330e840219a2dd1a409a18530a229172a90d2c91c044c`
+after its capture index and saved PR description were updated for the redaction. Attach this
+packet under its declared name, including `final-regressions-prior-red.log`,
+`final-audit-collector-green.log`, `final-six-modules.log`, `final-validate.log`,
+`derive_provenance.py`, `provenance-derived.json`, the captured source/registry and
+`call-sites.txt`. Also include the named historical `pr993-review-fix-20261011` receipts
+for the earlier 179/193-test head/merged rehearsal, and the shared root `call-sites.txt`.
+Historical sources and receipts retain their original revision identities.
+
+The completed attachment is retained privately in `pr993-capture-chain-fix-20261011`.
+Its `CITATION-CHECK.sha256` binds both current source seals, redaction notes, all cited
+source/receipt files and each disclosed original-to-masked mapping. The supported check is
+`sha256sum --strict --check CITATION-CHECK.sha256`, from its `attachments` directory;
+missing files and incorrect seals must fail. This uses the installed uutils/coreutils
+`0.10.0` command and its upstream
+[sha256sum missing-file tests](https://github.com/uutils/coreutils/blob/0.10.0/tests/by-util/test_sha256sum.rs).
+The previous reader attachment fails that same check; the completed attachment passes.
+Omitted-note, omitted-current-receipt, stale-seal, missing-historical-receipt, altered-masked-data
+and missing-pinned-binary controls are checked separately. Local checksum checks are attachment
+verification, not a new native model run or an ACK from a subsequent independent reader.
+
+Transport copies use the unchanged co-op `mask_packet.py` identified in the private correction
+index. Preserve each source `MANIFEST.sha256` byte-for-byte and supply `MASKED.tsv` with source
+and transport hashes plus the final transport manifest. Include the full pinned Claude executable
+at its recorded 257068216 bytes and SHA-256 `24972e3bc859fab2b46ed4c1e51f7d6130f06d3bd550811a114640de3370d0de`;
+its documented recovery from the transport helper's binary exclusion leaves upstream bytes intact.
+Before either next micro, attach the complete correction archive and check its transport seal and
+citation check from the extracted reader directory. A missing attachment or unexplained hash
+difference continues to block ACK.
