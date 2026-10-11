@@ -52,6 +52,28 @@ Raw U+001E and U+001F are replaced with U+FFFD before framing so original conten
 cannot impersonate the internal record markers. A two-line native probe proves
 names following either raw control character still receive their original lines.
 
+Publication mode (`scan_paths(..., reject_email=True)`) sends each individual
+serialized JSON report record separately to the supported native Betterleaks
+1.9.0 `stdin` command. The caller supplies layer/run records and individual
+repository/component index mappings; it never supplies the whole snapshot.
+It uses unframed native rules, with no repository prefix, suffix, separator or
+overlap. Every record must start with `{`, parse as an object and be strictly
+below 25,000 UTF-8 bytes; a larger or invalid record refuses before publication.
+Betterleaks owns nested decoding; native Expr neighbor filters remain active.
+This follows `cmd/stdin.go:47-49` and `sources/stdin.go:18-25` at
+`81aff7a638638aae3a659845d089043e1d8fe9ac`, as selected by the CC.
+The native file reader permits short initial reads and adds at most 25,000
+lookahead bytes. A record below that lookahead reaches EOF before a second
+fragment even after a short read. The original native-per-file repair was
+insufficient: its caller still passed the entire 300 KB document. Bare names
+and both encoded plants spanning byte 90,536 published, which the CC ruled a
+new privacy P1. Actual bounded records now refuse those plants and preserve
+previous output/registry bytes. Clean records below the bound publish; an
+oversized complete layer refuses, even if its title alone is native-clean.
+This explicit CC guard supersedes the prior unlimited-entry contract.
+General account-only repository/history framing remains a separate follow-up.
+See the [P1 correction](2026-10-11-final-stack-review-corrections.md#new-p1-actual-publication-records-and-source-pin-fidelity).
+
 The native command receives only its inline configuration environment. Competing
 scanner configurations, logging overrides and unrelated credentials are not
 inherited. `cmd/root.go` can print inline configuration on a parse error despite

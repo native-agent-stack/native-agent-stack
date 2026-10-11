@@ -31,6 +31,7 @@ Every path below was verified against `main` at `6d9a7a5`.
   which is a recipe of the `research-runtime` profile and is also cited by
   `catalogs/landscape/foundation.json` and `adoption/platforms/linux-wsl2.md`.
 - `catalogs/landscape/component-evidence-matrix.json`,
+  `catalogs/landscape/final-stack.json`,
   `docs/component-evidence-matrix.md`,
   `catalogs/landscape/new-host-grand-list.json` and
   `docs/new-host-grand-list.md` are generated foundation reports. Either lane
@@ -107,6 +108,8 @@ python3 -c 'import sys; from pathlib import Path; sys.path.insert(0, "scripts");
 for p in sys.argv[1:]: host_receipts.register_file(Path("."), p)' <files to register>
 python3 scripts/component_matrix.py --write
 python3 scripts/new_host_grand_list.py --write
+python3 scripts/final_stack.py --write
+python3 scripts/final_stack.py --check
 python3 scripts/validate.py
 ```
 

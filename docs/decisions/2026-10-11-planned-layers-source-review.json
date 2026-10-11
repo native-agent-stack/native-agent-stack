@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "reviewed_at": "2026-10-11",
+  "scope": "Checked-in source-review supplement for the two planned W4 layer rows. The approved plan's Design: ten layers table, original lines 386-387, was read and compared with the retained byte-identical capture. This supplement preserves the reviewed requirement projection without publishing host paths or private conversation. It selects no candidate and reports no measured strategy acceptance.",
+  "source": {
+    "record": "North-star plan v1: an evidence-driven desk that rides the market's current (command center, 2026-10-10)",
+    "approved": "2026-10-10",
+    "sha256": "fb4a95b19a00335c5831bce913cbf177f90d5bd2c17819013b6021d2dc585e5c",
+    "bytes": 55018,
+    "section": "Design: ten layers",
+    "rows": [2, 3],
+    "capture": "north-star-plan-v1-original.md",
+    "reviewed_generator_pin": "7ceedc64f38a0aa1fb4c48c6fb00ed62799d7141"
+  },
+  "layers": [
+    {
+      "catalog": "us-equities",
+      "layer_id": "catalysts-sentiment",
+      "title": "Catalysts and sentiment (free sources first)",
+      "requirement": "An event ledger with publication and first-observation clocks, from free sources first: EDGAR 8-K, openFDA approvals and complete response letters, ClinicalTrials.gov v2, USAspending, defense and SAM award notices, the Federal Register, Fed, BLS and BEA calendars, GDELT, Wikimedia pageviews and Alpaca News ratings. Paid sources such as X and bank research go to a proposal list, each with a value receipt. Market-wide regime inputs feed the strategy layer's selector.",
+      "acceptance": "Per-source receipts; 8-K coverage for 2022-2025; no forward rows in modelling lanes.",
+      "source": {
+        "record": "North-star plan v1: an evidence-driven desk that rides the market's current (command center, 2026-10-10)",
+        "approved": "2026-10-10",
+        "section": "Design: ten layers",
+        "row": 2
+      }
+    },
+    {
+      "catalog": "us-equities",
+      "layer_id": "judgment-features",
+      "title": "Judgment and features",
+      "requirement": "Typed model judgments (the returned model id, probabilities and available_at) in a DuckDB judgments table, joined point in time (ASOF JOIN) at the 09:20 ET cutoff.",
+      "acceptance": "Frozen, hashed case sets; macro-F1, Brier score and expected calibration error against every baseline; date-shift and entity-mask canaries; cost and p95 latency.",
+      "source": {
+        "record": "North-star plan v1: an evidence-driven desk that rides the market's current (command center, 2026-10-10)",
+        "approved": "2026-10-10",
+        "section": "Design: ten layers",
+        "row": 3
+      }
+    }
+  ]
+}

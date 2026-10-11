@@ -38,8 +38,10 @@ winner, records a landscape verdict, or flips a `platform_status`):
    with `--layer-ref <catalog>/<layer_id>` (section 3 step 3;
    changed after `v2026.09.26`).
 4. **Refresh the derived views.** `python3 scripts/component_matrix.py
-   --write`, then `python3 scripts/new_host_grand_list.py --write` (section 5
-   below). The grand list's "Qualified local models" section is built from
+   --write`, then `python3 scripts/new_host_grand_list.py --write`, then
+   `python3 scripts/final_stack.py --write` (section 5 below). The final command
+   refreshes `catalogs/landscape/final-stack.json` after its hashed inputs change.
+   The grand list's "Qualified local models" section is built from
    step 3's receipts; the runtime component's own winner row in the matrix
    carries them per platform too.
 5. **See what could flip.** `python3 scripts/verdict_flip_candidates.py`
@@ -50,7 +52,8 @@ winner, records a landscape verdict, or flips a `platform_status`):
    (a CI step runs it and posts the output to the job summary).
 6. **Validate.** `python3 scripts/host_receipts.py validate`,
    `python3 scripts/validate.py`, `python3 scripts/component_matrix.py
-   --check`, `python3 scripts/new_host_grand_list.py --check`, and the test
+   --check`, `python3 scripts/new_host_grand_list.py --check`,
+   `python3 scripts/final_stack.py --check`, and the test
    suite CI runs: `python3 -m unittest`. This repository's tests use the
    standard library's `unittest`, not `pytest` (not installed); running
    `python3 -m pytest` here does nothing useful.
@@ -307,10 +310,13 @@ Every receipt also names one `stage`. Two decide a platform status:
    ```sh
    python3 scripts/component_matrix.py --write
    python3 scripts/new_host_grand_list.py --write
+   python3 scripts/final_stack.py --write
+   python3 scripts/final_stack.py --check
    ```
 
-   The second command refreshes the new-host grand list, which joins the matrix; its `--check` also
-   runs in CI.
+   The second command refreshes the new-host grand list, which joins the matrix;
+   the third refreshes `catalogs/landscape/final-stack.json`, which joins the matrix,
+   verdicts, sweeps and declared run pins. Their `--check` modes also run in CI.
 
    `--write` recomputes and writes both
    `catalogs/landscape/component-evidence-matrix.json` and

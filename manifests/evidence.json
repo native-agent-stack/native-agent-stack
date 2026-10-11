@@ -5091,8 +5091,8 @@
     },
     {
       "path": ".github/workflows/adoption-bootstrap.yml",
-      "sha256": "7a602ef4630e532642e2a9b6159d1588f45b6a43c57b7b50519a341236b18cab",
-      "bytes": 10726
+      "sha256": "1f85c4e58330a3062bf3863fc9dba0317fb8787d9a9a992e72ca1b5774de55bb",
+      "bytes": 10796
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
@@ -5196,8 +5196,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "1c8a817bff26722134d9707dc47a7d9a5092342b95e1899e9977d9b1d3c1ece0",
-      "bytes": 39299
+      "sha256": "087532aa7611c74b7047e277d54f30e47b75c707d55c2bbd54ce7c657a654a8d",
+      "bytes": 39710
     },
     {
       "path": ".gitignore",
@@ -11357,7 +11357,7 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/resolver/gh_harness.py",
-      "sha256": "917e8b32a2c8a9b91d8a93a1bb27c6e819d32b158680d4bf65cbb35978997fdd",
+      "sha256": "7fa783ad5d2b9c99d9f82565718c12ccd7fc6a693f05e72c4f5e00686c52f600",
       "bytes": 35857
     },
     {
@@ -11372,8 +11372,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/resolver/push_gate.py",
-      "sha256": "39062cc57220b053e516b28d8ac825071f8e2ada8af59b5b389817dd84cc242f",
-      "bytes": 75874
+      "sha256": "abd695adba82234bb2671158c42de482cacaa350f983403cc3e939859acd7bdc",
+      "bytes": 75951
     },
     {
       "path": "blueprints/runtime-workers/openhands/run-e2e.sh",
@@ -17137,7 +17137,7 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "b5b52ab0497d6277b678b99d78f1adebbdfce49a5eaa9ba35c93043d3891bb96",
+      "sha256": "aad08353f6d26364d8d62c8cd6c14ab1d3ecdcccd5d28641ac81fe9c7469cc88",
       "bytes": 160022
     },
     {
@@ -17164,6 +17164,11 @@
       "path": "catalogs/landscape/component-evidence-matrix.json",
       "sha256": "7c68cc6e9e0001e4953ad08c6dec86cca462a5ca9787e5d1035a90f515f27885",
       "bytes": 315225
+    },
+    {
+      "path": "catalogs/landscape/final-stack.json",
+      "sha256": "2dd68f39d3a0ab12894cf49343f49ff9e22c2fdef9a0d6d4e751ef88ef1f1eab",
+      "bytes": 301336
     },
     {
       "path": "catalogs/landscape/foundation.json",
@@ -17249,6 +17254,11 @@
       "path": "catalogs/landscape/new-host-grand-list.json",
       "sha256": "ef738033f69e8785cf14172e0b34d477b34d77710e38702614adef1863b4e1c7",
       "bytes": 287964
+    },
+    {
+      "path": "catalogs/landscape/planned-layers.json",
+      "sha256": "b24e06efe5a029e4187af803701a56bdd74319e6b2d8fd82daa243b33294fb5d",
+      "bytes": 2365
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -17787,8 +17797,8 @@
     },
     {
       "path": "docs/contributing-evidence.md",
-      "sha256": "e03014e62d9eaceb179e50870b2e0b4882cf2d0da3ea3d4b52e7c7c62888d269",
-      "bytes": 32926
+      "sha256": "dcf7b0356787c145d8481bf2db7669040f6ba9878f6919317d24b698419967b3",
+      "bytes": 33339
     },
     {
       "path": "docs/convergence-architecture.md",
@@ -18632,8 +18642,8 @@
     },
     {
       "path": "docs/decisions/2026-10-09-host-name-scan.md",
-      "sha256": "35da3d0ed9e661ac1834589d5438ab6a8e29ffdf4f5ac29da8a22393b7cfa751",
-      "bytes": 15360
+      "sha256": "d2f67df8d99a136ec14594a2979a4468296ee0073f3184a4240d00b58eb14066",
+      "bytes": 16996
     },
     {
       "path": "docs/decisions/2026-10-09-mcp-surfaces-trials.md",
@@ -18711,9 +18721,19 @@
       "bytes": 5659
     },
     {
+      "path": "docs/decisions/2026-10-11-final-stack-review-corrections.md",
+      "sha256": "24336fd04475b1c417f4e6c9ec5ea132ed2e46c5b7d42e82c72f8b8f772caf37",
+      "bytes": 43874
+    },
+    {
       "path": "docs/decisions/2026-10-11-layer-resolution-protocol.md",
       "sha256": "a3bab6504f8c3a1ec800998b81f562496e85a1b5d1ca0de070a51352c06936b7",
       "bytes": 9899
+    },
+    {
+      "path": "docs/decisions/2026-10-11-planned-layers-source-review.json",
+      "sha256": "bbeafbef0f05c0b7595ebed36309d634076372f41c308a37cbb6840e2222b1bb",
+      "bytes": 2668
     },
     {
       "path": "docs/direct-results.md",
@@ -18867,8 +18887,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "ac7d4e04cc111f4b4c335a65faaa69d5ce3925842cb00b44809b99263993ad21",
-      "bytes": 258821
+      "sha256": "9c95d4852c3b4282d1717f603a7efffff95a361d86821b8a792475d8f15ef294",
+      "bytes": 263694
     },
     {
       "path": "docs/harness-rule-enforcement.md",
@@ -18917,8 +18937,8 @@
     },
     {
       "path": "docs/lanes.md",
-      "sha256": "36a2c7a6bb52252e04fd836ecd0684fc50a412f0b9226ff179c74e46fe4e31b8",
-      "bytes": 13410
+      "sha256": "a13844c6f680f394357240cd609c1aafb4cd513b7e9674b1ebd4635a842b56cb",
+      "bytes": 13529
     },
     {
       "path": "docs/memory-landscape-maintenance.md",
@@ -60647,8 +60667,8 @@
     },
     {
       "path": "scripts/component_matrix.py",
-      "sha256": "1c77250ae326b2cf7a8ed2dfc05ff8e83914e632960d1c426ae452cd1717642a",
-      "bytes": 80147
+      "sha256": "202d952952c361b7e17ee82740f7cd220e75cba2f3c7d9e82c433136d0fe0363",
+      "bytes": 80837
     },
     {
       "path": "scripts/credential_boot_receipt.py",
@@ -60662,13 +60682,18 @@
     },
     {
       "path": "scripts/currency_due.py",
-      "sha256": "ad7aefd8a4ba8c073c133df06796ecd83ee5333f5929f220d21a84fa6bc14e47",
-      "bytes": 57353
+      "sha256": "4a97f4f396c44a42ea8e16862435601a1d446ce2a65e0a7b63306e28d47834e9",
+      "bytes": 57356
     },
     {
       "path": "scripts/env_freshness.py",
       "sha256": "93646b8896d9efa89536b0c1be350de1cb2ce63ce73a463d30d13c79f0e548db",
       "bytes": 7138
+    },
+    {
+      "path": "scripts/final_stack.py",
+      "sha256": "82742dea85a9d2f9c7579a1069947975b4033265cf55f1e1baa232d10767a317",
+      "bytes": 58071
     },
     {
       "path": "scripts/freshness_propose.py",
@@ -60702,8 +60727,8 @@
     },
     {
       "path": "scripts/host_name_scan.py",
-      "sha256": "01ac281b13c17f292e66ee73bd04cd189edcfb608ac3f37d265adeb1a66d226d",
-      "bytes": 18544
+      "sha256": "a09a351de8fcd334938c7dd3f938e01b4e54cfd535c4f965e8ebe8b96f2c24ec",
+      "bytes": 21365
     },
     {
       "path": "scripts/host_receipts.py",
@@ -60779,6 +60804,11 @@
       "path": "scripts/starred_convergence.py",
       "sha256": "37f3b8f5f5409408e20bbadb730adac77d0ed9bb75b22a952d36e6343bb62b24",
       "bytes": 11294
+    },
+    {
+      "path": "scripts/sweep_policy.py",
+      "sha256": "1c8eb192b6b5bf33d1d7b03f34baac6b2193789be87db897fa43239d622d1e18",
+      "bytes": 258
     },
     {
       "path": "scripts/trading_gates.py",
@@ -61507,8 +61537,8 @@
     },
     {
       "path": "tests/test_currency_due.py",
-      "sha256": "6735fe966e1f42f5a32fcffb32a7e311e71a6528c09458f7d6f14a0844db9878",
-      "bytes": 103935
+      "sha256": "ce3848b2b311cfafadde5be1ae6073b319bbcfd28497740199807cd7ca8253aa",
+      "bytes": 104033
     },
     {
       "path": "tests/test_delisting_coverage.py",
@@ -61549,6 +61579,11 @@
       "path": "tests/test_extreme_gainer_audit.py",
       "sha256": "bfdf6e71700f259bdec3df2381328d07d0eb5c85622bf8a6d09a613de1cc75a4",
       "bytes": 15815
+    },
+    {
+      "path": "tests/test_final_stack.py",
+      "sha256": "7c19adf52dca4edbe006132bd740480c66c32fb26377c437c6f44253e3231dba",
+      "bytes": 60117
     },
     {
       "path": "tests/test_financial_data.py",
@@ -61682,8 +61717,8 @@
     },
     {
       "path": "tests/test_host_name_scan.py",
-      "sha256": "91c3ede06e49f4d89acf1147fa7bc22802699b7d9f8775479ce9d0f1a70a7fcb",
-      "bytes": 22509
+      "sha256": "0dbe4b3dd42e9a6c5b3dc53111fa9fda0a960d0ca723fed9d331d6394c2488f8",
+      "bytes": 27564
     },
     {
       "path": "tests/test_host_receipts.py",
@@ -61802,8 +61837,8 @@
     },
     {
       "path": "tests/test_local_pages_architecture_landscape_exclusions.py",
-      "sha256": "f380199e1d1d8cfc199ecedc21d03a98d7366c224be4c47eb10861e3c6404e4c",
-      "bytes": 11906
+      "sha256": "8e81ced59b9da8c72a9e3f62cba579713d940c0155a1f8772c74b4c7f6b91f21",
+      "bytes": 13218
     },
     {
       "path": "tests/test_local_pages_architecture_sources.py",
@@ -62217,8 +62252,8 @@
     },
     {
       "path": "tests/test_runtime_worker_openhands_push_gate.py",
-      "sha256": "9a9d2928a28883e135bceac4cd4da72839d11bfa3bfa2b7a6801c8b2940e9b98",
-      "bytes": 161891
+      "sha256": "9e5c753772df850caea8045545649dd035cf95d0a3a90657c657f61ee0118494",
+      "bytes": 161926
     },
     {
       "path": "tests/test_runtime_worker_openhands_resolver.py",
@@ -62757,8 +62792,8 @@
     },
     {
       "path": "tools/local-pages/source_policy.json",
-      "sha256": "78052497a0d7414fa4bc55ad9783592b7a127794c08ac9198bec726131820fe6",
-      "bytes": 758254
+      "sha256": "9b1f0dce48050556a8340393243a1101d4d3d3e1cb6f5cde3b6498db326b3909",
+      "bytes": 759363
     },
     {
       "path": "tools/omniroute/gateway_record.py",

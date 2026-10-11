@@ -2046,6 +2046,10 @@
     },
     {
       "root": "repo",
+      "path": "scripts/final_stack.py"
+    },
+    {
+      "root": "repo",
       "path": "scripts/freshness_propose.py"
     },
     {
@@ -2131,6 +2135,10 @@
     {
       "root": "repo",
       "path": "scripts/starred_convergence.py"
+    },
+    {
+      "root": "repo",
+      "path": "scripts/sweep_policy.py"
     },
     {
       "root": "repo",
@@ -2791,6 +2799,10 @@
       {
         "root": "repo",
         "path": "catalogs/landscape/new-host-grand-list.json"
+      },
+      {
+        "root": "repo",
+        "path": "catalogs/landscape/planned-layers.json"
       },
       {
         "root": "repo",
@@ -21488,6 +21500,11 @@
       "root": "repo",
       "path": "catalogs/landscape/grand-catalog-index-20261008.json",
       "reason": "G5 compact slot index with no layers, rows, candidates or components collection, so the supplement projection would attach no record to any layer."
+    },
+    {
+      "root": "repo",
+      "path": "catalogs/landscape/final-stack.json",
+      "reason": "A derived manifest reserved for the planned landscape.html (W4 PR 4); that consumer is not shipped by the W4 PR 2 generator. Architecture dated views would duplicate the source layer records."
     }
   ],
   "architecture_derivation_sources": [
@@ -21545,6 +21562,13 @@
       "sha256": "9d9cf1c5411153a3cc4be17f26dad549d45448ceef475637b4c13c5bb6151c98",
       "pin": "9d4c00cd05d79b3fd5074df2e46bacab87ee67ff",
       "scope": "Excluded from architecture_supplement: its top-level keys at this pin are kind, release_state, release_tag, schema_version, slots and source_sha256, none of which the supplement projection reads; added by #878 and unchanged since."
+    },
+    {
+      "root": "repo",
+      "path": "catalogs/landscape/final-stack.json",
+      "sha256": "bec35c4130522b9ac8169cc4b040ce87bc9ea3645f602aad9c07607745cfbadb",
+      "pin": "4d6cee1582f024d27319ee005117da5f15ebe269",
+      "scope": "Excluded from architecture_supplement: this derived manifest duplicates the canonical landscape layer records and is presented by landscape.html. Its classification was reviewed at this pin; regenerated output bytes remain bound separately by manifests/evidence.json. planned-layers.json remains a granted supplement."
     }
   ]
 }

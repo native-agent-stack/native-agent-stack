@@ -21,6 +21,7 @@ from pathlib import Path
 OVERRIDE = "NATIVE_AGENT_HOST_NAMES_JSON"
 PROFILE_ROOT = Path("/mnt/c/Users")
 PIN = "1.9.0"
+PUBLICATION_ENTRY_LIMIT = 25000  # Betterleaks@81aff7a6 sources/common.go:20; short reads are allowed.
 INVALID_UTF8_BYTES = dict.fromkeys(range(0xDC80, 0xDD00), 0xFFFD)
 # Microsoft defines these as a shared folder, template, or compatibility
 # junction, not a personal profile. Id/email sources are never filtered by it.
@@ -29,6 +30,10 @@ SYSTEM_PROFILE_DIRECTORIES = frozenset({"all users", "default", "default user", 
 
 class HostNameScanError(Exception):
     """A value-free failure message safe to show to the caller."""
+
+
+class PublicationEntryTooLarge(HostNameScanError):
+    """The serialized record exceeds the proven native single-fragment bound."""
 
 
 def _command(argv: list[str], *, root: Path,
@@ -123,7 +128,7 @@ def host_names(root: Path) -> tuple[str, ...]:
     return tuple(dict.fromkeys(names))
 
 
-def _config(names: tuple[str, ...], *, framed: bool = True) -> str:
+def _config(names: tuple[str, ...], *, framed: bool = True, reject_email: bool = False) -> str:
     # Go regexp.QuoteMeta's metacharacter set; quote literals, never parse them.
     special = r"\.+*?()|[]{}^$"
     frame_filter = (
@@ -151,11 +156,20 @@ def _config(names: tuple[str, ...], *, framed: bool = True) -> str:
                       "regex = " + json.dumps("(?i)(" + literal + ")", ensure_ascii=False),
                       "secretGroup = 1", "filter = " + json.dumps(
                           (frame_filter if framed else "") + boundary_filter)))
+    if reject_email:
+        # Generated-view email policy follows architecture_sources.py:29 at
+        # native-agent-stack@4d6cee1582f024d27319ee005117da5f15ebe269. Use the
+        # upstream Betterleaks 1.9.0 custom-rule/decoder path, not a local decoder.
+        # The email rule is used for native JSON publication-entry scans.
+        email = r"([\p{L}\p{N}.!#$%&'*+/=?^_`{|}~-]+@[\p{L}\p{N}.-]+\.[A-Za-z]{2,})"
+        lines.extend(("[[rules]]", 'id = "private-email"', 'description = "generated private email"',
+                      "regex = " + json.dumps(email), "secretGroup = 1",
+                      "filter = " + json.dumps((frame_filter if framed else "") + boundary_filter)))
     return "\n".join(lines) + "\n"
 
 
 def scan_paths(paths: list[Path], *, root: Path,
-               names: tuple[str, ...] | None = None) -> list[tuple[Path, int]]:
+               names: tuple[str, ...] | None = None, reject_email: bool = False) -> list[tuple[Path, int]]:
     """Return only caller-held paths and native numeric lines, never native text."""
     names = host_names(root) if names is None else names
     def entries():
@@ -169,17 +183,38 @@ def scan_paths(paths: list[Path], *, root: Path,
             except OSError:
                 raise HostNameScanError("host-name input unreadable") from None
             yield path, raw.decode("utf-8", errors="surrogateescape").translate(INVALID_UTF8_BYTES)
-    return _scan_entries(entries(), root=root, names=names)
+    return _scan_entries(entries(), root=root, names=names, reject_email=reject_email)
 
 
 def _scan_entries(entries: Iterable[tuple[Path, str]], *, root: Path,
-                  names: tuple[str, ...]) -> list[tuple[Path, int]]:
+                  names: tuple[str, ...], reject_email: bool = False) -> list[tuple[Path, int]]:
     binary = shutil.which("betterleaks")
     if binary is None:
         raise HostNameScanError("Betterleaks 1.9.0 is required for host-name scan")
     version = _command([binary, "version"], root=root, environment={})
     if version.returncode or version.stdout.strip() not in (PIN, "betterleaks version " + PIN):
         raise HostNameScanError("Betterleaks 1.9.0 is required for host-name scan")
+    if reject_email:
+        # CC-selected publication route: native cmd/stdin.go:47-49 and
+        # sources/stdin.go:18-25 at Betterleaks@81aff7a6. Each entry goes
+        # separately, unchanged, through the vendor's reader and decoder.
+        # No repository markers or overlap. Below the native lookahead,
+        # even a short initial pipe read reaches EOF in the same fragment.
+        findings = set()
+        for path, text in entries:
+            if len(text.encode("utf-8")) >= PUBLICATION_ENTRY_LIMIT:
+                raise PublicationEntryTooLarge("publication entry too large")
+            if not text.startswith("{"):
+                raise HostNameScanError("publication entry must start with a JSON object")
+            try:
+                if not isinstance(json.loads(text), dict):
+                    raise ValueError
+            except (ValueError, TypeError):
+                raise HostNameScanError("publication entry is not a JSON object") from None
+            origins = {line: (path, line) for line in range(1, text.count("\n") + 2)}
+            findings.update(_native_scan(text, origins, binary=binary, root=root,
+                                         names=names, framed=False, reject_email=True))
+        return sorted(findings, key=lambda finding: (str(finding[0]), finding[1]))
     # Upstream sources/file.go reads 100KB + up to 25KB of lookahead to a
     # double-newline boundary. Each record stays below 25KB even in UTF-8.
     # The overlap contains the longest literal and both Unicode neighbors;
@@ -212,9 +247,16 @@ def _scan_entries(entries: Iterable[tuple[Path, str]], *, root: Path,
                 line += 2
                 if end == len(text_line):
                     break
+    return _native_scan("".join(parts), origins, binary=binary, root=root,
+                        names=names, framed=True, reject_email=False)
+
+
+def _native_scan(text: str, origins: dict[int, tuple[Path, int]], *, binary: str,
+                 root: Path, names: tuple[str, ...], framed: bool,
+                 reject_email: bool) -> list[tuple[Path, int]]:
     # stdin needs only its inline config. Do not inherit competing config,
     # logging overrides, synthetic source values or unrelated credentials.
-    environment = {"BETTERLEAKS_CONFIG_TOML": _config(names)}
+    environment = {"BETTERLEAKS_CONFIG_TOML": _config(names, framed=framed, reject_email=reject_email)}
     try:
         completed = subprocess.run(
             [binary, "stdin", "--no-banner", "--no-color", "--log-level", "error",
@@ -222,7 +264,7 @@ def _scan_entries(entries: Iterable[tuple[Path, str]], *, root: Path,
              "--ignore-gitleaks-allow", "--gitleaks-ignore-path", os.devnull,
              "--max-decode-depth", "5", "--max-archive-depth", "0",
              "--max-target-megabytes", "0"],
-            input="".join(parts), cwd=root, env=environment, capture_output=True,
+            input=text, cwd=root, env=environment, capture_output=True,
             text=True, encoding="utf-8", errors="strict", timeout=120)
     except (OSError, UnicodeError, subprocess.SubprocessError):
         raise HostNameScanError("host-name scanner unavailable") from None
@@ -233,7 +275,8 @@ def _scan_entries(entries: Iterable[tuple[Path, str]], *, root: Path,
         findings: set[tuple[Path, int]] = set()
         for item in report:
             if not isinstance(item, dict) or item.get("RuleID") not in {
-                    f"host-name-{index}" for index in range(len(names))}:
+                    *({"private-email"} if reject_email else set()),
+                    *(f"host-name-{index}" for index in range(len(names)))}:
                 raise ValueError
             found_line = item.get("StartLine")
             if type(found_line) is not int or found_line not in origins:

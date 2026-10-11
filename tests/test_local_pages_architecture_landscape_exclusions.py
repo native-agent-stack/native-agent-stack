@@ -36,6 +36,19 @@ POLICY, SOURCES, EVIDENCE, BUILDER = (load(name) for name in ("source_policy", "
 
 
 class CommittedLandscapeSetTests(unittest.TestCase):
+    def test_derived_final_stack_is_excluded_but_planned_layers_are_granted(self):
+        policy = json.loads(POLICY_PATH.read_text())
+        excluded = {row["path"]: row for row in policy["architecture_supplement_exclusions"]}
+        supplements = {row["path"] for row in policy["architecture"]["architecture_supplement"]}
+        self.assertIn("catalogs/landscape/final-stack.json", excluded)
+        self.assertNotIn("catalogs/landscape/final-stack.json", supplements)
+        self.assertIn("catalogs/landscape/planned-layers.json", supplements)
+        self.assertIn("derived manifest", excluded["catalogs/landscape/final-stack.json"]["reason"])
+        provenance = {row["path"]: row for row in policy["architecture_derivation_sources"]}
+        derived = provenance["catalogs/landscape/final-stack.json"]
+        self.assertRegex(derived["pin"], r"\A[0-9a-f]{40}\Z")
+        self.assertRegex(derived["sha256"], r"\A[0-9a-f]{64}\Z")
+
     def test_every_committed_landscape_json_is_canonical_granted_or_excluded(self):
         tracked = subprocess.run(["git", "ls-files", "-z", "--", ":(glob)catalogs/landscape/*.json"], cwd=ROOT,
                                  check=True, capture_output=True).stdout.decode().split("\0")
@@ -73,6 +86,11 @@ class CommittedLandscapeSetTests(unittest.TestCase):
 
     def test_committed_exclusions_name_files_above_the_read_bound_or_without_projected_records(self):
         policy = json.loads(POLICY_PATH.read_text())
+        # The derived final-stack does contain projected layer records; its separate
+        # check above verifies the deliberate duplicate-view exclusion and provenance.
+        policy["architecture_supplement_exclusions"] = [
+            row for row in policy["architecture_supplement_exclusions"]
+            if row["path"] != "catalogs/landscape/final-stack.json"]
         rows = {row["path"]: row for row in policy["architecture_supplement_exclusions"]}
         self.assertEqual(set(rows), {"catalogs/landscape/grand-catalog-counts.json",
                                      "catalogs/landscape/grand-catalog-20261008.json",
