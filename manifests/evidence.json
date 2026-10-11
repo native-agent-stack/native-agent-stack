@@ -4941,8 +4941,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/cross-client.md",
-      "sha256": "15d35bfbe868fe724f980dad143a86814df5881a21dd830a990c60a59f3c674c",
-      "bytes": 4483
+      "sha256": "ea8ae1dfb90358f54a6adf2e714380f59c55379427ab82a97b32292e09caf83d",
+      "bytes": 4819
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/git-github-automation.md",
@@ -20029,6 +20029,11 @@
       "path": "evidence/artifacts/claude-native-practice-20261009/claude-native-slot-manifest.json",
       "sha256": "1ada50b39afc9a02b29f5a28a935c7bcdf8615140d0aa7d0229d92cef8f85448",
       "bytes": 236851
+    },
+    {
+      "path": "evidence/artifacts/claude-native-practice-20261009/cross-client-lines.json",
+      "sha256": "ece233bb88356790f166483435a694959d3c59bcf21b78eddb004683e7e3548a",
+      "bytes": 4546
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/fresh-session.json",
@@ -60797,8 +60802,8 @@
     },
     {
       "path": "tests/test_native_practice_cross_client_sources.py",
-      "sha256": "e6a0c5e637748744009c3789b77128d6350467289d5d1ac0a41b4550fa968623",
-      "bytes": 13837
+      "sha256": "33a6ffa13b7b8b37ed28d0521a5fa76393fb8b66fec3931216cf1f87f2e62d8a",
+      "bytes": 23771
     },
     {
       "path": "tests/test_native_practice_doc_corrections.py",

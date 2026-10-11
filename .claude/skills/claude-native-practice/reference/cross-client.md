@@ -32,9 +32,11 @@ Sources: <https://claude.com/blog/code-review>, <https://www.anthropic.com/resea
 | Native review | `/review-changes` (saved Workflow), `/code-review` in the main session | `codex review --base <ref>` or `--commit <sha>` |
 | Clean-context run for an eval | a fresh subagent or `claude -p` session | `codex exec --ephemeral` |
 
-Claude column sources: the Claude Code documentation pages the 2026-10-09 reading captured (the URL, the capture's sha256 and the
-line it was read at are the locators of `evidence/artifacts/claude-native-practice-20261009/claims.json`; lines are counted by
-newline in the capture). `/review-changes` is this repository's saved Workflow,
+Claude column sources: the Claude Code documentation pages the 2026-10-09 reading captured. For each citation, the URL, the capture's
+sha256 and the fetch time are locators of `evidence/artifacts/claude-native-practice-20261009/claims.json`, and the line (counted by newline
+in that capture) is recorded with the sha256 of its text in `evidence/artifacts/claude-native-practice-20261009/cross-client-lines.json`; a
+test checks the page against both. The captures are private working papers of the reading, not in this repository: with a capture,
+`sed -n '<line>p' <capture> | sha256sum` prints the recorded line hash. `/review-changes` is this repository's saved Workflow,
 `examples/claude-native/workflows/review-changes.js`.
 
 | Need | Claude Code source |
