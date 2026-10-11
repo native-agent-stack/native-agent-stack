@@ -1,0 +1,110 @@
+{
+ "pricing": {
+  "bytes": 50272,
+  "fetched_utc": "2026-10-11T08:39:11Z",
+  "note": "Only claude-fable-5-1 is checked against the token counters: its cache writes in the windows are priced at the 5-minute rate, while the counter's cacheCreation type does not say which duration an Opus or Sonnet write used.",
+  "page": "https://platform.claude.com/docs/en/about-claude/pricing.md",
+  "sha256": "67904e280b595d31f373c857844ed380072ae79d280d8f385640b5992d337ca9",
+  "usd_per_mtok": {
+   "claude-fable-5-1": {
+    "cache_read": 0.25,
+    "cache_write_1h": 20.0,
+    "cache_write_5m": 12.5,
+    "input": 10.0,
+    "output": 50.0
+   }
+  }
+ },
+ "queries": {
+  "counter_usd_by_model": "sum by (model) (increase(claude_code_cost_usage_USD_total[24h]))",
+  "events_cost_usd_by_model": "sum by (model) (sum_over_time({service_name=\"claude-code\"} | event_name=\"api_request\" | unwrap cost_usd [86400s]))",
+  "tokens_by_model_type": "sum by (model, type) (increase(claude_code_token_usage_tokens_total[24h]))"
+ },
+ "schema": "claude-native-practice-meter-windows/1",
+ "source": "the host's local Prometheus and Loki, read at two fixed instants; aggregate figures by model only (no prompt, response, path, session id or host name)",
+ "window_length": "24h",
+ "windows": [
+  {
+   "counter_usd_by_model": {
+    "claude-fable-5-1": 651.05,
+    "claude-haiku-5-5": 1.17,
+    "claude-opus-5-5": 1598.7,
+    "claude-sonnet-5-5": 597.98
+   },
+   "end_utc": "2026-10-11T01:10:00Z",
+   "events_cost_usd_by_model": {
+    "claude-fable-5-1": 55.21,
+    "claude-haiku-5-5": 7.79,
+    "claude-opus-5-5": 4086.37,
+    "claude-sonnet-5-5": 875.02
+   },
+   "tokens_by_model_type": {
+    "claude-fable-5-1": {
+     "cacheCreation": 1777955,
+     "cacheRead": 20407731,
+     "input": 48528376,
+     "output": 2768717
+    },
+    "claude-haiku-5-5": {
+     "cacheCreation": 184075,
+     "cacheRead": 926503,
+     "input": 1236119,
+     "output": 304562
+    },
+    "claude-opus-5-5": {
+     "cacheCreation": 74712439,
+     "cacheRead": 3936617164,
+     "input": 3558759,
+     "output": 18198455
+    },
+    "claude-sonnet-5-5": {
+     "cacheCreation": 36893766,
+     "cacheRead": 3504763594,
+     "input": 1923514,
+     "output": 11691698
+    }
+   }
+  },
+  {
+   "counter_usd_by_model": {
+    "claude-fable-5-1": 1008.41,
+    "claude-haiku-5-5": 1.41,
+    "claude-opus-5-5": 2374.21,
+    "claude-sonnet-5-5": 1010.9
+   },
+   "end_utc": "2026-10-11T08:00:00Z",
+   "events_cost_usd_by_model": {
+    "claude-fable-5-1": 55.21,
+    "claude-haiku-5-5": 2.97,
+    "claude-opus-5-5": 3905.22,
+    "claude-sonnet-5-5": 1301.04
+   },
+   "tokens_by_model_type": {
+    "claude-fable-5-1": {
+     "cacheCreation": 1777107,
+     "cacheRead": 20404459,
+     "input": 77215864,
+     "output": 4178686
+    },
+    "claude-haiku-5-5": {
+     "cacheCreation": 184075,
+     "cacheRead": 926503,
+     "input": 1509801,
+     "output": 358340
+    },
+    "claude-opus-5-5": {
+     "cacheCreation": 105452573,
+     "cacheRead": 6005050695,
+     "input": 4863148,
+     "output": 26933697
+    },
+    "claude-sonnet-5-5": {
+     "cacheCreation": 58001074,
+     "cacheRead": 5894537461,
+     "input": 4368525,
+     "output": 21485617
+    }
+   }
+  }
+ ]
+}

@@ -221,8 +221,7 @@ since 2026-02-11 and no releases, which fails the 90-day maintenance rule.
 | Blinded skills-content comparison | skills-library | skills-lifecycle |
 | Mislabel rate on the first real triage runs before any author gate | GitHub triage | api-actions |
 | agentsview retention probe | cleanupPeriodDays recommendation | command center |
-| Paired run 4 (preregistration sha256 `33bd44ca34cb`, approved by the command center 2026-10-11 ~01:12Z; its meters passed Stage 0 at 02:14Z and Stage 1 started at 02:18Z; its result is a later record): the advisor on against off (`CLAUDE_CODE_DISABLE_ADVISOR_TOOL=1`) for Workflow subagents on the frozen fixtures, hidden tests, blind-judged diffs and cost by model, with the cost counter, the `api_request` events and the transcripts reconciled | model-effort-routing (native advisor pairing), usage-cost-monitoring | cc-native-practice |
-| Paired run 5 (preregistration sha256 `66f87a9eb2b9`, with the command center's rulings in its first addendum; started 2026-10-11 03:20Z; its result is a later record): Sonnet 5.5 against Opus 5.5 at medium effort on review micros of five pull-request heads whose findings are known, scored by blind judges on the recall of the known findings, false positives and cost from the counter, with the rule that Sonnet takes review micros only if it finds every decisive finding Opus finds at no more than 60% of Opus's cost | model-effort-routing | cc-native-practice |
+| Paired run 4 (preregistration sha256 `33bd44ca34cb`, approved by the command center 2026-10-11 ~01:12Z; its meters passed Stage 0 at 02:14Z and Stage 1 started at 02:18Z; stopped on 2026-10-11 at the owner's priority after 2 of 8 pairs, with no verdict (private record sha256 `6fdeb8916960`); a restart needs a new ruling that links it to the north star): the advisor on against off (`CLAUDE_CODE_DISABLE_ADVISOR_TOOL=1`) for Workflow subagents on the frozen fixtures, hidden tests, blind-judged diffs and cost by model, with the cost counter, the `api_request` events and the transcripts reconciled | model-effort-routing (native advisor pairing), usage-cost-monitoring | cc-native-practice |
 
 ## Refresh loop
 
@@ -405,3 +404,17 @@ Workflow and the team stay available per task, as the owner directed. What the a
 the 45-minute wait ceiling in 3, and never started in 1; the team reached TEAM-DONE in 2 of 6, was stopped at the ceiling in 3, hit its cap in 1, and in 1 run waited on a question to the absent
 user. Four defects of the measurement were found during the run, each recorded as a new addendum file beside the preregistration: a harness-fault detector that counted file text, a blinding scan that
 redacted a fixture's own vocabulary, a refuter that was given untranslated reasons, and a failed diff capture for the team's F3 run, which voids that fixture's two pairs with the team (none of the four changes an outcome). Limits: one module family, one trial per arm, judges of the producers' own model family, costs list-equivalent.
+
+**Model routing for review micros (paired run 5).** Sonnet 5.5 against Opus 5.5, both at medium effort in `claude -p` on client 2.1.296 with the repository's own brief alone (tools Bash,
+Read, Glob and Grep; the home tree and the other runs' directories denied; the network closed), reviewed 5 pull-request heads of this repository whose findings were known from earlier Opus
+and GPT reads, two trials each (20 runs). A blind first judge and a refuter (Opus 5.5 at max effort) scored each run's recall of the 12 decisive known findings, its false positives and its
+cost from the counter. The rule fixed before the first run: Sonnet takes review micros only if, for every decisive finding, it found the finding in at least as many of its runs as Opus did,
+and its runs cost at most 60% of Opus's. Opus found 7 detections of 24 and Sonnet 6; Sonnet missed 1 decisive finding that Opus found (G10, found in 1 of Opus's 2 runs and 0 of Sonnet's), at
+17% of Opus's cost, so by the strict rule Opus stays. Trial 1 alone said Sonnet takes micros (its noise floor was 0.08); over the two trials the strict rule's noise floor is 0.02 (two
+identical reviewers would pass it that rarely, at the observed detection rate 0.27), and the tolerant reading, reported and not decisive, holds (0.62). Beside the rule, not inputs: outside
+the known findings Opus reported 7 real and new P1 or P2 findings against Sonnet's 1, and Sonnet approved #982 in both trials where Opus requested changes. The command center ruled the
+strict reading on 2026-10-11 (ruling sha256 `08aac8fd72be`, `research-cc-role-20261008/ruling-routing-run5-two-trial-20261011.md`): Opus for trading code, gate code and any micro that is the
+only Claude-family read of a gate; Sonnet at medium only for non-gate foundation changes (docs, pages, catalogs, generated reports); no slot row, default or skill text changes. Limits: the
+same 5 heads in both trials, so the second trial measures run-to-run variation on them; one brief; medium effort only; the judge and refuter are one family; the fence denies the client's
+persisted tool outputs and refused the runs that tried to read them (3 Opus runs in trial 2, 2 in trial 1); costs are API-list-equivalent, not billed. The preregistration is sha256
+`66f87a9eb2b9`, the result record `5642e6a1b989`, and the registration allows no third trial.

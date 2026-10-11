@@ -4,6 +4,9 @@ evidence/artifacts/native-practice-paired-runs-20261010/paired-runs.json holds t
 decision rule's inputs and the sha256 of every private paper the results rest on. The rows of the claude-native-practice skill (reference/slots.json) and the record's addendum
 (docs/decisions/2026-10-09-claude-code-native-practice.md) state the decisions; each statement here is derived from the artifact, so a row that drifts from the data, or an artifact
 whose rows no longer give the decision it records, fails. Repository-text checks only: the private papers and transcripts are not in the repository.
+
+Paired run 5 (model routing for review micros, decided 2026-10-11) is the routing_5 section: its 20 run rows, the 12 decisive findings with the runs that found each, the cost, the ruling and the sha256 of
+every paper. `routing_rule()` recomputes the registered rule from those rows, and the record's paragraph and owed table are checked against the artifact.
 """
 
 from __future__ import annotations
@@ -66,6 +69,55 @@ def orchestration_rule(o: dict, fixtures: list) -> dict:
         extra = resolved[arm] - resolved["A"]
         out[arm] = {"extra_resolved": extra, "judge_wins": wins, "cost_within_2x": within, "clears_rule": within and (extra >= 2 or wins >= 4)}
     return out
+
+
+ROUTING_HEADS = [989, 974, 982, 970, 978]
+ROUTING_COST_BOUND = 0.60
+STOP_RECORD_PREFIX = "6fdeb8916960"  # paired-advisor/addendum-06-owner-priority-stop-20261011.md, a private working paper
+
+
+def noise_floor(p: float, n: int, strict: bool) -> float:
+    """Chance that two identical reviewers, each finding a finding with probability p in each of two runs, satisfy the rule over n findings (strict: S_f >= O_f; tolerant: S_f >= O_f - 1)."""
+    b = [(1 - p) ** 2, 2 * p * (1 - p), p ** 2]
+    return (1 - sum(b[o] * b[s] for o in range(3) for s in range(3) if (s < o if strict else s < o - 1))) ** n
+
+
+def routing_rule(r: dict) -> dict:
+    """The registered rule of paired run 5, from the per-run rows and the per-finding detections alone: Sonnet takes review micros only if, for every decisive finding, it found the finding in at least as many
+    of its runs as Opus did, and its runs cost (the counter, main and subagent sources) at most 60% of Opus's; otherwise Opus stays. The tolerant reading and the noise floors are reported, not decisive."""
+    counts = {arm: {f["id"]: len(f["found"][arm]) for f in r["findings"]} for arm in "OS"}
+    cost = {arm: sum(run["cost_usd_m2"] for run in r["runs"] if run["arm"] == arm) for arm in "OS"}
+    missed = [g for g in counts["O"] if counts["S"][g] < counts["O"][g]]
+    ratio = cost["S"] / cost["O"]
+    n = len(counts["O"])
+    pooled = (sum(counts["O"].values()) + sum(counts["S"].values())) / (2 * n * 2)
+    return {"verdict": "SONNET TAKES" if not missed and ratio <= ROUTING_COST_BOUND else "OPUS STAYS", "counts": counts, "detections": {arm: sum(counts[arm].values()) for arm in "OS"}, "missed": missed,
+            "cost": cost, "ratio": ratio, "tolerant": all(counts["S"][g] >= counts["O"][g] - 1 for g in counts["O"]) and sum(counts["S"].values()) >= sum(counts["O"].values()) - 2,
+            "pooled": pooled, "strict_floor": noise_floor(pooled, n, True), "tolerant_floor": noise_floor(pooled, n, False)}
+
+
+def routing_paragraph(r: dict) -> str:
+    """The record's paragraph for paired run 5, written from the artifact alone (paraphrase; no owner quotation)."""
+    got, dec, beside, ruling, papers = routing_rule(r), r["decision"], r["beside_the_rule"], r["ruling"], r["papers"]
+    gid = got["missed"][0]
+    runs = {x["run"]: x for x in r["runs"]}
+    approved = sorted(f"#{x['pr']} t{x['trial']}" for x in r["runs"] if x["arm"] == "S" and x["verdict"] == "ACK" and runs[f"{x['pr']}-O-{x['trial']}"]["verdict"] == "CHANGES_REQUESTED")
+    differ_heads = sorted({a.split()[0] for a in approved})
+    both_trials = all(f"{h} t{t}" in approved for h in differ_heads for t in (1, 2))
+    return (f"**Model routing for review micros (paired run 5).** Sonnet 5.5 against Opus 5.5, both at medium effort in `claude -p` on client 2.1.296 with the repository's own brief alone (tools Bash, Read, Glob and Grep; "
+            f"the home tree and the other runs' directories denied; the network closed), reviewed {len(ROUTING_HEADS)} pull-request heads of this repository whose findings were known from earlier Opus and GPT reads, "
+            f"two trials each ({len(r['runs'])} runs). A blind first judge and a refuter (Opus 5.5 at max effort) scored each run's recall of the {dec['decisive_findings']} decisive known findings, its false positives and its cost from the counter. "
+            f"The rule fixed before the first run: Sonnet takes review micros only if, for every decisive finding, it found the finding in at least as many of its runs as Opus did, and its runs cost at most {ROUTING_COST_BOUND:.0%} of Opus's. "
+            f"Opus found {got['detections']['O']} detections of {2 * dec['decisive_findings']} and Sonnet {got['detections']['S']}; Sonnet missed {len(got['missed'])} decisive finding that Opus found "
+            f"({gid}, found in {got['counts']['O'][gid]} of Opus's 2 runs and {got['counts']['S'][gid]} of Sonnet's), at {got['ratio']:.0%} of Opus's cost, so by the strict rule Opus stays. Trial 1 alone said Sonnet takes micros "
+            f"(its noise floor was {dec['trial_1_alone']['strict_pass_chance_if_identical']:.2f}); over the two trials the strict rule's noise floor is {got['strict_floor']:.2f} (two identical reviewers would pass it that rarely, "
+            f"at the observed detection rate {got['pooled']:.2f}), and the tolerant reading, reported and not decisive, holds ({got['tolerant_floor']:.2f}). "
+            f"Beside the rule, not inputs: outside the known findings Opus reported {beside['real_new_p1_p2']['O']} real and new P1 or P2 findings against Sonnet's {beside['real_new_p1_p2']['S']}, "
+            f"and Sonnet approved {', '.join(differ_heads)}{' in both trials' if both_trials else ''} where Opus requested changes. The command center ruled the strict reading on {ruling['date']} "
+            f"(ruling sha256 `{ruling['sha256'][:12]}`, `{papers['ruling']['path']}`): Opus for trading code, gate code and any micro that is the only Claude-family read of a gate; Sonnet at medium only for non-gate foundation "
+            f"changes (docs, pages, catalogs, generated reports); no slot row, default or skill text changes. Limits: the same {len(ROUTING_HEADS)} heads in both trials, so the second trial measures run-to-run variation on them; one brief; medium effort only; "
+            f"the judge and refuter are one family; the fence denies the client's persisted tool outputs and refused the runs that tried to read them ({r['exposure']['limit'].split('(')[1].rstrip(')')}); costs are API-list-equivalent, not billed. "
+            f"The preregistration is sha256 `{papers['preregistration']['sha256'][:12]}`, the result record `{papers['result']['sha256'][:12]}`, and the registration allows no third trial.")
 
 
 class PlanningRunTests(unittest.TestCase):
@@ -296,6 +348,22 @@ class OrchestrationRunTests(unittest.TestCase):
         self.assertIn(f"the verifier returned in {returned} of 6 runs ({sum(1 for w in b_wf if w['verifier_refuted'])} refuted), was cut by the 45-minute wait ceiling of `claude -p` in {cut}, and in {never} the implementer itself ran to the ceiling", workflow["notes"])
         self.assertEqual((returned, cut, never), (2, 3, 1))
         self.assertIn("not found by name in 6 of 6 headless runs", workflow["notes"])
+        # The Codex review in GitHub of #1005 at bf864c370 (P2, workers.md:44): the measured failure matched the row's Overturn when, but the route still sent a fenced headless run to the name lookup
+        # that failed in 6 of 6 runs. The route now carries the scope, with the numbers the artifact gives, and Overturn when says which measured failures the scoped route does not avoid.
+        self.assertIn("Scoped to headless `claude -p` runs fenced with `--setting-sources local`: launch a saved Workflow by `scriptPath` (its name was not found in 6 of 6 runs of paired run 1, arm B)", workflow["route"])
+        self.assertIn(f"expect the 45-minute wait ceiling to cut a long verifier (it returned in {returned} of 6 runs and was cut in {cut})", workflow["route"])
+        self.assertIn("a measured failure mode on our runs beyond the two that paired run 1, arm B measured in fenced headless runs "
+                      "(the name lookup, which `scriptPath` avoids, and the verifier's wait ceiling, which the route above tells a session to expect)", workflow["overturn_when"])
+        self.assertEqual(workflow["status"], "default-scoped")
+        # The same review (P2, workers.md:29): the note said the team won no fixture, while the artifact counts one win (F2) and one tie (F4) against the single session.
+        c_won = [f for f in FIXTURES if pairs[(f, "AC")]["counted_preference"] == "C"]
+        a_won = [f for f in FIXTURES if pairs[(f, "AC")]["counted_preference"] == "A"]
+        tied = [f for f in FIXTURES if pairs[(f, "AC")]["counted_preference"] == "tie"]
+        primary_c_won = [f for f in PRIMARY if pairs[(f, "AC")]["counted_preference"] == "C"]
+        self.assertEqual((c_won, tied, len(a_won), primary_c_won), (["F2"], ["F4"], 3, []))
+        self.assertIn(f"it won {len(c_won)} of the 5 fixtures where its diff was captured ({c_won[0]}, in the analysis over all six fixtures; the single session won {len(a_won)} and {tied[0]} was a tie) "
+                      f"and none of the primary fixtures {PRIMARY[0]} to {PRIMARY[-1]}", teams["notes"])
+        self.assertNotIn("won no fixture", teams["notes"])
 
     def test_the_record_addendum_states_the_orchestration_decision(self):
         record = " ".join(RECORD.read_text(encoding="utf-8").split())
@@ -305,6 +373,116 @@ class OrchestrationRunTests(unittest.TestCase):
             with self.subTest(statement=needle):
                 self.assertIn(needle, paragraph)
         self.assertIn("18 of 18 verdicts held", paragraph)
+
+
+class RoutingRunTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.artifact = json.loads((ROOT / ARTIFACT_REL).read_text(encoding="utf-8"))
+        cls.r = cls.artifact["routing_5"]
+        cls.runs = {x["run"]: x for x in cls.r["runs"]}
+        cls.record = " ".join(RECORD.read_text(encoding="utf-8").split())
+
+    def test_the_grid_is_complete_and_every_run_is_a_structured_result_of_its_arm(self):
+        self.assertEqual(sorted(self.runs), sorted(f"{pr}-{arm}-{t}" for pr in ROUTING_HEADS for arm in "OS" for t in (1, 2)))
+        models = {"O": "claude-opus-5-5", "S": "claude-sonnet-5-5"}
+        for name, run in self.runs.items():
+            with self.subTest(run=name):
+                self.assertEqual(name, f"{run['pr']}-{run['arm']}-{run['trial']}")
+                self.assertEqual((run["model"], run["effort"], run["end_state"]), (models[run["arm"]], "medium", "structured"))
+                self.assertRegex(run["result_sha256"], SHA256)
+                self.assertRegex(run["head"], r"^[0-9a-f]{40}$")
+                self.assertGreater(run["cost_usd_m2"], 0)
+                self.assertIn(run["verdict"], ("ACK", "CHANGES_REQUESTED"))
+        for entry in self.r["design"]["heads"]:
+            with self.subTest(pr=entry["pr"]):
+                self.assertEqual({x["head"] for x in self.r["runs"] if x["pr"] == entry["pr"]}, {entry["head"]}, "one head per pull request in both trials")
+        self.assertEqual(sorted(e["pr"] for e in self.r["design"]["heads"]), sorted(ROUTING_HEADS))
+
+    def test_the_findings_name_runs_of_their_own_head_and_arm(self):
+        self.assertEqual(len(self.r["findings"]), 12)
+        self.assertEqual(len({f["id"] for f in self.r["findings"]}), 12)
+        for finding in self.r["findings"]:
+            for arm in "OS":
+                with self.subTest(finding=finding["id"], arm=arm):
+                    self.assertEqual(len(set(finding["found"][arm])), len(finding["found"][arm]))
+                    for run in finding["found"][arm]:
+                        self.assertEqual((self.runs[run]["pr"], self.runs[run]["arm"]), (finding["pr"], arm))
+
+    def test_the_recorded_decision_is_what_the_rows_give(self):
+        got, dec = routing_rule(self.r), self.r["decision"]
+        self.assertEqual(got["verdict"], "OPUS STAYS")
+        self.assertTrue(dec["verdict"].startswith(got["verdict"]))
+        self.assertEqual(dec["detections"], got["detections"])
+        self.assertEqual(dec["detections"], {"O": 7, "S": 6})
+        self.assertEqual(dec["missed_by_sonnet"], got["missed"])
+        self.assertEqual(got["missed"], ["G10"])
+        self.assertEqual(dec["opus_found_any"], sum(1 for f in self.r["findings"] if f["found"]["O"]))
+        self.assertEqual(dec["decisive_findings"], len(self.r["findings"]))
+        for arm in "OS":
+            self.assertAlmostEqual(dec["cost_usd_list_equivalent"][arm], got["cost"][arm], places=1)
+        self.assertAlmostEqual(dec["cost_ratio_sonnet_over_opus"], got["ratio"], places=3)
+        self.assertLessEqual(got["ratio"], ROUTING_COST_BOUND, "the cost rule holds; the recall rule is what fails")
+        self.assertEqual(dec["tolerant_reading_holds"], got["tolerant"])
+        self.assertTrue(got["tolerant"])
+        for key, value in (("pooled_mean_detection_rate", got["pooled"]), ("strict_pass_chance_if_identical", got["strict_floor"]), ("tolerant_pass_chance_if_identical", got["tolerant_floor"])):
+            with self.subTest(figure=key):
+                self.assertAlmostEqual(dec[key], value, places=3)
+        self.assertAlmostEqual(noise_floor(0.8, 12, True), 0.035, places=3)
+        self.assertAlmostEqual(noise_floor(0.8, 12, False), 0.733, places=3)
+        self.assertEqual(self.r["judging"]["contested_cells"], 0)
+
+    def test_the_rule_is_live_not_typed_in(self):
+        finds = copy.deepcopy(self.r)
+        for finding in finds["findings"]:
+            if finding["id"] == "G10":
+                finding["found"]["S"] = ["989-S-2"]  # Sonnet finds the finding in one run, as often as Opus does
+        self.assertEqual(routing_rule(finds)["verdict"], "SONNET TAKES")
+        pricey = copy.deepcopy(finds)
+        for run in pricey["runs"]:
+            if run["arm"] == "S":
+                run["cost_usd_m2"] *= 4  # four times the cost: 67% of Opus's, over the bound
+        self.assertEqual(routing_rule(pricey)["verdict"], "OPUS STAYS")
+        misses = copy.deepcopy(finds)
+        for finding in misses["findings"]:
+            if finding["id"] == "G1":
+                finding["found"]["S"] = []
+        self.assertEqual(routing_rule(misses)["verdict"], "OPUS STAYS")
+        self.assertFalse(routing_rule(misses)["tolerant"], "a finding Opus found twice and Sonnet never is outside the tolerant reading")
+
+    def test_the_papers_are_hashed_and_the_ruling_is_cited_by_path_and_hash(self):
+        for name, paper in self.r["papers"].items():
+            with self.subTest(paper=name):
+                self.assertRegex(paper["sha256"], SHA256)
+                self.assertGreater(paper["bytes"], 0)
+                self.assertNotIn("/home/", paper["path"])
+        ruling = self.r["ruling"]
+        self.assertEqual(ruling["sha256"], self.r["papers"]["ruling"]["sha256"])
+        self.assertIn("research-cc-role-20261008/ruling-routing-run5-two-trial-20261011.md", ruling["path"])
+        self.assertTrue(self.r["papers"]["preregistration"]["sha256"].startswith("66f87a9eb2b9"))
+        self.assertEqual(self.r["beside_the_rule"]["verdicts_that_differ"], sorted(f"#{x['pr']} t{x['trial']}" for x in self.r["runs"] if x["arm"] == "S" and self.runs[f"{x['pr']}-O-{x['trial']}"]["verdict"] != x["verdict"]))
+
+    def test_the_record_states_the_routing_decision_and_the_owed_table_is_right(self):
+        paragraph = routing_paragraph(self.r)
+        self.assertEqual(self.record.count(paragraph), 1, "the addendum carries the paragraph the artifact gives")
+        self.assertNotIn("Paired run 5 (preregistration", self.record, "a decided run is not owed")
+        row = next(line for line in RECORD.read_text(encoding="utf-8").splitlines() if line.startswith("| Paired run 4 ("))
+        self.assertIn("33bd44ca34cb", row)
+        self.assertIn("stopped on 2026-10-11 at the owner's priority after 2 of 8 pairs, with no verdict", row)
+        self.assertIn(STOP_RECORD_PREFIX, row)
+        self.assertNotIn("its result is a later record", row)
+        for needle in ("no slot row, default or skill text changes", f"`{self.r['ruling']['sha256'][:12]}`"):
+            self.assertIn(needle, paragraph)
+
+    def test_a_changed_figure_in_the_paragraph_is_caught(self):
+        paragraph = routing_paragraph(self.r)
+        mutated = copy.deepcopy(self.r)
+        mutated["decision"]["trial_1_alone"]["strict_pass_chance_if_identical"] = 0.5
+        self.assertNotEqual(routing_paragraph(mutated), paragraph)
+        for run in mutated["runs"]:
+            if run["arm"] == "S":
+                run["cost_usd_m2"] *= 2
+        self.assertNotIn(paragraph, routing_paragraph(mutated))
 
 
 if __name__ == "__main__":

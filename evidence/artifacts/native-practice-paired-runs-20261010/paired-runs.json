@@ -1492,5 +1492,857 @@
     "sha256": "ed7fd04db887e289fddcb62655a2758e2814f76b14d7aa1535028cb0a7740f27"
    }
   }
+ },
+ "routing_5": {
+  "question": "Can review micros (one pull-request head, the repository's own brief) move from Opus 5.5 to Sonnet 5.5 at medium effort without losing the known findings, at no more than 60% of Opus's cost?",
+  "design": {
+   "heads": [
+    {
+     "pr": 970,
+     "head": "90fab198098ef103b95c409c287f03ce5bd22f52"
+    },
+    {
+     "pr": 974,
+     "head": "0493513e2cadbf8980bf78f67ccce8d695d256c1"
+    },
+    {
+     "pr": 978,
+     "head": "c7a4603b0537345b7c3f96a1fdcbc7fe2ee176d1"
+    },
+    {
+     "pr": 982,
+     "head": "ad2e1b1ac4fc9c71a9a8a18a052813fa5f72b14c"
+    },
+    {
+     "pr": 989,
+     "head": "8fd958370b5d2eb8be2c3f3191921c3fe0ab5772"
+    }
+   ],
+   "arms": {
+    "O": "claude-opus-5-5 at medium effort",
+    "S": "claude-sonnet-5-5 at medium effort"
+   },
+   "trials": 2,
+   "runs": 20,
+   "client": "claude code 2.1.296 (pinned binary), claude -p",
+   "fence": "--tools Bash,Read,Glob,Grep with dontAsk and no allow rule; the home tree and each other run's directory denied by name; the network closed; the brief alone, no gate records or CI state",
+   "ground_truth": "22 findings known from earlier Opus and GPT reads, 12 of them decisive (reachable from the pull request, its commits, its description and an offline sandbox)",
+   "judging": "a blind first judge and a refuter, both claude-opus-5-5 at max effort on stripped packets (order fixed by a hash of head and trial, the refuter given the pair swapped)",
+   "rule": "Sonnet takes review micros only if, for every decisive finding, it found the finding in at least as many of its runs as Opus did, and the cost of its runs (the counter, main and subagent sources) is at most 60% of Opus's; otherwise Opus stays",
+   "second_trial": "run as an extension the command center decided after trial 1; the rule is applied to detection frequencies over the two trials"
+  },
+  "runs": [
+   {
+    "run": "989-O-1",
+    "pr": 989,
+    "arm": "O",
+    "trial": 1,
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "head": "8fd958370b5d2eb8be2c3f3191921c3fe0ab5772",
+    "end_state": "structured",
+    "verdict": "CHANGES_REQUESTED",
+    "findings": {
+     "P1": 0,
+     "P2": 2,
+     "P3": 1
+    },
+    "seconds": 978,
+    "tests_run": 6,
+    "shell_commands": 21,
+    "cost_usd_m2": 0.7573,
+    "cost_usd_m1": 0.7573,
+    "result_sha256": "78c19f470dc1a8104761951984504db102a8c2aa83b0632f72e8eaf347e2b714"
+   },
+   {
+    "run": "989-S-1",
+    "pr": 989,
+    "arm": "S",
+    "trial": 1,
+    "model": "claude-sonnet-5-5",
+    "effort": "medium",
+    "head": "8fd958370b5d2eb8be2c3f3191921c3fe0ab5772",
+    "end_state": "structured",
+    "verdict": "CHANGES_REQUESTED",
+    "findings": {
+     "P1": 0,
+     "P2": 2,
+     "P3": 2
+    },
+    "seconds": 714,
+    "tests_run": 5,
+    "shell_commands": 11,
+    "cost_usd_m2": 0.1958,
+    "cost_usd_m1": 0.1958,
+    "result_sha256": "adf3648ab7865e0132103953a024189d93a60cf418f12a104c1d432ff53ffe13"
+   },
+   {
+    "run": "989-O-2",
+    "pr": 989,
+    "arm": "O",
+    "trial": 2,
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "head": "8fd958370b5d2eb8be2c3f3191921c3fe0ab5772",
+    "end_state": "structured",
+    "verdict": "CHANGES_REQUESTED",
+    "findings": {
+     "P1": 0,
+     "P2": 2,
+     "P3": 1
+    },
+    "seconds": 756,
+    "tests_run": 6,
+    "shell_commands": 14,
+    "cost_usd_m2": 0.7179,
+    "cost_usd_m1": 0.7179,
+    "result_sha256": "e5732dd6bf961a42118236c4a0f7db576246826ade0f6a54e167be1fc07589c8"
+   },
+   {
+    "run": "989-S-2",
+    "pr": 989,
+    "arm": "S",
+    "trial": 2,
+    "model": "claude-sonnet-5-5",
+    "effort": "medium",
+    "head": "8fd958370b5d2eb8be2c3f3191921c3fe0ab5772",
+    "end_state": "structured",
+    "verdict": "CHANGES_REQUESTED",
+    "findings": {
+     "P1": 0,
+     "P2": 1,
+     "P3": 0
+    },
+    "seconds": 211,
+    "tests_run": 2,
+    "shell_commands": 8,
+    "cost_usd_m2": 0.1344,
+    "cost_usd_m1": 0.1344,
+    "result_sha256": "29af77695c7136ba0bb5ff8ddd3b65ff9659ebab1a7473ee239a4ebe51a45b2a"
+   },
+   {
+    "run": "974-O-1",
+    "pr": 974,
+    "arm": "O",
+    "trial": 1,
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "head": "0493513e2cadbf8980bf78f67ccce8d695d256c1",
+    "end_state": "structured",
+    "verdict": "CHANGES_REQUESTED",
+    "findings": {
+     "P1": 0,
+     "P2": 1,
+     "P3": 1
+    },
+    "seconds": 435,
+    "tests_run": 4,
+    "shell_commands": 36,
+    "cost_usd_m2": 1.8366,
+    "cost_usd_m1": 1.8366,
+    "result_sha256": "33ce2187e5b9c611874ed24887c64f82aeaedd8272878efc5382c0a6b5086884"
+   },
+   {
+    "run": "974-S-1",
+    "pr": 974,
+    "arm": "S",
+    "trial": 1,
+    "model": "claude-sonnet-5-5",
+    "effort": "medium",
+    "head": "0493513e2cadbf8980bf78f67ccce8d695d256c1",
+    "end_state": "structured",
+    "verdict": "CHANGES_REQUESTED",
+    "findings": {
+     "P1": 0,
+     "P2": 1,
+     "P3": 0
+    },
+    "seconds": 292,
+    "tests_run": 2,
+    "shell_commands": 14,
+    "cost_usd_m2": 0.3542,
+    "cost_usd_m1": 0.3542,
+    "result_sha256": "270ebc14d232656a76a02df838d11f056300f8f1488d24385c567f12216143e5"
+   },
+   {
+    "run": "974-O-2",
+    "pr": 974,
+    "arm": "O",
+    "trial": 2,
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "head": "0493513e2cadbf8980bf78f67ccce8d695d256c1",
+    "end_state": "structured",
+    "verdict": "CHANGES_REQUESTED",
+    "findings": {
+     "P1": 0,
+     "P2": 1,
+     "P3": 0
+    },
+    "seconds": 545,
+    "tests_run": 5,
+    "shell_commands": 46,
+    "cost_usd_m2": 2.0921,
+    "cost_usd_m1": 2.0921,
+    "result_sha256": "62fcab9bd7104e8ad248e0d5e9439a76619ff5fe4cb8413d59cedc245ed184cd"
+   },
+   {
+    "run": "974-S-2",
+    "pr": 974,
+    "arm": "S",
+    "trial": 2,
+    "model": "claude-sonnet-5-5",
+    "effort": "medium",
+    "head": "0493513e2cadbf8980bf78f67ccce8d695d256c1",
+    "end_state": "structured",
+    "verdict": "CHANGES_REQUESTED",
+    "findings": {
+     "P1": 0,
+     "P2": 1,
+     "P3": 1
+    },
+    "seconds": 401,
+    "tests_run": 3,
+    "shell_commands": 13,
+    "cost_usd_m2": 0.3018,
+    "cost_usd_m1": 0.3018,
+    "result_sha256": "d3e64285e9262699996a2018d853bd2087905c3c5a57e69f7d4485a353a5619b"
+   },
+   {
+    "run": "982-O-1",
+    "pr": 982,
+    "arm": "O",
+    "trial": 1,
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "head": "ad2e1b1ac4fc9c71a9a8a18a052813fa5f72b14c",
+    "end_state": "structured",
+    "verdict": "CHANGES_REQUESTED",
+    "findings": {
+     "P1": 0,
+     "P2": 1,
+     "P3": 3
+    },
+    "seconds": 1000,
+    "tests_run": 7,
+    "shell_commands": 43,
+    "cost_usd_m2": 1.7557,
+    "cost_usd_m1": 1.7557,
+    "result_sha256": "cbc86dc047b06f986975dac9c8616cb3e17d1991824acbd15431d621e483ada4"
+   },
+   {
+    "run": "982-S-1",
+    "pr": 982,
+    "arm": "S",
+    "trial": 1,
+    "model": "claude-sonnet-5-5",
+    "effort": "medium",
+    "head": "ad2e1b1ac4fc9c71a9a8a18a052813fa5f72b14c",
+    "end_state": "structured",
+    "verdict": "ACK",
+    "findings": {
+     "P1": 0,
+     "P2": 0,
+     "P3": 1
+    },
+    "seconds": 442,
+    "tests_run": 3,
+    "shell_commands": 14,
+    "cost_usd_m2": 0.2498,
+    "cost_usd_m1": 0.2498,
+    "result_sha256": "57e72f8a50ec814a0c4f3ca1a963e0ac8cdf6c0aa29841cd31dfc88aa6966174"
+   },
+   {
+    "run": "982-O-2",
+    "pr": 982,
+    "arm": "O",
+    "trial": 2,
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "head": "ad2e1b1ac4fc9c71a9a8a18a052813fa5f72b14c",
+    "end_state": "structured",
+    "verdict": "CHANGES_REQUESTED",
+    "findings": {
+     "P1": 0,
+     "P2": 3,
+     "P3": 3
+    },
+    "seconds": 659,
+    "tests_run": 6,
+    "shell_commands": 41,
+    "cost_usd_m2": 1.7615,
+    "cost_usd_m1": 1.7615,
+    "result_sha256": "3e8d1619ad0f1cb4549b12a1f5bd222cd43f64ad6950c1459aa21eeb0ea24c06"
+   },
+   {
+    "run": "982-S-2",
+    "pr": 982,
+    "arm": "S",
+    "trial": 2,
+    "model": "claude-sonnet-5-5",
+    "effort": "medium",
+    "head": "ad2e1b1ac4fc9c71a9a8a18a052813fa5f72b14c",
+    "end_state": "structured",
+    "verdict": "ACK",
+    "findings": {
+     "P1": 0,
+     "P2": 0,
+     "P3": 0
+    },
+    "seconds": 297,
+    "tests_run": 2,
+    "shell_commands": 12,
+    "cost_usd_m2": 0.2718,
+    "cost_usd_m1": 0.2718,
+    "result_sha256": "eec4a60c42f7eef46929ade370a7405833a48b01829b7962e929be91348d3386"
+   },
+   {
+    "run": "970-O-1",
+    "pr": 970,
+    "arm": "O",
+    "trial": 1,
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "head": "90fab198098ef103b95c409c287f03ce5bd22f52",
+    "end_state": "structured",
+    "verdict": "CHANGES_REQUESTED",
+    "findings": {
+     "P1": 0,
+     "P2": 2,
+     "P3": 2
+    },
+    "seconds": 558,
+    "tests_run": 7,
+    "shell_commands": 42,
+    "cost_usd_m2": 1.6771,
+    "cost_usd_m1": 1.6771,
+    "result_sha256": "e09bc9e76e54170cf23af3c8fa3fa65f8a8f121e94b9a88da97e0c89de8038c8"
+   },
+   {
+    "run": "970-S-1",
+    "pr": 970,
+    "arm": "S",
+    "trial": 1,
+    "model": "claude-sonnet-5-5",
+    "effort": "medium",
+    "head": "90fab198098ef103b95c409c287f03ce5bd22f52",
+    "end_state": "structured",
+    "verdict": "CHANGES_REQUESTED",
+    "findings": {
+     "P1": 0,
+     "P2": 1,
+     "P3": 1
+    },
+    "seconds": 433,
+    "tests_run": 5,
+    "shell_commands": 12,
+    "cost_usd_m2": 0.1995,
+    "cost_usd_m1": 0.1995,
+    "result_sha256": "ff2806679c1079363b298f4f1a5d70b9821a23c676f46e371ff49e32b2a7fe56"
+   },
+   {
+    "run": "970-O-2",
+    "pr": 970,
+    "arm": "O",
+    "trial": 2,
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "head": "90fab198098ef103b95c409c287f03ce5bd22f52",
+    "end_state": "structured",
+    "verdict": "CHANGES_REQUESTED",
+    "findings": {
+     "P1": 1,
+     "P2": 2,
+     "P3": 3
+    },
+    "seconds": 414,
+    "tests_run": 5,
+    "shell_commands": 34,
+    "cost_usd_m2": 1.4661,
+    "cost_usd_m1": 1.4661,
+    "result_sha256": "33b601786c2f5562b4ba2a198e71f54f9b29bc4acd591b164e776c4bbad4052c"
+   },
+   {
+    "run": "970-S-2",
+    "pr": 970,
+    "arm": "S",
+    "trial": 2,
+    "model": "claude-sonnet-5-5",
+    "effort": "medium",
+    "head": "90fab198098ef103b95c409c287f03ce5bd22f52",
+    "end_state": "structured",
+    "verdict": "CHANGES_REQUESTED",
+    "findings": {
+     "P1": 0,
+     "P2": 1,
+     "P3": 0
+    },
+    "seconds": 300,
+    "tests_run": 5,
+    "shell_commands": 20,
+    "cost_usd_m2": 0.3131,
+    "cost_usd_m1": 0.3131,
+    "result_sha256": "ae33ff0009d1898c28a8af74fc9a5d2990948db04465e653ed65885101b48076"
+   },
+   {
+    "run": "978-O-1",
+    "pr": 978,
+    "arm": "O",
+    "trial": 1,
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "head": "c7a4603b0537345b7c3f96a1fdcbc7fe2ee176d1",
+    "end_state": "structured",
+    "verdict": "ACK",
+    "findings": {
+     "P1": 0,
+     "P2": 0,
+     "P3": 3
+    },
+    "seconds": 572,
+    "tests_run": 5,
+    "shell_commands": 38,
+    "cost_usd_m2": 1.5686,
+    "cost_usd_m1": 1.5686,
+    "result_sha256": "95ee530bf7634216ef44119f9540ea92b133a8afdfb5746ce8cf3890b55ad3db"
+   },
+   {
+    "run": "978-S-1",
+    "pr": 978,
+    "arm": "S",
+    "trial": 1,
+    "model": "claude-sonnet-5-5",
+    "effort": "medium",
+    "head": "c7a4603b0537345b7c3f96a1fdcbc7fe2ee176d1",
+    "end_state": "structured",
+    "verdict": "ACK",
+    "findings": {
+     "P1": 0,
+     "P2": 0,
+     "P3": 0
+    },
+    "seconds": 284,
+    "tests_run": 5,
+    "shell_commands": 13,
+    "cost_usd_m2": 0.2819,
+    "cost_usd_m1": 0.2819,
+    "result_sha256": "dc148805dc2986d0229e7f116293c10f4c847d5d31349eb0c67a0006d6372481"
+   },
+   {
+    "run": "978-O-2",
+    "pr": 978,
+    "arm": "O",
+    "trial": 2,
+    "model": "claude-opus-5-5",
+    "effort": "medium",
+    "head": "c7a4603b0537345b7c3f96a1fdcbc7fe2ee176d1",
+    "end_state": "structured",
+    "verdict": "CHANGES_REQUESTED",
+    "findings": {
+     "P1": 0,
+     "P2": 2,
+     "P3": 2
+    },
+    "seconds": 1504,
+    "tests_run": 7,
+    "shell_commands": 55,
+    "cost_usd_m2": 2.4723,
+    "cost_usd_m1": 2.4723,
+    "result_sha256": "bd80b7ff5e56bb34a40d8d40791b8cf4fc9dc4d7d1aeb3f9f592eb382a9741be"
+   },
+   {
+    "run": "978-S-2",
+    "pr": 978,
+    "arm": "S",
+    "trial": 2,
+    "model": "claude-sonnet-5-5",
+    "effort": "medium",
+    "head": "c7a4603b0537345b7c3f96a1fdcbc7fe2ee176d1",
+    "end_state": "structured",
+    "verdict": "CHANGES_REQUESTED",
+    "findings": {
+     "P1": 0,
+     "P2": 2,
+     "P3": 2
+    },
+    "seconds": 516,
+    "tests_run": 4,
+    "shell_commands": 16,
+    "cost_usd_m2": 0.4136,
+    "cost_usd_m1": 0.4136,
+    "result_sha256": "955b048abeb0662c812e7607db8dd140bcd7526eecdb591d2e21e2cad2506089"
+   }
+  ],
+  "findings": [
+   {
+    "id": "G1",
+    "pr": 974,
+    "severity": "P2",
+    "family": "claude",
+    "title": "README-overnight claims no command starts a trial the transport would then refuse; a boats feed is accepted at config load and refused only after the trial starts, leaving a stuck state",
+    "found": {
+     "O": [
+      "974-O-1",
+      "974-O-2"
+     ],
+     "S": [
+      "974-S-1",
+      "974-S-2"
+     ]
+    }
+   },
+   {
+    "id": "G2",
+    "pr": 978,
+    "severity": "P2",
+    "family": "claude",
+    "title": "The weekly systemd unit's PATH does not contain gh, and the fetch does not catch FileNotFoundError, so every weekly run exits 1",
+    "found": {
+     "O": [],
+     "S": []
+    }
+   },
+   {
+    "id": "G3",
+    "pr": 970,
+    "severity": "P1",
+    "family": "claude+gpt",
+    "title": "Live catalog references to lines of adoption/skills/manifest.json are displaced by the new claude-api record (test_architecture_pin_source and test_upstream_surface_watch fail)",
+    "found": {
+     "O": [],
+     "S": []
+    }
+   },
+   {
+    "id": "G4",
+    "pr": 970,
+    "severity": "P1",
+    "family": "claude+gpt",
+    "title": "claude-api has no runtime-worker disposition: three tests of test_runtime_worker_skills fail with 'claude-api: neither reused nor excluded'",
+    "found": {
+     "O": [],
+     "S": []
+    }
+   },
+   {
+    "id": "G5",
+    "pr": 970,
+    "severity": "P1",
+    "family": "claude+gpt",
+    "title": "skills-lifecycle.json omits claude-api: test_landscape_sweep_skills fails on the one-task-per-pinned-skill check",
+    "found": {
+     "O": [],
+     "S": []
+    }
+   },
+   {
+    "id": "G6",
+    "pr": 970,
+    "severity": "P1",
+    "family": "claude+gpt",
+    "title": "The new routing skill has no grant in the reviewed architecture inventory: test_local_pages_policy_grants fails",
+    "found": {
+     "O": [],
+     "S": []
+    }
+   },
+   {
+    "id": "G7",
+    "pr": 970,
+    "severity": "P1",
+    "family": "claude+gpt",
+    "title": "The gate-read accounting receipt is stale after the new skills_status import: test_runtime_worker_openhands_push_gate fails",
+    "found": {
+     "O": [],
+     "S": []
+    }
+   },
+   {
+    "id": "G8",
+    "pr": 970,
+    "severity": "P2",
+    "family": "claude",
+    "title": "The on-listed description ceiling is raised from 11000 to 12000 in manifest.json without a dated record, and the description's claim of an existing 12000 is false",
+    "found": {
+     "O": [
+      "970-O-1",
+      "970-O-2"
+     ],
+     "S": [
+      "970-S-1",
+      "970-S-2"
+     ]
+    }
+   },
+   {
+    "id": "G9",
+    "pr": 970,
+    "severity": "P2",
+    "family": "claude",
+    "title": "The 'bundled claude-api skill' duplicate reason is dropped from manifest.json:883 without evidence",
+    "found": {
+     "O": [],
+     "S": []
+    }
+   },
+   {
+    "id": "G10",
+    "pr": 989,
+    "severity": "P2",
+    "family": "claude",
+    "title": "runner.py copies the mover runner's proof selection but not its provenance marker (summary promotion_gate validated or not_supplied), so an unqualified exploratory receipt reads like a qualified one",
+    "found": {
+     "O": [
+      "989-O-2"
+     ],
+     "S": []
+    }
+   },
+   {
+    "id": "G11",
+    "pr": 989,
+    "severity": "P2",
+    "family": "claude",
+    "title": "A verbatim owner quote added by the PR's first commit stays reachable in the PR's commits after the head paraphrases it",
+    "found": {
+     "O": [
+      "989-O-1",
+      "989-O-2"
+     ],
+     "S": [
+      "989-S-1",
+      "989-S-2"
+     ]
+    }
+   },
+   {
+    "id": "G12",
+    "pr": 982,
+    "severity": "P2",
+    "family": "gpt",
+    "title": "The closeout loader does not refuse an installed jsonschema version other than the pinned 4.26.0",
+    "found": {
+     "O": [],
+     "S": []
+    }
+   }
+  ],
+  "judging": {
+   "judge_model": "claude-opus-5-5 at max",
+   "records": [
+    {
+     "pr": 989,
+     "trial": 1,
+     "judge_sha256": "e5b2e07e566a4c166c779a3e50f1f86b5b9db5c66bcf528b80dd0a755e87b87b",
+     "refute_sha256": "0463d15534bd19f3ef3633babdc47552969b537536d00137678967e955e83c8f",
+     "cost_usd": 0.8569
+    },
+    {
+     "pr": 989,
+     "trial": 2,
+     "judge_sha256": "4ec32d3ac72b35c9abd0b9460207e0e27f0e433d4e9635060d4edfdd77b474e2",
+     "refute_sha256": "e51616cba662ed5f885529d80a3978fce4ae1e193f9a6a46365ef4cb23994aa0",
+     "cost_usd": 0.7446
+    },
+    {
+     "pr": 974,
+     "trial": 1,
+     "judge_sha256": "5799a73437e078099fb07f2b62a008910dbe9054f585c8e96b0274c508219466",
+     "refute_sha256": "0cd47a77b2879381c2a8c6cb5d84cfd8f3318dbadacc9a6d4cad99eec89ed101",
+     "cost_usd": 1.1824
+    },
+    {
+     "pr": 974,
+     "trial": 2,
+     "judge_sha256": "1bddd218641362895bae17c87ddeeacb607778f96e64cad05c0b038a42292c6e",
+     "refute_sha256": "724be86b3624ea7d315309f1f7367c230429b062d0d3a5bbf52e91aa42e04f98",
+     "cost_usd": 1.116
+    },
+    {
+     "pr": 982,
+     "trial": 1,
+     "judge_sha256": "d251070215773a569453441f6f993be8a85a3affbe1d1c229772079620ce169b",
+     "refute_sha256": "e8e90ec3d6efae88179b1dbdebb790951ab5ec603034bd5f17944885c0c51ee6",
+     "cost_usd": 1.7453
+    },
+    {
+     "pr": 982,
+     "trial": 2,
+     "judge_sha256": "f45f23d239662f18b5bf5f0f6a808cff8057db56581ded3b940fb7f7b9cfb918",
+     "refute_sha256": "980b62e984b4578962336555789e98a6d6ed5730c7baddee82e19620ccbddfc1",
+     "cost_usd": 3.5716
+    },
+    {
+     "pr": 970,
+     "trial": 1,
+     "judge_sha256": "4947d387b6e9fad9eec530f8b13e346aa371ac5a1a252255371a5986f07be7c5",
+     "refute_sha256": "3f9e84bfc33c82b9315e78d54649c512aabe90800854d2284afbd16211822632",
+     "cost_usd": 1.3821
+    },
+    {
+     "pr": 970,
+     "trial": 2,
+     "judge_sha256": "41f3885e6fcc08f13be51642b094df59fb8a8d3ef98aa67a8998bd6702695f1e",
+     "refute_sha256": "45c3f7b3465cadc2f7fcbcb78596646a2feaf974213ca7b3ffbb3b871422bc9e",
+     "cost_usd": 2.0333
+    },
+    {
+     "pr": 978,
+     "trial": 1,
+     "judge_sha256": "ad99265eeaf798795643d2d81e69f9ebca74a4109849dd947ce9f4a95a541218",
+     "refute_sha256": "e46637b47558ec0f84b4f6c590dd28a574352fa476a84425277a7336416d78be",
+     "cost_usd": 0.5872
+    },
+    {
+     "pr": 978,
+     "trial": 2,
+     "judge_sha256": "37bbec128ac03d3db22a22f0eb07f09f970eabd9351c351aebf57ac062092331",
+     "refute_sha256": "b12fbf290e5913469bfd3deb33fb2024351b15a5ea3ea26d2b514e2e113d3c1c",
+     "cost_usd": 3.3209
+    }
+   ],
+   "cost_usd_list_equivalent": 16.54,
+   "contested_cells": 0,
+   "superseded": [
+    {
+     "pr": 970,
+     "trial": 1,
+     "stage": "refute",
+     "reason": "incomplete by the preregistered rule: it covered every known id and agreed with the first judge on all 22 cells but listed three P3 findings as unmatched",
+     "cost_usd": 1.3218,
+     "record_sha256": "1c6eb3181b59d53ca6000f36b1f72b57ac32e34ecde022352d786f7dba8f83ee"
+    }
+   ]
+  },
+  "decision": {
+   "verdict": "OPUS STAYS for review micros",
+   "decisive_findings": 12,
+   "detections": {
+    "O": 7,
+    "S": 6
+   },
+   "opus_found_any": 4,
+   "missed_by_sonnet": [
+    "G10"
+   ],
+   "cost_usd_list_equivalent": {
+    "O": 16.11,
+    "S": 2.72
+   },
+   "cost_ratio_sonnet_over_opus": 0.1686,
+   "cost_bound": 0.6,
+   "strict_pass_chance_if_identical": 0.0201,
+   "tolerant_pass_chance_if_identical": 0.6204,
+   "tolerant_reading_holds": true,
+   "pooled_mean_detection_rate": 0.2708,
+   "pooled_recall": {
+    "O": 0.2917,
+    "S": 0.25
+   },
+   "recall_difference_bootstrap_95": [
+    -0.0833,
+    0.0
+   ],
+   "trial_1_alone": {
+    "verdict": "SONNET TAKES",
+    "strict_pass_chance_if_identical": 0.0828
+   }
+  },
+  "beside_the_rule": {
+   "real_new_p1_p2": {
+    "O": 7,
+    "S": 1
+   },
+   "false_positives_p1_p2": {
+    "O": 0,
+    "S": 1
+   },
+   "p3_detections": {
+    "O": [
+     5,
+     12
+    ],
+    "S": [
+     1,
+     12
+    ]
+   },
+   "findings_reported": {
+    "O": 36,
+    "S": 16
+   },
+   "verdicts_that_differ": [
+    "#982 t1",
+    "#982 t2"
+   ]
+  },
+  "exposure": {
+   "flagged_runs": {
+    "trial_1": 4,
+    "trial_2": 5
+   },
+   "outside_data": "no flagged call returned data about the pull request, the records, the other runs or the known findings; one run received environment information only (a directory name and its PATH)",
+   "limit": "the client's persisted tool outputs sit in a directory the fence denies; runs that tried to read them were refused (3 Opus runs in trial 2, 2 in trial 1)"
+  },
+  "ruling": {
+   "by": "the command center",
+   "date": "2026-10-11",
+   "path": "research-cc-role-20261008/ruling-routing-run5-two-trial-20261011.md (the command center's private research directory)",
+   "sha256": "08aac8fd72bed920e62c75fc268018d4878eb8d19918ac547e0f28c4546f15d7",
+   "decision": "the strict reading stands, so Opus stays the default for Claude review micros",
+   "routing": "Opus for every Claude read of trading code or gate code and for any micro that is the only Claude-family read of a gate; Sonnet at medium only for non-gate foundation changes (docs, pages, catalogs, generated reports); no slot row, default or skill text changes from the ruling alone"
+  },
+  "papers": {
+   "preregistration": {
+    "path": "paired-routing/preregistration.md",
+    "bytes": 19438,
+    "sha256": "66f87a9eb2b9283f99cadf0461e097ff33b4cf1691b651aa54e43903275df18a"
+   },
+   "addendum_01": {
+    "path": "paired-routing/addendum-01-ruling-and-extension-20261011.md",
+    "bytes": 3861,
+    "sha256": "1917091fe507696be015a53bbf7c8e694e46fdd3a1c901b4b22d7447229b7d55"
+   },
+   "addendum_02": {
+    "path": "paired-routing/addendum-02-harness-review-20261011.md",
+    "bytes": 8204,
+    "sha256": "854a075783c22fce86ded8bc7a90c44fa64fcfd51e1a7894eb40d75699b84452"
+   },
+   "addendum_03": {
+    "path": "paired-routing/addendum-03-trial-2-extension-20261011.md",
+    "bytes": 2447,
+    "sha256": "a4f8d1d2f4e9da1e5e52a90ab0a4925b42bbe24a684cd1c9b389a40973b5172f"
+   },
+   "ground_truth": {
+    "path": "paired-routing/ground_truth.json",
+    "bytes": 18901,
+    "sha256": "56ade702ae580a561c7fe3d688a7e1df62644dfcd19f80ff2581acbf93a11007"
+   },
+   "result": {
+    "path": "paired-routing/RESULT-trials-1-2.md",
+    "bytes": 27472,
+    "sha256": "5642e6a1b9895710679e30ae43af86801bee4742d42d87e6313aa79c7f7bfce9"
+   },
+   "result_trial_1": {
+    "path": "paired-routing/RESULT.md",
+    "bytes": 16722,
+    "sha256": "f7f8daad1a11a14b51164e98637199609c8fefcffc8b4a380e73388e34a9237d"
+   },
+   "analysis": {
+    "path": "paired-routing/two-trial-frozen/analysis-afbbe18e.json",
+    "bytes": 5994,
+    "sha256": "afbbe18e65ccfe2ddbe930ea42907e53e6a3a5faf83dc36731457ad53e5721b9"
+   },
+   "exposure": {
+    "path": "paired-routing/two-trial-frozen/exposure-4deb0871.txt",
+    "bytes": 9978,
+    "sha256": "4deb087164d31d0dd683599150523d00d0fbdcaca203fb40397e8d9078ad8438"
+   },
+   "ruling": {
+    "path": "research-cc-role-20261008/ruling-routing-run5-two-trial-20261011.md",
+    "bytes": 2311,
+    "sha256": "08aac8fd72bed920e62c75fc268018d4878eb8d19918ac547e0f28c4546f15d7"
+   }
+  }
  }
 }
