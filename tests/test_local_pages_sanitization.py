@@ -176,6 +176,32 @@ class SanitizationTests(unittest.TestCase):
             with self.subTest(public=public):
                 self.assertEqual(helper.text(public), public)
 
+    def test_encoded_at_signs_in_tokens_over_the_decoding_bound_are_masked(self):
+        # The micro's (a)4 at 50977b00: _encoded_token leaves a token over 4,096 characters undecoded, and _EMAIL
+        # matched only a literal @, so %40 and &#64; there rendered unmasked where b209afe8's page-local mask omitted them.
+        helper = load_helper()
+        at = "@"
+        long = "x" * 4100
+        for form in ("owner%40example.org", "owner&#64;example.org", "owner&#64example.org", "owner&#x40;example.org", "owner&commat;example.org",
+                     "owner%2540example.org", "owner" + at + "example%2Eorg", "owner" + at + "example&#46;org", "owner" + at + "example&period;org"):
+            with self.subTest(form=form):
+                self.assertEqual(helper.text(long + form + " tail"), "[email omitted] tail")
+        for public in ("https://registry.npmjs.org/%40openai%2fcodex", "https://www.npmjs.com/package/%40anthropic-ai/claude-code", "100%40 off", "a&#64b"):
+            with self.subTest(public=public):
+                self.assertEqual(helper.text(long + " " + public), long + " " + public)
+
+    def test_systemd_template_unit_names_are_not_addresses(self):
+        # The architecture layer pages list user timers such as git-maintenance@daily.timer; since the shared
+        # mask (50977b00) they rendered as "[email omitted]" (9 cells on the live layer pages at 2dfb3c8c).
+        helper = load_helper()
+        at = "@"
+        for unit in ("git-maintenance" + at + "daily.timer", "${USER_HOME}/.config/systemd/user/git-maintenance" + at + "weekly.timer",
+                     "getty" + at + "tty1.service", "user" + at + "1000.slice", "systemd-fsck" + at + "dev-disk.service"):
+            with self.subTest(unit=unit):
+                self.assertEqual(helper.text(unit), unit)
+        self.assertEqual(helper.text("owner" + at + "timer.example.org"), "[email omitted]")
+        self.assertEqual(helper.text("owner" + at + "example.services"), "[email omitted]")
+
     def test_email_placeholder_survives_identity_projection(self):
         helper = load_helper()
         for identity in ["email", "omitted"]:

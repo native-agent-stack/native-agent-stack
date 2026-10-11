@@ -101,6 +101,36 @@ class TokenToolsTests(unittest.TestCase):
         self.assertEqual(document["tools"][1]["estimate"], {"log": "${USER_HOME}/ledger", "contact": "[email omitted]", "savings_pct": 91.2})
         self.assertEqual(document["tools"][2]["message"], "failed reading ${USER_HOME}/ledger for [email omitted]")
 
+    def test_dict_keys_are_sanitized_as_well_as_values(self):
+        # The micro's (a)10 at 50977b00: estimates passed sanitize(), which projects values only, while the module
+        # docstring promised the whole file; a path or address used as a JSON key reached the report verbatim.
+        keyed = {SYNTHETIC_HOME + "/proxy.log": {"saved": 1}, SYNTHETIC_EMAIL: 2, "owner%40example.org": 3, "nested": {SYNTHETIC_HOME: [{SYNTHETIC_EMAIL: 4}]}}
+        runner = Runner({"headroom " + AGENT: completed(0, json.dumps(keyed))})
+        document = tools.collect("rtk", "headroom", "node", None, timeout=5, runner=runner)
+        self.assertEqual(document["tools"][1]["estimate"], {"${USER_HOME}/ledger/proxy.log": {"saved": 1}, "[email omitted]": 2, "[email omitted] (2)": 3,
+                                                            "nested": {"${USER_HOME}/ledger": [{"[email omitted]": 4}]}})
+        serialized = json.dumps(document)
+        self.assertNotIn("synthetic-user", serialized)
+        self.assertNotIn(SYNTHETIC_EMAIL, serialized)
+        self.assertNotIn("owner%40", serialized)
+
+    def test_destination_refuses_a_parent_or_ancestor_that_links_into_the_repository(self):
+        # Codex token_tools_now.py:160 and the micro's (a)2 at 50977b00: abspath() follows no symlink, so
+        # <tmp>/state linked to the checkout let --out land inside the repository.
+        base = Path(self.directory)
+        (base / "state").symlink_to(ROOT, target_is_directory=True)
+        (base / "deep").symlink_to(ROOT / "tools", target_is_directory=True)
+        outside = Path(self.enterContext(tempfile.TemporaryDirectory()))
+        (base / "elsewhere").symlink_to(outside, target_is_directory=True)
+        for inside in (base / "state/token-tools-now.json", base / "deep/local-pages/out/token-tools-now.json", base / "state"):
+            with self.subTest(inside=inside), self.assertRaises(ValueError):
+                tools.destination(inside)
+        self.assertEqual(tools.destination(base / "elsewhere/token-tools-now.json"), base / "elsewhere/token-tools-now.json")
+        with patch.object(tools, "collect") as collect, patch.object(tools, "publish") as publish, patch("sys.stderr"):
+            self.assertEqual(tools.main(["--out", str(base / "state/token-tools-now.json")]), 2)
+        collect.assert_not_called()
+        publish.assert_not_called()
+
     def test_publish_refuses_the_repository_and_replaces_atomically(self):
         for inside in (ROOT / "token-tools-now.json", ROOT / "tools/local-pages/out/token-tools-now.json", ROOT):
             with self.subTest(inside=inside), self.assertRaises(ValueError):

@@ -149,11 +149,15 @@ def _known(fleet: dict, name: str) -> bool:
     return isinstance(rows, list) and (status in ("reported", "snapshot fallback") if status is not None else reported)
 
 
-def _hcom(fleet: dict) -> tuple[list[dict], Any]:
+def _hcom(fleet: dict) -> tuple[list[dict], Any, str | None]:
+    """The roster's agents, read time and, unless it reported, its gap text with fleet_data's status and reason."""
     tracking = fleet.get("tracking") if isinstance(fleet.get("tracking"), dict) else {}
     hcom = tracking.get("hcom") if isinstance(tracking.get("hcom"), dict) else {}
-    agents = hcom.get("agents") if hcom.get("status") == "reported" and isinstance(hcom.get("agents"), list) else []
-    return [agent for agent in agents if isinstance(agent, dict)], hcom.get("read_utc")
+    reported = hcom.get("status") == "reported" and isinstance(hcom.get("agents"), list)
+    agents = hcom["agents"] if reported else []
+    gap = None if reported else ("fleet tracking hcom roster (" + str(hcom.get("status") or "not reported") + ")"
+                                 + (": " + hcom["reason"] if isinstance(hcom.get("reason"), str) and hcom["reason"] else ""))
+    return [agent for agent in agents if isinstance(agent, dict)], hcom.get("read_utc"), gap
 
 
 def _in_state(agent: dict | None) -> str:
@@ -175,8 +179,11 @@ def _agent_row(value: Any) -> tuple[str, str | None, str | None] | None:
 
 
 def _sessions(current: dict, fleet: dict) -> tuple[str, str, str, str]:
-    agents, hcom_read = _hcom(fleet)
+    agents, hcom_read, hcom_gap = _hcom(fleet)
     parts, missing = [], []
+    if hcom_gap:
+        # An unavailable roster is not an empty one: its gap makes the section partial, and the state ages read unknown.
+        parts.append(_gap(hcom_gap))
     claimed: set[int] = set()
     def agent_for(*names: Any) -> dict | None:
         for index, agent in enumerate(agents):
@@ -246,7 +253,7 @@ def _sessions(current: dict, fleet: dict) -> tuple[str, str, str, str]:
     status = "missing" if len(missing) == 3 else "partial" if missing else "wired"
     detail = "Missing: " + ", ".join(missing) + "." if missing else ""
     detail += (" " if detail else "") + "Last activity is the hcom state age; no other source records it. Models appear only where the fleet records one."
-    source = ('Fleet: ' + esc(fleet.get("fleet_source") or "not reported") + ' at ' + _time(fleet.get("at")) + '. hcom roster read ' + _time(hcom_read)
+    source = ('Fleet: ' + esc(fleet.get("fleet_source") or "not reported") + ' at ' + _time(fleet.get("at")) + ('. hcom roster read ' if hcom_gap is None else '. hcom roster unavailable at ') + _time(hcom_read)
               + '. Subagents: cc-now.json at ' + _time(current.get("updated_utc")) + '. <a href="fleet.html">Fleet page</a> has rates, pool and spend.')
     return status, detail, source, "".join(parts)
 
@@ -403,6 +410,11 @@ def _token_values(section: Any) -> dict:
     return values if isinstance(values, dict) else {}
 
 
+def _names_rtk(name: Any) -> bool:
+    """A token-window report belongs to RTK when its name says so, as the report names do ("rtk gain (...)")."""
+    return "rtk" in str(name).casefold()
+
+
 def _tool_estimate(row: dict) -> str:
     """A tool's own estimate as the producer recorded it: RTK's summary, Headroom's report, context-mode's checks."""
     estimate = row.get("estimate")
@@ -447,7 +459,7 @@ def _tokens(current: dict, inputs: dict, adoption: dict, refreshed: Any) -> tupl
     rows = []
     if window_doc and isinstance(window_doc.get("tool_reports"), dict):
         for name, values in window_doc["tool_reports"].items():
-            mechanism = "RTK" if "rtk" in str(name).casefold() else _humanize(str(name).split(" ")[0])
+            mechanism = "RTK" if _names_rtk(name) else _humanize(str(name).split(" ")[0])
             if isinstance(values, dict) and isinstance(values.get("tokens_saved"), dict):
                 saved = values["tokens_saved"]
                 share = _finite(saved.get("share_percent"))
@@ -1141,7 +1153,9 @@ def _counts(current: dict, fleet: dict, inputs: dict, statuses: dict) -> str:
     saved = (rtk.get("estimate") or {}).get("total_saved") if isinstance(rtk, dict) and isinstance(rtk.get("estimate"), dict) else None
     if saved is None:
         window, _ = _input(inputs, "token_window")
-        report = next(iter(window["tool_reports"].values()), None) if isinstance(window, dict) and isinstance(window.get("tool_reports"), dict) and window["tool_reports"] else None
+        reports = window["tool_reports"] if isinstance(window, dict) and isinstance(window.get("tool_reports"), dict) else {}
+        # Only a report RTK's name labels may supply this figure; another tool's report never stands in for it.
+        report = next((values for name, values in reports.items() if _names_rtk(name) and isinstance(values, dict) and "tokens_saved" in values), None)
         if not isinstance(report, dict):
             efficiency = current.get("token_efficiency") if isinstance(current.get("token_efficiency"), dict) else {}
             report = efficiency.get("rtk") if isinstance(efficiency.get("rtk"), dict) else {}

@@ -12,6 +12,11 @@ own, cited at the v3.13.16 mirror (cbc944f4bc59639a444dd971c737788ba2283a91):
 html.unescape (Lib/html/__init__.py:118 accepts a reference without its
 semicolon, :122), whose HTML5 table maps 'commat;' to '@' and 'period;' to '.'
 (Lib/html/entities.py:567, :1736), and urllib.parse.unquote (Lib/urllib/parse.py:694).
+A token over 4,096 characters is not decoded, so the mask also matches the
+encoded at-sign and dot forms in place (%40, %2540, &#64 with or without its
+semicolon, &#x40, &commat;, %2E, &#46 and &period;), as the b209afe8 page-local
+mask did for %40 and &#64;. A name ending in a systemd unit type
+(systemd.unit(5)), such as git-maintenance@daily.timer, is not an address.
 """
 
 import base64
@@ -29,7 +34,12 @@ _HOME = re.compile(r"/home/[^/\s\"'<>]+|/Users/[^/\s\"'<>]+")
 _SESSION = re.compile(r"[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}", re.I)
 _TASK = re.compile(r"task-[a-z0-9]{8}-[a-z0-9]{6}", re.I)
 _TOKEN = re.compile(r"[^\s<>\"']+")
-_EMAIL = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}")
+_AT = r"(?:@|%(?:25)?40|&#0*64;?|&#[xX]0*40;?|&commat;)"
+_DOT = r"(?:\.|%(?:25)?2[Ee]|&#0*46;?|&#[xX]0*2[Ee];?|&period;)"
+# A systemd template-unit instance (git-maintenance@daily.timer) ends in a unit type, never a top-level domain;
+# the types are systemd.unit(5)'s at systemd 259.
+_UNIT = r"(?:service|socket|device|mount|automount|swap|target|path|timer|slice|scope)(?![A-Za-z])"
+_EMAIL = re.compile(r"[A-Za-z0-9._%+-]+" + _AT + r"[A-Za-z0-9-]+(?:" + _DOT + r"[A-Za-z0-9-]+)*" + _DOT + r"(?!" + _UNIT + r")[A-Za-z]{2,}")
 _PRESERVED = re.compile(r"\$\{(?:USER_HOME|LOCAL_SESSION_ID|LOCAL_TASK_HANDLE)\}|\[personal identifier omitted\]|\[account artifact omitted\]|\[email omitted\]|native-agent-stack-1a")
 
 

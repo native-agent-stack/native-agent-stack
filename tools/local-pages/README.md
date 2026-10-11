@@ -206,9 +206,11 @@ neither stops the refresh. A view failure publishes an UNREPORTED placeholder
 while the other pages refresh. Each section carries a wired, partial or
 missing-input label, also recorded per section in the receipt. The label
 follows what the section renders: any stated gap, not-wired input or stale
-report makes it partial, and the detail names the reason. Each section and the
-count strip render in their own guard, so a value of the wrong type degrades
-only the part that reads it.
+report makes it partial, and the detail names the reason. An hcom roster that
+Fleet tracking could not read is such a gap, with fleet_data's status and
+reason, so Sessions reads partial rather than showing an empty roster. Each
+section and the count strip render in their own guard, so a value of the wrong
+type degrades only the part that reads it.
 
 Every value keeps its own source and window, and nothing is summed across
 windows. A report older than its limit at the refresh reads "stale" with its
@@ -255,7 +257,10 @@ The tokens section shows each token tool's own report command, run by
 `token_tools_now.py` (below), with its exit code, run time, version and the
 tool's own estimate. The native counters from `token-window-now.json` are
 labelled client counters. Nothing is summed across tools, evidence classes or
-windows. The only chart is token use by lane: one series in one hue, bars
+windows. The count strip's saved-tokens figure is RTK's own, from its
+token-tools row, the token-window report whose name names RTK, or
+`cc-now.json#/token_efficiency/rtk`, and otherwise reads UNKNOWN; another
+tool's figure never stands in for it. The only chart is token use by lane: one series in one hue, bars
 beside the numbers in the same table. Two inputs can read "not wired" with
 their reason: the `tools/token-report` manifest, whose README keeps raw
 reports private, and the north-star ten-layer table while
@@ -266,14 +271,18 @@ rendered.
 The shared sanitizer omits email addresses on every page, after the same
 per-token decoding it applies to home paths and identifiers, so percent-encoded,
 double-encoded and HTML-entity forms, with or without the semicolon, are
-matched in their decoded text.
+matched in their decoded text. A token over 4,096 characters is not decoded,
+so there the mask matches the encoded at-sign and dot forms in place. A
+systemd template-unit name such as `git-maintenance@daily.timer` ends in a unit
+type rather than a domain, so it stays readable.
 
 `token_tools_now.py` runs each installed token tool's own report command:
 `rtk gain --format json`, `headroom agent-savings --check-perf --hours 24
 --format json`, `headroom output-savings` and `doctor` from the context-mode
 plugin's `cli.bundle.mjs`. It writes `token-tools-now.json`
-(`token-tools-now/1`) atomically and refuses a destination inside the
-repository. Headroom runs with its update check, network use and telemetry off.
+(`token-tools-now/1`) atomically, passes dict keys as well as values through the
+shared sanitizer, and refuses a destination inside the repository, also when a
+parent or ancestor reaches it through a symlink. Headroom runs with its update check, network use and telemetry off.
 Headroom's agent-savings exits 1 below its profile target, and its output
 savings are counterfactual unless an A/B holdout is set. Context-mode reports
 savings only through its MCP tool `ctx_stats`, so only `doctor` runs. The CC's

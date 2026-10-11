@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+from datetime import datetime, timezone
 import hashlib
 import html
 from html.parser import HTMLParser
@@ -24,6 +25,9 @@ SPEC = importlib.util.spec_from_file_location("local_pages_command_center_view",
 view = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(view)
 POLICY_SPEC = importlib.util.spec_from_file_location("local_pages_command_center_policy", ROOT / "tools/local-pages/source_policy.py")
+FLEET_SPEC = importlib.util.spec_from_file_location("local_pages_command_center_fleet", ROOT / "tools/local-pages/fleet_data.py")
+fleet_data = importlib.util.module_from_spec(FLEET_SPEC)
+FLEET_SPEC.loader.exec_module(fleet_data)
 policy = importlib.util.module_from_spec(POLICY_SPEC)
 POLICY_SPEC.loader.exec_module(policy)
 BUILDER = composer_fixture.BUILDER
@@ -381,6 +385,54 @@ class CommandCenterViewTests(unittest.TestCase):
                 self.assertIn(label, statuses["cc-skills"]["detail"])
                 self.assertEqual(statuses["cc-skills"]["status"], "partial")
 
+    def test_an_unavailable_hcom_roster_is_a_stated_gap_and_sessions_is_partial(self):
+        # Codex :156 and the micro's (a)1 at 50977b00: fleet_data's own UNKNOWN roster left Sessions `wired`
+        # with the reason dropped. The shape here is the producer's, from fleet_data._tracking_hcom.
+        def unavailable(*_, **__):
+            raise OSError("synthetic hcom failure")
+        roster = fleet_data._tracking_hcom(unavailable, datetime(2026, 10, 11, 14, 1, 53, tzinfo=timezone.utc).timestamp())
+        self.assertEqual((roster["status"], roster["agents"], roster["reason"]), ("UNKNOWN", None, "Native hcom roster is UNKNOWN (OSError)."))
+        fleet = fleet_fixture()
+        fleet["tracking"]["hcom"] = roster
+        markup, statuses = self.render(fleet=fleet)
+        panel = section(markup, "cc-sessions")
+        self.assertIn("missing input: fleet tracking hcom roster (UNKNOWN): Native hcom roster is UNKNOWN (OSError).", panel)
+        self.assertIn("hcom roster unavailable at", panel)
+        self.assertEqual(statuses["cc-sessions"]["status"], "partial")
+        self.assertIn("Partial because of missing input: fleet tracking hcom roster (UNKNOWN)", statuses["cc-sessions"]["detail"])
+        self.assertEqual(table(markup, "Live Codex lanes")[1][2], "not recorded")
+        self.assertNotIn("synthetic hcom failure", markup)
+        unreported = fleet_fixture()
+        unreported["tracking"] = {"schema": "fleet-tracking/1", "status": "UNREPORTED", "reason": "Fleet adapter failed (OSError)"}
+        markup, statuses = self.render(fleet=unreported)
+        self.assertIn("missing input: fleet tracking hcom roster (not reported)", section(markup, "cc-sessions"))
+        self.assertEqual(statuses["cc-sessions"]["status"], "partial")
+        empty = fleet_fixture()
+        empty["tracking"]["hcom"]["agents"] = []
+        self.assertEqual(self.render(fleet=empty)[1]["cc-sessions"]["status"], "wired")
+
+    def test_the_count_strip_takes_the_rtk_figure_only_from_an_rtk_report(self):
+        # Codex :1144 and the micro's (a)3 at 50977b00: without an RTK row in token-tools-now.json, the strip took the
+        # first token-window report, whichever tool it was, and labelled its figure "RTK estimate".
+        def strip(markup):
+            start = markup.index('class="cc-counts"')
+            return markup[start:markup.index("</ul>", start)]
+        inputs = inputs_fixture()
+        inputs["token_tools"]["document"]["tools"][0].update(rc=None, error="command not found", estimate=None)
+        window = inputs["token_window"]["document"]
+        window["tool_reports"] = {"headroom proxy (24 h; the tool's own estimate)": {"tokens_saved": {"value": "999M", "share_percent": 90.0}}, **window["tool_reports"]}
+        markup, _ = self.render(inputs=inputs)
+        self.assertIn('<strong>218.5M</strong> <span>tokens saved (RTK estimate)</span>', strip(markup))
+        self.assertNotIn("999M", strip(markup))
+        window["tool_reports"] = {"headroom proxy (24 h; the tool's own estimate)": {"tokens_saved": {"value": "999M"}}}
+        markup, _ = self.render(inputs=inputs)
+        self.assertIn('<strong>2.5M</strong> <span>tokens saved (RTK estimate)</span>', strip(markup))
+        current = current_fixture()
+        del current["token_efficiency"]
+        markup, _ = self.render(current=current, inputs=inputs)
+        self.assertIn('<strong>UNKNOWN</strong> <span>tokens saved (RTK estimate)</span>', strip(markup))
+        self.assertNotIn("999M", strip(markup))
+
     def test_missing_inputs_render_stated_gaps_without_raising(self):
         failed_fleet = {"fleet_source": "not reported", "at": None, "lanes_live": None, "lanes_parked": None, "claude_sessions": None,
                         "exec_reads_in_flight": None, "availability": {name: {"status": "UNKNOWN"} for name in ("lanes_live", "lanes_parked", "claude_sessions")},
@@ -702,6 +754,8 @@ class CommandCenterViewTests(unittest.TestCase):
         current["cc_agents"]["running"].append(identity + " (" + SYNTHETIC_EMAILS[6] + ")")
         current["rulings"][0]["summary"] = SYNTHETIC_HOME + " " + SYNTHETIC_EMAILS[5]
         current["program"][0]["owner"] = identity + " " + SYNTHETIC_EMAILS[7]
+        # The micro's (a)4: a token over 4,096 characters is not decoded, so its encoded at sign is matched in place.
+        current["program"][1]["title"] = "x" * 4100 + SYNTHETIC_EMAILS[1] + " " + "y" * 4100 + SYNTHETIC_EMAILS[2]
         fleet = fleet_fixture()
         fleet["lanes_live"][0]["lane_model"] = SYNTHETIC_EMAILS[4]
         inputs = inputs_fixture()

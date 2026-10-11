@@ -18,8 +18,10 @@ and flags were read from each tool's --help at the installed version on
   the MCP tool ctx_stats; `statusline` prints a fixed headline when it has no
   session (bin/statusline.mjs:236-242), so it is not used.
 
-Text and JSON pass the shared page sanitizer before they are written, so the
-file carries no home path, session id or email address.
+Text and JSON pass the shared page sanitizer before they are written, dict
+keys as well as values, so the file carries no home path, session id or email
+address. The destination is refused inside the repository, also when a parent
+or ancestor reaches it through a symlink.
 """
 
 from __future__ import annotations
@@ -86,11 +88,27 @@ def version(argv: list[str], *, runner=subprocess.run) -> str | None:
     return lines[0] if lines else None
 
 
+def scrub(value):
+    """The shared sanitizer projects values only (sanitization.py sanitize); a key is text too, so it is projected as well."""
+    if isinstance(value, dict):
+        projected = {}
+        for key, child in value.items():
+            name = SANITIZE.text(key) if isinstance(key, str) else key
+            base, suffix = name, 2
+            while name in projected:  # two keys can project to one text, such as two omitted addresses
+                name, suffix = f"{base} ({suffix})", suffix + 1
+            projected[name] = scrub(child)
+        return projected
+    if isinstance(value, list):
+        return [scrub(child) for child in value]
+    return SANITIZE.sanitize(value)
+
+
 def row(tool: str, command: list[str], label: str, outcome: dict, tool_version: str | None, estimate: dict | None, *, note: str | None = None) -> dict:
     message = clean(outcome.get("stderr") or "", 400) if outcome.get("rc") not in (0, None) else None
     return {"tool": tool, "command": " ".join(command), "label": label, "version": tool_version, "rc": outcome.get("rc"),
             "started_utc": outcome.get("started_utc"), "seconds": outcome.get("seconds"), "error": outcome.get("error"),
-            "estimate": SANITIZE.sanitize(estimate) if estimate is not None else None, "message": message, "note": note}
+            "estimate": scrub(estimate) if estimate is not None else None, "message": message, "note": note}
 
 
 def rtk(executable: str, *, timeout: int, runner=subprocess.run) -> dict:
@@ -154,10 +172,14 @@ def collect(rtk_bin: str, headroom_bin: str, node: str, context_cli: Path | None
 
 
 def destination(path: Path) -> Path:
-    """The report is local state: refuse a destination inside the repository."""
+    """The report is local state: refuse a destination inside the repository, through a symlink too.
+
+    As tools/skill-usage/render_units.py _external_path does, both the absolute path and its resolve(),
+    which follows every symlinked parent and ancestor that exists, must stay outside the repository.
+    """
     path = Path(os.path.abspath(path))
-    if path == ROOT or ROOT in path.parents:
-        raise ValueError("--out must stay outside the repository")
+    if any(candidate == ROOT or ROOT in candidate.parents for candidate in (path, path.resolve())):
+        raise ValueError("--out must stay outside the repository, including through a symlink")
     return path
 
 
