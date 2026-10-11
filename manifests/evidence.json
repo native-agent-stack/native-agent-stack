@@ -5091,8 +5091,8 @@
     },
     {
       "path": ".github/workflows/adoption-bootstrap.yml",
-      "sha256": "7a602ef4630e532642e2a9b6159d1588f45b6a43c57b7b50519a341236b18cab",
-      "bytes": 10726
+      "sha256": "1f85c4e58330a3062bf3863fc9dba0317fb8787d9a9a992e72ca1b5774de55bb",
+      "bytes": 10796
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
@@ -5196,8 +5196,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "1c8a817bff26722134d9707dc47a7d9a5092342b95e1899e9977d9b1d3c1ece0",
-      "bytes": 39299
+      "sha256": "087532aa7611c74b7047e277d54f30e47b75c707d55c2bbd54ce7c657a654a8d",
+      "bytes": 39710
     },
     {
       "path": ".gitignore",
@@ -17166,6 +17166,11 @@
       "bytes": 315225
     },
     {
+      "path": "catalogs/landscape/final-stack.json",
+      "sha256": "bec35c4130522b9ac8169cc4b040ce87bc9ea3645f602aad9c07607745cfbadb",
+      "bytes": 300325
+    },
+    {
       "path": "catalogs/landscape/foundation.json",
       "sha256": "868d193a31080ab913400725140bd0d01e0afe97e28564fd12777f737d22951a",
       "bytes": 479154
@@ -17249,6 +17254,11 @@
       "path": "catalogs/landscape/new-host-grand-list.json",
       "sha256": "ef738033f69e8785cf14172e0b34d477b34d77710e38702614adef1863b4e1c7",
       "bytes": 287964
+    },
+    {
+      "path": "catalogs/landscape/planned-layers.json",
+      "sha256": "b970336c3345c5fd4cc2a78717c75f6c66898409dd7efbeada6f030f307463f4",
+      "bytes": 2183
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -60671,6 +60681,11 @@
       "bytes": 7138
     },
     {
+      "path": "scripts/final_stack.py",
+      "sha256": "1c78d9da00185981e9d73390b4192427c0fa348a595702e4fbe75ba9fc2ed25d",
+      "bytes": 52913
+    },
+    {
       "path": "scripts/freshness_propose.py",
       "sha256": "531456ba6379750c9282bdfc4277b53d7170c8e16e57eb778740bab023d793b6",
       "bytes": 70854
@@ -61549,6 +61564,11 @@
       "path": "tests/test_extreme_gainer_audit.py",
       "sha256": "bfdf6e71700f259bdec3df2381328d07d0eb5c85622bf8a6d09a613de1cc75a4",
       "bytes": 15815
+    },
+    {
+      "path": "tests/test_final_stack.py",
+      "sha256": "d18f70d1b7c9b8dc4080d3518aac49afe141a36373b21717bfc3b1867da051ee",
+      "bytes": 32236
     },
     {
       "path": "tests/test_financial_data.py",
@@ -62757,8 +62777,8 @@
     },
     {
       "path": "tools/local-pages/source_policy.json",
-      "sha256": "78052497a0d7414fa4bc55ad9783592b7a127794c08ac9198bec726131820fe6",
-      "bytes": 758254
+      "sha256": "566b5794e102e94ed04dd195d6b2c35634d62f89adbedd6beca40bb8701b40c9",
+      "bytes": 758521
     },
     {
       "path": "tools/omniroute/gateway_record.py",

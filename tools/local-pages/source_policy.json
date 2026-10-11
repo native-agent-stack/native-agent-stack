@@ -2046,6 +2046,10 @@
     },
     {
       "root": "repo",
+      "path": "scripts/final_stack.py"
+    },
+    {
+      "root": "repo",
       "path": "scripts/freshness_propose.py"
     },
     {
@@ -2758,6 +2762,10 @@
       },
       {
         "root": "repo",
+        "path": "catalogs/landscape/final-stack.json"
+      },
+      {
+        "root": "repo",
         "path": "catalogs/landscape/gap-crosswalk-92bb279.json"
       },
       {
@@ -2791,6 +2799,10 @@
       {
         "root": "repo",
         "path": "catalogs/landscape/new-host-grand-list.json"
+      },
+      {
+        "root": "repo",
+        "path": "catalogs/landscape/planned-layers.json"
       },
       {
         "root": "repo",
