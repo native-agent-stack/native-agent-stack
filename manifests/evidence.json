@@ -60802,8 +60802,8 @@
     },
     {
       "path": "tests/test_native_practice_cross_client_sources.py",
-      "sha256": "1938dd1a2a7b4f4551b49868b9c2d936ba41e73fbc9c1e5dd309c3de8b729fef",
-      "bytes": 47189
+      "sha256": "6c7334aa820914a96d9d5b9228630ab1e1621e03ca6ece86bc76124f3fd9a3d3",
+      "bytes": 62924
     },
     {
       "path": "tests/test_native_practice_doc_corrections.py",
