@@ -1811,9 +1811,20 @@ class StandingRuleSurfacesTests(unittest.TestCase):
     the token-lane list and the other rule sentences left every layer. The portable Claude block is exactly the core;
     the Codex template, both generated carriers, root AGENTS.md and the scaffold's AGENTS.md each hold it once.
     The 2026-10-09 correction amendment belongs to that same core on every layer and must survive the native
-    new-WSL and scaffold renderers. All paths tested here belong to this repository."""
+    new-WSL and scaffold renderers, and so do the 2026-10-11 compounding sentences. All paths tested here belong to
+    this repository."""
 
     LEGACY_CORRECTION = "When a claim proves wrong, record the correction."
+    # The compounding sentences of 2026-10-11 (docs/decisions/2026-10-11-compounding-rule-text.md), placed after the
+    # "Proceed where the evidence converges" sentence of the same bullet and before "Each choice adopts".
+    COMPOUNDING = (
+        "Every result lands in the repository as a reviewed, cited record (a pull request, decision, manifest or "
+        "receipt) that the next session starts from; settled work reopens only on new evidence or a landscape change, "
+        "and a better-evidenced source supersedes an older one through a recorded supersession, never a silent redo. "
+        "Work starts when its named inputs exist, never on a date."
+    )
+    COMPOUNDING_PLACED = ("any protected window intact. " + COMPOUNDING
+                          + " Each choice adopts the current best converged practice")
     CORRECTION = (
         "When a claim or fix proves wrong, resolve it from the upstream primary source at the pinned version through "
         "the vendor's supported path, record the correction with its citation, and add a regression test that fails "
@@ -1838,7 +1849,8 @@ class StandingRuleSurfacesTests(unittest.TestCase):
         "landscape-converged SOTA practice through hooks, workflows, rulesets, scheduled sweeps and runtime "
         "workers without waiting for prompts to name it. Proceed where the evidence "
         "converges, and apply or propose the related improvements the work surfaces, at a moment that keeps the "
-        "current focus and any protected window intact. Each choice adopts the current best converged practice and "
+        "current focus and any protected window intact. "
+        + COMPOUNDING + " Each choice adopts the current best converged practice and "
         "is replaced when the live landscape converges on a better-evidenced one. "
         + CORRECTION + "\n"
     )
@@ -1902,6 +1914,19 @@ class StandingRuleSurfacesTests(unittest.TestCase):
                 self.assertEqual(text.count(self.LEGACY_CORRECTION), 0)
                 self.assertEqual(text.count(self.CORRECTION), 1)
                 self.assertEqual(text.count(self.CORE), 1)
+
+    def test_every_layer_and_renderer_carries_the_compounding_sentences_in_place(self):
+        import new_wsl_client_config as cfg
+        import scaffold_repo as scaffold
+
+        texts = {relative: (ROOT / relative).read_text(encoding="utf-8") for relative in self.LAYERS}
+        texts["renderer claude"] = cfg.block_text(ROOT, cfg.CLAUDE_MD_PIECE)
+        texts["renderer codex"] = cfg.block_text(ROOT, cfg.CODEX_MD_PIECE)
+        texts["renderer scaffold/AGENTS.md"] = dict(scaffold.scaffold_files("0" * 40, ""))["AGENTS.md"].decode("utf-8")
+        for surface, text in texts.items():
+            with self.subTest(surface=surface):
+                self.assertEqual(text.count(self.COMPOUNDING), 1)
+                self.assertEqual(text.count(self.COMPOUNDING_PLACED), 1)
 
     def test_root_claude_md_loads_the_core_through_its_agents_md_import(self):
         # code.claude.com/docs/en/memory, "Share one file with other coding tools": the import keeps AGENTS.md the one
@@ -2271,7 +2296,11 @@ class PortableTopRuleTests(unittest.TestCase):
     # keeps the amended core on all six layers and in native renderer outputs; each rendered user block adds 225 bytes.
     # With carriers of 2302/2723 bytes, the actual totals are 5650/5751. REVIEW.md and nested trading instructions remain
     # outside this helper's startup scope. These manual ceilings retain the same +5%, rounded up.
-    STARTUP_BUDGET_BYTES = {"claude": 5933, "codex": 6039}
+    # The dated 2026-10-11 comparison (docs/decisions/2026-10-11-compounding-rule-text.md) adds 379 bytes (the
+    # compounding sentences and one space) to each of the two loaded core copies: 5808/5909 -> 6566/6667 bytes
+    # (Claude/Codex; the base includes #1008's 158-byte root bullet, which fit the old headroom). The same +5%,
+    # rounded up, gives 6895/7001.
+    STARTUP_BUDGET_BYTES = {"claude": 6895, "codex": 7001}
     # The four rules of the core (2026-10-08): research before acting with named sources, upstream as the truth with
     # the check order, decisions by evidence measured with upstream harnesses, and the compounding ecosystem with the
     # recorded correction.
