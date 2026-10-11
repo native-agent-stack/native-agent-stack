@@ -13,7 +13,15 @@
       "url": "https://github.com/seathatflowsinourveins/us-equities-trading/blob/f8c607bc1f1f0205fdc87095f47df150d2f78117/docs/decisions/2026-10-10-halt-exit-policy.md",
       "sha256": "ef1cf212b22c6f891da8fb322eb0b5838f1b685c307aa7eec3bf143423809887",
       "git_blob": "c17cfd13053fa1edb01731c7b620b77788f2c2d8",
-      "decision_2_sha256": "c68cb552a9de1f7a5c5339d80ede035d032a6a15f4856de3b0a4feda38cac074"
+      "decision_2_sha256": "c68cb552a9de1f7a5c5339d80ede035d032a6a15f4856de3b0a4feda38cac074",
+      "decision_2_extraction": {
+        "line_numbering": "1-based",
+        "first_line": 19,
+        "last_line": 25,
+        "encoding": "UTF-8",
+        "join": "LF",
+        "final_LF": true
+      }
     },
     "verification": "Both full captures match the private repository at the recorded pins. Decision 2 wording differs; its hold/flag/freeze policy is retained. Full private captures stay in the review packet."
   },

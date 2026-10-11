@@ -448,6 +448,19 @@ class CapacityRunTests(unittest.TestCase):
         pre = fx.FakeClock(datetime(2026, 9, 24, 11, 0, tzinfo=timezone.utc).timestamp())
         receipt, _, _ = run(self.tmp.name, clock=pre, broker=fx.FakeBroker(pre), allow_extended_hours=False)
         self.assertEqual(receipt["refusal_reason"], "extended_hours_not_allowed")
+        for allowed in (True, False):
+            with self.subTest(label="Thursday 18:00 ET", allow_extended_hours=allowed):
+                post = fx.FakeClock(datetime(2026, 9, 24, 22, 0, tzinfo=timezone.utc).timestamp())
+                broker = fx.FakeBroker(post)
+                receipt, _, _ = run(self.tmp.name, clock=post, broker=broker, allow_extended_hours=allowed)
+                self.assertEqual(receipt["session_kind"], "POST")
+                if allowed:
+                    self.assertIsNone(receipt["refusal_reason"])
+                    self.assertEqual(broker.extended_hours_flags, {True})
+                    self.assertTrue(receipt["extended_hours_orders"])
+                else:
+                    self.assertEqual(receipt["refusal_reason"], "extended_hours_not_allowed")
+                    self.assertEqual(len(broker.orders), 0)
 
     def test_price_band_and_rejections_are_data(self):
         self.assertEqual(c.limit_price_below_bid("500.00", 500), Decimal("475.00"))

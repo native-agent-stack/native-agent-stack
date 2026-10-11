@@ -318,6 +318,9 @@ class OvernightCitationCorrections(unittest.TestCase):
         self.assertEqual(source["commit"], pin)
         self.assertEqual(source["sha256"], "ef1cf212b22c6f891da8fb322eb0b5838f1b685c307aa7eec3bf143423809887")
         self.assertEqual(source["decision_2_sha256"], "c68cb552a9de1f7a5c5339d80ede035d032a6a15f4856de3b0a4feda38cac074")
+        self.assertEqual(source.get("decision_2_extraction"), {
+            "line_numbering": "1-based", "first_line": 19, "last_line": 25,
+            "encoding": "UTF-8", "join": "LF", "final_LF": True})
         url = ("https://github.com/seathatflowsinourveins/us-equities-trading/blob/"
                + pin + "/docs/decisions/2026-10-10-halt-exit-policy.md")
         self.assertEqual(source["url"], url)
@@ -331,7 +334,10 @@ class OvernightCitationCorrections(unittest.TestCase):
         data = (self.FIXTURES / source["capture"]).read_bytes()
         self.assertEqual(hashlib.sha256(data).hexdigest(), source["fixture_sha256"])
         self.assertEqual(source["url"], "https://docs.alpaca.markets/us/reference/get-v2-assets-symbol_or_asset_id.md")
-        self.assertIn(source["sha256"], self.citation(source["url"]))
+        citation = self.citation(source["url"])
+        self.assertIn(source["sha256"], citation)
+        self.assertIn("`overnight_tradable`", citation)
+        self.assertIn("`overnight_halted`", citation)
         captured = json.loads(data)
         self.assertIn("overnight_tradable", captured["AssetAttribute"]["enum"])
         self.assertIn("overnight_halted", captured["AssetAttribute"]["enum"])
@@ -342,5 +348,7 @@ class OvernightCitationCorrections(unittest.TestCase):
         data = (self.FIXTURES / source["capture"]).read_bytes()
         self.assertEqual(hashlib.sha256(data).hexdigest(), source["sha256"])
         self.assertEqual(source["url"], "https://docs.alpaca.markets/us/docs/historical-stock-data-1.md")
-        self.assertIn(source["sha256"], self.citation(source["url"]))
+        citation = self.citation(source["url"])
+        self.assertIn(source["sha256"], citation)
+        self.assertIn("15 minutes delayed", citation)
         self.assertIn(b"The trades are 15 minutes delayed", data)

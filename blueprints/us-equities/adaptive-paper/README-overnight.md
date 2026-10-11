@@ -108,10 +108,16 @@ and retained receipt.
 drives `runner.main()` through Controller construction.
 `MoverPaperCommandWiring.test_paper_main_preserves_extended_session_window_at_controller_construction`
 drives `mover_runner.main()` through MoverController construction. Both use
-PRE/RTH/POST controls and an OVERNIGHT clock. Scripted preflight isolates each
-constructor's own window; credentials, account state and broker operations are
-fixtures. Bypassing either production `_controller_session` call fails its
-OVERNIGHT assertion.
+PRE/RTH/POST controls and an OVERNIGHT clock.
+`MoverPaperCommandWiring.test_recover_main_preserves_extended_session_window_at_controller_construction`
+drives `mover_runner.main()`'s `recover` path through MoverController construction
+with the same controls. Scripted preflight isolates each constructor's own
+window; credentials, account state and broker operations are fixtures.
+All three tests pin `market_open` and the close passed to the controller:
+20:00 ET in PRE/RTH/POST, and the preflight close unchanged in OVERNIGHT.
+Bypassing a paper `_controller_session` call or always opening mover `recover`
+fails the corresponding OVERNIGHT assertion; passing the broker close in a
+supported session fails the close assertion.
 
 `OvernightCitationCorrections` binds the three corrected citations to
 `tests/fixtures/adaptive_paper_citations/`: two bounded public vendor fixtures

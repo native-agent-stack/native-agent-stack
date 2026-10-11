@@ -685,6 +685,7 @@ class MoverPaperCommandWiring(unittest.TestCase):
         for hour, expected_open in ((5, True), (11, True), (17, True), (21, False)):
             with self.subTest(hour_et=hour), tempfile.TemporaryDirectory() as root:
                 now = datetime(2026, 3, 10, hour, 0, tzinfo=ny).timestamp()
+                expected_close = datetime(2026, 3, 10, 20, 0, tzinfo=ny).timestamp() if expected_open else now + 3600
                 data = json.loads(CONFIG.read_text())
                 data["mover"]["session_scope"] = "any_session"
                 config_path, scan_path = Path(root) / "config.json", Path(root) / "scan.json"
@@ -730,8 +731,59 @@ class MoverPaperCommandWiring(unittest.TestCase):
                 self.assertIs(caught.exception, captured)
                 controller.assert_called_once()
                 self.assertIs(controller.call_args.kwargs["market_open"], expected_open)
+                self.assertEqual(controller.call_args.args[1], expected_close)
                 ledger.close.assert_called_once()
                 self.assertFalse((Path(root) / "state").exists())
+
+    def test_recover_main_preserves_extended_session_window_at_controller_construction(self):
+        import transport
+        from zoneinfo import ZoneInfo
+        ny = ZoneInfo("America/New_York")
+        for hour, expected_open in ((5, True), (11, True), (17, True), (21, False)):
+            with self.subTest(hour_et=hour), tempfile.TemporaryDirectory() as root:
+                now = datetime(2026, 3, 10, hour, 0, tzinfo=ny).timestamp()
+                expected_close = datetime(2026, 3, 10, 20, 0, tzinfo=ny).timestamp() if expected_open else now + 3600
+                data = json.loads(CONFIG.read_text())
+                data.update(regular_session_only=False, extended_hours_enabled=True)
+                data["sessions"]["extended_hours"] = True
+                config_path = Path(root) / "config.json"
+                config_path.write_text(json.dumps(data))
+                state_dir = Path(root) / "state" / self.FINGERPRINT / "mover"
+                state_dir.mkdir(parents=True)
+                metadata_path = state_dir / "trial.json"
+                metadata_bytes = json.dumps({"config_sha256": mover_runner._sha256(config_path.read_bytes())}).encode()
+                metadata_path.write_bytes(metadata_bytes)
+                observation = self.observation(["SPY"])
+                observation["clock"]["timestamp_ns"] = int(now * 1e9)
+                ledger = Mock()
+                ledger.positions.return_value = ledger.unresolved.return_value = []
+                captured = RuntimeError("captured_recover_controller")
+                # Keep recover's production helper real, independently of the
+                # earlier preflight gate. Only private fixture metadata is read;
+                # the constructor sentinel prevents persistence and broker work.
+                with patch.object(mover_runner, "credentials", return_value=("fixture", "fixture")), \
+                     patch.object(transport, "preflight", return_value=observation), \
+                     patch.object(mover_runner, "validate_preflight", return_value=now + 3600), \
+                     patch.object(mover_runner, "account_lock_fingerprint", return_value=nullcontext()), \
+                     patch.object(mover_runner, "Ledger", return_value=ledger), \
+                     patch.object(mover_runner, "save", side_effect=AssertionError("unexpected persistence")), \
+                     patch.object(mover_runner, "MoverController", side_effect=captured) as controller, \
+                     patch.object(transport, "AlpacaPaperTransport", side_effect=AssertionError("broker transport")), \
+                     patch.object(mover_runner, "recover_mover", side_effect=AssertionError("broker recovery")), \
+                     patch.object(mover_runner.time, "time", return_value=now):
+                    with self.assertRaises(RuntimeError) as caught:
+                        mover_runner.main([
+                            "recover", "--env-file", str(Path(root) / "unused.env"),
+                            "--config", str(config_path), "--output", str(Path(root) / "output.json"),
+                            "--state-root", str(Path(root) / "state")])
+                self.assertIs(caught.exception, captured)
+                controller.assert_called_once()
+                self.assertIs(controller.call_args.kwargs["market_open"], expected_open)
+                self.assertEqual(controller.call_args.args[1], expected_close)
+                ledger.close.assert_called_once()
+                self.assertEqual(metadata_path.read_bytes(), metadata_bytes)
+                self.assertEqual(list(state_dir.iterdir()), [metadata_path])
+                self.assertFalse((Path(root) / "output.json").exists())
 
     def test_paper_command_counts_sessions_persists_state_and_guards_a_shared_account(self):
         with tempfile.TemporaryDirectory() as root:

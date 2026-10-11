@@ -240,6 +240,7 @@ class IntegratedRunner(unittest.TestCase):
         for hour, expected_open in ((5, True), (11, True), (17, True), (21, False)):
             with self.subTest(hour_et=hour), tempfile.TemporaryDirectory() as root:
                 now = datetime(2026, 3, 10, hour, 0, tzinfo=ny).timestamp()
+                expected_close = datetime(2026, 3, 10, 20, 0, tzinfo=ny).timestamp() if expected_open else now + 3600
                 config, limits, policy = load_config(SOURCE / "config.json")
                 config.update(regular_session_only=False, extended_hours_enabled=True)
                 config["sessions"]["extended_hours"] = True
@@ -270,6 +271,7 @@ class IntegratedRunner(unittest.TestCase):
                 self.assertIs(caught.exception, captured)
                 controller.assert_called_once()
                 self.assertIs(controller.call_args.kwargs["market_open"], expected_open)
+                self.assertEqual(controller.call_args.args[1], expected_close)
                 ledger.close.assert_called_once()
                 self.assertFalse((Path(root) / "state").exists())
 
