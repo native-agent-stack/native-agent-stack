@@ -37,7 +37,7 @@ POLICY, SOURCES, EVIDENCE, BUILDER = (load(name) for name in ("source_policy", "
 
 class CommittedLandscapeSetTests(unittest.TestCase):
     def test_every_committed_landscape_json_is_canonical_granted_or_excluded(self):
-        tracked = subprocess.run(["git", "ls-files", "-z", "--", "catalogs/landscape/*.json"], cwd=ROOT,
+        tracked = subprocess.run(["git", "ls-files", "-z", "--", ":(glob)catalogs/landscape/*.json"], cwd=ROOT,
                                  check=True, capture_output=True).stdout.decode().split("\0")
         manifest = json.loads((ROOT / "catalogs/landscape/manifest.json").read_text())
         policy = json.loads(POLICY_PATH.read_text())

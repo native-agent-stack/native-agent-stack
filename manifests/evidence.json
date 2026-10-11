@@ -60876,6 +60876,11 @@
       "bytes": 74274
     },
     {
+      "path": "tests/test_local_pages_architecture_landscape_exclusions.py",
+      "sha256": "1745816be2626185bbb451e6fb94c961e75c508406f21e58b32203114bb0c030",
+      "bytes": 11637
+    },
+    {
       "path": "tests/test_local_pages_fleet_regressions.py",
       "sha256": "4601bbba4a6c1cf04352a484670b1601b468e9aa879c8ac5f55eee6c3fd5dd94",
       "bytes": 20940
