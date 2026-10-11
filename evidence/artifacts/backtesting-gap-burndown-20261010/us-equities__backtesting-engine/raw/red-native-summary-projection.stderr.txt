@@ -1,0 +1,14 @@
+E
+======================================================================
+ERROR: test_projection_uses_existing_runner_public_summary_keys (tests.test_backtesting_gap_burndown.NativeSummaryTests.test_projection_uses_existing_runner_public_summary_keys)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/tests/test_backtesting_gap_burndown.py", line 22, in test_projection_uses_existing_runner_public_summary_keys
+    projected = module.project_result("cash-refusal", "4", "CASH", observed)
+                ^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'mechanics' has no attribute 'project_result'
+
+----------------------------------------------------------------------
+Ran 1 test in 0.009s
+
+FAILED (errors=1)

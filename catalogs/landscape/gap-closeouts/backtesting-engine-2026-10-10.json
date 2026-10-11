@@ -1,0 +1,450 @@
+{
+  "schema_version": 1,
+  "catalog": "us-equities",
+  "layer_id": "backtesting-engine",
+  "date": "2026-10-10",
+  "source_crosswalk_sha256": "bb354c43a6d318c26eaeb889baa30b8006c23a0f3de2e6dfc123d999ad1726b8",
+  "gaps": [
+    {
+      "index": 0,
+      "source_text_sha256": "d8b9300e15e6aab1aa28acf22fb888a84b1f09a79c2ca2331fd88523b1eecbd4",
+      "status": "residual",
+      "reason": "Accepted one_zero comparator and fresh native execution reproduce; frozen stress/margin/adaptive mappings remain blocked. Corrected current harness rerun on 2026-10-11 exits 0, with three completed cases and one native denial-backed expected refusal; primary results retained in the hashed attachment packet. Latest rerun also requires nonempty round-trip fills, per-fill configured fees and native cash reconciliation; all three completed cases satisfy them.",
+      "evidence": [
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/0-gap.json",
+          "sha256": "a65bdf91f576b0e6b0d7784f789075bfca924f95542fd614e34cc8916ba03c69"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-lean-data.json",
+          "sha256": "50cbfaf051740c3e66f879a4d3eae2287258ceb1a1986247b0ad833a599f32a4"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-lean-data.stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-lean-data.stdout.txt",
+          "sha256": "30ead7944782705cdadeabc70c07fff989aa6e30196acd619c581172fecab03f"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-lean-data.verdict.json",
+          "sha256": "8d6b96cc44f333c7f7d1216b23b5eb654100439566bcda0344034d4b215760f4"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/fresh-native-v2.json",
+          "sha256": "ae6850cb6d0a884b50222eb0a0c472e5733e86543c2d5606bae20de1d2d6d919"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/fresh-native-v2.stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/fresh-native-v2.stdout.txt",
+          "sha256": "bc2037387ab65a18b83fccd2a3a1dac7a0df5f0c38a5ad84ef0c9edbbe8e1462"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/fresh-native-v2.verdict.json",
+          "sha256": "5bc6896cf67e942bfcd65cf479c1793d167bcf98dd4e6d4a478321465f612599"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/native-replay-economic-summary.json",
+          "sha256": "f16fa2bf3f24eca7c935951e98e4bde297fff0c90458df4e32310473cbd15800"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/source-pins.json",
+          "sha256": "630b960079377d5da7c392e7802b69cdd848cd5859e807fe1775f9c7347f8314"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/native-fee-margin-mechanics-final-20261011.json",
+          "sha256": "7a80a3558b0a5092b13da5d7d35ad332fbf9729ae4912771c6f2cc2a47a30646"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/cc-micro-comparators.json",
+          "sha256": "955f3aea9e1408801f91fbd911f5487df9b8e3980159125889a8bba2ee4a84d9"
+        }
+      ],
+      "vendor_paths": [
+        {
+          "repository": "https://github.com/nautechsystems/nautilus_trader",
+          "pin": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+          "path": "python/nautilus_trader/backtest/__init__.pyi"
+        },
+        {
+          "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+          "pin": "8bffa2c41692ef483e91b68e3b15aeb331423d2c",
+          "path": "blueprints/us-equities/engine-nautilus/spy-parity/compare.py"
+        }
+      ],
+      "reviews": [],
+      "category": "executable_now"
+    },
+    {
+      "index": 1,
+      "source_text_sha256": "af57d3a526310f0826a65869555e234ea5ae2afa6e13820f5fbb7b359e4b64d6",
+      "status": "blocked",
+      "reason": "No retained authorized Alpaca action-window directory or quote payload on this host; no lane credential/acquisition authority. Upstream examples directory has no unchanged equity example. The requested acquisition/unchanged-example gate is not closed.",
+      "evidence": [
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/1-gap.json",
+          "sha256": "f5ad897392370a669844daee9decc0a2c795fb833a0674b50aa643cb0478d09f"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/source-pins.json",
+          "sha256": "630b960079377d5da7c392e7802b69cdd848cd5859e807fe1775f9c7347f8314"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/1-nautilus-alpaca-bars-corporate-actions.json",
+          "sha256": "040d950dc471c09d92a8b069e0feff8e48086788900a9e852d1563f301eef56f"
+        }
+      ],
+      "vendor_paths": [
+        {
+          "repository": "https://github.com/nautechsystems/nautilus_trader",
+          "pin": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+          "path": "python/nautilus_trader/backtest/__init__.pyi"
+        }
+      ],
+      "reviews": [],
+      "category": "executable_now"
+    },
+    {
+      "index": 2,
+      "source_text_sha256": "c56fa1e680668f955ac229ce7d3deb63076496c185c43b4eaee443b2c236740f",
+      "status": "proposed",
+      "reason": "Re-confirmation on receipt-v2 of the 2026-09-23 settlement; this run does not create a new closure. Official latest non-prerelease list and tag response retained; rc5 selection remains unchanged.",
+      "evidence": [
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/2-gap.json",
+          "sha256": "182280b79719010d158bdddbe1348fd49eb2a8a9dd9a7d3793437d50fa55ed4b"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/latest-nonprerelease.json",
+          "sha256": "03dceaeb71662d5b6af1bb3f565d992b9ef49ec04c9ff517d00533ac19583ec5"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/latest-nonprerelease.stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/latest-nonprerelease.stdout.txt",
+          "sha256": "08c0a56e019d59475364014b84cc7e28021a9dab659bbd1d163917a5abbd9281"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/source-pins.json",
+          "sha256": "630b960079377d5da7c392e7802b69cdd848cd5859e807fe1775f9c7347f8314"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/stable-release-tag.json",
+          "sha256": "c33fd600ae54845a359e7ebddc8defcbee0ed70d62e29164a9ba0978782aacbf"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/stable-release-tag.stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/stable-release-tag.stdout.txt",
+          "sha256": "89565ac18180a5b32f7ce4c4d408559ff5bff3e1b645b6c31064e8ed84447357"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/2-nautilus-latest-stable-release.json",
+          "sha256": "756b60ca85546619f9d83c34825c989df939f59022d701d772d49c703d6d0a18"
+        }
+      ],
+      "vendor_paths": [
+        {
+          "repository": "https://github.com/nautechsystems/nautilus_trader",
+          "pin": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+          "path": "python/nautilus_trader/backtest/__init__.pyi"
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "index": 4,
+      "source_text_sha256": "4d9e0b7274baa32b1f95765448df6b809224841affd1ec638a317bdf4e7bdcc2",
+      "status": "residual",
+      "reason": "12 TestCaseSource cases of CanSubmitOrderWhenOutsideRegularTradingHours pass, covering outside-regular-hours submission decisions only. Native paper adapter initialization and an accepted vendor dataset remain open.",
+      "evidence": [
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/4-gap.json",
+          "sha256": "56fb9f7faa2b99b74a83576c11cdc45bebcf4261046b1dc6349f6db1a273ef47"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/lean-alpaca-model-tests-py312.json",
+          "sha256": "b67cdc2667e67cb6206f2bfbc9e7f69022d0fcabd29eb13ebc68741edb8a4ecc"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/lean-alpaca-model-tests-py312.stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/lean-alpaca-model-tests-py312.stdout.txt",
+          "sha256": "27a8d8dae2607e7108ea0121f7ee2c6a17b9a536f3f9d130c926e332100f4ce4"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/lean-model-summary.json",
+          "sha256": "f7575be269316eb364d0810b75e586d339d0267d7982a58cb483cea1fbcae7d6"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/source-pins.json",
+          "sha256": "630b960079377d5da7c392e7802b69cdd848cd5859e807fe1775f9c7347f8314"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/lean-model-explicit-environment.json",
+          "sha256": "c4282050f7cebfbcab01a31eca294a0f10393396395394951d0f9573ea2fed85"
+        }
+      ],
+      "vendor_paths": [
+        {
+          "repository": "https://github.com/QuantConnect/Lean",
+          "pin": "985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+          "path": "Tests/Common/Brokerages/AlpacaBrokerageModelTests.cs"
+        }
+      ],
+      "reviews": [],
+      "category": "executable_now"
+    },
+    {
+      "index": 6,
+      "source_text_sha256": "3deee2ea0925dbe07d32fe371ca17ee2935a7d492691c125a52fbc5fc191f189",
+      "status": "proposed",
+      "reason": "Re-confirmation on receipt-v2 of the 2026-09-23 settlement; this run does not create a new closure. All comparator modes executed: accepted v2 lean-data PASS; bars/no-attribution refuse incomplete evidence. Historical review excerpt retained and hash-verified.",
+      "evidence": [
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/6-gap.json",
+          "sha256": "3fe9810ce3b578d67dee00369530dc9fd1e42cd4732d44d50d6ee8f9b46cd8f8"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-bars.json",
+          "sha256": "bfce474d33696af933b590263c973db23eda4f3a622f66a5091639361ac9e193"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-bars.stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-bars.stdout.txt",
+          "sha256": "1bf6de8ef712374c9fd44e46a925a961119f5c5fc0550dc1811fb7829bad6c8e"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-bars.verdict.json",
+          "sha256": "46e0757187c2dfc4891fd7f3930d871524647c3e5dae699d07f2e12fd833c896"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-lean-data.json",
+          "sha256": "50cbfaf051740c3e66f879a4d3eae2287258ceb1a1986247b0ad833a599f32a4"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-lean-data.stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-lean-data.stdout.txt",
+          "sha256": "30ead7944782705cdadeabc70c07fff989aa6e30196acd619c581172fecab03f"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-lean-data.verdict.json",
+          "sha256": "8d6b96cc44f333c7f7d1216b23b5eb654100439566bcda0344034d4b215760f4"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-no-attribution.json",
+          "sha256": "e465019c893384ec2342df0b6de2664b86344276f007b6db747854826024c6ea"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-no-attribution.stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-no-attribution.stdout.txt",
+          "sha256": "30a81b9456833a0a06e326e2a404b4c271dad43c4530e7aceb91c87a3eb8476d"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-no-attribution.verdict.json",
+          "sha256": "85cf9b96067b1b5437f725552c3dbfa584427f16a0767376a5fe02f32db735b5"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/local-parity-boundaries.json",
+          "sha256": "17fe906d28ee4c0277b548b5f2e93a90fea3ae6a285005eda4d29dce435c7d24"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/local-parity-boundaries.stderr.txt",
+          "sha256": "34e02cfc761216553c6b30eb7f6b50dececf449b699d7977ad25a905a1d0994d"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/local-parity-boundaries.stdout.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/review-excerpt-integrity.json",
+          "sha256": "6ac8e184b77a8818d9d4d981e9cb1738ba90120c102bb22f48933d97e8de6ef0"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/6-comparator-modes-and-review-count.json",
+          "sha256": "b8b166f0fedc19b65dd19424402911741a699f73a7028c28d6803863b8849957"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/cc-micro-comparators.json",
+          "sha256": "955f3aea9e1408801f91fbd911f5487df9b8e3980159125889a8bba2ee4a84d9"
+        }
+      ],
+      "vendor_paths": [
+        {
+          "repository": "https://github.com/nautechsystems/nautilus_trader",
+          "pin": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+          "path": "python/nautilus_trader/backtest/__init__.pyi"
+        },
+        {
+          "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+          "pin": "8bffa2c41692ef483e91b68e3b15aeb331423d2c",
+          "path": "blueprints/us-equities/engine-nautilus/spy-parity/compare.py"
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "index": 7,
+      "source_text_sha256": "a2d912c233c144a38fa69201959cbac0fd2ce68f53903c032ab6ed99faf8423b",
+      "status": "proposed",
+      "reason": "New proposed gap-7 closure; no matrix credit until same-head GPT and Claude PASS references exist. Retained accepted v2 one_zero comparator PASS with 106 native execution checks; fresh diagnostic reproduces native end cash 90734.08, distributions 428.64 and equal runs. Ending-cash delta to frozen LEAN is zero instead of -655.12; the fresh run does not reset the review gate.",
+      "evidence": [
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/7-gap.json",
+          "sha256": "9389eedae8f23d21f73d924d7cfc0a25a5f26ad397eb6f3d372062cb5aa01409"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-lean-data.json",
+          "sha256": "50cbfaf051740c3e66f879a4d3eae2287258ceb1a1986247b0ad833a599f32a4"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-lean-data.stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-lean-data.stdout.txt",
+          "sha256": "30ead7944782705cdadeabc70c07fff989aa6e30196acd619c581172fecab03f"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/accepted-v2-lean-data.verdict.json",
+          "sha256": "8d6b96cc44f333c7f7d1216b23b5eb654100439566bcda0344034d4b215760f4"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/fresh-native-v2.json",
+          "sha256": "ae6850cb6d0a884b50222eb0a0c472e5733e86543c2d5606bae20de1d2d6d919"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/fresh-native-v2.stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/fresh-native-v2.stdout.txt",
+          "sha256": "bc2037387ab65a18b83fccd2a3a1dac7a0df5f0c38a5ad84ef0c9edbbe8e1462"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/fresh-native-v2.verdict.json",
+          "sha256": "5bc6896cf67e942bfcd65cf479c1793d167bcf98dd4e6d4a478321465f612599"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/native-replay-economic-summary.json",
+          "sha256": "f16fa2bf3f24eca7c935951e98e4bde297fff0c90458df4e32310473cbd15800"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/native-spy-replay-2.json",
+          "sha256": "ea7a427c2b71a34783d1945b61a92b1071b17776279f12e183dd48ef3fea22ba"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/native-spy-replay-2.stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/native-spy-replay-2.stdout.txt",
+          "sha256": "0bfc77327c14652c5aac12099fb412179c051bbd1a8c628ba06d446d65f5afe9"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/source-pins.json",
+          "sha256": "630b960079377d5da7c392e7802b69cdd848cd5859e807fe1775f9c7347f8314"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/cc-micro-comparators.json",
+          "sha256": "955f3aea9e1408801f91fbd911f5487df9b8e3980159125889a8bba2ee4a84d9"
+        }
+      ],
+      "vendor_paths": [
+        {
+          "repository": "https://github.com/nautechsystems/nautilus_trader",
+          "pin": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+          "path": "python/nautilus_trader/backtest/__init__.pyi"
+        },
+        {
+          "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+          "pin": "8bffa2c41692ef483e91b68e3b15aeb331423d2c",
+          "path": "blueprints/us-equities/engine-nautilus/spy-parity/compare.py"
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "index": 8,
+      "source_text_sha256": "f2cd2409dd7a864b1cadb4f8e101e1fa81869c7e6bbc8c319e3e7ce0c69c8cd5",
+      "status": "blocked",
+      "reason": "No retained authorized AAPL quotes/action-window acquisition on this host. Existing native receipt demonstrates missing split/distribution treatment; synthetic quote fills cannot replace the historical-data gate.",
+      "evidence": [
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/8-gap.json",
+          "sha256": "a1dc984076bbcd385465b8e6c0e3ad3598722d0109b5072d8c8d9f945232702e"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/source-pins.json",
+          "sha256": "630b960079377d5da7c392e7802b69cdd848cd5859e807fe1775f9c7347f8314"
+        },
+        {
+          "path": "evidence/artifacts/gap-wave2-20260923/us-equities__backtesting-engine/8-aapl-action-window-replay.json",
+          "sha256": "4bfef89e0ec120257246aadc65210e58f9fc56d36e81f84b5e7b2e2ce00026b0"
+        }
+      ],
+      "vendor_paths": [
+        {
+          "repository": "https://github.com/nautechsystems/nautilus_trader",
+          "pin": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+          "path": "python/nautilus_trader/backtest/__init__.pyi"
+        }
+      ],
+      "reviews": [],
+      "category": "executable_now"
+    },
+    {
+      "index": 9,
+      "source_text_sha256": "62fcf6999e960825fd8e1c386485030c2e645e0cf7350b124d6522cb1067be73",
+      "status": "residual",
+      "reason": "Three configured native economic cases complete and the over-capacity CASH case has two native NOTIONAL_EXCEEDS_FREE_BALANCE OrderDenied events and no fills. Frozen fractional slippage/adaptive parity and calibrated depth remain unqualified. Corrected current harness rerun on 2026-10-11 exits 0, with three completed cases and one native denial-backed expected refusal; primary results retained in the hashed attachment packet. Latest rerun also requires nonempty round-trip fills, per-fill configured fees and native cash reconciliation; all three completed cases satisfy them.",
+      "evidence": [
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/9-gap.json",
+          "sha256": "763d6680197622287772bec877f0734db1c4d36cd223d5ee853e8c0bae018df1"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/source-pins.json",
+          "sha256": "630b960079377d5da7c392e7802b69cdd848cd5859e807fe1775f9c7347f8314"
+        },
+        {
+          "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/native-fee-margin-mechanics-final-20261011.json",
+          "sha256": "7a80a3558b0a5092b13da5d7d35ad332fbf9729ae4912771c6f2cc2a47a30646"
+        }
+      ],
+      "vendor_paths": [
+        {
+          "repository": "https://github.com/nautechsystems/nautilus_trader",
+          "pin": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+          "path": "python/nautilus_trader/backtest/__init__.pyi"
+        },
+        {
+          "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+          "pin": "8bffa2c41692ef483e91b68e3b15aeb331423d2c",
+          "path": "blueprints/us-equities/engine-nautilus/spy-parity/compare.py"
+        }
+      ],
+      "reviews": [],
+      "category": "executable_now"
+    }
+  ]
+}

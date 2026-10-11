@@ -1,0 +1,22 @@
+Traceback (most recent call last):
+  File "/repo/.venv/lib/python3.12/site-packages/nautilus_trader/analysis/reporter.py", line 38, in _require_pandas
+    import pandas as pd  # noqa: F401 (presence check)
+    ^^^^^^^^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'pandas'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/repo/blueprints/us-equities/engine-nautilus/spy-parity/run.py", line 908, in <module>
+    main()
+  File "/repo/blueprints/us-equities/engine-nautilus/spy-parity/run.py", line 750, in main
+    runs = [run_once(conversion["rows"], events, args.out / label, label)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/repo/blueprints/us-equities/engine-nautilus/spy-parity/run.py", line 591, in run_once
+    reports = {"account": engine.generate_account_report(venue=venue),
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/repo/.venv/lib/python3.12/site-packages/nautilus_trader/analysis/reporter.py", line 205, in generate_account_report
+    _require_pandas()
+  File "/repo/.venv/lib/python3.12/site-packages/nautilus_trader/analysis/reporter.py", line 40, in _require_pandas
+    raise ImportError(
+ImportError: pandas is required for report generation; install it with `pip install pandas`

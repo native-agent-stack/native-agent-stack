@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "id": "final-round-pre-citation-refresh-20261011",
+  "command": [
+    "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.venv/bin/python",
+    "-m",
+    "unittest",
+    "tests.test_backtesting_gap_burndown",
+    "tests.test_gap_closeouts",
+    "tests.test_component_matrix",
+    "tests.test_gap_wave_ledger",
+    "tests.test_new_host_grand_list",
+    "tests.test_host_receipts.OutputDigestBasisTests",
+    "tests.test_spy_parity",
+    "tests.test_nautilus_equity_replay"
+  ],
+  "started_utc": "2026-10-11T15:12:06Z",
+  "finished_utc": "2026-10-11T15:12:09Z",
+  "duration_seconds": 2.656,
+  "observed_exit_code": 1,
+  "input_hashes": [
+    {
+      "path": "tests/test_backtesting_gap_burndown.py",
+      "sha256": "76cd67fcb74ceadfbbc72a8490daba91554aef63517f2c4f8344696c14bbd78c"
+    },
+    {
+      "path": "blueprints/us-equities/backtesting-gap-burndown-20261010/execute_comparators.py",
+      "sha256": "e68c5eb4d024c12f91614365008fdda33d26beafb17fedf1cfec2e6dcd0f0bbc"
+    },
+    {
+      "path": "blueprints/us-equities/backtesting-gap-burndown-20261010/native_mechanics.py",
+      "sha256": "7909db7e8611c25ba98fee87000c79aea5c527301c0743c716bc706286b61096"
+    }
+  ],
+  "output": "{\"status\": \"checked\", \"counts\": {\"advanced\": 52, \"not_run\": 3, \"not_settled\": 5, \"settled\": 9}}\n{\"status\": \"checked\", \"counts\": {\"advanced\": 59, \"settled\": 10}}\n{\"evidence\": \"evidence/artifacts/hw-profiles/recorded-host-20260101/profile.json\", \"host_id\": \"recorded-host-20260101\", \"status\": \"recorded\"}\n{\"evidence\": \"evidence/artifacts/hw-profiles/recorded-host-20260101/profile.json\", \"host_id\": \"recorded-host-20260101\", \"status\": \"recorded\"}\n................................................................................E..............................................................................................................................................................................................................................................................................................\n======================================================================\nERROR: test_real_repository_outputs_are_current (tests.test_component_matrix.CheckFreshnessTests.test_real_repository_outputs_are_current)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/tests/test_component_matrix.py\", line 403, in test_real_repository_outputs_are_current\n    exit_code = cm.main([\"--root\", str(REPO_ROOT), \"--check\"])\n                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/scripts/component_matrix.py\", line 1376, in main\n    document, flip_violations = build_document(root)\n                                ^^^^^^^^^^^^^^^^^^^^\n  File \"~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/scripts/component_matrix.py\", line 1009, in build_document\n    gap_doc = current_gap_document(root, load_optional(root, GAP_CROSSWALK_FILE))\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/scripts/component_matrix.py\", line 333, in current_gap_document\n    verified(evidence[\"path\"], evidence[\"sha256\"], \"evidence\")\n  File \"~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/scripts/component_matrix.py\", line 296, in verified\n    require(hashlib.sha256(raw).hexdigest() == digest == record.get(\"sha256\")\n  File \"~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/scripts/catalog_decisions.py\", line 38, in require\n    raise InvalidDecisionIndex(message)\nscripts.catalog_decisions.InvalidDecisionIndex: changed evidence: evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/0-gap.json\n\n----------------------------------------------------------------------\nRan 367 tests in 2.407s\n\nFAILED (errors=1)\n",
+  "output_sha256": "f8d352bc0e98fb23a6ea27035e314f80b67d2c202efca9c24180dbfffe073a74",
+  "scope": "Post-registration, pre-citation-refresh run. Observed exit 1 with one stale nested closeout-to-gap hash error; retained as a failed run, not green acceptance. Numeric/artifact assertions and existing parity/runner tests ran; distinct from native execution."
+}

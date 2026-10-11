@@ -1,0 +1,362 @@
+{
+  "schema_version": 1,
+  "scope": "Economic and native denial projection of the retained mechanics-2 primary; no new native execution",
+  "primary_sha256": "7c5841a3aa4e4cecdf19812127457daa2daab2e7af86ec6139dac6ae3e63df37",
+  "projection_source_sha256": "8f9e8db00d8c8575e1d1a1a258144aa14bbf362c90c748de53cfa7b6f5513a6c",
+  "results": [
+    {
+      "id": "one-fixed-fee",
+      "status": "completed",
+      "native_end_cash": "90732.08",
+      "native_fees": "2.00",
+      "fills": [
+        {
+          "utc_seconds": 1577977200,
+          "quantity": 304,
+          "price": "323.5800",
+          "fee": "1.00",
+          "side": "BUY"
+        },
+        {
+          "utc_seconds": 1588255200,
+          "quantity": -304,
+          "price": "291.6900",
+          "fee": "1.00",
+          "side": "SELL"
+        }
+      ],
+      "order_events": [
+        {
+          "event": "OrderInitialized",
+          "ts_event_ns": 1577826000000000000,
+          "leg": "STOP_MARKET"
+        },
+        {
+          "event": "OrderInitialized",
+          "ts_event_ns": 1577826000000000000,
+          "leg": "MARKET_IF_TOUCHED"
+        },
+        {
+          "event": "OrderSubmitted",
+          "ts_event_ns": 1577826000000000000,
+          "leg": "STOP_MARKET"
+        },
+        {
+          "event": "OrderSubmitted",
+          "ts_event_ns": 1577826000000000000,
+          "leg": "MARKET_IF_TOUCHED"
+        },
+        {
+          "event": "OrderAccepted",
+          "ts_event_ns": 1577826000000000000,
+          "leg": "STOP_MARKET"
+        },
+        {
+          "event": "OrderAccepted",
+          "ts_event_ns": 1577826000000000000,
+          "leg": "MARKET_IF_TOUCHED"
+        },
+        {
+          "event": "OrderFilled",
+          "ts_event_ns": 1577977200000000000,
+          "leg": "STOP_MARKET"
+        },
+        {
+          "event": "OrderCanceled",
+          "ts_event_ns": 1577977200000000000,
+          "leg": "MARKET_IF_TOUCHED",
+          "reason": ""
+        },
+        {
+          "event": "OrderInitialized",
+          "ts_event_ns": 1588190400000000000,
+          "leg": "STOP_MARKET"
+        },
+        {
+          "event": "OrderInitialized",
+          "ts_event_ns": 1588190400000000000,
+          "leg": "MARKET_IF_TOUCHED"
+        },
+        {
+          "event": "OrderSubmitted",
+          "ts_event_ns": 1588190400000000000,
+          "leg": "STOP_MARKET"
+        },
+        {
+          "event": "OrderSubmitted",
+          "ts_event_ns": 1588190400000000000,
+          "leg": "MARKET_IF_TOUCHED"
+        },
+        {
+          "event": "OrderAccepted",
+          "ts_event_ns": 1588190400000000000,
+          "leg": "STOP_MARKET"
+        },
+        {
+          "event": "OrderAccepted",
+          "ts_event_ns": 1588190400000000000,
+          "leg": "MARKET_IF_TOUCHED"
+        },
+        {
+          "event": "OrderFilled",
+          "ts_event_ns": 1588255200000000000,
+          "leg": "STOP_MARKET"
+        },
+        {
+          "event": "OrderCanceled",
+          "ts_event_ns": 1588255200000000000,
+          "leg": "MARKET_IF_TOUCHED",
+          "reason": ""
+        }
+      ]
+    },
+    {
+      "id": "two-margin-zero",
+      "status": "completed",
+      "native_end_cash": "81468.16",
+      "native_fees": "0.00",
+      "fills": [
+        {
+          "utc_seconds": 1577977200,
+          "quantity": 608,
+          "price": "323.5800",
+          "fee": "0.00",
+          "side": "BUY"
+        },
+        {
+          "utc_seconds": 1588255200,
+          "quantity": -608,
+          "price": "291.6900",
+          "fee": "0.00",
+          "side": "SELL"
+        }
+      ],
+      "order_events": [
+        {
+          "event": "OrderInitialized",
+          "ts_event_ns": 1577826000000000000,
+          "leg": "STOP_MARKET"
+        },
+        {
+          "event": "OrderInitialized",
+          "ts_event_ns": 1577826000000000000,
+          "leg": "MARKET_IF_TOUCHED"
+        },
+        {
+          "event": "OrderSubmitted",
+          "ts_event_ns": 1577826000000000000,
+          "leg": "STOP_MARKET"
+        },
+        {
+          "event": "OrderSubmitted",
+          "ts_event_ns": 1577826000000000000,
+          "leg": "MARKET_IF_TOUCHED"
+        },
+        {
+          "event": "OrderAccepted",
+          "ts_event_ns": 1577826000000000000,
+          "leg": "STOP_MARKET"
+        },
+        {
+          "event": "OrderAccepted",
+          "ts_event_ns": 1577826000000000000,
+          "leg": "MARKET_IF_TOUCHED"
+        },
+        {
+          "event": "OrderFilled",
+          "ts_event_ns": 1577977200000000000,
+          "leg": "STOP_MARKET"
+        },
+        {
+          "event": "OrderCanceled",
+          "ts_event_ns": 1577977200000000000,
+          "leg": "MARKET_IF_TOUCHED",
+          "reason": ""
+        },
+        {
+          "event": "OrderInitialized",
+          "ts_event_ns": 1588190400000000000,
+          "leg": "STOP_MARKET"
+        },
+        {
+          "event": "OrderInitialized",
+          "ts_event_ns": 1588190400000000000,
+          "leg": "MARKET_IF_TOUCHED"
+        },
+        {
+          "event": "OrderSubmitted",
+          "ts_event_ns": 1588190400000000000,
+          "leg": "STOP_MARKET"
+        },
+        {
+          "event": "OrderSubmitted",
+          "ts_event_ns": 1588190400000000000,
+          "leg": "MARKET_IF_TOUCHED"
+        },
+        {
+          "event": "OrderAccepted",
+          "ts_event_ns": 1588190400000000000,
+          "leg": "STOP_MARKET"
+        },
+        {
+          "event": "OrderAccepted",
+          "ts_event_ns": 1588190400000000000,
+          "leg": "MARKET_IF_TOUCHED"
+        },
+        {
+          "event": "OrderFilled",
+          "ts_event_ns": 1588255200000000000,
+          "leg": "STOP_MARKET"
+        },
+        {
+          "event": "OrderCanceled",
+          "ts_event_ns": 1588255200000000000,
+          "leg": "MARKET_IF_TOUCHED",
+          "reason": ""
+        }
+      ]
+    },
+    {
+      "id": "two-margin-fixed-fee",
+      "status": "completed",
+      "native_end_cash": "81466.16",
+      "native_fees": "2.00",
+      "fills": [
+        {
+          "utc_seconds": 1577977200,
+          "quantity": 608,
+          "price": "323.5800",
+          "fee": "1.00",
+          "side": "BUY"
+        },
+        {
+          "utc_seconds": 1588255200,
+          "quantity": -608,
+          "price": "291.6900",
+          "fee": "1.00",
+          "side": "SELL"
+        }
+      ],
+      "order_events": [
+        {
+          "event": "OrderInitialized",
+          "ts_event_ns": 1577826000000000000,
+          "leg": "STOP_MARKET"
+        },
+        {
+          "event": "OrderInitialized",
+          "ts_event_ns": 1577826000000000000,
+          "leg": "MARKET_IF_TOUCHED"
+        },
+        {
+          "event": "OrderSubmitted",
+          "ts_event_ns": 1577826000000000000,
+          "leg": "STOP_MARKET"
+        },
+        {
+          "event": "OrderSubmitted",
+          "ts_event_ns": 1577826000000000000,
+          "leg": "MARKET_IF_TOUCHED"
+        },
+        {
+          "event": "OrderAccepted",
+          "ts_event_ns": 1577826000000000000,
+          "leg": "STOP_MARKET"
+        },
+        {
+          "event": "OrderAccepted",
+          "ts_event_ns": 1577826000000000000,
+          "leg": "MARKET_IF_TOUCHED"
+        },
+        {
+          "event": "OrderFilled",
+          "ts_event_ns": 1577977200000000000,
+          "leg": "STOP_MARKET"
+        },
+        {
+          "event": "OrderCanceled",
+          "ts_event_ns": 1577977200000000000,
+          "leg": "MARKET_IF_TOUCHED",
+          "reason": ""
+        },
+        {
+          "event": "OrderInitialized",
+          "ts_event_ns": 1588190400000000000,
+          "leg": "STOP_MARKET"
+        },
+        {
+          "event": "OrderInitialized",
+          "ts_event_ns": 1588190400000000000,
+          "leg": "MARKET_IF_TOUCHED"
+        },
+        {
+          "event": "OrderSubmitted",
+          "ts_event_ns": 1588190400000000000,
+          "leg": "STOP_MARKET"
+        },
+        {
+          "event": "OrderSubmitted",
+          "ts_event_ns": 1588190400000000000,
+          "leg": "MARKET_IF_TOUCHED"
+        },
+        {
+          "event": "OrderAccepted",
+          "ts_event_ns": 1588190400000000000,
+          "leg": "STOP_MARKET"
+        },
+        {
+          "event": "OrderAccepted",
+          "ts_event_ns": 1588190400000000000,
+          "leg": "MARKET_IF_TOUCHED"
+        },
+        {
+          "event": "OrderFilled",
+          "ts_event_ns": 1588255200000000000,
+          "leg": "STOP_MARKET"
+        },
+        {
+          "event": "OrderCanceled",
+          "ts_event_ns": 1588255200000000000,
+          "leg": "MARKET_IF_TOUCHED",
+          "reason": ""
+        }
+      ]
+    },
+    {
+      "id": "four-cash-refusal",
+      "status": "expected_refusal",
+      "native_end_cash": "100000.00",
+      "native_fees": "0",
+      "fills": [],
+      "order_events": [
+        {
+          "event": "OrderInitialized",
+          "ts_event_ns": 1577826000000000000,
+          "leg": "STOP_MARKET"
+        },
+        {
+          "event": "OrderInitialized",
+          "ts_event_ns": 1577826000000000000,
+          "leg": "MARKET_IF_TOUCHED"
+        },
+        {
+          "event": "OrderDenied",
+          "ts_event_ns": 1577826000000000000,
+          "leg": "STOP_MARKET",
+          "reason": "NOTIONAL_EXCEEDS_FREE_BALANCE: free=100000.00 USD, notional=391703.74 USD"
+        },
+        {
+          "event": "OrderDenied",
+          "ts_event_ns": 1577826000000000000,
+          "leg": "MARKET_IF_TOUCHED",
+          "reason": "NOTIONAL_EXCEEDS_FREE_BALANCE: free=100000.00 USD, notional=391703.50 USD"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Native generated identifiers omitted.",
+    "Three completed economic cases and one declared refusal verified against native OrderDenied events.",
+    "No frozen stress/adaptive, broker or trading-gate qualification."
+  ]
+}

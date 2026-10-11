@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "phase": "exact original reviewed production source with current boundary tests",
+  "source_head": "e957df3367ef32289254d5c946415fd92c02960c",
+  "observed_utc": "2026-10-11T06:50:03Z",
+  "command": "Load named production modules with git show e957df33:<path>; run the four named FailureBoundaryTests using the unchanged main() interfaces. No filesystem checkout or production mutation.",
+  "input_sha256": {
+    "blueprints/us-equities/backtesting-gap-burndown-20261010/native_mechanics.py": "92118c505ec2f962ffa9e86d4a647db09250dea548c818b3839e46d40a206cd0",
+    "blueprints/us-equities/backtesting-gap-burndown-20261010/execute_comparators.py": "98e04cde1dfb6ffe1884402f87e590309febafb989656d5ab4503acca908a532"
+  },
+  "test_file_sha256": "448bfa81a755a475af46cb842f05c80b20538ebd5b717039a29d527bf92798fb",
+  "observed_exit_code": 1,
+  "tests_run": 4,
+  "failures": [
+    {
+      "test": "test_projection_keyerror_makes_mechanics_command_fail (tests.test_backtesting_gap_burndown.FailureBoundaryTests.test_projection_keyerror_makes_mechanics_command_fail)",
+      "assertion": "AssertionError: 0 == 0 : projection KeyError must fail the command, never become a successful refusal"
+    },
+    {
+      "test": "test_missing_verdict_fails_even_when_wrapper_reports_expected_exit (tests.test_backtesting_gap_burndown.FailureBoundaryTests.test_missing_verdict_fails_even_when_wrapper_reports_expected_exit)",
+      "assertion": "AssertionError: 0 == 0 : missing verdict must fail independently of process exit"
+    },
+    {
+      "test": "test_wrong_refusal_check_set_fails (tests.test_backtesting_gap_burndown.FailureBoundaryTests.test_wrong_refusal_check_set_fails)",
+      "assertion": "AssertionError: 0 == 0 : only the declared check ids qualify as expected refusal"
+    },
+    {
+      "test": "test_refusal_requires_native_denial_events (tests.test_backtesting_gap_burndown.FailureBoundaryTests.test_refusal_requires_native_denial_events)",
+      "assertion": "AssertionError: ValueError not raised"
+    }
+  ],
+  "errors": [],
+  "evidence_class": "synthetic boundary tests; original production defect reproduced"
+}

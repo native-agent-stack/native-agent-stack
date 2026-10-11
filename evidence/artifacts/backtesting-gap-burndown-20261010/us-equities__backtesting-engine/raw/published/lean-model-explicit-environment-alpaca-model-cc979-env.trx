@@ -1,0 +1,138 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="[redacted]" name="[MACHINE]" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-10-11T02:46:47.6228936-04:00" queuing="2026-10-11T02:46:47.6228937-04:00" start="2026-10-11T02:46:41.7479692-04:00" finish="2026-10-11T02:46:47.8099333-04:00" />
+  <TestSettings name="default" id="[redacted]">
+    <Deployment runDeploymentRoot="[MACHINE]" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="[redacted]" testId="[redacted]" testName="CanSubmitOrderWhenOutsideRegularTradingHours(Limit,QuantConnect.Orders.TimeInForces.GoodTilCanceledTimeInForce,False)" computerName="[MACHINE]" duration="00:00:00.0000470" startTime="2026-10-11T02:46:47.5778367-04:00" endTime="2026-10-11T02:46:47.5778838-04:00" testType="[redacted]" outcome="Passed" testListId="[redacted]" relativeResultsDirectory="[redacted]" />
+    <UnitTestResult executionId="[redacted]" testId="[redacted]" testName="CanSubmitOrderWhenOutsideRegularTradingHours(StopLimit,QuantConnect.Orders.TimeInForces.DayTimeInForce,False)" computerName="[MACHINE]" duration="00:00:00.0000550" startTime="2026-10-11T02:46:47.5777162-04:00" endTime="2026-10-11T02:46:47.5777707-04:00" testType="[redacted]" outcome="Passed" testListId="[redacted]" relativeResultsDirectory="[redacted]" />
+    <UnitTestResult executionId="[redacted]" testId="[redacted]" testName="CanSubmitOrderWhenOutsideRegularTradingHours(Market,QuantConnect.Orders.TimeInForces.GoodTilDateTimeInForce,False)" computerName="[MACHINE]" duration="00:00:00.0006930" startTime="2026-10-11T02:46:47.5769260-04:00" endTime="2026-10-11T02:46:47.5776186-04:00" testType="[redacted]" outcome="Passed" testListId="[redacted]" relativeResultsDirectory="[redacted]" />
+    <UnitTestResult executionId="[redacted]" testId="[redacted]" testName="CanSubmitOrderWhenOutsideRegularTradingHours(StopMarket,QuantConnect.Orders.TimeInForces.DayTimeInForce,False)" computerName="[MACHINE]" duration="00:00:00.0006640" startTime="2026-10-11T02:46:47.5769677-04:00" endTime="2026-10-11T02:46:47.5776318-04:00" testType="[redacted]" outcome="Passed" testListId="[redacted]" relativeResultsDirectory="[redacted]" />
+    <UnitTestResult executionId="[redacted]" testId="[redacted]" testName="CanSubmitOrderWhenOutsideRegularTradingHours(StopLimit,QuantConnect.Orders.TimeInForces.GoodTilDateTimeInForce,False)" computerName="[MACHINE]" duration="00:00:00.0000510" startTime="2026-10-11T02:46:47.5777787-04:00" endTime="2026-10-11T02:46:47.5778294-04:00" testType="[redacted]" outcome="Passed" testListId="[redacted]" relativeResultsDirectory="[redacted]" />
+    <UnitTestResult executionId="[redacted]" testId="[redacted]" testName="CanSubmitOrderWhenOutsideRegularTradingHours(StopLimit,QuantConnect.Orders.TimeInForces.GoodTilCanceledTimeInForce,False)" computerName="[MACHINE]" duration="00:00:00.0000540" startTime="2026-10-11T02:46:47.5777264-04:00" endTime="2026-10-11T02:46:47.5777804-04:00" testType="[redacted]" outcome="Passed" testListId="[redacted]" relativeResultsDirectory="[redacted]" />
+    <UnitTestResult executionId="[redacted]" testId="[redacted]" testName="CanSubmitOrderWhenOutsideRegularTradingHours(Market,QuantConnect.Orders.TimeInForces.GoodTilCanceledTimeInForce,False)" computerName="[MACHINE]" duration="00:00:00.0195420" startTime="2026-10-11T02:46:47.5559489-04:00" endTime="2026-10-11T02:46:47.5753582-04:00" testType="[redacted]" outcome="Passed" testListId="[redacted]" relativeResultsDirectory="[redacted]" />
+    <UnitTestResult executionId="[redacted]" testId="[redacted]" testName="CanSubmitOrderWhenOutsideRegularTradingHours(StopMarket,QuantConnect.Orders.TimeInForces.GoodTilCanceledTimeInForce,False)" computerName="[MACHINE]" duration="00:00:00.0000720" startTime="2026-10-11T02:46:47.5776351-04:00" endTime="2026-10-11T02:46:47.5777074-04:00" testType="[redacted]" outcome="Passed" testListId="[redacted]" relativeResultsDirectory="[redacted]" />
+    <UnitTestResult executionId="[redacted]" testId="[redacted]" testName="CanSubmitOrderWhenOutsideRegularTradingHours(StopMarket,QuantConnect.Orders.TimeInForces.GoodTilDateTimeInForce,False)" computerName="[MACHINE]" duration="00:00:00.0000749" startTime="2026-10-11T02:46:47.5776419-04:00" endTime="2026-10-11T02:46:47.5777169-04:00" testType="[redacted]" outcome="Passed" testListId="[redacted]" relativeResultsDirectory="[redacted]" />
+    <UnitTestResult executionId="[redacted]" testId="[redacted]" testName="CanSubmitOrderWhenOutsideRegularTradingHours(Limit,QuantConnect.Orders.TimeInForces.DayTimeInForce,True)" computerName="[MACHINE]" duration="00:00:00.0009800" startTime="2026-10-11T02:46:47.5777887-04:00" endTime="2026-10-11T02:46:47.5787688-04:00" testType="[redacted]" outcome="Passed" testListId="[redacted]" relativeResultsDirectory="[redacted]" />
+    <UnitTestResult executionId="[redacted]" testId="[redacted]" testName="CanSubmitOrderWhenOutsideRegularTradingHours(Limit,QuantConnect.Orders.TimeInForces.GoodTilDateTimeInForce,False)" computerName="[MACHINE]" duration="00:00:00.0000510" startTime="2026-10-11T02:46:47.5778910-04:00" endTime="2026-10-11T02:46:47.5779420-04:00" testType="[redacted]" outcome="Passed" testListId="[redacted]" relativeResultsDirectory="[redacted]" />
+    <UnitTestResult executionId="[redacted]" testId="[redacted]" testName="CanSubmitOrderWhenOutsideRegularTradingHours(Market,QuantConnect.Orders.TimeInForces.DayTimeInForce,False)" computerName="[MACHINE]" duration="00:00:00.0195240" startTime="2026-10-11T02:46:47.5559478-04:00" endTime="2026-10-11T02:46:47.5753462-04:00" testType="[redacted]" outcome="Passed" testListId="[redacted]" relativeResultsDirectory="[redacted]" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="CanSubmitOrderWhenOutsideRegularTradingHours(StopMarket,QuantConnect.Orders.TimeInForces.GoodTilCanceledTimeInForce,False)" storage="~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/lean-985ef30/tests/bin/debug/quantconnect.tests.dll" id="[redacted]">
+      <Execution id="[redacted]" />
+      <TestMethod codeBase="~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/lean-985ef30/Tests/bin/Debug/QuantConnect.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="QuantConnect.Tests.Common.Brokerages.AlpacaBrokerageModelTests" name="CanSubmitOrderWhenOutsideRegularTradingHours(StopMarket,QuantConnect.Orders.TimeInForces.GoodTilCanceledTimeInForce,False)" />
+    </UnitTest>
+    <UnitTest name="CanSubmitOrderWhenOutsideRegularTradingHours(Limit,QuantConnect.Orders.TimeInForces.DayTimeInForce,True)" storage="~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/lean-985ef30/tests/bin/debug/quantconnect.tests.dll" id="[redacted]">
+      <Execution id="[redacted]" />
+      <TestMethod codeBase="~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/lean-985ef30/Tests/bin/Debug/QuantConnect.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="QuantConnect.Tests.Common.Brokerages.AlpacaBrokerageModelTests" name="CanSubmitOrderWhenOutsideRegularTradingHours(Limit,QuantConnect.Orders.TimeInForces.DayTimeInForce,True)" />
+    </UnitTest>
+    <UnitTest name="CanSubmitOrderWhenOutsideRegularTradingHours(Market,QuantConnect.Orders.TimeInForces.GoodTilDateTimeInForce,False)" storage="~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/lean-985ef30/tests/bin/debug/quantconnect.tests.dll" id="[redacted]">
+      <Execution id="[redacted]" />
+      <TestMethod codeBase="~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/lean-985ef30/Tests/bin/Debug/QuantConnect.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="QuantConnect.Tests.Common.Brokerages.AlpacaBrokerageModelTests" name="CanSubmitOrderWhenOutsideRegularTradingHours(Market,QuantConnect.Orders.TimeInForces.GoodTilDateTimeInForce,False)" />
+    </UnitTest>
+    <UnitTest name="CanSubmitOrderWhenOutsideRegularTradingHours(StopMarket,QuantConnect.Orders.TimeInForces.GoodTilDateTimeInForce,False)" storage="~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/lean-985ef30/tests/bin/debug/quantconnect.tests.dll" id="[redacted]">
+      <Execution id="[redacted]" />
+      <TestMethod codeBase="~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/lean-985ef30/Tests/bin/Debug/QuantConnect.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="QuantConnect.Tests.Common.Brokerages.AlpacaBrokerageModelTests" name="CanSubmitOrderWhenOutsideRegularTradingHours(StopMarket,QuantConnect.Orders.TimeInForces.GoodTilDateTimeInForce,False)" />
+    </UnitTest>
+    <UnitTest name="CanSubmitOrderWhenOutsideRegularTradingHours(Limit,QuantConnect.Orders.TimeInForces.GoodTilDateTimeInForce,False)" storage="~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/lean-985ef30/tests/bin/debug/quantconnect.tests.dll" id="[redacted]">
+      <Execution id="[redacted]" />
+      <TestMethod codeBase="~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/lean-985ef30/Tests/bin/Debug/QuantConnect.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="QuantConnect.Tests.Common.Brokerages.AlpacaBrokerageModelTests" name="CanSubmitOrderWhenOutsideRegularTradingHours(Limit,QuantConnect.Orders.TimeInForces.GoodTilDateTimeInForce,False)" />
+    </UnitTest>
+    <UnitTest name="CanSubmitOrderWhenOutsideRegularTradingHours(StopLimit,QuantConnect.Orders.TimeInForces.GoodTilCanceledTimeInForce,False)" storage="~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/lean-985ef30/tests/bin/debug/quantconnect.tests.dll" id="[redacted]">
+      <Execution id="[redacted]" />
+      <TestMethod codeBase="~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/lean-985ef30/Tests/bin/Debug/QuantConnect.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="QuantConnect.Tests.Common.Brokerages.AlpacaBrokerageModelTests" name="CanSubmitOrderWhenOutsideRegularTradingHours(StopLimit,QuantConnect.Orders.TimeInForces.GoodTilCanceledTimeInForce,False)" />
+    </UnitTest>
+    <UnitTest name="CanSubmitOrderWhenOutsideRegularTradingHours(StopMarket,QuantConnect.Orders.TimeInForces.DayTimeInForce,False)" storage="~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/lean-985ef30/tests/bin/debug/quantconnect.tests.dll" id="[redacted]">
+      <Execution id="[redacted]" />
+      <TestMethod codeBase="~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/lean-985ef30/Tests/bin/Debug/QuantConnect.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="QuantConnect.Tests.Common.Brokerages.AlpacaBrokerageModelTests" name="CanSubmitOrderWhenOutsideRegularTradingHours(StopMarket,QuantConnect.Orders.TimeInForces.DayTimeInForce,False)" />
+    </UnitTest>
+    <UnitTest name="CanSubmitOrderWhenOutsideRegularTradingHours(Market,QuantConnect.Orders.TimeInForces.GoodTilCanceledTimeInForce,False)" storage="~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/lean-985ef30/tests/bin/debug/quantconnect.tests.dll" id="[redacted]">
+      <Execution id="[redacted]" />
+      <TestMethod codeBase="~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/lean-985ef30/Tests/bin/Debug/QuantConnect.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="QuantConnect.Tests.Common.Brokerages.AlpacaBrokerageModelTests" name="CanSubmitOrderWhenOutsideRegularTradingHours(Market,QuantConnect.Orders.TimeInForces.GoodTilCanceledTimeInForce,False)" />
+    </UnitTest>
+    <UnitTest name="CanSubmitOrderWhenOutsideRegularTradingHours(Limit,QuantConnect.Orders.TimeInForces.GoodTilCanceledTimeInForce,False)" storage="~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/lean-985ef30/tests/bin/debug/quantconnect.tests.dll" id="[redacted]">
+      <Execution id="[redacted]" />
+      <TestMethod codeBase="~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/lean-985ef30/Tests/bin/Debug/QuantConnect.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="QuantConnect.Tests.Common.Brokerages.AlpacaBrokerageModelTests" name="CanSubmitOrderWhenOutsideRegularTradingHours(Limit,QuantConnect.Orders.TimeInForces.GoodTilCanceledTimeInForce,False)" />
+    </UnitTest>
+    <UnitTest name="CanSubmitOrderWhenOutsideRegularTradingHours(Market,QuantConnect.Orders.TimeInForces.DayTimeInForce,False)" storage="~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/lean-985ef30/tests/bin/debug/quantconnect.tests.dll" id="[redacted]">
+      <Execution id="[redacted]" />
+      <TestMethod codeBase="~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/lean-985ef30/Tests/bin/Debug/QuantConnect.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="QuantConnect.Tests.Common.Brokerages.AlpacaBrokerageModelTests" name="CanSubmitOrderWhenOutsideRegularTradingHours(Market,QuantConnect.Orders.TimeInForces.DayTimeInForce,False)" />
+    </UnitTest>
+    <UnitTest name="CanSubmitOrderWhenOutsideRegularTradingHours(StopLimit,QuantConnect.Orders.TimeInForces.DayTimeInForce,False)" storage="~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/lean-985ef30/tests/bin/debug/quantconnect.tests.dll" id="[redacted]">
+      <Execution id="[redacted]" />
+      <TestMethod codeBase="~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/lean-985ef30/Tests/bin/Debug/QuantConnect.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="QuantConnect.Tests.Common.Brokerages.AlpacaBrokerageModelTests" name="CanSubmitOrderWhenOutsideRegularTradingHours(StopLimit,QuantConnect.Orders.TimeInForces.DayTimeInForce,False)" />
+    </UnitTest>
+    <UnitTest name="CanSubmitOrderWhenOutsideRegularTradingHours(StopLimit,QuantConnect.Orders.TimeInForces.GoodTilDateTimeInForce,False)" storage="~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/lean-985ef30/tests/bin/debug/quantconnect.tests.dll" id="[redacted]">
+      <Execution id="[redacted]" />
+      <TestMethod codeBase="~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/lean-985ef30/Tests/bin/Debug/QuantConnect.Tests.dll" adapterTypeName="executor://nunit3testexecutor/" className="QuantConnect.Tests.Common.Brokerages.AlpacaBrokerageModelTests" name="CanSubmitOrderWhenOutsideRegularTradingHours(StopLimit,QuantConnect.Orders.TimeInForces.GoodTilDateTimeInForce,False)" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="[redacted]" executionId="[redacted]" testListId="[redacted]" />
+    <TestEntry testId="[redacted]" executionId="[redacted]" testListId="[redacted]" />
+    <TestEntry testId="[redacted]" executionId="[redacted]" testListId="[redacted]" />
+    <TestEntry testId="[redacted]" executionId="[redacted]" testListId="[redacted]" />
+    <TestEntry testId="[redacted]" executionId="[redacted]" testListId="[redacted]" />
+    <TestEntry testId="[redacted]" executionId="[redacted]" testListId="[redacted]" />
+    <TestEntry testId="[redacted]" executionId="[redacted]" testListId="[redacted]" />
+    <TestEntry testId="[redacted]" executionId="[redacted]" testListId="[redacted]" />
+    <TestEntry testId="[redacted]" executionId="[redacted]" testListId="[redacted]" />
+    <TestEntry testId="[redacted]" executionId="[redacted]" testListId="[redacted]" />
+    <TestEntry testId="[redacted]" executionId="[redacted]" testListId="[redacted]" />
+    <TestEntry testId="[redacted]" executionId="[redacted]" testListId="[redacted]" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="[redacted]" />
+    <TestList name="All Loaded Results" id="[redacted]" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="12" executed="12" passed="12" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>NUnit Adapter 4.6.0.0: Test execution started
+Running selected tests in ~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/lean-985ef30/Tests/bin/Debug/QuantConnect.Tests.dll
+20261011 06:46:42.369 TRACE:: Composer(): Loading Assemblies from ~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/lean-985ef30/Tests/bin/Debug/
+20261011 06:46:44.423 TRACE:: PythonInitializer.Initialize(): start...
+PythonEngine.Initialize(): clr GetManifestResourceStream...
+20261011 06:46:44.630 TRACE:: PythonInitializer.Initialize(): ended
+20261011 06:46:46.350 TRACE:: Extensions.IsDirectoryEmpty(): directory '../../../Data/equity/sgx/map_files' not found or empty
+20261011 06:46:46.351 ERROR:: LocalDiskMapFileProvider.GetMapFileResolver(sgx): The specified directory does not exist: ../../../Data/equity/sgx/map_files
+20261011 06:46:46.593 TRACE:: Extensions.IsDirectoryEmpty(): directory '../../../Data/equity/oanda/map_files' not found or empty
+20261011 06:46:46.593 TRACE:: Extensions.IsDirectoryEmpty(): directory '../../../Data/equity/fxcm/map_files' not found or empty
+20261011 06:46:46.593 TRACE:: Extensions.IsDirectoryEmpty(): directory '../../../Data/equity/dukascopy/map_files' not found or empty
+20261011 06:46:46.593 TRACE:: Extensions.IsDirectoryEmpty(): directory '../../../Data/equity/bitfinex/map_files' not found or empty
+20261011 06:46:46.594 TRACE:: Extensions.IsDirectoryEmpty(): directory '../../../Data/equity/cmeglobex/map_files' not found or empty
+20261011 06:46:46.594 TRACE:: Extensions.IsDirectoryEmpty(): directory '../../../Data/equity/nymex/map_files' not found or empty
+20261011 06:46:46.594 TRACE:: Extensions.IsDirectoryEmpty(): directory '../../../Data/equity/cbot/map_files' not found or empty
+20261011 06:46:46.594 TRACE:: Extensions.IsDirectoryEmpty(): directory '../../../Data/equity/ice/map_files' not found or empty
+20261011 06:46:46.594 TRACE:: Extensions.IsDirectoryEmpty(): directory '../../../Data/equity/cboe/map_files' not found or empty
+20261011 06:46:46.594 TRACE:: Extensions.IsDirectoryEmpty(): directory '../../../Data/equity/cfe/map_files' not found or empty
+20261011 06:46:46.594 TRACE:: Extensions.IsDirectoryEmpty(): directory '../../../Data/equity/comex/map_files' not found or empty
+20261011 06:46:46.594 TRACE:: Extensions.IsDirectoryEmpty(): directory '../../../Data/equity/cme/map_files' not found or empty
+20261011 06:46:46.594 TRACE:: Extensions.IsDirectoryEmpty(): directory '../../../Data/equity/eurex/map_files' not found or empty
+20261011 06:46:46.595 TRACE:: Extensions.IsDirectoryEmpty(): directory '../../../Data/equity/hkfe/map_files' not found or empty
+20261011 06:46:46.595 TRACE:: Extensions.IsDirectoryEmpty(): directory '../../../Data/equity/ose/map_files' not found or empty
+20261011 06:46:46.595 TRACE:: Extensions.IsDirectoryEmpty(): directory '../../../Data/equity/nyseliffe/map_files' not found or empty
+20261011 06:46:46.595 TRACE:: Extensions.IsDirectoryEmpty(): directory '../../../Data/equity/coinbase/map_files' not found or empty
+20261011 06:46:46.595 TRACE:: Extensions.IsDirectoryEmpty(): directory '../../../Data/equity/kraken/map_files' not found or empty
+20261011 06:46:46.595 TRACE:: Extensions.IsDirectoryEmpty(): directory '../../../Data/equity/bitstamp/map_files' not found or empty
+20261011 06:46:46.595 TRACE:: Extensions.IsDirectoryEmpty(): directory '../../../Data/equity/okcoin/map_files' not found or empty
+20261011 06:46:46.595 TRACE:: Extensions.IsDirectoryEmpty(): directory '../../../Data/equity/bithumb/map_files' not found or empty
+20261011 06:46:46.595 TRACE:: Extensions.IsDirectoryEmpty(): directory '../../../Data/equity/binance/map_files' not found or empty
+20261011 06:46:46.596 TRACE:: Extensions.IsDirectoryEmpty(): directory '../../../Data/equity/poloniex/map_files' not found or empty
+20261011 06:46:46.596 TRACE:: Extensions.IsDirectoryEmpty(): directory '../../../Data/equity/coinone/map_files' not found or empty
+20261011 06:46:46.596 TRACE:: Extensions.IsDirectoryEmpty(): directory '../../../Data/equity/hitbtc/map_files' not found or empty
+20261011 06:46:46.596 TRACE:: Extensions.IsDirectoryEmpty(): directory '../../../Data/equity/bittrex/map_files' not found or empty
+20261011 06:46:46.596 TRACE:: Extensions.IsDirectoryEmpty(): directory '../../../Data/equity/ftx/map_files' not found or empty
+20261011 06:46:46.596 TRACE:: Extensions.IsDirectoryEmpty(): directory '../../../Data/equity/ftxus/map_files' not found or empty
+20261011 06:46:46.596 TRACE:: Extensions.IsDirectoryEmpty(): directory '../../../Data/equity/binanceus/map_files' not found or empty
+20261011 06:46:46.597 TRACE:: Extensions.IsDirectoryEmpty(): directory '../../../Data/equity/bybit/map_files' not found or empty
+20261011 06:46:46.597 TRACE:: Extensions.IsDirectoryEmpty(): directory '../../../Data/equity/interactivebrokers/map_files' not found or empty
+20261011 06:46:46.597 TRACE:: Extensions.IsDirectoryEmpty(): directory '../../../Data/equity/dydx/map_files' not found or empty
+20261011 06:46:46.597 TRACE:: Extensions.IsDirectoryEmpty(): directory '../../../Data/equity/krx/map_files' not found or empty
+   NUnit3TestExecutor discovered 12 of 12 NUnit test cases using Current Discovery mode, Non-Explicit run
+NUnit Adapter 4.6.0.0: Test execution complete
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

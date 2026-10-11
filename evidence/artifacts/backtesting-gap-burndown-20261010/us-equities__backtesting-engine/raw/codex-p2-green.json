@@ -1,0 +1,62 @@
+{
+  "observed_utc": "2026-10-11T08:56:49Z",
+  "input_hashes": {
+    "tests/test_backtesting_gap_burndown.py": "f88867d4a0a1e0229fa02e65fbe69b634c7837041d497698f41475aea73e0c16",
+    "blueprints/us-equities/backtesting-gap-burndown-20261010/execute_comparators.py": "fc490e7427cf9e2f45744ea234aa106430169af240b2dd8d2ce7d7adc2f12a5a",
+    "blueprints/us-equities/backtesting-gap-burndown-20261010/native_mechanics.py": "8f9e8db00d8c8575e1d1a1a258144aa14bbf362c90c748de53cfa7b6f5513a6c",
+    "catalogs/landscape/gap-closeouts/backtesting-engine-2026-10-10.json": "b1cf8256bb2f6e2b92f872739ab50092635550cb122f7f1491bb78131e2eb4a4"
+  },
+  "runs": [
+    {
+      "command": [
+        ".runtime/cc979-ci/bin/python",
+        "-m",
+        "unittest",
+        "tests.test_backtesting_gap_burndown",
+        "tests.test_gap_closeouts",
+        "tests.test_component_matrix",
+        "tests.test_new_host_grand_list"
+      ],
+      "observed_exit_code": 0,
+      "output": "{\"evidence\": \"evidence/artifacts/hw-profiles/recorded-host-20260101/profile.json\", \"host_id\": \"recorded-host-20260101\", \"status\": \"recorded\"}\n{\"evidence\": \"evidence/artifacts/hw-profiles/recorded-host-20260101/profile.json\", \"host_id\": \"recorded-host-20260101\", \"status\": \"recorded\"}\n...................................................................................................................................................\n----------------------------------------------------------------------\nRan 147 tests in 1.766s\n\nOK\n",
+      "output_sha256": "02ee9bd689af5951d070beb274a6e0576d83ca85c63aad3c6ecbd56b154a84e0",
+      "output_digest_basis": "published_bytes"
+    },
+    {
+      "command": [
+        ".runtime/cc979-ci/bin/python",
+        "-m",
+        "unittest",
+        "tests.test_spy_parity",
+        "tests.test_nautilus_equity_replay"
+      ],
+      "observed_exit_code": 0,
+      "output": "...........................................................................................................................................................................................\n----------------------------------------------------------------------\nRan 187 tests in 0.170s\n\nOK\n",
+      "output_sha256": "29492d9f3521792d89509debdb7ca150c3434ae1b8abe97c15fd332cf7d8748e",
+      "output_digest_basis": "published_bytes"
+    },
+    {
+      "command": [
+        ".runtime/cc979-ci/bin/python",
+        "scripts/component_matrix.py",
+        "--check"
+      ],
+      "observed_exit_code": 0,
+      "output": "{\"rows\": 32, \"status\": \"checked\"}\n",
+      "output_sha256": "08ce4f275c99b7f91a141cfca5b7384f060aacf620f23a324cde692d55e6ffcd",
+      "output_digest_basis": "published_bytes"
+    },
+    {
+      "command": [
+        ".runtime/cc979-ci/bin/python",
+        "scripts/new_host_grand_list.py",
+        "--check"
+      ],
+      "observed_exit_code": 0,
+      "output": "{\"status\": \"passed\", \"layers\": 32, \"winners\": 66}\n",
+      "output_sha256": "63d8d8221f6c7c051149b1405ef5de7623dbb2d37257fad49a8a774b02d49226",
+      "output_digest_basis": "published_bytes"
+    }
+  ],
+  "scope": "Focused touched/shared loader tests, existing parity fixtures and supported generator checks; no full test discovery"
+}

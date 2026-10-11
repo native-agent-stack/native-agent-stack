@@ -1,0 +1,41 @@
+{
+  "scope": "native configured fee/margin/refusal diagnostics on retained bundled SPY",
+  "qualifies_frozen_stress_case": false,
+  "results": [
+    {
+      "id": "one-fixed-fee",
+      "status": "completed",
+      "target": "1",
+      "account_type": "CASH",
+      "native_end_cash": "90732.08",
+      "native_fees": "2.00"
+    },
+    {
+      "id": "two-margin-zero",
+      "status": "completed",
+      "target": "2",
+      "account_type": "MARGIN",
+      "native_end_cash": "81468.16",
+      "native_fees": "0.00"
+    },
+    {
+      "id": "two-margin-fixed-fee",
+      "status": "completed",
+      "target": "2",
+      "account_type": "MARGIN",
+      "native_end_cash": "81466.16",
+      "native_fees": "2.00"
+    },
+    {
+      "id": "four-cash-refusal",
+      "status": "completed",
+      "target": "4",
+      "account_type": "CASH",
+      "native_end_cash": "100000.00",
+      "native_fees": "0"
+    }
+  ],
+  "slippage_fraction_mapped": false,
+  "adaptive_state_implemented": false,
+  "calibrated_liquidity": false
+}

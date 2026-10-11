@@ -1,0 +1,50 @@
+{
+  "id": "backtesting-gap-burndown-20261010/backtesting-engine/4",
+  "source_revision": "92bb279a09877e7add057272babbfc78a4d4ef3f",
+  "gap_refs": [
+    4
+  ],
+  "gap_index": 4,
+  "gap_text_sha256": "4d9e0b7274baa32b1f95765448df6b809224841affd1ec638a317bdf4e7bdcc2",
+  "outcome": "advanced",
+  "settles_gap": "partially",
+  "review_status": "proposed; shared closeout record governs review credit",
+  "evidence_class": "native_proven",
+  "result": "12 TestCaseSource cases of CanSubmitOrderWhenOutsideRegularTradingHours pass, covering outside-regular-hours submission decisions only. Native paper adapter initialization and an accepted vendor dataset remain open.",
+  "raw_outputs": [
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/lean-alpaca-model-tests-py312.json",
+      "sha256": "b67cdc2667e67cb6206f2bfbc9e7f69022d0fcabd29eb13ebc68741edb8a4ecc"
+    },
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/lean-alpaca-model-tests-py312.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/lean-alpaca-model-tests-py312.stdout.txt",
+      "sha256": "27a8d8dae2607e7108ea0121f7ee2c6a17b9a536f3f9d130c926e332100f4ce4"
+    },
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/lean-model-summary.json",
+      "sha256": "f7575be269316eb364d0810b75e586d339d0267d7982a58cb483cea1fbcae7d6"
+    },
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/source-pins.json",
+      "sha256": "630b960079377d5da7c392e7802b69cdd848cd5859e807fe1775f9c7347f8314"
+    },
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/lean-model-explicit-environment.json",
+      "sha256": "c4282050f7cebfbcab01a31eca294a0f10393396395394951d0f9573ea2fed85"
+    }
+  ],
+  "checked_at": "2026-10-10",
+  "model_calls": [],
+  "broker_requests": 0,
+  "limitations": [
+    "Historical source-revision gap accounting; no automatic strategy, paper, platform or live promotion.",
+    "New gate-owner review/first-run acceptance is not fabricated."
+  ],
+  "correction_provenance": {
+    "note": "Scoped references and accounting corrected after CC review; native command observations are unchanged."
+  }
+}

@@ -1,0 +1,5 @@
+Test run for ~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/lean-985ef30/Tests/bin/Debug/QuantConnect.Tests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+Results File: ~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/lean-985ef30/TestResults/alpaca-model-py312.trx
+
+Passed!  - Failed:     0, Passed:    12, Skipped:     0, Total:    12, Duration: 70 ms - QuantConnect.Tests.dll (net10.0)

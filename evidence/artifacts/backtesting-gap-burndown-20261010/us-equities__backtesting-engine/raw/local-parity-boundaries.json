@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "id": "local-parity-boundaries",
+  "command": [
+    "python3",
+    "-m",
+    "unittest",
+    "tests.test_spy_parity",
+    "tests.test_nautilus_equity_replay",
+    "tests.test_backtesting_gap_burndown",
+    "tests.test_component_matrix.GapCountTests"
+  ],
+  "started_utc": "2026-10-10T16:59:11.981846+00:00",
+  "finished_utc": "2026-10-10T16:59:12.601193+00:00",
+  "duration_seconds": 0.619,
+  "launched": true,
+  "observed_exit_code": 0,
+  "expected_exit_code": 0,
+  "expectation_met": true,
+  "input_hashes": [
+    {
+      "path": "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/tests/test_spy_parity.py",
+      "sha256": "f210e6f4fc1ff37173fc42e84ace878245e3448f03a2d1bee93d4be04ae6ab5e",
+      "bytes": 121917
+    },
+    {
+      "path": "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/tests/test_nautilus_equity_replay.py",
+      "sha256": "5e254b3f118ac09434dee27133c0665788e0b18190889334c39e4470a22fb056",
+      "bytes": 5412
+    }
+  ],
+  "captured_outputs": [
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/local-parity-boundaries.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "home_and_pytest_components_exported": true,
+      "digest_basis": "published_bytes"
+    },
+    {
+      "path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/local-parity-boundaries.stderr.txt",
+      "sha256": "34e02cfc761216553c6b30eb7f6b50dececf449b699d7977ad25a905a1d0994d",
+      "bytes": 291,
+      "home_and_pytest_components_exported": true,
+      "digest_basis": "published_bytes"
+    }
+  ],
+  "output_hashes": [],
+  "input_bytes_unchanged": true,
+  "scope": "observed command result only; no automatic evidence-class or gap-status promotion",
+  "environment_record": {
+    "status": "unavailable",
+    "reason": "The historical recorder did not retain its effective environment. Values are not reconstructed as observations. Prerequisite failures and the successful py312 captures retain observed outcomes.",
+    "recorder_source": {
+      "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+      "pin": "e957df3367ef32289254d5c946415fd92c02960c",
+      "path": "blueprints/us-equities/backtesting-gap-burndown-20261010/record.py:50-60",
+      "blob_sha1": "6705aa5cf2fae8e01f937ca05e080affa22b0b28",
+      "sha256": "28b1e441b55bc0f9f247bd665f3ddb0c68cfba7b32048ffa0d61ab3332b2bd19",
+      "retained_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/sources/record-6705aa5c.py"
+    },
+    "omitted_variable_names": [
+      "PATH",
+      "HOME",
+      "LANG",
+      "LC_ALL",
+      "OPENBLAS_NUM_THREADS",
+      "OMP_NUM_THREADS",
+      "DOTNET_CLI_TELEMETRY_OPTOUT",
+      "DOTNET_SKIP_FIRST_TIME_EXPERIENCE",
+      "DOTNET_NOLOGO",
+      "DOTNET_PROCESSOR_COUNT",
+      "DOTNET_CLI_HOME",
+      "NUGET_PACKAGES",
+      "LD_LIBRARY_PATH",
+      "PYTHONNET_PYDLL",
+      "PYTHONHOME"
+    ]
+  },
+  "correction_provenance": {
+    "note": "Observed command, timing and exit are unchanged. Environment omission is disclosed, not filled with inferred values."
+  }
+}

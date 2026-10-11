@@ -1,0 +1,19 @@
+{
+  "source_hashes": {
+    "nautechsystems/nautilus_trader@1b0a49d2792a9432a3aca3fcb617ce7a630d905e:crates/backtest/src/exchange.rs": "cc25575daa513bbb59ddc79ddd705705018c83ba14e413987a5af39aa7df1709",
+    "nautechsystems/nautilus_trader@1b0a49d2792a9432a3aca3fcb617ce7a630d905e:crates/execution/src/matching_engine/mod.rs": "f699a065e5fa73fc16c01bdc1532acc5baf3caf2a27dd5342fffb2c9b4f1279e",
+    "nautechsystems/nautilus_trader@1b0a49d2792a9432a3aca3fcb617ce7a630d905e:python/nautilus_trader/execution/__init__.pyi": "a124cb79e64140b38166a872eaca09bd96ff834e43fbd7f962496ab648e3f021",
+    "nautechsystems/nautilus_trader@1b0a49d2792a9432a3aca3fcb617ce7a630d905e:python/nautilus_trader/backtest/__init__.pyi": "85744bbfb88c06cb1e0170726dcc297270e8259f49b21726be11741ee926e369",
+    "QuantConnect/Lean@985ef30ad3ac774218c5ac516b4cb0aa2655730f:Tests/Common/Brokerages/AlpacaBrokerageModelTests.cs": "4d82ec021cb1f9031bd9cee4827af3b491f3f3b95fb0e828f1b45be83837e1fe",
+    "QuantConnect/Lean@985ef30ad3ac774218c5ac516b4cb0aa2655730f:Tests/AssemblyInitialize.cs": "0e51ebd4b2859f3457e821a68ef6b7afda7188b6371a5f24e01e5f43cf67cd3f",
+    "QuantConnect/Lean@985ef30ad3ac774218c5ac516b4cb0aa2655730f:Common/Python/PythonInitializer.cs": "ca4b5c7374c096309fb8b37f4ae3b29895f00b88b1e56e3db7bb95d489ca896c"
+  },
+  "observed_utc": "2026-10-10T17:01:27.091576+00:00",
+  "engine_extension_sha256": "a53dd5a24fe77f4c66169af84ee9c7e292018010922e3dce9a8b6c9f7f3b7021",
+  "dotnet_sdk": {
+    "version": "10.0.401",
+    "sha512": "51c8b999af9e8dd9998c9edc5944e19a90788862068acd38694e098889054ce8c23d4f0c5cccfa16bf187d044562359e5ee69a9f8ad0bbe913ba90311fbce25b",
+    "source": "https://builds.dotnet.microsoft.com/dotnet/release-metadata/10.0/releases.json"
+  },
+  "scope": "source/runtime provenance, no qualification or broker acceptance"
+}

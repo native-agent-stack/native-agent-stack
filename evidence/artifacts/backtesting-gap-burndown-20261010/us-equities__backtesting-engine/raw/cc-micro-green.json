@@ -1,0 +1,29 @@
+{
+  "observed_utc": "2026-10-11T09:56:20Z",
+  "base_head": "663349f68191e0c74aeac88e5d929bf9f096ee1d",
+  "test_source_sha256": "40deacdd8427ae07f14817318eb7e9d143f74dd12e6d1377ed30cb738d05d35b",
+  "runs": [
+    {
+      "command": ".runtime/cc979-ci/bin/python -m unittest tests.test_backtesting_gap_burndown tests.test_gap_closeouts tests.test_component_matrix tests.test_new_host_grand_list",
+      "observed_exit_code": 0,
+      "tests_passed": 156
+    },
+    {
+      "command": ".runtime/cc979-ci/bin/python -m unittest tests.test_spy_parity tests.test_nautilus_equity_replay",
+      "observed_exit_code": 0,
+      "tests_passed": 187
+    },
+    {
+      "command": ".runtime/cc979-ci/bin/python scripts/component_matrix.py --check",
+      "observed_exit_code": 0,
+      "rows": 32
+    },
+    {
+      "command": ".runtime/cc979-ci/bin/python scripts/new_host_grand_list.py --check",
+      "observed_exit_code": 0,
+      "layers": 32,
+      "winners": 66
+    }
+  ],
+  "scope": "Observed focused tests and supported generator checks; full discovery remains with hosted CI."
+}

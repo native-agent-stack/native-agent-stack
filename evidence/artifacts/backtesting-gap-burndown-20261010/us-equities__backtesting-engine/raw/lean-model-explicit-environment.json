@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "id": "lean-model-cc979-explicit-environment",
+  "command": [
+    "nice",
+    "-n",
+    "10",
+    "ionice",
+    "-c",
+    "2",
+    "-n",
+    "7",
+    ".runtime/dotnet-10.0.401/dotnet",
+    "test",
+    ".runtime/lean-985ef30/Tests/QuantConnect.Tests.csproj",
+    "--filter",
+    "FullyQualifiedName~AlpacaBrokerageModelTests",
+    "--logger",
+    "trx;LogFileName=alpaca-model-cc979-env.trx",
+    "--results-directory",
+    ".runtime/lean-985ef30/TestResults",
+    "--no-build",
+    "--no-restore",
+    "--verbosity",
+    "minimal",
+    "-m:1"
+  ],
+  "cwd": "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010",
+  "environment_record": {
+    "status": "observed",
+    "cleared": true,
+    "variables": {
+      "PATH": "/usr/bin:/bin",
+      "LANG": "C.UTF-8",
+      "OPENBLAS_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1",
+      "DOTNET_CLI_TELEMETRY_OPTOUT": "1",
+      "DOTNET_SKIP_FIRST_TIME_EXPERIENCE": "1",
+      "DOTNET_NOLOGO": "1",
+      "DOTNET_PROCESSOR_COUNT": "1",
+      "DOTNET_CLI_HOME": "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/dotnet-home",
+      "NUGET_PACKAGES": "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/nuget",
+      "LD_LIBRARY_PATH": "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/icu/usr/lib/x86_64-linux-gnu",
+      "PYTHONNET_PYDLL": "~/.local/share/uv/python/cpython-3.12.4-linux-x86_64-gnu/lib/libpython3.12.so",
+      "PYTHONHOME": "~/.local/share/uv/python/cpython-3.12.4-linux-x86_64-gnu"
+    }
+  },
+  "started_utc": "2026-10-11T06:46:40Z",
+  "finished_utc": "2026-10-11T06:46:47Z",
+  "duration_seconds": 7.437,
+  "observed_exit_code": 0,
+  "counters": {
+    "total": "12",
+    "executed": "12",
+    "passed": "12",
+    "failed": "0",
+    "error": "0",
+    "timeout": "0",
+    "aborted": "0",
+    "inconclusive": "0",
+    "passedButRunAborted": "0",
+    "notRunnable": "0",
+    "notExecuted": "0",
+    "disconnected": "0",
+    "warning": "0",
+    "completed": "0",
+    "inProgress": "0",
+    "pending": "0"
+  },
+  "input_hashes": [
+    {
+      "path": "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/lean-985ef30/Tests/Common/Brokerages/AlpacaBrokerageModelTests.cs",
+      "sha256": "4d82ec021cb1f9031bd9cee4827af3b491f3f3b95fb0e828f1b45be83837e1fe",
+      "bytes": 3828
+    },
+    {
+      "path": "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/dotnet-10.0.401/dotnet",
+      "sha256": "01d89e0a0191052bfea616cd4ce624c8faf13b05bbddf7f64499c23e2a9d9269",
+      "bytes": 71808
+    },
+    {
+      "path": "~/.local/share/uv/python/cpython-3.12.4-linux-x86_64-gnu/lib/libpython3.12.so",
+      "sha256": "39ea9abe113724756feafd2ccaebcdab75a79218183f6e09bf1dc6b3ad7c12f3",
+      "bytes": 39239808
+    }
+  ],
+  "outputs": [
+    {
+      "name": "stdout",
+      "text": "Test run for ~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/lean-985ef30/Tests/bin/Debug/QuantConnect.Tests.dll (.NETCoreApp,Version=v10.0)\nA total of 1 test files matched the specified pattern.\nResults File: ~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/lean-985ef30/TestResults/alpaca-model-cc979-env.trx\n\nPassed!  - Failed:     0, Passed:    12, Skipped:     0, Total:    12, Duration: 22 ms - QuantConnect.Tests.dll (net10.0)\n",
+      "sha256": "efb41e43d6d79a223be71922c5902692b849aa8f54dd9d4b2d3a374d16dbb213",
+      "bytes": 505,
+      "digest_basis": "published_bytes"
+    },
+    {
+      "name": "stderr",
+      "text": "",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "digest_basis": "published_bytes"
+    }
+  ],
+  "trx_sha256": "0122eb01fc3b3c5e8dcb2a32a6cdfe802b731421b4279eaf74a74b24b96f8f5c",
+  "scope": "12 TestCaseSource cases of CanSubmitOrderWhenOutsideRegularTradingHours; no paper adapter initialization or broker requests",
+  "source_repository": "https://github.com/QuantConnect/Lean",
+  "source_pin": "985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+  "trx_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/published/lean-model-explicit-environment-alpaca-model-cc979-env.trx",
+  "trx_digest_basis": "published_sanitized_bytes",
+  "private_outputs": [
+    {
+      "path": "~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/.runtime/lean-985ef30/Tests/bin/Debug/QuantConnect.Tests.dll",
+      "scope": "Private original DLL; its digest and bytes are retained only in private local evidence because the binary embeds a private home path."
+    }
+  ]
+}

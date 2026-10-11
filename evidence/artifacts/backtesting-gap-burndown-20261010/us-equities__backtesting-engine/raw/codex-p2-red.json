@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "source_head": "6f7de645e66666792d5d5180c917582a1cc5bf5c",
+  "committed_test_head": "663349f68191e0c74aeac88e5d929bf9f096ee1d",
+  "test_source_path": "evidence/artifacts/backtesting-gap-burndown-20261010/us-equities__backtesting-engine/raw/sources/codex-p2-red-committed-tests.py",
+  "test_source_sha256": "f88867d4a0a1e0229fa02e65fbe69b634c7837041d497698f41475aea73e0c16",
+  "command": "Run the two selected committed tests over git-show production modules and gap 0/9 receipts at 6f7de645; source identity is the corrected 663349f6 mechanics bytes as that test expects. In-memory adapters preserve main() signatures; no filesystem checkout or mutation.",
+  "observed_utc": "2026-10-11T09:52:11Z",
+  "observed_exit_code": 1,
+  "failures": 2,
+  "errors": 0,
+  "output": "test_clean_checkout_driver_invokes_all_modes_without_mutating_captures (committed_red.FailureBoundaryTests.test_clean_checkout_driver_invokes_all_modes_without_mutating_captures) ... FAIL\ntest_mechanics_citations_bind_native_execution_of_current_harness (committed_red.CloseoutRegressionTests.test_mechanics_citations_bind_native_execution_of_current_harness) ... FAIL\n\n======================================================================\nFAIL: test_clean_checkout_driver_invokes_all_modes_without_mutating_captures (committed_red.FailureBoundaryTests.test_clean_checkout_driver_invokes_all_modes_without_mutating_captures)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/tests/test_backtesting_gap_burndown.py\", line 44, in test_clean_checkout_driver_invokes_all_modes_without_mutating_captures\n    def test_relative_inputs_are_resolved_in_callers_directory(self):\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 1 != 0 : tracked verdicts must not prevent fresh comparator execution\n\n======================================================================\nFAIL: test_mechanics_citations_bind_native_execution_of_current_harness (committed_red.CloseoutRegressionTests.test_mechanics_citations_bind_native_execution_of_current_harness)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"~/code/native-agent-stack.foundation-engine-qual-backtesting-gaps-20261010/tests/test_backtesting_gap_burndown.py\", line 174, in test_mechanics_citations_bind_native_execution_of_current_harness\n    name = path.name.removesuffix(\".verdict.json\")\n    ...<2 lines>...\n    return SimpleNamespace(returncode=0 if name == \"accepted-v2-lean-data\" else 1)\nAssertionError: False is not true : gap citations need native execution of the current harness, not only an old-run projection\n\n----------------------------------------------------------------------\nRan 2 tests in 0.020s\n\nFAILED (failures=2)\n",
+  "output_sha256": "85f094f75b9a780cc166dd7e8b3b2e798163b3da61087c784be010cb5742aaee",
+  "scope": "Re-recorded fail-before using exact committed test bytes; draft capture remains in the immutable previous packet.",
+  "output_digest_basis": "published_bytes"
+}
