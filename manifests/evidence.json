@@ -4941,8 +4941,8 @@
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/cross-client.md",
-      "sha256": "24ce9c3d0b3ce48104176d3737a441402524a548fbd2c57af034e93e490460df",
-      "bytes": 2041
+      "sha256": "13f157f6d35e858bc1407664645e95c0a598b577c4d787a3da3687162e6b6570",
+      "bytes": 4875
     },
     {
       "path": ".claude/skills/claude-native-practice/reference/git-github-automation.md",
@@ -20836,6 +20836,11 @@
       "bytes": 238146
     },
     {
+      "path": "evidence/artifacts/claude-native-practice-20261009/cross-client-lines.json",
+      "sha256": "7874d2ee5c90bfb6d47f0f58ca29355696e0476ebd3a2a6c830d00e6ce2303d6",
+      "bytes": 4622
+    },
+    {
       "path": "evidence/artifacts/claude-native-practice-20261009/fresh-session.json",
       "sha256": "5db3955c7b24d3202d9a43c6f002a194e6091b007d3d68435bde982d485e8363",
       "bytes": 30132
@@ -20857,8 +20862,8 @@
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/primary-source-reading.json",
-      "sha256": "0d6807c6a7dd4e51a46fffd641123a0203749db613bba4d30b60cc6ac1c40eea",
-      "bytes": 445981
+      "sha256": "2d74c83c35a69045b99f0941443ae1ba54e709f96e5810ee811005da2b84c3f5",
+      "bytes": 449799
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/probes-20261009.json",
@@ -61901,6 +61906,11 @@
       "bytes": 5702
     },
     {
+      "path": "tests/test_native_practice_cross_client_sources.py",
+      "sha256": "201e7996da5b7a30dcfd9d8995e880819c694149b3ea4294462ea851533ffc5d",
+      "bytes": 69686
+    },
+    {
       "path": "tests/test_native_practice_doc_corrections.py",
       "sha256": "04410b557212f2cd75a0ac37a5d6fd0addd9920d7f8caaf8a057a8d0ba9432e1",
       "bytes": 3900
@@ -62102,8 +62112,8 @@
     },
     {
       "path": "tests/test_primary_source_reading_counts.py",
-      "sha256": "d5adf976f213cdff48d0c1ec245d58596203760d9f3ffb3253baedbfbc228b88",
-      "bytes": 20294
+      "sha256": "14c9cceaabec40f11ace0d25983ca5b7b23d389f70d1f2c84d2df8999061c790",
+      "bytes": 29253
     },
     {
       "path": "tests/test_promotion_gate.py",

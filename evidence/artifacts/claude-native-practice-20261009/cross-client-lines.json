@@ -1,0 +1,86 @@
+{
+ "schema": "claude-native-practice-cross-client-lines/1",
+ "note": "The lines the Claude source table of reference/cross-client.md cites, with the capture each was read from. Lines are counted by newline in the capture. line_sha256 is the sha256 of the line's bytes followed by a newline. For a line that is followed by a newline in the capture (each recorded line is), `sed -n '<line>p' <capture> | sha256sum` prints the same. The captures are private working papers of the 2026-10-09 reading, not in this repository; their hashes and fetch times are the locators of claims.json, which the guard test checks.",
+ "lines": [
+  {
+   "url": "https://code.claude.com/docs/en/cli-reference.md",
+   "line": 103,
+   "capture_sha256": "54587c07d51da9f23418857237434cd0140561736c943296e247d8e13cb85a58",
+   "fetched_utc": "2026-10-09T03:38:34Z",
+   "line_sha256": "efeb1a08813b39efcbb98709e8477a563805ec4ef94d5fdccfd9ba433e95b6ff",
+   "line_head": "| `--json-schema` | Get validated JSON output matching a JSON Schema after the a"
+  },
+  {
+   "url": "https://code.claude.com/docs/en/cli-reference.md",
+   "line": 112,
+   "capture_sha256": "54587c07d51da9f23418857237434cd0140561736c943296e247d8e13cb85a58",
+   "fetched_utc": "2026-10-09T03:38:34Z",
+   "line_sha256": "d82d212656cfcd9c61c26d8a927ed7078ce99ca04d3e66949bd45d611253bf05",
+   "line_head": "| `--output-format` | Specify output format for print mode (options: `text`, `js"
+  },
+  {
+   "url": "https://code.claude.com/docs/en/commands.md",
+   "line": 71,
+   "capture_sha256": "98494561aac56c1106a49955ba503529d4ae6a21ef1b593c187b4d22465caae0",
+   "fetched_utc": "2026-10-09T03:41:45Z",
+   "line_sha256": "58efa08a8511d6330546bdb3f35fff17778552e78c79187425563dbe0f7408f9",
+   "line_head": "| `/code-review [low\\|medium\\|high\\|xhigh\\|max\\|ultra] [--fix] [--comment] [--ma"
+  },
+  {
+   "url": "https://code.claude.com/docs/en/headless.md",
+   "line": 17,
+   "capture_sha256": "25885d2e178a9746066fc2e19a07a3debc31744c721282a744be80789591e738",
+   "fetched_utc": "2026-10-09T03:38:34Z",
+   "line_sha256": "465e4fdd7bb425d042d9645b542d01eab7a97868b3704fbab38e63390277ba9e",
+   "line_head": "This page covers using the Agent SDK via the CLI (`claude -p`). For the Python a"
+  },
+  {
+   "url": "https://code.claude.com/docs/en/hooks.md",
+   "line": 2587,
+   "capture_sha256": "3bd21d31955304d9ab33efb052a0b3bfdfeb19d1af5028a2588d69c5d9bdea95",
+   "fetched_utc": "2026-10-09T03:38:41Z",
+   "line_sha256": "6b32c97574311d127912ff1230241e94eb7c3c5457b22e54a1b91c4388255d77",
+   "line_head": "In addition to the [common input fields](#common-input-fields), Stop hooks recei"
+  },
+  {
+   "url": "https://code.claude.com/docs/en/hooks.md",
+   "line": 2655,
+   "capture_sha256": "3bd21d31955304d9ab33efb052a0b3bfdfeb19d1af5028a2588d69c5d9bdea95",
+   "fetched_utc": "2026-10-09T03:38:41Z",
+   "line_sha256": "3d16e333ffa379ee122d7ad20c9b50b624b148806e9f0f07217c7103047993b7",
+   "line_head": "| `decision` | `\"block\"` prevents Claude from stopping. Omit to allow Claude to "
+  },
+  {
+   "url": "https://code.claude.com/docs/en/plugins.md",
+   "line": 9,
+   "capture_sha256": "eb8b9f92d75d42d777d3bdbc89273c2df881b6a3cf58afaa63418d55a70538f5",
+   "fetched_utc": "2026-10-09T03:39:03Z",
+   "line_sha256": "21fdcfc941dd9c2bab11f6e95d4024c0a257b48f535f87adae8f903acdebcf8c",
+   "line_head": "A Claude Code plugin is a directory of skills, agents, hooks, MCP servers, or ot"
+  },
+  {
+   "url": "https://code.claude.com/docs/en/sub-agents.md",
+   "line": 11,
+   "capture_sha256": "b4e0ef9b2d9a1cba1a53c45a5d45b0c525d949261c8beb16d60dd35fbcb134d8",
+   "fetched_utc": "2026-10-09T03:39:03Z",
+   "line_sha256": "acae0fc77c92163c0a7e05e5a05ce7b1341f82363739e837a4093d9830face06",
+   "line_head": "Each subagent runs in its own context window with a custom system prompt, specif"
+  },
+  {
+   "url": "https://code.claude.com/docs/en/sub-agents.md",
+   "line": 492,
+   "capture_sha256": "b4e0ef9b2d9a1cba1a53c45a5d45b0c525d949261c8beb16d60dd35fbcb134d8",
+   "fetched_utc": "2026-10-09T03:39:03Z",
+   "line_sha256": "a2e450073758fd52f939d2117015286beb3a8fd1bc4287506fb85a6874fe68c4",
+   "line_head": "<Note>In version 2.1.63, the Task tool was renamed to Agent. Existing `Task(...)"
+  },
+  {
+   "url": "https://code.claude.com/docs/en/workflows.md",
+   "line": 204,
+   "capture_sha256": "e55138abf9b78682085c09b1b7632254461169eeed738f8b2a532849498e0c8e",
+   "fetched_utc": "2026-10-09T03:39:40Z",
+   "line_sha256": "6b7f4fd880cd8e3c61b67510a5eaefb86fcbdff6a31dc1b8b250be819ccbe80c",
+   "line_head": "* `.claude/workflows/` in your project: shared with everyone who clones the repo"
+  }
+ ]
+}
