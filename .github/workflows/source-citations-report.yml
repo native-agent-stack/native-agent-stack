@@ -1,0 +1,60 @@
+name: Source citations report
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, edited, ready_for_review]
+
+permissions: {}
+cache-mode: none
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  queue: max
+
+jobs:
+  source-citations:
+    name: Source citations (report only)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    # W1b phase B measures source findings; it never makes them a required gate.
+    continue-on-error: true
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      # All actions in this workflow are GitHub-owned. The verifier runs only
+      # from the trusted main base, never from the PR head or its merge tree.
+      - name: Check out the trusted PR base
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          persist-credentials: false
+      - name: Report current PR source citations
+        if: always()
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          SOURCE_REPOSITORY: ${{ github.repository }}
+          SOURCE_PR: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          verifier=tools/sota-sources/verify_sources.py
+          if [ ! -f "$verifier" ]; then
+            printf '%s\n' '## Source citations report' '' \
+              'Unavailable: the trusted PR base does not contain the verifier from #1003 yet.' \
+              'This phase is report-only; the existing sota-sources presence gate is unchanged.' \
+              >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          # #1003 supplies this CLI and appends its Markdown to GITHUB_STEP_SUMMARY.
+          # No PR description, title, branch name or citation enters shell source.
+          if python3 "$verifier" --repo "$SOURCE_REPOSITORY" --pr "$SOURCE_PR" \
+              --mode report --report "$RUNNER_TEMP/source-citations-report.json"; then
+            :
+          else
+            status=$?
+            printf '\n%s\n\n%s %s\n' '## Source citations report unavailable' \
+              'The report command exited' "$status; this phase remains report-only." \
+              >> "$GITHUB_STEP_SUMMARY"
+          fi

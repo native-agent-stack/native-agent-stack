@@ -67,11 +67,22 @@ class NewWorkflowSecurityCoverageTests(unittest.TestCase):
             # Its offline zizmor pass/fail assertions live in tests/test_sota_sources_gate.py.
             "sota-sources-gate.yml",
             "pr-metadata.yml",
+            "source-citations-report.yml",
         }
         self.assertEqual(
             actual, expected,
             "workflows/*.yml changed; update this test's coverage set to match",
         )
+
+    def test_source_citations_report_workflow_has_no_offline_findings(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            result = _analyze(WORKFLOWS_DIR / "source-citations-report.yml", Path(temporary))
+        try:
+            findings = json.loads(result.stdout)
+        except json.JSONDecodeError:
+            self.fail(f"zizmor did not return JSON (exit {result.returncode}): {result.stderr[:2000]}")
+        self.assertEqual(result.returncode, 0, result.stderr[:2000])
+        self.assertEqual(findings, [])
 
     def test_catalog_freshness_workflow_has_no_offline_findings(self):
         with tempfile.TemporaryDirectory() as temporary:
