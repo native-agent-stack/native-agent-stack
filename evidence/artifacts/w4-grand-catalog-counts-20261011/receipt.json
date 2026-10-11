@@ -109,7 +109,7 @@
       "test": "ArchitectureSourcesTests.test_derived_grand_counts_are_excluded_before_supplement_access",
       "test_exit_code": 1,
       "returned_diagnostic": "Architecture role/path has no independent approval: architecture_supplement",
-      "correction": "use the supported exact supplement exclusion before content access; no grant added"
+      "correction": "use the supported exact supplement exclusion before content access; no supplement read grant added. The later P1 repair below adds the separate repository inventory grant."
     },
     {
       "condition": "first index keys used bare repository slugs instead of final-stack identity",
@@ -141,5 +141,80 @@
     "No credential, authentication store, provider, broker, paper/N2/STOP or protected bundle operation.",
     "Both exporter modes require the host asset. CI consumers read only the committed snapshot; fixtures create their own temp-root asset."
   ],
-  "usage": {"provider_tokens": null, "model_runs": 0}
+  "usage": {"provider_tokens": null, "model_runs": 0},
+  "ci_policy_correction": {
+    "observed_at": "2026-10-11T05:43:32Z",
+    "reviewed_head": "a62abff1f6137eb5e81e2e775365980d704fe338",
+    "review": "CC Claude read CHANGES_REQUESTED; P1 hosted validate-shard-3 and validate-shard-7, run 38112865673",
+    "source": {
+      "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+      "pin": "a62abff1f6137eb5e81e2e775365980d704fe338",
+      "files": [
+        "scripts/local_pages_policy_grants.py:proposal,inventory_paths",
+        "tests/test_local_pages_architecture_landscape_exclusions.py:CommittedLandscapeSetTests",
+        "tests/test_local_pages_policy_grants.py:PolicyGrantDerivation.test_committed_repository_grants_match_current_git_inventory_paths",
+        "tools/local-pages/source_policy.json:architecture_derivation_sources"
+      ],
+      "upstream_commit_api_matches_pin": true,
+      "research": "search-first quick mode: the maintained native proposal and unittest harness already implement this exact boundary; no new package, integration or custom runner is needed. Registry alternatives and tool installation are outside this metadata repair."
+    },
+    "proposal": {
+      "command": "python3 scripts/local_pages_policy_grants.py --pin a62abff1f6137eb5e81e2e775365980d704fe338",
+      "exit_code": 0,
+      "committed_repository_inventory_count": 90,
+      "proposed_repository_inventory_count": 91,
+      "added": ["scripts/grand_catalog_counts.py"],
+      "removed": []
+    },
+    "failed_conditions": [
+      {
+        "command": "python3 -m unittest -v tests.test_local_pages_architecture_landscape_exclusions tests.test_local_pages_policy_grants",
+        "exit_code": 1,
+        "diagnostics": [
+          "AssertionError: Items in the first set but not the second: catalogs/landscape/grand-catalog-counts.json",
+          "AssertionError: Items in the second set but not the first: scripts/grand_catalog_counts.py"
+        ]
+      },
+      {
+        "condition": "updated committed-policy checks run before policy repair",
+        "exit_code": 1,
+        "tests": 2,
+        "returned_summary": "Ran 2 tests in 0.179s; FAILED (failures=1, errors=1)",
+        "diagnostics": [
+          "KeyError: catalogs/landscape/grand-catalog-counts.json",
+          "AssertionError: 90 != 91"
+        ]
+      },
+      {
+        "condition": "initial local reproduction used the nonexistent test_local_pages_source_policy_grants module",
+        "exit_code": 1,
+        "correction": "used the existing tests.test_local_pages_policy_grants module; both actual hosted failures then reproduced"
+      }
+    ],
+    "changes": [
+      "Add snapshot exclusion provenance with the unchanged e2489ca2 SHA256 and reviewed a62abff1 Git pin.",
+      "Add exactly one repository inventory grant for the exporter; no host asset or supplement read grant is added.",
+      "Update both committed-policy tests and correct the previous broad no-new-grant claim in docs and PR text."
+    ],
+    "tests": {
+      "command": "python3 -m unittest -v tests.test_grand_catalog_counts tests.test_local_pages_architecture_sources tests.test_local_pages_architecture_policy tests.test_local_pages_architecture_landscape_exclusions tests.test_local_pages_policy_grants",
+      "exit_code": 0,
+      "returned_summary": "Ran 77 tests in 9.339s; OK",
+      "skips": 0,
+      "evidence_class": "local_integration",
+      "scope": "Repository integration and synthetic fixture controls, not upstream acceptance or hosted CI."
+    },
+    "completeness_critic": {
+      "missed_dependency_classes_closed": ["committed landscape exclusion provenance", "tracked script inventory grants"],
+      "snapshot_unchanged": true,
+      "historical_host_exports_reused": true,
+      "committed_source_catalog_bytes": 28389911,
+      "source_boundary": "catalogs/landscape/grand-catalog-20261008.json is committed; the separately sealed tar.zst archive required by both current producer modes is host-only. The committed catalog does not make --check an offline command.",
+      "remaining": [
+        "The review's optional P3 offline snapshot semantic test and decoder-redaction control are outside this P1 metadata repair.",
+        "GPT FIRST read at the new head, exact-head hosted CI and CC landing remain separate."
+      ]
+    },
+    "usage": {"provider_tokens": null, "model_runs": 0}
+  }
 }

@@ -2046,6 +2046,10 @@
     },
     {
       "root": "repo",
+      "path": "scripts/grand_catalog_counts.py"
+    },
+    {
+      "root": "repo",
       "path": "scripts/hardware_profile.py"
     },
     {
@@ -21475,6 +21479,13 @@
     }
   ],
   "architecture_derivation_sources": [
+    {
+      "root": "repo",
+      "path": "catalogs/landscape/grand-catalog-counts.json",
+      "sha256": "e2489ca29c1377a688e4167846031f282f412489187f39cff18cae3dc3e294fe",
+      "pin": "a62abff1f6137eb5e81e2e775365980d704fe338",
+      "scope": "Excluded from architecture_supplement: derived counts and by_repository have no top-level layers, rows, candidates or components collection. The native scripts/local_pages_policy_grants.py proposal at this pin also adds only scripts/grand_catalog_counts.py to the 90 reviewed repository inventory paths, yielding 91; no host asset or supplement read grant is added."
+    },
     {
       "root": "repo",
       "path": "manifests/evidence.json",

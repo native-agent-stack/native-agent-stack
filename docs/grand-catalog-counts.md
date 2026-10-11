@@ -15,13 +15,18 @@ python3 scripts/grand_catalog_counts.py --check
 The asset defaults to `_FINAL_ASSET` under
 `~/.local/state/native-agent-stack`. `--state-root` and `--asset` can select an
 equivalent retained location inside the existing policy; neither adds a grant.
-CI reads the committed snapshot and its evidence binding. It does not need the
+CI verifies the committed snapshot's evidence binding. It does not need the
 host archive or run either producer mode against private state. The unit tests
 use temporary roots and synthetic archives.
 
 The existing architecture supplement policy excludes this derived file before
-content access. It introduces no new grant and does not treat counts as candidate
-or layer source records; direct W4/W1b consumers retain their own contracts.
+content access, with pinned SHA256 provenance in `architecture_derivation_sources`.
+The native `scripts/local_pages_policy_grants.py` proposal at
+`a62abff1f6137eb5e81e2e775365980d704fe338` adds one exact repository
+inventory grant for `scripts/grand_catalog_counts.py`, taking the reviewed set
+from 90 to 91. It adds no host asset or supplement read grant and does not treat
+counts as candidate or layer source records; direct W4/W1b consumers retain
+their own contracts.
 
 The native reader is `tools/local-pages/architecture_sources.py:261-319` at
 `seathatflowsinourveins/native-agent-stack@8bffa2c41692ef483e91b68e3b15aeb331423d2c`.

@@ -18757,8 +18757,8 @@
     },
     {
       "path": "docs/grand-catalog-counts.md",
-      "sha256": "aedf8b869ba102699ec047fd9d5c2e12e4ba47b21ecf65fe09e4200a2b2825de",
-      "bytes": 3995
+      "sha256": "2e7b51d3845cfb1b938d577606775a250e4fe51356c0b7d8545220c63f5eeb37",
+      "bytes": 4305
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -18767,8 +18767,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "98673d525e05f1401a76b03a0312c4f959ebcf35e0af13ed33481afab14b9b33",
-      "bytes": 257253
+      "sha256": "769a0439d785db37c70775f302186f2bdde674e07d5b72ee99a7e3d836a6b4dd",
+      "bytes": 258086
     },
     {
       "path": "docs/harness-rule-enforcement.md",
@@ -56292,8 +56292,8 @@
     },
     {
       "path": "evidence/artifacts/w4-grand-catalog-counts-20261011/receipt.json",
-      "sha256": "565a101bb3e034565e2613973dc510bb787063ccfe0b41b95a90374003d0cdb1",
-      "bytes": 7730
+      "sha256": "e07f2ae96f36e3575f87034c0f4a4af4494154cf04537c2677e56504b67d2f46",
+      "bytes": 12169
     },
     {
       "path": "evidence/artifacts/workstation-lane-20260925/nemotron-qualification/model_card_check.py",
@@ -60937,8 +60937,8 @@
     },
     {
       "path": "tests/test_local_pages_architecture_landscape_exclusions.py",
-      "sha256": "1745816be2626185bbb451e6fb94c961e75c508406f21e58b32203114bb0c030",
-      "bytes": 11637
+      "sha256": "f380199e1d1d8cfc199ecedc21d03a98d7366c224be4c47eb10861e3c6404e4c",
+      "bytes": 11906
     },
     {
       "path": "tests/test_local_pages_architecture_sources.py",
@@ -60952,8 +60952,8 @@
     },
     {
       "path": "tests/test_local_pages_policy_grants.py",
-      "sha256": "9622547a51054565483d31614115b3b4909303f79f96fa86717e53094c9414f2",
-      "bytes": 19398
+      "sha256": "372ede145f25c021bc8933a2a09ef51b1638020c53a2d932d4a02b8f78544f7c",
+      "bytes": 19389
     },
     {
       "path": "tests/test_managed_block.py",
@@ -61807,8 +61807,8 @@
     },
     {
       "path": "tools/local-pages/source_policy.json",
-      "sha256": "bcb2019d176c2d9f3c6319816bf685a87dabeab31799e91062a15a92be9816d8",
-      "bytes": 757307
+      "sha256": "c1283b4c9f03ee9e5abdebe550a603ee9eedf17d00bb3c4b4c37f29c3c83ba38",
+      "bytes": 758011
     },
     {
       "path": "tools/omniroute/gateway_record.py",
