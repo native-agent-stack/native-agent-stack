@@ -202,7 +202,9 @@ no-follow, protected-name checks, with repo and state roots only. Each read's
 path, role, hash, byte count and modification time join the custody table and
 the receipt's `command_center.inputs`. A missing or malformed input renders
 `missing input: <name>`, an unapproved one `unreadable (SourcePolicyError)`;
-neither stops the refresh. A view failure publishes an UNREPORTED placeholder
+neither stops the refresh. An `in_review` row that is not an object is rejected
+with a stated gap naming how many were rejected: PR waves reads partial, and the
+count strip counts the accepted rows only. A view failure publishes an UNREPORTED placeholder
 while the other pages refresh. Each section carries a wired, partial or
 missing-input label, also recorded per section in the receipt. The label
 follows what the section renders: any stated gap, not-wired input or stale
@@ -235,7 +237,11 @@ Codex carries that note. When #970's
 `daily_skill_usage.py` publishes `skills/skill-invoke-rate-latest.json`
 (`skill-invoke-rate-daily/1`) within 30 hours, its counts are used; otherwise
 the hourly reports are. A client or root that its producer did not measure
-reads "not measured" and never counts as zero.
+reads "not measured" and never counts as zero. The number of pinned skills with
+no 7-day call counts only skills with a measured 7-day column: with none
+measured it reads UNKNOWN (null in the receipt's `defects`), and with some
+measured the strip and the summary name that denominator ("3 of 6 measured";
+the receipt also carries `measured_skills` and `pinned_skills`).
 
 The landscape section lists each matrix winner's component, pin, evidence
 class, lifecycle stages and platforms, then the W6 final columns: verdict, run
@@ -249,7 +255,7 @@ pin's version equals the dotted version the mirror's tag names
 mirror commit's prefix. A winner the matrix records as unpinned reads "no pin
 recorded to compare", and a winner without an entry reads "no mirror"; both
 raw values render beside the relation. Terminal layer
-states come only from `final-stack.json` and read "pending #1008/#1007" until it
+states come only from `final-stack.json` and read "pending #1007 (#1008 landed 2026-10-11 21:34:23Z)" until it
 exists. The north-star readiness layers follow with the same columns, from
 their RECORDED claims.
 
@@ -268,18 +274,27 @@ reports private, and the north-star ten-layer table while
 it. The receipt's `command_center.not_wired` lists only the notices the page
 rendered.
 
-The shared sanitizer omits email addresses on every page, after the same
-per-token decoding it applies to home paths and identifiers, so percent-encoded,
-double-encoded and HTML-entity forms, with or without the semicolon, are
-matched in their decoded text. A token over 4,096 characters is not decoded,
-so there the mask matches these forms in place: for the at sign `%40`, `%2540`,
-`&#64` and `&#x40` (with or without the semicolon) and `&commat;`, and for the
-dot `%2E`, `%252E`, `&#46`, `&#x2E` and `&period;`. Other encodings in such a
-token, such as `&amp;#64;` or `%26%2364%3B`, stay as written. A systemd
+The shared sanitizer omits email addresses on every page and in
+`token-tools-now.json`, after the same per-token decoding it applies to home
+paths and identifiers, so percent-encoded, double-encoded and HTML-entity forms,
+with or without the semicolon, are matched in their decoded text. It reads the
+whole text with each token decoded and takes the whole local part RFC 5322
+allows: a run of atext (letters, digits and ``!#$%&'*+-=?^_`{|}~`` with dots,
+from its first letter or digit; the slash is left out, so a URL path such as
+`/@handle` is not an address) or a quoted string such as `"reviewer"` or
+`"john doe"`, whose quotes may be encoded too. So no part of a local part is left beside the placeholder, and the
+cost stays linear in the text's length. A token over 4,096 characters is not
+decoded, so there the mask matches these forms in place: for the at sign `%40`,
+`%2540`, `&#64` and `&#x40` (with or without the semicolon) and `&commat;`, for
+the dot `%2E`, `%252E`, `&#46`, `&#x2E` and `&period;`, and for the quotes `%22`,
+`%2522`, `&quot`, `&#34` and `&#x22`. Other encodings in such a token, such as
+`&amp;#64;` or `%26%2364%3B`, stay as written. A systemd
 template-unit name that ends in `service`, `socket`, `device`, `mount`,
 `automount`, `swap`, `path`, `timer`, `slice` or `scope`, such as
-`git-maintenance@daily.timer`, stays readable. A name ending in `target` is
-masked, because `target` is also a delegated top-level domain.
+`git-maintenance@daily.timer`, stays readable, except an instance name that
+itself contains a dot, which still masks (`openvpn-client@site.conf.service`
+becomes `[email omitted].service`; #1012 Follow-ups, the bdc09788 micro's (a)5). A name ending in
+`target` is masked, because `target` is also a delegated top-level domain.
 
 `token_tools_now.py` runs each installed token tool's own report command:
 `rtk gain --format json`, `headroom agent-savings --check-perf --hours 24

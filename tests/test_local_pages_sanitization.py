@@ -200,7 +200,57 @@ class SanitizationTests(unittest.TestCase):
             with self.subTest(unit=unit):
                 self.assertEqual(helper.text(unit), unit)
         self.assertEqual(helper.text("owner" + at + "timer.example.org"), "[email omitted]")
+        # Pinned current behaviour (#1012 Follow-ups (a)5): a dotted instance name still masks up to its last label.
+        self.assertEqual(helper.text("openvpn-client" + at + "site.conf.service"), "[email omitted].service")
         self.assertEqual(helper.text("owner" + at + "example.services"), "[email omitted]")
+
+    def test_quoted_and_rfc_local_parts_are_masked_whole(self):
+        # Astra's first read of a737ef98 (P1): "reviewer"@example.org and other RFC 5322 local parts (a quoted string,
+        # or atext such as ! ' { }) left all or part of the address readable. Each local part and domain here is unique,
+        # so the assertions need no address grammar: no part may remain, short or inside a token over 4,096 characters.
+        helper = load_helper()
+        at = "@"
+        locals_ = ('"zqa"', '"zqb zqb"', '"zq\\"c"', "%22zqd%22", "&quot;zqe&quot;", "&#34;zqf&#34;", "%2522zqg%2522", "zq!h", "zq'i", "{zqj}", "zq=l", "zq?m", "zq&n")
+        for local in locals_:
+            for at_form in (at, "%40", "&#64;", "%2540", "&commat;"):
+                for prefix in ("mail ", "x" * 4100 + " "):
+                    with self.subTest(local=local, at=at_form, long=len(prefix) > 10):
+                        out = helper.text(prefix + local + at_form + "zqdomain.example.org now")
+                        self.assertNotIn("zq", out)
+                        self.assertTrue(out.endswith("[email omitted] now"), out[-60:])
+        self.assertEqual(helper.text('Reply to "reviewer"' + at + "example.org"), "Reply to [email omitted]")
+        for public in ('say "hi" to them', 'He said "hello" and left', "uses: actions/checkout" + at + "v4", "npm i @anthropic-ai/claude-code" + at + "2.1.296",
+                       "https://medium.com/" + at + "someone.handle/a-post", "imports `" + at + "AGENTS.md`", "run_events/" + at + "agent.tool/history",
+                       "owner" + at + "example.org).", "git" + at + "github.com:org/repo.git"):
+            with self.subTest(public=public):
+                expected = {"owner" + at + "example.org).": "[email omitted]).", "git" + at + "github.com:org/repo.git": "[email omitted]:org/repo.git"}.get(public, public)
+                self.assertEqual(helper.text(public), expected)
+
+    def test_the_email_mask_is_linear_in_the_text_length(self):
+        # The micro's (a)5: the a737ef98 pattern backtracked on long runs (1.5-2.5 s per search at 16,000 characters).
+        helper = load_helper()
+        import time
+        started = time.perf_counter()
+        helper.text("x" * 32000)
+        self.assertLess(time.perf_counter() - started, 1.0)
+
+    def test_escaped_shell_text_before_an_at_sign_stays_linear(self):
+        # A quoted local part's content once allowed a backslash two parses (a quoted pair, or a plain character), so
+        # JSON-escaped shell text before an at sign backtracked exponentially: 90 s in one live build. Run in a child
+        # with a hard timeout, so a regression fails instead of hanging the suite.
+        import subprocess
+        import sys
+        child = (
+            "import importlib.util, sys\n"
+            "bs, q = chr(92), chr(34)\n"
+            "unit = \"'%a\" + bs * 2 + \"a' \" + bs + q + \"$aaa\" + bs + q + \" | aaaa -a '^\" + bs * 2 + \"[aa\" + bs * 2 + \"] aaa\" + bs * 2 + \".aa: .*\" + bs * 2 + \".aaaaaa/aaa\" + bs * 2 + \".aa' && \"\n"
+            "probe = unit * 3 + 'aaaa ' + q + 'aaaa: aaaa, aaaaaa ' + chr(64) + 'aaa.aa aaaa'\n"
+            "spec = importlib.util.spec_from_file_location('helper', sys.argv[1])\n"
+            "helper = importlib.util.module_from_spec(spec)\n"
+            "spec.loader.exec_module(helper)\n"
+            "print(helper.text(probe) == probe)\n")
+        result = subprocess.run([sys.executable, "-B", "-c", child, str(ROOT / "tools/local-pages/sanitization.py")], capture_output=True, text=True, timeout=30)
+        self.assertEqual((result.returncode, result.stdout.strip()), (0, "True"), result.stderr[-400:])
 
     def test_addresses_on_the_target_domain_are_masked(self):
         # The micro at bdc09788, (a)1: `target` is a delegated top-level domain (public_suffix_list.dat:10339-10341),

@@ -43,6 +43,28 @@ PANELS = ("cc-sessions", "cc-orchestration", "cc-prs", "cc-landscape", "cc-skill
 REFRESHED = "2026-10-11T16:00:00Z"
 
 
+QUOTED_PROBE = '"reviewer"' + AT + 'example.org'  # Astra's first read of a737ef98, review_probes.py:24
+# Local parts RFC 5322 allows that the a737ef98 mask missed in whole or in part; each part is unique, so a test can
+# assert that no part of the address survives without using any address grammar.
+WHOLE_ADDRESS_FORMS = ('"zqlocalone"' + AT + "zqdomainone.example.org", '"zqlocal two"' + AT + "zqdomaintwo.example.org", "%22zqlocalthree%22%40zqdomainthree.example.org",
+                       "&quot;zqlocal four&quot;&#64;zqdomainfour.example.org", "zq!localfive" + AT + "zqdomainfive.example.org", "{zqlocalsix}" + AT + "zqdomainsix.example.org",
+                       "zq'localseven%40zqdomainseven.example.org")
+WHOLE_ADDRESS_PARTS = ("zqlocal", "zqdomain")
+
+
+def decoded_text(markup: str) -> str:
+    """The whole page as a reader sees it after two rounds of HTML and percent decoding, not split into tokens."""
+    for _ in range(2):
+        markup = html.unescape(unquote(markup))
+    return markup
+
+
+def surviving_parts(markup: str) -> list[str]:
+    """Which planted address parts remain anywhere in the decoded page."""
+    text = decoded_text(markup)
+    return [part for part in WHOLE_ADDRESS_PARTS if part in text]
+
+
 def leaked_emails(markup: str) -> list[str]:
     """Emails in the page after decoding each token twice, as a browser or a copy-paste could."""
     found = []
@@ -336,7 +358,7 @@ class CommandCenterViewTests(unittest.TestCase):
         counts = re.findall(r'<strong>([^<]+)</strong> <span>([^<]+)</span>', markup[markup.index('class="cc-counts"'):])
         self.assertIn(("1", "GPT reads running"), counts)
         self.assertIn(("1 of 2", "layers converged"), counts)
-        self.assertIn(("3", "skills with no 7-day call"), counts)
+        self.assertIn(("3 of 6 measured", "skills with no 7-day call"), counts)
         self.assertIn(("222M", "tokens saved (RTK estimate)"), counts)
         self.assertIn("Partial because of not wired: Token-report manifest", statuses["cc-tokens"]["detail"])
         self.assertIn("Partial because of not wired: North-star ten-layer plan", statuses["cc-landscape"]["detail"])
@@ -433,6 +455,51 @@ class CommandCenterViewTests(unittest.TestCase):
         self.assertIn('<strong>UNKNOWN</strong> <span>tokens saved (RTK estimate)</span>', strip(markup))
         self.assertNotIn("999M", strip(markup))
 
+    def test_malformed_pr_rows_are_rejected_with_a_stated_gap(self):
+        # Astra's first read of a737ef98 (P2, review_probes.py:31): rows that are not objects rendered "No pull requests
+        # in review." as wired, while the strip counted them as two PRs.
+        current = current_fixture()
+        current["in_review"] = [None, "invalid row"]
+        markup, statuses = self.render(current=current)
+        panel = section(markup, "cc-prs")
+        self.assertNotIn("No pull requests in review.", panel)
+        self.assertIn("missing input: cc-now.json#/in_review: 2 rows are not PR objects and not shown", panel)
+        self.assertEqual(statuses["cc-prs"]["status"], "partial")
+        self.assertIn("Partial because of missing input: cc-now.json#/in_review: 2 rows are not PR objects", statuses["cc-prs"]["detail"])
+        self.assertIn('<strong>0</strong> <span>in review</span>', markup)
+        mixed = current_fixture()
+        mixed["in_review"] = [mixed["in_review"][0], 7, None]
+        markup, statuses = self.render(current=mixed)
+        self.assertEqual([row[0] for row in table(markup, "Pull requests in review")[1:]], ["#101"])
+        self.assertIn("missing input: cc-now.json#/in_review: 2 rows are not PR objects and not shown", section(markup, "cc-prs"))
+        self.assertEqual(statuses["cc-prs"]["status"], "partial")
+        self.assertIn('<strong>1</strong> <span>in review</span>', markup)
+        empty = current_fixture()
+        empty["in_review"] = []
+        markup, statuses = self.render(current=empty)
+        self.assertIn("<p>No pull requests in review.</p>", markup)
+        self.assertEqual(statuses["cc-prs"]["status"], "wired")
+
+    def test_skill_defects_are_unknown_without_a_measured_seven_day_column(self):
+        # Astra's first read of a737ef98 (P2, review_probes.py:40): with no 7-day measurement the view still published
+        # defects 0 in the receipt, the summary and the strip.
+        inputs = inputs_fixture()
+        inputs["skills_host"]["document"]["codex"]["measured"] = False
+        for name in ("skills_daily", "skills_claude_lanes", "skills_codex_lanes"):
+            inputs[name] = missing("state:" + name)
+        markup, statuses = self.render(inputs=inputs)
+        self.assertIsNone(statuses["cc-skills"]["defects"])
+        self.assertEqual(statuses["cc-skills"]["measured_skills"], 0)
+        self.assertIn('<strong>UNKNOWN</strong> <span>skills with no 7-day call</span>', markup)
+        self.assertIn("No pinned skill has a measured 7-day column, so the number with no call is UNKNOWN.", statuses["cc-skills"]["detail"])
+        self.assertNotIn("wiring defect</span>", section(markup, "cc-skills"))
+        full = inputs_fixture()
+        full["skills_manifest"]["document"]["skills"] = [entry for entry in full["skills_manifest"]["document"]["skills"] if entry["name"] not in ("http-only", "never-reported")]
+        markup, statuses = self.render(inputs=full)
+        self.assertEqual((statuses["cc-skills"]["defects"], statuses["cc-skills"]["measured_skills"], statuses["cc-skills"]["pinned_skills"]), (3, 6, 6))
+        self.assertIn('<strong>3</strong> <span>skills with no 7-day call</span>', markup)
+        self.assertIn("3 of 6 pinned skills recorded no call in any measured 7-day column", statuses["cc-skills"]["detail"])
+
     def test_missing_inputs_render_stated_gaps_without_raising(self):
         failed_fleet = {"fleet_source": "not reported", "at": None, "lanes_live": None, "lanes_parked": None, "claude_sessions": None,
                         "exec_reads_in_flight": None, "availability": {name: {"status": "UNKNOWN"} for name in ("lanes_live", "lanes_parked", "claude_sessions")},
@@ -512,7 +579,8 @@ class CommandCenterViewTests(unittest.TestCase):
         self.assertNotIn('href="http://example.org/skill"', markup)
         self.assertIn("fixture/skills@0123456789ab", rows["http-only"][1])
         self.assertEqual(statuses["cc-skills"]["defects"], 3)
-        self.assertIn("3 of 8 pinned skills recorded no call in any measured 7-day column", statuses["cc-skills"]["detail"])
+        self.assertIn("3 of the 6 pinned skills with a measured 7-day column recorded no call (zero calls = wiring defect); 2 of the 8 pinned skills have no 7-day measurement.", statuses["cc-skills"]["detail"])
+        self.assertEqual((statuses["cc-skills"]["measured_skills"], statuses["cc-skills"]["pinned_skills"]), (6, 8))
         no_manifest = inputs_fixture()
         no_manifest["skills_manifest"] = missing("repo:adoption/skills/manifest.json", "not present in the selected checkout")
         unknown_markup, unknown = self.render(inputs=no_manifest)
@@ -650,7 +718,7 @@ class CommandCenterViewTests(unittest.TestCase):
         self.assertEqual(sdk[3], "codex: pending final-stack.json drifted: pending final-stack.json unmirrored: pending final-stack.json")
         self.assertIn("codex: host E2E true, pin current false", sdk[4])
         self.assertEqual(sdk[5], "not recorded no post-fix invoke receipt yet")
-        self.assertEqual(sdk[6], "pending #1008/#1007")
+        self.assertEqual(sdk[6], "pending #1007 (#1008 landed 2026-10-11 21:34:23Z)")
         self.assertEqual(rows["Portfolio risk"][5], "fixture invoke receipt")
         self.assertIn("1 winner has no upstream mirror", section(markup, "cc-landscape"))
         self.assertIn("drifted @ 1.0.0", sdk[1])
@@ -763,9 +831,12 @@ class CommandCenterViewTests(unittest.TestCase):
         inputs["read_queue"]["document"]["waiting"][0]["gates"] = SYNTHETIC_EMAILS[2]
         inputs["token_tools"]["document"]["tools"][1]["message"] = "ledger at " + SYNTHETIC_HOME + " for " + SYNTHETIC_EMAILS[1]
         inputs["practice_slots"]["document"]["slots"][0]["default"] = SYNTHETIC_EMAILS[3]
+        current["program"][1]["owner"] = " ".join(WHOLE_ADDRESS_FORMS) + " " + QUOTED_PROBE
         with patch.object(view._sanitization.Path, "home", return_value=Path("/synthetic") / identity):
             markup, _ = view.render(current, fleet, inputs, adoption=adoption_fixture(), refreshed=REFRESHED)
         self.assertEqual(leaked_emails(markup), [])
+        self.assertEqual(surviving_parts(markup), [])
+        self.assertNotIn(QUOTED_PROBE, decoded_text(markup))
         self.assertNotIn("synthetic-user", markup)
         self.assertNotIn(identity, markup)
         self.assertIn("[email omitted]", markup)
@@ -887,10 +958,27 @@ class CommandCenterComposerTests(unittest.TestCase):
                      "state:coordination/command-center/pages/token-tools-now.json: not present in the state root",
                      "state:coordination/command-center/skills/skill-usage-host-latest.json: not present in the state root"):
             self.assertIn("missing input: " + name, page)
-        self.assertIn("pending #1008/#1007", page)
+        self.assertIn("pending #1007 (#1008 landed 2026-10-11 21:34:23Z)", page)
+        self.assertNotIn("#1008/#1007", page)
         self.assertEqual(receipt["command_center"]["inputs"]["readiness"]["status"], "missing")
         self.assertNotIn("command_center:readiness", receipt["inputs"])
         self.assertIn("Review a source", page)
+
+    def test_quoted_and_rfc_local_parts_leave_no_part_of_the_address(self):
+        # Astra's first read of a737ef98 (P1, review_probes.py:23): the quoted local part in her probe survived the
+        # whole composer. Every assertion here reads the decoded page text, with no address grammar of its own.
+        self.add_sections()
+        self.write_inputs()
+        self.current["in_review"][0]["state"] = "Reply to " + QUOTED_PROBE + " and " + " ; ".join(WHOLE_ADDRESS_FORMS)
+        self.current["waiting_on_owner"].append({"what": "Write to " + WHOLE_ADDRESS_FORMS[1], "detail": WHOLE_ADDRESS_FORMS[3]})
+        self.write_json(self.current_path, self.current)
+        receipt = self.refresh()
+        page = (self.output / "command-center.html").read_text()
+        self.assertNotIn(QUOTED_PROBE, decoded_text(page))
+        self.assertNotIn('"reviewer"', decoded_text(page))
+        self.assertEqual(surviving_parts(page), [])
+        self.assertIn("[email omitted]", page)
+        self.assertEqual(surviving_parts(json.dumps(receipt)), [])
 
     def test_unapproved_input_is_a_gap_not_a_stop(self):
         self.write_inputs()

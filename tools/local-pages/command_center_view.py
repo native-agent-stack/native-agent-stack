@@ -45,7 +45,9 @@ NOT_WIRED = {
     "north_star": "No committed record holds the owner's ten-layer plan table; the committed north-star readiness layers are above, and the CC can publish the plan as cc-now.json north_star_layers (README schema).",
 }
 NOT_WIRED_TITLES = {"token_report": "Token-report manifest", "north_star": "North-star ten-layer plan"}
-FINAL_STACK = "pending #1008/#1007: catalogs/landscape/final-stack.json is not in the selected checkout yet; its grant is in place."
+# #1008 merged at 2026-10-11T21:34:23Z (569bbc59) without final-stack.json; #1007 is the PR that adds it.
+FINAL_STACK_PENDING = "pending #1007 (#1008 landed 2026-10-11 21:34:23Z)"
+FINAL_STACK = FINAL_STACK_PENDING + ": catalogs/landscape/final-stack.json is not in the selected checkout yet; its grant is in place."
 DAILY_SCHEMA = "skill-invoke-rate-daily/1"
 RAW_KINDS = {"skills_host": "skill_invoke_rate_report", "skills_codex_lanes": "codex_lane_usage_report", "skills_claude_lanes": "claude_child_lane_usage"}
 TOOLS_SCHEMA = "token-tools-now/1"
@@ -280,13 +282,18 @@ def _scalar_cell(value: Any, present: bool, *, code: bool = False) -> str:
     return '<code>' + esc(value) + '</code>' if code else esc(value)
 
 
+def _pr_rows(rows: Any) -> list[dict] | None:
+    """The in_review rows the PR register can show: objects only. None when in_review is not a list."""
+    return [row for row in rows if isinstance(row, dict)] if isinstance(rows, list) else None
+
+
 def _prs(current: dict) -> tuple[str, str, str, str]:
     rows = current.get("in_review")
     source = 'cc-now.json in_review and landings_today at ' + _time(current.get("updated_utc")) + '.'
     table_rows, recorded = [], Counter()
-    for row in rows if isinstance(rows, list) else []:
-        if not isinstance(row, dict):
-            continue
+    accepted = _pr_rows(rows)
+    rejected = len(rows) - len(accepted) if isinstance(rows, list) else 0
+    for row in accepted or []:
         for field in PR_FIELDS:
             recorded[field] += row.get(field) is not None
         cells = [
@@ -300,7 +307,9 @@ def _prs(current: dict) -> tuple[str, str, str, str]:
     if not isinstance(rows, list):
         body = _gap("cc-now.json#/in_review")
     else:
-        body = _table("Pull requests in review, in the CC's order", ["PR", "Work", "Head", "Round", "Next gate", "Blockers", "Follow-ups", "Recorded state"], table_rows, css="cc-prs") if table_rows else '<p>No pull requests in review.</p>'
+        # A row that is not an object is rejected with its count, never shown as an empty register.
+        body = _gap("cc-now.json#/in_review: " + _plural(rejected, "row is not a PR object", "rows are not PR objects") + " and not shown") if rejected else ''
+        body += _table("Pull requests in review, in the CC's order", ["PR", "Work", "Head", "Round", "Next gate", "Blockers", "Follow-ups", "Recorded state"], table_rows, css="cc-prs") if table_rows else ('' if rejected else '<p>No pull requests in review.</p>')
     landed = current.get("landings_today")
     if isinstance(landed, list):
         items = "".join('<li>' + esc(item) + '</li>' for item in landed if isinstance(item, (str, int)) and not isinstance(item, bool))
@@ -686,7 +695,7 @@ def _skills(fleet: dict, inputs: dict, refreshed: Any) -> tuple[str, str, str, s
         parts.append('<p class="cc-source">Counts use the daily projection; the hourly reports are its inputs.</p>')
     manifest, manifest_item = _input(inputs, "skills_manifest")
     pinned = [skill for skill in (manifest.get("skills") or [] if isinstance(manifest, dict) else []) if isinstance(skill, dict) and isinstance(skill.get("name"), str)]
-    defects = 0 if model["rows"] and pinned else None
+    defects, measured = 0, 0
     if pinned:
         table_rows = []
         for skill in pinned:
@@ -703,6 +712,7 @@ def _skills(fleet: dict, inputs: dict, refreshed: Any) -> tuple[str, str, str, s
                     value = counts.get(column)
                     cells.append(_cell_count(value))
                 week = [counts.get(column) for column in SKILL_COLUMNS[1:] if counts.get(column) is not None]
+                measured += bool(week)
                 if week and all(value == 0 for value in week):
                     flags.append('<span class="pill p-crit">wiring defect</span><small>no recorded call in any measured 7-day column</small>')
                     defects += 1
@@ -784,8 +794,19 @@ def _skills(fleet: dict, inputs: dict, refreshed: Any) -> tuple[str, str, str, s
     parts.append('<details class="cc-more"><summary>Prometheus skill-invocation rates (Fleet tracking, strict)</summary><p class="cc-source">Separate from the counts above: a rate is shown only where a qualified producer reports it, and UNKNOWN is never zero. Evaluated ' + _time((tracking or {}).get("observed_utc")) + '.</p>' + rates + '</details>')
     read = len(model["documents"])
     status = "missing" if read == 0 and not pinned else "wired" if model["producer"] and all(model["fresh"].get(name) for name in (("skills_daily",) if model["producer"] == "skills_daily" else ("skills_host", "skills_codex_lanes", "skills_claude_lanes"))) else "partial"
-    detail = (f"{defects:,} of {len(pinned):,} pinned skills recorded no call in any measured 7-day column (zero calls = wiring defect). " if defects is not None and pinned else "") + "Counts come from the repository's measurement tools, not from Fleet's Prometheus rates."
-    return status, detail, 'adoption/skills/manifest.json joined with the skill-usage reports under coordination/command-center/skills/ and the cc-native-practice slots.', "".join(parts), defects
+    # A skill with no measured 7-day column is not a known zero: with none measured the count is UNKNOWN, and with
+    # some measured it is stated over the measured skills only.
+    if not pinned or not measured:
+        defects = None
+        coverage = "No pinned skill has a measured 7-day column, so the number with no call is UNKNOWN. " if pinned else ""
+    elif measured < len(pinned):
+        coverage = (f"{defects:,} of the {measured:,} pinned skills with a measured 7-day column recorded no call (zero calls = wiring defect); "
+                    f"{len(pinned) - measured:,} of the {len(pinned):,} pinned skills have no 7-day measurement. ")
+    else:
+        coverage = f"{defects:,} of {len(pinned):,} pinned skills recorded no call in any measured 7-day column (zero calls = wiring defect). "
+    detail = coverage + "Counts come from the repository's measurement tools, not from Fleet's Prometheus rates."
+    summary = {"defects": defects, "measured_skills": measured if pinned else None, "pinned_skills": len(pinned) if pinned else None}
+    return status, detail, 'adoption/skills/manifest.json joined with the skill-usage reports under coordination/command-center/skills/ and the cc-native-practice slots.', "".join(parts), summary
 
 
 def _states(document: dict, section: str) -> Counter:
@@ -976,7 +997,7 @@ def _landscape(current: dict, inputs: dict) -> tuple[str, str, str, str]:
                 run_pins.append('<li>' + esc(component) + ': ' + (esc(run.get("pin") or "unpinned") if isinstance(run, dict) else ('not recorded' if final is not None else 'pending final-stack.json')) + '</li>')
             terminal = final_layers.get(key)
             terminal_cell = ('<strong>' + esc(terminal.get("status")) + '</strong>' if isinstance(terminal, dict) and isinstance(terminal.get("status"), str)
-                             else _unrecorded("absent from final-stack.json") if final is not None else 'pending #1008/#1007')
+                             else _unrecorded("absent from final-stack.json") if final is not None else esc(FINAL_STACK_PENDING))
             invoke = convergence.get("invoke")
             invoke_cell = esc(invoke) if invoke not in (None, "") else _unrecorded(convergence.get("invoke_reason") if isinstance(convergence.get("invoke_reason"), str) else "")
             verdict = esc(row.get("verdict_status") or "not recorded") + '<small>' + esc(str(convergence.get("layer_state") or "state not recorded").replace("_", " ")) + '; ' + esc(row.get("independent_review") or "review not recorded") + '; checked ' + esc(convergence.get("verdict_checked_at") or "not recorded") + '</small>'
@@ -1026,7 +1047,7 @@ def _landscape(current: dict, inputs: dict) -> tuple[str, str, str, str]:
     parts.append('<h3>Rulings</h3>' + _rows_table("Rulings and adjudications the CC records", current.get("rulings"), [("file", "Record"), ("utc", "Time"), ("summary", "Summary")], missing="cc-now.json#/rulings", times=("utc",)))
     read = sum(isinstance(document, dict) for document in (matrix, grand, final, readiness))
     status = "missing" if read == 0 else "wired" if read == 4 else "partial"
-    detail = "Terminal states come only from final-stack.json; until it exists they read pending #1008/#1007. No state is inferred."
+    detail = "Terminal states come only from final-stack.json; until it exists they read " + FINAL_STACK_PENDING + ". No state is inferred."
     if status == "partial":
         detail += _unread(("component-evidence-matrix.json", matrix, matrix_item), ("new-host-grand-list.json", grand, grand_item), ("final-stack.json", final, final_item), ("readiness.json", readiness, readiness_item))
     return status, detail, 'Committed catalogs/landscape and catalogs/north-star records in the selected checkout, and cc-now.json program, mirrors and rulings.', "".join(parts)
@@ -1166,9 +1187,16 @@ def _counts(current: dict, fleet: dict, inputs: dict, statuses: dict) -> str:
     matrix, _ = _input(inputs, "matrix")
     overall = (((matrix.get("summary") or {}).get("convergence") or {}).get("overall") or {}) if isinstance(matrix, dict) and isinstance(matrix.get("summary"), dict) else {}
     converged = (f'{overall["converged"]:,} of {overall["layers"]:,}' if _count(overall.get("converged")) is not None and _count(overall.get("layers")) is not None else "UNKNOWN")
-    defects = statuses.get("cc-skills", {}).get("defects")
+    skills = statuses.get("cc-skills", {})
+    defects, measured, pinned = skills.get("defects"), skills.get("measured_skills"), skills.get("pinned_skills")
+    if not isinstance(defects, int):
+        defects_text = "UNKNOWN"
+    elif isinstance(measured, int) and isinstance(pinned, int) and measured < pinned:
+        defects_text = f"{defects:,} of {measured:,} measured"
+    else:
+        defects_text = f"{defects:,}"
     items = [
-        ("cc-prs", size(current.get("in_review")), "in review"),
+        ("cc-prs", size(_pr_rows(current.get("in_review"))), "in review"),
         ("cc-prs", size(current.get("landings_today")), "landed today"),
         ("cc-owner", size(current.get("waiting_on_owner")), "waiting on you"),
         ("cc-sessions", size(fleet.get("lanes_live"), _known(fleet, "lanes_live")), "live Codex lanes"),
@@ -1176,7 +1204,7 @@ def _counts(current: dict, fleet: dict, inputs: dict, statuses: dict) -> str:
         ("cc-sessions", size(cc_agents.get("running")), "CC subagents running"),
         ("cc-orchestration", size(queue.get("running")) if isinstance(queue, dict) else "UNKNOWN", "GPT reads running"),
         ("cc-landscape", converged, "layers converged"),
-        ("cc-skills", f"{defects:,}" if isinstance(defects, int) else "UNKNOWN", "skills with no 7-day call"),
+        ("cc-skills", defects_text, "skills with no 7-day call"),
         ("cc-tokens", saved_text, "tokens saved (RTK estimate)"),
     ]
     return '<ul class="cc-counts" aria-label="Counts; each links to its section">' + "".join(f'<li><a href="#{anchor}"><strong>{escape(value)}</strong> <span>{escape(label)}</span></a></li>' for anchor, value, label in items) + '</ul>'
@@ -1209,10 +1237,10 @@ def render(current: Any, fleet: Any, inputs: Any, *, adoption: Any = None, refre
     fleet = fleet if isinstance(fleet, dict) else {}
     inputs = inputs if isinstance(inputs, dict) else {}
     adoption = adoption if isinstance(adoption, dict) else {}
-    defects = None
+    skill_summary = {"defects": None, "measured_skills": None, "pinned_skills": None}
     def skills():
-        nonlocal defects
-        *result, defects = _skills(fleet, inputs, refreshed)
+        nonlocal skill_summary
+        *result, skill_summary = _skills(fleet, inputs, refreshed)
         return tuple(result)
     panels = [
         ("cc-sessions", "Sessions and lanes", lambda: _sessions(current, fleet)),
@@ -1238,7 +1266,7 @@ def render(current: Any, fleet: Any, inputs: Any, *, adoption: Any = None, refre
         statuses[anchor] = {"title": title, "status": status, "detail": detail, "not_wired": re.findall(r'data-cc-not-wired="([a-z_]+)"', body)}
         sections.append(f'<section class="cc-panel" id="{anchor}" aria-labelledby="{anchor}-title"><div class="cc-panel-head"><h2 id="{anchor}-title">{esc(title)}</h2><span class="pill {css}">{label}</span></div>'
                         f'<p class="cc-source">{source}</p>' + (f'<p class="cc-detail">{esc(detail)}</p>' if detail else '') + body + '</section>')
-    statuses["cc-skills"]["defects"] = defects
+    statuses["cc-skills"].update(skill_summary)
     try:
         counts = _counts(current, fleet, inputs, statuses)
     except PANEL_ERRORS as error:

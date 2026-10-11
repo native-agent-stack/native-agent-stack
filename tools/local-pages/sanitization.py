@@ -7,24 +7,44 @@ because that nested helper is not an importable API. No native reader is loaded.
 Account filtering comes from tools/local-pages/build_pages.py ACCOUNT_URL at
 the same pin; urllib.parse supplies host/path normalization for owner links.
 Email addresses are omitted after the same per-token decoding, so percent and
-HTML-entity forms are matched in their decoded text. The decoders are CPython's
-own, cited at the v3.13.16 mirror (cbc944f4bc59639a444dd971c737788ba2283a91):
+HTML-entity forms are matched in their decoded text. The match is anchored at
+the at sign and its domain, then takes the whole local part that ends there,
+in either form RFC 5322 section 3.4.1 allows: a run of atext (letters, digits
+and !#$%&'*+-=?^_`{|}~ with dots, taken from its first letter or digit, so a
+quote or backtick around an address stays and a Markdown `@AGENTS.md` is not an
+address; the slash is left out, so a URL path such as /@handle is not one
+either), or a quoted string such as "reviewer" or
+"john doe", whose quotes may also be percent- or entity-encoded in place.
+CPython's own address parser accepts the quoted form (Lib/email/_parseaddr.py
+getaddrspec, lines 365-379, and getquote, line 463, at the same mirror). The
+mask reads the whole text with each token decoded, so a local part that a
+quote, a space or an apostrophe splits across tokens is found whole. Text that
+decoding leaves unchanged is masked exactly from the start of the local part
+to the end of the domain; a token that decoding changes is omitted whole when
+the address touches it. It walks the at signs once, so the cost stays linear in
+the text's length. The decoders are CPython's own, cited at the v3.13.16
+mirror (cbc944f4bc59639a444dd971c737788ba2283a91):
 html.unescape (Lib/html/__init__.py:118 accepts a reference without its
 semicolon, :122), whose HTML5 table maps 'commat;' to '@' and 'period;' to '.'
 (Lib/html/entities.py:567, :1736), and urllib.parse.unquote (Lib/urllib/parse.py:694).
 A token over 4,096 characters is not decoded, so the mask also matches these
 encoded forms in place, as the b209afe8 page-local mask did for %40 and &#64;:
 for the at sign %40, %2540, &#64 and &#x40 (each reference with or without its
-semicolon) and &commat;, and for the dot %2E, %252E, &#46, &#x2E and &period;.
-Other encodings in such a token, such as &amp;#64; or %26%2364%3B, stay as
-written. A name ending in one of ten systemd unit types (systemd.unit(5):
+semicolon) and &commat;, for the dot %2E, %252E, &#46, &#x2E and &period;, and
+for the quotes of a quoted local part ", %22, %2522, &quot, &#34 and &#x22 (each
+reference with or without its semicolon). Other encodings in such a token, such
+as &amp;#64; or %26%2364%3B, stay as written. A name ending in one of ten systemd unit types (systemd.unit(5):
 service, socket, device, mount, automount, swap, path, timer, slice and scope),
-such as git-maintenance@daily.timer, is not an address. The eleventh, target, is
-also a delegated top-level domain, so a name ending in it is masked.
+such as git-maintenance@daily.timer, is not an address, except an instance name
+that itself contains a dot, which still masks (openvpn-client@site.conf.service
+becomes "[email omitted].service"; #1012 Follow-ups, the bdc09788 micro's (a)5). The eleventh,
+target, is also a delegated top-level domain, so a name ending in it is masked.
 """
 
 import base64
 import binascii
+from bisect import bisect_left, bisect_right
+from functools import lru_cache
 from html import unescape
 from pathlib import Path
 import re
@@ -45,7 +65,15 @@ _DOT = r"(?:\.|%(?:25)?2[Ee]|&#0*46;?|&#[xX]0*2[Ee];?|&period;)"
 # (public_suffix_list.dat), and a test checks this list against the installed public suffix list.
 _UNIT_TYPES = ("service", "socket", "device", "mount", "automount", "swap", "path", "timer", "slice", "scope")
 _UNIT = r"(?:" + "|".join(_UNIT_TYPES) + r")(?![A-Za-z])"
-_EMAIL = re.compile(r"[A-Za-z0-9._%+-]+" + _AT + r"[A-Za-z0-9-]+(?:" + _DOT + r"[A-Za-z0-9-]+)*" + _DOT + r"(?!" + _UNIT + r")[A-Za-z]{2,}")
+_DOMAIN = r"[A-Za-z0-9-]+(?:" + _DOT + r"[A-Za-z0-9-]+)*" + _DOT + r"(?!" + _UNIT + r")[A-Za-z]{2,}"
+_ADDRESS_TAIL = re.compile(_AT + _DOMAIN)
+# RFC 5322 3.2.3 atext plus the dot of a dot-atom, and 3.2.4 quoted strings, whose quotes may be encoded in place.
+# Without the slash: a URL path such as medium.com/@handle.name would otherwise read as an address.
+_ATEXT = frozenset("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!#$%&'*+-=?^_`{|}~.")
+_QUOTE = r'(?:"|%(?:25)?22|&quot;?|&#0*34;?|&#[xX]0*22;?)'
+_OMITTED = "[email omitted]"
+# A backslash always opens a quoted pair, so each character has one parse and the search stays linear in the window.
+_QUOTED_LOCAL = re.compile(_QUOTE + r"(?:\\.|(?!" + _QUOTE + r")[^\\\r\n]){1,256}" + _QUOTE + r"\Z")
 _PRESERVED = re.compile(r"\$\{(?:USER_HOME|LOCAL_SESSION_ID|LOCAL_TASK_HANDLE)\}|\[personal identifier omitted\]|\[account artifact omitted\]|\[email omitted\]|native-agent-stack-1a")
 
 
@@ -65,8 +93,80 @@ def _without_preserved(value: str) -> str:
     return _PRESERVED.sub("", value)
 
 
+def _local_start(value: str, at: int) -> int | None:
+    """Where the local part ending at value[at], the at sign, begins: a quoted string, else a run of atext."""
+    quoted = _QUOTED_LOCAL.search(value, max(0, at - 300), at)
+    if quoted:
+        return quoted.start()
+    start = at
+    while start > 0 and value[start - 1] in _ATEXT:
+        start -= 1
+    # The local part starts at its first letter or digit, so a quote or backtick around an address stays, and one
+    # with none, such as the backtick of a Markdown `@AGENTS.md`, is not an address.
+    first = next((index for index in range(start, at) if value[index].isascii() and value[index].isalnum()), None)
+    return first
+
+
+def _email_spans(value: str):
+    for tail in _ADDRESS_TAIL.finditer(value):
+        start = _local_start(value, tail.start())
+        if start is not None:
+            yield start, tail.end()
+
+
+def _mask_email(value: str) -> str:
+    pieces, cursor = [], 0
+    for start, end in _email_spans(value):
+        pieces += [value[cursor:max(start, cursor)], _OMITTED]
+        cursor = end
+    return "".join(pieces) + value[cursor:]
+
+
+@lru_cache(maxsize=65536)
+def _decode_token(token: str) -> str:
+    """Two rounds of percent, HTML-entity and backslash-escape decoding, as the token policy applies."""
+    decoded = token
+    for _ in range(2):
+        decoded = unescape(unquote(decoded))
+        decoded = re.sub(r"\\u([a-fA-F0-9]{4})|\\x([a-fA-F0-9]{2})", lambda match: chr(int(match.group(1) or match.group(2), 16)), decoded)
+    return decoded
+
+
+def _mask_decoded_email(value: str) -> str:
+    """Omit every address the token-decoded text shows, exactly where decoding changed nothing, else whole tokens."""
+    pieces, cursor = [], 0
+    for match in _TOKEN.finditer(value):
+        if match.start() > cursor:
+            pieces.append((cursor, match.start(), value[cursor:match.start()], False))
+        token = match.group()
+        decoded_token = token if len(token) > 4096 else _decode_token(token)
+        pieces.append((match.start(), match.end(), decoded_token, decoded_token != token))
+        cursor = match.end()
+    if cursor < len(value):
+        pieces.append((cursor, len(value), value[cursor:], False))
+    offsets, total = [], 0
+    for piece in pieces:
+        offsets.append(total)
+        total += len(piece[2])
+    decoded = "".join(piece[2] for piece in pieces)
+    ranges = []
+    for start, end in _email_spans(decoded):
+        first, last = bisect_right(offsets, start) - 1, bisect_left(offsets, end) - 1
+        low = pieces[first][0] if pieces[first][3] else pieces[first][0] + start - offsets[first]
+        high = pieces[last][1] if pieces[last][3] else pieces[last][0] + end - offsets[last]
+        if ranges and low <= ranges[-1][1]:
+            ranges[-1] = (ranges[-1][0], max(high, ranges[-1][1]))
+        else:
+            ranges.append((low, high))
+    out, cursor = [], 0
+    for low, high in ranges:
+        out += [value[cursor:low], _OMITTED]
+        cursor = high
+    return "".join(out) + value[cursor:]
+
+
 def _private(value: str, identity) -> bool:
-    return bool(_HOME.search(value) or _SESSION.search(value) or _TASK.search(value) or _EMAIL.search(value) or is_account_url(value) or identity and identity.search(_without_preserved(value)))
+    return bool(_HOME.search(value) or _SESSION.search(value) or _TASK.search(value) or next(_email_spans(value), None) or is_account_url(value) or identity and identity.search(_without_preserved(value)))
 
 
 def _project_identity(value: str, identity) -> str:
@@ -84,10 +184,7 @@ def _encoded_token(token: str, identity) -> str:
     """Omit an encoded token only when its decoded text matches the policy."""
     if len(token) > 4096:
         return token
-    decoded = token
-    for _ in range(2):
-        decoded = unescape(unquote(decoded))
-        decoded = re.sub(r"\\u([a-fA-F0-9]{4})|\\x([a-fA-F0-9]{2})", lambda match: chr(int(match.group(1) or match.group(2), 16)), decoded)
+    decoded = _decode_token(token)
     if decoded != token and _private(decoded, identity):
         return _portable_text(decoded, identity)
     candidate = None
@@ -106,7 +203,7 @@ def _portable_text(value: str, identity) -> str:
     value = _HOME.sub("${USER_HOME}", value)
     value = _SESSION.sub("${LOCAL_SESSION_ID}", value)
     value = _TASK.sub("${LOCAL_TASK_HANDLE}", value)
-    value = _EMAIL.sub("[email omitted]", value)
+    value = _mask_email(value)
     if identity:
         value = _project_identity(value, identity)
     value = ACCOUNT_URL.sub("[account artifact omitted]", value)
@@ -132,6 +229,7 @@ def sanitize(value: Any) -> Any:
     """Project source values without changing the input or reading any files."""
     if isinstance(value, str):
         identity = _identity_pattern(_home_name())
+        value = _mask_decoded_email(value)
         value = _TOKEN.sub(lambda match: _encoded_token(match.group(), identity), value)
         return _portable_text(value, identity)
     if isinstance(value, dict):

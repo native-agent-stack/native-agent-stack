@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import html
 import importlib.util
 import json
 from pathlib import Path
@@ -9,6 +10,7 @@ import subprocess
 import tempfile
 import unittest
 from unittest.mock import patch
+from urllib.parse import unquote
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -113,6 +115,19 @@ class TokenToolsTests(unittest.TestCase):
         self.assertNotIn("synthetic-user", serialized)
         self.assertNotIn(SYNTHETIC_EMAIL, serialized)
         self.assertNotIn("owner%40", serialized)
+
+    def test_quoted_local_parts_are_masked_in_keys_and_values(self):
+        # Astra's first read of a737ef98 (P1): the token report passes the same shared mask, so a quoted local part
+        # must not reach token-tools-now.json as a key or a value. The parts are unique, so no address grammar is needed.
+        quoted = '"zqlocal key"' + "@" + "zqdomain.example.org"
+        keyed = {quoted: {"note": "%22zqlocalvalue%22%40zqdomain.example.org"}, "path": ['&quot;zqlocal list&quot;&#64;zqdomain.example.org']}
+        runner = Runner({"headroom " + AGENT: completed(0, json.dumps(keyed))})
+        serialized = json.dumps(tools.collect("rtk", "headroom", "node", None, timeout=5, runner=runner))
+        for _ in range(2):
+            serialized = html.unescape(unquote(serialized))
+        self.assertNotIn("zqlocal", serialized)
+        self.assertNotIn("zqdomain", serialized)
+        self.assertIn("[email omitted]", serialized)
 
     def test_destination_refuses_a_parent_or_ancestor_that_links_into_the_repository(self):
         # Codex token_tools_now.py:160 and the micro's (a)2 at 50977b00: abspath() follows no symlink, so
