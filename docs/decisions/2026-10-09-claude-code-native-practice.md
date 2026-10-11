@@ -393,15 +393,15 @@ to the arm; costs are API-list-equivalent, not billed.
 
 **Orchestration (paired run 1).** Six validated north-star fixtures, one trial per arm: A, one headless session (Opus 5.5 at xhigh); B, a saved Workflow that has an implementer write the fix and a
 fresh-context verifier at max effort try to refute it; C, an interactive agent team in tmux (a lead with an implementer and a tester-reviewer; interactive against headless is a declared confound).
-Settings were fenced to `--setting-sources local` with Ultracode off, caps $15 for A and $30 for B and C, and a 45-minute ceiling. The first counted runs exposed a grader bug (asyncio's slow-callback
+Settings were fenced to `--setting-sources local` with Ultracode off, caps $15 for A and $30 for B and C, and process caps of 50 minutes per headless session and 45 per team. The first counted runs exposed a grader bug (asyncio's slow-callback
 noise hid valid tests from the one-line parser); the preregistered rule voids a fixture for every arm when review finds a grader bug, so F1 and F2 are void in the primary analysis and the regraded
 results over all six fixtures are the declared sensitivity analysis. Every run passed the hidden tests in both analyses (18 of 18), so no arm resolved more fixtures than the single session. The blind
 pairwise judges (fresh Opus 5.5 sessions at max effort on stripped, order-fixed diffs, each refuted by a second session in the opposite order; 18 of 18 verdicts held) preferred the single session's diff
 to the Workflow's on 5 of 6 fixtures and to the team's on 3 of the 5 where the team's diff was captured (F3's two pairs with the team are void: its diff was not captured), the Workflow's on 1 and the team's on 1. The single session cost $5.87 on average, the Workflow 1.6x and the team
 3.0x (1.50x and 2.55x over F3 to F6, the primary fixtures; the team's costs are estimates and ceiling-bound). Neither orchestrated arm clears the rule (it needs two more
 fixtures resolved or the judges' preference on four of the fixtures that count, at no more than twice the single session's mean cost), so the routing guidance for bounded fixes on north-star code names the single session; the
-Workflow and the team stay available per task, as the owner directed. What the arms measured is limited by the ceiling: the Workflow's verifier returned in 2 of 6 runs (0 refuted), was cut by
-the 45-minute wait ceiling in 3, and never started in 1; the team reached TEAM-DONE in 2 of 6, was stopped at the ceiling in 3, hit its cap in 1, and in 1 run waited on a question to the absent
+Workflow and the team stay available per task, as the owner directed. What the arms measured is limited by the time bounds: the Workflow's verifier returned in 2 of 6 runs (0 refuted), was cut by
+the 45-minute wait ceiling of `claude -p` in 3, and never started in 1 (the implementer itself ran to that wait); the team reached TEAM-DONE in 2 of 6, was stopped at the 45-minute team cap in 3, hit its $30 cap in 1, and in 1 run waited on a question to the absent
 user. Four defects of the measurement were found during the run, each recorded as a new addendum file beside the preregistration: a harness-fault detector that counted file text, a blinding scan that
 redacted a fixture's own vocabulary, a refuter that was given untranslated reasons, and a failed diff capture for the team's F3 run, which voids that fixture's two pairs with the team (none of the four changes an outcome). Limits: one module family, one trial per arm, judges of the producers' own model family, costs list-equivalent.
 
@@ -410,16 +410,17 @@ Read, Glob and Grep; the home tree and the other runs' directories denied; the n
 and GPT reads, two trials each (20 runs). A blind first judge and a refuter (Opus 5.5 at max effort) scored each run's recall of the 12 decisive known findings, its false positives and its
 cost from the counter. The rule fixed before the first run: Sonnet takes review micros only if, for every decisive finding, it found the finding in at least as many of its runs as Opus did,
 and its runs cost at most 60% of Opus's. Opus found 7 detections of 24 and Sonnet 6; Sonnet missed 1 decisive finding that Opus found (G10, found in 1 of Opus's 2 runs and 0 of Sonnet's), at
-17% of Opus's cost, so by the strict rule Opus stays. Trial 1 alone met the rule and said Sonnet takes micros (its noise floor was 0.08); the registration did not call for a second trial
-after that, and the command center added one after seeing the result, so the two-trial verdict is a ruled extension and not a preregistered outcome, and extending after a pass can only move
-the verdict toward Opus. Over the two trials the strict rule's noise floor is 0.02 at one shared detection rate of 0.27 (two identical reviewers would pass it that rarely) and 0.73 with each
-finding's own pooled rate (a plug-in calculation from these runs, not a significance test: a miss is less easily put down to chance than the first figure suggests, though it rests on one
-Opus detection); the tolerant reading, reported and not decisive, holds, and two identical reviewers would satisfy it 0.56 of the time (0.62 for its per-finding clause alone, the figure the
-result record prints). Beside the rule, not inputs: outside the known findings Opus reported 7 real and new P1 or P2 findings against Sonnet's 1, and Sonnet approved #982 in both trials
-where Opus requested changes. The command center ruled the strict reading on 2026-10-11 (ruling sha256 `a6beedb039e6`, `research-cc-role-20261008/ruling-routing-run5-two-trial-20261011.md`):
-Opus for trading code, gate code and any micro that is the only Claude-family read of a gate; Sonnet at medium only for non-gate foundation changes (docs, pages, catalogs, generated reports)
-where the change is mechanical or a second Claude-family read exists, which is the command center's routing discretion under the owner's direction to use the cheapest model that holds
-quality and not something run 5 measured (none of the 5 heads was a docs, pages or generated-report change); no slot row, default or skill text changes. Limits: the same 5 heads in both
-trials, so the second trial measures run-to-run variation on them; one brief; medium effort only; the judge and refuter are one family; the fence denies the client's persisted tool outputs
-and refused the runs that tried to read them (3 Opus runs in trial 2, 2 in trial 1); costs are API-list-equivalent, not billed. The preregistration is sha256 `66f87a9eb2b9`, the result
-record `5642e6a1b989`, and the registration allows no third trial.
+17% of Opus's cost, so by the strict rule Opus stays. Trial 1 alone met the rule and said Sonnet takes micros (its noise floor was 0.08); the registered trigger ended the run there (Sonnet
+takes review micros, no second trial), and the command center added one after seeing the result, so the two-trial verdict is a ruled extension and not a preregistered outcome, and extending
+after a pass can only move the verdict toward Opus. Over the two trials the strict rule's noise floor is 0.02 at one shared detection rate of 0.27 (two identical reviewers would pass it that
+rarely) and 0.73 with each finding's own pooled rate (a plug-in calculation from these runs, not a significance test: a miss is less easily put down to chance than the first figure suggests,
+though it rests on one Opus detection); the tolerant reading, reported and not decisive, holds, and two identical reviewers would satisfy it 0.56 of the time (0.62 for its per-finding clause
+alone, the figure the result record prints; the command center's ruling prints it too and is corrected in a sidecar file, sha256 `338600a94e55`, which leaves the ruling's bytes unchanged).
+Beside the rule, not inputs: outside the known findings Opus reported 7 real and new P1 or P2 findings against Sonnet's 1, and Sonnet approved #982 in both trials where Opus requested
+changes. The command center ruled the strict reading on 2026-10-11 (ruling sha256 `a6beedb039e6`, `research-cc-role-20261008/ruling-routing-run5-two-trial-20261011.md`): Opus for trading
+code, gate code and any micro that is the only Claude-family read of a gate; Sonnet at medium only for non-gate foundation changes (docs, pages, catalogs, generated reports) where the change
+is mechanical or a second Claude-family read exists, which is the command center's routing discretion under the owner's direction to use the cheapest model that holds quality and not
+something run 5 measured (none of the 5 heads was a docs, pages or generated-report change); no slot row, default or skill text changes. Limits: the same 5 heads in both trials, so the
+second trial measures run-to-run variation on them; one brief; medium effort only; the judge and refuter are one family; the fence denies the client's persisted tool outputs and refused the
+runs that tried to read them (3 Opus runs in trial 2, 2 in trial 1); costs are API-list-equivalent, not billed. The preregistration is sha256 `66f87a9eb2b9`, the result record
+`5642e6a1b989`, and the registration allows no third trial.

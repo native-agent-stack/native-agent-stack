@@ -12,6 +12,7 @@ every paper. `routing_rule()` recomputes the registered rule from those rows, an
 from __future__ import annotations
 
 import copy
+import importlib.util
 import itertools
 import json
 import os
@@ -88,7 +89,11 @@ def noise_floor(p: float, n: int, strict: bool) -> float:
 def tolerant_floor(p: float, n: int) -> float:
     """Chance that two identical reviewers satisfy the whole tolerant reading over n findings: S_f >= O_f - 1 for every finding AND Sonnet's detections in total at least Opus's minus 2. `noise_floor(p, n, False)`
     models the first clause only and printed 0.62 where this gives 0.56 (the Codex review in GitHub of #1005 at 5c5eecaad, P2, line 82; the command center's Claude read of the same head, P3-1): the sum over the findings of
-    the difference S_f - O_f is convolved with each difference held at -1 or more, and the outcomes whose running total is -2 or more are added."""
+    the difference S_f - O_f is convolved with each difference held at -1 or more, and the outcomes whose running total is -2 or more are added.
+    The reading and the null model are the run's own, registered before any run (papers.addendum_01, paired-routing/addendum-01-ruling-and-extension-20261011.md, sha256 1917091f..., lines 17-18); no third-party
+    statistical source defines them, so the reference is the brute-force enumeration in test_the_tolerant_floor_counts_both_clauses_of_the_reading. The sum of independent differences is convolved as numpy 2.5.3
+    documents numpy.convolve: "In probability theory, the sum of two independent random variables is distributed according to the convolution of their individual distributions." The cross-check test runs where numpy
+    is installed (the Codex review in GitHub of #1005 at 425240f6e, P1, line 91)."""
     b = [(1 - p) ** 2, 2 * p * (1 - p), p ** 2]
     step = {}
     for o in range(3):
@@ -145,11 +150,12 @@ def routing_paragraph(r: dict) -> str:
             f"The rule fixed before the first run: Sonnet takes review micros only if, for every decisive finding, it found the finding in at least as many of its runs as Opus did, and its runs cost at most {ROUTING_COST_BOUND:.0%} of Opus's. "
             f"Opus found {got['detections']['O']} detections of {2 * dec['decisive_findings']} and Sonnet {got['detections']['S']}; Sonnet missed {len(got['missed'])} decisive finding that Opus found "
             f"({gid}, found in {got['counts']['O'][gid]} of Opus's 2 runs and {got['counts']['S'][gid]} of Sonnet's), at {got['ratio']:.0%} of Opus's cost, so by the strict rule Opus stays. Trial 1 alone met the rule and said Sonnet takes micros "
-            f"(its noise floor was {dec['trial_1_alone']['strict_pass_chance_if_identical']:.2f}); the registration did not call for a second trial after that, and the command center added one after seeing the result, so the "
+            f"(its noise floor was {dec['trial_1_alone']['strict_pass_chance_if_identical']:.2f}); the registered trigger ended the run there (Sonnet takes review micros, no second trial), and the command center added one after seeing the result, so the "
             f"two-trial verdict is a ruled extension and not a preregistered outcome, and extending after a pass can only move the verdict toward Opus. Over the two trials the strict rule's noise floor is {got['strict_floor']:.2f} "
             f"at one shared detection rate of {got['pooled']:.2f} (two identical reviewers would pass it that rarely) and {got['strict_floor_per_finding']:.2f} with each finding's own pooled rate (a plug-in calculation from these runs, "
             f"not a significance test: a miss is less easily put down to chance than the first figure suggests, though it rests on {one_detection}); the tolerant reading, reported and not decisive, holds, and two identical "
-            f"reviewers would satisfy it {got['tolerant_floor']:.2f} of the time ({got['tolerant_clause_floor']:.2f} for its per-finding clause alone, the figure the result record prints). "
+            f"reviewers would satisfy it {got['tolerant_floor']:.2f} of the time ({got['tolerant_clause_floor']:.2f} for its per-finding clause alone, the figure the result record prints; the command center's ruling prints it too and is corrected in a sidecar "
+            f"file, sha256 `{papers['ruling_correction']['sha256'][:12]}`, which leaves the ruling's bytes unchanged). "
             f"Beside the rule, not inputs: outside the known findings Opus reported {beside['real_new_p1_p2']['O']} real and new P1 or P2 findings against Sonnet's {beside['real_new_p1_p2']['S']}, "
             f"and Sonnet approved {', '.join(differ_heads)}{' in both trials' if both_trials else ''} where Opus requested changes. The command center ruled the strict reading on {ruling['date']} "
             f"(ruling sha256 `{ruling['sha256'][:12]}`, `{papers['ruling']['path']}`): Opus for trading code, gate code and any micro that is the only Claude-family read of a gate; Sonnet at medium only for non-gate foundation "
@@ -415,6 +421,33 @@ class OrchestrationRunTests(unittest.TestCase):
                       f"and none of the primary fixtures {PRIMARY[0]} to {PRIMARY[-1]}", teams["notes"])
         self.assertNotIn("won no fixture", teams["notes"])
 
+    def test_the_time_bounds_the_row_and_the_record_state_are_the_registered_ones(self):
+        # The Codex review in GitHub of #1005 at 425240f6e (P2, workers.md:61): the orchestration-frameworks row and the record said "a 45-minute ceiling per run", while the registered design has two bounds, a 50-minute
+        # process cap for a headless session (arms A and B) and a 45-minute cap for the team (arm C; preregistration.md:156), and the Workflow's verifier was cut by the client's own 45-minute wait for background tasks
+        # (the stderr of the four B runs reads "Background tasks still running 45m after the last turn"), which is neither of them.
+        caps = self.o["design"]["caps"]
+        self.assertEqual((caps["headless_session_minutes"], caps["team_minutes"]), (50, 45))
+        for run in self.o["runs"]:
+            if run["arm"] != "C":
+                self.assertLess(run["seconds"], caps["headless_session_minutes"] * 60, f"{run['run']} stayed inside the headless cap")
+        c_runs = [x for x in self.o["runs"] if x["arm"] == "C"]
+        stopped = sum(x["stopped_at_45_minutes"] for x in c_runs)
+        not_done = sum(not x["team_done"] for x in c_runs)
+        at_wait = sum(1 for x in self.o["runs"] if x["arm"] == "B" and not x["workflow"]["verifier_returned"])
+        self.assertEqual((at_wait, stopped, not_done), (4, 3, 4))
+        bounds = f"process caps of {caps['headless_session_minutes']} minutes per headless session and {caps['team_minutes']} per team"
+        notes = self.slots["orchestration-frameworks"]["notes"]
+        page = (SLOTS.parent / "workers.md").read_text(encoding="utf-8")
+        record = " ".join(RECORD.read_text(encoding="utf-8").split())
+        self.assertIn(bounds, notes)
+        self.assertIn(f"{at_wait} of the 6 Workflow runs ended at `claude -p`'s own 45-minute wait for background tasks after the last turn, before the {caps['headless_session_minutes']}-minute cap", notes)
+        self.assertIn(f"{not_done} of the 6 team runs did not reach TEAM-DONE ({stopped} stopped at the {caps['team_minutes']}-minute team cap)", notes)
+        self.assertIn(notes, page, "the page mirrors the row")
+        self.assertIn(bounds, record)
+        self.assertIn(f"was stopped at the {caps['team_minutes']}-minute team cap in {stopped}", record)
+        for text in (notes, record, page):
+            self.assertNotIn("a 45-minute ceiling", text)
+
     def test_the_record_addendum_states_the_orchestration_decision(self):
         record = " ".join(RECORD.read_text(encoding="utf-8").split())
         paragraph = record.split("**Orchestration (paired run 1).**", 1)[1].split("**", 1)[0]
@@ -486,6 +519,25 @@ class RoutingRunTests(unittest.TestCase):
         self.assertAlmostEqual(got["strict_floor_per_finding"], 0.7305, places=3)
         self.assertEqual(self.r["judging"]["contested_cells"], 0)
 
+    @unittest.skipUnless(importlib.util.find_spec("numpy"), "numpy is not installed")
+    def test_the_tolerant_floor_matches_numpy_convolve_where_numpy_is_installed(self):
+        # The Codex review in GitHub of #1005 at 425240f6e (P1, line 91): the sum of the per-finding differences is the convolution of their distributions (numpy 2.5.3, numpy.convolve documentation); the running
+        # total of tolerant_floor is checked against numpy's own convolution, for the pooled rate of the run and for other rates and sizes.
+        import numpy
+        for p, n in ((0.27, 12), (0.3, 3), (0.5, 7), (0.9, 12)):
+            with self.subTest(p=p, n=n):
+                b = [(1 - p) ** 2, 2 * p * (1 - p), p ** 2]
+                step = numpy.zeros(4)  # the differences S_f - O_f of -1, 0, 1 and 2 (a difference below -1 is outside the per-finding clause)
+                for o in range(3):
+                    for s in range(3):
+                        if s - o >= -1:
+                            step[s - o + 1] += b[o] * b[s]
+                total = numpy.array([1.0])
+                for _ in range(n):
+                    total = numpy.convolve(total, step)
+                expected = float(sum(chance for index, chance in enumerate(total) if index - n >= -2))  # entry k holds the running total k - n
+                self.assertAlmostEqual(tolerant_floor(p, n), expected, places=12)
+
     def test_the_tolerant_floor_counts_both_clauses_of_the_reading(self):
         # The Codex review in GitHub of #1005 at 5c5eecaad (P2): the tolerant reading needs every S_f >= O_f - 1 AND a total within two, and the floor printed (0.62) modelled the first clause only.
         p, n = 0.3, 3
@@ -523,6 +575,17 @@ class RoutingRunTests(unittest.TestCase):
                 self.assertIn(needle, paragraph)
         self.assertIn("a ruled extension", dec["two_trial_verdict_basis"])
         self.assertIn("after seeing that result", dec["two_trial_verdict_basis"])
+        # The command center's Claude micro of #1005 at 425240f6e (P3-1): addendum 1 (line 13), written before any run, fixed the trigger too, which ends the run after a passing trial 1.
+        self.assertIn("and so was its trigger, which ends the run after a passing trial 1 (Sonnet takes review micros, no second trial)", dec["two_trial_verdict_basis"])
+        self.assertNotIn("but the decision to run them was not", dec["two_trial_verdict_basis"])
+        self.assertIn("the registered trigger ended the run there (Sonnet takes review micros, no second trial), and the command center added one after seeing the result", paragraph)
+        self.assertIn("Opus for every Claude read or micro of trading code and gate code", ruling["routing"])
+        self.assertIn("papers.addendum_01, lines 17-18", dec["tolerant_floor_basis"]["reading_and_null_model"])
+        self.assertIn("numpy.convolve", dec["tolerant_floor_basis"]["sum_of_independent_differences"])
+        self.assertEqual(dec["two_trial_verdict_basis_source"], self.r["papers"]["addendum_03"], "the basis cites addendum 3 of the run's papers by path, size and hash")
+        self.assertEqual(self.r["papers"]["addendum_03"]["path"], "paired-routing/addendum-03-trial-2-extension-20261011.md")
+        self.assertIn("papers.ruling_correction", self.r["ruling"]["correction_note"])
+        self.assertTrue(self.r["papers"]["ruling_correction"]["path"].endswith("ruling-routing-run5-two-trial-20261011.correction-01.md"))
         self.assertIn("second_trial", self.r["design"])
         self.assertIn("decided after trial 1", self.r["design"]["second_trial"])
 
@@ -544,7 +607,7 @@ class RoutingRunTests(unittest.TestCase):
                     walk(item, f"{trail}[{index}]")
 
         walk(self.artifact)
-        self.assertGreaterEqual(len(cited), 24)
+        self.assertGreaterEqual(len(cited), 26)
         for trail, entry in cited:
             with self.subTest(entry=trail):
                 relative = entry["path"].split(" (")[0]
@@ -554,6 +617,11 @@ class RoutingRunTests(unittest.TestCase):
                 self.assertEqual(hashlib.sha256(content).hexdigest()[:len(entry["sha256"])], entry["sha256"])
                 if "bytes" in entry:
                     self.assertEqual(len(content), entry["bytes"])
+        # the registered reading and null model the tolerant floor cites (Codex on #1005 at 425240f6e, P1, line 91) are at the lines the artifact names
+        relative = self.r["papers"]["addendum_01"]["path"]
+        lines = next(root / relative for root in roots if (root / relative).is_file()).read_text(encoding="utf-8").splitlines()
+        self.assertIn("a tolerant reading (S_f >= O_f - 1 on every decisive finding and the total of Sonnet's detections at least Opus's total minus 2)", lines[16])
+        self.assertIn("Noise floors for two identical reviewers who each find a finding with probability p", lines[17])
 
     def test_the_rule_is_live_not_typed_in(self):
         finds = copy.deepcopy(self.r)

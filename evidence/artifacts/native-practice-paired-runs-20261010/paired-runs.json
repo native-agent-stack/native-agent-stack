@@ -2249,7 +2249,16 @@
    },
    "tolerant_per_finding_clause_pass_chance_if_identical": 0.6204,
    "strict_pass_chance_if_identical_per_finding_rates": 0.7305,
-   "two_trial_verdict_basis": "a ruled extension: trial 1 met the registered rule (Sonnet takes review micros) and the command center added trial 2 after seeing that result (addendum 3 of the run's papers); the rule for two trials was fixed before any run (addendum 1) but the decision to run them was not, so the two-trial verdict is not a preregistered outcome, and an extension after a pass can only move the verdict toward Opus"
+   "two_trial_verdict_basis": "a ruled extension: trial 1 met the registered rule (Sonnet takes review micros); the rule for two trials was fixed before any run (addendum 1) and so was its trigger, which ends the run after a passing trial 1 (Sonnet takes review micros, no second trial); the command center ran trial 2 after seeing that result (addendum 3 of the run's papers), so the two-trial verdict is not a preregistered outcome, and an extension after a pass can only move the verdict toward Opus",
+   "two_trial_verdict_basis_source": {
+    "path": "paired-routing/addendum-03-trial-2-extension-20261011.md",
+    "bytes": 2447,
+    "sha256": "a4f8d1d2f4e9da1e5e52a90ab0a4925b42bbe24a684cd1c9b389a40973b5172f"
+   },
+   "tolerant_floor_basis": {
+    "reading_and_null_model": "the run's own, registered before any run: papers.addendum_01, lines 17-18 (the tolerant reading, and the noise floors of two identical reviewers who each find a finding with probability p in each run); no third-party source defines this registered reading, so the reference is the brute-force enumeration in tests/test_paired_runs_results.py",
+    "sum_of_independent_differences": "numpy 2.5.3, numpy.convolve documentation: the sum of two independent random variables is distributed according to the convolution of their individual distributions; the test cross-checks tolerant_floor against numpy.convolve where numpy is installed"
+   }
   },
   "beside_the_rule": {
    "real_new_p1_p2": {
@@ -2293,8 +2302,9 @@
    "path": "research-cc-role-20261008/ruling-routing-run5-two-trial-20261011.md (the command center's private research directory)",
    "sha256": "a6beedb039e6c9690c15d81d31b9084b354ae46ecbf8fb2a36416a88211f2863",
    "decision": "the strict reading stands, so Opus stays the default for Claude review micros",
-   "routing": "Opus for every Claude read of trading code or gate code and for any micro that is the only Claude-family read of a gate; Sonnet at medium only for non-gate foundation changes (docs, pages, catalogs, generated reports) where the change is mechanical or a second Claude-family read exists; no slot row, default or skill text changes from the ruling alone",
-   "revised": "the file was edited by the command center on 2026-10-11 after this record first cited it (a wording change at about 09:32Z); the text first cited, sha256 prefix 08aac8fd72be, is not retained"
+   "routing": "Opus for every Claude read or micro of trading code and gate code, and for any micro that is the only Claude-family read of a gate; Sonnet at medium only for non-gate foundation changes (docs, pages, catalogs, generated reports) where the change is mechanical or a second Claude-family read exists; no slot row, default or skill text changes from the ruling alone",
+   "revised": "the file was edited by the command center on 2026-10-11 after this record first cited it (a wording change at about 09:32Z); the text first cited, sha256 prefix 08aac8fd72be, is not retained",
+   "correction_note": "the command center corrected the ruling's figure for the tolerant noise floor (0.62, the per-finding clause alone; the full reading is 0.5551) and recorded how the two-trial verdict came about in a sidecar file (papers.ruling_correction), leaving the ruling's own bytes unchanged so that this pin stays valid"
   },
   "papers": {
    "preregistration": {
@@ -2351,6 +2361,11 @@
     "path": "paired-routing/CORRECTION-tolerant-floor-20261011.md",
     "bytes": 2352,
     "sha256": "f80215104fe6820567acf8c8857e2fffd0b2c5dfb3db759a2b7816fbffb86119"
+   },
+   "ruling_correction": {
+    "path": "research-cc-role-20261008/ruling-routing-run5-two-trial-20261011.correction-01.md",
+    "bytes": 1516,
+    "sha256": "338600a94e55afe618c769ea4e464738a7784bb4c96478125582aa3bc09a50dc"
    }
   }
  }
