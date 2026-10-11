@@ -21,6 +21,9 @@ unretained full-plan citation. The terminal definitions incorporate the CC's
 conditions 1–4. Operative requirements are retained here so future sessions
 need no access to the coordination file.
 
+The CC's 2026-10-11 17:30Z readiness ruling supersedes date-based comparison
+routing below; preregistered data windows retain their original boundaries.
+
 ## Decision
 
 Before any research dispatch or comparison:
@@ -60,8 +63,8 @@ A **FINAL layer reopens only when a sweep detects a change**. Bind the reopening
 to that sweep and its retained change evidence, then apply the same delta rule.
 The existing [sweep recipe](../../recipes/saturation-sweep.md) and
 [stopping rule](../landscape-continuation.md#a-bounded-stopping-rule) describe
-change triggers and closure evidence. A routine review date schedules a check;
-it does not by itself establish a changed result.
+change triggers and closure evidence. A routine review date records review
+metadata; it does not delay ready work or by itself establish a changed result.
 
 ## Terminal states and evidence
 
@@ -82,12 +85,17 @@ A layer is FINAL only when all of the following hold for each of its winners:
    retire; installation alone is not invoke evidence.
 
 **SCHEDULED:** no winner because evidence cannot settle the layer; commit to
-ONE preregistered comparison with a date and a fixed decision rule. Retain its
-comparison id, preregistration hash, run date and fixed decision rule, plus the
+ONE preregistered comparison with a readiness trigger and a fixed decision rule. Retain its
+comparison id, preregistration hash, readiness trigger and fixed decision rule, plus the
 frozen scope, before the run. SCHEDULED is terminal for the wave: its decision
-procedure is fixed, so the layer waits for the run rather than being relaunched.
+procedure is fixed, so the layer waits for its named inputs rather than being relaunched.
+A readiness trigger names the inputs whose existence starts the run, with no date.
+The comparison starts as soon as those inputs exist.
+A comparison whose inputs exist and has not run is a defect.
+The term SCHEDULED stays for compatibility and means a comparison pending its named inputs.
 It becomes FINAL or RETIRED when the comparison runs and its rule applies.
-A comparison that misses its date is a defect to fix, not a reason to re-research.
+Preregistered protocol windows, including the holdout boundary and the model seal
+before forward scoring, are data-range rules, not schedules.
 Use the existing W5 harnesses: promptfoo, token-e2e, cc-native-practice paired runs
 and landscape-sweep comparisons; introduce another only through its adoption
 decision.
@@ -98,7 +106,7 @@ does not claim a qualified winner or an E2E adoption.
 **Non-terminal:** everything else, including pending lanes, reopened, unswept,
 `no_selection` or no-winner without a scheduled comparison, and still undecided.
 `no_selection` must name its comparison in `open_gaps`, including the comparison
-id, preregistration hash, run date and fixed decision rule above, to qualify as
+id, preregistration hash, readiness trigger and fixed decision rule above, to qualify as
 SCHEDULED. No-winner without a scheduled comparison is not allowed;
 still undecided cannot be a terminal state. A catalog status alone is not a
 terminal state.
@@ -115,7 +123,7 @@ that this wave reached saturation.
 
 A new full survey on every launch discards retained adjudication work. Closing
 a layer from a selected pin alone omits native lifecycle and invoke evidence.
-Leaving a no-winner row without a dated comparison postpones the decision
+Leaving a no-winner row without a comparison's named inputs postpones the decision
 indefinitely. The chosen protocol reuses the existing verdict, sweep and
 comparison pipeline, and requires only a short always-loaded AGENTS.md pointer.
 
@@ -133,6 +141,9 @@ misclassify a layer; retain this record as superseded history.
   CC's 2026-10-11 06:12Z terminal-state ruling retained in
   `~/.local/state/native-agent-stack/coordination/command-center/research-cc-role-20261008/pr1008-claude-read-95b27707.md`,
   SHA256 `42e3e24ec9ee2e06288b6f6cba407b741e585ca93cef5e738f3f93535258c8de`.
+- Readiness amendment: the CC's 2026-10-11 17:30Z ruling retained in
+  `~/.local/state/native-agent-stack/coordination/command-center/research-cc-role-20261008/ruling-no-schedules-proceed-when-ready-20261011.md`,
+  SHA256 `dd05310efdb514b2886bb55a292176352f51f7d161345d8335e33d6285d191f2`.
 - Michael Nygard, [Documenting Architecture Decisions](https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions),
   2011-11-15, **Decision**, **Status**, **Consequences**: a short retained decision
   with context and consequences, and supersession rather than erasure.

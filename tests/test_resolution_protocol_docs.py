@@ -84,15 +84,15 @@ class ResolutionProtocolDocsTests(unittest.TestCase):
         ), terminal)
         scheduled = terminal.partition("**SCHEDULED:**")[2].partition("**RETIRED:**")[0]
         self.assert_phrases((
-            "ONE preregistered comparison with a date and a fixed decision rule",
-            "comparison id, preregistration hash, run date and fixed decision rule",
+            "ONE preregistered comparison with a readiness trigger and a fixed decision rule",
+            "comparison id, preregistration hash, readiness trigger and fixed decision rule",
             "becomes FINAL or RETIRED when the comparison runs and its rule applies",
-            "A comparison that misses its date is a defect to fix",
+            "A comparison whose inputs exist and has not run is a defect.",
         ), scheduled)
         non_terminal = terminal.partition("**Non-terminal:**")[2]
         self.assert_phrases((
             "`no_selection` must name its comparison in `open_gaps`",
-            "comparison id, preregistration hash, run date and fixed decision rule",
+            "comparison id, preregistration hash, readiness trigger and fixed decision rule",
             "No-winner without a scheduled comparison is not allowed",
             "still undecided cannot be a terminal state",
         ), non_terminal)
@@ -111,17 +111,29 @@ class ResolutionProtocolDocsTests(unittest.TestCase):
             "A zero-call tool is a wiring defect to fix, or a role to retire; "
             "installation alone is not invoke evidence.",
             "**SCHEDULED:** no winner because evidence cannot settle the layer; commit to "
-            "ONE preregistered comparison with a date and a fixed decision rule.",
-            "Retain its comparison id, preregistration hash, run date and fixed decision "
+            "ONE preregistered comparison with a readiness trigger and a fixed decision rule.",
+            "Retain its comparison id, preregistration hash, readiness trigger and fixed decision "
             "rule, plus the frozen scope, before the run.",
             "SCHEDULED is terminal for the wave: its decision procedure is fixed, so "
-            "the layer waits for the run rather than being relaunched.",
+            "the layer waits for its named inputs rather than being relaunched.",
             "It becomes FINAL or RETIRED when the comparison runs and its rule applies.",
-            "A comparison that misses its date is a defect to fix, not a reason to re-research.",
+            "A comparison whose inputs exist and has not run is a defect.",
             "**RETIRED:** the role is retired with a recorded reason (condition 4); "
             "retirement does not claim a qualified winner or an E2E adoption.",
             "A catalog status alone is not a terminal state.",
         ), terminal)
+
+    def test_scheduled_starts_on_readiness_and_preserves_data_windows(self):
+        scheduled = self.record().partition("**SCHEDULED:**")[2].partition("**RETIRED:**")[0]
+        self.assert_phrases((
+            "A readiness trigger names the inputs whose existence starts the run, with no date.",
+            "The comparison starts as soon as those inputs exist.",
+            "A comparison whose inputs exist and has not run is a defect.",
+            "The term SCHEDULED stays for compatibility and means a comparison pending its named inputs.",
+            "Preregistered protocol windows, including the holdout boundary and the model seal "
+            "before forward scoring, are data-range rules, not schedules.",
+        ), scheduled)
+        self.assertNotRegex(self.record(), r"\brun date\b|\bwith a date\b|\bmisses its date\b|\bdated comparison\b")
 
     def test_record_dates_the_authority_and_names_existing_harnesses(self):
         self.assert_phrases((
