@@ -1380,6 +1380,13 @@ class MapTests(unittest.TestCase):
 
 
 class AgentGapTests(unittest.TestCase):
+    def test_installed_skills_excludes_native_plugin_rows(self):
+        rows = {"skills": {"commands": [cfg.SKILLS_INSTALLER]}}
+        installed = cfg.installed_skills(rows)
+        self.assertNotIn("claude-api", installed,
+                         "The plan must not claim a native plugin its installer never installs")
+        self.assertEqual(len(installed), 28)
+
     """What each project agent names that this distribution will not have, derived from the frontmatter."""
 
     def test_the_gaps_are_the_servers_and_skills_the_agents_name_beyond_the_wired_ones_and_the_plans_skills(self):
@@ -1406,9 +1413,9 @@ class AgentGapTests(unittest.TestCase):
         # The skills rows run install_skills.py over adoption/skills/manifest.json (wave-2 skills ruling, change 7): the
         # selected rows, without the retired, pruned and held ones.
         selected = {skill["name"] for skill in json.loads((ROOT / cfg.SKILLS_MANIFEST_REL).read_text())["skills"]
-                    if skill.get("status") not in ("pruned", "held")}
+                    if skill.get("status") not in ("pruned", "held") and not skill.get("native_plugin")}
         self.assertEqual(plan["skills"], frozenset(selected))
-        self.assertEqual(len(plan["skills"]), 29)
+        self.assertEqual(len(plan["skills"]), 28)
         self.assertTrue({"tdd", "diagnosing-bugs", "codebase-design", "writing-for-agents", "skill-creator"} <= plan["skills"])
         self.assertEqual({"grill-me", "improve-codebase-architecture", "semgrep", "agent-browser", "domain-modeling",
                           "setup-matt-pocock-skills"} & plan["skills"], set())

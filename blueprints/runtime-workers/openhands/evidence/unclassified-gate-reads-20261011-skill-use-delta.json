@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "gate_read_accounting_delta",
   "date": "2026-10-11",
-  "source_commit": "561361c4818a13ad52d2a5be785a066c84128730",
+  "source_commit": "9794477a7855dbe30173ba884d1dcb38b0eb8a9e",
   "baseline_path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261004.json",
   "baseline_sha256": "8752740817bb41c1a582e33fa475e4ce4064f2ccfecadb706bce40ecb4512157",
   "mode": "monitoring_only",
@@ -42,13 +42,13 @@
     "scripts/skills_status.py:614",
     "scripts/skills_status.py:682",
     "scripts/skills_status.py:785",
-    "tools/adoption/install_skills.py:599",
-    "tools/adoption/install_skills.py:626",
-    "tools/adoption/install_skills.py:627"
+    "tools/adoption/install_skills.py:604",
+    "tools/adoption/install_skills.py:631",
+    "tools/adoption/install_skills.py:632"
   ],
   "derived_count": 340,
   "derivation": {
-    "source": "blueprints/runtime-workers/openhands/resolver/push_gate.py:derive_ci_protected; input commit 561361c4818a13ad52d2a5be785a066c84128730",
+    "source": "blueprints/runtime-workers/openhands/resolver/push_gate.py:derive_ci_protected; input commit 9794477a7855dbe30173ba884d1dcb38b0eb8a9e",
     "replay": "python3 -m unittest discover -s tests -p test_runtime_worker_openhands_push_gate.py",
     "method": "RepositoryWorkflowTests.derived() uses GitTree(HEAD) and derive_ci_protected. Compare script counts and shape multiplicities with the current main baseline, which already separates test modules.",
     "interpretation": "Monitoring accounting only; no permission or execution authority is added."

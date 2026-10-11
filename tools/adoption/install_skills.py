@@ -717,7 +717,8 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     home = Path(args.home)
-    skills = [s for s in all_skills if not isinstance(s, dict) or s.get("status") not in SKIPPED_STATUSES]
+    skills = [s for s in all_skills if not isinstance(s, dict)
+              or (s.get("status") not in SKIPPED_STATUSES and not s.get("native_plugin"))]
     if args.only:
         wanted = list(dict.fromkeys(args.only))
         by_name = {s["name"]: s for s in skills if isinstance(s, dict) and "name" in s}
@@ -726,6 +727,12 @@ def main(argv: list[str] | None = None) -> int:
         unknown = [name for name in wanted if name not in status_of]
         if unknown:
             print(f"install-skills failed: unknown --only name(s): {unknown}", file=sys.stderr)
+            return 1
+        native = [s["name"] for s in all_skills if isinstance(s, dict)
+                  and s.get("native_plugin") and s["name"] in wanted]
+        if native:
+            print(f"install-skills failed: native plugin --only name(s) are managed separately: {native}",
+                  file=sys.stderr)
             return 1
         pruned = [name for name in wanted if name not in by_name and status_of[name] == "pruned"]
         if pruned:
@@ -772,7 +779,9 @@ def main(argv: list[str] | None = None) -> int:
             return 1
 
     try:
-        if not skills or any(not isinstance(skill, dict) or not skill.get("native_plugin") for skill in skills):
+        only_native_rows = bool(all_skills) and all(isinstance(skill, dict) and skill.get("native_plugin")
+                                                   for skill in all_skills)
+        if skills or not only_native_rows:
             verify_skills_bin(args.skills_bin, manifest["cli"], home)
     except InstallError as error:
         print(f"install-skills failed: {error}", file=sys.stderr)

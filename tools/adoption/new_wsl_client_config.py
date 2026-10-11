@@ -411,10 +411,11 @@ SKILLS_INSTALLER = "tools/adoption/install_skills.py"
 
 def installed_skills(rows: dict, root: Path = ROOT) -> frozenset:
     """The skills the plan installs. Since the wave-2 skills ruling (change 7) its skills rows run the repository's
-    installer against adoption/skills/manifest.json: over every selected skill (none pruned or held) without --only, or
+    installer against adoption/skills/manifest.json: over every selected managed skill (none pruned, held or native-plugin)
+    without --only, or
     over its --only names. A row that runs the skills CLI's own add names its skills after -s."""
     selected = {skill["name"] for skill in read_json(root / SKILLS_MANIFEST_REL)["skills"]
-                if skill.get("status") not in ("pruned", "held")}
+                if skill.get("status") not in ("pruned", "held") and not skill.get("native_plugin")}
     found = set()
     for row in rows.values():
         for command in row.get("commands", []):

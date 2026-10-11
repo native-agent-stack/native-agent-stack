@@ -65,7 +65,7 @@ class SkillCorrectionClaimsTests(unittest.TestCase):
         self.assertIsNotNone(source, "Identify the measured input separately from future correction commits")
         self.assertEqual(source.group(1), delta["source_commit"])
         # Historical integration base captured with Git at the reviewed head.
-        self.assertIn("The final CC-cued main base is `1e6a49ffe8652918479e59bcb3751c0eb418e6d3`.", landing)
+        self.assertIn("The final CC-cued main base is `bcf55c457d057c71faceeab068bdd02017c43342`.", landing)
 
     def test_same_head_ablation_is_the_primary_comparison(self):
         primary = [(title, body) for title, body in sections((ROOT / DECISION).read_text())

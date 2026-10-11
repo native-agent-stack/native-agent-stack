@@ -21,6 +21,21 @@ TARGETS = {"security-audit", "gh-fix-ci", "gh-address-comments", "frontend-desig
 
 
 class NativePluginTests(unittest.TestCase):
+    def test_fresh_default_check_only_excludes_native_plugin_rows(self):
+        with tempfile.TemporaryDirectory() as temp:
+            home = Path(temp)
+            manifest = home / "plugin-manifest.json"
+            manifest.write_text(json.dumps({"skills": [{"name": "claude-api",
+                "native_plugin": "claude-api@fixture", "path": "skills/claude-api",
+                "ref": "a" * 40, "skill_md_sha256": "b" * 64}], "cli": {"version": "1.7.0"}}))
+            with patch.dict("os.environ", {}, clear=True), patch.object(
+                    install_skills, "verify_skills_bin", side_effect=AssertionError("No managed skills selected")), \
+                    contextlib.redirect_stdout(io.StringIO()) as output:
+                rc = install_skills.main(["--manifest", str(manifest), "--home", str(home),
+                                          "--check-only", "--json"])
+            self.assertEqual(0, rc, "Default acceptance must exclude separately managed native plugins")
+            self.assertEqual({}, json.loads(output.getvalue())["skills"])
+
     def test_fresh_native_plugin_is_not_installed_without_failing_default_run(self):
         with tempfile.TemporaryDirectory() as temp:
             home = Path(temp)
@@ -35,10 +50,11 @@ class NativePluginTests(unittest.TestCase):
                         rc = install_skills.main(["--manifest", str(manifest), "--home", str(home), "--json", *mode])
                         result = json.loads(output.getvalue())
                         self.assertEqual(0, rc, "Tracking a separately installed native plugin must not break bootstrap")
-                        self.assertEqual("not-installed", result["skills"]["claude-api"])
-                with contextlib.redirect_stdout(io.StringIO()):
-                    self.assertEqual(1, install_skills.main(["--manifest", str(manifest), "--home", str(home),
-                                                          "--check-only", "--only", "claude-api"]))
+                        self.assertNotIn("claude-api", result["skills"])
+                for mode in ([], ["--dry-run"], ["--check-only"]):
+                    with self.subTest(explicit_mode=mode), contextlib.redirect_stdout(io.StringIO()):
+                        self.assertEqual(1, install_skills.main(["--manifest", str(manifest), "--home", str(home),
+                                                              *mode, "--only", "claude-api"]))
             self.assertFalse((home / ".agents/skills/claude-api").exists())
 
     def test_native_plugin_check_only_honors_custom_claude_config_directory(self):
@@ -59,11 +75,13 @@ class NativePluginTests(unittest.TestCase):
             manifest.write_text(json.dumps({"skills": [skill], "cli": {"version": "1.7.0"}}))
             env = {"CLAUDE_CONFIG_DIR": str(config)}
             self.assertEqual("ok", skills_status.native_plugin_status(skill, home, env)["state"])
-            with patch.dict("os.environ", env, clear=True), contextlib.redirect_stdout(io.StringIO()) as output:
+            with patch.dict("os.environ", env, clear=True), contextlib.redirect_stdout(io.StringIO()):
+                state = install_skills.process_skill(skill, home, "must-not-run", False, False, True,
+                                                     check_only=True)
                 rc = install_skills.main(["--manifest", str(manifest), "--home", str(home), "--json",
                                           "--check-only", "--only", "claude-api"])
-            self.assertEqual(0, rc, "Installer and native status must use the same environment")
-            self.assertEqual("ok", json.loads(output.getvalue())["skills"]["claude-api"])
+            self.assertEqual("ok", state, "Installer and native status must use the same environment")
+            self.assertEqual(1, rc, "Explicit native plugin selection is outside this installer")
 
     def test_plugin_pin_uses_native_metadata_and_never_the_skills_cli(self):
         with tempfile.TemporaryDirectory() as temp:
