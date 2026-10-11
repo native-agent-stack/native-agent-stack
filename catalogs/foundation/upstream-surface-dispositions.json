@@ -454,8 +454,8 @@
   {
    "key": "claude:env:CLAUDE_CODE_SESSION_ID",
    "disposition": "declined",
-   "reason": "off on both hosts (read 2026-10-04)); the repository record at docs/contributing-evidence.md:410 names it",
-   "source": "docs/contributing-evidence.md:410",
+   "reason": "off on both hosts (read 2026-10-04)); the repository record at docs/contributing-evidence.md:416 names it",
+   "source": "docs/contributing-evidence.md:416",
    "carrier": null,
    "value": null,
    "scope": null,

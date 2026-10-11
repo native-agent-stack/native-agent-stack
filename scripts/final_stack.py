@@ -31,6 +31,7 @@ import json
 from pathlib import Path
 import re
 import sys
+import tempfile
 import tomllib
 
 try:
@@ -949,13 +950,25 @@ def main(argv=None) -> int:
         print(f"final_stack: {error}")
         return 1
     text = serialize(document)
-    try:
-        private_names = host_name_scan.host_names(root)
-    except host_name_scan.HostNameScanError:
-        raise SystemExit("final_stack: private identity context unavailable; aborting") from None
-    component_matrix.assert_no_private_content(text, private_names=private_names, reject_email=True)
+    component_matrix.assert_no_private_content(text, reject_email=True)
     status = {"layers": len(document["layers"]), "status_counts": document["summary"]["status"]}
     if args.write:
+        try:
+            private_names = host_name_scan.host_names(root)
+        except host_name_scan.HostNameScanError:
+            raise SystemExit("final_stack: private identity context unavailable; aborting") from None
+        # validate.py --scan-file and the pre-push hook use this same native
+        # scanner. Its upstream decoders and literal-boundary rules replace the
+        # former substring matcher; never publish native text or diagnostics.
+        try:
+            with tempfile.TemporaryDirectory(prefix="final-stack-publication-") as temporary:
+                candidate = Path(temporary) / "candidate.json"
+                candidate.write_bytes(text.encode("utf-8"))
+                findings = host_name_scan.scan_paths([candidate], root=root, names=private_names, reject_email=True)
+        except (host_name_scan.HostNameScanError, OSError):
+            raise SystemExit("final_stack: private publication scanner unavailable; aborting") from None
+        if findings:
+            raise SystemExit("final_stack: native scanner refused private publication content; aborting")
         (root / OUTPUT).write_text(text, encoding="utf-8")
         host_receipts.register_file(root, OUTPUT)
         print(json.dumps({"status": "written", **status}, sort_keys=True))

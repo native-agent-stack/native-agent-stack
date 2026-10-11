@@ -11357,7 +11357,7 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/resolver/gh_harness.py",
-      "sha256": "917e8b32a2c8a9b91d8a93a1bb27c6e819d32b158680d4bf65cbb35978997fdd",
+      "sha256": "7fa783ad5d2b9c99d9f82565718c12ccd7fc6a693f05e72c4f5e00686c52f600",
       "bytes": 35857
     },
     {
@@ -11372,8 +11372,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/resolver/push_gate.py",
-      "sha256": "39062cc57220b053e516b28d8ac825071f8e2ada8af59b5b389817dd84cc242f",
-      "bytes": 75874
+      "sha256": "abd695adba82234bb2671158c42de482cacaa350f983403cc3e939859acd7bdc",
+      "bytes": 75951
     },
     {
       "path": "blueprints/runtime-workers/openhands/run-e2e.sh",
@@ -17137,7 +17137,7 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "b5b52ab0497d6277b678b99d78f1adebbdfce49a5eaa9ba35c93043d3891bb96",
+      "sha256": "aad08353f6d26364d8d62c8cd6c14ab1d3ecdcccd5d28641ac81fe9c7469cc88",
       "bytes": 160022
     },
     {
@@ -18722,8 +18722,8 @@
     },
     {
       "path": "docs/decisions/2026-10-11-final-stack-review-corrections.md",
-      "sha256": "eecfeafa1128fd415088d9fb15ad2407adf43706365dbf8623301dc8515f8fdb",
-      "bytes": 12135
+      "sha256": "a8d2a1cd9d99f975e17fa6fb7242458f204ce41a8a22021d478c7080bfbea43d",
+      "bytes": 20832
     },
     {
       "path": "docs/decisions/2026-10-11-layer-resolution-protocol.md",
@@ -18882,7 +18882,7 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "09b0a3ecd3bbc4e2dee314739a51d8319718b95724a17acf3696892630b79cd1",
+      "sha256": "561a140cdb9d58caf9b76f21a7caf016c0e94eb1f9763e5c33108b0d2ee51a1c",
       "bytes": 260516
     },
     {
@@ -60662,8 +60662,8 @@
     },
     {
       "path": "scripts/component_matrix.py",
-      "sha256": "00294f6b37d4b2dea8828ca574463e6d6dd4ee541351bb6e820594b1709a1cc0",
-      "bytes": 81104
+      "sha256": "202d952952c361b7e17ee82740f7cd220e75cba2f3c7d9e82c433136d0fe0363",
+      "bytes": 80837
     },
     {
       "path": "scripts/credential_boot_receipt.py",
@@ -60687,8 +60687,8 @@
     },
     {
       "path": "scripts/final_stack.py",
-      "sha256": "cf337a95c0c6a0c316d00a0421774d6f26ccd57ccb0c01fc936d87dea5d17fc1",
-      "bytes": 53938
+      "sha256": "190c1435d883571a435f3cff208d0b31636c5ac911631e36c603624da4b437a2",
+      "bytes": 54815
     },
     {
       "path": "scripts/freshness_propose.py",
@@ -60722,8 +60722,8 @@
     },
     {
       "path": "scripts/host_name_scan.py",
-      "sha256": "01ac281b13c17f292e66ee73bd04cd189edcfb608ac3f37d265adeb1a66d226d",
-      "bytes": 18544
+      "sha256": "083b1fe7bb64d8942796c80a2ceed435fb023e7bcfda281d8066bbd01a3043f4",
+      "bytes": 19457
     },
     {
       "path": "scripts/host_receipts.py",
@@ -61577,8 +61577,8 @@
     },
     {
       "path": "tests/test_final_stack.py",
-      "sha256": "140f5121d4f514500dde717898c4a480044e0bc27189bba335aa9d8f810ccb15",
-      "bytes": 43656
+      "sha256": "cd53351e2437450dd12fc8f3bc234a49445f3142f4e18b12ecc057710db011ba",
+      "bytes": 49954
     },
     {
       "path": "tests/test_financial_data.py",
@@ -61712,8 +61712,8 @@
     },
     {
       "path": "tests/test_host_name_scan.py",
-      "sha256": "91c3ede06e49f4d89acf1147fa7bc22802699b7d9f8775479ce9d0f1a70a7fcb",
-      "bytes": 22509
+      "sha256": "15cf7bad15600b4efc5378c6bc07c6ece7116b42b9a75c0339062cd7f83c2d46",
+      "bytes": 23277
     },
     {
       "path": "tests/test_host_receipts.py",

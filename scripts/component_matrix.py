@@ -1100,11 +1100,12 @@ def serialize(document: dict) -> str:
     return json.dumps(document, indent=2, sort_keys=True) + "\n"
 
 
-def assert_no_private_content(text: str, *, private_names: tuple[str, ...] = (), reject_email: bool = False) -> None:
-    """Validate before publication; callers supply private identity context outside pure builders.
+def assert_no_private_content(text: str, *, reject_email: bool = False) -> None:
+    """Apply static publication patterns without collecting host context.
 
-    Email/literal handling follows architecture_sources.py:29 and
-    architecture_manifest.py:103-105 at 4d6cee1582f024d27319ee005117da5f15ebe269.
+    Email handling follows architecture_sources.py:29 at
+    4d6cee1582f024d27319ee005117da5f15ebe269. Private identifiers are scanned by
+    host_name_scan.scan_paths at the writer's boundary, using native decoders.
     The existing static path/token checks apply to every caller; strict context
     is opt-in so historical source captures are not reclassified as generated views.
     """
@@ -1113,10 +1114,6 @@ def assert_no_private_content(text: str, *, private_names: tuple[str, ...] = (),
             raise SystemExit(f"component_matrix: generated output contains possible {description}; aborting")
     if reject_email and re.search(r"\b[^\s<>]+@[^\s<>]+\.[A-Za-z]{2,}\b", text):
         raise SystemExit("component_matrix: generated output contains possible private email content; aborting")
-    folded = text.casefold()
-    if any(name and (name.casefold() in folded or json.dumps(name)[1:-1].casefold() in folded)
-           for name in private_names):
-        raise SystemExit("component_matrix: generated output contains a private account identifier; aborting")
 
 
 def alias_summary_sentence(aliases: list[dict]) -> str:

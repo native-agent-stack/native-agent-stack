@@ -8,6 +8,8 @@ import contextlib
 from datetime import date
 import io
 import json
+import base64
+import shutil
 from pathlib import Path
 import tempfile
 import unittest
@@ -144,10 +146,13 @@ class FixtureTestCase(unittest.TestCase):
         return next(layer for layer in document["layers"] if layer["layer_id"] == layer_id)
 
     @staticmethod
-    def run_main(root: Path, *args) -> tuple[int, str]:
+    def run_main(root: Path, *args, native_scan=False, private_names=("fixture-private-account",)) -> tuple[int, str]:
         buffer = io.StringIO()
-        with contextlib.redirect_stdout(buffer), mock.patch.dict("os.environ", {
-                host_name_scan.OVERRIDE: '["fixture-private-account"]'}):
+        with contextlib.ExitStack() as stack:
+            stack.enter_context(contextlib.redirect_stdout(buffer))
+            stack.enter_context(mock.patch.dict("os.environ", {host_name_scan.OVERRIDE: json.dumps(private_names)}))
+            if not native_scan:
+                stack.enter_context(mock.patch.object(host_name_scan, "scan_paths", return_value=[]))
             exit_code = fs.main(["--root", str(root), *args])
         return exit_code, buffer.getvalue()
 
@@ -210,6 +215,12 @@ class StatusTests(FixtureTestCase):
         self.assertEqual(layer["source"], "catalogs/landscape/planned-layers.json#/layers/0")
         self.assertEqual(document["summary"]["status"],
                          {"unswept": 1, "no-winner": 0, "reopened": 1, "converged": 0, "current": 0})
+
+    def test_a_completed_sweep_covering_a_planned_layer_is_no_winner(self):
+        document = self.build(planned=[_planned()],
+                              sweeps=[_sweep("planned-covered", "2026-09-23", [("us-equities", "planned-a")])])
+        layer = self.layer(document, "planned-a")
+        self.assertEqual((layer["status"], layer["winners"], layer["verdict"]), ("no-winner", [], None))
 
     def test_a_planned_layer_that_collides_with_a_landscape_row_fails(self):
         root = self.root()
@@ -565,7 +576,7 @@ class CheckTests(FixtureTestCase):
         self.assertIn("personal home path", str(raised.exception))
         self.assertFalse((root / fs.OUTPUT).exists())
 
-    def _assert_private_text_is_refused_before_publication(self, payload):
+    def _assert_private_text_is_refused_before_publication(self, payload, private_name="fixture-private-account"):
         root = self.fixture_root()
         self.assertEqual(self.run_main(root, "--write")[0], 0)
         output_before = (root / fs.OUTPUT).read_bytes()
@@ -578,7 +589,7 @@ class CheckTests(FixtureTestCase):
         # when running the pre-fix generator as a failing-first control.
         with mock.patch.object(Path, "write_text") as write, mock.patch.object(hr, "register_file") as register:
             with self.assertRaises(SystemExit) as refused:
-                self.run_main(root, "--write")
+                self.run_main(root, "--write", native_scan=True, private_names=(private_name,))
             write.assert_not_called()
             register.assert_not_called()
         self.assertNotIn(payload, str(refused.exception))
@@ -588,8 +599,88 @@ class CheckTests(FixtureTestCase):
     def test_private_email_is_refused_before_write_or_registration(self):
         self._assert_private_text_is_refused_before_publication("fixture-private@example.invalid")
 
+    @unittest.skipUnless(shutil.which("betterleaks"), "native encoded email plants require Betterleaks 1.9.0")
+    def test_native_scanner_refuses_encoded_email_without_an_account_name_match(self):
+        email = "unlisted-contact@example.invalid"
+        plants = {
+            "percent_at": email.replace("@", "%40"),
+            "percent_all": "".join("%" + format(byte, "02X") for byte in email.encode()),
+            "unicode": "".join(r"\u" + format(ord(char), "04x") for char in email),
+            "base64": base64.b64encode(email.encode()).decode(),
+        }
+        for form, payload in plants.items():
+            with self.subTest(form=form):
+                self._assert_private_text_is_refused_before_publication(payload)
+
+    @unittest.skipUnless(shutil.which("betterleaks"), "native write privacy plant requires Betterleaks 1.9.0")
     def test_explicit_private_account_is_refused_before_write_or_registration(self):
         self._assert_private_text_is_refused_before_publication("fixture-private-account")
+
+    @unittest.skipUnless(shutil.which("betterleaks"), "native write privacy plants require Betterleaks 1.9.0")
+    def test_native_scanner_refuses_encoded_account_plants_before_publication(self):
+        name = "fixture-private-account"
+        plants = {
+            "percent": "".join("%" + format(byte, "02X") for byte in name.encode()),
+            "unicode": "".join(r"\u" + format(ord(char), "04x") for char in name),
+            "base64": base64.b64encode(name.encode()).decode(),
+            "hex": name.encode().hex(),
+            "uppercase": name.upper(),
+        }
+        for form, payload in plants.items():
+            with self.subTest(form=form):
+                self._assert_private_text_is_refused_before_publication(payload)
+        self._assert_private_text_is_refused_before_publication("fixtureéaccount", private_name="fixtureéaccount")
+
+    def test_check_is_independent_of_root_account_and_native_scanner(self):
+        root = self.fixture_root()
+        self.assertEqual(self.run_main(root, "--write")[0], 0)
+        with mock.patch.object(host_name_scan, "host_names", side_effect=AssertionError("host context read")), \
+                mock.patch.object(host_name_scan, "scan_paths", side_effect=AssertionError("native scanner invoked")):
+            exit_code, output = self.run_main(root, "--check", native_scan=True, private_names=("root",))
+        self.assertEqual(exit_code, 0, output)
+
+    def test_native_scanner_failure_preserves_output_and_registration(self):
+        root = self.fixture_root()
+        self.assertEqual(self.run_main(root, "--write")[0], 0)
+        before = ((root / fs.OUTPUT).read_bytes(), (root / "manifests/evidence.json").read_bytes())
+        with mock.patch.object(Path, "write_text") as write, mock.patch.object(hr, "register_file") as register, \
+                mock.patch.object(host_name_scan, "scan_paths", side_effect=host_name_scan.HostNameScanError("native failure")):
+            with self.assertRaisesRegex(SystemExit, "private publication scanner unavailable"):
+                self.run_main(root, "--write", native_scan=True)
+            write.assert_not_called()
+            register.assert_not_called()
+        self.assertEqual(((root / fs.OUTPUT).read_bytes(), (root / "manifests/evidence.json").read_bytes()), before)
+
+    def test_native_scan_precedes_output_write_and_registration(self):
+        root = self.fixture_root()
+        events = []
+
+        def scan(paths, *, root, names, reject_email=False):
+            events.append("scan")
+            self.assertEqual(names, ("fixture-private-account",))
+            self.assertTrue(reject_email)
+            self.assertEqual(len(paths), 1)
+            self.assertNotEqual(paths[0], root / fs.OUTPUT)
+            self.assertEqual(json.loads(paths[0].read_bytes())["layers"][0]["title"], "Title for layer-a")
+            return []
+
+        with mock.patch.object(host_name_scan, "scan_paths", side_effect=scan), \
+                mock.patch.object(Path, "write_text", side_effect=lambda *a, **k: events.append("write")), \
+                mock.patch.object(hr, "register_file", side_effect=lambda *a: events.append("register")):
+            exit_code, output = self.run_main(root, "--write", native_scan=True)
+        self.assertEqual(exit_code, 0, output)
+        self.assertEqual(events, ["scan", "write", "register"])
+
+    @unittest.skipUnless(shutil.which("betterleaks"), "native write privacy control requires Betterleaks 1.9.0")
+    def test_native_write_scanner_preserves_unicode_alphanumeric_boundaries(self):
+        root = self.fixture_root()
+        source = root / "catalogs/landscape/foundation.json"
+        document = json.loads(source.read_text())
+        document["layers"][0]["title"] = "Afixture-private-accountZ"
+        _write_json(source, document)
+        exit_code, output = self.run_main(root, "--write", native_scan=True)
+        self.assertEqual(exit_code, 0, output)
+        self.assertIn("Afixture-private-accountZ", (root / fs.OUTPUT).read_text())
 
     def test_private_context_failure_preserves_output_and_registration(self):
         root = self.fixture_root()
@@ -678,6 +769,15 @@ class CheckTests(FixtureTestCase):
 
 
 class RepositoryTests(unittest.TestCase):
+    def test_committed_check_ignores_common_account_context(self):
+        for account in ("root", "ubuntu", "node", "dev"):
+            with self.subTest(account=account), mock.patch.dict("os.environ", {
+                    host_name_scan.OVERRIDE: json.dumps([account])}), \
+                    mock.patch.object(host_name_scan, "host_names", side_effect=AssertionError("host read")), \
+                    mock.patch.object(host_name_scan, "scan_paths", side_effect=AssertionError("native scan")), \
+                    contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(fs.main(["--root", str(REPO_ROOT), "--check"]), 0)
+
     def test_serializer_is_the_shared_first_party_callable(self):
         self.assertIs(fs.serialize, cm.serialize)
         self.assertEqual(fs.serialize({"z": 1, "a": []}), '{\n  "a": [],\n  "z": 1\n}\n')

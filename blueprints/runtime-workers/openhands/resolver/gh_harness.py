@@ -50,7 +50,7 @@ HOST = "github.com"
 ORIGIN_URL = f"https://{HOST}/{REPO}.git"
 API = f"repos/{REPO}"
 GH_VERSION = "2.101.0"
-LANE_LABELS = ("lane:foundation", "lane:trading", "lane:shared")  # docs/lanes.md:145-151
+LANE_LABELS = ("lane:foundation", "lane:trading", "lane:shared")  # docs/lanes.md:148-154
 PR_VIEW_FIELDS = ("number,url,isDraft,state,baseRefName,headRefName,headRefOid,labels,body,"
                   "autoMergeRequest,mergedAt")
 CHECK_FIELDS = "name,state,bucket,link,workflow"

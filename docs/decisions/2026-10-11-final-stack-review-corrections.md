@@ -90,6 +90,8 @@ same four controls then returned rc 0 (4 tests in 0.081s, zero skips).
   synthetic email/account payloads and publication I/O spies, proving refusal
   before output write or registration, unchanged existing output/registry and
   value-free diagnostics. Path/token protections remain enabled.
+  This describes the initial correction at `f5bd15dd`; the micro correction
+  below supersedes its literal matcher and its host-dependent check path.
 - **Reuse P3:** `final_stack.serialize` is now the imported
   [component-matrix callable](https://github.com/seathatflowsinourveins/native-agent-stack/blob/4d6cee1582f024d27319ee005117da5f15ebe269/scripts/component_matrix.py#L1099),
   with callable-identity and literal byte checks. The existing cadence from
@@ -144,3 +146,118 @@ best-effort indexed coverage. No claim of exhaustive mutation coverage is made.
 Hosted checks at the combined head, each family's designated micro and CC landing
 remain separate gates. Provider-token usage is unknown; this repair starts no
 model run.
+
+## Micro correction at f5bd15dd
+
+The micro found one CI failure and incomplete privacy coverage. The existing
+`tests.test_upstream_surface_watch` reproduced the moved citation error:
+114 tests, one failure, six existing optional skips, rc 1. The two catalog
+references now name `docs/contributing-evidence.md:416`; the same unchanged
+module returned rc 0 (114 tests in 1.903s, six existing optional skips).
+This module is part of the local acceptance closure from this correction onward.
+
+The native publication scanner replaces the handwritten private-name matcher.
+At `--write` only, the CLI collects native private-name context, stages the
+serialized bytes in a private temporary directory and invokes the existing
+`host_name_scan.scan_paths` before the final output write or registration. The
+temporary directory is removed on success or refusal. Static path/token/email
+validation remains in both modes; `--check` performs no host-name collection
+and requires no scanner. Failures return value-free refusal messages and leave
+the existing output and registry intact.
+
+Primary sources for this correction:
+
+- [First-party arbitrary-artifact scan](https://github.com/seathatflowsinourveins/native-agent-stack/blob/f5bd15dd5b100fd00d2aed9beca4941d0f6976d9/scripts/validate.py#L705)
+  and [native scanner integration](https://github.com/seathatflowsinourveins/native-agent-stack/blob/4d6cee1582f024d27319ee005117da5f15ebe269/scripts/host_name_scan.py#L157):
+  native rules, decoded findings, original locations and sanitized failures.
+- [Betterleaks 1.9.0 decoder](https://github.com/betterleaks/betterleaks/blob/81aff7a638638aae3a659845d089043e1d8fe9ac/detect/codec/decoder.go)
+  and [rule filters](https://github.com/betterleaks/betterleaks/blob/81aff7a638638aae3a659845d089043e1d8fe9ac/docs/config.md):
+  use the existing scanner and boundary filters rather than build another
+  decoder or substring matcher. Native executable and exact tag commit agree.
+- [Reviewed generator starting point](https://github.com/seathatflowsinourveins/native-agent-stack/blob/f5bd15dd5b100fd00d2aed9beca4941d0f6976d9/scripts/final_stack.py):
+  native write/check transition, static validation and unchanged data builder.
+
+| Control | Before correction / mutation | Corrected observation |
+| --- | --- | --- |
+| Native percent, literal Unicode escapes, base64 and hex private-account plants; check does not read host context | Two tests returned rc 1 with five failures: four accepted encoded plants plus host read on check | Native refusal/root-check gate returns rc 0; four tests in 1.969s, zero skips |
+| Uppercase and non-ASCII account plants | Supplied micro established missing branch coverage; the native scanner plants now exercise both rather than retain those local matcher branches | Included in actual native write plant test |
+| Completed sweep covering a planned layer | Dropping `state is None` caused current instead of no-winner: one failure, rc 1 | Mutation restored; no-winner, empty winner list and no verdict are asserted |
+| Scanner unavailable / context unavailable | Value-free fail-closed branch exercised | No final write, registration or existing-byte change |
+| Publication ordering | Native scan I/O spy examines the serialized candidate | Exact event order scan, write, register |
+| Native boundaries | Alphanumeric wrapper around a synthetic private name | Successful write, preserving native neighbor rules |
+
+The complete generator module returned rc 0: 60 tests in 2.684s, zero skips,
+including actual native plants. Hosts without Betterleaks explicitly skip the
+the native plant/control tests; ordinary pure builder/check fixtures replace
+only the scanner I/O boundary. Those skips are not native scanner acceptance.
+
+The expanded micro gate returned rc 0: 651 tests in 82.848s, six existing
+optional upstream-surface fixture skips. Its exact module command is:
+
+```sh
+python3 -B -m unittest tests.test_final_stack tests.test_component_matrix tests.test_host_name_scan tests.test_validate tests.test_upstream_surface_watch tests.test_local_pages_policy_grants tests.test_local_pages_architecture_landscape_exclusions tests.test_runtime_worker_openhands_push_gate tests.test_runtime_worker_openhands_resolver
+```
+
+All native scanner plants ran on this host; the six skips come from the existing
+upstream-surface module, whose stale locator now passes. Overlapping earlier
+test executions are not summed as additional coverage. Local FULL validation
+and native evidence checks pass at 70 components, 11,478 hashed files, four
+profiles and 239 receipts. This is preparation evidence; acceptance at a later
+combined committed head remains a separate check.
+
+Adjacent-state/call-site review: shared static validation callers in
+component-matrix main keep their existing no-context contract; final-stack check
+never invokes host context or the scanner. Write success, finding refusal,
+scanner error and context error all preserve their intended ordering. The
+planned-layer no-sweep and completed-sweep states have separate assertions.
+The native scanner's existing punctuation, Unicode-neighbor, encoded-line and
+error tests are included in the scoped gate. Current numeric citations affected
+by the earlier document insertions are checked one dependency wider; live
+resolver comments and the count-test base comment are corrected. Anti-pattern
+rows are reordered without adding lines to that document.
+
+Unmodified primary captures are retained in the lane's hashed attachment packet
+`grand-generator-fix/captures`, with `MANIFEST.sha256` and `sources.json`. Official
+HTML pages are stored as base64 original bytes; the source manifest records
+both original and stored hashes. Pinned Git blobs and upstream sources retain
+their original bytes. The co-op receives this directory with the next FIX-PUSHED
+handoff; captures support source verification and are not execution acceptance.
+
+The Astra micro at `f5bd15dd` independently confirmed the same locator,
+encoded-account and host-context defects. Its explicit encoded-email requirement
+adds an opt-in generated-email rule to the existing native scanner configuration;
+the rule uses Betterleaks' supported inline rules and decoder depth, with no
+new decoder. Other `scan_paths` and history callers retain account-only defaults.
+The final-stack writer opts in. Synthetic email plants whose local part does
+not match any supplied account cover `%40`, full percent, literal Unicode
+escapes and base64. Before that integration, two tests returned rc 1 with four
+refusal failures and one missing-API error; after it, four policy/ordering/check
+controls returned rc 0 in 2.454s. Static email/path/token checks remain active.
+
+A native scanner-bypass mutation caused six account-plant failures, including
+uppercase and non-ASCII, then was restored. The final committed-manifest check
+is exercised with root, ubuntu, node and dev, with host/scanner calls forbidden.
+The final expanded command above returned rc 0: 654 tests in 91.947s, with the
+same six existing optional upstream-surface skips; all native plants ran.
+
+The historical instruction-reference citation is resolved from its actual
+`56fced82727921f2de0d99790148acec0bdd11ca` source: the intended rule is at
+`docs/harness-defaults.md:208` there. Current line 210 is unrelated. The resolver
+comment now explicitly pins the historical guide/distro locators; the original
+source blobs are attached, rather than shifting their line numbers by inference.
+
+One step wider, the native actual-host scanner examined all 23 written and
+registered PR paths, including unchanged portions: zero findings. A private
+supplementary comparison for bare case-folded, percent, Unicode escapes, HTML
+entities, base64, hex and zero-width account spellings returned zero in each
+class. No private identifier or payload was printed. A context-mode metadata
+context produced generic hits during a preliminary attempt; that attempt is not
+claimed as host acceptance and was resolved by reproducing in the native shell
+context. No leak is inferred from that wrapper-dependent observation.
+
+The attachment closure now includes all 17 input files, the cited verdict wave,
+historical derived manifest, upstream tag/commit API objects and the original
+approved plan/design. The original plan was located through its maintained page
+generator's PLAN declaration; its design table confirms the two planned layers.
+The source manifest records every original byte count/hash. These captures
+close missing-source packet gaps, not historical model execution gaps.

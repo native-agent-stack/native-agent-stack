@@ -123,7 +123,7 @@ def host_names(root: Path) -> tuple[str, ...]:
     return tuple(dict.fromkeys(names))
 
 
-def _config(names: tuple[str, ...], *, framed: bool = True) -> str:
+def _config(names: tuple[str, ...], *, framed: bool = True, reject_email: bool = False) -> str:
     # Go regexp.QuoteMeta's metacharacter set; quote literals, never parse them.
     special = r"\.+*?()|[]{}^$"
     frame_filter = (
@@ -151,11 +151,20 @@ def _config(names: tuple[str, ...], *, framed: bool = True) -> str:
                       "regex = " + json.dumps("(?i)(" + literal + ")", ensure_ascii=False),
                       "secretGroup = 1", "filter = " + json.dumps(
                           (frame_filter if framed else "") + boundary_filter)))
+    if reject_email:
+        # Generated-view email policy follows architecture_sources.py:29 at
+        # native-agent-stack@4d6cee1582f024d27319ee005117da5f15ebe269. Use the
+        # upstream Betterleaks 1.9.0 custom-rule/decoder path, not a local decoder.
+        # Exclude the framing sentinels from the native rule's character classes.
+        email = r"([\p{L}\p{N}.!#$%&'*+/=?^_`{|}~-]+@[\p{L}\p{N}.-]+\.[A-Za-z]{2,})"
+        lines.extend(("[[rules]]", 'id = "private-email"', 'description = "generated private email"',
+                      "regex = " + json.dumps(email), "secretGroup = 1",
+                      "filter = " + json.dumps((frame_filter if framed else "") + boundary_filter)))
     return "\n".join(lines) + "\n"
 
 
 def scan_paths(paths: list[Path], *, root: Path,
-               names: tuple[str, ...] | None = None) -> list[tuple[Path, int]]:
+               names: tuple[str, ...] | None = None, reject_email: bool = False) -> list[tuple[Path, int]]:
     """Return only caller-held paths and native numeric lines, never native text."""
     names = host_names(root) if names is None else names
     def entries():
@@ -169,11 +178,11 @@ def scan_paths(paths: list[Path], *, root: Path,
             except OSError:
                 raise HostNameScanError("host-name input unreadable") from None
             yield path, raw.decode("utf-8", errors="surrogateescape").translate(INVALID_UTF8_BYTES)
-    return _scan_entries(entries(), root=root, names=names)
+    return _scan_entries(entries(), root=root, names=names, reject_email=reject_email)
 
 
 def _scan_entries(entries: Iterable[tuple[Path, str]], *, root: Path,
-                  names: tuple[str, ...]) -> list[tuple[Path, int]]:
+                  names: tuple[str, ...], reject_email: bool = False) -> list[tuple[Path, int]]:
     binary = shutil.which("betterleaks")
     if binary is None:
         raise HostNameScanError("Betterleaks 1.9.0 is required for host-name scan")
@@ -214,7 +223,7 @@ def _scan_entries(entries: Iterable[tuple[Path, str]], *, root: Path,
                     break
     # stdin needs only its inline config. Do not inherit competing config,
     # logging overrides, synthetic source values or unrelated credentials.
-    environment = {"BETTERLEAKS_CONFIG_TOML": _config(names)}
+    environment = {"BETTERLEAKS_CONFIG_TOML": _config(names, reject_email=reject_email)}
     try:
         completed = subprocess.run(
             [binary, "stdin", "--no-banner", "--no-color", "--log-level", "error",
@@ -233,7 +242,8 @@ def _scan_entries(entries: Iterable[tuple[Path, str]], *, root: Path,
         findings: set[tuple[Path, int]] = set()
         for item in report:
             if not isinstance(item, dict) or item.get("RuleID") not in {
-                    f"host-name-{index}" for index in range(len(names))}:
+                    *({"private-email"} if reject_email else set()),
+                    *(f"host-name-{index}" for index in range(len(names)))}:
                 raise ValueError
             found_line = item.get("StartLine")
             if type(found_line) is not int or found_line not in origins:

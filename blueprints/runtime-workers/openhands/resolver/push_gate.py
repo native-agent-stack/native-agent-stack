@@ -1069,8 +1069,9 @@ HFS_IGNORED = frozenset([*range(0x200c, 0x2010), *range(0x202a, 0x202f), *range(
 # Deny these artifacts everywhere, independently of the source-module closure.
 MODULE_ARTIFACT_SUFFIXES = (".pyc", ".pyo", ".so", ".pyd", ".dylib", ".dll")
 # Independent instruction-name policy: RESOLVER.md's validator contract;
-# recipes/README.md:184, :212, :218-220; docs/harness-defaults.md:208;
-# adoption/platforms/linux-wsl2-new-distro.md:1082-1083 (at 56fced827).
+# recipes/README.md:184, :212, :218-220;
+# docs/harness-defaults.md:208 and adoption/platforms/linux-wsl2-new-distro.md:1082-1083
+# at 56fced82727921f2de0d99790148acec0bdd11ca (historical source, not live line numbers).
 # The actual Codex template is named by tools/adoption/apply_codex_lane.py:111;
 # the default and role carrier blocks are selected by
 # adoption/hooks/claude/token-lanes-subagent-start.py:16-23,33-38 (at 656f263dc).

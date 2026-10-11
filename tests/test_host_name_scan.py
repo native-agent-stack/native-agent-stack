@@ -205,6 +205,18 @@ class HostNameSourceTests(unittest.TestCase):
 
 @unittest.skipUnless(shutil.which("betterleaks"), "native Betterleaks unavailable")
 class NativeHostNameScanTests(unittest.TestCase):
+    def test_email_policy_uses_native_decoding_without_an_account_match(self):
+        import base64
+        email = "unlisted-contact@example.invalid"
+        encoded = [email.replace("@", "%40"),
+                   "".join("%" + format(byte, "02X") for byte in email.encode()),
+                   "".join(r"\u" + format(ord(char), "04x") for char in email),
+                   base64.b64encode(email.encode()).decode()]
+        self.target.write_text("\n".join(encoded), encoding="utf-8")
+        self.assertEqual(host_name_scan.scan_paths([self.target], root=self.root, reject_email=True),
+                         [(self.target, line) for line in range(1, len(encoded) + 1)])
+        self.assertEqual(host_name_scan.scan_paths([self.target], root=self.root), [])
+
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary.cleanup)
