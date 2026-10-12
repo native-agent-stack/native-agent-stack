@@ -1,0 +1,248 @@
+{
+  "schema_version": 1,
+  "kind": "w6_pinned_citation_corrections",
+  "recorded_at": "2026-10-12T00:52:20Z",
+  "authority": "CC adjudication-pr1021-4ddd4822-20261012.md B1",
+  "original_bad_reference_count": 19,
+  "body_consistency_adjustments": 2,
+  "evidence_class": "source_review",
+  "corrections": [
+    {
+      "repository": "https://github.com/vllm-project/vllm",
+      "pin": "db9527a46873454610df6dbedf79a36d6bf1a7f6",
+      "field": "test_ref",
+      "old_ref": "pyproject.toml:63",
+      "new_ref": null,
+      "disposition": "withdrawn_as_explicit_qualification_gap",
+      "witness_line": null,
+      "source_file_sha256": null,
+      "review_scope": "B1"
+    },
+    {
+      "repository": "https://github.com/giancarloerra/SocratiCode",
+      "pin": "2218f25153d0f3f4a76ee240a5643dbc873e80be",
+      "field": "test_ref",
+      "old_ref": "README.md:1355",
+      "new_ref": "CONTRIBUTING.md:36",
+      "disposition": "corrected",
+      "witness_line": "npm run test:e2e",
+      "source_file_sha256": "3eaf1d84b2d95288abe990dd2b4da3e7caf43c4dfafc0ee328fefd894c3cf758",
+      "review_scope": "B1"
+    },
+    {
+      "repository": "https://github.com/vshulcz/deja-vu",
+      "pin": "aa521f3f1abb9aa5449e7812652be371f3f23be9",
+      "field": "test_ref",
+      "old_ref": "README.md:274",
+      "new_ref": null,
+      "disposition": "withdrawn_as_explicit_qualification_gap",
+      "witness_line": null,
+      "source_file_sha256": null,
+      "review_scope": "B1"
+    },
+    {
+      "repository": "https://github.com/mibayy/token-savior",
+      "pin": "0a4a2e126530ff1222b7f9c62c290e517a738328",
+      "field": "test_ref",
+      "old_ref": "README.md:187",
+      "new_ref": null,
+      "disposition": "withdrawn_as_explicit_qualification_gap",
+      "witness_line": null,
+      "source_file_sha256": null,
+      "review_scope": "B1"
+    },
+    {
+      "repository": "https://github.com/rohitg00/agentmemory",
+      "pin": "7ee162844956626d8b00ba459df169d542d4af9d",
+      "field": "test_ref",
+      "old_ref": "README.md:922",
+      "new_ref": null,
+      "disposition": "withdrawn_as_explicit_qualification_gap",
+      "witness_line": null,
+      "source_file_sha256": null,
+      "review_scope": "B1"
+    },
+    {
+      "repository": "https://github.com/openai/codex",
+      "pin": "092d3acd6bec3e3a14bdc7e7a2810ab628ab759d",
+      "field": "test_ref",
+      "old_ref": "justfile:47",
+      "new_ref": "justfile:87",
+      "disposition": "corrected",
+      "witness_line": "test *args:",
+      "source_file_sha256": "9d7a65a494c2b771471c1bfd2edef164a4d22e27015966ad3d4b7af4f3ae2402",
+      "review_scope": "B1"
+    },
+    {
+      "repository": "https://github.com/anthropics/claude-plugins-official",
+      "pin": "f359d43b406057f1a8cdbc4ea93b827642c162e6",
+      "field": "role_ref",
+      "old_ref": "README.md:5",
+      "new_ref": "plugins/pyright-lsp/README.md:3",
+      "disposition": "corrected",
+      "witness_line": "Python language server (Pyright) for Claude Code, providing static type checking and code intelligence.",
+      "source_file_sha256": "06831f5f4397506f295857d4de98bd0ceeeb23b2546168c3c0029c5e03782cf0",
+      "review_scope": "B1"
+    },
+    {
+      "repository": "https://github.com/microsoft/markitdown",
+      "pin": "fd239d5d2be43d9b68329730206b9312c7d5a388",
+      "field": "role_ref",
+      "old_ref": "README.md:8",
+      "new_ref": "README.md:10",
+      "disposition": "corrected",
+      "witness_line": "MarkItDown is a lightweight Python utility for converting various files to Markdown for use with LLMs and related text analysis pipelines. To this end, it is most comparable to [textract](https://github.com/deanmalmgren/textract), but with a focus on preserving important document structure and content as Markdown (including: headings, lists, tables, links, etc.) While the output is often reasonably presentable and human-friendly, it is meant to be consumed by text analysis tools -- and may not be the best option for high-fidelity document conversions for human consumption.",
+      "source_file_sha256": "4f6246f3064d5cf0b4c61652822dd743c69a3fe72fef925279d22a6a68b3fca4",
+      "review_scope": "B1"
+    },
+    {
+      "repository": "https://github.com/tsdgeos/poppler_mirror",
+      "pin": "5b97e475790a11012ec6095d9a47c23f7f229cb9",
+      "field": "role_ref",
+      "old_ref": "README.md:16",
+      "new_ref": "utils/pdftotext.cc:130",
+      "disposition": "corrected",
+      "witness_line": "                                   { .arg = \"-bbox-layout\", .kind = argFlag, .val = &bboxLayout, .size = 0, .usage = \"like -bbox but with extra layout bounding box data.  Sets -htmlmeta\" },",
+      "source_file_sha256": "e323a5939ee807d452e7f138156829d270dd7d93d92667eab22acc7eb09d83dc",
+      "review_scope": "B1"
+    },
+    {
+      "repository": "https://github.com/baidu/Unlimited-OCR",
+      "pin": "d49ff64afffc1f47ab563dc1c589bc2f78808fa4",
+      "field": "role_ref",
+      "old_ref": "README.md:85",
+      "new_ref": null,
+      "disposition": "withdrawn_as_explicit_qualification_gap",
+      "witness_line": null,
+      "source_file_sha256": null,
+      "review_scope": "B1"
+    },
+    {
+      "repository": "https://github.com/openai/codex",
+      "pin": "092d3acd6bec3e3a14bdc7e7a2810ab628ab759d",
+      "field": "role_ref",
+      "old_ref": "README.md:64",
+      "new_ref": "README.md:1",
+      "disposition": "corrected",
+      "witness_line": "<p align=\"center\"><strong>Codex CLI</strong> is a coding agent from OpenAI that runs locally on your computer.",
+      "source_file_sha256": "ba4e1f69ff48386e72a9c5e1edaf76aad64a475c2d51af79ccba6d1128261ba7",
+      "review_scope": "B1"
+    },
+    {
+      "repository": "https://github.com/giancarloerra/SocratiCode",
+      "pin": "2218f25153d0f3f4a76ee240a5643dbc873e80be",
+      "field": "role_ref",
+      "old_ref": "README.md:36",
+      "new_ref": "README.md:44",
+      "disposition": "corrected",
+      "witness_line": "**One thing, done well: deep codebase intelligence with zero setup, no bloat, and full automation.** SocratiCode gives AI assistants deep semantic understanding of your codebase: **hybrid search, cross-project search, polyglot code dependency graphs, symbol-level impact analysis and flow, interactive HTML graph explorer for visual navigation, and searchable context artifacts (database schemas, API specs, infra configs, architecture docs)**. Zero configuration: add it to an **MCP host that supports local stdio servers**, or use a supported plugin or extension. It manages everything automatically.",
+      "source_file_sha256": "280f3c7b8415953c00885f489cb59bab10d6e3bc8637a32f7196165cc4cb700d",
+      "review_scope": "B1"
+    },
+    {
+      "repository": "https://github.com/vllm-project/vllm",
+      "pin": "db9527a46873454610df6dbedf79a36d6bf1a7f6",
+      "field": "role_ref",
+      "old_ref": "README.md:14",
+      "new_ref": "README.md:24",
+      "disposition": "corrected",
+      "witness_line": "vLLM is a fast and easy-to-use library for LLM inference and serving.",
+      "source_file_sha256": "8d2e7cd8d120bcd91ddfa85ef957f7246021b4a3f46f2e1f4ccf084ec6c20026",
+      "review_scope": "B1"
+    },
+    {
+      "repository": "https://github.com/OSU-NLP-Group/HippoRAG",
+      "pin": "d5c8329422e0a0b834a15874545cb6a74b4f9b26",
+      "field": "role_ref",
+      "old_ref": "README.md:6",
+      "new_ref": "README.md:13",
+      "disposition": "corrected",
+      "witness_line": "HippoRAG 2 is a memory framework for LLMs that recognizes and uses connections in new knowledge, mirroring a key function of human long-term memory.",
+      "source_file_sha256": "5b6affb7fd746390990c63467f424501a3a67946461aa2e6244561130c3bc60b",
+      "review_scope": "B1"
+    },
+    {
+      "repository": "https://github.com/vectorize-io/hindsight",
+      "pin": "a9eeed77f9bce99d8f97d39a30d3281747300824",
+      "field": "role_ref",
+      "old_ref": "README.md:5",
+      "new_ref": "README.md:24",
+      "disposition": "corrected",
+      "witness_line": "Hindsight™ is an agent memory system built to create smarter agents that learn over time. Most agent memory systems focus on recalling conversation history. Hindsight is focused on making agents that learn, not just remember.",
+      "source_file_sha256": "a3e2745dedec4f9e0d4452857ef054699e60414740f5d8f12d41bd42711d476a",
+      "review_scope": "B1"
+    },
+    {
+      "repository": "https://github.com/opendatalab/MinerU",
+      "pin": "b7f3dd0c5f6e6d66a298239ffd02b328b873918e",
+      "field": "install_ref",
+      "old_ref": "README.md:74",
+      "new_ref": "README.md:84",
+      "disposition": "corrected",
+      "witness_line": "uv pip install -U \"mineru>=4.0,<5\"",
+      "source_file_sha256": "69c967e98536be101b5dc3420703d28cc1e0250eeca3b5bf156b060ac4ccfacb",
+      "review_scope": "B1"
+    },
+    {
+      "repository": "https://github.com/alibaba/Logics-Parsing",
+      "pin": "d75d42dbd92c518a4def19ac5895792828138d35",
+      "field": "install_ref",
+      "old_ref": "README.md:137",
+      "new_ref": "README.md:138",
+      "disposition": "corrected",
+      "witness_line": "python -m pip install \"vllm==0.22.1\" \"transformers==5.6.0\" Pillow PyMuPDF",
+      "source_file_sha256": "5fc2e3d1d459c252385627bce39a7c3204437eb3eaf5153806c418dcb0a6d77c",
+      "review_scope": "B1"
+    },
+    {
+      "repository": "https://github.com/exa-labs/exa-mcp-server",
+      "pin": "e9c3b0126a3373eb1aeaca162e84d0791ff4c7f7",
+      "field": "install_ref",
+      "old_ref": "package.json:41",
+      "new_ref": "package.json:42",
+      "disposition": "corrected",
+      "witness_line": "    \"setup\": \"npm ci\",",
+      "source_file_sha256": "bfd63123eb43f536b29ec35425a5fe807b293a3e1fcee34f63f73eedb2c9350b",
+      "review_scope": "B1"
+    },
+    {
+      "repository": "https://github.com/microsoft/markitdown",
+      "pin": "fd239d5d2be43d9b68329730206b9312c7d5a388",
+      "field": "install_ref",
+      "old_ref": "README.md:51",
+      "new_ref": "README.md:63",
+      "disposition": "corrected",
+      "witness_line": "To install MarkItDown, use pip: `pip install 'markitdown[all]'`. Alternatively, you can install it from the source:",
+      "source_file_sha256": "4f6246f3064d5cf0b4c61652822dd743c69a3fe72fef925279d22a6a68b3fca4",
+      "review_scope": "B1"
+    },
+    {
+      "repository": "https://github.com/openai/codex",
+      "pin": "092d3acd6bec3e3a14bdc7e7a2810ab628ab759d",
+      "field": "install_ref",
+      "old_ref": "README.md:19",
+      "new_ref": "README.md:42",
+      "disposition": "corrected",
+      "witness_line": "npm install -g @openai/codex",
+      "source_file_sha256": "ba4e1f69ff48386e72a9c5e1edaf76aad64a475c2d51af79ccba6d1128261ba7",
+      "review_scope": "body-record-consistency"
+    },
+    {
+      "repository": "https://github.com/giancarloerra/SocratiCode",
+      "pin": "2218f25153d0f3f4a76ee240a5643dbc873e80be",
+      "field": "install_ref",
+      "old_ref": "README.md:793",
+      "new_ref": "CONTRIBUTING.md:22",
+      "disposition": "corrected",
+      "witness_line": "npm install",
+      "source_file_sha256": "3eaf1d84b2d95288abe990dd2b4da3e7caf43c4dfafc0ee328fefd894c3cf758",
+      "review_scope": "body-record-consistency"
+    }
+  ],
+  "regression": {
+    "test": "tests/test_w6_layer_verdict_records.py",
+    "fail_first_command": "python3 -m unittest discover -s tests -p test_w6_layer_verdict_records.py -v",
+    "before_fix_exit": 1,
+    "before_fix_findings": "False citations, duplicate identity, absent role/check contract, omitted memory candidates and review metadata reproduced."
+  }
+}

@@ -1,0 +1,510 @@
+{
+  "schema_version": 1,
+  "kind": "w6_frozen_comparison",
+  "comparison_id": "w6-foundation-durable-memory-20261011",
+  "registered_at": "2026-10-11T23:15:50Z",
+  "phase": "preregistered; no run; layer terminal state SCHEDULED",
+  "catalog": "foundation",
+  "layer_id": "durable-memory",
+  "requirement_sha256": "7ad9f64302a5916b859c6ff0157249db6cb10b5ba21cdf3a57b57d3ea578b01b",
+  "catalog_ref": "catalogs/landscape/foundation.json#/layers/7",
+  "catalog_sha256": "868d193a31080ab913400725140bd0d01e0afe97e28564fd12777f737d22951a",
+  "harnesses": [
+    "Existing W5 landscape-sweep comparison path (without discovery)",
+    "Existing native paired-task practice",
+    "Existing token-e2e freeze/usage evidence"
+  ],
+  "new_harness": false,
+  "arms": [
+    {
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "pin": "89bd8ded3c1ab8b769cf99417d038ed0364403c8",
+      "upstream_role_ref": "README.md:8",
+      "upstream_install_ref": "CONTRIBUTING.md:8",
+      "upstream_test_ref": "CONTRIBUTING.md:9",
+      "role_ids": [
+        "shared_memory_backend",
+        "native_memory_capture"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
+    },
+    {
+      "repository": "https://github.com/anthropics/claude-code",
+      "pin": "3deb873687379f0c199a69fdaccc65f0865f7a29",
+      "upstream_role_ref": "README.md:7",
+      "upstream_install_ref": "README.md:23",
+      "upstream_test_ref": null,
+      "role_ids": [
+        "native_file_session_memory"
+      ],
+      "dependency": true,
+      "selection_scope": "dependency qualification only; not ranked as a standalone end-to-end layer winner"
+    },
+    {
+      "repository": "https://github.com/langchain-ai/langmem",
+      "pin": "48e3c11f5bb527282c7d5339c6a87a0b35abccfc",
+      "upstream_role_ref": "README.md:3",
+      "upstream_install_ref": "README.md:21",
+      "upstream_test_ref": "pyproject.toml:32",
+      "role_ids": [
+        "memory_management_primitives"
+      ],
+      "dependency": true,
+      "selection_scope": "dependency qualification only; not ranked as a standalone end-to-end layer winner"
+    },
+    {
+      "repository": "https://github.com/rohitg00/agentmemory",
+      "pin": "7ee162844956626d8b00ba459df169d542d4af9d",
+      "upstream_role_ref": "README.md:7",
+      "upstream_install_ref": "README.md:143",
+      "upstream_test_ref": null,
+      "role_ids": [
+        "shared_memory_backend",
+        "native_memory_capture"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
+    },
+    {
+      "repository": "https://github.com/MemPalace/MemPalace",
+      "pin": "1f0803a31958b30320418356b2db88c4ed9c27f9",
+      "upstream_role_ref": "README.md:7",
+      "upstream_install_ref": "README.md:80",
+      "upstream_test_ref": "CONTRIBUTING.md:33",
+      "role_ids": [
+        "shared_memory_backend",
+        "native_memory_capture"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids",
+      "role_source_witnesses": {
+        "native_memory_capture": {
+          "pin": "1f0803a31958b30320418356b2db88c4ed9c27f9",
+          "ref": "README.md:311-316",
+          "source_file_sha256": "3f6c55d2af94d8d1e4ef2876df4fc97eda55bbadb8ad3ae0fb0b6626e1c2e048",
+          "lines": [
+            "## Auto-save hooks",
+            "",
+            "Auto-save hooks for **Claude Code, Codex CLI, and Cursor IDE** save",
+            "periodically and before context compression:",
+            "",
+            "- Claude Code + Codex \u2192"
+          ],
+          "evidence_class": "source_review"
+        }
+      }
+    },
+    {
+      "repository": "https://github.com/vshulcz/deja-vu",
+      "pin": "aa521f3f1abb9aa5449e7812652be371f3f23be9",
+      "upstream_role_ref": "README.md:12",
+      "upstream_install_ref": "README.md:21",
+      "upstream_test_ref": null,
+      "role_ids": [
+        "shared_memory_backend",
+        "native_memory_capture"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
+    },
+    {
+      "repository": "https://github.com/vbcherepanov/total-agent-memory",
+      "pin": "f2f124fec90dc977f4610a1ea90aa05f5b916e56",
+      "upstream_role_ref": "README.md:10",
+      "upstream_install_ref": "README.md:50",
+      "upstream_test_ref": "README.md:160",
+      "role_ids": [
+        "shared_memory_backend",
+        "native_memory_capture"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
+    },
+    {
+      "repository": "https://github.com/vectorize-io/hindsight",
+      "pin": "a9eeed77f9bce99d8f97d39a30d3281747300824",
+      "upstream_role_ref": "README.md:24",
+      "upstream_install_ref": "README.md:98",
+      "upstream_test_ref": "CONTRIBUTING.md:94",
+      "role_ids": [
+        "shared_memory_backend",
+        "native_memory_capture"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
+    },
+    {
+      "repository": "https://github.com/tigerless-labs/agent-memory",
+      "pin": "aca58578ab386e4d422a97bcf32c2af2f3e57316",
+      "upstream_role_ref": "README.md:3",
+      "upstream_install_ref": "README.md:147",
+      "upstream_test_ref": "README.md:390",
+      "role_ids": [
+        "shared_memory_backend",
+        "native_memory_capture"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
+    }
+  ],
+  "fixture_seal": [
+    {
+      "path": "blueprints/memory-lifecycle-probe/corpus.json",
+      "sha256": "ae0625d292eb66a2d67de0e696b57830f9e621c75da41d60d97569d3901755f5"
+    }
+  ],
+  "cases": [
+    "three positive queries from frozen corpus",
+    "overwrite Orchard Pump: violet/19 replaces amber/17",
+    "delete Harbor Lantern: Juniper absent",
+    "second-project isolation",
+    "restart and clean-target restore",
+    "Native capture fixture: both existing clients emit the same frozen fictional note/update/delete outcomes into isolated supported upstream capture paths; verify cross-client recall and source paths after restart",
+    "Native file/session control: expose only the sealed fictional notes to the same downstream model/query, then resume and verify exact source references without claiming a shared backend",
+    "Native memory-primitives fixture: write/update/delete/search the same isolated note/store using the upstream API, retaining its application integration boundary"
+  ],
+  "mandatory_checks": [
+    "capture and source-grounded full read",
+    "supersession and abstention correctness",
+    "deletion and project isolation",
+    "restart and clean-target restore",
+    "complete usage and latency retained"
+  ],
+  "scope_limit": "These retained fixtures establish only bounded task/lifecycle correctness. A synthetic case score does not establish general SOTA, representative workload quality, or an upstream E2E. FINAL still requires all four protocol conditions at the run pin.",
+  "readiness_trigger": {
+    "all_of": [
+      "The shared newest-supported model/revision/license/prompt/settings seal from the fixed retained universe is committed before any capture or scoring",
+      "Exact arm binaries and their source pins verified in disposable environments through their own supported install paths",
+      "Each arm has its upstream-owned test/E2E recipe and a pinned receipt, or a retained substantive reason its scoped role is retired",
+      "Fixture hashes and complete usage instrumentation reproduce before the first arm",
+      "An isolated native runner is available without modifying the paper units, sealed bundles, Monday recorders or other lanes",
+      "Co-op relay that #1007 has LANDED and final-stack runs[] is available",
+      "All retained reopen and proposal prerequisites below have source-pinned scoped evidence or a substantive reviewed disposition before the affected run; unresolved operational/quality/coverage conditions cannot be ignored."
+    ],
+    "already_present": [
+      "retained fixture bytes",
+      "frozen arm source pins"
+    ],
+    "missing_at_registration": [
+      "arm runtime/E2E receipts at the frozen pins",
+      "#1007 LANDED relay",
+      "newest-supported shared model/revision/prompt/settings seal"
+    ],
+    "start_rule": "Start as soon as all named inputs exist; no calendar date is a trigger. A comparison ready but not run is a defect.",
+    "retained_reopen_inputs": [
+      {
+        "kind": "ledger_reopen",
+        "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/failures/durable-memory",
+        "trigger": "retained_failure",
+        "required_evidence": "Resolve retained retained_failure source/receipt/coverage evidence at the compared pin, or retain a substantive scoped disposition. Licence metadata alone cannot exclude a source.",
+        "owner": "layer-verdict"
+      },
+      {
+        "kind": "ledger_reopen",
+        "ref": "receipt_staleness:macos-arm64/ai-memory",
+        "trigger": "pin_moved",
+        "required_evidence": "Resolve retained pin_moved source/receipt/coverage evidence at the compared pin, or retain a substantive scoped disposition. Licence metadata alone cannot exclude a source.",
+        "owner": "layer-verdict"
+      },
+      {
+        "kind": "ledger_reopen",
+        "ref": "receipt_staleness:linux-wsl2-x86_64/ai-memory",
+        "trigger": "pin_moved",
+        "required_evidence": "Resolve retained pin_moved source/receipt/coverage evidence at the compared pin, or retain a substantive scoped disposition. Licence metadata alone cannot exclude a source.",
+        "owner": "layer-verdict"
+      },
+      {
+        "kind": "ledger_reopen",
+        "ref": "receipt_staleness:linux-wsl2-x86_64/codex",
+        "trigger": "pin_moved",
+        "required_evidence": "Resolve retained pin_moved source/receipt/coverage evidence at the compared pin, or retain a substantive scoped disposition. Licence metadata alone cannot exclude a source.",
+        "owner": "layer-verdict"
+      },
+      {
+        "kind": "ledger_reopen",
+        "ref": "receipt_staleness:macos-arm64/claude-code",
+        "trigger": "pin_moved",
+        "required_evidence": "Resolve retained pin_moved source/receipt/coverage evidence at the compared pin, or retain a substantive scoped disposition. Licence metadata alone cannot exclude a source.",
+        "owner": "layer-verdict"
+      },
+      {
+        "kind": "ledger_reopen",
+        "ref": "receipt_staleness:macos-arm64/codex",
+        "trigger": "pin_moved",
+        "required_evidence": "Resolve retained pin_moved source/receipt/coverage evidence at the compared pin, or retain a substantive scoped disposition. Licence metadata alone cannot exclude a source.",
+        "owner": "layer-verdict"
+      },
+      {
+        "kind": "retained_proposal_prerequisite",
+        "repository": "https://github.com/anthropics/claude-code",
+        "ref": "catalogs/sota-convergence/manifest-20260926.json#/foundation/7/candidates/0/comparison_that_would_overturn",
+        "additional_refs": [],
+        "required_evidence": "The retained native role/model/settings and source-backed comparison recipe are sealed before scoring; unsupported operational axes have a substantive disposition.",
+        "owner": "layer-verdict",
+        "status": "unverified_before_execution"
+      },
+      {
+        "kind": "retained_proposal_prerequisite",
+        "repository": "https://github.com/langchain-ai/langmem",
+        "ref": "catalogs/sota-convergence/manifest-20260926.json#/foundation/7/candidates/1/comparison_that_would_overturn",
+        "additional_refs": [],
+        "required_evidence": "Retained supported MCP/integration server exists at the source pin, or unsupported scope has a substantive disposition.",
+        "owner": "layer-verdict",
+        "status": "unverified_before_execution"
+      },
+      {
+        "kind": "retained_proposal_prerequisite",
+        "repository": "https://github.com/rohitg00/agentmemory",
+        "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/7/candidates/1/comparison_that_would_overturn",
+        "additional_refs": [
+          "catalogs/sota-convergence/manifest-20260926.json#/foundation/7/candidates/5/comparison_that_would_overturn"
+        ],
+        "required_evidence": "The retained native role/model/settings and source-backed comparison recipe are sealed before scoring; unsupported operational axes have a substantive disposition.",
+        "owner": "layer-verdict",
+        "status": "unverified_before_execution"
+      },
+      {
+        "kind": "retained_proposal_prerequisite",
+        "repository": "https://github.com/mempalace/mempalace",
+        "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/7/candidates/0/comparison_that_would_overturn",
+        "additional_refs": [
+          "catalogs/sota-convergence/manifest-20260926.json#/foundation/7/candidates/3/comparison_that_would_overturn"
+        ],
+        "required_evidence": "The retained native role/model/settings and source-backed comparison recipe are sealed before scoring; unsupported operational axes have a substantive disposition.",
+        "owner": "layer-verdict",
+        "status": "unverified_before_execution"
+      },
+      {
+        "kind": "retained_proposal_prerequisite",
+        "repository": "https://github.com/vshulcz/deja-vu",
+        "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/7/candidates/2/comparison_that_would_overturn",
+        "additional_refs": [
+          "catalogs/sota-convergence/manifest-20260926.json#/foundation/7/candidates/7/comparison_that_would_overturn"
+        ],
+        "required_evidence": "The retained native role/model/settings and source-backed comparison recipe are sealed before scoring; unsupported operational axes have a substantive disposition.",
+        "owner": "layer-verdict",
+        "status": "unverified_before_execution"
+      },
+      {
+        "kind": "retained_proposal_prerequisite",
+        "repository": "https://github.com/vbcherepanov/total-agent-memory",
+        "ref": "catalogs/sota-convergence/manifest-20260926.json#/foundation/7/candidates/10/comparison_that_would_overturn",
+        "additional_refs": [],
+        "required_evidence": "The retained native role/model/settings and source-backed comparison recipe are sealed before scoring; unsupported operational axes have a substantive disposition.",
+        "owner": "layer-verdict",
+        "status": "unverified_before_execution"
+      },
+      {
+        "kind": "retained_proposal_prerequisite",
+        "repository": "https://github.com/vectorize-io/hindsight",
+        "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/7/candidates/4/comparison_that_would_overturn",
+        "additional_refs": [
+          "catalogs/sota-convergence/manifest-20260926.json#/foundation/7/candidates/6/comparison_that_would_overturn"
+        ],
+        "required_evidence": "The retained native role/model/settings and source-backed comparison recipe are sealed before scoring; unsupported operational axes have a substantive disposition.",
+        "owner": "layer-verdict",
+        "status": "unverified_before_execution"
+      },
+      {
+        "kind": "retained_proposal_prerequisite",
+        "repository": "https://github.com/tigerless-labs/agent-memory",
+        "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/7/candidates/3/comparison_that_would_overturn",
+        "additional_refs": [],
+        "required_evidence": "The retained native role/model/settings and source-backed comparison recipe are sealed before scoring; unsupported operational axes have a substantive disposition.",
+        "owner": "layer-verdict",
+        "status": "unverified_before_execution"
+      }
+    ],
+    "owner": "layer-verdict",
+    "next_action": "Retain upstream runtime/E2E/model/instrumentation seals, then resolve the listed retained readiness inputs in the owned queue. No ready comparison remains unrun."
+  },
+  "execution_rule": {
+    "repetitions": 3,
+    "order": "Canonical repository order on first repetition, reverse on second, rotate first arm to last on third; same case order and fresh isolated stores",
+    "model": "Use the same precommitted newest-supported model/answer-context panel for comparable memory arms; use each upstream's supported native capture/extraction path. Preserve account/provider identity. No incumbent default or new paid route is implied.",
+    "preflight": "Retain unsupported role/model interfaces, absent test recipes, failed installations and spending/entitlement constraints with source-backed reasons; never silently omit a survivor. Licence provenance is metadata only, never an exclusion ground.",
+    "cost": "Record complete provider usage and elapsed time separately from tool-output/token estimates; never infer provider savings",
+    "protected_window": "Heavy E2E during the CC's Monday window uses systemd-run --user --scope -p CPUWeight=idle; a full suite additionally needs SUITE-REQUEST and SUITE-GO.",
+    "license_exclusion": false
+  },
+  "fixed_decision_rule": {
+    "eligibility": "For each predeclared role, every mapped role check must pass in all three repetitions with complete usage and upstream E2E at the comparison's immutable source pin. Dependency arms qualify only their mapped interface and are never scored as standalone end-to-end candidates.",
+    "rank": "Within each real role, rank all qualifying arms by pooled exact grounded-correct recall/usefulness on the same presealed newest-supported-model panels, then complete provider cost, median elapsed time and peak RSS. Native-file controls are diagnostic, not protected incumbents.",
+    "tie": "Record equal qualified results as co-qualified for the measured role; no automatic incumbent retention and no superiority claim. No memory backend or default is preselected.",
+    "none_qualify": "Record RETIRED for the unsupported role with all failure/retirement reasons; do not promote an unqualified arm.",
+    "terminal": "FINAL requires every selected deployed winner's actual final-stack runs[] pin to match its adopted tested source, with verdict/wave/next_review, upstream E2E at that operational run pin and invoke evidence/role reason. An experimental source-pin receipt does not qualify a different historical operational run pin.",
+    "amendments": "No new candidates or changed metrics after first run. Any necessary input correction requires a separately reviewed, hashed amendment before affected scoring.",
+    "incumbent_protection": false
+  },
+  "role_checks": {
+    "shared_memory_backend": {
+      "case_ids": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "mandatory_checks": [
+        "Exact source-grounded recall and full source read for all frozen positive/negative/superseded notes",
+        "Project isolation, deletion and clean-target restore",
+        "Evaluate matched newest-model panels with full cost; no incumbent preference",
+        "Update/delete/project-isolation/restore contract holds"
+      ]
+    },
+    "native_memory_capture": {
+      "case_ids": [
+        5
+      ],
+      "mandatory_checks": [
+        "Both native-client fixtures capture the same fictional outcomes through upstream's own supported capture path",
+        "No extra default capture owner or cross-project leakage",
+        "Supersession/deletion reaches recall after restart",
+        "Capture or index identical isolated cross-client fictional outcomes through native supported paths with exact source references",
+        "No substitute private transcript or protected source is ingested"
+      ]
+    },
+    "native_file_session_memory": {
+      "case_ids": [
+        6
+      ],
+      "mandatory_checks": [
+        "Native file/session control preserves exact fictional facts and resume identity",
+        "Same downstream model/query sees source files; control is not declared a shared backend"
+      ]
+    },
+    "memory_management_primitives": {
+      "case_ids": [
+        7
+      ],
+      "mandatory_checks": [
+        "Upstream native primitives write/update/delete/search the exact fixture through an isolated supported store",
+        "Application-owned integration boundary is explicit; primitives alone are not cross-client capture"
+      ]
+    }
+  },
+  "refrozen_at": "2026-10-12T06:23:56Z",
+  "amendment_authority": "CC adjudication-pr1021-599d9bbb-20261012.md: B2-r-2, B1-std, licence, survivor reasons and retained reopen inputs",
+  "model_policy": {
+    "use_newest_supported_from_frozen_universe": true,
+    "incumbent_default_models_are_not_protected": true,
+    "frozen_universe": {
+      "path": "catalogs/foundation/memory-stack-20260925.json",
+      "sha256": "a5d2b9647e044b7140f6952d36d27c5b6f2f78490452101895d33ac748faeb45",
+      "collection": "non_repository_decisions"
+    },
+    "supplement": {
+      "path": "catalogs/landscape/grand-catalog-20261008.json",
+      "sha256": "afb38c9427d7a344792b5ddcfa7cab64e9613a2fda64d1cecb30e2b0eae825bb"
+    },
+    "seal_rule": "Resolve and commit exact newest supported model revisions, licenses, common answer-model/context and memory extraction/embedding/reranking settings from this fixed retained universe before the first capture or scoring. Use the same primary model panel and equal case/model weights for comparable memory arms. Older installed defaults are diagnostic controls, never a protected selection. No model is chosen from comparison outcomes.",
+    "missing_input": "Committed primary-source model/prompt/settings seal; no unresolved model alias is a pin.",
+    "decision_basis": "Measured merit on the newest supported models, including the Hindsight versus ai-memory trial. The Mac-only 10-02 deployment nonselection is background history, not a merit disposition or omission.",
+    "licence_exclusion": false
+  },
+  "role_assignment_rule": "Source-advertised roles enter the common requirement comparison; no applicability change at scoring. Distinct native output contracts use separately defined oracles, never incompatible layout requirements imposed on flat output.",
+  "role_reconciliation": [
+    {
+      "repository": "https://github.com/vshulcz/deja-vu",
+      "pin": "aa521f3f1abb9aa5449e7812652be371f3f23be9",
+      "old_role_id": "cross_client_transcript_index",
+      "role_ids": [
+        "shared_memory_backend",
+        "native_memory_capture"
+      ],
+      "requirement_basis": "The layer requires shared memory and native capture across clients. The transcript arm cases 0-5 equal shared_memory_backend plus native_memory_capture; transcript indexing challenges the same recall/capture requirements.",
+      "previous_case_ids": [
+        5,
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "previous_mandatory_checks": [
+        "Read identical isolated cross-client fixture transcripts with exact source references",
+        "Update/delete/project-isolation/restore contract holds",
+        "No substitute private transcript or protected source is ingested"
+      ],
+      "source_ref": "README.md:12",
+      "qualification_boundary": "Role applicability is a preregistered comparison obligation, not a claim that this arm passed the common oracle or supports every required operation."
+    },
+    {
+      "repository": "https://github.com/MemPalace/MemPalace",
+      "pin": "1f0803a31958b30320418356b2db88c4ed9c27f9",
+      "added_role_id": "native_memory_capture",
+      "source_ref": "README.md:311-316",
+      "requirement_basis": "The pinned README advertises the common requirement role; it must enter the same-role comparison before any run.",
+      "qualification_boundary": "Advertised source capability is not an executed capture, retrieval or E2E result."
+    }
+  ],
+  "supersedes": {
+    "head": "599d9bbba34501687c358e42b29a3c9a485a56f3",
+    "preregistration_sha256": "30000658784bc54d16932ecfa1de9a321cf5f4dad2d447ff1aca71f31b6a1029",
+    "before_any_run": true,
+    "reason": "Adjudicated terminal re-freeze"
+  },
+  "retained_comparison_dispositions": [
+    {
+      "repository": "https://github.com/anthropics/claude-code",
+      "retained_comparison_refs": [
+        "catalogs/sota-convergence/manifest-20260926.json#/foundation/7/candidates/0/comparison_that_would_overturn"
+      ],
+      "frozen_rule_reason": "The A2 newest-supported-model/native-capture merit rule governs this memory candidate; Mac history is not current-host merit. Retain its operational/native capture/recall/supersession/recovery prerequisites before scoring."
+    },
+    {
+      "repository": "https://github.com/langchain-ai/langmem",
+      "retained_comparison_refs": [
+        "catalogs/sota-convergence/manifest-20260926.json#/foundation/7/candidates/1/comparison_that_would_overturn"
+      ],
+      "frozen_rule_reason": "The A2 newest-supported-model/native-capture merit rule governs this memory candidate; Mac history is not current-host merit. Retain its operational/native capture/recall/supersession/recovery prerequisites before scoring."
+    },
+    {
+      "repository": "https://github.com/rohitg00/agentmemory",
+      "retained_comparison_refs": [
+        "catalogs/sota-convergence/manifest-20260926.json#/foundation/7/candidates/5/comparison_that_would_overturn",
+        "catalogs/sota-convergence/manifest-20260929.json#/foundation/7/candidates/1/comparison_that_would_overturn"
+      ],
+      "frozen_rule_reason": "The A2 newest-supported-model/native-capture merit rule governs this memory candidate; Mac history is not current-host merit. Retain its operational/native capture/recall/supersession/recovery prerequisites before scoring."
+    },
+    {
+      "repository": "https://github.com/mempalace/mempalace",
+      "retained_comparison_refs": [
+        "catalogs/sota-convergence/manifest-20260926.json#/foundation/7/candidates/3/comparison_that_would_overturn",
+        "catalogs/sota-convergence/manifest-20260929.json#/foundation/7/candidates/0/comparison_that_would_overturn"
+      ],
+      "frozen_rule_reason": "The A2 newest-supported-model/native-capture merit rule governs this memory candidate; Mac history is not current-host merit. Retain its operational/native capture/recall/supersession/recovery prerequisites before scoring."
+    },
+    {
+      "repository": "https://github.com/vshulcz/deja-vu",
+      "retained_comparison_refs": [
+        "catalogs/sota-convergence/manifest-20260926.json#/foundation/7/candidates/7/comparison_that_would_overturn",
+        "catalogs/sota-convergence/manifest-20260929.json#/foundation/7/candidates/2/comparison_that_would_overturn"
+      ],
+      "frozen_rule_reason": "The A2 newest-supported-model/native-capture merit rule governs this memory candidate; Mac history is not current-host merit. Retain its operational/native capture/recall/supersession/recovery prerequisites before scoring."
+    },
+    {
+      "repository": "https://github.com/vbcherepanov/total-agent-memory",
+      "retained_comparison_refs": [
+        "catalogs/sota-convergence/manifest-20260926.json#/foundation/7/candidates/10/comparison_that_would_overturn"
+      ],
+      "frozen_rule_reason": "The A2 newest-supported-model/native-capture merit rule governs this memory candidate; Mac history is not current-host merit. Retain its operational/native capture/recall/supersession/recovery prerequisites before scoring."
+    },
+    {
+      "repository": "https://github.com/vectorize-io/hindsight",
+      "retained_comparison_refs": [
+        "catalogs/sota-convergence/manifest-20260926.json#/foundation/7/candidates/6/comparison_that_would_overturn",
+        "catalogs/sota-convergence/manifest-20260929.json#/foundation/7/candidates/4/comparison_that_would_overturn"
+      ],
+      "frozen_rule_reason": "The A2 newest-supported-model/native-capture merit rule governs this memory candidate; Mac history is not current-host merit. Retain its operational/native capture/recall/supersession/recovery prerequisites before scoring."
+    },
+    {
+      "repository": "https://github.com/tigerless-labs/agent-memory",
+      "retained_comparison_refs": [
+        "catalogs/sota-convergence/manifest-20260929.json#/foundation/7/candidates/3/comparison_that_would_overturn"
+      ],
+      "frozen_rule_reason": "The A2 newest-supported-model/native-capture merit rule governs this memory candidate; Mac history is not current-host merit. Retain its operational/native capture/recall/supersession/recovery prerequisites before scoring."
+    }
+  ]
+}

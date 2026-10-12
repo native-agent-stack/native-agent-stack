@@ -1,0 +1,1032 @@
+{
+  "schema_version": 1,
+  "kind": "w6_frozen_comparison",
+  "comparison_id": "w6-foundation-document-retrieval-20261011",
+  "registered_at": "2026-10-11T23:15:50Z",
+  "phase": "preregistered; no run; layer terminal state SCHEDULED",
+  "catalog": "foundation",
+  "layer_id": "document-retrieval",
+  "requirement_sha256": "fb292e216c7c4c66253e0e9395dca36c2ab16492ba8b6a69dabede9901d574bb",
+  "catalog_ref": "catalogs/landscape/foundation.json#/layers/5",
+  "catalog_sha256": "868d193a31080ab913400725140bd0d01e0afe97e28564fd12777f737d22951a",
+  "harnesses": [
+    "Existing W5 landscape-sweep comparison path (without discovery)",
+    "Existing native paired-task practice",
+    "Existing token-e2e freeze/usage evidence"
+  ],
+  "new_harness": false,
+  "arms": [
+    {
+      "repository": "https://github.com/tobi/qmd",
+      "pin": "facd35e01359e59d938bc9418e93fb9318addee3",
+      "upstream_role_ref": "README.md:1",
+      "upstream_install_ref": "README.md:32",
+      "upstream_test_ref": "package.json:31",
+      "role_ids": [
+        "document_retrieval"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
+    },
+    {
+      "repository": "https://github.com/microsoft/markitdown",
+      "pin": "fd239d5d2be43d9b68329730206b9312c7d5a388",
+      "upstream_role_ref": "README.md:10",
+      "upstream_install_ref": "README.md:63",
+      "upstream_test_ref": null,
+      "role_ids": [
+        "document_conversion",
+        "document_ocr_layout"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids",
+      "conversion_output": "native Markdown",
+      "role_source_witnesses": {
+        "document_ocr_layout": {
+          "ref": "README.md:130-132",
+          "pin": "fd239d5d2be43d9b68329730206b9312c7d5a388",
+          "source_file_sha256": "4f6246f3064d5cf0b4c61652822dd743c69a3fe72fef925279d22a6a68b3fca4",
+          "lines": [
+            "#### markitdown-ocr Plugin",
+            "",
+            "The `markitdown-ocr` plugin adds OCR support to PDF, DOCX, PPTX, and XLSX converters, extracting text from embedded images using LLM Vision \u2014 the same `llm_client` / `llm_model` pattern that MarkItDown already uses for image descriptions. No new ML libraries or binary dependencies required."
+          ],
+          "supporting_witnesses": [
+            {
+              "ref": "README.md:18",
+              "pin": "fd239d5d2be43d9b68329730206b9312c7d5a388",
+              "source_file_sha256": "4f6246f3064d5cf0b4c61652822dd743c69a3fe72fef925279d22a6a68b3fca4",
+              "lines": [
+                "- Images (EXIF metadata and OCR)"
+              ]
+            }
+          ]
+        }
+      },
+      "role_check_applicability": {
+        "document_ocr_layout": {
+          "case_ids": [
+            5
+          ],
+          "source_constraint": "Native image/markitdown-ocr text extraction through a configured llm_client/llm_model, which is a spending/entitlement readiness input. This native Markdown OCR route advertises no geometric output.",
+          "mandatory_checks": [
+            "Use the identical frozen rasterization and native supported image/plugin route; retain configured model/provider identity and complete costs.",
+            "Native OCR text/table values and source-image association match the authored oracle; no page-coordinate/layout requirement may be inferred from flat Markdown. Native layout references remain exclusively in the separately advertised layout role.",
+            "Retain every failure or skipped OCR due to absent supported client/model; missing entitlement is a recorded operational constraint, not an empty-output pass."
+          ]
+        }
+      }
+    },
+    {
+      "repository": "https://github.com/tsdgeos/poppler_mirror",
+      "pin": "5b97e475790a11012ec6095d9a47c23f7f229cb9",
+      "upstream_role_ref": "utils/pdftotext.cc:130",
+      "upstream_install_ref": null,
+      "upstream_test_ref": null,
+      "role_ids": [
+        "document_conversion",
+        "layout_referenced_conversion"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids",
+      "native_reference_form": "native PDF bounding boxes",
+      "role_source_witnesses": {
+        "layout_referenced_conversion": {
+          "ref": "utils/pdftotext.cc:130",
+          "pin": "5b97e475790a11012ec6095d9a47c23f7f229cb9",
+          "source_file_sha256": "e323a5939ee807d452e7f138156829d270dd7d93d92667eab22acc7eb09d83dc",
+          "lines": [
+            "                                   { .arg = \"-bbox-layout\", .kind = argFlag, .val = &bboxLayout, .size = 0, .usage = \"like -bbox but with extra layout bounding box data.  Sets -htmlmeta\" },"
+          ]
+        }
+      }
+    },
+    {
+      "repository": "https://github.com/datalab-to/marker",
+      "pin": "e7c67f1d239ea6a805cbf4ed6c6b2056d435e22d",
+      "upstream_role_ref": "README.md:23",
+      "upstream_install_ref": "README.md:78",
+      "upstream_test_ref": "pyproject.toml:64",
+      "role_ids": [
+        "document_conversion",
+        "document_ocr_layout",
+        "layout_referenced_conversion"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids",
+      "native_reference_form": "native paginated page anchors",
+      "role_source_witnesses": {
+        "layout_referenced_conversion": {
+          "ref": "README.md:133-135",
+          "pin": "e7c67f1d239ea6a805cbf4ed6c6b2056d435e22d",
+          "source_file_sha256": "1b874b82efc709d55d3a251cc631c13f695ed08935241fb4cce995e964fd00e4",
+          "lines": [
+            "- `--output_format [markdown|json|html|chunks]`: Specify the format for the output results.",
+            "- `--output_dir PATH`: Directory where output files will be saved. Defaults to the value specified in settings.OUTPUT_DIR.",
+            "- `--paginate_output`: Paginates the output, using `\\n\\n{PAGE_NUMBER}` followed by `-` * 48, then `\\n\\n`"
+          ]
+        }
+      }
+    },
+    {
+      "repository": "https://github.com/opendatalab/MinerU",
+      "pin": "b7f3dd0c5f6e6d66a298239ffd02b328b873918e",
+      "upstream_role_ref": "README.md:3",
+      "upstream_install_ref": "README.md:84",
+      "upstream_test_ref": "pyproject.toml:90",
+      "role_ids": [
+        "document_conversion",
+        "document_ocr_layout",
+        "document_retrieval",
+        "layout_referenced_conversion"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids",
+      "role_source_witnesses": {
+        "document_retrieval": {
+          "ref": "README.md:52",
+          "pin": "b7f3dd0c5f6e6d66a298239ffd02b328b873918e",
+          "source_file_sha256": "69c967e98536be101b5dc3420703d28cc1e0250eeca3b5bf156b060ac4ccfacb",
+          "lines": [
+            "- **Document library and agent reading**: discover files, cache results, search content, continue by page or block, and preserve stable citation locators."
+          ],
+          "supporting_witnesses": [
+            {
+              "ref": "README.md:236-240",
+              "pin": "b7f3dd0c5f6e6d66a298239ffd02b328b873918e",
+              "source_file_sha256": "69c967e98536be101b5dc3420703d28cc1e0250eeca3b5bf156b060ac4ccfacb",
+              "lines": [
+                "### Search local library, then read",
+                "",
+                "```bash",
+                "mineru search \"liquidated damages\" --min-tier basic --json",
+                "mineru read \"doc:ab12cd3/tier:standard/page:18\" --json"
+              ]
+            }
+          ]
+        },
+        "layout_referenced_conversion": {
+          "ref": "README.md:153",
+          "pin": "b7f3dd0c5f6e6d66a298239ffd02b328b873918e",
+          "source_file_sha256": "69c967e98536be101b5dc3420703d28cc1e0250eeca3b5bf156b060ac4ccfacb",
+          "lines": [
+            "- Keep stable references to document locations using `doc:{short_id}/tier:{tier}/page:{page_no}/block:{block_no}` locators."
+          ]
+        }
+      },
+      "native_reference_form": "native page/block locators"
+    },
+    {
+      "repository": "https://github.com/docling-project/docling",
+      "pin": "21588f5261d0a5a051102356d9babb35e790f33e",
+      "upstream_role_ref": "README.md:31",
+      "upstream_install_ref": "README.md:70",
+      "upstream_test_ref": "CONTRIBUTING.md:79",
+      "role_ids": [
+        "document_conversion",
+        "document_ocr_layout",
+        "layout_referenced_conversion"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids",
+      "native_reference_form": "native page provenance in lossless document model",
+      "role_source_witnesses": {
+        "layout_referenced_conversion": {
+          "ref": "docling/backend/docling_parse_backend.py:132-134",
+          "pin": "21588f5261d0a5a051102356d9babb35e790f33e",
+          "source_file_sha256": "cfd94eea0cf534805e1c006b0ba2366e25a01c8641b7325923e05a9bffa6278a",
+          "lines": [
+            "    @property",
+            "    def page_no(self) -> int:",
+            "        return self._result.page_number"
+          ]
+        }
+      }
+    },
+    {
+      "repository": "https://github.com/Cinnamon/kotaemon",
+      "pin": "9ad3e4e49aa35b8acddd235918a5d9753c1cfdf9",
+      "upstream_role_ref": "README.md:5",
+      "upstream_install_ref": "README.md:157",
+      "upstream_test_ref": "CONTRIBUTING.md:50",
+      "role_ids": [
+        "document_retrieval"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
+    },
+    {
+      "repository": "https://github.com/huggingface/sentence-transformers",
+      "pin": "ff69486771998c07008ebd3c7e05e827f03df46f",
+      "upstream_role_ref": "README.md:13",
+      "upstream_install_ref": "README.md:26",
+      "upstream_test_ref": "CONTRIBUTING.md:62",
+      "role_ids": [
+        "document_embedding_reranking"
+      ],
+      "dependency": true,
+      "selection_scope": "dependency qualification only; not ranked as a standalone end-to-end layer winner"
+    },
+    {
+      "repository": "https://github.com/arabold/docs-mcp-server",
+      "pin": "b8447383cfe5f9933da0a2f16a84c1a663e2d216",
+      "upstream_role_ref": "README.md:1",
+      "upstream_install_ref": "CONTRIBUTING.md:26",
+      "upstream_test_ref": "CONTRIBUTING.md:32",
+      "role_ids": [
+        "versioned_documentation_retrieval",
+        "document_retrieval"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids",
+      "role_source_witnesses": {
+        "document_retrieval": {
+          "ref": "README.md:61-64",
+          "pin": "b8447383cfe5f9933da0a2f16a84c1a663e2d216",
+          "source_file_sha256": "10ea967ead5cbd120c5dde8e46c85441d80655d5f34928f6a671c12cc33e7c2b",
+          "lines": [
+            "**2. Query the index:**",
+            "",
+            "```bash",
+            "npx @arabold/docs-mcp-server@latest search react \"useEffect cleanup\" --output yaml"
+          ],
+          "supporting_witnesses": [
+            {
+              "ref": "README.md:3",
+              "pin": "b8447383cfe5f9933da0a2f16a84c1a663e2d216",
+              "source_file_sha256": "10ea967ead5cbd120c5dde8e46c85441d80655d5f34928f6a671c12cc33e7c2b",
+              "lines": [
+                "**Docs MCP Server** solves the problem of AI hallucinations and outdated knowledge by providing a personal, always-current documentation index for your AI coding assistant. It fetches official docs from websites, GitHub, npm, PyPI, and local files, allowing your AI to query the exact version you are using."
+              ]
+            },
+            {
+              "ref": "README.md:16",
+              "pin": "b8447383cfe5f9933da0a2f16a84c1a663e2d216",
+              "source_file_sha256": "10ea967ead5cbd120c5dde8e46c85441d80655d5f34928f6a671c12cc33e7c2b",
+              "lines": [
+                "-   \ud83d\udcc1 **Multiple Sources:** Index websites, GitHub repositories, local folders, and zip archives."
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "repository": "https://github.com/VectifyAI/PageIndex",
+      "pin": "1a060dfc5c512ece03aeaa9cb80d76dbb5358bdf",
+      "upstream_role_ref": "README.md:33",
+      "upstream_install_ref": "README.md:33",
+      "upstream_test_ref": "pyproject.toml:57",
+      "role_ids": [
+        "document_retrieval"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
+    },
+    {
+      "repository": "https://github.com/xberg-io/xberg",
+      "pin": "b4bdf0b9346188c8b540698f80b359fb9ff60ed0",
+      "upstream_role_ref": "README.md:103",
+      "upstream_install_ref": "README.md:150",
+      "upstream_test_ref": "pyproject.toml:10",
+      "role_ids": [
+        "document_conversion",
+        "document_ocr_layout",
+        "layout_referenced_conversion",
+        "document_embedding_reranking"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids",
+      "native_reference_form": "native nodes with page/bounding-box metadata",
+      "role_source_witnesses": {
+        "layout_referenced_conversion": {
+          "ref": "crates/xberg-ffi/include/xberg.h:749-753",
+          "pin": "b4bdf0b9346188c8b540698f80b359fb9ff60ed0",
+          "source_file_sha256": "2446046f58c22e4f39de362af68ad0882a0240e08289a8f7a4f43537821fa732",
+          "lines": [
+            " * Each node has deterministic `id`, typed `content`, optional",
+            " * `parent`/`children` for tree structure, and metadata like page number,",
+            " * bounding box, and content layer.",
+            " */",
+            "typedef struct XBERGDocumentNode XBERGDocumentNode;"
+          ]
+        },
+        "document_embedding_reranking": {
+          "ref": "README.md:132",
+          "pin": "b4bdf0b9346188c8b540698f80b359fb9ff60ed0",
+          "source_file_sha256": "e7695c59610cbdc9b4f8602abbc6486c9565288aeee2e8feda19e74502cef112",
+          "lines": [
+            "| **Embeddings & search** | Local (ONNX) or provider-hosted embeddings (165 providers via liter-llm), sparse and late-interaction, cross-encoder reranking. |"
+          ],
+          "supporting_witnesses": [
+            {
+              "ref": "README.md:649",
+              "pin": "b4bdf0b9346188c8b540698f80b359fb9ff60ed0",
+              "source_file_sha256": "e7695c59610cbdc9b4f8602abbc6486c9565288aeee2e8feda19e74502cef112",
+              "lines": [
+                "| `embed` | \u2014 | Generate embeddings for text (local or provider-hosted) |"
+              ]
+            }
+          ]
+        }
+      },
+      "role_selection_scopes": {
+        "document_embedding_reranking": "Dependency-scoped native embedding/reranking API qualification on the common sealed model/corpus. Existing converter/OCR scopes remain candidate roles; no standalone retrieval-system merit from the primitive."
+      }
+    },
+    {
+      "repository": "https://github.com/pymupdf/pymupdf4llm",
+      "pin": "ed515362c37554244a20a0fd3ef12d53760249a8",
+      "upstream_role_ref": "README.md:26",
+      "upstream_install_ref": "README.md:58",
+      "upstream_test_ref": null,
+      "role_ids": [
+        "document_conversion",
+        "document_ocr_layout",
+        "layout_referenced_conversion"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids",
+      "native_reference_form": "native JSON per-element boxes/layout",
+      "role_source_witnesses": {
+        "layout_referenced_conversion": {
+          "ref": "README.md:85-91",
+          "pin": "ed515362c37554244a20a0fd3ef12d53760249a8",
+          "source_file_sha256": "0fc7f7b768e0782dc32dfaf91190bc64eb4be00696426b5d512c2a9e968513c7",
+          "lines": [
+            "### JSON output",
+            "",
+            "```python",
+            "import pymupdf4llm",
+            "",
+            "data = pymupdf4llm.to_json(\"document.pdf\")",
+            "# Returns bounding box info, layout data, and text per element"
+          ]
+        }
+      }
+    },
+    {
+      "repository": "https://github.com/datalab-to/surya",
+      "pin": "a2363d3311773a2b6145a40458043211c50c52f4",
+      "upstream_role_ref": "README.md:31",
+      "upstream_install_ref": "README.md:76",
+      "upstream_test_ref": "pyproject.toml:51",
+      "role_ids": [
+        "document_ocr_layout",
+        "layout_referenced_conversion"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids",
+      "native_reference_form": "native per-image page association/text boxes",
+      "role_source_witnesses": {
+        "layout_referenced_conversion": {
+          "ref": "README.md:141-146",
+          "pin": "a2363d3311773a2b6145a40458043211c50c52f4",
+          "source_file_sha256": "edb0368b5ad6ad33dbd705decd1c2d42dc11c9f011fe55be1e39ddb4550798f5",
+          "lines": [
+            "## OCR (text recognition)",
+            "",
+            "This command will write out a json file with the detected text and bboxes:",
+            "",
+            "```shell",
+            "surya_ocr DATA_PATH"
+          ]
+        }
+      }
+    },
+    {
+      "repository": "https://github.com/alibaba/Logics-Parsing",
+      "pin": "d75d42dbd92c518a4def19ac5895792828138d35",
+      "upstream_role_ref": "README.md:11",
+      "upstream_install_ref": "README.md:138",
+      "upstream_test_ref": null,
+      "role_ids": [
+        "document_ocr_layout",
+        "document_conversion",
+        "layout_referenced_conversion"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids",
+      "role_source_witnesses": {
+        "document_conversion": {
+          "ref": "README.md:178",
+          "pin": "d75d42dbd92c518a4def19ac5895792828138d35",
+          "source_file_sha256": "5fc2e3d1d459c252385627bce39a7c3204437eb3eaf5153806c418dcb0a6d77c",
+          "lines": [
+            "Outputs in `--output_dir` include parsed content (`markdown.md`), a multi-page document outline (`hierarchy.md`), raw labels (`raw_output.dsl`), and parsing results with metadata (`result.json`)."
+          ]
+        },
+        "layout_referenced_conversion": {
+          "ref": "inference_v3.py:47-54",
+          "pin": "d75d42dbd92c518a4def19ac5895792828138d35",
+          "source_file_sha256": "df833acf591303dcbd3978b2cec275fa1f8277e3d993d7ef877360d32a2da951",
+          "lines": [
+            "- Every label includes an absolute 0-based page id. Figure, chart and table locations, plus caption references to them, also include bounding-box coordinates normalized from 0 to 1000.",
+            "- Title: <|title|><|level|>N<|text|>TITLE_TEXT<|loc|>page, where N is 1-7.",
+            "- Text: <|text|>TEXT<|loc|>page.",
+            "- Table: <|table|>TABLE_HTML_OR_TEXT<|loc|>page,x1,y1,x2,y2.",
+            "- Figure/chart/formula: <|figure|><|loc|>page,x1,y1,x2,y2, <|chart|><|loc|>page,x1,y1,x2,y2, or <|formula|>FORMULA_TEXT<|loc|>page.",
+            "- Caption: <|caption|>CAPTION_TEXT<|loc|>page<|ref|>target_page,x1,y1,x2,y2.",
+            "- Use <|truncated|> when a text/table block continues later, and <|continued|> when it continues from earlier pages.",
+            "- For cross-column or merged text/table blocks, insert <break> at each content discontinuity and reduce each <|loc|> marker to its page id."
+          ]
+        }
+      },
+      "native_reference_form": "native absolute zero-based page ids and 0-1000 normalized geometry, converted explicitly into the frozen reference convention"
+    },
+    {
+      "repository": "https://github.com/baidu/Unlimited-OCR",
+      "pin": "d49ff64afffc1f47ab563dc1c589bc2f78808fa4",
+      "upstream_role_ref": null,
+      "upstream_install_ref": "README.md:159",
+      "upstream_test_ref": null,
+      "role_ids": [
+        "document_ocr_layout",
+        "layout_referenced_conversion",
+        "document_conversion"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids",
+      "role_source_witnesses": {
+        "layout_referenced_conversion": {
+          "ref": "README.md:297-302",
+          "pin": "d49ff64afffc1f47ab563dc1c589bc2f78808fa4",
+          "source_file_sha256": "08e531fef07276bb5bb036d675c991d3fbf39dc3cc985a8dda1b4c468bacdb9f",
+          "lines": [
+            "DET_RE = re.compile(r'<\\|det\\|>([^<\\s]+)(?:\\s*\\[[^\\]]*\\])?\\s*<\\|/det\\|>(.*)', re.DOTALL)",
+            "",
+            "def remove_det(raw: str) -> str:",
+            "    \"\"\"",
+            "    Strip <|det|>type [bbox]<|/det|> markers, group lines belonging to the",
+            "    same block with \\\\n, and separate different blocks with \\\\n\\\\n."
+          ],
+          "supporting_witnesses": [
+            {
+              "ref": "infer.py:245-249",
+              "pin": "d49ff64afffc1f47ab563dc1c589bc2f78808fa4",
+              "source_file_sha256": "537235bf5614318d9c84b728d4d67a7e5b2784884ec7aa6d1cafaa63d9b48760",
+              "lines": [
+                "        for i, image_path in enumerate(image_files):",
+                "            output_file = None",
+                "            if args.output_dir:",
+                "                output_file = os.path.join(args.output_dir, f\"{prefix}_page_{i + 1:04d}.md\")",
+                "            jobs.append((image_path, output_file))"
+              ]
+            }
+          ]
+        },
+        "document_conversion": {
+          "ref": "infer.py:245-249",
+          "pin": "d49ff64afffc1f47ab563dc1c589bc2f78808fa4",
+          "source_file_sha256": "537235bf5614318d9c84b728d4d67a7e5b2784884ec7aa6d1cafaa63d9b48760",
+          "lines": [
+            "        for i, image_path in enumerate(image_files):",
+            "            output_file = None",
+            "            if args.output_dir:",
+            "                output_file = os.path.join(args.output_dir, f\"{prefix}_page_{i + 1:04d}.md\")",
+            "            jobs.append((image_path, output_file))"
+          ],
+          "supporting_witnesses": [
+            {
+              "ref": "README.md:297-302",
+              "pin": "d49ff64afffc1f47ab563dc1c589bc2f78808fa4",
+              "source_file_sha256": "08e531fef07276bb5bb036d675c991d3fbf39dc3cc985a8dda1b4c468bacdb9f",
+              "lines": [
+                "DET_RE = re.compile(r'<\\|det\\|>([^<\\s]+)(?:\\s*\\[[^\\]]*\\])?\\s*<\\|/det\\|>(.*)', re.DOTALL)",
+                "",
+                "def remove_det(raw: str) -> str:",
+                "    \"\"\"",
+                "    Strip <|det|>type [bbox]<|/det|> markers, group lines belonging to the",
+                "    same block with \\\\n, and separate different blocks with \\\\n\\\\n."
+              ]
+            }
+          ]
+        }
+      },
+      "native_reference_form": "native det block bounding-box markers with per-page output filenames; preserve raw markers and seal coordinate-unit conversion before scoring"
+    },
+    {
+      "repository": "https://github.com/datalab-to/chandra",
+      "pin": "d4f7467435aa4137d9539f000ddf0b7ced3eb43f",
+      "upstream_role_ref": "README.md:23",
+      "upstream_install_ref": "README.md:58",
+      "upstream_test_ref": "pyproject.toml:58",
+      "role_ids": [
+        "document_conversion",
+        "document_ocr_layout",
+        "layout_referenced_conversion"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids",
+      "native_reference_form": "native page metadata with advertised detailed layout",
+      "role_source_witnesses": {
+        "layout_referenced_conversion": {
+          "ref": "README.md:159-161",
+          "pin": "d4f7467435aa4137d9539f000ddf0b7ced3eb43f",
+          "source_file_sha256": "edf170f70a20673559d6551e621bb5d5969a0b439d82125eca5ad6bec599b9fa",
+          "lines": [
+            "- `<filename>.md` - Markdown output",
+            "- `<filename>.html` - HTML output",
+            "- `<filename>_metadata.json` - Metadata (page info, token count, etc.)"
+          ]
+        }
+      }
+    }
+  ],
+  "fixture_seal": [
+    {
+      "path": "blueprints/convergence-practice/document-ingestion/corpus/authored-source.json",
+      "sha256": "9b294753d91abcbd8ebdd87460513014f179068796febfa9500ed25a5051ed34"
+    },
+    {
+      "path": "blueprints/convergence-practice/document-ingestion/corpus/lumen-qualification.pdf",
+      "sha256": "ca2b455ba16c76abdb26e198d95b27302cf4a0b8d00dd66c9a1f9d8be68d65f5"
+    },
+    {
+      "path": "blueprints/convergence-practice/document-ingestion/corpus/w3c-dummy.pdf",
+      "sha256": "3df79d34abbca99308e79cb94461c1893582604d68329a41fd4bec1885e6adb4"
+    }
+  ],
+  "cases": [
+    "parse born-digital PDF",
+    "retrieve authored positive facts with page citation",
+    "negative answer absent from sealed PDFs",
+    "invalid input",
+    "search-then-get exact body",
+    "Rasterize the already-sealed lumen PDF once with the same supported renderer/settings; OCR each common image and compare text, table cells and page layout with authored-source.json",
+    "Serve the already-sealed authored source under one declared local documentation version; index/search/get and query a nonexistent version",
+    "Run native embedding/reranking APIs on the common normalized sealed corpus/query text and preserve model identity, shapes and downstream source ranks",
+    "Validate native page/block or geometric references on the already-sealed authored PDF/common rasterization against authored-source.json, separately from flat content conversion."
+  ],
+  "mandatory_checks": [
+    "exact page text and table cells against authored-source oracle",
+    "source/page citations",
+    "correct abstention on negative queries",
+    "invalid input rejected",
+    "search-then-get body equality"
+  ],
+  "scope_limit": "These retained fixtures establish only bounded task/lifecycle correctness. A synthetic case score does not establish general SOTA, representative workload quality, or an upstream E2E. FINAL still requires all four protocol conditions at the run pin.",
+  "readiness_trigger": {
+    "all_of": [
+      "Exact arm binaries and their source pins verified in disposable environments through their own supported install paths",
+      "Each arm has its upstream-owned test/E2E recipe and a pinned receipt, or a retained substantive reason its scoped role is retired",
+      "Fixture hashes and complete usage instrumentation reproduce before the first arm",
+      "An isolated native runner is available without modifying the paper units, sealed bundles, Monday recorders or other lanes",
+      "Co-op relay that #1007 has LANDED and final-stack runs[] is available",
+      "All retained reopen and proposal prerequisites below have source-pinned scoped evidence or a substantive reviewed disposition before the affected run; unresolved operational/quality/coverage conditions cannot be ignored."
+    ],
+    "already_present": [
+      "retained fixture bytes",
+      "frozen arm source pins"
+    ],
+    "missing_at_registration": [
+      "arm runtime/E2E receipts at the frozen pins",
+      "#1007 LANDED relay"
+    ],
+    "start_rule": "Start as soon as all named inputs exist; no calendar date is a trigger. A comparison ready but not run is a defect.",
+    "retained_reopen_inputs": [
+      {
+        "kind": "ledger_reopen",
+        "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/failures/document-retrieval",
+        "trigger": "retained_failure",
+        "required_evidence": "Resolve retained retained_failure source/receipt/coverage evidence at the compared pin, or retain a substantive scoped disposition. Licence metadata alone cannot exclude a source.",
+        "owner": "layer-verdict"
+      },
+      {
+        "kind": "ledger_reopen",
+        "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/failures/document-retrieval",
+        "trigger": "retained_failure",
+        "required_evidence": "Resolve retained retained_failure source/receipt/coverage evidence at the compared pin, or retain a substantive scoped disposition. Licence metadata alone cannot exclude a source.",
+        "owner": "layer-verdict"
+      },
+      {
+        "kind": "retained_proposal_prerequisite",
+        "repository": "https://github.com/datalab-to/marker",
+        "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/5/candidates/0/comparison_that_would_overturn",
+        "additional_refs": [],
+        "required_evidence": "Retained native OCR/layout/scanned quality set and reading-order/table recipe are sealed.",
+        "owner": "layer-verdict",
+        "status": "unverified_before_execution"
+      },
+      {
+        "kind": "retained_proposal_prerequisite",
+        "repository": "https://github.com/opendatalab/mineru",
+        "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/5/candidates/1/comparison_that_would_overturn",
+        "additional_refs": [
+          "catalogs/sota-convergence/manifest-20260923.json#/foundation/5/candidates/1/comparison_that_would_overturn",
+          "catalogs/sota-convergence/manifest-20260926.json#/foundation/5/candidates/2/comparison_that_would_overturn"
+        ],
+        "required_evidence": "Native library search/read and retained judged/scanned/borderless TEDS recipes are sealed.",
+        "owner": "layer-verdict",
+        "status": "unverified_before_execution"
+      },
+      {
+        "kind": "retained_proposal_prerequisite",
+        "repository": "https://github.com/docling-project/docling",
+        "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/5/candidates/0/comparison_that_would_overturn",
+        "additional_refs": [
+          "catalogs/sota-convergence/manifest-20260926.json#/foundation/5/candidates/4/comparison_that_would_overturn"
+        ],
+        "required_evidence": "Retained scanned/borderless strata, table-fidelity/source-reference recipe and model settings are sealed.",
+        "owner": "layer-verdict",
+        "status": "unverified_before_execution"
+      },
+      {
+        "kind": "retained_proposal_prerequisite",
+        "repository": "https://github.com/cinnamon/kotaemon",
+        "ref": "catalogs/sota-convergence/manifest-20260926.json#/foundation/5/candidates/6/comparison_that_would_overturn",
+        "additional_refs": [],
+        "required_evidence": "Resumed-maintenance evidence and supported headless install/query are available at the tested pin.",
+        "owner": "layer-verdict",
+        "status": "unverified_before_execution"
+      },
+      {
+        "kind": "retained_proposal_prerequisite",
+        "repository": "https://github.com/huggingface/sentence-transformers",
+        "ref": "catalogs/sota-convergence/manifest-20260926.json#/foundation/5/candidates/0/comparison_that_would_overturn",
+        "additional_refs": [],
+        "required_evidence": "Supported checkpoint/prefix/dimensions and judged downstream recall/reranking panels are sealed; licences remain metadata.",
+        "owner": "layer-verdict",
+        "status": "unverified_before_execution"
+      },
+      {
+        "kind": "retained_proposal_prerequisite",
+        "repository": "https://github.com/arabold/docs-mcp-server",
+        "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/5/candidates/2/comparison_that_would_overturn",
+        "additional_refs": [
+          "catalogs/sota-convergence/manifest-20260926.json#/foundation/5/candidates/3/comparison_that_would_overturn"
+        ],
+        "required_evidence": "The retained native role/model/settings and source-backed comparison recipe are sealed before scoring; unsupported operational axes have a substantive disposition.",
+        "owner": "layer-verdict",
+        "status": "unverified_before_execution"
+      },
+      {
+        "kind": "retained_proposal_prerequisite",
+        "repository": "https://github.com/vectifyai/pageindex",
+        "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/5/candidates/3/comparison_that_would_overturn",
+        "additional_refs": [],
+        "required_evidence": "Retained financial query set and supported no-new-paid-key path exist; record a spending/entitlement disposition if a new paid key is required.",
+        "owner": "layer-verdict",
+        "status": "unverified_before_execution"
+      },
+      {
+        "kind": "retained_proposal_prerequisite",
+        "repository": "https://github.com/xberg-io/xberg",
+        "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/5/candidates/6/comparison_that_would_overturn",
+        "additional_refs": [],
+        "required_evidence": "Retained scanned/borderless table/throughput recipe and native feature/model set are sealed.",
+        "owner": "layer-verdict",
+        "status": "unverified_before_execution"
+      },
+      {
+        "kind": "retained_proposal_prerequisite",
+        "repository": "https://github.com/pymupdf/pymupdf4llm",
+        "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/5/candidates/5/comparison_that_would_overturn",
+        "additional_refs": [],
+        "required_evidence": "Retained Markdown/JSON, borderless/scanned table and native OCR settings/quality recipe are sealed.",
+        "owner": "layer-verdict",
+        "status": "unverified_before_execution"
+      },
+      {
+        "kind": "retained_proposal_prerequisite",
+        "repository": "https://github.com/datalab-to/surya",
+        "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/5/candidates/8/comparison_that_would_overturn",
+        "additional_refs": [],
+        "required_evidence": "Supported OCR/layout model, identical rasterization and retained quality-score recipe are sealed.",
+        "owner": "layer-verdict",
+        "status": "unverified_before_execution"
+      },
+      {
+        "kind": "retained_proposal_prerequisite",
+        "repository": "https://github.com/alibaba/logics-parsing",
+        "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/5/candidates/4/comparison_that_would_overturn",
+        "additional_refs": [],
+        "required_evidence": "Supported long-document model/settings and retained page/tree/table quality recipe are sealed.",
+        "owner": "layer-verdict",
+        "status": "unverified_before_execution"
+      },
+      {
+        "kind": "retained_proposal_prerequisite",
+        "repository": "https://github.com/baidu/unlimited-ocr",
+        "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/5/candidates/7/comparison_that_would_overturn",
+        "additional_refs": [],
+        "required_evidence": "Supported native install/test/output recipe resolves the retained source-role gap; unsupported paths remain failures.",
+        "owner": "layer-verdict",
+        "status": "unverified_before_execution"
+      },
+      {
+        "kind": "retained_proposal_prerequisite",
+        "repository": "https://github.com/datalab-to/chandra",
+        "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/5/candidates/13/comparison_that_would_overturn",
+        "additional_refs": [
+          "catalogs/sota-convergence/manifest-20260923.json#/foundation/5/candidates/6/comparison_that_would_overturn"
+        ],
+        "required_evidence": "Current default-branch maintenance receipt satisfies the retained 90-day recency criterion at scoring; source recency is not a calendar wait.",
+        "owner": "layer-verdict",
+        "status": "unverified_before_execution"
+      }
+    ],
+    "owner": "layer-verdict",
+    "next_action": "Retain upstream runtime/E2E/model/instrumentation seals, then resolve the listed retained readiness inputs in the owned queue. No ready comparison remains unrun."
+  },
+  "execution_rule": {
+    "repetitions": 3,
+    "order": "Canonical repository order on first repetition, reverse on second, rotate first arm to last on third; same case order and fresh isolated stores",
+    "model": "Preserve the native account and configured default model/effort; record exact identity in the freeze. No new paid route or model download is authorized by this artifact.",
+    "preflight": "Retain unsupported role/model interfaces, absent test recipes, failed installations and spending/entitlement constraints with source-backed reasons; never silently omit a survivor. Licence provenance is metadata only, never an exclusion ground.",
+    "cost": "Record complete provider usage and elapsed time separately from tool-output/token estimates; never infer provider savings",
+    "protected_window": "Heavy E2E during the CC's Monday window uses systemd-run --user --scope -p CPUWeight=idle; a full suite additionally needs SUITE-REQUEST and SUITE-GO.",
+    "license_exclusion": false
+  },
+  "fixed_decision_rule": {
+    "eligibility": "For each predeclared role, every mapped role check must pass in all three repetitions with complete usage and upstream E2E at the comparison's immutable source pin. Dependency arms qualify only their mapped interface and are never scored as standalone end-to-end candidates.",
+    "rank": "For each role, maximize exact grounded-correct cases, then minimize total provider cost, then median elapsed time, then peak RSS. Compare only arms covering that same role; dependency components keep their own qualification receipts.",
+    "tie": "Retain the existing qualified incumbent for that role if tied. Otherwise retain all exactly tied qualified arms with their measured equality; do not claim superiority.",
+    "none_qualify": "Record RETIRED for the unsupported role with all failure/retirement reasons; do not promote an unqualified arm.",
+    "terminal": "FINAL requires every selected deployed winner's actual final-stack runs[] pin to match its adopted tested source, with verdict/wave/next_review, upstream E2E at that operational run pin and invoke evidence/role reason. An experimental source-pin receipt does not qualify a different historical operational run pin.",
+    "amendments": "No new candidates or changed metrics after first run. Any necessary input correction requires a separately reviewed, hashed amendment before affected scoring."
+  },
+  "role_checks": {
+    "document_conversion": {
+      "case_ids": [
+        0,
+        3
+      ],
+      "mandatory_checks": [
+        "Native converted Markdown/plain-text/HTML content matches exact authored text/table values; MarkItDown is scored on native Markdown.",
+        "Invalid input is rejected with failures retained; no page or coordinates are required for flat conversion."
+      ],
+      "representation_scope": "Native flat content. Do not synthesize source metadata or require every supported format to emit Markdown."
+    },
+    "document_ocr_layout": {
+      "case_ids": [
+        5
+      ],
+      "mandatory_checks": [
+        "Use one common frozen rasterization of the sealed PDF",
+        "OCR text/table cells and page layout match authored oracle; no per-arm image tuning"
+      ]
+    },
+    "document_retrieval": {
+      "case_ids": [
+        1,
+        2,
+        4
+      ],
+      "mandatory_checks": [
+        "Same sealed normalized document corpus and positive/negative queries",
+        "Correct facts, absence and source/page citations",
+        "Search-then-get body equality"
+      ]
+    },
+    "versioned_documentation_retrieval": {
+      "case_ids": [
+        6
+      ],
+      "mandatory_checks": [
+        "Index the same sealed local documentation artifact under the declared version",
+        "Return exact source body/version and abstain from nonexistent version or fact"
+      ]
+    },
+    "document_embedding_reranking": {
+      "case_ids": [
+        7
+      ],
+      "mandatory_checks": [
+        "Supported checkpoint/revision sealed before use; licence metadata is never an exclusion.",
+        "Native embedding/reranking primitives work on the identical corpus/query text",
+        "Record finite shapes and deterministic ranking; assess downstream retrieval in the common fixed pipeline, not by parser score"
+      ]
+    },
+    "layout_referenced_conversion": {
+      "case_ids": [
+        8
+      ],
+      "reference_definition": "Page reference is an explicit native page ordinal normalized to the one-based authored page plus an exact source fragment. Layout reference is a native stable block/line/table locator round-tripping to that fragment, or an explicit rectangle/polygon normalized to PDF points. Native boxes must enclose authored text/table anchors within fixed two-point edge tolerance. Report page-only, stable-block and geometric scope separately; no page-only geometric superiority or metadata inferred from flat Markdown.",
+      "mandatory_checks": [
+        "Native source page and exact quoted text/table anchors match authored source; native reference form is sealed before use.",
+        "Stable native locators round-trip exact source; explicit native boxes use declared units/origin and fixed two-point source-anchor tolerance, never invented coordinates.",
+        "Advertised reference dimensions remain separate; no flat-only arm is rejected for missing this distinct role."
+      ]
+    }
+  },
+  "refrozen_at": "2026-10-12T09:10:22Z",
+  "amendment_authority": "CC adjudication-pr1021-599d9bbb-20261012.md: B2-r-2, B1-std, licence, survivor reasons and retained reopen inputs",
+  "role_assignment_rule": "Source-advertised roles enter the common requirement comparison; no applicability change at scoring. Distinct native output contracts use separately defined oracles, never incompatible layout requirements imposed on flat output.",
+  "role_reconciliation": [
+    {
+      "repository": "https://github.com/tsdgeos/poppler_mirror",
+      "pin": "5b97e475790a11012ec6095d9a47c23f7f229cb9",
+      "old_role_id": "pdf_text_layout_extraction",
+      "role_ids": [
+        "document_conversion"
+      ],
+      "requirement_basis": "The layer requires document conversion; the catalog explicitly selects Poppler PDF conversion. Cases 0 and 3 equal document_conversion, so native PDF extraction is evaluated in that common role.",
+      "previous_case_ids": [
+        0,
+        3
+      ],
+      "previous_mandatory_checks": [
+        "Extracted PDF text and page/layout references match authored oracle",
+        "Invalid PDF input is rejected"
+      ],
+      "source_ref": "utils/pdftotext.cc:130",
+      "qualification_boundary": "Role applicability is a preregistered comparison obligation, not a claim that this arm passed the common oracle or supports every required operation."
+    },
+    {
+      "authority": "CC terminal adjudication B1-std",
+      "reason": "Flat content and native source references have distinct oracles/cases. Poppler still shares flat conversion; MarkItDown uses native Markdown without manufactured metadata. Reference-capable arms retain each native advertised dimension."
+    }
+  ],
+  "supersedes": {
+    "head": "55c49da1924216665b21bb538cfe43becf448fc7",
+    "preregistration_sha256": "5be0515cc4367fc457e12bded1ed351ed022ff61a9ba55ced3998906ccac4848",
+    "before_any_run": true,
+    "reason": "Completion of the terminal source-advertised-role ruling; metrics, cases, source pins and candidate set unchanged."
+  },
+  "retained_comparison_dispositions": [
+    {
+      "repository": "https://github.com/datalab-to/marker",
+      "retained_comparison_refs": [
+        "catalogs/sota-convergence/manifest-20260923.json#/foundation/5/candidates/0/comparison_that_would_overturn"
+      ],
+      "frozen_rule_reason": "Shared native conversion/OCR/reference cases provide bounded authored-source correctness. They do not imply the retained large olmocr-bench/scanned-set reading-order or table result; seal that native quality recipe before extrapolation."
+    },
+    {
+      "repository": "https://github.com/opendatalab/mineru",
+      "retained_comparison_refs": [
+        "catalogs/sota-convergence/manifest-20260923.json#/foundation/5/candidates/1/comparison_that_would_overturn",
+        "catalogs/sota-convergence/manifest-20260926.json#/foundation/5/candidates/2/comparison_that_would_overturn",
+        "catalogs/sota-convergence/manifest-20260929.json#/foundation/5/candidates/1/comparison_that_would_overturn"
+      ],
+      "frozen_rule_reason": "Native library search/read now compares directly with qmd alongside conversion/OCR/reference checks. The retained judged retrieval and scanned/borderless TEDS study remains a scoring prerequisite; the authored fixture is only a bounded contract."
+    },
+    {
+      "repository": "https://github.com/docling-project/docling",
+      "retained_comparison_refs": [
+        "catalogs/sota-convergence/manifest-20260926.json#/foundation/5/candidates/4/comparison_that_would_overturn",
+        "catalogs/sota-convergence/manifest-20260929.json#/foundation/5/candidates/0/comparison_that_would_overturn"
+      ],
+      "frozen_rule_reason": "Native conversion/OCR/page provenance use the common authored input rather than a parser-name win. Retained scanned/borderless strata and table fidelity require their own sealed recipe before broader quality claims."
+    },
+    {
+      "repository": "https://github.com/cinnamon/kotaemon",
+      "retained_comparison_refs": [
+        "catalogs/sota-convergence/manifest-20260926.json#/foundation/5/candidates/6/comparison_that_would_overturn"
+      ],
+      "frozen_rule_reason": "Common retrieval/absence/source-body checks compare the same normalized corpus, not parser or UI breadth. Resumed maintenance and supported headless install/query are readiness conditions before scoring."
+    },
+    {
+      "repository": "https://github.com/huggingface/sentence-transformers",
+      "retained_comparison_refs": [
+        "catalogs/sota-convergence/manifest-20260926.json#/foundation/5/candidates/0/comparison_that_would_overturn"
+      ],
+      "frozen_rule_reason": "This dependency qualifies native embedding/reranking in the fixed downstream pipeline, not a whole retrieval application. Matched checkpoints and retained judged recall/control panels must be sealed; shapes alone do not prove quality."
+    },
+    {
+      "repository": "https://github.com/arabold/docs-mcp-server",
+      "retained_comparison_refs": [
+        "catalogs/sota-convergence/manifest-20260926.json#/foundation/5/candidates/3/comparison_that_would_overturn",
+        "catalogs/sota-convergence/manifest-20260929.json#/foundation/5/candidates/2/comparison_that_would_overturn"
+      ],
+      "frozen_rule_reason": "Common retrieval against qmd now tests recall/source body/freshness, while versioned-documentation scope remains separate. Website/version gains beyond the authored corpus are retained untested boundaries, not a singleton automatic win."
+    },
+    {
+      "repository": "https://github.com/vectifyai/pageindex",
+      "retained_comparison_refs": [
+        "catalogs/sota-convergence/manifest-20260929.json#/foundation/5/candidates/3/comparison_that_would_overturn"
+      ],
+      "frozen_rule_reason": "Common source-grounded retrieval does not assert the retained FinanceBench task ran. Seal its judged financial recipe and supported no-new-paid-key path; a new paid key is a spending/entitlement constraint, never licence exclusion."
+    },
+    {
+      "repository": "https://github.com/xberg-io/xberg",
+      "retained_comparison_refs": [
+        "catalogs/sota-convergence/manifest-20260929.json#/foundation/5/candidates/6/comparison_that_would_overturn"
+      ],
+      "frozen_rule_reason": "Native flat conversion/OCR/structured references meet the shared authored oracle against Poppler and other converters. Scanned/borderless TEDS and throughput remain sealed-input prerequisites; model presence alone is not a result."
+    },
+    {
+      "repository": "https://github.com/pymupdf/pymupdf4llm",
+      "retained_comparison_refs": [
+        "catalogs/sota-convergence/manifest-20260929.json#/foundation/5/candidates/5/comparison_that_would_overturn"
+      ],
+      "frozen_rule_reason": "Native Markdown/JSON and bounding-box output compare with Poppler on the same authored PDF. The retained heading/table/OCR and borderless-strata quality study is not inferred from a small fixture; retain its recipe before broader claims."
+    },
+    {
+      "repository": "https://github.com/datalab-to/surya",
+      "retained_comparison_refs": [
+        "catalogs/sota-convergence/manifest-20260929.json#/foundation/5/candidates/8/comparison_that_would_overturn"
+      ],
+      "frozen_rule_reason": "The common rasterization qualifies OCR/source-page boxes, not whole retrieval. Seal the native model and retained OCR quality recipe before extrapolation beyond the authored page."
+    },
+    {
+      "repository": "https://github.com/alibaba/logics-parsing",
+      "retained_comparison_refs": [
+        "catalogs/sota-convergence/manifest-20260929.json#/foundation/5/candidates/4/comparison_that_would_overturn"
+      ],
+      "frozen_rule_reason": "Its advertised native Markdown output enters content conversion alongside OCR; a model is not a retrieval system. Retained long-document/table quality and supported model settings remain pre-run evidence."
+    },
+    {
+      "repository": "https://github.com/baidu/unlimited-ocr",
+      "retained_comparison_refs": [
+        "catalogs/sota-convergence/manifest-20260929.json#/foundation/5/candidates/7/comparison_that_would_overturn"
+      ],
+      "frozen_rule_reason": "The OCR arm retains a named source-role/recipe gap rather than a universal converter claim. Shared raster/text/table checks govern that scope, and the retained OCR workload requires a supported sealed native recipe."
+    },
+    {
+      "repository": "https://github.com/datalab-to/chandra",
+      "retained_comparison_refs": [
+        "catalogs/sota-convergence/manifest-20260923.json#/foundation/5/candidates/6/comparison_that_would_overturn",
+        "catalogs/sota-convergence/manifest-20260929.json#/foundation/5/candidates/13/comparison_that_would_overturn"
+      ],
+      "frozen_rule_reason": "The missing-vote proposal remains in native conversion/OCR/reference checks. Current maintenance evidence and retained scanned/table recipe gate scoring; neither vote absence nor this bounded fixture decides general merit."
+    }
+  ],
+  "flat_conversion_source_witnesses": [
+    {
+      "ref": "packages/markitdown/src/markitdown/converters/_pdf_converter.py:570-589",
+      "pin": "fd239d5d2be43d9b68329730206b9312c7d5a388",
+      "source_file_sha256": "8a48783a111f8c240ab87320921455e879a5f6753421a6cc472e6d2b89bf2c92",
+      "lines": [
+        "            if form_page_count == 0:",
+        "                pdf_bytes.seek(0)",
+        "                markdown = pdfminer.high_level.extract_text(pdf_bytes)",
+        "            else:",
+        "                markdown = \"\\n\\n\".join(markdown_chunks).strip()",
+        "",
+        "        except Exception:",
+        "            # Fallback if pdfplumber fails",
+        "            pdf_bytes.seek(0)",
+        "            markdown = pdfminer.high_level.extract_text(pdf_bytes)",
+        "",
+        "        # Fallback if still empty",
+        "        if not markdown:",
+        "            pdf_bytes.seek(0)",
+        "            markdown = pdfminer.high_level.extract_text(pdf_bytes)",
+        "",
+        "        # Post-process to merge MasterFormat-style partial numbering with following text",
+        "        markdown = _merge_partial_numbering_lines(markdown)",
+        "",
+        "        return DocumentConverterResult(markdown=markdown)"
+      ]
+    },
+    {
+      "ref": "packages/markitdown/src/markitdown/_base_converter.py:8-25",
+      "pin": "fd239d5d2be43d9b68329730206b9312c7d5a388",
+      "source_file_sha256": "3b9cfbe86bc2af4f7f23042e60eaccf5e8d9df866d8a35a77d00672eab5202e6",
+      "lines": [
+        "    def __init__(",
+        "        self,",
+        "        markdown: str,",
+        "        *,",
+        "        title: Optional[str] = None,",
+        "    ):",
+        "        \"\"\"",
+        "        Initialize the DocumentConverterResult.",
+        "",
+        "        The only required parameter is the converted Markdown text.",
+        "        The title, and any other metadata that may be added in the future, are optional.",
+        "",
+        "        Parameters:",
+        "        - markdown: The converted Markdown text.",
+        "        - title: Optional title of the document.",
+        "        \"\"\"",
+        "        self.markdown = markdown",
+        "        self.title = title"
+      ]
+    }
+  ],
+  "completion_authority": "CC adjudication-pr1021-55c49da1-20261012.md: eight remaining advertised arm-role pairs, completion only",
+  "completion_role_pairs": [
+    {
+      "repository": "https://github.com/alibaba/Logics-Parsing",
+      "pin": "d75d42dbd92c518a4def19ac5895792828138d35",
+      "added_role_id": "layout_referenced_conversion",
+      "source_ref": "inference_v3.py:47-54"
+    },
+    {
+      "repository": "https://github.com/baidu/Unlimited-OCR",
+      "pin": "d49ff64afffc1f47ab563dc1c589bc2f78808fa4",
+      "added_role_id": "layout_referenced_conversion",
+      "source_ref": "README.md:297-302"
+    },
+    {
+      "repository": "https://github.com/baidu/Unlimited-OCR",
+      "pin": "d49ff64afffc1f47ab563dc1c589bc2f78808fa4",
+      "added_role_id": "document_conversion",
+      "source_ref": "infer.py:245-249"
+    },
+    {
+      "repository": "https://github.com/xberg-io/xberg",
+      "pin": "b4bdf0b9346188c8b540698f80b359fb9ff60ed0",
+      "added_role_id": "document_embedding_reranking",
+      "source_ref": "README.md:132"
+    },
+    {
+      "repository": "https://github.com/microsoft/markitdown",
+      "pin": "fd239d5d2be43d9b68329730206b9312c7d5a388",
+      "added_role_id": "document_ocr_layout",
+      "source_ref": "README.md:130-132"
+    }
+  ]
+}

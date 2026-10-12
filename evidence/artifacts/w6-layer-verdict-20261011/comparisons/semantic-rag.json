@@ -1,0 +1,451 @@
+{
+  "schema_version": 1,
+  "kind": "w6_frozen_comparison",
+  "comparison_id": "w6-foundation-semantic-rag-20261011",
+  "registered_at": "2026-10-11T23:15:50Z",
+  "phase": "preregistered; no run; layer terminal state SCHEDULED",
+  "catalog": "foundation",
+  "layer_id": "semantic-rag",
+  "requirement_sha256": "c045a0347485de1ff02d3188bb76efaf405850023a3c78fee6d53ed450c6bfc4",
+  "catalog_ref": "catalogs/landscape/foundation.json#/layers/6",
+  "catalog_sha256": "868d193a31080ab913400725140bd0d01e0afe97e28564fd12777f737d22951a",
+  "harnesses": [
+    "Existing W5 landscape-sweep comparison path (without discovery)",
+    "Existing native paired-task practice",
+    "Existing token-e2e freeze/usage evidence"
+  ],
+  "new_harness": false,
+  "arms": [
+    {
+      "repository": "https://github.com/giancarloerra/SocratiCode",
+      "pin": "2218f25153d0f3f4a76ee240a5643dbc873e80be",
+      "upstream_role_ref": "README.md:44",
+      "upstream_install_ref": "CONTRIBUTING.md:22",
+      "upstream_test_ref": "CONTRIBUTING.md:36",
+      "role_ids": [
+        "project_semantic_index",
+        "semantic_code_retrieval"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
+    },
+    {
+      "repository": "https://github.com/qdrant/qdrant",
+      "pin": "6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de",
+      "upstream_role_ref": "README.md:22",
+      "upstream_install_ref": null,
+      "upstream_test_ref": null,
+      "role_ids": [
+        "vector_storage",
+        "multivector_semantic_index"
+      ],
+      "dependency": true,
+      "selection_scope": "dependency qualification only; not ranked as a standalone end-to-end layer winner",
+      "role_source_witnesses": {
+        "multivector_semantic_index": {
+          "ref": "README.md:133",
+          "pin": "6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de",
+          "source_file_sha256": "f1455d12252bf40235ad0128d8e98b2cd6d42583e441ac832b01f4daf08df2e4",
+          "lines": [
+            "Qdrant supports dense vectors for semantic similarity, sparse vectors for full-text search, and multivector search for objects with multiple embeddings or late interaction models like ColBERT."
+          ]
+        }
+      },
+      "role_input_boundary": {
+        "multivector_semantic_index": "Externally computed multivectors from the sealed model-serving source are common inputs; qualify native index/search/storage/isolation with the same membership oracle, never claim Qdrant computes embeddings."
+      }
+    },
+    {
+      "repository": "https://github.com/vllm-project/vllm",
+      "pin": "db9527a46873454610df6dbedf79a36d6bf1a7f6",
+      "upstream_role_ref": "README.md:24",
+      "upstream_install_ref": "README.md:69",
+      "upstream_test_ref": null,
+      "role_ids": [
+        "model_serving"
+      ],
+      "dependency": true,
+      "selection_scope": "dependency qualification only; not ranked as a standalone end-to-end layer winner"
+    },
+    {
+      "repository": "https://github.com/ollama/ollama",
+      "pin": "eab97e9f92b9a25c2d52d2cc6c1b1c99bd9fae21",
+      "upstream_role_ref": "README.md:58",
+      "upstream_install_ref": "README.md:16",
+      "upstream_test_ref": null,
+      "role_ids": [
+        "model_serving"
+      ],
+      "dependency": true,
+      "selection_scope": "dependency qualification only; not ranked as a standalone end-to-end layer winner"
+    },
+    {
+      "repository": "https://github.com/OSU-NLP-Group/HippoRAG",
+      "pin": "d5c8329422e0a0b834a15874545cb6a74b4f9b26",
+      "upstream_role_ref": "README.md:13",
+      "upstream_install_ref": "README.md:48",
+      "upstream_test_ref": null,
+      "role_ids": [
+        "project_semantic_index",
+        "semantic_code_retrieval"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
+    },
+    {
+      "repository": "https://github.com/lightonai/next-plaid",
+      "pin": "c6c091d7ee14c81206bb28af90d8ff506fd0235e",
+      "upstream_role_ref": "README.md:22",
+      "upstream_install_ref": "README.md:35",
+      "upstream_test_ref": "Makefile:15",
+      "role_ids": [
+        "multivector_semantic_index",
+        "semantic_code_retrieval",
+        "project_semantic_index"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids",
+      "role_source_witnesses": {
+        "semantic_code_retrieval": {
+          "pin": "c6c091d7ee14c81206bb28af90d8ff506fd0235e",
+          "ref": "README.md:22",
+          "source_file_sha256": "0feb0aea9d954e1b39ebfe46fe7a6c343d798bc155537b5526e73b610105cb03",
+          "lines": [
+            "Semantic code search for your terminal and your coding agents. Searches combine regex filtering with semantic ranking. All local, your code never leaves your machine."
+          ],
+          "evidence_class": "source_review"
+        },
+        "project_semantic_index": {
+          "ref": "README.md:59",
+          "pin": "c6c091d7ee14c81206bb28af90d8ff506fd0235e",
+          "source_file_sha256": "0feb0aea9d954e1b39ebfe46fe7a6c343d798bc155537b5526e73b610105cb03",
+          "lines": [
+            "That's it. No server, no API, no dependencies. ColGREP is a single Rust binary with everything baked in. `colgrep init` builds the index for the first time. After that, every search detects file changes and updates the index automatically before returning results."
+          ],
+          "supporting_witnesses": [
+            {
+              "ref": "README.md:215",
+              "pin": "c6c091d7ee14c81206bb28af90d8ff506fd0235e",
+              "source_file_sha256": "0feb0aea9d954e1b39ebfe46fe7a6c343d798bc155537b5526e73b610105cb03",
+              "lines": [
+                "- **Incremental updates.** Add and delete documents without rebuilding the index."
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "repository": "https://github.com/minishlab/semble",
+      "pin": "0e5e02832ae0340c0feb637d2b7213fe065571fd",
+      "upstream_role_ref": "README.md:3",
+      "upstream_install_ref": "README.md:41",
+      "upstream_test_ref": "pyproject.toml:52",
+      "role_ids": [
+        "project_semantic_index",
+        "semantic_code_retrieval"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
+    }
+  ],
+  "fixture_seal": [
+    {
+      "path": "fixtures/rag-note.md",
+      "sha256": "27680cf43a65121fc1affbde0dba8021ea21180bb8db0a9c0f80a09b831257cc"
+    },
+    {
+      "path": "fixtures/after.py",
+      "sha256": "7808434453a0975ee01a5eae460e8866b78f9b3a8401f93f2b905b1f3a778e54"
+    }
+  ],
+  "cases": [
+    "which component persists vectors and code payloads (Qdrant)",
+    "which prefixes does embedding use (query: and passage:)",
+    "which tool retrieves Markdown separately (QMD)",
+    "negative query unsupported by sealed text",
+    "isolated add/update/delete/rename and restore",
+    "Native vector-store fixture: upsert the same sealed source payload/IDs, get exact values, delete/verify absence, restart and restore into an empty store",
+    "Native serving fixture: single/batched embedding of the sealed source/query text under the committed model seal; compare finite shape, identity and the seal's fixed parity oracle",
+    "Native multivector fixture: index/query exact sealed source membership, then add/delete/rename isolated copies and verify source membership and no cross-project result"
+  ],
+  "mandatory_checks": [
+    "grounded answer accuracy and supporting source locations",
+    "add/update/delete/rename freshness",
+    "no cross-project leakage",
+    "empty-target restore equality",
+    "cold-index time, query latency and peak RSS retained"
+  ],
+  "scope_limit": "These retained fixtures establish only bounded task/lifecycle correctness. A synthetic case score does not establish general SOTA, representative workload quality, or an upstream E2E. FINAL still requires all four protocol conditions at the run pin.",
+  "readiness_trigger": {
+    "all_of": [
+      "Exact arm binaries and their source pins verified in disposable environments through their own supported install paths",
+      "Each arm has its upstream-owned test/E2E recipe and a pinned receipt, or a retained substantive reason its scoped role is retired",
+      "Fixture hashes and complete usage instrumentation reproduce before the first arm",
+      "An isolated native runner is available without modifying the paper units, sealed bundles, Monday recorders or other lanes",
+      "Co-op relay that #1007 has LANDED and final-stack runs[] is available",
+      "All retained reopen and proposal prerequisites below have source-pinned scoped evidence or a substantive reviewed disposition before the affected run; unresolved operational/quality/coverage conditions cannot be ignored."
+    ],
+    "already_present": [
+      "retained fixture bytes",
+      "frozen arm source pins"
+    ],
+    "missing_at_registration": [
+      "arm runtime/E2E receipts at the frozen pins",
+      "#1007 LANDED relay"
+    ],
+    "start_rule": "Start as soon as all named inputs exist; no calendar date is a trigger. A comparison ready but not run is a defect.",
+    "retained_reopen_inputs": [
+      {
+        "kind": "ledger_reopen",
+        "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/failures/semantic-rag",
+        "trigger": "retained_failure",
+        "required_evidence": "Resolve retained retained_failure source/receipt/coverage evidence at the compared pin, or retain a substantive scoped disposition. Licence metadata alone cannot exclude a source.",
+        "owner": "layer-verdict"
+      },
+      {
+        "kind": "ledger_reopen",
+        "ref": "receipt_staleness:linux-wsl2-x86_64/vllm",
+        "trigger": "pin_moved",
+        "required_evidence": "Resolve retained pin_moved source/receipt/coverage evidence at the compared pin, or retain a substantive scoped disposition. Licence metadata alone cannot exclude a source.",
+        "owner": "layer-verdict"
+      },
+      {
+        "kind": "ledger_reopen",
+        "ref": "receipt_staleness:macos-arm64/ai-memory",
+        "trigger": "pin_moved",
+        "required_evidence": "Resolve retained pin_moved source/receipt/coverage evidence at the compared pin, or retain a substantive scoped disposition. Licence metadata alone cannot exclude a source.",
+        "owner": "layer-verdict"
+      },
+      {
+        "kind": "ledger_reopen",
+        "ref": "receipt_staleness:linux-wsl2-x86_64/ai-memory",
+        "trigger": "pin_moved",
+        "required_evidence": "Resolve retained pin_moved source/receipt/coverage evidence at the compared pin, or retain a substantive scoped disposition. Licence metadata alone cannot exclude a source.",
+        "owner": "layer-verdict"
+      },
+      {
+        "kind": "retained_proposal_prerequisite",
+        "repository": "https://github.com/ollama/ollama",
+        "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/6/candidates/2/comparison_that_would_overturn",
+        "additional_refs": [
+          "catalogs/sota-convergence/manifest-20260923.json#/foundation/6/candidates/0/comparison_that_would_overturn",
+          "catalogs/sota-convergence/manifest-20260926.json#/foundation/6/candidates/4/comparison_that_would_overturn"
+        ],
+        "required_evidence": "The retained native role/model/settings and source-backed comparison recipe are sealed before scoring; unsupported operational axes have a substantive disposition.",
+        "owner": "layer-verdict",
+        "status": "unverified_before_execution"
+      },
+      {
+        "kind": "retained_proposal_prerequisite",
+        "repository": "https://github.com/osu-nlp-group/hipporag",
+        "ref": "catalogs/sota-convergence/manifest-20260926.json#/foundation/6/candidates/7/comparison_that_would_overturn",
+        "additional_refs": [],
+        "required_evidence": "Retained judged multi-hop cross-file set and supported model/project restore recipe are sealed.",
+        "owner": "layer-verdict",
+        "status": "unverified_before_execution"
+      },
+      {
+        "kind": "retained_proposal_prerequisite",
+        "repository": "https://github.com/lightonai/next-plaid",
+        "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/6/candidates/0/comparison_that_would_overturn",
+        "additional_refs": [
+          "catalogs/sota-convergence/manifest-20260926.json#/foundation/6/candidates/1/comparison_that_would_overturn"
+        ],
+        "required_evidence": "Retained Semble benchmark, frozen-set NDCG@10 and native index/recovery recipe are sealed.",
+        "owner": "layer-verdict",
+        "status": "unverified_before_execution"
+      },
+      {
+        "kind": "retained_proposal_prerequisite",
+        "repository": "https://github.com/minishlab/semble",
+        "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/6/candidates/1/comparison_that_would_overturn",
+        "additional_refs": [
+          "catalogs/sota-convergence/manifest-20260926.json#/foundation/6/candidates/3/comparison_that_would_overturn"
+        ],
+        "required_evidence": "Retained Semble benchmark, judged relevance/NDCG@10 and project update/recovery recipe are sealed.",
+        "owner": "layer-verdict",
+        "status": "unverified_before_execution"
+      },
+      {
+        "kind": "retained_proposal_prerequisite",
+        "repository": "https://github.com/giancarloerra/socraticode",
+        "ref": "catalogs/sota-convergence/manifest-20260926.json#/foundation/6/candidates/0/comparison_that_would_overturn",
+        "additional_refs": [],
+        "required_evidence": "The retained native role/model/settings and source-backed comparison recipe are sealed before scoring; unsupported operational axes have a substantive disposition.",
+        "owner": "layer-verdict",
+        "status": "unverified_before_execution"
+      }
+    ],
+    "owner": "layer-verdict",
+    "next_action": "Retain upstream runtime/E2E/model/instrumentation seals, then resolve the listed retained readiness inputs in the owned queue. No ready comparison remains unrun."
+  },
+  "execution_rule": {
+    "repetitions": 3,
+    "order": "Canonical repository order on first repetition, reverse on second, rotate first arm to last on third; same case order and fresh isolated stores",
+    "model": "Preserve the native account and configured default model/effort; record exact identity in the freeze. No new paid route or model download is authorized by this artifact.",
+    "preflight": "Retain unsupported role/model interfaces, absent test recipes, failed installations and spending/entitlement constraints with source-backed reasons; never silently omit a survivor. Licence provenance is metadata only, never an exclusion ground.",
+    "cost": "Record complete provider usage and elapsed time separately from tool-output/token estimates; never infer provider savings",
+    "protected_window": "Heavy E2E during the CC's Monday window uses systemd-run --user --scope -p CPUWeight=idle; a full suite additionally needs SUITE-REQUEST and SUITE-GO.",
+    "license_exclusion": false
+  },
+  "fixed_decision_rule": {
+    "eligibility": "For each predeclared role, every mapped role check must pass in all three repetitions with complete usage and upstream E2E at the comparison's immutable source pin. Dependency arms qualify only their mapped interface and are never scored as standalone end-to-end candidates.",
+    "rank": "For each role, maximize exact grounded-correct cases, then minimize total provider cost, then median elapsed time, then peak RSS. Compare only arms covering that same role; dependency components keep their own qualification receipts.",
+    "tie": "Retain the existing qualified incumbent for that role if tied. Otherwise retain all exactly tied qualified arms with their measured equality; do not claim superiority.",
+    "none_qualify": "Record RETIRED for the unsupported role with all failure/retirement reasons; do not promote an unqualified arm.",
+    "terminal": "FINAL requires every selected deployed winner's actual final-stack runs[] pin to match its adopted tested source, with verdict/wave/next_review, upstream E2E at that operational run pin and invoke evidence/role reason. An experimental source-pin receipt does not qualify a different historical operational run pin.",
+    "amendments": "No new candidates or changed metrics after first run. Any necessary input correction requires a separately reviewed, hashed amendment before affected scoring."
+  },
+  "role_checks": {
+    "project_semantic_index": {
+      "case_ids": [
+        4
+      ],
+      "mandatory_checks": [
+        "Add/update/delete/rename catch-up in the deliberately indexed project",
+        "No cross-project leakage and empty-target restore equality",
+        "Isolation, deletion and restore retain exact source membership"
+      ]
+    },
+    "semantic_code_retrieval": {
+      "case_ids": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "mandatory_checks": [
+        "Grounded answer/supporting location against the sealed source oracle",
+        "Correct absence for unsupported concept",
+        "Source-grounded retrieval on the same corpus, independent of index/association mechanism"
+      ]
+    },
+    "multivector_semantic_index": {
+      "case_ids": [
+        7
+      ],
+      "mandatory_checks": [
+        "Index/query exact sealed source membership with upstream's native multivector path",
+        "Incremental add/delete and project isolation preserve source oracle"
+      ]
+    },
+    "vector_storage": {
+      "case_ids": [
+        5
+      ],
+      "mandatory_checks": [
+        "Native upsert/get/delete preserves payload/ID set and rejects absent IDs",
+        "Scoped persistence/restart/empty-target restore preserve exact values"
+      ]
+    },
+    "model_serving": {
+      "case_ids": [
+        6
+      ],
+      "mandatory_checks": [
+        "Upstream native serving returns declared model identity and finite embedding shape",
+        "Use sealed model's prefixes/dimensions; batch and single results satisfy its fixed parity oracle",
+        "No provider identity substitution"
+      ]
+    }
+  },
+  "refrozen_at": "2026-10-12T09:10:22Z",
+  "amendment_authority": "CC adjudication-pr1021-599d9bbb-20261012.md: B2-r-2, B1-std, licence, survivor reasons and retained reopen inputs",
+  "role_assignment_rule": "Source-advertised roles enter the common requirement comparison; no applicability change at scoring. Distinct native output contracts use separately defined oracles, never incompatible layout requirements imposed on flat output.",
+  "role_reconciliation": [
+    {
+      "repository": "https://github.com/OSU-NLP-Group/HippoRAG",
+      "pin": "d5c8329422e0a0b834a15874545cb6a74b4f9b26",
+      "old_role_id": "associative_semantic_retrieval",
+      "role_ids": [
+        "project_semantic_index",
+        "semantic_code_retrieval"
+      ],
+      "requirement_basis": "The layer requires semantic retrieval over the same project corpus. The associative arm cases 0-4 equal semantic_code_retrieval plus project_semantic_index. Association is an implementation mechanism, not a separately selected role.",
+      "previous_case_ids": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "previous_mandatory_checks": [
+        "Source-grounded associative retrieval on the same corpus",
+        "Isolation, deletion and restore retain exact source membership"
+      ],
+      "source_ref": "README.md:13",
+      "qualification_boundary": "Role applicability is a preregistered comparison obligation, not a claim that this arm passed the common oracle or supports every required operation."
+    },
+    {
+      "repository": "https://github.com/lightonai/next-plaid",
+      "pin": "c6c091d7ee14c81206bb28af90d8ff506fd0235e",
+      "added_role_id": "semantic_code_retrieval",
+      "source_ref": "README.md:22",
+      "requirement_basis": "The pinned README advertises the common requirement role; it must enter the same-role comparison before any run.",
+      "qualification_boundary": "Advertised source capability is not an executed capture, retrieval or E2E result."
+    }
+  ],
+  "supersedes": {
+    "head": "55c49da1924216665b21bb538cfe43becf448fc7",
+    "preregistration_sha256": "3b77e8a2e82d244d7b264e8eeeaebca8312f3128a5e6224ec784006f7d9ec2dd",
+    "before_any_run": true,
+    "reason": "Completion of the terminal source-advertised-role ruling; metrics, cases, source pins and candidate set unchanged."
+  },
+  "retained_comparison_dispositions": [
+    {
+      "repository": "https://github.com/ollama/ollama",
+      "retained_comparison_refs": [
+        "catalogs/sota-convergence/manifest-20260923.json#/foundation/6/candidates/0/comparison_that_would_overturn",
+        "catalogs/sota-convergence/manifest-20260926.json#/foundation/6/candidates/4/comparison_that_would_overturn",
+        "catalogs/sota-convergence/manifest-20260929.json#/foundation/6/candidates/2/comparison_that_would_overturn"
+      ],
+      "frozen_rule_reason": "Model-identity serving is a dependency interface, not end-to-end semantic retrieval. The common sealed embedding oracle governs its scoped serving claim, with downstream relevance tested only in a declared shared pipeline."
+    },
+    {
+      "repository": "https://github.com/osu-nlp-group/hipporag",
+      "retained_comparison_refs": [
+        "catalogs/sota-convergence/manifest-20260926.json#/foundation/6/candidates/7/comparison_that_would_overturn"
+      ],
+      "frozen_rule_reason": "It shares retrieval and project membership/restore rather than an associative singleton. A sealed judged multi-hop cross-file set remains prerequisite for the retained usefulness claim; single-concept cases do not prove multi-hop merit."
+    },
+    {
+      "repository": "https://github.com/lightonai/next-plaid",
+      "retained_comparison_refs": [
+        "catalogs/sota-convergence/manifest-20260926.json#/foundation/6/candidates/1/comparison_that_would_overturn",
+        "catalogs/sota-convergence/manifest-20260929.json#/foundation/6/candidates/0/comparison_that_would_overturn"
+      ],
+      "frozen_rule_reason": "Semantic code retrieval now compares with SocratiCode/semble, plus native multivector indexing. Retained Semble-bench/NDCG@10 and recovery inputs remain required before general relevance superiority; the bounded source oracle is not that result."
+    },
+    {
+      "repository": "https://github.com/minishlab/semble",
+      "retained_comparison_refs": [
+        "catalogs/sota-convergence/manifest-20260926.json#/foundation/6/candidates/3/comparison_that_would_overturn",
+        "catalogs/sota-convergence/manifest-20260929.json#/foundation/6/candidates/1/comparison_that_would_overturn"
+      ],
+      "frozen_rule_reason": "Common source-grounded retrieval and project update/isolation compare with the other declared indexes. Seal the retained judged set/Semble benchmark and NDCG@10 before general relevance claims; the small code fixture is bounded."
+    },
+    {
+      "repository": "https://github.com/giancarloerra/socraticode",
+      "retained_comparison_refs": [
+        "catalogs/sota-convergence/manifest-20260926.json#/foundation/6/candidates/0/comparison_that_would_overturn"
+      ],
+      "frozen_rule_reason": "The deduplicated exact-source arm tests index coverage/freshness and clean-target membership. Retained benchmark/control and another operational version are not transferred as comparison receipts."
+    }
+  ],
+  "completion_authority": "CC adjudication-pr1021-55c49da1-20261012.md: eight remaining advertised arm-role pairs, completion only",
+  "completion_role_pairs": [
+    {
+      "repository": "https://github.com/lightonai/next-plaid",
+      "pin": "c6c091d7ee14c81206bb28af90d8ff506fd0235e",
+      "added_role_id": "project_semantic_index",
+      "source_ref": "README.md:59"
+    },
+    {
+      "repository": "https://github.com/qdrant/qdrant",
+      "pin": "6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de",
+      "added_role_id": "multivector_semantic_index",
+      "source_ref": "README.md:133"
+    }
+  ]
+}
