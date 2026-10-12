@@ -3,7 +3,7 @@
 
 The PR-range pattern follows us-equities-trading's ci.yml at
 1e600094bdd3764a73cc7a1ea4ff85186fc7d6ac. That reference scopes PRs only;
-pushes require an available ancestor boundary and otherwise fail closed.
+new refs and rewritten pushes use an available origin/main merge base.
 Gitleaks v8.30.1 passes --log-opts to git log (sources/git.go at
 83d9cd684c87d95d656c1458ef04895a7f1cbd8e). Git v2.53.0 at
 67ad42147a7acc2af6074753ebd03d904476118f, Documentation/git-log.adoc,
@@ -20,6 +20,7 @@ import os
 import re
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 
@@ -41,12 +42,12 @@ def git(*args: str) -> str:
     return result.stdout.strip()
 
 
-def event_commit(value: object, field: str) -> str:
+def event_commit(value: object, field: str, *, allow_tag: bool = False) -> str:
     if not isinstance(value, str) or not SHA.fullmatch(value) or not value.strip("0"):
         raise RangeError(f"{field} must be a nonzero, full commit SHA")
     value = value.lower()
     resolved = git("rev-parse", "--verify", f"{value}^{{commit}}")
-    if resolved != value:
+    if resolved != value and not (allow_tag and git("cat-file", "-t", value) == "tag"):
         raise RangeError(f"{field} does not resolve to the specified commit")
     return resolved
 
@@ -89,14 +90,18 @@ def select_range(event_name: str, event: dict, *, ci_backstop: bool = False) -> 
                 raise RangeError("The PR payload base and merge base are on unrelated lines")
             reason = "pull-request-merge-first-parent"
     elif event_name == "push":
-        after = event_commit(event.get("after"), "push.after")
+        ref = event.get("ref", "")
+        after = event_commit(event.get("after"), "push.after",
+                             allow_tag=isinstance(ref, str) and ref.startswith("refs/tags/"))
         if after != head:
             raise RangeError("push.after does not match the checked-out HEAD")
         before = event.get("before")
         if not isinstance(before, str) or not SHA.fullmatch(before):
             raise RangeError("push.before must be a full commit SHA")
         if not before.strip("0"):
-            raise RangeError("New refs require a verified prior scanned boundary")
+            main = git("rev-parse", "--verify", "refs/remotes/origin/main^{commit}")
+            start = git("merge-base", main, head)
+            reason = "new-ref-main-merge-base"
         else:
             before = before.lower()
             before_object = subprocess.run(
@@ -104,7 +109,11 @@ def select_range(event_name: str, event: dict, *, ci_backstop: bool = False) -> 
                 stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, check=False,
             )
             if before_object.returncode:
-                raise RangeError("push.before is unavailable; complete coverage cannot be established")
+                if event.get("forced") is not True:
+                    raise RangeError("Unavailable push.before requires a verified forced event")
+                main = git("rev-parse", "--verify", "refs/remotes/origin/main^{commit}")
+                start = git("merge-base", main, head)
+                reason = "forced-push-main-merge-base"
             else:
                 if before_object.stdout.strip() != "commit":
                     raise RangeError("push.before must identify a commit object")
@@ -113,7 +122,11 @@ def select_range(event_name: str, event: dict, *, ci_backstop: bool = False) -> 
                     start = before
                     reason = "push-before"
                 else:
-                    raise RangeError("Rewritten history requires a verified prior scanned boundary")
+                    if event.get("forced") is not True:
+                        raise RangeError("Nonancestor push.before requires a verified forced event")
+                    main = git("rev-parse", "--verify", "refs/remotes/origin/main^{commit}")
+                    start = git("merge-base", main, head)
+                    reason = "forced-push-main-merge-base"
     elif event_name in ("workflow_dispatch", "schedule"):
         if not ci_backstop or os.environ.get("GITHUB_ACTIONS") != "true":
             raise RangeError("Full-history backstops require explicit CI authorization")
@@ -140,10 +153,76 @@ def select_range(event_name: str, event: dict, *, ci_backstop: bool = False) -> 
         log_opts = "--diff-merges=first-parent HEAD"
     # Validate the actual options sent to the scanner's git log, not an
     # independently enumerated, less restrictive commit range.
-    if not git("log", "--format=%H", "--max-count=1", *log_opts.split()):
+    if not git("log", "-s", "--format=%H", "--max-count=1", *log_opts.split()):
         raise RangeError("The emitted scan selection is empty; refusing to report success")
     return {"mode": mode, "log_opts": log_opts, "start": start, "end": head,
             "range": scan_range, "reason": reason}
+
+
+def prepare_merge_ignore(log_opts: str, output: Path) -> None:
+    """Translate reviewed bindings only onto merges carrying the identical blob.
+
+    Native mechanism: gitleaks8.30.1 detect/detect.go:711-734 at83d9cd68
+    checks exact commit:file:rule:line fingerprints. Native Git ls-tree at
+    git2.53.0/67ad4214 reports blob identity without reading file contents.
+    A source binding is copied only to an ancestral merge with that identical
+    regular-file blob. Changed contents, new locations and other commits keep
+    their own detection. Global fingerprints are never generated here.
+    """
+    if not re.fullmatch(r"--diff-merges=first-parent (?:HEAD|[0-9a-f]{40}\.\.(?:HEAD|[0-9a-f]{40}))", log_opts):
+        raise RangeError("Reviewed merge bindings require a verified scanner scope")
+    source = Path(".gitleaksignore")
+    if output.resolve() == source.resolve():
+        raise RangeError("Temporary merge bindings must not rewrite the reviewed ignore file")
+    original = source.read_text(encoding="utf-8")
+    bindings = []
+    for line in original.splitlines():
+        match = re.fullmatch(r"([0-9a-f]{40}):([^\r\n:]+):([a-zA-Z0-9_-]+):([1-9][0-9]*)", line)
+        if match:
+            commit, path, rule, location = match.groups()
+            if path.startswith("/") or any(part in ("", ".", "..") for part in path.split("/")):
+                raise RangeError("Reviewed fingerprint path is unsafe")
+            bindings.append((commit, path, rule, location))
+    merges = [line.split()[0] for line in git("log", "-s", "--format=%H %P", *log_opts.split()).splitlines()
+              if len(line.split()) > 2]
+    blobs = {}
+
+    def regular_blob(commit, path):
+        key = (commit, path)
+        if key not in blobs:
+            # Unavailable historical sources cannot grant an exemption. Git
+            # diagnostics are withheld; a missing binding stays fail-safe.
+            r = subprocess.run(["git", "ls-tree", "-z", commit, "--", path],
+                               capture_output=True, text=True, check=False)
+            records = r.stdout.split("\0") if r.returncode == 0 else []
+            found = [row.split("\t", 1)[0].split() for row in records
+                     if "\t" in row and row.split("\t", 1)[1] == path]
+            blobs[key] = (found[0][2] if len(found) == 1 and len(found[0]) == 3
+                          and found[0][:2] in (["100644", "blob"], ["100755", "blob"]) else None)
+        return blobs[key]
+
+    copied = set()
+    ancestry = {}
+    for commit, path, rule, location in bindings:
+        blob = regular_blob(commit, path)
+        if blob is None:
+            continue
+        for merge in merges:
+            if regular_blob(merge, path) != blob:
+                continue
+            pair = (commit, merge)
+            if pair not in ancestry:
+                ancestry[pair] = ancestor(commit, merge)
+            if ancestry[pair]:
+                copied.add(f"{merge}:{path}:{rule}:{location}")
+    output.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile("w", dir=output.parent, encoding="utf-8", delete=False) as handle:
+        temporary = Path(handle.name)
+        handle.write(original.rstrip("\n") + "\n" + "\n".join(sorted(copied)) + "\n")
+    try:
+        temporary.replace(output)
+    finally:
+        temporary.unlink(missing_ok=True)
 
 
 def main() -> int:
@@ -152,12 +231,17 @@ def main() -> int:
     parser.add_argument("--event-path", required=True, type=Path)
     parser.add_argument("--ci-backstop", action="store_true",
                         help="Allow a full-history backstop only when GITHUB_ACTIONS=true")
+    parser.add_argument("--ignore-output", type=Path,
+                        help="Write temporary exact merge bindings for identical reviewed blobs")
     args = parser.parse_args()
     try:
         event = json.loads(args.event_path.read_text(encoding="utf-8"))
         if not isinstance(event, dict):
             raise RangeError("The event payload must be an object")
         outputs = select_range(args.event_name, event, ci_backstop=args.ci_backstop)
+        if args.ignore_output is not None:
+            prepare_merge_ignore(outputs["log_opts"], args.ignore_output)
+            outputs["ignore_path"] = str(args.ignore_output)
     except (RangeError, OSError, ValueError, TypeError, AttributeError):
         # Do not echo payload contents, host paths, or raw subprocess diagnostics.
         print("::error::Cannot establish the authorized CI secret-scan scope; failing closed", file=sys.stderr)

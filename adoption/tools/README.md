@@ -301,9 +301,10 @@ evidence, rather than a measurement of the current PR range.
 
 CI scans a verified PR-owned range and, on normal pushes, uses
 `--diff-merges=first-parent <before>..<after>`, traversing all parent histories
-and emitting merge-resolution patches. An all-zero, unavailable or nonancestor
-`before` fails closed until a verified scanned boundary is available. Manually dispatched
-(`workflow_dispatch`) CI backstops use `--log-opts="--diff-merges=first-parent HEAD"`, limited to the checked-out
+and emitting merge-resolution patches. New refs and verified forced rewrites
+scan `merge-base(origin/main, tip)..tip`; unavailable main or unrelated histories fail closed.
+The separate `secret-scan-history.yml` runs on every branch/tag push, schedule and manual dispatch.
+Its scheduled/manual CI backstop uses `--log-opts="--diff-merges=first-parent HEAD"`, limited to the checked-out
 commit's ancestry, never all fetched refs. These backstops are permitted only
 on CI runners. The former `--max-target-megabytes 2` option was a per-target
 skip threshold, not a process-memory limit. The current CI commands retain

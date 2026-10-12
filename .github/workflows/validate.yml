@@ -367,7 +367,7 @@ jobs:
         run: |
           python3 scripts/ci_secret_scan_range.py \
             --event-name "$GITHUB_EVENT_NAME" --event-path "$GITHUB_EVENT_PATH" \
-            --ci-backstop >> "$GITHUB_OUTPUT"
+            --ci-backstop --ignore-output "$RUNNER_TEMP/gitleaks-merge-ignore" >> "$GITHUB_OUTPUT"
       - name: Install checksum-verified pinned gitleaks
         env:
           GITLEAKS_VERSION: '8.30.1'
@@ -392,24 +392,27 @@ jobs:
           # The real-checkout integration test uses the same verified window as the gate.
           GITLEAKS_HISTORY_RANGE: ${{ steps.scan_range.outputs.range }}
           GITLEAKS_HISTORY_MODE: ${{ steps.scan_range.outputs.mode }}
+          GITLEAKS_HISTORY_IGNORE: ${{ steps.scan_range.outputs.ignore_path }}
         run: |
           export PATH="$RUNNER_TEMP/gitleaks:$PATH"
-          python3 -m unittest tests.test_gitleaks_config tests.test_secret_scan_size.GitleaksLargeFileTests tests.test_secret_scan_size.ScannerTimerTests -v
+          python3 -m unittest tests.test_gitleaks_config tests.test_secret_scan_size.GitleaksLargeFileTests tests.test_secret_scan_size.ScannerTimerTests tests.test_secret_scan_size.CiSecretScanMergedHistoryTests tests.test_ci_secret_publication.ReviewedMergeTests -v
       - name: Scan git history for secrets
         if: ${{ !cancelled() && steps.scan_range.outcome == 'success' }}
         env:
           SCAN_LOG_OPTS: ${{ steps.scan_range.outputs.log_opts }}
+          SCAN_IGNORE_PATH: ${{ steps.scan_range.outputs.ignore_path }}
         run: |
           # --config: reviewed allowlists (.gitleaks.toml), including the exact generated
           # explorer HTML path. There is no size cap: large manifests/catalogs stay covered.
           # GNU time measures this full command; fixture measurements stay separate.
           # The helper supplies verified event options; local full-history scans stay prohibited.
-          # Source: gitleaks/gitleaks-action@bcfb9cce, src/gitleaks.js:103-115.
+          # Native Git merge formatting and exact fingerprints: gitleaks8.30.1 sources/git.go and detect/detect.go.
           # The 2026-10-09 full-history scan reached 72,638,124 KiB anon-rss and was OOM-killed.
-          # Git's merge-diff handling stays native; the dir scan checks the merge result.
+          # Merge patches traverse every parent; exact reviewed-blob bindings preserve later-value detection.
           status=0
           /usr/bin/time --quiet --format '{"elapsed_seconds":%e,"peak_rss_kib":%M,"exit_status":%x}' --output "$RUNNER_TEMP/gitleaks/full-git.time.json" "$RUNNER_TEMP/gitleaks/gitleaks" git . --config .gitleaks.toml \
             --log-opts="$SCAN_LOG_OPTS" \
+            --gitleaks-ignore-path "${SCAN_IGNORE_PATH:-.gitleaksignore}" \
             --redact --no-banner --report-format json --report-path "$RUNNER_TEMP/gitleaks/gitleaks.json" || status=$?
           metrics_status=0
           python3 scripts/secret_scan_metrics.py --scanner gitleaks --mode git --version 8.30.1 --history-scope="$SCAN_LOG_OPTS" \
@@ -487,7 +490,7 @@ jobs:
         run: |
           python3 scripts/ci_secret_scan_range.py \
             --event-name "$GITHUB_EVENT_NAME" --event-path "$GITHUB_EVENT_PATH" \
-            --ci-backstop >> "$GITHUB_OUTPUT"
+            --ci-backstop --ignore-output "$RUNNER_TEMP/betterleaks-merge-ignore" >> "$GITHUB_OUTPUT"
       - name: Install cosign pinned by digest
         env:
           COSIGN_VERSION: 'v3.0.6'
@@ -584,6 +587,7 @@ jobs:
         timeout-minutes: 10
         env:
           SCAN_LOG_OPTS: ${{ steps.scan_range.outputs.log_opts }}
+          SCAN_IGNORE_PATH: ${{ steps.scan_range.outputs.ignore_path }}
         run: |
           # The secret-scan job's config, including the exact generated explorer path exclusion.
           # No size cap: large current targets stay scanned. The native large-file tests above
@@ -604,7 +608,7 @@ jobs:
           status=0
           /usr/bin/time --version | grep -F '(GNU Time)'
           /usr/bin/time --quiet --format '{"elapsed_seconds":%e,"peak_rss_kib":%M,"exit_status":%x}' --output "$RUNNER_TEMP/betterleaks/full-git.time.json" "$RUNNER_TEMP/betterleaks/betterleaks" git . --config .gitleaks.toml \
-            --max-archive-depth 0 --gitleaks-ignore-path .gitleaksignore --log-opts="$SCAN_LOG_OPTS" \
+            --max-archive-depth 0 --gitleaks-ignore-path "${SCAN_IGNORE_PATH:-.gitleaksignore}" --log-opts="$SCAN_LOG_OPTS" \
             --redact --no-banner --report-format json --report-path "$report" --exit-code 0 || status=$?
           metrics_status=0
           python3 scripts/secret_scan_metrics.py --scanner betterleaks --mode git --version 1.8.1 --history-scope="$SCAN_LOG_OPTS" \

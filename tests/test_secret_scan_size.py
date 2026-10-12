@@ -215,6 +215,8 @@ def scan_fixture(binary, job, mode, size, path="manifests/large-shape.json", *, 
                 word = str(ROOT / ".gitleaks.toml")
             elif word == ".gitleaksignore":
                 word = str(ROOT / ".gitleaksignore")
+            elif word == "${SCAN_IGNORE_PATH:-.gitleaksignore}":
+                word = str(ROOT / ".gitleaksignore")
             elif word.startswith("--log-opts="):
                 word = "--log-opts=" + (event_log_opts or range_arg)
             elif word in ("$report", "$RUNNER_TEMP/gitleaks/gitleaks.json"):
@@ -436,7 +438,7 @@ class TimedWorkflowArgumentsTests(unittest.TestCase):
                                 self.assertIn("--log-opts=$SCAN_LOG_OPTS", args)
                             if job == "secret-scan-betterleaks":
                                 self.assertIn("--exit-code", args)
-                                self.assertIn(".gitleaksignore", args)
+                                self.assertTrue(".gitleaksignore" in args or "${SCAN_IGNORE_PATH:-.gitleaksignore}" in args)
 
 
 @unittest.skipUnless(GITLEAKS, "gitleaks is installed in its native secret-scan job")

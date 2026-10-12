@@ -1053,7 +1053,8 @@ class GitleaksLocalPrHistoryTests(unittest.TestCase):
             # the failure message names only non-secret fields.
             try:
                 findings = _scan_findings(["git", ".", "--config", str(CONFIG_PATH),
-                                           f"--log-opts=--diff-merges=first-parent {scope}"], report_path, cwd=ROOT)
+                                           f"--log-opts=--diff-merges=first-parent {scope}",
+                                           "--gitleaks-ignore-path", os.environ.get("GITLEAKS_HISTORY_IGNORE", str(ROOT / ".gitleaksignore"))], report_path, cwd=ROOT)
             except _LockBusy as exc:
                 self.skipTest(f"gitleaks per-user lock held by another scan: {exc}")
             located = [(f.get("RuleID"), f.get("File"), f.get("StartLine"), f.get("Fingerprint")) for f in findings]
@@ -1127,7 +1128,8 @@ class GitleaksBranchAncestryHistoryTests(unittest.TestCase):
             # the failure message names only non-secret fields.
             try:
                 findings = _scan_findings(["git", ".", "--config", str(CONFIG_PATH),
-                                           f"--log-opts=--diff-merges=first-parent {self.history_range}", "--redact"], report_path, cwd=ROOT)
+                                           f"--log-opts=--diff-merges=first-parent {self.history_range}", "--redact",
+                                           "--gitleaks-ignore-path", os.environ.get("GITLEAKS_HISTORY_IGNORE", str(ROOT / ".gitleaksignore"))], report_path, cwd=ROOT)
             except _LockBusy as exc:
                 self.skipTest(f"gitleaks per-user lock held by another scan: {exc}")
             located = [(f.get("RuleID"), f.get("File"), f.get("StartLine"), f.get("Fingerprint")) for f in findings]

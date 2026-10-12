@@ -88,7 +88,7 @@ class CiSecretScanRangeTests(unittest.TestCase):
         self.assertEqual(outputs.get("range"), f"{start}..{end}")
         self.assertEqual(outputs.get("log_opts"), log_opts or f"--diff-merges=first-parent {start}..{end}")
         self.assertRegex(outputs.get("reason", ""), r"^[a-z][a-z0-9-]+$")
-        actual = set(self.git("log", "--format=%H", *shlex.split(outputs["log_opts"])).splitlines())
+        actual = set(self.git("log", "-s", "--format=%H", *shlex.split(outputs["log_opts"])).splitlines())
         self.assertEqual(actual, set(commits), "the emitted range must contain exactly the landed commits")
         self.assertGreater(len(actual), 0, "a successful range may not scan nothing")
         return outputs
@@ -118,11 +118,12 @@ class CiSecretScanRangeTests(unittest.TestCase):
         self.assert_range("push", {"before": self.base, "after": self.feature_two},
                           self.base, self.feature_two, (self.feature_one, self.feature_two))
 
-    def test_unverified_push_boundaries_fail_closed_without_publishing_scanner_inputs(self):
+    def test_new_and_rewritten_push_boundaries_use_main_when_available(self):
         abandoned = self.commit("abandoned branch", self.base)
         for before in (ZERO_SHA, abandoned, "f" * 40):
             with self.subTest(before=before):
-                self.assert_rejected("push", {"before": before, "after": self.feature_two, "forced": True})
+                self.assert_range("push", {"before": before, "after": self.feature_two, "forced": True},
+                                  self.base, self.feature_two, (self.feature_one, self.feature_two))
 
     def test_push_options_include_merges_and_all_side_branch_commits(self):
         side = self.commit("push side branch", self.base)
@@ -132,16 +133,18 @@ class CiSecretScanRangeTests(unittest.TestCase):
         self.assert_range("push", {"before": self.base, "after": head},
                           self.base, head, (self.feature_one, side, merge, head))
 
-    def test_first_branch_push_fails_closed(self):
-        self.assert_rejected("push", {"before": ZERO_SHA, "after": self.feature_two})
+    def test_first_branch_push_scans_the_main_merge_base_range(self):
+        self.assert_range("push", {"before": ZERO_SHA, "after": self.feature_two},
+                          self.base, self.feature_two, (self.feature_one, self.feature_two))
 
     def test_force_push_with_a_nonancestor_boundary_fails_closed(self):
         before = self.commit("abandoned force-push branch", self.base)
         self.assert_rejected("push", {"before": before, "after": self.feature_two})
 
-    def test_force_push_with_an_unavailable_old_tip_fails_closed_even_with_the_forced_flag(self):
+    def test_force_push_with_unavailable_before_requires_boolean_flag_and_main_boundary(self):
         before = "a" * 40
-        self.assert_rejected("push", {"before": before, "after": self.feature_two, "forced": True})
+        self.assert_range("push", {"before": before, "after": self.feature_two, "forced": True},
+                          self.base, self.feature_two, (self.feature_one, self.feature_two))
         self.assert_rejected("push", {"before": before, "after": self.feature_two})
         self.assert_rejected("push", {"before": before, "after": self.feature_two, "forced": "true"})
 
@@ -199,7 +202,7 @@ class CiSecretScanRangeTests(unittest.TestCase):
         for event in ("schedule", "workflow_dispatch"):
             with self.subTest(event=event):
                 outputs = self.assert_ci_backstop(event, self.main)
-                actual = set(self.git("log", "--format=%H", *shlex.split(outputs["log_opts"])).splitlines())
+                actual = set(self.git("log", "-s", "--format=%H", *shlex.split(outputs["log_opts"])).splitlines())
                 self.assertEqual(actual, {self.root, self.base, self.main})
                 self.assertTrue({lane_tip, self.feature_one, self.feature_two}.isdisjoint(actual),
                                 "a sibling lane ref must not enter a CI backstop")
@@ -277,11 +280,17 @@ class CiSecretScanWorkflowRangeTests(unittest.TestCase):
             if re.search(r"\bscheduled(?: and manually(?: dispatched)?|/manual)(?: dispatched)? (?:ci )?backstops\b", text):
                 claimed.append(relative)
         if claimed:
-            workflow = (ROOT / ".github/workflows/validate.yml").read_text()
-            on_block = workflow.split("\non:\n", 1)[1].split("\npermissions:", 1)[0]
-            triggers = re.findall(r"(?m)^  ([a-z_]+):", on_block)
-            self.assertIn("schedule", triggers,
-                          f"A documented scheduled backstop needs a workflow trigger: {claimed}")
+            scheduled_scanners = []
+            for path in (ROOT / ".github/workflows").glob("*.yml"):
+                workflow = path.read_text()
+                if "\non:\n" not in workflow:
+                    continue
+                on_block = workflow.split("\non:\n", 1)[1].split("\npermissions:", 1)[0]
+                triggers = re.findall(r"(?m)^  ([a-z_]+):", on_block)
+                if "schedule" in triggers and re.search(r'/gitleaks" git\s', workflow):
+                    scheduled_scanners.append(path.name)
+            self.assertTrue(scheduled_scanners,
+                            f"A documented scheduled backstop needs a scheduled scanner workflow: {claimed}")
 
 
 if __name__ == "__main__":
