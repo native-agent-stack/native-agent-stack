@@ -542,6 +542,60 @@ class NativeTokenCIContracts(unittest.TestCase):
             with self.subTest(guess=guess.replace("\\u0040", "<at>")[:40]):
                 self.assertNotIn(hashlib.sha256(guess.encode()).hexdigest(), digests)
 
+    def test_a_json_line_holding_a_unicode_line_break_is_still_decoded(self):
+        # The command center's micro at 4c916e14 (B1): str.splitlines() also breaks at U+2028, U+2029 and U+0085, which
+        # RFC 8259 7 allows raw inside a string (rfc8259.txt:428-431), so such a JSON line was never decoded and its
+        # escaped address was published. A line ends only at a line feed.
+        operator = "@".join(("first.last", "mail-host.com"))
+        with tempfile.TemporaryDirectory() as directory:
+            run = self._new_run(Path(directory))
+            for separator in ("\u2028", "\u2029", "\x85"):
+                line = json.dumps({"note": "a" + separator + "b", "email": operator}, ensure_ascii=False)
+                line = line.replace("@", "\\u0040")
+                for text in (line, line + "\n", "plain\n" + line + "\r\n"):
+                    with self.subTest(separator=hex(ord(separator)), text=len(text)):
+                        published = run.publish(text)
+                        decoded = [json.loads(part) for part in published.split("\n") if part.strip().startswith("{")]
+                        self.assertTrue(decoded)
+                        self.assertNotIn(operator, json.dumps(decoded, ensure_ascii=False))
+                        self.assertIn(separator, published)  # the line keeps its own characters
+
+    def test_json_nested_deeper_than_the_decode_depth_is_refused(self):
+        # The command center's micro at 4c916e14 (B2): JSON text nested in string values more than four levels deep
+        # was passed through, so its escaped address was published. publish() now refuses it with a fixed message and
+        # publishes nothing; four levels are still decoded and cleaned. Real receipts nest at most two.
+        operator = "@".join(("first.last", "mail-host.com"))
+
+        def nested(levels, key=False):
+            text = json.dumps({operator: 1} if key else {"email": operator}).replace("@", "\\u0040")
+            for _ in range(levels - 1):
+                text = json.dumps({"text": text})
+            return text
+
+        with tempfile.TemporaryDirectory() as directory:
+            run = self._new_run(Path(directory))
+            for levels in (1, 2, 4):
+                for key in (False, True):
+                    with self.subTest(levels=levels, key=key):
+                        self.assertNotIn("u0040", run.publish(nested(levels, key)))
+            for levels in (5, 6, 7):
+                for key in (False, True):
+                    for text in (nested(levels, key), "plain\n" + nested(levels, key) + "\n"):
+                        with self.subTest(levels=levels, key=key, lines=text.count("\n")):
+                            with self.assertRaises(AssertionError) as refused:
+                                run.publish(text)
+                            self.assertEqual(str(refused.exception), ci.PUBLISH_REFUSED)
+            source = Path(directory) / "work" / "deep.json"
+            source.write_text(nested(5) + "\n")
+            with self.assertRaises(AssertionError):
+                run.artifact("deep.json", source)
+            with self.assertRaises(AssertionError):
+                run.command("prints-deep-json", [sys.executable, "-c", "print(" + repr(nested(6)) + ")"])
+            self.assertFalse((Path(directory) / "result" / "deep.json").exists())
+            published = (Path(directory) / "result" / "receipt.json").read_text()
+        self.assertNotIn("prints-deep-json", published)
+        self.assertNotIn("first.last", published)
+
     def test_publish_leaves_plain_and_clean_json_text_as_clean_gives_it(self):
         # Retained output keeps its bytes unless a decoded value hides something clean() removes.
         with tempfile.TemporaryDirectory() as directory:

@@ -93,7 +93,8 @@ PRIVATE_CONTENT = (
     # never starts inside a longer local part, and the left boundary refuses the same characters. A local part needs a
     # letter or a digit (the command center's ruling, 2026-10-12): local parts made only of RFC 5322 atext symbols are
     # not detected, though they are valid (CPython 3.13.16's email parser accepts them); no observed instance is
-    # identity-bearing (`@AGENTS.md`, a quoted @import: 139 at main 900835c6, none an address). Exempt: GitHub's
+    # identity-bearing (at main 900835c6 this rule without the guard, over every tracked blob, finds 125 in 76 files,
+    # each a backtick, quote or slash before an `@`-name such as `@AGENTS.md`; none is an address). Exempt: GitHub's
     # users.noreply.github.com addresses, the noreply commit trailers of Anthropic and GitHub, the RFC 2606 reserved
     # names exactly (example.com, example.net, example.org and their subdomains, and the .test, .example, .invalid and
     # .localhost TLDs), and a systemd instance unit (systemd.unit(5): name@instance.service, the suffix a unit type

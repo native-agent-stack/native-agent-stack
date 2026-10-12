@@ -18862,8 +18862,8 @@
     },
     {
       "path": "docs/decisions/2026-10-11-email-address-publication-rule.md",
-      "sha256": "583a10fde587b655974910b22a1b391988d5fa01b26617f29bc70de9db805934",
-      "bytes": 21607
+      "sha256": "665cb848d5e555d5ada5d95fc21ce8a6e49cb0e8e3e8c8b4cbc66a32852cde17",
+      "bytes": 24831
     },
     {
       "path": "docs/decisions/2026-10-11-final-stack-review-corrections.md",
@@ -60902,8 +60902,8 @@
     },
     {
       "path": "scripts/native_token_ci.py",
-      "sha256": "dbbea3dad9c2dbf96024b6db89e46389c1334e10f66c5ef7f07dc67f9e74bc6f",
-      "bytes": 120981
+      "sha256": "c28fe668cf355dc66f5daf961402d50371595781769328b869057371eba52aad",
+      "bytes": 122145
     },
     {
       "path": "scripts/new_wsl_profile.py",
@@ -60982,8 +60982,8 @@
     },
     {
       "path": "scripts/validate.py",
-      "sha256": "2cdede0da7d11ab72e477d6ba8d1603c45ce3837771079c595eeacfb18b9e59f",
-      "bytes": 47994
+      "sha256": "a259de072d29b7266f3ed9b71e4964af4d88e05d631ec51f9d138910bc808ab5",
+      "bytes": 48116
     },
     {
       "path": "scripts/validate_catalogs.py",
@@ -62202,8 +62202,8 @@
     },
     {
       "path": "tests/test_native_token_ci.py",
-      "sha256": "39ed44928824db814249fd9cb4d58b703ecb613c3e54c316435610c0f9242428",
-      "bytes": 126313
+      "sha256": "592051f8f2e0cd64aff51af97c72b387dbb3b5b7338961fff33593f44c1a3970",
+      "bytes": 129841
     },
     {
       "path": "tests/test_native_worker_fixture.py",

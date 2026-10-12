@@ -15,8 +15,12 @@ never starts inside a longer local part. It finds matches in any case; the revie
 the domain without case (DNS names are case-insensitive, RFC 4343) and the local part as written
 (RFC 5321 2.4). A local part needs a letter or a digit, and the command center kept that guard:
 local parts made only of RFC 5322 atext symbols are not detected, though they are valid (CPython
-3.13.16's email parser accepts one); no observed instance is identity-bearing (`` `@AGENTS.md` ``,
-a quoted `@import`; 139 at main `900835c6`, none an address). The guard is this change's own,
+3.13.16's email parser accepts one); no observed instance is identity-bearing. At main
+`900835c6` the rule without its guard, over every tracked blob read as UTF-8, finds 125 such local
+parts in 76 files, each a backtick (111), a quote (10), a slash (2) or two of them (2) before an
+`@`-name such as `` `@AGENTS.md` `` or a quoted `@import`; none is an address. (The command
+center's first figure, 139, came from an ad-hoc search and does not reproduce; its correction
+#182.) The guard is this change's own,
 added when the wider class turned 16 code spans of Claude Code imports into matches. Until the
 GPT read at `51f45b5d` this paragraph said such a local part "names no mailbox", which is false.
 It does not match these forms:
@@ -60,7 +64,8 @@ address. None holds an operator's address.
 
 The first version waived those 86 files by path. Codex's review showed that a path waiver also
 passes any later address added to the file (see below). `scripts/public_email_matches.json` now
-lists the reviewed matches themselves, in lower case, in four groups, each with its reason;
+lists the reviewed matches themselves, each as its reviewed spelling (the local part as written,
+the domain in lower case), in four groups, each with its reason;
 `validate.py` loads it as `PUBLIC_EMAIL_MATCHES`. After the reads at `e0862d8d` it holds 78
 values (it held 64): 19 added and 5 removed. 9 are matches that now start at a delimiter written
 before a listed or exempt address (7 listed, 2 noreply trailers); the 5 removed are those matches'
@@ -71,7 +76,7 @@ last is the URL-userinfo fixture main's #1003 added:
 | Reason | Matches |
 | --- | ---: |
 | Release-signing key or package-maintainer identity, as a signature check or package install printed it | 8 |
-| Upstream page, package, repository, tag, advisory or paper capture naming its own public contact or author | 38 |
+| Upstream page, package, repository, tag, advisory or paper capture naming its own public contact or author | 39 |
 | Placeholder, upstream test identity, the `git` SSH user of a public Git host, SSH algorithm name, escaped exempt address, a `@path` import or a decorator call after an escaped newline, or a URL path, `key=`, quote or code span written right before an address or an `@`-name | 27 |
 | URL user information or an agency contact in a test fixture, or an upstream bot's commit identity | 5 |
 
@@ -246,14 +251,17 @@ center ruled them into one commit:
   deep, and writes the document again only when a value changed; it serves every published
   command argument, output stream, artifact, MCP request and answer digest. Each digest is of the
   published bytes. `host_receipts.py` judges a receipt's decoded values the same way
-  (`:1434`, `:1445`).
+  (`:1434`, `:1445`). The mechanism: any character may be written as a `\u` escape (RFC 8259 7,
+  rfc8259.txt:433, <https://www.rfc-editor.org/rfc/rfc8259.txt>, read 2026-10-12T06:15:38Z,
+  `61a5378f4255c720beb2a4b4a63b29540147c140f36988bf086291989b4cd2d7`), and a decoder gives the
+  character back (CPython `cbc944f4` `Lib/json/decoder.py:60`, `_decode_uXXXX`, called at `:118`).
 - **P2-3: the waiver lowered the local part.** A reviewed address with one letter of its local
   part in upper case is a different mailbox (RFC 5321 2.4, rfc5321.txt:869: "the local-part of a
   mailbox MUST BE treated as case sensitive"; CPython's `headerregistry.py:50`, `:53`, `:62`,
   `:100` keep and compare it as written), yet it passed as the listed one. `email_key` keeps the
   local part and lowers the domain, in the loader, the dead-entry check and the waiver. The
-  registry lists 79 spellings: 8 entries took the spelling the tree carries, and one public
-  agreement carries a contact in two spellings, now two entries.
+  registry lists 79 spellings: 7 entries were respelled to the spelling the tree carries, and 1
+  was added beside a kept spelling, where one public agreement carries a contact in two spellings.
 - **P2-4: the counts** were corrected above.
 - **P3s folded:** the strict consumers' wording above, and the receipt's limitation text, which now
   says which digests are of published text. The rest are follow-ups in the pull request.
@@ -264,6 +272,29 @@ Each regression fails on `51f45b5d` and passes here:
   no published value decodes to it, and no digest matches the escaped text;
 - a local part's case variant, in the waiver, `validate()` and the dead-entry check, and a loader
   that keeps an entry's spelling.
+
+## After the command center's micro at 4c916e14 (2026-10-12, the terminal commit)
+
+The command center's Claude micro of the second fix closed 21 of 36 encoded leaks it probed at the base; of the 15 that
+remain, two are in `Run.publish()`'s own scope, and the command center ruled them in:
+
+- **B1: a Unicode line break split a JSON line.** `publish()` split JSON Lines text with `str.splitlines()`, which
+  also breaks at U+2028, U+2029 and U+0085 (CPython `cbc944f4` `Objects/unicodetype_db.h:6418-6430`). RFC 8259 7
+  allows those characters raw inside a string (rfc8259.txt:428-431), so such a line was never decoded and its escaped
+  address was published. A line now ends only at a line feed, and a trailing carriage return is kept.
+- **B2: nesting deeper than four levels passed through.** JSON text nested in string values five to seven levels deep,
+  in values, keys, JSON Lines and MCP answers, was published with its escaped address. `publish()` now refuses JSON
+  text beyond `PUBLISH_DEPTH` (four) with the fixed `PUBLISH_REFUSED` message, and nothing is published; a command, an
+  artifact or an MCP session that meets one fails. Real receipts nest at most two levels.
+- **Text:** the registry's spelling (above, 8 entries keep an upper-case local part), the table's second group (39),
+  the respelling count (7 respelled and 1 added), the 139 figure (above, now 125 in 76 files, method named), the
+  receipt's limitation text, and the escape mechanism's sources.
+
+Each regression fails on `4c916e14` and passes here: a JSON line holding each of the three characters, alone and
+among other lines; and five to seven levels in values and keys, alone and among other lines, through `publish()`,
+an artifact and a command. Shapes outside `publish()`'s stated scope (two values on one line, a BOM, a trailing comma,
+a log prefix, forms readable only by a person such as `\x40`, a fullwidth at sign or `%40`, duplicate names) are
+follow-ups for the shared email detector.
 
 ## SOTA sources
 
@@ -296,6 +327,11 @@ fetched.
   (139,432 bytes; `e921eca62b7fcfb982287f952ac3bea0b7770b87d93f836e1eed602b88f44cad`).
 - Claude Code docs, memory, the `@path/to/import` syntax, <https://code.claude.com/docs/en/memory>
   (797,902 bytes; `32b6627d64c2f33966e5fd1d27998508a0b8204fe24655680477f6a062da2e67`).
+- RFC 8259 7, "Any character may be escaped" (rfc8259.txt:433) and the characters a string may hold raw
+  (:428-431), <https://www.rfc-editor.org/rfc/rfc8259.txt> (read 2026-10-12T06:15:38Z;
+  `61a5378f4255c720beb2a4b4a63b29540147c140f36988bf086291989b4cd2d7`).
+- CPython v3.13.16 (`cbc944f4`): `Lib/json/decoder.py:60` and `:118` (a `\u` escape decoded to its character), and
+  `Objects/unicodetype_db.h:6418-6430` (the line breaks `str.splitlines()` honors).
 - RFC 5321 2.4, "the local-part of a mailbox MUST BE treated as case sensitive"
   (rfc5321.txt:869), <https://www.rfc-editor.org/rfc/rfc5321.txt> (read 2026-10-12T05:06:37Z;
   `7d560eddff1b213c17d4e1e5f95005728b2f05bc2b3947f0fcc91717c6707634`).

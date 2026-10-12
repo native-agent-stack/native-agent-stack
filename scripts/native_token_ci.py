@@ -70,6 +70,10 @@ REDACTIONS = (
         r"(?:[A-Za-z0-9-]+\.)+(?!(?:service|socket|device|mount|automount|swap|path|timer|slice|scope)"
         r"(?![\w-]|\.\w))(?:[A-Za-z]{2,}|xn--[A-Za-z0-9-]{0,58}[A-Za-z0-9])(?![\w-]|\.\w)", re.I), "<EMAIL>"),
 )
+# Run.publish decodes JSON text nested in string values this many levels deep; deeper JSON text is refused with this
+# fixed message, and nothing is published (the command center's micro at 4c916e14; real receipts nest at most two).
+PUBLISH_DEPTH = 4
+PUBLISH_REFUSED = "publish: JSON text nested in string values deeper than 4 levels is refused; nothing is published"
 # Serena declares 2.0.0.dev0 for every commit, so its manifest version names the commit after " @ "
 # and the commit is its identity (adoption/pins-linux-x86_64.json, kind uv-tool-from-git).
 SERENA_COMMIT = "c6fbd1c5932df2494ffa0020af5a9fbe80b82143"
@@ -619,7 +623,9 @@ class Run:
                        "RTK counters are fixture-local estimates, not provider savings",
                        "ccusage reads a committed synthetic usage log, not account history",
                        "No token-saving requirement: fidelity may need the larger representation",
-                       "Retained text replaces local paths and private content, in JSON values as decoded too; "
+                       "Retained text replaces local paths and private content, in JSON and JSON Lines values as "
+                       "decoded too (JSON text nested in strings up to four levels; deeper is refused, and a line "
+                       "ends only at a line feed); "
                        "command, artifact and MCP digests are of the published text, while the RTK exactness and "
                        "Serena parity digests are of fixture output before sanitization"],
         }
@@ -700,12 +706,23 @@ class Run:
 
     def publish(self, value: str, depth: int = 0) -> str:
         """clean() for text this run publishes, and for JSON or JSON Lines text also each decoded key and string value,
-        so what a JSON escape hides (\\u0040 for "@") is removed too; a string value that is itself JSON is read the
-        same way, four levels deep. Text whose decoded values clean() leaves alone is returned as clean() gives it;
-        otherwise the document is written again from the cleaned values. host_receipts.py judges a receipt's decoded
-        values the same way."""
+        so what a JSON escape hides (\\u0040 for "@", RFC 8259 7) is removed too; a string value that is itself
+        JSON is read the same way, PUBLISH_DEPTH levels deep, and JSON text nested deeper is refused (PUBLISH_REFUSED),
+        never passed through. A JSON Lines line ends only at a line feed (a trailing carriage return is kept): RFC 8259
+        7 allows U+2028, U+2029 and U+0085 raw in a string, and str.splitlines() would break there. Text whose decoded
+        values clean() leaves alone is returned as clean() gives it; otherwise the document is written again from the
+        cleaned values. host_receipts.py judges a receipt's decoded values the same way."""
         cleaned = self.clean(value)
-        if depth >= 4:
+
+        def parsed(text: str):
+            try:
+                node = json.loads(text)
+            except ValueError:
+                return None
+            return node if isinstance(node, (dict, list, str)) else None
+
+        if depth >= PUBLISH_DEPTH:
+            require(all(parsed(part) is None for part in [cleaned, *cleaned.split("\n")]), PUBLISH_REFUSED)
             return cleaned
 
         def walk(node):
@@ -732,8 +749,8 @@ class Run:
         whole = document(cleaned)
         if whole is not cleaned:
             return whole + "\n" * (len(cleaned) - len(cleaned.rstrip("\n")))
-        return "".join(document(line[:len(line.rstrip("\r\n"))]) + line[len(line.rstrip("\r\n")):]
-                       for line in cleaned.splitlines(keepends=True))
+        return "\n".join(document(line[:-1]) + "\r" if line.endswith("\r") else document(line)
+                         for line in cleaned.split("\n"))
 
     def flush(self) -> None:
         (self.output / "receipt.json").write_text(json.dumps(self.report, indent=2) + "\n")
