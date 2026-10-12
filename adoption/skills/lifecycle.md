@@ -126,7 +126,7 @@ the lock says, because the add would replace it
 (`rm(linkPath, { recursive: true })`,
 [L255-263](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/installer.ts#L255-L263)).
 So is a canonical path that is itself a link, for an entry installed for Claude Code
-(the rule does not apply to a Codex-only entry): the add removes it first
+(the rule, here and in the status check, does not apply to a Codex-only entry): the add removes it first
 ([`cleanAndCreateDirectory(canonicalDir)`, L389](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/installer.ts#L389)),
 and a real Claude folder that the link led to is then not the CLI's own link and is
 removed with its files. The rule stays literal: a link that the installer did not make
@@ -140,10 +140,11 @@ The same call recreates the canonical folder from nothing
 so a file beside the pinned `SKILL.md` that the CLI would not write, or an edited
 support file, is lost with it. Where an add is about to run over an existing
 folder whose `SKILL.md` is the pinned one (an unlocked folder, or one locked at the
-pin whose Claude link is missing), the folder must hold that `SKILL.md` alone or be
-the pinned tree: its git tree SHA, with the directories a skill's own tooling
-regenerates (`__pycache__` and the like) left out, equals the manifest's `tree_sha`,
-the comparison `scripts/skills_status.py` reports as `folder_tree`. Anything else
+pin whose Claude link, or in a project the Claude target, is missing), the folder must
+be the pinned tree: its git tree SHA, with the directories a skill's own tooling
+regenerates (`__pycache__` and the like; a file or a link of such a name is content)
+left out, equals the manifest's `tree_sha`, the comparison `scripts/skills_status.py`
+reports as `folder_tree`. Anything else
 (an extra, an edited or a missing file) is `local-modified`, refused unless
 `--force`. Not covered: an upgrade over a lock of an older tree, whose files nothing
 offline can name, and an `ok` install, where no add runs.

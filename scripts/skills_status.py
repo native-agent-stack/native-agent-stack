@@ -195,27 +195,29 @@ def sha256_file(path: Path) -> str | None:
         return None
 
 
-def git_tree_sha(folder: Path, skip: frozenset[str] = frozenset()) -> str | None:
+def git_tree_sha(folder: Path, skip: frozenset[str] = frozenset(), skip_dirs_only: bool = False) -> str | None:
     """The git tree SHA-1 of an on-disk folder, hashed the way git hashes a tree object.
 
     A regular file is a blob with mode 100755 when its owner-execute bit is set, else
     100644; a symlink is a blob of its target bytes with mode 120000 (never followed); a
     subdirectory is a 40000 tree; an empty directory is omitted, as git omits it. Entries
     sort by name bytes, a directory's name compared with a trailing "/". Names in ``skip``
-    are left out at every level. Returns None for a folder with nothing to hash; raises
-    OSError when an entry cannot be read. Only digests leave this function.
+    are left out at every level; with ``skip_dirs_only`` a name is left out only when the
+    entry is a real directory (a file or a link of that name is content and is hashed).
+    Returns None for a folder with nothing to hash; raises OSError when an entry cannot be
+    read. Only digests leave this function.
     """
     entries = []
     for name in os.listdir(folder):
-        if name in skip:
-            continue
         path = folder / name
         info = os.lstat(path)
+        if name in skip and not (skip_dirs_only and not stat.S_ISDIR(info.st_mode)):
+            continue
         raw_name = os.fsencode(name)
         if stat.S_ISLNK(info.st_mode):
             entries.append((raw_name, b"120000", _git_blob_sha(os.readlink(os.fsencode(path))), False))
         elif stat.S_ISDIR(info.st_mode):
-            subtree = git_tree_sha(path, skip)
+            subtree = git_tree_sha(path, skip, skip_dirs_only)
             if subtree is not None:
                 entries.append((raw_name, b"40000", bytes.fromhex(subtree), True))
         elif stat.S_ISREG(info.st_mode):
@@ -345,7 +347,8 @@ def list_agent_skill_dirs(agents_skills: Path) -> set[str]:
 def check_canonical(agents_skills: Path, skill: dict) -> dict:
     # `skills add` removes whatever sits at the skill folder and writes a real folder there (skills@7407f389 src/installer.ts L389-390), so a link at the leaf was made by someone
     # else: tools/adoption/install_skills.py refuses it as local-modified (claude_link_problem), and this check no longer follows it to a SKILL.md that happens to match.
-    if (agents_skills / skill["name"]).is_symlink():
+    # The rule is the installer's for an entry installed for Claude Code: a Codex-only entry gets no Claude entry to protect (the CLI returns after the canonical write, L395-402).
+    if (agents_skills / skill["name"]).is_symlink() and not skill.get("copy") and "claude-code" in (skill.get("agents") or ("claude-code", "codex")):
         return {"state": "canonical_link"}
     path = agents_skills / skill["name"] / SKILL_MD
     if path.is_file():

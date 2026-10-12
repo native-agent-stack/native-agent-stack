@@ -331,6 +331,43 @@ class SkillsStatusTests(unittest.TestCase):
         self.assertEqual(skill["claude_link"]["state"], "not_a_symlink")
         self.assertEqual(report["result"], "fail")
 
+    def test_a_canonical_link_is_not_judged_for_an_entry_that_is_not_installed_for_claude_code(self):
+        """The installer applies the rule to an entry installed for Claude Code only (the CLI returns after the canonical write for a universal agent, src/installer.ts L395-402; the Codex
+        review in GitHub on #1035)."""
+        alpha = dict(self.make_skill("alpha-skill"), agents=["codex"])
+        content = (self.home / ".agents" / "skills" / "alpha-skill" / "SKILL.md").read_bytes()
+        shutil.rmtree(self.home / ".agents" / "skills" / "alpha-skill")
+        elsewhere = self.home / "dotfiles" / "alpha-skill"
+        elsewhere.mkdir(parents=True)
+        (elsewhere / "SKILL.md").write_bytes(content)
+        (self.home / ".agents" / "skills" / "alpha-skill").symlink_to(elsewhere, target_is_directory=True)
+        self.write_claude_link("alpha-skill", kind="relative")
+        report, skill = self.layout_report(alpha)
+        self.assertEqual(skill["canonical"]["state"], "ok")
+
+    def test_git_tree_sha_skips_a_named_directory_but_hashes_a_file_or_link_of_that_name_when_asked(self):
+        folder = self.tmp / "tree"
+        (folder / ".venv").mkdir(parents=True)
+        (folder / ".venv" / "x").write_text("x")
+        (folder / "SKILL.md").write_text("# s\n")
+        skip = frozenset({".venv", "node_modules"})
+        plain = ss.git_tree_sha(folder, frozenset())
+        skipped = ss.git_tree_sha(folder, skip)
+        self.assertNotEqual(plain, skipped)
+        self.assertEqual(ss.git_tree_sha(folder, skip, skip_dirs_only=True), skipped, "a real directory of that name is skipped either way")
+        shutil.rmtree(folder / ".venv")
+        (folder / ".venv").write_text("mine")
+        self.assertEqual(ss.git_tree_sha(folder, skip), ss.git_tree_sha(folder, skip), "the default skips by name, as the status check always has")
+        self.assertNotEqual(ss.git_tree_sha(folder, skip, skip_dirs_only=True), skipped, "a file named .venv is content")
+        (folder / ".venv").unlink()
+        (folder / "node_modules").symlink_to(self.tmp, target_is_directory=True)
+        self.assertNotEqual(ss.git_tree_sha(folder, skip, skip_dirs_only=True), ss.git_tree_sha(folder, skip), "a link named node_modules is content")
+        (folder / "node_modules").unlink()
+        (folder / "scripts").mkdir()
+        (folder / "scripts" / "__pycache__").write_text("mine")
+        nested = frozenset({"__pycache__"})
+        self.assertNotEqual(ss.git_tree_sha(folder, nested, skip_dirs_only=True), ss.git_tree_sha(folder, nested), "the rule holds below the top level too")
+
     def test_a_real_folder_that_cannot_be_resolved_is_not_accepted_as_a_parent_alias(self):
         link, canonical = self.home / ".claude" / "skills" / "alpha-skill", self.home / ".agents" / "skills" / "alpha-skill"
         link.mkdir(parents=True)

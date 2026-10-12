@@ -341,6 +341,18 @@ def tree_sha(label: str) -> str:
     return hashlib.sha1(label.encode("utf-8")).hexdigest()
 
 
+def pinned_tree_sha(files: dict) -> str:
+    """The git tree SHA of a folder holding these files (path -> text): what the manifest's tree_sha is for a pinned vendor folder, hashed by the repository's own function."""
+    sys.path.insert(0, str(ROOT))
+    from scripts import skills_status
+    with tempfile.TemporaryDirectory() as tmp:
+        folder = Path(tmp)
+        for relative, text in files.items():
+            (folder / relative).parent.mkdir(parents=True, exist_ok=True)
+            (folder / relative).write_text(text, encoding="utf-8")
+        return skills_status.git_tree_sha(folder)
+
+
 class InstallSkillsTestCase(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
@@ -417,7 +429,7 @@ class ProjectInstallTests(InstallSkillsTestCase):
         self.project = self.tmp_path / "project with spaces"
         self.project.mkdir()
         self.content = "# Project skill\n"
-        self.skill = make_skill("project-skill", self.content, tree_sha("project"))
+        self.skill = make_skill("project-skill", self.content, pinned_tree_sha({"SKILL.md": self.content}))  # a real tree: the repairing add judges the canonical folder against it
         self.manifest = self.write_manifest([self.skill])
         self.fake_bin = write_fake_skills_bin(self.bin_dir, {
             "project-skill": {"skill_md": self.content, "tree_sha": self.skill["tree_sha"]}})
@@ -911,6 +923,7 @@ class GlobalClaudeLinkTests(InstallSkillsTestCase):
     Claude Code session listed the skill (scripts/skills_status.py failed it as claude_link missing)."""
 
     CONTENT = "# Linked skill\n"
+    TREE = pinned_tree_sha({"SKILL.md": CONTENT})  # a folder of the pinned SKILL.md alone is, file for file, the pinned tree of this fixture
     NAME = "linked-skill"
 
     def build_installed(self, home: Path, link: bool = True, name: str | None = None) -> dict:
@@ -920,12 +933,12 @@ class GlobalClaudeLinkTests(InstallSkillsTestCase):
         skill_dir.mkdir(parents=True)
         (skill_dir / "SKILL.md").write_text(self.CONTENT, encoding="utf-8")
         (home / ".agents" / ".skill-lock.json").write_text(json.dumps(
-            {"lockfileVersion": 3, "skills": {name: {"skillFolderHash": tree_sha(name)}}}))
+            {"lockfileVersion": 3, "skills": {name: {"skillFolderHash": self.TREE}}}))
         if link:
             link_dir = home / ".claude" / "skills"
             link_dir.mkdir(parents=True)
             os.symlink(os.path.relpath(skill_dir, link_dir), link_dir / name)
-        return make_skill(name, self.CONTENT, tree_sha(name))
+        return make_skill(name, self.CONTENT, self.TREE)
 
     def states(self, manifest: Path, *flags: str, **kwargs) -> tuple[int, dict]:
         result = self.run_install(manifest, *flags, "--json", **kwargs)
@@ -952,7 +965,7 @@ class GlobalClaudeLinkTests(InstallSkillsTestCase):
 
     def test_a_missing_claude_link_is_planned_in_a_dry_run_and_repaired_by_the_pinned_add(self):
         skill = self.build_installed(self.home, link=False)
-        fake_bin = write_fake_skills_bin(self.bin_dir, {self.NAME: {"skill_md": self.CONTENT, "tree_sha": tree_sha(self.NAME)}})
+        fake_bin = write_fake_skills_bin(self.bin_dir, {self.NAME: {"skill_md": self.CONTENT, "tree_sha": self.TREE}})
         manifest = self.write_manifest([skill])
         code, skills = self.states(manifest, "--dry-run", fake_bin=fake_bin)
         self.assertEqual((code, skills), (0, {self.NAME: "planned"}))
@@ -975,7 +988,7 @@ class GlobalClaudeLinkTests(InstallSkillsTestCase):
     def assert_refused_then_replaced_by_force(self, home: Path, bin_dir: Path, skill: dict, entry: Path) -> None:
         """Whatever the lock says, an entry at the Claude path that is not the link onto the canonical folder is local content."""
         before = snapshot_entry(entry)
-        fake_bin = write_fake_skills_bin(bin_dir, {self.NAME: {"skill_md": self.CONTENT, "tree_sha": tree_sha(self.NAME)}})
+        fake_bin = write_fake_skills_bin(bin_dir, {self.NAME: {"skill_md": self.CONTENT, "tree_sha": self.TREE}})
         manifest = self.write_manifest([skill])
         code, skills = self.states(manifest, "--check-only", fake_bin=fake_bin, home_arg=str(home))
         self.assertEqual((code, skills), (1, {self.NAME: "local-modified"}))
@@ -1024,7 +1037,7 @@ class GlobalClaudeLinkTests(InstallSkillsTestCase):
 
         def lock_at_the_pin_but_edited_canonical(home: Path) -> None:
             canonical(home, "# edited\n")
-            lock(home, tree_sha(self.NAME))
+            lock(home, self.TREE)
 
         states = (
             ("nothing installed", lambda home: None),
@@ -1032,7 +1045,7 @@ class GlobalClaudeLinkTests(InstallSkillsTestCase):
             ("an unlocked canonical folder with an edited SKILL.md", lambda home: canonical(home, "# edited\n")),
             ("a lock of an older tree (an upgrade)", locked_older_tree),
             ("a lock at the pin but an edited canonical SKILL.md", lock_at_the_pin_but_edited_canonical),
-            ("a lock at the pin but no canonical folder", lambda home: lock(home, tree_sha(self.NAME))),
+            ("a lock at the pin but no canonical folder", lambda home: lock(home, self.TREE)),
         )
         kinds = (("a real folder", make_real_folder), ("a link to another folder", make_foreign_link), ("a dangling link", make_dangling_link))
         for state, prepare in states:
@@ -1043,7 +1056,7 @@ class GlobalClaudeLinkTests(InstallSkillsTestCase):
                     entry = home / ".claude" / "skills" / self.NAME
                     entry.parent.mkdir(parents=True)
                     make(entry)
-                    self.assert_refused_then_replaced_by_force(home, bin_dir, make_skill(self.NAME, self.CONTENT, tree_sha(self.NAME)), entry)
+                    self.assert_refused_then_replaced_by_force(home, bin_dir, make_skill(self.NAME, self.CONTENT, self.TREE), entry)
 
     def test_a_refusal_names_every_local_content_it_protects(self):
         # The command center's read of 114d539f (P3-3): an unlocked canonical folder whose SKILL.md was edited AND a foreign link at the
@@ -1059,8 +1072,8 @@ class GlobalClaudeLinkTests(InstallSkillsTestCase):
                 entry.parent.mkdir(parents=True)
                 if foreign:
                     make_foreign_link(entry)
-                fake_bin = write_fake_skills_bin(bin_dir, {self.NAME: {"skill_md": self.CONTENT, "tree_sha": tree_sha(self.NAME)}})
-                skill = make_skill(self.NAME, self.CONTENT, tree_sha(self.NAME))
+                fake_bin = write_fake_skills_bin(bin_dir, {self.NAME: {"skill_md": self.CONTENT, "tree_sha": self.TREE}})
+                skill = make_skill(self.NAME, self.CONTENT, self.TREE)
                 result = self.run_install(self.write_manifest([skill]), "--json", fake_bin=fake_bin, home_arg=str(home))
                 if not (foreign or edited):
                     continue
@@ -1076,7 +1089,7 @@ class GlobalClaudeLinkTests(InstallSkillsTestCase):
     def assert_canonical_link_refused_then_replaced_by_force(self, home: Path, bin_dir: Path, skill: dict, canonical: Path, claude: Path) -> None:
         """The canonical path is a link: an ordinary run and check-only refuse it as local-modified (no add, nothing changed), --force replaces it."""
         link_text, claude_before = os.readlink(canonical), snapshot_entry(claude) if claude.is_dir() and not claude.is_symlink() else None
-        fake_bin = write_fake_skills_bin(bin_dir, {self.NAME: {"skill_md": self.CONTENT, "tree_sha": tree_sha(self.NAME)}})
+        fake_bin = write_fake_skills_bin(bin_dir, {self.NAME: {"skill_md": self.CONTENT, "tree_sha": self.TREE}})
         manifest = self.write_manifest([skill])
         result = self.run_install(manifest, "--json", fake_bin=fake_bin, home_arg=str(home))  # the ordinary run first: it must not reach the add
         if claude_before is not None:
@@ -1106,7 +1119,7 @@ class GlobalClaudeLinkTests(InstallSkillsTestCase):
         # Claude entry is the CLI's own link when the canonical path is itself a link. The add removes that link first (installer.ts L389, rm and
         # mkdir) and createSymlink then removes the real Claude folder with local-work.txt (L263). Refused whatever the lock says: absent, older, at the pin.
         older = tree_sha("an older tree")
-        for label, tree in (("no lock", None), ("a lock of an older tree", older), ("a lock at the pin", tree_sha(self.NAME))):
+        for label, tree in (("no lock", None), ("a lock of an older tree", older), ("a lock at the pin", self.TREE)):
             with self.subTest(lock=label):
                 home, bin_dir = self.fresh_home("reverse-alias " + label)
                 claude = home / ".claude" / "skills" / self.NAME
@@ -1119,14 +1132,14 @@ class GlobalClaudeLinkTests(InstallSkillsTestCase):
                 if tree is not None:
                     self.write_lock(home, tree)
                 self.assertEqual(claude.resolve(), canonical.resolve())  # the layout that the equality test used to accept
-                self.assert_canonical_link_refused_then_replaced_by_force(home, bin_dir, make_skill(self.NAME, self.CONTENT, tree_sha(self.NAME)), canonical, claude)
+                self.assert_canonical_link_refused_then_replaced_by_force(home, bin_dir, make_skill(self.NAME, self.CONTENT, self.TREE), canonical, claude)
 
     def test_any_canonical_link_is_refused_because_the_cli_writes_a_real_folder_there(self):
         # The command center's ruling (2026-10-12): the canonical leaf is the CLI's own real folder, so a link there is not state the installer wrote.
         # Measured with the real pinned CLI (pr-installlink/real-cli-reverse-alias-20261012T0415Z.txt): a link onto a folder elsewhere loses only the link,
         # the folder it led to survives; the refusal is the conservative reading, and a person who wants the link replaced passes --force.
-        for label, claude_entry, tree in (("claude entry absent", "absent", None), ("claude entry absent, lock at the pin", "absent", tree_sha(self.NAME)),
-                                          ("claude entry the relative link onto the canonical path, lock at the pin", "link", tree_sha(self.NAME)),
+        for label, claude_entry, tree in (("claude entry absent", "absent", None), ("claude entry absent, lock at the pin", "absent", self.TREE),
+                                          ("claude entry the relative link onto the canonical path, lock at the pin", "link", self.TREE),
                                           ("a dangling canonical link, claude entry absent", "dangling", None)):
             with self.subTest(case=label):
                 home, bin_dir = self.fresh_home("canonical-link " + label)
@@ -1144,7 +1157,7 @@ class GlobalClaudeLinkTests(InstallSkillsTestCase):
                     os.symlink(os.path.join("..", "..", ".agents", "skills", self.NAME), claude)
                 if tree is not None:
                     self.write_lock(home, tree)
-                self.assert_canonical_link_refused_then_replaced_by_force(home, bin_dir, make_skill(self.NAME, self.CONTENT, tree_sha(self.NAME)), canonical, claude)
+                self.assert_canonical_link_refused_then_replaced_by_force(home, bin_dir, make_skill(self.NAME, self.CONTENT, self.TREE), canonical, claude)
 
     def test_a_link_on_a_parent_folder_is_the_layout_createsymlink_accepts_and_stays_ok(self):
         # createSymlink returns without touching anything when ~/.claude/skills (or ~/.agents/skills) is a link onto the other, so both entries are one real
@@ -1157,8 +1170,8 @@ class GlobalClaudeLinkTests(InstallSkillsTestCase):
                 (real / self.NAME / "SKILL.md").write_text(self.CONTENT, encoding="utf-8")
                 other.parent.mkdir(parents=True, exist_ok=True)
                 os.symlink(real, other)
-                self.write_lock(home, tree_sha(self.NAME))
-                skill = make_skill(self.NAME, self.CONTENT, tree_sha(self.NAME))
+                self.write_lock(home, self.TREE)
+                skill = make_skill(self.NAME, self.CONTENT, self.TREE)
                 fake_bin = write_fake_skills_bin(bin_dir, {})
                 self.assertEqual(self.states(self.write_manifest([skill]), "--check-only", fake_bin=fake_bin, home_arg=str(home)), (0, {self.NAME: "ok"}))
                 self.assertEqual(calls_log(fake_bin), [["--version"]])
@@ -1182,7 +1195,7 @@ class GlobalClaudeLinkTests(InstallSkillsTestCase):
         # same question, whether the installed SKILL.md is the pinned one, through ONE helper (installed_skill_md_matches). A second copy of
         # the check would also be a second unclassified read for the push gate's monitoring baseline (tests.test_runtime_worker_openhands_push_gate).
         installer = load_installer_module()
-        skill = make_skill(self.NAME, self.CONTENT, tree_sha(self.NAME))
+        skill = make_skill(self.NAME, self.CONTENT, pinned_tree_sha({"SKILL.md": "# a local edit\n"}))  # the edited folder is the manifest's tree, so only the SKILL.md check decides
         folder = self.home / ".agents" / "skills" / self.NAME
         folder.mkdir(parents=True)
         (folder / "SKILL.md").write_text("# a local edit\n", encoding="utf-8")  # an unlocked canonical folder whose SKILL.md is not the pinned one
@@ -1206,8 +1219,8 @@ class GlobalClaudeLinkTests(InstallSkillsTestCase):
         link_dir.mkdir(parents=True)
         os.symlink(os.path.join("..", "..", ".agents", "skills", self.NAME), link_dir / self.NAME)
         self.assertFalse((link_dir / self.NAME).exists())  # dangling
-        skill = make_skill(self.NAME, self.CONTENT, tree_sha(self.NAME))
-        fake_bin = write_fake_skills_bin(self.bin_dir, {self.NAME: {"skill_md": self.CONTENT, "tree_sha": tree_sha(self.NAME)}})
+        skill = make_skill(self.NAME, self.CONTENT, self.TREE)
+        fake_bin = write_fake_skills_bin(self.bin_dir, {self.NAME: {"skill_md": self.CONTENT, "tree_sha": self.TREE}})
         manifest = self.write_manifest([skill])
         self.assertEqual(self.states(manifest, "--check-only", fake_bin=fake_bin), (1, {self.NAME: "missing-or-drifted"}))
         self.assertEqual(self.states(manifest, fake_bin=fake_bin), (0, {self.NAME: "installed"}))
@@ -1244,9 +1257,9 @@ class GlobalClaudeLinkTests(InstallSkillsTestCase):
         self.assertEqual((code, skills), (0, {self.NAME: "ok"}))
 
     def test_an_add_that_leaves_no_claude_link_is_not_verified_and_is_rolled_back(self):
-        skill = make_skill(self.NAME, self.CONTENT, tree_sha(self.NAME))
+        skill = make_skill(self.NAME, self.CONTENT, self.TREE)
         fake_bin = write_fake_skills_bin(
-            self.bin_dir, {self.NAME: {"skill_md": self.CONTENT, "tree_sha": tree_sha(self.NAME), "no_claude_link": 1}})
+            self.bin_dir, {self.NAME: {"skill_md": self.CONTENT, "tree_sha": self.TREE, "no_claude_link": 1}})
         result = self.run_install(self.write_manifest([skill]), "--json", fake_bin=fake_bin)
         self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
         self.assertEqual(json.loads(result.stdout)["skills"], {self.NAME: "rolled-back"})
@@ -1259,9 +1272,9 @@ class GlobalClaudeLinkTests(InstallSkillsTestCase):
         # The CLI copies the skill into the Claude folder when it cannot create the symlink and reports success (installer.ts
         # L428-440). That layout is not the one scripts/skills_status.py accepts (not_a_symlink), so the installer keeps requiring
         # the link, rolls the add back and says why; the Codex review in GitHub of 114d539f5 (P2, thread 2) asked it to accept the copy.
-        skill = make_skill(self.NAME, self.CONTENT, tree_sha(self.NAME))
+        skill = make_skill(self.NAME, self.CONTENT, self.TREE)
         fake_bin = write_fake_skills_bin(
-            self.bin_dir, {self.NAME: {"skill_md": self.CONTENT, "tree_sha": tree_sha(self.NAME), "copy_fallback": 1}})
+            self.bin_dir, {self.NAME: {"skill_md": self.CONTENT, "tree_sha": self.TREE, "copy_fallback": 1}})
         result = self.run_install(self.write_manifest([skill]), "--json", fake_bin=fake_bin)
         self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
         self.assertEqual(json.loads(result.stdout)["skills"], {self.NAME: "rolled-back"})
@@ -1596,7 +1609,8 @@ class LocalModifiedTests(InstallSkillsTestCase):
     def setUp(self):
         super().setUp()
         self.pinned_content = "# Pinned upstream content\n"
-        self.skill = make_skill("hand-installed", self.pinned_content, tree_sha("hand"))
+        self.tree = pinned_tree_sha({"SKILL.md": self.pinned_content})
+        self.skill = make_skill("hand-installed", self.pinned_content, self.tree)
         skill_dir = self.home / ".agents" / "skills" / "hand-installed"
         skill_dir.mkdir(parents=True)
         (skill_dir / "SKILL.md").write_text("# A locally hand-edited copy\n", encoding="utf-8")
@@ -1639,7 +1653,7 @@ class LocalModifiedTests(InstallSkillsTestCase):
         skill_dir = self.home / ".agents" / "skills" / "hand-installed"
         (skill_dir / "SKILL.md").write_text(self.pinned_content, encoding="utf-8")
         fake_bin = write_fake_skills_bin(
-            self.bin_dir, {"hand-installed": {"skill_md": self.pinned_content, "tree_sha": tree_sha("hand")}})
+            self.bin_dir, {"hand-installed": {"skill_md": self.pinned_content, "tree_sha": self.tree}})
         manifest = self.write_manifest([self.skill])
         result = self.run_install(manifest, fake_bin=fake_bin)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
@@ -1647,7 +1661,7 @@ class LocalModifiedTests(InstallSkillsTestCase):
 
     def test_force_overwrites_a_genuine_local_modification(self):
         fake_bin = write_fake_skills_bin(
-            self.bin_dir, {"hand-installed": {"skill_md": self.pinned_content, "tree_sha": tree_sha("hand")}})
+            self.bin_dir, {"hand-installed": {"skill_md": self.pinned_content, "tree_sha": self.tree}})
         manifest = self.write_manifest([self.skill])
         result = self.run_install(manifest, "--force", fake_bin=fake_bin)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
@@ -2096,18 +2110,6 @@ class HeldAndCopyTests(InstallSkillsTestCase):
                 self.assertFalse([call for call in calls_log(fake_bin) if call and call[0] == "add"])
 
 
-def pinned_tree_sha(files: dict) -> str:
-    """The git tree SHA of a folder holding these files (path -> text): what the manifest's tree_sha is for a pinned vendor folder, hashed by the repository's own function."""
-    sys.path.insert(0, str(ROOT))
-    from scripts import skills_status
-    with tempfile.TemporaryDirectory() as tmp:
-        folder = Path(tmp)
-        for relative, text in files.items():
-            (folder / relative).parent.mkdir(parents=True, exist_ok=True)
-            (folder / relative).write_text(text, encoding="utf-8")
-        return skills_status.git_tree_sha(folder)
-
-
 class ForeignContentTests(InstallSkillsTestCase):
     """F3 (research-queue row 42): no content the installer did not write is removed without --force.
 
@@ -2213,17 +2215,30 @@ class ForeignContentTests(InstallSkillsTestCase):
                 result, skills = self.states("--check-only")
                 self.assertEqual((result.returncode, skills), (1, {self.NAME: "missing-or-drifted"}), (directory, result.stdout))  # install-bound, not refused
 
-    def test_a_folder_of_the_pinned_skill_md_alone_has_nothing_else_to_lose(self):
-        self.canonical({})
-        result, skills = self.states()
-        self.assertEqual((result.returncode, skills), (0, {self.NAME: "installed"}), result.stdout + result.stderr)
+    def test_a_file_or_a_link_named_like_a_regenerated_directory_is_content(self):
+        """The name alone is not enough: a regular file `.venv`, a link `node_modules` or a file `scripts/__pycache__` is something the add would delete (the Codex review in GitHub, #1035)."""
+        makers = (("a file named .venv", lambda f: (f / ".venv").write_text("mine\n", encoding="utf-8")),
+                  ("a file named .venv below scripts", lambda f: (f / "scripts" / ".venv").write_text("mine\n", encoding="utf-8")),
+                  ("a link named .venv", lambda f: os.symlink("SKILL.md", f / ".venv")),
+                  ("a link named node_modules", lambda f: os.symlink(self.tmp_path, f / "node_modules")),
+                  ("a file named __pycache__ below scripts", lambda f: (f / "scripts" / "__pycache__").write_text("mine\n", encoding="utf-8")))
+        for label, make in makers:
+            with self.subTest(foreign=label):
+                shutil.rmtree(self.folder, ignore_errors=True)
+                self.canonical()
+                make(self.folder)
+                result, skills = self.states("--check-only")
+                self.assertEqual((result.returncode, skills), (1, {self.NAME: "local-modified"}), label)
 
-    def test_a_folder_of_the_pinned_skill_md_and_a_regenerated_directory_has_nothing_to_lose_either(self):
-        self.canonical({})
-        (self.folder / "__pycache__").mkdir()
-        (self.folder / "__pycache__" / "x.pyc").write_bytes(b"regenerated")
-        result, skills = self.states()
-        self.assertEqual((result.returncode, skills), (0, {self.NAME: "installed"}), result.stdout + result.stderr)
+    def test_a_skill_md_that_is_a_link_is_not_the_pinned_file_even_when_its_bytes_are(self):
+        """The SKILL.md check follows a link; the tree comparison does not (a link is a tree entry of its own kind), so a folder of one linked SKILL.md is protected too."""
+        shutil.rmtree(self.folder, ignore_errors=True)
+        self.folder.mkdir(parents=True)
+        elsewhere = self.tmp_path / "managed-elsewhere.md"
+        elsewhere.write_text(self.CONTENT, encoding="utf-8")
+        os.symlink(elsewhere, self.folder / "SKILL.md")
+        result, skills = self.states("--check-only")
+        self.assertEqual((result.returncode, skills), (1, {self.NAME: "local-modified"}))
 
     # ---- a locked folder
     def test_a_locked_folder_at_the_pin_without_its_claude_link_is_protected_from_the_repairing_add(self):
@@ -2287,6 +2302,26 @@ class ForeignContentTests(InstallSkillsTestCase):
         self.assertEqual((result.returncode, skills), (1, {self.NAME: "local-modified"}), result.stdout + result.stderr)
         self.assertEqual(self.add_calls(), [])
 
+    def test_a_project_folder_locked_at_the_pin_without_its_claude_target_is_protected_from_the_repairing_add(self):
+        """With --agent claude-code the project lock, the pinned tree and the pinned SKILL.md all match and only .claude/skills/<name> is missing: the add that makes it recreates the canonical folder
+        (the Codex review in GitHub, #1035, P1)."""
+        project = self.tmp_path / "project"
+        folder = project / ".agents" / "skills" / self.NAME
+        project.mkdir()
+        self.canonical(folder=folder)
+        (project / "skills-lock.json").write_text(json.dumps({"version": 1, "skills": {self.NAME: {
+            "source": self.skill["source"], "sourceType": "github", "ref": self.skill["ref"], "skillPath": self.skill["path"] + "/SKILL.md", "computedHash": "a" * 64}}}))
+        gh = self.bin_dir / "gh"
+        gh.write_text("#!/usr/bin/env python3\nimport json\nprint(json.dumps({'truncated': False, 'tree': [{'path': " + repr(self.skill["path"]) + ", 'type': 'tree', 'sha': " + repr(self.tree) + "}]}))\n")
+        gh.chmod(0o755)
+        env = {"PATH": str(self.bin_dir) + os.pathsep + os.environ["PATH"]}
+        flags = ("--project-dir", str(project), "--agent", "claude-code", "--check-only")
+        result, skills = self.states(*flags, env=env)
+        self.assertEqual((result.returncode, skills), (1, {self.NAME: "missing-or-drifted"}), "the pinned folder alone: the repair is allowed")
+        (folder / "local-work.txt").write_text("work that exists nowhere else\n", encoding="utf-8")
+        result, skills = self.states(*flags, env=env)
+        self.assertEqual((result.returncode, skills), (1, {self.NAME: "local-modified"}), result.stdout + result.stderr)
+
     def test_a_folder_that_cannot_be_read_is_unverified_not_a_pass(self):
         module = load_installer_module()
         self.canonical()
@@ -2294,6 +2329,104 @@ class ForeignContentTests(InstallSkillsTestCase):
             with self.assertRaises(module.InstallError) as caught:
                 module.unpinned_content(self.skill, self.home)
         self.assertIn("unverified (cannot read", str(caught.exception))
+
+
+PINNED_SKILLS_BIN = Path(os.environ.get("SKILLS_BIN") or Path.home() / ".local" / "share" / "new-wsl-native-stack" / "tools" / "skills-1.7.0" / "bin" / "skills")
+
+
+@unittest.skipUnless(PINNED_SKILLS_BIN.is_file() and os.access(PINNED_SKILLS_BIN, os.X_OK),
+                     "the pinned skills CLI (SKILLS_BIN of adoption/skills/lifecycle.md) is not installed here")
+class PinnedCliForeignContentTests(unittest.TestCase):
+    """What the guard rests on, measured with the pinned CLI itself (skills 1.7.0, vercel-labs/skills@7407f3893ad4dceab546ac002c3ef806e4000c73): `skills add` removes the canonical folder it is about to write
+    (src/installer.ts L193-200, written at L389-390), so any entry in it that the CLI would not write is lost with the folder, a regular file or a link named like a regenerated directory included. Each case runs
+    the CLI offline (a local source folder, a scratch HOME and project, telemetry off) twice: the classifier must call the state local-modified before any add, and the same add on a copy of it must delete the
+    entry. That control is what makes the refusal necessary; a pinned CLI that stopped deleting it would fail the control and send the guard back to review."""
+
+    NAME = "native-demo-skill"
+    FILES = {"SKILL.md": "---\nname: native-demo-skill\ndescription: A skill that the pinned CLI installs from a local folder.\n---\n# Native demo\n",
+             "scripts/run.py": "print('pinned')\n"}
+    EXTRAS = {"a stray file": ("local-work.txt", None), "a regular file named .venv": (".venv", None), "a regular file named .venv below scripts": ("scripts/.venv", None),
+              "a link named .venv": (".venv", "SKILL.md")}
+
+    def setUp(self):
+        self.module = load_installer_module()
+        self.row = make_skill(self.NAME, self.FILES["SKILL.md"], pinned_tree_sha(self.FILES))
+
+    def cli(self, *args, home, cwd):
+        env = {"HOME": str(home), "PATH": os.environ["PATH"], "DISABLE_TELEMETRY": "1", "DO_NOT_TRACK": "1"}
+        return subprocess.run([str(PINNED_SKILLS_BIN), *args], cwd=cwd, env=env, capture_output=True, text=True, timeout=180, stdin=subprocess.DEVNULL)
+
+    def source(self, root):
+        source = root / "source" / self.NAME
+        for relative, text in self.FILES.items():
+            (source / relative).parent.mkdir(parents=True, exist_ok=True)
+            (source / relative).write_text(text, encoding="utf-8")
+        return source
+
+    @staticmethod
+    def put(folder, relative, link_to):
+        entry = folder / relative
+        entry.parent.mkdir(parents=True, exist_ok=True)
+        if link_to is None:
+            entry.write_text("unique local work\n", encoding="utf-8")
+        else:
+            os.symlink(link_to, entry)
+        return entry
+
+    def test_an_unlocked_canonical_folder_with_an_extra_entry_is_refused_where_the_native_add_deletes_it(self):
+        for label, (relative, link_to) in self.EXTRAS.items():
+            with self.subTest(extra=label), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                home = root / "home"
+                home.mkdir()
+                source = self.source(root)
+                add = ["add", str(source), "--skill", self.NAME, "-g", "-y", "-a", "claude-code", "codex"]
+                done = self.cli(*add, home=home, cwd=root)
+                self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
+                folder = home / ".agents" / "skills" / self.NAME
+                self.assertEqual(self.module.skills_status_module().git_tree_sha(folder), self.row["tree_sha"], "the pinned CLI wrote exactly the pinned files")
+                (home / ".agents" / ".skill-lock.json").unlink(missing_ok=True)   # an unlocked folder: copied by hand, or its lock lost
+                link = home / ".claude" / "skills" / self.NAME
+                if link.is_symlink() or link.exists():
+                    link.unlink() if link.is_symlink() else shutil.rmtree(link)
+                self.put(folder, relative, link_to)
+                with mock.patch.dict(os.environ, {"XDG_STATE_HOME": "", "CLAUDE_CONFIG_DIR": ""}):
+                    self.assertEqual(self.module.classify_skill(self.row, home), "local-modified")
+                copy = root / "copy"
+                shutil.copytree(home, copy / "home", symlinks=True)
+                done = self.cli(*add, home=copy / "home", cwd=root)
+                self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
+                self.assertFalse(os.path.lexists(copy / "home" / ".agents" / "skills" / self.NAME / relative), "the control: the pinned CLI deletes it")
+
+    def test_a_project_locked_at_the_pin_with_its_claude_link_missing_is_refused_where_the_native_add_deletes_the_extra_file(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            home, project = root / "home", root / "project"
+            home.mkdir()
+            project.mkdir()
+            source = self.source(root)
+            add = ["add", str(source), "--skill", self.NAME, "-y", "-a", "universal", "claude-code"]
+            done = self.cli(*add, home=home, cwd=project)
+            self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
+            folder = project / ".agents" / "skills" / self.NAME
+            lock_file = project / "skills-lock.json"
+            lock = json.loads(lock_file.read_text(encoding="utf-8"))
+            entry = lock["skills"][self.NAME]
+            entry.update(sourceType="github", source=self.row["source"], ref=self.row["ref"], skillPath=self.row["path"] + "/SKILL.md")   # the lock names the manifest's source, as an install from it does
+            lock_file.write_text(json.dumps(lock), encoding="utf-8")
+            link = project / ".claude" / "skills" / self.NAME
+            self.assertTrue(os.path.lexists(link), "the pinned CLI linked the Claude folder")
+            link.unlink() if link.is_symlink() else shutil.rmtree(link)
+            pinned = {self.row["path"]: self.row["tree_sha"]}
+            with mock.patch.object(self.module, "pinned_source_trees", return_value=pinned), mock.patch.dict(os.environ, {"XDG_STATE_HOME": "", "CLAUDE_CONFIG_DIR": ""}):
+                self.assertEqual(self.module.classify_skill(self.row, home, project, "claude-code"), "install", "the pinned folder alone: the repair is allowed")
+                extra = self.put(folder, "local-work.txt", None)
+                self.assertEqual(self.module.classify_skill(self.row, home, project, "claude-code"), "local-modified")
+            copy = root / "copy"
+            shutil.copytree(project, copy, symlinks=True)
+            done = self.cli(*add, home=home, cwd=copy)
+            self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
+            self.assertFalse((copy / ".agents" / "skills" / self.NAME / extra.name).exists(), "the control: the pinned CLI deletes it")
 
 
 if __name__ == "__main__":

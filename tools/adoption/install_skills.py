@@ -46,13 +46,14 @@ For every manifest skill, in order:
       beside the pinned SKILL.md that the CLI would not write is lost with it,
       and so is an edited support file. Where an add is about to run over an
       existing folder whose SKILL.md is the pinned one (an unlocked folder, or
-      a folder locked at the pin whose Claude link is missing) the folder must
-      hold nothing but that SKILL.md or be the pinned tree: its git tree SHA,
+      a folder locked at the pin whose Claude link, or in a project the Claude
+      target, is missing) the folder must be the pinned tree: its git tree SHA,
       with the directories a skill's own tooling regenerates left out
       (scripts/skills_status.py git_tree_sha and RUNTIME_ARTIFACT_DIRS, the
-      check_folder_tree state), equals the manifest's tree_sha. Otherwise it
-      holds content the installer did not write (or lacks a pinned file, which
-      only --force repairs) and is 'local-modified', refused unless --force.
+      check_folder_tree state; a file or a link of such a name is content and
+      is hashed), equals the manifest's tree_sha. Otherwise it holds content
+      the installer did not write (or lacks a pinned file, which only --force
+      repairs) and is 'local-modified', refused unless --force.
       Not covered: an upgrade over a lock of an older tree, whose files this
       comparison cannot name (the lock proves the CLI wrote some earlier
       version there). A folder that is locked at the pin and linked is 'ok':
@@ -60,10 +61,9 @@ For every manifest skill, in order:
   (b) a folder exists at that path but the lock has no entry for <name> (for
       example a skill installed by hand before this manifest existed) -> only
       proceed (treat like a fresh install) when its SKILL.md sha256 already
-      equals the manifest's and the folder is nothing but that file or the
-      pinned tree (see the end of (a)), so a local edit or a local file is
-      never silently discarded; otherwise refuse with 'local-modified' unless
-      --force.
+      equals the manifest's and the folder is the pinned tree (see the end of
+      (a)), so a local edit or a local file is never silently discarded;
+      otherwise refuse with 'local-modified' unless --force.
   (c) otherwise, run `skills add <url> --skill <name> -g -y -a claude-code
       codex` (env DISABLE_TELEMETRY=1, so the run skips both telemetry and the
       add-time audit call) and re-check the same conditions as (a). A
@@ -351,15 +351,13 @@ def skills_status_module():
 
 
 def unpinned_content(skill: dict, home: Path, project_dir: Path | None = None) -> str | None:
-    """None when the installed folder holds nothing the add would delete that the pinned CLI did not write: it is SKILL.md alone (the caller has checked that file against the
-    manifest) or its git tree SHA, with the runtime-artifact directories left out, is the manifest's tree_sha. Otherwise the folder's tree SHA, for the refusal text. A folder that
-    cannot be read is unverified (InstallError), never a pass."""
+    """None when the installed folder is the pinned tree, so the add deletes nothing the pinned CLI did not write: its git tree SHA, with the runtime-artifact directories left out (a
+    file or a link of such a name is content and is hashed), is the manifest's tree_sha. Otherwise the folder's tree SHA, for the refusal text. A folder that cannot be read is
+    unverified (InstallError), never a pass."""
     status = skills_status_module()
     folder = installed_skill_dir(skill, home, project_dir)
     try:
-        if [name for name in os.listdir(folder) if name not in status.RUNTIME_ARTIFACT_DIRS] == ["SKILL.md"]:
-            return None
-        tree = status.git_tree_sha(folder, status.RUNTIME_ARTIFACT_DIRS)
+        tree = status.git_tree_sha(folder, status.RUNTIME_ARTIFACT_DIRS, skip_dirs_only=True)
     except (OSError, RecursionError) as error:
         raise InstallError(f"unverified (cannot read {folder}): {error}") from error
     return None if tree == skill["tree_sha"] else str(tree)
@@ -531,10 +529,10 @@ def classify_skill(skill: dict, home: Path, project_dir: Path | None = None, age
     entry = read_lock_entry(home, name, project_dir)
     if entry is not None:
         if project_dir is not None:
+            target_missing = False
             if agent == "claude-code":
                 target_md = project_dir / ".claude" / "skills" / name / "SKILL.md"
-                if not target_md.is_file() or sha256_of(target_md) != skill["skill_md_sha256"]:
-                    return "install"
+                target_missing = not target_md.is_file() or sha256_of(target_md) != skill["skill_md_sha256"]
             identity_matches = (
                 entry.get("sourceType") == "github" and entry.get("source") == skill["source"]
                 and entry.get("ref") == skill["ref"]
@@ -543,7 +541,12 @@ def classify_skill(skill: dict, home: Path, project_dir: Path | None = None, age
             if not (md_matches and identity_matches):
                 return "install"
             tree = pinned_source_trees(skill["source"], skill["ref"]).get(skill["path"])
-            return "ok" if tree == skill["tree_sha"] else "install"
+            if tree != skill["tree_sha"]:
+                return "install"
+            if target_missing:
+                # Locked at the pin with the pinned SKILL.md, only the Claude target missing: the repairing add still recreates the canonical folder.
+                return "local-modified" if unpinned_content(skill, home, project_dir) else "install"
+            return "ok"
         if not (md_matches and entry.get("skillFolderHash") == skill["tree_sha"]):
             return "install"
         if link_problem is None:
