@@ -1238,16 +1238,118 @@ class RepositoryWorkflowTests(unittest.TestCase):
         self.assertEqual((derived.files.get(module), protected.rule(module)),
                          ("ci_discovered", "ci_discovered"))
 
+    def test_newest_dated_delta_accepts_a_baseline_refresh_without_rewriting_history(self):
+        tree, previous = self.derived()
+
+        class AddedReadTree:
+            def entries(self):
+                return tree.entries()
+
+            def read(self, path):
+                source = tree.read(path)
+                if path == "scripts/skills_status.py":
+                    source += b"\nPath(dated_delta_fixture_path).read_text()\n"
+                return source
+
+        refreshed = self.g.derive_ci_protected(AddedReadTree())
+        added = set(refreshed.advisory.unclassified) - set(previous.advisory.unclassified)
+        self.assertEqual(len(added), 1, "The native fixture introduces exactly one advisory read")
+        evidence = Path("blueprints/runtime-workers/openhands/evidence")
+        original_delta_path = evidence / "unclassified-gate-reads-20261011-skill-use-delta.json"
+        original_delta = (ROOT / original_delta_path).read_bytes()
+        delta = json.loads(original_delta)
+        original_baseline = (ROOT / delta["baseline_path"]).read_bytes()
+        baseline = json.loads(original_baseline)
+        baseline["date"] = "2099-01-01"  # Synthetic later snapshot; original bytes stay intact.
+        baseline["count"] = len(refreshed.advisory.unclassified)
+        baseline["unclassified"] = sorted(refreshed.advisory.unclassified)
+        baseline["unclassified_shapes"] = refreshed.advisory.unclassified_shapes
+        baseline_path = evidence / "unclassified-gate-reads-20990101-fixture.json"
+        baseline_bytes = json.dumps(baseline).encode()
+        delta["date"] = "2099-01-01"
+        delta["baseline_path"] = str(baseline_path)
+        delta["baseline_sha256"] = sha256(baseline_bytes).hexdigest()
+        delta["derived_count"] = len(refreshed.advisory.unclassified)
+        # This fresh baseline already contains every native read and shape.
+        delta["added_by_script"] = delta["removed_by_script"] = {}
+        delta["added_shapes"] = delta["removed_shapes"] = []
+        delta["added_locations"] = delta["removed_locations"] = []
+        delta["read_classifications"] = []
+        delta_path = evidence / "unclassified-gate-reads-20990101-fixture-delta.json"
+        index = {"schema_version": 1, "entries": [
+            {"date": json.loads(original_delta)["date"], "path": original_delta_path.name},
+            {"date": delta["date"], "path": delta_path.name}]}
+        with tempfile.TemporaryDirectory(prefix="dated-advisory-delta-") as temporary:
+            fixture = Path(temporary)
+            (fixture / evidence).mkdir(parents=True)
+            (fixture / original_delta_path).write_bytes(original_delta)
+            (fixture / json.loads(original_delta)["baseline_path"]).write_bytes(original_baseline)
+            (fixture / baseline_path).write_bytes(baseline_bytes)
+            (fixture / delta_path).write_text(json.dumps(delta))
+            (fixture / evidence / "unclassified-gate-read-deltas.json").write_text(json.dumps(index))
+            with mock.patch(__name__ + ".ROOT", fixture), mock.patch.object(
+                    type(self), "_derived", (tree, refreshed)), contextlib.redirect_stdout(io.StringIO()):
+                self.test_advisory_baseline_and_explicit_categories_stay_bounded_on_this_repository()
+                # Selecting the newest entry must still enforce its recorded count.
+                delta["derived_count"] += 1
+                (fixture / delta_path).write_text(json.dumps(delta))
+                with self.assertRaises(AssertionError):
+                    self.test_advisory_baseline_and_explicit_categories_stay_bounded_on_this_repository()
+                delta["derived_count"] -= 1
+                (fixture / delta_path).write_text(json.dumps(delta))
+                historical_baseline = fixture / json.loads(original_delta)["baseline_path"]
+                historical_baseline.write_bytes(original_baseline + b"\n")
+                with self.assertRaises(AssertionError):
+                    self.test_advisory_baseline_and_explicit_categories_stay_bounded_on_this_repository()
+                historical_baseline.write_bytes(original_baseline)
+            self.assertEqual((fixture / original_delta_path).read_bytes(), original_delta)
+            self.assertEqual((fixture / json.loads(original_delta)["baseline_path"]).read_bytes(),
+                             original_baseline)
+
     def test_advisory_baseline_and_explicit_categories_stay_bounded_on_this_repository(self):
         # The monitoring baseline is stable under line-only changes. It is neither a
         # complete read inventory nor an enforcement/enablement requirement.
         tree, derived = self.derived()
         advisory = derived.advisory
         print(json.dumps({"advisory_gate_reads": self.g.advisory_gate_reads([derived])}, sort_keys=True))
-        baseline = json.loads((ROOT / "blueprints/runtime-workers/openhands/evidence/"
-                               "unclassified-gate-reads-20261004.json").read_text())
-        delta = json.loads((ROOT / "blueprints/runtime-workers/openhands/evidence/"
-                            "unclassified-gate-reads-20261011-skill-use-delta.json").read_text())
+        # Dated snapshots are immutable. Append a new dated delta rather than
+        # rebinding the historical 10-11 delta to later baseline bytes.
+        from datetime import date
+        evidence = Path("blueprints/runtime-workers/openhands/evidence")
+        evidence_root = (ROOT / evidence).resolve()
+        self.assertTrue(evidence_root.is_relative_to(ROOT.resolve()))
+        index = json.loads((evidence_root / "unclassified-gate-read-deltas.json").read_text())
+        self.assertEqual(index["schema_version"], 1)
+        entries = index["entries"]
+        self.assertTrue(entries, "Record at least one dated advisory delta")
+        dates = [date.fromisoformat(entry["date"]) for entry in entries]
+        self.assertEqual(dates, sorted(dates), "Append deltas in chronological order")
+        self.assertEqual(len({entry["path"] for entry in entries}), len(entries))
+        for entry in entries:
+            self.assertEqual(Path(entry["path"]).name, entry["path"])
+            self.assertTrue(entry["path"].endswith(".json"))
+            recorded_path = (evidence_root / entry["path"]).resolve()
+            self.assertTrue(recorded_path.is_relative_to(evidence_root))
+            recorded = json.loads(recorded_path.read_text())
+            self.assertEqual(recorded["date"], entry["date"])
+            self.assertEqual(recorded["mode"], "monitoring_only")
+            recorded_baseline = Path(recorded["baseline_path"])
+            self.assertFalse(recorded_baseline.is_absolute())
+            self.assertNotIn("..", recorded_baseline.parts)
+            self.assertTrue(recorded_baseline.is_relative_to(evidence))
+            recorded_file = (ROOT / recorded_baseline).resolve()
+            self.assertTrue(recorded_file.is_relative_to(evidence_root))
+            self.assertEqual(sha256(recorded_file.read_bytes()).hexdigest(),
+                             recorded["baseline_sha256"],
+                             "Historical baselines must retain their recorded bytes")
+        latest = entries[-1]  # Append order breaks ties within one UTC date.
+        delta = json.loads((ROOT / evidence / latest["path"]).read_text())
+        self.assertEqual(delta["date"], latest["date"])
+        baseline_path = Path(delta["baseline_path"])
+        self.assertFalse(baseline_path.is_absolute())
+        self.assertNotIn("..", baseline_path.parts)
+        self.assertTrue(baseline_path.is_relative_to(evidence))
+        baseline = json.loads((ROOT / baseline_path).read_text())
         self.assertEqual(sha256((ROOT / delta["baseline_path"]).read_bytes()).hexdigest(),
                          delta["baseline_sha256"])
         self.assertEqual(delta["mode"], "monitoring_only")
