@@ -45,19 +45,25 @@ For every manifest skill, in order:
       (cleanAndCreateDirectory and the copy, L193-200 and L389-390), so a file
       beside the pinned SKILL.md that the CLI would not write is lost with it,
       and so is an edited support file. Where an add is about to run over an
-      existing folder whose SKILL.md is the pinned one (an unlocked folder, or
-      a folder locked at the pin whose Claude link, or in a project the Claude
-      target, is missing) the folder must be the pinned tree: its git tree SHA,
+      existing folder (an unlocked one, one locked at the pin whose Claude link,
+      or in a project the Claude target, is missing or whose SKILL.md was edited,
+      and one whose lock identifies nothing: a project entry without the optional
+      ref or skillPath of src/local-lock.ts L16-L37 or with another source, a
+      global entry without a tree) the folder must be the pinned tree: its git tree SHA,
       with the directories a skill's own tooling regenerates left out
       (scripts/skills_status.py git_tree_sha and RUNTIME_ARTIFACT_DIRS, the
       check_folder_tree state; a file or a link of such a name is content and
-      is hashed), equals the manifest's tree_sha. Otherwise it holds content
-      the installer did not write (or lacks a pinned file, which only --force
-      repairs) and is 'local-modified', refused unless --force.
-      Not covered: an upgrade over a lock of an older tree, whose files this
-      comparison cannot name (the lock proves the CLI wrote some earlier
-      version there). A folder that is locked at the pin and linked is 'ok':
-      nothing is added there.
+      is hashed), equals the manifest's tree_sha, and it holds no entry that a
+      git tree cannot (an empty directory, a special file: the add deletes those
+      too; git_tree_sha strict). Otherwise it holds content the installer did
+      not write (or lacks a pinned file, which only --force repairs) and is
+      'local-modified', refused unless --force.
+      Not covered: an upgrade over a lock that positively names another
+      revision of the source (a project ref that is not the pin's, a global
+      skillFolderHash that is another tree), whose files this comparison cannot
+      name (the lock proves the CLI wrote some earlier version there). A folder
+      that is locked at the pin with a whole entry and linked is 'ok': nothing
+      is added there.
   (b) a folder exists at that path but the lock has no entry for <name> (for
       example a skill installed by hand before this manifest existed) -> only
       proceed (treat like a fresh install) when its SKILL.md sha256 already
@@ -534,32 +540,38 @@ def classify_skill(skill: dict, home: Path, project_dir: Path | None = None, age
     md_matches = installed_skill_md_matches(skill, home, project_dir)
     entry = read_lock_entry(home, name, project_dir)
     if entry is not None:
+        # An add recreates the canonical folder from nothing (src/installer.ts L195, called at L389), so only the pinned tree survives it unharmed. A lock excuses a folder that differs from the pinned
+        # tree in one case: it positively names another revision of this source (a project `ref` that is not the pin's, a global `skillFolderHash` that is not the pin's tree), an upgrade over an older pin
+        # (the documented boundary). Anything else about the lock identifies nothing and the folder is compared like an unlocked one: metadata the pinned CLI treats as optional or does not require to
+        # be well formed (a project entry's `ref` and `skillPath`, src/local-lock.ts L16-L37, "optional for backward compatibility with lock files written before this field existed"), another source,
+        # a hash that is missing. A folder that is gone is a clean repair.
+        def compared() -> str:
+            return "local-modified" if skill_dir.exists() and unpinned_content(skill, home, project_dir) else "install"
         if project_dir is not None:
             target_missing = False
             if agent == "claude-code":
                 target_md = project_dir / ".claude" / "skills" / name / "SKILL.md"
                 target_missing = not target_md.is_file() or sha256_of(target_md) != skill["skill_md_sha256"]
-            identity_matches = (
-                entry.get("sourceType") == "github" and entry.get("source") == skill["source"]
-                and entry.get("ref") == skill["ref"]
-                and entry.get("skillPath") == skill["path"] + "/SKILL.md"
-                and re.fullmatch(r"[0-9a-f]{64}", str(entry.get("computedHash", ""))) is not None)
-            if not identity_matches:
-                return "install"
+            from_source = entry.get("sourceType") == "github" and entry.get("source") == skill["source"]
+            ref = entry.get("ref")
+            if from_source and isinstance(ref, str) and ref and ref != skill["ref"]:
+                return "install"   # another revision of this source: an upgrade over an older pin, whose files nothing offline can name (documented boundary)
+            if not (from_source and ref == skill["ref"]):
+                return compared()
             tree = pinned_source_trees(skill["source"], skill["ref"]).get(skill["path"])
             if tree != skill["tree_sha"]:
                 return "install"
-            if md_matches and not target_missing:
+            complete = (entry.get("skillPath") == skill["path"] + "/SKILL.md"
+                        and re.fullmatch(r"[0-9a-f]{64}", str(entry.get("computedHash", ""))) is not None)
+            if complete and md_matches and not target_missing:
                 return "ok"
-            # Locked at the pin, so the folder is ours to compare whatever made the add necessary (the Claude target is missing, SKILL.md was edited or is gone): the add recreates
-            # the canonical folder from nothing (src/installer.ts L195, called at L389), so only the pinned tree survives it unharmed. A folder that is gone is a clean repair.
-            return "local-modified" if skill_dir.exists() and unpinned_content(skill, home, project_dir) else "install"
-        if entry.get("skillFolderHash") != skill["tree_sha"]:
+            return compared()   # the Claude target is missing, SKILL.md was edited or is gone, or the entry is not one the CLI wrote whole
+        folder_hash = entry.get("skillFolderHash")
+        if isinstance(folder_hash, str) and folder_hash and folder_hash != skill["tree_sha"]:
             return "install"   # a lock that names another tree: an upgrade over an older one, whose files nothing offline can name (documented boundary)
-        if md_matches and link_problem is None:
+        if folder_hash == skill["tree_sha"] and md_matches and link_problem is None:
             return "ok"
-        # Locked at the pin, but the link is missing or SKILL.md is not the pinned one: the add still recreates the canonical folder (L195, L389), so the folder must be the pinned tree.
-        return "local-modified" if skill_dir.exists() and unpinned_content(skill, home) else "install"
+        return compared()   # the link is missing, SKILL.md is not the pinned one, or the lock names no tree
     # An unlocked folder counts as (b) -- local content to protect -- as soon as it
     # *exists*, not only once it happens to contain a SKILL.md: a folder with other
     # files and no SKILL.md can never satisfy md_matches, so checking is_file() here
