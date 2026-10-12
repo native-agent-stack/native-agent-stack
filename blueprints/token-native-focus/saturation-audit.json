@@ -9726,7 +9726,7 @@
       },
       "artifact_baselines": [],
       "exact_causal_lifetime_provider_tokens_saved": null,
-      "next_action": "Reuse the scoped receipt; run a measured container route or the terminus-2 api_base route before any gateway comparison, and pin agent CLI versions with --ak version= for reproducible runs.",
+      "next_action": "Reuse the scoped receipt; run a measured container route or the terminus-2 api_base route before any gateway comparison, pin agent CLI versions with --ak version= for reproducible runs, and record restart, replay, retry, refusal and cleanup acceptance through Harbor's own interfaces before the frozen worker comparison.",
       "integration_mode": "Explicit per-run CLI invocation with a task directory; no resident service.",
       "lifecycle_evidence": {
         "assessment": "bounded_role_evidence",
@@ -9757,8 +9757,8 @@
           "evidence_refs": []
         },
         "restart": {
-          "status": "not_applicable",
-          "scope": "The selected role is a per-run CLI with no resident service.",
+          "status": "not_established",
+          "scope": "Harbor ships its own interrupted-job interfaces (harbor jobs resume, --max-retries, --resume-trajectory, harbor jobs regrade); none was exercised, so interrupted-job resume and retry behavior is unknown. The per-run CLI has no resident service to restart.",
           "evidence_refs": []
         },
         "cleanup": {

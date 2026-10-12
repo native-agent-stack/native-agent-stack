@@ -13,12 +13,15 @@
     "Container-to-gateway reachability was measured once: one TCP connect from a throwaway ubuntu:24.04 container on the default bridge network to 10.0.2.1:21128 timed out after 5 s (silently dropped, not refused) while a control connect to 10.0.2.1:53 opened. The probe covers one image, one network path and one port; it does not test other addresses, compose networks or a changed daemon configuration.",
     "Agent setup took 171.34 s of the 204.17 s trial on a bare ubuntu:24.04 image. No prebuilt-image run was measured.",
     "Isolation from <HOME>/.claude was checked by modification time and size plus a construction argument. A live Claude Code session and sibling agents rewrite <HOME>/.claude.json and <HOME>/.claude/projects continuously, so those two before/after values do not discriminate on their own.",
-    "The docker container count moved from 67 to 66 during the smoke window. No container named for Harbor, hello-world or hb__ existed before or after; the change is attributed to a process outside this lane."
+    "The docker container count moved from 67 to 66 during the smoke window. No container named for Harbor, hello-world or hb__ existed before or after; the change is attributed to a process outside this lane.",
+    "The terminus-2 --ak api_base= gateway route (the model client runs in the Harbor process on the host) is source-read, not live-tested: no request reached the gateway through it. Only the eight named adapters and terminus-2 were read for where their model client runs; terminus-2 is the only host-side client found among them, and the other 36 registered adapters were not read for this.",
+    "The container-to-gateway timeout is measured, but its cause is read from source (rootlesskit v3.1.0 and the daemon's observed --disable-host-loopback flag); it was not tested by changing the flag, which is host configuration.",
+    "The smoke trial's four named phases sum to 184.51 s of its 204.17 s; the other 19.66 s is measured in three windows (data.smoke.trial) and attributed from source to log sync, trajectory conversion, artifact collection and environment teardown, without timing those sub-steps."
   ],
   "checked_at": "2026-10-12",
-  "recorded_at_utc": "2026-10-12T18:08:27Z",
+  "recorded_at_utc": "2026-10-12T21:07:50Z",
   "timezone": "America/New_York",
-  "source_base": "d8f7e2051b61bde6361a85b64f41413798015353",
+  "source_base": "489b263286edd87493689347a5411b263d60e306",
   "data": {
     "pin": {
       "mirror_head": "dc933be707feafbb9efcdf092cb8a0e391332617",
@@ -61,6 +64,8 @@
           "models/trial/config.py",
           "trial/network_policy.py",
           "environments/docker/docker-compose-build.yaml",
+          "trial/trial.py",
+          "trial/single_step.py",
           "cli/notifications.py",
           "skills.py",
           "telemetry.py",
@@ -85,7 +90,8 @@
       "rootlesskit_version": "3.1.0",
       "rootlesskit_flags_observed": "--net=gvisor-tap-vsock --disable-host-loopback --port-driver=builtin",
       "uv": "0.12.22",
-      "python": "3.13.16"
+      "python": "3.13.16",
+      "rootlesskit_process_args": "rootlesskit --state-dir=/run/user/1000/dockerd-rootless --net=gvisor-tap-vsock --mtu=65520 --slirp4netns-sandbox=auto --slirp4netns-seccomp=auto --disable-host-loopback --port-driver=builtin --copy-up=/etc --copy-up=/run --propagation=rslave --detach-netns /usr/bin/dockerd-rootless.sh"
     },
     "install": {
       "documented_command": "uv tool install harbor",
@@ -125,7 +131,6 @@
         "only_in_wheel": 0,
         "only_installed": 0
       },
-      "freeze_sha256": "51a14f564eb8991e7d7f3331a7b19d2dc320290796e4cfc1997685a8d47a6a5d",
       "key_versions": {
         "litellm": "1.105.0",
         "pydantic": "2.14.1",
@@ -143,6 +148,11 @@
         "tool_receipt_mtime_utc": "2026-10-08T02:22:45Z",
         "used_by_this_lane": false,
         "modified_by_this_lane": false
+      },
+      "resolved_distributions_file": {
+        "path": "evidence/artifacts/harbor-smoke-20261012/resolved-distributions.txt",
+        "sha256": "b43d319d818f0a57a829b3f9ae4e7c6b71491f2dd3430da99e1b598b84a7f16e",
+        "disclosure": "Published; the names and versions only, under a two-line header."
       }
     },
     "harbor_run_environment": {
@@ -154,7 +164,8 @@
       "working_directory": "/var/tmp/cc-harbor-tmp/work",
       "confirmation_flag": "-y",
       "env_shim_disclosure": "Every harbor invocation ran through a short environment shim kept only in the scratch tree: it exports HOME, DOCKER_HOST and TMPDIR, sets HARBOR_TELEMETRY=off, changes to the scratch working directory and execs harbor. It contains no Harbor logic and is never committed. The CC accepted it on 2026-10-12 as a disclosed, scratch-only isolation measure.",
-      "telemetry": "HARBOR_TELEMETRY=off is standing for every Harbor run (CC ruling 2026-10-12); Harbor 0.24.0 has telemetry on by default (telemetry.py:40-45, 479-480)."
+      "telemetry": "HARBOR_TELEMETRY=off is standing for every Harbor run (CC ruling 2026-10-12); Harbor 0.24.0 has telemetry on by default (telemetry.py:40-45, 479-480).",
+      "shim_text": "export HOME=/var/tmp/cc-harbor-tmp/home TMPDIR=/var/tmp/cc-harbor-tmp/tmp HARBOR_TELEMETRY=off DOCKER_HOST=unix:///run/user/1000/docker.sock COLUMNS=200 NO_COLOR=1 PATH=/var/tmp/cc-harbor-tmp/bin:/usr/local/bin:/usr/bin:/bin; cd /var/tmp/cc-harbor-tmp/work; exec /var/tmp/cc-harbor-tmp/bin/harbor \"$@\""
     },
     "route_b_probe": {
       "ruling": "CC 2026-10-12: one probe from a throwaway ubuntu:24.04 container from the local image, no pull, no change to the Docker daemon or its rootlesskit flags.",
@@ -179,7 +190,17 @@
       "data_sent": false,
       "daemon_or_rootlesskit_changed": false,
       "cause_source": "rootless-containers/rootlesskit v3.1.0 (tag object 4fab82caf726318cef33bf82912546b8a529eaab, commit 62d2101fbbe4f79bc845a337c4e868d27ff602c9), pkg/network/gvisortapvsock/gvisortapvsock.go:106-124 (gateway is the network base plus 1, 10.0.2.1) and 142-148 (NAT from 10.0.2.1 to host 127.0.0.1 is configured only when --disable-host-loopback is absent)",
-      "route_policy_ruled": "Gateway routes in the comparison use terminus-2 with --ak api_base= (the model client runs in the Harbor process on the host); container adapters use route a only until a measured route exists."
+      "cause_status": "The timeout is measured. Its cause is read from the rootlesskit source and the daemon's observed flag; it was not tested by changing the flag (host configuration).",
+      "route_policy_ruled": "Gateway routes in the comparison use terminus-2 with --ak api_base= (the model client runs in the Harbor process on the host; source-read, not live-tested); container adapters use route a only until a measured route exists.",
+      "commands": [
+        "date -u +%Y-%m-%dT%H:%M:%SZ   (start_utc)",
+        "docker image ls -q ubuntu:24.04 | wc -l   (image_present)",
+        "ss -ltnH 'sport = :21128' | awk '{print $4}' | head -1   (listen_address_of_gateway_port)",
+        "docker run --rm --pull=never -i ubuntu:24.04 bash -s < evidence/artifacts/harbor-smoke-20261012/probe-inner.sh.txt",
+        "echo docker_run_exit=$?",
+        "date -u +%Y-%m-%dT%H:%M:%SZ   (end_utc)"
+      ],
+      "output_file": "evidence/artifacts/harbor-smoke-20261012/probe-output.txt"
     },
     "oracle_dry_run": {
       "purpose": "Harbor's own oracle agent runs the task's reference solution through the same Docker environment and verifier as the live smoke; no model call and no key.",
@@ -197,7 +218,14 @@
         "agent_setup": 0.0,
         "agent_execution": 0.36,
         "verifier": 19.28
-      }
+      },
+      "trial_wall_seconds": 36.17,
+      "unattributed_windows_seconds": {
+        "before_environment_setup": 0.04,
+        "between_agent_execution_and_verifier": 0.53,
+        "after_verifier_until_finished_at": 11.68
+      },
+      "command_shape": "<harbor-env wrapper> run -p /var/tmp/cc-harbor-tmp/tasks/hello-world -a oracle -e docker -o /var/tmp/cc-harbor-tmp/jobs --job-name cc-harbor-oracle-0 -n 1 -y"
     },
     "smoke": {
       "credential_slot": "anthropic-api-4",
@@ -237,7 +265,15 @@
           "agent_setup": 171.34,
           "agent_execution": 3.91,
           "verifier": 5.71
-        }
+        },
+        "phase_sum_seconds": 184.51,
+        "unattributed_seconds": 19.66,
+        "unattributed_windows_seconds": {
+          "before_environment_setup": 0.03,
+          "between_agent_execution_and_verifier": 6.02,
+          "after_verifier_until_finished_at": 13.61
+        },
+        "unattributed_attribution": "Windows measured from the trial's own timestamps. By source for this shared-verifier task (harbor/trial/single_step.py:40-54, trial/trial.py:551-556 and 1052-1058, agents/installed/claude_code.py:1657-1669, environments/docker/docker.py:1208), the middle window holds the agent-output sync (log download and the claude-code trajectory conversion on the host), the agent-log upload and artifact collection, and the last window holds the environment teardown after the verifier (docker compose down --rmi local --volumes --remove-orphans), with finished_at stamped afterwards. Sub-steps inside each window were not timed."
       },
       "usage": {
         "harbor_n_input_tokens": 32704,
@@ -260,7 +296,8 @@
         },
         "derivation": "Harbor n_input_tokens = input_tokens + cache_creation_input_tokens + cache_read_input_tokens = 4 + 5853 + 26847 = 32704; n_cache_tokens is cache_read_input_tokens only."
       },
-      "timestamp_note": "The job-level result.json started_at and finished_at are naive local time (13:09:59 to 13:13:23); trial-level phase fields are UTC with a Z suffix. This receipt cites the trial fields and the date -u run meta."
+      "timestamp_note": "The job-level result.json started_at and finished_at are naive local time (13:09:59 to 13:13:23); trial-level phase fields are UTC with a Z suffix. This receipt cites the trial fields and the date -u run meta.",
+      "wrapper_definition": "<harbor-env wrapper> is data.harbor_run_environment.shim_text"
     },
     "isolation": {
       "method": "Before/after snapshots of modification time and size only (never contents), plus a marker file and find -newer under the scratch tree, plus the redirected HOME's own listing.",
@@ -336,74 +373,45 @@
   },
   "provenance": [
     {
-      "name": "install.log",
-      "sha256": "6656c6ef3e275aca086af59f13904c5af2d998156e0c6e303987a0e150b7657b",
-      "disclosure": "Retained in the lane's private scratch tree; only factual result exported."
+      "name": "resolved-distributions.txt",
+      "path": "evidence/artifacts/harbor-smoke-20261012/resolved-distributions.txt",
+      "sha256": "b43d319d818f0a57a829b3f9ae4e7c6b71491f2dd3430da99e1b598b84a7f16e",
+      "disclosure": "Published. The 91 distribution names and versions the install resolved, under a two-line header; checked line by line for paths, direct or editable references and account names (none)."
     },
     {
-      "name": "freeze.txt",
-      "sha256": "51a14f564eb8991e7d7f3331a7b19d2dc320290796e4cfc1997685a8d47a6a5d",
-      "disclosure": "Resolved distribution list of the private install; retained privately; versions of eight packages exported."
-    },
-    {
-      "name": "verify-install.json",
-      "sha256": "197805d5fb5ee14f1e49e4e646d8da3cb0da4a5280afe1abcab5deeff314da35",
-      "disclosure": "Output of the install verification script; retained privately; values exported."
-    },
-    {
-      "name": "oracle-run.log",
-      "sha256": "2de6bfff524e1264141a42e35d4832d5dc2a92780fb1a3703e5e8d7a1b36fc9e",
-      "disclosure": "Harbor console output of the oracle trial; retained privately."
-    },
-    {
-      "name": "oracle-trial-result.json",
-      "sha256": "9803f03a03bdd6bb09e94e6f33e5ac83525982e52f630f8bb975347f97c802f5",
-      "disclosure": "Trial result.json of the oracle trial; retained privately; timings and reward exported."
-    },
-    {
-      "name": "smoke-run.log",
-      "sha256": "5f9d6e3f12ed3e0d9ede4dea8d205432c55d275622781e859eeb4c7d9af7582a",
-      "disclosure": "Harbor console output of the smoke relayed through the credential runner's masking; retained privately."
-    },
-    {
-      "name": "smoke-trial-result.json",
-      "sha256": "0e05b7ea92d568f3102ac59fe430b96c34932e22e95f4fd68991195d87c54adb",
-      "disclosure": "Trial result.json of the smoke; retained privately; timings, tokens, cost and reward exported."
-    },
-    {
-      "name": "smoke-claude-code.txt",
-      "sha256": "59492eede1218112d4260aab853c8e9a5b53c1c7f1270a93a207b30b895dc959",
-      "disclosure": "Claude Code stream-json output of the smoke; retained privately; result-event numbers exported."
-    },
-    {
-      "name": "snapshot-pre-smoke.json",
-      "sha256": "c6d30d6e31a3ab00947fbf8f7a0b30bfc9687e15cc0534350a73d566d89ad3da",
-      "disclosure": "Isolation snapshot (modification times, sizes, counts); retained privately; values exported."
-    },
-    {
-      "name": "snapshot-post-smoke.json",
-      "sha256": "984abff519b3490a775ca048aab92c7ae044d149c40827710df9bb8098adfc4b",
-      "disclosure": "Isolation snapshot (modification times, sizes, counts); retained privately; values exported."
-    },
-    {
-      "name": "adapter-matrix.json",
-      "sha256": "80c99730d87d9309b2042d3e05c799626d0b3844c064a1d4ba3f63e50e08f5e3",
-      "disclosure": "Mechanical per-adapter matrix over the 45 registered adapters; counts exported, matrix summarized in the decision draft."
-    },
-    {
-      "name": "gitleaks-jobs.json",
-      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
-      "disclosure": "Secret scan report over the job directory; zero findings."
-    },
-    {
-      "name": "probe.out",
+      "name": "probe-output.txt",
+      "path": "evidence/artifacts/harbor-smoke-20261012/probe-output.txt",
       "sha256": "1f56e7fc0bcd5ab6526ae8e804ddd00951cc8fe74e61fcdf01779ba321c065a4",
-      "disclosure": "Output of the single route-b probe (addresses, exit codes, elapsed milliseconds); retained privately; values exported."
+      "disclosure": "Published. The route-b probe's output as run: UTC times, the image count, the gateway listen address, the container's default-gateway route, and two connect results with exit codes and elapsed milliseconds. No names or paths."
     },
     {
-      "name": "gvisortapvsock.go",
+      "name": "probe-inner.sh.txt",
+      "path": "evidence/artifacts/harbor-smoke-20261012/probe-inner.sh.txt",
+      "sha256": "5ea562e45397a5ae7a873e7a2cc594207e28c5dcee0454362a8db99bd7f9db95",
+      "disclosure": "Published. The script the probe ran inside the container, stored with a .txt suffix; data.route_b_probe.commands gives the outer commands."
+    },
+    {
+      "name": "gvisortapvsock.go.txt",
+      "path": "evidence/artifacts/harbor-smoke-20261012/upstream/gvisortapvsock.go.txt",
       "sha256": "2e90a482578391b09f17ce8a87fab57c96babbe7f06962169542c43865d3157a",
-      "disclosure": "Upstream rootlesskit v3.1.0 source file fetched through the GitHub contents API; public; retained privately."
+      "disclosure": "Published. A byte-identical copy of pkg/network/gvisortapvsock/gvisortapvsock.go at rootless-containers/rootlesskit v3.1.0 (commit 62d2101fbbe4f79bc845a337c4e868d27ff602c9, git blob 805e97a93257f447aff56ea8d1463d306e77f00c, 14,462 bytes, Apache-2.0), fetched through the GitHub contents API on 2026-10-12 and stored with a .txt suffix so Go tooling does not treat it as source."
     }
-  ]
+  ],
+  "unpublished_originals": {
+    "names": [
+      "install.log",
+      "freeze.txt",
+      "verify-install.json",
+      "oracle-run.log",
+      "oracle-trial-result.json",
+      "smoke-run.log",
+      "smoke-trial-result.json",
+      "smoke-claude-code.txt",
+      "snapshot-pre-smoke.json",
+      "snapshot-post-smoke.json",
+      "adapter-matrix.json",
+      "gitleaks-jobs.json"
+    ],
+    "disclosure": "Kept in the lane's private scratch tree and not published. No digest of any of them is published: the repository is public, and a digest of unsanitized run output, a transcript or a home-state snapshot would let a guessed path or name be confirmed offline (correction #161). The data block of this receipt is the published projection of their measured values; the resolved-distribution list is published as resolved-distributions.txt and the adapter matrix as the decision record's table."
+  }
 }

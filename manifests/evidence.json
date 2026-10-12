@@ -4906,7 +4906,10 @@
         "Container-to-gateway reachability was measured once: one TCP connect from a throwaway ubuntu:24.04 container on the default bridge network to 10.0.2.1:21128 timed out after 5 s (silently dropped, not refused) while a control connect to 10.0.2.1:53 opened. The probe covers one image, one network path and one port; it does not test other addresses, compose networks or a changed daemon configuration.",
         "Agent setup took 171.34 s of the 204.17 s trial on a bare ubuntu:24.04 image. No prebuilt-image run was measured.",
         "Isolation from <HOME>/.claude was checked by modification time and size plus a construction argument. A live Claude Code session and sibling agents rewrite <HOME>/.claude.json and <HOME>/.claude/projects continuously, so those two before/after values do not discriminate on their own.",
-        "The docker container count moved from 67 to 66 during the smoke window. No container named for Harbor, hello-world or hb__ existed before or after; the change is attributed to a process outside this lane."
+        "The docker container count moved from 67 to 66 during the smoke window. No container named for Harbor, hello-world or hb__ existed before or after; the change is attributed to a process outside this lane.",
+        "The terminus-2 --ak api_base= gateway route (the model client runs in the Harbor process on the host) is source-read, not live-tested: no request reached the gateway through it. Only the eight named adapters and terminus-2 were read for where their model client runs; terminus-2 is the only host-side client found among them, and the other 36 registered adapters were not read for this.",
+        "The container-to-gateway timeout is measured, but its cause is read from source (rootlesskit v3.1.0 and the daemon's observed --disable-host-loopback flag); it was not tested by changing the flag, which is host configuration.",
+        "The smoke trial's four named phases sum to 184.51 s of its 204.17 s; the other 19.66 s is measured in three windows (data.smoke.trial) and attributed from source to log sync, trajectory conversion, artifact collection and environment teardown, without timing those sub-steps."
       ],
       "path": "evidence/receipts/harbor-smoke-20261012.json"
     }
@@ -11590,8 +11593,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "6c222e9ea08d3afe14eec5e86efa2df0f9e2d07730bdf64c86901a4ab8834937",
-      "bytes": 512938
+      "sha256": "3166af2d69ea1e4116c0e188a72f4a55f6fe4f6435ee007efa81ecc40d6a6b1c",
+      "bytes": 513265
     },
     {
       "path": "blueprints/trials-20260926/README.md",
@@ -17360,13 +17363,13 @@
     },
     {
       "path": "catalogs/landscape/final-stack.json",
-      "sha256": "643f13cc543b4f3214774e8e2d13bea298dc7e30e723f7fcb115cbbb0e7d66a4",
+      "sha256": "ce8a3375eaf0594d2a336192082dcbce3836b850b523aef2555fbafde495c269",
       "bytes": 309707
     },
     {
       "path": "catalogs/landscape/foundation.json",
-      "sha256": "bc7d5a739f1965b0c2275cff3a1fa223f8a6a45d16c335fcc767935235a55bb5",
-      "bytes": 479807
+      "sha256": "55751afc9a6e3d2dd814d5ba35d811ea9424464ccc417234b8cb6d08864e48b8",
+      "bytes": 480209
     },
     {
       "path": "catalogs/landscape/gap-closeouts/README.md",
@@ -36637,6 +36640,26 @@
       "path": "evidence/artifacts/harbor-0240-currency-20261009/upstream/tag-object.json",
       "sha256": "babb2265240ca677a2c74a4844553762966112a7737560c2faceae4082836165",
       "bytes": 670
+    },
+    {
+      "path": "evidence/artifacts/harbor-smoke-20261012/probe-inner.sh.txt",
+      "sha256": "5ea562e45397a5ae7a873e7a2cc594207e28c5dcee0454362a8db99bd7f9db95",
+      "bytes": 787
+    },
+    {
+      "path": "evidence/artifacts/harbor-smoke-20261012/probe-output.txt",
+      "sha256": "1f56e7fc0bcd5ab6526ae8e804ddd00951cc8fe74e61fcdf01779ba321c065a4",
+      "bytes": 333
+    },
+    {
+      "path": "evidence/artifacts/harbor-smoke-20261012/resolved-distributions.txt",
+      "sha256": "b43d319d818f0a57a829b3f9ae4e7c6b71491f2dd3430da99e1b598b84a7f16e",
+      "bytes": 1819
+    },
+    {
+      "path": "evidence/artifacts/harbor-smoke-20261012/upstream/gvisortapvsock.go.txt",
+      "sha256": "2e90a482578391b09f17ce8a87fab57c96babbe7f06962169542c43865d3157a",
+      "bytes": 14462
     },
     {
       "path": "evidence/artifacts/harness-rules-20261008/B-run-receipts.json",
@@ -59410,8 +59433,8 @@
     },
     {
       "path": "evidence/receipts/harbor-smoke-20261012.json",
-      "sha256": "42a7ee44a1e5100a482b4bcddcb57af451bce7372cc015435facd9c0eb9b8137",
-      "bytes": 20150
+      "sha256": "6685c39dacd9ccfca52f5bd794f3212720a39e9089327d4c2981878e70a7d00c",
+      "bytes": 23522
     },
     {
       "path": "evidence/receipts/headroom-039-qualification-20260925.json",
@@ -60685,8 +60708,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "f12df017667a032d6841920a1cba81ee46775f79aeb2d84fb1e210e168130617",
-      "bytes": 132446
+      "sha256": "2bfa2d4784a73ecdbc9b3c7d5deea7a422a81abd083d071c22fe5414c28be178",
+      "bytes": 132533
     },
     {
       "path": "observability/README.md",
@@ -61040,8 +61063,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "403c52fe11591ffb2472d55131ea271a4a837c8a26d9dbcb3f04fc9b73567209",
-      "bytes": 134510
+      "sha256": "9a3d20b35b69dd1d998340d14b1f87ad4cb8ac6159aa2dfcef4f3f0dedfaf4a4",
+      "bytes": 134596
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -62420,8 +62443,8 @@
     },
     {
       "path": "tests/test_local_pages_policy_grants.py",
-      "sha256": "f819d2f7086bc3af9f3da901611b54c66831dca672a0848b1277808d122c9108",
-      "bytes": 22554
+      "sha256": "f9e1e854ed27c2d20b5338c22d28a0a4b33e7dba206695d0f47037107b55efcd",
+      "bytes": 26987
     },
     {
       "path": "tests/test_managed_block.py",
@@ -63455,8 +63478,8 @@
     },
     {
       "path": "tools/local-pages/README.md",
-      "sha256": "44df718903d6a7e06800b184211a8d974d1a8f81bdcbe6b640fc78eade7c67c9",
-      "bytes": 32896
+      "sha256": "7e968b62ba9f4a12ee8069b356a5dfaf22436d896566e5dee8dfa6785549c8bc",
+      "bytes": 33519
     },
     {
       "path": "tools/local-pages/architecture_mapping.json",
@@ -63480,8 +63503,8 @@
     },
     {
       "path": "tools/local-pages/source_policy.json",
-      "sha256": "d9d83f49c84e79f469f98af9c63ea098b98a8259a4b3bea67eabec265080ebc4",
-      "bytes": 759622
+      "sha256": "9d0c0a4ba2c87c63a55caa0f86515090328a02772e067239744f3a265d41b0d2",
+      "bytes": 759847
     },
     {
       "path": "tools/omniroute/gateway_record.py",

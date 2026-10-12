@@ -2903,9 +2903,10 @@
           "name": "Harbor",
           "repository": "https://github.com/harbor-framework/harbor",
           "disposition": "conditional",
-          "rationale": "Container harness that runs each agent runtime in its own Docker container through upstream-shipped adapters; on this host its oracle trial and one claude-code trial of its hello-world task passed, a container-to-gateway probe timed out, and benchmark scoring, trajectory analysis and the other adapters are unqualified.",
-          "evidence_kind": "native_execution",
+          "rationale": "Container harness that runs each agent runtime in its own Docker container through upstream-shipped adapters, recorded here for that parallel-runtime role. Prior evidence: the 2026-10-09 currency receipt checked the v0.24.0 release, tag, wheel digest and install route (source review and a wheel digest check) without installing it, and records Harbor under the separate trajectory-analysis companion slot, a role this row does not qualify. On this host its oracle trial and one claude-code trial of its hello-world task then passed, a container-to-gateway probe timed out, and benchmark scoring, trajectory analysis and the other adapters are unqualified.",
+          "evidence_kind": "mixed",
           "evidence_refs": [
+            "evidence/artifacts/harbor-0240-currency-20261009/receipt.json",
             "evidence/receipts/harbor-smoke-20261012.json"
           ]
         }

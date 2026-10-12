@@ -1,5 +1,6 @@
 """Permission derivation excludes frozen inputs and never follows registries."""
 
+import ast
 import importlib.util
 from contextlib import ExitStack
 import copy
@@ -14,9 +15,33 @@ from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 REVIEWED_RECEIPT_PIN = "c945ea1f011e4c7e69a0b5f19052717b2af9d46e"
+# Exact receipt grants added after the pin. The Architecture reader authorizes every registered receipt and every evidence pointer a
+# landscape row cites, and a file that did not exist at the pin cannot be in the union derived from it. Each entry is one exact
+# repository path that a pull-request read named in its verdict. The policy stays a static list: the committed grants must equal the
+# reviewed union plus exactly these paths, every other path stays refused, and nothing here is a wildcard or is derived from the
+# evidence manifest.
+POST_PIN_RECEIPT_GRANTS = {
+    "evidence/receipts/harbor-smoke-20261012.json":
+        "#1047, GPT read of 1f5413b6 (P2): the new registered receipt; the Architecture build refused it without this grant",
+    "evidence/artifacts/harbor-0240-currency-20261009/receipt.json":
+        "#1047: cited by path from the Harbor landscape candidate (CC ruling 2026-10-12); the reader follows that pointer",
+}
 spec = importlib.util.spec_from_file_location("local_policy_grant_tests", ROOT / "scripts/local_pages_policy_grants.py")
 grants = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(grants)
+
+
+def current_eligible_receipt_paths() -> set:
+    """Receipt paths the derivation would propose from the working tree's registry (same eligibility rules as proposal())."""
+    policy_spec = importlib.util.spec_from_file_location("post_pin_policy_reference", ROOT / "tools/local-pages/source_policy.py")
+    policy = importlib.util.module_from_spec(policy_spec)
+    policy_spec.loader.exec_module(policy)
+    syntax = ast.parse((ROOT / grants.FROZEN_RULE).read_text(encoding="utf-8"))
+    prefixes = tuple(ast.literal_eval(node.value) for node in syntax.body
+                     if isinstance(node, ast.Assign) and any(isinstance(target, ast.Name) and target.id == "ARTIFACT"
+                                                             for target in node.targets))
+    metadata = json.loads((ROOT / "manifests/evidence.json").read_text(encoding="utf-8"))
+    return set(grants.receipt_paths(metadata, prefixes, policy.protected_path))
 
 
 def reviewed_snapshot():
@@ -149,16 +174,51 @@ class PolicyGrantDerivation(unittest.TestCase):
                     r"does not expand the independently reviewed pinned receipt grant set)\b",
                 )
 
-    def test_committed_receipt_grants_equal_the_native_reviewed_source_proposal(self):
+    def assert_receipt_grants_match(self, policy):
+        """The grants are the independently reviewed union at the pin plus exactly the listed post-pin paths."""
         reviewed = grants.proposal(ROOT, REVIEWED_RECEIPT_PIN)
         self.assertEqual(reviewed["source_pin"], REVIEWED_RECEIPT_PIN)
         self.assertEqual(reviewed["receipt_count"], 4648)
-        policy = json.loads((ROOT / "tools/local-pages/source_policy.json").read_text())
         actual = policy["architecture"]["architecture_receipt"]
-        expected = reviewed["architecture_receipt"]
-        self.assertEqual(len(actual), 4648)
+        additions = [{"root": "repo", "path": path} for path in POST_PIN_RECEIPT_GRANTS]
+        expected = sorted([*reviewed["architecture_receipt"], *additions], key=lambda row: (row["root"], row["path"]))
+        self.assertEqual(len(actual), 4648 + len(POST_PIN_RECEIPT_GRANTS))
         self.assertTrue(sorted(actual, key=lambda row: (row["root"], row["path"])) == expected,
-                        "Receipt grants differ from the exact independently reviewed union; paths omitted.")
+                        "Receipt grants differ from the independently reviewed union plus the listed post-pin grants; paths omitted.")
+
+    def test_committed_receipt_grants_equal_the_reviewed_union_plus_the_listed_post_pin_grants(self):
+        self.assert_receipt_grants_match(json.loads((ROOT / "tools/local-pages/source_policy.json").read_text()))
+
+    def test_receipt_check_refuses_a_missing_extra_replaced_or_duplicate_grant(self):
+        original = json.loads((ROOT / "tools/local-pages/source_policy.json").read_text())
+        for mutation in ("missing post-pin", "extra", "replaced", "duplicate", "reviewed one dropped"):
+            policy = copy.deepcopy(original)
+            rows = policy["architecture"]["architecture_receipt"]
+            listed = next(index for index, row in enumerate(rows) if row["path"] in POST_PIN_RECEIPT_GRANTS)
+            if mutation == "missing post-pin":
+                rows.pop(listed)
+            elif mutation == "extra":
+                rows.append({"root": "repo", "path": "evidence/receipts/ungranted-fixture-20261012.json"})
+            elif mutation == "replaced":
+                rows[listed] = {"root": "repo", "path": "evidence/receipts/ungranted-fixture-20261012.json"}
+            elif mutation == "duplicate":
+                rows.append(dict(rows[listed]))
+            else:
+                rows.pop(next(index for index, row in enumerate(rows) if row["path"] not in POST_PIN_RECEIPT_GRANTS))
+            with self.subTest(mutation=mutation), self.assertRaises(AssertionError):
+                self.assert_receipt_grants_match(policy)
+
+    def test_each_post_pin_receipt_grant_is_one_exact_eligible_registered_path_outside_the_reviewed_union(self):
+        reviewed = {row["path"] for row in grants.proposal(ROOT, REVIEWED_RECEIPT_PIN)["architecture_receipt"]}
+        eligible = current_eligible_receipt_paths()
+        for path, reason in POST_PIN_RECEIPT_GRANTS.items():
+            with self.subTest(path=path):
+                self.assertRegex(path, r"\Aevidence/(?:receipts|artifacts)/[A-Za-z0-9._/-]+\.json\Z")
+                self.assertNotIn("..", path.split("/"))
+                self.assertNotIn(path, reviewed, "a path already in the reviewed union needs no ledger entry")
+                self.assertIn(path, eligible, "a post-pin grant must be a registered, unprotected, non-frozen JSON path")
+                self.assertTrue((ROOT / path).is_file())
+                self.assertTrue(reason.strip())
 
     def test_reviewed_user_source_pin_is_reachable_from_main_with_matching_snapshot(self):
         relative = "tools/local-pages/inventory_user_names.json"

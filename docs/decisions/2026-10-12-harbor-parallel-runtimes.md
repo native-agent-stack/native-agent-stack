@@ -1,8 +1,14 @@
 # Decision: Harbor as the container harness for parallel runtime work (2026-10-12)
 
-**Status:** Proposed, recorded 2026-10-12T19:03:15Z on base `2f59d744`, in a draft pull request.
-The CC's 2026-10-12 rulings on the environment shim, telemetry and route b are recorded
-under "Decision". Not yet reviewed and not FINAL. The measured receipt is
+**Status:** Proposed, recorded 2026-10-12T19:03:15Z on base `2f59d744` in pull request #1047;
+rebased onto `489b2632` as a pure registry-only rebase (the 14 non-registry files have the same
+patch-id); amended 2026-10-12T21:07:15Z after the Claude and GPT reads of the first head
+(`1f5413b6`): the CC's ruling on the landscape candidate; the `terminus-2` route marked
+source-read, the timeout's cause labelled read from source, the unattributed smoke time
+explained and the supersession follow-up (Claude read); the private-byte digests removed, the
+exact Architecture grants and the replayable commands (GPT read). The CC's 2026-10-12 rulings on
+the environment shim, telemetry, route b and the landscape candidate are recorded under
+"Decision" and "Registration". Not yet reviewed and not FINAL. The measured receipt is
 [harbor-smoke-20261012.json](../../evidence/receipts/harbor-smoke-20261012.json); it is
 registered in `manifests/evidence.json` and covers the new `harbor` component in
 `manifests/stack.json` (see "Registration").
@@ -71,11 +77,13 @@ uv tool install --no-build --python <mise python 3.13.16> harbor==0.24.0
   both equal PyPI's published values and the 2026-10-09 receipt. Installed `RECORD`: 488
   files ok, 0 bad, 0 missing. Installed `harbor/` tree equals the extracted wheel (479
   files identical).
-- Resolved set: freeze SHA256 `51a14f564eb8991e7d7f3331a7b19d2dc320290796e4cfc1997685a8d47a6a5d`;
-  litellm 1.105.0, pydantic 2.14.1, typer 0.27.3, supabase 2.32.0, fastapi 0.143.0,
-  httpx 0.28.1, requests 2.34.2, PyJWT 2.15.1. Harbor's own requirements are lower bounds
-  (`pyproject.toml`), so a later install can resolve a different set; the freeze is the
-  record.
+- Resolved set: the 91 distribution names and versions are published in
+  [resolved-distributions.txt](../../evidence/artifacts/harbor-smoke-20261012/resolved-distributions.txt)
+  (SHA256 `b43d319d818f0a57a829b3f9ae4e7c6b71491f2dd3430da99e1b598b84a7f16e`; checked line by
+  line for paths, direct or editable references and account names, none); litellm 1.105.0,
+  pydantic 2.14.1, typer 0.27.3, supabase 2.32.0, fastapi 0.143.0, httpx 0.28.1, requests 2.34.2,
+  PyJWT 2.15.1. Harbor's own requirements are lower bounds (`pyproject.toml`), so a later
+  install can resolve a different set; the published list is the record.
 - A user-scope Harbor 0.24.0 install already exists on this host (`uv tool`, `no-build`,
   tool receipt dated 2026-10-08T02:22:45Z, entry points in `<HOME>/.local/bin`). It was
   neither used nor modified (snapshots unchanged).
@@ -98,7 +106,29 @@ The run used a short environment shim with these exports (scratch, not committed
 environment, changes to the scratch working directory and execs `harbor`; it contains no
 Harbor logic). The CC accepted it on 2026-10-12 as a disclosed, scratch-only isolation
 measure, and made `HARBOR_TELEMETRY=off` standing for every Harbor run; the disclosure is
-kept in the receipt (`data.harbor_run_environment`).
+kept in the receipt (`data.harbor_run_environment`). The shim's whole text, as run, is:
+
+```text
+export HOME=/var/tmp/cc-harbor-tmp/home TMPDIR=/var/tmp/cc-harbor-tmp/tmp HARBOR_TELEMETRY=off \
+  DOCKER_HOST=unix:///run/user/1000/docker.sock COLUMNS=200 NO_COLOR=1 \
+  PATH=/var/tmp/cc-harbor-tmp/bin:/usr/local/bin:/usr/bin:/bin
+cd /var/tmp/cc-harbor-tmp/work
+exec /var/tmp/cc-harbor-tmp/bin/harbor "$@"
+```
+
+## Custody of the run originals
+
+The install log, the verification output, the oracle and smoke console logs and trial result
+files, the Claude Code stream output, the two isolation snapshots, the adapter matrix JSON
+and the secret-scan report stay in the lane's private scratch tree. **No digest of any of
+them is published**: this repository is public, and a digest of unsanitized run output, a
+transcript or a home-state snapshot would let a guessed path or name be confirmed offline
+(correction #161). The receipt's `data` block is the published projection of their measured
+values, and its `unpublished_originals` object names them without digests. What is published
+with digests is only bytes that are in the repository: the resolved-distribution list, the
+probe's output and script, and the public rootlesskit file (the receipt's `provenance`). The
+regression `tests/test_provenance_digest_custody.py` rejects a `provenance` digest that
+hashes no repository file, with the 12 older receipts that carry the shape frozen by count.
 
 ## Route table (source read, no inference)
 
@@ -120,10 +150,11 @@ container, and the probe below measured that it is not.
 | mini-swe-agent | **Yes (source).** Spec `mini_swe_agent.py:508-512`: `MSWEA_API_KEY` first, then the provider's key by passthrough; error if none (`760`) | **Yes (source).** `OPENAI_BASE_URL`, `OPENAI_API_BASE` (`510`, `516-529`) |
 | openhands-sdk | **Yes, under a renamed variable.** `LLM_API_KEY` is required (`openhands_sdk.py:221-222`), `LLM_MODEL = model_name` (`230`); a credential-runner entry must export `LLM_API_KEY` | **Yes (source).** `LLM_BASE_URL` (`224-226`; runner `openhands_sdk_runner.py:192`, `213`) |
 | deerflow | **Yes (source).** `anthropic` maps to `langchain_anthropic:ChatAnthropic` with `ANTHROPIC_API_KEY` (`deerflow.py:130-133`, `260-262`); keys are forwarded from the host env by a fixed list (`38-57`, `642-644`) | **Only via the OpenRouter slug:** `-m openrouter/<model> --ak openrouter_base_url=<url>` with `OPENROUTER_API_KEY` (`76-79`, `253-259`). `OPENAI_BASE_URL` is not forwarded |
-| terminus-2 (extra) | Host-side client: LiteLLM in the Harbor process (`terminus_2/terminus_2.py:397-401`) | **Yes (source), and the only registered route that avoids the container-to-host problem below:** `--ak api_base=<url>` (`terminus_2.py:93`, `268`, `401`; `llms/lite_llm.py:118`, `653`) |
+| terminus-2 (extra) | Host-side client: LiteLLM in the Harbor process (`terminus_2/terminus_2.py:397-401`) | **Yes (source-read, not live-tested), and the only route found among the adapters read that avoids the container-to-host problem below:** `--ak api_base=<url>` (`terminus_2.py:93`, `268`, `401`; `llms/lite_llm.py:118`, `653`). Only the nine adapters in this section were read for where their model client runs; the other 36 registered adapters were not |
 
 **Route policy (CC ruling, 2026-10-12).** Gateway routes in the comparison use `terminus-2`
-with `--ak api_base=`; container adapters use route a only until a measured route exists.
+with `--ak api_base=` (source-read, not live-tested); container adapters use route a only
+until a measured route exists.
 The Docker daemon and its rootlesskit flags are host configuration and are not changed for
 this.
 
@@ -155,7 +186,8 @@ latest.
 (`terminus` and `terminus-1` are not registered). 18 declare a `MODEL_CONNECTION` spec
 (provider, key names, URL names, passthrough); 27 have none and parse `-m` and read their
 own environment (`agents/base.py:281-290`: no spec means an empty connection). Names only,
-generated mechanically over the wheel (matrix retained privately, hash in the receipt).
+generated mechanically over the wheel by a throwaway script; the JSON stays in the private
+scratch tree with no digest published, and this table is its published form.
 
 | Adapter | File under `harbor/agents/` | Model connection spec (`MODEL_CONNECTION`) | Other credential/endpoint names read (+ count of other names) |
 |---|---|---|---|
@@ -213,8 +245,15 @@ names read through a loop or a mapping (deerflow's forward list, the `PROVIDERS`
 ## Oracle dry run (zero spend)
 
 Harbor's own `oracle` agent runs the task's reference solution through the same Docker
-environment and verifier as the smoke, with no model call and no key.
-`harbor run -p hello-world -a oracle ...`: exit 0, 2026-10-12T17:08:24Z to 17:09:01Z (37 s),
+environment and verifier as the smoke, with no model call and no key. The exact invocation
+(`<harbor-env wrapper>` is the shim in the receipt's `data.harbor_run_environment.shim_text`):
+
+```text
+<harbor-env wrapper> run -p /var/tmp/cc-harbor-tmp/tasks/hello-world -a oracle -e docker \
+  -o /var/tmp/cc-harbor-tmp/jobs --job-name cc-harbor-oracle-0 -n 1 -y
+```
+
+Result: exit 0, 2026-10-12T17:08:24Z to 17:09:01Z (37 s),
 1 trial, 0 exceptions, reward 1.0; phases: environment setup 4.29 s, agent execution 0.36 s,
 verifier 19.28 s (the verifier runs apt, the astral uv installer and pytest inside the
 container, `tests/test.sh`).
@@ -223,20 +262,41 @@ container, `tests/test.sh`).
 
 Harbor's smallest example (`examples/tasks/hello-world`: `FROM ubuntu:24.04`, "Create a
 file called hello.txt with "Hello, world!" as the content.") with the `claude-code`
-adapter, `-m anthropic/claude-haiku-5-5`, key injected per command:
-`python3 -I tools/credentials/credential_run.py anthropic-api-4 -- <harbor command>` from
-the primary checkout. Slot `anthropic-api-4` worked; no fallback slot was tried. The local
-`--path` form was used so no task is fetched from the Harbor hub.
+adapter, `-m anthropic/claude-haiku-5-5`, key injected per command, run from the primary
+checkout:
+
+```text
+python3 -I tools/credentials/credential_run.py anthropic-api-4 -- <harbor-env wrapper> run \
+  -p /var/tmp/cc-harbor-tmp/tasks/hello-world -a claude-code -m anthropic/claude-haiku-5-5 \
+  -e docker -o /var/tmp/cc-harbor-tmp/jobs --job-name cc-harbor-smoke-cc-haiku-a4 -n 1 -y
+```
+
+Slot `anthropic-api-4` worked; no fallback slot was tried. The local `--path` form was used
+so no task is fetched from the Harbor hub. The task directory is a byte-for-byte copy of
+`examples/tasks/hello-world` at the mirror head (file digest prefixes are in the receipt).
 
 | Measure | Value |
 |---|---|
 | Exit code, wall | 0; 2026-10-12T17:09:58Z to 17:13:24Z, 206 s (Harbor "Total runtime 3m 24s") |
 | Result | 1 trial, 0 exceptions, reward 1.0 (`hello-world__8NxiCZF`) |
-| Trial phases | environment setup 3.55 s, **agent setup 171.34 s**, agent execution 3.91 s, verifier 5.71 s, trial 204.17 s |
+| Trial phases | environment setup 3.55 s, **agent setup 171.34 s**, agent execution 3.91 s, verifier 5.71 s (sum 184.51 s), trial 204.17 s |
+| Outside the four phases | 19.66 s: 0.03 s before environment setup, 6.02 s between agent execution and the verifier, 13.61 s after the verifier |
 | Agent in container | Claude Code 2.1.296, model `claude-haiku-5-5`, key source reported `ANTHROPIC_API_KEY` |
 | Harbor tokens | input 32,704, cache 26,847, output 106 |
 | Harbor cost | $0.001053495 (equals Claude's own `total_cost_usd`) |
 | Claude result event | 2 turns, 2,931 ms (API 2,726 ms), `end_turn`, one `Write` call |
+
+The 19.66 s is measured in its windows from the trial's own timestamps and attributed from
+source; the sub-steps inside each window were not timed. For this shared-verifier task
+(`trial/single_step.py:40-54`) the middle window holds the agent-output sync (log download and
+the host-side claude-code trajectory conversion, `trial/trial.py:1052-1058`,
+`agents/installed/claude_code.py:1657-1669`), the agent-log upload and artifact collection,
+and the last window holds the environment teardown after the verifier
+(`docker compose down --rmi local --volumes --remove-orphans`, `environments/docker/docker.py:1208`),
+because `finished_at` is stamped only after the stop (`trial/trial.py:551-556`). The oracle
+trial shows the same shape: 0.04 s, 0.53 s and 11.68 s outside its phases, and its short
+middle window fits the oracle agent not overriding the post-run hook (`agents/base.py:411-418`
+is a no-op; `agents/oracle.py` defines none), so there is nothing to convert.
 
 Token derivation, so 32,704 is not misread: Harbor `n_input_tokens` = `input_tokens` +
 `cache_creation_input_tokens` + `cache_read_input_tokens` = 4 + 5,853 + 26,847; Harbor
@@ -251,21 +311,60 @@ with `--pull=never`) and no change to the Docker daemon or its rootlesskit flags
 container used the rootless daemon's default bridge network (container default gateway
 `172.17.0.1`), which leaves through the same `tap0` as Harbor's compose networks.
 
+The commands, exactly as run, with the script that ran inside the container published as
+[probe-inner.sh.txt](../../evidence/artifacts/harbor-smoke-20261012/probe-inner.sh.txt):
+
+```text
+date -u +%Y-%m-%dT%H:%M:%SZ                                  # start_utc
+docker image ls -q ubuntu:24.04 | wc -l                        # image_present
+ss -ltnH 'sport = :21128' | awk '{print $4}' | head -1         # listen_address_of_gateway_port
+docker run --rm --pull=never -i ubuntu:24.04 bash -s < probe-inner.sh.txt
+echo docker_run_exit=$?
+date -u +%Y-%m-%dT%H:%M:%SZ                                  # end_utc
+```
+
+Its output, published byte for byte as
+[probe-output.txt](../../evidence/artifacts/harbor-smoke-20261012/probe-output.txt):
+
+```text
+start_utc=2026-10-12T18:03:31Z
+image_present=1
+listen_address_of_gateway_port=127.0.0.1:21128
+container_default_gateway_hex=010011AC
+control_virtual_gateway_dns target=10.0.2.1:53 rc=0 elapsed_ms=7 msg=none
+probe_local_gateway_port target=10.0.2.1:21128 rc=124 elapsed_ms=5004 msg=none
+docker_run_exit=0
+end_utc=2026-10-12T18:03:37Z
+```
+
+The daemon's flags, as observed in the process list the same day, and its version:
+
+```text
+rootlesskit --state-dir=/run/user/1000/dockerd-rootless --net=gvisor-tap-vsock --mtu=65520 --slirp4netns-sandbox=auto --slirp4netns-seccomp=auto --disable-host-loopback --port-driver=builtin --copy-up=/etc --copy-up=/run --propagation=rslave --detach-netns /usr/bin/dockerd-rootless.sh
+rootlesskit version 3.1.0
+```
+
 Address used: the gvisor-tap-vsock gateway `10.0.2.1`. Why that is the host address the
 network exposes, from the source at the installed version: rootlesskit v3.1.0 (tag object
 `4fab82caf726318cef33bf82912546b8a529eaab`, commit `62d2101fbbe4f79bc845a337c4e868d27ff602c9`),
 `pkg/network/gvisortapvsock/gvisortapvsock.go:106-124` computes the gateway as the network
 base plus 1, and `142-148` configures the NAT from `10.0.2.1` to the host's `127.0.0.1`
-only when `--disable-host-loopback` is absent. The installed rootlesskit is 3.1.0 and runs
-with that flag (process list); the gateway service listens on `127.0.0.1:21128` only.
+only when `--disable-host-loopback` is absent. A byte-identical copy of that file is
+published as
+[gvisortapvsock.go.txt](../../evidence/artifacts/harbor-smoke-20261012/upstream/gvisortapvsock.go.txt)
+(git blob `805e97a93257f447aff56ea8d1463d306e77f00c`, 14,462 bytes, Apache-2.0, fetched through
+the GitHub contents API at the tag). The installed rootlesskit is 3.1.0 and runs with that
+flag (process list above); the gateway service listens on `127.0.0.1:21128` only.
 
 | TCP connect from the container (no data sent) | Result |
 |---|---|
 | `10.0.2.1:21128` (the gateway port) | **Not open: timed out after 5 s** (exit 124, 5,004 ms); silently dropped, no refusal received |
 | `10.0.2.1:53` (control: the virtual gateway's own DNS) | Open in 7 ms |
 
-The control shows the address and the probe method work, so the timeout is the missing NAT
-and not a broken probe. "Refused" is not what was observed; the attempt was dropped.
+The control shows the address and the probe method work, so the probe itself is sound. The
+timeout is measured; its cause is read from source (the rootlesskit NAT condition above and
+the daemon's observed flag), and was not tested by changing the flag, which is host
+configuration. "Refused" is not what was observed; the attempt was dropped.
 Consequence: no measured route exists from a container to the gateway, and under the CC's
 route policy container adapters use route a only. Not tested: other host addresses, compose
 network variants, or any changed daemon configuration (host configuration, not ours to
@@ -301,16 +400,17 @@ on the `job=` field of the run-metadata line (no key material).
 
 ## Open questions and blockers
 
-1. **Route b is not open from inside an agent container as configured (measured).** The
-   probe above timed out at `10.0.2.1:21128` while the control opened; the cause is the
-   rootless daemon's `--disable-host-loopback` (rootlesskit v3.1.0 source, cited above).
-   Harbor 0.24.0 ships no host-gateway handling (`host.docker.internal` appears only in a
-   comment, `antigravity_base_url.py:24`); it offers `extra_docker_compose` for user compose
-   overrides (`models/trial/config.py:219`) and `extra_allowed_hosts`, which is a network
-   allowlist (`trial/network_policy.py:76`, `113`). Options, none applied: `terminus-2`
-   with `--ak api_base=` (the model client runs in the Harbor process on the host; source
-   read, no live check yet), or exposing the gateway on an address the container network
-   reaches, which changes host configuration and is the CC's call.
+1. **Route b is not open from inside an agent container as configured.** The timeout is
+   measured: the probe above timed out at `10.0.2.1:21128` while the control opened. The
+   cause is read from source, not tested: the rootless daemon's `--disable-host-loopback`
+   (rootlesskit v3.1.0 source, cited above), which was not toggled because it is host
+   configuration. Harbor 0.24.0 ships no host-gateway handling (`host.docker.internal`
+   appears only in a comment, `antigravity_base_url.py:24`); it offers `extra_docker_compose`
+   for user compose overrides (`models/trial/config.py:219`) and `extra_allowed_hosts`, which
+   is a network allowlist (`trial/network_policy.py:76`, `113`). Options, none applied:
+   `terminus-2` with `--ak api_base=` (the model client runs in the Harbor process on the
+   host; source-read, not live-tested), or exposing the gateway on an address the container
+   network reaches, which changes host configuration and is the CC's call.
 2. Route b's live check also waits for Codex pool capacity, and the wire format (Responses
    versus chat completions) is a property of each CLI, not of Harbor.
 3. Agent CLI versions are unpinned (table above). A run pin needs `--ak version=` for each
@@ -334,6 +434,22 @@ on the `job=` field of the run-metadata line (no key material).
    opt-in (`codex.py:1628-1656`); deerflow forwards a fixed list of host keys
    (`deerflow.py:38-57`). Job directories stay private (0 gitleaks findings here).
 9. The upstream acceptance command was not run (see Context).
+10. Follow-up, not done here: the 2026-09-20 architecture-wave row for Harbor
+    (`catalogs/convergence-practice/architecture-wave/harbor-framework__harbor.json`,
+    disposition `defer-install`) still reads as recorded. It is a dated, hash-listed ledger
+    entry bound to the v0.23.0 review by `source-review.json`, and a search of `scripts/`,
+    `tools/` and `blueprints/` found no generator that writes it, so this change leaves it
+    intact. The supersession below exists as this record's prose only until the owner of that
+    catalog adds a superseding record or pointer.
+11. The `terminus-2` gateway route has no live check. It is the only host-side model client
+    found among the nine adapters read; the other 36 registered adapters were not read for
+    where their model client runs.
+12. Restart, replay, retry, refusal and cleanup acceptance through Harbor's own interfaces
+    is not established. Harbor ships `harbor jobs resume -p <job-dir>` (`cli/jobs.py:2294`),
+    `--max-retries` (`:542`), `--resume-trajectory` (`:635`) and `harbor jobs regrade`
+    (`:2803`); none was exercised, so interrupted-job resume and retry behavior is unknown,
+    and the saturation audit marks the restart stage not established rather than not
+    applicable. Persistence and recovery stay unestablished and uninstall unexercised.
 
 ## Registration
 
@@ -345,6 +461,35 @@ hand.
   `freshness_propose.register_receipt` and `files[]` through `host_receipts.register_file`.
   Before registration `scripts/validate.py` failed with `evidence file is not hash-listed`
   (`scripts/validate.py:528`).
+- **Architecture grants (GPT read of 1f5413b6, P2).** The Architecture reader authorizes every
+  `receipts[]` path and every hash-listed `.json` under `evidence/receipts/` or `evidence/hosts/`
+  before enrichment (`tools/local-pages/architecture_evidence.py:193-197`), and it follows the `.json`
+  evidence pointers that landscape rows cite (`_safe_path`, `:161-162`). A new receipt, and the earlier
+  receipt the candidate now cites, therefore each need an exact `architecture_receipt` grant in
+  `tools/local-pages/source_policy.json`; without them hosted `validate-shard-7` failed
+  (`test_committed_catalog_set_builds_through_the_committed_policy`: no independent approval for
+  `architecture_receipt`) and every Architecture refresh would stop. The committed grants are pinned
+  to an independently reviewed union at `c945ea1f` (4648 paths) by
+  `tests/test_local_pages_policy_grants.py`, and no `receipts[]` entry had been added since that pin
+  (239 then and now), so these are the first post-pin grants. The change adds the two exact paths to the
+  policy and to an explicit ledger in that test (`POST_PIN_RECEIPT_GRANTS`): the committed list must equal
+  the reviewed union plus exactly those paths, a mutation test refuses a missing, extra, replaced or
+  duplicate entry, and each path must be a registered, unprotected, non-frozen JSON path outside the
+  reviewed union. Unlisted paths stay refused; there is no wildcard and no grant derived from the
+  evidence manifest. The fail-first regression is the existing committed-catalog test: rc 1 before the
+  grants (one failure), OK after; the full local-pages family and the policy and boundary modules were
+  rerun on the committed tree.
+- **Digests of private bytes (GPT read, P1).** See "Custody of the run originals". The receipt published
+  ten digests of unpublished run output, a transcript and home-state snapshots, plus a duplicate of the
+  freeze digest in this record; all are removed and no prefix of them survives in the tree or the pull
+  request text (prefix audit: 0 occurrences). The fail-first regression is
+  `tests/test_provenance_digest_custody.py` (13 tests): before the fix it reported 14 unresolved
+  `provenance` digests in this receipt, after it none. It rejects a `provenance` digest that hashes no
+  repository file; 12 older receipts carry the shape and are frozen by count (44 entries).
+- **Published artifacts.** Four sanitized files under `evidence/artifacts/harbor-smoke-20261012/`, hash-listed:
+  the resolved-distribution list, the probe's output and script (`.txt` suffix), and a byte-identical copy of
+  the public rootlesskit file at the cited tag (`upstream/gvisortapvsock.go.txt`, so Go tooling does not
+  treat it as source).
 - **Component.** `manifests/stack.json`: new `harbor` component in profile `optional`
   (membership added; commands `harbor --version` and `harbor run --help`; evidence id the
   receipt), because the receipt's `component_ids` is `["harbor"]` and a receipt record
@@ -372,23 +517,31 @@ hand.
   `build_ecosystem.py` wrote no tracked change (the explorer `docs/ecosystem/index.html` is
   gitignored). Older prose citations of `stack.json` lines in earlier decision records and
   evidence artifacts name older snapshots of that file and are left as recorded.
-- **Landscape candidate: a deviation, for the CC to rule on.** `landscape.py:1326` requires
+- **Landscape candidate (CC ruling, 2026-10-12: it stays).** `landscape.py:1326` requires
   every selected stack component to appear as a candidate in some layer, else "selected
   component lacks a current role explanation". Hindsight (#854) was already a candidate
   before it joined the stack; Harbor was not. This change adds one hand-written candidate,
-  `Harbor` (disposition `conditional`, evidence kind `native_execution`, the receipt as its
-  reference), to the `quality-evaluation` layer in `catalogs/landscape/foundation.json`,
-  following the slot this repository already recorded for Harbor
-  (`foundation/quality-evaluation/trajectory-analysis`,
-  `evidence/artifacts/harbor-0240-currency-20261009/receipt.json`). It changes no verdict
-  field: the local run of the verdict review gate
-  (`python3 scripts/verdict_review_gate.py --root . --base 2f59d744`) reports 0 changed rows
+  `Harbor` (disposition `conditional`, evidence kind `mixed`), to the `quality-evaluation`
+  layer in `catalogs/landscape/foundation.json`. That layer already carries Harbor in a
+  different role: the 2026-10-09 receipt records it as the trajectory-analysis companion
+  (slot `foundation/quality-evaluation/trajectory-analysis`). The new row records the
+  parallel-runtime harness role and does not qualify the companion role. The row cites two
+  receipts: the 2026-10-09 currency receipt
+  (`evidence/artifacts/harbor-0240-currency-20261009/receipt.json`: release, tag, wheel digest
+  and install route checked without installing) as the prior evidence it rests on, and this
+  change's receipt (`evidence/receipts/harbor-smoke-20261012.json`: native execution), which
+  is why the evidence kind is `mixed`, the label this layer already uses for rows that rest on
+  both source-level records and native results. The
+  CC ruled that the candidate stays as a recorded addition on that prior evidence, and that
+  the landscape sweep owns confirming or superseding it next. It changes no verdict field:
+  the local run of the verdict review gate
+  (`python3 scripts/verdict_review_gate.py --root . --base 489b2632`) reports 0 changed rows
   and 0 violations, and `tools/sota-convergence/build_verdicts.py --check` passes. The usual
   route (a sweep adds the candidate, then the stack follows) was not run; this record does
   not claim the layer was reopened.
 
-`python3 scripts/validate.py` exits 0 on this change (71 components, 240 receipts, 11,801
-hashed files; the base `2f59d744` has 70, 239 and 11,800). The sixteen steps of the
+`python3 scripts/validate.py` exits 0 on this change (71 components, 240 receipts, 11,821
+hashed files; the base `489b2632` has 70, 239 and 11,816). The sixteen steps of the
 pull-request validation sequence in `.github/workflows/validate.yml` (shard 0), plus the
 verdict review gate, pass locally.
 
@@ -396,14 +549,17 @@ verdict review gate, pass locally.
 
 1. Adopt Harbor 0.24.0 (`uv tool install --no-build harbor==0.24.0`, wheel SHA256 above) as
    the container harness for parallel runtime work, in one owned tool scope (open question 7).
-2. Operating rules, each measured above: redirect `HOME`, `TMPDIR`, `DOCKER_HOST` and set
-   `HARBOR_TELEMETRY=off` on every invocation; absolute `--jobs-dir`; local `--path` tasks;
-   `-y` for unattended runs; key per command through the credential runner; an oracle dry
-   run (no spend) before any live trial on a new task or image; `--ak version=` on every run
-   that must be reproducible; record both the wheel SHA256 and the mirror head.
-3. Route policy: gateway routes in the comparison use `terminus-2` with `--ak api_base=`;
-   container adapters use route a only until a measured route exists. The Docker daemon and
-   its rootlesskit flags stay unchanged.
+2. Operating rules. Measured here (every run was made this way): redirecting `HOME`, `TMPDIR`
+   and `DOCKER_HOST`, `HARBOR_TELEMETRY=off`, an absolute `--jobs-dir`, a local `--path`
+   task, `-y`, a key injected per command through the credential runner, and an oracle dry
+   run (no spend) ahead of the live trial. Proposed prerequisites, not measured here: pin the
+   agent CLI with `--ak version=<x>` on every run that must be reproducible (the `version`
+   option is in the adapter schema, but no pinned run was made), record both the wheel SHA256
+   and the mirror head, and accept Harbor's own restart, replay, retry, refusal and cleanup
+   interfaces before the frozen worker comparison (open question 12).
+3. Route policy: gateway routes in the comparison use `terminus-2` with `--ak api_base=`
+   (source-read, not live-tested); container adapters use route a only until a measured
+   route exists. The Docker daemon and its rootlesskit flags stay unchanged.
 4. Claim scope: install plus one claude-code trial of one trivial task on the Anthropic
    route, and one route-b probe. Route b for container adapters is measured not open;
    seven of the eight named adapters stay source-read until their live checks run.
@@ -411,7 +567,12 @@ verdict review gate, pass locally.
 CC rulings of 2026-10-12 folded in above: the environment shim is accepted as a disclosed,
 scratch-only isolation measure (HOME, DOCKER_HOST and TMPDIR; no Harbor logic; never
 committed; disclosure kept in the receipt); `HARBOR_TELEMETRY=off` is standing for every
-Harbor run; route b follows the policy in item 3 and was measured with the single probe.
+Harbor run; route b follows the policy in item 3 and was measured with the single probe, whose
+result the CC accepted (route a only for container adapters; gateway routes through
+`terminus-2` with `--ak api_base=`, source-read and not live-tested); the Harbor landscape candidate stays as a recorded
+addition on prior evidence (see "Registration"), with the landscape sweep owning its
+confirmation or supersession. The saturation audit's generated `g5_catalog_reconciliation`
+counts still read 70 selected components; the CC ruled that a follow-up outside this change.
 
 ## Supersession
 
@@ -419,13 +580,16 @@ On this host, for the install step and one end-to-end run, this measured record 
 the 2026-09-20 `defer-install` disposition and the 2026-10-09 profile statement that the
 entry is unprovisioned and unrun. It confirms the profile's pin (0.24.0 wheel, same SHA256)
 and does not supersede the profile's remaining gaps (upstream acceptance command, destination
-acceptance, provider benchmarks).
+acceptance, provider benchmarks). The supersession is recorded here and in the pull request;
+the 2026-09-20 row itself is not edited (open question 10).
 
 ## Inverse
 
-Revert this change's single commit: it removes this record, the receipt, the `files[]` and
-`receipts[]` entries in `manifests/evidence.json`, the `harbor` component and its profile
-membership in `manifests/stack.json`, and the regenerated derived files. Outside the
+Revert this change (the pull request lands as one squash commit): it removes this record, the
+receipt and the four published artifacts, the `files[]` and `receipts[]` entries in
+`manifests/evidence.json`, the `harbor` component and its profile membership in
+`manifests/stack.json`, the two exact Architecture grants with their ledger and README
+sentence, the custody test, and the regenerated derived files. Outside the
 repository, the only effects are the private install and scratch tree: remove the install
 with `UV_TOOL_DIR=/var/tmp/cc-harbor-tmp/uv-tools UV_TOOL_BIN_DIR=/var/tmp/cc-harbor-tmp/bin
 uv tool uninstall harbor`, then delete `/var/tmp/cc-harbor-tmp` by literal path. The

@@ -1,0 +1,8 @@
+start_utc=2026-10-12T18:03:31Z
+image_present=1
+listen_address_of_gateway_port=127.0.0.1:21128
+container_default_gateway_hex=010011AC
+control_virtual_gateway_dns target=10.0.2.1:53 rc=0 elapsed_ms=7 msg=none
+probe_local_gateway_port target=10.0.2.1:21128 rc=124 elapsed_ms=5004 msg=none
+docker_run_exit=0
+end_utc=2026-10-12T18:03:37Z
