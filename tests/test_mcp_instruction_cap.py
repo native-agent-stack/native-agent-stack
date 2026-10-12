@@ -192,6 +192,36 @@ class RecordTests(unittest.TestCase):
             for found in re.finditer(KNOB + r'"?\s*[:=]\s*"?(\d+)', text):
                 self.assertGreaterEqual(int(found.group(1)), whole, f"{path.relative_to(ROOT)} sets {KNOB} below the measured block")
 
+    def test_the_audit_group_is_retained_and_says_what_the_record_says_it_said(self):
+        """Review of #1052 at f17cb3a0 (P2): the audit artifact the record cites must be in the repository."""
+        retained = json.loads((MEASUREMENT.parent / "audit-group-CPA-V-06.json").read_text(encoding="utf-8"))
+        self.assertEqual(retained["group"]["id"], "CPA-V-06")
+        self.assertRegex(retained["source"]["sha256"], r"^[0-9a-f]{64}$")
+        self.assertIn(retained["source"]["sha256"], self.record)
+        claims = {c["claim"]: c for c in retained["group"]["claims"]}
+        block = claims["The block is 4,122 characters"]
+        self.assertEqual(block["status"], "not re-checked")
+        self.assertIn(f"{self.data['audit_claim']['block_characters']:,}", block["claim"])
+        self.assertIn("audit-group-CPA-V-06.json", self.record)
+
+    def test_the_record_names_the_layer_inputs_it_consumed_and_they_are_still_what_the_catalogs_say(self):
+        """Review of #1052 at f17cb3a0 (P1): AGENTS.md asks for the resolution protocol's inputs before a comparison; the record names them, and this fails when a catalog moves under it."""
+        foundation = json.loads((ROOT / "catalogs" / "landscape" / "foundation.json").read_text(encoding="utf-8"))
+        layer = next(entry for entry in foundation["layers"] if entry["layer_id"] == "durable-memory")
+        self.assertEqual((layer["decision"], layer["verdict_status"], layer["checked_at"]), ("keep_but_compare", "recorded", "2026-09-22"))
+        waves = (ROOT / "catalogs" / "sota-convergence" / "layer-verdict-waves.json").read_text(encoding="utf-8")
+        self.assertNotIn("durable-memory", waves, "a wave now names the layer: read it and update the record's protocol section")
+        ledger = json.loads((ROOT / "catalogs" / "saturation" / "ledger.json").read_text(encoding="utf-8"))
+        covering = sorted(((sweep["date"], sweep["sweep_id"], entry) for sweep in ledger["sweeps"] for entry in sweep.get("layers", [])
+                           if (entry["catalog"], entry["layer_id"]) == ("foundation", "durable-memory") and sweep.get("status") == "completed"), key=lambda row: row[:2])
+        date, sweep_id, entry = covering[-1]
+        self.assertEqual(sweep_id, "landscape-sweep-20260929", "a later sweep covers the layer: read its survivors and update the record")
+        for survivor in entry["survived"]:
+            self.assertIn(survivor["repo"].replace("https://github.com/", ""), self.record)
+        self.assertEqual(len(entry["reopen"]), 5)
+        for needle in ("keep_but_compare", sweep_id, "no wave", "bounded delta", "adjudicates none"):
+            self.assertIn(needle, self.record.replace("No wave", "no wave").replace("Bounded delta", "bounded delta"), needle)
+
     def test_the_tool_is_named_where_the_record_says_it_is(self):
         self.assertTrue((ROOT / "tools" / "adoption" / "mcp_instructions_length.py").is_file())
         self.assertIn("tools/adoption/mcp_instructions_length.py", self.record)

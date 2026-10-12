@@ -18967,8 +18967,8 @@
     },
     {
       "path": "docs/decisions/2026-10-12-mcp-instruction-cap.md",
-      "sha256": "05ba8f79bb696837b91aed7ae38a9b8bdf66d23fb1abe5427a8618299a966f77",
-      "bytes": 7437
+      "sha256": "233d366997fd45b8b3aa8ce801675e64e64a4a3404ffb95c80d94ab71fe74e57",
+      "bytes": 9485
     },
     {
       "path": "docs/decisions/2026-10-12-mcp-template-live-reconciliation.md",
@@ -39634,6 +39634,11 @@
       "path": "evidence/artifacts/mcp-instruction-cap-20261012/README.md",
       "sha256": "c2fc07747c12f695d8b710b478258ad1a79cad0786b75024e1d752fe0ca4d475",
       "bytes": 974
+    },
+    {
+      "path": "evidence/artifacts/mcp-instruction-cap-20261012/audit-group-CPA-V-06.json",
+      "sha256": "4b9d75b015f124b0189c33261833764f45db6bbba684b8309d2cd56a4341e5ad",
+      "bytes": 3018
     },
     {
       "path": "evidence/artifacts/mcp-instruction-cap-20261012/measurement.json",
@@ -62427,8 +62432,8 @@
     },
     {
       "path": "tests/test_mcp_instruction_cap.py",
-      "sha256": "396456541b77d51ac83c607da58d7916464fd9c79b0554f6e7ae6a609cb84403",
-      "bytes": 10917
+      "sha256": "77e11c0c8c6b2c06415e514d445bf8e78102b35cbdabd5f1918d3124cea86d1c",
+      "bytes": 13679
     },
     {
       "path": "tests/test_mcp_template_drift.py",

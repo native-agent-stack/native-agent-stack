@@ -15,6 +15,19 @@ measured: it is 17,724 characters, the part that must reach the model is 1,987, 
   follows' marker must stay self-contained and within that cap", and the test `handshake_core_survives_common_instruction_truncation` (L8087-L8112) fails the build when the marker is past character 2,048 or the core
   omits a required sentence (session-aware and static clients, untrusted history, no routine notes, broadening, the SessionStart handoff).
 
+## Resolution protocol ([2026-10-11-layer-resolution-protocol.md](2026-10-11-layer-resolution-protocol.md))
+
+This record touches the durable-memory layer only through its incumbent's configuration: the instruction text ai-memory serves and the client's cap on it. It adds no candidate, compares none and reopens nothing. Consumed before
+writing it:
+
+- **Verdict:** `catalogs/landscape/foundation.json`, layer `durable-memory`: decision `keep_but_compare`, `verdict_status` recorded, layer `checked_at` 2026-09-22; `winners[0]` is ai-memory pinned 2.3.2 there, and the host runs 2.6.3
+  (the measurement below is of the running server).
+- **Wave:** no wave of `catalogs/sota-convergence/layer-verdict-waves.json` names this layer, which is an explicit gap and not an input. The test below fails if one appears, so the record is revisited then.
+- **Latest sweep covering the layer:** `landscape-sweep-20260929` (completed 2026-09-29; `catalogs/sota-convergence/manifest-20260929.json`, `evidence/artifacts/landscape-sweep-20260929/returns.json`; ledger head sha256 prefix
+  `ec575b95c0558750` when read). Its survivors for the layer are `vshulcz/deja-vu`, `vectorize-io/hindsight`, `rohitg00/agentmemory`, `mempalace/mempalace` and `tigerless-labs/agent-memory`; its `reopen[]` holds five `pin_moved`
+  receipt-staleness triggers. All of them are carried forward as that sweep left them: this record adjudicates none.
+- **Bounded delta:** fill the named evidence gap. The audit's figure for the incumbent's instruction block was marked "not re-checked"; the measurement replaces it. Nothing about which memory system is the layer's choice changes.
+
 ## Measurement (2026-10-12T20:21:29Z)
 
 `python3 tools/adoption/mcp_instructions_length.py http://127.0.0.1:<ai-memory port>/mcp --cap 4096 --marker "--- Detailed tool routing follows. ---" --json`: one `initialize` request, no tool listed or called, the text
@@ -30,7 +43,7 @@ neither printed nor stored. The first host's ai-memory is 2.6.3 (`ai-memory --ve
 | What a cut at 4,096 keeps | the whole core and the first bullets: `memory_query`, `memory_recent` and `memory_status` cut inside its line |
 | The server's tool descriptions (`tools/list`, lengths only) | 23 tools, 20,381 characters in all, median 902, largest 1,905 (`memory_write_page`): none reaches the cap, so none is cut |
 
-The figures are in `evidence/artifacts/mcp-instruction-cap-20261012/measurement.json`; the `tools/list` figures come from `tools_list_lengths.py` beside it, which prints names and lengths only. The audit's 4,122 characters is not the live server's length; it matches neither the core nor the whole text.
+The figures are in `evidence/artifacts/mcp-instruction-cap-20261012/measurement.json` and the audit's group is retained there as `audit-group-CPA-V-06.json`; the `tools/list` figures come from `tools_list_lengths.py` beside it, which prints names and lengths only. The audit's 4,122 characters is not the live server's length; it matches neither the core nor the whole text.
 
 ## Decision
 
@@ -67,5 +80,6 @@ and the stdio servers of the profile are not reached by it); a future ai-memory 
 - `anthropics/claude-code@3deb873687379f0c199a69fdaccc65f0865f7a29` `CHANGELOG.md` L65 (2.1.296: default 2,048 to 4,096 characters) and L1522 (2.1.280: `CLAUDE_CODE_MAX_MCP_DESCRIPTION_LENGTH`).
 - `akitaonrails/ai-memory@89bd8ded3c1ab8b769cf99417d038ed0364403c8` `crates/ai-memory-mcp/src/server.rs` L169-L172 (the design comment and the constant) and L8087-L8112 (the core test). The mirror is at the 2.6.0 line and the
   host runs 2.6.3; the measurement above is of the running 2.6.3, whose marker is at character 1,987, under the 2,048 the test pins.
-- The converged practice audit, group CPA-V-06 (`research/claude-practice-audit-converged-20261012/converged.json`, sha256 prefix `18a731a5`), and the command center's ruling of 2026-10-12T13:38:12Z.
-- `docs/decisions/2026-09-29-max-default-effort.md` (the knob left as the user's decision), `docs/decisions/2026-10-08-philosophy-only-rules.md` (what the instruction files carry).
+- The converged practice audit, group CPA-V-06, retained verbatim in `evidence/artifacts/mcp-instruction-cap-20261012/audit-group-CPA-V-06.json` (the full `converged.json`, sha256 `18a731a5c9fb46f43345e1c9e6e948d0c649d8ed6769f6bb586e17247294fdba`, stays in the
+  private research record), and the command center's ruling of 2026-10-12T13:38:12Z that accepted the converged set as the work queue (a coordination record, cited by name and time).
+- `docs/decisions/2026-09-29-max-default-effort.md` (the knob left as the user's decision), `docs/decisions/2026-10-08-philosophy-only-rules.md` (what the instruction files carry), `docs/decisions/2026-10-11-layer-resolution-protocol.md` (the inputs consumed above).
