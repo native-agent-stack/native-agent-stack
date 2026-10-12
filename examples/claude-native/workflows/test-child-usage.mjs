@@ -198,7 +198,7 @@ try {
   expect('item 6: the same run with a real answer is complete and the cli exits 0', summarizeRun(answeredDir).status === 'complete' && cli(answeredDir, '--require-effort', 'max') === 0)
   // A call the runtime re-ran under the same journal key (a Workflow pauses at a usage limit and re-runs its waiting
   // agents after the reset): the attempt that returned nothing is superseded, not lost, and its usage still counts.
-  const limitRow = { type: 'assistant', isApiErrorMessage: true, effort: 'max', message: { id: 'syn1', model: '<synthetic>', usage: { input_tokens: 0, output_tokens: 0, cache_read_input_tokens: 0, cache_creation_input_tokens: 0 } } }
+  const limitRow = { type: 'assistant', isApiErrorMessage: true, error: 'rate_limit', message: { id: 'syn1', model: '<synthetic>', usage: { input_tokens: 0, output_tokens: 0, cache_read_input_tokens: 0, cache_creation_input_tokens: 0 } } }
   const rerun = join(dir, 'rerun'); mkdirSync(rerun)
   writeFileSync(join(rerun, 'journal.jsonl'), [{ type: 'launched' }, { ...started, key: 'v2:k1' }, { ...started, agentId: 'a3', label: 'review', key: 'v2:k2' },
     { ...started, agentId: 'a2', key: 'v2:k1' }, { type: 'result', agentId: 'a2', result: { ok: true } }, { type: 'result', agentId: 'a3', result: { ok: true } }].map((e) => JSON.stringify(e)).join('\n') + '\n')

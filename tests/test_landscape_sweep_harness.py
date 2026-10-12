@@ -4068,6 +4068,46 @@ class ConvertTests(unittest.TestCase):
                     self.assertEqual(done.stdout, "")
                     self.assertFalse((work / "out").exists())
 
+    def test_cli_refuses_native_decoded_identity_plants_before_publication(self):
+        from urllib.parse import quote
+        email = "review-fixture" + "@" + "example.org"
+        account = "review-fixture-account"
+        plants = {
+            "percent_email": quote(email, safe=""),
+            "base64_email": base64.b64encode(email.encode()).decode(),
+            "double_account": base64.b64encode(quote(account, safe="").replace("-", "%2D").encode()).decode(),
+        }
+        with mock.patch.dict(os.environ, {"NATIVE_AGENT_HOST_NAMES_JSON": json.dumps([account])}):
+            for kind, plant in plants.items():
+                with self.subTest(kind=kind):
+                    work = temp_dir(self)
+                    res = healthy_result()
+                    res["first"][0]["claude_discover"]["notes"] = "reference " + plant
+                    done = self.cli(work, res)
+                    self.assertEqual(done.returncode, 3, kind)
+                    self.assertIn("native publication scan found private content", done.stderr)
+                    self.assertEqual(done.stdout, "")
+                    self.assertFalse((work / "out").exists())
+                    self.assertNotIn(plant, done.stderr)
+
+    def test_cli_native_publication_refuses_unavailable_scanner_and_oversized_record(self):
+        for kind in ("unavailable", "oversized"):
+            with self.subTest(kind=kind), mock.patch.dict(os.environ, {
+                    "NATIVE_AGENT_HOST_NAMES_JSON": json.dumps(["scan-fixture-account"])}):
+                work = temp_dir(self)
+                res = healthy_result()
+                if kind == "oversized":
+                    res["first"][0]["claude_discover"]["notes"] = "x" * 26000
+                    done = self.cli(work, res)
+                else:
+                    with mock.patch.dict(os.environ, {"PATH": str(work / "no-binaries")}):
+                        done = self.cli(work, res)
+                self.assertEqual(done.returncode, 3, kind)
+                expected = "entry too large" if kind == "oversized" else "scanner unavailable"
+                self.assertIn(expected, done.stderr)
+                self.assertEqual(done.stdout, "")
+                self.assertFalse((work / "out").exists())
+
     def test_cli_keeps_unknown_effort_uncovered_through_supersession(self):
         for condition in ("unknown_terminal", "unmeasured_terminal", "empty_original"):
             with self.subTest(condition=condition):
@@ -5129,7 +5169,7 @@ class UsageRecordTests(unittest.TestCase):
             rows = [{"type": "assistant", "effort": "max", "message": {"id": f"m-{agent}", "model": "claude-opus-5-5",
                                                                        "usage": dict(zero, output_tokens=5)}}]
             if agent == "r0":
-                rows.append({"type": "assistant", "isApiErrorMessage": True, "effort": "max",
+                rows.append({"type": "assistant", "isApiErrorMessage": True, "error": "rate_limit",
                              "message": {"id": "limit", "model": "<synthetic>", "usage": zero}})
             (transcripts / f"agent-{agent}.meta.json").write_text(json.dumps({"model": "opus"}), encoding="utf-8")
             (transcripts / f"agent-{agent}.jsonl").write_text("".join(json.dumps(r) + "\n" for r in rows), encoding="utf-8")

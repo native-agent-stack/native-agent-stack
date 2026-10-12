@@ -3319,10 +3319,13 @@ export function summarizeChild(started, result, meta, transcript, transcriptFoun
   const usageByModel = {}
   for (const m of new Set(messages.map((r) => r.message.model || '(unresolved)'))) usageByModel[m] = sum(messages.filter((r) => (r.message.model || '(unresolved)') === m))
   const resolved = [...new Set(messages.map((r) => r.message.model).filter(Boolean))]
-  const efforts = [...new Set(messages.map((r) => r.effort).filter(Boolean))]
+  // The pinned adapter's real-message predicate excludes client-built <synthetic> rows.
+  // Keep their zero usage and issues in the retained transcript, but they are not provider requests.
+  const real = messages.filter((r) => r.message.model && r.message.model !== SYNTHETIC)
+  const efforts = [...new Set(real.map((r) => r.effort).filter(Boolean))]
   // The effort set omits absent values. Count them over the same deduplicated provider requests so
   // a nonempty set cannot be mistaken for affirmative measurement of every request.
-  const unknownEffortRequests = messages.filter((r) => typeof r.effort !== 'string' || !r.effort.trim()).length
+  const unknownEffortRequests = real.filter((r) => typeof r.effort !== 'string' || !r.effort.trim()).length
   const requested = meta && typeof meta.model === 'string' && meta.model ? meta.model : null
   const issues = []
   // Usage-integrity failures: provider usage that by_resolved_model cannot count or attribute. They are issues of any
@@ -3350,7 +3353,6 @@ export function summarizeChild(started, result, meta, transcript, transcriptFoun
   // Classifier fallback (model-config doc, "Automatic model fallback"): after a flagged request the
   // child continues on the fallback model, so a change of resolved model within the child, or a model
   // older than the alias's documented resolution for the entry's client version, is a substitution.
-  const real = messages.filter((r) => r.message.model && r.message.model !== SYNTHETIC)
   const runs = real.map((r) => r.message.model).filter((m, i, all) => i === 0 || m !== all[i - 1])
   if (runs.length > 1) issues.push('resolved model changed within the child: ' + runs.join(' -> '))
   if (requested) {
@@ -3365,7 +3367,7 @@ export function summarizeChild(started, result, meta, transcript, transcriptFoun
     agent_id: started.agentId, label: started.label ?? null, phase: started.phase ?? null,
     agent_type: meta ? meta.agentType ?? null : null,
     requested_model: requested, resolved_models: resolved, efforts, web_search: webSearch(transcript),
-    requests: messages.length, unknown_effort_requests: unknownEffortRequests, usage, usage_by_model: usageByModel,
+    requests: real.length, unknown_effort_requests: unknownEffortRequests, usage, usage_by_model: usageByModel,
     // Provider-returned cache read on the first request: evidence that the shared
     // prefix was served from cache for this child. Zero is not proof of a miss policy.
     first_request_cache_read: messages.length ? messages[0].message.usage.cache_read_input_tokens || 0 : null,

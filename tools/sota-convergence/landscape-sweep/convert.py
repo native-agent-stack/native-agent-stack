@@ -55,6 +55,9 @@ Both key collisions and any residue matching the selected checkout's PRIVATE_CON
 checking decoded documents and their exact emitted JSON text, including the summary (ensure_ascii=False),
 before --out is created or updated and before any summary is printed. Findings name the kind and a locator;
 matching keys use document-order indices, and collision locators use only indices, never key text.
+The #1007 native publication scanner also checks unchanged JSON records through Betterleaks 1.9.0's
+stdin decoder and email/host-name rules before writes. Encoded identities, an oversized entry or an
+unavailable scanner refuse without printing native diagnostics or the candidate text.
 The required regression loads scripts/validate.py's landed encoded home path rule by name, checking decoded
 and serialized output; another CLI fixture checks --repo-root selection without mocking the validator.
 Integrity: with --work-dir, every GPT-6 output is compared with the file Codex wrote (gpt6/<job>/last.json). Exit 4
@@ -85,6 +88,11 @@ from sweep_common import (REPO_ROOT, RedactionKeyCollision, canon, deviation_rou
                           ledger_module, load_json, pointer_token, private_content, private_findings,
                           rewrite_strings, sanitize, slug)
 from usage_record import measured_at_required_effort, superseded_at_required_effort  # noqa: E402
+# Native executable identity comes from the source checkout, independently of
+# a selected data-root's path-redaction context (which can be a synthetic profile).
+NATIVE_SCAN_ROOT = REPO_ROOT
+sys.path.insert(0, str(NATIVE_SCAN_ROOT / "scripts"))
+import host_name_scan  # noqa: E402
 
 # The Claude judgment roles all run on Opus (sweep.js WORKER, adoption/agents/claude/landscape-sweep-worker.md): the
 # facts refuter verifies, and the global model rule keeps Sonnet for command wrappers and mechanical extraction.
@@ -813,6 +821,44 @@ def main(argv=None) -> int:
         print("refusing to publish: possible private content (no artifacts written; text not shown):", file=sys.stderr)
         for pointer, kind in findings:
             print(f"  {pointer}: {kind}", file=sys.stderr)
+        return EXIT_PRIVATE
+    # #1007's native publication path at c2dee173 uses Betterleaks 1.9.0
+    # (81aff7a6 cmd/stdin.go:47-49, sources/stdin.go:18-25) per unchanged entry.
+    # Reuse its decoder and email/name rules for every record value AND dict key;
+    # do not add a second decoder. Native output/diagnostics never reach publication.
+    if not all(hasattr(host_name_scan, name) for name in ("PUBLICATION_ENTRY_LIMIT", "PublicationEntryTooLarge")):
+        print("refusing to publish: native publication scanner unavailable (no artifacts written)", file=sys.stderr)
+        return EXIT_PRIVATE
+    try:
+        entries = []
+        for name, document in documents.items():
+            complete = document if isinstance(document, dict) else {name: document}
+            text = json.dumps(complete, ensure_ascii=True)
+            # A complete small document is already one native publication entry.
+            # Larger documents use complete structural records, never byte cuts.
+            if len(text.encode("utf-8")) < host_name_scan.PUBLICATION_ENTRY_LIMIT:
+                entries.append((Path(f"{name}.json"), text))
+                continue
+            for key, value in complete.items():
+                if isinstance(value, dict):
+                    records = ({key: {identity: record}} for identity, record in value.items())
+                elif isinstance(value, list):
+                    records = ({key: record} for record in value)
+                else:
+                    records = ({key: value},)
+                entries.extend((Path(f"{name}.json"), json.dumps(record, ensure_ascii=True))
+                               for record in records)
+        native_findings = host_name_scan._scan_entries(
+            entries, root=NATIVE_SCAN_ROOT, names=host_name_scan.host_names(NATIVE_SCAN_ROOT), reject_email=True)
+    except host_name_scan.PublicationEntryTooLarge:
+        print("refusing to publish: native publication entry too large (no artifacts written)", file=sys.stderr)
+        return EXIT_PRIVATE
+    except (host_name_scan.HostNameScanError, OSError, TypeError, AttributeError):
+        print("refusing to publish: native publication scanner unavailable (no artifacts written)", file=sys.stderr)
+        return EXIT_PRIVATE
+    if native_findings:
+        print("refusing to publish: native publication scan found private content (no artifacts written; "
+              "text not shown)", file=sys.stderr)
         return EXIT_PRIVATE
     args.out.mkdir(parents=True, exist_ok=True)
     for name, text in emitted.items():

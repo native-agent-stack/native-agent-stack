@@ -274,3 +274,39 @@ include all42 selected copy-check dependencies. This is a retained-run integrati
 catalog/ledger publication. The earlier245-line journal prefix is captured unchanged from the final journal and
 rehashes exactly to the historically cited849ee994 digest; the earlier effort-gate and original red/green logs
 are attached as well. Private capture manifests distinguish exact originals from masked transport copies.
+
+## 2026-10-12 correction: synthetic session-limit rows and native publication scan
+
+The CC's addendum-01 to ruling-995-unknown-efforts-20261011 corrects the premise
+of the eight historical “unknown effort” rows above. They are client-built
+`<synthetic>` session-limit rows (`rate_limit`, zero tokens, no effort field),
+not provider-served requests without measurements. Their retained historical
+hashes/results remain intact. The earlier eight-failure/seven-reopen conversion
+is an observation of the superseded gate, not the corrected gate's outcome.
+
+The adapter now applies its maintained `real` predicate from
+child-usage.mjs at 8c32a84b:3350 to request count, effort set and unknown-effort
+count. It retains synthetic usage/issue provenance. The two existing rerun
+fixtures now use the actual synthetic row without an effort field: both fail
+with the held adapter and pass with this correction. Actual unknown provider
+efforts remain refused; an effort set alone still cannot establish coverage.
+No native journal, historical receipt or model counter is rewritten here.
+
+The workflow checksum file is regenerated in its own relative-path form;
+validate.yml's byte-identity command fails before and passes after.
+
+The publication path now reuses #1007's native scanner at c2dee173, rather
+than adding decoders. Installed Betterleaks reports 1.9.0; its pinned source
+is `81aff7a638638aae3a659845d089043e1d8fe9ac`, with supported stdin in
+`cmd/stdin.go:47–49` and `sources/stdin.go:18–25`. Native email/name rules and
+`--max-decode-depth 5` cover percent/base64 forms in emitted record keys and
+values. Every candidate goes through the shared scanner before output creation
+or summary print. Native diagnostics and candidate values stay private.
+The shared scanner's oversized-entry and unavailable-scanner refusals remain
+in force. Tests build encoded identities at runtime from synthetic example.org
+and made-up account fixtures; no real identity is used or encoded into a test.
+
+This ONE correction requires the native publication API landed in #1007;
+integration checks use that exact source. Its leased push waits for #1025 to
+land and the registry-only rebase onto the relayed main. The final branch's
+validator, publication scans and required CI checks must pass before acceptance.

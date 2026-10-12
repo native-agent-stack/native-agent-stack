@@ -687,7 +687,10 @@ post-run proof has been independently accepted. The proof's `supersessionPairs` 
 child identities and the exact native journal (both started and result keys, labels and order). Each explicit
 replacement chain must end at a complete measured max-only child. A completed mixed-effort intermediate stays
 retained and requires its own proved edge to that terminal; cycles and ambiguous same-label terminals refuse.
-The adapter reports `unknown_effort_requests` over the same deduplicated usage-bearing requests as `requests`.
+The adapter reports `unknown_effort_requests` over the same deduplicated real provider requests as `requests`.
+The maintained adapter's `real` predicate (child-usage.mjs at 8c32a84b:3350) excludes client-built
+`<synthetic>` session-limit rows, including a zero-token `rate_limit` row with no effort field. Those
+rows keep their usage/issue provenance, but count as neither a provider request nor an unknown effort.
 Coverage requires an affirmative zero unknown count and a nonzero request count at the terminal; a nonempty
 `efforts` set alone proves neither. Completed originals with absent/empty effort measurements or unknown
 requests refuse. Earlier receipts without the new count must be remeasured from retained transcripts with
@@ -695,6 +698,12 @@ this checkout's supported adapter; do not fill the count manually. An interrupte
 zero requests and zero unknowns has no request effort to lose. Other unmeasured attempts remain uncovered,
 retained and reopened by conversion and the result builder. URL-decoded string values and keys are also
 checked for private identifiers before any artifact write or summary print; encoded residual UUIDs refuse.
+The converter also reuses #1007's native per-entry publication path in `scripts/host_name_scan.py`
+at c2dee173: Betterleaks 1.9.0 (`81aff7a638638aae3a659845d089043e1d8fe9ac`,
+`cmd/stdin.go:47–49`, `sources/stdin.go:18–25`) supplies its decoder and email/name rules.
+Percent-encoded and base64 identities are checked in values and keys of all emitted records, including
+the printed summary. No encoded candidate or native diagnostic is printed; a match, oversized record
+or unavailable native scanner refuses before creating or changing output. No new decoder is added.
 Repeated completed labels alone never select a winner. The record
 retains every original under `superseded_attempts`, every aggregate counter, raw exit/hash, and transformation
 provenance with proof, contract, journal and processor hashes. A malformed or unbound proof, non-max replacement

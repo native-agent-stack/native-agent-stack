@@ -18862,8 +18862,8 @@
     },
     {
       "path": "docs/decisions/2026-10-11-landscape-postrun-accounting.md",
-      "sha256": "842487c6135bf2d227f2afd6655d53845453c5139bf9aca5bf84cf18c6296a21",
-      "bytes": 23410
+      "sha256": "b723a1b0cbaea6e5aa5a1a6cd53017986dd3ea5104f3dadcb061a8ac0ff170dc",
+      "bytes": 25710
     },
     {
       "path": "docs/decisions/2026-10-11-layer-resolution-protocol.md",
@@ -60002,7 +60002,7 @@
     },
     {
       "path": "examples/claude-native/workflows/SHA256SUMS",
-      "sha256": "d287061d1002fe87906ab671161ddc83795b29daad7c7c600cac4ccf5e83b3b7",
+      "sha256": "c2891d254108c5a3f8e0bc82582cb241c171d1a66b9af00c3b0c5216708539b3",
       "bytes": 1217
     },
     {
@@ -60012,8 +60012,8 @@
     },
     {
       "path": "examples/claude-native/workflows/child-usage.mjs",
-      "sha256": "e8659b58ab0813a840695f2ac9d9e413705585497ba4c470dc692e675dc5e9e5",
-      "bytes": 264947
+      "sha256": "45bbb40028b029766c783d4dbc58409ca6695e23c505e07bac844834a8934aa3",
+      "bytes": 265126
     },
     {
       "path": "examples/claude-native/workflows/codex-cross-review.mjs",
@@ -60042,8 +60042,8 @@
     },
     {
       "path": "examples/claude-native/workflows/test-child-usage.mjs",
-      "sha256": "8e3d5968a00da638cd47eb168a5a53859e54bd18ae56800a791e9c3aa61049dc",
-      "bytes": 118651
+      "sha256": "a5a8fcee90f9e86cfc7954a3dfcbc53607fb9dbd8336211911b9c6bf782143f4",
+      "bytes": 118657
     },
     {
       "path": "examples/claude-native/workflows/test-codex-envelope.mjs",
@@ -61992,8 +61992,8 @@
     },
     {
       "path": "tests/test_landscape_sweep_harness.py",
-      "sha256": "7a92a56228508783a172ebcfa200078e3ee803d5bfd241440ea7c10479e5995a",
-      "bytes": 388558
+      "sha256": "d380b1afe13ec9d5aeb587459dd8ebbc5834af1c0bd96027ffe3aaae8a9df7ef",
+      "bytes": 390818
     },
     {
       "path": "tests/test_landscape_sweep_skills.py",
@@ -63232,8 +63232,8 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/README.md",
-      "sha256": "ea15ee42ff7c94241ea1597a8f7ce0fc9a88ccd26bda367cf252d94d9d1bf7e5",
-      "bytes": 117215
+      "sha256": "be51772ba7358381ba696786810f3848d83f2353b7dcfee04f1ee9b80fc1d0fc",
+      "bytes": 118092
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/build_args.py",
@@ -63257,8 +63257,8 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/convert.py",
-      "sha256": "133f458fef507ddbe9237b4ccca259365718ecd4970dc7117a79eb3f951c145a",
-      "bytes": 56700
+      "sha256": "6450ce60c95924777cb3f41fa4c4392570c5d0d06630442167829227c110f47c",
+      "bytes": 59717
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/make_prompt.py",
