@@ -5146,8 +5146,8 @@
     },
     {
       "path": ".github/workflows/pr-metadata.yml",
-      "sha256": "02f41fba2f5a56370fd0ac55b01dc1bcf9cd158b70a2beb59ef29b664beda1f7",
-      "bytes": 21150
+      "sha256": "4a7181a091c858e1578fdc4e85260a03d2a37096dd1e4beb6b92045dbbd6bbac",
+      "bytes": 21152
     },
     {
       "path": ".github/workflows/practice-references-freshness.yml",
@@ -5186,8 +5186,8 @@
     },
     {
       "path": ".github/workflows/sota-sources-gate.yml",
-      "sha256": "74af8529f29fab9de33e69c4868c8de34ce733870b673c9ccd06e7c40f675a86",
-      "bytes": 14243
+      "sha256": "f9dcc13867df6591092c3fbba7d4b1141d4bdc46e4277119c184143b85e95cc7",
+      "bytes": 14245
     },
     {
       "path": ".github/workflows/supply-chain.yml",

@@ -169,8 +169,8 @@ jobs:
             });
             // The body is judged before it is parsed: a non-text, malformed or overlong one fails with a fixed rule id and is
             // not read further. Tabs and line breaks pass, a line break being a paragraph separator (Bidi_Class B: LF,
-            // CR, U+001C to U+001E and U+0085); #1003's mirror, tools/sota-sources/verify_sources.py, counts the last four
-            // as section content, since its JS_TRIM leaves them. Every other C0 and C1 control is refused. The rules also
+            // CR, U+001C to U+001E and U+0085); #1003's mirror of this check, in the sota-sources tool, counts the last
+            // four as section content, since its JS_TRIM leaves them. Every other C0 and C1 control is refused. The rules also
             // read a projection without them (below), so an admitted character cannot split a value.
             // The length bound is the gate's own, in code points. GitHub's REST update keeps a description of
             // at most 262,144 UTF-8 bytes (measured 2026-10-11), so no stored one reaches it; one here has carried 75,726 (#786).
