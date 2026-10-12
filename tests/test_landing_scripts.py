@@ -21,7 +21,8 @@ This module is that harness's offline subset, kept beside the one copy of the sc
     of which may print what gh or its API returned;
   * #1027: the squash body's publication scan: SQUASH_BODY_FILE is copied to a private snapshot, which squash_body_scan.py (home paths
     of every form, names, addresses, token shapes) and validate.py --scan-file scan, and which the merge is given; a match, a missing
-    or failing scanner and a file that changes after the scan end as the README says, and squash_body_scan.py itself is tested;
+    or failing scanner and a file that changes after the scan end as the README says, and squash_body_scan.py itself is tested; round 2
+    adds quoted and prefixed local parts and addresses before a unit type, each read first by CPython's RFC 5322 parser, the oracle;
   * the files under tools/landing: no home path and no form of an identity that must not appear, which is the running account (a
     generic CI account may stand as a bare word) and every name in LANDING_PROHIBITED_NAMES, none skipped for its length (#975 P2-1),
     and the README's digests.
@@ -53,6 +54,7 @@ import sys
 import tempfile
 import unittest
 import urllib.parse
+from email import _header_value_parser, errors as email_errors
 from pathlib import Path
 from unittest import mock
 
@@ -438,6 +440,34 @@ def betterleaks_pinned():
         return False
     done = subprocess.run([binary, "version"], capture_output=True, text=True, env={}, timeout=60)
     return done.returncode == 0 and done.stdout.strip() in (host_name_scan.PIN, "betterleaks version " + host_name_scan.PIN)
+
+
+def rfc5322(text):
+    """The RFC 5322 oracle of #1027 round 2 (the CC's adjudication at e203d014: one oracle for this email class, the parser Astra ran):
+    CPython's reading of an addr-spec, Lib/email/_header_value_parser.py get_addr_spec (:1682-1696 at v3.13.16, cbc944f4bc59; quoted strings
+    :1235-1275 and :1315-1331, local parts :1486-1575), as installed. (local part, domain, the class names of its defects) when it reads text
+    whole as one addr-spec, else None. For every text these tests give it, its answer is the same on CPython 3.12.3 (CI's), 3.13.16 and
+    3.14.4 (measured 2026-10-12)."""
+    try:
+        spec, rest = _header_value_parser.get_addr_spec(text)
+    except email_errors.HeaderParseError:
+        return None
+    if rest or spec.domain is None:
+        return None
+    return spec.local_part, spec.domain, tuple(type(defect).__name__ for defect in spec.all_defects)
+
+
+def round_2_allows(local, domain):
+    """The allowances of the CC's rulings of 2026-10-12 and of #1027 round 2, on an address as the oracle reads it, lower-cased: GitHub's
+    no-reply domain, a local part of exactly noreply or no-reply, the one vendor trailer address, and a unit instance <name>@<instance>.<type>
+    of service, timer, socket, path or mount (no longer target) whose <name>@<instance> does not have the repository's address shape
+    (scripts/host_name_scan.py:164: a domain that ends in a dot and two letters or more), the whole address compared."""
+    if domain == "users.noreply.github.com" or local in ("noreply", "no-reply") or (local, domain) == ("codex", "openai.com"):
+        return True
+    instance, _, kind = domain.rpartition(".")
+    unit = re.compile(r"[A-Za-z0-9:_.-]+")
+    return (kind in ("service", "timer", "socket", "path", "mount") and bool(unit.fullmatch(local)) and bool(unit.fullmatch(instance))
+            and re.match(r"[\w.-]+\.[A-Za-z]{2,}", instance) is None)
 
 
 def name_patterns(name):
@@ -3207,11 +3237,12 @@ class EndToEndTests(LandingCase):
                 self.assertNotIn("own name", out)
 
     def test_a_squash_body_with_a_systemd_unit_instance_lands_and_a_look_alike_does_not(self):
-        # #1027, the CC's ruling of 2026-10-12: <name>@<instance>.<type> with a type of service, timer, socket, target, path or mount is a
-        # unit instance (systemd/systemd man/systemd.unit.xml:121-136), not an address. At d6be1b02 the scripts read no body at all; the
-        # first scan of this change refused these. The look-alikes are still addresses, and a provider address is the control.
+        # #1027, the CC's ruling of 2026-10-12: <name>@<instance>.<type> with a type of service, timer, socket, path or mount is a unit
+        # instance (systemd/systemd man/systemd.unit.xml:121-136), not an address; the ruling named target too, which round 2 dropped (a
+        # top-level domain). At d6be1b02 the scripts read no body at all; the first scan of this change refused these. The look-alikes are
+        # still addresses, and a provider address is the control.
         units = ("getty@tty1.service", "serial-getty@ttyS0.service", "user@1000.service", "app@one.socket", "app@dev-sda1.timer",
-                 "fsck@dev.target", "watch@some.path", "mnt@data.mount")
+                 "watch" + "@some.path", "mnt" + "@data.mount")
         for script in (self.uet, self.nas):
             with self.subTest(script=script.key, body="unit instances"):
                 text = self.SQUASH_CLEAN + "\nThe units " + ", ".join(units) + " were restarted.\n"
@@ -3223,6 +3254,7 @@ class EndToEndTests(LandingCase):
             "a unit type that is not in the ruling": "ask person@host.device\n",
             "a local part that no unit name has": "ask jane+x@host.service\n",
             "a unit suffix inside a longer domain": "ask person@tty1.service.example.invalid\n",
+            "a target instance, which round 2 no longer keeps": "ask fsck" + "@dev.target\n",
         }.items()})
 
     def test_a_squash_body_with_a_vendor_co_author_trailer_lands_and_a_provider_address_does_not(self):
@@ -3242,6 +3274,120 @@ class EndToEndTests(LandingCase):
             "the vendor's local part at another domain": "Co-authored-by: Codex <codex@openai.com.example.invalid>\n",
             "a longer local part": "Co-authored-by: Codex <xcodex@openai.com>\n",
         }.items()})
+
+    # #1027 round 2 (the CC's adjudication at e203d014): both families landed an address through both real scanners, and each refusal below
+    # landed at e203d014 (exit 0, one merge call) but the percent-encoded quoted form, whose raw text was refused. Astra's P1s: a quoted
+    # local part ("x"@<provider>, RFC 5322 3.4.1) matched no address shape, and the vendor allowance stripped every leading non-word
+    # character, so +codex@<vendor> was compared as the vendor's address. Claude's B1: <local>@<provider>.com followed by a unit type had a
+    # unit instance's shape, for all six types, and .target is a top-level domain. Each case runs through both scripts with the canned
+    # `validate.py --scan-file` answer and, where Betterleaks is at its pin, with the real scan as well: validate.py has no address rule, so
+    # the refusal is squash_body_scan.py's. The oracle (rfc5322) reads every address first. Addresses other than no-reply ones are built
+    # from parts when the test runs, as the module's payloads are, unit names included.
+    ROUND_2_PERSON, ROUND_2_PROVIDER, ROUND_2_VENDOR = "zq" + "probe", "gm" + "ail.com", "codex" + "@" + "openai.com"
+
+    def scan_modes(self):
+        """How `validate.py --scan-file` answers: its canned clean line, and the real scan where Betterleaks is at host_name_scan.py's pin."""
+        modes = [("the canned validate.py answer", {})]
+        if betterleaks_pinned():
+            modes.append(("the real validate.py --scan-file", {"FAKE_VALIDATE_SCAN_PYTHON": sys.executable, "HOME": os.environ["HOME"]}))
+        return modes
+
+    def refused_by_both_scans(self, forms):
+        """Each form, {label: (text, the part of it that must not be printed)}, is refused by both scripts in each scan mode: exit 2, the
+        fixed line, no gh or git call and no snapshot left."""
+        for mode, real in self.scan_modes():
+            for script in (self.uet, self.nas):
+                for label, (text, secret) in forms.items():
+                    with self.subTest(script=script.key, form=label, scan=mode):
+                        code, out, log, tmp = self.land_squash(script, self.squash_body(self.SQUASH_CLEAN + text), **real)
+                        self.assert_squash_stopped(self.SQUASH_REFUSED, code, out, log, tmp, secrets=(secret,))
+
+    def test_a_quoted_local_part_is_refused_by_both_scripts_as_its_unquoted_form_is(self):
+        # Astra's P1 1 at e203d014: `Contact "x"@<provider>` landed through both real scanners in both scripts. The oracle reads the quoted
+        # form as the same address as the unquoted one, with no defect (RFC 5322 3.2.4: "quoted-string is identical to atom, semantically").
+        person, provider = self.ROUND_2_PERSON, self.ROUND_2_PROVIDER
+        quoted = {"a quoted local part": f'"{person}"@{provider}', "one with a space": f'"zq {person}"@{provider}',
+                  "one with a quoted pair": '"zq\\"' + person + f'"@{provider}', "an empty one": f'""@{provider}'}
+        self.assertEqual(rfc5322(quoted["a quoted local part"]), (person, provider, ()))
+        self.assertEqual(rfc5322(quoted["a quoted local part"])[:2], rfc5322(f"{person}@{provider}")[:2])
+        for label, spec in quoted.items():
+            with self.subTest(oracle=label):
+                self.assertEqual(rfc5322(spec)[1:], (provider, ()), "the oracle reads an address at the provider, with no defect")
+        self.assertEqual(rfc5322(f'zq."{person}"@{provider}'), (f"zq.{person}", provider, ("ObsoleteHeaderDefect",)))
+        self.refused_by_both_scans({
+            **{label: (f"Contact {spec}\n", provider) for label, spec in quoted.items()},
+            "in a trailer": (f'Signed-off-by: A Person <"{person}"@{provider}>\n', person),
+            "in a code span": (f'see `"{person}"@{provider}`\n', person),
+            "an obsolete local part, a quoted word after a dot": (f'ask zq."{person}"@{provider}\n', person),
+            "percent-encoded": (f"ask %22{person}%22@{provider}\n", person),
+        })
+
+    def test_a_vendor_or_no_reply_local_part_behind_a_prefix_is_refused_by_both_scripts(self):
+        # Astra's P1 2 at e203d014: the vendor's trailer with `+codex` for its local part landed through both real scanners in both scripts.
+        # The allowances compare the whole address; markup is outside it only when it wraps it. The oracle keeps the prefix in the local part.
+        vendor = self.ROUND_2_VENDOR
+        self.assertEqual(rfc5322("+" + vendor), ("+codex", "openai.com", ()))
+        self.assertEqual(rfc5322("!" + vendor), ("!codex", "openai.com", ()))
+        self.assertEqual(rfc5322("`" + vendor), ("`codex", "openai.com", ()), "a backtick that does not close is part of the local part")
+        self.assertEqual(rfc5322('"+codex"@openai.com'), ("+codex", "openai.com", ()))
+        self.assertEqual(rfc5322("+noreply@" + "example.invalid"), ("+noreply", "example.invalid", ()))
+        self.refused_by_both_scans({
+            "a plus in front of the vendor's local part": (f"Co-authored-by: Codex <+{vendor}>\n", "+codex"),
+            "a bang in front of it": (f"Co-authored-by: Codex <!{vendor}>\n", "!codex"),
+            "in prose": (f"ask +{vendor} today\n", "+codex"),
+            "inside a code span": (f"see `+{vendor}`\n", "+codex"),
+            "a quoted vendor local part with a plus": ('Co-authored-by: Codex <"+codex"@openai.com>\n', "+codex"),
+            "a backtick that does not close": (f"see `{vendor} today\n", "openai"),
+            "a plus in front of noreply": ("ask +noreply@" + "example.invalid\n", "example.invalid"),
+            "a bang in front of no-reply": ("ask !no-reply@" + "example.invalid\n", "example.invalid"),
+        })
+
+    def test_an_address_before_a_unit_type_and_an_address_at_target_are_refused_by_both_scripts(self):
+        # Claude's B1 at e203d014: `Restarted <address>.<type> after the merge.` landed in both scripts for each of the six types (12 of 12
+        # runs), and an address at <x>.target passed as a target instance. A unit is kept only when <name>@<instance> is no address, and
+        # target is no longer a kept type. The oracle reads each as an address, and <name>@<instance> too.
+        person, provider = self.ROUND_2_PERSON, self.ROUND_2_PROVIDER
+        target = "person" + "@" + "corp" + ".target"
+        self.assertEqual(rfc5322(f"{person}@{provider}"), (person, provider, ()))
+        self.assertEqual(rfc5322(target), ("person", "corp.target", ()))
+        forms = {f"an address before .{kind}": f"Restarted {person}@{provider}.{kind} after the merge.\n"
+                 for kind in ("service", "timer", "socket", "target", "path", "mount")}
+        for kind in ("service", "timer", "socket", "target", "path", "mount"):
+            with self.subTest(oracle=kind):
+                self.assertEqual(rfc5322(f"{person}@{provider}.{kind}"), (person, f"{provider}.{kind}", ()))
+        self.refused_by_both_scans({
+            **{label: (text, person) for label, text in forms.items()},
+            "an address before a unit type, in a code span": (f"see `{person}@{provider}.service`\n", person),
+            "an address with more after its domain, before a unit type": (f"Restarted {person}@{provider}-x.service\n", person),
+            "a quoted local part before a unit type": (f'Restarted "{person}"@{provider}.service\n', person),
+            "an address at .target": (f"ask {target}\n", "corp"),
+            "a target instance": ("ask fsck" + "@dev.target\n", "fsck"),
+        })
+
+    def test_the_vendor_trailer_the_no_reply_forms_and_unit_instances_still_land_through_both_scripts(self):
+        # #1027 round 2's controls: the exact vendor trailer, the no-reply forms, real unit instances and markup that wraps an allowed address
+        # land, with exit 0 and one merge call, in each scan mode. A rule that refused every address would fail here.
+        controls = {
+            "the exact vendor trailer": f"Co-authored-by: Codex <{self.ROUND_2_VENDOR}>",
+            "the vendor's no-reply trailer": "Co-authored-by: Codex <noreply@openai.com>",
+            "GitHub's ID+USERNAME no-reply form": f"Signed-off-by: A Person <{NOREPLY}>",
+            "GitHub's USERNAME no-reply form": "Signed-off-by: A Person <seathatflowsinourveins@users.noreply.github.com>",
+            "a no-reply local part": "Reply to no-reply@example.invalid.",
+            "unit instances": "Restarted getty" + "@tty1.service and user" + "@1000.service after the merge.",
+            "the vendor address in a code span, a no-reply one in bold": f"see `{self.ROUND_2_VENDOR}` and **noreply@anthropic.com**",
+        }
+        for spec, expected in ((self.ROUND_2_VENDOR, ("codex", "openai.com", ())), ("getty" + "@tty1.service", ("getty", "tty1.service", ())),
+                               ("user" + "@1000.service", ("user", "1000.service", ())), (NOREPLY, (NOREPLY.split("@")[0], "users.noreply.github.com", ()))):
+            with self.subTest(oracle=spec):
+                self.assertEqual(rfc5322(spec), expected)
+                self.assertTrue(round_2_allows(*expected[:2]))
+        for mode, real in self.scan_modes():
+            for script in (self.uet, self.nas):
+                for label, text in controls.items():
+                    with self.subTest(script=script.key, control=label, scan=mode):
+                        code, out, log, tmp = self.land_squash(script, self.squash_body(f"{self.SQUASH_CLEAN}{text}\n"), **real)
+                        self.assertEqual((code, len(self.merge_calls(log))), (0, 1), out)
+                        self.assertEqual(sorted(tmp.glob("squash-body-*")), [], "the snapshot is removed when the script exits")
 
     def test_a_squash_body_is_not_landed_when_a_scanner_or_the_names_file_is_missing_or_fails(self):
         # #1027, fail closed: a missing or failing scanner, an answer that is not a scan's own clean line (a scanner that exits 0 and prints
@@ -3484,6 +3630,14 @@ class SquashBodyScanTests(unittest.TestCase):
                    "noreply.person@example.invalid", "x'noreply@example.invalid", "person@users.noreply.github.com.example.invalid",
                    "pérson@exämple.invalid", "`person@example.invalid`", "**person@example.invalid**", "'person@example.invalid'",
                    "`xnoreply@anthropic.com`", "`x'noreply@example.invalid`")
+        # #1027 round 2 (Astra's P1s at e203d014): a quoted local part is the address its unquoted form is (RFC 5322 3.2.4), alone, with a
+        # space, a quoted pair or nothing in it, or mixed with atoms; markup that wraps an address is no part of it, and any other character
+        # in front of a no-reply local part is
+        passing += ("\"noreply\"@anthropic.com", "<\"no-reply\"@example.invalid>", "`**noreply@anthropic.com**`", "see `@AGENTS.md`.")
+        refused += ("\"person\"@example.invalid", "\"pers on\"@example.invalid", "\"per\\\"son\"@example.invalid", "\"\"@example.invalid",
+                    "zq.\"person\"@example.invalid", "\"zq\".person@example.invalid", "x\"person\"@example.invalid", "\"no reply\"@example.invalid",
+                    "+noreply@example.invalid", "!no-reply@example.invalid", "`noreply@example.invalid x", "`+noreply@example.invalid`",
+                    "noreply.@example.invalid", "\"x\"noreply@example.invalid")
         for text in passing:
             with self.subTest(passing=text):
                 self.assertIsNone(self.refusal(text))
@@ -3492,12 +3646,20 @@ class SquashBodyScanTests(unittest.TestCase):
                 self.assertEqual(self.refusal(text), "email other than a no-reply address (line 1)")
 
     def test_systemd_unit_instances_are_not_addresses_and_their_look_alikes_are(self):
-        # the CC's ruling of 2026-10-12: <name>@<instance>.<type>, the type one of six, with the characters a unit name has
+        # the CC's ruling of 2026-10-12: <name>@<instance>.<type>, the type one of six, with the characters a unit name has; since #1027
+        # round 2 (Claude's B1 at e203d014) one of five, target dropped, and only when <name>@<instance> is no address
         passing = ("getty@tty1.service", "serial-getty@ttyS0.service", "user@1000.service", "app@one.socket", "app@dev-sda1.timer",
-                   "fsck@dev.target", "watch@some.path", "mnt@data.mount", "a.b-c_d@e.f-g.service", "GETTY@TTY1.SERVICE", "(getty@tty1.service)")
+                   "watch" + "@some.path", "mnt" + "@data.mount", "a.b-c_d" + "@e.f-g.service", "GETTY" + "@TTY1.SERVICE", "(getty" + "@tty1.service)",
+                   "`getty" + "@tty1.service`.", "app" + "@one.c.socket")  # a dotted instance whose last label is one letter is no domain
         refused = ("person@service.com", "person@host.device", "person@host.automount", "person@host.swap", "person@host.slice", "person@host.scope",
                    "jane+x@host.service", "jane'x@host.service", "pérson@tty1.service", "person@tty1.service.example.invalid",
                    "person@tty1.servic", "person@tty1.services")
+        # Claude's B1 at e203d014: an address before each of the six types, quoted, wrapped or with more after its domain, and the target
+        # instances, now refused (each built from parts, as the module's payloads are)
+        refused += ("fsck" + "@dev.target", "person" + "@corp.target",
+                    *(f"person@example.invalid.{kind}" for kind in ("service", "timer", "socket", "target", "path", "mount")),
+                    "person" + "@example.invalid-x.service", "\"person\"@example.invalid.service", "`person" + "@example.invalid.mount`",
+                    "a:b" + "@example.invalid.service", "\"a:b\"@example.invalid.service")
         for text in passing:
             with self.subTest(passing=text):
                 self.assertIsNone(self.refusal(text))
@@ -3510,13 +3672,53 @@ class SquashBodyScanTests(unittest.TestCase):
         table = self.module.VENDOR_TRAILER_ADDRESSES
         self.assertEqual(sorted(table), ["codex@openai.com"])
         self.assertTrue(all(source.startswith("openai/codex@") for source in table.values()))
+        # #1027 round 2 (Astra's P1 2 at e203d014): the whole address is compared. Markup that wraps it is no part of it, and a quoted local
+        # part is its unquoted form; a character in front that does not wrap it (+, !, a backtick that does not close) makes another
+        # address, as do more characters after the domain, and so does a quoted word glued to an atom (the oracle reads it with a defect).
+        vendor = "codex" + "@openai.com"
+        round_2_passing = (f"**{vendor}**", f"'{vendor}'", f"`{vendor}`.", '"codex"' + "@openai.com")
+        round_2_refused = (f"+{vendor}", f"!{vendor}", f"<+{vendor}>", f"`+{vendor}`", f"**!{vendor}**", '"+codex"' + "@openai.com", f"`{vendor} x",
+                           f"{vendor}-x", f"{vendor}`s", f'"x"{vendor}', '"code"x' + "@openai.com", "codex." + "@openai.com")
         for text in ("Co-authored-by: Codex <codex@openai.com>", "co-authored-by: codex <CODEX@OPENAI.COM>", "Co-authored-by: Codex <noreply@openai.com>"):
+            with self.subTest(passing=text):
+                self.assertIsNone(self.refusal(text))
+        for text in round_2_passing:
             with self.subTest(passing=text):
                 self.assertIsNone(self.refusal(text))
         for text in ("someone@openai.com", "xcodex@openai.com", "codex@openai.com.example.invalid", "codex@mail.openai.com", "codex@openai.org",
                      "fictional.person" + "@gmail.com", "codex+1@openai.com"):
             with self.subTest(refused=text):
                 self.assertEqual(self.refusal(text), "email other than a no-reply address (line 1)")
+        for text in round_2_refused:
+            with self.subTest(refused=text):
+                self.assertEqual(self.refusal(text), "email other than a no-reply address (line 1)")
+
+    def test_each_address_is_judged_as_the_rfc_5322_oracle_reads_it_and_markup_counts_only_when_it_wraps_it(self):
+        # #1027 round 2 (the CC's adjudication at e203d014, rule 4: one RFC 5322 oracle for this email class): every local part here, quoted,
+        # obsolete or with a prefix, at every domain, in prose, in a trailer's brackets and wrapped in markup. The oracle (rfc5322) reads the
+        # address; the scan must pass it exactly when the allowances pass the whole address as the oracle reads it, with no defect
+        # (round_2_allows). Markup that wraps the address is outside it; a mark in front that does not close is part of the local part, as
+        # the oracle reads it. At e203d014 the quoted forms, the prefixed vendor and no-reply forms and the provider addresses before a unit
+        # type passed, and so did each target instance.
+        person, provider = "zq" + "probe", "gm" + "ail.com"
+        local_parts = ("codex", "CODEX", "+codex", "!codex", '"codex"', '"+codex"', '"co\\dex"', "noreply", "+noreply", '"noreply"', '"no reply"',
+                       "no-reply", "x.noreply", person, f'"{person}"', f'"zq {person}"', '"zq\\"q"', '""', f'zq."{person}"', f'"zq".{person}',
+                       "getty", "user", "fsck", "a.b-c_d")
+        domains = ("openai.com", "OpenAI.com", "anthropic.com", provider, "users.noreply.github.com", "tty1.service", "1000.service", "e.f-g.timer",
+                   "dev.target", "corp.target", "host.device", *(f"{provider}.{kind}" for kind in ("service", "timer", "socket", "target", "path", "mount")))
+        wrapped = ("see {} today", "Co-authored-by: Someone <{}>", "see `{}` today", "see **{}** today", "see '{}' today", "see `**{}**`.")
+        unclosed = ("see `{} today", "see *{} today", "see '{} today")  # the mark is part of the local part, as the oracle reads it
+        refused = "email other than a no-reply address (line 1)"
+        for local in local_parts:
+            for domain in domains:
+                spec = f"{local}@{domain}"
+                shown = spec.replace(provider, "<provider>").replace(person, "<person>")
+                for form in wrapped + unclosed:
+                    read = rfc5322(form[form.index("{") - 1] + spec if form in unclosed else spec)
+                    with self.subTest(address=shown, form=form):
+                        self.assertIsNotNone(read, "the oracle reads the address whole")
+                        allowed = not read[2] and round_2_allows(read[0].lower(), read[1].lower())
+                        self.assertEqual(self.refusal(form.format(spec)), None if allowed else refused)
 
     def test_a_name_equal_to_the_hosts_own_name_is_counted_and_never_refused(self):
         # the CC's ruling of 2026-10-12: compared when the scan runs, without regard to case; every other name still refuses
