@@ -95,3 +95,21 @@
 # the default all-refs acceptance command reach 0 findings without editing
 # .gitleaks.toml (owned by another PR) or that sibling branch.
 34fc51beaf24114fe266f73b2e36ae8176c8a521:tests/test_lane_packets.py:generic-api-key:255
+
+# C1: the same fourteen reviewed narrative locations are emitted under the
+# reaching merge when --diff-merges=first-parent is enabled. Exact merge
+# bindings preserve detection at these locations in any different commit.
+9b7a67b98eea708af7b495037c01b3f8f327d558:evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:sourcegraph-access-token:338
+9b7a67b98eea708af7b495037c01b3f8f327d558:evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:sourcegraph-access-token:424
+9b7a67b98eea708af7b495037c01b3f8f327d558:evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:sourcegraph-access-token:462
+9b7a67b98eea708af7b495037c01b3f8f327d558:evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:sourcegraph-access-token:468
+9b7a67b98eea708af7b495037c01b3f8f327d558:evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:sourcegraph-access-token:525
+9b7a67b98eea708af7b495037c01b3f8f327d558:evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:sourcegraph-access-token:682
+9b7a67b98eea708af7b495037c01b3f8f327d558:evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:sourcegraph-access-token:1439
+9b7a67b98eea708af7b495037c01b3f8f327d558:evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:sourcegraph-access-token:1445
+9b7a67b98eea708af7b495037c01b3f8f327d558:evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:sourcegraph-access-token:2567
+9b7a67b98eea708af7b495037c01b3f8f327d558:evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:sourcegraph-access-token:2915
+9b7a67b98eea708af7b495037c01b3f8f327d558:evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json:sourcegraph-access-token:2950
+9b7a67b98eea708af7b495037c01b3f8f327d558:evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json:sourcegraph-access-token:9360
+9b7a67b98eea708af7b495037c01b3f8f327d558:evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json:sourcegraph-access-token:10815
+9b7a67b98eea708af7b495037c01b3f8f327d558:evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json:sourcegraph-access-token:10890

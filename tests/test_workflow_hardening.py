@@ -1636,7 +1636,9 @@ class CiSecretScanWorkflowRangeTests(unittest.TestCase):
                 command = shlex.split(re.sub(r"\\\n\s*", " ", resolver["run"]))
                 self.assertEqual(command, ["python3", "scripts/ci_secret_scan_range.py",
                                            "--event-name", "$GITHUB_EVENT_NAME",
-                                           "--event-path", "$GITHUB_EVENT_PATH", "--ci-backstop", ">>", "$GITHUB_OUTPUT"],
+                                           "--event-path", "$GITHUB_EVENT_PATH", "--ci-backstop",
+                                           "--ignore-output", "$RUNNER_TEMP/" + ("gitleaks" if job_id == "secret-scan" else "betterleaks") + "-merge-ignore",
+                                           ">>", "$GITHUB_OUTPUT"],
                                  "the verified CLI outputs must become the scanner step outputs")
                 checkout = next(step for step in steps if step.get("uses", "").startswith("actions/checkout@"))
                 self.assertEqual(str(checkout["with"]["fetch-depth"]), "0")
@@ -1928,7 +1930,8 @@ class BetterleaksTrialJobTests(unittest.TestCase):
             # 1.8.1 opens them to depth 8 (cmd/root.go line 103); an ignore-file path always loads the
             # reviewed fingerprints (cmd/root.go lines 450-455).
             self.assertIn("--max-archive-depth 0", scan)
-            self.assertIn("--gitleaks-ignore-path .gitleaksignore", scan)
+            self.assertTrue('--gitleaks-ignore-path .gitleaksignore' in scan or
+                            '--gitleaks-ignore-path "${SCAN_IGNORE_PATH:-.gitleaksignore}"' in scan)
         self.assertNotIn("--validation", self.job)
         self.assertNotIn("--experiments", self.job)
 

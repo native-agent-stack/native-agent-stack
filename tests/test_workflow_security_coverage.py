@@ -44,6 +44,7 @@ class NewWorkflowSecurityCoverageTests(unittest.TestCase):
         actual = {path.name for path in WORKFLOWS_DIR.glob("*.yml")}
         expected = {
             "validate.yml",
+            "secret-scan-history.yml",
             "token-report.yml",
             "catalog-freshness.yml",
             "supply-chain.yml",

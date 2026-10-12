@@ -53,8 +53,9 @@ The Actions allow-list below was checked against live settings and pinned source
   [`docs/lanes.md`](lanes.md#hot-file-protocol).
 - **Secrets.** The required `secret-scan` job runs gitleaks 8.30.1 over a verified PR-owned history range or the
   normal push's `--diff-merges=first-parent <before>..<after>` range, plus the working tree and allowlist regression
-  tests. Every parent history is traversed and merge patches are included. All-zero, unavailable or nonancestor push `before` fails closed. Manually dispatched
-  (`workflow_dispatch`) CI backstops scan checked-out `HEAD` ancestry, never all refs; local scans use the PR range only.
+  tests. Every parent history is traversed and merge patches are included. New refs and verified forced rewrites use
+  `merge-base(origin/main, tip)..tip`. A separate history-only workflow scans every branch/tag push and has scheduled/manual
+  CI backstops on checked-out `HEAD` ancestry, never all refs; local scans use the PR range only.
   `secret-scan-betterleaks` runs betterleaks v1.8.1 as a non-required, report-only trial;
   its fixture tests d2, d4 and d5 fail on every run, and its findings appear only as counts. GitHub secret scanning and
   push protection are on; non-provider patterns and validity checks are off.
@@ -493,10 +494,11 @@ merge commit), or `<before>..<after>` for a normal push. Both use
 every parent history. Git's [merge-diff documentation](https://github.com/git/git/blob/67ad42147a7acc2af6074753ebd03d904476118f/Documentation/git-log.adoc#L130)
 explains why plain patch output omits merges. This option formats the diff;
 it does not apply `--first-parent` traversal or `--no-merges` filtering.
-An all-zero, unavailable or nonancestor push `before` fails closed until
-complete coverage can be established; no successful head-only fallback is permitted.
+New refs and verified forced rewrites use the available `origin/main` merge base through the tip.
+Unavailable main, unrelated histories and unverified rewrites fail closed; no successful head-only fallback is permitted.
 
-Manually dispatched (`workflow_dispatch`) backstops are CI-only and use
+The separate [`secret-scan-history.yml`](../.github/workflows/secret-scan-history.yml) listens for every branch/tag push,
+schedule and manual dispatch. Its scheduled/manual backstops are history-only, CI-only and use
 `--log-opts="--diff-merges=first-parent HEAD"`, scanning the checked-out commit's ancestry, never every
 fetched ref. Native Git follows parent links from the supplied commit, as
 [`rev-list-description.adoc`](https://github.com/git/git/blob/6de20f6092dcf9bdb1c8efe03db4b70c82b423dd/Documentation/rev-list-description.adoc#L1)
@@ -894,7 +896,7 @@ unrestricted default was not re-measured in that fix round and is not a
 current finding claim. The coordinator resolved the cross-branch check issue
 on 2026-09-23 by making CI scan `HEAD` ancestry. Since 2026-10-10 PR and normal
 push scans use verified event ranges with merge patches and all parent histories.
-Unverified push boundaries fail closed; only manually dispatched CI backstops retain `HEAD`
+New refs and verified rewrites use the main merge base; scheduled/manual CI backstops retain `HEAD`
 ancestry, never all refs (see above). Local scans use the PR range only and
 go through the guarded `gitleaks` launcher (memory-capped, one scan per user);
 do not raise its limits to retry a failed scan.
