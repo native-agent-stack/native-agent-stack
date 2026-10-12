@@ -18862,8 +18862,8 @@
     },
     {
       "path": "docs/decisions/2026-10-11-email-address-publication-rule.md",
-      "sha256": "3c10ec348392aa6b77e7e1f52d3e371dfa39039550efb93bef211bcddcf4ae84",
-      "bytes": 40567
+      "sha256": "964b87f7cce5ce7381651e06c3899e489681100ca36705724d4a14b0b2a33dff",
+      "bytes": 44057
     },
     {
       "path": "docs/decisions/2026-10-11-final-stack-review-corrections.md",
@@ -60902,8 +60902,8 @@
     },
     {
       "path": "scripts/native_token_ci.py",
-      "sha256": "d58461bfa017fac59ec09fe89b3c202dd7ce8968aa744c383ccd7dac564bce29",
-      "bytes": 138558
+      "sha256": "47ae8d4490e4af136572cf5f54f3a7478b8ff85603ffeb2f631a98f25c467561",
+      "bytes": 141293
     },
     {
       "path": "scripts/new_wsl_profile.py",
@@ -62202,8 +62202,8 @@
     },
     {
       "path": "tests/test_native_token_ci.py",
-      "sha256": "af6f60417417d7742969d43cd39128836aab82ffe4aef6cc5e65802bf009bb4f",
-      "bytes": 165728
+      "sha256": "97e997596b3d3a8bb406c799151a73ec540930ec478dedf2e0bf0a1dd7241d49",
+      "bytes": 170925
     },
     {
       "path": "tests/test_native_worker_fixture.py",

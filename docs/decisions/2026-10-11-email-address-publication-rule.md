@@ -375,8 +375,9 @@ recurrence, so the verifier is one function now, `publication_views()` in `scrip
 - a check it cannot finish raises `Unverifiable`, which both surfaces refuse: escaping still undone after
   `PUBLISH_DEPTH` passes, JSON nested deeper than `PUBLISH_DEPTH` levels, an object with a duplicate name, or JSON too
   deep for Python's decoder (`RecursionError`). An address escaped past the bound is refused in every framing; clean
-  text nested past it is refused in the framings the views read, which a prefix on the same line, a form feed, a
-  vertical tab, U+0085 and U+2028 are not (this said "whatever it holds" until addendum 05);
+  text nested past it is refused in the framings the views read, which a prefix on the same line is not, nor pretty
+  text after a form feed, a vertical tab, U+0085, U+2028 or U+2029 (one-line text after those is read; this said
+  "whatever it holds" until addendum 05);
 - the host-receipt scan judges every view with the reviewed-email waiver applied to each, so JSON held in a string is
   read, and a receipt the views cannot finish is refused.
 
@@ -454,6 +455,41 @@ re-reading; an unterminated string counted at its start; and `decoded()` letting
 and B are unchanged at both heads (0 refused, 17 rewritten by `clean()`), `validate.py` passes over the 239 host
 receipts, and the push gate's advisory counts are unchanged. On the same 1.1 MB inputs one `publish()` takes 2.1 s for
 pretty JSON and 2.3 s for JSON Lines here (1.9 s each at `167eb00a`, run back to back at a load of about 16).
+
+**Addendum 06 (from the GPT read and the command center's Claude read at `171b0811`, both CHANGES_REQUESTED on one
+ground):** addendum 05 said the re-reading bound made the decoding work "bounded by a multiple of its length", which
+both reads measured false (P2, availability). Every failed decode builds a `JSONDecodeError` that counts the line
+breaks from the start of what it decodes (python/cpython@`cbc944f4` `Lib/json/decoder.py:31-32`; the C scanner raises
+through it, `Modules/_json.c:299-312`), and the read across lines decoded the whole piece from each line that ends
+inside a JSON text. So each failure cost its position in the piece: for the pull request's own control, an object dump
+that is not JSON, the decoder was handed 1,250 times the text's length at 60,002 characters and 20,000 times at
+960,002 (9.6 s), and 16,000 short unclosed lines cost 512,000,000 counted characters.
+
+- **The read across lines decodes slices.** Each starts where the text does: the line's rest and 32 characters more
+  (`SLICE`), doubled while the text runs past the slice's end. A decode that fails within 16 characters of the slice's
+  end (`CUT`: a literal, an escape or a surrogate pair cut in two is at most 12), or on an unterminated string
+  (`Modules/_json.c:417`, `:433`), is retried on the doubled slice. Every slice's length, which bounds the decoding
+  and the error's line count in it, counts against `RESCANS`. The decoder is handed 1.92 times the dump's length at
+  every size (0.38 s at 960,002 characters) and 8.75 times the short lines' length, and it was handed 1,251 to 20,001
+  times at `171b0811`.
+- **P3s in this delta's code.** Two refused names in one object no longer collapse into one member: each is kept,
+  numbered after the first, and the report's own names are verified too (the GPT read's P3-3). A document holding
+  `NaN` that `clean()` changes is published cleaned again: its two parses are compared by their JSON, since `NaN`
+  never equals itself (the CC's P3-2). The comment and test text on the unread framings now say "on the same line" and
+  name U+2029 (P3-3). The lone-CR too-deep case uses 100,000 levels, which CPython 3.14 does not decode either (it
+  decodes 57,954; P3-6). Two tests close the CC's P3-5 gaps: a raw string the report holds beside its published form,
+  and a refused string at the report's top level. The surrogate refusal cites RFC 3629 3 (rfc3629.txt:231-234,
+  <https://www.rfc-editor.org/rfc/rfc3629.txt>, read 2026-10-12T16:14:24Z, 33,856 bytes, sha256
+  `a2a3a39457d30420c812f87a38cc2b9194832f6982ef17e619de7d816879d6a6`).
+- **Residuals, now stated.** Behind a lone CR, an RS or a prefix on the same line, a document with an address right
+  after a JSON escape is still published as invalid JSON with the address redacted (`publish()` rewrites only JSON it
+  reads whole or by line feed); no address is published. Both reads list it.
+
+The new tests fail on `171b0811` (4 failures: the decoded length for the dump and the short lines, the numbered names,
+`NaN`) and pass here. 8 of 8 weakened copies fail them (slices not charged, the whole rest decoded, no longer slice
+after a cut, an unterminated string not retried, refused names not numbered, the report's own names kept, NaN compared
+by value, and `publish()` recording its input as verified). Census A and B are unchanged at both heads, and no string
+of the 6 committed receipts `Run` wrote is refused.
 
 ## SOTA sources
 

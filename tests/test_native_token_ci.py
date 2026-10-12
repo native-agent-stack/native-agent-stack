@@ -833,7 +833,8 @@ class NativeTokenCIContracts(unittest.TestCase):
                 shapes[f"JSON in a string {levels} times, {frame}"] = prefix + nested + "\n"
             # The CC's micro at 6aaa204a (D5): an ordinary document whose levels below are CR-framed, and the same
             # depth with nothing private, which is refused too in these framings (the micro at 167eb00a, FC1: behind a
-            # prefix on its own line, a form feed, a vertical tab, U+0085 or U+2028, clean text nested deeper is not
+            # prefix on the same line, or pretty after a form feed, a vertical tab, U+0085, U+2028 or U+2029, clean text
+            # nested deeper is not
             # read as JSON; an escaped address there is still refused, by the escape bound).
             shapes[f"JSON in a string {levels + 1} times, CR-framed under a document"] = json.dumps(
                 {"log": "progress\r" + nested}, indent=2)
@@ -887,6 +888,10 @@ class NativeTokenCIContracts(unittest.TestCase):
                                ("after malformed text and an RS on the same line, pretty", "garbage\x1e" + pretty),
                                ("after a byte order mark", "\ufeff" + '{"k": 1, "k": 2}'),
                                ("after a line", "progress\n" + pretty),
+                               # The read across lines decodes growing slices (the GPT read at 171b0811): a text past the
+                               # first slice, a long string included, is read whole.
+                               ("after a line, past the first slice",
+                                "progress\n{\n \"k\": \"" + "a" * 300 + "\",\n \"k\": 2\n}"),
                                ("nested under a CR-framed object",
                                 "progress\r" + json.dumps({"inner": '{"k": 1, "k": 2}'}, indent=2)),
                                ("beside a long number, after a lone CR",
@@ -904,7 +909,7 @@ class NativeTokenCIContracts(unittest.TestCase):
             for levels in (20000, 100000):
                 for name, text in (("alone", "[" * levels + "]" * levels),
                                    ("a member", '{"a": ' + "[" * levels + "]" * levels + "}"),
-                                   ("after a lone CR", "progress\r" + "[" * levels + "]" * levels)):
+                                   ("after a lone CR", "progress\r" + "[" * 100000 + "]" * 100000)):
                     with self.subTest(levels=levels, shape=name):
                         with self.assertRaises(AssertionError) as refused:
                             run.publish(text)
@@ -1024,6 +1029,82 @@ class NativeTokenCIContracts(unittest.TestCase):
                                                                           indent=2)[:-200])):
                 with self.subTest(control=name):
                     self.assertEqual(run.publish(text), text)
+
+    def test_the_text_decoded_to_read_unclosed_json_is_bounded_by_its_length(self):
+        # The GPT read at 171b0811 (P2): every failed decode builds a JSONDecodeError that counts the line breaks from
+        # the start of what it decodes (python/cpython@cbc944f4 Lib/json/decoder.py:31-32), and the views decoded the
+        # whole piece from each line that ends inside a JSON text, so short unclosed lines cost the piece's length
+        # each: 16,000 of them scanned 512,000,000 characters. Each decode now takes a slice that starts where the text
+        # does, and the slices' lengths count against the bound. Measured as characters handed to the decoder, so the
+        # test does not depend on time.
+        decoded = ci.decoded
+        handed = []
+
+        def counting(text, index):
+            handed.append(len(text) - index)
+            return decoded(text, index)
+
+        for name, piece in (("short unclosed lines", "[\nx\n" * 4000),
+                            ("unclosed objects in a dump that is not JSON",
+                             "[\n" + "  {\n    name: 'a',\n  },\n" * 2000),
+                            ("pretty JSON after progress lines",
+                             "progress\n" * 200 + json.dumps([{"a": [1, 2]}] * 2000, indent=2))):
+            with self.subTest(shape=name):
+                handed.clear()
+                with patch.object(ci, "decoded", counting):
+                    try:
+                        ci.json_texts(piece)
+                    except ci.Unverifiable:
+                        pass
+                lines = piece.count("\n") + 1
+                self.assertLessEqual(sum(handed), (ci.RESCANS + 1) * len(piece) + lines, name)
+        with tempfile.TemporaryDirectory() as directory:
+            run = self._new_run(Path(directory))
+            text = "[\nx\n" * 4000
+            self.assertEqual(run.publish(text), text)  # clean text is still published as it is
+
+    def test_refused_names_keep_every_member(self):
+        # The same read (P3-3): two refused names in one object both became the refusal text, and one member was lost;
+        # and the report's own names were not verified. Each refused name is now kept, numbered after the first.
+        operator = "@".join(("first.last", "mail-host.com"))
+        hostile = ['{"email": "' + operator.replace("@", "\\u0040") + '", "n": %d}' % n for n in range(3)]
+        with tempfile.TemporaryDirectory() as directory:
+            run = self._new_run(Path(directory))
+            run.report["state_observations"]["tool"] = {name: [name] for name in hostile}
+            run.report[hostile[0]] = "a report field named by a tool"
+            run.flush()
+            published = (Path(directory) / "result" / "receipt.json").read_text()
+            recorded = json.loads(published)
+        self.assertNotIn("mail-host", published)
+        self.assertEqual(sorted(recorded["state_observations"]["tool"]),
+                         [ci.PUBLISH_REFUSED, ci.PUBLISH_REFUSED + " (2)", ci.PUBLISH_REFUSED + " (3)"])
+        self.assertEqual(recorded[ci.PUBLISH_REFUSED], "a report field named by a tool")
+
+    def test_a_document_holding_nan_that_clean_changes_is_published_cleaned(self):
+        # The CC's Claude micro at 171b0811 (P3-2): two parses of a document holding NaN never compared equal, so a
+        # document clean() changed was refused although clean()'s text read as the same document.
+        operator = "@".join(("first.last", "mail-host.com"))
+        with tempfile.TemporaryDirectory() as directory:
+            run = self._new_run(Path(directory))
+            published = run.publish('{"n": NaN, "email": "' + operator + '"}')
+        self.assertEqual(published, '{"n": NaN, "email": "<EMAIL>"}')
+
+    def test_a_raw_string_of_the_report_is_verified_even_beside_its_published_form(self):
+        # The same micro (P3-5): flush() skips a string publish() verified. A string publish() was given, recorded in
+        # the report as it was given, and a refused string the report holds at its top level are each refused.
+        operator = "@".join(("first.last", "mail-host.com"))
+        hostile = '{"email": "' + operator.replace("@", "\\u0040") + '"}'
+        raw = '{"email": "' + operator + '"}'
+        with tempfile.TemporaryDirectory() as directory:
+            run = self._new_run(Path(directory))
+            self.assertNotIn("mail-host", run.publish(raw))
+            run.report["as_given"] = raw
+            run.report["note"] = hostile
+            run.flush()
+            published = (Path(directory) / "result" / "receipt.json").read_text()
+        self.assertNotIn("mail-host", published)
+        self.assertEqual(json.loads(published)["note"], ci.PUBLISH_REFUSED)
+        self.assertEqual(json.loads(published)["as_given"], ci.PUBLISH_REFUSED)
 
     def test_an_mcp_session_closes_its_pipes(self):
         # The GPT read at 6aaa204a (P3-7): Popen closes its pipes only in __exit__ (python/cpython@cbc944f4

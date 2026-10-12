@@ -73,8 +73,9 @@ REDACTIONS = (
 )
 # Run.publish decodes JSON text nested in string values this many levels deep, and publication_views() decodes string
 # escapes this many passes over. Escaping still undone after that is refused in every framing; JSON nested deeper is
-# refused in the framings the views read (reader_pieces and json_texts: behind a prefix on its own line, or a form
-# feed, a vertical tab, U+0085 or U+2028, clean text nested deeper is not read as JSON); JSON too deep for Python's
+# refused in the framings the views read (reader_pieces and json_texts: behind a prefix on the same line, or pretty
+# text after a form feed, a vertical tab, U+0085, U+2028 or U+2029, clean text nested deeper is not read as JSON); JSON
+# too deep for Python's
 # decoder is refused. Each gets this fixed message, and nothing is published (the command center's micro at 4c916e14,
 # addendum 04, and the micro at 167eb00a). Committed native-token streams need at most two passes, and committed host
 # receipts at most three.
@@ -146,6 +147,16 @@ LINE_BREAK = re.compile("[\r\n]")
 # re-reading has covered this many times the piece's length, the piece is refused (the command center's micro at
 # 167eb00a, FC2: 300 such lines in 1.1 MB took 19 s).
 RESCANS = 16
+# A JSON text read across lines is decoded in a slice of the piece that starts where it does: the line's rest and this
+# many characters more, doubled while the text runs past the slice's end. Every failed decode builds a JSONDecodeError
+# that counts the line breaks from the start of what it decodes (python/cpython@cbc944f4 Lib/json/decoder.py:31-32,
+# raised by the C scanner too, Modules/_json.c:299-312), so decoding the whole piece from each line cost the piece's
+# length per line (the GPT read at 171b0811: 16,000 short unclosed lines scanned 512,000,000 characters). Each slice's
+# length counts against RESCANS.
+SLICE = 32
+# A decode that fails this close to a slice's end may have failed because the slice cut the text (a literal, an escape
+# or a surrogate pair cut in two is at most 12 characters); it is retried on a longer slice.
+CUT = 16
 BETWEEN_TEXTS = " \t\x1e\ufeff"  # within a line; the line breaks end it
 
 
@@ -164,9 +175,10 @@ def json_texts(piece: str) -> list:
     no JSON text starts, reading resumes at the next line, as a reader that reads a line and then parses the rest does
     (readline, then json.load). Each line is decoded alone first, so a failure costs that line's length (a
     JSONDecodeError counts lines up to its position); the rest of piece is read only when the line ends inside a JSON
-    text, where a text that fails inside the line fails the same way across lines. A text left unclosed is read again
-    from each later line that opens another inside it; past RESCANS times the piece's length of such re-reading the
-    piece is Unverifiable, so the work is bounded by a multiple of its length."""
+    text, where a text that fails inside the line fails the same way across lines. That read decodes slices that start
+    where the text does (SLICE, doubled while the text runs past one), and every slice's length, which bounds the
+    decoding and the error's line count in it, is charged; past RESCANS times the piece's length the piece is
+    Unverifiable. So the decoding work is bounded by a multiple of the piece's length plus its lines' lengths."""
     texts, start, reread = [], 0, 0
     while start < len(piece):
         following = LINE_BREAK.search(piece, start)
@@ -182,16 +194,27 @@ def json_texts(piece: str) -> list:
             except json.JSONDecodeError as error:
                 if error.pos < len(line):
                     break
-                try:  # the line ends inside a JSON text: read it across the lines that follow
-                    node, resumed = decoded(piece, start + index)
-                except json.JSONDecodeError as unclosed:
-                    # The decoder reports an unterminated string at its start, having scanned to the end.
-                    reached = len(piece) if unclosed.msg.startswith("Unterminated string") else unclosed.pos
-                    reread += reached - (start + index)
+                # The line ends inside a JSON text: read it across the lines that follow, in growing slices.
+                offset, size = start + index, len(line) - index + SLICE
+                while True:
+                    stop = min(len(piece), offset + size)
+                    chunk = piece[offset:stop]
+                    reread += len(chunk)
                     if reread > RESCANS * len(piece):
-                        raise Unverifiable("more unclosed JSON text than the views re-read") from unclosed
+                        raise Unverifiable("more unclosed JSON text than the views re-read")
+                    try:
+                        node, end = decoded(chunk, 0)
+                    except json.JSONDecodeError as unclosed:
+                        # The decoder reports an unterminated string at its start, having scanned to the slice's end
+                        # (python/cpython@cbc944f4 Modules/_json.c:417, :433; Lib/json/decoder.py:86, :107).
+                        if stop < len(piece) and (unclosed.msg.startswith("Unterminated string")
+                                                  or unclosed.pos >= len(chunk) - CUT):
+                            size *= 2
+                            continue
+                        break
+                    texts.append(node)
+                    resumed = offset + end
                     break
-                texts.append(node)
                 break
             texts.append(node)
         if resumed is not None:
@@ -956,7 +979,8 @@ class Run:
                 as_written, written_lossy = read(written)
                 if as_written is not None:
                     walked = walk(as_written)
-                    if node == walked:
+                    # Two parses compare by their JSON: NaN, a non-JSON constant a parse gives, never equals itself.
+                    if node == walked or (node is not None and json.dumps(node) == json.dumps(walked)):
                         return text
                     source, lossy = written, written_lossy
             if source is text:
@@ -967,7 +991,7 @@ class Run:
                     return text
             require(not lossy, PUBLISH_REFUSED)
             rewritten = json.dumps(walked, ensure_ascii=False, indent=2 if "\n" in source.strip() else None)
-            try:
+            try:  # UTF-8 has no encoding for a surrogate code point (RFC 3629 3, rfc3629.txt:231-234)
                 rewritten.encode("utf-8")
             except UnicodeEncodeError:  # a lone surrogate's escape, decoded, cannot be written back
                 require(False, PUBLISH_REFUSED)
@@ -1014,16 +1038,32 @@ class Run:
             elif isinstance(node, (list, tuple)):
                 return [verified(item) for item in node]
             elif isinstance(node, dict):
-                return {verified(key): verified(item) for key, item in node.items()}
+                return members(node)
             return node
 
-        for key, item in list(self.report.items()):
-            checked = verified(item)
-            if isinstance(item, (list, dict)) and checked != item:
-                item.clear()
-                item.extend(checked) if isinstance(item, list) else item.update(checked)
-            elif checked != item:
-                self.report[key] = checked
+        def members(node: dict) -> dict:
+            # A refused name becomes the refusal text, numbered when several are refused, so no member is lost (the
+            # GPT read at 171b0811).
+            out = {}
+            for key, item in node.items():
+                name = verified(key)
+                if name == PUBLISH_REFUSED and key != PUBLISH_REFUSED:
+                    count = sum(1 for other in out if other.startswith(PUBLISH_REFUSED))
+                    name = PUBLISH_REFUSED if not count else f"{PUBLISH_REFUSED} ({count + 1})"
+                out[name] = verified(item)
+            return out
+
+        checked = members(self.report)
+        for (key, current), item in zip(list(self.report.items()), checked.values()):
+            if isinstance(current, (list, dict)) and item != current:  # in place, as other code holds these
+                current.clear()
+                current.extend(item) if isinstance(current, list) else current.update(item)
+            elif item != current:
+                self.report[key] = item
+        if list(checked) != list(self.report):  # a refused name of the report's own, renamed in place
+            values = list(self.report.values())
+            self.report.clear()
+            self.report.update(zip(checked, values))
         if refused:
             self.report["failures"].append({"component": "receipt", "error": PUBLISH_REFUSED})
             if "status" in self.report:
