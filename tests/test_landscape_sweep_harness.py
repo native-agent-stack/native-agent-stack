@@ -261,7 +261,8 @@ def scope_for(layers=(("foundation", "alpha"), ("us-equities", "beta"), ("founda
 def child_usage_raw(run_id, labels, status="complete", transcript_root="/home/example/.claude/projects/p/s"):
     children = [{"label": label, "requested_model": "sonnet" if label.startswith("gpt6-") else "opus",
                  "resolved_models": ["claude-sonnet-5" if label.startswith("gpt6-") else "claude-opus-5-5"],
-                 "efforts": ["max"], "web_search": {"calls": 0, "capped": 0, "first_capped_at": None},
+                  "efforts": ["max"], "requests": 1, "unknown_effort_requests": 0,
+                  "web_search": {"calls": 0, "capped": 0, "first_capped_at": None},
                  "complete": True} for label in labels]
     return json.dumps({"transcript_dir": f"{transcript_root}/subagents/workflows/{run_id}", "status": status,
                        "reason": "fixture", "web_search": {"calls": 0, "capped": 0, "capped_children": []},
@@ -3807,7 +3808,8 @@ class ConvertTests(unittest.TestCase):
         # A record listing a re-run call's earlier attempt among its children (child-usage.mjs before
         # superseded_attempts): the vote names the attempt that returned, and <synthetic> is never a model.
         failed = {"label": "refute-fit:alpha", "agent_id": "x1", "requested_model": "opus",
-                  "resolved_models": ["claude-opus-5-5", "<synthetic>"], "efforts": ["max"], "complete": False}
+                  "resolved_models": ["claude-opus-5-5", "<synthetic>"], "efforts": ["max"],
+                  "requests": 1, "unknown_effort_requests": 0, "complete": False}
         raw = json.loads(child_usage_raw("wf_fixture-1", SYNTHETIC_LABELS))
         raw["children"].insert(0, failed)
         document = usage_record.record(json.dumps(raw).encode("utf-8"), 1, "cmd", ROOT)
@@ -3948,6 +3950,216 @@ class ConvertTests(unittest.TestCase):
         self.assertNotIn(identifier, done.stderr + done.stdout)
         self.assertEqual(done.stdout, "")
         self.assertEqual({path.name: path.read_bytes() for path in (work / "out").iterdir()}, previous)
+
+    def test_cli_redacts_session_segments_only_in_native_scratchpad_paths(self):
+        identifier = "-".join(["0123abcd", "4567", "89ab", "cdef", "0123456789ab"])
+        encoded = "-".join(("", "home", "fixtureuser", "code", "project"))
+        from urllib.parse import unquote
+        for prefix in ("~/.claude/projects/", "/tmp/claude-1000/", "file:///tmp/claude-1000/"):
+            with self.subTest(prefix=prefix):
+                work = temp_dir(self)
+                res = healthy_result()
+                path = prefix + encoded + "/" + identifier + "/scratchpad/worker/notes.md"
+                notes = {path: ["read " + path]}
+                res["first"][0]["claude_discover"]["notes"] = notes
+                done = self.cli(work, res, "--limit", "source " + path)
+                self.assertEqual(done.returncode, 0, done.stderr)
+                returns = json.loads((work / "out/returns.json").read_text())
+                expected = prefix + "<project-dir>/<session-id>/scratchpad/worker/notes.md"
+                self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                                 {expected: ["read " + expected]})
+                self.assertNotIn(identifier, done.stdout)
+                for file in (work / "out").glob("*.json"):
+                    self.assertNotIn(identifier, file.read_text())
+                    self.assertNotIn(identifier, unquote(file.read_text()))
+        # A bare session id remains a publication refusal; the rule must not redact arbitrary evidence ids.
+        work = temp_dir(self)
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = "session " + identifier
+        done = self.cli(work, res)
+        self.assertEqual(done.returncode, 3)
+        self.assertFalse((work / "out").exists())
+
+    def test_cli_refuses_scratchpad_prefixed_sibling_paths_without_overwrite(self):
+        identifier = "-".join(["0123abcd", "4567", "89ab", "cdef", "0123456789ab"])
+        for prefix in ("~/.claude/projects/", "/tmp/claude-1000/", "file:///tmp/claude-1000/"):
+            work = temp_dir(self)
+            result = healthy_result()
+            valid = prefix + "project/" + identifier + "/scratchpad/worker/note.md"
+            result["first"][0]["claude_discover"]["notes"] = valid
+            done = self.cli(work, result)
+            self.assertEqual(done.returncode, 0, done.stderr)
+            previous = {path.name: path.read_bytes() for path in (work / "out").iterdir()}
+            for sibling in ("scratchpad-secret/worker/note.md", "scratchpad.txt", "scratchpadX/worker/note.md",
+                            "scratchpad_foo/worker/note.md"):
+                for location in ("key", "value", "limit"):
+                    with self.subTest(prefix=prefix, sibling=sibling, location=location):
+                        for name, raw in previous.items():
+                            (work / "out" / name).write_bytes(raw)
+                        candidate = copy.deepcopy(result)
+                        path = prefix + "project/" + identifier + "/" + sibling
+                        args = []
+                        if location == "key":
+                            candidate["first"][0]["claude_discover"]["notes"] = {path: "source"}
+                        elif location == "limit":
+                            args = ["--limit", path]
+                        else:
+                            candidate["first"][0]["claude_discover"]["notes"] = path
+                        done = self.cli(work, candidate, *args)
+                        self.assertEqual(done.returncode, 3, done.stderr)
+                        self.assertEqual(done.stdout, "")
+                        self.assertEqual({f.name: f.read_bytes() for f in (work / "out").iterdir()}, previous)
+
+    def test_cli_redaction_requires_native_directory_prefix_components(self):
+        identifier = "-".join(["0123abcd", "4567", "89ab", "cdef", "0123456789ab"])
+        for prefix in ("~/.claude/projects/", "/tmp/claude-1000/", "file:///tmp/claude-1000/"):
+            for suffix in ("scratchpad", "scratchpad/", "scratchpad/worker/note.md"):
+                with self.subTest(prefix=prefix, suffix=suffix):
+                    work = temp_dir(self)
+                    result = healthy_result()
+                    result["first"][0]["claude_discover"]["notes"] = prefix + "project/" + identifier + "/" + suffix
+                    done = self.cli(work, result)
+                    self.assertEqual(done.returncode, 0, done.stderr)
+                    for path in (work / "out").glob("*.json"):
+                        self.assertNotIn(identifier, path.read_text())
+        for prefix in ("~/not.claude/projects/", "~/.claude/projectsX/", "/tmp/claudeX-1000/",
+                       "/other/tmp/claude-1000/"):
+            with self.subTest(prefix=prefix):
+                work = temp_dir(self)
+                result = healthy_result()
+                result["first"][0]["claude_discover"]["notes"] = prefix + "project/" + identifier + "/scratchpad/worker/note.md"
+                done = self.cli(work, result)
+                self.assertEqual(done.returncode, 3, done.stderr)
+                self.assertEqual(done.stdout, "")
+                self.assertFalse((work / "out").exists())
+
+    def test_cli_refuses_decoded_session_identifiers_before_any_publication(self):
+        from urllib.parse import unquote
+        identifier = "-".join(["0123abcd", "4567", "89ab", "cdef", "0123456789ab"])
+        raw = "/tmp/claude-1000/project/" + identifier + "/scratchpad/worker/notes.md"
+        spellings = [identifier.replace("-", "%2D"), identifier.replace("-", "%2d", 1),
+                     identifier.replace("0", "%30", 1), identifier.replace("-", "%252D")]
+        for encoded_id in spellings:
+            decoded = encoded_id
+            while unquote(decoded) != decoded:
+                decoded = unquote(decoded)
+            self.assertEqual(decoded, identifier)
+            for location in ("key", "value", "limit", "filename", "query"):
+                with self.subTest(spelling=encoded_id, location=location):
+                    work = temp_dir(self)
+                    res = healthy_result()
+                    url = "file:///tmp/claude-1000/project/" + encoded_id + "/scratchpad/worker/notes.md"
+                    if location == "filename":
+                        url = "file://" + raw + "/" + encoded_id + ".md"
+                    elif location == "query":
+                        url = "file://" + raw + "?session=" + encoded_id
+                    notes = {raw: ["read " + raw]}
+                    args = []
+                    if location == "key":
+                        notes[url] = "source"
+                    elif location == "limit":
+                        args = ["--limit", "read " + raw + " and " + url]
+                    else:
+                        notes[raw].append({"nested": "source " + url})
+                    res["first"][0]["claude_discover"]["notes"] = notes
+                    done = self.cli(work, res, *args)
+                    self.assertEqual(done.returncode, 3, done.stderr)
+                    self.assertIn("refusing to publish", done.stderr)
+                    self.assertEqual(done.stdout, "")
+                    self.assertFalse((work / "out").exists())
+
+    def test_cli_refuses_native_decoded_identity_plants_before_publication(self):
+        from urllib.parse import quote
+        email = "review-fixture" + "@" + "example.org"
+        account = "review-fixture-account"
+        plants = {
+            "percent_email": quote(email, safe=""),
+            "base64_email": base64.b64encode(email.encode()).decode(),
+            "double_account": base64.b64encode(quote(account, safe="").replace("-", "%2D").encode()).decode(),
+        }
+        with mock.patch.dict(os.environ, {"NATIVE_AGENT_HOST_NAMES_JSON": json.dumps([account])}):
+            for kind, plant in plants.items():
+                with self.subTest(kind=kind):
+                    work = temp_dir(self)
+                    res = healthy_result()
+                    res["first"][0]["claude_discover"]["notes"] = "reference " + plant
+                    done = self.cli(work, res)
+                    self.assertEqual(done.returncode, 3, kind)
+                    self.assertIn("native publication scan found private content", done.stderr)
+                    self.assertEqual(done.stdout, "")
+                    self.assertFalse((work / "out").exists())
+                    self.assertNotIn(plant, done.stderr)
+
+    def test_cli_native_publication_scans_large_document_keys_and_values_without_splitting_strings(self):
+        from urllib.parse import quote
+        email = "large-fixture" + "@" + "example.org"
+        account = "large-fixture-account"
+        plants = [quote(email, safe=""), base64.b64encode(email.encode()).decode(),
+                  base64.b64encode(quote(account, safe="").replace("-", "%2D").encode()).decode()]
+        with mock.patch.dict(os.environ, {"NATIVE_AGENT_HOST_NAMES_JSON": json.dumps([account])}):
+            for plant in plants:
+                for location in ("key", "value"):
+                    with self.subTest(location=location):
+                        work = temp_dir(self)
+                        res = healthy_result()
+                        notes = {"padding": ["public-note-" + str(i) for i in range(3000)]}
+                        if location == "key":
+                            notes[plant] = "public reference"
+                        else:
+                            notes["reference"] = plant
+                        self.assertGreater(len(json.dumps(notes).encode()), 25000)
+                        res["first"][0]["claude_discover"]["notes"] = notes
+                        done = self.cli(work, res)
+                        self.assertEqual(done.returncode, 3)
+                        self.assertIn("native publication scan found private content", done.stderr)
+                        self.assertEqual(done.stdout, "")
+                        self.assertFalse((work / "out").exists())
+                        self.assertNotIn(plant, done.stderr)
+
+    def test_cli_native_publication_refuses_unavailable_scanner_and_oversized_record(self):
+        for kind in ("unavailable", "oversized"):
+            with self.subTest(kind=kind), mock.patch.dict(os.environ, {
+                    "NATIVE_AGENT_HOST_NAMES_JSON": json.dumps(["scan-fixture-account"])}):
+                work = temp_dir(self)
+                res = healthy_result()
+                if kind == "oversized":
+                    res["first"][0]["claude_discover"]["notes"] = "x" * 26000
+                    done = self.cli(work, res)
+                else:
+                    with mock.patch.dict(os.environ, {"PATH": str(work / "no-binaries")}):
+                        done = self.cli(work, res)
+                self.assertEqual(done.returncode, 3, kind)
+                expected = "entry too large" if kind == "oversized" else "scanner unavailable"
+                self.assertIn(expected, done.stderr)
+                self.assertEqual(done.stdout, "")
+                self.assertFalse((work / "out").exists())
+
+    def test_cli_keeps_unknown_effort_uncovered_through_supersession(self):
+        for condition in ("unknown_terminal", "unmeasured_terminal", "empty_original"):
+            with self.subTest(condition=condition):
+                work = temp_dir(self)
+                raw = json.loads(child_usage_raw("wf_fixture-1", SYNTHETIC_LABELS))
+                terminal = next(c for c in raw["children"] if c["label"] == "critic")
+                terminal["agent_id"] = "terminal"
+                original = dict(terminal, agent_id="original", efforts=["max", "low"], superseded_by="terminal")
+                raw["superseded_attempts"] = [original]
+                if condition == "unknown_terminal":
+                    terminal.update(requests=2, unknown_effort_requests=1)
+                elif condition == "unmeasured_terminal":
+                    terminal.pop("unknown_effort_requests")
+                else:
+                    original.update(efforts=[], unknown_effort_requests=1)
+                usage = write_json(work / "usage.json", {"child_usage": raw, "measurement": {"exit_code": 0}})
+                done = self.cli(work, healthy_two_layers(), "--usage", str(usage))
+                self.assertEqual(done.returncode, 0, done.stderr)
+                summary = json.loads(done.stdout)
+                self.assertTrue(summary["effort_deviations"])
+                returns = json.loads((work / "out/returns.json").read_text())
+                self.assertFalse(any(returns["superseded_retained"].values()))
+                self.assertEqual(set(summary["reopened_layers"]), {"alpha", "beta"})
+                with self.assertRaisesRegex(ValueError, "effort_deviation retained failure"):
+                    make_result.check_usage({"child_usage": raw, "measurement": {"exit_code": 0}}, "fixture",
+                                            layer_ids=("alpha", "beta"))
 
     def test_cli_redacts_dash_encoded_project_directory_in_notes(self):
         encoded = "-".join(("", "home", "fixtureuser", "code", "project"))
@@ -4716,7 +4928,7 @@ class UsageRecordTests(unittest.TestCase):
                     "--out", work / "usage.json"])
         document = json.loads((work / "usage.json").read_text())
         self.assertEqual(document["measurement"]["exit_code"], 1)
-        self.assertEqual(document["measurement"]["raw_output_sha256"], hashlib.sha256(stdout).hexdigest())
+        self.assertNotIn("raw_output_sha256", document["measurement"])
         return done, document
 
     def test_killed_critic_rerun_under_changed_call_key_is_superseded(self):
@@ -4814,12 +5026,12 @@ class UsageRecordTests(unittest.TestCase):
         self.assertEqual(usage["effort_mismatches"], [{"child": orphan["label"], "efforts": []}])
         self.assertEqual(document["measurement"]["post_processing"]["linked_attempts"], 1)
 
-    def test_post_processing_retains_source_reason_and_covered_attempt_provenance(self):
+    def test_post_processing_withholds_source_reason_and_retains_covered_attempt_provenance(self):
         raw = paused_child_usage("critic")
         retry = next(c for c in raw["children"] if c["label"] == "critic" and c["complete"])
         same_key_target = next(c for c in raw["children"] if c["label"] == "discover:alpha")
         raw["superseded_attempts"] = [dict(same_key_target, agent_id="same-key-killed", complete=False,
-                                           efforts=[], superseded_by=same_key_target["agent_id"])]
+                                           efforts=[], requests=0, superseded_by=same_key_target["agent_id"])]
         raw["effort_mismatches"].append({"child": "discover:alpha", "efforts": [],
                                          "superseded_by": same_key_target["agent_id"]})
         raw["reason"] += "; 1 earlier attempt re-run under the same call key"
@@ -4829,7 +5041,7 @@ class UsageRecordTests(unittest.TestCase):
         self.assertEqual(done.returncode, 0, done.stderr)
         processing = document["measurement"]["post_processing"]
         self.assertEqual(processing["source_status"], raw["status"])
-        self.assertEqual(processing["source_reason"], raw["reason"])
+        self.assertNotIn("source_reason", processing)
         self.assertEqual(processing["linked_agent_ids"], ["killed"])
         self.assertEqual(processing["covered_agent_ids"], ["same-key-killed", "killed"])
         self.assertEqual(processing["covered_effort_mismatches"],
@@ -4881,7 +5093,8 @@ class UsageRecordTests(unittest.TestCase):
         self.assertEqual(done.returncode, 1)
         usage = document["child_usage"]
         self.assertEqual(usage["status"], "incomplete")
-        self.assertEqual(usage["superseded_attempts"][0]["usage_issues"], raw["children"][0]["usage_issues"])
+        self.assertEqual(usage["superseded_attempts"][0]["usage_issues"], ["provider_usage_incomplete"])
+        self.assertEqual(usage["superseded_attempts"][0]["usage_issues_count"], 1)
 
     def test_native_changed_keys_link_two_critics_and_a_followup_and_count_usage_once(self):
         self.assertTrue(NODE, "node is required for the native child-usage.mjs changed-key recovery fixture")
@@ -4922,7 +5135,7 @@ class UsageRecordTests(unittest.TestCase):
             with self.assertRaisesRegex(AssertionError, "node is required for the native child-usage.mjs"):
                 self.test_native_changed_keys_link_two_critics_and_a_followup_and_count_usage_once()
 
-    def test_record_sanitizes_the_transcript_dir_and_hashes_the_raw_output(self):
+    def test_record_sanitizes_the_transcript_dir_and_keeps_raw_output_seals_private(self):
         work = temp_dir(self)
         raw = child_usage_raw("wf_fixture-1", ["discover:alpha"])
         (work / "raw.json").write_bytes(raw)
@@ -4931,11 +5144,12 @@ class UsageRecordTests(unittest.TestCase):
         self.assertEqual(done.returncode, 0, done.stderr)
         document = json.loads((work / "usage.json").read_text())
         self.assertEqual(document["child_usage"]["transcript_dir"], "<session-transcripts>/subagents/workflows/wf_fixture-1")
-        self.assertEqual(document["measurement"]["raw_output_sha256"], hashlib.sha256(raw).hexdigest())
+        self.assertNotIn("raw_output_sha256", document["measurement"])
+        self.assertEqual(document["measurement"]["processor_sha256"], hashlib.sha256(
+            (HARNESS / "usage_record.py").read_bytes()).hexdigest())
         self.assertEqual(document["measurement"]["tool_sha256"], hashlib.sha256(
             (ROOT / usage_record.TOOL).read_bytes()).hexdigest())
-        self.assertEqual(document["measurement"]["command"], "node examples/claude-native/workflows/child-usage.mjs "
-                         "<session-transcripts>/subagents/workflows/wf_fixture-1 --require-effort max")
+        self.assertNotIn("command", document["measurement"])
         self.assertEqual(json.loads(done.stdout)["workflow_run"], "wf_fixture-1")
 
     def test_incomplete_usage_is_written_with_exit_1_and_private_content_is_refused(self):
@@ -4983,7 +5197,7 @@ class UsageRecordTests(unittest.TestCase):
             rows = [{"type": "assistant", "effort": "max", "message": {"id": f"m-{agent}", "model": "claude-opus-5-5",
                                                                        "usage": dict(zero, output_tokens=5)}}]
             if agent == "r0":
-                rows.append({"type": "assistant", "isApiErrorMessage": True, "effort": "max",
+                rows.append({"type": "assistant", "isApiErrorMessage": True, "error": "rate_limit",
                              "message": {"id": "limit", "model": "<synthetic>", "usage": zero}})
             (transcripts / f"agent-{agent}.meta.json").write_text(json.dumps({"model": "opus"}), encoding="utf-8")
             (transcripts / f"agent-{agent}.jsonl").write_text("".join(json.dumps(r) + "\n" for r in rows), encoding="utf-8")

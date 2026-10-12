@@ -19,6 +19,15 @@ const dup = summarizeChild(started, done, { model: 'sonnet', agentType: 'workflo
 expect('streamed duplicates of one message id count once with the largest output', dup.requests === 2 && dup.usage.output_tokens === 50 && dup.usage.input_tokens === 4 && dup.usage.cache_read_input_tokens === 1400)
 expect('first request cache read and effort are reported', dup.first_request_cache_read === 500 && dup.efforts.join() === 'medium' && dup.complete)
 expect('first request prompt size is input plus cache read plus cache creation', dup.first_request_prompt_tokens === 502)
+expect('all provider request efforts are affirmatively measured', dup.unknown_effort_requests === 0)
+const unknownEffort = summarizeChild(started, done, { model: 'sonnet' },
+  [msg('m1', 'claude-sonnet-5', 5, 0, 0, 'max'), msg('m2', 'claude-sonnet-5', 6, 0, 0, null)])
+expect('a filtered effort set does not hide an unknown provider request', unknownEffort.complete
+  && unknownEffort.requests === 2 && unknownEffort.efforts.join() === 'max' && unknownEffort.unknown_effort_requests === 1)
+const duplicateUnknown = summarizeChild(started, done, { model: 'sonnet' },
+  [msg('m1', 'claude-sonnet-5', 5, 0, 0, null), msg('m1', 'claude-sonnet-5', 6, 0, 0, null)])
+expect('unknown efforts follow the same deduplicated requests as usage', duplicateUnknown.requests === 1
+  && duplicateUnknown.unknown_effort_requests === 1)
 expect('null result is incomplete', !summarizeChild(started, { ...done, result: null }, { model: 'sonnet' }, [msg('m1', 'claude-sonnet-5', 5)]).complete)
 expect('missing journal result is incomplete', !summarizeChild(started, null, { model: 'sonnet' }, [msg('m1', 'claude-sonnet-5', 5)]).complete)
 // PR-A item 6 (#381 AA-PLAN: "a final text that is a wait notice or empty is not counted as complete"; U2 design section 6). The journal
@@ -152,9 +161,11 @@ try {
   writeFileSync(join(dir, 'agent-a1.jsonl'), JSON.stringify(msg('m1', 'claude-sonnet-5', 9, 100)) + '\n')
   const run = summarizeRun(dir)
   expect('run keeps every started child and is incomplete when one has no result, meta or transcript', run.status === 'incomplete' && run.children.length === 2 && run.children[0].complete && !run.children[1].complete)
-  const efforts = { children: [{ label: 'max', efforts: ['max'] }, { label: 'inherit', efforts: ['xhigh'] }, { label: 'mixed', efforts: ['max', 'high'] }, { label: 'none', efforts: [] }] }
+  const efforts = { children: [{ label: 'max', efforts: ['max'] }, { label: 'inherit', efforts: ['xhigh'] }, { label: 'mixed', efforts: ['max', 'high'] }, { label: 'none', efforts: [] }].map((c) => ({ requests: 1, unknown_effort_requests: 0, ...c })) }
   expect('require-effort flags every child not exactly at the level, including none recorded', JSON.stringify(effortMismatches(efforts, 'max').map((m) => m.child)) === '["inherit","mixed","none"]')
-  expect('require-effort passes a run whose children all ran at the level', effortMismatches({ children: [{ label: 'a', efforts: ['max'] }] }, 'max').length === 0)
+  expect('require-effort passes a run whose children all ran at the level', effortMismatches({ children: [{ label: 'a', efforts: ['max'], requests: 1, unknown_effort_requests: 0 }] }, 'max').length === 0)
+  expect('require-effort refuses a partly unmeasured request set', effortMismatches({ children: [unknownEffort] }, 'max').length === 1)
+  expect('require-effort refuses absent affirmative request measurements', effortMismatches({ children: [{ label: 'a', efforts: ['max'] }] }, 'max').length === 1)
   expect('per-model totals come from returned usage only', run.by_resolved_model['claude-sonnet-5'].output_tokens === 9 && run.by_resolved_model['claude-sonnet-5'].children === 1)
   // CLI: --require-effort on a complete one-child run (either argument order), and bad levels exit 2
   const cli = (...a) => spawnSync(process.execPath, [fileURLToPath(new URL('./child-usage.mjs', import.meta.url)), ...a], { encoding: 'utf8' }).status
@@ -187,7 +198,7 @@ try {
   expect('item 6: the same run with a real answer is complete and the cli exits 0', summarizeRun(answeredDir).status === 'complete' && cli(answeredDir, '--require-effort', 'max') === 0)
   // A call the runtime re-ran under the same journal key (a Workflow pauses at a usage limit and re-runs its waiting
   // agents after the reset): the attempt that returned nothing is superseded, not lost, and its usage still counts.
-  const limitRow = { type: 'assistant', isApiErrorMessage: true, effort: 'max', message: { id: 'syn1', model: '<synthetic>', usage: { input_tokens: 0, output_tokens: 0, cache_read_input_tokens: 0, cache_creation_input_tokens: 0 } } }
+  const limitRow = { type: 'assistant', isApiErrorMessage: true, error: 'rate_limit', message: { id: 'syn1', model: '<synthetic>', usage: { input_tokens: 0, output_tokens: 0, cache_read_input_tokens: 0, cache_creation_input_tokens: 0 } } }
   const rerun = join(dir, 'rerun'); mkdirSync(rerun)
   writeFileSync(join(rerun, 'journal.jsonl'), [{ type: 'launched' }, { ...started, key: 'v2:k1' }, { ...started, agentId: 'a3', label: 'review', key: 'v2:k2' },
     { ...started, agentId: 'a2', key: 'v2:k1' }, { type: 'result', agentId: 'a2', result: { ok: true } }, { type: 'result', agentId: 'a3', result: { ok: true } }].map((e) => JSON.stringify(e)).join('\n') + '\n')
@@ -200,7 +211,7 @@ try {
   expect('rerun: a no-result attempt whose call key started again is superseded and the run is complete', re.status === 'complete' && re.children.length === 2 && re.children.every((c) => c.complete) && (re.superseded_attempts || []).length === 1 && sup.agent_id === 'a1' && sup.superseded_by === 'a2' && sup.complete === false)
   expect('rerun: the superseded attempt keeps its issues and its usage counts in the per-model totals', (sup.issues || []).includes('no result entry in journal') && re.by_resolved_model['claude-sonnet-5'].output_tokens === 23 && re.by_resolved_model['<synthetic>'].children === 1)
   expect('rerun: the cli passes --require-effort max for a re-run call', cli(rerun, '--require-effort', 'max') === 0)
-  expect('rerun: --require-effort also checks superseded attempts', JSON.stringify(effortMismatches({ children: [{ label: 'a', efforts: ['max'] }], superseded_attempts: [{ label: 'a', agent_id: 'x1', superseded_by: 'x2', efforts: ['max', 'low'] }] }, 'max')) === JSON.stringify([{ child: 'a', efforts: ['max', 'low'], superseded_by: 'x2' }]))
+  expect('rerun: --require-effort also checks superseded attempts', JSON.stringify(effortMismatches({ children: [{ label: 'a', efforts: ['max'], requests: 1, unknown_effort_requests: 0 }], superseded_attempts: [{ label: 'a', agent_id: 'x1', superseded_by: 'x2', efforts: ['max', 'low'], requests: 2, unknown_effort_requests: 0 }] }, 'max')) === JSON.stringify([{ child: 'a', efforts: ['max', 'low'], superseded_by: 'x2' }]))
   // A superseded attempt keeps its usage-integrity failures (GPT-6 review of the 2026-09-26 record): usage the per-model
   // totals cannot count or attribute leaves the run incomplete, although the re-run call returned. The attempt's other
   // issues (no result entry, the <synthetic> usage-limit row outside the family) are expected and do not.

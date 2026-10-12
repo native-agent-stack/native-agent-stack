@@ -504,8 +504,8 @@ provides it.
   is ambiguous and links nothing. It uses the tool's journal order, retains `superseded_by` and the observed
   reason (call keys are not compared), and leaves `by_resolved_model` unchanged. The wrapper's exit code follows the
   post-processed status and uncovered effort mismatches; `measurement.exit_code` remains the raw tool exit and
-  `raw_output_sha256` remains the hash of its original stdout. `measurement.post_processing` retains
-  `source_status`, `source_reason`, `linked_agent_ids`, `covered_agent_ids` and `covered_effort_mismatches`, along
+  raw stdout authentication stays private and is omitted from the receipt. `measurement.post_processing` retains
+  `source_status`, `linked_agent_ids`, `covered_agent_ids` and `covered_effort_mismatches`, along
   with the linking and coverage counts. `multi_model_children` is recomputed after a move. The printed summary
   distinguishes `raw_exit_code` from the wrapper's `exit_code`. A linked attempt's `usage_issues` still keep the record incomplete.
   `make_result.py` also needs every attempt measured at effort `max` alone, covered by its completed same-label
@@ -555,7 +555,7 @@ The prerequisites:
 - the `landscape-sweep-worker` agent installed (`python3 tools/adoption/install_claude_profile.py --only agents`); hosts that opted into the held-out token-lanes carriers also refresh both with `python3 tools/adoption/install_claude_profile.py --only guard --hook token-lanes-subagent-start.py --hook token-lanes-session-start.py` (these carriers remain opt-in);
 - `gh` signed in;
 - `codex` on PATH, signed in natively;
-- node and python3.
+- node, python3 and Betterleaks 1.9.0 on PATH (the pinned native publication scanner described below).
 
 The work directory `W` holds prompts, host paths and raw Codex output, so it must sit outside every git repository.
 Every tool here refuses a work directory inside one; Codex would also load that repository's `AGENTS.md` into the
@@ -675,12 +675,52 @@ With no incomplete children or superseded usage-integrity gaps left, it reports 
 number linked, and can exit 0 while preserving the tool's raw exit 1 in the measurement. Superseded attempts
 whose re-run completed at max remain under `superseded_retained` per layer; they do not reopen a layer for effort.
 Uncovered effort deviations and capped WebSearch calls still retain their failures and reopen entries.
-`measurement.post_processing` preserves the tool's original `source_status` and `source_reason`, the
+`measurement.post_processing` preserves the tool's original `source_status`, the
 `linked_agent_ids`, `covered_agent_ids`, and full `covered_effort_mismatches`. It records the counts alongside
 these details, including when only some attempts link and the status stays incomplete. `multi_model_children`
 reflects the remaining children. The printed `raw_exit_code` names the tool's result; `exit_code` names the wrapper's.
 
-Offline source review extended agent-lab's `summarizeRun` and `effortMismatches` in the unchanged
+Offline source review extends the maintained adapter's `summarizeRun` and `effortMismatches`.
+**Completed changed-key reruns are a separate, explicit operation.** Pass all three
+`--supersession-proof`, `--supersession-contract` and `--supersession-journal` to `usage_record.py` only after the
+post-run proof has been independently accepted. The proof's `supersessionPairs` must match its contract, measured
+child identities and the exact native journal (both started and result keys, labels and order). Each explicit
+replacement chain must end at a complete measured max-only child. A completed mixed-effort intermediate stays
+retained and requires its own proved edge to that terminal; cycles and ambiguous same-label terminals refuse.
+The adapter reports `unknown_effort_requests` over the same deduplicated real provider requests as `requests`.
+The maintained adapter's `real` predicate (child-usage.mjs at 8c32a84b:3350) excludes client-built
+`<synthetic>` session-limit rows, including a zero-token `rate_limit` row with no effort field. Those
+rows keep their usage/issue provenance, but count as neither a provider request nor an unknown effort.
+Coverage requires an affirmative zero unknown count and a nonzero request count at the terminal; a nonempty
+`efforts` set alone proves neither. Completed originals with absent/empty effort measurements or unknown
+requests refuse. Earlier receipts without the new count must be remeasured from retained transcripts with
+this checkout's supported adapter; do not fill the count manually. An interrupted attempt with affirmatively
+zero requests and zero unknowns has no request effort to lose. Other unmeasured attempts remain uncovered,
+retained and reopened by conversion and the result builder. URL-decoded string values and keys are also
+checked for private identifiers before any artifact write or summary print; encoded residual UUIDs refuse.
+The converter also reuses #1007's native per-entry publication path in `scripts/host_name_scan.py`
+at c2dee173: Betterleaks 1.9.0 (`81aff7a638638aae3a659845d089043e1d8fe9ac`,
+`cmd/stdin.go:47–49`, `sources/stdin.go:18–25`) supplies its decoder and email/name rules.
+Percent-encoded and base64 identities are checked in values and keys of all emitted records, including
+the printed summary. No encoded candidate or native diagnostic is printed; a match, oversized record
+or unavailable native scanner refuses before creating or changing output. No new decoder is added.
+Repeated completed labels alone never select a winner. An explicit publication allowlist retains labels,
+agent IDs, measured counters, booleans and statuses; private call keys, input seals and free-form metadata stay
+local. Only proof, processor and adapter digests authenticate public preimages. A malformed or unbound proof,
+non-max terminal, cycle, ambiguous terminal or missing native result refuses before writing (exit 2). This does
+not rerun workers or edit native state; every original identity and measured aggregate counter remains.
+
+Requested `effort: max` is not measured max-only effort: a loaded skill may change subsequent request effort.
+The October 10 proof established call options and cache/prompt/result identity, but its quality-evaluation fit
+replacement still measured `[max, low]`. The exact contract therefore refuses; retain that failure or obtain a
+separately authorized repair and fresh proof. Never discard it to make step 7 succeed.
+
+`convert.py` also replaces a session UUID only in the native
+`<project directory>/<session UUID>/scratchpad/...` path under `.claude/projects` or `/tmp/claude-*`, preserving
+the scratch file suffix as a citation. Other session identifiers still refuse publication; key collisions still
+refuse before any artifact is written. This repair was reproduced against the three retained native notes.
+
+The source review of the ordinary recovery remains in the unchanged
 [vendored child-usage.mjs](../../../examples/claude-native/workflows/child-usage.mjs), as retained at
 native-agent-stack `8c32a84b246da66e43a6188c973741b09329e223`, SHA256
 `3e5189342734135e88a2295c1c2152275d9e26c0c7731ed5cbc8905bbccd98a4`.

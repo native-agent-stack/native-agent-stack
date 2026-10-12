@@ -149,6 +149,12 @@ background task the child left running at its final message (`return_quality`,
 [U2 measurement fields](#u2-measurement-fields-2026-09-29)). The counters are provider-returned and are not comparable
 to RTK, Context Mode, jCodeMunch or Headroom estimates.
 
+Since 2026-10-11 each child also reports `unknown_effort_requests`, counted over the same deduplicated
+usage-bearing assistant messages as `requests`. The `efforts` set omits missing values, so `["max"]` alone
+does not prove every request has an effort measurement. The native gate and supersession consumers require affirmative
+zero unknown count in a covering terminal. Remeasure earlier receipts with this adapter rather than assigning
+zero to a missing count. Usage completeness and effort acceptance remain separate checks.
+
 Each child also carries a `lanes` object read from its own transcript
 (`child-usage.mjs` changed after `v2026.09.26.2` to add it): tool calls,
 Bash calls, MCP calls per server (`mcp__<server>__<tool>`), Skill calls by skill,
