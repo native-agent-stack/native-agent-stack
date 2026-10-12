@@ -322,7 +322,9 @@ controls pass on both. Forms readable only by a person, such as `\x40`, a fullwi
 for the shared email detector. (Until addendum 03 this sentence also put two values on one line, a BOM, a trailing
 comma, a log prefix and duplicate names outside `publish()`'s scope. For an address, the escape projection below reads
 all four; the JSON reading takes two values on a line and a trailing comma, and a BOM since addendum 04; a duplicate
-name is refused in every JSON text the views read, which a log prefix on the same line is not.)
+name is refused in every JSON text the views read, which a log prefix on the same line is not, nor a pretty object
+after a form feed, a vertical tab, U+0085 or U+2028: a reader that splits there and parses the rest reads its
+duplicate, and no address, since the escape projection is blind to framing.)
 
 **Addendum 03 (the command center's, from a shadow review the co-op reproduced at `66036a74`):** the verifier still
 depended on framing. A pretty-printed object after a lone CR (a progress line, then JSON), or behind RS framing (RFC 7464
@@ -364,13 +366,17 @@ recurrence, so the verifier is one function now, `publication_views()` in `scrip
   every JSON text under each framing the views read: the whole text, a line feed, `str.splitlines()`, universal
   newlines, and records at RS, each whole across its line breaks (RFC 7464 2: a parser SHOULD continue past a
   malformed record, rfc7464.txt:153-155, as jq does at jqlang/jq@`4467af7068b1bcd7f882defff6e7ea674c5357f4`
-  `src/jv_parse.c:785-807`). Within each, JSON texts are read in turn, a byte order mark between them is skipped
-  (RFC 8259 8.1, rfc8259.txt:494-498, as jq 1.8.1 does), and where none starts, reading resumes at the next line, a
-  lone CR included, as readline-then-`json.load` does; a line is decoded alone first, and the text after it only when
-  the line ends inside a JSON text, so the reading stays linear. Nested JSON in a string value is read too;
+  `src/jv_parse.c:785-807`). Within each, JSON texts are read in turn, a byte order mark before a text is skipped
+  (RFC 8259 8.1 lets a parser ignore one at the beginning of a text, rfc8259.txt:494-498; jq 1.8.1 skips a leading one
+  only, so the views read more than it does), and where none starts, reading resumes at the next line, a lone CR
+  included, as readline-then-`json.load` does; a line is decoded alone first, and the text after it only when the line
+  ends inside a JSON text. (This said the reading stays linear; a text left unclosed was read again from each later
+  line that opens another, which addendum 05 below bounds.) Nested JSON in a string value is read too;
 - a check it cannot finish raises `Unverifiable`, which both surfaces refuse: escaping still undone after
   `PUBLISH_DEPTH` passes, JSON nested deeper than `PUBLISH_DEPTH` levels, an object with a duplicate name, or JSON too
-  deep for Python's decoder (`RecursionError`). Text past the bound is refused whatever it holds;
+  deep for Python's decoder (`RecursionError`). An address escaped past the bound is refused in every framing; clean
+  text nested past it is refused in the framings the views read, which a prefix on the same line, a form feed, a
+  vertical tab, U+0085 and U+2028 are not (this said "whatever it holds" until addendum 05);
 - the host-receipt scan judges every view with the reviewed-email waiver applied to each, so JSON held in a string is
   read, and a receipt the views cannot finish is refused.
 
@@ -391,12 +397,63 @@ streams below is). JSON too deep for Python's decoder is refused with `PUBLISH_R
 
 The regressions fail on `6aaa204a` (46 failures and 4 errors across the native-token, host-receipt and validate tests)
 and pass here. The command tests now read their payloads from files, so the argv publishes and the refusal is the
-output's (the GPT read's P3-6). 14 of 14 weakened copies fail them. A census on both heads
-gives the same result. Selector A takes every string under a `stdout` or `stderr` key, at any depth, in the tracked
-JSON files whose top-level `kind` is `native_cli_e2e` (26 files, 1,518 strings, 629 non-empty): all are published
-unchanged. Selector B takes the same strings in every tracked JSON file (198 files, 4,867 strings): none is refused,
-and `clean()` rewrites 17. On inputs of about 1.1 MB, one `publish()` takes at most 1.9 s here (1.65 s at `6aaa204a`).
-A truncated pretty document 300 levels deep takes 1.2 s (0.17 s), because each unclosed level is read across lines once.
+output's (the GPT read's P3-6). 14 of 14 weakened copies fail them: the escape bound, the nesting bound, RS records,
+merged names, changed numbers, `publish()` failing open on `Unverifiable`, the receipt scan decoding once or failing
+open, the byte order mark, line resumption, the read across lines, `publish()` raising `RecursionError`, and the
+noreply case in each copy. A census on both heads gives the same result. Selector A takes every string under a
+`stdout` or `stderr` key, at any depth, in the tracked JSON files whose top-level `kind` is `native_cli_e2e` (26
+files, 1,518 strings, 629 non-empty): all are published unchanged. Selector B takes the same strings in every tracked
+JSON file (198 files, 4,867 strings): none is refused, and `clean()` rewrites 17. On receipt-like inputs of about 1.1
+MB (pretty JSON, JSON Lines, progress lines at lone CRs), one `publish()` takes at most 1.9 s here (1.65 s at
+`6aaa204a`). A truncated pretty document (300 lines that each open an array, then a pretty array of 1,500 command
+entries, cut at 420,602 characters) takes 1.2 s (0.17 s), because each unclosed level is read to the end again;
+addendum 05 bounds that.
+
+**Addendum 05 (from the command center's Claude micro at `167eb00a`; the GPT read at that head is an ACK whose six P3s
+are in the pull request's Follow-ups):** one more P1 of the class on a surface `publish()` never covered, two rewrite
+defects Codex found, and four claims that were false or loose.
+
+- **The receipt's own strings (N1; Codex's thread 4247416401).** `Run.observe()` recorded the names a tool wrote under
+  its state directory through `clean()` alone, and `flush()` wrote them to `receipt.json`. A file name that is JSON
+  holding an escaped address was kept, and `json.load` of the receipt, then `json.loads` of the name, returned the
+  address. Every field recorded through `clean()` alone had the same path: an error message, a doctor line, an
+  environment value, a working directory. `flush()` now verifies every string of the receipt, names and values, as
+  `publish()` verifies its output (`unpublishable()`: the rules over every view), once per distinct string. One that
+  fails is replaced by the fixed `PUBLISH_REFUSED` text, and the run fails. Over the 6 committed receipts `Run` wrote
+  (16,224 strings, 1,005 distinct) none is refused.
+- **An address right after a JSON escape (thread 4247416418).** `clean()` works on the text as written, so a match
+  right after an escape took the escape's last character (`n`, `t`, `r`, `b`, `f`, `/` or the last digit of a `u`
+  escape) and the document went out as invalid JSON. Where `clean()` changed a JSON document, `document()` now reads
+  it as written, cleans its decoded values, and keeps `clean()`'s text only if that reads as the same document;
+  otherwise the document is written again from the cleaned values, at each level of JSON in strings. A match `clean()`
+  makes that no decoded value holds (a UUID-shaped run that starts with an escape's letter) leaves nothing to rewrite,
+  so that output is refused, not corrupted.
+- **A lone surrogate beside a value that needs cleaning (thread 4247416409).** The rewrite returned text that cannot
+  be encoded as UTF-8, so a command or an artifact raised `UnicodeEncodeError`. Such a rewrite is refused; with
+  nothing to clean, the document keeps every byte.
+- **Re-reading unclosed JSON (FC2).** A JSON text left unclosed was read to the end again from each later line that
+  opens another one inside it: 300 such lines in 1.1 MB took 18.3 s. `json_texts()` now counts that re-reading and
+  raises `Unverifiable` once it passes 16 times the text's length (`RESCANS`); an unterminated string counts to the
+  end of the text, where the decoder scanned, not to the position it reports. That input is refused in 4.3 s, and
+  8,000 lines that each open an array in 0.04 s (1.05 s before). Ten unclosed arrays, an object dump that is not JSON
+  and a truncated pretty document stay inside the bound and keep every byte.
+- **Claims corrected (FC1, FC3, FC4; P3s).** "Text past the bound is refused whatever it holds" is narrowed above and
+  in the code, the test's name and the commit text: the escape bound is blind to framing, the nesting bound applies
+  where the views read JSON. The byte order mark's attribution is corrected (jq skips a leading one only). Addendum 04
+  is labelled by the head it came from, `6aaa204a`, in the three comments that said `4c916e14`. The too-deep test
+  gains the lone-CR case, the path a weakened copy of the micro's survived. The bound's comment gives the passes the
+  micro measured (committed native-token streams need at most two, host receipts at most three). A run of 32 or more
+  backslashes, or 16 before an escape letter, is refused whatever it holds, by design; none occurs in the census.
+
+The new tests fail on `167eb00a` (6 failures and 23 errors across the native-token and host-receipt tests; the errors
+are the invalid JSON and the `UnicodeEncodeError` the two threads describe) and pass here. 13 of 13 weakened copies
+fail them: `flush()` verifying nothing, values but not names, or not inside lists; a refused string not failing the
+run, or leaving its status; the document never read as written; `clean()`'s text kept whenever it parses; lines not
+paired with the text as written; JSON as written passing the depth bound; a lone surrogate written back; no bound on
+re-reading; an unterminated string counted at its start; and `decoded()` letting `RecursionError` through. Census A
+and B are unchanged at both heads (0 refused, 17 rewritten by `clean()`), `validate.py` passes over the 239 host
+receipts, and the push gate's advisory counts are unchanged. On the same 1.1 MB inputs one `publish()` takes 2.1 s for
+pretty JSON and 2.3 s for JSON Lines here (1.9 s each at `167eb00a`, run back to back at a load of about 16).
 
 ## SOTA sources
 

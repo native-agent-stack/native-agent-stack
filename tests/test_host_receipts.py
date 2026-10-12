@@ -539,13 +539,15 @@ class ValidateFixtureTests(_ReceiptFixtureCase):
                 self.assertNotIn(an_address, output)
 
     def test_a_receipt_the_views_cannot_finish_is_rejected(self):
-        # The command center's addendum 04 at 4c916e14: a receipt whose views cannot be finished within the bound is
-        # refused, never certified. JSON nested past PUBLISH_DEPTH in an output excerpt (its innermost text has no
-        # quotes, so the receipt holds three levels of escaping and only the nesting bound applies), and escaping
-        # still undone after PUBLISH_DEPTH passes.
+        # The command center's addendum 04 (from the reads at 6aaa204a): a receipt whose views cannot be finished
+        # within the bound is refused, never certified. JSON nested past PUBLISH_DEPTH in an output excerpt (its
+        # innermost text has no quotes, so the receipt holds three levels of escaping and only the nesting bound
+        # applies), and escaping still undone after PUBLISH_DEPTH passes.
         backslash = chr(92)
         for name, excerpt in (("nested past the bound", json.dumps({"n": json.dumps({"n": json.dumps({"n": "[1]"})})})),
-                              ("escaped past the bound", "a" + backslash * 8 + "n")):
+                              ("escaped past the bound", "a" + backslash * 8 + "n"),
+                              # The micro at 167eb00a (FC2): more unclosed JSON than the views re-read.
+                              ("unclosed past the bound", "[\n" * 150)):
             with self.subTest(shape=name):
                 data = json.loads((FIXTURES / "valid.json").read_text(encoding="utf-8"))
                 data["catalog_revision"] = self.commit

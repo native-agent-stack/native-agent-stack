@@ -1445,7 +1445,7 @@ def validate_receipt_cross_references(root: Path, host_dir_name: str, path: Path
     # place of a literal '/', or \/ ), JSON held in a string value (a command's output
     # excerpt), and any framing a reader may use: judge every view
     # native_token_ci.publication_views() gives, the views Run.publish's verifier reads
-    # too (the command center's addendum 04 at 4c916e14), and refuse a receipt whose
+    # too (the command center's addendum 04, from the reads at 6aaa204a), and refuse a receipt whose
     # views cannot be finished within their bound.
     found = []
     try:

@@ -18862,8 +18862,8 @@
     },
     {
       "path": "docs/decisions/2026-10-11-email-address-publication-rule.md",
-      "sha256": "9356599e8734ee2b4de62c082b4537dc3f2aed59d37a1fac96d466ce4fc9a8ee",
-      "bytes": 34719
+      "sha256": "3c10ec348392aa6b77e7e1f52d3e371dfa39039550efb93bef211bcddcf4ae84",
+      "bytes": 40567
     },
     {
       "path": "docs/decisions/2026-10-11-final-stack-review-corrections.md",
@@ -60887,8 +60887,8 @@
     },
     {
       "path": "scripts/host_receipts.py",
-      "sha256": "b853aa15fa34b025a0658c88fa78bdbb81aa101f0c311de8c5249a16c1d6ce64",
-      "bytes": 112024
+      "sha256": "ac94965cb044057e2944ebb065bd7db9cbc1c71e6331fd0452a0fa5819737e2c",
+      "bytes": 112040
     },
     {
       "path": "scripts/kernel_keyring.py",
@@ -60902,8 +60902,8 @@
     },
     {
       "path": "scripts/native_token_ci.py",
-      "sha256": "304c9af2dab5c31ad1f86548e1af5a58b10a46df05a1dea7ecab441bc6621bdb",
-      "bytes": 132870
+      "sha256": "d58461bfa017fac59ec09fe89b3c202dd7ce8968aa744c383ccd7dac564bce29",
+      "bytes": 138558
     },
     {
       "path": "scripts/new_wsl_profile.py",
@@ -61922,8 +61922,8 @@
     },
     {
       "path": "tests/test_host_receipts.py",
-      "sha256": "eecb4c010ce1cdccb3e9738b0753a4f3686da472e27de4847828b04aa70efd3a",
-      "bytes": 149610
+      "sha256": "7c094d3de0905788f4514b4f027ba22bac236fb743530d7111fcb2d4087c257c",
+      "bytes": 149803
     },
     {
       "path": "tests/test_ibkr_acceptance.py",
@@ -62202,8 +62202,8 @@
     },
     {
       "path": "tests/test_native_token_ci.py",
-      "sha256": "920ba92e7cb6ebb55951456c3e141c38e3ce6c78628782d18df8e17bc55aa436",
-      "bytes": 157167
+      "sha256": "af6f60417417d7742969d43cd39128836aab82ffe4aef6cc5e65802bf009bb4f",
+      "bytes": 165728
     },
     {
       "path": "tests/test_native_worker_fixture.py",
