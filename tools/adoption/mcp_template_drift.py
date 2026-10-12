@@ -10,16 +10,19 @@ The live side is the user scope of Claude Code (`mcpServers` in ~/.claude.json, 
 that a plugin provides are not read. Nothing is written.
 
 One row per client and server name: SAME; DIFFERS (the differing fields named); TEMPLATE-ONLY (rendered, not registered); LIVE-ONLY (registered, not rendered). --acknowledged names a JSON file of the differences a decision record
-accepts (client, name, row, for DIFFERS the exact fields, a reason and a source file of this repository): such a row is reported `ack <row>` and does not fail the run, and an entry that matches no current row is reported
-STALE-ACK and does fail it, so an exception cannot outlive its cause. There is no default file: the entries describe one host.
+accepts (client, name, row, for DIFFERS the exact fields, a reason and a source: a regular file beneath this repository, named by a relative path and optionally followed by #heading): such a row is reported `ack <row>`
+and does not fail the run, and an entry that matches no current row is reported STALE-ACK and does fail it, so an exception cannot outlive its cause. There is no default file: the entries describe one host.
 
-Env and header values are compared and never printed (names only); a URL loses its userinfo and query; an argument that looks like NAME=VALUE or a long token is shown without its value.
+No value of a registration is printed, in either format or on either stream. Values are compared in memory and withheld from every description: environment variable and header NAMES are shown, never their values; a URL
+is shown as scheme://host (no userinfo, port, path, query or fragment); a command as its file name (no directory); an argument only when it is an option name (`--port`, `-y`, or the name in `--port=VALUE`), every other
+argument as <withheld>. A description is built from those names, counts and fixed words, so a value cannot reach it by taking a shape the report did not foresee.
 Exit 0: every difference is acknowledged; 1: an unacknowledged difference or a stale acknowledgement; 2: an input cannot be read.
 """
 from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import sys
 import tomllib
@@ -37,6 +40,11 @@ ACK_SCHEMA = "native-agent-stack/mcp-template-drift-acknowledged/v1"
 CLIENTS = ("claude", "codex")
 ROWS = ("DIFFERS", "TEMPLATE-ONLY", "LIVE-ONLY")
 ENV_ASSIGNMENT = re.compile(r"^[A-Za-z_]\w*=")
+WITHHELD = "<withheld>"
+NAME = re.compile(r"[A-Za-z0-9_][A-Za-z0-9_.:-]{0,63}\Z")                  # a variable, header, field or server name
+OPTION = re.compile(r"(?:--[a-z][a-z0-9_]*(?:-[a-z0-9_]+)*|-[A-Za-z])\Z")   # an option name: --kebab-case or one letter
+COMMAND = re.compile(r"[A-Za-z0-9_][A-Za-z0-9_.+-]{0,63}\Z")               # the file name of a program
+HOST = re.compile(r"[A-Za-z0-9](?:[A-Za-z0-9.-]{0,251}[A-Za-z0-9])?\Z")     # a host name or an IPv4 address
 CLAUDE_FIELDS = ("type", "url", "command", "args", "env", "headers")
 
 
@@ -44,8 +52,8 @@ class DriftError(ValueError):
     """An input cannot be read or does not have the expected shape."""
 
 
-def render_files(home: Path, authorization: bool = False) -> dict:
-    """{file name: text} of `new_wsl_client_config.py --render` for an account whose home is `home` (the host values of the distribution's template, moved to that home)."""
+def render_files(home: Path, authorization: bool = False, eco_root: Path | None = None) -> dict:
+    """{file name: text} of `new_wsl_client_config.py --render` for an account whose home is `home` (the host values of the distribution's template, moved to that home, with ECO_ROOT set to `eco_root` when given)."""
     template = (ROOT / new_wsl.HOST_TEMPLATE_REL).read_text(encoding="utf-8")
     values = json.loads(template.replace("${WSL_USER}", "example"))
     original = render_config.load_host_values
@@ -54,7 +62,10 @@ def render_files(home: Path, authorization: bool = False) -> dict:
         results, manifest, plan, errors, _ = new_wsl.analyse(ROOT, check_blocks=False, authorization=authorization)
         if errors:
             raise DriftError("the new-WSL client configuration check fails, so nothing can be rendered: " + "; ".join(errors[:3]))
-        return new_wsl.render(ROOT, results, plan, new_wsl.host_values("drift", plan, home, new_wsl.wired_path_dirs(results)), manifest)
+        values = new_wsl.host_values("drift", plan, home, new_wsl.wired_path_dirs(results))
+        if eco_root is not None:
+            values["ECO_ROOT"] = str(eco_root)
+        return new_wsl.render(ROOT, results, plan, values, manifest)
     except DriftError:
         raise
     except (new_wsl.ConfigError, render_config.RenderError, OSError, KeyError, ValueError) as error:
@@ -64,8 +75,8 @@ def render_files(home: Path, authorization: bool = False) -> dict:
 
 
 def render_templates(home: Path, eco_root: Path, authorization: bool = False) -> tuple[dict, dict]:
-    """(Claude servers, Codex servers) as the render writes them; the Claude file keeps ${HOME} and ${ECO_ROOT}, which `claude mcp add` receives rendered."""
-    files = render_files(home, authorization)
+    """(Claude servers, Codex servers) as the render writes them under the ecosystem prefix `eco_root`; the Claude file keeps ${HOME} and ${ECO_ROOT}, which `claude mcp add` receives rendered."""
+    files = render_files(home, authorization, eco_root)
     claude = icp.render_servers(json.loads(files["mcp-servers.json"]), home, eco_root)
     codex = tomllib.loads(files["codex.config.toml"]).get("mcp_servers", {})
     return claude, codex
@@ -124,27 +135,46 @@ def differing_fields(template: dict, live: dict) -> list[str]:
     return sorted(key for key in template.keys() | live.keys() if template.get(key) != live.get(key))
 
 
-def shown_url(url: str) -> str:
-    parts = urlsplit(url)
-    return f"{parts.scheme}://{parts.hostname or ''}{':' + str(parts.port) if parts.port else ''}{parts.path}" + ("?<query omitted>" if parts.query else "")
+def safe_name(name) -> str:
+    """A name (variable, header, field or server) as printed: itself when it has the shape of one, else the placeholder."""
+    return name if isinstance(name, str) and NAME.fullmatch(name) else WITHHELD
+
+
+def shown_url(url) -> str:
+    """scheme://host of a URL; userinfo, port, path, query and fragment are withheld, and a URL that does not parse is withheld whole."""
+    try:
+        parts = urlsplit(str(url))
+        scheme, host = parts.scheme.lower(), parts.hostname or ""
+    except ValueError:
+        return WITHHELD
+    return f"{scheme}://{host}" if scheme in ("http", "https", "ws", "wss") and HOST.fullmatch(host) else WITHHELD
+
+
+def shown_command(command) -> str:
+    """The file name of the program; the directory (which holds the account's home) is not printed."""
+    if not command:
+        return "(no command)"
+    name = os.path.basename(str(command).rstrip("/"))
+    return name if COMMAND.fullmatch(name) else WITHHELD
 
 
 def shown_arg(arg) -> str:
-    text = str(arg)
-    if re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", text):
-        return text.split("=", 1)[0] + "=<value omitted>"
-    if len(text) > 40 and re.fullmatch(r"[A-Za-z0-9_\-.=+/]{40,}", text) and not text.startswith("/"):
-        return "<long token omitted>"
-    return text
+    """An option name (`--port`, `-y`, and the name in `--port=VALUE`, which keeps `=<withheld>`); every other argument is the placeholder, whatever it looks like."""
+    name, equals, _ = str(arg).partition("=")
+    if len(name) <= 48 and OPTION.fullmatch(name):
+        return name + (f"={WITHHELD}" if equals else "")
+    return WITHHELD
 
 
 def describe(spec: dict) -> str:
-    """One line for a normalised spec: how it starts, its argument count, the NAMES of its env and headers."""
-    names = sorted(spec.get("env") or {}) + sorted(f"header:{key}" for key in spec.get("headers") or {})
-    start = shown_url(spec["url"]) if spec.get("url") else str(spec.get("command"))
+    """One line for a normalised spec, built from names, counts and fixed words: its type, how it starts (scheme://host, or the command's file name), its arguments (option names; the rest withheld) and the NAMES
+    of its env and headers."""
+    names = sorted(safe_name(name) for name in spec.get("env") or {}) + sorted(f"header:{safe_name(name)}" for name in spec.get("headers") or {})
+    start = shown_url(spec["url"]) if spec.get("url") else shown_command(spec.get("command"))
     args = [shown_arg(a) for a in spec.get("args") or []]
     shown_args = " ".join(args) if len(" ".join(args)) <= 90 else f"[{len(args)} args]"
-    return " ".join(part for part in (str(spec.get("type") or ("http" if spec.get("url") else "stdio")), start, shown_args, f"env/headers: {','.join(names)}" if names else "") if part)
+    kind = spec.get("type") or ("http" if spec.get("url") else "stdio")
+    return " ".join(part for part in (safe_name(kind), start, shown_args, f"env/headers: {','.join(names)}" if names else "") if part)
 
 
 def compare(client: str, template: dict, live: dict) -> list[dict]:
@@ -160,6 +190,18 @@ def compare(client: str, template: dict, live: dict) -> list[dict]:
             fields = differing_fields(a, b)
             rows.append({"client": client, "name": name, "row": "DIFFERS" if fields else "SAME", "fields": fields, "template": describe(a), "live": describe(b)})
     return rows
+
+
+def repository_file(source: str) -> bool:
+    """Whether `source` (a relative path, optionally followed by #heading) names a regular file beneath this repository: absolute paths and `..` are refused and symlinks are resolved first."""
+    name = source.split("#", 1)[0]
+    if not name or Path(name).is_absolute() or ".." in Path(name).parts:
+        return False
+    try:
+        resolved = (ROOT / name).resolve(strict=True)
+    except (OSError, RuntimeError, ValueError):
+        return False
+    return resolved.is_file() and resolved.is_relative_to(ROOT.resolve())
 
 
 def load_acknowledged(path: Path) -> list[dict]:
@@ -185,9 +227,8 @@ def load_acknowledged(path: Path) -> list[dict]:
             problems.append(f"{where}: a DIFFERS entry names the differing fields")
         if not str(entry.get("reason") or "").strip():
             problems.append(f"{where}: reason is missing")
-        source = str(entry.get("source") or "").split("#", 1)[0]
-        if not source or not (ROOT / source).is_file():
-            problems.append(f"{where}: source must be a file of this repository (got {entry.get('source')!r})")
+        if not repository_file(str(entry.get("source") or "")):
+            problems.append(f"{where}: source must be a relative path to a regular file beneath this repository (got {entry.get('source')!r})")
     if problems:
         raise DriftError(f"{path}: " + "; ".join(problems))
     return data["acknowledged"]
@@ -262,10 +303,12 @@ def main(argv: list[str] | None = None) -> int:
         print(f"mcp_template_drift: {error}", file=sys.stderr)
         return 2
     failed = any(r["row"] != "SAME" and not r.get("acknowledged") for r in rows) or bool(stale)
+    shown_rows = [{**r, "name": safe_name(r["name"]), "fields": [safe_name(f) for f in r["fields"]]} for r in rows]
+    shown_stale = [{**e, "name": safe_name(e["name"]), "fields": [safe_name(f) for f in e.get("fields") or []]} for e in stale]
     if args.json:
-        print(json.dumps({"ok": not failed, "notes": notes, "rows": rows, "stale": stale}, indent=1, sort_keys=True))
+        print(json.dumps({"ok": not failed, "notes": notes, "rows": shown_rows, "stale": shown_stale}, indent=1, sort_keys=True))
     else:
-        print(report(rows, stale, notes))
+        print(report(shown_rows, shown_stale, notes))
     return 1 if failed else 0
 
 

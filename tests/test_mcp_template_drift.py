@@ -1,18 +1,22 @@
 """Tests for tools/adoption/mcp_template_drift.py, the read-only report of where the MCP servers the committed new-WSL templates render differ from the servers an account's clients have registered.
 
 The live files here are fixtures written from the render itself, so "no difference" is exact and each difference is one deliberate change. The tool never starts a server, never calls a client and never writes outside the
-temporary directory of the test. Values of env entries, headers, URL userinfo and query strings, NAME=VALUE arguments and long tokens must not reach the output (the SENTINEL test).
+temporary directory of the test. No value of a registration reaches the output, in either format or on either stream: environment and header values, every argument but an option name, and a URL's userinfo, port, path and query are withheld (the SENTINEL, credential-form and property tests).
 """
 
 import contextlib
 import io
 import json
+import os
+import random
 import re
+import string
 import subprocess
 import sys
 import tempfile
 import tomllib
 import unittest
+import urllib.parse
 from pathlib import Path
 from unittest import mock
 
@@ -192,19 +196,107 @@ class DriftTests(unittest.TestCase):
         self.assertEqual(code, 0, [k for k, r in rows.items() if r["row"] != "SAME"])
 
     # ------------------------------------------------------------------ what is never printed
+    CREDENTIAL = "Review-S3cret!x9"
+    CREDENTIAL_FORMS = {
+        "an option and its value": lambda raw, quoted: ["--api-key", raw],
+        "an option and its percent-encoded value": lambda raw, quoted: ["--api-key", quoted],
+        "an option=value": lambda raw, quoted: [f"--api-key={raw}"],
+        "URL userinfo in an argument": lambda raw, quoted: [f"https://user:{quoted}@example.invalid/mcp"],
+        "a URL query in an argument": lambda raw, quoted: [f"https://example.invalid/mcp?key={quoted}"],
+        "an Authorization header argument": lambda raw, quoted: ["--header", f"Authorization: Bearer {raw}"],
+        "a long credential with a special character": lambda raw, quoted: ["--token", raw + "A" * 42],
+    }
+
     def test_values_of_env_headers_urls_and_arguments_never_reach_the_output(self):
         servers = json.loads(json.dumps(self.claude))
         servers["semble"]["env"][sorted(servers["semble"]["env"])[0]] = SENTINEL
-        servers["leaky-http"] = {"type": "http", "url": f"http://user:{SENTINEL}@127.0.0.1:1/mcp?token={SENTINEL}", "headers": {"Authorization": f"Bearer {SENTINEL}"}}
-        servers["leaky-stdio"] = {"type": "stdio", "command": "leaky", "args": [f"API_TOKEN={SENTINEL}", SENTINEL + "A" * 40, "--plain"], "env": {"API_KEY": SENTINEL}}
+        servers["leaky-http"] = {"type": "http", "url": f"http://user:{SENTINEL}@127.0.0.1:1/mcp/{SENTINEL}?token={SENTINEL}", "headers": {"Authorization": f"Bearer {SENTINEL}"}}
+        servers["leaky-stdio"] = {"type": "stdio", "command": f"/opt/{SENTINEL}/bin/leaky", "args": [f"API_TOKEN={SENTINEL}", SENTINEL + "A" * 40, "--plain"], "env": {"API_KEY": SENTINEL}}
         claude_path, codex_path = self.live(servers)
         for extra in ((), ("--json",)):
             code, out, err = self.run_tool(claude_path, codex_path, *extra)
             self.assertEqual(code, 1)
             self.assertNotIn(SENTINEL, out + err)
         code, out, _ = self.run_tool(claude_path, codex_path)
-        for shown in ("leaky-http", "leaky-stdio", "API_KEY", "Authorization", "API_TOKEN=<value omitted>", "<long token omitted>", "--plain", "?<query omitted>"):
+        for shown in ("leaky-http", "leaky-stdio", "API_KEY", "header:Authorization", "http://127.0.0.1 ", " leaky ", "--plain", drift.WITHHELD):
             self.assertIn(shown, out)
+        for hidden in ("API_TOKEN", "127.0.0.1:1", "/mcp", "token=", "/opt/"):
+            self.assertNotIn(hidden, out, "an argument that is not an option name, and a URL's port, path and query, are withheld")
+
+    def test_no_argument_value_reaches_either_output_format_for_either_client(self):
+        """The forms of the review of 2026-10-12 (Astra, #1034 at 6a7a7ce7): 7 forms x 2 clients x 2 formats, each on a server the templates lack (LIVE-ONLY) and on one they have (DIFFERS)."""
+        raw, quoted = self.CREDENTIAL, urllib.parse.quote(self.CREDENTIAL, safe="")
+        needles = (raw, quoted, "S3cret")
+        for label, make in self.CREDENTIAL_FORMS.items():
+            arguments = make(raw, quoted)
+            for client in ("claude", "codex"):
+                if client == "claude":
+                    servers = json.loads(json.dumps(self.claude))
+                    servers["only-live"] = {"type": "stdio", "command": "fixture", "args": list(arguments)}
+                    servers["semble"]["args"] = [*servers["semble"].get("args", []), *arguments]
+                    paths = self.live(servers)
+                else:
+                    def change(servers, arguments=arguments):
+                        servers["only-live"] = {"command": "fixture", "args": list(arguments)}
+                        servers["semble"]["args"] = [*servers["semble"].get("args", []), *arguments]
+                    paths = self.live(codex_text=self.codex_with(change))
+                for extra in ((), ("--json",)):
+                    with self.subTest(form=label, client=client, json=bool(extra)):
+                        code, out, err = self.run_tool(*paths, *extra)
+                        self.assertEqual(code, 1, "the drift itself is still reported")
+                        for needle in needles:
+                            self.assertNotIn(needle, out + err)
+                        self.assertIn("only-live", out)
+                        self.assertIn("semble", out)
+
+    def test_a_description_is_built_from_names_and_fixed_words_only(self):
+        """Value-free by construction: for 300 seeded random values placed in every position of a registration, no 8-character piece of the value is in the description."""
+        rnd = random.Random(1034)
+        alphabet = string.ascii_letters + string.digits + "!#$%&()*+,-./:;<=>?@[]^_{|}~ "
+        for index in range(300):
+            secret = "".join(rnd.choice(alphabet) for _ in range(rnd.randint(12, 48)))
+            stdio = {"type": "stdio", "url": None, "command": f"/opt/{secret}/bin/fixture", "args": [secret, f"--key={secret}", "--key", secret, f"-{secret}", f"https://{secret}@host.invalid/{secret}?q={secret}"],
+                     "env": {"ONE": secret}, "headers": {"X-Header": secret}}
+            http = {"type": "http", "url": f"https://u:{secret}@host.invalid:8443/{secret}?token={secret}#{secret}", "command": None, "args": [secret], "env": {"TWO": secret}, "headers": {"Authorization": secret}}
+            for spec in (stdio, http):
+                text = drift.describe(spec)
+                for position in range(len(secret) - 7):
+                    self.assertNotIn(secret[position:position + 8], text, (index, position, text))
+
+    def test_tokens_that_only_look_like_option_names_are_withheld(self):
+        """A single dash followed by letters, an upper-case word, a digit-led word or an overlong word is a value to the report, not an option name."""
+        hostile = ["-AbCdEfGhIjKlMnOp", "--AbCdEfGhIjKlMnOp", "--9digitsFirst", "-abc", "---triple", "--a" + "b" * 60, "--", "-", "--k e y", "--key\\n=v"]
+        text = drift.describe({"command": "tool", "args": hostile, "env": {}, "headers": {}})
+        self.assertEqual(text, "stdio tool [10 args]", "ten placeholders are longer than the 90 characters a description spends on arguments, so only the count is printed")
+        for token in hostile:
+            self.assertEqual(drift.shown_arg(token), drift.WITHHELD, token)
+        for token in ("-y", "-Y", "--port", "--no-update-notifier", "--max_tokens"):
+            self.assertEqual(drift.shown_arg(token), token)
+        self.assertEqual(drift.shown_arg("--token=abc"), "--token=" + drift.WITHHELD)
+        self.assertEqual(drift.shown_arg("--Token=abc"), drift.WITHHELD)
+
+    def test_names_that_do_not_look_like_names_are_withheld(self):
+        """Server, variable and header names are keys, printed as they are while they have the shape of a name."""
+        odd = "bad name =secret AKIAEXAMPLE!"
+        servers = json.loads(json.dumps(self.claude))
+        servers[odd] = {"type": "stdio", "command": "tool", "args": [], "env": {odd: "v", "GOOD_NAME": "v"}, "headers": {odd: "v"}}
+        for extra in ((), ("--json",)):
+            code, out, err = self.run_tool(*self.live(servers), *extra)
+            self.assertEqual(code, 1)
+            self.assertNotIn("AKIAEXAMPLE", out + err)
+            self.assertNotIn("secret", out + err)
+            self.assertIn("GOOD_NAME", out)
+            self.assertIn(drift.WITHHELD, out)
+
+    def test_the_description_keeps_what_a_reader_needs_without_a_value(self):
+        stdio = {"type": "stdio", "url": None, "command": "/home/example/.local/bin/server", "args": ["-y", "@scope/pkg@1.2.3", "--port", "8787", "--token=abc", "--header", "Authorization: Bearer abc"],
+                 "env": {"B_NAME": "1", "A_NAME": "2"}, "headers": {}}
+        self.assertEqual(drift.describe(stdio), f"stdio server -y {drift.WITHHELD} --port {drift.WITHHELD} --token={drift.WITHHELD} --header {drift.WITHHELD} env/headers: A_NAME,B_NAME")
+        http = {"type": "http", "url": "https://user:pw@Example.invalid:8443/mcp/path?key=v#frag", "command": None, "args": [], "env": {}, "headers": {"X-Api-Key": "v", "Authorization": "w"}}
+        self.assertEqual(drift.describe(http), "http https://example.invalid env/headers: header:Authorization,header:X-Api-Key")
+        crowded = {"type": "stdio", "url": None, "command": "tool", "args": [f"--flag{index}" for index in range(30)], "env": {}, "headers": {}}
+        self.assertEqual(drift.describe(crowded), "stdio tool [30 args]")
+        self.assertEqual(drift.describe({"command": None, "args": [], "env": {}, "headers": {}}), "stdio (no command)")
 
     # ------------------------------------------------------------------ acknowledged differences
     def test_acknowledged_rows_pass_and_are_reported_as_such(self):
@@ -264,6 +356,39 @@ class DriftTests(unittest.TestCase):
             self.assertEqual(out, "", label)
             self.assertIn(label, err, label)
 
+    def test_an_acknowledgement_source_is_a_regular_file_beneath_the_repository(self):
+        """Review of 2026-10-12 (Astra, #1034 at 6a7a7ce7): `(ROOT / source).is_file()` accepted /etc/passwd and ../pr-body.md, and main() then answered rc 0 with ok true."""
+        with tempfile.TemporaryDirectory() as directory:
+            repository = Path(directory) / "repository"
+            (repository / "docs").mkdir(parents=True)
+            record = repository / "docs" / "record.md"
+            record.write_text("# Heading\n", encoding="utf-8")
+            outside = Path(directory) / "outside.md"
+            outside.write_text("not a file of the repository\n", encoding="utf-8")
+            (repository / "docs" / "escape.md").symlink_to(outside)
+            (repository / "docs" / "alias.md").symlink_to(record)
+            (repository / "docs" / "folder").mkdir()
+            accepted = ["docs/record.md", "docs/record.md#heading", "docs/alias.md"]
+            refused = {"an absolute path": str(outside), "the absolute system file": "/etc/passwd", "an absolute path inside the repository": str(record), "parent traversal": "../outside.md",
+                       "traversal that returns inside": "docs/../docs/record.md", "a symlink to a file outside": "docs/escape.md", "a directory": "docs/folder",
+                       "a missing file": "docs/missing.md", "no path, only a fragment": "#heading", "a null byte": "docs/rec\0ord.md"}
+            with mock.patch.object(drift, "ROOT", repository):
+                for source in accepted:
+                    with self.subTest(accepted=source):
+                        entries = drift.load_acknowledged(self.acknowledgements(self.entry("claude", "x", "LIVE-ONLY", source=source)))
+                        self.assertEqual(len(entries), 1)
+                for label, source in refused.items():
+                    with self.subTest(refused=label):
+                        with self.assertRaises(drift.DriftError) as caught:
+                            drift.load_acknowledged(self.acknowledgements(self.entry("claude", "x", "LIVE-ONLY", source=source)))
+                        self.assertIn("source", str(caught.exception))
+            claude_path, codex_path = self.live()
+            for source in ("/etc/passwd", os.path.relpath(outside, ROOT)):
+                with self.subTest(through_main=source):
+                    code, out, err = self.run_tool(claude_path, codex_path, "--acknowledged", str(self.acknowledgements(self.entry("claude", "x", "LIVE-ONLY", source=source))))
+                    self.assertEqual((code, out), (2, ""))
+                    self.assertIn("source", err)
+
     def test_the_committed_acknowledgements_agree_with_the_render_and_cite_sections_of_their_record(self):
         """What can be checked without a live host: the file is well formed, each source is a heading of the record, a LIVE-ONLY entry names a server the render does not have and a DIFFERS entry one it has."""
         path = ROOT / "adoption" / "new-wsl" / "mcp-drift-acknowledged.json"
@@ -288,6 +413,37 @@ class DriftTests(unittest.TestCase):
                     self.assertEqual(entry["row"], "DIFFERS")
                     self.assertIn(entry["name"], rendered[entry["client"]])
                     self.assertEqual(entry["fields"], sorted(entry["fields"]), "fields are listed in the order the report prints them")
+
+    # ------------------------------------------------------------------ the ecosystem prefix
+    def test_the_ecosystem_root_reaches_both_templates(self):
+        """Review of 2026-10-12 (Astra, #1034 at 6a7a7ce7): the prefix went to the Claude renderer only, so Codex kept <home>/.local/share/codex-ecosystem (six false DIFFERS rows under another prefix)."""
+        custom = Path(self.tmp.name) / "another-prefix" / "ecosystem"
+        default_claude, default_codex = drift.render_templates(self.home, self.eco)
+        claude, codex = drift.render_templates(self.home, custom)
+
+        def moved(servers):
+            return json.loads(json.dumps(servers).replace(str(self.eco), str(custom)))
+        for client, got, base in (("claude", claude, default_claude), ("codex", codex, default_codex)):
+            with self.subTest(client=client):
+                self.assertIn(str(self.eco), json.dumps(base), "the default render uses the default prefix")
+                self.assertIn(str(custom), json.dumps(got), "the requested prefix is in the render")
+                self.assertNotIn(str(self.eco), json.dumps(got), "and none of the default prefix is left")
+                self.assertEqual(got, moved(base), "the prefix is the only difference")
+
+    def test_a_non_default_prefix_compares_the_same_for_both_clients_from_the_option_and_the_environment(self):
+        custom = Path(self.tmp.name) / "another-prefix" / "ecosystem"
+        claude_path, codex_path = self.live(json.loads(json.dumps(self.claude).replace(str(self.eco), str(custom))), self.codex_text.replace(str(self.eco), str(custom)))
+        for label, option, environment in (("the option", ["--eco-root", str(custom)], {}), ("ECO_INSTALL_ROOT", [], {"ECO_INSTALL_ROOT": str(custom)})):
+            with self.subTest(prefix_from=label), mock.patch.dict(os.environ):
+                os.environ.pop("ECO_INSTALL_ROOT", None)
+                os.environ.update(environment)
+                out, err = io.StringIO(), io.StringIO()
+                with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+                    code = drift.main(["--home", str(self.home), *option, "--claude-json", str(claude_path), "--codex-config", str(codex_path), "--json"])
+                data = json.loads(out.getvalue())
+                self.assertEqual([(r["client"], r["name"], r["fields"]) for r in data["rows"] if r["row"] != "SAME"], [], err.getvalue())
+                self.assertEqual(code, 0)
+                self.assertEqual({r["client"] for r in data["rows"]}, {"claude", "codex"})
 
     # ------------------------------------------------------------------ inputs that cannot be read
     def test_unreadable_live_files_exit_two_and_absent_default_files_are_skipped(self):

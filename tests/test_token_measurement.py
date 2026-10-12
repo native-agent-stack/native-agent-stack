@@ -173,8 +173,8 @@ STACK_LANE_COMMANDS = {
 }
 STACK_MCPORTER_LIST = 'mcporter --config "${MCPORTER_CONFIG}" list socraticode --brief --no-oauth'
 STACK_MCPORTER_CALLS = {
-    "codebase-memory": ('mcporter --config "${MCPORTER_CONFIG}" call codebase-memory.search_graph'
-                        ' --args "${GRAPH_QUERY_ARGS}" --output json --no-oauth', "codebase-memory-mcp"),
+    "codebase-memory-mcp": ('mcporter --config "${MCPORTER_CONFIG}" call codebase-memory-mcp.search_graph'
+                            ' --args "${GRAPH_QUERY_ARGS}" --output json --no-oauth', "codebase-memory-mcp"),
     "context-mode": ("mcporter --config \"${MCPORTER_CONFIG}\" call context-mode.ctx_doctor --args '{}'"
                      " --output text --no-oauth", "context-mode"),
 }

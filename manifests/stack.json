@@ -280,7 +280,7 @@
       "profile": "core",
       "role": "Persistent static code graph and call tracing",
       "commands": [
-        "mcporter --config \"${MCPORTER_CONFIG}\" call codebase-memory.search_graph --args \"${GRAPH_QUERY_ARGS}\" --output json --no-oauth"
+        "mcporter --config \"${MCPORTER_CONFIG}\" call codebase-memory-mcp.search_graph --args \"${GRAPH_QUERY_ARGS}\" --output json --no-oauth"
       ],
       "evidence_ids": [
         "native-cli-gaps",

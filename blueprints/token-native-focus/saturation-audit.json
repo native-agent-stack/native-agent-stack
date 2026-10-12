@@ -1819,7 +1819,7 @@
       "native_integration": {
         "recipe_source": "adoption/manifest.json#/recipe_map/codebase-memory-mcp",
         "documented_commands": [
-          "mcporter --config \"${MCPORTER_CONFIG}\" call codebase-memory.search_graph --args \"${GRAPH_QUERY_ARGS}\" --output json --no-oauth"
+          "mcporter --config \"${MCPORTER_CONFIG}\" call codebase-memory-mcp.search_graph --args \"${GRAPH_QUERY_ARGS}\" --output json --no-oauth"
         ],
         "scope": "Use the selected native recipe only when its task applies.",
         "recipe_document": "recipes/README.md",

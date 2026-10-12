@@ -163,7 +163,7 @@ Use the installed graph service where language-server coverage is insufficient; 
 License: **MIT**. Reviewed source: [`59a05eb1bf9e`](https://github.com/DeusData/codebase-memory-mcp/blob/59a05eb1bf9e11deb060d782cd7d3a29f2ae2866/README.md). Only the referenced receipt scope ran; commands may be prospective replays with operator-selected paths.
 
 ```text
-mcporter --config "${MCPORTER_CONFIG}" call codebase-memory.search_graph --args "${GRAPH_QUERY_ARGS}" --output json --no-oauth
+mcporter --config "${MCPORTER_CONFIG}" call codebase-memory-mcp.search_graph --args "${GRAPH_QUERY_ARGS}" --output json --no-oauth
 ```
 
 Workflow pins: Native receipt replays have their own pinned environments. Commands without explicit versions are moving upstream entry points, not reproducible installs of this reviewed snapshot; select and lock the named version/commit before deployment.

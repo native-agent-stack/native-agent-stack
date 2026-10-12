@@ -11562,8 +11562,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "a53aeca4bb512173566a3cb3625c605e9432700a665809e2a1f4b69403449032",
-      "bytes": 507937
+      "sha256": "62af01df711becb1bfa95c41410308fe8c236df281d1b60fc09eaac5f0bfc3d6",
+      "bytes": 507941
     },
     {
       "path": "blueprints/trials-20260926/README.md",
@@ -17307,7 +17307,7 @@
     },
     {
       "path": "catalogs/landscape/final-stack.json",
-      "sha256": "5dde8ad61bb124fbcb2d56acb6c0973febc0802fda54bf5e5d8127ce9c15153b",
+      "sha256": "a41b418f6f16b79b77f45dcb58a976d2ba506275c67bddabcb01e7d2467e9424",
       "bytes": 309186
     },
     {
@@ -17662,13 +17662,13 @@
     },
     {
       "path": "catalogs/us-equities/foundation-memory.json",
-      "sha256": "8e94846d16a9a5a16fcbe09cf3e2e6c5b205287b7cd354d2b4ec73cc8ceb578e",
-      "bytes": 80200
+      "sha256": "26510ab3cc3e6d6be21758ff1c1b0132542cfc16e2595169df4472005e001e5d",
+      "bytes": 80204
     },
     {
       "path": "catalogs/us-equities/foundation-memory.md",
-      "sha256": "effe53a745b895b1683634bf0e174a62012a0bb62d2f173d40582cea2476f7d9",
-      "bytes": 47825
+      "sha256": "3ccc5f68dac4ab7291306f57493df4bf72e7686034d1dd57ba87fc71ea544e57",
+      "bytes": 47829
     },
     {
       "path": "catalogs/us-equities/foundation-source-review.md",
@@ -18922,8 +18922,8 @@
     },
     {
       "path": "docs/decisions/2026-10-12-mcp-template-live-reconciliation.md",
-      "sha256": "565a45bc66baca0d3772f85153b8259313abaeb1b4aaee0dc68a7500a27ed6a3",
-      "bytes": 10688
+      "sha256": "0b19d5781b104041931b2966cdcad6fddf0cdd6f8864ae9b5804628166787b8e",
+      "bytes": 11541
     },
     {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
@@ -19392,8 +19392,8 @@
     },
     {
       "path": "docs/token-efficiency-stack.json",
-      "sha256": "fa273390dfb7914f48d89189764e8c417d393f354f664909c50a38bcc0ac3ca3",
-      "bytes": 595355
+      "sha256": "6c3927880b64c27b2e84dbde7ecb07acfdfe7701d8ed1056230937c7586dc315",
+      "bytes": 595363
     },
     {
       "path": "docs/token-efficiency-stack.md",
@@ -60612,8 +60612,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "613b658a3fcb5d57ffbdd5e5ef27899afc5b90dfa23e52e0d8c6e4869be3c904",
-      "bytes": 130805
+      "sha256": "17c6d6d62b4d9c86b6a4b76d5bd6ca2327f16bb2b3a9b7d3878723f12e92561a",
+      "bytes": 130809
     },
     {
       "path": "observability/README.md",
@@ -60967,8 +60967,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "b80ffe344f68fbfedcf46f067b2bb5ed3f5aae4f26a2636f819f3c892e015473",
-      "bytes": 133396
+      "sha256": "3e620cf07e04d66f774bedd09ea235907bf8797fc3c61885c1cea566f22bc4da",
+      "bytes": 133404
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -62332,8 +62332,13 @@
     },
     {
       "path": "tests/test_mcp_template_drift.py",
-      "sha256": "f972a6ee3bf861423a3b36f31cb287cc5d907d04a1ad6ddf2dd3b5260548ffde",
-      "bytes": 19747
+      "sha256": "b70208fea70f27f3c07359e20ae07d10974ddc4ddff1e78af0a10d324da68da3",
+      "bytes": 32112
+    },
+    {
+      "path": "tests/test_mcporter_selectors.py",
+      "sha256": "50b1300fd32f15c38393d6321c1dc082570dcc3e6f00a232343b7013e44c99c2",
+      "bytes": 4531
     },
     {
       "path": "tests/test_memory_landscape_capture_doc.py",
@@ -62832,8 +62837,8 @@
     },
     {
       "path": "tests/test_skill_usage.py",
-      "sha256": "418b3493d775756dd92e0d72c638cc9693d736823b058d03076029646e929fdf",
-      "bytes": 275412
+      "sha256": "18cc554e12513db0331a2eba74d503d635bab941393fd10a12e397e903fcb8bf",
+      "bytes": 276027
     },
     {
       "path": "tests/test_skill_usage_daily.py",
@@ -62927,8 +62932,8 @@
     },
     {
       "path": "tests/test_token_measurement.py",
-      "sha256": "e1fe9ef953ad3ceb52549bb8841e2d1b8b2f20a34852952f70d48aadcf77ec2c",
-      "bytes": 237423
+      "sha256": "732396b36f8aed292cb913d75c3f28c3f92e24fb045468aacd697e01a4234ffb",
+      "bytes": 237435
     },
     {
       "path": "tests/test_trading_2604_lock.py",
@@ -63137,8 +63142,8 @@
     },
     {
       "path": "tools/adoption/mcp_template_drift.py",
-      "sha256": "bb139369a358f7c6ee2fcc45c90ae004aab055cda6b4c7e39ea83a4d238170fc",
-      "bytes": 15830
+      "sha256": "6fa4e2caffd93dbc70a240ded6bcd84639828a47025f3776aeb0c9b01d3c8db9",
+      "bytes": 18865
     },
     {
       "path": "tools/adoption/new_wsl_client_config.py",
