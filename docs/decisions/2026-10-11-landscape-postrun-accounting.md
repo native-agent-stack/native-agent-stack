@@ -263,7 +263,7 @@ failures and reopens seven affected layers; no earlier clean-effort artifact is 
 usage validator accepts these properly retained failures. The49 captured GPT last.json files and scope input
 include all42 selected copy-check dependencies. This is a retained-run integration,not a new inference run or
 catalog/ledger publication. The earlier245-line journal prefix is captured unchanged from the final journal and
-rehashes exactly to the historically cited849ee994 digest; the earlier effort-gate and original red/green logs
+rehashes exactly to the historically cited journal digest retained privately; the earlier effort-gate and original red/green logs
 are attached as well. Private capture manifests distinguish exact originals from masked transport copies.
 
 ## 2026-10-12 correction: synthetic session-limit rows and native publication scan

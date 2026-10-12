@@ -3,6 +3,7 @@
 import copy
 import hashlib
 import json
+import re
 import shutil
 from pathlib import Path
 import subprocess
@@ -14,6 +15,13 @@ from tests.test_landscape_sweep_harness import HARNESS, child_usage_raw
 
 
 class CompletedSupersessionTests(unittest.TestCase):
+    def test_public_postrun_record_omits_private_journal_digest_prefix(self):
+        record = HARNESS.parents[2] / "docs/decisions/2026-10-11-landscape-postrun-accounting.md"
+        text = record.read_text(encoding="utf-8")
+        # A shortened authentication token still confirms a guessed private preimage.
+        self.assertIsNone(re.search(r"historically cited\s*[0-9a-fA-F]{7,}", text),
+                          "private journal digest prefix remains in the public citation")
+
     def setUp(self):
         temp = tempfile.TemporaryDirectory()
         self.addCleanup(temp.cleanup)

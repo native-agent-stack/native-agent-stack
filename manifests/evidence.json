@@ -18862,8 +18862,8 @@
     },
     {
       "path": "docs/decisions/2026-10-11-landscape-postrun-accounting.md",
-      "sha256": "5d04c1eb7668e2f6225b0134e24d42a7ca2426786be609d46c180cb7fe6edcfd",
-      "bytes": 25719
+      "sha256": "4a442360a0b2c06e65845ac9825826fffdaa4427aff73e9da9d035deea7be9b4",
+      "bytes": 25738
     },
     {
       "path": "docs/decisions/2026-10-11-layer-resolution-protocol.md",
@@ -61987,8 +61987,8 @@
     },
     {
       "path": "tests/test_landscape_postrun.py",
-      "sha256": "426649ae31ca6f01ce6c34bcb6d5822c003ca7a8d57ac55d9ba3c1f28e3fc826",
-      "bytes": 26709
+      "sha256": "96c8a527d6c4ec89656aa7a4c12aeaa6b93b768572891bf41511eedc535fa564",
+      "bytes": 27206
     },
     {
       "path": "tests/test_landscape_sweep_harness.py",
