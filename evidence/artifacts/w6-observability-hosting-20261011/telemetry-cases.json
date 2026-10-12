@@ -60,7 +60,10 @@
         "failed_run_retained": true,
         "failure_usage_status": "unreported",
         "fabricated_failure_usage": false
-      }
+      },
+      "role_ids": [
+        "telemetry"
+      ]
     },
     {
       "id": "duplicate-delivery",
@@ -69,7 +72,10 @@
         "success_a_total": 42,
         "counting_scope": "exact receipt identity",
         "delivery_attempts_retained": true
-      }
+      },
+      "role_ids": [
+        "telemetry"
+      ]
     },
     {
       "id": "collector-restart",
@@ -78,7 +84,10 @@
         "success_a_total": 42,
         "success_b_total": 18,
         "original_failure_retained": true
-      }
+      },
+      "role_ids": [
+        "telemetry"
+      ]
     },
     {
       "id": "backend-restart-and-persistence",
@@ -89,7 +98,10 @@
         "success_a_total": 42,
         "success_b_total": 18,
         "original_failure_retained": true
-      }
+      },
+      "role_ids": [
+        "telemetry"
+      ]
     },
     {
       "id": "project-scope-and-authority",
@@ -99,17 +111,107 @@
         "no_broker_execution_authority": true,
         "broker_client_created": false,
         "network_order_requests": 0
-      }
+      },
+      "role_ids": [
+        "authority"
+      ]
     },
     {
       "id": "clean-target-recovery",
-      "action": "Use common restic/rest-server dependency to back up only the owned fixture's live telemetry and fictional SQLite journal; run restic check --read-data, restore into an empty independent directory, and restore --verify",
+      "action": "Use pinned common restic and an isolated baseline repository for owned live telemetry and fictional SQLite: quiesce/checkpoint, seal hashes, backup, check --read-data, restore --verify into empty independent target, restart restored services and query the same oracle. No rest-server is required for backend qualification.",
       "oracle": {
         "check_exit": 0,
         "restore_verify_exit": 0,
         "byte_identical_live_state_and_fixture_journal": true,
-        "source_directory_not_reused": true
+        "source_directory_not_reused": true,
+        "restored_service_query_matches": true
+      },
+      "role_ids": [
+        "live_state_recovery"
+      ]
+    },
+    {
+      "id": "dashboard-correlation",
+      "role_ids": [
+        "dashboards"
+      ],
+      "action": "Use upstream UI in an isolated browser: open the fixture-a dashboard and locate failed receipt with matching log/metric/trace. Check every declared panel and query fixture-b separately.",
+      "oracle": {
+        "all_declared_panels_live": true,
+        "success_a_total": 42,
+        "success_b_total": 18,
+        "failure_usage_status": "unreported",
+        "matching_receipt_identity": true,
+        "cross_lane_values": 0,
+        "lighthouse_accessibility_score": 1.0,
+        "missing_or_error_panels": 0
+      }
+    },
+    {
+      "id": "failure-alert-delivery",
+      "role_ids": [
+        "alerting"
+      ],
+      "action": "Induce frozen failed worker event; exercise native routing to isolated common ntfy, restart owned notification components and replay identical event.",
+      "oracle": {
+        "failure_notification_received": true,
+        "receipt_and_scope_identity_exact": true,
+        "cross_project_notifications": 0,
+        "duplicate_failure_notifications": 0,
+        "delivery_deadline_ms": 5000,
+        "broker_credentials_or_actions": 0
+      }
+    },
+    {
+      "id": "owned-process-supervision",
+      "role_ids": [
+        "process_supervision"
+      ],
+      "action": "Pinned Dagu/native process control launches fictional successful and failed jobs, interrupts an owned child, then inspects completion/restart and cleanup records.",
+      "oracle": {
+        "successful_exit": 0,
+        "failed_exit_retained": true,
+        "complete_returned_results_retained": true,
+        "interrupted_attempt_retained": true,
+        "owned_child_orphans_after_cleanup": 0,
+        "unowned_processes_modified": 0,
+        "network_order_requests": 0
+      }
+    },
+    {
+      "id": "destination-deletion-protection",
+      "role_ids": [
+        "off_host_deletion_protection"
+      ],
+      "action": "Score retained recovery mechanisms on disposable off-host stores independently; do not use these results as a telemetry backend gate.",
+      "oracle": {
+        "off_host_destination_required": true,
+        "append_only_client_deletion_refused": true,
+        "fresh_target_restore_required": true,
+        "commands": [
+          "restic backup",
+          "restic forget --prune",
+          "direct client-authenticated seeded data-object deletion",
+          "restic check --read-data",
+          "restic restore --verify"
+        ],
+        "attack_boundary": "Research-client backup identity has no destination admin/snapshot rights. All attacks use disposable seeded stores on an independent owned destination.",
+        "protected_arms": [
+          "rest-server-append-only",
+          "rclone-append-only"
+        ],
+        "protected_expected": "Both client attacks are refused; seeded source hashes/snapshots stay intact; check --read-data and fresh-target restore --verify exit 0 with byte-identical fixture state.",
+        "sftp_expected": "Both attacks succeed on disposable writable SFTP. Use separately seeded attack and restore stores; destructive control success is not restoration qualification.",
+        "private_repository_isolation": "Two fictional principals cannot read/write/delete each other repository; TLS identity is verified with no plaintext fallback.",
+        "destination_identity": "Retain independent-host and persistent-path proof privately; publish scoped redacted attestation and fictional hashes only.",
+        "live_state": "Quiesce owned fixture, flush/checkpoint fictional SQLite, seal public hash manifest, back up, close source, restore into empty independent target, restart restored services and query the same oracle."
       }
     }
-  ]
+  ],
+  "refrozen_at": "2026-10-12T04:35:04Z",
+  "supersedes": {
+    "head": "f2374694f453f93418279c6b255ce6838f9f489d",
+    "sha256": "a18773b3bcff53d83dc526e07411ea13fe9f71fe85d8ba1bb479b99633093f0c",
+    "reason": "B3/B4 require protection/dashboard/alert/supervision criteria before replay; original event bytes and six case identities retained."
+  }
 }

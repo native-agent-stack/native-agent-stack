@@ -19417,8 +19417,8 @@
     },
     {
       "path": "docs/w6-observability-hosting-delta-20261011.md",
-      "sha256": "b7d7f3a98caf4148b4055532cd31f82430bc2d0eb5b62f086965b0e8afd96487",
-      "bytes": 5118
+      "sha256": "b9ac86702d1fbf5b2e259f9e7f602276c2bbb06925daf03b2a2df123025776d8",
+      "bytes": 5777
     },
     {
       "path": "evidence/artifacts/actionlint-successor-parity-20260927/README.md",
@@ -57417,23 +57417,23 @@
     },
     {
       "path": "evidence/artifacts/w6-observability-hosting-20261011/preregistration.json",
-      "sha256": "972efba72e71335940c0a1b3c949ff5921cf4d1ea8e79be4e172bd04c93551c3",
-      "bytes": 6974
+      "sha256": "cd83fdb082cf729ef80996b3a53e17a221838955f2e67143ea6065a3666a772a",
+      "bytes": 30867
     },
     {
       "path": "evidence/artifacts/w6-observability-hosting-20261011/primary-sources.json",
-      "sha256": "f9e22ab94f523ef1b9b0251b159582d60e3d29fdf150a11c7d19392578c6c142",
-      "bytes": 6465
+      "sha256": "ff80f44eee66cdd0e95905c0a43e212aa926d7a864a348a397607104292ba971",
+      "bytes": 25871
     },
     {
       "path": "evidence/artifacts/w6-observability-hosting-20261011/resolution-delta.json",
-      "sha256": "f0ead5e0252850d3dd0e38a062f268861fe48fa0ec8640c8579e14083ca86708",
-      "bytes": 7369
+      "sha256": "c246560f1151d1ed836b1528499bfd8bb301c028e6f62ba5b63cafbebf91208a",
+      "bytes": 18925
     },
     {
       "path": "evidence/artifacts/w6-observability-hosting-20261011/telemetry-cases.json",
-      "sha256": "a18773b3bcff53d83dc526e07411ea13fe9f71fe85d8ba1bb479b99633093f0c",
-      "bytes": 3782
+      "sha256": "3a3750b19def868dd36aed6ab9e357a76a3896137fd93722b6ca95df5b2c4eca",
+      "bytes": 8327
     },
     {
       "path": "evidence/artifacts/workstation-lane-20260925/nemotron-qualification/model_card_check.py",
@@ -62974,6 +62974,11 @@
       "path": "tests/test_w6_layer_verdict_records.py",
       "sha256": "5c3187b15fd0d6441d0bdcdeeba9622778e732bd8c00854aaaf677fff1012c61",
       "bytes": 10923
+    },
+    {
+      "path": "tests/test_w6_observability_hosting_records.py",
+      "sha256": "2a3482173600f7c787588a6e8a0550a18b12020089e8dfeb97cb907793863548",
+      "bytes": 6130
     },
     {
       "path": "tests/test_windows_terminal_defaults.py",
