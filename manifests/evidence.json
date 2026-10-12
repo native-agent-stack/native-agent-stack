@@ -18937,8 +18937,8 @@
     },
     {
       "path": "docs/decisions/2026-10-11-landscape-postrun-accounting.md",
-      "sha256": "5de9e6748ea7fa422c543c7caa0b840ec5ea4b95de24ccf0604632c53d8e516a",
-      "bytes": 31992
+      "sha256": "d0897e849717771b9c47104774b461ff44c7d586935572060c7a67c8d2cd979d",
+      "bytes": 32022
     },
     {
       "path": "docs/decisions/2026-10-11-layer-resolution-protocol.md",
