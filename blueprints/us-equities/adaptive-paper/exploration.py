@@ -56,24 +56,32 @@ def active_trial_metadata(state_dir):
 
     Pre-change B state can be read only when its JSON identity and registered
     limits match the active journal. Historical namespaces alone are insufficient.
+    A projection without a journal binding refuses; only state with no prior
+    trial in either artifact can bootstrap.
     This performs no writes; the account lock protects the caller's second read.
     """
     from safety import SafetyError
     state_dir=Path(state_dir)
     db_path=state_dir/'ledger.sqlite3'
     projection=state_dir/'trial.json'
+    projection_unreadable=False
     try:
         metadata=json.loads(projection.read_text()) if projection.exists() else None
     except (OSError,ValueError):
         metadata=None
+        projection_unreadable=True
     if not db_path.exists() or db_path.stat().st_size == 0:
-        return metadata
+        if metadata is not None or projection_unreadable:
+            raise SafetyError('active_trial_projection_unbound')
+        return None
     if db_path.is_symlink():
         raise SafetyError('ledger_symlink_refused')
     db=sqlite3.connect(db_path.resolve().as_uri()+'?mode=ro',uri=True)
     try:
         if not db.execute("SELECT 1 FROM sqlite_master WHERE name='meta'").fetchone():
-            return metadata
+            if metadata is not None or projection_unreadable:
+                raise SafetyError('active_trial_projection_unbound')
+            return None
         rows=dict(db.execute('SELECT key,value FROM meta'))
         record=rows.get('exploratory_active_trial')
         if record is not None:
@@ -86,6 +94,8 @@ def active_trial_metadata(state_dir):
             if (not isinstance(metadata,dict) or metadata.get('trial_id') != rows['trial_id']
                     or rows.get('exploratory_config:'+str(metadata.get('config_sha256'))) != rows.get('limits')):
                 raise SafetyError('active_trial_projection_unbound')
+        elif metadata is not None or projection_unreadable:
+            raise SafetyError('active_trial_projection_unbound')
         return metadata
     finally:
         db.close()
