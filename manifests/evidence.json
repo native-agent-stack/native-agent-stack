@@ -5721,8 +5721,8 @@
     },
     {
       "path": "adoption/skills/lifecycle.md",
-      "sha256": "164f4a30bbf0838c65b229885455693539a96f1e7b32ce6c9f563fdbbddb59e6",
-      "bytes": 20171
+      "sha256": "ef104b7f607138341f3d8c9a3ce79d45c44e7a1dee13bcdd352ad02dd4bbbdda",
+      "bytes": 21999
     },
     {
       "path": "adoption/skills/manifest.json",
@@ -61927,8 +61927,8 @@
     },
     {
       "path": "tests/test_install_skills.py",
-      "sha256": "7de56577e7b9aa721a9ad8799be488d6455986d381f9b6aa886af53416d33368",
-      "bytes": 103496
+      "sha256": "c49a21ea7b32660b69af03f82ba9fe0d259c391a1ca768bbe3a312a85fbb1dee",
+      "bytes": 134249
     },
     {
       "path": "tests/test_j775_panel_contracts.py",
@@ -62832,8 +62832,8 @@
     },
     {
       "path": "tools/adoption/install_skills.py",
-      "sha256": "e13707e55b0afbbf69920c2bf582be3cf555dad96a83cdb33707f9e3cdd00ed9",
-      "bytes": 48403
+      "sha256": "d6c3dabaea7ccb0a27450570604d4a17840b9b004433dbfd939a53074a561d12",
+      "bytes": 56898
     },
     {
       "path": "tools/adoption/managed_block.py",
