@@ -4931,9 +4931,24 @@
       "bytes": 3893
     },
     {
+      "path": ".claude/agents/semantic-evidence-reviewer.md",
+      "sha256": "794dae4340a438f5d03184923f2545743b42f4a8a903e480126058f6c0ec2a71",
+      "bytes": 2305
+    },
+    {
+      "path": ".claude/agents/source-scout.md",
+      "sha256": "13c472e5db39499805c0e9edbc65bf60ac50c1b36c3dbb62ee4c2fa067b8126d",
+      "bytes": 3069
+    },
+    {
       "path": ".claude/agents/stack-researcher.md",
       "sha256": "3335189f47ce227222b294c46be2d0632de9051d52509dadb13ec4676625629c",
       "bytes": 4714
+    },
+    {
+      "path": ".claude/agents/stack-verifier.md",
+      "sha256": "12c0e5b94817265dd5af72000fcc67a814a11248f97370272cf0ad7f7cbdbb73",
+      "bytes": 3804
     },
     {
       "path": ".claude/rules/trading.md",
@@ -17393,7 +17408,7 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "92d03dd0a126364707b8aaa4104b4b2d4e389a708a85d59f48e4042f7f4f94d6",
+      "sha256": "82fd36482a2f6701f6228a9f7cb5d96285824589c1b2ba9e8b5303489e0cefb5",
       "bytes": 190328
     },
     {
@@ -19055,6 +19070,11 @@
       "path": "docs/decisions/2026-10-12-mcp-template-live-reconciliation.md",
       "sha256": "a796423cb4464f5e74f538808c598b782e6d9bf05ad6035536796c0736ae68f1",
       "bytes": 13096
+    },
+    {
+      "path": "docs/decisions/2026-10-12-model-effort-routing.md",
+      "sha256": "932328cb423b6954026cb5e2f48c75f44751e838f058798751c44fcecd11bea2",
+      "bytes": 8646
     },
     {
       "path": "docs/decisions/2026-10-12-skills-installer-foreign-content.md",
