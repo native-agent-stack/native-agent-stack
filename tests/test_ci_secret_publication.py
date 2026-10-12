@@ -66,10 +66,12 @@ class PublicationWorkflowTests(unittest.TestCase):
         regular = jobs((ROOT / ".github/workflows/validate.yml").read_text())
         backstop = jobs((ROOT / ".github/workflows/secret-scan-history.yml").read_text())
         for job in ("secret-scan", "secret-scan-betterleaks"):
+            public_job = "publication-secret-scan" if job == "secret-scan" else "publication-betterleaks"
             self.assertEqual(run_block(step_block(regular[job], "Scan git history")),
-                             run_block(step_block(backstop[job], "Scan git history")))
+                             run_block(step_block(backstop[public_job], "Scan git history")))
             install = "Install checksum-verified pinned gitleaks" if job == "secret-scan" else "Install betterleaks after Sigstore"
-            self.assertEqual(step_block(regular[job], install), step_block(backstop[job], install))
+            self.assertEqual(step_block(regular[job], install), step_block(backstop[public_job], install))
+        self.assertTrue(set(regular).isdisjoint(backstop), "Required PR contexts must remain unambiguous")
     def test_all_branch_and_tag_pushes_trigger_the_gate(self):
         workflow = load_workflow((ROOT / ".github/workflows/secret-scan-history.yml").read_text())
         push = workflow["on"]["push"]

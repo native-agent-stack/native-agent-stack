@@ -13,6 +13,8 @@ new public refs an independent history gate without triggering its unrelated
 eight-shard suite. Both workflows retain the pinned scanner installations,
 redaction, exact generated-explorer exclusion, native timing and status rules.
 The history-only backstop runs no working-tree scanner.
+Its publication-secret-scan and publication-betterleaks job identifiers are
+distinct from the required PR checks, preserving unambiguous status contexts.
 
 Normal pushes retain the available ancestor `before..after` scope. New refs
 and verified forced rewrites use `merge-base(origin/main, tip)..tip`, traversing
@@ -104,3 +106,36 @@ A later primary result supersedes this decision only through a reviewed,
 cited record. A comparison can reconsider the scanner or coverage mechanism
 if it reproduces an omitted publication path or yields equal detection with
 lower measured cost on these frozen native fixtures.
+
+## Local qualification record
+
+- Original eight new assertions against landed949: rc1,8 tests,11 failing subcases.
+- Native publication graphs against the old selector: rc1, one test with three
+  failing new-ref/forced cases; the merge remained an existing detecting control.
+  Corrected native execution catches removed3MB targets on new branch, tag,
+  forced push and merge, rc0. The PR reviewed-replay fixture also preserves
+  detection of a new same-location value. Annotated-tag peel: red1 then green0.
+- ONE released targeted run on d8f7e205: rc1,418 tests,5 skips,one failure,
+  195.465s. Its only failure was the old A1 doc test searching validate.yml for
+  schedule instead of the new separate scanner workflow. The corrected
+  test_ci_secret_scan_range module passes25 tests, rc0. No second multi-module
+  or full repository run was performed.
+- Native historical reviewed-merge regression passes after replacing the
+  redundant full fixture commit literal with native short-prefix resolution.
+  The first content commit was stopped by the unchanged pre-commit scanner
+  on that literal; the staged patch then scans clean. No exemption was added
+  for the test hit. Every added test line is free of full commit literals.
+- Native validator passes70 components,11798 bindings,4 profiles,239 receipts
+  before the initial content commit. Both workflow files pass offline
+  zizmor1.30.1. Late evidence-only checks and the final publication qualification
+  remain separately recorded in the PR body.
+- Native GitTree/derive_ci_protected at initial content134bdc4f returns342
+  unclassified locations, with the same script/shape/location observation as
+  the landed949 dated delta. The immutable historical baseline/index and
+  prior delta bytes remain unchanged; no new advisory delta is required for
+  an unchanged inventory. This is monitoring-only evidence.
+
+Heavy checks ran under the Monday T2 idle-class wrapper with nice10 and idle
+I/O, and the queued run used a private GNU tee shim. Scratch lives under
+/var/tmp. Runtime key-shaped strings exist only in disposable synthetic
+fixtures; no credential values, paper operation or model call was involved.

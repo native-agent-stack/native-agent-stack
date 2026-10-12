@@ -5181,8 +5181,8 @@
     },
     {
       "path": ".github/workflows/secret-scan-history.yml",
-      "sha256": "46bbea8a7bb91c8f9b9996275fb392ad48eb3b41eb22d60063a98c1208a6bd47",
-      "bytes": 13162
+      "sha256": "67cc69c134e874f089cee85562db0f9c963aed1c15000a560e07f4ab1dfa11b5",
+      "bytes": 13174
     },
     {
       "path": ".github/workflows/security-scan.yml",
@@ -18922,8 +18922,8 @@
     },
     {
       "path": "docs/decisions/2026-10-12-secret-publication-coverage.md",
-      "sha256": "4f5719d1c54d9c216d9728ddaed9e43c2c0afa905e5d4e896dfb609a1a8bacdc",
-      "bytes": 6810
+      "sha256": "0b7afe5c6f92fb50b25bb0c6087aebf461789a149fc8d4cd1bcf1b7e0743db90",
+      "bytes": 9131
     },
     {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
@@ -61852,8 +61852,8 @@
     },
     {
       "path": "tests/test_ci_secret_publication.py",
-      "sha256": "309a72ab818187752b58920c01ccf45d73f4767abad482869da793ab80616b31",
-      "bytes": 15665
+      "sha256": "0628f62624f5766f767a166c039e3eaf69785de8daec8e245f85ef0707779d67",
+      "bytes": 15892
     },
     {
       "path": "tests/test_ci_secret_scan_range.py",
