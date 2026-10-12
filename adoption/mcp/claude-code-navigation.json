@@ -1,0 +1,62 @@
+{
+  "_comment": "On-demand code-navigation MCP servers for Claude Code: the entries that adoption/mcp/claude-user.json and adoption/new-wsl/templates/claude-user.mcp.additions.json carried at user scope until 2026-10-12, unchanged (serena, socraticode, codebase-memory-mcp; semble from the distribution's additions). They are not registered at user scope, so a session starts without their server instructions and tool names. A session that needs them (cross-file refactors, impact analysis, graph questions) loads them for that session only: `claude --mcp-config \"$(python3 tools/adoption/install_claude_profile.py --print-mcp-config)\"`, which renders ${HOME} and ${ECO_ROOT} for the host; a project can also register one of them with `claude mcp add --scope local`. Subagents inherit the session's servers, so the agents whose tool lists name these tools (evidence-reviewer, isolated-builder, security-reviewer, stack-researcher; the host's codebase-memory, codebase-memory-auditor and codebase-memory-scout) have them in such a session. The placeholders follow the convention of adoption/mcp/claude-user.json, and so do the Claude-side differences from the Codex template. Why and what was measured: docs/decisions/2026-10-12-code-navigation-on-demand.md. jcodemunch is not here: it stays in the user-scope template.",
+  "mcpServers": {
+    "serena": {
+      "type": "stdio",
+      "command": "${ECO_ROOT}/bin/serena",
+      "args": [
+        "start-mcp-server",
+        "--transport",
+        "stdio",
+        "--project-from-cwd",
+        "--context",
+        "claude-code",
+        "--enable-web-dashboard",
+        "true",
+        "--open-web-dashboard",
+        "false",
+        "--enable-gui-log-window",
+        "false"
+      ],
+      "env": {}
+    },
+    "semble": {
+      "type": "stdio",
+      "command": "semble",
+      "args": [],
+      "env": {
+        "SEMBLE_MODEL_NAME": "${HOME}/.local/share/semble/potion-code-16M-v2-e9d2a44c",
+        "SEMBLE_CACHE_LOCATION": "${HOME}/.cache/semble-claude"
+      }
+    },
+    "codebase-memory-mcp": {
+      "type": "stdio",
+      "command": "${ECO_ROOT}/bin/codebase-memory-mcp",
+      "args": [],
+      "env": {}
+    },
+    "socraticode": {
+      "type": "stdio",
+      "command": "${ECO_ROOT}/bin/node",
+      "args": [
+        "${ECO_ROOT}/bin/socraticode"
+      ],
+      "env": {
+        "QDRANT_MODE": "external",
+        "QDRANT_URL": "http://127.0.0.1:16333",
+        "EMBEDDING_PROVIDER": "lmstudio",
+        "LMSTUDIO_URL": "http://127.0.0.1:8231/v1",
+        "EMBEDDING_MODEL": "nvidia/Nemotron-3-Embed-8B-BF16",
+        "EMBEDDING_DIMENSIONS": "4096",
+        "EMBEDDING_CONTEXT_LENGTH": "4096",
+        "EMBEDDING_QUERY_PREFIX": "query: ",
+        "EMBEDDING_DOCUMENT_PREFIX": "passage: ",
+        "EMBEDDING_DOCUMENT_INCLUDE_PATH": "true",
+        "RESPECT_GITIGNORE": "true",
+        "INCLUDE_DOT_FILES": "false",
+        "SOCRATICODE_WATCHER": "auto",
+        "SEARCH_DEFAULT_LIMIT": "3"
+      }
+    }
+  }
+}

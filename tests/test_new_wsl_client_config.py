@@ -1243,11 +1243,11 @@ class MapTests(unittest.TestCase):
             root = make_catalog(Path(tmp))
 
             def change(data):
-                entry = next(e for e in data["entries"] if e["match"] == ["claude/mcp/server/serena"])
+                entry = next(e for e in data["entries"] if e["match"] == ["claude/mcp/server/qmd"])
                 entry["wiring"] = "slot:no-such-slot"
             edit_json(root / cfg.MAP_REL, change)
             errors = cfg.analyse(root)[3]
-        self.assertIn("claude/mcp/server/serena: slot 'no-such-slot' is not a foundation slot of the manifest", errors)
+        self.assertIn("claude/mcp/server/qmd: slot 'no-such-slot' is not a foundation slot of the manifest", errors)
 
     def test_a_malformed_wiring_is_refused(self):
         for wiring in ("wired", "slot:", "not_wired:", "practice:x"):
@@ -1393,9 +1393,10 @@ class AgentGapTests(unittest.TestCase):
         results, _, plan, errors, warnings = cfg.analyse(ROOT)
         self.assertEqual(errors, [])
         gaps = cfg.agent_gaps(ROOT, results, plan)
-        # Wave 3 wires the token servers; context-mode's plugin tools and skill retain their native names.
-        wired_servers = {"serena", "qmd", "ai-memory", "semble", "socraticode", "headroom", "codebase-memory-mcp",
-                         "jcodemunch", "plugin_context-mode_context-mode"}
+        # Wave 3 wires the token servers; context-mode's plugin tools and skill retain their native names. Since 2026-10-12
+        # (docs/decisions/2026-10-12-code-navigation-on-demand.md) serena, socraticode, codebase-memory-mcp and semble are not
+        # registered at Claude user scope: they sit in the on-demand file.
+        wired_servers = {"qmd", "ai-memory", "headroom", "jcodemunch", "plugin_context-mode_context-mode"}
         for path in sorted((ROOT / cfg.CLAUDE_AGENTS_REL).glob("*.md")):
             text = path.read_text()
             head = re.match(r"---\n(.*?)\n---\n", text, re.S).group(1)
@@ -1407,9 +1408,14 @@ class AgentGapTests(unittest.TestCase):
             gap = gaps.get(path.name, {"mcp_tools": [], "skills": []})
             self.assertEqual({tool.split("__")[1] for tool in gap["mcp_tools"]}, expected_servers, path.name)
             self.assertEqual(gap["skills"], expected_skills, path.name)
-        # The owner-selected token stack supplies every server and skill the project agents name; jCodeMunch is registered
-        # at user scope (the user's directive of 2026-10-04, docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md).
-        self.assertEqual(gaps, {})
+        # The owner-selected token stack supplies every server and skill the project agents name, except the on-demand
+        # code-navigation servers: the four agents whose tools name Serena and SocratiCode are the gaps (the state of a session
+        # that has not loaded the on-demand file), and nothing else is. jCodeMunch is registered at user scope (the user's
+        # directive of 2026-10-04, docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md).
+        self.assertEqual({name: sorted({tool.split("__")[1] for tool in gap["mcp_tools"]}) for name, gap in gaps.items()},
+                         {"evidence-reviewer.md": ["serena", "socraticode"], "isolated-builder.md": ["serena", "socraticode"],
+                          "security-reviewer.md": ["serena", "socraticode"], "stack-researcher.md": ["serena"]})
+        self.assertEqual([gap["skills"] for gap in gaps.values()], [[]] * 4)
         # The skills rows run install_skills.py over adoption/skills/manifest.json (wave-2 skills ruling, change 7): the
         # selected rows, without the retired, pruned and held ones.
         selected = {skill["name"] for skill in json.loads((ROOT / cfg.SKILLS_MANIFEST_REL).read_text())["skills"]
@@ -1422,23 +1428,18 @@ class AgentGapTests(unittest.TestCase):
         self.assertTrue(any("MCP_AUTO_OPEN_ENABLED" in w and "mcp-inspector" in w for w in warnings), warnings)
 
     def test_a_server_that_becomes_wired_leaves_the_gap(self):
+        # jCodeMunch is the control: serena and socraticode are on demand for Claude Code (no manifest change wires them), so the
+        # gap that follows the manifest is the slot of a server the user scope does register.
         with tempfile.TemporaryDirectory() as tmp:
             root = make_catalog(Path(tmp))
-
-            def install(data):
-                row = next(r for r in data["slots"] if r["slot_id"] == "code-search" and r["catalog"] == "foundation")
-                row.update(installs_nothing_extra=False, state="definitive", default="SocratiCode")
-                row["resolution"] = {"outcome": "final"}
-                row.pop("interim", None)       # a decided default replaces the interim install
-            # Keep the absent-server control now that the committed interim installs SocratiCode too.
-            edit_json(root / cfg.MANIFEST_REL, lambda data: next(
-                r for r in data["slots"] if r["slot_id"] == "code-search" and r["catalog"] == "foundation")[
-                    "interim"].update(default="semble 0.6.1"))
-            before = cfg.agent_gaps(root, *[cfg.analyse(root)[i] for i in (0, 2)])
-            edit_json(root / cfg.MANIFEST_REL, install)
             after = cfg.agent_gaps(root, *[cfg.analyse(root)[i] for i in (0, 2)])
-        self.assertIn("socraticode", json.dumps(before["evidence-reviewer.md"]))
-        self.assertNotIn("evidence-reviewer.md", after)    # jCodeMunch is wired too, so no gap remains
+            edit_json(root / cfg.MANIFEST_REL, lambda data: next(
+                r for r in data["slots"] if r["slot_id"] == "code-index" and r["catalog"] == "foundation").update(
+                installs_nothing_extra=True))
+            before = cfg.agent_gaps(root, *[cfg.analyse(root)[i] for i in (0, 2)])
+        self.assertIn("jcodemunch", json.dumps(before["evidence-reviewer.md"]))
+        self.assertNotIn("jcodemunch", json.dumps(after["evidence-reviewer.md"]))    # wired: only the on-demand servers remain
+        self.assertIn("serena", json.dumps(after["evidence-reviewer.md"]))
 
 
 class ManifestRuleTests(unittest.TestCase):
@@ -1456,7 +1457,9 @@ class ManifestRuleTests(unittest.TestCase):
     def test_a_split_slot_that_is_changed_to_installing_wires_its_piece_and_back(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = make_catalog(Path(tmp))
-            keys = ("claude/mcp/server/socraticode", "codex/config/mcp_servers.socraticode.command")
+            # The Claude piece left the map on 2026-10-12 (the on-demand file), so the slot's piece is the Codex one and the
+            # Claude render never carries the server, whatever the slot installs.
+            keys = ("codex/config/mcp_servers.socraticode.command",)
 
             def wired():
                 write_blocks(root)  # the names a block is filtered by follow the manifest
@@ -1471,8 +1474,8 @@ class ManifestRuleTests(unittest.TestCase):
 
             # Wave 3's split-slot interim installs both semble and SocratiCode.
             before = wired()
-            self.assertEqual([before[k] for k in keys], [True, True])
-            self.assertIn("socraticode", servers()[0])
+            self.assertEqual([before[k] for k in keys], [True])
+            self.assertNotIn("socraticode", servers()[0])
             self.assertIn("socraticode", servers()[1])
             manifest = root / cfg.MANIFEST_REL
             original = manifest.read_text()
@@ -1484,29 +1487,29 @@ class ManifestRuleTests(unittest.TestCase):
                 row.pop("interim", None)       # a decided default replaces the interim install
             edit_json(manifest, install)
             after = wired()
-            self.assertEqual([after[k] for k in keys], [True, True])
-            self.assertIn("socraticode", servers()[0])
+            self.assertEqual([after[k] for k in keys], [True])
+            self.assertNotIn("socraticode", servers()[0])
             self.assertIn("[mcp_servers.socraticode]", servers()[1])
             manifest.write_text(original, encoding="utf-8")
             restored = wired()
-            self.assertEqual([restored[k] for k in keys], [True, True])
-            self.assertIn("socraticode", servers()[0])
+            self.assertEqual([restored[k] for k in keys], [True])
+            self.assertNotIn("socraticode", servers()[0])
             # The slot installs a different owner: the piece for SocratiCode stays out, and the check says so.
             edit_json(manifest, lambda data: install(data, default="semble"))
             other = wired()
-            self.assertEqual([other[k] for k in keys], [False, False])
+            self.assertEqual([other[k] for k in keys], [False])
             self.assertTrue(any("installs 'semble'" in w for w in cfg.analyse(root)[4]))
 
     def test_a_slot_that_stops_installing_unwires_its_pieces(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = make_catalog(Path(tmp))
             edit_json(root / cfg.MANIFEST_REL, lambda data: next(
-                r for r in data["slots"] if r["slot_id"] == "serena" and r["catalog"] == "foundation").update(
+                r for r in data["slots"] if r["slot_id"] == "tobi-qmd" and r["catalog"] == "foundation").update(
                 installs_nothing_extra=True))
             results = {v.piece.key: v for v in cfg.analyse(root)[0]}
-        self.assertFalse(results["claude/mcp/server/serena"].wired)
-        self.assertFalse(results["codex/config/mcp_servers.serena.command"].wired)
-        self.assertIn("installs nothing extra", results["claude/mcp/server/serena"].reason)
+        self.assertFalse(results["claude/mcp/server/qmd"].wired)
+        self.assertFalse(results["codex/config/mcp_servers.qmd.url"].wired)
+        self.assertIn("installs nothing extra", results["claude/mcp/server/qmd"].reason)
 
     def test_the_slots_the_map_names_are_foundation_slots_and_the_unwired_ones_do_not_install(self):
         rows = foundation_rows()
@@ -1632,21 +1635,24 @@ class RenderTests(unittest.TestCase):
         overlay = json.loads(self.files["settings.linux-wsl2.overlay.json"])
         self.assertEqual(overlay, json.loads((ROOT / cfg.TEMPLATES["claude/overlay"]).read_text()))
 
-    def test_the_wired_servers_are_registered_and_serena_and_qmd_by_the_command_their_readmes_give(self):
+    def test_the_wired_servers_are_registered_and_the_on_demand_ones_keep_the_commands_their_readmes_give(self):
         servers = json.loads(self.files["mcp-servers.json"])["mcpServers"]
-        # The owner-selected token stack joins Serena, QMD and the interim memory/search installs.
-        self.assertEqual(list(servers), ["ai-memory", "serena", "socraticode", "headroom", "codebase-memory-mcp", "qmd",
-                                         "jcodemunch", "semble", "chrome-devtools", "promptfoo"])
-        self.assertEqual(servers["serena"]["command"], "serena")
-        self.assertEqual(servers["serena"]["args"][:1] + servers["serena"]["args"][3:6],
+        # Since 2026-10-12 serena, socraticode, codebase-memory-mcp and semble are not registered at Claude user scope: their
+        # entries, unchanged, are in the on-demand file (docs/decisions/2026-10-12-code-navigation-on-demand.md).
+        on_demand = json.loads((ROOT / "adoption/mcp/claude-code-navigation.json").read_text())["mcpServers"]
+        self.assertEqual(sorted(on_demand), ["codebase-memory-mcp", "semble", "serena", "socraticode"])
+        self.assertEqual(list(servers), ["ai-memory", "headroom", "qmd", "jcodemunch", "chrome-devtools", "promptfoo"])
+        # the shared template's entry: the distribution's override to the settings PATH (`serena`) applied to the registered entry only
+        self.assertEqual(on_demand["serena"]["command"], "${ECO_ROOT}/bin/serena")
+        self.assertEqual(on_demand["serena"]["args"][:1] + on_demand["serena"]["args"][3:6],
                          ["start-mcp-server", "--project-from-cwd", "--context", "claude-code"])
         self.assertEqual(servers["qmd"], {"type": "http", "url": "http://127.0.0.1:21851/mcp"})
         host = json.loads((ROOT / "adoption/hosts/example.json").read_text())
         self.assertEqual(servers["ai-memory"], {"type": "http", "url": f"http://{host['AI_MEMORY_URL']}/mcp"})
         # semble: the pinned model's local snapshot and Claude Code's own cache (wave-2 code-search ruling, changes 4, 5);
         # ${HOME} is filled when install_claude_profile.py registers the file.
-        self.assertEqual((servers["semble"]["command"], servers["semble"]["args"]), ("semble", []))
-        self.assertEqual(servers["semble"]["env"], {
+        self.assertEqual((on_demand["semble"]["command"], on_demand["semble"]["args"]), ("semble", []))
+        self.assertEqual(on_demand["semble"]["env"], {
             "SEMBLE_MODEL_NAME": "${HOME}/.local/share/semble/potion-code-16M-v2-e9d2a44c",
             "SEMBLE_CACHE_LOCATION": "${HOME}/.cache/semble-claude"})
         config = tomllib.loads(self.files["codex.config.toml"])
@@ -1659,7 +1665,8 @@ class RenderTests(unittest.TestCase):
         self.assertEqual(servers["chrome-devtools"], {"type": "stdio", "command": "npx", "args": chrome_args})
         self.assertEqual(config["mcp_servers"]["chrome-devtools"], {"command": "npx", "args": chrome_args})
         pinned_search = host["ECO_ROOT"] + "/tools/socraticode-1.15.0/lib/node_modules/socraticode/dist/index.js"
-        self.assertEqual(servers["socraticode"]["args"], [pinned_search.replace(host["ECO_ROOT"], "${ECO_ROOT}")])
+        # the shared template's npm bin link; the distribution's pinned entry point (the Codex line below) applied to the registered entry only
+        self.assertEqual(on_demand["socraticode"]["args"], ["${ECO_ROOT}/bin/socraticode"])
         self.assertEqual(config["mcp_servers"]["socraticode"]["args"], [pinned_search])
         # jCodeMunch at user scope, with the documented opt-out of its anonymous savings counter in the server's env block
         # (the user's directive of 2026-10-04; JCODEMUNCH_SHARE_SAVINGS=0, CONFIGURATION.md at the pinned revision).
@@ -1677,7 +1684,7 @@ class RenderTests(unittest.TestCase):
         semble = config["mcp_servers"]["semble"]
         self.assertEqual((semble["command"], semble["enabled_tools"]), ("semble", ["search", "find_related"]))
         self.assertEqual(semble["env"]["SEMBLE_CACHE_LOCATION"], "/home/example/.cache/semble-codex")
-        self.assertEqual(semble["env"]["SEMBLE_MODEL_NAME"], servers["semble"]["env"]["SEMBLE_MODEL_NAME"].replace(
+        self.assertEqual(semble["env"]["SEMBLE_MODEL_NAME"], on_demand["semble"]["env"]["SEMBLE_MODEL_NAME"].replace(
             "${HOME}", "/home/example"))
         for server in config["mcp_servers"].values():      # an approval mode is an authorization setting
             self.assertNotIn("default_tools_approval_mode", server)
@@ -1983,9 +1990,10 @@ class TemplateAdditionsTests(unittest.TestCase):
         keys = {v.piece.key for v in results}
         for key in ("codex/config/shell_environment_policy.inherit", "codex/config/shell_environment_policy.set.XDG_RUNTIME_DIR",
                     "codex/config/shell_environment_policy.set.DOCKER_HOST", "codex/config/mcp_servers.semble.command",
-                    "codex/config/mcp_servers.ai-memory.default_tools_approval_mode", "claude/mcp/server/semble",
+                    "codex/config/mcp_servers.ai-memory.default_tools_approval_mode",
                     "claude/settings/permission/allow/mcp__semble__search"):
             self.assertIn(key, keys)
+        self.assertNotIn("claude/mcp/server/semble", keys, "semble is on demand for Claude Code since 2026-10-12")
         self.assertFalse([key for key in keys if "_comment" in key])    # a file's note is not a piece
 
     def test_an_addition_that_names_a_key_of_its_template_is_refused(self):
@@ -2725,7 +2733,8 @@ class ApplyTests(ApplyCase):
         self.assertEqual(tree(self.home), before)
         self.assertFalse(self.marker.exists(), "a dry run started a client")
         self.assertIn("DRY RUN", out)
-        self.assertIn("claude mcp add --scope user serena -- serena start-mcp-server", out)
+        self.assertIn("claude mcp add --scope user --transport http qmd", out)
+        self.assertNotIn("claude mcp add --scope user serena", out, "the code-navigation servers are on demand since 2026-10-12")
         self.assertIn("summary: ", out)
         self.assertNotIn("failed", out.split("summary: ")[1])
 
@@ -2768,8 +2777,7 @@ class ApplyTests(ApplyCase):
                              icp.expected_sha256(icp.HOOKS[name]))
         self.assertEqual(len(list((self.home / ".claude/agents").iterdir())), 11)
         self.assertEqual(sorted(json.loads((self.home / ".stub-claude-mcp.json").read_text())),
-                         ["ai-memory", "chrome-devtools", "codebase-memory-mcp", "headroom", "jcodemunch", "promptfoo", "qmd", "semble",
-                          "serena", "socraticode"])
+                         ["ai-memory", "chrome-devtools", "headroom", "jcodemunch", "promptfoo", "qmd"])
         settings = json.loads((self.home / ".claude/settings.json").read_text())
         # The repository's hooks and the overlay's Notification, and the events ai-memory's hooks take (an interim install).
         self.assertEqual(sorted(settings["hooks"]), ["ConfigChange", "Notification", "PostToolUse", "PreCompact", "PreToolUse",
@@ -3991,39 +3999,43 @@ class McpEndpointRepairTests(unittest.TestCase):
     def test_alternate_host_render_uses_the_same_endpoints_and_keeps_other_env(self):
         host = render_config.load_host_values(EXAMPLE_HOST)
         host.update(QDRANT_URL="127.0.0.1:21633", EMBED_URL="127.0.0.1:28231")
-        with tempfile.TemporaryDirectory() as tmp, mock.patch.object(
-                render_config, "load_host_values", return_value=host):
-            code, _, err = run_main("--render", "--host", EXAMPLE_HOST, "--out", tmp)
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as base_tmp:
+            code, _, err = run_main("--render", "--host", EXAMPLE_HOST, "--out", base_tmp)
             self.assertEqual((code, err), (0, ""))
-            claude = json.loads((Path(tmp) / "mcp-servers.json").read_text())["mcpServers"]["socraticode"]
+            with mock.patch.object(render_config, "load_host_values", return_value=host):
+                code, _, err = run_main("--render", "--host", EXAMPLE_HOST, "--out", tmp)
+                self.assertEqual((code, err), (0, ""))
+            claude = json.loads((Path(tmp) / "mcp-servers.json").read_text())["mcpServers"]
             codex = tomllib.loads((Path(tmp) / "codex.config.toml").read_text())["mcp_servers"]["socraticode"]
-        self.assertEqual(claude["env"]["QDRANT_URL"], "http://127.0.0.1:21633")
-        self.assertEqual(claude["env"]["LMSTUDIO_URL"], "http://127.0.0.1:28231/v1")
-        for key in ("QDRANT_URL", "LMSTUDIO_URL"):
-            self.assertEqual(claude["env"][key], codex["env"][key], key)
-        # A partial host override must retain the native provider/model/dimension settings.
-        template = json.loads((ROOT / cfg.TEMPLATES["claude/mcp"]).read_text())["mcpServers"]["socraticode"]
-        self.assertEqual({k: v for k, v in claude["env"].items() if k not in ("QDRANT_URL", "LMSTUDIO_URL")},
-                         {k: v for k, v in template["env"].items() if k not in ("QDRANT_URL", "LMSTUDIO_URL")})
+            base = tomllib.loads((Path(base_tmp) / "codex.config.toml").read_text())["mcp_servers"]["socraticode"]
+        # Since 2026-10-12 the Claude render has no SocratiCode entry (it is in the on-demand file with the template's portable
+        # endpoints); the Codex entry takes the host's endpoints.
+        self.assertNotIn("socraticode", claude)
+        self.assertEqual(codex["env"]["QDRANT_URL"], "http://127.0.0.1:21633")
+        self.assertEqual(codex["env"]["LMSTUDIO_URL"], "http://127.0.0.1:28231/v1")
+        # A partial host override must retain the native provider/model/dimension settings (the example host's render is the base).
+        self.assertEqual({k: v for k, v in codex["env"].items() if k not in ("QDRANT_URL", "LMSTUDIO_URL")},
+                         {k: v for k, v in base["env"].items() if k not in ("QDRANT_URL", "LMSTUDIO_URL")})
 
     def test_check_accepts_matching_host_endpoints_with_client_specific_cache_paths(self):
         code, out, err = run_main("--check")
         self.assertEqual((code, err), (0, ""), out[-300:])
         self.assertIn("check passed", out)
 
-    def test_check_rejects_the_missing_env_override_even_when_the_example_matches(self):
+    def test_check_rejects_the_missing_url_override_even_when_the_example_matches(self):
+        # ai-memory is the one shared server whose value comes from the host since the Claude SocratiCode entry left the render
+        # (2026-10-12): without the override its Claude url is the template's portable default, which the example host equals.
         with tempfile.TemporaryDirectory() as tmp:
             root = make_catalog(Path(tmp))
 
-            def remove_host_env(data):
-                entry = next(e for e in data["entries"] if e["match"] == ["claude/mcp/server/socraticode"])
-                entry["override"].pop("env", None)
+            def remove_host_url(data):
+                entry = next(e for e in data["entries"] if e["match"] == ["claude/mcp/server/ai-memory"])
+                entry["override"].pop("url", None)
 
-            edit_json(root / cfg.MAP_REL, remove_host_env)
+            edit_json(root / cfg.MAP_REL, remove_host_url)
             code, _, err = run_main("--check", "--root", str(root))
         self.assertEqual(code, 1)
-        for field in ("env.QDRANT_URL", "env.LMSTUDIO_URL"):
-            self.assertIn(f"MCP server socraticode {field} differs between Claude and Codex renders", err)
+        self.assertIn("MCP server ai-memory url differs between Claude and Codex renders", err)
 
     def test_check_rejects_a_hardcoded_http_url_for_another_shared_server(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -4043,10 +4055,12 @@ class McpEndpointRepairTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = make_catalog(Path(tmp))
             path = root / cfg.TEMPLATES["codex/config"]
-            path.write_text(path.read_text().replace('QDRANT_URL = "http://${QDRANT_URL}"\n', ""))
+            old = 'url = "http://${AI_MEMORY_URL}/mcp"'
+            self.assertIn(old, path.read_text())
+            path.write_text(path.read_text().replace(old, 'url = "http://127.0.0.1:29374/mcp"'))
             code, _, err = run_main("--check", "--root", str(root))
         self.assertEqual(code, 1)
-        self.assertIn("MCP server socraticode env.QDRANT_URL differs between Claude and Codex renders", err)
+        self.assertIn("MCP server ai-memory url differs between Claude and Codex renders", err)
 
 
 ONLY_CODEX_CONFIG = tuple(arg for step in cfg.STEPS if step != "codex-config" for arg in ("--skip", step))

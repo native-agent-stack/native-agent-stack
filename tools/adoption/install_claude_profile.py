@@ -24,6 +24,10 @@
              is already registered with the same config, and left unchanged
              (reported) when it differs unless --replace-mcp is given
 
+`--print-mcp-config [TEMPLATE]` is not a step: it prints the servers of TEMPLATE (default adoption/mcp/claude-code-navigation.json, the on-demand code-navigation set that is not registered at user scope)
+rendered for this host, as the JSON `claude --mcp-config` takes, and stops without writing or registering anything:
+`claude --mcp-config "$(python3 tools/adoption/install_claude_profile.py --print-mcp-config)"`.
+
 A caller that wires only part of the profile narrows each step without changing its defaults:
 `--hook NAME` (repeatable) installs only the named files of the hook map (or of the held-out carriers) in the guard step, `--agent NAME`
 (repeatable) only the named files of adoption/agents/claude/ in the agents step, and `--mcp-template PATH` registers
@@ -88,6 +92,7 @@ ALL_HOOKS = {**HOOKS, **HELD_OUT_HOOKS}
 AGENTS_SRC_DIR = ROOT / "adoption" / "agents" / "claude"
 ROUTING_SKILL_SRC = ROOT / ".claude/skills/native-skill-routing/SKILL.md"
 MCP_TEMPLATE = ROOT / "adoption" / "mcp" / "claude-user.json"
+NAVIGATION_TEMPLATE = ROOT / "adoption" / "mcp" / "claude-code-navigation.json"  # the on-demand code-navigation set: never registered at user scope
 WORKFLOWS_SRC_DIR = ROOT / "examples" / "claude-native" / "workflows"
 WORKFLOWS_SHA256SUMS = WORKFLOWS_SRC_DIR / "SHA256SUMS"
 WORKFLOW_NAMES = ("readiness-audit.js", "review-changes.js", "layer-verdict-lane.js")
@@ -478,13 +483,40 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--mcp-template", default=None, metavar="PATH",
                          help="MCP step: register the servers of this file, in the shape of "
                               "adoption/mcp/claude-user.json, instead of that file")
+    parser.add_argument("--print-mcp-config", nargs="?", const=str(NAVIGATION_TEMPLATE), default=None, metavar="TEMPLATE",
+                         help="Print the servers of TEMPLATE (default: adoption/mcp/claude-code-navigation.json, the on-demand "
+                              "code-navigation set) rendered for this host as JSON for `claude --mcp-config`, and stop: "
+                              "nothing is written or registered, and no step runs")
     parser.add_argument("--dry-run", action="store_true", help="Report what would happen; write and register nothing")
     return parser
+
+
+def printed_mcp_config(template: Path, home: Path, eco_root: Path) -> str:
+    """The `{"mcpServers": {...}}` JSON of `template` with ${HOME} and ${ECO_ROOT} rendered: the shape `claude --mcp-config` takes."""
+    try:
+        data = json.loads(template.read_text(encoding="utf-8"))
+    except OSError as error:
+        raise InstallError(f"cannot read {template}: {error.strerror or error}") from None
+    except ValueError as error:
+        raise InstallError(f"{template} is not JSON: {error}") from None
+    if not isinstance(data, dict) or not isinstance(data.get("mcpServers"), dict):
+        raise InstallError(f"{template} has no mcpServers table")
+    return json.dumps({"mcpServers": render_servers(data, home, eco_root)}, indent=2)
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
+    if args.print_mcp_config is not None:
+        if args.only or args.hook or args.agent or args.replace_mcp or args.remove_workflows or args.mcp_template or args.dry_run:
+            parser.error("--print-mcp-config runs no step: it cannot be combined with --only, --hook, --agent, --replace-mcp, --remove-workflows, --mcp-template or --dry-run")
+        home = Path(args.home)
+        try:
+            print(printed_mcp_config(Path(args.print_mcp_config), home, Path(args.eco_root) if args.eco_root else default_eco_root(home)))
+        except InstallError as error:
+            print(f"install failed: {error}", file=sys.stderr)
+            return 1
+        return 0
     if args.remove_workflows and (args.only != ["workflows"] or args.replace_mcp):
         parser.error("--remove-workflows requires exactly --only workflows and cannot use --replace-mcp")
     steps = args.only or ["guard", "agents", "skills", "mcp"]

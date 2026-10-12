@@ -380,17 +380,6 @@
     },
     {
       "match": [
-        "claude/mcp/server/serena"
-      ],
-      "wiring": "slot:serena",
-      "owner": "Serena",
-      "override": {
-        "command": "serena"
-      },
-      "source": "Serena v1.7.0 docs/02-usage/030_clients.md L134: claude mcp add --scope user serena -- serena start-mcp-server --context claude-code --project-from-cwd. The template's extra flags (--transport, the three dashboard and GUI flags) are options of start-mcp-server at that tag (src/serena/cli.py L258-317). uv tool install puts `serena` in ~/.local/bin (uv 0.12.22 docs/reference/storage.md L87-96)."
-    },
-    {
-      "match": [
         "claude/mcp/server/qmd"
       ],
       "wiring": "slot:tobi-qmd",
@@ -414,38 +403,6 @@
     },
     {
       "match": [
-        "claude/mcp/server/socraticode"
-      ],
-      "wiring": "slot:code-search",
-      "owner": "SocratiCode",
-      "names": [
-        "socraticode"
-      ],
-      "override": {
-        "args": [
-          "${ECO_ROOT}/tools/socraticode-1.15.0/lib/node_modules/socraticode/dist/index.js"
-        ],
-        "env": {
-          "QDRANT_URL": "http://${QDRANT_URL}",
-          "LMSTUDIO_URL": "http://${EMBED_URL}/v1"
-        }
-      },
-      "source": "https://github.com/giancarloerra/SocratiCode/blob/f6191f076a42405f0d5508139f3a8b505cfef93a/README.md#configuration documents QDRANT_URL and LMSTUDIO_URL (including /v1). https://code.claude.com/docs/en/mcp documents the native server env object. Fill both endpoint variables from the selected host, as adoption/templates/codex.config.template.toml does, and retain the template's other env settings.",
-      "note": "The code-search slot is split between semble and SocratiCode and waits for the measurement; the owner's full-stack decision of 2026-10-04 makes both its interim install."
-    },
-    {
-      "match": [
-        "claude/mcp/server/semble"
-      ],
-      "wiring": "slot:code-search",
-      "owner": "semble",
-      "names": [
-        "semble"
-      ],
-      "source": "The code-search slot's interim install (definitive manifest, amendment 3): the uv tool's console script, SEMBLE_MODEL_NAME on the pinned model's local snapshot and Claude Code's own absolute SEMBLE_CACHE_LOCATION (wave-2 code-search ruling, changes 4 and 5). The entry is in adoption/new-wsl/templates/claude-user.mcp.additions.json, which only this tool reads, so install_claude_profile.py registers no semble server on another host."
-    },
-    {
-      "match": [
         "claude/mcp/server/headroom"
       ],
       "wiring": "slot:output-compression",
@@ -456,7 +413,6 @@
     },
     {
       "match": [
-        "claude/mcp/server/codebase-memory-mcp",
         "codex/*/mcp_servers.codebase-memory-mcp.*"
       ],
       "wiring": "slot:code-graph",

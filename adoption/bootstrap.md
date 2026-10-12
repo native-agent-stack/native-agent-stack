@@ -475,9 +475,11 @@ GitHub-hosted macOS runner; see
    Claude Code user-scope assets with
    [`tools/adoption/install_claude_profile.py`](../tools/adoption/install_claude_profile.py).
    Its MCP sub-step registers the template's commands but installs none of
-   them, so first install Serena (the MCP sub-step below names where the
-   template's other stdio servers come from) and
-   jCodeMunch, which its user-scope registration below uses, at their pins, with the
+   them, so first install jCodeMunch, which its user-scope registration below
+   uses (the MCP sub-step below names where the template's other stdio servers
+   come from), and Serena, which only the on-demand code-navigation set below
+   uses (changed 2026-10-12: the template no longer registers it), at their
+   pins, with the
    uv-tool layout `bootstrap-linux.sh` uses for its uv-tool pins
    (`python-tools/` and `bin/` under the ecosystem prefix, on either
    platform). That puts `serena` and `jcodemunch-mcp` in `${ECO_ROOT}/bin`,
@@ -539,8 +541,7 @@ GitHub-hosted macOS runner; see
      than the builder's worktree.
    - **MCP servers**: for each entry in
      [`adoption/mcp/claude-user.json`](mcp/claude-user.json) (`ai-memory`
-     and `qmd` over http; `serena`, `socraticode`, `headroom`, `codebase-memory-mcp`
-     and `jcodemunch` over stdio), renders its `${HOME}` and
+     and `qmd` over http; `headroom` and `jcodemunch` over stdio), renders its `${HOME}` and
      `${ECO_ROOT}` placeholders (`--eco-root`, default `$ECO_INSTALL_ROOT` or
      `~/.local/share/codex-ecosystem`), then uses native `claude mcp add --scope
      user --transport http <name> <url>` for HTTP, or `claude mcp add --scope user
@@ -580,6 +581,10 @@ GitHub-hosted macOS runner; see
      one daemon. The record is the 2026-09-30 addendum, added after
      `v2026.09.26.2`
      ([F4 Codex roles](../docs/decisions/2026-09-26-stack-agents-role-dispatch.md#addendum-2026-09-30-f4-codex-roles)).
+     Since 2026-10-12 the sentence about the carrier no longer holds for `serena`,
+     `socraticode` and `codebase-memory-mcp`: they belong to the on-demand set
+     below, and the carrier still names their tools
+     ([decision](../docs/decisions/2026-10-12-code-navigation-on-demand.md)).
      A host that registered one of these servers by hand keeps its entry: the
      installer reports it as matching (same command, arguments and variable
      names) or as differing, and replaces it only with `--replace-mcp`.
@@ -599,6 +604,37 @@ GitHub-hosted macOS runner; see
    in the default. The entry is the pinned README's own (`claude mcp add -s user
    jcodemunch jcodemunch-mcp`) with `JCODEMUNCH_SHARE_SAVINGS=0`, the documented
    opt-out of its anonymous savings counter, in its env block.
+
+   **Code navigation, on demand.** The file below and the `--print-mcp-config`
+   option were added after `v2026.10.05.1`. Changed 2026-10-12: the template no longer
+   registers `serena`, `socraticode` and `codebase-memory-mcp` at user scope,
+   nor does the new WSL distribution's addition for `semble`. Their server
+   instructions (each tells the model to use it first for code navigation)
+   and tool names loaded into every session, and the E1 comparison found no
+   code-navigation tool used in 288 runs of single-symbol lookups in
+   worktree sessions, at a median cost 14.6 percent and 9 s higher for
+   carrying `serena`, `semble`, `codebase-memory-mcp` and `jcodemunch` together
+   (their shares were not measured apart, and `socraticode` was not in the
+   comparison). That measured single-symbol lookups in worktree
+   sessions only; cross-file refactors and impact analysis keep the on-demand
+   path, and the directive lever (a paragraph in the instruction files) was not
+   delivered in that comparison, so it is untested
+   ([decision](../docs/decisions/2026-10-12-code-navigation-on-demand.md)).
+   The four stay installed, and their entries are unchanged in
+   [`adoption/mcp/claude-code-navigation.json`](mcp/claude-code-navigation.json).
+   A session that needs them loads that file for the session only, with the
+   `${HOME}` and `${ECO_ROOT}` placeholders rendered for this host:
+   ```sh
+   claude --mcp-config "$(python3 tools/adoption/install_claude_profile.py --print-mcp-config)"
+   ```
+   The subagents of that session inherit the servers, which is how the agents
+   whose tool lists name them (`evidence-reviewer`, `isolated-builder`,
+   `security-reviewer`, `stack-researcher`) get their Serena and SocratiCode
+   tools; in a session without the file those tools do not exist and the agents
+   read with Grep, Read and Glob. A project that wants one of them every time
+   registers it with `claude mcp add --scope local` from the project root, as
+   for jCodeMunch below. `jcodemunch` stays in the user-scope template: its
+   2026-10-04 record reserves a change to the user's instruction.
 
    **jCodeMunch, per project.** A project that wants its own private
    registration beside the user-scope one registers it from the project root:

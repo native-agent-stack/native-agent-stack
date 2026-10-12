@@ -54,14 +54,6 @@
       "source": "docs/decisions/2026-10-12-mcp-template-live-reconciliation.md#values-that-differ"
     },
     {
-      "client": "claude",
-      "name": "socraticode",
-      "row": "DIFFERS",
-      "fields": ["args", "command", "env"],
-      "reason": "the live server runs SocratiCode 1.16.0 through npx with an auto-resume and a collection prefix; the template names 1.15.0 and its node entry point; versions stay with the version owner",
-      "source": "docs/decisions/2026-10-12-mcp-template-live-reconciliation.md#values-that-differ"
-    },
-    {
       "client": "codex",
       "name": "socraticode",
       "row": "DIFFERS",

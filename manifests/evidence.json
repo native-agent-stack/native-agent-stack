@@ -5372,8 +5372,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "aa82f6f3a9df2c3c96c3154752a2b5de145498fb0d045af08fa0da7079a09c37",
-      "bytes": 74974
+      "sha256": "d8545836765239aea794e1cb3b191af9e0a42bbd7358b5e77e7d2cf3c5031b6f",
+      "bytes": 77456
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -5496,9 +5496,14 @@
       "bytes": 20245
     },
     {
+      "path": "adoption/mcp/claude-code-navigation.json",
+      "sha256": "018c20fb31bec0668f2a6d69efe32a2b9d1335638312fcf04a95f5b6a3a87fbf",
+      "bytes": 2981
+    },
+    {
       "path": "adoption/mcp/claude-user.json",
-      "sha256": "c8f2ea6759218c4271c44404e234959ce0f0ef4359bc915ba0b9e0c9bef56a5d",
-      "bytes": 7698
+      "sha256": "01206b87ed1408b8cf92ab3ed43df1220389e0caa492793d796f31a05d576964",
+      "bytes": 7571
     },
     {
       "path": "adoption/mcp/runtime-token-layer.json",
@@ -5522,8 +5527,8 @@
     },
     {
       "path": "adoption/new-wsl/client-config-map.json",
-      "sha256": "c395763f94d5bb335584d22ca4903dc977544d0e50fc6027f36e0fa64ee3a2af",
-      "bytes": 57789
+      "sha256": "3b4bba2956f19e40e32966cdc29d36e8c388818414169c6d4859d050c67b465a",
+      "bytes": 55434
     },
     {
       "path": "adoption/new-wsl/codex-user-instructions.md",
@@ -5532,13 +5537,13 @@
     },
     {
       "path": "adoption/new-wsl/mcp-drift-acknowledged.json",
-      "sha256": "883b6cf081c09853d47768fe9b869d473cec130b59f02650e0f025828cb36ab6",
-      "bytes": 5182
+      "sha256": "2cb00d71d8f754c3019d06319286439c38cb22a6291c9ae19c7af0bc98d47b16",
+      "bytes": 4742
     },
     {
       "path": "adoption/new-wsl/templates/claude-user.mcp.additions.json",
-      "sha256": "fc92181246725362e574467fb1bcfbf062a72833f59cd310a56f29bb8571eabb",
-      "bytes": 2099
+      "sha256": "0dd303508b97f31b90e68981b04e8a74433a149a563657b491afb646eb4890b3",
+      "bytes": 2267
     },
     {
       "path": "adoption/new-wsl/templates/claude.settings.additions.json",
@@ -18338,8 +18343,8 @@
     },
     {
       "path": "docs/decisions/2026-10-02-new-wsl-client-configuration.md",
-      "sha256": "be8a467cd2070d715a820213ab47fd35c49d727fdb7dabd1f4f01b1cbec7c5ef",
-      "bytes": 149798
+      "sha256": "f2be1efa9f33fc34525e35452a4484cb805d4b45b477be4594aa7ffa453c3a3d",
+      "bytes": 151673
     },
     {
       "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
@@ -18985,6 +18990,11 @@
       "path": "docs/decisions/2026-10-11-starred-finalization.md",
       "sha256": "65d339790291609f8aeebf302ffe56cac5a27434b43db904e4831e03646431cb",
       "bytes": 12766
+    },
+    {
+      "path": "docs/decisions/2026-10-12-code-navigation-on-demand.md",
+      "sha256": "a6ab7d7e9d39b3cbc4d7fad58b13571fb6d6ddafba32cbf40115f6f67f47636f",
+      "bytes": 20569
     },
     {
       "path": "docs/decisions/2026-10-12-converged-candidates-only.md",
@@ -62463,8 +62473,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "31aa607901be251aa8bc89df9fdcb02f2604ffc4f87b50c555d378d0470721cb",
-      "bytes": 169116
+      "sha256": "d38d482a6012b6fedf842b007d97446994cf7b6ffadeac1ac37d92b96a53da41",
+      "bytes": 178913
     },
     {
       "path": "tests/test_install_skills.py",
@@ -62598,8 +62608,8 @@
     },
     {
       "path": "tests/test_mcp_template_drift.py",
-      "sha256": "b6dbd8de87a49822ce9e0da2bd35adbb8b2736033c81241808e9222233df24e8",
-      "bytes": 61270
+      "sha256": "911f97fb4f1878860fc221f78add649fc00d55c8f238fda2ec681f8162dcef5f",
+      "bytes": 62276
     },
     {
       "path": "tests/test_mcporter_selectors.py",
@@ -62758,8 +62768,8 @@
     },
     {
       "path": "tests/test_new_wsl_client_config.py",
-      "sha256": "4dde6cfcb82636cad926dc412b9e0a587e53f98454b80b01b821b76bf579f6b6",
-      "bytes": 345950
+      "sha256": "2c7d823e6d58857a04fa1f1737b479d37e0e8abf937b75127f984374202ed006",
+      "bytes": 347879
     },
     {
       "path": "tests/test_new_wsl_definitive_defaults.py",
@@ -63433,8 +63443,8 @@
     },
     {
       "path": "tools/adoption/install_claude_profile.py",
-      "sha256": "187daeaf965192bdbae4551c4af7f288835d7a3f41314a74d0a8f5bc2e46aa40",
-      "bytes": 26080
+      "sha256": "860c409b52c47f5118ae3974ebf4409463fd9266911e9b620f927cea035994ed",
+      "bytes": 28520
     },
     {
       "path": "tools/adoption/install_skills.py",

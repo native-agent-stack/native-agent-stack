@@ -922,6 +922,10 @@ settings and the project agents' gaps) and the list of dropped units after them;
 
 | Project agent | MCP servers of its tools that are not wired | Skills the plan does not install |
 | --- | --- | --- |
+| `evidence-reviewer.md` | `serena`, `socraticode` | - |
+| `isolated-builder.md` | `serena`, `socraticode` | - |
+| `security-reviewer.md` | `serena`, `socraticode` | - |
+| `stack-researcher.md` | `serena` | - |
 
 `examples/claude-native/CLAUDE.md`, written to `adoption/new-wsl/claude-user-instructions.md` (0 unit(s) left out; 58 of 58 lines stay):
 
@@ -1347,3 +1351,21 @@ is unwired and no sentence of the instruction blocks changes. All earlier projec
 observations.
 
 Today: 403 pieces, 363 wired (211 practice, 152 through a slot), 24 not wired (0 through a slot that does not install, 24 by their own entry) and 16 authorization pieces
+
+## Addendum 2026-10-12: code navigation on demand
+
+The Claude user-scope profile stops registering `serena`, `socraticode`, `codebase-memory-mcp` and `semble`
+([decision](2026-10-12-code-navigation-on-demand.md)). Four Claude pieces leave the map: the entries of
+`claude/mcp/server/serena`, `claude/mcp/server/socraticode` and `claude/mcp/server/semble`, and the
+`claude/mcp/server/codebase-memory-mcp` match of the code graph entry, whose Codex tables stay wired. The Claude
+entries of the four servers are unchanged in `adoption/mcp/claude-code-navigation.json`, which this tool does not
+render: the distribution's overrides for them (Serena's command from the settings `PATH`, SocratiCode's pinned entry
+point and the host's Qdrant and embedding endpoints) applied to registered entries only, so the on-demand entries
+carry the shared template's values. The Codex pieces, semble's two Claude allow rules (inert while the server is not
+loaded) and the instruction blocks are unchanged, because no instruction source names the four servers. The third
+table of "Pieces that are not wired" now lists the four project agents whose tools name Serena and SocratiCode,
+which is the state of a session that has not loaded the on-demand file (`--check` prints the same four lines), and
+the host endpoint probe compares `ai-memory`, the one shared server whose value comes from the host; the Codex
+SocratiCode entry keeps the host's endpoints. All earlier projections remain historical observations.
+
+Today: 399 pieces, 359 wired (211 practice, 148 through a slot), 24 not wired (0 through a slot that does not install, 24 by their own entry) and 16 authorization pieces
