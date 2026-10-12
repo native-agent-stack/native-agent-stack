@@ -253,7 +253,7 @@ class DriftTests(unittest.TestCase):
 
     def test_a_description_is_built_from_names_and_fixed_words_only(self):
         """Value-free by construction: for 300 seeded random values placed in the arguments, an environment value, a header value, the directory of the command, the username, password, port, path, query and fragment of
-        a URL and the whole of the transport type, no 8-character piece of the value is in the description. Not covered here, because they are printed as names by design when they have the shape of one: the
+        a URL (with an `@`, and without one: a plain path, query and fragment, and the value as the port) and the whole of the transport type, no 8-character piece of the value is in the description. Not covered here, because they are printed as names by design when they have the shape of one: the
         host label and the command's file name (the shape tests below cover a credential that parses as a host)."""
         rnd = random.Random(1034)
         alphabet = string.ascii_letters + string.digits + "!#$%&()*+,-./:;<=>?@[]^_{|}~ "
@@ -264,7 +264,12 @@ class DriftTests(unittest.TestCase):
             http = {"type": "http", "url": f"https://u:{secret}@host.invalid:8443/{secret}?token={secret}#{secret}", "command": None, "args": [secret], "env": {"TWO": secret}, "headers": {"Authorization": secret}}
             username = {"type": "http", "url": f"https://{secret}:password@host.invalid:{rnd.randint(1, 65535)}/path", "command": None, "args": [], "env": {}, "headers": {}}
             typed = {"type": secret, "url": None, "command": "fixture", "args": [], "env": {}, "headers": {}}
-            for spec in (stdio, http, username, typed):
+            plain = {"type": "http", "url": f"https://host.invalid/{secret}?q={secret}#{secret}", "command": None, "args": [], "env": {}, "headers": {}}
+            ported = {"type": "http", "url": f"https://host.invalid:{secret}/", "command": None, "args": [], "env": {}, "headers": {}}
+            port = rnd.randint(10000, 65535)
+            numbered = {"type": "http", "url": f"https://host.invalid:{port}/{secret}", "command": None, "args": [], "env": {}, "headers": {}}
+            self.assertNotIn(str(port), drift.describe(numbered), "a valid port is a value too: five digits are below the 8-character piece")
+            for spec in (stdio, http, username, typed, plain, ported, numbered):
                 text = drift.describe(spec)
                 for position in range(len(secret) - 7):
                     self.assertNotIn(secret[position:position + 8], text, (index, position, text))
@@ -350,6 +355,50 @@ class DriftTests(unittest.TestCase):
                     self.assertEqual(done.stdout, "")
                     self.assertIn("semble", done.stderr)
                     self.assertNotIn("Traceback", done.stderr)
+
+    def test_an_input_that_cannot_be_read_ends_the_run_with_exit_two_and_a_fixed_message(self):
+        """The CC's micro read of cecf039f (pr1034-claude-micro-cecf039f.md, P3-1 and P3-3): a directory that cannot be searched, and an input nested deeper than the parser's recursion limit, ended the run with
+        exit 1 and a traceback that names an absolute path (CPython Lib/pathlib/_abc.py is_file L476-L488 re-raises EACCES; json and tomllib raise RecursionError)."""
+        for label, text, field in (("deeply nested JSON", "[" * 200000, "claude"), ("deeply nested TOML", "a = " + "[" * 200000, "codex")):
+            with self.subTest(label=label):
+                claude_path, codex_path = self.live()
+                (claude_path if field == "claude" else codex_path).write_text(text, encoding="utf-8")
+                code, out, err = self.run_tool(claude_path, codex_path)
+                self.assertEqual((code, out), (2, ""))
+                self.assertIn("RecursionError", err)
+                self.assertNotIn("Traceback", err)
+                self.assertNotIn(self.tmp.name, err)
+
+    @unittest.skipIf(os.geteuid() == 0, "root can search any directory")
+    def test_a_home_whose_codex_directory_cannot_be_searched_ends_the_run_with_exit_two(self):
+        home = Path(tempfile.mkdtemp(dir=self.tmp.name))
+        (home / ".codex").mkdir()
+        (home / ".codex" / "config.toml").write_text(self.codex_text, encoding="utf-8")
+        (home / ".claude.json").write_text(json.dumps({"mcpServers": json.loads(json.dumps(self.claude))}), encoding="utf-8")
+        (home / ".codex").chmod(0)
+        self.addCleanup((home / ".codex").chmod, 0o700)
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            code = drift.main(["--home", str(home), "--eco-root", str(self.eco)])
+        self.assertEqual((code, out.getvalue()), (2, ""))
+        self.assertIn("cannot read ~/.codex/config.toml: PermissionError", err.getvalue())
+        self.assertNotIn("Traceback", err.getvalue())
+        self.assertNotIn(str(home), err.getvalue())
+
+    def test_the_fields_of_a_differing_acknowledgement_are_a_list_of_names(self):
+        """The CC's micro read, P3-2: `sorted(entry["fields"])` raised TypeError for a list that mixes types, and a list of lists, a string and a number passed the check."""
+        for label, fields in (("mixed types", ["args", 1]), ("a list of lists", [["args"]]), ("a string", "args"), ("a number", 5), ("an empty list", []), ("a null", None)):
+            with self.subTest(fields=label):
+                path = self.acknowledgements({**self.entry("claude", "semble", "DIFFERS"), "fields": fields})
+                with self.assertRaises(drift.DriftError):
+                    drift.load_acknowledged(path)
+                err = io.StringIO()
+                with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(err):
+                    code = drift.main(["--home", str(self.home), "--eco-root", str(self.eco), "--acknowledged", str(path)])
+                self.assertEqual(code, 2)
+                self.assertNotIn("Traceback", err.getvalue())
+        good = self.acknowledgements(self.entry("claude", "semble", "DIFFERS", fields=["args", "env"]))
+        self.assertEqual(len(drift.load_acknowledged(good)), 1)
 
     def test_a_credential_that_ends_the_authority_early_is_not_printed_as_a_host(self):
         """The CC's read of 4916d3a4 (~/.local/state/native-agent-stack/coordination/command-center/research-cc-role-20261008/pr1034-claude-read-4916d3a4.md, P3-a and P3-d): a userinfo that holds an unescaped `/`,
@@ -512,6 +561,7 @@ class DriftTests(unittest.TestCase):
             (repository / "docs").mkdir(parents=True)
             record = repository / "docs" / "record.md"
             record.write_text("# Heading\n", encoding="utf-8")
+            (repository / "4242").write_text("a file whose name a number spells\n", encoding="utf-8")
             outside = Path(directory) / "outside.md"
             outside.write_text("not a file of the repository\n", encoding="utf-8")
             (repository / "docs" / "escape.md").symlink_to(outside)
@@ -520,7 +570,7 @@ class DriftTests(unittest.TestCase):
             accepted = ["docs/record.md", "docs/record.md#heading", "docs/alias.md"]
             refused = {"an absolute path": str(outside), "the absolute system file": "/etc/passwd", "an absolute path inside the repository": str(record), "parent traversal": "../outside.md",
                        "traversal that returns inside": "docs/../docs/record.md", "a symlink to a file outside": "docs/escape.md", "a directory": "docs/folder",
-                       "a missing file": "docs/missing.md", "no path, only a fragment": "#heading", "a null byte": "docs/rec\0ord.md"}
+                       "a missing file": "docs/missing.md", "no path, only a fragment": "#heading", "a null byte": "docs/rec\0ord.md", "a number that spells a file": 4242}
             with mock.patch.object(drift, "ROOT", repository):
                 for source in accepted:
                     with self.subTest(accepted=source):
@@ -537,6 +587,27 @@ class DriftTests(unittest.TestCase):
                     code, out, err = self.run_tool(claude_path, codex_path, "--acknowledged", str(self.acknowledgements(self.entry("claude", "x", "LIVE-ONLY", source=source))))
                     self.assertEqual((code, out), (2, ""))
                     self.assertIn("source", err)
+
+    def test_a_rejected_acknowledgement_source_is_never_printed(self):
+        """Astra's read of cecf039f (~/.cache/ns2604-gpt-reads/fix2-pr1034-cecf039f9/VERDICT.md, blocker 1): the refusal interpolated the rejected value with `!r`, so a path of the account, or a malformed object
+        holding a token, reached stderr with rc 2, in both formats. CPython `Doc/reference/lexical_analysis.rst` (v3.13.16 L785-L786): `!r` calls repr, which quotes the operand and does not redact it. The refusal names
+        the entry and the field and never what was given."""
+        claude_path, codex_path = self.live()
+        sources = {"an absolute path of an account": "/home/example/review-account-7f3a/decision.md", "an object holding a token": {"token": "private-review-token"}, "a list": ["private-review-token"],
+                   "a number": 90817263, "text with a token": "private-review-token/../x.md", "a null byte": "docs/rec\0ord-private.md", "a null": None, "a relative path to a missing file": "docs/private-review-missing.md"}
+        needles = ("review-account-7f3a", "private-review-token", "90817263", "ord-private", "private-review-missing")
+        for label, source in sources.items():
+            for extra in ((), ("--json",)):
+                with self.subTest(source=label, json=bool(extra)):
+                    path = self.acknowledgements({**self.entry("claude", "x", "LIVE-ONLY"), "source": source})
+                    done = subprocess.run([sys.executable, "-I", str(SCRIPT), "--home", str(self.home), "--eco-root", str(self.eco), "--claude-json", str(claude_path), "--codex-config", str(codex_path),
+                                           "--acknowledged", str(path), *extra], capture_output=True, text=True, timeout=180, env={"PATH": os.environ["PATH"], "HOME": str(self.home)})
+                    self.assertEqual(done.returncode, 2, done.stderr)
+                    self.assertEqual(done.stdout, "")
+                    for needle in needles:
+                        self.assertNotIn(needle, done.stdout + done.stderr)
+                    self.assertIn("acknowledged[0]", done.stderr)
+                    self.assertIn("source must be a relative path", done.stderr)
 
     def test_the_committed_acknowledgements_agree_with_the_render_and_cite_sections_of_their_record(self):
         """What can be checked without a live host: the file is well formed, each source is a heading of the record, a LIVE-ONLY entry names a server the render does not have and a DIFFERS entry one it has."""

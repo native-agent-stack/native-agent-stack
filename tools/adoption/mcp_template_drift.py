@@ -17,7 +17,8 @@ No value of a registration is printed, in either format or on either stream, err
 never their values; a URL is shown as scheme://host (no userinfo, port, path, query or fragment) and withheld whole when it holds an `@`; a command as its file name (no directory); the transport from a fixed set
 (stdio, http, sse); arguments by count only, because a token that looks like an option can be the value of the option before it. The host label and the command's file name are printed as names, not as values: they are
 the two places where text of a registration still reaches a description. A description is built from those names, counts and fixed words, so a value cannot reach it by taking a shape the report did not foresee; a field
-of an unexpected shape (a non-numeric timeout, a list that is a string, a table that is a list) ends the run with exit 2 and a message that names the server, never the value. Paths are printed relative to the home.
+of a shape that the checks name (a non-numeric timeout, a list that is a string, a table that is a list, a registration that is not a table, an argument that is not a string) ends the run with exit 2 and a message that names the server, never the value;
+a `type` or `command` of another kind is compared and withheld. Paths are printed relative to the home.
 Exit 0: every difference is acknowledged; 1: an unacknowledged difference or a stale acknowledgement; 2: an input cannot be read.
 """
 from __future__ import annotations
@@ -97,7 +98,7 @@ def shown_path(path: Path, home: Path | None = None) -> str:
 def read_claude(path: Path, home: Path | None = None) -> dict:
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, ValueError) as error:
+    except (OSError, ValueError, RecursionError) as error:
         raise DriftError(f"cannot read {shown_path(path, home)}: {type(error).__name__}") from None
     servers = data.get("mcpServers") if isinstance(data, dict) else None
     if not isinstance(servers, dict):
@@ -108,7 +109,7 @@ def read_claude(path: Path, home: Path | None = None) -> dict:
 def read_codex(path: Path, home: Path | None = None) -> dict:
     try:
         data = tomllib.loads(path.read_text(encoding="utf-8"))
-    except (OSError, ValueError) as error:
+    except (OSError, ValueError, RecursionError) as error:
         raise DriftError(f"cannot read {shown_path(path, home)}: {type(error).__name__}") from None
     servers = data.get("mcp_servers", {})
     if not isinstance(servers, dict):
@@ -243,7 +244,7 @@ def repository_file(source: str) -> bool:
 def load_acknowledged(path: Path, home: Path | None = None) -> list[dict]:
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, ValueError) as error:
+    except (OSError, ValueError, RecursionError) as error:
         raise DriftError(f"cannot read {shown_path(path, home)}: {type(error).__name__}") from None
     if not isinstance(data, dict) or data.get("schema") != ACK_SCHEMA or not isinstance(data.get("acknowledged"), list):
         raise DriftError(f"{shown_path(path, home)}: expected schema {ACK_SCHEMA} and an `acknowledged` list")
@@ -259,12 +260,13 @@ def load_acknowledged(path: Path, home: Path | None = None) -> list[dict]:
             problems.append(f"{where}: name is missing")
         if entry.get("row") not in ROWS:
             problems.append(f"{where}: row must be one of {ROWS}")
-        if entry.get("row") == "DIFFERS" and not (isinstance(entry.get("fields"), list) and entry["fields"]):
-            problems.append(f"{where}: a DIFFERS entry names the differing fields")
+        if entry.get("row") == "DIFFERS" and not (isinstance(entry.get("fields"), list) and entry["fields"] and all(isinstance(field, str) for field in entry["fields"])):
+            problems.append(f"{where}: a DIFFERS entry names the differing fields, as a list of strings")
         if not str(entry.get("reason") or "").strip():
             problems.append(f"{where}: reason is missing")
-        if not repository_file(str(entry.get("source") or "")):
-            problems.append(f"{where}: source must be a relative path to a regular file beneath this repository (got {entry.get('source')!r})")
+        if not isinstance(entry.get("source"), str) or not repository_file(entry["source"]):
+            # The value is input, and it may be a path of the account or any text: the refusal names the entry and the field, never what was given (CPython `!r` formats the operand, it does not redact it).
+            problems.append(f"{where}: source must be a relative path to a regular file beneath this repository")
     if problems:
         raise DriftError(f"{shown_path(path, home)}: " + "; ".join(problems))
     return data["acknowledged"]
@@ -327,7 +329,11 @@ def main(argv: list[str] | None = None) -> int:
         rows, notes, compared = [], [], []
         for client, template, reader in (("claude", claude_template, read_claude), ("codex", codex_template, read_codex)):
             explicit = (args.claude_json if client == "claude" else args.codex_config) is not None
-            if not sources[client].is_file() and not explicit:
+            try:
+                present = sources[client].is_file()
+            except OSError as error:   # EACCES on a parent directory is raised, not answered False (CPython Lib/pathlib/_abc.py is_file, v3.13.16 L476-L488)
+                raise DriftError(f"cannot read {shown_path(sources[client], home)}: {type(error).__name__}") from None
+            if not present and not explicit:
                 notes.append(f"{client}: no {shown_path(sources[client], home)}, not compared")
                 continue
             live = reader(sources[client], home)
