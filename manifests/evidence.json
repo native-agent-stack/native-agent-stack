@@ -5201,8 +5201,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "087532aa7611c74b7047e277d54f30e47b75c707d55c2bbd54ce7c657a654a8d",
-      "bytes": 39710
+      "sha256": "fb9e28b9012d90a12f85bbe7562b8b153d4791eba8f42871125ae72f985e0bb5",
+      "bytes": 41377
     },
     {
       "path": ".gitignore",
@@ -5211,8 +5211,8 @@
     },
     {
       "path": ".gitleaks.toml",
-      "sha256": "f9abe05a349ba68f75a0c326d86536226a9f3b1276e36f89971a2d02a67aef76",
-      "bytes": 33070
+      "sha256": "96482136147070cd68f0369d628b20f37103db882edb310724cb74efee46b551",
+      "bytes": 33456
     },
     {
       "path": ".gitleaksignore",
@@ -5841,8 +5841,8 @@
     },
     {
       "path": "adoption/tools/README.md",
-      "sha256": "26cd1c2ac3d50e26f71e6080c9cff72711dd38f8fe9c5b2c4dfbb913e0f50d0a",
-      "bytes": 41166
+      "sha256": "ed15bc47ab8ec76b7b7c997382f84d3592375e073b9ed1e9037077b5bf893b09",
+      "bytes": 42279
     },
     {
       "path": "adoption/tools/ecosystem-bounded-run",
@@ -11392,8 +11392,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-read-deltas.json",
-      "sha256": "4d444e61184b18ac5c54bdee87ac80a2ce1f420fcbd2a9c2d90c8f04e02516b0",
-      "bytes": 156
+      "sha256": "deaa5bff14e7b0dd6f6e4534bcf12ba5e10b605d1b73735f7e824527ec4a5a73",
+      "bytes": 263
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261004.json",
@@ -11404,6 +11404,11 @@
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261011-skill-use-delta.json",
       "sha256": "2a6b8c37d94237f1357b66f14eb8f1f4a996106520c787c580062c8932010114",
       "bytes": 5462
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261012-pr949-delta.json",
+      "sha256": "f2f79a45d92e6be9d953ecc42a5623e78860d593ac36e38a173ae17c2b1502dc",
+      "bytes": 6482
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unit-pass.txt",
@@ -19122,8 +19127,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "b3622e272e6cbfb083ebbb40e853f0451de066e8fcab2db9a2f91c07b5753f19",
-      "bytes": 104021
+      "sha256": "493052e05ac60606d3a0be4e6d3d9f83c02b40463c2c98e80508e793f560c5fc",
+      "bytes": 106136
     },
     {
       "path": "docs/grand-catalog-counts.md",
@@ -61006,6 +61011,11 @@
       "bytes": 14769
     },
     {
+      "path": "scripts/ci_secret_scan_range.py",
+      "sha256": "a3f6ad6cbc9cac0e48f3713c4d6ec10db0a17e9d58de0d2154d4c3ae8a9b19f7",
+      "bytes": 7976
+    },
+    {
       "path": "scripts/codex_quota.py",
       "sha256": "fa0e3c9e14f367da6a216eaeedfe5a6bac76274f02198f23e80b6f901a9bd94a",
       "bytes": 16819
@@ -61137,8 +61147,8 @@
     },
     {
       "path": "scripts/secret_scan_metrics.py",
-      "sha256": "89bd8c4f4d21d9328a8955d7a6103f10b7e4d921deaa8418a60181f0cf2cd774",
-      "bytes": 3590
+      "sha256": "183d6c2dd558062f118426ff79fd9cb8bdd22073d10b6158172e05ad91068388",
+      "bytes": 3904
     },
     {
       "path": "scripts/skills_status.py",
@@ -61806,6 +61816,11 @@
       "bytes": 22660
     },
     {
+      "path": "tests/test_ci_secret_scan_range.py",
+      "sha256": "f5a7f502d2d7211d06f785b676020c6351a8f2097223f993d853fe9f09130625",
+      "bytes": 15233
+    },
+    {
       "path": "tests/test_claude_federation_diagnostics.py",
       "sha256": "39a3f0dc6bed95370c93eac56449fa3e61c54d66edd8de35293a81991c63fdf1",
       "bytes": 4234
@@ -62052,8 +62067,8 @@
     },
     {
       "path": "tests/test_gitleaks_config.py",
-      "sha256": "f7e92bdf4cc9acab421d58859a772935d4bf3378cd3ed70a349d77ff23e7ecb7",
-      "bytes": 72804
+      "sha256": "4237c687d13336ad8a42a36c997cccdef752cde9b27851cb4b1f65ec894f7d1e",
+      "bytes": 87478
     },
     {
       "path": "tests/test_gitleaks_guarded_macos.py",
@@ -62717,13 +62732,13 @@
     },
     {
       "path": "tests/test_secret_scan_metrics.py",
-      "sha256": "0ce1a4e1be35cb2e1c38a580388b19c87993044f967eb119d77decc0ef08c086",
-      "bytes": 5392
+      "sha256": "0858dfdad1ae3a3aebd6e1cab97387240ba9922fed771da45074656f18b535e5",
+      "bytes": 5510
     },
     {
       "path": "tests/test_secret_scan_size.py",
-      "sha256": "d1d2ba30337805d1717c5916417701e46989a8641efcfe5859d8f6c1e62d3cc1",
-      "bytes": 17626
+      "sha256": "04461cda073dcd8604325c4cc19e163e529ef94026e50737c3499f8a28ec300a",
+      "bytes": 29349
     },
     {
       "path": "tests/test_security_identity.py",
@@ -62972,8 +62987,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "2d6fafd9110ebffae6d95db2005d5914e332ccf600cd0ed0e6d58001adf99e21",
-      "bytes": 142341
+      "sha256": "29379052d7cb2c51e33948175f28956d995f29ed74b936c29b9238d10aab70a8",
+      "bytes": 150255
     },
     {
       "path": "tests/test_workflow_policy.py",
@@ -63307,8 +63322,8 @@
     },
     {
       "path": "tools/local-pages/source_policy.json",
-      "sha256": "88d277e33d4c062fd07fb9ce9ebd2e1614f17bb355246b9f847eab0f73651653",
-      "bytes": 759459
+      "sha256": "78a4c1a3cd052d6a3a389894616cdffdfcde251e120ab673310a85c62b0dfa9e",
+      "bytes": 759542
     },
     {
       "path": "tools/omniroute/gateway_record.py",

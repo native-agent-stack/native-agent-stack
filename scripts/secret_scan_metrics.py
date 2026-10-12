@@ -17,6 +17,9 @@ import subprocess
 
 
 def record(args):
+    history_scope = args.history_scope if args.mode == "git" else None
+    if args.mode == "git" and (history_scope is None or not history_scope.strip()):
+        raise ValueError("Git scan history scope must be provided")
     timing = json.loads(args.timing.read_text())
     elapsed = timing["elapsed_seconds"]
     rss = timing["peak_rss_kib"]
@@ -43,7 +46,7 @@ def record(args):
         "measurement": "GNU time", "platform": platform.system(),
         "elapsed_seconds": elapsed, "peak_rss_kib": rss, "exit_status": status,
         "findings": count, "report_only": args.scanner == "betterleaks",
-        "checked_out_commit": revision, "history_scope": "HEAD" if args.mode == "git" else None,
+        "checked_out_commit": revision, "history_scope": history_scope,
         "event_name": os.environ.get("GITHUB_EVENT_NAME"), "ref": os.environ.get("GITHUB_REF"),
         "github_sha": os.environ.get("GITHUB_SHA"), "repository": os.environ.get("GITHUB_REPOSITORY"),
         "run_id": os.environ.get("GITHUB_RUN_ID"), "run_attempt": os.environ.get("GITHUB_RUN_ATTEMPT"),
@@ -62,6 +65,7 @@ def main():
     parser.add_argument("--report", type=Path)
     parser.add_argument("--scanner", choices=("gitleaks", "betterleaks"), required=True)
     parser.add_argument("--mode", choices=("git", "dir"), required=True)
+    parser.add_argument("--history-scope", help="Exact git log options used by the scanner; required for git mode")
     parser.add_argument("--version", required=True)
     parser.add_argument("--exit-status", type=int, required=True)
     parser.add_argument("--timeout-minutes", type=int, required=True)

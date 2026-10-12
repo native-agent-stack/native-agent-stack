@@ -14,13 +14,15 @@ import re
 import shlex
 import shutil
 import subprocess
+import sys
 import tempfile
 import unittest
 from contextlib import redirect_stdout
 from unittest.mock import patch
 
-from tests.test_workflow_hardening import jobs
+from tests.test_workflow_hardening import jobs, step_block, run_block
 from tests.test_gitleaks_config import GH_PAT_SHAPED_VALUE
+from tests import test_gitleaks_config as history_tests
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -30,6 +32,102 @@ CANARY = GH_PAT_SHAPED_VALUE
 SIZES = (2_000_001, 3_000_000)
 GITLEAKS = shutil.which("gitleaks")
 BETTERLEAKS = os.environ.get("BETTERLEAKS_TEST_BINARY")
+
+
+@unittest.skipUnless(GITLEAKS, "gitleaks not found on PATH")
+class CiSecretScanMergedHistoryTests(unittest.TestCase):
+    """Astra's add/remove and merge-resolution graphs, through the actual CI step."""
+
+    def test_large_removed_secrets_in_merged_histories_and_resolution_patches_are_detected(self):
+        with tempfile.TemporaryDirectory(prefix="ci-secret-merged-history-") as scratch:
+            base = Path(scratch)
+            repo = base / "repo"
+            repo.mkdir()
+            env = {"PATH": os.environ.get("PATH", os.defpath), "GIT_CONFIG_NOSYSTEM": "1",
+                   "GIT_CONFIG_GLOBAL": os.devnull, "GIT_AUTHOR_NAME": "Fixture",
+                   "GIT_AUTHOR_EMAIL": "fixture@example.invalid", "GIT_COMMITTER_NAME": "Fixture",
+                   "GIT_COMMITTER_EMAIL": "fixture@example.invalid", "TMPDIR": str(base)}
+
+            def git(*args, input=None):
+                result = subprocess.run(["git", *args], cwd=repo, env=env, input=input,
+                                        capture_output=True, text=True, timeout=15)
+                self.assertEqual(result.returncode, 0, "Fixture Git operation failed")
+                return result.stdout.strip()
+
+            git("init", "-q", "--object-format=sha1", "--initial-branch=main")
+            empty = git("mktree", input="")
+            raw = 'token = "' + CANARY + '"\n' + 'padding\n' * 375000
+            self.assertGreater(len(raw), 3_000_000)
+            blob = git("hash-object", "-w", "--stdin", input=raw)
+            secret_tree = git("mktree", input=f"100644 blob {blob}\tcanary.txt\n")
+
+            def commit(label, tree, *parents):
+                args = ["commit-tree", tree, "-m", label]
+                for parent in parents:
+                    args.extend(("-p", parent))
+                return git(*args)
+
+            root = commit("safe root", empty)
+            exposed = commit("synthetic addition", secret_tree, root)
+            clean = commit("synthetic removal", empty, exposed)
+            old = commit("old main", empty, root)
+            merge = commit("merge cleaned branch", empty, old, clean)
+            after = commit("clean after merge", empty, merge)
+            safe_side = commit("safe side", empty, root)
+            resolution = commit("synthetic merge resolution", secret_tree, old, safe_side)
+            resolution_clean = commit("remove resolution", empty, resolution)
+            checkout = commit("generated PR merge", empty, old, resolution_clean)
+            runner = base / "runner"
+            native = runner / "gitleaks"
+            native.mkdir(parents=True)
+            (native / "gitleaks").symlink_to(Path(GITLEAKS).resolve())
+            for relative in (".gitleaks.toml", ".gitleaksignore", "scripts/secret_scan_metrics.py",
+                             ".github/workflows/validate.yml"):
+                destination = repo / relative
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(ROOT / relative, destination)
+            script = run_block(step_block(jobs(WORKFLOW.read_text())["secret-scan"], "Scan git history"))
+            cases = (("push-merge-only", "push", {"before": old, "after": merge}, merge),
+                     ("push-merge-then-clean", "push", {"before": old, "after": after}, after),
+                     ("pr-resolution", "pull_request", {"pull_request": {
+                         "base": {"sha": root}, "head": {"sha": resolution_clean}}}, resolution_clean),
+                     ("pr-generated-merge", "pull_request", {"pull_request": {
+                         "base": {"sha": old}, "head": {"sha": resolution_clean}}}, checkout))
+            for label, event, payload, head in cases:
+                with self.subTest(case=label):
+                    git("update-ref", "refs/heads/main", head)
+                    git("update-ref", "refs/remotes/origin/main", head if event == "push" else root)
+                    event_path = base / "event.json"
+                    event_path.write_text(json.dumps(payload))
+                    selection = subprocess.run([sys.executable, "-B", str(ROOT / "scripts/ci_secret_scan_range.py"),
+                                                "--event-name", event, "--event-path", str(event_path)],
+                                               cwd=repo, env=env, capture_output=True, text=True)
+                    self.assertEqual(selection.returncode, 0, "Verified merge graph must be accepted")
+                    outputs = dict(line.split("=", 1) for line in selection.stdout.splitlines())
+                    result = subprocess.run(["bash", "--noprofile", "--norc", "-eo", "pipefail"],
+                                            input=script, cwd=repo, capture_output=True, text=True, timeout=60,
+                                            env={**env, "RUNNER_TEMP": str(runner), "SCAN_LOG_OPTS": outputs["log_opts"]})
+                    self.assertEqual(result.returncode, 1, "Actual CI history step must detect the removed synthetic secret")
+                    findings = json.loads((native / "gitleaks.json").read_text()) or []
+                    self.assertTrue(any(f.get("RuleID") == "github-pat" for f in findings),
+                                    "Actual CI history scan must report the synthetic detector")
+                    receipt = json.loads((native / "full-git.metrics.json").read_text())
+                    self.assertEqual(receipt["history_scope"], outputs["log_opts"])
+                    acceptance = unittest.TestResult()
+                    ci_env = {**env, "GITHUB_ACTIONS": "true", "GITHUB_EVENT_NAME": event,
+                              "GITLEAKS_TESTS_REQUIRED": "1", "GITLEAKS_HISTORY_RANGE": outputs["range"],
+                              "GITLEAKS_HISTORY_MODE": outputs["mode"]}
+                    with patch.object(history_tests, "ROOT", repo), \
+                            patch.object(history_tests, "CONFIG_PATH", repo / ".gitleaks.toml"), \
+                            patch.object(history_tests, "GITLEAKS", GITLEAKS), \
+                            patch.dict(os.environ, ci_env, clear=True), redirect_stdout(io.StringIO()):
+                        for cls in (history_tests.GitleaksLocalPrHistoryTests,
+                                    history_tests.GitleaksBranchAncestryHistoryTests):
+                            cls("test_head_ancestry_scoped_scan_has_zero_findings").run(acceptance)
+                    self.assertEqual(acceptance.errors, [])
+                    self.assertEqual(len(acceptance.skipped), 1 if event == "push" else 0)
+                    self.assertEqual(len(acceptance.failures), 1 if event == "push" else 2,
+                                     "Every applicable duplicate history scan must detect the large removed secret")
 
 
 def workflow_scanner_arguments(job, mode):
@@ -56,7 +154,7 @@ def gnu_time_on_linux():
     return str(timer) if probe.returncode == 0 and "(GNU Time)" in probe.stdout else None
 
 
-def scan_fixture(binary, job, mode, size, path="manifests/large-shape.json"):
+def scan_fixture(binary, job, mode, size, path="manifests/large-shape.json", *, event_scope=None):
     with tempfile.TemporaryDirectory() as tmp:
         base = Path(tmp)
         target = base / "tree"
@@ -67,12 +165,19 @@ def scan_fixture(binary, job, mode, size, path="manifests/large-shape.json"):
                "GIT_CONFIG_GLOBAL": os.devnull, "GIT_CONFIG_SYSTEM": os.devnull,
                "LANG": "C.UTF-8"}
         range_arg = None
+        event_log_opts = None
         if mode == "git":
             for args in (["init", "-q"], ["config", "user.name", "Fixture"],
                          ["config", "user.email", "fixture@example.invalid"],
                          ["commit", "--allow-empty", "-qm", "fixture base"]):
                 subprocess.run(["git", *args], cwd=target, env=env, check=True,
                                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            if event_scope:
+                # A finding before the event window must stay out of this scan.
+                (target / "prior-window.txt").write_text('github_pat_fixture = "' + CANARY + '"\n')
+                for args in (["add", "prior-window.txt"], ["commit", "-qm", "prior window"]):
+                    subprocess.run(["git", *args], cwd=target, env=env, check=True,
+                                   stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             range_arg = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=target, env=env,
                                                 text=True).strip() + "..HEAD"
         file = target / path
@@ -82,6 +187,25 @@ def scan_fixture(binary, job, mode, size, path="manifests/large-shape.json"):
             for args in (["add", "--", path], ["commit", "-qm", "fixture target"]):
                 subprocess.run(["git", *args], cwd=target, env=env, check=True,
                                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        if event_scope:
+            before = range_arg.split("..", 1)[0]
+            head = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=target, env=env,
+                                           text=True).strip()
+            payload = ({"before": before, "after": head} if event_scope == "push" else
+                       {"pull_request": {"base": {"sha": before}, "head": {"sha": head}}})
+            event_file = base / "event.json"
+            event_file.write_text(json.dumps(payload))
+            selected = subprocess.run(
+                [sys.executable, str(ROOT / "scripts/ci_secret_scan_range.py"),
+                 "--event-name", event_scope, "--event-path", str(event_file)],
+                cwd=target, env=env, capture_output=True, text=True,
+            )
+            if selected.returncode:
+                raise AssertionError("Production event helper rejected the real checkout fixture")
+            outputs = dict(line.split("=", 1) for line in selected.stdout.splitlines())
+            if outputs.get("mode") != "range" or outputs.get("range") != f"{before}..{head}":
+                raise AssertionError("Production helper did not retain the exact event window")
+            event_log_opts = outputs["log_opts"]
         report = base / "report.json"
         metrics_file = base / "metrics.txt"
         words = workflow_scanner_arguments(job, mode)
@@ -92,7 +216,7 @@ def scan_fixture(binary, job, mode, size, path="manifests/large-shape.json"):
             elif word == ".gitleaksignore":
                 word = str(ROOT / ".gitleaksignore")
             elif word.startswith("--log-opts="):
-                word = "--log-opts=" + range_arg
+                word = "--log-opts=" + (event_log_opts or range_arg)
             elif word in ("$report", "$RUNNER_TEMP/gitleaks/gitleaks.json"):
                 word = str(report)
             args.append(word)
@@ -100,17 +224,55 @@ def scan_fixture(binary, job, mode, size, path="manifests/large-shape.json"):
             args.extend(["--report-format", "json", "--report-path", str(report)])
         timer = gnu_time_on_linux()
         command = ([timer, "-f", "%e %M", "-o", str(metrics_file)] if timer else []) + args
-        result = subprocess.run(command, cwd=target, env=env, capture_output=True, text=True)
+        if event_scope:
+            # Execute the checked-in history step, including #964's native timer
+            # and resource-receipt writer, against this real Git checkout.
+            runner = base / "runner"
+            native = runner / "gitleaks"
+            native.mkdir(parents=True)
+            (native / "gitleaks").symlink_to(Path(binary).resolve())
+            for relative in (".gitleaks.toml", ".gitleaksignore", "scripts/secret_scan_metrics.py"):
+                destination = target / relative
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(ROOT / relative, destination)
+            binding = target / ".github/workflows/validate.yml"
+            binding.parent.mkdir(parents=True)
+            binding.write_bytes(WORKFLOW.read_bytes())
+            script = run_block(step_block(jobs(WORKFLOW.read_text())[job], "Scan git history"))
+            result = subprocess.run(
+                ["bash", "--noprofile", "--norc", "-eo", "pipefail"], input=script,
+                cwd=target, env={**env, "RUNNER_TEMP": str(runner), "SCAN_LOG_OPTS": event_log_opts},
+                capture_output=True, text=True,
+            )
+            report = native / "gitleaks.json"
+            if "scripts/secret_scan_metrics.py" in script:
+                receipt = json.loads((native / "full-git.metrics.json").read_text())
+                if not receipt:
+                    raise AssertionError("Native workflow step did not retain its resource receipt")
+                if receipt.get("history_scope") != event_log_opts:
+                    raise AssertionError("Native receipt must record the verified event scope")
+        else:
+            result = subprocess.run(command, cwd=target, env=env, capture_output=True, text=True)
         if result.returncode not in (0, 1):
             raise AssertionError(f"Scanner error, rc={result.returncode}; raw output withheld")
         findings = json.loads(report.read_text()) or []
+        if event_scope and any(f.get("File") != path or f.get("Commit") != head for f in findings):
+            raise AssertionError("Event-scoped scanner included a finding outside the event commit/path")
         located = [f for f in findings if f.get("File") == path]
         metrics = {"scanner": Path(binary).name, "mode": mode, "size_bytes": size,
                    "findings": len(located), "rc": result.returncode, "host": platform.system(),
                    "measurement": "gnu_time" if timer else "unmeasured"}
-        if timer:
+        if event_scope:
+            metrics.update(event=event_scope, verified_event_range=True)
+        if timer and not event_scope:
             seconds, rss = metrics_file.read_text().splitlines()[-1].split()
             metrics.update(elapsed_seconds=float(seconds), peak_rss_kib=int(rss))
+        elif event_scope and (native / "full-git.time.json").is_file():
+            native_timing = json.loads((native / "full-git.time.json").read_text())
+            metrics.update(elapsed_seconds=native_timing["elapsed_seconds"],
+                           peak_rss_kib=native_timing["peak_rss_kib"], native_workflow_step=True)
+        elif event_scope:
+            metrics["measurement"] = "unmeasured"
         print("large-file-scan-metrics: " + json.dumps(metrics, sort_keys=True))
         return located
 
@@ -271,7 +433,7 @@ class TimedWorkflowArgumentsTests(unittest.TestCase):
                             self.assertEqual(args[:2], ["--config", ".gitleaks.toml"])
                             self.assertIn("--redact", args)
                             if mode == "git":
-                                self.assertIn("--log-opts=HEAD", args)
+                                self.assertIn("--log-opts=$SCAN_LOG_OPTS", args)
                             if job == "secret-scan-betterleaks":
                                 self.assertIn("--exit-code", args)
                                 self.assertIn(".gitleaksignore", args)
@@ -279,6 +441,15 @@ class TimedWorkflowArgumentsTests(unittest.TestCase):
 
 @unittest.skipUnless(GITLEAKS, "gitleaks is installed in its native secret-scan job")
 class GitleaksLargeFileTests(unittest.TestCase):
+    def test_verified_event_scope_keeps_large_targets_and_the_exact_explorer_exclusion(self):
+        for event in ("pull_request", "push"):
+            with self.subTest(event=event):
+                self.assertTrue(scan_fixture(GITLEAKS, "secret-scan", "git", 3_000_000,
+                                             event_scope=event),
+                                "Verified event scope must not restore the old large-target skip")
+                self.assertEqual(scan_fixture(GITLEAKS, "secret-scan", "git", 3_000_000,
+                                              path="docs/ecosystem/index.html", event_scope=event), [])
+
     def test_git_and_dir_find_canaries_above_both_old_skip_boundaries(self):
         for mode in ("git", "dir"):
             for size in SIZES:

@@ -59,7 +59,8 @@ class ProductionTimingTests(unittest.TestCase):
                            "RUNNER_TEMP": str(runner), "GITHUB_STEP_SUMMARY": str(base / "summary"),
                            "GITHUB_EVENT_NAME": "pull_request", "GITHUB_REF": "refs/pull/7/merge",
                            "GITHUB_REPOSITORY": "fixture/project", "GITHUB_RUN_ID": "17",
-                           "GITHUB_RUN_ATTEMPT": "1", "GITHUB_JOB": "secret-scan", "FIXTURE_SCAN_STATUS": str(status)}
+                           "GITHUB_RUN_ATTEMPT": "1", "GITHUB_JOB": "secret-scan", "FIXTURE_SCAN_STATUS": str(status),
+                           "SCAN_LOG_OPTS": "--diff-merges=first-parent " + "1" * 40 + ".." + "2" * 40}
                     for args in (("init", "-q"), ("config", "user.name", "Fixture"),
                                  ("config", "user.email", "fixture@example.invalid"),
                                  ("add", "--", ".github", ".gitleaks.toml", ".gitleaksignore"),
@@ -77,7 +78,7 @@ class ProductionTimingTests(unittest.TestCase):
                     self.assertEqual(record["checked_out_commit"], head)
                     self.assertEqual(record["event_name"], "pull_request")
                     self.assertEqual(record["ref"], "refs/pull/7/merge")
-                    self.assertEqual(record["history_scope"], "HEAD" if mode == "git" else None)
+                    self.assertEqual(record["history_scope"], env["SCAN_LOG_OPTS"] if mode == "git" else None)
                     self.assertEqual(record["job_timeout_minutes"], budget)
                     self.assertGreaterEqual(record["elapsed_seconds"], 0)
                     self.assertGreater(record["peak_rss_kib"], 0)
