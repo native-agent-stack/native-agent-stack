@@ -5726,8 +5726,8 @@
     },
     {
       "path": "adoption/skills/lifecycle.md",
-      "sha256": "ef104b7f607138341f3d8c9a3ce79d45c44e7a1dee13bcdd352ad02dd4bbbdda",
-      "bytes": 21999
+      "sha256": "ab4969b0aaf7fad9ba4a36a403dfdb244739a402dc3d402f832405df925d56e5",
+      "bytes": 23451
     },
     {
       "path": "adoption/skills/manifest.json",
@@ -18924,6 +18924,11 @@
       "path": "docs/decisions/2026-10-12-mcp-template-live-reconciliation.md",
       "sha256": "a796423cb4464f5e74f538808c598b782e6d9bf05ad6035536796c0736ae68f1",
       "bytes": 13096
+    },
+    {
+      "path": "docs/decisions/2026-10-12-skills-installer-foreign-content.md",
+      "sha256": "c77b464f5d658954ad644a64f0cb082ac27f516515d63cc488e525405d0a2344",
+      "bytes": 5598
     },
     {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
@@ -61187,8 +61192,8 @@
     },
     {
       "path": "scripts/skills_status.py",
-      "sha256": "c15549048c60c737b1e3283218d61ed8003931571ccadab8575bbef256ff1d34",
-      "bytes": 44849
+      "sha256": "9f743a7feaf9c31795e8608e0c8249b499b0909991bcadf8f79331460ce9653e",
+      "bytes": 45970
     },
     {
       "path": "scripts/starred_convergence.py",
@@ -62202,8 +62207,8 @@
     },
     {
       "path": "tests/test_install_skills.py",
-      "sha256": "c49a21ea7b32660b69af03f82ba9fe0d259c391a1ca768bbe3a312a85fbb1dee",
-      "bytes": 134249
+      "sha256": "04b397fdcd5c12eb8ccf145aa87c624045294e2e81bdd02f1c27c15f1880a186",
+      "bytes": 147507
     },
     {
       "path": "tests/test_j775_panel_contracts.py",
@@ -62852,8 +62857,8 @@
     },
     {
       "path": "tests/test_skills_status.py",
-      "sha256": "49f075bb631348d1021c84bbd17a7d772696fc152782521295330bc4d61f66bc",
-      "bytes": 67596
+      "sha256": "3cc7394f9d09f383a1a498ee64abffa52c20ae4b6e513337330214aafaf537bb",
+      "bytes": 72860
     },
     {
       "path": "tests/test_sota_convergence.py",
@@ -63132,8 +63137,8 @@
     },
     {
       "path": "tools/adoption/install_skills.py",
-      "sha256": "d6c3dabaea7ccb0a27450570604d4a17840b9b004433dbfd939a53074a561d12",
-      "bytes": 56898
+      "sha256": "3b3c87896e29ac31d25dd56dbe04a4ca8ddda60a075c55bad63ac24cf6ea3e70",
+      "bytes": 60318
     },
     {
       "path": "tools/adoption/managed_block.py",
