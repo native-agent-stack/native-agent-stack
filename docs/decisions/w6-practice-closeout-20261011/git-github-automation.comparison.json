@@ -1,0 +1,195 @@
+{
+  "comparison_id": "w6-git-github-automation-20261011",
+  "scope_status": "preregistered_comparison_pending_named_inputs",
+  "catalog": "foundation",
+  "layer_id": "git-github-automation",
+  "requirement": {
+    "ref": "catalogs/landscape/foundation.json#/layers/19",
+    "source_sha256": "868d193a31080ab913400725140bd0d01e0afe97e28564fd12777f737d22951a"
+  },
+  "unresolved_repositories": [
+    "https://github.com/ataraxy-labs/sem"
+  ],
+  "harness": "Existing W1 known-finding replay, promptfoo scoring for sem, native gh lifecycle and existing pin_moved receipt mechanisms; no new harness.",
+  "scenarios": [
+    {
+      "role": "review",
+      "case_scope": {
+        "oracle": "The archived known P1/P2 findings at their defective heads plus independently labeled safe changes; immutable head/oracle packet required before replay.",
+        "pull_requests": [
+          974,
+          978,
+          970,
+          989,
+          982,
+          992
+        ]
+      },
+      "arms": [
+        {
+          "source": [
+            "in-use-readers",
+            "#953 worker at landed 3a8a8461; CC Claude reads; co-op GPT reads; Codex connector/exec (recorded run a956835d, installed/mirror 092d3acd)"
+          ],
+          "roles": [
+            "review"
+          ]
+        },
+        {
+          "source": [
+            "https://github.com/github/gh-aw",
+            "c16656ef90fa17dfe6e91fa8fb3d11f54632a74d"
+          ],
+          "roles": [
+            "review"
+          ]
+        },
+        {
+          "source": [
+            "https://github.com/openai/codex-action",
+            "a8d8be6ee028bea4525bc722d16f36687b408c81"
+          ],
+          "roles": [
+            "review"
+          ]
+        },
+        {
+          "source": [
+            "https://github.com/The-PR-Agent/pr-agent",
+            "1bf73e5d8fcfc25925f3773f8582fe5421ca7d80; native local CLI review"
+          ],
+          "roles": [
+            "review"
+          ],
+          "pin_authority": "The retained 10-10 seed 1bf73e5d8fcfc25925f3773f8582fe5421ca7d80 governs this preregistered CLI arm. The mirror lock observation at 330f0813 is newer and its README bytes match; it does not silently move the frozen execution pin."
+        },
+        {
+          "source": [
+            "https://github.com/coderabbitai/skills",
+            "928c3b61f71b578b1bcfbacc289f1446244dd9dd"
+          ],
+          "roles": [
+            "review"
+          ]
+        }
+      ],
+      "rule": "Reject any arm that fails to block any known P1 or P2; among all complete arms, choose fewest false blockers, then lowest complete measured provider cost; exact ties retain the qualified current path. Retain failures, incomplete reads and costs. If every arm is rejected, no arm is selected and the current path gains no new acceptance; retain the failed packet for adjudication.",
+      "source_refs": [
+        "docs/decisions/w6-practice-closeout-20261011/arm-dispositions.json#/review",
+        "catalogs/landscape/grand-catalog-20261008.json#/rows/3875"
+      ]
+    },
+    {
+      "role": "landing",
+      "case_scope": {
+        "oracle": "Lane-sealed incident replay using retained incident heads, merge-base states, review-thread states and verdict bindings. The in-use arm runs the native landing test paths without executing a real merge; mergify-cli runs its supported mergify config validation and action simulation against the same preregistered cases.",
+        "incidents": [
+          {
+            "id": "1018-after-1007-merge-skew",
+            "source": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/38184919849",
+            "expected": "refuse the merge that leaves main validation red"
+          },
+          {
+            "id": "997-unresolved-review-threads",
+            "source": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/997",
+            "expected": "refuse until the sealed head has no unresolved blocking threads"
+          },
+          {
+            "id": "stale-verdict-head",
+            "source": "tests/test_landing_scripts.py and the retained verdict/head binding receipts",
+            "expected": "refuse a verdict whose immutable head differs from the proposed merge head"
+          },
+          {
+            "id": "975-phrase-false-stop",
+            "source": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/975",
+            "expected": "permit the independently adjudicated safe case; count false stops and complete elapsed time"
+          }
+        ],
+        "input_seal": "The lane retains privacy-filtered incident payloads, immutable heads and expected conclusions before replay; no oracle is changed after an arm result."
+      },
+      "arms": [
+        {
+          "source": [
+            "in-use-landing",
+            "#975 at 86fa384421b1ca50134bd56d89cc72e0f7547816; #1027 at d6be1b021eeb7699513f6d1b473b4a543a3337ac (OPEN at source check); committed rulesets and #947 App"
+          ],
+          "roles": [
+            "landing"
+          ]
+        },
+        {
+          "source": [
+            "https://github.com/mergifyio/mergify-cli",
+            "6307ed10e8628c6fefe408e398ea48af16c94cfd"
+          ],
+          "roles": [
+            "landing"
+          ],
+          "run_path": "mergify config validates .mergify.yml and simulates actions (mergifyio/mergify-cli@6307ed10:README.md:178); a lane-owned Mergify account and retained configuration are named inputs."
+        }
+      ],
+      "rule": "Reject an arm that permits a merge-skew head, unresolved review threads, or stale-verdict head. Among complete passing arms choose the fewest false stops, then lowest median time-to-land in milliseconds on the identical sealed cases. Exact ties retain the qualified current path. If all arms fail, retain failures and select none."
+    },
+    {
+      "role": "structural-diff",
+      "case_scope": {
+        "source": "docs/decisions/2026-10-02-github-automation-practice.md:56-60",
+        "oracle": "Difftastic's sample files plus a frozen set of this repository's PR diffs; independent change questions and expected answers are sealed before scoring."
+      },
+      "arms": [
+        {
+          "source": "sem@0.25.0 at recovered immutable release commit",
+          "roles": [
+            "structural-diff"
+          ]
+        },
+        {
+          "source": "difftastic@0.71.0",
+          "roles": [
+            "structural-diff"
+          ]
+        },
+        {
+          "source": "plain git diff at retained host pin",
+          "roles": [
+            "structural-diff"
+          ]
+        }
+      ],
+      "rule": "Score agent-answer quality with promptfoo using the same independently sealed change questions and exact-match expected answers for every arm. The better preregistered mean score becomes the slot's pick; a tie goes to the user, as the existing P2 decision requires.",
+      "pin_authority": "The CC-directed 10-02 P2 comparison governs the sem check. sem 0.25.0 is the retained comparison version; 225e7721 is a separate source observation of 0.26.0, and grand-catalog 9eb4ebf9 remains historical. Recover the 0.25.0 release commit before execution.",
+      "retained_candidate_protocols": [
+        {
+          "repository": "https://github.com/ataraxy-labs/sem",
+          "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/19/candidates/0/comparison_that_would_overturn",
+          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate. For this candidate, a retained acceptance gate replaces a conflicting scenario gate, and a retained tie rule (including within-noise or equal-or-lower criteria) replaces the scenario tie rule; sem uses the separately named CC P2 authority."
+        }
+      ]
+    }
+  ],
+  "readiness": [
+    "#953 and #975 land for the preregistered review and landing replays",
+    "Archived W1 defective-head/oracle packet and P2 labeled case packet are retained with immutable hashes",
+    "Exact runtime pins, primary source and native acceptance boundaries are captured",
+    "The lane-sealed landing-incident heads, merge bases, thread states, verdict bindings and oracle packet are retained",
+    "#1027 landing implementation has its final immutable execution pin and source/acceptance boundary retained",
+    "The sem 0.25.0 comparison release commit and source/case oracle seals are retained",
+    "A lane-owned Mergify account and the exact .mergify.yml configuration plus supported mergify config simulation source/test packet exist before landing replay."
+  ],
+  "deltas": [
+    "Pin gh runtime 2.102.0 and bind release source fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd; qualify the lifecycle stage from actual commands.",
+    "Re-run Codex linux-wsl2 and macos pin_moved receipts through their owning native receipt paths.",
+    "Close github-ci-finalize HARNESS-WIF-FIX-PROPOSAL as superseded by #981; do not change another lane's proposal file.",
+    "Keep recorded Codex run 0.160.0/a956835d distinct from installed/mirror 0.162.1/092d3acd; rerun owning pin_moved receipts before qualification."
+  ],
+  "execution_constraints": [
+    "No new discovery; only retained 09-29/10-08 candidates and explicitly dispatched preregistered arms.",
+    "Seal exact case/oracle/source-pin bytes before execution; do not tune acceptance after results.",
+    "Retain failures, errors, cancellations and complete effort/cost; upstream tests and native invoke evidence remain distinct.",
+    "Heavy suites in Monday 08:00Z\u201320:00Z require T2 idle wrapper; full suites also require SUITE-GO.",
+    "Terminal classification authority is the co-op #1007 LANDED relay and c2dee173 final-stack contract. A winner requires all four conditions before FINAL.",
+    "Publish authentication digests only over privacy-safe preimages that are themselves published; original captures and their seals stay private.",
+    "Run a scenario when its own named source/oracle/reopening inputs exist; an unmet condition for another role cannot delay a ready scenario. The layer remains SCHEDULED until its remaining obligations close."
+  ],
+  "refrozen_at_utc": "2026-10-12T08:16:44Z"
+}

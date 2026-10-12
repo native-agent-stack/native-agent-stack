@@ -1,0 +1,108 @@
+{
+  "comparison_id": "w6-quality-evaluation-20261011",
+  "scope_status": "preregistered_comparison_pending_named_inputs",
+  "catalog": "foundation",
+  "layer_id": "quality-evaluation",
+  "requirement": {
+    "ref": "catalogs/landscape/foundation.json#/layers/10",
+    "source_sha256": "868d193a31080ab913400725140bd0d01e0afe97e28564fd12777f737d22951a"
+  },
+  "unresolved_repositories": [
+    "https://github.com/ukgovernmentbeis/inspect_ai",
+    "https://github.com/embeddings-benchmark/mteb"
+  ],
+  "harness": "Existing promptfoo and Inspect upstream-supported evaluation paths; do not add another harness.",
+  "scenarios": [
+    {
+      "role": "semantic-advice-evaluation",
+      "case_scope": {
+        "cases": 60,
+        "oracle": "Identical recorded outputs, mock tool responses and judge model on the 60 independently labeled cases, including wrong-ticker, look-ahead-date, missing-tool and grader-error mutations. Empty-output and externally-cancelled controls have distinct expected labels. Then add 20 independently labeled growth cases and test eval_set top-up without rerunning the original cases."
+      },
+      "arms": [
+        {
+          "source": "promptfoo@34f74d34e140b5e17d23770dfb2340057b1936b8",
+          "roles": [
+            "semantic-advice-evaluation"
+          ]
+        },
+        {
+          "source": "inspect_ai@a1dbea8db3cc85e04ff532760d0eaaeb64df6d3a",
+          "roles": [
+            "semantic-advice-evaluation"
+          ]
+        }
+      ],
+      "rule": "Reject missing cases or hidden errors/cancellations. Inspect joins or replaces only if it detects more injected mutations or correctly distinguishes empty/cancelled controls where Promptfoo does not, while preserving per-sample failure-localizing logs and running only the 20 growth cases during top-up. At detection/localization parity Promptfoo stays and Inspect remains keep_but_compare; compare complete provider USD only after the correctness criteria.",
+      "retained_comparison_refs": [
+        "catalogs/sota-convergence/manifest-20260929.json#/foundation/10/candidates/0"
+      ],
+      "retained_candidate_protocols": [
+        {
+          "repository": "https://github.com/ukgovernmentbeis/inspect_ai",
+          "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/10/candidates/0/comparison_that_would_overturn",
+          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate. For this candidate, a retained acceptance gate replaces a conflicting scenario gate, and a retained tie rule (including within-noise or equal-or-lower criteria) replaces the scenario tie rule."
+        }
+      ]
+    },
+    {
+      "role": "embedding-evaluation",
+      "case_scope": {
+        "oracle": "A privacy-filtered embedding/retrieval corpus, independent relevance labels and independent metric implementation, with per-query expected metrics/tolerances and a shuffled-ranking negative control; retain failed rankings and native-host execution boundaries."
+      },
+      "arms": [
+        {
+          "source": "MTEB at its recovered immutable source pin",
+          "roles": [
+            "embedding-evaluation"
+          ]
+        },
+        {
+          "source": "existing selected embedding-evaluation path at its retained run pin",
+          "roles": [
+            "embedding-evaluation"
+          ]
+        }
+      ],
+      "rule": "Reject missing/mismatched inputs, failed relevance thresholds, metric disagreement beyond the sealed per-query tolerance, or an undetected shuffled-ranking control. Equal quality means every shared oracle passes on the same labels. Rank such complete arms by provider USD, then elapsed milliseconds; ties retain the qualified task path. This does not substitute for the advice comparison.",
+      "retained_comparison_refs": [
+        "catalogs/sota-convergence/manifest-20260926.json#/foundation/10/candidates/4"
+      ],
+      "retained_candidate_protocols": [
+        {
+          "repository": "https://github.com/embeddings-benchmark/mteb",
+          "ref": "catalogs/sota-convergence/manifest-20260926.json#/foundation/10/candidates/4/comparison_that_would_overturn",
+          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate. For this candidate, a retained acceptance gate replaces a conflicting scenario gate, and a retained tie rule (including within-noise or equal-or-lower criteria) replaces the scenario tie rule."
+        }
+      ]
+    }
+  ],
+  "readiness": [
+    "60-case advice packet has an independent label seal and immutable case hash",
+    "MTEB retained source and matching embedding-evaluation case packet are recovered",
+    "Upstream install/test paths at the selected source pins are available",
+    "Mutation, empty/cancelled control, per-sample localization and 20-case growth/top-up oracle seals are retained",
+    "Embedding metric tolerances and the independent shuffled-ranking oracle are fixed before execution",
+    "A concrete embedding/retrieval change and privacy-filtered independent relevance/metric packet are retained."
+  ],
+  "deltas": [
+    "Consume the named Inspect survivor and carry MTEB explicitly; retain earlier substantive refutations of mutmut, cosmic-ray and opik rather than silently treating their omission as resolution."
+  ],
+  "execution_constraints": [
+    "No new discovery; only retained 09-29/10-08 candidates and explicitly dispatched preregistered arms.",
+    "Seal exact case/oracle/source-pin bytes before execution; do not tune acceptance after results.",
+    "Retain failures, errors, cancellations and complete effort/cost; upstream tests and native invoke evidence remain distinct.",
+    "Heavy suites in Monday 08:00Z\u201320:00Z require T2 idle wrapper; full suites also require SUITE-GO.",
+    "Terminal classification authority is the co-op #1007 LANDED relay and c2dee173 final-stack contract. A winner requires all four conditions before FINAL.",
+    "Publish authentication digests only over privacy-safe preimages that are themselves published; original captures and their seals stay private.",
+    "Run a scenario when its own named source/oracle/reopening inputs exist; an unmet condition for another role cannot delay a ready scenario. The layer remains SCHEDULED until its remaining obligations close."
+  ],
+  "retained_reopen_conditions": [
+    {
+      "repository": "https://github.com/embeddings-benchmark/mteb",
+      "event": "A concrete embedding/retrieval change and privacy-filtered independent relevance/metric packet are retained.",
+      "retained_ref": "catalogs/sota-convergence/manifest-20260926.json#/foundation/10/candidates/4/comparison_that_would_overturn"
+    }
+  ],
+  "refrozen_at_utc": "2026-10-12T08:16:44Z"
+}

@@ -1,0 +1,209 @@
+{
+  "comparison_id": "w6-observation-inference-20261011",
+  "scope_status": "preregistered_comparison_pending_named_inputs",
+  "catalog": "foundation",
+  "layer_id": "observation-inference",
+  "requirement": {
+    "ref": "catalogs/landscape/foundation.json#/layers/15",
+    "source_sha256": "868d193a31080ab913400725140bd0d01e0afe97e28564fd12777f737d22951a"
+  },
+  "unresolved_repositories": [
+    "https://github.com/traceloop/openllmetry",
+    "https://github.com/ollama/ollama",
+    "https://github.com/utkuozdemir/nvidia_gpu_exporter",
+    "https://github.com/nvidia/dcgm-exporter",
+    "https://github.com/ml-explore/mlx-lm",
+    "https://github.com/mostlygeek/llama-swap"
+  ],
+  "harness": "Existing native telemetry reconciliation, gateway qualification and inference comparisons; preserve their hardware, model and paper gates.",
+  "scenarios": [
+    {
+      "role": "provider-telemetry",
+      "case_scope": {
+        "oracle": "One identical native task with retained native counters and a known request count; separate content/privacy checks and duplicate capture controls."
+      },
+      "arms": [
+        {
+          "source": "required lane native Anthropic SDK usage receipt and the existing single collector",
+          "roles": [
+            "provider-telemetry"
+          ]
+        },
+        {
+          "source": "OpenLLMetry Anthropic instrumentation with TRACELOOP_TRACE_CONTENT=false to that same collector",
+          "roles": [
+            "provider-telemetry"
+          ]
+        }
+      ],
+      "rule": "Reject missing/double-counted request or token totals, sensitive-content capture or missing model/error attribution. Require exact integer-counter reconciliation against the frozen native receipt; then choose the lowest median collection overhead in milliseconds. An exact tie retains the qualified route.",
+      "retained_candidate_protocols": [
+        {
+          "repository": "https://github.com/traceloop/openllmetry",
+          "ref": "catalogs/sota-convergence/manifest-20260926.json#/foundation/15/candidates/4/comparison_that_would_overturn",
+          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate. For this candidate, a retained acceptance gate replaces a conflicting scenario gate, and a retained tie rule (including within-noise or equal-or-lower criteria) replaces the scenario tie rule."
+        }
+      ]
+    },
+    {
+      "role": "gpu-field-telemetry",
+      "case_scope": {
+        "oracle": "Additive WSL exporter trial beside the unchanged guard: paired GPU memory, failure series, known-load utilization against Windows interop nvidia-smi, query latency, guard timeouts and a cross-signal query. Drop UUID, serial and PCI labels; per-process capture stays off.",
+        "backend_boundary": "NVML is a separate backend qualification; retain nvidia-smi if NVML fails in the same WSL scope."
+      },
+      "arms": [
+        {
+          "source": "adopted Prometheus plus window.sh guard",
+          "roles": [
+            "gpu-field-telemetry"
+          ]
+        },
+        {
+          "source": "same path plus nvidia_gpu_exporter v1.15.1 nvidia-smi backend",
+          "roles": [
+            "gpu-field-telemetry"
+          ]
+        },
+        {
+          "source": "same path plus dcgm-exporter at its recovered pin (conditional DCGM capability input)",
+          "roles": [
+            "gpu-field-telemetry"
+          ]
+        }
+      ],
+      "rule": "Require memory agreement within 1 MiB for at least 99% of pairs, an explicit failure series, utilization agreement within 5 percentage points, no guard timeout or increased paired median query latency, and a useful cross-signal query absent from ad-hoc files. Compare eligible exporters on additional correct field coverage, then median collection overhead; do not score an exporter on provider request attribution.",
+      "retained_comparison_refs": [
+        "catalogs/sota-convergence/manifest-20260926.json#/foundation/15/candidates/0",
+        "catalogs/sota-convergence/manifest-20260926.json#/foundation/15/candidates/3"
+      ],
+      "retained_candidate_protocols": [
+        {
+          "repository": "https://github.com/utkuozdemir/nvidia_gpu_exporter",
+          "ref": "catalogs/sota-convergence/manifest-20260926.json#/foundation/15/candidates/0/comparison_that_would_overturn",
+          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate. For this candidate, a retained acceptance gate replaces a conflicting scenario gate, and a retained tie rule (including within-noise or equal-or-lower criteria) replaces the scenario tie rule."
+        },
+        {
+          "repository": "https://github.com/nvidia/dcgm-exporter",
+          "ref": "catalogs/sota-convergence/manifest-20260926.json#/foundation/15/candidates/3/comparison_that_would_overturn",
+          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate. For this candidate, a retained acceptance gate replaces a conflicting scenario gate, and a retained tie rule (including within-noise or equal-or-lower criteria) replaces the scenario tie rule."
+        }
+      ]
+    },
+    {
+      "role": "local-inference",
+      "case_scope": {
+        "oracle": "Existing independently frozen task/output pool at identical model/quantization and hardware scope; no cross-model or cross-host performance inference."
+      },
+      "arms": [
+        {
+          "source": "existing qualified runtime",
+          "roles": [
+            "local-inference"
+          ]
+        },
+        {
+          "source": "ollama",
+          "roles": [
+            "local-inference"
+          ]
+        },
+        {
+          "source": "mlx-lm",
+          "roles": [
+            "local-inference"
+          ]
+        }
+      ],
+      "rule": "Require all frozen correctness/privacy/recovery oracles at identical model, quantization and host scope. Among complete passing arms rank p95 task-completion latency in milliseconds, then peak resident bytes; exact ties retain the qualified route. Unsupported host/model combinations remain bounded non-results.",
+      "retained_candidate_protocols": [
+        {
+          "repository": "https://github.com/ollama/ollama",
+          "ref": "catalogs/sota-convergence/manifest-20260926.json#/foundation/15/candidates/2/comparison_that_would_overturn",
+          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate. For this candidate, a retained acceptance gate replaces a conflicting scenario gate, and a retained tie rule (including within-noise or equal-or-lower criteria) replaces the scenario tie rule."
+        },
+        {
+          "repository": "https://github.com/ml-explore/mlx-lm",
+          "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/15/candidates/4/comparison_that_would_overturn",
+          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate. For this candidate, a retained acceptance gate replaces a conflicting scenario gate, and a retained tie rule (including within-noise or equal-or-lower criteria) replaces the scenario tie rule."
+        }
+      ]
+    },
+    {
+      "role": "model-service-routing",
+      "case_scope": {
+        "oracle": "Seal the documented routing need, C1 admission cases, reload-latency samples and embedding-lane error controls on the same host. Backend inference is held constant."
+      },
+      "arms": [
+        {
+          "source": "existing llama-server router with unchanged backend pins",
+          "roles": [
+            "model-service-routing"
+          ]
+        },
+        {
+          "source": "systemd window exchanging vLLM embeddings service and llama-server C1",
+          "roles": [
+            "model-service-routing"
+          ]
+        },
+        {
+          "source": "llama-swap group around those identical backend pins",
+          "roles": [
+            "model-service-routing"
+          ]
+        }
+      ],
+      "rule": "Reject a route that misses the documented routing need, fails C1 admission or adds embedding-lane errors. Rank passing routes by p95 reload latency in milliseconds; ties retain the qualified router/window. Attribute results to routing only, never to a replacement inference engine.",
+      "retained_comparison_refs": [
+        "catalogs/sota-convergence/manifest-20260929.json#/foundation/15/candidates/15"
+      ],
+      "retained_candidate_protocols": [
+        {
+          "repository": "https://github.com/mostlygeek/llama-swap",
+          "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/15/candidates/15/comparison_that_would_overturn",
+          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate. For this candidate, a retained acceptance gate replaces a conflicting scenario gate, and a retained tie rule (including within-noise or equal-or-lower criteria) replaces the scenario tie rule."
+        }
+      ]
+    }
+  ],
+  "readiness": [
+    "All six retained candidate primary sources and exact pins are recovered",
+    "Native task/counter and inference task/model/hardware case seals are retained",
+    "GPU field/window/interop and routing admission/reload/error oracle packets are retained with identical backend pins",
+    "A required lane is evidenced making in-process Anthropic SDK calls outside Claude Code, with a content-disabled single-collector qualification packet.",
+    "NVIDIA documents WSL2/full-GeForce support, or retained native discovery shows additional memory/utilization/power fields on the declared WSL GPU; only then run the paired exporter trial.",
+    "The owner retains approved embeddings eviction or a second non-llama.cpp engine, or a documented multi-model need that native llama-server router mode fails on the same host."
+  ],
+  "deltas": [
+    "Reconcile llama-cpp/vllm/Claude pin_moved receipts and retained failures through owners.",
+    "Recover missing GPT-fit votes for mlx-lm and llama-swap or adjudicate substantively."
+  ],
+  "execution_constraints": [
+    "No new discovery; only retained 09-29/10-08 candidates and explicitly dispatched preregistered arms.",
+    "Seal exact case/oracle/source-pin bytes before execution; do not tune acceptance after results.",
+    "Retain failures, errors, cancellations and complete effort/cost; upstream tests and native invoke evidence remain distinct.",
+    "Heavy suites in Monday 08:00Z\u201320:00Z require T2 idle wrapper; full suites also require SUITE-GO.",
+    "Terminal classification authority is the co-op #1007 LANDED relay and c2dee173 final-stack contract. A winner requires all four conditions before FINAL.",
+    "Existing inference account/hardware and Monday paper execution gates permit the scoped run",
+    "Publish authentication digests only over privacy-safe preimages that are themselves published; original captures and their seals stay private.",
+    "Run a scenario when its own named source/oracle/reopening inputs exist; an unmet condition for another role cannot delay a ready scenario. The layer remains SCHEDULED until its remaining obligations close."
+  ],
+  "retained_reopen_conditions": [
+    {
+      "repository": "https://github.com/traceloop/openllmetry",
+      "event": "A required lane is evidenced making in-process Anthropic SDK calls outside Claude Code, with a content-disabled single-collector qualification packet.",
+      "retained_ref": "catalogs/sota-convergence/manifest-20260926.json#/foundation/15/candidates/4/comparison_that_would_overturn"
+    },
+    {
+      "repository": "https://github.com/nvidia/dcgm-exporter",
+      "event": "NVIDIA documents WSL2/full-GeForce support, or retained native discovery shows additional memory/utilization/power fields on the declared WSL GPU; only then run the paired exporter trial.",
+      "retained_ref": "catalogs/sota-convergence/manifest-20260926.json#/foundation/15/candidates/3/comparison_that_would_overturn"
+    },
+    {
+      "repository": "https://github.com/mostlygeek/llama-swap",
+      "event": "The owner retains approved embeddings eviction or a second non-llama.cpp engine, or a documented multi-model need that native llama-server router mode fails on the same host.",
+      "retained_ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/15/candidates/15/comparison_that_would_overturn"
+    }
+  ],
+  "refrozen_at_utc": "2026-10-12T08:16:44Z"
+}

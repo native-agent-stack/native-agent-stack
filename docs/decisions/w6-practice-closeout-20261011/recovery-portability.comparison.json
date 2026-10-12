@@ -1,0 +1,71 @@
+{
+  "comparison_id": "w6-recovery-portability-20261011",
+  "scope_status": "preregistered_comparison_pending_named_inputs",
+  "catalog": "foundation",
+  "layer_id": "recovery-portability",
+  "requirement": {
+    "ref": "catalogs/landscape/foundation.json#/layers/14",
+    "source_sha256": "868d193a31080ab913400725140bd0d01e0afe97e28564fd12777f737d22951a"
+  },
+  "unresolved_repositories": [
+    "https://github.com/microsoft/wsl"
+  ],
+  "harness": "Existing native adoption/restoration receipts and upstream-supported platform import/export paths; use synthetic state until destination-host gates exist.",
+  "scenarios": [
+    {
+      "role": "portable-owned-recovery",
+      "case_scope": {
+        "oracle": "Existing declared tool/application restoration profile and synthetic integrity oracles; keep second-physical-host results separate from same-host/private-prefix fixtures.",
+        "export_canaries": "Seed synthetic canaries at every auth-store path in docs/secret-storage.md; none may appear in the selective export archive, and the restored selected profile must pass its existing acceptance. Never use real credential contents."
+      },
+      "arms": [
+        {
+          "source": "existing uv/native-backup/Restic profile",
+          "roles": [
+            "portable-owned-recovery"
+          ]
+        },
+        {
+          "source": "microsoft/WSL export-import at recovered immutable source pin",
+          "roles": [
+            "portable-owned-recovery"
+          ]
+        }
+      ],
+      "rule": "Reject unequal declared paths/types/bytes/modes, failed isolation or any need to copy credential contents. Among passing equal restoration scopes rank required operator-command count, then median restore milliseconds, then complete provider USD; ties retain the smaller qualified profile. Full-distro export cannot prove selective portability.",
+      "retained_candidate_protocols": [
+        {
+          "repository": "https://github.com/microsoft/wsl",
+          "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/14/candidates/12/comparison_that_would_overturn",
+          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate. For this candidate, a retained acceptance gate replaces a conflicting scenario gate, and a retained tie rule (including within-noise or equal-or-lower criteria) replaces the scenario tie rule."
+        }
+      ]
+    }
+  ],
+  "readiness": [
+    "WSL retained primary source and missing GPT-fit outcome are recovered or substantively adjudicated",
+    "The declared restoration profile and synthetic input/oracle seal are retained",
+    "A destination host and its normal native sign-ins exist before any genuine destination-host acceptance",
+    "A WSL release documents selective export allowlist/exclude support at WslClient.cpp and official commands, with synthetic auth-store canaries and the equal-profile restore oracle packet."
+  ],
+  "deltas": [
+    "Consume retained failure and client/memory pin_moved references without relabeling historical same-host/synthetic results."
+  ],
+  "execution_constraints": [
+    "No new discovery; only retained 09-29/10-08 candidates and explicitly dispatched preregistered arms.",
+    "Seal exact case/oracle/source-pin bytes before execution; do not tune acceptance after results.",
+    "Retain failures, errors, cancellations and complete effort/cost; upstream tests and native invoke evidence remain distinct.",
+    "Heavy suites in Monday 08:00Z\u201320:00Z require T2 idle wrapper; full suites also require SUITE-GO.",
+    "Terminal classification authority is the co-op #1007 LANDED relay and c2dee173 final-stack contract. A winner requires all four conditions before FINAL.",
+    "Publish authentication digests only over privacy-safe preimages that are themselves published; original captures and their seals stay private.",
+    "Run a scenario when its own named source/oracle/reopening inputs exist; an unmet condition for another role cannot delay a ready scenario. The layer remains SCHEDULED until its remaining obligations close."
+  ],
+  "retained_reopen_conditions": [
+    {
+      "repository": "https://github.com/microsoft/wsl",
+      "event": "A WSL release documents selective export allowlist/exclude support at WslClient.cpp and official commands, with synthetic auth-store canaries and the equal-profile restore oracle packet.",
+      "retained_ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/14/candidates/12/comparison_that_would_overturn"
+    }
+  ],
+  "refrozen_at_utc": "2026-10-12T08:16:44Z"
+}

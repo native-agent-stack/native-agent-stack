@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "publication_state": "recorded_comparison_preregistrations_for_terminal_closeout",
+  "hash_rule": "SHA256 of exact UTF-8 comparison file bytes; frozen scenario scope, decision rules and readiness inputs precede execution. Exact case/source-pin packet seals are required inputs before running.",
+  "comparisons": [
+    {
+      "path": "docs/decisions/w6-practice-closeout-20261011/git-github-automation.comparison.json",
+      "preregistration_sha256": "d7c8542d5897c6dd2f96822a370996d95a00473ec8b97f245765558c7f36a3b8",
+      "comparison_id": "w6-git-github-automation-20261011"
+    },
+    {
+      "path": "docs/decisions/w6-practice-closeout-20261011/instructions-skills.comparison.json",
+      "preregistration_sha256": "f85304bb7bdfac05d361c746babe6a3a62a5186ea06ee72302f4f3039b724774",
+      "comparison_id": "w6-instructions-skills-20261011"
+    },
+    {
+      "path": "docs/decisions/w6-practice-closeout-20261011/observation-inference.comparison.json",
+      "preregistration_sha256": "22c642b8c5d331edf19c9e84b52e381fb85b4315f24f5d2d7f4f80e6f05f82cf",
+      "comparison_id": "w6-observation-inference-20261011"
+    },
+    {
+      "path": "docs/decisions/w6-practice-closeout-20261011/quality-evaluation.comparison.json",
+      "preregistration_sha256": "47782b9a7a6320d89c0c7a794998af7e05682395839c7495323fed8966df1716",
+      "comparison_id": "w6-quality-evaluation-20261011"
+    },
+    {
+      "path": "docs/decisions/w6-practice-closeout-20261011/recovery-portability.comparison.json",
+      "preregistration_sha256": "cb43f16a0044a883354209743f55c024ee8b97d647d3d8b2d963b06597c36c4a",
+      "comparison_id": "w6-recovery-portability-20261011"
+    },
+    {
+      "path": "docs/decisions/w6-practice-closeout-20261011/scheduling-supervision.comparison.json",
+      "preregistration_sha256": "adc039640a8a52599b153aa00cd30276d4a5bdeb0bf418909e808e35183cf13b",
+      "comparison_id": "w6-scheduling-supervision-20261011"
+    },
+    {
+      "path": "docs/decisions/w6-practice-closeout-20261011/token-efficiency.comparison.json",
+      "preregistration_sha256": "16e0fad18981e28b07686ec5efc4fd524539f7436f7ad55a7ef8da022173c8fb",
+      "comparison_id": "w6-token-efficiency-20261011"
+    }
+  ],
+  "refrozen_at_utc": "2026-10-12T08:16:44Z"
+}
