@@ -755,7 +755,7 @@
       "terminal_readiness": "#1007 LANDED satisfied; remaining pinned-runtime comparison inputs are explicitly unmet",
       "bounded_next_action": "Qualify only the frozen existing candidates on the retained cases through the named native/upstream paths. No new discovery.",
       "evidence_class": "source_review",
-      "preregistration_sha256": "96514687937dd0541f5736e4f6f7a438a351405daaf3afe704c2c0f5fec59667",
+      "preregistration_sha256": "8d205c6eb29fac4541a29d5e371de264aa4a845b365d9fc3214cf5fb369d8c86",
       "wave_ref": "catalogs/sota-convergence/layer-verdicts-20260922.json#/catalogs/foundation/3",
       "next_review": "2026-10-22",
       "next_review_gap": null,
@@ -770,7 +770,7 @@
         },
         "comparison_id": "w6-foundation-document-retrieval-20261011",
         "preregistration_ref": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/document-retrieval.json",
-        "preregistration_sha256": "96514687937dd0541f5736e4f6f7a438a351405daaf3afe704c2c0f5fec59667",
+        "preregistration_sha256": "8d205c6eb29fac4541a29d5e371de264aa4a845b365d9fc3214cf5fb369d8c86",
         "resolution_winners": [],
         "final_stack_source": {
           "commit": "c2dee173",
@@ -1073,7 +1073,7 @@
       "terminal_readiness": "#1007 LANDED satisfied; remaining pinned-runtime comparison inputs are explicitly unmet",
       "bounded_next_action": "Qualify only the frozen existing candidates on the retained cases through the named native/upstream paths. No new discovery.",
       "evidence_class": "source_review",
-      "preregistration_sha256": "71ecd57ce3c49064500ed918737686bdfbdd10577c1087c77ea685a12edc92bb",
+      "preregistration_sha256": "3e9ba562169f4ff233af2d0e48213a29d8710795f8281cb8075e312f9df20c73",
       "wave_ref": "catalogs/sota-convergence/layer-verdicts-20260922.json#/catalogs/foundation/16",
       "next_review": "2026-10-22",
       "next_review_gap": null,
@@ -1088,7 +1088,7 @@
         },
         "comparison_id": "w6-foundation-semantic-rag-20261011",
         "preregistration_ref": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/semantic-rag.json",
-        "preregistration_sha256": "71ecd57ce3c49064500ed918737686bdfbdd10577c1087c77ea685a12edc92bb",
+        "preregistration_sha256": "3e9ba562169f4ff233af2d0e48213a29d8710795f8281cb8075e312f9df20c73",
         "resolution_winners": [],
         "final_stack_source": {
           "commit": "c2dee173",
@@ -1430,7 +1430,7 @@
       "terminal_readiness": "#1007 LANDED satisfied; remaining pinned-runtime comparison inputs are explicitly unmet",
       "bounded_next_action": "Qualify only the frozen existing candidates on the retained cases through the named native/upstream paths. No new discovery.",
       "evidence_class": "source_review",
-      "preregistration_sha256": "4393b7454f2642160156aa71db5ad63928c8ea272ac269f60b4dece2eb01d468",
+      "preregistration_sha256": "30000658784bc54d16932ecfa1de9a321cf5f4dad2d447ff1aca71f31b6a1029",
       "wave_ref": "catalogs/sota-convergence/layer-verdicts-20260922.json#/catalogs/foundation/4",
       "next_review": "2026-10-22",
       "next_review_gap": null,
@@ -1445,7 +1445,7 @@
         },
         "comparison_id": "w6-foundation-durable-memory-20261011",
         "preregistration_ref": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/durable-memory.json",
-        "preregistration_sha256": "4393b7454f2642160156aa71db5ad63928c8ea272ac269f60b4dece2eb01d468",
+        "preregistration_sha256": "30000658784bc54d16932ecfa1de9a321cf5f4dad2d447ff1aca71f31b6a1029",
         "resolution_winners": [],
         "final_stack_source": {
           "commit": "c2dee173",
@@ -1670,7 +1670,7 @@
       "terminal_readiness": "#1007 LANDED satisfied; remaining pinned-runtime comparison inputs are explicitly unmet",
       "bounded_next_action": "Qualify only the frozen existing candidates on the retained cases through the named native/upstream paths. No new discovery.",
       "evidence_class": "source_review",
-      "preregistration_sha256": "4a40ea5731d59bdc82be5d18da88b9e9acaf0fb61443afa2ed8756bb74535a38",
+      "preregistration_sha256": "5b3f3805682f6c99600658b7a7a4cb968aecaf54588dd8d3ac0e6af1cd1f25fd",
       "wave_ref": "catalogs/sota-convergence/layer-verdicts-20260922.json#/catalogs/foundation/18",
       "next_review": "2026-10-22",
       "next_review_gap": null,
@@ -1685,7 +1685,7 @@
         },
         "comparison_id": "w6-foundation-web-research-20261011",
         "preregistration_ref": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/web-research.json",
-        "preregistration_sha256": "4a40ea5731d59bdc82be5d18da88b9e9acaf0fb61443afa2ed8756bb74535a38",
+        "preregistration_sha256": "5b3f3805682f6c99600658b7a7a4cb968aecaf54588dd8d3ac0e6af1cd1f25fd",
         "resolution_winners": [],
         "final_stack_source": {
           "commit": "c2dee173",
@@ -1820,5 +1820,45 @@
     "held_head": "4ddd4822d57be3c7ae07b5e0cf4666538166a3ad",
     "before_any_run": true,
     "refrozen_at": "2026-10-12T00:52:20Z"
+  },
+  "role_correction_authority": {
+    "record": "pr1021-claude-micro-d7d9df1f.md",
+    "held_head": "d7d9df1f07658b43a20d14bfd837602a6a492528",
+    "before_any_run": true,
+    "refrozen_at": "2026-10-12T03:09:16Z",
+    "layers": [
+      "document-retrieval",
+      "semantic-rag",
+      "durable-memory",
+      "web-research"
+    ],
+    "superseded_preregistrations": [
+      {
+        "layer_id": "document-retrieval",
+        "head": "d7d9df1f07658b43a20d14bfd837602a6a492528",
+        "sha256": "96514687937dd0541f5736e4f6f7a438a351405daaf3afe704c2c0f5fec59667"
+      },
+      {
+        "layer_id": "semantic-rag",
+        "head": "d7d9df1f07658b43a20d14bfd837602a6a492528",
+        "sha256": "71ecd57ce3c49064500ed918737686bdfbdd10577c1087c77ea685a12edc92bb"
+      },
+      {
+        "layer_id": "durable-memory",
+        "head": "d7d9df1f07658b43a20d14bfd837602a6a492528",
+        "sha256": "4393b7454f2642160156aa71db5ad63928c8ea272ac269f60b4dece2eb01d468"
+      },
+      {
+        "layer_id": "web-research",
+        "head": "d7d9df1f07658b43a20d14bfd837602a6a492528",
+        "sha256": "4a40ea5731d59bdc82be5d18da88b9e9acaf0fb61443afa2ed8756bb74535a38"
+      }
+    ],
+    "regression": {
+      "test_ref": "tests/test_w6_layer_verdict_records.py",
+      "before_fix_head": "d7d9df1f07658b43a20d14bfd837602a6a492528",
+      "before_fix_exit": 1,
+      "scope": "Identical singleton case sets/role unions cannot exclude competitors; next-plaid and MemPalace include their pinned README roles. Record consistency only."
+    }
   }
 }

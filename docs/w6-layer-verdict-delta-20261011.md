@@ -32,7 +32,7 @@ The [Mac-only 10-02 memory verdict](../blueprints/memory-stack/native-qualificat
 | code-navigation | mibayy/token-savior | `symbol_navigation`, `navigation_index_maintenance` | no |
 | document-retrieval | tobi/qmd | `document_retrieval` | no |
 | document-retrieval | microsoft/markitdown | `document_conversion` | no |
-| document-retrieval | tsdgeos/poppler_mirror | `pdf_text_layout_extraction` | no |
+| document-retrieval | tsdgeos/poppler_mirror | `document_conversion` | no |
 | document-retrieval | datalab-to/marker | `document_conversion`, `document_ocr_layout` | no |
 | document-retrieval | opendatalab/MinerU | `document_conversion`, `document_ocr_layout` | no |
 | document-retrieval | docling-project/docling | `document_conversion`, `document_ocr_layout` | no |
@@ -50,15 +50,15 @@ The [Mac-only 10-02 memory verdict](../blueprints/memory-stack/native-qualificat
 | semantic-rag | qdrant/qdrant | `vector_storage` | yes |
 | semantic-rag | vllm-project/vllm | `model_serving` | yes |
 | semantic-rag | ollama/ollama | `model_serving` | yes |
-| semantic-rag | OSU-NLP-Group/HippoRAG | `associative_semantic_retrieval` | no |
-| semantic-rag | lightonai/next-plaid | `multivector_semantic_index` | no |
+| semantic-rag | OSU-NLP-Group/HippoRAG | `project_semantic_index`, `semantic_code_retrieval` | no |
+| semantic-rag | lightonai/next-plaid | `multivector_semantic_index`, `semantic_code_retrieval` | no |
 | semantic-rag | minishlab/semble | `project_semantic_index`, `semantic_code_retrieval` | no |
 | durable-memory | akitaonrails/ai-memory | `shared_memory_backend`, `native_memory_capture` | no |
 | durable-memory | anthropics/claude-code | `native_file_session_memory` | yes |
 | durable-memory | langchain-ai/langmem | `memory_management_primitives` | yes |
 | durable-memory | rohitg00/agentmemory | `shared_memory_backend`, `native_memory_capture` | no |
-| durable-memory | MemPalace/MemPalace | `shared_memory_backend` | no |
-| durable-memory | vshulcz/deja-vu | `cross_client_transcript_index` | no |
+| durable-memory | MemPalace/MemPalace | `shared_memory_backend`, `native_memory_capture` | no |
+| durable-memory | vshulcz/deja-vu | `shared_memory_backend`, `native_memory_capture` | no |
 | durable-memory | vbcherepanov/total-agent-memory | `shared_memory_backend`, `native_memory_capture` | no |
 | durable-memory | vectorize-io/hindsight | `shared_memory_backend`, `native_memory_capture` | no |
 | durable-memory | tigerless-labs/agent-memory | `shared_memory_backend`, `native_memory_capture` | no |
@@ -66,9 +66,11 @@ The [Mac-only 10-02 memory verdict](../blueprints/memory-stack/native-qualificat
 | web-research | vercel-labs/agent-browser | `interactive_browser_retrieval` | no |
 | web-research | alphaXiv/OpenResearch | `paper_primary_source_retrieval` | no |
 | web-research | exa-labs/exa-mcp-server | `web_primary_source_retrieval` | no |
-| web-research | adbar/trafilatura | `web_content_extraction` | no |
+| web-research | adbar/trafilatura | `web_primary_source_retrieval` | no |
 | web-research | openai/codex | `web_primary_source_retrieval` | no |
 | web-research | webrecorder/browsertrix-crawler | `web_evidence_capture` | no |
+
+**B2-r common-role correction:** Poppler now enters document_conversion; HippoRAG enters project_semantic_index and semantic_code_retrieval; deja-vu enters shared_memory_backend and native_memory_capture; trafilatura enters web_primary_source_retrieval. Each removed singleton case set equals the common role or role union. Its mandatory checks are retained in the merged requirement roles, and each comparison records the requirement basis and previous checks. Applicability requires testing these obligations; it does not claim that the source passed them. MemPalace also enters native_memory_capture, witnessed by `README.md:311-316` at `1f0803a31958b30320418356b2db88c4ed9c27f9`; next-plaid also enters semantic_code_retrieval, witnessed by `README.md:22` at `c6c091d7ee14c81206bb28af90d8ff506fd0235e`. The exact README lines and source-file hashes are bound in each arm. All six arm changes precede any run; the four changed comparisons retain their superseded hashes and are re-frozen under the CC delta at `d7d9df1f`. Arm counts, pins and fixture cases are unchanged.
 
 **A1 review metadata:** `next_review=2026-10-22` comes from each layer's verdict in the landed final-stack view and closes the earlier condition-1 metadata gap. It is review metadata, not a wait date. The supported `run_pin` reader finds all 13 historical entries; `is_definitive` returns false/reopened for each at the recorded reader date. These readers do not supply runtime E2E or invoke evidence.
 
@@ -78,14 +80,14 @@ The seven known version deltas are explicit in each terminal record's `run_pin_r
 | --- | --- |
 | [w6-foundation-native-clients-20261011](../evidence/artifacts/w6-layer-verdict-20261011/comparisons/native-clients.json) | `521b7cd99c4570a18a1481a9b07959084641b79fe810fab958632d0ffbf4004d` |
 | [w6-foundation-code-navigation-20261011](../evidence/artifacts/w6-layer-verdict-20261011/comparisons/code-navigation.json) | `6a67cd1a1b024b83f4ac2240c6ae0e38e8e8f852fa4bbdbd5f0e2aaa9ce9ca5a` |
-| [w6-foundation-document-retrieval-20261011](../evidence/artifacts/w6-layer-verdict-20261011/comparisons/document-retrieval.json) | `96514687937dd0541f5736e4f6f7a438a351405daaf3afe704c2c0f5fec59667` |
-| [w6-foundation-semantic-rag-20261011](../evidence/artifacts/w6-layer-verdict-20261011/comparisons/semantic-rag.json) | `71ecd57ce3c49064500ed918737686bdfbdd10577c1087c77ea685a12edc92bb` |
-| [w6-foundation-durable-memory-20261011](../evidence/artifacts/w6-layer-verdict-20261011/comparisons/durable-memory.json) | `4393b7454f2642160156aa71db5ad63928c8ea272ac269f60b4dece2eb01d468` |
-| [w6-foundation-web-research-20261011](../evidence/artifacts/w6-layer-verdict-20261011/comparisons/web-research.json) | `4a40ea5731d59bdc82be5d18da88b9e9acaf0fb61443afa2ed8756bb74535a38` |
+| [w6-foundation-document-retrieval-20261011](../evidence/artifacts/w6-layer-verdict-20261011/comparisons/document-retrieval.json) | `8d205c6eb29fac4541a29d5e371de264aa4a845b365d9fc3214cf5fb369d8c86` |
+| [w6-foundation-semantic-rag-20261011](../evidence/artifacts/w6-layer-verdict-20261011/comparisons/semantic-rag.json) | `3e9ba562169f4ff233af2d0e48213a29d8710795f8281cb8075e312f9df20c73` |
+| [w6-foundation-durable-memory-20261011](../evidence/artifacts/w6-layer-verdict-20261011/comparisons/durable-memory.json) | `30000658784bc54d16932ecfa1de9a321cf5f4dad2d447ff1aca71f31b6a1029` |
+| [w6-foundation-web-research-20261011](../evidence/artifacts/w6-layer-verdict-20261011/comparisons/web-research.json) | `5b3f3805682f6c99600658b7a7a4cb968aecaf54588dd8d3ac0e6af1cd1f25fd` |
 
-The hashes supersede the original registration before any run, under B1/B2/A1/A2. Readiness names exact source-pin runtime/E2E receipts, committed model/instrumentation seals, scoped native use and an isolated queued runner. #1007 LANDED is satisfied; the remaining runtime inputs are not yet retained. A comparison starts as soon as those named inputs exist, with no calendar trigger. These small sealed fixtures qualify bounded contracts, not representative quality or universal SOTA.
+The hashes supersede the earlier registrations before any run, under B1/B2/A1/A2 and the four-layer B2-r correction. Readiness names exact source-pin runtime/E2E receipts, committed model/instrumentation seals, scoped native use and an isolated queued runner. #1007 LANDED is satisfied; the remaining runtime inputs are not yet retained. A comparison starts as soon as those named inputs exist, with no calendar trigger. These small sealed fixtures qualify bounded contracts, not representative quality or universal SOTA.
 
-The existing unittest record contracts in [test_w6_layer_verdict_records.py](../tests/test_w6_layer_verdict_records.py) reproduced the false citations, duplicate, unbound roles/checks, omitted memory candidates and review metadata before the correction. They verify record consistency only, never runtime behavior. Publication, final-stack and leak checks remain separately required before the single leased push.
+The existing unittest record contracts in [test_w6_layer_verdict_records.py](../tests/test_w6_layer_verdict_records.py) reproduced the false citations, duplicate, unbound roles/checks, omitted memory candidates and review metadata before the correction. The added B2-r regressions also fail against the retained d7d9df1f role assignments and check identical case coverage plus the two README-advertised roles. They verify record consistency only, never runtime behavior. Publication, final-stack and leak checks remain separately required before the single leased push.
 
 The derived view's post-#1007 skills-lifecycle source fingerprint is refreshed through the unchanged generator's own supported output, with its publication guard accepted and parsed run/layer arrays unchanged. #1025 owns that same main correction; rebase onto its landed main. Terminal provenance remains bound to the original `c2dee173` snapshot. No generator mechanism, selected runtime, paper unit/configuration, sealed bundle or Monday recorder changes.
 

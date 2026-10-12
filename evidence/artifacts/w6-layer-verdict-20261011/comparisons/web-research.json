@@ -3,7 +3,7 @@
   "kind": "w6_frozen_comparison",
   "comparison_id": "w6-foundation-web-research-20261011",
   "registered_at": "2026-10-11T23:15:50Z",
-  "phase": "preregistered; no run and no terminal state recorded",
+  "phase": "preregistered; no run; layer terminal state SCHEDULED",
   "catalog": "foundation",
   "layer_id": "web-research",
   "requirement_sha256": "c7d96e92b662770b358299b4ef22df82ac3000cb996a56fda1467b8d8201aa43",
@@ -71,7 +71,7 @@
       "upstream_install_ref": "CONTRIBUTING.md:30",
       "upstream_test_ref": "CONTRIBUTING.md:31",
       "role_ids": [
-        "web_content_extraction"
+        "web_primary_source_retrieval"
       ],
       "dependency": false,
       "selection_scope": "role-specific candidate; never rank across different role ids"
@@ -178,15 +178,7 @@
       ],
       "mandatory_checks": [
         "Return the intended frozen primary target and attributable exact extraction",
-        "Retain invalid-target failure and complete provider/runtime usage"
-      ]
-    },
-    "web_content_extraction": {
-      "case_ids": [
-        1,
-        2
-      ],
-      "mandatory_checks": [
+        "Retain invalid-target failure and complete provider/runtime usage",
         "Exact sealed page text/metadata extraction",
         "Invalid page/fetch is retained as failure"
       ]
@@ -212,7 +204,34 @@
       ]
     }
   },
-  "refrozen_at": "2026-10-12T00:52:20Z",
-  "amendment_authority": "CC adjudication-pr1021-4ddd4822-20261012.md: B1/B2/A1/A2, before any run",
-  "role_assignment_rule": "role_ids, dependency and role_checks are frozen here; no assignment or applicability change at execution/scoring time."
+  "refrozen_at": "2026-10-12T03:09:16Z",
+  "amendment_authority": "CC pr1021-claude-micro-d7d9df1f.md: B2-r, before any run",
+  "role_assignment_rule": "role_ids, dependency and role_checks are frozen here; identical singleton case sets or unions of competing roles cannot create a separate ranking. Source-advertised roles enter the common requirement comparison. No assignment or applicability change at execution/scoring time.",
+  "role_reconciliation": [
+    {
+      "repository": "https://github.com/adbar/trafilatura",
+      "pin": "e2f85c965662c7df26b73290ef175b2c2a5fdca6",
+      "old_role_id": "web_content_extraction",
+      "role_ids": [
+        "web_primary_source_retrieval"
+      ],
+      "requirement_basis": "The layer requires search/extract primary-source retrieval. Cases 1 and 2 equal web_primary_source_retrieval; the retained votes name Tavily Extract and agent-browser read as extraction comparators.",
+      "previous_case_ids": [
+        1,
+        2
+      ],
+      "previous_mandatory_checks": [
+        "Exact sealed page text/metadata extraction",
+        "Invalid page/fetch is retained as failure"
+      ],
+      "source_ref": "README.md:1",
+      "qualification_boundary": "Role applicability is a preregistered comparison obligation, not a claim that this arm passed the common oracle or supports every required operation."
+    }
+  ],
+  "supersedes": {
+    "head": "d7d9df1f07658b43a20d14bfd837602a6a492528",
+    "preregistration_sha256": "4a40ea5731d59bdc82be5d18da88b9e9acaf0fb61443afa2ed8756bb74535a38",
+    "before_any_run": true,
+    "reason": "B2-r common requirement role correction"
+  }
 }

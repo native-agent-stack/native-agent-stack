@@ -66,6 +66,43 @@ class W6RecordContracts(unittest.TestCase):
             keys = [(a["repository"].lower(), a["pin"]) for a in config["arms"]]
             self.assertEqual(len(keys), len(set(keys)), config["layer_id"])
 
+    def test_identical_case_sets_share_competing_roles(self):
+        for path in sorted((ARTIFACT / "comparisons").glob("*.json")):
+            config = json.loads(path.read_text(encoding="utf-8"))
+            checks = config["role_checks"]
+            candidates = [arm for arm in config["arms"] if not arm["dependency"]]
+            for arm in candidates:
+                covered = set().union(*(set(checks[role]["case_ids"]) for role in arm["role_ids"]))
+                own_sets = [set(checks[role]["case_ids"]) for role in arm["role_ids"]]
+                expected = {role for role, check in checks.items() if set(check["case_ids"]) in own_sets}
+                # A singleton alias must not hide a comparison spanning several
+                # incumbent roles. Overlapping multi-role coverage by itself
+                # does not establish another capability (for example indexing).
+                if len(arm["role_ids"]) == 1:
+                    for other in candidates:
+                        other_cases = set().union(*(set(checks[role]["case_ids"]) for role in other["role_ids"]))
+                        if covered == other_cases:
+                            expected.update(other["role_ids"])
+                with self.subTest(layer=config["layer_id"], arm=arm["repository"]):
+                    self.assertTrue(expected.issubset(arm["role_ids"]),
+                                    f"same-case roles excluded from ranking: {expected.difference(arm['role_ids'])}")
+
+    def test_pinned_readme_roles_enter_the_same_role_comparison(self):
+        expected = (
+            ("semantic-rag", "lightonai/next-plaid", "semantic_code_retrieval", "README.md:22"),
+            ("durable-memory", "mempalace/mempalace", "native_memory_capture", "README.md:311-316"),
+        )
+        for layer, repo, role, source_ref in expected:
+            config = load(f"comparisons/{layer}.json")
+            arm = next(a for a in config["arms"] if a["repository"].lower().endswith("/" + repo))
+            with self.subTest(layer=layer, arm=repo):
+                self.assertIn(role, arm["role_ids"])
+                witness = arm["role_source_witnesses"][role]
+                self.assertEqual(witness["ref"], source_ref)
+                self.assertEqual(witness["pin"], arm["pin"])
+                self.assertTrue(witness["source_file_sha256"])
+                self.assertTrue(witness["lines"])
+
     def test_current_host_memory_candidates_are_not_dropped_by_mac_nonselection(self):
         config = load("comparisons/durable-memory.json")
         arms = {a["repository"].lower() for a in config["arms"]}
