@@ -14,7 +14,7 @@ against it.
 | Inventory id | What it is | Status | Where it lives | Variable names |
 | --- | --- | --- | --- | --- |
 | `alpaca-paper` | Alpaca paper broker key pair | required now | `<store>/alpaca-paper.env` | `APCA_API_KEY_ID`, `APCA_API_SECRET_KEY` (optional, not secret: `APCA_API_BASE_URL`) |
-| `alpaca-paper-2` | Alpaca paper broker key pair, second paper account (isolated incentive-monitor study) | optional | `<store>/alpaca-paper-2.env`, pointer `PAPER_ENV_FILE_2` | `APCA_API_KEY_ID`, `APCA_API_SECRET_KEY` (optional, not secret: `APCA_API_BASE_URL`) |
+| `alpaca-paper-2` | Alpaca paper broker key pair, second paper account: paper lane A since 2026-10-12, on a fresh account (the incentive-monitor study it served is retired; lanes A and B never share an account) | optional | `<store>/alpaca-paper-2.env`, pointer `PAPER_ENV_FILE_2` | `APCA_API_KEY_ID`, `APCA_API_SECRET_KEY` (optional, not secret: `APCA_API_BASE_URL`) |
 | `alpaca-paper-c` | Alpaca paper broker key pair, account C (agent-native paper lane C). Paper keys only; the owner enters them from their own terminal, and the change that activates account C names its loader | optional | `<store>/alpaca-paper-c.env`, pointer `PAPER_ENV_FILE_C` | `APCA_API_KEY_ID`, `APCA_API_SECRET_KEY` (optional, not secret: `APCA_API_BASE_URL`) |
 | `sec-contact` | SEC/EDGAR contact string. This is private personal data, not an auth secret | required now | `<store>/sec-contact.env` | `SEC_USER_AGENT` (optional private contact: `EDGAR_IDENTITY`; optional public cap: `EDGAR_RATE_LIMIT_PER_SEC`) |
 | `databento` | Databento API key | only when you buy it | `<store>/databento.env` | `DATABENTO_API_KEY` |

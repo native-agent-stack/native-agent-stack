@@ -126,6 +126,17 @@ class CredentialStatusTests(unittest.TestCase):
         self.assertEqual(second["pointer_variables"], ["PAPER_ENV_FILE_2"])
         self.assertFalse(set(second["pointer_variables"]) & set(first["pointer_variables"]))
 
+    def test_second_paper_account_belongs_to_lane_a(self):
+        # The command center's ruling of 2026-10-12 (21:55Z): alpaca-paper-2 belongs to paper lane A on a fresh account, the
+        # incentive-monitor forward study it served is retired, and lanes A and B never share an account (lane B keeps
+        # alpaca-paper, so the two rows hold different files and pointers).
+        rows = {e["id"]: e for e in self.inventory["entries"]}
+        notes = rows["alpaca-paper-2"]["notes"]
+        for phrase in ("belongs to paper lane A", "incentive-monitor forward study", "is retired", "never share an account"):
+            self.assertIn(phrase, notes)
+        self.assertNotEqual(rows["alpaca-paper-2"]["store"]["path_template"], rows["alpaca-paper"]["store"]["path_template"])
+        self.assertFalse(set(rows["alpaca-paper-2"]["pointer_variables"]) & set(rows["alpaca-paper"]["pointer_variables"]))
+
     def test_account_c_paper_row_mirrors_the_first(self):
         # alpaca-paper-c is paper account C's slot (2026-10-11), for the agent-run paper lane C: the same class, store
         # kind and variables as account 1, its own lane, file and pointer, optional, and no loader or consumer until the
