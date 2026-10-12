@@ -362,7 +362,7 @@ python3 "$H/build_args.py" --work-dir "$W" --sweep-id "$LANE" --date "$DATE" --l
 ```
 
 The fallback is off unless `staged.json` carries `codex.fallback`. The host flag names the gateway's loopback
-address and port (default `127.0.0.1:20128`). The stager requires a native primary provider and a bare native model
+address and port (current deployment default `127.0.0.1:21128`). The stager requires a native primary provider and a bare native model
 name whose requested effort has a reasoning alias in the pinned gateway. It records the fallback provider and
 base URL without creating a lane home. Restaging changes no frozen
 templates, `prompts_sha256.txt`, workflow arguments or embedded script when only provider/fallback flags change.
@@ -417,7 +417,7 @@ the choice.
 
 #### Staging on the framework instance (20129)
 
-The default gateway stays 20128: `--omniroute-base-url` defaults to `http://127.0.0.1:20128/v1`, the model to `cx/gpt-6-astra`, and no provider headers are sent. To stage the lane on the framework OmniRoute instance at port 20129, which compresses a request and then passes it to 20128 through its `sharedgw` node:
+The current gateway default is21128: `--omniroute-base-url` defaults to `http://127.0.0.1:21128/v1`, the model to `cx/gpt-6-astra`, and no provider headers are sent. Render the prospective gateway service with `@OMNIROUTE_PORT@=21128`; alternate hosts pass an explicit matching endpoint. The historical framework instance at20129 forwarded to20128 through `sharedgw`; that recorded route is not silently migrated. To stage that explicitly selected historical framework route:
 
 ```sh
 python3 $H/build_args.py --work-dir "$W" --sweep-id "$LANE" --date "$DATE" --smoke mcp-surfaces \

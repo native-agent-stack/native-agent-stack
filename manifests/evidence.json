@@ -5801,13 +5801,13 @@
     },
     {
       "path": "adoption/templates/systemd/omniroute-fw.service",
-      "sha256": "a81772106fd2ed2be213679c683f002f1ac0b0b3a27ac68093508aa2ebb0aef5",
-      "bytes": 5935
+      "sha256": "5f30a4b82280dd4657c39c25eb4504e4e7af4275d1976362f8e94d4b242928c0",
+      "bytes": 6128
     },
     {
       "path": "adoption/templates/systemd/omniroute.service",
-      "sha256": "eedbec27fd53bb0eb8ef8f61ff2bc7ed874b657144ae6317e8476d2a8a218947",
-      "bytes": 7463
+      "sha256": "588b0c21924323b39bd02d5e01b30001418ccb28c2e168c185f48017fbdae605",
+      "bytes": 7956
     },
     {
       "path": "adoption/templates/systemd/skill-invoke-rate.service",
@@ -19142,8 +19142,8 @@
     },
     {
       "path": "docs/foundation-stack.md",
-      "sha256": "e1003554881d6ddfa464560e2596b456897408ee40a3cd012e72bd75e4a5e0ed",
-      "bytes": 42784
+      "sha256": "58a25feb4b84accec61089d488c1a02939272a14b02362f98cc9743bc4d8d836",
+      "bytes": 43079
     },
     {
       "path": "docs/full-stack-convergence.md",
@@ -60312,8 +60312,8 @@
     },
     {
       "path": "examples/claude-runtime-sdk/README.md",
-      "sha256": "818c0db76cd709aee8788e007eae6826028d4a7d0ca7337d0a4ad2c3a4f8dc80",
-      "bytes": 11259
+      "sha256": "1b2506bf37dd7baa195e6e17fa5dc3a5815ab54d1e158e0d480b2cfc950ab3a4",
+      "bytes": 11373
     },
     {
       "path": "examples/claude-runtime-sdk/tests/check_controls.py",
@@ -60332,7 +60332,7 @@
     },
     {
       "path": "examples/claude-runtime-sdk/worker.py",
-      "sha256": "5e66c0bed0aea3d6aee3d927d141beb50ebc809866087f2a878a749ed009c234",
+      "sha256": "a2be2c9a1c38a7e974848ff78b1ee62f93ca8b841e411f470553b66008d01c2d",
       "bytes": 19873
     },
     {
@@ -60669,6 +60669,11 @@
       "path": "manifests/stack.json",
       "sha256": "17c6d6d62b4d9c86b6a4b76d5bd6ca2327f16bb2b3a9b7d3878723f12e92561a",
       "bytes": 130809
+    },
+    {
+      "path": "notes/runtime-followups-20261012/README.md",
+      "sha256": "22b1975262a8171218b3cbe26093cb2d6cb8f917af526438836a0f4bbb156d53",
+      "bytes": 1707
     },
     {
       "path": "notes/runtime-profiles-20261012/README.md",
@@ -61152,8 +61157,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "8409c0b698949540b0af3e376e65e21e9ad3453557f44512ac1ec7a59c54d8d6",
-      "bytes": 133408
+      "sha256": "30f5857b57538deadb437000ae0a44860d215d86c3efe5a2bd590997833becb1",
+      "bytes": 133629
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -62467,8 +62472,8 @@
     },
     {
       "path": "tests/test_landscape_sweep_harness.py",
-      "sha256": "69ee39d4d1007934ae0ee45d0d51e189ec3792da6c5c88bb90a4a7d98fbdefba",
-      "bytes": 392428
+      "sha256": "effafab5e22b4f195d778e5c919c01b0074f14d0bff3b5dba8d7965c53c13fa0",
+      "bytes": 393432
     },
     {
       "path": "tests/test_landscape_sweep_skills.py",
@@ -62782,8 +62787,8 @@
     },
     {
       "path": "tests/test_omniroute_gateway_unit.py",
-      "sha256": "ebf44a8f8b263c2271aa29fe6f284678a0bb2bdf5700c664522ec6504b1242c7",
-      "bytes": 23194
+      "sha256": "773640baa3786a954f8331cf43774c5a3707fa9b692afebcb317d8e4bac2071d",
+      "bytes": 23278
     },
     {
       "path": "tests/test_openhands_lock_binding.py",
@@ -63787,8 +63792,8 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/README.md",
-      "sha256": "6da163f65c353dc8485ac880b919dca8d027c23a6f0a0458a70aad54e925eeaf",
-      "bytes": 118259
+      "sha256": "47d7d69d4878cd8c753ae883a910448f151384bafb37cea234cdffb0e7e50d46",
+      "bytes": 118439
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/build_args.py",
@@ -63977,7 +63982,7 @@
     },
     {
       "path": "tools/token-e2e/README.md",
-      "sha256": "5555451a8f5b8a6d80757d62205b70e00f8d59852799898a2b64848138db7bd4",
+      "sha256": "43ad7d4d6237fe836e7f158884667572d0de3b3e3dda8cefe483f4d8a0f65c05",
       "bytes": 43223
     },
     {

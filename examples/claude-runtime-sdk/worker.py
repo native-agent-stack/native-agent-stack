@@ -42,7 +42,7 @@ from claude_agent_sdk import (
 SDK_VERSION = "0.2.162"
 SDK_COMMIT = "f2204bb956bab02907aaf3cb88eb9dead28eaa35"
 OMNIROUTE_LAUNCH_COMMIT = "2f42a9ac19d1a247ec9ce5473b790843724b3061"
-DEFAULT_GATEWAY = "http://127.0.0.1:20128"
+DEFAULT_GATEWAY = "http://127.0.0.1:21128"
 MODEL_ID = re.compile(r"(?:[A-Za-z0-9_.:-]+/)?claude-[A-Za-z0-9_.:-]+\Z")
 USAGE_COUNTERS = {
     "input_tokens",

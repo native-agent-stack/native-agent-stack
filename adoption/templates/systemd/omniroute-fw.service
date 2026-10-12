@@ -4,9 +4,11 @@
 # evidence/artifacts/omniroute-rebuild-20260930/omniroute-fw.service; tests/test_omniroute_gateway_unit.py renders it
 # with the host's values and compares. It is not installed as it is. Decision: docs/decisions/2026-09-30-omniroute-rebuild.md.
 #
-# It is a second OmniRoute on the host that also runs omniroute.service (20128): its own data directory
+# This records the historical second OmniRoute beside omniroute.service (20128): its own data directory
 # (%h/.local/share/omniroute-fw), its own environment file and port 20129. A provider node inside it forwards to the
-# gateway on 20128. Apart from Description= and the comments, one directive differs from the installed unit: the
+# gateway on historical port 20128. A new deployment selects its backend to match the explicitly rendered
+# @OMNIROUTE_PORT@ in omniroute.service (currently 21128); this does not rewrite the dated host receipt.
+# Apart from Description= and the comments, one directive differs from the installed unit: the
 # explicit OMNIROUTE_SERVER_HOST below. The workstation's service log names OMNIROUTE_SERVER_HOST among the keys its
 # process environment already sets, and 20129 listens on 127.0.0.1 only, so the process environment is the same.
 #

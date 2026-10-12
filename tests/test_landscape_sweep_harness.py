@@ -1443,6 +1443,21 @@ class OmniRouteLaneBuildTests(unittest.TestCase):
         return work, profile, build(work, "--gpt6-provider", "omniroute", "--codex-host", "example",
                                     "--stack-worker-profile", profile, *extra)
 
+    def test_default_gateway_matches_prospective_service_and_explicit_override(self):
+        unit = (ROOT / "adoption/templates/systemd/omniroute.service").read_text().replace("@OMNIROUTE_PORT@","21128")
+        # The CC's established host endpoint is21128; the service template is
+        # rendered for a future host, never silently compared to an old live unit.
+        port = re.search(r"^ExecStart=.* --port (\d+)\b", unit, re.M)
+        self.assertIsNotNone(port)
+        work, _, done = self.stage_lane()
+        self.assertEqual(done.returncode,0,done.stderr)
+        config = (work / "codex-home/config.toml").read_text()
+        self.assertIn(f'base_url = "http://127.0.0.1:{port.group(1)}/v1"',config)
+        explicit, _, done = self.stage_lane("--omniroute-base-url","http://127.0.0.1:21128/v1")
+        self.assertEqual(done.returncode,0,done.stderr)
+        self.assertIn('base_url = "http://127.0.0.1:21128/v1"',
+                      (explicit / "codex-home/config.toml").read_text())
+
     def test_lane_home_carries_provider_mcp_servers_and_profile(self):
         work, profile, done = self.stage_lane()
         self.assertEqual(done.returncode, 0, done.stderr)
