@@ -158,10 +158,11 @@ DEFINITIONS = (
      "share none, including an unpinned or unparsed pin; null without a run."),
     ("funnel",
      "Cumulative distinct normalized repositories over the completed sweeps (stopped sweeps excluded). found: ledger "
-     "proposed plus the landscape candidates, alternatives and winners; refuted: the latest ledger appearance is in "
-     "refuted; surviving: the latest appearance is in survived, dated after the verdict; trialled: landscape rows "
+     "proposed plus the landscape candidates, alternatives and winners; refuted: the latest refutation without "
+     "a later survival or missing-vote-only re-proposal; surviving: an unresolved survival or missing-vote proposal dated after the "
+     "verdict; trialled: landscape rows "
      "with measured_comparison evidence or a measured_tradeoff disposition; adopted: winners with a run pin."),
-    ("survivors", "The surviving repositories of the funnel, each with the sweep and date of its latest survival."),
+    ("survivors", "The unresolved repositories of the funnel, with their latest survival or the missing-vote-only sweep and date that opened or reopened them."),
     ("index",
      "by_repository (normalized) and by_component_id (winners) map to every layer and role (winner, alternate, "
      "survivor, candidate) that names them."),
@@ -181,6 +182,7 @@ class Sources:
     def __init__(self, root: Path):
         self.root = root
         self.hashes: dict[str, str] = {}
+        self._json_cache: dict[str, object] = {}
 
     def path(self, relative: str) -> Path:
         try:
@@ -197,11 +199,15 @@ class Sources:
         return raw
 
     def json(self, relative: str):
+        if relative in self._json_cache:
+            return self._json_cache[relative]
         raw = self.read_bytes(relative)
         try:
-            return json.loads(raw.decode("utf-8"), object_pairs_hook=unique_json)
+            document = json.loads(raw.decode("utf-8"), object_pairs_hook=unique_json)
         except (UnicodeError, ValueError) as error:
             raise FinalStackError(f"{relative}: cannot read JSON ({error})") from error
+        self._json_cache[relative] = document
+        return document
 
     def toml(self, relative: str) -> dict:
         raw = self.read_bytes(relative)
@@ -467,10 +473,12 @@ def completed_sweeps(ledger: dict) -> list[dict]:
     return ordered
 
 
-def sweep_outcomes(sweeps: list[dict]) -> dict[tuple[str, str], dict]:
+def sweep_outcomes(sweeps: list[dict], sources: Sources) -> dict[tuple[str, str], dict]:
     """(catalog, layer_id) -> {"proposed": set, "latest": {repository: (outcome, sweep_id, date)}} over the completed
-    sweeps in date order; within one sweep a refutation is later than a survival."""
+    sweeps in date order; missing-vote-only re-proposals reopen earlier refutations, while earlier survivals keep
+    their provenance. Within one sweep a substantive refutation is later than a survival."""
     outcomes: dict[tuple[str, str], dict] = {}
+    target_of = saturation_ledger.ref_resolver(sources.json)
     for sweep in sweeps:
         for position, layer in enumerate(sweep["record"]["layers"]):
             where = f"{LEDGER}: {sweep['sweep_id']}: layers[{position}]"
@@ -478,7 +486,8 @@ def sweep_outcomes(sweeps: list[dict]) -> dict[tuple[str, str], dict]:
             proposed = layer.get("proposed") or []
             if not isinstance(proposed, list) or not all(isinstance(item, str) for item in proposed):
                 raise FinalStackError(where + ": proposed must be a list of repositories")
-            entry["proposed"].update(filter(None, map(host_receipts.normalize_repository, proposed)))
+            proposed_repositories = set(filter(None, map(host_receipts.normalize_repository, proposed)))
+            entry["proposed"].update(proposed_repositories)
             for outcome in ("survived", "refuted"):
                 items = layer.get(outcome) or []
                 if not isinstance(items, list) or not all(isinstance(item, dict) and isinstance(item.get("repo"), str)
@@ -487,7 +496,14 @@ def sweep_outcomes(sweeps: list[dict]) -> dict[tuple[str, str], dict]:
                 for item in items:
                     repository = host_receipts.normalize_repository(item["repo"])
                     if repository is not None:
-                        entry["latest"][repository] = (outcome, sweep["sweep_id"], sweep["date"])
+                        if outcome == "refuted" and saturation_ledger.refuted_by_absence(item, target_of):
+                            previous = entry["latest"].get(repository)
+                            if previous is None or (
+                                    previous[0] == "refuted" and repository in proposed_repositories
+                                    and (previous[2], previous[1]) < (sweep["date"], sweep["sweep_id"])):
+                                entry["latest"][repository] = ("survived", sweep["sweep_id"], sweep["date"])
+                        else:
+                            entry["latest"][repository] = (outcome, sweep["sweep_id"], sweep["date"])
     return outcomes
 
 
@@ -584,7 +600,7 @@ def build_document(root: Path) -> dict:
     research = one_row_each(RESEARCH_STATE, research_state.get("layers"), landscape)
     matrix_rows = one_row_each(MATRIX, matrix.get("rows"), landscape)
     sweeps = completed_sweeps(ledger)
-    outcomes = sweep_outcomes(sweeps)
+    outcomes = sweep_outcomes(sweeps, sources)
     registry = wave_registry(sources)
     # saturation_ledger.build_report reads these itself; they are recorded so a change to them is a source change.
     sources.read_bytes(ADOPTION)

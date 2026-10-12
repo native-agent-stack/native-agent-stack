@@ -289,6 +289,96 @@ class StatusTests(FixtureTestCase):
         self.assertEqual(document["index"]["by_repository"]["github.com/example/kept"],
                          [{"catalog": "foundation", "layer_id": "layer-a", "role": "survivor"}])
 
+    def test_shared_vote_document_is_read_once_per_build(self):
+        root = self.root()
+        repositories = ["https://github.com/example/first", "https://github.com/example/second"]
+        returns = "catalogs/sota-convergence/returns-shared.json"
+        sweep = _sweep("shared-votes", "2026-09-23", [("foundation", "layer-a")],
+                       outcomes={("foundation", "layer-a"): {"proposed": repositories,
+                                                             "refuted": repositories}})
+        for entry in sweep["layers"][0]["refuted"]:
+            entry.update(facts={"vote": "refuted", "ref": returns + "#/facts"},
+                         fit={"vote": "refuted", "ref": returns + "#/fit"})
+        _fixture(root, foundation=[_layer("layer-a")], sweeps=[sweep])
+        _write_json(root / returns, {"facts": {"refuted": True}, "fit": {"refuted": True}})
+        reads = []
+        read_bytes = fs.Sources.read_bytes
+
+        def counted_read(sources, relative):
+            reads.append(relative)
+            return read_bytes(sources, relative)
+
+        with mock.patch.object(fs.Sources, "read_bytes", counted_read):
+            for build_count in (1, 2):
+                document = fs.build_document(root)
+                self.assertEqual(reads.count(returns), build_count)
+                self.assertEqual(document["sources"][returns], hashlib.sha256((root / returns).read_bytes()).hexdigest())
+
+    def test_reproposed_chandra_with_only_a_missing_vote_reopens_a_prior_refutation(self):
+        root = self.root()
+        repository = "https://github.com/datalab-to/chandra"
+        returns = "catalogs/sota-convergence/returns-chandra.json"
+        earlier = _sweep("chandra-refuted", "2026-09-23", [("foundation", "document-retrieval")],
+                         outcomes={("foundation", "document-retrieval"): {"proposed": [repository],
+                                                                          "refuted": [repository]}})
+        earlier["layers"][0]["refuted"][0]["lens_votes"] = [
+            {"lens": 0, "vote": "not_refuted"}, {"lens": 1, "vote": "refuted"}]
+        later = _sweep("chandra-reproposed", "2026-09-29", [("foundation", "document-retrieval")],
+                       outcomes={("foundation", "document-retrieval"): {"proposed": [repository],
+                                                                        "refuted": [repository]}})
+        later["layers"][0]["refuted"][0].update(
+            facts={"vote": "not_refuted", "ref": returns + "#/facts"},
+            fit={"vote": "refuted", "ref": returns + "#/fit"})
+        _fixture(root, foundation=[_layer("document-retrieval")], sweeps=[earlier, later])
+        _write_json(root / returns, {
+            "facts": {"refuted": False},
+            "fit": {"refuted": True, "claude": {"refuted": False}, "gpt6": {"missing": True}}})
+
+        layer = self.layer(fs.build_document(root), "document-retrieval")
+        self.assertEqual(layer["survivors"], [
+            {"repository": "github.com/datalab-to/chandra", "sweep_id": "chandra-reproposed",
+             "date": "2026-09-29"}])
+        self.assertEqual((layer["funnel"]["refuted"], layer["funnel"]["surviving"]), (0, 1))
+
+    def test_missing_vote_only_candidate_survives_omission_until_a_returned_refutation(self):
+        root = self.root()
+        repository = "https://github.com/exa-labs/exa-mcp-server"
+        returns = "catalogs/sota-convergence/returns-20260923.json"
+        missing = _sweep("missing-fit", "2026-09-23", [("foundation", "layer-a")],
+                         outcomes={("foundation", "layer-a"): {"proposed": [repository],
+                                                               "refuted": [repository]}})
+        missing["layers"][0]["refuted"][0].update(
+            facts={"vote": "not_refuted", "ref": returns + "#/facts"},
+            fit={"vote": "refuted", "ref": returns + "#/fit"})
+        sweeps = [missing, _sweep("later-omission", "2026-09-26", [("foundation", "layer-a")])]
+        _fixture(root, foundation=[_layer("layer-a")], sweeps=sweeps)
+        _write_json(root / returns, {
+            "facts": {"refuted": False},
+            "fit": {"refuted": True, "claude": {"refuted": False}, "gpt6": {"missing": True}},
+            "merit": {"refuted": True}})
+
+        document = fs.build_document(root)
+        self.assertEqual(self.layer(document, "layer-a")["survivors"], [
+            {"repository": "github.com/exa-labs/exa-mcp-server", "sweep_id": "missing-fit",
+             "date": "2026-09-23"}])
+        self.assertEqual(self.layer(document, "layer-a")["funnel"]["surviving"], 1)
+        self.assertEqual(document["index"]["by_repository"]["github.com/exa-labs/exa-mcp-server"], [
+            {"catalog": "foundation", "layer_id": "layer-a", "role": "survivor"}])
+
+        refuted = _sweep("returned-refutation", "2026-09-29", [("foundation", "layer-a")],
+                         outcomes={("foundation", "layer-a"): {"proposed": [repository],
+                                                               "refuted": [repository]}})
+        refuted["layers"][0]["refuted"][0].update(
+            facts={"vote": "refuted", "ref": returns + "#/merit"},
+            fit={"vote": "not_refuted", "ref": returns + "#/facts"})
+        _fixture(root, foundation=[_layer("layer-a")], sweeps=[*sweeps, refuted])
+        self.assertEqual(self.layer(fs.build_document(root), "layer-a")["survivors"], [])
+
+        missing_again = dict(missing, sweep_id="missing-fit-again", date="2026-09-30",
+                             layers=[dict(missing["layers"][0], proposed=[])])
+        _fixture(root, foundation=[_layer("layer-a")], sweeps=[*sweeps, refuted, missing_again])
+        self.assertEqual(self.layer(fs.build_document(root), "layer-a")["survivors"], [])
+
     def test_trialled_funnel_deduplicates_positive_measured_evidence_across_roles(self):
         repository = "https://github.com/example/widget"
         document = self.build(foundation=[_layer("layer-a",
