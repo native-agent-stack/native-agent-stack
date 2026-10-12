@@ -2,14 +2,17 @@
 # /// script
 # requires-python = ">=3.13,<3.14"
 # dependencies = [
-#     "openai-codex==0.160.0",
+#     "openai-codex==0.162.1",
 # ]
 # ///
 """One native Codex SDK turn, or metadata preflight, through OmniRoute.
 
 Derived from openai/codex rust-v0.160.0, commit
 a956835d020762cb2b570053af06f643a11c0ecc, sdk/python/examples/{01,05,14}_*
-and sdk/python/src/openai_codex/{api,client,_run,async_client}.py. Preflight uses
+and sdk/python/src/openai_codex/{api,client,_run,async_client}.py. The qualified
+package/runtime pin is now rust-v0.162.1, 092d3acd6bec3e3a14bdc7e7a2810ab628ab759d;
+sdk/python/README.md:6-29 and _run.py:103-135 retain the native lifecycle.
+Preflight uses
 exactly pinned SDK internals in generated/v2_all.py and the native app-server
 request_processors/mcp_processor.rs. See README.md for sources.
 """
@@ -36,7 +39,7 @@ from openai_codex.generated.v2_all import (
 )
 from openai_codex.types import ReasoningEffort
 
-SDK_VERSION = "0.160.0"
+SDK_VERSION = "0.162.1"
 PROVIDER = "omniroute_runtime"
 DEFAULT_MODEL = "cx/gpt-6.1-sol-max"
 DEFAULT_BASE_URL = "http://127.0.0.1:21128/v1"
@@ -557,7 +560,7 @@ def parse_args(argv=None) -> argparse.Namespace:
     parser.add_argument(
         "--codex-bin",
         type=Path,
-        help="explicit native 0.160.0 binary; defaults to the pinned SDK bundle",
+        help="explicit native 0.162.1 binary; defaults to the pinned SDK bundle",
     )
     parser.add_argument(
         "--codex-home",

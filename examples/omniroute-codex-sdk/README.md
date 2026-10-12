@@ -11,8 +11,12 @@ the primary worker and an invocation-scoped OmniRoute Responses provider.
 The existing Codex integration remains the incumbent; this example does not
 select a winner in the separate SDK comparison.
 
-The [October 3 refresh receipt](../../evidence/receipts/omniroute-sdk-worker-0160-20261003.json)
-records current 0.160.0 checks. September 30 receipts below retain their original
+The [October 12 release replay](../../docs/decisions/2026-10-12-worker-sdk-replay.md)
+qualifies the retained read-only shell/count job at SDK/native runtime 0.162.1:
+completed turn, idle thread, closed SDK, two observed model requests and unchanged
+foreign sentinel. Workspace-write and coordinator-specific caller acceptance remain
+separate. The [October 3 refresh receipt](../../evidence/receipts/omniroute-sdk-worker-0160-20261003.json)
+records historical 0.160.0 checks. September 30 receipts below retain their original
 0.159.2 execution and are historical evidence.
 The builder's nested Codex sandbox caused two shell startup failures; the
 coordinator's separate non-nested read-only run completed one shell command
@@ -22,7 +26,7 @@ writing (`workspace-write`) dispatch is not yet qualified at 0.160.0.
 
 ## Call from a native Claude coordinator
 
-The PEP 723 scripts and adjacent locks pin `openai-codex==0.160.0`, including
+The worker and its fixture script and adjacent locks pin `openai-codex==0.162.1`, including
 its matching native CLI. In the native Claude session, use its `Bash` tool to run
 the following command from the repository root. `WORKER_PROJECT` is the owned
 task worktree with the selected project `.agents/skills`; `PRIVATE_WORKER_HOME`
@@ -104,7 +108,7 @@ qualified its native approval reviewer and accounting. This is separate from an
 explicit Astra judgment stage. The worker preserves existing native MCP/tool
 configuration; an empty private Codex home does not qualify those integrations.
 
-Use `--codex-bin` only for an explicit matching native 0.160.0 binary. An omitted
+Use `--codex-bin` only for an explicit matching native 0.162.1 binary. An omitted
 `--codex-home` inherits the native home; supplying it scopes worker configuration
 and recoverable state to the child process. The example neither reads nor copies
 authentication stores. The selected keyless loopback gateway owns its upstream

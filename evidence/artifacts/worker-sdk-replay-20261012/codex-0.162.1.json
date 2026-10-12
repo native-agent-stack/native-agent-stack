@@ -1,0 +1,278 @@
+{
+  "candidate_version": "0.162.1",
+  "checked_at": "2026-10-12T15:48:02Z",
+  "class": "native_proven",
+  "completion": {
+    "cleanup_status": "closed",
+    "command_returncode": 0,
+    "status": "completed",
+    "terminal_completion": true,
+    "thread_status": "idle"
+  },
+  "earlier_attempts": [
+    {
+      "argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle",
+        "/usr/bin/env",
+        "HOME=${SCRATCH_ROOT}/codex/home",
+        "TMPDIR=${SCRATCH_ROOT}/codex/state",
+        "UV_CACHE_DIR=${USER_HOME}/.cache/uv",
+        "${USER_HOME}/.local/bin/uv",
+        "run",
+        "--locked",
+        "--script",
+        "examples/omniroute-codex-sdk/worker.py",
+        "--workspace",
+        "${SCRATCH_ROOT}/codex/workspace",
+        "--codex-home",
+        "${SCRATCH_ROOT}/codex/home",
+        "--sandbox",
+        "read-only",
+        "--timeout",
+        "300",
+        "--request-id",
+        "runtime-workers-codex1621-20261012",
+        "--native-result",
+        "${SCRATCH_ROOT}/codex/native-result.json",
+        "--prompt",
+        "Run ls examples/omniroute-codex-sdk | wc -l with the shell tool and reply with the number. Work only in this owned workspace; preserve other workers and the foreign sentinel. Do not read credentials or external configuration."
+      ],
+      "captures": {
+        "stderr": {
+          "bytes": 203,
+          "sha256": "d1805c258015de3de9a0eb27c886ac8b48ca2f3e65d64484e29945539f713fd0"
+        },
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "finished": "2026-10-12T15:44:09Z",
+      "returncode": 127,
+      "started": "2026-10-12T15:44:08Z"
+    },
+    {
+      "argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle",
+        "/usr/bin/env",
+        "HOME=${SCRATCH_ROOT}/codex/home",
+        "TMPDIR=${SCRATCH_ROOT}/codex/state",
+        "UV_CACHE_DIR=${USER_HOME}/.cache/uv",
+        "${USER_HOME}/.local/share/mise/installs/uv/0.12.22/.mise-bins/uv",
+        "run",
+        "--locked",
+        "--script",
+        "examples/omniroute-codex-sdk/worker.py",
+        "--workspace",
+        "${SCRATCH_ROOT}/codex/workspace",
+        "--codex-home",
+        "${SCRATCH_ROOT}/codex/home",
+        "--sandbox",
+        "read-only",
+        "--timeout",
+        "300",
+        "--request-id",
+        "runtime-workers-codex1621-20261012-b",
+        "--native-result",
+        "${SCRATCH_ROOT}/codex/native-result-attempt2.json",
+        "--prompt",
+        "Run ls examples/omniroute-codex-sdk | wc -l with the shell tool and reply with the number. Work only in this owned workspace; preserve other workers and the foreign sentinel. Do not read credentials or external configuration."
+      ],
+      "captures": {
+        "stderr": {
+          "bytes": 95,
+          "sha256": "50f4e1f64849e9555c455302a43cdb358090881e5407a45abcdd8db4b3b57060"
+        },
+        "stdout": {
+          "bytes": 1484,
+          "sha256": "b0e77523834c7f6785776f7e8783963185e87317778b4ca0552e2fbc2137879b"
+        }
+      },
+      "finished": "2026-10-12T15:45:04Z",
+      "returncode": 0,
+      "started": "2026-10-12T15:44:51Z"
+    }
+  ],
+  "execution": {
+    "argv": [
+      "systemd-run",
+      "--user",
+      "--scope",
+      "-p",
+      "CPUWeight=idle",
+      "/usr/bin/env",
+      "HOME=${SCRATCH_ROOT}/codex/home",
+      "TMPDIR=${SCRATCH_ROOT}/codex/state",
+      "UV_CACHE_DIR=${USER_HOME}/.cache/uv",
+      "${USER_HOME}/.local/share/mise/installs/uv/0.12.22/.mise-bins/uv",
+      "run",
+      "--locked",
+      "--script",
+      "examples/omniroute-codex-sdk/worker.py",
+      "--workspace",
+      "${SCRATCH_ROOT}/codex/workspace",
+      "--codex-home",
+      "${SCRATCH_ROOT}/codex/home",
+      "--base-url",
+      "http://127.0.0.1:21281/v1",
+      "--sandbox",
+      "read-only",
+      "--timeout",
+      "300",
+      "--request-id",
+      "runtime-workers-codex1621-observed",
+      "--native-result",
+      "${SCRATCH_ROOT}/codex/native-result-observed.json",
+      "--prompt",
+      "Run ls examples/omniroute-codex-sdk | wc -l with the shell tool and reply with the number. Work only in this owned workspace; preserve other workers and the foreign sentinel. Do not read credentials or external configuration."
+    ],
+    "captures": {
+      "stderr": {
+        "bytes": 95,
+        "sha256": "b67bb1d641f561e7ab362f3b465af647428a1387676beec8847796a5017999aa"
+      },
+      "stdout": {
+        "bytes": 1481,
+        "sha256": "4306eaf4fab0070eb9aa31768754c33dab7acde0556d1b50f60357237a70e357"
+      }
+    },
+    "finished": "2026-10-12T15:48:02Z",
+    "returncode": 0,
+    "started": "2026-10-12T15:47:50Z"
+  },
+  "focused_checks": {
+    "pin_compatibility_before_after": {
+      "existing_test": "NativeTransportTests.test_native_payload_header_tools_and_nonadditive_resume",
+      "before": "With the retained 0.160.0 runtime guard and the new native 0.162.1 bundle, one test fails at initialization before model submission.",
+      "after": "With the updated 0.162.1 guard, the same existing lifecycle/resume oracle passes one test with zero failures/errors.",
+      "scope": "Authored loopback/native-runtime fixture; not a live model trial or a newly discovered upstream bug.",
+      "stderr_sha256": "6d77a8546eee07e430fd7f72e56e9a78e526bdd385101f3661b4eddd32830e35"
+    },
+    "class": "local_integration",
+    "command": {
+      "argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle",
+        "timeout",
+        "600",
+        "uv",
+        "run",
+        "--locked",
+        "--script",
+        "examples/omniroute-codex-sdk/test_worker.py"
+      ],
+      "captures": {
+        "stderr": {
+          "bytes": 9331,
+          "sha256": "f7ea7ec3cbb0ee17da5579b35b3f9a809261352ff660ede3341840a1ab07cec5"
+        },
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "finished": "2026-10-12T15:46:30Z",
+      "returncode": 0,
+      "started": "2026-10-12T15:45:45Z"
+    },
+    "errors": 0,
+    "failures": 0,
+    "tests": 31
+  },
+  "foreign_sentinel": {
+    "after_sha256": "ea3562ca47a2bfe59e9f66c12c69d7692bbff8bf2de5beac734972a86955e841",
+    "mtime_ns": 1791819760620912000,
+    "scope": "Foreign sibling fixture, outside each owned workspace; no real user file.",
+    "seeded_bytes_sha256": "ea3562ca47a2bfe59e9f66c12c69d7692bbff8bf2de5beac734972a86955e841",
+    "unchanged": true
+  },
+  "installation": {
+    "commands": [
+      "uv lock --script examples/omniroute-codex-sdk/worker.py",
+      "uv lock --script examples/omniroute-codex-sdk/test_worker.py",
+      "uv run --locked --script examples/omniroute-codex-sdk/worker.py"
+    ],
+    "native_runtime_version": "0.162.1",
+    "scope": "locked PEP723 script environment; bundled native runtime; standalone CLI unchanged",
+    "worker_lock_sha256": "0c4d466cdc8696689044eb2dcaae1b4ffdd7cacf88bb6a5f65de948483667b90",
+    "worker_source_sha256": "a2f10d340204cb34d64929d06c03b83d0cd50c7e7b9c303c939b57c3eff436f8",
+    "publication_source_sha256": "64f698a8dbc327e10b99875666f212ecce2128c7c1c2272344940107f993710e",
+    "source_equivalence_scope": "The measured source is retained in the private task workspace. Publication subsequently changes only the module documentation and --codex-bin help text; ASTs match after removing that module docstring and argparse help keywords. Native job behavior and version pin are identical."
+  },
+  "limitations": [
+    "Read-only task acceptance; workspace-write remains separately unqualified.",
+    "First attempt rc127 used an absent uv executable, submitted no inference, and is retained.",
+    "Direct default-port attempt completed but lacked an exact request counter; the observed attempt closes only that measurement gap.",
+    "Observer recorded two flow_error notices after two response_completed events; both native turn and command completed successfully. No general transport-error absence is claimed.",
+    "No selected account/configuration, standalone native CLI or other worker environment was changed.",
+    "Positive model requests are measured; backend identity, billing and comparative superiority remain unqualified."
+  ],
+  "model": {
+    "backend_identity_attested": false,
+    "completed_responses": 2,
+    "counting_unit": "dedicated reverse-observer request events",
+    "endpoint": "http://127.0.0.1:21128/v1",
+    "observed_request_efforts": [
+      "max"
+    ],
+    "owned_observer": "http://127.0.0.1:21281/v1",
+    "requested_effort": "max",
+    "requests_to_model": 2,
+    "route": "cx/gpt-6.1-sol-max"
+  },
+  "native_result": {
+    "bytes": 2737,
+    "private_relative_path": "codex/native-result-observed.json",
+    "sha256": "53750f24abdb128e8bae70dcf94218174224e4e0fd28338c5888889aa29f8e9f"
+  },
+  "observer_capture": {
+    "bytes": 2205,
+    "private_relative_path": "codex/gateway-observation.jsonl",
+    "sha256": "fba46f3461cd1614cbcd0f7f8d2b060297cc357234ea0ba4c4a03d66beaed2d5"
+  },
+  "observer_shutdown": {
+    "command_returncode": 130,
+    "reason": "owned transient observer stopped with SIGINT after measurement"
+  },
+  "old_version": "0.160.0",
+  "oracle": {
+    "actual_count": 12,
+    "command": "/bin/bash -c 'ls examples/omniroute-codex-sdk | wc -l'",
+    "command_exit_code": 0,
+    "expected_count": 12,
+    "final_response": "12",
+    "historical_scope": "Same retained shell/count task contract; historical 13 is not a fixed oracle for this 12-file workspace.",
+    "passes": true,
+    "task": "Run ls examples/omniroute-codex-sdk | wc -l with the shell tool and reply with the number."
+  },
+  "predicate_passes": true,
+  "schema_version": 1,
+  "upstream": {
+    "commit": "092d3acd6bec3e3a14bdc7e7a2810ab628ab759d",
+    "release_capture": {
+      "bytes": 636,
+      "private_relative_path": "evidence/codex1621-release.stdout",
+      "sha256": "76b86154976c42563d8b1b48d8b6a9d2cc0db36150864319c78880e40ec6afdc"
+    },
+    "release_note": "https://github.com/openai/codex/releases/tag/rust-v0.162.1",
+    "repository": "openai/codex",
+    "source_locations": [
+      "sdk/python/README.md:6-29",
+      "sdk/python/src/openai_codex/_run.py:103-135",
+      "sdk/python/src/openai_codex/async_client.py:93-103"
+    ],
+    "tag": "rust-v0.162.1"
+  },
+  "worker": "openai-codex-python-sdk"
+}
