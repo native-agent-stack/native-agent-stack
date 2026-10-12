@@ -1,0 +1,257 @@
+{
+  "schema_version": 1,
+  "rule_version": "angle-convergence/2",
+  "catalog": "foundation",
+  "weights": {
+    "A1": 0.2,
+    "A2": 0.2,
+    "A3": 0.15,
+    "A4": 0.15,
+    "A5": 0.2,
+    "A6": 0.1
+  },
+  "weights_stated_at": "2026-10-12T21:32:22Z",
+  "weight_reason": "V2 defaults stated before fresh source verification; all-unpublished layers transfer A5 to A6 by the fixed v2 rule.",
+  "disclosure": "V2 was adopted after the runtime v1 scores were visible. V1 verdicts remain in candidate history and the public source receipt retains their sign matrix. Current scores use fresh primary-source reads; the stated-before-scoring time applies to this re-verification, not the original v1 scores. Installs and smokes are A1; none is counted as comparative A6.",
+  "resolution_inputs": [
+    "catalogs/landscape/foundation.json",
+    "catalogs/sota-convergence/layer-verdict-waves.json",
+    "catalogs/sota-convergence/layer-verdicts-20260922.json",
+    "catalogs/saturation/ledger.json",
+    "catalogs/sota-convergence/manifest-20260929.json",
+    "evidence/artifacts/landscape-sweep-20260929/returns.json"
+  ],
+  "final_evidence": [],
+  "layer_id": "agent-sdks",
+  "published_evaluations_available": null,
+  "gaps": [
+    "No comparative A6 receipt has been published for these candidates.",
+    "The API Scorecard snapshots, where available, assess their own upstream commit, which can differ from the A1 capability pin.",
+    "Release and five-run CI snapshots are bounded observations; missing Scorecard results remain a coverage gap.",
+    "This initial record does not adjudicate cumulative survivors or supply FINAL E2E and invoke receipts.",
+    "Published evaluation availability is not fully verified for this layer. Unknown is not none: default A5 weight remains until absence is established.",
+    "Cumulative unresolved survivors github.com/agentproto/ts and github.com/github/copilot-sdk from landscape-sweep-20260929 remain unresolved."
+  ],
+  "candidates": [
+    {
+      "id": "deep-agents",
+      "name": "Deep Agents Code",
+      "repository": "https://github.com/langchain-ai/deepagents",
+      "pin": "a7f97e4d529db5566a0d187ee86b8996bd45ff98",
+      "role": "coding runtime (dual-wire, via native ACP)",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "mirror_status": "MIRRORED",
+      "adoption_status": "COMPARISON_ARM",
+      "confounds": [
+        "Capability source review is separate from native lifecycle qualification and route entitlement.",
+        "Published usage and evaluation rows cover different dates, upstream versions, provider routes and models; no causal harness ranking is inferred."
+      ],
+      "angles": {
+        "A1": {
+          "score": "+",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/langchain-ai/deepagents",
+              "pin": "a7f97e4d529db5566a0d187ee86b8996bd45ff98",
+              "path": "README.md",
+              "line": 12
+            }
+          ],
+          "note": "Pinned upstream capability documentation was re-read. The full six-requirement screen at this refreshed pin remains pending; README capability evidence alone does not complete it. Prior install and smoke observations are classified as A1; no private runtime receipt is published here."
+        },
+        "A2": {
+          "score": "0",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.scorecard.dev/projects/github.com/langchain-ai/deepagents",
+              "read_at": "2026-10-12T21:42:30Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://api.github.com/repos/langchain-ai/deepagents/releases/latest",
+              "read_at": "2026-10-12T21:42:31Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://api.github.com/repos/langchain-ai/deepagents/actions/runs?per_page=5",
+              "read_at": "2026-10-12T21:42:31Z"
+            }
+          ],
+          "note": "Public Scorecard HTTP 404; release {\"tag_name\":\"deepagents==0.7.24\",\"published_at\":\"2026-10-12T04:46:40Z\",\"prerelease\":false,\"draft\":false}; latest five CI conclusions [\"success\",\"success\",\"success\",\"success\",\"skipped\"]. Quality is scored mixed: release/CI evidence is bounded and security Scorecard coverage can be missing or at another commit. Raw scored fields and API times are retained in the public source receipt."
+        },
+        "A3": {
+          "score": "0",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.deps.dev/v3/projects/github.com%2Flangchain-ai%2Fdeepagents",
+              "read_at": "2026-10-12T21:42:31Z"
+            }
+          ],
+          "note": "deps.dev project snapshot: {\"projectKey\":{\"id\":\"github.com/langchain-ai/deepagents\"},\"starsCount\":30008,\"forksCount\":4212}. Mixed/limited community evidence; one star/fork snapshot is not an adverse capability finding."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://openrouter.ai/apps",
+              "read_at": "2026-10-12T21:41:48Z"
+            }
+          ],
+          "note": "No registry-specific download row was verified for this candidate. The official OpenRouter app page was read; absence is not zero usage."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://www.tbench.ai/leaderboard",
+              "read_at": "2026-10-12T21:44:03Z"
+            }
+          ],
+          "note": "No matching published Terminal-Bench row verified in this page's data. Prior leaderboard assertions are not transcribed without their row; this is a gap."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [],
+          "note": "No comparative measured run with a retained public receipt. Every v1 install/smoke score is removed from A6, including successful smokes and route failures; any published sanitized smoke belongs to A1."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "Complete the role-specific pin screen and missing angle sources, then run the preregistered comparison if the sourced angles disagree.",
+      "previous_verdict": "INSUFFICIENT",
+      "licence_note": {
+        "spdx_id": "MIT",
+        "source": {
+          "kind": "url",
+          "url": "https://api.deps.dev/v3/projects/github.com%2Flangchain-ai%2Fdeepagents",
+          "read_at": "2026-10-12T21:42:31Z"
+        },
+        "read_at": "2026-10-12T21:42:31Z",
+        "note": "Compliance metadata reported by deps.dev at this read, not a pin-level legal conclusion. It has no effect on scores, verdict or comparison-arm selection."
+      }
+    },
+    {
+      "id": "strands",
+      "name": "Strands CLI",
+      "repository": "https://github.com/strands-agents/harness-sdk",
+      "pin": "38afb968e1f40aa47546ead09a22ec031bd345de",
+      "role": "coding runtime (dual-wire, via native ACP)",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "mirror_status": "MIRRORED",
+      "adoption_status": "COMPARISON_ARM",
+      "confounds": [
+        "Capability source review is separate from native lifecycle qualification and route entitlement.",
+        "Published usage and evaluation rows cover different dates, upstream versions, provider routes and models; no causal harness ranking is inferred."
+      ],
+      "angles": {
+        "A1": {
+          "score": "+",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/strands-agents/harness-sdk",
+              "pin": "38afb968e1f40aa47546ead09a22ec031bd345de",
+              "path": "README.md",
+              "line": 12
+            }
+          ],
+          "note": "Pinned upstream capability documentation was re-read. The full six-requirement screen at this refreshed pin remains pending; README capability evidence alone does not complete it. Prior install and smoke observations are classified as A1; no private runtime receipt is published here."
+        },
+        "A2": {
+          "score": "0",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.scorecard.dev/projects/github.com/strands-agents/harness-sdk",
+              "read_at": "2026-10-12T21:42:31Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://api.github.com/repos/strands-agents/harness-sdk/releases/latest",
+              "read_at": "2026-10-12T21:42:31Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://api.github.com/repos/strands-agents/harness-sdk/actions/runs?per_page=5",
+              "read_at": "2026-10-12T21:42:31Z"
+            }
+          ],
+          "note": "Public Scorecard HTTP 404; release {\"tag_name\":\"python/v1.60.0\",\"published_at\":\"2026-10-12T19:37:14Z\",\"prerelease\":false,\"draft\":false}; latest five CI conclusions [\"skipped\",\"success\",\"success\",\"success\",\"failure\"]. Quality is scored mixed: release/CI evidence is bounded and security Scorecard coverage can be missing or at another commit. Raw scored fields and API times are retained in the public source receipt."
+        },
+        "A3": {
+          "score": "0",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.deps.dev/v3/projects/github.com%2Fstrands-agents%2Fharness-sdk",
+              "read_at": "2026-10-12T21:42:31Z"
+            }
+          ],
+          "note": "deps.dev project snapshot: {\"projectKey\":{\"id\":\"github.com/strands-agents/harness-sdk\"},\"starsCount\":8751,\"forksCount\":1346}. Mixed/limited community evidence; one star/fork snapshot is not an adverse capability finding."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://openrouter.ai/apps",
+              "read_at": "2026-10-12T21:41:48Z"
+            }
+          ],
+          "note": "No registry-specific download row was verified for this candidate. The official OpenRouter app page was read; absence is not zero usage."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://www.tbench.ai/leaderboard",
+              "read_at": "2026-10-12T21:44:03Z"
+            }
+          ],
+          "note": "No matching published Terminal-Bench row verified in this page's data. Prior leaderboard assertions are not transcribed without their row; this is a gap."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [],
+          "note": "No comparative measured run with a retained public receipt. Every v1 install/smoke score is removed from A6, including successful smokes and route failures; any published sanitized smoke belongs to A1."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "Complete the role-specific pin screen and missing angle sources, then run the preregistered comparison if the sourced angles disagree.",
+      "previous_verdict": "INSUFFICIENT",
+      "licence_note": {
+        "spdx_id": "Apache-2.0",
+        "source": {
+          "kind": "url",
+          "url": "https://api.deps.dev/v3/projects/github.com%2Fstrands-agents%2Fharness-sdk",
+          "read_at": "2026-10-12T21:42:31Z"
+        },
+        "read_at": "2026-10-12T21:42:31Z",
+        "note": "Compliance metadata reported by deps.dev at this read, not a pin-level legal conclusion. It has no effect on scores, verdict or comparison-arm selection."
+      }
+    }
+  ]
+}

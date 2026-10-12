@@ -1,0 +1,321 @@
+{
+  "schema_version": 1,
+  "evidence_class": "source_review",
+  "assessed_at": "2026-10-12T21:53:41Z",
+  "reads": [
+    {
+      "url": "https://artificialanalysis.ai/models/muse-wonder",
+      "read_at": "2026-10-12T21:53:40Z",
+      "http_status": 200,
+      "document_terms_present": [
+        "max",
+        "Max",
+        "52"
+      ],
+      "readable_text": true
+    },
+    {
+      "url": "https://code.claude.com/docs/en/legal-and-compliance",
+      "read_at": "2026-10-12T21:53:40Z",
+      "http_status": 200,
+      "document_terms_present": [
+        "max",
+        "Responses",
+        "gateway",
+        "subscription",
+        "Consumer Terms",
+        "Max",
+        "Claude Code"
+      ],
+      "readable_text": true
+    },
+    {
+      "url": "https://code.claude.com/docs/en/model-config",
+      "read_at": "2026-10-12T21:53:40Z",
+      "http_status": 200,
+      "document_terms_present": [
+        "claude-opus-5-5",
+        "claude-haiku-5-5",
+        "max",
+        "Responses",
+        "gateway",
+        "subscription",
+        "Consumer Terms",
+        "Max",
+        "52",
+        "Claude Code"
+      ],
+      "readable_text": true
+    },
+    {
+      "url": "https://dev.meta.ai/docs/coding-agents",
+      "read_at": "2026-10-12T21:53:40Z",
+      "http_status": 200,
+      "document_terms_present": [
+        "muse-wonder-1.0",
+        "muse-spark-1.3",
+        "max",
+        "Responses",
+        "subscription",
+        "Max",
+        "Claude Code",
+        "Codex"
+      ],
+      "readable_text": true
+    },
+    {
+      "url": "https://dev.meta.ai/docs/models",
+      "read_at": "2026-10-12T21:53:40Z",
+      "http_status": 200,
+      "document_terms_present": [
+        "muse-wonder-1.0",
+        "muse-spark-1.3",
+        "Muse Wonder Full",
+        "Power Usage",
+        "max",
+        "Responses",
+        "subscription",
+        "Max"
+      ],
+      "readable_text": true
+    },
+    {
+      "url": "https://dev.meta.ai/docs/muse-code/configuration",
+      "read_at": "2026-10-12T21:53:40Z",
+      "http_status": 200,
+      "document_terms_present": [
+        "max",
+        "Responses",
+        "subscription",
+        "Max"
+      ],
+      "readable_text": true
+    },
+    {
+      "url": "https://dev.meta.ai/docs/muse-code/subscriptions",
+      "read_at": "2026-10-12T21:53:40Z",
+      "http_status": 200,
+      "document_terms_present": [
+        "Muse Wonder Full",
+        "Power Usage",
+        "max",
+        "Responses",
+        "subscription",
+        "Max"
+      ],
+      "readable_text": true
+    },
+    {
+      "url": "https://dev.meta.ai/docs/reasoning",
+      "read_at": "2026-10-12T21:53:40Z",
+      "http_status": 200,
+      "document_terms_present": [
+        "muse-wonder-1.0",
+        "muse-spark-1.3",
+        "Muse Wonder Full",
+        "max",
+        "Responses",
+        "subscription",
+        "Max"
+      ],
+      "readable_text": true
+    },
+    {
+      "url": "https://dev.meta.ai/legal/terms-of-service",
+      "read_at": "2026-10-12T21:53:40Z",
+      "http_status": 200,
+      "document_terms_present": [
+        "max",
+        "Responses",
+        "gateway",
+        "subscription",
+        "Max",
+        "only with the coding harness"
+      ],
+      "readable_text": true
+    },
+    {
+      "url": "https://developers.openai.com/api/docs/models/gpt-6-astra",
+      "read_at": "2026-10-12T21:53:40Z",
+      "http_status": 200,
+      "document_terms_present": [
+        "gpt-6-astra",
+        "max",
+        "Responses",
+        "gateway",
+        "Max",
+        "Claude Code",
+        "Codex"
+      ],
+      "readable_text": true
+    },
+    {
+      "url": "https://developers.openai.com/api/docs/models/gpt-6-luna",
+      "read_at": "2026-10-12T21:53:40Z",
+      "http_status": 200,
+      "document_terms_present": [
+        "gpt-6-luna",
+        "max",
+        "Responses",
+        "gateway",
+        "Max",
+        "Claude Code",
+        "Codex"
+      ],
+      "readable_text": true
+    },
+    {
+      "url": "https://developers.openai.com/api/docs/models/gpt-6.1-sol",
+      "read_at": "2026-10-12T21:53:40Z",
+      "http_status": 200,
+      "document_terms_present": [
+        "gpt-6.1-sol",
+        "max",
+        "Responses",
+        "gateway",
+        "Max",
+        "Claude Code",
+        "Codex"
+      ],
+      "readable_text": true
+    },
+    {
+      "url": "https://developers.openai.com/codex/auth",
+      "read_at": "2026-10-12T21:53:40Z",
+      "http_status": 200,
+      "document_terms_present": [
+        "Responses",
+        "gateway",
+        "subscription",
+        "Claude Code",
+        "Codex"
+      ],
+      "readable_text": true
+    },
+    {
+      "url": "https://developers.openai.com/codex/models",
+      "read_at": "2026-10-12T21:53:40Z",
+      "http_status": 200,
+      "document_terms_present": [
+        "gpt-6.1-sol",
+        "gpt-6-astra",
+        "gpt-6-luna",
+        "max",
+        "Responses",
+        "gateway",
+        "Max",
+        "Claude Code",
+        "Codex"
+      ],
+      "readable_text": true
+    },
+    {
+      "url": "https://learn.chatgpt.com/docs/enterprise/sign-in-with-chatgpt-through-a-gateway",
+      "read_at": "2026-10-12T21:53:40Z",
+      "http_status": 200,
+      "document_terms_present": [
+        "Responses",
+        "gateway",
+        "Claude Code",
+        "Codex"
+      ],
+      "readable_text": true
+    },
+    {
+      "url": "https://openai.com/policies/terms-of-use/",
+      "read_at": "2026-10-12T21:53:40Z",
+      "http_status": 200,
+      "document_terms_present": [
+        "max",
+        "subscription",
+        "Max",
+        "Codex"
+      ],
+      "readable_text": true
+    },
+    {
+      "url": "https://platform.claude.com/docs/en/about-claude/models/overview",
+      "read_at": "2026-10-12T21:53:41Z",
+      "http_status": 200,
+      "document_terms_present": [
+        "claude-opus-5-5",
+        "claude-sonnet-5-5",
+        "claude-haiku-5-5",
+        "max",
+        "Responses",
+        "Max"
+      ],
+      "readable_text": true
+    },
+    {
+      "url": "https://support.claude.com/en/articles/11145838-using-claude-code-with-your-pro-or-max-plan",
+      "read_at": "2026-10-12T21:53:41Z",
+      "http_status": 200,
+      "document_terms_present": [
+        "max",
+        "subscription",
+        "Consumer Terms",
+        "Max",
+        "Claude Code"
+      ],
+      "readable_text": true
+    },
+    {
+      "url": "https://www.anthropic.com/legal/consumer-terms",
+      "read_at": "2026-10-12T21:53:41Z",
+      "http_status": 200,
+      "document_terms_present": [
+        "Responses",
+        "subscription",
+        "Consumer Terms",
+        "Claude Code"
+      ],
+      "readable_text": true
+    },
+    {
+      "url": "https://www.tbench.ai/leaderboard",
+      "read_at": "2026-10-12T21:53:41Z",
+      "http_status": 200,
+      "document_terms_present": [],
+      "readable_text": true
+    }
+  ],
+  "claims": [
+    {
+      "claim": "The three GPT model identifiers and supported Codex subscription mechanism are vendor-documented. Specific gateway/pool entitlement remains unverified.",
+      "sources": [
+        "https://developers.openai.com/codex/models",
+        "https://developers.openai.com/codex/auth",
+        "https://learn.chatgpt.com/docs/enterprise/sign-in-with-chatgpt-through-a-gateway",
+        "https://openai.com/policies/terms-of-use/"
+      ]
+    },
+    {
+      "claim": "Claude Code Pro/Max native access, applicable Consumer Terms and exact current Claude model identifiers are vendor-documented.",
+      "sources": [
+        "https://support.claude.com/en/articles/11145838-using-claude-code-with-your-pro-or-max-plan",
+        "https://www.anthropic.com/legal/consumer-terms",
+        "https://platform.claude.com/docs/en/about-claude/models/overview"
+      ]
+    },
+    {
+      "claim": "Muse Wonder Full is a Muse Code subscription variant; Model API max on muse-wonder-1.0 does not select it. Meta Terms section 3.2 forbids using the coding-harness subscription credential outside the coding harness.",
+      "sources": [
+        "https://dev.meta.ai/docs/models",
+        "https://dev.meta.ai/docs/muse-code/subscriptions",
+        "https://dev.meta.ai/legal/terms-of-service"
+      ]
+    },
+    {
+      "claim": "Artificial Analysis's published Muse Wonder (Max) Intelligence Index is 52; this row does not certify the Muse Wonder Full subscription variant.",
+      "sources": [
+        "https://artificialanalysis.ai/models/muse-wonder"
+      ]
+    }
+  ],
+  "limitations": [
+    "Vendor-document terms presence is a source-review locator, not a metric or proof of account eligibility.",
+    "No credential was read and no model request or comparative run was made.",
+    "The separate Facebook subscription-terms page returned a dynamic shell without readable terms; no payload is retained or scored."
+  ]
+}

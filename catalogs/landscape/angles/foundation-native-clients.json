@@ -1,0 +1,2021 @@
+{
+  "schema_version": 1,
+  "rule_version": "angle-convergence/2",
+  "catalog": "foundation",
+  "weights": {
+    "A1": 0.2,
+    "A2": 0.2,
+    "A3": 0.15,
+    "A4": 0.15,
+    "A5": 0.2,
+    "A6": 0.1
+  },
+  "weights_stated_at": "2026-10-12T21:32:22Z",
+  "weight_reason": "V2 defaults stated before fresh source verification; all-unpublished layers transfer A5 to A6 by the fixed v2 rule.",
+  "disclosure": "V2 was adopted after the runtime v1 scores were visible. V1 verdicts remain in candidate history and the public source receipt retains their sign matrix. Current scores use fresh primary-source reads; the stated-before-scoring time applies to this re-verification, not the original v1 scores. Installs and smokes are A1; none is counted as comparative A6.",
+  "resolution_inputs": [
+    "catalogs/landscape/foundation.json",
+    "catalogs/sota-convergence/layer-verdict-waves.json",
+    "catalogs/sota-convergence/layer-verdicts-20260922.json",
+    "catalogs/saturation/ledger.json",
+    "catalogs/sota-convergence/manifest-20260929.json",
+    "evidence/artifacts/landscape-sweep-20260929/returns.json"
+  ],
+  "final_evidence": [],
+  "layer_id": "native-clients",
+  "published_evaluations_available": true,
+  "gaps": [
+    "No comparative A6 receipt has been published for these candidates.",
+    "The API Scorecard snapshots, where available, assess their own upstream commit, which can differ from the A1 capability pin.",
+    "Release and five-run CI snapshots are bounded observations; missing Scorecard results remain a coverage gap.",
+    "This initial record does not adjudicate cumulative survivors or supply FINAL E2E and invoke receipts.",
+    "Claude Code and Codex have source-based convergence candidates; FINAL remains blocked by unbound E2E/invoke receipts and exact winner/run/angle pin alignment."
+  ],
+  "candidates": [
+    {
+      "id": "claude-code",
+      "name": "Claude Code",
+      "repository": "https://github.com/anthropics/claude-code",
+      "pin": "3deb873687379f0c199a69fdaccc65f0865f7a29",
+      "role": "Claude-route incumbent native client",
+      "a1_screened": true,
+      "a6_comparative": false,
+      "mirror_status": "MIRRORED",
+      "adoption_status": "CURRENT",
+      "confounds": [
+        "Capability source review is separate from native lifecycle qualification and route entitlement.",
+        "Published usage and evaluation rows cover different dates, upstream versions, provider routes and models; no causal harness ranking is inferred."
+      ],
+      "angles": {
+        "A1": {
+          "score": "+",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/anthropics/claude-code",
+              "pin": "3deb873687379f0c199a69fdaccc65f0865f7a29",
+              "path": "README.md",
+              "line": 22
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/anthropics/claude-code",
+              "pin": "3deb873687379f0c199a69fdaccc65f0865f7a29",
+              "path": "README.md",
+              "line": 3
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/anthropics/claude-code",
+              "pin": "3deb873687379f0c199a69fdaccc65f0865f7a29",
+              "path": "CHANGELOG.md",
+              "line": 9
+            }
+          ],
+          "note": "Pinned upstream capability documentation was re-read. The screen is limited to the stated native-client, role-2 worker or bash-control role. Prior install and smoke observations are classified as A1; no private runtime receipt is published here."
+        },
+        "A2": {
+          "score": "0",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.scorecard.dev/projects/github.com/anthropics/claude-code",
+              "read_at": "2026-10-12T21:42:29Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://api.github.com/repos/anthropics/claude-code/releases/latest",
+              "read_at": "2026-10-12T21:42:29Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://api.github.com/repos/anthropics/claude-code/actions/runs?per_page=5",
+              "read_at": "2026-10-12T21:42:30Z"
+            }
+          ],
+          "note": "Public Scorecard HTTP 404; release {\"tag_name\":\"v2.1.296\",\"published_at\":\"2026-10-09T19:28:59Z\",\"prerelease\":false,\"draft\":false}; latest five CI conclusions [\"success\",\"skipped\",null,\"success\",null]. Quality is scored mixed: release/CI evidence is bounded and security Scorecard coverage can be missing or at another commit. Raw scored fields and API times are retained in the public source receipt."
+        },
+        "A3": {
+          "score": "+",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.deps.dev/v3/projects/github.com%2Fanthropics%2Fclaude-code",
+              "read_at": "2026-10-12T21:42:29Z"
+            }
+          ],
+          "note": "deps.dev project snapshot: {\"projectKey\":{\"id\":\"github.com/anthropics/claude-code\"},\"starsCount\":150194,\"forksCount\":26206}. Positive community-scale proxy, with no verified star trajectory or independent adopter consensus."
+        },
+        "A4": {
+          "score": "+",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.npmjs.org/downloads/point/last-week/%40anthropic-ai%2Fclaude-code",
+              "read_at": "2026-10-12T21:44:02Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://openrouter.ai/apps",
+              "read_at": "2026-10-12T21:41:48Z"
+            }
+          ],
+          "note": "npm's published last-week fields: {\"downloads\":12502712,\"start\":\"2026-10-05\",\"end\":\"2026-10-11\",\"package\":\"@anthropic-ai/claude-code\"}. OpenRouter app rankings are opt-in traffic; package downloads include CI and non-agent use. These are different populations, not a measured share of all usage."
+        },
+        "A5": {
+          "score": "+",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://www.tbench.ai/leaderboard",
+              "read_at": "2026-10-12T21:44:03Z"
+            }
+          ],
+          "note": "Published Terminal-Bench row: {\"agent\":\"Claude Code\",\"model\":\"Opus 5.5\",\"effort\":\"max\",\"accuracy\":64.85,\"date\":\"2026-09-22\"}. Positive published outcome evidence; agent/model/version and submitter confounds prevent attributing a model gap to the harness."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [],
+          "note": "No comparative measured run with a retained public receipt. Every v1 install/smoke score is removed from A6, including successful smokes and route failures; any published sanitized smoke belongs to A1."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "CONVERGED",
+      "provisional": true,
+      "measure_next": null,
+      "previous_verdict": "CONVERGED",
+      "licence_note": {
+        "spdx_id": null,
+        "source": {
+          "kind": "url",
+          "url": "https://api.deps.dev/v3/projects/github.com%2Fanthropics%2Fclaude-code",
+          "read_at": "2026-10-12T21:42:29Z"
+        },
+        "read_at": "2026-10-12T21:42:29Z",
+        "note": "Compliance metadata reported by deps.dev at this read, not a pin-level legal conclusion. It has no effect on scores, verdict or comparison-arm selection."
+      }
+    },
+    {
+      "id": "codex-cli",
+      "name": "Codex CLI",
+      "repository": "https://github.com/openai/codex",
+      "pin": "092d3acd6bec3e3a14bdc7e7a2810ab628ab759d",
+      "role": "GPT-route incumbent native client",
+      "a1_screened": true,
+      "a6_comparative": false,
+      "mirror_status": "MIRRORED",
+      "adoption_status": "CURRENT",
+      "confounds": [
+        "Capability source review is separate from native lifecycle qualification and route entitlement.",
+        "Published usage and evaluation rows cover different dates, upstream versions, provider routes and models; no causal harness ranking is inferred."
+      ],
+      "angles": {
+        "A1": {
+          "score": "+",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/openai/codex",
+              "pin": "092d3acd6bec3e3a14bdc7e7a2810ab628ab759d",
+              "path": "README.md",
+              "line": 1
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/openai/codex",
+              "pin": "092d3acd6bec3e3a14bdc7e7a2810ab628ab759d",
+              "path": "codex-rs/model-provider-info/src/lib.rs",
+              "line": 41
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/openai/codex",
+              "pin": "092d3acd6bec3e3a14bdc7e7a2810ab628ab759d",
+              "path": "codex-rs/core/src/config/mod.rs",
+              "line": 7
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/openai/codex",
+              "pin": "092d3acd6bec3e3a14bdc7e7a2810ab628ab759d",
+              "path": "docs/getting-started.md",
+              "line": 3
+            }
+          ],
+          "note": "Pinned upstream capability documentation was re-read. The screen is limited to the stated native-client, role-2 worker or bash-control role. Prior install and smoke observations are classified as A1; no private runtime receipt is published here."
+        },
+        "A2": {
+          "score": "0",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.scorecard.dev/projects/github.com/openai/codex",
+              "read_at": "2026-10-12T21:42:29Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://api.github.com/repos/openai/codex/releases/latest",
+              "read_at": "2026-10-12T21:42:29Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://api.github.com/repos/openai/codex/actions/runs?per_page=5",
+              "read_at": "2026-10-12T21:42:30Z"
+            }
+          ],
+          "note": "Public Scorecard HTTP 200; release {\"tag_name\":\"rust-v0.162.1\",\"published_at\":\"2026-10-09T19:44:51Z\",\"prerelease\":false,\"draft\":false}; latest five CI conclusions [\"success\",\"success\",\"success\",\"success\",\"success\"]. Quality is scored mixed: release/CI evidence is bounded and security Scorecard coverage can be missing or at another commit. Raw scored fields and API times are retained in the public source receipt."
+        },
+        "A3": {
+          "score": "+",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.deps.dev/v3/projects/github.com%2Fopenai%2Fcodex",
+              "read_at": "2026-10-12T21:42:29Z"
+            }
+          ],
+          "note": "deps.dev project snapshot: {\"projectKey\":{\"id\":\"github.com/openai/codex\"},\"starsCount\":128197,\"forksCount\":20113}. Positive community-scale proxy, with no verified star trajectory or independent adopter consensus."
+        },
+        "A4": {
+          "score": "+",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.npmjs.org/downloads/point/last-week/%40openai%2Fcodex",
+              "read_at": "2026-10-12T21:44:02Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://openrouter.ai/apps",
+              "read_at": "2026-10-12T21:41:48Z"
+            }
+          ],
+          "note": "npm's published last-week fields: {\"downloads\":23862567,\"start\":\"2026-10-05\",\"end\":\"2026-10-11\",\"package\":\"@openai/codex\"}. OpenRouter app rankings are opt-in traffic; package downloads include CI and non-agent use. These are different populations, not a measured share of all usage."
+        },
+        "A5": {
+          "score": "+",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://www.tbench.ai/leaderboard",
+              "read_at": "2026-10-12T21:44:03Z"
+            }
+          ],
+          "note": "Published Terminal-Bench row: {\"agent\":\"Codex\",\"model\":\"GPT-6 Astra\",\"effort\":\"max\",\"accuracy\":58.18,\"date\":\"2026-09-03\"}. Positive published outcome evidence; agent/model/version and submitter confounds prevent attributing a model gap to the harness."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [],
+          "note": "No comparative measured run with a retained public receipt. Every v1 install/smoke score is removed from A6, including successful smokes and route failures; any published sanitized smoke belongs to A1."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "CONVERGED",
+      "provisional": true,
+      "measure_next": null,
+      "previous_verdict": "CONVERGED",
+      "licence_note": {
+        "spdx_id": "Apache-2.0",
+        "source": {
+          "kind": "url",
+          "url": "https://api.deps.dev/v3/projects/github.com%2Fopenai%2Fcodex",
+          "read_at": "2026-10-12T21:42:29Z"
+        },
+        "read_at": "2026-10-12T21:42:29Z",
+        "note": "Compliance metadata reported by deps.dev at this read, not a pin-level legal conclusion. It has no effect on scores, verdict or comparison-arm selection."
+      }
+    },
+    {
+      "id": "pi",
+      "name": "pi",
+      "repository": "https://github.com/earendil-works/pi",
+      "pin": "04566631c2b51fb688486bc1f040f60d1518c126",
+      "role": "coding runtime (dual-wire)",
+      "a1_screened": true,
+      "a6_comparative": false,
+      "mirror_status": "MIRRORED",
+      "adoption_status": "COMPARISON_ARM",
+      "confounds": [
+        "Capability source review is separate from native lifecycle qualification and route entitlement.",
+        "Published usage and evaluation rows cover different dates, upstream versions, provider routes and models; no causal harness ranking is inferred."
+      ],
+      "angles": {
+        "A1": {
+          "score": "+",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/earendil-works/pi",
+              "pin": "04566631c2b51fb688486bc1f040f60d1518c126",
+              "path": "README.md",
+              "line": 15
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/earendil-works/pi",
+              "pin": "04566631c2b51fb688486bc1f040f60d1518c126",
+              "path": "packages/coding-agent/README.md",
+              "line": 17
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/earendil-works/pi",
+              "pin": "04566631c2b51fb688486bc1f040f60d1518c126",
+              "path": "packages/coding-agent/docs/custom-provider.md",
+              "line": 1
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/earendil-works/pi",
+              "pin": "04566631c2b51fb688486bc1f040f60d1518c126",
+              "path": "packages/coding-agent/docs/rpc.md",
+              "line": 1
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/earendil-works/pi",
+              "pin": "04566631c2b51fb688486bc1f040f60d1518c126",
+              "path": "packages/coding-agent/docs/extensions.md",
+              "line": 3
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/earendil-works/pi",
+              "pin": "04566631c2b51fb688486bc1f040f60d1518c126",
+              "path": "packages/coding-agent/docs/settings.md",
+              "line": 18
+            }
+          ],
+          "note": "Pinned upstream capability documentation was re-read. The screen is limited to the stated native-client, role-2 worker or bash-control role. Prior install and smoke observations are classified as A1; no private runtime receipt is published here."
+        },
+        "A2": {
+          "score": "0",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.scorecard.dev/projects/github.com/earendil-works/pi",
+              "read_at": "2026-10-12T21:42:29Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://api.github.com/repos/earendil-works/pi/releases/latest",
+              "read_at": "2026-10-12T21:42:29Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://api.github.com/repos/earendil-works/pi/actions/runs?per_page=5",
+              "read_at": "2026-10-12T21:42:30Z"
+            }
+          ],
+          "note": "Public Scorecard HTTP 404; release {\"tag_name\":\"v1.1.0\",\"published_at\":\"2026-10-07T22:26:31Z\",\"prerelease\":false,\"draft\":false}; latest five CI conclusions [\"success\",\"success\",\"success\",\"success\",\"success\"]. Quality is scored mixed: release/CI evidence is bounded and security Scorecard coverage can be missing or at another commit. Raw scored fields and API times are retained in the public source receipt."
+        },
+        "A3": {
+          "score": "+",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.deps.dev/v3/projects/github.com%2Fearendil-works%2Fpi",
+              "read_at": "2026-10-12T21:42:29Z"
+            }
+          ],
+          "note": "deps.dev project snapshot: {\"projectKey\":{\"id\":\"github.com/earendil-works/pi\"},\"starsCount\":112900,\"forksCount\":14338}. Positive community-scale proxy, with no verified star trajectory or independent adopter consensus."
+        },
+        "A4": {
+          "score": "+",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.npmjs.org/downloads/point/last-week/%40earendil-works%2Fpi-coding-agent",
+              "read_at": "2026-10-12T21:44:02Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://openrouter.ai/apps",
+              "read_at": "2026-10-12T21:41:48Z"
+            }
+          ],
+          "note": "npm's published last-week fields: {\"downloads\":4156854,\"start\":\"2026-10-05\",\"end\":\"2026-10-11\",\"package\":\"@earendil-works/pi-coding-agent\"}. OpenRouter app rankings are opt-in traffic; package downloads include CI and non-agent use. These are different populations, not a measured share of all usage."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://www.tbench.ai/leaderboard",
+              "read_at": "2026-10-12T21:44:03Z"
+            }
+          ],
+          "note": "No matching published Terminal-Bench row verified in this page's data. Prior leaderboard assertions are not transcribed without their row; this is a gap."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [],
+          "note": "No comparative measured run with a retained public receipt. Every v1 install/smoke score is removed from A6, including successful smokes and route failures; any published sanitized smoke belongs to A1."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "Complete the role-specific pin screen and missing angle sources, then run the preregistered comparison if the sourced angles disagree.",
+      "previous_verdict": "CONVERGED",
+      "licence_note": {
+        "spdx_id": "MIT",
+        "source": {
+          "kind": "url",
+          "url": "https://api.deps.dev/v3/projects/github.com%2Fearendil-works%2Fpi",
+          "read_at": "2026-10-12T21:42:29Z"
+        },
+        "read_at": "2026-10-12T21:42:29Z",
+        "note": "Compliance metadata reported by deps.dev at this read, not a pin-level legal conclusion. It has no effect on scores, verdict or comparison-arm selection."
+      }
+    },
+    {
+      "id": "oh-my-pi",
+      "name": "oh-my-pi (omp)",
+      "repository": "https://github.com/can1357/oh-my-pi",
+      "pin": "5d0aaffaf1f987503ce129a642fb6e30339615af",
+      "role": "coding runtime (dual-wire)",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "mirror_status": "MIRRORED",
+      "adoption_status": "COMPARISON_ARM",
+      "confounds": [
+        "Capability source review is separate from native lifecycle qualification and route entitlement.",
+        "Published usage and evaluation rows cover different dates, upstream versions, provider routes and models; no causal harness ranking is inferred."
+      ],
+      "angles": {
+        "A1": {
+          "score": "+",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/can1357/oh-my-pi",
+              "pin": "5d0aaffaf1f987503ce129a642fb6e30339615af",
+              "path": "README.md",
+              "line": 6
+            }
+          ],
+          "note": "Pinned upstream capability documentation was re-read. The full six-requirement screen at this refreshed pin remains pending; README capability evidence alone does not complete it. Prior install and smoke observations are classified as A1; no private runtime receipt is published here."
+        },
+        "A2": {
+          "score": "0",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.scorecard.dev/projects/github.com/can1357/oh-my-pi",
+              "read_at": "2026-10-12T21:42:29Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://api.github.com/repos/can1357/oh-my-pi/releases/latest",
+              "read_at": "2026-10-12T21:42:29Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://api.github.com/repos/can1357/oh-my-pi/actions/runs?per_page=5",
+              "read_at": "2026-10-12T21:42:30Z"
+            }
+          ],
+          "note": "Public Scorecard HTTP 404; release {\"tag_name\":\"v18.10.3\",\"published_at\":\"2026-10-12T19:23:53Z\",\"prerelease\":false,\"draft\":false}; latest five CI conclusions [\"action_required\",\"action_required\",\"action_required\",\"action_required\",\"action_required\"]. Quality is scored mixed: release/CI evidence is bounded and security Scorecard coverage can be missing or at another commit. Raw scored fields and API times are retained in the public source receipt."
+        },
+        "A3": {
+          "score": "0",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.deps.dev/v3/projects/github.com%2Fcan1357%2Foh-my-pi",
+              "read_at": "2026-10-12T21:42:29Z"
+            }
+          ],
+          "note": "deps.dev project snapshot: {\"projectKey\":{\"id\":\"github.com/can1357/oh-my-pi\"},\"starsCount\":34459,\"forksCount\":3731}. Mixed/limited community evidence; one star/fork snapshot is not an adverse capability finding."
+        },
+        "A4": {
+          "score": "+",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.npmjs.org/downloads/point/last-week/%40oh-my-pi%2Fpi-coding-agent",
+              "read_at": "2026-10-12T21:44:02Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://openrouter.ai/apps",
+              "read_at": "2026-10-12T21:41:48Z"
+            }
+          ],
+          "note": "npm's published last-week fields: {\"downloads\":196149,\"start\":\"2026-10-05\",\"end\":\"2026-10-11\",\"package\":\"@oh-my-pi/pi-coding-agent\"}. OpenRouter app rankings are opt-in traffic; package downloads include CI and non-agent use. These are different populations, not a measured share of all usage."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://www.tbench.ai/leaderboard",
+              "read_at": "2026-10-12T21:44:03Z"
+            }
+          ],
+          "note": "No matching published Terminal-Bench row verified in this page's data. Prior leaderboard assertions are not transcribed without their row; this is a gap."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [],
+          "note": "No comparative measured run with a retained public receipt. Every v1 install/smoke score is removed from A6, including successful smokes and route failures; any published sanitized smoke belongs to A1."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "Complete the role-specific pin screen and missing angle sources, then run the preregistered comparison if the sourced angles disagree.",
+      "previous_verdict": "INSUFFICIENT",
+      "licence_note": {
+        "spdx_id": "MIT",
+        "source": {
+          "kind": "url",
+          "url": "https://api.deps.dev/v3/projects/github.com%2Fcan1357%2Foh-my-pi",
+          "read_at": "2026-10-12T21:42:29Z"
+        },
+        "read_at": "2026-10-12T21:42:29Z",
+        "note": "Compliance metadata reported by deps.dev at this read, not a pin-level legal conclusion. It has no effect on scores, verdict or comparison-arm selection."
+      }
+    },
+    {
+      "id": "opencode-1x",
+      "name": "OpenCode 1.x",
+      "repository": "https://github.com/anomalyco/opencode",
+      "pin": "a34961825be13a31daa76f33a8b47efcd198cfef",
+      "role": "coding runtime (dual-wire)",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "mirror_status": "MIRRORED",
+      "adoption_status": "COMPARISON_ARM",
+      "confounds": [
+        "Capability source review is separate from native lifecycle qualification and route entitlement.",
+        "Published usage and evaluation rows cover different dates, upstream versions, provider routes and models; no causal harness ranking is inferred."
+      ],
+      "angles": {
+        "A1": {
+          "score": "+",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/anomalyco/opencode",
+              "pin": "a34961825be13a31daa76f33a8b47efcd198cfef",
+              "path": "README.md",
+              "line": 10
+            }
+          ],
+          "note": "Pinned upstream capability documentation was re-read. The full six-requirement screen at this refreshed pin remains pending; README capability evidence alone does not complete it. Prior install and smoke observations are classified as A1; no private runtime receipt is published here."
+        },
+        "A2": {
+          "score": "0",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.scorecard.dev/projects/github.com/anomalyco/opencode",
+              "read_at": "2026-10-12T21:42:29Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://api.github.com/repos/anomalyco/opencode/releases/latest",
+              "read_at": "2026-10-12T21:42:29Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://api.github.com/repos/anomalyco/opencode/actions/runs?per_page=5",
+              "read_at": "2026-10-12T21:42:30Z"
+            }
+          ],
+          "note": "Public Scorecard HTTP 404; release {\"tag_name\":\"v1.19.0\",\"published_at\":\"2026-10-11T01:39:22Z\",\"prerelease\":false,\"draft\":false}; latest five CI conclusions [\"success\",null,\"success\",\"success\",\"success\"]. Quality is scored mixed: release/CI evidence is bounded and security Scorecard coverage can be missing or at another commit. Raw scored fields and API times are retained in the public source receipt."
+        },
+        "A3": {
+          "score": "+",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.deps.dev/v3/projects/github.com%2Fanomalyco%2Fopencode",
+              "read_at": "2026-10-12T21:42:29Z"
+            }
+          ],
+          "note": "deps.dev project snapshot: {\"projectKey\":{\"id\":\"github.com/anomalyco/opencode\"},\"starsCount\":212164,\"forksCount\":28258}. Positive community-scale proxy, with no verified star trajectory or independent adopter consensus."
+        },
+        "A4": {
+          "score": "+",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.npmjs.org/downloads/point/last-week/opencode-ai",
+              "read_at": "2026-10-12T21:44:02Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://openrouter.ai/apps",
+              "read_at": "2026-10-12T21:41:48Z"
+            }
+          ],
+          "note": "npm's published last-week fields: {\"downloads\":2988524,\"start\":\"2026-10-05\",\"end\":\"2026-10-11\",\"package\":\"opencode-ai\"}. OpenRouter app rankings are opt-in traffic; package downloads include CI and non-agent use. These are different populations, not a measured share of all usage."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://www.tbench.ai/leaderboard",
+              "read_at": "2026-10-12T21:44:03Z"
+            }
+          ],
+          "note": "No matching published Terminal-Bench row verified in this page's data. Prior leaderboard assertions are not transcribed without their row; this is a gap."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [],
+          "note": "No comparative measured run with a retained public receipt. Every v1 install/smoke score is removed from A6, including successful smokes and route failures; any published sanitized smoke belongs to A1."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "Complete the role-specific pin screen and missing angle sources, then run the preregistered comparison if the sourced angles disagree.",
+      "previous_verdict": "INSUFFICIENT",
+      "licence_note": {
+        "spdx_id": "MIT",
+        "source": {
+          "kind": "url",
+          "url": "https://api.deps.dev/v3/projects/github.com%2Fanomalyco%2Fopencode",
+          "read_at": "2026-10-12T21:42:29Z"
+        },
+        "read_at": "2026-10-12T21:42:29Z",
+        "note": "Compliance metadata reported by deps.dev at this read, not a pin-level legal conclusion. It has no effect on scores, verdict or comparison-arm selection."
+      }
+    },
+    {
+      "id": "opencode-2x",
+      "name": "OpenCode 2.x",
+      "repository": "https://github.com/anomalyco/opencode",
+      "pin": "a34961825be13a31daa76f33a8b47efcd198cfef",
+      "role": "coding runtime (dual-wire)",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "mirror_status": "MIRRORED",
+      "adoption_status": "COMPARISON_ARM",
+      "confounds": [
+        "Capability source review is separate from native lifecycle qualification and route entitlement.",
+        "Published usage and evaluation rows cover different dates, upstream versions, provider routes and models; no causal harness ranking is inferred."
+      ],
+      "angles": {
+        "A1": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/anomalyco/opencode",
+              "pin": "a34961825be13a31daa76f33a8b47efcd198cfef",
+              "path": "README.md",
+              "line": 10
+            }
+          ],
+          "note": "A formal capability screen at an exact pin is pending. UNMIRRORED candidates retain that gap. OpenCode 2.x is not screened using the mirror's 1.x/HEAD row."
+        },
+        "A2": {
+          "score": "0",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.scorecard.dev/projects/github.com/anomalyco/opencode",
+              "read_at": "2026-10-12T21:42:30Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://api.github.com/repos/anomalyco/opencode/releases/latest",
+              "read_at": "2026-10-12T21:42:30Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://api.github.com/repos/anomalyco/opencode/actions/runs?per_page=5",
+              "read_at": "2026-10-12T21:42:30Z"
+            }
+          ],
+          "note": "Public Scorecard HTTP 404; release {\"tag_name\":\"v1.19.0\",\"published_at\":\"2026-10-11T01:39:22Z\",\"prerelease\":false,\"draft\":false}; latest five CI conclusions [\"success\",null,\"success\",\"success\",\"success\"]. Quality is scored mixed: release/CI evidence is bounded and security Scorecard coverage can be missing or at another commit. Raw scored fields and API times are retained in the public source receipt."
+        },
+        "A3": {
+          "score": "0",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.deps.dev/v3/projects/github.com%2Fanomalyco%2Fopencode",
+              "read_at": "2026-10-12T21:42:30Z"
+            }
+          ],
+          "note": "deps.dev project snapshot: {\"projectKey\":{\"id\":\"github.com/anomalyco/opencode\"},\"starsCount\":212164,\"forksCount\":28258}. Mixed/limited community evidence; one star/fork snapshot is not an adverse capability finding."
+        },
+        "A4": {
+          "score": "0",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.npmjs.org/downloads/point/last-week/%40opencode%2Fcli",
+              "read_at": "2026-10-12T21:44:02Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://openrouter.ai/apps",
+              "read_at": "2026-10-12T21:41:48Z"
+            }
+          ],
+          "note": "npm's published last-week fields: {\"downloads\":197075,\"start\":\"2026-10-05\",\"end\":\"2026-10-11\",\"package\":\"@opencode/cli\"}. OpenRouter app rankings are opt-in traffic; package downloads include CI and non-agent use. These are different populations, not a measured share of all usage."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://www.tbench.ai/leaderboard",
+              "read_at": "2026-10-12T21:44:03Z"
+            }
+          ],
+          "note": "No matching published Terminal-Bench row verified in this page's data. Prior leaderboard assertions are not transcribed without their row; this is a gap."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [],
+          "note": "No comparative measured run with a retained public receipt. Every v1 install/smoke score is removed from A6, including successful smokes and route failures; any published sanitized smoke belongs to A1."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "Complete the role-specific pin screen and missing angle sources, then run the preregistered comparison if the sourced angles disagree.",
+      "previous_verdict": "INSUFFICIENT",
+      "licence_note": {
+        "spdx_id": "MIT",
+        "source": {
+          "kind": "url",
+          "url": "https://api.deps.dev/v3/projects/github.com%2Fanomalyco%2Fopencode",
+          "read_at": "2026-10-12T21:42:30Z"
+        },
+        "read_at": "2026-10-12T21:42:30Z",
+        "note": "Compliance metadata reported by deps.dev at this read, not a pin-level legal conclusion. It has no effect on scores, verdict or comparison-arm selection."
+      }
+    },
+    {
+      "id": "goose",
+      "name": "goose",
+      "repository": "https://github.com/aaif-goose/goose",
+      "pin": "4617040c7b650b37d599bdaa08d3790572c19ae8",
+      "role": "coding runtime (dual-wire)",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "mirror_status": "MIRRORED",
+      "adoption_status": "COMPARISON_ARM",
+      "confounds": [
+        "Capability source review is separate from native lifecycle qualification and route entitlement.",
+        "Published usage and evaluation rows cover different dates, upstream versions, provider routes and models; no causal harness ranking is inferred."
+      ],
+      "angles": {
+        "A1": {
+          "score": "+",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/aaif-goose/goose",
+              "pin": "4617040c7b650b37d599bdaa08d3790572c19ae8",
+              "path": "README.md",
+              "line": 5
+            }
+          ],
+          "note": "Pinned upstream capability documentation was re-read. The full six-requirement screen at this refreshed pin remains pending; README capability evidence alone does not complete it. Prior install and smoke observations are classified as A1; no private runtime receipt is published here."
+        },
+        "A2": {
+          "score": "0",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.scorecard.dev/projects/github.com/aaif-goose/goose",
+              "read_at": "2026-10-12T21:42:30Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://api.github.com/repos/aaif-goose/goose/releases/latest",
+              "read_at": "2026-10-12T21:42:30Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://api.github.com/repos/aaif-goose/goose/actions/runs?per_page=5",
+              "read_at": "2026-10-12T21:42:30Z"
+            }
+          ],
+          "note": "Public Scorecard HTTP 200; release {\"tag_name\":\"v1.54.0\",\"published_at\":\"2026-10-08T18:44:54Z\",\"prerelease\":false,\"draft\":false}; latest five CI conclusions [\"failure\",\"success\",\"skipped\",\"skipped\",\"skipped\"]. Quality is scored mixed: release/CI evidence is bounded and security Scorecard coverage can be missing or at another commit. Raw scored fields and API times are retained in the public source receipt."
+        },
+        "A3": {
+          "score": "0",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.deps.dev/v3/projects/github.com%2Faaif-goose%2Fgoose",
+              "read_at": "2026-10-12T21:42:30Z"
+            }
+          ],
+          "note": "deps.dev project snapshot: {\"projectKey\":{\"id\":\"github.com/aaif-goose/goose\"},\"starsCount\":54968,\"forksCount\":6360}. Mixed/limited community evidence; one star/fork snapshot is not an adverse capability finding."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://openrouter.ai/apps",
+              "read_at": "2026-10-12T21:41:48Z"
+            }
+          ],
+          "note": "No registry-specific download row was verified for this candidate. The official OpenRouter app page was read; absence is not zero usage."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://www.tbench.ai/leaderboard",
+              "read_at": "2026-10-12T21:44:03Z"
+            }
+          ],
+          "note": "No matching published Terminal-Bench row verified in this page's data. Prior leaderboard assertions are not transcribed without their row; this is a gap."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [],
+          "note": "No comparative measured run with a retained public receipt. Every v1 install/smoke score is removed from A6, including successful smokes and route failures; any published sanitized smoke belongs to A1."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "Complete the role-specific pin screen and missing angle sources, then run the preregistered comparison if the sourced angles disagree.",
+      "previous_verdict": "DISAGREE",
+      "licence_note": {
+        "spdx_id": "Apache-2.0",
+        "source": {
+          "kind": "url",
+          "url": "https://api.deps.dev/v3/projects/github.com%2Faaif-goose%2Fgoose",
+          "read_at": "2026-10-12T21:42:30Z"
+        },
+        "read_at": "2026-10-12T21:42:30Z",
+        "note": "Compliance metadata reported by deps.dev at this read, not a pin-level legal conclusion. It has no effect on scores, verdict or comparison-arm selection."
+      }
+    },
+    {
+      "id": "hermes-agent",
+      "name": "Hermes Agent",
+      "repository": "https://github.com/NousResearch/hermes-agent",
+      "pin": "3569e8461ea721623fa16e6f01fb636157989fe6",
+      "role": "coding runtime (dual-wire)",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "mirror_status": "MIRRORED",
+      "adoption_status": "COMPARISON_ARM",
+      "confounds": [
+        "Capability source review is separate from native lifecycle qualification and route entitlement.",
+        "Published usage and evaluation rows cover different dates, upstream versions, provider routes and models; no causal harness ranking is inferred."
+      ],
+      "angles": {
+        "A1": {
+          "score": "+",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/NousResearch/hermes-agent",
+              "pin": "3569e8461ea721623fa16e6f01fb636157989fe6",
+              "path": "README.md",
+              "line": 5
+            }
+          ],
+          "note": "Pinned upstream capability documentation was re-read. The full six-requirement screen at this refreshed pin remains pending; README capability evidence alone does not complete it. Prior install and smoke observations are classified as A1; no private runtime receipt is published here."
+        },
+        "A2": {
+          "score": "0",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.scorecard.dev/projects/github.com/NousResearch/hermes-agent",
+              "read_at": "2026-10-12T21:42:30Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://api.github.com/repos/NousResearch/hermes-agent/releases/latest",
+              "read_at": "2026-10-12T21:42:30Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://api.github.com/repos/NousResearch/hermes-agent/actions/runs?per_page=5",
+              "read_at": "2026-10-12T21:42:30Z"
+            }
+          ],
+          "note": "Public Scorecard HTTP 404; release {\"tag_name\":\"v0.21.7\",\"published_at\":\"2026-10-12T05:53:41Z\",\"prerelease\":false,\"draft\":false}; latest five CI conclusions [null,\"action_required\",\"action_required\",\"action_required\",null]. Quality is scored mixed: release/CI evidence is bounded and security Scorecard coverage can be missing or at another commit. Raw scored fields and API times are retained in the public source receipt."
+        },
+        "A3": {
+          "score": "+",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.deps.dev/v3/projects/github.com%2FNousResearch%2Fhermes-agent",
+              "read_at": "2026-10-12T21:42:30Z"
+            }
+          ],
+          "note": "deps.dev project snapshot: {\"projectKey\":{\"id\":\"github.com/nousresearch/hermes-agent\"},\"starsCount\":252939,\"forksCount\":54783}. Positive community-scale proxy, with no verified star trajectory or independent adopter consensus."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://openrouter.ai/apps",
+              "read_at": "2026-10-12T21:41:48Z"
+            }
+          ],
+          "note": "No registry-specific download row was verified for this candidate. The official OpenRouter app page was read; absence is not zero usage."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://www.tbench.ai/leaderboard",
+              "read_at": "2026-10-12T21:44:03Z"
+            }
+          ],
+          "note": "No matching published Terminal-Bench row verified in this page's data. Prior leaderboard assertions are not transcribed without their row; this is a gap."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [],
+          "note": "No comparative measured run with a retained public receipt. Every v1 install/smoke score is removed from A6, including successful smokes and route failures; any published sanitized smoke belongs to A1."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "Complete the role-specific pin screen and missing angle sources, then run the preregistered comparison if the sourced angles disagree.",
+      "previous_verdict": "DISAGREE",
+      "licence_note": {
+        "spdx_id": "MIT",
+        "source": {
+          "kind": "url",
+          "url": "https://api.deps.dev/v3/projects/github.com%2FNousResearch%2Fhermes-agent",
+          "read_at": "2026-10-12T21:42:30Z"
+        },
+        "read_at": "2026-10-12T21:42:30Z",
+        "note": "Compliance metadata reported by deps.dev at this read, not a pin-level legal conclusion. It has no effect on scores, verdict or comparison-arm selection."
+      }
+    },
+    {
+      "id": "cline",
+      "name": "Cline CLI",
+      "repository": "https://github.com/cline/cline",
+      "pin": "8eba11b2703f5b12d3f415544be37ffc0ca03be1",
+      "role": "coding runtime (dual-wire)",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "mirror_status": "MIRRORED",
+      "adoption_status": "COMPARISON_ARM",
+      "confounds": [
+        "Capability source review is separate from native lifecycle qualification and route entitlement.",
+        "Published usage and evaluation rows cover different dates, upstream versions, provider routes and models; no causal harness ranking is inferred."
+      ],
+      "angles": {
+        "A1": {
+          "score": "+",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/cline/cline",
+              "pin": "8eba11b2703f5b12d3f415544be37ffc0ca03be1",
+              "path": "README.md",
+              "line": 8
+            }
+          ],
+          "note": "Pinned upstream capability documentation was re-read. The full six-requirement screen at this refreshed pin remains pending; README capability evidence alone does not complete it. Prior install and smoke observations are classified as A1; no private runtime receipt is published here."
+        },
+        "A2": {
+          "score": "0",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.scorecard.dev/projects/github.com/cline/cline",
+              "read_at": "2026-10-12T21:42:30Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://api.github.com/repos/cline/cline/releases/latest",
+              "read_at": "2026-10-12T21:42:30Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://api.github.com/repos/cline/cline/actions/runs?per_page=5",
+              "read_at": "2026-10-12T21:42:30Z"
+            }
+          ],
+          "note": "Public Scorecard HTTP 404; release {\"tag_name\":\"desktop-v0.0.45\",\"published_at\":\"2026-10-08T06:50:30Z\",\"prerelease\":false,\"draft\":false}; latest five CI conclusions [\"skipped\",\"skipped\",\"skipped\",\"action_required\",\"action_required\"]. Quality is scored mixed: release/CI evidence is bounded and security Scorecard coverage can be missing or at another commit. Raw scored fields and API times are retained in the public source receipt."
+        },
+        "A3": {
+          "score": "0",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.deps.dev/v3/projects/github.com%2Fcline%2Fcline",
+              "read_at": "2026-10-12T21:42:30Z"
+            }
+          ],
+          "note": "deps.dev project snapshot: {\"projectKey\":{\"id\":\"github.com/cline/cline\"},\"starsCount\":69873,\"forksCount\":7604}. Mixed/limited community evidence; one star/fork snapshot is not an adverse capability finding."
+        },
+        "A4": {
+          "score": "+",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.npmjs.org/downloads/point/last-week/cline",
+              "read_at": "2026-10-12T21:44:02Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://openrouter.ai/apps",
+              "read_at": "2026-10-12T21:41:48Z"
+            }
+          ],
+          "note": "npm's published last-week fields: {\"downloads\":65829,\"start\":\"2026-10-05\",\"end\":\"2026-10-11\",\"package\":\"cline\"}. OpenRouter app rankings are opt-in traffic; package downloads include CI and non-agent use. These are different populations, not a measured share of all usage."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://www.tbench.ai/leaderboard",
+              "read_at": "2026-10-12T21:44:03Z"
+            }
+          ],
+          "note": "No matching published Terminal-Bench row verified in this page's data. Prior leaderboard assertions are not transcribed without their row; this is a gap."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [],
+          "note": "No comparative measured run with a retained public receipt. Every v1 install/smoke score is removed from A6, including successful smokes and route failures; any published sanitized smoke belongs to A1."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "Complete the role-specific pin screen and missing angle sources, then run the preregistered comparison if the sourced angles disagree.",
+      "previous_verdict": "DISAGREE",
+      "licence_note": {
+        "spdx_id": "Apache-2.0",
+        "source": {
+          "kind": "url",
+          "url": "https://api.deps.dev/v3/projects/github.com%2Fcline%2Fcline",
+          "read_at": "2026-10-12T21:42:30Z"
+        },
+        "read_at": "2026-10-12T21:42:30Z",
+        "note": "Compliance metadata reported by deps.dev at this read, not a pin-level legal conclusion. It has no effect on scores, verdict or comparison-arm selection."
+      }
+    },
+    {
+      "id": "qwen-code",
+      "name": "Qwen Code",
+      "repository": "https://github.com/QwenLM/qwen-code",
+      "pin": "aaf97b869dfcc4cf529ada1b036cad9b18695486",
+      "role": "coding runtime (dual-wire)",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "mirror_status": "MIRRORED",
+      "adoption_status": "COMPARISON_ARM",
+      "confounds": [
+        "Capability source review is separate from native lifecycle qualification and route entitlement.",
+        "Published usage and evaluation rows cover different dates, upstream versions, provider routes and models; no causal harness ranking is inferred."
+      ],
+      "angles": {
+        "A1": {
+          "score": "+",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/QwenLM/qwen-code",
+              "pin": "aaf97b869dfcc4cf529ada1b036cad9b18695486",
+              "path": "README.md",
+              "line": 10
+            }
+          ],
+          "note": "Pinned upstream capability documentation was re-read. The full six-requirement screen at this refreshed pin remains pending; README capability evidence alone does not complete it. Prior install and smoke observations are classified as A1; no private runtime receipt is published here."
+        },
+        "A2": {
+          "score": "0",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.scorecard.dev/projects/github.com/QwenLM/qwen-code",
+              "read_at": "2026-10-12T21:42:30Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://api.github.com/repos/QwenLM/qwen-code/releases/latest",
+              "read_at": "2026-10-12T21:42:30Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://api.github.com/repos/QwenLM/qwen-code/actions/runs?per_page=5",
+              "read_at": "2026-10-12T21:42:31Z"
+            }
+          ],
+          "note": "Public Scorecard HTTP 200; release {\"tag_name\":\"sdk-typescript-v0.1.19\",\"published_at\":\"2026-10-11T11:42:33Z\",\"prerelease\":false,\"draft\":false}; latest five CI conclusions [\"skipped\",\"skipped\",\"cancelled\",\"skipped\",\"cancelled\"]. Quality is scored mixed: release/CI evidence is bounded and security Scorecard coverage can be missing or at another commit. Raw scored fields and API times are retained in the public source receipt."
+        },
+        "A3": {
+          "score": "0",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.deps.dev/v3/projects/github.com%2FQwenLM%2Fqwen-code",
+              "read_at": "2026-10-12T21:42:30Z"
+            }
+          ],
+          "note": "deps.dev project snapshot: {\"projectKey\":{\"id\":\"github.com/qwenlm/qwen-code\"},\"starsCount\":28375,\"forksCount\":3174}. Mixed/limited community evidence; one star/fork snapshot is not an adverse capability finding."
+        },
+        "A4": {
+          "score": "0",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.npmjs.org/downloads/point/last-week/%40qwen-code%2Fqwen-code",
+              "read_at": "2026-10-12T21:44:02Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://openrouter.ai/apps",
+              "read_at": "2026-10-12T21:41:48Z"
+            }
+          ],
+          "note": "npm's published last-week fields: {\"downloads\":66107,\"start\":\"2026-10-05\",\"end\":\"2026-10-11\",\"package\":\"@qwen-code/qwen-code\"}. OpenRouter app rankings are opt-in traffic; package downloads include CI and non-agent use. These are different populations, not a measured share of all usage."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://www.tbench.ai/leaderboard",
+              "read_at": "2026-10-12T21:44:03Z"
+            }
+          ],
+          "note": "No matching published Terminal-Bench row verified in this page's data. Prior leaderboard assertions are not transcribed without their row; this is a gap."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [],
+          "note": "No comparative measured run with a retained public receipt. Every v1 install/smoke score is removed from A6, including successful smokes and route failures; any published sanitized smoke belongs to A1."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "Complete the role-specific pin screen and missing angle sources, then run the preregistered comparison if the sourced angles disagree.",
+      "previous_verdict": "INSUFFICIENT",
+      "licence_note": {
+        "spdx_id": "Apache-2.0",
+        "source": {
+          "kind": "url",
+          "url": "https://api.deps.dev/v3/projects/github.com%2FQwenLM%2Fqwen-code",
+          "read_at": "2026-10-12T21:42:30Z"
+        },
+        "read_at": "2026-10-12T21:42:30Z",
+        "note": "Compliance metadata reported by deps.dev at this read, not a pin-level legal conclusion. It has no effect on scores, verdict or comparison-arm selection."
+      }
+    },
+    {
+      "id": "jcode",
+      "name": "jcode",
+      "repository": "https://github.com/1jehuang/jcode",
+      "pin": "b3d4e2143670dd5aeafc81649d85eabdf1bc9d18",
+      "role": "coding runtime (dual-wire)",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "mirror_status": "MIRRORED",
+      "adoption_status": "COMPARISON_ARM",
+      "confounds": [
+        "Capability source review is separate from native lifecycle qualification and route entitlement.",
+        "Published usage and evaluation rows cover different dates, upstream versions, provider routes and models; no causal harness ranking is inferred."
+      ],
+      "angles": {
+        "A1": {
+          "score": "+",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/1jehuang/jcode",
+              "pin": "b3d4e2143670dd5aeafc81649d85eabdf1bc9d18",
+              "path": "README.md",
+              "line": 23
+            }
+          ],
+          "note": "Pinned upstream capability documentation was re-read. The full six-requirement screen at this refreshed pin remains pending; README capability evidence alone does not complete it. Prior install and smoke observations are classified as A1; no private runtime receipt is published here."
+        },
+        "A2": {
+          "score": "0",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.scorecard.dev/projects/github.com/1jehuang/jcode",
+              "read_at": "2026-10-12T21:42:30Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://api.github.com/repos/1jehuang/jcode/releases/latest",
+              "read_at": "2026-10-12T21:42:30Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://api.github.com/repos/1jehuang/jcode/actions/runs?per_page=5",
+              "read_at": "2026-10-12T21:42:31Z"
+            }
+          ],
+          "note": "Public Scorecard HTTP 404; release {\"tag_name\":\"v0.95.0\",\"published_at\":\"2026-10-12T00:43:40Z\",\"prerelease\":false,\"draft\":false}; latest five CI conclusions [\"success\",\"success\",\"success\",\"success\",\"success\"]. Quality is scored mixed: release/CI evidence is bounded and security Scorecard coverage can be missing or at another commit. Raw scored fields and API times are retained in the public source receipt."
+        },
+        "A3": {
+          "score": "0",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.deps.dev/v3/projects/github.com%2F1jehuang%2Fjcode",
+              "read_at": "2026-10-12T21:42:30Z"
+            }
+          ],
+          "note": "deps.dev project snapshot: {\"projectKey\":{\"id\":\"github.com/1jehuang/jcode\"},\"starsCount\":20320,\"forksCount\":2360}. Mixed/limited community evidence; one star/fork snapshot is not an adverse capability finding."
+        },
+        "A4": {
+          "score": "0",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.npmjs.org/downloads/point/last-week/jcode",
+              "read_at": "2026-10-12T21:44:02Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://openrouter.ai/apps",
+              "read_at": "2026-10-12T21:41:48Z"
+            }
+          ],
+          "note": "npm's published last-week fields: {\"downloads\":6,\"start\":\"2026-10-05\",\"end\":\"2026-10-11\",\"package\":\"jcode\"}. OpenRouter app rankings are opt-in traffic; package downloads include CI and non-agent use. These are different populations, not a measured share of all usage."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://www.tbench.ai/leaderboard",
+              "read_at": "2026-10-12T21:44:03Z"
+            }
+          ],
+          "note": "No matching published Terminal-Bench row verified in this page's data. Prior leaderboard assertions are not transcribed without their row; this is a gap."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [],
+          "note": "No comparative measured run with a retained public receipt. Every v1 install/smoke score is removed from A6, including successful smokes and route failures; any published sanitized smoke belongs to A1."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "Complete the role-specific pin screen and missing angle sources, then run the preregistered comparison if the sourced angles disagree.",
+      "previous_verdict": "INSUFFICIENT",
+      "licence_note": {
+        "spdx_id": "MIT",
+        "source": {
+          "kind": "url",
+          "url": "https://api.deps.dev/v3/projects/github.com%2F1jehuang%2Fjcode",
+          "read_at": "2026-10-12T21:42:30Z"
+        },
+        "read_at": "2026-10-12T21:42:30Z",
+        "note": "Compliance metadata reported by deps.dev at this read, not a pin-level legal conclusion. It has no effect on scores, verdict or comparison-arm selection."
+      }
+    },
+    {
+      "id": "deepseek-harness",
+      "name": "deepseek-harness",
+      "repository": "https://github.com/deepseek-ai/deepseek-harness",
+      "pin": "d743267388641bc76f17c45ce8b4c231aed1d32c",
+      "role": "coding runtime (dual-wire)",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "mirror_status": "MIRRORED",
+      "adoption_status": "COMPARISON_ARM",
+      "confounds": [
+        "Capability source review is separate from native lifecycle qualification and route entitlement.",
+        "Published usage and evaluation rows cover different dates, upstream versions, provider routes and models; no causal harness ranking is inferred."
+      ],
+      "angles": {
+        "A1": {
+          "score": "+",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/deepseek-ai/deepseek-harness",
+              "pin": "d743267388641bc76f17c45ce8b4c231aed1d32c",
+              "path": "README.md",
+              "line": 5
+            }
+          ],
+          "note": "Pinned upstream capability documentation was re-read. The full six-requirement screen at this refreshed pin remains pending; README capability evidence alone does not complete it. Prior install and smoke observations are classified as A1; no private runtime receipt is published here."
+        },
+        "A2": {
+          "score": "-",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.scorecard.dev/projects/github.com/deepseek-ai/deepseek-harness",
+              "read_at": "2026-10-12T21:42:30Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://api.github.com/repos/deepseek-ai/deepseek-harness/releases/latest",
+              "read_at": "2026-10-12T21:42:30Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://api.github.com/repos/deepseek-ai/deepseek-harness/actions/runs?per_page=5",
+              "read_at": "2026-10-12T21:42:31Z"
+            }
+          ],
+          "note": "Public Scorecard HTTP 404; release {\"status\":404}; latest five CI conclusions [\"failure\",\"failure\",\"failure\",\"failure\",\"failure\"]. The returned CI snapshot contains five failures; this is an adverse engineering signal, not an abandonment finding. Raw scored fields and API times are retained in the public source receipt."
+        },
+        "A3": {
+          "score": "+",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.deps.dev/v3/projects/github.com%2Fdeepseek-ai%2Fdeepseek-harness",
+              "read_at": "2026-10-12T21:42:30Z"
+            }
+          ],
+          "note": "deps.dev project snapshot: {\"projectKey\":{\"id\":\"github.com/deepseek-ai/deepseek-harness\"},\"starsCount\":247143,\"forksCount\":29682}. Positive community-scale proxy, with no verified star trajectory or independent adopter consensus."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.npmjs.org/downloads/point/last-week/%40deepseek-ai%2Fdeepseek-harness",
+              "read_at": "2026-10-12T21:44:02Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://openrouter.ai/apps",
+              "read_at": "2026-10-12T21:41:48Z"
+            }
+          ],
+          "note": "No registry-specific download row was verified for this candidate. The official OpenRouter app page was read; absence is not zero usage."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://www.tbench.ai/leaderboard",
+              "read_at": "2026-10-12T21:44:03Z"
+            }
+          ],
+          "note": "No matching published Terminal-Bench row verified in this page's data. Prior leaderboard assertions are not transcribed without their row; this is a gap."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [],
+          "note": "No comparative measured run with a retained public receipt. Every v1 install/smoke score is removed from A6, including successful smokes and route failures; any published sanitized smoke belongs to A1."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "Complete the role-specific pin screen and missing angle sources, then run the preregistered comparison if the sourced angles disagree.",
+      "previous_verdict": "DISAGREE",
+      "licence_note": {
+        "spdx_id": "MIT",
+        "source": {
+          "kind": "url",
+          "url": "https://api.deps.dev/v3/projects/github.com%2Fdeepseek-ai%2Fdeepseek-harness",
+          "read_at": "2026-10-12T21:42:30Z"
+        },
+        "read_at": "2026-10-12T21:42:30Z",
+        "note": "Compliance metadata reported by deps.dev at this read, not a pin-level legal conclusion. It has no effect on scores, verdict or comparison-arm selection."
+      }
+    },
+    {
+      "id": "kilo-code",
+      "name": "Kilo Code CLI",
+      "repository": "https://github.com/Kilo-Org/kilocode",
+      "pin": "UNVERIFIED",
+      "role": "coding runtime (dual-wire)",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "mirror_status": "UNMIRRORED",
+      "adoption_status": "COMPARISON_ARM",
+      "confounds": [
+        "Capability source review is separate from native lifecycle qualification and route entitlement.",
+        "Published usage and evaluation rows cover different dates, upstream versions, provider routes and models; no causal harness ranking is inferred."
+      ],
+      "angles": {
+        "A1": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://github.com/Kilo-Org/kilocode",
+              "read_at": "2026-10-12T21:47:43Z"
+            }
+          ],
+          "note": "A formal capability screen at an exact pin is pending. UNMIRRORED candidates retain that gap. OpenCode 2.x is not screened using the mirror's 1.x/HEAD row."
+        },
+        "A2": {
+          "score": "0",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.scorecard.dev/projects/github.com/Kilo-Org/kilocode",
+              "read_at": "2026-10-12T21:42:31Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://api.github.com/repos/Kilo-Org/kilocode/releases/latest",
+              "read_at": "2026-10-12T21:42:31Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://api.github.com/repos/Kilo-Org/kilocode/actions/runs?per_page=5",
+              "read_at": "2026-10-12T21:42:31Z"
+            }
+          ],
+          "note": "Public Scorecard HTTP 404; release {\"tag_name\":\"jetbrains/v7.1.9\",\"published_at\":\"2026-10-08T00:16:29Z\",\"prerelease\":false,\"draft\":false}; latest five CI conclusions [\"action_required\",\"action_required\",\"action_required\",\"action_required\",\"action_required\"]. Quality is scored mixed: release/CI evidence is bounded and security Scorecard coverage can be missing or at another commit. Raw scored fields and API times are retained in the public source receipt."
+        },
+        "A3": {
+          "score": "0",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.deps.dev/v3/projects/github.com%2FKilo-Org%2Fkilocode",
+              "read_at": "2026-10-12T21:42:31Z"
+            }
+          ],
+          "note": "deps.dev project snapshot: {\"projectKey\":{\"id\":\"github.com/kilo-org/kilocode\"},\"starsCount\":27524,\"forksCount\":3238}. Mixed/limited community evidence; one star/fork snapshot is not an adverse capability finding."
+        },
+        "A4": {
+          "score": "+",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.npmjs.org/downloads/point/last-week/%40kilocode%2Fcli",
+              "read_at": "2026-10-12T21:44:02Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://openrouter.ai/apps",
+              "read_at": "2026-10-12T21:41:48Z"
+            }
+          ],
+          "note": "npm's published last-week fields: {\"downloads\":28342,\"start\":\"2026-10-05\",\"end\":\"2026-10-11\",\"package\":\"@kilocode/cli\"}. OpenRouter app rankings are opt-in traffic; package downloads include CI and non-agent use. These are different populations, not a measured share of all usage."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://www.tbench.ai/leaderboard",
+              "read_at": "2026-10-12T21:44:03Z"
+            }
+          ],
+          "note": "No matching published Terminal-Bench row verified in this page's data. Prior leaderboard assertions are not transcribed without their row; this is a gap."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [],
+          "note": "No comparative measured run with a retained public receipt. Every v1 install/smoke score is removed from A6, including successful smokes and route failures; any published sanitized smoke belongs to A1."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "Complete the role-specific pin screen and missing angle sources, then run the preregistered comparison if the sourced angles disagree.",
+      "previous_verdict": "INSUFFICIENT",
+      "licence_note": {
+        "spdx_id": "MIT",
+        "source": {
+          "kind": "url",
+          "url": "https://api.deps.dev/v3/projects/github.com%2FKilo-Org%2Fkilocode",
+          "read_at": "2026-10-12T21:42:31Z"
+        },
+        "read_at": "2026-10-12T21:42:31Z",
+        "note": "Compliance metadata reported by deps.dev at this read, not a pin-level legal conclusion. It has no effect on scores, verdict or comparison-arm selection."
+      }
+    },
+    {
+      "id": "openclaw",
+      "name": "OpenClaw",
+      "repository": "https://github.com/openclaw/openclaw",
+      "pin": "UNVERIFIED",
+      "role": "personal/messaging agent (not a Stage A coding-runtime row)",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "mirror_status": "UNMIRRORED",
+      "adoption_status": "COMPARISON_ARM",
+      "confounds": [
+        "Capability source review is separate from native lifecycle qualification and route entitlement.",
+        "Published usage and evaluation rows cover different dates, upstream versions, provider routes and models; no causal harness ranking is inferred."
+      ],
+      "angles": {
+        "A1": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://github.com/openclaw/openclaw",
+              "read_at": "2026-10-12T21:47:43Z"
+            }
+          ],
+          "note": "A formal capability screen at an exact pin is pending. UNMIRRORED candidates retain that gap. OpenCode 2.x is not screened using the mirror's 1.x/HEAD row."
+        },
+        "A2": {
+          "score": "0",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.scorecard.dev/projects/github.com/openclaw/openclaw",
+              "read_at": "2026-10-12T21:42:31Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://api.github.com/repos/openclaw/openclaw/releases/latest",
+              "read_at": "2026-10-12T21:42:31Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://api.github.com/repos/openclaw/openclaw/actions/runs?per_page=5",
+              "read_at": "2026-10-12T21:42:36Z"
+            }
+          ],
+          "note": "Public Scorecard HTTP 404; release {\"tag_name\":\"v2026.10.2\",\"published_at\":\"2026-10-12T05:34:44Z\",\"prerelease\":false,\"draft\":false}; latest five CI conclusions [\"skipped\",\"skipped\",\"skipped\",\"skipped\",\"skipped\"]. Quality is scored mixed: release/CI evidence is bounded and security Scorecard coverage can be missing or at another commit. Raw scored fields and API times are retained in the public source receipt."
+        },
+        "A3": {
+          "score": "+",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.deps.dev/v3/projects/github.com%2Fopenclaw%2Fopenclaw",
+              "read_at": "2026-10-12T21:42:31Z"
+            }
+          ],
+          "note": "deps.dev project snapshot: {\"projectKey\":{\"id\":\"github.com/openclaw/openclaw\"},\"starsCount\":391504,\"forksCount\":82300}. Positive community-scale proxy, with no verified star trajectory or independent adopter consensus."
+        },
+        "A4": {
+          "score": "+",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.npmjs.org/downloads/point/last-week/openclaw",
+              "read_at": "2026-10-12T21:44:02Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://openrouter.ai/apps",
+              "read_at": "2026-10-12T21:41:48Z"
+            }
+          ],
+          "note": "npm's published last-week fields: {\"downloads\":3946280,\"start\":\"2026-10-05\",\"end\":\"2026-10-11\",\"package\":\"openclaw\"}. OpenRouter app rankings are opt-in traffic; package downloads include CI and non-agent use. These are different populations, not a measured share of all usage."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://www.tbench.ai/leaderboard",
+              "read_at": "2026-10-12T21:44:03Z"
+            }
+          ],
+          "note": "No matching published Terminal-Bench row verified in this page's data. Prior leaderboard assertions are not transcribed without their row; this is a gap."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [],
+          "note": "No comparative measured run with a retained public receipt. Every v1 install/smoke score is removed from A6, including successful smokes and route failures; any published sanitized smoke belongs to A1."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "Complete the role-specific pin screen and missing angle sources, then run the preregistered comparison if the sourced angles disagree.",
+      "previous_verdict": "INSUFFICIENT",
+      "licence_note": {
+        "spdx_id": "MIT",
+        "source": {
+          "kind": "url",
+          "url": "https://api.deps.dev/v3/projects/github.com%2Fopenclaw%2Fopenclaw",
+          "read_at": "2026-10-12T21:42:31Z"
+        },
+        "read_at": "2026-10-12T21:42:31Z",
+        "note": "Compliance metadata reported by deps.dev at this read, not a pin-level legal conclusion. It has no effect on scores, verdict or comparison-arm selection."
+      }
+    },
+    {
+      "id": "openhands-cli",
+      "name": "OpenHands CLI",
+      "repository": "https://github.com/OpenHands/OpenHands-CLI",
+      "pin": "UNVERIFIED",
+      "role": "role-1 CLI",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "mirror_status": "UNMIRRORED",
+      "adoption_status": "COMPARISON_ARM",
+      "confounds": [
+        "Capability source review is separate from native lifecycle qualification and route entitlement.",
+        "Published usage and evaluation rows cover different dates, upstream versions, provider routes and models; no causal harness ranking is inferred."
+      ],
+      "angles": {
+        "A1": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://github.com/OpenHands/OpenHands-CLI",
+              "read_at": "2026-10-12T21:47:43Z"
+            }
+          ],
+          "note": "A formal capability screen at an exact pin is pending. UNMIRRORED candidates retain that gap. OpenCode 2.x is not screened using the mirror's 1.x/HEAD row."
+        },
+        "A2": {
+          "score": "-",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.scorecard.dev/projects/github.com/OpenHands/OpenHands-CLI",
+              "read_at": "2026-10-12T21:42:31Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://api.github.com/repos/OpenHands/OpenHands-CLI/releases/latest",
+              "read_at": "2026-10-12T21:42:31Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://api.github.com/repos/OpenHands/OpenHands-CLI/actions/runs?per_page=5",
+              "read_at": "2026-10-12T21:42:31Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://raw.githubusercontent.com/OpenHands/OpenHands-CLI/main/README.md",
+              "read_at": "2026-10-12T21:47:42Z"
+            }
+          ],
+          "note": "UNMIRRORED. The current upstream README states that this project is no longer actively maintained; the role is rejected as abandoned. This is a public URL read, not a pinned implementation claim."
+        },
+        "A3": {
+          "score": "0",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.deps.dev/v3/projects/github.com%2FOpenHands%2FOpenHands-CLI",
+              "read_at": "2026-10-12T21:42:31Z"
+            }
+          ],
+          "note": "deps.dev project snapshot: {\"projectKey\":{\"id\":\"github.com/openhands/openhands-cli\"},\"starsCount\":263,\"forksCount\":120}. Mixed/limited community evidence; one star/fork snapshot is not an adverse capability finding."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://openrouter.ai/apps",
+              "read_at": "2026-10-12T21:41:48Z"
+            }
+          ],
+          "note": "No registry-specific download row was verified for this candidate. The official OpenRouter app page was read; absence is not zero usage."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://www.tbench.ai/leaderboard",
+              "read_at": "2026-10-12T21:44:03Z"
+            }
+          ],
+          "note": "No matching published Terminal-Bench row verified in this page's data. Prior leaderboard assertions are not transcribed without their row; this is a gap."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [],
+          "note": "No comparative measured run with a retained public receipt. Every v1 install/smoke score is removed from A6, including successful smokes and route failures; any published sanitized smoke belongs to A1."
+        }
+      },
+      "disqualifier": "abandoned",
+      "verdict": "REJECTED",
+      "provisional": false,
+      "measure_next": "Complete the role-specific pin screen and missing angle sources, then run the preregistered comparison if the sourced angles disagree.",
+      "previous_verdict": "INSUFFICIENT",
+      "licence_note": {
+        "spdx_id": "MIT",
+        "source": {
+          "kind": "url",
+          "url": "https://api.deps.dev/v3/projects/github.com%2FOpenHands%2FOpenHands-CLI",
+          "read_at": "2026-10-12T21:42:31Z"
+        },
+        "read_at": "2026-10-12T21:42:31Z",
+        "note": "Compliance metadata reported by deps.dev at this read, not a pin-level legal conclusion. It has no effect on scores, verdict or comparison-arm selection."
+      }
+    },
+    {
+      "id": "freebuff",
+      "name": "Freebuff",
+      "repository": "https://github.com/CodebuffAI/freebuff",
+      "pin": "UNVERIFIED",
+      "role": "hosted coding agent",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "mirror_status": "UNMIRRORED",
+      "adoption_status": "COMPARISON_ARM",
+      "confounds": [
+        "Capability source review is separate from native lifecycle qualification and route entitlement.",
+        "Published usage and evaluation rows cover different dates, upstream versions, provider routes and models; no causal harness ranking is inferred."
+      ],
+      "angles": {
+        "A1": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://github.com/CodebuffAI/freebuff",
+              "read_at": "2026-10-12T21:47:43Z"
+            }
+          ],
+          "note": "A formal capability screen at an exact pin is pending. UNMIRRORED candidates retain that gap. OpenCode 2.x is not screened using the mirror's 1.x/HEAD row."
+        },
+        "A2": {
+          "score": "-",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.scorecard.dev/projects/github.com/CodebuffAI/freebuff",
+              "read_at": "2026-10-12T21:42:31Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://api.github.com/repos/CodebuffAI/freebuff/releases/latest",
+              "read_at": "2026-10-12T21:42:31Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://api.github.com/repos/CodebuffAI/freebuff/actions/runs?per_page=5",
+              "read_at": "2026-10-12T21:42:32Z"
+            }
+          ],
+          "note": "Public Scorecard HTTP 404; release {\"status\":404}; latest five CI conclusions [\"failure\",\"failure\",\"failure\",\"failure\",\"failure\"]. The returned CI snapshot contains five failures; this is an adverse engineering signal, not an abandonment finding. Raw scored fields and API times are retained in the public source receipt."
+        },
+        "A3": {
+          "score": "0",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.deps.dev/v3/projects/github.com%2FCodebuffAI%2Ffreebuff",
+              "read_at": "2026-10-12T21:42:31Z"
+            }
+          ],
+          "note": "deps.dev project snapshot: {\"projectKey\":{\"id\":\"github.com/codebuffai/freebuff\"},\"starsCount\":13450,\"forksCount\":1431}. Mixed/limited community evidence; one star/fork snapshot is not an adverse capability finding."
+        },
+        "A4": {
+          "score": "+",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.npmjs.org/downloads/point/last-week/freebuff",
+              "read_at": "2026-10-12T21:44:03Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://openrouter.ai/apps",
+              "read_at": "2026-10-12T21:41:48Z"
+            }
+          ],
+          "note": "npm's published last-week fields: {\"downloads\":23218,\"start\":\"2026-10-05\",\"end\":\"2026-10-11\",\"package\":\"freebuff\"}. OpenRouter app rankings are opt-in traffic; package downloads include CI and non-agent use. These are different populations, not a measured share of all usage."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://www.tbench.ai/leaderboard",
+              "read_at": "2026-10-12T21:44:03Z"
+            }
+          ],
+          "note": "No matching published Terminal-Bench row verified in this page's data. Prior leaderboard assertions are not transcribed without their row; this is a gap."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [],
+          "note": "No comparative measured run with a retained public receipt. Every v1 install/smoke score is removed from A6, including successful smokes and route failures; any published sanitized smoke belongs to A1."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "Complete the role-specific pin screen and missing angle sources, then run the preregistered comparison if the sourced angles disagree.",
+      "previous_verdict": "INSUFFICIENT",
+      "licence_note": {
+        "spdx_id": "Apache-2.0",
+        "source": {
+          "kind": "url",
+          "url": "https://api.deps.dev/v3/projects/github.com%2FCodebuffAI%2Ffreebuff",
+          "read_at": "2026-10-12T21:42:31Z"
+        },
+        "read_at": "2026-10-12T21:42:31Z",
+        "note": "Compliance metadata reported by deps.dev at this read, not a pin-level legal conclusion. It has no effect on scores, verdict or comparison-arm selection."
+      }
+    },
+    {
+      "id": "muse-code",
+      "name": "Muse Code",
+      "repository": "https://dev.meta.ai/docs/muse-code",
+      "pin": "UNVERIFIED",
+      "role": "Meta subscription native harness, entering the pinned capability screen",
+      "a1_screened": false,
+      "a6_comparative": false,
+      "mirror_status": "UNMIRRORED",
+      "adoption_status": "TRIAL",
+      "confounds": [
+        "Vendor documentation establishes available mechanisms; an exact installed version and native qualification receipt are pending."
+      ],
+      "angles": {
+        "A1": {
+          "score": "+",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://dev.meta.ai/docs/muse-code",
+              "read_at": "2026-10-12T21:41:48Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://dev.meta.ai/docs/muse-code/configuration",
+              "read_at": "2026-10-12T21:41:48Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://dev.meta.ai/docs/muse-code/extending",
+              "read_at": "2026-10-12T21:43:28Z"
+            }
+          ],
+          "note": "Vendor docs cover Linux, headless muse exec --json, MCP, lifecycle hooks, skills, trusted AGENTS.md/CLAUDE.md context, and per-child worktree isolation. The isolation flag alone does not isolate every child. Exact install pin and measured operation remain pending."
+        },
+        "A2": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [],
+          "note": "Pending independent angle evidence."
+        },
+        "A3": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [],
+          "note": "Pending independent angle evidence."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [],
+          "note": "Pending independent angle evidence."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [],
+          "note": "Pending independent angle evidence."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [],
+          "note": "No comparative run."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "Retain a sanitized install receipt and its exact pin, complete the screen, and resolve the pending independent angles.",
+      "entitlement": {
+        "status": "documented",
+        "sources": [
+          {
+            "kind": "url",
+            "url": "https://dev.meta.ai/docs/muse-code/subscriptions",
+            "read_at": "2026-10-12T21:41:48Z"
+          }
+        ],
+        "note": "Muse subscriptions serve Muse Code only; Power Usage permits Muse Wonder Full. Credential-bearing inputs are not published."
+      },
+      "licence_note": {
+        "spdx_id": null,
+        "source": {
+          "kind": "url",
+          "url": "https://dev.meta.ai/docs/muse-code/subscriptions",
+          "read_at": "2026-10-12T21:41:48Z"
+        },
+        "read_at": "2026-10-12T21:41:48Z",
+        "note": "No SPDX identifier established for this vendor product. Vendor terms are retained as a compliance source; this note does not score, reject or select a comparison arm. Route entitlement is checked separately."
+      }
+    }
+  ]
+}

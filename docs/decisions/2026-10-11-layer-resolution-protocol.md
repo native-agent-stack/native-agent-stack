@@ -163,3 +163,15 @@ misclassify a layer; retain this record as superseded history.
 Source review establishes the protocol and harness references. Local integration
 can establish the doc-pinning red/green result and full publication validation.
 Neither is an executed winner comparison, E2E adoption receipt or invoke window.
+
+## Supersession: generator and FINAL enforcement (2026-10-12)
+
+The historical statement that the generator and file were absent at this
+decision's base remains part of that dated record. At base `703d588c` both
+`scripts/final_stack.py` and `catalogs/landscape/final-stack.json` exist, and
+the validate workflow runs `--check` on shard 0. The
+[angle-records decision](2026-10-12-angle-records-final-check.md) supersedes
+that implementation-status statement: the generator reads sourced angle
+records, re-derives v2 convergence and rejects explicit FINAL claims without
+the four conditions above. The historical terminal definitions are preserved.
+The first records add evidence and gaps; they do not declare a layer FINAL.

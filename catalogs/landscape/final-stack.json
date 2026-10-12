@@ -4863,6 +4863,63 @@
           "repository": "https://github.com/langchain-ai/langgraph"
         }
       ],
+      "angles": {
+        "candidates": [
+          {
+            "adoption_status": "COMPARISON_ARM",
+            "coverage": 0.55,
+            "disqualifier": null,
+            "id": "deep-agents",
+            "pin": "a7f97e4d529db5566a0d187ee86b8996bd45ff98",
+            "provisional": false,
+            "repository": "https://github.com/langchain-ai/deepagents",
+            "sourced_angles": 3,
+            "verdict": "INSUFFICIENT",
+            "weighted_score": 0.2
+          },
+          {
+            "adoption_status": "COMPARISON_ARM",
+            "coverage": 0.55,
+            "disqualifier": null,
+            "id": "strands",
+            "pin": "38afb968e1f40aa47546ead09a22ec031bd345de",
+            "provisional": false,
+            "repository": "https://github.com/strands-agents/harness-sdk",
+            "sourced_angles": 3,
+            "verdict": "INSUFFICIENT",
+            "weighted_score": 0.2
+          }
+        ],
+        "disclosure": "V2 was adopted after the runtime v1 scores were visible. V1 verdicts remain in candidate history and the public source receipt retains their sign matrix. Current scores use fresh primary-source reads; the stated-before-scoring time applies to this re-verification, not the original v1 scores. Installs and smokes are A1; none is counted as comparative A6.",
+        "effective_weights": {
+          "A1": 0.2,
+          "A2": 0.2,
+          "A3": 0.15,
+          "A4": 0.15,
+          "A5": 0.2,
+          "A6": 0.1
+        },
+        "gaps": [
+          "No comparative A6 receipt has been published for these candidates.",
+          "The API Scorecard snapshots, where available, assess their own upstream commit, which can differ from the A1 capability pin.",
+          "Release and five-run CI snapshots are bounded observations; missing Scorecard results remain a coverage gap.",
+          "This initial record does not adjudicate cumulative survivors or supply FINAL E2E and invoke receipts.",
+          "Published evaluation availability is not fully verified for this layer. Unknown is not none: default A5 weight remains until absence is established.",
+          "Cumulative unresolved survivors github.com/agentproto/ts and github.com/github/copilot-sdk from landscape-sweep-20260929 remain unresolved."
+        ],
+        "path": "catalogs/landscape/angles/foundation-agent-sdks.json",
+        "rule_version": "angle-convergence/2",
+        "status": "recorded",
+        "weights": {
+          "A1": 0.2,
+          "A2": 0.2,
+          "A3": 0.15,
+          "A4": 0.15,
+          "A5": 0.2,
+          "A6": 0.1
+        },
+        "weights_stated_at": "2026-10-12T21:32:22Z"
+      },
       "catalog": "foundation",
       "funnel": {
         "adopted": 1,
@@ -4896,6 +4953,7 @@
           "sweep_id": "landscape-sweep-20260929"
         }
       ],
+      "terminal_state": null,
       "title": "Agent SDKs and runtime workers",
       "verdict": {
         "adjudication_ref": null,
@@ -4982,6 +5040,10 @@
           "repository": "https://github.com/anchore/grype"
         }
       ],
+      "angles": {
+        "gap": "No angle record; convergence is unverified.",
+        "status": "missing"
+      },
       "catalog": "foundation",
       "funnel": {
         "adopted": 2,
@@ -5035,6 +5097,7 @@
           "sweep_id": "landscape-sweep-20260929"
         }
       ],
+      "terminal_state": null,
       "title": "CI and supply chain",
       "verdict": {
         "adjudication_ref": null,
@@ -5148,6 +5211,10 @@
           "repository": "https://github.com/DeusData/codebase-memory-mcp"
         }
       ],
+      "angles": {
+        "gap": "No angle record; convergence is unverified.",
+        "status": "missing"
+      },
       "catalog": "foundation",
       "funnel": {
         "adopted": 1,
@@ -5186,6 +5253,7 @@
           "sweep_id": "landscape-sweep-20260929"
         }
       ],
+      "terminal_state": null,
       "title": "Code navigation",
       "verdict": {
         "adjudication_ref": "evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-code-navigation-20260922.json",
@@ -5260,6 +5328,10 @@
           "repository": "https://github.com/run-llama/llama_index"
         }
       ],
+      "angles": {
+        "gap": "No angle record; convergence is unverified.",
+        "status": "missing"
+      },
       "catalog": "foundation",
       "funnel": {
         "adopted": 3,
@@ -5348,6 +5420,7 @@
           "sweep_id": "landscape-sweep-20260929"
         }
       ],
+      "terminal_state": null,
       "title": "Documents and ingestion",
       "verdict": {
         "adjudication_ref": "evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-document-retrieval-20260922.json",
@@ -5502,6 +5575,10 @@
           "repository": "https://github.com/thedotmack/claude-mem"
         }
       ],
+      "angles": {
+        "gap": "No angle record; convergence is unverified.",
+        "status": "missing"
+      },
       "catalog": "foundation",
       "funnel": {
         "adopted": 1,
@@ -5565,6 +5642,7 @@
           "sweep_id": "landscape-sweep-20260929"
         }
       ],
+      "terminal_state": null,
       "title": "Durable memory",
       "verdict": {
         "adjudication_ref": null,
@@ -5627,6 +5705,10 @@
           "repository": "https://github.com/openai/codex-plugin-cc"
         }
       ],
+      "angles": {
+        "gap": "No angle record; convergence is unverified.",
+        "status": "missing"
+      },
       "catalog": "foundation",
       "funnel": {
         "adopted": 3,
@@ -5660,6 +5742,7 @@
           "sweep_id": "landscape-sweep-20260929"
         }
       ],
+      "terminal_state": null,
       "title": "Git practice and GitHub automation",
       "verdict": {
         "adjudication_ref": null,
@@ -5797,6 +5880,10 @@
           "repository": "https://github.com/bentoml/BentoML"
         }
       ],
+      "angles": {
+        "gap": "No angle record; convergence is unverified.",
+        "status": "missing"
+      },
       "catalog": "foundation",
       "funnel": {
         "adopted": 3,
@@ -5819,6 +5906,7 @@
       "source": "catalogs/landscape/foundation.json#/layers/13",
       "status": "reopened",
       "survivors": [],
+      "terminal_state": null,
       "title": "Application and service hosting",
       "verdict": {
         "adjudication_ref": null,
@@ -5961,6 +6049,10 @@
           "repository": "https://github.com/anthropics/skills"
         }
       ],
+      "angles": {
+        "gap": "No angle record; convergence is unverified.",
+        "status": "missing"
+      },
       "catalog": "foundation",
       "funnel": {
         "adopted": 1,
@@ -5989,6 +6081,7 @@
           "sweep_id": "landscape-sweep-20260929"
         }
       ],
+      "terminal_state": null,
       "title": "Instructions and skills",
       "verdict": {
         "adjudication_ref": "evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-instructions-skills-20260922.json",
@@ -6097,6 +6190,10 @@
           "repository": "https://github.com/google/gvisor"
         }
       ],
+      "angles": {
+        "gap": "No angle record; convergence is unverified.",
+        "status": "missing"
+      },
       "catalog": "foundation",
       "funnel": {
         "adopted": 2,
@@ -6130,6 +6227,7 @@
           "sweep_id": "landscape-sweep-20260929"
         }
       ],
+      "terminal_state": null,
       "title": "Isolation",
       "verdict": {
         "adjudication_ref": null,
@@ -6214,6 +6312,10 @@
           "repository": "https://github.com/punkpeye/awesome-mcp-servers"
         }
       ],
+      "angles": {
+        "gap": "No angle record; convergence is unverified.",
+        "status": "missing"
+      },
       "catalog": "foundation",
       "funnel": {
         "adopted": 2,
@@ -6236,6 +6338,7 @@
       "source": "catalogs/landscape/foundation.json#/layers/17",
       "status": "reopened",
       "survivors": [],
+      "terminal_state": null,
       "title": "MCP servers and client surfaces",
       "verdict": {
         "adjudication_ref": null,
@@ -6312,6 +6415,217 @@
       ]
     },
     {
+      "alternates": [],
+      "angles": {
+        "candidates": [
+          {
+            "adoption_status": "TRIAL",
+            "coverage": 0.2,
+            "disqualifier": null,
+            "id": "muse-code-wonder-full",
+            "pin": "vendor-variant:Muse Wonder Full",
+            "provisional": false,
+            "repository": "https://dev.meta.ai/docs/muse-code",
+            "sourced_angles": 1,
+            "verdict": "INSUFFICIENT",
+            "weighted_score": 0.2
+          },
+          {
+            "adoption_status": "NOT_ADOPTED",
+            "coverage": 0.4,
+            "disqualifier": null,
+            "id": "muse-code-wonder-api",
+            "pin": "muse-wonder-1.0",
+            "provisional": false,
+            "repository": "https://dev.meta.ai/docs/models",
+            "sourced_angles": 2,
+            "verdict": "INSUFFICIENT",
+            "weighted_score": 0.4
+          },
+          {
+            "adoption_status": "NOT_ADOPTED",
+            "coverage": 0.4,
+            "disqualifier": null,
+            "id": "codex-wonder-api",
+            "pin": "muse-wonder-1.0",
+            "provisional": false,
+            "repository": "https://dev.meta.ai/docs/models",
+            "sourced_angles": 2,
+            "verdict": "INSUFFICIENT",
+            "weighted_score": 0.4
+          },
+          {
+            "adoption_status": "NOT_ADOPTED",
+            "coverage": 0.4,
+            "disqualifier": null,
+            "id": "opencode-wonder-api",
+            "pin": "muse-wonder-1.0",
+            "provisional": false,
+            "repository": "https://dev.meta.ai/docs/models",
+            "sourced_angles": 2,
+            "verdict": "INSUFFICIENT",
+            "weighted_score": 0.4
+          },
+          {
+            "adoption_status": "NOT_ADOPTED",
+            "coverage": 0.4,
+            "disqualifier": null,
+            "id": "claude-code-wonder-api",
+            "pin": "muse-wonder-1.0",
+            "provisional": false,
+            "repository": "https://dev.meta.ai/docs/models",
+            "sourced_angles": 2,
+            "verdict": "INSUFFICIENT",
+            "weighted_score": 0.4
+          },
+          {
+            "adoption_status": "NOT_ADOPTED",
+            "coverage": 0.2,
+            "disqualifier": null,
+            "id": "harness-spark-api",
+            "pin": "muse-spark-1.3",
+            "provisional": false,
+            "repository": "https://dev.meta.ai/docs/models",
+            "sourced_angles": 1,
+            "verdict": "INSUFFICIENT",
+            "weighted_score": 0.2
+          },
+          {
+            "adoption_status": "NOT_ADOPTED",
+            "coverage": 0.2,
+            "disqualifier": "missing_capability",
+            "id": "muse-subscription-foreign-harness",
+            "pin": "muse-code-subscription",
+            "provisional": false,
+            "repository": "https://dev.meta.ai/docs/models",
+            "sourced_angles": 1,
+            "verdict": "REJECTED",
+            "weighted_score": -0.2
+          },
+          {
+            "adoption_status": "CURRENT",
+            "coverage": 0.4,
+            "disqualifier": null,
+            "id": "codex-gpt-6-1-sol",
+            "pin": "gpt-6.1-sol",
+            "provisional": false,
+            "repository": "https://developers.openai.com/codex/models",
+            "sourced_angles": 2,
+            "verdict": "INSUFFICIENT",
+            "weighted_score": 0.4
+          },
+          {
+            "adoption_status": "CURRENT",
+            "coverage": 0.4,
+            "disqualifier": null,
+            "id": "codex-gpt-6-astra",
+            "pin": "gpt-6-astra",
+            "provisional": false,
+            "repository": "https://developers.openai.com/codex/models",
+            "sourced_angles": 2,
+            "verdict": "INSUFFICIENT",
+            "weighted_score": 0.4
+          },
+          {
+            "adoption_status": "TRIAL",
+            "coverage": 0.4,
+            "disqualifier": null,
+            "id": "codex-gpt-6-luna",
+            "pin": "gpt-6-luna",
+            "provisional": false,
+            "repository": "https://developers.openai.com/codex/models",
+            "sourced_angles": 2,
+            "verdict": "INSUFFICIENT",
+            "weighted_score": 0.4
+          },
+          {
+            "adoption_status": "CURRENT",
+            "coverage": 0.4,
+            "disqualifier": null,
+            "id": "claude-code-claude-opus-5-5",
+            "pin": "claude-opus-5-5",
+            "provisional": false,
+            "repository": "https://code.claude.com/docs/en/model-config",
+            "sourced_angles": 2,
+            "verdict": "INSUFFICIENT",
+            "weighted_score": 0.4
+          },
+          {
+            "adoption_status": "TRIAL",
+            "coverage": 0.4,
+            "disqualifier": null,
+            "id": "claude-code-claude-sonnet-5-5",
+            "pin": "claude-sonnet-5-5",
+            "provisional": false,
+            "repository": "https://code.claude.com/docs/en/model-config",
+            "sourced_angles": 2,
+            "verdict": "INSUFFICIENT",
+            "weighted_score": 0.4
+          },
+          {
+            "adoption_status": "TRIAL",
+            "coverage": 0.2,
+            "disqualifier": null,
+            "id": "claude-code-claude-haiku-5-5",
+            "pin": "claude-haiku-5-5",
+            "provisional": false,
+            "repository": "https://code.claude.com/docs/en/model-config",
+            "sourced_angles": 1,
+            "verdict": "INSUFFICIENT",
+            "weighted_score": 0.2
+          }
+        ],
+        "disclosure": "This is a source-review model-route record for the subscription-oriented foundation. V2 followed visible runtime v1 scores; no model-route score or deployment is inferred from a runtime smoke. Vendor documentation does not establish the entitlement or operation of any particular configured account or gateway.",
+        "effective_weights": {
+          "A1": 0.2,
+          "A2": 0.2,
+          "A3": 0.15,
+          "A4": 0.15,
+          "A5": 0.2,
+          "A6": 0.1
+        },
+        "gaps": [
+          "The model-routes layer has no catalog verdict, verdict wave, recorded sweep or retained comparison at this base. Its angle-only row is initial evidence, not a selection.",
+          "A2\u2013A4 remain pending at the route level; a harness's stars or traffic are not automatically a model-route score.",
+          "No comparative A6 on these subscription routes is retained.",
+          "No source-based row establishes FINAL without a matching run pin, upstream E2E receipt and invocation evidence or recorded reason.",
+          "The Facebook subscription-terms page did not yield readable terms in the public fetch. Meta's readable Model API Terms section 3.2 and subscription documentation establish the coding-harness credential restriction.",
+          "The supported OpenAI gateway documentation establishes a per-user ChatGPT sign-in mechanism. Entitlement of a specific pooled gateway configuration is unverified, so that deployment boundary remains pending."
+        ],
+        "path": "catalogs/landscape/angles/foundation-model-routes.json",
+        "rule_version": "angle-convergence/2",
+        "status": "recorded",
+        "weights": {
+          "A1": 0.2,
+          "A2": 0.2,
+          "A3": 0.15,
+          "A4": 0.15,
+          "A5": 0.2,
+          "A6": 0.1
+        },
+        "weights_stated_at": "2026-10-12T21:32:22Z"
+      },
+      "catalog": "foundation",
+      "funnel": {
+        "adopted": 0,
+        "found": 0,
+        "refuted": 0,
+        "surviving": 0,
+        "trialled": 0
+      },
+      "layer_id": "model-routes",
+      "open_gaps": null,
+      "research": null,
+      "saturation": null,
+      "source": "catalogs/landscape/angles/foundation-model-routes.json",
+      "status": "unswept",
+      "survivors": [],
+      "terminal_state": null,
+      "title": "model-routes",
+      "verdict": null,
+      "winners": []
+    },
+    {
       "alternates": [
         {
           "disposition": "out_of_scope",
@@ -6344,6 +6658,242 @@
           "repository": "https://github.com/letta-ai/letta"
         }
       ],
+      "angles": {
+        "candidates": [
+          {
+            "adoption_status": "CURRENT",
+            "coverage": 0.9,
+            "disqualifier": null,
+            "id": "claude-code",
+            "pin": "3deb873687379f0c199a69fdaccc65f0865f7a29",
+            "provisional": true,
+            "repository": "https://github.com/anthropics/claude-code",
+            "sourced_angles": 5,
+            "verdict": "CONVERGED",
+            "weighted_score": 0.7
+          },
+          {
+            "adoption_status": "CURRENT",
+            "coverage": 0.9,
+            "disqualifier": null,
+            "id": "codex-cli",
+            "pin": "092d3acd6bec3e3a14bdc7e7a2810ab628ab759d",
+            "provisional": true,
+            "repository": "https://github.com/openai/codex",
+            "sourced_angles": 5,
+            "verdict": "CONVERGED",
+            "weighted_score": 0.7
+          },
+          {
+            "adoption_status": "COMPARISON_ARM",
+            "coverage": 0.7,
+            "disqualifier": null,
+            "id": "pi",
+            "pin": "04566631c2b51fb688486bc1f040f60d1518c126",
+            "provisional": false,
+            "repository": "https://github.com/earendil-works/pi",
+            "sourced_angles": 4,
+            "verdict": "INSUFFICIENT",
+            "weighted_score": 0.5
+          },
+          {
+            "adoption_status": "COMPARISON_ARM",
+            "coverage": 0.7,
+            "disqualifier": null,
+            "id": "oh-my-pi",
+            "pin": "5d0aaffaf1f987503ce129a642fb6e30339615af",
+            "provisional": false,
+            "repository": "https://github.com/can1357/oh-my-pi",
+            "sourced_angles": 4,
+            "verdict": "INSUFFICIENT",
+            "weighted_score": 0.35
+          },
+          {
+            "adoption_status": "COMPARISON_ARM",
+            "coverage": 0.7,
+            "disqualifier": null,
+            "id": "opencode-1x",
+            "pin": "a34961825be13a31daa76f33a8b47efcd198cfef",
+            "provisional": false,
+            "repository": "https://github.com/anomalyco/opencode",
+            "sourced_angles": 4,
+            "verdict": "INSUFFICIENT",
+            "weighted_score": 0.5
+          },
+          {
+            "adoption_status": "COMPARISON_ARM",
+            "coverage": 0.5,
+            "disqualifier": null,
+            "id": "opencode-2x",
+            "pin": "a34961825be13a31daa76f33a8b47efcd198cfef",
+            "provisional": false,
+            "repository": "https://github.com/anomalyco/opencode",
+            "sourced_angles": 3,
+            "verdict": "INSUFFICIENT",
+            "weighted_score": 0.0
+          },
+          {
+            "adoption_status": "COMPARISON_ARM",
+            "coverage": 0.55,
+            "disqualifier": null,
+            "id": "goose",
+            "pin": "4617040c7b650b37d599bdaa08d3790572c19ae8",
+            "provisional": false,
+            "repository": "https://github.com/aaif-goose/goose",
+            "sourced_angles": 3,
+            "verdict": "INSUFFICIENT",
+            "weighted_score": 0.2
+          },
+          {
+            "adoption_status": "COMPARISON_ARM",
+            "coverage": 0.55,
+            "disqualifier": null,
+            "id": "hermes-agent",
+            "pin": "3569e8461ea721623fa16e6f01fb636157989fe6",
+            "provisional": false,
+            "repository": "https://github.com/NousResearch/hermes-agent",
+            "sourced_angles": 3,
+            "verdict": "INSUFFICIENT",
+            "weighted_score": 0.35
+          },
+          {
+            "adoption_status": "COMPARISON_ARM",
+            "coverage": 0.7,
+            "disqualifier": null,
+            "id": "cline",
+            "pin": "8eba11b2703f5b12d3f415544be37ffc0ca03be1",
+            "provisional": false,
+            "repository": "https://github.com/cline/cline",
+            "sourced_angles": 4,
+            "verdict": "INSUFFICIENT",
+            "weighted_score": 0.35
+          },
+          {
+            "adoption_status": "COMPARISON_ARM",
+            "coverage": 0.7,
+            "disqualifier": null,
+            "id": "qwen-code",
+            "pin": "aaf97b869dfcc4cf529ada1b036cad9b18695486",
+            "provisional": false,
+            "repository": "https://github.com/QwenLM/qwen-code",
+            "sourced_angles": 4,
+            "verdict": "INSUFFICIENT",
+            "weighted_score": 0.2
+          },
+          {
+            "adoption_status": "COMPARISON_ARM",
+            "coverage": 0.7,
+            "disqualifier": null,
+            "id": "jcode",
+            "pin": "b3d4e2143670dd5aeafc81649d85eabdf1bc9d18",
+            "provisional": false,
+            "repository": "https://github.com/1jehuang/jcode",
+            "sourced_angles": 4,
+            "verdict": "INSUFFICIENT",
+            "weighted_score": 0.2
+          },
+          {
+            "adoption_status": "COMPARISON_ARM",
+            "coverage": 0.55,
+            "disqualifier": null,
+            "id": "deepseek-harness",
+            "pin": "d743267388641bc76f17c45ce8b4c231aed1d32c",
+            "provisional": false,
+            "repository": "https://github.com/deepseek-ai/deepseek-harness",
+            "sourced_angles": 3,
+            "verdict": "INSUFFICIENT",
+            "weighted_score": 0.15
+          },
+          {
+            "adoption_status": "COMPARISON_ARM",
+            "coverage": 0.5,
+            "disqualifier": null,
+            "id": "kilo-code",
+            "pin": "UNVERIFIED",
+            "provisional": false,
+            "repository": "https://github.com/Kilo-Org/kilocode",
+            "sourced_angles": 3,
+            "verdict": "INSUFFICIENT",
+            "weighted_score": 0.15
+          },
+          {
+            "adoption_status": "COMPARISON_ARM",
+            "coverage": 0.5,
+            "disqualifier": null,
+            "id": "openclaw",
+            "pin": "UNVERIFIED",
+            "provisional": false,
+            "repository": "https://github.com/openclaw/openclaw",
+            "sourced_angles": 3,
+            "verdict": "INSUFFICIENT",
+            "weighted_score": 0.3
+          },
+          {
+            "adoption_status": "COMPARISON_ARM",
+            "coverage": 0.35,
+            "disqualifier": "abandoned",
+            "id": "openhands-cli",
+            "pin": "UNVERIFIED",
+            "provisional": false,
+            "repository": "https://github.com/OpenHands/OpenHands-CLI",
+            "sourced_angles": 2,
+            "verdict": "REJECTED",
+            "weighted_score": -0.2
+          },
+          {
+            "adoption_status": "COMPARISON_ARM",
+            "coverage": 0.5,
+            "disqualifier": null,
+            "id": "freebuff",
+            "pin": "UNVERIFIED",
+            "provisional": false,
+            "repository": "https://github.com/CodebuffAI/freebuff",
+            "sourced_angles": 3,
+            "verdict": "INSUFFICIENT",
+            "weighted_score": -0.05
+          },
+          {
+            "adoption_status": "TRIAL",
+            "coverage": 0.2,
+            "disqualifier": null,
+            "id": "muse-code",
+            "pin": "UNVERIFIED",
+            "provisional": false,
+            "repository": "https://dev.meta.ai/docs/muse-code",
+            "sourced_angles": 1,
+            "verdict": "INSUFFICIENT",
+            "weighted_score": 0.2
+          }
+        ],
+        "disclosure": "V2 was adopted after the runtime v1 scores were visible. V1 verdicts remain in candidate history and the public source receipt retains their sign matrix. Current scores use fresh primary-source reads; the stated-before-scoring time applies to this re-verification, not the original v1 scores. Installs and smokes are A1; none is counted as comparative A6.",
+        "effective_weights": {
+          "A1": 0.2,
+          "A2": 0.2,
+          "A3": 0.15,
+          "A4": 0.15,
+          "A5": 0.2,
+          "A6": 0.1
+        },
+        "gaps": [
+          "No comparative A6 receipt has been published for these candidates.",
+          "The API Scorecard snapshots, where available, assess their own upstream commit, which can differ from the A1 capability pin.",
+          "Release and five-run CI snapshots are bounded observations; missing Scorecard results remain a coverage gap.",
+          "This initial record does not adjudicate cumulative survivors or supply FINAL E2E and invoke receipts.",
+          "Claude Code and Codex have source-based convergence candidates; FINAL remains blocked by unbound E2E/invoke receipts and exact winner/run/angle pin alignment."
+        ],
+        "path": "catalogs/landscape/angles/foundation-native-clients.json",
+        "rule_version": "angle-convergence/2",
+        "status": "recorded",
+        "weights": {
+          "A1": 0.2,
+          "A2": 0.2,
+          "A3": 0.15,
+          "A4": 0.15,
+          "A5": 0.2,
+          "A6": 0.1
+        },
+        "weights_stated_at": "2026-10-12T21:32:22Z"
+      },
       "catalog": "foundation",
       "funnel": {
         "adopted": 2,
@@ -6366,6 +6916,7 @@
       "source": "catalogs/landscape/foundation.json#/layers/0",
       "status": "reopened",
       "survivors": [],
+      "terminal_state": null,
       "title": "Native clients",
       "verdict": {
         "adjudication_ref": null,
@@ -6504,6 +7055,10 @@
           "repository": "https://github.com/sgl-project/sglang"
         }
       ],
+      "angles": {
+        "gap": "No angle record; convergence is unverified.",
+        "status": "missing"
+      },
       "catalog": "foundation",
       "funnel": {
         "adopted": 3,
@@ -6557,6 +7112,7 @@
           "sweep_id": "landscape-sweep-20260926"
         }
       ],
+      "terminal_state": null,
       "title": "Observation and optional inference",
       "verdict": {
         "adjudication_ref": "evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-observation-inference-20260922.json",
@@ -6699,6 +7255,10 @@
           "repository": "https://github.com/mlflow/mlflow"
         }
       ],
+      "angles": {
+        "gap": "No angle record; convergence is unverified.",
+        "status": "missing"
+      },
       "catalog": "foundation",
       "funnel": {
         "adopted": 2,
@@ -6732,6 +7292,7 @@
           "sweep_id": "landscape-sweep-20260929"
         }
       ],
+      "terminal_state": null,
       "title": "Quality and evaluation",
       "verdict": {
         "adjudication_ref": null,
@@ -6840,6 +7401,10 @@
           "repository": "https://github.com/jetify-com/devbox"
         }
       ],
+      "angles": {
+        "gap": "No angle record; convergence is unverified.",
+        "status": "missing"
+      },
       "catalog": "foundation",
       "funnel": {
         "adopted": 2,
@@ -6868,6 +7433,7 @@
           "sweep_id": "landscape-sweep-20260929"
         }
       ],
+      "terminal_state": null,
       "title": "Recovery and portability",
       "verdict": {
         "adjudication_ref": null,
@@ -6959,6 +7525,10 @@
           "repository": "https://github.com/temporalio/temporal"
         }
       ],
+      "angles": {
+        "gap": "No angle record; convergence is unverified.",
+        "status": "missing"
+      },
       "catalog": "foundation",
       "funnel": {
         "adopted": 2,
@@ -7002,6 +7572,7 @@
           "sweep_id": "landscape-sweep-20260929"
         }
       ],
+      "terminal_state": null,
       "title": "Scheduling and supervision",
       "verdict": {
         "adjudication_ref": null,
@@ -7086,6 +7657,10 @@
           "repository": "https://github.com/openbao/openbao"
         }
       ],
+      "angles": {
+        "gap": "No angle record; convergence is unverified.",
+        "status": "missing"
+      },
       "catalog": "foundation",
       "funnel": {
         "adopted": 1,
@@ -7124,6 +7699,7 @@
           "sweep_id": "landscape-sweep-20260929"
         }
       ],
+      "terminal_state": null,
       "title": "Secrets and credentials",
       "verdict": {
         "adjudication_ref": null,
@@ -7210,6 +7786,10 @@
           "repository": "https://github.com/lancedb/lancedb"
         }
       ],
+      "angles": {
+        "gap": "No angle record; convergence is unverified.",
+        "status": "missing"
+      },
       "catalog": "foundation",
       "funnel": {
         "adopted": 3,
@@ -7258,6 +7838,7 @@
           "sweep_id": "landscape-sweep-20260926"
         }
       ],
+      "terminal_state": null,
       "title": "Semantic code retrieval",
       "verdict": {
         "adjudication_ref": null,
@@ -7382,6 +7963,10 @@
           "repository": "https://github.com/drona23/claude-token-efficient"
         }
       ],
+      "angles": {
+        "gap": "No angle record; convergence is unverified.",
+        "status": "missing"
+      },
       "catalog": "foundation",
       "funnel": {
         "adopted": 3,
@@ -7430,6 +8015,7 @@
           "sweep_id": "landscape-sweep-20260929"
         }
       ],
+      "terminal_state": null,
       "title": "Context and usage efficiency",
       "verdict": {
         "adjudication_ref": "evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-token-efficiency-20260922.json",
@@ -7560,6 +8146,10 @@
           "repository": "https://github.com/browser-use/browser-use"
         }
       ],
+      "angles": {
+        "gap": "No angle record; convergence is unverified.",
+        "status": "missing"
+      },
       "catalog": "foundation",
       "funnel": {
         "adopted": 3,
@@ -7603,6 +8193,7 @@
           "sweep_id": "landscape-sweep-20260929"
         }
       ],
+      "terminal_state": null,
       "title": "Web research",
       "verdict": {
         "adjudication_ref": "evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-web-research-20260922.json",
@@ -7763,6 +8354,62 @@
           "repository": "https://github.com/temporalio/temporal"
         }
       ],
+      "angles": {
+        "candidates": [
+          {
+            "adoption_status": "COMPARISON_ARM",
+            "coverage": 0.55,
+            "disqualifier": null,
+            "id": "openhands-sdk",
+            "pin": "54daf056bd863bb46f922a2fe9324dd736b37ff6",
+            "provisional": false,
+            "repository": "https://github.com/OpenHands/software-agent-sdk",
+            "sourced_angles": 3,
+            "verdict": "INSUFFICIENT",
+            "weighted_score": 0.2
+          },
+          {
+            "adoption_status": "COMPARISON_ARM",
+            "coverage": 0.75,
+            "disqualifier": null,
+            "id": "mini-swe-agent",
+            "pin": "04d809ceab9df28f9adaed044884180159172930",
+            "provisional": false,
+            "repository": "https://github.com/SWE-agent/mini-swe-agent",
+            "sourced_angles": 4,
+            "verdict": "INSUFFICIENT",
+            "weighted_score": 0.4
+          }
+        ],
+        "disclosure": "V2 was adopted after the runtime v1 scores were visible. V1 verdicts remain in candidate history and the public source receipt retains their sign matrix. Current scores use fresh primary-source reads; the stated-before-scoring time applies to this re-verification, not the original v1 scores. Installs and smokes are A1; none is counted as comparative A6.",
+        "effective_weights": {
+          "A1": 0.2,
+          "A2": 0.2,
+          "A3": 0.15,
+          "A4": 0.15,
+          "A5": 0.2,
+          "A6": 0.1
+        },
+        "gaps": [
+          "No comparative A6 receipt has been published for these candidates.",
+          "The API Scorecard snapshots, where available, assess their own upstream commit, which can differ from the A1 capability pin.",
+          "Release and five-run CI snapshots are bounded observations; missing Scorecard results remain a coverage gap.",
+          "This initial record does not adjudicate cumulative survivors or supply FINAL E2E and invoke receipts.",
+          "Cumulative unresolved survivor github.com/openai/codex from landscape-sweep-20260929 remains unresolved."
+        ],
+        "path": "catalogs/landscape/angles/foundation-workers.json",
+        "rule_version": "angle-convergence/2",
+        "status": "recorded",
+        "weights": {
+          "A1": 0.2,
+          "A2": 0.2,
+          "A3": 0.15,
+          "A4": 0.15,
+          "A5": 0.2,
+          "A6": 0.1
+        },
+        "weights_stated_at": "2026-10-12T21:32:22Z"
+      },
       "catalog": "foundation",
       "funnel": {
         "adopted": 2,
@@ -7791,6 +8438,7 @@
           "sweep_id": "landscape-sweep-20260929"
         }
       ],
+      "terminal_state": null,
       "title": "Workers and task ownership",
       "verdict": {
         "adjudication_ref": "evidence/artifacts/layer-verdicts-20260922/adjudication/foundation-workers-20260922.json",
@@ -7983,6 +8631,10 @@
           "repository": "https://github.com/jdx/mise"
         }
       ],
+      "angles": {
+        "gap": "No angle record; convergence is unverified.",
+        "status": "missing"
+      },
       "catalog": "us-equities",
       "funnel": {
         "adopted": 3,
@@ -8011,6 +8663,7 @@
           "sweep_id": "landscape-sweep-20260926"
         }
       ],
+      "terminal_state": null,
       "title": "Agents, models and workers",
       "verdict": {
         "adjudication_ref": null,
@@ -8128,6 +8781,10 @@
           "repository": "https://github.com/whchien/ai-trader"
         }
       ],
+      "angles": {
+        "gap": "No angle record; convergence is unverified.",
+        "status": "missing"
+      },
       "catalog": "us-equities",
       "funnel": {
         "adopted": 2,
@@ -8186,6 +8843,7 @@
           "sweep_id": "landscape-sweep-20261009-pine"
         }
       ],
+      "terminal_state": null,
       "title": "Backtesting engine",
       "verdict": {
         "adjudication_ref": null,
@@ -8260,6 +8918,10 @@
     },
     {
       "alternates": [],
+      "angles": {
+        "gap": "No angle record; convergence is unverified.",
+        "status": "missing"
+      },
       "catalog": "us-equities",
       "funnel": {
         "adopted": 0,
@@ -8275,6 +8937,7 @@
       "source": "catalogs/landscape/planned-layers.json#/layers/0",
       "status": "unswept",
       "survivors": [],
+      "terminal_state": null,
       "title": "Catalysts and sentiment (free sources first)",
       "verdict": null,
       "winners": []
@@ -8294,6 +8957,10 @@
           "repository": "https://github.com/modal-labs/modal-client"
         }
       ],
+      "angles": {
+        "gap": "No angle record; convergence is unverified.",
+        "status": "missing"
+      },
       "catalog": "us-equities",
       "funnel": {
         "adopted": 2,
@@ -8322,6 +8989,7 @@
           "sweep_id": "landscape-sweep-20260926"
         }
       ],
+      "terminal_state": null,
       "title": "Data quality and orchestration",
       "verdict": {
         "adjudication_ref": "evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-data-quality-orchestration-20260922.json",
@@ -8412,6 +9080,10 @@
           "repository": "https://github.com/promptfoo/promptfoo"
         }
       ],
+      "angles": {
+        "gap": "No angle record; convergence is unverified.",
+        "status": "missing"
+      },
       "catalog": "us-equities",
       "funnel": {
         "adopted": 1,
@@ -8434,6 +9106,7 @@
       "source": "catalogs/landscape/us-equities.json#/layers/8",
       "status": "reopened",
       "survivors": [],
+      "terminal_state": null,
       "title": "Evaluation and experiments",
       "verdict": {
         "adjudication_ref": "evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-evaluation-experiments-20260922.json",
@@ -8510,6 +9183,10 @@
     },
     {
       "alternates": [],
+      "angles": {
+        "gap": "No angle record; convergence is unverified.",
+        "status": "missing"
+      },
       "catalog": "us-equities",
       "funnel": {
         "adopted": 0,
@@ -8578,6 +9255,7 @@
           "sweep_id": "landscape-sweep-20260926"
         }
       ],
+      "terminal_state": null,
       "title": "Execution and broker adapters",
       "verdict": {
         "adjudication_ref": "evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-execution-broker-20260922.json",
@@ -8640,6 +9318,10 @@
           "repository": "https://github.com/OpenLineage/OpenLineage"
         }
       ],
+      "angles": {
+        "gap": "No angle record; convergence is unverified.",
+        "status": "missing"
+      },
       "catalog": "us-equities",
       "funnel": {
         "adopted": 0,
@@ -8673,6 +9355,7 @@
           "sweep_id": "landscape-sweep-20260926"
         }
       ],
+      "terminal_state": null,
       "title": "Identity, provenance and lineage",
       "verdict": {
         "adjudication_ref": "evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-identity-provenance-20260922.json",
@@ -8724,6 +9407,10 @@
     },
     {
       "alternates": [],
+      "angles": {
+        "gap": "No angle record; convergence is unverified.",
+        "status": "missing"
+      },
       "catalog": "us-equities",
       "funnel": {
         "adopted": 0,
@@ -8739,6 +9426,7 @@
       "source": "catalogs/landscape/planned-layers.json#/layers/1",
       "status": "unswept",
       "survivors": [],
+      "terminal_state": null,
       "title": "Judgment and features",
       "verdict": null,
       "winners": []
@@ -8800,6 +9488,10 @@
           "repository": "https://github.com/atilaahmettaner/tradingview-mcp"
         }
       ],
+      "angles": {
+        "gap": "No angle record; convergence is unverified.",
+        "status": "missing"
+      },
       "catalog": "us-equities",
       "funnel": {
         "adopted": 3,
@@ -8843,6 +9535,7 @@
           "sweep_id": "landscape-sweep-20260926"
         }
       ],
+      "terminal_state": null,
       "title": "Market data and reference",
       "verdict": {
         "adjudication_ref": null,
@@ -8938,6 +9631,10 @@
     },
     {
       "alternates": [],
+      "angles": {
+        "gap": "No angle record; convergence is unverified.",
+        "status": "missing"
+      },
       "catalog": "us-equities",
       "funnel": {
         "adopted": 0,
@@ -8966,6 +9663,7 @@
           "sweep_id": "landscape-sweep-20260926"
         }
       ],
+      "terminal_state": null,
       "title": "Observability and hosting",
       "verdict": {
         "adjudication_ref": "evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-observability-hosting-20260922.json",
@@ -9004,6 +9702,10 @@
           "repository": "https://github.com/ranaroussi/quantstats"
         }
       ],
+      "angles": {
+        "gap": "No angle record; convergence is unverified.",
+        "status": "missing"
+      },
       "catalog": "us-equities",
       "funnel": {
         "adopted": 1,
@@ -9032,6 +9734,7 @@
           "sweep_id": "landscape-sweep-20260926"
         }
       ],
+      "terminal_state": null,
       "title": "Portfolio and risk",
       "verdict": {
         "adjudication_ref": null,
@@ -9193,6 +9896,10 @@
           "repository": "https://github.com/microsoft/qlib"
         }
       ],
+      "angles": {
+        "gap": "No angle record; convergence is unverified.",
+        "status": "missing"
+      },
       "catalog": "us-equities",
       "funnel": {
         "adopted": 2,
@@ -9241,6 +9948,7 @@
           "sweep_id": "landscape-sweep-20260926"
         }
       ],
+      "terminal_state": null,
       "title": "Research, factors and ML",
       "verdict": {
         "adjudication_ref": null,
@@ -9316,6 +10024,10 @@
           "repository": "https://github.com/sigstore/cosign"
         }
       ],
+      "angles": {
+        "gap": "No angle record; convergence is unverified.",
+        "status": "missing"
+      },
       "catalog": "us-equities",
       "funnel": {
         "adopted": 2,
@@ -9374,6 +10086,7 @@
           "sweep_id": "landscape-sweep-20260926"
         }
       ],
+      "terminal_state": null,
       "title": "Security and supply chain",
       "verdict": {
         "adjudication_ref": null,
@@ -9522,6 +10235,10 @@
           "repository": "https://github.com/bytebase/dbhub"
         }
       ],
+      "angles": {
+        "gap": "No angle record; convergence is unverified.",
+        "status": "missing"
+      },
       "catalog": "us-equities",
       "funnel": {
         "adopted": 1,
@@ -9550,6 +10267,7 @@
           "sweep_id": "landscape-sweep-20260926"
         }
       ],
+      "terminal_state": null,
       "title": "Storage and compute",
       "verdict": {
         "adjudication_ref": null,
@@ -10672,12 +11390,17 @@
     }
   ],
   "schema_version": 1,
-  "scope": "One row per layer of the final stack: the landscape verdict rows and the planned layers, each with its status, verdict wave and next review, winners with their verdict and run pins, alternates, unadjudicated sweep survivors, open gaps, research state, saturation and the found-to-adopted funnel; the run pins; the intake; and a repository and component index. A read-only join of evidence recorded elsewhere; it selects nothing.",
+  "scope": "One row per layer of the final stack: the landscape verdict rows and the planned layers, each with its status, verdict wave and next review, winners with their verdict and run pins, alternates, unadjudicated sweep survivors, open gaps, research state, saturation and the found-to-adopted funnel; the run pins; the intake; and a repository and component index; sourced angle summaries and explicit FINAL checks. A read-only join of evidence recorded elsewhere; it selects nothing.",
   "sources": {
     "adoption/manifest.json": "2cdec6a1b92580527226c2c2196b8d5de809ee81877bdc6d95bf43481e388ee5",
     "adoption/pins-linux-x86_64.json": "964d085d8fe2cb8aba3d44678938e34a2b1d8b6e320227db4152352a0d0e2449",
     "adoption/pins-macos-arm64.json": "539a4840e1c5e2d5377685c274932f697d22bd16e28f99e70c12b2f86dc9f24c",
     "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock": "f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989",
+    "catalogs/landscape/angles/foundation-agent-sdks.json": "0ae55b7c7d95305b85203d6df686cffaad1b33e75c673790ed7b0ebb95f38adc",
+    "catalogs/landscape/angles/foundation-model-routes.json": "9f9517f9c07515e25978aac8c63948e1b6ef880ee673426f30aab9daf99948f8",
+    "catalogs/landscape/angles/foundation-native-clients.json": "5177c30702940de6123c59d96e8aed1dd570d3530cd54699b286df7a2ece6aa9",
+    "catalogs/landscape/angles/foundation-workers.json": "2ba4db7cd86fb47d0f8da027615a2ede92416f90918dc4bc8b4c2defb8dd3936",
+    "catalogs/landscape/angles/schema.json": "0352746b23b1b3b17751fad57be23846d697011ff46df37c23d2930939fc8328",
     "catalogs/landscape/component-evidence-matrix.json": "7c68cc6e9e0001e4953ad08c6dec86cca462a5ca9787e5d1035a90f515f27885",
     "catalogs/landscape/foundation.json": "55751afc9a6e3d2dd814d5ba35d811ea9424464ccc417234b8cb6d08864e48b8",
     "catalogs/landscape/manifest.json": "8f2795612616853c92db1571de32d5ffb2019c32b3376ef0ed3b28fe9a8cc077",
@@ -10687,8 +11410,11 @@
     "catalogs/landscape/us-equities.json": "6aff6411e711dcf3f0a487f343bb0e45c319a0a9235763a54eae9316e1597b0e",
     "catalogs/saturation/ledger.json": "b6ca3220516a515bd6dec13f122f48acdd8ef738565f9c0145839d99dd0c21f2",
     "catalogs/sota-convergence/layer-verdict-waves.json": "7f7056066fec1d5ea6e6cc5e243a668e509b1d74add94ec3d74cbd3025ebc756",
+    "catalogs/sota-convergence/layer-verdicts-20260922.json": "2fef6da7468a8e97a319fdc6f75f73374cd34b412bf93de90fd0c2a7504159de",
+    "catalogs/sota-convergence/manifest-20260929.json": "af4e0314b28acafe2b5e8a0bce71d1ced2efe911a3c3757557b23bd71c63c9ee",
     "catalogs/sota-convergence/manifest-20261009.json": "3f061eeb261a91e8eec0f586bc135179e56bacd6216adcf9ddfa526877879153",
     "catalogs/us-equities/runtime-target.json": "bd318252b220d2e611fa9baa21031359f0fbb8d07e1a7bb6a65f67c9cb02eb41",
+    "docs/decisions/2026-10-11-layer-resolution-protocol.md": "010e39f2a915cc1ea1e163d56cb0f8cbfbd9cedb14a9fd7f78b2defd24648c58",
     "docs/decisions/2026-10-11-planned-layers-source-review.json": "bbeafbef0f05c0b7595ebed36309d634076372f41c308a37cbb6840e2222b1bb",
     "evidence/artifacts/landscape-sweep-20260926/returns.json": "ea7e8ed285639a247df91d0c64d9378e080bc820170e9fc773434488397f4600",
     "evidence/artifacts/landscape-sweep-20260929/returns.json": "2f93067652c0f1e8e4f3d726895d2017eafef018412e47e9bc9b48e7ef931a9c",
@@ -10698,7 +11424,12 @@
   },
   "summary": {
     "alternates": 183,
-    "layers": 34,
+    "angles": {
+      "missing": 31,
+      "recorded": 4
+    },
+    "final_layers": 0,
+    "layers": 35,
     "matrix_convergence": {
       "converged": 0,
       "in_use": 170
@@ -10728,7 +11459,7 @@
       "current": 0,
       "no-winner": 2,
       "reopened": 30,
-      "unswept": 2
+      "unswept": 3
     },
     "survivors": 107,
     "winners": 66,

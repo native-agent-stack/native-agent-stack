@@ -1,0 +1,277 @@
+{
+  "schema_version": 1,
+  "rule_version": "angle-convergence/2",
+  "catalog": "foundation",
+  "weights": {
+    "A1": 0.2,
+    "A2": 0.2,
+    "A3": 0.15,
+    "A4": 0.15,
+    "A5": 0.2,
+    "A6": 0.1
+  },
+  "weights_stated_at": "2026-10-12T21:32:22Z",
+  "weight_reason": "V2 defaults stated before fresh source verification; all-unpublished layers transfer A5 to A6 by the fixed v2 rule.",
+  "disclosure": "V2 was adopted after the runtime v1 scores were visible. V1 verdicts remain in candidate history and the public source receipt retains their sign matrix. Current scores use fresh primary-source reads; the stated-before-scoring time applies to this re-verification, not the original v1 scores. Installs and smokes are A1; none is counted as comparative A6.",
+  "resolution_inputs": [
+    "catalogs/landscape/foundation.json",
+    "catalogs/sota-convergence/layer-verdict-waves.json",
+    "catalogs/sota-convergence/layer-verdicts-20260922.json",
+    "catalogs/saturation/ledger.json",
+    "catalogs/sota-convergence/manifest-20260929.json",
+    "evidence/artifacts/landscape-sweep-20260929/returns.json"
+  ],
+  "final_evidence": [],
+  "layer_id": "workers",
+  "published_evaluations_available": true,
+  "gaps": [
+    "No comparative A6 receipt has been published for these candidates.",
+    "The API Scorecard snapshots, where available, assess their own upstream commit, which can differ from the A1 capability pin.",
+    "Release and five-run CI snapshots are bounded observations; missing Scorecard results remain a coverage gap.",
+    "This initial record does not adjudicate cumulative survivors or supply FINAL E2E and invoke receipts.",
+    "Cumulative unresolved survivor github.com/openai/codex from landscape-sweep-20260929 remains unresolved."
+  ],
+  "candidates": [
+    {
+      "id": "openhands-sdk",
+      "name": "OpenHands SDK + Agent Server",
+      "repository": "https://github.com/OpenHands/software-agent-sdk",
+      "pin": "54daf056bd863bb46f922a2fe9324dd736b37ff6",
+      "role": "role-2 worker (not a role-1 CLI row)",
+      "a1_screened": true,
+      "a6_comparative": false,
+      "mirror_status": "MIRRORED",
+      "adoption_status": "COMPARISON_ARM",
+      "confounds": [
+        "Capability source review is separate from native lifecycle qualification and route entitlement.",
+        "Published usage and evaluation rows cover different dates, upstream versions, provider routes and models; no causal harness ranking is inferred."
+      ],
+      "angles": {
+        "A1": {
+          "score": "+",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/OpenHands/software-agent-sdk",
+              "pin": "54daf056bd863bb46f922a2fe9324dd736b37ff6",
+              "path": "README.md",
+              "line": 5
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/OpenHands/software-agent-sdk",
+              "pin": "54daf056bd863bb46f922a2fe9324dd736b37ff6",
+              "path": "README.md",
+              "line": 81
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/OpenHands/software-agent-sdk",
+              "pin": "54daf056bd863bb46f922a2fe9324dd736b37ff6",
+              "path": "openhands-sdk/openhands/sdk/llm/llm.py",
+              "line": 63
+            }
+          ],
+          "note": "Pinned upstream capability documentation was re-read. The screen is limited to the stated native-client, role-2 worker or bash-control role. Prior install and smoke observations are classified as A1; no private runtime receipt is published here."
+        },
+        "A2": {
+          "score": "0",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.scorecard.dev/projects/github.com/OpenHands/software-agent-sdk",
+              "read_at": "2026-10-12T21:42:31Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://api.github.com/repos/OpenHands/software-agent-sdk/releases/latest",
+              "read_at": "2026-10-12T21:42:31Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://api.github.com/repos/OpenHands/software-agent-sdk/actions/runs?per_page=5",
+              "read_at": "2026-10-12T21:42:31Z"
+            }
+          ],
+          "note": "Public Scorecard HTTP 404; release {\"tag_name\":\"v1.54.0\",\"published_at\":\"2026-10-09T18:36:49Z\",\"prerelease\":false,\"draft\":false}; latest five CI conclusions [\"skipped\",\"success\",\"success\",\"skipped\",\"success\"]. Quality is scored mixed: release/CI evidence is bounded and security Scorecard coverage can be missing or at another commit. Raw scored fields and API times are retained in the public source receipt."
+        },
+        "A3": {
+          "score": "0",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.deps.dev/v3/projects/github.com%2FOpenHands%2Fsoftware-agent-sdk",
+              "read_at": "2026-10-12T21:42:31Z"
+            }
+          ],
+          "note": "deps.dev project snapshot: {\"projectKey\":{\"id\":\"github.com/openhands/software-agent-sdk\"},\"starsCount\":1238,\"forksCount\":642}. Mixed/limited community evidence; one star/fork snapshot is not an adverse capability finding."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://openrouter.ai/apps",
+              "read_at": "2026-10-12T21:41:48Z"
+            }
+          ],
+          "note": "No registry-specific download row was verified for this candidate. The official OpenRouter app page was read; absence is not zero usage."
+        },
+        "A5": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://www.tbench.ai/leaderboard",
+              "read_at": "2026-10-12T21:44:03Z"
+            }
+          ],
+          "note": "No matching published Terminal-Bench row verified in this page's data. Prior leaderboard assertions are not transcribed without their row; this is a gap."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [],
+          "note": "No comparative measured run with a retained public receipt. Every v1 install/smoke score is removed from A6, including successful smokes and route failures; any published sanitized smoke belongs to A1."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "Complete the role-specific pin screen and missing angle sources, then run the preregistered comparison if the sourced angles disagree.",
+      "previous_verdict": "DISAGREE",
+      "licence_note": {
+        "spdx_id": "MIT",
+        "source": {
+          "kind": "url",
+          "url": "https://api.deps.dev/v3/projects/github.com%2FOpenHands%2Fsoftware-agent-sdk",
+          "read_at": "2026-10-12T21:42:31Z"
+        },
+        "read_at": "2026-10-12T21:42:31Z",
+        "note": "Compliance metadata reported by deps.dev at this read, not a pin-level legal conclusion. It has no effect on scores, verdict or comparison-arm selection."
+      }
+    },
+    {
+      "id": "mini-swe-agent",
+      "name": "mini-swe-agent",
+      "repository": "https://github.com/SWE-agent/mini-swe-agent",
+      "pin": "04d809ceab9df28f9adaed044884180159172930",
+      "role": "control (bash-only baseline)",
+      "a1_screened": true,
+      "a6_comparative": false,
+      "mirror_status": "MIRRORED",
+      "adoption_status": "COMPARISON_ARM",
+      "confounds": [
+        "Capability source review is separate from native lifecycle qualification and route entitlement.",
+        "Published usage and evaluation rows cover different dates, upstream versions, provider routes and models; no causal harness ranking is inferred."
+      ],
+      "angles": {
+        "A1": {
+          "score": "+",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "repo",
+              "repository": "https://github.com/SWE-agent/mini-swe-agent",
+              "pin": "04d809ceab9df28f9adaed044884180159172930",
+              "path": "README.md",
+              "line": 5
+            },
+            {
+              "kind": "repo",
+              "repository": "https://github.com/SWE-agent/mini-swe-agent",
+              "pin": "04d809ceab9df28f9adaed044884180159172930",
+              "path": "README.md",
+              "line": 43
+            }
+          ],
+          "note": "Pinned upstream capability documentation was re-read. The screen is limited to the stated native-client, role-2 worker or bash-control role. Prior install and smoke observations are classified as A1; no private runtime receipt is published here."
+        },
+        "A2": {
+          "score": "0",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.scorecard.dev/projects/github.com/SWE-agent/mini-swe-agent",
+              "read_at": "2026-10-12T21:42:31Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://api.github.com/repos/SWE-agent/mini-swe-agent/releases/latest",
+              "read_at": "2026-10-12T21:42:31Z"
+            },
+            {
+              "kind": "url",
+              "url": "https://api.github.com/repos/SWE-agent/mini-swe-agent/actions/runs?per_page=5",
+              "read_at": "2026-10-12T21:42:32Z"
+            }
+          ],
+          "note": "Public Scorecard HTTP 404; release {\"tag_name\":\"v2.4.6\",\"published_at\":\"2026-07-23T03:12:33Z\",\"prerelease\":false,\"draft\":false}; latest five CI conclusions [\"failure\",\"failure\",\"failure\",\"action_required\",\"action_required\"]. Quality is scored mixed: release/CI evidence is bounded and security Scorecard coverage can be missing or at another commit. Raw scored fields and API times are retained in the public source receipt."
+        },
+        "A3": {
+          "score": "0",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://api.deps.dev/v3/projects/github.com%2FSWE-agent%2Fmini-swe-agent",
+              "read_at": "2026-10-12T21:42:31Z"
+            }
+          ],
+          "note": "deps.dev project snapshot: {\"projectKey\":{\"id\":\"github.com/swe-agent/mini-swe-agent\"},\"starsCount\":8231,\"forksCount\":1129}. Mixed/limited community evidence; one star/fork snapshot is not an adverse capability finding."
+        },
+        "A4": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://openrouter.ai/apps",
+              "read_at": "2026-10-12T21:41:48Z"
+            }
+          ],
+          "note": "No registry-specific download row was verified for this candidate. The official OpenRouter app page was read; absence is not zero usage."
+        },
+        "A5": {
+          "score": "+",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [
+            {
+              "kind": "url",
+              "url": "https://www.tbench.ai/leaderboard",
+              "read_at": "2026-10-12T21:44:03Z"
+            }
+          ],
+          "note": "Published Terminal-Bench row: {\"agent\":\"mini-SWE-agent\",\"model\":\"Gemini 3.8 Flash\",\"effort\":\"high\",\"accuracy\":19.09,\"date\":\"2026-09-02\"}. Positive published outcome evidence; agent/model/version and submitter confounds prevent attributing a model gap to the harness."
+        },
+        "A6": {
+          "score": "U",
+          "read_at": "2026-10-12T21:47:43Z",
+          "sources": [],
+          "note": "No comparative measured run with a retained public receipt. Every v1 install/smoke score is removed from A6, including successful smokes and route failures; any published sanitized smoke belongs to A1."
+        }
+      },
+      "disqualifier": null,
+      "verdict": "INSUFFICIENT",
+      "provisional": false,
+      "measure_next": "Complete the role-specific pin screen and missing angle sources, then run the preregistered comparison if the sourced angles disagree.",
+      "previous_verdict": "CONVERGED",
+      "licence_note": {
+        "spdx_id": "MIT",
+        "source": {
+          "kind": "url",
+          "url": "https://api.deps.dev/v3/projects/github.com%2FSWE-agent%2Fmini-swe-agent",
+          "read_at": "2026-10-12T21:42:31Z"
+        },
+        "read_at": "2026-10-12T21:42:31Z",
+        "note": "Compliance metadata reported by deps.dev at this read, not a pin-level legal conclusion. It has no effect on scores, verdict or comparison-arm selection."
+      }
+    }
+  ]
+}

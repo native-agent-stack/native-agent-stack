@@ -35,10 +35,11 @@ import tempfile
 import tomllib
 
 try:
-    from . import component_matrix, host_receipts, host_name_scan, saturation_ledger
+    from . import angle_records, component_matrix, host_receipts, host_name_scan, saturation_ledger
     from .catalog_decisions import InvalidDecisionIndex, safe_file, unique_json
     from .sweep_policy import DEFAULT_SWEEP_CADENCE_DAYS
 except ImportError:  # running as a plain script, not a package
+    import angle_records
     import component_matrix
     import host_receipts
     import host_name_scan
@@ -62,7 +63,8 @@ SCOPE = (
     "One row per layer of the final stack: the landscape verdict rows and the planned layers, each with its status, "
     "verdict wave and next review, winners with their verdict and run pins, alternates, unadjudicated sweep "
     "survivors, open gaps, research state, saturation and the found-to-adopted funnel; the run pins; the intake; and "
-    "a repository and component index. A read-only join of evidence recorded elsewhere; it selects nothing."
+    "a repository and component index; sourced angle summaries and explicit FINAL checks. A read-only join of "
+    "evidence recorded elsewhere; it selects nothing."
 )
 OUTPUT = "catalogs/landscape/final-stack.json"
 LANDSCAPE_MANIFEST = "catalogs/landscape/manifest.json"
@@ -587,8 +589,98 @@ def layer_status(covered: bool, state: str | None, convergence: dict) -> str:
     return "current"
 
 
+def enforce_final(sources: Sources, layers: list[dict], runs: list[dict], angle_inputs: dict) -> None:
+    """Protocol conditions 1–4 apply only to explicitly FINAL layers.
+
+    A matrix 'converged' status is a different concept. This check never
+    promotes a layer or substitutes installation for invocation.
+    """
+    by_run = {run["id"]: run for run in runs}
+    for layer in layers:
+        if layer["terminal_state"] != "FINAL":
+            continue
+        key = (layer["catalog"], layer["layer_id"])
+
+        def fail(reason):
+            raise FinalStackError(f"FINAL {layer_key(*key)}: {reason}")
+
+        entry = angle_inputs.get(key)
+        if entry is None or not layer["winners"]:
+            fail("requires winners and a CONVERGED angle record")
+        verdict = layer["verdict"] or {}
+        wave = verdict.get("wave_doc") or {}
+        if not all(verdict.get(k) for k in ("date", "wave", "next_review")) or not wave.get("path"):
+            fail("condition 1 requires a recorded verdict, wave and next_review")
+        try:
+            raw = sources.read_bytes(wave["path"])
+        except FinalStackError:
+            fail("condition 1 verdict wave is not retained")
+        if hashlib.sha256(raw).hexdigest() != wave.get("sha256"):
+            fail("condition 1 verdict wave hash does not match")
+        record = entry["record"]
+        bound = {e["candidate_id"]: e for e in record["final_evidence"]}
+        for winner in layer["winners"]:
+            repository = host_receipts.normalize_repository(winner["repository"])
+            run = by_run.get(winner["run"])
+            if not winner.get("evidence_class"):
+                fail("condition 1 winner has no evidence class")
+            if run is None or not run.get("pin") or winner["pin_drift"] != "same":
+                fail("condition 2 winner requires a matching run pin in runs[]")
+            candidates = [c for c in record["candidates"]
+                          if host_receipts.normalize_repository(c["repository"]) == repository
+                          and compare_pins(parse_pin(c["pin"]), run) == "same"]
+            if len(candidates) != 1 or candidates[0]["verdict"] != "CONVERGED":
+                fail("winner requires one CONVERGED angle verdict at its run pin")
+            candidate = candidates[0]
+            evidence = bound.get(candidate["id"]) or {}
+            if compare_pins(parse_pin(evidence.get("run_pin")), run) != "same":
+                fail("FINAL evidence must bind the same run pin")
+
+            def receipt(field, condition):
+                path = evidence.get(field)
+                if not path:
+                    fail(f"condition {condition} requires {field}")
+                try:
+                    value = sources.json(path)
+                except FinalStackError:
+                    fail(f"condition {condition} receipt is unavailable")
+                if (not isinstance(value, dict) or value.get("evidence_class") != "native_proven"
+                    or host_receipts.normalize_repository(value.get("repository")) != repository
+                    or compare_pins(parse_pin(value.get("pin")), run) != "same"):
+                    fail(f"condition {condition} receipt must bind native evidence to repository and run pin")
+                return value
+
+            e2e = receipt("e2e_receipt", 3)
+            phases = {c.get("phase") for c in _dicts(e2e.get("commands"))
+                      if c.get("command") and type(c.get("exit_code")) is int and c["exit_code"] == 0}
+            cited = e2e.get("upstream_sources") or []
+            upstream = [s for s in _dicts(cited) if s.get("kind") == "repo" and s.get("path") and s.get("line")
+                        and host_receipts.normalize_repository(s.get("repository")) == repository
+                        and compare_pins(parse_pin(s.get("pin")), run) == "same"]
+            if (e2e.get("kind") != "upstream_e2e" or e2e.get("success") is not True
+                or not {"install", "test"}.issubset(phases) or not upstream
+                or any(c.get("exit_code") != 0 for c in _dicts(e2e.get("commands")))):
+                fail("condition 3 requires successful upstream install and test commands with pinned citations")
+            if evidence.get("invoke_receipt"):
+                invoke = receipt("invoke_receipt", 4)
+                try:
+                    start, end = (angle_records.timestamp(invoke[k]) for k in ("window_start", "window_end"))
+                    valid_window = start.tzinfo is not None and end.tzinfo is not None and start < end
+                except (KeyError, TypeError, ValueError):
+                    valid_window = False
+                if (invoke.get("kind") != "invocation" or not valid_window
+                    or type(invoke.get("calls")) is not int or invoke["calls"] <= 0):
+                    fail("condition 4 requires positive invocation calls in a measured window")
+            elif not (evidence.get("not_invoked_reason") or "").strip():
+                fail("condition 4 requires invoke evidence or a recorded non-invocation reason")
+
+
 def build_document(root: Path) -> dict:
     sources = Sources(root)
+    try:
+        angle_inputs = angle_records.load_records(sources)
+    except angle_records.AngleRecordError as error:
+        raise FinalStackError(str(error)) from error
     landscape = landscape_rows(sources)
     planned = planned_rows(sources, landscape)
     research_state, matrix, skills, ledger = (sources.json(relative)
@@ -620,9 +712,10 @@ def build_document(root: Path) -> dict:
     runs_by_id = {run["id"]: run for run in runs}
 
     layers = []
-    for key in sorted(set(landscape) | set(planned)):
+    for key in sorted(set(landscape) | set(planned) | set(angle_inputs)):
         catalog, layer_id = key
-        entry = landscape.get(key) or planned[key]
+        entry = landscape.get(key) or planned.get(key) or {
+            "row": {"title": layer_id, "candidates": []}, "source": angle_inputs[key]["path"]}
         row = entry["row"]
         is_landscape = key in landscape
         matrix_row = matrix_rows.get(key) or {}
@@ -657,6 +750,9 @@ def build_document(root: Path) -> dict:
             "title": row.get("title"),
             "source": entry["source"],
             "status": layer_status(bool(covering), state if is_landscape else None, convergence),
+            "terminal_state": row.get("terminal_state") or (angle_inputs.get(key, {}).get("record") or {}).get("terminal_state")
+                              or ("FINAL" if row.get("verdict_status") == "FINAL" else None),
+            "angles": angle_records.summary(angle_inputs.get(key)),
             "verdict": build_verdict(row, matrix_row, registry, reopened_by, root=root) if is_landscape else None,
             "winners": winners,
             "alternates": [{field: alternative.get(field) for field in
@@ -676,6 +772,8 @@ def build_document(root: Path) -> dict:
                                 if winner["run"] is not None} - {None}),
             },
         })
+
+    enforce_final(sources, layers, runs, angle_inputs)
 
     skills_coverage = []
     for task in _dicts(skills.get("tasks")):
@@ -774,6 +872,9 @@ def build_summary(layers: list[dict], runs: list[dict], skills_coverage: list[di
     overall = ((matrix.get("summary") or {}).get("convergence") or {}).get("overall") or {}
     return {
         "layers": len(layers),
+        "angles": {status: sum(layer["angles"]["status"] == status for layer in layers)
+                   for status in ("recorded", "missing")},
+        "final_layers": sum(layer["terminal_state"] == "FINAL" for layer in layers),
         "status": {status: sum(1 for layer in layers if layer["status"] == status) for status in STATUS_ORDER},
         "winners": len(winners),
         "pin_parse": {"parsed": sum(1 for winner in winners if "pin_parsed" in winner),
