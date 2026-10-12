@@ -5371,7 +5371,7 @@
     },
     {
       "path": "adoption/hooks/claude/SHA256SUMS",
-      "sha256": "1dd5700d8b131fdc3f7c187abe4cf7931c27d3dd18e027368e8f89b7f8da3afa",
+      "sha256": "d186d99e9824b5e84f4bef4eb3f79b1cde1560779114167a59dbaf83213eba7a",
       "bytes": 1229
     },
     {
@@ -17277,7 +17277,7 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "04fb844bc79dfae6310cc4def7c40d475d7283707a4ed394155704ff67241955",
+      "sha256": "71b336ca040330593b941ed349c73df818dce0090654c5897e4a592d3a81ed5f",
       "bytes": 190328
     },
     {
@@ -19332,8 +19332,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "395fef8b4464cbbb92f445be15f8d52e1416a0efe6b2a9d7e6f90e12ad7ae3ed",
-      "bytes": 204416
+      "sha256": "247ae4eb091350148ec7363bae7530348f521625dfbbd48522f23a3c138bf37d",
+      "bytes": 214358
     },
     {
       "path": "docs/stack.md",
@@ -61112,8 +61112,8 @@
     },
     {
       "path": "scripts/hooks/secret_path_guard.py",
-      "sha256": "ce9027c56a7006317f52c6cfc2bcb9b267a4f37050269ccdbd001d1371f7d83a",
-      "bytes": 297056
+      "sha256": "2f22132594c1488819ec9771d14171768f0adb62090355d8eaa6d90a0043d2e6",
+      "bytes": 315593
     },
     {
       "path": "scripts/host_name_scan.py",
@@ -62772,8 +62772,8 @@
     },
     {
       "path": "tests/test_secret_path_guard.py",
-      "sha256": "4891bf55e134d01b26491b37b41fba2f1dccac2525c98f984da95fa914e68a53",
-      "bytes": 393630
+      "sha256": "92ab9e97617ebe1e23f98dadd742a045e156a69a5dd2bc8e53496220cae65092",
+      "bytes": 403565
     },
     {
       "path": "tests/test_secret_scan_metrics.py",

