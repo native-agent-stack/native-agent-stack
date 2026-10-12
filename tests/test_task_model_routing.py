@@ -253,6 +253,21 @@ class TaskModelRoutingRecordTests(unittest.TestCase):
                     self.assertLessEqual(int(span.split("-")[-1]), len(lines(path)), f"{row[0]}: {path}:{span}")
         self.assertGreaterEqual(cited, 60)
 
+    def test_current_runtime_trial_locator_points_at_its_quoted_assignment(self):
+        # #1033's newly added current trial row must identify GPT_MODEL at
+        # its claimed line. Merely finding the quote elsewhere in the file
+        # accepted a locator that actually pointed at CLAUDE_MODEL.
+        rows = [row for row in self.rows if row[0].startswith("Pi/OpenCode worker trials:")]
+        self.assertEqual(len(rows), 1)
+        quotes = SAYS.findall(rows[0][4])
+        self.assertEqual(len(quotes), 1)
+        path, first, last, quoted = quotes[0]
+        excerpt = "\n".join(lines(path)[int(first) - 1:int(last or first)])
+        assignments = re.findall(r"`([^`]+)`", quoted)
+        self.assertIn('GPT_MODEL = "cx/gpt-6.1-sol"', assignments)
+        for assignment in assignments:
+            self.assertIn(assignment, excerpt, f"{path}:{first} does not identify its quoted assignment")
+
     def test_a_frontmatter_row_names_the_model_it_quotes(self):
         rows = [row for row in self.rows if row[4].startswith("**Agent frontmatter**")]
         self.assertGreaterEqual(len(rows), 8)

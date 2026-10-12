@@ -46,10 +46,13 @@ The tracker includes the pinned Superpowers15-name and Context Mode inventory
 and attributes completed native loader/read calls to those sources. Configured
 preloads are recorded separately and never counted as completed tool calls.
 
-OpenCode starts in the fresh worktree. Its last-loaded native
+OpenCode binds the fresh worktree with both child `PWD` and headless `--dir`:
+the pinned run CLI otherwise uses the caller's PWD instead of subprocess cwd.
+Its last-loaded native
 `OPENCODE_CONFIG_CONTENT` narrows each role's filesystem read patterns and
 external-directory rules to that worktree plus selected profile skill dirs;
-project configuration is disabled so it cannot broaden the profile fence.
+native project configuration and AGENTS.md/subtree instruction discovery stay
+enabled; the final permission overlay preserves the explicit role fence.
 Primary-checkout and unrelated-directory reads are denied by the pinned
 evaluator regression. These are native tool permissions, not an OS sandbox
 for builder shell commands or arbitrary MCP implementations.
@@ -155,7 +158,8 @@ files; mksglu/context-mode@6f0cc684 `start.mjs:19-28,308-311,387-389`,
 OpenCode source paths above are under `packages/opencode/`.
 Worktrunk invocation-local overrides use max-sixty/worktrunk@b49ca7eea9b03145791a5b94eccaf9c59412ed37,
 `docs/src/content/docs/config.md:675-698`. Worktrunk and Context Mode references
-were checked through pinned vendor URLs; those objects are absent from the host mirrors.
+were originally checked through pinned vendor URLs. Worktrunk's b49ca7ee object
+is now present in the mirror; Context Mode's cited source remains unmirrored.
 The dependency rebuild uses the installed npm11.19.0 command's supported
 named-package form ([npm rebuild](https://docs.npmjs.com/cli/v11/commands/npm-rebuild)).
 
@@ -164,3 +168,51 @@ Pi selects role tools without loading role text; inherited hostname references;
 briefs >=128KiB hit the Linux per-argument limit with a generic error. The W6
 comparison arms wait until B2 lands; historical inference receipts remain
 bound to their original generation and heads.
+
+Astra's d475ef81 delta confirms B1's 60 rendered role/profile combinations
+and B3's attribution behavior. Its three remaining blockers concern the
+publication record: hashes of unpublished failed logs, the synthetic fixture
+email under the literal no-reply rule, and the displaced Sol constant locator.
+The reopened correction omits all unpublished-output hashes, uses a synthetic
+GitHub no-reply fixture identity and restores the current locator. Dedicated
+regressions refuse an absent or mismatched published log preimage under these
+notes, a non-no-reply fixture identity and a misplaced trial assignment citation.
+Named captures remain coordination-side evidence; reviewer-unavailable bytes
+do not become independently verified evidence through the receipt's public hash.
+
+Additional P3 follow-ups from that delta: launch exceptions may bypass normal
+receipts/cleanup; replaying native boot requires the intended already-qualified
+private prefix, since generic installed package layouts may lack the sibling
+SQLite dependency expected by the test; and pinned unmirrored source captures
+plus a B4 fail-before regression were absent from the review packet. Pi auth,
+interactive role text, inherited hostname hygiene and the oversized brief
+remain in Follow-ups. W6 arms still wait for B2 landing and the CC cue.
+
+The CC's d475ef81 micro additionally reproduced inherited-PWD session binding
+and the loss of repository instructions when project configuration was disabled.
+The native regression captures one request at a namespace-local rejecting
+stub, with no key, outside network or inference. It requires the actual session
+and working-directory markers to identify the fresh worktree, its AGENTS.md
+marker to be present, and the primary marker absent. Native `debug agent` read
+probes allow the assigned tree and selected vendor file while denying the
+primary and unselected vendor files. The before-control loads d475ef81's real
+launch code, retaining its inherited PWD; it never assumes the worktree is the
+session base. Pin: anomalyco/opencode@53d1eabb `src/cli/cmd/run.ts:134,333-340`,
+`src/session/instruction.ts:123-150`; fixture bodies are now byte-identical to
+`src/util/wildcard.ts:3-19`, `src/permission/index.ts:28-38,178-214` and
+`packages/core/src/npm.ts:45-50`. OpenCode src paths are under packages/opencode.
+
+Store isolation applies specifically to Context Mode and generated profile
+files. Launchers and Terminal fragments use their documented external locations;
+ai-memory, qmd and SocratiCode retain configured shared stores, and OpenCode can
+write its native project-id cache under the Git common directory. Pi has no
+filesystem read fence. These boundaries must be carried into the W6 blindness
+conditions before any comparison runs.
+
+Other CC P3 follow-ups: canonical managed skills' supporting files remain
+unreadable through OpenCode native Read (named skill-loader text still loads);
+missing preload files reject the OpenCode config; native boot requires explicit
+package qualification and otherwise skips in CI; ignored-only worktrees are
+retained conservatively, runtime branches remain, and exception paths can miss
+cleanup; the invocation inventory's returned source mapping is currently unused
+by launch. These omissions do not become native readiness passes.

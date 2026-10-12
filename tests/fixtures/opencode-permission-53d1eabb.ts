@@ -1,17 +1,22 @@
 // Unchanged test-only native functions from anomalyco/opencode@53d1eabb61e21162157817bf677da0a4ad3332e3.
-// wildcard.ts:3-14; permission/index.ts:28-38,178-214; core/src/npm.ts:45-50.
+// util/wildcard.ts:3-19; permission/index.ts:28-38,178-214; core/src/npm.ts:45-50.
 // Types are stripped by Node at test execution; this is not a runtime permission implementation.
-export function match(input: string, pattern: string) {
-  const normalized = input.replaceAll("\\", "/")
+export function match(str: string, pattern: string) {
+  if (str) str = str.replaceAll("\\", "/")
+  if (pattern) pattern = pattern.replaceAll("\\", "/")
   let escaped = pattern
-    .replaceAll("\\", "/")
-    .replace(/[.+^${}()|[\]\\]/g, "\\$&")
-    .replace(/\*/g, ".*")
-    .replace(/\?/g, ".")
+    .replace(/[.+^${}()|[\]\\]/g, "\\$&") // escape special regex chars
+    .replace(/\*/g, ".*") // * becomes .*
+    .replace(/\?/g, ".") // ? becomes .
 
-  if (escaped.endsWith(" .*")) escaped = escaped.slice(0, -3) + "( .*)?"
+  // If pattern ends with " *" (space + wildcard), make the trailing part optional
+  // This allows "ls *" to match both "ls" and "ls -la"
+  if (escaped.endsWith(" .*")) {
+    escaped = escaped.slice(0, -3) + "( .*)?"
+  }
 
-  return new RegExp("^" + escaped + "$", process.platform === "win32" ? "si" : "s").test(normalized)
+  const flags = process.platform === "win32" ? "si" : "s"
+  return new RegExp("^" + escaped + "$", flags).test(str)
 }
 export function evaluate(permission: string, pattern: string, ...rulesets: PermissionV1.Ruleset[]): PermissionV1.Rule {
   return (
@@ -49,6 +54,7 @@ export function fromConfig(permission: ConfigPermissionV1.Info) {
 export function merge(...rulesets: PermissionV1.Ruleset[]): PermissionV1.Rule[] {
   return rulesets.flat()
 }
+
 export function disabled(tools: string[], ruleset: PermissionV1.Ruleset): Set<string> {
   const edits = ["edit", "write", "apply_patch"]
   const reads = ["list_mcp_resources", "list_mcp_resource_templates", "read_mcp_resource"]

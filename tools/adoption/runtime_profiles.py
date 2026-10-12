@@ -7,7 +7,9 @@ docs/models.md:21, docs/mcp.md:104, docs/cli.md:47, docs/prompt-templates.md:51.
 anomalyco/opencode@53d1eabb:packages/web/src/content/docs/{config,providers,
 agents,mcp-servers,skills}.mdx; current mirror 4d9678a7 retains the v1 contract.
 RTK owns shell rewriting; native MCP, model transports and sessions stay native.
-Generated files and persistent MCP stores are scoped to private profile roots.
+Generated profile files and Context Mode's persistent stores use private roots;
+launchers/Terminal fragments use their documented locations. Other MCP services
+retain their configured shared stores. OpenCode's project cache stays Git-native.
 No credential/auth store is copied, hashed or published. Native vendor ephemeral
 files retain their documented behavior; hermetic boot evidence is scoped below.
 """
@@ -635,7 +637,7 @@ def fresh_worktree(repository: Path, profile: str) -> Path:
 
 
 def worktree_permissions(root: Path, workspace: Path) -> dict:
-    """Native last-loaded config: filesystem Read is worktree-relative.
+    """Native last-loaded config, paired with an explicitly bound run directory.
 
     anomalyco/opencode@53d1eabb: tool/read.ts:250-258;
     project/instance-store.ts:54-58; config/config.ts:482-489;
@@ -715,7 +717,14 @@ def launch(args):
     runtime_env["CONTEXT_MODE_PROJECT_DIR"] = str(workspace)
     runtime_env["CLAUDE_PROJECT_DIR"] = str(workspace)
     if runtime == "opencode":
-        runtime_env["OPENCODE_DISABLE_PROJECT_CONFIG"] = "1"
+        # OpenCode53 run.ts:333-340 takes its session directory from PWD,
+        # not subprocess cwd. Bind both routes, including credential_run's
+        # child env prefix; --dir below also binds effect-cmd's instance.
+        runtime_env["PWD"] = str(workspace)
+        # instruction.ts:123-133 and core/instruction-context.ts:48 gate
+        # AGENTS.md/subtree loading with this flag. Explicitly clear even a
+        # caller's inherited disable; the last-loaded overlay retains fences.
+        runtime_env["OPENCODE_DISABLE_PROJECT_CONFIG"] = "0"
         runtime_env["OPENCODE_CONFIG_CONTENT"] = json.dumps(worktree_permissions(root, workspace))
     if meta.get("skills_bin"):
         runtime_env["PATH"] = str(Path(meta["skills_bin"]).parent) + os.pathsep + runtime_env["PATH"]
@@ -753,7 +762,7 @@ def launch(args):
             raise ProfileError("unknown role")
         command = [meta["opencode_bin"]]
         if args.print:
-            command += ["run", "--format", "json", "--title", "runtime-" + uuid.uuid4().hex]
+            command += ["run", "--dir", str(workspace), "--format", "json", "--title", "runtime-" + uuid.uuid4().hex]
         command += ["--model", ("anthropic/" if route == "claude" else "omniroute/") + meta["model"],
                     "--variant", meta["effort"]]
         if args.role:

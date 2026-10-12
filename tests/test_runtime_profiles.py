@@ -68,6 +68,51 @@ class RuntimeInvokeTrackerTests(unittest.TestCase):
 
 
 class NativeProfileGenerationTests(unittest.TestCase):
+    def test_opencode_launch_binds_vendor_session_directory_on_both_routes(self):
+        for route in ("gpt", "claude"):
+            for headless in (True, False):
+                with self.subTest(route=route, headless=headless), tempfile.TemporaryDirectory(dir="/var/tmp") as directory:
+                    state = Path(directory)
+                    profile = "opencode-" + route
+                    root = state / profile / "roles/reviewer"
+                    root.mkdir(parents=True)
+                    workspace = state / "worktree"; workspace.mkdir()
+                    (root / "profile.json").write_text(json.dumps({"status": "trial", "model": "fixture",
+                        "effort": "high", "opencode_bin": "/fixture/opencode",
+                        "roles": {"evidence-reviewer": {"tools": ["read"]}}}))
+                    config = root / "config/opencode/opencode.json"
+                    config.parent.mkdir(parents=True); config.write_text('{"agent":{}}')
+                    observed = []
+                    def runtime(command, **kwargs):
+                        if "/fixture/opencode" in command or command[0] in ("script", sys.executable, "timeout"):
+                            observed.append((command, kwargs))
+                        if command[0] == "/fixture/opencode" and "session" in command:
+                            kwargs["stdout"].write("[]")
+                        return subprocess.CompletedProcess(command, 0)
+                    args = argparse.Namespace(profile=profile, state_root=state, repository=state,
+                        role="evidence-reviewer", print=headless, prompt="fixture", timeout_seconds=1)
+                    with mock.patch.dict(os.environ, {"PWD": str(state / "primary"),
+                                                       "OPENCODE_DISABLE_PROJECT_CONFIG": "1"}), \
+                            mock.patch.object(profiles, "fresh_worktree", return_value=workspace), \
+                            mock.patch.object(profiles, "choose_slot", return_value="anthropic-api-4"), \
+                            mock.patch.object(profiles.subprocess, "run", side_effect=runtime), \
+                            mock.patch.object(profiles.subprocess, "check_output", return_value="a" * 40), \
+                            mock.patch.object(profiles, "utc", return_value="2026-10-12T00:00:00Z"), \
+                            mock.patch.object(profiles, "cleanup_worktree", return_value={"status": "removed"}), \
+                            redirect_stdout(io.StringIO()):
+                        self.assertEqual(profiles.launch(args), 0)
+                    command, kwargs = observed[0]
+                    self.assertEqual(kwargs["cwd"], workspace)
+                    if route == "claude":
+                        self.assertIn("PWD=" + str(workspace), command)
+                        self.assertIn("OPENCODE_DISABLE_PROJECT_CONFIG=0", command)
+                    else:
+                        self.assertEqual(kwargs["env"]["PWD"], str(workspace))
+                        self.assertEqual(kwargs["env"]["OPENCODE_DISABLE_PROJECT_CONFIG"], "0")
+                    if headless:
+                        start = command.index("/fixture/opencode")
+                        self.assertEqual(command[start + 1:start + 4], ["run", "--dir", str(workspace)])
+
     def test_selected_vendor_skills_read_with_pinned_native_permission_evaluator(self):
         node = shutil.which("node")
         if not node:
@@ -204,7 +249,7 @@ let input=''; process.stdin.on('data',x=>input+=x); process.stdin.on('end',()=>{
             repository.mkdir()
             subprocess.run(["git", "init", "-q", str(repository)], check=True)
             subprocess.run(["git", "-C", str(repository), "-c", "user.name=Fixture",
-                            "-c", "user.email=fixture@example.invalid", "commit", "-q",
+                            "-c", "user.email=fixture@users.noreply.github.com", "commit", "-q",
                             "--allow-empty", "-m", "fixture"], check=True)
             for state in ("clean", "dirty", "active"):
                 worktree = Path(directory) / state
@@ -318,7 +363,8 @@ let input=''; process.stdin.on('data',x=>input+=x); process.stdin.on('end',()=>{
             self.assertEqual(len(observed), 1)
             for name, value in expected.items():
                 self.assertEqual(observed[0].get(name), value, name)
-            self.assertEqual(observed[0]["OPENCODE_DISABLE_PROJECT_CONFIG"], "1")
+            self.assertEqual(observed[0]["OPENCODE_DISABLE_PROJECT_CONFIG"], "0")
+            self.assertEqual(observed[0]["PWD"], str(state))
             self.assertEqual(json.loads(observed[0]["OPENCODE_CONFIG_CONTENT"])["permission"]["read"]["../*"], "deny")
 
     def test_read_only_vendor_skill_loader_is_explicitly_narrowed_per_agent(self):
