@@ -1066,6 +1066,28 @@ class GlobalClaudeLinkTests(InstallSkillsTestCase):
                 self.assertEqual(str(entry) in result.stderr, foreign, result.stderr)
                 self.assertEqual("an unlocked local SKILL.md that does not match the pinned manifest hash" in result.stderr, edited, result.stderr)
 
+    def test_classify_skill_and_the_refusal_wording_ask_one_skill_md_check(self):
+        # The command center's condition 2 for #1024 (2026-10-12): the refusal wording (unlocked_folder_differs) and classify_skill ask the
+        # same question, whether the installed SKILL.md is the pinned one, through ONE helper (installed_skill_md_matches). A second copy of
+        # the check would also be a second unclassified read for the push gate's monitoring baseline (tests.test_runtime_worker_openhands_push_gate).
+        installer = load_installer_module()
+        skill = make_skill(self.NAME, self.CONTENT, tree_sha(self.NAME))
+        folder = self.home / ".agents" / "skills" / self.NAME
+        folder.mkdir(parents=True)
+        (folder / "SKILL.md").write_text("# a local edit\n", encoding="utf-8")  # an unlocked canonical folder whose SKILL.md is not the pinned one
+        with mock.patch.dict(os.environ):
+            os.environ.pop("CLAUDE_CONFIG_DIR", None)
+            os.environ.pop("XDG_STATE_HOME", None)
+            self.assertEqual((installer.classify_skill(skill, self.home), installer.unlocked_folder_differs(skill, self.home)), ("local-modified", True))
+            for matches in (False, True):
+                with self.subTest(helper_says_the_skill_md_matches=matches):
+                    with mock.patch.object(installer, "installed_skill_md_matches", return_value=matches) as helper:
+                        state = installer.classify_skill(skill, self.home)
+                        differs = installer.unlocked_folder_differs(skill, self.home)
+                    self.assertEqual(state, "install" if matches else "local-modified")
+                    self.assertEqual(differs, not matches)
+                    self.assertEqual(helper.call_count, 2, "both paths must ask the one helper")
+
     def test_a_dangling_link_onto_the_canonical_folder_is_the_clis_own_and_is_not_refused(self):
         # A half-removed install leaves the CLI's own link without its canonical folder. It points where the CLI would point
         # (createSymlink keeps a link with the same target, L258-259), so it is not local content: the add simply reinstalls.

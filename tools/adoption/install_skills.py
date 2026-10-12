@@ -275,6 +275,14 @@ def installed_skill_dir(skill: dict, home: Path, project_dir: Path | None = None
     return canonical_skill_dir(home, skill["name"], project_dir)
 
 
+def installed_skill_md_matches(skill: dict, home: Path, project_dir: Path | None = None) -> bool:
+    """Whether the installed SKILL.md is the pinned one: a file whose sha256 equals the manifest's skill_md_sha256. The one place
+    that reads it, shared by classify_skill and the refusal wording (unlocked_folder_differs), so that the installer keeps the
+    push gate's monitoring baseline at its five unclassified reads (tests.test_runtime_worker_openhands_push_gate)."""
+    skill_md = installed_skill_dir(skill, home, project_dir) / "SKILL.md"
+    return skill_md.is_file() and sha256_of(skill_md) == skill["skill_md_sha256"]
+
+
 def copy_placement_problem(skill: dict, home: Path) -> str | None:
     """Why a global Claude-Code-only copy is not placed for Claude Code alone, else None. Its entry in Claude Code's skills
     folder must be a real folder, not a link (a link reads another folder), and the shared canonical folder, where Codex
@@ -311,10 +319,8 @@ def claude_skills_dir(home: Path, project_dir: Path | None = None) -> Path:
 def unlocked_folder_differs(skill: dict, home: Path) -> bool:
     """Condition (b) of classify_skill for a global entry: a folder at the installed path, no lock entry, and a SKILL.md
     that is not the pinned one. Used to name every reason of a local-modified refusal."""
-    skill_dir = installed_skill_dir(skill, home)
-    skill_md = skill_dir / "SKILL.md"
-    return (read_lock_entry(home, skill["name"]) is None and skill_dir.exists()
-            and not (skill_md.is_file() and sha256_of(skill_md) == skill["skill_md_sha256"]))
+    return (read_lock_entry(home, skill["name"]) is None and installed_skill_dir(skill, home).exists()
+            and not installed_skill_md_matches(skill, home))
 
 
 def claude_link_problem(skill: dict, home: Path) -> str | None:
@@ -461,8 +467,7 @@ def classify_skill(skill: dict, home: Path, project_dir: Path | None = None, age
         # Whatever the lock says, the add replaces this entry (createSymlink L255-263; the Codex review in GitHub of
         # 114d539f5, thread 1): a first install and an unlocked canonical folder protect it exactly as a locked one does.
         return "local-modified"
-    skill_md = skill_dir / "SKILL.md"
-    md_matches = skill_md.is_file() and sha256_of(skill_md) == skill["skill_md_sha256"]
+    md_matches = installed_skill_md_matches(skill, home, project_dir)
     entry = read_lock_entry(home, name, project_dir)
     if entry is not None:
         if project_dir is not None:
