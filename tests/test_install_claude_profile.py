@@ -1825,6 +1825,14 @@ class StandingRuleSurfacesTests(unittest.TestCase):
     )
     COMPOUNDING_PLACED = ("any protected window intact. " + COMPOUNDING
                           + " Each choice adopts the current best converged practice")
+    # The converged-candidates sentence of 2026-10-12 (docs/decisions/2026-10-12-converged-candidates-only.md), the
+    # last sentence of the "Decide by evidence" bullet.
+    CONVERGED = (
+        "Use only converged candidates: a tool, runtime, model or skill is installed, run or made a default only after "
+        "the layer's own convergence passes it on quality and SOTA standing (a screen pass or a measured win); "
+        "popularity, recency and vendor claims make a candidate a lead for that screen, never an admission."
+    )
+    CONVERGED_PLACED = ("untested boundaries distinct. " + CONVERGED + "\n- The ecosystem compounds:")
     CORRECTION = (
         "When a claim or fix proves wrong, resolve it from the upstream primary source at the pinned version through "
         "the vendor's supported path, record the correction with its citation, and add a regression test that fails "
@@ -1844,7 +1852,7 @@ class StandingRuleSurfacesTests(unittest.TestCase):
         "agents' answers are leads to verify.\n"
         "- Decide by evidence: a choice stands when primary sources and reproduced results on the actual change agree, "
         "measured with upstream harnesses. Agreement, recency, popularity and incumbency are not evidence. Keep measured "
-        "results, simulations and untested boundaries distinct.\n"
+        "results, simulations and untested boundaries distinct. " + CONVERGED + "\n"
         "- The ecosystem compounds: a request is a starting point, not a boundary. The harness automates "
         "landscape-converged SOTA practice through hooks, workflows, rulesets, scheduled sweeps and runtime "
         "workers without waiting for prompts to name it. Proceed where the evidence "
@@ -1927,6 +1935,19 @@ class StandingRuleSurfacesTests(unittest.TestCase):
             with self.subTest(surface=surface):
                 self.assertEqual(text.count(self.COMPOUNDING), 1)
                 self.assertEqual(text.count(self.COMPOUNDING_PLACED), 1)
+
+    def test_every_layer_and_renderer_ends_the_evidence_bullet_with_the_converged_candidates_sentence(self):
+        import new_wsl_client_config as cfg
+        import scaffold_repo as scaffold
+
+        texts = {relative: (ROOT / relative).read_text(encoding="utf-8") for relative in self.LAYERS}
+        texts["renderer claude"] = cfg.block_text(ROOT, cfg.CLAUDE_MD_PIECE)
+        texts["renderer codex"] = cfg.block_text(ROOT, cfg.CODEX_MD_PIECE)
+        texts["renderer scaffold/AGENTS.md"] = dict(scaffold.scaffold_files("0" * 40, ""))["AGENTS.md"].decode("utf-8")
+        for surface, text in texts.items():
+            with self.subTest(surface=surface):
+                self.assertEqual(text.count(self.CONVERGED), 1)
+                self.assertEqual(text.count(self.CONVERGED_PLACED), 1)
 
     def test_root_claude_md_loads_the_core_through_its_agents_md_import(self):
         # code.claude.com/docs/en/memory, "Share one file with other coding tools": the import keeps AGENTS.md the one
@@ -2300,7 +2321,10 @@ class PortableTopRuleTests(unittest.TestCase):
     # compounding sentences and one space) to each of the two loaded core copies: 5808/5909 -> 6566/6667 bytes
     # (Claude/Codex; the base includes #1008's 158-byte root bullet, which fit the old headroom). The same +5%,
     # rounded up, gives 6895/7001.
-    STARTUP_BUDGET_BYTES = {"claude": 6895, "codex": 7001}
+    # The dated 2026-10-12 comparison (docs/decisions/2026-10-12-converged-candidates-only.md) adds 311 bytes (the
+    # converged-candidates sentence and one space) to each of the two loaded core copies: 6566/6667 -> 7188/7289 bytes
+    # (Claude/Codex). The same +5%, rounded up, gives 7548/7654.
+    STARTUP_BUDGET_BYTES = {"claude": 7548, "codex": 7654}
     # The four rules of the core (2026-10-08): research before acting with named sources, upstream as the truth with
     # the check order, decisions by evidence measured with upstream harnesses, and the compounding ecosystem with the
     # recorded correction.

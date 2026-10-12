@@ -5226,8 +5226,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "cf1027429ddf54971628d3e0ae219fc5a1a6df04a220b2831c300c57bf0309af",
-      "bytes": 3565
+      "sha256": "6d49c237210edef2d2d9429119bef3dd42d326ebed4ee26c5219d3aa61ab03d4",
+      "bytes": 3876
     },
     {
       "path": "CLAUDE.md",
@@ -5496,8 +5496,8 @@
     },
     {
       "path": "adoption/new-wsl/claude-user-instructions.md",
-      "sha256": "37bdc7ac965e68edd4fd0f54cffb29c0f9c00a5cce1aef5b763e8907ee6da8de",
-      "bytes": 2415
+      "sha256": "df7512431e1f0f23740610508900db889eb2eabfe1aec2c1714d84e3c9ed6a10",
+      "bytes": 2726
     },
     {
       "path": "adoption/new-wsl/client-config-map.json",
@@ -5506,8 +5506,8 @@
     },
     {
       "path": "adoption/new-wsl/codex-user-instructions.md",
-      "sha256": "eb046a6f4cac83506b8f775ba1c3a22865568823aa5eafb5998e92eec0d1db30",
-      "bytes": 3102
+      "sha256": "92b04d1a99fa1e6f06263b36df01e64ca7c1b79eab6d691810ff672654b7df45",
+      "bytes": 3413
     },
     {
       "path": "adoption/new-wsl/mcp-drift-acknowledged.json",
@@ -5611,8 +5611,8 @@
     },
     {
       "path": "adoption/scaffold/AGENTS.md",
-      "sha256": "828b72a4b175b7daadd8eeb70190efd458acfbc2d4aabddb42244c65a868a58e",
-      "bytes": 3069
+      "sha256": "31e61e2c5185f628ab76b503fb845bee2039e271b05c44e01f078c2d7b5e1929",
+      "bytes": 3380
     },
     {
       "path": "adoption/sdk/README.md",
@@ -5751,8 +5751,8 @@
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
-      "sha256": "eb046a6f4cac83506b8f775ba1c3a22865568823aa5eafb5998e92eec0d1db30",
-      "bytes": 3102
+      "sha256": "92b04d1a99fa1e6f06263b36df01e64ca7c1b79eab6d691810ff672654b7df45",
+      "bytes": 3413
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
@@ -18964,6 +18964,11 @@
       "path": "docs/decisions/2026-10-11-starred-finalization.md",
       "sha256": "65d339790291609f8aeebf302ffe56cac5a27434b43db904e4831e03646431cb",
       "bytes": 12766
+    },
+    {
+      "path": "docs/decisions/2026-10-12-converged-candidates-only.md",
+      "sha256": "53945bb0ddc06f4b0217a9d55221c64a1323a57f55fb23f6875a63ca89e81f49",
+      "bytes": 9883
     },
     {
       "path": "docs/decisions/2026-10-12-exploratory-account-rotation-and-exits.md",
@@ -60187,8 +60192,8 @@
     },
     {
       "path": "examples/claude-native/CLAUDE.md",
-      "sha256": "37bdc7ac965e68edd4fd0f54cffb29c0f9c00a5cce1aef5b763e8907ee6da8de",
-      "bytes": 2415
+      "sha256": "df7512431e1f0f23740610508900db889eb2eabfe1aec2c1714d84e3c9ed6a10",
+      "bytes": 2726
     },
     {
       "path": "examples/claude-native/agents/blind-adjudicator.md",
@@ -62147,8 +62152,8 @@
     },
     {
       "path": "tests/test_codex_worker_lane.py",
-      "sha256": "8bfeb4ba4c48b84e108389c1ca860334274f2ae209d86eb7ca9831972a7364c1",
-      "bytes": 193408
+      "sha256": "a4fbe8e24cdb3ed61265333165d09eda3382f8180f2cddf2eabd65ff42c42211",
+      "bytes": 193526
     },
     {
       "path": "tests/test_codex_worker_skill.py",
@@ -62412,8 +62417,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "70a8e1a5f51f60a088b3f515501a3981573faff63818d5ce3f97cef726b40ff5",
-      "bytes": 164908
+      "sha256": "c5fab59c0fb1d3afda6c46633e1634d396cae3341d2801fd201051f8a1fa7535",
+      "bytes": 166664
     },
     {
       "path": "tests/test_install_skills.py",

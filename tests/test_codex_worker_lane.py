@@ -53,8 +53,9 @@ FIXTURES = ROOT / "tests" / "fixtures" / "codex-worker-lane"
 # the former pre-RTK and session-lanes pins collapse into this one pin.
 # Authorized 2026-10-09 correction sentence: refresh the exact top-rule pin.
 # The 2026-10-11 compounding sentences (docs/decisions/2026-10-11-compounding-rule-text.md) refresh it again.
+# The 2026-10-12 converged-candidates sentence (docs/decisions/2026-10-12-converged-candidates-only.md) refreshes it.
 # RTK awareness and its independent pins remain unchanged.
-TOP_RULE_SHA256 = "7dc76265052d6610fdc91c4f72db22bbbe5f4fd002cd8fcaa35bffc5fa2bde8f"
+TOP_RULE_SHA256 = "185246275eb11ac0db957507f404a1612d0c462fca8744b12ab023c89ffa2b30"
 # The template's RTK section since 2026-10-08 (Codex audit F5): rtk-ai/rtk v0.51.0's default awareness paragraph,
 # hooks/rtk-awareness.md at e001f773, byte for byte. With the `rtk hook codex` PreToolUse hook the full text is not
 # needed (AWARENESS_CONFIG.md:12-13,34-38 at e001f773), and the default paragraph is verbatim at every awareness level
