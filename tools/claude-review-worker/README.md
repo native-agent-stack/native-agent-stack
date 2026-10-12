@@ -104,9 +104,10 @@ prompt says the check covers citation presence only.
    ```sh
    API_ACTIONS_LEDGER=/path/to/api-actions-ledger.jsonl   # required; nothing is spent without it
    CLAUDE_REVIEW_POST=0                                    # 1 posts statuses and comments; 0 writes everything, posts nothing
-   # CLAUDE_REVIEW_KEYS=anthropic-api-4,anthropic-api-3,anthropic-api-2,anthropic-api-5,anthropic-api,...
+   # CLAUDE_REVIEW_KEYS=anthropic-api-7,anthropic-api-4,anthropic-api-3,anthropic-api-2,anthropic-api-5,anthropic-api,...
    #   fill-first: the next key only when one is out of credit or revoked; a switch is a ledger row and a warning;
-   #   anthropic-api-3 is second (its CI-review purpose ended with #981) and anthropic-api-2 third (owner, 2026-10-11)
+   #   anthropic-api-7 (the Max-plan API credit, subscription) is first (2026-10-12), anthropic-api-3 follows
+   #   anthropic-api-4 (its CI-review purpose ended with #981) and anthropic-api-2 follows anthropic-api-3 (owner, 2026-10-11)
    # CLAUDE_BIN=~/.local/share/claude/versions/2.1.296                  # the pinned native binary
    # CLAUDE_REVIEW_STATE=~/.local/state/native-agent-stack/claude-review-worker
    # CLAUDE_REVIEW_TIMEOUT_SECONDS=2700

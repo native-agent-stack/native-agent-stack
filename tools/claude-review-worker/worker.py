@@ -82,10 +82,12 @@ FILES_API_CAP = 3000  # GET /pulls/{n}/files lists at most 3000 files; a list th
 # command center) puts anthropic-api-3 second; its CI-review purpose (the main-only claude-review environment secret)
 # ended when #981 removed the in-GitHub Claude workflows. The owner's direction of 2026-10-11 ~22:33Z (via the command
 # center) puts anthropic-api-2 third. anthropic-api-6 holds a second key of anthropic-api-5's account, so it adds no
-# credit and is not in the order; it is anthropic-api-5's spare (the command center's ruling of 2026-10-12, 20:34Z). A slot
-# the runner refuses is skipped.
-DEFAULT_KEYS = ("anthropic-api-4", "anthropic-api-3", "anthropic-api-2", "anthropic-api-5", "anthropic-api",
-                "anthropic-api-7", "anthropic-api-8", "anthropic-api-9", "anthropic-api-10")
+# credit and is not in the order; it is anthropic-api-5's spare (the command center's ruling of 2026-10-12, 20:34Z).
+# anthropic-api-7 holds the owner's Max-plan API credit, which the subscription includes, so it fills before the paid
+# keys (the command center's request of 2026-10-12, ~23:17Z, on the owner's subscription-oriented direction). A slot the
+# runner refuses is skipped.
+DEFAULT_KEYS = ("anthropic-api-7", "anthropic-api-4", "anthropic-api-3", "anthropic-api-2", "anthropic-api-5",
+                "anthropic-api", "anthropic-api-8", "anthropic-api-9", "anthropic-api-10")
 SWITCH_CLASSES = ("credit_exhausted", "revoked_key")
 DEFAULT_CLAUDE_BIN = "~/.local/share/claude/versions/2.1.296"
 DEFAULT_STATE = "~/.local/state/native-agent-stack/claude-review-worker"

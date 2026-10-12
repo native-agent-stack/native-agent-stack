@@ -22,7 +22,7 @@ main-only `claude-review` environment secret. The fill-first order is
 `anthropic-api-4`, `anthropic-api-3`, `anthropic-api-5`, `anthropic-api`,
 `anthropic-api-2`, then `anthropic-api-6` to `anthropic-api-10` as stored.
 That is the owner's revision of about 15:12Z on 2026-10-10 (relayed by the
-command center); it was revised twice since, see the follow-up section. It moved `anthropic-api-3` into the order, which the
+command center); it was revised three times since, see the follow-up section. It moved `anthropic-api-3` into the order, which the
 command center's 14:15Z record had kept for CI alone.
 
 Mark the inventory sentence "no Anthropic key is stored in GitHub" as
@@ -88,7 +88,7 @@ copies were taken from the same paths with `.md`. The quoted phrases were
 checked in both the HTML and the markdown:
 
 - [Admin API](https://docs.anthropic.com/en/api/administration-api) (now
-  `platform.claude.com/docs/en/manage-claude/admin-api`, markdown
+  `platform.claude.com/docs/en/manage-claude/admin-api`, markdown capture of a public page, read 2026-10-10,
   `sha256:81e4ddbfdacfff793ab12f8a9bf2bcddda10dbc90c88d4dc6e86ce9468d8827e`):
   "The Admin API is unavailable for individual accounts." Under "Accessing
   organization info", the `/v1/organizations/me` endpoint "returns the
@@ -98,19 +98,19 @@ checked in both the HTML and the markdown:
   workspace. The command center reports that the endpoint also answered for
   each stored key; this change did not repeat that call.
 - [Usage and Cost API](https://docs.anthropic.com/en/api/usage-cost-api) (now
-  `platform.claude.com/docs/en/manage-claude/usage-cost-api`, markdown
+  `platform.claude.com/docs/en/manage-claude/usage-cost-api`, markdown capture of a public page, read 2026-10-10,
   `sha256:4e8c9658637916235ef0b8433e36ec494a2be519ad72f2c923470c7f80274231`):
   the same sentence, "The Admin API is unavailable for individual accounts."
 - [Prompt caching](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching),
   "Cache storage and sharing" (now
-  `platform.claude.com/docs/en/build-with-claude/prompt-caching`, markdown
+  `platform.claude.com/docs/en/build-with-claude/prompt-caching`, markdown capture of a public page, read 2026-10-10,
   `sha256:e52e22f01d4eb474d5b15bd2b3ced251223679c96241eb141b79816333005df0`):
   "Caches are isolated between organizations. Different organizations never
   share caches, even if they use identical prompts." The page also says
   caches "are isolated per workspace" within an organization on the Claude
   API.
 - [API overview](https://platform.claude.com/docs/en/api/overview),
-  "Response headers" (markdown
+  "Response headers" (markdown capture of a public page, read 2026-10-10,
   `sha256:56b2a39bfcafe6f10efa7b5b3c81e4ba129d124998d67b278dbce8daaac607bf`):
   `anthropic-organization-id` is "The ID of the organization that the API
   key or access token used in the request belongs to."
@@ -121,11 +121,10 @@ checked in both the HTML and the markdown:
 Command-center inputs, used as leads and not re-measured here: the
 practice record `key-practice-20261010.md` (finalized 2026-10-10T14:15Z and
 refreshed to the 15:12Z order and then for the `anthropic-api-6` and
-`anthropic-api-7` rows,
-`sha256:ee25fc918f7e38e0bdb511ebfee0d4689ebdabd1014ec0bd34abce80d7de8254`) and
-`cc-tools/anthropic_key_health.sh`
-(`sha256:713453037a589118f575f7500783291968ecc1ab497838a5017b6b82a8d922d1`).
-Both live in the command center's private state directory. They supplied
+`anthropic-api-7` rows) and `cc-tools/anthropic_key_health.sh`. Both live in
+the command center's private state directory, so they are cited by name only:
+a digest of private bytes is never published here (correction of 2026-10-12;
+earlier revisions of this record carried their digests). They supplied
 the slot purposes, the organization id prefixes read at 14:14Z, the
 individual-account finding, the CI cap and the first failover order. The
 coordinator relayed the owner's revised order and `anthropic-api-3`'s
@@ -203,17 +202,20 @@ was retired (#981, [2026-10-10-retire-in-github-claude-review.md](2026-10-10-ret
 - `anthropic-api-6` holds a second key of `anthropic-api-5`'s account (organization prefix `e02c4dee`), so it adds no
   credit; the slot table says so, and the next key goes in `anthropic-api-7`, from a new account. The command center
   removed an invalid short value from the `anthropic-api-7` slot (16:04Z), which now reads missing.
-- **The fill-first order now** (2026-10-12): `anthropic-api-4`, `anthropic-api-3`, `anthropic-api-2`, `anthropic-api-5`,
-  `anthropic-api`, then `anthropic-api-7` to `anthropic-api-10` as stored. The owner put `anthropic-api-2` third on
-  2026-10-11 at about 22:33Z (the command center's `ruling-anthropic-api-automation-practice-20261011.md`, sha256 `c8765bcc66af490d8575b7a0af6b8eb1401d7b2efec81c6d060c166e6add79c3`; the review worker's `DEFAULT_KEYS` already followed it). The command
+- **The fill-first order now** (2026-10-12): `anthropic-api-7`, `anthropic-api-4`, `anthropic-api-3`, `anthropic-api-2`,
+  `anthropic-api-5`, `anthropic-api`, then `anthropic-api-8` to `anthropic-api-10` as stored. `anthropic-api-7` holds the
+  owner's Max-plan API credit, which the subscription includes, so it fills before the paid keys (the command center's request of 2026-10-12, about 23:17Z, on the owner's subscription-oriented direction).
+  The command center's key-health reading placed none of the slots it measured in that credit's organization, whose
+  name and id are not recorded here. The owner put `anthropic-api-2` third on
+  2026-10-11 at about 22:33Z (the command center's `ruling-anthropic-api-automation-practice-20261011.md`, a private record cited by name; the review worker's `DEFAULT_KEYS` already followed it). The command
   center's ruling of 2026-10-12, 20:34Z, takes `anthropic-api-6` out: the owner's order exists to fill distinct credit
   pools first, and a second key on `anthropic-api-5`'s account caps exactly when `anthropic-api-5` caps. It stays in
   the inventory as `anthropic-api-5`'s spare, used only to replace that key; its label and notes say so.
 - `anthropic_key_health.py` reports a 429 that carries `retry-after` as `rate_limited` and exits 0 for it, so a daily
   timer does not alarm on a throttled check. Anthropic's docs give the same status a second meaning, which the note did
-  not: the tier's spend cap answers 429 "until access resumes" (https://docs.anthropic.com/en/api/errors.md, read
+  not: the tier's spend cap answers 429 "until access resumes" (https://docs.anthropic.com/en/api/errors.md, capture of a public page, read
   2026-10-12T20:27:51Z, sha256 `45b370216e463bac22090d9f5823d9e410de5a05e69fac111dd8795628db4181`, line 25), with no
-  `retry-after` ("Not sent with the spend-cap 429", https://docs.anthropic.com/en/api/rate-limits.md, read
+  `retry-after` ("Not sent with the spend-cap 429", https://docs.anthropic.com/en/api/rate-limits.md, capture of a public page, read
   2026-10-12T20:28:08Z, sha256 `447a6f223f60445f056cf237d7f690a113abc5fcd908d9bc0fb37e25c6bbbacc`, line 293; usage
   pauses until the next month, line 47). So a 429 without that header is reported as `spend_capped` and fails, as does
   every other non-2xx answer; only the header's presence is kept, never its value
@@ -222,18 +224,18 @@ was retired (#981, [2026-10-10-retire-in-github-claude-review.md](2026-10-10-ret
 ## SOTA sources
 
 - [Anthropic Admin API](https://platform.claude.com/docs/en/manage-claude/admin-api)
-  (read 2026-10-10, markdown
+  (markdown capture of a public page, read 2026-10-10,
   `sha256:81e4ddbfdacfff793ab12f8a9bf2bcddda10dbc90c88d4dc6e86ce9468d8827e`):
   unavailable for individual accounts; `/v1/organizations/me` under
   "Accessing organization info".
 - [Anthropic Usage and Cost API](https://platform.claude.com/docs/en/manage-claude/usage-cost-api)
-  (read 2026-10-10, markdown
+  (markdown capture of a public page, read 2026-10-10,
   `sha256:4e8c9658637916235ef0b8433e36ec494a2be519ad72f2c923470c7f80274231`).
 - [Anthropic prompt caching, Cache storage and sharing](https://platform.claude.com/docs/en/build-with-claude/prompt-caching#cache-storage-and-sharing)
-  (read 2026-10-10, markdown
+  (markdown capture of a public page, read 2026-10-10,
   `sha256:e52e22f01d4eb474d5b15bd2b3ced251223679c96241eb141b79816333005df0`).
 - [Claude API overview, Response headers](https://platform.claude.com/docs/en/api/overview)
-  (read 2026-10-10, markdown
+  (markdown capture of a public page, read 2026-10-10,
   `sha256:56b2a39bfcafe6f10efa7b5b3c81e4ba129d124998d67b278dbce8daaac607bf`).
 - [python/cpython@v3.13.16 Lib/urllib/request.py](https://github.com/python/cpython/blob/v3.13.16/Lib/urllib/request.py#L623-L656):
   `HTTPRedirectHandler.redirect_request` copies every request header except

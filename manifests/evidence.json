@@ -5392,8 +5392,8 @@
     },
     {
       "path": "adoption/credential-inventory.json",
-      "sha256": "10c82636ddcaf345c1b8a83beed9391eda40ba048fa77548763066778ee7d233",
-      "bytes": 45743
+      "sha256": "2cc0e802e6aef3ef19895e37b3a097a30b7664c528f075e07f77c23dd9ebac85",
+      "bytes": 46361
     },
     {
       "path": "adoption/hardware-profiles.json",
@@ -17413,7 +17413,7 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "947084815246dfba311e69df4abeb1e69c7cb9eae37e6428af159c1b2ada7e47",
+      "sha256": "c9c37f1b11004ddcb1dcc8de13f69c88b6e83d0149c2f35eefb088c6dcb33e73",
       "bytes": 190328
     },
     {
@@ -18908,8 +18908,8 @@
     },
     {
       "path": "docs/decisions/2026-10-09-claude-review-worker.md",
-      "sha256": "a98f881031a05378240b7a03f2ebcd2767d2a1b743a77f8231dcc6b0cf2f309c",
-      "bytes": 64114
+      "sha256": "7a3dc1a195adddf2bb1ec76a55597360dfe7d15c387f98cef05919aa30949950",
+      "bytes": 64293
     },
     {
       "path": "docs/decisions/2026-10-09-codex-native-review-trial.md",
@@ -18948,8 +18948,8 @@
     },
     {
       "path": "docs/decisions/2026-10-10-anthropic-key-slots-and-practice.md",
-      "sha256": "fcbe1c9dd5b8a14ebae9bf747e33fda70a7a2033e070a2a1e793f97679a253d1",
-      "bytes": 16846
+      "sha256": "93da9206e0906b46313596ab1a6106cb2f88325ca0edebeb220cbef9659954fa",
+      "bytes": 17557
     },
     {
       "path": "docs/decisions/2026-10-10-claude-federation-diagnostics.md",
@@ -19498,8 +19498,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "0475368177c1546eb7f25a551ace321f088eb78be2225d7b5d36e7fa6b37f252",
-      "bytes": 208137
+      "sha256": "25224e118bb703ec429ac3af2297653d8e950b3875938a737073d6b1a8cc8e06",
+      "bytes": 209087
     },
     {
       "path": "docs/stack.md",
@@ -62238,8 +62238,8 @@
     },
     {
       "path": "tests/test_claude_review_worker.py",
-      "sha256": "d827e5cb94144a64c89ef04904ef41f889deecdae2428912b83641761d8f7ff6",
-      "bytes": 130875
+      "sha256": "c1a83f9de1b75c7d438babc64f4fb7dc75391eb42daa2ea4f8d2846c8fd8f14a",
+      "bytes": 131058
     },
     {
       "path": "tests/test_claude_spend_scan.py",
@@ -63673,8 +63673,8 @@
     },
     {
       "path": "tools/claude-review-worker/README.md",
-      "sha256": "aaccf9237e8ad77968e452c0f6bfbfcc6ea23d77374d0aa0776ae9b8a891d4c5",
-      "bytes": 13873
+      "sha256": "fb07c17177882fcb2bebc1b7eabd9486fb84ca2f1153ae84579e9916d9540227",
+      "bytes": 14007
     },
     {
       "path": "tools/claude-review-worker/essential-paths.json",
@@ -63698,8 +63698,8 @@
     },
     {
       "path": "tools/claude-review-worker/worker.py",
-      "sha256": "ae35d1baa6bf4a6c1c817054e812dddc4b106d2bda6043861bb83c26c6fa07bf",
-      "bytes": 129575
+      "sha256": "a09b772e84097bc292dffc68ffe2883b36a29ccf8c01d0501f63b748e10185cf",
+      "bytes": 129803
     },
     {
       "path": "tools/credentials/anthropic_key_health.py",

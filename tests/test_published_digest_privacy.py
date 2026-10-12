@@ -411,6 +411,38 @@ def stale_readiness_pins(root: Path, changed: set[str]) -> list[str]:
     return sorted(stale)
 
 
+KEY_SLOT_RECORDS = (("docs/decisions/2026-10-10-anthropic-key-slots-and-practice.md", None),
+                    ("docs/secret-storage.md", "## Key practice (2026-10-10)"))
+PUBLIC_CAPTURE = "capture of a public page"
+BACKTICKED = re.compile(r"`([^`\s]+)`")
+
+
+def record_lines(text: str, heading: str | None) -> list[tuple[int, str]]:
+    """A record's numbered lines, or those of the one section that starts at heading."""
+    lines = text.split("\n")
+    if heading is None:
+        return list(enumerate(lines, 1))
+    start = lines.index(heading)
+    end = next((i for i in range(start + 1, len(lines)) if lines[i].startswith("## ")), len(lines))
+    return list(enumerate(lines[start:end], start + 1))
+
+
+def uncited_digests(text: str, heading: str | None, root: Path) -> list[int]:
+    """The line numbers of 64-hex digests that are neither labelled a capture of a public page in their citation (the
+    digest's line and the two before it) nor the sha256 of a repository file named there in backticks."""
+    lines = text.split("\n")
+    found = []
+    for number, line in record_lines(text, heading):
+        for digest in DIGEST.findall(line):
+            context = " ".join(lines[max(0, number - 3):number])
+            if PUBLIC_CAPTURE in context:
+                continue
+            named = [root / ref for ref in BACKTICKED.findall(context) if (root / ref).is_file()]
+            if not any(sha256(path.read_bytes()) == digest for path in named):
+                found.append(number)
+    return found
+
+
 class PublishedDigestPrivacyTests(unittest.TestCase):
     maxDiff = None  # the messages are path, key and an 8-hex prefix only
 
@@ -562,6 +594,29 @@ class SyntheticOracleTests(unittest.TestCase):
         with mock.patch.dict(os.environ, {**fixture, host_name_scan.OVERRIDE: "invalid-json"}):
             with self.assertRaises(host_name_scan.HostNameScanError):
                 prohibited_names()
+
+
+class KeySlotRecordDigestTests(unittest.TestCase):
+    # #1050, Astra's first read (P1): the key-slot records cited private command-center records by digest. Each digest left
+    # in them hashes public bytes: a capture of a public page, labelled so, or a repository file named beside it (the
+    # command center's ruling of 2026-10-12, 22:44Z). findings() above reads JSON only.
+
+    def test_each_digest_in_the_key_slot_records_hashes_public_bytes(self):
+        for path, heading in KEY_SLOT_RECORDS:
+            with self.subTest(path=path):
+                self.assertEqual(uncited_digests((ROOT / path).read_text(encoding="utf-8"), heading, ROOT), [])
+
+    def test_a_digest_of_unpublished_bytes_is_found_and_public_ones_pass(self):
+        digest = sha256(b"a private record")
+        text = f"# Record\n\nThe practice record (`private/record.md`,\n`sha256:{digest}`).\n"
+        self.assertEqual(uncited_digests(text, None, ROOT), [4])
+        self.assertEqual(uncited_digests(text.replace("(`private", "(capture of a public page, read 2026-10-12, `private"),
+                                         None, ROOT), [])
+        own = "tests/test_published_digest_privacy.py"
+        self.assertEqual(uncited_digests(f"`{own}`, `sha256:{sha256((ROOT / own).read_bytes())}`\n", None, ROOT), [])
+        self.assertEqual(uncited_digests(f"`{own}`, `sha256:{digest}`\n", None, ROOT), [1])
+        section = f"## Other\n`sha256:{digest}`\n## Key practice (2026-10-10)\nclean\n## Next\n`sha256:{digest}`\n"
+        self.assertEqual(uncited_digests(section, "## Key practice (2026-10-10)", ROOT), [])
 
 
 if __name__ == "__main__":
