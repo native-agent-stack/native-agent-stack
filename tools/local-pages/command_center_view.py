@@ -864,7 +864,7 @@ def _manifests(inputs: dict) -> tuple[str, str, str, str]:
         state_rows = ['<tr><th scope="row">' + esc(state) + '</th><td class="cc-num">' + str(gates[state]) + '</td><td class="cc-num">' + str(items[state]) + '</td></tr>' for state in states]
         parts.append(_table("Readiness manifest counts by recorded state", ["State", "Gates", "Open items"], state_rows, numeric=(1, 2)))
     status = "missing" if read == 0 else "wired" if read == 3 else "partial"
-    detail = "The footer's native manifest SHA-256 is the native builder's render of the state root, a different document from the committed readiness manifest above."
+    detail = "The native readiness manifest is the native builder's render of the state root, a different document from the committed readiness manifest above; its SHA-256 is private host state and is not published."
     if status == "partial":
         detail += _unread(("readiness.json", readiness_doc, readiness), ("evidence.json", evidence_doc, evidence), ("final-stack.json", final_doc, final))
     return status, detail, 'Committed manifests in the selected checkout, read under exact source_policy.json grants.', "".join(parts)

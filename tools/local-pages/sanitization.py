@@ -10,15 +10,31 @@ Email addresses are omitted after the same per-token decoding, so percent and
 HTML-entity forms are matched in their decoded text. The match is anchored at
 the at sign and its domain, then takes the whole local part that ends there, in
 either form RFC 5322 section 3.4.1 allows: any nonempty run of atext (letters,
-digits and !#$%&'*+-=?^_`{|}~ with dots, so !!!@d is one), or a quoted string
-such as "reviewer", "john doe" or the empty "", whose quotes may be percent- or
-entity-encoded in place or JSON-escaped as \". CPython's own address parser
-accepts all of these (Lib/email/_parseaddr.py at the mirror named below:
+digits and !#$%&'*+-/=?^_`{|}~ with dots, so !!!@d and /@d are addresses), or a
+quoted string such as "reviewer", "john doe" or the empty "", whose quotes may be
+percent- or entity-encoded in place or JSON-escaped as \". CPython's own address
+parser accepts all of these (Lib/email/_parseaddr.py at the mirror named below:
 getaddrspec, lines 365-385, reads atoms through getatom, lines 475-493, and
 quoted strings through getquote, line 463, whose getdelimited loop, lines
-426-461, ends an empty one at line 449). Two contexts are set aside: the slash
-is not taken, so a URL path such as /@handle is not an address, and leading
-backticks open a Markdown code span, so `@AGENTS.md` is not one either. The
+426-461, ends an empty one at line 449). The slash and the backtick are atext
+like the rest, and three contexts are set aside, each positively identified
+(<at> stands for the at sign in the examples, so this file writes no address):
+inside a URL (a scheme, "://", and every character up to a space, an angle
+bracket or a quote) the slash ends the local part, so https://medium.com/<at>handle.name
+is a path, not an address, while https://example.org/path/NAME<at>HOST still masks
+from NAME; an at sign that comes right after a slash, with a name after it that a
+slash or an opening parenthesis follows, starts a path segment or a call, as in
+run_stream_events/<at>agent.tool/message_history and <at>DBOS.workflow()/<at>DBOS.step()
+(the slash must be the character right before the at sign, which no mailbox has,
+so an address that is itself a path segment, such as gcloud's
+legacy_credentials/NAME<at>HOST/adc.json, masks whole with its directory prefix);
+and a backtick string that does not follow a letter or digit and that a backtick
+string of equal length closes after the at sign opens a Markdown code span
+(CommonMark 0.31.2 section 6.1), so `@AGENTS.md` is not an address and a code span
+around an address keeps its backticks. A backtick string that nothing closes there
+is part of the local part, and so is a slash anywhere else: /<at>d, x/<at>d and a
+host path with no scheme and nothing after it (medium.com/<at>handle.name) are
+addresses and are masked. The
 mask reads the whole text with each token decoded, so a local part that a
 quote, a space or an apostrophe splits across tokens is found whole. Text that
 decoding leaves unchanged is masked exactly from the start of the local part to
@@ -80,9 +96,13 @@ _UNIT = r"(?:" + "|".join(_UNIT_TYPES) + r")(?![A-Za-z])"
 _DOMAIN = r"[A-Za-z0-9-]+(?:" + _DOT + r"[A-Za-z0-9-]+)*" + _DOT + r"(?!" + _UNIT + r")[A-Za-z]{2,}"
 _ADDRESS_TAIL = re.compile(_AT + _DOMAIN)
 RESIDUE_OMITTED = "[value omitted: an at sign beside a word remained after masking]"
-# RFC 5322 3.2.3 atext plus the dot of a dot-atom, and 3.2.4 quoted strings, whose quotes may be encoded in place.
-# Without the slash: a URL path such as medium.com/@handle.name would otherwise read as an address.
-_ATEXT = frozenset("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!#$%&'*+-=?^_`{|}~.")
+# RFC 5322 3.2.3 atext, all 81 characters, plus the dot of a dot-atom, and 3.2.4 quoted strings, whose quotes may be encoded
+# in place. The slash and the backtick are atext; _local_start names the three contexts that set them aside.
+_ATEXT = frozenset("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!#$%&'*+-/=?^_`{|}~.")
+_SCHEME = frozenset("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+-.")
+_LETTERS = frozenset("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+_URL_BODY = re.compile(r"[^\s<>\"']*")
+_TICKS = re.compile(r"`+")
 _QUOTE = r'(?:"|%(?:25)?22|&quot;?|&#0*34;?|&#[xX]0*22;?)'
 # After masking, an at sign, raw or encoded, followed by a domain and directly after a word character, or after a
 # quote with only whitespace between, is residue the mask could not classify (whitespace before the at sign, a
@@ -118,12 +138,60 @@ def _without_preserved(value: str) -> str:
     return _PRESERVED.sub("", value)
 
 
-def _local_start(value: str, at: int, floor: int = 0) -> int | None:
+def _url_spans(value: str) -> list[tuple[int, int]]:
+    """Each URL in the text as (start, end): a scheme (RFC 3986 section 3.1), "://", and every character up to a space, an
+    angle bracket or a quote. One pass: each "://" is found once and the scheme walk back is bounded."""
+    spans, cursor = [], 0
+    while (mark := value.find("://", cursor)) >= 0:
+        begin = mark
+        while begin > cursor and mark - begin < 32 and value[begin - 1] in _SCHEME:
+            begin -= 1
+        while begin < mark and value[begin] not in _LETTERS:
+            begin += 1
+        if begin == mark:
+            cursor = mark + 3
+            continue
+        cursor = _URL_BODY.match(value, mark + 3).end()
+        spans.append((begin, cursor))
+    return spans
+
+
+class _Context:
+    """What the text around an at sign can set aside, each found once per text and only when a local part asks for it."""
+
+    def __init__(self, value: str) -> None:
+        self.value = value
+        self._urls: tuple[list[int], list[int]] | None = None
+        self._ticks: dict[int, list[int]] | None = None
+
+    def in_url(self, index: int) -> bool:
+        if self._urls is None:
+            spans = _url_spans(self.value)
+            self._urls = ([low for low, _ in spans], [high for _, high in spans])
+        found = bisect_right(self._urls[0], index) - 1
+        return found >= 0 and index < self._urls[1][found]
+
+    def closes_after(self, opener_end: int, length: int, index: int) -> bool:
+        """Whether the first backtick string of exactly `length` characters from opener_end on starts after index: a code
+        span ends with a backtick string of equal length (CommonMark 0.31.2 section 6.1), so this one holds the at sign."""
+        if self._ticks is None:
+            self._ticks = {}
+            for match in _TICKS.finditer(self.value):
+                self._ticks.setdefault(match.end() - match.start(), []).append(match.start())
+        starts = self._ticks.get(length, [])
+        found = bisect_left(starts, opener_end)
+        return found < len(starts) and starts[found] > index
+
+
+def _local_start(value: str, at: int, end: int, floor: int = 0, context: _Context | None = None) -> int | None:
     """Where the local part ending at value[at], the at sign, begins: a quoted string, else a run of atext.
 
-    The atext walk stops after _LOCAL_PART_LIMIT characters and never passes floor, the end of the address
-    before it; a run that continues into that address is glued to it and starts at floor, so the two merge.
+    `end` is where the domain after the at sign ends. The atext walk stops after _LOCAL_PART_LIMIT characters and never
+    passes floor, the end of the address before it; a run that continues into that address is glued to it and starts at
+    floor, so the two merge. The slash and the backtick are atext like the rest, except in three positively identified
+    contexts: a URL, a path segment or call, and a Markdown code span.
     """
+    context = context or _Context(value)
     window = max(0, at - 300)
     quoted = _QUOTED_LOCAL.search(value, window, at) or _ESCAPED_QUOTED_LOCAL.search(value, window, at)
     if quoted:
@@ -131,19 +199,40 @@ def _local_start(value: str, at: int, floor: int = 0) -> int | None:
     start, stop = at, max(floor, at - _LOCAL_PART_LIMIT)
     while start > stop and value[start - 1] in _ATEXT:
         start -= 1
+    # Inside a URL the slash separates path segments, so it ends the local part: a path is no address, and an address
+    # after a path segment starts after the slash.
+    slash = value.rfind("/", start, at)
+    if slash >= 0 and context.in_url(at):
+        return slash + 1 if slash + 1 < at else None
     if start == floor > 0 and value[floor - 1] in _ATEXT:
         return floor
-    # Any nonempty atext run is a local part, letters or not (!!!@d is valid). Only Markdown context is set
-    # aside: leading backticks open a code span, so `foo@bar.md` keeps its backtick and `@AGENTS.md` is no address.
-    while start < at and value[start] == "`":
-        start += 1
+    # The nearest backtick string before the at sign that does not follow a letter or digit and that a backtick string of
+    # equal length closes after it opens the code span that holds the at sign: those backticks are delimiters, and the
+    # local part starts after them. A string that nothing closes there, or that the local part closes itself, is atext.
+    limit = at
+    while (mark := value.rfind("`", start, limit)) >= 0:
+        first = mark
+        while first > start and value[first - 1] == "`":
+            first -= 1
+        if first == start and start > 0 and value[start - 1] == "`":
+            break  # the walk cut this string short, so its length is unknown
+        if (first == 0 or not value[first - 1].isalnum()) and context.closes_after(mark + 1, mark + 1 - first, at):
+            start = mark + 1
+            break
+        limit = first
+    # An at sign right after a slash, with a name after it that a slash or an opening parenthesis follows, starts a path
+    # segment or a call. The slash must be the character right before the at sign (no mailbox ends in one): a name or a
+    # directory in front of the address leaves it whole, so legacy_credentials/NAME<at>HOST/adc.json masks together with
+    # its directory prefix.
+    if start < at and value[at - 1] == "/" and value[end:end + 1] in ("/", "("):
+        return None
     return start if start < at else None
 
 
 def _email_spans(value: str):
-    floor = 0
+    floor, context = 0, _Context(value)
     for tail in _ADDRESS_TAIL.finditer(value):
-        start = _local_start(value, tail.start(), floor)
+        start = _local_start(value, tail.start(), tail.end(), floor, context)
         if start is not None:
             yield start, tail.end()
             floor = tail.end()

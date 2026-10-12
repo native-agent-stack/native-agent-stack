@@ -478,7 +478,12 @@ class LocalPagesTests(unittest.TestCase):
             self.assertTrue(any(attributes.get("lang") == "en" for attributes in audit.attributes))
             self.assertTrue(any(attributes.get("id") == "main-content" for attributes in audit.attributes))
             self.assertTrue(any(attributes.get("aria-label") == "Local pages" for attributes in audit.attributes))
-            self.assertIn(expected, text)
+            if name in ("command-center", "sources"):
+                # #161: the native manifest is the native builder's render of the state root, so these two pages withhold its digest.
+                self.assertNotIn(expected, text)
+                self.assertIn("<strong>Native readiness manifest SHA-256:</strong> <code>private, not published (host state)</code>", text)
+            else:
+                self.assertIn(expected, text)
             self.assertIn("2030-01-02T03:04:05Z", text)
             for attributes in audit.attributes:
                 self.assertFalse(any(key.startswith("on") for key in attributes))

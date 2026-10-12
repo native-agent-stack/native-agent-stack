@@ -258,7 +258,7 @@ class SanitizationTests(unittest.TestCase):
 
     def test_empty_quoted_and_punctuation_only_local_parts_are_masked(self):
         # Astra's read of 51f85b5b, P1 1: a quoted local part needed at least one character and an atext one a letter
-        # or digit, so ""@example.target and !!!@example.target stayed readable. CPython's parser accepts both
+        # or digit, so an empty quoted one and a punctuation-only one on the target domain stayed readable. CPython's parser accepts both
         # (Lib/email/_parseaddr.py getaddrspec, lines 365-385, getatom, lines 475-493, and getdelimited, line 449, at cbc944f4).
         helper = load_helper()
         at = "@"
@@ -296,6 +296,133 @@ class SanitizationTests(unittest.TestCase):
             with self.subTest(form=name):
                 self.assertLess(float(seconds), 0.5)
                 self.assertEqual(left, "False")
+
+    def test_every_atext_character_is_a_whole_local_part_alone_and_mixed(self):
+        # Astra's read of 3d7b1e7a, P1 1 (review_probes.py test_all_81_atext_characters): CPython's parser takes each of the
+        # 81 atext characters as a whole local part (Lib/email/_parseaddr.py getatom, lines 475-493, at cbc944f4), and the
+        # slash and a lone backtick stayed readable. Each domain is unique, so the assertions need no address grammar.
+        helper = load_helper()
+        at = "@"
+        atext = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!#$%&'*+-/=?^_`{|}~"
+        self.assertEqual(len(atext), 81)
+        for char in atext:
+            for local in (char, "x" + char, char + "x", "x" + char + "x"):
+                for prefix in ("mail ", "x" * 4100 + " "):
+                    with self.subTest(local=local, long=len(prefix) > 10):
+                        self.assertEqual(helper.text(prefix + local + at + "zqdomain.example.org now"), prefix + "[email omitted] now")
+
+    def test_a_slash_before_the_at_sign_is_part_of_the_address_outside_a_url(self):
+        # Astra's read of 3d7b1e7a, P1 1: the atext set left out the slash, so "/" and "x/" before an at sign survived,
+        # also encoded ("%2F", "&#47;") and in the token report's keys and values. Inside a URL the slash still ends the
+        # local part, so a path is not an address and an address after a path segment is masked from that segment on.
+        helper = load_helper()
+        at = "@"
+        domain = at + "zqdomain.example.org"
+        for local in ("/", "x/", "zqa/zqb", "zqa//", "/zqa"):
+            for at_form in (at, "%40", "&#64;"):
+                with self.subTest(local=local, at=at_form):
+                    self.assertEqual(helper.text("mail " + local + at_form + "zqdomain.example.org now"), "mail [email omitted] now")
+        for encoded in ("%2F" + "%40zqdomain.example.org", "x%2F" + domain, "&#47;&#64;zqdomain.example.org", "x&#47;" + domain, "%2f" + domain):
+            with self.subTest(encoded=encoded):
+                self.assertEqual(helper.text("mail " + encoded + " now"), "mail [email omitted] now")
+        self.assertEqual(helper.text("mail x/" + domain + "."), "mail [email omitted].")
+        self.assertEqual(helper.text("see https://zqlocal" + domain + "/x"), "see https://[email omitted]/x")
+        self.assertEqual(helper.text("see https://example.org/path/zqlocal" + domain + " now"), "see https://example.org/path/[email omitted] now")
+        self.assertEqual(helper.text("see ssh://zqlocal" + domain + "/repo"), "see ssh://[email omitted]/repo")
+
+    def test_backticks_open_a_code_span_only_when_one_closes_after_the_address(self):
+        # Astra's read of 3d7b1e7a, P1 1: leading backticks were skipped without any code span, so a lone backtick before
+        # the at sign stayed readable. CommonMark 6.1 closes a span with a backtick string of equal length, so the leading
+        # backticks are delimiters only when such a string follows the at sign; otherwise they are part of the local part.
+        helper = load_helper()
+        at = "@"
+        domain = at + "zqdomain.example.org"
+        for value, expected in (("mail `" + domain + " now", "mail [email omitted] now"),
+                                ("mail `zqa" + domain + " now", "mail [email omitted] now"),
+                                ("mail ``zqa" + domain + " now", "mail [email omitted] now"),
+                                ("mail `zqa`" + domain + " now", "mail [email omitted] now"),
+                                ("mail ``zqa" + domain + "` now", "mail [email omitted]` now"),
+                                ("mail `/" + domain + " now", "mail [email omitted] now"),
+                                ("run `zqa" + domain + "` now", "run `[email omitted]` now"),
+                                ("run ``zqa" + domain + "`` now", "run ``[email omitted]`` now"),
+                                ("run `a/zqb" + domain + "` now", "run `[email omitted]` now"),
+                                ("run `/" + domain + "` now", "run `[email omitted]` now"),
+                                ("run `zqa" + domain + " and more` now", "run `[email omitted] and more` now"),
+                                ("x`" + domain + "` y", "[email omitted]` y")):
+            with self.subTest(value=value):
+                self.assertEqual(helper.text(value), expected)
+        for public in ("imports `" + at + "AGENTS.md` and `CLAUDE.md`", "``" + at + "AGENTS.md``", "[`" + at + "AGENTS.md`](AGENTS.md)", "a `b` then `" + at + "RTK.md` stays"):
+            with self.subTest(public=public):
+                self.assertEqual(helper.text(public), public)
+
+    def test_urls_markdown_links_and_path_segments_keep_their_at_signs(self):
+        # The contexts the walk sets aside, each positively identified (Astra's 3d7b1e7a P1 1: "preserve only positively
+        # identified surrounding URL/Markdown contexts"): a URL, a closed code span, and a name that follows a slash and is
+        # itself followed by a slash or an opening parenthesis. Every public string here stays as written.
+        helper = load_helper()
+        at = "@"
+        for public in ("https://medium.com/" + at + "someone.handle/a-post", "see https://medium.com/" + at + "someone.handle now",
+                       "https://medium.com/" + at + "someone.handle", "[docs](https://medium.com/" + at + "someone.handle/a-post)",
+                       "<https://medium.com/" + at + "someone.handle>", "https://example.org/a/" + at + "b.example.net/c",
+                       "[" + at + "AGENTS.md](AGENTS.md)",
+                       "run_stream_events/" + at + "agent.tool/message_history", "decorators " + at + "DBOS.workflow()/" + at + "DBOS.step() stay"):
+            with self.subTest(public=public):
+                self.assertEqual(helper.text(public), public)
+                self.assertEqual(helper.text(helper.text(public)), public)
+
+    def test_the_path_segment_exemption_needs_a_slash_right_before_the_at_sign(self):
+        # The CC's condition for the path-segment exemption (accepted 10-12): it fires only when the character right before the
+        # at sign is a slash, which no real mailbox has. gcloud keeps one directory per account, so an address that is itself a
+        # path segment (legacy_credentials/ + the account address + /adc.json) and x/ + an address + /y still mask. Outside a
+        # URL the slash is part of the local part, so the directory prefix goes with the address: the first group pins that
+        # cost. Inside a URL the slash ends the local part, so the prefix stays. The names are unique and built at run time.
+        helper = load_helper()
+        at = "@"
+        domain = at + "zqdomain.example.org"
+        for value, expected in (("see legacy_credentials/zqlocal" + domain + "/adc.json now", "see [email omitted]/adc.json now"),
+                                ("see x/zqlocal" + domain + "/y now", "see [email omitted]/y now"),
+                                ("see x/zqlocal" + domain + "(y) now", "see [email omitted](y) now"),
+                                ("see x//zqlocal" + domain + "/y now", "see [email omitted]/y now"),
+                                ("see https://h.example.org/legacy_credentials/zqlocal" + domain + "/adc.json now",
+                                 "see https://h.example.org/legacy_credentials/[email omitted]/adc.json now")):
+            with self.subTest(value=value):
+                out = helper.text(value)
+                self.assertNotIn("zqlocal", out)
+                self.assertNotIn("zqdomain", out)
+                self.assertEqual(out, expected)
+        # The exempt shape is only a slash-ended name with a slash or an opening parenthesis after its domain; it stays readable,
+        # and without that continuation the same slash-ended address masks whole.
+        for public in ("see x/" + domain + "/y now", "see x/" + domain + "(y) now", "see /" + domain + "/y now"):
+            with self.subTest(public=public):
+                self.assertEqual(helper.text(public), public)
+        for value in ("see x/" + domain + " now", "see x/" + domain + ", now", "see x/" + domain + ". now"):
+            with self.subTest(value=value):
+                self.assertNotIn("zqdomain", helper.text(value))
+
+    def test_slash_backtick_and_url_runs_stay_fast(self):
+        # The contexts above scan for URLs and for backtick strings; each form below would be quadratic if either scan
+        # restarted per at sign. Timed in a child process with a hard timeout, so a regression cannot hang the suite.
+        import subprocess
+        import sys
+        child = (
+            "import importlib.util, sys, time\n"
+            "spec = importlib.util.spec_from_file_location('helper', sys.argv[1])\n"
+            "helper = importlib.util.module_from_spec(spec)\n"
+            "spec.loader.exec_module(helper)\n"
+            "at = chr(64)\n"
+            "forms = {'slash': ('x/' + at + 'b.cc ') * 4000, 'ticks': (chr(96) + 'a' + at + 'b.cc ') * 4000, 'run': chr(96) * 50000 + at + 'b.cc',\n"
+            "         'url': 'https://h.example.org/' + ('a' + at + 'b.cc/') * 4500, 'schemes': 'a://' * 6000 + at + 'b.cc', 'path': ('/' + at + 'b.cc/') * 4500}\n"
+            "for name, value in forms.items():\n"
+            "    started = time.perf_counter()\n"
+            "    helper.text(value)\n"
+            "    print(name, round(time.perf_counter() - started, 3))\n")
+        result = subprocess.run([sys.executable, "-B", "-c", child, str(ROOT / "tools/local-pages/sanitization.py")], capture_output=True, text=True, timeout=120)
+        self.assertEqual(result.returncode, 0, result.stderr[-400:])
+        rows = [line.split() for line in result.stdout.split("\n") if line.strip()]
+        self.assertEqual([row[0] for row in rows], ["slash", "ticks", "run", "url", "schemes", "path"])
+        for name, seconds in rows:
+            with self.subTest(form=name):
+                self.assertLess(float(seconds), 0.5)
 
     def test_a_quoted_local_part_holding_an_at_sign_is_omitted_whole(self):
         # The 51f85b5b micro's B2: the inner match started later than the outer quoted string, and the merge kept the
@@ -362,6 +489,42 @@ class SanitizationTests(unittest.TestCase):
         exempt = re.fullmatch(r"\(\?:([a-z|]+)\)\(\?!\[A-Za-z\]\)", load_helper()._UNIT).group(1).split("|")
         self.assertEqual(len(exempt), len(set(exempt)))
         self.assertEqual(sorted(set(exempt) & tlds), [])
+
+    def test_the_page_and_skill_usage_sources_write_no_address_at_a_delegated_domain(self):
+        # Astra's read of 3d7b1e7a, P1 3: a comment in sanitization.py wrote out a complete address at a delegated top-level
+        # domain, and this repository publishes only a no-reply form or an example on a name RFC 2606 and RFC 6761 reserve
+        # (example.com, example.net, example.org, .example, .invalid, .test, .localhost). The grammar is the sanitizer's own:
+        # a nonempty run of atext, the slash included, before an at sign and a dotted domain. The backtick is left out of the
+        # local part, since it opens a Markdown code span (an AGENTS import is no address), and a name ending in a systemd
+        # unit type is a template-unit instance. A hit is reported by file and line only, so the check never prints an address.
+        helper = load_helper()
+        tail = re.compile("@" + r"([A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,})")
+        atext = set(helper._ATEXT) - {"`"}
+        reserved = ("example.com", "example.net", "example.org")
+        reserved_tlds = ("invalid", "test", "example", "localhost")
+        patterns = ("tools/local-pages/**/*", "tools/skill-usage/**/*", "tests/test_local_pages*.py", "tests/test_skill_usage*.py")
+        paths = sorted({path for pattern in patterns for path in ROOT.glob(pattern) if path.is_file()})
+        self.assertGreater(len(paths), 50)
+        hits = []
+        for path in paths:
+            try:
+                text = path.read_text(encoding="utf-8")
+            except UnicodeDecodeError:
+                continue
+            for number, line in enumerate(text.splitlines(), 1):
+                for match in tail.finditer(line):
+                    start = match.start()
+                    if start == 0 or line[start - 1] not in atext:
+                        continue
+                    local = start
+                    while local > 0 and line[local - 1] in atext:
+                        local -= 1
+                    name = match.group(1).lower()
+                    if (line[local:start].lower() in ("noreply", "no-reply") or "noreply" in name or name.rsplit(".", 1)[-1] in reserved_tlds + tuple(helper._UNIT_TYPES)
+                            or any(name == known or name.endswith("." + known) for known in reserved)):
+                        continue
+                    hits.append(f"{path.relative_to(ROOT)}:{number}")
+        self.assertEqual(hits, [], "a complete address at a delegated domain (the address itself is withheld from this report)")
 
     def test_email_placeholder_survives_identity_projection(self):
         helper = load_helper()

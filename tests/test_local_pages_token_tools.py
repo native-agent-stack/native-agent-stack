@@ -142,6 +142,26 @@ class TokenToolsTests(unittest.TestCase):
         self.assertNotIn("zqsp", serialized)
         self.assertIn("[value omitted: an at sign beside a word remained after masking]", serialized)
 
+    def test_slash_and_backtick_local_parts_are_masked_in_keys_and_values(self):
+        # Astra's read of 3d7b1e7a, P1 1 (review_probes.py test_slash_and_backtick_token_keys_values): scrub() kept "/", "x/" and
+        # a lone backtick before an at sign as both key and value. The token report shares the mask, so none may reach the
+        # file, plain or encoded; a URL and a closed code span stay as written.
+        at = "@"
+        for local in ("/", "x/", "`"):
+            with self.subTest(local=local):
+                address = local + at + "zqdomain.example.org"
+                self.assertNotIn("zqdomain", str(tools.scrub({address: address})))
+        keyed = {"/" + at + "zqdomain.example.org": "x/" + at + "zqdomain.example.org", "p": ["`" + at + "zqdomain.example.org", "%2F%40zqdomain.example.org",
+                                                                                           "&#47;&#64;zqdomain.example.org", "%60%40zqdomain.example.org"]}
+        runner = Runner({"headroom " + AGENT: completed(0, json.dumps(keyed))})
+        serialized = json.dumps(tools.collect("rtk", "headroom", "node", None, timeout=5, runner=runner))
+        for _ in range(2):
+            serialized = html.unescape(unquote(serialized))
+        self.assertNotIn("zqdomain", serialized)
+        self.assertIn("[email omitted]", serialized)
+        public = {"url": "https://medium.com/" + at + "someone.handle/a-post", "import": "`" + at + "AGENTS.md`"}
+        self.assertEqual(tools.scrub(public), public)
+
     def test_destination_refuses_a_parent_or_ancestor_that_links_into_the_repository(self):
         # Codex token_tools_now.py:160 and the micro's (a)2 at 50977b00: abspath() follows no symlink, so
         # <tmp>/state linked to the checkout let --out land inside the repository.

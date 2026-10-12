@@ -201,10 +201,19 @@ already makes, `cc-now.json`, and sixteen files read through
 no-follow, protected-name checks, with repo and state roots only. Each read's
 path, role, hash, byte count and modification time join the receipt's
 `command_center.inputs`, and its path joins the custody table on
-`sources.html`: a repository input with its SHA-256, a command-center state
-input (and `cc-now.json` and `adoption-now.json`) with a note that the page
-withholds its digest, since the digest of private raw bytes would confirm a
-guessed masked value (#161). A missing or malformed input renders
+`sources.html`: a repository input with its SHA-256, and any input read from
+the state root (the command-center state inputs, `cc-now.json`,
+`adoption-now.json`, the gap board, the roadmap inputs, the state-root readiness
+receipts and the role projection's registry files) with the note "private, not
+published (host state)", since the digest of private raw bytes would confirm a
+guessed masked value (#161). The rule is by provenance, not by name: the
+composer marks an input private when its path is under the state root, and the
+nonserved receipt keeps the digest and the `private` flag. The footer's native
+readiness manifest SHA-256 is the digest of a document the native builder
+renders from the state root, so the Command center and Sources pages print the
+same note there; the receipt keeps it as `native_readiness_manifest_sha256`.
+The other pages still print it (the digest policy for them is a Follow-up of
+#1012). A missing or malformed input renders
 `missing input: <name>`, an unapproved one `unreadable (SourcePolicyError)`;
 neither stops the refresh. An `in_review` row that is not an object is rejected
 with a stated gap naming how many were rejected: PR waves reads partial, and the
@@ -284,13 +293,31 @@ The shared sanitizer omits email addresses on every page and in
 paths and identifiers, so percent-encoded, double-encoded and HTML-entity forms,
 with or without the semicolon, are matched in their decoded text. It reads the
 whole text with each token decoded and takes the whole local part RFC 5322
-allows: any nonempty run of atext (letters, digits and
-``!#$%&'*+-=?^_`{|}~`` with dots, so `!!!@d` is one) or a quoted string such as
-`"reviewer"`, `"john doe"` or the empty `""`, whose quotes may be percent- or
-entity-encoded or JSON-escaped as `\"`. Two contexts are set aside: the slash is
-not taken, so a URL path such as `/@handle` is not an address, and leading
-backticks open a Markdown code span, so `` `@AGENTS.md` `` is not one either.
-Overlapping matches merge from their earliest start, so a quoted local part that
+allows: any nonempty run of atext (all 81 characters, the letters, digits and
+``!#$%&'*+-/=?^_`{|}~``, with dots, so `!!!@d` and `/@d` are addresses) or a
+quoted string such as `"reviewer"`, `"john doe"` or the empty `""`, whose quotes
+may be percent- or entity-encoded or JSON-escaped as `\"`. The slash and the
+backtick are atext like the rest, and exactly three contexts are set aside, each
+positively identified (`<at>` stands for the at sign below, so this file writes
+no address). Inside a URL (a scheme, `://`, and every character up to a space,
+an angle bracket or a quote) the slash ends the local part, so
+`https://medium.com/<at>handle.name` is a path, not an address, while an address
+after a path segment still masks from its own first character. An at sign that
+comes right after a slash, with a name after it that a slash or an opening
+parenthesis follows, starts a path segment or a call
+(`run_stream_events/<at>agent.tool/message_history`,
+`<at>DBOS.workflow()/<at>DBOS.step()`); the slash must be the character right
+before the at sign, which no mailbox has, so an address that is itself a path
+segment, such as gcloud's per-account `legacy_credentials/NAME<at>HOST/adc.json`,
+masks whole together with its directory prefix. And a backtick string that does not
+follow a letter or digit and that a backtick string of equal length closes after
+the at sign opens a Markdown code span (CommonMark 0.31.2 section 6.1), so
+`` `@AGENTS.md` `` is not an address and a code span around an address keeps its
+backticks. Anywhere else a slash or a backtick before the at sign is part of the
+local part: `/<at>d`, `x/<at>d` and a lone backtick before the at sign are
+masked whole, as is a host path with no scheme and nothing after it
+(`medium.com/<at>handle.name`). Overlapping matches merge from their earliest
+start, so a quoted local part that
 itself holds an at sign is omitted whole. From each at sign the walk back stops
 after 256 characters (RFC 5321 section 4.5.3.1.1 limits a local part to 64
 octets) and never passes the address before it, so the cost is linear in the
@@ -595,8 +622,10 @@ Every page distinguishes its generated refresh time from source-owned dates.
 The gap page preserves `updated_utc`; the sources page lists the date fields
 in each retained input when available. A roadmap without a source-owned snapshot date
 says so and identifies its file modification time as file metadata. Milestone
-dates remain event dates. The SHA on every page is the SHA-256 of the JSON
-produced by native `render`, rather than an invented readiness digest.
+dates remain event dates. The SHA in the footer of the Home, Readiness, Gap
+board, Roadmap and Fleet pages is the SHA-256 of the JSON produced by native
+`render`, rather than an invented readiness digest; the Command center and
+Sources pages print "private, not published (host state)" there (#161).
 Milestones preserve either a source `at` timestamp or the source `when` label,
 following the custodian's `cc-tools/roadmap/build_roadmap.py:284` schema. Relative
 `when` labels are displayed verbatim without inventing an ISO date. A milestone

@@ -359,11 +359,25 @@ def read_command_center_inputs(root: Path, state_root: Path, output_dir: Path, i
     return records
 
 
-PRIVATE_DIGEST = "private state input; this page withholds its digest, which the nonserved receipt keeps"
+PRIVATE_DIGEST = "private, not published (host state)"
+
+
+def is_host_state(path: Any, state_root: Path) -> bool:
+    """Whether bytes were read from the state root, which holds the host's private records (#161)."""
+    try:
+        return Path(str(path).split("#")[0]).is_relative_to(state_root)
+    except (TypeError, ValueError):
+        return False
 
 
 def served_identity(item: dict[str, Any]) -> str:
-    """What the composer's pages show for an input: its digest or status, or a withheld note if the receipt marks it private (#161)."""
+    """What the composer's pages show for an input: its digest or status, or a withheld note if the receipt marks it private (#161).
+
+    The class rule: bytes read from the state root are private, whatever their name, and keep their digest in the nonserved
+    receipt only (refresh() marks them as it captures them). A digest of private bytes, or of a document rendered from them
+    such as the native readiness manifest, would confirm a guessed value offline. A repository file's digest stays: its
+    preimage is published.
+    """
     return PRIVATE_DIGEST if item.get("private") else str(item.get("sha256") or item.get("status", "UNVERIFIED"))
 
 
@@ -386,6 +400,8 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
         if no_symlinks(path).is_relative_to(output_dir):
             raise ValueError("input is inside the served root")
         item = snapshot(path)
+        if is_host_state(item["path"], state_root):
+            item["private"] = True  # the pages withhold its digest, the receipt keeps it (#161)
         inputs[name] = item
         return item
     def override_path(value: Path | None, default: Path, role: str | None = None) -> Path:
@@ -455,7 +471,6 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
     road_input = capture("roadmap", override_inputs["roadmap"])
     road_index = capture("roadmap_inputs", override_inputs["roadmap_inputs"])
     current_input = capture("cc_now", override_inputs["cc_now"])
-    current_input["private"] = True  # the CC's private state: the composer's pages withhold its digest, the receipt keeps it (#161)
     current = strict_json(current_input["raw"])
     view = load_local("current_view")
     view.validate(current)
@@ -487,7 +502,6 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
     adoption_path = state_root / "coordination/command-center/pages/adoption-now.json"
     try:
         adoption_input = capture("adoption", adoption_path)
-        adoption_input["private"] = True
         adoption = strict_json(adoption_input["raw"])
         adoption_view.validate(adoption)
     except (OSError, ValueError, UnicodeError, KeyError, TypeError, AttributeError) as error:
@@ -582,7 +596,7 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
     current_notes.append(adoption_note)
     fleet_notes.append(adoption_note)
     if role_projection:
-        fleet_notes.extend('<code>' + esc(item.get("path", "UNREPORTED")) + '</code> — registry metadata SHA-256 <code>' + esc(item.get("sha256", "UNREPORTED")) + '</code>' for item in role_projection.get("sources", []) if isinstance(item, dict))
+        fleet_notes.extend('<code>' + esc(item.get("path", "UNREPORTED")) + '</code> — registry metadata SHA-256 <code>' + esc(PRIVATE_DIGEST if is_host_state(item.get("path"), state_root) else item.get("sha256", "UNREPORTED")) + '</code>' for item in role_projection.get("sources", []) if isinstance(item, dict))
     source_groups = {"index": current_notes, "command-center": cc_notes, "readiness": current_notes + readiness_notes, "gaps": gap_notes, "roadmap": road_notes, "fleet": fleet_notes}
     source_body = "".join(f'<section id="{key}" class="panel"><h2>{esc(PAGES[key])}</h2><ul class="source-list">' + "".join(f'<li>{note}</li>' for note in notes) + '</ul></section>' for key, notes in source_groups.items())
     custody_rows = "".join(f'<tr><td><code>{esc(label_path(item["path"], root, state_root))}</code></td><td><code>{esc(served_identity(item))}</code></td></tr>' for item in inputs.values())
@@ -608,14 +622,17 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
         role_body += '<section id="adoption-native-tools"><h2>Native orchestration and SDK use</h2>' + ''.join(extras) + '<p>Unattributed instances remain unassigned; an absent producer measurement is unmeasured.</p></section>'
     manifest_body = adoption_view.summary(adoption) + f'<section class="manifest-section" aria-labelledby="manifest-title"><h2 id="manifest-title" class="manifest-title">repository manifest at <code>{manifest_sha}</code>, dated receipts</h2><p><a href="sources.html#readiness">Source dates and retained receipt identities</a></p>' + readiness_body(native, manifest, current, view, fleet, source_dates=native_dates) + '</section>'
     common = (refreshed, manifest_sha)
+    # The native manifest is the native builder's render of the state root, so its digest is private state too (#161): the
+    # command-center and sources pages withhold it, and the nonserved receipt keeps it.
+    withheld = (refreshed, PRIVATE_DIGEST)
     outputs = {
         "index.html": document("index", "North-star readiness and next steps", "", current_scope, overview, *common, [], leading=index_leading),
-        "command-center.html": document("command-center", "Command center", "One view of lanes, PR waves, token savings, skill use, manifests and owner items.", current_scope, cc_body, *common, [], leading=cc_markup),
+        "command-center.html": document("command-center", "Command center", "One view of lanes, PR waves, token savings, skill use, manifests and owner items.", current_scope, cc_body, *withheld, [], leading=cc_markup),
         "readiness.html": document("readiness", "North-star readiness: what is done, what is left, what needs a decision", "", current_scope, manifest_body, *common, [], leading=view.render(current, workstation, validated=True, readings_normalized=True)),
         "gaps.html": document("gaps", "Grand Gap Board", "Find the open gaps, who owns them and what happens next.", gap_scope, gap_body(rows(gaps, "gaps", ("id", "group", "sev", "title"))), *common, []),
         "roadmap.html": document("roadmap", "Roadmap", "Read the dated milestones and server records.", road_scope, roadmap_body(roadmap), *common, []),
         "fleet.html": document("fleet", "Worker fleet", "", 'Native fleet as of ' + str(fleet.get("at") or "not reported"), role_body, *common, [], leading=fleet_view.render(fleet)),
-        "sources.html": document("sources", "Sources and dates", "Check the dates and identities behind each page.", 'Current view and dated repository receipts remain distinct.', source_body, *common, []),
+        "sources.html": document("sources", "Sources and dates", "Check the dates and identities behind each page.", 'Current view and dated repository receipts remain distinct.', source_body, *withheld, []),
     }
     for name in ("site.css", "site.js"):
         item = capture("asset:" + name, ASSETS / name)

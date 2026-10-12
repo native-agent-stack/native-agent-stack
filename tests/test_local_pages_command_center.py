@@ -1008,12 +1008,44 @@ class CommandCenterComposerTests(unittest.TestCase):
                 self.assertNotIn(address, page)
                 self.assertNotIn(AT + "example.target", page)
 
+    def test_slash_and_backtick_local_parts_never_reach_the_page_or_receipt(self):
+        # Astra's read of 3d7b1e7a, P1 1 (review_probes.py): a real composer fixture with a slash or backtick address in
+        # in_review[0].state published the complete address in command-center.html. The parts are unique, so the
+        # assertions need no address grammar; the encoded forms are the neighbours the token decoding must still reach.
+        self.add_sections()
+        self.write_inputs()
+        domain = AT + "zqdomain.example.org"
+        forms = ("/" + domain, "x/" + domain, "`" + domain, "zqlocal/" + domain, "`zqlocal" + domain, "zqlocal`" + domain, "a/zqlocalb" + domain, "zqlocal//" + domain,
+                 "%2F%40zqdomain.example.org", "x%2F" + domain, "&#47;&#64;zqdomain.example.org", "%60%40zqdomain.example.org", "&#96;" + domain)
+        # The last two are natural address path segments (gcloud's one directory per account, and x/ plus an address plus /y):
+        # the path-segment exemption needs a slash right before the at sign, so both mask, directory prefix included.
+        pairs = [(form, "[email omitted]") for form in forms] + [("`a/zqlocal" + domain + "`", "`[email omitted]`"),
+                                                                 ("legacy_credentials/zqlocal" + domain + "/adc.json", "[email omitted]/adc.json"),
+                                                                 ("x/zqlocal" + domain + "/y", "[email omitted]/y")]
+        for form, shown in pairs:
+            with self.subTest(form=form):
+                self.current["in_review"][0]["state"] = "Reply to " + form
+                self.current["waiting_on_owner"] = [{"what": "Write to " + form, "detail": form}]
+                self.write_json(self.current_path, self.current)
+                receipt = self.refresh()
+                page = (self.output / "command-center.html").read_text()
+                self.assertNotIn("zqdomain", decoded_text(page))
+                self.assertNotIn("zqlocal", decoded_text(page))
+                self.assertEqual(re.findall(r"Reply to ([^<]*)<", page), [shown])
+                self.assertEqual(re.findall(r"Write to ([^<]*)<", page), [shown])
+                self.assertNotIn("zqdomain", decoded_text(json.dumps(receipt)))
+        public = "imports `" + AT + "AGENTS.md` and https://medium.com/" + AT + "someone.handle/a-post"
+        self.current["in_review"][0]["state"] = public
+        self.write_json(self.current_path, self.current)
+        self.refresh()
+        self.assertIn(html.escape(public, quote=True), (self.output / "command-center.html").read_text())
+
     def test_composer_pages_withhold_every_digest_the_receipt_marks_private(self):
         # Astra's read of 51f85b5b, P1 2 (#161): sources.html published the SHA-256 of research-queue.tsv's raw bytes, so a
         # guessed private line could be confirmed. The command-center state inputs and cc-now.json are marked private and
-        # keep their digests in the nonserved receipt only. Scope: the pages this composer builds. Other state-root rows
-        # on sources.html (gaps, roadmap, readiness receipts) keep their raw digests, as on main; the architecture
-        # builder's custody pages are not in this output.
+        # keep their digests in the nonserved receipt only. Scope: the pages this composer builds; the architecture
+        # builder's custody pages are not in this output. Every other state-root input follows the same class rule in
+        # test_command_center_and_sources_serve_only_digests_of_published_bytes (Astra's read of 3d7b1e7a, P1 2).
         self.add_sections()
         self.write_inputs()
         queue = self.state / "coordination/ns2604-coop/research-queue.tsv"
@@ -1037,9 +1069,74 @@ class CommandCenterComposerTests(unittest.TestCase):
                 self.assertEqual([name for name, digest in private.items() if digest in text], [])
                 self.assertNotIn("zqprivate", decoded_text(text))
         sources = (self.output / "sources.html").read_text()
-        self.assertIn("private state input; this page withholds its digest, which the nonserved receipt keeps", sources)
+        self.assertIn("private, not published (host state)", sources)
         for name in ("readiness", "evidence"):
             self.assertIn(hashlib.sha256((self.root / dict((n, r) for n, _, r, _, _ in BUILDER.COMMAND_CENTER_INPUTS)[name]).read_bytes()).hexdigest(), sources)
+
+    def test_command_center_and_sources_serve_only_digests_of_published_bytes(self):
+        # Astra's read of 3d7b1e7a, P1 2 (#161): the footer of the new page served the SHA-256 of the native builder's render
+        # of the state root, whose raw bytes held a private address (the gate owner), and sources.html served the raw digests
+        # of the gate receipt, the gap board and the roadmap inputs. A digest of private bytes confirms a guessed value
+        # offline. The class rule: bytes read from the state root are private, whatever their name, and keep their digest in
+        # the nonserved receipt only; a digest on these two pages is that of bytes the repository publishes.
+        self.add_sections()
+        self.write_inputs()
+        private = "zqprivate" + AT + "example.org"  # built at run time: the repository holds no address literal
+        gate = json.loads(self.gate.read_text())
+        gate["owner"] = private
+        self.write_json(self.gate, gate)
+        self.gaps["gaps"][0]["owner"] = private
+        self.write_json(self.gaps_path, self.gaps)
+        self.write_json(self.road_inputs, {"board_base": str(self.state / "coordination/ns2604-coop/readiness-20261005/jobs/board.json"), "handbook_commit": private})
+        queue = self.state / "coordination/ns2604-coop/research-queue.tsv"
+        queue.write_bytes(("date_utc\tquestion\n2026-10-11\tContact " + private + "\n").encode())
+        receipt = self.refresh()
+        native, _ = BUILDER.load_native(self.root)
+        raw = native.render(native.build(self.root, self.state, self.source_index))
+        self.assertIn(private.encode(), raw)  # the oracle is real: the raw native manifest holds the private value
+        manifest = hashlib.sha256(raw).hexdigest()
+        self.assertEqual(receipt["native_readiness_manifest_sha256"], manifest)  # the nonserved receipt keeps it
+        state = {name: item for name, item in receipt["inputs"].items() if item.get("sha256") and Path(item["path"].split("#")[0]).is_relative_to(self.state)}
+        for name in ("readiness:gate", "gaps", "roadmap", "roadmap_inputs", "cc_now", "adoption", "command_center:research_queue"):
+            self.assertIn(name, state)
+        for name, item in state.items():
+            with self.subTest(input=name):
+                self.assertTrue(item.get("private"))
+                self.assertEqual(item["sha256"], hashlib.sha256(Path(item["path"]).read_bytes()).hexdigest())  # the receipt keeps it
+        published = {item["sha256"] for name, item in receipt["inputs"].items() if item.get("sha256") and name not in state}
+        self.assertIn(hashlib.sha256((self.root / "tools/north-star/sources.json").read_bytes()).hexdigest(), published)
+        private_digests = {item["sha256"] for item in state.values()} | {manifest}
+        for name in ("command-center", "sources"):
+            page = (self.output / (name + ".html")).read_text()
+            with self.subTest(page=name):
+                served = set(re.findall(r"\b[0-9a-f]{64}\b", page))
+                self.assertEqual(served & private_digests, set())
+                self.assertEqual(served - published, set(), "a digest on this page is not that of bytes the repository publishes")
+                self.assertNotIn("zqprivate", decoded_text(page))
+                self.assertIn("<strong>Native readiness manifest SHA-256:</strong> <code>private, not published (host state)</code>", page)
+        for page in sorted(self.output.rglob("*.html")):
+            with self.subTest(everywhere=page.name):
+                self.assertEqual(set(re.findall(r"\b[0-9a-f]{64}\b", page.read_text())) & {item["sha256"] for item in state.values()}, set())
+        sources = (self.output / "sources.html").read_text()
+        for name in ("readiness", "evidence"):
+            self.assertIn(hashlib.sha256((self.root / dict((n, r) for n, _, r, _, _ in BUILDER.COMMAND_CENTER_INPUTS)[name]).read_bytes()).hexdigest(), sources)
+        self.assertEqual(receipt["outputs"]["command-center.html"]["sha256"], hashlib.sha256((self.output / "command-center.html").read_bytes()).hexdigest())
+
+    def test_registry_metadata_digests_of_the_state_root_are_withheld_on_sources(self):
+        # The same class rule for the Fleet source notes: the role projection's registry files are read from the state root.
+        registry = self.state / "coordination/ns2604-coop/lanes/hcom-lanes.json"
+        self.write_json(registry, {"zqlane": "zqprivate" + AT + "example.org"})
+        digest = hashlib.sha256(registry.read_bytes()).hexdigest()
+        projection = {"document": self.adoption, "window": {}, "sources": [{"path": str(registry), "sha256": digest, "read_utc": REFRESHED, "mtime_utc": REFRESHED}],
+                      "source_errors": [], "instances": {"role_map": {}}, "orchestration": {"claude_by_role": {}, "codex_by_role": {}, "codex_unattributed": {}}, "sdk": {"status": "UNREPORTED"}}
+        role_module = SimpleNamespace(project=lambda *unused: projection)
+        original = BUILDER.load_local
+        with patch.object(BUILDER, "load_local", side_effect=lambda name: role_module if name == "adoption_roles" else original(name)):
+            receipt = self.refresh()
+        self.assertEqual(receipt["adoption_role_attribution"]["sources"][0]["sha256"], digest)  # the nonserved receipt keeps it
+        sources = (self.output / "sources.html").read_text()
+        self.assertIn("registry metadata SHA-256 <code>private, not published (host state)</code>", sources)
+        self.assertNotIn(digest, "\n".join(page.read_text() for page in self.output.rglob("*.html")))
 
     def test_unapproved_input_is_a_gap_not_a_stop(self):
         self.write_inputs()
