@@ -29,9 +29,9 @@ The [Mac-only 10-02 memory verdict](../blueprints/memory-stack/native-qualificat
 | code-navigation | oraios/serena | `symbol_navigation`, `reference_graph_navigation` | no |
 | code-navigation | anthropics/claude-plugins-official | `native_lsp_distribution` | yes |
 | code-navigation | abhigyanpatwari/GitNexus | `symbol_navigation`, `reference_graph_navigation`, `navigation_index_maintenance` | no |
-| code-navigation | mibayy/token-savior | `symbol_navigation`, `navigation_index_maintenance` | no |
+| code-navigation | mibayy/token-savior | `symbol_navigation`, `navigation_index_maintenance`, `reference_graph_navigation` | no |
 | document-retrieval | tobi/qmd | `document_retrieval` | no |
-| document-retrieval | microsoft/markitdown | `document_conversion` | no |
+| document-retrieval | microsoft/markitdown | `document_conversion`, `document_ocr_layout` | no |
 | document-retrieval | tsdgeos/poppler_mirror | `document_conversion`, `layout_referenced_conversion` | no |
 | document-retrieval | datalab-to/marker | `document_conversion`, `document_ocr_layout`, `layout_referenced_conversion` | no |
 | document-retrieval | opendatalab/MinerU | `document_conversion`, `document_ocr_layout`, `document_retrieval`, `layout_referenced_conversion` | no |
@@ -40,18 +40,18 @@ The [Mac-only 10-02 memory verdict](../blueprints/memory-stack/native-qualificat
 | document-retrieval | huggingface/sentence-transformers | `document_embedding_reranking` | yes |
 | document-retrieval | arabold/docs-mcp-server | `versioned_documentation_retrieval`, `document_retrieval` | no |
 | document-retrieval | VectifyAI/PageIndex | `document_retrieval` | no |
-| document-retrieval | xberg-io/xberg | `document_conversion`, `document_ocr_layout`, `layout_referenced_conversion` | no |
+| document-retrieval | xberg-io/xberg | `document_conversion`, `document_ocr_layout`, `layout_referenced_conversion`, `document_embedding_reranking` | no |
 | document-retrieval | pymupdf/pymupdf4llm | `document_conversion`, `document_ocr_layout`, `layout_referenced_conversion` | no |
 | document-retrieval | datalab-to/surya | `document_ocr_layout`, `layout_referenced_conversion` | no |
-| document-retrieval | alibaba/Logics-Parsing | `document_ocr_layout`, `document_conversion` | no |
-| document-retrieval | baidu/Unlimited-OCR | `document_ocr_layout` | no |
+| document-retrieval | alibaba/Logics-Parsing | `document_ocr_layout`, `document_conversion`, `layout_referenced_conversion` | no |
+| document-retrieval | baidu/Unlimited-OCR | `document_ocr_layout`, `layout_referenced_conversion`, `document_conversion` | no |
 | document-retrieval | datalab-to/chandra | `document_conversion`, `document_ocr_layout`, `layout_referenced_conversion` | no |
 | semantic-rag | giancarloerra/SocratiCode | `project_semantic_index`, `semantic_code_retrieval` | no |
-| semantic-rag | qdrant/qdrant | `vector_storage` | yes |
+| semantic-rag | qdrant/qdrant | `vector_storage`, `multivector_semantic_index` | yes |
 | semantic-rag | vllm-project/vllm | `model_serving` | yes |
 | semantic-rag | ollama/ollama | `model_serving` | yes |
 | semantic-rag | OSU-NLP-Group/HippoRAG | `project_semantic_index`, `semantic_code_retrieval` | no |
-| semantic-rag | lightonai/next-plaid | `multivector_semantic_index`, `semantic_code_retrieval` | no |
+| semantic-rag | lightonai/next-plaid | `multivector_semantic_index`, `semantic_code_retrieval`, `project_semantic_index` | no |
 | semantic-rag | minishlab/semble | `project_semantic_index`, `semantic_code_retrieval` | no |
 | durable-memory | akitaonrails/ai-memory | `shared_memory_backend`, `native_memory_capture` | no |
 | durable-memory | anthropics/claude-code | `native_file_session_memory` | yes |
@@ -83,9 +83,9 @@ The seven known version deltas are explicit in each terminal record's `run_pin_r
 | Single comparison | Current re-frozen preregistration SHA256 |
 | --- | --- |
 | [w6-foundation-native-clients-20261011](../evidence/artifacts/w6-layer-verdict-20261011/comparisons/native-clients.json) | `e70391bd323583f77a78e3327d29491a677e2fe7e5176c31d82e633fef124947` |
-| [w6-foundation-code-navigation-20261011](../evidence/artifacts/w6-layer-verdict-20261011/comparisons/code-navigation.json) | `ccf0ec381e21b96697b45b6f38a4e1ef5f6cb63e6d2315378b473badb7c5b1a0` |
-| [w6-foundation-document-retrieval-20261011](../evidence/artifacts/w6-layer-verdict-20261011/comparisons/document-retrieval.json) | `5be0515cc4367fc457e12bded1ed351ed022ff61a9ba55ced3998906ccac4848` |
-| [w6-foundation-semantic-rag-20261011](../evidence/artifacts/w6-layer-verdict-20261011/comparisons/semantic-rag.json) | `3b77e8a2e82d244d7b264e8eeeaebca8312f3128a5e6224ec784006f7d9ec2dd` |
+| [w6-foundation-code-navigation-20261011](../evidence/artifacts/w6-layer-verdict-20261011/comparisons/code-navigation.json) | `e0ed8b0e911db34f91b57bea5b3d31a89c2a2f32287a177002654b38a59df40f` |
+| [w6-foundation-document-retrieval-20261011](../evidence/artifacts/w6-layer-verdict-20261011/comparisons/document-retrieval.json) | `a06410fcea30b7638c56ac1df280c0a96f9912ec563459482351d167b61e4f11` |
+| [w6-foundation-semantic-rag-20261011](../evidence/artifacts/w6-layer-verdict-20261011/comparisons/semantic-rag.json) | `50ca296465f89d6a0aa643c67a063a3ded5eb38394462c5ec495972fa884b02c` |
 | [w6-foundation-durable-memory-20261011](../evidence/artifacts/w6-layer-verdict-20261011/comparisons/durable-memory.json) | `6450b9467c9345a67dc4fb571429b1c055fa924f8b422c8b7ab48aebeaba5cee` |
 | [w6-foundation-web-research-20261011](../evidence/artifacts/w6-layer-verdict-20261011/comparisons/web-research.json) | `db1df25eed815d73ce09e518f0a01895b95732821e01bf22e95e8bad01a41819` |
 

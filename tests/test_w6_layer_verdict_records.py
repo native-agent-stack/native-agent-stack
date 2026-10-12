@@ -94,6 +94,14 @@ class W6RecordContracts(unittest.TestCase):
             ("web-research", "vercel-labs/agent-browser", "web_primary_source_retrieval", "README.md:206-219"),
             ("document-retrieval", "opendatalab/mineru", "document_retrieval", "README.md:52"),
             ("document-retrieval", "arabold/docs-mcp-server", "document_retrieval", "README.md:61-64"),
+            ("code-navigation", "mibayy/token-savior", "reference_graph_navigation", "src/token_savior/tool_schemas.py:471-473"),
+            ("document-retrieval", "alibaba/logics-parsing", "layout_referenced_conversion", "inference_v3.py:47-54"),
+            ("document-retrieval", "baidu/unlimited-ocr", "layout_referenced_conversion", "README.md:297-302"),
+            ("document-retrieval", "baidu/unlimited-ocr", "document_conversion", "infer.py:245-249"),
+            ("semantic-rag", "lightonai/next-plaid", "project_semantic_index", "README.md:59"),
+            ("document-retrieval", "xberg-io/xberg", "document_embedding_reranking", "README.md:132"),
+            ("semantic-rag", "qdrant/qdrant", "multivector_semantic_index", "README.md:133"),
+            ("document-retrieval", "microsoft/markitdown", "document_ocr_layout", "README.md:130-132"),
         )
         for layer, repo, role, source_ref in expected:
             config = load(f"comparisons/{layer}.json")

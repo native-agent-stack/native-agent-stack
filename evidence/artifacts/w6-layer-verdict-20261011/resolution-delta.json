@@ -453,7 +453,7 @@
       "terminal_readiness": "#1007 LANDED satisfied; remaining pinned-runtime comparison inputs are explicitly unmet",
       "bounded_next_action": "Qualify only the frozen existing candidates on the retained cases through the named native/upstream paths. No new discovery.",
       "evidence_class": "source_review",
-      "preregistration_sha256": "ccf0ec381e21b96697b45b6f38a4e1ef5f6cb63e6d2315378b473badb7c5b1a0",
+      "preregistration_sha256": "e0ed8b0e911db34f91b57bea5b3d31a89c2a2f32287a177002654b38a59df40f",
       "wave_ref": "catalogs/sota-convergence/layer-verdicts-20260922.json#/catalogs/foundation/2",
       "next_review": "2026-10-22",
       "next_review_gap": null,
@@ -468,7 +468,7 @@
         },
         "comparison_id": "w6-foundation-code-navigation-20261011",
         "preregistration_ref": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/code-navigation.json",
-        "preregistration_sha256": "ccf0ec381e21b96697b45b6f38a4e1ef5f6cb63e6d2315378b473badb7c5b1a0",
+        "preregistration_sha256": "e0ed8b0e911db34f91b57bea5b3d31a89c2a2f32287a177002654b38a59df40f",
         "resolution_winners": [],
         "final_stack_source": {
           "commit": "c2dee173",
@@ -930,7 +930,7 @@
       "terminal_readiness": "#1007 LANDED satisfied; remaining pinned-runtime comparison inputs are explicitly unmet",
       "bounded_next_action": "Qualify only the frozen existing candidates on the retained cases through the named native/upstream paths. No new discovery.",
       "evidence_class": "source_review",
-      "preregistration_sha256": "5be0515cc4367fc457e12bded1ed351ed022ff61a9ba55ced3998906ccac4848",
+      "preregistration_sha256": "a06410fcea30b7638c56ac1df280c0a96f9912ec563459482351d167b61e4f11",
       "wave_ref": "catalogs/sota-convergence/layer-verdicts-20260922.json#/catalogs/foundation/3",
       "next_review": "2026-10-22",
       "next_review_gap": null,
@@ -945,7 +945,7 @@
         },
         "comparison_id": "w6-foundation-document-retrieval-20261011",
         "preregistration_ref": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/document-retrieval.json",
-        "preregistration_sha256": "5be0515cc4367fc457e12bded1ed351ed022ff61a9ba55ced3998906ccac4848",
+        "preregistration_sha256": "a06410fcea30b7638c56ac1df280c0a96f9912ec563459482351d167b61e4f11",
         "resolution_winners": [],
         "final_stack_source": {
           "commit": "c2dee173",
@@ -1415,7 +1415,7 @@
       "terminal_readiness": "#1007 LANDED satisfied; remaining pinned-runtime comparison inputs are explicitly unmet",
       "bounded_next_action": "Qualify only the frozen existing candidates on the retained cases through the named native/upstream paths. No new discovery.",
       "evidence_class": "source_review",
-      "preregistration_sha256": "3b77e8a2e82d244d7b264e8eeeaebca8312f3128a5e6224ec784006f7d9ec2dd",
+      "preregistration_sha256": "50ca296465f89d6a0aa643c67a063a3ded5eb38394462c5ec495972fa884b02c",
       "wave_ref": "catalogs/sota-convergence/layer-verdicts-20260922.json#/catalogs/foundation/16",
       "next_review": "2026-10-22",
       "next_review_gap": null,
@@ -1430,7 +1430,7 @@
         },
         "comparison_id": "w6-foundation-semantic-rag-20261011",
         "preregistration_ref": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/semantic-rag.json",
-        "preregistration_sha256": "3b77e8a2e82d244d7b264e8eeeaebca8312f3128a5e6224ec784006f7d9ec2dd",
+        "preregistration_sha256": "50ca296465f89d6a0aa643c67a063a3ded5eb38394462c5ec495972fa884b02c",
         "resolution_winners": [],
         "final_stack_source": {
           "commit": "c2dee173",
@@ -2525,7 +2525,7 @@
   "terminal_adjudication": {
     "record": "adjudication-pr1021-599d9bbb-20261012.md",
     "reviewed_head": "599d9bbba34501687c358e42b29a3c9a485a56f3",
-    "main_base": "64594c763502ac34891755d9bcc02c745cd3497a",
+    "main_base": "2a330b0a0be0bb64d1b86b89ee0c5b3bee1156a1",
     "refrozen_at": "2026-10-12T06:23:56Z",
     "before_any_run": true,
     "final_round_rule": "Both families read this terminal delta; only a new reproduced P1 reopens after the adjudicated commit.",
@@ -2543,5 +2543,19 @@
       "before_fix_exit": 1,
       "scope": "Role omissions, incompatible flat-output layout gate, licence exclusion, survivor reasons and readiness bindings."
     }
+  },
+  "terminal_completion": {
+    "record": "adjudication-pr1021-55c49da1-20261012.md",
+    "reviewed_head": "55c49da1924216665b21bb538cfe43becf448fc7",
+    "main_base": "2a330b0a0be0bb64d1b86b89ee0c5b3bee1156a1",
+    "refrozen_at": "2026-10-12T09:10:22Z",
+    "before_any_run": true,
+    "role_pair_count": 8,
+    "previous_preregistrations": {
+      "code-navigation": "ccf0ec381e21b96697b45b6f38a4e1ef5f6cb63e6d2315378b473badb7c5b1a0",
+      "document-retrieval": "5be0515cc4367fc457e12bded1ed351ed022ff61a9ba55ced3998906ccac4848",
+      "semantic-rag": "3b77e8a2e82d244d7b264e8eeeaebca8312f3128a5e6224ec784006f7d9ec2dd"
+    },
+    "scope": "Only the eight remaining source-advertised pairs, associated pin witnesses/output-input boundaries, corrected main base and affected re-freeze/hash copies. No new round or comparison run."
   }
 }

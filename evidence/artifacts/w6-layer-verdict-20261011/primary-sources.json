@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "w6_mirror_primary_sources",
   "recorded_at": "2026-10-11T23:15:50Z",
-  "corrected_at": "2026-10-12T06:23:56Z",
+  "corrected_at": "2026-10-12T09:10:22Z",
   "mirror_root": "~/code/upstream",
   "read_command": "GIT_NO_LAZY_FETCH=1 GIT_OPTIONAL_LOCKS=0 git show <MIRRORS.lock.json SHA>:<path>",
   "scope": "Corrected advertised capability/install/test references at the lock commit. Source review is not measured performance or E2E.",
@@ -52,6 +52,10 @@
         {
           "path": "README.md",
           "sha256": "48b46aa50dd7803bc30a7ae85c6e8c4f560e6b765973698d8ddced3b6e3ad378"
+        },
+        {
+          "path": "src/token_savior/tool_schemas.py",
+          "sha256": "cc38676b3494e99525a7d7dcd012f76c50dc6f7b0d35d1acabba3702b79af78a"
         }
       ],
       "evidence_class": "source_review",
@@ -237,6 +241,10 @@
         {
           "path": "README.md",
           "sha256": "5fc2e3d1d459c252385627bce39a7c3204437eb3eaf5153806c418dcb0a6d77c"
+        },
+        {
+          "path": "inference_v3.py",
+          "sha256": "df833acf591303dcbd3978b2cec275fa1f8277e3d993d7ef877360d32a2da951"
         }
       ],
       "evidence_class": "source_review"
@@ -253,6 +261,10 @@
         {
           "path": "README.md",
           "sha256": "08e531fef07276bb5bb036d675c991d3fbf39dc3cc985a8dda1b4c468bacdb9f"
+        },
+        {
+          "path": "infer.py",
+          "sha256": "537235bf5614318d9c84b728d4d67a7e5b2784884ec7aa6d1cafaa63d9b48760"
         }
       ],
       "evidence_class": "source_review",

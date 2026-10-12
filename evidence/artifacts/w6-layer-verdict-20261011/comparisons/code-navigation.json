@@ -63,10 +63,23 @@
       "upstream_test_ref": null,
       "role_ids": [
         "symbol_navigation",
-        "navigation_index_maintenance"
+        "navigation_index_maintenance",
+        "reference_graph_navigation"
       ],
       "dependency": false,
-      "selection_scope": "role-specific candidate; never rank across different role ids"
+      "selection_scope": "role-specific candidate; never rank across different role ids",
+      "role_source_witnesses": {
+        "reference_graph_navigation": {
+          "ref": "src/token_savior/tool_schemas.py:471-473",
+          "pin": "0a4a2e126530ff1222b7f9c62c290e517a738328",
+          "source_file_sha256": "cc38676b3494e99525a7d7dcd012f76c50dc6f7b0d35d1acabba3702b79af78a",
+          "lines": [
+            "    \"get_dependents\": {",
+            "        \"description\": (",
+            "        'Incoming deps: who calls/uses X, direct references only.' ),"
+          ]
+        }
+      }
     }
   ],
   "fixture_seal": [
@@ -218,14 +231,14 @@
       ]
     }
   },
-  "refrozen_at": "2026-10-12T06:23:56Z",
+  "refrozen_at": "2026-10-12T09:10:22Z",
   "amendment_authority": "CC adjudication-pr1021-599d9bbb-20261012.md: B2-r-2, B1-std, licence, survivor reasons and retained reopen inputs",
   "role_assignment_rule": "role_ids, dependency and role_checks are frozen here; no assignment or applicability change at execution/scoring time.",
   "supersedes": {
-    "head": "599d9bbba34501687c358e42b29a3c9a485a56f3",
-    "preregistration_sha256": "6a67cd1a1b024b83f4ac2240c6ae0e38e8e8f852fa4bbdbd5f0e2aaa9ce9ca5a",
+    "head": "55c49da1924216665b21bb538cfe43becf448fc7",
+    "preregistration_sha256": "ccf0ec381e21b96697b45b6f38a4e1ef5f6cb63e6d2315378b473badb7c5b1a0",
     "before_any_run": true,
-    "reason": "Adjudicated terminal re-freeze"
+    "reason": "Completion of the terminal source-advertised-role ruling; metrics, cases, source pins and candidate set unchanged."
   },
   "retained_comparison_dispositions": [
     {
@@ -250,6 +263,15 @@
         "catalogs/sota-convergence/manifest-20260929.json#/foundation/4/candidates/2/comparison_that_would_overturn"
       ],
       "frozen_rule_reason": "The shared required/forbidden-reference and edit/delete oracle separates navigation from memory/compaction. Published held-out evaluation and actual MCP invocation traces remain readiness inputs, not claimed results."
+    }
+  ],
+  "completion_authority": "CC adjudication-pr1021-55c49da1-20261012.md: eight remaining advertised arm-role pairs, completion only",
+  "completion_role_pairs": [
+    {
+      "repository": "https://github.com/mibayy/token-savior",
+      "pin": "0a4a2e126530ff1222b7f9c62c290e517a738328",
+      "added_role_id": "reference_graph_navigation",
+      "source_ref": "src/token_savior/tool_schemas.py:471-473"
     }
   ]
 }

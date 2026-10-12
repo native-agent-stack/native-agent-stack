@@ -36,10 +36,24 @@
       "upstream_install_ref": null,
       "upstream_test_ref": null,
       "role_ids": [
-        "vector_storage"
+        "vector_storage",
+        "multivector_semantic_index"
       ],
       "dependency": true,
-      "selection_scope": "dependency qualification only; not ranked as a standalone end-to-end layer winner"
+      "selection_scope": "dependency qualification only; not ranked as a standalone end-to-end layer winner",
+      "role_source_witnesses": {
+        "multivector_semantic_index": {
+          "ref": "README.md:133",
+          "pin": "6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de",
+          "source_file_sha256": "f1455d12252bf40235ad0128d8e98b2cd6d42583e441ac832b01f4daf08df2e4",
+          "lines": [
+            "Qdrant supports dense vectors for semantic similarity, sparse vectors for full-text search, and multivector search for objects with multiple embeddings or late interaction models like ColBERT."
+          ]
+        }
+      },
+      "role_input_boundary": {
+        "multivector_semantic_index": "Externally computed multivectors from the sealed model-serving source are common inputs; qualify native index/search/storage/isolation with the same membership oracle, never claim Qdrant computes embeddings."
+      }
     },
     {
       "repository": "https://github.com/vllm-project/vllm",
@@ -86,7 +100,8 @@
       "upstream_test_ref": "Makefile:15",
       "role_ids": [
         "multivector_semantic_index",
-        "semantic_code_retrieval"
+        "semantic_code_retrieval",
+        "project_semantic_index"
       ],
       "dependency": false,
       "selection_scope": "role-specific candidate; never rank across different role ids",
@@ -99,6 +114,24 @@
             "Semantic code search for your terminal and your coding agents. Searches combine regex filtering with semantic ranking. All local, your code never leaves your machine."
           ],
           "evidence_class": "source_review"
+        },
+        "project_semantic_index": {
+          "ref": "README.md:59",
+          "pin": "c6c091d7ee14c81206bb28af90d8ff506fd0235e",
+          "source_file_sha256": "0feb0aea9d954e1b39ebfe46fe7a6c343d798bc155537b5526e73b610105cb03",
+          "lines": [
+            "That's it. No server, no API, no dependencies. ColGREP is a single Rust binary with everything baked in. `colgrep init` builds the index for the first time. After that, every search detects file changes and updates the index automatically before returning results."
+          ],
+          "supporting_witnesses": [
+            {
+              "ref": "README.md:215",
+              "pin": "c6c091d7ee14c81206bb28af90d8ff506fd0235e",
+              "source_file_sha256": "0feb0aea9d954e1b39ebfe46fe7a6c343d798bc155537b5526e73b610105cb03",
+              "lines": [
+                "- **Incremental updates.** Add and delete documents without rebuilding the index."
+              ]
+            }
+          ]
         }
       }
     },
@@ -317,7 +350,7 @@
       ]
     }
   },
-  "refrozen_at": "2026-10-12T06:23:56Z",
+  "refrozen_at": "2026-10-12T09:10:22Z",
   "amendment_authority": "CC adjudication-pr1021-599d9bbb-20261012.md: B2-r-2, B1-std, licence, survivor reasons and retained reopen inputs",
   "role_assignment_rule": "Source-advertised roles enter the common requirement comparison; no applicability change at scoring. Distinct native output contracts use separately defined oracles, never incompatible layout requirements imposed on flat output.",
   "role_reconciliation": [
@@ -354,10 +387,10 @@
     }
   ],
   "supersedes": {
-    "head": "599d9bbba34501687c358e42b29a3c9a485a56f3",
-    "preregistration_sha256": "3e9ba562169f4ff233af2d0e48213a29d8710795f8281cb8075e312f9df20c73",
+    "head": "55c49da1924216665b21bb538cfe43becf448fc7",
+    "preregistration_sha256": "3b77e8a2e82d244d7b264e8eeeaebca8312f3128a5e6224ec784006f7d9ec2dd",
     "before_any_run": true,
-    "reason": "Adjudicated terminal re-freeze"
+    "reason": "Completion of the terminal source-advertised-role ruling; metrics, cases, source pins and candidate set unchanged."
   },
   "retained_comparison_dispositions": [
     {
@@ -398,6 +431,21 @@
         "catalogs/sota-convergence/manifest-20260926.json#/foundation/6/candidates/0/comparison_that_would_overturn"
       ],
       "frozen_rule_reason": "The deduplicated exact-source arm tests index coverage/freshness and clean-target membership. Retained benchmark/control and another operational version are not transferred as comparison receipts."
+    }
+  ],
+  "completion_authority": "CC adjudication-pr1021-55c49da1-20261012.md: eight remaining advertised arm-role pairs, completion only",
+  "completion_role_pairs": [
+    {
+      "repository": "https://github.com/lightonai/next-plaid",
+      "pin": "c6c091d7ee14c81206bb28af90d8ff506fd0235e",
+      "added_role_id": "project_semantic_index",
+      "source_ref": "README.md:59"
+    },
+    {
+      "repository": "https://github.com/qdrant/qdrant",
+      "pin": "6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de",
+      "added_role_id": "multivector_semantic_index",
+      "source_ref": "README.md:133"
     }
   ]
 }
