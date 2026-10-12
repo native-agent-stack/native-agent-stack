@@ -17348,8 +17348,8 @@
     },
     {
       "path": "catalogs/foundation/decisions.json",
-      "sha256": "767c13587fad67633bf839de50246f500af4ad5af1eaf6d40ab040d93b509d4f",
-      "bytes": 140483
+      "sha256": "ea9ea339a2fda04b779f3782930ef234c9e39f79ec7a6c4f79156e49a4240107",
+      "bytes": 140670
     },
     {
       "path": "catalogs/foundation/latest-models.json",
@@ -17408,7 +17408,7 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "82fd36482a2f6701f6228a9f7cb5d96285824589c1b2ba9e8b5303489e0cefb5",
+      "sha256": "7ffbbacca1721baeee78d1c9ad8f86a20037eee660f254973ae50557381e6e5d",
       "bytes": 190328
     },
     {
@@ -18353,8 +18353,8 @@
     },
     {
       "path": "docs/decisions/2026-09-30-task-model-routing.md",
-      "sha256": "c1236ababe5cda0b5d6091edf27e935b9973ff67bf30437b2e82a70187ebc584",
-      "bytes": 46609
+      "sha256": "eb3b44b811222ddbea0dee58df629241f314041ab68ef54855844c1346fd4353",
+      "bytes": 46749
     },
     {
       "path": "docs/decisions/2026-10-01-definitive-sota-wsl-program.md",
@@ -19073,8 +19073,8 @@
     },
     {
       "path": "docs/decisions/2026-10-12-model-effort-routing.md",
-      "sha256": "932328cb423b6954026cb5e2f48c75f44751e838f058798751c44fcecd11bea2",
-      "bytes": 8646
+      "sha256": "9cf7463ab3454fe49247668276afc01e9b89131999c19d2fe59cb9bdf781766e",
+      "bytes": 10947
     },
     {
       "path": "docs/decisions/2026-10-12-skills-installer-foreign-content.md",
@@ -60378,12 +60378,12 @@
     },
     {
       "path": "examples/claude-native/workflows/README.md",
-      "sha256": "e74ddc5557ac7a9b209ccdfe1eb403566cfe9e7c9f61bcd618ae8eda135d2de0",
-      "bytes": 114526
+      "sha256": "1461d130ea016bd21d46aa8fa40116278a3208d55e495ebc0f833b689e750301",
+      "bytes": 115525
     },
     {
       "path": "examples/claude-native/workflows/SHA256SUMS",
-      "sha256": "3b9592b0758826a95c060d466307f1241a102caaef7aa3007a20e974f572eda3",
+      "sha256": "04429e08bf9b323aacdade451731d00bf43c646ac76649ed1d5d7abd02ab63da",
       "bytes": 1217
     },
     {
@@ -60433,13 +60433,13 @@
     },
     {
       "path": "examples/claude-native/workflows/test-contract-mutations.mjs",
-      "sha256": "1f03bf1441e9a857cabb3aada203e66e5888a5fda2f466905eba3894a7fa9977",
-      "bytes": 22800
+      "sha256": "d99043552aca6fe3c242c6a70c05261e6368d5833c2c7fb6a0d62318d9b91ad1",
+      "bytes": 22874
     },
     {
       "path": "examples/claude-native/workflows/test-envelope.mjs",
-      "sha256": "2ce03ec8d73f711139a21f5f42a0b0ca3de89bedf539499ff82591a74ae0eec9",
-      "bytes": 58262
+      "sha256": "b09e1b2748a5dd7da1b44004917106fef1373f351e538a8ad339735df837e4bd",
+      "bytes": 58506
     },
     {
       "path": "examples/claude-native/workflows/test-usage-receipts.mjs",
@@ -62553,8 +62553,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "96efd873781bdb7b1309b18d892308529401ea2d3298a89150ff061b5f208cf7",
-      "bytes": 170517
+      "sha256": "13b79a321574571fef64d2d87a982dbd15e2d90bddde5d0ceaa809ebcc337706",
+      "bytes": 171313
     },
     {
       "path": "tests/test_install_skills.py",

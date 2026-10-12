@@ -18,7 +18,7 @@ const configured = (key) => resolve(HERE, typeof CONFIG[key] === 'string' ? CONF
 // afterwards, so the suite always reaches its SUMMARY line.
 const readOr = (path) => { try { return readFileSync(path, 'utf8') } catch { return '' } }
 const WF = { review: 'workflows/review-changes.js', readiness: 'workflows/readiness-audit.js' }
-// The one effort every saved workflow stage and project agent binds (since 2026-09-23; decision
+// The one effort every saved workflow stage binds (since 2026-09-23; project agents carry their routed effort since 2026-10-12, AGENT_EFFORT; decision
 // docs/decisions/2026-09-23-max-effort-default.md in the catalog). The coordinator runs at max in a terminal
 // session started through the ecosystem launcher and at xhigh, saved per model, elsewhere (Ultracode set xhigh on 2.1.281
 // and does not on 2.1.284). A stage with no effort of its own and no agent
@@ -29,7 +29,8 @@ const STAGE_EFFORT = 'max'
 // Each project agent's own effort since 2026-10-12 (docs/decisions/2026-10-12-model-effort-routing.md, the command
 // center's routing table): a named child (a teammate spawn) drops a per-launch effort and runs at its definition's,
 // so the definition carries the routed level. The blind roles keep their protocol's max. A saved stage still binds
-// STAGE_EFFORT, which overrides the definition for that unnamed stage.
+// STAGE_EFFORT; that a stage's effort wins over the definition's rests on Q3 of the 2026-09-23 record (Claude Code
+// 2.1.281, Sonnet 5), not re-measured on 2.1.296.
 const AGENT_EFFORT = { 'blind-adjudicator': 'max', 'blind-judge': 'max', 'blind-lane-reviewer': 'max', 'evidence-reviewer': 'xhigh', 'isolated-builder': 'high', 'landscape-sweep-worker': 'max', 'security-reviewer': 'xhigh', 'semantic-evidence-reviewer': 'xhigh', 'source-scout': 'medium', 'stack-researcher': 'high', 'stack-verifier': 'medium' }
 function load(file, stubs) {
   const body = readFileSync(join(ROOT, file), 'utf8').replace(/^export const meta/m, 'const meta')
@@ -419,7 +420,7 @@ function agentOptionLiterals(src) {
     const tools = ((fm.match(/^tools: (.*)$/m) || [null, ''])[1]).split(',').map((t) => t.trim()).filter(Boolean)
     expect('agents: ' + n + ' name matches its file', nameOf(fm) === n.replace(/\.md$/, ''))
     expect('agents: ' + n + ' declares an explicit model and effort', /^model: (haiku|sonnet|opus)$/m.test(fm) && /^effort: (low|medium|high|xhigh|max)$/m.test(fm))
-    // One effort line, and it is the stage effort: a second, lower line cannot hide behind the first.
+    // One effort line, and it is the agent's routed effort: a second line cannot hide behind the first.
     const routedEffort = AGENT_EFFORT[n.replace(/\.md$/, '')]
     expect('agents: ' + n + ' runs at its routed effort on a single effort line', routedEffort !== undefined && (fm.match(/^effort:/mg) || []).length === 1 && new RegExp('^effort: ' + routedEffort + '$', 'm').test(fm))
     expect('agents: ' + n + ' declares a tools allowlist', tools.length > 0)
@@ -452,7 +453,7 @@ function agentOptionLiterals(src) {
   const defaultRows = roleRows.filter((r) => r[1] === 'default workflow subagent')
   expect('routing doc: every default workflow subagent row binds a model at effort ' + STAGE_EFFORT, defaultRows.length > 0 && defaultRows.every((r) => new RegExp('^(Sonnet|Opus), ' + STAGE_EFFORT + '$').test(r[2])))
   const coordinatorRows = roleRows.filter((r) => r[1] === 'coordinator')
-  expect('routing doc: the coordinator row states the launcher max and the saved xhigh fallback under ultracode', coordinatorRows.length === 1 && coordinatorRows[0][2].includes('max from the launcher, else saved xhigh, under `ultracode`'))
+  expect('routing doc: the coordinator row states the routing ruling xhigh and the launcher max until relaunch under ultracode', coordinatorRows.length === 1 && coordinatorRows[0][2].includes('Opus 5.5 at xhigh (main-session row of the 2026-10-12 routing ruling; launcher max until each session is relaunched), under `ultracode`'))
   // Effort profile: the saved coordinator effort is xhigh (the launcher adds max), so the settings must not set
   // CLAUDE_CODE_EFFORT_LEVEL (any value overrides every stage's and agent's own effort; on 2.1.281 a value other than
   // xhigh also left ultracode's orchestration inactive) and must not cap effort below the stage effort, either

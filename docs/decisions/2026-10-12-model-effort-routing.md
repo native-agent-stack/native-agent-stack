@@ -15,12 +15,13 @@ is replaced by the table below. The coordinator's own effort is not decided here
 ## Decision
 
 The shipped agent definitions (`adoption/agents/claude/`, byte-identical in `.claude/agents/` and, for the agents
-it ships, `examples/claude-native/agents/`) carry the model and effort of the ruling's table:
+it ships, `examples/claude-native/agents/`) carry the model and effort of the ruling's table, except `source-scout`
+(below):
 
 | Agent | Work class (the ruling's table) | Model, effort |
 | --- | --- | --- |
-| `source-scout` | exact extraction, inventories, running named acceptance commands | Sonnet, medium |
-| `stack-verifier` | command re-runs and claim checks without judgment | Sonnet, medium |
+| `source-scout` | exact extraction, inventories, running named acceptance commands | Sonnet, medium (the ruling's mechanical row says Haiku, low; this record's deviation, below, not accepted by the ruling or its addendum 01) |
+| `stack-verifier` | command re-runs and claim checks without judgment, on non-gate work (below) | Sonnet, medium |
 | `stack-researcher` | research and synthesis on named sources | Sonnet, high |
 | `isolated-builder` | builders, on gate-relevant code by default | Opus, high |
 | `evidence-reviewer`, `security-reviewer`, `semantic-evidence-reviewer` | reviews, security review | Opus, xhigh |
@@ -29,15 +30,25 @@ it ships, `examples/claude-native/agents/`) carry the model and effort of the ru
 
 No definition is on Haiku. The one same-packet extraction trial (2026-09-21,
 [docs/ultracode-token-routing-20260921.md](../ultracode-token-routing-20260921.md) item 4, line 20) had the Opus
-verifier score a Sonnet inventory 14/14 lane rows and a Haiku 4.5 inventory 9/14, one row a quote attributed to a
-file that does not hold it; Haiku 5.5 is unmeasured on that task. So `source-scout` stays on Sonnet, and Haiku stays
+verifier score a Sonnet inventory 14/14 lane rows and a Haiku inventory 9/14, one row a quote attributed to a
+file that does not hold it (the record names no Haiku version); no trial on Haiku 5.5 is recorded. So `source-scout` stays on Sonnet, and Haiku stays
 a per-launch choice for mechanical work, which every spawn honors (below), until a repeat trial on Haiku 5.5 returns
 no unanchored citation on two distinct packets (the README's overturn condition).
 `isolated-builder` defaults to the gate-code tier; a builder on non-gate code is launched with a per-launch Sonnet.
 
-**Coordinator guidance.** A child launched with `name` (a teammate) runs at its definition's effort, or, when the
-definition sets none, at the session's; it drops a per-launch `effort`. To run a child at another effort, launch it
-without `name`; the per-launch `model` is honored either way.
+**Gate work stays on Opus.** The ruling keeps the command center's routing run 5 rule unchanged (the ruling's lines
+46-48): Opus for trading, gate reads and sole-Claude-read micros, and Sonnet only for non-gate foundation work. So `stack-verifier`,
+now Sonnet at medium, checks claims on non-gate work only. A gate verification, a trading read or a sole Claude read
+uses `evidence-reviewer` or `security-reviewer` (Opus, xhigh), or `stack-verifier` launched **without** `name` and
+with a per-launch `model: opus` and `effort: xhigh`: a named child drops a per-launch effort (below), so a named
+`stack-verifier` would run at medium even with a per-launch Opus.
+
+**Coordinator guidance.** In an interactive session, a child launched with `name` (a teammate) runs at its
+definition's effort, or, when the definition sets none, at the session's; it drops a per-launch `effort`. To run a
+child at another effort, launch it without `name`; the per-launch `model` is honored either way. Scope: P11, P12 and
+the command center's children were interactive. Under `-p` or the Agent SDK a named spawn stays a subagent (the
+`claude-native-practice` skill's workers reference), and that headless named case is not measured here; teammates on
+the tmux or pane backends inherit the leader's `--effort` (the changelog, line 4293), also not tested here.
 
 ## Evidence
 
@@ -80,9 +91,14 @@ SHA256SUMS); transcripts hold local session identifiers and paths and are not pu
   sha256 `8f65d1b1463bc7e24fa0eeeadd290278162b1f26c56be6190a1db510de8d7ca0`): lines 605-609, the session's effort
   resolution order (the environment variable, `--effort` or `/effort`; then settings; then the model's default), and
   line 613 (a top-level user `effortLevel` does not count for Opus 5.5; a per-model level does).
-- The client's changelog (anthropics/claude-code `CHANGELOG.md` in the local mirror, 2.1.296 at line 3): line 298,
-  2.1.292 "Added an `effort` parameter to the Agent tool"; line 657, a team agent "spawned by name now runs with its
-  own prompt, tools, disallowedTools and effort instead of the defaults".
+- The client's changelog (anthropics/claude-code `CHANGELOG.md` in the local mirror at `3deb8736`, 2.1.296 at line
+  3): line 298, 2.1.292 "Added an `effort` parameter to the Agent tool"; line 657, "a plugin-defined agent spawned by
+  name now runs with its own prompt, tools, disallowedTools and effort instead of the defaults". This repository's
+  agents are project agents, not plugin agents, so that line is context; P11 and P12 measure the project-agent case.
+- **Saved Workflow stages.** A saved stage's `effort: 'max'` over a definition's own effort rests on Q3 of
+  [2026-09-23-max-effort-default.md](2026-09-23-max-effort-default.md) (line 65): on Claude Code 2.1.281, with Sonnet
+  5, a stage of an agent whose frontmatter said `effort: medium` ran at `max`. P1 to P12 are Agent-tool spawns, not
+  Workflow stages, so that rule is not re-measured on 2.1.296; the after-measurement below includes it.
 
 **Tests.** `tests/test_install_claude_profile.py` (`ShippedAgentEffortTests`) holds each shipped definition at its
 routed model and one effort line; on main's definitions it fails 7 times, once per rerouted agent. The examples'
@@ -97,11 +113,15 @@ and a blind role off `max`.
 - **Removing `--effort max` from the launchers only.** Necessary for the sessions themselves and for named children
   whose definition sets no effort, and the ruling does it at each session's next relaunch; it leaves every definition
   that says `max` at `max`.
-- **Haiku for `source-scout`.** Not adopted: the only same-packet result (Haiku 4.5, above) failed, and Haiku 5.5 has
-  no such result yet; Haiku stays a per-launch choice for mechanical work.
+- **Haiku for `source-scout`.** Not adopted: the only same-packet result (a Haiku inventory, above) failed, and no
+  Haiku 5.5 result is recorded; Haiku stays a per-launch choice for mechanical work. This departs from the ruling's
+  mechanical row (Haiku, low), which neither the ruling nor its addendum 01 has accepted; the command center decides.
 
 ## Comparison that would overturn it
 
 The ruling's reopen rule: a lower tier is raised for a work class when a gate read or the other review family finds a
 reproduced miss that the tier's output should have caught, recorded with both records' paths. A client change that
-makes a named child honor a per-launch effort reopens the coordinator guidance; it does not change the table.
+makes a named child honor a per-launch effort reopens the coordinator guidance; it does not change the table. The
+after-measurement (a 24-hour usage sample by model and effort, after landing) separates fresh from resumed children,
+named from unnamed and interactive from headless spawns, saved Workflow stages, and user-scope reinstallation, and
+reports the requested and resolved values apart.
