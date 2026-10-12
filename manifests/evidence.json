@@ -5000,6 +5000,11 @@
       "bytes": 27627
     },
     {
+      "path": ".claude/skills/native-skill-routing/SKILL.md",
+      "sha256": "7faa87fe651ebcb8d9fe6f6a5a15602e377dc4d4b189e33e2dd425ddbb5783b9",
+      "bytes": 877
+    },
+    {
       "path": ".claude/skills/omniroute-runtime-worker/SKILL.md",
       "sha256": "feacd5b6324649e3fff16d4f7f469f994e2984dccbb462f84e6fa8bf8e93da48",
       "bytes": 3840
@@ -5615,14 +5620,114 @@
       "bytes": 77578
     },
     {
+      "path": "adoption/skills/claude-routing/README.md",
+      "sha256": "4934779119e5d51f683cdb13240c00dc094203ae1723158468b55953631b39b0",
+      "bytes": 3451
+    },
+    {
+      "path": "adoption/skills/claude-routing/evals/frontend-design/graders/target-used.md",
+      "sha256": "ff11aa91bfa593df7f4f3bb91a23015d1674c5e73fd4935619b553126e3d1c53",
+      "bytes": 116
+    },
+    {
+      "path": "adoption/skills/claude-routing/evals/frontend-design/prompt.md",
+      "sha256": "264fbaa4a7fe7c8bb284826f79e95e42c3c15012b9d3d640bdade0f29c4d5169",
+      "bytes": 422
+    },
+    {
+      "path": "adoption/skills/claude-routing/evals/gh-address-comments/graders/target-used.md",
+      "sha256": "6a728fdfdc6f9544dd272739fdbbdeef23b7b97920aab59c491ce582acbf1df1",
+      "bytes": 120
+    },
+    {
+      "path": "adoption/skills/claude-routing/evals/gh-address-comments/prompt.md",
+      "sha256": "42817d89ee009674a77ec573a2272a5158fb2be58079560339bfe72e121877d5",
+      "bytes": 466
+    },
+    {
+      "path": "adoption/skills/claude-routing/evals/gh-fix-ci/graders/target-used.md",
+      "sha256": "21f1a112447aa766932e4e734889f2996af72fc15ea98a5d4bbd8d3262b86e4d",
+      "bytes": 110
+    },
+    {
+      "path": "adoption/skills/claude-routing/evals/gh-fix-ci/prompt.md",
+      "sha256": "f886bd43ef58b465010ce053fbb0914afdb32ebfc0806cea7a522342544b2252",
+      "bytes": 477
+    },
+    {
+      "path": "adoption/skills/claude-routing/evals/security-audit/graders/target-used.md",
+      "sha256": "624f90316bffc938f8b6e03192cd5fded4e986d17b34456bdf553a798cc07cd8",
+      "bytes": 115
+    },
+    {
+      "path": "adoption/skills/claude-routing/evals/security-audit/prompt.md",
+      "sha256": "772103b32e539716b627afab7bb297d2b6e9a4e3cbe1dd1d805f840716509e47",
+      "bytes": 489
+    },
+    {
+      "path": "adoption/skills/claude-routing/evals/security-best-practices/graders/target-used.md",
+      "sha256": "cdc8772b31d339a962b29daf034e591b3b779593e05ba3b6193a7b3c7dab5452",
+      "bytes": 124
+    },
+    {
+      "path": "adoption/skills/claude-routing/evals/security-best-practices/prompt.md",
+      "sha256": "3e2279a0afd2fed13ede7e0b1958d9186b3bf0572fac0a16a26573ae5b51dea8",
+      "bytes": 445
+    },
+    {
+      "path": "adoption/skills/claude-routing/evals/security-threat-model/graders/target-used.md",
+      "sha256": "06603f1d6c6c5446f2f00e680e9122ae0eed2a2d5de8f14722af0ed7b35ff565",
+      "bytes": 122
+    },
+    {
+      "path": "adoption/skills/claude-routing/evals/security-threat-model/prompt.md",
+      "sha256": "41c67e6448e1e400a0ab9fe40df0b5387da9e7bd5cdc3d3bb695a1cf32161d82",
+      "bytes": 493
+    },
+    {
+      "path": "adoption/skills/claude-routing/evals/typesafe-ai/graders/target-used.md",
+      "sha256": "b53ab9ae78d4b582bd9719d99f926c74dfa180ae823f0a8d4ea762b07d34afde",
+      "bytes": 112
+    },
+    {
+      "path": "adoption/skills/claude-routing/evals/typesafe-ai/prompt.md",
+      "sha256": "1ce1feb354c4c7628ef85969c813f8cf6a33df162d89ce5ab9016ea293563068",
+      "bytes": 445
+    },
+    {
+      "path": "adoption/skills/claude-routing/trigger-baseline.json",
+      "sha256": "41577eb8f8fc960de6a55f51daa7ff9926a425f1de5c279aee7aaace5d12d58a",
+      "bytes": 835
+    },
+    {
+      "path": "adoption/skills/claude-routing/trigger-cases-v2.json",
+      "sha256": "abe9e10ad73dfe149c9d14f308908b7ceb52e23c8a632c38b03fd5420a479dbf",
+      "bytes": 3871
+    },
+    {
+      "path": "adoption/skills/claude-routing/trigger-cases-v3.json",
+      "sha256": "090622e86512918f436b6c298fafa86da667990498a6705235615c6e03801b4a",
+      "bytes": 6338
+    },
+    {
+      "path": "adoption/skills/claude-routing/trigger-cases-v4.json",
+      "sha256": "61fc5e5a2f61778afc6b43cb9b50f2f9a4f4f1a1b79ce3bfb83e679a5d14c1ab",
+      "bytes": 6759
+    },
+    {
+      "path": "adoption/skills/claude-routing/trigger-cases.json",
+      "sha256": "7c43985f523ed555e389dbd14155493603b36cdc8ab3a60f8161844be34452f2",
+      "bytes": 2326
+    },
+    {
       "path": "adoption/skills/lifecycle.md",
       "sha256": "164f4a30bbf0838c65b229885455693539a96f1e7b32ce6c9f563fdbbddb59e6",
       "bytes": 20171
     },
     {
       "path": "adoption/skills/manifest.json",
-      "sha256": "ee097ddab8488079a0e176c8c789dd51473089cc8a3938d95f878a58a2f212a7",
-      "bytes": 62359
+      "sha256": "699b0c0aa5df0631bdf56ac7633029a3355d96bc5ca6503f81bfcc1b96f822d8",
+      "bytes": 64517
     },
     {
       "path": "adoption/templates/claude.settings.linux-wsl2.overlay.json",
@@ -5693,6 +5798,16 @@
       "path": "adoption/templates/systemd/omniroute.service",
       "sha256": "eedbec27fd53bb0eb8ef8f61ff2bc7ed874b657144ae6317e8476d2a8a218947",
       "bytes": 7463
+    },
+    {
+      "path": "adoption/templates/systemd/skill-invoke-rate.service",
+      "sha256": "9297270957f82b401d82afa99663d41381bf708ab9992b88e3aa8416ac099a5c",
+      "bytes": 731
+    },
+    {
+      "path": "adoption/templates/systemd/skill-invoke-rate.timer",
+      "sha256": "b1f9eded28471df410105cb841ef1d4537c2da71efe2ad794aac32d413a0719a",
+      "bytes": 184
     },
     {
       "path": "adoption/templates/systemd/stack-currency.service",
@@ -11276,6 +11391,11 @@
       "bytes": 24531
     },
     {
+      "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261011-skill-use-delta.json",
+      "sha256": "2a6b8c37d94237f1357b66f14eb8f1f4a996106520c787c580062c8932010114",
+      "bytes": 5462
+    },
+    {
       "path": "blueprints/runtime-workers/openhands/evidence/unit-pass.txt",
       "sha256": "6576e0f1b0ea27a22909854a90299ffef78034239d7147629eec595f6f520de0",
       "bytes": 3013
@@ -11407,8 +11527,8 @@
     },
     {
       "path": "blueprints/runtime-workers/skills/manifest.json",
-      "sha256": "0139f9bce5e8043fa2eb3fd292042cb855bd1c5c3698dc093dc3cf03fdef7a39",
-      "bytes": 188942
+      "sha256": "f7ace88aa9b072cfff6f265c70f0f85fd826bd8e90154bde275ea1be6b3397f4",
+      "bytes": 189559
     },
     {
       "path": "blueprints/runtime-workers/skills/research.md",
@@ -17112,8 +17232,8 @@
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
-      "sha256": "d1ed06b8db2a6de06b4e3e3ff9e7455ffd9a10cafee3cbb0ed0196a6da8c8c9c",
-      "bytes": 326276
+      "sha256": "b7b2c18ee782d0bb9168357960ceb0e39c11b561261861f87a4ff7295d5e8033",
+      "bytes": 326277
     },
     {
       "path": "catalogs/foundation/new-wsl-layer-crosswalk-20261001.json",
@@ -17137,7 +17257,7 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "aad08353f6d26364d8d62c8cd6c14ab1d3ecdcccd5d28641ac81fe9c7469cc88",
+      "sha256": "9b329cd4b270950af684e427d8edf79554593912f38738eeb07299912f2a714a",
       "bytes": 160022
     },
     {
@@ -17167,7 +17287,7 @@
     },
     {
       "path": "catalogs/landscape/final-stack.json",
-      "sha256": "348fa7df1f8b3a963df41c9b5122543dd20d9c883e4c80be70438879b9cfebd7",
+      "sha256": "7266648a00bde5dcc4e3efb82aa1c909b52e3907032db1bc564d98d2afdadbc1",
       "bytes": 301336
     },
     {
@@ -17267,8 +17387,8 @@
     },
     {
       "path": "catalogs/landscape/skills-lifecycle.json",
-      "sha256": "b7bf21a3720cd2a546429449faf589402ea6e36c9f7558dbcea909c56d9bfcd8",
-      "bytes": 27054
+      "sha256": "4167b554698d7d6a8a60ebe7928d9b9b998ac2f47b4cd5d598c22a39c92f0db6",
+      "bytes": 27733
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
@@ -18307,7 +18427,7 @@
     },
     {
       "path": "docs/decisions/2026-10-04-pwsh7-windows-guidance.md",
-      "sha256": "212feea39edde28f9a40b3d6387364a7a47d6a2fbc9eff2e6f0e753d49a9fd0f",
+      "sha256": "d1619054032e90f4fc45383e37fa7a2e3e10bde11f1ccb4837d3873be19238a6",
       "bytes": 16799
     },
     {
@@ -18676,6 +18796,11 @@
       "bytes": 9146
     },
     {
+      "path": "docs/decisions/2026-10-10-daily-skill-invoke-rate.md",
+      "sha256": "d5e1edf44fa217defa4cd08085e9b2ad0643921ab002d0c73a0c4411c3e5dd9a",
+      "bytes": 38981
+    },
+    {
       "path": "docs/decisions/2026-10-10-landscape-scratch-ownership.md",
       "sha256": "909c48edba8f935c8102656f463a840950a3e885657d2fd2da973c8dbfb3c2a9",
       "bytes": 12263
@@ -19042,12 +19167,12 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "6ad52e89172f10ad0411d6e2c31126c4ff9e749a99bda992cdd0415359be164f",
+      "sha256": "fe0b6628bc589e59dc71a5a0fb6805ecab067e3f06043702919bf7f09ef9cba4",
       "bytes": 699356
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "8b695aa00184b67851ecf1d8e7ed59e03014fa9a48dd90fb9698ef4f8728732b",
+      "sha256": "f532931c1fa916096f458259d24c8f205d89991d531427d932c773a4fe703bbc",
       "bytes": 369789
     },
     {
@@ -42957,7 +43082,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "d73a15940fbe6ecf0d08b7252db9a04c0effbd4ba855481142b53ed29a45a090",
+      "sha256": "c1228aa2fab7222aba4bbc7df17fd68bf1acf77b208b329b366a0488a15beee9",
       "bytes": 76747
     },
     {
@@ -60812,8 +60937,8 @@
     },
     {
       "path": "scripts/skills_status.py",
-      "sha256": "eeb462e9b6b2b4acb6cc39af42ea96bf4a6dd14892a45a71d9fa61db229b806d",
-      "bytes": 42439
+      "sha256": "c15549048c60c737b1e3283218d61ed8003931571ccadab8575bbef256ff1d34",
+      "bytes": 44849
     },
     {
       "path": "scripts/starred_convergence.py",
@@ -61901,9 +62026,19 @@
       "bytes": 25991
     },
     {
+      "path": "tests/test_local_pages_fleet_data.py",
+      "sha256": "b3a17d47fdbf49ecce6bad308f3eab1979ca558843b7a03025c5fadff516865c",
+      "bytes": 34060
+    },
+    {
       "path": "tests/test_local_pages_fleet_regressions.py",
       "sha256": "4601bbba4a6c1cf04352a484670b1601b468e9aa879c8ac5f55eee6c3fd5dd94",
       "bytes": 20940
+    },
+    {
+      "path": "tests/test_local_pages_fleet_view.py",
+      "sha256": "8f90df8fb6573aa9a4fa146c53b4df10032df3d4829d5bc16dc20baecfed2356",
+      "bytes": 8033
     },
     {
       "path": "tests/test_local_pages_policy_grants.py",
@@ -62067,8 +62202,8 @@
     },
     {
       "path": "tests/test_new_wsl_client_config.py",
-      "sha256": "c68f8381b03724fab218351bde359a6e149ba6c257792e6d912c8f9e190e9df4",
-      "bytes": 345461
+      "sha256": "c311a13dae993199e4e50762584930b7cb96da1a8636a853e7e7596b7a4901b6",
+      "bytes": 345865
     },
     {
       "path": "tests/test_new_wsl_definitive_defaults.py",
@@ -62312,8 +62447,8 @@
     },
     {
       "path": "tests/test_runtime_worker_openhands_push_gate.py",
-      "sha256": "9e5c753772df850caea8045545649dd035cf95d0a3a90657c657f61ee0118494",
-      "bytes": 161926
+      "sha256": "b269ed8adf16aeaf8c17c53a0df82420b95390facc6d6183b64c309fe4844b1e",
+      "bytes": 163942
     },
     {
       "path": "tests/test_runtime_worker_openhands_resolver.py",
@@ -62401,14 +62536,29 @@
       "bytes": 103131
     },
     {
+      "path": "tests/test_skill_correction_claims.py",
+      "sha256": "83857ef0114e4c9ad12475469b43531ca0dcbddf04c7439b48ff4065ac785353",
+      "bytes": 7902
+    },
+    {
+      "path": "tests/test_skill_routing.py",
+      "sha256": "5cf8c94609521d261da848d23bb3c333854c4f69961f8e207f3b02d4d9420ab9",
+      "bytes": 10495
+    },
+    {
       "path": "tests/test_skill_usage.py",
       "sha256": "418b3493d775756dd92e0d72c638cc9693d736823b058d03076029646e929fdf",
       "bytes": 275412
     },
     {
+      "path": "tests/test_skill_usage_daily.py",
+      "sha256": "620152c398c44829b9f0a57ed415c17026998e3014b44ae8912134ce7ae378fa",
+      "bytes": 10233
+    },
+    {
       "path": "tests/test_skills_manifest.py",
-      "sha256": "5e866f2708e4a1f36e7b76f72fa82c8518b60c0d04b1168a53d92131a9447d77",
-      "bytes": 19996
+      "sha256": "5b9336366957584a595d7c99549167f4816a1aa4a3663b8b1e89b2b463c6adb5",
+      "bytes": 20249
     },
     {
       "path": "tests/test_skills_status.py",
@@ -62677,13 +62827,13 @@
     },
     {
       "path": "tools/adoption/install_claude_profile.py",
-      "sha256": "aacf9c7e02560732b42b74f0eab27ed5a5546fd8659c5dd04d3ad044d95bf4ba",
-      "bytes": 25134
+      "sha256": "187daeaf965192bdbae4551c4af7f288835d7a3f41314a74d0a8f5bc2e46aa40",
+      "bytes": 26080
     },
     {
       "path": "tools/adoption/install_skills.py",
-      "sha256": "c068934f1aa56204558e1b5b9898db6356a5682acca68b09ebaf49f3d9d7d538",
-      "bytes": 46809
+      "sha256": "e13707e55b0afbbf69920c2bf582be3cf555dad96a83cdb33707f9e3cdd00ed9",
+      "bytes": 48403
     },
     {
       "path": "tools/adoption/managed_block.py",
@@ -62692,8 +62842,8 @@
     },
     {
       "path": "tools/adoption/new_wsl_client_config.py",
-      "sha256": "27dda8f30a2409eb6eb99fd3f6e15850060423acc348bfe1fd92faffe30e0798",
-      "bytes": 166048
+      "sha256": "39e0117f266941b660dc4819891c18012a4935dcc4fb9624c5e56272e91d64b6",
+      "bytes": 166110
     },
     {
       "path": "tools/adoption/prove_codex_lane.py",
@@ -62891,6 +63041,11 @@
       "bytes": 32586
     },
     {
+      "path": "tools/local-pages/README.md",
+      "sha256": "44df718903d6a7e06800b184211a8d974d1a8f81bdcbe6b640fc78eade7c67c9",
+      "bytes": 32896
+    },
+    {
       "path": "tools/local-pages/architecture_mapping.json",
       "sha256": "0f214a70422673e880515633c5d50f994c85264e4cf68f854ea7abd44601de0b",
       "bytes": 24486
@@ -62901,9 +63056,19 @@
       "bytes": 27364
     },
     {
+      "path": "tools/local-pages/fleet_data.py",
+      "sha256": "4eb64c8766e3a5de0aa9aca5ca3272c415435d2d14f1d0db9569b80dbcd98e32",
+      "bytes": 62686
+    },
+    {
+      "path": "tools/local-pages/fleet_view.py",
+      "sha256": "d4125bf6855a886b1b3a13d5285e9a7ec52c0e0ac5c4ab9f617aceaacd4ed8e9",
+      "bytes": 26755
+    },
+    {
       "path": "tools/local-pages/source_policy.json",
-      "sha256": "9b1f0dce48050556a8340393243a1101d4d3d3e1cb6f5cde3b6498db326b3909",
-      "bytes": 759363
+      "sha256": "88d277e33d4c062fd07fb9ce9ebd2e1614f17bb355246b9f847eab0f73651653",
+      "bytes": 759459
     },
     {
       "path": "tools/omniroute/gateway_record.py",
@@ -62947,13 +63112,23 @@
     },
     {
       "path": "tools/skill-usage/README.md",
-      "sha256": "1dba321ff638013a83c5a4107b76b14ee88a0176469ee8307795d6f7dc34c693",
-      "bytes": 55795
+      "sha256": "4a603c06bef574515481b8794c1ae264dd2e5bff1911e96e2adb2ec1b97e3277",
+      "bytes": 57941
+    },
+    {
+      "path": "tools/skill-usage/daily_skill_usage.py",
+      "sha256": "1936dc7c54fc098431017eb769b4caf8914616698435a53b4146ed76b44b9d07",
+      "bytes": 11118
     },
     {
       "path": "tools/skill-usage/skill_usage.py",
-      "sha256": "f571ad6ab69b7909b24c66b8ac5ef31cfb4def75cbda1ee424e7a5a0af46de15",
-      "bytes": 152982
+      "sha256": "694ee1fe78914a6917e4a03ae2bed695792ae6919ef2d13b563d9eb28c10a7b9",
+      "bytes": 157857
+    },
+    {
+      "path": "tools/skill-usage/stage_routing_eval.py",
+      "sha256": "fdb0fde9f5a2a8768c9877d2514faafe6c84aa5739bffbbe1bb98ca23f252150",
+      "bytes": 2271
     },
     {
       "path": "tools/sota-convergence/README.md",

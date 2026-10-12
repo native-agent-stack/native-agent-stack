@@ -4,6 +4,7 @@
   "checked_at": "2026-09-30",
   "scope": "The lifecycle tasks the landscape sweep's skills modality sweeps (tools/sota-convergence/landscape-sweep/README.md, Skills modality), the installed skills of adoption/skills/manifest.json that serve each task, and the skill sources it searches. Each task is one skills-* layer. Inclusion does not install, accept or authorize a skill; adoption/skills/manifest.json stays the only place a skill is pinned.",
   "notes": [
+    "2026-10-11 amendment (docs/decisions/2026-10-10-daily-skill-invoke-rate.md): claude-api serves skills-implement exactly once as the already-installed Claude-native API/SDK plugin under the central manifest's 30-day trial. Its bundled duplicate remains the comparison baseline; this catalog entry performs no installation or runtime-worker deployment.",
     "2026-10-10 amendment (docs/decisions/2026-10-10-skills-claude-native-practice-row.md): this repository's own claude-native-practice skill serves agent-docs once, from the first-party source at the manifest row's pin; the task field named installed follows the central manifest's selected pins, and this metadata addition performs no client installation. The original catalog checked_at date is retained.",
     "2026-10-08 amendment (docs/decisions/2026-10-08-skills-cc-lanes-picks.md): the three verified vendor pins serve existing tasks once each: hcom-agent-messaging and loki serve debugging, and promptfoo-evals serves skill-lifecycle evaluation. The task field named installed follows the central manifest's selected pins; this metadata addition performs no client installation. Host installation follows the PR's landing, as the decision records. The original catalog checked_at date is retained.",
     "Each GitHub source's pin is its default-branch HEAD commit, read on 2026-09-30 with gh api repos/<owner>/<repo>/commits/<default branch> (read-only). None of the sources was archived.",
@@ -93,13 +94,13 @@
     {
       "layer_id": "skills-implement",
       "lifecycle_task": "implement",
-      "requirement": "Implement changes with this repository's current tooling: Python scripts and tools on uv, ruff and pyproject conventions, and the generated HTML guide and dashboards, which are hand-styled today.",
-      "installed": ["modern-python", "frontend-design"],
+      "requirement": "Implement changes with this repository's current tooling: Python scripts and tools on uv, ruff and pyproject conventions, the generated HTML guide and dashboards, and Claude API/Anthropic SDK integration through the already-installed Claude-native claude-api plugin.",
+      "installed": ["modern-python", "frontend-design", "claude-api"],
       "source_ids": ["trailofbits-skills", "anthropics-skills", "mattpocock-skills", "obra-superpowers", "addyosmani-agent-skills", "affaan-m-ecc", "skills-sh-registry", "composiohq-awesome-claude-skills"],
       "open_gaps": [
-        "Both are trial skills (the trial window's review falls after 2026-10-25, the manifest's trial block)."
+        "These are trial skills (the trial window's review falls after 2026-10-25, the manifest's trial block). claude-api's separate installed-plugin measurement does not establish an advantage over the bundled /claude-api skill."
       ],
-      "overturn_when": "A skill-creator paired benchmark (or a promptfoo config) on frozen Python and HTML change requests from this repository shows a candidate passing more of the repository's own tests and checks than the installed skill at no higher token or time cost, in Claude Code and in Codex; or an installed skill's upstream is archived, removed or relicensed."
+      "overturn_when": "A skill-creator paired benchmark (or a promptfoo config) on frozen Python, HTML and Claude API/SDK change requests from this repository shows a candidate passing more of the repository's own tests and checks than the installed skill at no higher token or time cost, in the relevant native client; compare the Claude-only plugin with bundled /claude-api on the same HEAD. An installed skill's upstream being archived, removed or relicensed also reopens the choice."
     },
     {
       "layer_id": "skills-test",

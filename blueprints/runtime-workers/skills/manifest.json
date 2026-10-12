@@ -3877,6 +3877,13 @@
   ],
   "excluded": [
     {
+      "name": "claude-api",
+      "source": "anthropics/skills",
+      "adoption_ref": "adoption/skills/manifest.json",
+      "reason": "2026-10-11: the installed Claude-native claude-api plugin is tracked in the main manifest's 30-day trial at anthropics/skills@dbd4588f9e1033efb41dad4bef2f7947c8993d44; it is outside the current frozen runtime-worker deployment scope (docs/decisions/2026-10-10-daily-skill-invoke-rate.md).",
+      "overturn": "A dated owner or command-center assignment selects this skill for an identified runtime-worker role and authorizes its separately pinned worker deployment."
+    },
+    {
       "name": "magic-word",
       "source": "OpenHands/extensions",
       "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/plugins/magic-test/skills/magic-word",

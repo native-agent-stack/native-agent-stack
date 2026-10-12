@@ -166,8 +166,8 @@ SKIPPED_STATUSES = ("pruned", "held")
 # Real-run and --dry-run each have their own notion of "nothing left to fix":
 # a dry run never executes `add`/`remove`, so 'planned' (not 'installed') is
 # its success outcome, but a real local-modified refusal is still a refusal.
-OK_STATUSES_REAL = {"ok", "installed"}
-OK_STATUSES_DRY_RUN = {"ok", "planned"}
+OK_STATUSES_REAL = {"ok", "installed", "not-installed"}
+OK_STATUSES_DRY_RUN = {"ok", "planned", "not-installed"}
 
 
 class InstallError(ValueError):
@@ -465,6 +465,23 @@ def process_skill(skill: dict, home: Path, skills_bin: str, dry_run: bool, force
         if not quiet:
             print(message)
 
+    if skill.get("native_plugin"):
+        # A native plugin stays in its own marketplace namespace. Never create
+        # a Vercel skills copy that shadows it; installation remains CC-owned.
+        sys.path.insert(0, str(ROOT))
+        from scripts.skills_status import native_plugin_status
+        status = native_plugin_status(skill, home, os.environ)
+        if status["state"] == "ok":
+            note(f"{name}: ok (native plugin at the pinned revision)")
+            return "ok"
+        if status["state"] == "missing" and not check_only:
+            # The decision registers an already-installed plugin for tracking;
+            # its native installation remains a separate, CC-owned operation.
+            note(f"{name}: not installed (separate native plugin installation)")
+            return "not-installed"
+        note(f"{name}: native plugin {status['state']}; use the reviewed Claude plugin install path")
+        return "missing-or-drifted"
+
     try:
         state = classify_skill(skill, home, project_dir, agent)
     except InstallError as error:
@@ -700,7 +717,8 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     home = Path(args.home)
-    skills = [s for s in all_skills if not isinstance(s, dict) or s.get("status") not in SKIPPED_STATUSES]
+    skills = [s for s in all_skills if not isinstance(s, dict)
+              or (s.get("status") not in SKIPPED_STATUSES and not s.get("native_plugin"))]
     if args.only:
         wanted = list(dict.fromkeys(args.only))
         by_name = {s["name"]: s for s in skills if isinstance(s, dict) and "name" in s}
@@ -709,6 +727,12 @@ def main(argv: list[str] | None = None) -> int:
         unknown = [name for name in wanted if name not in status_of]
         if unknown:
             print(f"install-skills failed: unknown --only name(s): {unknown}", file=sys.stderr)
+            return 1
+        native = [s["name"] for s in all_skills if isinstance(s, dict)
+                  and s.get("native_plugin") and s["name"] in wanted]
+        if native:
+            print(f"install-skills failed: native plugin --only name(s) are managed separately: {native}",
+                  file=sys.stderr)
             return 1
         pruned = [name for name in wanted if name not in by_name and status_of[name] == "pruned"]
         if pruned:
@@ -755,7 +779,10 @@ def main(argv: list[str] | None = None) -> int:
             return 1
 
     try:
-        verify_skills_bin(args.skills_bin, manifest["cli"], home)
+        only_native_rows = bool(all_skills) and all(isinstance(skill, dict) and skill.get("native_plugin")
+                                                   for skill in all_skills)
+        if skills or not only_native_rows:
+            verify_skills_bin(args.skills_bin, manifest["cli"], home)
     except InstallError as error:
         print(f"install-skills failed: {error}", file=sys.stderr)
         return 1

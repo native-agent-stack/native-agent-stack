@@ -1806,6 +1806,10 @@
     },
     {
       "root": "repo",
+      "path": ".claude/skills/native-skill-routing/SKILL.md"
+    },
+    {
+      "root": "repo",
       "path": ".claude/skills/omniroute-runtime-worker/SKILL.md"
     },
     {

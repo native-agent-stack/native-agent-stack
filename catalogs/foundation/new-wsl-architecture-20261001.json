@@ -169,7 +169,7 @@
           "name": "openai/skills (gh-fix-ci, security-best-practices)",
           "repository": "https://github.com/openai/skills",
           "pin": "49f948faa9258a0c61caceaf225e179651397431",
-          "pin_source": "adoption/skills/manifest.json:69",
+          "pin_source": "adoption/skills/manifest.json:100",
           "install": {
             "command": "python3 tools/adoption/install_skills.py --skills-bin \"$SKILLS_BIN\" --json",
             "kind": "repo_recipe",
@@ -191,7 +191,7 @@
           "name": "typesafe-ai/skills (typesafe-ai)",
           "repository": "https://github.com/typesafe-ai/skills",
           "pin": "65a39f393687675ce170e6094757de20370365b9",
-          "pin_source": "adoption/skills/manifest.json:44",
+          "pin_source": "adoption/skills/manifest.json:75",
           "install": {
             "command": "python3 tools/adoption/install_skills.py --skills-bin \"$SKILLS_BIN\" --json",
             "kind": "repo_recipe",
