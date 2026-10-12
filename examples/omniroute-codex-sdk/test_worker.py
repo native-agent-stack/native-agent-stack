@@ -2,7 +2,7 @@
 # /// script
 # requires-python = ">=3.13,<3.14"
 # dependencies = [
-#     "openai-codex==0.160.0",
+#     "openai-codex==0.162.1",
 # ]
 # ///
 """Local integration fixtures, not upstream tests or provider/model acceptance.

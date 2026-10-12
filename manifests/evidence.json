@@ -18907,13 +18907,18 @@
     },
     {
       "path": "docs/decisions/2026-10-11-research-convergence-practice.md",
-      "sha256": "18c527a058b4e9cb85d0d00221109c52e3dff54137674ff06357126c2f4f4198",
-      "bytes": 14811
+      "sha256": "568f85933ff70c696cf718292b0e9a715ae547ea08df2c32d2ecd4ce15a738ef",
+      "bytes": 15151
     },
     {
       "path": "docs/decisions/2026-10-11-sell-only-quote-freshness.md",
       "sha256": "f547857a970ef0e3b5585be294db9d3edc52c25615079c7900ed38552d0a8731",
       "bytes": 8417
+    },
+    {
+      "path": "docs/decisions/2026-10-12-worker-sdk-replay.md",
+      "sha256": "e244694e7ce18a14bd5b5fb36bac55c0a46c3588ee9b40d2222cf3358293cc26",
+      "bytes": 8320
     },
     {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
@@ -57446,6 +57451,21 @@
       "bytes": 8327
     },
     {
+      "path": "evidence/artifacts/worker-sdk-replay-20261012/codex-0.162.1.json",
+      "sha256": "eede9a9dc8ca12b0cc19bcbc38957cb0594cf74d0ed86d6f57a0d855a32669d6",
+      "bytes": 10478
+    },
+    {
+      "path": "evidence/artifacts/worker-sdk-replay-20261012/openhands-1.54.0.json",
+      "sha256": "647607b38b5187c3c4e236dcd2c3039c73cd78a03dcd160f8f2bbae4ad1be6a9",
+      "bytes": 4911
+    },
+    {
+      "path": "evidence/artifacts/worker-sdk-replay-20261012/openhands-requirements.in",
+      "sha256": "d1dda23be3994cd38ff7b557c1032f42ab6715a9e956ee19a86548d6d3a486e0",
+      "bytes": 46
+    },
+    {
       "path": "evidence/artifacts/workstation-lane-20260925/nemotron-qualification/model_card_check.py",
       "sha256": "c6ecc30a169b4af802f7e8497c7ebfc7c9373114bdd8589ef4ee4db102e516c3",
       "bytes": 8384
@@ -60387,8 +60407,8 @@
     },
     {
       "path": "examples/omniroute-codex-sdk/README.md",
-      "sha256": "c228b2f0e7b7be2226e11e8ac3c4602b2da9a25f5ce0bce0418542dc22cc0409",
-      "bytes": 20417
+      "sha256": "bc977c3bc4b30065a598768a03ee5cbe1daa680bd3784029245307e6c868144c",
+      "bytes": 20777
     },
     {
       "path": "examples/omniroute-codex-sdk/acceptance-plan.json",
@@ -60427,23 +60447,23 @@
     },
     {
       "path": "examples/omniroute-codex-sdk/test_worker.py",
-      "sha256": "d05bcc7a4451a2649becb0c32e31c3e6a0b909c9c02602ea68e2cc8bc59f2ddf",
+      "sha256": "24ad0b67b042a72f6abce363cb2d11c23074a3e379402ba2f340118ff7ae2cb2",
       "bytes": 46248
     },
     {
       "path": "examples/omniroute-codex-sdk/test_worker.py.lock",
-      "sha256": "df99054948f217c499ebd9ed19744f7e7d4f6c92fabec6820caf2ecd3e2660b3",
-      "bytes": 12840
+      "sha256": "0c4d466cdc8696689044eb2dcaae1b4ffdd7cacf88bb6a5f65de948483667b90",
+      "bytes": 12839
     },
     {
       "path": "examples/omniroute-codex-sdk/worker.py",
-      "sha256": "f1a2489fc059b5ab055392e26a1f13d1748623baed130d8808ddc99fc1c08610",
-      "bytes": 26572
+      "sha256": "64f698a8dbc327e10b99875666f212ecce2128c7c1c2272344940107f993710e",
+      "bytes": 26745
     },
     {
       "path": "examples/omniroute-codex-sdk/worker.py.lock",
-      "sha256": "df99054948f217c499ebd9ed19744f7e7d4f6c92fabec6820caf2ecd3e2660b3",
-      "bytes": 12840
+      "sha256": "0c4d466cdc8696689044eb2dcaae1b4ffdd7cacf88bb6a5f65de948483667b90",
+      "bytes": 12839
     },
     {
       "path": "examples/openhands-native-capabilities/README.md",

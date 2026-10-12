@@ -1,0 +1,123 @@
+{
+  "candidate_version": "1.54.0",
+  "checked_at": "2026-10-12T15:44:33Z",
+  "class": "native_proven",
+  "completion": {
+    "command_returncode": 0,
+    "execution_status": "finished",
+    "success": true,
+    "terminal_completion": true
+  },
+  "dispatcher": {
+    "job": "sdk154-replay",
+    "matches_installed_dispatcher": true,
+    "source_sha256": "7fe9333aa0c4148d8a4e5111eada6f1eca46108eb31e78f558283b6d7737db41",
+    "unit_scope": "transient idle scope, not the existing selected service"
+  },
+  "execution": {
+    "argv": [
+      "systemd-run",
+      "--user",
+      "--scope",
+      "-p",
+      "CPUWeight=idle",
+      "/usr/bin/env",
+      "HOME=${SCRATCH_ROOT}/openhands/home",
+      "PATH=${USER_HOME}/.local/share/mise/installs/node/24.21.0/bin:${USER_HOME}/.local/share/mise/installs/python/3.13.16/bin:/usr/bin:/bin",
+      "OH_PERSISTENCE_DIR=${OPENHANDS_JOB_STATE}/openhands-home",
+      "${USER_HOME}/.local/share/mise/installs/node/24.21.0/bin/srt",
+      "--settings",
+      "${SCRATCH_ROOT}/openhands/dispatch/srt-sdk154-replay.json",
+      "--",
+      "${SCRATCH_ROOT}/openhands/runtime/bin/python",
+      "${SCRATCH_ROOT}/openhands/dispatch/worker.py",
+      "--job",
+      "sdk154-replay"
+    ],
+    "captures": {
+      "stderr": {
+        "bytes": 4937,
+        "sha256": "b26d879b2e540d5bbd0ab51c57daf39df0f8eab6f79eddbd2243516fdeca4fff"
+      },
+      "stdout": {
+        "bytes": 23392,
+        "sha256": "af869dc53e300723fa00d1bd675b84a97b4a05b08c4482af14fd0b8d3df33a0e"
+      }
+    },
+    "finished": "2026-10-12T15:44:33Z",
+    "returncode": 0,
+    "started": "2026-10-12T15:43:42Z"
+  },
+  "foreign_sentinel": {
+    "after_sha256": "ea3562ca47a2bfe59e9f66c12c69d7692bbff8bf2de5beac734972a86955e841",
+    "mtime_ns": 1791819760620912000,
+    "scope": "Foreign sibling fixture, outside each owned workspace; no real user file.",
+    "seeded_bytes_sha256": "ea3562ca47a2bfe59e9f66c12c69d7692bbff8bf2de5beac734972a86955e841",
+    "unchanged": true
+  },
+  "installation": {
+    "commands": [
+      "uv venv --python 3.13 ${SCRATCH_ROOT}/openhands/runtime",
+      "uv pip install --python ${SCRATCH_ROOT}/openhands/runtime/bin/python openhands-sdk==1.54.0 openhands-tools==1.54.0"
+    ],
+    "freeze_capture": {
+      "bytes": 3660,
+      "private_relative_path": "evidence/openhands154-install-state.stdout",
+      "sha256": "661bc5e766a000af73d8836a64deb92c989c9150b35e3e40994d47f8e81d5b93"
+    },
+    "installed_versions": {
+      "fastmcp": "3.4.8",
+      "litellm": "1.105.0",
+      "openhands-sdk": "1.54.0",
+      "openhands-tools": "1.54.0"
+    },
+    "scope": "isolated /var/tmp runtime, selected host environment preserved"
+  },
+  "limitations": [
+    "Isolated owned-workspace arithmetic job; not a comparative winner or architecture FINAL.",
+    "Existing selected service and environment are unchanged; this receipt qualifies the isolated 1.54.0 candidate.",
+    "Per-job srt settings and private HOME differ from host deployment; original dispatcher bytes are unchanged.",
+    "Outbound LiteLLM cost-map requests were denied and used the local backup; this is not positive model traffic.",
+    "No release-wide API, remote backend artifact or container/Agent Server acceptance is claimed."
+  ],
+  "model": {
+    "backend_identity_attested": false,
+    "counting_unit": "native combined response-latency entries",
+    "endpoint": "http://127.0.0.1:21128/v1",
+    "requested_effort": "max",
+    "requests_to_model": 3,
+    "route": "openai/cx/gpt-6.1-sol-max"
+  },
+  "native_report": {
+    "bytes": 493,
+    "private_locator": "${OPENHANDS_JOB_STATE}/run-report.json",
+    "locator_scope": "Symbolic private per-job state under the isolated scratch home; retained bytes and hash are unchanged. The external private evidence index resolves this publication-safe locator.",
+    "sha256": "fc5555ec5c753d0a701a515821b3acfd14f5746c4bf65ffbce947c0fcaf04b90"
+  },
+  "old_version": "1.53.0",
+  "oracle": {
+    "actual": "55\n",
+    "expected": "55\n",
+    "passes": true,
+    "result_sha256": "4c82a221b575ce7fe118b2e8cdf0764bf4ef570a3017e80b6d3438af9095f376",
+    "task": "Use Python to compute sum(range(1, 11)); write the numeric answer followed by a newline into result.txt."
+  },
+  "predicate_passes": true,
+  "schema_version": 1,
+  "upstream": {
+    "commit": "1d471742ea7be017d013eaaa3080f5d28d5490cb",
+    "release_capture": {
+      "bytes": 5541,
+      "private_relative_path": "evidence/openhands154-release.stdout",
+      "sha256": "08fecc64fbaa49596121eee404ce3b3b15223340129acc27e57cb468a6e7cf01"
+    },
+    "release_note": "https://github.com/OpenHands/software-agent-sdk/releases/tag/v1.54.0",
+    "repository": "OpenHands/software-agent-sdk",
+    "source_locations": [
+      "examples/01_standalone_sdk/01_hello_world.py:9-29",
+      "openhands-sdk/openhands/sdk/llm/utils/metrics.py:125-127,171-176"
+    ],
+    "tag": "v1.54.0"
+  },
+  "worker": "openhands-sdk"
+}
