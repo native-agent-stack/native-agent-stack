@@ -47,9 +47,10 @@ For every manifest skill, in order:
       and so is an edited support file. Where an add is about to run over an
       existing folder (an unlocked one, one locked at the pin whose Claude link,
       or in a project the Claude target, is missing or whose SKILL.md was edited,
-      and one whose lock identifies nothing: a project entry without the optional
-      ref or skillPath of src/local-lock.ts L16-L37 or with another source, a
-      global entry without a tree) the folder must be the pinned tree: its git tree SHA,
+      and one whose lock does not name another revision of the manifest's source:
+      see lock_reading, whose table of lock entries is the "Lock entries" section
+      of docs/decisions/2026-10-12-skills-installer-foreign-content.md) the folder
+      must be the pinned tree: its git tree SHA,
       with the directories a skill's own tooling regenerates left out
       (scripts/skills_status.py git_tree_sha and RUNTIME_ARTIFACT_DIRS, the
       check_folder_tree state; a file or a link of such a name is content and
@@ -58,12 +59,15 @@ For every manifest skill, in order:
       too; git_tree_sha strict). Otherwise it holds content the installer did
       not write (or lacks a pinned file, which only --force repairs) and is
       'local-modified', refused unless --force.
-      Not covered: an upgrade over a lock that positively names another
-      revision of the source (a project ref that is not the pin's, a global
-      skillFolderHash that is another tree), whose files this comparison cannot
-      name (the lock proves the CLI wrote some earlier version there). A folder
-      that is locked at the pin with a whole entry and linked is 'ok': nothing
-      is added there.
+      Not covered: an upgrade over a lock that names another revision of the
+      manifest's GitHub source in the form the CLI writes one (a project ref
+      that is a full commit id other than the pin's, a global skillFolderHash
+      that is a git tree id other than the pin's), whose files this comparison
+      cannot name (the lock proves the CLI wrote some earlier version there).
+      A folder that is locked at the pin with a whole entry and linked is 'ok':
+      nothing is added there. A lock the CLI reads as empty (no numeric version,
+      a version below the first that holds the entry, no skills table) holds
+      no entry.
   (b) a folder exists at that path but the lock has no entry for <name> (for
       example a skill installed by hand before this manifest existed) -> only
       proceed (treat like a fresh install) when its SKILL.md sha256 already
@@ -469,12 +473,45 @@ def lock_retains(home: Path, name: str, project_dir: Path | None = None) -> bool
     return name in skills
 
 
+# The lock entries of the pinned CLI (vercel-labs/skills@7407f3893ad4dceab546ac002c3ef806e4000c73) and how this installer reads them; the table with every citation is the "Lock entries" section of
+# docs/decisions/2026-10-12-skills-installer-foreign-content.md, and tests.test_install_skills.LockEntryTable is built from it.
+LOCK_MINIMUM_VERSION = {"global": 3, "project": 1}   # src/skill-lock.ts L8 and L89-L101, src/local-lock.ts L6 and L83-L98: a lock without a numeric `version`, below this one, or without a `skills` table is read as empty
+GIT_ID = re.compile(r"[0-9a-f]{40}", re.IGNORECASE)    # src/update.ts L638: a skillFolderHash that is a git tree id; a full commit id has the same form
+
+
+def lock_skills(data, project: bool) -> dict:
+    """The entries a lock file holds as the pinned CLI reads it: none for a lock it reads as empty. The project reader also drops a lock in which any entry is not an object (its loop at L90-L94
+    throws on one and the catch at L97-L98 returns an empty lock)."""
+    if not isinstance(data, dict):
+        return {}
+    version, skills = data.get("version"), data.get("skills")
+    if isinstance(version, bool) or not isinstance(version, (int, float)) or version < LOCK_MINIMUM_VERSION["project" if project else "global"] or not isinstance(skills, dict):
+        return {}
+    if project and any(not isinstance(entry, dict) for entry in skills.values()):
+        return {}
+    return skills
+
+
 def read_lock_entry(home: Path, name: str, project_dir: Path | None = None) -> dict | None:
-    skills = load_lock(home, project_dir).get("skills")
-    if not isinstance(skills, dict):
-        return None
-    entry = skills.get(name)
+    entry = lock_skills(load_lock(home, project_dir), project_dir is not None).get(name)
     return entry if isinstance(entry, dict) else None
+
+
+def lock_reading(skill: dict, entry: dict, project: bool) -> str:
+    """What a lock entry says about the revision that wrote the folder: "same" (the pin), "older" (another revision of the manifest's source, an upgrade whose files nothing offline can name) or
+    "unidentified" (everything else: the folder is compared like an unlocked one). An entry names a revision only through a field that the pinned CLI writes as one, and only in the form it writes:
+    a global `skillFolderHash` that is a git tree id (src/add.ts L2099-L2111 writes the tree id of the skill folder for a GitHub source whose tree lookup succeeds and otherwise the CLI's own sha256
+    digest or empty text; src/update.ts L638 applies tree semantics to a 40-digit hex value of a GitHub source only), which is a content address and so says "same" whatever source wrote it, and "older" only
+    for the manifest's GitHub source; a project `ref` that is a full commit id (src/add.ts L2148-L2160 records what the user typed, a branch or a tag included, and either can name the pin's own commit),
+    for the manifest's GitHub source only."""
+    field, pin = ("ref", skill["ref"]) if project else ("skillFolderHash", skill["tree_sha"])
+    value = entry.get(field)
+    if not (isinstance(value, str) and GIT_ID.fullmatch(value)):
+        return "unidentified"
+    from_manifest_source = entry.get("sourceType") == "github" and entry.get("source") == skill["source"]
+    if value.lower() == str(pin).lower():
+        return "same" if (project is False or from_manifest_source) else "unidentified"
+    return "older" if from_manifest_source else "unidentified"
 
 
 @functools.lru_cache(maxsize=None)
@@ -541,37 +578,30 @@ def classify_skill(skill: dict, home: Path, project_dir: Path | None = None, age
     entry = read_lock_entry(home, name, project_dir)
     if entry is not None:
         # An add recreates the canonical folder from nothing (src/installer.ts L195, called at L389), so only the pinned tree survives it unharmed. A lock excuses a folder that differs from the pinned
-        # tree in one case: it positively names another revision of this source (a project `ref` that is not the pin's, a global `skillFolderHash` that is not the pin's tree), an upgrade over an older pin
-        # (the documented boundary). Anything else about the lock identifies nothing and the folder is compared like an unlocked one: metadata the pinned CLI treats as optional or does not require to
-        # be well formed (a project entry's `ref` and `skillPath`, src/local-lock.ts L16-L37, "optional for backward compatibility with lock files written before this field existed"), another source,
-        # a hash that is missing. A folder that is gone is a clean repair.
+        # tree in one case: it names another revision of the manifest's source through a field the CLI writes as a revision (lock_reading "older": the documented boundary, an upgrade over an older pin).
+        # Every other entry, and every field the CLI treats as optional or writes in another form, identifies nothing and the folder is compared like an unlocked one. A folder that is gone is a clean repair.
         def compared() -> str:
             return "local-modified" if skill_dir.exists() and unpinned_content(skill, home, project_dir) else "install"
+        reading = lock_reading(skill, entry, project_dir is not None)
+        if reading == "older":
+            return "install"
         if project_dir is not None:
             target_missing = False
             if agent == "claude-code":
                 target_md = project_dir / ".claude" / "skills" / name / "SKILL.md"
                 target_missing = not target_md.is_file() or sha256_of(target_md) != skill["skill_md_sha256"]
-            from_source = entry.get("sourceType") == "github" and entry.get("source") == skill["source"]
-            ref = entry.get("ref")
-            if from_source and isinstance(ref, str) and ref and ref != skill["ref"]:
-                return "install"   # another revision of this source: an upgrade over an older pin, whose files nothing offline can name (documented boundary)
-            if not (from_source and ref == skill["ref"]):
-                return compared()
-            tree = pinned_source_trees(skill["source"], skill["ref"]).get(skill["path"])
-            if tree != skill["tree_sha"]:
-                return "install"
-            complete = (entry.get("skillPath") == skill["path"] + "/SKILL.md"
-                        and re.fullmatch(r"[0-9a-f]{64}", str(entry.get("computedHash", ""))) is not None)
-            if complete and md_matches and not target_missing:
-                return "ok"
-            return compared()   # the Claude target is missing, SKILL.md was edited or is gone, or the entry is not one the CLI wrote whole
-        folder_hash = entry.get("skillFolderHash")
-        if isinstance(folder_hash, str) and folder_hash and folder_hash != skill["tree_sha"]:
-            return "install"   # a lock that names another tree: an upgrade over an older one, whose files nothing offline can name (documented boundary)
-        if folder_hash == skill["tree_sha"] and md_matches and link_problem is None:
+            if reading == "same":
+                tree = pinned_source_trees(skill["source"], skill["ref"]).get(skill["path"])
+                if tree != skill["tree_sha"]:
+                    return "install"
+                complete = (entry.get("skillPath") == skill["path"] + "/SKILL.md"
+                            and re.fullmatch(r"[0-9a-f]{64}", str(entry.get("computedHash", ""))) is not None)
+                if complete and md_matches and not target_missing:
+                    return "ok"
+            return compared()   # the Claude target is missing, SKILL.md was edited or is gone, the entry is not one the CLI wrote whole, or it identifies nothing
+        if reading == "same" and md_matches and link_problem is None:
             return "ok"
-        return compared()   # the link is missing, SKILL.md is not the pinned one, or the lock names no tree
+        return compared()   # the link is missing, SKILL.md is not the pinned one, or the entry identifies nothing
     # An unlocked folder counts as (b) -- local content to protect -- as soon as it
     # *exists*, not only once it happens to contain a SKILL.md: a folder with other
     # files and no SKILL.md can never satisfy md_matches, so checking is_file() here

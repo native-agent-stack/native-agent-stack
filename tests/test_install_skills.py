@@ -130,7 +130,7 @@ def load_lock(path: Path) -> dict:
                 return data
         except json.JSONDecodeError:
             pass
-    return {"lockfileVersion": 3, "skills": {}}
+    return {"version": 3, "skills": {}}
 
 
 def claude_skills_dir(target: Path, project: bool) -> Path:
@@ -197,7 +197,7 @@ if argv[0] == "add":
     path.parent.mkdir(parents=True, exist_ok=True)
     lock = load_lock(path)
     lock.setdefault("skills", {})[name] = {
-        "source": "github", "sourceType": "github", "sourceUrl": url,
+        "source": fixture.get("source", f"example/{name}"), "sourceType": "github", "sourceUrl": url, "ref": fixture.get("ref", "a" * 40),
         "skillPath": fixture.get("path", name), "skillFolderHash": fixture["tree_sha"],
         "installedAt": "2026-09-25T00:00:00Z", "updatedAt": "2026-09-25T00:00:00Z",
     }
@@ -316,6 +316,12 @@ def make_skill(name: str, skill_md: str, tree_sha: str, codex_enabled: bool = Tr
         "claude_listing": "on",
         "codex_enabled": codex_enabled,
     }
+
+
+def global_entry(name: str, tree: str, **fields) -> dict:
+    """A global lock entry as the pinned CLI writes it for a GitHub source whose tree lookup succeeded (src/add.ts L2099-L2122, src/skill-lock.ts L13-L38) for a manifest row of make_skill."""
+    return {"source": f"example/{name}", "sourceType": "github", "sourceUrl": f"https://github.com/example/{name}.git", "ref": "a" * 40, "skillPath": f"skills/{name}/SKILL.md",
+            "skillFolderHash": tree, "installedAt": "2026-09-25T00:00:00Z", "updatedAt": "2026-09-25T00:00:00Z", **fields}
 
 
 def make_manifest(skills: list[dict]) -> dict:
@@ -740,7 +746,7 @@ sys.exit(code)
         (global_skills / "project-skill").mkdir(parents=True)
         (global_skills / "project-skill" / "SKILL.md").write_text(self.content)  # matching bytes
         global_lock = self.home / ".agents" / ".skill-lock.json"
-        global_lock.write_text(json.dumps({"lockfileVersion": 3, "skills": {}}))
+        global_lock.write_text(json.dumps({"version": 3, "skills": {}}))
         (self.home / ".claude" / "skills" / "project-skill").mkdir(parents=True)
         projects, gh_log = self.project, self.bin_dir / "gh_calls.log"
         cases = (
@@ -774,7 +780,7 @@ sys.exit(code)
                 self.assertEqual(calls_log(self.fake_bin), calls_before)  # not even --version ran
                 self.assertEqual(gh_log.read_text() if gh_log.exists() else "", gh_before)
                 self.assertEqual((global_skills / "project-skill" / "SKILL.md").read_text(), self.content)
-                self.assertEqual(json.loads(global_lock.read_text()), {"lockfileVersion": 3, "skills": {}})
+                self.assertEqual(json.loads(global_lock.read_text()), {"version": 3, "skills": {}})
                 self.assertFalse((self.home / "skills-lock.json").exists())
 
     def test_project_dir_is_compared_with_the_home_the_cli_joins(self):
@@ -878,7 +884,7 @@ class IdempotentSkipTests(InstallSkillsTestCase):
         lock_dir = self.home / ".agents"
         lock_dir.mkdir(exist_ok=True)
         (lock_dir / ".skill-lock.json").write_text(json.dumps(
-            {"lockfileVersion": 3, "skills": {"steady-skill": {"skillFolderHash": tree_sha("steady")}}}))
+            {"version": 3, "skills": {"steady-skill": global_entry("steady-skill", tree_sha("steady"))}}))
         fake_bin = write_fake_skills_bin(self.bin_dir, {})  # no fixtures needed: add must never run
         manifest = self.write_manifest([skill])
         result = self.run_install(manifest, fake_bin=fake_bin)
@@ -933,7 +939,7 @@ class GlobalClaudeLinkTests(InstallSkillsTestCase):
         skill_dir.mkdir(parents=True)
         (skill_dir / "SKILL.md").write_text(self.CONTENT, encoding="utf-8")
         (home / ".agents" / ".skill-lock.json").write_text(json.dumps(
-            {"lockfileVersion": 3, "skills": {name: {"skillFolderHash": self.TREE}}}))
+            {"version": 3, "skills": {name: global_entry(name, self.TREE)}}))
         if link:
             link_dir = home / ".claude" / "skills"
             link_dir.mkdir(parents=True)
@@ -1029,7 +1035,7 @@ class GlobalClaudeLinkTests(InstallSkillsTestCase):
 
         def lock(home: Path, tree: str) -> None:
             (home / ".agents").mkdir(exist_ok=True)
-            (home / ".agents" / ".skill-lock.json").write_text(json.dumps({"lockfileVersion": 3, "skills": {self.NAME: {"skillFolderHash": tree}}}))
+            (home / ".agents" / ".skill-lock.json").write_text(json.dumps({"version": 3, "skills": {self.NAME: global_entry(self.NAME, tree)}}))
 
         def locked_older_tree(home: Path) -> None:
             canonical(home, self.CONTENT)
@@ -1084,7 +1090,7 @@ class GlobalClaudeLinkTests(InstallSkillsTestCase):
 
     def write_lock(self, home: Path, tree: str) -> None:
         (home / ".agents").mkdir(exist_ok=True)
-        (home / ".agents" / ".skill-lock.json").write_text(json.dumps({"lockfileVersion": 3, "skills": {self.NAME: {"skillFolderHash": tree}}}))
+        (home / ".agents" / ".skill-lock.json").write_text(json.dumps({"version": 3, "skills": {self.NAME: global_entry(self.NAME, tree)}}))
 
     def assert_canonical_link_refused_then_replaced_by_force(self, home: Path, bin_dir: Path, skill: dict, canonical: Path, claude: Path) -> None:
         """The canonical path is a link: an ordinary run and check-only refuse it as local-modified (no add, nothing changed), --force replaces it."""
@@ -2071,9 +2077,7 @@ class HeldAndCopyTests(InstallSkillsTestCase):
                     os.symlink("no-such-folder", shared)
             lock = self.home / ".agents" / ".skill-lock.json"   # the entry the CLI's add writes (fake bin above)
             lock.parent.mkdir(parents=True, exist_ok=True)
-            lock.write_text(json.dumps({"lockfileVersion": 3, "skills": {"copy-skill": {
-                "source": "github", "sourceType": "github", "sourceUrl": skill["url"], "skillPath": "copy-skill",
-                "skillFolderHash": tree_sha("copy")}}}), encoding="utf-8")
+            lock.write_text(json.dumps({"version": 3, "skills": {"copy-skill": global_entry("copy-skill", tree_sha("copy"))}}), encoding="utf-8")
 
         def snapshot():
             return {str(path.relative_to(self.home)): os.readlink(path) if path.is_symlink() else
@@ -2108,6 +2112,122 @@ class HeldAndCopyTests(InstallSkillsTestCase):
                 self.assertEqual(result.returncode, 1)
                 self.assertIn(message, result.stderr)
                 self.assertFalse([call for call in calls_log(fake_bin) if call and call[0] == "add"])
+
+
+OLD_TREE = tree_sha("an older tree")     # a git tree id that is not the pin's
+OLD_COMMIT = "b" * 40                    # a commit id that is not the pin's
+DIGEST = "c" * 64                        # the CLI's own sha256 digest of a folder (src/local-lock.ts L145-L160)
+
+
+def keyed(**fields):
+    """A transform that sets fields of the entry (a value of the sentinel DROP removes the key)."""
+    def make(entry, skill):
+        out = {**entry, **fields}
+        return {key: value for key, value in out.items() if value is not DROP}
+    return make
+
+
+DROP = object()
+
+
+def extra_state(reading, whole):
+    """The state of a folder that holds a local file beside the pinned ones: the add may run only for an entry that names another revision; a whole entry at the pin is `ok` (no add runs, nothing is deleted)."""
+    return "install" if reading == "older" else "ok" if (reading == "same" and whole) else "local-modified"
+
+
+def upper(field):
+    return lambda entry, skill: {**entry, field: entry[field].upper()}
+
+
+# The lock entries the pinned CLI (vercel-labs/skills@7407f3893ad4dceab546ac002c3ef806e4000c73) writes or leaves, and how install_skills.py reads each: (scope, id, upstream, entry transform, reading, whole).
+# `reading` is lock_reading's answer ("same" the pin, "older" another revision of the manifest's source, "unidentified"); `whole` is whether `ok` (no add) is possible for a pristine folder.
+# The sources are in docs/decisions/2026-10-12-skills-installer-foreign-content.md ("Lock entries"); this table and that one are built together.
+LOCK_ENTRY_TABLE = [
+    ("global", "G1", "src/add.ts L2102-L2107 writes the tree id of the skill folder, L2114-L2122 the entry", keyed(), "same", True),
+    ("global", "G1c", "src/update.ts L638 matches a tree id case-insensitively", upper("skillFolderHash"), "same", True),
+    ("global", "G2", "the same source and type with another tree id: an entry of an older pin (src/add.ts L2102-L2107)", keyed(skillFolderHash=OLD_TREE), "older", True),
+    ("global", "G2c", "the same, in capitals (src/update.ts L638)", keyed(skillFolderHash=OLD_TREE.upper()), "older", True),
+    ("global", "G3", "a GitHub entry whose tree lookup returned null (src/blob.ts L235-L270) holds the CLI's digest (src/add.ts L2108-L2111)", keyed(skillFolderHash=DIGEST), "unidentified", False),
+    ("global", "G4a", "a gitlab source holds the digest and its URL (src/add.ts L2108-L2111, src/add.ts L86-L104)", keyed(sourceType="gitlab", source="https://gitlab.example.invalid/example/x.git", skillFolderHash=DIGEST), "unidentified", False),
+    ("global", "G4b", "a generic git source holds the digest and its URL", keyed(sourceType="git", source="https://git.example.invalid/example/x.git", skillFolderHash=DIGEST), "unidentified", False),
+    ("global", "G4c", "a git entry of the manifest's source with another 40-digit id is not a GitHub tree id", keyed(sourceType="git", skillFolderHash=OLD_TREE), "unidentified", False),
+    ("global", "G5", "the well-known provider writes an empty hash (src/add.ts L1006-L1013)", keyed(sourceType="well-known", source="https://example.invalid", skillFolderHash="", sourceBaseUrl="https://example.invalid", wellKnownDigest=DROP), "unidentified", False),
+    ("global", "G6", "an empty hash: the tree has no such folder (src/add.ts L2099, L2102-L2107)", keyed(skillFolderHash=""), "unidentified", False),
+    ("global", "G7a", "no skillFolderHash key", keyed(skillFolderHash=DROP), "unidentified", False),
+    ("global", "G7b", "a null hash (hand-made)", keyed(skillFolderHash=None), "unidentified", False),
+    ("global", "G7c", "a number as hash (hand-made)", keyed(skillFolderHash=5), "unidentified", False),
+    ("global", "G7d", "a list as hash (hand-made)", keyed(skillFolderHash=[tree_sha("x")]), "unidentified", False),
+    ("global", "G8a", "text that is not a tree id (src/skill-lock.ts L24-L29: the GitHub tree SHA)", keyed(skillFolderHash="not-a-tree"), "unidentified", False),
+    ("global", "G8b", "39 hex digits", keyed(skillFolderHash="a" * 39), "unidentified", False),
+    ("global", "G8c", "41 hex digits", keyed(skillFolderHash="a" * 41), "unidentified", False),
+    ("global", "G8d", "one space", keyed(skillFolderHash=" "), "unidentified", False),
+    ("global", "G8e", "40 characters that are not all hex digits", keyed(skillFolderHash="g" * 40), "unidentified", False),
+    ("global", "G8f", "a tree id with a newline", keyed(skillFolderHash=OLD_TREE + "\n"), "unidentified", False),
+    ("global", "G9a", "another source with another tree id: a replacement by another skill, not an older pin", keyed(source="someone/else", skillFolderHash=OLD_TREE), "unidentified", False),
+    ("global", "G9b", "another source with the pin's tree id: a content address, the same bytes", keyed(source="someone/else"), "same", True),
+    ("global", "G9c", "no source and no source type, another tree id", keyed(source=DROP, sourceType=DROP, skillFolderHash=OLD_TREE), "unidentified", False),
+    ("global", "G9d", "the manifest's source with the type spelled in capitals", keyed(sourceType="GitHub", skillFolderHash=OLD_TREE), "unidentified", False),
+    ("global", "G9e", "the manifest's source in capitals", keyed(source="EXAMPLE/MULTI-FILE-SKILL", skillFolderHash=OLD_TREE), "unidentified", False),
+    ("global", "G10", "fields the CLI adds or leaves out (ref, skillPath, pluginName, sourceUrl) do not change the reading", keyed(ref=DROP, skillPath=DROP, pluginName="x", sourceUrl=DROP), "same", True),
+
+    ("project", "P1", "src/add.ts L2148-L2160 writes the entry; src/local-lock.ts L15-L46 defines it", keyed(), "same", True),
+    ("project", "P1c", "a ref in capitals names the same commit", upper("ref"), "same", True),
+    ("project", "P1x", "sourceUrl, subagents and wellKnownDigest are fields the CLI adds for other sources (src/add.ts L106-L108, L2144-L2159) and do not change the reading", keyed(sourceUrl="https://example.invalid", subagents=[""]), "same", True),
+    ("project", "P2", "another commit id of the manifest's source: an entry of an older pin", keyed(ref=OLD_COMMIT), "older", True),
+    ("project", "P2c", "the same, in capitals", keyed(ref=OLD_COMMIT.upper()), "older", True),
+    ("project", "P3a", "a ref the user typed that is a branch name (src/local-lock.ts L19-L20; add.ts L2148-L2160): it can name the pin's own commit", keyed(ref="main"), "unidentified", False),
+    ("project", "P3b", "a tag", keyed(ref="v1.2.3"), "unidentified", False),
+    ("project", "P3c", "an abbreviated commit id", keyed(ref="b" * 7), "unidentified", False),
+    ("project", "P3d", "39 hex digits", keyed(ref="b" * 39), "unidentified", False),
+    ("project", "P3e", "an empty ref", keyed(ref=""), "unidentified", False),
+    ("project", "P3f", "no ref (src/local-lock.ts L19-L20: optional; omitted when the user typed none)", keyed(ref=DROP), "unidentified", False),
+    ("project", "P3g", "a number or a list as ref (hand-made)", keyed(ref=7), "unidentified", False),
+    ("project", "P3h", "a commit id with a newline", keyed(ref=OLD_COMMIT + "\n"), "unidentified", False),
+    ("project", "P4a", "no skillPath (src/local-lock.ts L25-L31: optional for backward compatibility)", keyed(skillPath=DROP), "same", False),
+    ("project", "P4b", "another skillPath", keyed(skillPath="skills/another/SKILL.md"), "same", False),
+    ("project", "P4c", "no computedHash", keyed(computedHash=DROP), "same", False),
+    ("project", "P4d", "a computedHash that is not 64 hex digits (an empty one, 63 digits)", keyed(computedHash="a" * 63), "same", False),
+    ("project", "P4e", "a computedHash that is not text", keyed(computedHash=7), "same", False),
+    ("project", "P5a", "a generic git source for the same repository (src/add.ts L106-L108 adds sourceUrl)", keyed(sourceType="git", sourceUrl="https://git.example.invalid/x.git"), "unidentified", False),
+    ("project", "P5b", "a gitlab source", keyed(sourceType="gitlab", source="https://gitlab.example.invalid/example/x.git", ref=DROP, sourceUrl="https://gitlab.example.invalid/example/x.git"), "unidentified", False),
+    ("project", "P5c", "a local folder: a relative path, no ref, no skillPath (src/local-lock.ts L89-L93, L115)", keyed(sourceType="local", source="../source/multi-file-skill", ref=DROP, skillPath=DROP), "unidentified", False),
+    ("project", "P5d", "the well-known provider (src/add.ts L1030-L1040): no ref, no skillPath", keyed(sourceType="well-known", source="example.invalid", sourceUrl="https://example.invalid", ref=DROP, skillPath=DROP, wellKnownDigest=DIGEST), "unidentified", False),
+    ("project", "P5e", "an npm package (src/sync.ts L384-L396): no ref, no skillPath", keyed(sourceType="node_modules", source="some-package", ref=DROP, skillPath=DROP), "unidentified", False),
+    ("project", "P5f", "another source with another commit id", keyed(source="someone/else", ref=OLD_COMMIT), "unidentified", False),
+    ("project", "P5g", "another source with the pin's commit id", keyed(source="someone/else"), "unidentified", False),
+    ("project", "P5h", "the manifest's source in capitals", keyed(source="EXAMPLE/MULTI-FILE-SKILL"), "unidentified", False),
+    ("project", "P5i", "no sourceType", keyed(sourceType=DROP), "unidentified", False),
+]
+
+def keyed_older(scope):
+    """A transform that makes the entry of a whole install at the pin the entry of an older pin of the same source."""
+    field = "skillFolderHash" if scope == "global" else "ref"
+    return lambda entry, skill: {**entry, field: OLD_TREE if scope == "global" else OLD_COMMIT}
+
+
+# The lock file around an entry, as the pinned CLI reads it (src/skill-lock.ts L89-L101 and src/local-lock.ts L83-L98): a lock it reads as empty has no entries. (scope, id, upstream, text of the lock file)
+LOCK_FILE_TABLE = [
+    ("global", "GL1", "no `version` (skill-lock.ts L89)", lambda e: json.dumps({"skills": {e[0]: e[1]}})),
+    ("global", "GL2", "a version below 3 (skill-lock.ts L8, L94-L96)", lambda e: json.dumps({"version": 2, "skills": {e[0]: e[1]}})),
+    ("global", "GL3", "a version that is text (L89: typeof is not number)", lambda e: json.dumps({"version": "3", "skills": {e[0]: e[1]}})),
+    ("global", "GL4", "a boolean version", lambda e: json.dumps({"version": True, "skills": {e[0]: e[1]}})),
+    ("global", "GL5", "skills is a list", lambda e: json.dumps({"version": 3, "skills": [e[1]]})),
+    ("global", "GL6", "skills is null", lambda e: json.dumps({"version": 3, "skills": None})),
+    ("global", "GL7", "the entry is null", lambda e: json.dumps({"version": 3, "skills": {e[0]: None}})),
+    ("global", "GL8", "the entry is a list", lambda e: json.dumps({"version": 3, "skills": {e[0]: [e[1]]}})),
+    ("global", "GL9", "the lock is not JSON", lambda e: "{not json"),
+    ("global", "GL10", "the lock is a list", lambda e: json.dumps([e[1]])),
+    ("project", "PL1", "no `version` (local-lock.ts L82)", lambda e: json.dumps({"skills": {e[0]: e[1]}})),
+    ("project", "PL2", "a version below 1 (local-lock.ts L6, L86-L88)", lambda e: json.dumps({"version": 0, "skills": {e[0]: e[1]}})),
+    ("project", "PL3", "a version that is text", lambda e: json.dumps({"version": "1", "skills": {e[0]: e[1]}})),
+    ("project", "PL3b", "a boolean version (typeof true is boolean, local-lock.ts L82; Python counts True as 1)", lambda e: json.dumps({"version": True, "skills": {e[0]: e[1]}})),
+    ("project", "PL4", "skills is a list", lambda e: json.dumps({"version": 1, "skills": [e[1]]})),
+    ("project", "PL5", "skills is null", lambda e: json.dumps({"version": 1, "skills": None})),
+    ("project", "PL6", "the entry is null", lambda e: json.dumps({"version": 1, "skills": {e[0]: None}})),
+    ("project", "PL7", "another entry is null: the loop at L90-L94 throws and the catch at L97-L98 returns an empty lock", lambda e: json.dumps({"version": 1, "skills": {e[0]: e[1], "another-skill": None}})),
+    ("project", "PL8", "the lock is not JSON", lambda e: "{not json"),
+    ("project", "PL9", "the lock is a list", lambda e: json.dumps([e[1]])),
+]
 
 
 class ForeignContentTests(InstallSkillsTestCase):
@@ -2148,7 +2268,7 @@ class ForeignContentTests(InstallSkillsTestCase):
 
     def lock(self, tree):
         (self.home / ".agents").mkdir(exist_ok=True)
-        (self.home / ".agents" / ".skill-lock.json").write_text(json.dumps({"lockfileVersion": 3, "skills": {self.NAME: {"skillFolderHash": tree}}}))
+        (self.home / ".agents" / ".skill-lock.json").write_text(json.dumps({"version": 3, "skills": {self.NAME: global_entry(self.NAME, tree)}}))
 
     @staticmethod
     def snapshot(folder):
@@ -2511,8 +2631,8 @@ class ForeignContentTests(InstallSkillsTestCase):
                 result, skills = self.states("--project-dir", str(project), "--agent", agent, "--check-only", env=env)
                 self.assertEqual((result.returncode, skills), (1, {self.NAME: "missing-or-drifted"}), result.stdout + result.stderr)
 
-    def project_locked_at_the_pin(self, change=None):
-        """A project locked at the pin with the pinned folder; `change` edits the lock entry before it is written (the shapes of src/local-lock.ts L16-L37)."""
+    def project_locked_at_the_pin(self, change=None, lock_text=None, make=None):
+        """A project locked at the pin with the pinned folder; `change` edits the lock entry in place before it is written (the shapes of src/local-lock.ts L16-L37), `make` returns a new entry, `lock_text` writes the lock file around it."""
         project = self.tmp_path / "project"
         folder = project / ".agents" / "skills" / self.NAME
         shutil.rmtree(project, ignore_errors=True)
@@ -2521,7 +2641,9 @@ class ForeignContentTests(InstallSkillsTestCase):
         entry = {"source": self.skill["source"], "sourceType": "github", "ref": self.skill["ref"], "skillPath": self.skill["path"] + "/SKILL.md", "computedHash": "a" * 64}
         if change:
             change(entry)
-        (project / "skills-lock.json").write_text(json.dumps({"version": 1, "skills": {self.NAME: entry}}))
+        if make:
+            entry = make(entry)
+        (project / "skills-lock.json").write_text(lock_text((self.NAME, entry)) if lock_text else json.dumps({"version": 1, "skills": {self.NAME: entry}}))
         gh = self.bin_dir / "gh"
         gh.write_text("#!/usr/bin/env python3\nimport json\nprint(json.dumps({'truncated': False, 'tree': [{'path': " + repr(self.skill["path"]) + ", 'type': 'tree', 'sha': " + repr(self.tree) + "}]}))\n")
         gh.chmod(0o755)
@@ -2560,6 +2682,124 @@ class ForeignContentTests(InstallSkillsTestCase):
                 module.unpinned_content(self.skill, self.home)
         self.assertIn("unverified (cannot read", str(caught.exception))
 
+    # ---- the lock-entry table (decision record, "Lock entries"): every form the pinned CLI writes or leaves, project and global
+    def lock_case(self, scope, agent, entry_for, lock_text, state):
+        """Write the fixture of one row and one folder state; returns (project or None, folder, env). `entry_for(whole_entry) -> entry` turns the entry of a whole install at the pin into the row's form."""
+        env = None
+        if scope == "global":
+            self.fresh_home()
+            (self.home / ".agents").mkdir()
+            entry = entry_for(global_entry(self.NAME, self.tree), self.skill)
+            (self.home / ".agents" / ".skill-lock.json").write_text(lock_text((self.NAME, entry)) if lock_text else json.dumps({"version": 3, "skills": {self.NAME: entry}}))
+            project, folder = None, self.folder
+            if state != "gone":
+                self.canonical()
+                link_dir = self.home / ".claude" / "skills"
+                link_dir.mkdir(parents=True, exist_ok=True)
+                os.symlink(os.path.relpath(self.folder, link_dir), link_dir / self.NAME)
+        else:
+            project, folder, env = self.project_locked_at_the_pin(make=lambda e: entry_for(e, self.skill), lock_text=lock_text)
+            if agent == "claude-code":
+                target = project / ".claude" / "skills" / self.NAME
+                target.parent.mkdir(parents=True)
+                os.symlink(os.path.relpath(folder, target.parent), target)
+            if state == "gone":
+                shutil.rmtree(folder)
+        if state == "extra":
+            (folder / "local-work.txt").write_text("work that exists nowhere else\n", encoding="utf-8")
+        return project, folder, env
+
+    def classify_case(self, module, scope, agent, project):
+        with mock.patch.object(module, "pinned_source_trees", return_value={self.skill["path"]: self.tree}), mock.patch.dict(os.environ, {"XDG_STATE_HOME": "", "CLAUDE_CONFIG_DIR": ""}):
+            return module.classify_skill(self.skill, self.home, project, agent)
+
+    def test_the_lock_entry_table_gives_the_classifier_its_reading_for_every_form(self):
+        """The CC's adjudication of #1035 at 453ac683 (wave rule 4): the table is built from the upstream definition of what the pinned CLI writes or leaves in a lock, and every row is run for the global scope and for a
+        project under both agents, in three folder states: pristine (`ok` when the entry is whole and says the pin, else the add may run), with a local file (the add runs only for an entry that names another
+        revision of the manifest's source; for a whole entry at the pin with its link or target in place the state is `ok` and no add runs, so nothing is lost) and gone (a clean repair). The classifier answers
+        directly (module), and lock_reading answers the row's reading."""
+        module = load_installer_module()
+        for scope, row, upstream, entry_for, reading, whole in LOCK_ENTRY_TABLE:
+            for agent in (("universal",) if scope == "global" else ("universal", "claude-code")):
+                with self.subTest(form=row, scope=scope, agent=agent, upstream=upstream[:60]):
+                    entry = entry_for(global_entry(self.NAME, self.tree) if scope == "global" else {
+                        "source": self.skill["source"], "sourceType": "github", "ref": self.skill["ref"], "skillPath": self.skill["path"] + "/SKILL.md", "computedHash": "a" * 64}, self.skill)
+                    self.assertEqual(module.lock_reading(self.skill, entry, scope == "project"), reading)
+                    expected = {"pristine": "ok" if (reading == "same" and whole) else "install", "extra": extra_state(reading, whole), "gone": "install"}
+                    for state, answer in expected.items():
+                        project, folder, env = self.lock_case(scope, agent, entry_for, None, state)
+                        self.assertEqual(self.classify_case(module, scope, agent, project), answer, f"{row} {state}")
+
+    def test_a_lock_file_the_pinned_cli_reads_as_empty_has_no_entries(self):
+        """The same table for the lock file around the entry: a lock the CLI reads as empty (a missing or non-numeric `version`, a version below the first one that holds the field, no `skills` table, a file that is not JSON,
+        and for a project any entry that is not an object) holds no entry, even when the entry in it says the pin or an older pin: the folder is compared like an unlocked one."""
+        module = load_installer_module()
+        for scope, row, upstream, lock_text in LOCK_FILE_TABLE:
+            for agent in (("universal",) if scope == "global" else ("universal", "claude-code")):
+                with self.subTest(form=row, scope=scope, agent=agent, upstream=upstream[:60]):
+                    for entry_for, expected in ((lambda e, s: e, {"pristine": "install", "extra": "local-modified", "gone": "install"}),
+                                                (keyed_older(scope), {"pristine": "install", "extra": "local-modified", "gone": "install"})):
+                        for state, answer in expected.items():
+                            project, folder, env = self.lock_case(scope, agent, entry_for, lock_text, state)
+                            self.assertEqual(self.classify_case(module, scope, agent, project), answer, f"{row} {state}")
+
+    def test_lock_skills_holds_only_what_the_pinned_cli_reads(self):
+        """lock_skills on its own, for inputs that load_lock would already have filtered: a lock that is not an object, a version of another kind or below the first that holds the entry, skills of another kind."""
+        module = load_installer_module()
+        entry = {"source": "x"}
+        for project in (False, True):
+            minimum = 1 if project else 3
+            with self.subTest(project=project):
+                self.assertEqual(module.lock_skills({"version": minimum, "skills": {"a": entry}}, project), {"a": entry})
+                self.assertEqual(module.lock_skills({"version": minimum + 0.5, "skills": {"a": entry}}, project), {"a": entry})
+                for data in ([{"version": minimum, "skills": {"a": entry}}], None, "text", 5, {"version": minimum - 1, "skills": {"a": entry}}, {"version": str(minimum), "skills": {"a": entry}},
+                             {"version": None, "skills": {"a": entry}}, {"version": True if minimum == 1 else minimum - 1, "skills": {"a": entry}}, {"skills": {"a": entry}},
+                             {"version": minimum, "skills": [entry]}, {"version": minimum, "skills": None}, {"version": minimum, "skills": "a"}):
+                    self.assertEqual(module.lock_skills(data, project), {}, repr(data)[:60])
+        self.assertEqual(module.lock_skills({"version": 3, "skills": {"a": entry, "b": None}}, False), {"a": entry, "b": None}, "only the project reader drops a lock with an entry that is not an object")
+        self.assertEqual(module.lock_skills({"version": 1, "skills": {"a": entry, "b": None}}, True), {})
+
+    def test_the_source_tree_oracle_decides_a_project_entry_that_says_the_pin(self):
+        """A project entry of the manifest's source with the pin's commit id is only as good as the pinned source tree: when the GitHub tree of that ref disagrees with the manifest, or has no such folder, the
+        row is inconsistent and the installer stops before any add (classify_skill answers `install`, process_skill refuses it)."""
+        module = load_installer_module()
+        for oracle in ({}, {self.skill["path"]: OLD_TREE}, {"skills/another": self.tree}):
+            with self.subTest(oracle=sorted(oracle.values())[:1]):
+                project, folder, env = self.lock_case("project", "universal", lambda e, s: e, None, "extra")
+                with mock.patch.object(module, "pinned_source_trees", return_value=oracle), mock.patch.dict(os.environ, {"XDG_STATE_HOME": "", "CLAUDE_CONFIG_DIR": ""}):
+                    self.assertEqual(module.classify_skill(self.skill, self.home, project, "universal"), "install")
+                    self.assertEqual(module.classify_skill(self.skill, self.home, project, "claude-code"), "install")
+
+    def test_the_installer_path_follows_the_table_in_the_state_that_destroys(self):
+        """The full installer path (the fake CLI, --check-only and an ordinary run) for every row in the one state where an add deletes work, a local file beside the pinned folder: refused with the folder untouched
+        and no add, unless the row says another revision of the manifest's source, where the add runs (the documented boundary). Then --force replaces the folder."""
+        for scope, row, upstream, entry_for, reading, whole in LOCK_ENTRY_TABLE:
+            for agent in (("universal",) if scope == "global" else ("universal", "claude-code")):
+                with self.subTest(form=row, scope=scope, agent=agent):
+                    (self.fake_bin.parent / "calls.log").unlink(missing_ok=True)
+                    project, folder, env = self.lock_case(scope, agent, entry_for, None, "extra")
+                    flags = ("--project-dir", str(project), "--agent", agent) if scope == "project" else ()
+                    before = self.snapshot(folder)
+                    expected = extra_state(reading, whole)
+                    result, skills = self.states(*flags, "--check-only", env=env)
+                    self.assertEqual((result.returncode, skills), ((0, {self.NAME: "ok"}) if expected == "ok" else (1, {self.NAME: "missing-or-drifted" if expected == "install" else "local-modified"})), result.stdout + result.stderr)
+                    result, skills = self.states(*flags, env=env)
+                    if expected == "ok":
+                        self.assertEqual((result.returncode, skills), (0, {self.NAME: "ok"}), result.stdout + result.stderr)
+                        self.assertEqual(self.add_calls(), [])
+                        self.assertEqual(self.snapshot(folder), before, "no add runs: nothing is touched")
+                    elif reading == "older":
+                        self.assertEqual((result.returncode, skills), (0, {self.NAME: "installed"}), result.stdout + result.stderr)
+                        self.assertEqual(len(self.add_calls()), 1)
+                    else:
+                        self.assertEqual((result.returncode, skills), (1, {self.NAME: "local-modified"}), result.stdout + result.stderr)
+                        self.assertEqual(self.add_calls(), [])
+                        self.assertEqual(self.snapshot(folder), before, "nothing is touched")
+                        if row in ("G1", "G3", "G8a", "P1", "P3a", "P5c"):
+                            result, skills = self.states(*flags, "--force", env=env)
+                            self.assertEqual((result.returncode, skills), (0, {self.NAME: "installed"}), result.stdout + result.stderr)
+                            self.assertEqual(len(self.add_calls()), 1)
+
 
 PINNED_SKILLS_BIN = Path(os.environ.get("SKILLS_BIN") or Path.home() / ".local" / "share" / "new-wsl-native-stack" / "tools" / "skills-1.7.0" / "bin" / "skills")
 
@@ -2582,8 +2822,8 @@ class PinnedCliForeignContentTests(unittest.TestCase):
         self.module = load_installer_module()
         self.row = make_skill(self.NAME, self.FILES["SKILL.md"], pinned_tree_sha(self.FILES))
 
-    def cli(self, *args, home, cwd):
-        env = {"HOME": str(home), "PATH": os.environ["PATH"], "DISABLE_TELEMETRY": "1", "DO_NOT_TRACK": "1"}
+    def cli(self, *args, home, cwd, extra_env=None):
+        env = {"HOME": str(home), "PATH": os.environ["PATH"], "DISABLE_TELEMETRY": "1", "DO_NOT_TRACK": "1", **(extra_env or {})}
         return subprocess.run([str(PINNED_SKILLS_BIN), *args], cwd=cwd, env=env, capture_output=True, text=True, timeout=180, stdin=subprocess.DEVNULL)
 
     def source(self, root):
@@ -2645,7 +2885,7 @@ class PinnedCliForeignContentTests(unittest.TestCase):
             self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
             lock_file = home / ".agents" / ".skill-lock.json"
             # An install from the manifest's GitHub source records the pinned tree here; a local source records none, so the entry is written as the installer reads it.
-            lock_file.write_text(json.dumps({"lockfileVersion": 3, "skills": {self.NAME: {"skillFolderHash": self.row["tree_sha"]}}}), encoding="utf-8")
+            lock_file.write_text(json.dumps({"version": 3, "skills": {self.NAME: global_entry(self.NAME, self.row["tree_sha"])}}), encoding="utf-8")
             folder = home / ".agents" / "skills" / self.NAME
             copy = root / "copy"
             shutil.copytree(home, copy / "home", symlinks=True)
@@ -2786,7 +3026,7 @@ class PinnedCliForeignContentTests(unittest.TestCase):
             self.assertFalse((copy / ".agents" / "skills" / self.NAME / extra.name).exists(), "the control: the pinned CLI deletes it")
 
     def test_a_global_lock_that_names_no_tree_is_refused_where_the_native_add_deletes_the_extra_file(self):
-        """The global lock of an install from a local folder holds no pinned tree; so does a lock whose hash was lost. The entry is written as the installer reads it."""
+        """The pinned CLI writes no global lock at all for a local folder (src/add.ts L2087 needs a normalised source; src/source-parser.ts L12-L14 gives none for a local source), so this entry is hand-written, as a lock whose hash was lost: it holds no tree."""
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             home = root / "home"
@@ -2806,6 +3046,60 @@ class PinnedCliForeignContentTests(unittest.TestCase):
             done = self.cli(*add, home=copy / "home", cwd=root)
             self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
             self.assertFalse((copy / "home" / ".agents" / "skills" / self.NAME / "local-work.txt").exists(), "the control: the pinned CLI deletes it")
+
+    def git_source(self, root):
+        """A bare repository holding the pinned files under skills/<name>, answering a made-up https URL through url.<base>.insteadOf, so that the pinned CLI clones a generic git source offline.
+        Returns (url, environment for the CLI)."""
+        scratch = root / "githome"
+        scratch.mkdir()
+        identity = {"PATH": os.environ["PATH"], "HOME": str(scratch), "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@example.invalid", "GIT_COMMITTER_NAME": "t", "GIT_COMMITTER_EMAIL": "t@example.invalid"}
+        work, bare = root / "work", root / "example" / f"{self.NAME}.git"
+        for relative, content in self.FILES.items():
+            (work / "skills" / self.NAME / relative).parent.mkdir(parents=True, exist_ok=True)
+            (work / "skills" / self.NAME / relative).write_text(content, encoding="utf-8")
+        bare.parent.mkdir()
+        for args, cwd in ((["init", "-q", "-b", "main"], work), (["add", "-A"], work), (["commit", "-q", "-m", "pinned"], work), (["clone", "-q", "--bare", str(work), str(bare)], root)):
+            subprocess.run(["git", *args], cwd=cwd, env=identity, check=True, capture_output=True)
+        return (f"https://git.example.invalid/example/{self.NAME}.git",
+                {"GIT_CONFIG_COUNT": "1", "GIT_CONFIG_KEY_0": f"url.file://{root}/.insteadOf", "GIT_CONFIG_VALUE_0": "https://git.example.invalid/"})
+
+    def test_a_lock_the_pinned_cli_writes_for_a_generic_git_source_identifies_nothing_and_the_folder_is_protected(self):
+        """The CC's adjudication of #1035 at 453ac683, B1 with the real CLI (and the other family's first-round reproductions): the entry that the pinned CLI itself writes for a generic git source holds the CLI's
+        sha256 digest of the folder where the GitHub forms hold a tree id (src/add.ts L2108-L2111, L2148-L2160), a URL for `source` and no `ref`. It names no revision of the manifest's GitHub source, so the folder
+        is compared: a local file beside the pinned files is refused, where the add deletes it (the control)."""
+        for scope in ("global", "project"):
+            with self.subTest(scope=scope), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                home, project = root / "home", root / "project"
+                home.mkdir()
+                project.mkdir()
+                url, git_env = self.git_source(root)
+                add = ["add", url, "--skill", self.NAME, "-g", "-y", "-a", "claude-code", "codex"] if scope == "global" else ["add", url, "--skill", self.NAME, "-y", "-a", "universal", "claude-code"]
+                done = self.cli(*add, home=home, cwd=root if scope == "global" else project, extra_env=git_env)
+                self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
+                lock_file = home / ".agents" / ".skill-lock.json" if scope == "global" else project / "skills-lock.json"
+                lock = json.loads(lock_file.read_text(encoding="utf-8"))
+                entry = lock["skills"][self.NAME]
+                digest = entry["skillFolderHash" if scope == "global" else "computedHash"]
+                self.assertEqual((lock["version"], entry["sourceType"], "ref" in entry), (3 if scope == "global" else 1, "git", False))
+                self.assertRegex(digest, r"\A[0-9a-f]{64}\Z", "the CLI's own digest, not a tree id")
+                self.assertNotEqual(entry["source"], self.row["source"])
+                self.assertEqual(self.module.lock_reading(self.row, entry, scope == "project"), "unidentified")
+                folder = (home / ".agents" if scope == "global" else project / ".agents") / "skills" / self.NAME
+                self.assertEqual(self.module.skills_status_module().git_tree_sha(folder), self.row["tree_sha"], "the pinned CLI wrote exactly the pinned files")
+                copy_root = root / "copy"
+                shutil.copytree(home, copy_root / "home", symlinks=True)
+                shutil.copytree(project, copy_root / "project", symlinks=True)
+                self.put(folder, "local-work.txt", "file")
+                self.put((copy_root / "home" if scope == "global" else copy_root / "project") / ".agents" / "skills" / self.NAME, "local-work.txt", "file")
+                pinned = {self.row["path"]: self.row["tree_sha"]}
+                with mock.patch.object(self.module, "pinned_source_trees", return_value=pinned), mock.patch.dict(os.environ, {"XDG_STATE_HOME": "", "CLAUDE_CONFIG_DIR": ""}):
+                    for agent in ("claude-code", "universal") if scope == "project" else ("universal",):
+                        self.assertEqual(self.module.classify_skill(self.row, home, project if scope == "project" else None, agent), "local-modified", agent)
+                done = self.cli(*add, home=copy_root / "home", cwd=copy_root if scope == "global" else copy_root / "project", extra_env=git_env)
+                self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
+                replaced = (copy_root / "home" if scope == "global" else copy_root / "project") / ".agents" / "skills" / self.NAME
+                self.assertFalse(os.path.lexists(replaced / "local-work.txt"), "the control: the pinned CLI deletes it")
 
 
 if __name__ == "__main__":
