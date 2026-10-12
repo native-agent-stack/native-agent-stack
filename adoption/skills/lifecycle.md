@@ -116,11 +116,18 @@ failed installation. It disables telemetry and the add-time audit request. A
 matching existing installation is reused: the canonical folder, its lock entry
 and, for Claude Code, the relative link onto the canonical folder that the CLI
 makes for a non-universal agent
-([`src/installer.ts` L395-426](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/installer.ts#L395-L426)).
+([`createSymlink(canonicalDir, agentDir)`, `src/installer.ts` L426](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/installer.ts#L426);
+Codex is universal, [`src/agents.ts` L227](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/agents.ts#L227),
+and returns first, [L395-402](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/installer.ts#L395-L402)).
 A missing link is drift that the same add repairs; a folder, a link to another
-folder or a dangling link in its place is refused as `local-modified` unless
-`--force`, because the add would replace it
-([L255-263](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/installer.ts#L255-L263)).
+folder or a dangling link elsewhere in its place is refused as `local-modified`
+unless `--force`, whatever the lock says, because the add would replace it
+(`rm(linkPath, { recursive: true })`,
+[L255-263](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/installer.ts#L255-L263)).
+When the CLI cannot create the symlink it copies the skill there
+([L428-440](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/installer.ts#L428-L439));
+`scripts/skills_status.py` fails that layout, so the add is rolled back with the
+cause named.
 Apply only the selected profile's
 listing controls from [the update guide](../update.md#apply-the-skills-manifest).
 
