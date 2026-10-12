@@ -1238,16 +1238,244 @@ class RepositoryWorkflowTests(unittest.TestCase):
         self.assertEqual((derived.files.get(module), protected.rule(module)),
                          ("ci_discovered", "ci_discovered"))
 
+    def test_baseline_refresh_regression_accepts_a_committed_outer_observation(self):
+        """A normal publisher's next append must not invalidate our isolated fixture."""
+        source, derived = self.derived()
+        with tempfile.TemporaryDirectory(prefix="outer-dated-observation-") as temporary:
+            checkout = Path(temporary) / "checkout"
+            run_git(Path(temporary), "clone", "--shared", "--no-checkout", source.repo, str(checkout))
+            run_git(checkout, "checkout", "--detach", source.commit)
+            evidence = Path("blueprints/runtime-workers/openhands/evidence")
+            index_file = checkout / evidence / "unclassified-gate-read-deltas.json"
+            index = json.loads(index_file.read_text())
+            previous = index["entries"][-1]
+            appended = {**previous, "path": "unclassified-gate-reads-outer-fixture-delta.json"}
+            (checkout / evidence / appended["path"]).write_bytes(
+                (checkout / evidence / previous["path"]).read_bytes())
+            index["entries"].append(appended)
+            index_file.write_text(json.dumps(index))
+            published_commit = commit_all(checkout, "append valid same-date outer observation")
+            outer_tree = self.g.patch_policy.GitTree(checkout, published_commit, git=REAL_GIT)
+            with mock.patch(__name__ + ".ROOT", checkout), mock.patch.object(
+                    type(self), "_derived", (outer_tree, derived)), contextlib.redirect_stdout(io.StringIO()):
+                self.test_advisory_baseline_and_explicit_categories_stay_bounded_on_this_repository()
+                self.test_newest_dated_delta_accepts_a_baseline_refresh_without_rewriting_history()
+                for mutation in ("omit", "reorder", "edit"):
+                    changed = json.loads(json.dumps(index))
+                    if mutation == "omit":
+                        changed["entries"].pop(0)
+                    elif mutation == "reorder":
+                        changed["entries"][-2:] = reversed(changed["entries"][-2:])
+                    else:
+                        changed["entries"][0]["path"] = "edited-historical-delta.json"
+                    index_file.write_text(json.dumps(changed))
+                    with self.subTest(mutation=mutation):
+                        with self.assertRaisesRegex(AssertionError, "append-only"):
+                            self.test_advisory_baseline_and_explicit_categories_stay_bounded_on_this_repository()
+                index_file.write_text(json.dumps(index))
+
+    def test_newest_dated_delta_accepts_a_baseline_refresh_without_rewriting_history(self):
+        tree, previous = self.derived()
+
+        class AddedReadTree:
+            def entries(self):
+                return tree.entries()
+
+            def read(self, path):
+                source = tree.read(path)
+                if path == "scripts/skills_status.py":
+                    source += b"\nPath(dated_delta_fixture_path).read_text()\n"
+                return source
+
+        refreshed = self.g.derive_ci_protected(AddedReadTree())
+        added = set(refreshed.advisory.unclassified) - set(previous.advisory.unclassified)
+        self.assertEqual(len(added), 1, "The native fixture introduces exactly one advisory read")
+        evidence = Path("blueprints/runtime-workers/openhands/evidence")
+        original_delta_path = evidence / "unclassified-gate-reads-20261011-skill-use-delta.json"
+        original_delta = (ROOT / original_delta_path).read_bytes()
+        delta = json.loads(original_delta)
+        original_baseline = (ROOT / delta["baseline_path"]).read_bytes()
+        baseline = json.loads(original_baseline)
+        baseline["date"] = "2099-01-01"  # Synthetic later snapshot; original bytes stay intact.
+        baseline["count"] = len(refreshed.advisory.unclassified)
+        baseline["unclassified"] = sorted(refreshed.advisory.unclassified)
+        baseline["unclassified_shapes"] = refreshed.advisory.unclassified_shapes
+        baseline_path = evidence / "unclassified-gate-reads-20990101-fixture.json"
+        baseline_bytes = json.dumps(baseline).encode()
+        delta["date"] = "2099-01-01"
+        delta["baseline_path"] = str(baseline_path)
+        delta["baseline_sha256"] = sha256(baseline_bytes).hexdigest()
+        delta["derived_count"] = len(refreshed.advisory.unclassified)
+        # This fresh baseline already contains every native read and shape.
+        delta["added_by_script"] = delta["removed_by_script"] = {}
+        delta["added_shapes"] = delta["removed_shapes"] = []
+        delta["added_locations"] = delta["removed_locations"] = []
+        delta["read_classifications"] = []
+        delta_path = evidence / "unclassified-gate-reads-20990101-fixture-delta.json"
+        index = {"schema_version": 1, "entries": [
+            {"date": json.loads(original_delta)["date"], "path": original_delta_path.name},
+            {"date": delta["date"], "path": delta_path.name}]}
+        with tempfile.TemporaryDirectory(prefix="dated-advisory-delta-") as temporary:
+            fixture = Path(temporary)
+            (fixture / evidence).mkdir(parents=True)
+            (fixture / original_delta_path).write_bytes(original_delta)
+            (fixture / json.loads(original_delta)["baseline_path"]).write_bytes(original_baseline)
+            (fixture / baseline_path).write_bytes(baseline_bytes)
+            (fixture / delta_path).write_text(json.dumps(delta))
+            # Seed this fixture's own history before its first checker call.
+            # The outer checkout may already contain later valid publications.
+            index_file = fixture / evidence / "unclassified-gate-read-deltas.json"
+            run_git(fixture, "init", "-q")
+            index_file.write_text(json.dumps({**index, "entries": index["entries"][:1]}))
+            initial_commit = commit_all(fixture, "published original fixture observation")
+            fixture_tree = self.g.patch_policy.GitTree(fixture, initial_commit, git=REAL_GIT)
+            index_file.write_text(json.dumps(index))
+            with mock.patch(__name__ + ".ROOT", fixture), mock.patch.object(
+                    type(self), "_derived", (fixture_tree, refreshed)), contextlib.redirect_stdout(io.StringIO()):
+                self.test_advisory_baseline_and_explicit_categories_stay_bounded_on_this_repository()
+                # Selecting the newest entry must still enforce its recorded count.
+                delta["derived_count"] += 1
+                (fixture / delta_path).write_text(json.dumps(delta))
+                with self.assertRaises(AssertionError):
+                    self.test_advisory_baseline_and_explicit_categories_stay_bounded_on_this_repository()
+                delta["derived_count"] -= 1
+                (fixture / delta_path).write_text(json.dumps(delta))
+                historical_baseline = fixture / json.loads(original_delta)["baseline_path"]
+                historical_baseline.write_bytes(original_baseline + b"\n")
+                with self.assertRaises(AssertionError):
+                    self.test_advisory_baseline_and_explicit_categories_stay_bounded_on_this_repository()
+                historical_baseline.write_bytes(original_baseline)
+                # A publisher must append, even when the later observation has
+                # the same UTC date. Dropping the old entry must not hide it.
+                for observation_date in (delta["date"], index["entries"][0]["date"]):
+                    delta["date"] = observation_date
+                    index["entries"][-1]["date"] = observation_date
+                    (fixture / delta_path).write_text(json.dumps(delta))
+                    index_file.write_text(json.dumps(index))
+                    self.test_advisory_baseline_and_explicit_categories_stay_bounded_on_this_repository()
+                    omitted = {**index, "entries": index["entries"][1:]}
+                    index_file.write_text(json.dumps(omitted))
+                    for rewrite_baseline in (False, True):
+                        with self.subTest(observation_date=observation_date,
+                                          omitted_entry=True, rewrite_baseline=rewrite_baseline):
+                            historical_baseline.write_bytes(
+                                original_baseline + (b"\n" if rewrite_baseline else b""))
+                            with self.assertRaisesRegex(AssertionError, "append-only"):
+                                self.test_advisory_baseline_and_explicit_categories_stay_bounded_on_this_repository()
+                    historical_baseline.write_bytes(original_baseline)
+                    index_file.write_text(json.dumps(index))
+                # Exercise the same omission after committing it: comparing
+                # only HEAD's index would accept the rewritten candidate.
+                published_commit = commit_all(fixture, "append same-date observation")
+                historical_tree = self.g.patch_policy.GitTree(fixture, published_commit, git=REAL_GIT)
+                with mock.patch.object(type(self), "_derived", (historical_tree, refreshed)):
+                    self.test_advisory_baseline_and_explicit_categories_stay_bounded_on_this_repository()
+                    historical_baseline.write_bytes(original_baseline + b"\n")
+                    original_record = json.loads(original_delta)
+                    original_record["baseline_sha256"] = sha256(historical_baseline.read_bytes()).hexdigest()
+                    (fixture / original_delta_path).write_text(json.dumps(original_record))
+                    with self.subTest(published_delta_rebound=True):
+                        with self.assertRaisesRegex(AssertionError, "Published advisory deltas"):
+                            self.test_advisory_baseline_and_explicit_categories_stay_bounded_on_this_repository()
+                    (fixture / original_delta_path).write_bytes(original_delta)
+                    index_file.write_text(json.dumps(omitted))
+                    historical_tree.commit = commit_all(fixture, "candidate omits history and rewrites baseline")
+                    with self.subTest(committed_omission=True):
+                        with self.assertRaisesRegex(AssertionError, "append-only"):
+                            self.test_advisory_baseline_and_explicit_categories_stay_bounded_on_this_repository()
+                historical_baseline.write_bytes(original_baseline)
+                index_file.write_text(json.dumps(index))
+            self.assertEqual((fixture / original_delta_path).read_bytes(), original_delta)
+            self.assertEqual((fixture / json.loads(original_delta)["baseline_path"]).read_bytes(),
+                             original_baseline)
+
     def test_advisory_baseline_and_explicit_categories_stay_bounded_on_this_repository(self):
         # The monitoring baseline is stable under line-only changes. It is neither a
         # complete read inventory nor an enforcement/enablement requirement.
         tree, derived = self.derived()
         advisory = derived.advisory
         print(json.dumps({"advisory_gate_reads": self.g.advisory_gate_reads([derived])}, sort_keys=True))
-        baseline = json.loads((ROOT / "blueprints/runtime-workers/openhands/evidence/"
-                               "unclassified-gate-reads-20261004.json").read_text())
-        delta = json.loads((ROOT / "blueprints/runtime-workers/openhands/evidence/"
-                            "unclassified-gate-reads-20261011-skill-use-delta.json").read_text())
+        # Dated snapshots are immutable. Append a new dated delta rather than
+        # rebinding the historical 10-11 delta to later baseline bytes.
+        from datetime import date
+        evidence = Path("blueprints/runtime-workers/openhands/evidence")
+        evidence_root = (ROOT / evidence).resolve()
+        self.assertTrue(evidence_root.is_relative_to(ROOT.resolve()))
+        index_path = evidence / "unclassified-gate-read-deltas.json"
+        index = json.loads((ROOT / index_path).read_text())
+        self.assertEqual(index["schema_version"], 1)
+        entries = index["entries"]
+        self.assertTrue(entries, "Record at least one dated advisory delta")
+        dates = [date.fromisoformat(entry["date"]) for entry in entries]
+        self.assertEqual(dates, sorted(dates), "Append deltas in chronological order")
+        self.assertEqual(len({entry["path"] for entry in entries}), len(entries))
+        # Git 2.53.0 rev-list --full-history follows every merge parent:
+        # git/git@67ad42147a7acc2af6074753ebd03d904476118f,
+        # Documentation/rev-list-options.adoc:520-525. GitTree resolves HEAD
+        # to an object id; no mutable remote ref or candidate-supplied pin is
+        # trusted. Every ancestral index version must remain a prefix, even
+        # after the candidate removal/rewrite has itself been committed.
+        git_command = [tree.git, "-C", tree.repo]
+        git_options = dict(check=True, capture_output=True, text=True,
+                           env=self.g.patch_policy.GIT_ENV, timeout=120)
+        shallow = subprocess.run(git_command + ["rev-parse", "--is-shallow-repository"],
+                                 **git_options).stdout.strip()
+        self.assertEqual(shallow, "false", "Baseline preservation requires full Git history")
+        revisions = subprocess.run(git_command + ["rev-list", "--full-history", tree.commit,
+                                                  "--", str(index_path)],
+                                   **git_options).stdout.splitlines()
+        self.assertTrue(revisions, "Committed advisory index history is required")
+        for revision in revisions:
+            published = self.g.patch_policy.GitTree(tree.repo, revision, git=tree.git)
+            self.assertIn(str(index_path), published.entries(),
+                          "The append-only advisory index cannot be deleted")
+            published_entries = json.loads(published.read(str(index_path)))["entries"]
+            self.assertEqual(entries[:len(published_entries)], published_entries,
+                             "The advisory index is append-only across committed history")
+            # Bind old bytes independently of the candidate index and of any
+            # candidate edit to a delta's expected baseline hash.
+            for entry in published_entries:
+                published_path = evidence / entry["path"]
+                self.assertEqual(published_path.parent, evidence)
+                candidate_path = (ROOT / published_path).resolve()
+                self.assertTrue(candidate_path.is_relative_to(evidence_root))
+                published_bytes = published.read(str(published_path))
+                self.assertTrue(candidate_path.read_bytes() == published_bytes,
+                                "Published advisory deltas must retain their bytes")
+                published_baseline = Path(json.loads(published_bytes)["baseline_path"])
+                self.assertFalse(published_baseline.is_absolute())
+                self.assertNotIn("..", published_baseline.parts)
+                self.assertTrue(published_baseline.is_relative_to(evidence))
+                candidate_baseline = (ROOT / published_baseline).resolve()
+                self.assertTrue(candidate_baseline.is_relative_to(evidence_root))
+                self.assertTrue(candidate_baseline.read_bytes() ==
+                                published.read(str(published_baseline)),
+                                "Published historical baselines must retain their bytes")
+        for entry in entries:
+            self.assertEqual(Path(entry["path"]).name, entry["path"])
+            self.assertTrue(entry["path"].endswith(".json"))
+            recorded_path = (evidence_root / entry["path"]).resolve()
+            self.assertTrue(recorded_path.is_relative_to(evidence_root))
+            recorded = json.loads(recorded_path.read_text())
+            self.assertEqual(recorded["date"], entry["date"])
+            self.assertEqual(recorded["mode"], "monitoring_only")
+            recorded_baseline = Path(recorded["baseline_path"])
+            self.assertFalse(recorded_baseline.is_absolute())
+            self.assertNotIn("..", recorded_baseline.parts)
+            self.assertTrue(recorded_baseline.is_relative_to(evidence))
+            recorded_file = (ROOT / recorded_baseline).resolve()
+            self.assertTrue(recorded_file.is_relative_to(evidence_root))
+            self.assertEqual(sha256(recorded_file.read_bytes()).hexdigest(),
+                             recorded["baseline_sha256"],
+                             "Historical baselines must retain their recorded bytes")
+        latest = entries[-1]  # Append order breaks ties within one UTC date.
+        delta = json.loads((ROOT / evidence / latest["path"]).read_text())
+        self.assertEqual(delta["date"], latest["date"])
+        baseline_path = Path(delta["baseline_path"])
+        self.assertFalse(baseline_path.is_absolute())
+        self.assertNotIn("..", baseline_path.parts)
+        self.assertTrue(baseline_path.is_relative_to(evidence))
+        baseline = json.loads((ROOT / baseline_path).read_text())
         self.assertEqual(sha256((ROOT / delta["baseline_path"]).read_bytes()).hexdigest(),
                          delta["baseline_sha256"])
         self.assertEqual(delta["mode"], "monitoring_only")
