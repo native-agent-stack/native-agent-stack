@@ -125,11 +125,28 @@ dangling link elsewhere) is refused as `local-modified` unless `--force`, whatev
 the lock says, because the add would replace it
 (`rm(linkPath, { recursive: true })`,
 [L255-263](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/installer.ts#L255-L263)).
-So is a canonical path that is itself a link: the add removes it first
+So is a canonical path that is itself a link, for an entry installed for Claude Code
+(the rule does not apply to a Codex-only entry): the add removes it first
 ([`cleanAndCreateDirectory(canonicalDir)`, L389](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/installer.ts#L389)),
 and a real Claude folder that the link led to is then not the CLI's own link and is
-removed with its files. Other files beside a pinned `SKILL.md` in the canonical
-folder are not yet protected from the add (the next pull request of this lane).
+removed with its files. The rule stays literal: a link that the installer did not make
+is content it did not write, the CLI writes a real folder there, and none of the
+host's canonical entries is a link. `scripts/skills_status.py` enforces the same
+rule (`canonical_link`) and accepts the one layout that a link on a parent folder
+makes (`~/.claude/skills` onto `~/.agents/skills`, or the reverse), as `createSymlink`
+does ([L240-250](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/installer.ts#L240-L250)).
+The same call recreates the canonical folder from nothing
+([L389-390](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/installer.ts#L389-L390)),
+so a file beside the pinned `SKILL.md` that the CLI would not write, or an edited
+support file, is lost with it. Where an add is about to run over an existing
+folder whose `SKILL.md` is the pinned one (an unlocked folder, or one locked at the
+pin whose Claude link is missing), the folder must hold that `SKILL.md` alone or be
+the pinned tree: its git tree SHA, with the directories a skill's own tooling
+regenerates (`__pycache__` and the like) left out, equals the manifest's `tree_sha`,
+the comparison `scripts/skills_status.py` reports as `folder_tree`. Anything else
+(an extra, an edited or a missing file) is `local-modified`, refused unless
+`--force`. Not covered: an upgrade over a lock of an older tree, whose files nothing
+offline can name, and an `ok` install, where no add runs.
 When the CLI cannot create the symlink it copies the skill there
 ([L428-440](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/installer.ts#L428-L440));
 `scripts/skills_status.py` fails that layout, so the add is rolled back with the

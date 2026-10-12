@@ -174,6 +174,9 @@ if argv[0] == "add":
         shutil.rmtree(skill_dir)
     skill_dir.mkdir(parents=True)
     (skill_dir / "SKILL.md").write_text(fixture["skill_md"], encoding="utf-8")
+    for relative, content in fixture.get("files", {}).items():  # the rest of the pinned vendor folder
+        (skill_dir / relative).parent.mkdir(parents=True, exist_ok=True)
+        (skill_dir / relative).write_text(content, encoding="utf-8")
     if not copy and not fixture.get("no_claude_link") and (not project or "claude-code" in argv):
         link_dir = claude_skills_dir(target, project)
         link_dir.mkdir(parents=True, exist_ok=True)
@@ -1092,7 +1095,7 @@ class GlobalClaudeLinkTests(InstallSkillsTestCase):
             os.environ.pop("CLAUDE_CONFIG_DIR", None)
             os.environ.pop("XDG_STATE_HOME", None)
             self.assertEqual(load_installer_module().claude_link_problem(skill, home), "canonical-link")  # equal resolved paths are not proof of ownership here
-        forced =self.run_install(manifest, "--force", "--json", fake_bin=fake_bin, home_arg=str(home))
+        forced = self.run_install(manifest, "--force", "--json", fake_bin=fake_bin, home_arg=str(home))
         self.assertEqual(forced.returncode, 0, forced.stdout + forced.stderr)
         self.assertEqual(json.loads(forced.stdout)["skills"], {self.NAME: "installed"})
         self.assertFalse(canonical.is_symlink())
@@ -2091,6 +2094,206 @@ class HeldAndCopyTests(InstallSkillsTestCase):
                 self.assertEqual(result.returncode, 1)
                 self.assertIn(message, result.stderr)
                 self.assertFalse([call for call in calls_log(fake_bin) if call and call[0] == "add"])
+
+
+def pinned_tree_sha(files: dict) -> str:
+    """The git tree SHA of a folder holding these files (path -> text): what the manifest's tree_sha is for a pinned vendor folder, hashed by the repository's own function."""
+    sys.path.insert(0, str(ROOT))
+    from scripts import skills_status
+    with tempfile.TemporaryDirectory() as tmp:
+        folder = Path(tmp)
+        for relative, text in files.items():
+            (folder / relative).parent.mkdir(parents=True, exist_ok=True)
+            (folder / relative).write_text(text, encoding="utf-8")
+        return skills_status.git_tree_sha(folder)
+
+
+class ForeignContentTests(InstallSkillsTestCase):
+    """F3 (research-queue row 42): no content the installer did not write is removed without --force.
+
+    The add recreates the canonical folder from nothing (vercel-labs/skills@7407f3893ad4dceab546ac002c3ef806e4000c73, src/installer.ts L193-200 and L389-390), so a file beside a pinned
+    SKILL.md that the CLI would not write is lost with the folder, and so is an edited support file. The installer asks the question scripts/skills_status.py already asks of an
+    installed folder (check_folder_tree): does its git tree SHA, with the regenerable runtime-artifact directories left out, equal the manifest's tree_sha? A folder of SKILL.md alone has
+    nothing else to lose. Fake CLI fixtures with real git tree SHAs: integration fixtures, not a native run."""
+
+    NAME = "multi-file-skill"
+    CONTENT = "# Multi-file skill\n"
+    PINNED = {"references/guide.md": "# Guide\n", "scripts/run.py": "print('pinned')\n"}
+
+    def setUp(self):
+        super().setUp()
+        self.tree = pinned_tree_sha({"SKILL.md": self.CONTENT, **self.PINNED})
+        self.skill = make_skill(self.NAME, self.CONTENT, self.tree)
+        self.fake_bin = write_fake_skills_bin(self.bin_dir, {self.NAME: {"skill_md": self.CONTENT, "tree_sha": self.tree, "files": self.PINNED}})
+        self.manifest = self.write_manifest([self.skill])
+        self.folder = self.home / ".agents" / "skills" / self.NAME
+
+    def install(self, *flags, manifest=None, fake_bin=None, env=None):
+        return self.run_install(manifest or self.manifest, *flags, "--json", fake_bin=fake_bin or self.fake_bin, env=env)
+
+    def states(self, *flags, **kwargs):
+        result = self.install(*flags, **kwargs)
+        return result, (json.loads(result.stdout)["skills"] if result.stdout.strip() else None)
+
+    def add_calls(self, fake_bin=None):
+        return [call for call in calls_log(fake_bin or self.fake_bin) if call and call[0] == "add"]
+
+    def canonical(self, files=None, skill_md=None, folder=None):
+        folder = folder or self.folder
+        for rel, text in {"SKILL.md": self.CONTENT if skill_md is None else skill_md, **(self.PINNED if files is None else files)}.items():
+            (folder / rel).parent.mkdir(parents=True, exist_ok=True)
+            (folder / rel).write_text(text, encoding="utf-8")
+
+    def lock(self, tree):
+        (self.home / ".agents").mkdir(exist_ok=True)
+        (self.home / ".agents" / ".skill-lock.json").write_text(json.dumps({"lockfileVersion": 3, "skills": {self.NAME: {"skillFolderHash": tree}}}))
+
+    @staticmethod
+    def snapshot(folder):
+        return {str(p.relative_to(folder)): (os.readlink(p) if p.is_symlink() else p.read_bytes() if p.is_file() else None) for p in sorted(folder.rglob("*"))}
+
+    def assert_protected_then_replaced_by_force(self):
+        """check-only and an ordinary run refuse and say why; nothing is touched and the add is not reached; --force then writes the pinned folder alone."""
+        before = self.snapshot(self.folder)
+        result, skills = self.states("--check-only")
+        self.assertEqual((result.returncode, skills), (1, {self.NAME: "local-modified"}), result.stdout + result.stderr)
+        result, skills = self.states()
+        self.assertEqual((result.returncode, skills), (1, {self.NAME: "local-modified"}), result.stdout + result.stderr)
+        self.assertIn(str(self.folder), result.stderr)
+        self.assertIn("not the pinned tree", result.stderr)
+        self.assertIn(self.tree[:12], result.stderr)
+        self.assertEqual(self.add_calls(), [])
+        self.assertEqual(self.snapshot(self.folder), before)
+        forced, skills = self.states("--force")
+        self.assertEqual((forced.returncode, skills), (0, {self.NAME: "installed"}), forced.stdout + forced.stderr)
+        self.assertEqual(len(self.add_calls()), 1)
+        self.assertEqual(sorted(k for k, v in self.snapshot(self.folder).items() if v is not None), sorted(["SKILL.md", *self.PINNED]))
+
+    # ---- an unlocked canonical folder whose SKILL.md is the pinned one
+    def test_an_unlocked_folder_with_the_pinned_files_and_one_more_is_protected(self):
+        self.canonical()
+        (self.folder / "local-work.txt").write_text("work that exists nowhere else\n", encoding="utf-8")
+        self.assert_protected_then_replaced_by_force()
+
+    def test_an_unlocked_folder_with_an_edited_support_file_is_protected(self):
+        self.canonical({**self.PINNED, "references/guide.md": "# Guide, with my notes\n"})
+        self.assert_protected_then_replaced_by_force()
+
+    def test_a_folder_that_lacks_a_pinned_file_is_not_the_pinned_tree_either(self):
+        """Nothing is lost by adding it back, but the comparison is the tree's: a missing file is repaired by --force (the status check calls this folder drift too)."""
+        self.canonical({"references/guide.md": self.PINNED["references/guide.md"]})
+        self.assert_protected_then_replaced_by_force()
+
+    def test_a_git_directory_a_metadata_file_and_a_linked_directory_are_content(self):
+        makers = (("a git directory", lambda f: (f / ".git").mkdir() or (f / ".git" / "HEAD").write_text("ref: refs/heads/main\n")),
+                  ("a metadata.json file", lambda f: (f / "metadata.json").write_text("{}", encoding="utf-8")),
+                  ("a linked directory", lambda f: os.symlink(self.tmp_path, f / "linked")),
+                  ("a linked file", lambda f: os.symlink(f / "SKILL.md", f / "alias.md")))
+        for label, make in makers:
+            with self.subTest(foreign=label):
+                shutil.rmtree(self.folder, ignore_errors=True)
+                self.canonical()
+                make(self.folder)
+                result, skills = self.states("--check-only")
+                self.assertEqual((result.returncode, skills), (1, {self.NAME: "local-modified"}), label)
+
+    def test_an_unlocked_folder_that_is_exactly_the_pinned_one_is_adopted_without_force(self):
+        self.canonical()
+        result, skills = self.states()
+        self.assertEqual((result.returncode, skills), (0, {self.NAME: "installed"}), result.stdout + result.stderr)
+        self.assertEqual(len(self.add_calls()), 1)
+
+    def test_the_directories_a_skills_own_tooling_regenerates_are_not_content_to_protect(self):
+        for directory in ("scripts/__pycache__", ".venv", "node_modules", ".pytest_cache"):
+            with self.subTest(directory=directory):
+                shutil.rmtree(self.folder, ignore_errors=True)
+                self.canonical()
+                (self.folder / directory).mkdir(parents=True)
+                (self.folder / directory / "artifact.bin").write_bytes(b"regenerated")
+                result, skills = self.states("--check-only")
+                self.assertEqual((result.returncode, skills), (1, {self.NAME: "missing-or-drifted"}), (directory, result.stdout))  # install-bound, not refused
+
+    def test_a_folder_of_the_pinned_skill_md_alone_has_nothing_else_to_lose(self):
+        self.canonical({})
+        result, skills = self.states()
+        self.assertEqual((result.returncode, skills), (0, {self.NAME: "installed"}), result.stdout + result.stderr)
+
+    def test_a_folder_of_the_pinned_skill_md_and_a_regenerated_directory_has_nothing_to_lose_either(self):
+        self.canonical({})
+        (self.folder / "__pycache__").mkdir()
+        (self.folder / "__pycache__" / "x.pyc").write_bytes(b"regenerated")
+        result, skills = self.states()
+        self.assertEqual((result.returncode, skills), (0, {self.NAME: "installed"}), result.stdout + result.stderr)
+
+    # ---- a locked folder
+    def test_a_locked_folder_at_the_pin_without_its_claude_link_is_protected_from_the_repairing_add(self):
+        self.lock(self.tree)
+        self.canonical()
+        (self.folder / "local-work.txt").write_text("work that exists nowhere else\n", encoding="utf-8")
+        self.assert_protected_then_replaced_by_force()
+
+    def test_a_locked_folder_at_the_pin_without_its_claude_link_and_without_extras_is_repaired(self):
+        self.lock(self.tree)
+        self.canonical()
+        result, skills = self.states()
+        self.assertEqual((result.returncode, skills), (0, {self.NAME: "installed"}), result.stdout + result.stderr)
+        self.assertTrue((self.home / ".claude" / "skills" / self.NAME).is_symlink())
+
+    def test_an_upgrade_over_an_older_pin_is_not_covered(self):
+        """The lock proves the CLI wrote an earlier version there, and nothing offline can name that version's files, so the upgrade add runs as before (adoption/skills/lifecycle.md)."""
+        self.lock(tree_sha("an older tree"))
+        self.canonical()
+        (self.folder / "local-work.txt").write_text("work that exists nowhere else\n", encoding="utf-8")
+        result, skills = self.states()
+        self.assertEqual((result.returncode, skills), (0, {self.NAME: "installed"}), result.stdout + result.stderr)
+        self.assertFalse((self.folder / "local-work.txt").exists(), "the boundary this record states: an upgrade replaces the folder")
+
+    def test_a_complete_locked_install_stays_ok_whatever_the_folder_holds(self):
+        """No add runs for an ok install, so nothing is deleted and the folder is not judged (scripts/skills_status.py reports drift separately)."""
+        self.lock(self.tree)
+        self.canonical()
+        (self.folder / "local-work.txt").write_text("kept: no add runs for an ok install\n", encoding="utf-8")
+        link_dir = self.home / ".claude" / "skills"
+        link_dir.mkdir(parents=True)
+        os.symlink(os.path.relpath(self.folder, link_dir), link_dir / self.NAME)
+        result, skills = self.states("--check-only")
+        self.assertEqual((result.returncode, skills), (0, {self.NAME: "ok"}))
+
+    # ---- the other places a canonical folder is recreated
+    def test_a_claude_code_copy_entry_protects_the_claude_folder(self):
+        files = {"scripts/x.py": "x = 1\n"}
+        tree = pinned_tree_sha({"SKILL.md": "# Copy\n", **files})
+        skill = dict(make_skill("copy-skill", "# Copy\n", tree, codex_enabled=False), agents=["claude-code"], copy=True)
+        fake_bin = write_fake_skills_bin(self.bin_dir, {"copy-skill": {"skill_md": "# Copy\n", "tree_sha": tree, "files": files}})
+        manifest = self.write_manifest([skill])
+        folder = self.home / ".claude" / "skills" / "copy-skill"
+        self.canonical(files, skill_md="# Copy\n", folder=folder)
+        (folder / "notes.txt").write_text("mine\n", encoding="utf-8")
+        result, skills = self.states("--check-only", manifest=manifest, fake_bin=fake_bin)
+        self.assertEqual((result.returncode, skills), (1, {"copy-skill": "local-modified"}), result.stdout + result.stderr)
+        (folder / "notes.txt").unlink()
+        result, skills = self.states(manifest=manifest, fake_bin=fake_bin)
+        self.assertEqual((result.returncode, skills), (0, {"copy-skill": "installed"}), result.stdout + result.stderr)
+
+    def test_a_project_canonical_folder_is_protected_too(self):
+        project = self.tmp_path / "project"
+        project.mkdir()
+        self.canonical(folder=project / ".agents" / "skills" / self.NAME)
+        (project / ".agents" / "skills" / self.NAME / "local-work.txt").write_text("work that exists nowhere else\n", encoding="utf-8")
+        gh = self.bin_dir / "gh"  # a project run verifies the pinned source tree through gh before it classifies anything
+        gh.write_text("#!/usr/bin/env python3\nimport json\nprint(json.dumps({'truncated': False, 'tree': [{'path': " + repr(self.skill["path"]) + ", 'type': 'tree', 'sha': " + repr(self.tree) + "}]}))\n")
+        gh.chmod(0o755)
+        result, skills = self.states("--project-dir", str(project), "--agent", "universal", "--check-only", env={"PATH": str(self.bin_dir) + os.pathsep + os.environ["PATH"]})
+        self.assertEqual((result.returncode, skills), (1, {self.NAME: "local-modified"}), result.stdout + result.stderr)
+        self.assertEqual(self.add_calls(), [])
+
+    def test_a_folder_that_cannot_be_read_is_unverified_not_a_pass(self):
+        module = load_installer_module()
+        self.canonical()
+        with mock.patch.object(module.skills_status_module(), "git_tree_sha", side_effect=PermissionError("denied")):
+            with self.assertRaises(module.InstallError) as caught:
+                module.unpinned_content(self.skill, self.home)
+        self.assertIn("unverified (cannot read", str(caught.exception))
 
 
 if __name__ == "__main__":
