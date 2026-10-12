@@ -358,6 +358,11 @@ def profile_environment(profile: str, state: Path, role_scope: str | None = None
         return {**telemetry, "PI_CODING_AGENT_DIR": str(root / "agent")}
     return {**telemetry, "XDG_CONFIG_HOME": str(root / "config"), "XDG_DATA_HOME": str(root / "data"),
             "XDG_CACHE_HOME": str(root / "cache"), "XDG_STATE_HOME": str(root / "state"),
+            # anomalyco/opencode@53d1eabb:packages/core/src/flag/flag.ts:47;
+            # packages/core/src/database/database.ts:43-55. Explicit DB
+            # overrides outrank XDG; bind every native child/collector to its
+            # profile-owned path through this shared environment policy.
+            "OPENCODE_DB": str(root.absolute() / "data/opencode/opencode.db"),
             "OPENCODE_CONFIG": str(root / "config/opencode/opencode.json"),
             "OPENCODE_CONFIG_DIR": str(root / "config/opencode"),
             "OPENCODE_DISABLE_CLAUDE_CODE_SKILLS": "1", "OPENCODE_DISABLE_MODELS_FETCH": "1",

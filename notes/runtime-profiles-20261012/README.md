@@ -313,3 +313,37 @@ successful collection. Normal successful cleanup remains receipt-first.
 The native baseline switch now selects its loaded baseline's wrapper, or no
 wrapper if that baseline predates it; it no longer silently uses the head's
 filesystem implementation. Historical captures remain unpublished and unhashed.
+
+The private-state correction explicitly sets `OPENCODE_DB` to an absolute
+database path under each OpenCode profile/role's data directory. Native launch,
+headless dispatch, discovery and collection all use `profile_environment`, so
+an inherited override cannot select a shared database instead. This follows
+anomalyco/opencode@53d1eabb `packages/core/src/flag/flag.ts:47` and
+`packages/core/src/database/database.ts:43-55`: an absolute override takes
+precedence over the XDG data directory. Those source bytes were read from the
+pinned mirror with lazy fetching disabled.
+The three new regressions fail at631b5711 and pass after the binding: four
+actual installed-CLI collector cases leave absent/existing synthetic outside
+DB state untouched and initialize valid private SQLite files; two headless
+route controls and ten discovery scope controls check the same policy. Initial
+agent calls and discovery commands are controlled in these fixtures; no model
+or real account DB is accessed. Alias-read fencing remains PARKED.
+
+The fix4 verdict's six P3s remain Follow-ups:
+- Qualify or refuse the npm `.bin/opencode` launcher spelling; the namespace
+  fixtures currently qualify the direct installed native executable.
+- Harden exceptional startup/collection and malformed session elements while
+  preserving original errors, bounded failure receipts and retry state.
+- Add specific pinned role-preparation and session-list/export error-contract
+  citations to their earlier derived fix-record entries.
+- Close the named Git/committed-MCP and srt-proxy tests; optional Context Mode
+  boot inputs and historical author passes remain bounded provenance.
+- Preserve the missing source/capture/archived-locator gaps; RTK, Context Mode
+  and pi-otel cited objects remain unmirrored at the noted pins.
+- Keep inherited hostname hygiene separate from this patch; no historical
+  rewrite or new publication exception is introduced.
+The Claude check at631b5711 passed718 tests with19 skips. Its original tail
+did not preserve eighteen reasons; a bounded skip-only replay selects the
+same nineteen cases and records each reason in the PR description. Skips do
+not establish readiness. The new native DB test also skips without an explicit
+installed OpenCode binary; the author supplied it for the passing native run.
