@@ -38,20 +38,47 @@ Categories describe each row's primary discovery role. Existing canonical layer
 links remain available for other roles. KEEP-MIRROR preserves reproducible
 primary references for recorded mirror roles and selected components; it does
 not claim all 45 are mutually comparable winners or qualify new runtime adoption.
-Thirty-seven already occur in the protected mirror inventory. Eight additional
+Thirty-seven already occurred in the original protected mirror inventory. Eight additional
 selected components have their recorded source version resolved to a Git tag or
 commit in the retained mirror-pin projection. The skills-ref package's 0.1.0
 is a package version, not an upstream tag: its existing source_pin
 69ef37e9424c0a7ea9dd2293b559e43ec8176379 is used instead.
 
-The protected projection contains 94 matched repositories, based on the mirror
-inventory and 298 decision/dependency/runtime source files across both
-repositories. It is conservative evidence of protection, not a complete
-package-name-to-repository resolver for all transitive locks. **No removal is
-authorized in this wave**, including where such a mapping is unavailable. Any
-future proposed removal must independently clear the complete protected set.
-Registered mirrors, pinned dependencies in either repository and repositories
-cited by a decision record are never eligible for UNSTAR.
+The corrected protected projection contains all 373 listed repositories. It
+scans 349 tracked sources: 319 at native-agent-stack
+`86fa384421b1ca50134bd56d89cc72e0f7547816` and 30 at us-equities-trading
+`56e174a20d115996ed2c791e14391c8ea820bb8b`. Both heads were obtained with
+`git rev-parse`. The extraction includes URL and bare owner/repo citations in
+Markdown decision records and their JSON attachments, workflow `uses:` pins,
+and dependency manifests and lockfiles from both repositories. It retains the
+first witness per repository per source, with its line, Git head and file hash.
+The public mirror projection contains 220 entries, matching 55 listed repositories.
+All 373 are conservatively protected because the retained decision attachment
+`docs/decisions/memory-adoption-835/g5-grand-catalog-ae6cc228.json` cites the
+whole list; 141 also have a mirror, Markdown decision, workflow or dependency
+witness. This does not change the 45 KEEP-MIRROR/328 KEEP decisions.
+
+`scripts/starred_protected.py` is the committed producer. It replays the named
+Git trees and the embedded public repository/ref mirror projection without
+depending on a later working tree or on mutable MIRRORS.json array positions:
+
+```sh
+python3 scripts/starred_protected.py --uet-root /path/to/us-equities-trading
+```
+
+Dependency package names use conservative normalized repository-basename
+matching as well as direct GitHub citations; a name match can overprotect and
+is explicitly labelled as a candidate, not an authoritative package mapping.
+Different package/repository aliases and missing historical inputs remain
+unresolved. The previous capture also missed direct bare-slug citations,
+workflow pins and trading dependency pins; that was an extraction defect,
+not a transitive-mapping limitation. The corrected capture includes all 32
+repositories reproduced by the CC, including actions/checkout workflow pins
+and pytest-dev/pytest at trading pyproject.toml:11. **No removal is authorized
+in this wave.** Future removal must independently clear the complete protected
+set; absence from a bounded capture cannot authorize it. Registered mirrors,
+pinned dependencies in either repository and repositories cited by a decision
+record are never eligible for UNSTAR.
 
 UNSTAR eligibility in the existing validator requires archived=true, or a push
 strictly older than 18 calendar months and a complete public release history
@@ -82,6 +109,13 @@ in the input digest.
 - CPython v3.13.16 at cbc944f4bc59639a444dd971c737788ba2283a91,
   `Doc/library/datetime.rst` and `Doc/library/calendar.rst`, supplies aware UTC
   timestamp comparisons and calendar-month day bounds for the 18-month rule.
+- The protected-capture correction uses Git's supported tree/blob interfaces,
+  verified with installed Git 2.53.0 and the mirror at
+  `git/git@67ad42147a7acc2af6074753ebd03d904476118f`,
+  `Documentation/git-ls-tree.adoc:55-63` and `Documentation/revisions.adoc:217-223`.
+  NUL-delimited tree paths and `<rev>:<path>` bind witnesses to immutable bytes.
+  Package normalization follows the PyPA name-normalization specification
+  (lowercase and collapse runs of `-`, `_`, `.`); no package resolver is added.
 - The README first-install correction follows installed systemd
   259.5-0ubuntu3.4 and the pinned upstream implementation
   [`systemd/systemd@b3d8fc43`, `src/systemctl/systemctl-list-unit-files.c:289-290`](https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/src/systemctl/systemctl-list-unit-files.c#L289-L290).
@@ -102,6 +136,14 @@ and licence-based removals were accepted; they pass after extending the existing
 validator. Fixtures also cover the exact 18-month boundary and incomplete/recent
 release evidence. These are local integration and synthetic policy checks;
 they do not measure strategy returns or comparative runtime quality.
+
+For B1, the planted actions/checkout UNSTAR regression was run against the
+unchanged c8e7071f capture and validator first: rc 1, one failed assertion and
+zero errors because removal was accepted. It passes with the corrected capture
+(rc 0), refusing the same removal as protected. Producer fixtures cover bare
+and URL citations, a workflow action subpath with a SHA pin, a Python package
+pin and replay of a named tree despite a changed working file. No unstar call
+or execution path is added.
 
 The PR must land before execution. The CC alone performs the landed UNSTAR list
 once, writes the timestamped owner/repository re-star receipt, and registers the

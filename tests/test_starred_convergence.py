@@ -15,6 +15,25 @@ REGISTRY = "catalogs/sota-convergence/layer-verdict-waves.json"
 
 
 class StarredConvergenceTests(unittest.TestCase):
+    def test_captured_actions_checkout_pin_cannot_be_unstarred(self):
+        from scripts.catalog_decisions import load
+        root = Path(__file__).resolve().parents[1]
+        manifest = deepcopy(load(root, MANIFEST))
+        row = next(row for row in manifest["repositories"] if row["repository"].lower() == "actions/checkout")
+        target = next(other for other in manifest["repositories"]
+                      if other["category"] == row["category"] and other["decision"] == "KEEP"
+                      and other is not row)
+        row.update(decision="UNSTAR", unstar_basis="superseded", superseded_by=target["repository"],
+                   decision_reason="Synthetic same-category removal plant.",
+                   supersession_evidence_refs=[row["signals"]["source_ref"]])
+
+        def read(path):
+            return manifest if path == MANIFEST else load(root, path)
+
+        snapshot = load(root, "catalogs/convergence-practice/public-starred.json")
+        with self.assertRaisesRegex(ValueError, "cannot UNSTAR a protected repository"):
+            validate_convergence(root, snapshot, read=read)
+
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary.cleanup)

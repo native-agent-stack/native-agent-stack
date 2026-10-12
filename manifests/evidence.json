@@ -17192,8 +17192,8 @@
     },
     {
       "path": "catalogs/convergence-practice/sources/starred-protected-20261011.json",
-      "sha256": "5dc047208faf287af741de8e4813d5796ac90eda3546f284e4d4c59eb5bb8733",
-      "bytes": 40253
+      "sha256": "40c32eb251a591df3263cc18c84602a86d67b1320bb12fbc05e41958b301cd12",
+      "bytes": 468626
     },
     {
       "path": "catalogs/convergence-practice/sources/starred-signals-20261011.json",
@@ -17202,8 +17202,8 @@
     },
     {
       "path": "catalogs/convergence-practice/starred-convergence-20261010.json",
-      "sha256": "1edede67db76c6f8102b485653f49fe257aab11e9fb760bd5fa13ae9784f27bf",
-      "bytes": 922749
+      "sha256": "e9b66183cb4f15a64065b22c0cd689ac4b32d3133732605bb68c26d931697712",
+      "bytes": 1271534
     },
     {
       "path": "catalogs/convergence-practice/starred-seeds-20261010.json",
@@ -18937,8 +18937,8 @@
     },
     {
       "path": "docs/decisions/2026-10-11-starred-finalization.md",
-      "sha256": "2eabeeb3724facd855a320d0c74cfab67e6f04914d95f0f29ec0796582cf2136",
-      "bytes": 9472
+      "sha256": "1b68db23c42787d4b4cfdd661c0966459d981b562258f9b0071b9b81f7a2fe0a",
+      "bytes": 12144
     },
     {
       "path": "docs/decisions/2026-10-12-mcp-template-live-reconciliation.md",
@@ -61216,6 +61216,11 @@
       "bytes": 17830
     },
     {
+      "path": "scripts/starred_protected.py",
+      "sha256": "d0c4dbe7f2d269e87aacd8e6201227a0b06b0c8a33b6dbe7746f52e206be6a3a",
+      "bytes": 8977
+    },
+    {
       "path": "scripts/sweep_policy.py",
       "sha256": "1c8eb192b6b5bf33d1d7b03f34baac6b2193789be87db897fa43239d622d1e18",
       "bytes": 258
@@ -62897,13 +62902,18 @@
     },
     {
       "path": "tests/test_starred_convergence.py",
-      "sha256": "bd272fdf841902bb4a413e745983bcde846daf6afb76ea25d74a89c1eff2790e",
-      "bytes": 16821
+      "sha256": "9f535438a0cda8c2738a2091bf09f9b7b83280cc405c2c110b7a38dbea0b3501",
+      "bytes": 17943
     },
     {
       "path": "tests/test_starred_maintenance.py",
       "sha256": "4b1b81c92e93d7c6fddb417aa23bf8e46b34dc2d2c5c673545d6b065c34ed312",
       "bytes": 14668
+    },
+    {
+      "path": "tests/test_starred_protected.py",
+      "sha256": "f045395b855362eadf9efd2c685565c887639a791675e4c3fa7a58ca4b3a5aa1",
+      "bytes": 2676
     },
     {
       "path": "tests/test_start_closure_sampler.py",
