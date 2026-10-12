@@ -265,11 +265,13 @@ Windows Terminal re-saves `settings.json` in its own layout, written from its se
   unit binds. The user-scope template `adoption/mcp/claude-user.json` keeps
   the default 49374. That template changed after `v2026.10.05.1`:
   SocratiCode's model/dimensions are Nemotron-3-Embed-8B/4096,
-  with portable endpoint defaults retained; the target host registers its
-  own endpoints. Its comment gives the remove-then-add sequence for
-  another port. That template changed after `v2026.09.24.1`: serena runs
+  with portable endpoint defaults retained, in the on-demand file since
+  2026-10-12; the target host registers its own endpoints. Its comment gives the remove-then-add sequence for
+  another port. That template changed after `v2026.09.24.1`: serena ran
   `${ECO_ROOT}/bin/serena` instead of a `serena-context` wrapper, and
-  jcodemunch is no longer registered at user scope (a per-project opt-in in
+  jcodemunch was no longer registered at user scope. Since then jcodemunch is
+  at user scope again (2026-10-04) and serena, socraticode,
+  codebase-memory-mcp and semble are loaded on demand (2026-10-12;
   `adoption/bootstrap.md` step 4a).
 - With `networkingMode=mirrored`, a wildcard (`*` or `0.0.0.0`) listener can be
   reached from the local network

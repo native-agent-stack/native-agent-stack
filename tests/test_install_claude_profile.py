@@ -1803,6 +1803,43 @@ class PrintMcpConfigTests(unittest.TestCase):
                     self.assertEqual((code, out), (1, ""))
                     self.assertIn(reason, err)
 
+    def test_server_prints_only_the_named_servers_in_the_files_order_and_an_unknown_name_fails(self):
+        """Claude read of c1d798de (P2-4): --mcp-config replaces a same-named registered server (measured at 2.1.296), so a host must be able to leave out an entry that cannot start there."""
+        code, out, err = self.run_main("--print-mcp-config", "--server", "semble", "--server", "serena", "--home", "/h", "--eco-root", "/e")
+        self.assertEqual((code, err), (0, ""))
+        self.assertEqual(list(json.loads(out)["mcpServers"]), ["serena", "semble"], "the file's order, not the order asked for")
+        everything = json.loads(self.run_main("--print-mcp-config", "--home", "/h", "--eco-root", "/e")[1])["mcpServers"]
+        self.assertEqual(json.loads(out)["mcpServers"], {name: everything[name] for name in ("serena", "semble")}, "the entries are the file's entries, rendered")
+        self.assertNotIn("socraticode", out)
+        code, out, err = self.run_main("--print-mcp-config", "--server", "serena", "--server", "no-such", "--home", "/h", "--eco-root", "/e")
+        self.assertEqual((code, out), (1, ""))
+        self.assertIn("no server named no-such", err)
+        self.assertIn("claude-code-navigation.json", err)
+        code, out, err = self.run_main("--print-mcp-config", str(icp.MCP_TEMPLATE), "--server", "qmd", "--home", "/h", "--eco-root", "/e")
+        self.assertEqual((code, list(json.loads(out)["mcpServers"])), (0, ["qmd"]), "a named template is filtered too")
+
+    def test_server_needs_print_mcp_config_and_leaves_the_steps_alone(self):
+        code, out, err = self.run_main("--only", "mcp", "--server", "serena", "--dry-run")
+        self.assertEqual((code, out), (2, ""))
+        self.assertIn("--server needs --print-mcp-config", err)
+
+    def test_the_render_error_names_the_file_being_rendered(self):
+        """Claude read of c1d798de (P3-7): the message always said claude-user.json, so a bad on-demand file was reported as the wrong file."""
+        with tempfile.TemporaryDirectory() as tmp:
+            bad = Path(tmp) / "on-demand-copy.json"
+            bad.write_text(json.dumps({"mcpServers": {"x": {"command": "${NOPE}/bin/x"}}}), encoding="utf-8")
+            code, out, err = self.run_main("--print-mcp-config", str(bad), "--home", "/h", "--eco-root", "/e")
+            self.assertEqual((code, out), (1, ""))
+            self.assertIn("on-demand-copy.json: cannot render", err)
+            self.assertNotIn("claude-user.json", err)
+            code, out, err = self.run_main("--only", "mcp", "--mcp-template", str(bad), "--dry-run", "--home", tmp, "--eco-root", "/e")
+            self.assertNotEqual(code, 0)
+            self.assertIn("on-demand-copy.json: cannot render", err + out)
+            self.assertNotIn("claude-user.json", err + out)
+        with self.assertRaises(icp.InstallError) as default:
+            icp.render_servers({"mcpServers": {"x": {"command": "${NOPE}/bin/x"}}}, Path("/h"), Path("/e"))
+        self.assertIn("claude-user.json: cannot render", str(default.exception), "without a source the user-scope template is named, as before")
+
     def test_the_command_in_the_bootstrap_guide_is_the_command_this_option_serves(self):
         text = (ROOT / "adoption" / "bootstrap.md").read_text(encoding="utf-8")
         self.assertIn('claude --mcp-config "$(python3 tools/adoption/install_claude_profile.py --print-mcp-config)"', text)

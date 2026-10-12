@@ -26,7 +26,9 @@
 
 `--print-mcp-config [TEMPLATE]` is not a step: it prints the servers of TEMPLATE (default adoption/mcp/claude-code-navigation.json, the on-demand code-navigation set that is not registered at user scope)
 rendered for this host, as the JSON `claude --mcp-config` takes, and stops without writing or registering anything:
-`claude --mcp-config "$(python3 tools/adoption/install_claude_profile.py --print-mcp-config)"`.
+`claude --mcp-config "$(python3 tools/adoption/install_claude_profile.py --print-mcp-config)"`. `--server NAME` (repeatable) prints only the named servers, in the file's order, and an unknown name fails.
+The flag matters because `--mcp-config` replaces a server of the same name that is registered at user scope (measured on client 2.1.296: the on-demand SocratiCode entry, which cannot start on the first host,
+turned that host's working registration into a failed one), so a host loads only the entries that start there.
 
 A caller that wires only part of the profile narrows each step without changing its defaults:
 `--hook NAME` (repeatable) installs only the named files of the hook map (or of the held-out carriers) in the guard step, `--agent NAME`
@@ -382,9 +384,11 @@ def default_eco_root(home: Path) -> Path:
     return Path(env_root) if env_root else home / ".local" / "share" / "codex-ecosystem"
 
 
-def render_servers(data: dict, home: Path, eco_root: Path) -> dict:
+def render_servers(data: dict, home: Path, eco_root: Path, source: Path | None = None) -> dict:
     """Substitute the template's ${HOME} and ${ECO_ROOT} placeholders in every
-    server's url, command, args and env values; any other placeholder fails."""
+    server's url, command, args and env values; any other placeholder fails.
+    The error names `source`, the file being rendered (the user-scope template by default)."""
+    shown = (MCP_TEMPLATE if source is None else Path(source)).name
     values = {"HOME": str(home), "ECO_ROOT": str(eco_root)}
 
     def render(value):
@@ -392,7 +396,7 @@ def render_servers(data: dict, home: Path, eco_root: Path) -> dict:
             try:
                 return string.Template(value).substitute(values)
             except (KeyError, ValueError) as error:
-                raise InstallError(f"{MCP_TEMPLATE.name}: cannot render {value!r} ({error})") from None
+                raise InstallError(f"{shown}: cannot render {value!r} ({error})") from None
         if isinstance(value, list):
             return [render(item) for item in value]
         if isinstance(value, dict):
@@ -421,7 +425,7 @@ def install_mcp_servers(claude_bin: str, dry_run: bool, home: Path, eco_root: Pa
     template = MCP_TEMPLATE if template is None else template
     if not template.is_file():
         raise InstallError(f"missing template: {template}")
-    servers = render_servers(json.loads(template.read_text()), home, eco_root)
+    servers = render_servers(json.loads(template.read_text()), home, eco_root, template)
     results = []
     for name, spec in servers.items():
         server_type = spec.get("type", "stdio")
@@ -487,12 +491,14 @@ def build_parser() -> argparse.ArgumentParser:
                          help="Print the servers of TEMPLATE (default: adoption/mcp/claude-code-navigation.json, the on-demand "
                               "code-navigation set) rendered for this host as JSON for `claude --mcp-config`, and stop: "
                               "nothing is written or registered, and no step runs")
+    parser.add_argument("--server", action="append", default=None, metavar="NAME",
+                         help="With --print-mcp-config: print only the named server (repeatable), in the file's order; an unknown name fails")
     parser.add_argument("--dry-run", action="store_true", help="Report what would happen; write and register nothing")
     return parser
 
 
-def printed_mcp_config(template: Path, home: Path, eco_root: Path) -> str:
-    """The `{"mcpServers": {...}}` JSON of `template` with ${HOME} and ${ECO_ROOT} rendered: the shape `claude --mcp-config` takes."""
+def printed_mcp_config(template: Path, home: Path, eco_root: Path, servers: list[str] | None = None) -> str:
+    """The `{"mcpServers": {...}}` JSON of `template` with ${HOME} and ${ECO_ROOT} rendered: the shape `claude --mcp-config` takes. `servers` keeps only the named entries, in the file's order."""
     try:
         data = json.loads(template.read_text(encoding="utf-8"))
     except OSError as error:
@@ -501,18 +507,25 @@ def printed_mcp_config(template: Path, home: Path, eco_root: Path) -> str:
         raise InstallError(f"{template} is not JSON: {error}") from None
     if not isinstance(data, dict) or not isinstance(data.get("mcpServers"), dict):
         raise InstallError(f"{template} has no mcpServers table")
-    return json.dumps({"mcpServers": render_servers(data, home, eco_root)}, indent=2)
+    if servers:
+        unknown = sorted(set(servers) - set(data["mcpServers"]))
+        if unknown:
+            raise InstallError(f"{template.name} has no server named {', '.join(unknown)} (it has {', '.join(data['mcpServers'])})")
+        data = {**data, "mcpServers": {name: spec for name, spec in data["mcpServers"].items() if name in servers}}
+    return json.dumps({"mcpServers": render_servers(data, home, eco_root, template)}, indent=2)
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
+    if args.server and args.print_mcp_config is None:
+        parser.error("--server needs --print-mcp-config")
     if args.print_mcp_config is not None:
         if args.only or args.hook or args.agent or args.replace_mcp or args.remove_workflows or args.mcp_template or args.dry_run:
             parser.error("--print-mcp-config runs no step: it cannot be combined with --only, --hook, --agent, --replace-mcp, --remove-workflows, --mcp-template or --dry-run")
         home = Path(args.home)
         try:
-            print(printed_mcp_config(Path(args.print_mcp_config), home, Path(args.eco_root) if args.eco_root else default_eco_root(home)))
+            print(printed_mcp_config(Path(args.print_mcp_config), home, Path(args.eco_root) if args.eco_root else default_eco_root(home), args.server))
         except InstallError as error:
             print(f"install failed: {error}", file=sys.stderr)
             return 1

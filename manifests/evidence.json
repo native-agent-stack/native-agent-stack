@@ -5372,8 +5372,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "d8545836765239aea794e1cb3b191af9e0a42bbd7358b5e77e7d2cf3c5031b6f",
-      "bytes": 77456
+      "sha256": "590ba3639bfad8366c3306c2f258b399ae3bfb75efac5dcf3af49553b5ad1b74",
+      "bytes": 78681
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -5497,13 +5497,13 @@
     },
     {
       "path": "adoption/mcp/claude-code-navigation.json",
-      "sha256": "018c20fb31bec0668f2a6d69efe32a2b9d1335638312fcf04a95f5b6a3a87fbf",
-      "bytes": 2981
+      "sha256": "f7c07c4e3601c88d48fb3f7cede577b9343ab6fb3ead8d29ff1f3d39fd772546",
+      "bytes": 3715
     },
     {
       "path": "adoption/mcp/claude-user.json",
-      "sha256": "01206b87ed1408b8cf92ab3ed43df1220389e0caa492793d796f31a05d576964",
-      "bytes": 7571
+      "sha256": "e6ed5f757151df36650e53c72c6f3433383428b729476ad79a2d472699138baa",
+      "bytes": 7641
     },
     {
       "path": "adoption/mcp/runtime-token-layer.json",
@@ -5527,8 +5527,8 @@
     },
     {
       "path": "adoption/new-wsl/client-config-map.json",
-      "sha256": "3b4bba2956f19e40e32966cdc29d36e8c388818414169c6d4859d050c67b465a",
-      "bytes": 55434
+      "sha256": "093af25173024a5bb3d70d2692f1a7ba9a9be6d581f929b8d44658f68fe9c8a0",
+      "bytes": 57829
     },
     {
       "path": "adoption/new-wsl/codex-user-instructions.md",
@@ -5602,13 +5602,13 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
-      "sha256": "6ef7140eab6ca92485aeda946362fec655385a22b651a6f34e026961688e8ed5",
-      "bytes": 30359
+      "sha256": "ddbec7d612a3270374ce9684daa80715746568a3ccfd9fe2bd239882168de638",
+      "bytes": 30527
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "ba9152882aaaccc27fc3ff0228b53a59117c9b85147cd142824695ddbee313be",
-      "bytes": 67387
+      "sha256": "a098e5d8b69ab00e871f22925f680df6f6b60bf4f8df37fb7018bcd8285173c7",
+      "bytes": 67565
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -18343,8 +18343,8 @@
     },
     {
       "path": "docs/decisions/2026-10-02-new-wsl-client-configuration.md",
-      "sha256": "f2be1efa9f33fc34525e35452a4484cb805d4b45b477be4594aa7ffa453c3a3d",
-      "bytes": 151673
+      "sha256": "71a48f22142986088952db6dc67b7a5f4ba6c2c800f720a07f72fa2d49e60921",
+      "bytes": 152214
     },
     {
       "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
@@ -18993,8 +18993,8 @@
     },
     {
       "path": "docs/decisions/2026-10-12-code-navigation-on-demand.md",
-      "sha256": "a6ab7d7e9d39b3cbc4d7fad58b13571fb6d6ddafba32cbf40115f6f67f47636f",
-      "bytes": 20569
+      "sha256": "02b1f37dcc60ea658d8c48a47edf18f3b7585d79093640d5475871d99f361976",
+      "bytes": 25887
     },
     {
       "path": "docs/decisions/2026-10-12-converged-candidates-only.md",
@@ -19483,8 +19483,8 @@
     },
     {
       "path": "docs/token-efficiency-stack.json",
-      "sha256": "6c3927880b64c27b2e84dbde7ecb07acfdfe7701d8ed1056230937c7586dc315",
-      "bytes": 595363
+      "sha256": "a3538127b876c630f14bca9c795d7a7a2ede7c59f5b1a064ac6214c8452a92dc",
+      "bytes": 595605
     },
     {
       "path": "docs/token-efficiency-stack.md",
@@ -62473,8 +62473,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "d38d482a6012b6fedf842b007d97446994cf7b6ffadeac1ac37d92b96a53da41",
-      "bytes": 178913
+      "sha256": "2a70e005733ece42de70692906d40c0f6c5e09ff74d63dc89c7b203d3958f9e3",
+      "bytes": 182031
     },
     {
       "path": "tests/test_install_skills.py",
@@ -62768,8 +62768,8 @@
     },
     {
       "path": "tests/test_new_wsl_client_config.py",
-      "sha256": "2c7d823e6d58857a04fa1f1737b479d37e0e8abf937b75127f984374202ed006",
-      "bytes": 347879
+      "sha256": "d2eb55428a23fcc55ed00811a5211f7f3c78c3f03b817adfb48b639422e322af",
+      "bytes": 356423
     },
     {
       "path": "tests/test_new_wsl_definitive_defaults.py",
@@ -63443,8 +63443,8 @@
     },
     {
       "path": "tools/adoption/install_claude_profile.py",
-      "sha256": "860c409b52c47f5118ae3974ebf4409463fd9266911e9b620f927cea035994ed",
-      "bytes": 28520
+      "sha256": "b2ea5d140e2b923ab211f7bc1d125c0d73f40e47220afaff2cefdad2cb94edf7",
+      "bytes": 29939
     },
     {
       "path": "tools/adoption/install_skills.py",
@@ -63463,8 +63463,8 @@
     },
     {
       "path": "tools/adoption/new_wsl_client_config.py",
-      "sha256": "39e0117f266941b660dc4819891c18012a4935dcc4fb9624c5e56272e91d64b6",
-      "bytes": 166110
+      "sha256": "228b49c1056c39f32e9f218618df538fe0cb20cb6db43d36c772f09b51abfdfe",
+      "bytes": 167557
     },
     {
       "path": "tools/adoption/prove_codex_lane.py",

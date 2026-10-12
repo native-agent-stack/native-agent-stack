@@ -3,13 +3,13 @@
 Status: decided by the command center's ruling on the E1 comparison (RULED at 2026-10-12T09:47:08Z) and its addendum 01 on deviation D3 (2026-10-12T17:10:08Z); private records `ruling-e1-code-navigation-outcome-20261012.md` and
 `.addendum-01.md` under `coordination/command-center/research-cc-role-20261008/`. This record carries the
 evidence and the change to the templates. The stored client configuration of the host, the vendor-installed hooks and the vendor-installed agent files are changed by the command center after this lands, with an install
-receipt, never by this change (host steps below).
+receipt, never by this change (the host handoff below).
 
 ## Context
 
 The Claude Code user-scope profile (`adoption/mcp/claude-user.json`, plus the new WSL distribution's `claude-user.mcp.additions.json`) registered the code-navigation servers `serena`, `socraticode`,
-`codebase-memory-mcp`, `jcodemunch` and (in the additions) `semble` at user scope, so every session of the host started with their server instructions (each tells the model to use it first for code navigation) and
-their tool names loaded. The Claude-family practice audit counted eight always-on instruction blocks of 8,103 characters with four competing "use me first" claims (CPA-C-007, CPA-V-36).
+`codebase-memory-mcp`, `jcodemunch` and (in the additions) `semble` at user scope, so every session of the host started with their tool names loaded and, for `serena`, `codebase-memory-mcp` and `semble`, with a server instruction block that tells the model to use that server first for code
+navigation (SocratiCode sends no instruction block). The Claude-family practice audit counted eight always-on instruction blocks of 8,103 characters with four competing "use me first" claims (CPA-C-007, CPA-V-36).
 
 E1 (code navigation under worktree-per-task) asked which change makes those tools get used, correctly, in a per-task worktree session, at no loss of correctness and no gain in cost. Its record is private; the
 configs and tools that run it are public (`blueprints/native-skill-practice/e-series/`, [decision record](2026-10-12-e-series-promptfoo-configs.md)). Twelve frozen questions of one repository (definition, call sites,
@@ -35,21 +35,25 @@ codebase-memory-mcp (`directives/path.md`); each is the only content of `CLAUDE.
 | Arm | Runs | Correct | Used a code-navigation tool (questions of 12; runs) | Median cost (USD) | Median seconds | Median turns |
 | --- | --- | --- | --- | --- | --- | --- |
 | A0a, the runner's reference (no paragraph) | 36 | 31 | 0; 0 | 0.0742 | 21.0 | 4.0 |
-| A0a, matched: the same configuration (addendum 3) | 36 | 25 | 0; 0 | 0.0784 | 14.7 | 4.0 |
+| A0a, matched: the same configuration (addendum 3) | 36 | 33 (25 as first graded) | 0; 0 | 0.0784 | 14.7 | 4.0 |
 | A1, Serena's paragraph | 36 | 34 | 12; 35 | 0.0917 | 22.2 | 5.0 |
-| A3, the path paragraph | 36 | 20 | 2; 7 | 0.0930 | 18.4 | 4.5 |
+| A3, the path paragraph | 36 | 34 (20 as first graded) | 2; 7 | 0.0930 | 18.4 | 4.5 |
+
+The correct counts are those of the grader after deviation D4 of [the e-series change](2026-10-12-e-series-promptfoo-configs.md): the first grading scored an answer wrong when it cited `<root>/trees/base/<file>` with the right lines (the
+stale-start arms' prompt names that tree), because `norm` dropped only the private runner's `/wt/` and `/primary/` directories; the stored results were graded again with the root-aware `norm`, unchanged otherwise.
 
 Read by the preregistered rule (section 6 of the comparison's preregistration): A1 meets (iii) (use on 12 of 12 questions). The runner's A0a ran on another route (the parity cell found promptfoo costing +3.5 and +8.2 percent
 over the runner on two questions), so (i) and (ii) are read against an A0a run through the same configuration: 36 runs from 20:04Z to 20:25Z, pre-flight 5 of 5 before and after (end gate 20:28:18Z), fixed in addendum 3 of
-the comparison's record before the first run. Against it A1 meets (i) (34 correct against 25) and fails (ii): median cost 0.0917 against 0.0784 USD, a ratio of 1.170 against the limit of 1.10 (1.24 against the runner's A0a).
-A3 fails (i) and (iii). The outcome fixed in advance for this case: the paragraph makes the tools get used, correctly, at a cost the rule does not allow; no default changes and the carrying-cost reading of FIX-3 stands. So
+the comparison's record before the first run. Against it A1 meets (i) (34 correct against 33; 34 against 25 as first graded) and fails (ii): median cost 0.0917 against 0.0784 USD, a ratio of 1.170 against the limit of 1.10 (1.24 against the runner's A0a).
+A3 fails (iii) (use on 2 of 12 questions) and meets (i) (34 against 33). The outcome fixed in advance for this case: the paragraph makes the tools get used, correctly, at a cost the rule does not allow; no default changes and the carrying-cost reading of FIX-3 stands. So
 a delivered paragraph does change use: the claim withdrawn by addendum 01 is replaced by "Serena's paragraph makes the tools get used on single-symbol lookups, at a cost that (ii) does not allow".
 
-A lead, not a result (our own measurement is one angle, A6, under the command center's multi-angle ruling of 2026-10-12, tool clock 20:31Z, `ruling-multi-angle-convergence-20261012.md`): the matched A0a is 6 correct answers below the runner's A0a (25 against 31: the "explain" questions 0 of 9 against 4 of 9, one each on
-definition and call sites), its median cost is 5.7 percent above the runner's and none of its runs used a code-navigation tool, so the route check of addendum 3 reports no difference. A1's extra correct answers are
-concentrated on the "explain" questions (7 of 9 against 0 of 9). A1's median time is 22.2 s against 14.7 s. The cost per correct answer favours A1: 0.0962 USD against 0.1105 USD for the matched A0a (total cost 3.271 and
-2.763 USD). The rule above does not read cost per correct answer, and 36 runs per arm over 12 questions do not support more than a lead. It seeds one new preregistered comparison, with cost per correct answer as the primary
-metric, stratified by question type, and the directive delivered only when the tools are loaded on demand; that comparison is written before any run and goes through the command center. This change does not wait for it.
+**Correction (deviation D4, found by the first full read of the e-series change, 2026-10-12).** An earlier version of this record read a lead into the first grading: the matched A0a 6 correct answers below the runner's
+(25 against 31), the "explain" questions 0 of 9 for it against 7 of 9 for A1, and a lower cost per correct answer for A1 (0.0962 against 0.1105 USD). The three came from the path defect above. Graded again (`e1_decide.load_runs`
+with the root-aware `norm`, the stored results unchanged), the matched A0a has 33 correct (explain 6 of 9), 2 above the runner's 31, so the route check of addendum 3 finds no difference in correctness, cost or tool use; A1 has
+34 (explain 7 of 9, one answer apart); the cost per correct answer is 0.0837 USD for the matched A0a against 0.0962 USD for A1, and by question type A1 is higher on `def`, `refs` and `callers` and lower on `explain` (0.1266
+against 0.1432), at n = 9 per cell. No lead remains, and the preregistered comparison the first reading seeded was withdrawn before any run (the command center's ruling of 2026-10-12, on this re-grade). Our own measurement
+is one angle, A6, under the command center's multi-angle ruling of 2026-10-12 (tool clock 20:31Z, `ruling-multi-angle-convergence-20261012.md`): for this layer it reads "no measured benefit". The rule outcomes above stand.
 
 This change does not adopt a directive arm: FIX-3 is the ruling, the paragraph is the only memory content of the session in that comparison (more salient than in production), and the production-like arm is not measured.
 
@@ -58,20 +62,24 @@ This change does not adopt a directive arm: FIX-3 is the ruling, the paragraph i
 1. **`serena`, `socraticode` and `codebase-memory-mcp` leave `adoption/mcp/claude-user.json`; `semble` leaves the distribution's `claude-user.mcp.additions.json`.** The shared template registers `ai-memory`, `headroom`, `qmd` and
    `jcodemunch`. `jcodemunch` stays: [the 2026-10-04 record](2026-10-04-new-wsl-jcodemunch-user-scope.md) reserves removing it, or narrowing its scope in the default, to the user's instruction, and the command center
    has ruled that its E1 ruling does not carry that instruction. If the user gives it before the first read of this change starts, it joins this commit on the command center's record; otherwise it is a follow-up.
-2. **The five entries move unchanged into a new on-demand file, `adoption/mcp/claude-code-navigation.json`.** A session that needs them (cross-file refactors, impact analysis, graph questions) loads them for that
+2. **The four entries move into a new on-demand file, `adoption/mcp/claude-code-navigation.json`, with the values they had.** A session that needs them (cross-file refactors, impact analysis, graph questions) loads them for that
    session only: `claude --mcp-config "$(python3 tools/adoption/install_claude_profile.py --print-mcp-config)"`. The new `--print-mcp-config [TEMPLATE]` option renders the file's `${HOME}` and `${ECO_ROOT}`
-   placeholders for the host and prints the JSON `claude --mcp-config` takes; it runs no step, registers nothing and writes nothing. A project that wants one of them every time registers it with
+   placeholders for the host and prints the JSON `claude --mcp-config` takes; it runs no step, registers nothing and writes nothing. `--server NAME` (repeatable) prints only the named entries, because a server loaded by
+   `--mcp-config` replaces a registered server of the same name for that session (measured below). A project that wants one of them every time registers it with
    `claude mcp add --scope local`, as for jCodeMunch (`adoption/bootstrap.md` step 4a). The Claude allow rules for semble's two tools stay in `claude.settings.additions.json`: inert while the server is not loaded.
+   On a new WSL distribution host the file is rendered, not printed from the template: `new_wsl_client_config.py --render` writes `mcp-servers.on-demand.json` with the overrides the map gives each entry, as it renders the registered servers
+   (Serena's command from the settings `PATH`, SocratiCode's pinned entry point under `tools/socraticode-1.15.0/` and the host's Qdrant and embedding endpoints), and `--print-mcp-config` prints that file. The template's own values
+   (`${ECO_ROOT}/bin/socraticode`, the shared endpoints) are what every other host gets.
 3. **The token-lane carrier blocks are unchanged.** They name `serena`, `socraticode` and `codebase-memory-mcp` tools; the existing coverage test requires every server a carrier names to be registered or a sourced
    exception, so `CARRIER_EXCEPTIONS` of `tests/test_install_claude_profile.py` now lists the three, each with the phrase in `adoption/bootstrap.md` and in this record that says why. The blocks already say "if exposed"
    (main session) and load their tools by one `ToolSearch` call, which finds nothing for a server that is not loaded; shrinking their text is a follow-up that needs the handbook and the hook tests with it.
 4. **The Codex templates are untouched**: E1 measured Claude Code sessions only.
 5. **The always-on instruction blocks shrink with the servers.** The ruling's "the always-on instruction blocks shrink to match" is the servers' own instruction text: the session header of 2026-10-12 lists eight server blocks
-   (agentsview, ai-memory, codebase-memory-mcp, grafana, jcodemunch, qmd, semble, serena), and five remain once the host steps are done (SocratiCode contributes none). The hook-injected carrier blocks of decision 3 are a
+   (agentsview, ai-memory, codebase-memory-mcp, grafana, jcodemunch, qmd, semble, serena), and five remain once the host handoff is done (SocratiCode contributes none). The hook-injected carrier blocks of decision 3 are a
    different text and stay.
 6. **Scope limit, stated where the change is read.** E1 tested single-symbol lookups in worktree sessions of one repository (Python symbols, medium effort). Other task classes, such as cross-file refactors and impact
    analysis, were not measured and keep the on-demand path. The carrying cost was measured for the four servers together (the share of each is unknown) and `socraticode` was not in the comparison (its index belongs to
-   the shared checkout); its removal rests on the ruling and on the same mechanism (a use-me-first instruction block and tool names loaded for every session).
+   the shared checkout); its removal rests on the ruling and on the tool names and descriptions it loads into every session. It has no instruction block, so it was never one of the competing "use me first" claims.
 
 ## The agents whose tools sit in the on-demand set
 
@@ -85,46 +93,67 @@ So in a session started with the on-demand file every agent below has its tools 
 | `isolated-builder` | `adoption/agents/claude/` | 6 Serena, 3 SocratiCode | the same |
 | `security-reviewer` | `adoption/agents/claude/` | 7 Serena, 4 SocratiCode | the same |
 | `stack-researcher` | `adoption/agents/claude/` | 4 Serena | the same |
-| `codebase-memory`, `codebase-memory-auditor`, `codebase-memory-scout` | vendor-installed on the host (`~/.claude/agents`), not in any template | `mcp__codebase-memory-mcp__*` (besides Read, Grep, Glob) | Read, Grep and Glob only; the graph questions they exist for go unserved (host step 3) |
+| `codebase-memory`, `codebase-memory-auditor`, `codebase-memory-scout` | vendor-installed on the host (`~/.claude/agents`), not in any template | `mcp__codebase-memory-mcp__*` (besides Read, Grep, Glob) | Read, Grep and Glob only; the graph questions they exist for go unserved (handoff step 6) |
 | `semble-search` | vendor-installed on the host | none: Bash and Read, running the `semble` command line | unaffected |
 
 Measured on the installed client (2.1.296, `haiku`, one run per arm, an empty directory, `--setting-sources local --strict-mcp-config`, a probe agent passed with `--agents` whose tools are `Read` and one `codebase-memory-mcp` tool):
 with `--mcp-config` set to the `codebase-memory-mcp` entry of the printed config the subagent called the tool and returned its output (project list); without the option it launched, reported the tool absent and listed `Read`
 (private record `research/cc-native-practice-20261009/fix-3-20261012/agent-probe/`). One run per arm: the catalog agents themselves, Serena and SocratiCode were not run.
 
+**A server loaded by `--mcp-config` replaces a registered server of the same name for that session.** `CHANGELOG.md` L7929 (2.0.30) says "Fixed `--mcp-config` flag to correctly override file-based MCP configurations"; measured on the
+installed client (2.1.296, one run each, `haiku`, one turn, `--setting-sources user`, an empty directory, the init event's `mcp_servers`): without the option the host's registered `socraticode` is listed as pending (its connection had not
+finished at the event; `claude mcp list` shows the registration connected), and with `--mcp-config` holding only the on-demand `socraticode` entry, whose `${ECO_ROOT}/bin/socraticode` is absent on this host, it is listed as failed.
+Loading the shared template's SocratiCode entry therefore broke the working registration for that session; the rendered file carries the pinned entry point and the host's endpoints instead (`OnDemandRenderTests` starts the emitted
+command in the distribution's layout, which has no `bin/socraticode`, with endpoints other than the shared ones, and shows the template's entry failing with MODULE_NOT_FOUND). `--server` stays for a host that wants a subset.
+
 The vendor's way to give an agent its own server is the `mcpServers` frontmatter field: "Inline servers defined here are connected when the subagent starts ... and disconnected when it finishes", and "to keep an MCP
 server out of the main conversation entirely and avoid its tool descriptions consuming context there, define it inline here rather than in `.mcp.json`" (https://code.claude.com/docs/en/sub-agents, "Scope MCP
 servers to a subagent", read 2026-10-12; in the client since 2.1.117 for a main-thread agent, `anthropics/claude-code@3deb8736` `CHANGELOG.md` L5601, with the subagent and `--strict-mcp-config` rules at 2.1.153,
 L4783-L4784, and the folder-trust rule for project agent files at 2.1.238, L3138). It is not used for the four catalog agents: the server connects at every spawn of the agent, and these reviewers and builders are spawned
-often, so each spawn would pay the start-up that E1 measured per session. It fits the three `codebase-memory` agents, whose only purpose is graph questions; that is a host edit of vendor-installed files (host step 3).
+often, so each spawn would pay the start-up that E1 measured per session. It fits the three `codebase-memory` agents, whose only purpose is graph questions; that is a host edit of vendor-installed files (handoff step 6).
 
-## Host steps (the command center's act after landing, with an install receipt; none is run here)
+## Host handoff (the command center's act after landing, with an install receipt; none is run here)
 
-1. `claude mcp remove <name> -s user` for `serena`, `socraticode`, `codebase-memory-mcp` and `semble`, all four registered on the first host (the value-free report `tools/adoption/mcp_template_drift.py` with this change
-   applied, run 2026-10-12, lists each as an unacknowledged LIVE-ONLY row and nothing else open; check with `claude mcp list` afterwards). Keep the live command lines first if they are wanted again: `serena` runs as
-   `serena` from `PATH` (12 arguments), `socraticode` through `npx` (3 arguments; SocratiCode 1.16.0 according to [the reconciliation record](2026-10-12-mcp-template-live-reconciliation.md#values-that-differ)), `semble` and
-   `codebase-memory-mcp` by their plain commands. Until then the report's four open rows are the pending step, so no acknowledgement row is added. Do `socraticode` last: see step 6.
-2. CPA-V-36: the codebase-memory hooks the vendor installed in the host's settings (four SessionStart entries, SubagentStart, PreToolUse) and Serena's opt-in activate hook are absent from every template and inject text
+One order, with the recovery in it. The replacement is rendered and accepted while the live registrations still work, and they are removed only after it passes. Rerunning the profile installer is not a step: it visits only the
+servers present in its input and never prunes a registration, so it cannot complete the removal (`install_claude_profile.py`, the `--only mcp` loop).
+
+1. **Capture** each live registration as JSON into a private file (owner-readable, outside every repository; see Rollback): `serena` runs as `serena` from `PATH` (12 arguments), `socraticode` through `npx` (3 arguments;
+   SocratiCode 1.16.0 according to [the reconciliation record](2026-10-12-mcp-template-live-reconciliation.md#values-that-differ)), `semble` and `codebase-memory-mcp` by their plain commands. The value-free report
+   `tools/adoption/mcp_template_drift.py` with this change applied (run 2026-10-12) lists each as an unacknowledged LIVE-ONLY row and nothing else open; no acknowledgement row is added, so those four rows are the pending step.
+2. **Render** the host's files with the command that rendered its registrations: `python3 tools/adoption/new_wsl_client_config.py --render --host <host> --out <dir>`. `<dir>/mcp-servers.on-demand.json` holds the four with the
+   host's values. SocratiCode's entry is the distribution's pin (1.15.0, `tools/socraticode-1.15.0/lib/node_modules/socraticode/dist/index.js`, present on the first host), not the live registration's 1.16.0: bumping the pin
+   is the version owner's change to the map, not this one.
+3. **Accept** while the live registrations stand: start a session with `claude --strict-mcp-config --mcp-config "$(python3 tools/adoption/install_claude_profile.py --print-mcp-config <dir>/mcp-servers.on-demand.json)"`
+   (`--strict-mcp-config`, so that no registration masks a failure) and see the four connected in `/mcp`, or call one tool of each. If any does not connect, stop: nothing has been changed.
+4. **Remove** the live registrations: `claude mcp remove <name> -s user` for `serena`, `socraticode`, `codebase-memory-mcp` and `semble`; check with `claude mcp list` and with the drift report (no LIVE-ONLY row for them).
+5. CPA-V-36: the codebase-memory hooks the vendor installed in the host's settings (four SessionStart entries, SubagentStart, PreToolUse) and Serena's opt-in activate hook are absent from every template and inject text
    about tools that are no longer loaded; remove them with the servers or keep them on purpose.
-3. The three `codebase-memory*` agent files: give each an inline `codebase-memory-mcp` entry under `mcpServers` (the entry of the on-demand file, rendered), or leave them to sessions that load the on-demand file.
-4. The new WSL distribution's render no longer carries the four Claude pieces (`client-config-map.json` loses their entries); a rebuilt host gets the user-scope set above and the on-demand file as a template only.
-5. `jcodemunch` stays registered until the user's instruction.
-6. `socraticode`: the on-demand entry names `${ECO_ROOT}/bin/node` and `${ECO_ROOT}/bin/socraticode`, and the second does not exist on the first host; the live registration runs SocratiCode through `npx` (3 arguments,
-   1.16.0 according to the reconciliation record). Before step 1 removes that registration, either keep it until the version owner's entry replaces the on-demand one, or accept that `socraticode` does not start on
-   demand on this host until then. The entry is the version owner's to bump; E1 did not measure `socraticode`.
+6. The three `codebase-memory*` agent files: give each an inline `codebase-memory-mcp` entry under `mcpServers` (the entry of the rendered on-demand file), or leave them to sessions that load the on-demand file.
+7. `jcodemunch` stays registered until the user's instruction.
+8. **Receipt**: record the outcome as the install receipt (value-free: the commands, their exit codes, the four servers connected in step 3, the drift report after step 4).
+9. **Recovery**: before step 4 nothing has changed. After it, a registration is restored from its captured file (Rollback) and the drift report shows its row again.
 
-## What the on-demand entries do not do yet
+## Rollback
 
-They are the shared template's entries, as the installer registered them. The new WSL distribution's overrides for the registered entries (Serena by `serena` from the settings `PATH`, SocratiCode's pinned entry point and the host's
-Qdrant and embedding endpoints) are not applied to them, and `new_wsl_client_config.py` renders no on-demand file. On the first host `${ECO_ROOT}/bin/serena`, `bin/codebase-memory-mcp` and `semble` exist; `${ECO_ROOT}/bin/socraticode`
-does not (the live registration runs SocratiCode through `npx`), so the on-demand `socraticode` entry needs the version owner's entry before its first use here. Both are follow-ups, outside this change: E1 did not measure
-`socraticode`, and the version owner decides its entry.
+- **Template path, one command each:** `git revert` the merge commit of this change and run `python3 tools/adoption/install_claude_profile.py --only mcp`, which registers the four servers again from the restored user-scope
+  template (a server already registered is reported as matching or left unchanged); or, without reverting, `python3 tools/adoption/install_claude_profile.py --only mcp --mcp-template adoption/mcp/claude-code-navigation.json`,
+  which registers the on-demand entries at user scope. Both restore the template's values, not this host's live ones (`serena` run from `PATH`, SocratiCode through `npx`).
+- **Live values:** before the removal (handoff step 1), capture each server's registration as JSON into a private file that is not in any repository and is readable by the owner only (it can hold environment values):
+  `jq '.mcpServers["serena"]' ~/.claude.json`, once per name. Restore one with `claude mcp add-json --scope user serena "$(cat <that file>)"` (`add-json` is in `CHANGELOG.md` L8759 and answers
+  `claude mcp add-json --help` on 2.1.296). `claude mcp get <name>` prints the same values as text, which `add-json` does not take.
+
+## What the on-demand file does and does not carry
+
+On a new WSL distribution host it carries the map's overrides (step 2 of the handoff); on any other host it carries the shared template's values, as the registered entries did: `${ECO_ROOT}/bin/serena`, `bin/codebase-memory-mcp`
+and `semble` exist on the first host, and `${ECO_ROOT}/bin/socraticode` does not on a host the install plan built, which is why the file is rendered there. SocratiCode's version (the plan pins 1.15.0; the live registration runs 1.16.0 through
+`npx`) is the version owner's to bump; E1 did not measure `socraticode`.
 
 ## Records this changes
 
 - [2026-10-12-mcp-template-live-reconciliation.md](2026-10-12-mcp-template-live-reconciliation.md), decision 1: the code graph server keeps the vendor's key `codebase-memory-mcp` in the Codex template and in the on-demand file; the
   Claude user-scope template no longer carries it. Its acknowledged row for Claude `socraticode` (DIFFERS) is removed in this change, since the server is no longer rendered; the Codex rows stay.
-- [2026-10-02-new-wsl-client-configuration.md](2026-10-02-new-wsl-client-configuration.md): the counts (399 pieces, 359 wired), the agents' gaps table (the four agents above) and an addendum.
+- [2026-10-02-new-wsl-client-configuration.md](2026-10-02-new-wsl-client-configuration.md): an addendum (the four pieces are a group of their own, `claude/mcp-on-demand`, rendered to `mcp-servers.on-demand.json`; the counts are the ones before this change,
+  403 pieces and 363 wired) and the agents' gaps table (the four agents above).
 - The 2026-09-30 sentence in `adoption/mcp/claude-user.json`, that the file registers every server the carrier blocks name except context-mode, no longer holds for `serena`, `socraticode` and `codebase-memory-mcp`: the file's own comment
   says so, and `CARRIER_EXCEPTIONS` records why that is allowed.
 
@@ -144,9 +173,10 @@ measured cost; `socraticode` as an arm; the carrier text; the production-like ar
 
 ## Overturn conditions
 
-- A comparison on cross-file or impact tasks in which the servers' absence costs correctness: restore them for that task class (a profile, or the user-scope set).
+- A comparison on cross-file or impact tasks in which the servers' absence costs correctness reopens the question for that task class (a profile, or the user-scope set). Under the multi-angle ruling a comparison is one angle
+  (A6), so the question is decided across the angles, not by that comparison alone.
 - A larger repeat, or a production-like arm (the repository's own instructions around the paragraph), in which Serena's paragraph keeps (i) and (iii) and brings the median cost to at most 1.1 times the matched A0a's (1.170 at
-  36 runs per arm): Serena with a directive then meets the three criteria for single-symbol lookups, and the always-on question reopens for that task class with the directive as the lever.
+  36 runs per arm) reopens the always-on question for single-symbol lookups, with the directive as the lever; it is again one angle (A6), decided across the angles.
 - The user's instruction on `jcodemunch` (2026-10-04 record), either way.
 
 ## Sources
@@ -154,6 +184,8 @@ measured cost; `socraticode` as an arm; the carrier text; the production-like ar
 - E1 comparison records (private, cc-native-practice): `E1-PREREGISTRATION.md`, addenda 1 and 2, `delivery-probe-20261012/RESULT.md`; the command center's ruling and addendum 01 of 2026-10-12.
 - `docs/decisions/2026-10-12-e-series-promptfoo-configs.md` (the configs and D3), `docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md` (the overturn clause), `docs/decisions/2026-09-23-claude-user-profile.md`
   (the 2026-09-25 precedent: jCodeMunch registered per project because its instruction loaded into every session).
+- The command center's multi-angle ruling, `ruling-multi-angle-convergence-20261012.md` (tool clock 20:31Z): our own measurement is angle A6, one of six, and admits or rejects nothing alone. The private override probe of this record
+  (init events of two sessions, 2026-10-12) is in the cc-native-practice record `fix-3-20261012/`.
 - `claude --help` of the installed client 2.1.296: `--mcp-config <configs...>  Load MCP servers from JSON files or strings (space-separated)`, which is what `--print-mcp-config` feeds; read 2026-10-12.
 - https://code.claude.com/docs/en/sub-agents ("Scope MCP servers to a subagent", "Trust required for inline MCP servers"), read 2026-10-12; `anthropics/claude-code@3deb873687379f0c199a69fdaccc65f0865f7a29`
   `CHANGELOG.md` L5601, L4783-L4784, L3138.

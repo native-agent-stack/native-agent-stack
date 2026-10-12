@@ -549,9 +549,11 @@ GitHub-hosted macOS runner; see
      mcp get <name>` already reports a matching transport, command/URL, args
      and env variable names (values are not compared -- the running host owns
      them). `adoption/mcp/claude-user.json` changed after `v2026.10.05.1`:
-     SocratiCode's model and dimensions name Nemotron-3-Embed-8B/4096; its
-     endpoint values retain the portable host-example defaults. A target
-     host's registration supplies its own Qdrant and embedding endpoints.
+     SocratiCode's model and dimensions name Nemotron-3-Embed-8B/4096, with its
+     endpoint values at the portable host-example defaults, and since
+     2026-10-12 that entry is in the on-demand file below, not in this
+     template. A target host's registration supplies its own Qdrant and
+     embedding endpoints.
      A same-named server with a different config is reported and left
      unchanged unless `--replace-mcp` is given. That flag re-registers every
      differing server, including an `ai-memory` entry that names this host's
@@ -565,9 +567,12 @@ GitHub-hosted macOS runner; see
      then
      `claude mcp add --scope user --transport http ai-memory http://127.0.0.1:<port>/mcp`.
      The template changed after `v2026.09.26.2`: `socraticode`, `headroom`,
-     `codebase-memory` and `qmd` joined, so a new host registers every server
-     the SubagentStart token-lanes carrier names except `jcodemunch` (below)
-     and context-mode, which its plugin supplies. Each entry runs the command,
+     `codebase-memory` and `qmd` joined; since 2026-10-12 `serena`,
+     `socraticode`, `codebase-memory-mcp` and `semble` are in the on-demand
+     set below ([decision](../docs/decisions/2026-10-12-code-navigation-on-demand.md)),
+     so a new host registers `ai-memory`, `headroom`, `qmd` and `jcodemunch`,
+     and the SubagentStart token-lanes carrier still names the tools of the
+     on-demand servers. Each entry runs the command,
      arguments and environment of its entry in the Codex user template; the
      template's `_comment` gives the three Claude-side differences and the
      repository-default SocratiCode endpoints (`QDRANT_URL` and `EMBED_URL` in
@@ -581,10 +586,6 @@ GitHub-hosted macOS runner; see
      one daemon. The record is the 2026-09-30 addendum, added after
      `v2026.09.26.2`
      ([F4 Codex roles](../docs/decisions/2026-09-26-stack-agents-role-dispatch.md#addendum-2026-09-30-f4-codex-roles)).
-     Since 2026-10-12 the sentence about the carrier no longer holds for `serena`,
-     `socraticode` and `codebase-memory-mcp`: they belong to the on-demand set
-     below, and the carrier still names their tools
-     ([decision](../docs/decisions/2026-10-12-code-navigation-on-demand.md)).
      A host that registered one of these servers by hand keeps its entry: the
      installer reports it as matching (same command, arguments and variable
      names) or as differing, and replaces it only with `--replace-mcp`.
@@ -608,33 +609,52 @@ GitHub-hosted macOS runner; see
    **Code navigation, on demand.** The file below and the `--print-mcp-config`
    option were added after `v2026.10.05.1`. Changed 2026-10-12: the template no longer
    registers `serena`, `socraticode` and `codebase-memory-mcp` at user scope,
-   nor does the new WSL distribution's addition for `semble`. Their server
-   instructions (each tells the model to use it first for code navigation)
-   and tool names loaded into every session, and the E1 comparison found no
-   code-navigation tool used in 288 runs of single-symbol lookups in
+   nor does the new WSL distribution's addition for `semble`. Their tool names
+   loaded into every session, and `serena`, `codebase-memory-mcp` and `semble`
+   each sent an instruction block that tells the model to use that server
+   first for code navigation (SocratiCode sends none). The E1 comparison found
+   no code-navigation tool used in 288 runs of single-symbol lookups in
    worktree sessions, at a median cost 14.6 percent and 9 s higher for
    carrying `serena`, `semble`, `codebase-memory-mcp` and `jcodemunch` together
    (their shares were not measured apart, and `socraticode` was not in the
    comparison). That measured single-symbol lookups in worktree
    sessions only; cross-file refactors and impact analysis keep the on-demand
-   path, and the directive lever (a paragraph in the instruction files) was not
-   delivered in that comparison, so it is untested
+   path. The corrected re-run did deliver the directive lever: Serena's
+   paragraph in the local memory file made the tools get used on 12 of 12
+   questions and failed the cost rule at 1.170 times the matched baseline's
+   median, so no default changed
    ([decision](../docs/decisions/2026-10-12-code-navigation-on-demand.md)).
-   The four stay installed, and their entries are unchanged in
-   [`adoption/mcp/claude-code-navigation.json`](mcp/claude-code-navigation.json).
-   A session that needs them loads that file for the session only, with the
-   `${HOME}` and `${ECO_ROOT}` placeholders rendered for this host:
+   The four stay installed, and their entries are in
+   [`adoption/mcp/claude-code-navigation.json`](mcp/claude-code-navigation.json)
+   with the values they had. A session that needs them loads that file for the
+   session only, with the `${HOME}` and `${ECO_ROOT}` placeholders rendered for
+   this host:
    ```sh
    claude --mcp-config "$(python3 tools/adoption/install_claude_profile.py --print-mcp-config)"
    ```
+   A server loaded this way replaces a server of the same name that is
+   registered at user scope, for that session (measured on client 2.1.296), so
+   load a file whose entries start on the host; `--server NAME` (repeatable)
+   prints only the named ones. On a new WSL distribution host the template's
+   values are not the host's (the install plan creates no
+   `${ECO_ROOT}/bin/socraticode`, and the endpoints are the host's), so the
+   distribution renders the file with the map's overrides and the command prints
+   that:
+   ```sh
+   python3 tools/adoption/new_wsl_client_config.py --render --host NAME --out DIR
+   claude --mcp-config "$(python3 tools/adoption/install_claude_profile.py --print-mcp-config DIR/mcp-servers.on-demand.json)"
+   ```
    The subagents of that session inherit the servers, which is how the agents
    whose tool lists name them (`evidence-reviewer`, `isolated-builder`,
-   `security-reviewer`, `stack-researcher`) get their Serena and SocratiCode
-   tools; in a session without the file those tools do not exist and the agents
-   read with Grep, Read and Glob. A project that wants one of them every time
-   registers it with `claude mcp add --scope local` from the project root, as
-   for jCodeMunch below. `jcodemunch` stays in the user-scope template: its
-   2026-10-04 record reserves a change to the user's instruction.
+   `security-reviewer`, `stack-researcher`) get their Serena tools, and their
+   SocratiCode tools when an entry that starts is loaded; in a session
+   without the file those tools do not exist and the agents read with Grep,
+   Read and Glob. A project that wants one of them every time registers it
+   with `claude mcp add --scope local` from the project root, as for
+   jCodeMunch below. `jcodemunch` stays in the user-scope template: its
+   2026-10-04 record reserves a change to the user's instruction. The record
+   gives the rollback of this change, for the template and for a host's live
+   registrations.
 
    **jCodeMunch, per project.** A project that wants its own private
    registration beside the user-scope one registers it from the project root:
@@ -703,10 +723,11 @@ GitHub-hosted macOS runner; see
    `adoption/mcp/claude-user.json` also changed after `v2026.09.24.1`: at that
    tag its `serena` entry runs `${ECO_ROOT}/bin/serena-context`, a wrapper
    nothing in this catalog installs, so a host at the tag registers a `serena`
-   server that cannot start. Here it runs `${ECO_ROOT}/bin/serena`, installed
-   above. On a host already registered from the tag the installer reports
-   `serena` as differing; run `claude mcp remove serena -s user`, then
-   `python3 tools/adoption/install_claude_profile.py --only mcp`. The tag's
+   server that cannot start. Here the user-scope template no longer registers `serena` (since
+   2026-10-12), and its on-demand entry runs `${ECO_ROOT}/bin/serena`,
+   installed above. A host already registered from the tag keeps the `serena`
+   that cannot start: run `claude mcp remove serena -s user`, and load Serena
+   on demand (step 4a) when it is wanted. The tag's
    template also registered `jcodemunch` at user scope, as this one does again
    (changed 2026-10-04), so a host registered from the tag keeps that entry and
    the installer reports it as already registered.
