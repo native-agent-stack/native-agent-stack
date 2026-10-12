@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "scope": "Eight new mirror nominations resolve the recorded selected source versions; no runtime adoption or version update.",
+  "repositories": [
+    {
+      "repository": "gastownhall/beads",
+      "recorded_version": "1.3.0",
+      "ref": "v1.3.0",
+      "commit": "f45b249ce6b40ba62aecc03949e6371e8f7c79d8",
+      "source": "GitHub git tag",
+      "resolved": true
+    },
+    {
+      "repository": "jgravelle/jcodemunch-mcp",
+      "recorded_version": "1.108.327",
+      "ref": "v1.108.327",
+      "commit": "6d5ae86c130f96624e2ca2d797fa3b853c210b9d",
+      "source": "GitHub git tag",
+      "resolved": true
+    },
+    {
+      "repository": "agentskills/agentskills",
+      "recorded_version": "0.1.0",
+      "resolved": true,
+      "ref": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+      "commit": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+      "source": "manifests/stack.json source_pin and GitHub defaultBranchRef"
+    },
+    {
+      "repository": "davila7/claude-code-templates",
+      "recorded_version": "c840d6f626be7ba418da60aeb0f2080413562451",
+      "ref": "c840d6f626be7ba418da60aeb0f2080413562451",
+      "commit": "c840d6f626be7ba418da60aeb0f2080413562451",
+      "source": "GitHub git commit",
+      "resolved": true
+    },
+    {
+      "repository": "mksglu/context-mode",
+      "recorded_version": "1.0.169",
+      "ref": "v1.0.169",
+      "commit": "589d8214d56740a28b5f7bf63167743d586b0b40",
+      "source": "GitHub git tag",
+      "resolved": true
+    },
+    {
+      "repository": "shanraisshan/claude-code-best-practice",
+      "recorded_version": "15969ed2471a177d938c889255d2f23f07e4742a",
+      "ref": "15969ed2471a177d938c889255d2f23f07e4742a",
+      "commit": "15969ed2471a177d938c889255d2f23f07e4742a",
+      "source": "GitHub git commit",
+      "resolved": true
+    },
+    {
+      "repository": "vectorize-io/hindsight",
+      "recorded_version": "0.10.2",
+      "ref": "v0.10.2",
+      "commit": "5fc4ce20917b916240cef27c212c387a177f115b",
+      "source": "GitHub git tag",
+      "resolved": true
+    },
+    {
+      "repository": "andrewyng/context-hub",
+      "recorded_version": "0.1.4",
+      "ref": "v0.1.4",
+      "commit": "04c149cd82d23d037e157d5920b80b0ca10d84b5",
+      "source": "GitHub git tag",
+      "resolved": true
+    }
+  ]
+}

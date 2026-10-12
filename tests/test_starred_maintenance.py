@@ -20,6 +20,29 @@ SPEC.loader.exec_module(renderer)
 
 
 class StarredMaintenanceTests(unittest.TestCase):
+    @unittest.skipUnless(shutil.which("systemctl"), "requires installed systemctl")
+    def test_install_preflight_accepts_absent_timer_and_still_requires_user_manager(self):
+        readme = (ROOT / "tools/starred-maintenance/README.md").read_text()
+        line = next(line for line in readme.splitlines()
+                    if line.startswith("systemctl --user list-unit-files"))
+        # Upstream systemd pin b3d8fc43, systemctl-list-unit-files.c:289-290,
+        # returns ENOENT for no matches. Probe the documented preflight only.
+        present = subprocess.run(["systemctl", "--user", "list-unit-files", "--no-legend"],
+                                 capture_output=True, text=True, timeout=10)
+        if present.returncode:
+            self.skipTest("a reachable user manager is required for the native preflight check")
+        absent = line.replace("native-agent-newstars.timer", "native-agent-stars-absent-fixture.timer")
+        result = subprocess.run(["sh", "-c", "set -eu\n" + absent + "\nprintf 'preflight-complete\\n'"],
+                                capture_output=True, text=True, timeout=10)
+        self.assertEqual(result.returncode, 0, "first-install preflight stopped on an absent timer")
+        self.assertEqual(result.stdout, "preflight-complete\n")
+        with tempfile.TemporaryDirectory() as runtime:
+            refused = subprocess.run(["sh", "-c", "set -eu\n" + absent + "\nprintf 'unexpected\\n'"],
+                                     capture_output=True, text=True, timeout=10,
+                                     env={"PATH": "/usr/bin:/bin", "XDG_RUNTIME_DIR": runtime})
+        self.assertNotEqual(refused.returncode, 0)
+        self.assertNotIn("unexpected", refused.stdout)
+
     def test_readme_documents_current_native_cli_verification(self):
         readme = (ROOT / "tools/starred-maintenance/README.md").read_text()
         self.assertIn("`%h/.local/share/mise/shims`", readme)

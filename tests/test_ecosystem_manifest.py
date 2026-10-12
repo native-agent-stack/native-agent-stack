@@ -58,6 +58,15 @@ class Page(HTMLParser):
 
 
 class EcosystemManifestTests(unittest.TestCase):
+    def test_migrated_canonical_snapshot_missing_manifest_refuses_publication(self):
+        path = self.root / "catalogs/convergence-practice/public-starred.json"
+        snapshot = json.loads(path.read_text())
+        snapshot.update(kind="public_starred", schema_version=1)
+        self.write("catalogs/convergence-practice/public-starred.json", snapshot)
+        result = self.run_generator("--check")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("canonical public-star snapshot requires convergence_manifest", result.stdout + result.stderr)
+
     def test_metadata_only_starred_convergence_does_not_render_as_source_reviewed(self):
         from scripts.build_ecosystem import build_data
         data = build_data(ROOT)

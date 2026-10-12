@@ -11397,8 +11397,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-read-deltas.json",
-      "sha256": "deaa5bff14e7b0dd6f6e4534bcf12ba5e10b605d1b73735f7e824527ec4a5a73",
-      "bytes": 263
+      "sha256": "71680301005e030ac0371d175ccbe8eba365a55560f71299c71d09fc4ffca625",
+      "bytes": 371
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261004.json",
@@ -11409,6 +11409,16 @@
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261011-skill-use-delta.json",
       "sha256": "2a6b8c37d94237f1357b66f14eb8f1f4a996106520c787c580062c8932010114",
       "bytes": 5462
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261012-pr1016-delta.json",
+      "sha256": "13f6709a5d99db7618f29d2326b4555c13526ecb63d9681340b40c991cf8668f",
+      "bytes": 1141
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261012-pr1016.json",
+      "sha256": "6df6bb62e1bde5843ba77a800af2e889a4affb1c4c4bb6389234697c2755df05",
+      "bytes": 24739
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261012-pr949-delta.json",
@@ -17186,9 +17196,24 @@
       "bytes": 618109
     },
     {
+      "path": "catalogs/convergence-practice/sources/starred-mirror-pins-20261011.json",
+      "sha256": "206588aed52d011df810b1a9c2b82918bd6213383d95b6039c272b218ca0d484",
+      "bytes": 2305
+    },
+    {
+      "path": "catalogs/convergence-practice/sources/starred-protected-20261011.json",
+      "sha256": "40c32eb251a591df3263cc18c84602a86d67b1320bb12fbc05e41958b301cd12",
+      "bytes": 468626
+    },
+    {
+      "path": "catalogs/convergence-practice/sources/starred-signals-20261011.json",
+      "sha256": "0ab290e804ab1b1c9f044340d845759c8657febb89d0dd3c13d55d9998d4d827",
+      "bytes": 234359
+    },
+    {
       "path": "catalogs/convergence-practice/starred-convergence-20261010.json",
-      "sha256": "e007e3fd8702859b2f4b452dbdfbc21366acbb2bcce30f684a0a8709915d2062",
-      "bytes": 434974
+      "sha256": "e9b66183cb4f15a64065b22c0cd689ac4b32d3133732605bb68c26d931697712",
+      "bytes": 1271534
     },
     {
       "path": "catalogs/convergence-practice/starred-seeds-20261010.json",
@@ -17647,8 +17672,8 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "00254eeb9844866120b1c8ab30f14f79d1cb7d458789e64eb57fe722befba19a",
-      "bytes": 1146887
+      "sha256": "852ef3b60b709e08d199067d13b45461df560273868fc6b0d9bb33a5c7ccaa5f",
+      "bytes": 1158392
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
@@ -18919,6 +18944,11 @@
       "path": "docs/decisions/2026-10-11-sell-only-quote-freshness.md",
       "sha256": "f547857a970ef0e3b5585be294db9d3edc52c25615079c7900ed38552d0a8731",
       "bytes": 8417
+    },
+    {
+      "path": "docs/decisions/2026-10-11-starred-finalization.md",
+      "sha256": "65d339790291609f8aeebf302ffe56cac5a27434b43db904e4831e03646431cb",
+      "bytes": 12766
     },
     {
       "path": "docs/decisions/2026-10-12-mcp-template-live-reconciliation.md",
@@ -61197,8 +61227,13 @@
     },
     {
       "path": "scripts/starred_convergence.py",
-      "sha256": "37f3b8f5f5409408e20bbadb730adac77d0ed9bb75b22a952d36e6343bb62b24",
-      "bytes": 11294
+      "sha256": "b231d06f113e45638395a0496e6a712a8451f063d82f04d53129dfa17baeb76d",
+      "bytes": 17830
+    },
+    {
+      "path": "scripts/starred_protected.py",
+      "sha256": "d0c4dbe7f2d269e87aacd8e6201227a0b06b0c8a33b6dbe7746f52e206be6a3a",
+      "bytes": 8977
     },
     {
       "path": "scripts/sweep_policy.py",
@@ -62007,8 +62042,8 @@
     },
     {
       "path": "tests/test_ecosystem_manifest.py",
-      "sha256": "1a407834cd8f09d6a5d21e9d24d630fe05c36f383cdfd7ab8a0af8a561e65420",
-      "bytes": 147505
+      "sha256": "7abbcc021219b62e4ab223963008cf64834fecf88fdf27316c211945e8dde908",
+      "bytes": 148079
     },
     {
       "path": "tests/test_edgartools_pin_move.py",
@@ -62882,13 +62917,18 @@
     },
     {
       "path": "tests/test_starred_convergence.py",
-      "sha256": "c6bf34b100096c84012a5b4e2140d4bf320a9f7e955926a7a82052e4e145dca2",
-      "bytes": 11612
+      "sha256": "9f535438a0cda8c2738a2091bf09f9b7b83280cc405c2c110b7a38dbea0b3501",
+      "bytes": 17943
     },
     {
       "path": "tests/test_starred_maintenance.py",
-      "sha256": "0dad5e0ba473341d4cb7db26bbd2ee953b01219607671256322450451ab5c822",
-      "bytes": 12940
+      "sha256": "4b1b81c92e93d7c6fddb417aa23bf8e46b34dc2d2c5c673545d6b065c34ed312",
+      "bytes": 14668
+    },
+    {
+      "path": "tests/test_starred_protected.py",
+      "sha256": "9d389e681e9505922e62ef62c7abf3a959d69ca93ecf82df04adddb914e1677a",
+      "bytes": 2997
     },
     {
       "path": "tests/test_start_closure_sampler.py",
@@ -63382,8 +63422,8 @@
     },
     {
       "path": "tools/local-pages/source_policy.json",
-      "sha256": "78a4c1a3cd052d6a3a389894616cdffdfcde251e120ab673310a85c62b0dfa9e",
-      "bytes": 759542
+      "sha256": "d9d83f49c84e79f469f98af9c63ea098b98a8259a4b3bea67eabec265080ebc4",
+      "bytes": 759622
     },
     {
       "path": "tools/omniroute/gateway_record.py",
@@ -63692,8 +63732,8 @@
     },
     {
       "path": "tools/starred-maintenance/README.md",
-      "sha256": "fc9520afc4b05fbe776ced8b3d59e9b6ad4ece299fff49f4fcf4efe59b6d0724",
-      "bytes": 11902
+      "sha256": "60178e2b8dd7ff17a7b42fb81f41ce1790699dc8a3423e107c53e80337f7f2f2",
+      "bytes": 12493
     },
     {
       "path": "tools/starred-maintenance/render_units.py",

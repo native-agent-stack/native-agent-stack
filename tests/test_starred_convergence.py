@@ -15,6 +15,25 @@ REGISTRY = "catalogs/sota-convergence/layer-verdict-waves.json"
 
 
 class StarredConvergenceTests(unittest.TestCase):
+    def test_captured_actions_checkout_pin_cannot_be_unstarred(self):
+        from scripts.catalog_decisions import load
+        root = Path(__file__).resolve().parents[1]
+        manifest = deepcopy(load(root, MANIFEST))
+        row = next(row for row in manifest["repositories"] if row["repository"].lower() == "actions/checkout")
+        target = next(other for other in manifest["repositories"]
+                      if other["category"] == row["category"] and other["decision"] == "KEEP"
+                      and other is not row)
+        row.update(decision="UNSTAR", unstar_basis="superseded", superseded_by=target["repository"],
+                   decision_reason="Synthetic same-category removal plant.",
+                   supersession_evidence_refs=[row["signals"]["source_ref"]])
+
+        def read(path):
+            return manifest if path == MANIFEST else load(root, path)
+
+        snapshot = load(root, "catalogs/convergence-practice/public-starred.json")
+        with self.assertRaisesRegex(ValueError, "cannot UNSTAR a protected repository"):
+            validate_convergence(root, snapshot, read=read)
+
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary.cleanup)
@@ -58,9 +77,98 @@ class StarredConvergenceTests(unittest.TestCase):
                          {"status": "valid", "count": 1, "pending": 0, "seed_count": 1, "in_scope": 1,
                           "out_of_scope": 0, "needs_evidence": 0, "archived": 0, "superseded": 0})
 
+    def finalize(self, *, protected=False):
+        signals = {"repository": "owner/tool", "archived": False, "pushed_at": "2026-10-10T00:00:00Z",
+                   "latest_release": None, "stars": 10, "open_issues": 0, "dependents": None,
+                   "observed_at": "2026-10-11T17:00:00Z", "cutoff_18_months": "2025-04-11T17:00:00Z",
+                   "release_in_18_month_window": False, "release_history_complete": True}
+        path = "catalogs/convergence-practice/signals.json"
+        protection = "catalogs/convergence-practice/protected.json"
+        self.write(path, {"repositories": [signals]})
+        self.write(protection, {"repositories": {"owner/tool": [{"kind": "upstream_mirror"}]}
+                               if protected else {}})
+        self.manifest["finalization"] = {"schema_version": 1, "signals_source": path,
+                                         "protected_source": protection}
+        self.row.update(category="research-skills", decision="KEEP", decision_reason="Retain evidenced discovery.",
+                        protected=protected, signals={k: v for k, v in signals.items() if k != "repository"})
+        self.row["signals"]["source_ref"] = path + "#/repositories/0"
+        self.sync()
+
+    def test_finalized_category_and_signals_are_required_and_source_bound(self):
+        self.finalize()
+        self.assertEqual(validate_convergence(self.root, self.snapshot)["status"], "valid")
+        self.row["category"] = "unknown"
+        self.reject("finalized category")
+        self.row["category"] = "research-skills"
+        self.row["signals"]["stars"] = 11
+        self.reject("signals disagree")
+
+    def test_finalized_unstar_cannot_remove_protected_or_recent_repository(self):
+        self.finalize(protected=True)
+        self.row.update(decision="UNSTAR", unstar_basis="archived")
+        self.reject("protected repository")
+        self.finalize()
+        self.row.update(decision="UNSTAR", unstar_basis="inactive_18_months")
+        self.reject("18-month")
+
+    def test_finalized_unstar_requires_complete_release_window_and_strict_cutoff(self):
+        self.finalize()
+        path = self.manifest["finalization"]["signals_source"]
+        self.row.update(decision="UNSTAR", unstar_basis="inactive_18_months")
+        for pushed, recent in (("2025-04-11T17:00:00Z", False), ("2025-04-11T16:59:59Z", True),
+                               ("2025-04-11T16:59:59Z", None)):
+            self.row["signals"].update(pushed_at=pushed, release_in_18_month_window=recent)
+            self.write(path, {"repositories": [dict(self.row["signals"], repository="owner/tool")]})
+            self.reject("18-month")
+        self.row["signals"].update(pushed_at="2025-04-11T16:59:59Z", release_in_18_month_window=False)
+        self.write(path, {"repositories": [dict(self.row["signals"], repository="owner/tool")]})
+        self.sync()
+        self.assertEqual(validate_convergence(self.root, self.snapshot)["status"], "valid")
+
+    def test_finalized_license_cannot_authorize_unstar(self):
+        self.finalize()
+        self.row.update(decision="UNSTAR", unstar_basis="license")
+        self.reject("UNSTAR basis")
+
     def test_legacy_fixture_without_convergence_manifest_is_preserved(self):
         self.assertEqual(validate_convergence(self.root, {"repositories": [{"repository": "owner/tool"}]}),
                          {"status": "legacy", "count": 1})
+
+    def test_source_review_url_must_belong_to_the_seed_repository(self):
+        self.seeds["seeds"][0]["evidence_class"] = "source_review"
+        for host, suffix in (("github.com", "/blob/"), ("raw.githubusercontent.com", "/")):
+            with self.subTest(host=host):
+                self.seeds["seeds"][0]["source_refs"] = [
+                    "https://" + host + "/other/project" + suffix + "a" * 40 + "/README.md"]
+                self.reject("source URL repository disagrees")
+                self.seeds["seeds"][0]["source_refs"] = [
+                    "https://" + host + "/OWNER/TOOL" + suffix + "a" * 40 + "/README.md"]
+                self.sync()
+                self.assertEqual(validate_convergence(self.root, self.snapshot)["status"], "valid")
+
+    def test_canonical_snapshot_losing_only_convergence_manifest_fails_closed(self):
+        self.snapshot.update(kind="public_starred", schema_version=1)
+        self.snapshot.pop("convergence_manifest")
+        with self.assertRaisesRegex(ValueError, "canonical.*convergence_manifest"):
+            validate_convergence(self.root, self.snapshot)
+
+    def test_every_seed_row_must_be_referenced_by_a_disposition(self):
+        unused = deepcopy(self.seeds["seeds"][0])
+        unused.update(repository="other/project", source_refs=[
+            "https://github.com/other/project/blob/" + "b" * 40 + "/README.md"])
+        self.seeds["seeds"].append(unused)
+        self.reject("every seed row.*referenced")
+
+    def test_seed_coverage_checks_distinct_rows_even_for_the_same_repository(self):
+        extra = deepcopy(self.seeds["seeds"][0])
+        extra["layer"] = "code-navigation"
+        self.seeds["seeds"].append(extra)
+        self.reject("every seed row.*referenced")
+        self.row["layer_keys"].append("code-navigation")
+        self.row["verdict_follow_up"]["layer_keys"].append("code-navigation")
+        self.row["seed_refs"].append(SEEDS + "#/seeds/1")
+        self.sync()
+        self.assertEqual(validate_convergence(self.root, self.snapshot)["seed_count"], 2)
 
     def test_source_review_status_does_not_claim_adoption_or_acceptance(self):
         self.snapshot["repositories"][0]["disposition_status"] = "IN-SCOPE-SOURCE-REVIEW"

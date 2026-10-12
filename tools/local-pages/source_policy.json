@@ -2146,6 +2146,10 @@
     },
     {
       "root": "repo",
+      "path": "scripts/starred_protected.py"
+    },
+    {
+      "root": "repo",
       "path": "scripts/sweep_policy.py"
     },
     {
