@@ -1,6 +1,6 @@
 # Native client (`native-clients`)
 
-Client 2.1.295, checked 2026-10-09. Index: [slots.md](slots.md).
+Client 2.1.296, checked 2026-10-12. Index: [slots.md](slots.md).
 
 ## client-core
 
@@ -116,8 +116,8 @@ Client 2.1.295, checked 2026-10-09. Index: [slots.md](slots.md).
 - **Route:** Opus 5.5 for judgment and build; Sonnet 5.5 or Haiku 5.5 only for a task class with a frozen paired A/B at parity; keep `CLAUDE_CODE_EFFORT_LEVEL` and `CLAUDE_CODE_SUBAGENT_MODEL_FORCE` unset, because they override frontmatter and per-call effort; Codex lanes through the gateway for fan-out research
 - **Alternatives, ranked:** 1. Re-run failed attempts at a higher effort; 2. Native advisor pairing; 3. Classifier routing to Sonnet or Opus by task complexity (dynamic workflows post; candidate until the M7 paired A/B)
 - **Rejected:** musistudio/claude-code-router; `opusplan` as a default; A global `CLAUDE_CODE_EFFORT_LEVEL` pin; A cheaper subagent default without an A/B; `MAX_THINKING_TOKENS` caps
-- **Evidence:** sub-agents.md model resolution order; model-effort-O3, O5, O7; Measured here: promptfoo three-model extraction A/B, 60/60 each (one fixture class); #840 Haiku trial; Designed, not measured: J4 tiering (Opus census, Haiku sample, sealed 5% Opus re-read)
-- **Notes:** Model choices are the owner's; this row is a recommendation. The M7 effort sweep (high, xhigh, max on our tasks) is owed.
+- **Evidence:** sub-agents.md model resolution order; model-effort-O3, O5, O7; Measured here: promptfoo three-model extraction A/B, 60/60 each (one fixture class); #840 Haiku trial; Designed, not measured: J4 tiering (Opus census, Haiku sample, sealed 5% Opus re-read); CHANGELOG@v2.1.296 L7 (`CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL` runs every workflow agent on one model while other subagents keep theirs)
+- **Notes:** Model choices are the owner's; this row is a recommendation. The M7 effort sweep (high, xhigh, max on our tasks) is owed. `CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL` (2.1.296) is unset here: it would pin every workflow agent to one model, which the per-role route above does not do, and no task class has a paired A/B at parity.
 - **Supersedes:** R52 (Ultracode is a separate toggle since 2.1.284); AN-05 (`sonnet` resolves to Sonnet 5.5); M7 extended with Anthropic's published effort priors
 - **Overturn when:** The M7 sweep shows a lower effort at quality parity for a task class, or max scoring below xhigh; or a newer model release.
 - **Primary sources** (read 2026-10-09; 6 of 15 practices the refuters kept, measured first; fetch time and sha256 of the bytes read in the record's reading file):

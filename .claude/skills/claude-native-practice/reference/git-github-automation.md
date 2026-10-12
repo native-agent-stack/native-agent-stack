@@ -1,6 +1,6 @@
 # GitHub automation (`git-github-automation`)
 
-Client 2.1.295, checked 2026-10-09. Index: [slots.md](slots.md).
+Client 2.1.296, checked 2026-10-12. Index: [slots.md](slots.md).
 
 ## github-action
 

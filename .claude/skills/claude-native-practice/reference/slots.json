@@ -1,7 +1,7 @@
 {
  "schema": "claude-native-practice-slots/1",
- "client_version": "2.1.295",
- "checked_at": "2026-10-09",
+ "client_version": "2.1.296",
+ "checked_at": "2026-10-12",
  "record": "docs/decisions/2026-10-09-claude-code-native-practice.md",
  "selection_rule": "One default per role slot; overlaps become ranked alternatives or rejections. A native Claude Code feature that covers the slot is the default unless a measured gap exists. Repository quality selects (maintenance, releases, tests, docs, upstream adoption); popularity and invoke counts never do. A token or cost saving becomes a default only with quality parity measured on paired same-task runs (promptfoo 0.124.0 or the skill-creator benchmark, blind judge plus exact checks); otherwise it stays an alternative marked pending. A retired slot is the exception: it has no default, and its row says what replaced the route.",
  "status_values": {
@@ -456,9 +456,10 @@
     "sub-agents.md model resolution order",
     "model-effort-O3, O5, O7",
     "Measured here: promptfoo three-model extraction A/B, 60/60 each (one fixture class); #840 Haiku trial",
-    "Designed, not measured: J4 tiering (Opus census, Haiku sample, sealed 5% Opus re-read)"
+    "Designed, not measured: J4 tiering (Opus census, Haiku sample, sealed 5% Opus re-read)",
+    "CHANGELOG@v2.1.296 L7 (`CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL` runs every workflow agent on one model while other subagents keep theirs)"
    ],
-   "notes": "Model choices are the owner's; this row is a recommendation. The M7 effort sweep (high, xhigh, max on our tasks) is owed.",
+   "notes": "Model choices are the owner's; this row is a recommendation. The M7 effort sweep (high, xhigh, max on our tasks) is owed. `CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL` (2.1.296) is unset here: it would pin every workflow agent to one model, which the per-role route above does not do, and no task class has a paired A/B at parity.",
    "overturn_when": "The M7 sweep shows a lower effort at quality parity for a task class, or max scoring below xhigh; or a newer model release.",
    "supersedes": [
     "R52 (Ultracode is a separate toggle since 2.1.284)",
@@ -559,9 +560,10 @@
    "evidence": [
     "context-window.md what survives compaction",
     "context-token-O3, O15, O16",
-    "Measured upstream: compaction pays only on long runs (Anthropic, optimizing-for-cost-and-intelligence)"
+    "Measured upstream: compaction pays only on long runs (Anthropic, optimizing-for-cost-and-intelligence)",
+    "CHANGELOG@v2.1.296 L6 (`autoCompactWindow` in subagent frontmatter and `--agents` definitions: a subagent can auto-compact earlier than the main conversation's window)"
    ],
-   "notes": "No quality loss measured or claimed: this is the native default; no override is set on the host or template.",
+   "notes": "No quality loss measured or claimed: this is the native default; no override is set on the host or template. Since 2.1.296 a subagent definition can set `autoCompactWindow` to compact earlier than the main window; none of ours does, and no paired run supports an earlier window.",
    "overturn_when": "A paired same-task run shows an earlier window keeps quality at lower cost, or a release changes compaction.",
    "supersedes": [
     "topic: auto-compact threshold (window now saved per model)",
@@ -1124,9 +1126,10 @@
    ],
    "evidence": [
     "sub-agents.md frontmatter and priority",
-    "subagents-teams-O2, O3, O15"
+    "subagents-teams-O2, O3, O15",
+    "CHANGELOG@v2.1.296 L6 (`autoCompactWindow` in subagent frontmatter and `--agents` definitions: a subagent can auto-compact earlier than the main conversation's window); CHANGELOG@v2.1.296 L59 (`--debug` names unrecognized frontmatter fields in custom agent files, with a hint for likely typos)"
    ],
-   "notes": "Four host copies differ from adoption/agents/claude and four host-only definitions exist (G6b). Portability: the user-scope copies run in other projects, where 4 are stale and 4 of 11 bodies point at native-agent-stack-only paths; the north star needs repository-neutral bodies before relying on them.",
+   "notes": "Measured 2026-10-12: the 11 user-scope copies equal adoption/agents/claude byte for byte (4 differed on 2026-10-09, G6b), and the four host-only definitions remain (codebase-memory, codebase-memory-auditor, codebase-memory-scout and semble-search, installed by their vendors). Portability: that 4 of 11 bodies point at native-agent-stack-only paths was measured on 2026-10-09 and is not re-measured here; the north star needs repository-neutral bodies before relying on the user-scope copies in other projects. Since 2.1.296 `claude --debug` names a misspelt frontmatter field of a custom agent file, and no catalog definition sets `autoCompactWindow`.",
    "overturn_when": "A release changes definition scope or priority, or a measured role-quality gap.",
    "supersedes": [],
    "primary_sources": [
@@ -1251,9 +1254,10 @@
    "evidence": [
     "workflows.md resume and limits",
     "background-workflows-O8, O9, O10",
-    "Paired run 1, 2026-10-10 (evidence/artifacts/native-practice-paired-runs-20261010/paired-runs.json; RESULT.md sha256 e87b9cabd8c2, score.json 72dc84ef76b0): six bounded north-star fixes, one trial per arm; every mode passed 6 of 6, the single session cost $5.87 on average, the verify Workflow 1.6x and the agent team 3.0x (estimates), and the blind judges preferred the single session's diff to the Workflow's on 5 of 6 fixtures and to the team's on 3 of the 5 where the team's diff was captured"
+    "Paired run 1, 2026-10-10 (evidence/artifacts/native-practice-paired-runs-20261010/paired-runs.json; RESULT.md sha256 e87b9cabd8c2, score.json 72dc84ef76b0): six bounded north-star fixes, one trial per arm; every mode passed 6 of 6, the single session cost $5.87 on average, the verify Workflow 1.6x and the agent team 3.0x (estimates), and the blind judges preferred the single session's diff to the Workflow's on 5 of 6 fixtures and to the team's on 3 of the 5 where the team's diff was captured",
+    "CHANGELOG@v2.1.296 L7 (`CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL` runs every workflow agent on one model while other subagents keep theirs)"
    ],
-   "notes": "Saved workflows are not yet at a native discovery location, and the adopt step names an agents/ directory that does not exist. Verified: a `-p` launch of a saved Workflow needs a launch-scoped `--allowedTools 'Workflow(<name>)'`; on WSL2 background carry-over relies on the on-demand supervisor. Measured 2026-10-10 (paired run 1, arm B): under `--setting-sources local` a saved Workflow in the repository's `.claude/workflows` was not found by name in 6 of 6 headless runs (the available list held only `deep-research`) and was launched by `scriptPath` instead; the verifier returned in 2 of 6 runs (0 refuted), was cut by the background-wait ceiling of `claude -p` in 3 (45 minutes as the runner set it with `CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=2700000`; the client's default is 10 minutes: env-vars.md and headless.md of the pinned documentation), and in 1 the implementer itself ran to that ceiling.",
+   "notes": "Saved workflows are not yet at a native discovery location, and the adopt step names an agents/ directory that does not exist. Verified: a `-p` launch of a saved Workflow needs a launch-scoped `--allowedTools 'Workflow(<name>)'`; on WSL2 background carry-over relies on the on-demand supervisor. Measured 2026-10-10 (paired run 1, arm B): under `--setting-sources local` a saved Workflow in the repository's `.claude/workflows` was not found by name in 6 of 6 headless runs (the available list held only `deep-research`) and was launched by `scriptPath` instead; the verifier returned in 2 of 6 runs (0 refuted), was cut by the background-wait ceiling of `claude -p` in 3 (45 minutes as the runner set it with `CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=2700000`; the client's default is 10 minutes: env-vars.md and headless.md of the pinned documentation), and in 1 the implementer itself ran to that ceiling. `CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL` (2.1.296) is unset: workflow agents keep the model their role or call names.",
    "overturn_when": "A release changes Workflow resume or limits, or a measured failure mode on our runs beyond the two that paired run 1, arm B measured in fenced headless runs (the name lookup, which `scriptPath` avoids, and the verifier's wait ceiling, which the route above tells a session to expect).",
    "supersedes": [
     "R52 Ultracode clause"
@@ -1670,9 +1674,10 @@
    ],
    "evidence": [
     "mcp.md tool search and output limits",
-    "mcp-O2, O3, O4, O5, O6, O7"
+    "mcp-O2, O3, O4, O5, O6, O7",
+    "CHANGELOG@v2.1.296 L65 (the default limit on MCP tool descriptions sent up front and on MCP server instructions is 4,096 characters, was 2,048); `CLAUDE_CODE_MAX_MCP_DESCRIPTION_LENGTH` changes it: CHANGELOG@v2.1.296 L1522"
    ],
-   "notes": "Registrations drift between host and template (qmd stdio versus HTTP, ports, a server key): G6b. Verified: on user-scope registrations `alwaysLoad: true` loads every tool of that server upfront (the per-tool opt-out works only for --mcp-config, SDK and plugin servers); image results stay under MAX_MCP_OUTPUT_TOKENS; the upfront fallback behind a non-first-party base URL dates from 2.1.70.",
+   "notes": "Registrations drift between host and template (qmd stdio versus HTTP, ports, a server key): G6b. Verified: on user-scope registrations `alwaysLoad: true` loads every tool of that server upfront (the per-tool opt-out works only for --mcp-config, SDK and plugin servers); image results stay under MAX_MCP_OUTPUT_TOKENS; the upfront fallback behind a non-first-party base URL dates from 2.1.70. Since 2.1.296 the default cap on MCP tool descriptions and server instructions is 4,096 characters (2,048 before); the knob that changes it is unset here.",
    "overturn_when": "A measured context or quality gap from deferral, or a release changes tool-search defaults.",
    "supersedes": [
     "topic: MCP tool loading (native deferral converged)"

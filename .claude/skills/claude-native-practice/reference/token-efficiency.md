@@ -1,6 +1,6 @@
 # Context and tokens (`token-efficiency`)
 
-Client 2.1.295, checked 2026-10-09. Index: [slots.md](slots.md).
+Client 2.1.296, checked 2026-10-12. Index: [slots.md](slots.md).
 
 ## context-compaction
 
@@ -9,8 +9,8 @@ Client 2.1.295, checked 2026-10-09. Index: [slots.md](slots.md).
 - **Route:** Manual levers apply to top-level interactive sessions; `-p` workers, Workflow children and subagents compact automatically; re-inject must-keep state with a SessionStart hook matching `compact`
 - **Alternatives, ranked:** 1. SessionStart(compact) hook; 2. Per-model `/autocompact` window behind a 200K gateway
 - **Rejected:** A standing `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE` or lowered window; Disabling auto-compaction; Fixed-percentage 'rot boundary' rules
-- **Evidence:** context-window.md what survives compaction; context-token-O3, O15, O16; Measured upstream: compaction pays only on long runs (Anthropic, optimizing-for-cost-and-intelligence)
-- **Notes:** No quality loss measured or claimed: this is the native default; no override is set on the host or template.
+- **Evidence:** context-window.md what survives compaction; context-token-O3, O15, O16; Measured upstream: compaction pays only on long runs (Anthropic, optimizing-for-cost-and-intelligence); CHANGELOG@v2.1.296 L6 (`autoCompactWindow` in subagent frontmatter and `--agents` definitions: a subagent can auto-compact earlier than the main conversation's window)
+- **Notes:** No quality loss measured or claimed: this is the native default; no override is set on the host or template. Since 2.1.296 a subagent definition can set `autoCompactWindow` to compact earlier than the main window; none of ours does, and no paired run supports an earlier window.
 - **Supersedes:** topic: auto-compact threshold (window now saved per model); M16 (compaction retraction defect fixed in 2.1.293); M17 (SessionStart compact matcher is the documented route)
 - **Overturn when:** A paired same-task run shows an earlier window keeps quality at lower cost, or a release changes compaction.
 - **Primary sources** (read 2026-10-09; 6 of 12 practices the refuters kept, measured first; fetch time and sha256 of the bytes read in the record's reading file):
