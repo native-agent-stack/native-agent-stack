@@ -132,7 +132,7 @@ as `missing` with reason `skipped`.
   "tokenizer_prefix": "~/.local/share/native-token-report/tokenizer",
   "gateways": [{
     "id": "omniroute",
-    "base_url": "http://127.0.0.1:20128",
+    "base_url": "http://127.0.0.1:21128",
     "routes": [{"id": "models", "path": "/v1/models"},
                {"id": "health", "path": "/health", "ignore_keys": ["uptime"]}],
     "build_id": {"route": "health", "field": "build"}

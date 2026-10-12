@@ -238,7 +238,7 @@ At that selected commit, [`reasoningSuffix.ts` L1-L31](https://github.com/diegos
 
   The 2026-09-27 build's exact commands, digests and toolchain are in its `build-provenance.json`. The 2026-09-30 rebuild ran the same steps at `2f42a9ac1`, and upstream's own `check:pack-boot` passes on both tarballs (the 20129 tarball on its third attempt; the first two failed with causes not established); its tarball digests, prefixes and step times are in its receipt.
 - **Service.** Run each gateway from its values-free template:
-  - [`adoption/templates/systemd/omniroute.service`](../adoption/templates/systemd/omniroute.service) runs `omniroute serve --port 20128 --no-open --no-tray`;
+  - [`adoption/templates/systemd/omniroute.service`](../adoption/templates/systemd/omniroute.service) runs `omniroute serve --port @OMNIROUTE_PORT@ --no-open --no-tray`. Render 21128 for the current deployment, matching the Codex profile and landscape client default; explicitly render 20128 only for the dated hosts described above. This follows `diegosouzapw/OmniRoute@7f3cbb04:bin/cli/commands/serve.mjs:86,180-182`; the vendor default remains 20128;
   - [`adoption/templates/systemd/omniroute-fw.service`](../adoption/templates/systemd/omniroute-fw.service) runs port 20129 with its own data directory.
 
   Both run on loopback with `Restart=on-failure` and no `--daemon`. A unit holds no secret, and its secrets come only through `EnvironmentFile=`. A user service also inherits the user manager's environment, so keep credentials out of the manager. `CODEX_CLIENT_VERSION` in the unit is the version the gateway announces to the ChatGPT backend (0.159.1 since 2026-09-30, while the installed Codex is 0.157.1); a Codex client that reports its own version keeps it on inference.

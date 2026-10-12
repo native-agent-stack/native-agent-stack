@@ -37,15 +37,16 @@ Preflight makes no provider request. It reports selected options, package pin,
 loopback port and capability configuration without printing paths, settings or
 credentials. Set `ADVERTISED_CLAUDE_MODEL` to an explicitly reviewed model ID.
 The examples name NativeStack2604's 21128 gateway; another host uses its own
-gateway root. The code's generic fallback remains unchanged, so every invocation
-on NativeStack2604 supplies `--gateway http://127.0.0.1:21128`.
+gateway root. The code's deployment default is also 21128, matching the current
+client defaults and the explicitly rendered service port. Historical 20128 hosts
+must supply their own `--gateway`; no recorded historical service is rewritten.
 `CLAUDE_CODE_EFFORT_LEVEL` must be absent from the launcher process:
 the native variable can override the explicit `effort="max"`. Remove it only from
 the worker launch environment when needed; do not change the coordinator's
 environment or settings. The standalone worker adopts OmniRoute's pinned
 [`buildClaudeEnv`](https://github.com/diegosouzapw/OmniRoute/blob/2f42a9ac19d1a247ec9ce5473b790843724b3061/bin/cli/commands/launch.mjs#L23)
 transport: it removes inherited `ANTHROPIC_*` from its own process, sets the
-loopback Anthropic root (normally `http://127.0.0.1:20128`, without `/v1`), enables
+loopback Anthropic root (current deployment default `http://127.0.0.1:21128`, without `/v1`), enables
 native gateway model discovery and supplies the documented `omniroute-no-auth`
 sentinel for a keyless loopback gateway. An authenticated gateway may use
 `--gateway-token-env APPLICATION_BINDING`: the runtime copies that opaque

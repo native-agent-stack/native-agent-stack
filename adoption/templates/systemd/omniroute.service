@@ -1,11 +1,14 @@
-# OmniRoute gateway (port 20128): a values-free systemd --user unit template.
+# OmniRoute gateway: a values-free systemd --user unit template with an explicit deployment port.
 #
 # It mirrors the unit installed on the NativeStack WSL2 workstation since the 2026-09-30 rebuild,
 # evidence/artifacts/omniroute-rebuild-20260930/omniroute.service (and, with that build's prefix, the 2026-09-27 record);
 # tests/test_omniroute_gateway_unit.py renders it with the host's values and compares. It is not installed as it is.
 # Decisions: docs/decisions/2026-09-27-omniroute-account-pool.md and docs/decisions/2026-09-30-omniroute-rebuild.md.
 #
-# Apart from Description= and the comments, one directive differs from the installed unit: the explicit
+# Rendering @OMNIROUTE_PORT@=20128 preserves the historical units above. New NativeStack2604 deployments use21128,
+# the measured host route and current client default; choose the same explicit port for every consumer.
+# diegosouzapw/OmniRoute@7f3cbb04:bin/cli/commands/serve.mjs:86,180-182 supports the port override.
+# Apart from Description=, the selected port and the comments, one directive differs from the installed unit: the explicit
 # OMNIROUTE_SERVER_HOST below. On the workstation the environment file already sets the same value, so the process
 # environment is the same.
 #
@@ -13,6 +16,7 @@
 #   @OMNIROUTE_PREFIX@      the owned npm prefix of the build (docs/foundation-stack.md, "Source build of
 #                           release/v3.8.51"); it holds bin/omniroute and shim/.
 #   @NODE_PREFIX@           a Node 24 installation whose bin/ holds node (upstream engines: >=22.22.2 <23 or >=24 <27).
+#   @OMNIROUTE_PORT@        selected loopback gateway port (21128 for the current deployment; historical20128 is explicit).
 #   @CODEX_CLIENT_VERSION@  the Codex version the gateway announces to the ChatGPT backend for the models catalog and for
 #                           callers that report none: the host's `codex --version` number, or a newer released one when a
 #                           released model needs it (0.159.1 on the workstation since 2026-09-30, while the installed Codex
@@ -86,7 +90,7 @@ Environment=STREAM_READINESS_MAX_TIMEOUT_MS=600000
 Environment=STREAM_ACTIVE_TIMEOUT_MS=3600000
 # Templates stay the single writer for Codex/Claude configs (src/shared/services/cliRuntime.ts L1077-1078).
 Environment=CLI_ALLOW_CONFIG_WRITES=false
-ExecStart=@OMNIROUTE_PREFIX@/bin/omniroute serve --port 20128 --no-open --no-tray
+ExecStart=@OMNIROUTE_PREFIX@/bin/omniroute serve --port @OMNIROUTE_PORT@ --no-open --no-tray
 Restart=on-failure
 RestartSec=5
 TimeoutStopSec=30

@@ -45,9 +45,9 @@ GATEWAY = Unit(
     template=TEMPLATES / "omniroute.service",
     installed=RECEIPT / "omniroute.service",
     values={"OMNIROUTE_PREFIX": f"{TOOLS}/omniroute-3.8.51-2f42a9ac-pr13788-affinity2", "NODE_PREFIX": NODE_PREFIX,
-            "CODEX_CLIENT_VERSION": "0.159.1"},
+            "CODEX_CLIENT_VERSION": "0.159.1", "OMNIROUTE_PORT": "20128"},
     environment_file="EnvironmentFile=%h/.local/share/omniroute/server.env",
-    exec_start="ExecStart=@OMNIROUTE_PREFIX@/bin/omniroute serve --port 20128 --no-open --no-tray",
+    exec_start="ExecStart=@OMNIROUTE_PREFIX@/bin/omniroute serve --port @OMNIROUTE_PORT@ --no-open --no-tray",
 )
 GATEWAY_20260927 = GATEWAY._replace(
     installed=ROOT / "evidence/artifacts/omniroute-gateway-20260927/omniroute.service",
@@ -388,10 +388,10 @@ class FrameworkTemplateTests(TemplateChecks, unittest.TestCase):
     unit = FRAMEWORK
 
     def test_shares_no_port_environment_file_or_data_directory_with_the_gateway(self):
-        self.assertEqual(separation_problems(read(GATEWAY.template), self.template), [])
+        self.assertEqual(separation_problems(render(read(GATEWAY.template),GATEWAY.values), self.template), [])
 
     def test_a_shared_port_environment_file_or_data_directory_is_caught(self):
-        gateway = read(GATEWAY.template)
+        gateway = render(read(GATEWAY.template),GATEWAY.values)
         self.assertEqual(separation_problems(gateway, self.template.replace("--port 20129", "--port 20128")),
                          ["shared or missing port"])
         shared_file = self.template.replace(FRAMEWORK.environment_file, GATEWAY.environment_file)
