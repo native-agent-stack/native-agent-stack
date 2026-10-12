@@ -1,0 +1,29 @@
+The 26 mutants of round 2 (the other half's record, the refresh lock, the unit templates): one change each; a mutant is killed when tests.test_skill_usage_daily fails or times out.
+
+killed   (failed) a record whose `measured` is not a mapping of booleans is taken
+killed   (failed) `measured` need only name the half's keys
+killed   (failed) `host` and `lanes` may be any type
+killed   (failed) `window_days` and `codex_bulk_scan_limit` may be any type
+killed   (failed) `generated_at` may be any value
+killed   (failed) the refresh keeps the narrow error boundary
+killed   (failed) a row's counts are copied as they are
+killed   (failed) a row's wiring is copied as it is
+killed   (failed) the refresh takes no lock
+killed   (failed) the other record is read before the lock is asked for
+killed   (failed) the lock does not exclude
+killed   (failed) the lock file is group and world readable
+killed   (failed) the wait for the lock is a thousand times longer
+killed   (failed) the lock is not dropped when its holder fails
+killed   (failed) a host without flock cannot refresh
+killed   (failed) the worktree guard runs after the lock file is opened
+killed   (failed) the record directory is not created before the lock
+killed   (failed) the Codex service leaves the hierarchy writable
+killed   (failed) the Claude service makes only /usr read-only
+killed   (failed) the Claude service leaves the home writable
+killed   (failed) the Codex service hides the home
+killed   (failed) the Codex service allows writes to the whole home
+killed   (failed) the Claude service has no private /tmp
+killed   (failed) the Claude service may write bytecode
+killed   (failed) a missing record directory is ignored
+killed   (failed) the Codex service writes its combined record elsewhere
+26 mutants, 26 killed, survivors: none

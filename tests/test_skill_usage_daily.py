@@ -11,6 +11,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import threading
 import unittest
 from unittest import mock
 
@@ -487,6 +488,351 @@ class HalvesTests(unittest.TestCase):
                     self.assertEqual(done.returncode, 0, done.stderr)
 
 
+def projected(half):
+    daily = daily_module()
+    host, codex, claude = claude_reports() if half == "claude" else codex_reports()
+    return daily.project_reports(host, codex, claude, now=NOW, window=7, half=half)
+
+
+def run_half(half, directory, *extra):
+    """daily.main for one half with the collection stubbed: (exit code, stderr text)."""
+    daily = daily_module()
+    reports = claude_reports() if half == "claude" else codex_reports()
+    root = "--claude-root" if half == "claude" else "--codex-root"
+    argv = ["--half", half, root, "/fixture/root", "--now", NOW, "--out", str(directory / f"{half}.json"), *extra]
+    errors = io.StringIO()
+    with mock.patch.object(daily, "require_reviewed_main"), mock.patch.object(daily, "collect_half", return_value=reports), \
+            contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(errors):
+        code = daily.main(argv)
+    return code, errors.getvalue()
+
+
+class OtherRecordTests(unittest.TestCase):
+    """Astra's read of 6c4bbd0d (P1-2): the other half's record is a file another process wrote. One that parses as JSON and has the schema and the half but another shape used to end in an AttributeError in the merge:
+    the refresh's handler did not catch it, the half exited 1 after writing its own record, and the traceback printed the account's home path. An invalid record is an absent half."""
+
+    def malformed(self):
+        base = projected("codex")
+        return {
+            "measured is a list": dict(base, measured=[]),
+            "measured is missing": {key: value for key, value in base.items() if key != "measured"},
+            "measured lacks the half's key": dict(base, measured={}),
+            "measured holds a non-boolean": dict(base, measured={"codex": "yes"}),
+            "host is a mapping": dict(base, host={"name": "gh-fix-ci"}),
+            "lanes is a string": dict(base, lanes="none"),
+            "generated_at is a number": dict(base, generated_at=5),
+            "generated_at is not a timestamp": dict(base, generated_at="yesterday"),
+            "window_days is a string": dict(base, window_days="7"),
+            "window_days is a boolean": dict(base, window_days=True),
+            "codex_bulk_scan_limit is a list": dict(base, codex_bulk_scan_limit=[1]),
+        }
+
+    def test_a_record_of_another_shape_is_an_absent_half(self):
+        daily = daily_module()
+        self.assertEqual(daily.half_record(projected("codex"), "codex"), projected("codex"), "a record the half itself writes is taken")
+        for name, record in self.malformed().items():
+            with self.subTest(record=name):
+                self.assertIsNone(daily.half_record(record, "codex"))
+                merged = daily.merge_halves(projected("claude"), record)
+                self.assertEqual(merged["measured"], {"host": True, "codex": False, "claude": True})
+                self.assertIsNone(merged["halves"]["codex"])
+        for value in (None, [], "text", 5, [{"schema": "skill-invoke-rate-daily/1", "half": "codex"}]):
+            self.assertIsNone(daily.half_record(value, "codex"))
+        combined = daily.merge_halves(projected("claude"), projected("codex"))      # the combined record has all three keys: only its `half` tells it from a half's record
+        self.assertEqual(combined["half"], "all")
+        for half in daily.HALVES:
+            self.assertIsNone(daily.half_record(combined, half), "a combined record is not a half's record")
+        self.assertIsNone(daily.half_record(projected("claude"), "codex"))
+        self.assertIsNone(daily.half_record(projected("codex"), "claude"))
+
+    def test_a_row_value_of_another_type_is_unknown_in_the_combined_record(self):
+        """The merge copies counts and the wiring name from the other half's rows; a value of another type (a boolean would read as zero uses) is unknown, not copied."""
+        daily = daily_module()
+        codex = projected("codex")
+        codex["host"][0].update(codex_use=False, codex_skill_md_reads=-3, codex_name_mentions="4")
+        codex["host"][1].update(codex_use=True)
+        claude = projected("claude")
+        claude["host"][0].update(wiring={"status": "wired"}, claude_uses_lifetime=2.5)
+        merged = daily.merge_halves(claude, codex)
+        rows = {row["name"]: row for row in merged["host"]}
+        self.assertEqual((rows["gh-fix-ci"]["codex_use"], rows["gh-fix-ci"]["codex_skill_md_reads"], rows["gh-fix-ci"]["codex_name_mentions"]), (None, None, None))
+        self.assertEqual((rows["gh-fix-ci"]["wiring"], rows["gh-fix-ci"]["claude_uses_lifetime"]), (None, None))
+        self.assertIsNone(rows["typesafe-ai"]["codex_use"])
+        self.assertEqual(merged["zero_use"]["codex"], [], "a boolean is not a count of zero")
+
+    def test_a_malformed_other_record_leaves_the_halfs_exit_status_and_prints_no_traceback(self):
+        for name, record in self.malformed().items():
+            with self.subTest(record=name), tempfile.TemporaryDirectory() as temp:
+                directory = Path(temp)
+                other = directory / "codex.json"
+                other.write_text(json.dumps(record))
+                code, errors = run_half("claude", directory, "--combined-out", str(directory / "combined.json"), "--other-record", str(other))
+                self.assertEqual((code, errors), (0, ""), "the half is measured: no failure, nothing on stderr (a traceback would name the home path)")
+                self.assertEqual(json.loads((directory / "claude.json").read_text())["measured"], {"host": True, "claude": True}, "the half's own record is written first and stays")
+                self.assertEqual(json.loads((directory / "combined.json").read_text())["measured"], {"host": True, "codex": False, "claude": True})
+
+    def test_an_error_inside_the_refresh_is_a_fixed_message_whatever_it_is(self):
+        daily = daily_module()
+        for error in (AttributeError("sentinel text of an error"), RuntimeError("boom"), RecursionError()):
+            with self.subTest(error=type(error).__name__), tempfile.TemporaryDirectory() as temp:
+                with mock.patch.object(daily, "merge_halves", side_effect=error):
+                    self.assertIs(daily.refresh_combined(Path(temp) / "combined.json", projected("claude"), None), False)
+        errors = io.StringIO()
+        with tempfile.TemporaryDirectory() as temp, mock.patch.object(daily, "require_reviewed_main"), mock.patch.object(daily, "collect_half", return_value=claude_reports()), \
+                mock.patch.object(daily, "merge_halves", side_effect=AttributeError("sentinel text of an error")), contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(errors):
+            directory = Path(temp)
+            code = daily.main(["--half", "claude", "--claude-root", "/fixture/root", "--now", NOW, "--out", str(directory / "claude.json"), "--combined-out", str(directory / "combined.json")])
+        self.assertEqual(code, 0)
+        self.assertEqual(errors.getvalue(), "daily skill usage: the combined record was not refreshed\n", "a fixed message: no traceback, no text of the error")
+
+
+class RefreshLockTests(unittest.TestCase):
+    """Astra's read of 6c4bbd0d (P3-5): both timers are Persistent=true, so after the host was off both units start at once and their refreshes can overlap. Each half publishes its own record, then reads the other's
+    and publishes the combined one; without a lock the later publication can be built from an older read. The refresh now holds a lock from the read to the rename."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.directory = Path(self.tmp.name)
+        self.combined, self.codex_record = self.directory / "combined.json", self.directory / "codex.json"
+        self.lock = self.directory / "combined.json.lock"
+        self.daily = daily_module()
+
+    def hold_lock(self):
+        """The other half's refresh: holds the lock until the test releases it. Returns (release event, thread)."""
+        held, release = threading.Event(), threading.Event()
+
+        def other_half_refresh():
+            with self.daily.refresh_lock(self.lock):
+                held.set()
+                release.wait(20)
+        holder = threading.Thread(target=other_half_refresh)
+        holder.start()
+        self.assertTrue(held.wait(10))
+        return release, holder
+
+    def test_a_refresh_waits_for_the_other_halfs_refresh_and_then_reads_the_record_that_half_published(self):
+        release, holder = self.hold_lock()
+        result = []
+        waiter = threading.Thread(target=lambda: result.append(self.daily.refresh_combined(self.combined, projected("claude"), self.codex_record)))
+        waiter.start()
+        waiter.join(0.5)
+        self.assertTrue(waiter.is_alive(), "while the other half's refresh holds the lock, this refresh has neither read nor published")
+        self.assertFalse(self.combined.exists())
+        self.codex_record.write_text(json.dumps(projected("codex")))   # the other half publishes its own record before its refresh ends
+        release.set()
+        holder.join(10)
+        waiter.join(10)
+        self.assertEqual(result, [True])
+        data = json.loads(self.combined.read_text())
+        self.assertEqual(data["measured"], {"host": True, "codex": True, "claude": True}, "built from the newest record of each half, not from the read taken before the wait")
+        self.assertEqual(stat.S_IMODE(self.lock.stat().st_mode) & 0o077, 0, "the lock file is private to the account")
+
+    def test_a_refresh_that_cannot_get_the_lock_gives_up_and_publishes_nothing(self):
+        release, holder = self.hold_lock()
+        try:
+            self.assertFalse(self.daily.refresh_combined(self.combined, projected("claude"), self.codex_record, wait=0.2))
+            self.assertFalse(self.combined.exists())
+        finally:
+            release.set()
+            holder.join(10)
+        self.assertTrue(self.daily.refresh_combined(self.combined, projected("claude"), self.codex_record, wait=0.2), "the lock is free again once its holder is done")
+
+    def test_the_lock_is_dropped_when_its_holder_fails(self):
+        with self.assertRaises(RuntimeError):
+            with self.daily.refresh_lock(self.lock):
+                raise RuntimeError("a failed refresh")
+        with self.daily.refresh_lock(self.lock, wait=0.2):
+            pass
+
+    def test_the_record_directory_is_created_private_and_a_host_without_flock_still_refreshes(self):
+        fresh = self.directory / "records" / "combined.json"
+        self.assertTrue(self.daily.refresh_combined(fresh, projected("claude"), None))
+        self.assertEqual(stat.S_IMODE(fresh.parent.stat().st_mode), 0o700)
+        with mock.patch.object(self.daily, "fcntl", None):
+            self.assertTrue(self.daily.refresh_combined(self.combined, projected("claude"), None), "no flock, no lock: the refresh is the one that ran before the lock")
+        self.assertTrue(self.combined.exists())
+
+    def test_no_lock_file_is_created_for_a_destination_inside_a_worktree(self):
+        inside = ROOT / "combined-inside-the-worktree.json"
+        self.assertFalse(self.daily.refresh_combined(inside, projected("claude"), None))
+        self.assertFalse(inside.exists())
+        self.assertFalse(inside.with_name(inside.name + ".lock").exists(), "the guard runs before the lock file is opened")
+
+    def test_concurrent_refreshes_leave_one_complete_combined_record(self):
+        """Both halves have published their own record and refresh at once, in either start order: the combined record is complete and parses."""
+        claude, codex = projected("claude"), projected("codex")
+        claude_record = self.directory / "claude.json"
+        for first in ("claude", "codex"):
+            self.combined.unlink(missing_ok=True)
+            claude_record.unlink(missing_ok=True)
+            self.codex_record.unlink(missing_ok=True)
+            claude_record.write_text(json.dumps(claude))
+            self.codex_record.write_text(json.dumps(codex))
+            threads = [threading.Thread(target=self.daily.refresh_combined, args=(self.combined, claude, self.codex_record)),
+                       threading.Thread(target=self.daily.refresh_combined, args=(self.combined, codex, claude_record))]
+            for thread in (threads if first == "claude" else reversed(threads)):
+                thread.start()
+            for thread in threads:
+                thread.join(20)
+            with self.subTest(started_first=first):
+                self.assertEqual(json.loads(self.combined.read_text())["measured"], {"host": True, "codex": True, "claude": True})
+
+
+SANDBOX_KEYS = ("ProtectSystem", "ProtectHome", "ReadWritePaths", "PrivateTmp")
+
+
+def service_section(text):
+    """The [Service] section of a rendered unit as {key: [values, in order]}, comment lines dropped."""
+    found, inside = {}, False
+    for line in text.splitlines():
+        line = line.strip()
+        if line.startswith("[") and line.endswith("]"):
+            inside = line == "[Service]"
+        elif inside and line and not line.startswith("#") and "=" in line:
+            key, _, value = line.partition("=")
+            found.setdefault(key, []).append(value)
+    return found
+
+
+class ServiceSandboxTests(unittest.TestCase):
+    """Astra's read of 6c4bbd0d (P1-1): UMask= restricts the mode of what a service creates, not where it can write, and neither service established a read-only file system or a write allow-list, so ordinary Python start-up
+    wrote a __pycache__ into the live clone. systemd.exec(5) (systemd 259.5 installed; systemd/systemd@e846bbad man/systemd.exec.xml L1497 ProtectSystem=, L1526 ProtectHome=, L1809 ReadWritePaths=, L1919 PrivateTmp=):
+    ProtectSystem=strict mounts the hierarchy read-only, ProtectHome=read-only does the same for the home directory, ReadWritePaths= allow-lists the one directory that is written."""
+
+    def render(self, directory):
+        daily = daily_module()
+        daily.render_units(directory, Path("/fixture/live"), Path(sys.executable), Path("/fixture/bin/node"))
+        return daily, {half: (directory / f"skill-invoke-rate-{half}.service") for half in daily.HALVES}
+
+    def test_each_service_makes_the_file_system_read_only_except_its_record_directory(self):
+        with tempfile.TemporaryDirectory() as temp:
+            daily, services = self.render(Path(temp))
+            for half, service in services.items():
+                section = service_section(service.read_text())
+                with self.subTest(half=half):
+                    self.assertEqual(section.get("ProtectSystem"), ["strict"])
+                    self.assertEqual(section.get("ProtectHome"), ["read-only"])
+                    self.assertEqual(section.get("PrivateTmp"), ["true"])
+                    self.assertIn("PYTHONDONTWRITEBYTECODE=1", section.get("Environment", []), "every interpreter the service starts, not only the parent")
+                    writable = section.get("ReadWritePaths", [])
+                    self.assertEqual(len(writable), 1, "one directory is written")
+                    self.assertEqual(len(writable[0].split()), 1)
+                    self.assertTrue(writable[0].startswith("%h/"), "a path under the account's home, resolved by the user manager")
+                    self.assertFalse(writable[0].startswith(("-", "+")), "a missing directory fails the unit instead of running it unconfined")
+                    records = {os.path.dirname(match) for match in re.findall(r"--(?:out|combined-out|other-record) (\S+)", section["ExecStart"][0])}
+                    self.assertEqual(records, {writable[0]}, "every record the half writes or reads is in the one writable directory, so a path moved in ExecStart needs its allow-list moved too")
+                    for protected in ("/fixture/live", "%h/.claude", "%h/.codex"):
+                        self.assertFalse(writable[0] == protected or writable[0].startswith(protected + "/") or protected.startswith(writable[0] + "/"), f"{protected} is read-only")
+
+    @unittest.skipUnless(shutil.which("systemd-analyze"), "native systemd analyzer unavailable")
+    def test_the_native_analyzer_reads_the_directives_as_protection(self):
+        analyze = shutil.which("systemd-analyze")
+        if "--offline" not in subprocess.run([analyze, "security", "--help"], capture_output=True, text=True, timeout=30).stdout:
+            self.skipTest("this systemd-analyze has no `security --offline`")
+
+        def rows(unit):
+            done = subprocess.run([analyze, "security", "--offline=yes", "--user", "--json=short", str(unit)], capture_output=True, text=True, timeout=60)
+            self.assertEqual(done.returncode, 0, done.stderr)
+            return {row["json_field"]: row for row in json.loads(done.stdout) if row.get("json_field") in ("ProtectSystem", "ProtectHome", "PrivateTmp")}
+        with tempfile.TemporaryDirectory() as temp:
+            directory = Path(temp)
+            daily, services = self.render(directory)
+            for half, service in services.items():
+                bare = directory / f"bare-{half}.service"
+                bare.write_text("".join(line + "\n" for line in service.read_text().splitlines() if line.partition("=")[0] not in SANDBOX_KEYS and "PYTHONDONTWRITEBYTECODE" not in line))
+                protected, unprotected = rows(service), rows(bare)
+                with self.subTest(half=half):
+                    self.assertTrue(protected["ProtectSystem"]["set"] and not unprotected["ProtectSystem"]["set"], protected["ProtectSystem"]["description"])
+                    self.assertTrue(protected["PrivateTmp"]["set"] and not unprotected["PrivateTmp"]["set"])
+                    self.assertNotEqual(protected["ProtectHome"]["description"], unprotected["ProtectHome"]["description"])
+                    self.assertIn("read-only", protected["ProtectHome"]["description"])
+
+
+PROBE = r"""
+import errno, json, os, sys
+from pathlib import Path
+clone, other, records, unrelated = (Path(arg) for arg in sys.argv[1:5])
+
+
+def attempt(target):
+    try:
+        target.write_text("x")
+        target.unlink()
+        return "written"
+    except OSError as error:
+        return errno.errorcode.get(error.errno, "?")
+
+
+sys.path.insert(0, str(clone))
+import helper_module
+print(json.dumps({"clone": attempt(clone / "probe.txt"), "other": attempt(other / "probe.txt"), "unrelated": attempt(unrelated), "records": attempt(records / "probe.txt"),
+                  "pycache": (clone / "__pycache__").exists(), "helper": helper_module.VALUE}))
+"""
+
+
+class ServiceSandboxRuntimeTests(unittest.TestCase):
+    """The rendered service's own directives, applied by the user manager to a probe: writes to the clone and to the rest of the home are refused, the record directory is written, no bytecode is written."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.systemd_run = shutil.which("systemd-run")
+        if not cls.systemd_run:
+            raise unittest.SkipTest("systemd-run is unavailable")
+        if sys.executable.startswith(("/tmp/", "/var/tmp/")):
+            raise unittest.SkipTest("the interpreter lives where PrivateTmp= hides it")
+        try:
+            done = subprocess.run([cls.systemd_run, "--user", "--wait", "--collect", "--pipe", "-q", "-p", "ProtectSystem=strict", "-p", "ProtectHome=read-only", "-p", "PrivateTmp=true", "/bin/true"],
+                                  capture_output=True, text=True, timeout=60)
+        except (OSError, subprocess.SubprocessError):
+            raise unittest.SkipTest("the user manager cannot be reached") from None
+        if done.returncode != 0:
+            raise unittest.SkipTest("this user manager cannot set up the file system namespaces the services use")
+
+    def properties(self, section, records):
+        home = str(Path.home())
+        out = []
+        for key in SANDBOX_KEYS:
+            for value in section[key]:
+                value = records if key == "ReadWritePaths" else value
+                out += ["-p", f"{key}={value.replace('%h', home)}"]
+        for value in section["Environment"]:
+            if value.startswith("PYTHONDONTWRITEBYTECODE="):
+                out += ["-p", f"Environment={value}"]
+        return out
+
+    def probe(self, extra, fixture):
+        clone, other, records = fixture / "clone", fixture / "other", fixture / "records"
+        unrelated = Path.home() / f".skill-sandbox-probe-{os.getpid()}"
+        self.addCleanup(lambda: unrelated.unlink(missing_ok=True))
+        done = subprocess.run([self.systemd_run, "--user", "--wait", "--collect", "--pipe", "-q", "-p", f"WorkingDirectory={clone}", *extra, sys.executable, "-c", PROBE, str(clone), str(other), str(records), str(unrelated)],
+                              capture_output=True, text=True, timeout=120)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        return json.loads(done.stdout)
+
+    def test_the_rendered_directives_refuse_writes_to_the_clone_and_the_home_and_allow_the_records(self):
+        try:
+            fixture = Path(tempfile.mkdtemp(prefix=".skill-sandbox-", dir=Path.home()))
+        except OSError:
+            self.skipTest("the home directory is not writable")
+        self.addCleanup(shutil.rmtree, fixture, True)
+        for name in ("clone", "other", "records"):
+            (fixture / name).mkdir()
+        (fixture / "clone" / "helper_module.py").write_text("VALUE = 7\n")
+        with tempfile.TemporaryDirectory() as temp:
+            daily = daily_module()
+            daily.render_units(Path(temp), Path("/fixture/live"), Path(sys.executable), Path("/fixture/bin/node"))
+            sections = {half: service_section((Path(temp) / f"skill-invoke-rate-{half}.service").read_text()) for half in daily.HALVES}
+        control = self.probe(["-p", "Environment=PYTHONDONTWRITEBYTECODE="], fixture)
+        self.assertEqual(control, {"clone": "written", "other": "written", "unrelated": "written", "records": "written", "pycache": True, "helper": 7},
+                         "without the directives the probe writes everywhere and the interpreter writes bytecode into the clone: the probe sees what the sandbox must stop")
+        shutil.rmtree(fixture / "clone" / "__pycache__")
+        for half, section in sections.items():
+            with self.subTest(half=half):
+                confined = self.probe(self.properties(section, str(fixture / "records")), fixture)
+                self.assertEqual(confined, {"clone": "EROFS", "other": "EROFS", "unrelated": "EROFS", "records": "written", "pycache": False, "helper": 7})
+
+
 class CaptureTimeoutTests(unittest.TestCase):
     """CPA-C-002 of the Claude-family practice audit (2026-10-12): the daily record was not running because the /skill-doctor capture hit its 30 s default (it takes about 19 s on a quiet host and about 60 s at three
     runnable threads per CPU, docs/decisions/2026-10-12-skill-invoke-rate-timer.md) and the daily run had no way to give it more."""
@@ -546,7 +892,7 @@ class ReviewedMainCloneTests(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory()
         self.root = Path(self.tmp.name)
         self.env = {"PATH": os.environ["PATH"], "HOME": str(self.root), "GIT_CONFIG_NOSYSTEM": "1", "GIT_AUTHOR_NAME": "t", "GIT_COMMITTER_NAME": "t",
-                    "GIT_AUTHOR_EMAIL": "t@example.invalid", "GIT_COMMITTER_EMAIL": "t@example.invalid"}
+                    "GIT_AUTHOR_EMAIL": "fixture@users.noreply.github.com", "GIT_COMMITTER_EMAIL": "fixture@users.noreply.github.com"}
         self.git("init", "-q", "--bare", "-b", "main", str(self.root / "origin.git"), cwd=self.root)
         work = self.root / "work"
         self.git("init", "-q", "-b", "main", str(work), cwd=self.root)

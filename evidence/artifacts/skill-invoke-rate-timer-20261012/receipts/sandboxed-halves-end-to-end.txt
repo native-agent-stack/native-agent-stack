@@ -1,0 +1,32 @@
+The rendered units (render_units from a scratch live clone whose HEAD is a commit of origin/main carrying this change) started as transient user units with the [Service] directives of the rendered files
+(ProtectSystem=strict, ProtectHome=read-only, ReadWritePaths= the record directory, PrivateTmp=true, PYTHONDONTWRITEBYTECODE=1), the record paths moved to a scratch directory under the home; one half after the other; times UTC.
+Other work (test suites and mutation runs) loaded the host during the Codex half, so its wall time is not comparable with the unsandboxed run's.
+
+== claude half
+start 2026-10-12T22:10:25Z
+Finished with result: success
+Main processes terminated with: code=exited, status=0/SUCCESS
+Service runtime: 3min 7.517s
+CPU time consumed: 3min 44.021s
+Memory peak: 1.9G (swap: 0B)
+systemd-run exit 0
+end   2026-10-12T22:13:33Z
+
+== codex half
+start 2026-10-12T22:13:48Z
+Running as unit: ccnp-e2e-codex-1791843228.service
+Finished with result: success
+Main processes terminated with: code=exited, status=0/SUCCESS
+Service runtime: 33min 58.051s
+CPU time consumed: 38min 20.154s
+Memory peak: 8.8G (swap: 0B)
+systemd-run exit 0
+end   2026-10-12T22:47:46Z
+
+== afterwards: the records the two halves wrote (counts only) and the clone
+skill-invoke-rate-claude-latest.json: mode 0o600, 83147 bytes, half claude, measured {'claude': True, 'host': True}, skills 30, lanes 546, halves None
+skill-invoke-rate-codex-latest.json: mode 0o600, 9618 bytes, half codex, measured {'codex': True}, skills 30, lanes 3, halves None
+skill-invoke-rate-latest.json: mode 0o600, 86593 bytes, half all, measured {'claude': True, 'codex': True, 'host': True}, skills 30, lanes 549, halves [('claude', '2026-10-12T22:10:25.785570+00:00'), ('codex', '2026-10-12T22:13:48.432916+00:00')]
+skill-invoke-rate-latest.json.lock: mode 0o600, 0 bytes
+records dir mode: 0o700
+clone git status lines: 0 | __pycache__ directories: []

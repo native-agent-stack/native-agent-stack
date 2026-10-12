@@ -14,6 +14,16 @@ Type=oneshot
 WorkingDirectory=@REPOSITORY@
 UMask=0077
 Nice=10
+# Writes: the record directory below and nothing else (the half's own record, the combined record the Fleet page reads, and the lock that serialises the combined refresh; both halves write the same directory).
+# ProtectSystem=strict mounts the whole file hierarchy read-only, ProtectHome=read-only does the same for the home directory (the live clone and the client's own state included), and ReadWritePaths= opens the one
+# directory that is written (systemd.exec(5), systemd 259.5). In a user service these need unprivileged user namespaces, which the user manager then enables itself (PrivateUsers=); on a host without them the unit
+# fails to start (status 226/NAMESPACE) and never runs unconfined. The directory must exist before the unit starts (mkdir -m 0700 -p): ReadWritePaths= without a leading "-" fails closed on a missing path.
+# PYTHONDONTWRITEBYTECODE=1 reaches every interpreter the service starts (-B on the parent alone would not), and PrivateTmp=true gives the client its own temporary directory under ProtectSystem=strict.
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=%h/.local/state/native-agent-stack/coordination/command-center/skills
+PrivateTmp=true
+Environment=PYTHONDONTWRITEBYTECODE=1
 Environment=PATH=%h/.local/bin:%h/.local/share/mise/shims:/usr/local/bin:/usr/bin:/bin
 TimeoutStartSec=17min
 ExecStart="@PYTHON@" "@REPOSITORY@/tools/skill-usage/daily_skill_usage.py" --half claude --node "@NODE@" --claude-root %h/.claude/projects --window 7 --out %h/.local/state/native-agent-stack/coordination/command-center/skills/skill-invoke-rate-claude-latest.json --combined-out %h/.local/state/native-agent-stack/coordination/command-center/skills/skill-invoke-rate-latest.json --other-record %h/.local/state/native-agent-stack/coordination/command-center/skills/skill-invoke-rate-codex-latest.json

@@ -1,0 +1,42 @@
+{
+ "summary": {
+  "runs": 3,
+  "unit_env": true,
+  "min": 17.2,
+  "median": 17.6,
+  "max": 17.9,
+  "errors": 0
+ },
+ "rows": [
+  {
+   "run": 1,
+   "seconds": 17.6,
+   "load1": 11.7,
+   "format": "json",
+   "skills": 73,
+   "num_turns": 0,
+   "total_cost_usd": 0,
+   "error": null
+  },
+  {
+   "run": 2,
+   "seconds": 17.2,
+   "load1": 13.0,
+   "format": "json",
+   "skills": 73,
+   "num_turns": 0,
+   "total_cost_usd": 0,
+   "error": null
+  },
+  {
+   "run": 3,
+   "seconds": 17.9,
+   "load1": 13.0,
+   "format": "json",
+   "skills": 73,
+   "num_turns": 0,
+   "total_cost_usd": 0,
+   "error": null
+  }
+ ]
+}

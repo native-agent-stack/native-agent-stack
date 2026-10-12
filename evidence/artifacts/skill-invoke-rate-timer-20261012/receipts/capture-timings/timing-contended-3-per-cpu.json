@@ -1,0 +1,18 @@
+[
+ {
+  "run": 1,
+  "wall_seconds": 61.9,
+  "rc": 0,
+  "skills": 73,
+  "burners": 2,
+  "runnable_per_cpu": 3
+ },
+ {
+  "run": 2,
+  "wall_seconds": 57.7,
+  "rc": 0,
+  "skills": 73,
+  "burners": 2,
+  "runnable_per_cpu": 3
+ }
+]

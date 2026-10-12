@@ -36,7 +36,16 @@ python3 tools/skill-usage/daily_skill_usage.py \
 This writes `skill-invoke-rate-claude.{service,timer}` (09:30 UTC, limit 17 minutes)
 and `skill-invoke-rate-codex.{service,timer}` (10:00 UTC, limit 63 minutes). The
 CC verifies/installs/enables these files after landing, following the
-existing user-timer procedure. Rendering does not load or start a unit.
+existing user-timer procedure. Rendering does not load or start a unit. Each service is confined to its record
+directory: `ProtectSystem=strict` and `ProtectHome=read-only` make the file system
+read-only for it (the live clone and the client's own state included),
+`ReadWritePaths=` opens `~/.local/state/native-agent-stack/coordination/command-center/skills`
+(the half's record, the combined record and its lock; create it with `mkdir -m 0700 -p`
+before enabling the timers, because a missing path fails the unit), and
+`PYTHONDONTWRITEBYTECODE=1` keeps every interpreter from writing bytecode
+(docs/decisions/2026-10-12-skill-invoke-rate-timer.md, decision 7). The refresh of
+the combined record holds a lock, so two halves that finish together (both timers
+are `Persistent=true`) leave a record built from the newest record of each.
 Live scheduled collection, and rendering, refuse a clone that is not at a
 commit of origin/main (`git merge-base --is-ancestor HEAD origin/main`): the
 live clone is a detached worktree of origin/main, so a branch name cannot be

@@ -8,8 +8,9 @@ unmeasured and a timeout leaves only its own half unmeasured (docs/decisions/202
   --half codex    the Codex rollout scan of the host report (windowed use counts) and the skill_usage.py --lanes report
 
 Each half publishes `skill-invoke-rate-<half>-latest.json` (--out) and then refreshes the combined `skill-invoke-rate-latest.json` that the Fleet page reads
-(--combined-out), merged from its own record and the other half's newest one (--other-record). A report file given on the command line projects a
-combined record from files, without collecting.
+(--combined-out), merged from its own record and the other half's newest one (--other-record). The refresh reads the other record and publishes the combined one
+under a lock, so two halves that finish together (a catch-up after the host was off starts both units at once) leave a combined record built from the newest
+record of each. A report file given on the command line projects a combined record from files, without collecting.
 
 The CC installs the rendered user timers after landing. Tests pass a stub runner;
 lanes never invoke the real Claude client through this script.
@@ -20,6 +21,7 @@ so a branch name cannot be the test. A clone on a feature branch, or with
 commits of its own, is refused, and so is rendering the units for one.
 """
 import argparse
+import contextlib
 from datetime import timedelta
 import json
 import os
@@ -29,8 +31,14 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 
 import skill_usage
+
+try:
+    import fcntl
+except ImportError:  # no flock where there is no systemd timer to race with
+    fcntl = None
 
 ROOT = Path(__file__).resolve().parents[2]
 NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.:-]{0,100}\Z")
@@ -46,6 +54,7 @@ CODEX_ROW_FIELDS = ("codex_use", "codex_skill_md_reads", "codex_name_mentions")
 # lanes sweep 2 min 18 s (1.8 GB peak; 198 MB of JSON on stdout, 513 MB to parse); the host report's Codex scan 1 min 10 s (2.8 GB peak, 3,234 rollout files); the Codex lanes scan 25 min 47 s (1.8 GB peak,
 # 29 CPU minutes). The limits: the capture its own limit (skill_usage.DEFAULT_CLAUDE_TIMEOUT, 300 s) plus a minute, the two one-core commands 600 s each (4.3 and 8.5 times their wall; a CPU-bound command takes
 # about three times as long at three runnable threads per CPU), and the Codex lanes scan twice its wall, the command center's rule of 2026-10-12 (a scan that is slower than that is the case for an incremental scan).
+LOCK_WAIT = 60                # seconds one refresh waits for the other half's refresh: the lock is held for one read and one rename
 CAPTURE_MARGIN = 60           # added to the capture's own limit (skill_usage.DEFAULT_CLAUDE_TIMEOUT, or --claude-timeout): start-up and the report
 TIMEOUTS = {"claude_sweep": 600, "codex_host": 600, "codex_lanes": 3120}
 
@@ -184,7 +193,32 @@ def collect_half(half, roots, *, window, now, node="node", runner=subprocess.run
 
 
 def half_record(value, half):
-    return value if isinstance(value, dict) and value.get("schema") == SCHEMA and value.get("half") == half else None
+    """`value` as the record of `half`, or None. A record is taken only when every field the merge reads has the type it is written with (a record that parses as JSON but has another shape is an absent half,
+    not an error): `measured` a mapping of booleans for the half's keys, `host` and `lanes` null or a list, `generated_at` null or an ISO timestamp, `window_days` and `codex_bulk_scan_limit` null or a count."""
+    if not (isinstance(value, dict) and value.get("schema") == SCHEMA and value.get("half") == half):
+        return None
+    measured = value.get("measured")
+    if not isinstance(measured, dict) or not all(isinstance(measured.get(key), bool) for key in HALF_KEYS[half]):
+        return None
+    if any(value.get(key) is not None and not isinstance(value[key], list) for key in ("host", "lanes")):
+        return None
+    if any(value.get(key) is not None and count(value[key]) is None for key in ("window_days", "codex_bulk_scan_limit")):
+        return None
+    stamp = value.get("generated_at")
+    if stamp is not None:
+        try:
+            skill_usage.parse_iso(stamp)
+        except (AttributeError, TypeError, ValueError):
+            return None
+    return value
+
+
+def row_field(row, field):
+    """One field of a skill row of a half's record as the combined record carries it: a count, or for `wiring` a short name; anything else is unknown."""
+    value = row.get(field)
+    if field == "wiring":
+        return value if isinstance(value, str) and NAME.fullmatch(value) else None
+    return count(value)
 
 
 def merge_halves(claude, codex):
@@ -194,8 +228,8 @@ def merge_halves(claude, codex):
     by_half = {"claude": {row["name"]: row for row in (claude or {}).get("host") or [] if isinstance(row, dict) and isinstance(row.get("name"), str) and NAME.fullmatch(row["name"])},
                "codex": {row["name"]: row for row in (codex or {}).get("host") or [] if isinstance(row, dict) and isinstance(row.get("name"), str) and NAME.fullmatch(row["name"])}}
     names = list(by_half["claude"]) + [name for name in by_half["codex"] if name not in by_half["claude"]]
-    host = [{"name": name, **{field: by_half["claude"].get(name, {}).get(field) for field in CLAUDE_ROW_FIELDS},
-             **{field: by_half["codex"].get(name, {}).get(field) for field in CODEX_ROW_FIELDS}} for name in names] if names else None
+    host = [{"name": name, **{field: row_field(by_half["claude"].get(name, {}), field) for field in CLAUDE_ROW_FIELDS},
+             **{field: row_field(by_half["codex"].get(name, {}), field) for field in CODEX_ROW_FIELDS}} for name in names] if names else None
     lanes = [lane for source, client in ((claude, "claude"), (codex, "codex")) for lane in (source or {}).get("lanes") or []
              if isinstance(lane, dict) and lane.get("client") == client]
     stamps = [skill_usage.parse_iso(record["generated_at"]) for record in (claude, codex) if record and isinstance(record.get("generated_at"), str)]
@@ -211,25 +245,58 @@ def merge_halves(claude, codex):
             "measured": measured}
 
 
-def refresh_combined(combined, own, other):
-    """Write the combined record from this half's record and the other half's newest one (a missing or unreadable file is an absent half). Never raises: the half's own record is what the unit's exit
-    status stands for."""
+@contextlib.contextmanager
+def refresh_lock(path, wait=LOCK_WAIT):
+    """An exclusive flock on `path` (created mode 0600) for one refresh: waits up to `wait` seconds for the other half's refresh, then raises TimeoutError. The lock belongs to the open file description, so two
+    opens of the file in one process also exclude each other (util-linux sys-utils/flock.1.adoc L84), and it is dropped when the descriptor is closed or the process ends (L78), so a crashed refresh never
+    holds it."""
+    if fcntl is None:
+        yield
+        return
+    descriptor = os.open(path, os.O_RDWR | os.O_CREAT | os.O_CLOEXEC, 0o600)
     try:
-        try:
-            newest = json.loads(other.read_text()) if other else None
-        except (OSError, ValueError):
-            newest = None
-        records = {own.get("half"): own}
-        records.setdefault("claude" if own.get("half") == "codex" else "codex", newest)
-        publish(combined.absolute(), merge_halves(records.get("claude"), records.get("codex")))
+        deadline = time.monotonic() + wait
+        while True:
+            try:
+                fcntl.flock(descriptor, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                break
+            except BlockingIOError:
+                if time.monotonic() >= deadline:
+                    raise TimeoutError("the other half's refresh holds the lock") from None
+                time.sleep(0.05)
+        yield
+    finally:
+        os.close(descriptor)
+
+
+def refresh_combined(combined, own, other, wait=LOCK_WAIT):
+    """Write the combined record from this half's record and the other half's newest one (a missing, unreadable or malformed file is an absent half). The read of the other record and the publication of the
+    combined one happen under one lock: a half publishes its own record before it asks for the lock, so whichever refresh runs second reads what the first half published and writes the last combined record.
+    Never raises, whatever the other record holds or the lock or the destination does: the half's own record is what the unit's exit status stands for, and the caller prints a fixed message on False."""
+    try:
+        destination = combined.absolute()
+        require_outside_worktrees(destination)   # before the lock file is opened: it sits in the destination's directory
+        destination.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+        with refresh_lock(destination.with_name(destination.name + ".lock"), wait):
+            try:
+                newest = json.loads(other.read_text()) if other else None
+            except (OSError, ValueError):
+                newest = None
+            records = {own.get("half"): own}
+            records.setdefault("claude" if own.get("half") == "codex" else "codex", newest)
+            publish(destination, merge_halves(records.get("claude"), records.get("codex")))
         return True
-    except (OSError, ValueError, KeyError, TypeError):
+    except Exception:  # noqa: BLE001 - a convenience refresh must not change the exit status or print a traceback (its text can hold the home path)
         return False
 
 
-def publish(path, report):
+def require_outside_worktrees(path):
     if skill_usage.inside_git_work_tree(path.parent) or path.is_relative_to(ROOT):
         raise ValueError("report destination must be outside git worktrees")
+
+
+def publish(path, report):
+    require_outside_worktrees(path)
     path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
     descriptor, temp = tempfile.mkstemp(prefix=".skill-usage-", dir=path.parent)
     try:

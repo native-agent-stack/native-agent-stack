@@ -1,0 +1,55 @@
+{
+ "systemd": "systemd 259 (259.5-0ubuntu3.4)",
+ "control_without_the_directives": {
+  "clone": "written",
+  "other": "written",
+  "unrelated": "written",
+  "records": "written",
+  "pycache": true,
+  "helper": 7
+ },
+ "confined_claude": {
+  "directives": {
+   "ProtectSystem": [
+    "strict"
+   ],
+   "ProtectHome": [
+    "read-only"
+   ],
+   "PrivateTmp": [
+    "true"
+   ],
+   "ReadWritePaths": "<the record directory>"
+  },
+  "attempts": {
+   "clone": "EROFS",
+   "other": "EROFS",
+   "unrelated": "EROFS",
+   "records": "written",
+   "pycache": false,
+   "helper": 7
+  }
+ },
+ "confined_codex": {
+  "directives": {
+   "ProtectSystem": [
+    "strict"
+   ],
+   "ProtectHome": [
+    "read-only"
+   ],
+   "PrivateTmp": [
+    "true"
+   ],
+   "ReadWritePaths": "<the record directory>"
+  },
+  "attempts": {
+   "clone": "EROFS",
+   "other": "EROFS",
+   "unrelated": "EROFS",
+   "records": "written",
+   "pycache": false,
+   "helper": 7
+  }
+ }
+}

@@ -1,0 +1,4 @@
+The unmodified daily script (before this change) run from the live clone, a detached worktree of origin/main, on 2026-10-12: it printed the line below on standard error before collecting anything
+(the script returns exit status 2 for this message: `main` of tools/skill-usage/daily_skill_usage.py).
+
+daily skill usage unavailable; inspect the native collector separately
