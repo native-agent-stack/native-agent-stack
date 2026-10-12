@@ -230,9 +230,81 @@ jobs:
             // keeps link destinations). Emphasis goes only in pairs around a word without a separator in it, so a glob such as
             // Users/*/ keeps its star.
             const fromCode = (code) => (code <= 0x10FFFF && !(code >= 0xD800 && code <= 0xDFFF) ? String.fromCodePoint(code) : '');
-            const named = new Map([['amp', '&'], ['lt', '<'], ['gt', '>'], ['quot', '"'], ['apos', "'"], ['sol', '/'],
-              ['bsol', '\\'], ['colon', ':'], ['period', '.'], ['lowbar', '_'], ['hyphen', '-'], ['dash', '-'], ['tilde', '~'],
-              ['nbsp', '\u00A0'], ['Tab', '\t'], ['NewLine', '\n']]);
+            // Named character references: the HTML5 table as cmark-gfm pins it (src/entities.inc at 587a12bb), limited
+            // to the 297 names whose text, after the projection below, is ASCII or nothing; no other name can complete
+            // or hide a value the rules read. tests/test_sota_sources_gate.py regenerates this subset from the table.
+            // entities-begin
+            const named = new Map(Object.entries({
+              "AMP": "&", "Afr": "\ud835\udd04", "Aopf": "\ud835\udd38", "ApplyFunction": "\u2061",
+              "Ascr": "\ud835\udc9c", "Bernoullis": "\u212c", "Bfr": "\ud835\udd05", "Bopf": "\ud835\udd39",
+              "Bscr": "\u212c", "CapitalDifferentialD": "\u2145", "Cayleys": "\u212d", "Cfr": "\u212d",
+              "Colone": "\u2a74", "Copf": "\u2102", "Cscr": "\ud835\udc9e", "DD": "\u2145", "Dfr": "\ud835\udd07",
+              "DiacriticalGrave": "`", "DifferentialD": "\u2146", "Dopf": "\ud835\udd3b", "Dscr": "\ud835\udc9f",
+              "Efr": "\ud835\udd08", "Eopf": "\ud835\udd3c", "Equal": "\u2a75", "Escr": "\u2130",
+              "ExponentialE": "\u2147", "Ffr": "\ud835\udd09", "Fopf": "\ud835\udd3d", "Fouriertrf": "\u2131",
+              "Fscr": "\u2131", "GT": ">", "Gfr": "\ud835\udd0a", "Gopf": "\ud835\udd3e", "Gscr": "\ud835\udca2",
+              "Hat": "^", "Hfr": "\u210c", "HilbertSpace": "\u210b", "Hopf": "\u210d", "Hscr": "\u210b",
+              "IJlig": "\u0132", "Ifr": "\u2111", "Im": "\u2111", "ImaginaryI": "\u2148",
+              "InvisibleComma": "\u2063", "InvisibleTimes": "\u2062", "Iopf": "\ud835\udd40", "Iscr": "\u2110",
+              "Jfr": "\ud835\udd0d", "Jopf": "\ud835\udd41", "Jscr": "\ud835\udca5", "Kfr": "\ud835\udd0e",
+              "Kopf": "\ud835\udd42", "Kscr": "\ud835\udca6", "LT": "<", "Laplacetrf": "\u2112",
+              "Lfr": "\ud835\udd0f", "Lopf": "\ud835\udd43", "Lscr": "\u2112", "MediumSpace": "\u205f",
+              "Mellintrf": "\u2133", "Mfr": "\ud835\udd10", "Mopf": "\ud835\udd44", "Mscr": "\u2133",
+              "NegativeMediumSpace": "\u200b", "NegativeThickSpace": "\u200b", "NegativeThinSpace": "\u200b",
+              "NegativeVeryThinSpace": "\u200b", "NewLine": "\n", "Nfr": "\ud835\udd11", "NoBreak": "\u2060",
+              "NonBreakingSpace": "\u00a0", "Nopf": "\u2115", "Nscr": "\ud835\udca9", "Ofr": "\ud835\udd12",
+              "Oopf": "\ud835\udd46", "Oscr": "\ud835\udcaa", "Pfr": "\ud835\udd13", "Poincareplane": "\u210c",
+              "Popf": "\u2119", "Pscr": "\ud835\udcab", "QUOT": "\"", "Qfr": "\ud835\udd14", "Qopf": "\u211a",
+              "Qscr": "\ud835\udcac", "Re": "\u211c", "Rfr": "\u211c", "Ropf": "\u211d", "Rscr": "\u211b",
+              "Sfr": "\ud835\udd16", "Sopf": "\ud835\udd4a", "Sscr": "\ud835\udcae", "TRADE": "\u2122",
+              "Tab": "\t", "Tfr": "\ud835\udd17", "ThickSpace": "\u205f\u200a", "ThinSpace": "\u2009",
+              "Topf": "\ud835\udd4b", "Tscr": "\ud835\udcaf", "Ufr": "\ud835\udd18", "UnderBar": "_",
+              "Uopf": "\ud835\udd4c", "Uscr": "\ud835\udcb0", "VerticalLine": "|", "VeryThinSpace": "\u200a",
+              "Vfr": "\ud835\udd19", "Vopf": "\ud835\udd4d", "Vscr": "\ud835\udcb1", "Wfr": "\ud835\udd1a",
+              "Wopf": "\ud835\udd4e", "Wscr": "\ud835\udcb2", "Xfr": "\ud835\udd1b", "Xopf": "\ud835\udd4f",
+              "Xscr": "\ud835\udcb3", "Yfr": "\ud835\udd1c", "Yopf": "\ud835\udd50", "Yscr": "\ud835\udcb4",
+              "ZeroWidthSpace": "\u200b", "Zfr": "\u2128", "Zopf": "\u2124", "Zscr": "\ud835\udcb5",
+              "af": "\u2061", "afr": "\ud835\udd1e", "amp": "&", "aopf": "\ud835\udd52", "apos": "'",
+              "ascr": "\ud835\udcb6", "ast": "*", "bernou": "\u212c", "bfr": "\ud835\udd1f",
+              "bopf": "\ud835\udd53", "bscr": "\ud835\udcb7", "bsol": "\\", "cfr": "\ud835\udd20",
+              "circledS": "\u24c8", "colon": ":", "comma": ",", "commat": "@", "complexes": "\u2102",
+              "copf": "\ud835\udd54", "cscr": "\ud835\udcb8", "dd": "\u2146", "dfr": "\ud835\udd21", "dollar": "$",
+              "dopf": "\ud835\udd55", "dscr": "\ud835\udcb9", "ee": "\u2147", "efr": "\ud835\udd22",
+              "ell": "\u2113", "emsp": "\u2003", "emsp13": "\u2004", "emsp14": "\u2005", "ensp": "\u2002",
+              "eopf": "\ud835\udd56", "equals": "=", "escr": "\u212f", "excl": "!", "expectation": "\u2130",
+              "exponentiale": "\u2147", "ffilig": "\ufb03", "fflig": "\ufb00", "ffllig": "\ufb04",
+              "ffr": "\ud835\udd23", "filig": "\ufb01", "fjlig": "fj", "fllig": "\ufb02", "fopf": "\ud835\udd57",
+              "fscr": "\ud835\udcbb", "gfr": "\ud835\udd24", "gopf": "\ud835\udd58", "grave": "`",
+              "gscr": "\u210a", "gt": ">", "hairsp": "\u200a", "hamilt": "\u210b", "hellip": "\u2026",
+              "hfr": "\ud835\udd25", "hopf": "\ud835\udd59", "hscr": "\ud835\udcbd", "ic": "\u2063",
+              "ifr": "\ud835\udd26", "ii": "\u2148", "ijlig": "\u0133", "image": "\u2111", "imagline": "\u2110",
+              "imagpart": "\u2111", "incare": "\u2105", "integers": "\u2124", "iopf": "\ud835\udd5a",
+              "iscr": "\ud835\udcbe", "it": "\u2062", "jfr": "\ud835\udd27", "jopf": "\ud835\udd5b",
+              "jscr": "\ud835\udcbf", "kfr": "\ud835\udd28", "kopf": "\ud835\udd5c", "kscr": "\ud835\udcc0",
+              "lagran": "\u2112", "lbrace": "{", "lbrack": "[", "lcub": "{", "lfr": "\ud835\udd29",
+              "lopf": "\ud835\udd5d", "lowbar": "_", "lpar": "(", "lrm": "\u200e", "lscr": "\ud835\udcc1",
+              "lsqb": "[", "lt": "<", "mfr": "\ud835\udd2a", "midast": "*", "mldr": "\u2026",
+              "mopf": "\ud835\udd5e", "mscr": "\ud835\udcc2", "naturals": "\u2115", "nbsp": "\u00a0",
+              "nfr": "\ud835\udd2b", "nldr": "\u2025", "nopf": "\ud835\udd5f", "nscr": "\ud835\udcc3", "num": "#",
+              "numero": "\u2116", "numsp": "\u2007", "oS": "\u24c8", "ofr": "\ud835\udd2c", "oopf": "\ud835\udd60",
+              "order": "\u2134", "orderof": "\u2134", "ordf": "\u00aa", "ordm": "\u00ba", "oscr": "\u2134",
+              "percnt": "%", "period": ".", "pfr": "\ud835\udd2d", "phmmat": "\u2133", "planckh": "\u210e",
+              "plus": "+", "popf": "\ud835\udd61", "primes": "\u2119", "pscr": "\ud835\udcc5", "puncsp": "\u2008",
+              "qfr": "\ud835\udd2e", "qopf": "\ud835\udd62", "qscr": "\ud835\udcc6", "quaternions": "\u210d",
+              "quest": "?", "quot": "\"", "rationals": "\u211a", "rbrace": "}", "rbrack": "]", "rcub": "}",
+              "real": "\u211c", "realine": "\u211b", "realpart": "\u211c", "reals": "\u211d",
+              "rfr": "\ud835\udd2f", "rlm": "\u200f", "ropf": "\ud835\udd63", "rpar": ")", "rscr": "\ud835\udcc7",
+              "rsqb": "]", "semi": ";", "sfr": "\ud835\udd30", "shy": "\u00ad", "sol": "/", "sopf": "\ud835\udd64",
+              "sscr": "\ud835\udcc8", "sup1": "\u00b9", "sup2": "\u00b2", "sup3": "\u00b3", "tfr": "\ud835\udd31",
+              "thinsp": "\u2009", "topf": "\ud835\udd65", "trade": "\u2122", "tscr": "\ud835\udcc9",
+              "ufr": "\ud835\udd32", "uopf": "\ud835\udd66", "uscr": "\ud835\udcca", "verbar": "|", "vert": "|",
+              "vfr": "\ud835\udd33", "vopf": "\ud835\udd67", "vscr": "\ud835\udccb", "wfr": "\ud835\udd34",
+              "wopf": "\ud835\udd68", "wscr": "\ud835\udccc", "xfr": "\ud835\udd35", "xopf": "\ud835\udd69",
+              "xscr": "\ud835\udccd", "yfr": "\ud835\udd36", "yopf": "\ud835\udd6a", "yscr": "\ud835\udcce",
+              "zeetrf": "\u2128", "zfr": "\ud835\udd37", "zopf": "\ud835\udd6b", "zscr": "\ud835\udccf",
+              "zwj": "\u200d", "zwnj": "\u200c"
+            }));
+            // entities-end
             const percentRun = (run) => {
               try { return decodeURIComponent(run); } catch { return run.replace(/%([0-9A-Fa-f]{2})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16))); }
             };
@@ -243,47 +315,85 @@ jobs:
             // CommonMark's own link shape, read too: a destination, whitespace (a line break among it) and an optional
             // quoted or parenthesized title. Each whitespace run is taken whole ((?=(\s*))\N), so no split of a run is retried.
             const titled = /!?\[([^\[\]\n]*)\]\((?=(\s*))\2<?[^\s()<>]*>?(?=(\s*))\3(?:(?:"[^"\n]*"|'[^'\n]*'|\([^()\n]*\))(?=(\s*))\4)?\)/g;
-            // Only the inline elements GitHub renders are removed; any other <word>, such as a <user> placeholder, stays as text.
+            // The inline elements GitHub renders are removed here; the projection below removes every raw-HTML construct.
             const inlineTags = /<\/?(?:a|abbr|b|bdi|bdo|br|cite|code|del|dfn|em|i|img|ins|kbd|mark|q|rp|rt|ruby|s|samp|small|span|strike|strong|sub|sup|time|tt|u|var|wbr)\b[^<>\n]*>/gi;
             const decoders = [
               (text) => text.replace(/(?:%[0-9A-Fa-f]{2})+/g, percentRun),
               (text) => text.replace(/\\u([0-9A-Fa-f]{4})|\\\//g, (_, hex) => (hex ? String.fromCharCode(parseInt(hex, 16)) : '/')),
-              (text) => text.replace(/&(?:#([0-9]{1,7})|#[xX]([0-9A-Fa-f]{1,6})|([A-Za-z]{2,8}));/g,
+              (text) => text.replace(/&(?:#([0-9]{1,7})|#[xX]([0-9A-Fa-f]{1,6})|([A-Za-z][A-Za-z0-9]{1,31}));/g,
                 (whole, decimal, hex, name) => (decimal ? fromCode(Number(decimal)) : hex ? fromCode(parseInt(hex, 16)) : named.get(name) ?? whole)),
               (text) => text.replace(links, '$1').replace(titled, '$1').replace(/!?\[([^\[\]\n]*)\]\[[^\[\]\n]*\]/g, '$1').replace(/<((?:https?|file|mailto):[^<>\s]*)>/g, '$1')
                 .replace(inlineTags, '').replace(/\\([!-\/:-@\[-`{-~])/g, '$1').replace(/`/g, '')
                 .replace(/(\*{1,3}|~{1,2}|_{1,3})([\p{L}\p{N}][^\s*~_\/\\]*?)\1/gu, '$2'),
             ];
-            // The rules read the body as written and a projection of it for reading (the command center's ruling at
-            // 752d9618, rule 4): HTML comments removed, as GitHub hides them (CommonMark 0.31.2, spec.txt:8986: <!-->,
-            // <!---> or <!-- up to -->, found by one linear scan), and every character of general category Cc, Cf, Zl or
-            // Zp but tab, LF and CR removed (234 code points in Unicode 17.0, which Node 24.21 carries, as in Python
-            // 3.13.16's 15.1). A value split by a comment, a zero-width or bidi format character or an admitted line
-            // break is read joined.
-            const withoutComments = (text) => {
+            // The rules read the body as written and a projection of it for reading (the command center's rulings at
+            // 752d9618 and e15d1259, rule 4: each set is the one a specification defines, not a list). The projection
+            // removes every raw-HTML construct of the GFM grammar (github/cmark-gfm@587a12bb test/spec.txt:9360-9431, "Raw
+            // HTML": an open tag, a closing tag, a comment, a processing instruction, a declaration and a CDATA section), as
+            // GitHub drops them, by one linear scan; a construct that stands alone between separators (whitespace, a slash
+            // or a backslash, or either end), such as a <user> placeholder in a path, is kept, since removing it would join
+            // the separators around it. It then removes every character of general category Cc, Cf, Zl or Zp but tab, LF
+            // and CR, and every Default_Ignorable_Code_Point (UCD DerivedCoreProperties.txt; Unicode 17.0 in Node 24.21),
+            // and applies NFKC, which folds width forms such as a fullwidth solidus. A value spelled with its own characters
+            // is read joined, whatever is inserted between them; a look-alike that substitutes a character is not.
+            const tagAt = /<[A-Za-z][A-Za-z0-9-]*(?:\s+[A-Za-z_:][A-Za-z0-9_.:-]*(?:\s*=\s*(?:[^\s"'=<>`]+|'[^']*'|"[^"]*"))?)*\s*\/?>|<\/[A-Za-z][A-Za-z0-9-]*\s*>/y;
+            const markupEnd = (text, open) => {
+              const closer = (start, close) => {
+                const at = text.indexOf(close, start);
+                return at < 0 ? -1 : at + close.length;
+              };
+              if (text.startsWith('<!--', open)) return closer(open + 2, '-->');
+              if (text.startsWith('<?', open)) return closer(open + 2, '?>');
+              if (text.startsWith('<![CDATA[', open)) return closer(open + 9, ']]>');
+              if (/^<![A-Za-z]/.test(text.slice(open, open + 3))) return closer(open + 2, '>');
+              tagAt.lastIndex = open;
+              const match = tagAt.exec(text);
+              return match ? open + match[0].length : -1;
+            };
+            const separator = (character) => character === undefined || /[\s\/\\]/.test(character);
+            const withoutMarkup = (text) => {
               let out = '';
               let at = 0;
-              for (let open = text.indexOf('<!--'); open >= 0; open = text.indexOf('<!--', at)) {
-                const close = text.indexOf('-->', open + 2);
-                if (close < 0) break;
-                out += text.slice(at, open);
-                at = close + 3;
+              const unclosed = new Set();
+              for (let open = text.indexOf('<'); open >= 0; open = text.indexOf('<', open + 1)) {
+                // A backslash-escaped '<' is text (CommonMark's backslash escapes): count the backslashes before it.
+                let slashes = 0;
+                while (text[open - 1 - slashes] === '\\') slashes += 1;
+                if (slashes % 2) continue;
+                // Once a closer is missing after one opening, it is missing after every later one: skip them.
+                const kind = text.startsWith('<!--', open) ? '-->' : text.startsWith('<?', open) ? '?>'
+                  : text.startsWith('<![CDATA[', open) ? ']]>' : /^<![A-Za-z]/.test(text.slice(open, open + 3)) ? '>' : null;
+                if (kind && unclosed.has(kind)) continue;
+                const end = markupEnd(text, open);
+                if (end < 0) {
+                  if (kind) unclosed.add(kind);
+                  continue;
+                }
+                if (!(separator(text[open - 1]) && separator(text[end]))) {
+                  out += text.slice(at, open);
+                  at = end;
+                }
+                open = end - 1;
               }
               return out + text.slice(at);
             };
-            const project = (text) => withoutComments(text).replace(/(?![\t\n\r])[\p{Cc}\p{Cf}\p{Zl}\p{Zp}]/gu, '');
+            const projectCharacters = (text) => text
+              .replace(/(?![\t\n\r])[\p{Cc}\p{Cf}\p{Zl}\p{Zp}\p{Default_Ignorable_Code_Point}]/gu, '').normalize('NFKC');
+            // Markup is removed from the body as written only: GitHub parses raw HTML there, never in what a reference,
+            // an escape or Markdown decodes to, so the projection's decoder chains apply the character projection alone.
+            const project = (text) => projectCharacters(withoutMarkup(text));
             // The decoders compose: the rules see the body and its projection after every order of every subset of them,
             // each decoder at most once along a chain and never to a fixed point (up to 65 forms from each), so a value
             // written with several of these at once, such as character references around emphasis, is judged as it reads
             // too. In the projection's chains each decoder's output is projected again, so a reference that decodes to a
-            // comment or a format character is removed as well.
+            // format character or a width form is read as that character too.
             const forms = new Set();
             const compose = (text, rest, then) => {
               forms.add(text);
               rest.forEach((decoder, index) => compose(then(decoder(text)), rest.filter((_, other) => other !== index), then));
             };
             compose(body, decoders, (text) => text);
-            compose(project(body), decoders, project);
+            compose(project(body), decoders, projectCharacters);
             const hits = privacy.filter(([, pattern]) => [...forms].some((form) => pattern.test(form))).map(([id]) => id);
             const problems = [];
             if (!content) {

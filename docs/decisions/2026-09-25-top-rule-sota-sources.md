@@ -397,6 +397,64 @@ Boundaries this states: the projection removes characters, it does not render Ma
 line break or by a carriage return is still not joined; and a value hidden under two layers of the same encoding is
 not decoded, as before.
 
+### After the command center's Claude micro of `e15d1259` (2026-10-12, the terminal commit)
+
+The command center's micro at `e15d1259` found three more ways to hide a split from the projection, each a privacy P1,
+and its adjudication made this the terminal commit. The class had recurred three times (B1 to M1 to N3, T8 to N1, and
+the entity map to N2), so each enumeration is replaced by the set a specification defines (rule 4), in both copies:
+
+- **N1: raw HTML other than a comment.** An unknown tag, `<font>`, `<input>`, CDATA or a processing instruction split
+  a home path or a token; GitHub drops the markup and shows the value whole. The projection now removes every raw-HTML
+  construct of the GFM grammar: an open tag, a closing tag, a comment, a processing instruction, a declaration and a
+  CDATA section (github/cmark-gfm@`587a12bb54d95ac37241377e6ddc93ea0e45439b` `test/spec.txt:9360-9431`, "Raw HTML";
+  file sha256 `7d8e5814befec287ac116786d81ff14e0adc9b13295b4494649e995408fd871c`). It reads them from the body as
+  written only, as GitHub parses raw HTML there and never in what a reference or an escape decodes to, and it treats
+  a backslash-escaped `<` as text (CommonMark's backslash escapes). One left-to-right scan finds them; once a closer
+  (`-->`, `?>`, `]]>`, `>`) is missing after one opening, later openings of that kind are skipped, so the scan stays
+  linear. A construct that stands alone between separators (whitespace, a slash or a backslash, or either end), such
+  as the documented `<user>` placeholder in `C:\Users\<user>\x`, is kept: removing it would join the separators
+  around it into a different path, while no value can be split there.
+- **N2: named references outside the 16-name map.** `&shy;`, `&zwj;`, `&UnderBar;` or `&dollar;` split or completed a
+  value. Named references are now decoded from the HTML5 table as cmark-gfm pins it (`src/entities.inc` at the same
+  commit, 2,125 names; the spec names WHATWG's `entities.json` as the authority, `test/spec.txt:5946-5950`), limited
+  mechanically to the 297 names whose text, after the projection's character step, is ASCII or nothing; no other
+  name can complete or hide a value the rules read. `tests/fixtures/cmark-gfm-entities-587a12bb.json` keeps the table
+  (sha256 of the source file `3932dfa630067813f47be6ae0072e1645c1183bde41140b51443f50857c88909`), and a test
+  regenerates the subset from it and compares it with the job's map; another, where the mirror is present, compares the
+  fixture with `src/entities.inc` at the pin. The old map's `&hyphen;` and `&dash;` gave ASCII `-`; the table gives
+  U+2010, which no rule reads.
+- **N3: invisible characters outside Cc, Cf, Zl and Zp.** A variation selector, the combining grapheme joiner, a Hangul
+  filler or a reserved default-ignorable split a value. The projection also removes every Default_Ignorable_Code_Point
+  (Unicode 17.0.0 `DerivedCoreProperties.txt`, 4,174 code points, <https://www.unicode.org/Public/17.0.0/ucd/>, read
+  2026-10-12T08:01:08Z, sha256 `24c7fed1195c482faaefd5c1e7eb821c5ee1fb6de07ecdbaa64b56a99da22c08`; Node 24.21's
+  `\p{Default_Ignorable_Code_Point}` matches the same 4,174).
+- **Width forms.** The projection applies NFKC (`String.prototype.normalize`), which folds a fullwidth solidus,
+  fullwidth letters and mathematical letters to ASCII.
+
+The rules still run on the body as written too, so the projection only adds catches; clean bodies stay clean,
+including #1003's mirror tests and the 19 masked lines. **What the gate guarantees:** no value spelled with its own
+characters is published, whatever is inserted between them. **What it does not:** a look-alike that substitutes a
+character (a division slash, a Cyrillic letter) rather than inserting one; closing that needs the UTS #39 confusables
+data, a P2 follow-up (a skeleton projection).
+
+On Node 24.21, 67 adversarial shapes at the bound each get a verdict within 0.47 s on this 64-CPU host at a load
+of about 18 (four runs, worst 0.46, 0.46, 0.45 and 0.47 s), the earlier 52 plus unclosed markup of each kind, attribute runs, reference
+runs and width-form runs.
+
+The new tests fail at `e15d1259` (51 failures, 2 errors). Eleven weakened copies were run, and all eleven fail the tests:
+
+- no markup removal; no closing tags; no processing instructions; no CDATA; no placeholder exception; an escaped
+  `<` read as markup; unclosed openings rescanned (no verdict within the test's 60 s);
+- names of at most 8 letters, as before; the map without `UnderBar`;
+- no Default_Ignorable_Code_Point; no NFKC.
+
+Old and new gates give the same outcome on the live description of every open pull request (75) and of the latest
+400 in any state, at 2026-10-12T08:21Z; neither names a rule on any of them. Only rule ids were printed.
+
+Boundaries this states: raw HTML inside a code span or block is removed too, though GitHub shows it as text, so such
+contrived text can be refused; a value split across a line break, by a carriage return, or under two layers of one
+encoding is not joined.
+
 ## Alternatives considered
 
 - **A checklist item in the PR template only.** Rejected: nothing fails, and the rule was already implied by the core

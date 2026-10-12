@@ -16,6 +16,7 @@ calling it at a pinned commit. These tests keep the two copies one check:
   scaffold keeps that file under a `.template` name that validate.yml's repository-wide zizmor gate does not collect.
 """
 
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -379,6 +380,33 @@ GATE_ONLY_CASES = {"a percent-encoded home path", "a JSON-escaped slash", "a JSO
                    "a name split by a link whose title holds a parenthesis",
                    "a lower-case macOS home in a file URL", "redundant leading slashes"}
 
+# The HTML5 named-reference table as github/cmark-gfm pins it (src/entities.inc), the gate's subset's source.
+CMARK_PIN = "587a12bb54d95ac37241377e6ddc93ea0e45439b"
+ENTITY_FIXTURE = ROOT / "tests/fixtures/cmark-gfm-entities-587a12bb.json"
+UPSTREAM_CMARK = Path.home() / "code/upstream/github/cmark-gfm"
+NODE_PROJECT = r"""
+const fs = require('fs');
+const project = (s) => s.replace(/(?![\t\n\r])[\p{Cc}\p{Cf}\p{Zl}\p{Zp}\p{Default_Ignorable_Code_Point}]/gu, '').normalize('NFKC');
+process.stdout.write(JSON.stringify(JSON.parse(fs.readFileSync(0, 'utf8')).map(project)));
+"""
+
+
+def node_project(text: str) -> str:
+    """The gate's character projection (strip, then NFKC), run in node as the job runs it."""
+    result = subprocess.run([NODE, "-e", NODE_PROJECT], input=json.dumps([text]), capture_output=True, text=True,
+                            timeout=60, check=True)
+    return json.loads(result.stdout)[0]
+
+
+def gate_entity_subset() -> dict:
+    """The gate's named-reference map, evaluated from the job's script between its entities markers."""
+    script = inline_script(sota_job(GATE))
+    block = script.split("// entities-begin\n", 1)[1].split("// entities-end\n", 1)[0]
+    result = subprocess.run([NODE, "-e", block + "\nprocess.stdout.write(JSON.stringify(Object.fromEntries(named)));"],
+                            capture_output=True, text=True, timeout=60, check=True)
+    return json.loads(result.stdout)
+
+
 # The repository's own WSL recipe, receipts and their frozen copies write the UNC form with the user masked.
 MASKED_WSL_FILES = ["adoption/platforms/linux-wsl2-new-distro.md", "adoption/templates/wsl/stage1-receipt.example.json",
                     "docs/decisions/2026-10-01-new-wsl-distro-recipe.md", "docs/secret-storage.md",
@@ -507,6 +535,107 @@ class GatePrivacyTests(unittest.TestCase):
             with self.subTest(shape=shape[:24], separator=hex(ord(separator))):
                 self.assertIn("(rules: ", outcome["failed"] or "")
 
+    def test_a_value_split_or_completed_by_markup_references_or_ignorables_is_caught(self):
+        # The command center's micro at e15d1259 (N1, N2, N3) and its terminal ruling: the projection reads the sets the
+        # specifications define. Raw HTML of every kind in the GFM grammar (github/cmark-gfm@587a12bb test/spec.txt
+        # :9360-9431), the HTML5 named references, every Default_Ignorable_Code_Point, and NFKC width forms.
+        cases = []
+        markup = ["<x>", "</x>", "<x/>", '<x y="z">', "<font>", "</font>", "<nobr>", "<input>", "<template></template>",
+                  "<custom-el>", "<![CDATA[x]]>", "<?x?>", "<!-- c -->", "<!DOCTYPE x>", "<a href='q'>", "<x\ny=z>"]
+        for piece in markup:
+            cases.append(("markup " + piece, "/ho" + piece + "me/alice/x", "personal-home-path"))
+        cases += [("markup in a Windows profile", "C:" + BS + "Us<x>ers" + BS + "Alice", "windows-user-path"),
+                  ("CDATA in a Windows profile", "C:" + BS + "Users" + BS + "Al<![CDATA[]]>ice", "windows-user-path"),
+                  ("markup in a graph id", "home-al<x>ice-code-x", "encoded-home-path"),
+                  ("a processing instruction in a graph id", "home-al<?p?>ice-code-x", "encoded-home-path"),
+                  ("markup in a GitHub token", "gh<b>p_" + "a" * 36, "github-token"),
+                  ("markup in an Anthropic key", "sk-" + "ant-" + "A" * 15 + "<i>" + "A" * 15, "api-secret")]
+        for name in ("shy", "zwj", "zwnj", "lrm", "rlm", "ZeroWidthSpace", "NoBreak", "it", "ic", "af", "InvisibleTimes",
+                     "NegativeThinSpace"):
+            cases.append(("reference &" + name + ";", "/ho&" + name + ";me/alice/x", "personal-home-path"))
+        cases += [("&UnderBar; completes a token", "ghp&UnderBar;" + "a" * 36, "github-token"),
+                  ("&UnderBar; in a fine-grained token", "github&UnderBar;pat_" + "a" * 30, "github-token"),
+                  ("&dollar; completes a UNC home", BS * 2 + "wsl&dollar;" + BS + "D" + BS + "home" + BS + "alice",
+                   "personal-home-path"),
+                  ("&quest; completes a device path", BS * 2 + "&quest;" + BS + "UNC" + BS + "wsl.localhost" + BS + "D" + BS
+                   + "home" + BS + "alice", "personal-home-path"),
+                  ("&sol; and math letters", "&sol;&hopf;ome&sol;alice&sol;x", "personal-home-path")]
+        for point in (0x034F, 0xFE00, 0xFE0F, 0xE0100, 0x180B, 0x180F, 0x17B4, 0x3164, 0x115F, 0x2065, 0xFFF0, 0xE0002,
+                      0xE0041, 0xE007F):
+            cases.append((f"default-ignorable U+{point:04X}", "/ho" + chr(point) + "me/alice/x", "personal-home-path"))
+        cases += [("a numeric reference to VS16", "/ho&#xFE0F;me/alice/x", "personal-home-path"),
+                  ("a numeric reference to CGJ", "/ho&#x34F;me/alice/x", "personal-home-path"),
+                  ("a fullwidth solidus", chr(0xFF0F) + "home" + chr(0xFF0F) + "alice" + chr(0xFF0F) + "x", "personal-home-path"),
+                  ("a fullwidth reverse solidus", "C:" + chr(0xFF3C) + "Users" + chr(0xFF3C) + "Alice", "windows-user-path"),
+                  ("fullwidth letters", "/" + "".join(chr(0xFF41 + ord(c) - 97) for c in "home") + "/alice/x",
+                   "personal-home-path")]
+        payloads = [body("x " + text + " y" + SOURCES) for _, text, _ in cases]
+        outcomes = {path.name: run_check(inline_script(sota_job(path)), payloads) for path in (VALIDATE, GATE)}
+        self.assertEqual(outcomes["pr-metadata.yml"], outcomes["sota-sources-gate.yml"])
+        for (case, _, rule), outcome in zip(cases, outcomes["sota-sources-gate.yml"]):
+            with self.subTest(case=case):
+                self.assertIn(rule, outcome["failed"] or "")
+
+    def test_a_sample_across_the_entity_subset_is_decoded(self):
+        # Every 4th name of the gate's subset, each placed where its decoded character completes a value (or, for a
+        # name that projects to nothing, inside one).
+        table = json.loads(ENTITY_FIXTURE.read_text(encoding="utf-8"))["entities"]
+        subset = gate_entity_subset()
+        templates = [(HOME + "alice/x", "personal-home-path"), ("gh" + "p_" + "abcdefghijklmnopqrstuvwxyz0123456789",
+                                                             "github-token"), ("C:" + BS + "Users" + BS + "Alice", "windows-user-path")]
+        cases = []
+        for name in sorted(subset)[::4]:
+            projected = node_project("".join(map(chr, table[name])))
+            if projected == "":
+                cases.append((name, "/ho&" + name + ";me/alice/x", "personal-home-path"))
+                continue
+            for template, rule in templates:
+                if len(projected) == 1 and projected in template:
+                    cases.append((name, template.replace(projected, "&" + name + ";", 1), rule))
+                    break
+        self.assertGreater(len(cases), 30)
+        payloads = [body("x " + text + " y" + SOURCES) for _, text, _ in cases]
+        outcomes = run_check(inline_script(sota_job(GATE)), payloads)
+        for (name, _, rule), outcome in zip(cases, outcomes):
+            with self.subTest(name=name):
+                self.assertIn(rule, outcome["failed"] or "")
+
+    def test_the_entity_subset_is_regenerated_from_the_pinned_table(self):
+        # The gate's map holds exactly the names of the pinned HTML5 table (cmark-gfm src/entities.inc at 587a12bb,
+        # kept as tests/fixtures/cmark-gfm-entities-587a12bb.json) whose text, after the gate's character projection,
+        # is ASCII or nothing, each with its table value.
+        fixture = json.loads(ENTITY_FIXTURE.read_text(encoding="utf-8"))
+        self.assertEqual(len(fixture["entities"]), 2125)
+        expected = {name: "".join(map(chr, points)) for name, points in fixture["entities"].items()
+                    if all(ord(c) < 128 for c in node_project("".join(map(chr, points))))}
+        self.assertEqual(gate_entity_subset(), expected)
+        self.assertEqual(len(expected), 297)
+
+    @unittest.skipUnless((UPSTREAM_CMARK / "src/entities.inc").exists(), "the github/cmark-gfm mirror is not on this host")
+    def test_the_entity_fixture_is_the_pinned_upstream_table(self):
+        raw = subprocess.run(["git", "-C", str(UPSTREAM_CMARK), "show", CMARK_PIN + ":src/entities.inc"],
+                             capture_output=True, check=True).stdout
+        fixture = json.loads(ENTITY_FIXTURE.read_text(encoding="utf-8"))
+        self.assertEqual(hashlib.sha256(raw).hexdigest(), fixture["sha256"])
+        table = {}
+        for name, numbers in re.findall(rb'[{][(]unsigned char[*][)]"([A-Za-z0-9]+)", [{]([0-9, ]+)[}][}]', raw):
+            data = bytes(int(number) for number in numbers.decode().split(","))
+            table[name.decode()] = [ord(c) for c in data.split(b"\0", 1)[0].decode("utf-8")]
+        self.assertEqual(table, fixture["entities"])
+
+    def test_ordinary_markup_and_placeholders_still_pass(self):
+        texts = ["<details><summary>Notes</summary>See ~/" + ".config and the logs.</details>", "a <b>bold</b> word<br>",
+                 "<!-- a comment --> and <sub>2</sub>", "C:" + BS + "Users" + BS + "<name>" + BS + "AppData",
+                 HOME + "<user>/x", BS * 2 + "wsl$" + BS + "D" + BS + "home" + BS + "<WSL_USER>" + BS + "x",
+                 "Use `<x>` or <kbd>Ctrl</kbd>&shy;C, a&zwj;b, x&UnderBar;y and &dollar;5.", "fullwidth " + chr(0xFF21) + "BC",
+                 "an unclosed <!-- comment", "an unclosed <?pi and <![CDATA[ and <!X", "a < b > c and 1<2",
+                 # A backslash-escaped '<' is text: GitHub shows C:\\Users<x>alice, so the tag is not removed.
+                 "C:" + BS + "Users" + BS + "<x>alice"]
+        outcomes = {path.name: run_check(inline_script(sota_job(path)), [body(text + SOURCES) for text in texts])
+                    for path in (VALIDATE, GATE)}
+        self.assertEqual(outcomes["pr-metadata.yml"], outcomes["sota-sources-gate.yml"])
+        self.assertEqual([outcome["failed"] for outcome in outcomes["sota-sources-gate.yml"]], [None] * len(texts))
+
     def test_clean_bodies_with_admitted_and_format_characters_pass(self):
         # The projection removes characters; it never refuses a body that carries them around ordinary text.
         texts = ["See the notes" + character + "in the docs, ~/" + ".config and <user>." for character in
@@ -539,11 +668,14 @@ class GatePrivacyTests(unittest.TestCase):
         # Round 2: unclosed comments, and the titled link shape's quote and whitespace runs.
         projected = [("<!--" * MAX_BODY)[:MAX_BODY - len(SOURCES)], ("[a](" + '"' * MAX_BODY)[:MAX_BODY - len(SOURCES)],
                      ("[a](b " + " \n" * MAX_BODY)[:MAX_BODY - len(SOURCES)], ("[a](\"x" * MAX_BODY)[:MAX_BODY - len(SOURCES)]]
+        # The terminal round: unclosed markup of each kind, attribute runs, references and width forms.
+        projected += [(unit * MAX_BODY)[:MAX_BODY - len(SOURCES)] for unit in
+                      ("<?", "<![CDATA[", "<!X", "<a b='", '<a b="', "<a b ", "<a ", "&shy;", "&UnderBar;", chr(0xFF0F))]
         start = time.monotonic()
         outcomes = run_check(inline_script(sota_job(GATE)),
                              [body(text + SOURCES) for text in [run, mixed] + brackets + unclosed + projected])
-        self.assertLess(time.monotonic() - start, 30)
-        self.assertEqual([outcome["failed"] for outcome in outcomes], [None] * 14)
+        self.assertLess(time.monotonic() - start, 45)
+        self.assertEqual([outcome["failed"] for outcome in outcomes], [None] * 24)
 
     def test_credential_lengths_agree_with_scripts_validate_at_each_minimum(self):
         # (P2-2) one below, at and one above each rule's minimum length, alone and glued to Unicode word characters.
