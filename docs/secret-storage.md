@@ -1798,38 +1798,33 @@ record `readers/guard-fp-20261012/FINDING-reserved-word-segments.md`), on the co
 commands shows the false positives falling and no new refusal of a command that is not a true positive.
 
 **What changes.** Each item below is in `scripts/hooks/secret_path_guard.py` and in
-`GuardFalsePositiveRepairTests` of `tests/test_secret_path_guard.py`, whose rows fail on the guard at `2f59d744`
-(42 failures and one error) and pass here.
+`GuardFalsePositiveRepairTests` of `tests/test_secret_path_guard.py`, whose rows fail on the guard at `6934527e`
+(37 failures and one error; the whole module there: 40 failures and 15 errors) and pass here.
 
 - **L2: more masked bodies** (`k4_code_bodies`). Besides form F, a here-document body leaves both base word readings
   when all of these hold. Its delimiter word is one quoted identifier and its operator is `<<`, not `<<-`. Bash reads
   the operator outside every quote, comment and substitution and resumes at top level after the body
   (`k4_resume_contexts` gives the empty context). Its operator line is one physical line, not continued, with exactly
   one `<<`. After the line's last `;`, `&&` or `||`, and past leading reserved words, assignments with a plain value
-  and `timeout DURATION` (which runs the command on the same standard input), the command is an F operator line or
-  exactly `cat > FILE` or `cat >> FILE` writing a `.py`, `.js`, `.mjs` or `.cjs` file. Output redirections that stand
+  and `timeout DURATION` (which runs the command on the same standard input), the command is an F operator line.
+  Output redirections that stand
   before `<<` are read after it, since they touch descriptors 1 and 2 only (Bash Reference Manual, "Redirections").
   A later line equals the delimiter. The operator line, the terminator line and all text after the terminator stay
   in both readings, and TAIL-READ reads each text after a terminator without the masked bodies inside it. The CODE
   rules read every masked interpreter body as its language's code. The whole-text rules, the keyring-code rule and
   the after-source checks (`environment_dump_after_source`, `trace_while_sourcing`) still read the whole text,
-  bodies included, so no after-source verdict changes. A written code file's body is read neither as shell nor as
-  code: this command does not run it as written, and the guard reads no script file, whether a here-document or the
-  Write tool wrote it. Every other here-document keeps both base readings: an unquoted delimiter, an interpreter named
-  by a variable, any other launcher, a pipe program outside F's filters, a shell script, a data or prose file, or a
-  name only a variable holds. The ruling's sentence is about code: a prose body with a line that reads as a dump stays
-  refused under the K3 record (`test_blocked_commands`), and the one such command in the replay window is among the
-  residuals below. A file named as Python or JavaScript that a `cat` writes and a shell then runs in the same command
-  is a recorded residual (`EXPECTED_PASS_THROUGH`).
+  bodies included, so no after-source verdict changes. Every other here-document keeps both base readings: an
+  unquoted delimiter, an interpreter named by a variable, any other launcher, a pipe program outside F's filters, and
+  every file a `cat` writes, whatever its name, because a later command of the same request can run that body. The
+  ruling's sentence is about code: a prose body with a line that reads as a dump stays refused under the K3 record
+  (`test_blocked_commands`).
 - **L3: literals read as bash reads them** (SHELL-LITERAL). In a literal read as shell text, a `(` that touches a word
   character before it is read as a blank (`K4_CALL_PARENTHESIS`): bash runs nothing from `name(`, which can only begin
   a function definition `name ()` and is otherwise a syntax error, so `sorted(set(m))` in Python source no longer
-  yields a `set` segment, while `(set)`, `$(...)` and `<(...)` keep theirs. A literal that is the only argument of a
-  data method (`d.get("env")`, `line.startswith("export ")`; `K4_DATA_METHODS`, from the str, bytes, dict, list, set
-  and re methods of the Python Library Reference and the String, Array, Map, Set and RegExp methods of ECMA-262) is a
-  key or an affix, not a standalone command. Every recognized shell-out call is still read by SHELL-OUT, and a call
-  through any other name stays standalone. RESERVED (below) stays off inside a literal's reading, since Python's and
-  JavaScript's `if`, `else`, `while` and `do` would read as bash's.
+  yields a `set` segment, while `(set)`, `$(...)` and `<(...)` keep theirs. A literal that is a method's only
+  argument stays a standalone literal whatever the method's name, since the name does not prove the receiver inert.
+  RESERVED (below) stays off inside a literal's reading, since Python's and JavaScript's `if`, `else`, `while` and `do`
+  would read as bash's.
 - **Pointer presence check** (`printenv_presence_check`): `printenv` with one or more inventory pointer names, no
   option, and standard output's last redirection on `/dev/null` (`>/dev/null`, `&>/dev/null`, `>& /dev/null`,
   also followed by `2>&1`) answers by its exit status only. `printenv NAME` alone, a pipe, `>/dev/null 1>&2`, a
@@ -1841,16 +1836,29 @@ commands shows the false positives falling and no new refusal of a command that 
   present in bare `env`'s). The prior reading's bare `env` segment for such a command is no longer added.
 - **RESERVED** (tier k, `k4_reserved_reason`): a segment of either reading that begins with `!`, `{`, `if`, `then`,
   `elif`, `else`, `while`, `until`, `do` or `coproc` is read again as the command after those words, through
-  `k4_derived` and every rule. Before, no segment rule read that command. It only refuses. `case` patterns,
-  `coproc NAME { ... }` and `function NAME { ... }` are not read this way.
+  `k4_derived` and every rule. Before, no segment rule read that command. It only refuses. It reads the segments of
+  the command with each word-touching `(` read as a blank, as L3 reads literals (`k4_reserved_segments`), so Python's
+  `if set(a) != set(b):` in a body that keeps the shell readings is no `if` followed by a bare `set`; every other
+  segment is the same. `case` patterns, `coproc NAME { ... }` and `function NAME { ... }` are not read this way.
+
+**Corrections after the first review (2026-10-12).** Astra's adversarial read of the first version (head `d2fcf5b5`)
+reproduced two P1 regressions against the merge base `6934527e`, each turning a refusal into an allow: a file that a
+`cat` writes was masked by name alone, and a later command of the same request could run its body; and a literal that
+was the only argument of a method with a data-sounding name was taken as no command, although an attribute can hold
+any callable (CPython `v3.13.16`, `Doc/library/types.rst`, `SimpleNamespace`). Both exemptions are withdrawn. The
+reviewer's nine fixtures are regression rows (`WRITTEN_AND_METHOD_REFUSED`); they fail on the first version's guard and
+pass on main's and here. The first version also recorded the written-then-run case as a residual; that residual is
+gone. Withdrawing the written-file exemption made one replayed command refuse anew through RESERVED (Python's
+`if set(...)` read as shell); RESERVED's `name(` reading above restores it.
 
 **Replay.** The landing condition's measurement: every Bash call in this host's Claude Code transcripts, subagents
 included, timestamped from 2026-10-11T00:00Z to 2026-10-13T00:00Z, extracted 2026-10-12T18:36Z: 55,469 calls, 54,207
-distinct commands, each read by `check()` of the guard at `2f59d744` and of this change, with the hook's size limit.
+distinct commands, each read by `check()` of the guard at the merge base `6934527e` (sha256 `ce9027c56a7006317f52c6cfc2bcb9b267a4f37050269ccdbd001d1371f7d83a`, the same
+bytes as at `2f59d744` and at `703d588c`) and of this change, with the hook's size limit; rerun after the corrections.
 
 | Class | Main | This change |
 | --- | ---: | ---: |
-| `environment_dump` | 262 | 34 |
+| `environment_dump` | 262 | 91 |
 | `dotenv_read` | 24 | 24 |
 | `interpreter_environment_unclassified` | 17 | 18 |
 | `secret_name_search` | 14 | 14 |
@@ -1861,19 +1869,21 @@ distinct commands, each read by `check()` of the guard at `2f59d744` and of this
 | `process_environment` | 4 | 4 |
 | `secret_variable_reference` | 3 | 2 |
 | six other classes (one or two each) | 8 | 8 |
-| **All refusals** | **359** | **131** |
+| **All refusals** | **359** | **188** |
 
-No command that main allowed is refused. 228 commands main refused now pass: 218 here-document bodies (the `set`,
+No command that main allowed is refused. 171 commands main refused now pass: 161 here-document bodies (the `set`,
 `env` and `export` words of Python and JavaScript code read as shell commands), 9 `env --help` or `--version`
 calls, and one Python string literal naming the key runner's usage, with no invocation. One refusal changes reason,
 from `environment_dump` to `interpreter_environment_unclassified`. No command in the window was a literal pointer
 presence check; its two pointer checks name the pointer through a loop variable (`printenv $v`), which still
-refuses. The 34 remaining `environment_dump` refusals: 15 `env` piped into a filter (the guard does not judge
-filters), 13 here-documents outside L2 and L3 (three interpreters named by a variable, two unquoted delimiters, two
-pipe filters outside F's list, two written shell or prose files, two literal shapes, one interpreter heredoc inside
-a `-c` string and one standalone `env` literal), two such loop checks, one `printenv` of a variable that is not a
-pointer, one `env -i` with assignments only, and two inline programs that print the environment. The commands
-themselves stay with the lane's private records, since they hold command text.
+refuses. The 91 remaining `environment_dump` refusals: 70 here-documents outside L2 and L3 (49 files a `cat` writes
+and 8 data-method literals, both withdrawn above, and 13 other shapes: interpreters named by a variable, unquoted
+delimiters, pipe filters outside F's list, literal shapes, an interpreter here-document inside a `-c` string and a
+standalone `env` literal), 15 `env` piped into a filter (the guard does not judge filters), two such loop checks, one
+`printenv` of a variable that is not a pointer, one `env -i` with assignments only, and two inline programs that print
+the environment. The first version's replay (refusals 359 to 131) counted the two withdrawn exemptions. The replay
+record keeps both guards' bytes, the corpus and every verdict with a SHA256SUMS; the commands stay with the lane's
+private records, since they hold command text.
 
 **Pointers in non-interactive shells.** Measured on 2026-10-12: this host's `~/.bashrc` exports the pointers after
 its interactive guard, and a Claude Code 2.1.296 Bash tool shell is neither interactive nor a login shell (`$-` is

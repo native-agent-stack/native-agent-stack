@@ -1,5 +1,8 @@
 # Secret guard hook fails closed — 2026-10-08
 
+Line numbers in this record (`scripts/hooks/secret_path_guard.py` and `docs/secret-storage.md`) hold at `958a6d1a`
+(#924), this record's last revision; later changes to those files move them (note added 2026-10-12).
+
 Both repository declarations of the secret-path guard's PreToolUse hook now carry
 `"onFailure": "block"`: the project hook in `.claude/settings.json` and the user
 template hook in `adoption/templates/claude.settings.template.json`. No other
