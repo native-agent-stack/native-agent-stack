@@ -1,0 +1,522 @@
+{
+  "schema_version": 1,
+  "kind": "w6_frozen_comparison",
+  "comparison_id": "w6-us-equities-observability-hosting-20261011",
+  "registered_at": "2026-10-11T23:28:28Z",
+  "catalog": "us-equities",
+  "layer_id": "observability-hosting",
+  "catalog_ref": "catalogs/landscape/us-equities.json#/layers/10",
+  "catalog_sha256": "6aff6411e711dcf3f0a487f343bb0e45c319a0a9235763a54eae9316e1597b0e",
+  "requirement_sha256": "0fe225429e2d705a673dbccca452902f48f06675f5683466525d34d26ebd8732",
+  "phase": "preregistered; not run; layer terminal state SCHEDULED",
+  "harness": "Upstream-owned backend/recovery tests plus existing native receipt/persistence oracles; a common SigNoz case driver is not yet adopted.",
+  "new_harness": false,
+  "arms": [
+    {
+      "id": "grafana-stack",
+      "components": [
+        {
+          "repository": "https://github.com/grafana/grafana",
+          "pin": "6193dc03311b631b9727b560d24369e683dc396e",
+          "install_ref": "Makefile:336",
+          "test_ref": "Makefile:542",
+          "source_ref": "evidence/artifacts/w6-observability-hosting-20261011/primary-sources.json",
+          "component_id": "grafana"
+        },
+        {
+          "repository": "https://github.com/grafana/loki",
+          "pin": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
+          "install_ref": "README.md:108",
+          "test_ref": "Makefile:378",
+          "source_ref": "evidence/artifacts/w6-observability-hosting-20261011/primary-sources.json",
+          "component_id": "loki"
+        },
+        {
+          "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+          "pin": "ae8c507510f48f433ab47dd1c6b01a59d6c388b5",
+          "install_ref": "Makefile:481",
+          "test_ref": "Makefile:107",
+          "source_ref": "evidence/artifacts/w6-observability-hosting-20261011/primary-sources.json",
+          "component_id": "opentelemetry-collector-contrib"
+        },
+        {
+          "repository": "https://github.com/prometheus/prometheus",
+          "pin": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+          "install_ref": "README.md:100",
+          "test_ref": "CONTRIBUTING.md:42",
+          "source_ref": "evidence/artifacts/w6-observability-hosting-20261011/primary-sources.json",
+          "component_id": "prometheus"
+        },
+        {
+          "repository": "https://github.com/prometheus/alertmanager",
+          "pin": "73c6bfe7393929211294c1954f30d8ed78e4d0ad",
+          "install_ref": "Makefile:30",
+          "test_ref": "Makefile:33",
+          "source_ref": "evidence/artifacts/w6-observability-hosting-20261011/primary-sources.json",
+          "component_id": "alertmanager"
+        },
+        {
+          "repository": "https://github.com/binwiederhier/ntfy",
+          "pin": "10cb6506f836dbb00bb77e3b52669f6ace37f555",
+          "install_ref": "Makefile:93",
+          "test_ref": "Makefile:280",
+          "source_ref": "evidence/artifacts/w6-observability-hosting-20261011/primary-sources.json",
+          "component_id": "ntfy"
+        }
+      ],
+      "scope": "Complete recorded reference path with alertmanager and ntfy at the operational release tags; no historical receipt transfer.",
+      "role_ids": [
+        "telemetry",
+        "dashboards",
+        "alerting",
+        "live_state_recovery"
+      ]
+    },
+    {
+      "id": "signoz",
+      "components": [
+        {
+          "repository": "https://github.com/SigNoz/signoz",
+          "pin": "6b137947280595ecabea354b54076356b78d8433",
+          "install_ref": null,
+          "test_ref": "Makefile:244-246",
+          "source_ref": "evidence/artifacts/w6-observability-hosting-20261011/primary-sources.json",
+          "install_gap": "UNMIRRORED SigNoz/foundry: deploy/README.md:8-14 deprecates old install/compose. Full-arm deployment is not asserted. Pin and qualify Foundry deployment and image graph before replay."
+        }
+      ],
+      "common_notification_destination": {
+        "repository": "https://github.com/binwiederhier/ntfy",
+        "pin": "10cb6506f836dbb00bb77e3b52669f6ace37f555",
+        "install_ref": "Makefile:93",
+        "test_ref": "Makefile:280",
+        "source_ref": "evidence/artifacts/w6-observability-hosting-20261011/primary-sources.json",
+        "component_id": "ntfy"
+      },
+      "transport": null,
+      "deployment_gap": "UNMIRRORED SigNoz/foundry: deploy/README.md:8-14 deprecates old install/compose. Full-arm deployment is not asserted. Pin and qualify Foundry deployment and image graph before replay.",
+      "role_ids": [
+        "telemetry",
+        "dashboards",
+        "alerting",
+        "live_state_recovery"
+      ]
+    }
+  ],
+  "common_recovery_dependencies": [
+    {
+      "repository": "https://github.com/restic/restic",
+      "pin": "6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf",
+      "install_ref": "CONTRIBUTING.md:91",
+      "test_ref": "CONTRIBUTING.md:101",
+      "source_ref": "evidence/artifacts/w6-observability-hosting-20261011/primary-sources.json",
+      "component_id": "restic"
+    }
+  ],
+  "cumulative_survivor_disposition": {
+    "repository": "https://github.com/restic/rest-server",
+    "origin_sweep": "landscape-sweep-20260926",
+    "disposition": "included_in_frozen_recovery_subrole_comparison",
+    "case_id": "destination-deletion-protection",
+    "reason": "Test the retained deletion protection against SFTP and fit-vote rclone, independently of the two telemetry backends."
+  },
+  "fixture_seal": {
+    "path": "evidence/artifacts/w6-observability-hosting-20261011/telemetry-cases.json",
+    "sha256": "3a3750b19def868dd36aed6ab9e357a76a3896137fd93722b6ca95df5b2c4eca"
+  },
+  "repetitions": 3,
+  "order": [
+    "grafana-stack then signoz",
+    "signoz then grafana-stack",
+    "grafana-stack then signoz"
+  ],
+  "fresh_store_each_repetition": true,
+  "readiness_trigger": {
+    "all_of": [
+      "Pinned backends/common components have upstream install/test/E2E, complete source/image graphs and qualified case-driver adoption",
+      "Amended fixture reproduces and commands/queries/dashboard/alert/recovery/instrumentation identities are sealed",
+      "Attributable bounded native-client receipt exists; identical source bytes replayed in both arms, provider cost diagnostic",
+      "Independent destination capability proves persistent paths/principal separation and immutable-snapshot exclusion premise",
+      "Requirement-scoped read-only private-repository/uet runner receipt exists with fictional telemetry and no real path mutation",
+      "Isolated runner slot exists behind cued landing and suite priority queue",
+      "Relayed #1007 LANDED snapshot and run release reconciliation are available"
+    ],
+    "present_at_registration": [
+      "retained candidate boundary",
+      "locked sources",
+      "amended fictional fixture and decision rule",
+      "#1007 LANDED"
+    ],
+    "missing_at_registration": [
+      "runtime/E2E and complete Foundry source/deployment/image seals",
+      "case-driver adoption",
+      "native-usage/private-runner receipts",
+      "independent destination capability/protection receipts",
+      "isolated queued slot"
+    ],
+    "start_rule": "Start as soon as all named inputs exist; no date is a trigger and no ready comparison remains unrun",
+    "owner": "layer-verdict",
+    "next_action": "Reproduce supported source-pin deployment/E2E and driver adoption in isolated stores, then capture scoped native/destination receipts through suite queue."
+  },
+  "fixed_decision_rule": {
+    "mandatory": "All mapped backend oracles, common supervision/authority, upstream source/image-qualified E2E and native-receipt parity pass three repetitions. Source/synthetic review alone cannot qualify. Score deletion protection independently; its failure cannot retire telemetry.",
+    "rank_keys": [
+      "median_elapsed_ns",
+      "median_peak_rss_bytes"
+    ],
+    "rank": "If only one backend qualifies select it. If both qualify choose an arm with >=10% lower median elapsed, provided RSS is not >10% higher. Otherwise, if neither has material elapsed advantage, choose an arm with >=10% lower median RSS, provided elapsed is not >10% higher. Opposing material tradeoffs retain both as co-qualified, no automatic winner.",
+    "tie": "Within both tolerances retain both measured source/image-bound arms as co-qualified, with equality and no superiority/automatic installed-path selection.",
+    "none_qualify": "Retire only unsupported backend role with failures, not separately qualified supervision/isolation/recovery.",
+    "terminal": "FINAL also requires verdict/wave/next_review and actual selected deployed runs[] source/image binding, upstream E2E and invoke or role reason at the adopted pin. Co-qualification alone is not FINAL.",
+    "failure_retention": "Retain every failed install/deployment, restart, alert, attack, restore and missing sample; no silent retry/dropped repetition.",
+    "amendments": "Input corrections require independent reviewed hashed amendments before scoring; never change arms/gates/metrics/tolerances after replay.",
+    "total_outcome": "Evaluate elapsed advantage with 10*x<=9*y and the RSS guard 10*x_rss<=11*y_rss in both directions. If exactly one direction qualifies select it. If neither elapsed direction qualifies and neither has any elapsed material advantage, apply the same RSS advantage and elapsed guard. If no single arm is selected, retain both as co-qualified with the measured tolerance/tradeoff classification. All conditions use exact integers."
+  },
+  "protected_scope": "Only disposable owned services, stores, telemetry and fictional journals. Never modify paper units, paper configuration, the sealed bundle, Monday recorders, actual broker journals, acquisition paths or another lane's runner configuration.",
+  "monday_rule": "Inside the CC's heavy-E2E window use systemd-run --user --scope -p CPUWeight=idle. A full suite additionally needs SUITE-REQUEST and the co-op's SUITE-GO.",
+  "source_evidence_class": "source_review",
+  "fixture_evidence_class": "synthetic",
+  "refrozen_at": "2026-10-12T04:35:04Z",
+  "supersedes": {
+    "head": "f2374694f453f93418279c6b255ce6838f9f489d",
+    "preregistration_sha256": "972efba72e71335940c0a1b3c949ff5921cf4d1ea8e79be4e172bd04c93551c3",
+    "fixture_sha256": "a18773b3bcff53d83dc526e07411ea13fe9f71fe85d8ba1bb479b99633093f0c",
+    "before_any_run": true,
+    "authority": "CC pr1022-claude-read-f2374694.md B1-B7"
+  },
+  "driver_adoption": {
+    "status": "required_before_execution",
+    "existing_reference": "observability/backends/check_persistence.py supports the reference services only",
+    "signoz_gap": "No named driver runs all frozen SigNoz cases. Qualify its upstream integration/E2E path against these oracles and record an adoption decision before replay. Do not implement a replacement backend.",
+    "owner": "layer-verdict",
+    "next_action": "Retain reviewed adoption identifying source/image-bound native commands and the common measurement invocation. Missing driver acceptance blocks readiness."
+  },
+  "run_pin_reconciliation": {
+    "grafana": {
+      "operational_run_pin": "13.2.3",
+      "run_ref": "c2dee173:catalogs/landscape/final-stack.json#/runs",
+      "comparison_source_pin": "6193dc03311b631b9727b560d24369e683dc396e",
+      "comparison_release": "v13.2.3",
+      "reason": "Comparison release equals the recorded operational version. Exact locked source and eventual image identities govern; version agreement alone does not establish deployed source/image identity.",
+      "receipt_transfer_allowed": false,
+      "final_requirement": "Supported adoption binds tested source/image into actual runs[] with upstream E2E and invoke at that operational pin."
+    },
+    "loki": {
+      "operational_run_pin": "3.7.8",
+      "run_ref": "c2dee173:catalogs/landscape/final-stack.json#/runs",
+      "comparison_source_pin": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
+      "comparison_release": "v3.7.8",
+      "reason": "Comparison release equals the recorded operational version. Exact locked source and eventual image identities govern; version agreement alone does not establish deployed source/image identity.",
+      "receipt_transfer_allowed": false,
+      "final_requirement": "Supported adoption binds tested source/image into actual runs[] with upstream E2E and invoke at that operational pin."
+    },
+    "opentelemetry-collector-contrib": {
+      "operational_run_pin": "0.162.0",
+      "run_ref": "c2dee173:catalogs/landscape/final-stack.json#/runs",
+      "comparison_source_pin": "ae8c507510f48f433ab47dd1c6b01a59d6c388b5",
+      "comparison_release": "v0.162.0",
+      "reason": "Comparison release equals the recorded operational version. Exact locked source and eventual image identities govern; version agreement alone does not establish deployed source/image identity.",
+      "receipt_transfer_allowed": false,
+      "final_requirement": "Supported adoption binds tested source/image into actual runs[] with upstream E2E and invoke at that operational pin."
+    },
+    "prometheus": {
+      "operational_run_pin": "3.15.0",
+      "run_ref": "c2dee173:catalogs/landscape/final-stack.json#/runs",
+      "comparison_source_pin": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+      "comparison_release": "v3.15.0",
+      "reason": "Comparison release equals the recorded operational version. Exact locked source and eventual image identities govern; version agreement alone does not establish deployed source/image identity.",
+      "receipt_transfer_allowed": false,
+      "final_requirement": "Supported adoption binds tested source/image into actual runs[] with upstream E2E and invoke at that operational pin."
+    },
+    "alertmanager": {
+      "operational_run_pin": "0.34.1",
+      "run_ref": "c2dee173:catalogs/landscape/final-stack.json#/runs",
+      "comparison_source_pin": "73c6bfe7393929211294c1954f30d8ed78e4d0ad",
+      "comparison_release": "v0.34.1",
+      "reason": "Comparison release equals the recorded operational version. Exact locked source and eventual image identities govern; version agreement alone does not establish deployed source/image identity.",
+      "receipt_transfer_allowed": false,
+      "final_requirement": "Supported adoption binds tested source/image into actual runs[] with upstream E2E and invoke at that operational pin."
+    },
+    "ntfy": {
+      "operational_run_pin": "2.28.0",
+      "run_ref": "c2dee173:catalogs/landscape/final-stack.json#/runs",
+      "comparison_source_pin": "10cb6506f836dbb00bb77e3b52669f6ace37f555",
+      "comparison_release": "v2.28.0",
+      "reason": "Comparison release equals the recorded operational version. Exact locked source and eventual image identities govern; version agreement alone does not establish deployed source/image identity.",
+      "receipt_transfer_allowed": false,
+      "final_requirement": "Supported adoption binds tested source/image into actual runs[] with upstream E2E and invoke at that operational pin."
+    },
+    "restic": {
+      "operational_run_pin": "0.19.1",
+      "run_ref": "c2dee173:catalogs/landscape/final-stack.json#/runs",
+      "comparison_source_pin": "6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf",
+      "comparison_release": "v0.19.1",
+      "reason": "Comparison release equals the recorded operational version. Exact locked source and eventual image identities govern; version agreement alone does not establish deployed source/image identity.",
+      "receipt_transfer_allowed": false,
+      "final_requirement": "Supported adoption binds tested source/image into actual runs[] with upstream E2E and invoke at that operational pin."
+    },
+    "dagu": {
+      "operational_run_pin": "2.16.6",
+      "run_ref": "c2dee173:catalogs/landscape/final-stack.json#/runs",
+      "comparison_source_pin": "58fed633d58c1dd1319091fdb2c2f6158ecfa053",
+      "comparison_release": "v2.16.6",
+      "reason": "Comparison release equals the recorded operational version. Exact locked source and eventual image identities govern; version agreement alone does not establish deployed source/image identity.",
+      "receipt_transfer_allowed": false,
+      "final_requirement": "Supported adoption binds tested source/image into actual runs[] with upstream E2E and invoke at that operational pin."
+    },
+    "sandbox-runtime": {
+      "operational_run_pin": "0.0.79",
+      "run_ref": "c2dee173:catalogs/landscape/final-stack.json#/runs",
+      "comparison_source_pin": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+      "comparison_release": "v0.0.79",
+      "reason": "Comparison release equals the recorded operational version. Exact locked source and eventual image identities govern; version agreement alone does not establish deployed source/image identity.",
+      "receipt_transfer_allowed": false,
+      "final_requirement": "Supported adoption binds tested source/image into actual runs[] with upstream E2E and invoke at that operational pin."
+    }
+  },
+  "common_operational_dependencies": [
+    {
+      "repository": "https://github.com/dagucloud/dagu",
+      "pin": "58fed633d58c1dd1319091fdb2c2f6158ecfa053",
+      "install_ref": null,
+      "test_ref": null,
+      "source_ref": "evidence/artifacts/w6-observability-hosting-20261011/primary-sources.json",
+      "component_id": "dagu",
+      "install_gap": "Pinned upstream install recipe not yet captured"
+    },
+    {
+      "repository": "https://github.com/anthropics/sandbox-runtime",
+      "pin": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+      "install_ref": "README.md:14",
+      "test_ref": null,
+      "source_ref": "evidence/artifacts/w6-observability-hosting-20261011/primary-sources.json",
+      "component_id": "sandbox-runtime"
+    }
+  ],
+  "recovery_subrole": {
+    "role_id": "off_host_deletion_protection",
+    "comparison_unit": "w6-us-equities-observability-hosting-20261011",
+    "basis": "The 09-26 survivor challenges compromised-client deletion and off-host recovery independently of telemetry selection.",
+    "source_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/raw/observability-hosting/first/claude_discover/proposed/5",
+    "fit_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/votes/observability-hosting/5/fit",
+    "arms": [
+      {
+        "id": "rest-server-append-only",
+        "component": {
+          "repository": "https://github.com/restic/rest-server",
+          "pin": "0f256e8ea8eae5611b04d1abed9ae6c38f76e215",
+          "install_ref": "README.md:20",
+          "test_ref": ".github/workflows/tests.yml:61",
+          "source_ref": "evidence/artifacts/w6-observability-hosting-20261011/primary-sources.json"
+        },
+        "flags": [
+          "--append-only",
+          "--private-repos",
+          "--tls",
+          "--path"
+        ],
+        "path_rule": "Explicit persistent owned path on an independent host, sealed separately per repetition; never the temporary default.",
+        "mechanism_ref": "README.md:35-51; README.md:84; README.md:173",
+        "source_version_reason": "The proposal reviewed v0.14.0; this locked current source tests append-only/private-repository/TLS behavior through its own build/tests. No old receipt transfers."
+      },
+      {
+        "id": "restic-sftp",
+        "component": {
+          "repository": "https://github.com/restic/restic",
+          "pin": "6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf",
+          "install_ref": "CONTRIBUTING.md:91",
+          "test_ref": "CONTRIBUTING.md:101",
+          "source_ref": "evidence/artifacts/w6-observability-hosting-20261011/primary-sources.json"
+        },
+        "mechanism_ref": "doc/030_preparing_a_new_repo.rst:95-108",
+        "expectation": "Writable SFTP control permits forget/prune and direct data deletion; success is expected threat-model control behavior, not protection acceptance."
+      },
+      {
+        "id": "rclone-append-only",
+        "component": {
+          "repository": "https://github.com/rclone/rclone",
+          "pin": "4f19e9cd6f442282d7fa8d5fdbd28ebb68be1131",
+          "install_ref": "Makefile:53",
+          "test_ref": "Makefile:94",
+          "source_ref": "evidence/artifacts/w6-observability-hosting-20261011/primary-sources.json"
+        },
+        "flags": [
+          "serve",
+          "restic",
+          "--append-only",
+          "--private-repos",
+          "--cert",
+          "--key"
+        ],
+        "mechanism_ref": "docs/content/commands/rclone_serve_restic.md:228-239",
+        "path_rule": "Explicit persistent isolated destination, TLS and per-fixture authentication; same destination resources and data seal."
+      }
+    ],
+    "immutable_snapshot_disposition": {
+      "disposition": "excluded_from_this_destination_configuration_conditionally",
+      "reason": "No independently administered immutable-snapshot filesystem/source pin/destination policy is selected in retained inputs. A generic filesystem feature is not an executable protection arm. The required destination-capability receipt must establish this absence before this three-arm configuration can run.",
+      "reopen_rule": "If the actual destination already has immutable snapshots with the same protection, halt before scoring and add the retained mechanism through a reviewed hashed amendment. Do not score around it or claim rest-server adds value."
+    },
+    "oracle": {
+      "off_host_destination_required": true,
+      "append_only_client_deletion_refused": true,
+      "fresh_target_restore_required": true,
+      "commands": [
+        "restic backup",
+        "restic forget --prune",
+        "direct client-authenticated seeded data-object deletion",
+        "restic check --read-data",
+        "restic restore --verify"
+      ],
+      "attack_boundary": "Research-client backup identity has no destination admin/snapshot rights. All attacks use disposable seeded stores on an independent owned destination.",
+      "protected_arms": [
+        "rest-server-append-only",
+        "rclone-append-only"
+      ],
+      "protected_expected": "Both client attacks are refused; seeded source hashes/snapshots stay intact; check --read-data and fresh-target restore --verify exit 0 with byte-identical fixture state.",
+      "sftp_expected": "Both attacks succeed on disposable writable SFTP. Use separately seeded attack and restore stores; destructive control success is not restoration qualification.",
+      "private_repository_isolation": "Two fictional principals cannot read/write/delete each other repository; TLS identity is verified with no plaintext fallback.",
+      "destination_identity": "Retain independent-host and persistent-path proof privately; publish scoped redacted attestation and fictional hashes only.",
+      "live_state": "Quiesce owned fixture, flush/checkpoint fictional SQLite, seal public hash manifest, back up, close source, restore into empty independent target, restart restored services and query the same oracle."
+    },
+    "failure_retires_telemetry_backend": false,
+    "fixed_decision_rule": {
+      "mandatory": "Protected arms pass all deletion-refusal/isolation/TLS/off-host/fresh-restore oracles in three repetitions. SFTP must reproduce the expected destructive control.",
+      "rank": "This sub-role decides deletion protection, not speed. SFTP must reproduce its expected writable-control behavior. Co-qualify every protected mechanism that passes all required protection/restore fields; report any differences without a superiority ranking.",
+      "tie": "If both protected mechanisms pass, retain both as co-qualified for this protection scope; no unmeasured default is adopted.",
+      "none_qualify": "Retire only unsupported deletion protection with failures, never telemetry/dashboards/alerting by this protection failure."
+    }
+  },
+  "wave_dispositions": {
+    "why_plan_rule_governs": "The CC-approved trading plan section 6 and W6 addition direct one Grafana-stack vs SigNoz comparison. It replaces the telemetry bundle/ablation contest; scoped recovery and isolation stay mandatory and cannot be removed by the backend winner. This reconciles the rule before a run, not the measured 09-22 disagreement.",
+    "plan_ref": "trading-cc/specs/w6-us-equities-dispatch-plan-20261011.md sections 1 and 6; CC W6 addition relayed by co-op",
+    "retained_arms": {
+      "c14+c5+c6": {
+        "disposition": "represented_by_full_reference_arm",
+        "reason": "Collector/Prometheus/Loki plus dashboards/alerts tested at run release pins; no receipt transfers."
+      },
+      "c14+c6": {
+        "disposition": "superseded_backend_ablation",
+        "reason": "The plan chooses coverage and material latency/resource merit of complete backends over Loki-only storage ablation. Native-usage, historical metric and log gates still pass; service omission is not equivalence evidence."
+      },
+      "c8": {
+        "disposition": "common_live_state_recovery_plus_independent_protection_subrole",
+        "reason": "Static receipts do not qualify live telemetry/SQLite restore; fresh service queries and separate off-host client-deletion protection are tested."
+      },
+      "c3": {
+        "disposition": "common_isolation_and_authority_gate",
+        "reason": "Reuse main foundation/isolation scope; both backends exercise pinned sandbox network denial and removal of broker authority, without creating a broker client/contacting a real order endpoint."
+      }
+    },
+    "signoz_prior_refutation": {
+      "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/10/candidates/1/adversarial_verification/votes/1",
+      "disposition": "retained_prior_merit_refutation_reopened_by_plan",
+      "reason": "Service-count/RAM objection stays historical evidence; CC plan reopens named comparison. Measure actual source/image-sealed services/resources; claim no consolidation advantage from a name."
+    }
+  },
+  "role_checks": {
+    "telemetry": {
+      "case_ids": [
+        "usage-parity",
+        "duplicate-delivery",
+        "collector-restart",
+        "backend-restart-and-persistence"
+      ],
+      "mandatory_checks": [
+        "All usage categories/receipt identity, duplicate policy, failed attempts and historical log/metric/trace match source oracle."
+      ]
+    },
+    "dashboards": {
+      "case_ids": [
+        "dashboard-correlation"
+      ],
+      "mandatory_checks": [
+        "Every declared relevant panel live with exact fixture values/identity and no cross-scope leakage; Lighthouse accessibility 1.0."
+      ]
+    },
+    "alerting": {
+      "case_ids": [
+        "failure-alert-delivery"
+      ],
+      "mandatory_checks": [
+        "Failure reaches isolated ntfy within 5000ms with exact receipt identity, no duplicate/cross-scope notification, including owned restart."
+      ]
+    },
+    "process_supervision": {
+      "case_ids": [
+        "owned-process-supervision"
+      ],
+      "mandatory_checks": [
+        "Dagu/native scope retains complete outputs/exits/interruptions, zero owned child orphans, no unowned changes."
+      ]
+    },
+    "authority": {
+      "case_ids": [
+        "project-scope-and-authority"
+      ],
+      "mandatory_checks": [
+        "Pinned sandbox denies order-network access and removes broker authority, creates no broker client, contacts no real endpoint."
+      ]
+    },
+    "live_state_recovery": {
+      "case_ids": [
+        "clean-target-recovery"
+      ],
+      "mandatory_checks": [
+        "Restic backs up quiesced/checkpointed live fictional state, check/restore verify succeed, restored services match source queries."
+      ]
+    },
+    "off_host_deletion_protection": {
+      "case_ids": [
+        "destination-deletion-protection"
+      ],
+      "mandatory_checks": [
+        "Independent persistent destination, client deletion refusal, private-repository/TLS isolation and fresh restore are scored separately."
+      ]
+    }
+  },
+  "measurement_protocol": {
+    "clock": "monotonic_ns on one measurement host per pair; retain all raw timestamps",
+    "scored_backend_case_ids": [
+      "usage-parity",
+      "duplicate-delivery",
+      "collector-restart",
+      "backend-restart-and-persistence",
+      "clean-target-recovery",
+      "dashboard-correlation",
+      "failure-alert-delivery"
+    ],
+    "elapsed_start": "Immediately before first native ingest action in usage-parity after clean owned deployments report ready; install/startup excluded and separately retained.",
+    "elapsed_stop": "Immediately after final native response validating failure-alert-delivery, including all scored restarts/restores/UI queries in declared order.",
+    "execution_order": [
+      "usage-parity",
+      "duplicate-delivery",
+      "collector-restart",
+      "backend-restart-and-persistence",
+      "clean-target-recovery",
+      "dashboard-correlation",
+      "failure-alert-delivery"
+    ],
+    "recovery_elapsed_start": "Immediately before check --read-data on seeded destination after attack verification.",
+    "recovery_elapsed_stop": "Immediately after fresh-target restored-service query validation, including restore --verify and restored startup.",
+    "rss_process_set": "All isolated arm-cgroup descendants/containers, including backend stores, Collector, UI/alert services, arm-specific notifications and transient backup/restore children. Exclude identical external driver/browser/recorder and separately scored common sandbox/supervisor; report their costs separately.",
+    "rss_aggregation": "Every 50ms sum concurrent /proc/<pid>/status VmRSS bytes for all live descendants; take maximum sum in interval, not sum of independent per-process maxima. Retain all samples/PID membership.",
+    "rss_sample_interval_ms": 50,
+    "missing_sample_rule": "Missing membership/permissions/sample disqualifies repetition; no zero substitution.",
+    "repetitions": 3,
+    "summaries": "Median of three complete elapsed_ns values and median of three simultaneous RSS peaks; exact retained integers, not rounded displays.",
+    "elapsed_tolerance_fraction": 0.1,
+    "rss_tolerance_fraction": 0.1,
+    "material_advantage": "X materially beats Y iff X <= 0.90 * Y, using exact integer ratios; boundary equality counts. No post-run threshold choice.",
+    "gate_timeout_ms": 120000,
+    "oracle_poll_interval_ms": 100,
+    "diagnostic_only": [
+      "full correctness is eligibility, not rank",
+      "provider cost and native usage are identical source-task replay diagnostics",
+      "operated service/image counts",
+      "install/bring-up time",
+      "backend storage/retrieval costs"
+    ],
+    "pre_run_seal": "Exact native commands, queries/panel definitions/alert routes, polling, cgroup membership and images sealed before replay; input changes require reviewed hashed amendments before scoring.",
+    "common_gate_phase": "Authority and process-supervision gates execute before scored ingest; independently scored deletion protection executes outside backend timing/RSS intervals."
+  }
+}

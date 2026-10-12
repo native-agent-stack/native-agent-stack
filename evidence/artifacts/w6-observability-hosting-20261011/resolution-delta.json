@@ -1,0 +1,306 @@
+{
+  "schema_version": 1,
+  "kind": "w6_protocol_delta",
+  "recorded_at": "2026-10-11T23:28:28Z",
+  "base_commit": "77185991ec9627e59473df5b4d7a11ca87b0461d",
+  "catalog": "us-equities",
+  "layer_id": "observability-hosting",
+  "catalog_ref": "catalogs/landscape/us-equities.json#/layers/10",
+  "catalog_sha256": "6aff6411e711dcf3f0a487f343bb0e45c319a0a9235763a54eae9316e1597b0e",
+  "row_sha256": "a6ad30665839bc6ab2f3b5ed426787d9b82404bd11810daf3805f9461520fc3a",
+  "verdict_status": "pending_lanes",
+  "winners": [],
+  "wave_ref": "catalogs/sota-convergence/layer-verdicts-20260922.json#/catalogs/us-equities/7",
+  "wave_sha256": "2fef6da7468a8e97a319fdc6f75f73374cd34b412bf93de90fd0c2a7504159de",
+  "next_review": null,
+  "next_review_gap": "No next_review in the consumed row or wave; condition 1 remains a gap.",
+  "sweeps": [
+    {
+      "id": "landscape-sweep-20260923",
+      "row_ref": "catalogs/saturation/ledger.json#/sweeps/1/layers/30",
+      "manifest_ref": "catalogs/sota-convergence/manifest-20260923.json",
+      "manifest_sha256": "304d75dd0dabb02ba46191161732c17d234c3608a194f538c6bee6b64b8069c8",
+      "returns_ref": null,
+      "returns_sha256": null,
+      "survivor_count": 0,
+      "missing_vote_note": "per-vote returns not retained; votes are the manifest's per-lens refuted flags",
+      "reopen": []
+    },
+    {
+      "id": "landscape-sweep-20260926",
+      "row_ref": "catalogs/saturation/ledger.json#/sweeps/3/layers/30",
+      "manifest_ref": "catalogs/sota-convergence/manifest-20260926.json",
+      "manifest_sha256": "a72177d162f84ba827028a7bff5ebc78ea9195c7a99ed2b411c75f7869b20e0e",
+      "returns_ref": "evidence/artifacts/landscape-sweep-20260926/returns.json",
+      "returns_sha256": "ea7e8ed285639a247df91d0c64d9378e080bc820170e9fc773434488397f4600",
+      "survivor_count": 1,
+      "missing_vote_note": null,
+      "reopen": [
+        {
+          "trigger": "retained_failure",
+          "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/failures/observability-hosting"
+        }
+      ]
+    }
+  ],
+  "latest_covering_sweep": "landscape-sweep-20260926",
+  "cumulative_survivor_count": 1,
+  "dispositions": [
+    {
+      "repository": "https://github.com/restic/rest-server",
+      "origin_sweep": "landscape-sweep-20260926",
+      "disposition": "included_in_frozen_recovery_subrole_comparison",
+      "case_id": "destination-deletion-protection",
+      "reason": "Test the retained deletion protection against SFTP and fit-vote rclone, independently of the two telemetry backends."
+    }
+  ],
+  "comparison_id": "w6-us-equities-observability-hosting-20261011",
+  "preregistration_ref": "evidence/artifacts/w6-observability-hosting-20261011/preregistration.json",
+  "preregistration_sha256": "cd83fdb082cf729ef80996b3a53e17a221838955f2e67143ea6065a3666a772a",
+  "fixture_sha256": "3a3750b19def868dd36aed6ab9e357a76a3896137fd93722b6ca95df5b2c4eca",
+  "terminal_state": "SCHEDULED",
+  "terminal_evidence": {
+    "state": "SCHEDULED",
+    "recorded_at": "2026-10-12T04:35:04Z",
+    "readiness_relay": {
+      "pr": 1007,
+      "merge_commit": "c2dee173",
+      "co_op_direction_at": "2026-10-11T23:35:52Z",
+      "satisfied": true
+    },
+    "comparison_id": "w6-us-equities-observability-hosting-20261011",
+    "preregistration_ref": "evidence/artifacts/w6-observability-hosting-20261011/preregistration.json",
+    "preregistration_sha256": "cd83fdb082cf729ef80996b3a53e17a221838955f2e67143ea6065a3666a772a",
+    "final_stack_source": {
+      "commit": "c2dee173",
+      "path": "catalogs/landscape/final-stack.json",
+      "sha256": "2dd68f39d3a0ab12894cf49343f49ff9e22c2fdef9a0d6d4e751ef88ef1f1eab",
+      "reader_script_sha256": "82742dea85a9d2f9c7579a1069947975b4033265cf55f1e1baa232d10767a317",
+      "reader_api": [
+        "run_pin",
+        "is_definitive"
+      ],
+      "row": {
+        "catalog": "us-equities",
+        "layer_id": "observability-hosting",
+        "manifest_status": "no-winner",
+        "next_review": null,
+        "winners": []
+      }
+    },
+    "resolution_winners": [],
+    "reason": "Pending_lanes/no winner remains SCHEDULED; amended source/fixture decision procedure does not supply missing deployment/driver/destination/runtime receipts.",
+    "readiness_trigger": "Start as soon as all named inputs exist; no date is a trigger and no ready comparison remains unrun Required inputs: complete source/image runtimes/driver, scoped native/runner receipts, destination capability, instrumentation and slot.",
+    "readiness_satisfied": [
+      "retained candidate boundary",
+      "locked sources",
+      "amended fictional fixture and decision rule",
+      "#1007 LANDED"
+    ],
+    "readiness_unmet": [
+      "runtime/E2E and complete Foundry source/deployment/image seals",
+      "case-driver adoption",
+      "native-usage/private-runner receipts",
+      "independent destination capability/protection receipts",
+      "isolated queued slot"
+    ],
+    "comparison_ready": false,
+    "fixed_decision_rule": {
+      "mandatory": "All mapped backend oracles, common supervision/authority, upstream source/image-qualified E2E and native-receipt parity pass three repetitions. Source/synthetic review alone cannot qualify. Score deletion protection independently; its failure cannot retire telemetry.",
+      "rank_keys": [
+        "median_elapsed_ns",
+        "median_peak_rss_bytes"
+      ],
+      "rank": "If only one backend qualifies select it. If both qualify choose an arm with >=10% lower median elapsed, provided RSS is not >10% higher. Otherwise, if neither has material elapsed advantage, choose an arm with >=10% lower median RSS, provided elapsed is not >10% higher. Opposing material tradeoffs retain both as co-qualified, no automatic winner.",
+      "tie": "Within both tolerances retain both measured source/image-bound arms as co-qualified, with equality and no superiority/automatic installed-path selection.",
+      "none_qualify": "Retire only unsupported backend role with failures, not separately qualified supervision/isolation/recovery.",
+      "terminal": "FINAL also requires verdict/wave/next_review and actual selected deployed runs[] source/image binding, upstream E2E and invoke or role reason at the adopted pin. Co-qualification alone is not FINAL.",
+      "failure_retention": "Retain every failed install/deployment, restart, alert, attack, restore and missing sample; no silent retry/dropped repetition.",
+      "amendments": "Input corrections require independent reviewed hashed amendments before scoring; never change arms/gates/metrics/tolerances after replay.",
+      "total_outcome": "Evaluate elapsed advantage with 10*x<=9*y and the RSS guard 10*x_rss<=11*y_rss in both directions. If exactly one direction qualifies select it. If neither elapsed direction qualifies and neither has any elapsed material advantage, apply the same RSS advantage and elapsed guard. If no single arm is selected, retain both as co-qualified with the measured tolerance/tradeoff classification. All conditions use exact integers."
+    },
+    "frozen_scope": "One id; two full telemetry backend arms, independently scored retained recovery mechanisms and common isolation/supervision. No run.",
+    "evidence_class": "source_review",
+    "final_claim": false
+  },
+  "terminal_readiness": "#1007 LANDED satisfied; remaining comparison readiness inputs are explicitly unmet",
+  "foundation_shared_fact_refs": [
+    {
+      "ref": "catalogs/landscape/foundation.json#/layers/0",
+      "commit": "421bf3f98b631d931838c22a927b4fec246f7df8",
+      "scope": "Main-base native-client facts only; no unlanded #1021 input."
+    },
+    {
+      "ref": "catalogs/landscape/foundation.json#/layers/3",
+      "commit": "421bf3f98b631d931838c22a927b4fec246f7df8",
+      "scope": "Common sandbox/isolation source scope, actual denial acceptance required."
+    },
+    {
+      "ref": "catalogs/landscape/foundation.json#/layers/12",
+      "commit": "421bf3f98b631d931838c22a927b4fec246f7df8",
+      "scope": "Dagu/native supervision, fictional job/cleanup acceptance required."
+    },
+    {
+      "ref": "catalogs/landscape/foundation.json#/layers/14",
+      "commit": "421bf3f98b631d931838c22a927b4fec246f7df8",
+      "scope": "Restic source recovery scope, static backup is not live/protected recovery."
+    },
+    {
+      "ref": "catalogs/landscape/foundation.json#/layers/15",
+      "commit": "421bf3f98b631d931838c22a927b4fec246f7df8",
+      "scope": "Collector/Prometheus/Loki facts, source classes not native receipts."
+    }
+  ],
+  "trading_requirement_delta": [
+    "Only private-repository/uet runner compatibility is additional; scoped telemetry, broker-authority denial and recoverable state are existing requirements.",
+    "Private scope is sourced to architecture ownership/platform routing and CC-approved dispatch; fictional telemetry and read-only compatibility only.",
+    "Actual trading data/broker/account identities and recorders are never mutated or published."
+  ],
+  "source_refs": "evidence/artifacts/w6-observability-hosting-20261011/primary-sources.json",
+  "evidence_class": "source_review",
+  "no_runtime_adoption_claim": true,
+  "requirement_source_refs": [
+    "catalogs/landscape/us-equities.json#/layers/10/requirement",
+    "blueprints/us-equities/architecture/README.md#ownership",
+    "blueprints/us-equities/architecture/README.md#platforms-and-hosting",
+    "trading-cc/specs/w6-us-equities-dispatch-plan-20261011.md sections 1 and 6"
+  ],
+  "wave_dispositions": {
+    "why_plan_rule_governs": "The CC-approved trading plan section 6 and W6 addition direct one Grafana-stack vs SigNoz comparison. It replaces the telemetry bundle/ablation contest; scoped recovery and isolation stay mandatory and cannot be removed by the backend winner. This reconciles the rule before a run, not the measured 09-22 disagreement.",
+    "plan_ref": "trading-cc/specs/w6-us-equities-dispatch-plan-20261011.md sections 1 and 6; CC W6 addition relayed by co-op",
+    "retained_arms": {
+      "c14+c5+c6": {
+        "disposition": "represented_by_full_reference_arm",
+        "reason": "Collector/Prometheus/Loki plus dashboards/alerts tested at run release pins; no receipt transfers."
+      },
+      "c14+c6": {
+        "disposition": "superseded_backend_ablation",
+        "reason": "The plan chooses coverage and material latency/resource merit of complete backends over Loki-only storage ablation. Native-usage, historical metric and log gates still pass; service omission is not equivalence evidence."
+      },
+      "c8": {
+        "disposition": "common_live_state_recovery_plus_independent_protection_subrole",
+        "reason": "Static receipts do not qualify live telemetry/SQLite restore; fresh service queries and separate off-host client-deletion protection are tested."
+      },
+      "c3": {
+        "disposition": "common_isolation_and_authority_gate",
+        "reason": "Reuse main foundation/isolation scope; both backends exercise pinned sandbox network denial and removal of broker authority, without creating a broker client/contacting a real order endpoint."
+      }
+    },
+    "signoz_prior_refutation": {
+      "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/10/candidates/1/adversarial_verification/votes/1",
+      "disposition": "retained_prior_merit_refutation_reopened_by_plan",
+      "reason": "Service-count/RAM objection stays historical evidence; CC plan reopens named comparison. Measure actual source/image-sealed services/resources; claim no consolidation advantage from a name."
+    }
+  },
+  "run_pin_reconciliation": {
+    "grafana": {
+      "operational_run_pin": "13.2.3",
+      "run_ref": "c2dee173:catalogs/landscape/final-stack.json#/runs",
+      "comparison_source_pin": "6193dc03311b631b9727b560d24369e683dc396e",
+      "comparison_release": "v13.2.3",
+      "reason": "Comparison release equals the recorded operational version. Exact locked source and eventual image identities govern; version agreement alone does not establish deployed source/image identity.",
+      "receipt_transfer_allowed": false,
+      "final_requirement": "Supported adoption binds tested source/image into actual runs[] with upstream E2E and invoke at that operational pin."
+    },
+    "loki": {
+      "operational_run_pin": "3.7.8",
+      "run_ref": "c2dee173:catalogs/landscape/final-stack.json#/runs",
+      "comparison_source_pin": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
+      "comparison_release": "v3.7.8",
+      "reason": "Comparison release equals the recorded operational version. Exact locked source and eventual image identities govern; version agreement alone does not establish deployed source/image identity.",
+      "receipt_transfer_allowed": false,
+      "final_requirement": "Supported adoption binds tested source/image into actual runs[] with upstream E2E and invoke at that operational pin."
+    },
+    "opentelemetry-collector-contrib": {
+      "operational_run_pin": "0.162.0",
+      "run_ref": "c2dee173:catalogs/landscape/final-stack.json#/runs",
+      "comparison_source_pin": "ae8c507510f48f433ab47dd1c6b01a59d6c388b5",
+      "comparison_release": "v0.162.0",
+      "reason": "Comparison release equals the recorded operational version. Exact locked source and eventual image identities govern; version agreement alone does not establish deployed source/image identity.",
+      "receipt_transfer_allowed": false,
+      "final_requirement": "Supported adoption binds tested source/image into actual runs[] with upstream E2E and invoke at that operational pin."
+    },
+    "prometheus": {
+      "operational_run_pin": "3.15.0",
+      "run_ref": "c2dee173:catalogs/landscape/final-stack.json#/runs",
+      "comparison_source_pin": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+      "comparison_release": "v3.15.0",
+      "reason": "Comparison release equals the recorded operational version. Exact locked source and eventual image identities govern; version agreement alone does not establish deployed source/image identity.",
+      "receipt_transfer_allowed": false,
+      "final_requirement": "Supported adoption binds tested source/image into actual runs[] with upstream E2E and invoke at that operational pin."
+    },
+    "alertmanager": {
+      "operational_run_pin": "0.34.1",
+      "run_ref": "c2dee173:catalogs/landscape/final-stack.json#/runs",
+      "comparison_source_pin": "73c6bfe7393929211294c1954f30d8ed78e4d0ad",
+      "comparison_release": "v0.34.1",
+      "reason": "Comparison release equals the recorded operational version. Exact locked source and eventual image identities govern; version agreement alone does not establish deployed source/image identity.",
+      "receipt_transfer_allowed": false,
+      "final_requirement": "Supported adoption binds tested source/image into actual runs[] with upstream E2E and invoke at that operational pin."
+    },
+    "ntfy": {
+      "operational_run_pin": "2.28.0",
+      "run_ref": "c2dee173:catalogs/landscape/final-stack.json#/runs",
+      "comparison_source_pin": "10cb6506f836dbb00bb77e3b52669f6ace37f555",
+      "comparison_release": "v2.28.0",
+      "reason": "Comparison release equals the recorded operational version. Exact locked source and eventual image identities govern; version agreement alone does not establish deployed source/image identity.",
+      "receipt_transfer_allowed": false,
+      "final_requirement": "Supported adoption binds tested source/image into actual runs[] with upstream E2E and invoke at that operational pin."
+    },
+    "restic": {
+      "operational_run_pin": "0.19.1",
+      "run_ref": "c2dee173:catalogs/landscape/final-stack.json#/runs",
+      "comparison_source_pin": "6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf",
+      "comparison_release": "v0.19.1",
+      "reason": "Comparison release equals the recorded operational version. Exact locked source and eventual image identities govern; version agreement alone does not establish deployed source/image identity.",
+      "receipt_transfer_allowed": false,
+      "final_requirement": "Supported adoption binds tested source/image into actual runs[] with upstream E2E and invoke at that operational pin."
+    },
+    "dagu": {
+      "operational_run_pin": "2.16.6",
+      "run_ref": "c2dee173:catalogs/landscape/final-stack.json#/runs",
+      "comparison_source_pin": "58fed633d58c1dd1319091fdb2c2f6158ecfa053",
+      "comparison_release": "v2.16.6",
+      "reason": "Comparison release equals the recorded operational version. Exact locked source and eventual image identities govern; version agreement alone does not establish deployed source/image identity.",
+      "receipt_transfer_allowed": false,
+      "final_requirement": "Supported adoption binds tested source/image into actual runs[] with upstream E2E and invoke at that operational pin."
+    },
+    "sandbox-runtime": {
+      "operational_run_pin": "0.0.79",
+      "run_ref": "c2dee173:catalogs/landscape/final-stack.json#/runs",
+      "comparison_source_pin": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+      "comparison_release": "v0.0.79",
+      "reason": "Comparison release equals the recorded operational version. Exact locked source and eventual image identities govern; version agreement alone does not establish deployed source/image identity.",
+      "receipt_transfer_allowed": false,
+      "final_requirement": "Supported adoption binds tested source/image into actual runs[] with upstream E2E and invoke at that operational pin."
+    }
+  },
+  "correction_authority": {
+    "record": "pr1022-claude-read-f2374694.md",
+    "reviewed_head": "f2374694f453f93418279c6b255ce6838f9f489d",
+    "main_base": "421bf3f98b631d931838c22a927b4fec246f7df8",
+    "refrozen_at": "2026-10-12T04:35:04Z",
+    "before_any_run": true,
+    "superseded_preregistration_sha256": "972efba72e71335940c0a1b3c949ff5921cf4d1ea8e79be4e172bd04c93551c3",
+    "superseded_fixture_sha256": "a18773b3bcff53d83dc526e07411ea13fe9f71fe85d8ba1bb479b99633093f0c",
+    "fail_first": {
+      "test_ref": "tests/test_w6_observability_hosting_records.py",
+      "before_fix_head": "f2374694f453f93418279c6b255ce6838f9f489d",
+      "before_fix_exit": 1,
+      "scope": "B1-B7 record consistency only."
+    }
+  },
+  "sweep_gap_dispositions": [
+    {
+      "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/failures/observability-hosting",
+      "disposition": "retained_latest_sweep_discovery_gap",
+      "reason": "Missing GPT discovery/capped searches leave one-family discovery, not candidate adjudication. No broad discovery in this delta."
+    },
+    {
+      "ref": "catalogs/sota-convergence/manifest-20260923.json#/trading/10/candidates/0",
+      "repository": "https://github.com/garethgeorge/backrest",
+      "disposition": "outside_sweep_lane_census_retained_unverified",
+      "reason": "Beyond-lane row has no votes/no demonstrated scheduling gap over Dagu/systemd. Neither newly adopted nor merit-refuted survivor."
+    }
+  ]
+}

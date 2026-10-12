@@ -1,0 +1,611 @@
+{
+  "schema_version": 1,
+  "kind": "w6_mirror_primary_sources",
+  "recorded_at": "2026-10-12T04:35:04Z",
+  "mirror_root": "~/code/upstream",
+  "read_command": "GIT_NO_LAZY_FETCH=1 GIT_OPTIONAL_LOCKS=0 git show <lock commit>:<path>",
+  "scope": "Exact lock-SHA source witnesses; source review does not qualify deployment, E2E, native usage or recovery.",
+  "sources": [
+    {
+      "repository": "https://github.com/SigNoz/signoz",
+      "pin": "6b137947280595ecabea354b54076356b78d8433",
+      "manifest_ref": "6b137947280595ecabea354b54076356b78d8433",
+      "mirror_status": "MIRRORED",
+      "mirror_dir": "SigNoz/signoz",
+      "role_ref": "README.md:23",
+      "install_ref": null,
+      "test_ref": "Makefile:244-246",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "25621be3e5a76e70740b3b55a36b35a9074af930c6c189df633c7e9cadbceb73"
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "sha256": "287e4bdd07fd17b1befb20aea0754a5770f6fd56e84c2aa3f81df3230a850749"
+        },
+        {
+          "path": "Makefile",
+          "sha256": "472f725c4dbddb1b34cc9120a2a2fc016592019681c1168921353826f010050b"
+        },
+        {
+          "path": "deploy/README.md",
+          "sha256": "1bd197f03a0149f054215fabcc1cb124a3a68e057694f74d30d1a0302f2b1d14"
+        }
+      ],
+      "citation_witnesses": {
+        "role_ref": {
+          "ref": "README.md:23",
+          "pin": "6b137947280595ecabea354b54076356b78d8433",
+          "source_file_sha256": "25621be3e5a76e70740b3b55a36b35a9074af930c6c189df633c7e9cadbceb73",
+          "lines": [
+            "SigNoz is an open-source observability platform built on OpenTelemetry. We\u2019re building an enterprise-grade alternative to fragmented monitoring stacks, with logs, metrics, traces, alerts, and dashboards in one place."
+          ]
+        },
+        "test_ref": {
+          "ref": "Makefile:244-246",
+          "pin": "6b137947280595ecabea354b54076356b78d8433",
+          "source_file_sha256": "472f725c4dbddb1b34cc9120a2a2fc016592019681c1168921353826f010050b",
+          "lines": [
+            ".PHONY: py-test",
+            "py-test: ## Runs integration tests",
+            "\t@cd tests && uv run pytest --basetemp=./tmp/ -vv --capture=no integration/tests/"
+          ]
+        },
+        "deployment_gap": {
+          "ref": "deploy/README.md:8-14",
+          "pin": "6b137947280595ecabea354b54076356b78d8433",
+          "source_file_sha256": "1bd197f03a0149f054215fabcc1cb124a3a68e057694f74d30d1a0302f2b1d14",
+          "lines": [
+            "> **Note:** The `install.sh` script and the `docker-compose` manifests have been deprecated.",
+            "",
+            "SigNoz now installs and runs through [Foundry](https://signoz.io/docs/install/docker/).",
+            "",
+            "> **Already running SigNoz via Docker Compose?** See the [Migration Guide](./MIGRATION.md) to transition your existing deployment to Foundry.",
+            "",
+            "Please follow the latest installation instructions at [signoz.io/docs/install/docker](https://signoz.io/docs/install/docker/)."
+          ]
+        }
+      },
+      "evidence_class": "source_review",
+      "scope": "Integration setup/tests are upstream-owned; complete deployment and E2E remain unmet. Unit tests are not E2E.",
+      "install_gap": "UNMIRRORED SigNoz/foundry: deploy/README.md:8-14 deprecates old install/compose. Full-arm deployment is not asserted. Pin and qualify Foundry deployment and image graph before replay.",
+      "unit_test_ref": "Makefile:100-102",
+      "integration_setup_ref": "Makefile:236-238",
+      "e2e_gap": "Integration setup/tests are separate; retain complete upstream UI/backend E2E commands and results at source/image identities before qualification."
+    },
+    {
+      "repository": "https://github.com/grafana/grafana",
+      "pin": "6193dc03311b631b9727b560d24369e683dc396e",
+      "manifest_ref": "v13.2.3",
+      "mirror_status": "MIRRORED",
+      "mirror_dir": "grafana/grafana-w6-run-13.2.3",
+      "role_ref": "README.md:8",
+      "install_ref": "Makefile:336",
+      "test_ref": "Makefile:542",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "fc8a867bf09f319b9288746ab0148faff2e92ed39cd702252ce59161e576c019"
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "sha256": "37bbdfaad94a1fa0c0d0ad87278afad1b91e7007ef8197062a27f96e61dd5246"
+        },
+        {
+          "path": "package.json",
+          "sha256": "a8b922a1e9c05e4491a79db23be5a25a61a3df2699fcec0458914f73d34ac20b"
+        },
+        {
+          "path": "Makefile",
+          "sha256": "d7719b60a946eac3516764e74fa5933852b72894319bd2b13295ac2840906472"
+        }
+      ],
+      "citation_witnesses": {
+        "role_ref": {
+          "ref": "README.md:8",
+          "pin": "6193dc03311b631b9727b560d24369e683dc396e",
+          "source_file_sha256": "fc8a867bf09f319b9288746ab0148faff2e92ed39cd702252ce59161e576c019",
+          "lines": [
+            "Grafana allows you to query, visualize, alert on and understand your metrics no matter where they are stored. Create, explore, and share dashboards with your team and foster a data-driven culture:"
+          ]
+        },
+        "install_ref": {
+          "ref": "Makefile:336",
+          "pin": "6193dc03311b631b9727b560d24369e683dc396e",
+          "source_file_sha256": "d7719b60a946eac3516764e74fa5933852b72894319bd2b13295ac2840906472",
+          "lines": [
+            "build-go: pkg/services/preference/themes_generated.go"
+          ]
+        },
+        "test_ref": {
+          "ref": "Makefile:542",
+          "pin": "6193dc03311b631b9727b560d24369e683dc396e",
+          "source_file_sha256": "d7719b60a946eac3516764e74fa5933852b72894319bd2b13295ac2840906472",
+          "lines": [
+            "test-go: test-go-unit test-go-integration"
+          ]
+        }
+      },
+      "evidence_class": "source_review",
+      "scope": "Source at the operational release; frontend/backend E2E still required."
+    },
+    {
+      "repository": "https://github.com/grafana/loki",
+      "pin": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
+      "manifest_ref": "v3.7.8",
+      "mirror_status": "MIRRORED",
+      "mirror_dir": "grafana/loki",
+      "role_ref": "README.md:24",
+      "install_ref": "README.md:108",
+      "test_ref": "Makefile:378",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "af9e356ba4d99300f4e145be9c0b5885587b2ba8dbba89e2a5f149cd3572c04a"
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "sha256": "6a8fdba4e29e3e453acdcfc941d60b2dcc8b1a5b651622db4eb52667935f9c53"
+        },
+        {
+          "path": "Makefile",
+          "sha256": "38b020ac2791318005310734854922c802f36968e5530b3e8b7d2749d04721de"
+        }
+      ],
+      "citation_witnesses": {
+        "role_ref": {
+          "ref": "README.md:24",
+          "pin": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
+          "source_file_sha256": "af9e356ba4d99300f4e145be9c0b5885587b2ba8dbba89e2a5f149cd3572c04a",
+          "lines": [
+            "- [Loki](https://github.com/grafana/loki) is the main service, responsible for storing logs and processing queries."
+          ]
+        },
+        "install_ref": {
+          "ref": "README.md:108",
+          "pin": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
+          "source_file_sha256": "af9e356ba4d99300f4e145be9c0b5885587b2ba8dbba89e2a5f149cd3572c04a",
+          "lines": [
+            "$ go build ./cmd/loki"
+          ]
+        },
+        "test_ref": {
+          "ref": "Makefile:378",
+          "pin": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
+          "source_file_sha256": "38b020ac2791318005310734854922c802f36968e5530b3e8b7d2749d04721de",
+          "lines": [
+            "test: all ## run the unit tests"
+          ]
+        }
+      },
+      "evidence_class": "source_review",
+      "scope": "Own log-storage/build/test references, not qualification."
+    },
+    {
+      "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+      "pin": "ae8c507510f48f433ab47dd1c6b01a59d6c388b5",
+      "manifest_ref": "v0.162.0",
+      "mirror_status": "MIRRORED",
+      "mirror_dir": "open-telemetry/opentelemetry-collector-contrib-w6-run-0.162.0",
+      "role_ref": "README.md:40",
+      "install_ref": "Makefile:481",
+      "test_ref": "Makefile:107",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "9d35acfa4e58b455b556c89274bc7b3dd48531daa7c333e4cf7f1157a7b98add"
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "sha256": "ab83c5c84927ea7d9d31607f74c87f02bf9dbc4bbd843d88dfcbb10794a9982d"
+        },
+        {
+          "path": "Makefile",
+          "sha256": "a3198087b154fad8ea604dded99644c15b0a9d412777f9281491ad05c9720a18"
+        }
+      ],
+      "citation_witnesses": {
+        "role_ref": {
+          "ref": "README.md:40",
+          "pin": "ae8c507510f48f433ab47dd1c6b01a59d6c388b5",
+          "source_file_sha256": "9d35acfa4e58b455b556c89274bc7b3dd48531daa7c333e4cf7f1157a7b98add",
+          "lines": [
+            "This is a repository for OpenTelemetry Collector components that are not suitable for the  [core repository](https://github.com/open-telemetry/opentelemetry-collector) of the collector. "
+          ]
+        },
+        "install_ref": {
+          "ref": "Makefile:481",
+          "pin": "ae8c507510f48f433ab47dd1c6b01a59d6c388b5",
+          "source_file_sha256": "a3198087b154fad8ea604dded99644c15b0a9d412777f9281491ad05c9720a18",
+          "lines": [
+            "otelcontribcol: genotelcontribcol"
+          ]
+        },
+        "test_ref": {
+          "ref": "Makefile:107",
+          "pin": "ae8c507510f48f433ab47dd1c6b01a59d6c388b5",
+          "source_file_sha256": "a3198087b154fad8ea604dded99644c15b0a9d412777f9281491ad05c9720a18",
+          "lines": [
+            "e2e-test: otelcontribcol oteltestbedcol"
+          ]
+        }
+      },
+      "evidence_class": "source_review",
+      "scope": "Operational source release; build and E2E targets are distinct."
+    },
+    {
+      "repository": "https://github.com/prometheus/prometheus",
+      "pin": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+      "manifest_ref": "v3.15.0",
+      "mirror_status": "MIRRORED",
+      "mirror_dir": "prometheus/prometheus-w6-run-3.15.0",
+      "role_ref": "README.md:21-23",
+      "install_ref": "README.md:100",
+      "test_ref": "CONTRIBUTING.md:42",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "9ef538829dfc934d7ef53c62bafb3a2ea78b0cab432b2bbf47e84192abf6fddb"
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "sha256": "9142132947ae1d8ee9947b8725e56dbd5e9ee384733a5c59d5eda0dbc1b8fd8c"
+        },
+        {
+          "path": "Makefile",
+          "sha256": "0e430c9e0870a217f34f69e776a9ef2899d9968e4388f85b9e050265ed3753b7"
+        }
+      ],
+      "citation_witnesses": {
+        "role_ref": {
+          "ref": "README.md:21-23",
+          "pin": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+          "source_file_sha256": "9ef538829dfc934d7ef53c62bafb3a2ea78b0cab432b2bbf47e84192abf6fddb",
+          "lines": [
+            "Prometheus, a [Cloud Native Computing Foundation](https://cncf.io/) project, is a systems and service monitoring system. It collects metrics",
+            "from configured targets at given intervals, evaluates rule expressions,",
+            "displays the results, and can trigger alerts when specified conditions are observed."
+          ]
+        },
+        "install_ref": {
+          "ref": "README.md:100",
+          "pin": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+          "source_file_sha256": "9ef538829dfc934d7ef53c62bafb3a2ea78b0cab432b2bbf47e84192abf6fddb",
+          "lines": [
+            "make build"
+          ]
+        },
+        "test_ref": {
+          "ref": "CONTRIBUTING.md:42",
+          "pin": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+          "source_file_sha256": "9142132947ae1d8ee9947b8725e56dbd5e9ee384733a5c59d5eda0dbc1b8fd8c",
+          "lines": [
+            "make test         # Make sure all the tests pass before you commit and push :)"
+          ]
+        }
+      },
+      "evidence_class": "source_review",
+      "scope": "Operational source release, no receipt transfer."
+    },
+    {
+      "repository": "https://github.com/prometheus/alertmanager",
+      "pin": "73c6bfe7393929211294c1954f30d8ed78e4d0ad",
+      "manifest_ref": "v0.34.1",
+      "mirror_status": "MIRRORED",
+      "mirror_dir": "prometheus/alertmanager",
+      "role_ref": "README.md:6",
+      "install_ref": "Makefile:30",
+      "test_ref": "Makefile:33",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "815b847f34bd84afc784d2bdf77060e3a7099da36766ac1dacfa0c76fcc5f3e5"
+        },
+        {
+          "path": "Makefile",
+          "sha256": "e62ae420a29bc51f739fdfb5a0997442d3ffd8f339cb7c47734d66ba0716dc7a"
+        }
+      ],
+      "citation_witnesses": {
+        "role_ref": {
+          "ref": "README.md:6",
+          "pin": "73c6bfe7393929211294c1954f30d8ed78e4d0ad",
+          "source_file_sha256": "815b847f34bd84afc784d2bdf77060e3a7099da36766ac1dacfa0c76fcc5f3e5",
+          "lines": [
+            "The Alertmanager handles alerts sent by client applications such as the Prometheus server. It takes care of deduplicating, grouping, and routing them to the correct [receiver integrations](https://prometheus.io/docs/alerting/latest/configuration/#receiver) such as email, PagerDuty, OpsGenie, or many other [mechanisms](https://prometheus.io/docs/operating/integrations/#alertmanager-webhook-receiver) thanks to the webhook receiver. It also takes care of silencing and inhibition of alerts."
+          ]
+        },
+        "install_ref": {
+          "ref": "Makefile:30",
+          "pin": "73c6bfe7393929211294c1954f30d8ed78e4d0ad",
+          "source_file_sha256": "e62ae420a29bc51f739fdfb5a0997442d3ffd8f339cb7c47734d66ba0716dc7a",
+          "lines": [
+            "build: ui-elm common-build"
+          ]
+        },
+        "test_ref": {
+          "ref": "Makefile:33",
+          "pin": "73c6bfe7393929211294c1954f30d8ed78e4d0ad",
+          "source_file_sha256": "e62ae420a29bc51f739fdfb5a0997442d3ffd8f339cb7c47734d66ba0716dc7a",
+          "lines": [
+            "test: ui-elm common-test"
+          ]
+        }
+      },
+      "evidence_class": "source_review",
+      "scope": "Reference-arm alert routing; isolated notification acceptance required."
+    },
+    {
+      "repository": "https://github.com/binwiederhier/ntfy",
+      "pin": "10cb6506f836dbb00bb77e3b52669f6ace37f555",
+      "manifest_ref": "v2.28.0",
+      "mirror_status": "MIRRORED",
+      "mirror_dir": "binwiederhier/ntfy",
+      "role_ref": "README.md:29",
+      "install_ref": "Makefile:93",
+      "test_ref": "Makefile:280",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "ad08c06351ad4748e6b6913e1e7b9b7221135d68b6b3cf1774a26c4c0f706526"
+        },
+        {
+          "path": "Makefile",
+          "sha256": "c0738aa7531992804f07000ac65898caed6ab34f33239d44a6da27304516e5f5"
+        }
+      ],
+      "citation_witnesses": {
+        "role_ref": {
+          "ref": "README.md:29",
+          "pin": "10cb6506f836dbb00bb77e3b52669f6ace37f555",
+          "source_file_sha256": "ad08c06351ad4748e6b6913e1e7b9b7221135d68b6b3cf1774a26c4c0f706526",
+          "lines": [
+            "notification service. With ntfy, you can **send notifications to your phone or desktop via scripts** from any computer, "
+          ]
+        },
+        "install_ref": {
+          "ref": "Makefile:93",
+          "pin": "10cb6506f836dbb00bb77e3b52669f6ace37f555",
+          "source_file_sha256": "c0738aa7531992804f07000ac65898caed6ab34f33239d44a6da27304516e5f5",
+          "lines": [
+            "build: web docs cli"
+          ]
+        },
+        "test_ref": {
+          "ref": "Makefile:280",
+          "pin": "10cb6506f836dbb00bb77e3b52669f6ace37f555",
+          "source_file_sha256": "c0738aa7531992804f07000ac65898caed6ab34f33239d44a6da27304516e5f5",
+          "lines": [
+            "test: cli-test web-test"
+          ]
+        }
+      },
+      "evidence_class": "source_review",
+      "scope": "Common isolated notification destination; no personal endpoint."
+    },
+    {
+      "repository": "https://github.com/restic/rest-server",
+      "pin": "0f256e8ea8eae5611b04d1abed9ae6c38f76e215",
+      "manifest_ref": "0f256e8ea8eae5611b04d1abed9ae6c38f76e215",
+      "mirror_status": "MIRRORED",
+      "mirror_dir": "restic/rest-server",
+      "role_ref": "README.md:84",
+      "install_ref": "README.md:20",
+      "test_ref": ".github/workflows/tests.yml:61",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "78fa75d8f8669f3fc3e89d81648b5924dc9d1f878082bb4d0aa14e87259c1d64"
+        },
+        {
+          "path": ".github/workflows/tests.yml",
+          "sha256": "61d5bdb2c4f9170f4dac8beafd4596c8542f8cef7c13b3656c590bc7c815666c"
+        }
+      ],
+      "citation_witnesses": {
+        "role_ref": {
+          "ref": "README.md:84",
+          "pin": "0f256e8ea8eae5611b04d1abed9ae6c38f76e215",
+          "source_file_sha256": "78fa75d8f8669f3fc3e89d81648b5924dc9d1f878082bb4d0aa14e87259c1d64",
+          "lines": [
+            "The `--append-only` mode allows creation of new backups but prevents deletion and modification of existing backups. This can be useful when backing up systems that have a potential of being hacked."
+          ]
+        },
+        "install_ref": {
+          "ref": "README.md:20",
+          "pin": "0f256e8ea8eae5611b04d1abed9ae6c38f76e215",
+          "source_file_sha256": "78fa75d8f8669f3fc3e89d81648b5924dc9d1f878082bb4d0aa14e87259c1d64",
+          "lines": [
+            "For building the `rest-server` binary run `CGO_ENABLED=0 go build -o rest-server ./cmd/rest-server`"
+          ]
+        },
+        "test_ref": {
+          "ref": ".github/workflows/tests.yml:61",
+          "pin": "0f256e8ea8eae5611b04d1abed9ae6c38f76e215",
+          "source_file_sha256": "61d5bdb2c4f9170f4dac8beafd4596c8542f8cef7c13b3656c590bc7c815666c",
+          "lines": [
+            "          go test -cover ${{matrix.test_opts}} ./..."
+          ]
+        }
+      },
+      "evidence_class": "source_review",
+      "scope": "Recovery protection candidate, not constant telemetry dependency."
+    },
+    {
+      "repository": "https://github.com/restic/restic",
+      "pin": "6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf",
+      "manifest_ref": "v0.19.1",
+      "mirror_status": "MIRRORED",
+      "mirror_dir": "restic/restic",
+      "role_ref": "README.md:7",
+      "install_ref": "CONTRIBUTING.md:91",
+      "test_ref": "CONTRIBUTING.md:101",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "8180046c28e55384c37588607b64a160b3e359a044d6ac59fddb94d659eab75d"
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "sha256": "6d9e8295cc7eb415fb3a094bd55ead25b54b00d988fc4e84f09a0df46f71a299"
+        },
+        {
+          "path": "Makefile",
+          "sha256": "308dc7fa5136f323440d274eb58e5980a36bf46b78c4b118c61afd9ca72cf4cc"
+        },
+        {
+          "path": "doc/030_preparing_a_new_repo.rst",
+          "sha256": "bcda900e10668d8b1389607f29dc5033bfb4ed9706d265285c2d23ad68cb8da2"
+        }
+      ],
+      "citation_witnesses": {
+        "role_ref": {
+          "ref": "README.md:7",
+          "pin": "6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf",
+          "source_file_sha256": "8180046c28e55384c37588607b64a160b3e359a044d6ac59fddb94d659eab75d",
+          "lines": [
+            "restic is a backup program that is fast, efficient and secure. It supports the three major operating systems (Linux, macOS, Windows) and a few smaller ones (FreeBSD, OpenBSD)."
+          ]
+        },
+        "install_ref": {
+          "ref": "CONTRIBUTING.md:91",
+          "pin": "6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf",
+          "source_file_sha256": "6d9e8295cc7eb415fb3a094bd55ead25b54b00d988fc4e84f09a0df46f71a299",
+          "lines": [
+            "    $ go build ./cmd/restic"
+          ]
+        },
+        "test_ref": {
+          "ref": "CONTRIBUTING.md:101",
+          "pin": "6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf",
+          "source_file_sha256": "6d9e8295cc7eb415fb3a094bd55ead25b54b00d988fc4e84f09a0df46f71a299",
+          "lines": [
+            "    $ go test ./..."
+          ]
+        }
+      },
+      "evidence_class": "source_review",
+      "scope": "Common backup client; SFTP is a destructive control, not immutability evidence."
+    },
+    {
+      "repository": "https://github.com/rclone/rclone",
+      "pin": "4f19e9cd6f442282d7fa8d5fdbd28ebb68be1131",
+      "manifest_ref": "4f19e9cd6f442282d7fa8d5fdbd28ebb68be1131",
+      "mirror_status": "MIRRORED",
+      "mirror_dir": "rclone/rclone",
+      "role_ref": "docs/content/commands/rclone_serve_restic.md:228",
+      "install_ref": "Makefile:53",
+      "test_ref": "Makefile:94",
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "fde45f81100e0a18b261f84073e2633f17db4e0b5e3ceacc14e41c525eb1aa22"
+        },
+        {
+          "path": "Makefile",
+          "sha256": "70b5d9a7be1de31e6202705251fe9c35dcf2cba170e5a396b635e451fcad0e1d"
+        },
+        {
+          "path": "docs/content/commands/rclone_serve_restic.md",
+          "sha256": "963b935609d7eb97cbab5d5e2bb384e4aaec98dca368e2395841d242e91a2bfd"
+        }
+      ],
+      "citation_witnesses": {
+        "role_ref": {
+          "ref": "docs/content/commands/rclone_serve_restic.md:228",
+          "pin": "4f19e9cd6f442282d7fa8d5fdbd28ebb68be1131",
+          "source_file_sha256": "963b935609d7eb97cbab5d5e2bb384e4aaec98dca368e2395841d242e91a2bfd",
+          "lines": [
+            "      --append-only                     Disallow deletion of repository data"
+          ]
+        },
+        "install_ref": {
+          "ref": "Makefile:53",
+          "pin": "4f19e9cd6f442282d7fa8d5fdbd28ebb68be1131",
+          "source_file_sha256": "70b5d9a7be1de31e6202705251fe9c35dcf2cba170e5a396b635e451fcad0e1d",
+          "lines": [
+            "rclone:"
+          ]
+        },
+        "test_ref": {
+          "ref": "Makefile:94",
+          "pin": "4f19e9cd6f442282d7fa8d5fdbd28ebb68be1131",
+          "source_file_sha256": "70b5d9a7be1de31e6202705251fe9c35dcf2cba170e5a396b635e451fcad0e1d",
+          "lines": [
+            "test:\trclone test_all"
+          ]
+        }
+      },
+      "evidence_class": "source_review",
+      "scope": "Retained fit-vote append-only comparator, not new discovery."
+    },
+    {
+      "repository": "https://github.com/dagucloud/dagu",
+      "pin": "58fed633d58c1dd1319091fdb2c2f6158ecfa053",
+      "manifest_ref": "v2.16.6",
+      "mirror_status": "MIRRORED",
+      "mirror_dir": "dagucloud/dagu",
+      "role_ref": "README.md:18-20",
+      "install_ref": null,
+      "test_ref": null,
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "153ec405b99603e6d52772eb152f00505c24c02ec24b463691dcbd7cb4fc2658"
+        }
+      ],
+      "citation_witnesses": {
+        "role_ref": {
+          "ref": "README.md:18-20",
+          "pin": "58fed633d58c1dd1319091fdb2c2f6158ecfa053",
+          "source_file_sha256": "153ec405b99603e6d52772eb152f00505c24c02ec24b463691dcbd7cb4fc2658",
+          "lines": [
+            "Dagu is a local-first workflow engine for operations and internal automation. It is open source and self-hostable: a single binary with a built-in Web UI, no external database or message broker, running on Linux, macOS, and Windows. Define [DAGs](https://en.wikipedia.org/wiki/Directed_acyclic_graph) in a declarative YAML format. It natively supports shell commands, Docker containers, Kubernetes Jobs, remote commands via SSH, and more through Dagu Actions.",
+            "",
+            "Dagu turns existing scripts and runbooks into production workflows with scheduling, retries, human tasks, and run history. It runs where your data and credentials live: on-prem, air-gapped, edge, or cloud, and scales from a single node to a fleet of workers."
+          ]
+        }
+      },
+      "evidence_class": "source_review",
+      "scope": "Existing supervision scope; executable install/test recipe is a pre-run gap."
+    },
+    {
+      "repository": "https://github.com/anthropics/sandbox-runtime",
+      "pin": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+      "manifest_ref": "v0.0.79",
+      "mirror_status": "MIRRORED",
+      "mirror_dir": "anthropics/sandbox-runtime",
+      "role_ref": "README.md:3",
+      "install_ref": "README.md:14",
+      "test_ref": null,
+      "reviewed_files": [
+        {
+          "path": "README.md",
+          "sha256": "2b18ce30672734247519435d5755875ed5f962ef9d0dbfe00994f6097bbe4b93"
+        }
+      ],
+      "citation_witnesses": {
+        "role_ref": {
+          "ref": "README.md:3",
+          "pin": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+          "source_file_sha256": "2b18ce30672734247519435d5755875ed5f962ef9d0dbfe00994f6097bbe4b93",
+          "lines": [
+            "A lightweight sandboxing tool for enforcing filesystem and network restrictions on arbitrary processes at the OS level, without requiring a container."
+          ]
+        },
+        "install_ref": {
+          "ref": "README.md:14",
+          "pin": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+          "source_file_sha256": "2b18ce30672734247519435d5755875ed5f962ef9d0dbfe00994f6097bbe4b93",
+          "lines": [
+            "npm install -g @anthropic-ai/sandbox-runtime"
+          ]
+        }
+      },
+      "evidence_class": "source_review",
+      "scope": "Existing isolation scope; require source-qualified owned denial acceptance.",
+      "test_gap": "No executable source-pinned sandbox test/E2E recipe is captured here; retain it before qualification."
+    }
+  ]
+}
