@@ -6,7 +6,7 @@
   "tool_sha256": "75a6d74b07b62d8bb1be0ed37bcffece18781c9c1bdff4a94c23cd5ce9dbe60b",
   "command": "node .claude/workflows/child-usage.mjs <session-transcripts>/subagents/workflows/wf_38aa6d5d-d6c",
   "exit_code": 0,
-  "raw_output_sha256": "0954aca86737c36901e98cfbafa30e577ceb029edcf6f8bf7bca468d0b7819db",
+  "raw_output_sha256": "private, not published (host state)",
   "measured_at_utc": "2026-09-24T01:41:33Z",
   "note": "Per-request provider usage from the retained subagent transcripts. A child counts only the assistant messages that already carry usage; for an incomplete run (status below) interrupted requests may be missing, so its totals are a lower bound. The raw output differs from this copy only in transcript_dir, which held a host path."
  },

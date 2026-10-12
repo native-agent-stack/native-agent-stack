@@ -209,26 +209,26 @@ component and absolute temporary prefix (including file URLs) remain controls; s
 This follows the native path shape already captured, with the selected checkout's UUID/privacy grammar and
 the supported CPython percent-decoding validation unchanged.
 
-The six-line README insertion moved the current workflow stagger policy paragraph to line1095. Both the
-catalog disposition's source and its reason now cite that exact line; its existing test fails at1089 and passes
+The six-line README insertion moved the current workflow stagger policy paragraph to line 1095. Both the
+catalog disposition's source and its reason now cite that exact line; its existing test fails at 1089 and passes
 after correction. The README gate clarification preserves its line count. Changed registered hashes/bytes are
 refreshed. The catalog edit is only this enforced citation repair; sweep publication/ledger work is still separate.
 
-Final tests transplanted onto a genuine detached prior17eb102d tree reproduce all five findings: ten tests,
+Final tests transplanted onto a genuine detached prior 17eb102d tree reproduce all five findings: ten tests,
 27 failing subtests, zero errors. Wider prefix controls separately fail two subtests before their correction.
-The old289-test pre-feature module transplanted against corrected production reproduces13 failures/12 errors:
+The old 289-test pre-feature module transplanted against corrected production reproduces 13 failures/12 errors:
 all require affirmative synthetic request fields, absent from the old fixture helper. With ONLY those fixture
-measurements supplied (the helper plus two hand-written attempts, no assertions or production changes), all289
+measurements supplied (the helper plus two hand-written attempts, no assertions or production changes), all 289
 tests pass with the same three optional skips. This distinguishes the intentional refusal of unmeasured input
 from a product regression. The exact fixture-only patch and both outcomes are retained for independent review.
 
 ### Per-attempt unknown-effort disclosure provisos
 
-The CC's05:58Z pre-ruling directs disclosure rather than a paid rerun, conditioned separately for each interrupted
+The CC's 05:58Z pre-ruling directs disclosure rather than a paid rerun, conditioned separately for each interrupted
 identity on a completed known preregistered-effort replacement and no interrupted output reaching recorded
 returns. Read-only mechanical checks pass both provisos for all eight identities. The preregistered source is
 the privately retained repair script: its GPT
-fit wrapper at line174 and Claude fit call at231 request max. Each replacement has known `[max]`, zero unknown
+fit wrapper at line 174 and Claude fit call at 231 request max. Each replacement has known `[max]`, zero unknown
 requests, positive measured requests, and a matching native start/result key. None of the eight has a native
 result row or appears in the final native result; historical converted references are accounting-only entries.
 
@@ -243,27 +243,27 @@ result row or appears in the final native result; historical converted reference
 | adcd3dcb76b572aca | a2c1dd81987c62f73 | 6 | pass |
 | ae3dc39bf44926156 | a4511b892126cfb11 | 13 | pass |
 
-Every identity remains counted in127 native attempts (106 active+21 superseded). The disclosure's original
+Every identity remains counted in 127 native attempts (106 active+21 superseded). The disclosure's original
 raw source and the fresh stricter native measurement remain in the private evidence store. The stricter
 gate adds eight unknown-effort mismatch rows. Its child/superseded arrays and
 aggregate model/WebSearch counters are exactly equal to the original strict measurement. The wrapper retains
-raw1/wrapper1; all unknowns remain visible. No counter rewrite or clean-effort waiver is made. README11–12
+raw 1/wrapper 1; all unknowns remain visible. No counter rewrite or clean-effort waiver is made. README 11–12
 and catalog-owner publication must disclose these eight rows while original authentication stays private when that gated work
 proceeds. The checks are scoped to the retained native journal/final result and historical converted returns;
 they do not claim publication has occurred or unprovided external job files have been independently replayed.
 
-The corrected adapter's supported offline suite passes224/224. The four full named Python modules (postrun,
-complete sweep harness,evidence manifest and upstream surface watch) pass424 tests at both the correction
-source and an isolated merge with main7b76a88c (nine explicit optional skips). The full114-test surface watcher
-passes with six skips; its citation class passes6/6. FULL validation passes at head11427 and merged11477
+The corrected adapter's supported offline suite passes 224/224. The four full named Python modules (postrun,
+complete sweep harness, evidence manifest and upstream surface watch) pass 424 tests at both the correction
+source and an isolated merge with main 7b76a88c (nine explicit optional skips). The full 114-test surface watcher
+passes with six skips; its citation class passes 6/6. FULL validation passes at head 11427 and merged 11477
 hashed files. The original pre-cue failures remain retained alongside the fixture-only controlled comparison.
 
-Fresh supported conversion over the retained native run and actual work-directory GPT outputs returns0:
-13 layers,151 proposals,53 survivor pairs,and42 GPT-6 copy matches. It now retains eight unknown-effort
+Fresh supported conversion over the retained native run and actual work-directory GPT outputs returns 0:
+13 layers, 151 proposals, 53 survivor pairs, and 42 GPT-6 copy matches. It now retains eight unknown-effort
 failures and reopens seven affected layers; no earlier clean-effort artifact is overwritten. The supported result
-usage validator accepts these properly retained failures. The49 captured GPT last.json files and scope input
-include all42 selected copy-check dependencies. This is a retained-run integration,not a new inference run or
-catalog/ledger publication. The earlier245-line journal prefix is captured unchanged from the final journal and
+usage validator accepts these properly retained failures. The 49 captured GPT last.json files and scope input
+include all 42 selected copy-check dependencies. This is a retained-run integration, not a new inference run or
+catalog/ledger publication. The earlier 245-line journal prefix is captured unchanged from the final journal and
 rehashes exactly to the historically cited journal digest retained privately; the earlier effort-gate and original red/green logs
 are attached as well. Private capture manifests distinguish exact originals from masked transport copies.
 

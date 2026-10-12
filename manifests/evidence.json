@@ -11402,8 +11402,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-read-deltas.json",
-      "sha256": "71680301005e030ac0371d175ccbe8eba365a55560f71299c71d09fc4ffca625",
-      "bytes": 371
+      "sha256": "060ef1dfefe0e6c27087852ff0269a1bec839621c85d6b328e0f7737483ef618",
+      "bytes": 479
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261004.json",
@@ -11424,6 +11424,11 @@
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261012-pr1016.json",
       "sha256": "6df6bb62e1bde5843ba77a800af2e889a4affb1c4c4bb6389234697c2755df05",
       "bytes": 24739
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261012-pr1032-delta.json",
+      "sha256": "d9c9cecb7b93a8aee9867364c5678a859cb6ba4ae7c82631bcc73660075fbe4f",
+      "bytes": 9734
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261012-pr949-delta.json",
@@ -17347,7 +17352,7 @@
     },
     {
       "path": "catalogs/landscape/final-stack.json",
-      "sha256": "a41b418f6f16b79b77f45dcb58a976d2ba506275c67bddabcb01e7d2467e9424",
+      "sha256": "d2a78cd3150bd632caa3af4a3e1038ed76c7b7a41cda471e6e01a7c1244ce165",
       "bytes": 309186
     },
     {
@@ -17462,13 +17467,18 @@
     },
     {
       "path": "catalogs/saturation/README.md",
-      "sha256": "65b35374209ae8abf0d37154e4664cdcac98d5415f02b4583a9c479b4bf4436e",
-      "bytes": 12036
+      "sha256": "8d97bb6a89966d08a3cb81162aadb331afd29322c63556428be240547c593e85",
+      "bytes": 13410
     },
     {
       "path": "catalogs/saturation/ledger.json",
-      "sha256": "b6ca3220516a515bd6dec13f122f48acdd8ef738565f9c0145839d99dd0c21f2",
-      "bytes": 413173
+      "sha256": "c7dc7ad675bd0b6bd4a5db4898b91c155360e119ad6c6f2910f4c45e0a502807",
+      "bytes": 416951
+    },
+    {
+      "path": "catalogs/saturation/ledger.schema.json",
+      "sha256": "6910b7ab6cc859255dee22d22a24bcfc90596f6d880dfc028a50b3002c8a8f73",
+      "bytes": 8040
     },
     {
       "path": "catalogs/sota-convergence/README.md",
@@ -18937,8 +18947,8 @@
     },
     {
       "path": "docs/decisions/2026-10-11-landscape-postrun-accounting.md",
-      "sha256": "5de9e6748ea7fa422c543c7caa0b840ec5ea4b95de24ccf0604632c53d8e516a",
-      "bytes": 31992
+      "sha256": "d0897e849717771b9c47104774b461ff44c7d586935572060c7a67c8d2cd979d",
+      "bytes": 32022
     },
     {
       "path": "docs/decisions/2026-10-11-layer-resolution-protocol.md",
@@ -18964,6 +18974,11 @@
       "path": "docs/decisions/2026-10-11-starred-finalization.md",
       "sha256": "65d339790291609f8aeebf302ffe56cac5a27434b43db904e4831e03646431cb",
       "bytes": 12766
+    },
+    {
+      "path": "docs/decisions/2026-10-12-child-usage-publication-privacy.md",
+      "sha256": "e7c43306f7a72b65aa608adca79496287e77be989bb20bf1bb9ad307bed4c2c7",
+      "bytes": 5780
     },
     {
       "path": "docs/decisions/2026-10-12-exploratory-account-rotation-and-exits.md",
@@ -36817,13 +36832,13 @@
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260923-attempts/child-usage-wf_28d47bbc-1b5.json",
-      "sha256": "801d59237231fddcae82ab5a19d3b25b09388e9b6f6f61e974073cf1251e63be",
-      "bytes": 14819
+      "sha256": "96ff83c72ce818937cb886cbe73477c3e70af259a56eb8ef0ad4a883931b0d01",
+      "bytes": 14790
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260923-attempts/child-usage-wf_38aa6d5d-d6c.json",
-      "sha256": "865fe3ad94f8cc0e8690e6f6b78b1b74dde5b9883fe2df12b52226a4c029bddc",
-      "bytes": 94478
+      "sha256": "037dafd178db334060a6ebe743f0661d430fda8c0e961a36cae62610d27f2bce",
+      "bytes": 94449
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260923-attempts/wf_28d47bbc-1b5.json",
@@ -36887,18 +36902,18 @@
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260926-attempts/child-usage-wf_1753e674-5dc.json",
-      "sha256": "8af2dd0b2ce99d62057ddb821b0e65e78028deb91d2f639aa0ab377fed92f06f",
-      "bytes": 6136
+      "sha256": "48bfa4d8c0b19db9c946e5ac0dd68938e22f41b2777d7f0ae2003aa8f357098b",
+      "bytes": 6107
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260926-attempts/child-usage-wf_8397ada1-777.json",
-      "sha256": "76890e29fd79298e51bd15e9c2f365b0322075fa6ae703a0bcf19afc502f7c46",
-      "bytes": 190289
+      "sha256": "bda8970218b650b4f8b00781b5db621c8db3984bb343ad4e201c073668caca55",
+      "bytes": 190260
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260926-attempts/child-usage-wf_a874897e-af1.json",
-      "sha256": "0fba2967b093025ffea598d8f2c78d806f55006d9d220d87556bd93245625bcb",
-      "bytes": 11530
+      "sha256": "a4fbb62c3b22f34d464c033fe3b3f909b22b6c352b0b9dd458f0fdddc3da576a",
+      "bytes": 11501
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260926-attempts/wf_1753e674-5dc.json",
@@ -36917,13 +36932,13 @@
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/child-usage-wf_555874dd-5a7.json",
-      "sha256": "02f6c023675a76952fa4f26df7ddd1ea660553c3629149ef1b1e7c5042e31c77",
-      "bytes": 371162
+      "sha256": "c437d7484a4fd3fad675a798b38dce6cad9edb50fdd8fec1f9dc1b97cf60bcbe",
+      "bytes": 371133
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/child-usage-wf_8066ceb5-b9a.json",
-      "sha256": "08d919b086fbcc2394b3e8a57e54c8da168a528afb31625bbd17fa933236526f",
-      "bytes": 45181
+      "sha256": "ff6e61f99643f59b335ee288563163b1168855b3b8800908b1f6b47964869d8c",
+      "bytes": 45152
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/codex-client-check-20261003.txt",
@@ -37052,8 +37067,8 @@
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260926/child-usage-wf_6a6cb7b8-c22.json",
-      "sha256": "a398e214f24316cab6265dedafb82253b44987fe1d3f0f971b27b35df1e08540",
-      "bytes": 67439
+      "sha256": "f1ce91fce3955aee71f963fd44a8d8eafd2db969bdbee46f593ce4e248712546",
+      "bytes": 67410
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260926/cisco-ai-defense-skill-scanner.json",
@@ -37477,18 +37492,18 @@
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260929-attempts/child-usage-wf_08a5b367-311.json",
-      "sha256": "b5f0aa00a623ab743a0443cdb23df2bcdb2f493d7d72ecc632d85c797a615ecf",
-      "bytes": 1881383
+      "sha256": "65f000976448d9cad88075b291cda3752e66e562665cef4be57759ed886c4949",
+      "bytes": 1881354
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260929-attempts/child-usage-wf_3ec5fdfe-6e6.json",
-      "sha256": "068e5d89ccd61fef92a28eeb76f2adb2deed410eb6ec7309b89d1b51322f8973",
-      "bytes": 74400
+      "sha256": "ce0cd31816fa47b6d66aa29bbcd1b1b1b3b5628625f224ac4dbd84f767c2a90f",
+      "bytes": 74371
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260929-attempts/child-usage-wf_466387c0-f92.json",
-      "sha256": "294f584f86a7bda1a662c21074b6ec96bdf645324a625c1fd0c22a931e5b2dc3",
-      "bytes": 14467
+      "sha256": "5a33793bcc0f1990d5db7c79fc4dddbd90bbc55ca5dd4d528ea8ee41e5b9c521",
+      "bytes": 14438
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260929-attempts/gpt6-job-outcomes.json",
@@ -37692,8 +37707,8 @@
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20261009-pine-attempts/child-usage-wf_638ac506-e83.json",
-      "sha256": "13a2760dc905fb85f9ac6cc083389af066f32adf465c7864a8e88c6f2168d3d0",
-      "bytes": 342409
+      "sha256": "1886aeac306d7643402efdd929b350e6c522623f941ad65067158590fffb4b6f",
+      "bytes": 342380
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20261009-pine/arose26-pinescript-langium.json",
@@ -61242,8 +61257,8 @@
     },
     {
       "path": "scripts/component_matrix.py",
-      "sha256": "202d952952c361b7e17ee82740f7cd220e75cba2f3c7d9e82c433136d0fe0363",
-      "bytes": 80837
+      "sha256": "e4772a7a08e149f118f727ebe6c6f411a3da4e0f99ba8764084eb4b9a683cd28",
+      "bytes": 80988
     },
     {
       "path": "scripts/credential_boot_receipt.py",
@@ -61362,8 +61377,8 @@
     },
     {
       "path": "scripts/saturation_ledger.py",
-      "sha256": "611b5640c92b3985675f3405770405cdc2a9552a8b5e6bc3b3f7a868168f6b76",
-      "bytes": 110935
+      "sha256": "1e4ff5f719d8e5472b01434327dd72a5ad5418b928a11d4c41de26dcc6394f04",
+      "bytes": 119472
     },
     {
       "path": "scripts/secret_scan_metrics.py",
@@ -62059,6 +62074,11 @@
       "path": "tests/test_catalyst_provenance.py",
       "sha256": "d97ef06024b15d92c7447ee889c708a2975ec583d947c1e3590471373872164d",
       "bytes": 12522
+    },
+    {
+      "path": "tests/test_child_usage_publication.py",
+      "sha256": "8029cb0e0ddddb42a2df142a1c82b9af4b80ee5fbe5646d927be985695dc1767",
+      "bytes": 2596
     },
     {
       "path": "tests/test_child_usage_suite.py",
@@ -63002,8 +63022,8 @@
     },
     {
       "path": "tests/test_saturation_ledger.py",
-      "sha256": "c0311178a40acd4f233bbce29540f6f591f3878e855242f85f71b8dc49a3cbb3",
-      "bytes": 112415
+      "sha256": "a3968e6eca264b3d773182730f2f9909908082846370a39a7589e03e878fb4a0",
+      "bytes": 119498
     },
     {
       "path": "tests/test_scaffold_repo.py",

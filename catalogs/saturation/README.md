@@ -19,6 +19,27 @@ Nothing here writes `research-state.json`, the verdict ledgers or the SOTA manif
 
 ## Record
 
+The same hash chain accepts `kind: redaction-supersession` records for the #161
+publication correction. Each names an existing `usage_ref`, its immutable
+`historical_blob` (`commit`, `path`), matching `historical_sha256`, current
+`successor_sha256`, reason `#161` and computed `prev_sha256`. Original sweeps and
+their `usage_sha256` values stay unchanged. The checker resolves every historical
+blob locally through Git without lazy fetching and checks current registered
+bytes against the newest binding. Missing Git objects fail closed; the review
+packet must supply that history.
+
+This kind permits only replacing `measurement.raw_output_sha256` with
+`private, not published (host state)`; all other receipt data must remain equal.
+It records no date, run, layer, vote or new discovery and is inert to clean counts.
+`--check --base` still requires every old record as an exact unchanged prefix.
+
+Use `python3 scripts/saturation_ledger.py --append INPUT.json` with one record or
+a nonempty array of these records. A batch repairs several current bindings
+atomically: the whole proposed chain and its current/historical inputs must
+check before the native writer changes the ledger. Do not supply `prev_sha256`;
+the appender computes the links and head. The old unsafe receipt field remains
+in immutable published history, a history residual rather than a new publication.
+
 Each sweep record holds these fields:
 
 - `sweep_id`, `date`, `workflow_run` and `status` (`completed` or `stopped`)

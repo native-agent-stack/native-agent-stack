@@ -6,7 +6,7 @@
   "tool_sha256": "85b9581370b3bbfa31aa473616e350dcbac9cb9688178e339a5497ff26ad730d",
   "command": "node examples/claude-native/workflows/child-usage.mjs <session-transcripts>/subagents/workflows/wf_8397ada1-777 --require-effort max",
   "exit_code": 1,
-  "raw_output_sha256": "13e509dbb51b5f81de0c1b0e67c9fa3b0ecc802d82b1177f17749776c9d1bc67",
+  "raw_output_sha256": "private, not published (host state)",
   "measured_at_utc": "2026-09-26T17:50:08Z",
   "note": "Per-request provider usage of the Claude workflow children, from the retained native transcripts (message ids counted once). web_search counts each child's WebSearch calls and those the session's WebSearch cap refused (capped). The GPT-6 jobs are Codex usage, retained per job in the run's returns (raw and gpt6_usage); the two counters are never summed."
  },

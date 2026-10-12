@@ -711,6 +711,8 @@ def completed_sweeps(ledger_doc) -> list[dict]:
     sweeps = []
     for position, sweep in enumerate(sweeps_value):
         where = f"component_matrix: {SATURATION_LEDGER_FILE}: sweeps[{position}]"
+        if saturation_ledger.is_redaction_record(sweep):
+            continue  # An authenticated privacy binding has no new run, date, vote or layer.
         if not isinstance(sweep, dict) or sweep.get("status") not in saturation_ledger.STATUSES:
             raise SystemExit(where + " needs the status " + " or ".join(saturation_ledger.STATUSES))
         if sweep["status"] != COMPLETED_SWEEP:
