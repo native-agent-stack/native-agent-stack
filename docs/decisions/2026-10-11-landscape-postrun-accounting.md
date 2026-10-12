@@ -16,9 +16,7 @@ unrelated evidence identifiers.
   key, `Hr()` canonically serializes cache-relevant options (including model and effort), and `No()` hashes
   previous key, prompt and those options with NUL separators. This is the supported native Workflow resume
   mechanism; this change consumes its independently proved identities rather than implementing a runner.
-- The retained, CC-accepted post-run proof has SHA-256
-  `07182245d40b737437ec1ee5d433c502f6e750f12166f85720f3647d00fc454d`; its contract has SHA-256
-  `b363af4cf1ba6a6070f5d8d64c36c52062444a4c99af84e816c0deba312c4e4e`.
+- The retained, CC-accepted post-run proof and its contract remain in the private evidence store.
   The proof establishes a byte-equal 221-line original prefix, 106 replays, twelve reruns, nine approved equal
   keys and three dynamic keys recomputed from actual replacement discovery, with result equality. Its limitation
   explicitly delegates actual request effort to `usage_record.py`. The proof is trusted caller input, bound to
@@ -69,13 +67,12 @@ Actual remeasurement corrected a material assumption in the handoff: eleven repl
 `refute-fit:quality-evaluation:followup` replacement **ab5674e67ae285517** has 33 requests at `[max, low]`.
 Its original **af1c37c58587a048b** was complete at `[max]`. The replacement loaded property-based-testing;
 the installed skill's frontmatter explicitly declares `effort: low`. Requested max opts do not prove that every
-subsequent request stayed max. Native transcript SHA-256:
-`62261ed5732764aadc3b233b7ba66408005fa643cf033d25827187aab8752325`.
+subsequent request stayed max. The native transcript is retained privately.
 
 The actual supplied twelve-pair operation therefore **refuses with exit 2, before writing**. No pair, effort,
-native journal, source transcript, vote or counter was waived or edited. The complete actual journal hashes to
-`849ee99442d1158a33303c68640ffffd8575779c9e16c86f1874c2f024dc824b`. The measured gate and owner ruling request
-are retained privately at `tier1/postrun-20261011/effort-gate.json` within the wave's working state.
+native journal, source transcript, vote or counter was waived or edited. The complete actual journal,
+measured gate and owner ruling request are retained privately at
+`tier1/postrun-20261011/effort-gate.json` within the wave's working state.
 
 The repaired converter's actual preview succeeds: thirteen layers, 151 proposals, 53 surviving layer/repository
 pairs (52 unique repositories), and all 42 GPT-6 copy comparisons match. It explicitly retains both measured
@@ -105,13 +102,10 @@ only against a future client's primary source and a reproduced run, preserving t
 
 The ONE CC-authorized repair completed at 2026-10-11T02:23Z. Re-execution proves all 118 prior completed calls
 replayed and only the approved fit call appended. The 245-line prefix is byte-equal; the final journal has exactly
-247 lines (one new started/result pair), SHA-256
-`4b34a664f56145c3a285b013f6ca2abd2f4c59d257825a49b842c580164efe47`.
-The new key is `v2:56c965af13485b93c3a4c1ee72e748f7b17810161d8f9ebf8b442f9642a1077c`, new agent
-`aab7e4ff6c231f5ee`, superseding mixed-effort `ab5674e67ae285517`. Its native first prompt matches the approved
-prompt, and the replayed result equals the final native result. Extended proof SHA-256:
-`4d28bec0326f9493fc278e07291363485582cce924f3bd814c93af5ba8f05f3d`.
-The thirteen-pair contract hashes to `89faaeceb995aad15a7069a295e6b38c2d4530fca1431bd726ca662e37ffa2a5`.
+247 lines (one new started/result pair), retained privately with its native cache key. The new agent
+`aab7e4ff6c231f5ee` supersedes mixed-effort `ab5674e67ae285517`. Its native first prompt matches the approved
+prompt, and the replayed result equals the final native result. The extended proof and thirteen-pair
+contract remain in the private evidence store.
 
 The unchanged native usage tool measures the new child as claude-opus-5-5, 42 requests, efforts `[max]`.
 `usage_record.py` exits **0**, preserving native raw exit **1**, with 106 active children and 21 superseded
@@ -121,9 +115,8 @@ and point to the new max terminal, including in converted `superseded_retained`.
 An independent check against a fresh execution of the unchanged native tool exits **0**: every original child
 field is preserved, aggregate model/WebSearch counters are identical to native raw output, raw output hash and
 exit match, both non-max attempts are covered, and none is uncovered. This checks the input proof graph and native
-measurements independently of the wrapper's traversal. Effort-gate receipt SHA-256:
-`322f152f72045e454cc6abd5a15a44c2f8a7c0e206e0f7fe2007cf7eff44973a`.
-The final usage receipt hashes to `bf6c257a5213960e6cf8a16019fcd6fea7d8ff9282fb1b44834650fe86edf373`.
+measurements independently of the wrapper's traversal. The effort-gate and final usage receipts
+remain in the private evidence store.
 Native workflow summary counters and full per-child usage are separate counters; they are preserved separately.
 
 Final conversion exits **0** with thirteen layers, 151 proposals, 53 survivor pairs, all 42 GPT-6 copy checks
@@ -179,8 +172,7 @@ the two mixed-effort completed attempts remain covered. The wrapper now correctl
 native raw **1**, and the eight unknown attempts remain uncovered. This supersedes the earlier clean-effort
 acceptance in this decision for publication purposes; the historical receipts remain intact.
 
-The new private raw output is SHA-256 `9c63e6f2cd1d2d4969659922b8672647bc24d86a69d9f21bb104adac951b76e2`;
-the final corrected usage receipt is SHA-256 `c07326d18ac7a9758ff5c21b729aacd05a2ecac8b566eb68a7a97011c1698dcd`.
+The new private raw output and final corrected usage receipt remain in the private evidence store.
 README11–12 publication and ledger registration must account for these uncovered attempts before using a
 clean-effort claim. No additional model call, native journal change, manual measurement fill, catalog edit or
 ledger append was performed. The frozen owner handoff remains historical, not silently replaced.
@@ -234,7 +226,7 @@ from a product regression. The exact fixture-only patch and both outcomes are re
 The CC's05:58Z pre-ruling directs disclosure rather than a paid rerun, conditioned separately for each interrupted
 identity on a completed known preregistered-effort replacement and no interrupted output reaching recorded
 returns. Read-only mechanical checks pass both provisos for all eight identities. The preregistered source is
-the hash-bound repair script `1e00814482abdfc828fa9b7edc256c5961ee911a9d2c8f64e34bd0b70fac765c`: its GPT
+the privately retained repair script: its GPT
 fit wrapper at line174 and Claude fit call at231 request max. Each replacement has known `[max]`, zero unknown
 requests, positive measured requests, and a matching native start/result key. None of the eight has a native
 result row or appears in the final native result; historical converted references are accounting-only entries.
@@ -250,13 +242,12 @@ result row or appears in the final native result; historical converted reference
 | adcd3dcb76b572aca | a2c1dd81987c62f73 | 6 | pass |
 | ae3dc39bf44926156 | a4511b892126cfb11 | 13 | pass |
 
-Every identity remains counted in127 native attempts (106 active+21 superseded). The disclosure's original raw
-source hash stays `9c63e6f2cd1d2d4969659922b8672647bc24d86a69d9f21bb104adac951b76e2`. The stricter native
-gate adds eight unknown-effort mismatch rows; a fresh raw output hashes to
-`4474dec20397e0eb084e618a2fd67b5d479d206da37e24f77e9b3904fe3ee038`. Its child/superseded arrays and
+Every identity remains counted in127 native attempts (106 active+21 superseded). The disclosure's original
+raw source and the fresh stricter native measurement remain in the private evidence store. The stricter
+gate adds eight unknown-effort mismatch rows. Its child/superseded arrays and
 aggregate model/WebSearch counters are exactly equal to the original strict measurement. The wrapper retains
 raw1/wrapper1; all unknowns remain visible. No counter rewrite or clean-effort waiver is made. README11–12
-and catalog-owner publication must disclose these eight rows and original source hash when that gated work
+and catalog-owner publication must disclose these eight rows while original authentication stays private when that gated work
 proceeds. The checks are scoped to the retained native journal/final result and historical converted returns;
 they do not claim publication has occurred or unprovided external job files have been independently replayed.
 
@@ -310,3 +301,14 @@ This ONE correction requires the native publication API landed in #1007;
 integration checks use that exact source. Its leased push waits for #1025 to
 land and the registry-only rebase onto the relayed main. The final branch's
 validator, publication scans and required CI checks must pass before acceptance.
+
+## Digest publication correction
+
+Private-original authentication hashes and the native cache key are retained only in the private evidence
+store. The explicit-supersession receipt now retains its redacted proof projection and hashes that exact
+UTF-8 JSON representation, including the final newline used by the repository's `json_text` writer. The
+validated native proof/contract/journal binding and counters are unchanged. Unused capture metadata is
+excluded from the published proof preimage. Contract/journal authentication seals remain local provenance;
+a usage receipt must stay private unless its publication representation binds only published safe bytes.
+The runtime synthetic-identity regression exercises the public CLI and distinguishes this digest from
+the original private proof digest. Public-file digests and the vendor executable identity are unchanged.

@@ -75,6 +75,29 @@ class CompletedSupersessionTests(unittest.TestCase):
         return subprocess.run(args, capture_output=True, text=True)
 
     @unittest.skipUnless(shutil.which("node"), "node not installed")
+    def test_receipt_proof_digest_binds_published_redacted_proof_not_private_original(self):
+        identity = "digest-fixture-" + self.work.name + "@" + "example.org"
+        self.proof["private_note"] = identity
+        self.write("proof.json", self.proof)
+        private_digest = self.sha("proof.json")
+        done = self.run_usage(explicit=True)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        published = (self.work / "usage.json").read_text()
+        self.assertNotIn(identity, published)
+        provenance = json.loads(published)["measurement"]["post_processing"]["explicit_supersession"]
+        self.assertNotEqual(provenance["proof_sha256"], private_digest)
+        redacted = provenance["proof"]
+        self.assertEqual(redacted, {
+            "status": "proved-actual-resumed-run",
+            "nativeRun": {"runId": "wf_fixture-1", "status": "completed"},
+            "originalPrefix": {"byteEqual": True},
+            "reexecutedResultEqualsNative": True,
+            "supersessionPairs": self.proof["supersessionPairs"],
+        })
+        published_preimage = (json.dumps(redacted, indent=1, ensure_ascii=False) + "\n").encode()
+        self.assertEqual(provenance["proof_sha256"], hashlib.sha256(published_preimage).hexdigest())
+        self.assertNotIn(private_digest, published)
+
     def test_native_cli_requires_every_request_effort_to_be_known(self):
         run = self.work / "native"
         run.mkdir()
@@ -162,7 +185,8 @@ console.log(JSON.stringify(summarizeChild({agentId: 'fixture', label: 'fixture'}
         self.assertEqual(document["measurement"]["exit_code"], 1)
         self.assertEqual(document["measurement"]["raw_output_sha256"], self.sha("raw.json"))
         provenance = document["measurement"]["post_processing"]["explicit_supersession"]
-        self.assertEqual(provenance["proof_sha256"], self.sha("proof.json"))
+        proof_bytes = (json.dumps(provenance["proof"], indent=1, ensure_ascii=False) + "\n").encode()
+        self.assertEqual(provenance["proof_sha256"], hashlib.sha256(proof_bytes).hexdigest())
         self.assertEqual(provenance["contract_sha256"], self.sha("contract.json"))
         by_id = {c["agent_id"]: c for c in usage["superseded_attempts"]}
         for child in self.raw["children"][:12]:

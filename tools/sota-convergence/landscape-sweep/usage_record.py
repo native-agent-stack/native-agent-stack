@@ -23,8 +23,8 @@ Precondition: sweep.js issues one logical call per label per run; runtime retrie
 Without an explicit proven pair list, a label with more than one complete child remains ambiguous and is never
 linked. The optional explicit path validates the proof/contract/journal hashes, native started/result identities,
 same-label completed children, temporal order and a measured max-only terminal, including explicitly proved
-completed replacement chains. Its provenance retains all
-three input hashes and the processor hash; no native record or usage counter is changed. The ordinary record carries neither call keys
+completed replacement chains. Its provenance publishes a redacted proof preimage and hashes those exact serialized bytes;
+contract/journal authentication hashes remain local evidence, with the processor hash. No native record or usage counter is changed. The ordinary record carries neither call keys
 nor timestamps, so linking observes only a missing result and a later complete same-label attempt. These attempts
 keep their superseded_by and observed reason; their usage already counts in by_resolved_model and is never added again. With no
 incomplete children or superseded usage_issues left, status becomes complete and reason counts the new links.
@@ -54,7 +54,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from sweep_common import REPO_ROOT, private_content, private_findings, sha256_bytes, write_json  # noqa: E402
+from sweep_common import REPO_ROOT, json_text, private_content, private_findings, sha256_bytes, write_json  # noqa: E402
 
 TOOL = "examples/claude-native/workflows/child-usage.mjs"
 MARKER = "/subagents/workflows/"
@@ -206,7 +206,13 @@ def proven_supersessions(output: dict, proof_path: Path, contract_path: Path, jo
         active = [child["agent_id"] for child in completed if child["agent_id"] not in old_ids]
         if active != [terminal_id]:
             raise ValueError("supersession label does not have exactly one authorized active terminal")
-    return pairs, {"proof_sha256": sha256_bytes(proof_bytes), "contract_sha256": sha256_bytes(contract_bytes),
+    # Publish only the validated proof projection, excluding private capture metadata and input seals.
+    # Retain its exact preimage in the receipt so the digest authenticates redacted, available bytes.
+    redacted_proof = {"status": proof["status"], "nativeRun": {"runId": run, "status": native["status"]},
+                      "originalPrefix": {"byteEqual": True}, "reexecutedResultEqualsNative": True,
+                      "supersessionPairs": pairs}
+    return pairs, {"proof": redacted_proof, "proof_sha256": sha256_bytes(json_text(redacted_proof).encode("utf-8")),
+                   "contract_sha256": sha256_bytes(contract_bytes),
                    "journal_sha256": sha256_bytes(journal_bytes), "processor_sha256": sha256_bytes(Path(__file__).read_bytes()),
                    "pairs": pairs}
 
