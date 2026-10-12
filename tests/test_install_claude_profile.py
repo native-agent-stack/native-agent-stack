@@ -1828,8 +1828,8 @@ class StandingRuleSurfacesTests(unittest.TestCase):
     # The converged-candidates sentence of 2026-10-12 (docs/decisions/2026-10-12-converged-candidates-only.md), the
     # last sentence of the "Decide by evidence" bullet.
     CONVERGED = (
-        "Use only converged candidates: a tool, runtime, model or skill is installed, run or made a default only after "
-        "the layer's own convergence passes it on quality and SOTA standing (a screen pass or a measured win); "
+        "Use only converged candidates: a tool, runtime, model or skill is installed or run for trial only after the "
+        "layer's own screen passes it, and becomes a default only after a measured win on quality at no higher cost; "
         "popularity, recency and vendor claims make a candidate a lead for that screen, never an admission."
     )
     # The converged-harness sentence of the same date and record follows it at the end of the bullet.
@@ -2331,8 +2331,9 @@ class PortableTopRuleTests(unittest.TestCase):
     # The dated 2026-10-12 comparison (docs/decisions/2026-10-12-converged-candidates-only.md) adds 311 bytes (the
     # converged-candidates sentence and one space) to each of the two loaded core copies: 6566/6667 -> 7188/7289 bytes
     # (Claude/Codex). The same +5%, rounded up, gives 7548/7654. The converged-harness sentence of the same record adds
-    # 253 more bytes to each copy: 7694/7795 bytes, so 8079/8185.
-    STARTUP_BUDGET_BYTES = {"claude": 8079, "codex": 8185}
+    # 253 more bytes to each copy (7694/7795 bytes, so 8079/8185), and the tightened first sentence (trial after the
+    # screen, a default after a measured win) 4 more: 7702/7803 bytes, so 8088/8194.
+    STARTUP_BUDGET_BYTES = {"claude": 8088, "codex": 8194}
     # The four rules of the core (2026-10-08): research before acting with named sources, upstream as the truth with
     # the check order, decisions by evidence measured with upstream harnesses, and the compounding ecosystem with the
     # recorded correction.

@@ -56,7 +56,7 @@ FIXTURES = ROOT / "tests" / "fixtures" / "codex-worker-lane"
 # The 2026-10-12 converged-candidates and converged-harness sentences (docs/decisions/2026-10-12-converged-candidates-only.md)
 # refresh it.
 # RTK awareness and its independent pins remain unchanged.
-TOP_RULE_SHA256 = "c95b90ae90b6d8797acd365ac0839fdfaaff77c4b5950b30985b847fcccef9c9"
+TOP_RULE_SHA256 = "5d034e3605f415b03fc2e797535372446b3902b6dd6b5cb9a14352467239ca73"
 # The template's RTK section since 2026-10-08 (Codex audit F5): rtk-ai/rtk v0.51.0's default awareness paragraph,
 # hooks/rtk-awareness.md at e001f773, byte for byte. With the `rtk hook codex` PreToolUse hook the full text is not
 # needed (AWARENESS_CONFIG.md:12-13,34-38 at e001f773), and the default paragraph is verbatim at every awareness level
