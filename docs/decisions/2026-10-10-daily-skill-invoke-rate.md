@@ -424,6 +424,16 @@ skips. Each passes against the corrected files.
 
 ## 2026-10-11 landing integration
 
+Inventory validation commit is `900835c60ce9890cd704df4e98ded0b8aa91977d` (#970's landed squash).
+The dated counts below are checked against that commit's tracked tree,
+catalog and policy. The original carry input remains recorded as historical
+measurement provenance; later live grants do not revise these dated values.
+Mechanism: Git 2.53.0, `git ls-tree -r -z --name-only --full-tree <rev>` and
+`git show <rev>:<path>`; pinned upstream
+[`git-ls-tree.adoc:44-61`](https://github.com/git/git/blob/67ad42147a7acc2af6074753ebd03d904476118f/Documentation/git-ls-tree.adoc#L44-L61),
+[`git-show.adoc:25`](https://github.com/git/git/blob/67ad42147a7acc2af6074753ebd03d904476118f/Documentation/git-show.adoc#L25),
+and [`revisions.adoc:217-220`](https://github.com/git/git/blob/67ad42147a7acc2af6074753ebd03d904476118f/Documentation/revisions.adoc#L217-L220).
+
 Historical #1013 integration base (retained as the reviewed source binding):
 The final CC-cued main base is `ccff8765bf91aa02c0c4addad25d680d32abac89`.
 The current carry base is `c735e8b2e7d096475ceed380ce956b9191af508c`. Its inventory was re-derived

@@ -18797,8 +18797,8 @@
     },
     {
       "path": "docs/decisions/2026-10-10-daily-skill-invoke-rate.md",
-      "sha256": "d5e1edf44fa217defa4cd08085e9b2ad0643921ab002d0c73a0c4411c3e5dd9a",
-      "bytes": 38981
+      "sha256": "9dfabad485e34c07d533b8670f6af5d53f38f1d98f571eb275f9f157311041ec",
+      "bytes": 39835
     },
     {
       "path": "docs/decisions/2026-10-10-landscape-scratch-ownership.md",
@@ -62537,8 +62537,8 @@
     },
     {
       "path": "tests/test_skill_correction_claims.py",
-      "sha256": "83857ef0114e4c9ad12475469b43531ca0dcbddf04c7439b48ff4065ac785353",
-      "bytes": 7902
+      "sha256": "a84d1d4a927853b6409efd1bed3becbf7ae74664bebf99373db31113246ac4db",
+      "bytes": 11049
     },
     {
       "path": "tests/test_skill_routing.py",
