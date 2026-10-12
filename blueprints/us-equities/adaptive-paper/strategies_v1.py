@@ -144,8 +144,16 @@ class PolicyConfig:
     # check further down (isinstance(v, (float, int)) excludes str), so its
     # presence changes nothing about that loop.
     leverage_policy_id: str | None = None
+    # Sell disposition/pricing only. Entry features retain quote_age_seconds.
+    # runner supplies the validated effective RiskLimits value; direct default
+    # callers and older config-shaped fixtures fall back to the entry bound.
+    exit_quote_age_seconds: int | None = None
 
     def __post_init__(self):
+        if self.exit_quote_age_seconds is not None and (
+                type(self.exit_quote_age_seconds) is not int
+                or not 1 <= self.exit_quote_age_seconds <= 30):
+            raise ValueError("invalid_exit_quote_age")
         if (not self.symbols or len(set(self.symbols)) != len(self.symbols)
                 or not set(self.benchmarks).issubset(self.symbols)):
             raise ValueError("invalid_universe")
@@ -220,6 +228,12 @@ class PolicyConfig:
                 or (self.time_decay_start_seconds is not None
                     and self.time_decay_start_seconds >= self.max_hold_seconds)):
             raise ValueError("invalid_policy_bounds")
+
+
+def sell_quote_age_seconds(config):
+    """Effective sell bound; absent/null also preserves older config fixtures."""
+    value = getattr(config, "exit_quote_age_seconds", None)
+    return config.quote_age_seconds if value is None else value
 
 
 @dataclass(frozen=True)
@@ -416,7 +430,7 @@ class AdaptivePolicy:
         self.last_exit_decisions = {}
         for symbol, holding in self.holdings.items():
             latest = self.latest.get(symbol)
-            quote_fresh = bool(latest and now - latest.timestamp <= c.quote_age_seconds)
+            quote_fresh = bool(latest and now - latest.timestamp <= sell_quote_age_seconds(c))
             if self.exit_session != "RTH":
                 quote_fresh = bool(quote_fresh and
                                    now >= latest.timestamp - QUOTE_FUTURE_TOLERANCE_SECONDS)

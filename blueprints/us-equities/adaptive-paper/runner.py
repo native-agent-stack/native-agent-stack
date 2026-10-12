@@ -439,6 +439,7 @@ def load_config(path, *, registry_path=None):
                       max_outstanding_orders=c["max_outstanding_orders"], max_rest_per_minute=c["max_api_requests_per_minute"],
                       max_submits_per_minute=c["max_submit_requests_per_minute"],
                       quote_max_age_seconds=c["quote_max_age_seconds"], trial_seconds=c["duration_seconds"],
+                      exit_quote_max_age_seconds=c.get("exit_quote_max_age_seconds"),
                       cleanup_seconds=c["cleanup_seconds"], min_entry_close_seconds=c["min_entry_close_seconds"],
                       overnight_gross_multiple=session_policy["overnight_gross_multiple"],
                       **({"leverage": leverage} if leverage is not None else {}))
@@ -458,6 +459,7 @@ def load_config(path, *, registry_path=None):
                           max_order_notional=float(c["max_order_notional_usd"]),
                           warmup_samples=c["warmup_samples"], warmup_seconds=c["warmup_seconds"],
                           minimum_edge_bps=c["minimum_edge_bps"], quote_age_seconds=c["quote_max_age_seconds"],
+                          exit_quote_age_seconds=risk.effective_exit_quote_max_age_seconds,
                           min_hold_seconds=c["min_hold_seconds"], max_hold_seconds=c["max_hold_seconds"],
                           stop_bps=c["stop_bps"], take_profit_bps=c["take_profit_bps"], trailing_bps=c["trailing_bps"],
                           gap_stop_enabled=gap_stop_enabled, exit_replace_enabled=exit_replace_enabled,
@@ -2561,6 +2563,8 @@ def main():
                     request_observer=responses.append,
                     quote_timeout=config["quote_max_age_seconds"], feed=config["feed"],
                     order_quote_max_age_seconds=config["quote_max_age_seconds"],
+                    **({"exit_quote_max_age_seconds": ledger.limits.exit_quote_max_age_seconds}
+                       if ledger.limits.exit_quote_max_age_seconds is not None else {}),
                     required_quote_symbols=needed if recovering and needed else config["benchmarks"],
                     history_start=datetime.fromtimestamp(metadata["started_at"], timezone.utc),
                     # This lane keeps its first checkpoint baseline and fee window; legacy

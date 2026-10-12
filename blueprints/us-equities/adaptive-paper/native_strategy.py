@@ -15,6 +15,7 @@ from native_adapter import guarded_callback
 from safety import DEFAULT_STOP, SafetyError, evaluate_gap_risk
 from sessions import SessionKind, next_trading_day, previous_trading_day, session_at
 from strategies import AdaptivePolicy, OperationalStatus, QUOTE_FUTURE_TOLERANCE_SECONDS, limit_price
+from strategies_v1 import sell_quote_age_seconds
 
 
 class AdaptiveStrategy(Strategy):
@@ -616,13 +617,11 @@ class AdaptiveStrategy(Strategy):
                                      "expected_session_date": str(expected_prior_date) if expected_prior_date else None})
                     continue
                 quote = self.policy.latest.get(symbol)
-                # D2 (round 4): the quote used to DERIVE the armed stop
-                # price was never age-checked at all. Apply the same
-                # freshness window every other order path in this file
-                # uses; a symbol with only a stale/future-stamped quote at
-                # this tick simply stays pending and is retried on the
-                # next RTH tick, not silently skipped for the rest of the
-                # session.
+                # Arming derives a stop reference price and retains the
+                # ENTRY quote-age window, independently of the sell trigger.
+                # A symbol with only a stale/future-stamped reference at
+                # this tick stays pending and is retried on the next RTH
+                # tick, not silently skipped for the rest of the session.
                 if (quote is None or now - quote.timestamp > self.policy.config.quote_age_seconds
                         or now < quote.timestamp - QUOTE_FUTURE_TOLERANCE_SECONDS):
                     continue
@@ -673,15 +672,14 @@ class AdaptiveStrategy(Strategy):
                     continue
                 stop_price = self._gap_risk_stop_price.get(symbol)
                 quote = self.policy.latest.get(symbol)
-                # D2 (round 3): the trigger used to read policy.latest with
-                # no quote-age guard at all, unlike every other order path
-                # in this file (rebalance()'s own action loop, replace_exit,
-                # _submit_replacement_exit) -- a stale quote could still
-                # trip the gap stop. Apply the identical freshness window
-                # (same QUOTE_FUTURE_TOLERANCE_SECONDS/quote_age_seconds
-                # those paths use) here too.
+                # The trigger is a sell decision and uses the effective
+                # sell quote-age bound, like the native action and cancel-ack
+                # replacement guards. Absent an exit age it inherits entry.
+                # This does not widen the entry-age reference windows used
+                # to arm a stop or capture a prior close. The future-clock
+                # tolerance is unchanged for both default and explicit ages.
                 if (stop_price is None or quote is None
-                        or now - quote.timestamp > self.policy.config.quote_age_seconds
+                        or now - quote.timestamp > sell_quote_age_seconds(self.policy.config)
                         or now < quote.timestamp - QUOTE_FUTURE_TOLERANCE_SECONDS):
                     continue
                 if Decimal(str(quote.bid)) <= stop_price:
@@ -711,13 +709,11 @@ class AdaptiveStrategy(Strategy):
                     self._prior_close_capture_pending.discard(symbol)
                     continue
                 quote = self.policy.latest.get(symbol)
-                # D3 (round 4)/D2 (round 5): guard the capture itself with
-                # the same freshness window -- an unguarded/stale/
-                # future-stamped quote used to be captured (and persisted)
-                # as "the" prior close unconditionally. A symbol whose
-                # quote is still stale simply stays pending and is retried
-                # on the next non-RTH tick, instead of never being
-                # captured for this crossing at all.
+                # Prior-close capture retains the ENTRY-age reference
+                # window and future tolerance, independently of the sell
+                # trigger. A stale reference stays pending and is retried
+                # on the next non-RTH tick rather than being persisted as
+                # the prior close or abandoned for this crossing.
                 if (quote is None or now - quote.timestamp > self.policy.config.quote_age_seconds
                         or now < quote.timestamp - QUOTE_FUTURE_TOLERANCE_SECONDS):
                     continue
@@ -858,7 +854,7 @@ class AdaptiveStrategy(Strategy):
             return None
         quote = self.policy.latest.get(symbol)
         fresh = bool(quote and
-                     now - quote.timestamp <= self.policy.config.quote_age_seconds and
+                     now - quote.timestamp <= sell_quote_age_seconds(self.policy.config) and
                      now >= quote.timestamp - QUOTE_FUTURE_TOLERANCE_SECONDS)
         return DEFAULT_PLAN.evaluate(ExitContext(
             now=now, entered_at=now, pnl_bps=0.0, trail_bps=0.0,
@@ -1075,7 +1071,9 @@ class AdaptiveStrategy(Strategy):
             if session_exit is not None and not session_exit.submit:
                 self._flag_exit_position(symbol, session_exit)
                 continue
-            if not quote or now - quote.timestamp > self.policy.config.quote_age_seconds \
+            max_age = (sell_quote_age_seconds(self.policy.config) if side == "sell"
+                       else self.policy.config.quote_age_seconds)
+            if not quote or now - quote.timestamp > max_age \
                     or now < quote.timestamp - QUOTE_FUTURE_TOLERANCE_SECONDS:
                 if side == "sell":
                     self._flag_exit_position(symbol, ExitDecision(
@@ -1340,18 +1338,19 @@ class AdaptiveStrategy(Strategy):
         symbol = replacement["symbol"]
         self._exit_replace_busy.discard(symbol)
         quote = self.policy.latest.get(symbol)
+        max_age = sell_quote_age_seconds(self.policy.config)
         session_exit = self._session_exit_decision(symbol, now, replacement["reason"])
         if session_exit is not None and not session_exit.submit:
             self._flag_exit_position(symbol, session_exit)
             self._clear_gap_stop_for_dropped_replacement(replacement)
             return
         if (self.faulted or self._halted(symbol) or not quote
-                or now - quote.timestamp > self.policy.config.quote_age_seconds
+                or now - quote.timestamp > max_age
                 or now < quote.timestamp - QUOTE_FUTURE_TOLERANCE_SECONDS):
             if self._halted(symbol):
                 self._flag_exit_position(symbol, ExitDecision(
                     "exit_halted", 0.0, "hold", submit=False, flag_position=True))
-            elif (not quote or now - quote.timestamp > self.policy.config.quote_age_seconds
+            elif (not quote or now - quote.timestamp > max_age
                     or now < quote.timestamp - QUOTE_FUTURE_TOLERANCE_SECONDS):
                 self._flag_exit_position(symbol, ExitDecision(
                     "quote_stale", 0.0, "hold", submit=False, flag_position=True))

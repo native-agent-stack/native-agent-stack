@@ -192,6 +192,9 @@ class RiskLimits:
     # dropped from frozen_json() when None, so the persisted meta.limits
     # bytes for the default path are unchanged (see Ledger.__init__).
     leverage: LeveragePolicy | None = None
+    # Optional owned-sell freshness: omitted means the entry bound. The 30 s
+    # ceiling is the largest age threshold measured by the 2026-10-11 pull.
+    exit_quote_max_age_seconds: int | None = None
 
     def __post_init__(self):
         for field in ("capital_usd", "max_gross_exposure_usd", "max_order_notional_usd",
@@ -224,6 +227,10 @@ class RiskLimits:
             value = getattr(self, field)
             if type(value) is not int or not 1 <= value <= cap:
                 raise SafetyError("integer_limit_out_of_bounds")
+        if self.exit_quote_max_age_seconds is not None and (
+                type(self.exit_quote_max_age_seconds) is not int or
+                not 1 <= self.exit_quote_max_age_seconds <= 30):
+            raise SafetyError("integer_limit_out_of_bounds")
         if (self.max_submits_per_minute > self.max_rest_per_minute - 20
                 or self.min_entry_close_seconds < self.cleanup_seconds):
             raise SafetyError("cleanup_reserve_required")
@@ -278,16 +285,22 @@ class RiskLimits:
         the default multiple of 1.0 this equals the ordinary intraday cap."""
         return self.max_gross_exposure_usd * self.overnight_gross_multiple
 
+    @property
+    def effective_exit_quote_max_age_seconds(self):
+        return (self.quote_max_age_seconds if self.exit_quote_max_age_seconds is None
+                else self.exit_quote_max_age_seconds)
+
     def frozen_json(self):
         """The exact bytes persisted to `meta.limits` (see Ledger.__init__)
-        and compared byte-for-byte against a mismatched reopen. `leverage`
-        (None on every default/pre-G-e path) is dropped from the dict
-        entirely rather than serialized as null, so the persisted bytes for
-        every existing on-disk ledger, and for every config without a
-        `leverage_policy` block, are unchanged from before G-e."""
+        and compared byte-for-byte against a mismatched reopen. Absent
+        optional leverage and exit-age values are omitted, preserving old
+        ledger bytes for unchanged defaults. An explicit exit-age value is
+        frozen and requires the same limits when the ledger is reopened."""
         d = asdict(self)
         if d["leverage"] is None:
             del d["leverage"]
+        if d["exit_quote_max_age_seconds"] is None:
+            del d["exit_quote_max_age_seconds"]
         return json.dumps(d, default=str, sort_keys=True)
 
 
@@ -689,15 +702,15 @@ class Ledger:
         if age < 0 or age >= allowed:
             raise SafetyError("trial_window_ended")
 
-    def _check_quote(self, quote, now, *, check_spread=True):
+    def _check_quote(self, quote, now, *, check_spread=True, side="buy"):
         if not isinstance(quote, Quote):
             raise SafetyError("quote_required")
-        if not -0.25 <= now - quote.timestamp <= self.limits.quote_max_age_seconds:
+        max_age = (self.limits.effective_exit_quote_max_age_seconds if side == "sell"
+                   else self.limits.quote_max_age_seconds)
+        if not -0.25 <= now - quote.timestamp <= max_age:
             raise SafetyError("quote_not_fresh")
-        # check_spread doubles as "this is a new-risk (entry) check"; a halted
-        # or LULD-flagged quote blocks new risk exactly like a stale or
-        # over-wide quote does, while the existing exit (sell) chain, which
-        # already skips the spread gate here, is left untouched.
+        # Spread/halt gates remain entry-only. The explicit side selects sell age;
+        # mark_to_market() keeps the default entry age when it calls this check.
         if check_spread and quote.halted:
             raise SafetyError("quote_halted")
         if check_spread and (quote.ask - quote.bid) * 10000 / ((quote.ask + quote.bid) / 2) > self.limits.max_spread_bps:
@@ -832,7 +845,7 @@ class Ledger:
                 if (existing.symbol, existing.side, existing.qty, existing.limit_price) != (symbol, side, qty, price):
                     raise SafetyError("client_id_conflicts_with_durable_intent")
                 return existing
-            self._check_quote(quote, now, check_spread=side == "buy")
+            self._check_quote(quote, now, check_spread=side == "buy", side=side)
             if quote.symbol != symbol:
                 raise SafetyError("quote_symbol_mismatch")
             if market_open is not True or close - now < (self.limits.min_entry_close_seconds if side == "buy" else 1):
@@ -910,7 +923,7 @@ class Ledger:
             intent = _intent(row)
             if intent.status != "reserved" or intent.broker_id is not None or intent.filled_qty:
                 raise SafetyError("pending_intent_already_observed_or_terminal")
-            self._check_quote(quote, now, check_spread=intent.side == "buy")
+            self._check_quote(quote, now, check_spread=intent.side == "buy", side=intent.side)
             if quote.symbol != intent.symbol:
                 raise SafetyError("quote_symbol_mismatch")
             if market_open is not True or close - now < (self.limits.min_entry_close_seconds if intent.side == "buy" else 1):
