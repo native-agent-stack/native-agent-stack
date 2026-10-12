@@ -51,11 +51,81 @@ the pinned run CLI otherwise uses the caller's PWD instead of subprocess cwd.
 Its last-loaded native
 `OPENCODE_CONFIG_CONTENT` narrows each role's filesystem read patterns and
 external-directory rules to that worktree plus selected profile skill dirs;
-native project configuration and AGENTS.md/subtree instruction discovery stay
-enabled; the final permission overlay preserves the explicit role fence.
+project config/agents/plugins are disabled so a deep-merged named grant cannot
+widen the role tool fence. The worktree's root AGENTS.md is supplied through
+native absolute `instructions` in that overlay (OpenCode53d1eabb
+`src/session/instruction.ts:135-150`); root-rule prompt loading is measured.
+Automatic subtree AGENTS.md discovery is disabled and remains a capability
+omission pending its own qualified instruction-loading test.
 Primary-checkout and unrelated-directory reads are denied by the pinned
-evaluator regression. These are native tool permissions, not an OS sandbox
-for builder shell commands or arbitrary MCP implementations.
+evaluator regression for direct lexical paths. The additional native
+filesystem boundary below handles aliases; its explicit dependency mounts
+are exceptions to the worktree/profile scope. Pi's filesystem reads remain
+outside this OpenCode-only boundary.
+
+The f1eaa2fb review reproduced a native Read alias escape: a file/directory
+symlink inside the worktree or an admitted vendor directory could reveal a
+directly denied primary-checkout file. The correction checks those
+roots before launch and refuses existing escaping, broken or cyclic links
+without reading target bytes. An empty-root Bubblewrap filesystem namespace
+then binds only the worktree, private profile and explicit public executable,
+runtime, managed-skill and system dependencies. Primary checkout/HOME is not
+mounted; links introduced after preflight still cannot reach absent targets.
+The native test preserves normal owned/selected reads and checks all three
+primary-target alias cases, a relative primary link, an alias to an unselected
+vendor file, an allowed owned-file alias, and a link created inside an already-
+running namespace. Unselected pinned vendor skill directories are additionally
+masked with native read-only empty mounts so aliases cannot bypass their grant.
+
+Installed Bubblewrap0.11.1 uses its documented `--ro-bind`, `--bind`,
+`--unshare-pid`, `--proc`, `--dev` and `--chdir` mechanism; no vendor Read
+implementation or runtime plugin is replaced. Its fresh proc/device mounts are
+explicit process dependencies, and the network namespace stays native so
+Claude Console and OmniRoute retain their native network path. The primary
+Git metadata is absent; full live worktree Git consumers need separate
+qualification inside this boundary. This is filesystem isolation with named dependency exceptions,
+not a network-isolation claim or permission to run W6 arms.
+Source: containers/bubblewrap@124c4cdf4321f63ef17a1cb0ce8f9dd45bd7adbe
+`bwrap.xml:135,218,293-317,401-409`, checked with `GIT_NO_LAZY_FETCH=1` and
+`git show 124c4cdf:bwrap.xml` in the containers/bubblewrap mirror. The mirror
+was synchronized to v0.11.1 at13:51:01Z; the earlier URL check is superseded.
+
+The mechanism exception is limited to this P1 and these command profiles.
+At anthropics/sandbox-runtime@d9aac2098351ca17f3743fbaf6ecbd0051b7e00e,
+`src/sandbox/sandbox-config.ts:1138` requires network configuration and
+`:743-748` requires its allowedDomains array. The supported CLI config therefore
+always activates network restriction/proxy (`src/sandbox/sandbox-manager.ts:1919-1930`)
+and Linux `--unshare-net` (`src/sandbox/linux-sandbox-utils.ts:3370-3382`). It
+has no CLI setting for this filesystem boundary while retaining the original
+network namespace/native loopback route. This says nothing against srt's
+filesystem alias denial: that control passed. The complete native loopback
+request capture failed through that srt route, while the direct Bubblewrap
+filesystem-only control preserved the rejecting loopback endpoint and denied
+the aliases. The broader question of whether a supported srt proxy arrangement
+could carry these loopback requests is UNTESTED; failed request attempts do not
+establish that no such arrangement exists. Closing test is planned as
+`test_runtime_profile_consumers.NativeNamespaceConsumerTests.test_srt_proxy_loopback_route`
+(not yet implemented/run): use the identical native client and rejecting
+loopback stub through srt's documented proxy configuration and require request
+capture plus all alias negatives. All cited srt bytes were read from the v0.0.79
+mirror with lazy fetch disabled; this is not a blanket proxy limitation claim.
+
+Untested boundary: live Git and the actual committed MCP consumers inside
+the new dependency-limited namespace are not qualified. Closing test is planned
+as `test_runtime_profile_consumers.NativeNamespaceConsumerTests.test_git_and_committed_mcp_consumers`
+(not yet implemented or run): create an origin/main Worktrunk worktree, build
+each real OpenCode route command, and require native Git head/status plus every
+admitted committed MCP connection and a bounded harmless tool call to succeed
+inside the identical wrapper. Record exact tool counts, exits and tracker
+observations without copying auth or native session state. Missing Git metadata,
+consumer dependencies or disconnected MCP must fail this test. Alias negatives,
+including a link created after namespace entry, must remain denied. Until it
+passes there is no new full-profile acceptance or readiness promotion.
+
+The isolation layer's recorded winner is unchanged. The co-op's research queue
+has "srt against direct Bubblewrap for runtime-profile isolation", added at
+13:52:29Z with readiness input #1033 LANDED; this comparison decides any later
+winner change. This PR's in-scope P1 exception does not decide that research row.
 
 Each profile and role owns `CLAUDE_CONFIG_DIR`, `CONTEXT_MODE_DATA_DIR` and
 `CONTEXT_MODE_DIR`; the token layer has the actual Pi/OpenCode platform and a
@@ -163,6 +233,15 @@ is now present in the mirror; Context Mode's cited source remains unmirrored.
 The dependency rebuild uses the installed npm11.19.0 command's supported
 named-package form ([npm rebuild](https://docs.npmjs.com/cli/v11/commands/npm-rebuild)).
 
+Final adjudicated correction: B-1 adds the native filesystem boundary and
+fail-before alias controls; B-2 disables project configuration while retaining
+root AGENTS.md through absolute native instructions and proves an injected
+project shell grant is refused; B-3 updates claims/counts and the rebased base.
+The isolation research row is preserved. Both families read the final head
+once under the terminal rule. After landing, a fresh `prepare` into a new
+private state root is required before comparisons or shadow reviews resume;
+the historical v9 state lacks the newer generated directories.
+
 Follow-ups remain: Pi discovery does not gate on auth readiness; interactive
 Pi selects role tools without loading role text; inherited hostname references;
 briefs >=128KiB hit the Linux per-argument limit with a generic error. The W6
@@ -216,3 +295,8 @@ package qualification and otherwise skips in CI; ignored-only worktrees are
 retained conservatively, runtime branches remain, and exception paths can miss
 cleanup; the invocation inventory's returned source mapping is currently unused
 by launch. These omissions do not become native readiness passes.
+The native OpenCode and byte-provenance regressions skip in CI unless their
+explicit binary/mirror inputs exist; CI's portable controls do not replace
+those native runs. The output-hash regression covers one runtime notes subtree
+and specific output-hash keys; the broader publication detector still excludes
+notes. Historical flag-truthiness and #161 locator gaps remain named follow-ups.

@@ -663,7 +663,119 @@ def worktree_permissions(root: Path, workspace: Path) -> dict:
             scoped_read[os.path.relpath(target, workspace) + "/*"] = "allow"
         agents[name] = {"permission": {**permission, "read": scoped_read,
                                        "external_directory": scoped_external}}
-    return {"permission": {"read": read, "external_directory": external}, "agent": agents}
+    # OpenCode53 instruction.ts:135-150 loads absolute instructions even
+    # when project config is disabled. Preserve the repository's root rules
+    # without loading project agents/plugins or merging additional tool grants.
+    instructions = [str(workspace / "AGENTS.md")] if (workspace / "AGENTS.md").is_file() else []
+    return {"permission": {"read": read, "external_directory": external}, "agent": agents,
+            "instructions": instructions}
+
+
+def check_read_links(roots: list[Path]) -> None:
+    """Fail closed on pre-existing aliases outside the admitted read roots.
+
+    No target contents are opened. This is preflight only; the filesystem
+    namespace below remains the boundary for links introduced after the scan.
+    """
+    lexical = [root.absolute() for root in roots]
+    for root in lexical:
+        if root.is_symlink():
+            try:
+                target = root.resolve(strict=True)
+            except (OSError, RuntimeError):
+                raise ProfileError("escaping or unresolved read link; launch refused") from None
+            if not any(target == base or target.is_relative_to(base) for base in lexical):
+                raise ProfileError("escaping or unresolved read link; launch refused")
+    allowed = [root.resolve(strict=True) for root in roots if root.exists()]
+    for root in allowed:
+        for directory, dirs, files in os.walk(root, followlinks=False):
+            for name in [*dirs, *files]:
+                path = Path(directory) / name
+                if not path.is_symlink():
+                    continue
+                try:
+                    target = path.resolve(strict=True)
+                except (OSError, RuntimeError):
+                    raise ProfileError("escaping or unresolved read link; launch refused") from None
+                if not any(target == base or target.is_relative_to(base) for base in allowed):
+                    raise ProfileError("escaping or unresolved read link; launch refused")
+
+
+def opencode_filesystem_roots(root: Path, workspace: Path, meta: dict, role: str | None) -> list[str]:
+    """Explicit dependency roots for Bubblewrap's native bind-mount interface.
+
+    containers/bubblewrap@124c4cdf (v0.11.1):bwrap.xml:135,293-314,401-405.
+    The empty-root filesystem protects against aliases after preflight too.
+    Executable/package/system dependencies are explicit read-only exceptions.
+    """
+    config = json.loads((root / "config/opencode/opencode.json").read_text())
+    vendor = []
+    for agent_name, agent in config.get("agent", {}).items():
+        if role and agent_name != role:
+            continue
+        for path, action in agent.get("permission", {}).get("external_directory", {}).items():
+            if action == "allow" and path.endswith("/*"):
+                vendor.append(Path(path[:-2]))
+    check_read_links([workspace, *vendor])
+    # Never give the sandbox the primary checkout or host HOME as a dependency.
+    # The CLI's public npm prefix and selected language runtime installations
+    # contain executable dependencies, not native user auth/session stores.
+    binary = Path(meta["opencode_bin"]).resolve()
+    binary_root = binary.parent
+    if binary.parent.name == "bin" and binary.parent.parent.name == "opencode-ai":
+        binary_root = binary.parent.parent.parent
+    dependencies = {str(binary_root), "/usr", "/bin", "/lib", "/lib64", "/sbin",
+                    "/etc/ssl", "/etc/ca-certificates", "/etc/resolv.conf", "/etc/hosts"}
+    for executable in (sys.executable, shutil.which("node"), shutil.which("uv")):
+        if executable:
+            dependencies.add(str(Path(executable).resolve().parent.parent))
+    if meta.get("auxiliary_root"):
+        dependencies.add(str(Path(meta["auxiliary_root"]).resolve()))
+    managed = json.loads((ROOT / "adoption/skills/manifest.json").read_text())["skills"]
+    skills = [str(Path.home() / ".agents/skills" / item["name"]) for item in managed
+              if item.get("status") != "held" and not item.get("native_plugin")
+              and item.get("agents") != ["claude-code"]]
+    return [*sorted(dependencies), *skills]
+
+
+def opencode_sandbox_command(command: list[str], root: Path, workspace: Path,
+                             meta: dict, role: str | None) -> list[str]:
+    bwrap = shutil.which("bwrap")
+    if not bwrap:
+        raise ProfileError("qualified native filesystem boundary unavailable; launch refused")
+    version = subprocess.run([bwrap, "--version"], capture_output=True, text=True, check=True)
+    if version.stdout.strip() != "bubblewrap 0.11.1":
+        raise ProfileError("native Bubblewrap does not match qualified 0.11.1; launch refused")
+    wrapper = [bwrap, "--unshare-pid", "--die-with-parent", "--new-session"]
+    admitted = set()
+    for name in opencode_filesystem_roots(root, workspace, meta, role):
+        path = Path(name)
+        if not path.exists():
+            continue
+        resolved = path.resolve(strict=True)
+        for destination in (resolved, path):
+            if str(destination) not in admitted:
+                wrapper += ["--ro-bind", str(resolved), str(destination)]
+                admitted.add(str(destination))
+    # No bind of '/' or HOME: denied targets are absent under every spelling.
+    # Keep the existing network namespace so both documented routes remain
+    # usable; this boundary isolates filesystem reads, not network traffic.
+    wrapper += ["--bind", str(root), str(root), "--bind", str(workspace), str(workspace),
+                "--bind", str(root / "tmp"), "/tmp"]
+    # The runtime needs its own profile/cache, but a lexical workspace alias
+    # must not reveal an ungranted vendor skill within that cache. Mask the
+    # complete pinned unselected inventory at the filesystem layer, too.
+    selected = set(agent_vendor_skills(role)) if role else set()
+    selected.add("using-superpowers")
+    package = root / "cache/opencode/packages" / SUPERPOWERS_PLUGIN / "node_modules/superpowers/skills"
+    for name in SUPERPOWERS_SKILLS:
+        if name not in selected and (package / name).exists():
+            target = str((package / name).resolve(strict=True))
+            wrapper += ["--tmpfs", target, "--remount-ro", target]
+    wrapper += ["--dev", "/dev",
+                "--proc", "/proc",
+                "--chdir", str(workspace), "--", *command]
+    return wrapper
 
 
 def active_worktree(workspace: Path) -> bool:
@@ -721,11 +833,12 @@ def launch(args):
         # not subprocess cwd. Bind both routes, including credential_run's
         # child env prefix; --dir below also binds effect-cmd's instance.
         runtime_env["PWD"] = str(workspace)
-        # instruction.ts:123-133 and core/instruction-context.ts:48 gate
-        # AGENTS.md/subtree loading with this flag. Explicitly clear even a
-        # caller's inherited disable; the last-loaded overlay retains fences.
-        runtime_env["OPENCODE_DISABLE_PROJECT_CONFIG"] = "0"
+        # config.ts:420-424 deep-merges project grants that a later wildcard
+        # deny does not remove. Disable project config; the overlay supplies
+        # absolute AGENTS.md through instruction.ts:135-150 instead.
+        runtime_env["OPENCODE_DISABLE_PROJECT_CONFIG"] = "1"
         runtime_env["OPENCODE_CONFIG_CONTENT"] = json.dumps(worktree_permissions(root, workspace))
+        runtime_env["TMPDIR"] = str(root / "tmp")
     if meta.get("skills_bin"):
         runtime_env["PATH"] = str(Path(meta["skills_bin"]).parent) + os.pathsep + runtime_env["PATH"]
     if meta.get("tier1_input"):
@@ -769,6 +882,7 @@ def launch(args):
             command += ["--agent", args.role]
         if args.prompt:
             command.append(args.prompt)
+        command = opencode_sandbox_command(command, root, workspace, meta, args.role)
     if not args.print:
         # credential_run masks through pipes. util-linux script provides the
         # native TUI a PTY without reading/copying authentication state.

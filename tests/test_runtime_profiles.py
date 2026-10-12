@@ -68,6 +68,27 @@ class RuntimeInvokeTrackerTests(unittest.TestCase):
 
 
 class NativeProfileGenerationTests(unittest.TestCase):
+    def test_escaping_links_are_refused_in_worktree_and_selected_vendor_roots(self):
+        with tempfile.TemporaryDirectory(dir="/var/tmp") as directory:
+            root = Path(directory)
+            workspace, vendor, primary = [root / name for name in ("worktree", "vendor", "primary")]
+            for path in (workspace, vendor, primary):
+                path.mkdir()
+            outside = primary / "private.txt"; outside.write_text("synthetic outside")
+            owned = workspace / "owned.txt"; owned.write_text("synthetic owned")
+            (workspace / "safe.txt").symlink_to(owned)
+            profiles.check_read_links([workspace, vendor])
+            for base, target in ((workspace, outside), (workspace, primary), (vendor, outside)):
+                with self.subTest(base=base.name, directory=target.is_dir()):
+                    alias = base / "escape"
+                    alias.symlink_to(target, target_is_directory=target.is_dir())
+                    with self.assertRaisesRegex(profiles.ProfileError, "escaping or unresolved read link"):
+                        profiles.check_read_links([workspace, vendor])
+                    alias.unlink()
+            (workspace / "broken").symlink_to(primary / "missing")
+            with self.assertRaises(profiles.ProfileError):
+                profiles.check_read_links([workspace, vendor])
+
     def test_opencode_launch_binds_vendor_session_directory_on_both_routes(self):
         for route in ("gpt", "claude"):
             for headless in (True, False):
@@ -93,6 +114,7 @@ class NativeProfileGenerationTests(unittest.TestCase):
                         role="evidence-reviewer", print=headless, prompt="fixture", timeout_seconds=1)
                     with mock.patch.dict(os.environ, {"PWD": str(state / "primary"),
                                                        "OPENCODE_DISABLE_PROJECT_CONFIG": "1"}), \
+                            mock.patch.object(profiles, "opencode_sandbox_command", side_effect=lambda command, *args: command), \
                             mock.patch.object(profiles, "fresh_worktree", return_value=workspace), \
                             mock.patch.object(profiles, "choose_slot", return_value="anthropic-api-4"), \
                             mock.patch.object(profiles.subprocess, "run", side_effect=runtime), \
@@ -105,10 +127,10 @@ class NativeProfileGenerationTests(unittest.TestCase):
                     self.assertEqual(kwargs["cwd"], workspace)
                     if route == "claude":
                         self.assertIn("PWD=" + str(workspace), command)
-                        self.assertIn("OPENCODE_DISABLE_PROJECT_CONFIG=0", command)
+                        self.assertIn("OPENCODE_DISABLE_PROJECT_CONFIG=1", command)
                     else:
                         self.assertEqual(kwargs["env"]["PWD"], str(workspace))
-                        self.assertEqual(kwargs["env"]["OPENCODE_DISABLE_PROJECT_CONFIG"], "0")
+                        self.assertEqual(kwargs["env"]["OPENCODE_DISABLE_PROJECT_CONFIG"], "1")
                     if headless:
                         start = command.index("/fixture/opencode")
                         self.assertEqual(command[start + 1:start + 4], ["run", "--dir", str(workspace)])
@@ -355,6 +377,7 @@ let input=''; process.stdin.on('data',x=>input+=x); process.stdin.on('end',()=>{
             args = argparse.Namespace(profile="opencode-claude", state_root=state, repository=state,
                                       role="isolated-builder", print=False, prompt=None)
             with mock.patch.object(profiles, "fresh_worktree", return_value=state), \
+                    mock.patch.object(profiles, "opencode_sandbox_command", side_effect=lambda command, *args: command), \
                     mock.patch.object(profiles, "cleanup_worktree", return_value={"status": "removed"}), \
                     mock.patch.object(profiles, "choose_slot", return_value="anthropic-api-4"), \
                     mock.patch.object(profiles, "profile_environment", return_value=expected), \
@@ -363,7 +386,7 @@ let input=''; process.stdin.on('data',x=>input+=x); process.stdin.on('end',()=>{
             self.assertEqual(len(observed), 1)
             for name, value in expected.items():
                 self.assertEqual(observed[0].get(name), value, name)
-            self.assertEqual(observed[0]["OPENCODE_DISABLE_PROJECT_CONFIG"], "0")
+            self.assertEqual(observed[0]["OPENCODE_DISABLE_PROJECT_CONFIG"], "1")
             self.assertEqual(observed[0]["PWD"], str(state))
             self.assertEqual(json.loads(observed[0]["OPENCODE_CONFIG_CONTENT"])["permission"]["read"]["../*"], "deny")
 

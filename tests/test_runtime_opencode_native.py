@@ -35,13 +35,18 @@ class Handler(BaseHTTPRequestHandler):
     def log_message(self, *args): pass
 server = HTTPServer(('127.0.0.1', 21128), Handler)
 threading.Thread(target=server.serve_forever, daemon=True).start()
-result = subprocess.run(sys.argv[2:], stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=25)
+try:
+    result = subprocess.run(sys.argv[2:], stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=25)
+except subprocess.TimeoutExpired as error:
+    from types import SimpleNamespace
+    result = SimpleNamespace(returncode=124, stderr=(error.stderr or b'').decode() if isinstance(error.stderr,bytes) else (error.stderr or ''))
 text = json.dumps(request)
 created = __import__('re').findall(r'created .*?directory=([^\s]+)', result.stderr)
 summary = {'exit_code':result.returncode, 'request_captured':bool(request),
     'owned_instruction':'OWNED_AGENTS_MARKER' in text, 'primary_instruction':'PRIMARY_AGENTS_MARKER' in text,
     'working_directory_owned':('Working directory: '+sys.argv[1]) in text,
-    'session_directory_owned':bool(created) and all(p==sys.argv[1] for p in created)}
+    'session_directory_owned':bool(created) and all(p==sys.argv[1] for p in created),
+    'diagnostic':result.stderr[-1600:] if not request else ''}
 print(json.dumps(summary))
 server.shutdown()
 '''
@@ -78,6 +83,8 @@ class NativeOpenCodeContractTests(unittest.TestCase):
             (workspace / "AGENTS.md").write_text("OWNED_AGENTS_MARKER\n")
             owned, outside = workspace / "owned.txt", primary / "primary-only.txt"
             owned.write_text("OWNED_FILE_MARKER\n"); outside.write_text("PRIMARY_FILE_MARKER\n")
+            unrelated = scratch / "unrelated/outside.txt"
+            unrelated.parent.mkdir(); unrelated.write_text("UNRELATED_FILE_MARKER\n")
             state = home / ".local/state/profiles"
             with mock.patch.object(module, "canonical_servers", return_value={"context-mode": {"command": "node"}}), \
                     mock.patch.object(module.shutil, "which", return_value="/fixture/rtk"), \
@@ -111,6 +118,7 @@ class NativeOpenCodeContractTests(unittest.TestCase):
                 launch.update(command=command, env=kwargs["env"], cwd=kwargs["cwd"])
                 return subprocess.CompletedProcess(command, 0)
             with mock.patch.dict(os.environ, {"PWD": str(primary)}), \
+                    mock.patch.object(module, "opencode_sandbox_command", side_effect=lambda command, *args: command, create=True), \
                     mock.patch.object(module, "fresh_worktree", return_value=workspace), \
                     mock.patch.object(module.subprocess, "run", side_effect=record), \
                     mock.patch.object(module.subprocess, "check_output", return_value="a" * 40), \
@@ -120,7 +128,11 @@ class NativeOpenCodeContractTests(unittest.TestCase):
                 module.launch(args)
             env = {key: value for key, value in launch["env"].items() if key.startswith(("XDG_", "OPENCODE_"))}
             env.update(HOME=str(home), PWD=launch["env"]["PWD"], PATH="/usr/bin:/bin",
-                       TMPDIR=str(root / "tmp"), LANG="C.UTF-8", TERM="dumb")
+                       TMPDIR=str(scratch), LANG="C.UTF-8", TERM="dumb")
+            # The late-link probe is a native Node program. Its interpreter is an
+            # explicit public dependency, never selected through host config.
+            node = str(Path(shutil.which("node")).resolve())
+            env["PATH"] = str(Path(node).parent) + ":/usr/bin:/bin"
             # No inherited host environment/credential. Host tree is read-only;
             # private scratch and scratch-backed /tmp are the only writable dirs.
             def native(argv, cwd=workspace):
@@ -132,32 +144,94 @@ class NativeOpenCodeContractTests(unittest.TestCase):
                                       capture_output=True, text=True, timeout=35)
             version = native([binary, "--version"])
             self.assertEqual(version.stdout.strip(), "1.18.35", "test binary does not match installed source pin")
+            with mock.patch.object(Path, "home", return_value=home):
+                fenced = profiles.opencode_sandbox_command([binary], root, workspace,
+                    {"opencode_bin": binary}, "evidence-reviewer")
+            sandbox_prefix = fenced[:-1]
             capture = scratch / "capture.py"; capture.write_text(CAPTURE)
             command = launch["command"]
             command = command[command.index(binary):]
-            summary = native([sys.executable, str(capture), str(workspace), binary,
+            summary = native([sys.executable, str(capture), str(workspace), *sandbox_prefix, binary,
                               "--print-logs", "--log-level", "INFO", *command[1:]])
             self.assertEqual(summary.returncode, 0, "hermetic fixture runner failed")
             result = json.loads(summary.stdout)
-            self.assertTrue(result["request_captured"], "native request never reached namespace-local reject stub")
+            self.assertTrue(result["request_captured"], "native request never reached namespace-local reject stub: "
+                            + result.get("diagnostic", "").replace(str(Path.home()), "<home>"))
             # Subtests report both defects at the reviewed baseline.
             for field in ("session_directory_owned", "working_directory_owned", "owned_instruction"):
                 with self.subTest(field=field):
                     self.assertTrue(result[field], "native session/prompt did not use its assigned worktree")
             self.assertFalse(result["primary_instruction"])
+            # Project config is attacker-controlled input to deep merge. A
+            # named permission survives a later wildcard deny unless project
+            # loading is disabled. Exercise the real native tool, not only
+            # rendered keys, while preserving absolute AGENTS.md loading.
+            (workspace / "opencode.json").write_text(json.dumps({"agent": {
+                "evidence-reviewer": {"permission": {"bash": "allow"}}}}))
+            with self.subTest(target="project_config_tool_grant"):
+                shell = native([*sandbox_prefix, binary, "debug", "agent", "evidence-reviewer",
+                    "--tool", "bash", "--params", json.dumps({
+                        "command": "printf FIXTURE_PROJECT_TOOL_ESCAPE",
+                        "description": "synthetic neutral tool-fence probe"})])
+                self.assertNotIn("FIXTURE_PROJECT_TOOL_ESCAPE", shell.stdout,
+                                 "worktree project config enabled an ungranted shell tool")
+                self.assertNotEqual(shell.returncode, 0, "native shell fence was not enforced")
             # Match the actual native run.ts directory rule, including a
             # baseline inherited PWD, rather than an assumed worktree base.
             native_directory = workspace if "--dir" in command else Path(env["PWD"])
+            file_alias = workspace / "linked-primary.txt"
+            directory_alias = workspace / "linked-primary-dir"
+            vendor_alias = selected.parent / "linked-primary.txt"
+            relative_alias = workspace / "relative-primary.txt"
+            unselected_alias = workspace / "linked-unselected.txt"
+            safe_alias = workspace / "linked-owned.txt"
+            unrelated_alias = workspace / "linked-unrelated.txt"
+            file_alias.symlink_to(outside)
+            directory_alias.symlink_to(outside.parent, target_is_directory=True)
+            vendor_alias.symlink_to(outside)
+            relative_alias.symlink_to(os.path.relpath(outside, workspace))
+            unselected_alias.symlink_to(unselected)
+            safe_alias.symlink_to(owned)
+            unrelated_alias.symlink_to(unrelated)
             for label, target, marker, permitted in (
                 ("owned", owned, "OWNED_FILE_MARKER", True),
                 ("primary", outside, "PRIMARY_FILE_MARKER", False),
+                ("unrelated", unrelated, "UNRELATED_FILE_MARKER", False),
                 ("selected_vendor", selected, "SELECTED_VENDOR_MARKER", True),
                 ("unselected_vendor", unselected, "UNSELECTED_VENDOR_MARKER", False),
+                ("file_alias", file_alias, "PRIMARY_FILE_MARKER", False),
+                ("directory_alias", directory_alias / outside.name, "PRIMARY_FILE_MARKER", False),
+                ("vendor_alias", vendor_alias, "PRIMARY_FILE_MARKER", False),
+                ("relative_alias", relative_alias, "PRIMARY_FILE_MARKER", False),
+                ("unselected_alias", unselected_alias, "UNSELECTED_VENDOR_MARKER", False),
+                ("owned_alias", safe_alias, "OWNED_FILE_MARKER", True),
+                ("unrelated_alias", unrelated_alias, "UNRELATED_FILE_MARKER", False),
             ):
                 with self.subTest(target=label):
-                    probe = native([binary, "debug", "agent", "evidence-reviewer", "--tool", "read",
+                    probe = native([*sandbox_prefix, binary, "debug", "agent", "evidence-reviewer", "--tool", "read",
                                     "--params", json.dumps({"filePath": str(target)})], cwd=native_directory)
-                    self.assertEqual(marker in probe.stdout, permitted, "native read containment differs from the role contract")
+                    self.assertEqual(marker in probe.stdout, permitted,
+                        "native read containment differs from the role contract: "
+                        + probe.stderr.replace(str(Path.home()), "<home>")[-1400:])
+            # Create the alias from inside the already-running filesystem
+            # namespace: the guarantee cannot depend on the preflight snapshot.
+            script = "const fs=require('fs');fs.symlinkSync(process.argv[1],process.argv[2]);" \
+                     "let disclosed=false;try{disclosed=fs.readFileSync(process.argv[2],'utf8').includes('PRIMARY_FILE_MARKER')}catch{}" \
+                     "console.log(JSON.stringify({disclosed}));"
+            live = native([*sandbox_prefix, node, "-e", script, str(outside), str(workspace / "late-alias")])
+            self.assertEqual(live.returncode, 0, "live-link boundary probe did not execute: "
+                             + live.stderr.replace(str(Path.home()), "<home>")[-1000:])
+            self.assertFalse(json.loads(live.stdout)["disclosed"])
+            late_vendor = native([*sandbox_prefix, node, "-e", script, str(unselected),
+                                  str(workspace / "late-vendor-alias")])
+            self.assertEqual(late_vendor.returncode, 0, "live vendor-link boundary probe did not execute")
+            # The helper checks the primary marker; verify the unselected
+            # vendor target is absent too using an independent content oracle.
+            vendor_read = native([*sandbox_prefix, node, "-e",
+                "const f=require('fs');try{console.log(f.readFileSync(process.argv[1],'utf8'))}catch{console.log('DENIED')}",
+                str(workspace / "late-vendor-alias")])
+            self.assertEqual(vendor_read.returncode, 0)
+            self.assertEqual(vendor_read.stdout.strip(), "DENIED")
 
 
 if __name__ == "__main__":

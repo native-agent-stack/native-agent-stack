@@ -60622,8 +60622,8 @@
     },
     {
       "path": "notes/runtime-profiles-20261012/README.md",
-      "sha256": "84844af269b479b4d204215e4219dad544dea75b9bd9b2add7418a722db0d0cb",
-      "bytes": 14391
+      "sha256": "729552b22d6fc8a636769479c680b2aa56f017a15d5acac192d22cbb2b64332a",
+      "bytes": 20350
     },
     {
       "path": "notes/runtime-profiles-20261012/REPLAY-SOURCES.md",
@@ -60644,6 +60644,11 @@
       "path": "notes/runtime-profiles-20261012/W6-PREREGISTRATION.md",
       "sha256": "25b7b28c20927574978368f0f5424a485157b691d66383bf3628e8773614c695",
       "bytes": 3916
+    },
+    {
+      "path": "notes/runtime-profiles-20261012/receipts/final-adjudication-20261012.json",
+      "sha256": "70fd6c69cd21eadfba0df7a161e98caac6e6943881d396457b738b0563d23fba",
+      "bytes": 6557
     },
     {
       "path": "notes/runtime-profiles-20261012/receipts/opencode-claude.delta-smoke.json",
@@ -62862,13 +62867,13 @@
     },
     {
       "path": "tests/test_runtime_opencode_native.py",
-      "sha256": "04aeed942af187edbeebc3aac2b098134b9fc57186a3bf59d4f3d20565931962",
-      "bytes": 10423
+      "sha256": "9f198027197e4a1cd4a547142d9e5a3a19138a50c1d93407539d09e0d3b1d0d3",
+      "bytes": 15966
     },
     {
       "path": "tests/test_runtime_profiles.py",
-      "sha256": "6b7cd31cf686c5a30848b0be9e2925392d1fb8fc4baa5e239fc1c9176c040c5a",
-      "bytes": 34226
+      "sha256": "894cf58c9a4296b15a6a2b72e68f669b79a43e7fdf4c1baf147734ef35ea1d38",
+      "bytes": 35842
     },
     {
       "path": "tests/test_runtime_publication.py",
@@ -63322,8 +63327,8 @@
     },
     {
       "path": "tools/adoption/runtime_profiles.py",
-      "sha256": "a5f6e31b7853e6212c7f1b9335a1feeab970b3101ae1cfe48ab417f02b1df616",
-      "bytes": 60365
+      "sha256": "d749b006e7205fe65a7ad3caf40414d5352fc7221b8703c484f26bb2b64f54b2",
+      "bytes": 66765
     },
     {
       "path": "tools/adoption/runtime_skill_freshness.py",
