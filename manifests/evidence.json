@@ -18967,8 +18967,8 @@
     },
     {
       "path": "docs/decisions/2026-10-12-mcp-instruction-cap.md",
-      "sha256": "233d366997fd45b8b3aa8ce801675e64e64a4a3404ffb95c80d94ab71fe74e57",
-      "bytes": 9485
+      "sha256": "629e46c5a140c47de14c33e40ae5dcb14a5f65f5213741ee7191f8ab737c6dff",
+      "bytes": 12266
     },
     {
       "path": "docs/decisions/2026-10-12-mcp-template-live-reconciliation.md",
@@ -39632,23 +39632,48 @@
     },
     {
       "path": "evidence/artifacts/mcp-instruction-cap-20261012/README.md",
-      "sha256": "c2fc07747c12f695d8b710b478258ad1a79cad0786b75024e1d752fe0ca4d475",
-      "bytes": 974
+      "sha256": "2905627ea50d762b23d903d863e867db8e0e59c4e3894a078496bd93f1829c25",
+      "bytes": 2576
     },
     {
       "path": "evidence/artifacts/mcp-instruction-cap-20261012/audit-group-CPA-V-06.json",
-      "sha256": "4b9d75b015f124b0189c33261833764f45db6bbba684b8309d2cd56a4341e5ad",
-      "bytes": 3018
+      "sha256": "292b38f4af82549134f4948423edb95a2a6b3ad699f60d882bc3ce5dc1fad69c",
+      "bytes": 3061
     },
     {
       "path": "evidence/artifacts/mcp-instruction-cap-20261012/measurement.json",
-      "sha256": "8396c0f2053dd399c6aeac63a05dd8f3538eba35b0deb922c0192df87f172def",
-      "bytes": 1567
+      "sha256": "ec1ce01101bdac073780ed47025b1a86894ccf278067f3cca5736d8728835556",
+      "bytes": 3863
+    },
+    {
+      "path": "evidence/artifacts/mcp-instruction-cap-20261012/receipts/ai-memory-reply-shape.txt",
+      "sha256": "8877cd1982a3e67e7148a0820aab2811df8e3fbd6ee399e993e00698e82f5da8",
+      "bytes": 470
+    },
+    {
+      "path": "evidence/artifacts/mcp-instruction-cap-20261012/receipts/fail-before-round2.txt",
+      "sha256": "ae8b0d962776126d1ca46c56895e082f044183334d0d1972112dfd6afea55faa",
+      "bytes": 2663
+    },
+    {
+      "path": "evidence/artifacts/mcp-instruction-cap-20261012/receipts/mutants-round2-38.txt",
+      "sha256": "bd21b8a27be92c274a239348e0e5050353db644c6c7a77e8368c036310632d1a",
+      "bytes": 2445
+    },
+    {
+      "path": "evidence/artifacts/mcp-instruction-cap-20261012/receipts/mutants-tool-round1-16.txt",
+      "sha256": "90a092640fcd85486b9d0d8b99acd077b948d235a2615672e739d9c9ae6db7a2",
+      "bytes": 1070
+    },
+    {
+      "path": "evidence/artifacts/mcp-instruction-cap-20261012/source_constant_length.py",
+      "sha256": "e290ef29685ef896bca1deb9220f57c1bac554213b908c3e7d337939daf5d543",
+      "bytes": 3181
     },
     {
       "path": "evidence/artifacts/mcp-instruction-cap-20261012/tools_list_lengths.py",
-      "sha256": "3bd26ac267c07356d5c63dc3bd63e3bde87c53095d78f00dd896575b0963415b",
-      "bytes": 1755
+      "sha256": "517a7c1526f4294e6856b256ec292a06d5e66a1781b9187d52cc55db0d43e754",
+      "bytes": 3907
     },
     {
       "path": "evidence/artifacts/mcp-surfaces-trials-20261009/README.md",
@@ -62432,8 +62457,8 @@
     },
     {
       "path": "tests/test_mcp_instruction_cap.py",
-      "sha256": "77e11c0c8c6b2c06415e514d445bf8e78102b35cbdabd5f1918d3124cea86d1c",
-      "bytes": 13679
+      "sha256": "64d53e966a40cc4ecb196d68c81443bd08f1a7c02f2a6a87754dcb9cd402c122",
+      "bytes": 46741
     },
     {
       "path": "tests/test_mcp_template_drift.py",
@@ -63252,8 +63277,8 @@
     },
     {
       "path": "tools/adoption/mcp_instructions_length.py",
-      "sha256": "3125959f180fac0f7c3b96d67443362c5eb09d03b99221bbca9c41d2241e5cf9",
-      "bytes": 5706
+      "sha256": "0f6c6ac5bcbb750cf0d3758f0c0a9432e39590478c22b5f3c4c99c173d8bec1a",
+      "bytes": 12792
     },
     {
       "path": "tools/adoption/mcp_template_drift.py",

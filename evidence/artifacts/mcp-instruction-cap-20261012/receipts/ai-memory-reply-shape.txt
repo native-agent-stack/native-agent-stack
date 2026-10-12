@@ -1,0 +1,4 @@
+The shape of the running ai-memory 2.6.3 endpoint's replies, as counts and header names only (initialize, the initialized notification, tools/list), taken with the lifecycle of tools_list_lengths.py:
+initialize: 200 | application/json | events/messages: ['response'] | header names: ['connection', 'content-length', 'content-type', 'date']
+initialized notification: 202 | body bytes 0
+tools/list: 200 | application/json | messages: ['response'] | session id sent: False

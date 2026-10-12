@@ -1,8 +1,7 @@
 {
-  "about": "The group CPA-V-06 of the converged Claude practice audit, copied verbatim from the full file, which stays in the private research record (docs/decisions/2026-10-12-mcp-instruction-cap.md cites this excerpt).",
+  "about": "The group CPA-V-06 of the converged Claude practice audit, copied verbatim from the full file, which stays in the private research record; no digest of that file is published here, because a digest of bytes that are not published binds nothing a reader can check (docs/decisions/2026-10-12-mcp-instruction-cap.md cites this excerpt).",
   "source": {
     "file": "converged.json",
-    "sha256": "18a731a5c9fb46f43345e1c9e6e948d0c649d8ed6769f6bb586e17247294fdba",
     "kind": "claude_practice_audit_converged_manifest",
     "generated_at_tool_utc": "2026-10-12T13:36:19Z",
     "group_count": 48,

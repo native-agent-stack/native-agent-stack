@@ -1,15 +1,117 @@
 {
-  "schema": 1,
-  "about": "ai-memory's MCP server instructions against Claude Code's cap on MCP server instructions (CPA-V-06). Counts only: the instruction text is neither printed nor stored.",
-  "measured_at_utc": "2026-10-12T20:21:29Z",
-  "client": {"name": "Claude Code", "version": "2.1.296", "default_cap_characters": 4096, "changelog": "anthropics/claude-code@3deb873687379f0c199a69fdaccc65f0865f7a29 CHANGELOG.md L65"},
-  "command": "python3 tools/adoption/mcp_instructions_length.py http://127.0.0.1:<ai-memory port>/mcp --cap 4096 --marker \"--- Detailed tool routing follows. ---\" --json",
-  "server": {"name": "ai-memory", "version": "2.6.3", "protocol_version": "2025-06-18"},
-  "instructions": {"characters": 17724, "bytes": 17803, "sha256_16": "32d8deb7c1ef5020", "marker": "--- Detailed tool routing follows. ---", "core": 1987, "detail": 15699, "detail_bullets": 23},
-  "cap": 4096,
-  "over_the_cap": 13628,
-  "the_part_that_must_reach_the_model_is_over_the_cap": false,
-  "tools_list": {"command": "python3 evidence/artifacts/mcp-instruction-cap-20261012/tools_list_lengths.py http://127.0.0.1:<ai-memory port>/mcp", "tools": 23, "description_characters": 20381, "median": 902, "max": 1905},
-  "audit_claim": {"group": "CPA-V-06", "block_characters": 4122, "status_in_the_audit": "not re-checked"},
-  "upstream_design": {"revision": "akitaonrails/ai-memory@89bd8ded3c1ab8b769cf99417d038ed0364403c8", "file": "crates/ai-memory-mcp/src/server.rs", "design_comment_lines": "169-172", "core_test_lines": "8087-8112", "core_limit_characters": 2048}
+  "schema": 2,
+  "about": "ai-memory's MCP server instructions against Claude Code's cap on MCP server instructions (CPA-V-06). Every figure under `runs` is the verbatim JSON output of the command beside it; the instruction text is neither printed nor stored.",
+  "measured_at_utc": "2026-10-12T23:47:58Z",
+  "client": {
+    "name": "Claude Code",
+    "version": "2.1.296",
+    "default_cap_characters": 4096,
+    "changelog": "anthropics/claude-code@3deb873687379f0c199a69fdaccc65f0865f7a29 CHANGELOG.md L65"
+  },
+  "ai_memory": {
+    "running_version": "2.6.3",
+    "source_revision": "385b81ea95f7b73ede7146d0ae606c4caa7b43c1",
+    "source_tag": "v2.6.3",
+    "mirror_manifest_pin": "89bd8ded3c1ab8b769cf99417d038ed0364403c8"
+  },
+  "runs": {
+    "instructions": {
+      "command": "python3 tools/adoption/mcp_instructions_length.py http://127.0.0.1:<ai-memory port>/mcp --cap 4096 --marker \"--- Detailed tool routing follows. ---\" --bullet \"- `\" --json",
+      "output": {
+        "server": "ai-memory",
+        "version": "2.6.3",
+        "protocol_version": "2025-06-18",
+        "characters": 17724,
+        "utf16_units": 17725,
+        "outside_bmp": 1,
+        "bytes": 17803,
+        "sha256_16": "32d8deb7c1ef5020",
+        "marker": "--- Detailed tool routing follows. ---",
+        "core": 1987,
+        "detail": 15699,
+        "bullet": "- `",
+        "bullets": 23,
+        "bullets_started_under_cap": 3,
+        "bullets_cut_by_cap": 1,
+        "cap": 4096,
+        "must_reach_the_model": 1987,
+        "over_the_cap": false
+      }
+    },
+    "tools_list": {
+      "command": "python3 evidence/artifacts/mcp-instruction-cap-20261012/tools_list_lengths.py http://127.0.0.1:<ai-memory port>/mcp --json",
+      "output": {
+        "tools": 23,
+        "description_characters": 20381,
+        "median": 902,
+        "max": 1905,
+        "largest": [
+          [
+            "memory_write_page",
+            1905
+          ],
+          [
+            "memory_query",
+            1493
+          ],
+          [
+            "memory_consolidate",
+            1292
+          ],
+          [
+            "memory_forget_sweep",
+            1281
+          ],
+          [
+            "memory_read_page",
+            1267
+          ],
+          [
+            "memory_install_self_routing",
+            1254
+          ]
+        ]
+      }
+    },
+    "source_constant_v2_6_3": {
+      "command": "python3 evidence/artifacts/mcp-instruction-cap-20261012/source_constant_length.py <ai-memory@v2.6.3>/crates/ai-memory-mcp/src/server.rs MEMORY_INSTRUCTIONS --marker \"--- Detailed tool routing follows. ---\"",
+      "output": {
+        "constant": "MEMORY_INSTRUCTIONS",
+        "characters": 17724,
+        "utf16_units": 17725,
+        "outside_bmp": 1,
+        "sha256_16": "32d8deb7c1ef5020",
+        "marker": "--- Detailed tool routing follows. ---",
+        "core": 1987,
+        "detail": 15699
+      }
+    },
+    "source_constant_mirror_pin": {
+      "command": "the same script on crates/ai-memory-mcp/src/server.rs at 89bd8ded3c1ab8b769cf99417d038ed0364403c8 (git show)",
+      "output": {
+        "constant": "MEMORY_INSTRUCTIONS",
+        "characters": 16702,
+        "utf16_units": 16703,
+        "outside_bmp": 1,
+        "sha256_16": "29cec0e724371103",
+        "marker": "--- Detailed tool routing follows. ---",
+        "core": 1987,
+        "detail": 14677
+      }
+    }
+  },
+  "audit_claim": {
+    "group": "CPA-V-06",
+    "block_characters": 4122,
+    "status_in_the_audit": "not re-checked"
+  },
+  "upstream_lines": {
+    "revision": "akitaonrails/ai-memory@385b81ea95f7b73ede7146d0ae606c4caa7b43c1",
+    "file": "crates/ai-memory-mcp/src/server.rs",
+    "design_comment_and_constant": "169-172",
+    "protocol_version_default": 6275,
+    "with_instructions": 6276,
+    "core_test": "8163-8189",
+    "core_limit_characters": 2048
+  }
 }
