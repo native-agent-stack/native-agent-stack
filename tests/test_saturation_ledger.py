@@ -456,7 +456,7 @@ class IntegrityTests(FixtureCase):
             self.skipTest("git unavailable")
         ledger = self.appended(result(), result("fx-2", "2026-10-08"))
         (self.root / sl.LEDGER).write_text(sl.dump(ledger), encoding="utf-8")
-        git = ["git", "-C", str(self.root), "-c", "user.name=t", "-c", "user.email=t@example.invalid"]
+        git = ["git", "-C", str(self.root), "-c", "user.name=t", "-c", "user.email=fixture"]
         subprocess.run([*git, "init", "-q"], check=True)
         subprocess.run([*git, "add", "-A"], check=True)
         subprocess.run([*git, "commit", "-q", "-m", "base"], check=True)
@@ -874,7 +874,7 @@ class RedactionSupersessionTests(FixtureCase):
         ledger = self.appended(result())
         (self.root / sl.LEDGER).write_text(sl.dump(ledger))
         git = ["git", "-C", str(self.root), "-c", "user.name=fixture",
-               "-c", "user.email=fixture@example.invalid"]
+               "-c", "user.email=fixture"]
         subprocess.run([*git, "init", "-q"], check=True)
         subprocess.run([*git, "add", "-A"], check=True)
         subprocess.run([*git, "commit", "-q", "-m", "published historical fixture"], check=True)

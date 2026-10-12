@@ -11,6 +11,13 @@ ROOT = postrun.HARNESS.parents[2]
 
 
 class ChildUsagePublicationTests(unittest.TestCase):
+    def test_ledger_fixture_source_omits_non_no_reply_email_literals(self):
+        source = (ROOT / "tests/test_saturation_ledger.py").read_text(encoding="utf-8")
+        addresses = re.findall(r"[A-Za-z0-9][A-Za-z0-9._%+-]*@[A-Za-z0-9.-]+\.[A-Za-z]{2,}", source)
+        disallowed = [value for value in addresses
+                      if not value.casefold().endswith("@users.noreply.github.com")]
+        self.assertEqual(len(disallowed), 0, "ledger fixture source publishes non-no-reply email literals")
+
     def test_published_child_usage_receipts_do_not_authenticate_private_raw_output(self):
         receipts = sorted((ROOT / "evidence/artifacts").rglob("child-usage*.json"))
         flagged = []
