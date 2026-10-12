@@ -5146,8 +5146,8 @@
     },
     {
       "path": ".github/workflows/pr-metadata.yml",
-      "sha256": "2c4b76aae623d8dcf4c93c1909cf8b9710fc7192a518af1a48a8221c6e3d1f7e",
-      "bytes": 32333
+      "sha256": "cbcb0a3fcc7ec8d195df278e55e1ed204912509e2016bd0503d134aea10fc2cb",
+      "bytes": 94211
     },
     {
       "path": ".github/workflows/practice-references-freshness.yml",
@@ -5186,8 +5186,8 @@
     },
     {
       "path": ".github/workflows/sota-sources-gate.yml",
-      "sha256": "4b32de23130cbb9c36bbb6d894d8c15a105633517e69fc9450ae903f8660e226",
-      "bytes": 25426
+      "sha256": "adf95ab85f7a12416c90e1982cc4c1f6c379606a46daa3dedf0171d651fdca5a",
+      "bytes": 87304
     },
     {
       "path": ".github/workflows/supply-chain.yml",
@@ -18007,8 +18007,8 @@
     },
     {
       "path": "docs/decisions/2026-09-25-top-rule-sota-sources.md",
-      "sha256": "c3ff3dbafc78e1dee468ee8fbb1ffe701f998df5662cf3f3c214966c05f0b55d",
-      "bytes": 41271
+      "sha256": "49a7bf7390519c2d9f2db5fe5e2c03d54676efa06c8653d2599d028a38855240",
+      "bytes": 48231
     },
     {
       "path": "docs/decisions/2026-09-25-workstation-sota-refresh.md",
@@ -61027,8 +61027,8 @@
     },
     {
       "path": "scripts/validate.py",
-      "sha256": "1607f30c260191e346bdcf49d58be863ed375dbb82d34990c1bd8bfe78c8b728",
-      "bytes": 44420
+      "sha256": "8b5fde4c09af38186a742ba6acbf6bce59787b2bec33e85b9afbddbbe3df4c02",
+      "bytes": 44741
     },
     {
       "path": "scripts/validate_catalogs.py",
@@ -61104,6 +61104,11 @@
       "path": "tests/fixtures/cmark-gfm-entities-587a12bb.json",
       "sha256": "863c4003aa39e6445f112408678045391500bee219fb9dcf7ae847015dde0c0e",
       "bytes": 60057
+    },
+    {
+      "path": "tests/fixtures/cmark-gfm-rendered-rules-587a12bb.json",
+      "sha256": "18d7949fbae523e02e80bbc12f92395f835ec0fbc2735e494c93f0c55f1e328a",
+      "bytes": 66963
     },
     {
       "path": "tests/fixtures/codex-worker-lane/README.md",
@@ -62662,8 +62667,8 @@
     },
     {
       "path": "tests/test_sota_sources_gate.py",
-      "sha256": "1787164acb674cfb6ebe5f890645ebbb72f1fc5276db66367076c5008cc422cf",
-      "bytes": 64758
+      "sha256": "38df8b4c25009157ccd6bcd7708ff22e6db4cd7371a8dd7a105743949db37a33",
+      "bytes": 78595
     },
     {
       "path": "tests/test_spy_parity.py",
@@ -62772,8 +62777,8 @@
     },
     {
       "path": "tests/test_validate.py",
-      "sha256": "2fadd21151974c7ffbd0141a8c45ad3c2a833090d4d615476c3cd2318cf8bcaf",
-      "bytes": 53117
+      "sha256": "efd387aac30d8df5fa91898d172d4fca36b868aa959b17dc431908648b609f87",
+      "bytes": 55163
     },
     {
       "path": "tests/test_validate_shards.py",

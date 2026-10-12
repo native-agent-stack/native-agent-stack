@@ -94,7 +94,8 @@ The co-op's GPT read at `07595323` found three gaps, now closed in both copies o
   image text (a label without brackets in it) and autolinks, resolves backslash escapes, and drops backticks, the inline HTML elements GitHub renders
   (any other `<word>` stays, so a `<name>` placeholder is not read as a tag) and emphasis markers in pairs around a
   word with no separator inside (so a glob such as `Users/*/` keeps its star). Link destinations stay in the body
-  itself.
+  itself. (A word holding `_` was not decoded either, which the command center's micro at `4360b9e2` showed; addendum
+  02 below replaces this rendered form with cmark-gfm's own inline parser.)
   `<user>`, `example` and `~/` still pass in every form. `scripts/validate.py`'s publication scan does not decode;
   the gate's pre-pass adds to it. A carried email rule would run over the same forms.
 - **A macOS home in any case.** The gate-only `macos-user-path` rule catches `/users/<name>` in any case except the
@@ -174,7 +175,8 @@ copies of the job. The seventh, about publication order, is answered without a c
   character reference around a name in emphasis is therefore read as GitHub displays it. Codex suggested a pinned
   GitHub-compatible renderer. The job runs inline in `actions/github-script` with no dependency install, so the
   rendered form stays the handwritten approximation described above. A Markdown construct it does not model, such as a
-  reference definition or nested emphasis, can still hide a name from it.
+  reference definition or nested emphasis, can still hide a name from it. (Addendum 02 below ports the pinned
+  renderer's inline parser into the job, which still installs nothing, so both are read as GitHub reads them.)
 - **Any private-key label.** In `validate.py` and the gate, the private-key rule now takes gitleaks's header form,
   `-----BEGIN[ A-Z0-9_-]{0,100}PRIVATE KEY(?: BLOCK)?-----`
   ([gitleaks `config/gitleaks.toml`, rule `private-key`](https://github.com/gitleaks/gitleaks/blob/83d9cd684c87d95d656c1458ef04895a7f1cbd8e/config/gitleaks.toml#L2784-L2788)).
@@ -413,12 +415,15 @@ the entity map to N2), so each enumeration is replaced by the set a specificatio
   (`-->`, `?>`, `]]>`, `>`) is missing after one opening, later openings of that kind are skipped, so the scan stays
   linear. A construct that stands alone between separators (whitespace, a slash or a backslash, or either end), such
   as the documented `<user>` placeholder in `C:\Users\<user>\x`, was kept: removing it would join the separators
-  around it into a different path. Addendum 01 below narrows that to tags, for the home-path rules only.
+  around it into a different path. Addendum 01 below narrows that to tags, for the home-path rules only, and addendum
+  02 removes the exception: GitHub hides such a tag too, so a placeholder in a forward-slash path is refused unless it
+  is escaped (`\<user>`) or in a code span.
 - **N2: named references outside the 16-name map.** `&shy;`, `&zwj;`, `&UnderBar;` or `&dollar;` split or completed a
   value. Named references are now decoded from the HTML5 table as cmark-gfm pins it (`src/entities.inc` at the same
   commit, 2,125 names; the spec names WHATWG's `entities.json` as the authority, `test/spec.txt:5946-5950`), limited
-  mechanically to the 297 names whose text, after the projection's character step, is ASCII or nothing; no other
-  name can complete or hide a value the rules read. `tests/fixtures/cmark-gfm-entities-587a12bb.json` keeps the table
+  mechanically to the 297 names whose text, after the projection's character step, is ASCII or nothing. (The premise
+  that no other name can complete or hide a value was false: the graph-id rule reads any letter, so `&eacute;`
+  completed one, as the command center's micro at `4360b9e2` showed. Addendum 02 below decodes all 2,125 names.) `tests/fixtures/cmark-gfm-entities-587a12bb.json` keeps the table
   (sha256 of the source file `3932dfa630067813f47be6ae0072e1645c1183bde41140b51443f50857c88909`), and a test
   regenerates the subset from it and compares it with the job's map; another, where the mirror is present, compares the
   fixture with `src/entities.inc` at the pin. The old map's `&hyphen;` and `&dash;` gave ASCII `-`; the table gives
@@ -432,8 +437,12 @@ the entity map to N2), so each enumeration is replaced by the set a specificatio
   fullwidth letters and mathematical letters to ASCII.
 
 The rules still run on the body as written too, so the projection only adds catches; clean bodies stay clean,
-including #1003's mirror tests and the 19 masked lines. **What the gate guarantees** (with addendum 01 below): no
-value spelled with its own characters is published, whatever is inserted between them. **What it does not:** a look-alike that substitutes a
+including #1003's mirror tests and the 19 masked lines. **What the gate guarantees** (with addendums 01 and 02 below):
+a value spelled with its own characters is refused when it shows whole in the body as written, in the text the pinned
+renderer's inline parser displays for it (with the block structure approximated as addendum 02 states), or in their
+decodings. (Until addendum 02 this read "whatever is inserted between them": a nested link destination, a defined
+reference, nested emphasis and escaped underscores each disproved it, in the GPT read and the micro at `4360b9e2`.)
+**What it does not:** a look-alike that substitutes a
 character (a division slash, a Cyrillic letter) rather than inserting one; closing that needs the UTS #39 confusables
 data, a P2 follow-up (a skeleton projection).
 
@@ -452,8 +461,8 @@ Old and new gates give the same outcome on the live description of every open pu
 400 in any state, at 2026-10-12T08:21Z; neither names a rule on any of them. Only rule ids were printed.
 
 Boundaries this states: raw HTML inside a code span or block is removed too, though GitHub shows it as text, so such
-contrived text can be refused; a value split across a line break, by a carriage return, or under two layers of one
-encoding is not joined.
+contrived text can be refused (since addendum 02 a code span shows it as text, as GitHub does); a value split across a
+line break, by a carriage return, or under two layers of one encoding is not joined.
 
 **Addendum 01 (the command center's, at `e15d1259`, from the co-op's GPT read at `30f2e005`):** the placeholder
 exception shielded a comment standing between whitespace, so `x Bearer <!--x--> ` followed by a 40-character token
@@ -477,7 +486,64 @@ every rule; comments and processing instructions kept as placeholders; no placeh
 and Slack-style token prefixes (`AKIA`, `xox`) have no ported rule here, as the original scope states, so they are not
 among the regressions. On Node 24.21, 70 adversarial shapes at the bound each get a verdict within 0.83 s on this
 64-CPU host at a load of about 15 (four runs, worst 0.67, 0.83, 0.63 and 0.65 s); the extra projection costs about a
-third more time.
+third more time. (The micro at `4360b9e2` measured more: summed over 67 matched shapes, 1.44 times the base.)
+
+**Addendum 02 (from the GPT read and the command center's Claude micro at `4360b9e2`, under the command center's
+process for this class: the verdict files are the input, one commit):** Codex's five threads on `30f2e005` and the
+micro's new shapes showed values that GitHub (github/cmark-gfm@`587a12bb54d95ac37241377e6ddc93ea0e45439b`) shows
+whole and both copies accepted: a nested link destination (`[al](foo(and(more)))ice`, thread 4246122618), a defined
+shortcut reference (thread 4246122624), nested emphasis (thread 4246122650), escaped or emphasized underscores in a
+token and emphasis around `_` or a separator (2a, 2b), a tag before a forward-slash profile name (2c), and a named
+reference outside the old subset (2d). Each was another shape the hand-written decoder did not model, the class's
+recurrence. The fix matches the text the pinned renderer shows instead of adding to the list:
+
+- **The renderer's inline parser, ported.** The job's Markdown decoder is now cmark-gfm's own inline parsing at the
+  pin, for the text it displays: `src/inlines.c`'s `parse_inline` (backslash escapes, code spans, character
+  references, autolinks, raw HTML, links and images, emphasis), `scan_delims` (the flanking rules,
+  `test/spec.txt:6475-6488`), `process_emphasis` and `S_insert_emph` (the rule of three), `handle_close_bracket`,
+  `manual_scan_link_url` (a destination's parentheses nest at most 32 deep, `src/inlines.c:1074-1077`), `link_label`
+  and the reference map (`src/inlines.c:1209`, `:1224`; `src/map.c`'s normalization), and
+  `extensions/strikethrough.c`. An image shows its alt text. Raw HTML is hidden as GitHub hides it, and a code span or
+  an escaped `<` shows it as text. Every named reference of the pinned table (2,125) is decoded, and an invalid numeric
+  reference reads as U+FFFD (`src/houdini_html_u.c`), which also settles the adjudicated T9; an undefined reference
+  stays as written, which settles T11.
+- **Block structure, approximated.** Fenced code is shown as written; block-quote, list, task and heading markers
+  and thematic breaks are not shown; each table cell is read alone. Emphasis is matched both within a blank-line
+  paragraph and within each line, and every line that starts like a reference definition defines its label. A
+  footnote reference is shown as written, and an HTML block or indented code is read as inline text.
+- **The forms.** The rules read the body as written and every chain of the decoders over it (percent, JSON,
+  character references, the rendered text), as written and with each step's output character-projected. The separate
+  markup-removing projection and its placeholder exception are gone, since the rendered text is what GitHub shows; a
+  `<user>` placeholder in a forward-slash path must be escaped or put in a code span, and the failure message says so.
+  Each decoder runs once per distinct text.
+- **Rule alphabets** (threads 4246122631 and 4246122640), in `scripts/validate.py` and both copies: an account name is
+  any run of word characters, Unicode letters and digits included; a bearer value takes RFC 6750 2.1's `b64token`
+  alphabet, `+` and `/` included, then any `=` padding (rfc6750.txt:252-254,
+  <https://www.rfc-editor.org/rfc/rfc6750.txt>,
+  read 2026-10-12T11:30:30Z, 38,949 bytes, sha256 `9dc385cf4ecdd85024e5a95e447ede9230e11700bf35251906b25b37557d604b`).
+  Over the 12,518 tracked files that decode as UTF-8, the widened rules match nothing the current ones do not (0 new
+  matches; paths and counts only were printed).
+
+Evidence. The pinned renderer was built from the mirror with gcc (its three generated headers written as its CMake
+files write them) and passes its own specification harness: 670 passed, 0 failed. Run on the job's own script, the
+port's displayed text equals the renderer's on all 242 specification examples that are a single paragraph of inline
+content. Over 76,360 bodies (14 values, each with 21 constructs inserted at every position or 19 wrappings around
+every span of up to 14 characters), every rule the renderer's visible text trips is tripped by the port's text or the
+body as written: 0 missed, and none of the 943 extra refusals comes from the port. `tests/test_sota_sources_gate.py`
+keeps a 3,732-body sample of that kind with the rules the renderer's text trips
+(`tests/fixtures/cmark-gfm-rendered-rules-587a12bb.json`): both copies must refuse each, and where gcc and the mirror
+are present a second test rebuilds the renderer and regenerates the fixture. The new tests fail at `4360b9e2` (35
+failures) and pass here; 14 of 14 weakened copies fail them (a destination that does not nest, no shortcut reference,
+an undefined reference collapsed, `_` flanking as `*` does, no rule of three, no strikethrough, the old entity subset,
+an invalid reference read as nothing, no rendered form, ASCII account names and the old bearer alphabet in each of the
+gate and `validate.py`, and a tag kept between separators; taking one emphasis delimiter at a time shows the same
+text, so it is not counted). On Node 24.21, the 70 adversarial shapes of the earlier rounds each get a verdict within
+0.69 s at the bound (two runs, worst 0.65 and 0.69 s), against 0.77 s at `4360b9e2` run back to back (0.74 and 0.77
+s), on this 64-CPU host at a load of about 16; the new bound test's 29 renderer-stress bodies take about 2 s together.
+The gate at `4360b9e2` and this one name no rule on the live description of any open pull request (68) or of the
+latest 400 in any state, at 2026-10-12T13:59Z; only rule ids were printed.
+A renderer replacement (rendering in the job through GitHub's own Markdown API, or a maintained library) stays the
+research-queue comparison the GPT read names for the `secrets-credentials` layer.
 
 ## Alternatives considered
 

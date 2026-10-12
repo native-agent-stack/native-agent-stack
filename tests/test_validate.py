@@ -701,6 +701,39 @@ class EncodedHomePathTests(unittest.TestCase):
                     self.assertIsNotNone(pattern.search(prefix + content))
 
 
+class AccountNameAndBearerAlphabetTests(unittest.TestCase):
+    # Codex's threads 4246122631 and 4246122640 on #991: an account name is any run of word characters (Unicode
+    # letters and digits too), and a bearer value takes RFC 6750 2.1's b64token alphabet, then any '=' padding
+    # (rfc6750.txt:252-254). Values are joined at run time so this file carries none the rules flag.
+    def test_a_unicode_account_name_matches_each_home_rule(self):
+        rules = dict(PRIVATE_CONTENT)
+        name = chr(0x5F20) + chr(0x4F1F)
+        home, backslash = "/" + "home/", chr(92)
+        cases = [("personal home path", home + name + "/x"), ("personal home path", "/" + "Users/" + name + "/x"),
+                 ("personal home path", home + "j" + chr(0xF6) + "rg/x"),
+                 ("personal home path", backslash * 2 + "wsl$" + backslash + "U" + backslash + "home" + backslash + name
+                  + backslash + "x"),
+                 ("Windows user path", "C:" + backslash + "Users" + backslash + name),
+                 ("encoded home path", "-home-" + name + "-code-x")]
+        for rule, text in cases:
+            with self.subTest(rule=rule, text=text):
+                self.assertIsNotNone(rules[rule].search(text))
+        for text in (home + "<user>/x", home + "example/x", home + "/x"):
+            with self.subTest(placeholder=text):
+                self.assertIsNone(rules["personal home path"].search(text))
+
+    def test_a_bearer_value_takes_the_b64token_alphabet(self):
+        pattern = dict(PRIVATE_CONTENT)["bearer credential"]
+        scheme = "Bear" + "er "
+        for value in ("abcdefghij+klmnopqrstuvwxyz1234567890==", "abcdefghij/klmnopqrstuvwxyz1234567890",
+                      "a" * 29 + "+", "a" * 30 + "="):
+            with self.subTest(value=value):
+                self.assertIsNotNone(pattern.search(scheme + value))
+        for value in ("a" * 29 + "==", "a" * 29 + " x", "a" * 29 + ":"):
+            with self.subTest(short=value):
+                self.assertIsNone(pattern.search(scheme + value))
+
+
 class DirectCodegraphHomePrivacyProperties(unittest.TestCase):
     """Finite semantic domains for graph identifiers, independent of the regex.
 
