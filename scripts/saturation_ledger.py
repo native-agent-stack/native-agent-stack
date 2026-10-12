@@ -7,6 +7,12 @@ layer. Records form a hash chain: every sweep carries ``prev_sha256``, the sha25
 canonical JSON of the record before it (the first one chains to the policy), and the file keeps
 ``head_sha256`` for the last record. Editing, reordering or deleting a record breaks the chain.
 
+Privacy-only redaction-supersession records extend that same chain without rewriting a sweep.
+They bind a usage file's historical Git commit:path blob to its current redacted successor;
+the newest binding governs current bytes, while every predecessor remains verified. These
+records do not count as sweeps or change derived decisions. --append accepts one such record
+or an atomic array, with the full proposed ledger checked before it is written.
+
 Derived per layer, never stored:
 
 - a completed sweep is **clean** for a layer when that layer's discovery return and per-vote
@@ -88,6 +94,8 @@ REOPEN_TRIGGERS = ("requirement_changed", "platform_profile_changed", "retained_
                    "selection_changed")
 RESETTING_RECEIPT_FLAGS = {"pin_moved": "pin_moved", "stale": "stale_receipt"}
 HEX64 = re.compile(r"[0-9a-f]{64}")
+REDACTION_FIELDS = {"kind", "usage_ref", "historical_blob", "historical_sha256",
+                    "successor_sha256", "reason", "prev_sha256"}
 DATE = re.compile(r"\d{4}-\d{2}-\d{2}")
 COMPUTED_FIELDS = ("prev_sha256", "manifest_sha256", "usage_sha256", "returns_sha256", "record_sha256")
 SWEEP_FIELDS = ("sweep_id", "date", "workflow_run", "status", "manifest_ref", "manifest_sha256", "lane",
@@ -521,6 +529,20 @@ def record_sha256(record: dict) -> str:
     return sha256_bytes(canonical(record))
 
 
+def is_redaction_record(record) -> bool:
+    """Structural discriminator for ledger readers; cryptographic bindings are checked by Checker."""
+    if not isinstance(record, dict) or set(record) != REDACTION_FIELDS:
+        return False
+    blob = record.get("historical_blob")
+    return (record.get("kind") == "redaction-supersession" and record.get("reason") == "#161"
+            and isinstance(record.get("usage_ref"), str) and bool(record["usage_ref"])
+            and isinstance(blob, dict) and set(blob) == {"commit", "path"}
+            and blob.get("path") == record["usage_ref"] and isinstance(blob.get("commit"), str)
+            and bool(re.fullmatch(r"[0-9a-f]{40}", blob["commit"]))
+            and all(isinstance(record.get(key), str) and HEX64.fullmatch(record[key])
+                    for key in ("historical_sha256", "successor_sha256", "prev_sha256")))
+
+
 def requirement_sha256(row: dict) -> str:
     """The layer's frozen requirement: its research-state next_action and decision_ref."""
     return sha256_bytes(canonical({"next_action": row.get("next_action"), "decision_ref": row.get("decision_ref")}))
@@ -720,6 +742,7 @@ class Checker:
         self._files = None
         self._json_cache: dict = {}
         self._v2_fields: dict = {}
+        self._usage_successors: dict = {}
 
     def error(self, message: str) -> None:
         self.errors.append(message)
@@ -751,7 +774,8 @@ class Checker:
         if record.get("sha256") != actual:
             self.error(f"{label}: {relative} differs from its {EVIDENCE} registration")
             return False
-        if expected_sha is not None and expected_sha != actual:
+        effective_sha = self._usage_successors.get((relative, expected_sha), expected_sha)
+        if effective_sha is not None and effective_sha != actual:
             self.error(f"{label}: recorded sha256 of {relative} does not match the file")
             return False
         return True
@@ -801,6 +825,7 @@ class Checker:
         if not isinstance(sweeps, list):
             self.error("ledger: sweeps must be a list")
             return self.errors
+        self.check_redaction_bindings(sweeps)
         previous = genesis_sha256(ledger)
         seen_ids, last_date = set(), None
         proposals_so_far: dict = {}
@@ -816,6 +841,8 @@ class Checker:
                 self.error(f"{label}: prev_sha256 breaks the hash chain (an earlier record was edited, "
                            "reordered or removed)")
             previous = record_sha256(sweep)
+            if sweep.get("kind") == "redaction-supersession":
+                continue  # It extends the same hash chain but records no discovery, vote or run.
             sweep_id = sweep.get("sweep_id")
             if not isinstance(sweep_id, str) or not sweep_id:
                 self.error(f"{label}: sweep_id required")
@@ -834,6 +861,78 @@ class Checker:
         if ledger.get("head_sha256") != previous:
             self.error("ledger: head_sha256 does not match the last record (a record was removed or edited)")
         return self.errors
+
+    def check_redaction_bindings(self, records: list) -> None:
+        """Resolve usage successors without changing any historical sweep or its stored digest.
+
+        Git's immutable commit:path blob authenticates the predecessor. The newest binding
+        authenticates current registered bytes; only removal of raw-output authentication is
+        permitted by this #161 kind, so a binding cannot rewrite usage counters or verdicts.
+        """
+        roots, effective = {}, {}
+        for index, record in enumerate(records):
+            if not isinstance(record, dict):
+                continue
+            if record.get("kind") != "redaction-supersession":
+                path, digest = record.get("usage_ref"), record.get("usage_sha256")
+                if isinstance(path, str) and isinstance(digest, str):
+                    roots.setdefault(path, set()).add(digest)
+                    effective.setdefault(path, digest)
+                continue
+            label = f"sweeps[{index}].redaction-supersession"
+            path, historical = record.get("usage_ref"), record.get("historical_blob")
+            old_sha, new_sha = record.get("historical_sha256"), record.get("successor_sha256")
+            if (not is_redaction_record(record) or path not in roots
+                    or old_sha != effective.get(path)):
+                self.error(f"{label}: malformed record or historical digest does not extend its usage binding")
+                continue
+            try:
+                safe_path(self.root, path)
+                kind = subprocess.run(["git", "-C", str(self.root), "cat-file", "-t", historical["commit"]],
+                                      capture_output=True, check=False, timeout=15,
+                                      env={**os.environ, "GIT_NO_LAZY_FETCH": "1", "GIT_OPTIONAL_LOCKS": "0"})
+                if kind.returncode or kind.stdout.strip() != b"commit":
+                    raise LedgerError("historical source is not an available Git commit")
+                shown = subprocess.run(["git", "-C", str(self.root), "show",
+                                        f"{historical['commit']}:{path}"],
+                                       capture_output=True, check=False, timeout=15,
+                                       env={**os.environ, "GIT_NO_LAZY_FETCH": "1", "GIT_OPTIONAL_LOCKS": "0"})
+                if shown.returncode or sha256_bytes(shown.stdout) != old_sha:
+                    raise LedgerError("historical commit:path blob is unavailable or its digest disagrees")
+                predecessor = json.loads(shown.stdout, object_pairs_hook=_unique)
+                measurement = predecessor.get("measurement") if isinstance(predecessor, dict) else None
+                if (not isinstance(measurement, dict)
+                        or not isinstance(measurement.get("raw_output_sha256"), str)):
+                    raise LedgerError("historical receipt has no raw-output authentication field")
+            except (LedgerError, OSError, ValueError, subprocess.TimeoutExpired) as error:
+                self.error(f"{label}: {error}")
+                continue
+            effective[path] = new_sha
+            # Earlier successors may be superseded again. Current bytes are checked against
+            # only the newest binding below; every historical predecessor is still verified.
+            for digest in roots[path]:
+                self._usage_successors[path, digest] = new_sha
+        for path, current_sha in effective.items():
+            if not any(key[0] == path for key in self._usage_successors):
+                continue
+            if not self.registered(path, f"redaction-successor {path}", current_sha):
+                continue
+            # Compare with the original historical blob, allowing only the ruled field redaction.
+            first = next(record for record in records if isinstance(record, dict)
+                         and record.get("kind") == "redaction-supersession" and record.get("usage_ref") == path)
+            try:
+                raw = subprocess.run(["git", "-C", str(self.root), "show",
+                                      f"{first['historical_blob']['commit']}:{path}"],
+                                     capture_output=True, check=False, timeout=15,
+                                     env={**os.environ, "GIT_NO_LAZY_FETCH": "1", "GIT_OPTIONAL_LOCKS": "0"})
+                if raw.returncode:
+                    raise LedgerError("original historical receipt unavailable")
+                expected = json.loads(raw.stdout, object_pairs_hook=_unique)
+                expected["measurement"]["raw_output_sha256"] = "private, not published (host state)"
+                if expected != self.document(path):
+                    raise LedgerError("successor changes fields outside the #161 raw-output redaction")
+            except (LedgerError, OSError, ValueError, KeyError, TypeError, subprocess.TimeoutExpired) as error:
+                self.error(f"redaction-successor {path}: {error}")
 
     def check_not_replayed(self, sweep: dict, label: str, seen: dict) -> None:
         """One record per run: its workflow run, usage output and lane returns are never reused by
@@ -1363,6 +1462,8 @@ def derive(ledger: dict, current: dict | None = None) -> dict:
     K, gap = policy.get("K", 3), policy.get("min_gap_days", 7)
     state: dict = {}
     for sweep in ledger.get("sweeps") or []:
+        if sweep.get("kind") == "redaction-supersession":
+            continue
         completed = sweep.get("status") == "completed"
         sweep_date = date.fromisoformat(sweep["date"])
         for layer in sweep.get("layers") or []:
@@ -1539,7 +1640,9 @@ def build_report(root: Path, ledger: dict, staleness=None, freshness=None, fresh
     completed = [s for s in ledger.get("sweeps") or [] if s.get("status") == "completed"]
     return {
         "policy": ledger.get("policy"),
-        "sweeps": len(ledger.get("sweeps") or []),
+        "sweeps": sum(record.get("kind") != "redaction-supersession" for record in ledger.get("sweeps") or []),
+        "redaction_supersessions": sum(record.get("kind") == "redaction-supersession"
+                                       for record in ledger.get("sweeps") or []),
         "completed_sweeps": len(completed),
         "last_completed": {"sweep_id": completed[-1]["sweep_id"], "date": completed[-1]["date"]} if completed else None,
         "inputs": {"staleness": staleness is not None, "freshness": freshness_state,
@@ -1690,9 +1793,28 @@ def complete_result(root: Path, ledger: dict, result: dict) -> dict:
         field: value for field, value in record.items() if field not in SWEEP_FIELDS}
 
 
-def append(root: Path, ledger: dict, result: dict) -> dict:
+def append(root: Path, ledger: dict, result: dict | list) -> dict:
     """Return a new ledger with ``result`` appended; refuses a broken existing ledger, a reused
     sweep_id or a record that does not check."""
+    if isinstance(result, list) or isinstance(result, dict) and result.get("kind") == "redaction-supersession":
+        bindings = result if isinstance(result, list) else [result]
+        if not bindings or not all(isinstance(item, dict) and item.get("kind") == "redaction-supersession"
+                                  and "prev_sha256" not in item for item in bindings):
+            raise LedgerError("redaction append requires nonempty redaction-supersession records without prev_sha256")
+        updated = copy.deepcopy(ledger)
+        for item in bindings:
+            record = copy.deepcopy(item)
+            record["prev_sha256"] = updated.get("head_sha256")
+            updated["sweeps"].append(record)
+            updated["head_sha256"] = record_sha256(record)
+        # Validate the entire proposed chain and all old/new bindings. Redaction can repair
+        # a current-byte mismatch, but cannot hide a broken historical record or registration.
+        errors = check_ledger(root, updated)
+        if errors:
+            raise LedgerError("redaction-supersession does not check:\n  " + "\n  ".join(errors))
+        return updated
+    if not isinstance(result, dict):
+        raise LedgerError("result must be a sweep object or a redaction-supersession batch")
     errors = check_ledger(root, ledger)
     if errors:
         raise LedgerError("the existing ledger does not check; refusing to append:\n  " + "\n  ".join(errors))
@@ -1880,7 +2002,7 @@ def main(argv=None) -> int:
             for error in errors:
                 print(f"error: {error}", file=sys.stderr)
             if not errors:
-                print(f"ok: {len(ledger['sweeps'])} sweep record(s), chain intact, bindings verified")
+                print(f"ok: {len(ledger['sweeps'])} ledger record(s), chain intact, bindings verified")
             return 1 if errors else 0
         if args.report:
             staleness = json.loads(args.staleness.read_text(encoding="utf-8")) if args.staleness else None
@@ -1893,7 +2015,9 @@ def main(argv=None) -> int:
             return 0
         result = json.loads(args.append.read_text(encoding="utf-8"), object_pairs_hook=_unique)
         write_ledger(root, ledger_path, append(root, ledger, result))
-        print(f"appended {result.get('sweep_id')} to {ledger_path}")
+        name = f"{len(result)} redaction-supersession records" if isinstance(result, list) else (
+            result.get("sweep_id") or result.get("kind"))
+        print(f"appended {name} to {ledger_path}")
         return 0
     except (LedgerError, OSError, ValueError, KeyError) as error:
         print(f"error: {error}", file=sys.stderr)

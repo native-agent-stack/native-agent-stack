@@ -17342,7 +17342,7 @@
     },
     {
       "path": "catalogs/landscape/final-stack.json",
-      "sha256": "a41b418f6f16b79b77f45dcb58a976d2ba506275c67bddabcb01e7d2467e9424",
+      "sha256": "d2a78cd3150bd632caa3af4a3e1038ed76c7b7a41cda471e6e01a7c1244ce165",
       "bytes": 309186
     },
     {
@@ -17457,13 +17457,18 @@
     },
     {
       "path": "catalogs/saturation/README.md",
-      "sha256": "65b35374209ae8abf0d37154e4664cdcac98d5415f02b4583a9c479b4bf4436e",
-      "bytes": 12036
+      "sha256": "8d97bb6a89966d08a3cb81162aadb331afd29322c63556428be240547c593e85",
+      "bytes": 13410
     },
     {
       "path": "catalogs/saturation/ledger.json",
-      "sha256": "b6ca3220516a515bd6dec13f122f48acdd8ef738565f9c0145839d99dd0c21f2",
-      "bytes": 413173
+      "sha256": "c7dc7ad675bd0b6bd4a5db4898b91c155360e119ad6c6f2910f4c45e0a502807",
+      "bytes": 416951
+    },
+    {
+      "path": "catalogs/saturation/ledger.schema.json",
+      "sha256": "6910b7ab6cc859255dee22d22a24bcfc90596f6d880dfc028a50b3002c8a8f73",
+      "bytes": 8040
     },
     {
       "path": "catalogs/sota-convergence/README.md",
@@ -18962,8 +18967,8 @@
     },
     {
       "path": "docs/decisions/2026-10-12-child-usage-publication-privacy.md",
-      "sha256": "cf578d2e3a9dd29f05c03e92e7e63569db72528d841c7cc093f971c3dc5e5c15",
-      "bytes": 4299
+      "sha256": "d67c0aaf23ebcd1f2aa0ed6f76d15ffa484b41bd3e32cc52d071176b96707404",
+      "bytes": 4852
     },
     {
       "path": "docs/decisions/2026-10-12-exploratory-account-rotation-and-exits.md",
@@ -61112,8 +61117,8 @@
     },
     {
       "path": "scripts/component_matrix.py",
-      "sha256": "202d952952c361b7e17ee82740f7cd220e75cba2f3c7d9e82c433136d0fe0363",
-      "bytes": 80837
+      "sha256": "e4772a7a08e149f118f727ebe6c6f411a3da4e0f99ba8764084eb4b9a683cd28",
+      "bytes": 80988
     },
     {
       "path": "scripts/credential_boot_receipt.py",
@@ -61232,8 +61237,8 @@
     },
     {
       "path": "scripts/saturation_ledger.py",
-      "sha256": "611b5640c92b3985675f3405770405cdc2a9552a8b5e6bc3b3f7a868168f6b76",
-      "bytes": 110935
+      "sha256": "1e4ff5f719d8e5472b01434327dd72a5ad5418b928a11d4c41de26dcc6394f04",
+      "bytes": 119472
     },
     {
       "path": "scripts/secret_scan_metrics.py",
@@ -62837,8 +62842,8 @@
     },
     {
       "path": "tests/test_saturation_ledger.py",
-      "sha256": "c0311178a40acd4f233bbce29540f6f591f3878e855242f85f71b8dc49a3cbb3",
-      "bytes": 112415
+      "sha256": "8d04a01c54f102f407f54c0330a23878a29b0af179580688034234bee6b22fa7",
+      "bytes": 119524
     },
     {
       "path": "tests/test_scaffold_repo.py",

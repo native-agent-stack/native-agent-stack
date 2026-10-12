@@ -34,26 +34,33 @@ This directly extends the selected native implementation from #995. Sources:
   published-byte authentication is distinct from authentication of a private
   original, including when the private input's literal identity is absent.
 
-## Frozen ledger migration gate
+## Append-only redaction-supersession binding
 
 Six corrected receipts are `usage_ref` inputs of the append-only saturation
-ledger. Native registration binds their new safe bytes, but
-`scripts/saturation_ledger.py` `Validator.check_sweep` still requires their old
-`usage_sha256` values. The check therefore refuses six mismatches and two
-dependent lost-worker checks. Re-chaining history alone would violate the
-independent unchanged-prefix check and its regression.
+ledger. Before this extension, `scripts/saturation_ledger.py` `Checker.check_sweep`
+required their original `usage_sha256` to match current bytes and refused six
+mismatches and two dependent lost-worker checks. Re-chaining history would
+violate the independent unchanged-prefix check and its regression.
 
-The ledger is preserved. No integrity check is disabled, no historical counter
-or adjudication is rewritten, and no raw private seal is retained to make the
-check pass. This draft needs the CC's narrow privacy migration ruling before it
-can be accepted: a natively verified privacy-only binding migration with full
-semantic-equivalence evidence, or a supported immutable-source binding that
-preserves the append-only provenance and validates the safe successor.
+The CC ruled option (b): append a native `redaction-supersession` record for each
+of the six inputs. Each binds the original public Git blob at commit
+`421bf3f98b631d931838c22a927b4fec246f7df8`, whose digest must equal the stored usage
+digest, to the current redacted successor's digest. Reason `#161` and the native
+chain link are explicit. Original sweeps, votes, policy and counters are unchanged.
 
-`python3 scripts/validate.py` and the refreshed evidence manifest pass. The
-native saturation-ledger check is explicitly failing until that migration is
-ruled and implemented; the draft is not ready to land. #995 must land first
-because the explicit supersession writer does not exist at the main snapshot.
+The checker verifies every historical blob and the newest registered successor.
+Receipt JSON may differ only by the ruled raw-authentication marker. Tampering
+fails even if its registration is refreshed; changing a counter fails even with
+a newly declared successor digest. Missing Git objects fail closed. The native
+appender accepts a single binding or atomic batch and checks the full proposed
+chain; it cannot repair an unrelated broken history or registration.
+
+`--check --base` and the existing re-chained-history regression are unchanged.
+The redacted-state regression fails on the old checker and passes after this
+extension. Controls cover tampering, missing history, successive bindings and
+counter changes. Bindings are inert to saturation derivation. The old raw field
+remains in immutable published history, as the CC's ruling notes; no new private
+authentication is published. #995 still lands first because it supplies the writer.
 
 ## Follow-ups
 

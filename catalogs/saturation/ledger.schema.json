@@ -17,10 +17,32 @@
     "min_gap_days": {"type": "integer", "minimum": 0, "description": "Minimum days between two counted sweeps."}
    }
   },
-  "sweeps": {"type": "array", "items": {"$ref": "#/$defs/sweep"}},
+  "sweeps": {"type": "array", "items": {"oneOf": [{"$ref": "#/$defs/sweep"}, {"$ref": "#/$defs/redaction_supersession"}]}},
   "head_sha256": {"$ref": "#/$defs/sha256", "description": "sha256 of the canonical JSON of the last sweep (of {schema_version, policy} when there is none)."}
  },
  "$defs": {
+  "redaction_supersession": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": ["kind", "usage_ref", "historical_blob", "historical_sha256", "successor_sha256", "reason", "prev_sha256"],
+   "properties": {
+    "kind": {"const": "redaction-supersession"},
+    "usage_ref": {"$ref": "#/$defs/path"},
+    "historical_blob": {
+     "type": "object",
+     "additionalProperties": false,
+     "required": ["commit", "path"],
+     "properties": {
+      "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+      "path": {"$ref": "#/$defs/path"}
+     }
+    },
+    "historical_sha256": {"$ref": "#/$defs/sha256"},
+    "successor_sha256": {"$ref": "#/$defs/sha256"},
+    "reason": {"const": "#161"},
+    "prev_sha256": {"$ref": "#/$defs/sha256"}
+   }
+  },
   "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
   "path": {"type": "string", "minLength": 1, "pattern": "^[^/\\\\]"},
   "repo": {"type": "string", "minLength": 1},

@@ -865,6 +865,112 @@ def skills_result(**overrides):
     return value
 
 
+class RedactionSupersessionTests(FixtureCase):
+    def redacted_fixture(self):
+        value = json.loads((self.root / USAGE).read_text())
+        value["measurement"] = {"raw_output_sha256": hashlib.sha256(b"synthetic private original").hexdigest()}
+        write(self.root, USAGE, value)
+        register(self.root)
+        ledger = self.appended(result())
+        (self.root / sl.LEDGER).write_text(sl.dump(ledger))
+        git = ["git", "-C", str(self.root), "-c", "user.name=fixture",
+               "-c", "user.email=fixture@example.invalid"]
+        subprocess.run([*git, "init", "-q"], check=True)
+        subprocess.run([*git, "add", "-A"], check=True)
+        subprocess.run([*git, "commit", "-q", "-m", "published historical fixture"], check=True)
+        commit = subprocess.check_output([*git, "rev-parse", "HEAD"], text=True).strip()
+        value["measurement"]["raw_output_sha256"] = "private, not published (host state)"
+        write(self.root, USAGE, value)
+        register(self.root)
+        binding = {"kind": "redaction-supersession", "usage_ref": USAGE,
+                   "historical_blob": {"commit": commit, "path": USAGE},
+                   "historical_sha256": ledger["sweeps"][0]["usage_sha256"],
+                   "successor_sha256": sl.file_sha256(self.root, USAGE), "reason": "#161"}
+        bound = copy.deepcopy(ledger)
+        binding["prev_sha256"] = bound["head_sha256"]
+        bound["sweeps"].append(binding)
+        bound["head_sha256"] = sl.record_sha256(binding)
+        return ledger, bound, binding, git
+
+    def test_redacted_usage_has_append_only_historical_and_successor_bindings(self):
+        original, bound, binding, git = self.redacted_fixture()
+        self.assertTrue(sl.check_ledger(self.root, original))
+        self.assertEqual(sl.check_ledger(self.root, bound), [])
+        self.assertEqual(sl.check_append_only(self.root, bound, "HEAD"), [])
+        self.assertEqual(bound["sweeps"][:-1], original["sweeps"])
+        self.assertEqual(sl.derive(bound), sl.derive(original))
+        from scripts.component_matrix import completed_sweeps
+        self.assertEqual(completed_sweeps(bound), completed_sweeps(original))
+
+    def test_tampered_successor_is_refused_even_if_its_registration_is_refreshed(self):
+        original, bound, binding, git = self.redacted_fixture()
+        value = json.loads((self.root / USAGE).read_text())
+        value["child_usage"]["status"] = "incomplete"
+        write(self.root, USAGE, value)
+        register(self.root)
+        self.assertTrue(sl.check_ledger(self.root, bound))
+
+    def test_missing_or_mismatched_historical_blob_is_refused(self):
+        original, bound, binding, git = self.redacted_fixture()
+        for field, value in [("commit", "0" * 40), ("path", "missing.json")]:
+            with self.subTest(field=field):
+                broken = copy.deepcopy(bound)
+                broken["sweeps"][-1]["historical_blob"][field] = value
+                broken["head_sha256"] = sl.record_sha256(broken["sweeps"][-1])
+                self.assertTrue(sl.check_ledger(self.root, broken))
+        tree = subprocess.check_output([*git, "rev-parse", "HEAD^{tree}"], text=True).strip()
+        broken = copy.deepcopy(bound)
+        broken["sweeps"][-1]["historical_blob"]["commit"] = tree
+        broken["head_sha256"] = sl.record_sha256(broken["sweeps"][-1])
+        self.assertTrue(sl.check_ledger(self.root, broken))
+
+    def test_native_append_repairs_redacted_binding_without_changing_old_records(self):
+        original, bound, binding, git = self.redacted_fixture()
+        request = {key: value for key, value in binding.items() if key != "prev_sha256"}
+        self.assertEqual(sl.append(self.root, original, request), bound)
+        self.assertEqual(sl.append(self.root, original, [request]), bound)
+        self.assertEqual(sl.check_append_only(self.root, bound, "HEAD"), [])
+
+    def test_failed_native_batch_does_not_write_any_record(self):
+        original, bound, binding, git = self.redacted_fixture()
+        request = {key: value for key, value in binding.items() if key != "prev_sha256"}
+        invalid = {**request, "reason": "not-the-ruled-redaction"}
+        path = self.root / "redactions.json"
+        path.write_text(json.dumps([request, invalid]))
+        before = (self.root / sl.LEDGER).read_bytes()
+        with contextlib.redirect_stderr(io.StringIO()):
+            self.assertEqual(sl.main(["--root", str(self.root), "--append", str(path)]), 2)
+        self.assertEqual((self.root / sl.LEDGER).read_bytes(), before)
+
+    def test_newest_binding_governs_current_bytes_and_every_predecessor_is_verified(self):
+        original, bound, binding, git = self.redacted_fixture()
+        (self.root / sl.LEDGER).write_text(sl.dump(bound))
+        subprocess.run([*git, "add", "-A"], check=True)
+        subprocess.run([*git, "commit", "-q", "-m", "published safe successor"], check=True)
+        commit = subprocess.check_output([*git, "rev-parse", "HEAD"], text=True).strip()
+        value = json.loads((self.root / USAGE).read_text())
+        (self.root / USAGE).write_text(json.dumps(value, indent=4) + "\n")
+        register(self.root)
+        request = {"kind": "redaction-supersession", "usage_ref": USAGE,
+                   "historical_blob": {"commit": commit, "path": USAGE},
+                   "historical_sha256": binding["successor_sha256"],
+                   "successor_sha256": sl.file_sha256(self.root, USAGE), "reason": "#161"}
+        latest = sl.append(self.root, bound, request)
+        self.assertEqual(sl.check_ledger(self.root, latest), [])
+        self.assertEqual(sl.check_append_only(self.root, latest, "HEAD"), [])
+        self.assertEqual(latest["sweeps"][:-1], bound["sweeps"])
+
+    def test_a_binding_cannot_authorize_changed_usage_counters(self):
+        original, bound, binding, git = self.redacted_fixture()
+        value = json.loads((self.root / USAGE).read_text())
+        value["child_usage"]["children"][0]["extra_counter"] = 999
+        write(self.root, USAGE, value)
+        register(self.root)
+        bound["sweeps"][-1]["successor_sha256"] = sl.file_sha256(self.root, USAGE)
+        bound["head_sha256"] = sl.record_sha256(bound["sweeps"][-1])
+        self.assertTrue(sl.check_ledger(self.root, bound))
+
+
 class SkillsLayerTests(FixtureCase):
     """The skills modality's layers (catalog skills, one per skills lifecycle task) in the report and the ledger."""
 
@@ -1059,8 +1165,20 @@ class RepositoryLedgerTests(unittest.TestCase):
             ledger = sl.append(ROOT, ledger, item)
         seed = ledger["sweeps"]
         self.assertEqual(seed[0]["prev_sha256"], committed["sweeps"][0]["prev_sha256"])
+        historical = copy.deepcopy(committed["sweeps"][:len(seed)])
+        # Re-derivation reads today's safe bytes; the frozen sweeps retain their original
+        # receipt digest. Only an independently checked supersession accounts for that delta.
+        self.assertEqual(sl.check_ledger(ROOT, committed), [])
+        for index, record in enumerate(historical):
+            bindings = [item for item in committed["sweeps"]
+                        if item.get("kind") == "redaction-supersession"
+                        and item.get("usage_ref") == record["usage_ref"]]
+            if bindings:
+                self.assertEqual(bindings[0]["historical_sha256"], record["usage_sha256"])
+                self.assertEqual(bindings[-1]["successor_sha256"], seed[index]["usage_sha256"])
+                record["usage_sha256"] = bindings[-1]["successor_sha256"]
         self.assertEqual([self.without_append_time_hashes(record) for record in seed],
-                         [self.without_append_time_hashes(record) for record in committed["sweeps"][:len(seed)]])
+                         [self.without_append_time_hashes(record) for record in historical])
 
     def test_the_seed_hashes_match_the_files_at_the_commits_they_cite(self):
         committed = json.loads((ROOT / sl.LEDGER).read_text(encoding="utf-8"))["sweeps"][:2]
