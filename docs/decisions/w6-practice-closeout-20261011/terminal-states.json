@@ -22,7 +22,7 @@
       "role": "in-GitHub Claude OIDC review",
       "reason": "Retired by #981; HARNESS-WIF-FIX-PROPOSAL is superseded.",
       "authority_commit": "8bffa2c41692ef483e91b68e3b15aeb331423d2c",
-      "boundary": "This retires a role, not the entire git-github-automation layer or the local review-and-landing path."
+      "boundary": "This retires a role, not the entire git-github-automation layer or the local preregistered review and landing paths."
     },
     {
       "repository": "https://github.com/OpenHands/OpenHands",
@@ -42,16 +42,17 @@
       "terminal_state": "SCHEDULED",
       "comparison_id": "w6-git-github-automation-20261011",
       "preregistration_ref": "docs/decisions/w6-practice-closeout-20261011/git-github-automation.comparison.json",
-      "preregistration_sha256": "7645182ce8a46711cf31a904c7f603d2bd15b8ed4dfe36da01f990c0e39affd5",
+      "preregistration_sha256": "d7c8542d5897c6dd2f96822a370996d95a00473ec8b97f245765558c7f36a3b8",
       "readiness_trigger": {
         "event": "The existing evidence owner retains the hash-bound w6-git-github-automation-20261011 packet with all source, oracle and retained-reopen inputs listed below.",
         "required_inputs": [
-          "#953 and #975 land for the review-and-landing replay",
+          "#953 and #975 land for the preregistered review and landing replays",
           "Archived W1 defective-head/oracle packet and P2 labeled case packet are retained with immutable hashes",
           "Exact runtime pins, primary source and native acceptance boundaries are captured",
           "The lane-sealed landing-incident heads, merge bases, thread states, verdict bindings and oracle packet are retained",
           "#1027 landing implementation has its final immutable execution pin and source/acceptance boundary retained",
-          "The sem 0.25.0 comparison release commit and source/case oracle seals are retained"
+          "The sem 0.25.0 comparison release commit and source/case oracle seals are retained",
+          "A lane-owned Mergify account and the exact .mergify.yml configuration plus supported mergify config simulation source/test packet exist before landing replay."
         ],
         "met_at_closeout": false
       },
@@ -155,7 +156,7 @@
       "terminal_state": "SCHEDULED",
       "comparison_id": "w6-instructions-skills-20261011",
       "preregistration_ref": "docs/decisions/w6-practice-closeout-20261011/instructions-skills.comparison.json",
-      "preregistration_sha256": "0ca6e570c4dac8416b96125e2acf5fc75a0f89a8a4dfbabf587d77f789b5f751",
+      "preregistration_sha256": "f85304bb7bdfac05d361c746babe6a3a62a5186ea06ee72302f4f3039b724774",
       "readiness_trigger": {
         "event": "The existing evidence owner retains the hash-bound w6-instructions-skills-20261011 packet with all source, oracle and retained-reopen inputs listed below.",
         "required_inputs": [
@@ -239,7 +240,7 @@
               "retirement_ref": "docs/decisions/w6-practice-closeout-20261011/arm-dispositions.json#/component_retirements/0"
             }
           ],
-          "boundary": "Historical c2dee173 snapshot is retained; candidate:openai-skills is RETIRED and excluded from future winner qualification."
+          "boundary": "Historical c2dee173 snapshot is retained; candidate:openai-skills is RETIRED only as a currency source for instructions-skills. Four installed frozen copies stay in use until a maintained successor qualifies; nothing is uninstalled."
         },
         "upstream_e2e": {
           "qualified_join": false,
@@ -260,7 +261,7 @@
       "terminal_state": "SCHEDULED",
       "comparison_id": "w6-observation-inference-20261011",
       "preregistration_ref": "docs/decisions/w6-practice-closeout-20261011/observation-inference.comparison.json",
-      "preregistration_sha256": "c23fdfa225861aefbb3f404355542bf8abcf4299e4c32503f7e41ce674a53806",
+      "preregistration_sha256": "22c642b8c5d331edf19c9e84b52e381fb85b4315f24f5d2d7f4f80e6f05f82cf",
       "readiness_trigger": {
         "event": "The existing evidence owner retains the hash-bound w6-observation-inference-20261011 packet with all source, oracle and retained-reopen inputs listed below.",
         "required_inputs": [
@@ -377,7 +378,7 @@
       "terminal_state": "SCHEDULED",
       "comparison_id": "w6-quality-evaluation-20261011",
       "preregistration_ref": "docs/decisions/w6-practice-closeout-20261011/quality-evaluation.comparison.json",
-      "preregistration_sha256": "ec4f4271e07c76f0eef2fa5787efa4cf96e862e126e6892c08b5f88f398a7167",
+      "preregistration_sha256": "47782b9a7a6320d89c0c7a794998af7e05682395839c7495323fed8966df1716",
       "readiness_trigger": {
         "event": "The existing evidence owner retains the hash-bound w6-quality-evaluation-20261011 packet with all source, oracle and retained-reopen inputs listed below.",
         "required_inputs": [
@@ -477,7 +478,7 @@
       "terminal_state": "SCHEDULED",
       "comparison_id": "w6-recovery-portability-20261011",
       "preregistration_ref": "docs/decisions/w6-practice-closeout-20261011/recovery-portability.comparison.json",
-      "preregistration_sha256": "14dae35c0e84e071caa54b8ba559f3f2cab202b43e6eee843cdab3322627a2bf",
+      "preregistration_sha256": "cb43f16a0044a883354209743f55c024ee8b97d647d3d8b2d963b06597c36c4a",
       "readiness_trigger": {
         "event": "The existing evidence owner retains the hash-bound w6-recovery-portability-20261011 packet with all source, oracle and retained-reopen inputs listed below.",
         "required_inputs": [
@@ -571,7 +572,7 @@
       "terminal_state": "SCHEDULED",
       "comparison_id": "w6-scheduling-supervision-20261011",
       "preregistration_ref": "docs/decisions/w6-practice-closeout-20261011/scheduling-supervision.comparison.json",
-      "preregistration_sha256": "fdc5a6ee76f5d76c9dbbae510565a6e5a9c4632b19eaa4bda6d1fd2f776459c3",
+      "preregistration_sha256": "adc039640a8a52599b153aa00cd30276d4a5bdeb0bf418909e808e35183cf13b",
       "readiness_trigger": {
         "event": "The existing evidence owner retains the hash-bound w6-scheduling-supervision-20261011 packet with all source, oracle and retained-reopen inputs listed below.",
         "required_inputs": [
@@ -579,8 +580,8 @@
           "Checkpoint A/B, SQL-job, Conductor cancellation and three-host finalize/leader-kill oracle packets and host scopes are sealed",
           "Owning runtime/client moved-pin qualification receipts are retained",
           "The owning recovery lane qualifies an upstream-supported Dagu 2.17.2 scheduler execution path against the retained A/B oracles; the accepted 2.16.6-only runner is not reused unchanged.",
-          "A real SQL-centric research job documents the needed advantage over Dagu plus ordinary transactions and its supported intended-host installation boundary.",
-          "A retained native four-case recovery qualification or documented subprocess-cancellation primitive supplies the reopening evidence for the Conductor comparison."
+          "A concrete SQL-centric research job and an upstream-supported intended-host installation/test packet exist for pg_durable. Its comparison measures advantage over Dagu plus ordinary transactions.",
+          "A retained native four-case recovery run receipt or upstream documentation identifying a subprocess-cancellation primitive exists at an immutable pin for Conductor."
         ],
         "met_at_closeout": false
       },
@@ -679,7 +680,7 @@
       "terminal_state": "SCHEDULED",
       "comparison_id": "w6-token-efficiency-20261011",
       "preregistration_ref": "docs/decisions/w6-practice-closeout-20261011/token-efficiency.comparison.json",
-      "preregistration_sha256": "0c6cd76ede091d0c799135da66cf98bb33a2e2540fbcb180e6901a17f73bcb05",
+      "preregistration_sha256": "16e0fad18981e28b07686ec5efc4fd524539f7436f7ad55a7ef8da022173c8fb",
       "readiness_trigger": {
         "event": "The existing evidence owner retains the hash-bound w6-token-efficiency-20261011 packet with all source, oracle and retained-reopen inputs listed below.",
         "required_inputs": [
@@ -791,10 +792,67 @@
       "component_id": "candidate:openai-skills",
       "repository": "https://github.com/openai/skills",
       "terminal_state": "RETIRED",
-      "reason": "Upstream deprecates this repository and names openai/plugins as its successor. No successor adoption is inferred.",
+      "reason": "Upstream deprecates this repository as a currency source for instructions-skills. The four installed copies remain in use until a maintained successor qualifies; nothing is uninstalled. openai/plugins is not a replacement, per the 09-26 refutation.",
       "source": "openai/skills@49f948faa9258a0c61caceaf225e179651397431:README.md:2",
       "successor": "https://github.com/openai/plugins",
-      "successor_source_pin": "0722921d5542fc593105c27bd52630babd8b8c2a"
+      "successor_source_pin": "0722921d5542fc593105c27bd52630babd8b8c2a",
+      "role_scope": "as a currency source for instructions-skills",
+      "successor_disposition": "openai/plugins is a named successor repository, not a replacement (09-26 refutation); no successor adoption is inferred.",
+      "frozen_copies": [
+        {
+          "skill": "gh-fix-ci",
+          "manifest_ref": "8b1ef0c3:adoption/skills/manifest.json:97",
+          "ref": "49f948faa9258a0c61caceaf225e179651397431",
+          "lifecycle": "deprecated upstream, frozen copy",
+          "in_use_until": "A maintained successor qualifies through the instructions-skills comparison; nothing is uninstalled.",
+          "w7_research_row": {
+            "queue": "co-op research-queue.tsv",
+            "row": 38,
+            "question": "Which maintained upstream qualifies as successor for the frozen gh-fix-ci copy?",
+            "readiness_trigger": "The instructions-skills W6 closeout lands."
+          }
+        },
+        {
+          "skill": "security-best-practices",
+          "manifest_ref": "8b1ef0c3:adoption/skills/manifest.json:122",
+          "ref": "49f948faa9258a0c61caceaf225e179651397431",
+          "lifecycle": "deprecated upstream, frozen copy",
+          "in_use_until": "A maintained successor qualifies through the instructions-skills comparison; nothing is uninstalled.",
+          "w7_research_row": {
+            "queue": "co-op research-queue.tsv",
+            "row": 39,
+            "question": "Which maintained upstream qualifies as successor for the frozen security-best-practices copy?",
+            "readiness_trigger": "The instructions-skills W6 closeout lands."
+          }
+        },
+        {
+          "skill": "security-threat-model",
+          "manifest_ref": "8b1ef0c3:adoption/skills/manifest.json:272",
+          "ref": "49f948faa9258a0c61caceaf225e179651397431",
+          "lifecycle": "deprecated upstream, frozen copy",
+          "in_use_until": "A maintained successor qualifies through the instructions-skills comparison; nothing is uninstalled.",
+          "w7_research_row": {
+            "queue": "co-op research-queue.tsv",
+            "row": 40,
+            "question": "Which maintained upstream qualifies as successor for the frozen security-threat-model copy?",
+            "readiness_trigger": "The instructions-skills W6 closeout lands."
+          }
+        },
+        {
+          "skill": "gh-address-comments",
+          "manifest_ref": "8b1ef0c3:adoption/skills/manifest.json:297",
+          "ref": "49f948faa9258a0c61caceaf225e179651397431",
+          "lifecycle": "deprecated upstream, frozen copy",
+          "in_use_until": "A maintained successor qualifies through the instructions-skills comparison; nothing is uninstalled.",
+          "w7_research_row": {
+            "queue": "co-op research-queue.tsv",
+            "row": 41,
+            "question": "Which maintained upstream qualifies as successor for the frozen gh-address-comments copy?",
+            "readiness_trigger": "The instructions-skills W6 closeout lands."
+          }
+        }
+      ]
     }
-  ]
+  ],
+  "refrozen_at_utc": "2026-10-12T08:16:44Z"
 }

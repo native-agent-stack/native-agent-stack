@@ -41,7 +41,7 @@
         {
           "repository": "https://github.com/traceloop/openllmetry",
           "ref": "catalogs/sota-convergence/manifest-20260926.json#/foundation/15/candidates/4/comparison_that_would_overturn",
-          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate before scenario tie-breaking."
+          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate. For this candidate, a retained acceptance gate replaces a conflicting scenario gate, and a retained tie rule (including within-noise or equal-or-lower criteria) replaces the scenario tie rule."
         }
       ]
     },
@@ -80,12 +80,12 @@
         {
           "repository": "https://github.com/utkuozdemir/nvidia_gpu_exporter",
           "ref": "catalogs/sota-convergence/manifest-20260926.json#/foundation/15/candidates/0/comparison_that_would_overturn",
-          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate before scenario tie-breaking."
+          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate. For this candidate, a retained acceptance gate replaces a conflicting scenario gate, and a retained tie rule (including within-noise or equal-or-lower criteria) replaces the scenario tie rule."
         },
         {
           "repository": "https://github.com/nvidia/dcgm-exporter",
           "ref": "catalogs/sota-convergence/manifest-20260926.json#/foundation/15/candidates/3/comparison_that_would_overturn",
-          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate before scenario tie-breaking."
+          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate. For this candidate, a retained acceptance gate replaces a conflicting scenario gate, and a retained tie rule (including within-noise or equal-or-lower criteria) replaces the scenario tie rule."
         }
       ]
     },
@@ -119,12 +119,12 @@
         {
           "repository": "https://github.com/ollama/ollama",
           "ref": "catalogs/sota-convergence/manifest-20260926.json#/foundation/15/candidates/2/comparison_that_would_overturn",
-          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate before scenario tie-breaking."
+          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate. For this candidate, a retained acceptance gate replaces a conflicting scenario gate, and a retained tie rule (including within-noise or equal-or-lower criteria) replaces the scenario tie rule."
         },
         {
           "repository": "https://github.com/ml-explore/mlx-lm",
           "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/15/candidates/4/comparison_that_would_overturn",
-          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate before scenario tie-breaking."
+          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate. For this candidate, a retained acceptance gate replaces a conflicting scenario gate, and a retained tie rule (including within-noise or equal-or-lower criteria) replaces the scenario tie rule."
         }
       ]
     },
@@ -161,7 +161,7 @@
         {
           "repository": "https://github.com/mostlygeek/llama-swap",
           "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/15/candidates/15/comparison_that_would_overturn",
-          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate before scenario tie-breaking."
+          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate. For this candidate, a retained acceptance gate replaces a conflicting scenario gate, and a retained tie rule (including within-noise or equal-or-lower criteria) replaces the scenario tie rule."
         }
       ]
     }
@@ -179,7 +179,7 @@
     "Recover missing GPT-fit votes for mlx-lm and llama-swap or adjudicate substantively."
   ],
   "execution_constraints": [
-    "No new discovery; only retained 09-29/10-08 candidates and explicitly dispatched review-and-landing arms.",
+    "No new discovery; only retained 09-29/10-08 candidates and explicitly dispatched preregistered arms.",
     "Seal exact case/oracle/source-pin bytes before execution; do not tune acceptance after results.",
     "Retain failures, errors, cancellations and complete effort/cost; upstream tests and native invoke evidence remain distinct.",
     "Heavy suites in Monday 08:00Z\u201320:00Z require T2 idle wrapper; full suites also require SUITE-GO.",
@@ -204,5 +204,6 @@
       "event": "The owner retains approved embeddings eviction or a second non-llama.cpp engine, or a documented multi-model need that native llama-server router mode fails on the same host.",
       "retained_ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/15/candidates/15/comparison_that_would_overturn"
     }
-  ]
+  ],
+  "refrozen_at_utc": "2026-10-12T08:16:44Z"
 }

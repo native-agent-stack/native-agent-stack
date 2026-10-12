@@ -55,7 +55,7 @@
         {
           "repository": "https://github.com/dagucloud/dagu",
           "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/12/candidates/0/comparison_that_would_overturn",
-          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate before scenario tie-breaking."
+          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate. For this candidate, a retained acceptance gate replaces a conflicting scenario gate, and a retained tie rule (including within-noise or equal-or-lower criteria) replaces the scenario tie rule."
         }
       ]
     },
@@ -85,7 +85,7 @@
         {
           "repository": "https://github.com/restatedev/restate",
           "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/12/candidates/1/comparison_that_would_overturn",
-          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate before scenario tie-breaking."
+          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate. For this candidate, a retained acceptance gate replaces a conflicting scenario gate, and a retained tie rule (including within-noise or equal-or-lower criteria) replaces the scenario tie rule."
         }
       ]
     },
@@ -116,7 +116,7 @@
         {
           "repository": "https://github.com/microsoft/pg_durable",
           "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/12/candidates/3/comparison_that_would_overturn",
-          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate before scenario tie-breaking."
+          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate. For this candidate, a retained acceptance gate replaces a conflicting scenario gate, and a retained tie rule (including within-noise or equal-or-lower criteria) replaces the scenario tie rule."
         }
       ]
     },
@@ -152,7 +152,7 @@
         {
           "repository": "https://github.com/conductor-oss/conductor",
           "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/12/candidates/2/comparison_that_would_overturn",
-          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate before scenario tie-breaking."
+          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate. For this candidate, a retained acceptance gate replaces a conflicting scenario gate, and a retained tie rule (including within-noise or equal-or-lower criteria) replaces the scenario tie rule."
         }
       ]
     }
@@ -162,14 +162,14 @@
     "Checkpoint A/B, SQL-job, Conductor cancellation and three-host finalize/leader-kill oracle packets and host scopes are sealed",
     "Owning runtime/client moved-pin qualification receipts are retained",
     "The owning recovery lane qualifies an upstream-supported Dagu 2.17.2 scheduler execution path against the retained A/B oracles; the accepted 2.16.6-only runner is not reused unchanged.",
-    "A real SQL-centric research job documents the needed advantage over Dagu plus ordinary transactions and its supported intended-host installation boundary.",
-    "A retained native four-case recovery qualification or documented subprocess-cancellation primitive supplies the reopening evidence for the Conductor comparison."
+    "A concrete SQL-centric research job and an upstream-supported intended-host installation/test packet exist for pg_durable. Its comparison measures advantage over Dagu plus ordinary transactions.",
+    "A retained native four-case recovery run receipt or upstream documentation identifying a subprocess-cancellation primitive exists at an immutable pin for Conductor."
   ],
   "deltas": [
     "Apply only pin/evidence changes and surviving alternatives, preserving later substantive refutations of Temporal and Absurd."
   ],
   "execution_constraints": [
-    "No new discovery; only retained 09-29/10-08 candidates and explicitly dispatched review-and-landing arms.",
+    "No new discovery; only retained 09-29/10-08 candidates and explicitly dispatched preregistered arms.",
     "Seal exact case/oracle/source-pin bytes before execution; do not tune acceptance after results.",
     "Retain failures, errors, cancellations and complete effort/cost; upstream tests and native invoke evidence remain distinct.",
     "Heavy suites in Monday 08:00Z\u201320:00Z require T2 idle wrapper; full suites also require SUITE-GO.",
@@ -189,5 +189,6 @@
       "event": "A retained native four-case recovery qualification or documented subprocess-cancellation primitive supplies the reopening evidence for the Conductor comparison.",
       "retained_ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/12/candidates/2/comparison_that_would_overturn"
     }
-  ]
+  ],
+  "refrozen_at_utc": "2026-10-12T08:16:44Z"
 }

@@ -46,12 +46,12 @@
         {
           "repository": "https://github.com/ojuschugh1/sqz",
           "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/9/candidates/0/comparison_that_would_overturn",
-          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate before scenario tie-breaking."
+          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate. For this candidate, a retained acceptance gate replaces a conflicting scenario gate, and a retained tie rule (including within-noise or equal-or-lower criteria) replaces the scenario tie rule."
         },
         {
           "repository": "https://github.com/paritok-official/paritok-4b-v1",
           "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/9/candidates/2/comparison_that_would_overturn",
-          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate before scenario tie-breaking."
+          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate. For this candidate, a retained acceptance gate replaces a conflicting scenario gate, and a retained tie rule (including within-noise or equal-or-lower criteria) replaces the scenario tie rule."
         }
       ]
     },
@@ -82,7 +82,7 @@
         {
           "repository": "https://github.com/lockedinlabs-ai/agent-console",
           "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/9/candidates/1/comparison_that_would_overturn",
-          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate before scenario tie-breaking."
+          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate. For this candidate, a retained acceptance gate replaces a conflicting scenario gate, and a retained tie rule (including within-noise or equal-or-lower criteria) replaces the scenario tie rule."
         }
       ]
     },
@@ -125,7 +125,7 @@
           ]
         },
         {
-          "source": "Codex 0.158.0 native deferral control",
+          "source": "Codex 0.162.1/092d3acd native deferral control (the retained source control was 0.158.0)",
           "roles": [
             "mcp-tool-definition-deferral"
           ]
@@ -152,12 +152,12 @@
         {
           "repository": "https://github.com/atlassian-labs/mcp-compressor",
           "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/9/candidates/3/comparison_that_would_overturn",
-          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate before scenario tie-breaking."
+          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate. For this candidate, a retained acceptance gate replaces a conflicting scenario gate, and a retained tie rule (including within-noise or equal-or-lower criteria) replaces the scenario tie rule."
         },
         {
           "repository": "https://github.com/klavis-ai/klavis",
           "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/9/candidates/10/comparison_that_would_overturn",
-          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate before scenario tie-breaking."
+          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate. For this candidate, a retained acceptance gate replaces a conflicting scenario gate, and a retained tie rule (including within-noise or equal-or-lower criteria) replaces the scenario tie rule."
         }
       ]
     }
@@ -170,10 +170,11 @@
     "A retained maintained default-branch commit satisfies the historical post-2026-07-01 criterion, with the staged-discovery/native-deferral case packet and its complete accounting oracles."
   ],
   "deltas": [
-    "Recover the GPT-fit missing votes for mcp-compressor and klavis or settle their roles from primary evidence; missing returns do not refute either."
+    "Recover the GPT-fit missing votes for mcp-compressor and klavis or settle their roles from primary evidence; missing returns do not refute either.",
+    "Run the Codex native-deferral control at installed/mirror 0.162.1/092d3acd. Retained 0.158.0 remains the historical source version; capture the current supported mechanism/source and execution receipts before the comparison."
   ],
   "execution_constraints": [
-    "No new discovery; only retained 09-29/10-08 candidates and explicitly dispatched review-and-landing arms.",
+    "No new discovery; only retained 09-29/10-08 candidates and explicitly dispatched preregistered arms.",
     "Seal exact case/oracle/source-pin bytes before execution; do not tune acceptance after results.",
     "Retain failures, errors, cancellations and complete effort/cost; upstream tests and native invoke evidence remain distinct.",
     "Heavy suites in Monday 08:00Z\u201320:00Z require T2 idle wrapper; full suites also require SUITE-GO.",
@@ -187,5 +188,6 @@
       "event": "A retained maintained default-branch commit satisfies the historical post-2026-07-01 criterion, with the staged-discovery/native-deferral case packet and its complete accounting oracles.",
       "retained_ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/9/candidates/10/comparison_that_would_overturn"
     }
-  ]
+  ],
+  "refrozen_at_utc": "2026-10-12T08:16:44Z"
 }

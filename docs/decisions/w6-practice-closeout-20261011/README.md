@@ -18,17 +18,17 @@ host install, model/E2E run, qualified winner or live configuration change.
 
 | Layer | State | Comparison and frozen scope/rule | Exact preregistration SHA256 |
 | --- | --- | --- | --- |
-| git-github-automation | SCHEDULED | [w6-git-github-automation-20261011](git-github-automation.comparison.json) | `7645182ce8a46711cf31a904c7f603d2bd15b8ed4dfe36da01f990c0e39affd5` |
-| instructions-skills | SCHEDULED | [w6-instructions-skills-20261011](instructions-skills.comparison.json) | `0ca6e570c4dac8416b96125e2acf5fc75a0f89a8a4dfbabf587d77f789b5f751` |
-| observation-inference | SCHEDULED | [w6-observation-inference-20261011](observation-inference.comparison.json) | `c23fdfa225861aefbb3f404355542bf8abcf4299e4c32503f7e41ce674a53806` |
-| quality-evaluation | SCHEDULED | [w6-quality-evaluation-20261011](quality-evaluation.comparison.json) | `ec4f4271e07c76f0eef2fa5787efa4cf96e862e126e6892c08b5f88f398a7167` |
-| recovery-portability | SCHEDULED | [w6-recovery-portability-20261011](recovery-portability.comparison.json) | `14dae35c0e84e071caa54b8ba559f3f2cab202b43e6eee843cdab3322627a2bf` |
-| scheduling-supervision | SCHEDULED | [w6-scheduling-supervision-20261011](scheduling-supervision.comparison.json) | `fdc5a6ee76f5d76c9dbbae510565a6e5a9c4632b19eaa4bda6d1fd2f776459c3` |
-| token-efficiency | SCHEDULED | [w6-token-efficiency-20261011](token-efficiency.comparison.json) | `0c6cd76ede091d0c799135da66cf98bb33a2e2540fbcb180e6901a17f73bcb05` |
+| git-github-automation | SCHEDULED | [w6-git-github-automation-20261011](git-github-automation.comparison.json) | `d7c8542d5897c6dd2f96822a370996d95a00473ec8b97f245765558c7f36a3b8` |
+| instructions-skills | SCHEDULED | [w6-instructions-skills-20261011](instructions-skills.comparison.json) | `f85304bb7bdfac05d361c746babe6a3a62a5186ea06ee72302f4f3039b724774` |
+| observation-inference | SCHEDULED | [w6-observation-inference-20261011](observation-inference.comparison.json) | `22c642b8c5d331edf19c9e84b52e381fb85b4315f24f5d2d7f4f80e6f05f82cf` |
+| quality-evaluation | SCHEDULED | [w6-quality-evaluation-20261011](quality-evaluation.comparison.json) | `47782b9a7a6320d89c0c7a794998af7e05682395839c7495323fed8966df1716` |
+| recovery-portability | SCHEDULED | [w6-recovery-portability-20261011](recovery-portability.comparison.json) | `cb43f16a0044a883354209743f55c024ee8b97d647d3d8b2d963b06597c36c4a` |
+| scheduling-supervision | SCHEDULED | [w6-scheduling-supervision-20261011](scheduling-supervision.comparison.json) | `adc039640a8a52599b153aa00cd30276d4a5bdeb0bf418909e808e35183cf13b` |
+| token-efficiency | SCHEDULED | [w6-token-efficiency-20261011](token-efficiency.comparison.json) | `16e0fad18981e28b07686ec5efc4fd524539f7436f7ad55a7ef8da022173c8fb` |
 
 The comparison files name their required source, case/oracle and owner-receipt
 inputs. The readiness event is retention of the hash-bound input packet for the
-named comparison with every listed input present; the review-and-landing replay
+named comparison with every listed input present; the preregistered review and landing replays
 also requires #953 and #975 to land. Both were OPEN at the original source check; they have since
 landed as 3a8a8461 and 86fa3844. The case/source/owner inputs remain required, and #1027 is OPEN
 at the subsequent source check.
@@ -112,10 +112,10 @@ not survivors, qualified choices or native acceptance. No discovery ran.
 
 ## Named GitHub and quality deltas
 
-The review-and-landing role compares the current pinned #953/connector/exec/GPT
-kit/#975/ruleset/#947 path with gh-aw, codex-action, reviewdog, mergify-cli,
-coderabbit skills and PR-Agent on its local CLI path. Landing compares the #975/#1027 scripts,
-rulesets and #947 with mergify-cli using a sealed incident replay. Reviewdog is a reporting adapter;
+The preregistered review role compares the in-use #953 worker, CC Claude reads,
+co-op GPT reads and Codex connector/exec with gh-aw, codex-action, PR-Agent on its local CLI path
+and coderabbit skills. Landing compares the #975/#1027 scripts, rulesets and #947 with mergify-cli
+using a preregistered lane-sealed incident replay. Reviewdog is a reporting adapter;
 OpenHands and both SWE-agent resolvers are excluded from these roles. W1 review replays
 #974, #978, #970, #989, #982 and #992: block every known P1/P2, then minimize false
 blockers and complete measured cost. The sem subcomparison follows the existing
@@ -215,3 +215,11 @@ and Conductor recovery keep their retained job/cancellation scopes and resource 
 Inspect tests mutations, empty/cancelled controls, failure localization and 20-case top-up.
 Each retained not-adopted condition is a named readiness input; missing votes remain missing.
 All seven preregistrations, decision-rule copies and readiness copies are re-frozen together.
+
+## Round-2 adjudication and re-freeze
+
+The seven comparisons re-freeze together at 2026-10-12T08:16:44Z under the CC's round-2 adjudication. Retained candidate gates and tie rules replace conflicting scenario gates and ties for that candidate. The survivor counts explicitly separate survived kinds from missing-vote pending proposals, including the #1026 aggregate semantics.
+
+openai/skills is retired only as a currency source for instructions-skills. gh-fix-ci, security-best-practices, security-threat-model and gh-address-comments remain in use at 49f948fa with lifecycle "deprecated upstream, frozen copy" until maintained successors qualify; nothing is uninstalled. openai/plugins is not a replacement (09-26 refutation). The arm, terminal and run-assessment records carry each manifest pointer and W7 question, co-op rows 38–41.
+
+PR-Agent runs at the retained 1bf73e5d seed pin; the newer 330f0813 lock observation has identical README bytes and does not move that frozen arm. The Codex deferral control runs at installed/mirror 0.162.1/092d3acd; 0.158.0 is historical. The landing replay requires a lane-owned Mergify account and retained `.mergify.yml`, then uses the vendor's `mergify config` simulation. Conductor and pg_durable readiness names existing primitive/run/job inputs; their advantages are outcomes measured by the comparison. tardigrde/agent-skill-eval and ml4t/skills remain dated stopped-sweep inputs for later intake.

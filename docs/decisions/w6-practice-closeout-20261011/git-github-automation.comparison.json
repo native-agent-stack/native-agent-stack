@@ -60,7 +60,8 @@
           ],
           "roles": [
             "review"
-          ]
+          ],
+          "pin_authority": "The retained 10-10 seed 1bf73e5d8fcfc25925f3773f8582fe5421ca7d80 governs this preregistered CLI arm. The mirror lock observation at 330f0813 is newer and its README bytes match; it does not silently move the frozen execution pin."
         },
         {
           "source": [
@@ -81,7 +82,7 @@
     {
       "role": "landing",
       "case_scope": {
-        "oracle": "Owner-sealed incident replay using the retained incident heads, merge-base states, review-thread states and verdict bindings; run through the native landing test paths without executing a real merge.",
+        "oracle": "Lane-sealed incident replay using retained incident heads, merge-base states, review-thread states and verdict bindings. The in-use arm runs the native landing test paths without executing a real merge; mergify-cli runs its supported mergify config validation and action simulation against the same preregistered cases.",
         "incidents": [
           {
             "id": "1018-after-1007-merge-skew",
@@ -123,7 +124,8 @@
           ],
           "roles": [
             "landing"
-          ]
+          ],
+          "run_path": "mergify config validates .mergify.yml and simulates actions (mergifyio/mergify-cli@6307ed10:README.md:178); a lane-owned Mergify account and retained configuration are named inputs."
         }
       ],
       "rule": "Reject an arm that permits a merge-skew head, unresolved review threads, or stale-verdict head. Among complete passing arms choose the fewest false stops, then lowest median time-to-land in milliseconds on the identical sealed cases. Exact ties retain the qualified current path. If all arms fail, retain failures and select none."
@@ -160,18 +162,19 @@
         {
           "repository": "https://github.com/ataraxy-labs/sem",
           "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/19/candidates/0/comparison_that_would_overturn",
-          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate before scenario tie-breaking; sem uses the separately named CC P2 authority."
+          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate. For this candidate, a retained acceptance gate replaces a conflicting scenario gate, and a retained tie rule (including within-noise or equal-or-lower criteria) replaces the scenario tie rule; sem uses the separately named CC P2 authority."
         }
       ]
     }
   ],
   "readiness": [
-    "#953 and #975 land for the review-and-landing replay",
+    "#953 and #975 land for the preregistered review and landing replays",
     "Archived W1 defective-head/oracle packet and P2 labeled case packet are retained with immutable hashes",
     "Exact runtime pins, primary source and native acceptance boundaries are captured",
     "The lane-sealed landing-incident heads, merge bases, thread states, verdict bindings and oracle packet are retained",
     "#1027 landing implementation has its final immutable execution pin and source/acceptance boundary retained",
-    "The sem 0.25.0 comparison release commit and source/case oracle seals are retained"
+    "The sem 0.25.0 comparison release commit and source/case oracle seals are retained",
+    "A lane-owned Mergify account and the exact .mergify.yml configuration plus supported mergify config simulation source/test packet exist before landing replay."
   ],
   "deltas": [
     "Pin gh runtime 2.102.0 and bind release source fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd; qualify the lifecycle stage from actual commands.",
@@ -180,12 +183,13 @@
     "Keep recorded Codex run 0.160.0/a956835d distinct from installed/mirror 0.162.1/092d3acd; rerun owning pin_moved receipts before qualification."
   ],
   "execution_constraints": [
-    "No new discovery; only retained 09-29/10-08 candidates and explicitly dispatched review-and-landing arms.",
+    "No new discovery; only retained 09-29/10-08 candidates and explicitly dispatched preregistered arms.",
     "Seal exact case/oracle/source-pin bytes before execution; do not tune acceptance after results.",
     "Retain failures, errors, cancellations and complete effort/cost; upstream tests and native invoke evidence remain distinct.",
     "Heavy suites in Monday 08:00Z\u201320:00Z require T2 idle wrapper; full suites also require SUITE-GO.",
     "Terminal classification authority is the co-op #1007 LANDED relay and c2dee173 final-stack contract. A winner requires all four conditions before FINAL.",
     "Publish authentication digests only over privacy-safe preimages that are themselves published; original captures and their seals stay private.",
     "Run a scenario when its own named source/oracle/reopening inputs exist; an unmet condition for another role cannot delay a ready scenario. The layer remains SCHEDULED until its remaining obligations close."
-  ]
+  ],
+  "refrozen_at_utc": "2026-10-12T08:16:44Z"
 }

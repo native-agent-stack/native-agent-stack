@@ -37,7 +37,7 @@
         {
           "repository": "https://github.com/microsoft/wsl",
           "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/14/candidates/12/comparison_that_would_overturn",
-          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate before scenario tie-breaking."
+          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate. For this candidate, a retained acceptance gate replaces a conflicting scenario gate, and a retained tie rule (including within-noise or equal-or-lower criteria) replaces the scenario tie rule."
         }
       ]
     }
@@ -52,7 +52,7 @@
     "Consume retained failure and client/memory pin_moved references without relabeling historical same-host/synthetic results."
   ],
   "execution_constraints": [
-    "No new discovery; only retained 09-29/10-08 candidates and explicitly dispatched review-and-landing arms.",
+    "No new discovery; only retained 09-29/10-08 candidates and explicitly dispatched preregistered arms.",
     "Seal exact case/oracle/source-pin bytes before execution; do not tune acceptance after results.",
     "Retain failures, errors, cancellations and complete effort/cost; upstream tests and native invoke evidence remain distinct.",
     "Heavy suites in Monday 08:00Z\u201320:00Z require T2 idle wrapper; full suites also require SUITE-GO.",
@@ -66,5 +66,6 @@
       "event": "A WSL release documents selective export allowlist/exclude support at WslClient.cpp and official commands, with synthetic auth-store canaries and the equal-profile restore oracle packet.",
       "retained_ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/14/candidates/12/comparison_that_would_overturn"
     }
-  ]
+  ],
+  "refrozen_at_utc": "2026-10-12T08:16:44Z"
 }

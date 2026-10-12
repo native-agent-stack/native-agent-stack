@@ -150,10 +150,66 @@
       "component_id": "candidate:openai-skills",
       "repository": "https://github.com/openai/skills",
       "terminal_state": "RETIRED",
-      "reason": "Upstream deprecates this repository and names openai/plugins as its successor. No successor adoption is inferred.",
+      "reason": "Upstream deprecates this repository as a currency source for instructions-skills. The four installed copies remain in use until a maintained successor qualifies; nothing is uninstalled. openai/plugins is not a replacement, per the 09-26 refutation.",
       "source": "openai/skills@49f948faa9258a0c61caceaf225e179651397431:README.md:2",
       "successor": "https://github.com/openai/plugins",
-      "successor_source_pin": "0722921d5542fc593105c27bd52630babd8b8c2a"
+      "successor_source_pin": "0722921d5542fc593105c27bd52630babd8b8c2a",
+      "role_scope": "as a currency source for instructions-skills",
+      "successor_disposition": "openai/plugins is a named successor repository, not a replacement (09-26 refutation); no successor adoption is inferred.",
+      "frozen_copies": [
+        {
+          "skill": "gh-fix-ci",
+          "manifest_ref": "8b1ef0c3:adoption/skills/manifest.json:97",
+          "ref": "49f948faa9258a0c61caceaf225e179651397431",
+          "lifecycle": "deprecated upstream, frozen copy",
+          "in_use_until": "A maintained successor qualifies through the instructions-skills comparison; nothing is uninstalled.",
+          "w7_research_row": {
+            "queue": "co-op research-queue.tsv",
+            "row": 38,
+            "question": "Which maintained upstream qualifies as successor for the frozen gh-fix-ci copy?",
+            "readiness_trigger": "The instructions-skills W6 closeout lands."
+          }
+        },
+        {
+          "skill": "security-best-practices",
+          "manifest_ref": "8b1ef0c3:adoption/skills/manifest.json:122",
+          "ref": "49f948faa9258a0c61caceaf225e179651397431",
+          "lifecycle": "deprecated upstream, frozen copy",
+          "in_use_until": "A maintained successor qualifies through the instructions-skills comparison; nothing is uninstalled.",
+          "w7_research_row": {
+            "queue": "co-op research-queue.tsv",
+            "row": 39,
+            "question": "Which maintained upstream qualifies as successor for the frozen security-best-practices copy?",
+            "readiness_trigger": "The instructions-skills W6 closeout lands."
+          }
+        },
+        {
+          "skill": "security-threat-model",
+          "manifest_ref": "8b1ef0c3:adoption/skills/manifest.json:272",
+          "ref": "49f948faa9258a0c61caceaf225e179651397431",
+          "lifecycle": "deprecated upstream, frozen copy",
+          "in_use_until": "A maintained successor qualifies through the instructions-skills comparison; nothing is uninstalled.",
+          "w7_research_row": {
+            "queue": "co-op research-queue.tsv",
+            "row": 40,
+            "question": "Which maintained upstream qualifies as successor for the frozen security-threat-model copy?",
+            "readiness_trigger": "The instructions-skills W6 closeout lands."
+          }
+        },
+        {
+          "skill": "gh-address-comments",
+          "manifest_ref": "8b1ef0c3:adoption/skills/manifest.json:297",
+          "ref": "49f948faa9258a0c61caceaf225e179651397431",
+          "lifecycle": "deprecated upstream, frozen copy",
+          "in_use_until": "A maintained successor qualifies through the instructions-skills comparison; nothing is uninstalled.",
+          "w7_research_row": {
+            "queue": "co-op research-queue.tsv",
+            "row": 41,
+            "question": "Which maintained upstream qualifies as successor for the frozen gh-address-comments copy?",
+            "readiness_trigger": "The instructions-skills W6 closeout lands."
+          }
+        }
+      ]
     }
   ]
 }

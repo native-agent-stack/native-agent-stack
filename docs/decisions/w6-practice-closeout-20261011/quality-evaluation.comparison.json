@@ -41,7 +41,7 @@
         {
           "repository": "https://github.com/ukgovernmentbeis/inspect_ai",
           "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/10/candidates/0/comparison_that_would_overturn",
-          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate before scenario tie-breaking."
+          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate. For this candidate, a retained acceptance gate replaces a conflicting scenario gate, and a retained tie rule (including within-noise or equal-or-lower criteria) replaces the scenario tie rule."
         }
       ]
     },
@@ -72,7 +72,7 @@
         {
           "repository": "https://github.com/embeddings-benchmark/mteb",
           "ref": "catalogs/sota-convergence/manifest-20260926.json#/foundation/10/candidates/4/comparison_that_would_overturn",
-          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate before scenario tie-breaking."
+          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate. For this candidate, a retained acceptance gate replaces a conflicting scenario gate, and a retained tie rule (including within-noise or equal-or-lower criteria) replaces the scenario tie rule."
         }
       ]
     }
@@ -89,7 +89,7 @@
     "Consume the named Inspect survivor and carry MTEB explicitly; retain earlier substantive refutations of mutmut, cosmic-ray and opik rather than silently treating their omission as resolution."
   ],
   "execution_constraints": [
-    "No new discovery; only retained 09-29/10-08 candidates and explicitly dispatched review-and-landing arms.",
+    "No new discovery; only retained 09-29/10-08 candidates and explicitly dispatched preregistered arms.",
     "Seal exact case/oracle/source-pin bytes before execution; do not tune acceptance after results.",
     "Retain failures, errors, cancellations and complete effort/cost; upstream tests and native invoke evidence remain distinct.",
     "Heavy suites in Monday 08:00Z\u201320:00Z require T2 idle wrapper; full suites also require SUITE-GO.",
@@ -103,5 +103,6 @@
       "event": "A concrete embedding/retrieval change and privacy-filtered independent relevance/metric packet are retained.",
       "retained_ref": "catalogs/sota-convergence/manifest-20260926.json#/foundation/10/candidates/4/comparison_that_would_overturn"
     }
-  ]
+  ],
+  "refrozen_at_utc": "2026-10-12T08:16:44Z"
 }

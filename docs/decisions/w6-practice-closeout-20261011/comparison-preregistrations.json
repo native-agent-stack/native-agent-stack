@@ -5,38 +5,39 @@
   "comparisons": [
     {
       "path": "docs/decisions/w6-practice-closeout-20261011/git-github-automation.comparison.json",
-      "preregistration_sha256": "7645182ce8a46711cf31a904c7f603d2bd15b8ed4dfe36da01f990c0e39affd5",
+      "preregistration_sha256": "d7c8542d5897c6dd2f96822a370996d95a00473ec8b97f245765558c7f36a3b8",
       "comparison_id": "w6-git-github-automation-20261011"
     },
     {
       "path": "docs/decisions/w6-practice-closeout-20261011/instructions-skills.comparison.json",
-      "preregistration_sha256": "0ca6e570c4dac8416b96125e2acf5fc75a0f89a8a4dfbabf587d77f789b5f751",
+      "preregistration_sha256": "f85304bb7bdfac05d361c746babe6a3a62a5186ea06ee72302f4f3039b724774",
       "comparison_id": "w6-instructions-skills-20261011"
     },
     {
       "path": "docs/decisions/w6-practice-closeout-20261011/observation-inference.comparison.json",
-      "preregistration_sha256": "c23fdfa225861aefbb3f404355542bf8abcf4299e4c32503f7e41ce674a53806",
+      "preregistration_sha256": "22c642b8c5d331edf19c9e84b52e381fb85b4315f24f5d2d7f4f80e6f05f82cf",
       "comparison_id": "w6-observation-inference-20261011"
     },
     {
       "path": "docs/decisions/w6-practice-closeout-20261011/quality-evaluation.comparison.json",
-      "preregistration_sha256": "ec4f4271e07c76f0eef2fa5787efa4cf96e862e126e6892c08b5f88f398a7167",
+      "preregistration_sha256": "47782b9a7a6320d89c0c7a794998af7e05682395839c7495323fed8966df1716",
       "comparison_id": "w6-quality-evaluation-20261011"
     },
     {
       "path": "docs/decisions/w6-practice-closeout-20261011/recovery-portability.comparison.json",
-      "preregistration_sha256": "14dae35c0e84e071caa54b8ba559f3f2cab202b43e6eee843cdab3322627a2bf",
+      "preregistration_sha256": "cb43f16a0044a883354209743f55c024ee8b97d647d3d8b2d963b06597c36c4a",
       "comparison_id": "w6-recovery-portability-20261011"
     },
     {
       "path": "docs/decisions/w6-practice-closeout-20261011/scheduling-supervision.comparison.json",
-      "preregistration_sha256": "fdc5a6ee76f5d76c9dbbae510565a6e5a9c4632b19eaa4bda6d1fd2f776459c3",
+      "preregistration_sha256": "adc039640a8a52599b153aa00cd30276d4a5bdeb0bf418909e808e35183cf13b",
       "comparison_id": "w6-scheduling-supervision-20261011"
     },
     {
       "path": "docs/decisions/w6-practice-closeout-20261011/token-efficiency.comparison.json",
-      "preregistration_sha256": "0c6cd76ede091d0c799135da66cf98bb33a2e2540fbcb180e6901a17f73bcb05",
+      "preregistration_sha256": "16e0fad18981e28b07686ec5efc4fd524539f7436f7ad55a7ef8da022173c8fb",
       "comparison_id": "w6-token-efficiency-20261011"
     }
-  ]
+  ],
+  "refrozen_at_utc": "2026-10-12T08:16:44Z"
 }

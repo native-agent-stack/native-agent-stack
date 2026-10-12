@@ -233,16 +233,18 @@
       "terminal_readiness_trigger": {
         "event": "The existing evidence owner retains the hash-bound w6-git-github-automation-20261011 packet with all source, oracle and retained-reopen inputs listed below.",
         "required_inputs": [
-          "#953 and #975 land for the review-and-landing replay",
+          "#953 and #975 land for the preregistered review and landing replays",
           "Archived W1 defective-head/oracle packet and P2 labeled case packet are retained with immutable hashes",
           "Exact runtime pins, primary source and native acceptance boundaries are captured",
           "The lane-sealed landing-incident heads, merge bases, thread states, verdict bindings and oracle packet are retained",
           "#1027 landing implementation has its final immutable execution pin and source/acceptance boundary retained",
-          "The sem 0.25.0 comparison release commit and source/case oracle seals are retained"
+          "The sem 0.25.0 comparison release commit and source/case oracle seals are retained",
+          "A lane-owned Mergify account and the exact .mergify.yml configuration plus supported mergify config simulation source/test packet exist before landing replay."
         ],
         "met_at_closeout": false
       },
-      "terminal_state_ref": "docs/decisions/w6-practice-closeout-20261011/terminal-states.json#/layers/0"
+      "terminal_state_ref": "docs/decisions/w6-practice-closeout-20261011/terminal-states.json#/layers/0",
+      "survivor_count_scope": "survivor_count counts survived kinds only. After #1026 lands, final-stack survivors equals survivor_count plus missing_vote_pending_count; this closeout preserves the split explicitly."
     },
     {
       "catalog": "foundation",
@@ -414,7 +416,8 @@
         ],
         "met_at_closeout": false
       },
-      "terminal_state_ref": "docs/decisions/w6-practice-closeout-20261011/terminal-states.json#/layers/3"
+      "terminal_state_ref": "docs/decisions/w6-practice-closeout-20261011/terminal-states.json#/layers/3",
+      "survivor_count_scope": "survivor_count counts survived kinds only. After #1026 lands, final-stack survivors equals survivor_count plus missing_vote_pending_count; this closeout preserves the split explicitly."
     },
     {
       "catalog": "foundation",
@@ -555,7 +558,8 @@
         ],
         "met_at_closeout": false
       },
-      "terminal_state_ref": "docs/decisions/w6-practice-closeout-20261011/terminal-states.json#/layers/1"
+      "terminal_state_ref": "docs/decisions/w6-practice-closeout-20261011/terminal-states.json#/layers/1",
+      "survivor_count_scope": "survivor_count counts survived kinds only. After #1026 lands, final-stack survivors equals survivor_count plus missing_vote_pending_count; this closeout preserves the split explicitly."
     },
     {
       "catalog": "foundation",
@@ -854,7 +858,8 @@
         ],
         "met_at_closeout": false
       },
-      "terminal_state_ref": "docs/decisions/w6-practice-closeout-20261011/terminal-states.json#/layers/6"
+      "terminal_state_ref": "docs/decisions/w6-practice-closeout-20261011/terminal-states.json#/layers/6",
+      "survivor_count_scope": "survivor_count counts survived kinds only. After #1026 lands, final-stack survivors equals survivor_count plus missing_vote_pending_count; this closeout preserves the split explicitly."
     },
     {
       "catalog": "foundation",
@@ -1228,7 +1233,8 @@
         ],
         "met_at_closeout": false
       },
-      "terminal_state_ref": "docs/decisions/w6-practice-closeout-20261011/terminal-states.json#/layers/2"
+      "terminal_state_ref": "docs/decisions/w6-practice-closeout-20261011/terminal-states.json#/layers/2",
+      "survivor_count_scope": "survivor_count counts survived kinds only. After #1026 lands, final-stack survivors equals survivor_count plus missing_vote_pending_count; this closeout preserves the split explicitly."
     },
     {
       "catalog": "foundation",
@@ -1544,12 +1550,13 @@
           "Checkpoint A/B, SQL-job, Conductor cancellation and three-host finalize/leader-kill oracle packets and host scopes are sealed",
           "Owning runtime/client moved-pin qualification receipts are retained",
           "The owning recovery lane qualifies an upstream-supported Dagu 2.17.2 scheduler execution path against the retained A/B oracles; the accepted 2.16.6-only runner is not reused unchanged.",
-          "A real SQL-centric research job documents the needed advantage over Dagu plus ordinary transactions and its supported intended-host installation boundary.",
-          "A retained native four-case recovery qualification or documented subprocess-cancellation primitive supplies the reopening evidence for the Conductor comparison."
+          "A concrete SQL-centric research job and an upstream-supported intended-host installation/test packet exist for pg_durable. Its comparison measures advantage over Dagu plus ordinary transactions.",
+          "A retained native four-case recovery run receipt or upstream documentation identifying a subprocess-cancellation primitive exists at an immutable pin for Conductor."
         ],
         "met_at_closeout": false
       },
-      "terminal_state_ref": "docs/decisions/w6-practice-closeout-20261011/terminal-states.json#/layers/5"
+      "terminal_state_ref": "docs/decisions/w6-practice-closeout-20261011/terminal-states.json#/layers/5",
+      "survivor_count_scope": "survivor_count counts survived kinds only. After #1026 lands, final-stack survivors equals survivor_count plus missing_vote_pending_count; this closeout preserves the split explicitly."
     },
     {
       "catalog": "foundation",
@@ -1669,8 +1676,9 @@
         ],
         "met_at_closeout": false
       },
-      "terminal_state_ref": "docs/decisions/w6-practice-closeout-20261011/terminal-states.json#/layers/4"
+      "terminal_state_ref": "docs/decisions/w6-practice-closeout-20261011/terminal-states.json#/layers/4",
+      "survivor_count_scope": "survivor_count counts survived kinds only. After #1026 lands, final-stack survivors equals survivor_count plus missing_vote_pending_count; this closeout preserves the split explicitly."
     }
   ],
-  "stopped_sweep_boundary": "Stopped-sweep proposals remain dated inputs for later intake; no stopped sweep supplies a new adjudication for this W6 candidate set."
+  "stopped_sweep_boundary": "Stopped-sweep proposals tardigrde/agent-skill-eval and ml4t/skills remain dated inputs for later intake; no stopped sweep supplies a new adjudication for this W6 candidate set."
 }
