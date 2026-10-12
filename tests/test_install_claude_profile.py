@@ -1830,10 +1830,10 @@ class StandingRuleSurfacesTests(unittest.TestCase):
     # ruling; the same record adds "alone" to the bullet's not-evidence clause.
     CONVERGED = (
         "Use only converged candidates: a tool, runtime, model or skill is installed or run for trial only after the "
-        "layer's screen passes it, and becomes a default only when the layer's multi-angle convergence agrees "
-        "(capability at the pin, upstream engineering quality, community consensus, net usage, published evaluations "
-        "and our own measured runs); where angles disagree, measure the disputed dimension first-hand, and no single "
-        "angle admits a candidate on its own."
+        "layer's screen (its requirements checked at a pin) passes it, and becomes a default only when the layer's "
+        "multi-angle convergence agrees (capability at the pin, upstream engineering quality, community consensus, net "
+        "usage, published evaluations and our own measured runs); where angles disagree, measure the disputed "
+        "dimension first-hand, and no single angle makes a candidate a default."
     )
     NOT_EVIDENCE = "Agreement, recency, popularity and incumbency alone are not evidence."
     NOT_EVIDENCE_BEFORE = "Agreement, recency, popularity and incumbency are not evidence."
@@ -1963,6 +1963,13 @@ class StandingRuleSurfacesTests(unittest.TestCase):
                 self.assertEqual(text.count(self.CONVERGED_PLACED), 1)
                 self.assertEqual(text.count("upstream harnesses. " + self.NOT_EVIDENCE + " Keep measured results"), 1)
                 self.assertEqual(text.count(self.NOT_EVIDENCE_BEFORE), 0)
+
+    def test_the_long_form_rule_says_alone_in_its_not_evidence_clause(self):
+        """docs/harness-defaults.md holds the long form, not a copy of the core; under multi-angle convergence its
+        clause must not deny stars evidence outright (review round 1 of docs/decisions/2026-10-12-converged-candidates-only.md)."""
+        text = (ROOT / "docs/harness-defaults.md").read_text(encoding="utf-8")
+        self.assertEqual(text.count("Agreement, recency, stars and extra tooling alone are not evidence."), 1)
+        self.assertEqual(text.count("Agreement, recency, stars and extra tooling are not evidence."), 0)
 
     def test_root_claude_md_loads_the_core_through_its_agents_md_import(self):
         # code.claude.com/docs/en/memory, "Share one file with other coding tools": the import keeps AGENTS.md the one
@@ -2342,7 +2349,8 @@ class PortableTopRuleTests(unittest.TestCase):
     # 253 more bytes to each copy (7694/7795 bytes, so 8079/8185), and the tightened first sentence (trial after the
     # screen, a default after a measured win) 4 more: 7702/7803 bytes, so 8088/8194. The final wording (multi-angle
     # convergence for defaults, and "alone" in the not-evidence clause) adds 153 more: 8008/8109 bytes, so 8409/8515.
-    STARTUP_BUDGET_BYTES = {"claude": 8409, "codex": 8515}
+    # Review round 1 defines the screen and says no single angle makes a default: 34 more, 8076/8177, so 8480/8586.
+    STARTUP_BUDGET_BYTES = {"claude": 8480, "codex": 8586}
     # The four rules of the core (2026-10-08): research before acting with named sources, upstream as the truth with
     # the check order, decisions by evidence measured with upstream harnesses, and the compounding ecosystem with the
     # recorded correction.
