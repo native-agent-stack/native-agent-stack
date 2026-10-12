@@ -18957,8 +18957,8 @@
     },
     {
       "path": "docs/memory-landscape-maintenance.md",
-      "sha256": "bac5985e7f6cea426a40a6067fa00fbe236cf5f33f1acf64b35a092c17fde5a3",
-      "bytes": 18683
+      "sha256": "c0f50770c3118c0b5e62e01a3c12516aee7c051639904ad44da5c091a8ae6403",
+      "bytes": 19928
     },
     {
       "path": "docs/memory-rag-native-practice.md",
@@ -61917,8 +61917,8 @@
     },
     {
       "path": "tests/test_memory_landscape_capture_doc.py",
-      "sha256": "528799c8dd40b5fa9422d7ca4bc5a0be9b10bc0ee07b549aa5c28645712fd804",
-      "bytes": 9804
+      "sha256": "0f40e33257ac8b6fdcfce58e6085469b6bb96efee3de6da8e31d54c0f8895bdd",
+      "bytes": 16735
     },
     {
       "path": "tests/test_memory_lifecycle.py",

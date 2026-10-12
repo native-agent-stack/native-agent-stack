@@ -20,12 +20,24 @@ The corrected statements are pinned, each to its upstream mechanism:
    write_hook_trusts). The first version said re-rendering changes trusted_hash.
 4. The 2026-09-21 qualification prose that follows the corrections is dated and points at correction #149, so it cannot
    state the old host state in the present tense beside the correction. correction_149_section stops before that prose.
+5. The lead that introduces the documented `install-hooks --capture-assistant` commands is dated and cites the retained
+   2026-09-21 record (native-commands.json:295-393: the three installers were run with the flag, exit 0 each), so it is
+   a record of that day and not the host's hook state. Correction #149 then cannot say that "the earlier hook
+   applications ran without the flag", which the same record contradicts: it names the later flagless applications
+   (the #144 repair and the 2.6.3 re-stage) and leaves the loss in between as host history not reconstructed here.
+6. The Codex count is one profile's seven. hook-trust.json lists seven ai-memory commands in each of two profiles (native
+   :35-77, Desktop :279-321), so correction #149 bounds its 0 of 7 and its Codex conclusions to the native profile and
+   claims nothing about the Desktop profile, which was not measured.
 """
+import json
 import re
 import unittest
 from pathlib import Path
 
-DOC = Path(__file__).resolve().parents[1] / "docs" / "memory-landscape-maintenance.md"
+ROOT = Path(__file__).resolve().parents[1]
+DOC = ROOT / "docs" / "memory-landscape-maintenance.md"
+ARTIFACTS = ROOT / "evidence" / "artifacts" / "memory-landscape-20260921"
+INSTALLERS = ("hook-install-claude", "hook-install-codex", "hook-install-desktop")
 
 
 def section_from(text, heading):
@@ -56,6 +68,44 @@ def qualification_tail(text):
     if start == -1 or end == -1:
         raise AssertionError("docs/memory-landscape-maintenance.md lacks the qualification prose after the corrections")
     return text[start:end]
+
+
+def installer_lead(text):
+    """The paragraph that introduces the documented `install-hooks --capture-assistant` commands."""
+    block = text.find("```sh\nai-memory install-hooks --agent claude-code --capture-assistant")
+    if block == -1:
+        raise AssertionError("docs/memory-landscape-maintenance.md lacks the documented install-hooks commands")
+    end = text.rfind("\n\n", 0, block)
+    return text[text.rfind("\n\n", 0, end) + 2:end].strip()
+
+
+def artifact_lines(name):
+    return (ARTIFACTS / name).read_text(encoding="utf-8").splitlines()
+
+
+def record_span(lines, name):
+    """1-based first and last line of the pretty-printed command record `name` in native-commands.json."""
+    start = next(i for i, line in enumerate(lines) if line == f'    "{name}": {{')
+    end = next(i for i in range(start, len(lines)) if lines[i] in ("    },", "    }"))
+    return start + 1, end + 1
+
+
+def find_record(node, name):
+    if isinstance(node, dict):
+        if name in node:
+            return node[name]
+        for value in node.values():
+            found = find_record(value, name)
+            if found is not None:
+                return found
+    return None
+
+
+def profile_lines(lines, block, prefix):
+    """1-based lines of the hook keys that start with `prefix` in one hook-trust.json hooks/list block."""
+    start = next(i for i, line in enumerate(lines) if line == f'    "{block}": {{')
+    end = next((i for i in range(start + 1, len(lines)) if lines[i].startswith('    "')), len(lines))
+    return [i + 1 for i in range(start, end) if f'"key": "{prefix}' in lines[i]]
 
 
 class CaptureCheckCommandTests(unittest.TestCase):
@@ -162,6 +212,70 @@ class OlderQualificationStatementTests(unittest.TestCase):
             self.assertIn("correction #149", paragraph, "the current host state lives in the correction")
         self.assertNotRegex(tail, r"excerpts are separately opted in")
         self.assertNotRegex(tail, r"\bIn this qualification\b")
+
+    def test_qualification_prose_bounds_the_current_codex_state_to_the_native_profile(self):
+        tail = " ".join(qualification_tail(DOC.read_text(encoding="utf-8")).split())
+        self.assertIn("For the current native Codex state see correction #149", tail)
+        self.assertIn("the Desktop profile was not measured", tail)
+        self.assertNotIn("For the current Codex state", tail, "an unbounded Codex conclusion")
+
+
+class InstallerLeadTests(unittest.TestCase):
+    def test_lead_is_dated_cites_the_retained_installer_record_and_points_at_correction_149(self):
+        text = DOC.read_text(encoding="utf-8")
+        lead = " ".join(installer_lead(text).split())
+        self.assertNotIn("The actual upstream installers were run", text, "an undated claim beside correction #149")
+        self.assertIn("At the 2026-09-21 qualification the upstream installers were run with `--capture-assistant`", lead)
+        self.assertIn("not the hook state now", lead)
+        self.assertIn("correction #149", lead)
+        lines = artifact_lines("native-commands.json")
+        first = record_span(lines, INSTALLERS[0])[0]
+        last = record_span(lines, INSTALLERS[-1])[1]
+        self.assertIn(f"evidence/artifacts/memory-landscape-20260921/native-commands.json:{first}-{last}", lead)
+
+    def test_the_cited_installer_record_carries_the_flag_and_exit_zero(self):
+        data = json.loads((ARTIFACTS / "native-commands.json").read_text(encoding="utf-8"))
+        for name in INSTALLERS:
+            record = find_record(data, name)
+            self.assertIsNotNone(record, f"native-commands.json lacks {name}")
+            self.assertIn("--capture-assistant", record["argv"], f"{name} was run without the flag")
+            self.assertEqual(record["exit_code"], 0, name)
+
+    def test_correction_149_dates_the_flagless_applications_instead_of_contradicting_the_record(self):
+        section = " ".join(correction_149_section(DOC.read_text(encoding="utf-8")).split())
+        self.assertNotRegex(section, r"[Tt]he earlier hook applications", "the 2026-09-21 installers carried the flag")
+        self.assertIn("The qualification's own installers carried the flag (`native-commands.json:295-393`", section)
+        self.assertIn(
+            "so the flag was lost between then and 2026-10-11; the loss path is host history not reconstructed here", section
+        )
+        self.assertIn(
+            "Two later applications, the #144 repair (a bare re-apply) and the 2.6.3 re-stage of 2026-10-10, ran without the flag",
+            section,
+        )
+        self.assertIn("was not in force on this host on 2026-10-11", section)
+
+
+class CodexProfileScopeTests(unittest.TestCase):
+    def test_correction_149_counts_both_codex_profiles_and_bounds_its_count_to_the_native_one(self):
+        section = " ".join(correction_149_section(DOC.read_text(encoding="utf-8")).split())
+        trust = artifact_lines("hook-trust.json")
+        native = profile_lines(trust, "hook-trust-before", "$HOME/.codex/hooks.json:")
+        desktop = profile_lines(trust, "hook-trust-desktop-before", "$DESKTOP_HOME_PARENT/.codex/hooks.json:")
+        self.assertEqual((len(native), len(desktop)), (7, 7), "seven ai-memory Codex commands in each profile")
+        self.assertIn(f"native (`$HOME/.codex/hooks.json`, `hook-trust.json:{native[0]}-{native[-1]}`)", section)
+        self.assertIn(
+            f"Desktop (`$DESKTOP_HOME_PARENT/.codex/hooks.json`, `hook-trust.json:{desktop[0]}-{desktop[-1]}`)", section
+        )
+        self.assertIn(f"{len(native) + len(desktop)} in all", section)
+        self.assertIn("The 0 of 7 is the native profile's", section)
+        self.assertIn("the Desktop profile's seven were not measured", section)
+        self.assertIn("claims nothing about their flag or trust state", section)
+
+    def test_correction_149_bounds_its_codex_conclusions_to_the_native_profile(self):
+        section = " ".join(correction_149_section(DOC.read_text(encoding="utf-8")).split())
+        self.assertIn("Native Codex is pending a trust refresh", section)
+        self.assertIn("so native Codex assistant capture stays off until then", section)
+        self.assertNotRegex(section, r"so Codex assistant capture stays off until then", "an unbounded Codex conclusion")
 
 
 if __name__ == "__main__":
