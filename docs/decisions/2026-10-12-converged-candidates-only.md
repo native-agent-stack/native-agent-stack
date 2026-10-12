@@ -1,20 +1,26 @@
-# Decision: use only converged candidates (2026-10-12)
+# Decision: use only converged candidates, through a converged harness (2026-10-12)
 
-**Status:** foundation rule text on the owner's direction. The six repository rule surfaces change together in this
+**Status:** foundation rule text on the owner's directions. The six repository rule surfaces change together in this
 PR; the user-level files follow only after it lands (below). **Supersession:** none. This extends the existing
 "Decide by evidence" rule and replaces no record.
 
 ## The rule
 
-The sentence goes at the end of the third core bullet, "Decide by evidence", after "Keep measured results, simulations
-and untested boundaries distinct.":
+Two sentences go at the end of the third core bullet, "Decide by evidence", after "Keep measured results, simulations
+and untested boundaries distinct.", in this order:
 
 > Use only converged candidates: a tool, runtime, model or skill is installed, run or made a default only after the layer's own convergence passes it on quality and SOTA standing (a screen pass or a measured win); popularity, recency and vendor claims make a candidate a lead for that screen, never an admission.
 
-It is 310 UTF-8 bytes and 53 words, SHA256 `added1b0c16f135f79366df655b87eae5b80d04fb998a073c7cd19096a73e17a`; each copy
-grows by 311 bytes with its leading space.
+> Use models only through a converged harness with its full layers (skills, MCP, hook equivalents, memory and token efficiency, telemetry, isolation and roles, invoke receipts); a bare API call is for measurement probes and smokes only, recorded as such.
 
-## Basis
+| Sentence | UTF-8 bytes | Words | SHA256 |
+| --- | ---: | ---: | --- |
+| Converged candidates | 310 | 53 | `added1b0c16f135f79366df655b87eae5b80d04fb998a073c7cd19096a73e17a` |
+| Converged harness | 252 | 39 | `f91075feb66ac3aa83d8fe8df3a2cde36b61df05c453306b735a75153c32429f` |
+
+With one leading space each, every copy grows by 311 + 253 = 564 bytes.
+
+## Basis: the converged-candidates sentence
 
 - **The owner's direction, 2026-10-12, 19:57Z and 19:58Z** (paraphrased, not quoted): use only SOTA candidates that
   the current landscape's convergence has passed. It is a foundation rule: research-driven, and also about the
@@ -33,6 +39,20 @@ grows by 311 bytes with its leading space.
   (Decision, steps 1-3) already reads: the layer's catalog verdict and wave, and the latest sweep's survivors in
   `catalogs/saturation/ledger.json`.
 
+## Basis: the converged-harness sentence
+
+- **The owner's direction, 2026-10-12, 20:15Z** (paraphrased, not quoted): models are used only through a SOTA harness
+  with its full layers; a bare model without them is obsolete.
+- **The CC record.** The CC's runtime-worker roadmap ruling,
+  `~/.local/state/native-agent-stack/coordination/command-center/research-cc-role-20261008/ruling-runtime-roadmap-20261012.md`,
+  SHA256 `a0104adef843e4039586a2b909de5275501eea1fb407bfa7f453c72c7df107ca`, written on that direction (tool clock
+  20:16Z). Its "Rule" section states this rule for the foundation rules, in the same PR as the converged-candidates
+  rule. Its stage 2, "Fully harnessed", names the layers a runtime's receipt shows wired: hook equivalents, the
+  token-efficiency and memory layer, telemetry, effort on the wire and read-only roles. It is the CC's private record,
+  outside this repository, restated only as relied on here.
+- **What it extends.** The first sentence governs which harness is admitted; this one says a model runs only inside
+  one, so the harness's layers apply to every model call. "Converged harness" is a harness the first sentence admits.
+
 ## What it changes
 
 - **An install, an arm or a default needs the layer's convergence record**: a screen pass or a measured win on quality
@@ -41,14 +61,17 @@ grows by 311 bytes with its leading space.
   admit it.
 - **A candidate already in use without that record** enters the screen as a lead; a pass admits it only through a
   recorded supersession, as correction #192 did for its two arms.
+- **A model call runs inside a converged harness** with its listed layers. A bare API call is allowed only as a
+  measurement probe or a smoke, and its record says so.
 
 No tool, hook, check or runtime behavior changes in this PR, and it reopens no settled record.
 
 ## Surfaces
 
 The six always-loaded surfaces of `StandingRuleSurfacesTests.LAYERS` (`tests/test_install_claude_profile.py`) each hold
-the core once; all six now end the bullet with the sentence. Each changed line differs from main `7151664c9` only by the
-appended 311 bytes.
+the core once; all six now end the bullet with the two sentences. Each changed line differs from main `7151664c9` only
+by the appended 564 bytes. The first sentence landed in commit `7feb5fc1` and the second in the fast-forward commit after
+it, both regenerated the same way.
 
 | Surface | How it changes |
 | --- | --- |
@@ -56,7 +79,7 @@ appended 311 bytes.
 | `examples/claude-native/CLAUDE.md` (:7) | Source of the Claude user block, edited. |
 | `adoption/templates/codex.AGENTS.template.md` (:9) | Source of the Codex user block, edited. |
 | `adoption/scaffold/AGENTS.md` (:8) | Scaffold source, edited. `tests/test_scaffold_repo.py` keeps its top-rule block byte-identical to the Codex template's. |
-| `adoption/new-wsl/claude-user-instructions.md` (:7) | Generated by `python3 tools/adoption/new_wsl_client_config.py --write-blocks` at 20:03:42Z: "0 unit(s) ... left out". |
+| `adoption/new-wsl/claude-user-instructions.md` (:7) | Generated by `python3 tools/adoption/new_wsl_client_config.py --write-blocks` at 20:03:42Z and again at 20:18:13Z: "0 unit(s) ... left out" each time. |
 | `adoption/new-wsl/codex-user-instructions.md` (:9) | Generated by the same command. |
 
 Both carriers are byte-identical to their sources (`cmp` after the write).
@@ -80,56 +103,61 @@ it up when its installer or `managed_block.py` runs there.
 [The context-budget record](2026-10-05-harness-context-budget.md) requires a dated comparison before a fixed ceiling
 changes. The figures come from the test module's `startup_files()`, raw UTF-8 bytes including the markers.
 
-| Loaded file | Main `7151664c9` | This change |
-| --- | ---: | ---: |
-| Claude user block | 2,681 | 2,992 |
-| Codex user block | 3,102 | 3,413 |
-| `AGENTS.md` | 3,565 | 3,876 |
-| `CLAUDE.md` (Claude only) | 320 | 320 |
-| **Claude total** | 6,566 | 7,188 |
-| **Codex total** | 6,667 | 7,289 |
+| Loaded file | Main `7151664c9` | First sentence (`7feb5fc1`) | Both sentences |
+| --- | ---: | ---: | ---: |
+| Claude user block | 2,681 | 2,992 | 3,245 |
+| Codex user block | 3,102 | 3,413 | 3,666 |
+| `AGENTS.md` | 3,565 | 3,876 | 4,129 |
+| `CLAUDE.md` (Claude only) | 320 | 320 | 320 |
+| **Claude total** | 6,566 | 7,188 | 7,694 |
+| **Codex total** | 6,667 | 7,289 | 7,795 |
 
-- **Old ceilings:** 6,895 and 7,001 bytes. **New ceilings:** the new totals plus 5%, rounded up: 7,548 and 7,654
-  (`STARTUP_BUDGET_BYTES`).
-- **Required behavior:** the rule is a foundation rule, so it is always-loaded text in both clients and on every layer.
-- The Codex template's separate 8,192-byte check holds at 3,413 bytes.
+- **Old ceilings:** 6,895 and 7,001 bytes. **Ceilings at `7feb5fc1`:** 7,548 and 7,654. **New ceilings:** the final
+  totals plus 5%, rounded up: 8,079 and 8,185 (`STARTUP_BUDGET_BYTES`).
+- **Required behavior:** both are foundation rules, so they are always-loaded text in both clients and on every layer.
+- The Codex template's separate 8,192-byte check holds at 3,666 bytes.
 
 **Alternatives considered:**
 - **A pointer** to this record. Other projects lack this repository's paths, and a pointer keeps a foundation rule out
   of the startup context. Rejected.
-- **A new bullet.** The sentence applies "Decide by evidence" to admission; a fifth bullet would split one rule.
+- **A new bullet.** The sentences apply "Decide by evidence" to admission and use; a fifth bullet would split one rule.
   Rejected.
-- **A hook or check instead of text.** No current tool admits a candidate by itself, so there is no single call to
-  guard. The Overturn section names when enforcement moves there.
+- **A hook or check instead of text.** No current tool admits a candidate or routes a model call by itself, so there is
+  no single call to guard. The Overturn section names when enforcement moves there.
 
 ## Checks
 
 These are checks on repository text, pins and registration. They do not measure behavior.
 
-- **The new test fails first.**
-  `StandingRuleSurfacesTests.test_every_layer_and_renderer_ends_the_evidence_bullet_with_the_converged_candidates_sentence`
-  asserts the sentence once, at the end of the bullet and before the next one, on the six layers and in the outputs of
-  the two native block renderers and the scaffold renderer. Against the unedited surfaces at 2026-10-12T20:03:20Z it
-  failed with 9 failing subtests, rc 1. It passes after the edit and the regeneration.
-- **The discriminating control.** With the surfaces edited and the old `CORE`, `TOP_RULE_SHA256` and ceilings,
+- **The new test fails first, for each sentence.**
+  `StandingRuleSurfacesTests.test_every_layer_and_renderer_ends_the_evidence_bullet_with_the_converged_candidates_and_harness_sentences`
+  asserts each sentence once, both together at the end of the bullet and before the next one, on the six layers and in
+  the outputs of the two native block renderers and the scaffold renderer.
+  - First sentence: against the unedited surfaces at 2026-10-12T20:03:20Z it failed with 9 failing subtests, rc 1.
+  - Second sentence: extended with it, against the surfaces of `7feb5fc1` at 20:17:59Z, it failed with 9 failing
+    subtests, rc 1.
+
+  It passes after each edit and regeneration.
+- **The discriminating controls.** With the surfaces edited and the previous `CORE`, `TOP_RULE_SHA256` and ceilings,
   `StandingRuleSurfacesTests`, `PortableTopRuleTests`, `test_codex_worker_lane.TemplateTests` and `test_scaffold_repo`
-  ran 63 tests at 20:03:50Z: rc 1, 15 failures in the four core-equality tests, the Codex pin and the two budget tests
-  (Claude 7,188 and Codex 7,289 over the old ceilings). `test_scaffold_repo` passed, as the scaffold and template moved
-  together.
-- **The existing equality tests are updated, not loosened.** `CORE` now ends the bullet with the sentence.
-- **The Codex top-rule pin.** `TOP_RULE_SHA256` was re-derived with the module's own `template_segments()`: 2,607 UTF-8
-  bytes (2,296 plus 311), `185246275eb11ac0db957507f404a1612d0c462fca8744b12ab023c89ffa2b30`.
+  ran 63 tests, rc 1, with 15 failures each time: in the four core-equality tests, the Codex pin and the two budget
+  tests. At 20:03:50Z Claude 7,188 and Codex 7,289 bytes exceeded 6,895 and 7,001; at 20:18:14Z, 7,694 and 7,795
+  exceeded 7,548 and 7,654. `test_scaffold_repo` passed both times, as the scaffold and template moved together.
+- **The existing equality tests are updated, not loosened.** `CORE` now ends the bullet with both sentences.
+- **The Codex top-rule pin.** `TOP_RULE_SHA256` was re-derived with the module's own `template_segments()`: 2,860 UTF-8
+  bytes (2,296 plus 564), `c95b90ae90b6d8797acd365ac0839fdfaaff77c4b5950b30985b847fcccef9c9`.
 - **The module runs.** `tests.test_install_claude_profile`, `tests.test_managed_block`,
   `tests.test_new_wsl_client_config`, `tests.test_validate`, `tests.test_codex_worker_lane` and
-  `tests.test_scaffold_repo` in one idle-weight scope, 20:04:46Z to 20:08:40Z: `Ran 626 tests`, `OK (skipped=13)`.
+  `tests.test_scaffold_repo` in one idle-weight scope; on the first sentence, 20:10:54Z to 20:14:32Z: `Ran 626 tests`,
+  `OK (skipped=13)`. The run on both sentences is in the PR description.
 
 ## Overturn
 
 - A same-version A/B on an upstream harness (promptfoo for the gateway lanes, Harbor or Inspect for agent tasks) shows
   the added text raises startup cost without a measured gain in admission discipline. A shorter wording or a pointer then
   replaces it, through a new record that supersedes this one.
-- Recorded incidents show a candidate admitted without its layer's convergence record while this text is loaded. The
-  enforcement then belongs in a hook, check or workflow.
+- Recorded incidents show a candidate admitted without its layer's convergence record, or a bare model call used for
+  work, while this text is loaded. The enforcement then belongs in a hook, check or workflow.
 - The owner rewords the rule, or a client release changes how `CLAUDE.md` or `AGENTS.md` load or are sized.
 
 ## Limits
@@ -145,4 +173,5 @@ These are checks on repository text, pins and registration. They do not measure 
   one core on every layer, regeneration with `cmd_write_blocks` in `tools/adoption/new_wsl_client_config.py`, the pin
   re-derivation and the dated budget comparison.
 - **Convergence record:** [the layer-resolution protocol](2026-10-11-layer-resolution-protocol.md).
-- **CC record:** the addendum and correction #192 above, at the SHA256 given.
+- **CC records:** the harness-stack addendum with correction #192, and the runtime-roadmap ruling, at the SHA256s given
+  above.

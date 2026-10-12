@@ -1832,7 +1832,13 @@ class StandingRuleSurfacesTests(unittest.TestCase):
         "the layer's own convergence passes it on quality and SOTA standing (a screen pass or a measured win); "
         "popularity, recency and vendor claims make a candidate a lead for that screen, never an admission."
     )
-    CONVERGED_PLACED = ("untested boundaries distinct. " + CONVERGED + "\n- The ecosystem compounds:")
+    # The converged-harness sentence of the same date and record follows it at the end of the bullet.
+    HARNESS = (
+        "Use models only through a converged harness with its full layers (skills, MCP, hook equivalents, memory and "
+        "token efficiency, telemetry, isolation and roles, invoke receipts); a bare API call is for measurement probes "
+        "and smokes only, recorded as such."
+    )
+    CONVERGED_PLACED = ("untested boundaries distinct. " + CONVERGED + " " + HARNESS + "\n- The ecosystem compounds:")
     CORRECTION = (
         "When a claim or fix proves wrong, resolve it from the upstream primary source at the pinned version through "
         "the vendor's supported path, record the correction with its citation, and add a regression test that fails "
@@ -1852,7 +1858,7 @@ class StandingRuleSurfacesTests(unittest.TestCase):
         "agents' answers are leads to verify.\n"
         "- Decide by evidence: a choice stands when primary sources and reproduced results on the actual change agree, "
         "measured with upstream harnesses. Agreement, recency, popularity and incumbency are not evidence. Keep measured "
-        "results, simulations and untested boundaries distinct. " + CONVERGED + "\n"
+        "results, simulations and untested boundaries distinct. " + CONVERGED + " " + HARNESS + "\n"
         "- The ecosystem compounds: a request is a starting point, not a boundary. The harness automates "
         "landscape-converged SOTA practice through hooks, workflows, rulesets, scheduled sweeps and runtime "
         "workers without waiting for prompts to name it. Proceed where the evidence "
@@ -1936,7 +1942,7 @@ class StandingRuleSurfacesTests(unittest.TestCase):
                 self.assertEqual(text.count(self.COMPOUNDING), 1)
                 self.assertEqual(text.count(self.COMPOUNDING_PLACED), 1)
 
-    def test_every_layer_and_renderer_ends_the_evidence_bullet_with_the_converged_candidates_sentence(self):
+    def test_every_layer_and_renderer_ends_the_evidence_bullet_with_the_converged_candidates_and_harness_sentences(self):
         import new_wsl_client_config as cfg
         import scaffold_repo as scaffold
 
@@ -1947,6 +1953,7 @@ class StandingRuleSurfacesTests(unittest.TestCase):
         for surface, text in texts.items():
             with self.subTest(surface=surface):
                 self.assertEqual(text.count(self.CONVERGED), 1)
+                self.assertEqual(text.count(self.HARNESS), 1)
                 self.assertEqual(text.count(self.CONVERGED_PLACED), 1)
 
     def test_root_claude_md_loads_the_core_through_its_agents_md_import(self):
@@ -2323,8 +2330,9 @@ class PortableTopRuleTests(unittest.TestCase):
     # rounded up, gives 6895/7001.
     # The dated 2026-10-12 comparison (docs/decisions/2026-10-12-converged-candidates-only.md) adds 311 bytes (the
     # converged-candidates sentence and one space) to each of the two loaded core copies: 6566/6667 -> 7188/7289 bytes
-    # (Claude/Codex). The same +5%, rounded up, gives 7548/7654.
-    STARTUP_BUDGET_BYTES = {"claude": 7548, "codex": 7654}
+    # (Claude/Codex). The same +5%, rounded up, gives 7548/7654. The converged-harness sentence of the same record adds
+    # 253 more bytes to each copy: 7694/7795 bytes, so 8079/8185.
+    STARTUP_BUDGET_BYTES = {"claude": 8079, "codex": 8185}
     # The four rules of the core (2026-10-08): research before acting with named sources, upstream as the truth with
     # the check order, decisions by evidence measured with upstream harnesses, and the compounding ecosystem with the
     # recorded correction.
