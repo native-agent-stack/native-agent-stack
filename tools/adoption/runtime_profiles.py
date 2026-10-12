@@ -529,7 +529,8 @@ def render(profile: str, *, state: Path, home: Path, eco_root: Path, templates: 
                 "canonical_mcp_sources": [str(p.relative_to(ROOT)) if p.is_relative_to(ROOT) else str(p)
                                           for p in templates], "mcp_server_names": sorted(servers)}
     metadata["excluded_mcp_servers"] = excluded_servers
-    metadata["no_mcp"] = bool(no_mcp)
+    if no_mcp:
+        metadata["no_mcp"] = True
     metadata["auxiliary_root"] = str(auxiliary_root) if auxiliary_root else None
     metadata["tier1_input"] = str(tier1_input) if tier1_input else None
     metadata["tier1_slots"] = [s["layer_id"] for s in tier1["slots"]] if tier1 else []
