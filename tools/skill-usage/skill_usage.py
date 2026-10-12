@@ -251,7 +251,15 @@ def skill_doctor_argv(managed_paths=None) -> list:
     return list(SKILL_DOCTOR_ARGV)
 
 
-def run_skill_doctor(*, timeout: int = 30, runner=subprocess.run, managed_paths=None) -> dict:
+# One capture is about one core of CPU work, so its wall time follows the load of the host. Measured 2026-10-12 on Claude Code 2.1.296 (the account's store held 6,263 transcript files, 7.3 GB): 13 captures on a quiet
+# host took 17.2 to 20.1 s (median 18.5), 26.5 CPU seconds in 18.5 s, and 19.0 s with the process pinned to one CPU (start-up and hooks are about 2 s of it; the rest is the command's own work, over a store that was
+# not varied). On one CPU shared with two busy loops (three runnable threads per CPU) two captures took 57.7 and 61.9 s. The capture of 2026-10-11T16:13:49Z that hit the old 30 s limit ran at a 1 minute load of 175
+# on 64 CPUs (2.7 per CPU); over 7 days that load peaked at 201 (3.1 per CPU, about 58 s) and its 95th percentile was 111 (1.7 per CPU, about 32 s, already past 30 s). 300 s is five times the capture at the peak
+# and leaves room for the store to double during the trial (docs/decisions/2026-10-12-skill-invoke-rate-timer.md).
+DEFAULT_CLAUDE_TIMEOUT = 300
+
+
+def run_skill_doctor(*, timeout: int = DEFAULT_CLAUDE_TIMEOUT, runner=subprocess.run, managed_paths=None) -> dict:
     """Run skill_doctor_argv() (SKILL_DOCTOR_ARGV; without --strict-mcp-config on a host with a managed MCP config),
     stdin from /dev/null."""
     try:
@@ -2348,8 +2356,8 @@ def build_parser() -> argparse.ArgumentParser:
                                 help=f"Run '{shlex.join(SKILL_DOCTOR_ARGV)}' now (stdin from /dev/null; without "
                                      "--strict-mcp-config where a managed MCP config is deployed); refused "
                                      "unless total_cost_usd == 0 and num_turns == 0")
-    parser.add_argument("--claude-timeout", type=int, default=30, metavar="SECONDS",
-                         help="Timeout for --run-skill-doctor (default: 30)")
+    parser.add_argument("--claude-timeout", type=int, default=DEFAULT_CLAUDE_TIMEOUT, metavar="SECONDS",
+                         help=f"Timeout for --run-skill-doctor (default: {DEFAULT_CLAUDE_TIMEOUT}; a capture takes about 19 s on a quiet host and about 60 s at three runnable threads per CPU)")
     parser.add_argument("--codex-root", action="append", default=[], type=Path, metavar="DIR",
                          help="Root to scan for rollout-*.jsonl (repeatable; no default search: "
                               "omit entirely to report Codex as not-measured)")

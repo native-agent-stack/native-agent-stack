@@ -9,28 +9,47 @@ Pages and zero-use decisions use the de-inflated count; reads remain visible.
 
 ## Daily host and lane results
 
-`daily_skill_usage.py` runs the existing host report, Codex `--lanes` report and
-Claude `child-usage.mjs --lanes-sweep` with a common seven-day window. Its
-private output contains names/counts only, plus timestamps and measurement
-flags. Fleet reads `coordination/command-center/skills/skill-invoke-rate-latest.json`
+`daily_skill_usage.py` runs the existing native reports for one client at a time
+with a common seven-day window: `--half claude` the host report's `/skill-doctor`
+capture and Claude `child-usage.mjs --lanes-sweep`, `--half codex` the host
+report's Codex rollout scan and the Codex `--lanes` report. Each half is its own
+user unit with its own limits and its own record (`skill-invoke-rate-claude-latest.json`,
+`skill-invoke-rate-codex-latest.json`), whose `measured` holds only that half's
+keys, so a slow Codex scan (25 min 47 s on the host) never leaves the Claude half
+unmeasured and a timeout marks only its own half. After its record is written,
+a half refreshes the combined `skill-invoke-rate-latest.json` (`--combined-out`)
+from its own record and the other half's newest (`--other-record`). The private
+output contains names/counts only, plus timestamps and measurement flags. Fleet
+reads the combined `coordination/command-center/skills/skill-invoke-rate-latest.json`
 under its state root; it labels lifetime Claude host uses, windowed native
 Claude Skill calls and Codex skill-file reads separately.
 
-Render the timer for the selected live main clone into a review directory:
+Render the timers for the live clone into a review directory:
 
 ```sh
 python3 tools/skill-usage/daily_skill_usage.py \
   --render-units /tmp/skill-invoke-rate-units \
-  --repository <absolute-live-main-clone> \
+  --repository <absolute-live-clone> \
   --python /usr/bin/python3 --node <absolute-node-executable>
 ```
 
-The CC verifies/installs/enables these files after landing, following the
+This writes `skill-invoke-rate-claude.{service,timer}` (09:30 UTC, limit 17 minutes)
+and `skill-invoke-rate-codex.{service,timer}` (10:00 UTC, limit 63 minutes). The
+CC verifies/installs/enables these files after landing, following the
 existing user-timer procedure. Rendering does not load or start a unit.
-Live scheduled collection refuses a checkout whose branch is not main.
-Both transcript roots are explicit in the rendered service. Offline replay
-accepts `--host-report`, `--codex-lanes-report` and `--claude-lanes-report`
-captures; an omitted client remains UNKNOWN, with a nonzero run status.
+Live scheduled collection, and rendering, refuse a clone that is not at a
+commit of origin/main (`git merge-base --is-ancestor HEAD origin/main`): the
+live clone is a detached worktree of origin/main, so a branch name cannot be
+the test, while a feature branch or commits of the clone's own are refused.
+Each command has its own limit (`TIMEOUTS`, measured in
+docs/decisions/2026-10-12-skill-invoke-rate-timer.md): the `/skill-doctor`
+capture may take 300 s (`--claude-timeout`, default `skill_usage.py`
+`DEFAULT_CLAUDE_TIMEOUT`; about 19 s on a quiet host and about 60 s at three
+runnable threads per CPU), the Claude sweep 600 s, the host report's Codex scan
+600 s and the Codex lanes scan 3,120 s. The root of the half's own client is
+explicit in its service. Offline replay accepts `--host-report`,
+`--codex-lanes-report` and `--claude-lanes-report` captures (no `--half`: a
+combined projection); an omitted client remains UNKNOWN, with a nonzero run status.
 
 The official `claude-api@anthropic-agent-skills` entry stays a native plugin;
 it is checked against its registry commit and unchanged SKILL.md hash and is

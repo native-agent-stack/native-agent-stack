@@ -504,7 +504,7 @@ claim regressions retain their separate historical replay results above.
 The daily adapter now requires the native host report's Codex measurement
 flag, a configured root and at least one scanned rollout before projecting
 Codex invocation counts. The upstream native metadata is exposed by
-[`tools/skill-usage/skill_usage.py:702`](../../tools/skill-usage/skill_usage.py#L702).
+[`tools/skill-usage/skill_usage.py:710`](../../tools/skill-usage/skill_usage.py#L710).
 This follows the unavailable-root boundary in the existing Claude collector,
 [`child-usage.mjs:3537`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/1e6a49ffe8652918479e59bcb3751c0eb418e6d3/examples/claude-native/workflows/child-usage.mjs#L3537)
 at that retained source-binding base. With no scanned rollout, the daily report emits

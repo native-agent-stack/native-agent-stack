@@ -1,0 +1,20 @@
+# The Codex half of the daily skill record: the host report's Codex rollout scan (windowed use counts per skill) and the skill_usage.py --lanes report. The Claude Code half is
+# skill-invoke-rate-claude.service; each has its own timeouts and its own record, so this scan, which takes 25 min 47 s on the host, never leaves the Claude half unmeasured
+# and a timeout here marks only this half (docs/decisions/2026-10-12-skill-invoke-rate-timer.md).
+# Render @REPOSITORY@ to the live clone, %h/code/native-agent-stack-live, matching stack-currency.service: a detached worktree of origin/main, which
+# daily_skill_usage.py accepts (any commit of origin/main; it refuses a feature branch and commits of the clone's own, and so does --render-units).
+# Render @PYTHON@ and @NODE@ to installed interpreter paths:
+#   python3 tools/skill-usage/daily_skill_usage.py --render-units <dir> --repository %h/code/native-agent-stack-live --python <python> --node <node>
+# The CC installs this file after landing; the authoring lane runs fixture tests only. TimeoutStartSec exceeds the sum of the half's command limits
+# (daily_skill_usage.py half_budget; a test pins it): the host report's Codex scan 600 s, the lanes scan 3120 s (twice its measured wall), and a minute of margin.
+[Unit]
+Description=Daily native skill invocation report, Codex half
+
+[Service]
+Type=oneshot
+WorkingDirectory=@REPOSITORY@
+UMask=0077
+Nice=10
+Environment=PATH=%h/.local/bin:%h/.local/share/mise/shims:/usr/local/bin:/usr/bin:/bin
+TimeoutStartSec=63min
+ExecStart="@PYTHON@" "@REPOSITORY@/tools/skill-usage/daily_skill_usage.py" --half codex --node "@NODE@" --codex-root %h/.codex/sessions --window 7 --out %h/.local/state/native-agent-stack/coordination/command-center/skills/skill-invoke-rate-codex-latest.json --combined-out %h/.local/state/native-agent-stack/coordination/command-center/skills/skill-invoke-rate-latest.json --other-record %h/.local/state/native-agent-stack/coordination/command-center/skills/skill-invoke-rate-claude-latest.json
