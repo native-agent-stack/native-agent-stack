@@ -17287,8 +17287,8 @@
     },
     {
       "path": "catalogs/landscape/final-stack.json",
-      "sha256": "7266648a00bde5dcc4e3efb82aa1c909b52e3907032db1bc564d98d2afdadbc1",
-      "bytes": 301336
+      "sha256": "30b7b8523b5570f531a46d9eec2a997b40609f5230683a8a276d2dbacea0b74a",
+      "bytes": 308806
     },
     {
       "path": "catalogs/landscape/foundation.json",
@@ -60832,8 +60832,8 @@
     },
     {
       "path": "scripts/final_stack.py",
-      "sha256": "82742dea85a9d2f9c7579a1069947975b4033265cf55f1e1baa232d10767a317",
-      "bytes": 58071
+      "sha256": "2f2f10a188e88b400267bdceb7019c770456a054a454b0a2cf44d2c199cd4710",
+      "bytes": 58593
     },
     {
       "path": "scripts/freshness_propose.py",
@@ -61757,8 +61757,8 @@
     },
     {
       "path": "tests/test_final_stack.py",
-      "sha256": "7c19adf52dca4edbe006132bd740480c66c32fb26377c437c6f44253e3231dba",
-      "bytes": 60117
+      "sha256": "ab354a4cfb632bca25dc0c36bf8500d10323de65ac3c47d33aa8fdfb56f4270f",
+      "bytes": 62620
     },
     {
       "path": "tests/test_financial_data.py",
