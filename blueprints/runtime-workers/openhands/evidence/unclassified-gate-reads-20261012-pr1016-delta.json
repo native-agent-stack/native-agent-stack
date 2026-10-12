@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "kind": "gate_read_accounting_delta",
+  "date": "2026-10-12",
+  "source_commit": "d5e4d4a42942e062b4780419d8d2afcba2088152",
+  "baseline_path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261012-pr1016.json",
+  "baseline_sha256": "6df6bb62e1bde5843ba77a800af2e889a4affb1c4c4bb6389234697c2755df05",
+  "mode": "monitoring_only",
+  "added_by_script": {},
+  "removed_by_script": {},
+  "added_shapes": [],
+  "removed_shapes": [],
+  "added_locations": [],
+  "derived_count": 344,
+  "derivation": {
+    "source": "blueprints/runtime-workers/openhands/resolver/push_gate.py:derive_ci_protected",
+    "contract": "blueprints/runtime-workers/openhands/evidence/advisory-gate-deltas.md at 66584736c076873ca7e5898e3bd8111cca1a1447",
+    "method": "Native GitTree at source_commit supplies the complete new dated baseline. Relative additions and removals are empty because that baseline contains every observed read and shape.",
+    "interpretation": "Dated monitoring observation only; no permission or execution authority is added."
+  },
+  "read_classifications": [],
+  "removed_locations": []
+}
