@@ -29,7 +29,7 @@ endpoint; no custom Prometheus writer or credential-dependent collector is
 introduced or installed by this lane.
 
 Private source references are `coordination/cc-native-practice-20261009/w5_guard.py`
-(source SHA-256 `ce5a71d94df2dbc71b6585260804d637c13047fc5a3a15fe2db8c6e9ac9b8ef5`)
+private, not published (host state)
 and `coordination/api-actions-20261008/harness/common.py`
 (source SHA-256 `dc612c7342428ce44dc0feffbe5fc3849ac7f61641ef929f87158813e982c73a`), especially `totals`,
 `settle_unknown` and `void`. Only source and allowlisted ledger schema/amounts

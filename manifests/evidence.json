@@ -18452,8 +18452,8 @@
     },
     {
       "path": "docs/decisions/2026-10-06-native-lane-invocation-observability.md",
-      "sha256": "4e488b2e5f64c1b900fc3039518874821e125744178d840c8db9b1c3003f9cc6",
-      "bytes": 42956
+      "sha256": "e1ddf06c55898a97c7eda069a665ac46b643f8e04fa0b01a45a564946e5e41bc",
+      "bytes": 43365
     },
     {
       "path": "docs/decisions/2026-10-06-ns2604-native-dashboard-countability.md",
@@ -18662,8 +18662,8 @@
     },
     {
       "path": "docs/decisions/2026-10-10-claude-usage-observability.md",
-      "sha256": "32b69800063a3b4617443773b1042464a51537e99dbbdf95a96cff99adbc1e20",
-      "bytes": 16132
+      "sha256": "31d498eb7ee4067ae9ad1afe48d093f1d03b7dd42de93a9c40c4074593202ac6",
+      "bytes": 16084
     },
     {
       "path": "docs/decisions/2026-10-10-codex-lane-omniroute.md",
@@ -61474,6 +61474,11 @@
       "path": "tests/test_claude_spend_window.py",
       "sha256": "185c3e7e05f8ebde0fb70d25f24b7291672ec5036f492e005a8c89008e664401",
       "bytes": 5507
+    },
+    {
+      "path": "tests/test_claude_usage_citations.py",
+      "sha256": "a5d301906f8196f55dac986542bf56a3fe722c6ecf676393349b81a84a16a560",
+      "bytes": 2948
     },
     {
       "path": "tests/test_claude_usage_metrics.py",

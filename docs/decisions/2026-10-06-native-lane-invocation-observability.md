@@ -400,6 +400,11 @@ The Lanes MCP queries in `observability/lanes_dashboard.py`, `dashboard()` (the 
 the complete INVOKE-RATES report/panels remain separately prepared, not claimed
 deployed by this source table.
 
+File-plus-symbol references avoid dependence on a PR-branch commit after
+squash. Installed Git 2.53.0 documents that `--squash` creates the working
+tree and index state without recording `MERGE_HEAD`, permitting one new
+commit: [git/git v2.53.0, `Documentation/merge-options.adoc:119-127`](https://github.com/git/git/blob/67ad42147a7acc2af6074753ebd03d904476118f/Documentation/merge-options.adoc#L119-L127).
+
 The source-table critic corrected two allowlist-to-emission promotions in this
 amendment: retained `server` and `skill` keys are permissions, not evidence that
 the provider supplies them. The retained MCP metric read-back
