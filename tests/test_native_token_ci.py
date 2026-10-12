@@ -476,6 +476,81 @@ class NativeTokenCIContracts(unittest.TestCase):
                 self.assertNotIn(hashlib.sha256(guess.encode()).hexdigest(), digests)
         self.assertNotIn("raw_sha256", published)
 
+    def test_a_json_escaped_address_is_removed_from_every_published_form(self):
+        # The co-op's GPT read at 51f45b5d (P1): clean() read text only, so an address whose "@" a JSON escape hid
+        # (\u0040) was published, and a reader's json.loads gave it back. Each published JSON value is now judged as
+        # decoded, nested JSON in a string value too, and each digest is of the published bytes.
+        operator = "@".join(("first.last", "mail-host.com"))
+        escaped = json.dumps({"email": operator}).replace("@", "\\u0040")
+        nested = json.dumps({"text": escaped})  # a JSON string holding JSON whose "@" is escaped
+        lines = [escaped, nested]
+
+        def decoded(text, depth=0):
+            """Every string a reader can get back from text by decoding JSON, nested JSON included."""
+            found = [text]
+            if depth >= 4:
+                return found
+            for document in [text] + text.splitlines():
+                try:
+                    node = json.loads(document)
+                except ValueError:
+                    continue
+                stack = [node]
+                while stack:
+                    item = stack.pop()
+                    if isinstance(item, dict):
+                        stack.extend(list(item) + list(item.values()))
+                    elif isinstance(item, list):
+                        stack.extend(item)
+                    elif isinstance(item, str):
+                        found.extend(decoded(item, depth + 1))
+            return found
+
+        with tempfile.TemporaryDirectory() as directory:
+            run = self._new_run(Path(directory))
+            program = "import sys\n" + "".join(f"print({line!r})\nprint({line!r}, file=sys.stderr)\n" for line in lines)
+            run.command("prints-an-escaped-address", [sys.executable, "-c", program])
+            source = Path(directory) / "work" / "page.json"
+            source.write_text("\n".join(lines) + "\n")
+            run.artifact("page.json", source)
+            server = Path(directory) / "server.py"
+            server.write_text("import json, sys\n"
+                              "for line in sys.stdin:\n"
+                              "    message = json.loads(line)\n"
+                              "    if 'id' in message:\n"
+                              "        answer = json.dumps({'jsonrpc': '2.0', 'id': message['id'], "
+                              f"'result': {{'owner': {operator!r}, 'text': {escaped!r}}}}})\n"
+                              "        print(answer.replace('@', '\\\\u0040'), flush=True)\n")
+            ci.mcp_stdio_session(run, "mcp-prints-an-escaped-address", [sys.executable, str(server)],
+                                 [("initialize", {}), ("tools/list", {})], timeout=30)
+            published = (Path(directory) / "result" / "receipt.json").read_text()
+            retained = (Path(directory) / "result" / "page.json").read_bytes()
+        texts = decoded(published) + decoded(retained.decode())
+        self.assertGreater(len(texts), 10)
+        self.assertFalse(any(operator in text for text in texts), "a published value decodes to the address")
+        receipt = json.loads(published)
+        self.assertEqual(receipt["artifacts"]["page.json"]["retained_sha256"], hashlib.sha256(retained).hexdigest())
+        for entry in receipt["commands"]:
+            with self.subTest(command=entry["label"]):
+                for stream in ("stdout", "stderr"):
+                    self.assertEqual(entry[stream + "_sha256"], hashlib.sha256(entry[stream].encode()).hexdigest())
+        guesses = {"\n".join(lines) + "\n"} | {line + "\n" for line in lines}
+        guesses |= {json.dumps({"jsonrpc": "2.0", "id": number, "result": {"owner": operator, "text": escaped}}
+                               ).replace("@", "\\u0040") + "\n" for number in (1, 2)}
+        digests = set(re.findall(r"[0-9a-f]{64}", published))
+        for guess in guesses:
+            with self.subTest(guess=guess.replace("\\u0040", "<at>")[:40]):
+                self.assertNotIn(hashlib.sha256(guess.encode()).hexdigest(), digests)
+
+    def test_publish_leaves_plain_and_clean_json_text_as_clean_gives_it(self):
+        # Retained output keeps its bytes unless a decoded value hides something clean() removes.
+        with tempfile.TemporaryDirectory() as directory:
+            run = self._new_run(Path(directory))
+            for text in ('{"a": 1,\n  "b": "x\\u00e9"}\n', '{"a": 1}\n{"b": [true, null]}\n', "plain text, no JSON\n",
+                         "not json {\n", '"just a string"'):
+                with self.subTest(text=text[:20]):
+                    self.assertEqual(run.publish(text), run.clean(text))
+
     def test_clean_redacts_uuid_text(self):
         # Source: scripts/validate.py:PRIVATE_CONTENT, including case and embedded matches.
         # Assemble fabricated identifiers so the test source contains no private-content match.

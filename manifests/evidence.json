@@ -18862,8 +18862,8 @@
     },
     {
       "path": "docs/decisions/2026-10-11-email-address-publication-rule.md",
-      "sha256": "f7030180fb7231887471ca9dc095b2ecc2ccf55b2d711b100e0fa78c8ce210df",
-      "bytes": 17310
+      "sha256": "583a10fde587b655974910b22a1b391988d5fa01b26617f29bc70de9db805934",
+      "bytes": 21607
     },
     {
       "path": "docs/decisions/2026-10-11-final-stack-review-corrections.md",
@@ -60902,8 +60902,8 @@
     },
     {
       "path": "scripts/native_token_ci.py",
-      "sha256": "efac24d92c9c633a439c7f41c1e18e79d2591169e7e5a0356fd3ce93e26ca730",
-      "bytes": 118846
+      "sha256": "dbbea3dad9c2dbf96024b6db89e46389c1334e10f66c5ef7f07dc67f9e74bc6f",
+      "bytes": 120981
     },
     {
       "path": "scripts/new_wsl_profile.py",
@@ -60922,8 +60922,8 @@
     },
     {
       "path": "scripts/public_email_matches.json",
-      "sha256": "0b41c2d1ae48e191d667a8d61b9ccae0cc428f8ddff49572e75340bc3a87cda8",
-      "bytes": 3595
+      "sha256": "34a18525ded9b69c6016287683e94fee44a62185f8f388b686304a0025994025",
+      "bytes": 3632
     },
     {
       "path": "scripts/public_starred.py",
@@ -60982,8 +60982,8 @@
     },
     {
       "path": "scripts/validate.py",
-      "sha256": "31da1ecb13ad7746b186f1b95f96384750bc0361891592f8eeceeae03967996b",
-      "bytes": 47322
+      "sha256": "2cdede0da7d11ab72e477d6ba8d1603c45ce3837771079c595eeacfb18b9e59f",
+      "bytes": 47994
     },
     {
       "path": "scripts/validate_catalogs.py",
@@ -62202,8 +62202,8 @@
     },
     {
       "path": "tests/test_native_token_ci.py",
-      "sha256": "39de0c7429ed3a1e6380c08d71a6c49279c14153db9be9ace4088692d6423bfe",
-      "bytes": 121624
+      "sha256": "39ed44928824db814249fd9cb4d58b703ecb613c3e54c316435610c0f9242428",
+      "bytes": 126313
     },
     {
       "path": "tests/test_native_worker_fixture.py",
@@ -62707,8 +62707,8 @@
     },
     {
       "path": "tests/test_validate.py",
-      "sha256": "e66adb41192811c36e3349d002be7588dfa5de1b4a7a5c50ac8e572f9bc63710",
-      "bytes": 66449
+      "sha256": "f24d24f892532aa2308e89e0a0eda3dacf39cc97e2ae1937fdd0f8424129aefa",
+      "bytes": 68768
     },
     {
       "path": "tests/test_validate_shards.py",

@@ -11,10 +11,15 @@ address.
 
 It matches an RFC 5322 3.4.1 `addr-spec` whose local part is a dot-atom: every `atext` character
 of 3.2.3 and `.` (rfc5322.txt:679-690). The left boundary refuses the same characters, so a match
-never starts inside a longer local part. It ignores case, because DNS names are case-insensitive
-(RFC 4343). A local part needs a letter or a digit: one of symbols only (`` `@AGENTS.md` ``, a
-quoted `@import`) names no mailbox. That guard is this change's own, added when the wider class
-turned 16 code spans of Claude Code imports into matches. It does not match these forms:
+never starts inside a longer local part. It finds matches in any case; the reviewed list compares
+the domain without case (DNS names are case-insensitive, RFC 4343) and the local part as written
+(RFC 5321 2.4). A local part needs a letter or a digit, and the command center kept that guard:
+local parts made only of RFC 5322 atext symbols are not detected, though they are valid (CPython
+3.13.16's email parser accepts one); no observed instance is identity-bearing (`` `@AGENTS.md` ``,
+a quoted `@import`; 139 at main `900835c6`, none an address). The guard is this change's own,
+added when the wider class turned 16 code spans of Claude Code imports into matches. Until the
+GPT read at `51f45b5d` this paragraph said such a local part "names no mailbox", which is false.
+It does not match these forms:
 
 - GitHub's `users.noreply.github.com` commit addresses, and the `noreply@` commit
   identities of Anthropic (the Claude Code co-author trailer) and GitHub.
@@ -75,20 +80,28 @@ beside a listed one is refused. The waiver covers the email rule only, in the pu
 and in the host-receipt scan, where the raw receipt and each decoded JSON string are judged on
 their own. The publication scan reads raw text only, for every rule, so an address a JSON escape
 hides in another file meets the same boundary as an escaped home path there; host receipts are
-the files that are parsed. Every other pattern still applies. The loader refuses an entry that is not lower case
-or is listed twice. A test fails when an entry no tracked file but the registry carries, so a
+the files that are parsed. Every other pattern still applies. An entry is the reviewed spelling: its
+local part as written and its domain in lower case; the loader refuses any other form, or an entry
+listed twice. A spelling whose local part differs only in case is another match, with an entry of
+its own when a public source carries it (one public agreement carries two). A test fails when an entry no tracked file but the registry carries, so a
 dead entry cannot later waive a new address without review; the publication scan already refuses
 any match the list lacks, so the list and the tree agree exactly. A match is a whole dot-atom
 local part, so a listed address never waives a longer one that ends with it. At `e0862d8d` the rule
-matched 499 times in 93 tracked files (435 times in 92 outside the registry). At this head, on main
-`3a8a8461`, it matches 533 times in 106 files, and 455 times in 105 outside the registry.
+matched 499 times in 93 tracked files (435 times in 92 outside the registry). At `51f45b5d` it
+matched 532 times in 106 files and 454 times in 105 outside the registry; an earlier version of
+this sentence said 533 and 455, measured before that head's last edit. At the head that answers
+the GPT read of `51f45b5d`, on main `3a8a8461`, it matches 533 times in 106 files and 454 times
+in 105 outside the registry (`git ls-files`, each tracked file read as UTF-8, the rule's
+`finditer`).
 
 ## Consequences
 
 The tools that import `PRIVATE_CONTENT` now apply the rule to what they write. These are the
 landscape sweep (`sweep_common.py`; `convert.py` exits 3 on a residue match), the token-stack
 `bundle.py` and `counter_readings.py`. An upstream capture that carries a maintainer's or
-vendor's contact is refused there until it is reviewed. `scripts/native_token_ci.py` keeps its
+vendor's contact is refused there until it is redacted: those strict consumers, like
+`--scan-file`, do not read the reviewed list, which waives only the publication scan and the
+host-receipt scan. `scripts/native_token_ci.py` keeps its
 own copies of the rules it redacts (`REDACTIONS`), and now redacts addresses as `<EMAIL>`. A
 test holds each copy equal to its `validate.py` original. The PR-body gate (#991) maps its
 rules by name and, once landed, fails a test when `validate.py` has a rule it does not carry.
@@ -215,6 +228,43 @@ The rule is hand-written, and two rounds of reads found boundary defects in it. 
 center's research-queue row for one maintained, cited detector shared with #1012 covers this
 rule too; this change fixes the classes found.
 
+## After the GPT delta read at 51f45b5d (2026-10-12)
+
+The co-op's GPT read of the fix (Astra, CHANGES_REQUESTED) found two P1s and two P2s. The command
+center ruled them into one commit:
+
+- **P1-1, split.** The letter-or-digit guard stays, as the command center ruled at 03:26Z: no
+  observed symbol-only local part is identity-bearing, and an account name is always alphanumeric.
+  The record's and the comment's "names no mailbox" was false: CPython 3.13.16's parser accepts
+  such a local part (`Lib/email/_header_value_parser.py:1219`, `:1360`, `:1486`, `:1682` at
+  `cbc944f4`). It is restated as the residual above, in `validate.py`, the sanitizer's copy and the
+  pull request description.
+- **P1-2: a JSON escape hid an address from `Run.clean()`.** An address whose `@` was written
+  `\u0040` in a tool's JSON output passed `clean()`, which reads text, and a reader's `json.loads`
+  gave it back from the published receipt or artifact. `Run.publish()` now cleans each decoded key
+  and string value of JSON or JSON Lines text, nested JSON in a string value too, four levels
+  deep, and writes the document again only when a value changed; it serves every published
+  command argument, output stream, artifact, MCP request and answer digest. Each digest is of the
+  published bytes. `host_receipts.py` judges a receipt's decoded values the same way
+  (`:1434`, `:1445`).
+- **P2-3: the waiver lowered the local part.** A reviewed address with one letter of its local
+  part in upper case is a different mailbox (RFC 5321 2.4, rfc5321.txt:869: "the local-part of a
+  mailbox MUST BE treated as case sensitive"; CPython's `headerregistry.py:50`, `:53`, `:62`,
+  `:100` keep and compare it as written), yet it passed as the listed one. `email_key` keeps the
+  local part and lowers the domain, in the loader, the dead-entry check and the waiver. The
+  registry lists 79 spellings: 8 entries took the spelling the tree carries, and one public
+  agreement carries a contact in two spellings, now two entries.
+- **P2-4: the counts** were corrected above.
+- **P3s folded:** the strict consumers' wording above, and the receipt's limitation text, which now
+  says which digests are of published text. The rest are follow-ups in the pull request.
+
+Each regression fails on `51f45b5d` and passes here:
+
+- a JSON-escaped address, nested JSON too, in a command's output, an artifact and an MCP answer:
+  no published value decodes to it, and no digest matches the escaped text;
+- a local part's case variant, in the waiver, `validate()` and the dead-entry check, and a loader
+  that keeps an entry's spelling.
+
 ## SOTA sources
 
 All sources were read 2026-10-11 at 02:08Z unless noted. Each page's sha256 is over the bytes
@@ -246,6 +296,13 @@ fetched.
   (139,432 bytes; `e921eca62b7fcfb982287f952ac3bea0b7770b87d93f836e1eed602b88f44cad`).
 - Claude Code docs, memory, the `@path/to/import` syntax, <https://code.claude.com/docs/en/memory>
   (797,902 bytes; `32b6627d64c2f33966e5fd1d27998508a0b8204fe24655680477f6a062da2e67`).
+- RFC 5321 2.4, "the local-part of a mailbox MUST BE treated as case sensitive"
+  (rfc5321.txt:869), <https://www.rfc-editor.org/rfc/rfc5321.txt> (read 2026-10-12T05:06:37Z;
+  `7d560eddff1b213c17d4e1e5f95005728b2f05bc2b3947f0fcc91717c6707634`).
+- CPython v3.13.16 (`cbc944f4bc59639a444dd971c737788ba2283a91`, the local upstream mirror):
+  `Lib/email/_header_value_parser.py:1219` (`get_atext`), `:1360` (`get_dot_atom_text`), `:1486`
+  (`get_local_part`), `:1682` (`get_addr_spec`); `Lib/email/headerregistry.py:50`, `:53`, `:62`,
+  `:100` (the local part kept and compared as written).
 - Python 3.13 `re`, fixed-length lookbehind and `IGNORECASE`, the installed 3.13.16's
   documentation, <https://docs.python.org/3.13/library/re.html> (242,273 bytes;
   `19195ec76056c9b8088394ba81014ff47e1d4040a8eae092e450412f75f5c378`).

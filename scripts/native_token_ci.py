@@ -60,6 +60,8 @@ REDACTIONS = (
     ("local session identifier", re.compile(r"[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}", re.I), "<UUID>"),
     ("personal home path", re.compile(r"/(?:home|Users)/(?!example(?:/|\b))[A-Za-z0-9_.-]+(?:/|\b)"),
      "<HOME-EXAMPLE>"),
+    # Like its original, it leaves out local parts made only of RFC 5322 atext symbols (not detected; no observed
+    # instance is identity-bearing).
     ("email address", re.compile(
         r"(?<![\w.!#$%&'*+/=?^`{|}~-])(?![.!#$%&'*+/=?^_`{|}~-]*@)(?!noreply@(?:anthropic|github)\.com(?![\w-]|\.\w))"
         r"[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@"
@@ -617,7 +619,9 @@ class Run:
                        "RTK counters are fixture-local estimates, not provider savings",
                        "ccusage reads a committed synthetic usage log, not account history",
                        "No token-saving requirement: fidelity may need the larger representation",
-                       "Retained text replaces local paths; raw byte hashes precede sanitization"],
+                       "Retained text replaces local paths and private content, in JSON values as decoded too; "
+                       "command, artifact and MCP digests are of the published text, while the RTK exactness and "
+                       "Serena parity digests are of fixture output before sanitization"],
         }
         # A fresh allowlist excludes tokens, provider routing and inherited tool-state overrides.
         self.env = {key: os.environ[key] for key in ("PATH", "HOME") if key in os.environ}
@@ -694,6 +698,43 @@ class Run:
             value = pattern.sub(placeholder, value)
         return value
 
+    def publish(self, value: str, depth: int = 0) -> str:
+        """clean() for text this run publishes, and for JSON or JSON Lines text also each decoded key and string value,
+        so what a JSON escape hides (\\u0040 for "@") is removed too; a string value that is itself JSON is read the
+        same way, four levels deep. Text whose decoded values clean() leaves alone is returned as clean() gives it;
+        otherwise the document is written again from the cleaned values. host_receipts.py judges a receipt's decoded
+        values the same way."""
+        cleaned = self.clean(value)
+        if depth >= 4:
+            return cleaned
+
+        def walk(node):
+            if isinstance(node, str):
+                return self.publish(node, depth + 1)
+            if isinstance(node, list):
+                return [walk(item) for item in node]
+            if isinstance(node, dict):
+                return {walk(key): walk(item) for key, item in node.items()}
+            return node
+
+        def document(text: str) -> str:
+            try:
+                node = json.loads(text)
+            except ValueError:
+                return text
+            if not isinstance(node, (dict, list, str)):
+                return text
+            walked = walk(node)
+            if walked == node:
+                return text
+            return json.dumps(walked, ensure_ascii=False, indent=2 if "\n" in text.strip() else None)
+
+        whole = document(cleaned)
+        if whole is not cleaned:
+            return whole + "\n" * (len(cleaned) - len(cleaned.rstrip("\n")))
+        return "".join(document(line[:len(line.rstrip("\r\n"))]) + line[len(line.rstrip("\r\n")):]
+                       for line in cleaned.splitlines(keepends=True))
+
     def flush(self) -> None:
         (self.output / "receipt.json").write_text(json.dumps(self.report, indent=2) + "\n")
 
@@ -727,19 +768,19 @@ class Run:
             except subprocess.TimeoutExpired:
                 signal_group(process, signal.SIGKILL)
                 stdout, stderr = process.communicate()
-        entry = {"label": label, "argv": [self.clean(arg) for arg in argv],
+        entry = {"label": label, "argv": [self.publish(arg) for arg in argv],
                  "cwd": self.clean(str(cwd or self.work)), "exit_code": process.returncode,
                  "expected_exit": "any" if nonzero is None else "nonzero" if nonzero else "zero",
                  "timed_out": timed_out,
                  "elapsed_seconds": round(time.monotonic() - start, 3),
-                 "stdout": self.clean(stdout.decode("utf-8", errors="replace")),
-                 "stderr": self.clean(stderr.decode("utf-8", errors="replace"))}
+                 "stdout": self.publish(stdout.decode("utf-8", errors="replace")),
+                 "stderr": self.publish(stderr.decode("utf-8", errors="replace"))}
         # Digests of the published (sanitized) text only: a digest of the raw output would confirm what clean() took
         # out to anyone who can guess it.
         entry["stdout_sha256"] = digest(entry["stdout"].encode())
         entry["stderr_sha256"] = digest(entry["stderr"].encode())
         if env:
-            entry["env_overrides"] = {key: None if value is None else self.clean(value) for key, value in env.items()}
+            entry["env_overrides"] = {key: None if value is None else self.publish(value) for key, value in env.items()}
         self.report["commands"].append(entry)
         self.flush()
         require(not timed_out, f"{label}: timed out")
@@ -759,7 +800,7 @@ class Run:
 
     def artifact(self, name: str, source: Path) -> None:
         raw = source.read_bytes()
-        public = self.clean(raw.decode("utf-8")).encode()
+        public = self.publish(raw.decode("utf-8")).encode()
         (self.output / name).write_bytes(public)
         self.report["artifacts"][name] = {"retained_sha256": digest(public)}  # never a digest of the raw bytes
 
@@ -1356,8 +1397,8 @@ def mcp_stdio_session(run: Run, label: str, argv: list[str], requests: list[tupl
                         "result" in message or "error" in message):
                     break
             responses.append(line)
-            exchange.append({"request": run.clean(json.dumps(request)),
-                             "response_sha256": digest(run.clean(line.decode("utf-8", errors="replace")).encode())})
+            exchange.append({"request": run.publish(json.dumps(request)),
+                             "response_sha256": digest(run.publish(line.decode("utf-8", errors="replace")).encode())})
             if number == 1:
                 process.stdin.write(b'{"jsonrpc": "2.0", "method": "notifications/initialized"}\n')
                 process.stdin.flush()
@@ -1381,16 +1422,16 @@ def mcp_stdio_session(run: Run, label: str, argv: list[str], requests: list[tupl
                 process.wait()
         for reader in readers:
             reader.join(timeout=5)
-        entry = {"label": label, "argv": [run.clean(arg) for arg in argv], "cwd": run.clean(str(cwd or run.work)),
+        entry = {"label": label, "argv": [run.publish(arg) for arg in argv], "cwd": run.clean(str(cwd or run.work)),
                  "exit_code": process.returncode, "expected_exit": "any",
                  "timed_out": failure == "timed out waiting for an answer",
                  "elapsed_seconds": round(time.monotonic() - start, 3), "mcp_exchange": exchange,
-                 "stdout": run.clean(bytes(stdout).decode("utf-8", errors="replace")),
-                 "stderr": run.clean(bytes(stderr).decode("utf-8", errors="replace"))}
+                 "stdout": run.publish(bytes(stdout).decode("utf-8", errors="replace")),
+                 "stderr": run.publish(bytes(stderr).decode("utf-8", errors="replace"))}
         entry["stdout_sha256"] = digest(entry["stdout"].encode())
         entry["stderr_sha256"] = digest(entry["stderr"].encode())
         if env:
-            entry["env_overrides"] = {key: None if value is None else run.clean(value) for key, value in env.items()}
+            entry["env_overrides"] = {key: None if value is None else run.publish(value) for key, value in env.items()}
         run.report["commands"].append(entry)
         run.flush()
     require(failure is None, f"{label}: {failure}")

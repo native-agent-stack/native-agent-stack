@@ -187,7 +187,7 @@ class PublicationValidationTests(unittest.TestCase):
         from scripts import validate as validator_module
         relative = "evidence/artifacts/upstream-page.html"
         reviewed = {address("press", "upstream-vendor.com"): "fixture: an upstream page's contact"}
-        self.add(relative, "contact " + address("Press", "Upstream-Vendor.com") + "\n")
+        self.add(relative, "contact " + address("press", "Upstream-Vendor.com") + "\n")  # DNS names ignore case
         with patch.dict(validator_module.PUBLIC_EMAIL_MATCHES, reviewed):
             self.assertEqual(validate(self.root)["hashed_files"], 3)
         self.evidence["files"].pop()
@@ -215,6 +215,22 @@ class PublicationValidationTests(unittest.TestCase):
                     self.assertFalse(validator_module.unreviewed_email(text))
         relative = "evidence/artifacts/upstream-page.html"
         self.add(relative, "contact private!" + listed + "\n")
+        with patch.dict(validator_module.PUBLIC_EMAIL_MATCHES, reviewed):
+            with self.assertRaises(InvalidPublication) as refused:
+                validate(self.root)
+        self.assertIn(relative + ": contains possible email address", str(refused.exception))
+
+    def test_a_local_part_case_variant_is_not_waived(self):
+        # The co-op's GPT read at 51f45b5d (P2) and Codex's thread: the waiver lowered the whole match, so a local part
+        # differing only in case passed as the reviewed address. RFC 5321 2.4: "the local-part of a mailbox MUST BE
+        # treated as case sensitive"; only the domain is compared without case.
+        from scripts import validate as validator_module
+        relative = "evidence/artifacts/upstream-page.html"
+        reviewed = {address("press", "upstream-vendor.com"): "fixture: an upstream page's contact"}
+        with patch.dict(validator_module.PUBLIC_EMAIL_MATCHES, reviewed):
+            self.assertTrue(validator_module.unreviewed_email("contact " + address("Press", "upstream-vendor.com")))
+            self.assertFalse(validator_module.unreviewed_email("contact " + address("press", "UPSTREAM-VENDOR.COM")))
+        self.add(relative, "contact " + address("Press", "upstream-vendor.com") + "\n")
         with patch.dict(validator_module.PUBLIC_EMAIL_MATCHES, reviewed):
             with self.assertRaises(InvalidPublication) as refused:
                 validate(self.root)
@@ -1169,11 +1185,16 @@ class EmailAddressRuleTests(unittest.TestCase):
         self.assertEqual(module.PUBLIC_EMAIL_MATCHES, {})
         self.assertIn("email address", dict(module.PRIVATE_CONTENT))
 
-    def test_an_entry_must_be_lower_case_and_listed_once(self):
+    def test_an_entry_has_a_lower_case_domain_and_is_listed_once(self):
+        # The local part keeps its case (RFC 5321 2.4), so an entry is the reviewed spelling; its domain is lower case.
         from scripts.validate import load_public_email_matches
         with tempfile.TemporaryDirectory() as temporary:
             data = Path(temporary) / "public_email_matches.json"
-            for groups in ([{"reason": "r", "matches": [address("Press", "vendor.com")]}],
+            groups = [{"reason": "r", "matches": [address("Press", "vendor.com"), address("press", "vendor.com")]}]
+            data.write_text(json.dumps({"schema_version": 2, "groups": groups}), encoding="utf-8")
+            self.assertEqual(set(load_public_email_matches(data)),
+                             {address("Press", "vendor.com"), address("press", "vendor.com")})
+            for groups in ([{"reason": "r", "matches": [address("press", "Vendor.com")]}],
                            [{"reason": "r", "matches": [address("press", "vendor.com")]},
                             {"reason": "s", "matches": [address("press", "vendor.com")]}]):
                 with self.subTest(groups=len(groups)):
@@ -1212,6 +1233,12 @@ class EmailAddressRuleTests(unittest.TestCase):
         page = "contact " + address("press", "upstream-vendor.com") + "\n"
         self.assertEqual(unoccurring_email_matches({PUBLIC_EMAIL_REGISTRY: registry,
                                                     "evidence/artifacts/page.html": page}, listed), [])
+        # A spelling that differs in the local part's case is a different match; one in the domain's case is not.
+        for local, domain, dead in (("Press", "upstream-vendor.com", True), ("press", "Upstream-Vendor.COM", False)):
+            with self.subTest(local=local, domain=domain):
+                page = "contact " + address(local, domain) + "\n"
+                self.assertEqual(unoccurring_email_matches({"evidence/artifacts/page.html": page}, listed),
+                                 list(listed) if dead else [])
 
 
 if __name__ == "__main__":

@@ -51,10 +51,17 @@ def load_public_email_matches(path: Path) -> dict[str, str]:
     matches: dict[str, str] = {}
     for group in groups:
         for entry in group["matches"]:
-            if entry != entry.lower() or entry in matches:
-                raise ValueError(f"{path.name}: each entry must be lower case and listed once")
+            if entry != email_key(entry) or entry in matches:
+                raise ValueError(f"{path.name}: each entry is its reviewed spelling with a lower-case domain, listed once")
             matches[entry] = group["reason"]
     return matches
+
+
+def email_key(match: str) -> str:
+    """A match as the registry lists it: the local part as written, since RFC 5321 2.4 says "the local-part of a
+    mailbox MUST BE treated as case sensitive", and the domain in lower case, since DNS names ignore case (RFC 4343)."""
+    local, _, domain = match.rpartition("@")
+    return local + "@" + domain.lower()
 
 
 PUBLIC_EMAIL_REGISTRY = "scripts/public_email_matches.json"
@@ -84,7 +91,9 @@ PRIVATE_CONTENT = (
     ("bearer credential", re.compile(r"\bBearer\s+[A-Za-z0-9._~-]{30,}", re.I)),
     # An addr-spec (RFC 5322 3.4.1) whose local part is a dot-atom: every atext character (3.2.3) and ".", so a match
     # never starts inside a longer local part, and the left boundary refuses the same characters. A local part needs a
-    # letter or a digit: one of only symbols (`@AGENTS.md`, a quoted @import) names no mailbox. Exempt: GitHub's
+    # letter or a digit (the command center's ruling, 2026-10-12): local parts made only of RFC 5322 atext symbols are
+    # not detected, though they are valid (CPython 3.13.16's email parser accepts them); no observed instance is
+    # identity-bearing (`@AGENTS.md`, a quoted @import: 139 at main 900835c6, none an address). Exempt: GitHub's
     # users.noreply.github.com addresses, the noreply commit trailers of Anthropic and GitHub, the RFC 2606 reserved
     # names exactly (example.com, example.net, example.org and their subdomains, and the .test, .example, .invalid and
     # .localhost TLDs), and a systemd instance unit (systemd.unit(5): name@instance.service, the suffix a unit type
@@ -105,7 +114,7 @@ def unoccurring_email_matches(texts: dict, listed) -> list:
     """The listed matches that no text but the registry's own carries ({relative path: text}). The registry names every
     entry, so it never counts: an entry found only there is dead and would waive a later address unreviewed."""
     rule = dict(PRIVATE_CONTENT)["email address"]
-    found = {match.group(0).lower() for relative, text in texts.items() if relative != PUBLIC_EMAIL_REGISTRY
+    found = {email_key(match.group(0)) for relative, text in texts.items() if relative != PUBLIC_EMAIL_REGISTRY
              for match in rule.finditer(text)}
     return sorted(set(listed) - found)
 
@@ -113,9 +122,9 @@ def unoccurring_email_matches(texts: dict, listed) -> list:
 def unreviewed_email(content: str) -> bool:
     """Whether the email rule matches anything in content that PUBLIC_EMAIL_MATCHES does not list. A match is a whole
     dot-atom local part (the rule's class is every atext character), so a listed address glued to the end of a longer
-    local part (private!<listed>) is a different, unlisted match."""
+    local part (private!<listed>) is a different, unlisted match, and so is one whose local part differs in case."""
     rule = dict(PRIVATE_CONTENT)["email address"]
-    return any(match.group(0).lower() not in PUBLIC_EMAIL_MATCHES for match in rule.finditer(content))
+    return any(email_key(match.group(0)) not in PUBLIC_EMAIL_MATCHES for match in rule.finditer(content))
 
 
 class InvalidPublication(ValueError):
