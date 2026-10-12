@@ -1,151 +1,177 @@
 # Lane B deployments by readiness
 
-The deployment helper is glue around the existing paper engine. A deployment
-freezes source, configs, stage order and native units. The co-op issuer supplies
-fresh observations and writes single-use per-trial GOs when validity holds.
-Exploratory lane B needs no per-series authorization artifact; lane A's frozen
-qualification path remains unchanged.
+This helper composes the existing native paper engine. It adds frozen deployment
+metadata, explicit pass order, fresh account readiness and single-use dispatch;
+it implements no trading decision, order pricing or risk-limit engine. The co-op
+is the operational GO writer. Lane A's frozen code, journals and qualification
+records remain separate. Every public receipt is labelled paper_lane=B and
+evidence_class=exploratory, with relative artifact ids and hashes.
 
-Every published receipt carries paper_lane=B and evidence_class=exploratory.
-Artifacts use relative ids and hashes, with no account id or private home path.
-Native orders remain stocks, LIMIT/DAY on the paper endpoint, through
-credential_run inventory alpaca-paper. The helper adds no order implementation.
+## Scope and current limitations
 
-## Cut and register a session deployment
+This PR admits RTH and POST kinds only. PRE and intentional overnight require
+separately reviewed lifecycle work. At the current native producer pin, TIMES
+ends at10:00: the proposed16:05 POST mover recipe is REFUSED at build and verify,
+not presented as runnable. A reviewed producer capability and producer-to-helper
+integration receipt must precede enabling that rule. No earlier data is
+restamped. A supported POST kind alone does not establish a supported mover scan.
 
-Use the canonical managed runtime and a reviewed landed source pin. Keep scratch
-and test outputs under /var/tmp. These commands prepare artifacts; they do not
-install units, start services or write a GO.
+The first mover recipe is ONE setting at the code's existing ceiling:
+mover-max, canonical max-leverage4, gross40,000 USD, order10,000 USD,
+entry1,000 USD, five symbols, loss/drawdown100 USD, 100shares/notional.
+Every mover config, including custom aliases, must match this setting until
+a versioned sizing preset is registered. Native five-slot/exit-headroom10/order
+ceiling limits initial entries to at most5,000 USD before liquidity, share and
+regime restrictions. Report achieved exposure; no rung comparison is cut.
 
-    python paper_deployment.py cut --bundle NEW_DIRECTORY --deployment UNIQUE-ID --source-pin LANDED-COMMIT --order mover-max postmover-max
+RTH's rule is10:00|G20|V1000000|any, any_session, X3, end15:55 ET.
+The secondary16:05|G20|V1000000|any/end19:55 proposal is documented as unsupported
+by this producer, not selected by the historical study or this helper.
+Trials last1,200s, units bound runtime1,500s and cleanup900s; admission reserves
+runtime plus TWO stop-phase bounds. These are venue/protocol windows, no timers.
 
-Git archive is the source mechanism. The pin's own helper builds its configs;
-all source/config/unit bytes enter SHA256SUMS, verified with
-sha256sum --strict -c SHA256SUMS. Preserve the previous deployment and receipts.
-Do not patch a sealed packet in place.
+## Cut and state
 
-The first mover deployment uses ONE setting at the current code ceiling and
-reports achieved exposure. No rung trial is cut until the versioned sizing
-preset is registered; cut refuses the old rung templates. Their remaining
-coverage is synthetic config validation, not a production request.
-Built-in mover stages use the canonical leverage schedule, 1,200-second
-trials, 1,500-second unit runtime and 900-second cleanup bounds. Native
-load_mover_config validates every generated config. RTH uses
-10:00|G20|V1000000|any, any_session, X3 and trial end15:55 ET. POST uses
-16:05|G20|V1000000|any and trial end19:55 ET. These are venue/protocol admission
-boundaries, not calendar timers. Input observations must be fresh at each trial.
-PRE is supported through a native-validated custom stage specification.
+Use the reviewed landed source pin and canonical managed runtime:
 
-The request ceilings are conservative: native trial150 REST/minute and
-120 submits/minute, readiness-only Ledger50 REST/minute. Their rolling sum is
-at most200 REST; at least30 native slots remain outside the submit ceiling.
-These are ceilings, never request or fill targets. Other inventory users must
-coordinate with the co-op; an external process cannot be accounted for from
-this helper's ledger alone.
+    python paper_deployment.py cut --bundle NEW_DIRECTORY --deployment UNIQUE-ID --source-pin LANDED-COMMIT --order mover-max
 
-Current native mover MAX_SYMBOLS5 and EXIT_HEADROOM_FACTOR10, together with
-RiskLimits' per-order ceiling10,000 USD, limit each initial entry to at most
-1,000 USD. Five entries therefore total at most5,000 USD before the other
-liquidity/share/regime caps. Configuring a leverage rung does not prove it was
-attained; use the native achievement receipt. No safety ceiling is widened.
+Git archive preserves native source. The selected pin's helper validates configs.
+Every extracted file, including nested SHA256SUMS, enters the root manifest;
+ONLY root/SHA256SUMS is excluded from its own preimage. Source/config/unit files
+and the root manifest become read-only. Native strict checks and file-inventory
+checks detect edits and additional files. Installed digest pinning is a remaining
+pre-install hardening item; do not claim this same-user store authenticates an
+issuer against a malicious same-user process.
 
-Optional --stage-spec names a JSON mapping from custom stage id to:
+Only the approved canonical account exploratory root is admitted. Existing
+symlinks in the root or descendants are refused before reads/writes; bundle
+destinations inside the account or qualification roots are refused. New private
+directories use0700 and JSON/capability files0600. Unique atomic temporary files
+avoid an interrupted fixed-name write wedging a slot. Private account/capability
+files NEVER enter a public evidence packet.
 
-    {"engine_kind": "t22", "session_kind": "RTH", "config": "relative-config.json"}
+Native state remains the same exploratory/account-state journal across
+deployments. Raw config_file_sha256 freezes file bytes; native config_sha256
+uses exploration.config_digest(resolved,raw_bytes,limits=limits) when that
+reviewed API is present. Old native source uses raw hashes. Native config
+namespace and recovery bind the effective digest, never a raw/effective alias.
+Changing a finished native config requires the reviewed registration capability
+and fresh flat/account/cash/fee checks; before it lands changed-config orders
+are refused. Never create another DB to bypass continuity.
 
-The mapping accompanies --order. Its config is frozen and validated by native
-load_config/load_mover_config. T22 requires the reviewed caller's resolved _t22
-capability, exact factor bytes and t22_dispatch.validate_availability; older
-source refuses t22_dispatch_not_available. Relative factors_file bytes are
-copied and hash-bound. No old baseline dispatch fallback is accepted.
+A custom stage specification maps ids to engine_kind adaptive|mover|t22,
+session_kind RTH|POST and relative config file. T22 requires native resolved
+_t22, exact factor bytes and declared availability; an old source cannot
+silently fall back to baseline. No live-dir is passed. Multi-config deployments
+remain unusable at this base until the native rotation API lands.
+Factor availability gates only the selected T22 stage's issue/start, never
+bundle integrity or recovery. Expired inputs cannot disable cleanup or another
+stage. The caller's config-only require_t22_packet=False seam is used for
+integrity/recovery when available; admission uses full provenance loading and
+validate_stage for duration plus cleanup coverage. Custom T22 configs retain
+their own native share quantity. The first T22 cut still requires the reviewed
+landed caller, producer/source/receipt closure and a native composition witness;
+this branch does not deploy an unpublished caller or producer recipe.
 
-## Co-op issuer contract
+## Account readiness, pass order and dispatch
 
-All commands use the sealed source's paper_deployment.py (or its
-deployment_issue_go.py writer entrypoint), --bundle PACKET and
---state EXPLORATORY-ROOT. Stage and trial ids are explicit; trials match the
-native1–24 character contract.
+The co-op invokes the sealed helper with --bundle and --state:
+publish-scan; credential_run alpaca-paper observe; check; then issue.
+Stage/trial ids are explicit, native trial ids at most24 characters.
+--pass-id identifies the pass; when omitted a first trial's unique id is used.
+One durable sequence cursor admits only the next stage and latest predecessor.
+Issuing records a pending trial under the writer mutex; recovery advances only
+after its genuine flat handoff. An old but valid predecessor cannot authorize a
+new pass or another successor. Refused/unknown active state is never retried
+into a fabricated completion.
 
-1. For mover input, call publish-scan --stage STAGE --input-packet PRODUCER_DIR.
-   The producer supplies input.json, scan.json, ranked-100.json, commitment.json.
-   Commitment fields are paper_lane, evidence_class, config_sha256,
-   scan_sha256, ranked_sha256, input_sha256, code_sha256, observed_at
-   (original aware UTC ISO) and session_date.
-   Full ranked symbols contain exact native rows; scan symbols equal the first
-   at most5 rows. Native load_scan checks rule/date/freshness/ranks. The helper
-   retains content-addressed input bytes and publishes SCAN-READY.json only
-   after all hashes agree. Publishing a scan never writes GO.
-2. Invoke observe --stage STAGE --trial UNIQUE-TRIAL through the id-based
-   credential runner. This runtime-only worker performs native GET preflight,
-   acquires the native account writer mutex and repeats the observation.
-   It never submits/cancels orders. All requests use the native readiness Ledger.
-   It publishes deployments/ID/instances/TRIAL/readiness.json with the lane
-   labels, bundle/config/trial/session bindings, observation clock, flat arrays,
-   request count and native writer/preflight flags. No account identifier leaves
-   the observation. Native startup still rechecks full traded assets and quotes.
-3. Call deployment_issue_go.py check --stage STAGE --trial TRIAL
-   [--previous PREVIOUS-TRIAL], then issue with the same arguments immediately.
-   Account readiness must be no more than30 seconds old, never future. The
-   first stage requires a fresh proof too. Every later stage binds the exact
-   previous trial's native recovery output and handoff; it cannot use an old
-   pass's completed stage file. Its request window must have drained60 seconds.
-   The issuer may wait, then acquire a new fresh account proof.
-4. The writer validates manifest/config/native ceilings, current session and
-   full RuntimeMaxSec+cleanup headroom, fresh inputs, lane A unit/process
-   exclusion, no STOP/HOLD/active experiment and no pending/used token.
-   It fsyncs payload and audit before publishing GO.sha256 last.
-   Only the co-op issuer invokes issue in production; tests use SYN roots.
-5. The native path unit consumes the token once, rechecks all bindings and
-   calls paper through credential_run. The service's bounded stop hook performs
-   exact-config recover. Its own validation receipt is durable before an
-   unchanged service-owned STOP clears. Foreign STOP persists. Failed recovery
-   or nonflat proof retains the active binding and stops continuation.
+Observe makes native GET preflight, acquires the account writer lock and repeats
+it. The fingerprint and a random salt remain in0600 private state; only the
+salt-keyed account commitment appears in public readiness/GO bindings.
+Native child preflight compares the actual account to that private binding,
+including recovery, before engine dispatch. Account A's readiness cannot admit
+account B, even if B is flat and has an occupied namespace.
+Readiness is at most30s old, never future. Native startup rechecks positions,
+orders, assets, entitlements and quote freshness through its ordinary path.
 
-GO schema: schema_version, paper_lane, evidence_class, deployment, stage,
-trial, bundle_sha256, config_sha256, session_kind, session_date, issued_at,
-readiness_sha256, previous_trial, previous_handoff_sha256, scan_binding,
-order_sha256. The300-second GO TTL is separate from the30-second account proof
-and native quote age3 seconds. SCAN-READY binds schema_version, labels,
-deployment/stage/session/config, engine_scan_sha256, commitment_sha256,
-ranked_sha256, input_sha256 and original observed_at.
+The native child requires a parent-created, single-use capability tied to the
+consumed GO, active trial, account commitment, stage, config, session and expiry.
+The random capability crosses the credential runner through inherited stdin,
+never argv or environment. The public native spelling without this capability
+cannot reach the credential loader or engine. Native paper/recover/flat output
+remains private and masked until its labelled safe receipt is written.
 
-## State and installation
+Both issue and start check STOP, HOLD, active state, lane A inventory/processes,
+config/bundle, session headroom, account and scan bindings, the cursor and replay.
+A refused token is retired, retained and not silently reissued. Unit start limits
+bound repeated supervisor activation, including validation failure before run.
+STOP is the native safety.DEFAULT_STOP, never an arbitrary state.parent latch.
+Only the service's own unchanged STOP may clear AFTER its durable native flat
+validation; foreign or changed STOP remains. Recovery retains hook ownership
+on retries and waits boundedly for the writer lock. Unknown/missing output
+refuses; only native no_owned_trial_to_recover invokes the GET-only flat proof.
+Mover recover argv has no --trial; native engine exceptions produce fixed
+failure receipts. Completion timestamps are captured AFTER recovery, and the
+60s request drain includes the last account trial across passes/deployments.
 
-Use the standard account's exploratory root. Native state remains the SAME
-exploratory/account-state across deployments. Effective config namespaces are
-registered in that native account journal by the reviewed rotation API; never
-create a fresh DB to evade cash/fee/request history. Before that API lands, a
-same-config trial can run, but changed-config rotation is natively refused.
-Recover always uses the engine/config that owned the active trial.
+The account's native Ledger remains authoritative for orders/budgets. Readiness
+uses its own50 REST/min Ledger, native trial150 REST/min and120 submit/min caps;
+sum<=200 is conservative arithmetic, not an empirical throughput claim.
+Other processes/inventory users require coordination. The helper cannot prove
+their request history from its journal alone.
 
-With the co-op issuer stopped and all old trials recovered flat, disarm old
-deployment paths, verify no pending GO or active binding, install only the
-new sealed unit files, native-verify/reload, then enable and arm only the new
-paths. Do not run old and new watchers on the same slot. Retain journals,
-receipts, used tokens and writer locks. The co-op restarts its issuer on the
-new bundle. No calendar timer, manual GO, manual STOP or manual HOLD change.
+## Scan contract and clocks
 
-Counterbalanced order is a manifest input. A subsequent deployment has a new id,
-seal and per-trial ids but retains the native account journal. One account has
-one writer; sequential recovery and flat readiness remain mandatory.
+Producer files: input.json, scan.json, ranked-100.json, commitment.json.
+Commitment carries labels, raw config_file_sha256 (file-compatible config_sha256
+is accepted), effective_config_sha256, scan_sha256, ranked_sha256,
+input_sha256, code_sha256, observed_at=data cutoff,
+source_observed_at=acquisition and session_date. Original scan_time is preserved.
+input.source declares intraday mode, signal_cutoff_utc and observed_at acquisition.
+An omitted source uses the native fixed rule cutoff (09:30 maps09:28).
+Cutoff<=acquisition<=now and cutoff<=scan_time; scan_time need not precede
+acquisition. Both data and generation must be fresh. Morning protocol issuance
+is outside this RTH/POST helper's scope.
 
-## Sources and measured boundary
+Each artifact is read ONCE into bounded bytes, then hashed, parsed and retained.
+The full list's first at most5 native rows equal scan.symbols exactly.
+SCAN-READY publishes only after native schema/rule/rank/date/freshness and
+commitment checks. Every admission independently checks the RETAINED commitment
+against the retained bytes; startup copies the already-verified bytes, never
+an unchecked path reread. Publishing a scan writes no GO.
+Source closure/code provenance remains distinct from data freshness.
 
-- native-agent-stack d8f7e2051b61bde6361a85b64f41413798015353:
-  runner.py load_config/validate_preflight/main; mover.py load_mover_config,
-  load_scan/build_plan; safety.py Ledger/request_budget/account_lock_fingerprint;
-  transport.py preflight and its paper-only guarded SDK client. This helper
-  composes those mechanisms and does not modify their risk/order implementation.
-- alpacahq/alpaca-py cc4cb3b7ba50ae250e621983c2779047fb16bb28:
-  alpaca/trading/client.py get_orders107, get_all_positions235, get_account465;
-  the native transport remains the adapter to those official APIs.
-- systemd/systemd e846bbad04d87e58ba9c3e30d8a1087141691715:
-  man/systemd.path.xml PathExists; man/systemd.service.xml RuntimeMaxSec and
-  ExecStopPost; man/systemd.resource-control.xml CPUWeight.
+## Installation and follow-ups
 
-The regression seam is tests.test_paper_deployment: SYN filesystem roots,
-external native broker/dispatch seam intercepted, actual native config/scan
-validators and Ledger exercised. No credential or broker acceptance is claimed.
-Focused tests use the idle CPU scope during the paper window; broader suites
-also require the co-op suite queue. Source/config validation is distinct from
-real entitlement, fresh factor acquisition, fills, slippage and achieved leverage.
+No installation or operation from an unreviewed branch. Stop the issuer, recover
+the old writer flat, disarm old paths, verify no pending token/active binding,
+install the exact sealed units, native-verify/reload and arm only the new paths.
+Retain every old journal, receipt, token and lock. The co-op restarts its issuer
+on the new deployment. No manual GO, STOP or HOLD action.
+
+Remaining P3 triggers are recorded in the PR Follow-ups: installed digest pin and
+portable source/evidence captures; authenticated issuer custody if required;
+additional producer capabilities and live-view portability; migration of legacy
+unmarked journals; crash projection/retry integration with the reviewed rotation
+API; empirical broker entitlement, rate, slippage and attained exposure evidence.
+No native engine or safety ceiling is changed by this helper.
+
+## Sources and verification
+
+- Native engine atd8f7e2051b61bde6361a85b64f41413798015353:
+  runner.load_config/validate_preflight/main, mover.load_mover_config/load_scan,
+  safety.Ledger/account_lock_fingerprint, transport.preflight.
+- alpaca-py cc4cb3b7ba50ae250e621983c2779047fb16bb28:
+  alpaca/trading/client.py get_orders107/get_all_positions235/get_account465.
+- systemd e846bbad04d87e58ba9c3e30d8a1087141691715:
+  systemd.path.xml PathExists, systemd.service.xml ExecStopPost/RuntimeMaxSec,
+  systemd.resource-control.xml CPUWeight; unit commands reject unsupported path
+  characters rather than silently misparse whitespace or percent specifiers.
+
+Named regression modules use SYN roots, external native broker/dispatch seams
+intercepted, and actual native config/scan/parser/Ledger validation. The guard
+census mutates only in-memory copies and records each killed/surviving guard and
+the exact negative test, not a blanket coverage claim. Managed SDK runtime tests
+and archive-environment dependency skips are separate evidence. No new broker
+acceptance or strategy-performance claim is made.

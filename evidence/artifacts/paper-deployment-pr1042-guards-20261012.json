@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "paper_lane": "B",
+  "evidence_class": "synthetic",
+  "pr": 1042,
+  "review_head": "26561618b0465cd7f5d3cf4b130a09fc2ca79297",
+  "native_execution": "NOT_RUN",
+  "boundary": "Isolated SYN roots and account locks; broker, credential pointer and dispatch seams intercepted; no installed unit or production state action.",
+  "inputs_sha256": {
+    "blueprints/us-equities/adaptive-paper/paper_deployment.py": "c6404bb25b1eb8dfbde6cb82208c9eab8d151e75799fa28ccaa8c0d3365e082d",
+    "tests/test_paper_deployment.py": "8e177f56b20baf8e743101e58e5eef5f57ac5875603b76a45a596ecca72af3cc",
+    "tests/test_paper_deployment_guards.py": "a0147afbd4d269036819431aabdcaf5bdebef338669df74d383e542630086144",
+    "tests/paper_deployment_guard_census.py": "8479e0edeaa008e826c2340fd16c8351fc0db027b777d163680d050ef740479e"
+  },
+  "named_checks": [
+    {"modules": ["tests.test_paper_deployment", "tests.test_paper_deployment_guards", "tests.test_adaptive_paper_source_hashes_manifest"], "rc": 0, "tests": 73, "skips": 0},
+    {"modules": ["tests.test_paper_deployment", "tests.test_paper_deployment_guards", "tests.test_adaptive_paper_mover", "tests.test_adaptive_paper_runner"], "rc": 0, "tests": 332, "note": "Before final additional SYN cases; native engine modules unchanged."},
+    {"command": "scripts/validate.py", "rc": 0, "components": 70, "hashed_files": 11795, "profiles": 4, "receipts": 239}
+  ],
+  "published_head_fail_first": {"tests": 40, "assertion_failures": 11, "api_shape_errors": 10, "already_passing": 19, "output": "pr1042-baseline-new-guards-red2.log", "output_sha256": "3ede5de708d5081199ef2ec3b68509a9cb02975f61196664a0381c4ebf8844ae", "note": "No blanket claim that all new cases fail at the old head; API errors are distinct from assertion regressions."},
+  "separate_fail_first": [
+    {"case": "public native bypass", "red_output": "pr1042-B1-red2.log", "red_sha256": "672071c3f0e6da5bdaeb12edf64faa8c2b987d7f7a4945ee45dcd0553e9fa7ee"},
+    {"case": "mover recovery parser, STOP retry and finish time", "red_output": "pr1042-B2-B10-red.log", "red_sha256": "b930e3e5d55c29590fde131409fb47f1990583e4f362e93be5167f5dfc5606ed"}
+  ],
+  "census_command": "systemd-run --user --scope -p CPUWeight=idle env TMPDIR=/var/tmp PY -E -s -B -m tests.paper_deployment_guard_census --mode MODE --start 0 --count COUNT --output OUTPUT",
+  "interpreter": "PY denotes the managed runtime interpreter; paths and native account identities are not portable evidence.",
+  "censuses": [
+    {"mode": "guards", "rc": 0, "baseline_passed": true, "baseline_tests": 52, "killed": 131, "survived": 0, "unmapped": 0, "output": "pr1042-staged-guards.json", "output_sha256": "9cb57677d5c4cd458cab687cb0ae9555c6b25e8cc4ffed4cc8f3b5ff88057e6a"},
+    {"mode": "calls", "rc": 0, "baseline_passed": true, "baseline_tests": 52, "killed": 22, "survived": 0, "unmapped": 0, "output": "pr1042-staged-calls.json", "output_sha256": "87ae3d45eeeb365dc25b83c640c3f57a790887ff0a5a2cdd736ed6e34fb5b0e4"},
+    {"mode": "flat", "rc": 0, "baseline_passed": true, "baseline_tests": 52, "killed": 12, "survived": 0, "unmapped": 0, "output": "pr1042-staged-flat.json", "output_sha256": "7b5f05566c0eaa7c6c8f6c27ffd885b4f2a335757d574391f1bf002516f50c61"},
+    {"mode": "group", "rc": 0, "baseline_passed": true, "baseline_tests": 52, "killed": 1, "survived": 0, "unmapped": 0, "output": "pr1042-staged-group.json", "output_sha256": "3157574fdffe6412e7e9c7aeef8aa17c070b680fe2b1aeaf87c9edb30deee82e"},
+    {"mode": "operands", "source_sha256": "22477732ba40c0f24e957f59ab63242bea88df6357369579bcb1957f9f3d8e84", "rc": 0, "baseline_passed": true, "baseline_tests": 51, "killed": 94, "survived": 62, "unmapped": 0, "output": "pr1042-operand-census.json", "output_sha256": "12222535014b0c195d5d6e53825995805929898797c60c67bfd252ab8e1bd93c", "note": "Earlier-source exploratory finer compound-operand coverage probe; survivors remain survivors, not certified equivalents or all-killed evidence. This does not certify current-source operand coverage."}
+  ],
+  "scope": "Whole explicit Refused guards, protected call and mutex deletions, native flat-proof assignments/operands, grouped whole-guard deletion. The operand probe is separate. Every full local output retains line/function/mutation and the exact failing test; hashes bind those retained outputs.",
+  "reproducibility": "Current-source guard/call/flat/group runs use the checked-in harness and start with a green 52-case baseline. Earlier-source operand probe is explicitly distinguished. The census emits per-mutant results without editing source or production state. Synthetic sensitivity is not broker acceptance or a universal safety proof."
+}
