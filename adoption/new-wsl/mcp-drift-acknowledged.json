@@ -1,0 +1,97 @@
+{
+  "schema": "native-agent-stack/mcp-template-drift-acknowledged/v1",
+  "about": "The differences between the committed new-WSL MCP templates and the servers the account's clients have registered that a decision record accepts, for the distribution's first host. Run it with the authorization settings rendered, as this host applies them: python3 tools/adoption/mcp_template_drift.py --with-authorization-settings --acknowledged adoption/new-wsl/mcp-drift-acknowledged.json (exit 0 while only these differences remain, 1 on any other difference or on an entry below that no longer matches). Each entry names the client, the server, the kind of row and, for DIFFERS, the exact fields; a reason; and the record that carries the evidence. Stored client configuration is changed by the command center on a reviewed diff, never by this file.",
+  "acknowledged": [
+    {
+      "client": "claude",
+      "name": "agentsview",
+      "row": "LIVE-ONLY",
+      "reason": "the command center ruled on 2026-10-12 that agentsview stays out of the templates; it is registered on this host only",
+      "source": "docs/decisions/2026-10-12-mcp-template-live-reconciliation.md#servers-that-stay-out-of-the-templates"
+    },
+    {
+      "client": "claude",
+      "name": "grafana",
+      "row": "LIVE-ONLY",
+      "reason": "stays out until draft #807 decides the Grafana server's slot; registered read-only (--disable-write) on this host",
+      "source": "docs/decisions/2026-10-12-mcp-template-live-reconciliation.md#servers-that-stay-out-of-the-templates"
+    },
+    {
+      "client": "claude",
+      "name": "hindsight",
+      "row": "LIVE-ONLY",
+      "reason": "the research-memory unit of this host stays out of the templates; its loopback route accepts any Origin (research row sent to the owner)",
+      "source": "docs/decisions/2026-10-12-mcp-template-live-reconciliation.md#servers-that-stay-out-of-the-templates"
+    },
+    {
+      "client": "codex",
+      "name": "hindsight",
+      "row": "LIVE-ONLY",
+      "reason": "as for Claude Code: the research-memory unit of this host stays out of the templates",
+      "source": "docs/decisions/2026-10-12-mcp-template-live-reconciliation.md#servers-that-stay-out-of-the-templates"
+    },
+    {
+      "client": "codex",
+      "name": "promptfoo",
+      "row": "LIVE-ONLY",
+      "reason": "wired for Claude Code in this change (the ruling names the Claude template); the Codex entry forwards a gateway key by name and is a separate decision",
+      "source": "docs/decisions/2026-10-12-mcp-template-live-reconciliation.md#promptfoo"
+    },
+    {
+      "client": "claude",
+      "name": "headroom",
+      "row": "DIFFERS",
+      "fields": ["args"],
+      "reason": "the template's --proxy-url port 1 is a closed-port placeholder; the live proxy listens on a host port that stays out of the shared templates",
+      "source": "docs/decisions/2026-10-12-mcp-template-live-reconciliation.md#values-that-differ"
+    },
+    {
+      "client": "codex",
+      "name": "headroom",
+      "row": "DIFFERS",
+      "fields": ["args"],
+      "reason": "as for Claude Code: the live proxy port is a host value",
+      "source": "docs/decisions/2026-10-12-mcp-template-live-reconciliation.md#values-that-differ"
+    },
+    {
+      "client": "claude",
+      "name": "socraticode",
+      "row": "DIFFERS",
+      "fields": ["args", "command", "env"],
+      "reason": "the live server runs SocratiCode 1.16.0 through npx with an auto-resume and a collection prefix; the template names 1.15.0 and its node entry point; versions stay with the version owner",
+      "source": "docs/decisions/2026-10-12-mcp-template-live-reconciliation.md#values-that-differ"
+    },
+    {
+      "client": "codex",
+      "name": "socraticode",
+      "row": "DIFFERS",
+      "fields": ["args", "env"],
+      "reason": "as for Claude Code: the version and its environment belong to the version owner",
+      "source": "docs/decisions/2026-10-12-mcp-template-live-reconciliation.md#values-that-differ"
+    },
+    {
+      "client": "codex",
+      "name": "chrome-devtools",
+      "row": "DIFFERS",
+      "fields": ["enabled"],
+      "reason": "the live Codex entry is disabled (enabled = false), a host choice kept in stored client configuration",
+      "source": "docs/decisions/2026-10-12-mcp-template-live-reconciliation.md#values-that-differ"
+    },
+    {
+      "client": "codex",
+      "name": "codebase-memory-mcp",
+      "row": "DIFFERS",
+      "fields": ["env_vars"],
+      "reason": "the live entry forwards CBM_CACHE_DIR and CBM_RUNTIME_DIR by name and the host owns their values; whether the template forwards them is open",
+      "source": "docs/decisions/2026-10-12-mcp-template-live-reconciliation.md#values-that-differ"
+    },
+    {
+      "client": "codex",
+      "name": "jcodemunch",
+      "row": "DIFFERS",
+      "fields": ["enabled_tools"],
+      "reason": "the template limits Codex to the three front-door tools (menu, order, route); the live entry lists none and so exposes every tool; changing it is the command center's act on stored configuration",
+      "source": "docs/decisions/2026-10-12-mcp-template-live-reconciliation.md#values-that-differ"
+    }
+  ]
+}
