@@ -19,11 +19,11 @@ import sys
 import tempfile
 import re
 
-from runtime_profiles import ROOT, PROFILES, ROLE_SCOPES, private_write, profile_environment, utc, choose_slot
+from runtime_profiles import ROOT, PROFILES, ROLE_SCOPES, private_write, profile_environment, utc, choose_slot, child_environment
 
 
 def native(command, *, env, cwd, input=None, seconds=180):
-    with tempfile.TemporaryFile(mode="w+") as output, tempfile.TemporaryFile(mode="w+") as errors:
+    with tempfile.TemporaryFile(mode="w+", dir="/var/tmp") as output, tempfile.TemporaryFile(mode="w+", dir="/var/tmp") as errors:
         try:
             result = subprocess.run(command, env=env, cwd=cwd, input=input, text=True,
                                     stdout=output, stderr=errors, timeout=seconds)
@@ -117,7 +117,7 @@ def check(args, profile):
     # Our non-secret descriptor is explicit input, not native config/auth.
     descriptor = json.loads((root / "profile.json").read_text())
     aux = Path(descriptor["auxiliary_root"]) if descriptor.get("auxiliary_root") else None
-    env = {**os.environ, **profile_environment(profile, args.state_root, args.role_scope, aux)}
+    env = child_environment(profile_environment(profile, args.state_root, args.role_scope, aux))
     env["CONTEXT_MODE_PROJECT_DIR"] = str(args.workspace)
     env["CLAUDE_PROJECT_DIR"] = str(args.workspace)
     if descriptor.get("skills_bin"):
@@ -135,7 +135,7 @@ def check(args, profile):
                             "--only", "ANTHROPIC_API_KEY", "--", "env",
                             *[key + "=" + value for key, value in profile_environment(profile, args.state_root, args.role_scope, aux).items()],
                             *auth_command]
-        auth_code, auth_output = native(auth_command, env=os.environ if slot else env, cwd=args.workspace)
+        auth_code, auth_output = native(auth_command, env=child_environment(loader=True) if slot else env, cwd=args.workspace)
         auth = {"native_check": "pi auth check --json --no-refresh", "exit_code": auth_code,
                 "credential_loader_id": slot, "ready": auth_code == 0, "inference_required": True}
     if runtime == "pi":

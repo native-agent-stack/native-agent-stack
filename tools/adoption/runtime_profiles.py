@@ -113,6 +113,25 @@ def utc() -> str:
     return subprocess.check_output(["date", "-u", "+%Y-%m-%dT%H:%M:%SZ"], text=True).strip()
 
 
+def child_environment(overrides=None, *, loader=False) -> dict:
+    """Explicit subprocess environment; never enumerate inherited credentials.
+
+    Python subprocess's env replaces inheritance. The Console loader alone
+    keeps XDG_STATE_HOME for its own inventory lookup; its selected injection
+    remains credential_run.py's job. No auth variable or pointer is inspected.
+    containers/bubblewrap@124c4cdf:bwrap.xml:230 describes the equivalent
+    --clearenv control; the subprocess env applies before namespace creation.
+    """
+    names = ("HOME", "PATH", "LANG", "LC_ALL", "LC_CTYPE", "TZ", "TERM", "COLORTERM")
+    if loader:
+        names += ("XDG_STATE_HOME",)
+    environment = {name: os.environ[name] for name in names if name in os.environ}
+    environment.setdefault("PATH", os.defpath)
+    environment["TMPDIR"] = "/var/tmp"
+    environment.update(overrides or {})
+    return environment
+
+
 def owned_destination(path: Path):
     """Refuse symlink traversal and protected client roots before any write."""
     path = path.absolute()
@@ -332,6 +351,7 @@ def profile_environment(profile: str, state: Path, role_scope: str | None = None
     # runtime platforms. Its standalone DB uses DIR while adapter sessions
     # and memory use DATA_DIR: keep both plus its config root profile-private.
     telemetry.update(CLAUDE_CONFIG_DIR=str(root / "claude"),
+                     TMPDIR=str(root / "tmp"),
                      CONTEXT_MODE_DATA_DIR=str(root / "context-state"),
                      CONTEXT_MODE_DIR=str(root / "context-state/context-mode"),
                      CONTEXT_MODE_PLATFORM="pi" if profile.startswith("pi-") else "opencode")
@@ -372,7 +392,7 @@ def profile_environment(profile: str, state: Path, role_scope: str | None = None
 def render(profile: str, *, state: Path, home: Path, eco_root: Path, templates: list[Path],
            pi_bin: Path, opencode_bin: Path, rtk_source: Path, wsl=False, role_scope=None,
            auxiliary_root: Path | None = None, tier1_input: Path | None = None,
-           skills_bin: Path | None = None):
+           skills_bin: Path | None = None, resume=False):
     if profile not in PROFILES:
         raise ProfileError("unknown profile")
     tier1 = None
@@ -386,11 +406,29 @@ def render(profile: str, *, state: Path, home: Path, eco_root: Path, templates: 
                 or len(tier1.get("slots", [])) != 13):
             raise ProfileError("canonical Tier1 input differs from managed manifest")
     runtime, route = profile.split("-")
+    # Persist exactly the absolute spelling admitted below. Do not resolve a
+    # relative spelling again after switching into a fresh worktree.
+    pi_bin, opencode_bin = pi_bin.resolve(), opencode_bin.resolve()
     qualified_version = verify_runtime_binary(runtime, pi_bin if runtime == "pi" else opencode_bin)
     destination = owned_destination(state / profile)
     if role_scope:
         destination = destination / "roles" / role_scope
     if destination.exists():
+        if resume:
+            descriptor = destination / "profile.json"
+            if descriptor.is_symlink() or not descriptor.is_file():
+                raise ProfileError("resume requires an owned preparation descriptor")
+            metadata = json.loads(descriptor.read_text())
+            if (metadata.get("prepared_by") != "native-agent-stack.runtime_profiles"
+                    or metadata.get("profile") != profile or metadata.get("role_scope") != role_scope
+                    or metadata.get(runtime + "_bin") != str(pi_bin if runtime == "pi" else opencode_bin)
+                    or metadata.get("runtime_version") != qualified_version
+                    or metadata.get("rtk_source") != str(rtk_source.resolve())
+                    or metadata.get("status") not in {"preparing", "trial"}):
+                raise ProfileError("resume preparation identity differs; state retained")
+            if metadata["status"] == "trial":
+                return {"profile": profile, "status": "trial", "already_prepared": True}
+            return finish_prepare(profile, state, destination, metadata, rtk_source, role_scope)
         raise ProfileError("use a new profile state root; existing runtime state is preserved")
     if wsl:
         servers = render_wsl_mcp(home, eco_root)
@@ -505,7 +543,8 @@ def render(profile: str, *, state: Path, home: Path, eco_root: Path, templates: 
         # Keep the same SKILL.md sources, loaded through OpenCode's native
         # Agent Skills paths; no copied skills or rewritten skill bodies.
         private_write(destination / "config/opencode/opencode.json", json.dumps(config, indent=2) + "\n")
-    metadata = {"schema_version": 1, "profile": profile, "role_scope": role_scope, "status": "trial",
+    metadata = {"schema_version": 1, "profile": profile, "role_scope": role_scope, "status": "preparing",
+                "prepared_by": "native-agent-stack.runtime_profiles", "rtk_source": str(rtk_source.resolve()),
                 "model": CLAUDE_MODEL if route == "claude" else GPT_MODEL,
                 "effort": "xhigh" if route == "claude" else "high",
                 "pi_bin": str(pi_bin), "opencode_bin": str(opencode_bin), "runtime_version": qualified_version,
@@ -522,14 +561,26 @@ def render(profile: str, *, state: Path, home: Path, eco_root: Path, templates: 
     if role_scope and ROLE_SCOPES[role_scope][1]:
         metadata["skill_sources"].update({name: "obra/superpowers@" + SUPERPOWERS for name in SUPERPOWERS_SKILLS})
     private_write(destination / "profile.json", json.dumps(metadata, indent=2) + "\n")
+    return finish_prepare(profile, state, destination, metadata, rtk_source, role_scope)
+
+
+def finish_prepare(profile, state, destination, metadata, rtk_source, role_scope):
+    """Resume supported installers in place; publish readiness only on success.
+
+    Unrelated/pre-existing files are never deleted. Python os.replace atomically
+    promotes only our descriptor, after all vendor installation steps succeed.
+    """
+    runtime = profile.split("-")[0]
+    pi_bin = Path(metadata["pi_bin"])
+    token_environment = profile_environment(profile, state, role_scope)
     # The unchanged vendor bootstrap also normalizes its own package files.
     # A private native npm install keeps that write surface inside the profile.
     # scripts/postinstall.mjs:211-227 at6f0cc684 writes host HOME otherwise;
     # npm's documented --ignore-scripts disables that install hook.
-    install_env = {**os.environ, **token_environment,
+    install_env = child_environment({**token_environment,
                    "npm_config_cache": str(destination / "vendor/npm-cache"),
                    "npm_config_devdir": str(destination / "vendor/node-gyp"),
-                   "TMPDIR": str(destination / "tmp")}
+                   "TMPDIR": str(destination / "tmp")})
     subprocess.run(["npm", "install", "--no-audit", "--no-fund", "--ignore-scripts", "--prefix",
                     str(destination / "vendor/context-mode"), "context-mode@" + CONTEXT_MODE_VERSION],
                    env=install_env, check=True,
@@ -547,18 +598,18 @@ def render(profile: str, *, state: Path, home: Path, eco_root: Path, templates: 
     rtk = shutil.which("rtk")
     if not rtk:
         raise ProfileError("the selected RTK vendor CLI is required")
-    version = subprocess.check_output([rtk, "--version"], text=True).strip()
-    pin = subprocess.check_output(["git", "-C", str(rtk_source), "rev-parse", "HEAD"], text=True).strip()
+    version = subprocess.check_output([rtk, "--version"], env=install_env, text=True).strip()
+    pin = subprocess.check_output(["git", "-C", str(rtk_source), "rev-parse", "HEAD"], env=install_env, text=True).strip()
     if version != "rtk 0.51.0" or pin != "e001f773f80b22b7dc4c7a79521b30e35aaef026":
         raise ProfileError("RTK installer/source version mismatch")
     if runtime == "pi":
         command = [rtk, "init", "--global", "--agent", "pi", "--hook-only", "--no-patch"]
-        environment = {**os.environ, **profile_environment(profile, state, role_scope)}
+        environment = child_environment(profile_environment(profile, state, role_scope))
     else:
         rtk_home = destination / "rtk-home"
-        rtk_home.mkdir(mode=0o700)
+        rtk_home.mkdir(mode=0o700, exist_ok=True)
         command = [rtk, "init", "--global", "--opencode", "--hook-only", "--no-patch"]
-        environment = {**os.environ, "HOME": str(rtk_home)}
+        environment = child_environment({**token_environment, "HOME": str(rtk_home)})
     subprocess.run(command, env=environment, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
     if runtime == "pi" and role_scope and ROLE_SCOPES[role_scope][1]:
         # Vendor install first, then native resource-selection settings; no
@@ -582,7 +633,12 @@ def render(profile: str, *, state: Path, home: Path, eco_root: Path, templates: 
         # before its first load (README bootstrap defaults otherwise remote).
         subprocess.run([str(pi_bin), "install", PI_OTEL], env=environment, check=True,
                        stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
-    return {"profile": profile, "status": "trial", "mcp_servers": len(servers), "roles": len(roles)}
+    metadata = {**metadata, "status": "trial"}
+    pending = destination / (".profile-ready-" + uuid.uuid4().hex + ".json")
+    private_write(pending, json.dumps(metadata, indent=2) + "\n")
+    os.replace(pending, destination / "profile.json")
+    return {"profile": profile, "status": "trial", "mcp_servers": len(metadata["mcp_server_names"]),
+            "roles": len(metadata["roles"])}
 
 
 def choose_slot() -> str:
@@ -851,10 +907,20 @@ def cleanup_worktree(repository: Path, workspace: Path) -> dict:
         return {"status": "retained_status_error", "exit_code": status.returncode}
     if status.stdout:
         return {"status": "retained_dirty", "dirty_entries": status.stdout.count(b"\0")}
+    branch = subprocess.run(["git", "-C", str(workspace), "symbolic-ref", "--quiet", "--short", "HEAD"],
+                            capture_output=True, text=True)
+    owned_branch = branch.stdout.strip() if branch.returncode == 0 else ""
     result = subprocess.run(["git", "-C", str(repository), "worktree", "remove", str(workspace)],
                             stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
-    return {"status": "removed" if result.returncode == 0 else "retained_remove_error",
-            "exit_code": result.returncode}
+    receipt = {"status": "removed" if result.returncode == 0 else "retained_remove_error",
+               "exit_code": result.returncode}
+    if result.returncode == 0 and re.fullmatch(r"runtime/(?:pi|opencode)-(?:claude|gpt)-[0-9a-f]{12}", owned_branch):
+        # Git's supported non-forcing deletion preserves unmerged commits.
+        deleted = subprocess.run(["git", "-C", str(repository), "branch", "-d", owned_branch],
+                                 stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+        receipt["branch_cleanup"] = "removed" if deleted.returncode == 0 else "retained_unmerged_or_error"
+        receipt["branch_exit_code"] = deleted.returncode
+    return receipt
 
 
 def launch(args):
@@ -871,6 +937,32 @@ def launch(args):
         raise ProfileError("only measured selections may change trial status")
     verify_runtime_binary(runtime, Path(meta[runtime + "_bin"]))
     workspace = fresh_worktree(args.repository.resolve(), profile)
+    try:
+        return launch_in_worktree(args, runtime, route, root, role_scope, meta, workspace)
+    except (OSError, ValueError, subprocess.SubprocessError) as failure:
+        # Recovery covers every post-creation transition, including namespace
+        # setup/slot selection. Never serialize exception messages or argv.
+        run = root / "runs" / uuid.uuid4().hex
+        try:
+            cleanup = cleanup_worktree(args.repository.resolve(), workspace)
+        except (OSError, ValueError, subprocess.SubprocessError):
+            cleanup = {"status": "retained_cleanup_error"}
+        try:
+            run.mkdir(mode=0o700, parents=True)
+            private_write(run / "recovery-receipt.json", json.dumps({
+                "schema_version": 1, "status": "launch_failed", "finished_at": utc(),
+                "failure_type": type(failure).__name__,
+                "exit_code": failure.returncode if isinstance(failure, subprocess.CalledProcessError) else 2,
+                "worktree_cleanup": cleanup,
+            }, indent=2) + "\n")
+        except (OSError, ValueError, subprocess.SubprocessError):
+            # An unwritable receipt must not replace the original failure.
+            pass
+        raise
+
+
+def launch_in_worktree(args, runtime, route, root, role_scope, meta, workspace):
+    profile = args.profile
     aux = Path(meta["auxiliary_root"]) if meta.get("auxiliary_root") else None
     runtime_env = profile_environment(profile, args.state_root, role_scope, aux)
     runtime_env["CONTEXT_MODE_PROJECT_DIR"] = str(workspace)
@@ -890,8 +982,8 @@ def launch(args):
         runtime_env["PATH"] = str(Path(meta["skills_bin"]).parent) + os.pathsep + runtime_env["PATH"]
     if meta.get("tier1_input"):
         runtime_env["NS_TIER1_INPUT"] = meta["tier1_input"]
-    env = {**os.environ, **runtime_env,
-           "NS_RUNTIME_REQUEST_ID": "ns-run-" + profile + "-" + uuid.uuid4().hex}
+    env = child_environment({**runtime_env,
+           "NS_RUNTIME_REQUEST_ID": "ns-run-" + profile + "-" + uuid.uuid4().hex})
     title = "native-stack " + profile + " trial"
     if not args.print:
         print("\033]0;" + title + "\007", end="", flush=True)
@@ -944,7 +1036,7 @@ def launch(args):
         # the host store in the loader's original environment; apply runtime
         # XDG isolation only to its child through env. No store is copied into
         # a runtime profile and no credential path/value is materialized here.
-        env = {**os.environ, "NS_RUNTIME_REQUEST_ID": env["NS_RUNTIME_REQUEST_ID"]}
+        env = child_environment({"NS_RUNTIME_REQUEST_ID": env["NS_RUNTIME_REQUEST_ID"]}, loader=True)
     if args.print:
         run = root / "runs" / uuid.uuid4().hex
         run.mkdir(mode=0o700, parents=True)
@@ -1039,7 +1131,7 @@ def launch(args):
             # Claude's loader used the host environment; restore only the
             # native profile variables for post-run collection. Otherwise
             # session list/export would visit the account's main OpenCode DB.
-            collector_env = {**os.environ, **runtime_env}
+            collector_env = child_environment(runtime_env)
             with tempfile.TemporaryFile(mode="w+") as stream:
                 listing = subprocess.run([meta["opencode_bin"], "session", "list", "--format", "json"],
                                          cwd=workspace, env=collector_env, stdout=stream, stderr=subprocess.DEVNULL)
@@ -1139,6 +1231,8 @@ def parser():
     prepare.add_argument("--pi-bin", type=Path, required=True)
     prepare.add_argument("--opencode-bin", type=Path, required=True)
     prepare.add_argument("--rtk-source", type=Path, required=True)
+    prepare.add_argument("--resume", action="store_true",
+                         help="resume only this generator's incomplete preparation; preserve all existing files")
     prepare.add_argument("--wsl-render", action="store_true",
                          help="render canonical MCP through new_wsl_client_config's WSL map first")
     prepare.add_argument("--role-scoped", action=argparse.BooleanOptionalAction, default=True,
@@ -1185,7 +1279,7 @@ def main(argv=None):
                                             pi_bin=args.pi_bin, opencode_bin=args.opencode_bin,
                                             rtk_source=args.rtk_source, wsl=args.wsl_render, role_scope=scope,
                                             auxiliary_root=args.auxiliary_root, tier1_input=args.tier1_input,
-                                            skills_bin=args.skills_bin)))
+                                            skills_bin=args.skills_bin, resume=args.resume)))
             return 0
         if args.command == "install-launchers":
             install_launchers(args)
