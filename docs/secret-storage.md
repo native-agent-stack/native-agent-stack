@@ -1881,10 +1881,12 @@ its interactive guard, and a Claude Code 2.1.296 Bash tool shell is neither inte
 startup file for such a shell except the one `BASH_ENV` names (bash(1), "INVOCATION"). The mechanism this record
 chooses is Claude Code's user-scope `env` object in `~/.claude/settings.json`, which sets variables "for every session
 and for the subprocesses Claude Code starts from it" ([settings reference](https://code.claude.com/docs/en/settings-reference.md),
-`env`, read 2026-10-12T19:05Z, sha256 `4bec5505c7f33da3284848047b7e0c90148d777daf90b4cfda9da0a64878de08`). The
-operator adds each pointer of the block in [Picking up in a new session](#picking-up-in-a-new-session) there, as an
-absolute path. Pointers are paths, never values, and the profile installer's `env` handling is for MCP servers only,
-so a reinstall leaves the object alone. Agents edit neither settings nor startup files. A SessionStart hook that
+`env`, read 2026-10-12T19:05Z, sha256 `4bec5505c7f33da3284848047b7e0c90148d777daf90b4cfda9da0a64878de08`). Each
+pointer of the block in [Picking up in a new session](#picking-up-in-a-new-session) goes there as an absolute path.
+That is a Claude Code configuration change, which the command center makes after this record lands, from its reviewed
+diff (its ruling of 2026-10-12, 19:35Z); no other agent makes it. Pointers are paths, never values, and the profile
+installer's `env` handling is for MCP servers only, so a reinstall leaves the object alone. The startup files stay the
+operator's (`Edit(~/.zshrc)`, below). A SessionStart hook that
 appends the exports to `CLAUDE_ENV_FILE` ([hooks](https://code.claude.com/docs/en/hooks.md), "Persist environment
 variables", read 2026-10-12T19:05Z, sha256 `31754d5adce5052af35acf85dc2ed207bb082b7dbf87f25218047b10a024a073`) also
 works; it was not chosen because it adds a hook to install for values that never change on a host.
