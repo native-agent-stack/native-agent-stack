@@ -33,7 +33,7 @@
       "names": [
         "promptfoo"
       ],
-      "source": "promptfoo/promptfoo 0.123.1 at 34f74d34e140b5e17d23770dfb2340057b1936b8: site/docs/integrations/mcp-server.md L37 (`promptfoo mcp --transport stdio`), L49-52 (the client entry) and L169 (stdio is the transport of desktop AI tools that talk over stdin/stdout); src/commands/mcp/server.ts L94-112 registers its 14 tools. The entry runs the installed global package of the manifest's promptfoo slot (install plan row 'Promptfoo 0.123.1'), not `npx promptfoo@latest`, so the version stays the pinned one; the state directory is the distribution's own and telemetry and the update check are off. Registered for Claude Code only here: the Codex entry forwards a gateway key by name and is a separate decision (docs/decisions/2026-10-12-mcp-template-live-reconciliation.md)."
+      "source": "promptfoo/promptfoo 0.123.1 at 34f74d34e140b5e17d23770dfb2340057b1936b8: site/docs/integrations/mcp-server.md L37 (`promptfoo mcp --transport stdio`), L49-52 (the client entry) and L169 (stdio is the transport of desktop AI tools that talk over stdin/stdout); src/commands/mcp/server.ts L94-112 registers its 14 tools. The entry runs the installed global package of the manifest's promptfoo slot (install plan row 'Promptfoo 0.123.1'), not `npx promptfoo@latest`, so the version is the installed one and never a floating one (the manifest pins 0.123.1, the first host runs 0.124.0: a currency item for the version owner); the state directory is the distribution's own and telemetry and the update check are off. Registered for Claude Code only here: the Codex entry forwards a gateway key by name and is a separate decision (docs/decisions/2026-10-12-mcp-template-live-reconciliation.md)."
     },
     {
       "match": [

@@ -1,7 +1,7 @@
 """Tests for tools/adoption/mcp_template_drift.py, the read-only report of where the MCP servers the committed new-WSL templates render differ from the servers an account's clients have registered.
 
 The live files here are fixtures written from the render itself, so "no difference" is exact and each difference is one deliberate change. The tool never starts a server, never calls a client and never writes outside the
-temporary directory of the test. No value of a registration reaches the output, in either format or on either stream: environment and header values, every argument but an option name, and a URL's userinfo, port, path and query are withheld (the SENTINEL, credential-form and property tests).
+temporary directory of the test. No value of a registration reaches the output, in either format or on either stream: environment and header values and every argument (they are counted, never shown) are withheld, and so is every part of a URL but scheme://host (the SENTINEL, credential-form and property tests).
 """
 
 import contextlib
@@ -10,6 +10,7 @@ import json
 import os
 import random
 import re
+import shutil
 import string
 import subprocess
 import sys
@@ -212,16 +213,17 @@ class DriftTests(unittest.TestCase):
         servers["semble"]["env"][sorted(servers["semble"]["env"])[0]] = SENTINEL
         servers["leaky-http"] = {"type": "http", "url": f"http://user:{SENTINEL}@127.0.0.1:1/mcp/{SENTINEL}?token={SENTINEL}", "headers": {"Authorization": f"Bearer {SENTINEL}"}}
         servers["leaky-stdio"] = {"type": "stdio", "command": f"/opt/{SENTINEL}/bin/leaky", "args": [f"API_TOKEN={SENTINEL}", SENTINEL + "A" * 40, "--plain"], "env": {"API_KEY": SENTINEL}}
+        servers["plain-http"] = {"type": "http", "url": "http://127.0.0.1:1/mcp/path?x=1", "headers": {}}
         claude_path, codex_path = self.live(servers)
         for extra in ((), ("--json",)):
             code, out, err = self.run_tool(claude_path, codex_path, *extra)
             self.assertEqual(code, 1)
             self.assertNotIn(SENTINEL, out + err)
         code, out, _ = self.run_tool(claude_path, codex_path)
-        for shown in ("leaky-http", "leaky-stdio", "API_KEY", "header:Authorization", "http://127.0.0.1 ", " leaky ", "--plain", drift.WITHHELD):
+        for shown in ("leaky-http", "leaky-stdio", "API_KEY", "header:Authorization", "http <withheld> env/headers: header:Authorization", "http http://127.0.0.1", " leaky 3 args "):
             self.assertIn(shown, out)
-        for hidden in ("API_TOKEN", "127.0.0.1:1", "/mcp", "token=", "/opt/"):
-            self.assertNotIn(hidden, out, "an argument that is not an option name, and a URL's port, path and query, are withheld")
+        for hidden in ("API_TOKEN", "--plain", "127.0.0.1:1", "/mcp", "token=", "/opt/"):
+            self.assertNotIn(hidden, out, "arguments are counted, never shown; a URL's port, path and query are withheld")
 
     def test_no_argument_value_reaches_either_output_format_for_either_client(self):
         """The forms of the review of 2026-10-12 (Astra, #1034 at 6a7a7ce7): 7 forms x 2 clients x 2 formats, each on a server the templates lack (LIVE-ONLY) and on one they have (DIFFERS)."""
@@ -250,7 +252,9 @@ class DriftTests(unittest.TestCase):
                         self.assertIn("semble", out)
 
     def test_a_description_is_built_from_names_and_fixed_words_only(self):
-        """Value-free by construction: for 300 seeded random values placed in every position of a registration, no 8-character piece of the value is in the description."""
+        """Value-free by construction: for 300 seeded random values placed in the arguments, an environment value, a header value, the directory of the command, the username, password, port, path, query and fragment of
+        a URL and the whole of the transport type, no 8-character piece of the value is in the description. Not covered here, because they are printed as names by design when they have the shape of one: the
+        host label and the command's file name (the shape tests below cover a credential that parses as a host)."""
         rnd = random.Random(1034)
         alphabet = string.ascii_letters + string.digits + "!#$%&()*+,-./:;<=>?@[]^_{|}~ "
         for index in range(300):
@@ -258,22 +262,63 @@ class DriftTests(unittest.TestCase):
             stdio = {"type": "stdio", "url": None, "command": f"/opt/{secret}/bin/fixture", "args": [secret, f"--key={secret}", "--key", secret, f"-{secret}", f"https://{secret}@host.invalid/{secret}?q={secret}"],
                      "env": {"ONE": secret}, "headers": {"X-Header": secret}}
             http = {"type": "http", "url": f"https://u:{secret}@host.invalid:8443/{secret}?token={secret}#{secret}", "command": None, "args": [secret], "env": {"TWO": secret}, "headers": {"Authorization": secret}}
-            for spec in (stdio, http):
+            username = {"type": "http", "url": f"https://{secret}:password@host.invalid:{rnd.randint(1, 65535)}/path", "command": None, "args": [], "env": {}, "headers": {}}
+            typed = {"type": secret, "url": None, "command": "fixture", "args": [], "env": {}, "headers": {}}
+            for spec in (stdio, http, username, typed):
                 text = drift.describe(spec)
                 for position in range(len(secret) - 7):
                     self.assertNotIn(secret[position:position + 8], text, (index, position, text))
 
-    def test_tokens_that_only_look_like_option_names_are_withheld(self):
-        """A single dash followed by letters, an upper-case word, a digit-led word or an overlong word is a value to the report, not an option name."""
-        hostile = ["-AbCdEfGhIjKlMnOp", "--AbCdEfGhIjKlMnOp", "--9digitsFirst", "-abc", "---triple", "--a" + "b" * 60, "--", "-", "--k e y", "--key\\n=v"]
+    def test_no_argument_token_is_printed_whatever_it_looks_like(self):
+        """Review of the open threads on #1034 at 4916d3a4 (the Codex reviewer): in `['--api-key', '--secret-token']` the second token is the credential and has the shape of an option, so the shape of a token
+        cannot decide what may be printed. Arguments are counted."""
+        hostile = ["--api-key", "--secret-token", "-A", "--api-key=--secret-token", "-AbCdEfGhIjKlMnOp", "--9digitsFirst", "---triple", "--", "-", "--k e y", "--key\\n=v", "plain"]
         text = drift.describe({"command": "tool", "args": hostile, "env": {}, "headers": {}})
-        self.assertEqual(text, "stdio tool [10 args]", "ten placeholders are longer than the 90 characters a description spends on arguments, so only the count is printed")
-        for token in hostile:
-            self.assertEqual(drift.shown_arg(token), drift.WITHHELD, token)
-        for token in ("-y", "-Y", "--port", "--no-update-notifier", "--max_tokens"):
-            self.assertEqual(drift.shown_arg(token), token)
-        self.assertEqual(drift.shown_arg("--token=abc"), "--token=" + drift.WITHHELD)
-        self.assertEqual(drift.shown_arg("--Token=abc"), drift.WITHHELD)
+        self.assertEqual(text, "stdio tool 12 args")
+        for arguments, expected in (([], "stdio tool"), (["-y"], "stdio tool 1 arg"), (["--api-key", "--secret-token"], "stdio tool 2 args")):
+            self.assertEqual(drift.describe({"command": "tool", "args": arguments, "env": {}, "headers": {}}), expected)
+        self.assertFalse(hasattr(drift, "shown_arg"), "no function prints an argument")
+
+    def test_a_credential_that_looks_like_an_option_is_not_printed_by_either_client_in_either_format(self):
+        """The forms of the Codex review thread (`--api-key --secret-token-abcdef`) and of the second GPT read at 4916d3a4 (~/.cache/ns2604-gpt-reads/fix1-pr1034-4916d3a47/VERDICT.md, blocker 1): a positional value after
+        `--` and the operand of a short option are values with the shape of an option. CPython v3.12.3 `Lib/argparse.py` L1964 and L2503 (end-of-options handling) and `Lib/getopt.py` (`getopt(['-k', '--x'], 'k:')`
+        returns `[('-k', '--x')]`) execute them as values."""
+        for label, arguments in (("a long option-shaped value", ["--api-key", "--secret-token-abcdef"]), ("an option=value with an option-shaped value", ["--api-key=--secret-token-abcdef"]),
+                                 ("a short option-shaped value", ["--token", "-Z"]), ("a positional value after the end-of-options marker", ["--", "--review-secret-9"]),
+                                 ("the operand of a short option", ["-k", "--review-secret-9"])):
+            for client in ("claude", "codex"):
+                if client == "claude":
+                    servers = json.loads(json.dumps(self.claude))
+                    servers["only-live"] = {"type": "stdio", "command": "fixture", "args": list(arguments)}
+                    paths = self.live(servers)
+                else:
+                    paths = self.live(codex_text=self.codex_with(lambda servers, arguments=arguments: servers.update({"only-live": {"command": "fixture", "args": list(arguments)}})))
+                for extra in ((), ("--json",)):
+                    with self.subTest(form=label, client=client, json=bool(extra)):
+                        code, out, err = self.run_tool(*paths, *extra)
+                        self.assertEqual(code, 1)
+                        for needle in ("secret-token-abcdef", "review-secret-9", "--token", " -k "):
+                            self.assertNotIn(needle, out + err)
+                        self.assertIn("only-live", out)
+
+    def test_a_field_of_an_unexpected_shape_ends_the_run_with_exit_two_and_never_prints_its_value(self):
+        """Review of the open threads on #1034 at 4916d3a4 (the Codex reviewer): `normalise_codex({'startup_timeout_sec': 'SENTINEL-value'})` raised a ValueError that quotes the value, and main() caught only DriftError."""
+        for label, bad in (("a string", "SENTINEL-value"), ("a list", ["SENTINEL-value"]), ("a table", {"SENTINEL": "value"})):
+            with self.subTest(codex_timeout=label):
+                text = self.codex_with(lambda servers, bad=bad: servers["semble"].update(startup_timeout_sec=bad))
+                code, out, err = self.run_tool(*self.live(codex_text=text))
+                self.assertEqual((code, out), (2, ""))
+                self.assertNotIn("SENTINEL", err)
+                self.assertIn("semble", err)
+                self.assertIn("unexpected shape", err)
+        for label, field, bad in (("an environment that is a string", "env", "SENTINEL-value"), ("arguments that are a number", "args", 5)):
+            with self.subTest(claude=label):
+                servers = json.loads(json.dumps(self.claude))
+                servers["semble"][field] = bad
+                code, out, err = self.run_tool(*self.live(servers))
+                self.assertEqual((code, out), (2, ""))
+                self.assertNotIn("SENTINEL", err)
+                self.assertIn("semble", err)
 
     def test_names_that_do_not_look_like_names_are_withheld(self):
         """Server, variable and header names are keys, printed as they are while they have the shape of a name."""
@@ -288,14 +333,118 @@ class DriftTests(unittest.TestCase):
             self.assertIn("GOOD_NAME", out)
             self.assertIn(drift.WITHHELD, out)
 
+    def test_a_malformed_timeout_ends_the_command_with_exit_two_and_prints_no_secret_on_either_stream(self):
+        """Blocker 2 of the second GPT read at 4916d3a4 (~/.cache/ns2604-gpt-reads/fix1-pr1034-4916d3a47/VERDICT.md): the real command, as a subprocess, with a secret in each malformed timeout field. float() formats its
+        failure with %R of the input (CPython Objects/floatobject.c, `float_from_string_inner`: v3.12.3 L190-193, v3.13.16 L183-186), the report caught only DriftError, so the traceback printed the secret and the exit
+        code was 1."""
+        secret = "Review-S3cret!x9"
+        for field in ("startup_timeout_sec", "tool_timeout_sec"):
+            claude_path, codex_path = self.live(codex_text=self.codex_with(lambda servers, field=field: servers["semble"].update({field: secret})))
+            for extra in ((), ("--json",)):
+                with self.subTest(field=field, json=bool(extra)):
+                    done = subprocess.run([sys.executable, "-I", str(SCRIPT), "--home", str(self.home), "--eco-root", str(self.eco), "--claude-json", str(claude_path), "--codex-config", str(codex_path), *extra],
+                                          capture_output=True, text=True, timeout=180, env={"PATH": os.environ["PATH"], "HOME": str(self.home)})
+                    self.assertEqual(done.returncode, 2, done.stderr)
+                    for needle in (secret, "S3cret", "x9"):
+                        self.assertNotIn(needle, done.stdout + done.stderr)
+                    self.assertEqual(done.stdout, "")
+                    self.assertIn("semble", done.stderr)
+                    self.assertNotIn("Traceback", done.stderr)
+
+    def test_a_credential_that_ends_the_authority_early_is_not_printed_as_a_host(self):
+        """The CC's read of 4916d3a4 (~/.local/state/native-agent-stack/coordination/command-center/research-cc-role-20261008/pr1034-claude-read-4916d3a4.md, P3-a and P3-d): a userinfo that holds an unescaped `/`,
+        `?` or `#` parses as the host (CPython Lib/urllib/parse.py urlsplit), and the transport type is any name-shaped text. A URL with an `@` anywhere is withheld whole, and the type is a fixed vocabulary."""
+        sentinel = "Zq7secretpartK2"
+        forms = {"a userinfo with a slash": f"https://{sentinel}/p@host.invalid", "a userinfo with a question mark": f"https://user:{sentinel}?x@host.invalid",
+                 "a userinfo with a number sign": f"https://user:{sentinel}#x@host.invalid", "a password with a slash": f"https://user:{sentinel}/x@host.invalid",
+                 "a port that is not a number": f"https://host.invalid:{sentinel}/x"}
+        for label, url in forms.items():
+            for client in ("claude", "codex"):
+                if client == "claude":
+                    servers = json.loads(json.dumps(self.claude))
+                    servers["only-live"] = {"type": sentinel, "url": url}
+                    paths = self.live(servers)
+                else:
+                    paths = self.live(codex_text=self.codex_with(lambda servers, url=url: servers.update({"only-live": {"url": url}})))
+                for extra in ((), ("--json",)):
+                    with self.subTest(form=label, client=client, json=bool(extra)):
+                        code, out, err = self.run_tool(*paths, *extra)
+                        self.assertEqual(code, 1)
+                        self.assertNotIn(sentinel.lower(), (out + err).lower())
+                        self.assertIn("only-live", out)
+
+    def test_a_registration_of_the_wrong_shape_ends_the_run_with_exit_two_and_names_the_server_only(self):
+        """The same read, P3-b: a list given as text printed a count of its characters, and a Codex `mcp_servers` that is not a table ended in an uncaught AttributeError and exit 1."""
+        sentinel = "Zq7secretpartK2 with spaces"
+        cases = (("args as a string", "claude", lambda servers: servers["semble"].update({"args": sentinel})), ("args holding a non-string", "claude", lambda servers: servers["semble"].update({"args": [1, sentinel]})),
+                 ("env as a list", "claude", lambda servers: servers["semble"].update({"env": [sentinel]})), ("headers as a string", "claude", lambda servers: servers["semble"].update({"headers": sentinel})),
+                 ("a registration that is a string", "claude", lambda servers: servers.update({"semble": sentinel})),
+                 ("env as a list of pairs", "claude", lambda servers: servers["semble"].update({"env": [[sentinel, "v"]]})), ("headers as a list of pairs", "claude", lambda servers: servers["semble"].update({"headers": [[sentinel, "v"]]})),
+                 ("args as a string", "codex", lambda servers: servers["semble"].update({"args": sentinel})), ("env as a list", "codex", lambda servers: servers["semble"].update({"env": [sentinel]})),
+                 ("env as a list of pairs", "codex", lambda servers: servers["semble"].update({"env": [[sentinel, "v"]]})), ("env_vars as a table", "codex", lambda servers: servers["semble"].update({"env_vars": {sentinel: "v"}})),
+                 ("enabled_tools as a string", "codex", lambda servers: servers["semble"].update({"enabled_tools": sentinel})))
+        for label, client, change in cases:
+            with self.subTest(client=client, shape=label):
+                if client == "claude":
+                    servers = json.loads(json.dumps(self.claude))
+                    change(servers)
+                    paths = self.live(servers)
+                else:
+                    paths = self.live(codex_text=self.codex_with(change))
+                code, out, err = self.run_tool(*paths)
+                self.assertEqual((code, out), (2, ""), err)
+                self.assertIn("semble", err)
+                self.assertNotIn("Zq7secretpartK2", err)
+        claude_path, codex_path = self.live()
+        codex_path.write_text('[[mcp_servers]]\nname = "Zq7secretpartK2"\n', encoding="utf-8")
+        code, out, err = self.run_tool(claude_path, codex_path)
+        self.assertEqual((code, out), (2, ""))
+        self.assertIn("is not a table", err)
+        self.assertNotIn("Zq7secretpartK2", err)
+
+    def test_paths_are_printed_relative_to_the_home(self):
+        """The same read, P3-c: the notes and the read errors printed the absolute path of the live files, which holds the account's name."""
+        claude_path, codex_path = self.live()
+        (self.home / ".codex").mkdir(exist_ok=True)
+        shutil.copy(claude_path, self.home / ".claude.json")
+        shutil.copy(codex_path, self.home / ".codex" / "config.toml")
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            code = drift.main(["--home", str(self.home), "--eco-root", str(self.eco)])
+        self.assertEqual(code, 0, out.getvalue())
+        self.assertIn("(~/.claude.json)", out.getvalue())
+        self.assertIn("(~/.codex/config.toml)", out.getvalue())
+        self.assertNotIn(str(self.home), out.getvalue() + err.getvalue())
+        (self.home / ".claude.json").write_text("{", encoding="utf-8")
+        with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(err):
+            self.assertEqual(drift.main(["--home", str(self.home), "--eco-root", str(self.eco)]), 2)
+        self.assertIn("cannot read ~/.claude.json: JSONDecodeError", err.getvalue())
+        self.assertNotIn(str(self.home), err.getvalue())
+        outside = self.live()
+        code, out, err = self.run_tool(*outside)
+        self.assertEqual(code, 0, out)
+        self.assertIn("(claude.json)", out, "a file outside the home is named by its file name alone")
+        self.assertIn("(config.toml)", out)
+        self.assertNotIn(self.tmp.name, out + err)
+        directory = Path(tempfile.mkdtemp(dir=self.tmp.name))
+        for label, arguments in (("claude", [str(directory), str(outside[1])]), ("codex", [str(outside[0]), str(directory)])):
+            code, out, err = self.run_tool(*arguments)
+            self.assertEqual((code, out), (2, ""), label)
+            self.assertIn("IsADirectoryError", err, "a read error names the kind of error, not its text (which carries the path)")
+            self.assertNotIn(self.tmp.name, err)
+
     def test_the_description_keeps_what_a_reader_needs_without_a_value(self):
         stdio = {"type": "stdio", "url": None, "command": "/home/example/.local/bin/server", "args": ["-y", "@scope/pkg@1.2.3", "--port", "8787", "--token=abc", "--header", "Authorization: Bearer abc"],
                  "env": {"B_NAME": "1", "A_NAME": "2"}, "headers": {}}
-        self.assertEqual(drift.describe(stdio), f"stdio server -y {drift.WITHHELD} --port {drift.WITHHELD} --token={drift.WITHHELD} --header {drift.WITHHELD} env/headers: A_NAME,B_NAME")
-        http = {"type": "http", "url": "https://user:pw@Example.invalid:8443/mcp/path?key=v#frag", "command": None, "args": [], "env": {}, "headers": {"X-Api-Key": "v", "Authorization": "w"}}
+        self.assertEqual(drift.describe(stdio), "stdio server 7 args env/headers: A_NAME,B_NAME")
+        http = {"type": "http", "url": "https://Example.invalid:8443/mcp/path?key=v#frag", "command": None, "args": [], "env": {}, "headers": {"X-Api-Key": "v", "Authorization": "w"}}
         self.assertEqual(drift.describe(http), "http https://example.invalid env/headers: header:Authorization,header:X-Api-Key")
-        crowded = {"type": "stdio", "url": None, "command": "tool", "args": [f"--flag{index}" for index in range(30)], "env": {}, "headers": {}}
-        self.assertEqual(drift.describe(crowded), "stdio tool [30 args]")
+        self.assertEqual(drift.describe({**http, "url": "https://user:pw@Example.invalid:8443/mcp/path?key=v#frag"}), "http <withheld> env/headers: header:Authorization,header:X-Api-Key", "a URL with userinfo is withheld whole")
+        for port in ("notaport", "99999", "-1"):
+            self.assertEqual(drift.describe({**http, "url": f"https://example.invalid:{port}/mcp"}), "http <withheld> env/headers: header:Authorization,header:X-Api-Key", f"a URL whose port is {port} does not parse: withheld whole")
+        self.assertEqual(drift.describe({**http, "type": "Zq7-not-a-transport"}), "<withheld> https://example.invalid env/headers: header:Authorization,header:X-Api-Key", "the type is a fixed vocabulary")
+        for transport in ("stdio", "http", "sse"):
+            self.assertTrue(drift.describe({**http, "type": transport}).startswith(transport + " "))
         self.assertEqual(drift.describe({"command": None, "args": [], "env": {}, "headers": {}}), "stdio (no command)")
 
     # ------------------------------------------------------------------ acknowledged differences

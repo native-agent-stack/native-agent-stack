@@ -17,6 +17,7 @@ SKIPPED_DIRECTORIES = {".git", "node_modules", "__pycache__", "evidence", "tests
 SKIPPED_PREFIXES = ("docs/decisions/",)
 SUFFIXES = {".md", ".json", ".txt", ".yaml", ".yml", ".sh", ".toml", ".mjs", ".py"}
 SELECTOR = re.compile(r"\bmcporter\b[^\n]*?\bcall\s+([A-Za-z0-9_-]+)\.([A-Za-z0-9_]+)")
+LISTING = re.compile(r"\bmcporter\b[^\n]*?\blist\s+([A-Za-z0-9_][A-Za-z0-9_-]*)(?=[\s\"'\\]|$)")   # `list SERVER`: the server is a positional word, never a flag
 
 
 def registered_servers() -> set:
@@ -24,13 +25,16 @@ def registered_servers() -> set:
 
 
 def selectors_of(text: str) -> list:
-    """(line number, server, tool) of each `mcporter ... call SERVER.TOOL` on a line that selects the example configuration; the server is the text before the first dot."""
+    """(line number, server, tool) of each `mcporter ... call SERVER.TOOL` on a line that selects the example configuration; the server is the text before the first dot. A `mcporter ... list SERVER` gives
+    (line number, server, "(list)"): MCPorter finds that server by name too, and when it is not exact it answers by auto-correcting a near name, which is a guess, not a contract (list-command.ts)."""
     found = []
     for number, line in enumerate(text.splitlines(), 1):
         if "MCPORTER_CONFIG" not in line:
             continue
         for match in SELECTOR.finditer(line):
             found.append((number, match.group(1), match.group(2)))
+        for match in LISTING.finditer(line):
+            found.append((number, match.group(1), "(list)"))
     return found
 
 
@@ -76,6 +80,9 @@ class McporterSelectorTests(unittest.TestCase):
         self.assertIn("codebase-memory-mcp", servers)
         self.assertEqual(selectors_of('mcporter --config "$OTHER" call codebase-memory.search_graph'), [], "only calls that select the example configuration are in scope")
         self.assertEqual(selectors_of("a.b mcporter call x"), [])
+        listing = 'mcporter --config "$MCPORTER_CONFIG" list codebase-memory --schema --no-oauth'
+        self.assertEqual(selectors_of(listing), [(1, "codebase-memory", "(list)")], "a `list SERVER` is a selector too (recipes/README.md named the short key and worked only through auto-correction)")
+        self.assertEqual(selectors_of('mcporter --config "${MCPORTER_CONFIG}" list --brief --no-oauth'), [], "a list of every server names none")
 
 
 if __name__ == "__main__":

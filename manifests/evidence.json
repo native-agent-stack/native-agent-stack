@@ -5496,8 +5496,8 @@
     },
     {
       "path": "adoption/new-wsl/client-config-map.json",
-      "sha256": "3ed55821eb1036580a2c80582d4ae3096f0c55c814c7b0ef531d44b111ac6769",
-      "bytes": 57665
+      "sha256": "2abeba475ed19cca353cc3accb7e4f0487b75c2d97b694f000784fcfe464cae3",
+      "bytes": 57786
     },
     {
       "path": "adoption/new-wsl/codex-user-instructions.md",
@@ -5511,8 +5511,8 @@
     },
     {
       "path": "adoption/new-wsl/templates/claude-user.mcp.additions.json",
-      "sha256": "bd504da5e329645a3d44334e2ab5734b35db7614468b7ce6a99dfb900be12d9c",
-      "bytes": 2063
+      "sha256": "fc92181246725362e574467fb1bcfbf062a72833f59cd310a56f29bb8571eabb",
+      "bytes": 2099
     },
     {
       "path": "adoption/new-wsl/templates/claude.settings.additions.json",
@@ -18277,8 +18277,8 @@
     },
     {
       "path": "docs/decisions/2026-10-02-new-wsl-client-configuration.md",
-      "sha256": "e6fba9dd8bc8512177431f60108fd350210a440378418b23c3b72cd22e18e8b2",
-      "bytes": 149762
+      "sha256": "be8a467cd2070d715a820213ab47fd35c49d727fdb7dabd1f4f01b1cbec7c5ef",
+      "bytes": 149798
     },
     {
       "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
@@ -18922,8 +18922,8 @@
     },
     {
       "path": "docs/decisions/2026-10-12-mcp-template-live-reconciliation.md",
-      "sha256": "0b19d5781b104041931b2966cdcad6fddf0cdd6f8864ae9b5804628166787b8e",
-      "bytes": 11541
+      "sha256": "32e638ef2bc3edef115fb5908be77bc069faced571a68d98927399fb15103381",
+      "bytes": 12658
     },
     {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
@@ -60967,8 +60967,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "3e620cf07e04d66f774bedd09ea235907bf8797fc3c61885c1cea566f22bc4da",
-      "bytes": 133404
+      "sha256": "8409c0b698949540b0af3e376e65e21e9ad3453557f44512ac1ec7a59c54d8d6",
+      "bytes": 133408
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -62332,13 +62332,13 @@
     },
     {
       "path": "tests/test_mcp_template_drift.py",
-      "sha256": "b70208fea70f27f3c07359e20ae07d10974ddc4ddff1e78af0a10d324da68da3",
-      "bytes": 32112
+      "sha256": "b5972b01dade0d6b4830d2be4cf3bc647a1775aea929e91a9250c84fc563816a",
+      "bytes": 45177
     },
     {
       "path": "tests/test_mcporter_selectors.py",
-      "sha256": "50b1300fd32f15c38393d6321c1dc082570dcc3e6f00a232343b7013e44c99c2",
-      "bytes": 4531
+      "sha256": "4d131f0c2c1c0a1a854e852adec4e20681a1ca215e4494b438fae608a0609158",
+      "bytes": 5476
     },
     {
       "path": "tests/test_memory_landscape_capture_doc.py",
@@ -63142,8 +63142,8 @@
     },
     {
       "path": "tools/adoption/mcp_template_drift.py",
-      "sha256": "6fa4e2caffd93dbc70a240ded6bcd84639828a47025f3776aeb0c9b01d3c8db9",
-      "bytes": 18865
+      "sha256": "03475891bab7f6987407b658392dfd917a626740ede1fb15d17ad5e997893828",
+      "bytes": 22248
     },
     {
       "path": "tools/adoption/new_wsl_client_config.py",

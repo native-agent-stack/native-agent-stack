@@ -1339,7 +1339,7 @@ Today: 402 pieces, 362 wired (211 practice, 151 through a slot), 24 not wired (0
 
 The reconciliation of the committed templates with the servers the account's clients have registered
 ([decision](2026-10-12-mcp-template-live-reconciliation.md)) changes two wired pieces of the Claude MCP
-template. `claude/mcp/server/promptfoo` joins, wired through the `promptfoo` slot (Promptfoo 0.123.1:
+template. `claude/mcp/server/promptfoo` joins, wired through the `promptfoo` slot (pinned Promptfoo 0.123.1, the first host runs 0.124.0:
 `promptfoo mcp --transport stdio` from the installed package, the distribution's own state directory, telemetry
 and the update check off). The code graph server's piece is `claude/mcp/server/codebase-memory-mcp`, the key
 the vendor's documentation registers and the clients show, and its Codex tables carry the same key. No piece
