@@ -18722,8 +18722,8 @@
     },
     {
       "path": "docs/decisions/2026-10-11-compounding-rule-text.md",
-      "sha256": "c0c2302392a95fab8867cc4e6b71c3d4c70d34437b46644737e5ac1d1eadbdb9",
-      "bytes": 16181
+      "sha256": "a6f24aa9fdd11d60c0befcbe65ebfdb93ad0efb68ab92f08f495b4fb644afc1f",
+      "bytes": 18762
     },
     {
       "path": "docs/decisions/2026-10-11-final-stack-review-corrections.md",

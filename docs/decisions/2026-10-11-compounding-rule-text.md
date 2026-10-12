@@ -1,17 +1,29 @@
 # Decision: work compounds through reviewed, cited repository records (2026-10-11)
 
-**Status:** owner-approved rule text. The six repository surfaces change together in this PR; the user-level files
-follow only after it lands (below).
+**Status:** rule text whose first sentence the owner approved and whose optional second sentence the command center
+(CC) included under the owner's delegation (Trigger). The six repository surfaces change together in this PR; the
+user-level files follow only after it lands (below).
 
 ## Trigger
 
-On 2026-10-11 the owner approved the exact text that section 1 of the command center's (CC's) 19:10Z ruling proposed
-for the "The ecosystem compounds" bullet: its main sentence and its optional second clause. The CC relayed the
-approval to this build lane by 22:06Z.
+On 2026-10-11, section 1 of the CC's 19:10Z ruling proposed text for the "The ecosystem compounds" bullet: a main
+sentence and an "Optional second clause". At 19:12Z the CC sent both to the owner and asked for an OK or an edit.
 
+- **The first sentence.** The owner approved the section 1 proposal at 22:01Z. The owner's answer is recorded in
+  paraphrase and is not quoted here.
+- **The second sentence.** It was presented as the optional clause, and the owner's answer did not single it out. The
+  CC included it under the owner's delegation in that answer, because it restates the owner's own no-dates direction
+  (the 17:31Z ruling below).
+- **The owner was told at 23:44Z,** with the option to drop the clause before this PR lands. If the owner drops it, a
+  recorded supersession removes it from every surface.
 - The ruling is retained in
   `~/.local/state/native-agent-stack/coordination/command-center/research-cc-role-20261008/ruling-north-star-handbook-compounding-20261011.md`,
-  SHA256 `9dfd309773abd0b24d0923e06426fd46212f92709fdb121fdc33121694ba138d`.
+  SHA256 `9dfd309773abd0b24d0923e06426fd46212f92709fdb121fdc33121694ba138d`. Its last line still says that section 1
+  waits for the owner's OK. Its addendum-01 beside it,
+  `ruling-north-star-handbook-compounding-20261011.addendum-01.md` (23:56:42Z), SHA256
+  `8dd06f2bdf349b4e584cb8943e7ba735e5e08cce33c66226e6db37f0504eda6c`, supersedes that line and records the facts
+  above. It gives each sentence's UTF-8 SHA256: `a38a40e4622831a25641d3eaa1e0b80b3b73e756e3917262569f959f061461c5`
+  for the first and `1be84fa09477e62c66379765971fb4d9f4811bff793b6b9ced0154954355b4bf` for the second.
 - The second sentence comes from the CC's 17:31Z readiness ruling, which
   [the layer-resolution record](2026-10-11-layer-resolution-protocol.md) already cites (SHA256 `dd05310efdb5...`).
 
@@ -31,6 +43,11 @@ before "Each choice adopts the current best converged practice":
 
 The sentence after it already says that a better-evidenced practice replaces an older one; the new text says how that
 replacement is recorded. No tool, hook, check or runtime behavior changes, and this change reopens no settled record.
+
+**What the second sentence leaves in force.** The trading lane's Claude read of us-equities-trading #87 proposed this
+clarification (F1); the rule text on the surfaces does not change.
+
+The second sentence forbids a date as the trigger that starts work; it leaves in force every time bound the contract states as a fact or protocol window, such as a live promotion record's `not_before`, market hours and a release receipt's date boundary.
 
 ## Evidence
 
@@ -57,8 +74,11 @@ at least one more pass:
     showed the same sentence splitter drawing findings in five consecutive rounds.
   - #165 (17:16Z): one false claim was split into a fix now and a follow-up, which would have left the same claim
     false in the docs for a later round.
-  - #172 (22:05:54Z): a credential-exposure class was deferred as pre-existing. A later read reproduced more forms of
-    it, and the fix moved into the PR that touches the guard.
+  - #172 (22:05:54Z): a guard-bypass class that had been ruled a follow-up for #1014 was re-ruled a P1 to fix in
+    #1014, after a later read reproduced more forms of it. The log superseded #172 at 22:18:17Z: under the owner's
+    threat model of 22:17Z, guard bypasses are follow-ups, not P1s, kept in the research queue (row 23). #1014 landed
+    as `ccff8765`, and its only guard change lets `POINTER_VARIABLE` take a one-letter suffix; no deny-by-default
+    pointer rule landed. Both changes of ruling are recorded.
 - **A claim without its measurement (3).** The new text does not address these directly; they are listed so the twelve
   are complete.
   - #164 (16:58Z): an incomplete split rule for a names list, which can return a false zero.
@@ -74,7 +94,10 @@ SHA256 `40ef7f137a4d0aaaa140a3a9a6057c3aadb0741ad3d02e3756f6115a54a67ee9`.
 - 39 PRs waited on one unmet input: a verdict wave, and main had recorded none since 2026-09-22.
 - 7 finished PRs sat outside the landing wave. 61 PRs here and 5 in us-equities-trading had no CC record in the
   record directories the triage read.
-- 15 PRs had three or more recorded Claude review rounds, and 4 fold receivers merged without their donors.
+- 15 PRs had three or more recorded Claude review rounds.
+- 3 fold receivers (#878, #927, #958) merged without their 4 donors (#804, #915, #870, #829). The triage's line 64
+  says 4 receivers; its addendum-01 beside it, `pr-triage-20261011.addendum-01.md`, SHA256
+  `68a6060adb49b6c888c1d5a0c321b60b85b0a00457032bc042197e20db571b7a`, corrects the count from the triage's own rows.
 
 These are records and counts, not a measured effect of the rule text on behavior (see Limits).
 
@@ -145,7 +168,7 @@ bytes of each client's loaded files, including the markers.
 - **Old ceilings.** 5,933 and 6,039 bytes: the 2026-10-09 totals of 5,650 and 5,751 plus 5%. The base above already
   includes #1008's 158-byte root bullet, which fit the old headroom.
 - **New ceilings.** The new totals plus 5%, rounded up: 6,895 and 7,001 bytes (`STARTUP_BUDGET_BYTES`).
-- **Required behavior.** The approved text is always-loaded text (ruling section 1), in both clients and on every layer.
+- **Required behavior.** Both sentences are always-loaded text (ruling section 1), in both clients and on every layer.
 - **The Codex template's separate 8,192-byte check** still holds at 3,102 bytes. Codex's `project_doc_max_bytes`
   default of 32 KiB ([Codex AGENTS.md guide](https://developers.openai.com/codex/guides/agents-md), read 2026-10-11)
   is far above the 3,565-byte root file.
@@ -154,8 +177,9 @@ bytes of each client's loaded files, including the markers.
 - **A task pointer**, one line naming this record. It would cost far fewer bytes, but other projects lack this
   repository's paths (the user blocks and the scaffold leave it), and a pointer keeps the rule out of the startup
   context. Rejected.
-- **The main sentence alone**, without the optional clause. It saves 58 bytes per copy, but the owner approved both.
-  Rejected.
+- **The main sentence alone**, without the optional clause. It saves 58 bytes per copy, but the clause restates the
+  owner's own no-dates direction, and the CC included it under the owner's delegation; the owner, told at 23:44Z, may
+  still drop it (Trigger). Rejected unless the owner drops it.
 - **The user-level blocks only, not root `AGENTS.md`.** It saves 379 bytes per client but breaks the one-core-on-every-
   layer rule of [the philosophy-only record](2026-10-08-philosophy-only-rules.md), which `StandingRuleSurfacesTests`
   enforces. Rejected.
@@ -180,8 +204,7 @@ These are checks on repository text, pins and registration. They do not measure 
   at 22:20:58Z.
 - **The budget.** `test_rendered_startup_files_fit_each_clients_fixed_byte_budget` failed against the old ceilings at
   22:20:58Z (Claude 6,566 over 5,933; Codex 6,667 over 6,039) and passes with the new ones.
-  `test_growth_in_any_loaded_file_crosses_the_fixed_budget` still shows that one more byte in any loaded file crosses
-  them.
+  `test_growth_in_any_loaded_file_crosses_the_fixed_budget` fills the available headroom in each loaded file in turn, verifies that equality with the ceiling passes, then appends a two-byte UTF-8 character and verifies rejection.
 - **The module runs**, from 22:21:36Z to 22:24:52Z, all rc 0:
 
   | Module | Tests | Skipped |
@@ -207,7 +230,8 @@ These are checks on repository text, pins and registration. They do not measure 
 
 - No behavior is measured. The checks show where the text is and that it is identical, not that agents follow it.
 - The user-level pickup rests on the CC's host tooling, which this repository neither versions nor tests.
-- The corrections log, the ruling and the triage are the CC's private records. This record restates what it relies on.
+- The corrections log, the ruling, the triage and their addenda are the CC's private records. This record restates
+  what it relies on.
 
 ## Sources
 
@@ -228,5 +252,6 @@ These are checks on repository text, pins and registration. They do not measure 
     2011-11-15, read 2026-10-11: a reversed decision is kept and marked superseded, with a reference to its replacement;
   - [MADR 4.0.0 `template/adr-template.md`, line 3](https://github.com/adr/madr/blob/2475fe1973f66a12aaf58a91d8fa7b42c0f5ea3d/template/adr-template.md#L3):
     its status field includes "superseded by ADR-0123".
-- **CC records,** private and outside this repository: the ruling and the triage at the SHA256s above, corrections
-  #161 to #172, and the readiness ruling that the layer-resolution record cites.
+- **CC records,** private and outside this repository: the ruling, the triage and their addenda-01 at the SHA256s
+  above, corrections #161 to #172 with #172's supersession, and the readiness ruling that the layer-resolution record
+  cites.
