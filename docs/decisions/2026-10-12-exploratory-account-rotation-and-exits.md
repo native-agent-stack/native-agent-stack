@@ -47,6 +47,20 @@ config repairs the projection. Unbound pre-change projections fail closed.
 The standalone registration API is restricted to bootstrap before any trial;
 rotation callers must use atomic admission. Empty files without tables can
 bootstrap, but existing unmarked account journals still refuse adoption.
+A non-null `trial.json` without a journal binding refuses with
+`active_trial_projection_unbound`: a missing or empty database, a database
+without `meta`, and a `meta` record without a trial identity cannot authorize
+that projection. Bootstrap remains available when both artifacts contain no
+prior trial state (no projection, or JSON `null`). Falsey non-null JSON and
+an unreadable projection cannot establish an empty root. A bound legacy
+projection remains readable, and a committed active SQLite record still
+overrides a missing, stale or unreadable projection. This
+corrects the orphaned-projection follow-up from #1038; refusing the projection
+preserves the requirement that fee, cash, fill, request and halt continuity
+come from the existing account journal rather than a newly created one.
+A complete root copy (journal plus projection), or the journal alone, remains
+accepted because the journal retains the authoritative lineage. This
+projection-only gate does not discharge the CC's copied-root re-cut hold.
 Duplicate identities, backward clocks,
 unfinished/held state, unresolved orders, cash drift, changed capital, exhausted
 risk budgets and latched halts refuse. A refusal cannot publish new limits or
@@ -82,6 +96,19 @@ marketable LIMIT/DAY path; no broker stop, market or multi-leg order is added.
 
 ## Sources at the pins
 
+- NAS #1038 as landed on main at `489b263286edd87493689347a5411b263d60e306`
+  (source blob `7da1d432`),
+  `blueprints/us-equities/adaptive-paper/exploration.py:69-89`: the pre-fix
+  missing/empty/no-identity read paths could return an unbound projection.
+  The final orphan regression fails there for all five journal fixtures;
+  no broker acceptance is inferred from these synthetic tests.
+- Official `python/cpython` v3.13.16 at
+  `cbc944f4bc59639a444dd971c737788ba2283a91`,
+  `Lib/test/test_sqlite3/test_dbapi.py:726-740` (`test_open_uri_readonly`) and
+  `Doc/library/sqlite3.rst:2473-2481`: `mode=ro` refuses database creation
+  and writes. The retained helper uses this supported read-only connection;
+  the application additionally requires a journal trial/config binding.
+  The upstream test ran on Python 3.13.16 with SQLite 3.53.1 and passed.
 - NAS main `d8f7e2051b61bde6361a85b64f41413798015353`:
   `runner.py:2520` config-hash barrier; `safety.py:476-481` frozen limits;
   `safety.py:631-638` same-journal trial transition; `mover_runner.py:730-812`
@@ -106,6 +133,18 @@ decision through a cited regression, not through silent state replacement.
 
 ## Follow-ups
 
+- Orphan F2: dangling/looping projection symlinks read as absent, with no
+  lineage value read. Trigger: any restore procedure that links state roots;
+  clarify the treatment of unresolved links before changing this behavior.
+- Orphan F3: refusals surface as `SafetyError` exit 3 instead of a
+  `not_started` reason in the receipt. Trigger: before an operator must
+  diagnose an orphan from receipts alone; document the owner's recovery path.
+- Orphan F4: inherited read-only URI mode, the legacy config/limits comparison
+  and the dictionary type check survive the exploratory test deletion sweep.
+  Trigger: the next change to `active_trial_metadata`.
+- Orphan F8: the observational metrics exporter and conservative capacity
+  ladder still read JSON directly. The reviewer gave no separate trigger;
+  retain this boundary when their state readers next change.
 - Registered wider stop/risk ceilings, if a future exploratory plan needs them,
   require a separate version; none is granted here.
 - Historical comparison and empirical preset selection remain with their

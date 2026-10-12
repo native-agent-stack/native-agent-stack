@@ -4,6 +4,8 @@ from decimal import Decimal
 from pathlib import Path
 from contextlib import closing
 import json
+import hashlib
+import sqlite3
 import sys
 import tempfile
 import unittest
@@ -33,7 +35,106 @@ def seeded(root):
     return ledger
 
 
+def state_artifacts(root):
+    # SQLite's read-only WAL connection may create auxiliary -wal/-shm files.
+    # Compare the persisted database/projection, not those coordination files.
+    return {name:('directory' if (root/name).is_dir()
+                  else hashlib.sha256((root/name).read_bytes()).hexdigest())
+            for name in ('ledger.sqlite3', 'trial.json') if (root/name).exists()}
+
+
 class ExploratoryAuthorityGuards(unittest.TestCase):
+    def test_orphaned_projection_cannot_authorize_a_new_journal(self):
+        for journal in ('missing', 'empty', 'no-tables', 'no-meta', 'no-trial'):
+            with self.subTest(journal=journal), tempfile.TemporaryDirectory(dir='/var/tmp') as root:
+                root=Path(root)
+                path=root/'ledger.sqlite3'
+                projected={**metadata(), 'phase':'finished'}
+                (root/'trial.json').write_text(json.dumps(projected))
+                if journal=='empty':
+                    path.touch()
+                elif journal in ('no-tables', 'no-meta'):
+                    with closing(sqlite3.connect(path)) as db:
+                        # A valid database with no application state, or an unrelated
+                        # schema, binds no trial identity or configuration.
+                        db.execute('PRAGMA user_version=1')
+                        if journal=='no-meta':
+                            db.execute('CREATE TABLE unrelated(value TEXT)')
+                        db.commit()
+                elif journal=='no-trial':
+                    with closing(Ledger(path, exploratory=True)):
+                        pass
+                before=state_artifacts(root)
+                with self.assertRaisesRegex(SafetyError, '^active_trial_projection_unbound$'):
+                    exploration.active_trial_metadata(root)
+                self.assertEqual(state_artifacts(root), before)
+
+    def test_falsey_or_unreadable_projection_cannot_hide_prior_state(self):
+        for projection in ('{}', '[]', 'false', '0', '""', '{', 'directory'):
+            for journal in ('missing', 'empty', 'no-meta', 'no-trial'):
+                with self.subTest(projection=projection, journal=journal), tempfile.TemporaryDirectory(dir='/var/tmp') as root:
+                    root=Path(root)
+                    path=root/'ledger.sqlite3'
+                    if projection=='directory':
+                        (root/'trial.json').mkdir()
+                    else:
+                        (root/'trial.json').write_text(projection)
+                    if journal=='empty':
+                        path.touch()
+                    elif journal=='no-meta':
+                        with closing(sqlite3.connect(path)) as db:
+                            db.execute('PRAGMA user_version=1')
+                            db.commit()
+                    elif journal=='no-trial':
+                        with closing(Ledger(path, exploratory=True)):
+                            pass
+                    before=state_artifacts(root)
+                    with self.assertRaisesRegex(SafetyError, '^active_trial_projection_unbound$'):
+                        exploration.active_trial_metadata(root)
+                    self.assertEqual(state_artifacts(root), before)
+
+    def test_bootstrap_requires_no_prior_trial_in_either_artifact(self):
+        for journal in ('missing', 'empty', 'no-tables', 'pre-trial'):
+            for projection in ('missing', 'null'):
+                with self.subTest(journal=journal, projection=projection), tempfile.TemporaryDirectory(dir='/var/tmp') as root:
+                    root=Path(root)
+                    path=root/'ledger.sqlite3'
+                    if journal=='empty':
+                        path.touch()
+                    elif journal=='no-tables':
+                        with closing(sqlite3.connect(path)) as db:
+                            db.execute('PRAGMA user_version=1')
+                            db.commit()
+                    elif journal=='pre-trial':
+                        with closing(Ledger(path, exploratory=True)):
+                            pass
+                    if projection=='null':
+                        (root/'trial.json').write_text('null')
+                    before=state_artifacts(root)
+                    self.assertIsNone(exploration.active_trial_metadata(root))
+                    self.assertEqual(state_artifacts(root), before)
+
+    def test_bound_legacy_projection_and_authoritative_trial_remain_readable(self):
+        for binding in ('legacy', 'authoritative-missing', 'authoritative-stale',
+                        'authoritative-unreadable', 'authoritative-directory'):
+            with self.subTest(binding=binding), tempfile.TemporaryDirectory(dir='/var/tmp') as root:
+                root=Path(root)
+                with closing(seeded(root)) as ledger:
+                    if binding=='legacy':
+                        ledger.db.execute("DELETE FROM meta WHERE key='exploratory_active_trial'")
+                if binding=='authoritative-missing':
+                    (root/'trial.json').unlink()
+                elif binding=='authoritative-stale':
+                    (root/'trial.json').write_text(json.dumps(metadata('stale')))
+                elif binding=='authoritative-unreadable':
+                    (root/'trial.json').write_text('{')
+                elif binding=='authoritative-directory':
+                    (root/'trial.json').unlink()
+                    (root/'trial.json').mkdir()
+                before=state_artifacts(root)
+                self.assertEqual(exploration.active_trial_metadata(root), metadata())
+                self.assertEqual(state_artifacts(root), before)
+
     def test_t1_rotation_is_explicit_and_never_enabled_by_recovery(self):
         with tempfile.TemporaryDirectory(dir='/var/tmp') as root:
             path=Path(root)/'ledger.sqlite3'

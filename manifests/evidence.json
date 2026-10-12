@@ -13107,8 +13107,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/exploration.py",
-      "sha256": "4e42358613bf7a5feb5c440da61c93ee78d28b88177a3ef3d892f9330b4eda0a",
-      "bytes": 5713
+      "sha256": "34dd029394c43fd2fbb4e2bcaac7e00c8236c9d61c5408459027388df406aebe",
+      "bytes": 6272
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/exploratory-exit-presets.json",
@@ -13412,7 +13412,7 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "488bb599340bfb4f2251530ede8f48d8eee3fa62233c3f9f39f55870afc6e5e4",
+      "sha256": "b3cb2d29882cbb731c767769f67053ba2120b05e24a0b3de300edbd195b8a837",
       "bytes": 9504
     },
     {
@@ -18967,8 +18967,8 @@
     },
     {
       "path": "docs/decisions/2026-10-12-exploratory-account-rotation-and-exits.md",
-      "sha256": "4b86d87b67c01f2ffdf7ac94d2d0b3bdb10b227c7ead66d908505c4433c14e94",
-      "bytes": 7413
+      "sha256": "cc86f7a2cb0d4f81e05ceb53ccbb4b99c42cb07e561ca47b4e7051b35e6e44e8",
+      "bytes": 10146
     },
     {
       "path": "docs/decisions/2026-10-12-mcp-template-live-reconciliation.md",
@@ -61767,8 +61767,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_exploratory_authority.py",
-      "sha256": "d3db12785f12553b24bace4210a657ba1a348bf8619c28bc51190b622babee73",
-      "bytes": 7067
+      "sha256": "31d8b02f9868f15eb507280b27a24ff8ab586f20f9208c34ca553f495bfcfd84",
+      "bytes": 12714
     },
     {
       "path": "tests/test_adaptive_paper_exploratory_presets.py",
