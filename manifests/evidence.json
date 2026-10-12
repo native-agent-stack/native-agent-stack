@@ -5371,7 +5371,7 @@
     },
     {
       "path": "adoption/hooks/claude/SHA256SUMS",
-      "sha256": "d18e950000590289221beacce730068c557f8494e124238e867936a4eadea44a",
+      "sha256": "7ea89390ff302679db455787f8e8724cb36cd30b30389ec7680a3e97c7e9af36",
       "bytes": 1229
     },
     {
@@ -60182,7 +60182,7 @@
     },
     {
       "path": "examples/claude-native/workflows/SHA256SUMS",
-      "sha256": "c2891d254108c5a3f8e0bc82582cb241c171d1a66b9af00c3b0c5216708539b3",
+      "sha256": "6b4da12d9fa4ec192238d366d4b9238ece9f9994949271452bf9d3946bc5fcc0",
       "bytes": 1217
     },
     {
