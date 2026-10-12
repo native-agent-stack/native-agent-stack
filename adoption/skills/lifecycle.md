@@ -113,7 +113,15 @@ python3 scripts/skills_status.py --skills-bin "$SKILLS_BIN" --json
 The existing installer checks the CLI pin, calls upstream `skills add` with each
 immutable tree URL and only the selected clients, then verifies or rolls back a
 failed installation. It disables telemetry and the add-time audit request. A
-matching existing installation is reused. Apply only the selected profile's
+matching existing installation is reused: the canonical folder, its lock entry
+and, for Claude Code, the relative link onto the canonical folder that the CLI
+makes for a non-universal agent
+([`src/installer.ts` L395-426](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/installer.ts#L395-L426)).
+A missing link is drift that the same add repairs; a folder, a link to another
+folder or a dangling link in its place is refused as `local-modified` unless
+`--force`, because the add would replace it
+([L255-263](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/installer.ts#L255-L263)).
+Apply only the selected profile's
 listing controls from [the update guide](../update.md#apply-the-skills-manifest).
 
 A session never installs a skill ad hoc; it records the candidate and the

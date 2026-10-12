@@ -22,8 +22,10 @@ of the real `skills` CLI (v1.7.0) to exercise install_skills.py end to end:
                     "claude-link"), remove_exit fails the remove before it
                     deletes anything, remove_cannot_run leaves the binary
                     non-executable (1) or deletes it (2) after add, so the
-                    rollback cannot start, and lock_after_remove leaves the
-                    lock "malformed" (truncated, entry kept) or "unreadable".
+                    rollback cannot start, lock_after_remove leaves the
+                    lock "malformed" (truncated, entry kept) or "unreadable",
+                    and, for add, no_claude_link (1) writes the canonical
+                    folder and the lock entry but no Claude Code link.
                     A set, non-blank $CLAUDE_CONFIG_DIR moves the global link
                     to $CLAUDE_CONFIG_DIR/skills, as in skills 1.7.0.
   Every global path (canonical folder, lock, link) is joined as skills 1.7.0's
@@ -170,7 +172,7 @@ if argv[0] == "add":
         shutil.rmtree(skill_dir)
     skill_dir.mkdir(parents=True)
     (skill_dir / "SKILL.md").write_text(fixture["skill_md"], encoding="utf-8")
-    if not copy and (not project or "claude-code" in argv):
+    if not copy and not fixture.get("no_claude_link") and (not project or "claude-code" in argv):
         link_dir = claude_skills_dir(target, project)
         link_dir.mkdir(parents=True, exist_ok=True)
         link = link_dir / name
@@ -848,6 +850,9 @@ class IdempotentSkipTests(InstallSkillsTestCase):
         skill_dir = self.home / ".agents" / "skills" / "steady-skill"
         skill_dir.mkdir(parents=True)
         (skill_dir / "SKILL.md").write_text(content, encoding="utf-8")
+        link_dir = self.home / ".claude" / "skills"  # the link a finished add leaves (GlobalClaudeLinkTests)
+        link_dir.mkdir(parents=True)
+        os.symlink(os.path.relpath(skill_dir, link_dir), link_dir / "steady-skill")
         lock_dir = self.home / ".agents"
         lock_dir.mkdir(exist_ok=True)
         (lock_dir / ".skill-lock.json").write_text(json.dumps(
@@ -858,6 +863,143 @@ class IdempotentSkipTests(InstallSkillsTestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("ok", result.stdout)
         self.assertEqual(calls_log(fake_bin), [["--version"]])
+
+
+class GlobalClaudeLinkTests(InstallSkillsTestCase):
+    """A global skill is installed only when the canonical folder, its lock entry AND the Claude Code link are in place.
+
+    The contract is the Skills CLI's own (vercel-labs/skills@7407f3893ad4dceab546ac002c3ef806e4000c73, src/installer.ts): installSkillForAgent copies the skill to the
+    canonical folder (L389-390), skips the agent link only for a universal agent such as Codex (L395-402), and otherwise calls createSymlink(canonicalDir, agentDir)
+    (L426), which writes symlink(relative(realLinkDir, target), linkPath) after replacing whatever sits at the link path (L227-290); the same add writes the lock entry.
+    tools/adoption/install_skills.py used to check only the first two, so --check-only said ok for typesafe-ai on 2026-10-11 while ~/.claude/skills had no entry for it and no
+    Claude Code session listed the skill (scripts/skills_status.py failed it as claude_link missing)."""
+
+    CONTENT = "# Linked skill\n"
+    NAME = "linked-skill"
+
+    def build_installed(self, home: Path, link: bool = True, name: str | None = None) -> dict:
+        """The state a finished add leaves (canonical folder with the pinned SKILL.md, lock entry, and optionally the relative Claude link)."""
+        name = name or self.NAME
+        skill_dir = home / ".agents" / "skills" / name
+        skill_dir.mkdir(parents=True)
+        (skill_dir / "SKILL.md").write_text(self.CONTENT, encoding="utf-8")
+        (home / ".agents" / ".skill-lock.json").write_text(json.dumps(
+            {"lockfileVersion": 3, "skills": {name: {"skillFolderHash": tree_sha(name)}}}))
+        if link:
+            link_dir = home / ".claude" / "skills"
+            link_dir.mkdir(parents=True)
+            os.symlink(os.path.relpath(skill_dir, link_dir), link_dir / name)
+        return make_skill(name, self.CONTENT, tree_sha(name))
+
+    def states(self, manifest: Path, *flags: str, **kwargs) -> tuple[int, dict]:
+        result = self.run_install(manifest, *flags, "--json", **kwargs)
+        return result.returncode, json.loads(result.stdout)["skills"]
+
+    def test_a_complete_install_stays_ok_in_check_only(self):
+        skill = self.build_installed(self.home, link=True)
+        fake_bin = write_fake_skills_bin(self.bin_dir, {})
+        code, skills = self.states(self.write_manifest([skill]), "--check-only", fake_bin=fake_bin)
+        self.assertEqual((code, skills), (0, {self.NAME: "ok"}))
+        self.assertEqual(calls_log(fake_bin), [["--version"]])
+
+    def test_a_canonical_folder_and_lock_entry_without_the_claude_link_is_not_ok_in_check_only(self):
+        # The command center's required case (2026-10-11): returncode 0 and "ok" before the fix, 1 and "missing-or-drifted" after.
+        skill = self.build_installed(self.home, link=False)
+        self.assertFalse((self.home / ".claude" / "skills" / self.NAME).exists())
+        fake_bin = write_fake_skills_bin(self.bin_dir, {})
+        result = self.run_install(self.write_manifest([skill]), "--check-only", "--json", fake_bin=fake_bin)
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        report = json.loads(result.stdout)
+        self.assertFalse(report["ok"])
+        self.assertEqual(report["skills"], {self.NAME: "missing-or-drifted"})
+        self.assertEqual(calls_log(fake_bin), [["--version"]])  # check-only never runs the add
+
+    def test_a_missing_claude_link_is_planned_in_a_dry_run_and_repaired_by_the_pinned_add(self):
+        skill = self.build_installed(self.home, link=False)
+        fake_bin = write_fake_skills_bin(self.bin_dir, {self.NAME: {"skill_md": self.CONTENT, "tree_sha": tree_sha(self.NAME)}})
+        manifest = self.write_manifest([skill])
+        code, skills = self.states(manifest, "--dry-run", fake_bin=fake_bin)
+        self.assertEqual((code, skills), (0, {self.NAME: "planned"}))
+        self.assertEqual(calls_log(fake_bin), [["--version"]])
+        self.assertFalse((self.home / ".claude" / "skills" / self.NAME).exists())
+        code, skills = self.states(manifest, fake_bin=fake_bin)
+        self.assertEqual((code, skills), (0, {self.NAME: "installed"}))
+        self.assertEqual(calls_log(fake_bin)[-1], ["add", skill["url"], "--skill", self.NAME, "-g", "-y", "-a", "claude-code", "codex"])
+        link = self.home / ".claude" / "skills" / self.NAME
+        self.assertEqual(os.readlink(link), os.path.join("..", "..", ".agents", "skills", self.NAME))
+        code, skills = self.states(manifest, "--check-only", fake_bin=fake_bin)
+        self.assertEqual((code, skills), (0, {self.NAME: "ok"}))
+
+    def test_a_claude_entry_that_is_not_the_link_onto_the_canonical_folder_is_protected_and_force_replaces_it(self):
+        # createSymlink (installer.ts L255-263) removes whatever sits at the link path, a real folder recursively, so a
+        # folder or a foreign link there is local content: refused without --force, as the project-scope check already does.
+        def real_folder(entry: Path) -> None:
+            entry.mkdir()
+            (entry / "SKILL.md").write_text("# my own copy\n", encoding="utf-8")
+
+        def foreign_link(entry: Path) -> None:
+            elsewhere = entry.parent.parent / "elsewhere"
+            elsewhere.mkdir()
+            os.symlink(elsewhere, entry)
+
+        def dangling_link(entry: Path) -> None:
+            os.symlink(entry.parent.parent / "nowhere", entry)
+
+        for label, make in (("a real folder", real_folder), ("a link to another folder", foreign_link), ("a dangling link", dangling_link)):
+            with self.subTest(entry=label):
+                home = self.tmp_path / ("home-" + label.replace(" ", "-"))
+                home.mkdir()
+                bin_dir = self.tmp_path / ("bin-" + label.replace(" ", "-"))
+                bin_dir.mkdir()
+                skill = self.build_installed(home, link=False)
+                entry = home / ".claude" / "skills" / self.NAME
+                entry.parent.mkdir(parents=True)
+                make(entry)
+                before = os.readlink(entry) if entry.is_symlink() else sorted(p.name for p in entry.iterdir())
+                fake_bin = write_fake_skills_bin(bin_dir, {self.NAME: {"skill_md": self.CONTENT, "tree_sha": tree_sha(self.NAME)}})
+                manifest = self.write_manifest([skill])
+                code, skills = self.states(manifest, "--check-only", fake_bin=fake_bin, home_arg=str(home))
+                self.assertEqual((code, skills), (1, {self.NAME: "local-modified"}))
+                result = self.run_install(manifest, "--json", fake_bin=fake_bin, home_arg=str(home))
+                self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+                self.assertEqual(json.loads(result.stdout)["skills"], {self.NAME: "local-modified"})
+                self.assertIn(str(entry), result.stderr)  # the refusal names the Claude entry, not an unlocked SKILL.md
+                self.assertEqual(calls_log(fake_bin), [["--version"], ["--version"]])
+                self.assertEqual(os.readlink(entry) if entry.is_symlink() else sorted(p.name for p in entry.iterdir()), before)
+                forced = self.run_install(manifest, "--force", "--json", fake_bin=fake_bin, home_arg=str(home))
+                self.assertEqual(forced.returncode, 0, forced.stdout + forced.stderr)
+                self.assertEqual(json.loads(forced.stdout)["skills"], {self.NAME: "installed"})
+                self.assertEqual(os.readlink(entry), os.path.join("..", "..", ".agents", "skills", self.NAME))
+
+    def test_the_link_is_read_where_claude_config_dir_moves_it(self):
+        skill = self.build_installed(self.home, link=True)  # the link is in the default ~/.claude/skills
+        fake_bin = write_fake_skills_bin(self.bin_dir, {})
+        manifest = self.write_manifest([skill])
+        config = self.tmp_path / "claude-config"
+        env = {"CLAUDE_CONFIG_DIR": str(config)}
+        self.assertEqual(self.states(manifest, "--check-only", env=env, fake_bin=fake_bin), (1, {self.NAME: "missing-or-drifted"}))
+        (config / "skills").mkdir(parents=True)
+        os.symlink(os.path.relpath(self.home / ".agents" / "skills" / self.NAME, config / "skills"), config / "skills" / self.NAME)
+        self.assertEqual(self.states(manifest, "--check-only", env=env, fake_bin=fake_bin), (0, {self.NAME: "ok"}))
+
+    def test_a_codex_only_entry_needs_no_claude_link(self):
+        # Codex loads the canonical folder itself (installer.ts L395-402 skips the agent link for a universal agent).
+        skill = self.build_installed(self.home, link=False)
+        skill["agents"] = ["codex"]
+        fake_bin = write_fake_skills_bin(self.bin_dir, {})
+        code, skills = self.states(self.write_manifest([skill]), "--check-only", fake_bin=fake_bin)
+        self.assertEqual((code, skills), (0, {self.NAME: "ok"}))
+
+    def test_an_add_that_leaves_no_claude_link_is_not_verified_and_is_rolled_back(self):
+        skill = make_skill(self.NAME, self.CONTENT, tree_sha(self.NAME))
+        fake_bin = write_fake_skills_bin(
+            self.bin_dir, {self.NAME: {"skill_md": self.CONTENT, "tree_sha": tree_sha(self.NAME), "no_claude_link": 1}})
+        result = self.run_install(self.write_manifest([skill]), "--json", fake_bin=fake_bin)
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertEqual(json.loads(result.stdout)["skills"], {self.NAME: "rolled-back"})
+        self.assertEqual([call[0] for call in calls_log(fake_bin)], ["--version", "add", "remove"])
+        self.assertIn("rolled back", result.stderr)
+        self.assertFalse((self.home / ".agents" / "skills" / self.NAME).exists())
 
 
 class AddAndVerifyTests(InstallSkillsTestCase):

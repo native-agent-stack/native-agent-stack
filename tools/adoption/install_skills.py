@@ -6,9 +6,22 @@ lock file or the canonical skill folders itself.
 For every manifest skill, in order:
 
   (a) already installed and locked at the pinned revision (the canonical
-      ~/.agents/skills/<name>/SKILL.md sha256 matches skill_md_sha256, and the
-      global skill lock's skillFolderHash for <name> matches tree_sha) ->
-      'ok': nothing is run.
+      ~/.agents/skills/<name>/SKILL.md sha256 matches skill_md_sha256, the
+      global skill lock's skillFolderHash for <name> matches tree_sha, and,
+      for an entry installed for claude-code, the Claude Code link
+      <claude skills folder>/<name> resolves to the canonical folder) ->
+      'ok': nothing is run. A missing link is drift ('install': the add makes
+      it); anything else at that path (a real folder, a link to another
+      folder, a dangling link) is local content that the CLI would replace,
+      a folder recursively (skills@7407f389 src/installer.ts L255-263), so it
+      is refused as 'local-modified' unless --force, as in project scope.
+      The link is the CLI's own for a non-universal agent: installSkillForAgent
+      copies to the canonical folder (L389-390), skips the agent link only for
+      a universal agent such as Codex (L395-402) and otherwise calls
+      createSymlink(canonicalDir, agentDir) (L426), a relative symlink
+      (L284-288). scripts/skills_status.py checks the same link. Until
+      2026-10-11 this check stopped at the first two conditions, so
+      --check-only said ok for a skill whose link was missing.
   (b) a folder exists at that path but the lock has no entry for <name> (for
       example a skill installed by hand before this manifest existed) -> only
       proceed (treat like a fresh install) when its SKILL.md sha256 already
@@ -16,8 +29,8 @@ For every manifest skill, in order:
       otherwise refuse with 'local-modified' unless --force.
   (c) otherwise, run `skills add <url> --skill <name> -g -y -a claude-code
       codex` (env DISABLE_TELEMETRY=1, so the run skips both telemetry and the
-      add-time audit call) and re-check the same two conditions as (a). A
-      mismatch after add (wrong tree, wrong bytes, or the CLI silently
+      add-time audit call) and re-check the same conditions as (a). A
+      mismatch after add (wrong tree, wrong bytes, no link, or the CLI silently
       installing something else) runs `skills remove <name> -g -y -a
       claude-code codex`, then reads back the canonical folder, the lock
       entry and the claude-code link ($CLAUDE_CONFIG_DIR/skills when set, as
@@ -283,6 +296,25 @@ def claude_skills_dir(home: Path, project_dir: Path | None = None) -> Path:
     return node_path_join(claude_config_dir or str(home / ".claude"), "skills")
 
 
+def claude_link_problem(skill: dict, home: Path) -> str | None:
+    """Why a global entry's Claude Code link is not in place, else None: "missing" (nothing at the link path; the add
+    makes it) or "elsewhere" (something that does not resolve to the canonical folder: a real folder, a link to another
+    folder or a dangling link, which the CLI would replace without asking, skills@7407f389 src/installer.ts L255-263).
+    The link is the CLI's own for a non-universal agent (installSkillForAgent L395-426: a relative symlink onto the
+    canonical folder, createSymlink L227-290) and is what scripts/skills_status.py checks (check_claude_link). Codex
+    loads the canonical folder itself (L395-402), and a Claude-Code-only copy is its own folder, so neither needs one."""
+    if copy_mode(skill) or "claude-code" not in skill_agents(skill):
+        return None
+    name = skill["name"]
+    link, canonical = claude_skills_dir(home) / name, canonical_skill_dir(home, name)
+    if not os.path.lexists(link):
+        return "missing"
+    try:
+        return None if link.resolve(strict=True) == canonical.resolve(strict=True) else "elsewhere"
+    except (OSError, RuntimeError):  # a dangling link or a link loop
+        return "elsewhere"
+
+
 def project_containment_problem(project_dir: Path, home: Path, names: list[str]) -> str | None:
     """Why a project install could write outside the (resolved) project_dir, else None.
 
@@ -379,12 +411,13 @@ def pinned_source_trees(source: str, ref: str) -> dict[str, str]:
 
 
 def classify_skill(skill: dict, home: Path, project_dir: Path | None = None, agent: str = "universal") -> str:
-    """'ok' (a)), 'local-modified' (b), refused), 'misplaced' (a global
+    """'ok' (a), which for a global entry includes the Claude Code link), 'local-modified' (b), refused; a global
+    Claude entry that is not the link onto the canonical folder, claude_link_problem), 'misplaced' (a global
     Claude-Code-only copy whose Claude entry is a link or whose name the shared
     canonical folder also holds, copy_placement_problem: refused, never 'ok'),
     or 'install' (needs an add: either a fresh install, a locked-but-mismatched
-    entry, or an unlocked folder that already matches the manifest
-    byte-for-byte)."""
+    entry, a locked entry whose Claude Code link is missing, or an unlocked
+    folder that already matches the manifest byte-for-byte)."""
     name = skill["name"]
     skill_dir = installed_skill_dir(skill, home, project_dir)
     if project_dir is None and copy_mode(skill) and copy_placement_problem(skill, home):
@@ -418,7 +451,10 @@ def classify_skill(skill: dict, home: Path, project_dir: Path | None = None, age
                 return "install"
             tree = pinned_source_trees(skill["source"], skill["ref"]).get(skill["path"])
             return "ok" if tree == skill["tree_sha"] else "install"
-        return "ok" if (md_matches and entry.get("skillFolderHash") == skill["tree_sha"]) else "install"
+        if not (md_matches and entry.get("skillFolderHash") == skill["tree_sha"]):
+            return "install"
+        problem = claude_link_problem(skill, home)
+        return "ok" if problem is None else "install" if problem == "missing" else "local-modified"
     # An unlocked folder counts as (b) -- local content to protect -- as soon as it
     # *exists*, not only once it happens to contain a SKILL.md: a folder with other
     # files and no SKILL.md can never satisfy md_matches, so checking is_file() here
@@ -504,7 +540,13 @@ def process_skill(skill: dict, home: Path, skills_bin: str, dry_run: bool, force
         note(f"{name}: {status}")
         return status
     if state == "local-modified" and not force:
+        try:
+            claude_entry_in_the_way = project_dir is None and claude_link_problem(skill, home) == "elsewhere"
+        except InstallError:
+            claude_entry_in_the_way = False
         protected = ("local project content or an unmanaged Claude target" if project_dir is not None
+                     else f"{claude_skills_dir(home) / name}, which is not a link onto the canonical folder"
+                     if claude_entry_in_the_way
                      else "an unlocked local SKILL.md that does not match the pinned manifest hash")
         print(f"{name}: local-modified -- refusing to overwrite {protected} "
               f"(pass --force to overwrite it)", file=sys.stderr)
@@ -541,10 +583,12 @@ def process_skill(skill: dict, home: Path, skills_bin: str, dry_run: bool, force
             return "error"  # An unavailable oracle is not evidence of a mismatch.
         verified = False
     if verified:
-        # classify_skill checks SKILL.md's sha256 and the lock's recorded tree (skills' skillFolderHash is the source
-        # tree hash recorded at install, vercel-labs/skills v1.7.0 src/skill-lock.ts), not the installed support files.
+        # classify_skill checks SKILL.md's sha256, the lock's recorded tree (skills' skillFolderHash is the source
+        # tree hash recorded at install, vercel-labs/skills v1.7.0 src/skill-lock.ts) and, globally, the Claude Code
+        # link, not the installed support files.
         if project_dir is None:
-            note(f"{name}: installed; SKILL.md sha256 matches the pin and the lock records tree {skill['tree_sha']}")
+            note(f"{name}: installed; SKILL.md sha256 matches the pin, the lock records tree {skill['tree_sha']}"
+                 + ("; the Claude Code link resolves to the canonical folder" if not copy and "claude-code" in agents else ""))
         else:
             note(f"{name}: installed; SKILL.md sha256 and project lock identity match pinned source tree {skill['tree_sha']}")
         return "installed"
@@ -586,8 +630,8 @@ def process_skill(skill: dict, home: Path, skills_bin: str, dry_run: bool, force
               f"{lock_label}={lock_retained}, claude-link={claude_retained})"
               + (f"; left: {', '.join(left)}" if left else ""), file=sys.stderr)
         return "error"
-    print(f"{name}: installed content did not match the pinned manifest hash/tree; rolled back",
-          file=sys.stderr)
+    print(f"{name}: installed content did not match the pinned manifest hash/tree, or left no Claude Code link; "
+          "rolled back", file=sys.stderr)
     return "rolled-back"
 
 
