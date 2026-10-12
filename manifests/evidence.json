@@ -61992,8 +61992,8 @@
     },
     {
       "path": "tests/test_landscape_sweep_harness.py",
-      "sha256": "d380b1afe13ec9d5aeb587459dd8ebbc5834af1c0bd96027ffe3aaae8a9df7ef",
-      "bytes": 390818
+      "sha256": "aeb994b368bcb8a4898f7e3037662b8cdaaafead42e25390f6ae1691655501c9",
+      "bytes": 392417
     },
     {
       "path": "tests/test_landscape_sweep_skills.py",
@@ -63257,8 +63257,8 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/convert.py",
-      "sha256": "6450ce60c95924777cb3f41fa4c4392570c5d0d06630442167829227c110f47c",
-      "bytes": 59717
+      "sha256": "ad5a99e41cebb40df9568b66cedd0f754dc271581934d6f523b9ed203d872eab",
+      "bytes": 60145
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/make_prompt.py",

@@ -4090,6 +4090,32 @@ class ConvertTests(unittest.TestCase):
                     self.assertFalse((work / "out").exists())
                     self.assertNotIn(plant, done.stderr)
 
+    def test_cli_native_publication_scans_large_document_keys_and_values_without_splitting_strings(self):
+        from urllib.parse import quote
+        email = "large-fixture" + "@" + "example.org"
+        account = "large-fixture-account"
+        plants = [quote(email, safe=""), base64.b64encode(email.encode()).decode(),
+                  base64.b64encode(quote(account, safe="").replace("-", "%2D").encode()).decode()]
+        with mock.patch.dict(os.environ, {"NATIVE_AGENT_HOST_NAMES_JSON": json.dumps([account])}):
+            for plant in plants:
+                for location in ("key", "value"):
+                    with self.subTest(location=location):
+                        work = temp_dir(self)
+                        res = healthy_result()
+                        notes = {"padding": ["public-note-" + str(i) for i in range(3000)]}
+                        if location == "key":
+                            notes[plant] = "public reference"
+                        else:
+                            notes["reference"] = plant
+                        self.assertGreater(len(json.dumps(notes).encode()), 25000)
+                        res["first"][0]["claude_discover"]["notes"] = notes
+                        done = self.cli(work, res)
+                        self.assertEqual(done.returncode, 3)
+                        self.assertIn("native publication scan found private content", done.stderr)
+                        self.assertEqual(done.stdout, "")
+                        self.assertFalse((work / "out").exists())
+                        self.assertNotIn(plant, done.stderr)
+
     def test_cli_native_publication_refuses_unavailable_scanner_and_oversized_record(self):
         for kind in ("unavailable", "oversized"):
             with self.subTest(kind=kind), mock.patch.dict(os.environ, {

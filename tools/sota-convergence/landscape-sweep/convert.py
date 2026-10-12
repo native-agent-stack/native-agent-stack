@@ -824,7 +824,7 @@ def main(argv=None) -> int:
         return EXIT_PRIVATE
     # #1007's native publication path at c2dee173 uses Betterleaks 1.9.0
     # (81aff7a6 cmd/stdin.go:47-49, sources/stdin.go:18-25) per unchanged entry.
-    # Reuse its decoder and email/name rules for every record value AND dict key;
+    # Reuse its decoder and email/name rules for every string value AND dict key;
     # do not add a second decoder. Native output/diagnostics never reach publication.
     if not all(hasattr(host_name_scan, name) for name in ("PUBLICATION_ENTRY_LIMIT", "PublicationEntryTooLarge")):
         print("refusing to publish: native publication scanner unavailable (no artifacts written)", file=sys.stderr)
@@ -835,19 +835,27 @@ def main(argv=None) -> int:
             complete = document if isinstance(document, dict) else {name: document}
             text = json.dumps(complete, ensure_ascii=True)
             # A complete small document is already one native publication entry.
-            # Larger documents use complete structural records, never byte cuts.
+            # Larger documents retain complete original string tokens and keys,
+            # using the existing traversal and native bounded JSON entries.
             if len(text.encode("utf-8")) < host_name_scan.PUBLICATION_ENTRY_LIMIT:
                 entries.append((Path(f"{name}.json"), text))
                 continue
-            for key, value in complete.items():
-                if isinstance(value, dict):
-                    records = ({key: {identity: record}} for identity, record in value.items())
-                elif isinstance(value, list):
-                    records = ({key: record} for record in value)
-                else:
-                    records = ({key: value},)
-                entries.extend((Path(f"{name}.json"), json.dumps(record, ensure_ascii=True))
-                               for record in records)
+            strings = []
+            def retain(text):
+                strings.append(text)
+                return text
+            rewrite_strings(complete, retain)
+            batch = []
+            for value in dict.fromkeys(strings):
+                candidate = json.dumps({"": [*batch, value]}, ensure_ascii=True)
+                if batch and len(candidate.encode("utf-8")) >= host_name_scan.PUBLICATION_ENTRY_LIMIT:
+                    entries.append((Path(f"{name}.json"), json.dumps({"": batch}, ensure_ascii=True)))
+                    batch = []
+                batch.append(value)
+            if batch:
+                # A single oversized original string is never split or clipped;
+                # the shared native scanner still refuses it as oversized.
+                entries.append((Path(f"{name}.json"), json.dumps({"": batch}, ensure_ascii=True)))
         native_findings = host_name_scan._scan_entries(
             entries, root=NATIVE_SCAN_ROOT, names=host_name_scan.host_names(NATIVE_SCAN_ROOT), reject_email=True)
     except host_name_scan.PublicationEntryTooLarge:
