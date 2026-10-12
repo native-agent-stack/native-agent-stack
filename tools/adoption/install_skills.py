@@ -11,13 +11,20 @@ For every manifest skill, in order:
       for an entry installed for claude-code, the Claude Code link
       <claude skills folder>/<name> resolves to the canonical folder) ->
       'ok': nothing is run. A missing link is drift ('install': the add makes
-      it). Anything else at that path (a real folder, a link to another
-      folder, a dangling link elsewhere) is local content that the add would
-      replace, a folder recursively (skills@7407f389 src/installer.ts,
-      createSymlink: lstat at L255, `rm(linkPath)` at L261 and
+      it). An entry that does not resolve to the canonical folder (a real
+      folder, a link to another folder, a dangling link elsewhere) is local
+      content that the add would replace, a folder recursively (skills@7407f389
+      src/installer.ts, createSymlink: lstat at L255, `rm(linkPath)` at L261 and
       `rm(linkPath, { recursive: true })` at L263), so it is refused as
       'local-modified' unless --force, whatever the lock says (a first
       install and an unlocked canonical folder included), as in project scope.
+      So is a canonical path that is itself a link: the add removes it first
+      (`cleanAndCreateDirectory(canonicalDir)` at L389) and only then judges
+      the Claude entry, so a real Claude folder that the link leads to is not
+      the CLI's own link although both resolve to one folder, and createSymlink
+      removes it at L263 (a parent that is a link, ~/.claude/skills onto
+      ~/.agents/skills, is the layout createSymlink accepts at L240-250 and
+      stays accepted).
       The link is the CLI's own for a non-universal agent. For a source
       outside the CLI's blob allowlist (every source of the adoption manifest
       except vercel-labs ones: src/add.ts L1370-1392 and L1978) the function
@@ -34,6 +41,11 @@ For every manifest skill, in order:
       variant has the same shape (L1043-1088). scripts/skills_status.py checks
       the same link. Until 2026-10-11 this check stopped at the first two
       conditions, so --check-only said ok for a skill whose link was missing.
+      Known limit (pre-existing, its own pull request): condition (b) and the
+      Claude entry check compare SKILL.md and the link target only, so other
+      content beside a pinned SKILL.md (an extra file in an unlocked or locked
+      canonical folder) is not protected from the add, which recreates that
+      folder (L389).
   (b) a folder exists at that path but the lock has no entry for <name> (for
       example a skill installed by hand before this manifest existed) -> only
       proceed (treat like a fresh install) when its SKILL.md sha256 already
@@ -325,10 +337,15 @@ def unlocked_folder_differs(skill: dict, home: Path) -> bool:
 
 def claude_link_problem(skill: dict, home: Path) -> str | None:
     """Why a global entry's Claude Code link is not in place, else None: "missing" (nothing at the link path; the add
-    makes it) or "elsewhere" (something that does not resolve to the canonical folder: a real folder, a link to another
-    folder or a dangling link elsewhere, which the add would replace without asking, skills@7407f389 src/installer.ts
-    createSymlink L255-263). The resolve is not strict: a dangling link that points at the canonical folder is the CLI's
-    own (a half-removed install; createSymlink keeps a link with the same target, L258-259). The link is the CLI's own
+    makes it), "canonical-link" (the canonical path is itself a link, which the add replaces first,
+    cleanAndCreateDirectory(canonicalDir) at skills@7407f389 src/installer.ts L389, and then judges the Claude entry; a real
+    Claude folder that the link leads to resolves equal to it until then and is removed with its local content at L263, so
+    equal resolved paths prove ownership only when the canonical path is the CLI's own real folder) or "elsewhere"
+    (something that does not resolve to the canonical folder: a real folder, a link to another folder or a dangling link
+    elsewhere, which the add would replace without asking, createSymlink L255-263). A parent that is a link (~/.claude/skills
+    onto ~/.agents/skills, which createSymlink accepts at L240-250) still counts as the same folder. The resolve is not
+    strict: a dangling link that points at the canonical folder is the CLI's own (a half-removed install; createSymlink
+    keeps a link with the same target, L258-259). The link is the CLI's own
     for a non-universal agent (installSkillForAgent: createSymlink(canonicalDir, agentDir) at L426, a relative symlink
     at L284-288; Codex is universal, src/agents.ts L227 and L910-912, and returns at L395-402) and is what
     scripts/skills_status.py checks (check_claude_link). A Claude-Code-only copy is its own folder, so it needs none."""
@@ -336,6 +353,8 @@ def claude_link_problem(skill: dict, home: Path) -> str | None:
         return None
     name = skill["name"]
     link, canonical = claude_skills_dir(home) / name, canonical_skill_dir(home, name)
+    if os.path.islink(canonical):
+        return "canonical-link"
     if not os.path.lexists(link):
         return "missing"
     try:
@@ -441,7 +460,8 @@ def pinned_source_trees(source: str, ref: str) -> dict[str, str]:
 
 def classify_skill(skill: dict, home: Path, project_dir: Path | None = None, agent: str = "universal") -> str:
     """'ok' (a), which for a global entry includes the Claude Code link), 'local-modified' (b), refused; a global
-    Claude entry that is not the link onto the canonical folder, claude_link_problem), 'misplaced' (a global
+    Claude entry that is not the link onto the canonical folder, or a canonical path that is itself a link,
+    claude_link_problem), 'misplaced' (a global
     Claude-Code-only copy whose Claude entry is a link or whose name the shared
     canonical folder also holds, copy_placement_problem: refused, never 'ok'),
     or 'install' (needs an add: either a fresh install, a locked-but-mismatched
@@ -463,9 +483,11 @@ def classify_skill(skill: dict, home: Path, project_dir: Path | None = None, age
             if not canonical_link:
                 return "local-modified"
     link_problem = claude_link_problem(skill, home) if project_dir is None else None
-    if link_problem == "elsewhere":
+    if link_problem in ("elsewhere", "canonical-link"):
         # Whatever the lock says, the add replaces this entry (createSymlink L255-263; the Codex review in GitHub of
         # 114d539f5, thread 1): a first install and an unlocked canonical folder protect it exactly as a locked one does.
+        # A canonical link is replaced first (L389), so the Claude folder it leads to is local content too (Astra's delta
+        # read of 0d2bce2a9, blocker 1).
         return "local-modified"
     md_matches = installed_skill_md_matches(skill, home, project_dir)
     entry = read_lock_entry(home, name, project_dir)
@@ -577,8 +599,12 @@ def process_skill(skill: dict, home: Path, skills_bin: str, dry_run: bool, force
         else:
             reasons = []
             try:
-                if claude_link_problem(skill, home) == "elsewhere":
-                    reasons.append(f"{claude_skills_dir(home) / name}, which is not a link onto the canonical folder")
+                problem, claude_entry = claude_link_problem(skill, home), claude_skills_dir(home) / name
+                if problem == "canonical-link":
+                    reasons.append(f"{canonical_skill_dir(home, name)}, which is a link where the CLI writes the canonical folder "
+                                   f"(the add replaces it, then the Claude Code entry at {claude_entry} unless that is the CLI's own link)")
+                elif problem == "elsewhere":
+                    reasons.append(f"{claude_entry}, which is not a link onto the canonical folder")
             except InstallError:
                 pass
             if unlocked_folder_differs(skill, home):
