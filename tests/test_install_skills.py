@@ -2230,6 +2230,27 @@ class ForeignContentTests(InstallSkillsTestCase):
                 result, skills = self.states("--check-only")
                 self.assertEqual((result.returncode, skills), (1, {self.NAME: "local-modified"}), label)
 
+    def test_an_entry_a_git_tree_cannot_hold_is_content_too(self):
+        """An empty directory and a special file have no entry in the pinned tree and no bytes in a hash, and the add deletes them (the Codex review in GitHub, #1035, round two)."""
+        makers = (("an empty directory", lambda f: (f / "notes").mkdir()), ("an empty directory below references", lambda f: (f / "references" / "empty").mkdir()),
+                  ("a directory that holds only a regenerated one", lambda f: (f / "cache-holder" / "__pycache__").mkdir(parents=True)), ("a named pipe", lambda f: os.mkfifo(f / "pipe")))
+        for label, make in makers:
+            with self.subTest(foreign=label):
+                shutil.rmtree(self.folder, ignore_errors=True)
+                self.canonical()
+                make(self.folder)
+                result, skills = self.states("--check-only")
+                self.assertEqual((result.returncode, skills), (1, {self.NAME: "local-modified"}), label)
+                result, skills = self.states()
+                self.assertEqual((result.returncode, skills), (1, {self.NAME: "local-modified"}), label)
+                self.assertIn("an empty directory or a special file", result.stderr)
+                self.assertEqual(self.add_calls(), [])
+        shutil.rmtree(self.folder, ignore_errors=True)
+        self.canonical()
+        (self.folder / ".venv").mkdir()
+        result, skills = self.states("--check-only")
+        self.assertEqual((result.returncode, skills), (1, {self.NAME: "missing-or-drifted"}), "an empty regenerated directory is not content to protect")
+
     def test_a_skill_md_that_is_a_link_is_not_the_pinned_file_even_when_its_bytes_are(self):
         """The SKILL.md check follows a link; the tree comparison does not (a link is a tree entry of its own kind), so a folder of one linked SKILL.md is protected too."""
         shutil.rmtree(self.folder, ignore_errors=True)
@@ -2322,6 +2343,90 @@ class ForeignContentTests(InstallSkillsTestCase):
         result, skills = self.states(*flags, env=env)
         self.assertEqual((result.returncode, skills), (1, {self.NAME: "local-modified"}), result.stdout + result.stderr)
 
+    # ---- a locked folder at the pin whose SKILL.md was edited: the same add recreates the folder
+    def locked_global_install(self):
+        """A complete locked install at the pin: the lock names the pinned tree, the folder is the pinned tree, the Claude link is in place."""
+        self.lock(self.tree)
+        self.canonical()
+        link_dir = self.home / ".claude" / "skills"
+        link_dir.mkdir(parents=True, exist_ok=True)
+        os.symlink(os.path.relpath(self.folder, link_dir), link_dir / self.NAME)
+
+    def test_a_locked_install_at_the_pin_with_an_edited_skill_md_is_protected_from_the_add(self):
+        """Second GPT read of #1035 at 9a77a96e (~/.cache/ns2604-gpt-reads/fix1-pr1035-9a77a96e8/VERDICT.md, blocker 1): the lock names the pinned tree, SKILL.md is edited, md_matches is False, and the early
+        `install` let the add delete the edit and every extra file (vercel-labs/skills@7407f389 src/installer.ts L195, called at L389). The folder must be the pinned tree before every add over it."""
+        edits = (("an edited SKILL.md", lambda f: (f / "SKILL.md").write_text(self.CONTENT + "a local instruction\n", encoding="utf-8")),
+                 ("an edited SKILL.md and an extra file", lambda f: ((f / "SKILL.md").write_text(self.CONTENT + "a local instruction\n", encoding="utf-8"), (f / "local-work.txt").write_text("mine\n", encoding="utf-8"))),
+                 ("no SKILL.md and an extra file", lambda f: ((f / "SKILL.md").unlink(), (f / "local-work.txt").write_text("mine\n", encoding="utf-8"))))
+        for label, change in edits:
+            with self.subTest(change=label):
+                shutil.rmtree(self.home, ignore_errors=True)
+                self.home.mkdir()
+                (self.fake_bin.parent / "calls.log").unlink(missing_ok=True)   # each case counts its own add calls
+                self.locked_global_install()
+                change(self.folder)
+                self.assert_protected_then_replaced_by_force()
+
+    def test_a_locked_install_at_the_pin_with_an_edited_skill_md_and_no_link_is_protected_too(self):
+        self.lock(self.tree)
+        self.canonical()
+        (self.folder / "SKILL.md").write_text(self.CONTENT + "a local instruction\n", encoding="utf-8")
+        self.assert_protected_then_replaced_by_force()
+
+    def test_a_locked_install_at_the_pin_whose_folder_is_gone_is_repaired_without_force(self):
+        """The clean controls of the same transition: nothing to lose when the folder is missing, and the pinned folder with a missing link is repaired (test above)."""
+        self.lock(self.tree)
+        result, skills = self.states("--check-only")
+        self.assertEqual((result.returncode, skills), (1, {self.NAME: "missing-or-drifted"}), result.stdout + result.stderr)
+        result, skills = self.states()
+        self.assertEqual((result.returncode, skills), (0, {self.NAME: "installed"}), result.stdout + result.stderr)
+        self.assertEqual(len(self.add_calls()), 1)
+
+    def test_an_upgrade_over_an_older_pin_with_an_edited_skill_md_is_still_not_covered(self):
+        self.lock(tree_sha("an older tree"))
+        self.canonical()
+        (self.folder / "SKILL.md").write_text(self.CONTENT + "a local instruction\n", encoding="utf-8")
+        result, skills = self.states()
+        self.assertEqual((result.returncode, skills), (0, {self.NAME: "installed"}), result.stdout + result.stderr)
+
+    def project_locked_at_the_pin(self):
+        project = self.tmp_path / "project"
+        folder = project / ".agents" / "skills" / self.NAME
+        shutil.rmtree(project, ignore_errors=True)
+        project.mkdir()
+        self.canonical(folder=folder)
+        (project / "skills-lock.json").write_text(json.dumps({"version": 1, "skills": {self.NAME: {
+            "source": self.skill["source"], "sourceType": "github", "ref": self.skill["ref"], "skillPath": self.skill["path"] + "/SKILL.md", "computedHash": "a" * 64}}}))
+        gh = self.bin_dir / "gh"
+        gh.write_text("#!/usr/bin/env python3\nimport json\nprint(json.dumps({'truncated': False, 'tree': [{'path': " + repr(self.skill["path"]) + ", 'type': 'tree', 'sha': " + repr(self.tree) + "}]}))\n")
+        gh.chmod(0o755)
+        return project, folder, {"PATH": str(self.bin_dir) + os.pathsep + os.environ["PATH"]}
+
+    def test_a_project_locked_at_the_pin_with_an_edited_skill_md_is_protected_from_the_add(self):
+        """The same state in a project, for both agents (the Claude target is missing for claude-code, absent by design for universal)."""
+        edits = (("an edited SKILL.md", lambda f: (f / "SKILL.md").write_text(self.CONTENT + "a local instruction\n", encoding="utf-8")),
+                 ("an edited SKILL.md and an extra file", lambda f: ((f / "SKILL.md").write_text(self.CONTENT + "a local instruction\n", encoding="utf-8"), (f / "local-work.txt").write_text("mine\n", encoding="utf-8"))),
+                 ("no SKILL.md and an extra file", lambda f: ((f / "SKILL.md").unlink(), (f / "local-work.txt").write_text("mine\n", encoding="utf-8"))))
+        for agent in ("universal", "claude-code"):
+            for label, change in edits:
+                with self.subTest(agent=agent, change=label):
+                    project, folder, env = self.project_locked_at_the_pin()
+                    change(folder)
+                    flags = ("--project-dir", str(project), "--agent", agent)
+                    result, skills = self.states(*flags, "--check-only", env=env)
+                    self.assertEqual((result.returncode, skills), (1, {self.NAME: "local-modified"}), result.stdout + result.stderr)
+                    result, skills = self.states(*flags, env=env)
+                    self.assertEqual((result.returncode, skills), (1, {self.NAME: "local-modified"}), result.stdout + result.stderr)
+                    self.assertEqual(self.add_calls(), [])
+
+    def test_a_project_locked_at_the_pin_whose_folder_is_gone_is_repaired_without_force(self):
+        for agent in ("universal", "claude-code"):
+            with self.subTest(agent=agent):
+                project, folder, env = self.project_locked_at_the_pin()
+                shutil.rmtree(folder)
+                result, skills = self.states("--project-dir", str(project), "--agent", agent, "--check-only", env=env)
+                self.assertEqual((result.returncode, skills), (1, {self.NAME: "missing-or-drifted"}), result.stdout + result.stderr)
+
     def test_a_folder_that_cannot_be_read_is_unverified_not_a_pass(self):
         module = load_installer_module()
         self.canonical()
@@ -2345,8 +2450,8 @@ class PinnedCliForeignContentTests(unittest.TestCase):
     NAME = "native-demo-skill"
     FILES = {"SKILL.md": "---\nname: native-demo-skill\ndescription: A skill that the pinned CLI installs from a local folder.\n---\n# Native demo\n",
              "scripts/run.py": "print('pinned')\n"}
-    EXTRAS = {"a stray file": ("local-work.txt", None), "a regular file named .venv": (".venv", None), "a regular file named .venv below scripts": ("scripts/.venv", None),
-              "a link named .venv": (".venv", "SKILL.md")}
+    EXTRAS = {"a stray file": ("local-work.txt", "file"), "a regular file named .venv": (".venv", "file"), "a regular file named .venv below scripts": ("scripts/.venv", "file"),
+              "a link named .venv": (".venv", "link"), "an empty directory": ("notes", "dir"), "a named pipe": ("pipe", "fifo")}
 
     def setUp(self):
         self.module = load_installer_module()
@@ -2364,17 +2469,21 @@ class PinnedCliForeignContentTests(unittest.TestCase):
         return source
 
     @staticmethod
-    def put(folder, relative, link_to):
+    def put(folder, relative, kind):
         entry = folder / relative
         entry.parent.mkdir(parents=True, exist_ok=True)
-        if link_to is None:
+        if kind == "file":
             entry.write_text("unique local work\n", encoding="utf-8")
+        elif kind == "link":
+            os.symlink("SKILL.md", entry)
+        elif kind == "dir":
+            entry.mkdir()
         else:
-            os.symlink(link_to, entry)
+            os.mkfifo(entry)
         return entry
 
     def test_an_unlocked_canonical_folder_with_an_extra_entry_is_refused_where_the_native_add_deletes_it(self):
-        for label, (relative, link_to) in self.EXTRAS.items():
+        for label, (relative, kind) in self.EXTRAS.items():
             with self.subTest(extra=label), tempfile.TemporaryDirectory() as directory:
                 root = Path(directory)
                 home = root / "home"
@@ -2389,14 +2498,75 @@ class PinnedCliForeignContentTests(unittest.TestCase):
                 link = home / ".claude" / "skills" / self.NAME
                 if link.is_symlink() or link.exists():
                     link.unlink() if link.is_symlink() else shutil.rmtree(link)
-                self.put(folder, relative, link_to)
+                copy = root / "copy"
+                shutil.copytree(home, copy / "home", symlinks=True)   # before the entry goes in: a named pipe cannot be copied
+                self.put(folder, relative, kind)
+                self.put(copy / "home" / ".agents" / "skills" / self.NAME, relative, kind)
                 with mock.patch.dict(os.environ, {"XDG_STATE_HOME": "", "CLAUDE_CONFIG_DIR": ""}):
                     self.assertEqual(self.module.classify_skill(self.row, home), "local-modified")
-                copy = root / "copy"
-                shutil.copytree(home, copy / "home", symlinks=True)
                 done = self.cli(*add, home=copy / "home", cwd=root)
                 self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
                 self.assertFalse(os.path.lexists(copy / "home" / ".agents" / "skills" / self.NAME / relative), "the control: the pinned CLI deletes it")
+
+    def test_a_locked_install_at_the_pin_with_an_edited_skill_md_is_refused_where_the_native_add_deletes_the_edit_and_the_extra_file(self):
+        """Second GPT read of #1035 at 9a77a96e (blocker 1): the same-pin lock plus an edited SKILL.md returned `install` before the content check. Global scope, the lock as the installer reads it."""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            home = root / "home"
+            home.mkdir()
+            source = self.source(root)
+            add = ["add", str(source), "--skill", self.NAME, "-g", "-y", "-a", "claude-code", "codex"]
+            done = self.cli(*add, home=home, cwd=root)
+            self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
+            lock_file = home / ".agents" / ".skill-lock.json"
+            # An install from the manifest's GitHub source records the pinned tree here; a local source records none, so the entry is written as the installer reads it.
+            lock_file.write_text(json.dumps({"lockfileVersion": 3, "skills": {self.NAME: {"skillFolderHash": self.row["tree_sha"]}}}), encoding="utf-8")
+            folder = home / ".agents" / "skills" / self.NAME
+            copy = root / "copy"
+            shutil.copytree(home, copy / "home", symlinks=True)
+            with mock.patch.dict(os.environ, {"XDG_STATE_HOME": "", "CLAUDE_CONFIG_DIR": ""}):
+                self.assertEqual(self.module.classify_skill(self.row, home), "ok", "the complete locked install, before any edit")
+                for target in (folder, copy / "home" / ".agents" / "skills" / self.NAME):
+                    (target / "SKILL.md").write_text(self.FILES["SKILL.md"] + "a local instruction\n", encoding="utf-8")
+                    self.put(target, "local-work.txt", "file")
+                self.assertEqual(self.module.classify_skill(self.row, home), "local-modified")
+            done = self.cli(*add, home=copy / "home", cwd=root)
+            self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
+            replaced = copy / "home" / ".agents" / "skills" / self.NAME
+            self.assertEqual((replaced / "SKILL.md").read_text(encoding="utf-8"), self.FILES["SKILL.md"], "the control: the pinned CLI replaces the edit")
+            self.assertFalse(os.path.lexists(replaced / "local-work.txt"), "and deletes the extra file")
+
+    def test_a_project_locked_at_the_pin_with_an_edited_skill_md_is_refused_where_the_native_add_deletes_the_edit_and_the_extra_file(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            home, project = root / "home", root / "project"
+            home.mkdir()
+            project.mkdir()
+            source = self.source(root)
+            add = ["add", str(source), "--skill", self.NAME, "-y", "-a", "universal", "claude-code"]
+            done = self.cli(*add, home=home, cwd=project)
+            self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
+            lock_file = project / "skills-lock.json"
+            lock = json.loads(lock_file.read_text(encoding="utf-8"))
+            lock["skills"][self.NAME].update(sourceType="github", source=self.row["source"], ref=self.row["ref"], skillPath=self.row["path"] + "/SKILL.md")
+            lock_file.write_text(json.dumps(lock), encoding="utf-8")
+            folder = project / ".agents" / "skills" / self.NAME
+            copy = root / "copy"
+            shutil.copytree(project, copy, symlinks=True)
+            pinned = {self.row["path"]: self.row["tree_sha"]}
+            with mock.patch.object(self.module, "pinned_source_trees", return_value=pinned), mock.patch.dict(os.environ, {"XDG_STATE_HOME": "", "CLAUDE_CONFIG_DIR": ""}):
+                for agent in ("claude-code", "universal"):
+                    self.assertEqual(self.module.classify_skill(self.row, home, project, agent), "ok", f"the complete locked project install for {agent}, before any edit")
+                for target in (folder, copy / ".agents" / "skills" / self.NAME):
+                    (target / "SKILL.md").write_text(self.FILES["SKILL.md"] + "a local instruction\n", encoding="utf-8")
+                    self.put(target, "local-work.txt", "file")
+                for agent in ("claude-code", "universal"):
+                    self.assertEqual(self.module.classify_skill(self.row, home, project, agent), "local-modified", agent)
+            done = self.cli(*add, home=home, cwd=copy)
+            self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
+            replaced = copy / ".agents" / "skills" / self.NAME
+            self.assertEqual((replaced / "SKILL.md").read_text(encoding="utf-8"), self.FILES["SKILL.md"], "the control: the pinned CLI replaces the edit")
+            self.assertFalse(os.path.lexists(replaced / "local-work.txt"), "and deletes the extra file")
 
     def test_a_project_locked_at_the_pin_with_its_claude_link_missing_is_refused_where_the_native_add_deletes_the_extra_file(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -2420,7 +2590,7 @@ class PinnedCliForeignContentTests(unittest.TestCase):
             pinned = {self.row["path"]: self.row["tree_sha"]}
             with mock.patch.object(self.module, "pinned_source_trees", return_value=pinned), mock.patch.dict(os.environ, {"XDG_STATE_HOME": "", "CLAUDE_CONFIG_DIR": ""}):
                 self.assertEqual(self.module.classify_skill(self.row, home, project, "claude-code"), "install", "the pinned folder alone: the repair is allowed")
-                extra = self.put(folder, "local-work.txt", None)
+                extra = self.put(folder, "local-work.txt", "file")
                 self.assertEqual(self.module.classify_skill(self.row, home, project, "claude-code"), "local-modified")
             copy = root / "copy"
             shutil.copytree(project, copy, symlinks=True)

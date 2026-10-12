@@ -368,6 +368,30 @@ class SkillsStatusTests(unittest.TestCase):
         nested = frozenset({"__pycache__"})
         self.assertNotEqual(ss.git_tree_sha(folder, nested, skip_dirs_only=True), ss.git_tree_sha(folder, nested), "the rule holds below the top level too")
 
+    def test_git_tree_sha_in_strict_mode_refuses_an_entry_a_git_tree_cannot_hold(self):
+        """Review of 9a77a96e in GitHub (#1035, round two): an empty directory and a special file have no entry in a git tree, so the hash accepted a folder that held one, and the add deletes it."""
+        folder = self.tmp / "strict"
+        skip = frozenset({"__pycache__"})
+        cases = (("an empty directory", {}, lambda: (folder / "notes").mkdir()), ("a nested empty directory", {}, lambda: (folder / "notes" / "inner").mkdir(parents=True)),
+                 ("a named pipe", {}, lambda: os.mkfifo(folder / "pipe")), ("a directory holding only a skipped one", {}, lambda: (folder / "cache" / "__pycache__").mkdir(parents=True)),
+                 ("an empty directory beside a file", {"refs/a.md": "a"}, lambda: (folder / "refs" / "empty").mkdir()))
+        for label, files, make in cases:
+            with self.subTest(entry=label):
+                shutil.rmtree(folder, ignore_errors=True)
+                folder.mkdir()
+                for name, text in {"SKILL.md": "# s\n", **files}.items():
+                    (folder / name).parent.mkdir(parents=True, exist_ok=True)
+                    (folder / name).write_text(text)
+                plain = ss.git_tree_sha(folder, skip)
+                make()
+                self.assertEqual(ss.git_tree_sha(folder, skip), plain, "the default leaves it out, as git does, and as the status check always has")
+                with self.assertRaises(ss.UnrepresentedEntry):
+                    ss.git_tree_sha(folder, skip, skip_dirs_only=True, strict=True)
+        shutil.rmtree(folder, ignore_errors=True)
+        (folder / ".venv").mkdir(parents=True)
+        (folder / "SKILL.md").write_text("# s\n")
+        self.assertEqual(ss.git_tree_sha(folder, frozenset({".venv"}), skip_dirs_only=True, strict=True), ss.git_tree_sha(folder, frozenset({".venv"})), "an empty skipped directory is regenerated, not content")
+
     def test_a_real_folder_that_cannot_be_resolved_is_not_accepted_as_a_parent_alias(self):
         link, canonical = self.home / ".claude" / "skills" / "alpha-skill", self.home / ".agents" / "skills" / "alpha-skill"
         link.mkdir(parents=True)
@@ -922,6 +946,31 @@ class SkillsStatusTests(unittest.TestCase):
         self.assertEqual(report["folder_trees"]["drift"], ["alpha-skill", "beta-skill"])
         self.assertEqual(report["result"], "ok")
         self.assertIn("drift=alpha-skill,beta-skill", ss.render_text(report))
+
+    def test_the_status_check_judges_content_as_the_installer_does(self):
+        """Second GPT read of #1035 at 9a77a96e (~/.cache/ns2604-gpt-reads/fix1-pr1035-9a77a96e8/VERDICT.md, blocker 2): check_folder_tree still skipped a runtime-directory name whatever the entry was, so a regular
+        `.venv` was `runtime_artifacts` for the status check and `local-modified` for the installer. A file or a link of that name is content (the add deletes it: vercel-labs/skills@7407f389 src/installer.ts
+        L195); a real directory of a regenerated name is not. An empty directory or a special file stays invisible to this comparison, as to a git tree (the fixture's own `empty-dir`)."""
+        manifest, alpha, beta = self.setup_pair()
+        agents_skills = self.home / ".agents" / "skills"
+        folder = self.populate_tree("alpha-skill")
+        alpha["tree_sha"] = ss.git_tree_sha(folder)
+        pristine = self.tmp / "pristine-alpha"
+        shutil.copytree(folder, pristine, symlinks=True)
+        cases = (("nothing added", lambda f: None, "ok"),
+                 ("a real .venv directory with files", lambda f: ((f / ".venv").mkdir(), (f / ".venv" / "pyvenv.cfg").write_text("home = /usr/bin\n")), "runtime_artifacts"),
+                 ("an empty .venv directory (invisible to a git tree)", lambda f: (f / ".venv").mkdir(), "ok"),
+                 ("a regular file named .venv", lambda f: (f / ".venv").write_text("mine\n"), "drift"),
+                 ("a regular file named .venv below scripts", lambda f: (f / "scripts" / ".venv").write_text("mine\n"), "drift"),
+                 ("a link named .venv", lambda f: (f / ".venv").symlink_to("SKILL.md"), "drift"),
+                 ("a link named node_modules", lambda f: (f / "node_modules").symlink_to(self.home, target_is_directory=True), "drift"),
+                 ("a regular file named __pycache__ below scripts", lambda f: (f / "scripts" / "__pycache__").write_text("mine\n"), "drift"))
+        for label, make, expected in cases:
+            with self.subTest(entry=label):
+                shutil.rmtree(folder, ignore_errors=True)
+                shutil.copytree(pristine, folder, symlinks=True)
+                make(folder)
+                self.assertEqual(ss.check_folder_tree(agents_skills, alpha), {"state": expected})
 
     def test_folder_tree_missing_folder(self):
         manifest, alpha, beta = self.setup_pair()

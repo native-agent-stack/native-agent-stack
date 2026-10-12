@@ -399,7 +399,7 @@ records identify their measured inputs, not durable code-source citations.
 
 | Corrected mechanism | Primary source and supported entry point | Reproduced before and after result |
 | --- | --- | --- |
-| Description-budget accounting and dated ceiling | [`scripts/skills_status.py:558`](../../scripts/skills_status.py#L558) (this PR; no branch-SHA pin); `budget_report(manifest, skills_root="<skills-root>")` | The native sum is 11791 characters. The ceiling-decision regression fails with 90fab198's missing pointer and passes with the current dated rationale. The increase from main's 11000 ceiling is explicit policy, not an existing client limit. |
+| Description-budget accounting and dated ceiling | [`scripts/skills_status.py:571`](../../scripts/skills_status.py#L571) (this PR; no branch-SHA pin); `budget_report(manifest, skills_root="<skills-root>")` | The native sum is 11791 characters. The ceiling-decision regression fails with 90fab198's missing pointer and passes with the current dated rationale. The increase from main's 11000 ceiling is explicit policy, not an existing client limit. |
 | Zero-call reading | [`tools/local-pages/fleet_view.py:243`](../../tools/local-pages/fleet_view.py#L243) (this PR; no branch-SHA pin); `_skill_usage` through the maintained fleet-view suite | The revised zero-call checks fail four assertions on the prior renderer and pass after; zero calls ask to check wiring for every receipt label. |
 | Exhaustive runtime-worker adoption | [`tests/test_runtime_worker_skills.py:32`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/878f2891aaa9027b10b7af3e4321ef5e882eedd0/tests/test_runtime_worker_skills.py#L32) (main `878f2891`); `adoption_contract_problems` and its three repository contracts | Three original failures report claude-api neither reused nor excluded; all three pass with the explicit adoption_ref exclusion and overturn condition. |
 | Exhaustive lifecycle task map | [`tests/test_landscape_sweep_skills.py:133`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/878f2891aaa9027b10b7af3e4321ef5e882eedd0/tests/test_landscape_sweep_skills.py#L133) (main `878f2891`); `CatalogTests.test_every_pinned_skill_serves_exactly_one_task` | The original missing claude-api task fails; the corrected map passes with exactly one implementation task. |
@@ -526,7 +526,7 @@ plan layers were incomplete.
 The native status check receives `os.environ`, so a fixture plugin under
 `CLAUDE_CONFIG_DIR` is resolved identically by the installer and status
 checker. The retained reference is
-[`scripts/skills_status.py:250`](../../scripts/skills_status.py#L250), the
+[`scripts/skills_status.py:260`](../../scripts/skills_status.py#L260), the
 existing config-directory resolver, and the official
 [environment-variable documentation, CLAUDE_CONFIG_DIR](https://code.claude.com/docs/en/env-vars#variables).
 The official page states that this variable overrides the configuration

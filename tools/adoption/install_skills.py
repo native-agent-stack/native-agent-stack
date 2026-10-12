@@ -350,14 +350,19 @@ def skills_status_module():
     return skills_status
 
 
+UNREPRESENTED = "unrepresented"
+
+
 def unpinned_content(skill: dict, home: Path, project_dir: Path | None = None) -> str | None:
     """None when the installed folder is the pinned tree, so the add deletes nothing the pinned CLI did not write: its git tree SHA, with the runtime-artifact directories left out (a
-    file or a link of such a name is content and is hashed), is the manifest's tree_sha. Otherwise the folder's tree SHA, for the refusal text. A folder that cannot be read is
-    unverified (InstallError), never a pass."""
+    file or a link of such a name is content and is hashed), is the manifest's tree_sha, and it holds no entry that a git tree cannot (an empty directory, a special file: the add deletes
+    those too). Otherwise the folder's tree SHA, or UNREPRESENTED, for the refusal text. A folder that cannot be read is unverified (InstallError), never a pass."""
     status = skills_status_module()
     folder = installed_skill_dir(skill, home, project_dir)
     try:
-        tree = status.git_tree_sha(folder, status.RUNTIME_ARTIFACT_DIRS, skip_dirs_only=True)
+        tree = status.git_tree_sha(folder, status.RUNTIME_ARTIFACT_DIRS, skip_dirs_only=True, strict=True)
+    except status.UnrepresentedEntry:
+        return UNREPRESENTED
     except (OSError, RecursionError) as error:
         raise InstallError(f"unverified (cannot read {folder}): {error}") from error
     return None if tree == skill["tree_sha"] else str(tree)
@@ -496,8 +501,9 @@ def pinned_source_trees(source: str, ref: str) -> dict[str, str]:
 def classify_skill(skill: dict, home: Path, project_dir: Path | None = None, agent: str = "universal") -> str:
     """'ok' (a), which for a global entry includes the Claude Code link), 'local-modified' (b), refused; a global
     Claude entry that is not the link onto the canonical folder, or a canonical path that is itself a link,
-    claude_link_problem; or a folder whose SKILL.md is the pinned one but that holds content the pinned
-    CLI did not write, unpinned_content), 'misplaced' (a global
+    claude_link_problem; or a folder the add would recreate that is not the pinned tree: an unlocked one, one
+    locked at the pin whose link is missing or whose SKILL.md was edited, a project's, unpinned_content),
+    'misplaced' (a global
     Claude-Code-only copy whose Claude entry is a link or whose name the shared
     canonical folder also holds, copy_placement_problem: refused, never 'ok'),
     or 'install' (needs an add: either a fresh install, a locked-but-mismatched
@@ -538,21 +544,22 @@ def classify_skill(skill: dict, home: Path, project_dir: Path | None = None, age
                 and entry.get("ref") == skill["ref"]
                 and entry.get("skillPath") == skill["path"] + "/SKILL.md"
                 and re.fullmatch(r"[0-9a-f]{64}", str(entry.get("computedHash", ""))) is not None)
-            if not (md_matches and identity_matches):
+            if not identity_matches:
                 return "install"
             tree = pinned_source_trees(skill["source"], skill["ref"]).get(skill["path"])
             if tree != skill["tree_sha"]:
                 return "install"
-            if target_missing:
-                # Locked at the pin with the pinned SKILL.md, only the Claude target missing: the repairing add still recreates the canonical folder.
-                return "local-modified" if unpinned_content(skill, home, project_dir) else "install"
+            if md_matches and not target_missing:
+                return "ok"
+            # Locked at the pin, so the folder is ours to compare whatever made the add necessary (the Claude target is missing, SKILL.md was edited or is gone): the add recreates
+            # the canonical folder from nothing (src/installer.ts L195, called at L389), so only the pinned tree survives it unharmed. A folder that is gone is a clean repair.
+            return "local-modified" if skill_dir.exists() and unpinned_content(skill, home, project_dir) else "install"
+        if entry.get("skillFolderHash") != skill["tree_sha"]:
+            return "install"   # a lock that names another tree: an upgrade over an older one, whose files nothing offline can name (documented boundary)
+        if md_matches and link_problem is None:
             return "ok"
-        if not (md_matches and entry.get("skillFolderHash") == skill["tree_sha"]):
-            return "install"
-        if link_problem is None:
-            return "ok"
-        # Locked at the pin with the pinned SKILL.md, only the link missing: the repairing add still recreates the canonical folder (L389).
-        return "local-modified" if unpinned_content(skill, home) else "install"
+        # Locked at the pin, but the link is missing or SKILL.md is not the pinned one: the add still recreates the canonical folder (L195, L389), so the folder must be the pinned tree.
+        return "local-modified" if skill_dir.exists() and unpinned_content(skill, home) else "install"
     # An unlocked folder counts as (b) -- local content to protect -- as soon as it
     # *exists*, not only once it happens to contain a SKILL.md: a folder with other
     # files and no SKILL.md can never satisfy md_matches, so checking is_file() here
@@ -656,8 +663,11 @@ def process_skill(skill: dict, home: Path, skills_bin: str, dry_run: bool, force
             if unlocked_folder_differs(skill, home):
                 reasons.append("an unlocked local SKILL.md that does not match the pinned manifest hash")
             elif not reasons and (tree := unpinned_content(skill, home)):
-                reasons.append(f"{installed_skill_dir(skill, home)}, whose files are not the pinned tree (git tree {tree[:12]}, pinned {skill['tree_sha'][:12]}): "
-                               "a file the pinned CLI would not write, an edited file or a missing one")
+                if tree == UNREPRESENTED:
+                    reasons.append(f"{installed_skill_dir(skill, home)}, which holds an empty directory or a special file that the pinned tree cannot (the add deletes it)")
+                else:
+                    reasons.append(f"{installed_skill_dir(skill, home)}, whose files are not the pinned tree (git tree {tree[:12]}, pinned {skill['tree_sha'][:12]}): "
+                                   "a file the pinned CLI would not write, an edited file or a missing one")
             protected = " and ".join(reasons) or "an unlocked local SKILL.md that does not match the pinned manifest hash"
         print(f"{name}: local-modified -- refusing to overwrite {protected} "
               f"(pass --force to overwrite it)", file=sys.stderr)

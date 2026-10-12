@@ -5726,8 +5726,8 @@
     },
     {
       "path": "adoption/skills/lifecycle.md",
-      "sha256": "fd2114c9d550966977d60d42a5697b42bdfe9fab26ca11c1ef9315c01a6b637e",
-      "bytes": 23532
+      "sha256": "880fe5d61edcc722cb79cbe1da41ce21106de667275166b470bc0679e674ea4b",
+      "bytes": 23752
     },
     {
       "path": "adoption/skills/manifest.json",
@@ -18832,7 +18832,7 @@
     },
     {
       "path": "docs/decisions/2026-10-10-daily-skill-invoke-rate.md",
-      "sha256": "dcc5642fe8f9b8e1758d1755c8074cb6de6e54bdc15fb409cca21de66bf3b85b",
+      "sha256": "25446226cae9d87a5aaea0b21f3aa0e108478613983494510f2277d05aa99d62",
       "bytes": 39835
     },
     {
@@ -18927,8 +18927,8 @@
     },
     {
       "path": "docs/decisions/2026-10-12-skills-installer-foreign-content.md",
-      "sha256": "84ec0f4daaf2a93e55ca7543d24bcc139bff6e55a5b1d3ee5e7feee9218073bc",
-      "bytes": 6979
+      "sha256": "7a9007fcb9f121d7c9b105e8778d488f844a88fb607092b33931c6d20fd9071d",
+      "bytes": 8025
     },
     {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
@@ -61192,8 +61192,8 @@
     },
     {
       "path": "scripts/skills_status.py",
-      "sha256": "9680d38304dfcf5eb500a91fe15caff7c5843035c2851ceefd2b757519b1c0d1",
-      "bytes": 46502
+      "sha256": "aa03834a67b0aea20557a9ef6452050f26b1cb936c47ecf010f243d8a0136af4",
+      "bytes": 47370
     },
     {
       "path": "scripts/starred_convergence.py",
@@ -62207,8 +62207,8 @@
     },
     {
       "path": "tests/test_install_skills.py",
-      "sha256": "b66f847e66475207e8c61972cbd58aa70a7da713750517111d7ef6c7e02c4f98",
-      "bytes": 157537
+      "sha256": "ed1f07d8ada104901569d25e6ced32161ab04b2c809975932444c2bbb0b8052d",
+      "bytes": 170728
     },
     {
       "path": "tests/test_j775_panel_contracts.py",
@@ -62857,8 +62857,8 @@
     },
     {
       "path": "tests/test_skills_status.py",
-      "sha256": "f7dfe4e72cc6020730df3e1a734ff6cfd1fed7aa37ebe582d2185bbde87b3aaf",
-      "bytes": 75455
+      "sha256": "25721f7174192f3e5e9b5a4ff10fe7b03789ad3f605803025f04623fa12d8f04",
+      "bytes": 79705
     },
     {
       "path": "tests/test_sota_convergence.py",
@@ -63137,8 +63137,8 @@
     },
     {
       "path": "tools/adoption/install_skills.py",
-      "sha256": "9c84ac6d4198990f2ca2d74443113237cd818fe689e32365716905a10795da90",
-      "bytes": 60550
+      "sha256": "49c392949fdb345f441a74336c095f3689793bfa912e3ea734930c7571c112af",
+      "bytes": 61530
     },
     {
       "path": "tools/adoption/managed_block.py",
