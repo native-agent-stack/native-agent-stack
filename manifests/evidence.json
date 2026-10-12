@@ -18947,8 +18947,8 @@
     },
     {
       "path": "docs/decisions/2026-10-11-starred-finalization.md",
-      "sha256": "76ad490df969d0ea9972b315fe0632e412380df1c43adc18b1369f0e7ac482a2",
-      "bytes": 12464
+      "sha256": "65d339790291609f8aeebf302ffe56cac5a27434b43db904e4831e03646431cb",
+      "bytes": 12766
     },
     {
       "path": "docs/decisions/2026-10-12-mcp-template-live-reconciliation.md",

@@ -192,8 +192,12 @@ validator without claiming upstream execution or runtime selection.
 
 The native monitoring producer sees two additional conservative read locations
 from the URL identity and seed-pointer expressions, including the `*#/seeds/*`
-shape. The monitoring record is re-derived with its existing GitTree producer
-to 334 entries; no enforcement category is added. Its current locator list and
-shape values are checked against the final source. Old source_files_sha256
-values remain explicitly labelled historical metadata rather than being claimed
-as current-file bindings; their separate follow-up is not folded into this PR.
+shape. Under #1030's dated append contract (`advisory-gate-deltas.md` at
+66584736c076873ca7e5898e3bd8111cca1a1447), the 2026-10-04 baseline remains
+unchanged at 332 reads. This PR's observation is the 2026-10-12 snapshot with
+344 reads and 100 shape-bearing locations, derived through the existing native
+GitTree producer at d5e4d4a42942e062b4780419d8d2afcba2088152 and appended after
+#949's observation. Its matching delta is monitoring-only; no enforcement
+category is added. The snapshot's locator list and shape values match that
+source. This PR adds no label to the baseline's source_files_sha256 values and
+does not change them; their separate follow-up remains outside this correction.
