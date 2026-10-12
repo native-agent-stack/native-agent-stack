@@ -282,6 +282,36 @@ class CredentialStatusTests(unittest.TestCase):
         path.chmod(0o644)
         self.assertIn("mode_not_0600", self.entry(self.report(), "tavily")["findings"])
 
+    def test_sharadar_row_is_a_paid_stored_file_entry_like_databento(self):
+        # The owner's interactive entry for the Sharadar key needs an inventory row: open_credential_terminal.sh and
+        # set_credential.py accept only ids committed here. It mirrors databento's row (a paid research-lane key in its
+        # own 0600 file, no loader yet), and its notes carry the vendor's own facts (https://sharadar.com/llms.txt):
+        # the direct API, not Nasdaq Data Link, and the key sent as the x-api-key header.
+        rows = {e["id"]: e for e in self.inventory["entries"]}
+        row, model = rows["sharadar"], rows["databento"]
+        for field in ("class", "status", "lane", "optional_variables", "pointer_variables", "loaders",
+                      "environment_only_consumers"):
+            with self.subTest(field=field):
+                self.assertEqual(row[field], model[field])
+        self.assertEqual(row["variables"], ["SHARADAR_API_KEY"])
+        self.assertEqual(row["store"], {"kind": "private_env_file",
+                                        "path_template": "${XDG_CONFIG_HOME:-$HOME/.config}/native-agent-stack/sharadar.env"})
+        self.assertIn("open_credential_terminal.sh sharadar", row["rotation"])
+        for words in ("https://api.sharadar.com/v1.0", "x-api-key", "not Nasdaq Data Link", "https://sharadar.com/llms.txt"):
+            self.assertIn(words, row["notes"])
+        table = (ROOT / "docs/secret-storage.md").read_text(encoding="utf-8")
+        self.assertEqual(sum(1 for line in table.splitlines() if line.startswith("| `sharadar` |")
+                             and "`<store>/sharadar.env`" in line and "`SHARADAR_API_KEY`" in line), 1)
+        self.assertEqual(self.entry(self.report(), "sharadar")["state"], "missing")
+        path = self.store / "sharadar.env"
+        path.write_text(f"export SHARADAR_API_KEY={self.fake_a}\n")
+        path.chmod(0o600)
+        report = self.report()
+        entry = self.entry(report, "sharadar")
+        self.assertEqual((entry["state"], entry["mode"], entry["findings"]), ("ok", "0600", []))
+        self.assertEqual(report["coverage"]["undeclared_store_files"], [])
+        self.assert_no_values(json.dumps(report), cs.render_text(report))
+
     def test_interim_tavily_rotation_step_is_stated_once_in_each_place(self):
         # Until the id-based runner lands, tvly-keyring and kernel_keyring.py exec read the keyring copy, not the file,
         # so renewing only the file would leave them on the old key. The step is stated once, dated, in the inventory
