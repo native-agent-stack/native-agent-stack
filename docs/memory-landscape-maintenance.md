@@ -125,22 +125,27 @@ printf '{"cwd":"%s"}' "$DIR" | ai-memory --data-dir "$AI_MEMORY_DATA_DIR" hook \
 
 and expect `capture_mode` `allowlist`, with `marker_present` and `admits_capture` true only for enrolled directories; `ai-memory status` also reports `capture_mode`. Inverse: `install-hooks … --capture-mode denylist --apply` (or delete `<data_dir>/capture-mode`) and remove the markers that were added.
 
-**Correction, 2026-10-11 (CC correction #149).** The `--capture-assistant` opt-in documented above (the two `install-hooks` commands and the "Assistant capture … explicit opt-ins" sentence) was not in force on this host: 0 of 9 Claude hook commands and 0 of 7 Codex hook commands carried it, because the earlier hook applications ran without the flag and ai-memory only preserves an opt-in already baked into the installed Stop command (`existing_capture_assistant_opt_in`, ai-memory v2.6.0 `crates/ai-memory-cli/src/commands/install_hooks.rs:689-701` and `:1104-1109` @ 89bd8ded; a bare re-apply, such as the #144 repair, therefore does not add it). Claude was re-staged with `--capture-assistant` on 2026-10-11 and its Stop hook now carries the flag. Only the Stop hook carries it by design, so the other eight Claude commands correctly do not (the renderer bakes the flag only when `event == "stop"`, `crates/ai-memory-cli/src/commands/render_shared.rs:1425-1427` @ 89bd8ded; `install_hooks.rs:1142` reads the Stop command for it). Codex is pending a trust refresh: re-rendering changes its hooks' `trusted_hash`, and the changed commands run only once reviewed through the ordinary `/hooks` interface (no trust-bypass flag, no trust-store edit), so Codex assistant capture stays off until then. Host note: the GPT read kit (`tools/gpt_read_repo_exec_omni.sh`, `tools/strip_read_markers.py`) lives in the co-op's host state directory, not in this repository; its comment that "repositories commit the marker" contradicts `.gitignore:73` (`/.ai-memory.toml`, the marker is never committed), so the correct statement is that the marker is untracked, a per-host decision copied only by `.worktreeinclude`.
+**Correction, 2026-10-11 (CC correction #149).** The `--capture-assistant` opt-in documented above (the two `install-hooks` commands and the "Assistant capture … explicit opt-ins" sentence) was not in force on this host: 0 of 9 Claude hook commands and 0 of 7 Codex hook commands carried it. These counts and the host history in this correction (the earlier hook applications, the Claude re-stage and the pending Codex trust) are CC host measurements, recorded as correction #149 in `command-center/lessons-20261005/cc-corrections-20261005.md` (host state, not in this repository) and not re-read by this change. The earlier hook applications ran without the flag, and ai-memory only preserves an opt-in already baked into the installed Stop command (`existing_capture_assistant_opt_in`, `crates/ai-memory-cli/src/commands/install_hooks.rs:689-701` and `:1104-1109`, identical at ai-memory v2.6.3 = 385b81ea, the release this host runs, and at v2.6.0 = 89bd8ded); a bare re-apply, such as the #144 repair, therefore does not add it. Claude was re-staged with `--capture-assistant` on 2026-10-11 and its Stop hook now carries the flag. Only the Stop hook carries it by design, so the other eight Claude commands correctly do not (the renderer bakes the flag only when `event == "stop"`, `crates/ai-memory-cli/src/commands/render_shared.rs:1425-1427`, so only the Stop command can carry it, and `install_hooks.rs:1142` scans the installed ai-memory commands for it; both ranges are identical at v2.6.3 = 385b81ea and v2.6.0 = 89bd8ded). Codex is pending a trust refresh: re-rendering a hook command changes its computed current hash, but the stored `trusted_hash` is unchanged, so the hook is marked modified and Codex skips it until the changed command is reviewed through the ordinary `/hooks` interface, which writes the reviewed current hash into `trusted_hash` (no trust-bypass flag, no trust-store edit; `docs/decisions/2026-10-04-codex-rtk-hook-qualified.md` Decision 1 states the mechanism from openai/codex rust-v0.159.3; at rust-v0.162.1 = 092d3acd, the installed `codex-cli`, `codex-rs/hooks/src/engine/discovery.rs:796-813` `hook_trust_status` marks a stored hash that differs from the current hash `Modified`, `:715-721` runs a hook only when it is Managed or Trusted unless `bypass_hook_trust` is set, and `codex-rs/tui/src/hooks_rpc.rs:58-92` `write_hook_trusts` writes the reviewed current hash), so Codex assistant capture stays off until then. Host note: the GPT read kit (`tools/gpt_read_repo_exec_omni.sh`, `tools/strip_read_markers.py`) lives in the co-op's host state directory, not in this repository; its comment that "repositories commit the marker" contradicts `.gitignore:73` (`/.ai-memory.toml`, the marker is never committed), so the correct statement is that the marker is untracked, a per-host decision copied only by `.worktreeinclude`.
 
 `CLAUDE_SETTINGS`, `CODEX_HOOKS` and `MEMORY_URL` are host-specific placeholders.
-The upstream installer preserves unrelated hooks and writes a backup. Claude's
-pre-existing prompt-capture opt-out remains off. Both clients' assistant Stop
-excerpts are separately opted in, sanitized and capped at 2,000 bytes; a final
-message exceeding 64 KiB is dropped entirely. They are not full transcripts.
-The service must enable this field as well as the client hook.
-An existing Desktop task's hook reload is not proved by editing its file.
+The upstream installer preserves unrelated hooks and writes a backup.
+At the 2026-09-21 qualification this review recorded Claude's pre-existing
+prompt-capture opt-out as off and both clients' assistant Stop excerpts as
+opted in separately; correction #149 above gives the host state measured on
+2026-10-11. Where the opt-in is in force, the excerpts are sanitized and
+capped at 2,000 bytes, and a final message exceeding 64 KiB is dropped
+entirely. They are not full transcripts. The service must enable this field as
+well as the client hook. An existing Desktop task's hook reload is not proved
+by editing its file.
 
-Codex also requires native trust for a changed hook command. In this qualification
-the first task ran without the modified Stop hook. Only that reviewed hook was
-then trusted through the ordinary `/hooks` interface in each native/Desktop
-profile; no trust-bypass flag or direct trust-store edit was used. Native
-`hooks/list` subsequently reported zero untrusted hooks in both profiles, and a
-new native task supplied the actual captured outcome.
+Codex also requires native trust for a changed hook command.
+At the 2026-09-21 qualification the first task ran without the modified Stop
+hook. Only that reviewed hook was then trusted through the ordinary `/hooks`
+interface in each native/Desktop profile; no trust-bypass flag or direct
+trust-store edit was used. Native `hooks/list` subsequently reported zero
+untrusted hooks in both profiles, and a new native task supplied the actual
+captured outcome. For the current Codex state see correction #149 above:
+assistant capture is off until Codex trust is refreshed.
 
 ## Commands and observed results
 
