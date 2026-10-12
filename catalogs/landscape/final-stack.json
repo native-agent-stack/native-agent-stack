@@ -10659,7 +10659,7 @@
     "adoption/pins-linux-x86_64.json": "964d085d8fe2cb8aba3d44678938e34a2b1d8b6e320227db4152352a0d0e2449",
     "adoption/pins-macos-arm64.json": "539a4840e1c5e2d5377685c274932f697d22bd16e28f99e70c12b2f86dc9f24c",
     "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock": "f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989",
-    "catalogs/landscape/component-evidence-matrix.json": "7c68cc6e9e0001e4953ad08c6dec86cca462a5ca9787e5d1035a90f515f27885",
+    "catalogs/landscape/component-evidence-matrix.json": "02ac70488aa0b9a73cc5340c51f7925a2913737aa60e1d859c3224d49484022d",
     "catalogs/landscape/foundation.json": "868d193a31080ab913400725140bd0d01e0afe97e28564fd12777f737d22951a",
     "catalogs/landscape/manifest.json": "8f2795612616853c92db1571de32d5ffb2019c32b3376ef0ed3b28fe9a8cc077",
     "catalogs/landscape/planned-layers.json": "b24e06efe5a029e4187af803701a56bdd74319e6b2d8fd82daa243b33294fb5d",

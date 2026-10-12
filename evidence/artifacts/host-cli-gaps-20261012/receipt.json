@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "kind": "host_cli_gap_repair",
+  "observed_utc": "2026-10-12T14:53:32Z",
+  "evidence_class": "native_proven",
+  "platform": "linux-x86_64",
+  "catalog_base": "d8f7e2051b61bde6361a85b64f41413798015353",
+  "installer": "adoption/bootstrap-linux.sh",
+  "pin_sources": ["adoption/skills/manifest.json", "adoption/pins-linux-x86_64.json"],
+  "native_host_receipts": [
+    "evidence/hosts/host-cli-gap-20261012/host-cli-gap-20261012--tavily-cli--install--20261012.json",
+    "evidence/hosts/host-cli-gap-20261012/host-cli-gap-20261012--openresearch--install--20261012.json"
+  ],
+  "recorder_identity_input": "public-host-cli-gap-recorder",
+  "recorder_scope": "Public task pseudonym supplied to the native recorder, not an account or machine name. Skills CLI has no separate stack/winner component id; this supplemental receipt binds its checks without inventing one.",
+  "before": {
+    "command": "python3 tools/adoption/install_skills.py --check-only",
+    "exit_code": 1,
+    "diagnostic": "skills not found",
+    "on_path": {"skills": false, "tvly": false, "orx": false, "pdftotext": false, "agent-browser": false}
+  },
+  "install": {
+    "command": "systemd-run --user --scope -p CPUWeight=idle bash adoption/bootstrap-linux.sh --only skills --only tavily-cli --only orx --skip-system-packages",
+    "exit_code": 0,
+    "verified_pins": 3,
+    "failed_probes": 0,
+    "vendor_routes": {"skills": "checksum-verified npm archive in isolated prefix", "tavily-cli": "uv tool install --python 3.13 tavily-cli==0.1.8", "orx": "checksum-verified release tarball in isolated prefix"},
+    "scope": "Existing bootstrap functions and pin sources only; existing ecosystem bin already on PATH; no profile/PATH edit, client install, core refresh, authentication or provider operation. npm also publishes the vendor add-skill alias."
+  },
+  "after": {
+    "command": "python3 tools/adoption/install_skills.py --check-only",
+    "exit_code": 0,
+    "summary": "install-skills: 28/28 ok",
+    "probes": [
+      {"command": "skills --version", "exit_code": 0, "output": "1.7.0"},
+      {"command": "tvly --version", "exit_code": 0, "output": "tavily-cli 0.1.8"},
+      {"command": "orx --version", "exit_code": 0, "output": "orx 0.2.15"}
+    ],
+    "on_path": {"skills": true, "tvly": true, "orx": true, "pdftotext": false, "agent-browser": false}
+  },
+  "inverse": {
+    "evidence_class": "local_integration",
+    "scope": "Same bootstrap selection in a new disposable prefix; live host installation retained.",
+    "install_command": "ECO_INSTALL_ROOT=<owned-prefix> systemd-run --user --scope -p CPUWeight=idle bash adoption/bootstrap-linux.sh --only skills --only tavily-cli --only orx --skip-system-packages",
+    "install_exit_code": 0,
+    "commands": [
+      {"command": "npm uninstall --global --ignore-scripts --no-audit --no-fund --prefix <owned-prefix>/tools/skills-1.7.0 skills", "exit_code": 0},
+      {"command": "UV_TOOL_DIR=<owned-prefix>/python-tools UV_TOOL_BIN_DIR=<owned-prefix>/bin uv tool uninstall tavily-cli", "exit_code": 0},
+      {"command": "rm -- <owned-prefix>/bin/orx <owned-prefix>/bin/skills <owned-prefix>/bin/add-skill; rm -r -- <owned-prefix>/tools/orx-0.2.15", "exit_code": 0}
+    ],
+    "readback": "No skills, add-skill, tvly or orx executable or dangling publication link remains in the disposable prefix."
+  },
+  "retained_boundaries": {
+    "pdftotext": "qualified-prefix-only: current Poppler 26.09.0 recipe is Mac-specific, makes no global default, and does not qualify Linux. No Linux bootstrap pin exists; Linux absence remains a platform gap, not a pass.",
+    "pdftotext_source": "blueprints/convergence-practice/document-ingestion/README.md",
+    "agent-browser": "held; no install or browser download performed",
+    "credentials": "No credential/configuration read, sign-in or live provider call performed."
+  },
+  "limitations": [
+    "Version and installed-skill checks do not establish live web-research acceptance.",
+    "The existing tavily-cli sdist digest is an independent cross-check; the native uv route resolves the exact version and its dependencies through its index. This repair does not add dependency locking.",
+    "This host run used the proposed bootstrap source before review; it is not a platform-status promotion."
+  ]
+}

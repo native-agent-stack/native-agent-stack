@@ -5341,8 +5341,8 @@
     },
     {
       "path": "adoption/bootstrap-linux.sh",
-      "sha256": "0a635049216dc715d70cf6ef325474c06e59ce5ae2f2a29ab962f24cffe6ec9e",
-      "bytes": 74811
+      "sha256": "12282fdad903975bba19bc344f12cef6b8f949e94dcdba65680ae14899cba1a9",
+      "bytes": 76774
     },
     {
       "path": "adoption/bootstrap-macos.sh",
@@ -5351,8 +5351,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "9a81f6d200291a55f1abea93ced95ccce7c0451d6f239c114e0658f18326f840",
-      "bytes": 74970
+      "sha256": "2e2fe980d4ffc2d5eb3adc02022d498bf194b3aadd1a496a98c432ecffa44867",
+      "bytes": 77270
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -17297,12 +17297,12 @@
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "sha256": "7c68cc6e9e0001e4953ad08c6dec86cca462a5ca9787e5d1035a90f515f27885",
-      "bytes": 315225
+      "sha256": "02ac70488aa0b9a73cc5340c51f7925a2913737aa60e1d859c3224d49484022d",
+      "bytes": 315261
     },
     {
       "path": "catalogs/landscape/final-stack.json",
-      "sha256": "5dde8ad61bb124fbcb2d56acb6c0973febc0802fda54bf5e5d8127ce9c15153b",
+      "sha256": "72fbe27b0c05fd75baf23251a456382299870c26eb6baae75a7a9298390dd349",
       "bytes": 309186
     },
     {
@@ -17932,7 +17932,7 @@
     },
     {
       "path": "docs/component-evidence-matrix.md",
-      "sha256": "0fad007a8e9568b4271e2ac2b1996a57dd1fa52883f902b8c784eeca07e968a7",
+      "sha256": "5c7dc6a8faba02037bf40a02b5b22260613e9c2ed38a3976b26349c1857322b5",
       "bytes": 32981
     },
     {
@@ -18914,6 +18914,11 @@
       "path": "docs/decisions/2026-10-11-sell-only-quote-freshness.md",
       "sha256": "f547857a970ef0e3b5585be294db9d3edc52c25615079c7900ed38552d0a8731",
       "bytes": 8417
+    },
+    {
+      "path": "docs/decisions/2026-10-12-host-cli-gap-repair.md",
+      "sha256": "bcc9d5e09592350eafefea17dfd64bc121349fa20e4dfed01815cacdb583bb69",
+      "bytes": 5730
     },
     {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
@@ -36684,6 +36689,11 @@
       "path": "evidence/artifacts/host-baseline-20261004/stackmeasure2604.json",
       "sha256": "0d771af61bf75d07cbc6bf428b82652b0d5cd3a030ff3a4e83e28439b5ea66c6",
       "bytes": 11952
+    },
+    {
+      "path": "evidence/artifacts/host-cli-gaps-20261012/receipt.json",
+      "sha256": "4adc1e08cfe21269389546a512bb602a028888f673d4557da7a14b257c2b251a",
+      "bytes": 4305
     },
     {
       "path": "evidence/artifacts/host-upgrade-20260923/upgrade-evidence.json",
@@ -58041,6 +58051,16 @@
       "bytes": 4142
     },
     {
+      "path": "evidence/hosts/host-cli-gap-20261012/host-cli-gap-20261012--openresearch--install--20261012.json",
+      "sha256": "5d8b50501a50dc8f84f08cb3b3fcbd86ab1daa4f1bb14700e5d4a079c1ba86a9",
+      "bytes": 1620
+    },
+    {
+      "path": "evidence/hosts/host-cli-gap-20261012/host-cli-gap-20261012--tavily-cli--install--20261012.json",
+      "sha256": "f21e57b5830ba7fd01c95af4ae2cd7a977dfa61792773e4a0c3aabb79e8d3bfb",
+      "bytes": 1508
+    },
+    {
       "path": "evidence/hosts/mac-coordinator-64gb-20260925/mac-coordinator-64gb-20260925--ai-memory--use--20260925.json",
       "sha256": "491a43789016027cd144f38a0bc9fc30f6d305a32025a9dc8972e542f96fd8c4",
       "bytes": 7687
@@ -61647,8 +61667,8 @@
     },
     {
       "path": "tests/test_adoption_bootstrap.py",
-      "sha256": "58e541faa0bd735e6cc44e1da47120c772712458acc4370e58fc78c6105f9fe0",
-      "bytes": 105822
+      "sha256": "43d88395fdea5e7768cfb10a80702e25eafea11d4d84d4b74236ba5beb7e545c",
+      "bytes": 105861
     },
     {
       "path": "tests/test_adoption_bootstrap_linux_platform.py",
@@ -61764,6 +61784,11 @@
       "path": "tests/test_bootstrap_integrity_drivers.py",
       "sha256": "5d1db3ac65ec37ce71934eebe971d6276321e7f0b33137e8a5f33d668e91bd3a",
       "bytes": 14613
+    },
+    {
+      "path": "tests/test_bootstrap_selected_pins.py",
+      "sha256": "06fb2fac0eaf9fe7fe4cb56e2508d6eb8965ed37026281a62929041643723d4c",
+      "bytes": 5144
     },
     {
       "path": "tests/test_broad_universe_coverage.py",

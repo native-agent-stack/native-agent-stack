@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "id": "host-cli-gap-20261012--tavily-cli--install--20261012",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "host-cli-gap-20261012",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": false
+  },
+  "catalog_revision": "d8f7e2051b61bde6361a85b64f41413798015353",
+  "recorded_by": {
+    "identity_sha256": "4bbad487d839bc52782f02d7231406c6d0de7a72790dc27e0759ef41cb37265a"
+  },
+  "component_id": "tavily-cli",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "tvly --version",
+      "exit": 0,
+      "duration_s": 0.39,
+      "output_sha256": "c73223cbe97117324b832cfd3511f10dca1401e0d0c0e3dff251669700cbbe34",
+      "output_excerpt": "tavily-cli 0.1.8\n"
+    }
+  ],
+  "tool_versions": {
+    "tavily-cli": "0.1.8"
+  },
+  "observed_at_utc": "2026-10-12T15:00:04Z",
+  "result": "pass",
+  "claim": "Pinned bootstrap install and executable publication recorded in evidence/artifacts/host-cli-gaps-20261012/receipt.json; installed CLI version checked here.",
+  "limitations": [
+    "Version-only check; no credential or provider operation; independent review pending."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-10-12T15:00:04Z",
+      "reviewer": {
+        "identity_sha256": "4bbad487d839bc52782f02d7231406c6d0de7a72790dc27e0759ef41cb37265a"
+      }
+    }
+  ]
+}

@@ -12,6 +12,8 @@ usage() {
     '                                [--configure-claude-user-profile]' \
     '                                [--configure-full-profile --host <name>' \
     '                                 [--skip <step>]...]' \
+    '   or: bash bootstrap-linux.sh --only <pinned-id> [--only <pinned-id>...]' \
+    '                               [--skip-system-packages]' \
     '' \
     'Installs the tools pinned in adoption/pins-linux-x86_64.json for the' \
     "given profile's component_ids (from adoption/manifest.json) under" \
@@ -20,6 +22,9 @@ usage() {
     'is SHA-256 verified before extraction; a pin with a null sha256 refuses' \
     'to install (fail closed), except a uv-tool-from-git pin (serena), which' \
     'has no archive to hash and instead pins and verifies an exact git commit.' \
+    'Targeted --only installs just the named pins, using existing prerequisites;' \
+    'it neither refreshes core tools nor configures a user profile. The skills' \
+    'CLI is read from adoption/skills/manifest.json; other ids use Linux pins.' \
     'A selected component with no pin at all also' \
     'fails closed (exit 3) before installing anything, unless it is named in' \
     '--allow-unpinned, in which case it is skipped and echoed to the run log.' \
@@ -50,6 +55,7 @@ script_dir="$(cd -- "$script_dir" >/dev/null 2>&1 && pwd -P)"
 repo_root="$(cd -- "$script_dir/.." >/dev/null 2>&1 && pwd -P)"
 
 profile_id=""
+only_ids=()
 skip_system=0
 allow_unpinned_ids=()
 configure_claude_user_profile=0
@@ -58,6 +64,11 @@ full_profile_host=""
 full_profile_skips=()
 while [[ $# -gt 0 ]]; do
   case "$1" in
+    --only)
+      [[ $# -ge 2 && -n "$2" && "$2" != --* ]] || { printf -- '--only requires a pinned id.\n' >&2; exit 2; }
+      only_ids+=("$2")
+      shift 2
+      ;;
     --profile)
       [[ $# -ge 2 ]] || { printf -- '--profile requires a value.\n' >&2; exit 2; }
       profile_id="$2"
@@ -131,7 +142,14 @@ while [[ $# -gt 0 ]]; do
       ;;
   esac
 done
-[[ -n "$profile_id" ]] || { printf -- 'Missing required --profile <id>.\n' >&2; exit 2; }
+if [[ ${#only_ids[@]} -gt 0 ]]; then
+  [[ -z "$profile_id" && "$configure_full_profile" == 0 && "$configure_claude_user_profile" == 0 \
+     && ${#allow_unpinned_ids[@]} -eq 0 ]] || {
+    printf -- '--only cannot be combined with --profile, --allow-unpinned or profile configuration.\n' >&2; exit 2
+  }
+else
+  [[ -n "$profile_id" ]] || { printf -- 'Missing required --profile <id>.\n' >&2; exit 2; }
+fi
 
 # full_profile_selected STEP: whether --configure-full-profile runs STEP (it is not named in --skip).
 full_profile_selected() {
@@ -236,27 +254,54 @@ pins_path="$repo_root/adoption/pins-linux-x86_64.json"
 [[ -r "$manifest_path" ]] || { printf 'Missing manifest: %s\n' "$manifest_path" >&2; exit 1; }
 [[ -r "$pins_path" ]] || { printf 'Missing pins file: %s\n' "$pins_path" >&2; exit 1; }
 
-component_ids_json="$(jq -c --arg id "$profile_id" \
-  '[.profiles[] | select(.id == $id) | .component_ids[]]' "$manifest_path")"
-[[ "$component_ids_json" != "[]" ]] || {
-  printf 'Unknown or empty profile: %s\n' "$profile_id" >&2
-  exit 1
+pin_entry() {
+  if [[ "$1" == skills ]]; then
+    # The CLI's existing source of truth; install_npm verifies this archive,
+    # then the normal bounded report probes the published executable.
+    jq -c '.cli | {id: "skills", version, kind: "npm", url: .tarball, sha256,
+      ignore_scripts: true, install_note: .install,
+      version_probe: {method: "exec", command: "skills", args: ["--version"]}}' \
+      "$repo_root/adoption/skills/manifest.json"
+  else
+    jq -c --arg id "$1" '.tools[] | select(.id == $id)' "$pins_path"
+  fi
 }
-mapfile -t component_ids < <(printf '%s' "$component_ids_json" | jq -r '.[]')
+
+if [[ ${#only_ids[@]} -gt 0 ]]; then
+  component_ids=()
+  for selected_id in "${only_ids[@]}"; do
+    [[ "$selected_id" =~ ^[a-z0-9][a-z0-9-]*$ ]] || { printf 'Invalid pinned id: %s\n' "$selected_id" >&2; exit 2; }
+    [[ -n "$(pin_entry "$selected_id")" ]] || { printf 'No pin for selected component: %s\n' "$selected_id" >&2; exit 3; }
+    case " ${component_ids[*]} " in
+      *" $selected_id "*) ;;
+      *) component_ids+=("$selected_id") ;;
+    esac
+  done
+  profile_id="selected:${component_ids[*]}"
+else
+  component_ids_json="$(jq -c --arg id "$profile_id" \
+    '[.profiles[] | select(.id == $id) | .component_ids[]]' "$manifest_path")"
+  [[ "$component_ids_json" != "[]" ]] || {
+    printf 'Unknown or empty profile: %s\n' "$profile_id" >&2
+    exit 1
+  }
+  mapfile -t component_ids < <(printf '%s' "$component_ids_json" | jq -r '.[]')
+fi
 
 # Fail closed on any selected component with no pin, before installing
 # anything: install_pin's own "no pin -> skip" path only ever reaches
 # components explicitly allowed via --allow-unpinned below.
-all_selected_ids=(node uv gh)
+all_selected_ids=()
+[[ ${#only_ids[@]} -gt 0 ]] || all_selected_ids=(node uv gh)
 for selected_id in "${component_ids[@]}"; do
   case "$selected_id" in
-    node|uv|gh) continue ;;
+    node|uv|gh) [[ ${#only_ids[@]} -gt 0 ]] || continue ;;
   esac
   all_selected_ids+=("$selected_id")
 done
 unpinned_ids=()
 for selected_id in "${all_selected_ids[@]}"; do
-  pin_entry="$(jq -c --arg id "$selected_id" '.tools[] | select(.id == $id)' "$pins_path")"
+  pin_entry="$(pin_entry "$selected_id")"
   [[ -n "$pin_entry" ]] || unpinned_ids+=("$selected_id")
 done
 if [[ ${#unpinned_ids[@]} -gt 0 ]]; then
@@ -1070,7 +1115,7 @@ rtk_config_reminder() {
 install_pin() {
   local id="$1"
   local entry
-  entry="$(jq -c --arg id "$id" '.tools[] | select(.id == $id)' "$pins_path")"
+  entry="$(pin_entry "$id")"
   if [[ -z "$entry" ]]; then
     printf 'No pin for component %s in %s; skipping.\n' "$id" "$pins_path" >&2
     return 0
@@ -1120,13 +1165,15 @@ installed_pin_ids=()
 
 # node, uv and gh are core prerequisites the npm-kind pins and gh-based
 # verification below depend on; install them before the profile's own list.
-for core_id in node uv gh; do
-  install_pin "$core_id"
-done
+if [[ ${#only_ids[@]} -eq 0 ]]; then
+  for core_id in node uv gh; do
+    install_pin "$core_id"
+  done
+fi
 
 for id in "${component_ids[@]}"; do
   case "$id" in
-    node|uv|gh) continue ;;
+    node|uv|gh) [[ ${#only_ids[@]} -gt 0 ]] || continue ;;
   esac
   install_pin "$id"
 done
@@ -1251,7 +1298,7 @@ write_version_report() {
   version_report_platform
   git --version
   for id in ${installed_pin_ids[@]+"${installed_pin_ids[@]}"}; do
-    entry="$(jq -c --arg id "$id" '.tools[] | select(.id == $id)' "$pins_path")"
+    entry="$(pin_entry "$id")"
     version="$(jq -r '.version' <<<"$entry")"
     method="$(jq -r '.version_probe.method // "undeclared"' <<<"$entry")"
     expected="$(jq -r '.version_probe.expect // .version' <<<"$entry")"

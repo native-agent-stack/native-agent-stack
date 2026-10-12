@@ -109,6 +109,46 @@ GitHub-hosted macOS runner; see
    script before running it on a new host; it installs only what the chosen
    `--profile` selects.
 
+   **Repair selected Linux CLI installs without refreshing a profile.** On a
+   host with the bootstrap prerequisites already installed, use the repeatable
+   `--only` selector (added after `v2026.10.05.1`):
+
+   ```sh
+   bash adoption/bootstrap-linux.sh --only skills --only tavily-cli --only orx --skip-system-packages
+   python3 tools/adoption/install_skills.py --check-only
+   skills --version
+   tvly --version
+   orx --version
+   ```
+
+   This calls the existing vendor installers and bounded version report for
+   exactly those ids. It does not refresh node, uv, gh or a client profile.
+   `skills` takes its archive/version/hash from `adoption/skills/manifest.json`;
+   other ids take their existing Linux pin. The native installers publish
+   executable links in `$ECO_INSTALL_ROOT/bin`. That directory must already be
+   on PATH, or be added through the bootstrap's managed `path-block` step;
+   `--only` never edits a shell profile. Explicit `--profile` and profile
+   configuration flags cannot be combined with `--only`.
+
+   A [host receipt](../evidence/artifacts/host-cli-gaps-20261012/receipt.json)
+   records the default skills check failing before this repair and passing
+   afterward, plus native versions and the inverse in a disposable prefix.
+   The inverse is `npm uninstall --global --prefix <skills-prefix> skills`,
+   `uv tool uninstall tavily-cli` with the same `UV_TOOL_DIR` and
+   `UV_TOOL_BIN_DIR`, and removal of the owned orx prefix/publication link.
+   Remove the bootstrap's skills/add-skill publication links too, after
+   verifying they still target that owned prefix. Retain receipts and any
+   pre-existing install before removing or replacing it.
+
+   Poppler is deliberately qualified-prefix-only under the current
+   [document-ingestion recipe](../blueprints/convergence-practice/document-ingestion/README.md#build-and-qualify-another-explicit-mac-prefix):
+   it builds Poppler 26.09.0 on an explicit Mac dependency prefix and neither
+   promotes a global default nor qualifies Linux. The Linux bootstrap has no
+   Poppler pin. An absent Linux `pdftotext` remains an explicit platform gap;
+   installing a distro version would require its own pinned recipe and
+   acceptance. This repair leaves that boundary intact and leaves held
+   agent-browser uninstalled.
+
    `installed-versions.txt` checks each pin the run installed with the
    `version_probe` its pin entry declares: the declared command, run with
    stdin from `/dev/null` in its own process group and killed after 30 s (or the
