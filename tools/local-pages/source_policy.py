@@ -358,6 +358,29 @@ class ArchitectureReads:
                      "file_utc": datetime.fromtimestamp(info.st_mtime, timezone.utc).isoformat().replace("+00:00", "Z")}
 
 
+class CommandCenterReads(ArchitectureReads):
+    """Add the command center's exact roles to the same bounded no-follow reader.
+
+    Each command_center_* role in the committed policy names exact repo or state
+    paths; the user root is never granted here, and the Architecture roles,
+    aliases and families keep their own checks.
+    """
+
+    def __init__(self, root, state_root, policy_path=POLICY_PATH):
+        super().__init__(root, state_root, policy_path)
+        entries = self.policy.document.get("command_center", {})
+        if not isinstance(entries, dict):
+            raise SourcePolicyError("command-center permissions must be a role map")
+        for role, paths in entries.items():
+            if not isinstance(role, str) or not role.startswith("command_center_") or not isinstance(paths, list):
+                raise SourcePolicyError("invalid command-center exact-path role")
+            self.allowed[role] = set()
+            for record in paths:
+                if not isinstance(record, dict) or record.get("root") not in {"repo", "state"}:
+                    raise SourcePolicyError("command-center permission requires the repo or state root")
+                self.allowed[role].add((record["root"], _relative(record.get("path"))))
+
+
 @contextmanager
 def guard_native(native, root, state_root, spec_path, *, policy_path=POLICY_PATH):
     """Guard every original native file read, including forced and linked inputs.

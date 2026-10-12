@@ -8,8 +8,8 @@ the stated window, and Codex counts are SKILL.md reads. Groups overlap. Missing
 client measurements stay UNKNOWN. The section is refreshed by the existing
 page builder after the CC deploys the daily timer.
 
-`build_pages.py` presents the CC current view, native readiness receipts,
-gap board, roadmap, fleet, architecture and sources as seven complete local HTML documents. It uses the existing
+`build_pages.py` presents the CC current view, command center, native readiness receipts,
+gap board, roadmap, fleet, architecture and sources as eight complete local HTML documents. It uses the existing
 `tools/north-star/build_readiness.py` functions `build`, `render` and
 `render_fragment`; it adds presentation and refresh custody without deciding
 gate acceptance. The initial reference is repository commit
@@ -178,6 +178,245 @@ once. Sparse maps show zero recorded calls, while unknown values stay
 unreported. Counts describe the stated retrospective window and do not prove
 adoption acceptance, fresh-session use or workflow improvement.
 
+`command_center_view.py` renders `command-center.html`, the first entry in the
+index's page list and the second in the navigation. It adds no collector. Its
+nine sections reuse the Fleet and Adoption observations that every refresh
+already makes, `cc-now.json`, and sixteen files read through
+`source_policy.CommandCenterReads` under exact `command_center_*` roles in
+`source_policy.json`:
+
+| Section | Inputs |
+| --- | --- |
+| Sessions and lanes | Fleet `lanes_live`, `claude_sessions`, `exec_reads_in_flight`, `lanes_parked` and the hcom roster; `cc-now.json#/cc_agents/running` |
+| Orchestration | `cc-now.json#/orchestration` and `#/landing_queue`; `state:coordination/ns2604-coop/read-queue-now.json`; the `orchestration-frameworks` slot of `state:coordination/cc-native-practice-20261009/slots-final.json`; Adoption `orchestration` tool calls by role |
+| PR waves | `cc-now.json#/in_review` and `#/landings_today` |
+| Resolution landscape | `repo:catalogs/landscape/component-evidence-matrix.json`, `new-host-grand-list.json` and `final-stack.json`; the layers of `repo:catalogs/north-star/readiness.json`; `cc-now.json#/program`, `#/mirrors` (with `pins`), `#/rulings` and the optional `#/north_star_layers` |
+| SOTA skill invoke rates | `repo:adoption/skills/manifest.json`; `state:coordination/command-center/skills/skill-usage-host-latest.json`, `skill-usage-codex-lanes-latest.json`, `skill-usage-claude-lanes-latest.json` and #970's `skill-invoke-rate-latest.json`; the slots in `slots-final.json`; Fleet tracking's per-lane `skill_invocations` rates |
+| Tokens saved | `state:coordination/command-center/pages/token-tools-now.json` and `token-window-now.json`; Adoption token-efficiency server counts; `cc-now.json#/token_efficiency` (and `#/token_use_24h` when the token window is missing) |
+| Research queue | `state:coordination/ns2604-coop/research-queue.tsv`; `repo:catalogs/landscape/research-state.json` `resume_order` |
+| Compounding manifests | `repo:catalogs/north-star/readiness.json`, `manifests/evidence.json` and `catalogs/landscape/final-stack.json` |
+| Waiting on you | `cc-now.json#/waiting_on_owner` |
+
+`CommandCenterReads` extends the Architecture reader: the same bounded,
+no-follow, protected-name checks, with repo and state roots only. Each read's
+path, role, hash, byte count and modification time join the receipt's
+`command_center.inputs`, and its path joins the custody table on
+`sources.html`: a repository input with its SHA-256, and any input read from
+the state root (the command-center state inputs, `cc-now.json`,
+`adoption-now.json`, the gap board, the roadmap inputs, the state-root readiness
+receipts and the role projection's registry files) with the note "private, not
+published (host state)", since the digest of private raw bytes would confirm a
+guessed masked value (#161). The rule is by provenance, not by name: the
+composer marks an input private when its path is under the state root, and the
+nonserved receipt keeps the digest and the `private` flag. The footer's native
+readiness manifest SHA-256 is the digest of a document the native builder
+renders from the state root, so every page prints the same note there, as the
+Readiness heading does; the receipt keeps it as
+`native_readiness_manifest_sha256`. Before publication each page also passes
+`sanitization.withhold_digests`, so no page carries the SHA-256 of state-root
+bytes that the refresh records, or a prefix of one 7 or more hex characters
+long: a content-addressed name such as `receipt-<16 hex>.json` reads
+`receipt-[digest prefix withheld].json` (#1012 GPT fix3 verdict, BLOCKER 1;
+Claude micro at 38302cd2, (d)3). A missing or malformed input renders
+`missing input: <name>`, an unapproved one `unreadable (SourcePolicyError)`;
+neither stops the refresh. An `in_review` row that is not an object is rejected
+with a stated gap naming how many were rejected: PR waves reads partial, and the
+count strip counts the accepted rows only. A view failure publishes an UNREPORTED placeholder
+while the other pages refresh. Each section carries a wired, partial or
+missing-input label, also recorded per section in the receipt. The label
+follows what the section renders: any stated gap, not-wired input or stale
+report makes it partial, and the detail names the reason. An hcom roster that
+Fleet tracking could not read is such a gap, with fleet_data's status and
+reason, so Sessions reads partial rather than showing an empty roster. Each
+section and the count strip render in their own guard, so a value of the wrong
+type degrades only the part that reads it.
+
+Every value keeps its own source and window, and nothing is summed across
+windows. A report older than its limit at the refresh reads "stale" with its
+age: three hours for the hourly skill and token reports, 30 hours for the daily
+Codex lanes report, one hour for the read queue. A read queue without a
+parseable `updated_utc` leaves Orchestration partial, since its age is unknown.
+Times the CC records as a time
+of day (`15:38Z`) are shown as recorded, never completed with a date. Skill
+counts come from the repository's measurement tools and stay separate from
+Fleet's Prometheus rates, where a rate the producer does not qualify stays
+UNKNOWN.
+
+The skills section has one row per skill pinned in
+`adoption/skills/manifest.json`: its source@ref (linked only for an https URL),
+its path and the counts per client, which are Claude lifetime uses, Claude Skill
+calls in main sessions and in subagents over 7 days (calls, not sessions:
+child-usage.mjs counts each invocation), and Codex use, SKILL.md reads and name
+mentions over 7 days. A pinned skill with zero calls in every measured 7-day
+column is flagged "wiring defect"; one with no skills-lock record and no
+`/skill-doctor` row is also "not installed", and while `/skill-doctor` itself
+is unmeasured that install state reads "not measured"; a skill with recorded
+calls that the manifest does not pin is listed as "unpinned". Codex counts are
+shown for every pinned skill, and a skill the manifest does not enable for
+Codex carries that note. When #970's
+`daily_skill_usage.py` publishes `skills/skill-invoke-rate-latest.json`
+(`skill-invoke-rate-daily/1`) within 30 hours, its counts are used; otherwise
+the hourly reports are. While the daily projection is current, an hourly report
+it replaces that is absent or stale reads "not used" and is no gap. A skill
+that the Claude lanes report measured keeps those counts when the host report
+has no row for it, and its other columns stay unmeasured. A client or root that its producer did not measure
+reads "not measured" and never counts as zero. The number of pinned skills with
+no 7-day call counts only skills with a measured 7-day column: with none
+measured it reads UNKNOWN (null in the receipt's `defects`), and with some
+measured the strip and the summary name that denominator ("3 of 6 measured";
+the receipt also carries `measured_skills` and `pinned_skills`).
+
+The landscape section lists each matrix winner's component, pin, evidence
+class, lifecycle stages and platforms, then the W6 final columns: verdict, run
+pin, upstream E2E at the pin and invoke evidence, each as recorded or "not
+recorded". A winner's run pin is that of the run its same-layer winner in
+`final-stack.json` names in `run`, whose id can differ from the matrix
+component id; a final-stack winner without a run shows its `run_reason`, and a
+layer that lists no such winner falls back to the run with the component's id.
+Each winner's github.com repository is matched, by owner/name and
+ignoring case, to `cc-now.json#/mirrors/pins`. "Matches the pin" means the
+pin's version equals the dotted version the mirror's tag names
+(`rust-v0.155.1`, `v1.30.1` and `release-1.2` name `0.155.1`, `1.30.1` and
+`1.2`; a ref without a dotted version, such as `HEAD`, `main` or
+`codex-cli-v2`, is compared as written), or a commit in the pin shares the
+mirror commit's prefix. A winner the matrix records as unpinned reads "no pin
+recorded to compare", and a winner without an entry reads "no mirror"; both
+raw values render beside the relation. Terminal layer
+states come only from `final-stack.json` and read "pending #1007 (#1008 landed 2026-10-11 21:34:23Z)" until it
+exists. The north-star readiness layers follow with the same columns, from
+their RECORDED claims.
+
+The tokens section shows each token tool's own report command, run by
+`token_tools_now.py` (below), with its exit code, run time, version and the
+tool's own estimate. The native counters from `token-window-now.json` are
+labelled client counters. Each Adoption server row is labelled by its
+case-folded name: RTK, Headroom, jCodeMunch, otherwise Context Mode. Nothing is summed across tools, evidence classes or
+windows. The count strip's saved-tokens figure is RTK's own, from its
+token-tools row, the token-window report whose name names RTK, or
+`cc-now.json#/token_efficiency/rtk`, and otherwise reads UNKNOWN; another
+tool's figure never stands in for it. The only chart is token use by lane: one series in one hue, bars
+beside the numbers in the same table. Two inputs can read "not wired" with
+their reason: the `tools/token-report` manifest, whose README keeps raw
+reports private, and the north-star ten-layer table while
+`cc-now.json#/north_star_layers` is absent, since no committed record holds
+it. The receipt's `command_center.not_wired` lists only the notices the page
+rendered.
+
+The shared sanitizer omits email addresses on every page and in
+`token-tools-now.json`, after the same per-token decoding it applies to home
+paths and identifiers, so percent-encoded, double-encoded and HTML-entity forms,
+with or without the semicolon, are matched in their decoded text. It reads the
+whole text with each token decoded and takes the whole local part RFC 5322
+allows: any nonempty run of atext (all 81 characters, the letters, digits and
+``!#$%&'*+-/=?^_`{|}~``, with dots, so `!!!@d` and `/@d` are addresses) or a
+quoted string such as `"reviewer"`, `"john doe"` or the empty `""`, whose quotes
+may be percent- or entity-encoded or JSON-escaped as `\"`. The slash and the
+backtick are atext like the rest, and exactly three contexts are set aside, each
+positively identified (`<at>` stands for the at sign below, so this file writes
+no address). Inside a URL (a scheme, `://`, and every character up to a space,
+an angle bracket or a quote) the slash ends the local part, so
+`https://medium.com/<at>handle.name` is a path, not an address, while an address
+after a path segment still masks from its own first character. An at sign that
+comes right after a slash, with a name after it that a slash or an opening
+parenthesis follows, starts a path segment or a call
+(`run_stream_events/<at>agent.tool/message_history`,
+`<at>DBOS.workflow()/<at>DBOS.step()`); the slash must be the character right
+before the at sign, so an address that is itself a path segment, such as
+gcloud's per-account `legacy_credentials/NAME<at>HOST/adc.json`, masks whole
+together with its directory prefix. RFC 5322 also allows a local part that ends
+in a slash, and such an address with a slash or a parenthesis after it stays
+readable, a cost #1012's Follow-ups record. And a backtick string that a
+backtick string of equal length closes after the at sign opens a Markdown code
+span (CommonMark 0.31.2 section 6.1) when it does not follow a letter or digit,
+a condition of this mask that CommonMark does not set and that masks more, so
+`` `@AGENTS.md` `` is not an address and a code span around an address keeps its
+backticks. Anywhere else a slash or a backtick before the at sign is part of the
+local part: `/<at>d`, `x/<at>d` and a lone backtick before the at sign are
+masked whole, as is a host path with no scheme and nothing after it
+(`medium.com/<at>handle.name`). Overlapping matches merge from their earliest
+start, so a quoted local part that
+itself holds an at sign is omitted whole. From each at sign the walk back stops
+after 256 characters (RFC 5321 section 4.5.3.1.1 limits a local part to 64
+octets) and never passes the address before it, so the cost is linear in the
+text's length; a local part over 256 characters keeps its leading part visible.
+After masking, a value that still holds an at sign, raw or encoded, followed by
+a domain and directly after a word character, or after a quote with only
+whitespace between, is dropped whole and reads `[value omitted: an at sign
+beside a word remained after masking]`; the command-center page counts those
+values and names their sections partial. A token over 4,096 characters is not
+decoded for the mask, so there the mask first matches these forms in place: for
+the at sign `%40`, `%2540`, `&#64` and `&#x40` (with or without the semicolon)
+and `&commat;`, for the dot `%2E`, `%252E`, `&#46`, `&#x2E` and `&period;`, and
+for the quotes `%22`, `%2522`, `&quot`, `&#34` and `&#x22`. No such token is
+published unchecked: it is then decoded with the same two rounds, and one that
+an address touches in its decoded text, or whose decoded text turns the
+character beside an in-place mask into part of the address, is omitted whole as
+`[email omitted]`; one whose decoded text, or the text it encodes as hex or
+base64, holds a home path, a session id, a task handle, an account URL or the
+home name reads `[long token omitted: it decodes to private text]`, and the
+command-center page counts those tokens as it counts dropped values (#1012 GPT
+fix3 verdict, BLOCKER 2). A systemd
+template-unit name that ends in `service`, `socket`, `device`, `mount`,
+`automount`, `swap`, `path`, `timer`, `slice` or `scope`, such as
+`git-maintenance@daily.timer`, stays readable, except an instance name that
+itself contains a dot, which still masks (`openvpn-client@site.conf.service`
+becomes `[email omitted].service`; #1012 Follow-ups, the bdc09788 micro's (a)5). A name ending in
+`target` is masked, because `target` is also a delegated top-level domain.
+
+`token_tools_now.py` runs each installed token tool's own report command:
+`rtk gain --format json`, `headroom agent-savings --check-perf --hours 24
+--format json`, `headroom output-savings` and `doctor` from the context-mode
+plugin's `cli.bundle.mjs`. It writes `token-tools-now.json`
+(`token-tools-now/1`) atomically, passes dict keys as well as values through the
+shared sanitizer, and refuses a destination inside the repository, also when a
+parent or ancestor reaches it through a symlink. Headroom runs with its update check, network use and telemetry off.
+Headroom's agent-savings exits 1 below its profile target, and its output
+savings are counterfactual unless an A/B holdout is set. Context-mode reports
+savings only through its MCP tool `ctx_stats`, so only `doctor` runs. The CC's
+hourly usage refresh calls it beside the token window:
+
+```sh
+python3 tools/local-pages/token_tools_now.py \
+  --out /path/to/native-state/coordination/command-center/pages/token-tools-now.json \
+  --context-mode-cli /path/to/context-mode/1.0.169/cli.bundle.mjs
+```
+
+The skill reports come from `tools/skill-usage/render_units.py`, which renders
+two user services and timers for review: hourly, `skill_usage.py
+--run-skill-doctor --window 7` (91 s measured on 2026-10-11, including a $0,
+zero-turn `claude -p /skill-doctor`) and `child-usage.mjs --lanes-sweep` over
+seven days (198 s, 1.9 GB peak), projected by `systemd/claude-lanes.jq` from
+181 MB to the aggregate skill counts; daily, `skill_usage.py --lanes` over
+seven days, which runs the Node kernel once per rollout session and had not
+finished after 25 minutes (completion time unmeasured), so it keeps the report
+without per-actor rows. Each step renames a finished report into place.
+
+The CC publishes these `cc-now.json` projections; all are optional and every
+absent field reads "not recorded":
+
+| Field | Shape |
+| --- | --- |
+| `in_review[]` | `pr`, `what`, `state`, plus optional `head`, `round` (non-negative integer or text), `next_gate`, `blockers` and `follow_ups` (a list of text or one text; `[]` reads "none") |
+| `cc_agents.running[]` | `"name (task)"` text or `{name, task, model}`; a model appears only in object rows |
+| `orchestration` | `{slot, default, state, evidence, next}` |
+| `landing_queue[]` | `{pr, head, state, since_utc}` |
+| `program[]` | `{ws, title, owner, state, gate, reopen}` |
+| `mirrors` | `{count, manifest_rows, synced_utc, failed: [], pins: {"owner/name": {ref, commit, synced_at_utc}}}` |
+| `rulings[]` | `{file, utc, summary}` |
+| `north_star_layers[]` | `{n, name, target, lane, acceptance, state}` |
+
+The co-op's `read-queue-now.json` is `{updated_utc, slots, running: [{read,
+pr, head, tier, started_utc}], waiting: [{pr, head, kind, gates}]}`. Another
+type in a field reads "not recorded (unsupported value)".
+
+```json
+{"in_review": [{"pr": "#1234", "what": "fixture work", "state": "micro running",
+                "head": "abc12345", "round": 2, "next_gate": "Astra micro at abc12345",
+                "blockers": ["Codex P2: reinstall race"], "follow_ups": ["one re-pin"]}],
+ "cc_agents": {"running": [{"name": "cc-micro-1234", "task": "#1234 micro at abc12345",
+                            "model": "claude-opus-5-5"}]}}
+```
+
 `architecture_builder.py` generates `architecture.html` from the canonical
 catalogs named by `catalogs/landscape/manifest.json`, the current retained G5
 asset, exact source metadata inventories and the hashed hourly Adoption
@@ -219,12 +458,24 @@ stated limits are bound in the receipt. The reader does not open raw hook
 sources, client configuration, credentials, env files or crontab contents.
 
 State-root host receipts come only from the CC's sanitized
-`coordination/command-center/pages/host-receipts-index.json`. Its path/hash and
-each index-provided title/path/hash/byte count/mtime are retained in a separate
+`coordination/command-center/pages/host-receipts-index.json`. Its path and
+each index-provided title/path/byte count/mtime are retained in a separate
 collapsed detail table labelled `local host receipt (state root)`. Receipt
 hashes are declared by the index and mtime is file metadata; no referenced
 markdown bodies are opened, and no execution date, command, result or E2E
 acceptance is inferred. The mixed `e2e-truth-20261006` directory is excluded.
+
+The Architecture pages follow the composer's #161 rule: bytes read from the
+state root are private. Their footers print "private, not published (host
+state)" for the retained native manifest digest, and the custody table, the
+host-receipt table, the layer headers and every other cell print the same note
+for the SHA-256 of any record read from the state root (the adoption snapshot,
+the retained refresh projection, the automation projection, the host-receipt
+index and the receipts it declares) and "[digest prefix withheld]" for a prefix
+of one 7 or more hex characters long, such as a content-addressed snapshot
+name. The architecture receipt keeps every digest, and each detail page is
+named by the digest of the bytes it publishes (#1012 Claude micro at 38302cd2,
+(c); GPT fix3 verdict, BLOCKER 1).
 
 Architecture's native manifest identity and instance-to-role mapping come from
 the retained `research/fullspeed-20261008/g5-stars-gap/local-pages/refresh-receipt.json`
@@ -407,8 +658,11 @@ Every page distinguishes its generated refresh time from source-owned dates.
 The gap page preserves `updated_utc`; the sources page lists the date fields
 in each retained input when available. A roadmap without a source-owned snapshot date
 says so and identifies its file modification time as file metadata. Milestone
-dates remain event dates. The SHA on every page is the SHA-256 of the JSON
-produced by native `render`, rather than an invented readiness digest.
+dates remain event dates. The footer of every page names the native readiness
+manifest, the SHA-256 of the JSON produced by native `render` rather than an
+invented readiness digest, and prints "private, not published (host state)" in
+its place, since that JSON is rendered from the state root; the nonserved
+receipt keeps the digest (#161).
 Milestones preserve either a source `at` timestamp or the source `when` label,
 following the custodian's `cc-tools/roadmap/build_roadmap.py:284` schema. Relative
 `when` labels are displayed verbatim without inventing an ISO date. A milestone
@@ -460,7 +714,15 @@ nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p t
 nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_fleet_tracking.py
 nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_fleet_tracking_view.py
 nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_adoption.py
+nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest tests.test_local_pages_command_center
+nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest tests.test_local_pages_token_tools
+nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest tests.test_skill_usage_units
 ```
+
+When the comma-separated `LANDING_PROHIBITED_NAMES` is set (the variable the
+#975 landing tests read), the command-center privacy tests also scan the
+generated page and the view module for each name; no name is written into the
+repository.
 
 The fixtures use the repository's real native builder and local temporary
 receipts. They need no external network, shared service, credentials or

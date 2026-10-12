@@ -1,0 +1,11 @@
+# Render for review; the CC installs it after landing.
+[Unit]
+Description=Hourly skill invoke-rate report refresh for the command-center page
+
+[Timer]
+OnCalendar=@ON_CALENDAR@
+RandomizedDelaySec=300
+Unit=native-agent-skill-usage.service
+
+[Install]
+WantedBy=timers.target

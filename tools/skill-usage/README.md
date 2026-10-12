@@ -149,6 +149,35 @@ python3 scripts/host_receipts.py record \
 native output, it is not an unchanged upstream test and not a synthetic fixture (those stay under
 `tests/fixtures/skill_usage/`, which is never cited as host evidence).
 
+## Scheduled reports for the command-center page
+
+`render_units.py` renders two user services and timers into a review directory outside the checkout;
+nothing is installed:
+
+```sh
+python3 tools/skill-usage/render_units.py --repo "$PWD" \
+  --skills-dir "$HOME/.local/state/native-agent-stack/coordination/command-center/skills" \
+  --codex-root "$HOME/.codex/sessions" --claude-root "$HOME/.claude/projects" --output-dir /path/outside/checkout/units
+```
+
+- `native-agent-skill-usage`, hourly: `--run-skill-doctor --window 7` writes `skill-usage-host-latest.json`
+  (91 s measured on 2026-10-11, 387 MB peak; every run starts the $0, zero-turn `claude -p /skill-doctor`
+  the tool refuses otherwise, with `--claude-timeout 120` because the 30-second default expired once on a
+  loaded host and left Claude unmeasured), then `child-usage.mjs --lanes-sweep` over seven days writes
+  `skill-usage-claude-lanes-latest.json` (198 s and a 1.9 GB peak; `systemd/claude-lanes.jq` keeps only its
+  aggregate skill counts, 26 KB of a 181 MB report).
+- `native-agent-skill-usage-codex-lanes`, daily at 01:30: `--lanes` over seven days writes
+  `skill-usage-codex-lanes-latest.json` without its per-actor rows. It runs the Node kernel once per rollout
+  session and had not finished after 25 minutes; its completion time is unmeasured, and the three-hour limit
+  is a ceiling rather than a measurement.
+
+Each step writes a temporary file beside its destination and renames the finished report into place,
+so the page never reads a partial file. Both services run idle-class (`CPUWeight=idle`, `Nice=19`,
+`IOSchedulingClass=idle`), so a measurement run yields to interactive work. The page reads these three
+names, #970's `skill-invoke-rate-latest.json` and the practice slots under
+`tools/local-pages/source_policy.json` `command_center_skills`, and labels a report stale when it is
+older than three hours (30 for the daily report).
+
 ## Reading the numbers correctly
 
 - **Claude's `uses` is not windowed.** Only `/skill-doctor`'s `7d tokens` column carries an

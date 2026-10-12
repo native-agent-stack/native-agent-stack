@@ -40,7 +40,27 @@ ROAD_REFERENCE_FILES = {
     "css_from": ("coordination/command-center/cc-tools/invoke-evidence/build_page.py",),
 }
 _SANITIZER = None
-PAGES = {"index": "Home", "readiness": "Readiness", "gaps": "Gap board", "roadmap": "Roadmap", "fleet": "Fleet", "architecture": "Architecture", "sources": "Sources"}
+PAGES = {"index": "Home", "command-center": "Command center", "readiness": "Readiness", "gaps": "Gap board", "roadmap": "Roadmap", "fleet": "Fleet", "architecture": "Architecture", "sources": "Sources"}
+# Every file the command center reads, each under its exact command_center_*
+# role in source_policy.json: (name, root, relative path, role, format).
+COMMAND_CENTER_INPUTS = (
+    ("readiness", "repo", "catalogs/north-star/readiness.json", "command_center_manifests", "json"),
+    ("evidence", "repo", "manifests/evidence.json", "command_center_manifests", "json"),
+    ("skills_manifest", "repo", "adoption/skills/manifest.json", "command_center_manifests", "json"),
+    ("matrix", "repo", "catalogs/landscape/component-evidence-matrix.json", "command_center_landscape", "json"),
+    ("grand_list", "repo", "catalogs/landscape/new-host-grand-list.json", "command_center_landscape", "json"),
+    ("research_state", "repo", "catalogs/landscape/research-state.json", "command_center_landscape", "json"),
+    ("final_stack", "repo", "catalogs/landscape/final-stack.json", "command_center_landscape", "json"),
+    ("token_window", "state", "coordination/command-center/pages/token-window-now.json", "command_center_usage", "json"),
+    ("token_tools", "state", "coordination/command-center/pages/token-tools-now.json", "command_center_usage", "json"),
+    ("skills_daily", "state", "coordination/command-center/skills/skill-invoke-rate-latest.json", "command_center_skills", "json"),
+    ("practice_slots", "state", "coordination/cc-native-practice-20261009/slots-final.json", "command_center_skills", "json"),
+    ("skills_host", "state", "coordination/command-center/skills/skill-usage-host-latest.json", "command_center_skills", "json"),
+    ("skills_codex_lanes", "state", "coordination/command-center/skills/skill-usage-codex-lanes-latest.json", "command_center_skills", "json"),
+    ("skills_claude_lanes", "state", "coordination/command-center/skills/skill-usage-claude-lanes-latest.json", "command_center_skills", "json"),
+    ("research_queue", "state", "coordination/ns2604-coop/research-queue.tsv", "command_center_queues", "text"),
+    ("read_queue", "state", "coordination/ns2604-coop/read-queue-now.json", "command_center_queues", "json"),
+)
 
 
 def utc_now() -> str:
@@ -311,6 +331,81 @@ def northstar_entry(output_dir: Path) -> str:
     return '<li><a href="northstar.html">North-star grand page</a><p>See what is next, the ten layers, the roadmap and token use.</p></li>'
 
 
+def read_command_center_inputs(root: Path, state_root: Path, output_dir: Path, inputs: dict[str, dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    """Read each command-center input under its exact grant; a failure is a stated gap, never a stop."""
+    records: dict[str, dict[str, Any]] = {}
+    try:
+        reads = load_local("source_policy").CommandCenterReads(root, state_root, policy_path=SOURCE_POLICY_PATH)
+    except (OSError, ValueError, UnicodeError) as error:
+        return {name: {"status": "missing", "label": base + ":" + relative, "role": role, "reason": "source policy unavailable (" + type(error).__name__ + ")"}
+                for name, base, relative, role, _ in COMMAND_CENTER_INPUTS}
+    for name, base, relative, role, kind in COMMAND_CENTER_INPUTS:
+        path = {"repo": root, "state": state_root}[base] / relative
+        record: dict[str, Any] = {"label": base + ":" + relative, "role": role}
+        try:
+            if no_symlinks(path).is_relative_to(output_dir):
+                raise ValueError("input is inside the served root")
+            raw, metadata = reads.read(role, path)
+            document = raw.decode("utf-8") if kind == "text" else strict_json(raw)
+            if kind == "json" and not isinstance(document, dict):
+                raise ValueError("input must be a JSON object")
+        except FileNotFoundError:
+            records[name] = dict(record, status="missing", reason="not present in the selected checkout" if base == "repo" else "not present in the state root")
+        except (OSError, ValueError, UnicodeError) as error:
+            records[name] = dict(record, status="missing", reason="unreadable (" + type(error).__name__ + ")")
+        else:
+            inputs["command_center:" + name] = dict(metadata, private=True) if base == "state" else metadata
+            records[name] = dict(record, status="read", sha256=metadata["sha256"], bytes=metadata["bytes"], file_utc=metadata["file_utc"], document=document)
+    return records
+
+
+PRIVATE_DIGEST = "private, not published (host state)"
+
+
+def is_host_state(path: Any, state_root: Path) -> bool:
+    """Whether bytes were read from the state root, which holds the host's private records (#161)."""
+    try:
+        return Path(str(path).split("#")[0]).is_relative_to(state_root)
+    except (TypeError, ValueError):
+        return False
+
+
+def state_digests(state_root: Path, *values: Any) -> set[str]:
+    """Every SHA-256 the values record for bytes read from the state root (#161): from a record whose path lies under the
+    state root, whose root is "state" or that the receipt marks private, each field named for a SHA-256."""
+    found: set[str] = set()
+    def walk(value: Any) -> None:
+        if isinstance(value, dict):
+            path = value.get("path")
+            if value.get("private") is True or value.get("root") == "state" or isinstance(path, str) and Path(path).is_absolute() and is_host_state(path, state_root):
+                found.update(child.lower() for key, child in value.items() if "sha256" in str(key) and isinstance(child, str) and re.fullmatch(r"[0-9a-fA-F]{64}", child))
+            for child in value.values():
+                walk(child)
+        elif isinstance(value, (list, tuple)):
+            for child in value:
+                walk(child)
+    for value in values:
+        walk(value)
+    return found
+
+
+def withhold(outputs: dict[str, bytes], digests: set[str]) -> dict[str, bytes]:
+    """The HTML outputs with no private digest and no 7-character or longer prefix of one (#161)."""
+    return {name: sanitizer().withhold_digests(raw.decode("utf-8"), digests, PRIVATE_DIGEST).encode("utf-8") if name.endswith(".html") else raw
+            for name, raw in outputs.items()}
+
+
+def served_identity(item: dict[str, Any]) -> str:
+    """What the composer's pages show for an input: its digest or status, or a withheld note if the receipt marks it private (#161).
+
+    The class rule: bytes read from the state root are private, whatever their name, and keep their digest in the nonserved
+    receipt only (refresh() marks them as it captures them). A digest of private bytes, or of a document rendered from them
+    such as the native readiness manifest, would confirm a guessed value offline. A repository file's digest stays: its
+    preimage is published.
+    """
+    return PRIVATE_DIGEST if item.get("private") else str(item.get("sha256") or item.get("status", "UNVERIFIED"))
+
+
 def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
             sources: Path = Path("tools/north-star/sources.json"),
             gaps_source: Path | None = None, roadmap_source: Path | None = None,
@@ -330,6 +425,8 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
         if no_symlinks(path).is_relative_to(output_dir):
             raise ValueError("input is inside the served root")
         item = snapshot(path)
+        if is_host_state(item["path"], state_root):
+            item["private"] = True  # the pages withhold its digest, the receipt keeps it (#161)
         inputs[name] = item
         return item
     def override_path(value: Path | None, default: Path, role: str | None = None) -> Path:
@@ -402,7 +499,7 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
     current = strict_json(current_input["raw"])
     view = load_local("current_view")
     view.validate(current)
-    for name in ("current_view", "workstation", "sanitization", "fleet_data", "fleet_view", "adoption_view"):
+    for name in ("current_view", "workstation", "sanitization", "fleet_data", "fleet_view", "adoption_view", "command_center_view"):
         capture("module:" + name, Path(__file__).resolve().parent / (name + ".py"))
     workstation = collect_workstation(current["workstation"])
     fleet_cache = no_symlinks(receipt.parent / "fleet/cache")
@@ -482,9 +579,28 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
         if name.startswith("roadmap:"):
             description = "; ".join(f"{key} = {value}" for key, value in item.get("source_dates", {}).items()) or item.get("status") or "source date unspecified"
             road_notes.append('<code>' + esc(label_path(item["path"], root, state_root)) + '</code> — ' + esc(description))
-    overview = '<section class="panel"><h2>Choose a page</h2><ul class="page-index"><li><a href="readiness.html">North-star readiness</a><p>What is done, what is left and what needs a decision.</p></li>' + northstar_entry(output_dir) + '<li><a href="gaps.html">Grand Gap Board</a><p>Find open gaps and their next actions.</p></li><li><a href="roadmap.html">Roadmap</a><p>Read the dated milestones and server records.</p></li><li><a href="fleet.html">Worker fleet</a><p>See the lanes, sessions, jobs and spend.</p></li><li><a href="sources.html">Sources</a><p>Check input dates, hashes and evidence scope.</p></li></ul></section>'
+    cc_inputs = read_command_center_inputs(root, state_root, output_dir, inputs)
+    cc_view = load_local("command_center_view")
+    try:
+        cc_markup, cc_panels = cc_view.render(current, fleet, cc_inputs, adoption=adoption, refreshed=refreshed)
+        # Only the not-wired inputs the page rendered; a published projection replaces its notice.
+        command_center = {"status": "RECORDED", "panels": cc_panels, "not_wired": {key: cc_view.NOT_WIRED[key] for row in cc_panels.values() for key in row.get("not_wired", [])}}
+    except (ValueError, TypeError, KeyError, AttributeError, IndexError, OverflowError, RecursionError) as error:
+        # The consolidated view is optional: a view failure publishes a stated
+        # placeholder while every other page keeps its own observation.
+        cc_markup, command_center = None, {"status": "UNREPORTED", "reason": "Command center view unavailable (" + type(error).__name__ + ")"}
+    command_center["inputs"] = {name: {key: value for key, value in item.items() if key != "document"} for name, item in cc_inputs.items()}
+    cc_body = '' if cc_markup is not None else '<section class="panel" id="cc-view"><h2>UNREPORTED</h2><p>' + esc(command_center["reason"]) + '. Other pages retain their own current observations.</p></section>'
+    cc_notes = [f'<code>{esc(label_path(current_input["path"], root, state_root))}</code> — in_review, landings_today, cc_agents, waiting_on_owner, token_efficiency, orchestration, landing_queue, program, mirrors and rulings; {esc(served_identity(current_input))}',
+                'Sessions, lanes, the hcom roster and skill-invocation rates come from the Fleet observation as of ' + esc(fleet.get("at") or "not reported") + '; orchestration and token-tool counts reuse the Adoption snapshot. Both are listed under Fleet.']
+    for name, base, relative, role, _ in COMMAND_CENTER_INPUTS:
+        item = cc_inputs[name]
+        identity = PRIVATE_DIGEST if base == "state" else 'SHA-256 <code>' + esc(item.get("sha256")) + '</code>'
+        cc_notes.append(f'<code>{esc(base)}:{esc(relative)}</code> — ' + (f'read under the exact <code>{esc(role)}</code> grant; {identity}' if item["status"] == "read" else 'missing input: ' + esc(item["reason"])))
+    cc_notes += [esc(reason) for reason in command_center.get("not_wired", {}).values()]
+    overview = '<section class="panel"><h2>Choose a page</h2><ul class="page-index"><li><a href="command-center.html">Command center</a><p>Track lanes, PR waves, token savings, skill use, manifests and owner items.</p></li><li><a href="readiness.html">North-star readiness</a><p>What is done, what is left and what needs a decision.</p></li>' + northstar_entry(output_dir) + '<li><a href="gaps.html">Grand Gap Board</a><p>Find open gaps and their next actions.</p></li><li><a href="roadmap.html">Roadmap</a><p>Read the dated milestones and server records.</p></li><li><a href="fleet.html">Worker fleet</a><p>See the lanes, sessions, jobs and spend.</p></li><li><a href="sources.html">Sources</a><p>Check input dates, hashes and evidence scope.</p></li></ul></section>'
     current_scope = 'command-center current view snapshot; ' + view.observation_time(current["updated_utc"], plain=True)
-    current_notes = [f'<code>{esc(label_path(current_input["path"], root, state_root))}</code> — {esc(current_scope)}; SHA-256 <code>{current_input["sha256"]}</code>', 'Workstation readings use an exact Prometheus metric when present, otherwise the CC-owned value and its recorded read time.']
+    current_notes = [f'<code>{esc(label_path(current_input["path"], root, state_root))}</code> — {esc(current_scope)}; {esc(served_identity(current_input))}', 'Workstation readings use an exact Prometheus metric when present, otherwise the CC-owned value and its recorded read time.']
     fleet_notes = [f'<code>{esc(key)}</code> — {esc(value or "not reported")}' for key, value in fleet.get("source_times", {}).items()]
     actions = fleet.get("actions") if isinstance(fleet.get("actions"), dict) else {}
     actions_ttl = actions.get("cache_ttl_seconds")
@@ -499,16 +615,16 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
     fleet_notes.append('Spend ceiling source: ' + esc(sdk_policy.get("ceiling_source") or "not reported") + '; read ' + esc(sdk_policy.get("ceiling_read_utc") or "not reported") + '. Planned table amounts: expected USD ' + esc(sdk_policy.get("table_expected_usd") if sdk_policy.get("table_expected_usd") is not None else "not reported") + '; at caps USD ' + esc(sdk_policy.get("table_at_caps_usd") if sdk_policy.get("table_at_caps_usd") is not None else "not reported") + '. These are estimates, separate from the native ledger actual-cost sum.')
     for lane, deadline in fleet_policy.get("versions", {}).get("hold_until", {}).items():
         fleet_notes.append('Version hold for ' + esc(lane) + ': ' + esc(deadline))
-    adoption_note = f'<code>{esc(label_path(adoption_input["path"], root, state_root))}</code> — adoption-now/1; generated {esc(adoption["generated_utc"])}; window {esc(adoption["window_hours"])} hours; SHA-256 <code>{esc(adoption_input["sha256"])}</code>. The co-op owns the hourly collector; pages read its published snapshot.'
+    adoption_note = f'<code>{esc(label_path(adoption_input["path"], root, state_root))}</code> — adoption-now/1; generated {esc(adoption["generated_utc"])}; window {esc(adoption["window_hours"])} hours; {esc(served_identity(adoption_input))}. The co-op owns the hourly collector; pages read its published snapshot.'
     if adoption.get("status") == "UNREPORTED":
         adoption_note = '<code>' + esc(label_path(adoption_input["path"], root, state_root)) + '</code> — UNKNOWN: ' + esc(adoption["reason"])
     current_notes.append(adoption_note)
     fleet_notes.append(adoption_note)
     if role_projection:
-        fleet_notes.extend('<code>' + esc(item.get("path", "UNREPORTED")) + '</code> — registry metadata SHA-256 <code>' + esc(item.get("sha256", "UNREPORTED")) + '</code>' for item in role_projection.get("sources", []) if isinstance(item, dict))
-    source_groups = {"index": current_notes, "readiness": current_notes + readiness_notes, "gaps": gap_notes, "roadmap": road_notes, "fleet": fleet_notes}
+        fleet_notes.extend('<code>' + esc(item.get("path", "UNREPORTED")) + '</code> — registry metadata SHA-256 <code>' + esc(PRIVATE_DIGEST if is_host_state(item.get("path"), state_root) else item.get("sha256", "UNREPORTED")) + '</code>' for item in role_projection.get("sources", []) if isinstance(item, dict))
+    source_groups = {"index": current_notes, "command-center": cc_notes, "readiness": current_notes + readiness_notes, "gaps": gap_notes, "roadmap": road_notes, "fleet": fleet_notes}
     source_body = "".join(f'<section id="{key}" class="panel"><h2>{esc(PAGES[key])}</h2><ul class="source-list">' + "".join(f'<li>{note}</li>' for note in notes) + '</ul></section>' for key, notes in source_groups.items())
-    custody_rows = "".join(f'<tr><td><code>{esc(label_path(item["path"], root, state_root))}</code></td><td><code>{esc(item.get("sha256") or item.get("status", "UNVERIFIED"))}</code></td></tr>' for item in inputs.values())
+    custody_rows = "".join(f'<tr><td><code>{esc(label_path(item["path"], root, state_root))}</code></td><td><code>{esc(served_identity(item))}</code></td></tr>' for item in inputs.values())
     source_body += f'<section id="sources" class="panel"><h2>Input identity</h2><div class="table-wrap"><table><thead><tr><th>Source</th><th>SHA-256 or status</th></tr></thead><tbody>{custody_rows}</tbody></table></div></section>'
     index_leading = f'<header class="page-header"><h1>North-star readiness and next steps</h1><p class="current-stamp">Current view snapshot: {view.observation_time(current["updated_utc"])}</p><p>{esc(current["headline"])}</p><p class="now-score"><strong>{current["readiness"]["start_gates_met"]} of {current["readiness"]["start_gates_total"]} START gates met</strong></p></header>' + view.gate_strip(current)
     native_dates = {(sanitizer().sanitize(raw_manifest["receipts"][name.removeprefix("readiness:")]["root"]), sanitizer().sanitize(raw_manifest["receipts"][name.removeprefix("readiness:")]["path"])): item.get("source_dates", {}) for name, item in inputs.items() if name.startswith("readiness:")}
@@ -529,16 +645,23 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
         sdk_projection = role_projection.get("sdk") or {}
         extras.append('<h3>SDK client observations</h3><p>' + esc(display(sdk_projection)) + '</p>')
         role_body += '<section id="adoption-native-tools"><h2>Native orchestration and SDK use</h2>' + ''.join(extras) + '<p>Unattributed instances remain unassigned; an absent producer measurement is unmeasured.</p></section>'
-    manifest_body = adoption_view.summary(adoption) + f'<section class="manifest-section" aria-labelledby="manifest-title"><h2 id="manifest-title" class="manifest-title">repository manifest at <code>{manifest_sha}</code>, dated receipts</h2><p><a href="sources.html#readiness">Source dates and retained receipt identities</a></p>' + readiness_body(native, manifest, current, view, fleet, source_dates=native_dates) + '</section>'
-    common = (refreshed, manifest_sha)
+    # The native manifest is the native builder's render of the state root, so its digest is private state too (#161):
+    # no page prints it, and the nonserved receipt keeps it (#1012 GPT fix3 verdict, BLOCKER 1).
+    manifest_body = adoption_view.summary(adoption) + f'<section class="manifest-section" aria-labelledby="manifest-title"><h2 id="manifest-title" class="manifest-title">native readiness manifest, SHA-256 <code>{PRIVATE_DIGEST}</code>; dated receipts</h2><p><a href="sources.html#readiness">Source dates and retained receipt identities</a></p>' + readiness_body(native, manifest, current, view, fleet, source_dates=native_dates) + '</section>'
+    withheld = (refreshed, PRIVATE_DIGEST)
     outputs = {
-        "index.html": document("index", "North-star readiness and next steps", "", current_scope, overview, *common, [], leading=index_leading),
-        "readiness.html": document("readiness", "North-star readiness: what is done, what is left, what needs a decision", "", current_scope, manifest_body, *common, [], leading=view.render(current, workstation, validated=True, readings_normalized=True)),
-        "gaps.html": document("gaps", "Grand Gap Board", "Find the open gaps, who owns them and what happens next.", gap_scope, gap_body(rows(gaps, "gaps", ("id", "group", "sev", "title"))), *common, []),
-        "roadmap.html": document("roadmap", "Roadmap", "Read the dated milestones and server records.", road_scope, roadmap_body(roadmap), *common, []),
-        "fleet.html": document("fleet", "Worker fleet", "", 'Native fleet as of ' + str(fleet.get("at") or "not reported"), role_body, *common, [], leading=fleet_view.render(fleet)),
-        "sources.html": document("sources", "Sources and dates", "Check the dates and identities behind each page.", 'Current view and dated repository receipts remain distinct.', source_body, *common, []),
+        "index.html": document("index", "North-star readiness and next steps", "", current_scope, overview, *withheld, [], leading=index_leading),
+        "command-center.html": document("command-center", "Command center", "One view of lanes, PR waves, token savings, skill use, manifests and owner items.", current_scope, cc_body, *withheld, [], leading=cc_markup),
+        "readiness.html": document("readiness", "North-star readiness: what is done, what is left, what needs a decision", "", current_scope, manifest_body, *withheld, [], leading=view.render(current, workstation, validated=True, readings_normalized=True)),
+        "gaps.html": document("gaps", "Grand Gap Board", "Find the open gaps, who owns them and what happens next.", gap_scope, gap_body(rows(gaps, "gaps", ("id", "group", "sev", "title"))), *withheld, []),
+        "roadmap.html": document("roadmap", "Roadmap", "Read the dated milestones and server records.", road_scope, roadmap_body(roadmap), *withheld, []),
+        "fleet.html": document("fleet", "Worker fleet", "", 'Native fleet as of ' + str(fleet.get("at") or "not reported"), role_body, *withheld, [], leading=fleet_view.render(fleet)),
+        "sources.html": document("sources", "Sources and dates", "Check the dates and identities behind each page.", 'Current view and dated repository receipts remain distinct.', source_body, *withheld, []),
     }
+    # No page carries a digest of private bytes or a prefix of one, such as a content-addressed receipt name: every
+    # rendering path above withholds them, and this pass guarantees it for each page (#1012 GPT fix3 verdict, BLOCKER 1).
+    private_digests = state_digests(state_root, inputs, fleet, role_projection, command_center) | {manifest_sha}
+    outputs = withhold(outputs, private_digests)
     for name in ("site.css", "site.js"):
         item = capture("asset:" + name, ASSETS / name)
         outputs["assets/" + name] = item["raw"]
@@ -556,6 +679,7 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
                     "command_center_current_view": {"updated_utc": current["updated_utc"], "sha256": current_input["sha256"], "schema": current["schema"]},
                     "workstation": workstation,
                     "fleet": fleet,
+                    "command_center": command_center,
                      "adoption": {"schema": adoption["schema"], "generated_utc": adoption["generated_utc"], "window_hours": adoption["window_hours"], "sha256": adoption_input["sha256"], "status": adoption.get("status", "RECORDED"), "reason": adoption.get("reason")},
                     "adoption_role_attribution": {"window": role_projection.get("window"), "sources": role_projection.get("sources"), "source_errors": role_projection.get("source_errors"), "instances": role_projection.get("instances"), "sdk": role_projection.get("sdk")} if role_projection else ({"status": "UNREPORTED", "reason": role_projection_error} if role_projection_error else {"status": "registry unavailable; attribution unreported"}),
                    "source_scope": {"readiness": "Per-source retained dates; no combined snapshot timestamp", "gaps": gap_scope, "roadmap": road_scope},
@@ -577,7 +701,7 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
                 "current_observation": False}
             if not (output_dir / "architecture.html").exists():
                 body = '<section class="panel" id="architecture-custody"><h2>UNREPORTED</h2><p>The Architecture source view is unavailable. Other pages retain their own current observations.</p></section>'
-                outputs["architecture.html"] = document("architecture", "Architecture unavailable", "No current Architecture observation is reported.", "Source view unavailable; no gate or execution claim.", body, refreshed, manifest_sha, [])
+                outputs["architecture.html"] = withhold({"architecture.html": document("architecture", "Architecture unavailable", "No current Architecture observation is reported.", "Source view unavailable; no gate or execution claim.", body, *withheld, [])}, private_digests)["architecture.html"]
                 receipt_doc["outputs"]["architecture.html"] = {"sha256": hashlib.sha256(outputs["architecture.html"]).hexdigest(), "bytes": len(outputs["architecture.html"])}
                 receipt_doc["architecture"]["page_status"] = "unreported placeholder"
             else:
@@ -652,7 +776,8 @@ def main(argv: list[str] | None = None) -> int:
         parser.exit(1, f"local-pages: refresh failed ({type(error).__name__})\n")
     except (OSError, ValueError, KeyError, TypeError, AttributeError, ImportError) as error:
         parser.exit(1, f"local-pages: refresh failed ({type(error).__name__}): {error}\n")
-    print(json.dumps({"output_dir": str(output), "receipt": str(receipt), "generated_utc": result["generated_utc"], "native_readiness_manifest_sha256": result["native_readiness_manifest_sha256"], "pages": 6, "API_errors": result["workstation"].get("API_errors", []) + result["fleet"].get("API_errors", [])}, sort_keys=True))
+    # The run summary goes to the unit journal, so it names the receipt, which keeps the private native manifest digest (#161).
+    print(json.dumps({"output_dir": str(output), "receipt": str(receipt), "generated_utc": result["generated_utc"], "pages": sum(1 for name in result["outputs"] if name.endswith(".html") and "/" not in name), "API_errors": result["workstation"].get("API_errors", []) + result["fleet"].get("API_errors", [])}, sort_keys=True))
     return 0
 
 

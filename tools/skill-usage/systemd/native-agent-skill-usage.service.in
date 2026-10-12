@@ -1,0 +1,28 @@
+# Render with tools/skill-usage/render_units.py before review.
+# Hourly: the host report (91 s measured on 2026-10-11, including the $0,
+# zero-turn claude -p /skill-doctor run) and the Claude lanes sweep (198 s,
+# 1.9 GB peak memory).
+# Each step writes a temporary file beside its destination and renames it into
+# place, so a reader never sees a partial report; a failed step stops the later
+# one for that run, and the page shows each report's age. The ':' prefix
+# disables environment expansion, so '$' reaches the shell unchanged; quoted
+# argv uses systemd's C escapes and %% for '%'.
+[Unit]
+Description=Refresh the hourly skill invoke-rate reports the command-center page reads
+
+[Service]
+Type=oneshot
+UMask=0077
+NoNewPrivileges=true
+# Idle class for CPU, nice level and I/O: measurement runs yield to interactive work (the CC's host-capacity
+# T2 result). CPUWeight=idle sets cgroup v2 cpu.idle (systemd.resource-control(5), systemd 259); the user
+# manager here delegates the cpu controller. The idle I/O class takes no priority level.
+CPUWeight=idle
+Nice=19
+IOSchedulingClass=idle
+TimeoutStartSec=1800
+# claude, node and jq resolve here; skill_usage.py --run-skill-doctor runs claude.
+Environment=PATH=%h/.local/share/codex-ecosystem/bin:%h/.local/share/mise/shims:%h/.local/bin:/usr/local/bin:/usr/bin:/bin
+Environment=PYTHONDONTWRITEBYTECODE=1
+ExecStart=@EXEC_HOST@
+ExecStart=@EXEC_CLAUDE_LANES@
