@@ -58,8 +58,56 @@
   "preregistration_ref": "evidence/artifacts/w6-observability-hosting-20261011/preregistration.json",
   "preregistration_sha256": "972efba72e71335940c0a1b3c949ff5921cf4d1ea8e79be4e172bd04c93551c3",
   "fixture_sha256": "a18773b3bcff53d83dc526e07411ea13fe9f71fe85d8ba1bb479b99633093f0c",
-  "terminal_state": null,
-  "terminal_readiness": "#1007 LANDED relay, then the applicable evidence-defined terminal record",
+  "terminal_state": "SCHEDULED",
+  "terminal_evidence": {
+    "state": "SCHEDULED",
+    "recorded_at": "2026-10-11T23:40:15Z",
+    "readiness_relay": {
+      "pr": 1007,
+      "merge_commit": "c2dee173",
+      "co_op_direction_at": "2026-10-11T23:35:52Z",
+      "satisfied": true
+    },
+    "comparison_id": "w6-us-equities-observability-hosting-20261011",
+    "preregistration_ref": "evidence/artifacts/w6-observability-hosting-20261011/preregistration.json",
+    "preregistration_sha256": "972efba72e71335940c0a1b3c949ff5921cf4d1ea8e79be4e172bd04c93551c3",
+    "final_stack_source": {
+      "commit": "c2dee173",
+      "path": "catalogs/landscape/final-stack.json",
+      "sha256": "2dd68f39d3a0ab12894cf49343f49ff9e22c2fdef9a0d6d4e751ef88ef1f1eab",
+      "reader_script_sha256": "82742dea85a9d2f9c7579a1069947975b4033265cf55f1e1baa232d10767a317",
+      "reader_api": [
+        "run_pin",
+        "is_definitive"
+      ],
+      "row": {
+        "catalog": "us-equities",
+        "layer_id": "observability-hosting",
+        "manifest_status": "no-winner",
+        "next_review": null,
+        "winners": []
+      }
+    },
+    "resolution_winners": [],
+    "reason": "The catalog and landed view name no winner. Synthetic cases and source targets do not establish upstream E2E, real native usage parity or private-runner compatibility. The single frozen backend comparison supplies the committed decision procedure.",
+    "readiness_trigger": "Start as soon as both pinned runtime/E2E receipts, fixture/image seals, attributable native-usage evidence, the bounded read-only private runner probe and an isolated queued slot exist. #1007 LANDED is satisfied; no date triggers the remaining work.",
+    "readiness_satisfied": [
+      "#1007 LANDED relay",
+      "source pins and sealed six-case fixture"
+    ],
+    "readiness_unmet": [
+      "compared runtime/E2E receipts",
+      "owned isolated deployments and transitive image seals",
+      "attributable native source-usage receipt and private runner compatibility probe",
+      "isolated queued runner slot"
+    ],
+    "comparison_ready": false,
+    "fixed_decision_rule": "Every oracle field must pass in three paired repetitions. Rank qualified backends by exact correctness, complete provider cost, median elapsed time, then peak RSS. Exact equality retains the existing Grafana path and records equality; zero qualifying arms retires the unsupported role with its failures. No third backend or post-run metric change.",
+    "frozen_scope": "Two backend arms and the common restic/rest-server recovery dependency, with the original six-case seal; preregistration bytes unchanged.",
+    "evidence_class": "source_review",
+    "final_claim": false
+  },
+  "terminal_readiness": "#1007 LANDED satisfied; remaining comparison readiness inputs are explicitly unmet",
   "foundation_shared_fact_refs": [
     {
       "ref": "catalogs/landscape/foundation.json#/layers/15",

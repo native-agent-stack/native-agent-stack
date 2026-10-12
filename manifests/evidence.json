@@ -19417,8 +19417,8 @@
     },
     {
       "path": "docs/w6-observability-hosting-delta-20261011.md",
-      "sha256": "17e7654c9e6c4751c389611a9e194f1e4ddd0bba1282b147c4f7e8bdce7a2e37",
-      "bytes": 4007
+      "sha256": "b7d7f3a98caf4148b4055532cd31f82430bc2d0eb5b62f086965b0e8afd96487",
+      "bytes": 5118
     },
     {
       "path": "evidence/artifacts/actionlint-successor-parity-20260927/README.md",
@@ -57427,8 +57427,8 @@
     },
     {
       "path": "evidence/artifacts/w6-observability-hosting-20261011/resolution-delta.json",
-      "sha256": "8231c30682032fd3c6e6e0cdb7fbae7500b408d37ef97762c1a5bf346194e1d0",
-      "bytes": 4678
+      "sha256": "f0ead5e0252850d3dd0e38a062f268861fe48fa0ec8640c8579e14083ca86708",
+      "bytes": 7369
     },
     {
       "path": "evidence/artifacts/w6-observability-hosting-20261011/telemetry-cases.json",
