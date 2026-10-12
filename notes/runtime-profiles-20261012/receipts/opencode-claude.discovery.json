@@ -1,0 +1,190 @@
+{
+  "schema_version": 1,
+  "status": "trial",
+  "profile": "ns-opencode-claude",
+  "role_scope": "builder",
+  "started_utc": "2026-10-12T06:38:28Z",
+  "tool_read_utc": "2026-10-12T06:39:08Z",
+  "discovery_command": [
+    "opencode",
+    "debug",
+    "skill"
+  ],
+  "discovery_exit_code": 0,
+  "skills": {
+    "required_managed_count": 27,
+    "managed_checks": {
+      "typesafe-ai": "ok",
+      "gh-fix-ci": "ok",
+      "security-best-practices": "ok",
+      "iterative-retrieval": "ok",
+      "search-first": "ok",
+      "diagnosing-bugs": "ok",
+      "tdd": "ok",
+      "codebase-design": "ok",
+      "security-threat-model": "ok",
+      "gh-address-comments": "ok",
+      "codeql": "ok",
+      "supply-chain-risk-auditor": "ok",
+      "agentic-actions-auditor": "ok",
+      "property-based-testing": "ok",
+      "modern-python": "ok",
+      "sarif-parsing": "ok",
+      "fp-check": "ok",
+      "mcp-builder": "ok",
+      "frontend-design": "ok",
+      "find-skills": "ok",
+      "variant-analysis": "ok",
+      "writing-for-agents": "ok",
+      "security-audit": "ok",
+      "hcom-agent-messaging": "ok",
+      "promptfoo-evals": "ok",
+      "loki": "ok",
+      "claude-native-practice": "ok"
+    },
+    "managed_pass": true,
+    "native_discovered_count": 48,
+    "extras": [
+      "brainstorming",
+      "customize-opencode",
+      "diagnosing-superpowers",
+      "dispatching-parallel-agents",
+      "executing-plans",
+      "finishing-a-development-branch",
+      "hf-cli",
+      "mineru",
+      "native-stack-research",
+      "native-stack-worker",
+      "qmd",
+      "receiving-code-review",
+      "requesting-code-review",
+      "subagent-driven-development",
+      "systematic-debugging",
+      "test-driven-development",
+      "using-git-worktrees",
+      "using-superpowers",
+      "verification-before-completion",
+      "writing-plans",
+      "writing-skills"
+    ],
+    "builtin_names": [
+      "customize-opencode"
+    ],
+    "listing_description_chars": 15169,
+    "listing_description_tokens_o200k": 3079,
+    "tokenizer_version": "0.14.0",
+    "listing_token_basis": "o200k_base on name:description lines; proxy, not native Claude tokenizer or system-prompt billing"
+  },
+  "mcp_command": [
+    "opencode",
+    "mcp",
+    "list"
+  ],
+  "mcp": {
+    "exit_code": 0,
+    "all_connected": true,
+    "expected_names": [
+      "ai-memory",
+      "chrome-devtools",
+      "codebase-memory",
+      "context-mode",
+      "jcodemunch",
+      "qmd",
+      "semble",
+      "serena",
+      "socraticode"
+    ],
+    "tool_counts": "UNVERIFIED: native CLI list has no JSON tool-count interface",
+    "servers": [
+      {
+        "name": "ai-memory",
+        "state": "connected"
+      },
+      {
+        "name": "chrome-devtools",
+        "state": "connected"
+      },
+      {
+        "name": "codebase-memory",
+        "state": "connected"
+      },
+      {
+        "name": "context-mode",
+        "state": "connected"
+      },
+      {
+        "name": "jcodemunch",
+        "state": "connected"
+      },
+      {
+        "name": "qmd",
+        "state": "connected"
+      },
+      {
+        "name": "semble",
+        "state": "connected"
+      },
+      {
+        "name": "serena",
+        "state": "connected"
+      },
+      {
+        "name": "socraticode",
+        "state": "connected"
+      }
+    ]
+  },
+  "model_calls": 0,
+  "native_state_published": false,
+  "native_cli_invocations": {
+    "rtk": {
+      "exit_code": 0,
+      "scope": "native version probe, not functional acceptance"
+    },
+    "wt": {
+      "exit_code": 0,
+      "scope": "native version probe, not functional acceptance"
+    },
+    "qmd": {
+      "exit_code": 0,
+      "scope": "native version probe, not functional acceptance"
+    },
+    "promptfoo": {
+      "exit_code": 0,
+      "scope": "native version probe, not functional acceptance"
+    },
+    "mcporter": {
+      "exit_code": 0,
+      "scope": "native version probe, not functional acceptance"
+    },
+    "srt": {
+      "exit_code": 0,
+      "scope": "native version probe, not functional acceptance"
+    },
+    "orx": {
+      "exit_code": 0,
+      "scope": "native version probe, not functional acceptance"
+    },
+    "agent-browser": {
+      "exit_code": 0,
+      "scope": "native version probe, not functional acceptance"
+    },
+    "tvly": {
+      "exit_code": 0,
+      "scope": "native version probe, not functional acceptance"
+    },
+    "gitleaks": {
+      "exit_code": 0,
+      "scope": "native version probe, not functional acceptance"
+    }
+  },
+  "pending_layers": {
+    "socraticode": "pending E1: fresh worktree has no index; incremental indexing/path-per-call unmeasured"
+  },
+  "auth": {
+    "native_check": "not provided by OpenCode 1.18.35",
+    "loader_health_ready": true,
+    "credential_loader_id": "anthropic-api-4",
+    "inference_required": true
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "kind": "runtime-profile-final-adjudicated-correction",
+  "recorded_at": "2026-10-12T14:44:02Z",
+  "clock": "date -u",
+  "reviewed_head": "f1eaa2fb5444341d60064c007504b31c9c093fa9",
+  "base_after_rebase": "d8f7e2051b61bde6361a85b64f41413798015353",
+  "rebased_prior_head": "37b7b92e7c8b80510443b0775fa16e3c1141a71a",
+  "delivery": "ONE scope-locked fix commit after registry-only rebase; ONE push leased on reviewed_head",
+  "api_spend_usd": 0,
+  "provider_inference_calls": 0,
+  "scope_supersession": "Historical fixture record only. The CC scope ruling at 16:37:44Z retains private profile state and role grants; all alias-read fencing acceptance claims are withdrawn and PARKED. This record does not establish current read containment or full runtime readiness.",
+  "corrections": [
+    {
+      "finding": "B-1 / Astra P1: lexical aliases bypass native Read permissions",
+      "mechanism": "Historical Bubblewrap 0.11.1 implementation with computed dependency mounts; dependency selection was subsequently revised. This mechanism is not qualified as an alias-read fence.",
+      "evidence_class": "local_integration",
+      "before": "Existing installed-CLI fixture plus worktree-file, worktree-directory and selected-vendor aliases fails 3 native subcases at reviewed head; a separately added unselected-vendor alias fails before the directory mask",
+      "after": "Limited historical fixture observations only; the alias-read containment conclusion is withdrawn. PARKED for separate qualification under the narrowed scope.",
+      "portable": "Preflight missing-function control fails; 24 profile tests pass with the guard and launch binding",
+      "sources": [
+        "anomalyco/opencode@53d1eabb61e21162157817bf677da0a4ad3332e3:packages/opencode/src/tool/read.ts:234-257,331",
+        "anomalyco/opencode@53d1eabb61e21162157817bf677da0a4ad3332e3:packages/opencode/src/tool/external-directory.ts:24-26",
+        "containers/bubblewrap@124c4cdf4321f63ef17a1cb0ce8f9dd45bd7adbe:bwrap.xml:135,218,293-317,401-409"
+      ]
+    },
+    {
+      "finding": "B-2: project config deep merge enables an ungranted role tool",
+      "mechanism": "Disable native project config/agents/plugins; supply worktree root AGENTS.md via absolute native instructions in the final overlay",
+      "evidence_class": "local_integration",
+      "before": "Installed debug-agent executes the synthetic neutral bash command injected by a worktree opencode.json; 1 native subcase fails before the flag/instructions fix",
+      "after": "Same injected project grant cannot enable bash; native tool exits nonzero and returns no marker; root AGENTS.md still appears in the captured request",
+      "omission": "Automatic subtree AGENTS.md discovery is disabled and unqualified",
+      "sources": [
+        "anomalyco/opencode@53d1eabb61e21162157817bf677da0a4ad3332e3:packages/opencode/src/config/config.ts:420-424,482-489",
+        "anomalyco/opencode@53d1eabb61e21162157817bf677da0a4ad3332e3:packages/opencode/src/session/instruction.ts:135-150"
+      ]
+    },
+    {
+      "finding": "B-3: containment, tool-fence, count and base claims",
+      "mechanism": "Claims identify filesystem dependency exceptions, disabled project config and root-only instructions; body uses actual final counts and rebased base",
+      "evidence_class": "source_review"
+    }
+  ],
+  "native_validation_command": "systemd-run --user --scope -p CPUWeight=idle env TMPDIR=/var/tmp PYTHONDONTWRITEBYTECODE=1 NS_OPENCODE_TEST_BIN=<installed-public-1.18.35-binary> python3 -B -m unittest discover -s tests -p test_runtime_opencode_native.py -q",
+  "portable_validation_command": "systemd-run --user --scope -p CPUWeight=idle env TMPDIR=/var/tmp PYTHONDONTWRITEBYTECODE=1 python3 -B -m unittest discover -s tests -p test_runtime_profiles.py -q",
+  "publication_boundary": "Synthetic markers only. No key, provider connection outside fixture, inference, public output hash or copied native private state. Rejecting loopback fixture remains inside an outer network namespace; production filesystem wrapper retains the caller's network namespace.",
+  "srt_exception": {
+    "source": "anthropics/sandbox-runtime@d9aac2098351ca17f3743fbaf6ecbd0051b7e00e:src/sandbox/sandbox-config.ts:1138,743-748;src/sandbox/sandbox-manager.ts:1919-1930;src/sandbox/linux-sandbox-utils.ts:3375-3378",
+    "reason": "Supported CLI requires a network section/allowedDomains and activates proxy plus --unshare-net, so it cannot retain the original network namespace while selecting this filesystem boundary",
+    "qualification_limit": "Whether a supported srt proxy arrangement could instead carry native loopback traffic is UNTESTED. Failed attempts do not prove none can.",
+    "recorded_isolation_winner": "unchanged; research-queue row 51 compares srt against direct Bubblewrap after #1033 LANDED"
+  },
+  "untested_boundaries": [
+    {
+      "boundary": "Live Git and real committed MCP consumers inside the new namespace",
+      "closing_test": "test_runtime_profile_consumers.NativeNamespaceConsumerTests.test_git_and_committed_mcp_consumers",
+      "status": "planned, not implemented/run; must require real Worktrunk Git head/status, every admitted MCP connection/tool count, harmless tool calls and tracker observations; PARKED read fencing needs separate qualification"
+    },
+    {
+      "boundary": "Supported sandbox-runtime proxy carrying native loopback traffic",
+      "closing_test": "test_runtime_profile_consumers.NativeNamespaceConsumerTests.test_srt_proxy_loopback_route",
+      "status": "planned, not implemented/run; same installed native client and rejecting loopback fixture, documented proxy configuration and request capture; PARKED read fencing needs separate qualification"
+    }
+  ],
+  "follow_ups": [
+    "Native binary/mirror tests skip in CI unless qualified inputs are present",
+    "Output-hash regression covers specific keys in one runtime notes subtree; broader detector excludes notes",
+    "Exceptional launch exits can bypass receipts and normal cleanup",
+    "Historical captures and exact unmirrored vendor records remain verification gaps",
+    "Subtree instructions, Pi auth admission/no-prompt role text, canonical supporting files, preload readiness, conservative ignored-tree retention, surviving branches, shared MCP stores, native caches, unused inventory return and oversized briefs retain their documented limits"
+  ],
+  "after_landing": "Fresh prepare into a new state root is required before runtime comparison or shadow reviews; historical v9 prepare is not reused",
+  "terminal_rule": "After this commit both families read the same new head once; only a NEW reproduced P1 reopens"
+}

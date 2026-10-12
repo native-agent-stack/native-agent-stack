@@ -1448,13 +1448,13 @@ class OmniRouteLaneBuildTests(unittest.TestCase):
         self.assertEqual(done.returncode, 0, done.stderr)
         config = (work / "codex-home" / "config.toml").read_text(encoding="utf-8")
         for line in ('model = "cx/gpt-6-astra"', 'model_provider = "omniroute"', 'model_reasoning_effort = "max"',
-                     "[model_providers.omniroute]", 'base_url = "http://127.0.0.1:20128/v1"',
+                     "[model_providers.omniroute]", 'base_url = "http://127.0.0.1:21128/v1"',
                      'env_key = "OMNIROUTE_API_KEY"', "requires_openai_auth = false", 'wire_api = "responses"'):
             self.assertIn(line, config)
         for server in TOKEN_MCP_SERVERS:
             self.assertIn(f"[mcp_servers.{server}]", config)
         self.assertNotIn("supports_websockets = true", config)
-        self.assertNotIn("http_headers", config)  # the 20128 default sends no provider headers
+        self.assertNotIn("http_headers", config)  # the 21128 default sends no provider headers
         # The key never reaches a shell snapshot file, and GPT-6 Astra's search is Codex's standalone web.run.
         for line in ("[features]", "shell_snapshot = false", "standalone_web_search = true",
                      "supports_standalone_web_search = true"):

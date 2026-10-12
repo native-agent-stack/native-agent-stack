@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "kind": "runtime-profile-reopened-corrections",
+  "recorded_at": "2026-10-12T12:23:42Z",
+  "clock": "date -u",
+  "baseline": "d475ef813c7713d0125da6123ff0869b8c720ad4",
+  "release": "ONE commit leased on the baseline; both-family delta reads before landing",
+  "provider_inference_calls": 0,
+  "api_spend_usd": 0,
+  "w6_arms": "not run; wait until #1033 lands and the CC cue",
+  "corrections": [
+    {
+      "finding": "Astra1 / CC N3: unpublished log hashes",
+      "change": "All eight unpublished-output hashes omitted. No original log or native private state read, copied or hashed for publication.",
+      "evidence_class": "synthetic",
+      "regression": "tests/test_runtime_publication.py scans output-hash fields in notes/runtime-profiles receipts; absent/mismatched preimages fail, exact published sanitized fixture bytes pass",
+      "before": "3 tests, 2 failures jointly with the fixture email control; exit 1",
+      "after": "5 tests with explicit vendor source, no skips, exit 0"
+    },
+    {
+      "finding": "Astra2: literal no-reply fixture identity",
+      "change": "Synthetic GitHub no-reply identity replaces the disallowed synthetic email; lifecycle behavior is unchanged",
+      "evidence_class": "synthetic",
+      "regression": "Runtime publication module checks the source's Git fixture email against the literal no-reply rule; fails before, passes after"
+    },
+    {
+      "finding": "Astra3: displaced Sol trial locator",
+      "change": "Current trial row points at GPT_MODEL at line 40 after the corrected module scope text; model and effort unchanged",
+      "evidence_class": "local_integration",
+      "regression": "tests/test_task_model_routing.py now requires this current trial citation's exact line span to contain its quoted assignment",
+      "before": "11 tests, 1 failure, exit 1",
+      "after": "11 tests, exit 0"
+    },
+    {
+      "finding": "CC N1: inherited PWD inverts native OpenCode read containment",
+      "change": "Both routes bind child PWD to the fresh worktree; headless OpenCode also receives native --dir",
+      "evidence_class": "local_integration",
+      "regressions": [
+        "Portable launch checks use an inherited wrong PWD across GPT/Claude and print/interactive paths; 4 before subcases fail, 23 profile tests pass after",
+        "Hermetic installed OpenCode 1.18.35 runs the actual launch command against a namespace-local rejecting endpoint; session/working directory equal fresh worktree; real native debug-agent reads allow owned and selected vendor files, deny primary and unselected vendor files"
+      ],
+      "native_before": "Exact baseline launch module; wrong inherited PWD retained; real HOME/code versus var/tmp relative depths; session/prompt and native read controls fail",
+      "native_after": "1 test, exit 0; native run/debug-agent commands; no key, provider, external network or inference",
+      "source": "anomalyco/opencode@53d1eabb:packages/opencode/src/cli/cmd/run.ts:134,333-340"
+    },
+    {
+      "finding": "CC N2: project-disable flag removes AGENTS.md",
+      "change": "Explicitly clear inherited project-disable flag; native project/subtree instruction discovery remains enabled; final permission overlay retained",
+      "evidence_class": "local_integration",
+      "regression": "Hermetic native request contains owned AGENTS.md marker and excludes primary marker; exact baseline omits owned marker",
+      "source": "anomalyco/opencode@53d1eabb:packages/opencode/src/session/instruction.ts:123-150; packages/core/src/instruction-context.ts:48"
+    },
+    {
+      "finding": "CC N4: overbroad private-store claim and rewritten fixture described as unchanged",
+      "change": "Scope text names Context Mode/profile files, external launcher/fragment locations, shared MCP stores and native Git project cache. Fixture functions copied byte-identically from the pin, with accurate spans.",
+      "evidence_class": "source_review",
+      "before": "Scope claim control against exact baseline fails once; vendor-byte fixture control fails two blocks",
+      "after": "5 publication tests pass with explicit pinned vendor source, no skips",
+      "sources": [
+        "anomalyco/opencode@53d1eabb:packages/opencode/src/util/wildcard.ts:3-19",
+        "anomalyco/opencode@53d1eabb:packages/opencode/src/permission/index.ts:28-38,178-214",
+        "anomalyco/opencode@53d1eabb:packages/core/src/npm.ts:45-50"
+      ]
+    }
+  ],
+  "commands": [
+    "TMPDIR=/var/tmp PYTHONDONTWRITEBYTECODE=1 python3 -B -m unittest discover -s tests -p test_runtime_profiles.py -q",
+    "TMPDIR=/var/tmp PYTHONDONTWRITEBYTECODE=1 NS_OPENCODE_TEST_SOURCE=<public-pinned-mirror> python3 -B -m unittest discover -s tests -p test_runtime_publication.py -q",
+    "TMPDIR=/var/tmp PYTHONDONTWRITEBYTECODE=1 python3 -B -m unittest discover -s tests -p test_task_model_routing.py -q",
+    "TMPDIR=/var/tmp PYTHONDONTWRITEBYTECODE=1 NS_OPENCODE_TEST_BIN=<installed-public-1.18.35-binary> python3 -B -m unittest discover -s tests -p test_runtime_opencode_native.py -q",
+    "NS_RUNTIME_OPENCODE_BASELINE_SOURCE=<git-show-d475ef81-runtime_profiles.py> <same native module command>; exit 1",
+    "NS_RUNTIME_SCOPE_BASELINE_SOURCE=<git-show-d475ef81-runtime_profiles.py> <same publication module command>; exit 1"
+  ],
+  "capture_boundary": "Output captures remain unpublished under coordination scratch /var/tmp. No output hash or raw request is published. Native fixture endpoint rejects the captured request; all writes occur in its scratch/scratch-backed tmp with the host tree read-only. No new native profile acceptance or W6 run is claimed.",
+  "native_fixture_omissions": "Optional plugins/MCP entries are omitted from the focused directory/instruction/read fixture; actual native CLI, agents, configuration and tools run.",
+  "follow_ups": [
+    "Exceptional launch/collection errors can bypass normal receipts and cleanup",
+    "Native boot needs the intended already-qualified flat private npm prefix; default CI skips and generic installed layouts may lack its assumed sibling SQLite dependency",
+    "Missing unmirrored pinned captures and B4 fail-before evidence in the historical review packet remain gaps",
+    "Pi discovery does not gate on auth readiness",
+    "Interactive Pi does not automatically load role text without a prompt",
+    "Inherited hostname references remain hygiene follow-ups",
+    "Oversized briefs exceed Linux's per-argument limit and receive a generic refusal",
+    "Canonical managed-skill supporting files remain unreadable through OpenCode native Read; named skill-loader text loads",
+    "Missing canonical preload files reject the native OpenCode configuration",
+    "Ignored-only trees are conservatively retained and runtime branches remain",
+    "OpenCode writes the native Git common-directory project-id cache",
+    "ai-memory, qmd and SocratiCode retain configured shared stores; Pi has no filesystem read fence; these are W6 blindness inputs",
+    "Invocation inventory's returned source mapping remains unused by launch"
+  ],
+  "mirror_currency": "Worktrunk b49ca7ee is now in its host mirror; Context Mode 6f0cc684 remains unmirrored and was checked through pinned vendor URLs"
+}

@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "kind": "runtime-private-database-override-correction",
+  "recorded_at": "2026-10-12T18:31:44Z",
+  "clock": "date -u",
+  "reviewed_head": "631b57111f180ddbadf135c98ff32696e335b6a6",
+  "input_verdict": "fix4-pr1033-b0042381b/VERDICT.md",
+  "retained_property": "profile-private native state; role tool grants unchanged",
+  "source": "anomalyco/opencode@53d1eabb61e21162157817bf677da0a4ad3332e3:packages/core/src/flag/flag.ts:47;packages/core/src/database/database.ts:22-55",
+  "change": "Common profile environment explicitly binds the native OPENCODE_DB override to an absolute per-profile/role data path, used by interactive/headless launch, discovery and collection on both routes",
+  "before": "Three shipped regressions against exact631b5711:exit1,16assertion failures,0errors; includes four real native collector cases with absent/existing synthetic outside DBs",
+  "after": "Three regressions:exit0,0skips with explicit installed OpenCode1.18.35; native private SQLite files initialize/integrity-check, synthetic outside files and sidecars unchanged; two headless and ten discovery scope controls pass",
+  "evidence_classes": [
+    "local_integration",
+    "synthetic"
+  ],
+  "provider_calls": 0,
+  "api_spend_usd": 0,
+  "bounded_command_prefix": "systemd-run --user --scope -p CPUWeight=idle timeout --signal=TERM --kill-after=5s 180s env TMPDIR=/var/tmp PYTHONDONTWRITEBYTECODE=1",
+  "commands": [
+    {"command": "<prefix> NS_RUNTIME_DB_BASELINE_SOURCE=<exact-git-show-631b5711-source> NS_OPENCODE_TEST_BIN=<direct-installed-public-1.18.35-binary> python3 -B -m unittest tests.test_runtime_database_isolation -q", "exit_code": 1, "tests": 3, "assertion_failures": 16, "errors": 0, "skips": 0},
+    {"command": "<prefix> NS_OPENCODE_TEST_BIN=<same-direct-native-binary> python3 -B -m unittest tests.test_runtime_database_isolation -q", "exit_code": 0, "tests": 3, "skips": 0},
+    {"command": "<prefix> python3 -B -m unittest tests.test_runtime_profiles -q", "exit_code": 0, "tests": 24, "skips": 0},
+    {"command": "<prefix> NS_PI_TEST_BIN=<installed-public-1.1.0-binary> NS_OPENCODE_TEST_BIN=<direct-installed-public-1.18.35-binary> python3 -B -m unittest tests.test_runtime_profile_readiness -q", "exit_code": 0, "tests": 7, "skips": 0},
+    {"command": "<prefix> NS_OPENCODE_TEST_SOURCE=<public-pinned-mirror> python3 -B -m unittest tests.test_runtime_publication -q", "exit_code": 0, "tests": 5, "skips": 0},
+    {"command": "<prefix> python3 -B -m unittest tests.test_task_model_routing -q", "exit_code": 0, "tests": 11, "skips": 0},
+    {"command": "<prefix> NS_CONTEXT_MODE_TEST_PACKAGE=<qualified-flat-vendor-prefix> python3 -B -m unittest tests.test_runtime_boot -q", "exit_code": 0, "tests": 1, "profile_boots": 4, "skips": 0},
+    {"command": "<prefix> python3 scripts/validate.py", "exit_code": 0, "public_file_hashes": 11838}
+  ],
+  "privacy": "Synthetic HOME/configs/DBs only; no real account DB or credential read. Initial agent/discovery calls controlled; actual installed CLI collects sessions. Captures unpublished and unhashed",
+  "claude_check_at_631b5711": {
+    "tests_run": 718,
+    "skipped": 19,
+    "verdict": "PASS_WITH_P3",
+    "skip_reason_provenance": "Original tail incomplete; bounded skip-only replay selected these same nineteen cases under omitted native prerequisites and recorded all nineteen skips",
+    "skips": [
+      {
+        "test": "tests.test_codex_worker_lane.CodexIntegrationTests.test_a_project_config_outranks_the_profile_but_not_the_pinned_flags",
+        "reason": "set NAS_CODEX_INTEGRATION=1 with codex-cli 0.160.0 on PATH to run the real app-server"
+      },
+      {
+        "test": "tests.test_codex_worker_lane.CodexIntegrationTests.test_codex_follows_links_below_agents_and_the_role_count_never_undercounts_it",
+        "reason": "set NAS_CODEX_INTEGRATION=1 with codex-cli 0.160.0 on PATH to run the real app-server"
+      },
+      {
+        "test": "tests.test_codex_worker_lane.CodexIntegrationTests.test_real_app_server_apply_and_byte_exact_rollback",
+        "reason": "set NAS_CODEX_INTEGRATION=1 with codex-cli 0.160.0 on PATH to run the real app-server"
+      },
+      {
+        "test": "tests.test_codex_worker_lane.CodexIntegrationTests.test_required_serena_starts_before_the_first_turn_on_a_custom_provider",
+        "reason": "set NAS_CODEX_INTEGRATION=1 with codex-cli 0.160.0 on PATH to run the real app-server"
+      },
+      {
+        "test": "tests.test_codex_worker_lane.CodexIntegrationTests.test_serena_startup_trial",
+        "reason": "set NAS_CODEX_INTEGRATION=1 with codex-cli 0.160.0 on PATH to run the real app-server"
+      },
+      {
+        "test": "tests.test_codex_worker_lane.CodexIntegrationTests.test_strict_config_refuses_the_launchers_model_flag",
+        "reason": "set NAS_CODEX_INTEGRATION=1 with codex-cli 0.160.0 on PATH to run the real app-server"
+      },
+      {
+        "test": "tests.test_codex_worker_lane.CodexIntegrationTests.test_strict_config_refuses_the_stack_worker_profile_at_this_pin",
+        "reason": "set NAS_CODEX_INTEGRATION=1 with codex-cli 0.160.0 on PATH to run the real app-server"
+      },
+      {
+        "test": "tests.test_codex_worker_lane.CodexIntegrationTests.test_the_doctor_reader_accepts_the_shipped_roles_and_flags_a_malformed_one",
+        "reason": "set NAS_CODEX_INTEGRATION=1 with codex-cli 0.160.0 on PATH to run the real app-server"
+      },
+      {
+        "test": "tests.test_codex_worker_lane.CodexIntegrationTests.test_the_jcodemunch_recipe_step_registers_the_server_only_where_it_is_copied",
+        "reason": "set NAS_CODEX_INTEGRATION=1 with codex-cli 0.160.0 on PATH to run the real app-server"
+      },
+      {
+        "test": "tests.test_codex_worker_lane.CodexIntegrationTests.test_the_omniroute_filter_keeps_the_key_out_of_commands",
+        "reason": "set NAS_CODEX_INTEGRATION=1 with codex-cli 0.160.0 on PATH to run the real app-server"
+      },
+      {
+        "test": "tests.test_codex_worker_lane.CodexIntegrationTests.test_the_omniroute_profile_loads_strictly_and_names_its_key",
+        "reason": "set NAS_CODEX_INTEGRATION=1 with codex-cli 0.160.0 on PATH to run the real app-server"
+      },
+      {
+        "test": "tests.test_codex_worker_lane.CodexIntegrationTests.test_worker_profile_sets_chub_opt_outs_in_an_isolated_home",
+        "reason": "set NAS_CODEX_INTEGRATION=1 with codex-cli 0.160.0 on PATH to run the real app-server"
+      },
+      {
+        "test": "tests.test_landscape_sweep_harness.OmniRouteLaneBuildTests.test_context_mode_reads_only_the_listed_skill_files",
+        "reason": "set CONTEXT_MODE_SECURITY_JS to an installed context-mode build/security.js"
+      },
+      {
+        "test": "tests.test_landscape_sweep_harness.ShellTests.test_runs_under_bash_3_2",
+        "reason": "no real bash 3.2 binary (set BASH32_BINARY, or run on a Mac)"
+      },
+      {
+        "test": "tests.test_landscape_sweep_harness.ShellTests.test_shellcheck",
+        "reason": "shellcheck is not installed"
+      },
+      {
+        "test": "tests.test_runtime_boot.HermeticRuntimeBootTests.test_context_mode_boot_creates_zero_entries_outside_profile",
+        "reason": "explicit installed context-mode test package not supplied"
+      },
+      {
+        "test": "tests.test_runtime_opencode_native.NativeOpenCodeContractTests.test_real_session_prompt_and_reads_use_fresh_worktree",
+        "reason": "explicit installed OpenCode binary and bubblewrap required"
+      },
+      {
+        "test": "tests.test_runtime_profile_readiness.RuntimeReadinessTests.test_installed_public_runtime_versions_match_the_qualified_releases",
+        "reason": "explicit installed public binary paths required"
+      },
+      {
+        "test": "tests.test_runtime_publication.RuntimePublicationTests.test_fixture_claimed_native_functions_match_the_pinned_vendor_bytes",
+        "reason": "explicit public vendor source mirror required for byte-provenance check"
+      }
+    ]
+  },
+  "new_native_skip_reason": "explicit installed public OpenCode binary required",
+  "follow_ups": [
+    "PARKED: alias-read fencing; no renewed acceptance claim",
+    "Qualify or refuse npm .bin/opencode launcher spelling; direct native binary currently qualified",
+    "Exceptional startup/collection and malformed session entries",
+    "Earlier preparation/collection record entries need their own pinned mechanism citations",
+    "Full Git/MCP and srt proxy tests unimplemented; historical Context Mode boot provenance bounded",
+    "Unmirrored cited RTK/Context Mode/pi-otel objects and absent captures/archived locator semantic checks",
+    "Inherited hostname hygiene"
+  ],
+  "readiness": "No fresh four-profile model/MCP-consumer acceptance or comparison promotion. New prepare/arms await landing and CC cue"
+}

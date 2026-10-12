@@ -35,7 +35,8 @@ model_context_window = 800000
 # (web.run), which the provider below opts into.
 web_search = "live"
 
-# Upstream's documented block (docs/guides/CODEX-CLI-CONFIGURATION.md L22-41 at a58000c7), port 20128 as a literal:
+# Upstream's documented block (docs/guides/CODEX-CLI-CONFIGURATION.md L22-41 at a58000c7), using the recorded
+# new-WSL loopback port (adoption/new-wsl/client-config-map.json, gateway base_url entry):
 # a host-value placeholder here would fail every host that lacks the value. OmniRoute's Codex models carry the cx/
 # prefix (same guide, L150-161); no gateway-side alias is needed. Never set name = "OpenAI": Codex's is_openai()
 # compares only this display name (codex-rs/model-provider-info/src/lib.rs L601-603) and would switch on OpenAI-only
@@ -45,7 +46,7 @@ web_search = "live"
 # deferred-v3.8.52 on 2026-09-27); a gateway without it has no such route.
 [model_providers.omniroute]
 name = "OmniRoute"
-base_url = "http://127.0.0.1:20128/v1"
+base_url = "http://127.0.0.1:21128/v1"
 env_key = "OMNIROUTE_API_KEY"
 env_key_instructions = "Export OMNIROUTE_API_KEY only in the shell that starts `codex -p omniroute`: the gateway's key, stored under inventory id omniroute with tools/credentials/open_credential_terminal.sh omniroute, or any non-empty value for a keyless loopback gateway."
 wire_api = "responses"

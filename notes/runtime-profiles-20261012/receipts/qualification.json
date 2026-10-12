@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "status": "trial",
+  "tool_read_utc": "2026-10-12T06:27:22Z",
+  "evidence_class": "local_integration",
+  "focused_repository_tests": {
+    "profile_command": "python3 -B -m unittest discover -s tests -p test_runtime_profiles.py -q",
+    "profile_tests": 16,
+    "profile_exit_code": 0,
+    "tracker_command": "python3 -B -m unittest discover -s tests -p test_runtime_usage.py -q",
+    "tracker_tests": 17,
+    "tracker_exit_code": 0,
+    "wsl_module_command": "python3 -B -m unittest discover -s tests -p test_new_wsl_client_config.py -q",
+    "wsl_module_tests": 231,
+    "wsl_module_exit_code": 0,
+    "codex_worker_lane_tests": 123,
+    "codex_worker_lane_exit_code": 0,
+    "codex_worker_lane_expected_skips": 12,
+    "landscape_sweep_harness_tests": 289,
+    "landscape_sweep_harness_exit_code": 0,
+    "landscape_sweep_expected_skips": 3,
+    "task_model_routing_tests": 10,
+    "task_model_routing_exit_code": 0,
+    "fail_before": ["OmniRoute template 20128 differs from committed live gateway21128", "existing tracker rejects --runtime-log", "foreign-session/user-forged interactive exports counted before ownership checks"]
+  },
+  "pi_otel_upstream": {
+    "repository": "https://github.com/b1tank/pi-otel",
+    "pin": "3cd674533a8d24c9b8a2a6a94072eec25466e128",
+    "package": "@b1tank/pi-otel@0.5.0",
+    "command": "npm test -- test/integration.test.ts",
+    "locked_dependency_run": {"exit_code": 0, "test_files": 1, "tests": 1, "vitest": "5.0.1"},
+    "installed_client_override": {"command": "npm install --no-save --package-lock=false --no-audit --no-fund @earendil-works/pi-coding-agent@1.1.0", "exit_code": 0, "pi_version": "1.1.0", "vitest": "5.0.3", "dependency_resolution_deviation": true},
+    "client_override_run": {"exit_code": 0, "test_files": 1, "tests": 1},
+    "scope": "Unchanged upstream test uses local mock model and collector; exports and redaction asserted; no external model calls",
+    "live_collector_delivery": "UNVERIFIED: local host listener is present; no profile-tagged metric found in sampled exporter"
+  },
+  "auxiliary_vendor_installs": {
+    "tavily-cli": {"version": "0.1.8", "source": "adoption/pins-linux-x86_64.json", "mechanism": "uv tool install --python 3.13 tavily-cli==0.1.8, owned prefix", "install_exit_code": 0, "version_exit_code": 0},
+    "agent-browser": {"version": "0.38.2", "source": "adoption/pins-linux-x86_64.json; recipes/README.md:81", "mechanism": "npm install --global --prefix <owned-prefix> agent-browser@0.38.2", "install_exit_code": 0, "version_exit_code": 0, "browser_download_or_launch": false},
+    "openresearch": {"version": "0.2.15", "source": "adoption/pins-linux-x86_64.json; alphaXiv/OpenResearch releasev0.2.15", "archive_pin_verified": true, "version_exit_code": 0, "discover_or_paper_request": false}
+  },
+  "spend": {
+    "console_usage_priced_usd": 1.137788,
+    "gpt_api_equivalent_usd": 0.3087792,
+    "combined_api_equivalent_usd": 1.4465672,
+    "invoice_verified": false,
+    "comparative_runs": 0
+  },
+  "publication": {
+    "gitleaks_receipt_set_exit_code": 0,
+    "native_config_auth_session_lock_roots_copied_hashed_or_published": false,
+    "private_input_digests_published": false
+  },
+  "implementation_review": {
+    "reviewed_head": "58a05d0313b5e9f1b7183831637dfc0ed281120f",
+    "gpt_verdict": "CHANGES_REQUESTED",
+    "reproduced_p2s": ["interactive OpenCodeClaude collector XDG", "ungranted native Skill helper", "Unicode JSONLF framing", "mandatory Pi MCP readiness"],
+    "regression_before": {"tests": 4, "failure_events": 5, "exit_code": 1, "scope": "exact-head synthetic reviewer fixture; no native auth/session reads"},
+    "local_fix_profile_tests": 16,
+    "local_fix_exit_code": 0,
+    "claude_attempt": {"exit_code": 124, "final_response": false, "actual_cost_usd": null, "cost_status": "UNVERIFIED: timeout without final native receipt"},
+    "remaining_reads": "CC-owned Claude and co-op-cut Astra FIRST at the fix head; no further lane self-dispatch"
+  },
+  "limitations": [
+    "Version/help invocations prove executable wiring only, not functional web/browser/quality acceptance",
+    "OpenCode native MCP status has no structured per-server tool counts; Pi counts are separate server inventory evidence",
+    "SocratiCode remains pending E1 for unindexed fresh worktree",
+    "Native model/request labels are not independently traced HTTP request IDs",
+    "Tier1 consumed by path from CNP; Tier2 uses Skills1.7.0 with SKILLS_API_URL seam; local index and independent CNP checks are pending",
+    "All runtime profiles remain trial"
+  ]
+}

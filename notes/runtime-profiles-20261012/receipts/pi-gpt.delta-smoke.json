@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "status": "trial",
+  "profile": "pi-gpt",
+  "role": "isolated-builder",
+  "started_at": "2026-10-12T06:32:54Z",
+  "finished_at": "2026-10-12T06:33:23Z",
+  "head": "2a330b0a0be0bb64d1b86b89ee0c5b3bee1156a1",
+  "request_label": "ns-run-pi-gpt-b3e864efa46a4103bfb2e4c5ffdd8eec",
+  "model": "cx/gpt-6.1-sol",
+  "credential_loader_id": null,
+  "inference": {
+    "completed_native_steps": 3,
+    "usage": {
+      "input": 19863,
+      "output": 187,
+      "reasoning": 31,
+      "cache_read": 18304,
+      "cache_write": 0,
+      "total_tokens": 38354
+    },
+    "native_cost_usd": 0.0434264,
+    "usage_measured": true,
+    "response_ids": [],
+    "native_session_ids": [],
+    "http_request_id": "UNVERIFIED: native events expose no independently traced HTTP request id",
+    "cost_basis": "native usage priced by runtime model metadata; GPT is API-price equivalent",
+    "invoice_verified": false
+  },
+  "runtime_exit_code": 0,
+  "tracker_exit_code": 0,
+  "invocations": {
+    "measured": true,
+    "evidence_class": "prompted_or_unclassified_native_invocation",
+    "organic_use_measured": false,
+    "logs_scanned": 1,
+    "sessions_measured": 1,
+    "parse_errors": 0,
+    "invalid_records": 0,
+    "orphan_results": 0,
+    "pending_tool_calls": 0,
+    "failed_tool_calls": 0,
+    "conflicting_tool_calls": 0,
+    "completed_tool_calls": 2,
+    "successful_skill_uses": {
+      "find-skills": 1
+    },
+    "successful_mcp_calls": {
+      "context-mode": 1
+    }
+  },
+  "publication_boundary": "derived facts only; native state remains private",
+  "evidence_class": "native_proven",
+  "command": [
+    "ns-run",
+    "ns-pi-gpt",
+    "builder",
+    "PROFILE-V6-DELTA-BRIEF.md",
+    "--timeout-seconds",
+    "180"
+  ],
+  "pending_layers": {
+    "socraticode": "pending E1: fresh worktree has no index; no automatic indexing measured"
+  },
+  "invocation_scope": "Prompted/unclassified smoke only; no organic invoke-rate claim.",
+  "private_native_state_hashed_or_published": false
+}

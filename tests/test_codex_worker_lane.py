@@ -664,7 +664,7 @@ class TemplateTests(unittest.TestCase):
         self.assertEqual(profile["model_context_window"], 800000)
         provider = profile["model_providers"]["omniroute"]
         self.assertEqual(provider["name"], "OmniRoute")  # "OpenAI" would switch on is_openai() paths
-        self.assertEqual(provider["base_url"], "http://127.0.0.1:20128/v1")
+        self.assertEqual(provider["base_url"], "http://127.0.0.1:21128/v1")
         self.assertEqual(provider["env_key"], "OMNIROUTE_API_KEY")
         self.assertEqual(provider["wire_api"], "responses")
         self.assertIs(provider["requires_openai_auth"], False)

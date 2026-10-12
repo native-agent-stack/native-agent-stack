@@ -2353,6 +2353,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--codex-root", action="append", default=[], type=Path, metavar="DIR",
                          help="Root to scan for rollout-*.jsonl (repeatable; no default search: "
                               "omit entirely to report Codex as not-measured)")
+    parser.add_argument("--runtime-log", action="append", default=[], nargs=2,
+                         metavar=("RUNTIME", "JSONL"),
+                         help="Read a native pi or opencode log in place; report derived successful skill/MCP "
+                              "invocations and session counts, without copying or hashing private runtime state")
     parser.add_argument("--window", action="append", default=[], type=int, metavar="N",
                          help="Invoke-rate window in days (repeatable; default: 7 and 30)")
     parser.add_argument("--now", default=None, metavar="ISO8601",
@@ -2449,6 +2453,13 @@ def main(argv=None) -> int:
 
     report = build_report(manifest, claude=claude, codex_scan=codex_scan,
                            lock_installed_at=lock_installed_at, now=now, windows=windows)
+    if args.runtime_log:
+        from runtime_usage import scan
+        try:
+            report["runtimes"] = scan(args.runtime_log, names, skillmd_hits=skillmd_hits)
+        except (OSError, ValueError) as error:
+            print(f"skill_usage: runtime log refused: {type(error).__name__}", file=sys.stderr)
+            return 2
 
     if not write_out(args.out, report):
         return 2

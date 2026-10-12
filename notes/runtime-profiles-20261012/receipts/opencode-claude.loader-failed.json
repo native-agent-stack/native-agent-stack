@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "status": "trial",
+  "profile": "opencode-claude",
+  "role": "isolated-builder",
+  "started_at": "2026-10-12T06:06:31Z",
+  "finished_at": "2026-10-12T06:06:31Z",
+  "head": "2bdb5731ddec6159d02266af16fe30d4bb677510",
+  "request_label": "ns-run-opencode-claude-d81b91181c1d4ce981ce406c2233f28c",
+  "model": "claude-opus-5-5",
+  "credential_loader_id": "anthropic-api-4",
+  "inference": {
+    "completed_native_steps": 0,
+    "usage": {
+      "input": 0,
+      "output": 0,
+      "reasoning": 0,
+      "cache_read": 0,
+      "cache_write": 0,
+      "total_tokens": 0
+    },
+    "native_cost_usd": null,
+    "response_ids": [],
+    "native_session_ids": [],
+    "http_request_id": "UNVERIFIED: native events expose no independently traced HTTP request id",
+    "cost_basis": "native usage priced by runtime model metadata; GPT is API-price equivalent",
+    "invoice_verified": false,
+    "usage_measured": false
+  },
+  "runtime_exit_code": 1,
+  "tracker_exit_code": 0,
+  "invocations": {
+    "completed_tool_calls": 0,
+    "conflicting_tool_calls": 0,
+    "evidence_class": "prompted_or_unclassified_native_invocation",
+    "failed_tool_calls": 0,
+    "invalid_records": 0,
+    "logs_scanned": 1,
+    "measured": true,
+    "organic_use_measured": false,
+    "orphan_results": 0,
+    "parse_errors": 0,
+    "pending_tool_calls": 0,
+    "sessions_measured": 0,
+    "successful_mcp_calls": {},
+    "successful_skill_uses": {}
+  },
+  "publication_boundary": "derived facts only; native state remains private",
+  "evidence_class": "native_proven",
+  "command": [
+    "ns-run",
+    "ns-opencode-claude",
+    "builder",
+    "PROFILE-SMOKE-BRIEF.md",
+    "--timeout-seconds",
+    "240"
+  ],
+  "pending_layers": {
+    "socraticode": "pending E1: fresh worktree has no index; no automatic indexing measured"
+  },
+  "invocation_scope": "Prompted/unclassified smoke only; no organic invoke-rate claim.",
+  "failure_class": "Credential loader inherited OpenCode XDG_STATE_HOME; no completed provider inference. Fixed by applying runtime XDG values only inside credential_run's child.",
+  "private_native_state_hashed_or_published": false
+}
