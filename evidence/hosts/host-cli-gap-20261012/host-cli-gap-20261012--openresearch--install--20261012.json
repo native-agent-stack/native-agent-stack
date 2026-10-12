@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "id": "host-cli-gap-20261012--openresearch--install--20261012",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "host-cli-gap-20261012",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": false
+  },
+  "catalog_revision": "d8f7e2051b61bde6361a85b64f41413798015353",
+  "recorded_by": {
+    "identity_sha256": "4bbad487d839bc52782f02d7231406c6d0de7a72790dc27e0759ef41cb37265a"
+  },
+  "component_id": "openresearch",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "orx --version",
+      "exit": 0,
+      "duration_s": 0.015,
+      "output_sha256": "264274379edfe04945169c167abcdf48c639d702ca40792cca4d4a330e477dd0",
+      "output_excerpt": "orx 0.2.15\n"
+    }
+  ],
+  "tool_versions": {
+    "openresearch": "0.2.15"
+  },
+  "observed_at_utc": "2026-10-12T14:59:00Z",
+  "result": "pass",
+  "claim": "Pinned bootstrap install and executable publication recorded in evidence/artifacts/host-cli-gaps-20261012/receipt.json; installed CLI version checked here.",
+  "limitations": [
+    "Bootstrap pin 0.2.15 differs from the older landscape winner pin; version-only receipt does not qualify the newer version or promote any status. No provider operation; independent review pending."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-10-12T14:59:00Z",
+      "reviewer": {
+        "identity_sha256": "4bbad487d839bc52782f02d7231406c6d0de7a72790dc27e0759ef41cb37265a"
+      }
+    }
+  ]
+}
