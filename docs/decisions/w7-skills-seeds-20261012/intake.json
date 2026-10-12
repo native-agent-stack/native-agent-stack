@@ -4336,23 +4336,37 @@
     }
   ],
   "gsd_seed": {
-    "repository": "https://github.com/gsd-build/get-shit-done",
-    "commit": "bdcaab2c752d9a33a1a1ca9acf3a3c81fb991815",
-    "path": "README.md",
-    "published_blob_sha256": "6530ef6aad23383980a7c405d32c40e73c798ee4263a883f804aef31548569b6",
-    "bytes": 329,
-    "state": "REPOSITORY_MOVED; EXACT_SKILL_ENTRY_UNESTABLISHED",
-    "named_successor": "https://github.com/open-gsd/gsd-core",
-    "successor_pin": "b747aca5b1dcff699c36d90c5b9fca0ec6354c1c",
-    "boundary": "No SKILL.md exists at the retained source pin. Registry results are third-party discovery leads and are not identified as the owner-requested GSD skill.",
-    "successor_source": {
-      "path": "README.md",
-      "published_blob_sha256": "66fe062ee3705af835b09ffa8da112fd14bc8a6025f0d4fb22b4291d353268a9",
-      "bytes": 5922,
-      "role": "meta-prompting/context engineering/spec-driven development framework",
-      "native_install_path": "README.md:43-48; official runtime installer; no install executed",
-      "boundary": "The source repository is identified. Exact eligible skill path, role scope and S1 comparison remain unqualified."
-    },
+    "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/instructions-skills/151",
+    "repository": "https://github.com/open-gsd/gsd-core",
+    "commit": "ed0f3fd55849eb041eb2503762c9833b83694abd",
+    "state": "RETAINED_MASTER_SEED; NOT_S1_ADJUDICATED",
+    "primary_metadata_state": "UNMIRRORED",
+    "boundary": "Already retained since #978 (333ec47b9); no GSD seed is added. Exact primary skill metadata at the retained pin is unrecovered. Registry results and later heads are observations, not substitutes for retained-pin facts/fit/role adjudication.",
+    "observations": [
+      {
+        "kind": "ARCHIVED_REPOSITORY_REDIRECT",
+        "repository": "https://github.com/gsd-build/get-shit-done",
+        "commit": "bdcaab2c752d9a33a1a1ca9acf3a3c81fb991815",
+        "path": "README.md",
+        "published_blob_sha256": "6530ef6aad23383980a7c405d32c40e73c798ee4263a883f804aef31548569b6",
+        "bytes": 329,
+        "state": "OBSERVATION_ONLY; NOT_RETAINED_PIN",
+        "named_successor": "https://github.com/open-gsd/gsd-core",
+        "boundary": "Archived README documents the move; this observed commit is not a frozen master seed. No SKILL.md was present at this observed pin."
+      },
+      {
+        "kind": "LATER_HEAD",
+        "repository": "https://github.com/open-gsd/gsd-core",
+        "commit": "b747aca5b1dcff699c36d90c5b9fca0ec6354c1c",
+        "path": "README.md",
+        "published_blob_sha256": "66fe062ee3705af835b09ffa8da112fd14bc8a6025f0d4fb22b4291d353268a9",
+        "bytes": 5922,
+        "state": "OBSERVATION_ONLY; NOT_RETAINED_PIN",
+        "role": "meta-prompting/context engineering/spec-driven development framework",
+        "native_install_path": "README.md:43-48; official runtime installer; no install executed",
+        "boundary": "Later-head README observation does not recover metadata at the retained master pin or establish eligible skill scope, S1 qualification or adoption."
+      }
+    ],
     "registry_probe": {
       "command": "DISABLE_TELEMETRY=1 npx --yes skills@1.7.0 find get-shit-done",
       "exit_code": 0,

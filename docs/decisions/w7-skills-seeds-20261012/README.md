@@ -56,14 +56,23 @@ replacement refutation and the four frozen copies are not cleared by that name.
 
 ## GSD source correction
 
-The retained `gsd-build/get-shit-done` pin
+The frozen master entry
+`catalogs/convergence-practice/sources/master-seeds-20261010.json#/instructions-skills/151`
+already retains `open-gsd/gsd-core` at
+`ed0f3fd55849eb041eb2503762c9833b83694abd`. It entered the published master with
+#978 (`333ec47b9`). This intake binds that existing seed; it adds no GSD seed.
+The retained pin is UNMIRRORED: its exact primary skill metadata has not been
+recovered, and facts/fit/role adjudication remains pending.
+
+The archived `gsd-build/get-shit-done` README observed at
 `bdcaab2c752d9a33a1a1ca9acf3a3c81fb991815` has no SKILL.md and its
 [README](https://github.com/gsd-build/get-shit-done/blob/bdcaab2c752d9a33a1a1ca9acf3a3c81fb991815/README.md)
 redirects to `open-gsd/gsd-core`. The successor's
 [README at b747aca5](https://github.com/open-gsd/gsd-core/blob/b747aca5b1dcff699c36d90c5b9fca0ec6354c1c/README.md)
-describes a context-engineering/spec-driven development framework and its native
-runtime installer. Its repository identity is established; an eligible skill
-entry, narrowed role and executed S1 qualification remain pending.
+is a later-head observation only, not the retained master pin. It describes a
+context-engineering/spec-driven development framework and its native runtime
+installer. The archived redirect establishes the repository move; neither
+observation supplies the retained pin's missing metadata or an executed S1 result.
 
 The vendor command `DISABLE_TELEMETRY=1 npx --yes skills@1.7.0 find get-shit-done`
 exited 0. Its third-party variants are recorded only as discovery leads. Search
