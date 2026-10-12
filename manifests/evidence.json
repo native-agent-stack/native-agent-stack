@@ -18927,8 +18927,8 @@
     },
     {
       "path": "docs/decisions/2026-10-12-skills-installer-foreign-content.md",
-      "sha256": "9556e7fe929735ff32c35a76a78b2440aee28e6bfc20286533b4ef259b906294",
-      "bytes": 16603
+      "sha256": "086d80eea068c899dae3c49b8befb83731f87c88b33c01e9dec88cf9f439c23a",
+      "bytes": 19447
     },
     {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
@@ -62207,8 +62207,8 @@
     },
     {
       "path": "tests/test_install_skills.py",
-      "sha256": "5cc382e7b0ac69154fa4373992f699271548efbee22f8726711aaecb5de8a13e",
-      "bytes": 216440
+      "sha256": "6d939894cbcde3839bcbb373a4a985d37387704d5badff69718c2bb32e279682",
+      "bytes": 233774
     },
     {
       "path": "tests/test_j775_panel_contracts.py",
@@ -63137,8 +63137,8 @@
     },
     {
       "path": "tools/adoption/install_skills.py",
-      "sha256": "8d9c46581fd769795f37fcdb8043d54ab3f4a014bf743b21aae4e0b8784a2ff1",
-      "bytes": 65346
+      "sha256": "a89b0a4e97c56bb3ec5973253ef6a683f4d44ab5f32c4e4ea37cdb688f2bbe46",
+      "bytes": 66626
     },
     {
       "path": "tools/adoption/managed_block.py",

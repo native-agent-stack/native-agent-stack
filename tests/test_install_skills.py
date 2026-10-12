@@ -122,15 +122,30 @@ def lock_path(home: Path) -> Path:
     return node_join(str(home), ".agents", ".skill-lock.json")
 
 
-def load_lock(path: Path) -> dict:
-    if path.is_file():
-        try:
-            data = json.loads(path.read_text())
-            if isinstance(data, dict):
-                return data
-        except json.JSONDecodeError:
-            pass
-    return {"version": 3, "skills": {}}
+def reject_constant(token):
+    raise ValueError(token)
+
+
+def load_lock(path: Path, project: bool = False) -> dict:
+    # skills@7407f389 readSkillLock and readLocalLock (src/skill-lock.ts L84-L101, src/local-lock.ts L76-L98): a lock the CLI cannot parse (JSON.parse rejects NaN, Infinity and -Infinity), whose version is not
+    # a number or is below the first that holds the entry, or whose skills is falsy, is an empty lock; the project reader also throws on a null entry and on a local entry whose source is not text.
+    empty = {"version": 1 if project else 3, "skills": {}}
+    if not path.is_file():
+        return empty
+    try:
+        data = json.loads(path.read_text(), parse_constant=reject_constant)
+    except ValueError:
+        return empty
+    if not isinstance(data, dict):
+        return empty
+    version, skills = data.get("version"), data.get("skills")
+    if isinstance(version, bool) or not isinstance(version, (int, float)) or skills in (None, False, 0, "") or version < (1 if project else 3):
+        return empty
+    if project and isinstance(skills, dict):
+        for entry in skills.values():
+            if entry is None or (isinstance(entry, dict) and entry.get("sourceType") == "local" and not isinstance(entry.get("source"), str)):
+                return empty
+    return data
 
 
 def claude_skills_dir(target: Path, project: bool) -> Path:
@@ -195,7 +210,7 @@ if argv[0] == "add":
             os.symlink(os.path.relpath(skill_dir, link_dir), link)
     path = target / "skills-lock.json" if project else lock_path(home)
     path.parent.mkdir(parents=True, exist_ok=True)
-    lock = load_lock(path)
+    lock = load_lock(path, project)
     lock.setdefault("skills", {})[name] = {
         "source": fixture.get("source", f"example/{name}"), "sourceType": "github", "sourceUrl": url, "ref": fixture.get("ref", "a" * 40),
         "skillPath": fixture.get("path", name), "skillFolderHash": fixture["tree_sha"],
@@ -258,7 +273,7 @@ if argv[0] == "remove":
         else:
             link.unlink()
     path = target / "skills-lock.json" if project else lock_path(home)
-    lock = load_lock(path)
+    lock = load_lock(path, project)
     # lock_after_remove: "malformed" leaves a truncated lock that still holds the entry;
     # "unreadable" removes the entry and then makes the lock unreadable.
     fault = FIXTURES.get(name, {}).get("lock_after_remove")
@@ -2217,6 +2232,12 @@ LOCK_FILE_TABLE = [
     ("global", "GL8", "the entry is a list", lambda e: json.dumps({"version": 3, "skills": {e[0]: [e[1]]}})),
     ("global", "GL9", "the lock is not JSON", lambda e: "{not json"),
     ("global", "GL10", "the lock is a list", lambda e: json.dumps([e[1]])),
+    ("global", "GL11", "a version of NaN: JSON.parse rejects the token (skill-lock.ts L85, L99-L101); json.loads takes it unless its parse_constant hook raises", lambda e: json.dumps({"version": float("nan"), "skills": {e[0]: e[1]}})),
+    ("global", "GL12", "a version of Infinity", lambda e: json.dumps({"version": float("inf"), "skills": {e[0]: e[1]}})),
+    ("global", "GL13", "a version of -Infinity (also below the first version)", lambda e: json.dumps({"version": float("-inf"), "skills": {e[0]: e[1]}})),
+    ("global", "GL14", "NaN in another entry: the whole file is rejected, not the field", lambda e: json.dumps({"version": 3, "skills": {e[0]: e[1], "another-skill": {"skillFolderHash": float("nan")}}})),
+    ("global", "GL15", "Infinity in a field of the entry itself", lambda e: json.dumps({"version": 3, "skills": {e[0]: {**e[1], "pluginName": float("inf")}}})),
+    ("global", "GL16", "-Infinity in a field of the lock outside skills", lambda e: json.dumps({"version": 3, "skills": {e[0]: e[1]}, "dismissed": float("-inf")})),
     ("project", "PL1", "no `version` (local-lock.ts L82)", lambda e: json.dumps({"skills": {e[0]: e[1]}})),
     ("project", "PL2", "a version below 1 (local-lock.ts L6, L86-L88)", lambda e: json.dumps({"version": 0, "skills": {e[0]: e[1]}})),
     ("project", "PL3", "a version that is text", lambda e: json.dumps({"version": "1", "skills": {e[0]: e[1]}})),
@@ -2227,7 +2248,36 @@ LOCK_FILE_TABLE = [
     ("project", "PL7", "another entry is null: the loop at L90-L94 throws and the catch at L97-L98 returns an empty lock", lambda e: json.dumps({"version": 1, "skills": {e[0]: e[1], "another-skill": None}})),
     ("project", "PL8", "the lock is not JSON", lambda e: "{not json"),
     ("project", "PL9", "the lock is a list", lambda e: json.dumps([e[1]])),
+    ("project", "PL10", "a version of NaN (local-lock.ts L80, L97-L98)", lambda e: json.dumps({"version": float("nan"), "skills": {e[0]: e[1]}})),
+    ("project", "PL11", "a version of Infinity", lambda e: json.dumps({"version": float("inf"), "skills": {e[0]: e[1]}})),
+    ("project", "PL12", "a version of -Infinity", lambda e: json.dumps({"version": float("-inf"), "skills": {e[0]: e[1]}})),
+    ("project", "PL13", "NaN in another entry", lambda e: json.dumps({"version": 1, "skills": {e[0]: e[1], "another-skill": {"computedHash": float("nan")}}})),
+    ("project", "PL14", "Infinity in a field of the entry itself", lambda e: json.dumps({"version": 1, "skills": {e[0]: {**e[1], "ref": float("inf")}}})),
+    ("project", "PL15", "-Infinity in a field of the lock outside skills", lambda e: json.dumps({"version": 1, "skills": {e[0]: e[1]}, "dismissed": float("-inf")})),
+    ("project", "PL16", "another entry is local with a null source: isAbsolute(null) throws (local-lock.ts L91) and the catch returns an empty lock", lambda e: json.dumps({"version": 1, "skills": {e[0]: e[1], "another-skill": {"sourceType": "local", "source": None, "computedHash": "x"}}})),
+    ("project", "PL17", "another entry is local with a number as source", lambda e: json.dumps({"version": 1, "skills": {e[0]: e[1], "another-skill": {"sourceType": "local", "source": 5, "computedHash": "x"}}})),
+    ("project", "PL18", "another entry is local with a list as source", lambda e: json.dumps({"version": 1, "skills": {e[0]: e[1], "another-skill": {"sourceType": "local", "source": ["x"], "computedHash": "x"}}})),
+    ("project", "PL19", "another entry is local with no source", lambda e: json.dumps({"version": 1, "skills": {e[0]: e[1], "another-skill": {"sourceType": "local", "computedHash": "x"}}})),
+    ("project", "PL20", "the entry itself is local with a null source", lambda e: json.dumps({"version": 1, "skills": {e[0]: {**e[1], "sourceType": "local", "source": None}}})),
+    ("project", "PL21", "the entry itself is local with no source", lambda e: json.dumps({"version": 1, "skills": {e[0]: {k: v for k, v in {**e[1], "sourceType": "local"}.items() if k != "source"}}})),
+    ("project", "PL22", "the entry itself is local with an object as source", lambda e: json.dumps({"version": 1, "skills": {e[0]: {**e[1], "sourceType": "local", "source": {"path": "x"}}}})),
 ]
+
+# Forms the pinned project reader KEEPS (a property read on a string, a number, a boolean or a list gives undefined, so nothing throws in src/local-lock.ts L90-L94; measured by executing the reader body on Node
+# 24.21.0) but that this installer reads as an empty lock: a hand-made damaged lock fails closed, stricter than the reader. Same shape as LOCK_FILE_TABLE.
+LOCK_FILE_STRICTER_TABLE = [
+    ("project", "PS1", "another entry is a string", lambda e: json.dumps({"version": 1, "skills": {e[0]: e[1], "another-skill": "x"}})),
+    ("project", "PS2", "another entry is a number", lambda e: json.dumps({"version": 1, "skills": {e[0]: e[1], "another-skill": 7}})),
+    ("project", "PS3", "another entry is true", lambda e: json.dumps({"version": 1, "skills": {e[0]: e[1], "another-skill": True}})),
+    ("project", "PS4", "another entry is a list", lambda e: json.dumps({"version": 1, "skills": {e[0]: e[1], "another-skill": ["x"]}})),
+]
+
+
+# Lock forms with no clean-install control on the installer path. `skills` as a list (GL5, PL4): the pinned writer assigns the new entry as a property of the array (src/skill-lock.ts L186, src/local-lock.ts
+# L195) and JSON.stringify drops a named property of an array (measured on Node 24.21.0, reader_measure.js), so a real add would leave no entry to verify; this is derived from the source and the
+# stringify measurement, not run through the CLI (the writers need a GitHub source). The four forms the reader keeps (LOCK_FILE_STRICTER_TABLE): the add succeeds and leaves the hand-made entry in place, the installer
+# reads that lock as empty, cannot verify the install by the lock and rolls it back; they are checked in the destructive state only.
+NO_CLEAN_INSTALL_CONTROL = {"GL5", "PL4"} | {row[1] for row in LOCK_FILE_STRICTER_TABLE}
 
 
 class ForeignContentTests(InstallSkillsTestCase):
@@ -2731,10 +2781,11 @@ class ForeignContentTests(InstallSkillsTestCase):
                         self.assertEqual(self.classify_case(module, scope, agent, project), answer, f"{row} {state}")
 
     def test_a_lock_file_the_pinned_cli_reads_as_empty_has_no_entries(self):
-        """The same table for the lock file around the entry: a lock the CLI reads as empty (a missing or non-numeric `version`, a version below the first one that holds the field, no `skills` table, a file that is not JSON,
-        and for a project any entry that is not an object) holds no entry, even when the entry in it says the pin or an older pin: the folder is compared like an unlocked one."""
+        """The same table for the lock file around the entry: a lock the CLI reads as empty (a missing or non-numeric `version`, a version below the first one that holds the field, no `skills` table, a file that is not
+        JSON, one that holds NaN, Infinity or -Infinity, and for a project a null entry or a local entry whose source is not text) holds no entry, even when the entry in it says the pin or an older pin: the folder is
+        compared like an unlocked one. LOCK_FILE_STRICTER_TABLE adds the forms the reader keeps and this installer does not."""
         module = load_installer_module()
-        for scope, row, upstream, lock_text in LOCK_FILE_TABLE:
+        for scope, row, upstream, lock_text in LOCK_FILE_TABLE + LOCK_FILE_STRICTER_TABLE:
             for agent in (("universal",) if scope == "global" else ("universal", "claude-code")):
                 with self.subTest(form=row, scope=scope, agent=agent, upstream=upstream[:60]):
                     for entry_for, expected in ((lambda e, s: e, {"pristine": "install", "extra": "local-modified", "gone": "install"}),
@@ -2758,6 +2809,20 @@ class ForeignContentTests(InstallSkillsTestCase):
                     self.assertEqual(module.lock_skills(data, project), {}, repr(data)[:60])
         self.assertEqual(module.lock_skills({"version": 3, "skills": {"a": entry, "b": None}}, False), {"a": entry, "b": None}, "only the project reader drops a lock with an entry that is not an object")
         self.assertEqual(module.lock_skills({"version": 1, "skills": {"a": entry, "b": None}}, True), {})
+        local = {"sourceType": "local", "source": "../x", "computedHash": "x"}
+        self.assertEqual(module.lock_skills({"version": 1, "skills": {"a": entry, "b": local}}, True), {"a": entry, "b": local}, "a local entry with a text source is read as written (the reader resolves it)")
+        self.assertEqual(module.lock_skills({"version": 1, "skills": {"a": entry, "b": {**local, "source": ""}}}, True), {"a": entry, "b": {**local, "source": ""}}, "an empty text is still text")
+        self.assertEqual(module.lock_skills({"version": 1, "skills": {"a": entry, "b": {**local, "sourceType": "Local", "source": None}}}, True), {"a": entry, "b": {**local, "sourceType": "Local", "source": None}},
+                         "the reader compares sourceType to 'local' exactly, so a null source of another type throws nothing")
+        for kept in ({"sourceType": "github", "source": None}, {"source": 5}, {"sourceType": "node_modules", "source": ["x"]}):
+            self.assertEqual(module.lock_skills({"version": 1, "skills": {"a": entry, "b": kept}}, True), {"a": entry, "b": kept}, "only a local entry resolves its source, so only it can throw")
+        for bad in (None, 5, ["x"], {"path": "x"}, DROP):
+            sibling = {k: v for k, v in {**local, "source": bad}.items() if v is not DROP}
+            with self.subTest(source=repr(bad)):
+                self.assertEqual(module.lock_skills({"version": 1, "skills": {"a": entry, "b": sibling}}, True), {}, "isAbsolute(entry.source) throws for a source that is not text (local-lock.ts L91)")
+                self.assertEqual(module.lock_skills({"version": 3, "skills": {"a": entry, "b": sibling}}, False), {"a": entry, "b": sibling}, "the global reader has no per-entry loop")
+        for kept in ("x", 7, True, ["x"]):
+            self.assertEqual(module.lock_skills({"version": 1, "skills": {"a": entry, "b": kept}}, True), {}, "the reader keeps these entries; this installer deliberately does not")
 
     def test_the_source_tree_oracle_decides_a_project_entry_that_says_the_pin(self):
         """A project entry of the manifest's source with the pin's commit id is only as good as the pinned source tree: when the GitHub tree of that ref disagrees with the manifest, or has no such folder, the
@@ -2769,6 +2834,55 @@ class ForeignContentTests(InstallSkillsTestCase):
                 with mock.patch.object(module, "pinned_source_trees", return_value=oracle), mock.patch.dict(os.environ, {"XDG_STATE_HOME": "", "CLAUDE_CONFIG_DIR": ""}):
                     self.assertEqual(module.classify_skill(self.skill, self.home, project, "universal"), "install")
                     self.assertEqual(module.classify_skill(self.skill, self.home, project, "claude-code"), "install")
+
+    def test_a_lock_text_with_a_json_constant_anywhere_is_unreadable_and_a_number_too_big_for_a_double_is_not(self):
+        """Astra's delta read of 23e2dcbe (P1 1): json.loads takes NaN, Infinity and -Infinity, and JSON.parse, the pinned CLI's reader (skill-lock.ts L85, local-lock.ts L80), throws on each and its catch returns an empty
+        lock. 1e999 is a valid JSON number and both parse it as Infinity (measured on Node 24.21.0)."""
+        module = load_installer_module()
+        self.fresh_home()
+        (self.home / ".agents").mkdir()
+        project = self.home / "project"
+        project.mkdir()
+        places = ((self.home / ".agents" / ".skill-lock.json", {}, "global"), (project / "skills-lock.json", {"project_dir": project}, "project"))
+        with mock.patch.dict(os.environ, {"XDG_STATE_HOME": "", "CLAUDE_CONFIG_DIR": ""}):
+            for token in ("NaN", "Infinity", "-Infinity"):
+                for where in ('{"version": %s, "skills": {"a": {"x": 1}}}', '{"version": 3, "skills": {"a": {"x": %s}}}', '{"version": 3, "skills": {"a": {"x": 1}}, "y": [%s]}',
+                              '{"version": 3, "skills": {"a": {"x": 1}}, "y": {"z": %s}}'):
+                    for lock_path, kwargs, scope in places:
+                        lock_path.write_text(where % token, encoding="utf-8")
+                        with self.subTest(token=token, text=where % token, scope=scope):
+                            self.assertEqual(module.load_lock(self.home, **kwargs), {})
+                            self.assertIsNone(module.read_lock_entry(self.home, "a", **kwargs))
+            for lock_path, kwargs, scope in places:
+                lock_path.write_text('{"version": 1e999, "skills": {"a": {"x": 1}}}', encoding="utf-8")
+                with self.subTest(scope=scope):
+                    self.assertEqual(module.read_lock_entry(self.home, "a", **kwargs), {"x": 1}, "a number too large for a double is still a number")
+        with self.assertRaises(json.JSONDecodeError):
+            module.reject_constant("NaN")
+
+    def test_a_lock_the_pinned_cli_reads_as_empty_authorizes_no_add_over_local_work_on_the_installer_path(self):
+        """Astra's delta read of 23e2dcbe (P1 1 and 2): the whole installer (the fake CLI, --check-only and an ordinary run) for every lock-file form, with the entry naming another revision of the manifest's source, the one
+        reading that lets an add run over local work. Where a local file sits beside the pinned ones the run is refused with the folder untouched and no add; where nothing is at risk (a pristine folder, or none) the add runs."""
+        for scope, row, upstream, lock_text in LOCK_FILE_TABLE + LOCK_FILE_STRICTER_TABLE:
+            for agent in (("universal",) if scope == "global" else ("universal", "claude-code")):
+                with self.subTest(form=row, scope=scope, agent=agent):
+                    (self.fake_bin.parent / "calls.log").unlink(missing_ok=True)
+                    project, folder, env = self.lock_case(scope, agent, keyed_older(scope), lock_text, "extra")
+                    flags = ("--project-dir", str(project), "--agent", agent) if scope == "project" else ()
+                    before = self.snapshot(folder)
+                    result, skills = self.states(*flags, "--check-only", env=env)
+                    self.assertEqual((result.returncode, skills), (1, {self.NAME: "local-modified"}), result.stdout + result.stderr)
+                    result, skills = self.states(*flags, env=env)
+                    self.assertEqual((result.returncode, skills), (1, {self.NAME: "local-modified"}), result.stdout + result.stderr)
+                    self.assertEqual(self.add_calls(), [])
+                    self.assertEqual(self.snapshot(folder), before, "nothing is touched")
+                    for state in (() if row in NO_CLEAN_INSTALL_CONTROL else ("pristine", "gone")):
+                        (self.fake_bin.parent / "calls.log").unlink(missing_ok=True)
+                        project, folder, env = self.lock_case(scope, agent, keyed_older(scope), lock_text, state)
+                        flags = ("--project-dir", str(project), "--agent", agent) if scope == "project" else ()
+                        result, skills = self.states(*flags, env=env)
+                        self.assertEqual((result.returncode, skills), (0, {self.NAME: "installed"}), state + result.stdout + result.stderr)
+                        self.assertEqual(len(self.add_calls()), 1, state)
 
     def test_the_installer_path_follows_the_table_in_the_state_that_destroys(self):
         """The full installer path (the fake CLI, --check-only and an ordinary run) for every row in the one state where an add deletes work, a local file beside the pinned folder: refused with the folder untouched
@@ -3047,12 +3161,66 @@ class PinnedCliForeignContentTests(unittest.TestCase):
             self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
             self.assertFalse((copy / "home" / ".agents" / "skills" / self.NAME / "local-work.txt").exists(), "the control: the pinned CLI deletes it")
 
+    def test_a_global_lock_with_a_json_constant_is_refused_where_the_native_add_deletes_the_extra_file(self):
+        """Astra's delta read of 23e2dcbe (P1 1): the pinned reader parses the lock with JSON.parse (skill-lock.ts L85), which throws on NaN, Infinity and -Infinity, and its catch returns an empty lock, so the entry in this one,
+        which names another revision of the manifest's source, excuses nothing; the add recreates the folder all the same."""
+        for token in ("NaN", "Infinity", "-Infinity"):
+            with self.subTest(token=token), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                home = root / "home"
+                home.mkdir()
+                source = self.source(root)
+                add = ["add", str(source), "--skill", self.NAME, "-g", "-y", "-a", "claude-code", "codex"]
+                done = self.cli(*add, home=home, cwd=root)
+                self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
+                lock_file = home / ".agents" / ".skill-lock.json"
+                lock_file.write_text('{"version": %s, "skills": {"%s": {"source": "%s", "sourceType": "github", "skillFolderHash": "%s"}}}' % (token, self.NAME, self.row["source"], OLD_TREE), encoding="utf-8")
+                folder = home / ".agents" / "skills" / self.NAME
+                self.put(folder, "local-work.txt", "file")
+                copy = root / "copy"
+                shutil.copytree(home, copy / "home", symlinks=True)
+                with mock.patch.dict(os.environ, {"XDG_STATE_HOME": "", "CLAUDE_CONFIG_DIR": ""}):
+                    self.assertEqual(self.module.classify_skill(self.row, home), "local-modified")
+                done = self.cli(*add, home=copy / "home", cwd=root)
+                self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
+                self.assertFalse((copy / "home" / ".agents" / "skills" / self.NAME / "local-work.txt").exists(), "the control: the pinned CLI deletes it")
+
+    def test_a_project_lock_with_a_local_entry_whose_source_is_not_text_is_refused_where_the_native_add_deletes_the_extra_file(self):
+        """Astra's delta read of 23e2dcbe (P1 2): another entry of the project lock is local and its source is not text, so `isAbsolute(entry.source)` throws in the pinned reader (local-lock.ts L90-L94) and its catch (L97-L98)
+        returns an empty lock; the managed entry, at another commit of the manifest's source, excuses nothing, and the add recreates the folder all the same."""
+        for bad in (None, 5, ["x"]):
+            with self.subTest(source=repr(bad)), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                home, project = root / "home", root / "project"
+                home.mkdir()
+                project.mkdir()
+                source = self.source(root)
+                add = ["add", str(source), "--skill", self.NAME, "-y", "-a", "universal", "claude-code"]
+                done = self.cli(*add, home=home, cwd=project)
+                self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
+                lock_file = project / "skills-lock.json"
+                lock = json.loads(lock_file.read_text(encoding="utf-8"))
+                lock["skills"][self.NAME].update(sourceType="github", source=self.row["source"], ref=OLD_COMMIT)
+                lock["skills"]["another-skill"] = {"sourceType": "local", "source": bad, "computedHash": "x"}
+                lock_file.write_text(json.dumps(lock), encoding="utf-8")
+                folder = project / ".agents" / "skills" / self.NAME
+                pinned = {self.row["path"]: self.row["tree_sha"]}
+                self.put(folder, "local-work.txt", "file")
+                with mock.patch.object(self.module, "pinned_source_trees", return_value=pinned), mock.patch.dict(os.environ, {"XDG_STATE_HOME": "", "CLAUDE_CONFIG_DIR": ""}):
+                    for agent in ("claude-code", "universal"):
+                        self.assertEqual(self.module.classify_skill(self.row, home, project, agent), "local-modified", agent)
+                copy = root / "copy"
+                shutil.copytree(project, copy, symlinks=True)
+                done = self.cli(*add, home=home, cwd=copy)
+                self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
+                self.assertFalse((copy / ".agents" / "skills" / self.NAME / "local-work.txt").exists(), "the control: the pinned CLI deletes it")
+
     def git_source(self, root):
         """A bare repository holding the pinned files under skills/<name>, answering a made-up https URL through url.<base>.insteadOf, so that the pinned CLI clones a generic git source offline.
         Returns (url, environment for the CLI)."""
         scratch = root / "githome"
         scratch.mkdir()
-        identity = {"PATH": os.environ["PATH"], "HOME": str(scratch), "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@example.invalid", "GIT_COMMITTER_NAME": "t", "GIT_COMMITTER_EMAIL": "t@example.invalid"}
+        identity = {"PATH": os.environ["PATH"], "HOME": str(scratch), "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "no-address", "GIT_COMMITTER_NAME": "t", "GIT_COMMITTER_EMAIL": "no-address"}
         work, bare = root / "work", root / "example" / f"{self.NAME}.git"
         for relative, content in self.FILES.items():
             (work / "skills" / self.NAME / relative).parent.mkdir(parents=True, exist_ok=True)

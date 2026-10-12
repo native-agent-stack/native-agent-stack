@@ -66,7 +66,9 @@ For every manifest skill, in order:
       cannot name (the lock proves the CLI wrote some earlier version there).
       A folder that is locked at the pin with a whole entry and linked is 'ok':
       nothing is added there. A lock the CLI reads as empty (no numeric version,
-      a version below the first that holds the entry, no skills table) holds
+      a version below the first that holds the entry, no skills table, text
+      that JSON.parse rejects, NaN, Infinity and -Infinity among it, and in a
+      project a null entry or a local entry whose source is not text) holds
       no entry.
   (b) a folder exists at that path but the lock has no entry for <name> (for
       example a skill installed by hand before this manifest existed) -> only
@@ -448,12 +450,19 @@ def lock_file_path(home: Path, project_dir: Path | None = None) -> Path:
     return node_path_join(str(home), ".agents", ".skill-lock.json")
 
 
+def reject_constant(token):
+    """json.loads hands NaN, Infinity and -Infinity to its parse_constant hook instead of rejecting them (Lib/json/decoder.py L46-L49, Doc/library/json.rst L324-L329 at python/cpython@v3.13.16); JSON.parse rejects
+    them (measured on Node 24.21.0: SyntaxError for each), and both lock readers of the pinned CLI return an empty lock when it does (src/skill-lock.ts L85 and L99-L101, src/local-lock.ts L80 and L97-L98). A lock
+    that holds one anywhere is therefore unreadable here too. 1e999 is a valid JSON number and stays one (both parse it as Infinity)."""
+    raise json.JSONDecodeError(f"{token} is not JSON", token, 0)
+
+
 def load_lock(home: Path, project_dir: Path | None = None) -> dict:
     path = lock_file_path(home, project_dir)
     if not path.is_file():
         return {}
     try:
-        data = json.loads(path.read_text(encoding="utf-8"))
+        data = json.loads(path.read_text(encoding="utf-8"), parse_constant=reject_constant)
     except json.JSONDecodeError:
         return {}
     return data if isinstance(data, dict) else {}
@@ -480,14 +489,15 @@ GIT_ID = re.compile(r"[0-9a-f]{40}", re.IGNORECASE)    # src/update.ts L638: a s
 
 
 def lock_skills(data, project: bool) -> dict:
-    """The entries a lock file holds as the pinned CLI reads it: none for a lock it reads as empty. The project reader also drops a lock in which any entry is not an object (its loop at L90-L94
-    throws on one and the catch at L97-L98 returns an empty lock)."""
+    """The entries a lock file holds as the pinned CLI reads it: none for a lock it reads as empty. The project reader (src/local-lock.ts L80-L98) reads every entry inside its try: `entry.sourceType` throws
+    on a null entry, and `isAbsolute(entry.source)` (L91) throws for a local entry whose `source` is missing or is not text; either returns an empty lock. A string, number, boolean or list entry does not throw
+    there (the property read gives undefined) and the reader keeps the lock; this installer reads such a lock as empty too, which is stricter than the reader: a hand-made form that fails closed."""
     if not isinstance(data, dict):
         return {}
     version, skills = data.get("version"), data.get("skills")
     if isinstance(version, bool) or not isinstance(version, (int, float)) or version < LOCK_MINIMUM_VERSION["project" if project else "global"] or not isinstance(skills, dict):
         return {}
-    if project and any(not isinstance(entry, dict) for entry in skills.values()):
+    if project and any(not isinstance(entry, dict) or (entry.get("sourceType") == "local" and not isinstance(entry.get("source"), str)) for entry in skills.values()):
         return {}
     return skills
 
