@@ -917,10 +917,12 @@ class ReviewRunTest(unittest.TestCase):
         self.assertEqual(h.rows()[2]["reason"], "revoked_key (HTTP 401)")
 
     def test_the_default_key_order_is_fill_first_with_api_3_second_and_api_2_third(self):
-        # The owner's directions: api-3 second (2026-10-10 ~15:12Z), api-2 third (2026-10-11 ~22:33Z).
+        # The owner's directions: api-3 second (2026-10-10 ~15:12Z), api-2 third (2026-10-11 ~22:33Z); api-6, a second key of
+        # api-5's account, is its spare and not in the order (the command center's ruling of 2026-10-12, 20:34Z).
         self.assertEqual(crw.DEFAULT_KEYS, ("anthropic-api-4", "anthropic-api-3", "anthropic-api-2", "anthropic-api-5",
-                                            "anthropic-api", "anthropic-api-6", "anthropic-api-7", "anthropic-api-8",
-                                            "anthropic-api-9", "anthropic-api-10"))
+                                            "anthropic-api", "anthropic-api-7", "anthropic-api-8", "anthropic-api-9",
+                                            "anthropic-api-10"))
+        self.assertNotIn("anthropic-api-6", crw.DEFAULT_KEYS)
 
     def test_a_key_the_runner_refuses_is_skipped_before_any_debit(self):
         with tempfile.TemporaryDirectory() as temporary:

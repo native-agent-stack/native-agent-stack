@@ -27,7 +27,7 @@ against it.
 | `anthropic-api-3` | Anthropic Claude API key, third key (CI Claude review first, then local quality work) | optional | `<store>/anthropic-api-3.env` | `ANTHROPIC_API_KEY` |
 | `anthropic-api-4` | Anthropic Claude API key, fourth key (additional credit; direct use only) | optional | `<store>/anthropic-api-4.env` | `ANTHROPIC_API_KEY` |
 | `anthropic-api-5` | Anthropic Claude API key, fifth key (additional credit; direct use only) | optional | `<store>/anthropic-api-5.env` | `ANTHROPIC_API_KEY` |
-| `anthropic-api-6` | Anthropic Claude API key, sixth key (additional credit; direct use only) | optional | `<store>/anthropic-api-6.env` | `ANTHROPIC_API_KEY` |
+| `anthropic-api-6` | Anthropic Claude API key, sixth key: a spare of anthropic-api-5's account (no added credit; direct use only) | optional | `<store>/anthropic-api-6.env` | `ANTHROPIC_API_KEY` |
 | `anthropic-api-7` | Anthropic Claude API key, seventh key (additional credit; direct use only) | optional | `<store>/anthropic-api-7.env` | `ANTHROPIC_API_KEY` |
 | `anthropic-api-8` | Anthropic Claude API key, eighth key (additional credit; direct use only) | optional | `<store>/anthropic-api-8.env` | `ANTHROPIC_API_KEY` |
 | `anthropic-api-9` | Anthropic Claude API key, ninth key (additional credit; direct use only) | optional | `<store>/anthropic-api-9.env` | `ANTHROPIC_API_KEY` |
@@ -194,13 +194,18 @@ individual account. Account names and credit balances are not recorded here.
     center). Keys are not pooled; each spends its own account's credit.
     Quality work uses one key until Anthropic reports that key's credit
     exhausted, or answers 401 for a revoked key, and then moves to the next
-    in a fixed order: `anthropic-api-4`, `anthropic-api-3`, `anthropic-api-5`,
-    `anthropic-api`, `anthropic-api-2`, then `anthropic-api-6` to
-    `anthropic-api-10` as they are stored. `anthropic-api-3` serves the CI
-    review first and local quality work second. The owner set this order at
+    in a fixed order: `anthropic-api-4`, `anthropic-api-3`, `anthropic-api-2`,
+    `anthropic-api-5`, `anthropic-api`, then `anthropic-api-7` to
+    `anthropic-api-10` as they are stored. The owner set the first order at
     about 15:12Z on 2026-10-10 (relayed by the command center), moving
-    `anthropic-api-3` into it; the command center's 14:15Z record had kept
-    that slot for CI alone. Never round-robin. Anthropic's
+    `anthropic-api-3` into it, and put `anthropic-api-2` third on 2026-10-11
+    at about 22:33Z (the command center's `ruling-anthropic-api-automation-practice-20261011.md`, sha256 `c8765bcc66af490d8575b7a0af6b8eb1401d7b2efec81c6d060c166e6add79c3`). `anthropic-api-3`'s CI-review purpose
+    ended when #981 removed the in-GitHub Claude workflows, so it serves local
+    work only. `anthropic-api-6` is `anthropic-api-5`'s spare and stays out of
+    the order, used only to replace that key: it holds a second key of
+    `anthropic-api-5`'s account, so it caps exactly when `anthropic-api-5`
+    caps (the command center's ruling of 2026-10-12, 20:34Z, following the
+    owner's intent of filling distinct credit pools first). Never round-robin. Anthropic's
     [prompt-caching page](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching)
     ("Cache storage and sharing", read 2026-10-10) states "Caches are
     isolated between organizations. Different organizations never share
@@ -211,8 +216,7 @@ individual account. Account names and credit balances are not recorded here.
     warm. The same page also isolates caches per workspace within an
     organization on the Claude API. Each switch is a ledger row and a
     command-center alert. The api-actions harness and the review worker
-    (#953) implement the order; `anthropic-api-6` shares
-    `anthropic-api-5`'s account, so moving to it buys no new credit.
+    (#953, `DEFAULT_KEYS`) implement the order.
 11. **Next key.** Add a key by opening the terminal for the next empty slot,
     `anthropic-api-7` first, and from an account that no stored slot uses, so
     that it adds credit.

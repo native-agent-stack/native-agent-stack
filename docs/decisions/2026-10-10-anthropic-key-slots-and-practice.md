@@ -22,7 +22,7 @@ main-only `claude-review` environment secret. The fill-first order is
 `anthropic-api-4`, `anthropic-api-3`, `anthropic-api-5`, `anthropic-api`,
 `anthropic-api-2`, then `anthropic-api-6` to `anthropic-api-10` as stored.
 That is the owner's revision of about 15:12Z on 2026-10-10 (relayed by the
-command center). It moved `anthropic-api-3` into the order, which the
+command center); it was revised twice since, see the follow-up section. It moved `anthropic-api-3` into the order, which the
 command center's 14:15Z record had kept for CI alone.
 
 Mark the inventory sentence "no Anthropic key is stored in GitHub" as
@@ -203,6 +203,12 @@ was retired (#981, [2026-10-10-retire-in-github-claude-review.md](2026-10-10-ret
 - `anthropic-api-6` holds a second key of `anthropic-api-5`'s account (organization prefix `e02c4dee`), so it adds no
   credit; the slot table says so, and the next key goes in `anthropic-api-7`, from a new account. The command center
   removed an invalid short value from the `anthropic-api-7` slot (16:04Z), which now reads missing.
+- **The fill-first order now** (2026-10-12): `anthropic-api-4`, `anthropic-api-3`, `anthropic-api-2`, `anthropic-api-5`,
+  `anthropic-api`, then `anthropic-api-7` to `anthropic-api-10` as stored. The owner put `anthropic-api-2` third on
+  2026-10-11 at about 22:33Z (the command center's `ruling-anthropic-api-automation-practice-20261011.md`, sha256 `c8765bcc66af490d8575b7a0af6b8eb1401d7b2efec81c6d060c166e6add79c3`; the review worker's `DEFAULT_KEYS` already followed it). The command
+  center's ruling of 2026-10-12, 20:34Z, takes `anthropic-api-6` out: the owner's order exists to fill distinct credit
+  pools first, and a second key on `anthropic-api-5`'s account caps exactly when `anthropic-api-5` caps. It stays in
+  the inventory as `anthropic-api-5`'s spare, used only to replace that key; its label and notes say so.
 - `anthropic_key_health.py` reports a 429 that carries `retry-after` as `rate_limited` and exits 0 for it, so a daily
   timer does not alarm on a throttled check. Anthropic's docs give the same status a second meaning, which the note did
   not: the tier's spend cap answers 429 "until access resumes" (https://docs.anthropic.com/en/api/errors.md, read
