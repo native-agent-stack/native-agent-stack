@@ -18967,8 +18967,8 @@
     },
     {
       "path": "docs/decisions/2026-10-12-exploratory-account-rotation-and-exits.md",
-      "sha256": "69180ac88eb31d30d84251044acaa0f6648a68fb1eb3d84a038fd0e4c405c5b7",
-      "bytes": 10101
+      "sha256": "cc86f7a2cb0d4f81e05ceb53ccbb4b99c42cb07e561ca47b4e7051b35e6e44e8",
+      "bytes": 10146
     },
     {
       "path": "docs/decisions/2026-10-12-mcp-template-live-reconciliation.md",

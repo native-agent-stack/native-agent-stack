@@ -96,7 +96,8 @@ marketable LIMIT/DAY path; no broker stop, market or multi-leg order is added.
 
 ## Sources at the pins
 
-- NAS #1038 at `dc58840439137913871148b9de89e1281e3e44ba`,
+- NAS #1038 as landed on main at `489b263286edd87493689347a5411b263d60e306`
+  (source blob `7da1d432`),
   `blueprints/us-equities/adaptive-paper/exploration.py:69-89`: the pre-fix
   missing/empty/no-identity read paths could return an unbound projection.
   The final orphan regression fails there for all five journal fixtures;
