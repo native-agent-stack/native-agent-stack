@@ -32,18 +32,24 @@ The E1 arms with a hook (A2n the Bash-aware nudge, A2v the vendor reminder hooks
 E=blueprints/native-skill-practice/e-series/e1
 python3 $E/e1_prepare.py --root <root outside $HOME and the repository> --claude <client 2.1.296> --semble-model <dir> [--sdk-from <SDK 0.3.283 dir>]
 python3 $E/e1_run.py --root <root> --preflight --slot <inventory id>                    # one row per arm: servers connected, directive delivered
-python3 $E/e1_run.py --root <root> --questions --arms A0a,A1 --slot <inventory id>      # the 12 frozen questions x 3 repeats per arm; --ids and --repeats narrow it
+python3 $E/e1_run.py --root <root> --questions --arms A0a,A1 --slot <inventory id>      # the 12 frozen questions x 3 repeats per arm; --ids and --repeats (1 to 3) narrow it
 python3 $E/e1_decide.py <root>/out/questions-*.json --baseline A0a                      # the rule above over the result files
 ```
 
-`e1_prepare.py` builds four trees under `<root>/trees` (the base commit, the base commit with the serena paragraph in `CLAUDE.local.md`, the stale commit, the stale commit with the path paragraph), the sandbox and
+A question run starts only behind a passing pre-flight: `--preflight` records its outcome in `<root>/out/preflight-<time>.gate` (read from the result file, not from promptfoo's exit status, which two environment
+variables can set to 0 and which the runner therefore removes from the child's environment), and `--questions` refuses unless the newest record passed, belongs to this preparation of the root and covers the asked-for
+arms. `e1_decide.py` decides only a result file that `e1_run.py` produced behind such a record (`<result>.gate` beside it); a file without one is refused, and `--ungated` prints the table without a verdict. A failed
+pre-flight after a run voids it, so the preregistered gates before the first and after the last run are `--preflight` before and after, and `--require-after-gate` makes the decision ask for the second.
+
+`e1_prepare.py` replaces only a root of this harness (a non-empty directory must hold a `manifest.json` of schema 2 that names the harness, and replacing it takes `--rebuild`; any other directory is refused and left as
+it was). It builds four trees under `<root>/trees` (the base commit, the base commit with the serena paragraph in `CLAUDE.local.md`, the stale commit, the stale commit with the path paragraph), the sandbox and
 permission fence as `settings.json`, the staged config, and `manifest.json`; `e1_run.py` refuses to start when anything the manifest recorded has changed, removes the variables that change a session's model,
 effort or credential route, and runs one eval step at a time with no cache, no sharing and no database write. Run the pre-flight first and again after any change to the host.
 
 The base commit `2bdb5731` and the stale commit `a30c2188` are in `tasks.json` with the 12 questions and their gold answers, computed from the base commit by script (git archive and Python's `ast`); the file is
 byte-identical to the one the preregistration froze (sha256 starting `9d2727ad3ba5cb9f`). `e1_grade.py` grades an answer by the preregistered rules; `python3 e1_grade.py` runs its self-test.
 
-## What the pre-flight row settles
+## What the pre-flight row settles (and what reads it)
 
 The client's init record (tools offered, servers connected) is not part of the provider's response, and an MCP server that fails to start looks, to every metric, like a model that chose not to use it. The pre-flight
 row asks each arm to list the code-navigation tools it has and to quote the first sentence of the "Code navigation" paragraph, with no tool but ToolSearch allowed: the four servers' tools must be listed (A5: none)

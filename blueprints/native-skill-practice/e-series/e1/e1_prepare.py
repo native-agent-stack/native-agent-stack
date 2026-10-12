@@ -8,8 +8,10 @@ settings.json (the runner's sandbox and permission fence), config/ (a copy of th
 cache/, out/ and promptfoo-state/ directories, and manifest.json (commits, tree heads, tool versions, the sha256 of every staged file and of settings.json). e1_run.py refuses to start when a staged file
 no longer matches the manifest. --claude is the versioned client binary (2.1.296), not the wrapper on PATH. --sdk-from links an existing @anthropic-ai/claude-agent-sdk 0.3.283 (the copy promptfoo
 bundles); without it the script runs `npm install` for that version, the route promptfoo's provider page documents.
-The root must be outside the repository and outside $HOME (the fence denies reading $HOME), and must be new, empty, or an earlier root of this script (--rebuild replaces its trees and config). Nothing
-here calls a model or reads a key. Exit 0 prepared, 2 a refusal with the reason on stderr.
+The root must be outside the repository and outside $HOME (the fence denies reading $HOME), and must be new, empty, or an earlier root of this script: a directory is one only if its manifest.json is a
+manifest of this harness (validate_manifest), and replacing it takes --rebuild, which replaces its trees and config and keeps out/ (each result file there is bound to the preparation that produced it by
+e1_gate.py, so a rebuild does not let an older generation's files be decided with a newer one's). Any other non-empty directory is refused, with or without --rebuild, and left as it was. Nothing here calls
+a model or reads a key. Exit 0 prepared, 2 a refusal with the reason on stderr.
 """
 import argparse
 import hashlib
@@ -19,6 +21,7 @@ import re
 import shutil
 import subprocess
 import sys
+import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -58,15 +61,67 @@ def is_inside(path, parent):
         return False
 
 
-def check_root(root, repo, home):
+def validate_manifest(manifest):
+    """The reasons `manifest` is not the manifest of a root this harness prepared (an empty list when it is): the marker and the schema, and the shape of every field a later step reads."""
+    if not isinstance(manifest, dict):
+        return ["it is not a JSON object"]
+    sha, commit = re.compile(r"[0-9a-f]{64}"), re.compile(r"[0-9a-f]{40}")
+    problems = []
+
+    def keyed(name, keys, pattern=None, optional=False):
+        value = manifest.get(name)
+        if not isinstance(value, dict) or set(value) != set(keys):
+            problems.append(f"it records no {name} for exactly {sorted(keys)}" if not optional else f"its {name} do not match")
+        elif pattern and not all(isinstance(v, str) and pattern.fullmatch(v) for v in value.values()):
+            problems.append(f"a {name} entry is not a digest")
+    if manifest.get("harness") != C.HARNESS:
+        problems.append("it does not name this harness")
+    if manifest.get("schema") != C.MANIFEST_SCHEMA:
+        problems.append(f"its schema is not {C.MANIFEST_SCHEMA}")
+    if not isinstance(manifest.get("root"), str) or not isinstance(manifest.get("generation"), str):
+        problems.append("it records no root or generation")
+    keyed("commits", ("base", "stale"), commit)
+    keyed("trees", tuple(C.TREES), commit)
+    keyed("staged", tuple(C.STAGED_FILES), sha)
+    keyed("directives", tuple(name for name, (_, directive) in C.TREES.items() if directive), sha)
+    if not isinstance(manifest.get("settings_sha256"), str) or not sha.fullmatch(manifest["settings_sha256"]):
+        problems.append("it records no digest of settings.json")
+    for name in ("claude", "promptfoo"):
+        value = manifest.get(name)
+        if not isinstance(value, dict) or not isinstance(value.get("path"), str) or not isinstance(value.get("version"), str):
+            problems.append(f"it records no {name} path and version")
+    if not isinstance(manifest.get("semble_model"), str) or not isinstance(manifest.get("servers"), dict):
+        problems.append("it records no semble model or servers")
+    return problems
+
+
+def owner_problems(root):
+    """Why `root` (a non-empty directory) is not a root of this harness, or an empty list when its manifest.json is a manifest of this harness."""
+    try:
+        manifest = json.loads((root / MANIFEST).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return ["it holds no readable manifest.json"]
+    return validate_manifest(manifest)
+
+
+def check_root(root, repo, home, rebuild=False):
     if not root.is_absolute() or Path(os.path.realpath(root)) != root:
         raise Refusal("the root must be an absolute path with no symbolic link in it")
     if is_inside(root, repo):
         raise Refusal("the root is inside the repository")
     if is_inside(root, home):
         raise Refusal("the root is inside $HOME, which the fence denies reading")
-    if root.exists() and (not root.is_dir() or (any(root.iterdir()) and not (root / MANIFEST).is_file())):
-        raise Refusal("the root exists and is not empty and holds no manifest.json of an earlier prepare")
+    if not root.exists():
+        return
+    if not root.is_dir():
+        raise Refusal("the root exists and is not a directory")
+    if not any(root.iterdir()):
+        return
+    problems = owner_problems(root)
+    if problems:   # a file named manifest.json does not make a directory ours: nothing in a directory that is not a root of this harness is changed, with or without --rebuild
+        raise Refusal(f"the root exists, is not empty and is not a root of this harness ({problems[0]}); nothing was changed")
+    if not rebuild:
+        raise Refusal("the root already holds a prepared E1 root; pass --rebuild to replace its trees, config and manifest")
 
 
 def settings_for(root, home):
@@ -161,9 +216,7 @@ def main(argv=None):
             raise Refusal("--repo is required: this copy of the scripts is not inside the repository")
         root, repo = Path(os.path.abspath(args.root)), args.repo.resolve()
         tasks = json.loads((C.HERE / "tasks.json").read_text(encoding="utf-8"))
-        check_root(root, repo, home)
-        if (root / "trees").exists() and not args.rebuild:
-            raise Refusal("the root already holds trees; pass --rebuild to replace them")
+        check_root(root, repo, home, args.rebuild)
         tools = checks(args, repo, tasks)
         if args.dry_run:
             print(json.dumps({"dry_run": True, "root": str(root), "trees": sorted(C.TREES), "tools": {k: tools[k] for k in ("claude", "promptfoo")}}, indent=1))
@@ -177,8 +230,10 @@ def main(argv=None):
             (root / name).mkdir(mode=0o700, exist_ok=True)
         (root / "settings.json").write_text(json.dumps(settings_for(root, home), indent=1) + "\n", encoding="utf-8")
         route = stage_config(root, args.sdk_from)
-        manifest = {"schema": 1, "created_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "root": str(root), "commits": {"base": tasks["base"], "stale": tasks["stale"]}, "trees": heads,
-                    **tools, "sdk": {"version": C.SDK_VERSION, "route": route}, "staged": {name: sha256_file(root / "config" / name) for name in C.STAGED_FILES},
+        directives = {name: sha256_file(root / "trees" / name / "CLAUDE.local.md") for name, (_, directive) in C.TREES.items() if directive}
+        manifest = {"harness": C.HARNESS, "schema": C.MANIFEST_SCHEMA, "generation": uuid.uuid4().hex, "created_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "root": str(root),
+                    "commits": {"base": tasks["base"], "stale": tasks["stale"]}, "trees": heads,
+                    **tools, "directives": directives, "sdk": {"version": C.SDK_VERSION, "route": route}, "staged": {name: sha256_file(root / "config" / name) for name in C.STAGED_FILES},
                     "settings_sha256": sha256_file(root / "settings.json")}
         (root / MANIFEST).write_text(json.dumps(manifest, indent=1) + "\n", encoding="utf-8")
         print(json.dumps({"root": str(root), "trees": heads, "sdk": route, "manifest": str(root / MANIFEST)}, indent=1))

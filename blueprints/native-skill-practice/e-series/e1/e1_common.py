@@ -16,6 +16,9 @@ def find_repo_root():
 
 
 REPO_ROOT = find_repo_root()
+HARNESS = "native-skill-practice/e-series/e1"   # the ownership marker of a prepared root's manifest.json
+MANIFEST_SCHEMA = 2
+GENERATED_REPEATS = 3                          # repeats of every question the staged generator makes (promptfooconfig.yaml, tests: config: repeats); --repeats can only select among them
 CLIENT_VERSION = "2.1.296"  # the versioned client binary the runner and the parity cell used; the wrapper on PATH adds interactive-session flags
 PROMPTFOO_MINIMUM = "0.124.0"  # copy_working_dir exists from this release (promptfoo/promptfoo@30949931ee90, src/providers/agentWorkspace.ts)
 SDK_VERSION = "0.3.283"  # @anthropic-ai/claude-agent-sdk as pinned by promptfoo 0.124.0 (package.json)
@@ -29,6 +32,9 @@ CHILD_ENV = {"MCP_TIMEOUT": "120000", "CLAUDE_CODE_ENABLE_TELEMETRY": "0", "DISA
 BEHAVIOUR_VARS = ["CLAUDECODE", "CLAUDE_CODE_DISABLE_ADVISOR_TOOL", "CLAUDE_CODE_EFFORT_LEVEL", "MAX_THINKING_TOKENS", "CLAUDE_CODE_SUBAGENT_MODEL", "CLAUDE_CODE_SUBAGENT_MODEL_FORCE", "ANTHROPIC_MODEL",
                   "ANTHROPIC_SMALL_FAST_MODEL", "ANTHROPIC_DEFAULT_OPUS_MODEL", "ANTHROPIC_DEFAULT_SONNET_MODEL", "ANTHROPIC_DEFAULT_HAIKU_MODEL", "CLAUDE_CODE_MAX_OUTPUT_TOKENS", "CLAUDE_CODE_DISABLE_THINKING",
                   "ANTHROPIC_BASE_URL", "ANTHROPIC_AUTH_TOKEN", "CLAUDE_CODE_OAUTH_TOKEN", "ENABLE_TOOL_SEARCH", "CLAUDE_CONFIG_DIR"]
+# Variables that decide promptfoo's exit status: the pass-rate below which a run fails and the status it then returns (promptfoo/promptfoo@30949931ee90 src/node/doEval.ts L1271-L1286). A caller that has set
+# either can turn a failed pre-flight into status 0, so e1_run.py removes them and still reads the emitted result, not the status, to decide whether the pre-flight passed.
+EXIT_VARS = ["PROMPTFOO_FAILED_TEST_EXIT_CODE", "PROMPTFOO_PASS_RATE_THRESHOLD"]
 SERVERS = ("serena", "semble", "codebase-memory-mcp", "jcodemunch")  # the four servers every arm with servers connects
 SERVER_COMMANDS = {"serena": "serena", "semble": "semble", "codebase-memory-mcp": "codebase-memory-mcp", "jcodemunch": "jcodemunch-mcp"}  # the executable of each, resolved on PATH
 CODE_NAV_SERVERS = SERVERS + ("socraticode",)  # a tool named mcp__<server>__* of these counts as a code-navigation call (m1)

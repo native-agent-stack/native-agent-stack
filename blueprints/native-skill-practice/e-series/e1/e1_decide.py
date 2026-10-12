@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""E1 decision rule (preregistration section 6, addendum 1) over promptfoo result files: e1_decide.py RESULTS.json [RESULTS.json ...] [--baseline A0a] [--json OUT]
+"""E1 decision rule (preregistration section 6, addendum 1) over promptfoo result files: e1_decide.py RESULTS.json [RESULTS.json ...] [--baseline A0a] [--json OUT] [--ungated] [--require-after-gate]
+
+A result file is decided only if e1_run.py produced it behind a passing pre-flight of the root's current preparation (e1_gate.py: its <name>.gate record is present and matches, and no later pre-flight failed);
+otherwise the run refuses (exit 2). --ungated reads files without that record for description only: the table is printed and no verdict is, and the JSON says so. --require-after-gate also asks for
+a passing pre-flight made after each file (the preregistered gate after the last run).
 
 Reads the `question` rows of promptfoo's `-o` files (the `preflight` row is not a measurement), regrades every stored answer with e1_grade.py as it is now, and takes cost, turns and seconds from the response and
 the tool names from `response.metadata.toolCalls`. Per arm, over the questions it shares with the baseline arm:
@@ -7,12 +11,14 @@ the tool names from `response.metadata.toolCalls`. Per arm, over the questions i
   (ii)  median cost: the median response cost, against the baseline's (passes when at most 1.1 times);
   (iii) code-navigation use: the share of questions on which at least half of the arm's repeats called a tool of the code-navigation servers (passes at 70 percent or more).
 An arm is adopted as the default of a worktree workflow only when (i), (ii) and (iii) all pass; otherwise the outcome is "correct non-use or no gain". A5 (no server) is a cost and correctness reference, not an
-adoption candidate. Also printed: use by run, the carrying cost of the servers (A0b against A5) and each arm's median seconds and turns. The statistics are descriptive. A run that ended in a provider error is a
+adoption candidate. Also printed: use by run, the carrying cost of the servers (A0b against A5) and each arm's median seconds and turns. The statistics are descriptive. A run that ended in a provider error, or whose response has no usable cost (missing, not a finite number or negative: a missing cost must not read as a free run), is a
 fault: it is listed, left out of the figures, and the exit status is 3 so that someone reads it before the figures are used; arms that do not hold the same (question, repeat) runs over the shared questions are refused (exit 2).
+A (arm, question, repeat) that appears twice, across files or within one, is a fault: the first is kept and the exit status is 3, so a replayed file is read before its figures are used.
 Exit 0 decided, 2 a refusal, 3 faults present.
 """
 import argparse
 import json
+import math
 import statistics
 import sys
 from collections import Counter
@@ -20,6 +26,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import e1_common as C  # noqa: E402
+import e1_gate  # noqa: E402
 import e1_grade  # noqa: E402
 from e1_assert import parse_output  # noqa: E402
 
@@ -31,7 +38,7 @@ USE_SHARE = 0.7
 def load_runs(paths, tasks):
     """(runs, faults) from promptfoo result files; a run is a dict, a fault is a one-line text."""
     questions = {q["id"]: q for q in tasks["questions"]}
-    runs, faults = [], []
+    runs, faults, seen = [], [], set()
     for path in paths:
         for item in json.loads(Path(path).read_text(encoding="utf-8"))["results"]["results"]:
             if ((item.get("testCase") or {}).get("metadata") or {}).get("kind") != "question":
@@ -46,12 +53,20 @@ def load_runs(paths, tasks):
             if item.get("failureReason") == PROVIDER_ERROR or response.get("error"):  # an assertion that rejects an answer is failureReason 1 and a result; its text is also in item["error"]
                 faults.append(f"{tag}: provider error ({str(response.get('error') or item.get('error'))[:80]})")
                 continue
+            cost = response.get("cost")
+            if not isinstance(cost, (int, float)) or isinstance(cost, bool) or not math.isfinite(cost) or cost < 0:
+                faults.append(f"{tag}: the response has no usable cost ({type(cost).__name__}); the run is left out")   # a missing cost must not read as a free run (criterion ii)
+                continue
+            if (arm, qid, str((item.get("vars") or {}).get("repeat"))) in seen:
+                faults.append(f"{tag}: the same run appears twice (a replayed result file?); the first is kept")
+                continue
+            seen.add((arm, qid, str((item.get("vars") or {}).get("repeat"))))
             meta = response.get("metadata") or {}
             names = [c.get("name") for c in meta.get("toolCalls") or [] if isinstance(c, dict)]
             nav = [n for n in names if isinstance(n, str) and any(n.startswith(f"mcp__{s}__") for s in C.CODE_NAV_SERVERS)]
             millis = meta.get("durationMs") if isinstance(meta.get("durationMs"), (int, float)) else item.get("latencyMs")
             runs.append({"arm": arm, "q": qid, "repeat": str((item.get("vars") or {}).get("repeat")), "correct": bool(e1_grade.grade(questions[qid], parse_output(response.get("output")))["correct"]),
-                         "cost": float(response.get("cost") or 0.0), "turns": meta.get("numTurns") or 0, "seconds": (millis or 0) / 1000.0, "nav": bool(nav)})
+                         "cost": float(cost), "turns": meta.get("numTurns") or 0, "seconds": (millis or 0) / 1000.0, "nav": bool(nav)})
     return runs, faults
 
 
@@ -133,7 +148,14 @@ def main(argv=None):
     parser.add_argument("results", nargs="+", type=Path)
     parser.add_argument("--baseline", default="A0a")
     parser.add_argument("--json", type=Path)
+    parser.add_argument("--ungated", action="store_true", help="read files without a gate record, for description only: no verdict is printed")
+    parser.add_argument("--require-after-gate", action="store_true", help="also require a passing pre-flight made after each result file")
     args = parser.parse_args(argv)
+    problems = [problem for path in args.results for problem in e1_gate.verify_result(path, require_after=args.require_after_gate)]
+    if problems and not args.ungated:
+        for problem in problems:
+            print(f"refused: {problem}", file=sys.stderr)
+        return 2
     tasks = json.loads((C.HERE / "tasks.json").read_text(encoding="utf-8"))
     runs, faults = load_runs(args.results, tasks)
     for fault in faults:
@@ -143,7 +165,12 @@ def main(argv=None):
     except ValueError as error:
         print(f"refused: {error}", file=sys.stderr)
         return 2
+    ungated = bool(problems)
+    if ungated:
+        result = {**result, "verdicts": {}, "ungated": problems}
     print(render(result))
+    if ungated:
+        print("UNGATED: " + "; ".join(problems) + "; no verdict is given", file=sys.stderr)
     if args.json:
         args.json.write_text(json.dumps({**result, "faults": faults}, indent=1) + "\n", encoding="utf-8")
     return 3 if faults else 0

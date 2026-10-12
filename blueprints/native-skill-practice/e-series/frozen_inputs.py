@@ -4,7 +4,7 @@ tests: [{path: file://../frozen_inputs.py:create_tests, config: {experiment: e2}
 
 It returns test rows only from <frozen dir>/<experiment>.json (the `frozen/` folder beside this file, or the folder named by $E_SERIES_FROZEN), and only when that file says status "frozen", names every input
 the design needs, and each named input is a file whose sha256 still matches. Otherwise it raises, and promptfoo stops while loading the config, before any provider call, with the list of what is missing. The
-frozen file is the experiment's preregistration receipt: it holds the rows themselves, so what runs is what was frozen. Work starts when its named inputs exist, never on a date.
+frozen file is the experiment's preregistration receipt: it holds the rows themselves, so what runs is what was frozen. This follows the rule in AGENTS.md (Native engineering defaults) that work starts once its named inputs exist, not on a date.
 
 Frozen file: {"experiment": "e2", "status": "frozen", "inputs": {"<name>": {"path": "<file, relative to the frozen folder or absolute>", "sha256": "<64 hex digits>"}}, "tests": [<promptfoo test rows>]}
 """

@@ -30,6 +30,7 @@ for folder in (ES, E1):
 import e1_assert  # noqa: E402
 import e1_common as C  # noqa: E402
 import e1_decide  # noqa: E402
+import e1_gate  # noqa: E402
 import e1_grade  # noqa: E402
 import e1_prepare  # noqa: E402
 import e1_run  # noqa: E402
@@ -67,6 +68,44 @@ def promptfoo_binary():
 
 
 PROMPTFOO = promptfoo_binary()
+
+
+FAKE_PROMPTFOO = r"""
+import json, os, shutil, sys
+args = sys.argv[1:]
+if args[:1] == ["--version"]:
+    print("0.124.0")
+    sys.exit(0)
+kind = args[args.index("--filter-metadata") + 1].split("=")[1] if "--filter-metadata" in args else "?"
+arms = args[args.index("--filter-providers") + 1].strip("^()$").split("|") if "--filter-providers" in args else []
+NAMES = ("E1_ROOT", "TMPDIR", "CLAUDE_CODE_EFFORT_LEVEL", "ANTHROPIC_BASE_URL", "MCP_TIMEOUT", "PROMPTFOO_DISABLE_SHARING", "PROMPTFOO_FAILED_TEST_EXIT_CODE", "PROMPTFOO_PASS_RATE_THRESHOLD")
+if os.environ.get("FAKE_LOG"):
+    env = {k: os.environ.get(k) for k in NAMES}
+    with open(os.environ["FAKE_LOG"], "a") as log:
+        log.write(json.dumps({"kind": kind, "arms": arms, "argv": args, "cwd": os.getcwd(), "env": env,
+                              "exit_vars": {k: env[k] for k in ("PROMPTFOO_FAILED_TEST_EXIT_CODE", "PROMPTFOO_PASS_RATE_THRESHOLD")}}) + "\n")
+out = args[args.index("-o") + 1]
+mode = os.environ.get("FAKE_PREFLIGHT", "pass")
+items = []
+for arm in arms if kind == "preflight" else []:
+    if mode == "missing" and arm == arms[-1]:
+        continue
+    ok = not (mode == "fail" and arm == arms[0])
+    items.append({"provider": {"label": arm}, "vars": {"question_id": "preflight", "repeat": "1"}, "testCase": {"metadata": {"kind": "preflight"}}, "response": {"output": "{}"},
+                  "gradingResult": {"pass": ok}, "success": ok, "failureReason": 0 if ok else 1})
+if kind == "preflight" or not os.environ.get("FAKE_RESULTS"):
+    with open(out, "w") as stream:
+        json.dump({"results": {"results": items}}, stream)
+else:
+    shutil.copyfile(os.environ["FAKE_RESULTS"], out)
+if os.environ.get("FAKE_STATUS") is not None:
+    sys.exit(int(os.environ["FAKE_STATUS"]))
+if os.environ.get("FAKE_EMULATE_EXIT") and items and not all(item["success"] for item in items):    # promptfoo@30949931ee90 src/node/doEval.ts L1271-L1286
+    pass_rate = 100.0 * sum(item["success"] for item in items) / len(items)
+    if pass_rate < float(os.environ.get("PROMPTFOO_PASS_RATE_THRESHOLD", "100")):
+        sys.exit(int(os.environ.get("PROMPTFOO_FAILED_TEST_EXIT_CODE", "100")))
+sys.exit(0)
+"""
 
 
 def good_output(question):
@@ -155,6 +194,13 @@ class InputsTests(unittest.TestCase):
                                              "CLAUDE_CONFIG_DIR"])
         self.assertEqual(C.STAGED_FILES, ["promptfooconfig.yaml", "tasks.json", "e1_common.py", "e1_grade.py", "e1_tests.py", "e1_assert.py", "directives/serena.md", "directives/path.md"])
 
+    def test_the_exit_variables_the_repeats_and_the_marker_are_the_documented_ones(self):
+        """Review of #1046 at 30639cdc1 (P1, P3): promptfoo/promptfoo@30949931ee90 src/node/doEval.ts L1271-L1286 reads exactly these two variables to decide the exit status; the staged generator makes three repeats."""
+        self.assertEqual(C.EXIT_VARS, ["PROMPTFOO_FAILED_TEST_EXIT_CODE", "PROMPTFOO_PASS_RATE_THRESHOLD"])
+        self.assertEqual(C.GENERATED_REPEATS, 3)
+        self.assertEqual((C.HARNESS, C.MANIFEST_SCHEMA), ("native-skill-practice/e-series/e1", 2))
+        self.assertTrue(set(C.EXIT_VARS).isdisjoint(C.BEHAVIOUR_VARS))
+
     def test_arms_and_trees_agree(self):
         self.assertEqual(list(C.ARMS), ["A0a", "A0b", "A1", "A3", "A5"])
         for arm, spec in C.ARMS.items():
@@ -234,7 +280,7 @@ class ConfigTests(unittest.TestCase):
             self.assertEqual(self.providers[arm]["prompts"], ["stale-start" if spec["add"] else "worktree-start"], arm)
 
     def test_the_tests_come_from_the_generator_with_three_repeats(self):
-        self.assertEqual(self.config["tests"], [{"path": "file://e1_tests.py:create_tests", "config": {"repeats": 3}}])
+        self.assertEqual(self.config["tests"], [{"path": "file://e1_tests.py:create_tests", "config": {"repeats": C.GENERATED_REPEATS}}])
         self.assertEqual(self.config["evaluateOptions"], {"maxConcurrency": 1, "cache": False})
 
     def test_every_staged_file_exists_and_the_config_references_only_staged_files(self):
@@ -359,6 +405,36 @@ class GraderTests(unittest.TestCase):
             return set(output.get("functions") or []) == set(question["gold"]["functions"])
         self.assertFalse(preregistered(q, qualified))
         self.assertTrue(e1_grade.grade(q, qualified)["correct"])
+
+    def test_an_absolute_citation_under_a_prepared_tree_or_a_promptfoo_workspace_is_graded_as_the_relative_one(self):
+        """Review of #1046 at 30639cdc1 (P3) and the stored stage: on the matched A0a control 14 of 36 answers cited /<root>/trees/base/<file> with the right lines and were graded wrong (explain 0 of 9 before, 6 of 9 after
+        the prefix is dropped). promptfoo/promptfoo@30949931ee90 src/providers/agentWorkspace.ts L662-L668: a per-call workspace is <tmp>/promptfoo-workspace-<id>/workspace."""
+        q = QUESTIONS["p-def"]
+        f, ln = q["gold"]["file"], q["gold"]["line"]
+        for label, prefix in (("relative", ""), ("the prepared base tree", "/var/tmp/e1/trees/base/"), ("another prepared tree", "/var/tmp/e1/trees/base-serena/"),
+                              ("a promptfoo workspace", "/var/tmp/e1/tmp/promptfoo-workspace-AbC123/workspace/"), ("a ./ prefix", "./")):
+            with self.subTest(prefix=label):
+                self.assertTrue(e1_grade.grade(q, {"citations": [{"file": prefix + f, "line": ln}]})["correct"])
+                self.assertFalse(e1_grade.grade(q, {"citations": [{"file": prefix + f, "line": ln + 1}]})["correct"], "the line still has to be the gold line")
+        e = QUESTIONS["p-explain"]
+        cited = [{"file": "/var/tmp/e1/trees/base/" + e["gold"]["file"], "line": line} for line in e["gold"]["lines"]]
+        self.assertTrue(e1_grade.grade(e, {"citations": cited})["correct"])
+
+    def test_only_a_leading_run_of_directories_ending_in_a_known_name_is_dropped_and_the_stale_tree_stays_distinct(self):
+        """No arbitrary suffix is stripped (review of #1046 at 30639cdc1, P3): a relative path with such a directory in it, an absolute path elsewhere and the stale location stay as they are."""
+        norm = e1_grade.norm
+        self.assertEqual(norm("tools/trees/base/x.py"), "tools/trees/base/x.py", "a relative path is never cut")
+        self.assertEqual(norm("/usr/lib/python3/x.py"), "/usr/lib/python3/x.py")
+        self.assertEqual(norm("/var/tmp/e1/trees/other/x.py"), "/var/tmp/e1/trees/other/x.py", "only the four prepared trees")
+        self.assertEqual(norm("/var/tmp/e1/tmp/promptfoo-workspace-x/other/x.py"), "/var/tmp/e1/tmp/promptfoo-workspace-x/other/x.py", "only the workspace directory itself")
+        self.assertEqual(norm("/a/trees/base/trees/stale/x.py"), "trees/stale/x.py", "the first match ends the run of directories")
+        q = QUESTIONS["p-def"]
+        stale = q["defined_at_stale"]
+        if stale:
+            f, ln = stale[0]
+            graded = e1_grade.grade(q, {"citations": [{"file": "/var/tmp/e1/trees/stale/" + f, "line": ln}]})
+            self.assertFalse(graded["correct"])
+            self.assertTrue(graded["wrong_tree"], "an answer at the stale commit's location is still told apart from one at the base commit's")
 
     def test_bare_name_and_norm(self):
         self.assertEqual(e1_grade.bare_name("A.b.c()"), "c")
@@ -616,6 +692,45 @@ class DecideTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "do not hold the same"):
             e1_decide.decide(doubled + same + [self.run_of("A1", "q2", repeat="2")], "A0a")
 
+    def test_a_response_without_a_usable_cost_is_a_fault_and_left_out_not_a_free_run(self):
+        """Review of #1046 at 30639cdc1 (P1): `float(cost or 0.0)` read a missing cost as zero, which could pass criterion (ii) with no cost measurement at all (promptfoo@30949931ee90
+        src/providers/claude-agent-sdk.ts L2445 makes the cost undefined when usage is unavailable and L2498 returns it with a success response)."""
+        q = QUESTIONS["p-def"]
+        good = promptfoo_item("A0a", "p-def", 1, good_output(q))
+        bad = {}
+        for label, value in (("missing", None), ("null", None), ("an empty string", ""), ("a string", "0.05"), ("a boolean", True), ("negative", -0.05), ("not a number", float("nan")),
+                             ("infinite", float("inf")), ("minus infinite", float("-inf")), ("a list", [0.05])):
+            item = promptfoo_item("A1", "p-def", 1, good_output(q))
+            if label == "missing":
+                del item["response"]["cost"]
+            else:
+                item["response"]["cost"] = value
+            bad[label] = item
+        with tempfile.TemporaryDirectory() as tmp:
+            path = write_results(Path(tmp) / "r.json", [good, *bad.values()])
+            runs, faults = e1_decide.load_runs([path], TASKS)
+        self.assertEqual([r["arm"] for r in runs], ["A0a"], "only the run with a cost is kept")
+        self.assertEqual(len(faults), len(bad))
+        self.assertTrue(all("no usable cost" in fault and "A1 p-def r1" in fault for fault in faults), faults)
+        zero = promptfoo_item("A1", "p-def", 1, good_output(q), cost=0.0)
+        with tempfile.TemporaryDirectory() as tmp:
+            kept, none = e1_decide.load_runs([write_results(Path(tmp) / "z.json", [zero])], TASKS)
+        self.assertEqual((len(kept), none), (1, []), "a cost that is present and numeric is a measurement, even 0")
+
+    def test_a_replayed_result_is_a_duplicate_fault_not_a_second_sample(self):
+        """Review of #1046 at 30639cdc1 (P3): a duplicated matched pair was counted twice with no fault ("2 vs 2")."""
+        q = QUESTIONS["p-def"]
+        items = [promptfoo_item(a, "p-def", 1, good_output(q)) for a in ("A0a", "A1")]
+        with tempfile.TemporaryDirectory() as tmp:
+            once = write_results(Path(tmp) / "once.json", items)
+            again = write_results(Path(tmp) / "again.json", items)
+            runs, faults = e1_decide.load_runs([once, again], TASKS)
+            twice_in_one, within = e1_decide.load_runs([write_results(Path(tmp) / "two.json", items + items)], TASKS)
+        self.assertEqual(len(runs), 2, "the first of each pair is kept")
+        self.assertEqual(len(faults), 2)
+        self.assertTrue(all("appears twice" in fault for fault in faults), faults)
+        self.assertEqual((len(twice_in_one), len(within)), (2, 2))
+
     def test_the_carrying_cost_needs_the_same_pairs_in_a0b_and_a5(self):
         a0b = [self.run_of("A0b", q, repeat=str(r)) for q, r in (("q1", 1), ("q1", 2), ("q2", 1))]
         a5 = [self.run_of("A5", q, repeat=str(r)) for q, r in (("q1", 1), ("q2", 1), ("q2", 2))]
@@ -632,23 +747,29 @@ class DecideTests(unittest.TestCase):
     def test_the_command_line_prints_the_table_writes_json_and_exits_zero_two_or_three(self):
         q = QUESTIONS["p-def"]
         with tempfile.TemporaryDirectory() as tmp:
-            tmp = Path(tmp)
-            good = write_results(tmp / "good.json", [promptfoo_item(a, "p-def", 1, good_output(q)) for a in ("A0a", "A0b")])
-            out = tmp / "out.json"
-            done = subprocess.run([sys.executable, "-I", str(E1 / "e1_decide.py"), str(good), "--json", str(out)], capture_output=True, text=True, timeout=60)
+            gated = GatedRoot(Path(tmp))
+            decide = [sys.executable, "-I", str(gated.s.e1 / "e1_decide.py")]
+            good = gated.add_results([promptfoo_item(a, "p-def", 1, good_output(q)) for a in ("A0a", "A0b")])
+            out = Path(tmp) / "out.json"
+            done = subprocess.run([*decide, str(good), "--json", str(out)], capture_output=True, text=True, timeout=60)
             self.assertEqual(done.returncode, 0, done.stderr)
             self.assertIn("A0b", done.stdout)
             self.assertIn("correct non-use or no gain", done.stdout)
             self.assertEqual(json.loads(out.read_text())["faults"], [])
-            faulty = write_results(tmp / "faulty.json", [promptfoo_item("A0a", "p-def", 1, good_output(q)), promptfoo_item("A0b", "p-def", 1, good_output(q)), promptfoo_item("A0b", "p-def", 2, None, error="x")])
-            self.assertEqual(subprocess.run([sys.executable, "-I", str(E1 / "e1_decide.py"), str(faulty)], capture_output=True, text=True, timeout=60).returncode, 3)
-            no_base = write_results(tmp / "nb.json", [promptfoo_item("A0b", "p-def", 1, good_output(q))])
-            refused = subprocess.run([sys.executable, "-I", str(E1 / "e1_decide.py"), str(no_base)], capture_output=True, text=True, timeout=60)
+            faulty = gated.add_results([promptfoo_item("A0a", "p-def", 1, good_output(q)), promptfoo_item("A0b", "p-def", 1, good_output(q)), promptfoo_item("A0b", "p-def", 2, None, error="x")])
+            self.assertEqual(subprocess.run([*decide, str(faulty)], capture_output=True, text=True, timeout=60).returncode, 3)
+            no_base = gated.add_results([promptfoo_item("A0b", "p-def", 1, good_output(q))])
+            refused = subprocess.run([*decide, str(no_base)], capture_output=True, text=True, timeout=60)
             self.assertEqual(refused.returncode, 2)
             self.assertIn("baseline", refused.stderr)
 
 
 class FrozenInputsTests(unittest.TestCase):
+    def test_the_docstring_cites_the_rule_in_agents_md_and_does_not_quote_the_owner(self):
+        """Review of #1046 at 30639cdc1 (P3): the sentence was repeated as the owner's words."""
+        self.assertIn("AGENTS.md", F.__doc__)
+        self.assertNotIn("Work starts when its named inputs exist", F.__doc__)
+
     def freeze(self, folder: Path, experiment="e2", status="frozen", drop=None, tamper=False, rows=None):
         design = F.DESIGNS[experiment]
         inputs = {}
@@ -819,6 +940,232 @@ class ScratchRepository:
     def run(self, *args, env=None):
         return subprocess.run([sys.executable, "-I", str(self.e1 / "e1_run.py"), "--root", str(self.root), *args], capture_output=True, text=True, env=env or self.env, timeout=120)
 
+    def python_script(self, name, source):
+        path = self.bin / name
+        path.write_text(f"#!{sys.executable}\n{source}")
+        path.chmod(path.stat().st_mode | stat.S_IXUSR)
+        return path
+
+    def use_fake_promptfoo(self):
+        """Make promptfoo an executable that writes result files and logs every call: FAKE_PREFLIGHT (pass, fail or missing), FAKE_STATUS, FAKE_RESULTS (a file copied as the question result), FAKE_LOG."""
+        self.promptfoo = self.python_script("promptfoo-bin", FAKE_PROMPTFOO)
+        self.log = self.work / "promptfoo-calls.jsonl"
+        self.env["FAKE_LOG"] = str(self.log)
+        return self.promptfoo
+
+    def calls(self, kind=None):
+        lines = [json.loads(line) for line in self.log.read_text().splitlines()] if self.log.exists() else []
+        return [call for call in lines if kind is None or call["kind"] == kind]
+
+    def with_env(self, **extra):
+        return {**self.env, **extra}
+
+    def gate_files(self, prefix):
+        return sorted((self.root / "out").glob(f"{prefix}-*.gate"))
+
+    def passing_preflight(self, *arms):
+        done = self.run("--preflight", *(["--arms", ",".join(arms)] if arms else []))
+        assert done.returncode == 0, done.stderr
+        return done
+
+
+class GatedRoot:
+    """A prepared scratch root behind a passing pre-flight (the fake promptfoo), able to add question runs whose result file holds the items given."""
+
+    def __init__(self, tmp):
+        self.s = ScratchRepository(Path(tmp))
+        self.s.use_fake_promptfoo()
+        assert self.s.prepare().returncode == 0
+        self.s.passing_preflight()
+        self.count = 0
+
+    def add_results(self, items, *run_args):
+        self.count += 1
+        items_file = write_results(self.s.work / f"fake-results-{self.count}.json", items)
+        done = self.s.run("--questions", *run_args, env=self.s.with_env(FAKE_RESULTS=str(items_file)))
+        assert done.returncode == 0, done.stderr
+        return sorted((self.s.root / "out").glob("questions-*.json"))[-1]
+
+
+class GatedDecideTests(unittest.TestCase):
+    """Review of #1046 at 30639cdc1 (P1, P3): a result file is decided only if e1_run.py produced it behind a passing pre-flight of the root's current preparation."""
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory(prefix="e-series-gate-")
+        self.addCleanup(self._tmp.cleanup)
+        self.gated = GatedRoot(Path(self._tmp.name))
+        self.s = self.gated.s
+        self.q = QUESTIONS["p-def"]
+
+    def decide(self, *args):
+        return subprocess.run([sys.executable, "-I", str(self.s.e1 / "e1_decide.py"), *map(str, args)], capture_output=True, text=True, timeout=60)
+
+    def pair(self, **a1):
+        return [promptfoo_item("A0a", "p-def", 1, good_output(self.q)), promptfoo_item("A1", "p-def", 1, good_output(self.q), calls=("mcp__serena__find_symbol",), **a1)]
+
+    def test_a_result_behind_a_passing_preflight_is_decided_and_the_record_names_what_it_ran_behind(self):
+        result = self.gated.add_results(self.pair())
+        done = self.decide(result)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        self.assertIn("ADOPT", done.stdout)
+        record = json.loads(result.with_name(result.stem + ".gate").read_text())
+        pre = self.s.gate_files("preflight")[-1]
+        self.assertEqual((record["kind"], record["preflight"], record["preflight_sha256"], record["result_sha256"]), ("questions", pre.name, sha256_bytes(pre), sha256_bytes(result)))
+        self.assertEqual(record["manifest_sha256"], sha256_bytes(self.s.root / "manifest.json"))
+
+    def test_a_file_without_a_record_or_outside_a_root_is_refused_and_ungated_prints_the_table_without_a_verdict(self):
+        result = self.gated.add_results(self.pair())
+        bare = Path(self._tmp.name) / "bare.json"
+        shutil.copyfile(result, bare)
+        done = self.decide(bare)
+        self.assertEqual(done.returncode, 2)
+        self.assertIn("is not in the out directory of a prepared root", done.stderr)
+        loose = self.s.root / "out" / "questions-19990101T000000000000Z.json"
+        shutil.copyfile(result, loose)
+        done = self.decide(loose)
+        self.assertEqual(done.returncode, 2)
+        self.assertIn("has no gate record", done.stderr)
+        described = self.decide(loose, "--ungated")
+        self.assertEqual(described.returncode, 0, described.stderr)
+        self.assertIn("A1", described.stdout)
+        self.assertNotIn("ADOPT", described.stdout)
+        self.assertNotIn("correct non-use", described.stdout)
+        self.assertIn("UNGATED", described.stderr)
+
+    def test_an_edited_file_an_older_preparation_and_a_voided_run_are_refused(self):
+        result = self.gated.add_results(self.pair())
+        self.assertEqual(self.decide(result).returncode, 0)
+        original = result.read_text()
+        result.write_text(original.replace("0.05", "0.01"))
+        done = self.decide(result)
+        self.assertEqual(done.returncode, 2)
+        self.assertIn("has changed", done.stderr)
+        result.write_text(original)
+        self.s.run("--preflight", env=self.s.with_env(FAKE_PREFLIGHT="fail"))
+        done = self.decide(result)
+        self.assertEqual(done.returncode, 2)
+        self.assertIn("did not pass", done.stderr)
+        self.assertIn("void", done.stderr)
+        self.s.passing_preflight()
+        self.assertEqual(self.decide(result).returncode, 2, "a later passing pre-flight does not undo it: the runs since the last passing one before the failure stay void")
+        fresh = self.gated.add_results(self.pair())
+        self.assertEqual(self.decide(fresh).returncode, 0, "a run behind the new passing pre-flight is decided")
+        self.assertEqual(self.s.prepare("--rebuild").returncode, 0)
+        done = self.decide(result)
+        self.assertEqual(done.returncode, 2)
+        self.assertIn("earlier preparation", done.stderr)
+
+    def test_the_pre_flight_record_a_result_ran_behind_must_be_there_unchanged_and_passed(self):
+        result = self.gated.add_results(self.pair())
+        sidecar = result.with_name(result.stem + ".gate")
+        recorded = json.loads(sidecar.read_text())
+        gate = self.s.root / "out" / recorded["preflight"]
+        text = gate.read_text()
+        gate.write_text(text.replace('"passed": true', '"passed": true, "note": "edited"'))
+        done = self.decide(result)
+        self.assertEqual(done.returncode, 2)
+        self.assertIn("is gone or has changed", done.stderr)
+        gate.unlink()
+        self.assertIn("is gone or has changed", self.decide(result).stderr)
+        gate.write_text(text)
+        self.assertEqual(self.decide(result).returncode, 0)
+        # a record that names a pre-flight which failed, even one made before the run, does not open the gate
+        failed = self.s.run("--preflight", env=self.s.with_env(FAKE_PREFLIGHT="fail"))
+        self.assertEqual(failed.returncode, 100)
+        failed_gate = self.s.gate_files("preflight")[-1]
+        self.s.passing_preflight()
+        forged = self.gated.add_results(self.pair())
+        forged_sidecar = forged.with_name(forged.stem + ".gate")
+        record = json.loads(forged_sidecar.read_text())
+        record["preflight"], record["preflight_sha256"] = failed_gate.name, sha256_bytes(failed_gate)
+        forged_sidecar.write_text(json.dumps(record))
+        done = self.decide(forged)
+        self.assertEqual(done.returncode, 2)
+        self.assertIn("ran behind a pre-flight that did not pass", done.stderr)
+
+    def test_the_gate_after_the_last_run_can_be_required(self):
+        result = self.gated.add_results(self.pair())
+        self.assertEqual(e1_gate.verify_result(result), [])
+        self.assertTrue(any("no pre-flight after" in problem for problem in e1_gate.verify_result(result, require_after=True)))
+        self.assertEqual(self.decide(result).returncode, 0)
+        done = self.decide(result, "--require-after-gate")
+        self.assertEqual(done.returncode, 2)
+        self.assertIn("no pre-flight after", done.stderr)
+        self.s.passing_preflight()
+        self.assertEqual(e1_gate.verify_result(result, require_after=True), [])
+        self.assertEqual(self.decide(result, "--require-after-gate").returncode, 0)
+
+    def test_a_missing_cost_never_gives_an_adoption(self):
+        """Review of #1046 at 30639cdc1 (P1): A0a cost 0.05, A1 correct with a Serena call and no cost: the decision CLI returned rc 0 and `ADOPT`."""
+        for label, value in (("missing", "delete"), ("null", None), ("an empty string", ""), ("negative", -0.05), ("minus infinite", float("-inf"))):
+            items = self.pair()
+            if value == "delete":
+                del items[1]["response"]["cost"]
+            else:
+                items[1]["response"]["cost"] = value
+            with self.subTest(cost=label):
+                done = self.decide(self.gated.add_results(items))
+                self.assertEqual(done.returncode, 3, done.stdout + done.stderr)
+                self.assertNotIn("ADOPT", done.stdout)
+                self.assertIn("no usable cost", done.stderr)
+        zero = self.decide(self.gated.add_results(self.pair(cost=0.0)))
+        self.assertEqual(zero.returncode, 0, "a cost of 0 that is present is a measurement")
+
+    def test_a_replayed_result_file_is_a_fault_with_its_exit_status(self):
+        first = self.gated.add_results(self.pair())
+        second = self.gated.add_results(self.pair())
+        done = self.decide(first, second)
+        self.assertEqual(done.returncode, 3, done.stdout)
+        self.assertIn("appears twice", done.stderr)
+
+
+class GateUnitTests(unittest.TestCase):
+    """e1_gate.preflight_outcome over promptfoo result files: what counts as a passed pre-flight row."""
+
+    def row(self, arm, ok=True, **changes):
+        item = promptfoo_item(arm, "preflight", 1, {"answer": "TOOLS: none"}, kind="preflight")
+        item["gradingResult"] = {"pass": ok}
+        item["failureReason"] = 0 if ok else 1
+        item.update(changes)
+        return item
+
+    def outcome(self, items, arms=("A0a", "A5")):
+        with tempfile.TemporaryDirectory() as tmp:
+            return e1_gate.preflight_outcome(write_results(Path(tmp) / "r.json", items), arms)
+
+    def test_a_pre_flight_passes_only_when_each_asked_for_arm_has_exactly_one_passing_row(self):
+        self.assertEqual(self.outcome([self.row("A0a"), self.row("A5")]), (True, []))
+        ok, reasons = self.outcome([self.row("A0a"), self.row("A5", ok=False)])
+        self.assertFalse(ok)
+        self.assertEqual(reasons, ["A5: the assertion did not pass, failure reason 1"])
+        ok, reasons = self.outcome([self.row("A0a")])
+        self.assertEqual((ok, reasons), (False, ["A5: 0 pre-flight rows, expected 1"]))
+        ok, reasons = self.outcome([self.row("A0a"), self.row("A0a"), self.row("A5")])
+        self.assertEqual((ok, reasons), (False, ["A0a: 2 pre-flight rows, expected 1"]))
+        ok, reasons = self.outcome([self.row("A0a"), self.row("A5"), self.row("A1")])
+        self.assertEqual((ok, reasons), (False, ["pre-flight rows of arms that were not asked for: A1"]))
+
+    def test_each_sign_of_a_failed_row_counts_by_itself(self):
+        error = {"response": {"error": "provider failed"}}
+        cases = {"the assertion is not a pass": dict(gradingResult={"pass": False}, failureReason=0), "no assertion result": dict(gradingResult={}), "a failure reason": dict(failureReason=2),
+                 "a provider error": error}
+        for label, changes in cases.items():
+            with self.subTest(sign=label):
+                ok, reasons = self.outcome([self.row("A0a"), self.row("A5", **changes)])
+                self.assertFalse(ok)
+                self.assertTrue(reasons and reasons[0].startswith("A5: "), reasons)
+
+    def test_a_question_row_is_not_a_pre_flight_row_and_an_unreadable_result_fails(self):
+        question = promptfoo_item("A5", "p-def", 1, {}, kind="question")
+        self.assertEqual(self.outcome([self.row("A0a"), self.row("A5"), question]), (True, []))
+        with tempfile.TemporaryDirectory() as tmp:
+            missing = Path(tmp) / "none.json"
+            self.assertEqual(e1_gate.preflight_outcome(missing, ("A5",)), (False, ["promptfoo wrote no readable result file"]))
+            broken = Path(tmp) / "broken.json"
+            for text in ("{not json", "[]", json.dumps({"results": {"results": "x"}}), json.dumps({"results": {}})):
+                broken.write_text(text)
+                self.assertFalse(e1_gate.preflight_outcome(broken, ("A5",))[0], text)
+
 
 class PrepareTests(unittest.TestCase):
     def setUp(self):
@@ -853,6 +1200,9 @@ class PrepareTests(unittest.TestCase):
         for name in e1_prepare.WORK_DIRS:
             self.assertEqual(stat.S_IMODE((root / name).stat().st_mode), 0o700, name)
         self.assertEqual(sha256_bytes(root / "settings.json"), manifest["settings_sha256"])
+        self.assertEqual((manifest["harness"], manifest["schema"]), (C.HARNESS, C.MANIFEST_SCHEMA))
+        self.assertEqual(e1_prepare.validate_manifest(manifest), [])
+        self.assertRegex(manifest["generation"], r"^[0-9a-f]{32}$")
 
     def test_the_fence_denies_home_and_every_sibling_of_the_root_but_not_the_root(self):
         sibling = self.s.work / "another-lanes-files"
@@ -941,6 +1291,78 @@ class PrepareTests(unittest.TestCase):
         self.assertEqual((foreign / "keep.txt").read_text(), "someone else's file\n")
         self.assertEqual(sorted(p.name for p in foreign.iterdir()), ["keep.txt"])
 
+    def test_a_directory_with_a_file_named_manifest_json_is_not_a_root_of_this_harness(self):
+        """Review of #1046 at 30639cdc1 (P1): the name of the file was the whole test of ownership, and config/ was then removed without --rebuild."""
+        s = self.s
+        cases = {"an unrelated manifest": json.dumps({"application": "unrelated"}), "not JSON": "{not json", "a list": "[1, 2]", "another harness": json.dumps({"harness": "another/harness", "schema": 2}),
+                 "this harness with an older schema": json.dumps({"harness": C.HARNESS, "schema": 1}), "this harness without its fields": json.dumps({"harness": C.HARNESS, "schema": C.MANIFEST_SCHEMA})}
+        for label, text in cases.items():
+            foreign = s.work / ("foreign-" + re.sub(r"\W+", "-", label))
+            (foreign / "config").mkdir(parents=True)
+            (foreign / "manifest.json").write_text(text)
+            (foreign / "config" / "keep.txt").write_text("someone else's file\n")
+            for extra in ((), ("--rebuild",)):
+                with self.subTest(case=label, rebuild=bool(extra)):
+                    done = s.prepare(*extra, root=foreign)
+                    self.assertEqual(done.returncode, 2, done.stderr)
+                    self.assertIn("is not a root of this harness", done.stderr)
+                    self.assertEqual((foreign / "config" / "keep.txt").read_text(), "someone else's file\n")
+                    self.assertEqual(sorted(p.name for p in foreign.iterdir()), ["config", "manifest.json"])
+                    self.assertEqual((foreign / "manifest.json").read_text(), text)
+        control = s.work / "foreign-without-a-manifest"
+        (control / "config").mkdir(parents=True)
+        (control / "config" / "keep.txt").write_text("kept\n")
+        self.assertEqual(s.prepare(root=control).returncode, 2, "the control of the review: no manifest at all was already refused")
+        self.assertTrue((control / "config" / "keep.txt").exists())
+
+    def test_a_root_of_this_harness_is_replaced_only_with_rebuild_even_when_it_is_partial(self):
+        """Review of #1046 at 30639cdc1 (P1): `trees/` was the only thing the rebuild check looked for, and config/ was removed unconditionally."""
+        s = self.s
+        self.assertEqual(s.prepare().returncode, 0)
+        generation = json.loads((s.root / "manifest.json").read_text())["generation"]
+        shutil.rmtree(s.root / "trees")       # a manifest and config/ but no trees/
+        done = s.prepare()
+        self.assertEqual(done.returncode, 2)
+        self.assertIn("--rebuild", done.stderr)
+        self.assertTrue((s.root / "config" / "promptfooconfig.yaml").is_file(), "config/ is not replaced without --rebuild")
+        done = s.prepare("--rebuild")
+        self.assertEqual(done.returncode, 0, done.stderr)
+        replaced = json.loads((s.root / "manifest.json").read_text())
+        self.assertEqual(e1_prepare.validate_manifest(replaced), [])
+        self.assertNotEqual(replaced["generation"], generation, "every preparation is a new generation")
+        self.assertTrue((s.root / "trees" / "base").is_dir())
+
+    def test_each_field_a_later_step_reads_is_checked_in_an_otherwise_valid_manifest(self):
+        s = self.s
+        self.assertEqual(s.prepare().returncode, 0)
+        good = json.loads((s.root / "manifest.json").read_text())
+        self.assertEqual(e1_prepare.validate_manifest(good), [])
+        edits = {"another harness": lambda m: m.update(harness="another/harness"), "an older schema": lambda m: m.update(schema=1), "no root": lambda m: m.pop("root"), "no generation": lambda m: m.pop("generation"),
+                 "a commit that is not a commit": lambda m: m["commits"].update(base="abc"), "no commits": lambda m: m.pop("commits"), "a tree missing": lambda m: m["trees"].pop("stale"),
+                 "a staged digest that is not one": lambda m: m["staged"].update({"promptfooconfig.yaml": "x"}), "a staged file missing": lambda m: m["staged"].pop("tasks.json"),
+                 "a directive digest missing": lambda m: m["directives"].pop("stale-path"), "no digest of settings": lambda m: m.update(settings_sha256="x"),
+                 "no client version": lambda m: m["claude"].pop("version"), "no promptfoo path": lambda m: m.update(promptfoo={"version": "0.124.0"}), "no semble model": lambda m: m.pop("semble_model"),
+                 "servers that are not a mapping": lambda m: m.update(servers=[])}
+        for label, edit in edits.items():
+            copy = json.loads(json.dumps(good))
+            edit(copy)
+            with self.subTest(defect=label):
+                self.assertTrue(e1_prepare.validate_manifest(copy), "a manifest with this defect is not one of this harness")
+
+    def test_run_refuses_a_manifest_of_another_shape_without_a_traceback(self):
+        s = self.s
+        self.assertEqual(s.prepare().returncode, 0)
+        manifest_path = s.root / "manifest.json"
+        saved = manifest_path.read_text()
+        for text in ("{not json", "[1]", json.dumps({"application": "unrelated"}), json.dumps({**json.loads(saved), "staged": {}})):
+            manifest_path.write_text(text)
+            done = s.run("--preflight", "--dry-run")
+            self.assertEqual(done.returncode, 2, text)
+            self.assertNotIn("Traceback", done.stderr)
+            self.assertIn("manifest", done.stderr)
+        manifest_path.write_text(saved)
+        self.assertEqual(s.run("--preflight", "--dry-run").returncode, 0)
+
     def test_a_dry_run_checks_and_writes_nothing(self):
         done = self.s.prepare("--dry-run")
         self.assertEqual(done.returncode, 0, done.stderr)
@@ -999,17 +1421,69 @@ class PrepareTests(unittest.TestCase):
         """Review of #1046 at 38f4151a (P1): promptfoo exits 100 when at least one test failed (promptfoo@30949931ee90 site/docs/usage/command-line.md L171); a pre-flight row that fails is a wiring
         defect that automation must see, a question row whose answer is wrong is a measurement."""
         s = self.s
-        failing = s.script("promptfoo-failing", 'if [ "$1" = "eval" ]; then exit 100; fi\necho "0.124.0"')
-        self.assertEqual(s.prepare(promptfoo=failing).returncode, 0)
-        pre = s.run("--preflight")
+        s.use_fake_promptfoo()
+        self.assertEqual(s.prepare().returncode, 0)
+        pre = s.run("--preflight", env=s.with_env(FAKE_PREFLIGHT="fail", FAKE_STATUS="100"))
         self.assertEqual(pre.returncode, 100, pre.stderr)
         self.assertIn("promptfoo exited 100", pre.stderr)
-        questions = s.run("--questions")
+        self.assertEqual(s.run("--preflight", env=s.with_env(FAKE_STATUS="1")).returncode, 1, "any other status is kept")
+        self.assertFalse(json.loads(s.gate_files("preflight")[-1].read_text())["passed"], "rows that pass do not open the gate when promptfoo itself failed")
+        self.assertEqual(s.run("--questions").returncode, 2)
+        self.assertEqual(s.run("--preflight").returncode, 0)
+        questions = s.run("--questions", env=s.with_env(FAKE_STATUS="100"))
         self.assertEqual(questions.returncode, 0, questions.stderr)
-        broken = s.script("promptfoo-broken", 'if [ "$1" = "eval" ]; then exit 1; fi\necho "0.124.0"')
-        self.assertEqual(s.prepare("--rebuild", promptfoo=broken).returncode, 0)
-        self.assertEqual(s.run("--preflight").returncode, 1)
-        self.assertEqual(s.run("--questions").returncode, 1, "any other status is kept in both stages")
+        self.assertEqual(s.run("--questions", env=s.with_env(FAKE_STATUS="1")).returncode, 1, "any other status is kept in the questions too")
+
+    def test_run_refuses_a_directive_file_edited_after_prepare_or_a_manifest_that_does_not_record_it(self):
+        """Review of #1046 at 30639cdc1 (P2): git reports only `?? CLAUDE.local.md` whatever the file holds, so the content is compared with the staged directive and the digest the manifest recorded."""
+        s = self.s
+        self.assertEqual(s.prepare().returncode, 0)
+        manifest_path = s.root / "manifest.json"
+        manifest = json.loads(manifest_path.read_text())
+        self.assertEqual(manifest["directives"], {"base-serena": sha256_bytes(s.e1 / "directives" / "serena.md"), "stale-path": sha256_bytes(s.e1 / "directives" / "path.md")})
+        self.assertEqual(s.run("--preflight", "--dry-run").returncode, 0)
+        for tree in ("base-serena", "stale-path"):
+            live = s.root / "trees" / tree / "CLAUDE.local.md"
+            original = live.read_text()
+            live.write_text(original + "Use grep instead.\n")
+            with self.subTest(tree=tree):
+                done = s.run("--preflight", "--dry-run")
+                self.assertEqual(done.returncode, 2, tree)
+                self.assertIn(f"directive file of tree {tree}", done.stderr)
+                other = "stale-path" if tree == "base-serena" else "base-serena"
+                self.assertNotIn(f"directive file of tree {other}", done.stderr, "the controls are independent: the other tree's file is not blamed")
+            live.write_text(original)
+            self.assertEqual(s.run("--preflight", "--dry-run").returncode, 0, tree)
+        live = s.root / "trees" / "base-serena" / "CLAUDE.local.md"
+        original = live.read_text()
+        live.write_text(original + "Use grep instead.\n")
+        manifest["directives"]["base-serena"] = sha256_bytes(live)       # live file and manifest changed together: the staged directive is the third witness
+        manifest_path.write_text(json.dumps(manifest))
+        done = s.run("--preflight", "--dry-run")
+        self.assertEqual(done.returncode, 2)
+        self.assertIn("directive file of tree base-serena", done.stderr)
+        live.write_text(original)
+        manifest["directives"]["base-serena"] = "0" * 64                  # the live file is the staged one, the manifest records another digest
+        manifest_path.write_text(json.dumps(manifest))
+        done = s.run("--preflight", "--dry-run")
+        self.assertEqual(done.returncode, 2)
+        self.assertIn("directive file of tree base-serena", done.stderr)
+        manifest["directives"]["base-serena"] = sha256_bytes(s.e1 / "directives" / "serena.md")
+        manifest_path.write_text(json.dumps(manifest))
+        self.assertEqual(s.run("--preflight", "--dry-run").returncode, 0)
+        staged = s.root / "config" / "directives" / "serena.md"
+        text = staged.read_text()
+        staged.write_text(text + "an edit of the staged copy\n")
+        self.assertIn("staged file directives/serena.md", s.run("--preflight", "--dry-run").stderr)
+        staged.write_text(text)
+        source = s.e1 / "directives" / "serena.md"
+        source.write_text(source.read_text() + "an edit of the repository's copy after prepare\n")
+        self.assertEqual(s.run("--preflight", "--dry-run").returncode, 0, "the root is held to what was prepared into it, not to the repository's later edits")
+        del manifest["directives"]
+        manifest_path.write_text(json.dumps(manifest))
+        done = s.run("--preflight", "--dry-run")
+        self.assertEqual(done.returncode, 2)
+        self.assertIn("records no directives", done.stderr)
 
     def test_run_refuses_a_root_that_was_copied_or_moved_but_accepts_another_name_for_the_same_directory(self):
         """Review of #1046 at 38f4151a (P2): settings.json is bound to the recorded root and its siblings."""
@@ -1048,7 +1522,7 @@ class PrepareTests(unittest.TestCase):
     def test_run_dry_run_prints_the_command_the_variables_it_sets_and_removes(self):
         s = self.s
         self.assertEqual(s.prepare().returncode, 0)
-        env = {**s.env, "CLAUDE_CODE_EFFORT_LEVEL": "max", "ANTHROPIC_BASE_URL": "http://127.0.0.1:1"}
+        env = {**s.env, "CLAUDE_CODE_EFFORT_LEVEL": "max", "ANTHROPIC_BASE_URL": "http://127.0.0.1:1", "PROMPTFOO_FAILED_TEST_EXIT_CODE": "0", "PROMPTFOO_PASS_RATE_THRESHOLD": "0"}
         done = s.run("--questions", "--arms", "A1,A5", "--ids", "p-def,p-refs", "--repeats", "2", "--slot", "some-slot", "--credential-runner", str(CREDENTIAL_RUNNER), "--dry-run", env=env)
         self.assertEqual(done.returncode, 0, done.stderr)
         plan = json.loads(done.stdout)
@@ -1067,6 +1541,9 @@ class PrepareTests(unittest.TestCase):
         self.assertTrue(eval_cmd[eval_cmd.index("-o") + 1].startswith(str(s.root / "out" / "questions-")))
         self.assertIn("CLAUDE_CODE_EFFORT_LEVEL", plan["removes"])
         self.assertIn("ANTHROPIC_BASE_URL", plan["removes"])
+        self.assertIn("PROMPTFOO_FAILED_TEST_EXIT_CODE", plan["removes"])
+        self.assertIn("PROMPTFOO_PASS_RATE_THRESHOLD", plan["removes"])
+        self.assertTrue(plan["gate"].startswith("refused: no pre-flight has run"), "a dry run says what a real run would be told, and starts nothing")
         for name in ("E1_ROOT", "E1_CLAUDE", "E1_SEMBLE_MODEL", "TMPDIR", "PROMPTFOO_CONFIG_DIR", "PROMPTFOO_DISABLE_TELEMETRY", "PROMPTFOO_DISABLE_UPDATE", "PROMPTFOO_DISABLE_SHARING", "CLAUDE_CODE_TMPDIR"):
             self.assertIn(name, plan["sets"])
         pre = json.loads(s.run("--preflight", "--dry-run").stdout)["command"]
@@ -1078,33 +1555,108 @@ class PrepareTests(unittest.TestCase):
         s = self.s
         self.assertEqual(s.prepare().returncode, 0)
         for args, reason in ((("--questions", "--arms", "A1,A2n"), "unknown arm"), (("--questions", "--ids", "p-def,x-none"), "unknown question"), (("--questions", "--repeats", "0"), "--repeats"),
-                             (("--questions", "--repeats", "10"), "--repeats")):
+                             (("--questions", "--repeats", "4"), "makes 3 repeats"), (("--questions", "--repeats", "10"), "--repeats")):
             done = s.run(*args, "--dry-run")
             self.assertEqual(done.returncode, 2, args)
             self.assertIn(reason, done.stderr, args)
+        self.assertEqual(s.run("--questions", "--repeats", "3", "--dry-run").returncode, 0, "the generator's own count is accepted")
         self.assertEqual(s.run("--preflight", "--questions").returncode, 2, "the two stages are exclusive")
 
     def test_run_starts_promptfoo_in_the_staged_config_with_a_clean_environment_and_treats_exit_100_of_the_questions_as_a_result(self):
         s = self.s
+        s.use_fake_promptfoo()
         self.assertEqual(s.prepare().returncode, 0)
-        record = s.work / "seen.json"
-        s.script("promptfoo-bin", 'if [ "$1" = "--version" ]; then echo "0.124.0"; exit 0; fi\n'
-                                   f'{sys.executable} -I -c \'import json,os,sys; json.dump({{"argv": sys.argv[1:], "cwd": os.getcwd(), "env": {{k: os.environ.get(k) for k in ("E1_ROOT","TMPDIR","CLAUDE_CODE_EFFORT_LEVEL","ANTHROPIC_BASE_URL","MCP_TIMEOUT","PROMPTFOO_DISABLE_SHARING")}}}}, open("{record}", "w"))\' "$@"\n'
-                                   "exit ${FAKE_STATUS:-0}")
-        env = {**s.env, "CLAUDE_CODE_EFFORT_LEVEL": "max", "ANTHROPIC_BASE_URL": "http://127.0.0.1:1", "FAKE_STATUS": "100"}
+        env = s.with_env(CLAUDE_CODE_EFFORT_LEVEL="max", ANTHROPIC_BASE_URL="http://127.0.0.1:1", FAKE_STATUS="100", PROMPTFOO_FAILED_TEST_EXIT_CODE="0", PROMPTFOO_PASS_RATE_THRESHOLD="0")
+        s.passing_preflight()
         done = s.run("--questions", env=env)
         self.assertEqual(done.returncode, 0, done.stderr)
-        seen = json.loads(record.read_text())
+        seen = s.calls("question")[-1]
         self.assertEqual(seen["cwd"], str((s.root / "config").resolve()))
         self.assertEqual(seen["argv"][0], "eval")
-        self.assertIsNone(seen["env"]["CLAUDE_CODE_EFFORT_LEVEL"])
-        self.assertIsNone(seen["env"]["ANTHROPIC_BASE_URL"])
+        for name in ("CLAUDE_CODE_EFFORT_LEVEL", "ANTHROPIC_BASE_URL", "PROMPTFOO_FAILED_TEST_EXIT_CODE", "PROMPTFOO_PASS_RATE_THRESHOLD"):
+            self.assertIsNone(seen["env"][name], f"{name} does not reach promptfoo")
         self.assertEqual(seen["env"]["E1_ROOT"], str(s.root))
         self.assertEqual(seen["env"]["TMPDIR"], str(s.root / "tmp"))
         self.assertEqual(seen["env"]["MCP_TIMEOUT"], "120000")
         self.assertEqual(seen["env"]["PROMPTFOO_DISABLE_SHARING"], "1")
         self.assertEqual(s.run("--questions", env={**env, "FAKE_STATUS": "7"}).returncode, 7, "any other status is a fault and is passed on")
-        self.assertEqual(s.run("--preflight", env=env).returncode, 100, "a failed pre-flight row keeps promptfoo's status (review of #1046, P1)")
+        self.assertEqual(s.run("--preflight", env=env).returncode, 100, "a pre-flight whose promptfoo exits 100 keeps that status (review of #1046, P1)")
+
+    def test_the_exit_status_variables_of_the_caller_do_not_decide_the_preflight(self):
+        """Review of #1046 at 30639cdc1 (P1): promptfoo returns PROMPTFOO_FAILED_TEST_EXIT_CODE (default 100) only if the pass rate is below PROMPTFOO_PASS_RATE_THRESHOLD (default 100)
+        (promptfoo@30949931ee90 src/node/doEval.ts L1271-L1286), so a caller that set either could turn a failed pre-flight into status 0. The fake promptfoo does what that code does."""
+        s = self.s
+        s.use_fake_promptfoo()
+        self.assertEqual(s.prepare().returncode, 0)
+        for label, extra in (("default", {}), ("threshold 0", {"PROMPTFOO_PASS_RATE_THRESHOLD": "0"}), ("exit code 0", {"PROMPTFOO_FAILED_TEST_EXIT_CODE": "0"}),
+                             ("both", {"PROMPTFOO_PASS_RATE_THRESHOLD": "0", "PROMPTFOO_FAILED_TEST_EXIT_CODE": "0"})):
+            with self.subTest(settings=label):
+                done = s.run("--preflight", env=s.with_env(FAKE_PREFLIGHT="fail", FAKE_EMULATE_EXIT="1", **extra))
+                self.assertEqual(done.returncode, 100, done.stderr)
+                self.assertFalse(json.loads(s.gate_files("preflight")[-1].read_text())["passed"])
+                self.assertEqual(s.calls("preflight")[-1]["exit_vars"], {"PROMPTFOO_FAILED_TEST_EXIT_CODE": None, "PROMPTFOO_PASS_RATE_THRESHOLD": None}, "neither variable reaches promptfoo")
+        for label, mode in (("a row failed", "fail"), ("a row is missing", "missing")):
+            with self.subTest(result=label):
+                done = s.run("--preflight", env=s.with_env(FAKE_PREFLIGHT=mode, FAKE_STATUS="0"))
+                self.assertEqual(done.returncode, 100, "promptfoo said 0 and the result says otherwise: the result decides")
+                self.assertIn("pre-flight failed", done.stderr)
+
+    def test_questions_do_not_start_without_a_passing_preflight_of_this_preparation_for_the_asked_arms(self):
+        """Review of #1046 at 30639cdc1 (P1): `--questions` after a failed pre-flight, or with none, started promptfoo."""
+        s = self.s
+        s.use_fake_promptfoo()
+        self.assertEqual(s.prepare().returncode, 0)
+
+        def refused(*args, reason):
+            before = len(s.calls("question"))
+            done = s.run("--questions", *args)
+            self.assertEqual(done.returncode, 2, done.stderr)
+            self.assertIn(reason, done.stderr)
+            self.assertEqual(len(s.calls("question")), before, "promptfoo was not started")
+        refused(reason="no pre-flight has run")                                                      # absent
+        self.assertEqual(s.run("--preflight", env=s.with_env(FAKE_PREFLIGHT="fail")).returncode, 100)
+        refused(reason="did not pass")                                                               # failed
+        self.assertEqual(s.run("--preflight", env=s.with_env(FAKE_PREFLIGHT="missing")).returncode, 100)
+        refused(reason="expected 1")                                                                 # a row missing
+        self.assertEqual(s.run("--preflight", "--arms", "A5").returncode, 0)
+        refused("--arms", "A1", reason="did not cover arm(s) A1")                                    # wrong arm
+        newest = s.gate_files("preflight")[-1]
+        result = s.root / "out" / json.loads(newest.read_text())["result"]
+        text = result.read_text()
+        result.write_text(text + " ")
+        refused("--arms", "A5", reason="gone or has changed")                                        # the result it was made from changed
+        result.write_text(text)
+        done = s.run("--questions", "--arms", "A5")                                                  # control: the arm it covered, behind an unchanged record
+        self.assertEqual(done.returncode, 0, done.stderr)
+        self.assertEqual(s.calls("question")[-1]["arms"], ["A5"])
+        self.assertEqual(s.run("--preflight", "--arms", "A5", env=s.with_env(FAKE_PREFLIGHT="fail")).returncode, 100)
+        refused("--arms", "A5", reason="did not pass")                                               # the newest record decides, not an older passing one
+        self.assertEqual(s.run("--preflight", "--arms", "A5").returncode, 0)
+        self.assertEqual(s.prepare("--rebuild").returncode, 0)
+        refused("--arms", "A5", reason="another preparation")                                        # stale: a new preparation of the root
+
+    def test_a_dry_run_reports_the_gate_and_a_passing_one_is_reported_as_passed(self):
+        s = self.s
+        s.use_fake_promptfoo()
+        self.assertEqual(s.prepare().returncode, 0)
+        self.assertIn("no pre-flight has run", json.loads(s.run("--questions", "--dry-run").stdout)["gate"])
+        s.passing_preflight()
+        self.assertTrue(json.loads(s.run("--questions", "--dry-run").stdout)["gate"].startswith("passed: preflight-"))
+        self.assertNotIn("gate", json.loads(s.run("--preflight", "--dry-run").stdout))
+        self.assertEqual(s.calls("question"), [])
+
+    def test_a_relative_credential_runner_is_resolved_before_promptfoo_is_started_from_the_staged_config(self):
+        """Review of #1046 at 30639cdc1 (P3): the runner was passed as typed and promptfoo is started from <root>/config, so a relative spelling passed the dry run and failed the launch."""
+        s = self.s
+        s.use_fake_promptfoo()
+        self.assertEqual(s.prepare().returncode, 0)
+        (s.work / "fake-runner.py").write_text("import os, sys\nos.execv(sys.argv[3], sys.argv[3:])\n")    # argv: runner, slot, --, the command
+        cmd = [sys.executable, "-I", str(s.e1 / "e1_run.py"), "--root", str(s.root), "--preflight", "--slot", "some-slot", "--credential-runner", "fake-runner.py"]
+        planned = json.loads(subprocess.run([*cmd, "--dry-run"], capture_output=True, text=True, env=s.env, cwd=s.work, timeout=120).stdout)["command"]
+        self.assertEqual(planned[2], str(s.work / "fake-runner.py"))
+        done = subprocess.run(cmd, capture_output=True, text=True, env=s.env, cwd=s.work, timeout=120)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        self.assertEqual(len(s.calls("preflight")), 1, "the runner ran promptfoo")
 
     def test_the_test_pattern_selects_the_descriptions_of_the_asked_questions_and_repeats_only(self):
         pattern = re.compile(e1_run.test_pattern(["p-def"], 2))
@@ -1172,6 +1724,30 @@ class PromptfooIntegrationTests(unittest.TestCase):
         self.assertEqual(by[("A0b", "p-def")]["turns"], 3)
         self.assertTrue(by[("A0b", "p-refs")]["nav"], "a tool named mcp__serena__* in toolCalls is a code-navigation call")
         self.assertFalse(by[("A0b", "p-def")]["nav"])
+
+
+    def test_a_failing_preflight_stays_a_failure_under_the_exit_settings_of_the_caller(self):
+        """Review of #1046 at 30639cdc1 (P1), reproduced with the real promptfoo: the stub lists servers for A5, which has none, so its pre-flight assertion fails; with either exit setting the runner returned 0."""
+        (self.tmp / "scratch").mkdir()
+        s = ScratchRepository(self.tmp / "scratch")
+        s.env["PATH"] = f"{s.bin}{os.pathsep}{os.environ['PATH']}"      # the real promptfoo is a node script; the fake servers and git still come first
+        done = s.prepare(promptfoo=PROMPTFOO)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        config = s.root / "config"
+        (config / "stub_provider.py").write_text(STUB_PROVIDER)
+        (config / "promptfooconfig.yaml").write_text(STUB_CONFIG)
+        manifest_path = s.root / "manifest.json"
+        manifest = json.loads(manifest_path.read_text())
+        manifest["staged"]["promptfooconfig.yaml"] = sha256_bytes(config / "promptfooconfig.yaml")
+        manifest_path.write_text(json.dumps(manifest))
+        env = s.env
+        for label, extra in (("default", {}), ("pass-rate threshold 0", {"PROMPTFOO_PASS_RATE_THRESHOLD": "0"}), ("exit code 0", {"PROMPTFOO_FAILED_TEST_EXIT_CODE": "0"})):
+            with self.subTest(settings=label):
+                done = s.run("--preflight", "--arms", "A5", env={**env, **extra})
+                self.assertEqual(done.returncode, 100, done.stderr)
+                self.assertFalse(json.loads(s.gate_files("preflight")[-1].read_text())["passed"])
+                refused = s.run("--questions", "--arms", "A5", env={**env, **extra})
+                self.assertEqual(refused.returncode, 2, "a failed pre-flight leaves no way to the questions")
 
 
 STUB_CONFIG = """description: stub
