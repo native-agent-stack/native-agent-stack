@@ -164,11 +164,11 @@
       "term": "winners[].pin_drift"
     },
     {
-      "definition": "Cumulative distinct normalized repositories over the completed sweeps (stopped sweeps excluded). found: ledger proposed plus the landscape candidates, alternatives and winners; refuted: the latest substantive ledger adjudication refutes it; surviving: an unresolved survival or missing-vote-only proposal dated after the verdict; trialled: landscape rows with measured_comparison evidence or a measured_tradeoff disposition; adopted: winners with a run pin.",
+      "definition": "Cumulative distinct normalized repositories over the completed sweeps (stopped sweeps excluded). found: ledger proposed plus the landscape candidates, alternatives and winners; refuted: the latest refutation without a later survival or missing-vote-only re-proposal; surviving: an unresolved survival or missing-vote proposal dated after the verdict; trialled: landscape rows with measured_comparison evidence or a measured_tradeoff disposition; adopted: winners with a run pin.",
       "term": "funnel"
     },
     {
-      "definition": "The unresolved repositories of the funnel, each with its latest survival or initial missing-vote-only sweep and date.",
+      "definition": "The unresolved repositories of the funnel, with their latest survival or the missing-vote-only sweep and date that opened or reopened them.",
       "term": "survivors"
     },
     {
@@ -1500,6 +1500,13 @@
         {
           "catalog": "us-equities",
           "layer_id": "research-factors-ml",
+          "role": "survivor"
+        }
+      ],
+      "github.com/datalab-to/chandra": [
+        {
+          "catalog": "foundation",
+          "layer_id": "document-retrieval",
           "role": "survivor"
         }
       ],
@@ -5250,8 +5257,8 @@
       "funnel": {
         "adopted": 3,
         "found": 23,
-        "refuted": 7,
-        "surviving": 12,
+        "refuted": 6,
+        "surviving": 13,
         "trialled": 1
       },
       "layer_id": "document-retrieval",
@@ -5287,6 +5294,11 @@
           "date": "2026-09-26",
           "repository": "github.com/cinnamon/kotaemon",
           "sweep_id": "landscape-sweep-20260926"
+        },
+        {
+          "date": "2026-09-29",
+          "repository": "github.com/datalab-to/chandra",
+          "sweep_id": "landscape-sweep-20260929"
         },
         {
           "date": "2026-09-23",
@@ -10699,7 +10711,7 @@
       "reopened": 30,
       "unswept": 2
     },
-    "survivors": 106,
+    "survivors": 107,
     "winners": 66,
     "winners_with_run": 59
   }
