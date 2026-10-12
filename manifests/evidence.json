@@ -18747,8 +18747,8 @@
     },
     {
       "path": "docs/decisions/2026-10-09-claude-review-worker.md",
-      "sha256": "8ac125de3ef17e149391e08175b00f67cf365d0ebcd8a5bb0a91f301d2e3337c",
-      "bytes": 62373
+      "sha256": "2bb9a918a745fa854330b14f4e10498e910c9a58dd87afcfc49e443863d38be9",
+      "bytes": 63960
     },
     {
       "path": "docs/decisions/2026-10-09-codex-native-review-trial.md",
@@ -61622,8 +61622,8 @@
     },
     {
       "path": "tests/test_claude_review_worker.py",
-      "sha256": "890d644757305e86a3157c325f05ddeca2588ece27faa8d39f642b2901aa7691",
-      "bytes": 130675
+      "sha256": "efd8a21ced31a7c47b71296f84c6a60a456f65f6e709272c42830bcbecee39cf",
+      "bytes": 130695
     },
     {
       "path": "tests/test_claude_spend_scan.py",
@@ -62972,8 +62972,8 @@
     },
     {
       "path": "tools/claude-review-worker/worker.py",
-      "sha256": "30d5fbd68f6c521a3336a104df7b1cec223177ff6c3008d66cdfc7d7fef270a6",
-      "bytes": 129379
+      "sha256": "94887696bf940372593f1864fa5fd69c66d321e675c2e69debe21195b6def364",
+      "bytes": 129396
     },
     {
       "path": "tools/credentials/anthropic_key_health.py",

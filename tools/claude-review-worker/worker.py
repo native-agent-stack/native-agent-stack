@@ -593,13 +593,13 @@ def export_pins(env: dict, mirrors: Path, pins, dest: Path, limit: int = UPSTREA
 
 def review_settings() -> dict:
     """claudeMdExcludes is not used: CLAUDE_CODE_DISABLE_CLAUDE_MDS in SANDBOX_ENV replaces it as the instruction
-    fence (command center, 2026-10-10). promptCacheTtl keeps the main conversation's prompt cache for an hour, since
-    reviews of consecutive heads usually start more than 5 minutes apart (anthropics/claude-code@3deb873
-    CHANGELOG.md:2970; on an API key the unset default is 5 minutes). subagentPromptCacheTtl stays unset: the review
+    fence (command center, 2026-10-10). promptCacheTtl is "5m": measured on 2026-10-12, "1h" bills every cache write
+    of a run at the 1-hour price while a later head reads none of the shared prompt, since the client's breakpoint sits
+    at the end of the user message (decision record, "Prompt caching"). subagentPromptCacheTtl stays unset: the review
     runs no subagent."""
     return {
         "disableAllHooks": True,
-        "promptCacheTtl": "1h",
+        "promptCacheTtl": "5m",
         "enabledPlugins": {name: False for name in BUILTIN_PLUGINS},
         "permissions": {"blockReadsOutsideWorkingDirectories": True, "deny": list(DENY_RULES)},
     }
