@@ -6,8 +6,8 @@
   "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
   "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
   "outputs": {
-    "docs/new-wsl-handbook.md": "f532931c1fa916096f458259d24c8f205d89991d531427d932c773a4fe703bbc",
-    "docs/new-wsl-handbook.json": "fe0b6628bc589e59dc71a5a0fb6805ecab067e3f06043702919bf7f09ef9cba4"
+    "docs/new-wsl-handbook.md": "46043b18cade9b754a5a0c8cd6a02e0a39296230de94d5820866a39734f5dc72",
+    "docs/new-wsl-handbook.json": "4ce5f261562807cc0eca8e31aaf65cb7bf4c42bc115cf994905fc5ea1dd0bb6e"
   },
   "inventory": {
     "layers": 37,
@@ -1038,6 +1038,22 @@
       "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
       "evidence_class": "local_integration",
       "scope": "CC19:51 landing repair on current main; native write/check confirm unchanged generated hashes. Both main and retirement receipt histories retained; no host/model acceptance."
+    },
+    {
+      "recorded_at_utc": "2026-10-12T18:36:38Z",
+      "source_main": "2f59d7448c7e4a51cf592f78818838353ba2dca9",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "check_command": "python3 scripts/build_new_wsl_handbook.py --check",
+      "check_exit_code": 0,
+      "current_outputs": {
+        "docs/new-wsl-handbook.md": "46043b18cade9b754a5a0c8cd6a02e0a39296230de94d5820866a39734f5dc72",
+        "docs/new-wsl-handbook.json": "4ce5f261562807cc0eca8e31aaf65cb7bf4c42bc115cf994905fc5ea1dd0bb6e"
+      },
+      "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
+      "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
+      "evidence_class": "local_integration",
+      "scope": "Regenerated through the unchanged native builder after the Harbor stack-component registration changed two hashed inputs: the adoption recipe map gained harbor, and the architecture edition's Nemotron revision citation moved from stack line 2118 to 2141 (the cited revision is unchanged). No host, model or provider acceptance."
     }
   ],
   "previous_outputs": [
@@ -1237,6 +1253,15 @@
         "docs/new-wsl-handbook.json": "6ad52e89172f10ad0411d6e2c31126c4ff9e749a99bda992cdd0415359be164f"
       },
       "reason": "Superseding current-main landing cue; preserve all prior current bindings and both incoming histories."
+    },
+    {
+      "superseded_at_utc": "2026-10-12T18:36:38Z",
+      "source_main": "2f59d7448c7e4a51cf592f78818838353ba2dca9",
+      "outputs": {
+        "docs/new-wsl-handbook.md": "f532931c1fa916096f458259d24c8f205d89991d531427d932c773a4fe703bbc",
+        "docs/new-wsl-handbook.json": "fe0b6628bc589e59dc71a5a0fb6805ecab067e3f06043702919bf7f09ef9cba4"
+      },
+      "reason": "Harbor stack-component registration changes two hashed handbook inputs (adoption recipe map; architecture Nemotron stack-line citation); the previous maintained output binding is preserved as historical evidence."
     }
   ]
 }

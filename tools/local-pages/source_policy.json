@@ -12498,6 +12498,10 @@
       },
       {
         "root": "repo",
+        "path": "evidence/artifacts/harbor-0240-currency-20261009/receipt.json"
+      },
+      {
+        "root": "repo",
         "path": "evidence/artifacts/harness-rules-20261008/B-run-receipts.json"
       },
       {
@@ -20455,6 +20459,10 @@
       {
         "root": "repo",
         "path": "evidence/receipts/harbor-e2e-token-tools-20260930.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/harbor-smoke-20261012.json"
       },
       {
         "root": "repo",

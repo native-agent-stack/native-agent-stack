@@ -147,6 +147,7 @@
     "fastapi": "blueprints/convergence-practice/application-delivery/README.md",
     "gitleaks": "recipes/README.md",
     "grafana": "observability/backends/README.md",
+    "harbor": "recipes/README.md",
     "headroom": "recipes/README.md",
     "hindsight": "recipes/hindsight-research-memory.md",
     "huggingface-hub-native": "recipes/README.md",

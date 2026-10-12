@@ -2159,10 +2159,10 @@ Reference edition: [catalogs/foundation/new-wsl-architecture-20261001.json](../c
 
 | Repository source | SHA-256 |
 | --- | --- |
-| [adoption/manifest.json](../adoption/manifest.json) | `44c193b87cc03e0f52782e024deb8d80368fe843eb9153f98cd54cc9f9f9caf9` (without source.release_tag, source.release_commit, updated_at) |
+| [adoption/manifest.json](../adoption/manifest.json) | `c15d89df84e1cc346ca3efe0590a464cdcc5b2b772d3ef598739c7945778d238` (without source.release_tag, source.release_commit, updated_at) |
 | [adoption/new-wsl-profile.json](../adoption/new-wsl-profile.json) | `3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a` |
 | [adoption/platforms/linux-wsl2-new-distro.md](../adoption/platforms/linux-wsl2-new-distro.md) | `d79da9e44ea865913f3dc9d78a0dcc2dc235ae02d7873ff60ed7ebcdd72d3781` |
-| [catalogs/foundation/new-wsl-architecture-20261001.json](../catalogs/foundation/new-wsl-architecture-20261001.json) | `b7b2c18ee782d0bb9168357960ceb0e39c11b561261861f87a4ff7295d5e8033` |
+| [catalogs/foundation/new-wsl-architecture-20261001.json](../catalogs/foundation/new-wsl-architecture-20261001.json) | `14fd038fb205c6a4ffb54c49c4d3a86b04d9b917b28a39e3866c9b43e56810ce` |
 | [catalogs/landscape/research-state.json](../catalogs/landscape/research-state.json) | `fe142c1b8b8ec8b92d69ec5971d68028225899c101ffc43cea618883b119332a` |
 | [catalogs/landscape/us-equities.json](../catalogs/landscape/us-equities.json) | `6aff6411e711dcf3f0a487f343bb0e45c319a0a9235763a54eae9316e1597b0e` |
 | [docs/decisions/2026-10-05-ns2604-foundation-requalification.md](../docs/decisions/2026-10-05-ns2604-foundation-requalification.md) | `44d667b2b63de07784aa8816c65bd8949ed91bfb83a8cc77b69c52516663fc6d` |

@@ -286,7 +286,15 @@ eligibility declaration from the repository tripwire. The receipt grant set
 was reviewed at `c945ea1f011e4c7e69a0b5f19052717b2af9d46e`: removing the two
 unused frozen permissions leaves 4648 exact JSON receipt paths. This remains
 the reviewed pinned union; the current main proposal's 4725 eligible paths
-do not add permissions without independent review.
+do not add permissions without independent review. A file that did not exist
+at that pin cannot be in the union derived from it, so a grant for one is an
+exact post-pin entry: `POST_PIN_RECEIPT_GRANTS` in
+`tests/test_local_pages_policy_grants.py` lists each path with the pull-request
+read that named it, and the committed list must equal the reviewed union plus
+exactly those paths. Every other path stays refused; a wildcard or a grant
+derived from the evidence manifest is not accepted. Two entries exist so far,
+both for #1047: its new registered receipt and the earlier Harbor receipt that
+a landscape row now cites, because the reader follows cited evidence pointers.
 Derivation does not open referenced receipt or frozen artifact bodies and
 does not add descriptive-pin exceptions. Separately reviewed user canonical
 filenames are metadata during permission generation. The shared reader uses

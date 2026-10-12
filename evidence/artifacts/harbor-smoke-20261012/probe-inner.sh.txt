@@ -1,0 +1,15 @@
+#!/bin/bash
+# Runs INSIDE a throwaway ubuntu:24.04 container (default bridge network, like Harbor's task containers).
+# One TCP connect to the local gateway port at the gvisor-tap-vsock gateway address, plus a control connect to the
+# virtual gateway's own DNS port so a refusal can be told from a broken probe. No data is sent on either connection.
+probe() {
+  local host=$1 port=$2 label=$3 s e out rc
+  s=$(date +%s%N)
+  out=$(timeout 5 bash -c "exec 3<>/dev/tcp/$host/$port" 2>&1)
+  rc=$?
+  e=$(date +%s%N)
+  echo "$label target=$host:$port rc=$rc elapsed_ms=$(( (e - s) / 1000000 )) msg=${out:-none}"
+}
+echo "container_default_gateway_hex=$(awk '$2=="00000000"{print $3}' /proc/net/route)"
+probe 10.0.2.1 53 control_virtual_gateway_dns
+probe 10.0.2.1 21128 probe_local_gateway_port
