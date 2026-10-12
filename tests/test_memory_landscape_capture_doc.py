@@ -10,12 +10,14 @@ The corrected statements are pinned, each to its upstream mechanism:
    climbs to $HOME (marker.rs:938-1025 at v2.6.0), so a worktree below the enrolled checkout inherits the marker, and
    `.worktreeinclude` copies it into Claude Code and Worktrunk worktrees. The first version's blanket claim that lane
    worktrees "carry none and are not captured" was false.
-3. Correction #149 states the host's hook state as CC host measurements with a repo-safe locator, cites its ai-memory
-   mechanism at the release the host runs (v2.6.3 = 385b81ea; the cited ranges are identical at v2.6.0 = 89bd8ded), and
-   describes Codex hook trust as upstream does: re-rendering changes the computed current hash, the stored trusted_hash
-   is unchanged, and the /hooks review writes the reviewed hash (docs/decisions/2026-10-04-codex-rtk-hook-qualified.md,
-   Decision 1, read there at rust-v0.159.3 and re-read at rust-v0.162.1 = 092d3acd: discovery.rs hook_trust_status,
-   hooks_rpc.rs write_hook_trusts). The first version said re-rendering changes trusted_hash.
+3. Correction #149 states the host's hook state as CC host measurements with a repo-safe, state-root-relative locator
+   (coordination/lessons-20261005/cc-corrections-20261005.md; the first form, command-center/lessons-20261005/..., named
+   a directory the ledger does not sit under, CC correction #180). It cites its ai-memory mechanism at the release the
+   host runs (v2.6.3 = 385b81ea; the cited ranges are identical at v2.6.0 = 89bd8ded) and describes Codex hook trust as
+   upstream does: re-rendering changes the computed current hash, the stored trusted_hash is unchanged, and the /hooks
+   review writes the reviewed hash (docs/decisions/2026-10-04-codex-rtk-hook-qualified.md, Decision 1, read there at
+   rust-v0.159.3 and re-read at rust-v0.162.1 = 092d3acd: discovery.rs hook_trust_status, hooks_rpc.rs
+   write_hook_trusts). The first version said re-rendering changes trusted_hash.
 4. The 2026-09-21 qualification prose that follows the corrections is dated and points at correction #149, so it cannot
    state the old host state in the present tense beside the correction. correction_149_section stops before that prose.
 """
@@ -127,8 +129,9 @@ class CaptureAssistantCorrectionTests(unittest.TestCase):
         self.assertRegex(
             section,
             r"CC host measurements, recorded as correction #149 in "
-            r"`command-center/lessons-20261005/cc-corrections-20261005\.md` \(host state, not in this repository\)",
+            r"`coordination/lessons-20261005/cc-corrections-20261005\.md` \(host state, not in this repository\)",
         )
+        self.assertNotIn("command-center/lessons-20261005", text, "the ledger has no command-center/ parent (CC correction #180)")
         self.assertRegex(section, r"not re-read by this change")
         self.assertNotRegex(text, r"/(?:home|Users)/\w|/\.local/|(?<![\w$])[~]/", "a locator must not be a home or state path")
 
