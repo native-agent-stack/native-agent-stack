@@ -113,7 +113,28 @@ python3 scripts/skills_status.py --skills-bin "$SKILLS_BIN" --json
 The existing installer checks the CLI pin, calls upstream `skills add` with each
 immutable tree URL and only the selected clients, then verifies or rolls back a
 failed installation. It disables telemetry and the add-time audit request. A
-matching existing installation is reused. Apply only the selected profile's
+matching existing installation is reused: the canonical folder, its lock entry
+and, for Claude Code, the relative link onto the canonical folder that the CLI
+makes for a non-universal agent
+([`createSymlink(canonicalDir, agentDir)`, `src/installer.ts` L426](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/installer.ts#L426);
+Codex is universal, [`src/agents.ts` L227](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/agents.ts#L227),
+and returns first, [L395-402](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/installer.ts#L395-L402)).
+A missing link is drift that the same add repairs; an entry in its place that
+does not resolve to the canonical folder (a folder, a link to another folder or a
+dangling link elsewhere) is refused as `local-modified` unless `--force`, whatever
+the lock says, because the add would replace it
+(`rm(linkPath, { recursive: true })`,
+[L255-263](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/installer.ts#L255-L263)).
+So is a canonical path that is itself a link: the add removes it first
+([`cleanAndCreateDirectory(canonicalDir)`, L389](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/installer.ts#L389)),
+and a real Claude folder that the link led to is then not the CLI's own link and is
+removed with its files. Other files beside a pinned `SKILL.md` in the canonical
+folder are not yet protected from the add (the next pull request of this lane).
+When the CLI cannot create the symlink it copies the skill there
+([L428-440](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/installer.ts#L428-L440));
+`scripts/skills_status.py` fails that layout, so the add is rolled back with the
+cause named.
+Apply only the selected profile's
 listing controls from [the update guide](../update.md#apply-the-skills-manifest).
 
 A session never installs a skill ad hoc; it records the candidate and the
