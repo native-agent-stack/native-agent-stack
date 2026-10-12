@@ -22,8 +22,10 @@ with the verdict files as arguments (at least one) and these differences: `manif
 identity (CI arbitrates the registry), a BEHIND branch is updated server-side (merge method), the aggregate `validate` check
 must have succeeded at the head (every page of check runs is read; the rule is below), the Codex gate is asked again before the
 validation, and the head is then merged into the current `origin/main` in a temporary worktree
-under `/var/tmp` where `scripts/validate.py` must exit 0 (exit 10 otherwise). Its output is never printed: it goes to a file made by
-`mktemp "${TMPDIR:-/tmp}/nas-validate-XXXXXX"` (mode 0600) outside the worktree, and exit 10 names that file and the exit code. `gh pr
+under `/var/tmp` where `scripts/validate.py` must exit 0, and after it each currency check of `validate.yml`'s shard 0 whose script the
+merge holds (exit 10 otherwise; CC correction #176, below). Their output is never printed: it goes to a file made by
+`mktemp "${TMPDIR:-/tmp}/nas-validate-XXXXXX"` (mode 0600) outside the worktree, and exit 10 names that file, the exit code and, for a
+currency check, its command. `gh pr
 merge --match-head-commit` pins only the head ("Commit SHA that the pull request head must match to allow merge", sources below), so
 `origin/main` is read again with `git ls-remote` after each validation: when it moved, the merge onto the new main is validated again,
 at most three validations in all (exit 13 when it moved after each; #975, Codex P2 at af9d1901), and the final gate reads it once more.
@@ -41,6 +43,32 @@ runs that share a `completed_at` pass when each passes and fail when one fails; 
 supersedes nothing, since jq orders null before every string (`jqlang/jq@jq-1.8.1` `docs/content/manual/v1.8/manual.yml:1544-1552`,
 `:2425-2433`; both times are nullable, `api.github.com.json:146097-146107`), while a failing run without them is superseded by
 nothing. `validate` counts when it is complete, not failing, and a run with its greatest `completed_at` succeeded.
+
+**The currency checks (`nas_land.sh`, CC correction #176).** #1007 bound the sha256 of a catalog file in `final-stack.json` and #1018
+changed that file. Each was green on its own base and `validate.py` passed on the merge, so #1018 landed, and `main`'s
+`validate-shard-0` failed on `scripts/final_stack.py --check`, which `validate.py` does not run. After `validate.py` the merge now runs
+the currency checks of shard 0 of `.github/workflows/validate.yml` as those steps run them, with `-E -s -B` as for `validate.py`, in the
+workflow's order (`validate.yml:135-177`). They are every shard-0 step that runs a Python script with `--check`:
+`blueprints/blind-catalog-convergence/audit_reports.py`, `tools/sota-convergence/build_verdicts.py`, `scripts/component_matrix.py`,
+`scripts/new_host_grand_list.py`, `scripts/final_stack.py`, `tools/sota-convergence/gap_crosswalk.py build`,
+`tools/sota-convergence/gap_wave_ledger.py` with its step's `--wave` and `--owner` arguments (`validate.yml:166-174`, a folded `run: >-`)
+and `scripts/build_ecosystem.py`, each with `--check`. #176 named seven; the CC's ruling of 2026-10-12 added the ledger check, and a
+test keeps the list equal to the workflow's steps. A check runs only when its script is in the merge; the first that fails stops the
+landing with exit 10, named by its command, and its output stays in the validation's file. On `main` at `86fa3844` the eight exit 0 in
+about 8 s, 6.3 s of it `build_ecosystem.py` (measured 2026-10-12T02:18Z with `python3 -E -s -B`). `uet_land.sh` needs no such step: the trading repository's `main` rules count `ci-gate` only on a head that is up
+to date with `main` (`strict_required_status_checks_policy: true`), so its CI, `uv lock --check` included (`ci.yml` at `0e987311`), ran
+on the tree the squash merge makes. This repository's rules do not require that (`false`; both read from `GET
+/repos/{owner}/{repo}/rules/branches/main` at 2026-10-12T02:23:46Z), which is why `nas_land.sh` validates the merge itself. A merge
+queue would test each merge with the pull requests ahead of it on GitHub's side, and needs an organization-owned repository (sources below).
+
+**The squash body (`SQUASH_BODY_FILE`, the CC, 2026-10-12).** Both repositories' squash setting is `COMMIT_MESSAGES`, "default to the
+branch's commit messages" (`squash_merge_commit_message`, read from `GET /repos/{owner}/{repo}` at 2026-10-12T02:23:46Z), and the scripts
+named no body, so a squash merge carried the branch's commit messages into `main`, a claim that review corrected later included. When
+`SQUASH_BODY_FILE` is set, the merge passes it with `--body-file`; `gh` reads the file when the merge call starts and sends it as
+`MergePullRequestInput.commitBody`, "Commit body to use for the merge commit; if omitted, a default message will be used" (sources
+below). The file is checked before the lock and any call: a value that is not a readable, non-empty regular file stops the landing with
+exit 2, `-` included (`gh` reads `-` as standard input), and the path is never printed. An empty value is none. The final gate does not
+read the file again.
 
 **`codex_gate.py <owner/repo> <pr> [<read head>]`** prints one status line about the connector's review and exits 0 (a review of the
 read head or of the current head that started at or after the latest trigger finished, and none is running), 3 (running, the
@@ -213,7 +241,8 @@ expected head:
 | `VERDICT_FILES` | none | `uet_land.sh` | space-separated verdict files that each must name the read head |
 | `GATES_DONE` | none | both | receipt naming the read head; required when a verdict file states a landing gate |
 | `GPT_VERDICT` | none | `uet_land.sh` | the co-op's verdict file accepted instead of Codex when `codex_gate.py` exits 5 |
-| `TMPDIR` | `/tmp` | both | where a failed merge keeps gh's output (`merge-fail-XXXXXX`, mode 0600), and `nas_land.sh` the validation's output (`nas-validate-XXXXXX`, kept when it fails) |
+| `SQUASH_BODY_FILE` | none | both | the squash commit's body (`gh pr merge --body-file`), for a pull request whose commit messages carry a claim corrected after review; it must be a readable, non-empty regular file, not `-`, or the landing stops with exit 2 before any call; an empty value is none |
+| `TMPDIR` | `/tmp` | both | where a failed merge keeps gh's output (`merge-fail-XXXXXX`, mode 0600), and `nas_land.sh` the output of the validation or of the currency check that failed (`nas-validate-XXXXXX`, kept when it fails) |
 | `LANDING_PROHIBITED_NAMES` | none | the tests only | comma-separated identities that must not appear in any form under `tools/landing` (see Tests) |
 
 The scripts also need `gh` 2.48.0 or later (`gh api --paginate --slurp`; authenticated for the repository), `git` 2.39.0 or
@@ -226,13 +255,14 @@ one, and the script then reports exit 10, "does not merge cleanly".
 ## Exit codes
 
 From the script headers. `uet_land.sh`: 2 verdict gate (a verdict file, `GATES_DONE` or `trading-cc-read`, also when a file, record or
-status cannot be read), 3 head moved, 4 change differs, 5 CI failed (at the final gate also: no longer complete and green), 6 timeout,
+status cannot be read) or a `SQUASH_BODY_FILE` that is not a readable, non-empty file (before any call), 3 head moved, 4 change differs, 5 CI failed (at the final gate also: no longer complete and green), 6 timeout,
 7 merge failed, 8 blocked, 9 the Codex gate gave neither 0 nor 5: a review running or not finished since its latest trigger (its 3, after
 the 20-minute wait or at the final gate), a review that ended other than Completed or a summary last edited by another account (its
 4), a gate that failed or is missing; or a 5 without an accepted `GPT_VERDICT` (#975 P3-7 at 761810d7: the header named only some of
 these). `nas_land.sh`: 2 as above, 3 head moved, 4 `update-branch` refused or the change differs after it or at the final gate, 5 CI
 failing (also at the final gate), 6 timeout, 7 merge failed, 8 blocked by policy, 9 as above, but a 5 proceeds, and a 3 before the
-validation stops too, 10 the merge onto current `origin/main` fails `scripts/validate.py` or does not merge cleanly, 13 origin/main moved
+validation stops too, 10 the merge onto current `origin/main` does not merge cleanly, fails `scripts/validate.py` or fails one of the
+shard-0 currency checks whose script it holds (CC correction #176), 13 origin/main moved
 after each of three validations, moved after the last validation (read at the final gate) or could not be read, so nothing is merged
 (#975, new in round 3). Both scripts also exit 11 when the no-reply author address cannot be formed (nothing is merged), 12 when the
 merge landed but its commit's author is not that address or the commit could not be read (CC correction #148), and 14 when another
@@ -259,7 +289,8 @@ The files were moved from the CC's tools directory on 2026-10-10 and synced on 2
 00:02Z (the head-following function of uet#58 and correction #148); #975's fix commit then took the CC's live patch of
 2026-10-11T03:37Z (P2-3 and P2-2, above). At the sync the shell scripts were the live copies with only host paths changed: the three
 lines of the move (the repository default and `COORD` on one line, the record path, the gate path), the same line counts, and
-`codex_gate.py` byte for byte. Expanding the three expressions to the CC host's paths gave the digests of the "after #148" column.
+`codex_gate.py` byte for byte. Expanding the three expressions to the CC host's paths gave the live copies byte for byte (their
+digests are withheld, below).
 The patched live copies also differ in the merge-failure line, whose file the CC keeps in its own tools directory until it takes
 this line's `${TMPDIR:-/tmp}` after review (2026-10-11). The review of that fix commit then led to two more changes, made here and
 not yet in the live copies: `codex_gate.py` catches any exception and exits 4 with one fixed line (#975 P2), and `lg_ci_state` in
@@ -282,16 +313,32 @@ activity rules (above). The CC's adjudication of 5b8ba3b2 added the final fix: t
 trigger-window wording (P3-a, P3-d); Codex's change-identity finding is a declared gap (below) and its sandboxing of the validation a
 follow-up. The CC's Claude micro at 3e6e7e46 (A1) and Codex's P2 at nas:289 added one more correction to nas's check runs: a failing
 run stands unless a run of its name started and completed after it, and every page is read (above); in the same commit, for Codex's P1
-at nas:234, both scripts read `trading-cc-read` from the combined status, every page of it (above). The live copies were last
-changed at 2026-10-11T05:03:28Z (the CC's patch that took the status-gate failure line); the "Live copy" column is their sha256 (`sha256sum`) and line count as read at 2026-10-11T13:59Z, which replace the digests of the
-CC's 03:37Z patch recorded here before (`1bc1f53b…` and `287f2e7e…`, #975 P3-2). The "Here" column is each file as committed: its
-sha256 and line count.
+at nas:234, both scripts read `trading-cc-read` from the combined status, every page of it (above). The live copies were
+changed at 2026-10-11T05:03:28Z (the CC's patch that took the status-gate failure line); the "Live copy" columns give their line
+counts as read at 2026-10-11T13:59Z, which replaced the record of the CC's 03:37Z patch (#975 P3-2). The "Here" column is each file
+as committed: its sha256 and line count.
+
+On 2026-10-12 the CC patched the live copies twice more, and both patches are ported here (file times 00:10:46Z and 00:37:48Z; the
+copies they replaced are the ones of the "Live copy" column): CC correction #176 in `nas_land.sh` (the currency checks, above) and
+`SQUASH_BODY_FILE` in both scripts (above). The port follows this copy's structure in three ways. The live copies print the last 300
+bytes of a failing check's output; here it stays in the validation's 0600 file, as `validate.py`'s does (#975 P2-C). The live copies
+check `SQUASH_BODY_FILE` before the group that is parsed whole and accept any non-empty path; here the check is the group's first
+statement after the arguments, still before the lock and any call, and also refuses a directory, an unreadable file and `-`. The live
+copies keep the validation's output beside the worktree and a failed merge's under the CC's tools directory; here both go to
+`${TMPDIR:-/tmp}`, as before. The CC's regression for #176 (`test_merge_validate_currency.sh` in its tools directory, which cuts
+`merge_validate` out of a script and runs it on a scratch repository whose merge fails `final_stack.py --check`) passes on this
+`merge_validate`. The live copies should again be replaced whole.
+
+No digest of a live copy is recorded here (CC correction #161; the CC's ruling of 2026-10-12 withheld the ones the table held before):
+the live copies hold the CC host's paths, and since everything else in them is public, a digest of their bytes would let anyone
+confirm a guessed path. The live `codex_gate.py` holds no host path; its digest is withheld by the same rule, so the only digests in
+this section are the repository copies' (a test checks that).
 
 | File | Before correction #136 | Live copy, after #148 | Live copy, since 2026-10-11T05:03:28Z | Here |
 | --- | --- | --- | --- | --- |
-| `uet_land.sh` | `b794e3a46772c0a598dff9eee972ad449e5d63f0c81b60b9db1d5cb4944747bb` (115 lines) | `301fb5b07274b28fde0f2061356bf9682883eca352c8bcb7a3119e8934920c7d` (232 lines) | `bfe664bcc00fd99cbe2a0afe7a76c483d8d7896e44f665eac066972cdec2ed7a` (233 lines) | `b479987f7be4f1bfb50d80f96cd851b95496ceb92d1117e8bf01aec70d4f5fb6` (387 lines) |
-| `nas_land.sh` | `2fefe070b95229de3dcad14052cf5c031b70c202bf4a34f4452e6e0cb5832936` (135 lines) | `96144670bc301036604fc39e57e3ab4e4a2e43a6b9d6b8b645ef7b02482f4017` (243 lines) | `842b85b7f53048e9df027ca537ea99b6208e616e0f239ca30bb1748a5bc1f2ad` (246 lines) | `d46729d6628f9d4f5e636bd1c7501d8cb812b612dfc86b929dc2c5a18032b727` (447 lines) |
-| `codex_gate.py` | (unchanged) | `31524d2871cde79ecb2c5b9bc56b6175ce9fafab9ad4d2e2e3eb3594e1cb2422` (108 lines) | the same | `e2132ab71b6e55fea8922b9c5b0b8c17bde87b1d37f11bf384b785bef6f96b6a` (226 lines) |
+| `uet_land.sh` | withheld (CC #161: a digest of a file whose only non-public bytes are host paths confirms a guessed path) (115 lines) | withheld (CC #161: a digest of a file whose only non-public bytes are host paths confirms a guessed path) (232 lines) | withheld (CC #161: a digest of a file whose only non-public bytes are host paths confirms a guessed path) (233 lines) | `ef961098379274cde349c552217bfc82cf5d83572d468597e4ff9e9b095ded9d` (394 lines) |
+| `nas_land.sh` | withheld (CC #161: a digest of a file whose only non-public bytes are host paths confirms a guessed path) (135 lines) | withheld (CC #161: a digest of a file whose only non-public bytes are host paths confirms a guessed path) (243 lines) | withheld (CC #161: a digest of a file whose only non-public bytes are host paths confirms a guessed path) (246 lines) | `9bd565b365c7f1c1fc0f8195d5fe5ea0c83dec411cc59b73158dc7d7d0cf4675` (472 lines) |
+| `codex_gate.py` | (unchanged) | withheld (CC #161: a digest of a file whose only non-public bytes are host paths confirms a guessed path) (108 lines) | the same | `e2132ab71b6e55fea8922b9c5b0b8c17bde87b1d37f11bf384b785bef6f96b6a` (226 lines) |
 
 Corrections the scripts carry: #118 (every gate before the merge, in order), #121 (a verdict file that states a landing gate needs
 a receipt), #122 and #123 (a Codex review must have finished; uet#40 and uet#47 merged while one was running), #136
@@ -302,7 +349,8 @@ and #975's P2-3 (the CI allow-list), P2-2 (no text from `gh` or its API is print
 call), the gate error (P2: exit 4 and one fixed line, no traceback), the commit-status allow-list (P3) and P2-1 (the privacy scan
 checks every prohibited identity), round 3 (above: the completion bound to the latest request, the gates read again before the merge,
 typed values, no local diagnostics, the base re-read) and round 4 (above: the lock, the final gate, one read per file, the gate's
-snapshot). The block is identical in both scripts, apart from `lg_ci_state`, which only `uet_land.sh` has.
+snapshot), and the CC's patches of 2026-10-12: #176 (the merge's shard-0 currency checks, `nas_land.sh`) and the squash body
+(`SQUASH_BODY_FILE`, both). The block is identical in both scripts, apart from `lg_ci_state`, which only `uet_land.sh` has.
 
 ## Known gaps, left as they were
 
@@ -312,6 +360,11 @@ and 4). These stay until a change with its own tests fixes them:
 
 - `U` and `G` are expanded unquoted: a clone path with whitespace breaks both scripts.
 - `nas_land.sh`'s validation merge needs a git identity (above). Its header now lists exit 4.
+- The merge runs shard 0's Python `--check` steps, not all of shard 0: the shard's validators before them (such as
+  `scripts/validate_catalogs.py` and `scripts/validate_convergence.py`) and its checks that are not one Python command (the example
+  workflows' `sha256sum --check`, the contract suites, zizmor and actionlint) do not run on the merge, so a merge that fails only one of
+  them still lands. Each check runs on the merge as the worktree holds it, uncommitted, so a check that read the committed tree would
+  read `main`; none of the eight does (they read files, and `gap_crosswalk.py` a fixed revision).
 - A call whose failure never stopped a landing still does not: an unreadable draft flag (both scripts) leaves a draft unmarked, and
   an unreadable `mergeStateStatus` (`nas_land.sh`) skips the BEHIND update and the BLOCKED stop, so the merge call itself is the check
   (exit 7 when GitHub refuses it). `nas_land.sh`'s final gate does not read `mergeStateStatus`; thread resolution is required
@@ -388,9 +441,19 @@ page 1 supersedes land; check runs that jq cannot judge print neither jq's error
 in both scripts: a `trading-cc-read` failure or pending status behind 100 newer statuses of 100 other contexts, or of one, stops with 2
 (at 3e6e7e46 the gate gave "no status", exit 0 with nothing printed, and both scripts landed: exit 0, one merge), a success behind them
 has its record checked, and a reply that is not an array of pages with statuses, an empty one included, stops with 2 and prints nothing
-of it. The fake `gh` serves page 1 of the statuses list as the first `per_page` statuses and builds the combined status from it as
-GitHub gave it when measured: each context once with its newest status, in pages of `per_page` contexts. It is offline, needs `jq`,
-and is Linux-only. A script edit that moves a decision site fails the module instead of leaving it untested.
+of it. The CC's patches of 2026-10-12 add, each failing at 86fa3844: the checks `merge_validate` names are exactly the shard-0 steps of
+`validate.yml` that run a Python script with `--check`, as those steps run them and in their order, a folded `run: >-` step included
+(at 86fa3844 it named none; the reader is also run on a synthetic workflow); the provenance section carries a 64-hex digest only in
+its "Here" column (CC #161; at 86fa3844 seven digests of live copies stood beside them); a merge that passes `validate.py` and fails
+`scripts/final_stack.py --check` stops with 10 naming that check, the checks after it not run and its output only in the 0600 file (it
+merged at 86fa3844); a check runs only when its script is in the merge, and a landing whose checks pass merges; a `SQUASH_BODY_FILE`
+that is missing, empty, a directory, `-` or unreadable stops both scripts with 2 before any call, printing no path (each landed at
+86fa3844); and a body file whose path has a space reaches the merge as one `--body-file` argument (the merge had none at 86fa3844),
+while an empty value adds none. The fake `python3` answers a currency check itself, so it never takes one of the gate's answers, and
+the fake `gh` can write the merge's arguments NUL-separated. The fake `gh` serves page 1 of the statuses list as the first `per_page`
+statuses and builds the combined status from it as GitHub gave it when measured: each context once with its newest status, in pages of
+`per_page` contexts. It is offline, needs `jq`, and is Linux-only. A script edit that moves a decision site fails the module instead of
+leaving it untested.
 
 **The privacy scan (#975 P2-1).** Two kinds of identity are scanned for, each in these forms: the bare word, an identifier or path
 form (joined to other text by `-`, `_`, `.`, `/`, `\`, `@`, `:`, `~` or `=`, as in `project-<name>-tools` or `<name>@host`), a
@@ -458,3 +521,13 @@ above still hold; the schema's bytes are unchanged, sha256 `3ed09565…`); insta
 | Every page of check runs (Codex P2 at nas:289) | `cli/cli@v2.102.0` (the local upstream mirror at `fc4b137c`): `pkg/cmd/api/api.go`, `030eda84…`; `pkg/cmd/api/pagination.go`, `0565f3040ed1843875732e5df5dbc50fdbc90bb3b45685eabfd83c133b4c79b0`; `go.mod`, `115bc54638dc4fa5a72da79d9f87fca699ee5b1fc7e21ea9314a517fb18fb40b`; `github/rest-api-description@58b1e0c00b39:descriptions/api.github.com/api.github.com.json`, `da3d22e4…`; `github/docs@be38ec5d78e24172587e61b3c6ff40ace1865c71:content/rest/using-the-rest-api/using-pagination-in-the-rest-api.md`, `418bdf281d74a89c7dabedc4af53a6f7b286f2416e7670d9cc71453db08d8640` (the local upstream mirrors, read on 2026-10-11) | `api.github.com.json:55518`, `:55521` the list-for-ref endpoint takes `per_page` and `page`, `:344577-344585` `per_page` is "(max 100)", `:344616-344624` `page`, `:55563-55564` its reply carries a `Link` header, `:347322-347327` whose example names the next page with `rel="next"`; the docs, `:22` "You can use the `link` header from the response to request additional pages of data", `:28` the header is omitted "if all results fit on a single page", `:49` "The URL for the next page is followed by `rel="next"`"; `api.go:358-360` `--paginate` keeps a `per_page` the path has (`pagination.go:94-110`), `:431-470` asks for page after page while `pagination.go:17-24` finds `rel="next"`, `:362-371` with `--slurp` writes every page into one JSON array, `:260-273` `--slurp` needs `--paginate` and refuses `--jq`, so `nas_checks` runs jq itself on the array (gh's own `--jq` is go-gh's, `api.go:28`, on gojq, `go.mod:21`, `:141`), and `:546`, `:553-565` the body of a failed page is still written and gh exits non-zero, so its exit code is checked before jq reads. Measured on 2026-10-11 at `26f551b1` (43 runs): `per_page=10` gave 5 pages of 10, 10, 10, 10 and 3 runs, `total_count` 43 on each, the same 43 ids as one `per_page=100` page, the next link `filter=latest&per_page=10&page=2`, and the same four counts |
 | The newest status of each context, on every page (Codex P1 at nas:234) | `github/rest-api-description@58b1e0c00b39:descriptions/api.github.com/api.github.com.json`, `da3d22e4…`; `github/docs@be38ec5d78e24172587e61b3c6ff40ace1865c71:src/rest/data/fpt-2022-11-28/commits.json`, `57f0a021883f869390a022e41bdbe77267d5ebbdbf59849d2891380f5e363247` (the local upstream mirrors, read on 2026-10-11) | `api.github.com.json:55664-55667` `GET /repos/{owner}/{repo}/commits/{ref}/status`, "a combined view of commit statuses for a given ref", whose `state` is success "if the latest status for all contexts is `success`"; `:55687`, `:55690` it takes `per_page` and `page`; `:55694-55699` its reply is a `combined-commit-status`, `:148666-148707`, with `statuses` of `simple-commit-status` (`:148606`: `context`, `state` and a nullable `description`) and `total_count`; the docs' REST data, `commits.json:9530`, give the same text and parameters. Neither says the entries are one per context. Measured on 2026-10-11, read only: on 8 public heads (`kubernetes/kubernetes`, 2 to 35 statuses in 2 to 15 contexts) and on the 12 of our 80 heads that have statuses, every context appeared once, as the list's first (newest) status of it, and `total_count` was the number of contexts; with `per_page=5`, the first page of each of the 5 heads with 13 to 15 contexts carried a `Link` `rel="next"`, and `--paginate --slurp` gave the same entries as one page of 100 on all 8; on our 80 heads the combined read and the 3e6e7e46 read gave the same `trading-cc-read` state and description |
 | The connector's own layout and footer | `tests/fixtures/landing/codex-summary-comment.json`, `3918a25359d64ea4b2bcf31ec9ac9d92ff681270c072da6af625575eab720792` (the summary comment of nas#975 with its four revisions, masked by `mask_packet.py`'s rule with nothing to replace; the body's sha256 is `1236fe482740fa1ccdaac6d50d4e1e77f6a6e961d64e8dd5377a4923a6f8d0dc`) | a row of four cells (the review kind "📝 Code Review", the status "✅ Completed" with its time, the commit 761810d in backticks, the trigger kind "Manual request"), the Running form "🔄 Running since" with its time, the newest revision equal to the body, every editor the Bot `chatgpt-codex-connector`, and the footer "Codex reacts with 👀 while any review is running, comments if it has suggestions, and reacts with 👍 once all reviews finish with no findings" |
+
+The CC's patches of 2026-10-12 (#176 and the squash body). Read on 2026-10-12 from the local upstream mirrors at the pins given;
+installed: `gh` 2.102.0.
+
+| Mechanism | Source at the pin, sha256 | Lines read and what they say |
+| --- | --- | --- |
+| How `gh` takes the body file | `cli/cli@v2.102.0` (the local upstream mirror at `fc4b137c`): `pkg/cmd/pr/merge/merge.go`, `ca3849b4…`; `pkg/cmd/pr/merge/http.go`, `17eb5418a1771692864b8f7476947f088252ccde0037d089c9faf441ff7c8877`; `pkg/cmdutil/file_input.go`, `94076f6234180f85f2a555a5733e024146ea2c0cac54af19c86c72b015252828` | `merge.go:177` `--body-file` (`-F`), "Read body text from `file` (use "-" to read from standard input)", `:176` `--body`; `:138-144` the two are mutually exclusive; `:146-153` the file is read when the command starts and sets `BodySet`; `:292-293` the body goes into the merge payload; `http.go:72-75` a set body becomes the mutation's `CommitBody`, an empty one included; `file_input.go:8-16` `-` reads standard input, any other name the file |
+| The merge's body field | the GraphQL schema, `3ed09565…` | `schema.docs.graphql:26080-26082` `MergePullRequestInput.commitBody: String`, "Commit body to use for the merge commit; if omitted, a default message will be used" |
+| The squash default of both repositories | `github/rest-api-description@58b1e0c00b39:descriptions/api.github.com/api.github.com.json`, `da3d22e4…`; `github/docs@be38ec5d78e24172587e61b3c6ff40ace1865c71`: `content/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/configuring-commit-squashing-for-pull-requests.md`, `de95ca812994fdf9276ab499209bff15fc11e80d6740c78bdf96a30148ebb0ce`; `content/pull-requests/reference/pull-request-merges.md`, `731e80f541245c27b499b28de6760b3228d1bb7e924c4f8047a01a42aa238d81` | `api.github.com.json:138199-138208` `full-repository.squash_merge_commit_message`, one of `PR_BODY`, `COMMIT_MESSAGES` and `BLANK`, "`COMMIT_MESSAGES` - default to the branch's commit messages" (`:40076` the same setting in `repos/update`); `configuring-commit-squashing-for-pull-requests.md:23-26` the default message and its formats; `pull-request-merges.md:45-49` the default squash message comes from the repository settings and can be edited at the merge. Both repositories read `COMMIT_MESSAGES` at 2026-10-12T02:23:46Z |
+| Why the merge is validated here, and what would do it on GitHub's side | `github/docs@be38ec5d78e24172587e61b3c6ff40ace1865c71`: `data/reusables/pull_requests/merge-queue-overview.md`, `00008b55054578c947f05f8b17a6fdfdb809f826f511346c53c804038b5023da`; `content/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/managing-a-merge-queue.md`, `3ccb7ceb787e04077634c15ff7b5cf63641f20b0245341dcf31d6ac3511e382e`; `data/reusables/gated-features/merge-queue.md`, `a2e204a6f2c4f6bbc91fbc08a96d5c9f71485ba073dc1119a41e8efbc35a7290` | `merge-queue-overview.md:1` a merge queue ensures "the branch is never broken by incompatible changes", `:3` the same benefits as **Require branches to be up to date before merging**, `:7` it checks a pull request's changes "applied to the latest version of the target branch and any pull requests already in the queue"; `managing-a-merge-queue.md:84` the queue's temporary branches group a pull request with the latest base and the pull requests ahead of it; `gated-features/merge-queue.md:2` merge queues are available in organization-owned repositories only. The rules of both `main` branches (`strict_required_status_checks_policy`: `true` for the trading repository, `false` here) were read at 2026-10-12T02:23:46Z |

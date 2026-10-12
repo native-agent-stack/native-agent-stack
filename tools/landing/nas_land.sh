@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # CC landing for native-agent-stack (correction #118): the merge runs only after every gate passes, in this order.
-# usage: nas_land.sh <pr> <read-head-sha-prefix> <verdict-file> [<verdict-file> ...]
+# usage: [SQUASH_BODY_FILE=<file>] nas_land.sh <pr> <read-head-sha-prefix> <verdict-file> [<verdict-file> ...]
 # Order (#975 round 4): the landing lock -> early refusals (the head carries the read head's change, trading-cc-read, the verdict files) ->
 # slow steps (update-branch when BEHIND, ready, the Codex wait, the CI wait, the Codex gate before the validation, the merge onto the current
 # origin/main validated (again while main moves), the author address) -> final_gate, fast reads only (the head and its change, the verdict
@@ -10,10 +10,14 @@
 # longer complete and green), 6 timeout, 7 merge failed, 8 blocked by policy, 9 the Codex gate (codex_gate.py) gave neither 0 nor 5 (a 5
 # proceeds here): a review running or not finished since its latest trigger (its 3, after the 20-minute wait, before the validation or at
 # the final gate), a review that ended other than Completed or a summary last edited by another account (its 4), a gate that failed or is
-# missing, 10 the merge onto CURRENT origin/main fails scripts/validate.py or does not merge cleanly (2026-10-10).
+# missing, 10 the merge onto CURRENT origin/main fails scripts/validate.py or does not merge cleanly (2026-10-10), or fails one of
+# validate.yml's shard-0 currency checks whose script it holds (CC correction #176, 2026-10-12).
 # 11 the no-reply author address could not be formed (nothing merged), 12 merged, but the merge commit's author is not that address (correction #148).
 # 13 origin/main moved after each of three validations, moved after the last validation (final gate) or is unreadable (nothing merged; #975).
 # 14 another landing of this repository holds the landing lock, or the lock cannot be taken (nothing merged; #975 round 4).
+# SQUASH_BODY_FILE (the CC, 2026-10-12): when set, the squash commit's body is that file (gh pr merge --body-file), for a PR whose commit
+# messages carry a claim corrected after review (the repository's squash default is COMMIT_MESSAGES). A value that is not a readable,
+# non-empty regular file stops with exit 2 before the lock and any call.
 # Correction #136 (2026-10-10): verdict/record acceptance and change identity use the lg_* functions below (land-patches-20261010).
 # #975 P2-2 (2026-10-11): no text from gh or its API is printed. Every gh call drops its stderr, a failure ends in its step's fixed message and exit code, and gh api
 # writes an error response's body to stdout (cli v2.102.0 pkg/cmd/api/api.go:538-539 and :546), so a value read from it is shown only as a state word or a count.
@@ -29,6 +33,10 @@ R=seathatflowsinourveins/native-agent-stack
 N=${1:?pr}; E=${2:?read head}; shift 2
 [ $# -ge 1 ] || { echo "#$N no verdict file given: stop"; exit 2; }
 VF=("$@")  # #975 round 4: the verdict files, kept for final_gate (the CI loop's `set --` replaces the positional parameters)
+# gh reads the body file when the merge call starts, and "-" would make it read standard input (cli v2.102.0 pkg/cmd/pr/merge/merge.go:146-153,
+# pkg/cmdutil/file_input.go:8-15), so "-" is refused with every other value that is not a readable, non-empty regular file. The path is not printed.
+[ -z "${SQUASH_BODY_FILE:-}" ] || { [ "$SQUASH_BODY_FILE" != - ] && [ -f "$SQUASH_BODY_FILE" ] && [ -r "$SQUASH_BODY_FILE" ] && [ -s "$SQUASH_BODY_FILE" ]; } \
+  || { echo "#$N SQUASH_BODY_FILE is set but is not a readable, non-empty file (path withheld): stop, nothing merged"; exit 2; }
 # 2026-10-10: same-change tolerance (as uet_land.sh). A head that is a pure rebase or merge-update of the read head
 # (per-file changed lines identical, manifests/evidence.json excluded; CI arbitrates the registry) keeps the reads, and
 # a BEHIND branch is updated server-side (gh pr update-branch, merge method) instead of waiting for a lane push.
@@ -343,8 +351,13 @@ codex_wait() {
 # #975 (Codex P2 and GPT P2-C at af9d1901, 2026-10-11): validate.py's output is free text, so it is not printed. It goes to a file that mktemp
 # makes under TMPDIR (mode 0600), outside the worktree, so it outlives the worktree's removal, and exit 10 names that file and the exit code.
 # VBASE is the main the validation ran on.
+# CC correction #176 (2026-10-12): two PRs, each green on its own base, left main red when one changed a source of a generated artifact
+# that the other had bound (#1018 after #1007: final-stack.json), and validate.py does not run that check. After validate.py, the merge
+# runs validate.yml's shard-0 currency checks in the workflow's order (validate.yml:135-177), each only when its script is in the merge:
+# every shard-0 step that runs a Python script with --check, the gap-wave ledger's included (the CC's ruling of 2026-10-12; #176 had
+# left it out). A failing check is exit 10 as well, named by its command, its output kept as validate.py's is.
 merge_validate() {
-  local wt rc err
+  local wt rc err chk what=validate.py
   VBASE=
   $G fetch -q origin main "pull/$N/head" 2>/dev/null || { echo "#$N fetch failed: stop"; return 1; }
   wt=$(mktemp -d /var/tmp/nas-land-$N-XXXXXX 2>/dev/null) || { echo "#$N no temporary directory for the validation worktree: stop"; return 1; }
@@ -356,13 +369,25 @@ merge_validate() {
   fi
   err=$(mktemp "${TMPDIR:-/tmp}/nas-validate-XXXXXX" 2>/dev/null) || err=/dev/null
   (cd "$wt" 2>/dev/null && python3 -E -s -B scripts/validate.py >"$err" 2>&1); rc=$?
+  if [ "$rc" = 0 ]; then
+    for chk in "blueprints/blind-catalog-convergence/audit_reports.py --check" "tools/sota-convergence/build_verdicts.py --check" \
+               "scripts/component_matrix.py --check" "scripts/new_host_grand_list.py --check" "scripts/final_stack.py --check" \
+               "tools/sota-convergence/gap_crosswalk.py build --check" \
+               "tools/sota-convergence/gap_wave_ledger.py --wave gap-wave2-20260923 --wave gap-wave3-20260923 --owner gap-resolution --check" \
+               "scripts/build_ecosystem.py --check"; do
+      [ -f "$wt/${chk%% *}" ] || continue
+      what="the currency check $chk"
+      (cd "$wt" 2>/dev/null && python3 -E -s -B $chk >"$err" 2>&1); rc=$?
+      [ "$rc" = 0 ] || break
+    done
+  fi
   git -C "$wt" merge --abort >/dev/null 2>&1; $G worktree remove --force "$wt" >/dev/null 2>&1
   if [ "$rc" != 0 ]; then
-    [ "$err" = /dev/null ] && { echo "#$N validate.py on the merge with current main exited $rc; its output could not be kept, and is not echoed: stop"; return 1; }
-    echo "#$N validate.py on the merge with current main exited $rc; its output is kept only in local file ${err##*/} in the temp directory (0600), never echoed: stop"; return 1
+    [ "$err" = /dev/null ] && { echo "#$N $what on the merge with current main exited $rc; its output could not be kept, and is not echoed: stop"; return 1; }
+    echo "#$N $what on the merge with current main exited $rc; its output is kept only in local file ${err##*/} in the temp directory (0600), never echoed: stop"; return 1
   fi
   [ "$err" = /dev/null ] || rm -f -- "$err"
-  echo "#$N the merge onto current main validates (rc 0)"; return 0
+  echo "#$N the merge onto current main validates (rc 0: validate.py and the shard-0 currency checks whose scripts it holds)"; return 0
 }
 # #975 round 4 (the CC's micro at 761810d7: each gate could change between its last read and the merge, and each round-3 fix left the next
 # gap): after every slow step, final_gate reads every gate again, fast reads only and in this order, and nothing but the merge follows it:
@@ -439,7 +464,7 @@ for v in 1 2 3; do
 done
 ae=$(lg_author_email "$R") || { echo "#$N cannot form the no-reply author address (correction #148): stop, nothing merged"; exit 11; }
 final_gate "$cur"
-out=$(gh pr merge "$N" -R $R --squash --match-head-commit "$cur" -A "$ae" 2>&1) || { cls=$(printf '%s' "$out" | grep -o -i -E 'not mergeable|head branch was modified|required status check|review|draft|merge conflict|protected branch|rate limit|authentication|not found' | head -1 | tr 'A-Z ' 'a-z_'); mf=$(lg_keep merge-fail "$out") && kept="gh output kept only in local file $mf in the temp directory (0600), never echoed" || kept="gh output could not be kept, and is not echoed"; echo "#$N merge failed (class: ${cls:-other}); $kept (#975 P2-2)"; exit 7; }
+out=$(gh pr merge "$N" -R $R --squash --match-head-commit "$cur" -A "$ae" ${SQUASH_BODY_FILE:+--body-file "$SQUASH_BODY_FILE"} 2>&1) || { cls=$(printf '%s' "$out" | grep -o -i -E 'not mergeable|head branch was modified|required status check|review|draft|merge conflict|protected branch|rate limit|authentication|not found' | head -1 | tr 'A-Z ' 'a-z_'); mf=$(lg_keep merge-fail "$out") && kept="gh output kept only in local file $mf in the temp directory (0600), never echoed" || kept="gh output could not be kept, and is not echoed"; echo "#$N merge failed (class: ${cls:-other}); $kept (#975 P2-2)"; exit 7; }
 sleep 4
 echo "#$N $(gh pr view "$N" -R $R --json state,mergeCommit,mergedAt --jq '"\(.state) \(.mergeCommit.oid) \(.mergedAt)"' 2>/dev/null) (CI $ci ok)"
 lg_author_check "$R" "$N" "$ae" || exit 12

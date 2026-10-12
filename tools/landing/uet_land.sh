@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # CC landing for us-equities-trading (private, owned by one account, no merge queue; strict up-to-date + linear + squash).
-# usage: [VERDICT_FILES="…"] [GATES_DONE=<receipt>] [GPT_VERDICT=<verdict>] uet_land.sh <pr> <read-head-sha-prefix>
+# usage: [VERDICT_FILES="…"] [GATES_DONE=<receipt>] [GPT_VERDICT=<verdict>] [SQUASH_BODY_FILE=<file>] uet_land.sh <pr> <read-head-sha-prefix>
 # Order (#975 round 4): the landing lock -> early refusals (trading-cc-read, the verdict files, the head carries the read head's change) ->
 # slow steps (ready, the Codex wait, update-branch --rebase and the change check, the CI wait, the author address) -> final_gate, fast reads
 # only (the head and its change, the verdict files, trading-cc-read, the Codex gate, CI) -> the squash merge pinned to the head -> its author.
@@ -13,6 +13,9 @@
 # gate that failed or is missing; or it gave 5 without an accepted GPT_VERDICT, 11 the no-reply author address could not be formed
 # (nothing merged), 12 merged, but the merge commit's author is not that address (correction #148), 14 another landing of this repository
 # holds the landing lock, or the lock cannot be taken (nothing merged; #975 round 4).
+# SQUASH_BODY_FILE (the CC, 2026-10-12): when set, the squash commit's body is that file (gh pr merge --body-file), for a PR whose commit
+# messages carry a claim corrected after review (the repository's squash default is COMMIT_MESSAGES). A value that is not a readable,
+# non-empty regular file stops with exit 2 before the lock and any call.
 # Correction #136 (2026-10-10): verdict/record acceptance, change identity and the CI state use the lg_* functions below (land-patches-20261010).
 # #975 P2-2 (2026-10-11): no text from gh or its API is printed. Every gh call drops its stderr, a failure ends in its step's fixed message and exit code, and gh api
 # writes an error response's body to stdout (cli v2.102.0 pkg/cmd/api/api.go:538-539 and :546), so a value read from it is shown only as a state word or a count.
@@ -25,6 +28,10 @@ set -u
 {
 R=seathatflowsinourveins/us-equities-trading
 N=${1:?pr}; E=${2:?read head}
+# gh reads the body file when the merge call starts, and "-" would make it read standard input (cli v2.102.0 pkg/cmd/pr/merge/merge.go:146-153,
+# pkg/cmdutil/file_input.go:8-15), so "-" is refused with every other value that is not a readable, non-empty regular file. The path is not printed.
+[ -z "${SQUASH_BODY_FILE:-}" ] || { [ "$SQUASH_BODY_FILE" != - ] && [ -f "$SQUASH_BODY_FILE" ] && [ -r "$SQUASH_BODY_FILE" ] && [ -s "$SQUASH_BODY_FILE" ]; } \
+  || { echo "#$N SQUASH_BODY_FILE is set but is not a readable, non-empty file (path withheld): stop, nothing merged"; exit 2; }
 U=${LANDING_UET_REPO:-$HOME/code/us-equities-trading}; COORD=${LANDING_COORD:-${XDG_STATE_HOME:-$HOME/.local/state}/native-agent-stack/coordination}
 LG_GIT="git -C $U"
 # >>> land-gate-fns
@@ -379,7 +386,7 @@ done
 [ -n "$ci" ] || { echo "#$N CI timeout"; exit 6; }
 ae=$(lg_author_email "$R") || { echo "#$N cannot form the no-reply author address (correction #148): stop, nothing merged"; exit 11; }
 final_gate "$H"
-out=$(gh pr merge "$N" -R $R --squash --match-head-commit "$H" -A "$ae" 2>&1) || { cls=$(printf '%s' "$out" | grep -o -i -E 'not mergeable|head branch was modified|required status check|review|draft|merge conflict|protected branch|rate limit|authentication|not found' | head -1 | tr 'A-Z ' 'a-z_'); mf=$(lg_keep merge-fail "$out") && kept="gh output kept only in local file $mf in the temp directory (0600), never echoed" || kept="gh output could not be kept, and is not echoed"; echo "#$N merge failed (class: ${cls:-other}); $kept (#975 P2-2)"; exit 7; }
+out=$(gh pr merge "$N" -R $R --squash --match-head-commit "$H" -A "$ae" ${SQUASH_BODY_FILE:+--body-file "$SQUASH_BODY_FILE"} 2>&1) || { cls=$(printf '%s' "$out" | grep -o -i -E 'not mergeable|head branch was modified|required status check|review|draft|merge conflict|protected branch|rate limit|authentication|not found' | head -1 | tr 'A-Z ' 'a-z_'); mf=$(lg_keep merge-fail "$out") && kept="gh output kept only in local file $mf in the temp directory (0600), never echoed" || kept="gh output could not be kept, and is not echoed"; echo "#$N merge failed (class: ${cls:-other}); $kept (#975 P2-2)"; exit 7; }
 sleep 4
 echo "#$N $(gh pr view "$N" -R $R --json state,mergeCommit,mergedAt --jq '"\(.state) \(.mergeCommit.oid) \(.mergedAt)"' 2>/dev/null) (CI $ci ok)"
 lg_author_check "$R" "$N" "$ae" || exit 12

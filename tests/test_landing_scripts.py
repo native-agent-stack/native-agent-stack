@@ -71,6 +71,29 @@ STATUSES = ROOT / "tests/fixtures/landing/status-state.json"
 RUNNING_STATES = ("PENDING", "EXPECTED")
 UNLISTED_STATE = "FUTURE_STATE"  # synthetic: a state GitHub may add to StatusState later; the script must fail closed on it
 ADDRESS = "api-text-4e9b@example.invalid"  # synthetic: stands for an address that a status description or a gh or API diagnostic could carry
+# CC correction #176 (2026-10-12): the currency checks of validate.yml's shard 0 that nas's validation runs after validate.py, in that
+# order: every shard-0 step that runs a Python script with --check (the CC's ruling of 2026-10-12 added the gap-wave ledger's)
+CURRENCY_CHECKS = ("blueprints/blind-catalog-convergence/audit_reports.py --check", "tools/sota-convergence/build_verdicts.py --check",
+                   "scripts/component_matrix.py --check", "scripts/new_host_grand_list.py --check", "scripts/final_stack.py --check",
+                   "tools/sota-convergence/gap_crosswalk.py build --check",
+                   "tools/sota-convergence/gap_wave_ledger.py --wave gap-wave2-20260923 --wave gap-wave3-20260923 --owner gap-resolution --check",
+                   "scripts/build_ecosystem.py --check")
+
+
+def shard_0_python_checks(workflow):
+    """The commands, without `python3 `, of the workflow's shard-0 steps that run `python3 <script>.py ... --check`, in their order. A
+    step's run is one line or a folded `>-` block, whose lines YAML joins with spaces; a literal `|` block is a script, not one command."""
+    commands = []
+    for step in re.split(r"^      - ", Path(workflow).read_text(encoding="utf-8"), flags=re.M)[1:]:
+        if not re.search(r"^        if: matrix\.shard == 0$", step, re.M):
+            continue
+        single = re.search(r"^        run: (?![>|])(.+)$", step, re.M)
+        folded = re.search(r"^        run: >-\n((?:          \S.*\n?)+)", step, re.M)
+        run = single.group(1) if single else " ".join(line.strip() for line in folded.group(1).splitlines()) if folded else ""
+        found = re.fullmatch(r"python3 (\S+\.py(?: .+)? --check)", run)
+        if found:
+            commands.append(found.group(1))
+    return tuple(commands)
 
 
 def setUpModule():
@@ -107,6 +130,8 @@ def q(path):
 # #975 round 4: FAKE_GH_HOOK runs (sh -c) before every call that matches the glob FAKE_GH_HOOK_ON, so a test can change GitHub-side or
 # local data at one step (the flip suite does it at the author-address lookup, the last slow step before final_gate). `gh api graphql`
 # answers only the review-thread count; any other query fails, as for a gate that runs against this fake.
+# SQUASH_BODY_FILE (the CC, 2026-10-12): FAKE_MERGE_ARGV, when set, names a file that `gh pr merge` writes its arguments to, each ended
+# by a NUL byte, so a test sees argument boundaries that FAKE_LOG's one line cannot show (a body file whose path has a space).
 FAKE_GH = r'''#!/usr/bin/env bash
 [ -n "${FAKE_LOG:-}" ] && printf 'gh %s\n' "$*" >> "$FAKE_LOG"
 if [ -n "${FAKE_GH_HOOK:-}" ] && [[ "$*" == ${FAKE_GH_HOOK_ON:-} ]]; then sh -c "$FAKE_GH_HOOK"; fi
@@ -153,7 +178,8 @@ case "$1 $2" in
     exec jq -r "$prog" "$FAKE_PRVIEW" ;;
   "pr ready") exit 0 ;;
   "pr update-branch") exit "${FAKE_UPDATE_RC:-0}" ;;
-  "pr merge") printf '%s\n' "${FAKE_MERGE_STDOUT-merged}"; [ -z "${FAKE_MERGE_STDERR:-}" ] || printf '%s\n' "$FAKE_MERGE_STDERR" >&2
+  "pr merge") [ -z "${FAKE_MERGE_ARGV:-}" ] || printf '%s\0' "$@" > "$FAKE_MERGE_ARGV"
+              printf '%s\n' "${FAKE_MERGE_STDOUT-merged}"; [ -z "${FAKE_MERGE_STDERR:-}" ] || printf '%s\n' "$FAKE_MERGE_STDERR" >&2
               exit "${FAKE_MERGE_RC:-0}" ;;
   *) exit 1 ;;
 esac
@@ -162,6 +188,9 @@ esac
 # FAKE_REAL_PYTHON, when set, runs the real codex_gate.py with that interpreter instead of the canned answer (its gh is the fake gh).
 # #975 round 3: FAKE_GATE_HOOK runs before each gate call's answer and FAKE_VALIDATE_HOOK before each validation's, so a test can change
 # GitHub-side data (a status, a record, origin's main) while a landing waits; FAKE_VALIDATE_OUT is the validation's output.
+# CC correction #176 (2026-10-12): a currency check that nas's validation runs after validate.py (`... <script> [build] --check`) is
+# answered here and never by the gate's answers below: exit 0, or, when its arguments match the glob FAKE_CHECK_FAIL, FAKE_CHECK_OUT and
+# exit FAKE_CHECK_RC (default 1). FAKE_VALIDATE_HOOK runs in the validation's worktree, so it can put a check's script in the merge.
 FAKE_PYTHON3 = r'''#!/usr/bin/env bash
 printf 'python3 %s\n' "$*" >> "$FAKE_LOG"
 case "$*" in
@@ -170,6 +199,8 @@ case "$*" in
                          echo "${FAKE_VALIDATE_OUT:-validate stub}"; exit "${FAKE_VALIDATE_RC:-0}" ;;
   *codex_gate.py*) [ -z "${FAKE_GATE_HOOK:-}" ] || sh -c "$FAKE_GATE_HOOK"
                    [ -z "${FAKE_REAL_PYTHON:-}" ] || exec "$FAKE_REAL_PYTHON" "$@" ;;
+  *" --check") if [ -n "${FAKE_CHECK_FAIL:-}" ] && [[ "$*" == $FAKE_CHECK_FAIL ]]; then echo "${FAKE_CHECK_OUT:-check stub}"; exit "${FAKE_CHECK_RC:-1}"; fi
+               echo "check stub"; exit 0 ;;
 esac
 rc=${FAKE_GATE_RC:-0}
 if [ -n "${FAKE_GATE_SEQ:-}" ]; then
@@ -650,13 +681,48 @@ class ScriptTextTests(LandingCase):
                 self.assertIn(f"--match-head-commit {pinned}", script.lines[merge])
                 self.assertEqual(script.text.count("\nfinal_gate "), 1)
 
+    def test_nas_runs_the_currency_checks_of_validate_ymls_shard_0_in_the_workflows_order(self):
+        # CC correction #176 (2026-10-12): merge_validate ran validate.py alone, and #1018 landed on #1007 with final_stack.py --check
+        # failing. It runs every shard-0 step of .github/workflows/validate.yml that runs a Python script with --check, as that step runs
+        # it and in its order; the CC's ruling of 2026-10-12 added the gap-wave ledger's, a folded `run: >-` step #176's list left out.
+        body = self.nas.cut(r"^merge_validate\(\) \{$", r"^\}$")
+        self.assertEqual(tuple(re.findall(r'"([^"]+ --check)"', body)), CURRENCY_CHECKS)
+        self.assertEqual(shard_0_python_checks(ROOT / ".github/workflows/validate.yml"), CURRENCY_CHECKS)
+
+    def test_the_workflow_reader_takes_one_line_and_folded_runs_and_nothing_else(self):
+        # The reader behind the test above, on a synthetic workflow: a one-line and a folded --check step of shard 0 count, in order; a
+        # step of another shard, a literal block, a report-only run that does not end with --check and a non-Python check do not.
+        workflow = self.write("validate.yml", "jobs:\n  validate:\n    steps:\n"
+                              "      - name: a\n        if: matrix.shard == 0\n        run: python3 a/one.py --check\n"
+                              "      - name: b\n        if: matrix.shard == 1\n        run: python3 b/other.py --check\n"
+                              "      - name: c\n        if: matrix.shard == 0\n        # a comment\n        run: >-\n"
+                              "          python3 c/folded.py\n          --wave w --check\n"
+                              "      - name: d\n        if: matrix.shard == 0\n        run: |\n          python3 d/script.py --check\n"
+                              "      - name: e\n        if: matrix.shard == 0\n        run: python3 e/report.py --check --today x | tee s\n"
+                              "      - name: f\n        if: matrix.shard == 0\n        run: sha256sum --check --strict SHA256SUMS\n")
+        self.assertEqual(shard_0_python_checks(workflow), ("a/one.py --check", "c/folded.py --wave w --check"))
+
+    def test_the_provenance_section_carries_a_digest_only_for_the_repository_copies(self):
+        # CC correction #161 and the CC's ruling of 2026-10-12: a digest of a file whose only non-public bytes are host paths confirms a
+        # guessed path offline. The live copies hold the CC host's paths, so the section gives their line counts and no digest; a 64-hex
+        # digest stands only in the "Here" column, the repository copies as committed. At 86fa3844 seven stood in the live-copy columns.
+        readme = (LANDING / "README.md").read_text(encoding="utf-8")
+        section = readme.split("## Provenance and digests", 1)[1].split("\n## ", 1)[0]
+        digest = r"(?<![0-9a-f])[0-9a-f]{64}(?![0-9a-f])"
+        here = []
+        for line in section.splitlines():
+            if re.match(r"\| `(uet_land\.sh|nas_land\.sh|codex_gate\.py)` \|", line):
+                here += re.findall(digest, line.rstrip(" |").rsplit("|", 1)[1])
+        self.assertEqual(len(here), 3, "each row's last cell holds its file's digest as committed")
+        self.assertEqual(sorted(re.findall(digest, section)), sorted(here))
+
     def test_readme_names_every_variable_and_exit_code_the_scripts_use(self):
         readme = (LANDING / "README.md").read_text(encoding="utf-8")
         for script in (self.uet, self.nas):
             with self.subTest(script=script.key):
                 for name in sorted(set(re.findall(r"\bLANDING_[A-Z_]+\b", script.text))):
                     self.assertIn(f"`{name}`", readme)
-                for name in ("VERDICT_FILES", "GATES_DONE", "GPT_VERDICT"):
+                for name in ("VERDICT_FILES", "GATES_DONE", "GPT_VERDICT", "SQUASH_BODY_FILE"):
                     if name in script.text:
                         self.assertIn(f"`{name}`", readme)
                 section = readme.split("## Exit codes", 1)[1].split("\n## ", 1)[0]
@@ -2876,6 +2942,92 @@ class EndToEndTests(LandingCase):
                 self.assertEqual((code, self.merge_calls(log)), (expected, []), out)
                 self.assertNotIn(str(self.dir), out, "no path is printed")
                 self.assertNotIn("/home/example", out)
+
+    # ------------------------------------------------------------------------------------------ the CC's live patches of 2026-10-12
+    def plant(self, checks):
+        """A FAKE_VALIDATE_HOOK that puts each check's script into the validation's worktree, where the hook runs, as a merge holds it."""
+        scripts = [check.split(" ", 1)[0] for check in checks]
+        return " && ".join(f"mkdir -p {q(Path(script).parent)} && : > {q(script)}" for script in scripts)
+
+    def check_calls(self, log):
+        prefix = "python3 -E -s -B "
+        return [line[len(prefix):] for line in log if line.startswith(prefix) and line.endswith(" --check")]
+
+    def test_nas_stops_with_10_when_the_merge_passes_validate_py_but_fails_a_currency_check(self):
+        # CC correction #176: #1007 bound a file's sha256 in final-stack.json and #1018 changed the file; each was green on its own base,
+        # validate.py passed on the merge, #1018 landed and main's shard 0 failed on final_stack.py --check. At 86fa3844 this landing merged
+        # (exit 0, one merge) and ran no check. The checks before the failing one run, the rest do not, and its output stays in the 0600 file.
+        tmp = self.dir / f"tmp-{next(self.counter)}"
+        tmp.mkdir()
+        output = f"final-stack.json is stale: {ADDRESS} /home/example/secret"
+        code, out, log = self.land(self.nas, FAKE_VALIDATE_HOOK=self.plant(CURRENCY_CHECKS), FAKE_CHECK_FAIL="*scripts/final_stack.py --check",
+                                   FAKE_CHECK_OUT=output, TMPDIR=str(tmp))
+        self.assertEqual((code, self.merge_calls(log)), (10, []), out)
+        self.assertEqual([line for line in log if "validate.py" in line], ["python3 -E -s -B scripts/validate.py"], "validate.py ran and passed")
+        self.assertEqual(self.check_calls(log), list(CURRENCY_CHECKS[:5]), "in validate.yml's order, up to the failing check")
+        kept = sorted(tmp.glob("nas-validate-*"))
+        self.assertEqual(len(kept), 1, out)
+        self.assertEqual(stat.S_IMODE(kept[0].stat().st_mode), 0o600)
+        self.assertEqual(kept[0].read_text(encoding="utf-8"), f"{output}\n")
+        self.assertIn(f"#{PR} the currency check scripts/final_stack.py --check on the merge with current main exited 1; its output is kept only "
+                      f"in local file {kept[0].name} in the temp directory (0600), never echoed: stop", out)
+        for text in ("example.invalid", "/home/example", "stale"):
+            self.assertNotIn(text, out)
+        self.assertEqual(sorted(Path("/var/tmp").glob(f"nas-land-{PR}-*")), [], "the worktree is removed")
+
+    def test_nas_runs_each_currency_check_whose_script_the_merge_holds_and_then_lands(self):
+        # CC correction #176, the other side: a check runs only when its script is in the merge (the fixture's tree holds none, and none
+        # runs), once per validation, and a landing whose checks all pass merges.
+        code, out, log = self.land(self.nas)
+        self.assertEqual((code, len(self.merge_calls(log)), self.check_calls(log)), (0, 1, []), out)
+        held = [check for check in CURRENCY_CHECKS if "gap_crosswalk" not in check]
+        code, out, log = self.land(self.nas, FAKE_VALIDATE_HOOK=self.plant(held))
+        self.assertEqual((code, len(self.merge_calls(log)), self.check_calls(log)), (0, 1, held), out)
+        self.assertIn(f"#{PR} the merge onto current main validates (rc 0: validate.py and the shard-0 currency checks whose scripts it holds)", out)
+
+    def test_a_squash_body_file_that_is_not_a_readable_non_empty_file_stops_both_scripts_with_2_before_any_call(self):
+        # SQUASH_BODY_FILE (the CC, 2026-10-12): the CC's live copies check the file before any gate. At 86fa3844 the scripts did not read
+        # the variable, and each of these landed (exit 0, one merge, with the default body). "-" would make gh read standard input.
+        home = self.dir / f"home-{next(self.counter)}/home/example"
+        home.mkdir(parents=True)
+        empty = home / "empty.md"
+        empty.write_bytes(b"")
+        unreadable = home / "unreadable.md"
+        unreadable.write_text("The squash body.\n", encoding="utf-8")
+        cases = [("missing", home / "missing.md"), ("empty", empty), ("a directory", home), ("standard input", "-")]
+        if os.geteuid() != 0:  # root reads a file with mode 000
+            cases.append(("unreadable", unreadable))
+        unreadable.chmod(0)
+        try:
+            for script in (self.uet, self.nas):
+                for name, path in cases:
+                    with self.subTest(script=script.key, body=name):
+                        code, out, log = self.land(script, SQUASH_BODY_FILE=str(path))
+                        self.assertEqual((code, log), (2, []), out)
+                        self.assertIn(f"#{PR} SQUASH_BODY_FILE is set but is not a readable, non-empty file (path withheld): stop, nothing merged", out)
+                        self.assertNotIn("/home/example", out)
+        finally:
+            unreadable.chmod(0o600)
+
+    def test_a_squash_body_file_is_passed_to_the_merge_as_one_body_file_argument(self):
+        # SQUASH_BODY_FILE (the CC, 2026-10-12): both repositories' squash default is COMMIT_MESSAGES, so a commit message that carries a
+        # claim corrected after review would land; the merge takes its body from the file instead. At 86fa3844 the merge call had no
+        # --body-file. An empty value is the same as none, and the path is never printed.
+        body = self.dir / f"body {next(self.counter)}/squash body.md"
+        body.parent.mkdir()
+        body.write_text("The squash body, corrected after review.\n", encoding="utf-8")
+        for script, repo in ((self.uet, UET_REPO), (self.nas, NAS_REPO)):
+            merge = f"gh pr merge {PR} -R {repo} --squash --match-head-commit {self.head} -A {NOREPLY}"
+            with self.subTest(script=script.key, body="a file whose path has a space"):
+                argv = self.dir / f"argv-{next(self.counter)}"
+                code, out, log = self.land(script, SQUASH_BODY_FILE=str(body), FAKE_MERGE_ARGV=str(argv))
+                self.assertEqual((code, self.merge_calls(log)), (0, [f"{merge} --body-file {body}"]), out)
+                self.assertEqual(argv.read_bytes().split(b"\0")[:-1], [os.fsencode(part) for part in (
+                    "pr", "merge", PR, "-R", repo, "--squash", "--match-head-commit", self.head, "-A", NOREPLY, "--body-file", str(body))])
+                self.assertNotIn(str(body), out)
+            with self.subTest(script=script.key, body="an empty value"):
+                code, out, log = self.land(script, SQUASH_BODY_FILE="")
+                self.assertEqual((code, self.merge_calls(log)), (0, [merge]), out)
 
 
 if __name__ == "__main__":
