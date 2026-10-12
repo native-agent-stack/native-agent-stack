@@ -57,9 +57,9 @@ except ImportError:
     NATIVE = False
 
 try:  # package mode (python -m unittest tests.x) or discover -s tests (top-level modules)
-    from .adaptive_paper_hermetic import patch_default_stop, restore_default_stop
+    from .adaptive_paper_hermetic import FixtureClock, patch_default_stop, restore_default_stop
 except ImportError:
-    from adaptive_paper_hermetic import patch_default_stop, restore_default_stop  # noqa: E402
+    from adaptive_paper_hermetic import FixtureClock, patch_default_stop, restore_default_stop  # noqa: E402
 
 _HERMETIC_TOKEN = None
 
@@ -1058,10 +1058,11 @@ class MoverLaneFees(FeePrivacyCapture, unittest.TestCase):
         self.after_checkpoint = None
         self.start_cash = D("100000")
         self.time_offset = 0
+        self.clock = FixtureClock()     # every command of the test runs on it (run_command)
 
     def post_fees(self):
         """The broker posts the measured FEE activities now: cash falls by 0.47 and the rows are listed."""
-        created = time.time()
+        created = self.clock.time() + self.time_offset   # the clock the commands read
         self.posted.extend((created, row) for row in measured_rows())
         if self.broker is None:
             self.start_cash -= D("0.47")
@@ -1101,7 +1102,6 @@ class MoverLaneFees(FeePrivacyCapture, unittest.TestCase):
         import transport
         out = Path(root) / f"{trial or command}.json"
         real_load_scan, real_build_plan = mover_runner.load_scan, mover_runner.build_plan
-        real_time = time.time
 
         def compressed_plan(settings, limits, scan, session, *, t0, **kwargs):
             timing = mover.Timing(t0, t0 + 2.0, 1.0, 1.0, t0 + 4.0, t0 + 8.0, None, 1.5)
@@ -1171,7 +1171,8 @@ class MoverLaneFees(FeePrivacyCapture, unittest.TestCase):
                  patch.object(mover_runner, "build_plan", compressed_plan), \
                  patch.object(mover_runner, "_controller_session", lambda close, now, policy: (now + 36000, True)), \
                  native_pre_dispatch(), \
-                 (patch("time.time", lambda: real_time() + self.time_offset) if checkpoint_seam else nullcontext()), \
+                 self.clock.patched(), \
+                 (patch("time.time", lambda: self.clock.time() + self.time_offset) if checkpoint_seam else nullcontext()), \
                  (patch.object(mover_runner, "run_mover", reconciled_trial) if checkpoint_seam else nullcontext()), \
                  (patch.object(mover_runner, "recover_mover", reconciled_recovery) if checkpoint_seam else nullcontext()):
                 code = mover_runner.main(args)
@@ -1276,7 +1277,7 @@ class MoverLaneFees(FeePrivacyCapture, unittest.TestCase):
             _, limits, _ = mover_runner.load_mover_config(config)
             ledger = Ledger(state / "ledger.sqlite3", limits)
             try:
-                now = time.time()
+                now = self.clock.time()
                 for _ in range(limits.max_rest_per_minute):
                     self.assertEqual(ledger.request_budget(now, "read"), 0)
             finally:
@@ -1363,6 +1364,18 @@ class MoverLaneFees(FeePrivacyCapture, unittest.TestCase):
             self.assertEqual(D(totals["ledger_realized_pnl_delta_usd"]), D(totals["realized_pnl_usd"]) + D("-0.47"))
             self.assertTrue(totals["pnl_consistent"], totals)
             self.assertNotIn(ACCOUNT_TEXT, json.dumps(receipt))
+
+    def test_a_mover_trial_keeps_the_fixture_clock_after_20_et(self):
+        # Around the command the clock reads Sunday 2026-10-11 20:05 ET, Monday's OVERNIGHT session,
+        # where the controller refuses every order that lacks an overnight asset status (none is
+        # supplied): a trial on that clock would end completed_no_signals.
+        night = FixtureClock(datetime(2026, 10, 12, 0, 5, tzinfo=timezone.utc).timestamp())
+        with tempfile.TemporaryDirectory() as root:
+            config = self.fast_config(root)
+            (Path(root) / "scan.json").write_bytes(scan_raw([scan_row("AAA", 1, "10.00")]))
+            with night.patched():
+                code, receipt = self.run_command(root, "night-1", config=config)
+            self.assertEqual((code, receipt["status"], receipt["flat"]), (0, "passed", True), receipt.get("error_reason"))
 
 
 if __name__ == "__main__":
