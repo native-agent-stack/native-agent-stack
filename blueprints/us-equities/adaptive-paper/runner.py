@@ -378,10 +378,16 @@ def strategy_pool_and_selector(config, registry_entries, *, session="regular"):
     return pool, selector
 
 
+T22_PAPER_DISPATCH_VERSION = "t22-exploratory-v1"
+
+
 def load_config(path, *, registry_path=None):
     c = json.loads(Path(path).read_text())
     is_exploratory(c)
     apply_exit_preset(c, "adaptive")
+    if "t22" in c:
+        from t22_dispatch import load_dispatch
+        c["_t22"] = load_dispatch(c, path)
     require_qualified_stream(c["feed"])
     # G-e: leverage above 1x is refused exactly as before UNLESS a
     # "leverage_policy" block is present, in which case it is deferred to
@@ -1674,6 +1680,10 @@ def _final_corporate_action_guard_summary(strategy, held_symbols, now):
 
 async def run_native(controller, policy_config, assets, trial_id, config, baseline_cash, *, account_fingerprint="simulation",
                      log_directory=None, ca_refresh_state=None):
+    if "_t22" in config:
+        from t22_dispatch import run
+        return await run(controller, assets, config, baseline_cash,
+                         account_fingerprint=account_fingerprint, log_directory=log_directory)
     from native_adapter import build_node
     from native_strategy import AdaptiveStrategy
     # R5: use the same registry entries load_config already validated (and
