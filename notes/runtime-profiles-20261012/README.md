@@ -347,3 +347,38 @@ did not preserve eighteen reasons; a bounded skip-only replay selects the
 same nineteen cases and records each reason in the PR description. Skips do
 not establish readiness. The new native DB test also skips without an explicit
 installed OpenCode binary; the author supplied it for the passing native run.
+# Role-level no-MCP generation (W6 prerequisite)
+
+`prepare --no-mcp-role reviewer` generates the reviewer-scoped profile with
+zero MCP servers and removes every imported MCP grant before native role
+translation. Repeat the option for another scope. Unscoped and other scoped
+profiles retain the required Context Mode server; `--no-role-scoped` with this
+option is refused before writes. Native read/find/grep (OpenCode: read/glob/grep),
+role text, models, effort and package/skill preloads remain unchanged. Existing
+profile files are not edited; prepare into a fresh state root.
+
+Pi's resulting role launch uses its native `--no-mcp`, documented at
+`earendil-works/pi@04566631:packages/coding-agent/docs/cli.md:198-199` (built-in
+MCP support). OpenCode receives `mcp: {}`; its source enumerates configured
+servers at `anomalyco/opencode@53d1eabb:packages/opencode/src/mcp/index.ts:496,
+505-522`, matching `packages/web/src/content/docs/mcp-servers.mdx:24-26`.
+Vendor skill-package preparation is unchanged; optional here means the server
+configuration is not required for that flagged role profile. This generated
+configuration test does not replace the post-landing zero-spend wire checks.
+
+Guard controls in `tests/test_runtime_nomcp.py`:
+
+- Removing server clearing or MCP-grant filtering fails
+  `test_flag_removes_servers_and_every_mcp_grant_preserving_native_tools_and_prompt`.
+- Relaxing the ordinary Context Mode requirement fails
+  `test_context_mode_stays_required_without_flag_for_every_scope_and_runtime`.
+- Dropping native Read fails the same preservation test; native Pi argv is also
+  covered by `test_pi_launch_uses_native_no_mcp_with_the_unchanged_review_builtins`.
+- `test_no_mcp_role_accepts_templates_without_context_mode` exercises the
+  explicit role-only exception; `test_unscoped_no_mcp_is_refused_without_writes`
+  keeps the exception scoped, and the CLI test covers all 20 generated profiles.
+
+This option is a CC-approved W6 prerequisite, separate from the frozen A and
+D-SDK arms and #1054's deferred environment/lifecycle fixes. B/C and D-Pi are
+reprepared only after this generator change lands and the co-op relays LANDED.
+No comparison case, oracle or CORPUS is opened by these synthetic tests.
