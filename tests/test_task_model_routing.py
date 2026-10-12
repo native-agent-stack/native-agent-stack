@@ -55,7 +55,8 @@ CITE = re.compile(rf"`([\w./-]+\.{EXTENSIONS}):(\d+(?:-\d+)?(?:,\d+(?:-\d+)?)*)`
 SAYS = re.compile(rf"`([\w./-]+\.{EXTENSIONS}):(\d+)(?:-(\d+))?` says ([^;]+)")
 # GPT-6.1 Sol's configured routes: Sol/Ultra coordinates Codex and Sol/Max runs the primary workers. Generic children
 # inherit their active parent's model, with Max effort, so they do not form a globally Sol-pinned route.
-SOL_ROUTES = {"interactive codex": "ultra", "primary codex workers": "max"}
+SOL_ROUTES = {"interactive codex": "ultra", "primary codex workers": "max",
+              "pi/opencode worker trials": "high"}
 USER_TEMPLATE = "adoption/templates/codex.config.template.toml"
 STACK_WORKER = "adoption/templates/codex.stack-worker.config.toml"
 PLACEHOLDER = "${CODEX_MODEL}"
@@ -86,6 +87,7 @@ TABLE_HEADER = re.compile(r"\[[^\[\]]+\]")
 D4_BINDINGS = {(USER_TEMPLATE, "model"),
                ("tools/adoption/render_config.py", "CODEX_MODEL_CURRENT"), (STACK_WORKER, "model")}
 D4_COMMAND = "-p stack-worker -m"
+TRIAL_BINDINGS = {("tools/adoption/runtime_profiles.py", "GPT_MODEL")}
 
 
 def table(text: str) -> tuple[list[str], list[list[str]]]:
@@ -201,7 +203,7 @@ def routing_problems(rows: list[list[str]], texts: dict[str, str]) -> list[str]:
     for (path, name), count in sorted((bound - cited).items()):
         problems += [f"{path}: {name} binds GPT-6.1 and no Sol row cites it"] * count
     problems += [f"{path}: {name} is cited by a Sol row, but D4 routes GPT-6.1 to no such binding"
-                 for path, name in sorted(cited) if (path, name) not in D4_BINDINGS and name != D4_COMMAND]
+                 for path, name in sorted(cited) if (path, name) not in D4_BINDINGS | TRIAL_BINDINGS and name != D4_COMMAND]
     return problems
 
 
@@ -269,7 +271,8 @@ class TaskModelRoutingRecordTests(unittest.TestCase):
         for route, wanted in SOL_ROUTES.items():
             with self.subTest(route=route):
                 [row] = [row for row in sol if route in row[0].lower()]
-                self.assertEqual((row[1], effort(row)), ("Codex CLI", wanted))
+                client = "Pi / OpenCode (trial)" if route == "pi/opencode worker trials" else "Codex CLI"
+                self.assertEqual((row[1], effort(row)), (client, wanted))
         # Nowhere else, binding by binding: each GPT-6.1 binding in a routing file is one a Sol row cites by file and
         # name, and one D4 makes. The scan must find the user template's coordinator key by table and the stack-worker
         # profile's `model`, while the generic-child model stays unbound.

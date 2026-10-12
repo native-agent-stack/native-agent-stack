@@ -135,6 +135,16 @@ lines up to its 2026-09-28 addendum are the same at both. A later edit can move 
 | Complex-workflow coordination: a Codex task that needs Astra to coordinate it | Codex CLI | GPT-6 Astra (`gpt-6-astra`) | ultra: proactive delegation at the model's `xhigh` | **Instruction only**: chosen per task under D4's routing record; no file binds it, since the user template's model is the coordinator row's `CODEX_MODEL` | `docs/decisions/2026-09-30-sol-primary-quality-defaults.md:14-17`; `docs/decisions/2026-09-27-model-currency.md:451` |
 | Escalation to a single consequential judgment: conflicting primary evidence, a consequential architecture decision, a complex change across systems, or a failure unresolved after one bounded Sol repair | Codex CLI | GPT-6 Astra (`gpt-6-astra`) | max | **Instruction only**: the worker substitutes the model on its command line, as the stack-worker profile's header says: `adoption/templates/codex.stack-worker.config.toml:4` says `substitute -m gpt-6-astra and keep max effort` | `docs/decisions/2026-09-30-sol-primary-quality-defaults.md:17-20`; `docs/decisions/2026-09-30-sol-primary-quality-defaults.md:38-49`; `docs/decisions/2026-09-27-model-currency.md:451` |
 
+| Pi/OpenCode worker trials: isolated runtime acceptance and the preregistered W6 arms | Pi / OpenCode (trial) | GPT-6.1 Sol (`gpt-6.1-sol`) through the `cx/` OmniRoute route | high | **Trial configuration**, not a standing D4 role change: `tools/adoption/runtime_profiles.py:37` says `GPT_MODEL = "cx/gpt-6.1-sol"`; the four profiles retain native model/effort flags and remain trial | CC ruling runtime-profiles-and-invoke-gap20261012 addendum01; `notes/runtime-profiles-20261012/README.md:1`; `notes/runtime-profiles-20261012/W6-PREREGISTRATION.md:1` |
+
+### Addendum (2026-10-12): isolated runtime trial binding
+
+The added Pi/OpenCode row records the CC's named trial model and effort. It
+does not replace the two globally configured Codex Sol routes, promote a trial
+runtime or authorize a comparative run before its sealed packet and CC cue.
+The consistency check distinguishes this explicit trial binding from D4's
+standing bindings; every other new GPT-6.1 binding still requires a cited row.
+
 ### Addendum (2026-10-09): generic-child enforcement restated
 
 The generic-child row replaces the historical template quote at lines 30–31.

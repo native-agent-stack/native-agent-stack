@@ -5,7 +5,7 @@
   "evidence_class": "local_integration",
   "focused_repository_tests": {
     "profile_command": "python3 -B -m unittest discover -s tests -p test_runtime_profiles.py -q",
-    "profile_tests": 12,
+    "profile_tests": 16,
     "profile_exit_code": 0,
     "tracker_command": "python3 -B -m unittest discover -s tests -p test_runtime_usage.py -q",
     "tracker_tests": 17,
@@ -13,6 +13,14 @@
     "wsl_module_command": "python3 -B -m unittest discover -s tests -p test_new_wsl_client_config.py -q",
     "wsl_module_tests": 231,
     "wsl_module_exit_code": 0,
+    "codex_worker_lane_tests": 123,
+    "codex_worker_lane_exit_code": 0,
+    "codex_worker_lane_expected_skips": 12,
+    "landscape_sweep_harness_tests": 289,
+    "landscape_sweep_harness_exit_code": 0,
+    "landscape_sweep_expected_skips": 3,
+    "task_model_routing_tests": 10,
+    "task_model_routing_exit_code": 0,
     "fail_before": ["OmniRoute template 20128 differs from committed live gateway21128", "existing tracker rejects --runtime-log", "foreign-session/user-forged interactive exports counted before ownership checks"]
   },
   "pi_otel_upstream": {
@@ -42,6 +50,16 @@
     "gitleaks_receipt_set_exit_code": 0,
     "native_config_auth_session_lock_roots_copied_hashed_or_published": false,
     "private_input_digests_published": false
+  },
+  "implementation_review": {
+    "reviewed_head": "58a05d0313b5e9f1b7183831637dfc0ed281120f",
+    "gpt_verdict": "CHANGES_REQUESTED",
+    "reproduced_p2s": ["interactive OpenCodeClaude collector XDG", "ungranted native Skill helper", "Unicode JSONLF framing", "mandatory Pi MCP readiness"],
+    "regression_before": {"tests": 4, "failure_events": 5, "exit_code": 1, "scope": "exact-head synthetic reviewer fixture; no native auth/session reads"},
+    "local_fix_profile_tests": 16,
+    "local_fix_exit_code": 0,
+    "claude_attempt": {"exit_code": 124, "final_response": false, "actual_cost_usd": null, "cost_status": "UNVERIFIED: timeout without final native receipt"},
+    "remaining_reads": "CC-owned Claude and co-op-cut Astra FIRST at the fix head; no further lane self-dispatch"
   },
   "limitations": [
     "Version/help invocations prove executable wiring only, not functional web/browser/quality acceptance",

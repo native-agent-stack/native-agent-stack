@@ -18227,8 +18227,8 @@
     },
     {
       "path": "docs/decisions/2026-09-30-task-model-routing.md",
-      "sha256": "0fcd4c4d3ddf7f23121ff85f58dc23a2d4c5ac543044949f9342a129e11085d4",
-      "bytes": 44901
+      "sha256": "50c892881462fd061eee0c1dfd6983ca63de9f9da3ccf4d2e4b0886cc48f1846",
+      "bytes": 45902
     },
     {
       "path": "docs/decisions/2026-10-01-definitive-sota-wsl-program.md",
@@ -60622,8 +60622,8 @@
     },
     {
       "path": "notes/runtime-profiles-20261012/README.md",
-      "sha256": "7552add04a5ed2f096fc201c15d4d3632753d599302b08112325ab4d0f9c2b5f",
-      "bytes": 5019
+      "sha256": "17375ca14efbdc29293617a48cb71d253f28fda518259bcbeaf6dfbf235534c8",
+      "bytes": 5857
     },
     {
       "path": "notes/runtime-profiles-20261012/REPLAY-SOURCES.md",
@@ -60722,8 +60722,8 @@
     },
     {
       "path": "notes/runtime-profiles-20261012/receipts/qualification.json",
-      "sha256": "c35a2920a5b34f68da59a640490dc6d0b2d2e560f2dac4b0911f309702120ecb",
-      "bytes": 3481
+      "sha256": "b414f6ced3482ae717a7454334989658958f9d8eec5b8e66be6652ca7c4efe42",
+      "bytes": 4591
     },
     {
       "path": "observability/README.md",
@@ -62042,7 +62042,7 @@
     },
     {
       "path": "tests/test_codex_worker_lane.py",
-      "sha256": "d89dba8f88966d4f1d976907678bb8fcc8e1e17d6cd8ae5952f3131406831548",
+      "sha256": "8bfeb4ba4c48b84e108389c1ca860334274f2ae209d86eb7ca9831972a7364c1",
       "bytes": 193408
     },
     {
@@ -62362,7 +62362,7 @@
     },
     {
       "path": "tests/test_landscape_sweep_harness.py",
-      "sha256": "8ece31277bcd55f9aaf5353fad5ad7e29c8e94df52f5efaafceb73d322d4178b",
+      "sha256": "69ee39d4d1007934ae0ee45d0d51e189ec3792da6c5c88bb90a4a7d98fbdefba",
       "bytes": 392428
     },
     {
@@ -62842,8 +62842,8 @@
     },
     {
       "path": "tests/test_runtime_profiles.py",
-      "sha256": "5062038ff7c4512d2ae73c471e9a050f988a2dc1343ecfe15f084c13c27bf9ab",
-      "bytes": 8643
+      "sha256": "1aec310b680c1c14db58cc07855bb34be5b65ae77010a1c7eb44c136ae444333",
+      "bytes": 14035
     },
     {
       "path": "tests/test_runtime_usage.py",
@@ -63017,8 +63017,8 @@
     },
     {
       "path": "tests/test_task_model_routing.py",
-      "sha256": "9407fc3c7a99882d641197ade720b5d597a8f11c000a8323b0eaa704afe74111",
-      "bytes": 23463
+      "sha256": "c8414680c3ef645fbe8dc7fc7acb8a17bd343101e4123e0f8946031932487cfd",
+      "bytes": 23703
     },
     {
       "path": "tests/test_token_e2e_grader.py",
@@ -63287,13 +63287,13 @@
     },
     {
       "path": "tools/adoption/runtime_acceptance.py",
-      "sha256": "a9b16c48e07afb01a9a8dfa4d9619d48044ed9d23fc3659595a7e7ad343f4590",
-      "bytes": 11300
+      "sha256": "33845edd7817f540da52c4cd066cc27b6d27946bdb858b381426c6893eb46259",
+      "bytes": 11725
     },
     {
       "path": "tools/adoption/runtime_profiles.py",
-      "sha256": "ae2cddb0624770334e0c8c7920427b652c43b1231c41d94cb7c591c03a605e5a",
-      "bytes": 45758
+      "sha256": "215e55d43dbf9ef568c139f74226203ca702fb159aa36d4f868148de2502730c",
+      "bytes": 46422
     },
     {
       "path": "tools/adoption/runtime_skill_freshness.py",
@@ -63657,7 +63657,7 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/build_args.py",
-      "sha256": "4663c0ba3a3f63ce03314900b23f6f15d854d16c3490d37a3d911f3fa7b34410",
+      "sha256": "87d149928fd44e3193cb97c7b0e3dec3e692a93f35652cac625cf9475eb52c85",
       "bytes": 51739
     },
     {

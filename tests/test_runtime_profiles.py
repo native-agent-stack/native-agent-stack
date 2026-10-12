@@ -14,6 +14,9 @@ import tomllib
 import unittest
 import importlib.util
 import argparse
+from unittest import mock
+import io
+from contextlib import redirect_stdout
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools/adoption"))
@@ -64,6 +67,88 @@ class RuntimeInvokeTrackerTests(unittest.TestCase):
 
 
 class NativeProfileGenerationTests(unittest.TestCase):
+    def test_valid_native_json_strings_with_unicode_line_separators_keep_usage(self):
+        with tempfile.TemporaryDirectory() as directory:
+            log = Path(directory) / "events.jsonl"
+            event = {"type": "message_end", "message": {"role": "assistant",
+                     "content": [{"type": "text", "text": "first\u2028second\u2029third"}],
+                     "usage": {"input": 5, "output": 2, "totalTokens": 7, "cost": {"total": 0.01}}}}
+            log.write_text(json.dumps(event, ensure_ascii=False) + "\n")
+            measured = profiles.inference_facts(log, "pi")
+            self.assertEqual(measured["completed_native_steps"], 1)
+            self.assertEqual(measured["usage"]["total_tokens"], 7)
+            self.assertEqual(measured["native_cost_usd"], 0.01)
+
+    def test_pi_mcp_exit_zero_does_not_accept_absent_or_disabled_mandatory_server(self):
+        for servers in [[], [{"name": "context-mode", "state": "disabled", "tools": []}]]:
+            with self.subTest(servers=servers), tempfile.TemporaryDirectory() as directory:
+                state = Path(directory)
+                root = state / "pi-gpt"
+                root.mkdir()
+                (root / "profile.json").write_text(json.dumps({"pi_bin": "/fixture/pi",
+                    "mcp_server_names": ["context-mode"]}))
+                args = argparse.Namespace(state_root=state, workspace=state, out=state / "receipts",
+                                          role_scope=None, tokenizer_python=Path(sys.executable))
+
+                def native(command, **kwargs):
+                    if "mcp" in command:
+                        return 0, json.dumps({"servers": servers})
+                    return 0, "{}"
+
+                with mock.patch.object(acceptance, "native", side_effect=native), \
+                        mock.patch.object(acceptance, "discovered", return_value=[]), \
+                        mock.patch.object(acceptance, "skill_integrity", return_value={"managed_pass": True}), \
+                        redirect_stdout(io.StringIO()):
+                    self.assertFalse(acceptance.check(args, "pi-gpt"))
+                receipt = json.loads((args.out / "pi-gpt.discovery.json").read_text())
+                self.assertFalse(receipt["mcp"]["all_connected"])
+
+    def test_interactive_claude_opencode_collector_uses_profile_xdg_after_loader(self):
+        with tempfile.TemporaryDirectory() as directory:
+            state = Path(directory)
+            role = state / "opencode-claude/roles/builder"
+            role.mkdir(parents=True)
+            (role / "profile.json").write_text(json.dumps({
+                "status": "trial", "model": "fixture", "effort": "xhigh",
+                "opencode_bin": "/fixture/opencode", "roles": {"isolated-builder": {"tools": []}},
+            }))
+            expected = {"XDG_STATE_HOME": str(role / "state"), "XDG_DATA_HOME": str(role / "data"),
+                        "OPENCODE_CONFIG_DIR": str(role / "config")}
+            observed = []
+
+            def run(command, **kwargs):
+                if command[0] == "/fixture/opencode":
+                    observed.append(kwargs["env"])
+                    kwargs["stdout"].write("[]")
+                return subprocess.CompletedProcess(command, 0)
+
+            args = argparse.Namespace(profile="opencode-claude", state_root=state, repository=state,
+                                      role="isolated-builder", print=False, prompt=None)
+            with mock.patch.object(profiles, "fresh_worktree", return_value=state), \
+                    mock.patch.object(profiles, "choose_slot", return_value="anthropic-api-4"), \
+                    mock.patch.object(profiles, "profile_environment", return_value=expected), \
+                    mock.patch.object(profiles.subprocess, "run", side_effect=run), redirect_stdout(io.StringIO()):
+                self.assertEqual(profiles.launch(args), 0)
+            self.assertEqual(len(observed), 1)
+            for name, value in expected.items():
+                self.assertEqual(observed[0].get(name), value, name)
+
+    def test_vendor_skill_helper_does_not_broaden_imported_role_tool_fence(self):
+        with tempfile.TemporaryDirectory() as directory:
+            state = Path(directory)
+            servers = {"context-mode": {"type": "stdio", "command": "/fixture/mcp"}}
+            with mock.patch.object(profiles, "canonical_servers", return_value=servers), \
+                    mock.patch.object(profiles.shutil, "which", return_value="/fixture/rtk"), \
+                    mock.patch.object(profiles.subprocess, "check_output", side_effect=[
+                        "rtk 0.51.0\n", "e001f773f80b22b7dc4c7a79521b30e35aaef026\n"]), \
+                    mock.patch.object(profiles.subprocess, "run", return_value=subprocess.CompletedProcess([], 0)):
+                profiles.render("opencode-gpt", state=state, home=state, eco_root=state, templates=[],
+                                pi_bin=state / "pi", opencode_bin=state / "opencode", rtk_source=state,
+                                role_scope="auditor")
+            config = json.loads((state / "opencode-gpt/roles/auditor/config/opencode/opencode.json").read_text())
+            for name in profiles.ROLES:
+                self.assertNotIn("skill", config["agent"][name]["permission"], name)
+
     def test_native_mcp_failed_or_absent_status_is_not_connected_despite_exit_zero(self):
         output = "│ ✓ serena connected\n│ ✗ socraticode failed\n"
         states = acceptance.opencode_statuses(output, ["serena", "socraticode", "context-mode"])

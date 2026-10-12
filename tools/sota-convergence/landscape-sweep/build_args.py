@@ -113,7 +113,7 @@ HEADER_VALUE = re.compile(r"[!#-\[\]-~](?:[ !#-\[\]-~]{0,126}[!#-\[\]-~])?")
 # config.toml routes Codex through the local OmniRoute gateway (Codex model_providers with env_key; see
 # https://developers.openai.com/codex/config-reference) and carries the token-stack MCP servers.
 PROVIDERS = ("native", "omniroute")
-OMNIROUTE_DEFAULT_URL = "http://127.0.0.1:20128/v1"
+OMNIROUTE_DEFAULT_URL = "http://127.0.0.1:21128/v1"
 OMNIROUTE_DEFAULT_MODEL = "cx/gpt-6-astra"
 OMNIROUTE_KEY_ENV = "OMNIROUTE_API_KEY"
 # A loopback OmniRoute set up without a login or API key (upstream `omniroute setup --non-interactive`, REQUIRE_API_KEY
@@ -638,7 +638,7 @@ def main(argv=None) -> int:
     parser.add_argument("--gpt6-fallback", choices=("omniroute",),
                         help="opt in to transport-only native-limit failover, keeping the native prompt and inputs")
     parser.add_argument("--fallback-codex-host", metavar="HOST:PORT",
-                        help="keyless loopback fallback gateway (default 127.0.0.1:20128); needs --gpt6-fallback")
+                        help="keyless loopback fallback gateway (default 127.0.0.1:21128); needs --gpt6-fallback")
     parser.add_argument("--omniroute-base-url", default=OMNIROUTE_DEFAULT_URL,
                         help=f"loopback OmniRoute Responses endpoint (default {OMNIROUTE_DEFAULT_URL})")
     parser.add_argument("--codex-host", metavar="HOST",
@@ -694,7 +694,7 @@ def main(argv=None) -> int:
         if args.gpt6_fallback:
             if args.gpt6_provider != "native" or slash:
                 raise ValueError("--gpt6-fallback needs the native provider and a model without a provider segment")
-            host = args.fallback_codex_host or "127.0.0.1:20128"
+            host = args.fallback_codex_host or "127.0.0.1:21128"
             match = re.fullmatch(r"(?:127\.0\.0\.1|localhost):([0-9]{1,5})", host)
             if match is None or not 1 <= int(match[1]) <= 65535:
                 raise ValueError("--fallback-codex-host must be 127.0.0.1:PORT or localhost:PORT (1-65535)")

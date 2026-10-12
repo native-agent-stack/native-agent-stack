@@ -359,7 +359,12 @@ def render(profile: str, *, state: Path, home: Path, eco_root: Path, templates: 
             allowed_skills = [*skills, *ROLE_SCOPES[role_scope][1], "using-superpowers"]
             skill_permission = {"*": "deny", **{name: "allow" for name in allowed_skills}}
             for name in ROLES:
-                config["agent"][name]["permission"]["skill"] = skill_permission
+                if "skill" in roles[name]["tools"]:
+                    config["agent"][name]["permission"]["skill"] = skill_permission
+            # These imported roles grant Read but not Claude Skill. Preserve
+            # that fence: SKILL.md reads count through the native tracker.
+            # The vendor bootstrap remains, while its native skill helper is
+            # unavailable unless the canonical role explicitly grants Skill.
         # Keep the same SKILL.md sources, loaded through OpenCode's native
         # Agent Skills paths; no copied skills or rewritten skill bodies.
         private_write(destination / "config/opencode/opencode.json", json.dumps(config, indent=2) + "\n")
@@ -436,7 +441,7 @@ def inference_facts(log: Path, runtime: str):
     """Numeric native usage and safe response identifiers, without raw text."""
     usage = {k: 0 for k in ("input", "output", "reasoning", "cache_read", "cache_write", "total_tokens")}
     cost, completed, ids, sessions = 0.0, 0, set(), set()
-    for line in log.read_text().splitlines():
+    for line in log.read_text().split("\n"):
         try:
             event = json.loads(line)
         except ValueError:
@@ -607,7 +612,7 @@ def launch(args):
         # The response record stays private and requires the usual publication
         # scan before anybody chooses to include its text in a review packet.
         texts = []
-        for line in log.read_text().splitlines():
+        for line in log.read_text().split("\n"):
             try:
                 event = json.loads(line)
             except ValueError:
@@ -646,9 +651,13 @@ def launch(args):
         else:
             # Native metadata listing scopes collection to this fresh
             # worktree. Export is read transiently, reduced, then discarded.
+            # Claude's loader used the host environment; restore only the
+            # native profile variables for post-run collection. Otherwise
+            # session list/export would visit the account's main OpenCode DB.
+            collector_env = {**os.environ, **runtime_env}
             with tempfile.TemporaryFile(mode="w+") as stream:
                 listing = subprocess.run([meta["opencode_bin"], "session", "list", "--format", "json"],
-                                         cwd=workspace, env=env, stdout=stream, stderr=subprocess.DEVNULL)
+                                         cwd=workspace, env=collector_env, stdout=stream, stderr=subprocess.DEVNULL)
                 stream.seek(0)
                 sessions = json.load(stream) if listing.returncode == 0 else []
             measured = []
@@ -657,7 +666,7 @@ def launch(args):
                     continue
                 with tempfile.TemporaryFile(mode="w+") as stream:
                     exported = subprocess.run([meta["opencode_bin"], "export", session["id"]],
-                                              cwd=workspace, env=env, stdout=stream, stderr=subprocess.DEVNULL)
+                                              cwd=workspace, env=collector_env, stdout=stream, stderr=subprocess.DEVNULL)
                     if exported.returncode == 0:
                         stream.seek(0)
                         measured.append(scan_opencode_export(json.load(stream), names, skillmd_hits=skillmd_hits))

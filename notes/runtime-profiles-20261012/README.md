@@ -9,7 +9,9 @@ Claude MCP renderer and the existing new-WSL wiring map. It installs unchanged
 RTK hooks with RTK0.51.0 and Superpowers7.0.0 at its pinned vendor ref. Pi's
 package bootstrap re-exposes all15 skills after package filtering; the CC
 accepted package-level role scope and requires listing-size measurement.
-OpenCode uses native `permission.skill` to narrow its model-visible role list.
+OpenCode's native `permission.skill` is restricted only when the imported
+canonical role explicitly grants Skill. Current imported roles grant Read,
+so their native Skill helper stays denied; SKILL.md reads remain available.
 Tier1 uses CNP's13-slot input by path, validates its27managed names against
 the manifest and preserves its open gaps. Tier2 uses the pinned Skills1.7.0
 CLI's unchanged `skills find` path; unset SKILLS_API_URL means skills.sh today.
@@ -81,3 +83,13 @@ reads' configuration (instructions present)"**, with these limits verbatim:
 
 The measurement used cx/gpt-6-astra; these profiles' GPT model is
 cx/gpt-6.1-sol. It does not prove every model/route combination unchanged.
+
+The independent GPT implementation review at58a05d03 reproduced four P2s:
+interactive Claude/OpenCode collection lost its XDG isolation after the loader;
+the renderer added an ungranted native Skill helper; Unicode line separators
+inside valid native JSON erased usage/handoff records; Pi MCP exit0 could mean
+empty or disabled servers. The follow-up commit restores the isolated
+collection environment, preserves imported grants, uses LF-only JSON framing
+and requires each mandatory MCP name to be connected. Regression fixtures fail
+at58a05d03 and pass with these fixes. Native historical smokes remain bound to
+their original profile generation and main head, not relabeled as new runs.

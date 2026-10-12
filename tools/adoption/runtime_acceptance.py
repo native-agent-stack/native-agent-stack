@@ -46,7 +46,9 @@ def discovered(runtime, text):
     if runtime == "opencode":
         return [{"name": s["name"], "description": s.get("description", ""), "path": s.get("location"),
                  "builtin": s.get("location") == "<built-in>"} for s in json.loads(text)]
-    for line in text.splitlines():
+    for line in text.split("\n"):
+        if not line.strip():
+            continue
         event = json.loads(line)
         if event.get("command") == "get_commands" and event.get("success"):
             return [{"name": s["name"].removeprefix("skill:"), "description": s.get("description", ""),
@@ -149,6 +151,7 @@ def check(args, profile):
     mcp_facts = {"exit_code": mcp_code, "all_connected": mcp_code == 0,
                  "expected_names": descriptor["mcp_server_names"]}
     if runtime == "pi":
+        mcp_facts["all_connected"] = False
         try:
             servers = json.loads(mcp_output).get("servers", [])
             if isinstance(servers, dict):
@@ -156,6 +159,11 @@ def check(args, profile):
             mcp_facts["servers"] = [{"name": s["name"], "state": s.get("state"),
                                        "tool_count": len(s.get("tools", []))} for s in servers
                                       if s.get("name") in descriptor["mcp_server_names"]]
+            found = mcp_facts["servers"]
+            expected = descriptor["mcp_server_names"]
+            mcp_facts["all_connected"] = (mcp_code == 0 and bool(expected)
+                and len(found) == len(expected) and {s["name"] for s in found} == set(expected)
+                and all(s["state"] == "connected" for s in found))
         except (ValueError, KeyError, TypeError):
             mcp_facts["readback"] = "unreadable"
     else:
