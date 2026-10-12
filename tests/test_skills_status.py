@@ -274,6 +274,142 @@ class SkillsStatusTests(unittest.TestCase):
         self.assertEqual((link["state"], link["kind"]), ("not_a_symlink", "copy"))
         self.assertEqual(report["result"], "fail")
 
+    def layout_report(self, alpha):
+        manifest = self.build_manifest([alpha])
+        self.write_lock(self.lock_entries_for([alpha]))
+        self.write_claude_settings({})
+        self.write_codex_config([])
+        report = self.report(manifest)
+        return report, self.skill_result(report, alpha["name"])
+
+    def test_a_claude_skills_folder_linked_onto_the_canonical_one_is_the_layout_createsymlink_accepts(self):
+        """skills@7407f389 src/installer.ts L240-250: createSymlink returns without touching anything when the link path and the canonical folder are one real path, which is what a
+        parent link makes them. install_skills.py has accepted it since 2026-10-11; the status check reported it as not_a_symlink (Astra's read of 0d5272df7, follow-up 1)."""
+        alpha = self.make_skill("alpha-skill")
+        (self.home / ".claude").mkdir()
+        (self.home / ".claude" / "skills").symlink_to(self.home / ".agents" / "skills", target_is_directory=True)
+        report, skill = self.layout_report(alpha)
+        self.assertEqual(skill["claude_link"], {"state": "ok", "kind": "parent_link"})
+        self.assertEqual((skill["canonical"]["state"], skill["pass"], report["result"]), ("ok", True, "ok"))
+
+    def test_a_canonical_skills_folder_linked_onto_the_claude_one_is_accepted_too(self):
+        alpha = self.make_skill("alpha-skill")
+        real = self.home / ".claude" / "skills"
+        real.parent.mkdir(parents=True, exist_ok=True)
+        shutil.move(str(self.home / ".agents" / "skills"), str(real))  # the folder, with the skill, now lives under .claude
+        (self.home / ".agents" / "skills").symlink_to(real, target_is_directory=True)
+        report, skill = self.layout_report(alpha)
+        self.assertEqual(skill["claude_link"], {"state": "ok", "kind": "parent_link"})
+        self.assertEqual((skill["canonical"]["state"], report["result"]), ("ok", "ok"))
+
+    def test_a_canonical_leaf_that_is_a_link_is_not_the_folder_the_cli_writes(self):
+        """install_skills.py refuses a link at the canonical skill path (the add removes it first, src/installer.ts L389) as local-modified; the status check followed it and said ok
+        (Astra's read of 0d5272df7, follow-up 1, and the Codex review in GitHub, thread 2). Both required checks now enforce the same rule."""
+        alpha = self.make_skill("alpha-skill")
+        content = (self.home / ".agents" / "skills" / "alpha-skill" / "SKILL.md").read_bytes()
+        shutil.rmtree(self.home / ".agents" / "skills" / "alpha-skill")
+        elsewhere = self.home / "dotfiles" / "alpha-skill"
+        elsewhere.mkdir(parents=True)
+        (elsewhere / "SKILL.md").write_bytes(content)
+        (self.home / ".agents" / "skills" / "alpha-skill").symlink_to(elsewhere, target_is_directory=True)
+        self.write_claude_link("alpha-skill", kind="relative")
+        report, skill = self.layout_report(alpha)
+        self.assertEqual(skill["canonical"]["state"], "canonical_link")
+        self.assertEqual((skill["pass"], report["result"]), (False, "fail"))
+
+    def test_a_canonical_link_onto_a_real_claude_folder_is_not_ok_in_either_check(self):
+        """The reverse alias of #1024: the canonical path links onto the real folder at the Claude path, so the two resolve equal while the Claude entry is no link of the CLI's."""
+        alpha = self.make_skill("alpha-skill")
+        content = (self.home / ".agents" / "skills" / "alpha-skill" / "SKILL.md").read_bytes()
+        shutil.rmtree(self.home / ".agents" / "skills" / "alpha-skill")
+        real = self.home / ".claude" / "skills" / "alpha-skill"
+        real.mkdir(parents=True)
+        (real / "SKILL.md").write_bytes(content)
+        (self.home / ".agents" / "skills" / "alpha-skill").symlink_to(real, target_is_directory=True)
+        report, skill = self.layout_report(alpha)
+        self.assertEqual(skill["canonical"]["state"], "canonical_link")
+        self.assertEqual(skill["claude_link"]["state"], "not_a_symlink")
+        self.assertEqual(report["result"], "fail")
+
+    def test_a_canonical_link_is_not_judged_for_an_entry_that_is_not_installed_for_claude_code(self):
+        """The installer applies the rule to an entry installed for Claude Code only (the CLI returns after the canonical write for a universal agent, src/installer.ts L395-402; the Codex
+        review in GitHub on #1035)."""
+        alpha = dict(self.make_skill("alpha-skill"), agents=["codex"])
+        content = (self.home / ".agents" / "skills" / "alpha-skill" / "SKILL.md").read_bytes()
+        shutil.rmtree(self.home / ".agents" / "skills" / "alpha-skill")
+        elsewhere = self.home / "dotfiles" / "alpha-skill"
+        elsewhere.mkdir(parents=True)
+        (elsewhere / "SKILL.md").write_bytes(content)
+        (self.home / ".agents" / "skills" / "alpha-skill").symlink_to(elsewhere, target_is_directory=True)
+        self.write_claude_link("alpha-skill", kind="relative")
+        report, skill = self.layout_report(alpha)
+        self.assertEqual(skill["canonical"]["state"], "ok")
+
+    def test_git_tree_sha_skips_a_named_directory_but_hashes_a_file_or_link_of_that_name_when_asked(self):
+        folder = self.tmp / "tree"
+        (folder / ".venv").mkdir(parents=True)
+        (folder / ".venv" / "x").write_text("x")
+        (folder / "SKILL.md").write_text("# s\n")
+        skip = frozenset({".venv", "node_modules"})
+        plain = ss.git_tree_sha(folder, frozenset())
+        skipped = ss.git_tree_sha(folder, skip)
+        self.assertNotEqual(plain, skipped)
+        self.assertEqual(ss.git_tree_sha(folder, skip, skip_dirs_only=True), skipped, "a real directory of that name is skipped either way")
+        shutil.rmtree(folder / ".venv")
+        (folder / ".venv").write_text("mine")
+        self.assertEqual(ss.git_tree_sha(folder, skip), ss.git_tree_sha(folder, skip), "the default skips by name, as the status check always has")
+        self.assertNotEqual(ss.git_tree_sha(folder, skip, skip_dirs_only=True), skipped, "a file named .venv is content")
+        (folder / ".venv").unlink()
+        (folder / "node_modules").symlink_to(self.tmp, target_is_directory=True)
+        self.assertNotEqual(ss.git_tree_sha(folder, skip, skip_dirs_only=True), ss.git_tree_sha(folder, skip), "a link named node_modules is content")
+        (folder / "node_modules").unlink()
+        (folder / "scripts").mkdir()
+        (folder / "scripts" / "__pycache__").write_text("mine")
+        nested = frozenset({"__pycache__"})
+        self.assertNotEqual(ss.git_tree_sha(folder, nested, skip_dirs_only=True), ss.git_tree_sha(folder, nested), "the rule holds below the top level too")
+
+    def test_git_tree_sha_in_strict_mode_refuses_an_entry_a_git_tree_cannot_hold(self):
+        """Review of 9a77a96e in GitHub (#1035, round two): an empty directory and a special file have no entry in a git tree, so the hash accepted a folder that held one, and the add deletes it."""
+        folder = self.tmp / "strict"
+        skip = frozenset({"__pycache__"})
+        cases = (("an empty directory", {}, lambda: (folder / "notes").mkdir()), ("a nested empty directory", {}, lambda: (folder / "notes" / "inner").mkdir(parents=True)),
+                 ("a named pipe", {}, lambda: os.mkfifo(folder / "pipe")), ("a directory holding only a skipped one", {}, lambda: (folder / "cache" / "__pycache__").mkdir(parents=True)),
+                 ("an empty directory beside a file", {"refs/a.md": "a"}, lambda: (folder / "refs" / "empty").mkdir()))
+        for label, files, make in cases:
+            with self.subTest(entry=label):
+                shutil.rmtree(folder, ignore_errors=True)
+                folder.mkdir()
+                for name, text in {"SKILL.md": "# s\n", **files}.items():
+                    (folder / name).parent.mkdir(parents=True, exist_ok=True)
+                    (folder / name).write_text(text)
+                plain = ss.git_tree_sha(folder, skip)
+                make()
+                self.assertEqual(ss.git_tree_sha(folder, skip), plain, "the default leaves it out, as git does, and as the status check always has")
+                with self.assertRaises(ss.UnrepresentedEntry):
+                    ss.git_tree_sha(folder, skip, skip_dirs_only=True, strict=True)
+        shutil.rmtree(folder, ignore_errors=True)
+        (folder / ".venv").mkdir(parents=True)
+        (folder / "SKILL.md").write_text("# s\n")
+        self.assertEqual(ss.git_tree_sha(folder, frozenset({".venv"}), skip_dirs_only=True, strict=True), ss.git_tree_sha(folder, frozenset({".venv"})), "an empty skipped directory is regenerated, not content")
+
+    def test_a_real_folder_that_cannot_be_resolved_is_not_accepted_as_a_parent_alias(self):
+        link, canonical = self.home / ".claude" / "skills" / "alpha-skill", self.home / ".agents" / "skills" / "alpha-skill"
+        link.mkdir(parents=True)
+        canonical.mkdir(parents=True)
+        with mock.patch.object(ss.Path, "resolve", side_effect=RuntimeError("Symlink loop from 'x'")):
+            result = ss.check_claude_link(link, canonical, parent_alias=True)
+        self.assertEqual(result, {"state": "not_a_symlink", "kind": "copy"})
+
+    def test_a_claude_code_copy_is_still_a_real_folder_in_its_own_place(self):
+        """A parent link must not turn the copy check around: a copy entry compares the Claude path with itself."""
+        alpha = dict(self.make_skill("alpha-skill"), copy=True, agents=["claude-code"])
+        real = self.home / ".claude" / "skills" / "alpha-skill"
+        real.mkdir(parents=True)
+        shutil.copy(self.home / ".agents" / "skills" / "alpha-skill" / "SKILL.md", real / "SKILL.md")
+        shutil.rmtree(self.home / ".agents" / "skills" / "alpha-skill")
+        report, skill = self.layout_report(alpha)
+        self.assertEqual(skill["claude_link"], {"state": "ok", "kind": "copy"})
+
     def test_wrong_target_link_fails(self):
         alpha = self.make_skill("alpha-skill")
         manifest = self.build_manifest([alpha])
@@ -810,6 +946,31 @@ class SkillsStatusTests(unittest.TestCase):
         self.assertEqual(report["folder_trees"]["drift"], ["alpha-skill", "beta-skill"])
         self.assertEqual(report["result"], "ok")
         self.assertIn("drift=alpha-skill,beta-skill", ss.render_text(report))
+
+    def test_the_status_check_judges_content_as_the_installer_does(self):
+        """Second GPT read of #1035 at 9a77a96e (~/.cache/ns2604-gpt-reads/fix1-pr1035-9a77a96e8/VERDICT.md, blocker 2): check_folder_tree still skipped a runtime-directory name whatever the entry was, so a regular
+        `.venv` was `runtime_artifacts` for the status check and `local-modified` for the installer. A file or a link of that name is content (the add deletes it: vercel-labs/skills@7407f389 src/installer.ts
+        L195); a real directory of a regenerated name is not. An empty directory or a special file stays invisible to this comparison, as to a git tree (the fixture's own `empty-dir`)."""
+        manifest, alpha, beta = self.setup_pair()
+        agents_skills = self.home / ".agents" / "skills"
+        folder = self.populate_tree("alpha-skill")
+        alpha["tree_sha"] = ss.git_tree_sha(folder)
+        pristine = self.tmp / "pristine-alpha"
+        shutil.copytree(folder, pristine, symlinks=True)
+        cases = (("nothing added", lambda f: None, "ok"),
+                 ("a real .venv directory with files", lambda f: ((f / ".venv").mkdir(), (f / ".venv" / "pyvenv.cfg").write_text("home = /usr/bin\n")), "runtime_artifacts"),
+                 ("an empty .venv directory (invisible to a git tree)", lambda f: (f / ".venv").mkdir(), "ok"),
+                 ("a regular file named .venv", lambda f: (f / ".venv").write_text("mine\n"), "drift"),
+                 ("a regular file named .venv below scripts", lambda f: (f / "scripts" / ".venv").write_text("mine\n"), "drift"),
+                 ("a link named .venv", lambda f: (f / ".venv").symlink_to("SKILL.md"), "drift"),
+                 ("a link named node_modules", lambda f: (f / "node_modules").symlink_to(self.home, target_is_directory=True), "drift"),
+                 ("a regular file named __pycache__ below scripts", lambda f: (f / "scripts" / "__pycache__").write_text("mine\n"), "drift"))
+        for label, make, expected in cases:
+            with self.subTest(entry=label):
+                shutil.rmtree(folder, ignore_errors=True)
+                shutil.copytree(pristine, folder, symlinks=True)
+                make(folder)
+                self.assertEqual(ss.check_folder_tree(agents_skills, alpha), {"state": expected})
 
     def test_folder_tree_missing_folder(self):
         manifest, alpha, beta = self.setup_pair()

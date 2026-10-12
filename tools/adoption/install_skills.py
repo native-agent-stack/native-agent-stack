@@ -41,15 +41,40 @@ For every manifest skill, in order:
       variant has the same shape (L1043-1088). scripts/skills_status.py checks
       the same link. Until 2026-10-11 this check stopped at the first two
       conditions, so --check-only said ok for a skill whose link was missing.
-      Known limit (pre-existing, its own pull request): condition (b) and the
-      Claude entry check compare SKILL.md and the link target only, so other
-      content beside a pinned SKILL.md (an extra file in an unlocked or locked
-      canonical folder) is not protected from the add, which recreates that
-      folder (L389).
+      The add also recreates the canonical folder from nothing
+      (cleanAndCreateDirectory and the copy, L193-200 and L389-390), so a file
+      beside the pinned SKILL.md that the CLI would not write is lost with it,
+      and so is an edited support file. Where an add is about to run over an
+      existing folder (an unlocked one, one locked at the pin whose Claude link,
+      or in a project the Claude target, is missing or whose SKILL.md was edited,
+      and one whose lock does not name another revision of the manifest's source:
+      see lock_reading, whose table of lock entries is the "Lock entries" section
+      of docs/decisions/2026-10-12-skills-installer-foreign-content.md) the folder
+      must be the pinned tree: its git tree SHA,
+      with the directories a skill's own tooling regenerates left out
+      (scripts/skills_status.py git_tree_sha and RUNTIME_ARTIFACT_DIRS, the
+      check_folder_tree state; a file or a link of such a name is content and
+      is hashed), equals the manifest's tree_sha, and it holds no entry that a
+      git tree cannot (an empty directory, a special file: the add deletes those
+      too; git_tree_sha strict). Otherwise it holds content the installer did
+      not write (or lacks a pinned file, which only --force repairs) and is
+      'local-modified', refused unless --force.
+      Not covered: an upgrade over a lock that names another revision of the
+      manifest's GitHub source in the form the CLI writes one (a project ref
+      that is a full commit id other than the pin's, a global skillFolderHash
+      that is a git tree id other than the pin's), whose files this comparison
+      cannot name (the lock proves the CLI wrote some earlier version there).
+      A folder that is locked at the pin with a whole entry and linked is 'ok':
+      nothing is added there. A lock the CLI reads as empty (no numeric version,
+      a version below the first that holds the entry, no skills table, text
+      that JSON.parse rejects, NaN, Infinity and -Infinity among it, and in a
+      project a null entry or a local entry whose source is not text) holds
+      no entry.
   (b) a folder exists at that path but the lock has no entry for <name> (for
       example a skill installed by hand before this manifest existed) -> only
       proceed (treat like a fresh install) when its SKILL.md sha256 already
-      equals the manifest's, so a local edit is never silently discarded;
+      equals the manifest's and the folder is the pinned tree (see the end of
+      (a)), so a local edit or a local file is never silently discarded;
       otherwise refuse with 'local-modified' unless --force.
   (c) otherwise, run `skills add <url> --skill <name> -g -y -a claude-code
       codex` (env DISABLE_TELEMETRY=1, so the run skips both telemetry and the
@@ -328,6 +353,33 @@ def claude_skills_dir(home: Path, project_dir: Path | None = None) -> Path:
     return node_path_join(claude_config_dir or str(home / ".claude"), "skills")
 
 
+@functools.lru_cache(maxsize=None)
+def skills_status_module():
+    """scripts/skills_status.py, which already hashes an installed folder the way git hashes a tree (git_tree_sha) and names the directories a skill's own tooling creates in it
+    (RUNTIME_ARTIFACT_DIRS): the installer uses that predicate rather than a second one."""
+    sys.path.insert(0, str(ROOT))
+    from scripts import skills_status
+    return skills_status
+
+
+UNREPRESENTED = "unrepresented"
+
+
+def unpinned_content(skill: dict, home: Path, project_dir: Path | None = None) -> str | None:
+    """None when the installed folder is the pinned tree, so the add deletes nothing the pinned CLI did not write: its git tree SHA, with the runtime-artifact directories left out (a
+    file or a link of such a name is content and is hashed), is the manifest's tree_sha, and it holds no entry that a git tree cannot (an empty directory, a special file: the add deletes
+    those too). Otherwise the folder's tree SHA, or UNREPRESENTED, for the refusal text. A folder that cannot be read is unverified (InstallError), never a pass."""
+    status = skills_status_module()
+    folder = installed_skill_dir(skill, home, project_dir)
+    try:
+        tree = status.git_tree_sha(folder, status.RUNTIME_ARTIFACT_DIRS, skip_dirs_only=True, strict=True)
+    except status.UnrepresentedEntry:
+        return UNREPRESENTED
+    except (OSError, RecursionError) as error:
+        raise InstallError(f"unverified (cannot read {folder}): {error}") from error
+    return None if tree == skill["tree_sha"] else str(tree)
+
+
 def unlocked_folder_differs(skill: dict, home: Path) -> bool:
     """Condition (b) of classify_skill for a global entry: a folder at the installed path, no lock entry, and a SKILL.md
     that is not the pinned one. Used to name every reason of a local-modified refusal."""
@@ -398,12 +450,19 @@ def lock_file_path(home: Path, project_dir: Path | None = None) -> Path:
     return node_path_join(str(home), ".agents", ".skill-lock.json")
 
 
+def reject_constant(token):
+    """json.loads hands NaN, Infinity and -Infinity to its parse_constant hook instead of rejecting them (Lib/json/decoder.py L46-L49, Doc/library/json.rst L324-L329 at python/cpython@v3.13.16); JSON.parse rejects
+    them (measured on Node 24.21.0: SyntaxError for each), and both lock readers of the pinned CLI return an empty lock when it does (src/skill-lock.ts L85 and L99-L101, src/local-lock.ts L80 and L97-L98). A lock
+    that holds one anywhere is therefore unreadable here too. 1e999 is a valid JSON number and stays one (both parse it as Infinity)."""
+    raise json.JSONDecodeError(f"{token} is not JSON", token, 0)
+
+
 def load_lock(home: Path, project_dir: Path | None = None) -> dict:
     path = lock_file_path(home, project_dir)
     if not path.is_file():
         return {}
     try:
-        data = json.loads(path.read_text(encoding="utf-8"))
+        data = json.loads(path.read_text(encoding="utf-8"), parse_constant=reject_constant)
     except json.JSONDecodeError:
         return {}
     return data if isinstance(data, dict) else {}
@@ -423,12 +482,46 @@ def lock_retains(home: Path, name: str, project_dir: Path | None = None) -> bool
     return name in skills
 
 
+# The lock entries of the pinned CLI (vercel-labs/skills@7407f3893ad4dceab546ac002c3ef806e4000c73) and how this installer reads them; the table with every citation is the "Lock entries" section of
+# docs/decisions/2026-10-12-skills-installer-foreign-content.md, and tests.test_install_skills.LockEntryTable is built from it.
+LOCK_MINIMUM_VERSION = {"global": 3, "project": 1}   # src/skill-lock.ts L8 and L89-L101, src/local-lock.ts L6 and L83-L98: a lock without a numeric `version`, below this one, or without a `skills` table is read as empty
+GIT_ID = re.compile(r"[0-9a-f]{40}", re.IGNORECASE)    # src/update.ts L638: a skillFolderHash that is a git tree id; a full commit id has the same form
+
+
+def lock_skills(data, project: bool) -> dict:
+    """The entries a lock file holds as the pinned CLI reads it: none for a lock it reads as empty. The project reader (src/local-lock.ts L80-L98) reads every entry inside its try: `entry.sourceType` throws
+    on a null entry, and `isAbsolute(entry.source)` (L91) throws for a local entry whose `source` is missing or is not text; either returns an empty lock. A string, number, boolean or list entry does not throw
+    there (the property read gives undefined) and the reader keeps the lock; this installer reads such a lock as empty too, which is stricter than the reader: a hand-made form that fails closed."""
+    if not isinstance(data, dict):
+        return {}
+    version, skills = data.get("version"), data.get("skills")
+    if isinstance(version, bool) or not isinstance(version, (int, float)) or version < LOCK_MINIMUM_VERSION["project" if project else "global"] or not isinstance(skills, dict):
+        return {}
+    if project and any(not isinstance(entry, dict) or (entry.get("sourceType") == "local" and not isinstance(entry.get("source"), str)) for entry in skills.values()):
+        return {}
+    return skills
+
+
 def read_lock_entry(home: Path, name: str, project_dir: Path | None = None) -> dict | None:
-    skills = load_lock(home, project_dir).get("skills")
-    if not isinstance(skills, dict):
-        return None
-    entry = skills.get(name)
+    entry = lock_skills(load_lock(home, project_dir), project_dir is not None).get(name)
     return entry if isinstance(entry, dict) else None
+
+
+def lock_reading(skill: dict, entry: dict, project: bool) -> str:
+    """What a lock entry says about the revision that wrote the folder: "same" (the pin), "older" (another revision of the manifest's source, an upgrade whose files nothing offline can name) or
+    "unidentified" (everything else: the folder is compared like an unlocked one). An entry names a revision only through a field that the pinned CLI writes as one, and only in the form it writes:
+    a global `skillFolderHash` that is a git tree id (src/add.ts L2099-L2111 writes the tree id of the skill folder for a GitHub source whose tree lookup succeeds and otherwise the CLI's own sha256
+    digest or empty text; src/update.ts L638 applies tree semantics to a 40-digit hex value of a GitHub source only), which is a content address and so says "same" whatever source wrote it, and "older" only
+    for the manifest's GitHub source; a project `ref` that is a full commit id (src/add.ts L2148-L2160 records what the user typed, a branch or a tag included, and either can name the pin's own commit),
+    for the manifest's GitHub source only."""
+    field, pin = ("ref", skill["ref"]) if project else ("skillFolderHash", skill["tree_sha"])
+    value = entry.get(field)
+    if not (isinstance(value, str) and GIT_ID.fullmatch(value)):
+        return "unidentified"
+    from_manifest_source = entry.get("sourceType") == "github" and entry.get("source") == skill["source"]
+    if value.lower() == str(pin).lower():
+        return "same" if (project is False or from_manifest_source) else "unidentified"
+    return "older" if from_manifest_source else "unidentified"
 
 
 @functools.lru_cache(maxsize=None)
@@ -461,7 +554,9 @@ def pinned_source_trees(source: str, ref: str) -> dict[str, str]:
 def classify_skill(skill: dict, home: Path, project_dir: Path | None = None, agent: str = "universal") -> str:
     """'ok' (a), which for a global entry includes the Claude Code link), 'local-modified' (b), refused; a global
     Claude entry that is not the link onto the canonical folder, or a canonical path that is itself a link,
-    claude_link_problem), 'misplaced' (a global
+    claude_link_problem; or a folder the add would recreate that is not the pinned tree: an unlocked one, one
+    locked at the pin whose link is missing or whose SKILL.md was edited, a project's, unpinned_content),
+    'misplaced' (a global
     Claude-Code-only copy whose Claude entry is a link or whose name the shared
     canonical folder also holds, copy_placement_problem: refused, never 'ok'),
     or 'install' (needs an add: either a fresh install, a locked-but-mismatched
@@ -492,30 +587,40 @@ def classify_skill(skill: dict, home: Path, project_dir: Path | None = None, age
     md_matches = installed_skill_md_matches(skill, home, project_dir)
     entry = read_lock_entry(home, name, project_dir)
     if entry is not None:
+        # An add recreates the canonical folder from nothing (src/installer.ts L195, called at L389), so only the pinned tree survives it unharmed. A lock excuses a folder that differs from the pinned
+        # tree in one case: it names another revision of the manifest's source through a field the CLI writes as a revision (lock_reading "older": the documented boundary, an upgrade over an older pin).
+        # Every other entry, and every field the CLI treats as optional or writes in another form, identifies nothing and the folder is compared like an unlocked one. A folder that is gone is a clean repair.
+        def compared() -> str:
+            return "local-modified" if skill_dir.exists() and unpinned_content(skill, home, project_dir) else "install"
+        reading = lock_reading(skill, entry, project_dir is not None)
+        if reading == "older":
+            return "install"
         if project_dir is not None:
+            target_missing = False
             if agent == "claude-code":
                 target_md = project_dir / ".claude" / "skills" / name / "SKILL.md"
-                if not target_md.is_file() or sha256_of(target_md) != skill["skill_md_sha256"]:
+                target_missing = not target_md.is_file() or sha256_of(target_md) != skill["skill_md_sha256"]
+            if reading == "same":
+                tree = pinned_source_trees(skill["source"], skill["ref"]).get(skill["path"])
+                if tree != skill["tree_sha"]:
                     return "install"
-            identity_matches = (
-                entry.get("sourceType") == "github" and entry.get("source") == skill["source"]
-                and entry.get("ref") == skill["ref"]
-                and entry.get("skillPath") == skill["path"] + "/SKILL.md"
-                and re.fullmatch(r"[0-9a-f]{64}", str(entry.get("computedHash", ""))) is not None)
-            if not (md_matches and identity_matches):
-                return "install"
-            tree = pinned_source_trees(skill["source"], skill["ref"]).get(skill["path"])
-            return "ok" if tree == skill["tree_sha"] else "install"
-        if not (md_matches and entry.get("skillFolderHash") == skill["tree_sha"]):
-            return "install"
-        return "ok" if link_problem is None else "install"
+                complete = (entry.get("skillPath") == skill["path"] + "/SKILL.md"
+                            and re.fullmatch(r"[0-9a-f]{64}", str(entry.get("computedHash", ""))) is not None)
+                if complete and md_matches and not target_missing:
+                    return "ok"
+            return compared()   # the Claude target is missing, SKILL.md was edited or is gone, the entry is not one the CLI wrote whole, or it identifies nothing
+        if reading == "same" and md_matches and link_problem is None:
+            return "ok"
+        return compared()   # the link is missing, SKILL.md is not the pinned one, or the entry identifies nothing
     # An unlocked folder counts as (b) -- local content to protect -- as soon as it
     # *exists*, not only once it happens to contain a SKILL.md: a folder with other
     # files and no SKILL.md can never satisfy md_matches, so checking is_file() here
     # instead of the folder itself would fall through to "install" and let `skills
     # add` (which recreates the target directory from scratch) silently discard it.
     if skill_dir.exists():
-        return "install" if md_matches else "local-modified"
+        if not md_matches:
+            return "local-modified"
+        return "local-modified" if unpinned_content(skill, home, project_dir) else "install"
     return "install"
 
 
@@ -609,6 +714,12 @@ def process_skill(skill: dict, home: Path, skills_bin: str, dry_run: bool, force
                 pass
             if unlocked_folder_differs(skill, home):
                 reasons.append("an unlocked local SKILL.md that does not match the pinned manifest hash")
+            elif not reasons and (tree := unpinned_content(skill, home)):
+                if tree == UNREPRESENTED:
+                    reasons.append(f"{installed_skill_dir(skill, home)}, which holds an empty directory or a special file that the pinned tree cannot (the add deletes it)")
+                else:
+                    reasons.append(f"{installed_skill_dir(skill, home)}, whose files are not the pinned tree (git tree {tree[:12]}, pinned {skill['tree_sha'][:12]}): "
+                                   "a file the pinned CLI would not write, an edited file or a missing one")
             protected = " and ".join(reasons) or "an unlocked local SKILL.md that does not match the pinned manifest hash"
         print(f"{name}: local-modified -- refusing to overwrite {protected} "
               f"(pass --force to overwrite it)", file=sys.stderr)
@@ -770,10 +881,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--only", action="append", metavar="NAME",
                          help="Process only this manifest skill name; repeatable")
     parser.add_argument("--force", action="store_true",
-                         help="Overwrite a local, unlocked skill folder whose SKILL.md does not "
-                              "match the manifest, an unmanaged project Claude target, or a global "
-                              "Claude Code entry that is not the link onto the canonical folder "
-                              "(default: refuse it as local-modified)")
+                         help="Overwrite what the add would replace and the installer did not write "
+                              "(default: refuse it as local-modified): a local, unlocked skill folder "
+                              "whose SKILL.md does not match the manifest, or whose files are not the "
+                              "pinned tree (an extra, an edited or a missing file); an unmanaged project "
+                              "Claude target; a global Claude Code entry that is not the link onto the "
+                              "canonical folder; or a canonical path that is itself a link")
     parser.add_argument("--print-codex-config", action="store_true",
                          help="Print a [[skills.config]] path/enabled=false table for every "
                               "codex_enabled: false manifest skill (a reuse_ref entry takes the "
