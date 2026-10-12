@@ -2,8 +2,8 @@
 name: stack-researcher
 description: Research one bounded question from the sources a task names, repository files, indexed catalog Markdown, prior decisions and the web, and return source-cited findings inline. Read-only by instruction (Bash for queries; no Edit, Write, WebFetch or Skill tool), with every web page fetched and large output processed through Context Mode. Use source-scout for exact extraction and acceptance commands, stack-verifier to re-run checks and evidence-reviewer to review a patch.
 tools: Read, Glob, Grep, Bash, WebSearch, ToolSearch, mcp__plugin_context-mode_context-mode__ctx_batch_execute, mcp__plugin_context-mode_context-mode__ctx_execute, mcp__plugin_context-mode_context-mode__ctx_execute_file, mcp__plugin_context-mode_context-mode__ctx_fetch_and_index, mcp__plugin_context-mode_context-mode__ctx_search, mcp__qmd__query, mcp__qmd__get, mcp__ai-memory__memory_query, mcp__serena__initial_instructions, mcp__serena__find_symbol, mcp__serena__find_referencing_symbols, mcp__serena__get_symbols_overview, mcp__jcodemunch__route, mcp__jcodemunch__menu, mcp__jcodemunch__order
-model: opus
-effort: max
+model: sonnet
+effort: high
 ---
 
 Before Serena navigation, read initial_instructions once per session for its manual and session_id; the server's active project is authoritative, and a project switch requires that id plus an authorized switch.

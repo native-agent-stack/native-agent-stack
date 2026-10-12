@@ -3,9 +3,10 @@
 These are project-authored saved scripts and agent definitions for the upstream
 Claude Workflow runtime. The saved workflow scripts and the original source-scout,
 evidence-reviewer and isolated-builder definitions derive from the deployed agent-lab
-files in the retained portable qualification. Since 2026-09-23 every stage and agent
-binds effort `max`, models unchanged
-([decision](../../../docs/decisions/2026-09-23-max-effort-default.md)).
+files in the retained portable qualification. Since 2026-09-23 every saved stage binds
+effort `max` ([decision](../../../docs/decisions/2026-09-23-max-effort-default.md)); since
+2026-10-12 each agent definition carries the model and effort of the command center's routing table, the
+blind roles keeping their protocol's `max` ([decision](../../../docs/decisions/2026-10-12-model-effort-routing.md)).
 `review-changes.js`, `readiness-audit.js` and `layer-verdict-lane.js` are
 byte-identical to agent-lab `b31f640` (the `max` change is agent-lab #43; the lane is
 pinned at agent-lab `e070125` in `vendored-lanes.json`). The
@@ -83,17 +84,17 @@ reads the inventoried files in full and marks diff-dependent claims unverifiable
 
 | Agent | Model, effort | Tools | Use |
 | --- | --- | --- | --- |
-| `source-scout` | Sonnet, max | Read, Grep, Glob, Bash; no project instructions loaded | exact extraction, inventories, running the acceptance commands a task names (raw through `rtk proxy` where `rtk` is installed) |
-| `evidence-reviewer` | Opus, max | Read, Glob, Grep, ToolSearch and named read-only MCP tools; no Bash, Edit or Write | independent review from source and recorded evidence |
-| `security-reviewer` | Opus, max | Same named read tools as evidence-reviewer behind ToolSearch; no Bash, Edit, Write, WebFetch or Skill; `security-best-practices` preloaded | adversarial security review, including agent permission and tool-surface widening; reports findings, never fixes |
-| `isolated-builder` | Opus, max, in the coordinator-created worktree its brief names | Read, Edit, Write, Glob, Grep, Bash, ToolSearch and named MCP read tools (no Serena symbol-edit tool); `context-mode:context-mode` preloaded | a bounded implementation from a clear contract |
-| `stack-researcher` | Opus, max | Read, Glob, Grep, Bash, WebSearch, ToolSearch and named Context Mode, QMD, ai-memory, Serena and jCodeMunch read tools; no Edit, Write, WebFetch or Skill | research from the web, documentation, repository and catalog, returned inline |
-| `stack-verifier` | Opus, max | Read, Glob, Grep, Bash, ToolSearch and named Context Mode tools; no project instructions; no Edit, Write, WebFetch or Skill | re-running named commands and deciding claims from their output and source; never fixes |
+| `source-scout` | Sonnet, medium | Read, Grep, Glob, Bash; no project instructions loaded | exact extraction, inventories, running the acceptance commands a task names (raw through `rtk proxy` where `rtk` is installed) |
+| `evidence-reviewer` | Opus, xhigh | Read, Glob, Grep, ToolSearch and named read-only MCP tools; no Bash, Edit or Write | independent review from source and recorded evidence |
+| `security-reviewer` | Opus, xhigh | Same named read tools as evidence-reviewer behind ToolSearch; no Bash, Edit, Write, WebFetch or Skill; `security-best-practices` preloaded | adversarial security review, including agent permission and tool-surface widening; reports findings, never fixes |
+| `isolated-builder` | Opus, high, in the coordinator-created worktree its brief names | Read, Edit, Write, Glob, Grep, Bash, ToolSearch and named MCP read tools (no Serena symbol-edit tool); `context-mode:context-mode` preloaded | a bounded implementation from a clear contract |
+| `stack-researcher` | Sonnet, high | Read, Glob, Grep, Bash, WebSearch, ToolSearch and named Context Mode, QMD, ai-memory, Serena and jCodeMunch read tools; no Edit, Write, WebFetch or Skill | research from the web, documentation, repository and catalog, returned inline |
+| `stack-verifier` | Sonnet, medium | Read, Glob, Grep, Bash, ToolSearch and named Context Mode tools; no project instructions; no Edit, Write, WebFetch or Skill | re-running named commands and deciding claims from their output and source; never fixes |
 
 Context Mode `ctx_execute*` can run commands, so the reviewers' read-only rule
 there is an instruction, not a sandbox; the same holds for the Bash of the
 scout, the researcher and the verifier. Two
-more definitions ship here. `semantic-evidence-reviewer` (Opus, max; Read, Glob,
+more definitions ship here. `semantic-evidence-reviewer` (Opus, xhigh; Read, Glob,
 Grep; the `typesafe-ai` skill) is project-local to agent-lab and published
 separately. `blind-lane-reviewer` (Opus, max; Read, Glob and Grep; no preloaded
 skill and no project instructions) is the agent every `layer-verdict-lane` stage
@@ -1106,14 +1107,19 @@ Applies to the coordinator and every Workflow/Agent child (project agents and `.
 
 Name the role's `agentType` on each stage beside an explicit `model` and `effort: 'max'`; the stage's `model` overrides the agent's own default (the official workflows doc counts it as the per-invocation model). Each agent's body carries its role's lanes, so the packet carries only the task. Semantic (TypeSafe) reviews and layer-verdict lane stages keep the agents the routing table below names; a stage no role fits runs as the default child with a `// dispatch: <reason>` comment beside the call.
 
+A named child (one launched with `name`, a teammate) runs at its definition's `effort` and drops a per-launch
+`effort`; an unnamed child takes the per-launch `effort` over its definition's. Both honor a per-launch `model`
+(measured on 2.1.296, [decision](../../../docs/decisions/2026-10-12-model-effort-routing.md)). To run a child at
+an effort other than its definition's, launch it without `name`.
+
 | Role | `agentType` | Model, effort | Use |
 | --- | --- | --- | --- |
-| scout | `source-scout` | Sonnet, max | exact extraction, inventories and the acceptance commands a task names |
-| researcher | `stack-researcher` | Opus, max | web, documentation, repository and catalog research; pages through `ctx_fetch_and_index`; findings returned inline |
-| builder | `isolated-builder` | Opus, max | a bounded implementation in the owned checkout the coordinator prepared at the exact base and named in the brief; its handoff runs the three registry test methods `tests.test_osv_lockfile_coverage.LockfileInventoryTests.test_every_tracked_lockfile_and_manifest_is_listed`, `tests.test_blind_checkout.RepositoryClassificationTests.test_every_blueprint_value_under_a_label_key_is_classified` and `tests.test_workflow_security_coverage.NewWorkflowSecurityCoverageTests.test_all_published_workflows_are_listed_and_covered` with zizmor on `PATH`, where a skip is not a pass (the same three that `scripts/git-hooks/pre-push` runs on the tip commit of each pushed ref) |
-| reviewer | `evidence-reviewer` | Opus, max | independent review from source and recorded evidence, running no commands |
-| security | `security-reviewer` | Opus, max | adversarial security review from original source, including agent tool grants; security-best-practices preloaded; never fixes or runs acceptance commands |
-| verifier | `stack-verifier` | Opus, max | re-running named commands and deciding claims from their output and source; never fixes |
+| scout | `source-scout` | Sonnet, medium | exact extraction, inventories and the acceptance commands a task names |
+| researcher | `stack-researcher` | Sonnet, high | web, documentation, repository and catalog research; pages through `ctx_fetch_and_index`; findings returned inline |
+| builder | `isolated-builder` | Opus, high | a bounded implementation in the owned checkout the coordinator prepared at the exact base and named in the brief; its handoff runs the three registry test methods `tests.test_osv_lockfile_coverage.LockfileInventoryTests.test_every_tracked_lockfile_and_manifest_is_listed`, `tests.test_blind_checkout.RepositoryClassificationTests.test_every_blueprint_value_under_a_label_key_is_classified` and `tests.test_workflow_security_coverage.NewWorkflowSecurityCoverageTests.test_all_published_workflows_are_listed_and_covered` with zizmor on `PATH`, where a skip is not a pass (the same three that `scripts/git-hooks/pre-push` runs on the tip commit of each pushed ref) |
+| reviewer | `evidence-reviewer` | Opus, xhigh | independent review from source and recorded evidence, running no commands |
+| security | `security-reviewer` | Opus, xhigh | adversarial security review from original source, including agent tool grants; security-best-practices preloaded; never fixes or runs acceptance commands |
+| verifier | `stack-verifier` | Sonnet, medium | re-running named commands and deciding claims from their output and source; never fixes |
 | adjudicator | `blind-adjudicator` | Opus, max | one anonymous two-return layer-verdict disagreement |
 
 The researcher, verifier and security rows, and the builder's new preload, are unmeasured: their first-prompt size, lane use, correctness and billed cost against `general-purpose` stages are preregistered, with the result that would overturn this table, in [the decision record](../../../docs/decisions/2026-09-26-stack-agents-role-dispatch.md).
@@ -1150,20 +1156,20 @@ Spawning a child has a fixed prompt cost before any work. Run ids, the extractio
 
 In real runs the adopted definitions, with their full grants and bodies plus the task packet, started at 17,535 (`evidence-reviewer`, packet including the inventory) and 17,864 (`isolated-builder`, before its new preload). Sibling children launched together each wrote their own cache (first-request cache read 0); a repeat spawn of the same agent type about two minutes later read 34,591 of 42,091 tokens from cache. Children use the 5-minute cache class, so `subagentPromptCacheTtl` stays at its five-minute default: the one-hour class only pays for a child that idles more than five minutes between requests.
 
-Effort column since 2026-09-23: every child role runs at `max` with its task-matched model, and the coordinator runs at `max` in a terminal session started through the ecosystem launcher and at xhigh, saved per model, elsewhere (2026-09-29). The prompt-size figures above predate this change.
+Effort column since 2026-10-12: each agent row is its definition's routed model and effort ([decision](../../../docs/decisions/2026-10-12-model-effort-routing.md)); a default child stage still binds `max` (since 2026-09-23), and the coordinator runs at `max` in a terminal session started through the ecosystem launcher and at xhigh, saved per model, elsewhere (2026-09-29). The prompt-size figures above predate this change.
 
 | Task class | Agent / stage | Model, effort | Lanes |
 | --- | --- | --- | --- |
 | Requirements, decomposition, integration, hard judgments | coordinator | Opus 5.5, max from the launcher, else saved xhigh, under `ultracode` (on 2.1.281 a `max` session turned its orchestration off; a Sonnet 5.5 coordinator, the user's choice, sends each judgment to an `opus` stage); Fable 5.1 as an explicit escalation | all, one per artifact |
-| Exact extraction, inventory, running acceptance commands | `source-scout` | Sonnet, max | `rg`/focused Read, `qmd search`, `jq` pipelines, RTK-filtered Bash with `rtk proxy` recovery; acceptance commands run raw through `rtk proxy` where `rtk` is installed. Bash is granted, so its read-only rule is an instruction, not a sandbox |
-| Web, documentation, repository and catalog research | `stack-researcher` | Opus, max | WebSearch, then `ctx_fetch_and_index` and `ctx_search`, with no WebFetch (the lane a default child used when told to on 2026-09-21: 1 fetch, 5 searches, 8 requests); Context Mode for large output; `rg`/Read plus Serena and jCodeMunch reads for code; `qmd query`/`get`; ai-memory query; all deferred and returned inline. Bash is granted, so its read-only rule is an instruction |
-| Implementation from a clear contract | `isolated-builder` (coordinator-created worktree) | Opus, max | Edit and Write in the owned checkout the brief names, after checking that it is not the coordinator's own checkout and sits at the stated base (no frontmatter `isolation` since 2026-09-27); named Serena read tools, SocratiCode, jCodeMunch, Context Mode, ai-memory, all deferred. Serena binds the parent session's project at startup, so its symbol-edit tools, removed on 2026-09-26, would edit that checkout rather than the worktree. Preloads `context-mode:context-mode` (its `verification-before-completion` preload was removed on 2026-09-28); first-prompt size is unmeasured for this configuration |
-| Independent review from source and recorded evidence | `evidence-reviewer` | Opus, max | named Serena, SocratiCode, jCodeMunch and ai-memory read tools plus Context Mode `ctx_execute*`, all deferred. No Bash, Edit, Write or symbol-edit tool; `ctx_execute*` can still run commands in the working tree, so file safety there is an instruction, not a sandbox |
-| Adversarial security review of a supplied diff or artifact | `security-reviewer` | Opus, max | Same named read tools as evidence-reviewer behind ToolSearch; `security-best-practices` preloaded. No Bash, Edit, Write, WebFetch or Skill; Context Mode and jCodeMunch read-only use remains an instruction. None yet: first-prompt size, lane use, correctness and cost are preregistered in the [decision record](../../../docs/decisions/2026-09-26-stack-agents-role-dispatch.md) |
-| Review of supplied semantic (TypeSafe) judgments against original source | `semantic-evidence-reviewer` | Opus, max | Read, Glob, Grep and the `typesafe-ai` skill preloaded (first prompt 15,059 in the 2026-09-22 probe); no MCP grants, Bash or writes |
+| Exact extraction, inventory, running acceptance commands | `source-scout` | Sonnet, medium | `rg`/focused Read, `qmd search`, `jq` pipelines, RTK-filtered Bash with `rtk proxy` recovery; acceptance commands run raw through `rtk proxy` where `rtk` is installed. Bash is granted, so its read-only rule is an instruction, not a sandbox |
+| Web, documentation, repository and catalog research | `stack-researcher` | Sonnet, high | WebSearch, then `ctx_fetch_and_index` and `ctx_search`, with no WebFetch (the lane a default child used when told to on 2026-09-21: 1 fetch, 5 searches, 8 requests); Context Mode for large output; `rg`/Read plus Serena and jCodeMunch reads for code; `qmd query`/`get`; ai-memory query; all deferred and returned inline. Bash is granted, so its read-only rule is an instruction |
+| Implementation from a clear contract | `isolated-builder` (coordinator-created worktree) | Opus, high | Edit and Write in the owned checkout the brief names, after checking that it is not the coordinator's own checkout and sits at the stated base (no frontmatter `isolation` since 2026-09-27); named Serena read tools, SocratiCode, jCodeMunch, Context Mode, ai-memory, all deferred. Serena binds the parent session's project at startup, so its symbol-edit tools, removed on 2026-09-26, would edit that checkout rather than the worktree. Preloads `context-mode:context-mode` (its `verification-before-completion` preload was removed on 2026-09-28); first-prompt size is unmeasured for this configuration |
+| Independent review from source and recorded evidence | `evidence-reviewer` | Opus, xhigh | named Serena, SocratiCode, jCodeMunch and ai-memory read tools plus Context Mode `ctx_execute*`, all deferred. No Bash, Edit, Write or symbol-edit tool; `ctx_execute*` can still run commands in the working tree, so file safety there is an instruction, not a sandbox |
+| Adversarial security review of a supplied diff or artifact | `security-reviewer` | Opus, xhigh | Same named read tools as evidence-reviewer behind ToolSearch; `security-best-practices` preloaded. No Bash, Edit, Write, WebFetch or Skill; Context Mode and jCodeMunch read-only use remains an instruction. None yet: first-prompt size, lane use, correctness and cost are preregistered in the [decision record](../../../docs/decisions/2026-09-26-stack-agents-role-dispatch.md) |
+| Review of supplied semantic (TypeSafe) judgments against original source | `semantic-evidence-reviewer` | Opus, xhigh | Read, Glob, Grep and the `typesafe-ai` skill preloaded (first prompt 15,059 in the 2026-09-22 probe); no MCP grants, Bash or writes |
 | Layer-verdict lane stages: propose, refute and re-check one stripped packet from its repository root | `blind-lane-reviewer` | Opus, max | Read, Glob and Grep; no preloaded skill and no project instructions (`omitClaudeMd`); used by `layer-verdict-lane` |
 | Layer-verdict adjudication: judge, or refute a judgment on, one anonymous two-return disagreement input | `blind-adjudicator` | Opus, max | Read, Glob and Grep; no preloaded skill and no project instructions (`omitClaudeMd`); used by the catalog's adjudication lane |
-| Verification that must re-run commands | `stack-verifier` | Opus, max | acceptance commands raw through `rtk proxy`; Context Mode `ctx_execute*`, `ctx_batch_execute` and `ctx_search` to count in code; no project instructions (`omitClaudeMd`), Edit or Write, and it never fixes. Bash is granted, so its read-only rule is an instruction |
+| Verification that must re-run commands | `stack-verifier` | Sonnet, medium | acceptance commands raw through `rtk proxy`; Context Mode `ctx_execute*`, `ctx_batch_execute` and `ctx_search` to count in code; no project instructions (`omitClaudeMd`), Edit or Write, and it never fixes. Bash is granted, so its read-only rule is an instruction |
 | A stage no role fits, with its reason beside the call; the vendored `readiness-audit` verify stage | default workflow subagent | Opus, max | full tools, skills listing and project instructions; pays the 42k prompt deliberately |
 | Cross-family review | `/codex:review` lanes | Codex | see `recipes/claude-codex-cooperation-lanes.md`; usage is not in the Claude journal |
 

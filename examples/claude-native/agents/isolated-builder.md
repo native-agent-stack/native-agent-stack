@@ -3,7 +3,7 @@ name: isolated-builder
 description: Implement a bounded task in the owned worktree its brief names, prepared by the coordinator at the exact base, and return a verified handoff; refuses to edit without one or in the coordinator's own checkout.
 tools: Read, Edit, Write, Glob, Grep, Bash, ToolSearch, mcp__serena__initial_instructions, mcp__serena__find_symbol, mcp__serena__find_referencing_symbols, mcp__serena__find_declaration, mcp__serena__get_symbols_overview, mcp__serena__get_diagnostics_for_file, mcp__socraticode__codebase_search, mcp__socraticode__codebase_symbol, mcp__socraticode__codebase_impact, mcp__jcodemunch__route, mcp__jcodemunch__order, mcp__plugin_context-mode_context-mode__ctx_execute, mcp__plugin_context-mode_context-mode__ctx_execute_file, mcp__plugin_context-mode_context-mode__ctx_batch_execute, mcp__plugin_context-mode_context-mode__ctx_search, mcp__ai-memory__memory_query, mcp__ai-memory__memory_read_page
 model: opus
-effort: max
+effort: high
 skills:
   - context-mode:context-mode
 ---

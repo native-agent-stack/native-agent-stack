@@ -26,6 +26,11 @@ const WF = { review: 'workflows/review-changes.js', readiness: 'workflows/readin
 // its model's saved level or default (the coordinator's xhigh on 2.1.281), and CLAUDE_CODE_EFFORT_LEVEL overrides every child's effort, so max is bound per stage and per agent and the
 // settings leave that variable unset.
 const STAGE_EFFORT = 'max'
+// Each project agent's own effort since 2026-10-12 (docs/decisions/2026-10-12-model-effort-routing.md, the command
+// center's routing table): a named child (a teammate spawn) drops a per-launch effort and runs at its definition's,
+// so the definition carries the routed level. The blind roles keep their protocol's max. A saved stage still binds
+// STAGE_EFFORT, which overrides the definition for that unnamed stage.
+const AGENT_EFFORT = { 'blind-adjudicator': 'max', 'blind-judge': 'max', 'blind-lane-reviewer': 'max', 'evidence-reviewer': 'xhigh', 'isolated-builder': 'high', 'landscape-sweep-worker': 'max', 'security-reviewer': 'xhigh', 'semantic-evidence-reviewer': 'xhigh', 'source-scout': 'medium', 'stack-researcher': 'high', 'stack-verifier': 'medium' }
 function load(file, stubs) {
   const body = readFileSync(join(ROOT, file), 'utf8').replace(/^export const meta/m, 'const meta')
   const fn = new Function('args', 'agent', 'parallel', 'pipeline', 'phase', 'log', 'budget', 'workflow', 'return (async () => {\n' + body + '\n})()')
@@ -415,7 +420,8 @@ function agentOptionLiterals(src) {
     expect('agents: ' + n + ' name matches its file', nameOf(fm) === n.replace(/\.md$/, ''))
     expect('agents: ' + n + ' declares an explicit model and effort', /^model: (haiku|sonnet|opus)$/m.test(fm) && /^effort: (low|medium|high|xhigh|max)$/m.test(fm))
     // One effort line, and it is the stage effort: a second, lower line cannot hide behind the first.
-    expect('agents: ' + n + ' runs at effort ' + STAGE_EFFORT + ' on a single effort line', (fm.match(/^effort:/mg) || []).length === 1 && new RegExp('^effort: ' + STAGE_EFFORT + '$', 'm').test(fm))
+    const routedEffort = AGENT_EFFORT[n.replace(/\.md$/, '')]
+    expect('agents: ' + n + ' runs at its routed effort on a single effort line', routedEffort !== undefined && (fm.match(/^effort:/mg) || []).length === 1 && new RegExp('^effort: ' + routedEffort + '$', 'm').test(fm))
     expect('agents: ' + n + ' declares a tools allowlist', tools.length > 0)
     // Frontmatter `isolation: worktree` branches from the default branch, not the exact base, and on 2026-09-25 rewrote the
     // shared core.hooksPath (docs/harness-defaults.md anti-pattern log), so no agent declares it (since 2026-09-27). A

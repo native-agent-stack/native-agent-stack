@@ -275,9 +275,13 @@ class TaskModelRoutingRecordTests(unittest.TestCase):
             with self.subTest(row=row[0]):
                 alias = re.search(r"`(opus|sonnet)`", row[2])
                 quoted = re.search(r"`model: (\w+)`", row[4])
-                self.assertTrue(alias and quoted)
+                effort = re.search(r"`effort: (\w+)`", row[4])
+                self.assertTrue(alias and quoted and effort)
                 self.assertEqual(alias.group(1), quoted.group(1))
-                self.assertEqual(row[3], "max")
+                # The effort column states the definition's effort first (since 2026-10-12 each definition carries
+                # its routed level, docs/decisions/2026-10-12-model-effort-routing.md); a row may add what a saved
+                # workflow stage binds after a semicolon.
+                self.assertEqual(row[3].split(";")[0], effort.group(1))
 
     def test_gpt_6_1_sol_is_routed_where_the_sol_primary_record_routes_it_and_nowhere_else(self):
         # The table's Sol rows are the two configured routes, each a Codex row at the record's effort.

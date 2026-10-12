@@ -1022,10 +1022,25 @@ class AgentsInstallTests(unittest.TestCase):
 
 
 class ShippedAgentEffortTests(unittest.TestCase):
-    """Every shipped agent runs at effort max beside its task-matched model
-    (docs/decisions/2026-09-23-max-effort-default.md): an agent's frontmatter effort
-    is what a stage without its own effort runs at, and a second, lower effort line
-    must not hide behind the first."""
+    """Every shipped agent carries the model and effort of the command center's routing table
+    (docs/decisions/2026-10-12-model-effort-routing.md, superseding 2026-09-23-max-effort-default.md for
+    effort): on Claude Code 2.1.296 a named child (a teammate spawn) drops a per-launch effort and runs at its
+    definition's, so the definition is where the level is set. The blind roles and the landscape sweep keep
+    their protocol's max, and a second effort line must not hide behind the first."""
+
+    ROUTED = {
+        "blind-adjudicator": ("opus", "max"),
+        "blind-judge": ("opus", "max"),
+        "blind-lane-reviewer": ("opus", "max"),
+        "evidence-reviewer": ("opus", "xhigh"),
+        "isolated-builder": ("opus", "high"),
+        "landscape-sweep-worker": ("opus", "max"),
+        "security-reviewer": ("opus", "xhigh"),
+        "semantic-evidence-reviewer": ("opus", "xhigh"),
+        "source-scout": ("sonnet", "medium"),
+        "stack-researcher": ("sonnet", "high"),
+        "stack-verifier": ("sonnet", "medium"),
+    }
 
     @staticmethod
     def frontmatter(path: Path) -> list[str]:
@@ -1034,13 +1049,15 @@ class ShippedAgentEffortTests(unittest.TestCase):
             return []
         return lines[1:lines.index("---", 1)]
 
-    def test_each_shipped_agent_has_exactly_one_effort_max_line(self):
+    def test_each_shipped_agent_has_its_routed_model_and_one_effort_line(self):
         agents = sorted(icp.AGENTS_SRC_DIR.glob("*.md"))
-        self.assertTrue(agents)
+        self.assertEqual(sorted(path.stem for path in agents), sorted(self.ROUTED))
         for path in agents:
+            model, effort = self.ROUTED[path.stem]
             with self.subTest(agent=path.name):
-                effort_lines = [line for line in self.frontmatter(path) if line.startswith("effort:")]
-                self.assertEqual(effort_lines, ["effort: max"])
+                front = self.frontmatter(path)
+                self.assertEqual([line for line in front if line.startswith("effort:")], ["effort: " + effort])
+                self.assertEqual([line for line in front if line.startswith("model:")], ["model: " + model])
 
     def test_the_check_rejects_a_lower_or_repeated_effort(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -1053,11 +1070,16 @@ class ShippedAgentEffortTests(unittest.TestCase):
                     effort_lines = [line for line in self.frontmatter(path) if line.startswith("effort:")]
                     self.assertNotEqual(effort_lines, ["effort: max"])
 
+    def test_only_the_protocol_roles_keep_max(self):
+        # The routing table lowers every role but the blind protocol roles and the landscape sweep's workers.
+        self.assertEqual(sorted(name for name, (_, effort) in self.ROUTED.items() if effort == "max"),
+                         ["blind-adjudicator", "blind-judge", "blind-lane-reviewer", "landscape-sweep-worker"])
+
 
 class ShippedAgentFrontmatterTests(unittest.TestCase):
     """Every shipped agent's frontmatter parses as a YAML mapping, uses only documented subagent
     fields with documented types and values, and names an explicit model beside its effort (the
-    repository rule: effort max with an explicit model).
+    repository rule: an explicit model and effort, the routed levels of ShippedAgentEffortTests).
 
     Source: the "Frontmatter reference" table and "Subagent files Claude Code skips" section of
     https://code.claude.com/docs/en/sub-agents, read 2026-09-26 against Claude Code 2.1.283. Claude

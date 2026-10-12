@@ -1,5 +1,7 @@
 # Decision: `max` effort for every Claude child, Ultracode for the main loop (2026-09-23)
 
+**Superseded for effort (2026-10-12)** by [2026-10-12-model-effort-routing.md](2026-10-12-model-effort-routing.md): each agent definition now carries the model and effort of the command center's routing table, the blind roles and the landscape sweep keeping `max`; a saved workflow stage still binds `effort: 'max'`. The record below is kept as it was decided.
+
 **Decided by:** unit `max-effort-default`, its own dedicated worktree, branch
 `claude/max-effort-default-20260923` (first based on `origin/main@40828dfe`, later
 rebased onto the current `main`), acting on the owner's 2026-09-23 request for maximum-quality `max` effort

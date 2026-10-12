@@ -4917,23 +4917,23 @@
   "files": [
     {
       "path": ".claude/agents/evidence-reviewer.md",
-      "sha256": "84e7ec7b433fc6ef3506a2488c5641b9ed8d88bae8f296b197b182964fa31399",
-      "bytes": 2825
+      "sha256": "91d7d2c9d06a47ef2b6cf34bb212e8f48cc8ded2eeab71656b42123b73b6b26f",
+      "bytes": 2827
     },
     {
       "path": ".claude/agents/isolated-builder.md",
-      "sha256": "e22c8f8d5d5239ddce211aad69e695b2952951bab7142998f0c12445cd399096",
-      "bytes": 3881
+      "sha256": "49ad19746d8e35e88c60fb3af4ef29aab6a5877b7949b9f51fbb7db1c711c28c",
+      "bytes": 3882
     },
     {
       "path": ".claude/agents/security-reviewer.md",
-      "sha256": "fc51df098f4e5fb3a0ccde3b13700814151d3391d112bee49f7030a834da5770",
-      "bytes": 3891
+      "sha256": "8beabfa7e80ce1e0411cf60dc3eda40c27251052c833b38865c79201c144a4e0",
+      "bytes": 3893
     },
     {
       "path": ".claude/agents/stack-researcher.md",
-      "sha256": "5fea67ac0e615b420871b6302558dbce3025e052259545e9eeb0020991e55240",
-      "bytes": 4711
+      "sha256": "3335189f47ce227222b294c46be2d0632de9051d52509dadb13ec4676625629c",
+      "bytes": 4714
     },
     {
       "path": ".claude/rules/trading.md",
@@ -5287,13 +5287,13 @@
     },
     {
       "path": "adoption/agents/claude/evidence-reviewer.md",
-      "sha256": "84e7ec7b433fc6ef3506a2488c5641b9ed8d88bae8f296b197b182964fa31399",
-      "bytes": 2825
+      "sha256": "91d7d2c9d06a47ef2b6cf34bb212e8f48cc8ded2eeab71656b42123b73b6b26f",
+      "bytes": 2827
     },
     {
       "path": "adoption/agents/claude/isolated-builder.md",
-      "sha256": "e22c8f8d5d5239ddce211aad69e695b2952951bab7142998f0c12445cd399096",
-      "bytes": 3881
+      "sha256": "49ad19746d8e35e88c60fb3af4ef29aab6a5877b7949b9f51fbb7db1c711c28c",
+      "bytes": 3882
     },
     {
       "path": "adoption/agents/claude/landscape-sweep-worker.md",
@@ -5302,28 +5302,28 @@
     },
     {
       "path": "adoption/agents/claude/security-reviewer.md",
-      "sha256": "fc51df098f4e5fb3a0ccde3b13700814151d3391d112bee49f7030a834da5770",
-      "bytes": 3891
+      "sha256": "8beabfa7e80ce1e0411cf60dc3eda40c27251052c833b38865c79201c144a4e0",
+      "bytes": 3893
     },
     {
       "path": "adoption/agents/claude/semantic-evidence-reviewer.md",
-      "sha256": "c1cb4882dc104b306e5fd07c52d0a444674b26ffa71f5577710aa03bacd22853",
-      "bytes": 2303
+      "sha256": "794dae4340a438f5d03184923f2545743b42f4a8a903e480126058f6c0ec2a71",
+      "bytes": 2305
     },
     {
       "path": "adoption/agents/claude/source-scout.md",
-      "sha256": "f79cead4a3f9c14986bb28815d046eacf8bf79c92fe923094f66f97a64c06341",
-      "bytes": 3066
+      "sha256": "13c472e5db39499805c0e9edbc65bf60ac50c1b36c3dbb62ee4c2fa067b8126d",
+      "bytes": 3069
     },
     {
       "path": "adoption/agents/claude/stack-researcher.md",
-      "sha256": "5fea67ac0e615b420871b6302558dbce3025e052259545e9eeb0020991e55240",
-      "bytes": 4711
+      "sha256": "3335189f47ce227222b294c46be2d0632de9051d52509dadb13ec4676625629c",
+      "bytes": 4714
     },
     {
       "path": "adoption/agents/claude/stack-verifier.md",
-      "sha256": "a4cc7f5024af7fdea544a0963d8ff6f712c9eb460812582fd93368870eeeabcc",
-      "bytes": 3799
+      "sha256": "12c0e5b94817265dd5af72000fcc67a814a11248f97370272cf0ad7f7cbdbb73",
+      "bytes": 3804
     },
     {
       "path": "adoption/agents/codex/SHA256SUMS",
@@ -17333,8 +17333,8 @@
     },
     {
       "path": "catalogs/foundation/decisions.json",
-      "sha256": "89091ead1eecd0cf5f030f75ef721fe750b34023705f770539923180b7e87163",
-      "bytes": 140288
+      "sha256": "767c13587fad67633bf839de50246f500af4ad5af1eaf6d40ab040d93b509d4f",
+      "bytes": 140483
     },
     {
       "path": "catalogs/foundation/latest-models.json",
@@ -18108,8 +18108,8 @@
     },
     {
       "path": "docs/decisions/2026-09-23-max-effort-default.md",
-      "sha256": "5df52d0fa2440419a8bd31db737fe33c4bb95e724737aaeb5ef147fea75b9449",
-      "bytes": 23193
+      "sha256": "01116afbc92303559f13e716a80d8651bf4248c2be4a2a7ca4b05cf48dfc915f",
+      "bytes": 23555
     },
     {
       "path": "docs/decisions/2026-09-24-secret-storage.md",
@@ -18338,8 +18338,8 @@
     },
     {
       "path": "docs/decisions/2026-09-30-task-model-routing.md",
-      "sha256": "69caa36500e10cd027eda388d754adba8397939d15e7f74805ad6440f6c353b3",
-      "bytes": 45902
+      "sha256": "c1236ababe5cda0b5d6091edf27e935b9973ff67bf30437b2e82a70187ebc584",
+      "bytes": 46609
     },
     {
       "path": "docs/decisions/2026-10-01-definitive-sota-wsl-program.md",
@@ -56413,8 +56413,8 @@
     },
     {
       "path": "evidence/artifacts/token-adoption-e2e-20260926/README.md",
-      "sha256": "a729db863c7c6ba549543f7ed91ff8a502ed118d166e6e5eb1e28d4f2c2e1e32",
-      "bytes": 78655
+      "sha256": "5444aac42af5130367fa1a65b20c155dc80ad58096aedaee6d893ac7117e37bf",
+      "bytes": 80633
     },
     {
       "path": "evidence/artifacts/token-adoption-e2e-20260926/RUNBOOK.md",
@@ -60313,38 +60313,38 @@
     },
     {
       "path": "examples/claude-native/agents/evidence-reviewer.md",
-      "sha256": "84e7ec7b433fc6ef3506a2488c5641b9ed8d88bae8f296b197b182964fa31399",
-      "bytes": 2825
+      "sha256": "91d7d2c9d06a47ef2b6cf34bb212e8f48cc8ded2eeab71656b42123b73b6b26f",
+      "bytes": 2827
     },
     {
       "path": "examples/claude-native/agents/isolated-builder.md",
-      "sha256": "e22c8f8d5d5239ddce211aad69e695b2952951bab7142998f0c12445cd399096",
-      "bytes": 3881
+      "sha256": "49ad19746d8e35e88c60fb3af4ef29aab6a5877b7949b9f51fbb7db1c711c28c",
+      "bytes": 3882
     },
     {
       "path": "examples/claude-native/agents/security-reviewer.md",
-      "sha256": "fc51df098f4e5fb3a0ccde3b13700814151d3391d112bee49f7030a834da5770",
-      "bytes": 3891
+      "sha256": "8beabfa7e80ce1e0411cf60dc3eda40c27251052c833b38865c79201c144a4e0",
+      "bytes": 3893
     },
     {
       "path": "examples/claude-native/agents/semantic-evidence-reviewer.md",
-      "sha256": "c1cb4882dc104b306e5fd07c52d0a444674b26ffa71f5577710aa03bacd22853",
-      "bytes": 2303
+      "sha256": "794dae4340a438f5d03184923f2545743b42f4a8a903e480126058f6c0ec2a71",
+      "bytes": 2305
     },
     {
       "path": "examples/claude-native/agents/source-scout.md",
-      "sha256": "f79cead4a3f9c14986bb28815d046eacf8bf79c92fe923094f66f97a64c06341",
-      "bytes": 3066
+      "sha256": "13c472e5db39499805c0e9edbc65bf60ac50c1b36c3dbb62ee4c2fa067b8126d",
+      "bytes": 3069
     },
     {
       "path": "examples/claude-native/agents/stack-researcher.md",
-      "sha256": "5fea67ac0e615b420871b6302558dbce3025e052259545e9eeb0020991e55240",
-      "bytes": 4711
+      "sha256": "3335189f47ce227222b294c46be2d0632de9051d52509dadb13ec4676625629c",
+      "bytes": 4714
     },
     {
       "path": "examples/claude-native/agents/stack-verifier.md",
-      "sha256": "a4cc7f5024af7fdea544a0963d8ff6f712c9eb460812582fd93368870eeeabcc",
-      "bytes": 3799
+      "sha256": "12c0e5b94817265dd5af72000fcc67a814a11248f97370272cf0ad7f7cbdbb73",
+      "bytes": 3804
     },
     {
       "path": "examples/claude-native/ultracode.settings.json",
@@ -60358,12 +60358,12 @@
     },
     {
       "path": "examples/claude-native/workflows/README.md",
-      "sha256": "b85e83f514dd7baf5902dde96ed1dde0b2d1e270c758a110d3acf3c65e2081ef",
-      "bytes": 113734
+      "sha256": "e74ddc5557ac7a9b209ccdfe1eb403566cfe9e7c9f61bcd618ae8eda135d2de0",
+      "bytes": 114526
     },
     {
       "path": "examples/claude-native/workflows/SHA256SUMS",
-      "sha256": "6b4da12d9fa4ec192238d366d4b9238ece9f9994949271452bf9d3946bc5fcc0",
+      "sha256": "3b9592b0758826a95c060d466307f1241a102caaef7aa3007a20e974f572eda3",
       "bytes": 1217
     },
     {
@@ -60413,13 +60413,13 @@
     },
     {
       "path": "examples/claude-native/workflows/test-contract-mutations.mjs",
-      "sha256": "2867a2c7ae3a313d346c34338f13ecb23699045d6533013889285cc87f4c7625",
-      "bytes": 22586
+      "sha256": "1f03bf1441e9a857cabb3aada203e66e5888a5fda2f466905eba3894a7fa9977",
+      "bytes": 22800
     },
     {
       "path": "examples/claude-native/workflows/test-envelope.mjs",
-      "sha256": "07a7402e23cd8ea6aa1be5d23b0238a87b99d8c91f65ca1140ff8ffaa14e3516",
-      "bytes": 57413
+      "sha256": "2ce03ec8d73f711139a21f5f42a0b0ca3de89bedf539499ff82591a74ae0eec9",
+      "bytes": 58262
     },
     {
       "path": "examples/claude-native/workflows/test-usage-receipts.mjs",
@@ -62533,8 +62533,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "31aa607901be251aa8bc89df9fdcb02f2604ffc4f87b50c555d378d0470721cb",
-      "bytes": 169116
+      "sha256": "96efd873781bdb7b1309b18d892308529401ea2d3298a89150ff061b5f208cf7",
+      "bytes": 170517
     },
     {
       "path": "tests/test_install_skills.py",
@@ -63278,8 +63278,8 @@
     },
     {
       "path": "tests/test_task_model_routing.py",
-      "sha256": "bdbdb66eb4efd8a39b3c57ebd02e42ce869aa75996fa27f4d56da1ae259c7a2b",
-      "bytes": 24608
+      "sha256": "f046be0d43c2c35dcc95a691e52b34803017fa3207f4d9768250f558b95c0153",
+      "bytes": 24994
     },
     {
       "path": "tests/test_token_e2e_grader.py",
@@ -63288,8 +63288,8 @@
     },
     {
       "path": "tests/test_token_e2e_preregistration.py",
-      "sha256": "efeda300bf452c5c323541554505a21af2264b4336f16cda67801d96195ab8db",
-      "bytes": 55914
+      "sha256": "6973400b4f91d16d1d45cacf47da89c4e4e389113c555fb212081848575b5c72",
+      "bytes": 56939
     },
     {
       "path": "tests/test_token_e2e_receipt_checks.py",

@@ -906,3 +906,28 @@ Current execution/result status was not established by this structural CI
 repair. The owner must resolve that status before any future execution, using
 the command center's landing chronology. This amendment is not a run,
 qualification, result or execution authorization.
+
+## Amendment 5 (2026-10-12): role bodies after the model and effort routing decision
+
+This append-only amendment records replacement body pins for the five adopted role bodies, whose frontmatter
+`model` and `effort` lines change under
+[docs/decisions/2026-10-12-model-effort-routing.md](../../../docs/decisions/2026-10-12-model-effort-routing.md):
+`stack-verifier.md` and `source-scout.md` to Sonnet at medium, `stack-researcher.md` to Sonnet at high,
+`isolated-builder.md` to Opus at high and `evidence-reviewer.md` to Opus at xhigh. Nothing else changes in a body
+(the `model` line only in the first and third). It supersedes every earlier body-hash requirement for these five files (Amendment 2, Amendment 3,
+Amendment 4 and RUNBOOK's Freeze and preflight role-body paragraph); identity across adoption, project and
+installed user copies still blocks a future launch on a missing or differing copy.
+
+| Role body | SHA256 after Amendment 5 |
+| --- | --- |
+| `stack-verifier.md` | `12c0e5b94817265dd5af72000fcc67a814a11248f97370272cf0ad7f7cbdbb73` |
+| `isolated-builder.md` | `49ad19746d8e35e88c60fb3af4ef29aab6a5877b7949b9f51fbb7db1c711c28c` |
+| `source-scout.md` | `13c472e5db39499805c0e9edbc65bf60ac50c1b36c3dbb62ee4c2fa067b8126d` |
+| `stack-researcher.md` | `3335189f47ce227222b294c46be2d0632de9051d52509dadb13ec4676625629c` |
+| `evidence-reviewer.md` | `91d7d2c9d06a47ef2b6cf34bb212e8f48cc8ded2eeab71656b42123b73b6b26f` |
+
+All prior text and seals remain history. The sealed protocol, runner, RUNBOOK and fixture bytes are unchanged,
+so their existing Amendment 3 seal still applies. Previous executions retain their original body identities and
+interpretation; no earlier record is rewritten or recoded. A future execution states the models and efforts its
+roles ran at, which now differ from the executed `max`, and the owner resolves whether that execution compares
+with the earlier ones. This amendment is not a run, qualification, result or execution authorization.

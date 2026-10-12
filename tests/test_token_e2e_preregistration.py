@@ -101,6 +101,15 @@ AMENDMENT_4_ROLE_BODY_ROWS = (
     "| `stack-researcher.md` | `5fea67ac0e615b420871b6302558dbce3025e052259545e9eeb0020991e55240` |",
     "| `evidence-reviewer.md` | `84e7ec7b433fc6ef3506a2488c5641b9ed8d88bae8f296b197b182964fa31399` |",
 )
+# Amendment 5 (2026-10-12): the five role bodies after the model and effort routing decision
+# (docs/decisions/2026-10-12-model-effort-routing.md); they replace every earlier row above.
+AMENDMENT_5_ROLE_BODY_ROWS = (
+    "| `stack-verifier.md` | `12c0e5b94817265dd5af72000fcc67a814a11248f97370272cf0ad7f7cbdbb73` |",
+    "| `isolated-builder.md` | `49ad19746d8e35e88c60fb3af4ef29aab6a5877b7949b9f51fbb7db1c711c28c` |",
+    "| `source-scout.md` | `13c472e5db39499805c0e9edbc65bf60ac50c1b36c3dbb62ee4c2fa067b8126d` |",
+    "| `stack-researcher.md` | `3335189f47ce227222b294c46be2d0632de9051d52509dadb13ec4676625629c` |",
+    "| `evidence-reviewer.md` | `91d7d2c9d06a47ef2b6cf34bb212e8f48cc8ded2eeab71656b42123b73b6b26f` |",
+)
 # The README amendment rule preserves every earlier seal table: the Repair 1
 # rows, verbatim. Kept as table rows, not "name": "digest" pairs, which the
 # pre-commit gitleaks generic-api-key rule reads as a keyed secret.
@@ -655,8 +664,13 @@ class TokenE2EPreregistrationTests(unittest.TestCase):
         for row in AMENDMENT_4_ROLE_BODY_ROWS:
             with self.subTest(file=row.split("`")[1], field="amendment_4_row"):
                 self.assertIn(row, amendment_4)
+        amendment_5 = section(readme, "## Amendment 5 (2026-10-12)", "\n## ")
+        for row in AMENDMENT_5_ROLE_BODY_ROWS:
+            with self.subTest(file=row.split("`")[1], field="amendment_5_row"):
+                self.assertIn(row, amendment_5)
         current = {row.split("`")[1]: row.split("`")[3]
-                   for row in ROLE_BODY_ROWS + AMENDMENT_3_ROLE_BODY_ROWS + AMENDMENT_4_ROLE_BODY_ROWS}
+                   for row in ROLE_BODY_ROWS + AMENDMENT_3_ROLE_BODY_ROWS + AMENDMENT_4_ROLE_BODY_ROWS
+                   + AMENDMENT_5_ROLE_BODY_ROWS}
         self.assertEqual(len(current), len(ROLE_BODY_ROWS))
         for filename, digest in current.items():
             for copy in ("adoption/agents/claude", ".claude/agents"):

@@ -2,8 +2,8 @@
 name: stack-verifier
 description: Verify supplied claims by re-running the commands a task names and reading original source, and return a verdict per claim with exit codes and summaries copied verbatim. Read-only by instruction (Bash and Context Mode; no Edit, Write, WebFetch or Skill tool), and it never fixes what it finds. Use source-scout for extraction and inventories and evidence-reviewer for source review without execution.
 tools: Read, Glob, Grep, Bash, ToolSearch, mcp__plugin_context-mode_context-mode__ctx_batch_execute, mcp__plugin_context-mode_context-mode__ctx_execute, mcp__plugin_context-mode_context-mode__ctx_execute_file, mcp__plugin_context-mode_context-mode__ctx_search
-model: opus
-effort: max
+model: sonnet
+effort: medium
 maxTurns: 100
 omitClaudeMd: true
 ---
