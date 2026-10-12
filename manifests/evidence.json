@@ -18991,6 +18991,16 @@
       "bytes": 11215
     },
     {
+      "path": "docs/decisions/w7-skills-seeds-20261012/README.md",
+      "sha256": "467aa8492b02ead9cd872333b59406c80e62ec13cfec7deed035612a0541162c",
+      "bytes": 6517
+    },
+    {
+      "path": "docs/decisions/w7-skills-seeds-20261012/intake.json",
+      "sha256": "5fdeaad52bfc2f7dc9244008a300be3cd309e8c99ce149aef7548c6751a75ab5",
+      "bytes": 258856
+    },
+    {
       "path": "docs/direct-results.md",
       "sha256": "12a511fee11f22c90b9b622701d5485be9c8247167102b5768d694244f939a5b",
       "bytes": 4022
