@@ -64,6 +64,11 @@ class NativeOpenCodeContractTests(unittest.TestCase):
             spec = importlib.util.spec_from_file_location("opencode_contract_baseline", baseline)
             module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
             module.ROOT = ROOT
+        # Native verification of executable layouts uses only an already
+        # installed public uv binary; never a real private file.
+        uv_layout = os.environ.get("NS_RUNTIME_TEST_UV_LAYOUT")
+        original_path = os.environ.get("PATH", "")
+        self.addCleanup(os.environ.__setitem__, "PATH", original_path)
         with tempfile.TemporaryDirectory(dir="/var/tmp") as temporary:
             scratch = Path(temporary)
             # Match host relative depths: primary below HOME/code, runtime
@@ -82,11 +87,15 @@ class NativeOpenCodeContractTests(unittest.TestCase):
                            check=True, capture_output=True)
             (workspace / "AGENTS.md").write_text("OWNED_AGENTS_MARKER\n")
             owned, outside = workspace / "owned.txt", primary / "primary-only.txt"
+            if uv_layout == "local":
+                outside = home / ".local/state/private-fixture.txt"
+                outside.parent.mkdir(parents=True)
             owned.write_text("OWNED_FILE_MARKER\n"); outside.write_text("PRIMARY_FILE_MARKER\n")
             unrelated = scratch / "unrelated/outside.txt"
             unrelated.parent.mkdir(); unrelated.write_text("UNRELATED_FILE_MARKER\n")
             state = home / ".local/state/profiles"
             with mock.patch.object(module, "canonical_servers", return_value={"context-mode": {"command": "node"}}), \
+                    mock.patch.object(module, "verify_runtime_binary", return_value="1.18.35", create=True), \
                     mock.patch.object(module.shutil, "which", return_value="/fixture/rtk"), \
                     mock.patch.object(module.subprocess, "check_output", side_effect=[
                         "rtk 0.51.0\n", "e001f773f80b22b7dc4c7a79521b30e35aaef026\n"]), \
@@ -119,6 +128,7 @@ class NativeOpenCodeContractTests(unittest.TestCase):
                 return subprocess.CompletedProcess(command, 0)
             with mock.patch.dict(os.environ, {"PWD": str(primary)}), \
                     mock.patch.object(module, "opencode_sandbox_command", side_effect=lambda command, *args: command, create=True), \
+                    mock.patch.object(module, "verify_runtime_binary", return_value="1.18.35", create=True), \
                     mock.patch.object(module, "fresh_worktree", return_value=workspace), \
                     mock.patch.object(module.subprocess, "run", side_effect=record), \
                     mock.patch.object(module.subprocess, "check_output", return_value="a" * 40), \
@@ -144,9 +154,14 @@ class NativeOpenCodeContractTests(unittest.TestCase):
                                       capture_output=True, text=True, timeout=35)
             version = native([binary, "--version"])
             self.assertEqual(version.stdout.strip(), "1.18.35", "test binary does not match installed source pin")
+            if uv_layout:
+                uv_bin = home / (".local/bin" if uv_layout == "local" else "bin")
+                uv_bin.mkdir(parents=True)
+                shutil.copy2(Path(shutil.which("uv")).resolve(), uv_bin / "uv")
+                os.environ["PATH"] = str(uv_bin) + os.pathsep + original_path
             with mock.patch.object(Path, "home", return_value=home):
-                fenced = profiles.opencode_sandbox_command([binary], root, workspace,
-                    {"opencode_bin": binary}, "evidence-reviewer")
+                fenced = (module.opencode_sandbox_command([binary], root, workspace,
+                    {"opencode_bin": binary}, "evidence-reviewer") if hasattr(module,"opencode_sandbox_command") else [binary])
             sandbox_prefix = fenced[:-1]
             capture = scratch / "capture.py"; capture.write_text(CAPTURE)
             command = launch["command"]

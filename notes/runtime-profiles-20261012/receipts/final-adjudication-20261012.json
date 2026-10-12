@@ -9,13 +9,14 @@
   "delivery": "ONE scope-locked fix commit after registry-only rebase; ONE push leased on reviewed_head",
   "api_spend_usd": 0,
   "provider_inference_calls": 0,
+  "scope_supersession": "Historical fixture record only. The CC scope ruling at 16:37:44Z retains private profile state and role grants; all alias-read fencing acceptance claims are withdrawn and PARKED. This record does not establish current read containment or full runtime readiness.",
   "corrections": [
     {
       "finding": "B-1 / Astra P1: lexical aliases bypass native Read permissions",
-      "mechanism": "Installed Bubblewrap 0.11.1, empty root with explicit public dependency mounts, assigned worktree and private profile; existing escaping/broken/cyclic link preflight; read-only empty mounts for unselected pinned vendor skills; no primary checkout or host HOME mount",
+      "mechanism": "Historical Bubblewrap 0.11.1 implementation with computed dependency mounts; dependency selection was subsequently revised. This mechanism is not qualified as an alias-read fence.",
       "evidence_class": "local_integration",
       "before": "Existing installed-CLI fixture plus worktree-file, worktree-directory and selected-vendor aliases fails 3 native subcases at reviewed head; a separately added unselected-vendor alias fails before the directory mask",
-      "after": "Actual native run/debug-agent controls preserve owned/selected/owned-alias reads and root AGENTS.md, deny direct primary/unrelated/unselected and all tested alias forms; aliases created after namespace entry cannot disclose primary or unselected vendor targets",
+      "after": "Limited historical fixture observations only; the alias-read containment conclusion is withdrawn. PARKED for separate qualification under the narrowed scope.",
       "portable": "Preflight missing-function control fails; 24 profile tests pass with the guard and launch binding",
       "sources": [
         "anomalyco/opencode@53d1eabb61e21162157817bf677da0a4ad3332e3:packages/opencode/src/tool/read.ts:234-257,331",
@@ -54,12 +55,12 @@
     {
       "boundary": "Live Git and real committed MCP consumers inside the new namespace",
       "closing_test": "test_runtime_profile_consumers.NativeNamespaceConsumerTests.test_git_and_committed_mcp_consumers",
-      "status": "planned, not implemented/run; must require real Worktrunk Git head/status, every admitted MCP connection/tool count, harmless tool calls and tracker observations, retaining direct/alias negatives"
+      "status": "planned, not implemented/run; must require real Worktrunk Git head/status, every admitted MCP connection/tool count, harmless tool calls and tracker observations; PARKED read fencing needs separate qualification"
     },
     {
       "boundary": "Supported sandbox-runtime proxy carrying native loopback traffic",
       "closing_test": "test_runtime_profile_consumers.NativeNamespaceConsumerTests.test_srt_proxy_loopback_route",
-      "status": "planned, not implemented/run; same installed native client and rejecting loopback fixture, documented proxy configuration, request captured and alias negatives retained"
+      "status": "planned, not implemented/run; same installed native client and rejecting loopback fixture, documented proxy configuration and request capture; PARKED read fencing needs separate qualification"
     }
   ],
   "follow_ups": [

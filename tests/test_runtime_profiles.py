@@ -68,6 +68,13 @@ class RuntimeInvokeTrackerTests(unittest.TestCase):
 
 
 class NativeProfileGenerationTests(unittest.TestCase):
+    def setUp(self):
+        # Renderer/command contracts use controlled fixture binaries. Actual
+        # absent/wrong/native version admission is covered without this stub
+        # by test_runtime_profile_readiness and the installed-CLI module.
+        self.version_patch = mock.patch.object(profiles, "verify_runtime_binary", return_value="fixture-version")
+        self.version_patch.start()
+        self.addCleanup(self.version_patch.stop)
     def test_escaping_links_are_refused_in_worktree_and_selected_vendor_roots(self):
         with tempfile.TemporaryDirectory(dir="/var/tmp") as directory:
             root = Path(directory)
@@ -85,6 +92,9 @@ class NativeProfileGenerationTests(unittest.TestCase):
                     with self.assertRaisesRegex(profiles.ProfileError, "escaping or unresolved read link"):
                         profiles.check_read_links([workspace, vendor])
                     alias.unlink()
+            cyclic=workspace/'cycle';cyclic.symlink_to(cyclic)
+            with self.assertRaises(profiles.ProfileError):profiles.check_read_links([workspace,vendor])
+            cyclic.unlink()
             (workspace / "broken").symlink_to(primary / "missing")
             with self.assertRaises(profiles.ProfileError):
                 profiles.check_read_links([workspace, vendor])

@@ -13,10 +13,10 @@ The CC's B1 ruling explicitly authorizes OpenCode's native read-only skill
 loader. Each agent's `permission.skill` grants the27 managed names, its own
 role's vendor set and its canonical preloads; the wildcard remains denied.
 Security-reviewer preloads security-best-practices and isolated-builder
-preloads Context Mode through native file references. Native Read allows
-only selected vendor skill directories under the private profile; canonical
+preloads Context Mode through native file references. Native direct-path Read permissions grant
+selected vendor skill directories under the private profile; canonical
 managed skills use the named native loader without opening the host directory.
-Unselected vendor skills and unrelated external directories stay denied.
+Unselected vendor skill names and direct external-directory permissions are denied.
 The cache layout comes from OpenCode53d1eabb `core/src/global.ts:12`,
 `core/src/npm.ts:45-50,87,133` and `plugin/shared.ts:207-212`; the Superpowers
 skills directory comes from bb92a777 `.opencode/plugins/superpowers.js:25,223`.
@@ -57,57 +57,40 @@ native absolute `instructions` in that overlay (OpenCode53d1eabb
 `src/session/instruction.ts:135-150`); root-rule prompt loading is measured.
 Automatic subtree AGENTS.md discovery is disabled and remains a capability
 omission pending its own qualified instruction-loading test.
-Primary-checkout and unrelated-directory reads are denied by the pinned
-evaluator regression for direct lexical paths. The additional native
-filesystem boundary below handles aliases; its explicit dependency mounts
-are exceptions to the worktree/profile scope. Pi's filesystem reads remain
-outside this OpenCode-only boundary.
-
-The f1eaa2fb review reproduced a native Read alias escape: a file/directory
-symlink inside the worktree or an admitted vendor directory could reveal a
-directly denied primary-checkout file. The correction checks those
-roots before launch and refuses existing escaping, broken or cyclic links
-without reading target bytes. An empty-root Bubblewrap filesystem namespace
-then binds only the worktree, private profile and explicit public executable,
-runtime, managed-skill and system dependencies. Primary checkout/HOME is not
-mounted; links introduced after preflight still cannot reach absent targets.
-The native test preserves normal owned/selected reads and checks all three
-primary-target alias cases, a relative primary link, an alias to an unselected
-vendor file, an allowed owned-file alias, and a link created inside an already-
-running namespace. Unselected pinned vendor skill directories are additionally
-masked with native read-only empty mounts so aliases cannot bypass their grant.
+The pinned evaluator tests direct lexical permissions and role tool grants.
+The CC's 16:37:44Z scope ruling retains private profile state and role grants
+as this PR's acceptance properties. **PARKED: filesystem read fencing through
+aliases.** No current alias-containment guarantee or acceptance claim is made.
+Earlier mechanism observations in the receipts are historical fixture results
+only and are superseded as readiness claims by this scope ruling. Pi has no
+filesystem read fence. Broad read containment needs its own qualification.
 
 Installed Bubblewrap0.11.1 uses its documented `--ro-bind`, `--bind`,
 `--unshare-pid`, `--proc`, `--dev` and `--chdir` mechanism; no vendor Read
 implementation or runtime plugin is replaced. Its fresh proc/device mounts are
-explicit process dependencies, and the network namespace stays native so
-Claude Console and OmniRoute retain their native network path. The primary
-Git metadata is absent; full live worktree Git consumers need separate
-qualification inside this boundary. This is filesystem isolation with named dependency exceptions,
-not a network-isolation claim or permission to run W6 arms.
+explicit process dependencies, and the network namespace stays native.
+Full live Git/MCP consumers still need separate qualification. Keeping this
+mechanism is implementation detail, not an alias-read admission gate or a
+permission to run W6 arms.
 Source: containers/bubblewrap@124c4cdf4321f63ef17a1cb0ce8f9dd45bd7adbe
 `bwrap.xml:135,218,293-317,401-409`, checked with `GIT_NO_LAZY_FETCH=1` and
 `git show 124c4cdf:bwrap.xml` in the containers/bubblewrap mirror. The mirror
 was synchronized to v0.11.1 at13:51:01Z; the earlier URL check is superseded.
 
-The mechanism exception is limited to this P1 and these command profiles.
+The recorded mechanism exception applies to these command profiles.
 At anthropics/sandbox-runtime@d9aac2098351ca17f3743fbaf6ecbd0051b7e00e,
 `src/sandbox/sandbox-config.ts:1138` requires network configuration and
 `:743-748` requires its allowedDomains array. The supported CLI config therefore
 always activates network restriction/proxy (`src/sandbox/sandbox-manager.ts:1919-1930`)
 and Linux `--unshare-net` (`src/sandbox/linux-sandbox-utils.ts:3370-3382`). It
 has no CLI setting for this filesystem boundary while retaining the original
-network namespace/native loopback route. This says nothing against srt's
-filesystem alias denial: that control passed. The complete native loopback
-request capture failed through that srt route, while the direct Bubblewrap
-filesystem-only control preserved the rejecting loopback endpoint and denied
-the aliases. The broader question of whether a supported srt proxy arrangement
+network namespace/native loopback route. The broader question of whether a supported srt proxy arrangement
 could carry these loopback requests is UNTESTED; failed request attempts do not
 establish that no such arrangement exists. Closing test is planned as
 `test_runtime_profile_consumers.NativeNamespaceConsumerTests.test_srt_proxy_loopback_route`
 (not yet implemented/run): use the identical native client and rejecting
 loopback stub through srt's documented proxy configuration and require request
-capture plus all alias negatives. All cited srt bytes were read from the v0.0.79
+capture plus a separately preregistered containment qualification. All cited srt bytes were read from the v0.0.79
 mirror with lazy fetch disabled; this is not a blanket proxy limitation claim.
 
 Untested boundary: live Git and the actual committed MCP consumers inside
@@ -118,14 +101,14 @@ each real OpenCode route command, and require native Git head/status plus every
 admitted committed MCP connection and a bounded harmless tool call to succeed
 inside the identical wrapper. Record exact tool counts, exits and tracker
 observations without copying auth or native session state. Missing Git metadata,
-consumer dependencies or disconnected MCP must fail this test. Alias negatives,
-including a link created after namespace entry, must remain denied. Until it
+consumer dependencies or disconnected MCP must fail this test. The PARKED
+read-fencing question needs a separate qualification before it is claimed. Until it
 passes there is no new full-profile acceptance or readiness promotion.
 
 The isolation layer's recorded winner is unchanged. The co-op's research queue
 has "srt against direct Bubblewrap for runtime-profile isolation", added at
 13:52:29Z with readiness input #1033 LANDED; this comparison decides any later
-winner change. This PR's in-scope P1 exception does not decide that research row.
+winner change. This PR does not decide that research row.
 
 Each profile and role owns `CLAUDE_CONFIG_DIR`, `CONTEXT_MODE_DATA_DIR` and
 `CONTEXT_MODE_DIR`; the token layer has the actual Pi/OpenCode platform and a
@@ -233,8 +216,8 @@ is now present in the mirror; Context Mode's cited source remains unmirrored.
 The dependency rebuild uses the installed npm11.19.0 command's supported
 named-package form ([npm rebuild](https://docs.npmjs.com/cli/v11/commands/npm-rebuild)).
 
-Final adjudicated correction: B-1 adds the native filesystem boundary and
-fail-before alias controls; B-2 disables project configuration while retaining
+The earlier adjudicated mechanism remains in the implementation, with read
+fencing now PARKED under the scope ruling. B-2 disables project configuration while retaining
 root AGENTS.md through absolute native instructions and proves an injected
 project shell grant is refused; B-3 updates claims/counts and the rebased base.
 The isolation research row is preserved. Both families read the final head
@@ -300,3 +283,33 @@ explicit binary/mirror inputs exist; CI's portable controls do not replace
 those native runs. The output-hash regression covers one runtime notes subtree
 and specific output-hash keys; the broader publication detector still excludes
 notes. Historical flag-truthiness and #161 locator gaps remain named follow-ups.
+
+The dependency selection mounts OpenCode/Node/uv executables as individual files, obtains
+Python library paths through native sysconfig, and refuses a directory that
+encompasses HOME, the primary checkout or unrelated private-state roots. An
+opaque optional auxiliary prefix no longer grants that whole tree; its public
+resource paths must be qualified separately. The host and standalone-layout
+fixtures are exploratory mechanism evidence; they do not close the PARKED
+read-fencing question or establish full runtime readiness.
+
+Default `prepare` now creates every role-scoped descriptor required by the
+installed launchers and ns-run; `--no-role-scoped` is an explicit unscoped
+research mode, not the preparation contract for those launchers. Preparation
+and launch verify native Pi1.1.0/OpenCode1.18.35 existence/version in a private
+empty HOME without inherited credentials. Wrong/missing binaries refuse before
+trial state is written or a fresh worktree is created. These releases remain
+qualified until a separate supported-generation change is recorded.
+Native version contracts: earendil-works/pi@04566631:
+packages/coding-agent/docs/cli.md:245; anomalyco/opencode@53d1eabb:
+packages/opencode/src/index.ts:51, read from their pinned mirrors.
+Standalone uv installer layouts: astral-sh/uv@2ad97ed9:
+docs/reference/installer.md:5-12 and docs/getting-started/installation.md:270.
+
+Interactive OpenCode collection retains listing/export failures as unmeasured
+failure receipts and returns their nonzero status. Partial successful exports
+are labelled separately; missing data is never reported as measured zero use.
+The session/worktree retry state is retained and cleanup is skipped until a
+successful collection. Normal successful cleanup remains receipt-first.
+The native baseline switch now selects its loaded baseline's wrapper, or no
+wrapper if that baseline predates it; it no longer silently uses the head's
+filesystem implementation. Historical captures remain unpublished and unhashed.

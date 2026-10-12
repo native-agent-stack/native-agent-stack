@@ -60622,8 +60622,8 @@
     },
     {
       "path": "notes/runtime-profiles-20261012/README.md",
-      "sha256": "729552b22d6fc8a636769479c680b2aa56f017a15d5acac192d22cbb2b64332a",
-      "bytes": 20350
+      "sha256": "aaf2ecca9f6d43d5c0cdf0567db85b883f192f06320d589ebee57f316093ac2d",
+      "bytes": 21217
     },
     {
       "path": "notes/runtime-profiles-20261012/REPLAY-SOURCES.md",
@@ -60646,9 +60646,14 @@
       "bytes": 3916
     },
     {
+      "path": "notes/runtime-profiles-20261012/receipts/dependency-and-readiness-correction-20261012.json",
+      "sha256": "48f4751ca255675086a41992f0110aa90396c270dfbc9f03a870c1986fc6ad61",
+      "bytes": 5022
+    },
+    {
       "path": "notes/runtime-profiles-20261012/receipts/final-adjudication-20261012.json",
-      "sha256": "70fd6c69cd21eadfba0df7a161e98caac6e6943881d396457b738b0563d23fba",
-      "bytes": 6557
+      "sha256": "2d4f04eddc24f485a4b6ac8368a04826adc82dcdd28abf137405def4980c3fee",
+      "bytes": 6696
     },
     {
       "path": "notes/runtime-profiles-20261012/receipts/opencode-claude.delta-smoke.json",
@@ -62867,13 +62872,18 @@
     },
     {
       "path": "tests/test_runtime_opencode_native.py",
-      "sha256": "9f198027197e4a1cd4a547142d9e5a3a19138a50c1d93407539d09e0d3b1d0d3",
-      "bytes": 15966
+      "sha256": "72c3f3ef5027aeb36b6f0581c3eb8e7c08bad29c5a4ef4d395e324927f386e6c",
+      "bytes": 17037
+    },
+    {
+      "path": "tests/test_runtime_profile_readiness.py",
+      "sha256": "ea6904016837c15760f1d7f96d27c7d81d897fdb865e8aaa9d3b176ec9db8ae7",
+      "bytes": 8473
     },
     {
       "path": "tests/test_runtime_profiles.py",
-      "sha256": "894cf58c9a4296b15a6a2b72e68f669b79a43e7fdf4c1baf147734ef35ea1d38",
-      "bytes": 35842
+      "sha256": "40457adb80ac6fc59793a1b093146ea89141f45dcbd7a47531f48813d7a67115",
+      "bytes": 36484
     },
     {
       "path": "tests/test_runtime_publication.py",
@@ -63327,8 +63337,8 @@
     },
     {
       "path": "tools/adoption/runtime_profiles.py",
-      "sha256": "d749b006e7205fe65a7ad3caf40414d5352fc7221b8703c484f26bb2b64f54b2",
-      "bytes": 66765
+      "sha256": "1499281bed4b43cc83319aa84308a3540afcbcc9058d7d2e4c41b850b3b0ef64",
+      "bytes": 71298
     },
     {
       "path": "tools/adoption/runtime_skill_freshness.py",

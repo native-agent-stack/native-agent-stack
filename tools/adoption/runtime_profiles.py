@@ -71,6 +71,28 @@ def profile_name(value):
     return value.removeprefix("ns-")
 
 
+def verify_runtime_binary(runtime: str, executable: Path) -> str:
+    """Native version admission in an empty fixture HOME, without credentials.
+
+    earendil-works/pi@04566631:packages/coding-agent/docs/cli.md:245;
+    anomalyco/opencode@53d1eabb:packages/opencode/src/index.ts:51.
+    Configuration/permissions/events are qualified only at these releases.
+    """
+    expected = {"pi": "1.1.0", "opencode": "1.18.35"}[runtime]
+    path = executable.resolve()
+    if not path.is_file() or not os.access(path, os.X_OK):
+        raise ProfileError("runtime executable unavailable; preparation/launch refused")
+    with tempfile.TemporaryDirectory(dir="/var/tmp") as temporary:
+        environment = {"HOME": temporary, "TMPDIR": temporary, "LANG": "C.UTF-8",
+                       "PATH": os.environ.get("PATH", os.defpath)}
+        result = subprocess.run([str(path), "--version"], cwd=temporary, env=environment,
+                                capture_output=True, text=True, timeout=15)
+    version = (result.stdout or "").strip()
+    if result.returncode or version not in {expected, runtime + " " + expected, runtime + " v" + expected}:
+        raise ProfileError("runtime version differs from qualified release; preparation/launch refused")
+    return expected
+
+
 def module(name: str, path: Path):
     spec = importlib.util.spec_from_file_location(name, path)
     mod = importlib.util.module_from_spec(spec)
@@ -359,6 +381,7 @@ def render(profile: str, *, state: Path, home: Path, eco_root: Path, templates: 
                 or len(tier1.get("slots", [])) != 13):
             raise ProfileError("canonical Tier1 input differs from managed manifest")
     runtime, route = profile.split("-")
+    qualified_version = verify_runtime_binary(runtime, pi_bin if runtime == "pi" else opencode_bin)
     destination = owned_destination(state / profile)
     if role_scope:
         destination = destination / "roles" / role_scope
@@ -480,7 +503,7 @@ def render(profile: str, *, state: Path, home: Path, eco_root: Path, templates: 
     metadata = {"schema_version": 1, "profile": profile, "role_scope": role_scope, "status": "trial",
                 "model": CLAUDE_MODEL if route == "claude" else GPT_MODEL,
                 "effort": "xhigh" if route == "claude" else "high",
-                "pi_bin": str(pi_bin), "opencode_bin": str(opencode_bin),
+                "pi_bin": str(pi_bin), "opencode_bin": str(opencode_bin), "runtime_version": qualified_version,
                 "roles": {name: {k: v for k, v in item.items() if k != "agent"} for name, item in roles.items()},
                 "canonical_mcp_sources": [str(p.relative_to(ROOT)) if p.is_relative_to(ROOT) else str(p)
                                           for p in templates], "mcp_server_names": sorted(servers)}
@@ -674,8 +697,8 @@ def worktree_permissions(root: Path, workspace: Path) -> dict:
 def check_read_links(roots: list[Path]) -> None:
     """Fail closed on pre-existing aliases outside the admitted read roots.
 
-    No target contents are opened. This is preflight only; the filesystem
-    namespace below remains the boundary for links introduced after the scan.
+    No target contents are opened. This is preflight only; it does not
+    establish the separately PARKED alias-read containment property.
     """
     lexical = [root.absolute() for root in roots]
     for root in lexical:
@@ -705,7 +728,7 @@ def opencode_filesystem_roots(root: Path, workspace: Path, meta: dict, role: str
     """Explicit dependency roots for Bubblewrap's native bind-mount interface.
 
     containers/bubblewrap@124c4cdf (v0.11.1):bwrap.xml:135,293-314,401-405.
-    The empty-root filesystem protects against aliases after preflight too.
+    Alias-read containment qualification is PARKED under the scope ruling.
     Executable/package/system dependencies are explicit read-only exceptions.
     """
     config = json.loads((root / "config/opencode/opencode.json").read_text())
@@ -721,21 +744,41 @@ def opencode_filesystem_roots(root: Path, workspace: Path, meta: dict, role: str
     # The CLI's public npm prefix and selected language runtime installations
     # contain executable dependencies, not native user auth/session stores.
     binary = Path(meta["opencode_bin"]).resolve()
-    binary_root = binary.parent
-    if binary.parent.name == "bin" and binary.parent.parent.name == "opencode-ai":
-        binary_root = binary.parent.parent.parent
-    dependencies = {str(binary_root), "/usr", "/bin", "/lib", "/lib64", "/sbin",
+    # Native OpenCode, Node and uv executables are admitted as individual
+    # files. Their installer path never implies a package/home ancestor.
+    dependencies = {str(binary), "/usr", "/bin", "/lib", "/lib64", "/sbin",
                     "/etc/ssl", "/etc/ca-certificates", "/etc/resolv.conf", "/etc/hosts"}
     for executable in (sys.executable, shutil.which("node"), shutil.which("uv")):
         if executable:
-            dependencies.add(str(Path(executable).resolve().parent.parent))
-    if meta.get("auxiliary_root"):
-        dependencies.add(str(Path(meta["auxiliary_root"]).resolve()))
+            dependencies.add(str(Path(executable).resolve()))
+    # Python's own supported sysconfig reports its public library directories;
+    # never infer them by moving two levels above the selected executable.
+    import sysconfig
+    for name in ("stdlib", "platstdlib", "purelib", "platlib"):
+        directory = sysconfig.get_path(name)
+        if directory:
+            dependencies.add(str(Path(directory).resolve()))
+    library = sysconfig.get_config_var("LIBDIR")
+    if library:
+        dependencies.add(str(Path(library).resolve()))
+    # Auxiliary resources require explicit qualified paths, not an entire
+    # opaque install/state prefix. Existing optional prefixes remain a named
+    # full-consumer readiness gap until their resource list is qualified.
+    dependencies.update(meta.get("qualified_auxiliary_read_paths", []))
     managed = json.loads((ROOT / "adoption/skills/manifest.json").read_text())["skills"]
     skills = [str(Path.home() / ".agents/skills" / item["name"]) for item in managed
               if item.get("status") != "held" and not item.get("native_plugin")
               and item.get("agents") != ["claude-code"]]
-    return [*sorted(dependencies), *skills]
+    paths = [*sorted(dependencies), *skills]
+    home = Path.home().resolve()
+    forbidden = [home, ROOT.resolve(), home / ".local", home / ".local/state",
+                 home / ".cache", home / ".config", home / ".codex", home / ".claude",
+                 home / ".pi", home / ".agents"]
+    for name in paths:
+        path = Path(name).resolve()
+        if path.is_dir() and any(path == private or private.is_relative_to(path) for private in forbidden):
+            raise ProfileError("unqualified broad dependency directory; sandbox refused")
+    return paths
 
 
 def opencode_sandbox_command(command: list[str], root: Path, workspace: Path,
@@ -757,14 +800,12 @@ def opencode_sandbox_command(command: list[str], root: Path, workspace: Path,
             if str(destination) not in admitted:
                 wrapper += ["--ro-bind", str(resolved), str(destination)]
                 admitted.add(str(destination))
-    # No bind of '/' or HOME: denied targets are absent under every spelling.
-    # Keep the existing network namespace so both documented routes remain
-    # usable; this boundary isolates filesystem reads, not network traffic.
+    # Explicit binds retain the existing network namespace. Dependency
+    # qualification and alias-read containment are separate readiness gaps.
     wrapper += ["--bind", str(root), str(root), "--bind", str(workspace), str(workspace),
                 "--bind", str(root / "tmp"), "/tmp"]
-    # The runtime needs its own profile/cache, but a lexical workspace alias
-    # must not reveal an ungranted vendor skill within that cache. Mask the
-    # complete pinned unselected inventory at the filesystem layer, too.
+    # Mask the pinned unselected vendor inventory as implementation hygiene.
+    # This guard does not qualify the separately PARKED alias-read fence.
     selected = set(agent_vendor_skills(role)) if role else set()
     selected.add("using-superpowers")
     package = root / "cache/opencode/packages" / SUPERPOWERS_PLUGIN / "node_modules/superpowers/skills"
@@ -823,6 +864,7 @@ def launch(args):
     meta = json.loads((root / "profile.json").read_text())
     if meta.get("status") != "trial":
         raise ProfileError("only measured selections may change trial status")
+    verify_runtime_binary(runtime, Path(meta[runtime + "_bin"]))
     workspace = fresh_worktree(args.repository.resolve(), profile)
     aux = Path(meta["auxiliary_root"]) if meta.get("auxiliary_root") else None
     runtime_env = profile_environment(profile, args.state_root, role_scope, aux)
@@ -981,6 +1023,8 @@ def launch(args):
         from skill_usage import skillmd_hits
         inventory = json.loads((ROOT / "adoption/skills/manifest.json").read_text())
         names, skill_sources = invocation_inventory(inventory, meta, runtime)
+        collection_code = 0
+        collection_errors = []
         if runtime == "pi":
             explicit_logs = [("pi", path) for path in (interactive_run / "sessions").rglob("*.jsonl")]
             measured = scan(explicit_logs, names, skillmd_hits=skillmd_hits)
@@ -995,7 +1039,19 @@ def launch(args):
                 listing = subprocess.run([meta["opencode_bin"], "session", "list", "--format", "json"],
                                          cwd=workspace, env=collector_env, stdout=stream, stderr=subprocess.DEVNULL)
                 stream.seek(0)
-                sessions = json.load(stream) if listing.returncode == 0 else []
+                if listing.returncode:
+                    collection_code = listing.returncode
+                    collection_errors.append({"operation": "session_list", "exit_code": listing.returncode})
+                    sessions = []
+                else:
+                    try:
+                        sessions = json.load(stream)
+                        if not isinstance(sessions, list):
+                            raise ValueError("invalid session listing")
+                    except (ValueError, TypeError):
+                        sessions = []
+                        collection_code = 2
+                        collection_errors.append({"operation": "session_list_decode", "exit_code": 2})
             measured = []
             for session in sessions:
                 if session.get("directory") != str(workspace):
@@ -1005,14 +1061,31 @@ def launch(args):
                                               cwd=workspace, env=collector_env, stdout=stream, stderr=subprocess.DEVNULL)
                     if exported.returncode == 0:
                         stream.seek(0)
-                        measured.append(scan_opencode_export(json.load(stream), names, skillmd_hits=skillmd_hits))
-        private_write(interactive_run / "invocations.json", json.dumps(measured, indent=2) + "\n")
-        cleanup = cleanup_worktree(args.repository.resolve(), workspace)
+                        try:
+                            measured.append(scan_opencode_export(json.load(stream), names, skillmd_hits=skillmd_hits))
+                        except (ValueError, TypeError):
+                            collection_code = collection_code or 2
+                            collection_errors.append({"operation": "session_export_decode", "exit_code": 2})
+                    else:
+                        collection_code = collection_code or exported.returncode
+                        collection_errors.append({"operation": "session_export", "exit_code": exported.returncode})
+        measurement = measured if not collection_code else {"status": "collection_failed", "measured": False,
+                        "successful_partial_measurements": measured, "errors": collection_errors}
+        private_write(interactive_run / "invocations.json", json.dumps(measurement, indent=2) + "\n")
+        private_write(interactive_run / "collection-receipt.json", json.dumps({
+            "schema_version": 1, "status": "collection_failed" if collection_code else "measured",
+            "exit_code": collection_code, "errors": collection_errors,
+            "runtime_exit_code": result.returncode, "retry_state_retained": bool(collection_code),
+        }, indent=2) + "\n")
+        cleanup = ({"status": "retained_collection_failed"} if collection_code
+                   else cleanup_worktree(args.repository.resolve(), workspace))
         private_write(interactive_run / "worktree-cleanup.json", json.dumps(cleanup, indent=2) + "\n")
         print(json.dumps({"invocations": str(interactive_run / "invocations.json"),
-                          "runtime_exit_code": result.returncode, "worktree_cleanup": cleanup,
+                          "runtime_exit_code": result.returncode, "collection_exit_code": collection_code,
+                          "collection_receipt": str(interactive_run / "collection-receipt.json"),
+                          "worktree_cleanup": cleanup,
                           "retained_worktree": str(workspace) if cleanup["status"] != "removed" else None}))
-    return result.returncode
+    return result.returncode or collection_code
 
 
 def install_launchers(args):
@@ -1063,7 +1136,7 @@ def parser():
     prepare.add_argument("--rtk-source", type=Path, required=True)
     prepare.add_argument("--wsl-render", action="store_true",
                          help="render canonical MCP through new_wsl_client_config's WSL map first")
-    prepare.add_argument("--role-scoped", action="store_true",
+    prepare.add_argument("--role-scoped", action=argparse.BooleanOptionalAction, default=True,
                          help="also install vendor role sets into separate native role profile roots")
     prepare.add_argument("--auxiliary-root", type=Path,
                          help="owned vendor-install prefix for Tavily, agent-browser and OpenResearch; no installer duplication")

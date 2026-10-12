@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "kind": "runtime-profile-dependency-and-readiness-correction",
+  "recorded_at": "2026-10-12T16:45:34Z",
+  "clock": "date -u",
+  "reviewed_head": "e3988eddd4d5cabf726d463b1f904d17628170a5",
+  "base": "d8f7e2051b61bde6361a85b64f41413798015353",
+  "process": "ONE commit answering supplied verdict and four threads; scope narrowed to private profile state and role grants. Alias-read fencing PARKED. Both families judge it, Claude verification uses own tests/claims/landing state only",
+  "provider_calls": 0,
+  "api_spend_usd": 0,
+  "findings": [
+    {
+      "id": "Astra P1",
+      "before": "Actual installed native Read control passes on host layout; uv under synthetic HOME/bin or HOME/.local/bin each gives 5 alias/late-link failures with product source unchanged",
+      "after": "PARKED under the scope ruling: no current alias-read containment claim. Dependency binds minimized as implementation hygiene; limited native fixture observations do not establish this property or full runtime readiness.",
+      "evidence_class": "local_integration",
+      "source": "astral-sh/uv@2ad97ed9b2b052144151844d00b2e718564ca2ce:docs/reference/installer.md:5-12;docs/getting-started/installation.md:270;containers/bubblewrap@124c4cdf:bwrap.xml:309-310"
+    },
+    {
+      "comments": [4248193194,4248193203],
+      "before": "Default parser/preparation renders four unscoped states; default builder launch returns 2 because scoped descriptor is absent; duplicate comments describe one defect",
+      "after": "Role-scoped preparation defaults on and generates builder/reviewer/auditor/researcher states for each profile; prepare-to-required-descriptor regression passes",
+      "evidence_class": "synthetic"
+    },
+    {
+      "comments": [4248193210],
+      "before": "Renderer accepts nonexistent OpenCode and never invokes it; wrong runtime can reach launch",
+      "after": "Existence/executable/native version checked before rendering trial state and before fresh worktree at launch; absent/wrong/correct fixture controls and installed public Pi/OpenCode checks pass",
+      "evidence_class": "local_integration"
+    },
+    {
+      "comments": [4248193225],
+      "before": "Listing exit7 or export exit8 becomes launch exit0, empty measurements and cleanup",
+      "after": "Nonzero listing/export propagated; bounded collection failure receipt with measured=false; partial data distinguished; session/worktree retained for retry, cleanup skipped. Separate failure controls pass.",
+      "evidence_class": "synthetic"
+    }
+  ],
+  "readiness_regressions": "7 focused tests, exit0 with explicit installed public binary inputs, no skips; original before-control fails with 16 missing-descriptor/collection assertions and 5 absent-version-hook errors",
+  "native_layout_commands": [
+    "systemd-run --user --scope -p CPUWeight=idle env TMPDIR=/var/tmp PYTHONDONTWRITEBYTECODE=1 NS_RUNTIME_TEST_UV_LAYOUT=home NS_OPENCODE_TEST_BIN=<installed-public-1.18.35-binary> python3 -B -m unittest discover -s tests -p test_runtime_opencode_native.py -q",
+    "systemd-run --user --scope -p CPUWeight=idle env TMPDIR=/var/tmp PYTHONDONTWRITEBYTECODE=1 NS_RUNTIME_TEST_UV_LAYOUT=local NS_OPENCODE_TEST_BIN=<installed-public-1.18.35-binary> python3 -B -m unittest discover -s tests -p test_runtime_opencode_native.py -q"
+  ],
+  "baseline_replay": "Baseline selection wiring repaired; exploratory filesystem fixture results do not establish the PARKED read-fencing property",
+  "focused_validation": "7 readiness tests (no skips), 24 profile tests, 5 publication tests (no skips), 11 routing tests, one native test per executable layout and one hermetic boot test pass. Integrity validation passes with 11831 registered public files.",
+  "version_sources": "earendil-works/pi@04566631:packages/coding-agent/docs/cli.md:245;anomalyco/opencode@53d1eabb:packages/opencode/src/index.ts:51",
+  "before_captures": "Unpublished synthetic fixture captures under coordination /var/tmp; no output hashes recorded",
+  "native_boundary": "Actual installed OpenCode/Bubblewrap, synthetic outside markers and copied public uv executable only; no real private state/credential copied/read; HTTP fixture rejects request inside outer network namespace, no inference",
+  "retained_gaps": [
+    "PARKED: read fencing through aliases; no current readiness claim, historical fixture claims superseded by scope ruling",
+    "Live Git/actual committed MCP consumer qualification in dependency-limited namespace is still untested",
+    "Supported srt proxy arrangement for native loopback remains untested",
+    "Exceptional pre-receipt launch exits retain the previously recorded cleanup gap",
+    "Historical source/capture and limited publication-key coverage gaps remain explicit",
+    "Native binary/mirror CI inputs are optional; portable checks are not native qualification"
+  ],
+  "after_push": "Source-screen/Harbor work parks for pool conservation; runtime comparison/shadow arms require landing, fresh prepare and CC cue"
+}
