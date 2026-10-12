@@ -431,7 +431,7 @@ measurement provenance; later live grants do not revise these dated values.
 Mechanism: Git 2.53.0, `git ls-tree -r -z --name-only --full-tree <rev>` and
 `git show <rev>:<path>`; pinned upstream
 [`git-ls-tree.adoc:44-61`](https://github.com/git/git/blob/67ad42147a7acc2af6074753ebd03d904476118f/Documentation/git-ls-tree.adoc#L44-L61),
-[`git-show.adoc:25`](https://github.com/git/git/blob/67ad42147a7acc2af6074753ebd03d904476118f/Documentation/git-show.adoc#L25),
+[`git-show.adoc:27`](https://github.com/git/git/blob/67ad42147a7acc2af6074753ebd03d904476118f/Documentation/git-show.adoc#L27),
 and [`revisions.adoc:217-220`](https://github.com/git/git/blob/67ad42147a7acc2af6074753ebd03d904476118f/Documentation/revisions.adoc#L217-L220).
 
 Historical #1013 integration base (retained as the reviewed source binding):

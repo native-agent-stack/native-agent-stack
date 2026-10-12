@@ -5,7 +5,7 @@ not open private receipts, client configuration or native model transcripts.
 CPython's unittest, json, pathlib and re APIs own execution and parsing.
 Dated inventory uses Git 2.53.0's tree/blob APIs (git/git v2.53.0 at
 67ad42147a7acc2af6074753ebd03d904476118f): git-ls-tree.adoc:44-61
-(-r, -z, --name-only), git-show.adoc:25 (plain blob contents), and
+(-r, -z, --name-only), git-show.adoc:27 (plain blob contents), and
 revisions.adoc:217-220 (<rev>:<path>). The tree, catalog and policy all
 come from the record's inventory-validation commit, never the live index.
 """

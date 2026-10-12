@@ -40,6 +40,8 @@ the candidate files. Removing an entry, replacing a delta's expected
 hash, or committing the removal cannot hide a historical baseline.
 Full Git history is required; a shallow checkout fails explicitly.
 The validation workflow already checks out with `fetch-depth: 0`.
+A follow-on PR whose committed delta needs a fix after its first push may
+only append a superseding entry or rewrite its branch.
 
 ## Derive the new delta
 
@@ -63,6 +65,13 @@ newest count or rewritten historical baseline fails the regression.
 The regression also rejects omitted entries both with and without a
 baseline rewrite, for later and equal dates, and after the omission has
 been committed. A valid same-date append remains accepted.
+The refresh fixture seeds its own committed history before the first
+checker invocation, independently of observations in the outer checkout.
+A second regression commits a valid same-date observation in an outer
+checkout before exercising the refresh fixture; omission, reorder and
+edit controls must still fail. Both fixture history and candidate files
+use the same isolated repository; the production preservation checker
+is unchanged by this fixture correction.
 
 Run the owning module before publishing:
 
@@ -92,6 +101,11 @@ path-limited commit enumeration, and
 `Documentation/rev-list-options.adoc:520-525` documents following all
 merge parents with `--full-history`. The comparison uses resolved commit
 objects rather than a mutable remote branch or a candidate-selected pin.
+The outer regression uses supported local Git commands from that pin:
+`Documentation/git-clone.adoc:80-85` (`--shared`) and `:160-161`
+(`--no-checkout`), plus `Documentation/git-checkout.adoc:66-71`
+(`--detach`). The source objects remain referenced for the temporary
+clone's lifetime; fixture commits are discarded with that clone.
 The index uses the existing CPython JSON parser and `datetime.date`
 ordering, with no new runtime dependency or replacement inventory policy.
 Installed CPython 3.13.16 source pin:

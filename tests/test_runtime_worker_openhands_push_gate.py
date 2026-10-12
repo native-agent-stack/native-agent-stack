@@ -1238,6 +1238,42 @@ class RepositoryWorkflowTests(unittest.TestCase):
         self.assertEqual((derived.files.get(module), protected.rule(module)),
                          ("ci_discovered", "ci_discovered"))
 
+    def test_baseline_refresh_regression_accepts_a_committed_outer_observation(self):
+        """A normal publisher's next append must not invalidate our isolated fixture."""
+        source, derived = self.derived()
+        with tempfile.TemporaryDirectory(prefix="outer-dated-observation-") as temporary:
+            checkout = Path(temporary) / "checkout"
+            run_git(Path(temporary), "clone", "--shared", "--no-checkout", source.repo, str(checkout))
+            run_git(checkout, "checkout", "--detach", source.commit)
+            evidence = Path("blueprints/runtime-workers/openhands/evidence")
+            index_file = checkout / evidence / "unclassified-gate-read-deltas.json"
+            index = json.loads(index_file.read_text())
+            previous = index["entries"][-1]
+            appended = {**previous, "path": "unclassified-gate-reads-outer-fixture-delta.json"}
+            (checkout / evidence / appended["path"]).write_bytes(
+                (checkout / evidence / previous["path"]).read_bytes())
+            index["entries"].append(appended)
+            index_file.write_text(json.dumps(index))
+            published_commit = commit_all(checkout, "append valid same-date outer observation")
+            outer_tree = self.g.patch_policy.GitTree(checkout, published_commit, git=REAL_GIT)
+            with mock.patch(__name__ + ".ROOT", checkout), mock.patch.object(
+                    type(self), "_derived", (outer_tree, derived)), contextlib.redirect_stdout(io.StringIO()):
+                self.test_advisory_baseline_and_explicit_categories_stay_bounded_on_this_repository()
+                self.test_newest_dated_delta_accepts_a_baseline_refresh_without_rewriting_history()
+                for mutation in ("omit", "reorder", "edit"):
+                    changed = json.loads(json.dumps(index))
+                    if mutation == "omit":
+                        changed["entries"].pop(0)
+                    elif mutation == "reorder":
+                        changed["entries"][-2:] = reversed(changed["entries"][-2:])
+                    else:
+                        changed["entries"][0]["path"] = "edited-historical-delta.json"
+                    index_file.write_text(json.dumps(changed))
+                    with self.subTest(mutation=mutation):
+                        with self.assertRaisesRegex(AssertionError, "append-only"):
+                            self.test_advisory_baseline_and_explicit_categories_stay_bounded_on_this_repository()
+                index_file.write_text(json.dumps(index))
+
     def test_newest_dated_delta_accepts_a_baseline_refresh_without_rewriting_history(self):
         tree, previous = self.derived()
 
@@ -1286,9 +1322,16 @@ class RepositoryWorkflowTests(unittest.TestCase):
             (fixture / json.loads(original_delta)["baseline_path"]).write_bytes(original_baseline)
             (fixture / baseline_path).write_bytes(baseline_bytes)
             (fixture / delta_path).write_text(json.dumps(delta))
-            (fixture / evidence / "unclassified-gate-read-deltas.json").write_text(json.dumps(index))
+            # Seed this fixture's own history before its first checker call.
+            # The outer checkout may already contain later valid publications.
+            index_file = fixture / evidence / "unclassified-gate-read-deltas.json"
+            run_git(fixture, "init", "-q")
+            index_file.write_text(json.dumps({**index, "entries": index["entries"][:1]}))
+            initial_commit = commit_all(fixture, "published original fixture observation")
+            fixture_tree = self.g.patch_policy.GitTree(fixture, initial_commit, git=REAL_GIT)
+            index_file.write_text(json.dumps(index))
             with mock.patch(__name__ + ".ROOT", fixture), mock.patch.object(
-                    type(self), "_derived", (tree, refreshed)), contextlib.redirect_stdout(io.StringIO()):
+                    type(self), "_derived", (fixture_tree, refreshed)), contextlib.redirect_stdout(io.StringIO()):
                 self.test_advisory_baseline_and_explicit_categories_stay_bounded_on_this_repository()
                 # Selecting the newest entry must still enforce its recorded count.
                 delta["derived_count"] += 1
@@ -1308,7 +1351,6 @@ class RepositoryWorkflowTests(unittest.TestCase):
                     delta["date"] = observation_date
                     index["entries"][-1]["date"] = observation_date
                     (fixture / delta_path).write_text(json.dumps(delta))
-                    index_file = fixture / evidence / "unclassified-gate-read-deltas.json"
                     index_file.write_text(json.dumps(index))
                     self.test_advisory_baseline_and_explicit_categories_stay_bounded_on_this_repository()
                     omitted = {**index, "entries": index["entries"][1:]}
@@ -1324,22 +1366,8 @@ class RepositoryWorkflowTests(unittest.TestCase):
                     index_file.write_text(json.dumps(index))
                 # Exercise the same omission after committing it: comparing
                 # only HEAD's index would accept the rewritten candidate.
-                run_git(fixture, "init", "-q")
-                index_file.write_text(json.dumps({**index, "entries": index["entries"][:1]}))
-                commit_all(fixture, "published original observation")
-                index_file.write_text(json.dumps(index))
                 published_commit = commit_all(fixture, "append same-date observation")
-
-                class HistoricalTree:
-                    repo, git, commit = str(fixture), REAL_GIT, published_commit
-
-                    def entries(self):
-                        return tree.entries()
-
-                    def read(self, path):
-                        return tree.read(path)
-
-                historical_tree = HistoricalTree()
+                historical_tree = self.g.patch_policy.GitTree(fixture, published_commit, git=REAL_GIT)
                 with mock.patch.object(type(self), "_derived", (historical_tree, refreshed)):
                     self.test_advisory_baseline_and_explicit_categories_stay_bounded_on_this_repository()
                     historical_baseline.write_bytes(original_baseline + b"\n")
