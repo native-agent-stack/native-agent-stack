@@ -39,12 +39,16 @@ PRIVATE_CONTENT = (
     # Historical prose can glue a UUID to a word; word boundaries miss it.
     ("local session identifier", re.compile(r"[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}", re.I)),
     ("local companion task handle", re.compile(r"task-[a-z0-9]{8}-[a-z0-9]{6}", re.I)),
-    # A WSL distribution's home through its Windows UNC path, \\wsl$\<distro>\home\<name>, \\wsl\... or
-    # \\wsl.localhost\..., the prefix in any case (MicrosoftDocs/wsl@a1473a69 WSL/filesystems.md:22, :34;
-    # wsl-config.md:162; release-notes.md:24, :76, :145), and JSON-escaped.
+    # A WSL distribution's home through its Windows UNC path: \\wsl$\<distro>\home\<name>, \\wsl\... or
+    # \\wsl.localhost\..., the prefix in any case (MicrosoftDocs/wsl@a1473a69 WSL/filesystems.md:34;
+    # wsl-config.md:162; release-notes.md:24, :76, :145), also as a device UNC path (\\?\UNC\..., \\.\UNC\...),
+    # with either slash, and <distro>\mnt\<drive>\Users\<name> too (dotnet/docs@8a189e07
+    # docs/standard/io/file-path-formats.md:94-95, :155, :206), and JSON-escaped.
     ("personal home path", re.compile(r"/(?:home|Users)/(?!example(?:/|\b))[A-Za-z0-9_.-]+(?:/|\b)"
-                                      r"|\\{2,4}[Ww][Ss][Ll](?:\.[Ll][Oo][Cc][Aa][Ll][Hh][Oo][Ss][Tt]|\$)?\\{1,2}"
-                                      r"[^\\/\s]{1,64}\\{1,2}home\\{1,2}(?!example(?:\\|\b))[A-Za-z0-9_.-]+(?:\\|\b)")),
+                                      r"|[\\/]{2,4}(?:[?.][\\/]{1,2}[Uu][Nn][Cc][\\/]{1,2})?[Ww][Ss][Ll]"
+                                      r"(?:\.[Ll][Oo][Cc][Aa][Ll][Hh][Oo][Ss][Tt]|\$)?[\\/]{1,2}[^\\/\r\n]{1,255}[\\/]{1,2}"
+                                      r"(?:home|mnt[\\/]{1,2}[A-Za-z][\\/]{1,2}[Uu][Ss][Ee][Rr][Ss])[\\/]{1,2}"
+                                      r"(?!example(?:[\\/]|\b))[A-Za-z0-9_.-]+(?:[\\/]|\b)")),
     ("Windows user path", re.compile(r"(?:[A-Za-z]:[/\\]+|/mnt/[A-Za-z]/)Users[/\\]+(?!example(?:[/\\]|\b))[A-Za-z0-9_.-]+", re.I)),
     # Claude project and scratchpad directories encode path separators as dashes,
     # including bare homes and Windows profiles reached through WSL mounts. The Users

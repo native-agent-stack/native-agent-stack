@@ -164,10 +164,11 @@ copies of the job. The seventh, about publication order, is answered without a c
 
   The bound is therefore the gate's own: 262,144 code points, so an astral character counts once. A code point takes
   at least one UTF-8 byte, so no description the update stores reaches the bound. It is also about 3.5 times the
-  longest description seen here. On Node 24.21, 35 adversarial shapes at the bound each get a verdict within
-  0.25 s, measured at the commit that answers the command center's read of `4e5ef13d` (the last section). An earlier
-  version of this sentence said "within 0.3 s" for every body at the bound; an unclosed link of whitespace broke it
-  until that commit.
+  longest description seen here. On Node 24.21, 52 adversarial shapes at the bound each get a verdict within
+  0.46 s on this 64-CPU host at a load of about 25 (four runs, worst 0.39, 0.43, 0.41 and 0.46 s), measured at the round-2 commit
+  (the last section). Earlier versions of this sentence said "within 0.3 s" for every body at the bound, which an
+  unclosed link of whitespace broke, and "within 0.25 s", which the command center's micro at `752d9618` measured as
+  0.26 to 0.28 s at a load of about 26.
 - **The decoders compose.** Each decoder still runs at most once along a chain, never to a fixed point. The rules
   now see every order of every subset of the four decoders: 65 forms, counting the body. A slash written as a
   character reference around a name in emphasis is therefore read as GitHub displays it. Codex suggested a pinned
@@ -180,9 +181,10 @@ copies of the job. The seventh, about publication order, is answered without a c
   The rule drops gitleaks's `(?i)` and stays case-sensitive as before. PKCS #8 `ENCRYPTED PRIVATE KEY` and OpenPGP
   `PGP PRIVATE KEY BLOCK` headers are caught; `PUBLIC KEY` is not. Over this branch's tracked tree the wider rule adds no
   match.
-- **A repository named like a graph id passes the gate.** The graph-id form of `encoded-home-path` (`home-<name>-code-`
+- **A repository named like a graph id passed the gate, until fix round 2 removed the exemption (the last
+  section).** The graph-id form of `encoded-home-path` (`home-<name>-code-`
   with no leading dash) failed a cited URL such as `github.com/<owner>/home-<name>-code-review`. In the gate only,
-  that form is not read as a repository name: the segment right after one owner segment of a public code host's URL,
+  that form was not read as a repository name: the segment right after one owner segment of a public code host's URL,
   where the URL starts its token (narrowed after the command center's read of `4e5ef13d`, the last section; before
   it, the whole path within 256 characters of the host was exempt). The hosts are
   `github.com`, `githubusercontent.com`, `gitlab.com`, `bitbucket.org`, `codeberg.org`, `huggingface.co` and `sr.ht`,
@@ -237,8 +239,8 @@ are fixed in both copies of the job, on a rebase onto main `0f153784`:
   scheme, so `http://127.0.0.1:8788/p/home-<name>-code-<project>` and the same id under `https://localhost/` passed
   both copies, while `validate.py` refused both. The exemption is now limited to the path of a public code host's URL
   (above), an allowlist rather than a list of local hosts, so private addresses and intranet names stay caught too.
-  (That path still reached an inner `https://` and Markdown delimiters; the last section narrows it to a repository
-  name.)
+  (That path still reached an inner `https://` and Markdown delimiters; the read of `4e5ef13d` narrowed it to a
+  repository name, and fix round 2 removed it.)
   New cases cover loopback, `localhost`, `[::1]`, `*.localhost`, a private address, an unlisted public host, userinfo,
   a query string and an upper-case host; each agrees with `validate.py`. The public-repository control, now also on a
   code host's subdomain, passes.
@@ -292,12 +294,13 @@ of them privacy P1s. All four are fixed in one commit, in both copies of the job
   form's `example` exemption and end. Sources: Microsoft's "Working across file systems"
   (<https://learn.microsoft.com/en-us/windows/wsl/filesystems>, read 2026-10-12T03:48:54Z, sha256
   `fc8542ae8955e3ee1c732b33a83f9e8f34d596ffde35bf3a2463d2badcca791d`; its source, MicrosoftDocs/wsl@`a1473a69`
-  `WSL/filesystems.md:22`, `:34`), `WSL/wsl-config.md:162` (`\\wsl.localhost\Ubuntu-20.04\etc\wsl.conf`), and the WSL
+  `WSL/filesystems.md:34`), `WSL/wsl-config.md:162` (`\\wsl.localhost\Ubuntu-20.04\etc\wsl.conf`), and the WSL
   release notes, `WSL/release-notes.md:24` (Build 21354: the `\\wsl.localhost` prefix, and `\\wsl$` keeps working),
   `:76` (Build 20175: `\\wsl`) and `:145` (Build 19013: the `\\wsl$` check is case-insensitive). The 19 tracked
   lines that write the form, in 11 files, stay clean, and so does the rest of the tree.
 - **B1 (P2): the body guard turned a required check red.** It refused U+001C and U+0085, while #1003's mirror
-  (`scripts/verify_sources.py`) finds section content in them, so `tests.test_verify_sources` failed in shard 4 of the
+  (`tools/sota-sources/verify_sources.py`; an earlier version of this line named `scripts/verify_sources.py`, which
+  does not exist) counts them as section content, since its `JS_TRIM` (`:142`) leaves them, so `tests.test_verify_sources` failed in shard 4 of the
   required `validate`. The guard now admits tabs and line breaks, a line break being a paragraph separator by Unicode's
   Bidi_Class B: LF, CR, U+001C to U+001E and U+0085 (Python's `unicodedata`, UCD 15.1.0). Every other C0 and C1
   control is still refused; a test runs all 65 through both copies. The failure message is unchanged.
@@ -306,9 +309,10 @@ of them privacy P1s. All four are fixed in one commit, in both copies of the job
   within 130 s. The parentheses are now read as runs that cannot overlap, with no line break and one level of nested
   pairs (`\([^()\n]*(?:\([^()\n]*\)[^()\n]*)*\)`), so an unclosed `(` is scanned once to the end of its line. A
   destination with spaces, or a link with a title, is still decoded. A link split across lines, or whose title holds an
-  unmatched parenthesis, is not decoded; the body itself is still read as written.
+  unmatched parenthesis, was no longer decoded, a regression from `4e5ef13d` that fix round 2 restores.
 
-On Node 24.21, 35 adversarial shapes at the bound each get a verdict within 0.25 s: the second read's 21, plus
+On Node 24.21, 35 adversarial shapes at the bound each got a verdict within 0.25 s in this run (the micro at
+`752d9618` measured 0.26 to 0.28 s at a load of about 26; the last section restates the bound): the second read's 21, plus
 unclosed links of spaces, line feeds and tabs, nested, quoted and repeated link runs, code-host owner runs and UNC
 runs. One of them is refused for its own content: after Markdown's unescaping it holds a home named `wsl`.
 
@@ -327,9 +331,71 @@ Old and new gates give the same outcome on the live description of every open pu
 latest 400 in any state, at 2026-10-12T04:24Z; neither names a rule on any of them. Only rule ids were printed.
 
 Boundaries this states: the exemption takes exactly one owner segment, so a GitLab subgroup's repository named like a
-graph id is refused, as is a code-host URL glued to a preceding word character. The UNC form needs a distribution
-name of at most 64 characters; a home under another share, such as `\\host\c$\Users\<name>\`, and `\home\<name>\`
+graph id is refused, as is a code-host URL glued to a preceding word character (fix round 2 removes the exemption).
+The UNC form needs a distribution name of at most 64 characters (255 since fix round 2); a home under another share, such as `\\host\c$\Users\<name>\`, and `\home\<name>\`
 without a prefix stay follow-ups, as the read listed them.
+
+### After the command center's Claude micro of `752d9618` (2026-10-12, fix round 2)
+
+The command center's Claude micro at `752d9618` verified B2, B3's five bodies, B4 and the fail-first account, and found
+three blockers; the command center's adjudication ruled M1 and M2 privacy P1s and upheld Codex's T8 as P1. The class
+recurred three times (B1 to M1, B3 to M2, and T8), so the fix moves to the input rather than the patterns (rule 4).
+One commit, in both copies of the job and, for the home-path rule, in `validate.py`:
+
+- **M1 and T8: a projection for reading.** The guard admits U+001C to U+001E and U+0085, and no form removed them, so
+  a home path, a graph id, a UNC home, a Windows profile or a token split by one passed both copies (52 of 68 of the
+  micro's bodies; at `4e5ef13d` all 68 were refused). An HTML comment split a value the same way (T8), and GitHub hides
+  it. The rules now read the body as written and a projection of it: HTML comments removed as CommonMark reads them
+  (0.31.2, spec.txt:8986: `<!-->`, `<!--->`, or `<!--` up to `-->`; <https://spec.commonmark.org/0.31.2/spec.txt>,
+  read 2026-10-12T05:21:42Z, sha256 `bfef4ddc97276b6ab6c2a28ace48478e35b1c50e60cde9f517ab8ab030aa3b82`), found by one
+  linear scan, and every character of general category Cc, Cf, Zl or Zp but tab, LF and CR removed. Those are 234 code
+  points in the Unicode 17.0.0 database, which Node 24.21 carries (ICU 78.3), and the same 234 in Python 3.13.16's
+  15.1.0 (`extracted/DerivedGeneralCategory.txt`, <https://www.unicode.org/Public/17.0.0/ucd/extracted/>, read
+  05:21:42Z, sha256 `d62e5bab70ca74f099343f71224fa051cb1fdd61a1ab45c0488c44cfc0b6102e`; Node's
+  `\p{Cc}\p{Cf}\p{Zl}\p{Zp}` gives the same set). The decoders compose over the projection as over the body, and in
+  the projection's chains each decoder's output is projected again, so a reference that decodes to a comment or a
+  format character is removed too. Clean bodies that carry these characters still pass, as #1003's mirror expects.
+- **M2: the code-host exemption is removed.** A code-host URL glued inside another URL after `(`, `'`, `"`, `[`, `<` or
+  `>` still exempted a graph id (the real names caught 0 of 3 in the gate, 3 of 3 in `validate.py`). After two rounds
+  of bypasses the exemption is gone, and the gate reads the graph-id form as `validate.py` does. A repository named
+  like a graph id is refused by both scans; it is cited another way.
+- **The rarer UNC forms.** A device UNC path (`\\?\UNC\wsl.localhost\...`, `\\.\UNC\wsl$\...`), either slash
+  (`//wsl$/<distro>\home\<name>`), a distribution name with a space or up to 255 characters, and a Windows profile
+  through the distribution's mount (`<distro>\mnt\<drive>\Users\<name>`) are now read in all three copies.
+  Sources: dotnet/docs@`8a189e07f74e50fa0e49551857c3b88d69a7630b` `docs/standard/io/file-path-formats.md:94-95` (the
+  `\\.\UNC\` and `\\?\UNC\` device paths), `:155` (forward slashes are separators) and `:206` (names are
+  case-insensitive); file sha256 `82ed20b86d1d6fc189337703f40e95de6ec9ab624439662a8ed6ea1348cfc64c`, read 05:22:04Z.
+  The B4 citation now names `WSL/filesystems.md:34` only; `:22` is the `/mnt/c` line.
+- **The two link shapes 752d9618 stopped decoding** (a link whose title is on the next line, and a title holding an
+  unmatched parenthesis) are decoded again by a second link pattern in CommonMark's own shape. Each whitespace run in it
+  is taken whole (`(?=(\s*))\N`), so it stays linear.
+- **M3:** the mirror's path and reading are corrected above and in the job's comment.
+
+On Node 24.21, 52 adversarial shapes at the bound each get a verdict within 0.46 s on this 64-CPU host at a load
+of about 25 (four runs, worst 0.39, 0.43, 0.41 and 0.46 s): the earlier 35, plus unclosed comments, quote,
+whitespace and pointy link runs, admitted and format character runs, comment- and format-split values, and device
+and slash UNC runs. Two are refused for their own content: a UNC home named `wsl`, as before, and a format-split home
+path.
+
+The new tests fail at `752d9618` (183 failures). Twelve weakened copies were run, and all twelve fail the tests:
+
+- no projection, comments kept in it, no character removed from it, only Cc removed, or the projection's chains not
+  projected again;
+- the code-host exemption back, as at `752d9618`;
+- the titled link pattern removed;
+- no device UNC prefix in the two copies, or in `validate.py`; no `mnt\<drive>\Users` branch; distribution names of 64
+  characters at most; backslashes only (the two copies), as at `752d9618`.
+
+Old and new gates give the same outcome on the live description of every open pull request (76) and of the latest
+400 in any state, at 2026-10-12T05:31Z; neither names a rule on any of them. Only rule ids were printed.
+
+Codex's T9 (`/ho&#x110000;me/<name>/x` is refused, though GitHub renders U+FFFD there) and T11 (an unresolved reference
+link such as `/home/[al][missing]ice/x` is refused) are fail-safe false positives on contrived text. They stay as they
+are and are follow-ups.
+
+Boundaries this states: the projection removes characters, it does not render Markdown, so a value split across a
+line break or by a carriage return is still not joined; and a value hidden under two layers of the same encoding is
+not decoded, as before.
 
 ## Alternatives considered
 

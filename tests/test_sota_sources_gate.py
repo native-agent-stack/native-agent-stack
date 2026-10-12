@@ -278,8 +278,8 @@ PRIVACY_CASES = [
     ("an encrypted PKCS #8 key", "-----BEGIN " + "ENCRYPTED PRIVATE KEY-----" + SOURCES, ["private-key"]),
     ("an OpenPGP private key block", "-----BEGIN " + "PGP PRIVATE KEY BLOCK-----" + SOURCES, ["private-key"]),
     ("a public key passes", "-----BEGIN " + "PUBLIC KEY-----" + SOURCES, []),
-    ("a repository named like a graph project passes", "https://github.com/acme/" + "home-" + "assistant-code-review" + SOURCES,
-     []),
+    ("a repository named like a graph project is refused", "https://github.com/acme/" + "home-" + "assistant-code-review"
+     + SOURCES, ["encoded-home-path"]),
     ("a graph project id in a cache path", "~/.cache/codebase-memory-mcp/" + "home-" + "alice-code-x.db" + SOURCES,
      ["encoded-home-path"]),
     ("an encoded home in a local URL", "http://127.0.0.1:8788/p/" + "-home-" + "alice-code-x/" + SOURCES,
@@ -300,7 +300,8 @@ PRIVACY_CASES = [
      ["encoded-home-path"]),
     ("a graph id in a code host URL's query", "https://github.com/a?u=" + GRAPH_ID + SOURCES, ["encoded-home-path"]),
     ("a graph id under an upper-case code host", "https://GITHUB.COM/acme/" + GRAPH_ID + SOURCES, ["encoded-home-path"]),
-    ("a repository on a code host's subdomain passes", "https://gist.github.com/acme/" + GRAPH_ID + SOURCES, []),
+    ("a repository on a code host's subdomain is refused", "https://gist.github.com/acme/" + GRAPH_ID + SOURCES,
+     ["encoded-home-path"]),
     # The command center's Claude read of 4e5ef13d (B3): the exemption is for the repository segment of a code-host URL
     # that starts its own token, so an inner scheme, a query, a link destination, a delimiter or a deeper path is read.
     ("a graph id behind a code host inside a local URL", "http://127.0.0.1:8788/p/https://github.com/" + GRAPH_ID + SOURCES,
@@ -320,9 +321,26 @@ PRIVACY_CASES = [
      ["encoded-home-path"]),
     ("a graph id after a code-host URL and a comma", "https://github.com/acme,/" + GRAPH_ID + SOURCES,
      ["encoded-home-path"]),
-    ("a linked repository named like a graph project passes", "[r](https://github.com/acme/" + GRAPH_ID + ")" + SOURCES, []),
-    ("an autolinked repository named like a graph project passes", "<https://gitlab.com/acme/" + GRAPH_ID + ">" + SOURCES,
-     []),
+    ("a linked repository named like a graph project is refused", "[r](https://github.com/acme/" + GRAPH_ID + ")" + SOURCES,
+     ["encoded-home-path"]),
+    ("an autolinked repository named like a graph project is refused", "<https://gitlab.com/acme/" + GRAPH_ID + ">"
+     + SOURCES, ["encoded-home-path"]),
+    # The command center's Claude micro at 752d9618 (M2): a code-host URL glued inside another URL after a token-start
+    # character still exempted a graph id. With the exemption gone, each is refused.
+    *[("a graph id behind a code host glued after " + glue, "http://localhost/?q=" + glue + "https://github.com/o/" + GRAPH_ID
+       + SOURCES, ["encoded-home-path"]) for glue in ("(", "'", '"', "[", "<", ">")],
+    ("a graph id behind a code host in a nested link destination", "[t](http://localhost/(https://github.com/o/" + GRAPH_ID
+     + "))" + SOURCES, ["encoded-home-path"]),
+    # Codex's review of d81969dd (T8): GitHub hides an HTML comment, so a value split by one reads whole.
+    ("a home path split by an HTML comment", "/ho<!--x-->me/alice/x" + SOURCES, ["personal-home-path"]),
+    ("a home path split by an empty HTML comment", "/ho<!-->me/alice/x" + SOURCES, ["personal-home-path"]),
+    ("a token split by an HTML comment", "gh<!-- -->p_" + "a" * 36 + SOURCES, ["github-token"]),
+    ("a home path split by a reference to a zero-width space", "/ho&#x200b;me/alice/x" + SOURCES, ["personal-home-path"]),
+    # The micro at 752d9618: two link shapes 4e5ef13d decoded and 752d9618 did not.
+    ("a name split by a link whose title is on the next line", HOME + "[al](https://example.org\n\"t\")ice/x" + SOURCES,
+     ["personal-home-path"]),
+    ("a name split by a link whose title holds a parenthesis", HOME + "[al](https://example.org \"t(x\")ice/x" + SOURCES,
+     ["personal-home-path"]),
     # The same read (B4): a WSL distribution's home through its Windows UNC path, as File Explorer and the WSL
     # documentation write it, and JSON-escaped.
     ("a WSL home through wsl.localhost", BS * 2 + "wsl.localhost" + BS + "Ubuntu" + BS + "home" + BS + "alice" + BS + "x"
@@ -336,17 +354,29 @@ PRIVACY_CASES = [
     ("a masked WSL home passes", BS * 2 + "wsl$" + BS + "Ubuntu" + BS + "home" + BS + "<WSL_USER>" + BS + "x" + SOURCES, []),
     ("the example WSL home passes", BS * 2 + "wsl.localhost" + BS + "Ubuntu" + BS + "home" + BS + "example" + BS + "x"
      + SOURCES, []),
+    # The micro at 752d9618: the rarer UNC forms (.NET's file path formats: device UNC paths, either slash).
+    ("a WSL home through a device UNC path", BS * 2 + "?" + BS + "UNC" + BS + "wsl.localhost" + BS + "D" + BS + "home" + BS
+     + "alice" + SOURCES, ["personal-home-path"]),
+    ("a WSL home through a dot device UNC path", BS * 2 + "." + BS + "unc" + BS + "wsl$" + BS + "D" + BS + "home" + BS
+     + "alice" + BS + "x" + SOURCES, ["personal-home-path"]),
+    ("a WSL home with mixed slashes", "//wsl$/D" + BS + "home" + BS + "alice" + BS + "x" + SOURCES, ["personal-home-path"]),
+    ("a WSL home under a distribution name with a space", BS * 2 + "wsl$" + BS + "Ubuntu 24.04" + BS + "home" + BS + "alice"
+     + SOURCES, ["personal-home-path"]),
+    ("a WSL home under a long distribution name", BS * 2 + "wsl$" + BS + "d" * 100 + BS + "home" + BS + "alice" + SOURCES,
+     ["personal-home-path"]),
+    ("a Windows profile through a WSL home's mount", BS * 2 + "wsl.localhost" + BS + "D" + BS + "mnt" + BS + "c" + BS
+     + "Users" + BS + "alice" + BS + "x" + SOURCES, ["personal-home-path"]),
 ]
 
-# Cases the gate judges beyond validate.py's patterns: decoded or rendered forms, the gate-only macOS rule, and the
-# gate-only exemption of graph-shaped names inside http(s) URLs.
+# Cases the gate judges beyond validate.py's patterns: decoded, rendered or projected forms, and the gate-only macOS rule.
 GATE_ONLY_CASES = {"a percent-encoded home path", "a JSON-escaped slash", "a JSON unicode escape",
                    "HTML character references", "a name split by a Markdown link", "a name split by emphasis", "a path split by an inline tag",
                    "a mixed-case macOS home", "a lower-case macOS home", "character references around emphasis",
-                   "percent escapes around a link-split name", "a repository named like a graph project passes",
-                   "a repository on a code host's subdomain passes",
-                   "a linked repository named like a graph project passes",
-                   "an autolinked repository named like a graph project passes",
+                   "percent escapes around a link-split name", "a home path split by an HTML comment",
+                   "a home path split by an empty HTML comment", "a token split by an HTML comment",
+                   "a home path split by a reference to a zero-width space",
+                   "a name split by a link whose title is on the next line",
+                   "a name split by a link whose title holds a parenthesis",
                    "a lower-case macOS home in a file URL", "redundant leading slashes"}
 
 # The repository's own WSL recipe, receipts and their frozen copies write the UNC form with the user masked.
@@ -368,7 +398,7 @@ class ScriptsValidateWslHomeTests(unittest.TestCase):
         import validate
         pattern = dict(validate.PRIVATE_CONTENT)["personal home path"]
         cases = [(case, text, rules) for case, text, rules in PRIVACY_CASES if "WSL home" in case]
-        self.assertEqual(len(cases), 6)
+        self.assertEqual(len(cases), 12)
         for case, text, rules in cases:
             with self.subTest(case=case):
                 self.assertEqual(bool(pattern.search(text)), rules == ["personal-home-path"])
@@ -457,6 +487,35 @@ class GatePrivacyTests(unittest.TestCase):
                 if not admitted:
                     self.assertIn("(rule: body-control)", outcome["failed"])
 
+    def test_a_value_split_by_an_admitted_or_format_character_is_still_caught(self):
+        # The command center's Claude micro at 752d9618 (M1): the guard admits U+001C to U+001E and U+0085, and the
+        # scan never removed them, so a value split by one passed both copies (52 of 68); at 4e5ef13d all 68 were
+        # refused. The rules now also read a projection without Cc, Cf, Zl and Zp characters (but tab, LF and CR).
+        shapes = ["/home/<s>alice/x", "/ho<s>me/alice/x", "/home<s>/alice/x", "-home-<s>alice-code-x/", "home-al<s>ice-code-x",
+                  "ho<s>me-alice-code-x", "C:" + BS + "Users" + BS + "<s>Alice", "C:" + BS + "Us<s>ers" + BS + "Alice",
+                  BS * 2 + "wsl$" + BS + "D" + BS + "home" + BS + "<s>alice", BS * 2 + "wsl$" + BS + "D" + BS + "ho<s>me" + BS
+                  + "alice", "gh" + "p_<s>" + "a" * 36, "gh" + "p_" + "a" * 18 + "<s>" + "a" * 18, "sk-" + "ant-<s>" + "A" * 30,
+                  # the separator only beside the value
+                  "<s>" + HOME + "alice/x", HOME + "alice/x<s>", "<s>" + GRAPH_ID, "<s>gh" + "p_" + "a" * 36]
+        separators = ["\x1c", "\x1d", "\x1e", "\x85", "\u200b", "\u00ad", "\u2028", "\u2029", "\u202e", "\ufeff", "\u2060"]
+        cases = [(shape, separator) for separator in separators for shape in shapes]
+        payloads = [body("x " + shape.replace("<s>", separator) + " y" + SOURCES) for shape, separator in cases]
+        outcomes = {path.name: run_check(inline_script(sota_job(path)), payloads) for path in (VALIDATE, GATE)}
+        self.assertEqual(outcomes["pr-metadata.yml"], outcomes["sota-sources-gate.yml"])
+        self.assertEqual(len(cases), 187)
+        for (shape, separator), outcome in zip(cases, outcomes["sota-sources-gate.yml"]):
+            with self.subTest(shape=shape[:24], separator=hex(ord(separator))):
+                self.assertIn("(rules: ", outcome["failed"] or "")
+
+    def test_clean_bodies_with_admitted_and_format_characters_pass(self):
+        # The projection removes characters; it never refuses a body that carries them around ordinary text.
+        texts = ["See the notes" + character + "in the docs, ~/" + ".config and <user>." for character in
+                 ("\x1c", "\x1d", "\x1e", "\x85", "\u200b", "\u00ad", "\u2028", "\u2029", "\u202e", "\ufeff", "<!-- a comment -->")]
+        outcomes = {path.name: run_check(inline_script(sota_job(path)), [body(text + SOURCES) for text in texts])
+                    for path in (VALIDATE, GATE)}
+        self.assertEqual(outcomes["pr-metadata.yml"], outcomes["sota-sources-gate.yml"])
+        self.assertEqual([outcome["failed"] for outcome in outcomes["sota-sources-gate.yml"]], [None] * len(texts))
+
     def test_a_body_at_the_bound_is_scanned_in_bounded_time(self):
         # The graph-id rule searched from every home- to the end of its run, quadratic in the run's length: a
         # 262,144-character run of "home-a.b-c_d-" took 21 s in the gate per form and 93 s in validate.py. The name now
@@ -477,11 +536,14 @@ class GatePrivacyTests(unittest.TestCase):
         # destination retried every split of the run, so "[a](" and 65,536 spaces gave no verdict within 130 s.
         unclosed = ["[a](" + filler * (MAX_BODY - 4 - len(SOURCES)) for filler in (" ", "\n", "\t")] + [
             ("[a](" + "(b) " * MAX_BODY)[:MAX_BODY - len(SOURCES)], ("[a](b " * MAX_BODY)[:MAX_BODY - len(SOURCES)]]
+        # Round 2: unclosed comments, and the titled link shape's quote and whitespace runs.
+        projected = [("<!--" * MAX_BODY)[:MAX_BODY - len(SOURCES)], ("[a](" + '"' * MAX_BODY)[:MAX_BODY - len(SOURCES)],
+                     ("[a](b " + " \n" * MAX_BODY)[:MAX_BODY - len(SOURCES)], ("[a](\"x" * MAX_BODY)[:MAX_BODY - len(SOURCES)]]
         start = time.monotonic()
         outcomes = run_check(inline_script(sota_job(GATE)),
-                             [body(text + SOURCES) for text in [run, mixed] + brackets + unclosed])
-        self.assertLess(time.monotonic() - start, 20)
-        self.assertEqual([outcome["failed"] for outcome in outcomes], [None] * 10)
+                             [body(text + SOURCES) for text in [run, mixed] + brackets + unclosed + projected])
+        self.assertLess(time.monotonic() - start, 30)
+        self.assertEqual([outcome["failed"] for outcome in outcomes], [None] * 14)
 
     def test_credential_lengths_agree_with_scripts_validate_at_each_minimum(self):
         # (P2-2) one below, at and one above each rule's minimum length, alone and glued to Unicode word characters.
@@ -541,7 +603,12 @@ TEMPLATES = {
                            BS * 2 + "wsl.localhos" + X + BS + "U" + BS + "home" + BS + "al",
                            BS * 2 + "wsl$" + BS + X + BS + "home" + BS + "al", BS + X + "wsl$" + BS + "U" + BS + "home" + BS + "al",
                            BS * 2 + "wsl$" + BS + "U" + BS + "hom" + X + BS + "al",
-                           BS * 2 + "wsl" + X + BS + "U" + BS + "home" + BS + "al"],
+                           BS * 2 + "wsl" + X + BS + "U" + BS + "home" + BS + "al",
+                           BS * 2 + "?" + BS + "UN" + X + BS + "wsl$" + BS + "U" + BS + "home" + BS + "al",
+                           BS * 2 + X + BS + "UNC" + BS + "wsl$" + BS + "U" + BS + "home" + BS + "al",
+                           "/" + X + "wsl$/U" + BS + "home" + BS + "al",
+                           BS * 2 + "wsl$" + BS + "U" + BS + "mnt" + BS + "c" + BS + "User" + X + BS + "al",
+                           BS * 2 + "wsl$" + BS + "U" + BS + "mn" + X + BS + "c" + BS + "Users" + BS + "al"],
     "windows-user-path": ["C:\\User" + X + "\\bo", X + ":\\Users\\bo", "C:\\Users\\" + X,
                           "C:\\Users\\example" + X, "/mnt/" + X + "/Users" + "/bo", "c:\\" + X + "sers\\bo"],
     "encoded-home-path": [X + "-home-" + "bo-x", "-home-" + X, "-home-" + "bo" + X, "-home-example" + X, "home-" + X + "-code-x",
