@@ -4,7 +4,7 @@
   "recorded_at": "2026-10-11T23:15:50Z",
   "base_commit": "77185991ec9627e59473df5b4d7a11ca87b0461d",
   "authority": "docs/decisions/2026-10-11-layer-resolution-protocol.md",
-  "phase": "protocol steps 1-3; terminal states not recorded before #1007 LANDED",
+  "phase": "six SCHEDULED terminal records; no comparison run or FINAL claim",
   "candidate_boundary": "09-29 sweep returns plus 10-08 grand catalog; cumulative prior survivors and scoped completed missing-vote adjudications are retained, not rediscovered",
   "input_hashes": {
     "catalogs/sota-convergence/layer-verdict-waves.json": "7f7056066fec1d5ea6e6cc5e243a668e509b1d74add94ec3d74cbd3025ebc756",
@@ -147,7 +147,7 @@
       "terminal_readiness": "#1007 LANDED satisfied; remaining pinned-runtime comparison inputs are explicitly unmet",
       "bounded_next_action": "Qualify only the frozen existing candidates on the retained cases through the named native/upstream paths. No new discovery.",
       "evidence_class": "source_review",
-      "preregistration_sha256": "521b7cd99c4570a18a1481a9b07959084641b79fe810fab958632d0ffbf4004d",
+      "preregistration_sha256": "e70391bd323583f77a78e3327d29491a677e2fe7e5176c31d82e633fef124947",
       "wave_ref": "catalogs/sota-convergence/layer-verdicts-20260922.json#/catalogs/foundation/10",
       "next_review": "2026-10-22",
       "next_review_gap": null,
@@ -162,7 +162,7 @@
         },
         "comparison_id": "w6-foundation-native-clients-20261011",
         "preregistration_ref": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/native-clients.json",
-        "preregistration_sha256": "521b7cd99c4570a18a1481a9b07959084641b79fe810fab958632d0ffbf4004d",
+        "preregistration_sha256": "e70391bd323583f77a78e3327d29491a677e2fe7e5176c31d82e633fef124947",
         "resolution_winners": [],
         "final_stack_source": {
           "commit": "c2dee173",
@@ -228,7 +228,8 @@
         "readiness_unmet": [
           "arm runtime/upstream E2E receipts at the frozen pins",
           "complete usage-instrumentation freeze and scoped native invoke/role evidence",
-          "isolated queued native runner"
+          "isolated queued native runner",
+          "Retained reopen/proposal evidence needs scoped source receipts or substantive disposition before affected scoring."
         ],
         "comparison_ready": false,
         "fixed_decision_rule": {
@@ -239,7 +240,7 @@
           "terminal": "FINAL requires every selected deployed winner's actual final-stack runs[] pin to match its adopted tested source, with verdict/wave/next_review, upstream E2E at that operational run pin and invoke evidence/role reason. An experimental source-pin receipt does not qualify a different historical operational run pin.",
           "amendments": "No new candidates or changed metrics after first run. Any necessary input correction requires a separately reviewed, hashed amendment before affected scoring."
         },
-        "frozen_scope": "Refrozen under B1/B2/A2 with explicit roles/dependencies/checks/cases and corrected citations before any run; current hash above supersedes original.",
+        "frozen_scope": "One comparison per layer with retained candidates and source-advertised roles; native output-reference scope qualifies separately. Retained operational/quality/coverage inputs gate affected scoring; no outcome claim.",
         "evidence_class": "source_review",
         "final_claim": false,
         "next_review": "2026-10-22",
@@ -262,7 +263,62 @@
             "receipt_transfer_allowed": false,
             "final_requirement": "Supported adoption into matching runs[] then upstream E2E and invoke at that operational pin."
           }
-        }
+        },
+        "retained_reopen_inputs": [
+          {
+            "kind": "ledger_reopen",
+            "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/failures/native-clients",
+            "trigger": "retained_failure",
+            "required_evidence": "Resolve retained retained_failure source/receipt/coverage evidence at the compared pin, or retain a substantive scoped disposition. Licence metadata alone cannot exclude a source.",
+            "owner": "layer-verdict"
+          },
+          {
+            "kind": "ledger_reopen",
+            "ref": "receipt_staleness:macos-arm64/ai-memory",
+            "trigger": "pin_moved",
+            "required_evidence": "Resolve retained pin_moved source/receipt/coverage evidence at the compared pin, or retain a substantive scoped disposition. Licence metadata alone cannot exclude a source.",
+            "owner": "layer-verdict"
+          },
+          {
+            "kind": "ledger_reopen",
+            "ref": "receipt_staleness:linux-wsl2-x86_64/ai-memory",
+            "trigger": "pin_moved",
+            "required_evidence": "Resolve retained pin_moved source/receipt/coverage evidence at the compared pin, or retain a substantive scoped disposition. Licence metadata alone cannot exclude a source.",
+            "owner": "layer-verdict"
+          },
+          {
+            "kind": "ledger_reopen",
+            "ref": "receipt_staleness:linux-wsl2-x86_64/codex",
+            "trigger": "pin_moved",
+            "required_evidence": "Resolve retained pin_moved source/receipt/coverage evidence at the compared pin, or retain a substantive scoped disposition. Licence metadata alone cannot exclude a source.",
+            "owner": "layer-verdict"
+          },
+          {
+            "kind": "ledger_reopen",
+            "ref": "receipt_staleness:macos-arm64/claude-code",
+            "trigger": "pin_moved",
+            "required_evidence": "Resolve retained pin_moved source/receipt/coverage evidence at the compared pin, or retain a substantive scoped disposition. Licence metadata alone cannot exclude a source.",
+            "owner": "layer-verdict"
+          },
+          {
+            "kind": "ledger_reopen",
+            "ref": "receipt_staleness:macos-arm64/codex",
+            "trigger": "pin_moved",
+            "required_evidence": "Resolve retained pin_moved source/receipt/coverage evidence at the compared pin, or retain a substantive scoped disposition. Licence metadata alone cannot exclude a source.",
+            "owner": "layer-verdict"
+          },
+          {
+            "kind": "retained_proposal_prerequisite",
+            "repository": "https://github.com/earendil-works/pi",
+            "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/0/candidates/6/comparison_that_would_overturn",
+            "additional_refs": [
+              "catalogs/sota-convergence/manifest-20260926.json#/foundation/0/candidates/6/comparison_that_would_overturn"
+            ],
+            "required_evidence": "Permitted-account/provider bridge, native recovery and source-pinned Terminal-Bench recipe with at least three repetitions are sealed before broader merit.",
+            "owner": "layer-verdict",
+            "status": "unverified_before_execution"
+          }
+        ]
       },
       "next_review_ref": "c2dee173:catalogs/landscape/final-stack.json (this layer's verdict.next_review)"
     },
@@ -335,7 +391,7 @@
           "origin_sweep": "landscape-sweep-20260929",
           "input_kind": "survivor",
           "disposition": "included_in_frozen_comparison",
-          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
+          "reason": "Integrated native LSP is a client/dependency control on the same authored symbol/reference oracle; plugin presence alone cannot replace Serena or qualify full navigation. Retain the cross-client replacement claim as an untested boundary.",
           "comparison_id": "w6-foundation-code-navigation-20261011",
           "adjudication_ref": null,
           "source": {
@@ -343,14 +399,19 @@
             "pin": "f359d43b406057f1a8cdbc4ea93b827642c162e6",
             "ref": "README.md:3",
             "evidence_class": "source_review"
-          }
+          },
+          "retained_comparison_refs": [
+            "catalogs/sota-convergence/manifest-20260926.json#/foundation/4/candidates/0/comparison_that_would_overturn",
+            "catalogs/sota-convergence/manifest-20260929.json#/foundation/4/candidates/0/comparison_that_would_overturn"
+          ],
+          "frozen_rule_reason": "Integrated native LSP is a client/dependency control on the same authored symbol/reference oracle; plugin presence alone cannot replace Serena or qualify full navigation. Retain the cross-client replacement claim as an untested boundary."
         },
         {
           "repository": "https://github.com/abhigyanpatwari/gitnexus",
           "origin_sweep": "landscape-sweep-20260929",
           "input_kind": "survivor",
           "disposition": "included_in_frozen_comparison",
-          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
+          "reason": "Common authored reference precision and index freshness qualify bounded graph correctness. The named codebase-memory-mcp impact/latency baseline is not an arm, so no superiority over it is inferred; retain that broader comparison before any such claim.",
           "comparison_id": "w6-foundation-code-navigation-20261011",
           "adjudication_ref": null,
           "source": {
@@ -358,14 +419,19 @@
             "pin": "191a954bf67583447dac5c71cc8d679aabd101d8",
             "ref": "README.md:31",
             "evidence_class": "source_review"
-          }
+          },
+          "retained_comparison_refs": [
+            "catalogs/sota-convergence/manifest-20260926.json#/foundation/4/candidates/7/comparison_that_would_overturn",
+            "catalogs/sota-convergence/manifest-20260929.json#/foundation/4/candidates/1/comparison_that_would_overturn"
+          ],
+          "frozen_rule_reason": "Common authored reference precision and index freshness qualify bounded graph correctness. The named codebase-memory-mcp impact/latency baseline is not an arm, so no superiority over it is inferred; retain that broader comparison before any such claim."
         },
         {
           "repository": "https://github.com/mibayy/token-savior",
           "origin_sweep": "landscape-sweep-20260929",
           "input_kind": "survivor",
           "disposition": "included_in_frozen_comparison",
-          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
+          "reason": "The shared required/forbidden-reference and edit/delete oracle separates navigation from memory/compaction. Published held-out evaluation and actual MCP invocation traces remain readiness inputs, not claimed results.",
           "comparison_id": "w6-foundation-code-navigation-20261011",
           "adjudication_ref": null,
           "source": {
@@ -373,7 +439,11 @@
             "pin": "0a4a2e126530ff1222b7f9c62c290e517a738328",
             "ref": "README.md:7",
             "evidence_class": "source_review"
-          }
+          },
+          "retained_comparison_refs": [
+            "catalogs/sota-convergence/manifest-20260929.json#/foundation/4/candidates/2/comparison_that_would_overturn"
+          ],
+          "frozen_rule_reason": "The shared required/forbidden-reference and edit/delete oracle separates navigation from memory/compaction. Published held-out evaluation and actual MCP invocation traces remain readiness inputs, not claimed results."
         }
       ],
       "changed_evidence": [],
@@ -383,7 +453,7 @@
       "terminal_readiness": "#1007 LANDED satisfied; remaining pinned-runtime comparison inputs are explicitly unmet",
       "bounded_next_action": "Qualify only the frozen existing candidates on the retained cases through the named native/upstream paths. No new discovery.",
       "evidence_class": "source_review",
-      "preregistration_sha256": "6a67cd1a1b024b83f4ac2240c6ae0e38e8e8f852fa4bbdbd5f0e2aaa9ce9ca5a",
+      "preregistration_sha256": "ccf0ec381e21b96697b45b6f38a4e1ef5f6cb63e6d2315378b473badb7c5b1a0",
       "wave_ref": "catalogs/sota-convergence/layer-verdicts-20260922.json#/catalogs/foundation/2",
       "next_review": "2026-10-22",
       "next_review_gap": null,
@@ -398,7 +468,7 @@
         },
         "comparison_id": "w6-foundation-code-navigation-20261011",
         "preregistration_ref": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/code-navigation.json",
-        "preregistration_sha256": "6a67cd1a1b024b83f4ac2240c6ae0e38e8e8f852fa4bbdbd5f0e2aaa9ce9ca5a",
+        "preregistration_sha256": "ccf0ec381e21b96697b45b6f38a4e1ef5f6cb63e6d2315378b473badb7c5b1a0",
         "resolution_winners": [],
         "final_stack_source": {
           "commit": "c2dee173",
@@ -448,7 +518,8 @@
         "readiness_unmet": [
           "arm runtime/upstream E2E receipts at the frozen pins",
           "complete usage-instrumentation freeze and scoped native invoke/role evidence",
-          "isolated queued native runner"
+          "isolated queued native runner",
+          "Retained reopen/proposal evidence needs scoped source receipts or substantive disposition before affected scoring."
         ],
         "comparison_ready": false,
         "fixed_decision_rule": {
@@ -459,7 +530,7 @@
           "terminal": "FINAL requires every selected deployed winner's actual final-stack runs[] pin to match its adopted tested source, with verdict/wave/next_review, upstream E2E at that operational run pin and invoke evidence/role reason. An experimental source-pin receipt does not qualify a different historical operational run pin.",
           "amendments": "No new candidates or changed metrics after first run. Any necessary input correction requires a separately reviewed, hashed amendment before affected scoring."
         },
-        "frozen_scope": "Refrozen under B1/B2/A2 with explicit roles/dependencies/checks/cases and corrected citations before any run; current hash above supersedes original.",
+        "frozen_scope": "One comparison per layer with retained candidates and source-advertised roles; native output-reference scope qualifies separately. Retained operational/quality/coverage inputs gate affected scoring; no outcome claim.",
         "evidence_class": "source_review",
         "final_claim": false,
         "next_review": "2026-10-22",
@@ -473,7 +544,54 @@
             "receipt_transfer_allowed": false,
             "final_requirement": "Supported adoption into matching runs[] then upstream E2E and invoke at that operational pin."
           }
-        }
+        },
+        "retained_reopen_inputs": [
+          {
+            "kind": "ledger_reopen",
+            "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/failures/code-navigation",
+            "trigger": "retained_failure",
+            "required_evidence": "Resolve retained retained_failure source/receipt/coverage evidence at the compared pin, or retain a substantive scoped disposition. Licence metadata alone cannot exclude a source.",
+            "owner": "layer-verdict"
+          },
+          {
+            "kind": "ledger_reopen",
+            "ref": "catalog-freshness:mcp-inspector (license None -> NOASSERTION)",
+            "trigger": "selection_changed",
+            "required_evidence": "Resolve retained selection_changed source/receipt/coverage evidence at the compared pin, or retain a substantive scoped disposition. Licence metadata alone cannot exclude a source.",
+            "owner": "layer-verdict"
+          },
+          {
+            "kind": "retained_proposal_prerequisite",
+            "repository": "https://github.com/anthropics/claude-plugins-official",
+            "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/4/candidates/0/comparison_that_would_overturn",
+            "additional_refs": [
+              "catalogs/sota-convergence/manifest-20260926.json#/foundation/4/candidates/0/comparison_that_would_overturn"
+            ],
+            "required_evidence": "The retained native role/model/settings and source-backed comparison recipe are sealed before scoring; unsupported operational axes have a substantive disposition.",
+            "owner": "layer-verdict",
+            "status": "unverified_before_execution"
+          },
+          {
+            "kind": "retained_proposal_prerequisite",
+            "repository": "https://github.com/abhigyanpatwari/gitnexus",
+            "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/4/candidates/1/comparison_that_would_overturn",
+            "additional_refs": [
+              "catalogs/sota-convergence/manifest-20260926.json#/foundation/4/candidates/7/comparison_that_would_overturn"
+            ],
+            "required_evidence": "Exposed graph/index tools, held-out impact/baseline recipe and edit/delete traces are sealed; licence change is metadata only.",
+            "owner": "layer-verdict",
+            "status": "unverified_before_execution"
+          },
+          {
+            "kind": "retained_proposal_prerequisite",
+            "repository": "https://github.com/mibayy/token-savior",
+            "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/4/candidates/2/comparison_that_would_overturn",
+            "additional_refs": [],
+            "required_evidence": "Published held-out source/reference evaluation, actual exposed MCP tool/call traces, initialization and edit/delete recipe exist.",
+            "owner": "layer-verdict",
+            "status": "unverified_before_execution"
+          }
+        ]
       },
       "next_review_ref": "c2dee173:catalogs/landscape/final-stack.json (this layer's verdict.next_review)"
     },
@@ -557,7 +675,7 @@
           "origin_sweep": "landscape-sweep-20260923",
           "input_kind": "survivor",
           "disposition": "included_in_frozen_comparison",
-          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
+          "reason": "Shared native conversion/OCR/reference cases provide bounded authored-source correctness. They do not imply the retained large olmocr-bench/scanned-set reading-order or table result; seal that native quality recipe before extrapolation.",
           "comparison_id": "w6-foundation-document-retrieval-20261011",
           "adjudication_ref": null,
           "source": {
@@ -565,14 +683,18 @@
             "pin": "e7c67f1d239ea6a805cbf4ed6c6b2056d435e22d",
             "ref": "README.md:23",
             "evidence_class": "source_review"
-          }
+          },
+          "retained_comparison_refs": [
+            "catalogs/sota-convergence/manifest-20260923.json#/foundation/5/candidates/0/comparison_that_would_overturn"
+          ],
+          "frozen_rule_reason": "Shared native conversion/OCR/reference cases provide bounded authored-source correctness. They do not imply the retained large olmocr-bench/scanned-set reading-order or table result; seal that native quality recipe before extrapolation."
         },
         {
           "repository": "https://github.com/opendatalab/mineru",
           "origin_sweep": "landscape-sweep-20260929",
           "input_kind": "survivor",
           "disposition": "included_in_frozen_comparison",
-          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
+          "reason": "Native library search/read now compares directly with qmd alongside conversion/OCR/reference checks. The retained judged retrieval and scanned/borderless TEDS study remains a scoring prerequisite; the authored fixture is only a bounded contract.",
           "comparison_id": "w6-foundation-document-retrieval-20261011",
           "adjudication_ref": null,
           "source": {
@@ -580,14 +702,20 @@
             "pin": "b7f3dd0c5f6e6d66a298239ffd02b328b873918e",
             "ref": "README.md:3",
             "evidence_class": "source_review"
-          }
+          },
+          "retained_comparison_refs": [
+            "catalogs/sota-convergence/manifest-20260923.json#/foundation/5/candidates/1/comparison_that_would_overturn",
+            "catalogs/sota-convergence/manifest-20260926.json#/foundation/5/candidates/2/comparison_that_would_overturn",
+            "catalogs/sota-convergence/manifest-20260929.json#/foundation/5/candidates/1/comparison_that_would_overturn"
+          ],
+          "frozen_rule_reason": "Native library search/read now compares directly with qmd alongside conversion/OCR/reference checks. The retained judged retrieval and scanned/borderless TEDS study remains a scoring prerequisite; the authored fixture is only a bounded contract."
         },
         {
           "repository": "https://github.com/docling-project/docling",
           "origin_sweep": "landscape-sweep-20260929",
           "input_kind": "survivor",
           "disposition": "included_in_frozen_comparison",
-          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
+          "reason": "Native conversion/OCR/page provenance use the common authored input rather than a parser-name win. Retained scanned/borderless strata and table fidelity require their own sealed recipe before broader quality claims.",
           "comparison_id": "w6-foundation-document-retrieval-20261011",
           "adjudication_ref": null,
           "source": {
@@ -595,14 +723,19 @@
             "pin": "21588f5261d0a5a051102356d9babb35e790f33e",
             "ref": "README.md:31",
             "evidence_class": "source_review"
-          }
+          },
+          "retained_comparison_refs": [
+            "catalogs/sota-convergence/manifest-20260926.json#/foundation/5/candidates/4/comparison_that_would_overturn",
+            "catalogs/sota-convergence/manifest-20260929.json#/foundation/5/candidates/0/comparison_that_would_overturn"
+          ],
+          "frozen_rule_reason": "Native conversion/OCR/page provenance use the common authored input rather than a parser-name win. Retained scanned/borderless strata and table fidelity require their own sealed recipe before broader quality claims."
         },
         {
           "repository": "https://github.com/cinnamon/kotaemon",
           "origin_sweep": "landscape-sweep-20260926",
           "input_kind": "missing_vote",
           "disposition": "included_in_frozen_comparison",
-          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
+          "reason": "Common retrieval/absence/source-body checks compare the same normalized corpus, not parser or UI breadth. Resumed maintenance and supported headless install/query are readiness conditions before scoring.",
           "comparison_id": "w6-foundation-document-retrieval-20261011",
           "adjudication_ref": null,
           "source": {
@@ -610,14 +743,18 @@
             "pin": "9ad3e4e49aa35b8acddd235918a5d9753c1cfdf9",
             "ref": "README.md:5",
             "evidence_class": "source_review"
-          }
+          },
+          "retained_comparison_refs": [
+            "catalogs/sota-convergence/manifest-20260926.json#/foundation/5/candidates/6/comparison_that_would_overturn"
+          ],
+          "frozen_rule_reason": "Common retrieval/absence/source-body checks compare the same normalized corpus, not parser or UI breadth. Resumed maintenance and supported headless install/query are readiness conditions before scoring."
         },
         {
           "repository": "https://github.com/huggingface/sentence-transformers",
           "origin_sweep": "landscape-sweep-20260926",
           "input_kind": "missing_vote",
           "disposition": "included_in_frozen_comparison",
-          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
+          "reason": "This dependency qualifies native embedding/reranking in the fixed downstream pipeline, not a whole retrieval application. Matched checkpoints and retained judged recall/control panels must be sealed; shapes alone do not prove quality.",
           "comparison_id": "w6-foundation-document-retrieval-20261011",
           "adjudication_ref": null,
           "source": {
@@ -625,14 +762,18 @@
             "pin": "ff69486771998c07008ebd3c7e05e827f03df46f",
             "ref": "README.md:13",
             "evidence_class": "source_review"
-          }
+          },
+          "retained_comparison_refs": [
+            "catalogs/sota-convergence/manifest-20260926.json#/foundation/5/candidates/0/comparison_that_would_overturn"
+          ],
+          "frozen_rule_reason": "This dependency qualifies native embedding/reranking in the fixed downstream pipeline, not a whole retrieval application. Matched checkpoints and retained judged recall/control panels must be sealed; shapes alone do not prove quality."
         },
         {
           "repository": "https://github.com/arabold/docs-mcp-server",
           "origin_sweep": "landscape-sweep-20260929",
           "input_kind": "survivor",
           "disposition": "included_in_frozen_comparison",
-          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
+          "reason": "Common retrieval against qmd now tests recall/source body/freshness, while versioned-documentation scope remains separate. Website/version gains beyond the authored corpus are retained untested boundaries, not a singleton automatic win.",
           "comparison_id": "w6-foundation-document-retrieval-20261011",
           "adjudication_ref": null,
           "source": {
@@ -640,14 +781,19 @@
             "pin": "b8447383cfe5f9933da0a2f16a84c1a663e2d216",
             "ref": "README.md:1",
             "evidence_class": "source_review"
-          }
+          },
+          "retained_comparison_refs": [
+            "catalogs/sota-convergence/manifest-20260926.json#/foundation/5/candidates/3/comparison_that_would_overturn",
+            "catalogs/sota-convergence/manifest-20260929.json#/foundation/5/candidates/2/comparison_that_would_overturn"
+          ],
+          "frozen_rule_reason": "Common retrieval against qmd now tests recall/source body/freshness, while versioned-documentation scope remains separate. Website/version gains beyond the authored corpus are retained untested boundaries, not a singleton automatic win."
         },
         {
           "repository": "https://github.com/vectifyai/pageindex",
           "origin_sweep": "landscape-sweep-20260929",
           "input_kind": "survivor",
           "disposition": "included_in_frozen_comparison",
-          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
+          "reason": "Common source-grounded retrieval does not assert the retained FinanceBench task ran. Seal its judged financial recipe and supported no-new-paid-key path; a new paid key is a spending/entitlement constraint, never licence exclusion.",
           "comparison_id": "w6-foundation-document-retrieval-20261011",
           "adjudication_ref": null,
           "source": {
@@ -655,14 +801,18 @@
             "pin": "1a060dfc5c512ece03aeaa9cb80d76dbb5358bdf",
             "ref": "README.md:33",
             "evidence_class": "source_review"
-          }
+          },
+          "retained_comparison_refs": [
+            "catalogs/sota-convergence/manifest-20260929.json#/foundation/5/candidates/3/comparison_that_would_overturn"
+          ],
+          "frozen_rule_reason": "Common source-grounded retrieval does not assert the retained FinanceBench task ran. Seal its judged financial recipe and supported no-new-paid-key path; a new paid key is a spending/entitlement constraint, never licence exclusion."
         },
         {
           "repository": "https://github.com/xberg-io/xberg",
           "origin_sweep": "landscape-sweep-20260929",
           "input_kind": "missing_vote",
           "disposition": "included_in_frozen_comparison",
-          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
+          "reason": "Native flat conversion/OCR/structured references meet the shared authored oracle against Poppler and other converters. Scanned/borderless TEDS and throughput remain sealed-input prerequisites; model presence alone is not a result.",
           "comparison_id": "w6-foundation-document-retrieval-20261011",
           "adjudication_ref": null,
           "source": {
@@ -670,14 +820,18 @@
             "pin": "b4bdf0b9346188c8b540698f80b359fb9ff60ed0",
             "ref": "README.md:103",
             "evidence_class": "source_review"
-          }
+          },
+          "retained_comparison_refs": [
+            "catalogs/sota-convergence/manifest-20260929.json#/foundation/5/candidates/6/comparison_that_would_overturn"
+          ],
+          "frozen_rule_reason": "Native flat conversion/OCR/structured references meet the shared authored oracle against Poppler and other converters. Scanned/borderless TEDS and throughput remain sealed-input prerequisites; model presence alone is not a result."
         },
         {
           "repository": "https://github.com/pymupdf/pymupdf4llm",
           "origin_sweep": "landscape-sweep-20260929",
           "input_kind": "missing_vote",
           "disposition": "included_in_frozen_comparison",
-          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
+          "reason": "Native Markdown/JSON and bounding-box output compare with Poppler on the same authored PDF. The retained heading/table/OCR and borderless-strata quality study is not inferred from a small fixture; retain its recipe before broader claims.",
           "comparison_id": "w6-foundation-document-retrieval-20261011",
           "adjudication_ref": null,
           "source": {
@@ -685,14 +839,18 @@
             "pin": "ed515362c37554244a20a0fd3ef12d53760249a8",
             "ref": "README.md:26",
             "evidence_class": "source_review"
-          }
+          },
+          "retained_comparison_refs": [
+            "catalogs/sota-convergence/manifest-20260929.json#/foundation/5/candidates/5/comparison_that_would_overturn"
+          ],
+          "frozen_rule_reason": "Native Markdown/JSON and bounding-box output compare with Poppler on the same authored PDF. The retained heading/table/OCR and borderless-strata quality study is not inferred from a small fixture; retain its recipe before broader claims."
         },
         {
           "repository": "https://github.com/datalab-to/surya",
           "origin_sweep": "landscape-sweep-20260929",
           "input_kind": "missing_vote",
           "disposition": "included_in_frozen_comparison",
-          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
+          "reason": "The common rasterization qualifies OCR/source-page boxes, not whole retrieval. Seal the native model and retained OCR quality recipe before extrapolation beyond the authored page.",
           "comparison_id": "w6-foundation-document-retrieval-20261011",
           "adjudication_ref": null,
           "source": {
@@ -700,14 +858,18 @@
             "pin": "a2363d3311773a2b6145a40458043211c50c52f4",
             "ref": "README.md:31",
             "evidence_class": "source_review"
-          }
+          },
+          "retained_comparison_refs": [
+            "catalogs/sota-convergence/manifest-20260929.json#/foundation/5/candidates/8/comparison_that_would_overturn"
+          ],
+          "frozen_rule_reason": "The common rasterization qualifies OCR/source-page boxes, not whole retrieval. Seal the native model and retained OCR quality recipe before extrapolation beyond the authored page."
         },
         {
           "repository": "https://github.com/alibaba/logics-parsing",
           "origin_sweep": "landscape-sweep-20260929",
           "input_kind": "missing_vote",
           "disposition": "included_in_frozen_comparison",
-          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
+          "reason": "Its advertised native Markdown output enters content conversion alongside OCR; a model is not a retrieval system. Retained long-document/table quality and supported model settings remain pre-run evidence.",
           "comparison_id": "w6-foundation-document-retrieval-20261011",
           "adjudication_ref": null,
           "source": {
@@ -715,14 +877,18 @@
             "pin": "d75d42dbd92c518a4def19ac5895792828138d35",
             "ref": "README.md:11",
             "evidence_class": "source_review"
-          }
+          },
+          "retained_comparison_refs": [
+            "catalogs/sota-convergence/manifest-20260929.json#/foundation/5/candidates/4/comparison_that_would_overturn"
+          ],
+          "frozen_rule_reason": "Its advertised native Markdown output enters content conversion alongside OCR; a model is not a retrieval system. Retained long-document/table quality and supported model settings remain pre-run evidence."
         },
         {
           "repository": "https://github.com/baidu/unlimited-ocr",
           "origin_sweep": "landscape-sweep-20260929",
           "input_kind": "missing_vote",
           "disposition": "included_in_frozen_comparison",
-          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
+          "reason": "The OCR arm retains a named source-role/recipe gap rather than a universal converter claim. Shared raster/text/table checks govern that scope, and the retained OCR workload requires a supported sealed native recipe.",
           "comparison_id": "w6-foundation-document-retrieval-20261011",
           "adjudication_ref": null,
           "source": {
@@ -730,14 +896,18 @@
             "pin": "d49ff64afffc1f47ab563dc1c589bc2f78808fa4",
             "ref": null,
             "evidence_class": "source_review"
-          }
+          },
+          "retained_comparison_refs": [
+            "catalogs/sota-convergence/manifest-20260929.json#/foundation/5/candidates/7/comparison_that_would_overturn"
+          ],
+          "frozen_rule_reason": "The OCR arm retains a named source-role/recipe gap rather than a universal converter claim. Shared raster/text/table checks govern that scope, and the retained OCR workload requires a supported sealed native recipe."
         },
         {
           "repository": "https://github.com/datalab-to/chandra",
           "origin_sweep": "landscape-sweep-20260929",
           "input_kind": "missing_vote",
           "disposition": "included_in_frozen_comparison",
-          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
+          "reason": "The missing-vote proposal remains in native conversion/OCR/reference checks. Current maintenance evidence and retained scanned/table recipe gate scoring; neither vote absence nor this bounded fixture decides general merit.",
           "comparison_id": "w6-foundation-document-retrieval-20261011",
           "adjudication_ref": null,
           "source": {
@@ -745,7 +915,12 @@
             "pin": "d4f7467435aa4137d9539f000ddf0b7ced3eb43f",
             "ref": "README.md:23",
             "evidence_class": "source_review"
-          }
+          },
+          "retained_comparison_refs": [
+            "catalogs/sota-convergence/manifest-20260923.json#/foundation/5/candidates/6/comparison_that_would_overturn",
+            "catalogs/sota-convergence/manifest-20260929.json#/foundation/5/candidates/13/comparison_that_would_overturn"
+          ],
+          "frozen_rule_reason": "The missing-vote proposal remains in native conversion/OCR/reference checks. Current maintenance evidence and retained scanned/table recipe gate scoring; neither vote absence nor this bounded fixture decides general merit."
         }
       ],
       "changed_evidence": [],
@@ -755,7 +930,7 @@
       "terminal_readiness": "#1007 LANDED satisfied; remaining pinned-runtime comparison inputs are explicitly unmet",
       "bounded_next_action": "Qualify only the frozen existing candidates on the retained cases through the named native/upstream paths. No new discovery.",
       "evidence_class": "source_review",
-      "preregistration_sha256": "8d205c6eb29fac4541a29d5e371de264aa4a845b365d9fc3214cf5fb369d8c86",
+      "preregistration_sha256": "5be0515cc4367fc457e12bded1ed351ed022ff61a9ba55ced3998906ccac4848",
       "wave_ref": "catalogs/sota-convergence/layer-verdicts-20260922.json#/catalogs/foundation/3",
       "next_review": "2026-10-22",
       "next_review_gap": null,
@@ -770,7 +945,7 @@
         },
         "comparison_id": "w6-foundation-document-retrieval-20261011",
         "preregistration_ref": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/document-retrieval.json",
-        "preregistration_sha256": "8d205c6eb29fac4541a29d5e371de264aa4a845b365d9fc3214cf5fb369d8c86",
+        "preregistration_sha256": "5be0515cc4367fc457e12bded1ed351ed022ff61a9ba55ced3998906ccac4848",
         "resolution_winners": [],
         "final_stack_source": {
           "commit": "c2dee173",
@@ -852,7 +1027,8 @@
         "readiness_unmet": [
           "arm runtime/upstream E2E receipts at the frozen pins",
           "complete usage-instrumentation freeze and scoped native invoke/role evidence",
-          "isolated queued native runner"
+          "isolated queued native runner",
+          "Retained reopen/proposal evidence needs scoped source receipts or substantive disposition before affected scoring."
         ],
         "comparison_ready": false,
         "fixed_decision_rule": {
@@ -863,7 +1039,7 @@
           "terminal": "FINAL requires every selected deployed winner's actual final-stack runs[] pin to match its adopted tested source, with verdict/wave/next_review, upstream E2E at that operational run pin and invoke evidence/role reason. An experimental source-pin receipt does not qualify a different historical operational run pin.",
           "amendments": "No new candidates or changed metrics after first run. Any necessary input correction requires a separately reviewed, hashed amendment before affected scoring."
         },
-        "frozen_scope": "Refrozen under B1/B2/A2 with explicit roles/dependencies/checks/cases and corrected citations before any run; current hash above supersedes original.",
+        "frozen_scope": "One comparison per layer with retained candidates and source-advertised roles; native output-reference scope qualifies separately. Retained operational/quality/coverage inputs gate affected scoring; no outcome claim.",
         "evidence_class": "source_review",
         "final_claim": false,
         "next_review": "2026-10-22",
@@ -895,7 +1071,149 @@
             "receipt_transfer_allowed": false,
             "final_requirement": "Supported adoption into matching runs[] then upstream E2E and invoke at that operational pin."
           }
-        }
+        },
+        "retained_reopen_inputs": [
+          {
+            "kind": "ledger_reopen",
+            "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/failures/document-retrieval",
+            "trigger": "retained_failure",
+            "required_evidence": "Resolve retained retained_failure source/receipt/coverage evidence at the compared pin, or retain a substantive scoped disposition. Licence metadata alone cannot exclude a source.",
+            "owner": "layer-verdict"
+          },
+          {
+            "kind": "ledger_reopen",
+            "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/failures/document-retrieval",
+            "trigger": "retained_failure",
+            "required_evidence": "Resolve retained retained_failure source/receipt/coverage evidence at the compared pin, or retain a substantive scoped disposition. Licence metadata alone cannot exclude a source.",
+            "owner": "layer-verdict"
+          },
+          {
+            "kind": "retained_proposal_prerequisite",
+            "repository": "https://github.com/datalab-to/marker",
+            "ref": "catalogs/sota-convergence/manifest-20260923.json#/foundation/5/candidates/0/comparison_that_would_overturn",
+            "additional_refs": [],
+            "required_evidence": "Retained native OCR/layout/scanned quality set and reading-order/table recipe are sealed.",
+            "owner": "layer-verdict",
+            "status": "unverified_before_execution"
+          },
+          {
+            "kind": "retained_proposal_prerequisite",
+            "repository": "https://github.com/opendatalab/mineru",
+            "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/5/candidates/1/comparison_that_would_overturn",
+            "additional_refs": [
+              "catalogs/sota-convergence/manifest-20260923.json#/foundation/5/candidates/1/comparison_that_would_overturn",
+              "catalogs/sota-convergence/manifest-20260926.json#/foundation/5/candidates/2/comparison_that_would_overturn"
+            ],
+            "required_evidence": "Native library search/read and retained judged/scanned/borderless TEDS recipes are sealed.",
+            "owner": "layer-verdict",
+            "status": "unverified_before_execution"
+          },
+          {
+            "kind": "retained_proposal_prerequisite",
+            "repository": "https://github.com/docling-project/docling",
+            "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/5/candidates/0/comparison_that_would_overturn",
+            "additional_refs": [
+              "catalogs/sota-convergence/manifest-20260926.json#/foundation/5/candidates/4/comparison_that_would_overturn"
+            ],
+            "required_evidence": "Retained scanned/borderless strata, table-fidelity/source-reference recipe and model settings are sealed.",
+            "owner": "layer-verdict",
+            "status": "unverified_before_execution"
+          },
+          {
+            "kind": "retained_proposal_prerequisite",
+            "repository": "https://github.com/cinnamon/kotaemon",
+            "ref": "catalogs/sota-convergence/manifest-20260926.json#/foundation/5/candidates/6/comparison_that_would_overturn",
+            "additional_refs": [],
+            "required_evidence": "Resumed-maintenance evidence and supported headless install/query are available at the tested pin.",
+            "owner": "layer-verdict",
+            "status": "unverified_before_execution"
+          },
+          {
+            "kind": "retained_proposal_prerequisite",
+            "repository": "https://github.com/huggingface/sentence-transformers",
+            "ref": "catalogs/sota-convergence/manifest-20260926.json#/foundation/5/candidates/0/comparison_that_would_overturn",
+            "additional_refs": [],
+            "required_evidence": "Supported checkpoint/prefix/dimensions and judged downstream recall/reranking panels are sealed; licences remain metadata.",
+            "owner": "layer-verdict",
+            "status": "unverified_before_execution"
+          },
+          {
+            "kind": "retained_proposal_prerequisite",
+            "repository": "https://github.com/arabold/docs-mcp-server",
+            "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/5/candidates/2/comparison_that_would_overturn",
+            "additional_refs": [
+              "catalogs/sota-convergence/manifest-20260926.json#/foundation/5/candidates/3/comparison_that_would_overturn"
+            ],
+            "required_evidence": "The retained native role/model/settings and source-backed comparison recipe are sealed before scoring; unsupported operational axes have a substantive disposition.",
+            "owner": "layer-verdict",
+            "status": "unverified_before_execution"
+          },
+          {
+            "kind": "retained_proposal_prerequisite",
+            "repository": "https://github.com/vectifyai/pageindex",
+            "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/5/candidates/3/comparison_that_would_overturn",
+            "additional_refs": [],
+            "required_evidence": "Retained financial query set and supported no-new-paid-key path exist; record a spending/entitlement disposition if a new paid key is required.",
+            "owner": "layer-verdict",
+            "status": "unverified_before_execution"
+          },
+          {
+            "kind": "retained_proposal_prerequisite",
+            "repository": "https://github.com/xberg-io/xberg",
+            "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/5/candidates/6/comparison_that_would_overturn",
+            "additional_refs": [],
+            "required_evidence": "Retained scanned/borderless table/throughput recipe and native feature/model set are sealed.",
+            "owner": "layer-verdict",
+            "status": "unverified_before_execution"
+          },
+          {
+            "kind": "retained_proposal_prerequisite",
+            "repository": "https://github.com/pymupdf/pymupdf4llm",
+            "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/5/candidates/5/comparison_that_would_overturn",
+            "additional_refs": [],
+            "required_evidence": "Retained Markdown/JSON, borderless/scanned table and native OCR settings/quality recipe are sealed.",
+            "owner": "layer-verdict",
+            "status": "unverified_before_execution"
+          },
+          {
+            "kind": "retained_proposal_prerequisite",
+            "repository": "https://github.com/datalab-to/surya",
+            "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/5/candidates/8/comparison_that_would_overturn",
+            "additional_refs": [],
+            "required_evidence": "Supported OCR/layout model, identical rasterization and retained quality-score recipe are sealed.",
+            "owner": "layer-verdict",
+            "status": "unverified_before_execution"
+          },
+          {
+            "kind": "retained_proposal_prerequisite",
+            "repository": "https://github.com/alibaba/logics-parsing",
+            "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/5/candidates/4/comparison_that_would_overturn",
+            "additional_refs": [],
+            "required_evidence": "Supported long-document model/settings and retained page/tree/table quality recipe are sealed.",
+            "owner": "layer-verdict",
+            "status": "unverified_before_execution"
+          },
+          {
+            "kind": "retained_proposal_prerequisite",
+            "repository": "https://github.com/baidu/unlimited-ocr",
+            "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/5/candidates/7/comparison_that_would_overturn",
+            "additional_refs": [],
+            "required_evidence": "Supported native install/test/output recipe resolves the retained source-role gap; unsupported paths remain failures.",
+            "owner": "layer-verdict",
+            "status": "unverified_before_execution"
+          },
+          {
+            "kind": "retained_proposal_prerequisite",
+            "repository": "https://github.com/datalab-to/chandra",
+            "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/5/candidates/13/comparison_that_would_overturn",
+            "additional_refs": [
+              "catalogs/sota-convergence/manifest-20260923.json#/foundation/5/candidates/6/comparison_that_would_overturn"
+            ],
+            "required_evidence": "Current default-branch maintenance receipt satisfies the retained 90-day recency criterion at scoring; source recency is not a calendar wait.",
+            "owner": "layer-verdict",
+            "status": "unverified_before_execution"
+          }
+        ]
       },
       "next_review_ref": "c2dee173:catalogs/landscape/final-stack.json (this layer's verdict.next_review)"
     },
@@ -995,7 +1313,7 @@
           "origin_sweep": "landscape-sweep-20260929",
           "input_kind": "survivor",
           "disposition": "included_in_frozen_comparison",
-          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
+          "reason": "Model-identity serving is a dependency interface, not end-to-end semantic retrieval. The common sealed embedding oracle governs its scoped serving claim, with downstream relevance tested only in a declared shared pipeline.",
           "comparison_id": "w6-foundation-semantic-rag-20261011",
           "adjudication_ref": null,
           "source": {
@@ -1003,14 +1321,20 @@
             "pin": "eab97e9f92b9a25c2d52d2cc6c1b1c99bd9fae21",
             "ref": "README.md:58",
             "evidence_class": "source_review"
-          }
+          },
+          "retained_comparison_refs": [
+            "catalogs/sota-convergence/manifest-20260923.json#/foundation/6/candidates/0/comparison_that_would_overturn",
+            "catalogs/sota-convergence/manifest-20260926.json#/foundation/6/candidates/4/comparison_that_would_overturn",
+            "catalogs/sota-convergence/manifest-20260929.json#/foundation/6/candidates/2/comparison_that_would_overturn"
+          ],
+          "frozen_rule_reason": "Model-identity serving is a dependency interface, not end-to-end semantic retrieval. The common sealed embedding oracle governs its scoped serving claim, with downstream relevance tested only in a declared shared pipeline."
         },
         {
           "repository": "https://github.com/osu-nlp-group/hipporag",
           "origin_sweep": "landscape-sweep-20260926",
           "input_kind": "missing_vote",
           "disposition": "included_in_frozen_comparison",
-          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
+          "reason": "It shares retrieval and project membership/restore rather than an associative singleton. A sealed judged multi-hop cross-file set remains prerequisite for the retained usefulness claim; single-concept cases do not prove multi-hop merit.",
           "comparison_id": "w6-foundation-semantic-rag-20261011",
           "adjudication_ref": null,
           "source": {
@@ -1018,14 +1342,18 @@
             "pin": "d5c8329422e0a0b834a15874545cb6a74b4f9b26",
             "ref": "README.md:13",
             "evidence_class": "source_review"
-          }
+          },
+          "retained_comparison_refs": [
+            "catalogs/sota-convergence/manifest-20260926.json#/foundation/6/candidates/7/comparison_that_would_overturn"
+          ],
+          "frozen_rule_reason": "It shares retrieval and project membership/restore rather than an associative singleton. A sealed judged multi-hop cross-file set remains prerequisite for the retained usefulness claim; single-concept cases do not prove multi-hop merit."
         },
         {
           "repository": "https://github.com/lightonai/next-plaid",
           "origin_sweep": "landscape-sweep-20260929",
           "input_kind": "survivor",
           "disposition": "included_in_frozen_comparison",
-          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
+          "reason": "Semantic code retrieval now compares with SocratiCode/semble, plus native multivector indexing. Retained Semble-bench/NDCG@10 and recovery inputs remain required before general relevance superiority; the bounded source oracle is not that result.",
           "comparison_id": "w6-foundation-semantic-rag-20261011",
           "adjudication_ref": null,
           "source": {
@@ -1033,14 +1361,19 @@
             "pin": "c6c091d7ee14c81206bb28af90d8ff506fd0235e",
             "ref": "README.md:22",
             "evidence_class": "source_review"
-          }
+          },
+          "retained_comparison_refs": [
+            "catalogs/sota-convergence/manifest-20260926.json#/foundation/6/candidates/1/comparison_that_would_overturn",
+            "catalogs/sota-convergence/manifest-20260929.json#/foundation/6/candidates/0/comparison_that_would_overturn"
+          ],
+          "frozen_rule_reason": "Semantic code retrieval now compares with SocratiCode/semble, plus native multivector indexing. Retained Semble-bench/NDCG@10 and recovery inputs remain required before general relevance superiority; the bounded source oracle is not that result."
         },
         {
           "repository": "https://github.com/minishlab/semble",
           "origin_sweep": "landscape-sweep-20260929",
           "input_kind": "survivor",
           "disposition": "included_in_frozen_comparison",
-          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
+          "reason": "Common source-grounded retrieval and project update/isolation compare with the other declared indexes. Seal the retained judged set/Semble benchmark and NDCG@10 before general relevance claims; the small code fixture is bounded.",
           "comparison_id": "w6-foundation-semantic-rag-20261011",
           "adjudication_ref": null,
           "source": {
@@ -1048,14 +1381,19 @@
             "pin": "0e5e02832ae0340c0feb637d2b7213fe065571fd",
             "ref": "README.md:3",
             "evidence_class": "source_review"
-          }
+          },
+          "retained_comparison_refs": [
+            "catalogs/sota-convergence/manifest-20260926.json#/foundation/6/candidates/3/comparison_that_would_overturn",
+            "catalogs/sota-convergence/manifest-20260929.json#/foundation/6/candidates/1/comparison_that_would_overturn"
+          ],
+          "frozen_rule_reason": "Common source-grounded retrieval and project update/isolation compare with the other declared indexes. Seal the retained judged set/Semble benchmark and NDCG@10 before general relevance claims; the small code fixture is bounded."
         },
         {
           "repository": "https://github.com/giancarloerra/socraticode",
           "origin_sweep": "landscape-sweep-20260926",
           "input_kind": "missing_vote",
           "disposition": "included_in_frozen_comparison",
-          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
+          "reason": "The deduplicated exact-source arm tests index coverage/freshness and clean-target membership. Retained benchmark/control and another operational version are not transferred as comparison receipts.",
           "comparison_id": "w6-foundation-semantic-rag-20261011",
           "adjudication_ref": null,
           "source": {
@@ -1063,7 +1401,11 @@
             "pin": "2218f25153d0f3f4a76ee240a5643dbc873e80be",
             "ref": "README.md:44",
             "evidence_class": "source_review"
-          }
+          },
+          "retained_comparison_refs": [
+            "catalogs/sota-convergence/manifest-20260926.json#/foundation/6/candidates/0/comparison_that_would_overturn"
+          ],
+          "frozen_rule_reason": "The deduplicated exact-source arm tests index coverage/freshness and clean-target membership. Retained benchmark/control and another operational version are not transferred as comparison receipts."
         }
       ],
       "changed_evidence": [],
@@ -1073,7 +1415,7 @@
       "terminal_readiness": "#1007 LANDED satisfied; remaining pinned-runtime comparison inputs are explicitly unmet",
       "bounded_next_action": "Qualify only the frozen existing candidates on the retained cases through the named native/upstream paths. No new discovery.",
       "evidence_class": "source_review",
-      "preregistration_sha256": "3e9ba562169f4ff233af2d0e48213a29d8710795f8281cb8075e312f9df20c73",
+      "preregistration_sha256": "3b77e8a2e82d244d7b264e8eeeaebca8312f3128a5e6224ec784006f7d9ec2dd",
       "wave_ref": "catalogs/sota-convergence/layer-verdicts-20260922.json#/catalogs/foundation/16",
       "next_review": "2026-10-22",
       "next_review_gap": null,
@@ -1088,7 +1430,7 @@
         },
         "comparison_id": "w6-foundation-semantic-rag-20261011",
         "preregistration_ref": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/semantic-rag.json",
-        "preregistration_sha256": "3e9ba562169f4ff233af2d0e48213a29d8710795f8281cb8075e312f9df20c73",
+        "preregistration_sha256": "3b77e8a2e82d244d7b264e8eeeaebca8312f3128a5e6224ec784006f7d9ec2dd",
         "resolution_winners": [],
         "final_stack_source": {
           "commit": "c2dee173",
@@ -1170,7 +1512,8 @@
         "readiness_unmet": [
           "arm runtime/upstream E2E receipts at the frozen pins",
           "complete usage-instrumentation freeze and scoped native invoke/role evidence",
-          "isolated queued native runner"
+          "isolated queued native runner",
+          "Retained reopen/proposal evidence needs scoped source receipts or substantive disposition before affected scoring."
         ],
         "comparison_ready": false,
         "fixed_decision_rule": {
@@ -1181,7 +1524,7 @@
           "terminal": "FINAL requires every selected deployed winner's actual final-stack runs[] pin to match its adopted tested source, with verdict/wave/next_review, upstream E2E at that operational run pin and invoke evidence/role reason. An experimental source-pin receipt does not qualify a different historical operational run pin.",
           "amendments": "No new candidates or changed metrics after first run. Any necessary input correction requires a separately reviewed, hashed amendment before affected scoring."
         },
-        "frozen_scope": "Refrozen under B1/B2/A2 with explicit roles/dependencies/checks/cases and corrected citations before any run; current hash above supersedes original.",
+        "frozen_scope": "One comparison per layer with retained candidates and source-advertised roles; native output-reference scope qualifies separately. Retained operational/quality/coverage inputs gate affected scoring; no outcome claim.",
         "evidence_class": "source_review",
         "final_claim": false,
         "next_review": "2026-10-22",
@@ -1213,7 +1556,89 @@
             "receipt_transfer_allowed": false,
             "final_requirement": "Supported adoption into matching runs[] then upstream E2E and invoke at that operational pin."
           }
-        }
+        },
+        "retained_reopen_inputs": [
+          {
+            "kind": "ledger_reopen",
+            "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/failures/semantic-rag",
+            "trigger": "retained_failure",
+            "required_evidence": "Resolve retained retained_failure source/receipt/coverage evidence at the compared pin, or retain a substantive scoped disposition. Licence metadata alone cannot exclude a source.",
+            "owner": "layer-verdict"
+          },
+          {
+            "kind": "ledger_reopen",
+            "ref": "receipt_staleness:linux-wsl2-x86_64/vllm",
+            "trigger": "pin_moved",
+            "required_evidence": "Resolve retained pin_moved source/receipt/coverage evidence at the compared pin, or retain a substantive scoped disposition. Licence metadata alone cannot exclude a source.",
+            "owner": "layer-verdict"
+          },
+          {
+            "kind": "ledger_reopen",
+            "ref": "receipt_staleness:macos-arm64/ai-memory",
+            "trigger": "pin_moved",
+            "required_evidence": "Resolve retained pin_moved source/receipt/coverage evidence at the compared pin, or retain a substantive scoped disposition. Licence metadata alone cannot exclude a source.",
+            "owner": "layer-verdict"
+          },
+          {
+            "kind": "ledger_reopen",
+            "ref": "receipt_staleness:linux-wsl2-x86_64/ai-memory",
+            "trigger": "pin_moved",
+            "required_evidence": "Resolve retained pin_moved source/receipt/coverage evidence at the compared pin, or retain a substantive scoped disposition. Licence metadata alone cannot exclude a source.",
+            "owner": "layer-verdict"
+          },
+          {
+            "kind": "retained_proposal_prerequisite",
+            "repository": "https://github.com/ollama/ollama",
+            "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/6/candidates/2/comparison_that_would_overturn",
+            "additional_refs": [
+              "catalogs/sota-convergence/manifest-20260923.json#/foundation/6/candidates/0/comparison_that_would_overturn",
+              "catalogs/sota-convergence/manifest-20260926.json#/foundation/6/candidates/4/comparison_that_would_overturn"
+            ],
+            "required_evidence": "The retained native role/model/settings and source-backed comparison recipe are sealed before scoring; unsupported operational axes have a substantive disposition.",
+            "owner": "layer-verdict",
+            "status": "unverified_before_execution"
+          },
+          {
+            "kind": "retained_proposal_prerequisite",
+            "repository": "https://github.com/osu-nlp-group/hipporag",
+            "ref": "catalogs/sota-convergence/manifest-20260926.json#/foundation/6/candidates/7/comparison_that_would_overturn",
+            "additional_refs": [],
+            "required_evidence": "Retained judged multi-hop cross-file set and supported model/project restore recipe are sealed.",
+            "owner": "layer-verdict",
+            "status": "unverified_before_execution"
+          },
+          {
+            "kind": "retained_proposal_prerequisite",
+            "repository": "https://github.com/lightonai/next-plaid",
+            "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/6/candidates/0/comparison_that_would_overturn",
+            "additional_refs": [
+              "catalogs/sota-convergence/manifest-20260926.json#/foundation/6/candidates/1/comparison_that_would_overturn"
+            ],
+            "required_evidence": "Retained Semble benchmark, frozen-set NDCG@10 and native index/recovery recipe are sealed.",
+            "owner": "layer-verdict",
+            "status": "unverified_before_execution"
+          },
+          {
+            "kind": "retained_proposal_prerequisite",
+            "repository": "https://github.com/minishlab/semble",
+            "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/6/candidates/1/comparison_that_would_overturn",
+            "additional_refs": [
+              "catalogs/sota-convergence/manifest-20260926.json#/foundation/6/candidates/3/comparison_that_would_overturn"
+            ],
+            "required_evidence": "Retained Semble benchmark, judged relevance/NDCG@10 and project update/recovery recipe are sealed.",
+            "owner": "layer-verdict",
+            "status": "unverified_before_execution"
+          },
+          {
+            "kind": "retained_proposal_prerequisite",
+            "repository": "https://github.com/giancarloerra/socraticode",
+            "ref": "catalogs/sota-convergence/manifest-20260926.json#/foundation/6/candidates/0/comparison_that_would_overturn",
+            "additional_refs": [],
+            "required_evidence": "The retained native role/model/settings and source-backed comparison recipe are sealed before scoring; unsupported operational axes have a substantive disposition.",
+            "owner": "layer-verdict",
+            "status": "unverified_before_execution"
+          }
+        ]
       },
       "next_review_ref": "c2dee173:catalogs/landscape/final-stack.json (this layer's verdict.next_review)"
     },
@@ -1315,7 +1740,11 @@
             "pin": "3deb873687379f0c199a69fdaccc65f0865f7a29",
             "ref": "README.md:7",
             "evidence_class": "source_review"
-          }
+          },
+          "retained_comparison_refs": [
+            "catalogs/sota-convergence/manifest-20260926.json#/foundation/7/candidates/0/comparison_that_would_overturn"
+          ],
+          "frozen_rule_reason": "The A2 newest-supported-model/native-capture merit rule governs this memory candidate; Mac history is not current-host merit. Retain its operational/native capture/recall/supersession/recovery prerequisites before scoring."
         },
         {
           "repository": "https://github.com/langchain-ai/langmem",
@@ -1330,7 +1759,11 @@
             "pin": "48e3c11f5bb527282c7d5339c6a87a0b35abccfc",
             "ref": "README.md:3",
             "evidence_class": "source_review"
-          }
+          },
+          "retained_comparison_refs": [
+            "catalogs/sota-convergence/manifest-20260926.json#/foundation/7/candidates/1/comparison_that_would_overturn"
+          ],
+          "frozen_rule_reason": "The A2 newest-supported-model/native-capture merit rule governs this memory candidate; Mac history is not current-host merit. Retain its operational/native capture/recall/supersession/recovery prerequisites before scoring."
         },
         {
           "repository": "https://github.com/rohitg00/agentmemory",
@@ -1345,7 +1778,12 @@
             "pin": "7ee162844956626d8b00ba459df169d542d4af9d",
             "ref": "README.md:7",
             "evidence_class": "source_review"
-          }
+          },
+          "retained_comparison_refs": [
+            "catalogs/sota-convergence/manifest-20260926.json#/foundation/7/candidates/5/comparison_that_would_overturn",
+            "catalogs/sota-convergence/manifest-20260929.json#/foundation/7/candidates/1/comparison_that_would_overturn"
+          ],
+          "frozen_rule_reason": "The A2 newest-supported-model/native-capture merit rule governs this memory candidate; Mac history is not current-host merit. Retain its operational/native capture/recall/supersession/recovery prerequisites before scoring."
         },
         {
           "repository": "https://github.com/mempalace/mempalace",
@@ -1360,7 +1798,12 @@
             "pin": "1f0803a31958b30320418356b2db88c4ed9c27f9",
             "ref": "README.md:7",
             "evidence_class": "source_review"
-          }
+          },
+          "retained_comparison_refs": [
+            "catalogs/sota-convergence/manifest-20260926.json#/foundation/7/candidates/3/comparison_that_would_overturn",
+            "catalogs/sota-convergence/manifest-20260929.json#/foundation/7/candidates/0/comparison_that_would_overturn"
+          ],
+          "frozen_rule_reason": "The A2 newest-supported-model/native-capture merit rule governs this memory candidate; Mac history is not current-host merit. Retain its operational/native capture/recall/supersession/recovery prerequisites before scoring."
         },
         {
           "repository": "https://github.com/vshulcz/deja-vu",
@@ -1375,7 +1818,12 @@
             "pin": "aa521f3f1abb9aa5449e7812652be371f3f23be9",
             "ref": "README.md:12",
             "evidence_class": "source_review"
-          }
+          },
+          "retained_comparison_refs": [
+            "catalogs/sota-convergence/manifest-20260926.json#/foundation/7/candidates/7/comparison_that_would_overturn",
+            "catalogs/sota-convergence/manifest-20260929.json#/foundation/7/candidates/2/comparison_that_would_overturn"
+          ],
+          "frozen_rule_reason": "The A2 newest-supported-model/native-capture merit rule governs this memory candidate; Mac history is not current-host merit. Retain its operational/native capture/recall/supersession/recovery prerequisites before scoring."
         },
         {
           "repository": "https://github.com/vbcherepanov/total-agent-memory",
@@ -1390,7 +1838,11 @@
             "pin": "f2f124fec90dc977f4610a1ea90aa05f5b916e56",
             "ref": "README.md:10",
             "evidence_class": "source_review"
-          }
+          },
+          "retained_comparison_refs": [
+            "catalogs/sota-convergence/manifest-20260926.json#/foundation/7/candidates/10/comparison_that_would_overturn"
+          ],
+          "frozen_rule_reason": "The A2 newest-supported-model/native-capture merit rule governs this memory candidate; Mac history is not current-host merit. Retain its operational/native capture/recall/supersession/recovery prerequisites before scoring."
         },
         {
           "repository": "https://github.com/vectorize-io/hindsight",
@@ -1405,7 +1857,12 @@
             "pin": "a9eeed77f9bce99d8f97d39a30d3281747300824",
             "ref": "README.md:24",
             "evidence_class": "source_review"
-          }
+          },
+          "retained_comparison_refs": [
+            "catalogs/sota-convergence/manifest-20260926.json#/foundation/7/candidates/6/comparison_that_would_overturn",
+            "catalogs/sota-convergence/manifest-20260929.json#/foundation/7/candidates/4/comparison_that_would_overturn"
+          ],
+          "frozen_rule_reason": "The A2 newest-supported-model/native-capture merit rule governs this memory candidate; Mac history is not current-host merit. Retain its operational/native capture/recall/supersession/recovery prerequisites before scoring."
         },
         {
           "repository": "https://github.com/tigerless-labs/agent-memory",
@@ -1420,7 +1877,11 @@
             "pin": "aca58578ab386e4d422a97bcf32c2af2f3e57316",
             "ref": "README.md:3",
             "evidence_class": "source_review"
-          }
+          },
+          "retained_comparison_refs": [
+            "catalogs/sota-convergence/manifest-20260929.json#/foundation/7/candidates/3/comparison_that_would_overturn"
+          ],
+          "frozen_rule_reason": "The A2 newest-supported-model/native-capture merit rule governs this memory candidate; Mac history is not current-host merit. Retain its operational/native capture/recall/supersession/recovery prerequisites before scoring."
         }
       ],
       "changed_evidence": [],
@@ -1430,7 +1891,7 @@
       "terminal_readiness": "#1007 LANDED satisfied; remaining pinned-runtime comparison inputs are explicitly unmet",
       "bounded_next_action": "Qualify only the frozen existing candidates on the retained cases through the named native/upstream paths. No new discovery.",
       "evidence_class": "source_review",
-      "preregistration_sha256": "30000658784bc54d16932ecfa1de9a321cf5f4dad2d447ff1aca71f31b6a1029",
+      "preregistration_sha256": "6450b9467c9345a67dc4fb571429b1c055fa924f8b422c8b7ab48aebeaba5cee",
       "wave_ref": "catalogs/sota-convergence/layer-verdicts-20260922.json#/catalogs/foundation/4",
       "next_review": "2026-10-22",
       "next_review_gap": null,
@@ -1445,7 +1906,7 @@
         },
         "comparison_id": "w6-foundation-durable-memory-20261011",
         "preregistration_ref": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/durable-memory.json",
-        "preregistration_sha256": "30000658784bc54d16932ecfa1de9a321cf5f4dad2d447ff1aca71f31b6a1029",
+        "preregistration_sha256": "6450b9467c9345a67dc4fb571429b1c055fa924f8b422c8b7ab48aebeaba5cee",
         "resolution_winners": [],
         "final_stack_source": {
           "commit": "c2dee173",
@@ -1497,7 +1958,8 @@
           "Committed primary-source model/prompt/settings seal; no unresolved model alias is a pin.",
           "arm runtime/upstream E2E receipts at the frozen pins",
           "complete usage-instrumentation freeze and scoped native invoke/role evidence",
-          "isolated queued native runner"
+          "isolated queued native runner",
+          "Retained reopen/proposal evidence needs scoped source receipts or substantive disposition before affected scoring."
         ],
         "comparison_ready": false,
         "fixed_decision_rule": {
@@ -1509,7 +1971,7 @@
           "amendments": "No new candidates or changed metrics after first run. Any necessary input correction requires a separately reviewed, hashed amendment before affected scoring.",
           "incumbent_protection": false
         },
-        "frozen_scope": "Refrozen under B1/B2/A2 with explicit roles/dependencies/checks/cases and corrected citations before any run; current hash above supersedes original.",
+        "frozen_scope": "One comparison per layer with retained candidates and source-advertised roles; native output-reference scope qualifies separately. Retained operational/quality/coverage inputs gate affected scoring; no outcome claim.",
         "evidence_class": "source_review",
         "final_claim": false,
         "next_review": "2026-10-22",
@@ -1523,7 +1985,131 @@
             "receipt_transfer_allowed": false,
             "final_requirement": "Supported adoption into matching runs[] then upstream E2E and invoke at that operational pin."
           }
-        }
+        },
+        "retained_reopen_inputs": [
+          {
+            "kind": "ledger_reopen",
+            "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/failures/durable-memory",
+            "trigger": "retained_failure",
+            "required_evidence": "Resolve retained retained_failure source/receipt/coverage evidence at the compared pin, or retain a substantive scoped disposition. Licence metadata alone cannot exclude a source.",
+            "owner": "layer-verdict"
+          },
+          {
+            "kind": "ledger_reopen",
+            "ref": "receipt_staleness:macos-arm64/ai-memory",
+            "trigger": "pin_moved",
+            "required_evidence": "Resolve retained pin_moved source/receipt/coverage evidence at the compared pin, or retain a substantive scoped disposition. Licence metadata alone cannot exclude a source.",
+            "owner": "layer-verdict"
+          },
+          {
+            "kind": "ledger_reopen",
+            "ref": "receipt_staleness:linux-wsl2-x86_64/ai-memory",
+            "trigger": "pin_moved",
+            "required_evidence": "Resolve retained pin_moved source/receipt/coverage evidence at the compared pin, or retain a substantive scoped disposition. Licence metadata alone cannot exclude a source.",
+            "owner": "layer-verdict"
+          },
+          {
+            "kind": "ledger_reopen",
+            "ref": "receipt_staleness:linux-wsl2-x86_64/codex",
+            "trigger": "pin_moved",
+            "required_evidence": "Resolve retained pin_moved source/receipt/coverage evidence at the compared pin, or retain a substantive scoped disposition. Licence metadata alone cannot exclude a source.",
+            "owner": "layer-verdict"
+          },
+          {
+            "kind": "ledger_reopen",
+            "ref": "receipt_staleness:macos-arm64/claude-code",
+            "trigger": "pin_moved",
+            "required_evidence": "Resolve retained pin_moved source/receipt/coverage evidence at the compared pin, or retain a substantive scoped disposition. Licence metadata alone cannot exclude a source.",
+            "owner": "layer-verdict"
+          },
+          {
+            "kind": "ledger_reopen",
+            "ref": "receipt_staleness:macos-arm64/codex",
+            "trigger": "pin_moved",
+            "required_evidence": "Resolve retained pin_moved source/receipt/coverage evidence at the compared pin, or retain a substantive scoped disposition. Licence metadata alone cannot exclude a source.",
+            "owner": "layer-verdict"
+          },
+          {
+            "kind": "retained_proposal_prerequisite",
+            "repository": "https://github.com/anthropics/claude-code",
+            "ref": "catalogs/sota-convergence/manifest-20260926.json#/foundation/7/candidates/0/comparison_that_would_overturn",
+            "additional_refs": [],
+            "required_evidence": "The retained native role/model/settings and source-backed comparison recipe are sealed before scoring; unsupported operational axes have a substantive disposition.",
+            "owner": "layer-verdict",
+            "status": "unverified_before_execution"
+          },
+          {
+            "kind": "retained_proposal_prerequisite",
+            "repository": "https://github.com/langchain-ai/langmem",
+            "ref": "catalogs/sota-convergence/manifest-20260926.json#/foundation/7/candidates/1/comparison_that_would_overturn",
+            "additional_refs": [],
+            "required_evidence": "Retained supported MCP/integration server exists at the source pin, or unsupported scope has a substantive disposition.",
+            "owner": "layer-verdict",
+            "status": "unverified_before_execution"
+          },
+          {
+            "kind": "retained_proposal_prerequisite",
+            "repository": "https://github.com/rohitg00/agentmemory",
+            "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/7/candidates/1/comparison_that_would_overturn",
+            "additional_refs": [
+              "catalogs/sota-convergence/manifest-20260926.json#/foundation/7/candidates/5/comparison_that_would_overturn"
+            ],
+            "required_evidence": "The retained native role/model/settings and source-backed comparison recipe are sealed before scoring; unsupported operational axes have a substantive disposition.",
+            "owner": "layer-verdict",
+            "status": "unverified_before_execution"
+          },
+          {
+            "kind": "retained_proposal_prerequisite",
+            "repository": "https://github.com/mempalace/mempalace",
+            "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/7/candidates/0/comparison_that_would_overturn",
+            "additional_refs": [
+              "catalogs/sota-convergence/manifest-20260926.json#/foundation/7/candidates/3/comparison_that_would_overturn"
+            ],
+            "required_evidence": "The retained native role/model/settings and source-backed comparison recipe are sealed before scoring; unsupported operational axes have a substantive disposition.",
+            "owner": "layer-verdict",
+            "status": "unverified_before_execution"
+          },
+          {
+            "kind": "retained_proposal_prerequisite",
+            "repository": "https://github.com/vshulcz/deja-vu",
+            "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/7/candidates/2/comparison_that_would_overturn",
+            "additional_refs": [
+              "catalogs/sota-convergence/manifest-20260926.json#/foundation/7/candidates/7/comparison_that_would_overturn"
+            ],
+            "required_evidence": "The retained native role/model/settings and source-backed comparison recipe are sealed before scoring; unsupported operational axes have a substantive disposition.",
+            "owner": "layer-verdict",
+            "status": "unverified_before_execution"
+          },
+          {
+            "kind": "retained_proposal_prerequisite",
+            "repository": "https://github.com/vbcherepanov/total-agent-memory",
+            "ref": "catalogs/sota-convergence/manifest-20260926.json#/foundation/7/candidates/10/comparison_that_would_overturn",
+            "additional_refs": [],
+            "required_evidence": "The retained native role/model/settings and source-backed comparison recipe are sealed before scoring; unsupported operational axes have a substantive disposition.",
+            "owner": "layer-verdict",
+            "status": "unverified_before_execution"
+          },
+          {
+            "kind": "retained_proposal_prerequisite",
+            "repository": "https://github.com/vectorize-io/hindsight",
+            "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/7/candidates/4/comparison_that_would_overturn",
+            "additional_refs": [
+              "catalogs/sota-convergence/manifest-20260926.json#/foundation/7/candidates/6/comparison_that_would_overturn"
+            ],
+            "required_evidence": "The retained native role/model/settings and source-backed comparison recipe are sealed before scoring; unsupported operational axes have a substantive disposition.",
+            "owner": "layer-verdict",
+            "status": "unverified_before_execution"
+          },
+          {
+            "kind": "retained_proposal_prerequisite",
+            "repository": "https://github.com/tigerless-labs/agent-memory",
+            "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/7/candidates/3/comparison_that_would_overturn",
+            "additional_refs": [],
+            "required_evidence": "The retained native role/model/settings and source-backed comparison recipe are sealed before scoring; unsupported operational axes have a substantive disposition.",
+            "owner": "layer-verdict",
+            "status": "unverified_before_execution"
+          }
+        ]
       },
       "next_review_ref": "c2dee173:catalogs/landscape/final-stack.json (this layer's verdict.next_review)"
     },
@@ -1607,7 +2193,7 @@
           "origin_sweep": "landscape-sweep-20260923",
           "input_kind": "survivor",
           "disposition": "included_in_frozen_comparison",
-          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
+          "reason": "Shared source extraction/attribution/failure checks compare all declared extraction arms. Retained 30-URL recall@5 and supported remote fixture reachability must be sealed before a broader search-merit claim.",
           "comparison_id": "w6-foundation-web-research-20261011",
           "adjudication_ref": null,
           "source": {
@@ -1615,14 +2201,19 @@
             "pin": "e9c3b0126a3373eb1aeaca162e84d0791ff4c7f7",
             "ref": "README.md:4",
             "evidence_class": "source_review"
-          }
+          },
+          "retained_comparison_refs": [
+            "catalogs/sota-convergence/manifest-20260923.json#/foundation/8/candidates/0/comparison_that_would_overturn",
+            "catalogs/sota-convergence/manifest-20260926.json#/foundation/8/candidates/1/comparison_that_would_overturn"
+          ],
+          "frozen_rule_reason": "Shared source extraction/attribution/failure checks compare all declared extraction arms. Retained 30-URL recall@5 and supported remote fixture reachability must be sealed before a broader search-merit claim."
         },
         {
           "repository": "https://github.com/adbar/trafilatura",
           "origin_sweep": "landscape-sweep-20260929",
           "input_kind": "survivor",
           "disposition": "included_in_frozen_comparison",
-          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
+          "reason": "Extraction now compares with agent-browser read as the retained votes required. Exact HTML fallback/text/metadata governs this scoped role; QA or provider search ranking is not inferred from extraction alone.",
           "comparison_id": "w6-foundation-web-research-20261011",
           "adjudication_ref": null,
           "source": {
@@ -1630,14 +2221,19 @@
             "pin": "e2f85c965662c7df26b73290ef175b2c2a5fdca6",
             "ref": "README.md:1",
             "evidence_class": "source_review"
-          }
+          },
+          "retained_comparison_refs": [
+            "catalogs/sota-convergence/manifest-20260926.json#/foundation/8/candidates/0/comparison_that_would_overturn",
+            "catalogs/sota-convergence/manifest-20260929.json#/foundation/8/candidates/0/comparison_that_would_overturn"
+          ],
+          "frozen_rule_reason": "Extraction now compares with agent-browser read as the retained votes required. Exact HTML fallback/text/metadata governs this scoped role; QA or provider search ranking is not inferred from extraction alone."
         },
         {
           "repository": "https://github.com/openai/codex",
           "origin_sweep": "landscape-sweep-20260926",
           "input_kind": "missing_vote",
           "disposition": "included_in_frozen_comparison",
-          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
+          "reason": "Native web tool/provider identity qualifies primary bytes/attribution/failures, separately from coding. Retained 30-URL recall@5 and supported shared delivery remain prerequisite for broader search merit.",
           "comparison_id": "w6-foundation-web-research-20261011",
           "adjudication_ref": null,
           "source": {
@@ -1645,14 +2241,18 @@
             "pin": "092d3acd6bec3e3a14bdc7e7a2810ab628ab759d",
             "ref": "README.md:1",
             "evidence_class": "source_review"
-          }
+          },
+          "retained_comparison_refs": [
+            "catalogs/sota-convergence/manifest-20260926.json#/foundation/8/candidates/3/comparison_that_would_overturn"
+          ],
+          "frozen_rule_reason": "Native web tool/provider identity qualifies primary bytes/attribution/failures, separately from coding. Retained 30-URL recall@5 and supported shared delivery remain prerequisite for broader search merit."
         },
         {
           "repository": "https://github.com/webrecorder/browsertrix-crawler",
           "origin_sweep": "landscape-sweep-20260929",
           "input_kind": "missing_vote",
           "disposition": "included_in_frozen_comparison",
-          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
+          "reason": "Archival provenance/cleanup qualifies captured source bytes, not QA/search ranking. Its supported container runtime and retained changed-page/archive task are required before the larger capture claim.",
           "comparison_id": "w6-foundation-web-research-20261011",
           "adjudication_ref": null,
           "source": {
@@ -1660,7 +2260,11 @@
             "pin": "b8c38c4da141e855212d65ac714bfe663d178557",
             "ref": "README.md:1",
             "evidence_class": "source_review"
-          }
+          },
+          "retained_comparison_refs": [
+            "catalogs/sota-convergence/manifest-20260929.json#/foundation/8/candidates/11/comparison_that_would_overturn"
+          ],
+          "frozen_rule_reason": "Archival provenance/cleanup qualifies captured source bytes, not QA/search ranking. Its supported container runtime and retained changed-page/archive task are required before the larger capture claim."
         }
       ],
       "changed_evidence": [],
@@ -1670,7 +2274,7 @@
       "terminal_readiness": "#1007 LANDED satisfied; remaining pinned-runtime comparison inputs are explicitly unmet",
       "bounded_next_action": "Qualify only the frozen existing candidates on the retained cases through the named native/upstream paths. No new discovery.",
       "evidence_class": "source_review",
-      "preregistration_sha256": "5b3f3805682f6c99600658b7a7a4cb968aecaf54588dd8d3ac0e6af1cd1f25fd",
+      "preregistration_sha256": "db1df25eed815d73ce09e518f0a01895b95732821e01bf22e95e8bad01a41819",
       "wave_ref": "catalogs/sota-convergence/layer-verdicts-20260922.json#/catalogs/foundation/18",
       "next_review": "2026-10-22",
       "next_review_gap": null,
@@ -1685,7 +2289,7 @@
         },
         "comparison_id": "w6-foundation-web-research-20261011",
         "preregistration_ref": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/web-research.json",
-        "preregistration_sha256": "5b3f3805682f6c99600658b7a7a4cb968aecaf54588dd8d3ac0e6af1cd1f25fd",
+        "preregistration_sha256": "db1df25eed815d73ce09e518f0a01895b95732821e01bf22e95e8bad01a41819",
         "resolution_winners": [],
         "final_stack_source": {
           "commit": "c2dee173",
@@ -1767,7 +2371,8 @@
         "readiness_unmet": [
           "arm runtime/upstream E2E receipts at the frozen pins",
           "complete usage-instrumentation freeze and scoped native invoke/role evidence",
-          "isolated queued native runner"
+          "isolated queued native runner",
+          "Retained reopen/proposal evidence needs scoped source receipts or substantive disposition before affected scoring."
         ],
         "comparison_ready": false,
         "fixed_decision_rule": {
@@ -1778,7 +2383,7 @@
           "terminal": "FINAL requires every selected deployed winner's actual final-stack runs[] pin to match its adopted tested source, with verdict/wave/next_review, upstream E2E at that operational run pin and invoke evidence/role reason. An experimental source-pin receipt does not qualify a different historical operational run pin.",
           "amendments": "No new candidates or changed metrics after first run. Any necessary input correction requires a separately reviewed, hashed amendment before affected scoring."
         },
-        "frozen_scope": "Refrozen under B1/B2/A2 with explicit roles/dependencies/checks/cases and corrected citations before any run; current hash above supersedes original.",
+        "frozen_scope": "One comparison per layer with retained candidates and source-advertised roles; native output-reference scope qualifies separately. Retained operational/quality/coverage inputs gate affected scoring; no outcome claim.",
         "evidence_class": "source_review",
         "final_claim": false,
         "next_review": "2026-10-22",
@@ -1810,7 +2415,63 @@
             "receipt_transfer_allowed": false,
             "final_requirement": "Supported adoption into matching runs[] then upstream E2E and invoke at that operational pin."
           }
-        }
+        },
+        "retained_reopen_inputs": [
+          {
+            "kind": "ledger_reopen",
+            "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/failures/web-research",
+            "trigger": "retained_failure",
+            "required_evidence": "Resolve retained retained_failure source/receipt/coverage evidence at the compared pin, or retain a substantive scoped disposition. Licence metadata alone cannot exclude a source.",
+            "owner": "layer-verdict"
+          },
+          {
+            "kind": "ledger_reopen",
+            "ref": "evidence/artifacts/landscape-sweep-20260929/returns.json#/failures/web-research",
+            "trigger": "retained_failure",
+            "required_evidence": "Resolve retained retained_failure source/receipt/coverage evidence at the compared pin, or retain a substantive scoped disposition. Licence metadata alone cannot exclude a source.",
+            "owner": "layer-verdict"
+          },
+          {
+            "kind": "retained_proposal_prerequisite",
+            "repository": "https://github.com/exa-labs/exa-mcp-server",
+            "ref": "catalogs/sota-convergence/manifest-20260926.json#/foundation/8/candidates/1/comparison_that_would_overturn",
+            "additional_refs": [
+              "catalogs/sota-convergence/manifest-20260923.json#/foundation/8/candidates/0/comparison_that_would_overturn"
+            ],
+            "required_evidence": "Retained 30-URL recall@5 and a supported identical-byte fixture route reachable by remote and local arms are sealed before affected scoring.",
+            "owner": "layer-verdict",
+            "status": "unverified_before_execution"
+          },
+          {
+            "kind": "retained_proposal_prerequisite",
+            "repository": "https://github.com/adbar/trafilatura",
+            "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/8/candidates/0/comparison_that_would_overturn",
+            "additional_refs": [
+              "catalogs/sota-convergence/manifest-20260926.json#/foundation/8/candidates/0/comparison_that_would_overturn"
+            ],
+            "required_evidence": "The retained native role/model/settings and source-backed comparison recipe are sealed before scoring; unsupported operational axes have a substantive disposition.",
+            "owner": "layer-verdict",
+            "status": "unverified_before_execution"
+          },
+          {
+            "kind": "retained_proposal_prerequisite",
+            "repository": "https://github.com/openai/codex",
+            "ref": "catalogs/sota-convergence/manifest-20260926.json#/foundation/8/candidates/3/comparison_that_would_overturn",
+            "additional_refs": [],
+            "required_evidence": "Native web tool/provider identity, retained 30-URL recall@5 and supported same-byte fixture delivery are sealed.",
+            "owner": "layer-verdict",
+            "status": "unverified_before_execution"
+          },
+          {
+            "kind": "retained_proposal_prerequisite",
+            "repository": "https://github.com/webrecorder/browsertrix-crawler",
+            "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/8/candidates/11/comparison_that_would_overturn",
+            "additional_refs": [],
+            "required_evidence": "Supported container runtime and retained changed-page/archive-provenance fixture execute in an isolated owned store.",
+            "owner": "layer-verdict",
+            "status": "unverified_before_execution"
+          }
+        ]
       },
       "next_review_ref": "c2dee173:catalogs/landscape/final-stack.json (this layer's verdict.next_review)"
     }
@@ -1859,6 +2520,28 @@
       "before_fix_head": "d7d9df1f07658b43a20d14bfd837602a6a492528",
       "before_fix_exit": 1,
       "scope": "Identical singleton case sets/role unions cannot exclude competitors; next-plaid and MemPalace include their pinned README roles. Record consistency only."
+    }
+  },
+  "terminal_adjudication": {
+    "record": "adjudication-pr1021-599d9bbb-20261012.md",
+    "reviewed_head": "599d9bbba34501687c358e42b29a3c9a485a56f3",
+    "main_base": "64594c763502ac34891755d9bcc02c745cd3497a",
+    "refrozen_at": "2026-10-12T06:23:56Z",
+    "before_any_run": true,
+    "final_round_rule": "Both families read this terminal delta; only a new reproduced P1 reopens after the adjudicated commit.",
+    "previous_preregistrations": {
+      "native-clients": "521b7cd99c4570a18a1481a9b07959084641b79fe810fab958632d0ffbf4004d",
+      "code-navigation": "6a67cd1a1b024b83f4ac2240c6ae0e38e8e8f852fa4bbdbd5f0e2aaa9ce9ca5a",
+      "document-retrieval": "8d205c6eb29fac4541a29d5e371de264aa4a845b365d9fc3214cf5fb369d8c86",
+      "semantic-rag": "3e9ba562169f4ff233af2d0e48213a29d8710795f8281cb8075e312f9df20c73",
+      "durable-memory": "30000658784bc54d16932ecfa1de9a321cf5f4dad2d447ff1aca71f31b6a1029",
+      "web-research": "5b3f3805682f6c99600658b7a7a4cb968aecaf54588dd8d3ac0e6af1cd1f25fd"
+    },
+    "regression": {
+      "test_ref": "tests/test_w6_layer_verdict_records.py",
+      "before_fix_head": "599d9bbba34501687c358e42b29a3c9a485a56f3",
+      "before_fix_exit": 1,
+      "scope": "Role omissions, incompatible flat-output layout gate, licence exclusion, survivor reasons and readiness bindings."
     }
   }
 }

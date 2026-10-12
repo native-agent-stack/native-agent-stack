@@ -91,6 +91,9 @@ class W6RecordContracts(unittest.TestCase):
         expected = (
             ("semantic-rag", "lightonai/next-plaid", "semantic_code_retrieval", "README.md:22"),
             ("durable-memory", "mempalace/mempalace", "native_memory_capture", "README.md:311-316"),
+            ("web-research", "vercel-labs/agent-browser", "web_primary_source_retrieval", "README.md:206-219"),
+            ("document-retrieval", "opendatalab/mineru", "document_retrieval", "README.md:52"),
+            ("document-retrieval", "arabold/docs-mcp-server", "document_retrieval", "README.md:61-64"),
         )
         for layer, repo, role, source_ref in expected:
             config = load(f"comparisons/{layer}.json")
@@ -102,6 +105,48 @@ class W6RecordContracts(unittest.TestCase):
                 self.assertEqual(witness["pin"], arm["pin"])
                 self.assertTrue(witness["source_file_sha256"])
                 self.assertTrue(witness["lines"])
+
+    def test_flat_conversion_does_not_require_native_layout_metadata(self):
+        config = load("comparisons/document-retrieval.json")
+        common = config["role_checks"]["document_conversion"]
+        self.assertFalse(any("page/layout" in check for check in common["mandatory_checks"]))
+        self.assertIn("layout_referenced_conversion", config["role_checks"])
+        layout = config["role_checks"]["layout_referenced_conversion"]
+        self.assertTrue(layout["reference_definition"])
+        self.assertNotEqual(set(layout["case_ids"]), set(common["case_ids"]))
+        arms = {a["repository"].lower(): a for a in config["arms"]}
+        markdown = arms["https://github.com/microsoft/markitdown"]
+        self.assertIn("document_conversion", markdown["role_ids"])
+        self.assertNotIn("layout_referenced_conversion", markdown["role_ids"])
+        self.assertEqual(markdown["conversion_output"], "native Markdown")
+        self.assertIn("layout_referenced_conversion", arms["https://github.com/tsdgeos/poppler_mirror"]["role_ids"])
+
+    def test_licence_metadata_never_unqualifies_an_arm(self):
+        for path in sorted((ARTIFACT / "comparisons").glob("*.json")):
+            config = json.loads(path.read_text(encoding="utf-8"))
+            self.assertNotIn("license/model conflicts", config["execution_rule"]["preflight"])
+            self.assertIs(config["execution_rule"]["license_exclusion"], False)
+
+    def test_each_non_memory_survivor_has_its_own_retained_comparison_reason(self):
+        for row in load("resolution-delta.json")["layers"]:
+            if row["layer_id"] == "durable-memory":
+                continue
+            for survivor in row["dispositions"]:
+                with self.subTest(layer=row["layer_id"], survivor=survivor["repository"]):
+                    self.assertTrue(survivor.get("retained_comparison_refs"))
+                    self.assertTrue(survivor.get("frozen_rule_reason"))
+                    self.assertNotIn("Mac deployment", survivor["reason"])
+
+    def test_retained_reopen_conditions_are_explicit_readiness_inputs(self):
+        for path in sorted((ARTIFACT / "comparisons").glob("*.json")):
+            config = json.loads(path.read_text(encoding="utf-8"))
+            readiness = config["readiness_trigger"]
+            self.assertTrue(readiness.get("retained_reopen_inputs"), config["layer_id"])
+            self.assertTrue(any("retained reopen" in condition.lower() for condition in readiness["all_of"]))
+            for condition in readiness["retained_reopen_inputs"]:
+                self.assertTrue(condition["ref"])
+                self.assertTrue(condition["required_evidence"])
+                self.assertEqual(condition["owner"], "layer-verdict")
 
     def test_current_host_memory_candidates_are_not_dropped_by_mac_nonselection(self):
         config = load("comparisons/durable-memory.json")

@@ -3,7 +3,7 @@
   "kind": "w6_frozen_comparison",
   "comparison_id": "w6-foundation-native-clients-20261011",
   "registered_at": "2026-10-11T23:15:50Z",
-  "phase": "preregistered; no run and no terminal state recorded",
+  "phase": "preregistered; no run; layer terminal state SCHEDULED",
   "catalog": "foundation",
   "layer_id": "native-clients",
   "requirement_sha256": "79b17443825138cf97e2dea1f67a29c581730bb1a1e25e780bd695a8a45b38d2",
@@ -86,7 +86,8 @@
       "Each arm has its upstream-owned test/E2E recipe and a pinned receipt, or a retained substantive reason its scoped role is retired",
       "Fixture hashes and complete usage instrumentation reproduce before the first arm",
       "An isolated native runner is available without modifying the paper units, sealed bundles, Monday recorders or other lanes",
-      "Co-op relay that #1007 has LANDED and final-stack runs[] is available"
+      "Co-op relay that #1007 has LANDED and final-stack runs[] is available",
+      "All retained reopen and proposal prerequisites below have source-pinned scoped evidence or a substantive reviewed disposition before the affected run; unresolved operational/quality/coverage conditions cannot be ignored."
     ],
     "already_present": [
       "retained fixture bytes",
@@ -96,15 +97,73 @@
       "arm runtime/E2E receipts at the frozen pins",
       "#1007 LANDED relay"
     ],
-    "start_rule": "Start as soon as all named inputs exist; no calendar date is a trigger. A comparison ready but not run is a defect."
+    "start_rule": "Start as soon as all named inputs exist; no calendar date is a trigger. A comparison ready but not run is a defect.",
+    "retained_reopen_inputs": [
+      {
+        "kind": "ledger_reopen",
+        "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/failures/native-clients",
+        "trigger": "retained_failure",
+        "required_evidence": "Resolve retained retained_failure source/receipt/coverage evidence at the compared pin, or retain a substantive scoped disposition. Licence metadata alone cannot exclude a source.",
+        "owner": "layer-verdict"
+      },
+      {
+        "kind": "ledger_reopen",
+        "ref": "receipt_staleness:macos-arm64/ai-memory",
+        "trigger": "pin_moved",
+        "required_evidence": "Resolve retained pin_moved source/receipt/coverage evidence at the compared pin, or retain a substantive scoped disposition. Licence metadata alone cannot exclude a source.",
+        "owner": "layer-verdict"
+      },
+      {
+        "kind": "ledger_reopen",
+        "ref": "receipt_staleness:linux-wsl2-x86_64/ai-memory",
+        "trigger": "pin_moved",
+        "required_evidence": "Resolve retained pin_moved source/receipt/coverage evidence at the compared pin, or retain a substantive scoped disposition. Licence metadata alone cannot exclude a source.",
+        "owner": "layer-verdict"
+      },
+      {
+        "kind": "ledger_reopen",
+        "ref": "receipt_staleness:linux-wsl2-x86_64/codex",
+        "trigger": "pin_moved",
+        "required_evidence": "Resolve retained pin_moved source/receipt/coverage evidence at the compared pin, or retain a substantive scoped disposition. Licence metadata alone cannot exclude a source.",
+        "owner": "layer-verdict"
+      },
+      {
+        "kind": "ledger_reopen",
+        "ref": "receipt_staleness:macos-arm64/claude-code",
+        "trigger": "pin_moved",
+        "required_evidence": "Resolve retained pin_moved source/receipt/coverage evidence at the compared pin, or retain a substantive scoped disposition. Licence metadata alone cannot exclude a source.",
+        "owner": "layer-verdict"
+      },
+      {
+        "kind": "ledger_reopen",
+        "ref": "receipt_staleness:macos-arm64/codex",
+        "trigger": "pin_moved",
+        "required_evidence": "Resolve retained pin_moved source/receipt/coverage evidence at the compared pin, or retain a substantive scoped disposition. Licence metadata alone cannot exclude a source.",
+        "owner": "layer-verdict"
+      },
+      {
+        "kind": "retained_proposal_prerequisite",
+        "repository": "https://github.com/earendil-works/pi",
+        "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/0/candidates/6/comparison_that_would_overturn",
+        "additional_refs": [
+          "catalogs/sota-convergence/manifest-20260926.json#/foundation/0/candidates/6/comparison_that_would_overturn"
+        ],
+        "required_evidence": "Permitted-account/provider bridge, native recovery and source-pinned Terminal-Bench recipe with at least three repetitions are sealed before broader merit.",
+        "owner": "layer-verdict",
+        "status": "unverified_before_execution"
+      }
+    ],
+    "owner": "layer-verdict",
+    "next_action": "Retain upstream runtime/E2E/model/instrumentation seals, then resolve the listed retained readiness inputs in the owned queue. No ready comparison remains unrun."
   },
   "execution_rule": {
     "repetitions": 3,
     "order": "Canonical repository order on first repetition, reverse on second, rotate first arm to last on third; same case order and fresh isolated stores",
     "model": "Preserve the native account and configured default model/effort; record exact identity in the freeze. No new paid route or model download is authorized by this artifact.",
-    "preflight": "Record unsupported role, license/model conflicts, absent test recipes and failed installation as unqualified arms with the source-backed reason; never silently omit a survivor",
+    "preflight": "Retain unsupported role/model interfaces, absent test recipes, failed installations and spending/entitlement constraints with source-backed reasons; never silently omit a survivor. Licence provenance is metadata only, never an exclusion ground.",
     "cost": "Record complete provider usage and elapsed time separately from tool-output/token estimates; never infer provider savings",
-    "protected_window": "Heavy E2E during the CC's Monday window uses systemd-run --user --scope -p CPUWeight=idle; a full suite additionally needs SUITE-REQUEST and SUITE-GO."
+    "protected_window": "Heavy E2E during the CC's Monday window uses systemd-run --user --scope -p CPUWeight=idle; a full suite additionally needs SUITE-REQUEST and SUITE-GO.",
+    "license_exclusion": false
   },
   "fixed_decision_rule": {
     "eligibility": "For each predeclared role, every mapped role check must pass in all three repetitions with complete usage and upstream E2E at the comparison's immutable source pin. Dependency arms qualify only their mapped interface and are never scored as standalone end-to-end candidates.",
@@ -137,7 +196,15 @@
       ]
     }
   },
-  "refrozen_at": "2026-10-12T00:52:20Z",
-  "amendment_authority": "CC adjudication-pr1021-4ddd4822-20261012.md: B1/B2/A1/A2, before any run",
-  "role_assignment_rule": "role_ids, dependency and role_checks are frozen here; no assignment or applicability change at execution/scoring time."
+  "refrozen_at": "2026-10-12T06:23:56Z",
+  "amendment_authority": "CC adjudication-pr1021-599d9bbb-20261012.md: B2-r-2, B1-std, licence, survivor reasons and retained reopen inputs",
+  "role_assignment_rule": "role_ids, dependency and role_checks are frozen here; no assignment or applicability change at execution/scoring time.",
+  "supersedes": {
+    "head": "599d9bbba34501687c358e42b29a3c9a485a56f3",
+    "preregistration_sha256": "521b7cd99c4570a18a1481a9b07959084641b79fe810fab958632d0ffbf4004d",
+    "before_any_run": true,
+    "reason": "Adjudicated terminal re-freeze"
+  },
+  "changed_evidence_comparison_reason": "Pi shares native client/session contracts. Its Terminal-Bench/account bridge is a retained readiness boundary; the small fixture is not that benchmark.",
+  "retained_comparison_dispositions": []
 }

@@ -3,7 +3,7 @@
   "kind": "w6_frozen_comparison",
   "comparison_id": "w6-foundation-code-navigation-20261011",
   "registered_at": "2026-10-11T23:15:50Z",
-  "phase": "preregistered; no run and no terminal state recorded",
+  "phase": "preregistered; no run; layer terminal state SCHEDULED",
   "catalog": "foundation",
   "layer_id": "code-navigation",
   "requirement_sha256": "541e910f32a9234da77a670ca290c0d7755bb926e0484a546cdb64666dd149b6",
@@ -95,7 +95,8 @@
       "Each arm has its upstream-owned test/E2E recipe and a pinned receipt, or a retained substantive reason its scoped role is retired",
       "Fixture hashes and complete usage instrumentation reproduce before the first arm",
       "An isolated native runner is available without modifying the paper units, sealed bundles, Monday recorders or other lanes",
-      "Co-op relay that #1007 has LANDED and final-stack runs[] is available"
+      "Co-op relay that #1007 has LANDED and final-stack runs[] is available",
+      "All retained reopen and proposal prerequisites below have source-pinned scoped evidence or a substantive reviewed disposition before the affected run; unresolved operational/quality/coverage conditions cannot be ignored."
     ],
     "already_present": [
       "retained fixture bytes",
@@ -105,15 +106,65 @@
       "arm runtime/E2E receipts at the frozen pins",
       "#1007 LANDED relay"
     ],
-    "start_rule": "Start as soon as all named inputs exist; no calendar date is a trigger. A comparison ready but not run is a defect."
+    "start_rule": "Start as soon as all named inputs exist; no calendar date is a trigger. A comparison ready but not run is a defect.",
+    "retained_reopen_inputs": [
+      {
+        "kind": "ledger_reopen",
+        "ref": "evidence/artifacts/landscape-sweep-20260926/returns.json#/failures/code-navigation",
+        "trigger": "retained_failure",
+        "required_evidence": "Resolve retained retained_failure source/receipt/coverage evidence at the compared pin, or retain a substantive scoped disposition. Licence metadata alone cannot exclude a source.",
+        "owner": "layer-verdict"
+      },
+      {
+        "kind": "ledger_reopen",
+        "ref": "catalog-freshness:mcp-inspector (license None -> NOASSERTION)",
+        "trigger": "selection_changed",
+        "required_evidence": "Resolve retained selection_changed source/receipt/coverage evidence at the compared pin, or retain a substantive scoped disposition. Licence metadata alone cannot exclude a source.",
+        "owner": "layer-verdict"
+      },
+      {
+        "kind": "retained_proposal_prerequisite",
+        "repository": "https://github.com/anthropics/claude-plugins-official",
+        "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/4/candidates/0/comparison_that_would_overturn",
+        "additional_refs": [
+          "catalogs/sota-convergence/manifest-20260926.json#/foundation/4/candidates/0/comparison_that_would_overturn"
+        ],
+        "required_evidence": "The retained native role/model/settings and source-backed comparison recipe are sealed before scoring; unsupported operational axes have a substantive disposition.",
+        "owner": "layer-verdict",
+        "status": "unverified_before_execution"
+      },
+      {
+        "kind": "retained_proposal_prerequisite",
+        "repository": "https://github.com/abhigyanpatwari/gitnexus",
+        "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/4/candidates/1/comparison_that_would_overturn",
+        "additional_refs": [
+          "catalogs/sota-convergence/manifest-20260926.json#/foundation/4/candidates/7/comparison_that_would_overturn"
+        ],
+        "required_evidence": "Exposed graph/index tools, held-out impact/baseline recipe and edit/delete traces are sealed; licence change is metadata only.",
+        "owner": "layer-verdict",
+        "status": "unverified_before_execution"
+      },
+      {
+        "kind": "retained_proposal_prerequisite",
+        "repository": "https://github.com/mibayy/token-savior",
+        "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/4/candidates/2/comparison_that_would_overturn",
+        "additional_refs": [],
+        "required_evidence": "Published held-out source/reference evaluation, actual exposed MCP tool/call traces, initialization and edit/delete recipe exist.",
+        "owner": "layer-verdict",
+        "status": "unverified_before_execution"
+      }
+    ],
+    "owner": "layer-verdict",
+    "next_action": "Retain upstream runtime/E2E/model/instrumentation seals, then resolve the listed retained readiness inputs in the owned queue. No ready comparison remains unrun."
   },
   "execution_rule": {
     "repetitions": 3,
     "order": "Canonical repository order on first repetition, reverse on second, rotate first arm to last on third; same case order and fresh isolated stores",
     "model": "Preserve the native account and configured default model/effort; record exact identity in the freeze. No new paid route or model download is authorized by this artifact.",
-    "preflight": "Record unsupported role, license/model conflicts, absent test recipes and failed installation as unqualified arms with the source-backed reason; never silently omit a survivor",
+    "preflight": "Retain unsupported role/model interfaces, absent test recipes, failed installations and spending/entitlement constraints with source-backed reasons; never silently omit a survivor. Licence provenance is metadata only, never an exclusion ground.",
     "cost": "Record complete provider usage and elapsed time separately from tool-output/token estimates; never infer provider savings",
-    "protected_window": "Heavy E2E during the CC's Monday window uses systemd-run --user --scope -p CPUWeight=idle; a full suite additionally needs SUITE-REQUEST and SUITE-GO."
+    "protected_window": "Heavy E2E during the CC's Monday window uses systemd-run --user --scope -p CPUWeight=idle; a full suite additionally needs SUITE-REQUEST and SUITE-GO.",
+    "license_exclusion": false
   },
   "fixed_decision_rule": {
     "eligibility": "For each predeclared role, every mapped role check must pass in all three repetitions with complete usage and upstream E2E at the comparison's immutable source pin. Dependency arms qualify only their mapped interface and are never scored as standalone end-to-end candidates.",
@@ -167,7 +218,38 @@
       ]
     }
   },
-  "refrozen_at": "2026-10-12T00:52:20Z",
-  "amendment_authority": "CC adjudication-pr1021-4ddd4822-20261012.md: B1/B2/A1/A2, before any run",
-  "role_assignment_rule": "role_ids, dependency and role_checks are frozen here; no assignment or applicability change at execution/scoring time."
+  "refrozen_at": "2026-10-12T06:23:56Z",
+  "amendment_authority": "CC adjudication-pr1021-599d9bbb-20261012.md: B2-r-2, B1-std, licence, survivor reasons and retained reopen inputs",
+  "role_assignment_rule": "role_ids, dependency and role_checks are frozen here; no assignment or applicability change at execution/scoring time.",
+  "supersedes": {
+    "head": "599d9bbba34501687c358e42b29a3c9a485a56f3",
+    "preregistration_sha256": "6a67cd1a1b024b83f4ac2240c6ae0e38e8e8f852fa4bbdbd5f0e2aaa9ce9ca5a",
+    "before_any_run": true,
+    "reason": "Adjudicated terminal re-freeze"
+  },
+  "retained_comparison_dispositions": [
+    {
+      "repository": "https://github.com/anthropics/claude-plugins-official",
+      "retained_comparison_refs": [
+        "catalogs/sota-convergence/manifest-20260926.json#/foundation/4/candidates/0/comparison_that_would_overturn",
+        "catalogs/sota-convergence/manifest-20260929.json#/foundation/4/candidates/0/comparison_that_would_overturn"
+      ],
+      "frozen_rule_reason": "Integrated native LSP is a client/dependency control on the same authored symbol/reference oracle; plugin presence alone cannot replace Serena or qualify full navigation. Retain the cross-client replacement claim as an untested boundary."
+    },
+    {
+      "repository": "https://github.com/abhigyanpatwari/gitnexus",
+      "retained_comparison_refs": [
+        "catalogs/sota-convergence/manifest-20260926.json#/foundation/4/candidates/7/comparison_that_would_overturn",
+        "catalogs/sota-convergence/manifest-20260929.json#/foundation/4/candidates/1/comparison_that_would_overturn"
+      ],
+      "frozen_rule_reason": "Common authored reference precision and index freshness qualify bounded graph correctness. The named codebase-memory-mcp impact/latency baseline is not an arm, so no superiority over it is inferred; retain that broader comparison before any such claim."
+    },
+    {
+      "repository": "https://github.com/mibayy/token-savior",
+      "retained_comparison_refs": [
+        "catalogs/sota-convergence/manifest-20260929.json#/foundation/4/candidates/2/comparison_that_would_overturn"
+      ],
+      "frozen_rule_reason": "The shared required/forbidden-reference and edit/delete oracle separates navigation from memory/compaction. Published held-out evaluation and actual MCP invocation traces remain readiness inputs, not claimed results."
+    }
+  ]
 }

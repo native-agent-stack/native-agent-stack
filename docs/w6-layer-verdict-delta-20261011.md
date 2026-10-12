@@ -2,7 +2,7 @@
 
 **All six W6 layers are SCHEDULED.** The terminal records follow the co-op's #1007 LANDED relay and the CC's adjudication of #1021 at `4ddd4822`. No comparison, installation, upstream E2E, invoke acceptance or FINAL is claimed. Each layer has one re-frozen comparison with its id, hash, readiness inputs and fixed rule.
 
-The [delta record](../evidence/artifacts/w6-layer-verdict-20261011/resolution-delta.json) consumes source base `77185991`, the 09-22 verdict wave, the covering 09-23/26/29 sweep adjudications, the retained 10-03 scoped completion, later deployment history, and the exact `c2dee173` final-stack snapshot. The cumulative census remains **33**, including missing-vote-only proposals; pi is separate changed evidence. Later omission never clears a survivor. The canonical view's missing-vote survivor defect belongs to the separately routed generator follow-up, so its smaller survivor list is not substituted for this census.
+The [delta record](../evidence/artifacts/w6-layer-verdict-20261011/resolution-delta.json) consumes source base `77185991`, the 09-22 verdict wave, the covering 09-23/26/29 sweep adjudications, the retained 10-03 scoped completion, later deployment history, and the exact `c2dee173` final-stack snapshot. The cumulative census remains **33**, including missing-vote-only proposals; pi is separate changed evidence. Later omission never clears a survivor. The historical view has a narrower missing-vote list; this protocol-correct census is retained independently of the derived view or a later generator correction.
 
 | Layer | Cumulative ledger inputs | Latest covering sweep | W6 disposition |
 | --- | ---: | --- | --- |
@@ -32,20 +32,20 @@ The [Mac-only 10-02 memory verdict](../blueprints/memory-stack/native-qualificat
 | code-navigation | mibayy/token-savior | `symbol_navigation`, `navigation_index_maintenance` | no |
 | document-retrieval | tobi/qmd | `document_retrieval` | no |
 | document-retrieval | microsoft/markitdown | `document_conversion` | no |
-| document-retrieval | tsdgeos/poppler_mirror | `document_conversion` | no |
-| document-retrieval | datalab-to/marker | `document_conversion`, `document_ocr_layout` | no |
-| document-retrieval | opendatalab/MinerU | `document_conversion`, `document_ocr_layout` | no |
-| document-retrieval | docling-project/docling | `document_conversion`, `document_ocr_layout` | no |
+| document-retrieval | tsdgeos/poppler_mirror | `document_conversion`, `layout_referenced_conversion` | no |
+| document-retrieval | datalab-to/marker | `document_conversion`, `document_ocr_layout`, `layout_referenced_conversion` | no |
+| document-retrieval | opendatalab/MinerU | `document_conversion`, `document_ocr_layout`, `document_retrieval`, `layout_referenced_conversion` | no |
+| document-retrieval | docling-project/docling | `document_conversion`, `document_ocr_layout`, `layout_referenced_conversion` | no |
 | document-retrieval | Cinnamon/kotaemon | `document_retrieval` | no |
 | document-retrieval | huggingface/sentence-transformers | `document_embedding_reranking` | yes |
-| document-retrieval | arabold/docs-mcp-server | `versioned_documentation_retrieval` | no |
+| document-retrieval | arabold/docs-mcp-server | `versioned_documentation_retrieval`, `document_retrieval` | no |
 | document-retrieval | VectifyAI/PageIndex | `document_retrieval` | no |
-| document-retrieval | xberg-io/xberg | `document_conversion`, `document_ocr_layout` | no |
-| document-retrieval | pymupdf/pymupdf4llm | `document_conversion`, `document_ocr_layout` | no |
-| document-retrieval | datalab-to/surya | `document_ocr_layout` | no |
-| document-retrieval | alibaba/Logics-Parsing | `document_ocr_layout` | no |
+| document-retrieval | xberg-io/xberg | `document_conversion`, `document_ocr_layout`, `layout_referenced_conversion` | no |
+| document-retrieval | pymupdf/pymupdf4llm | `document_conversion`, `document_ocr_layout`, `layout_referenced_conversion` | no |
+| document-retrieval | datalab-to/surya | `document_ocr_layout`, `layout_referenced_conversion` | no |
+| document-retrieval | alibaba/Logics-Parsing | `document_ocr_layout`, `document_conversion` | no |
 | document-retrieval | baidu/Unlimited-OCR | `document_ocr_layout` | no |
-| document-retrieval | datalab-to/chandra | `document_conversion`, `document_ocr_layout` | no |
+| document-retrieval | datalab-to/chandra | `document_conversion`, `document_ocr_layout`, `layout_referenced_conversion` | no |
 | semantic-rag | giancarloerra/SocratiCode | `project_semantic_index`, `semantic_code_retrieval` | no |
 | semantic-rag | qdrant/qdrant | `vector_storage` | yes |
 | semantic-rag | vllm-project/vllm | `model_serving` | yes |
@@ -63,14 +63,18 @@ The [Mac-only 10-02 memory verdict](../blueprints/memory-stack/native-qualificat
 | durable-memory | vectorize-io/hindsight | `shared_memory_backend`, `native_memory_capture` | no |
 | durable-memory | tigerless-labs/agent-memory | `shared_memory_backend`, `native_memory_capture` | no |
 | web-research | tavily-ai/tavily-cli | `web_primary_source_retrieval` | no |
-| web-research | vercel-labs/agent-browser | `interactive_browser_retrieval` | no |
+| web-research | vercel-labs/agent-browser | `interactive_browser_retrieval`, `web_primary_source_retrieval` | no |
 | web-research | alphaXiv/OpenResearch | `paper_primary_source_retrieval` | no |
 | web-research | exa-labs/exa-mcp-server | `web_primary_source_retrieval` | no |
 | web-research | adbar/trafilatura | `web_primary_source_retrieval` | no |
 | web-research | openai/codex | `web_primary_source_retrieval` | no |
 | web-research | webrecorder/browsertrix-crawler | `web_evidence_capture` | no |
 
-**B2-r common-role correction:** Poppler now enters document_conversion; HippoRAG enters project_semantic_index and semantic_code_retrieval; deja-vu enters shared_memory_backend and native_memory_capture; trafilatura enters web_primary_source_retrieval. Each removed singleton case set equals the common role or role union. Its mandatory checks are retained in the merged requirement roles, and each comparison records the requirement basis and previous checks. Applicability requires testing these obligations; it does not claim that the source passed them. MemPalace also enters native_memory_capture, witnessed by `README.md:311-316` at `1f0803a31958b30320418356b2db88c4ed9c27f9`; next-plaid also enters semantic_code_retrieval, witnessed by `README.md:22` at `c6c091d7ee14c81206bb28af90d8ff506fd0235e`. The exact README lines and source-file hashes are bound in each arm. All six arm changes precede any run; the four changed comparisons retain their superseded hashes and are re-frozen under the CC delta at `d7d9df1f`. Arm counts, pins and fixture cases are unchanged.
+**Prior B2-r correction:** Poppler joined content conversion; HippoRAG joined project indexing and semantic retrieval; deja-vu joined memory/capture; trafilatura joined primary-source extraction. MemPalace's capture witness is `README.md:311-316` at `1f0803a31958b30320418356b2db88c4ed9c27f9`, and next-plaid's semantic-search witness is `README.md:22` at `c6c091d7ee14c81206bb28af90d8ff506fd0235e`. The terminal adjudication below preserves those assignments while separating incompatible native output contracts. Recorded source lines/file hashes qualify applicability only, not successful runtime execution.
+
+The terminal adjudication applies advertised roles throughout: agent-browser read joins source retrieval; MinerU search/read and docs-mcp-server join retrieval against qmd. Exact README witnesses are retained. Flat native conversion has no page/coordinate gate; MarkItDown uses native Markdown. Source references have a distinct layout_referenced_conversion case, never invented from flat output. Per-survivor comparison refs/reasons and retained reopen/proposal inputs gate all six comparisons. Licence provenance is metadata, never exclusion. All six files re-freeze under the 599d9bbb adjudication; source pins, arm counts and original fixture bytes remain bound.
+
+A **page reference** is an explicit native page ordinal normalized to the one-based authored page, with an exact quoted source fragment. A **layout reference** is a native stable block/line/table locator that reads back that fragment, or an explicit rectangle/polygon normalized to PDF points. Native boxes must enclose the authored text/table anchor within the fixed two-point edge tolerance. Page-only, stable-block and geometric dimensions remain separate: a page anchor cannot claim geometric quality. The native reference form is fixed before execution; flat Markdown is never assigned synthetic page numbers or coordinates.
 
 **A1 review metadata:** `next_review=2026-10-22` comes from each layer's verdict in the landed final-stack view and closes the earlier condition-1 metadata gap. It is review metadata, not a wait date. The supported `run_pin` reader finds all 13 historical entries; `is_definitive` returns false/reopened for each at the recorded reader date. These readers do not supply runtime E2E or invoke evidence.
 
@@ -78,17 +82,17 @@ The seven known version deltas are explicit in each terminal record's `run_pin_r
 
 | Single comparison | Current re-frozen preregistration SHA256 |
 | --- | --- |
-| [w6-foundation-native-clients-20261011](../evidence/artifacts/w6-layer-verdict-20261011/comparisons/native-clients.json) | `521b7cd99c4570a18a1481a9b07959084641b79fe810fab958632d0ffbf4004d` |
-| [w6-foundation-code-navigation-20261011](../evidence/artifacts/w6-layer-verdict-20261011/comparisons/code-navigation.json) | `6a67cd1a1b024b83f4ac2240c6ae0e38e8e8f852fa4bbdbd5f0e2aaa9ce9ca5a` |
-| [w6-foundation-document-retrieval-20261011](../evidence/artifacts/w6-layer-verdict-20261011/comparisons/document-retrieval.json) | `8d205c6eb29fac4541a29d5e371de264aa4a845b365d9fc3214cf5fb369d8c86` |
-| [w6-foundation-semantic-rag-20261011](../evidence/artifacts/w6-layer-verdict-20261011/comparisons/semantic-rag.json) | `3e9ba562169f4ff233af2d0e48213a29d8710795f8281cb8075e312f9df20c73` |
-| [w6-foundation-durable-memory-20261011](../evidence/artifacts/w6-layer-verdict-20261011/comparisons/durable-memory.json) | `30000658784bc54d16932ecfa1de9a321cf5f4dad2d447ff1aca71f31b6a1029` |
-| [w6-foundation-web-research-20261011](../evidence/artifacts/w6-layer-verdict-20261011/comparisons/web-research.json) | `5b3f3805682f6c99600658b7a7a4cb968aecaf54588dd8d3ac0e6af1cd1f25fd` |
+| [w6-foundation-native-clients-20261011](../evidence/artifacts/w6-layer-verdict-20261011/comparisons/native-clients.json) | `e70391bd323583f77a78e3327d29491a677e2fe7e5176c31d82e633fef124947` |
+| [w6-foundation-code-navigation-20261011](../evidence/artifacts/w6-layer-verdict-20261011/comparisons/code-navigation.json) | `ccf0ec381e21b96697b45b6f38a4e1ef5f6cb63e6d2315378b473badb7c5b1a0` |
+| [w6-foundation-document-retrieval-20261011](../evidence/artifacts/w6-layer-verdict-20261011/comparisons/document-retrieval.json) | `5be0515cc4367fc457e12bded1ed351ed022ff61a9ba55ced3998906ccac4848` |
+| [w6-foundation-semantic-rag-20261011](../evidence/artifacts/w6-layer-verdict-20261011/comparisons/semantic-rag.json) | `3b77e8a2e82d244d7b264e8eeeaebca8312f3128a5e6224ec784006f7d9ec2dd` |
+| [w6-foundation-durable-memory-20261011](../evidence/artifacts/w6-layer-verdict-20261011/comparisons/durable-memory.json) | `6450b9467c9345a67dc4fb571429b1c055fa924f8b422c8b7ab48aebeaba5cee` |
+| [w6-foundation-web-research-20261011](../evidence/artifacts/w6-layer-verdict-20261011/comparisons/web-research.json) | `db1df25eed815d73ce09e518f0a01895b95732821e01bf22e95e8bad01a41819` |
 
-The hashes supersede the earlier registrations before any run, under B1/B2/A1/A2 and the four-layer B2-r correction. Readiness names exact source-pin runtime/E2E receipts, committed model/instrumentation seals, scoped native use and an isolated queued runner. #1007 LANDED is satisfied; the remaining runtime inputs are not yet retained. A comparison starts as soon as those named inputs exist, with no calendar trigger. These small sealed fixtures qualify bounded contracts, not representative quality or universal SOTA.
+These hashes supersede earlier registrations before any run under the terminal adjudication. Readiness names exact source-pin runtime/E2E receipts, committed model/instrumentation seals, scoped native use and an isolated queued runner. #1007 LANDED is satisfied; the remaining runtime inputs are not yet retained. A comparison starts as soon as those named inputs exist, with no calendar trigger. These small sealed fixtures qualify bounded contracts, not representative quality or universal SOTA.
 
 The existing unittest record contracts in [test_w6_layer_verdict_records.py](../tests/test_w6_layer_verdict_records.py) reproduced the false citations, duplicate, unbound roles/checks, omitted memory candidates and review metadata before the correction. The added B2-r regressions also fail against the retained d7d9df1f role assignments and check identical case coverage plus the two README-advertised roles. They verify record consistency only, never runtime behavior. Publication, final-stack and leak checks remain separately required before the single leased push.
 
-The derived view's post-#1007 skills-lifecycle source fingerprint is refreshed through the unchanged generator's own supported output, with its publication guard accepted and parsed run/layer arrays unchanged. #1025 owns that same main correction; rebase onto its landed main. Terminal provenance remains bound to the original `c2dee173` snapshot. No generator mechanism, selected runtime, paper unit/configuration, sealed bundle or Monday recorder changes.
+The derived view's post-#1007 skills-lifecycle source fingerprint is refreshed through the unchanged generator's own supported output, with its publication guard accepted and parsed run/layer arrays unchanged. #1025 owns that main correction; the branch is rebased onto descendant main. Terminal provenance remains bound to the original `c2dee173` snapshot. No generator mechanism, selected runtime, paper unit/configuration, sealed bundle or Monday recorder changes.
 
 Monday heavy E2E uses `systemd-run --user --scope -p CPUWeight=idle`; a full suite needs SUITE-REQUEST and SUITE-GO. Cued landings and the paper path retain priority. Astra's first read and the CC's Claude delta read apply to the final head. All claims made by this closeout remain source_review unless the separate integrity checks are labeled local_integration.
