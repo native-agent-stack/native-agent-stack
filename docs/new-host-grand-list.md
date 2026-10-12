@@ -55,7 +55,7 @@ Locally-run model weights a host receipt recorded qualifying on a runtime compon
 
 | Layer | Decision | Winner | Pin (upstream) | Evidence | WSL2 | macOS | Installed by | Open gaps (executable now / all) |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Agent SDKs and runtime workers | retain | `codex` | 0.155.1 (behind rust-v0.162.0) | native_proven | host_verified, bootstrap 0.160.0 | untested, bootstrap 0.155.1 | new-wsl-clean-foundation, foundation-cpu, research-runtime, macos-arm64-foundation, token-efficiency | 12 / 14 |
+| Agent SDKs and runtime workers | retain | `codex` | 0.155.1 (behind rust-v0.162.0) | native_proven | host_verified, bootstrap 0.162.1 | untested, bootstrap 0.155.1 | new-wsl-clean-foundation, foundation-cpu, research-runtime, macos-arm64-foundation, token-efficiency | 12 / 14 |
 | CI and supply chain | retain | `zizmor` | 1.30.1 | native_proven | host_verified | untested | — | 9 / 14 |
 |  |  | `syft` | 1.52.0 (behind v1.54.1) | native_proven | host_verified | untested | — |  |
 |  |  | `candidate:actions-attest` | unpinned | native_proven | accepted | untested | — |  |
@@ -63,7 +63,7 @@ Locally-run model weights a host receipt recorded qualifying on a runtime compon
 | Documents and ingestion | keep_but_compare | `qmd` | 2.8.3 | local_integration | host_verified, bootstrap 2.8.3 | untested, bootstrap 2.8.3 | foundation-cpu, token-efficiency | 5 / 7 |
 |  |  | `markitdown` | 0.1.7 (behind v0.1.8) | local_integration | host_verified, bootstrap 0.1.8 | untested, bootstrap 0.1.8 | token-efficiency |  |
 |  |  | `poppler` | 26.09.0 | local_integration | host_verified | untested | — |  |
-| Durable memory | keep_but_compare | `ai-memory` | 2.3.2 (behind v2.6.2) | native_proven | host_verified, bootstrap 2.4.1 | untested, bootstrap 2.3.2 | foundation-cpu, recovery, macos-arm64-foundation, token-efficiency | 9 / 13 |
+| Durable memory | keep_but_compare | `ai-memory` | 2.3.2 (behind v2.6.2) | native_proven | host_verified, bootstrap 2.6.3 | untested, bootstrap 2.3.2 | foundation-cpu, recovery, macos-arm64-foundation, token-efficiency | 9 / 13 |
 | Git practice and GitHub automation | retain | `worktrunk` | 0.79.0 (behind v0.80.0) | source_review | host_verified | host_verified | — | 11 / 12 |
 |  |  | `candidate:cli-cli` | unpinned | source_review | not_established, bootstrap 2.101.0 | untested, bootstrap 2.101.0 | — |  |
 |  |  | `difftastic` | 0.71.0 | source_review | host_verified | untested | — |  |
@@ -78,7 +78,7 @@ Locally-run model weights a host receipt recorded qualifying on a runtime compon
 | MCP servers and client surfaces | retain | `mcporter` | 0.13.13 (behind v0.14.2) | native_proven | host_verified, bootstrap 0.14.2 | untested, bootstrap 0.13.13 | foundation-cpu, macos-arm64-foundation, token-efficiency | 12 / 14 |
 |  |  | `mcp-inspector` | 2.7.0 (behind 2.10.1) | native_proven | host_verified | untested | — |  |
 | Native clients | retain | `claude-code` | 2.1.278 (behind v2.1.295) | native_proven | accepted, bootstrap 2.1.295 | untested, bootstrap 2.1.295 | new-wsl-clean-foundation, foundation-cpu, research-runtime, macos-arm64-foundation, token-efficiency | 9 / 14 |
-|  |  | `codex` | 0.155.1 (behind rust-v0.162.0) | native_proven | host_verified, bootstrap 0.160.0 | untested, bootstrap 0.155.1 | new-wsl-clean-foundation, foundation-cpu, research-runtime, macos-arm64-foundation, token-efficiency |  |
+|  |  | `codex` | 0.155.1 (behind rust-v0.162.0) | native_proven | host_verified, bootstrap 0.162.1 | untested, bootstrap 0.155.1 | new-wsl-clean-foundation, foundation-cpu, research-runtime, macos-arm64-foundation, token-efficiency |  |
 | Observation and optional inference | keep_but_compare | `opentelemetry-collector-contrib` | 0.161.0 (behind v0.162.0) | synthetic | host_verified | untested | observability | 8 / 11 |
 |  |  | `prometheus` | 3.14.0 (behind v3.15.0) | synthetic | host_verified | untested | observability |  |
 |  |  | `loki` | 3.7.8 | synthetic | host_verified | untested | observability |  |
@@ -89,7 +89,7 @@ Locally-run model weights a host receipt recorded qualifying on a runtime compon
 | Scheduling and supervision | keep_but_compare | `dagu` | 2.16.6 (behind v2.18.2) | local_integration | host_verified | untested | research-runtime | 5 / 13 |
 |  |  | `systemd` | 255.4-1ubuntu8.17 | local_integration | host_verified | untested | research-runtime |  |
 | Secrets and credentials | keep_but_compare | `gitleaks` | 8.30.1 | local_integration | host_verified | host_verified | — | 5 / 9 |
-| Semantic code retrieval | keep_but_compare | `socraticode` | 1.14.0 (behind v1.16.0) | native_proven | host_verified, bootstrap 1.15.0 | untested, bootstrap 1.14.0 | semantic-rag, macos-arm64-foundation, token-efficiency | 10 / 12 |
+| Semantic code retrieval | keep_but_compare | `socraticode` | 1.14.0 (behind v1.16.0) | native_proven | host_verified, bootstrap 1.16.0 | untested, bootstrap 1.14.0 | semantic-rag, macos-arm64-foundation, token-efficiency | 10 / 12 |
 |  |  | `qdrant` | 1.19.1 (behind v1.19.2) | native_proven | host_verified | untested, bootstrap 1.19.1 | semantic-rag, recovery, macos-arm64-foundation |  |
 |  |  | `vllm` | 0.25.0 (behind v0.31.0) | native_proven | host_verified | untested | semantic-rag |  |
 | Context and usage efficiency | keep_but_compare | `rtk` | 0.49.0 (behind v0.51.0) | synthetic | host_verified, bootstrap 0.51.0 | host_verified, bootstrap 0.51.0 | foundation-cpu, token-efficiency | 4 / 6 |
@@ -106,8 +106,8 @@ Locally-run model weights a host receipt recorded qualifying on a runtime compon
 | Layer | Decision | Winner | Pin (upstream) | Evidence | WSL2 | macOS | Installed by | Open gaps (executable now / all) |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Agents, models and workers | keep_but_compare | `codex-native-sdk` | CLI rust-v0.155.1; Python openai-codex 0.154.0 (behind rust-v0.162.0) | native_proven | accepted | untested | — | 9 / 15 |
-|  |  | `foundation-ai-memory` | v2.3.1 (behind v2.6.2) | native_proven | accepted, bootstrap 2.4.1 | untested, bootstrap 2.3.2 | foundation-cpu, recovery, macos-arm64-foundation, token-efficiency |  |
-|  |  | `foundation-socraticode` | v1.14.0 (behind v1.16.0) | native_proven | accepted, bootstrap 1.15.0 | untested, bootstrap 1.14.0 | semantic-rag, macos-arm64-foundation, token-efficiency |  |
+|  |  | `foundation-ai-memory` | v2.3.1 (behind v2.6.2) | native_proven | accepted, bootstrap 2.6.3 | untested, bootstrap 2.3.2 | foundation-cpu, recovery, macos-arm64-foundation, token-efficiency |  |
+|  |  | `foundation-socraticode` | v1.14.0 (behind v1.16.0) | native_proven | accepted, bootstrap 1.16.0 | untested, bootstrap 1.14.0 | semantic-rag, macos-arm64-foundation, token-efficiency |  |
 | Backtesting engine | keep_but_compare | `nautilustrader` | 2.0.0rc5 (tag v2.0.0rc5; source pin from evidence/receipts/native-nautilus-v2-20260920.json — commit 1b0a49d2792a9432a3aca3fcb617ce7a630d905e) (behind v2.0.0rc6) | native_proven | host_verified | untested | trading-nautilus | 8 / 12 |
 |  |  | `lean` | 985ef30ad3ac774218c5ac516b4cb0aa2655730f | native_proven | host_verified | untested | research-runtime |  |
 | Data quality and orchestration | retain | `dagu` | v2.16.6 (behind v2.18.2) | synthetic | host_verified | untested | research-runtime | 6 / 9 |

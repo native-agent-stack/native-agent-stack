@@ -4912,6 +4912,26 @@
         "The smoke trial's four named phases sum to 184.51 s of its 204.17 s; the other 19.66 s is measured in three windows (data.smoke.trial) and attributed from source to log sync, trajectory conversion, artifact collection and environment teardown, without timing those sub-steps."
       ],
       "path": "evidence/receipts/harbor-smoke-20261012.json"
+    },
+    {
+      "id": "runtime-six-pin-alignment-20261012",
+      "kind": "artifact_measurement",
+      "component_ids": [
+        "socraticode",
+        "ai-memory",
+        "dagu",
+        "promptfoo",
+        "codex",
+        "systemd"
+      ],
+      "claim": "Reconcile six committed runtime pins with measured versions already present on this Linux host, backed by each vendor release note/source commit and artifact identity where packaged.",
+      "limitations": [
+        "Version, package/plugin metadata and selected artifact identity checks only; source test suites, new-host installation, provider/model operations and full lifecycle acceptance were not performed.",
+        "Older acceptance receipts remain unchanged and qualify their own dated versions and workloads; current version measurements do not renew those claims.",
+        "The systemd pin records the installed Ubuntu distribution build 259.5-0ubuntu3.4 and user-manager version; the vendor v259/v259.5 sources do not claim an upstream source build was installed.",
+        "The SocratiCode check reads installed plugin/package metadata without launching the MCP server; existing configuration/route reconciliation belongs to the corresponding template owner."
+      ],
+      "path": "evidence/receipts/runtime-six-pin-alignment-20261012.json"
     }
   ],
   "files": [
@@ -5224,6 +5244,11 @@
       "path": ".github/workflows/sota-sources-gate.yml",
       "sha256": "468a1d1b8b765823dc5175f546c236cdf026669de2581e8149c1ef68177274e7",
       "bytes": 3020
+    },
+    {
+      "path": ".github/workflows/source-citations-report.yml",
+      "sha256": "769cc256339d0ed7a1e065dea3348393488585a70b7a2223dc7524845fe965ed",
+      "bytes": 2301
     },
     {
       "path": ".github/workflows/supply-chain.yml",
@@ -5597,8 +5622,8 @@
     },
     {
       "path": "adoption/pins-linux-x86_64.json",
-      "sha256": "964d085d8fe2cb8aba3d44678938e34a2b1d8b6e320227db4152352a0d0e2449",
-      "bytes": 35096
+      "sha256": "f4ccbe24c051e6a308c3afead299b28dd4113d8f29b9a3ebc61a228ea25475c3",
+      "bytes": 32936
     },
     {
       "path": "adoption/pins-macos-arm64.json",
@@ -11488,8 +11513,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-read-deltas.json",
-      "sha256": "ca56f6daf8e577ab089d4898b06e0c93fd6d7d70e0575c628c803623418975e1",
-      "bytes": 925
+      "sha256": "2aa604e855d9fe817407a561877fc08c4307ab4c622d309bfc7a4d64442375af",
+      "bytes": 1033
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261004.json",
@@ -11500,6 +11525,11 @@
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261011-skill-use-delta.json",
       "sha256": "2a6b8c37d94237f1357b66f14eb8f1f4a996106520c787c580062c8932010114",
       "bytes": 5462
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261012-pr1006-delta.json",
+      "sha256": "a3fdb8a0e74c1d164140e937856d2df2941318f65ac45edaac9840a54b5c68f2",
+      "bytes": 13899
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261012-pr1016-delta.json",
@@ -17463,8 +17493,8 @@
     },
     {
       "path": "catalogs/landscape/final-stack.json",
-      "sha256": "ce8a3375eaf0594d2a336192082dcbce3836b850b523aef2555fbafde495c269",
-      "bytes": 309707
+      "sha256": "f1cfd2df19964b3c59aa79417ceaad17650db632fdbf672cd43da5d882ab3576",
+      "bytes": 309907
     },
     {
       "path": "catalogs/landscape/foundation.json",
@@ -17548,7 +17578,7 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "ef738033f69e8785cf14172e0b34d477b34d77710e38702614adef1863b4e1c7",
+      "sha256": "e97d7d03c8f37db0b5043994961a545956198af325fc2c49cbec14e280129abc",
       "bytes": 287964
     },
     {
@@ -19102,6 +19132,11 @@
       "bytes": 11192
     },
     {
+      "path": "docs/decisions/2026-10-12-runtime-six-pin-alignment.md",
+      "sha256": "6703ff5ce07065a82232c4fa975a7639543dc7d68ded16c4ea6c29226ae14a58",
+      "bytes": 4331
+    },
+    {
       "path": "docs/decisions/2026-10-12-skills-installer-foreign-content.md",
       "sha256": "086d80eea068c899dae3c49b8befb83731f87c88b33c01e9dec88cf9f439c23a",
       "bytes": 19447
@@ -19288,7 +19323,7 @@
     },
     {
       "path": "docs/foundation-stack.md",
-      "sha256": "e1003554881d6ddfa464560e2596b456897408ee40a3cd012e72bd75e4a5e0ed",
+      "sha256": "bd60ef0f6b8eb3d05167cadaafddf07e061e62e98053695f0a0ec6a8de3d0251",
       "bytes": 42784
     },
     {
@@ -19483,7 +19518,7 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "c70da6919c046d5e9c3b697255b5450e7a6018cabc47a84decfea401d70f78ff",
+      "sha256": "a30d8d9f414db65a9d3792c7918af315d8e17b12a83cfb111a7eca268afdd4c1",
       "bytes": 19134
     },
     {
@@ -19535,6 +19570,11 @@
       "path": "docs/secret-storage.md",
       "sha256": "fb6982179a79cdb8cfafd2dbec391b1269ea9e780632f8ba3758dd42f9b4364a",
       "bytes": 207300
+    },
+    {
+      "path": "docs/sota-source-report.md",
+      "sha256": "07d544e0aed1f9925e442419f4eb7e210097af7749632249a407de67c04e433a",
+      "bytes": 3812
     },
     {
       "path": "docs/stack.md",
@@ -51652,6 +51692,11 @@
       "bytes": 20488
     },
     {
+      "path": "evidence/artifacts/runtime-six-pin-alignment-20261012/install-plan.json",
+      "sha256": "181d540828ffb8039bcd033dc072cdf7db6dcf4dbcb854c41bbd4142aa64d631",
+      "bytes": 7586
+    },
+    {
       "path": "evidence/artifacts/s4-record-corrections-20261008/README.md",
       "sha256": "1ee7ec996cb72c7efb43e501c84585939e1389a521552625b2234419e4ef8704",
       "bytes": 4423
@@ -60247,6 +60292,11 @@
       "bytes": 4748
     },
     {
+      "path": "evidence/receipts/runtime-six-pin-alignment-20261012.json",
+      "sha256": "861a01ec72ab7d0e3150b96710069008a9f33d486cb68b739b9ad1acbea635b3",
+      "bytes": 6948
+    },
+    {
       "path": "evidence/receipts/runtime-tools.json",
       "sha256": "67b25345616bf4ff12abb62439b69f4f38d9589ca94134fd455ef61ea0e24540",
       "bytes": 1840
@@ -60963,8 +61013,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "2bfa2d4784a73ecdbc9b3c7d5deea7a422a81abd083d071c22fe5414c28be178",
-      "bytes": 132533
+      "sha256": "edf7d9c3ad33de5adc64d2fe4d8c897cc7dac48b4af5a91c3e6f6f99decc98ef",
+      "bytes": 133182
     },
     {
       "path": "notes/runtime-profiles-20261012/README.md",
@@ -61448,8 +61498,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "9a3d20b35b69dd1d998340d14b1f87ad4cb8ac6159aa2dfcef4f3f0dedfaf4a4",
-      "bytes": 134596
+      "sha256": "1ef8deea31b1c48e4f43324879afea5b960c4fef1d716557212f5d2d6d3b5643",
+      "bytes": 132259
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -62002,6 +62052,11 @@
       "bytes": 1029
     },
     {
+      "path": "tests/fixtures/source-citations-report/verifier.py",
+      "sha256": "3e02319fba3f95ea51c3d7894f80e6c8e4ffe82082d3e67026518e4bee85ddd8",
+      "bytes": 952
+    },
+    {
       "path": "tests/fixtures/verify_sources/github-rest-recorded.json",
       "sha256": "e3c38676b2ba3c35ab6f6afa609373fb49f09f2b3fb43c438afc918bbbb9082e",
       "bytes": 9627
@@ -62188,7 +62243,7 @@
     },
     {
       "path": "tests/test_adoption_bootstrap_linux_platform.py",
-      "sha256": "702f81f588772fdfd0e8246e7a00efddadce765a5c390fdbd7df675ede502ec8",
+      "sha256": "c4c54108ca612609476f1029209c2545844d63c46647e4676a6bce682772cdff",
       "bytes": 28940
     },
     {
@@ -63447,6 +63502,11 @@
       "bytes": 16230
     },
     {
+      "path": "tests/test_source_citations_report_workflow.py",
+      "sha256": "1831959ea90b1f9713b2545e5826793f302eeda06a28ffa48d6d8f7a1c5bcd5b",
+      "bytes": 5371
+    },
+    {
       "path": "tests/test_spy_parity.py",
       "sha256": "f210e6f4fc1ff37173fc42e84ace878245e3448f03a2d1bee93d4be04ae6ab5e",
       "bytes": 121917
@@ -63628,8 +63688,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "5e87651b314dde9cb62b4caecf1d06df89ac567e1dbca0947158381dc3bd4cae",
-      "bytes": 152178
+      "sha256": "502bb2d772f463916bd097cd9475a06c0c50fd99dec649c5a3e81f34078d3271",
+      "bytes": 153538
     },
     {
       "path": "tests/test_workflow_policy.py",
@@ -63643,8 +63703,8 @@
     },
     {
       "path": "tests/test_workflow_security_coverage.py",
-      "sha256": "8f1b6e166d31f368e123f0befe807d1f60f5a38cf529e0399750fc7651ddcc22",
-      "bytes": 11617
+      "sha256": "edb4ee96dd1eb6e95c0e41f2a2a3d5aad5bc19c23fecc223a0587025895b2e7f",
+      "bytes": 12200
     },
     {
       "path": "tests/test_wsl_memory_maintenance.py",
@@ -63993,8 +64053,8 @@
     },
     {
       "path": "tools/local-pages/source_policy.json",
-      "sha256": "d3bc37ce42a461b489146cc578cc2fb6121357ecab590b3534cb0d27ec5ecee1",
-      "bytes": 759968
+      "sha256": "10af44bd5cfc3423a305bdd74a1b0b9b20bf2ec0d842f17b395d40ba40f4b7b1",
+      "bytes": 760065
     },
     {
       "path": "tools/omniroute/gateway_record.py",

@@ -6773,7 +6773,7 @@
               "verdict_winner": "true"
             }
           ],
-          "pin_drift": "same",
+          "pin_drift": "differs",
           "pin_parsed": {
             "commit": null,
             "version": "0.123.1"
@@ -7043,7 +7043,7 @@
               "verdict_winner": "true"
             }
           ],
-          "pin_drift": "same",
+          "pin_drift": "differs",
           "pin_parsed": {
             "commit": null,
             "version": "2.16.6"
@@ -7065,7 +7065,7 @@
               "verdict_winner": "true"
             }
           ],
-          "pin_drift": "same",
+          "pin_drift": "differs",
           "pin_parsed": {
             "commit": null,
             "version": "255.4-1ubuntu8.17"
@@ -8351,7 +8351,7 @@
           "component_id": "dagu",
           "evidence_class": "synthetic",
           "factors": [],
-          "pin_drift": "same",
+          "pin_drift": "differs",
           "pin_parsed": {
             "commit": null,
             "version": "2.16.6"
@@ -9652,10 +9652,10 @@
         }
       ],
       "id": "ai-memory",
-      "pin": "2.4.1",
+      "pin": "2.6.3",
       "pin_parsed": {
-        "commit": null,
-        "version": "2.4.1"
+        "commit": "385b81ea95f7b73ede7146d0ae606c4caa7b43c1",
+        "version": "2.6.3"
       },
       "platforms": [
         "linux-x86_64"
@@ -9797,10 +9797,10 @@
         }
       ],
       "id": "codex",
-      "pin": "0.160.0",
+      "pin": "0.162.1",
       "pin_parsed": {
-        "commit": null,
-        "version": "0.160.0"
+        "commit": "092d3acd6bec3e3a14bdc7e7a2810ab628ab759d",
+        "version": "0.162.1"
       },
       "platforms": [
         "linux-x86_64"
@@ -9853,15 +9853,15 @@
     {
       "conflicts": [],
       "id": "dagu",
-      "pin": "2.16.6",
+      "pin": "2.18.2",
       "pin_parsed": {
         "commit": null,
-        "version": "2.16.6"
+        "version": "2.18.2"
       },
       "platforms": [],
       "repository": "github.com/dagucloud/dagu",
       "source": "manifests/stack.json#/components/44",
-      "source_pin": "v2.16.6",
+      "source_pin": "v2.18.2",
       "source_pin_kind": "tag"
     },
     {
@@ -10361,10 +10361,10 @@
     {
       "conflicts": [],
       "id": "promptfoo",
-      "pin": "0.123.1",
+      "pin": "0.124.0",
       "pin_parsed": {
-        "commit": null,
-        "version": "0.123.1"
+        "commit": "30949931ee90c963acd487e97828c9441db0bcd4",
+        "version": "0.124.0"
       },
       "platforms": [],
       "repository": "github.com/promptfoo/promptfoo",
@@ -10555,10 +10555,10 @@
         }
       ],
       "id": "socraticode",
-      "pin": "1.15.0",
+      "pin": "1.16.0",
       "pin_parsed": {
-        "commit": null,
-        "version": "1.15.0"
+        "commit": "3d3a4a4d427cb0f29de4f5dd1360da52896f62df",
+        "version": "1.16.0"
       },
       "platforms": [
         "linux-x86_64"
@@ -10581,10 +10581,10 @@
     {
       "conflicts": [],
       "id": "systemd",
-      "pin": "255.4-1ubuntu8.17",
+      "pin": "259.5-0ubuntu3.4",
       "pin_parsed": {
-        "commit": null,
-        "version": "255.4-1ubuntu8.17"
+        "commit": "b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a",
+        "version": "259.5-0ubuntu3.4"
       },
       "platforms": [],
       "repository": "github.com/systemd/systemd",
@@ -10675,7 +10675,7 @@
   "scope": "One row per layer of the final stack: the landscape verdict rows and the planned layers, each with its status, verdict wave and next review, winners with their verdict and run pins, alternates, unadjudicated sweep survivors, open gaps, research state, saturation and the found-to-adopted funnel; the run pins; the intake; and a repository and component index. A read-only join of evidence recorded elsewhere; it selects nothing.",
   "sources": {
     "adoption/manifest.json": "2cdec6a1b92580527226c2c2196b8d5de809ee81877bdc6d95bf43481e388ee5",
-    "adoption/pins-linux-x86_64.json": "964d085d8fe2cb8aba3d44678938e34a2b1d8b6e320227db4152352a0d0e2449",
+    "adoption/pins-linux-x86_64.json": "f4ccbe24c051e6a308c3afead299b28dd4113d8f29b9a3ebc61a228ea25475c3",
     "adoption/pins-macos-arm64.json": "539a4840e1c5e2d5377685c274932f697d22bd16e28f99e70c12b2f86dc9f24c",
     "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock": "f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989",
     "catalogs/landscape/component-evidence-matrix.json": "7c68cc6e9e0001e4953ad08c6dec86cca462a5ca9787e5d1035a90f515f27885",
@@ -10693,7 +10693,7 @@
     "evidence/artifacts/landscape-sweep-20260926/returns.json": "ea7e8ed285639a247df91d0c64d9378e080bc820170e9fc773434488397f4600",
     "evidence/artifacts/landscape-sweep-20260929/returns.json": "2f93067652c0f1e8e4f3d726895d2017eafef018412e47e9bc9b48e7ef931a9c",
     "evidence/artifacts/landscape-sweep-20261009-pine/returns.json": "8b91d1acc81d71d8a911916cd1869a4d0a5742f95bb529c76d321c9793e2f961",
-    "manifests/stack.json": "2bfa2d4784a73ecdbc9b3c7d5deea7a422a81abd083d071c22fe5414c28be178",
+    "manifests/stack.json": "edf7d9c3ad33de5adc64d2fe4d8c897cc7dac48b4af5a91c3e6f6f99decc98ef",
     "tools/sota-convergence/landscape-sweep/seeds-20260926.json": "bf564498e96b7d926543a4957f4eec3e81e3aa723299a5752bf7d01efde9c91c"
   },
   "summary": {
@@ -10704,8 +10704,8 @@
       "in_use": 170
     },
     "pin_drift": {
-      "differs": 28,
-      "same": 25,
+      "differs": 32,
+      "same": 21,
       "unknown": 6
     },
     "pin_parse": {

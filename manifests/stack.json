@@ -83,7 +83,8 @@
         "native-returned-results-20260921",
         "full-stack-convergence-20260921",
         "claude-upstream-checks-20260921",
-        "claude-repository-evidence-20260921", "2604-drift-version-readback-20261008"
+        "claude-repository-evidence-20260921",
+        "2604-drift-version-readback-20261008"
       ],
       "upstream_sources": [
         "https://github.com/kenn-io/agentsview/releases/tag/v0.44.0"
@@ -95,7 +96,7 @@
     {
       "id": "ai-memory",
       "repository": "https://github.com/akitaonrails/ai-memory",
-      "version": "2.4.1",
+      "version": "2.6.3",
       "license": "MIT",
       "profile": "core",
       "role": "Shared scoped Markdown decisions and automatic heuristic cross-client handoffs",
@@ -127,14 +128,15 @@
         "claude-repository-evidence-20260921",
         "memory-lifecycle-probe-20260921",
         "ai-memory-240-qualification-20260925",
-        "ai-memory-241-qualification-20260925"
+        "ai-memory-241-qualification-20260925",
+        "runtime-six-pin-alignment-20261012"
       ],
       "upstream_sources": [
         "https://github.com/akitaonrails/ai-memory",
-        "https://github.com/akitaonrails/ai-memory/releases/tag/v2.4.1"
+        "https://github.com/akitaonrails/ai-memory/releases/tag/v2.6.3"
       ],
-      "source_pin": "433a19f3d54dea287571b1423591db2a89965fa9",
-      "freshness": "2.4.1 serves nativestack-memory.service and the ai-memory hooks on the NativeStack WSL2 host since 2026-09-26, after a rehearsal against 2.4.0 on restored copies (independent review) and a user-approved cold-copy cutover (V66 to V67, forward-only); 2.4.0 had replaced 2.3.2 there on 2026-09-25 the same way. The 7 changed Codex hook commands await the user's /hooks re-trust. Among those seven commands, the Codex PreCompact hook remains unverified after the upgrade: whether it fires correctly has not been checked; this is a recorded verification gap, not an observed defect. 2.4.0 and the cold V66 copy are kept for rollback. Receipts before 2026-09-25 retain their original 2.3.x version and scope. The Mac pin stays 2.3.2, and the landscape winner pin stays 2.3.2 until a new verdict wave."
+      "source_pin": "385b81ea95f7b73ede7146d0ae606c4caa7b43c1",
+      "freshness": "Runtime pin reconciled on 2026-10-12 from 2.4.1 to measured 2.6.3. https://github.com/akitaonrails/ai-memory/releases/tag/v2.6.3 and source 385b81ea95f7b73ede7146d0ae606c4caa7b43c1 bind the vendor release; evidence/receipts/runtime-six-pin-alignment-20261012.json records the host check and artifact identity. This observation establishes version/package identity; older retained acceptance receipts qualify their dated versions and workloads. No host installation, service/store change or new model/lifecycle acceptance was executed."
     },
     {
       "id": "ast-grep",
@@ -297,7 +299,7 @@
     {
       "id": "codex",
       "repository": "https://github.com/openai/codex",
-      "version": "0.160.0",
+      "version": "0.162.1",
       "license": "Apache-2.0",
       "profile": "core",
       "role": "Native subscription coding client",
@@ -342,16 +344,17 @@
         "codex-01592-qualification-20260930",
         "codex-01593-native-queue-20261001",
         "codex-01593-hindsight-native-memory-20261001",
-        "runtime-sdk-20261003"
+        "runtime-sdk-20261003",
+        "runtime-six-pin-alignment-20261012"
       ],
       "upstream_sources": [
         "https://github.com/openai/codex",
-        "https://github.com/openai/codex/releases/tag/rust-v0.160.0",
+        "https://github.com/openai/codex/releases/tag/rust-v0.162.1",
         "https://github.com/openai/codex/blob/rust-v0.160.0/scripts/install/install.sh",
         "https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/app-server-daemon/README.md"
       ],
-      "source_pin": "a956835d020762cb2b570053af06f643a11c0ecc",
-      "freshness": "Linux 0.160.0 is selected from the current stable rust-v0.160.0 release, commit a956835d020762cb2b570053af06f643a11c0ecc. The 2026-10-03 coordinator compatibility record retains the matching Python SDK and bundled CLI, strict-hash installation with CPython 3.13.15 and uv 0.12.17, matching npm-platform and bundled binary SHA256, and completed native-account SDK, gateway SDK and gateway CLI marker canaries (evidence/artifacts/runtime-sdk-20261003/receipt.json). The official install.sh and app-server-daemon README are unchanged upstream from rust-v0.159.3. The dated 0.159.3 queue and Hindsight receipts retain their original scope and do not qualify those operations at 0.160.0. The shared host launcher, daemon and production prefix still run 0.159.3 until a coordinated switch; the repository pin does not switch them. The shared portable template keeps daemon_auto_start false, so daemon adoption on another host remains opt-in. The npm wrapper bytes match registry dist.integrity and SHA256; signature and attestation verification were not recorded. Gateway backend model and effort were not read from the call log. Sanitized returned results, hashes and positive/negative marker controls are retained; original SDK outer argv/cwd, attested native heredoc and process start/end times remain incomplete, so runtime-sdk-20261003 is compatibility_attempt. This is same-host compatibility evidence, not native_cli_e2e, new-host, model-quality or whole-memory-backend acceptance. The move is inside the seven-day cooldown recorded in docs/decisions/2026-09-25-workstation-sota-refresh.md, as the earlier 0.159.2 and 0.159.3 moves were (docs/decisions/2026-09-27-model-currency.md). tools/adoption/apply_codex_lane.py follows the Linux pin; historical receipts and rollback installations remain available, and macOS stays at 0.155.1 pending its own qualification. The Linux codex pin row carries one dated hold, 0.159.3 until 2026-11-04 (X18, the #626 landing exception), with that version's install data; scripts/adoption_status.py --pinned-versions reports a host not yet switched as held, not drift, until that date. The hold installs and qualifies nothing (docs/decisions/2026-10-04-codex-dated-holds.md)."
+      "source_pin": "092d3acd6bec3e3a14bdc7e7a2810ab628ab759d",
+      "freshness": "Runtime pin reconciled on 2026-10-12 from 0.160.0 to measured 0.162.1. https://github.com/openai/codex/releases/tag/rust-v0.162.1 and source 092d3acd6bec3e3a14bdc7e7a2810ab628ab759d bind the vendor release; evidence/receipts/runtime-six-pin-alignment-20261012.json records the host check and artifact identity. This observation establishes version/package identity; older retained acceptance receipts qualify their dated versions and workloads. No host installation, service/store change or new model/lifecycle acceptance was executed."
     },
     {
       "id": "codex-for-claude",
@@ -543,7 +546,8 @@
         "native-returned-results-20260921",
         "full-stack-convergence-20260921",
         "claude-upstream-checks-20260921",
-        "claude-repository-evidence-20260921", "2604-drift-version-readback-20261008"
+        "claude-repository-evidence-20260921",
+        "2604-drift-version-readback-20261008"
       ],
       "upstream_sources": [
         "https://github.com/headroomlabs-ai/headroom",
@@ -711,7 +715,7 @@
     {
       "id": "promptfoo",
       "repository": "https://github.com/promptfoo/promptfoo",
-      "version": "0.123.1",
+      "version": "0.124.0",
       "license": "MIT",
       "profile": "optional",
       "role": "Explicit evaluation configuration/fixtures",
@@ -725,13 +729,15 @@
         "native-dashboard-data-20260921",
         "native-returned-results-20260921",
         "claude-upstream-checks-20260921",
-        "claude-repository-evidence-20260921"
+        "claude-repository-evidence-20260921",
+        "runtime-six-pin-alignment-20261012"
       ],
       "upstream_sources": [
-        "https://github.com/promptfoo/promptfoo"
+        "https://github.com/promptfoo/promptfoo",
+        "https://github.com/promptfoo/promptfoo/releases/tag/0.124.0"
       ],
-      "source_pin": null,
-      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json.",
+      "source_pin": "30949931ee90c963acd487e97828c9441db0bcd4",
+      "freshness": "Runtime pin reconciled on 2026-10-12 from 0.123.1 to measured 0.124.0. https://github.com/promptfoo/promptfoo/releases/tag/0.124.0 and source 30949931ee90c963acd487e97828c9441db0bcd4 bind the vendor release; evidence/receipts/runtime-six-pin-alignment-20261012.json records the host check and artifact identity. This observation establishes version/package identity; older retained acceptance receipts qualify their dated versions and workloads. No host installation, service/store change or new model/lifecycle acceptance was executed.",
       "optional_reason": "Useful specialist/reference component; not a required condition for the demonstrated native core."
     },
     {
@@ -880,7 +886,9 @@
         "component-history",
         "token-practice-coverage-20260920",
         "native-sandbox-network-20260920",
-        "claude-repository-evidence-20260921", "native-sandbox-smoke-20261008", "native-sandbox-codex-binding-20261008"
+        "claude-repository-evidence-20260921",
+        "native-sandbox-smoke-20261008",
+        "native-sandbox-codex-binding-20261008"
       ],
       "upstream_sources": [
         "https://github.com/anthropics/sandbox-runtime"
@@ -973,7 +981,7 @@
     {
       "id": "socraticode",
       "repository": "https://github.com/giancarloerra/SocratiCode",
-      "version": "1.15.0",
+      "version": "1.16.0",
       "license": "AGPL-3.0-only; upstream commercial alternative",
       "profile": "core",
       "role": "Automatically refreshed semantic code retrieval and native code graph",
@@ -999,13 +1007,15 @@
         "full-stack-convergence-20260921",
         "claude-upstream-checks-20260921",
         "claude-repository-evidence-20260921",
-        "socraticode-1150-qualification-20260927"
+        "socraticode-1150-qualification-20260927",
+        "runtime-six-pin-alignment-20261012"
       ],
       "upstream_sources": [
-        "https://github.com/giancarloerra/SocratiCode"
+        "https://github.com/giancarloerra/SocratiCode",
+        "https://github.com/giancarloerra/SocratiCode/releases/tag/v1.16.0"
       ],
-      "source_pin": "f6191f076a42405f0d5508139f3a8b505cfef93a",
-      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
+      "source_pin": "3d3a4a4d427cb0f29de4f5dd1360da52896f62df",
+      "freshness": "Runtime pin reconciled on 2026-10-12 from 1.15.0 to measured 1.16.0. https://github.com/giancarloerra/SocratiCode/releases/tag/v1.16.0 and source 3d3a4a4d427cb0f29de4f5dd1360da52896f62df bind the vendor release; evidence/receipts/runtime-six-pin-alignment-20261012.json records the host check and artifact identity. This observation establishes version/package identity; older retained acceptance receipts qualify their dated versions and workloads. No host installation, service/store change or new model/lifecycle acceptance was executed."
     },
     {
       "id": "toon",
@@ -1093,7 +1103,7 @@
         "https://github.com/max-sixty/worktrunk/releases/tag/v0.80.0"
       ],
       "source_pin": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
-      "freshness": "2026-10-03 W1 scratch qualification: The recorded version command printed \"wt v0.80.0\" (exit 0). The synthetic repository wt list smoke printed \"○ Showing 1 worktree\" (exit 0). Current upstream metadata is in catalogs/landscape/upstream-snapshot.json. This integration changes repository pins; it does not switch a host installation. Prior 0.79.0 receipts retain their original scope.",
+      "freshness": "2026-10-03 W1 scratch qualification: The recorded version command printed \"wt v0.80.0\" (exit 0). The synthetic repository wt list smoke printed \"\u25cb Showing 1 worktree\" (exit 0). Current upstream metadata is in catalogs/landscape/upstream-snapshot.json. This integration changes repository pins; it does not switch a host installation. Prior 0.79.0 receipts retain their original scope.",
       "optional_reason": "Useful specialist/reference component; not a required condition for the demonstrated native core."
     },
     {
@@ -1354,10 +1364,10 @@
     {
       "id": "dagu",
       "repository": "https://github.com/dagucloud/dagu",
-      "version": "2.16.6",
+      "version": "2.18.2",
       "license": "GPL-3.0",
       "role": "Manual native research workflows and private local run history",
-      "source_pin": "v2.16.6",
+      "source_pin": "v2.18.2",
       "commands": [
         "dagu validate --dagu-home \"$RESEARCH_HOME\" \"$DAG\"",
         "dagu start --context local --dagu-home \"$RESEARCH_HOME\" --run-id \"$NEW_RUN_ID\" \"$DAG\"",
@@ -1376,13 +1386,15 @@
         "native-returned-results-20260921",
         "full-stack-convergence-20260921",
         "claude-upstream-checks-20260921",
-        "claude-repository-evidence-20260921"
+        "claude-repository-evidence-20260921",
+        "runtime-six-pin-alignment-20261012"
       ],
       "profile": "supporting",
       "upstream_sources": [
-        "https://github.com/dagucloud/dagu"
+        "https://github.com/dagucloud/dagu",
+        "https://github.com/dagucloud/dagu/releases/tag/v2.18.2"
       ],
-      "freshness": "Dated native acceptance on 2026-09-19; pins and limits retained, not an automatic latest-update policy."
+      "freshness": "Runtime pin reconciled on 2026-10-12 from 2.16.6 to measured 2.18.2. https://github.com/dagucloud/dagu/releases/tag/v2.18.2 and source 5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4 bind the vendor release; evidence/receipts/runtime-six-pin-alignment-20261012.json records the host check and artifact identity. This observation establishes version/package identity; older retained acceptance receipts qualify their dated versions and workloads. No host installation, service/store change or new model/lifecycle acceptance was executed."
     },
     {
       "id": "lean",
@@ -1468,7 +1480,7 @@
     {
       "id": "systemd",
       "repository": "https://github.com/systemd/systemd",
-      "version": "255.4-1ubuntu8.17",
+      "version": "259.5-0ubuntu3.4",
       "license": "LGPL-2.1-or-later and GPL-2.0-or-later components",
       "role": "Existing Linux user manager; bounded transient research process-tree supervision",
       "commands": [
@@ -1481,13 +1493,18 @@
         "native-worker-cgroup-20260920",
         "native-service-reboot-20260920",
         "native-dashboard-data-20260921",
-        "claude-repository-evidence-20260921"
+        "claude-repository-evidence-20260921",
+        "runtime-six-pin-alignment-20261012"
       ],
       "profile": "supporting",
       "upstream_sources": [
-        "https://www.freedesktop.org/software/systemd/man/latest/systemd-run.html"
+        "https://github.com/systemd/systemd",
+        "https://github.com/systemd/systemd/releases/tag/v259.5",
+        "https://www.freedesktop.org/software/systemd/man/latest/systemd-run.html",
+        "https://github.com/systemd/systemd/releases/tag/v259"
       ],
-      "freshness": "Existing distribution version executed; upstream v261.3 reviewed separately, not installed."
+      "freshness": "Runtime pin reconciled on 2026-10-12 from 255.4-1ubuntu8.17 to measured 259.5-0ubuntu3.4. https://github.com/systemd/systemd/releases/tag/v259.5 and source b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a bind the vendor release; evidence/receipts/runtime-six-pin-alignment-20261012.json records the host check and artifact identity. This observation establishes version/package identity; older retained acceptance receipts qualify their dated versions and workloads. No host installation, service/store change or new model/lifecycle acceptance was executed.",
+      "source_pin": "b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a"
     },
     {
       "id": "pandas",
@@ -2474,7 +2491,9 @@
       "role": "Simple Claude Code background tasks",
       "consumer_limit": "Titles, safety checks and quick summaries; latest Haiku line retained as the owner's dated exception, without heavier-line promotion for currency.",
       "currency_status": "in_use",
-      "currency_rows": ["background-haiku"],
+      "currency_rows": [
+        "background-haiku"
+      ],
       "landscape_checked_at": "2026-10-07",
       "overturn": "An Anthropic Haiku 5.x model ID becomes available.",
       "selection_scope": "Owner ruling and reported application at 2026-10-07T04:15Z; no new configuration read-back or model run by this wave.",

@@ -1,0 +1,161 @@
+{
+  "schema_version": 1,
+  "kind": "runtime_pin_install_plan",
+  "status": "source_plan_for_observed_versions",
+  "date": "2026-10-12",
+  "base_commit": "d8f7e2051b61bde6361a85b64f41413798015353",
+  "supersedes": {
+    "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+    "scope": "Runtime-version target for the Promptfoo row only; the older complete new-host plan and its frozen fixtures remain a dated record."
+  },
+  "scope": "Supported vendor routes for the measured six runtime versions; no command in this plan was executed as a host installation.",
+  "owners": [
+    {
+      "component_id": "socraticode",
+      "version": "1.16.0",
+      "release": "https://github.com/giancarloerra/SocratiCode/releases/tag/v1.16.0",
+      "source_commit": "3d3a4a4d427cb0f29de4f5dd1360da52896f62df",
+      "host_check": {
+        "method": "installed-plugin-and-package-metadata",
+        "observed": "1.16.0",
+        "exit": 0
+      },
+      "artifact": {
+        "id": "socraticode",
+        "bytes": 1065187,
+        "sha256": "3cb602cf2f50f863ef79dde56923d65b7ce840e2cc26070efa41743d2b4aaafe"
+      },
+      "receipt": "evidence/receipts/runtime-six-pin-alignment-20261012.json",
+      "execution_status": "UNRUN",
+      "install": {
+        "command": "claude plugin marketplace update socraticode; claude plugin update --scope user socraticode@socraticode",
+        "codex_command": "codex plugin marketplace upgrade socraticode; codex plugin add socraticode@socraticode",
+        "source": "https://github.com/giancarloerra/SocratiCode/blob/3d3a4a4d427cb0f29de4f5dd1360da52896f62df/README.md",
+        "guard": "Select the reviewed v1.16.0 plugin source at marketplace setup. Current plugin metadata is measured; this assignment performs no configuration or dependency-tree change."
+      }
+    },
+    {
+      "component_id": "ai-memory",
+      "version": "2.6.3",
+      "release": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.6.3",
+      "source_commit": "385b81ea95f7b73ede7146d0ae606c4caa7b43c1",
+      "host_check": {
+        "command": "ai-memory --version",
+        "observed": "2.6.3",
+        "exit": 0
+      },
+      "artifact": {
+        "id": "ai-memory",
+        "bytes": 18132522,
+        "sha256": "933be9bb8fe6930336933f0b8adf0695007e644f945898f9f030fd312326f0f3"
+      },
+      "receipt": "evidence/receipts/runtime-six-pin-alignment-20261012.json",
+      "execution_status": "UNRUN",
+      "install": {
+        "command": "Use the matching v2.6.3 Linux release archive through the existing checksum-gated Linux bootstrap.",
+        "source": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.6.3",
+        "guard": "Memory-owner backup/cutover procedure is required before opening an existing store with a changed binary. This assignment checks the already installed binary only."
+      }
+    },
+    {
+      "component_id": "dagu",
+      "version": "2.18.2",
+      "release": "https://github.com/dagucloud/dagu/releases/tag/v2.18.2",
+      "source_commit": "5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4",
+      "host_check": {
+        "command": "dagu version",
+        "observed": "2.18.2",
+        "exit": 0
+      },
+      "artifact": {
+        "id": "dagu",
+        "bytes": 54238739,
+        "sha256": "5a84c093b9ba9d02b7a60e106bb91d46f9383fd01c62bd51560e41193f05792b"
+      },
+      "receipt": "evidence/receipts/runtime-six-pin-alignment-20261012.json",
+      "execution_status": "UNRUN",
+      "install": {
+        "command": "Use the matching v2.18.2 dagu_2.18.2_linux_amd64.tar.gz vendor release archive in its owned prefix.",
+        "source": "https://github.com/dagucloud/dagu/releases/tag/v2.18.2",
+        "guard": "The artifact SHA256 and current host binary match; DAG/service execution and any scheduler migration remain separate."
+      }
+    },
+    {
+      "component_id": "promptfoo",
+      "version": "0.124.0",
+      "release": "https://github.com/promptfoo/promptfoo/releases/tag/0.124.0",
+      "source_commit": "30949931ee90c963acd487e97828c9441db0bcd4",
+      "host_check": {
+        "command": "promptfoo --version",
+        "observed": "0.124.0",
+        "exit": 0
+      },
+      "artifact": {
+        "id": "promptfoo",
+        "bytes": 6689796,
+        "sha256": "d0aa69e35d40be9b37454ce7569e04c62af67f3b45dd679182e53b170ef69c24"
+      },
+      "receipt": "evidence/receipts/runtime-six-pin-alignment-20261012.json",
+      "execution_status": "UNRUN",
+      "install": {
+        "command": "npm install --global --prefix \"$STACK_HOME/tools/promptfoo-0.124.0\" \"$VERIFIED_PROMPTFOO_01240_TARBALL\"",
+        "source": "https://github.com/promptfoo/promptfoo/blob/30949931ee90c963acd487e97828c9441db0bcd4/README.md",
+        "guard": "Fetch the 0.124.0 registry tarball and match SHA256/SHA512/SHA1 from the receipt before using it. Select provider optional SDKs explicitly; hosted ChatKit removal and opt-in SDK changes are in the release notes."
+      }
+    },
+    {
+      "component_id": "codex",
+      "version": "0.162.1",
+      "release": "https://github.com/openai/codex/releases/tag/rust-v0.162.1",
+      "source_commit": "092d3acd6bec3e3a14bdc7e7a2810ab628ab759d",
+      "host_check": {
+        "command": "codex --version",
+        "observed": "0.162.1",
+        "exit": 0
+      },
+      "artifact": {
+        "id": "codex",
+        "bytes": 4904,
+        "sha256": "0b4b2e33a65883e4f69c903484d8dd7770b3cb8b324f520068b6fd85d42b65ea"
+      },
+      "receipt": "evidence/receipts/runtime-six-pin-alignment-20261012.json",
+      "execution_status": "UNRUN",
+      "install": {
+        "command": "npm install --global --prefix \"$STACK_HOME/tools/codex-0.162.1\" @openai/codex@0.162.1",
+        "source": "https://github.com/openai/codex/blob/092d3acd6bec3e3a14bdc7e7a2810ab628ab759d/scripts/install/install.sh",
+        "guard": "Existing Linux bootstrap retains exact wrapper/platform-alias/archive/binary verification before publication; ignore_scripts is preserved.",
+        "platform_dependency": {
+          "name": "@openai/codex-linux-x64",
+          "resolved_package": "@openai/codex",
+          "version": "0.162.1-linux-x64",
+          "sha256": "7417711678b464eee70664126e39e88bb3c84c2928da0e71f14b56e04ff5c09f",
+          "integrity": "sha512-cjK2mdHIfEepZ1lQ1MX3aTQC+8ncIsvnacl/6vI2dIIcfP8/MrhTQ2+qRlkXFNDzJSj1d36quIszP+3/4CUJWQ==",
+          "archive_binary": {
+            "path": "vendor/x86_64-unknown-linux-musl/bin/codex",
+            "sha256": "628e35487d888a28f0427fc37501da529dd3d81fcbad7a2c3421c1e8670d92e1"
+          }
+        }
+      }
+    },
+    {
+      "component_id": "systemd",
+      "version": "259.5-0ubuntu3.4",
+      "release": "https://github.com/systemd/systemd/releases/tag/v259.5",
+      "source_commit": "b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a",
+      "host_check": {
+        "command": "systemctl --version; dpkg-query -W systemd; systemctl --user show --property=Version --value",
+        "observed": "259.5-0ubuntu3.4",
+        "exit": 0
+      },
+      "artifact": null,
+      "receipt": "evidence/receipts/runtime-six-pin-alignment-20261012.json",
+      "execution_status": "UNRUN",
+      "install": {
+        "command": "Retain the existing distribution-owned systemd 259.5-0ubuntu3.4 installation.",
+        "source": "https://github.com/systemd/systemd/releases/tag/v259",
+        "point_release": "https://github.com/systemd/systemd/releases/tag/v259.5",
+        "guard": "This is the observed Ubuntu package/user-manager version, not an upstream source-build installation. No system unit or property changes."
+      }
+    }
+  ]
+}
