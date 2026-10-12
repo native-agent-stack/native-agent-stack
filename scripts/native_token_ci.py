@@ -35,6 +35,7 @@ import argparse
 from datetime import datetime, timezone
 import hashlib
 from html.parser import HTMLParser
+import io
 import json
 import os
 from pathlib import Path
@@ -73,7 +74,64 @@ REDACTIONS = (
 # Run.publish decodes JSON text nested in string values this many levels deep; deeper JSON text is refused with this
 # fixed message, and nothing is published (the command center's micro at 4c916e14; real receipts nest at most two).
 PUBLISH_DEPTH = 4
-PUBLISH_REFUSED = "publish: JSON text nested in string values deeper than 4 levels is refused; nothing is published"
+PUBLISH_REFUSED = ("publish: output a reader could decode to private content (JSON nested in string values deeper than "
+                   "4 levels, an object with a duplicate name, or JSON a reader splits differently) is refused; nothing "
+                   "is published")
+
+
+def unique_members(pairs: list) -> dict:
+    """Run.publish's object_pairs_hook: json.loads keeps only the last member of a duplicate name, so an earlier one
+    would go out uninspected; such an object is refused (RFC 8259 4: names SHOULD be unique; the command center's
+    addendum 01 at 4c916e14)."""
+    require(len({name for name, _ in pairs}) == len(pairs), PUBLISH_REFUSED)
+    return dict(pairs)
+
+
+class JsonNumber(str):
+    """A JSON number kept as its text, so a reader's view of it has no length limit (CPython's int() refuses more than
+    4300 digits: Objects/longobject.c:2957 at cbc944f4)."""
+
+
+VERIFY_DECODER = json.JSONDecoder(object_pairs_hook=list, parse_int=JsonNumber, parse_float=JsonNumber,
+                                  parse_constant=JsonNumber)
+
+
+def json_texts(piece: str) -> list:
+    """The JSON texts a stream reader (jq, RFC 7464 json-seq) takes from piece, in order: JSON whitespace and the RS
+    record separator between texts are skipped, and reading stops at the first byte that starts no JSON text."""
+    texts, index = [], 0
+    while True:
+        while index < len(piece) and piece[index] in " \t\n\r\x1e":
+            index += 1
+        if index >= len(piece):
+            return texts
+        try:
+            node, index = VERIFY_DECODER.raw_decode(piece, index)
+        except ValueError:
+            return texts
+        texts.append(node)
+
+
+def recoverable(text: str, depth: int = 0) -> bool:
+    """Whether a reader can decode private content from published text (the command center's micro at adc2adb2, N1):
+    REDACTIONS over the text, and over every key and string value of each JSON text in it, as split by a line feed, by
+    str.splitlines() and by universal newlines (Lib/_pyio.py:153-154 at cbc944f4), nested JSON PUBLISH_DEPTH levels
+    deep; an object's members are all read, duplicates too. JSON text nested deeper counts as recoverable."""
+    if any(pattern.search(text) for _, pattern, _ in REDACTIONS):
+        return True
+    pieces = {text, *text.split("\n"), *text.splitlines(), *io.StringIO(text, newline=None)}
+    for piece in pieces:
+        for node in json_texts(piece):
+            if depth >= PUBLISH_DEPTH and not isinstance(node, (JsonNumber, bool, type(None))):
+                return True
+            stack = [node]
+            while stack:
+                item = stack.pop()
+                if isinstance(item, (list, tuple)):
+                    stack.extend(item)
+                elif isinstance(item, str) and not isinstance(item, JsonNumber) and recoverable(item, depth + 1):
+                    return True
+    return False
 # Serena declares 2.0.0.dev0 for every commit, so its manifest version names the commit after " @ "
 # and the commit is its identity (adoption/pins-linux-x86_64.json, kind uv-tool-from-git).
 SERENA_COMMIT = "c6fbd1c5932df2494ffa0020af5a9fbe80b82143"
@@ -624,8 +682,10 @@ class Run:
                        "ccusage reads a committed synthetic usage log, not account history",
                        "No token-saving requirement: fidelity may need the larger representation",
                        "Retained text replaces local paths and private content, in JSON and JSON Lines values as "
-                       "decoded too (JSON text nested in strings up to four levels; deeper is refused, and a line "
-                       "ends only at a line feed); "
+                       "decoded too (JSON text nested in strings up to four levels; deeper, or an object with a "
+                       "duplicate name, is refused, and a line ends only at a line feed); the output is then read back "
+                       "under line feeds, splitlines and universal newlines, and refused if any reader recovers private "
+                       "content; "
                        "command, artifact and MCP digests are of the published text, while the RTK exactness and "
                        "Serena parity digests are of fixture output before sanitization"],
         }
@@ -708,7 +768,8 @@ class Run:
         """clean() for text this run publishes, and for JSON or JSON Lines text also each decoded key and string value,
         so what a JSON escape hides (\\u0040 for "@", RFC 8259 7) is removed too; a string value that is itself
         JSON is read the same way, PUBLISH_DEPTH levels deep, and JSON text nested deeper is refused (PUBLISH_REFUSED),
-        never passed through. A JSON Lines line ends only at a line feed (a trailing carriage return is kept): RFC 8259
+        never passed through, as is an object with a duplicate name. Finally the output itself is verified: if any
+        reader recovers private content from it (recoverable()), it is refused. A JSON Lines line ends only at a line feed (a trailing carriage return is kept): RFC 8259
         7 allows U+2028, U+2029 and U+0085 raw in a string, and str.splitlines() would break there. Text whose decoded
         values clean() leaves alone is returned as clean() gives it; otherwise the document is written again from the
         cleaned values. host_receipts.py judges a receipt's decoded values the same way."""
@@ -716,7 +777,7 @@ class Run:
 
         def parsed(text: str):
             try:
-                node = json.loads(text)
+                node = json.loads(text, object_pairs_hook=unique_members)
             except ValueError:
                 return None
             return node if isinstance(node, (dict, list, str)) else None
@@ -736,7 +797,7 @@ class Run:
 
         def document(text: str) -> str:
             try:
-                node = json.loads(text)
+                node = json.loads(text, object_pairs_hook=unique_members)
             except ValueError:
                 return text
             if not isinstance(node, (dict, list, str)):
@@ -748,9 +809,14 @@ class Run:
 
         whole = document(cleaned)
         if whole is not cleaned:
-            return whole + "\n" * (len(cleaned) - len(cleaned.rstrip("\n")))
-        return "\n".join(document(line[:-1]) + "\r" if line.endswith("\r") else document(line)
-                         for line in cleaned.split("\n"))
+            published = whole + "\n" * (len(cleaned) - len(cleaned.rstrip("\n")))
+        else:
+            published = "\n".join(document(line[:-1]) + "\r" if line.endswith("\r") else document(line)
+                                  for line in cleaned.split("\n"))
+        # Verify the output, not the input (the command center's addendum 02): refuse when any reader recovers what
+        # clean() removes.
+        require(depth > 0 or not recoverable(published), PUBLISH_REFUSED)
+        return published
 
     def flush(self) -> None:
         (self.output / "receipt.json").write_text(json.dumps(self.report, indent=2) + "\n")

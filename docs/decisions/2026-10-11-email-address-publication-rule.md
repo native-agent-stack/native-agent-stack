@@ -292,7 +292,29 @@ remain, two are in `Run.publish()`'s own scope, and the command center ruled the
 
 Each regression fails on `4c916e14` and passes here: a JSON line holding each of the three characters, alone and
 among other lines; and five to seven levels in values and keys, alone and among other lines, through `publish()`,
-an artifact and a command. Shapes outside `publish()`'s stated scope (two values on one line, a BOM, a trailing comma,
+an artifact and a command.
+
+**Addendum (the command center's addendum 01 at 4c916e14, from the GPT read at `4c916e14`):** an object with a
+duplicate name hid an earlier member from the sanitizer, since `json.loads` keeps only the last one and an unchanged
+document was published as written. RFC 8259 4 says the names within an object SHOULD be unique (rfc8259.txt:322,
+read 2026-10-12T06:15:38Z). `publish()` parses through an `object_pairs_hook` that refuses such an object with
+`PUBLISH_REFUSED`, so nothing is published; unique-name JSON keeps every byte. Each regression (`publish()`, an
+artifact, a command and an MCP answer) fails on `adc2adb2` and passes here.
+
+**Addendum 02 (the command center's micro at `adc2adb2`, N1):** splitting JSON Lines only at a line feed left JSON
+beside a lone CR, or after RS, FF, VT, FS, GS, U+0085, U+2028 or U+2029, undecoded, while Python's universal newlines
+(`Lib/_pyio.py:153-154` at `cbc944f4`), `str.splitlines()` and `jq` read the escaped address back. Choosing one
+splitting always leaves a reader that splits differently (rule 4), so `publish()` now verifies its own output:
+`recoverable()` reads the exact text to be published under a line feed, `str.splitlines()` and universal newlines,
+decodes every JSON text in each piece as a stream reader does (JSON whitespace and RFC 7464's RS between texts),
+reads every member of every object, duplicates included, and nested JSON to the same depth, and applies the
+sanitizer's rules to each decoded value. Numbers are kept as their text, so the micro's N2 (an integer past CPython's
+4,300-digit limit beside the address, which `json.loads` refuses with a plain `ValueError` while jq and Node read
+on) is read too. If any reader recovers private content, the output is refused with `PUBLISH_REFUSED`; clean output
+keeps every byte. Over the committed native-token receipts, 765 published streams pass unchanged; a 1.1 MB JSON
+document is verified in 1.6 s. Each regression (the micro's lone-CR, separator, json-seq and long-number shapes,
+through `publish()`, an artifact, a command and an MCP answer) fails on `adc2adb2` and passes here; its byte-for-byte
+controls pass on both. Shapes outside `publish()`'s stated scope (two values on one line, a BOM, a trailing comma,
 a log prefix, forms readable only by a person such as `\x40`, a fullwidth at sign or `%40`, duplicate names) are
 follow-ups for the shared email detector.
 
