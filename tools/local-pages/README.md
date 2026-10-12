@@ -210,10 +210,14 @@ guessed masked value (#161). The rule is by provenance, not by name: the
 composer marks an input private when its path is under the state root, and the
 nonserved receipt keeps the digest and the `private` flag. The footer's native
 readiness manifest SHA-256 is the digest of a document the native builder
-renders from the state root, so the Command center and Sources pages print the
-same note there; the receipt keeps it as `native_readiness_manifest_sha256`.
-The other pages still print it (the digest policy for them is a Follow-up of
-#1012). A missing or malformed input renders
+renders from the state root, so every page prints the same note there, as the
+Readiness heading does; the receipt keeps it as
+`native_readiness_manifest_sha256`. Before publication each page also passes
+`sanitization.withhold_digests`, so no page carries the SHA-256 of state-root
+bytes that the refresh records, or a prefix of one 7 or more hex characters
+long: a content-addressed name such as `receipt-<16 hex>.json` reads
+`receipt-[digest prefix withheld].json` (#1012 GPT fix3 verdict, BLOCKER 1;
+Claude micro at 38302cd2, (d)3). A missing or malformed input renders
 `missing input: <name>`, an unapproved one `unreadable (SourcePolicyError)`;
 neither stops the refresh. An `in_review` row that is not an object is rejected
 with a stated gap naming how many were rejected: PR waves reads partial, and the
@@ -230,7 +234,9 @@ type degrades only the part that reads it.
 Every value keeps its own source and window, and nothing is summed across
 windows. A report older than its limit at the refresh reads "stale" with its
 age: three hours for the hourly skill and token reports, 30 hours for the daily
-Codex lanes report, one hour for the read queue. Times the CC records as a time
+Codex lanes report, one hour for the read queue. A read queue without a
+parseable `updated_utc` leaves Orchestration partial, since its age is unknown.
+Times the CC records as a time
 of day (`15:38Z`) are shown as recorded, never completed with a date. Skill
 counts come from the repository's measurement tools and stay separate from
 Fleet's Prometheus rates, where a rate the producer does not qualify stays
@@ -250,7 +256,10 @@ shown for every pinned skill, and a skill the manifest does not enable for
 Codex carries that note. When #970's
 `daily_skill_usage.py` publishes `skills/skill-invoke-rate-latest.json`
 (`skill-invoke-rate-daily/1`) within 30 hours, its counts are used; otherwise
-the hourly reports are. A client or root that its producer did not measure
+the hourly reports are. While the daily projection is current, an hourly report
+it replaces that is absent or stale reads "not used" and is no gap. A skill
+that the Claude lanes report measured keeps those counts when the host report
+has no row for it, and its other columns stay unmeasured. A client or root that its producer did not measure
 reads "not measured" and never counts as zero. The number of pinned skills with
 no 7-day call counts only skills with a measured 7-day column: with none
 measured it reads UNKNOWN (null in the receipt's `defects`), and with some
@@ -260,7 +269,11 @@ the receipt also carries `measured_skills` and `pinned_skills`).
 The landscape section lists each matrix winner's component, pin, evidence
 class, lifecycle stages and platforms, then the W6 final columns: verdict, run
 pin, upstream E2E at the pin and invoke evidence, each as recorded or "not
-recorded". Each winner's github.com repository is matched, by owner/name and
+recorded". A winner's run pin is that of the run its same-layer winner in
+`final-stack.json` names in `run`, whose id can differ from the matrix
+component id; a final-stack winner without a run shows its `run_reason`, and a
+layer that lists no such winner falls back to the run with the component's id.
+Each winner's github.com repository is matched, by owner/name and
 ignoring case, to `cc-now.json#/mirrors/pins`. "Matches the pin" means the
 pin's version equals the dotted version the mirror's tag names
 (`rust-v0.155.1`, `v1.30.1` and `release-1.2` name `0.155.1`, `1.30.1` and
@@ -276,7 +289,8 @@ their RECORDED claims.
 The tokens section shows each token tool's own report command, run by
 `token_tools_now.py` (below), with its exit code, run time, version and the
 tool's own estimate. The native counters from `token-window-now.json` are
-labelled client counters. Nothing is summed across tools, evidence classes or
+labelled client counters. Each Adoption server row is labelled by its
+case-folded name: RTK, Headroom, jCodeMunch, otherwise Context Mode. Nothing is summed across tools, evidence classes or
 windows. The count strip's saved-tokens figure is RTK's own, from its
 token-tools row, the token-window report whose name names RTK, or
 `cc-now.json#/token_efficiency/rtk`, and otherwise reads UNKNOWN; another
@@ -307,11 +321,14 @@ comes right after a slash, with a name after it that a slash or an opening
 parenthesis follows, starts a path segment or a call
 (`run_stream_events/<at>agent.tool/message_history`,
 `<at>DBOS.workflow()/<at>DBOS.step()`); the slash must be the character right
-before the at sign, which no mailbox has, so an address that is itself a path
-segment, such as gcloud's per-account `legacy_credentials/NAME<at>HOST/adc.json`,
-masks whole together with its directory prefix. And a backtick string that does not
-follow a letter or digit and that a backtick string of equal length closes after
-the at sign opens a Markdown code span (CommonMark 0.31.2 section 6.1), so
+before the at sign, so an address that is itself a path segment, such as
+gcloud's per-account `legacy_credentials/NAME<at>HOST/adc.json`, masks whole
+together with its directory prefix. RFC 5322 also allows a local part that ends
+in a slash, and such an address with a slash or a parenthesis after it stays
+readable, a cost #1012's Follow-ups record. And a backtick string that a
+backtick string of equal length closes after the at sign opens a Markdown code
+span (CommonMark 0.31.2 section 6.1) when it does not follow a letter or digit,
+a condition of this mask that CommonMark does not set and that masks more, so
 `` `@AGENTS.md` `` is not an address and a code span around an address keeps its
 backticks. Anywhere else a slash or a backtick before the at sign is part of the
 local part: `/<at>d`, `x/<at>d` and a lone backtick before the at sign are
@@ -327,11 +344,18 @@ a domain and directly after a word character, or after a quote with only
 whitespace between, is dropped whole and reads `[value omitted: an at sign
 beside a word remained after masking]`; the command-center page counts those
 values and names their sections partial. A token over 4,096 characters is not
-decoded, so there the mask matches these forms in place: for the at sign `%40`,
-`%2540`, `&#64` and `&#x40` (with or without the semicolon) and `&commat;`, for
-the dot `%2E`, `%252E`, `&#46`, `&#x2E` and `&period;`, and for the quotes `%22`,
-`%2522`, `&quot`, `&#34` and `&#x22`. Other encodings in such a token, such as
-`&amp;#64;` or `%26%2364%3B`, stay as written. A systemd
+decoded for the mask, so there the mask first matches these forms in place: for
+the at sign `%40`, `%2540`, `&#64` and `&#x40` (with or without the semicolon)
+and `&commat;`, for the dot `%2E`, `%252E`, `&#46`, `&#x2E` and `&period;`, and
+for the quotes `%22`, `%2522`, `&quot`, `&#34` and `&#x22`. No such token is
+published unchecked: it is then decoded with the same two rounds, and one that
+an address touches in its decoded text, or whose decoded text turns the
+character beside an in-place mask into part of the address, is omitted whole as
+`[email omitted]`; one whose decoded text, or the text it encodes as hex or
+base64, holds a home path, a session id, a task handle, an account URL or the
+home name reads `[long token omitted: it decodes to private text]`, and the
+command-center page counts those tokens as it counts dropped values (#1012 GPT
+fix3 verdict, BLOCKER 2). A systemd
 template-unit name that ends in `service`, `socket`, `device`, `mount`,
 `automount`, `swap`, `path`, `timer`, `slice` or `scope`, such as
 `git-maintenance@daily.timer`, stays readable, except an instance name that
@@ -434,12 +458,24 @@ stated limits are bound in the receipt. The reader does not open raw hook
 sources, client configuration, credentials, env files or crontab contents.
 
 State-root host receipts come only from the CC's sanitized
-`coordination/command-center/pages/host-receipts-index.json`. Its path/hash and
-each index-provided title/path/hash/byte count/mtime are retained in a separate
+`coordination/command-center/pages/host-receipts-index.json`. Its path and
+each index-provided title/path/byte count/mtime are retained in a separate
 collapsed detail table labelled `local host receipt (state root)`. Receipt
 hashes are declared by the index and mtime is file metadata; no referenced
 markdown bodies are opened, and no execution date, command, result or E2E
 acceptance is inferred. The mixed `e2e-truth-20261006` directory is excluded.
+
+The Architecture pages follow the composer's #161 rule: bytes read from the
+state root are private. Their footers print "private, not published (host
+state)" for the retained native manifest digest, and the custody table, the
+host-receipt table, the layer headers and every other cell print the same note
+for the SHA-256 of any record read from the state root (the adoption snapshot,
+the retained refresh projection, the automation projection, the host-receipt
+index and the receipts it declares) and "[digest prefix withheld]" for a prefix
+of one 7 or more hex characters long, such as a content-addressed snapshot
+name. The architecture receipt keeps every digest, and each detail page is
+named by the digest of the bytes it publishes (#1012 Claude micro at 38302cd2,
+(c); GPT fix3 verdict, BLOCKER 1).
 
 Architecture's native manifest identity and instance-to-role mapping come from
 the retained `research/fullspeed-20261008/g5-stars-gap/local-pages/refresh-receipt.json`
@@ -622,10 +658,11 @@ Every page distinguishes its generated refresh time from source-owned dates.
 The gap page preserves `updated_utc`; the sources page lists the date fields
 in each retained input when available. A roadmap without a source-owned snapshot date
 says so and identifies its file modification time as file metadata. Milestone
-dates remain event dates. The SHA in the footer of the Home, Readiness, Gap
-board, Roadmap and Fleet pages is the SHA-256 of the JSON produced by native
-`render`, rather than an invented readiness digest; the Command center and
-Sources pages print "private, not published (host state)" there (#161).
+dates remain event dates. The footer of every page names the native readiness
+manifest, the SHA-256 of the JSON produced by native `render` rather than an
+invented readiness digest, and prints "private, not published (host state)" in
+its place, since that JSON is rendered from the state root; the nonserved
+receipt keeps the digest (#161).
 Milestones preserve either a source `at` timestamp or the source `when` label,
 following the custodian's `cc-tools/roadmap/build_roadmap.py:284` schema. Relative
 `when` labels are displayed verbatim without inventing an ISO date. A milestone

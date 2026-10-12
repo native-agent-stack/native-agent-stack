@@ -470,6 +470,17 @@ class CommandCenterViewTests(unittest.TestCase):
         clean, _ = self.render()
         self.assertNotIn("omitted because an at sign", clean)
 
+    def test_long_tokens_dropped_for_private_decoded_text_are_counted_on_the_page(self):
+        # The GPT fix3 verdict at 38302cd2, BLOCKER 2 (fix3-pr1012-38302cd2a/VERDICT.md): a token over 4,096 characters
+        # whose decoded text is private is omitted whole; the page states how many, and the section reads partial.
+        current = current_fixture()
+        current["in_review"][0]["state"] = "x" * 4100 + "%2F".join(SYNTHETIC_HOME.split("/")) + "%2Fnotes"
+        markup, statuses = self.render(current=current)
+        self.assertNotIn("synthetic-user", decoded_text(markup))
+        self.assertIn("missing input: 1 long token omitted because the decoded text is private", markup)
+        self.assertEqual(statuses["cc-prs"]["status"], "partial")
+        self.assertIn("1 long token omitted for private text once decoded", statuses["cc-prs"]["detail"])
+
     def test_malformed_pr_rows_are_rejected_with_a_stated_gap(self):
         # Astra's first read of a737ef98 (P2, review_probes.py:31): rows that are not objects rendered "No pull requests
         # in review." as wired, while the strip counted them as two PRs.
@@ -614,8 +625,8 @@ class CommandCenterViewTests(unittest.TestCase):
         self.assertIn('<tr class="cc-ao-row">', markup)
 
     def test_skill_counts_and_install_state_follow_what_the_producer_measured(self):
-        # skill_usage.py counts Codex reads for every manifest skill (codex.enabled is the manifest's flag),
-        # and writes "not-measured" for Claude when /skill-doctor did not run (tools/skill-usage/skill_usage.py:544-592).
+        # skill_usage.py counts Codex reads for every manifest skill (codex.enabled is the manifest's flag), and writes
+        # "not-measured" for Claude when /skill-doctor did not run (tools/skill-usage/skill_usage.py:603, :615 and :652 at 900835c6).
         inputs = inputs_fixture()
         host = inputs["skills_host"]["document"]
         host["claude"] = {"measured": False}
@@ -632,6 +643,35 @@ class CommandCenterViewTests(unittest.TestCase):
         self.assertIn("install state not measured", rows["absent-skill"][8])
         self.assertNotIn("not installed", rows["absent-skill"][8])
         self.assertNotIn("install state not measured", rows["search-first"][8])
+
+    def test_lane_counts_survive_a_host_report_without_the_skill(self):
+        # The Claude micro at 38302cd2, (b) (pr1012-claude-micro-38302cd2.md): a skill the lane reports measured keeps
+        # those counts when the host report has no row for it; its other columns stay unmeasured.
+        inputs = inputs_fixture()
+        host = inputs["skills_host"]["document"]
+        host["skills"] = [row for row in host["skills"] if row["name"] != "search-first"]
+        markup, _ = self.render(inputs=inputs)
+        rows = {row[0].split(" ")[0]: row for row in table(markup, "The 8 skills pinned")[1:]}
+        self.assertEqual(rows["search-first"][2:9], ["not measured", "10", "202", "not measured", "not measured", "not measured", "in use"])
+
+    def test_a_current_daily_projection_makes_absent_or_stale_hourly_reports_no_gap(self):
+        # The Claude micro at 38302cd2, (b): the daily projection replaces the hourly reports while it is current, so an
+        # absent or stale hourly report it replaces reads "not used" and leaves the section wired.
+        inputs = inputs_fixture()
+        inputs["skills_daily"] = record(daily_fixture())
+        inputs["skills_codex_lanes"] = missing("state:coordination/command-center/skills/skill-usage-codex-lanes-latest.json")
+        inputs["skills_claude_lanes"]["document"]["window"]["until"] = "2026-10-11T09:00:00.000Z"
+        markup, statuses = self.render(inputs=inputs)
+        self.assertEqual(statuses["cc-skills"]["status"], "wired")
+        sources = {row[0].split(" (")[0]: " ".join(row) for row in table(markup, "Skill-count sources")[1:]}
+        for producer in ("skill_usage.py --lanes, 7 days", "child-usage.mjs --lanes-sweep, 7 days"):
+            self.assertIn("not used: the current daily projection above replaces this report", sources[producer])
+        self.assertIn("min old at this refresh", sources["skill_usage.py --run-skill-doctor --window 7"])
+        stale = copy.deepcopy(inputs)
+        stale["skills_daily"]["document"]["generated_at"] = "2026-10-09T00:00:00+00:00"
+        markup, statuses = self.render(inputs=stale)
+        self.assertEqual(statuses["cc-skills"]["status"], "partial")
+        self.assertIn("missing input: state:coordination/command-center/skills/skill-usage-codex-lanes-latest.json", markup)
 
     def test_skills_accept_the_daily_projection_and_keep_unscanned_roots_unknown(self):
         inputs = inputs_fixture()
@@ -773,6 +813,41 @@ class CommandCenterViewTests(unittest.TestCase):
         self.assertIn("missing input: cc-now.json#/mirrors/pins", markup)
         self.assertEqual(table(markup, "Workstreams WS1 to WS6")[2], ["WS2", "Second stream", "not recorded", "running", "not recorded", "not recorded"])
         self.assertEqual(table(markup, "Rulings and adjudications")[1][1], "05:59Z as recorded")
+
+    def test_run_pins_follow_the_final_stack_winner_run_field(self):
+        # The Claude micro at 38302cd2, (b) (pr1012-claude-micro-38302cd2.md): a run pin is resolved through the same-layer
+        # final-stack winner's run field, whose id can differ from the matrix component id, and a winner without a run
+        # shows its recorded run_reason.
+        inputs = inputs_fixture()
+        inputs["final_stack"] = record({"checked_at": "2026-10-11", "summary": {"layers": 1, "status": {"reopened": 1}},
+                                        "runs": [{"id": "codex-cli", "pin": "0.155.1"}, {"id": "drifted", "pin": "9.9.9"}],
+                                        "layers": [{"catalog": "foundation", "layer_id": "agent-sdks", "status": "reopened",
+                                                    "winners": [{"component_id": "codex", "run": "codex-cli", "run_reason": None},
+                                                                {"component_id": "drifted", "run": None, "run_reason": "unpinned"}]}]})
+        markup, _ = self.render(inputs=inputs)
+        rows = {row[0].split(" foundation/")[0].split(" us-equities/")[0]: row for row in table(markup, "Foundation and trading layers with the W6 final criteria")[1:]}
+        self.assertEqual(rows["Agent SDKs"][3], "codex: 0.155.1 drifted: not recorded unpinned unmirrored: not recorded")
+
+    def test_an_undated_read_queue_leaves_orchestration_partial(self):
+        # The Claude micro at 38302cd2, (b): only a read queue with a current generation time counts as recorded.
+        inputs = inputs_fixture()
+        inputs["read_queue"]["document"]["updated_utc"] = "not a time"
+        markup, statuses = self.render(inputs=inputs)
+        self.assertEqual(statuses["cc-orchestration"]["status"], "partial")
+        self.assertIn("read-queue-now.json has no parseable updated_utc", statuses["cc-orchestration"]["detail"])
+        self.assertIn("age unknown: no parseable generation time", section(markup, "cc-orchestration"))
+
+    def test_token_efficiency_rows_keep_their_own_mechanism(self):
+        # The Claude micro at 38302cd2, (b): an Adoption server row is labelled by its case-folded name, RTK included.
+        adoption = adoption_fixture()
+        adoption["layers"]["session context and token efficiency"]["servers"].update({
+            "rtk": {"claude_calls": 5, "claude_sessions": 2, "codex_calls": 3, "codex_conversations": 1},
+            "Headroom-Proxy": {"claude_calls": 1, "claude_sessions": 1, "codex_calls": 0, "codex_conversations": 0}})
+        markup, _ = self.render(adoption=adoption)
+        recorded = {row[1]: row[0] for row in table(markup, "Recorded tool reports and invocations")[1:]}
+        self.assertEqual(recorded["rtk invocations"], "RTK")
+        self.assertEqual(recorded["Headroom-Proxy invocations"], "Headroom")
+        self.assertNotIn("headroom_24h", recorded)
 
     def test_orchestration_shows_the_recorded_resolution_queues_and_role_counts(self):
         markup, statuses = self.render()
@@ -1040,12 +1115,29 @@ class CommandCenterComposerTests(unittest.TestCase):
         self.refresh()
         self.assertIn(html.escape(public, quote=True), (self.output / "command-center.html").read_text())
 
+    def test_entity_local_parts_in_long_tokens_never_reach_the_page_or_receipt(self):
+        # The GPT fix3 verdict at 38302cd2, BLOCKER 2 (fix3-pr1012-38302cd2a/VERDICT.md): no token over 4,096 characters
+        # reaches the page unchecked. The parts are unique, so the assertions need no address grammar.
+        self.add_sections()
+        self.write_inputs()
+        for entity in ("&#47;", "&#96;", "&#65;", "&sol;"):
+            for value in ("x" * 4100 + ":" + entity + AT + "zqdomain.example.org", "x" * 4100 + ":" + entity + "&#122;&#113;local" + AT + "zqdomain.example.org"):
+                with self.subTest(entity=entity, neighbour="local" in value):
+                    self.current["in_review"][0]["state"] = value
+                    self.current["waiting_on_owner"] = [{"what": value, "detail": value}]
+                    self.write_json(self.current_path, self.current)
+                    receipt = self.refresh()
+                    page = decoded_text((self.output / "command-center.html").read_text())
+                    self.assertNotIn("zq", page)
+                    self.assertIn("[email omitted]", page)
+                    self.assertNotIn("zq", decoded_text(json.dumps(receipt)))
+
     def test_composer_pages_withhold_every_digest_the_receipt_marks_private(self):
         # Astra's read of 51f85b5b, P1 2 (#161): sources.html published the SHA-256 of research-queue.tsv's raw bytes, so a
         # guessed private line could be confirmed. The command-center state inputs and cc-now.json are marked private and
         # keep their digests in the nonserved receipt only. Scope: the pages this composer builds; the architecture
-        # builder's custody pages are not in this output. Every other state-root input follows the same class rule in
-        # test_command_center_and_sources_serve_only_digests_of_published_bytes (Astra's read of 3d7b1e7a, P1 2).
+        # builder's pages follow the same rule in test_local_pages_architecture_read_boundary.py. Every other state-root
+        # input follows the same class rule in test_command_center_and_sources_serve_only_digests_of_published_bytes.
         self.add_sections()
         self.write_inputs()
         queue = self.state / "coordination/ns2604-coop/research-queue.tsv"
@@ -1114,13 +1206,39 @@ class CommandCenterComposerTests(unittest.TestCase):
                 self.assertEqual(served - published, set(), "a digest on this page is not that of bytes the repository publishes")
                 self.assertNotIn("zqprivate", decoded_text(page))
                 self.assertIn("<strong>Native readiness manifest SHA-256:</strong> <code>private, not published (host state)</code>", page)
-        for page in sorted(self.output.rglob("*.html")):
-            with self.subTest(everywhere=page.name):
-                self.assertEqual(set(re.findall(r"\b[0-9a-f]{64}\b", page.read_text())) & {item["sha256"] for item in state.values()}, set())
+        # Every published output, not only these two pages, withholds every private digest and any 7-character prefix of
+        # one (the GPT fix3 verdict at 38302cd2, BLOCKER 1); absence of the 7-character prefix covers every longer one.
+        outputs = sorted(path for path in self.output.rglob("*") if path.is_file())
+        self.assertEqual(len(outputs), len(receipt["outputs"]))
+        for path in outputs:
+            with self.subTest(everywhere=path.name):
+                text = path.read_text()
+                self.assertEqual([digest for digest in private_digests if digest[:7] in text], [])
+        heading = re.search(r'<h2 id="manifest-title"[^>]*>(.*?)</h2>', (self.output / "readiness.html").read_text()).group(1)
+        self.assertIn("private, not published (host state)", heading)
         sources = (self.output / "sources.html").read_text()
         for name in ("readiness", "evidence"):
             self.assertIn(hashlib.sha256((self.root / dict((n, r) for n, _, r, _, _ in BUILDER.COMMAND_CENTER_INPUTS)[name]).read_bytes()).hexdigest(), sources)
         self.assertEqual(receipt["outputs"]["command-center.html"]["sha256"], hashlib.sha256((self.output / "command-center.html").read_bytes()).hexdigest())
+
+    def test_content_addressed_names_of_private_inputs_withhold_their_digest_prefix(self):
+        # The Claude micro at 38302cd2, (d)3 (pr1012-claude-micro-38302cd2.md): a state-root receipt named by its own
+        # SHA-256 carried a 16-character prefix of a private digest onto the pages. No page carries one now, names included.
+        raw = self.gate.read_bytes()
+        named = self.state / ("gate-" + hashlib.sha256(raw).hexdigest()[:16] + ".json")
+        named.write_bytes(raw)
+        self.source_spec["sources"]["gate"] = {"root": "state", "path": named.name}
+        self.write_json(self.source_index, self.source_spec)
+        policy_document = json.loads(self.policy_path.read_text())
+        policy_document["sources"]["gate"] = [{"root": "state", "path": named.name}]
+        self.write_json(self.policy_path, policy_document)
+        receipt = self.refresh()
+        digest = hashlib.sha256(raw).hexdigest()
+        self.assertEqual(receipt["inputs"]["readiness:gate"]["sha256"], digest)  # the nonserved receipt keeps it
+        for page in sorted(self.output.rglob("*.html")):
+            with self.subTest(page=page.name):
+                self.assertNotIn(digest[:7], page.read_text())
+        self.assertIn("state:gate-[digest prefix withheld].json", (self.output / "sources.html").read_text())
 
     def test_registry_metadata_digests_of_the_state_root_are_withheld_on_sources(self):
         # The same class rule for the Fleet source notes: the role projection's registry files are read from the state root.

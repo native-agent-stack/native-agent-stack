@@ -370,6 +370,31 @@ def is_host_state(path: Any, state_root: Path) -> bool:
         return False
 
 
+def state_digests(state_root: Path, *values: Any) -> set[str]:
+    """Every SHA-256 the values record for bytes read from the state root (#161): from a record whose path lies under the
+    state root, whose root is "state" or that the receipt marks private, each field named for a SHA-256."""
+    found: set[str] = set()
+    def walk(value: Any) -> None:
+        if isinstance(value, dict):
+            path = value.get("path")
+            if value.get("private") is True or value.get("root") == "state" or isinstance(path, str) and Path(path).is_absolute() and is_host_state(path, state_root):
+                found.update(child.lower() for key, child in value.items() if "sha256" in str(key) and isinstance(child, str) and re.fullmatch(r"[0-9a-fA-F]{64}", child))
+            for child in value.values():
+                walk(child)
+        elif isinstance(value, (list, tuple)):
+            for child in value:
+                walk(child)
+    for value in values:
+        walk(value)
+    return found
+
+
+def withhold(outputs: dict[str, bytes], digests: set[str]) -> dict[str, bytes]:
+    """The HTML outputs with no private digest and no 7-character or longer prefix of one (#161)."""
+    return {name: sanitizer().withhold_digests(raw.decode("utf-8"), digests, PRIVATE_DIGEST).encode("utf-8") if name.endswith(".html") else raw
+            for name, raw in outputs.items()}
+
+
 def served_identity(item: dict[str, Any]) -> str:
     """What the composer's pages show for an input: its digest or status, or a withheld note if the receipt marks it private (#161).
 
@@ -620,20 +645,23 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
         sdk_projection = role_projection.get("sdk") or {}
         extras.append('<h3>SDK client observations</h3><p>' + esc(display(sdk_projection)) + '</p>')
         role_body += '<section id="adoption-native-tools"><h2>Native orchestration and SDK use</h2>' + ''.join(extras) + '<p>Unattributed instances remain unassigned; an absent producer measurement is unmeasured.</p></section>'
-    manifest_body = adoption_view.summary(adoption) + f'<section class="manifest-section" aria-labelledby="manifest-title"><h2 id="manifest-title" class="manifest-title">repository manifest at <code>{manifest_sha}</code>, dated receipts</h2><p><a href="sources.html#readiness">Source dates and retained receipt identities</a></p>' + readiness_body(native, manifest, current, view, fleet, source_dates=native_dates) + '</section>'
-    common = (refreshed, manifest_sha)
-    # The native manifest is the native builder's render of the state root, so its digest is private state too (#161): the
-    # command-center and sources pages withhold it, and the nonserved receipt keeps it.
+    # The native manifest is the native builder's render of the state root, so its digest is private state too (#161):
+    # no page prints it, and the nonserved receipt keeps it (#1012 GPT fix3 verdict, BLOCKER 1).
+    manifest_body = adoption_view.summary(adoption) + f'<section class="manifest-section" aria-labelledby="manifest-title"><h2 id="manifest-title" class="manifest-title">native readiness manifest, SHA-256 <code>{PRIVATE_DIGEST}</code>; dated receipts</h2><p><a href="sources.html#readiness">Source dates and retained receipt identities</a></p>' + readiness_body(native, manifest, current, view, fleet, source_dates=native_dates) + '</section>'
     withheld = (refreshed, PRIVATE_DIGEST)
     outputs = {
-        "index.html": document("index", "North-star readiness and next steps", "", current_scope, overview, *common, [], leading=index_leading),
+        "index.html": document("index", "North-star readiness and next steps", "", current_scope, overview, *withheld, [], leading=index_leading),
         "command-center.html": document("command-center", "Command center", "One view of lanes, PR waves, token savings, skill use, manifests and owner items.", current_scope, cc_body, *withheld, [], leading=cc_markup),
-        "readiness.html": document("readiness", "North-star readiness: what is done, what is left, what needs a decision", "", current_scope, manifest_body, *common, [], leading=view.render(current, workstation, validated=True, readings_normalized=True)),
-        "gaps.html": document("gaps", "Grand Gap Board", "Find the open gaps, who owns them and what happens next.", gap_scope, gap_body(rows(gaps, "gaps", ("id", "group", "sev", "title"))), *common, []),
-        "roadmap.html": document("roadmap", "Roadmap", "Read the dated milestones and server records.", road_scope, roadmap_body(roadmap), *common, []),
-        "fleet.html": document("fleet", "Worker fleet", "", 'Native fleet as of ' + str(fleet.get("at") or "not reported"), role_body, *common, [], leading=fleet_view.render(fleet)),
+        "readiness.html": document("readiness", "North-star readiness: what is done, what is left, what needs a decision", "", current_scope, manifest_body, *withheld, [], leading=view.render(current, workstation, validated=True, readings_normalized=True)),
+        "gaps.html": document("gaps", "Grand Gap Board", "Find the open gaps, who owns them and what happens next.", gap_scope, gap_body(rows(gaps, "gaps", ("id", "group", "sev", "title"))), *withheld, []),
+        "roadmap.html": document("roadmap", "Roadmap", "Read the dated milestones and server records.", road_scope, roadmap_body(roadmap), *withheld, []),
+        "fleet.html": document("fleet", "Worker fleet", "", 'Native fleet as of ' + str(fleet.get("at") or "not reported"), role_body, *withheld, [], leading=fleet_view.render(fleet)),
         "sources.html": document("sources", "Sources and dates", "Check the dates and identities behind each page.", 'Current view and dated repository receipts remain distinct.', source_body, *withheld, []),
     }
+    # No page carries a digest of private bytes or a prefix of one, such as a content-addressed receipt name: every
+    # rendering path above withholds them, and this pass guarantees it for each page (#1012 GPT fix3 verdict, BLOCKER 1).
+    private_digests = state_digests(state_root, inputs, fleet, role_projection, command_center) | {manifest_sha}
+    outputs = withhold(outputs, private_digests)
     for name in ("site.css", "site.js"):
         item = capture("asset:" + name, ASSETS / name)
         outputs["assets/" + name] = item["raw"]
@@ -673,7 +701,7 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
                 "current_observation": False}
             if not (output_dir / "architecture.html").exists():
                 body = '<section class="panel" id="architecture-custody"><h2>UNREPORTED</h2><p>The Architecture source view is unavailable. Other pages retain their own current observations.</p></section>'
-                outputs["architecture.html"] = document("architecture", "Architecture unavailable", "No current Architecture observation is reported.", "Source view unavailable; no gate or execution claim.", body, refreshed, manifest_sha, [])
+                outputs["architecture.html"] = withhold({"architecture.html": document("architecture", "Architecture unavailable", "No current Architecture observation is reported.", "Source view unavailable; no gate or execution claim.", body, *withheld, [])}, private_digests)["architecture.html"]
                 receipt_doc["outputs"]["architecture.html"] = {"sha256": hashlib.sha256(outputs["architecture.html"]).hexdigest(), "bytes": len(outputs["architecture.html"])}
                 receipt_doc["architecture"]["page_status"] = "unreported placeholder"
             else:
@@ -748,7 +776,8 @@ def main(argv: list[str] | None = None) -> int:
         parser.exit(1, f"local-pages: refresh failed ({type(error).__name__})\n")
     except (OSError, ValueError, KeyError, TypeError, AttributeError, ImportError) as error:
         parser.exit(1, f"local-pages: refresh failed ({type(error).__name__}): {error}\n")
-    print(json.dumps({"output_dir": str(output), "receipt": str(receipt), "generated_utc": result["generated_utc"], "native_readiness_manifest_sha256": result["native_readiness_manifest_sha256"], "pages": sum(1 for name in result["outputs"] if name.endswith(".html") and "/" not in name), "API_errors": result["workstation"].get("API_errors", []) + result["fleet"].get("API_errors", [])}, sort_keys=True))
+    # The run summary goes to the unit journal, so it names the receipt, which keeps the private native manifest digest (#161).
+    print(json.dumps({"output_dir": str(output), "receipt": str(receipt), "generated_utc": result["generated_utc"], "pages": sum(1 for name in result["outputs"] if name.endswith(".html") and "/" not in name), "API_errors": result["workstation"].get("API_errors", []) + result["fleet"].get("API_errors", [])}, sort_keys=True))
     return 0
 
 

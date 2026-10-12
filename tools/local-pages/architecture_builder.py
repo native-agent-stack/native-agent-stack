@@ -175,24 +175,35 @@ def build(root: Path, state_root: Path, output_dir: Path, receipt: Path,
     attribution = {"status": "retained window matches published observation" if window_matches else "unattributed", "reason": None if window_matches else "retained role projection window differs from the published observation window", "window": retained["window"], "source": {**retained["source"], "locator": "/adoption_role_attribution/instances/role_map"}}
     components = inventory.get("items", []) + [component for layer in model["layers"] for category in ("winners", "candidates", "alternatives", "rejected", "source_quality", "g5_candidates") for component in layer.get(category, []) if isinstance(component, dict)]
     _normalize_invocation_roles(components, retained["role_map"] if window_matches else {}, attribution)
+    # Bytes read from the state root are private (#161): the view withholds their digests and every prefix of one, and the
+    # nonserved receipt keeps them (#1012 Claude micro at 38302cd2, (c); GPT fix3 verdict, BLOCKER 1).
+    host_items = (model.get("host_receipts") or {}).get("items") or []
+    private = pages.state_digests(state_root, model, inventory, retained["source"], attribution) | {retained["manifest_sha256"].lower()}
+    private |= {item["sha256"].lower() for item in host_items if isinstance(item, dict) and isinstance(item.get("sha256"), str)}
     detail_outputs = {}
-    body, counts = load("architecture_view").render(model, inventory, first_layer, detail_outputs=detail_outputs)
+    body, counts = load("architecture_view").render(model, inventory, first_layer, detail_outputs=detail_outputs,
+                                                    withhold=lambda markup: pages.sanitizer().withhold_digests(markup, private, pages.PRIVATE_DIGEST))
     if first_layer is None and counts["rendered_layer_count"] != model["layer_count"]:
         raise ValueError("architecture section count differs from canonical landscape")
     if counts["rendered_layer_count"] == 0:
         raise ValueError("selected architecture layer does not exist")
     generated = datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
     manifest_sha = retained["manifest_sha256"]
+    # The retained native manifest digest is private host state (#161): the footers withhold it, and only the nonserved
+    # receipt keeps it (#1012 GPT fix3 verdict, BLOCKER 1).
+    footer_identity = pages.PRIVATE_DIGEST
     scope = "Builder reads dated landscape choices, current CC stage records and published invoke observations."
     style_raw = policy_module._read_regular(MANIFEST_STYLE, 1024 * 1024)
     style = "\n  <style>\n" + style_raw.decode("utf-8") + "  </style>"
-    html = pages.document("architecture", "Architecture by layer", "The whole stack first, then each layer's selected tools, alternatives, inventories and evidence.", scope, body, generated, manifest_sha, [], head=style)
+    html = pages.document("architecture", "Architecture by layer", "The whole stack first, then each layer's selected tools, alternatives, inventories and evidence.", scope, body, generated, footer_identity, [], head=style)
     builder_path = Path(__file__).resolve()
     outputs = {"architecture.html": html}
     for name, raw in detail_outputs.items():
         detail_body = '<p><a href="architecture.html">All Architecture layers</a></p><div id="architecture-detail-content">' + raw.decode("utf-8") + '</div>'
-        detail = pages.document("architecture", "Architecture component detail", "Expand a table to read its component evidence.", scope, detail_body, generated, manifest_sha, [])
+        detail = pages.document("architecture", "Architecture component detail", "Expand a table to read its component evidence.", scope, detail_body, generated, footer_identity, [])
         outputs[name] = detail.replace(b"<head>", b'<head>\n  <base href="../../">', 1).replace(b'href="#architecture-custody"', b'href="architecture.html#architecture-custody"')
+    outputs = pages.withhold(outputs, private)
+    html = outputs["architecture.html"]
     if len(html) >= 1_500_000:
         raise ValueError("initial Architecture HTML must be under 1500000 bytes")
     components = [item for item in inventory.get("items", []) if item.get("kind") == "component"]

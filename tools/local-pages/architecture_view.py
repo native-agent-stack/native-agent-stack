@@ -267,10 +267,11 @@ def _layer_detail(row: dict, items: list[dict], model: dict) -> str:
     return content
 
 
-def _deferred(key: str, label: str, content: str, outputs: dict[str, bytes] | None) -> str:
+def _deferred(key: str, label: str, content: str, outputs: dict[str, bytes] | None, withhold=lambda markup: markup) -> str:
     if outputs is None:
         return content
-    raw = content.encode("utf-8")
+    # The detail page is named by the digest of the bytes it publishes, after withholding.
+    raw = withhold(content).encode("utf-8")
     slug = re.sub(r"[^a-zA-Z0-9_-]+", "-", _sanitizer().text(key)).strip("-") or "detail"
     path = f'architecture/layers/{slug}-{hashlib.sha256(raw).hexdigest()[:16]}.html'
     outputs[path] = raw
@@ -286,7 +287,10 @@ def _local_host_receipts(host: dict) -> str:
 
 
 def render(model: dict, inventory: dict, first_layer: str | None = None,
-           detail_outputs: dict[str, bytes] | None = None) -> tuple[str, dict]:
+           detail_outputs: dict[str, bytes] | None = None, withhold=None) -> tuple[str, dict]:
+    """The page body and its counts. `withhold` projects rendered markup before it is published or a detail page is named;
+    the builder passes the private-digest withholding (#161)."""
+    withhold = withhold or (lambda markup: markup)
     mapped, unmapped = join_inventory(model, inventory)
     all_layers = model["layers"]
     selected = [row for row in all_layers if first_layer in (None, row["key"], row["layer_id"], row["catalog"] + "/" + row["layer_id"])]
@@ -301,7 +305,7 @@ def render(model: dict, inventory: dict, first_layer: str | None = None,
         both = sum(1 for item in candidates if isinstance(item, dict) and (item.get("invoke") or {}).get("calls", 0) is not None and (item.get("invoke") or {}).get("calls", 0) > 0 and (item.get("e2e") or {}).get("verified", False))
         body = f'<section class="architecture-layer" id="layer-{esc(key)}" data-layer="{esc(key)}"><header><h2>{esc(row["title"])}</h2><p class="architecture-layer-id">{esc(row["catalog"])} / {esc(row["layer_id"])}</p><p class="architecture-observation">Invoke snapshot {esc(value(observation.get("generated_utc")))} · SHA-256 <code>{esc(value(observation_source.get("sha256")))}</code></p><p><strong>{both} of {len(candidates)}</strong> source components with both recorded organic use and upstream E2E evidence.</p></header><dl class="architecture-choice"><div><dt>Current choice</dt><dd>{esc(value(row.get("current_choice")))}</dd></div><div><dt>Recorded verdict</dt><dd>{esc(value(row.get("verdict_status") or row.get("decision")))}</dd></div><div><dt>Requirement</dt><dd>{esc(value(row.get("requirement")))}</dd></div><div><dt>Reason</dt><dd>{esc(value(row.get("rationale")))}</dd></div></dl>'
         counts_text = f'Component tables · {len(row.get("winners") or [])} winners · {len(candidates)} landscape candidates · {len(grand)} G5 candidates · {len(mapped[key])} inventory items'
-        body += _deferred(key, counts_text, _layer_detail(row, mapped[key], model), detail_outputs)
+        body += _deferred(key, counts_text, _layer_detail(row, mapped[key], model), detail_outputs, withhold)
         body += '<p class="source-note">Catalog date ' + esc(value(row.get("checked_at"))) + '; source references ' + _source_refs(row) + '</p></section>'
         sections.append(body)
     design = model.get("design") or {}
@@ -322,9 +326,9 @@ def render(model: dict, inventory: dict, first_layer: str | None = None,
     local_items = host.get("items") or []
     local_source = next(iter(host.get("sources") or []), {})
     local_intro = f'<p>{len(local_items)} local host receipts · index <code>{esc(value(local_source.get("path")))}#{esc(value(local_source.get("sha256")))}</code></p>'
-    body += '<section id="architecture-local-host-receipts"><h2>Local host receipts</h2>' + local_intro + _deferred("local-host-receipts", f'Local host receipt metadata · {len(local_items)} records', _local_host_receipts(host), detail_outputs) + '</section>'
+    body += '<section id="architecture-local-host-receipts"><h2>Local host receipts</h2>' + local_intro + _deferred("local-host-receipts", f'Local host receipt metadata · {len(local_items)} records', _local_host_receipts(host), detail_outputs, withhold) + '</section>'
     unmapped_detail = _closed("Unmapped observed items", len(unmapped), _inventory_table(unmapped, "Unmapped observed items", model))
-    body += '<section id="architecture-unmapped"><h2>Unmapped inventory</h2><p>' + str(len(unmapped)) + ' items remain outside canonical joins and the committed mapping; each carries its specific reason.</p>' + (_deferred("unmapped", f'Unmapped observed items · {len(unmapped)} records', unmapped_detail, detail_outputs) if unmapped else '') + '</section>'
+    body += '<section id="architecture-unmapped"><h2>Unmapped inventory</h2><p>' + str(len(unmapped)) + ' items remain outside canonical joins and the committed mapping; each carries its specific reason.</p>' + (_deferred("unmapped", f'Unmapped observed items · {len(unmapped)} records', unmapped_detail, detail_outputs, withhold) if unmapped else '') + '</section>'
     unapproved = inventory.get("unapproved_counts") or {}
     unapproved_total = unapproved.get("total")
     counts_list = '<ul>' + ''.join(
@@ -335,6 +339,6 @@ def render(model: dict, inventory: dict, first_layer: str | None = None,
     excluded = [row for row in model.get("excluded_supplements") or [] if isinstance(row, dict)]
     exclusions = ('<p>Landscape files excluded by the source policy and never opened: ' + "; ".join(f'<code>{esc(row.get("path"))}</code> ({esc(row.get("reason"))})' for row in excluded) + '.</p>') if excluded else ''
     custody_detail = '<p>Installed frontend-design metadata: <code>' + design_text + '</code></p>' + exclusions + _closed("Architecture input custody", len(sources), custody)
-    body += '<section id="architecture-custody"><h2>Builder sources and design provenance</h2>' + _deferred("custody", f'Source custody · {len(sources)} records', custody_detail, detail_outputs) + '</section>'
+    body += '<section id="architecture-custody"><h2>Builder sources and design provenance</h2>' + _deferred("custody", f'Source custody · {len(sources)} records', custody_detail, detail_outputs, withhold) + '</section>'
     receipt = {"canonical_layer_count": len(all_layers), "rendered_layer_count": len(selected), "layer_keys": [row["key"] for row in selected], "mapped_inventory_occurrences": sum(len(items) for items in mapped.values()), "unmapped_inventory_items": len(unmapped), "unapproved_inventory_items": unapproved_total}
-    return body, receipt
+    return withhold(body), receipt

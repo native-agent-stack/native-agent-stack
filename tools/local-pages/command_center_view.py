@@ -493,10 +493,12 @@ def _tokens(current: dict, inputs: dict, adoption: dict, refreshed: Any) -> tupl
     for name, row in sorted(servers.items()):
         if not isinstance(row, dict):
             continue
-        mechanism = "Headroom" if "headroom" in name else "jCodeMunch" if "jcodemunch" in name else "Context Mode"
+        # Classified by the same case-folded names the filter above accepts, so each row keeps its own mechanism.
+        folded = name.casefold()
+        mechanism = "RTK" if "rtk" in folded else "Headroom" if "headroom" in folded else "jCodeMunch" if "jcodemunch" in folded else "Context Mode"
         calls = ('Claude ' + _cell_count(row.get("claude_calls")) + ' calls in ' + _cell_count(row.get("claude_sessions")) + ' sessions; Codex ' + _cell_count(row.get("codex_calls")) + ' calls in ' + _cell_count(row.get("codex_conversations")) + ' conversations')
         rows.append('<tr><th scope="row">' + esc(mechanism) + '</th><td>' + esc(name) + ' invocations</td><td>' + calls + '</td><td>' + adoption_window + '</td><td>adoption-now.json layers</td></tr>')
-    if efficiency is not None and isinstance(efficiency.get("headroom_24h"), str) and not any("headroom" in name for name in servers):
+    if efficiency is not None and isinstance(efficiency.get("headroom_24h"), str) and not any("headroom" in name.casefold() for name in servers):
         rows.append('<tr><th scope="row">Headroom</th><td>headroom_24h</td><td>' + esc(efficiency["headroom_24h"]) + '</td><td>24 h (from the field name)</td><td>cc-now.json token_efficiency</td></tr>')
     parts.append('<h3>Token-efficiency tool use, as recorded</h3>' + (_table("Recorded tool reports and invocations, each with its own window; nothing is summed", ["Mechanism", "Measure", "Value", "Window", "Source"], rows) if rows else _gap("token-window-now.json tool_reports and cc-now.json#/token_efficiency")))
     if efficiency is not None and isinstance(efficiency.get("fix"), str):
@@ -602,6 +604,12 @@ def _skill_model(inputs: dict, refreshed: Any) -> dict:
     # The daily projection (#970) is preferred when current, or when no hourly host report exists.
     if daily is not None and (fresh.get("skills_daily") or "skills_host" not in documents):
         model["producer"] = "skills_daily"
+        if fresh.get("skills_daily"):
+            # A current daily projection replaces the hourly reports, so one that is absent or stale is no gap of the
+            # counts shown (#1012 Claude micro at 38302cd2, (b)).
+            for index, (name, producer) in enumerate(SKILL_PRODUCERS.items()):
+                if name != "skills_daily" and not fresh.get(name):
+                    sources[index] = (producer, ('not used: the current daily projection above replaces this report', '', ''), None)
         measured = daily.get("measured") if isinstance(daily.get("measured"), dict) else {}
         claude_main, claude_sub = {}, {}
         for lane in daily.get("lanes") or []:
@@ -651,10 +659,18 @@ def _skill_model(inputs: dict, refreshed: Any) -> dict:
             "codex_reads": _count(week.get("skill_md_reads")) if codex_known and "skill_md_reads" in week else None,
             "codex_mentions": _count(week.get("name_mentions")) if codex_known and "name_mentions" in week else None,
             "codex_disabled": codex.get("enabled") is False}
-        # Installed means a skills-lock record or a row in Claude's /skill-doctor table. Without a
-        # measured table (skill_usage.py:556 writes "not-measured"), a skill with no lock record is unknown.
+        # Installed means a skills-lock record or a row in Claude's /skill-doctor table. Without a measured
+        # table (skill_usage.py:615 at 900835c6 writes "not-measured"), a skill with no lock record is unknown.
         claude_measured = isinstance(host.get("claude"), dict) and host["claude"].get("measured") is True and bool(claude)
         model["installed"][skill["name"]] = True if skill.get("installed_at") or claude.get("in_table") is True else False if claude_measured else None
+    # A skill the lane reports measured keeps those counts when the host report has no row for it; its other columns
+    # stay unmeasured (#1012 Claude micro at 38302cd2, (b)).
+    for name in sorted(set(claude_main or {}) | set(claude_sub or {})):
+        if name not in model["rows"]:
+            model["rows"][name] = {"claude_lifetime": None,
+                                   "claude_main": _count(claude_main.get(name, 0)) if claude_main is not None else None,
+                                   "claude_sub": _count(claude_sub.get(name, 0)) if claude_sub is not None else None,
+                                   "codex_use": None, "codex_reads": None, "codex_mentions": None, "codex_disabled": False}
     groups = codex_lanes.get("groups") if isinstance(codex_lanes, dict) and isinstance(codex_lanes.get("groups"), dict) else {}
     for label, group in groups.items():
         members = [(label.replace("_", " "), group)] if isinstance(group, dict) and "skill_md_reads" in group else [
@@ -948,6 +964,22 @@ def _platforms(winner: dict) -> str:
     return '<small>platforms: ' + (", ".join(pairs) if pairs else "not recorded") + '</small>'
 
 
+def _run_pin(component: Any, winner: Any, runs: dict) -> str:
+    """The run pin final-stack.json records for a matrix winner: its layer winner names the run in `run`.
+
+    The run is resolved through the same-layer winner's `run` field, whose id can differ from the matrix component id, and
+    a winner without a run shows its recorded `run_reason`. A layer that lists no such winner falls back to the run whose
+    id is the component id (#1012 Claude micro at 38302cd2, (b))."""
+    if isinstance(winner, dict):
+        run = runs.get(winner["run"]) if isinstance(winner.get("run"), str) else None
+        reason = winner.get("run_reason") if isinstance(winner.get("run_reason"), str) else ""
+    else:
+        run, reason = runs.get(component), ""
+    if isinstance(run, dict):
+        return esc(run.get("pin") or "unpinned")
+    return 'not recorded' + ('<small>' + esc(reason) + '</small>' if reason else '')
+
+
 def _recorded(field: Any) -> str:
     """A readiness-manifest field: its value when RECORDED, otherwise 'not recorded' with the reason."""
     if isinstance(field, dict) and field.get("status") == "RECORDED" and field.get("value") not in (None, ""):
@@ -982,6 +1014,7 @@ def _landscape(current: dict, inputs: dict) -> tuple[str, str, str, str]:
             convergence = row.get("convergence") if isinstance(row.get("convergence"), dict) else {}
             components = {item.get("id"): item for item in convergence.get("components") or [] if isinstance(item, dict)}
             grand_winners = {winner.get("component_id"): winner for winner in (grand_layers.get(key) or {}).get("winners") or [] if isinstance(winner, dict)}
+            final_winners = {winner.get("component_id"): winner for winner in (final_layers.get(key) or {}).get("winners") or [] if isinstance(winner, dict)}
             winners = [winner for winner in row.get("winners") or [] if isinstance(winner, dict)]
             cells, e2e, run_pins = [], [], []
             for winner in winners:
@@ -993,8 +1026,7 @@ def _landscape(current: dict, inputs: dict) -> tuple[str, str, str, str]:
                 cells.append('<li>' + esc(component) + ' @ ' + esc(winner.get("pin") or "unpinned") + '<small>' + esc(winner.get("evidence_class") or "class not recorded") + '</small>' + _stages(winner) + _platforms(winner) + behind + mirror + '</li>')
                 state = components.get(component) or {}
                 e2e.append('<li>' + esc(component) + ': host E2E ' + esc(state.get("host_e2e") or "not recorded") + ', pin current ' + esc(state.get("pin_current") or "not recorded") + '</li>')
-                run = runs.get(component)
-                run_pins.append('<li>' + esc(component) + ': ' + (esc(run.get("pin") or "unpinned") if isinstance(run, dict) else ('not recorded' if final is not None else 'pending final-stack.json')) + '</li>')
+                run_pins.append('<li>' + esc(component) + ': ' + (_run_pin(component, final_winners.get(component), runs) if final is not None else 'pending final-stack.json') + '</li>')
             terminal = final_layers.get(key)
             terminal_cell = ('<strong>' + esc(terminal.get("status")) + '</strong>' if isinstance(terminal, dict) and isinstance(terminal.get("status"), str)
                              else _unrecorded("absent from final-stack.json") if final is not None else esc(FINAL_STACK_PENDING))
@@ -1072,9 +1104,13 @@ def _orchestration(current: dict, inputs: dict, adoption: dict, refreshed: Any) 
     recorded += isinstance(landing, list)
     parts.append('<h3>Landing queue</h3>' + _rows_table("Pull requests queued to land, in the CC's order", landing, [("pr", "PR"), ("head", "Head"), ("state", "State"), ("since_utc", "Since")], missing="cc-now.json#/landing_queue", times=("since_utc",)))
     queue, queue_item = _input(inputs, "read_queue")
+    undated = False
     if isinstance(queue, dict):
-        recorded += 1
-        fresh, _ok = _freshness(queue.get("updated_utc"), refreshed, STALE_AFTER["read_queue"])
+        fresh, current_queue = _freshness(queue.get("updated_utc"), refreshed, STALE_AFTER["read_queue"])
+        # Only a queue with a current generation time counts as recorded, so an undated or stale queue leaves the
+        # section partial (#1012 Claude micro at 38302cd2, (b)).
+        recorded += current_queue
+        undated = _age(queue.get("updated_utc"), refreshed) is None
         slots = queue.get("slots")
         parts.append('<h3>GPT read queue</h3><p class="cc-source">read-queue-now.json updated ' + _when(queue.get("updated_utc")) + '; ' + fresh + '. Slots: ' + (_cell_count(slots) if not isinstance(slots, str) else esc(slots)) + '.</p>')
         parts.append(_rows_table("Reads running", queue.get("running"), [("read", "Read"), ("pr", "PR"), ("head", "Head"), ("tier", "Tier"), ("started_utc", "Started")], missing="read-queue-now.json running", times=("started_utc",)))
@@ -1093,8 +1129,10 @@ def _orchestration(current: dict, inputs: dict, adoption: dict, refreshed: Any) 
         parts.append('<h3>Orchestration tool calls by role</h3>' + _table("Native orchestration tool calls by role, " + (f"{hours} h" if _count(hours) is not None else "window not stated") + ", from adoption-now.json", ["Role", "Client", "Calls by tool"], rows))
     else:
         parts.append('<h3>Orchestration tool calls by role</h3>' + _gap("adoption-now.json orchestration"))
-    status = "missing" if recorded == 0 and orchestration is None else "wired" if recorded == 3 else "partial"
+    status = "missing" if recorded == 0 and orchestration is None and not isinstance(queue, dict) else "wired" if recorded == 3 else "partial"
     detail = "The orchestration slot's resolution is the CC's record; this page shows it and decides nothing."
+    if undated:
+        detail += " Partial because read-queue-now.json has no parseable updated_utc, so its queue is not shown as current."
     return status, detail, 'cc-now.json orchestration and landing_queue, the co-op read-queue-now.json and adoption-now.json.', "".join(parts)
 
 
@@ -1219,10 +1257,13 @@ def _derive(status: str, detail: str, body: str) -> tuple[str, str]:
     plain = [unescape(re.sub(r"<[^>]+>", "", match)) for match in _RENDERED_GAP.findall(body)]
     not_wired = [unescape(re.sub(r"<[^>]+>", "", match)) for match in _RENDERED_NOT_WIRED.findall(body)]
     stale = body.count('class="cc-stale">stale<')
-    # A value the shared sanitizer dropped because an at sign beside a word remained after masking (fail-closed).
+    # A value the shared sanitizer dropped because an at sign beside a word remained after masking, and a long token it
+    # dropped because its decoded text is private (both fail-closed).
     omitted = body.count(_sanitization.RESIDUE_OMITTED)
+    long_tokens = body.count(_sanitization.LONG_TOKEN_OMITTED)
     reasons = (["missing input: " + "; ".join(plain)] if plain else []) + (["not wired: " + ", ".join(not_wired)] if not_wired else []) + ([_plural(stale, "stale report", "stale reports")] if stale else []) \
-        + ([_plural(omitted, "value omitted", "values omitted") + " after masking"] if omitted else [])
+        + ([_plural(omitted, "value omitted", "values omitted") + " after masking"] if omitted else []) \
+        + ([_plural(long_tokens, "long token omitted", "long tokens omitted") + " for private text once decoded"] if long_tokens else [])
     derived = "partial" if reasons else "wired"
     final = max(status, derived, key=SEVERITY.__getitem__)
     if reasons and final != "wired":
@@ -1280,8 +1321,10 @@ def render(current: Any, fleet: Any, inputs: Any, *, adoption: Any = None, refre
     except PANEL_ERRORS as error:
         stamp, headline = 'Current view snapshot not reported', _gap("cc-now.json#/headline (" + type(error).__name__ + ")")
     omitted = sum(section.count(_sanitization.RESIDUE_OMITTED) for section in sections) + counts.count(_sanitization.RESIDUE_OMITTED) + headline.count(_sanitization.RESIDUE_OMITTED)
-    # The page states how many values it dropped, so a fail-closed omission is never silent.
+    long_tokens = sum(part.count(_sanitization.LONG_TOKEN_OMITTED) for part in sections + [counts, headline])
+    # The page states how many values and long tokens it dropped, so a fail-closed omission is never silent.
     residue = _gap(_plural(omitted, "value", "values") + " omitted because an at sign beside a word remained after masking") if omitted else ''
+    residue += _gap(_plural(long_tokens, "long token", "long tokens") + " omitted because the decoded text is private") if long_tokens else ''
     markup = (f'<section id="cc-view" class="cc-view" aria-labelledby="cc-title"><header class="page-header"><h1 id="cc-title">Command center</h1><p class="current-stamp">{stamp}</p>{headline}{residue}</header>'
               + counts + '<div class="cc-grid">' + "".join(sections) + '</div></section>')
     return markup, statuses

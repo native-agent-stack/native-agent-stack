@@ -8,7 +8,7 @@ import re
 from typing import Any
 import unittest
 from unittest.mock import patch
-from urllib.parse import quote
+from urllib.parse import quote, unquote
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -194,6 +194,53 @@ class SanitizationTests(unittest.TestCase):
             with self.subTest(public=public):
                 self.assertEqual(helper.text(long + " " + public), long + " " + public)
 
+    def test_tokens_over_the_decoding_bound_are_decoded_and_checked_before_publication(self):
+        # The GPT fix3 verdict at 38302cd2, BLOCKER 2 (fix3-pr1012-38302cd2a/VERDICT.md): no token over 4,096 characters is
+        # published unchecked. The control decodes with the pinned CPython modules (Lib/html/__init__.py and
+        # Lib/email/_parseaddr.py at cbc944f4, v3.13.16; the installed 3.13.16 files are byte-identical) and shows that
+        # each entity form is an address the pinned parser takes whole.
+        from email._parseaddr import AddressList
+        from html import unescape
+        helper = load_helper()
+        at, long = "@", "x" * 4100
+
+        def decoded(value: str) -> str:
+            for _ in range(2):
+                value = unescape(unquote(value))
+            return value
+
+        # Each value is unique in "zq", so no part of the address may remain once decoded: the second form's local part is
+        # partly entity-encoded, which the in-place mask alone left readable in front of its placeholder.
+        for entity in ("&#47;", "&#96;", "&#65;", "&sol;"):
+            address = unescape(entity) + at + "zqdomain.example.org"
+            self.assertEqual(AddressList(address).addresslist, [("", address)])
+            for value in (long + ":" + entity + at + "zqdomain.example.org", long + ":" + entity + "&#122;&#113;local" + at + "zqdomain.example.org"):
+                with self.subTest(entity=entity, value=value[-40:]):
+                    out = helper.text(value)
+                    self.assertNotIn("zq", decoded(out))
+                    self.assertTrue(out.endswith("[email omitted]"), out[-40:])
+        # Encodings only decoding shows: a double-encoded local-part character, at sign or dot, and a quoted local part in
+        # front of a long token whose at sign is double-encoded.
+        for value in (long + ":&amp;#122;&amp;#113;local" + at + "zqdomain.example.org", long + ":%26#122;%26#113;local" + at + "zqdomain.example.org",
+                      long + ":zqlocal&amp;#64;zqdomain.example.org", long + ":zqlocal" + at + "zqd.example&amp;#46;zqdomain.org",
+                      '"zqlocal one"&amp;#64;zqdomain.example.org' + long):
+            with self.subTest(value=value[-40:]):
+                out = helper.text(value)
+                self.assertNotIn("zq", decoded(out))
+                self.assertIn("[email omitted]", out)
+        # A long token whose decoded text, or the text it encodes as base64, holds another private value is omitted whole.
+        for value in (long + quote(SYNTHETIC_HOME + "/notes", safe=""), long + "%2D".join(SYNTHETIC_SESSION.split("-")),
+                      base64.b64encode((("zqlocal" + at + "zqdomain.example.org ") * 250).encode()).decode()):
+            with self.subTest(value=value[-40:]):
+                self.assertEqual(helper.text(value), helper.LONG_TOKEN_OMITTED)
+                self.assertEqual(helper.sanitize({"k": [value]}), {"k": [helper.LONG_TOKEN_OMITTED]})
+        self.assertEqual(helper.text(helper.LONG_TOKEN_OMITTED), helper.LONG_TOKEN_OMITTED)
+        # A long token whose decoded text holds nothing private stays as written, and an in-place mask keeps its prefix.
+        for public in (long + "%20and%20more", "https://medium.com/" + at + "someone.handle/a-post?" + "q=a%20b&" * 600, long + "&lt;" + at + "zqd.example.org"):
+            with self.subTest(public=public[-40:]):
+                self.assertEqual(helper.text(public), public)
+        self.assertEqual(helper.text(long + ":a;zqlocal" + at + "zqdomain.example.org"), long + ":a;[email omitted]")
+
     def test_systemd_template_unit_names_are_not_addresses(self):
         # The architecture layer pages list user timers such as git-maintenance@daily.timer; since the shared
         # mask (50977b00) they rendered as "[email omitted]" (9 cells on the live layer pages at 2dfb3c8c).
@@ -372,7 +419,8 @@ class SanitizationTests(unittest.TestCase):
 
     def test_the_path_segment_exemption_needs_a_slash_right_before_the_at_sign(self):
         # The CC's condition for the path-segment exemption (accepted 10-12): it fires only when the character right before the
-        # at sign is a slash, which no real mailbox has. gcloud keeps one directory per account, so an address that is itself a
+        # at sign is a slash (RFC 5322 allows a local part ending in one; that cost is recorded in #1012's Follow-ups).
+        # gcloud keeps one directory per account, so an address that is itself a
         # path segment (legacy_credentials/ + the account address + /adc.json) and x/ + an address + /y still mask. Outside a
         # URL the slash is part of the local part, so the directory prefix goes with the address: the first group pins that
         # cost. Inside a URL the slash ends the local part, so the prefix stays. The names are unique and built at run time.

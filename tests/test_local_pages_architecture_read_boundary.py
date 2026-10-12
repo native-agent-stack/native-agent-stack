@@ -257,6 +257,39 @@ class ArchitectureReadBoundaryTests(unittest.TestCase):
         self.assertIn(b"g5-stars-gap", emitted)
         self.assertFalse(any(Path(module["path"]).stem in {"adoption_roles", "build_readiness"} for module in result["modules"]))
 
+    def test_architecture_pages_withhold_the_retained_native_manifest_digest(self):
+        # The GPT fix3 verdict at 38302cd2, BLOCKER 1 (fix3-pr1012-38302cd2a/VERDICT.md): the retained native manifest digest
+        # is private host state, so no Architecture page prints it or a 7-character prefix of it; the receipt keeps it.
+        with self.read_guard():
+            result = builder.build(self.root, self.state, self.output, self.receipt)
+        self.assertEqual(result["native_readiness_manifest_sha256"], "a" * 64)
+        pages = sorted(self.output.rglob("*.html"))
+        self.assertGreater(len(pages), 1)
+        for page in pages:
+            with self.subTest(page=page.name):
+                text = page.read_text()
+                self.assertNotIn("a" * 7, text)
+                self.assertIn("<strong>Native readiness manifest SHA-256:</strong> <code>private, not published (host state)</code>", text)
+
+    def test_architecture_pages_withhold_every_state_root_digest_and_prefix(self):
+        # The Claude micro at 38302cd2, (c) (pr1012-claude-micro-38302cd2.md), and the GPT fix3 verdict, BLOCKER 1: bytes read
+        # from the state root are private (#161), so no Architecture output prints their digests, an index-declared host
+        # receipt digest, or a 7-character prefix of one, such as a content-addressed snapshot name; the receipt keeps them.
+        with self.read_guard():
+            result = builder.build(self.root, self.state, self.output, self.receipt)
+        private = {hashlib.sha256(path.read_bytes()).hexdigest() for path in self.state.rglob("*") if path.is_file()} | {"a" * 64, "b" * 64}
+        snapshot = hashlib.sha256(self.snapshot.read_bytes()).hexdigest()
+        self.assertIn(snapshot, json.dumps(result))
+        outputs = sorted(path for path in self.output.rglob("*") if path.is_file())
+        self.assertGreater(len(outputs), 3)
+        for path in outputs:
+            with self.subTest(output=path.name):
+                text = path.read_text()
+                self.assertEqual([digest[:7] for digest in sorted(private) if digest[:7] in text], [])
+        custody = next(path.read_text() for path in outputs if "Architecture input custody" in path.read_text())
+        self.assertIn("<td>private, not published (host state)</td>", custody)
+        self.assertIn("adoption-now-[digest prefix withheld].json", custody)
+
     def test_raw_role_receipts_are_not_read_for_retained_attribution(self):
         for relative in ("coordination/ns2604-coop/notes/parking-20261008/park-raw.json", "coordination/ns2604-coop/notes/capacity-ruling-20261008/relay-receipt.json", "coordination/ns2604-coop/lanes/hcom-lanes.json", "coordination/ns2604-coop/lanes/threads.json"):
             self.write(self.state, relative, {"lanes": [{"name": "beni", "lane": "unapproved"}]})

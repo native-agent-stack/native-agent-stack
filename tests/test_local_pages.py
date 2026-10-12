@@ -478,12 +478,10 @@ class LocalPagesTests(unittest.TestCase):
             self.assertTrue(any(attributes.get("lang") == "en" for attributes in audit.attributes))
             self.assertTrue(any(attributes.get("id") == "main-content" for attributes in audit.attributes))
             self.assertTrue(any(attributes.get("aria-label") == "Local pages" for attributes in audit.attributes))
-            if name in ("command-center", "sources"):
-                # #161: the native manifest is the native builder's render of the state root, so these two pages withhold its digest.
-                self.assertNotIn(expected, text)
-                self.assertIn("<strong>Native readiness manifest SHA-256:</strong> <code>private, not published (host state)</code>", text)
-            else:
-                self.assertIn(expected, text)
+            # #161: the native manifest is the native builder's render of the state root, so no page prints its digest (the GPT
+            # fix3 verdict at 38302cd2, BLOCKER 1); the nonserved receipt keeps it.
+            self.assertNotIn(expected, text)
+            self.assertIn("<strong>Native readiness manifest SHA-256:</strong> <code>private, not published (host state)</code>", text)
             self.assertIn("2030-01-02T03:04:05Z", text)
             for attributes in audit.attributes:
                 self.assertFalse(any(key.startswith("on") for key in attributes))
@@ -830,6 +828,18 @@ class LocalPagesTests(unittest.TestCase):
         self.assertEqual(result["inputs"]["native_source_index"]["sha256"], hashlib.sha256(override.read_bytes()).hexdigest())
         self.assertEqual((self.output / "assets/site.css").read_bytes(), (self.assets / "site.css").read_bytes())
         self.assertFalse((self.root / "tools/local-pages/assets").exists())
+
+    def test_cli_summary_names_the_receipt_without_the_private_manifest_digest(self) -> None:
+        # The GPT fix3 verdict at 38302cd2, BLOCKER 1 (#161): the native manifest digest is private, so the run summary the
+        # unit journal keeps names the nonserved receipt that holds it and prints no digest of private bytes.
+        stdout = io.StringIO()
+        with redirect_stdout(stdout):
+            self.assertEqual(BUILDER.main(["--root", str(self.root), "--state-root", str(self.state), "--output-dir", str(self.output), "--receipt", str(self.receipt)]), 0)
+        summary = json.loads(stdout.getvalue())
+        receipt = json.loads(self.receipt.read_text())
+        self.assertEqual(summary["receipt"], str(self.receipt))
+        private = {item["sha256"] for item in receipt["inputs"].values() if item.get("private") and item.get("sha256")} | {receipt["native_readiness_manifest_sha256"]}
+        self.assertEqual([digest for digest in private if digest[:7] in stdout.getvalue()], [])
 
     def test_cli_failure_is_finite_and_does_not_publish(self) -> None:
         self.gaps_path.write_text('{"gaps": [], "gaps": []}')

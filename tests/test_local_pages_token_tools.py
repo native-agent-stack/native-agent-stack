@@ -162,6 +162,20 @@ class TokenToolsTests(unittest.TestCase):
         public = {"url": "https://medium.com/" + at + "someone.handle/a-post", "import": "`" + at + "AGENTS.md`"}
         self.assertEqual(tools.scrub(public), public)
 
+    def test_entity_local_parts_in_long_tokens_are_masked_in_keys_and_values(self):
+        # The GPT fix3 verdict at 38302cd2, BLOCKER 2 (fix3-pr1012-38302cd2a/VERDICT.md): the token report shares the mask,
+        # so a token over 4,096 characters is decoded and checked before it reaches the file as a key or a value.
+        at = "@"
+        for entity in ("&#47;", "&#96;", "&#65;", "&sol;"):
+            for value in ("x" * 4100 + ":" + entity + at + "zqdomain.example.org", "x" * 4100 + ":" + entity + "&#122;&#113;local" + at + "zqdomain.example.org"):
+                with self.subTest(entity=entity, neighbour="local" in value):
+                    runner = Runner({"headroom " + AGENT: completed(0, json.dumps({value: value}))})
+                    serialized = json.dumps(tools.collect("rtk", "headroom", "node", None, timeout=5, runner=runner))
+                    for _ in range(2):
+                        serialized = html.unescape(unquote(serialized))
+                    self.assertNotIn("zq", serialized)
+                    self.assertIn("[email omitted]", serialized)
+
     def test_destination_refuses_a_parent_or_ancestor_that_links_into_the_repository(self):
         # Codex token_tools_now.py:160 and the micro's (a)2 at 50977b00: abspath() follows no symlink, so
         # <tmp>/state linked to the checkout let --out land inside the repository.
