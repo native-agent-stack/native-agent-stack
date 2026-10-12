@@ -300,9 +300,10 @@ and `--all` scans are prohibited locally. The dated measurement above of
 evidence, rather than a measurement of the current PR range.
 
 CI scans a verified PR-owned range and, on normal pushes, uses
-`--no-merges --first-parent <before>..<after>`. An all-zero or nonancestor
-`before` selects `-1`, scanning the head commit only. Scheduled and manually
-dispatched CI backstops use `--log-opts=HEAD`, limited to the checked-out
+`--diff-merges=first-parent <before>..<after>`, traversing all parent histories
+and emitting merge-resolution patches. An all-zero, unavailable or nonancestor
+`before` fails closed until a verified scanned boundary is available. Manually dispatched
+(`workflow_dispatch`) CI backstops use `--log-opts="--diff-merges=first-parent HEAD"`, limited to the checked-out
 commit's ancestry, never all fetched refs. These backstops are permitted only
 on CI runners. The former `--max-target-megabytes 2` option was a per-target
 skip threshold, not a process-memory limit. The current CI commands retain

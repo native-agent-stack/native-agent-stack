@@ -5201,8 +5201,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "6f657c06a52e66ee0287414dcc68d4701d3c58ea2d8366aac9d8aad4501cfca7",
-      "bytes": 41311
+      "sha256": "fb9e28b9012d90a12f85bbe7562b8b153d4791eba8f42871125ae72f985e0bb5",
+      "bytes": 41377
     },
     {
       "path": ".gitignore",
@@ -5211,8 +5211,8 @@
     },
     {
       "path": ".gitleaks.toml",
-      "sha256": "436e1b63a57e5682d508ea4ef6a72c9de9d81f9fdf19e001333c2dfcf0658429",
-      "bytes": 33415
+      "sha256": "96482136147070cd68f0369d628b20f37103db882edb310724cb74efee46b551",
+      "bytes": 33456
     },
     {
       "path": ".gitleaksignore",
@@ -5841,8 +5841,8 @@
     },
     {
       "path": "adoption/tools/README.md",
-      "sha256": "38676c51fe191baba6508c827a0900afd0dd9f2c6844cf726bd8055f656c439a",
-      "bytes": 42142
+      "sha256": "ed15bc47ab8ec76b7b7c997382f84d3592375e073b9ed1e9037077b5bf893b09",
+      "bytes": 42279
     },
     {
       "path": "adoption/tools/ecosystem-bounded-run",
@@ -11397,8 +11397,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261004.json",
-      "sha256": "7333a344d98538c6a3303811e987ac2f7c14105ae4a5acc193d7a97f1ce8a35c",
-      "bytes": 24821
+      "sha256": "ea9f669049ebbb8ff91d8e49f568bcf0210bff31678b2eb030dbb5fa71a2354d",
+      "bytes": 24713
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261011-skill-use-delta.json",
@@ -19117,8 +19117,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "6a8e43e9c2993e92f61969704b69afd2a3d14772e92709a36e0f4769d493c4fe",
-      "bytes": 105708
+      "sha256": "493052e05ac60606d3a0be4e6d3d9f83c02b40463c2c98e80508e793f560c5fc",
+      "bytes": 106136
     },
     {
       "path": "docs/grand-catalog-counts.md",
@@ -60952,8 +60952,8 @@
     },
     {
       "path": "scripts/ci_secret_scan_range.py",
-      "sha256": "2191d6814d972ceedaac6db4d28bf9e4e474fd72146f7f489c31c2fb4b1331a6",
-      "bytes": 8103
+      "sha256": "a3f6ad6cbc9cac0e48f3713c4d6ec10db0a17e9d58de0d2154d4c3ae8a9b19f7",
+      "bytes": 7976
     },
     {
       "path": "scripts/codex_quota.py",
@@ -61087,8 +61087,8 @@
     },
     {
       "path": "scripts/secret_scan_metrics.py",
-      "sha256": "89bd8c4f4d21d9328a8955d7a6103f10b7e4d921deaa8418a60181f0cf2cd774",
-      "bytes": 3590
+      "sha256": "183d6c2dd558062f118426ff79fd9cb8bdd22073d10b6158172e05ad91068388",
+      "bytes": 3904
     },
     {
       "path": "scripts/skills_status.py",
@@ -61757,8 +61757,8 @@
     },
     {
       "path": "tests/test_ci_secret_scan_range.py",
-      "sha256": "0a232c6a59491352cfb16cae82b8e02c06c36a1126dbce6f3ba971eab10da21c",
-      "bytes": 14570
+      "sha256": "f5a7f502d2d7211d06f785b676020c6351a8f2097223f993d853fe9f09130625",
+      "bytes": 15233
     },
     {
       "path": "tests/test_claude_federation_diagnostics.py",
@@ -62007,8 +62007,8 @@
     },
     {
       "path": "tests/test_gitleaks_config.py",
-      "sha256": "febb6a1a1b825fed8a864087051e6d9ce0883920f4092fa6f0356bca57226e79",
-      "bytes": 87498
+      "sha256": "4237c687d13336ad8a42a36c997cccdef752cde9b27851cb4b1f65ec894f7d1e",
+      "bytes": 87478
     },
     {
       "path": "tests/test_gitleaks_guarded_macos.py",
@@ -62667,13 +62667,13 @@
     },
     {
       "path": "tests/test_secret_scan_metrics.py",
-      "sha256": "0ce1a4e1be35cb2e1c38a580388b19c87993044f967eb119d77decc0ef08c086",
-      "bytes": 5392
+      "sha256": "0858dfdad1ae3a3aebd6e1cab97387240ba9922fed771da45074656f18b535e5",
+      "bytes": 5510
     },
     {
       "path": "tests/test_secret_scan_size.py",
-      "sha256": "6682a07928fd04d0fc128672540b05996a817caa5a75e0dff38e6b07a821928f",
-      "bytes": 22357
+      "sha256": "04461cda073dcd8604325c4cc19e163e529ef94026e50737c3499f8a28ec300a",
+      "bytes": 29349
     },
     {
       "path": "tests/test_security_identity.py",
@@ -62917,8 +62917,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "4292ab812135ee019dc13348c2deae44410b9ccbfc9f7b224537a8d8be0e6670",
-      "bytes": 150121
+      "sha256": "29379052d7cb2c51e33948175f28956d995f29ed74b936c29b9238d10aab70a8",
+      "bytes": 150255
     },
     {
       "path": "tests/test_workflow_policy.py",

@@ -1967,7 +1967,8 @@ class BetterleaksTrialJobTests(unittest.TestCase):
             for mode, expected in (("findings", 0), ("clean", 0), ("scan-error", 1)):
                 with self.subTest(step=name, mode=mode):
                     rc, output, summary = self.run_step(name, self.SCAN_STUB,
-                                                        {"STUB_MODE": mode, "STUB_REPORT": str(report)})
+                                                        {"STUB_MODE": mode, "STUB_REPORT": str(report),
+                                                         "SCAN_LOG_OPTS": "--diff-merges=first-parent " + "1" * 40 + ".." + "2" * 40})
                     self.assertEqual(rc, expected, output)
                     self.assertNotIn(sentinel, output + summary)
                     self.assertNotIn("first.txt", summary)

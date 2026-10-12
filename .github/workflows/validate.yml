@@ -412,7 +412,7 @@ jobs:
             --log-opts="$SCAN_LOG_OPTS" \
             --redact --no-banner --report-format json --report-path "$RUNNER_TEMP/gitleaks/gitleaks.json" || status=$?
           metrics_status=0
-          python3 scripts/secret_scan_metrics.py --scanner gitleaks --mode git --version 8.30.1 \
+          python3 scripts/secret_scan_metrics.py --scanner gitleaks --mode git --version 8.30.1 --history-scope="$SCAN_LOG_OPTS" \
             --timing "$RUNNER_TEMP/gitleaks/full-git.time.json" --output "$RUNNER_TEMP/gitleaks/full-git.metrics.json" \
             --report "$RUNNER_TEMP/gitleaks/gitleaks.json" --exit-status "$status" --timeout-minutes 10 || metrics_status=$?
           if [ "$status" -ne 0 ]; then exit "$status"; fi
@@ -607,7 +607,7 @@ jobs:
             --max-archive-depth 0 --gitleaks-ignore-path .gitleaksignore --log-opts="$SCAN_LOG_OPTS" \
             --redact --no-banner --report-format json --report-path "$report" --exit-code 0 || status=$?
           metrics_status=0
-          python3 scripts/secret_scan_metrics.py --scanner betterleaks --mode git --version 1.8.1 \
+          python3 scripts/secret_scan_metrics.py --scanner betterleaks --mode git --version 1.8.1 --history-scope="$SCAN_LOG_OPTS" \
             --timing "$RUNNER_TEMP/betterleaks/full-git.time.json" --output "$RUNNER_TEMP/betterleaks/full-git.metrics.json" \
             --report "$report" --exit-status "$status" --timeout-minutes 20 || metrics_status=$?
           if [ -s "$report" ]; then

@@ -1052,8 +1052,8 @@ class GitleaksLocalPrHistoryTests(unittest.TestCase):
             # gitleaks v8.30.1 report/finding.go lines 78-86; betterleaks v1.8.1 cmd/root.go line 589), and
             # the failure message names only non-secret fields.
             try:
-                findings = _scan_findings(["git", ".", "--config", str(CONFIG_PATH), "--max-target-megabytes", "2",
-                                           f"--log-opts={scope}"], report_path, cwd=ROOT)
+                findings = _scan_findings(["git", ".", "--config", str(CONFIG_PATH),
+                                           f"--log-opts=--diff-merges=first-parent {scope}"], report_path, cwd=ROOT)
             except _LockBusy as exc:
                 self.skipTest(f"gitleaks per-user lock held by another scan: {exc}")
             located = [(f.get("RuleID"), f.get("File"), f.get("StartLine"), f.get("Fingerprint")) for f in findings]
@@ -1070,8 +1070,8 @@ class GitleaksBranchAncestryHistoryTests(unittest.TestCase):
     """The real landed commit range must scan clean, independently of other refs.
 
     CI supplies GITLEAKS_HISTORY_RANGE and GITLEAKS_HISTORY_MODE from the event
-    helper. Range mode verifies and scans that window; intentional CI push-tip
-    and scheduled/manual backstop modes skip this duplicate scan because the
+    helper. Range mode verifies and scans that window; intentional CI
+    scheduled/manual backstop modes skip this duplicate scan because the
     main step performs it. A local run must supply its verified PR range
     explicitly; absence skips this integration check unless CI requires it.
     The 2026-10-09 full-history OOM incident replaced the former local
@@ -1085,14 +1085,14 @@ class GitleaksBranchAncestryHistoryTests(unittest.TestCase):
         self.history_range = os.environ.get("GITLEAKS_HISTORY_RANGE", "")
         required = bool(os.environ.get("GITLEAKS_TESTS_REQUIRED"))
         mode = os.environ.get("GITLEAKS_HISTORY_MODE", "" if required else "range")
-        if mode not in ("range", "tip", "full"):
+        if mode not in ("range", "full"):
             raise _ScannerError("the history integration check requires a recognized event scan mode")
         if mode != "range":
-            events = {"tip": ("push",), "full": ("schedule", "workflow_dispatch")}
+            events = {"full": ("schedule", "workflow_dispatch")}
             if os.environ.get("GITHUB_ACTIONS") != "true" or os.environ.get("GITHUB_EVENT_NAME") not in events[mode]:
-                raise _ScannerError("native tip/full history modes are permitted only for matching GitHub CI events")
+                raise _ScannerError("native full history mode is permitted only for matching GitHub CI events")
             if self.history_range:
-                raise _ScannerError("native tip/full history modes must not carry a commit range")
+                raise _ScannerError("native full history mode must not carry a commit range")
             self.skipTest(f"the main CI history step performs the intentional {mode} event scan")
         if not self.history_range:
             if required:
@@ -1126,8 +1126,8 @@ class GitleaksBranchAncestryHistoryTests(unittest.TestCase):
             # gitleaks v8.30.1 report/finding.go lines 78-86; betterleaks v1.8.1 cmd/root.go line 589), and
             # the failure message names only non-secret fields.
             try:
-                findings = _scan_findings(["git", ".", "--config", str(CONFIG_PATH), "--max-target-megabytes", "2",
-                                           f"--log-opts={self.history_range}", "--redact"], report_path, cwd=ROOT)
+                findings = _scan_findings(["git", ".", "--config", str(CONFIG_PATH),
+                                           f"--log-opts=--diff-merges=first-parent {self.history_range}", "--redact"], report_path, cwd=ROOT)
             except _LockBusy as exc:
                 self.skipTest(f"gitleaks per-user lock held by another scan: {exc}")
             located = [(f.get("RuleID"), f.get("File"), f.get("StartLine"), f.get("Fingerprint")) for f in findings]
@@ -1186,7 +1186,7 @@ class HistoryRangeContractTests(unittest.TestCase):
         scanner.assert_not_called()
 
     def test_intentional_native_modes_skip_only_for_matching_ci_events(self):
-        for mode, event in (("tip", "push"), ("full", "schedule"), ("full", "workflow_dispatch")):
+        for mode, event in (("full", "schedule"), ("full", "workflow_dispatch")):
             with self.subTest(mode=mode, event=event):
                 result, git, scanner = self.run_history_test("", mode=mode, github_actions=True, event=event)
                 self.assertEqual(len(result.skipped), 1)
@@ -1235,7 +1235,7 @@ class HistoryRangeContractTests(unittest.TestCase):
         self.assertEqual(result.failures + result.errors + result.skipped, [])
         self.assertEqual(git.call_count, 3)
         scanner.assert_called_once()
-        self.assertIn(f"--log-opts={value}", scanner.call_args.args[0])
+        self.assertIn(f"--log-opts=--diff-merges=first-parent {value}", scanner.call_args.args[0])
         self.assertIn("--redact", scanner.call_args.args[0])
 
 
@@ -1354,7 +1354,7 @@ class ScannerErrorTests(unittest.TestCase):
         output = stream.getvalue()
         self.assertEqual(len(argvs), 1, argvs)
         self.assertIn("--redact", argvs[0])
-        self.assertIn("--log-opts=" + "a" * 40 + "..HEAD", argvs[0])
+        self.assertIn("--log-opts=--diff-merges=first-parent " + "a" * 40 + "..HEAD", argvs[0])
         self.assertEqual(output.strip().splitlines()[-1], "FAILED (failures=1)")
         self.assertIn(finding["Fingerprint"], output)
         self.assertNotIn(sentinel, output)

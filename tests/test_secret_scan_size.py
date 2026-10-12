@@ -22,6 +22,7 @@ from unittest.mock import patch
 
 from tests.test_workflow_hardening import jobs, step_block, run_block
 from tests.test_gitleaks_config import GH_PAT_SHAPED_VALUE
+from tests import test_gitleaks_config as history_tests
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -31,6 +32,102 @@ CANARY = GH_PAT_SHAPED_VALUE
 SIZES = (2_000_001, 3_000_000)
 GITLEAKS = shutil.which("gitleaks")
 BETTERLEAKS = os.environ.get("BETTERLEAKS_TEST_BINARY")
+
+
+@unittest.skipUnless(GITLEAKS, "gitleaks not found on PATH")
+class CiSecretScanMergedHistoryTests(unittest.TestCase):
+    """Astra's add/remove and merge-resolution graphs, through the actual CI step."""
+
+    def test_large_removed_secrets_in_merged_histories_and_resolution_patches_are_detected(self):
+        with tempfile.TemporaryDirectory(prefix="ci-secret-merged-history-") as scratch:
+            base = Path(scratch)
+            repo = base / "repo"
+            repo.mkdir()
+            env = {"PATH": os.environ.get("PATH", os.defpath), "GIT_CONFIG_NOSYSTEM": "1",
+                   "GIT_CONFIG_GLOBAL": os.devnull, "GIT_AUTHOR_NAME": "Fixture",
+                   "GIT_AUTHOR_EMAIL": "fixture@example.invalid", "GIT_COMMITTER_NAME": "Fixture",
+                   "GIT_COMMITTER_EMAIL": "fixture@example.invalid", "TMPDIR": str(base)}
+
+            def git(*args, input=None):
+                result = subprocess.run(["git", *args], cwd=repo, env=env, input=input,
+                                        capture_output=True, text=True, timeout=15)
+                self.assertEqual(result.returncode, 0, "Fixture Git operation failed")
+                return result.stdout.strip()
+
+            git("init", "-q", "--object-format=sha1", "--initial-branch=main")
+            empty = git("mktree", input="")
+            raw = 'token = "' + CANARY + '"\n' + 'padding\n' * 375000
+            self.assertGreater(len(raw), 3_000_000)
+            blob = git("hash-object", "-w", "--stdin", input=raw)
+            secret_tree = git("mktree", input=f"100644 blob {blob}\tcanary.txt\n")
+
+            def commit(label, tree, *parents):
+                args = ["commit-tree", tree, "-m", label]
+                for parent in parents:
+                    args.extend(("-p", parent))
+                return git(*args)
+
+            root = commit("safe root", empty)
+            exposed = commit("synthetic addition", secret_tree, root)
+            clean = commit("synthetic removal", empty, exposed)
+            old = commit("old main", empty, root)
+            merge = commit("merge cleaned branch", empty, old, clean)
+            after = commit("clean after merge", empty, merge)
+            safe_side = commit("safe side", empty, root)
+            resolution = commit("synthetic merge resolution", secret_tree, old, safe_side)
+            resolution_clean = commit("remove resolution", empty, resolution)
+            checkout = commit("generated PR merge", empty, old, resolution_clean)
+            runner = base / "runner"
+            native = runner / "gitleaks"
+            native.mkdir(parents=True)
+            (native / "gitleaks").symlink_to(Path(GITLEAKS).resolve())
+            for relative in (".gitleaks.toml", ".gitleaksignore", "scripts/secret_scan_metrics.py",
+                             ".github/workflows/validate.yml"):
+                destination = repo / relative
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(ROOT / relative, destination)
+            script = run_block(step_block(jobs(WORKFLOW.read_text())["secret-scan"], "Scan git history"))
+            cases = (("push-merge-only", "push", {"before": old, "after": merge}, merge),
+                     ("push-merge-then-clean", "push", {"before": old, "after": after}, after),
+                     ("pr-resolution", "pull_request", {"pull_request": {
+                         "base": {"sha": root}, "head": {"sha": resolution_clean}}}, resolution_clean),
+                     ("pr-generated-merge", "pull_request", {"pull_request": {
+                         "base": {"sha": old}, "head": {"sha": resolution_clean}}}, checkout))
+            for label, event, payload, head in cases:
+                with self.subTest(case=label):
+                    git("update-ref", "refs/heads/main", head)
+                    git("update-ref", "refs/remotes/origin/main", head if event == "push" else root)
+                    event_path = base / "event.json"
+                    event_path.write_text(json.dumps(payload))
+                    selection = subprocess.run([sys.executable, "-B", str(ROOT / "scripts/ci_secret_scan_range.py"),
+                                                "--event-name", event, "--event-path", str(event_path)],
+                                               cwd=repo, env=env, capture_output=True, text=True)
+                    self.assertEqual(selection.returncode, 0, "Verified merge graph must be accepted")
+                    outputs = dict(line.split("=", 1) for line in selection.stdout.splitlines())
+                    result = subprocess.run(["bash", "--noprofile", "--norc", "-eo", "pipefail"],
+                                            input=script, cwd=repo, capture_output=True, text=True, timeout=60,
+                                            env={**env, "RUNNER_TEMP": str(runner), "SCAN_LOG_OPTS": outputs["log_opts"]})
+                    self.assertEqual(result.returncode, 1, "Actual CI history step must detect the removed synthetic secret")
+                    findings = json.loads((native / "gitleaks.json").read_text()) or []
+                    self.assertTrue(any(f.get("RuleID") == "github-pat" for f in findings),
+                                    "Actual CI history scan must report the synthetic detector")
+                    receipt = json.loads((native / "full-git.metrics.json").read_text())
+                    self.assertEqual(receipt["history_scope"], outputs["log_opts"])
+                    acceptance = unittest.TestResult()
+                    ci_env = {**env, "GITHUB_ACTIONS": "true", "GITHUB_EVENT_NAME": event,
+                              "GITLEAKS_TESTS_REQUIRED": "1", "GITLEAKS_HISTORY_RANGE": outputs["range"],
+                              "GITLEAKS_HISTORY_MODE": outputs["mode"]}
+                    with patch.object(history_tests, "ROOT", repo), \
+                            patch.object(history_tests, "CONFIG_PATH", repo / ".gitleaks.toml"), \
+                            patch.object(history_tests, "GITLEAKS", GITLEAKS), \
+                            patch.dict(os.environ, ci_env, clear=True), redirect_stdout(io.StringIO()):
+                        for cls in (history_tests.GitleaksLocalPrHistoryTests,
+                                    history_tests.GitleaksBranchAncestryHistoryTests):
+                            cls("test_head_ancestry_scoped_scan_has_zero_findings").run(acceptance)
+                    self.assertEqual(acceptance.errors, [])
+                    self.assertEqual(len(acceptance.skipped), 1 if event == "push" else 0)
+                    self.assertEqual(len(acceptance.failures), 1 if event == "push" else 2,
+                                     "Every applicable duplicate history scan must detect the large removed secret")
 
 
 def workflow_scanner_arguments(job, mode):
@@ -152,6 +249,8 @@ def scan_fixture(binary, job, mode, size, path="manifests/large-shape.json", *, 
                 receipt = json.loads((native / "full-git.metrics.json").read_text())
                 if not receipt:
                     raise AssertionError("Native workflow step did not retain its resource receipt")
+                if receipt.get("history_scope") != event_log_opts:
+                    raise AssertionError("Native receipt must record the verified event scope")
         else:
             result = subprocess.run(command, cwd=target, env=env, capture_output=True, text=True)
         if result.returncode not in (0, 1):

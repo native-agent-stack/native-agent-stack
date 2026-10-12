@@ -109,9 +109,9 @@
 # scanning the ancestry of the PR merge commit or main on push. The all-refs
 # default had let open PR #116's branch fail PR #117's required check.
 # Current policy, 2026-10-10: PRs scan a verified PR-owned range; normal pushes
-# use --no-merges --first-parent <before>..<after>. All-zero or nonancestor
-# before selects --log-opts=-1, the head commit only. Scheduled and manually
-# dispatched CI backstops use --log-opts=HEAD, the checked-out commit's ancestry,
+# use --diff-merges=first-parent <before>..<after>, traversing all parents.
+# All-zero, unavailable or nonancestor before fails closed. Manually dispatched
+# (workflow_dispatch) CI backstops use --log-opts="--diff-merges=first-parent HEAD", the checked-out commit's ancestry,
 # never all refs; those backstops are CI-only. Local scans use
 # --log-opts="<merge-base>..HEAD" only, never full history or --all.
 # The --max-target-megabytes 2 option is a per-target skip threshold, not an

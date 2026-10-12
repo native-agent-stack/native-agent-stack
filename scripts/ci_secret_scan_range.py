@@ -3,10 +3,12 @@
 
 The PR-range pattern follows us-equities-trading's ci.yml at
 1e600094bdd3764a73cc7a1ea4ff85186fc7d6ac. That reference scopes PRs only;
-pushes and CI backstops follow the CC's 2026-10-10 vendor baseline ruling
-(gitleaks/gitleaks-action src/gitleaks.js at bcfb9cce635345aac9996cedc19b2de8e01b894f).
+pushes require an available ancestor boundary and otherwise fail closed.
 Gitleaks v8.30.1 passes --log-opts to git log (sources/git.go at
-83d9cd684c87d95d656c1458ef04895a7f1cbd8e). Full backstops require both
+83d9cd684c87d95d656c1458ef04895a7f1cbd8e). Git v2.53.0 at
+67ad42147a7acc2af6074753ebd03d904476118f, Documentation/git-log.adoc,
+requires --diff-merges to emit merge patches; first-parent diff formatting
+does not restrict parent traversal. Full backstops require both
 --ci-backstop and GITHUB_ACTIONS=true; local scans remain PR-range only.
 """
 
@@ -94,9 +96,7 @@ def select_range(event_name: str, event: dict, *, ci_backstop: bool = False) -> 
         if not isinstance(before, str) or not SHA.fullmatch(before):
             raise RangeError("push.before must be a full commit SHA")
         if not before.strip("0"):
-            # The vendor baseline checks only the tip when there is no prior tip.
-            mode = "tip"
-            reason = "new-branch-head-only"
+            raise RangeError("New refs require a verified prior scanned boundary")
         else:
             before = before.lower()
             before_object = subprocess.run(
@@ -104,13 +104,7 @@ def select_range(event_name: str, event: dict, *, ci_backstop: bool = False) -> 
                 stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, check=False,
             )
             if before_object.returncode:
-                # A force push can orphan the old tip, so a fresh checkout may not
-                # contain it. Only GitHub's explicit boolean forced flag permits
-                # this unavailable-commit fallback; malformed/ordinary pushes fail.
-                if event.get("forced") is not True:
-                    raise RangeError("push.before is unavailable without a forced push")
-                mode = "tip"
-                reason = "force-push-unavailable-before-head-only"
+                raise RangeError("push.before is unavailable; complete coverage cannot be established")
             else:
                 if before_object.stdout.strip() != "commit":
                     raise RangeError("push.before must identify a commit object")
@@ -119,10 +113,7 @@ def select_range(event_name: str, event: dict, *, ci_backstop: bool = False) -> 
                     start = before
                     reason = "push-before"
                 else:
-                    # Rewritten history has no ordinary pushed range. Match the
-                    # CC's vendor baseline with a head-only scan, not a merge-base.
-                    mode = "tip"
-                    reason = "force-push-head-only"
+                    raise RangeError("Rewritten history requires a verified prior scanned boundary")
     elif event_name in ("workflow_dispatch", "schedule"):
         if not ci_backstop or os.environ.get("GITHUB_ACTIONS") != "true":
             raise RangeError("Full-history backstops require explicit CI authorization")
@@ -136,15 +127,21 @@ def select_range(event_name: str, event: dict, *, ci_backstop: bool = False) -> 
     if mode == "range":
         if not SHA.fullmatch(start) or not ancestor(start, head):
             raise RangeError("The scan start must be a commit ancestor of HEAD")
-        if start == head or not git("rev-list", "--max-count=1", f"{start}..{head}"):
+        if start == head:
             raise RangeError("The scan range is empty; refusing to report success")
         scan_range = f"{start}..{head}"
-        log_opts = f"--no-merges --first-parent {scan_range}" if event_name == "push" else scan_range
+        # Format merge patches against their first parent, while traversing all
+        # parents. --first-parent traversal or --no-merges loses reachable leaks.
+        log_opts = f"--diff-merges=first-parent {scan_range}"
     else:
         scan_range = ""
         # CC 2026-10-10 amendment: the CI backstop scans only the checkout's ancestry.
         # Unrelated lane refs must not turn a scheduled/dispatch run red.
-        log_opts = "-1" if mode == "tip" else "HEAD"
+        log_opts = "--diff-merges=first-parent HEAD"
+    # Validate the actual options sent to the scanner's git log, not an
+    # independently enumerated, less restrictive commit range.
+    if not git("log", "--format=%H", "--max-count=1", *log_opts.split()):
+        raise RangeError("The emitted scan selection is empty; refusing to report success")
     return {"mode": mode, "log_opts": log_opts, "start": start, "end": head,
             "range": scan_range, "reason": reason}
 

@@ -52,9 +52,9 @@ The Actions allow-list below was checked against live settings and pinned source
   and the final catalog's generator once it lands). `manifests/evidence.json` follows the hot-file protocol in
   [`docs/lanes.md`](lanes.md#hot-file-protocol).
 - **Secrets.** The required `secret-scan` job runs gitleaks 8.30.1 over a verified PR-owned history range or the
-  normal push's `--no-merges --first-parent <before>..<after>` range, plus the working tree and allowlist regression
-  tests. All-zero or nonancestor push `before` selects the head commit only (`-1`). Scheduled and manually
-  dispatched CI backstops scan checked-out `HEAD` ancestry, never all refs; local scans use the PR range only.
+  normal push's `--diff-merges=first-parent <before>..<after>` range, plus the working tree and allowlist regression
+  tests. Every parent history is traversed and merge patches are included. All-zero, unavailable or nonancestor push `before` fails closed. Manually dispatched
+  (`workflow_dispatch`) CI backstops scan checked-out `HEAD` ancestry, never all refs; local scans use the PR range only.
   `secret-scan-betterleaks` runs betterleaks v1.8.1 as a non-required, report-only trial;
   its fixture tests d2, d4 and d5 fail on every run, and its findings appear only as counts. GitHub secret scanning and
   push protection are on; non-provider patterns and validity checks are off.
@@ -488,13 +488,16 @@ both `--redact`. The checkout depth makes the range endpoints available; it
 does not choose the scan scope. Since 2026-10-10,
 [`scripts/ci_secret_scan_range.py`](../scripts/ci_secret_scan_range.py) selects
 a verified PR-owned range (the PR merge checkout's first parent through its
-merge commit), or `--no-merges --first-parent <before>..<after>` for a normal
-push. An all-zero or nonancestor push `before` selects `--log-opts=-1`, scanning
-the head commit only. A missing `before` permits that fallback only for an
-explicitly forced push; malformed or unavailable endpoints fail closed.
+merge commit), or `<before>..<after>` for a normal push. Both use
+`--diff-merges=first-parent` to emit merge-resolution patches while traversing
+every parent history. Git's [merge-diff documentation](https://github.com/git/git/blob/67ad42147a7acc2af6074753ebd03d904476118f/Documentation/git-log.adoc#L130)
+explains why plain patch output omits merges. This option formats the diff;
+it does not apply `--first-parent` traversal or `--no-merges` filtering.
+An all-zero, unavailable or nonancestor push `before` fails closed until
+complete coverage can be established; no successful head-only fallback is permitted.
 
-Scheduled and manually dispatched backstops are CI-only and use
-`--log-opts=HEAD`, scanning the checked-out commit's ancestry, never every
+Manually dispatched (`workflow_dispatch`) backstops are CI-only and use
+`--log-opts="--diff-merges=first-parent HEAD"`, scanning the checked-out commit's ancestry, never every
 fetched ref. Native Git follows parent links from the supplied commit, as
 [`rev-list-description.adoc`](https://github.com/git/git/blob/6de20f6092dcf9bdb1c8efe03db4b70c82b423dd/Documentation/rev-list-description.adoc#L1)
 defines; [`--all`](https://github.com/git/git/blob/6de20f6092dcf9bdb1c8efe03db4b70c82b423dd/Documentation/rev-list-options.adoc#L167)
@@ -890,8 +893,8 @@ of the current PR range. An earlier residual sibling-branch finding under the
 unrestricted default was not re-measured in that fix round and is not a
 current finding claim. The coordinator resolved the cross-branch check issue
 on 2026-09-23 by making CI scan `HEAD` ancestry. Since 2026-10-10 PR and normal
-push scans use verified event ranges, with head-only fallback for all-zero or
-nonancestor push `before`; only scheduled/manual CI backstops retain `HEAD`
+push scans use verified event ranges with merge patches and all parent histories.
+Unverified push boundaries fail closed; only manually dispatched CI backstops retain `HEAD`
 ancestry, never all refs (see above). Local scans use the PR range only and
 go through the guarded `gitleaks` launcher (memory-capped, one scan per user);
 do not raise its limits to retry a failed scan.
