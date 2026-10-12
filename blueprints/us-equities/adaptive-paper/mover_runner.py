@@ -46,6 +46,8 @@ _HERE = str(Path(__file__).resolve().parent)
 if _HERE not in sys.path:
     sys.path.insert(0, _HERE)
 import safety  # noqa: E402
+import runner as runner_module
+from exploration import config_digest, is_exploratory, receipt_labels, validate_exploratory_paths
 from mover import (EXIT_HEADROOM_FACTOR, PROTOCOL_ID, X1_FLATTEN_AT_ET, X2_HOLD_SECONDS,  # noqa: E402
                    X3_TRAIL_FRACTION, X4_STOP_FRACTION, X4_TARGET_FRACTION, MoverBook, MoverRefusal, Timing,
                    build_plan, engine_config, load_mover_config, load_scan, plan_session, session_state_after, text)
@@ -630,7 +632,10 @@ def _preflight_observer(attempts):
 # ---------------------------------------------------------------------------
 
 def command_check(args):
-    config, limits, settings = load_mover_config(args.config)
+    config, limits, settings = load_trial_config(args)
+    runner_module.RECEIPT_LABELS = receipt_labels(config)
+    if args.output:
+        validate_exploratory_paths(config, None, args.output)
     raw = args.scan.read_bytes()
     # --assume-fresh: load_scan evaluates the scan as of its own scan_time (now=None), so that
     # time comes from the same guarded parser and a malformed file is refused, not raised.
@@ -650,7 +655,7 @@ def command_check(args):
         print(json.dumps({"status": "refused", "reason": str(exc)}))
         return 2
     result = {"status": "valid", "freshness_checked": not args.assume_fresh, "scan_sha256": scan.sha256,
-              "config_sha256": _sha256(args.config.read_bytes()), "rule": plan.rule.text, "exit_rule": plan.exit_rule,
+              "config_sha256": config_digest(config, args.config.read_bytes(), limits=limits), "rule": plan.rule.text, "exit_rule": plan.exit_rule,
               "assumed": "session 1, equity = capital_usd, trial start = now",
               **plan_receipt(plan),
               "symbols": [{"symbol": s.scan.symbol, "rank": s.scan.rank, "leverage_i": text(s.leverage_i),
@@ -671,8 +676,15 @@ def command_paper(args):
         raise ValueError("invalid_trial_id")
     from transport import (AlpacaPaperTransport, TransportError, halt_statuses_supported, nasdaq_halt_seed,
                            preflight, fee_checkpoint)
-    config, limits, settings = load_mover_config(args.config)
-    config_sha = _sha256(args.config.read_bytes())
+    config, limits, settings = load_trial_config(args)
+    exploratory = is_exploratory(config)
+    runner_module.RECEIPT_LABELS = receipt_labels(config)
+    validate_exploratory_paths(config, args.state_root, args.output, live_dir=args.live_dir)
+    if exploratory and (args.gate_result is not None or args.snapshot is not None):
+        raise SafetyError("exploratory_qualification_forbidden")
+    if exploratory and safety.DEFAULT_STOP.exists():
+        raise SafetyError("global_stop_latched")
+    config_sha = config_digest(config, args.config.read_bytes(), limits=limits)
     try:
         raw = args.scan.read_bytes()
     except OSError:
@@ -702,7 +714,10 @@ def command_paper(args):
         return not_started(args.output, evidence_class="PAPER", reason="preflight_error:" + type(exc).__name__,
                            stage="preflight", config_sha256=config_sha, scan_sha256=scan_sha)
     summary = public_preflight(observation, probe_config)
+    summary.update(runner_module.RECEIPT_LABELS)
     summary.update(http=responses, config_sha256=config_sha, scan_sha256=scan_sha)
+    if exploratory:
+        summary["raw_config_sha256"] = _sha256(args.config.read_bytes())
     assets = {asset["symbol"]: asset for asset in observation["assets"]}
     tradable = [s for s in symbols if assets.get(s, {}).get("status") == "active"
                 and assets.get(s, {}).get("tradable") is True]
@@ -727,19 +742,25 @@ def command_paper(args):
                            config_sha256=config_sha, scan_sha256=scan_sha, preflight=summary)
     fingerprint = observation["account_identity_sha256"]
     with account_lock_fingerprint(fingerprint):
-        state_dir = args.state_root / fingerprint / "mover"
+        if exploratory and safety.DEFAULT_STOP.exists():
+            raise SafetyError("global_stop_latched")
+        state_dir = args.state_root / fingerprint / ("adaptive" if exploratory else "mover")
         metadata_path = state_dir / "trial.json"
-        if (args.state_root / fingerprint / "adaptive").exists() and not args.allow_shared_account:
+        if not exploratory and (args.state_root / fingerprint / "adaptive").exists() and not args.allow_shared_account:
             # The adaptive lane's own continuity check and snapshot reconciliation do not
             # tolerate another ledger's orders or cash changes on its account (see README-mover.md).
             return not_started(args.output, evidence_class="PAPER", reason="account_shared_with_adaptive_lane",
                                stage="trial_start", config_sha256=config_sha, scan_sha256=scan_sha, preflight=summary)
         previous = json.loads(metadata_path.read_text()) if metadata_path.exists() else None
+        if exploratory and previous is not None and (not isinstance(previous, dict)
+                or previous.get("paper_lane") != "B" or previous.get("evidence_class") != "exploratory"):
+            raise SafetyError("exploratory_trial_lineage_required")
         if previous is not None and (not isinstance(previous, dict) or previous.get("phase") != "finished"):
             return not_started(args.output, evidence_class="PAPER", reason="existing_trial_requires_explicit_recovery",
                                stage="trial_start", config_sha256=config_sha, scan_sha256=scan_sha, preflight=summary)
         try:
-            ledger = Ledger(state_dir / "ledger.sqlite3", limits)
+            ledger = Ledger(state_dir / "ledger.sqlite3", limits,
+                            **({"exploratory": True} if exploratory else {}))
         except SafetyError as exc:
             return not_started(args.output, evidence_class="PAPER", reason=str(exc), stage="trial_start",
                                config_sha256=config_sha, scan_sha256=scan_sha, preflight=summary)
@@ -796,7 +817,8 @@ def command_paper(args):
                 scan = replace(scan, symbols=tuple(s for s in scan.symbols if s.symbol in tradable))
                 plan = build_plan(settings, limits, scan, session_plan, trial_id=args.trial, evidence_class="PAPER",
                                   t0=now, equity=equity, engine_leverage_multiple=multiple)
-                ledger.begin_next_trial(now, args.trial)
+                ledger.begin_next_trial(now, args.trial,
+                    **({"config_sha256": config_sha, "limits": limits} if exploratory else {}))
             except (SafetyError, TransportError) as exc:
                 return not_started(args.output, evidence_class="PAPER", reason=str(exc), stage="trial_start",
                                    config_sha256=config_sha, scan_sha256=scan_sha, preflight=summary)
@@ -809,6 +831,8 @@ def command_paper(args):
                         "baseline_cash": format(baseline, "f"), "phase": "starting",
                         "inter_trial_cash_change_usd": None if inter_trial is None else format(inter_trial, "f"),
                         "lane_state": session_state_after(session_plan, equity_end=equity), "history": history}
+            if exploratory:
+                metadata["engine_kind"] = "mover"
             save(metadata_path, metadata)
             fee_window = fee_window_start(metadata)
             controller_close, market_open = _controller_session(close, now, session_policy)
@@ -899,8 +923,11 @@ def command_recover(args):
     global LAST_EVIDENCE_CLASS
     LAST_EVIDENCE_CLASS = "PAPER"
     from transport import AlpacaPaperTransport, TransportError, preflight
-    config, limits, settings = load_mover_config(args.config)
-    config_sha = _sha256(args.config.read_bytes())
+    config, limits, settings = load_trial_config(args)
+    exploratory = is_exploratory(config)
+    runner_module.RECEIPT_LABELS = receipt_labels(config)
+    validate_exploratory_paths(config, args.state_root, args.output)
+    config_sha = config_digest(config, args.config.read_bytes(), limits=limits)
     session_policy = validate_session_policy(config)
     key, secret = credentials(args.env_file)
     attempts, responses = [], []
@@ -918,7 +945,7 @@ def command_recover(args):
         return not_started(args.output, evidence_class="PAPER", reason=str(exc), stage="preflight")
     fingerprint = observation["account_identity_sha256"]
     with account_lock_fingerprint(fingerprint):
-        state_dir = args.state_root / fingerprint / "mover"
+        state_dir = args.state_root / fingerprint / ("adaptive" if exploratory else "mover")
         metadata_path = state_dir / "trial.json"
         if not metadata_path.exists():
             raise SafetyError("no_owned_trial_to_recover")
@@ -927,7 +954,10 @@ def command_recover(args):
         # its account mutex before Ledger initialization or durable reservations.
         if not isinstance(metadata, dict) or metadata.get("config_sha256") != config_sha:
             raise SafetyError("recovery_config_differs_from_frozen_trial")
-        ledger = Ledger(state_dir / "ledger.sqlite3", limits)
+        if exploratory and (metadata.get("paper_lane") != "B" or metadata.get("engine_kind") != "mover"):
+            raise SafetyError("recovery_engine_differs_from_frozen_trial")
+        ledger = Ledger(state_dir / "ledger.sqlite3", limits,
+                        **({"exploratory": True} if exploratory else {}))
         try:
             for attempt in attempts:
                 if attempt["kind"] != "data_read" and ledger.request_budget(attempt["timestamp"], "read"):
@@ -1005,8 +1035,10 @@ def command_synthetic(args):
     global LAST_EVIDENCE_CLASS
     LAST_EVIDENCE_CLASS = "SYN"
     from mover_simulation import MoverSimulatedPort
-    config, limits, settings = load_mover_config(args.config)
-    config_sha = _sha256(args.config.read_bytes())
+    config, limits, settings = load_trial_config(args)
+    runner_module.RECEIPT_LABELS = receipt_labels(config)
+    validate_exploratory_paths(config, None, args.output)
+    config_sha = config_digest(config, args.config.read_bytes(), limits=limits)
     raw = args.scan.read_bytes()
     now = time.time()
     try:
@@ -1084,11 +1116,27 @@ def build_parser():
     return parser
 
 
+def load_trial_config(args):
+    """Set labels and validate writable paths before any failure receipt or broker read."""
+    global LAST_OUTPUT
+    LAST_OUTPUT = None
+    raw = json.loads(args.config.read_text())
+    runner_module.RECEIPT_LABELS = receipt_labels(raw)
+    validate_exploratory_paths(raw, getattr(args, "state_root", None), getattr(args, "output", None),
+                               live_dir=getattr(args, "live_dir", None))
+    LAST_OUTPUT = getattr(args, "output", None)
+    loaded = load_mover_config(args.config)
+    runner_module.RECEIPT_LABELS = receipt_labels(loaded[0])
+    return loaded
+
+
 @runtime_read_locked
+@runner_module.receipt_scope
 def main(argv=None):
     global LAST_OUTPUT
+    runner_module.RECEIPT_LABELS = {}
     args = build_parser().parse_args(argv)
-    LAST_OUTPUT = getattr(args, "output", None)
+    LAST_OUTPUT = None
     if args.command in ("paper", "synthetic") and not TRIAL_ID.fullmatch(args.trial):
         raise ValueError("invalid_trial_id")
     if args.command == "synthetic" and not 1 <= args.hold_seconds <= 60:
@@ -1105,6 +1153,7 @@ if __name__ == "__main__":
         failure = {"schema_version": 1, "kind": "mover_trial_receipt", "protocol": PROTOCOL_ID,
                    "evidence_class": LAST_EVIDENCE_CLASS, "status": "failed", "error_type": type(exc).__name__,
                    "reason": _bounded_reason(exc), "reconciliation": "not_established"}
+        failure.update(runner_module.LAST_RECEIPT_LABELS)
         if LAST_OUTPUT is not None:
             save(LAST_OUTPUT, failure)
         print(json.dumps(failure))

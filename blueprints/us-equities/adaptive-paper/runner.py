@@ -30,6 +30,7 @@ from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 import hashlib
 import json
+from functools import wraps
 import os
 from pathlib import Path
 import re
@@ -44,6 +45,7 @@ from credential_source import (BASE_URL_VARIABLE, SOURCE_ENV_FILE, SOURCES as CR
                                CredentialSourceError, paper_base_url_reason, select_credentials, selection_error)
 from financing import MARGIN_RATES, overnight_financing_projection
 from feeds import require_qualified_stream
+from exploration import apply_exit_preset, config_digest, is_exploratory, receipt_labels, validate_exploratory_paths
 from leverage import LeveragePolicyError, next_lower_rung_ceiling, validate_leverage_policy
 from safety import (Ledger, Quote, RiskLimits, SafetyError, account_lock_fingerprint, DEFAULT_STOP,
                     execution_from_observation)
@@ -55,6 +57,23 @@ from transport import (AlpacaPaperTransport, TransportError, RejectedSubmission,
 
 SOURCE = Path(__file__).resolve().parent
 LAST_OUTPUT = None
+RECEIPT_LABELS = {}
+LAST_RECEIPT_LABELS = {}
+
+
+def receipt_scope(function):
+    """Keep opt-in labels inside one CLI invocation, including its callbacks."""
+    @wraps(function)
+    def call(*args, **kwargs):
+        global RECEIPT_LABELS, LAST_RECEIPT_LABELS
+        prior = RECEIPT_LABELS
+        RECEIPT_LABELS = {}
+        try:
+            return function(*args, **kwargs)
+        finally:
+            LAST_RECEIPT_LABELS = dict(RECEIPT_LABELS)
+            RECEIPT_LABELS = prior
+    return call
 # E4: how long entries wait at startup for the halt seed read (one halts feed request run
 # while the node connects) before the stream alone decides.
 HALT_SEED_WAIT_SECONDS = 3.0
@@ -73,6 +92,10 @@ def _seed_failure(exc):
 
 
 def save(path, data):
+    if RECEIPT_LABELS:
+        if data.get("evidence_class") not in (None, "exploratory"):
+            data.setdefault("execution_evidence_class", data["evidence_class"])
+        data.update(RECEIPT_LABELS)
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
     tmp = path.with_suffix(path.suffix + ".tmp")
@@ -356,6 +379,8 @@ def strategy_pool_and_selector(config, registry_entries, *, session="regular"):
 
 def load_config(path, *, registry_path=None):
     c = json.loads(Path(path).read_text())
+    is_exploratory(c)
+    apply_exit_preset(c, "adaptive")
     require_qualified_stream(c["feed"])
     # G-e: leverage above 1x is refused exactly as before UNLESS a
     # "leverage_policy" block is present, in which case it is deferred to
@@ -462,6 +487,10 @@ def load_config(path, *, registry_path=None):
                           exit_quote_age_seconds=risk.effective_exit_quote_max_age_seconds,
                           min_hold_seconds=c["min_hold_seconds"], max_hold_seconds=c["max_hold_seconds"],
                           stop_bps=c["stop_bps"], take_profit_bps=c["take_profit_bps"], trailing_bps=c["trailing_bps"],
+                          **({k: c[k] for k in ("vol_stop_multiplier", "vol_reference_bps", "stop_min_bps",
+                             "stop_max_bps", "trailing_min_bps", "trailing_max_bps", "take_profit_fraction",
+                             "time_decay_start_seconds", "time_decay_min_multiplier") if k in c}
+                             if c.get("resolved_exploratory_exit_preset") else {}),
                           gap_stop_enabled=gap_stop_enabled, exit_replace_enabled=exit_replace_enabled,
                           **({"leverage_policy_id": leverage.version} if leverage is not None else {}))
     if set(c["strategy_scope"]) != set(AdaptivePolicy.families):
@@ -2289,8 +2318,11 @@ def _controller_session(close, now, session_policy):
 
 
 @runtime_read_locked
+@receipt_scope
 def main():
-    global LAST_OUTPUT
+    global LAST_OUTPUT, RECEIPT_LABELS
+    RECEIPT_LABELS = {}
+    LAST_OUTPUT = None
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("command", choices=["preflight", "paper", "recover"])
     parser.add_argument("--credentials", choices=CREDENTIAL_SOURCES, default=SOURCE_ENV_FILE,
@@ -2319,10 +2351,19 @@ def main():
     problem = selection_error(args.credentials, args.env_file)
     if problem is not None:
         parser.error(problem)
-    LAST_OUTPUT = args.output
     if not re.fullmatch(r"[a-z0-9-]{1,24}", args.trial):
         raise ValueError("invalid_trial_id")
+    raw_config = json.loads(args.config.read_text())
+    exploratory = is_exploratory(raw_config)
+    RECEIPT_LABELS = receipt_labels(raw_config)
+    validate_exploratory_paths(raw_config, args.state_root, args.output, live_dir=args.live_dir)
+    LAST_OUTPUT = args.output
+    if exploratory and (args.gate_result is not None or args.snapshot is not None):
+        raise SafetyError("exploratory_qualification_forbidden")
+    if exploratory and args.command == "paper" and DEFAULT_STOP.exists():
+        raise SafetyError("global_stop_latched")
     config, limits, policy_config = load_config(args.config)
+    RECEIPT_LABELS = receipt_labels(config)
     session_policy = validate_session_policy(config)
     try:
         # Before credentials or any request: no order path without the boundary.
@@ -2365,9 +2406,12 @@ def main():
         print(json.dumps({k: result[k] for k in ("status", "stage", "reason", "orders_submitted")}))
         return 2
     summary = public_preflight(observation, config)
+    summary.update(RECEIPT_LABELS)
     summary["http"] = responses
     summary["order_contract"] = contract_status
-    summary["config_sha256"] = hashlib.sha256(args.config.read_bytes()).hexdigest()
+    summary["config_sha256"] = config_digest(config, args.config.read_bytes(), limits=limits)
+    if exploratory:
+        summary["raw_config_sha256"] = hashlib.sha256(args.config.read_bytes()).hexdigest()
     if args.command == "preflight":
         try:
             validate_preflight(observation, config, require_open=True, session_policy=session_policy)
@@ -2410,7 +2454,7 @@ def main():
     # A non-object state file (e.g. [] or null) is treated as no resumable phase,
     # so the strict flat-account gate applies.
     prior_phase = prior_metadata.get("phase") if isinstance(prior_metadata, dict) else None
-    prior_hold = bool(session_policy["overnight_holds"] and prior_phase == "held_overnight")
+    prior_hold = bool(not exploratory and session_policy["overnight_holds"] and prior_phase == "held_overnight")
     try:
         # allow_existing (recovery mode) stays scoped to --command recover
         # only; overnight_holds must not relax the cash/equity floor, window
@@ -2442,6 +2486,8 @@ def main():
             "policy_version": leverage_policy.version}
     fingerprint = observation["account_identity_sha256"]
     with account_lock_fingerprint(fingerprint):
+        if exploratory and args.command == "paper" and DEFAULT_STOP.exists():
+            raise SafetyError("global_stop_latched")
         state_dir = args.state_root / fingerprint / "adaptive"
         metadata_path = state_dir / "trial.json"
         previous_metadata = json.loads(metadata_path.read_text()) if metadata_path.exists() else None
@@ -2450,7 +2496,7 @@ def main():
         # overnight_holds invocation -- the D1 ledger-adoption path handles
         # picking the held position back up -- while every other non-finished
         # phase still requires explicit --command recover, unchanged.
-        resumable_hold = bool(previous_metadata and previous_metadata.get("phase") == "held_overnight"
+        resumable_hold = bool(not exploratory and previous_metadata and previous_metadata.get("phase") == "held_overnight"
                               and session_policy["overnight_holds"])
         if resumable_hold != prior_hold:
             raise SafetyError("trial_state_changed_during_preflight")
@@ -2459,7 +2505,14 @@ def main():
             raise SafetyError("existing_trial_requires_explicit_recovery")
         if args.command == "recover" and not metadata_path.exists():
             raise SafetyError("no_owned_trial_to_recover")
-        ledger = Ledger(state_dir / "ledger.sqlite3", limits)
+        if exploratory and args.command == "recover" and previous_metadata.get("engine_kind", "adaptive") != "adaptive":
+            raise SafetyError("recovery_engine_differs_from_frozen_trial")
+        if exploratory and previous_metadata is not None and (
+                previous_metadata.get("paper_lane") != "B"
+                or previous_metadata.get("evidence_class") != "exploratory"):
+            raise SafetyError("exploratory_trial_lineage_required")
+        ledger = Ledger(state_dir / "ledger.sqlite3", limits,
+                        **({"exploratory": True} if exploratory else {}))
         try:
             now = time.time()
             for attempt in attempts:
@@ -2516,7 +2569,8 @@ def main():
                                            - ledger.accounting().cash_delta_usd, "f")
                     now = time.time()
                 if previous_metadata:
-                    if previous_metadata["config_sha256"] != summary["config_sha256"]:
+                    if previous_metadata["config_sha256"] != summary["config_sha256"] and (
+                            not exploratory or resumable_hold):
                         raise SafetyError("next_trial_config_differs_from_frozen_limits")
                     if (ledger.positions() or ledger.unresolved()) and not resumable_hold:
                         raise SafetyError("next_trial_requires_recovery")
@@ -2547,13 +2601,18 @@ def main():
                     held_resume_matches_ledger(ledger, observation)
                     ledger.resume_held_trial(now, args.trial)
                 else:
-                    ledger.begin_next_trial(now, args.trial)
-                metadata = {"trial_id": args.trial,
+                    ledger.begin_next_trial(now, args.trial,
+                        **({"config_sha256": summary["config_sha256"], "limits": limits} if exploratory else {}))
+                metadata = {**({k: previous_metadata[k] for k in ("lane_state", "history")
+                               if previous_metadata and k in previous_metadata} if exploratory else {}),
+                            "trial_id": args.trial,
                             "started_at": previous_metadata["started_at"] if previous_metadata else now,
                             "current_trial_started_at": now, "config_sha256": summary["config_sha256"],
                             "fee_window_start": fee_start,
                             "baseline_cash": previous_metadata["baseline_cash"] if previous_metadata else baseline_cash,
                             "phase": "starting"}
+                if exploratory:
+                    metadata["engine_kind"] = "adaptive"
                 save(metadata_path, metadata)
             def fresh_port(recovering=False):
                 needed = sorted(set(ledger.positions()) | {i.symbol for i in ledger.unresolved()})
@@ -2658,6 +2717,7 @@ if __name__ == "__main__":
         # Never serialize arbitrary provider exception text or request headers.
         failure = {"status": "failed", "error_type": type(exc).__name__,
                    "reconciliation": "not_established"}
+        failure.update(LAST_RECEIPT_LABELS)
         if LAST_OUTPUT is not None:
             save(LAST_OUTPUT, failure)
         print(json.dumps(failure))

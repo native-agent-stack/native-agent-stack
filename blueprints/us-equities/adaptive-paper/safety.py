@@ -10,6 +10,7 @@ from dataclasses import asdict, dataclass
 from datetime import date, datetime, timezone
 from decimal import Decimal, localcontext
 import fcntl
+import errno
 import hashlib
 import json
 import math
@@ -295,7 +296,9 @@ class RiskLimits:
         and compared byte-for-byte against a mismatched reopen. Absent
         optional leverage and exit-age values are omitted, preserving old
         ledger bytes for unchanged defaults. An explicit exit-age value is
-        frozen and requires the same limits when the ledger is reopened."""
+        frozen and requires the same limits when the default ledger is reopened.
+        Explicit lane-B journals retain those bytes until a reconciled next-trial
+        transition atomically registers the new config and limits."""
         d = asdict(self)
         if d["leverage"] is None:
             del d["leverage"]
@@ -437,11 +440,30 @@ class Ledger:
     SQLite transactions protect risk reservations even across connections. The
     caller also holds account_lock for the entire account-writer lifetime.
     """
-    def __init__(self, db_path, limits=None):
+    def __init__(self, db_path, limits=None, *, exploratory=False):
         self.path = Path(db_path)
         self.limits = limits or RiskLimits()
         if not isinstance(self.limits, RiskLimits):
             raise SafetyError("risk_limits_required")
+        self.exploratory = exploratory
+        if type(exploratory) is not bool:
+            raise SafetyError("invalid_exploratory_mode")
+        if self.path.exists():
+            if self.path.is_symlink():
+                raise OSError(errno.ELOOP, "ledger_symlink_refused")
+            # Refuse cross-lane adoption before schema/WAL operations can touch
+            # another lane's retained journal. Read-only URI uses escaped paths.
+            probe = sqlite3.connect(self.path.resolve().as_uri() + "?mode=ro", uri=True)
+            try:
+                has_meta = probe.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='meta'").fetchone()
+                row = probe.execute("SELECT value FROM meta WHERE key='paper_lane'").fetchone() if has_meta else None
+                lane = row[0] if row else None
+                if exploratory and lane != "B":
+                    raise SafetyError("exploratory_journal_required")
+                if not exploratory and lane == "B":
+                    raise SafetyError("exploratory_journal_requires_lane_b")
+            finally:
+                probe.close()
         self.path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
         fd = os.open(self.path, os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600)
         os.close(fd)
@@ -476,9 +498,30 @@ class Ledger:
             frozen = self.limits.frozen_json()
             with self._transaction():
                 previous = self._get("limits")
+                lane = self._get("paper_lane")
+                if exploratory and previous is not None and lane != "B":
+                    raise SafetyError("exploratory_journal_required")
+                if not exploratory and lane == "B":
+                    raise SafetyError("exploratory_journal_requires_lane_b")
                 if previous is not None and previous != frozen:
-                    raise SafetyError("persisted_risk_limits_differ")
-                self._set("limits", frozen)
+                    if not exploratory:
+                        raise SafetyError("persisted_risk_limits_differ")
+                    # Open under the OLD bounds. The runner must reconcile fees/cash
+                    # before register_exploratory_config may install the next bounds.
+                    data = json.loads(previous)
+                    if data.get("leverage") is not None:
+                        block = data["leverage"]
+                        block["max_leverage"] = D(block["max_leverage"])
+                        block["overnight_max_leverage"] = D(block["overnight_max_leverage"])
+                        block["schedule"] = tuple((s, tuple((r, D(v)) for r, v in row))
+                                                  for s, row in block["schedule"])
+                        block["ladder"] = tuple((D(a), D(b)) for a, b in block["ladder"])
+                        data["leverage"] = LeveragePolicy(**block)
+                    self.limits = RiskLimits(**data)
+                else:
+                    self._set("limits", frozen)
+                if exploratory:
+                    self._set("paper_lane", "B")
                 version = self._get("schema_version")
                 if version not in (None, "1", "2", "3"):
                     raise SafetyError("unsupported_ledger_schema")
@@ -628,14 +671,68 @@ class Ledger:
             self._event("recovery_started", at=now, cleanup_seconds=self.limits.cleanup_seconds)
             return now
 
-    def begin_next_trial(self, now, trial_id):
+    def register_exploratory_config(self, config_sha256, limits, now):
+        """Register a config namespace on the SAME journal after external reconciliation.
+
+        Caller holds the account lock, has a finished trial and fresh flat broker
+        state, and has booked/reconciled fees and baseline cash. No accounting,
+        request history, halt or STOP state is reset. Default journals stay frozen.
+        """
+        with self._limits_transaction():
+            self._register_exploratory_config(config_sha256, limits, now)
+
+    @contextmanager
+    def _limits_transaction(self):
+        previous = self.limits
+        try:
+            with self._transaction():
+                yield
+        except BaseException:
+            self.limits = previous
+            raise
+
+    def _register_exploratory_config(self, config_sha256, limits, now):
+        if not self.exploratory or not isinstance(limits, RiskLimits):
+            raise SafetyError("exploratory_journal_required")
+        if type(config_sha256) is not str or not re.fullmatch("[0-9a-f]{64}", config_sha256):
+            raise SafetyError("invalid_config_namespace")
+        now = instant(now)
+        # Caller holds the transaction shared with trial admission.
+        if self._positions() or any(not i.terminal for i in self.intents()):
+            raise SafetyError("next_trial_requires_flat_and_terminal")
+        if limits.capital_usd != self.limits.capital_usd:
+            raise SafetyError("exploratory_capital_continuity_required")
+        state = self._state()
+        if state.halted_reason not in (None, "recovery_only"):
+            raise SafetyError("next_trial_cannot_clear_risk_halt")
+        if state.gross_loss_usd >= limits.max_gross_loss_usd or state.drawdown_usd >= limits.max_drawdown_usd:
+            raise SafetyError("next_trial_risk_budget_exhausted")
+        history = json.loads(self._get("exploratory_config_history") or "[]")
+        registered = self._get("exploratory_config:" + config_sha256)
+        if registered is not None and registered != limits.frozen_json():
+            raise SafetyError("config_namespace_limits_conflict")
+        if config_sha256 not in history:
+            history.append(config_sha256)
+        self._set("exploratory_config_history", json.dumps(history))
+        self._set("exploratory_config:" + config_sha256, limits.frozen_json())
+        self._set("limits", limits.frozen_json())
+        self._event("exploratory_config_registered", at=now, config_sha256=config_sha256,
+                    paper_lane="B", evidence_class="exploratory")
+        self.limits = limits
+
+    def exploratory_config_history(self):
+        """Registered namespaces in order; all share this journal's account lineage."""
+        return json.loads(self._get("exploratory_config_history") or "[]")
+
+    def begin_next_trial(self, now, trial_id, *, config_sha256=None, limits=None):
         """Start an explicitly requested new bounded trial in the SAME account DB.
 
         Caller must have stopped admissions, held the writer lock, and observed
         fresh broker flat/idle cash/position reconciliation before invoking this.
         Durable risk, fill accounting and request history are never reset.
         """
-        return self._begin_trial(now, trial_id, require_flat=True, event_kind="next_trial_started")
+        return self._begin_trial(now, trial_id, require_flat=True, event_kind="next_trial_started",
+                                 config_sha256=config_sha256, limits=limits)
 
     def resume_held_trial(self, now, trial_id):
         """S2: start an explicitly requested new bounded trial that
@@ -656,11 +753,11 @@ class Ledger:
         """
         return self._begin_trial(now, trial_id, require_flat=False, event_kind="held_trial_resumed")
 
-    def _begin_trial(self, now, trial_id, *, require_flat, event_kind):
+    def _begin_trial(self, now, trial_id, *, require_flat, event_kind, config_sha256=None, limits=None):
         now = instant(now)
         if type(trial_id) is not str or not re.fullmatch(r"[a-z0-9-]{1,24}", trial_id):
             raise SafetyError("invalid_trial_id")
-        with self._transaction():
+        with self._limits_transaction():
             if self.db.execute("SELECT 1 FROM trials WHERE trial_id=?", (trial_id,)).fetchone():
                 raise SafetyError("trial_id_already_used")
             start = self._get("trial_start")
@@ -676,6 +773,8 @@ class Ledger:
             if (state.gross_loss_usd >= self.limits.max_gross_loss_usd or
                     state.drawdown_usd >= self.limits.max_drawdown_usd):
                 raise SafetyError("next_trial_risk_budget_exhausted")
+            if config_sha256 is not None or limits is not None:
+                self._register_exploratory_config(config_sha256, limits, now)
             self.db.execute("INSERT INTO trials VALUES (?,?)", (trial_id, now))
             self._set("trial_start", now)
             self._set("trial_id", trial_id)

@@ -35,14 +35,20 @@ readiness checks.
 
 ## Remaining execution work
 
-- No runner or configuration alias for the exploratory paper runs has been
-  verified. This change does not select an account or operate the frozen
-  qualification trials' state.
-- The existing config-hash continuity check still raises
-  `next_trial_config_differs_from_frozen_limits` for a changed configuration on
-  the same account's next trial. Removing mandatory qualification does not
-  enable same-account preset/rung rotation. Retain the account's existing state
-  root and ledger, fee and cash continuity when resolving that limitation.
+- The explicit configuration pair `paper_lane: "B"` and
+  `evidence_class: "exploratory"` selects the same-account exploratory path.
+  Use one stable `<state>/exploratory/account-state` root for baseline and mover
+  trials; both share its account journal. Finished, flat trials can rotate
+  configurations only after fee/cash reconciliation, with effective-config
+  namespaces registered in the same ledger. Lane A and recovery stay frozen.
+  Broker-paper acceptance for rotation is **NOT_RUN**; focused CLI/journal
+  tests are synthetic evidence, not a verified live account alias.
+- `exploratory_exit_preset` selects a versioned candidate in
+  `exploratory-exit-presets.json`. Mover X1-X4/chain presets are the first paper
+  target; their numeric parameters use existing constants, not historical
+  selection. Check (d)'s existing RiskLimits ceilings stay enforced. See the
+  [rotation and exit decision](../../../docs/decisions/2026-10-12-exploratory-account-rotation-and-exits.md)
+  for namespace, labels, state isolation and recovery rules.
 - The bounded source review of main at `03a986ed` and T22 at `a9e4eeb7` found
   no production paper dispatch caller for T22's factor/cohort strategies. T22
   documents that it supplies no paper command. Its native synthetic corpus
