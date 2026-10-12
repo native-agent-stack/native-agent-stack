@@ -30,6 +30,17 @@ snapshot belongs in a new dated file. Point the new delta's
 The checker validates each historical baseline against its own recorded
 hash, rather than rebinding every historical delta to the latest bytes.
 
+The index is append-only against every committed version reachable from
+the tested tree's resolved Git commit. The checker uses
+`git rev-list --full-history <commit> -- <index-path>` and the native
+`GitTree` reader. Every prior entries array must remain an unchanged
+prefix, including entries sharing a date. Prior delta and baseline bytes
+are also read independently from those Git objects and compared with
+the candidate files. Removing an entry, replacing a delta's expected
+hash, or committing the removal cannot hide a historical baseline.
+Full Git history is required; a shallow checkout fails explicitly.
+The validation workflow already checks out with `fetch-depth: 0`.
+
 ## Derive the new delta
 
 Use the existing native `patch_policy.GitTree(root, source_commit)` and
@@ -49,6 +60,9 @@ The newest delta is checked against the current native derivation with
 the existing exact script, shape, total, classification and protection
 assertions. Older deltas retain their dated baseline bindings. A changed
 newest count or rewritten historical baseline fails the regression.
+The regression also rejects omitted entries both with and without a
+baseline rewrite, for later and equal dates, and after the omission has
+been committed. A valid same-date append remains accepted.
 
 Run the owning module before publishing:
 
@@ -73,6 +87,11 @@ installed Git 2.53.0,
 `git/git@67ad42147a7acc2af6074753ebd03d904476118f`,
 `Documentation/git-ls-tree.adoc:44-61` and
 `Documentation/revisions.adoc:217-220` for pinned tree/blob inputs.
+At the same Git pin, `Documentation/git-rev-list.adoc:65-70` documents
+path-limited commit enumeration, and
+`Documentation/rev-list-options.adoc:520-525` documents following all
+merge parents with `--full-history`. The comparison uses resolved commit
+objects rather than a mutable remote branch or a candidate-selected pin.
 The index uses the existing CPython JSON parser and `datetime.date`
 ordering, with no new runtime dependency or replacement inventory policy.
 Installed CPython 3.13.16 source pin:

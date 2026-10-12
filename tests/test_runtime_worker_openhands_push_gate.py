@@ -1302,6 +1302,61 @@ class RepositoryWorkflowTests(unittest.TestCase):
                 with self.assertRaises(AssertionError):
                     self.test_advisory_baseline_and_explicit_categories_stay_bounded_on_this_repository()
                 historical_baseline.write_bytes(original_baseline)
+                # A publisher must append, even when the later observation has
+                # the same UTC date. Dropping the old entry must not hide it.
+                for observation_date in (delta["date"], index["entries"][0]["date"]):
+                    delta["date"] = observation_date
+                    index["entries"][-1]["date"] = observation_date
+                    (fixture / delta_path).write_text(json.dumps(delta))
+                    index_file = fixture / evidence / "unclassified-gate-read-deltas.json"
+                    index_file.write_text(json.dumps(index))
+                    self.test_advisory_baseline_and_explicit_categories_stay_bounded_on_this_repository()
+                    omitted = {**index, "entries": index["entries"][1:]}
+                    index_file.write_text(json.dumps(omitted))
+                    for rewrite_baseline in (False, True):
+                        with self.subTest(observation_date=observation_date,
+                                          omitted_entry=True, rewrite_baseline=rewrite_baseline):
+                            historical_baseline.write_bytes(
+                                original_baseline + (b"\n" if rewrite_baseline else b""))
+                            with self.assertRaisesRegex(AssertionError, "append-only"):
+                                self.test_advisory_baseline_and_explicit_categories_stay_bounded_on_this_repository()
+                    historical_baseline.write_bytes(original_baseline)
+                    index_file.write_text(json.dumps(index))
+                # Exercise the same omission after committing it: comparing
+                # only HEAD's index would accept the rewritten candidate.
+                run_git(fixture, "init", "-q")
+                index_file.write_text(json.dumps({**index, "entries": index["entries"][:1]}))
+                commit_all(fixture, "published original observation")
+                index_file.write_text(json.dumps(index))
+                published_commit = commit_all(fixture, "append same-date observation")
+
+                class HistoricalTree:
+                    repo, git, commit = str(fixture), REAL_GIT, published_commit
+
+                    def entries(self):
+                        return tree.entries()
+
+                    def read(self, path):
+                        return tree.read(path)
+
+                historical_tree = HistoricalTree()
+                with mock.patch.object(type(self), "_derived", (historical_tree, refreshed)):
+                    self.test_advisory_baseline_and_explicit_categories_stay_bounded_on_this_repository()
+                    historical_baseline.write_bytes(original_baseline + b"\n")
+                    original_record = json.loads(original_delta)
+                    original_record["baseline_sha256"] = sha256(historical_baseline.read_bytes()).hexdigest()
+                    (fixture / original_delta_path).write_text(json.dumps(original_record))
+                    with self.subTest(published_delta_rebound=True):
+                        with self.assertRaisesRegex(AssertionError, "Published advisory deltas"):
+                            self.test_advisory_baseline_and_explicit_categories_stay_bounded_on_this_repository()
+                    (fixture / original_delta_path).write_bytes(original_delta)
+                    index_file.write_text(json.dumps(omitted))
+                    historical_tree.commit = commit_all(fixture, "candidate omits history and rewrites baseline")
+                    with self.subTest(committed_omission=True):
+                        with self.assertRaisesRegex(AssertionError, "append-only"):
+                            self.test_advisory_baseline_and_explicit_categories_stay_bounded_on_this_repository()
+                historical_baseline.write_bytes(original_baseline)
+                index_file.write_text(json.dumps(index))
             self.assertEqual((fixture / original_delta_path).read_bytes(), original_delta)
             self.assertEqual((fixture / json.loads(original_delta)["baseline_path"]).read_bytes(),
                              original_baseline)
@@ -1318,13 +1373,56 @@ class RepositoryWorkflowTests(unittest.TestCase):
         evidence = Path("blueprints/runtime-workers/openhands/evidence")
         evidence_root = (ROOT / evidence).resolve()
         self.assertTrue(evidence_root.is_relative_to(ROOT.resolve()))
-        index = json.loads((evidence_root / "unclassified-gate-read-deltas.json").read_text())
+        index_path = evidence / "unclassified-gate-read-deltas.json"
+        index = json.loads((ROOT / index_path).read_text())
         self.assertEqual(index["schema_version"], 1)
         entries = index["entries"]
         self.assertTrue(entries, "Record at least one dated advisory delta")
         dates = [date.fromisoformat(entry["date"]) for entry in entries]
         self.assertEqual(dates, sorted(dates), "Append deltas in chronological order")
         self.assertEqual(len({entry["path"] for entry in entries}), len(entries))
+        # Git 2.53.0 rev-list --full-history follows every merge parent:
+        # git/git@67ad42147a7acc2af6074753ebd03d904476118f,
+        # Documentation/rev-list-options.adoc:520-525. GitTree resolves HEAD
+        # to an object id; no mutable remote ref or candidate-supplied pin is
+        # trusted. Every ancestral index version must remain a prefix, even
+        # after the candidate removal/rewrite has itself been committed.
+        git_command = [tree.git, "-C", tree.repo]
+        git_options = dict(check=True, capture_output=True, text=True,
+                           env=self.g.patch_policy.GIT_ENV, timeout=120)
+        shallow = subprocess.run(git_command + ["rev-parse", "--is-shallow-repository"],
+                                 **git_options).stdout.strip()
+        self.assertEqual(shallow, "false", "Baseline preservation requires full Git history")
+        revisions = subprocess.run(git_command + ["rev-list", "--full-history", tree.commit,
+                                                  "--", str(index_path)],
+                                   **git_options).stdout.splitlines()
+        self.assertTrue(revisions, "Committed advisory index history is required")
+        for revision in revisions:
+            published = self.g.patch_policy.GitTree(tree.repo, revision, git=tree.git)
+            self.assertIn(str(index_path), published.entries(),
+                          "The append-only advisory index cannot be deleted")
+            published_entries = json.loads(published.read(str(index_path)))["entries"]
+            self.assertEqual(entries[:len(published_entries)], published_entries,
+                             "The advisory index is append-only across committed history")
+            # Bind old bytes independently of the candidate index and of any
+            # candidate edit to a delta's expected baseline hash.
+            for entry in published_entries:
+                published_path = evidence / entry["path"]
+                self.assertEqual(published_path.parent, evidence)
+                candidate_path = (ROOT / published_path).resolve()
+                self.assertTrue(candidate_path.is_relative_to(evidence_root))
+                published_bytes = published.read(str(published_path))
+                self.assertTrue(candidate_path.read_bytes() == published_bytes,
+                                "Published advisory deltas must retain their bytes")
+                published_baseline = Path(json.loads(published_bytes)["baseline_path"])
+                self.assertFalse(published_baseline.is_absolute())
+                self.assertNotIn("..", published_baseline.parts)
+                self.assertTrue(published_baseline.is_relative_to(evidence))
+                candidate_baseline = (ROOT / published_baseline).resolve()
+                self.assertTrue(candidate_baseline.is_relative_to(evidence_root))
+                self.assertTrue(candidate_baseline.read_bytes() ==
+                                published.read(str(published_baseline)),
+                                "Published historical baselines must retain their bytes")
         for entry in entries:
             self.assertEqual(Path(entry["path"]).name, entry["path"])
             self.assertTrue(entry["path"].endswith(".json"))
