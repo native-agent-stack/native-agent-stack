@@ -1520,7 +1520,7 @@ class ManifestRuleTests(unittest.TestCase):
                          {"serena", "tobi-qmd", "otel-collector-contrib", "gpt-gateway", "claude-code", "mise",
                           "mcp-inspector", "context-supply", "memory-owner", "code-search", "statusline",
                           "container-engine", "command-output", "output-compression", "code-index", "code-graph",
-                          "api-docs", "playwright-cli"})
+                          "api-docs", "playwright-cli", "promptfoo"})
         self.assertEqual({s for s in slots if rows[s].get("interim")}, {"memory-owner", "code-search"})
 
 
@@ -1636,7 +1636,7 @@ class RenderTests(unittest.TestCase):
         servers = json.loads(self.files["mcp-servers.json"])["mcpServers"]
         # The owner-selected token stack joins Serena, QMD and the interim memory/search installs.
         self.assertEqual(list(servers), ["ai-memory", "serena", "socraticode", "headroom", "codebase-memory-mcp", "qmd",
-                                         "jcodemunch", "semble", "chrome-devtools"])
+                                         "jcodemunch", "semble", "chrome-devtools", "promptfoo"])
         self.assertEqual(servers["serena"]["command"], "serena")
         self.assertEqual(servers["serena"]["args"][:1] + servers["serena"]["args"][3:6],
                          ["start-mcp-server", "--project-from-cwd", "--context", "claude-code"])
@@ -2768,7 +2768,8 @@ class ApplyTests(ApplyCase):
                              icp.expected_sha256(icp.HOOKS[name]))
         self.assertEqual(len(list((self.home / ".claude/agents").iterdir())), 11)
         self.assertEqual(sorted(json.loads((self.home / ".stub-claude-mcp.json").read_text())),
-                         ["ai-memory", "chrome-devtools", "codebase-memory-mcp", "headroom", "jcodemunch", "qmd", "semble", "serena", "socraticode"])
+                         ["ai-memory", "chrome-devtools", "codebase-memory-mcp", "headroom", "jcodemunch", "promptfoo", "qmd", "semble",
+                          "serena", "socraticode"])
         settings = json.loads((self.home / ".claude/settings.json").read_text())
         # The repository's hooks and the overlay's Notification, and the events ai-memory's hooks take (an interim install).
         self.assertEqual(sorted(settings["hooks"]), ["ConfigChange", "Notification", "PostToolUse", "PreCompact", "PreToolUse",
