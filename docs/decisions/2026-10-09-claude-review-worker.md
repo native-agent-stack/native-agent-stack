@@ -204,8 +204,25 @@ pull requests now. It reuses the repository's own fence: main at the working dir
   shape. Not measured here: whether the client writes a cache breakpoint at the end of that shared part, which a later
   head needs in order to read it (`:9`; the client places its own breakpoints). The cache hit rate recorded with each
   settle measures it on real runs.
-- **A one-hour cache.** The worker's settings set `promptCacheTtl` to `"1h"` (anthropics/claude-code@`3deb873`
-  `CHANGELOG.md:2970`, 2.1.243: "so API-key and cloud-provider users can keep a 1-hour prompt cache on the main
+- **A five-minute cache, measured (2026-10-12; it supersedes the one-hour setting below).** The co-op's research-queue
+  row 31 asked whether `"1h"` pays back across heads, and the command center approved two live probe sessions on
+  main `3a8a8461` (anthropic-api-4, $1.5006 settled in the ledger). The decision rule was written before the first one.
+  Session 2 began 6 minutes 39 seconds after session 1's last request, past any 5-minute entry:
+  - every cache write of every run was billed at the 1-hour TTL (5-minute writes: 0; the review runs wrote 16,988
+    and 17,705 tokens);
+  - session 2's review run read only the client's own 3,735-token prefix and wrote its prompt again (1,706 tokens),
+    though the probe arms whose prompts were identical across sessions read theirs whole. So the client's breakpoint
+    sits at the end of the user message, and a later head, whose prompt ends with its own line, reads none of the
+    shared part (`:9`);
+  - at the skill's prices (`:144`: reads 0.05x, writes 1.25x at five minutes and 2x at one hour), the one-hour TTL
+    saved 0 per later head against a premium of 0.75 x 17,705 = 13,279 base-token equivalents.
+
+  The setting is therefore `promptCacheTtl: "5m"` (the TTL values as the API names them, `:124`). The stable-first
+  order above stays: it costs nothing, and it is what a breakpoint at the end of the shared part would need. Whether
+  the client can place one there is a follow-up. The measurement is in the api-actions coordination record
+  `readers/row31-cache-ttl-payback-20261012.md`.
+- **A one-hour cache (2026-10-11, superseded above).** The worker's settings set `promptCacheTtl` to `"1h"`
+  (anthropics/claude-code@`3deb873` `CHANGELOG.md:2970`, 2.1.243: "so API-key and cloud-provider users can keep a 1-hour prompt cache on the main
   conversation while subagents stay at 5 minutes"; the 2.1.296 binary's schema accepts `"5m"` or `"1h"`, and on an
   API key the unset default is 5 minutes). Ticks run every 15 minutes and at most two reviews run per tick, so heads
   of one repository usually start more than 5 minutes apart: the 5-60 minute window where the skill says the 1-hour

@@ -1494,8 +1494,8 @@ class InvocationTest(unittest.TestCase):
         self.assertEqual(allowed, ["Read(./**)", "Glob(./**)", "Grep(./**)", "Read(//review/input/**)"])
         settings = json.loads(flags[flags.index("--settings") + 1])
         self.assertIs(settings["disableAllHooks"], True)
-        # The main conversation's cache outlives the gap between heads; there is no subagent.
-        self.assertEqual(settings["promptCacheTtl"], "1h")
+        # Measured (row 31, 2026-10-12): "1h" doubles every write and a later head reads none of it; no subagent.
+        self.assertEqual(settings["promptCacheTtl"], "5m")
         self.assertNotIn("subagentPromptCacheTtl", settings)
         self.assertNotIn("claudeMdExcludes", settings)  # replaced by CLAUDE_CODE_DISABLE_CLAUDE_MDS in the sandbox
         self.assertIs(settings["permissions"]["blockReadsOutsideWorkingDirectories"], True)
