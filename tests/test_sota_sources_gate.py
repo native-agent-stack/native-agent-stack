@@ -231,6 +231,7 @@ class GateBehaviourTests(unittest.TestCase):
 # so this file itself carries none of them for scripts/validate.py's own scan.
 SOURCES = "\n\n### SOTA sources\n- https://github.com/o/r at v1.2.3, src/x.py\n"
 HOME = "/" + "home/"
+BS = "\\"
 GRAPH_ID = "home-" + "alice-code-project"  # a graph project id, in the form without a leading dash
 MAX_BODY = 262144  # the gate's own bound, in code points
 PRIVACY_CASES = [
@@ -300,6 +301,41 @@ PRIVACY_CASES = [
     ("a graph id in a code host URL's query", "https://github.com/a?u=" + GRAPH_ID + SOURCES, ["encoded-home-path"]),
     ("a graph id under an upper-case code host", "https://GITHUB.COM/acme/" + GRAPH_ID + SOURCES, ["encoded-home-path"]),
     ("a repository on a code host's subdomain passes", "https://gist.github.com/acme/" + GRAPH_ID + SOURCES, []),
+    # The command center's Claude read of 4e5ef13d (B3): the exemption is for the repository segment of a code-host URL
+    # that starts its own token, so an inner scheme, a query, a link destination, a delimiter or a deeper path is read.
+    ("a graph id behind a code host inside a local URL", "http://127.0.0.1:8788/p/https://github.com/" + GRAPH_ID + SOURCES,
+     ["encoded-home-path"]),
+    ("a graph id behind a code host in a local URL's query", "http://localhost/?q=https://github.com/p/" + GRAPH_ID + SOURCES,
+     ["encoded-home-path"]),
+    ("a graph id as a code-host link's destination", "[https://github.com/o/r](" + GRAPH_ID + ")" + SOURCES,
+     ["encoded-home-path"]),
+    ("a graph id after a comma behind a code-host URL", "https://github.com/o/r," + GRAPH_ID + SOURCES, ["encoded-home-path"]),
+    ("a graph id deeper in a code-host URL's path", "https://github.com/o/r/blob/main/" + GRAPH_ID + ".db" + SOURCES,
+     ["encoded-home-path"]),
+    ("a graph id after a pipe behind a code-host URL", "| https://github.com/o|" + GRAPH_ID + " |" + SOURCES,
+     ["encoded-home-path"]),
+    ("a graph id after a table cell's code-host URL", "|https://github.com/acme|/" + GRAPH_ID + "|" + SOURCES,
+     ["encoded-home-path"]),
+    ("a graph id after a code-host URL and a semicolon", "https://github.com/acme;/" + GRAPH_ID + SOURCES,
+     ["encoded-home-path"]),
+    ("a graph id after a code-host URL and a comma", "https://github.com/acme,/" + GRAPH_ID + SOURCES,
+     ["encoded-home-path"]),
+    ("a linked repository named like a graph project passes", "[r](https://github.com/acme/" + GRAPH_ID + ")" + SOURCES, []),
+    ("an autolinked repository named like a graph project passes", "<https://gitlab.com/acme/" + GRAPH_ID + ">" + SOURCES,
+     []),
+    # The same read (B4): a WSL distribution's home through its Windows UNC path, as File Explorer and the WSL
+    # documentation write it, and JSON-escaped.
+    ("a WSL home through wsl.localhost", BS * 2 + "wsl.localhost" + BS + "Ubuntu" + BS + "home" + BS + "alice" + BS + "x"
+     + SOURCES, ["personal-home-path"]),
+    ("a WSL home through wsl$", BS * 2 + "wsl$" + BS + "Ubuntu-24.04" + BS + "home" + BS + "alice" + SOURCES,
+     ["personal-home-path"]),
+    ("a WSL home through the wsl prefix", BS * 2 + "WSL" + BS + "Ubuntu" + BS + "home" + BS + "alice" + SOURCES,
+     ["personal-home-path"]),
+    ("a JSON-escaped WSL home", BS * 4 + "wsl.localhost" + BS * 2 + "Ubuntu" + BS * 2 + "home" + BS * 2 + "alice" + BS * 2
+     + "x" + SOURCES, ["personal-home-path"]),
+    ("a masked WSL home passes", BS * 2 + "wsl$" + BS + "Ubuntu" + BS + "home" + BS + "<WSL_USER>" + BS + "x" + SOURCES, []),
+    ("the example WSL home passes", BS * 2 + "wsl.localhost" + BS + "Ubuntu" + BS + "home" + BS + "example" + BS + "x"
+     + SOURCES, []),
 ]
 
 # Cases the gate judges beyond validate.py's patterns: decoded or rendered forms, the gate-only macOS rule, and the
@@ -309,7 +345,43 @@ GATE_ONLY_CASES = {"a percent-encoded home path", "a JSON-escaped slash", "a JSO
                    "a mixed-case macOS home", "a lower-case macOS home", "character references around emphasis",
                    "percent escapes around a link-split name", "a repository named like a graph project passes",
                    "a repository on a code host's subdomain passes",
+                   "a linked repository named like a graph project passes",
+                   "an autolinked repository named like a graph project passes",
                    "a lower-case macOS home in a file URL", "redundant leading slashes"}
+
+# The repository's own WSL recipe, receipts and their frozen copies write the UNC form with the user masked.
+MASKED_WSL_FILES = ["adoption/platforms/linux-wsl2-new-distro.md", "adoption/templates/wsl/stage1-receipt.example.json",
+                    "docs/decisions/2026-10-01-new-wsl-distro-recipe.md", "docs/secret-storage.md",
+                    "evidence/artifacts/new-wsl-fix-wave-20261004/frozen-inputs/linux-wsl2-new-distro.md.txt",
+                    "evidence/artifacts/new-wsl-fix-wave-20261004/frozen-inputs/test_wsl_new_distro_recipe.py.txt",
+                    "evidence/artifacts/new-wsl-rehearsal-20261002/runs-on-wsl-3.0.1.json",
+                    "evidence/artifacts/new-wsl-rehearsal-20261002/stage1-receipt.json",
+                    "evidence/artifacts/user-facing-local-time-20261005/frozen-inputs/2026-10-01-new-wsl-distro-recipe.md.txt",
+                    "evidence/artifacts/user-facing-local-time-20261005/frozen-inputs/stage1-receipt.example.json.txt",
+                    "tests/test_wsl_new_distro_recipe.py"]
+
+
+class ScriptsValidateWslHomeTests(unittest.TestCase):
+    def test_scripts_validate_reads_a_wsl_unc_home(self):
+        # The command center's Claude read of 4e5ef13d (B4), in validate.py's copy of the rule.
+        sys.path.insert(0, str(ROOT / "scripts"))
+        import validate
+        pattern = dict(validate.PRIVATE_CONTENT)["personal home path"]
+        cases = [(case, text, rules) for case, text, rules in PRIVACY_CASES if "WSL home" in case]
+        self.assertEqual(len(cases), 6)
+        for case, text, rules in cases:
+            with self.subTest(case=case):
+                self.assertEqual(bool(pattern.search(text)), rules == ["personal-home-path"])
+
+    def test_the_tracked_masked_wsl_homes_stay_clean(self):
+        sys.path.insert(0, str(ROOT / "scripts"))
+        import validate
+        pattern = dict(validate.PRIVATE_CONTENT)["personal home path"]
+        unc_home = re.compile(r"\\\\+[Ww][Ss][Ll](?:\.localhost|\$)\\+[^\\\s]+\\+home\\+")
+        lines = [line for path in MASKED_WSL_FILES for line in (ROOT / path).read_text(encoding="utf-8").splitlines()
+                 if unc_home.search(line)]
+        self.assertGreaterEqual(len(lines), len(MASKED_WSL_FILES))
+        self.assertEqual(sum(1 for line in lines if pattern.search(line)), 0)
 
 
 @unittest.skipUnless(NODE, "node unavailable; CI's runner images carry it")
@@ -349,7 +421,7 @@ class GatePrivacyTests(unittest.TestCase):
             ("far over the limit", body("a" * 4 * MAX_BODY + SOURCES), "body-size"),
             ("a NUL", body("abc\x00def" + SOURCES), "body-control"),
             ("an escape character", body("\x1b[31m" + SOURCES), "body-control"),
-            ("a C1 control", body("\x85" + SOURCES), "body-control"),
+            ("a C1 control", body("\x9b" + SOURCES), "body-control"),
             ("a lone surrogate", body("\ud800" + SOURCES), "body-encoding"),
             ("an object", body({}), "body-type"),
             ("a list", body([]), "body-type"),
@@ -369,6 +441,22 @@ class GatePrivacyTests(unittest.TestCase):
                                      f"must be text of at most {MAX_BODY} characters, with no control characters "
                                      "other than tabs and line breaks.")
 
+    def test_the_guard_admits_tabs_and_line_breaks_only(self):
+        # The command center's Claude read of 4e5ef13d (B1): #1003's mirror finds section content in U+001C and U+0085,
+        # so the guard must not refuse them. A line break is a paragraph separator, Bidi_Class B in the Unicode
+        # Character Database Python carries; every other C0 and C1 control is refused, in both copies.
+        import unicodedata
+        controls = [chr(code) for code in [*range(0x20), *range(0x7F, 0xA0)]]
+        payloads = [body("a" + control + "b" + SOURCES) for control in controls]
+        outcomes = {path.name: run_check(inline_script(sota_job(path)), payloads) for path in (VALIDATE, GATE)}
+        self.assertEqual(outcomes["pr-metadata.yml"], outcomes["sota-sources-gate.yml"])
+        for control, outcome in zip(controls, outcomes["sota-sources-gate.yml"]):
+            with self.subTest(control=hex(ord(control))):
+                admitted = control == "\t" or unicodedata.bidirectional(control) == "B"
+                self.assertEqual(outcome["failed"] is None, admitted, outcome)
+                if not admitted:
+                    self.assertIn("(rule: body-control)", outcome["failed"])
+
     def test_a_body_at_the_bound_is_scanned_in_bounded_time(self):
         # The graph-id rule searched from every home- to the end of its run, quadratic in the run's length: a
         # 262,144-character run of "home-a.b-c_d-" took 21 s in the gate per form and 93 s in validate.py. The name now
@@ -385,11 +473,15 @@ class GatePrivacyTests(unittest.TestCase):
         # unmatched '[', so 262,144 of them gave no verdict within 125 s.
         brackets = ["[" * (MAX_BODY - len(SOURCES)), ("![" * MAX_BODY)[:MAX_BODY - len(SOURCES)],
                     ("[a][" * MAX_BODY)[:MAX_BODY - len(SOURCES)]]
+        # The command center's Claude read of 4e5ef13d (B2): adjacent whitespace quantifiers around an empty link
+        # destination retried every split of the run, so "[a](" and 65,536 spaces gave no verdict within 130 s.
+        unclosed = ["[a](" + filler * (MAX_BODY - 4 - len(SOURCES)) for filler in (" ", "\n", "\t")] + [
+            ("[a](" + "(b) " * MAX_BODY)[:MAX_BODY - len(SOURCES)], ("[a](b " * MAX_BODY)[:MAX_BODY - len(SOURCES)]]
         start = time.monotonic()
         outcomes = run_check(inline_script(sota_job(GATE)),
-                             [body(text + SOURCES) for text in [run, mixed] + brackets])
+                             [body(text + SOURCES) for text in [run, mixed] + brackets + unclosed])
         self.assertLess(time.monotonic() - start, 20)
-        self.assertEqual([outcome["failed"] for outcome in outcomes], [None] * 5)
+        self.assertEqual([outcome["failed"] for outcome in outcomes], [None] * 10)
 
     def test_credential_lengths_agree_with_scripts_validate_at_each_minimum(self):
         # (P2-2) one below, at and one above each rule's minimum length, alone and glued to Unicode word characters.
@@ -443,7 +535,13 @@ GATE_ONLY_RULES = {"macos-user-path"}
 X = "\x01"  # where each code point goes
 TEMPLATES = {
     "personal-home-path": ["/home/" + X, X + "/home" + "/al", "/home" + "/al" + X, "/home/example" + X, "/Users/" + X + "/a",
-                           "/" + X + "ome/al/"],
+                           "/" + X + "ome/al/", BS * 2 + "wsl$" + BS + "U" + BS + "home" + BS + X,
+                           BS * 2 + "wsl$" + BS + "U" + BS + "home" + BS + "example" + X,
+                           BS * 2 + "ws" + X + ".localhost" + BS + "U" + BS + "home" + BS + "al",
+                           BS * 2 + "wsl.localhos" + X + BS + "U" + BS + "home" + BS + "al",
+                           BS * 2 + "wsl$" + BS + X + BS + "home" + BS + "al", BS + X + "wsl$" + BS + "U" + BS + "home" + BS + "al",
+                           BS * 2 + "wsl$" + BS + "U" + BS + "hom" + X + BS + "al",
+                           BS * 2 + "wsl" + X + BS + "U" + BS + "home" + BS + "al"],
     "windows-user-path": ["C:\\User" + X + "\\bo", X + ":\\Users\\bo", "C:\\Users\\" + X,
                           "C:\\Users\\example" + X, "/mnt/" + X + "/Users" + "/bo", "c:\\" + X + "sers\\bo"],
     "encoded-home-path": [X + "-home-" + "bo-x", "-home-" + X, "-home-" + "bo" + X, "-home-example" + X, "home-" + X + "-code-x",

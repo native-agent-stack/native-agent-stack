@@ -56,8 +56,9 @@ close. Their historical tests had already refuted or failed to support the arms:
 ## PR-body privacy scan (2026-10-10)
 
 The command center's correction #145 found the host account name, inside absolute home paths, in eleven places in
-this public repository's pull request descriptions and comments; it masked them all. To keep a new description from
-carrying one, the required `sota-sources` job (both byte-identical copies, `pr-metadata.yml` and
+this public repository's pull request descriptions and comments; it masked them all. So that a new description
+carrying one is detected and its pull request kept from landing (a failing check cannot withdraw a published
+description; see "Publication comes first" below), the required `sota-sources` job (both byte-identical copies, `pr-metadata.yml` and
 `sota-sources-gate.yml`) also scans the current pull request body, read through the REST "Get a pull request" endpoint
 as before (<https://docs.github.com/en/rest/pulls/pulls#get-a-pull-request>, `body`; read 2026-10-10T19:54Z):
 
@@ -65,8 +66,9 @@ as before (<https://docs.github.com/en/rest/pulls/pulls#get-a-pull-request>, `bo
   Windows user path, encoded home path, Hugging Face, GitHub and Tavily tokens, API secrets, private keys, bearer
   credentials), written in JavaScript; the two session-identifier rules are left out, since a pull request body may
   cite an identifier on purpose;
-- no host name is needed: the rules match any `/home/<name>/` or `/Users/<name>/` path, and the documented exemptions
-  (`example`, `<user>`, `~/`) pass;
+- no host name is needed: the rules match any `/home/<name>/` or `/Users/<name>/` path (and, since the command
+  center's read of `4e5ef13d`, a WSL home through its Windows UNC path), and the documented exemptions (`example`,
+  `<user>`, `~/`) pass;
 - the job fails closed and its message names only the rule ids, never the matched text;
 - `tests.test_sota_sources_gate.GatePrivacyTests` runs both copies on fixtures built at run time (so the test file
   carries no private-looking value), checks that a missing section and a private body are reported together, and runs
@@ -80,7 +82,8 @@ Callers of the reusable gate get the scan when they bump their pin.
 The co-op's GPT read at `07595323` found three gaps, now closed in both copies of the job:
 
 - **The body is judged before it is read.** A description that is not text, is longer than the gate's bound, holds a
-  lone surrogate, or holds a control character other than tab, LF or CR fails with one fixed rule id (`body-type`,
+  lone surrogate, or holds a control character other than a tab or a line break (LF and CR at first; since the
+  command center's read of `4e5ef13d`, every paragraph separator, see the last section) fails with one fixed rule id (`body-type`,
   `body-size`, `body-encoding`, `body-control`), and nothing else is reported. The bound was first 65,536 UTF-16 code
   units, on the premise that GitHub refuses a longer body; that premise was wrong, and the bound is now the gate's own
   (correction in the next section). `String.prototype.isWellFormed` reports lone surrogates
@@ -161,8 +164,10 @@ copies of the job. The seventh, about publication order, is answered without a c
 
   The bound is therefore the gate's own: 262,144 code points, so an astral character counts once. A code point takes
   at least one UTF-8 byte, so no description the update stores reaches the bound. It is also about 3.5 times the
-  longest description seen here. On Node 24.21 a body at the bound is scanned within 0.3 s. That includes the
-  adversarial bodies below and, since the second GPT read, runs of unmatched brackets (see that section).
+  longest description seen here. On Node 24.21, 35 adversarial shapes at the bound each get a verdict within
+  0.25 s, measured at the commit that answers the command center's read of `4e5ef13d` (the last section). An earlier
+  version of this sentence said "within 0.3 s" for every body at the bound; an unclosed link of whitespace broke it
+  until that commit.
 - **The decoders compose.** Each decoder still runs at most once along a chain, never to a fixed point. The rules
   now see every order of every subset of the four decoders: 65 forms, counting the body. A slash written as a
   character reference around a name in emphasis is therefore read as GitHub displays it. Codex suggested a pinned
@@ -177,7 +182,9 @@ copies of the job. The seventh, about publication order, is answered without a c
   match.
 - **A repository named like a graph id passes the gate.** The graph-id form of `encoded-home-path` (`home-<name>-code-`
   with no leading dash) failed a cited URL such as `github.com/<owner>/home-<name>-code-review`. In the gate only,
-  that form is not read in the path of a public code host's URL, within 256 characters of the host. The hosts are
+  that form is not read as a repository name: the segment right after one owner segment of a public code host's URL,
+  where the URL starts its token (narrowed after the command center's read of `4e5ef13d`, the last section; before
+  it, the whole path within 256 characters of the host was exempt). The hosts are
   `github.com`, `githubusercontent.com`, `gitlab.com`, `bitbucket.org`, `codeberg.org`, `huggingface.co` and `sr.ht`,
   with up to four subdomain labels, in lower case. (At `fc60da90` any `http(s)` URL was exempt; the second GPT read
   corrected that.) The check runs only where `home-` occurs. The first form tried scanned back from every position:
@@ -230,6 +237,8 @@ are fixed in both copies of the job, on a rebase onto main `0f153784`:
   scheme, so `http://127.0.0.1:8788/p/home-<name>-code-<project>` and the same id under `https://localhost/` passed
   both copies, while `validate.py` refused both. The exemption is now limited to the path of a public code host's URL
   (above), an allowlist rather than a list of local hosts, so private addresses and intranet names stay caught too.
+  (That path still reached an inner `https://` and Markdown delimiters; the last section narrows it to a repository
+  name.)
   New cases cover loopback, `localhost`, `[::1]`, `*.localhost`, a private address, an unlisted public host, userinfo,
   a query string and an upper-case host; each agrees with `validate.py`. The public-repository control, now also on a
   code host's subdomain, passes.
@@ -238,7 +247,8 @@ are fixed in both copies of the job, on a rebase onto main `0f153784`:
   262,144 `[` gave no verdict within 125 s, against the job's 2-minute limit; here, 4,096 took 0.87 s and 8,192 took
   3.26 s. A label now holds no bracket, as in CommonMark, in all three classes. That run now takes 0.16 s, and 21
   adversarial shapes at the bound (bracket, parenthesis, tag, entity, percent, emphasis, backslash, backtick and
-  graph-id runs) take at most 0.26 s each. The bounded-time test adds three bracket runs. The 41 earlier privacy-case
+  graph-id runs) take at most 0.26 s each. That set missed an unclosed link of whitespace, which the command center's
+  read of `4e5ef13d` found (the last section). The bounded-time test adds three bracket runs. The 41 earlier privacy-case
   outcomes are unchanged, including a name split by a Markdown link.
 
 The new tests fail on the rebased previous head `ee2070f0` (18 failures, 1 error). Thirteen weakened copies were run,
@@ -261,6 +271,65 @@ The reader's P3 follow-ups are not in this change: two live line locators that t
 captures for the handwritten Markdown approximation, the URL exemption, the 256-character bound and the POSIX
 leading-slash rule; the repeated-decoding boundary, already stated above; and existing hostname references in the
 manifest.
+
+### After the command center's Claude read of `4e5ef13d` (2026-10-12)
+
+The command center's Claude read at `4e5ef13d` (CHANGES_REQUESTED) found four defects, and its adjudication ruled two
+of them privacy P1s. All four are fixed in one commit, in both copies of the job and, for the home-path rule, in
+`validate.py`:
+
+- **B3 (P1): the code-host exemption let an encoded home path through.** It skipped the graph-id form anywhere within
+  256 characters after a listed host, across `)`, `(`, `]`, `[`, `,`, `;`, `|`, `*` and an inner `https://`. So a graph
+  id behind `https://github.com/` inside a local URL or its query, as the destination of a link whose label is a
+  code-host URL, after a comma, or deeper in a code-host path passed both copies, while `validate.py` refused each. The
+  exemption now covers only a repository name: the segment right after one owner segment (`[A-Za-z0-9_.~-]{1,100}`) of
+  a listed host's URL, and the URL must start its token, after whitespace, a quote, `<`, `(` or `[`. The check still
+  runs only where `home-` occurs and looks back over a bounded window, so it stays linear.
+- **B4 (P1): a WSL home through its UNC path passed all three scans.** `\\wsl.localhost\<distro>\home\<name>`,
+  `\\wsl$\...` and the JSON-escaped form carry the account name, and this repository's own WSL tooling writes the
+  form (masked). `personal home path`, in `validate.py` and both copies, now also reads `\\wsl$\`, `\\wsl\` and
+  `\\wsl.localhost\` in any case, with one or two backslashes per separator, then `<distro>\home\<name>`, with the POSIX
+  form's `example` exemption and end. Sources: Microsoft's "Working across file systems"
+  (<https://learn.microsoft.com/en-us/windows/wsl/filesystems>, read 2026-10-12T03:48:54Z, sha256
+  `fc8542ae8955e3ee1c732b33a83f9e8f34d596ffde35bf3a2463d2badcca791d`; its source, MicrosoftDocs/wsl@`a1473a69`
+  `WSL/filesystems.md:22`, `:34`), `WSL/wsl-config.md:162` (`\\wsl.localhost\Ubuntu-20.04\etc\wsl.conf`), and the WSL
+  release notes, `WSL/release-notes.md:24` (Build 21354: the `\\wsl.localhost` prefix, and `\\wsl$` keeps working),
+  `:76` (Build 20175: `\\wsl`) and `:145` (Build 19013: the `\\wsl$` check is case-insensitive). The 19 tracked
+  lines that write the form, in 11 files, stay clean, and so does the rest of the tree.
+- **B1 (P2): the body guard turned a required check red.** It refused U+001C and U+0085, while #1003's mirror
+  (`scripts/verify_sources.py`) finds section content in them, so `tests.test_verify_sources` failed in shard 4 of the
+  required `validate`. The guard now admits tabs and line breaks, a line break being a paragraph separator by Unicode's
+  Bidi_Class B: LF, CR, U+001C to U+001E and U+0085 (Python's `unicodedata`, UCD 15.1.0). Every other C0 and C1
+  control is still refused; a test runs all 65 through both copies. The failure message is unchanged.
+- **B2 (P2): the link decoder backtracked quadratically.** Three adjacent whitespace quantifiers around a possibly
+  empty destination retried every split of a run: `[a](` and 32,768 spaces took 42 s, and 65,536 gave no verdict
+  within 130 s. The parentheses are now read as runs that cannot overlap, with no line break and one level of nested
+  pairs (`\([^()\n]*(?:\([^()\n]*\)[^()\n]*)*\)`), so an unclosed `(` is scanned once to the end of its line. A
+  destination with spaces, or a link with a title, is still decoded. A link split across lines, or whose title holds an
+  unmatched parenthesis, is not decoded; the body itself is still read as written.
+
+On Node 24.21, 35 adversarial shapes at the bound each get a verdict within 0.25 s: the second read's 21, plus
+unclosed links of spaces, line feeds and tabs, nested, quoted and repeated link runs, code-host owner runs and UNC
+runs. One of them is refused for its own content: after Markdown's unescaping it holds a home named `wsl`.
+
+The new tests fail on `4e5ef13d`'s job and `validate.py` (34 failures, 1 error). They include the four subtests of
+`tests.test_verify_sources` that kept the required check red. Thirteen weakened copies were run, and all thirteen
+fail the tests:
+
+- the exemption back to 256 characters after the host, or a URL that need not start its token;
+- an owner segment that may hold `,`, `|` and `;`, or `/`;
+- no UNC form in the two copies, or in `validate.py`; no `\\wsl` prefix without a suffix; no `example` exemption in
+  it; single separators only (no JSON-escaped form);
+- U+0085 refused again, or U+001F admitted;
+- the old link regex, or one whose runs overlap (each gives no verdict within the test's 60 s).
+
+Old and new gates give the same outcome on the live description of every open pull request (76) and of the
+latest 400 in any state, at 2026-10-12T04:24Z; neither names a rule on any of them. Only rule ids were printed.
+
+Boundaries this states: the exemption takes exactly one owner segment, so a GitLab subgroup's repository named like a
+graph id is refused, as is a code-host URL glued to a preceding word character. The UNC form needs a distribution
+name of at most 64 characters; a home under another share, such as `\\host\c$\Users\<name>\`, and `\home\<name>\`
+without a prefix stay follow-ups, as the read listed them.
 
 ## Alternatives considered
 

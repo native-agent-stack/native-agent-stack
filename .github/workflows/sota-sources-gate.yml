@@ -43,14 +43,17 @@ jobs:
               pull_number: context.issue.number
             });
             // The body is judged before it is parsed: a non-text, malformed or overlong one fails with a fixed rule id and is
-            // not read further. The length bound is the gate's own, in code points. GitHub's REST update keeps a description of
+            // not read further. Tabs and line breaks pass, a line break being a paragraph separator (Bidi_Class B: LF,
+            // CR, U+001C to U+001E and U+0085), as #1003's scripts/verify_sources.py mirror reads them; every other C0
+            // and C1 control is refused.
+            // The length bound is the gate's own, in code points. GitHub's REST update keeps a description of
             // at most 262,144 UTF-8 bytes (measured 2026-10-11), so no stored one reaches it; one here has carried 75,726 (#786).
             const MAX_BODY = 262144;
             const raw = pullRequest.body ?? '';
             const refused = typeof raw !== 'string' ? 'body-type'
               : [...raw].length > MAX_BODY ? 'body-size'
               : !raw.isWellFormed() ? 'body-encoding'
-              : /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]/.test(raw) ? 'body-control' : null;
+              : /[\u0000-\u0008\u000B\u000C\u000E-\u001B\u001F\u007F-\u0084\u0086-\u009F]/.test(raw) ? 'body-control' : null;
             if (refused) {
               core.setFailed(`The PR description cannot be checked (rule: ${refused}): it must be text of at most ${MAX_BODY} characters, with no control characters other than tabs and line breaks.`);
               return;
@@ -76,13 +79,16 @@ jobs:
             const users = `[Uu]${s17f}[Ee][Rr]${s17f}`;
             const example = '[Ee][Xx][Aa][Mm][Pp][Ll][Ee]';
             const privacy = [
-              ['personal-home-path', rule(String.raw`\/(?:home|Users)\/(?!example(?:\/|${b}))[A-Za-z0-9_.\-]+(?:\/|${b})`)],
+              // A WSL distribution's home is read through its Windows UNC path too: \\wsl$\, \\wsl\ or \\wsl.localhost\, then
+              // <distro>\home\<name>, the prefix in any case and JSON-escaped (scripts/validate.py cites the WSL docs).
+              ['personal-home-path', rule(String.raw`\/(?:home|Users)\/(?!example(?:\/|${b}))[A-Za-z0-9_.\-]+(?:\/|${b})|\\{2,4}[Ww][Ss][Ll](?:\.[Ll][Oo][Cc][Aa][Ll][Hh][Oo][Ss][Tt]|\$)?\\{1,2}[^\\\/${S}]{1,64}\\{1,2}home\\{1,2}(?!example(?:\\|${b}))[A-Za-z0-9_.\-]+(?:\\|${b})`)],
               ['windows-user-path', rule(String.raw`(?:[${AZ}]:[\/\\]+|\/[Mm][Nn][Tt]\/[${AZ}]\/)${users}[\/\\]+(?!${example}(?:[\/\\]|${b}))[${AZ}0-9_.\-]+`)],
-              // Only here: the graph-id form (home-<name>-code-, no leading dash) is not read in a public code host's URL path,
-              // within 256 characters of the host, where it names a repository: github.com/<owner>/home-<name>-code-review.
-              // The hosts are listed in lower case, so a loopback, private or unlisted host is still read; the path stops at
-              // : @ ? #, so userinfo and query strings are read too. The check runs only where home- occurs, so it stays linear.
-              ['encoded-home-path', rule(String.raw`(?<![${W}\-])(?:-home-|-${users}-|[${AZ}]--${users}-|-[Mm][Nn][Tt]-[${AZ}]-${users}-)(?!example(?:-|[\/\\"'${S}\x60)\]]|${end}))[A-Za-z0-9_.]+(?:-|(?=[\/\\"'${S}\x60)\]]|${end}))|(?<![\p{L}\p{Nd}\p{Nl}\p{No}])home-(?<!https?:\/\/(?:[a-z0-9\-]{1,63}\.){0,4}(?:github\.com|githubusercontent\.com|gitlab\.com|bitbucket\.org|codeberg\.org|huggingface\.co|sr\.ht)\/[^${S}<>"'\x60:@?#]{0,256}home-)(?!example-code-)[${W}.][${W}.\-]{0,255}-code-`)],
+              // Only here: the graph-id form (home-<name>-code-, no leading dash) is not read as a repository name, that is
+              // the segment after one owner segment of a listed code host's URL: github.com/<owner>/home-<name>-code-review.
+              // The URL must start the token (after whitespace, a quote, < ( or [), so an inner scheme inside another URL, a
+              // query, a link destination after ]( and any deeper path are read; the hosts are lower case. Linear: the check
+              // runs only where home- occurs, over at most 100 characters of owner.
+              ['encoded-home-path', rule(String.raw`(?<![${W}\-])(?:-home-|-${users}-|[${AZ}]--${users}-|-[Mm][Nn][Tt]-[${AZ}]-${users}-)(?!example(?:-|[\/\\"'${S}\x60)\]]|${end}))[A-Za-z0-9_.]+(?:-|(?=[\/\\"'${S}\x60)\]]|${end}))|(?<![\p{L}\p{Nd}\p{Nl}\p{No}])home-(?<!(?<![^${S}<>"'\x60(\[])https?:\/\/(?:[a-z0-9\-]{1,63}\.){0,4}(?:github\.com|githubusercontent\.com|gitlab\.com|bitbucket\.org|codeberg\.org|huggingface\.co|sr\.ht)\/[A-Za-z0-9_.~\-]{1,100}\/home-)(?!example-code-)[${W}.][${W}.\-]{0,255}-code-`)],
               ['hugging-face-token', rule(String.raw`${b}hf_[A-Za-z0-9]{20,}${b}`)],
               ['github-token', rule(String.raw`${b}(?:gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,})${b}`)],
               ['tavily-token', rule(String.raw`${b}tvly-(?:(?:prod|dev)-)?[A-Za-z0-9_\-]{24,}${b}`)],
@@ -106,8 +112,10 @@ jobs:
             const percentRun = (run) => {
               try { return decodeURIComponent(run); } catch { return run.replace(/%([0-9A-Fa-f]{2})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16))); }
             };
-            // A link label holds no '[', so an unmatched '[' is passed over once, not rescanned to the end of the body.
-            const links = /!?\[([^\[\]\n]*)\]\(\s*<?([^\s()<>]*)>?(?:\s+(?:"[^"\n]*"|'[^'\n]*'|\([^()\n]*\)))?\s*\)/g;
+            // A link label holds no '[', so an unmatched '[' is passed over once, not rescanned to the end of the body. Its
+            // parentheses hold no line break and one level of nested pairs, read by runs that cannot overlap, so an
+            // unclosed '(' is scanned once to the end of its line.
+            const links = /!?\[([^\[\]\n]*)\]\([^()\n]*(?:\([^()\n]*\)[^()\n]*)*\)/g;
             // Only the inline elements GitHub renders are removed; any other <word>, such as a <user> placeholder, stays as text.
             const inlineTags = /<\/?(?:a|abbr|b|bdi|bdo|br|cite|code|del|dfn|em|i|img|ins|kbd|mark|q|rp|rt|ruby|s|samp|small|span|strike|strong|sub|sup|time|tt|u|var|wbr)\b[^<>\n]*>/gi;
             const decoders = [
