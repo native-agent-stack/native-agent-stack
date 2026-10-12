@@ -195,6 +195,31 @@ class PublicationValidationTests(unittest.TestCase):
         with patch.dict(validator_module.PUBLIC_EMAIL_MATCHES, reviewed):
             self.assert_invalid("personal home path")
 
+    def test_a_reviewed_address_glued_to_a_longer_local_part_is_refused(self):
+        # The co-op's GPT read at e0862d8d (P1): the rule's local part leaves out dot-atom characters such as "!", so
+        # in private!<listed> it matched only the listed tail, and the waiver passed a different address.
+        from scripts import validate as validator_module
+        listed = address("press", "upstream-vendor.com")
+        reviewed = {listed: "fixture: an upstream page's contact"}
+        with patch.dict(validator_module.PUBLIC_EMAIL_MATCHES, reviewed):
+            # The command center's read at e0862d8d: all 15 atext characters the class left out (RFC 5322 3.2.3).
+            for glue in "!#$&'*/=?^`{|}~":
+                with self.subTest(glue=glue):
+                    text = "x private" + glue + listed + " y"
+                    match = dict(PRIVATE_CONTENT)["email address"].search(text)
+                    self.assertEqual(match.group(0), "private" + glue + listed)
+                    self.assertTrue(validator_module.unreviewed_email(text))
+            for case, text in {"plain": "contact " + listed, "angle brackets": "<" + listed + ">",
+                               "mailto": "mailto:" + listed, "double quotes": '"' + listed + '"'}.items():
+                with self.subTest(case=case):
+                    self.assertFalse(validator_module.unreviewed_email(text))
+        relative = "evidence/artifacts/upstream-page.html"
+        self.add(relative, "contact private!" + listed + "\n")
+        with patch.dict(validator_module.PUBLIC_EMAIL_MATCHES, reviewed):
+            with self.assertRaises(InvalidPublication) as refused:
+                validate(self.root)
+        self.assertIn(relative + ": contains possible email address", str(refused.exception))
+
     def test_an_unreviewed_address_beside_a_reviewed_one_is_refused(self):
         # Codex's review of 308033f6: a reviewed file no longer waives a later address added to it.
         from scripts import validate as validator_module
@@ -1061,11 +1086,20 @@ class EmailAddressRuleTests(unittest.TestCase):
         "a prefix of an exempt address": address("xnoreply", "anthropic.com"),
         "an exempt address as a subdomain": address("noreply", "anthropic.com.mail-host.org"),
         "example as a subdomain label": address("someone", "example.com.mail-host.org"),
+        "example.com under a letters-only domain": address("someone", "example.com.mailhost.org"),
+        "example under a letters-only second level": address("someone", "example.mailhost.com"),
+        "a subdomain of that": address("someone", "dept.example.mailhost.com"),
+        "example under a country code": address("someone", "example.co.uk"),
+        "a .target address (a TLD as well as a unit type)": address("someone", "corp.target"),
+        "a decorator call after an escaped newline (a reviewed entry where public)": "\\n" + "@" + "app.get(",
+        "a delimiter glued before an address": "`" + address("first.last", "mail-host.com"),
         "example as a word part": address("someone", "notexample.com"),
         "noreply domain as a subdomain": address("1+someone", "users.noreply.github.com.mail-host.org"),
         "a unit type as a domain label": address("someone", "tty1.service.com"),
         "git as a local-part prefix": address("gitlab-user", "mail-host.com"),
         "a Moldovan domain": address("someone", "mail-host.md"),
+        "an address before a parenthesized note": address("first.last", "mail-host.com") + "(primary)",
+        "an escaped newline, an address, then a parenthesis": "\\n" + address("someone", "mail-host.com") + "(x)",
         "git at a company host": address("git", "private-company.com"),
         "git SSH user of a public host": "ssh -T " + address("git", "github.com"),
         "an IDNA top-level domain": address("someone", "company.xn--p1ai"),
@@ -1080,7 +1114,6 @@ class EmailAddressRuleTests(unittest.TestCase):
         "GitHub web-flow committer": address("noreply", "github.com"),
         "example.com": address("someone", "example.com"),
         "example.org subdomain": address("someone", "mail.example.org"),
-        "example under a country code": address("someone", "example.co.uk"),
         ".test": address("someone", "host.test"),
         ".example": address("someone", "host.example"),
         ".invalid": address("someone", "host.invalid"),
@@ -1091,7 +1124,8 @@ class EmailAddressRuleTests(unittest.TestCase):
         "systemd user manager": address("user", "1000.service"),
         "systemd timer instance": address("job", "daily.timer"),
         "Claude Code import": "\n" + "@" + "RTK.md",
-        "decorator call": "\\n" + "@" + "app.get(",
+        "a code span of an import": "`" + "@" + "AGENTS.md`",
+        "a quoted import": "'" + "@" + "RTK.md'",
         "no TLD": address("someone", "localhost"),
         "numeric last label": address("package", "1.2.3"),
     }
@@ -1147,25 +1181,37 @@ class EmailAddressRuleTests(unittest.TestCase):
                     with self.assertRaises(ValueError):
                         load_public_email_matches(data)
 
-    def test_every_reviewed_match_still_occurs_in_the_tree(self):
-        # An entry no tracked file carries is dead and would waive a later address unreviewed; the publication scan
-        # already refuses any match the list lacks, so together the list and the tree agree exactly.
-        from scripts.validate import PUBLIC_EMAIL_MATCHES
-        rule = self.rule()
+    def test_every_reviewed_match_still_occurs_outside_the_registry(self):
+        # An entry no tracked file but the registry carries is dead and would waive a later address unreviewed; the
+        # publication scan already refuses any match the list lacks, so together the list and the tree agree exactly.
+        from scripts.validate import PUBLIC_EMAIL_MATCHES, PUBLIC_EMAIL_REGISTRY, unoccurring_email_matches
         listing = subprocess.run(["git", "ls-files", "-z"], cwd=ROOT, capture_output=True, check=False)
         if listing.returncode:
             self.skipTest("not a Git checkout")
-        found = set()
+        texts = {}
         for relative in filter(None, listing.stdout.decode().split("\0")):
             try:
                 raw = (ROOT / relative).read_bytes()
             except OSError:
                 continue
             if b"@" in raw:
-                found.update(match.group(0).lower() for match in rule.finditer(raw.decode("utf-8", "replace")))
+                texts[relative] = raw.decode("utf-8", "replace")
+        self.assertIn(PUBLIC_EMAIL_REGISTRY, texts)  # it is tracked, and it is left out below
         for reason in PUBLIC_EMAIL_MATCHES.values():
             self.assertTrue(reason.strip())
-        self.assertEqual(sorted(set(PUBLIC_EMAIL_MATCHES) - found), [], "listed matches no tracked file carries")
+        self.assertEqual(unoccurring_email_matches(texts, PUBLIC_EMAIL_MATCHES), [],
+                         "listed matches no tracked file but the registry carries")
+
+    def test_an_entry_found_only_in_the_registry_is_dead(self):
+        # The co-op's GPT read at e0862d8d (P2): the coverage check scanned the registry too, so every entry supplied
+        # its own occurrence and an orphan passed.
+        from scripts.validate import PUBLIC_EMAIL_REGISTRY, unoccurring_email_matches
+        listed = {address("press", "upstream-vendor.com"): "fixture: an upstream page's contact"}
+        registry = json.dumps({"schema_version": 2, "groups": [{"reason": "r", "matches": list(listed)}]})
+        self.assertEqual(unoccurring_email_matches({PUBLIC_EMAIL_REGISTRY: registry}, listed), list(listed))
+        page = "contact " + address("press", "upstream-vendor.com") + "\n"
+        self.assertEqual(unoccurring_email_matches({PUBLIC_EMAIL_REGISTRY: registry,
+                                                    "evidence/artifacts/page.html": page}, listed), [])
 
 
 if __name__ == "__main__":

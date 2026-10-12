@@ -436,6 +436,46 @@ class NativeTokenCIContracts(unittest.TestCase):
                 with self.subTest(expected=expected.replace("<EMAIL>", "<redacted>")):
                     self.assertEqual(run.clean(value), expected)
 
+    def test_clean_redacts_an_address_before_a_parenthesis(self):
+        # The co-op's GPT read at e0862d8d (P1): a "(" after an address exempted it from the rule, so clean() kept it.
+        operator = "@".join(("first.last", "mail-host.com"))
+        with tempfile.TemporaryDirectory() as directory:
+            run = self._new_run(Path(directory))
+            self.assertEqual(run.clean(f"signed in as {operator}(primary)"), "signed in as <EMAIL>(primary)")
+            self.assertEqual(run.clean("x private!" + operator), "x <EMAIL>")  # the whole dot-atom, not its tail
+
+    def test_no_published_digest_confirms_what_clean_removed(self):
+        # The co-op's GPT read at e0862d8d (P1, under correction #161): raw_sha256, stdout_raw_sha256 and
+        # stderr_raw_sha256 hashed the bytes before clean(), so a guess at a removed address could be confirmed.
+        operator = "@".join(("first.last", "mail-host.com"))
+        with tempfile.TemporaryDirectory() as directory:
+            run = self._new_run(Path(directory))
+            run.command("prints-an-address", [sys.executable, "-c", f"import sys; print({operator!r}); "
+                                              f"print({operator!r}, file=sys.stderr)"])
+            source = Path(directory) / "work" / "page.txt"
+            source.write_text(f"contact {operator}\n")
+            run.artifact("page.txt", source)
+            server = Path(directory) / "server.py"
+            server.write_text("import json, sys\n"
+                              "for line in sys.stdin:\n"
+                              "    message = json.loads(line)\n"
+                              "    if 'id' in message:\n"
+                              f"        print(json.dumps({{'jsonrpc': '2.0', 'id': message['id'], "
+                              f"'result': {{'owner': {operator!r}}}}}), flush=True)\n")
+            ci.mcp_stdio_session(run, "mcp-prints-an-address", [sys.executable, str(server)],
+                                 [("initialize", {}), ("tools/list", {})], timeout=30)
+            published = (Path(directory) / "result" / "receipt.json").read_text()
+            retained = (Path(directory) / "result" / "page.txt").read_text()
+        self.assertNotIn(operator, published + retained)
+        guesses = {operator, operator + "\n", f"contact {operator}\n"}
+        guesses |= {json.dumps({"jsonrpc": "2.0", "id": number, "result": {"owner": operator}}) + "\n"
+                    for number in (1, 2)}
+        digests = set(re.findall(r"[0-9a-f]{64}", published))
+        for guess in guesses:
+            with self.subTest(guess=guess.replace(operator, "<operator>")):
+                self.assertNotIn(hashlib.sha256(guess.encode()).hexdigest(), digests)
+        self.assertNotIn("raw_sha256", published)
+
     def test_clean_redacts_uuid_text(self):
         # Source: scripts/validate.py:PRIVATE_CONTENT, including case and embedded matches.
         # Assemble fabricated identifiers so the test source contains no private-content match.

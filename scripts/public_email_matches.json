@@ -17,6 +17,8 @@
     {
       "reason": "an upstream page, package, repository, tag, advisory or paper capture naming its own public contact or author",
       "matches": [
+        "//lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org",
+        "//mail.python.org/archives/list/security-announce@python.org",
         "alexgshaw64@gmail.com",
         "arwgard@icloud.com",
         "bd-ops@alpaca.markets",
@@ -35,13 +37,11 @@
         "neoconnect@cboe.ca",
         "npm-oidc-no-reply@github.com",
         "nvd@nist.gov",
-        "package-announce@lists.fedoraproject.org",
         "rahul.chowdhury@alpaca.markets",
         "responsible.disclosure@vercel.com",
         "rmteam@nyse.com",
         "sean.wooden@kattenlaw.com",
         "security-advisories@github.com",
-        "security-announce@python.org",
         "sethmichaellarson@gmail.com",
         "steipete@gmail.com",
         "structureddata@sec.gov",
@@ -58,9 +58,22 @@
       ]
     },
     {
-      "reason": "a placeholder, an upstream test identity, the git SSH user of a public Git host, an SSH algorithm name, an escaped exempt address or a Claude Code @path import after an escaped newline, which the rule reads as an address",
+      "reason": "a placeholder, an upstream test identity, the git SSH user of a public Git host, an SSH algorithm name, an escaped exempt address, a Claude Code @path import or a decorator call after an escaped newline, or a URL path, key=, quote or code span written right before an address or an @-name, which the rule reads as an address",
       "matches": [
+        "'content=@fixture.json",
+        "'plugins.context-mode@context-mode.enabled",
+        "//medium.com/@samuel.tinnerholm",
+        "`git@github.com",
+        "`noreply@anthropic.com",
+        "`noreply@github.com",
+        "`sk-ssh-ed25519@openssh.com",
+        "body=@comment.md",
+        "d.kaeli}@northeastern.edu",
+        "dbos.requiredrole`/`@dbos.defaultrequiredrole",
         "git@github.com",
+        "n@agents.md",
+        "n@app.get",
+        "n@app.route",
         "n@fenced.md",
         "n@mcp.tool",
         "n@reference.md",
@@ -68,10 +81,10 @@
         "n@tilde-fenced.md",
         "n@unloaded.md",
         "namespace@your.domain",
-        "plugins.context-mode@context-mode.enabled",
-        "sk-ssh-ed25519@openssh.com",
+        "run_stream_events/@agent.tool",
         "t@e.com",
         "u003cnoreply@anthropic.com",
+        "user.email=t@e.com",
         "xfe@rtk.md",
         "your@email.com"
       ]
@@ -79,10 +92,11 @@
     {
       "reason": "a URL's user information or an agency's public contact in a test fixture, or an upstream bot's commit identity",
       "matches": [
+        "//user@api.github.com",
+        "//user@paper-api.alpaca.markets",
         "openhands@all-hands.dev",
         "pw@data.alpaca.markets",
-        "secret@github.com",
-        "user@paper-api.alpaca.markets"
+        "secret@github.com"
       ]
     }
   ]

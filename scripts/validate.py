@@ -57,6 +57,7 @@ def load_public_email_matches(path: Path) -> dict[str, str]:
     return matches
 
 
+PUBLIC_EMAIL_REGISTRY = "scripts/public_email_matches.json"
 PUBLIC_EMAIL_MATCHES = load_public_email_matches(Path(__file__).resolve().parent / "public_email_matches.json")
 PRIVATE_CONTENT = (
     # Historical prose can glue a UUID to a word; word boundaries miss it.
@@ -81,23 +82,38 @@ PRIVATE_CONTENT = (
     ("API secret", re.compile(r"\bsk-(?:proj-|ant-)?[A-Za-z0-9_-]{24,}\b")),
     ("private key", re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----")),
     ("bearer credential", re.compile(r"\bBearer\s+[A-Za-z0-9._~-]{30,}", re.I)),
-    # An addr-spec (RFC 5322 3.4.1) in dot-atom characters. Exempt: GitHub's users.noreply.github.com addresses,
-    # the noreply commit trailers of Anthropic and GitHub, the RFC 2606 reserved names (example.* and the .test,
-    # .example, .invalid and .localhost TLDs, with example.* under any TLD), a systemd instance unit
-    # (systemd.unit(5): name@instance.service, the suffix a unit type) and a decorator call. The last label is
-    # letters or an IDNA A-label (RFC 5890 2.3.2.1: "xn--" and at most 59 more characters), as every TLD in the
-    # IANA list is. DNS names ignore case (RFC 4343), so the rule does; Python lookbehinds are fixed-width.
+    # An addr-spec (RFC 5322 3.4.1) whose local part is a dot-atom: every atext character (3.2.3) and ".", so a match
+    # never starts inside a longer local part, and the left boundary refuses the same characters. A local part needs a
+    # letter or a digit: one of only symbols (`@AGENTS.md`, a quoted @import) names no mailbox. Exempt: GitHub's
+    # users.noreply.github.com addresses, the noreply commit trailers of Anthropic and GitHub, the RFC 2606 reserved
+    # names exactly (example.com, example.net, example.org and their subdomains, and the .test, .example, .invalid and
+    # .localhost TLDs), and a systemd instance unit (systemd.unit(5): name@instance.service, the suffix a unit type
+    # that is not also a TLD; target is one, IANA list 2026101001). A "(" after a match exempts nothing. The last label
+    # is letters or an IDNA A-label (RFC 5890 2.3.2.1: "xn--" and at most 59 more characters), as every TLD in the IANA
+    # list is. DNS names ignore case (RFC 4343), so the rule does; Python lookbehinds are fixed-width.
     ("email address", re.compile(
-        r"(?<![\w.%+-])(?!noreply@(?:anthropic|github)\.com(?![\w-]|\.\w))[A-Za-z0-9._%+-]+@"
-        r"(?!(?:[A-Za-z0-9-]+\.)*(?:users\.noreply\.github\.com|example(?:\.[A-Za-z]{2,})+"
+        r"(?<![\w.!#$%&'*+/=?^`{|}~-])(?![.!#$%&'*+/=?^_`{|}~-]*@)(?!noreply@(?:anthropic|github)\.com(?![\w-]|\.\w))"
+        r"[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@"
+        r"(?!(?:[A-Za-z0-9-]+\.)*(?:users\.noreply\.github\.com|example\.(?:com|net|org)"
         r"|[A-Za-z0-9-]+\.(?:test|example|invalid|localhost))(?![\w-]|\.\w))"
-        r"(?:[A-Za-z0-9-]+\.)+(?!(?:service|socket|target|device|mount|automount|swap|path|timer|slice|scope)"
-        r"(?![\w-]|\.\w))(?:[A-Za-z]{2,}|xn--[A-Za-z0-9-]{0,58}[A-Za-z0-9])(?![\w-]|\.\w|\()", re.I)),
+        r"(?:[A-Za-z0-9-]+\.)+(?!(?:service|socket|device|mount|automount|swap|path|timer|slice|scope)"
+        r"(?![\w-]|\.\w))(?:[A-Za-z]{2,}|xn--[A-Za-z0-9-]{0,58}[A-Za-z0-9])(?![\w-]|\.\w)", re.I)),
 )
 
 
+def unoccurring_email_matches(texts: dict, listed) -> list:
+    """The listed matches that no text but the registry's own carries ({relative path: text}). The registry names every
+    entry, so it never counts: an entry found only there is dead and would waive a later address unreviewed."""
+    rule = dict(PRIVATE_CONTENT)["email address"]
+    found = {match.group(0).lower() for relative, text in texts.items() if relative != PUBLIC_EMAIL_REGISTRY
+             for match in rule.finditer(text)}
+    return sorted(set(listed) - found)
+
+
 def unreviewed_email(content: str) -> bool:
-    """Whether the email rule matches anything in content that PUBLIC_EMAIL_MATCHES does not list."""
+    """Whether the email rule matches anything in content that PUBLIC_EMAIL_MATCHES does not list. A match is a whole
+    dot-atom local part (the rule's class is every atext character), so a listed address glued to the end of a longer
+    local part (private!<listed>) is a different, unlisted match."""
     rule = dict(PRIVATE_CONTENT)["email address"]
     return any(match.group(0).lower() not in PUBLIC_EMAIL_MATCHES for match in rule.finditer(content))
 

@@ -61,11 +61,12 @@ REDACTIONS = (
     ("personal home path", re.compile(r"/(?:home|Users)/(?!example(?:/|\b))[A-Za-z0-9_.-]+(?:/|\b)"),
      "<HOME-EXAMPLE>"),
     ("email address", re.compile(
-        r"(?<![\w.%+-])(?!noreply@(?:anthropic|github)\.com(?![\w-]|\.\w))[A-Za-z0-9._%+-]+@"
-        r"(?!(?:[A-Za-z0-9-]+\.)*(?:users\.noreply\.github\.com|example(?:\.[A-Za-z]{2,})+"
+        r"(?<![\w.!#$%&'*+/=?^`{|}~-])(?![.!#$%&'*+/=?^_`{|}~-]*@)(?!noreply@(?:anthropic|github)\.com(?![\w-]|\.\w))"
+        r"[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@"
+        r"(?!(?:[A-Za-z0-9-]+\.)*(?:users\.noreply\.github\.com|example\.(?:com|net|org)"
         r"|[A-Za-z0-9-]+\.(?:test|example|invalid|localhost))(?![\w-]|\.\w))"
-        r"(?:[A-Za-z0-9-]+\.)+(?!(?:service|socket|target|device|mount|automount|swap|path|timer|slice|scope)"
-        r"(?![\w-]|\.\w))(?:[A-Za-z]{2,}|xn--[A-Za-z0-9-]{0,58}[A-Za-z0-9])(?![\w-]|\.\w|\()", re.I), "<EMAIL>"),
+        r"(?:[A-Za-z0-9-]+\.)+(?!(?:service|socket|device|mount|automount|swap|path|timer|slice|scope)"
+        r"(?![\w-]|\.\w))(?:[A-Za-z]{2,}|xn--[A-Za-z0-9-]{0,58}[A-Za-z0-9])(?![\w-]|\.\w)", re.I), "<EMAIL>"),
 )
 # Serena declares 2.0.0.dev0 for every commit, so its manifest version names the commit after " @ "
 # and the commit is its identity (adoption/pins-linux-x86_64.json, kind uv-tool-from-git).
@@ -731,9 +732,12 @@ class Run:
                  "expected_exit": "any" if nonzero is None else "nonzero" if nonzero else "zero",
                  "timed_out": timed_out,
                  "elapsed_seconds": round(time.monotonic() - start, 3),
-                 "stdout_raw_sha256": digest(stdout), "stderr_raw_sha256": digest(stderr),
                  "stdout": self.clean(stdout.decode("utf-8", errors="replace")),
                  "stderr": self.clean(stderr.decode("utf-8", errors="replace"))}
+        # Digests of the published (sanitized) text only: a digest of the raw output would confirm what clean() took
+        # out to anyone who can guess it.
+        entry["stdout_sha256"] = digest(entry["stdout"].encode())
+        entry["stderr_sha256"] = digest(entry["stderr"].encode())
         if env:
             entry["env_overrides"] = {key: None if value is None else self.clean(value) for key, value in env.items()}
         self.report["commands"].append(entry)
@@ -757,8 +761,7 @@ class Run:
         raw = source.read_bytes()
         public = self.clean(raw.decode("utf-8")).encode()
         (self.output / name).write_bytes(public)
-        self.report["artifacts"][name] = {"raw_sha256": digest(raw),
-                                           "retained_sha256": digest(public)}
+        self.report["artifacts"][name] = {"retained_sha256": digest(public)}  # never a digest of the raw bytes
 
     def install(self, name: str) -> str:
         prefix = self.work / "install" / name
@@ -1310,8 +1313,8 @@ def mcp_stdio_session(run: Run, label: str, argv: list[str], requests: list[tupl
     basic/transports#stdio): newline-delimited JSON-RPC on the server's stdin and stdout, the
     `initialize` answer awaited before `notifications/initialized` is sent, then each request
     awaited before the next. Returns the server's response lines exactly as it wrote them,
-    initialize first. The session is recorded like a command, with each request and the raw hash
-    of its answer. MCPorter is not used here: its 0.14.1 client first sends a `server/discover`
+    initialize first. The session is recorded like a command, with each request and the hash of
+    its sanitized answer. MCPorter is not used here: its 0.14.1 client first sends a `server/discover`
     probe that ai-memory's server rejects by exiting, and its answers are re-serialized."""
     start = time.monotonic()
     process = subprocess.Popen(argv, cwd=cwd or run.work, env=run.environment(env),
@@ -1353,7 +1356,8 @@ def mcp_stdio_session(run: Run, label: str, argv: list[str], requests: list[tupl
                         "result" in message or "error" in message):
                     break
             responses.append(line)
-            exchange.append({"request": run.clean(json.dumps(request)), "response_raw_sha256": digest(line)})
+            exchange.append({"request": run.clean(json.dumps(request)),
+                             "response_sha256": digest(run.clean(line.decode("utf-8", errors="replace")).encode())})
             if number == 1:
                 process.stdin.write(b'{"jsonrpc": "2.0", "method": "notifications/initialized"}\n')
                 process.stdin.flush()
@@ -1381,9 +1385,10 @@ def mcp_stdio_session(run: Run, label: str, argv: list[str], requests: list[tupl
                  "exit_code": process.returncode, "expected_exit": "any",
                  "timed_out": failure == "timed out waiting for an answer",
                  "elapsed_seconds": round(time.monotonic() - start, 3), "mcp_exchange": exchange,
-                 "stdout_raw_sha256": digest(bytes(stdout)), "stderr_raw_sha256": digest(bytes(stderr)),
                  "stdout": run.clean(bytes(stdout).decode("utf-8", errors="replace")),
                  "stderr": run.clean(bytes(stderr).decode("utf-8", errors="replace"))}
+        entry["stdout_sha256"] = digest(entry["stdout"].encode())
+        entry["stderr_sha256"] = digest(entry["stderr"].encode())
         if env:
             entry["env_overrides"] = {key: None if value is None else run.clean(value) for key, value in env.items()}
         run.report["commands"].append(entry)

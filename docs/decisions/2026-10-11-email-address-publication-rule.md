@@ -9,19 +9,28 @@ address.
 
 ## The rule
 
-It matches an RFC 5322 3.4.1 `addr-spec` written in dot-atom characters
-(`local-part "@" domain`), ignoring case, because DNS names are case-insensitive
-(RFC 4343). It does not match these forms:
+It matches an RFC 5322 3.4.1 `addr-spec` whose local part is a dot-atom: every `atext` character
+of 3.2.3 and `.` (rfc5322.txt:679-690). The left boundary refuses the same characters, so a match
+never starts inside a longer local part. It ignores case, because DNS names are case-insensitive
+(RFC 4343). A local part needs a letter or a digit: one of symbols only (`` `@AGENTS.md` ``, a
+quoted `@import`) names no mailbox. That guard is this change's own, added when the wider class
+turned 16 code spans of Claude Code imports into matches. It does not match these forms:
 
 - GitHub's `users.noreply.github.com` commit addresses, and the `noreply@` commit
   identities of Anthropic (the Claude Code co-author trailer) and GitHub.
-- The RFC 2606 reserved names: `example.com`, `example.net` and `example.org`, and the
-  `.test`, `.example`, `.invalid` and `.localhost` TLDs. The command center's request also
-  exempts `example.*` under any other TLD (`example.co.uk`); RFC 2606 does not reserve those.
-- Beyond the request, three forms that are not addresses or name no person: GitHub's
-  `noreply@github.com` committer, a systemd instance unit (`getty@tty1.service`,
-  `user@1000.service`), whose last label is a unit type listed in systemd.unit(5) and is not
-  a TLD, and a decorator call such as `@app.get(`.
+- The RFC 2606 reserved names, exactly (rfc2606.txt:106-121): `example.com`, `example.net` and
+  `example.org` with their subdomains, and the `.test`, `.example`, `.invalid` and `.localhost`
+  TLDs. Until the reads at `e0862d8d`, `example.*` under any other TLD was exempt too (the
+  command center's first request), and the exemption chained through further labels, so
+  `…@example.com.<letters-only domain>.org` passed. Both are gone.
+- Beyond the request, two forms that are not addresses or name no person: GitHub's
+  `noreply@github.com` committer, and a systemd instance unit (`getty@tty1.service`,
+  `user@1000.service`) whose last label is a unit type listed in systemd.unit(5) that is not
+  also a TLD. `target` is both (IANA list 2026101001, line 1111), so it is no longer exempt.
+- A `(` after a match exempts nothing. Until the reads at `e0862d8d`, any match followed by `(`
+  was exempt, so an address with a parenthesized note passed both scans and `clean()`. The 7
+  tree matches that exemption covered, decorator calls after an escaped newline (`\n@app.get(`,
+  where the `n` is the escape's), are reviewed entries now.
 
 The last label is letters, or an IDNA A-label: `xn--` followed by at most 59 more characters
 (RFC 5890 2.3.2.1). Every TLD in IANA's list is one or the other.
@@ -31,8 +40,8 @@ A Claude Code `@path.md` import at the start of a line has no local part and doe
 an escaped newline (`\n@…md`), which reads as an address; those matches are reviewed entries.
 
 Each exemption is anchored at both ends. A longer local part (`xnoreply@…`), a reserved name
-used as a subdomain of another domain (`…@example.com.<other>`), and a unit type used as an
-inner label are all still refused. Python's `re` lookbehinds must match a fixed width, so the
+used as a subdomain of another domain (`…@example.com.<other>`, letters only or not), and a unit
+type used as an inner label are all refused. Python's `re` lookbehinds must match a fixed width, so the
 left boundary is a one-character class.
 
 ## Reviewed public matches
@@ -46,15 +55,20 @@ address. None holds an operator's address.
 
 The first version waived those 86 files by path. Codex's review showed that a path waiver also
 passes any later address added to the file (see below). `scripts/public_email_matches.json` now
-lists the reviewed matches themselves, 64 distinct values in lower case, in four groups, each
-with its reason. `validate.py` loads it as `PUBLIC_EMAIL_MATCHES`:
+lists the reviewed matches themselves, in lower case, in four groups, each with its reason;
+`validate.py` loads it as `PUBLIC_EMAIL_MATCHES`. After the reads at `e0862d8d` it holds 78
+values (it held 64): 19 added and 5 removed. 9 are matches that now start at a delimiter written
+before a listed or exempt address (7 listed, 2 noreply trailers); the 5 removed are those matches'
+earlier values. 2 are the decorator calls behind the `(` term's 7 tree matches. 7 are texts the
+wider class now reads as an address (URL paths, `key=`, a brace, an escaped-newline import). The
+last is the URL-userinfo fixture main's #1003 added:
 
 | Reason | Matches |
 | --- | ---: |
 | Release-signing key or package-maintainer identity, as a signature check or package install printed it | 8 |
 | Upstream page, package, repository, tag, advisory or paper capture naming its own public contact or author | 38 |
-| Placeholder, upstream test identity, the `git` SSH user of a public Git host, SSH algorithm name, escaped exempt address, or a `@path` import after an escaped newline | 14 |
-| URL user information or an agency contact in a test fixture, or an upstream bot's commit identity | 4 |
+| Placeholder, upstream test identity, the `git` SSH user of a public Git host, SSH algorithm name, escaped exempt address, a `@path` import or a decorator call after an escaped newline, or a URL path, `key=`, quote or code span written right before an address or an `@`-name | 27 |
+| URL user information or an agency contact in a test fixture, or an upstream bot's commit identity | 5 |
 
 A text passes the email rule only when every match in it is listed, so an unreviewed address
 beside a listed one is refused. The waiver covers the email rule only, in the publication scan
@@ -62,10 +76,12 @@ and in the host-receipt scan, where the raw receipt and each decoded JSON string
 their own. The publication scan reads raw text only, for every rule, so an address a JSON escape
 hides in another file meets the same boundary as an escaped home path there; host receipts are
 the files that are parsed. Every other pattern still applies. The loader refuses an entry that is not lower case
-or is listed twice. A test fails when an entry no tracked file carries, so a dead entry cannot
-later waive a new address without review; the publication scan already refuses any match the
-list lacks, so the list and the tree agree exactly. At this head the rule matches 497 times in
-93 tracked files: the 86, six that cite `git@github.com`, and the list itself.
+or is listed twice. A test fails when an entry no tracked file but the registry carries, so a
+dead entry cannot later waive a new address without review; the publication scan already refuses
+any match the list lacks, so the list and the tree agree exactly. A match is a whole dot-atom
+local part, so a listed address never waives a longer one that ends with it. At `e0862d8d` the rule
+matched 499 times in 93 tracked files (435 times in 92 outside the registry). At this head, on main
+`3a8a8461`, it matches 533 times in 106 files, and 455 times in 105 outside the registry.
 
 ## Consequences
 
@@ -151,6 +167,53 @@ was a no-op and was skipped, and each of the other nine fails the tests:
 
 The host-receipt change has its own test: an address a JSON escape hides in a receipt is
 refused even when the raw bytes hold no unreviewed match.
+
+## After the two reads at e0862d8d (2026-10-12)
+
+The co-op's GPT read (Astra) and the command center's Claude read reproduced these defects. The
+command center ruled both families' findings into one commit:
+
+- **B1, P1: a `(` after an address exempted it.** The rule's last lookahead refused any match
+  followed by `(`, so `<address>(primary)` passed the publication scan, `--scan-file` and the
+  host-receipt scan, and `Run.clean()` kept it (RFC 5322 allows a comment after a dot-atom,
+  rfc5322.txt:695). The term is gone from the rule and the sanitizer's copy. Its 7 tree matches
+  are reviewed entries.
+- **B2, P1: a reviewed suffix waived a longer address.** The local part left out 15 `atext`
+  characters (`` ! # $ & ' * / = ? ^ ` { | } ~ ``, rfc5322.txt:679-690). In `private!<listed>` the
+  rule matched only the listed tail, and the waiver passed an address the list does not name. The
+  local part and its left boundary now take every `atext` character, so the match is the whole
+  dot-atom and the waiver compares it exactly. The registry was re-reviewed: matches whose value
+  now starts at a delimiter (a URL path, `user.email=`, a quote or a code span) are listed as
+  they read.
+- **B3, P2: the registry proved its own coverage.** The dead-entry check scanned the registry too,
+  so every entry found itself. `unoccurring_email_matches` leaves the registry out, and a test
+  holds an entry found only there to be dead.
+- **B4, P1 (correction #161): published digests confirmed what `clean()` removed.** `raw_sha256`
+  (artifacts) and `stdout_raw_sha256` and `stderr_raw_sha256` (commands and the MCP stdio
+  session) hashed the bytes before redaction. Anyone with a guess could confirm a removed address
+  by hashing it. The receipt now holds digests of the published, sanitized text only
+  (`stdout_sha256`, `stderr_sha256`, `retained_sha256`), and an MCP answer's digest is of its
+  sanitized form (`response_sha256`). No reader in `scripts/` or `tests/` used the raw fields.
+- **C1, P2: the `example` exemption chained** through letters-only labels, as above. It now names
+  RFC 2606's three domains exactly.
+- **C2: `target` is a TLD**, so the unit-type exemption no longer covers it.
+- **C3: the counts** below are measured at this head.
+
+Each regression fails on `e0862d8d` and passes here (exit codes 1 and 0):
+
+- the annotated address, in the rule's cases and in `clean()`;
+- each of the 15 glued characters, in the rule, the waiver and `validate()`;
+- the registry-only orphan;
+- the chained `example` names;
+- a `.target` address;
+- no published digest, across a command, an artifact and an MCP session, matching the SHA-256
+  of a removed address or of the raw output that held it.
+
+Every address in the tests is synthetic and built at test time.
+
+The rule is hand-written, and two rounds of reads found boundary defects in it. The command
+center's research-queue row for one maintained, cited detector shared with #1012 covers this
+rule too; this change fixes the classes found.
 
 ## SOTA sources
 
