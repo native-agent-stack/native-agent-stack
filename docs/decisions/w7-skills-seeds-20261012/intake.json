@@ -71,7 +71,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/5",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/0"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/0",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/5"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-design-intake/1",
@@ -79,7 +82,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/62",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/5"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/5",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/62"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-design-intake/2",
@@ -87,7 +93,11 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/65",
           "primary_metadata_key": "bmad-code-org/bmad-method|8f2c13dd0e0073cad84168a679e5c553b2fb30b6|bmad-advanced-elicitation",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/65",
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/66"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-design-intake/3",
@@ -95,7 +105,11 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/67",
           "primary_metadata_key": "bmad-code-org/bmad-method|8f2c13dd0e0073cad84168a679e5c553b2fb30b6|bmad-forge-idea",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/67",
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/68"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-design-intake/4",
@@ -103,7 +117,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/80",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/7"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/7",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/80"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-design-intake/5",
@@ -111,7 +128,11 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/97",
           "primary_metadata_key": "everyinc/compound-engineering-plugin|030188b4ba27f2dc33fbc4d5a112d3c8cc893e8c|ce-doc-review",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/97",
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/98"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-design-intake/6",
@@ -119,7 +140,11 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/101",
           "primary_metadata_key": "fission-ai/openspec|2500d6da971336167548b53731a35b2127df35ac|openspec-explore",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/101",
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/102"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-design-intake/7",
@@ -127,7 +152,11 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/105",
           "primary_metadata_key": "garrytan/gstack|857466ff8b93c0575bc9e46cf2838d1962077d8f|office-hours",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/105",
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/106"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-design-intake/8",
@@ -135,21 +164,30 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/119",
           "primary_metadata_key": "google-labs-code/stitch-skills|0337446dadde6f8c94210444e2aa9d546126480f|design-md",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/119"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-design-intake/9",
           "subject": "https://github.com/google-labs-code/stitch-skills",
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/1632",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
-          "subject_kind": "REPOSITORY_OR_REFERENCE_SEED"
+          "subject_kind": "REPOSITORY_OR_REFERENCE_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/1632"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-design-intake/10",
           "subject": "https://github.com/phuryn/pm-skills",
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/3136",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
-          "subject_kind": "REPOSITORY_OR_REFERENCE_SEED"
+          "subject_kind": "REPOSITORY_OR_REFERENCE_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/3136"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-design-intake/11",
@@ -157,7 +195,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4450",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/10"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/10",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4450"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-design-intake/12",
@@ -165,7 +206,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4503",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/13"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/13",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4503"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-design-intake/13",
@@ -173,7 +217,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4511",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/14"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/14",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4511"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-design-intake/14",
@@ -181,7 +228,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4542",
           "primary_metadata_key": "phuryn/pm-skills|8607e3b077817f89bf4a9b623246219734ac3be0|create-prd",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4542"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-design-intake/15",
@@ -189,7 +239,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4554",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/16"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/16",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4554"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-design-intake/16",
@@ -197,7 +250,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4602",
           "primary_metadata_key": "xurble/mad-skills|8424ee10851d6f2ac7a7c4e6f2420288b4f6c760|clarify-requirements",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4602"
+          ]
         }
       ],
       "grand_row_refs": [
@@ -223,7 +279,8 @@
         "catalogs/landscape/grand-catalog-20261008.json#/rows/4542",
         "catalogs/landscape/grand-catalog-20261008.json#/rows/4554",
         "catalogs/landscape/grand-catalog-20261008.json#/rows/4602"
-      ]
+      ],
+      "resolution_ref": "docs/decisions/w7-skills-seeds-20261012/resolution-state.json#/slots/0"
     },
     {
       "layer_id": "skills-security",
@@ -263,7 +320,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/9",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/0"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/0",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/9"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-security/1",
@@ -271,7 +331,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/24",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/1"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/1",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/24"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-security/2",
@@ -279,7 +342,11 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/47",
           "primary_metadata_key": "anthropics/claude-plugins-official|d182ca456ca09d31d139f7d3818d1d333b103cce|claude-security",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/47",
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/48"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-security/3",
@@ -287,7 +354,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/60",
           "primary_metadata_key": "awarexone/agentic-bug-hunter|06c0bcb8e4291b7e431523b8294a6deaf5b61ab5|bug-bounty",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/60"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-security/4",
@@ -295,7 +365,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/74",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/6"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/6",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/74"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-security/5",
@@ -303,7 +376,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/75",
           "primary_metadata_key": "cloudflare/security-audit-skill|c1c8a8c1471069fb0e188eeaff69b8e8db6564a8|security-audit",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/75"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-security/6",
@@ -311,7 +387,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/85",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/7"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/7",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/85"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-security/7",
@@ -319,7 +398,11 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/103",
           "primary_metadata_key": "garrytan/gstack|857466ff8b93c0575bc9e46cf2838d1962077d8f|cso",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/103",
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/104"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-security/8",
@@ -327,7 +410,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/110",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/8"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/8",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/110"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-security/9",
@@ -335,20 +421,27 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/117",
           "primary_metadata_key": "github/awesome-copilot|143a3d976b3c1603cc8932984d5e1f28501cb5fc|threat-model-analyst",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/117"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-security/10",
           "subject": "https://github.com/awarexone/agentic-bug-hunter",
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/592",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
-          "subject_kind": "REPOSITORY_OR_REFERENCE_SEED"
+          "subject_kind": "REPOSITORY_OR_REFERENCE_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/592"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-security/11",
           "subject": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/895",
           "primary_metadata_state": "NO_GRAND_ROW_BINDING",
-          "subject_kind": "REPOSITORY_OR_REFERENCE_SEED"
+          "subject_kind": "REPOSITORY_OR_REFERENCE_SEED",
+          "grand_refs": []
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-security/12",
@@ -356,7 +449,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4512",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/14"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/14",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4512"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-security/13",
@@ -364,7 +460,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4526",
           "primary_metadata_key": "openai/plugins|5fd93af4cd0c623e020d0cc7e9ce178b4ac1f70f|security-diff-scan",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4526"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-security/14",
@@ -372,7 +471,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4527",
           "primary_metadata_key": "openai/plugins|5fd93af4cd0c623e020d0cc7e9ce178b4ac1f70f|security-scan",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4527"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-security/15",
@@ -380,7 +482,11 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4528",
           "primary_metadata_key": "openai/plugins|5fd93af4cd0c623e020d0cc7e9ce178b4ac1f70f|threat-model",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4528",
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4529"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-security/16",
@@ -388,7 +494,11 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4530",
           "primary_metadata_key": "openai/plugins|5fd93af4cd0c623e020d0cc7e9ce178b4ac1f70f|triage-finding",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4530",
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4531"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-security/17",
@@ -396,7 +506,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4532",
           "primary_metadata_key": "openai/plugins|5fd93af4cd0c623e020d0cc7e9ce178b4ac1f70f|validation",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4532"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-security/18",
@@ -404,7 +517,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4536",
           "primary_metadata_key": "openai/skills|49f948faa9258a0c61caceaf225e179651397431|security-best-practices",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4536"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-security/19",
@@ -412,7 +528,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4537",
           "primary_metadata_key": "openai/skills|49f948faa9258a0c61caceaf225e179651397431|security-threat-model",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4537"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-security/20",
@@ -420,7 +539,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4550",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/15"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/15",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4550"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-security/21",
@@ -428,7 +550,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4559",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/16"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/16",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4559"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-security/22",
@@ -436,7 +561,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4564",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/17"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/17",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4564"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-security/23",
@@ -444,7 +572,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4573",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/18"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/18",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4573"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-security/24",
@@ -452,7 +583,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4575",
           "primary_metadata_key": "trailofbits/skills|82fe8226252622fa807643bdca1710901198553a|agentic-actions-auditor",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4575"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-security/25",
@@ -460,7 +594,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4576",
           "primary_metadata_key": "trailofbits/skills|82fe8226252622fa807643bdca1710901198553a|codeql",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4576"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-security/26",
@@ -468,7 +605,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4577",
           "primary_metadata_key": "trailofbits/skills|82fe8226252622fa807643bdca1710901198553a|fp-check",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4577"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-security/27",
@@ -476,7 +616,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4583",
           "primary_metadata_key": "trailofbits/skills|82fe8226252622fa807643bdca1710901198553a|sarif-parsing",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4583"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-security/28",
@@ -484,7 +627,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4584",
           "primary_metadata_key": "trailofbits/skills|82fe8226252622fa807643bdca1710901198553a|supply-chain-risk-auditor",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4584"
+          ]
         }
       ],
       "grand_row_refs": [
@@ -520,7 +666,8 @@
         "catalogs/landscape/grand-catalog-20261008.json#/rows/4577",
         "catalogs/landscape/grand-catalog-20261008.json#/rows/4583",
         "catalogs/landscape/grand-catalog-20261008.json#/rows/4584"
-      ]
+      ],
+      "resolution_ref": "docs/decisions/w7-skills-seeds-20261012/resolution-state.json#/slots/1"
     },
     {
       "layer_id": "skills-ci-pr",
@@ -553,7 +700,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/3",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/0"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/0",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/3"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-ci-pr/1",
@@ -561,7 +711,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/18",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/1"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/1",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/18"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-ci-pr/2",
@@ -569,7 +722,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/78",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/7"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/7",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/78"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-ci-pr/3",
@@ -577,7 +733,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/89",
           "primary_metadata_key": "cursor/plugins|77526ffa67f8dafc698d14b5356e6d4fc78c3127|fix-ci",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/89"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-ci-pr/4",
@@ -585,7 +744,11 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/90",
           "primary_metadata_key": "cursor/plugins|77526ffa67f8dafc698d14b5356e6d4fc78c3127|fix-merge-conflicts",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/90",
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/91"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-ci-pr/5",
@@ -593,7 +756,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/92",
           "primary_metadata_key": "cursor/plugins|77526ffa67f8dafc698d14b5356e6d4fc78c3127|get-pr-comments",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/92"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-ci-pr/6",
@@ -601,7 +767,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/94",
           "primary_metadata_key": "equinor/fusion-skills|e8fd6cfaf8ed8ea78c564ca87ca60eaaa4615612|fusion-github-review-resolution",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/94"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-ci-pr/7",
@@ -609,7 +778,11 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/95",
           "primary_metadata_key": "everyinc/compound-engineering-plugin|030188b4ba27f2dc33fbc4d5a112d3c8cc893e8c|ce-babysit-pr",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/95",
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/96"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-ci-pr/8",
@@ -617,7 +790,11 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/99",
           "primary_metadata_key": "everyinc/compound-engineering-plugin|030188b4ba27f2dc33fbc4d5a112d3c8cc893e8c|ce-resolve-pr-feedback",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/99",
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/100"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-ci-pr/9",
@@ -625,13 +802,17 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/107",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/8"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/8",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/107"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-ci-pr/10",
           "subject": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/814",
           "primary_metadata_state": "NO_GRAND_ROW_BINDING",
-          "subject_kind": "REPOSITORY_OR_REFERENCE_SEED"
+          "subject_kind": "REPOSITORY_OR_REFERENCE_SEED",
+          "grand_refs": []
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-ci-pr/11",
@@ -639,7 +820,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4448",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/10"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/10",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4448"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-ci-pr/12",
@@ -647,7 +831,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4501",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/13"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/13",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4501"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-ci-pr/13",
@@ -655,7 +842,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4510",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/14"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/14",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4510"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-ci-pr/14",
@@ -663,7 +853,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4534",
           "primary_metadata_key": "openai/skills|49f948faa9258a0c61caceaf225e179651397431|gh-address-comments",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4534"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-ci-pr/15",
@@ -671,7 +864,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4535",
           "primary_metadata_key": "openai/skills|49f948faa9258a0c61caceaf225e179651397431|gh-fix-ci",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4535"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-ci-pr/16",
@@ -679,7 +875,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4539",
           "primary_metadata_key": "parcha-ai/parcha-skills|31b804ccb999ccee809e65590b48c1220c8d0ddd|review-loop",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4539"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-ci-pr/17",
@@ -687,7 +886,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4552",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/16"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/16",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4552"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-ci-pr/18",
@@ -695,7 +897,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4563",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/17"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/17",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4563"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-ci-pr/19",
@@ -703,7 +908,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4570",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/18"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/18",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4570"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-ci-pr/20",
@@ -711,7 +919,11 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4596",
           "primary_metadata_key": "warpdotdev/common-skills|69b4753651ab7fab518c82be087b9f1d5b966631|respond-to-pr-comments-in-blocklist",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4596",
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4597"
+          ]
         }
       ],
       "grand_row_refs": [
@@ -739,7 +951,8 @@
         "catalogs/landscape/grand-catalog-20261008.json#/rows/4570",
         "catalogs/landscape/grand-catalog-20261008.json#/rows/4596",
         "catalogs/landscape/grand-catalog-20261008.json#/rows/4597"
-      ]
+      ],
+      "resolution_ref": "docs/decisions/w7-skills-seeds-20261012/resolution-state.json#/slots/2"
     },
     {
       "layer_id": "skills-skill-lifecycle",
@@ -775,7 +988,11 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/34",
           "primary_metadata_key": "agent-sh/agnix|1306ce5e302b8295c5c8e4865cbac5929caa67f4|agnix",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/34",
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/35"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-skill-lifecycle/1",
@@ -783,7 +1000,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/38",
           "primary_metadata_key": "alchaincyf/darwin-skill|8a8b66258e3c45d6ae4aea39719468c6428fcb0a|darwin-skill",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/38"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-skill-lifecycle/2",
@@ -791,7 +1011,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/41",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/3"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/3",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/41"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-skill-lifecycle/3",
@@ -799,7 +1022,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/45",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/4"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/4",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/45"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-skill-lifecycle/4",
@@ -807,7 +1033,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/53",
           "primary_metadata_key": "anthropics/skills|683bc88e56f3e09ba94f7055977f3d3aa499f202|skill-creator",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/53"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-skill-lifecycle/5",
@@ -815,7 +1044,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/64",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/5"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/5",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/64"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-skill-lifecycle/6",
@@ -823,7 +1055,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/86",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/7"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/7",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/86"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-skill-lifecycle/7",
@@ -831,40 +1066,54 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/111",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/8"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/8",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/111"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-skill-lifecycle/8",
           "subject": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/795",
           "primary_metadata_state": "NO_GRAND_ROW_BINDING",
-          "subject_kind": "REPOSITORY_OR_REFERENCE_SEED"
+          "subject_kind": "REPOSITORY_OR_REFERENCE_SEED",
+          "grand_refs": []
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-skill-lifecycle/9",
           "subject": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/898",
           "primary_metadata_state": "NO_GRAND_ROW_BINDING",
-          "subject_kind": "REPOSITORY_OR_REFERENCE_SEED"
+          "subject_kind": "REPOSITORY_OR_REFERENCE_SEED",
+          "grand_refs": []
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-skill-lifecycle/10",
           "subject": "https://github.com/virgiliojr94/book-to-skill",
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4161",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
-          "subject_kind": "REPOSITORY_OR_REFERENCE_SEED"
+          "subject_kind": "REPOSITORY_OR_REFERENCE_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4161"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-skill-lifecycle/11",
           "subject": "https://github.com/xingkongliang/skills-manager",
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4309",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
-          "subject_kind": "REPOSITORY_OR_REFERENCE_SEED"
+          "subject_kind": "REPOSITORY_OR_REFERENCE_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4309"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-skill-lifecycle/12",
           "subject": "https://github.com/yusufkaraaslan/skill_seekers",
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4386",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
-          "subject_kind": "REPOSITORY_OR_REFERENCE_SEED"
+          "subject_kind": "REPOSITORY_OR_REFERENCE_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4386"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-skill-lifecycle/13",
@@ -872,7 +1121,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4466",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/12"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/12",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4466"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-skill-lifecycle/14",
@@ -880,7 +1132,11 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4499",
           "primary_metadata_key": "nvidia/skillspector|a50b9c93835c94f7d36329f11c6599abbb9c74ee|skill-inspector",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4499",
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4500"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-skill-lifecycle/15",
@@ -888,7 +1144,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4506",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/13"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/13",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4506"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-skill-lifecycle/16",
@@ -896,7 +1155,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4513",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/14"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/14",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4513"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-skill-lifecycle/17",
@@ -904,7 +1166,11 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4519",
           "primary_metadata_key": "openai/plugins|5fd93af4cd0c623e020d0cc7e9ce178b4ac1f70f|evaluate-skill",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4519",
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4520"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-skill-lifecycle/18",
@@ -912,7 +1178,11 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4523",
           "primary_metadata_key": "openai/plugins|5fd93af4cd0c623e020d0cc7e9ce178b4ac1f70f|improve-skill",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4523",
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4524"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-skill-lifecycle/19",
@@ -920,7 +1190,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4525",
           "primary_metadata_key": "openai/plugins|5fd93af4cd0c623e020d0cc7e9ce178b4ac1f70f|metric-pack-designer",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4525"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-skill-lifecycle/20",
@@ -928,7 +1201,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4538",
           "primary_metadata_key": "openai/skills|49f948faa9258a0c61caceaf225e179651397431|skill-creator",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4538"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-skill-lifecycle/21",
@@ -936,7 +1212,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4545",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/24"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/24",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4545"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-skill-lifecycle/22",
@@ -944,7 +1223,12 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4546",
           "primary_metadata_key": "promptfoo/promptfoo|d46ee504e366be7788df5d389420ff36bb7e03c3|promptfoo-evals",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4546",
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4547",
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4548"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-skill-lifecycle/23",
@@ -952,7 +1236,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4560",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/16"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/16",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4560"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-skill-lifecycle/24",
@@ -960,7 +1247,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4565",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/17"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/17",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4565"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-skill-lifecycle/25",
@@ -968,7 +1258,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4589",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/22"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/22",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4589"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-skill-lifecycle/26",
@@ -976,7 +1269,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4593",
           "primary_metadata_key": "vercel-labs/skills|05bf93879366fa21c5a4df7482a96adf13beabd2|find-skills",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4593"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-skill-lifecycle/27",
@@ -984,7 +1280,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4594",
           "primary_metadata_key": "virgiliojr94/book-to-skill|e180fc46365e8c1aab0120778cc8a40b9515324b|book-to-skill",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4594"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-skill-lifecycle/28",
@@ -992,7 +1291,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4601",
           "primary_metadata_key": "xingkongliang/skills-manager|b2dba38d498930f23821445bf762cb25e8583436|manage-skills",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4601"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-skill-lifecycle/29",
@@ -1000,7 +1302,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4604",
           "primary_metadata_key": "yusufkaraaslan/skill_seekers|5b5d8dfca263fa76e6daae9f292890b311ef36aa|skill-builder",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4604"
+          ]
         }
       ],
       "grand_row_refs": [
@@ -1038,7 +1343,8 @@
         "catalogs/landscape/grand-catalog-20261008.json#/rows/4594",
         "catalogs/landscape/grand-catalog-20261008.json#/rows/4601",
         "catalogs/landscape/grand-catalog-20261008.json#/rows/4604"
-      ]
+      ],
+      "resolution_ref": "docs/decisions/w7-skills-seeds-20261012/resolution-state.json#/slots/3"
     },
     {
       "layer_id": "skills-agent-docs",
@@ -1069,42 +1375,60 @@
           "subject": "agent-sh/agnix@agnix",
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/33",
           "primary_metadata_state": "NO_IMPLEMENTATION_PIN",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/33"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-agent-docs/1",
           "subject": "anthropics/skills@claude-api",
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/49",
           "primary_metadata_state": "NO_IMPLEMENTATION_PIN",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/49"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-agent-docs/2",
           "subject": "dyoshikawa/rulesync@rulesync",
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/93",
           "primary_metadata_state": "NO_IMPLEMENTATION_PIN",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/93"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-agent-docs/3",
           "subject": "github/awesome-copilot@docs-sync-audit",
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/114",
           "primary_metadata_state": "NO_IMPLEMENTATION_PIN",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/114"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-agent-docs/4",
           "subject": "mblode/agent-skills@agents-md",
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4462",
           "primary_metadata_state": "NO_IMPLEMENTATION_PIN",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4462"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-agent-docs/5",
           "subject": "zandereins/schliff@schliff",
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4605",
           "primary_metadata_state": "NO_IMPLEMENTATION_PIN",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4605"
+          ]
         }
       ],
       "grand_row_refs": [
@@ -1114,7 +1438,8 @@
         "catalogs/landscape/grand-catalog-20261008.json#/rows/114",
         "catalogs/landscape/grand-catalog-20261008.json#/rows/4462",
         "catalogs/landscape/grand-catalog-20261008.json#/rows/4605"
-      ]
+      ],
+      "resolution_ref": "docs/decisions/w7-skills-seeds-20261012/resolution-state.json#/slots/4"
     },
     {
       "layer_id": "skills-architecture",
@@ -1140,77 +1465,110 @@
           "subject": "addyosmani/agent-skills@api-and-interface-design",
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/11",
           "primary_metadata_state": "NO_IMPLEMENTATION_PIN",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/11"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-architecture/1",
           "subject": "addyosmani/agent-skills@code-simplification",
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/13",
           "primary_metadata_state": "NO_IMPLEMENTATION_PIN",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/13"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-architecture/2",
           "subject": "codybrom/clairvoyance@design-review",
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/76",
           "primary_metadata_state": "NO_IMPLEMENTATION_PIN",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/76"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-architecture/3",
           "subject": "https://github.com/denissergeevitch/agents-best-practices",
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/1131",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
-          "subject_kind": "REPOSITORY_OR_REFERENCE_SEED"
+          "subject_kind": "REPOSITORY_OR_REFERENCE_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/1131"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-architecture/4",
           "subject": "hyhmrright/brooks-lint@brooks-audit",
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4442",
           "primary_metadata_state": "NO_IMPLEMENTATION_PIN",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4442"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-architecture/5",
           "subject": "levnikolaevich/claude-code-skills@ln-56-architecture-auditor",
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4446",
           "primary_metadata_state": "NO_IMPLEMENTATION_PIN",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4446"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-architecture/6",
           "subject": "mattpocock/skills@improve-codebase-architecture",
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4458",
           "primary_metadata_state": "NO_IMPLEMENTATION_PIN",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4458"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-architecture/7",
           "subject": "terminalskills/skills@improve-codebase-architecture",
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4567",
           "primary_metadata_state": "NO_IMPLEMENTATION_PIN",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4567"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-architecture/8",
           "subject": "wondelai/skills@software-design-philosophy",
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4598",
           "primary_metadata_state": "NO_IMPLEMENTATION_PIN",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4598"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-architecture/9",
           "subject": "wshobson/agents@architecture-patterns",
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4599",
           "primary_metadata_state": "NO_IMPLEMENTATION_PIN",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4599"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-architecture/10",
           "subject": "wshobson/agents@python-design-patterns",
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4600",
           "primary_metadata_state": "NO_IMPLEMENTATION_PIN",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4600"
+          ]
         }
       ],
       "grand_row_refs": [
@@ -1225,7 +1583,8 @@
         "catalogs/landscape/grand-catalog-20261008.json#/rows/4598",
         "catalogs/landscape/grand-catalog-20261008.json#/rows/4599",
         "catalogs/landscape/grand-catalog-20261008.json#/rows/4600"
-      ]
+      ],
+      "resolution_ref": "docs/decisions/w7-skills-seeds-20261012/resolution-state.json#/slots/5"
     },
     {
       "layer_id": "skills-browser",
@@ -1253,7 +1612,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/2",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/0"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/0",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/2"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-browser/1",
@@ -1261,7 +1623,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/12",
           "primary_metadata_key": "addyosmani/agent-skills|1401c8b8030e023baeebb31781a6653fe8e93026|browser-testing-with-devtools",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/12"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-browser/2",
@@ -1269,7 +1634,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/17",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/1"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/1",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/17"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-browser/3",
@@ -1277,7 +1645,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/27",
           "primary_metadata_key": "affaan-m/ecc|ef648e01899ba3e8dc6371642deaaf64b4477775|browser-qa",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/27"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-browser/4",
@@ -1285,7 +1656,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/42",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/4"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/4",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/42"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-browser/5",
@@ -1293,7 +1667,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/54",
           "primary_metadata_key": "anthropics/skills|683bc88e56f3e09ba94f7055977f3d3aa499f202|webapp-testing",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/54"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-browser/6",
@@ -1301,7 +1678,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/61",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/5"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/5",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/61"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-browser/7",
@@ -1309,7 +1689,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/71",
           "primary_metadata_key": "brettdavies/crawl4ai-skill|98f71583e27fe07f3f662398bc3c1c59af75e70c|crawl4ai",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/71"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-browser/8",
@@ -1317,7 +1700,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/72",
           "primary_metadata_key": "browser-use/browser-use|7be96ed8bafa8dfe1eef228b59cf5c884b8b2431|browser-use",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/72"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-browser/9",
@@ -1325,7 +1711,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/73",
           "primary_metadata_key": "chromedevtools/chrome-devtools-mcp|b2f522c8ba0fd2e00a679159b4aa5243de5f1b78|chrome-devtools-cli",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/73"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-browser/10",
@@ -1333,7 +1722,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/77",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/7"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/7",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/77"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-browser/11",
@@ -1341,7 +1733,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4463",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/11"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/11",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4463"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-browser/12",
@@ -1349,7 +1744,11 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4467",
           "primary_metadata_key": "microsoft/playwright-cli|b85c7a736bb473bf55b584e54a09ffa698d6d871|playwright-cli",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4467",
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4468"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-browser/13",
@@ -1357,7 +1756,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4509",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/14"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/14",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4509"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-browser/14",
@@ -1365,7 +1767,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4522",
           "primary_metadata_key": "openai/plugins|5fd93af4cd0c623e020d0cc7e9ce178b4ac1f70f|frontend-testing-debugging",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4522"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-browser/15",
@@ -1373,7 +1778,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4551",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/16"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/16",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4551"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-browser/16",
@@ -1381,7 +1789,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4588",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/20"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/20",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4588"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-browser/17",
@@ -1389,7 +1800,11 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4590",
           "primary_metadata_key": "vercel-labs/agent-browser|0207911f1bd4d0393eddaa90f2e50f96e0fb8974|agent-browser",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4590",
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4591"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-browser/18",
@@ -1397,7 +1812,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4592",
           "primary_metadata_key": "vercel-labs/agent-browser|0207911f1bd4d0393eddaa90f2e50f96e0fb8974|core",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4592"
+          ]
         }
       ],
       "grand_row_refs": [
@@ -1422,7 +1840,8 @@
         "catalogs/landscape/grand-catalog-20261008.json#/rows/4590",
         "catalogs/landscape/grand-catalog-20261008.json#/rows/4591",
         "catalogs/landscape/grand-catalog-20261008.json#/rows/4592"
-      ]
+      ],
+      "resolution_ref": "docs/decisions/w7-skills-seeds-20261012/resolution-state.json#/slots/6"
     },
     {
       "layer_id": "skills-debug",
@@ -1454,7 +1873,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/0",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/23"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/23",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/0"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-debug/1",
@@ -1462,7 +1884,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/1",
           "primary_metadata_key": "aannoo/hcom|139235d735915ecab351292e26b3982de3dab799|hcom-agent-messaging",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/1"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-debug/2",
@@ -1470,7 +1895,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/0"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/0",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-debug/3",
@@ -1478,7 +1906,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/14",
           "primary_metadata_key": "addyosmani/agent-skills|1401c8b8030e023baeebb31781a6653fe8e93026|debugging-and-error-recovery",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/14"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-debug/4",
@@ -1486,7 +1917,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/19",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/1"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/1",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/19"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-debug/5",
@@ -1494,7 +1928,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/79",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/7"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/7",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/79"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-debug/6",
@@ -1502,7 +1939,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/108",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/8"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/8",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/108"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-debug/7",
@@ -1510,7 +1950,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/120",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/25"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/25",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/120"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-debug/8",
@@ -1518,7 +1961,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/121",
           "primary_metadata_key": "grafana/skills|1ccacf29049fde66637fe01ab93a83a772da323b|loki",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/121"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-debug/9",
@@ -1526,7 +1972,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/122",
           "primary_metadata_key": "grafana/skills|1ccacf29049fde66637fe01ab93a83a772da323b|pyroscope",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/122"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-debug/10",
@@ -1534,7 +1983,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4449",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/10"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/10",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4449"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-debug/11",
@@ -1542,7 +1994,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4456",
           "primary_metadata_key": "mattpocock/skills|b0618bc436ad893b3c5e84e55fba86586d34a404|diagnosing-bugs",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4456"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-debug/12",
@@ -1550,7 +2005,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4502",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/13"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/13",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4502"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-debug/13",
@@ -1558,7 +2016,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4508",
           "primary_metadata_key": "obra/superpowers|8ca22dba9a94f28898bbce59f2537ff4d87c747d|systematic-debugging",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4508"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-debug/14",
@@ -1566,7 +2027,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4553",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/16"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/16",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4553"
+          ]
         }
       ],
       "grand_row_refs": [
@@ -1585,7 +2049,8 @@
         "catalogs/landscape/grand-catalog-20261008.json#/rows/4502",
         "catalogs/landscape/grand-catalog-20261008.json#/rows/4508",
         "catalogs/landscape/grand-catalog-20261008.json#/rows/4553"
-      ]
+      ],
+      "resolution_ref": "docs/decisions/w7-skills-seeds-20261012/resolution-state.json#/slots/7"
     },
     {
       "layer_id": "skills-implement",
@@ -1616,7 +2081,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/6",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/0"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/0",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/6"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-implement/1",
@@ -1624,7 +2092,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/15",
           "primary_metadata_key": "addyosmani/agent-skills|1401c8b8030e023baeebb31781a6653fe8e93026|frontend-ui-engineering",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/15"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-implement/2",
@@ -1632,7 +2103,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/16",
           "primary_metadata_key": "addyosmani/agent-skills|1401c8b8030e023baeebb31781a6653fe8e93026|incremental-implementation",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/16"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-implement/3",
@@ -1640,7 +2114,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/20",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/1"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/1",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/20"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-implement/4",
@@ -1648,7 +2125,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/28",
           "primary_metadata_key": "affaan-m/ecc|ef648e01899ba3e8dc6371642deaaf64b4477775|design-system",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/28"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-implement/5",
@@ -1656,7 +2136,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/30",
           "primary_metadata_key": "affaan-m/ecc|ef648e01899ba3e8dc6371642deaaf64b4477775|python-patterns",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/30"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-implement/6",
@@ -1664,7 +2147,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/43",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/4"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/4",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/43"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-implement/7",
@@ -1672,7 +2158,11 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/50",
           "primary_metadata_key": "anthropics/skills|683bc88e56f3e09ba94f7055977f3d3aa499f202|frontend-design",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/50",
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/51"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-implement/8",
@@ -1680,7 +2170,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/59",
           "primary_metadata_key": "astral-sh/claude-code-plugins|f3ce88a7ba830f53afd6d944c1d0278ed318e142|uv",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/59"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-implement/9",
@@ -1688,26 +2181,34 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/81",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/7"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/7",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/81"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-implement/10",
           "subject": "https://github.com/abi/screenshot-to-code",
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/181",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
-          "subject_kind": "REPOSITORY_OR_REFERENCE_SEED"
+          "subject_kind": "REPOSITORY_OR_REFERENCE_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/181"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-implement/11",
           "subject": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/814",
           "primary_metadata_state": "NO_GRAND_ROW_BINDING",
-          "subject_kind": "REPOSITORY_OR_REFERENCE_SEED"
+          "subject_kind": "REPOSITORY_OR_REFERENCE_SEED",
+          "grand_refs": []
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-implement/12",
           "subject": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/887",
           "primary_metadata_state": "NO_GRAND_ROW_BINDING",
-          "subject_kind": "REPOSITORY_OR_REFERENCE_SEED"
+          "subject_kind": "REPOSITORY_OR_REFERENCE_SEED",
+          "grand_refs": []
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-implement/13",
@@ -1715,7 +2216,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4445",
           "primary_metadata_key": "leonxlnx/taste-skill|ce26fc25c0e5e8cab638f883de62d9a86ee5e45b|redesign-existing-projects",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4445"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-implement/14",
@@ -1723,7 +2227,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4451",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/10"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/10",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4451"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-implement/15",
@@ -1731,7 +2238,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4457",
           "primary_metadata_key": "mattpocock/skills|b0618bc436ad893b3c5e84e55fba86586d34a404|implement",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4457"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-implement/16",
@@ -1739,7 +2249,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4498",
           "primary_metadata_key": "nextlevelbuilder/ui-ux-pro-max-skill|477bcb28c9812b385cb51a4605ddf30d7b2266e2|ui-ux-pro-max",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4498"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-implement/17",
@@ -1747,7 +2260,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4504",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/13"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/13",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4504"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-implement/18",
@@ -1755,7 +2271,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4521",
           "primary_metadata_key": "openai/plugins|5fd93af4cd0c623e020d0cc7e9ce178b4ac1f70f|frontend-app-builder",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4521"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-implement/19",
@@ -1763,7 +2282,11 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4540",
           "primary_metadata_key": "pbakaus/impeccable|ece38d9904b8a619b3f77cab476eacad09c4fb11|impeccable",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4540",
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4541"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-implement/20",
@@ -1771,7 +2294,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4555",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/16"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/16",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4555"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-implement/21",
@@ -1779,7 +2305,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4571",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/18"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/18",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4571"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-implement/22",
@@ -1787,7 +2316,11 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4578",
           "primary_metadata_key": "trailofbits/skills|82fe8226252622fa807643bdca1710901198553a|modern-python",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4578",
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4579"
+          ]
         }
       ],
       "grand_row_refs": [
@@ -1815,7 +2348,8 @@
         "catalogs/landscape/grand-catalog-20261008.json#/rows/4571",
         "catalogs/landscape/grand-catalog-20261008.json#/rows/4578",
         "catalogs/landscape/grand-catalog-20261008.json#/rows/4579"
-      ]
+      ],
+      "resolution_ref": "docs/decisions/w7-skills-seeds-20261012/resolution-state.json#/slots/8"
     },
     {
       "layer_id": "skills-mcp-build",
@@ -1841,7 +2375,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/21",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/1"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/1",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/21"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-mcp-build/1",
@@ -1849,7 +2386,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/39",
           "primary_metadata_key": "alpayc/mcp-migration-check|560d1f4fef6fdc1580b68c8a92b5714499fcfcd8|mcp-migration",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/39"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-mcp-build/2",
@@ -1857,7 +2397,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/40",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/3"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/3",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/40"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-mcp-build/3",
@@ -1865,7 +2408,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/44",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/4"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/4",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/44"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-mcp-build/4",
@@ -1873,7 +2419,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/52",
           "primary_metadata_key": "anthropics/skills|683bc88e56f3e09ba94f7055977f3d3aa499f202|mcp-builder",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/52"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-mcp-build/5",
@@ -1881,7 +2430,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/82",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/7"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/7",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/82"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-mcp-build/6",
@@ -1889,7 +2441,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/88",
           "primary_metadata_key": "cure-consulting-group/productengineeringskills|fd5b82cdae0963e97ec0c534c2b08cfe95a652fb|mcp-server-builder",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/88"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-mcp-build/7",
@@ -1897,7 +2452,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/118",
           "primary_metadata_key": "github/awesome-copilot|143a3d976b3c1603cc8932984d5e1f28501cb5fc|typescript-mcp-server-generator",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/118"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-mcp-build/8",
@@ -1905,7 +2463,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/123",
           "primary_metadata_key": "hiadamhere/skills|ce5aa4c3da15b917d69858f163514b8825a2e396|mcp-sdk",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/123"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-mcp-build/9",
@@ -1913,7 +2474,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4441",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/9"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/9",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4441"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-mcp-build/10",
@@ -1921,7 +2485,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4464",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/12"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/12",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4464"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-mcp-build/11",
@@ -1929,7 +2496,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4496",
           "primary_metadata_key": "modelcontextprotocol/kotlin-sdk|32e648305df4f3b96c7ebc5260f061d7ed13ca1c|mcp-docs",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4496"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-mcp-build/12",
@@ -1937,7 +2507,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4497",
           "primary_metadata_key": "modelcontextprotocol/modelcontextprotocol|75db1e987cbbba6d170315dc99d0dfc440754aef|search-mcp-github",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4497"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-mcp-build/13",
@@ -1945,7 +2518,11 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4543",
           "primary_metadata_key": "prefecthq/fastmcp|5baeacfe20eca735cb949564b4915f93a622b916|fastmcp-client-cli",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4543",
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4544"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-mcp-build/14",
@@ -1953,7 +2530,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4556",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/16"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/16",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4556"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-mcp-build/15",
@@ -1961,7 +2541,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4566",
           "primary_metadata_key": "tenequm/skills|0e8107783cfe2715e4c14002c7579bd4d60537e8|mcp-best-practices",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4566"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-mcp-build/16",
@@ -1969,7 +2552,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4603",
           "primary_metadata_key": "yigitkonur/skills-by-yigitkonur|fd8b771f7a4bccdb9db92bfee396a0f045041fb9|build-mcp-server-sdk-v2",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4603"
+          ]
         }
       ],
       "grand_row_refs": [
@@ -1991,7 +2577,8 @@
         "catalogs/landscape/grand-catalog-20261008.json#/rows/4556",
         "catalogs/landscape/grand-catalog-20261008.json#/rows/4566",
         "catalogs/landscape/grand-catalog-20261008.json#/rows/4603"
-      ]
+      ],
+      "resolution_ref": "docs/decisions/w7-skills-seeds-20261012/resolution-state.json#/slots/9"
     },
     {
       "layer_id": "skills-research",
@@ -2018,7 +2605,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/7",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/0"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/0",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/7"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-research/1",
@@ -2026,7 +2616,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/22",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/1"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/1",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/22"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-research/2",
@@ -2034,7 +2627,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/26",
           "primary_metadata_key": "affaan-m/ecc|ef648e01899ba3e8dc6371642deaaf64b4477775|architecture-decision-records",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/26"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-research/3",
@@ -2042,7 +2638,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/29",
           "primary_metadata_key": "affaan-m/ecc|ef648e01899ba3e8dc6371642deaaf64b4477775|iterative-retrieval",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/29"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-research/4",
@@ -2050,7 +2649,11 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/31",
           "primary_metadata_key": "affaan-m/ecc|ef648e01899ba3e8dc6371642deaaf64b4477775|search-first",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/31",
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/32"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-research/5",
@@ -2058,7 +2661,11 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/36",
           "primary_metadata_key": "akitaonrails/ai-memory|fc4da03ac5268aa44d18894685818eab2f9ecdea|ai-memory-retrieval",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/36",
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/37"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-research/6",
@@ -2066,7 +2673,11 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/55",
           "primary_metadata_key": "assafelovic/gpt-researcher|0957c301ed06c2a5857b834358c7227c739041d4|gpt-researcher",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/55",
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/56"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-research/7",
@@ -2074,7 +2685,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/63",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/5"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/5",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/63"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-research/8",
@@ -2082,7 +2696,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/83",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/7"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/7",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/83"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-research/9",
@@ -2090,21 +2707,31 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/112",
           "primary_metadata_key": "github/awesome-copilot|143a3d976b3c1603cc8932984d5e1f28501cb5fc|agent-skill-stack",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/112",
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/113"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-research/10",
           "subject": "https://github.com/avelino/awesome-go",
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/585",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
-          "subject_kind": "REPOSITORY_OR_REFERENCE_SEED"
+          "subject_kind": "REPOSITORY_OR_REFERENCE_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/585"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-research/11",
           "subject": "https://github.com/wanshuiyin/auto-claude-code-research-in-sleep",
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4229",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
-          "subject_kind": "REPOSITORY_OR_REFERENCE_SEED"
+          "subject_kind": "REPOSITORY_OR_REFERENCE_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4229"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-research/12",
@@ -2112,7 +2739,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4452",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/10"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/10",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4452"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-research/13",
@@ -2120,7 +2750,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4459",
           "primary_metadata_key": "mattpocock/skills|b0618bc436ad893b3c5e84e55fba86586d34a404|research",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4459"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-research/14",
@@ -2128,7 +2761,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4465",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/12"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/12",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4465"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-research/15",
@@ -2136,7 +2772,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4516",
           "primary_metadata_key": "openai/plugins|5fd93af4cd0c623e020d0cc7e9ce178b4ac1f70f|aiq-research",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4516"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-research/16",
@@ -2144,7 +2783,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4557",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/16"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/16",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4557"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-research/17",
@@ -2152,7 +2794,11 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4568",
           "primary_metadata_key": "tobi/qmd|facd35e01359e59d938bc9418e93fb9318addee3|qmd",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4568",
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4569"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-research/18",
@@ -2160,7 +2806,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4595",
           "primary_metadata_key": "wanshuiyin/auto-claude-code-research-in-sleep|26b95cfa0d8747078e9e43b42e20952709e561b8|research-lit",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4595"
+          ]
         }
       ],
       "grand_row_refs": [
@@ -2188,7 +2837,8 @@
         "catalogs/landscape/grand-catalog-20261008.json#/rows/4568",
         "catalogs/landscape/grand-catalog-20261008.json#/rows/4569",
         "catalogs/landscape/grand-catalog-20261008.json#/rows/4595"
-      ]
+      ],
+      "resolution_ref": "docs/decisions/w7-skills-seeds-20261012/resolution-state.json#/slots/10"
     },
     {
       "layer_id": "skills-review",
@@ -2219,7 +2869,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/8",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/0"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/0",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/8"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-review/1",
@@ -2227,7 +2880,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/23",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/1"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/1",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/23"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-review/2",
@@ -2235,7 +2891,11 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/57",
           "primary_metadata_key": "ast-grep/agent-skill|f2175aff21f20cfb8e2db30c28febeb3a2d42b61|ast-grep",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/57",
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/58"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-review/3",
@@ -2243,7 +2903,11 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/69",
           "primary_metadata_key": "boundaryml/baml|1698b89bc0881ce893e0f0b9f5d842108cfefe81|baml-core",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/69",
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/70"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-review/4",
@@ -2251,7 +2915,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/84",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/7"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/7",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/84"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-review/5",
@@ -2259,7 +2926,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/109",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/8"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/8",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/109"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-review/6",
@@ -2267,7 +2937,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4453",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/10"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/10",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4453"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-review/7",
@@ -2275,7 +2948,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4455",
           "primary_metadata_key": "mattpocock/skills|b0618bc436ad893b3c5e84e55fba86586d34a404|code-review",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4455"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-review/8",
@@ -2283,7 +2959,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4505",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/13"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/13",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4505"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-review/9",
@@ -2291,7 +2970,11 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4514",
           "primary_metadata_key": "openai/codex|3f1ccb7ceb814e54314826f68d61c892e2f5a48e|review-agent",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4514",
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4515"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-review/10",
@@ -2299,7 +2982,11 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4517",
           "primary_metadata_key": "openai/plugins|5fd93af4cd0c623e020d0cc7e9ce178b4ac1f70f|assess-patch-risk",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4517",
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4518"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-review/11",
@@ -2307,7 +2994,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4533",
           "primary_metadata_key": "openai/plugins|5fd93af4cd0c623e020d0cc7e9ce178b4ac1f70f|verify-fix",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4533"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-review/12",
@@ -2315,7 +3005,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4549",
           "primary_metadata_key": "pydantic/skills|238d97102650c1caa51f35027aee13c469c59542|building-pydantic-ai-agents",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4549"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-review/13",
@@ -2323,7 +3016,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4558",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/16"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/16",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4558"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-review/14",
@@ -2331,7 +3027,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4572",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/18"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/18",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4572"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-review/15",
@@ -2339,7 +3038,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4585",
           "primary_metadata_key": "trailofbits/skills|82fe8226252622fa807643bdca1710901198553a|variant-analysis",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4585"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-review/16",
@@ -2347,7 +3049,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4586",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/19"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/19",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4586"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-review/17",
@@ -2355,7 +3060,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4587",
           "primary_metadata_key": "typesafe-ai/skills|65a39f393687675ce170e6094757de20370365b9|typesafe-ai",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4587"
+          ]
         }
       ],
       "grand_row_refs": [
@@ -2381,7 +3089,8 @@
         "catalogs/landscape/grand-catalog-20261008.json#/rows/4585",
         "catalogs/landscape/grand-catalog-20261008.json#/rows/4586",
         "catalogs/landscape/grand-catalog-20261008.json#/rows/4587"
-      ]
+      ],
+      "resolution_ref": "docs/decisions/w7-skills-seeds-20261012/resolution-state.json#/slots/11"
     },
     {
       "layer_id": "skills-test",
@@ -2411,7 +3120,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/10",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/0"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/0",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/10"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-test/1",
@@ -2419,7 +3131,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/25",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/1"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/1",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/25"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-test/2",
@@ -2427,7 +3142,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/46",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/4"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/4",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/46"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-test/3",
@@ -2435,7 +3153,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/87",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/7"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/7",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/87"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-test/4",
@@ -2443,7 +3164,11 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/115",
           "primary_metadata_key": "github/awesome-copilot|143a3d976b3c1603cc8932984d5e1f28501cb5fc|test-gap-audit",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/115",
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/116"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-test/5",
@@ -2451,7 +3176,11 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4443",
           "primary_metadata_key": "internationalcolorconsortium/iccdev|647ba5e67724862cc048c5216c046e6e9247f9c7|clusterfuzzlite",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4443",
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4444"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-test/6",
@@ -2459,7 +3188,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4447",
           "primary_metadata_key": "lgtm-hq/ai-skills|64070edb3077ce36ea1c436c9ccf1567be48fc3a|scorecard",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4447"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-test/7",
@@ -2467,7 +3199,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4454",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/10"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/10",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4454"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-test/8",
@@ -2475,7 +3210,11 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4460",
           "primary_metadata_key": "mattpocock/skills|b0618bc436ad893b3c5e84e55fba86586d34a404|tdd",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4460",
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4461"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-test/9",
@@ -2483,7 +3222,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4507",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/13"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/13",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4507"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-test/10",
@@ -2491,7 +3233,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4561",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/16"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/16",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4561"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-test/11",
@@ -2499,7 +3244,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4562",
           "primary_metadata_key": "socketdev/socket-btm|f1555cdf9bedcaf04c824c6bb4d1768736bcd077|property-and-fuzz-testing",
           "primary_metadata_state": "UNMIRRORED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4562"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-test/12",
@@ -2507,7 +3255,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4574",
           "primary_metadata_state": "UNBOUND_SKILL_OR_NONCOMMIT_SOURCE",
           "subject_kind": "SOURCE_OR_REGISTRY",
-          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/18"
+          "source_definition_ref": "catalogs/landscape/skills-lifecycle.json#/sources/18",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4574"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-test/13",
@@ -2515,7 +3266,11 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4580",
           "primary_metadata_key": "trailofbits/skills|82fe8226252622fa807643bdca1710901198553a|ossfuzz",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4580",
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4581"
+          ]
         },
         {
           "master_ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/skills-test/14",
@@ -2523,7 +3278,10 @@
           "grand_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/4582",
           "primary_metadata_key": "trailofbits/skills|82fe8226252622fa807643bdca1710901198553a|property-based-testing",
           "primary_metadata_state": "PRIMARY_METADATA_CAPTURED",
-          "subject_kind": "NAMED_SKILL_SEED"
+          "subject_kind": "NAMED_SKILL_SEED",
+          "grand_refs": [
+            "catalogs/landscape/grand-catalog-20261008.json#/rows/4582"
+          ]
         }
       ],
       "grand_row_refs": [
@@ -2546,7 +3304,8 @@
         "catalogs/landscape/grand-catalog-20261008.json#/rows/4580",
         "catalogs/landscape/grand-catalog-20261008.json#/rows/4581",
         "catalogs/landscape/grand-catalog-20261008.json#/rows/4582"
-      ]
+      ],
+      "resolution_ref": "docs/decisions/w7-skills-seeds-20261012/resolution-state.json#/slots/12"
     }
   ],
   "primary_metadata": {
@@ -2857,7 +3616,7 @@
         {
           "path": "plugins/fp-check/skills/fp-check/SKILL.md",
           "metadata_name": "fp-check",
-          "description": "Systematically verifies suspected security bugs to eliminate false positives, producing a TRUE POSITIVE or FALSE POSITIVE verdict with documented evidence for each. Use when asked whether a specific finding is real, exploitable, or a false positive, or to verify or validate a suspected vulnerability — not for hunting or discovering new bugs.",
+          "description": "Systematically verifies suspected security bugs to eliminate false positives, producing a TRUE POSITIVE or FALSE POSITIVE verdict with documented evidence for each. Use when asked whether a specific finding is real, exploitable, or a false positive, or to verify or validate a suspected vulnerability \u2014 not for hunting or discovering new bugs.",
           "disable_model_invocation": null,
           "user_invocable": null,
           "effort": null,
@@ -2876,7 +3635,7 @@
         {
           "path": "plugins/static-analysis/skills/sarif-parsing/SKILL.md",
           "metadata_name": "sarif-parsing",
-          "description": "Parses and processes SARIF files from static analysis tools like CodeQL, Semgrep, or other scanners. Triggers on \"parse sarif\", \"read scan results\", \"aggregate findings\", \"deduplicate alerts\", or \"process sarif output\". Handles filtering, deduplication, format conversion, and CI/CD integration of SARIF data. Does NOT run scans — use the Semgrep or CodeQL skills for that.",
+          "description": "Parses and processes SARIF files from static analysis tools like CodeQL, Semgrep, or other scanners. Triggers on \"parse sarif\", \"read scan results\", \"aggregate findings\", \"deduplicate alerts\", or \"process sarif output\". Handles filtering, deduplication, format conversion, and CI/CD integration of SARIF data. Does NOT run scans \u2014 use the Semgrep or CodeQL skills for that.",
           "disable_model_invocation": null,
           "user_invocable": null,
           "effort": null,
@@ -3200,7 +3959,7 @@
         {
           "path": "docs/ja-JP/skills/browser-qa/SKILL.md",
           "metadata_name": "browser-qa",
-          "description": "このスキルを使用して、機能をデプロイ後にブラウザ自動化を使用した自動ビジュアルテストとUI相互作用検証を自動化します。",
+          "description": "\u3053\u306e\u30b9\u30ad\u30eb\u3092\u4f7f\u7528\u3057\u3066\u3001\u6a5f\u80fd\u3092\u30c7\u30d7\u30ed\u30a4\u5f8c\u306b\u30d6\u30e9\u30a6\u30b6\u81ea\u52d5\u5316\u3092\u4f7f\u7528\u3057\u305f\u81ea\u52d5\u30d3\u30b8\u30e5\u30a2\u30eb\u30c6\u30b9\u30c8\u3068UI\u76f8\u4e92\u4f5c\u7528\u691c\u8a3c\u3092\u81ea\u52d5\u5316\u3057\u307e\u3059\u3002",
           "disable_model_invocation": null,
           "user_invocable": null,
           "effort": null,
@@ -3435,7 +4194,7 @@
         {
           "path": "docs/ja-JP/skills/design-system/SKILL.md",
           "metadata_name": "design-system",
-          "description": "アクセシビリティ、レスポンシブネス、テーマ設定、コンポーネント群、トークンを備えた本番環境対応デザインシステムの構築。Figma、Storybook、コンポーネントライブラリ統合。",
+          "description": "\u30a2\u30af\u30bb\u30b7\u30d3\u30ea\u30c6\u30a3\u3001\u30ec\u30b9\u30dd\u30f3\u30b7\u30d6\u30cd\u30b9\u3001\u30c6\u30fc\u30de\u8a2d\u5b9a\u3001\u30b3\u30f3\u30dd\u30fc\u30cd\u30f3\u30c8\u7fa4\u3001\u30c8\u30fc\u30af\u30f3\u3092\u5099\u3048\u305f\u672c\u756a\u74b0\u5883\u5bfe\u5fdc\u30c7\u30b6\u30a4\u30f3\u30b7\u30b9\u30c6\u30e0\u306e\u69cb\u7bc9\u3002Figma\u3001Storybook\u3001\u30b3\u30f3\u30dd\u30fc\u30cd\u30f3\u30c8\u30e9\u30a4\u30d6\u30e9\u30ea\u7d71\u5408\u3002",
           "disable_model_invocation": null,
           "user_invocable": null,
           "effort": null,
@@ -3445,7 +4204,7 @@
         {
           "path": "docs/zh-CN/skills/design-system/SKILL.md",
           "metadata_name": "design-system",
-          "description": "使用此技能生成或审计设计系统，检查视觉一致性，并审查涉及样式的PR。",
+          "description": "\u4f7f\u7528\u6b64\u6280\u80fd\u751f\u6210\u6216\u5ba1\u8ba1\u8bbe\u8ba1\u7cfb\u7edf\uff0c\u68c0\u67e5\u89c6\u89c9\u4e00\u81f4\u6027\uff0c\u5e76\u5ba1\u67e5\u6d89\u53ca\u6837\u5f0f\u7684PR\u3002",
           "disable_model_invocation": null,
           "user_invocable": null,
           "effort": null,
@@ -3494,7 +4253,7 @@
         {
           "path": "docs/es/skills/python-patterns/SKILL.md",
           "metadata_name": "python-patterns",
-          "description": "Patrones idiomáticos de Python, estándares PEP 8, type hints y buenas prácticas para construir aplicaciones Python robustas, eficientes y mantenibles.",
+          "description": "Patrones idiom\u00e1ticos de Python, est\u00e1ndares PEP 8, type hints y buenas pr\u00e1cticas para construir aplicaciones Python robustas, eficientes y mantenibles.",
           "disable_model_invocation": null,
           "user_invocable": null,
           "effort": null,
@@ -3504,7 +4263,7 @@
         {
           "path": "docs/ja-JP/skills/python-patterns/SKILL.md",
           "metadata_name": "python-patterns",
-          "description": "Pythonic イディオム、PEP 8標準、型ヒント、堅牢で効率的かつ保守可能なPythonアプリケーションを構築するためのベストプラクティス。",
+          "description": "Pythonic \u30a4\u30c7\u30a3\u30aa\u30e0\u3001PEP 8\u6a19\u6e96\u3001\u578b\u30d2\u30f3\u30c8\u3001\u5805\u7262\u3067\u52b9\u7387\u7684\u304b\u3064\u4fdd\u5b88\u53ef\u80fd\u306aPython\u30a2\u30d7\u30ea\u30b1\u30fc\u30b7\u30e7\u30f3\u3092\u69cb\u7bc9\u3059\u308b\u305f\u3081\u306e\u30d9\u30b9\u30c8\u30d7\u30e9\u30af\u30c6\u30a3\u30b9\u3002",
           "disable_model_invocation": null,
           "user_invocable": null,
           "effort": null,
@@ -3514,7 +4273,7 @@
         {
           "path": "docs/tr/skills/python-patterns/SKILL.md",
           "metadata_name": "python-patterns",
-          "description": "Pythonic idiomlar, PEP 8 standartları, type hint'ler ve sağlam, verimli ve bakımı kolay Python uygulamaları oluşturmak için en iyi uygulamalar.",
+          "description": "Pythonic idiomlar, PEP 8 standartlar\u0131, type hint'ler ve sa\u011flam, verimli ve bak\u0131m\u0131 kolay Python uygulamalar\u0131 olu\u015fturmak i\u00e7in en iyi uygulamalar.",
           "disable_model_invocation": null,
           "user_invocable": null,
           "effort": null,
@@ -3524,7 +4283,7 @@
         {
           "path": "docs/zh-CN/skills/python-patterns/SKILL.md",
           "metadata_name": "python-patterns",
-          "description": "Pythonic 惯用法、PEP 8 标准、类型提示以及构建稳健、高效且可维护的 Python 应用程序的最佳实践。",
+          "description": "Pythonic \u60ef\u7528\u6cd5\u3001PEP 8 \u6807\u51c6\u3001\u7c7b\u578b\u63d0\u793a\u4ee5\u53ca\u6784\u5efa\u7a33\u5065\u3001\u9ad8\u6548\u4e14\u53ef\u7ef4\u62a4\u7684 Python \u5e94\u7528\u7a0b\u5e8f\u7684\u6700\u4f73\u5b9e\u8df5\u3002",
           "disable_model_invocation": null,
           "user_invocable": null,
           "effort": null,
@@ -3749,7 +4508,7 @@
         {
           "path": "docs/ja-JP/skills/architecture-decision-records/SKILL.md",
           "metadata_name": "architecture-decision-records",
-          "description": "コーディングセッション中にアーキテクチャ決定を構造化ADRとして記録し、自動的に決定の瞬間を検出し、コンテキスト、検討された代替案、根拠を記録します。今後の開発者がコードベースの形成理由を理解するためのADRログを維持します。",
+          "description": "\u30b3\u30fc\u30c7\u30a3\u30f3\u30b0\u30bb\u30c3\u30b7\u30e7\u30f3\u4e2d\u306b\u30a2\u30fc\u30ad\u30c6\u30af\u30c1\u30e3\u6c7a\u5b9a\u3092\u69cb\u9020\u5316ADR\u3068\u3057\u3066\u8a18\u9332\u3057\u3001\u81ea\u52d5\u7684\u306b\u6c7a\u5b9a\u306e\u77ac\u9593\u3092\u691c\u51fa\u3057\u3001\u30b3\u30f3\u30c6\u30ad\u30b9\u30c8\u3001\u691c\u8a0e\u3055\u308c\u305f\u4ee3\u66ff\u6848\u3001\u6839\u62e0\u3092\u8a18\u9332\u3057\u307e\u3059\u3002\u4eca\u5f8c\u306e\u958b\u767a\u8005\u304c\u30b3\u30fc\u30c9\u30d9\u30fc\u30b9\u306e\u5f62\u6210\u7406\u7531\u3092\u7406\u89e3\u3059\u308b\u305f\u3081\u306eADR\u30ed\u30b0\u3092\u7dad\u6301\u3057\u307e\u3059\u3002",
           "disable_model_invocation": null,
           "user_invocable": null,
           "effort": null,
@@ -3759,7 +4518,7 @@
         {
           "path": "docs/zh-CN/skills/architecture-decision-records/SKILL.md",
           "metadata_name": "architecture-decision-records",
-          "description": "在Claude Code会话期间，将做出的架构决策捕获为结构化的架构决策记录（ADR）。自动检测决策时刻，记录上下文、考虑的替代方案和理由。维护一个ADR日志，以便未来的开发人员理解代码库为何以当前方式构建。",
+          "description": "\u5728Claude Code\u4f1a\u8bdd\u671f\u95f4\uff0c\u5c06\u505a\u51fa\u7684\u67b6\u6784\u51b3\u7b56\u6355\u83b7\u4e3a\u7ed3\u6784\u5316\u7684\u67b6\u6784\u51b3\u7b56\u8bb0\u5f55\uff08ADR\uff09\u3002\u81ea\u52a8\u68c0\u6d4b\u51b3\u7b56\u65f6\u523b\uff0c\u8bb0\u5f55\u4e0a\u4e0b\u6587\u3001\u8003\u8651\u7684\u66ff\u4ee3\u65b9\u6848\u548c\u7406\u7531\u3002\u7ef4\u62a4\u4e00\u4e2aADR\u65e5\u5fd7\uff0c\u4ee5\u4fbf\u672a\u6765\u7684\u5f00\u53d1\u4eba\u5458\u7406\u89e3\u4ee3\u7801\u5e93\u4e3a\u4f55\u4ee5\u5f53\u524d\u65b9\u5f0f\u6784\u5efa\u3002",
           "disable_model_invocation": null,
           "user_invocable": null,
           "effort": null,
@@ -3798,7 +4557,7 @@
         {
           "path": "docs/ja-JP/skills/iterative-retrieval/SKILL.md",
           "metadata_name": "iterative-retrieval",
-          "description": "サブエージェントのコンテキスト問題を解決するために、コンテキスト取得を段階的に洗練するパターン",
+          "description": "\u30b5\u30d6\u30a8\u30fc\u30b8\u30a7\u30f3\u30c8\u306e\u30b3\u30f3\u30c6\u30ad\u30b9\u30c8\u554f\u984c\u3092\u89e3\u6c7a\u3059\u308b\u305f\u3081\u306b\u3001\u30b3\u30f3\u30c6\u30ad\u30b9\u30c8\u53d6\u5f97\u3092\u6bb5\u968e\u7684\u306b\u6d17\u7df4\u3059\u308b\u30d1\u30bf\u30fc\u30f3",
           "disable_model_invocation": null,
           "user_invocable": null,
           "effort": null,
@@ -3808,7 +4567,7 @@
         {
           "path": "docs/ko-KR/skills/iterative-retrieval/SKILL.md",
           "metadata_name": "iterative-retrieval",
-          "description": "서브에이전트 컨텍스트 문제를 해결하기 위한 점진적 컨텍스트 검색 개선 패턴",
+          "description": "\uc11c\ube0c\uc5d0\uc774\uc804\ud2b8 \ucee8\ud14d\uc2a4\ud2b8 \ubb38\uc81c\ub97c \ud574\uacb0\ud558\uae30 \uc704\ud55c \uc810\uc9c4\uc801 \ucee8\ud14d\uc2a4\ud2b8 \uac80\uc0c9 \uac1c\uc120 \ud328\ud134",
           "disable_model_invocation": null,
           "user_invocable": null,
           "effort": null,
@@ -3818,7 +4577,7 @@
         {
           "path": "docs/zh-CN/skills/iterative-retrieval/SKILL.md",
           "metadata_name": "iterative-retrieval",
-          "description": "逐步优化上下文检索以解决子代理上下文问题的模式",
+          "description": "\u9010\u6b65\u4f18\u5316\u4e0a\u4e0b\u6587\u68c0\u7d22\u4ee5\u89e3\u51b3\u5b50\u4ee3\u7406\u4e0a\u4e0b\u6587\u95ee\u9898\u7684\u6a21\u5f0f",
           "disable_model_invocation": null,
           "user_invocable": null,
           "effort": null,
@@ -3867,7 +4626,7 @@
         {
           "path": "docs/ja-JP/skills/search-first/SKILL.md",
           "metadata_name": "search-first",
-          "description": "コーディング前の調査ワークフロー。カスタムコードを書く前に既存のツール、ライブラリ、パターンを検索します。researcher エージェントを呼び出します。",
+          "description": "\u30b3\u30fc\u30c7\u30a3\u30f3\u30b0\u524d\u306e\u8abf\u67fb\u30ef\u30fc\u30af\u30d5\u30ed\u30fc\u3002\u30ab\u30b9\u30bf\u30e0\u30b3\u30fc\u30c9\u3092\u66f8\u304f\u524d\u306b\u65e2\u5b58\u306e\u30c4\u30fc\u30eb\u3001\u30e9\u30a4\u30d6\u30e9\u30ea\u3001\u30d1\u30bf\u30fc\u30f3\u3092\u691c\u7d22\u3057\u307e\u3059\u3002researcher \u30a8\u30fc\u30b8\u30a7\u30f3\u30c8\u3092\u547c\u3073\u51fa\u3057\u307e\u3059\u3002",
           "disable_model_invocation": null,
           "user_invocable": null,
           "effort": null,
@@ -3877,7 +4636,7 @@
         {
           "path": "docs/zh-CN/skills/search-first/SKILL.md",
           "metadata_name": "search-first",
-          "description": "研究优先于编码的工作流程。在编写自定义代码之前，搜索现有的工具、库和模式。调用研究员代理。",
+          "description": "\u7814\u7a76\u4f18\u5148\u4e8e\u7f16\u7801\u7684\u5de5\u4f5c\u6d41\u7a0b\u3002\u5728\u7f16\u5199\u81ea\u5b9a\u4e49\u4ee3\u7801\u4e4b\u524d\uff0c\u641c\u7d22\u73b0\u6709\u7684\u5de5\u5177\u3001\u5e93\u548c\u6a21\u5f0f\u3002\u8c03\u7528\u7814\u7a76\u5458\u4ee3\u7406\u3002",
           "disable_model_invocation": null,
           "user_invocable": null,
           "effort": null,
@@ -4122,7 +4881,7 @@
         {
           "path": "plugins/variant-analysis/skills/variant-analysis/SKILL.md",
           "metadata_name": "variant-analysis",
-          "description": "Hunts for the other instances of a bug already found — the variants of one root cause across a codebase. Use immediately after a vulnerability, logic bug, or bad pattern turns up in a specific file and the question becomes where else it occurs, including the bare conversational form (\"are there others like this?\", \"is this the same bug?\"). Also for generalizing one known instance into a CodeQL or Semgrep query for its whole pattern family, and for triaging a set of look-alike candidates against a known root cause. Not for initial discovery with no bug in hand.",
+          "description": "Hunts for the other instances of a bug already found \u2014 the variants of one root cause across a codebase. Use immediately after a vulnerability, logic bug, or bad pattern turns up in a specific file and the question becomes where else it occurs, including the bare conversational form (\"are there others like this?\", \"is this the same bug?\"). Also for generalizing one known instance into a CodeQL or Semgrep query for its whole pattern family, and for triaging a set of look-alike candidates against a known root cause. Not for initial discovery with no bug in hand.",
           "disable_model_invocation": null,
           "user_invocable": null,
           "effort": null,
@@ -4226,7 +4985,7 @@
         {
           "path": "plugins/property-based-testing/skills/property-based-testing/SKILL.md",
           "metadata_name": "property-based-testing",
-          "description": "Writes, reviews, and debugs property-based tests — Hypothesis, fast-check, proptest, jqwik, rapid, and Echidna or Medusa for Solidity invariants. Use whenever tests should cover a whole input domain instead of a hand-picked list of examples: encode/decode and serialize/deserialize pairs, parsers, canonicalizers and normalizers, validators, numeric and Decimal types, comparators and sort order, data structures, and smart-contract state invariants. Also use when adding cases to an existing @given, fast-check, or proptest suite, when judging whether existing property tests assert anything real, and when a generator has shrunk a counterexample and you need to tell a wrong property from a genuine bug. Not for coverage-guided binary fuzzing (libFuzzer, AFL), mutation-testing campaigns, static analysis, benchmarking, or end-to-end UI tests.",
+          "description": "Writes, reviews, and debugs property-based tests \u2014 Hypothesis, fast-check, proptest, jqwik, rapid, and Echidna or Medusa for Solidity invariants. Use whenever tests should cover a whole input domain instead of a hand-picked list of examples: encode/decode and serialize/deserialize pairs, parsers, canonicalizers and normalizers, validators, numeric and Decimal types, comparators and sort order, data structures, and smart-contract state invariants. Also use when adding cases to an existing @given, fast-check, or proptest suite, when judging whether existing property tests assert anything real, and when a generator has shrunk a counterexample and you need to tell a wrong property from a genuine bug. Not for coverage-guided binary fuzzing (libFuzzer, AFL), mutation-testing campaigns, static analysis, benchmarking, or end-to-end UI tests.",
           "disable_model_invocation": null,
           "user_invocable": null,
           "effort": "low",
@@ -4369,20 +5128,25 @@
     ],
     "registry_probe": {
       "command": "DISABLE_TELEMETRY=1 npx --yes skills@1.7.0 find get-shit-done",
-      "exit_code": 0,
-      "third_party_leads": [
+      "exit_code": null,
+      "authority": "Original stdout/stderr are not retained, so the claimed historical execution and reported leads are unverified. A later registry result cannot authenticate this run. No new probe was executed for this correction.",
+      "reported_exit_code": 0,
+      "reported_third_party_leads": [
         "ctsstc/get-shit-done-skills@gsd",
         "shoootyou/get-shit-done-multi@get-shit-done"
       ],
-      "authority": "Discovery only; neither is identified as the official GSD source."
+      "state": "UNVERIFIED_HISTORICAL_RESULT",
+      "stdout_ref": null,
+      "stderr_ref": null
     }
   },
   "handoff": {
     "cc_native_practice": "Tier1 slot selection, Tier2 index, vendor installer, paired frozen-task measurement.",
     "vano": "Runtime wiring and non-zero invoke acceptance.",
     "convergence_practice": "Seed provenance, primary metadata gaps and delta-only facts/fit/role intake.",
-    "execution_gate": "Per-layer W6 closeout LANDED before row36 comparison amendment/run; seed preparation starts now.",
-    "promotion_rule": "Measured correct-skill invocation, task outcome and complete provider tokens/cost on owner-frozen paired tasks; repetition/rank/stars are leads only."
+    "execution_gate": "W6 closeout landing triggered S1 intake; W7 S1 remains explicitly parked. A qualifier amends the unrun comparison; execution separately requires its sealed source/case/oracle/owner packet. If the comparison has run, open a new comparison.",
+    "promotion_rule": "Measured correct-skill invocation, task outcome and complete provider tokens/cost on owner-frozen paired tasks; repetition/rank/stars are leads only.",
+    "comparison_binding_ref": "docs/decisions/w7-skills-seeds-20261012/intake.json#/comparison"
   },
   "instructions_skills_master_scope": {
     "ref": "catalogs/convergence-practice/sources/master-seeds-20261010.json#/instructions-skills",
@@ -4395,6 +5159,26 @@
     "find_source": "src/find.ts:87-92",
     "project_scope_source": "README.md:87-90 and :132-133",
     "pin_boundary": "The central adoption manifest freezes skills CLI 1.7.0. The source is observed at that pin; no installed host default is changed.",
-    "probe_result": "The standalone skills command was absent from this shell PATH. The pinned npx find command succeeded; no skills add/use/update/check command was executed."
+    "probe_result": "Historical npx find execution was reported successful, but its original stdout/stderr are unretained and the result is unverified. No add/use/update/check command or new discovery probe was executed for this correction."
+  },
+  "layer_resolution": {
+    "path": "docs/decisions/w7-skills-seeds-20261012/resolution-state.json",
+    "sha256": "90013e750a09c056aec527ce989a89fe5a073e063e76daf4370fe9cd648bdd15",
+    "scope": "13 explicit dedicated-layer gaps plus the retained foundation instructions-skills state; source-only correction, no resumed S1."
+  },
+  "comparison": {
+    "source_commit": "5421e5d67017a1c366ee599c97c93e17ca38878e",
+    "comparison_id": "w6-instructions-skills-20261011",
+    "path": "docs/decisions/w6-practice-closeout-20261011/instructions-skills.comparison.json",
+    "sha256": "f85304bb7bdfac05d361c746babe6a3a62a5186ea06ee72302f4f3039b724774",
+    "frozen_scope": "preregistered_comparison_pending_named_inputs",
+    "scope_ref": "docs/decisions/w6-practice-closeout-20261011/instructions-skills.comparison.json#/scenarios",
+    "readiness_ref": "docs/decisions/w6-practice-closeout-20261011/instructions-skills.comparison.json#/readiness",
+    "task_oracle_refs": [
+      "docs/decisions/w6-practice-closeout-20261011/instructions-skills.comparison.json#/scenarios/0/case_scope/oracle",
+      "docs/decisions/w6-practice-closeout-20261011/instructions-skills.comparison.json#/scenarios/0/retained_candidate_protocols"
+    ],
+    "task_oracle_state": "SPECIFICATION_ONLY; OWNER_PACKET_UNSEALED",
+    "boundary": "The retained oracle specification is bound; actual owner task/oracle/source-pin bytes remain required before execution. No eligibility or measured result is inferred."
   }
 }

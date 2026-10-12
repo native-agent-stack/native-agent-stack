@@ -39,6 +39,35 @@ The metadata preimages are the publicly available upstream Git blobs at the
 recorded repository, commit and path. Their digests cover those exact bytes.
 This record contains no original private capture seal or native cache key.
 
+Each master-seed object now exposes its primary and secondary catalog pointers
+as `grand_refs`. The existing per-slot `grand_row_refs` already enumerated all
+272 rows; the correction makes their seed-level provenance explicit too.
+Neither row membership nor metadata recovery supplies an adjudication.
+
+## Layer resolution at the reviewed source head
+
+[resolution-state.json](resolution-state.json) records the reviewed `29f28d4e`
+state using its unchanged public source inputs at ancestor `5421e5d6`, with exact
+source-byte bindings. This is a retrospective
+correction of the missing protocol record; it does not claim the original
+metadata recovery had recorded that state before dispatch. Further W7 S1 work
+is parked.
+
+Each of the 13 lifecycle tasks has an explicit dedicated verdict, wave and
+covering-sweep absence. Its cumulative survivor set is unresolved, not empty.
+The snapshot binds the searched catalog/wave/ledger inventories and the bounded
+next action: retain the missing dedicated evidence or explicitly adopt a
+role-scoped parent disposition before S1. An absent dedicated verdict never
+turns these seeds into the complete unresolved candidate set.
+
+The shared foundation instructions-skills state is recorded separately: the
+09-22 verdict/wave, latest covering 09-29 ledger/manifest/returns, cumulative
+mattpocock/skills survivor and its prior-vote history, reopening evidence and
+SCHEDULED comparison are carried from the retained W6 closeout. Later sweeps of
+other layers do not replace that layer's latest sweep. Stopped-attempt and
+pending-source boundaries remain explicit; before a resumed dispatch, refresh
+any completed source awaiting append and preserve every unresolved survivor.
+
 ## Priority gaps and frozen copies
 
 The design-intake slot has no installed catalog default. The security, ci-pr and
@@ -74,10 +103,13 @@ context-engineering/spec-driven development framework and its native runtime
 installer. The archived redirect establishes the repository move; neither
 observation supplies the retained pin's missing metadata or an executed S1 result.
 
-The vendor command `DISABLE_TELEMETRY=1 npx --yes skills@1.7.0 find get-shit-done`
-exited 0. Its third-party variants are recorded only as discovery leads. Search
-rank, stars and install counts do not establish identity, quality or fit. No
-installer was executed, and no registry variant is substituted for official GSD.
+The historical vendor command
+`DISABLE_TELEMETRY=1 npx --yes skills@1.7.0 find get-shit-done` was reported to
+exit 0, but its original stdout/stderr were not retained. Its execution and the
+two reported third-party results are therefore unverified. A later registry
+response cannot authenticate that historical run. They remain reported leads
+only; no new probe was run for this correction. No installer was executed,
+and no registry variant is substituted for official GSD.
 
 ## Owner handoff and readiness
 
@@ -97,14 +129,34 @@ The supplied W6 instructions-skills rule and owner-frozen paired tasks decide
 correct-skill invocation, task outcome and complete provider tokens/cost. No
 whole-pack installation or replacement research harness is introduced.
 
-Seed preparation starts under CC addendum 03. The row-36 readiness event for
-comparison amendment/execution remains that layer's W6 closeout landing, followed
-by retention of its complete source/case/owner input packet. No calendar date
-substitutes for readiness. The 56 unmirrored subjects are bounded recovery inputs;
+The exact authority is `w6-instructions-skills-20261011`, bound at public ancestor
+`5421e5d67017a1c366ee599c97c93e17ca38878e` (the same bytes reviewed at `29f28d4e`):
+[instructions-skills.comparison.json](../w6-practice-closeout-20261011/instructions-skills.comparison.json),
+SHA256 `f85304bb7bdfac05d361c746babe6a3a62a5186ea06ee72302f4f3039b724774`.
+`intake.json#/comparison` binds its frozen scope, scenarios, readiness and
+task/oracle specification references. The selected-skills scenario compares
+baseline native instructions with selected mattpocock skill files; its existing
+correctness/safety and complete-cost rule remains unchanged. The actual owner
+task/oracle/source-pin packet is unsealed and remains an execution prerequisite.
+This source packet neither invents tasks nor declares the comparison ready.
+
+Seed preparation was authorized under CC addendum 03. The W6 closeout has
+landed, but further W7 S1 work is explicitly parked. After an explicit resume,
+a qualifier amends an unrun comparison before execution; if it has already run,
+the qualifier opens a new comparison. Execution separately needs the complete
+source/case/owner input packet. No calendar date substitutes for readiness.
+The 56 unmirrored subjects are bounded recovery inputs;
 their metadata and qualified current maintenance evidence must exist before the
 affected candidate can advance. Unmet inputs in one role cannot delay another
 ready role. Protected paper work and cued landings retain precedence; heavy host
 runs in the Monday window use the T2 wrapper and suite queue.
+
+[Repository regressions](../../../tests/test_w7_skills_seed_bindings.py) cover
+the original GSD correction, per-seed catalog joins, resolution gaps and parent
+state, exact comparison binding, and unverified probe disposition. They use the
+CPython unittest harness cited by the
+[resolution protocol](../2026-10-11-layer-resolution-protocol.md), and immutable
+published Git inputs. These are provenance checks, not skill/runtime trials.
 
 ## Follow-ups
 
