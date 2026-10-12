@@ -18452,8 +18452,8 @@
     },
     {
       "path": "docs/decisions/2026-10-06-native-lane-invocation-observability.md",
-      "sha256": "fd8c895c079a95e3a85154fded2ffdbc0269713acdc990e8a7d223094afb71be",
-      "bytes": 43260
+      "sha256": "4e488b2e5f64c1b900fc3039518874821e125744178d840c8db9b1c3003f9cc6",
+      "bytes": 42956
     },
     {
       "path": "docs/decisions/2026-10-06-ns2604-native-dashboard-countability.md",
