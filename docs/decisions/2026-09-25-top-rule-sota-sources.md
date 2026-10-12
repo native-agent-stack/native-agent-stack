@@ -412,8 +412,8 @@ the entity map to N2), so each enumeration is replaced by the set a specificatio
   a backslash-escaped `<` as text (CommonMark's backslash escapes). One left-to-right scan finds them; once a closer
   (`-->`, `?>`, `]]>`, `>`) is missing after one opening, later openings of that kind are skipped, so the scan stays
   linear. A construct that stands alone between separators (whitespace, a slash or a backslash, or either end), such
-  as the documented `<user>` placeholder in `C:\Users\<user>\x`, is kept: removing it would join the separators
-  around it into a different path, while no value can be split there.
+  as the documented `<user>` placeholder in `C:\Users\<user>\x`, was kept: removing it would join the separators
+  around it into a different path. Addendum 01 below narrows that to tags, for the home-path rules only.
 - **N2: named references outside the 16-name map.** `&shy;`, `&zwj;`, `&UnderBar;` or `&dollar;` split or completed a
   value. Named references are now decoded from the HTML5 table as cmark-gfm pins it (`src/entities.inc` at the same
   commit, 2,125 names; the spec names WHATWG's `entities.json` as the authority, `test/spec.txt:5946-5950`), limited
@@ -432,8 +432,8 @@ the entity map to N2), so each enumeration is replaced by the set a specificatio
   fullwidth letters and mathematical letters to ASCII.
 
 The rules still run on the body as written too, so the projection only adds catches; clean bodies stay clean,
-including #1003's mirror tests and the 19 masked lines. **What the gate guarantees:** no value spelled with its own
-characters is published, whatever is inserted between them. **What it does not:** a look-alike that substitutes a
+including #1003's mirror tests and the 19 masked lines. **What the gate guarantees** (with addendum 01 below): no
+value spelled with its own characters is published, whatever is inserted between them. **What it does not:** a look-alike that substitutes a
 character (a division slash, a Cyrillic letter) rather than inserting one; closing that needs the UTS #39 confusables
 data, a P2 follow-up (a skeleton projection).
 
@@ -454,6 +454,30 @@ Old and new gates give the same outcome on the live description of every open pu
 Boundaries this states: raw HTML inside a code span or block is removed too, though GitHub shows it as text, so such
 contrived text can be refused; a value split across a line break, by a carriage return, or under two layers of one
 encoding is not joined.
+
+**Addendum 01 (the command center's, at `e15d1259`, from the co-op's GPT read at `30f2e005`):** the placeholder
+exception shielded a comment standing between whitespace, so `x Bearer <!--x--> ` followed by a 40-character token
+was refused at `260803e1` and accepted at `30f2e005`, while GitHub (cmark-gfm at the pin) hides the comment and shows
+the token whole; a tag, a processing instruction or CDATA in the same place passed at both heads. The projection is
+now two, as the read proposed and the command center accepted:
+
+- the credential rules (Hugging Face, GitHub, Tavily, API secret, private key, bearer) read the body with every
+  raw-HTML construct removed, wherever it stands;
+- the home-path rules (personal, Windows, encoded and macOS homes) read the body with every comment, processing
+  instruction, declaration and CDATA section removed, and keep only a tag that stands alone between separators, the
+  documented placeholder form;
+- both still compose with the decoders, and the rules still read the body as written.
+
+Regressions, in both copies: each construct (a comment, an open and a closing tag, `<font>`, `<input>`, a processing
+instruction, a declaration, CDATA) between `Bearer` and its token, and at the start of every ported token's value
+(`ghp_`, `github_pat_`, `sk-ant-`, `hf_`, `tvly-`); and a comment, a processing instruction, a declaration or CDATA
+between the path separators of a Windows profile. The new tests fail at `30f2e005` (12 failures: the 8 bearer forms
+and the 4 path forms) and pass here; the placeholder controls pass on both. Three weakened copies (one projection for
+every rule; comments and processing instructions kept as placeholders; no placeholder exception) each fail them. AWS
+and Slack-style token prefixes (`AKIA`, `xox`) have no ported rule here, as the original scope states, so they are not
+among the regressions. On Node 24.21, 70 adversarial shapes at the bound each get a verdict within 0.83 s on this
+64-CPU host at a load of about 15 (four runs, worst 0.67, 0.83, 0.63 and 0.65 s); the extra projection costs about a
+third more time.
 
 ## Alternatives considered
 

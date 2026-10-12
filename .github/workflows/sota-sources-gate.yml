@@ -205,9 +205,12 @@ jobs:
             // 752d9618 and e15d1259, rule 4: each set is the one a specification defines, not a list). The projection
             // removes every raw-HTML construct of the GFM grammar (github/cmark-gfm@587a12bb test/spec.txt:9360-9431, "Raw
             // HTML": an open tag, a closing tag, a comment, a processing instruction, a declaration and a CDATA section), as
-            // GitHub drops them, by one linear scan; a construct that stands alone between separators (whitespace, a slash
-            // or a backslash, or either end), such as a <user> placeholder in a path, is kept, since removing it would join
-            // the separators around it. It then removes every character of general category Cc, Cf, Zl or Zp but tab, LF
+            // GitHub drops them, by one linear scan. There are two projections (the command center's addendum 01 at
+            // e15d1259, from Astra's read at 30f2e005: "Bearer <!--x--> " before a token showed the token whole): the
+            // credential rules read one with all markup removed; the home-path rules read one that keeps a tag standing
+            // alone between separators (whitespace, a slash or a backslash, or either end), such as a <user> placeholder in
+            // C:\Users\<user>\x, since removing it would join the separators into a different path. A comment, a processing
+            // instruction, a declaration and CDATA are removed from both, wherever they stand. It then removes every character of general category Cc, Cf, Zl or Zp but tab, LF
             // and CR, and every Default_Ignorable_Code_Point (UCD DerivedCoreProperties.txt; Unicode 17.0 in Node 24.21),
             // and applies NFKC, which folds width forms such as a fullwidth solidus. A value spelled with its own characters
             // is read joined, whatever is inserted between them; a look-alike that substitutes a character is not.
@@ -226,7 +229,7 @@ jobs:
               return match ? open + match[0].length : -1;
             };
             const separator = (character) => character === undefined || /[\s\/\\]/.test(character);
-            const withoutMarkup = (text) => {
+            const withoutMarkup = (text, keepPathPlaceholders) => {
               let out = '';
               let at = 0;
               const unclosed = new Set();
@@ -244,7 +247,8 @@ jobs:
                   if (kind) unclosed.add(kind);
                   continue;
                 }
-                if (!(separator(text[open - 1]) && separator(text[end]))) {
+                const tag = text[open + 1] !== '!' && text[open + 1] !== '?';
+                if (!(keepPathPlaceholders && tag && separator(text[open - 1]) && separator(text[end]))) {
                   out += text.slice(at, open);
                   at = end;
                 }
@@ -256,20 +260,24 @@ jobs:
               .replace(/(?![\t\n\r])[\p{Cc}\p{Cf}\p{Zl}\p{Zp}\p{Default_Ignorable_Code_Point}]/gu, '').normalize('NFKC');
             // Markup is removed from the body as written only: GitHub parses raw HTML there, never in what a reference,
             // an escape or Markdown decodes to, so the projection's decoder chains apply the character projection alone.
-            const project = (text) => projectCharacters(withoutMarkup(text));
-            // The decoders compose: the rules see the body and its projection after every order of every subset of them,
+            const pathRules = new Set(['personal-home-path', 'windows-user-path', 'encoded-home-path', 'macos-user-path']);
+            // The decoders compose: the rules see the body and their projection after every order of every subset of them,
             // each decoder at most once along a chain and never to a fixed point (up to 65 forms from each), so a value
             // written with several of these at once, such as character references around emphasis, is judged as it reads
             // too. In the projection's chains each decoder's output is projected again, so a reference that decodes to a
             // format character or a width form is read as that character too.
-            const forms = new Set();
-            const compose = (text, rest, then) => {
+            const compose = (forms, text, rest, then) => {
               forms.add(text);
-              rest.forEach((decoder, index) => compose(then(decoder(text)), rest.filter((_, other) => other !== index), then));
+              rest.forEach((decoder, index) => compose(forms, then(decoder(text)), rest.filter((_, other) => other !== index), then));
+              return forms;
             };
-            compose(body, decoders, (text) => text);
-            compose(project(body), decoders, projectCharacters);
-            const hits = privacy.filter(([, pattern]) => [...forms].some((form) => pattern.test(form))).map(([id]) => id);
+            const asWritten = [...compose(new Set(), body, decoders, (text) => text)];
+            const credentialForms = [...asWritten, ...compose(new Set(), projectCharacters(withoutMarkup(body, false)), decoders,
+              projectCharacters)];
+            const pathForms = [...asWritten, ...compose(new Set(), projectCharacters(withoutMarkup(body, true)), decoders,
+              projectCharacters)];
+            const hits = privacy.filter(([id, pattern]) => (pathRules.has(id) ? pathForms : credentialForms)
+              .some((form) => pattern.test(form))).map(([id]) => id);
             const problems = [];
             if (!content) {
               problems.push('The PR description needs a non-empty "SOTA sources" section: the repository, pin and file, or the published reference, behind each change (AGENTS.md top rule).');

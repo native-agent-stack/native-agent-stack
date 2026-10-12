@@ -560,6 +560,23 @@ class GatePrivacyTests(unittest.TestCase):
                   ("&quest; completes a device path", BS * 2 + "&quest;" + BS + "UNC" + BS + "wsl.localhost" + BS + "D" + BS
                    + "home" + BS + "alice", "personal-home-path"),
                   ("&sol; and math letters", "&sol;&hopf;ome&sol;alice&sol;x", "personal-home-path")]
+        # Astra's read at 30f2e005 (P1): the placeholder exception kept a construct between whitespace, so a comment or a
+        # tag between "Bearer" and its token hid it from the bearer rule, while GitHub shows the token whole.
+        for piece in ("<!--x-->", "<x>", "<font>", "<input>", "<?x?>", "<![CDATA[x]]>", "<!X y>", "</x>"):
+            cases.append(("bearer split by " + piece, "Bearer " + piece + " " + "A" * 40, "bearer-credential"))
+            cases.append(("a token prefix split by " + piece, "gh" + "p_" + piece + "a" * 36, "github-token"))
+            cases.append(("a key prefix split by " + piece, "sk-" + "ant-" + piece + "A" * 30, "api-secret"))
+            cases.append(("a fine-grained token prefix split by " + piece, "github" + "_pat_" + piece + "a" * 30,
+                          "github-token"))
+            cases.append(("a Hugging Face prefix split by " + piece, "hf" + "_" + piece + "a" * 20, "hugging-face-token"))
+            cases.append(("a Tavily prefix split by " + piece, "tvly-" + piece + "a" * 24, "tavily-token"))
+            cases.append(("a spaced token prefix split by " + piece, "Bearer " + piece + " " + "gh" + "p_" + "a" * 36,
+                          "github-token"))
+        # Only a tag is kept as a path placeholder: a comment, a processing instruction, a declaration or CDATA between
+        # path separators is removed, as GitHub hides it, so the name after it is read.
+        for piece in ("<!-- -->", "<?x?>", "<!X y>", "<![CDATA[]]>"):
+            cases.append(("a home split by " + piece + " between separators", "C:/" + "Users/" + piece + "/Alice",
+                          "windows-user-path"))
         for point in (0x034F, 0xFE00, 0xFE0F, 0xE0100, 0x180B, 0x180F, 0x17B4, 0x3164, 0x115F, 0x2065, 0xFFF0, 0xE0002,
                       0xE0041, 0xE007F):
             cases.append((f"default-ignorable U+{point:04X}", "/ho" + chr(point) + "me/alice/x", "personal-home-path"))
@@ -629,6 +646,7 @@ class GatePrivacyTests(unittest.TestCase):
                  HOME + "<user>/x", BS * 2 + "wsl$" + BS + "D" + BS + "home" + BS + "<WSL_USER>" + BS + "x",
                  "Use `<x>` or <kbd>Ctrl</kbd>&shy;C, a&zwj;b, x&UnderBar;y and &dollar;5.", "fullwidth " + chr(0xFF21) + "BC",
                  "an unclosed <!-- comment", "an unclosed <?pi and <![CDATA[ and <!X", "a < b > c and 1<2",
+                 "C:/" + "Users/<name>/AppData and " + HOME + "<!-- c -->/x", "Bearer <user> token",
                  # A backslash-escaped '<' is text: GitHub shows C:\\Users<x>alice, so the tag is not removed.
                  "C:" + BS + "Users" + BS + "<x>alice"]
         outcomes = {path.name: run_check(inline_script(sota_job(path)), [body(text + SOURCES) for text in texts])
