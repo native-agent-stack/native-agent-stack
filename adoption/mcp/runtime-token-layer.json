@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "context-mode": {
+      "type": "stdio",
+      "command": "${ECO_ROOT}/bin/node",
+      "args": ["${ECO_ROOT}/tools/context-mode-1.0.169/lib/node_modules/context-mode/start.mjs"],
+      "env": {"CONTEXT_MODE_PLATFORM": "claude-code"}
+    }
+  }
+}

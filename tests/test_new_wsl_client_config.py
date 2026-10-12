@@ -1373,9 +1373,9 @@ class MapTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = make_catalog(Path(tmp))
             path = root / cfg.TEMPLATES["codex/omniroute"]
-            path.write_text(path.read_text().replace("127.0.0.1:20128", "127.0.0.1:20999"), encoding="utf-8")
+            path.write_text(path.read_text().replace("127.0.0.1:21128", "127.0.0.1:20999"), encoding="utf-8")
             errors = cfg.analyse(root)[3]
-        self.assertTrue(any("the rewrite source '127.0.0.1:20128' is not in the template value" in e for e in errors),
+        self.assertTrue(any("the rewrite source '127.0.0.1:21128' is not in the template value" in e for e in errors),
                         errors)
 
 

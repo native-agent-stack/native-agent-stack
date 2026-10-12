@@ -813,11 +813,11 @@
       "owner": "OmniRoute",
       "rewrite": [
         {
-          "from": "127.0.0.1:20128",
+          "from": "127.0.0.1:21128",
           "to": "127.0.0.1:{gateway_port}"
         }
       ],
-      "source": "The template carries the workstation's port 20128 as a literal. The install plan's gateway listens on 21128 (install-plan.json row gpt-gateway, config/omniroute.env.example)."
+      "source": "The template carries the recorded new-WSL port 21128 as a literal. The install plan's gateway listens on 21128 (install-plan.json row gpt-gateway, config/omniroute.env.example)."
     },
     {
       "match": [
