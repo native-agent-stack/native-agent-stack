@@ -1,0 +1,161 @@
+{
+  "schema_version": 1,
+  "kind": "gate_read_accounting_delta",
+  "date": "2026-10-12",
+  "source_commit": "b5164706abaf0d12905f4b07c2c089737c78b6df",
+  "baseline_path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261004.json",
+  "baseline_sha256": "5ea8e4db0ab15115e5b1eec6c1939450514dc227e0f9308d865f661507c6c93d",
+  "mode": "monitoring_only",
+  "added_by_script": {
+    "scripts/skills_status.py": 10
+  },
+  "removed_by_script": {},
+  "added_shapes": [
+    {
+      "script": "scripts/skills_status.py",
+      "shape": [
+        "/*"
+      ],
+      "count": 1
+    }
+  ],
+  "removed_shapes": [],
+  "added_locations": [
+    "scripts/skills_status.py:223",
+    "scripts/skills_status.py:346",
+    "scripts/skills_status.py:347",
+    "scripts/skills_status.py:348",
+    "scripts/skills_status.py:352",
+    "scripts/skills_status.py:604",
+    "scripts/skills_status.py:612",
+    "scripts/skills_status.py:614",
+    "scripts/skills_status.py:682",
+    "scripts/skills_status.py:785",
+    "tools/adoption/install_skills.py:294",
+    "tools/adoption/install_skills.py:295",
+    "tools/adoption/install_skills.py:721",
+    "tools/adoption/install_skills.py:748",
+    "tools/adoption/install_skills.py:749"
+  ],
+  "derived_count": 342,
+  "derivation": {
+    "source": "blueprints/runtime-workers/openhands/resolver/push_gate.py:derive_ci_protected; input commit b5164706abaf0d12905f4b07c2c089737c78b6df",
+    "replay": "python3 -B -m unittest tests.test_runtime_worker_openhands_push_gate",
+    "method": "Native GitTree at the #949 content head rebased onto 66584736. Compare unclassified script counters, shape multiplicities and exact locations against the immutable baseline pinned by the 10-11 skill-use delta. This is a new dated observation of the current candidate, not a replacement baseline.",
+    "interpretation": "Monitoring accounting only; no permission or execution authority is added. The ten additional reads belong to the already recorded skill-status observation; installer differences are source-line moves. The final #949 event helper adds no unclassified read multiplicity."
+  },
+  "read_classifications": [
+    {
+      "location": "scripts/skills_status.py:223",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "read-only skill/configuration status; no worker execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/skills_status.py:346",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "read-only skill/configuration status; no worker execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/skills_status.py:347",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "read-only skill/configuration status; no worker execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/skills_status.py:348",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "read-only skill/configuration status; no worker execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/skills_status.py:352",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "read-only skill/configuration status; no worker execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/skills_status.py:604",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "read-only skill/configuration status; no worker execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/skills_status.py:612",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "read-only skill/configuration status; no worker execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/skills_status.py:614",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "read-only skill/configuration status; no worker execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/skills_status.py:682",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "read-only skill/configuration status; no worker execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "scripts/skills_status.py:785",
+      "native_bucket": "unclassified",
+      "classification": "user_status_observation",
+      "scope": "read-only skill/configuration status; no worker execution authority",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/install_skills.py:294",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "unchanged installer read multiplicity; source location moved",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/install_skills.py:295",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "unchanged installer read multiplicity; source location moved",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/install_skills.py:721",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "unchanged installer read multiplicity; source location moved",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/install_skills.py:748",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "unchanged installer read multiplicity; source location moved",
+      "permission_change": false
+    },
+    {
+      "location": "tools/adoption/install_skills.py:749",
+      "native_bucket": "unclassified",
+      "classification": "source_line_move_only",
+      "scope": "unchanged installer read multiplicity; source location moved",
+      "permission_change": false
+    }
+  ],
+  "removed_locations": [
+    "tools/adoption/install_skills.py:403",
+    "tools/adoption/install_skills.py:404",
+    "tools/adoption/install_skills.py:587",
+    "tools/adoption/install_skills.py:614",
+    "tools/adoption/install_skills.py:615"
+  ]
+}
