@@ -1,9 +1,10 @@
 # Landing scripts
 
-The command center (CC) lands pull requests with three files kept here, so the repository holds the one copy and its tests:
-`uet_land.sh` (the private trading repository), `nas_land.sh` (this repository) and `codex_gate.py` (the Codex review gate that
-both call). They merge pull requests. No workflow runs them: the CC runs them from a clone of this repository, and CI runs
-their tests.
+The command center (CC) lands pull requests with four files kept here, so the repository holds the one copy and its tests:
+`uet_land.sh` (the private trading repository), `nas_land.sh` (this repository), `codex_gate.py` (the Codex review gate that
+both call) and `squash_body_scan.py` (the publication scan of a squash body, which both call when `SQUASH_BODY_FILE` is set; new in
+#1027, with no live copy). The scripts merge pull requests. No workflow runs them: the CC runs them from a clone of this repository,
+and CI runs their tests.
 
 ## What each does
 
@@ -64,11 +65,59 @@ queue would test each merge with the pull requests ahead of it on GitHub's side,
 **The squash body (`SQUASH_BODY_FILE`, the CC, 2026-10-12).** Both repositories' squash setting is `COMMIT_MESSAGES`, "default to the
 branch's commit messages" (`squash_merge_commit_message`, read from `GET /repos/{owner}/{repo}` at 2026-10-12T02:23:46Z), and the scripts
 named no body, so a squash merge carried the branch's commit messages into `main`, a claim that review corrected later included. When
-`SQUASH_BODY_FILE` is set, the merge passes it with `--body-file`; `gh` reads the file when the merge call starts and sends it as
-`MergePullRequestInput.commitBody`, "Commit body to use for the merge commit; if omitted, a default message will be used" (sources
-below). The file is checked before the lock and any call: a value that is not a readable, non-empty regular file stops the landing with
-exit 2, `-` included (`gh` reads `-` as standard input), and the path is never printed. An empty value is none. The final gate does not
-read the file again.
+`SQUASH_BODY_FILE` is set, the merge passes a scanned snapshot of it with `--body-file`; `gh` reads the file when the merge call starts and
+sends it as `MergePullRequestInput.commitBody`, "Commit body to use for the merge commit; if omitted, a default message will be used"
+(sources below). The file is checked before the lock and any call: a value that is not a readable, non-empty regular file stops the
+landing with exit 2, `-` included (`gh` reads `-` as standard input), and the path is never printed. An empty value is none.
+
+**The squash body is scanned (#1027, Astra's P1 at d6be1b02).** The body becomes the commit message in `main`'s history for good, and the
+check above read no byte of it: a body holding a home path, an account name, an address that is not a no-reply one or a token shape
+landed (four synthetic payloads, each exit 0 with one merge call). `gh` reads the file when the merge call starts, over an hour after
+any check made on it in the worst case (the Codex wait takes up to 20 minutes, the CI wait up to 50), so the scanned bytes must be the
+bytes `gh` reads. A set `SQUASH_BODY_FILE` is therefore copied once to a snapshot (`mktemp "${TMPDIR:-/tmp}/squash-body-XXXXXX"`, mode 0600),
+the snapshot is scanned twice, and the merge is given the snapshot, never the file; the final gate has nothing of the caller's file to read
+again. An `EXIT` trap removes the snapshot on every exit, a terminating signal included (measured 2026-10-12 with bash 5.3.9: after
+SIGTERM and SIGHUP sent to a script holding a snapshot, none was left). Both scans run before the lock and before any `gh` or `git` call,
+with `-E -s -B` as `merge_validate` runs `validate.py` (with `-I` the script's directory is off `sys.path`, `validate.py` cannot import its
+sibling `host_name_scan.py` and exits 2: measured 2026-10-12, and CPython's documentation of `-I`, sources below):
+
+1. `squash_body_scan.py <snapshot> <validate.py> <names file>`, in this directory. It reads the text, and its percent-decoded form, for
+   every pattern of `PRIVATE_CONTENT` in the given `validate.py` (the repository's table for published text: home paths, the dash-encoded
+   and graph-id forms, Windows user paths, tokens and session identifiers); for a WSL UNC home path, `\\wsl.localhost\<distro>\home\<user>`
+   or `\\wsl$\<distro>\home\<user>`, which that table does not match (it knows the forward-slash forms), any run of backslashes counting
+   for one because JSON and Markdown double them; for an email address that is not a no-reply one (GitHub's `ID+USERNAME` and `USERNAME`
+   forms at `users.noreply.github.com`, or a local part of exactly `noreply` or `no-reply`, pass; the shape is the native private-email
+   rule of `scripts/host_name_scan.py`, with a lookbehind so that a long run costs one pass, and a local part with no letter or digit,
+   such as the backticked `@AGENTS.md` import, is no mailbox; two shapes that are not addresses pass, by the CC's ruling of 2026-10-12: a
+   systemd unit instance, `<name>@<instance>.<type>` with a type of `service`, `timer`, `socket`, `target`, `path` or `mount` and only the
+   characters a unit name has, as in `getty@tty1.service`, and an address of the short list `VENDOR_TRAILER_ADDRESSES`, each entry with the
+   vendor source it comes from, now `codex@openai.com`, the Codex co-author address in the vendor's own history, which #1002's email registry
+   will replace); and for each name of the names file as a whole token in any letter case (not inside a longer run of letters or digits,
+   the boundary rule of `host_name_scan.py`). A name equal to the running host's own name (`hostname`, as `socket.gethostname()` returns it,
+   compared when the scan runs without regard to case, and never printed) is a warning and not a refusal, by the CC's ruling that the host
+   name is hygiene and never a blocker: its occurrences are counted. Every other name still refuses. The names file is
+   `$LANDING_COORD/command-center/cc-tools/landing-prohibited-names.env`: one `LANDING_PROHIBITED_NAMES=<name>,<name>,...` assignment, the
+   list the tests read from the environment under that name. It is parsed, never sourced: no line of it runs, and no name reaches a shell
+   variable, an argument or the output. It prints one line and nothing of the body: `squash body scan: clean (names_checked=<n>[,
+   warnings=<k>])`, or `squash body scan: refused: <class> (line <n>)[; ...][ (warnings=<k>)]` with the classes of the list above, or
+   `squash body scan: could not run`. For a count above 0 the landing prints one line of its own, `SQUASH_BODY_FILE names this host's own
+   name <k> time(s): a warning, not a refusal (the name is not printed)`, and goes on.
+2. `scripts/validate.py --scan-file <snapshot>`, the scan the pre-push hook runs: `PRIVATE_CONTENT` and the runtime host-local names
+   (the account, the host, the Windows profiles) through Betterleaks at `host_name_scan.py`'s pin. Its answer counts only as the exact
+   line `{"matching_locations": 0, "scanned_files": <n>, "source": "host", "status": "passed"}`; the synthetic sources of
+   `NATIVE_AGENT_HOST_NAMES_JSON` (`"source": "synthetic"`) never pass. It leaves the host's own name alone on a WSL host whose hostname is
+   its `WSL_DISTRO_NAME`: `scripts/host_name_scan.py:65-68` drops the hostname source then, and on the CC's host it does (measured
+   2026-10-12: a body naming the host passed both scans). Where the two differ, this scan would refuse a mention.
+
+A match stops the landing with exit 2 and the line `SQUASH_BODY_FILE holds text the publication scan refuses (details withheld;
+squash_body_scan.py names the classes and lines): stop, nothing merged`. A snapshot that cannot be made or copied, a scanner or names file
+that is missing or unreadable, a scan that fails and any answer that is not a scan's own clean line (an empty one included) stop it with
+exit 2 and `SQUASH_BODY_FILE could not be scanned: a scanner or the names file is missing, unreadable or failed (details withheld): stop,
+nothing merged`: the scan fails closed. No path, name, text or scanner output is printed, but one count: how often the body names the
+host's own name. To see why a body is refused, run
+`python3 -E -s -B squash_body_scan.py <body> <validate.py> <names file>` by hand. The defaults are the scanner beside the script (as
+`codex_gate.py` is), `scripts/validate.py` in the clone `LANDING_NAS_REPO` names (the CC's checkout by default, for both scripts), and the
+names file above.
 
 **`codex_gate.py <owner/repo> <pr> [<read head>]`** prints one status line about the connector's review and exits 0 (a review of the
 read head or of the current head that started at or after the latest trigger finished, and none is running), 3 (running, the
@@ -234,15 +283,18 @@ expected head:
 | Variable | Default | Used by | Meaning |
 | --- | --- | --- | --- |
 | `LANDING_UET_REPO` | `$HOME/code/us-equities-trading` | `uet_land.sh` | clone of the trading repository: fetches, `rev-parse`, change identity (the path must not contain whitespace) |
-| `LANDING_NAS_REPO` | `$HOME/code/native-agent-stack` | `nas_land.sh` | clone of this repository, used the same way (no whitespace) |
+| `LANDING_NAS_REPO` | `$HOME/code/native-agent-stack` | both | clone of this repository, used the same way by `nas_land.sh` (no whitespace); both scripts take the squash body scan's `scripts/validate.py` from it (#1027) |
 | `LANDING_COORD` | `${XDG_STATE_HOME:-$HOME/.local/state}/native-agent-stack/coordination` | both | coordination tree; a status description `PASS: trading-cc/reads/<record>.md` names `$LANDING_COORD/trading-cc/reads/<record>.md` |
 | `LANDING_GATE` | `codex_gate.py` in the directory of the script, symlinks resolved (`readlink -f "$0"`) | both | the Codex gate; it works through a symlink or a wrapper that `exec`s the real path, and not when the script is read from a pipe or a process substitution (set this variable then) |
 | `LANDING_LOCK_DIR` | `$LANDING_COORD/command-center/landing-locks` | both | where the landing lock of each repository is kept (`us-equities-trading.lock`, `native-agent-stack.lock`); created when missing, and outside every worktree |
 | `VERDICT_FILES` | none | `uet_land.sh` | space-separated verdict files that each must name the read head |
 | `GATES_DONE` | none | both | receipt naming the read head; required when a verdict file states a landing gate |
 | `GPT_VERDICT` | none | `uet_land.sh` | the co-op's verdict file accepted instead of Codex when `codex_gate.py` exits 5 |
-| `SQUASH_BODY_FILE` | none | both | the squash commit's body (`gh pr merge --body-file`), for a pull request whose commit messages carry a claim corrected after review; it must be a readable, non-empty regular file, not `-`, or the landing stops with exit 2 before any call; an empty value is none |
-| `TMPDIR` | `/tmp` | both | where a failed merge keeps gh's output (`merge-fail-XXXXXX`, mode 0600), and `nas_land.sh` the output of the validation or of the currency check that failed (`nas-validate-XXXXXX`, kept when it fails) |
+| `SQUASH_BODY_FILE` | none | both | the squash commit's body (`gh pr merge --body-file`), for a pull request whose commit messages carry a claim corrected after review; it must be a readable, non-empty regular file, not `-`, and its text must pass the publication scan (a snapshot of it is scanned and is the file the merge is given; #1027), or the landing stops with exit 2 before any call; an empty value is none |
+| `LANDING_BODY_SCAN` | `squash_body_scan.py` in the directory of the script, symlinks resolved | both | the squash body's scanner (only when `SQUASH_BODY_FILE` is set); set it when the script is read from a pipe or a process substitution; a missing file stops the landing with exit 2 |
+| `LANDING_SCANNER` | `$LANDING_NAS_REPO/scripts/validate.py` | both | the repository's `validate.py`, which the squash body scan loads for `PRIVATE_CONTENT` and runs as `validate.py --scan-file`; a missing file stops the landing with exit 2 |
+| `LANDING_NAMES_FILE` | `$LANDING_COORD/command-center/cc-tools/landing-prohibited-names.env` | both | the names the squash body scan refuses: one `LANDING_PROHIBITED_NAMES=<name>,<name>,...` assignment, parsed and never sourced; missing, unreadable or naming nobody stops the landing with exit 2 |
+| `TMPDIR` | `/tmp` | both | where a failed merge keeps gh's output (`merge-fail-XXXXXX`, mode 0600), and `nas_land.sh` the output of the validation or of the currency check that failed (`nas-validate-XXXXXX`, kept when it fails), and both scripts the squash body's snapshot (`squash-body-XXXXXX`, mode 0600, removed when the script exits) |
 | `LANDING_PROHIBITED_NAMES` | none | the tests only | comma-separated identities that must not appear in any form under `tools/landing` (see Tests) |
 
 The scripts also need `gh` 2.48.0 or later (`gh api --paginate --slurp`; authenticated for the repository), `git` 2.39.0 or
@@ -255,7 +307,7 @@ one, and the script then reports exit 10, "does not merge cleanly".
 ## Exit codes
 
 From the script headers. `uet_land.sh`: 2 verdict gate (a verdict file, `GATES_DONE` or `trading-cc-read`, also when a file, record or
-status cannot be read) or a `SQUASH_BODY_FILE` that is not a readable, non-empty file (before any call), 3 head moved, 4 change differs, 5 CI failed (at the final gate also: no longer complete and green), 6 timeout,
+status cannot be read) or a `SQUASH_BODY_FILE` that is not a readable, non-empty file, that the publication scan refuses or that cannot be scanned (before any call), 3 head moved, 4 change differs, 5 CI failed (at the final gate also: no longer complete and green), 6 timeout,
 7 merge failed, 8 blocked, 9 the Codex gate gave neither 0 nor 5: a review running or not finished since its latest trigger (its 3, after
 the 20-minute wait or at the final gate), a review that ended other than Completed or a summary last edited by another account (its
 4), a gate that failed or is missing; or a 5 without an accepted `GPT_VERDICT` (#975 P3-7 at 761810d7: the header named only some of
@@ -329,6 +381,13 @@ copies keep the validation's output beside the worktree and a failed merge's und
 `merge_validate` out of a script and runs it on a scratch repository whose merge fails `final_stack.py --check`) passes on this
 `merge_validate`. The live copies should again be replaced whole.
 
+#1027 (Astra's P1 at d6be1b02) adds to both scripts the squash body's snapshot and publication scan (above) and one file the live copies
+do not have, `squash_body_scan.py`, which goes beside them in the CC's tools directory as `codex_gate.py` does. The scan finds
+`scripts/validate.py` in the clone `LANDING_NAS_REPO` names (the CC's checkout by default) and the names list at its default path under
+the coordination tree, so the replaced copies need no further host path; a copy run from another place sets `LANDING_BODY_SCAN`,
+`LANDING_SCANNER` or `LANDING_NAMES_FILE`. The table below gives the digests of the three files that have live copies; the scanner's
+is not recorded.
+
 No digest of a live copy is recorded here (CC correction #161; the CC's ruling of 2026-10-12 withheld the ones the table held before):
 the live copies hold the CC host's paths, and since everything else in them is public, a digest of their bytes would let anyone
 confirm a guessed path. The live `codex_gate.py` holds no host path; its digest is withheld by the same rule, so the only digests in
@@ -336,8 +395,8 @@ this section are the repository copies' (a test checks that).
 
 | File | Before correction #136 | Live copy, after #148 | Live copy, since 2026-10-11T05:03:28Z | Here |
 | --- | --- | --- | --- | --- |
-| `uet_land.sh` | withheld (CC #161: a digest of a file whose only non-public bytes are host paths confirms a guessed path) (115 lines) | withheld (CC #161: a digest of a file whose only non-public bytes are host paths confirms a guessed path) (232 lines) | withheld (CC #161: a digest of a file whose only non-public bytes are host paths confirms a guessed path) (233 lines) | `ef961098379274cde349c552217bfc82cf5d83572d468597e4ff9e9b095ded9d` (394 lines) |
-| `nas_land.sh` | withheld (CC #161: a digest of a file whose only non-public bytes are host paths confirms a guessed path) (135 lines) | withheld (CC #161: a digest of a file whose only non-public bytes are host paths confirms a guessed path) (243 lines) | withheld (CC #161: a digest of a file whose only non-public bytes are host paths confirms a guessed path) (246 lines) | `9bd565b365c7f1c1fc0f8195d5fe5ea0c83dec411cc59b73158dc7d7d0cf4675` (472 lines) |
+| `uet_land.sh` | withheld (CC #161: a digest of a file whose only non-public bytes are host paths confirms a guessed path) (115 lines) | withheld (CC #161: a digest of a file whose only non-public bytes are host paths confirms a guessed path) (232 lines) | withheld (CC #161: a digest of a file whose only non-public bytes are host paths confirms a guessed path) (233 lines) | `74c570a82c15c5f987528ff7b36f1d0f53d93475b113e6c0922bb0ff928fdfba` (447 lines) |
+| `nas_land.sh` | withheld (CC #161: a digest of a file whose only non-public bytes are host paths confirms a guessed path) (135 lines) | withheld (CC #161: a digest of a file whose only non-public bytes are host paths confirms a guessed path) (243 lines) | withheld (CC #161: a digest of a file whose only non-public bytes are host paths confirms a guessed path) (246 lines) | `9dc4fd51c4b31d08a2cd7507197651076ed3c02671c4254d3191fa0a795e4808` (525 lines) |
 | `codex_gate.py` | (unchanged) | withheld (CC #161: a digest of a file whose only non-public bytes are host paths confirms a guessed path) (108 lines) | the same | `e2132ab71b6e55fea8922b9c5b0b8c17bde87b1d37f11bf384b785bef6f96b6a` (226 lines) |
 
 Corrections the scripts carry: #118 (every gate before the merge, in order), #121 (a verdict file that states a landing gate needs
@@ -350,7 +409,7 @@ call), the gate error (P2: exit 4 and one fixed line, no traceback), the commit-
 checks every prohibited identity), round 3 (above: the completion bound to the latest request, the gates read again before the merge,
 typed values, no local diagnostics, the base re-read) and round 4 (above: the lock, the final gate, one read per file, the gate's
 snapshot), and the CC's patches of 2026-10-12: #176 (the merge's shard-0 currency checks, `nas_land.sh`) and the squash body
-(`SQUASH_BODY_FILE`, both). The block is identical in both scripts, apart from `lg_ci_state`, which only `uet_land.sh` has.
+(`SQUASH_BODY_FILE`, both), whose publication scan is #1027's. The block is identical in both scripts, apart from `lg_ci_state`, which only `uet_land.sh` has.
 
 ## Known gaps, left as they were
 
@@ -391,6 +450,20 @@ and 4). These stay until a change with its own tests fixes them:
   spelling, look-alike Unicode, zero-width characters, names split across lines, gzip or UTF-16 files, colon, `0x`, octal, `\u` or
   HTML-entity encodings, a name glued to letters or digits (`host=<name>01`, the letter and digit boundary of
   `scripts/host_name_scan.py`), or a generic running account joined by a character outside the joiner class.
+- The squash body scan is conservative (#1027), and fails closed where it is unsure. Run on the last 600 commit messages of `main` at
+  3a8a8461ee60 (2026-10-12; counts only), it refuses 8: 0 names, 5 addresses, 3 home paths. The 5 addresses are 3 at a mail provider and 2
+  at a reserved test domain. It warns, without refusing, about 26 messages (66 occurrences) that name the host's own name; it passes the
+  2 that carry a systemd unit instance, the 1 that carries the vendor co-author address and the 402 that carry the vendor `noreply`
+  trailer. (Before the CC's three allowances of 2026-10-12 it refused 37: 26 names, 8 addresses, 3 home paths.) A refused body is rewritten,
+  or the names file edited; the scan has no other allow-list. It decodes percent-escapes and not hex, base64, `\u`, HTML entities or
+  doubly encoded text, finds a WSL UNC home path but not other UNC shares, and reads the names file's last `LANDING_PROHIBITED_NAMES`
+  assignment only (the tests' scan, by contrast, also finds a name's hex and base64 spellings).
+- The history residual (#1027): the 3 messages with a home path and the 3 with an address at a mail provider counted above already sit in
+  `main`'s commit history (the whole history at that base, 1229 messages, holds 5 and 4). History is immutable, as for CC correction #177,
+  and this change rewrites none of it. Whether any of them is identity-bearing is a follow-up.
+- `validate.py --scan-file` runs only where Betterleaks is installed at `host_name_scan.py`'s pin and `powershell.exe` answers on WSL; the
+  CC's host has both. Elsewhere, and in CI, the landing with a `SQUASH_BODY_FILE` stops with exit 2 (the tests for the real scan skip
+  there). `NATIVE_AGENT_HOST_NAMES_JSON` set in the CC's shell makes `validate.py` report synthetic sources, which the scripts refuse.
 - Very short prohibited names fail on coincidences (the CC's P3-6 at af9d1901): a two-letter name matches base64 fragments in several
   files and a one-letter name matches every file. This fails closed; names under about four characters are not useful entries.
 
@@ -448,12 +521,34 @@ its "Here" column (CC #161; at 86fa3844 seven digests of live copies stood besid
 `scripts/final_stack.py --check` stops with 10 naming that check, the checks after it not run and its output only in the 0600 file (it
 merged at 86fa3844); a check runs only when its script is in the merge, and a landing whose checks pass merges; a `SQUASH_BODY_FILE`
 that is missing, empty, a directory, `-` or unreadable stops both scripts with 2 before any call, printing no path (each landed at
-86fa3844); and a body file whose path has a space reaches the merge as one `--body-file` argument (the merge had none at 86fa3844),
-while an empty value adds none. The fake `python3` answers a currency check itself, so it never takes one of the gate's answers, and
+86fa3844); and a body file reaches the merge as one `--body-file` argument (the merge had none at 86fa3844; since #1027 it is the snapshot, in a
+`TMPDIR` whose name may have a space), while an empty value adds none. The fake `python3` answers a currency check itself, so it never takes one of the gate's answers, and
 the fake `gh` can write the merge's arguments NUL-separated. The fake `gh` serves page 1 of the statuses list as the first `per_page`
 statuses and builds the combined status from it as GitHub gave it when measured: each context once with its newest status, in pages of
 `per_page` contexts. It is offline, needs `jq`, and is Linux-only. A script edit that moves a decision site fails the module instead of
 leaving it untested.
+
+**The squash body scan's tests (#1027).** Each fails at d6be1b02, where a body with a home path, a name, an address or a token shape landed
+(exit 0, one merge call). Both scripts refuse, with exit 2 and the fixed line, before any `gh` or `git` call and with no merge: a body
+holding a home path of each form (`/home/<user>`, `/Users/<user>`, a Windows profile path with either slash, the WSL mount,
+`\\wsl.localhost\<distro>\home\<user>` and the older `\\wsl$\...` with one or doubled backslashes, the dash-encoded and graph-id forms, and a
+percent-encoded one), a name of a synthetic names file (bare, upper case, as an identifier, in a path, percent-encoded), an address that
+is not a no-reply one (plain, mixed case, in a trailer, percent-encoded, and four look-alikes) or a token shape (seven kinds). They stop
+the same way when `validate.py`, the scanner or the names file is missing, unreadable or naming nobody, when the scanner exits 2, prints
+nothing or another line, has a syntax error or refuses, and for every answer of `validate.py --scan-file` but its clean line. The
+valid-body control (GitHub's no-reply form, the vendor `noreply` trailer, a synthetic name inside a longer word, the placeholder account's
+home path) lands with exit 0 and one merge call; the merge reads the body's bytes from a mode-0600 snapshot in a `TMPDIR` whose name has a
+space, not from the caller's file, both scans having run on that one snapshot first. A file rewritten after the scan does not reach the
+merge; the snapshot exists during the run and is gone after exits 0, 3 and 7 and after SIGTERM and SIGHUP; and the defaults of
+`LANDING_SCANNER` and `LANDING_NAMES_FILE` are the clone's `validate.py` and the file under the coordination tree. Where Betterleaks is
+installed at the pin, the real `validate.py --scan-file` passes the clean body and refuses one that names the account running the tests.
+The CC's three allowances of 2026-10-12 have their own tests: a body that names the host lands with the count printed and the name not,
+while a body that also holds another listed name is refused; systemd unit instances land, and their look-alikes (a domain, a type outside
+the ruling, a local part no unit has) and a provider address, the control, are refused; the vendor co-author address lands, in any letter
+case and with the vendor's `noreply` form, while another local part at the vendor's domain, the vendor's local part at another domain and
+a provider address are refused; and a scanner that prints a warning count that is not a number stops the landing.
+`squash_body_scan.py` is also tested by itself: the names file's formats and that no line of it runs, the address rule's controls, the
+unit and vendor rules, the host name, a name as a whole token, and its one output line.
 
 **The privacy scan (#975 P2-1).** Two kinds of identity are scanned for, each in these forms: the bare word, an identifier or path
 form (joined to other text by `-`, `_`, `.`, `/`, `\`, `@`, `:`, `~` or `=`, as in `project-<name>-tools` or `<name>@host`), a
@@ -531,3 +626,12 @@ installed: `gh` 2.102.0.
 | The merge's body field | the GraphQL schema, `3ed09565…` | `schema.docs.graphql:26080-26082` `MergePullRequestInput.commitBody: String`, "Commit body to use for the merge commit; if omitted, a default message will be used" |
 | The squash default of both repositories | `github/rest-api-description@58b1e0c00b39:descriptions/api.github.com/api.github.com.json`, `da3d22e4…`; `github/docs@be38ec5d78e24172587e61b3c6ff40ace1865c71`: `content/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/configuring-commit-squashing-for-pull-requests.md`, `de95ca812994fdf9276ab499209bff15fc11e80d6740c78bdf96a30148ebb0ce`; `content/pull-requests/reference/pull-request-merges.md`, `731e80f541245c27b499b28de6760b3228d1bb7e924c4f8047a01a42aa238d81` | `api.github.com.json:138199-138208` `full-repository.squash_merge_commit_message`, one of `PR_BODY`, `COMMIT_MESSAGES` and `BLANK`, "`COMMIT_MESSAGES` - default to the branch's commit messages" (`:40076` the same setting in `repos/update`); `configuring-commit-squashing-for-pull-requests.md:23-26` the default message and its formats; `pull-request-merges.md:45-49` the default squash message comes from the repository settings and can be edited at the merge. Both repositories read `COMMIT_MESSAGES` at 2026-10-12T02:23:46Z |
 | Why the merge is validated here, and what would do it on GitHub's side | `github/docs@be38ec5d78e24172587e61b3c6ff40ace1865c71`: `data/reusables/pull_requests/merge-queue-overview.md`, `00008b55054578c947f05f8b17a6fdfdb809f826f511346c53c804038b5023da`; `content/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/managing-a-merge-queue.md`, `3ccb7ceb787e04077634c15ff7b5cf63641f20b0245341dcf31d6ac3511e382e`; `data/reusables/gated-features/merge-queue.md`, `a2e204a6f2c4f6bbc91fbc08a96d5c9f71485ba073dc1119a41e8efbc35a7290` | `merge-queue-overview.md:1` a merge queue ensures "the branch is never broken by incompatible changes", `:3` the same benefits as **Require branches to be up to date before merging**, `:7` it checks a pull request's changes "applied to the latest version of the target branch and any pull requests already in the queue"; `managing-a-merge-queue.md:84` the queue's temporary branches group a pull request with the latest base and the pull requests ahead of it; `gated-features/merge-queue.md:2` merge queues are available in organization-owned repositories only. The rules of both `main` branches (`strict_required_status_checks_policy`: `true` for the trading repository, `false` here) were read at 2026-10-12T02:23:46Z |
+| How `gh` takes the body file, for the snapshot (#1027) | the three `cli/cli` files above, read on 2026-10-12 through the GitHub contents API at `fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd` (the commit of `v2.102.0`): the local mirror, a blobless clone at `ec5b5120`, holds no tag and not that commit; the digests equal the ones above | `merge.go:146-153` is in the command's `RunE`, so `gh` reads the file when `gh pr merge` starts, however long before that the landing checked it; `:292-293` and `http.go:72-75` send what it read. A scan of the caller's file is therefore a scan of other bytes than `gh` may read, which is why the scripts scan a snapshot and give `gh` the snapshot |
+| A WSL UNC home path (#1027) | `MicrosoftDocs/WSL@a1473a69d10c` (HEAD on 2026-10-12, read through the contents API): `WSL/release-notes.md`, `7c8890227146c81681f8d743ad9ff8a1675310c52c22d7e54f4b4c08c89a57dd`; `WSL/wsl-config.md`, `2f84606529d3486b0b62dadea3afcbcb26cbccdd20ceb6cc0e4470b1520eee74` | `release-notes.md:24` "Switch the \\wsl prefix to \\wsl.localhost to avoid issues when there is a machine on the network named "wsl". \\wsl$ will continue to work."; `wsl-config.md:162` the path of a distribution's file is `\\wsl.localhost\<distro>\etc\wsl.conf` (the page's example names a stock distribution). So a home directory is `\\wsl.localhost\<distro>\home\<user>` or `\\wsl$\<distro>\home\<user>`. `scripts/validate.py:38-61` (`PRIVATE_CONTENT`) matches neither (measured 2026-10-12: no finding for either, one for the same path with forward slashes) |
+| The no-reply addresses (#1027) | `github/docs@be38ec5d78e24172587e61b3c6ff40ace1865c71:content/account-and-profile/reference/email-addresses-reference.md`, `fbbf1c5f700d977f8672462859621f9412e65531a57790fa779e191a4d1c0949` | `:47` an account created after July 18, 2017 has `ID+USERNAME@users.noreply.github.com`, `:48` an older one that kept its address private `USERNAME@users.noreply.github.com`. The vendor trailer `Co-Authored-By: ... <noreply@anthropic.com>` is this repository's convention, not GitHub's: 402 of the last 600 commit messages of `main` at 3a8a8461ee60 carry it (measured 2026-10-12) |
+| The address shape and a name's boundary (#1027) | this repository, `scripts/host_name_scan.py` at the base | `:164` the native `private-email` rule (RFC 5322 atext characters, `@`, letters, digits, dots and hyphens, a TLD of two letters or more) that the scanner's email check uses; `:144-150` `boundary_filter` drops a match with a letter or digit just before or after it, which is the whole-token rule of the name check; `scripts/validate.py:316-345` `scan_file_for_private_content` reads a file as UTF-8, else Latin-1, as `squash_body_scan.py` does, and `:737-780` is the `--scan-file` mode (exit 0 clean, 1 findings, 2 unavailable) |
+| An `EXIT` trap on a terminating signal (#1027) | `bash.git@bash-5.3:doc/bashref.texi` (git.savannah.gnu.org, `plain/doc/bashref.texi?h=bash-5.3`, read 2026-10-12), `f3d37d57a1061e24d266051de9bd47ffa43dc86584afea11576c535ad2be32d5`; installed: bash 5.3.9 | `:4777-4778` "If a sigspec is 0 or EXIT, action is executed when the shell exits", `:4358` "Any trap on EXIT is executed before the shell terminates". The manual does not say a signal counts, so it was measured: a script that made a file and set the trap, killed with SIGTERM and with SIGHUP while it waited on a child, ran the trap each time (the file was gone) and then died of the signal (a Python parent sees `-15` and `-1`); `test_the_snapshot_is_removed_when_a_signal_ends_the_landing` repeats it on both scripts |
+| Isolated mode (#1027) | `python/cpython@v3.13.16:Doc/using/cmdline.rst`, `ef999234d959b0a1d9a96a7f1f047170a77cd89fee9ffaa2a3db1af412a8ef0b` (the local upstream mirror at `cbc944f4bc59`) | `:308-316` `-I` "also implies -E, -P and -s", and "sys.path contains neither the script's directory nor the user's site-packages directory"; `:254-257` `-B`; `:392-395` `-s`. Measured 2026-10-12: `python3 -I scripts/validate.py --scan-file <file>` exits 2 (`"status": "error"`: `host_name_scan` is not importable), `python3 -E -s -B` exits 0 |
+| A systemd unit instance is no address (#1027) | `systemd/systemd@c7a8e871de3427cf654d9a608dc58663874197bb` (the local upstream mirror, HEAD on 2026-10-12): `man/systemd.unit.xml`, `520150b19c123762db6405bd68442bb72c8a5ea6e56cd383b99e9774e1c874b4` | `:121-124` the unit name prefix is ASCII letters, digits, `:`, `-`, `_`, `.` and `\`; `:125-128` the type suffix is one of `.service`, `.socket`, `.device`, `.mount`, `.automount`, `.swap`, `.target`, `.path`, `.timer`, `.slice` or `.scope` (the CC's ruling names six); `:130-135` an instance name is inserted between the `@` and the type suffix. So `getty@tty1.service` has the shape of an address (an `@`, a dot, a suffix of two letters or more) and is a unit; 2 of the last 600 commit messages of `main` carry one (measured 2026-10-12) |
+| Vendor co-author trailer addresses (#1027) | `openai/codex` (the local upstream mirror): the commit `db22c91e61cc80defa5bbafc22bd8a8c7672e5e1` (2026-05-05); `openai/codex@092d3acd6bec`, `codex-rs/ext/git-attribution/src/world_state.rs`, `5d202fa01fcc99d301dd5e330065b2100168819ef5d4c625e7a3b963940f7490` | the message of `db22c91e61`, line 38, is `Co-authored-by: Codex <codex@openai.com>`: the vendor's own repository carries that form, which is why it is on the list. The vendor's current attribution code writes `Co-authored-by: Codex <noreply@openai.com>` (`world_state.rs:11` and `:19`), which passes as a no-reply address. No other primary source holds the older form: the five `openai/*` mirrors at their HEADs and the 36 Codex pages of developers.openai.com hold no `codex@openai.com` (measured 2026-10-12). GitHub code search finds the exact trailer in 988 files (a count, not a source). `main`'s history holds it once, in four lines of one commit message |
+| The host's own name (#1027) | `python/cpython@v3.13.16:Doc/library/socket.rst`, `fa1ad5f48c9a9d9317a9502aacb068b73dbbdefb5894e61a59ae19838cf07bfe` (the local upstream mirror); this repository, `scripts/host_name_scan.py` at the base | `socket.rst:988-991` `socket.gethostname()` returns "the hostname of the machine where the Python interpreter is currently executing" (measured equal to `uname -n` on the CC's host); `host_name_scan.py:65-68` the repository's own scan drops the hostname source when it equals `WSL_DISTRO_NAME`: "WSL can expose its public distro/project label as the Linux hostname. Exclude that hostname source only; coincident private sources remain." |

@@ -5,7 +5,8 @@
 # slow steps (update-branch when BEHIND, ready, the Codex wait, the CI wait, the Codex gate before the validation, the merge onto the current
 # origin/main validated (again while main moves), the author address) -> final_gate, fast reads only (the head and its change, the verdict
 # files, trading-cc-read, the Codex gate, the check runs, origin/main) -> the squash merge pinned to the head -> its author.
-# Exit codes: 2 verdict gate (a verdict file, GATES_DONE or trading-cc-read; a file, record or status that cannot be read included), 3 head
+# Exit codes: 2 verdict gate (a verdict file, GATES_DONE or trading-cc-read; a file, record or status that cannot be read included), or a
+# SQUASH_BODY_FILE that is unreadable, empty, refused by the publication scan or not scannable (all before any gh or git call), 3 head
 # moved, 4 change differs (after update-branch, or at the final gate) or update-branch refused, 5 CI failing (at the final gate also: no
 # longer complete and green), 6 timeout, 7 merge failed, 8 blocked by policy, 9 the Codex gate (codex_gate.py) gave neither 0 nor 5 (a 5
 # proceeds here): a review running or not finished since its latest trigger (its 3, after the 20-minute wait, before the validation or at
@@ -17,7 +18,9 @@
 # 14 another landing of this repository holds the landing lock, or the lock cannot be taken (nothing merged; #975 round 4).
 # SQUASH_BODY_FILE (the CC, 2026-10-12): when set, the squash commit's body is that file (gh pr merge --body-file), for a PR whose commit
 # messages carry a claim corrected after review (the repository's squash default is COMMIT_MESSAGES). A value that is not a readable,
-# non-empty regular file stops with exit 2 before the lock and any call.
+# non-empty regular file stops with exit 2 before the lock and any call. The file is copied once to a private snapshot, the snapshot is
+# scanned for text that must not reach main's history (lg_body_snapshot; #1027) and the merge is given that snapshot, not the file: a
+# match, or a scanner or names file that is missing or fails, stops with exit 2 too (nothing printed but one fixed line).
 # Correction #136 (2026-10-10): verdict/record acceptance and change identity use the lg_* functions below (land-patches-20261010).
 # #975 P2-2 (2026-10-11): no text from gh or its API is printed. Every gh call drops its stderr, a failure ends in its step's fixed message and exit code, and gh api
 # writes an error response's body to stdout (cli v2.102.0 pkg/cmd/api/api.go:538-539 and :546), so a value read from it is shown only as a state word or a count.
@@ -221,7 +224,57 @@ lg_keep() {  # <file name prefix> <text>
   { printf '%s\n' "$2" > "$f"; } 2>/dev/null || { rm -f -- "$f" 2>/dev/null; return 1; }
   echo "${f##*/}"
 }
+# SQUASH_BODY_FILE (the CC, 2026-10-12; the scan is the P1 of #1027 at d6be1b02, Astra). The file becomes the squash commit's message in main's
+# history for good, and gh sends the bytes it holds when the merge call starts (cli v2.102.0 pkg/cmd/pr/merge/merge.go:146-153 reads the file,
+# :292-293 and http.go:72-75 send it as CommitBody; pkg/cmdutil/file_input.go:8-16), minutes after any check made here. So the file is copied
+# once to a snapshot (mktemp under TMPDIR, mode 0600; the EXIT trap removes it on any exit, a signal included: measured, README), the snapshot is
+# scanned, and the merge is given the snapshot, never the file. Two scans, both of the snapshot: squash_body_scan.py (the repository's
+# PRIVATE_CONTENT table, a WSL UNC home path, an address that is no no-reply one, a name of the names file; the file is parsed there, never
+# sourced) and scripts/validate.py --scan-file (PRIVATE_CONTENT and the runtime host-local names, the scan the pre-push hook runs; its answer
+# counts only when it says source "host", never the synthetic override's). Both run with -E -s -B, as merge_validate runs validate.py: with -I
+# the script's directory is off sys.path and validate.py cannot import host_name_scan.py (measured 2026-10-12: exit 2). Fail closed: a match,
+# a copy that fails, a scanner or names file that is missing or unreadable, and any answer but a scan's own clean line stop the landing with
+# exit 2 and one fixed line. No path, name, text or scanner output is printed, but one count: a name of the names file that is the host's own
+# name is a warning, not a refusal (the CC's ruling of 2026-10-12); squash_body_scan.py counts it, and the count is printed as a number.
+# Defaults: the scanner beside this script, validate.py in the clone of this repository (LANDING_NAS_REPO), the names file in the coordination tree.
+lg_body_snapshot() {  # <file> : sets SB to the scanned snapshot and returns 0 only when both scans pass; else prints one fixed line and returns 2
+  local here scan val names o r w why=cannot
+  local clean_scan='^squash body scan: clean \(names_checked=[0-9]+(, warnings=([0-9]+))?\)$'
+  local clean_cli='^\{"matching_locations": 0, "scanned_files": [0-9]+, "source": "host", "status": "passed"\}$'
+  here=$(dirname "$(readlink -f -- "$0")")
+  scan=${LANDING_BODY_SCAN:-$here/squash_body_scan.py}
+  val=${LANDING_SCANNER:-${LANDING_NAS_REPO:-$HOME/code/native-agent-stack}/scripts/validate.py}
+  names=${LANDING_NAMES_FILE:-$COORD/command-center/cc-tools/landing-prohibited-names.env}
+  SB=$(mktemp "${TMPDIR:-/tmp}/squash-body-XXXXXX" 2>/dev/null) || SB=
+  [ -n "$SB" ] || { echo "#$N SQUASH_BODY_FILE cannot be copied to a private snapshot (path withheld): stop, nothing merged"; return 2; }
+  trap 'rm -f -- "$SB"' EXIT
+  { cp -- "$1" "$SB" && chmod 600 -- "$SB" && [ -s "$SB" ]; } 2>/dev/null \
+    || { echo "#$N SQUASH_BODY_FILE cannot be copied to a private snapshot (path withheld): stop, nothing merged"; return 2; }
+  if [ -f "$scan" ] && [ -f "$val" ]; then
+    o=$(python3 -E -s -B "$scan" "$SB" "$val" "$names" 2>/dev/null); r=$?
+    if [ "$r" = 0 ] && [[ "$o" =~ $clean_scan ]]; then
+      w=${BASH_REMATCH[2]:-0}
+      o=$(python3 -E -s -B "$val" --scan-file "$SB" 2>/dev/null); r=$?
+      if [ "$r" = 0 ] && [[ "$o" =~ $clean_cli ]]; then
+        [ "$w" = 0 ] || echo "#$N SQUASH_BODY_FILE names this host's own name $w time(s): a warning, not a refusal (the name is not printed)"
+        return 0
+      fi
+      [ "$r" = 1 ] && why=refused
+    elif [ "$r" = 1 ] && [[ "$o" == "squash body scan: refused: "* ]]; then
+      why=refused
+    fi
+  fi
+  if [ "$why" = refused ]; then
+    echo "#$N SQUASH_BODY_FILE holds text the publication scan refuses (details withheld; squash_body_scan.py names the classes and lines): stop, nothing merged"
+  else
+    echo "#$N SQUASH_BODY_FILE could not be scanned: a scanner or the names file is missing, unreadable or failed (details withheld): stop, nothing merged"
+  fi
+  return 2
+}
 # <<< land-gate-fns
+# SQUASH_BODY_FILE: the snapshot and both scans (exit 2) come after the readability check above and before the lock and every git and gh call.
+SB=
+[ -z "${SQUASH_BODY_FILE:-}" ] || lg_body_snapshot "$SQUASH_BODY_FILE" || exit 2
 lg_lock "${LANDING_LOCK_DIR:-$COORD/command-center/landing-locks}" || exit 14
 $G fetch -q origin main "pull/$N/head" 2>/dev/null
 EF=$($G rev-parse --verify -q "$E^{commit}" 2>/dev/null) || { $G fetch -q origin "$E" 2>/dev/null; EF=$($G rev-parse --verify -q "$E^{commit}" 2>/dev/null); }
@@ -464,7 +517,7 @@ for v in 1 2 3; do
 done
 ae=$(lg_author_email "$R") || { echo "#$N cannot form the no-reply author address (correction #148): stop, nothing merged"; exit 11; }
 final_gate "$cur"
-out=$(gh pr merge "$N" -R $R --squash --match-head-commit "$cur" -A "$ae" ${SQUASH_BODY_FILE:+--body-file "$SQUASH_BODY_FILE"} 2>&1) || { cls=$(printf '%s' "$out" | grep -o -i -E 'not mergeable|head branch was modified|required status check|review|draft|merge conflict|protected branch|rate limit|authentication|not found' | head -1 | tr 'A-Z ' 'a-z_'); mf=$(lg_keep merge-fail "$out") && kept="gh output kept only in local file $mf in the temp directory (0600), never echoed" || kept="gh output could not be kept, and is not echoed"; echo "#$N merge failed (class: ${cls:-other}); $kept (#975 P2-2)"; exit 7; }
+out=$(gh pr merge "$N" -R $R --squash --match-head-commit "$cur" -A "$ae" ${SB:+--body-file "$SB"} 2>&1) || { cls=$(printf '%s' "$out" | grep -o -i -E 'not mergeable|head branch was modified|required status check|review|draft|merge conflict|protected branch|rate limit|authentication|not found' | head -1 | tr 'A-Z ' 'a-z_'); mf=$(lg_keep merge-fail "$out") && kept="gh output kept only in local file $mf in the temp directory (0600), never echoed" || kept="gh output could not be kept, and is not echoed"; echo "#$N merge failed (class: ${cls:-other}); $kept (#975 P2-2)"; exit 7; }
 sleep 4
 echo "#$N $(gh pr view "$N" -R $R --json state,mergeCommit,mergedAt --jq '"\(.state) \(.mergeCommit.oid) \(.mergedAt)"' 2>/dev/null) (CI $ci ok)"
 lg_author_check "$R" "$N" "$ae" || exit 12

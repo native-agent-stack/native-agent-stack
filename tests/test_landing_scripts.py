@@ -19,6 +19,9 @@ This module is that harness's offline subset, kept beside the one copy of the sc
   * each script end to end with a fake gh, python3 and sleep: the variables and their defaults, the gate path through a symlink and
     a wrapper, the order in which the gates stop a landing, a failed merge and a failing gh call at each call site (#975 P2-2), none
     of which may print what gh or its API returned;
+  * #1027: the squash body's publication scan: SQUASH_BODY_FILE is copied to a private snapshot, which squash_body_scan.py (home paths
+    of every form, names, addresses, token shapes) and validate.py --scan-file scan, and which the merge is given; a match, a missing
+    or failing scanner and a file that changes after the scan end as the README says, and squash_body_scan.py itself is tested;
   * the files under tools/landing: no home path and no form of an identity that must not appear, which is the running account (a
     generic CI account may stand as a bare word) and every name in LANDING_PROHIBITED_NAMES, none skipped for its length (#975 P2-1),
     and the README's digests.
@@ -43,6 +46,7 @@ import os
 import re
 import shutil
 import signal
+import socket
 import stat
 import subprocess
 import sys
@@ -53,6 +57,7 @@ from pathlib import Path
 from unittest import mock
 
 import tests
+from scripts import host_name_scan
 
 ROOT = Path(__file__).resolve().parents[1]
 LANDING = ROOT / "tools/landing"
@@ -132,6 +137,8 @@ def q(path):
 # answers only the review-thread count; any other query fails, as for a gate that runs against this fake.
 # SQUASH_BODY_FILE (the CC, 2026-10-12): FAKE_MERGE_ARGV, when set, names a file that `gh pr merge` writes its arguments to, each ended
 # by a NUL byte, so a test sees argument boundaries that FAKE_LOG's one line cannot show (a body file whose path has a space).
+# #1027: FAKE_MERGE_BODY, when set, names a file that `gh pr merge` copies its --body-file argument to when the call starts, as gh reads
+# it (cli v2.102.0 pkg/cmd/pr/merge/merge.go:146-153), and records that file's mode beside it; the scripts delete their snapshot on exit.
 FAKE_GH = r'''#!/usr/bin/env bash
 [ -n "${FAKE_LOG:-}" ] && printf 'gh %s\n' "$*" >> "$FAKE_LOG"
 if [ -n "${FAKE_GH_HOOK:-}" ] && [[ "$*" == ${FAKE_GH_HOOK_ON:-} ]]; then sh -c "$FAKE_GH_HOOK"; fi
@@ -179,6 +186,11 @@ case "$1 $2" in
   "pr ready") exit 0 ;;
   "pr update-branch") exit "${FAKE_UPDATE_RC:-0}" ;;
   "pr merge") [ -z "${FAKE_MERGE_ARGV:-}" ] || printf '%s\0' "$@" > "$FAKE_MERGE_ARGV"
+              if [ -n "${FAKE_MERGE_BODY:-}" ]; then  # the body file as the merge call finds it: its bytes, and its mode in "$FAKE_MERGE_BODY.mode"
+                for ((i = 0; i < ${#args[@]}; i++)); do
+                  [ "${args[i]}" != "--body-file" ] || { cp -- "${args[i+1]}" "$FAKE_MERGE_BODY"; stat -c %a "${args[i+1]}" > "$FAKE_MERGE_BODY.mode"; }
+                done
+              fi
               printf '%s\n' "${FAKE_MERGE_STDOUT-merged}"; [ -z "${FAKE_MERGE_STDERR:-}" ] || printf '%s\n' "$FAKE_MERGE_STDERR" >&2
               exit "${FAKE_MERGE_RC:-0}" ;;
   *) exit 1 ;;
@@ -191,9 +203,19 @@ esac
 # CC correction #176 (2026-10-12): a currency check that nas's validation runs after validate.py (`... <script> [build] --check`) is
 # answered here and never by the gate's answers below: exit 0, or, when its arguments match the glob FAKE_CHECK_FAIL, FAKE_CHECK_OUT and
 # exit FAKE_CHECK_RC (default 1). FAKE_VALIDATE_HOOK runs in the validation's worktree, so it can put a check's script in the merge.
+# #1027: the squash body's scans run before the lock, and both of their command lines name scripts/validate.py, so they are answered first.
+# squash_body_scan.py (whatever file of that name) runs with the interpreter FAKE_BODY_SCAN_PYTHON, and gets the gate's canned answer, which is
+# no clean answer of its own, when that is unset. `validate.py --scan-file` runs with FAKE_VALIDATE_SCAN_PYTHON when that is set (the real scanner,
+# which needs Betterleaks); else it answers FAKE_SCAN_OUT (a clean JSON line when unset) and exits FAKE_SCAN_RC (default 0). FAKE_REAL_PYTHON is
+# not used for either: it makes the gate real too.
 FAKE_PYTHON3 = r'''#!/usr/bin/env bash
 printf 'python3 %s\n' "$*" >> "$FAKE_LOG"
 case "$*" in
+  *squash_body_scan.py*) [ -z "${FAKE_BODY_SCAN_PYTHON:-}" ] || exec "$FAKE_BODY_SCAN_PYTHON" "$@" ;;
+  *--scan-file*) [ -z "${FAKE_VALIDATE_SCAN_PYTHON:-}" ] || exec "$FAKE_VALIDATE_SCAN_PYTHON" "$@"
+                 if [ -n "${FAKE_SCAN_OUT+set}" ]; then printf '%s' "$FAKE_SCAN_OUT"
+                 else printf '{"matching_locations": 0, "scanned_files": 1, "source": "host", "status": "passed"}\n'; fi
+                 exit "${FAKE_SCAN_RC:-0}" ;;
   *scripts/validate.py*) printf 'validate-tree %s\n' "$(git ls-files | tr '\n' ' ')" >> "$FAKE_LOG"
                          [ -z "${FAKE_VALIDATE_HOOK:-}" ] || sh -c "$FAKE_VALIDATE_HOOK"
                          echo "${FAKE_VALIDATE_OUT:-validate stub}"; exit "${FAKE_VALIDATE_RC:-0}" ;;
@@ -406,6 +428,16 @@ def account_name():
         return pwd.getpwuid(os.getuid()).pw_name
     except KeyError:
         return getpass.getuser()
+
+
+def betterleaks_pinned():
+    """True when the native scanner behind `validate.py --scan-file` (Betterleaks at host_name_scan.py's pin) is installed, as
+    host_name_scan._scan_entries checks it: `betterleaks version` prints the pin, bare or after its name."""
+    binary = shutil.which("betterleaks")
+    if binary is None:
+        return False
+    done = subprocess.run([binary, "version"], capture_output=True, text=True, env={}, timeout=60)
+    return done.returncode == 0 and done.stdout.strip() in (host_name_scan.PIN, "betterleaks version " + host_name_scan.PIN)
 
 
 def name_patterns(name):
@@ -680,6 +712,23 @@ class ScriptTextTests(LandingCase):
                 self.assertTrue(script.lines[merge - 2].startswith('ae=$(lg_author_email "$R")'))
                 self.assertIn(f"--match-head-commit {pinned}", script.lines[merge])
                 self.assertEqual(script.text.count("\nfinal_gate "), 1)
+
+    def test_the_squash_body_is_scanned_before_the_lock_and_the_merge_is_given_only_the_snapshot(self):
+        # #1027: the check of the variable, then the snapshot and its scans, then the lock. The merge line names the snapshot; the only lines
+        # outside the comments that read the caller's file are the check and the call that copies it.
+        for script in (self.uet, self.nas):
+            with self.subTest(script=script.key):
+                lines = script.lines
+                call = lines.index('[ -z "${SQUASH_BODY_FILE:-}" ] || lg_body_snapshot "$SQUASH_BODY_FILE" || exit 2')
+                lock = lines.index('lg_lock "${LANDING_LOCK_DIR:-$COORD/command-center/landing-locks}" || exit 14')
+                check = next(i for i, line in enumerate(lines) if line.startswith('[ -z "${SQUASH_BODY_FILE:-}" ] || { [ "$SQUASH_BODY_FILE" != - ]'))
+                self.assertLess(check, call)
+                self.assertLess(call, lock)
+                reads = [i for i, line in enumerate(lines) if "$SQUASH_BODY_FILE" in line and not line.lstrip().startswith("#")]
+                self.assertEqual(reads, [check, call])
+                merge = next(line for line in lines if line.startswith("out=$(gh pr merge "))
+                self.assertIn('${SB:+--body-file "$SB"}', merge)
+                self.assertNotIn("SQUASH_BODY_FILE", merge)
 
     def test_nas_runs_the_currency_checks_of_validate_ymls_shard_0_in_the_workflows_order(self):
         # CC correction #176 (2026-10-12): merge_validate ran validate.py alone, and #1018 landed on #1007 with final_stack.py --check
@@ -3009,25 +3058,518 @@ class EndToEndTests(LandingCase):
         finally:
             unreadable.chmod(0o600)
 
+    # ------------------------------------------------------------------------------------------ the squash body's publication scan (#1027)
+    # Astra's P1 at d6be1b02: the scripts checked that SQUASH_BODY_FILE was a readable, non-empty regular file and nothing more, so a body
+    # holding a home path, an account name, an address that is not a no-reply one or a token shape went into main's permanent history (her
+    # four synthetic payloads each gave exit 0 and one merge call). The file is now copied to a private snapshot, which squash_body_scan.py
+    # and `validate.py --scan-file` scan and which the merge is given. Every payload here is built from parts: this module is a published
+    # file itself, and validate.py's scan reads it.
+    SQUASH_NAMES = "LANDING_PROHIBITED_NAMES=zqxsynth,qvortex\n"  # a synthetic names file: two identities that no account has
+    SQUASH_REFUSED = ("SQUASH_BODY_FILE holds text the publication scan refuses (details withheld; squash_body_scan.py names the classes and "
+                      "lines): stop, nothing merged")
+    SQUASH_UNSCANNABLE = ("SQUASH_BODY_FILE could not be scanned: a scanner or the names file is missing, unreadable or failed "
+                          "(details withheld): stop, nothing merged")
+    SQUASH_CLI_CLEAN = '{"matching_locations": 0, "scanned_files": 1, "source": "host", "status": "passed"}\n'
+    # a body that passes: the no-reply addresses that squash bodies carry (GitHub's, and the vendor trailer), a synthetic name inside a
+    # longer word, and the placeholder account's home path, which PRIVATE_CONTENT exempts
+    SQUASH_CLEAN = ("The corrected claim, which review changed.\n\nThe zqxsynthesis step is unchanged, as is /" + "home" + "/example/work.\n\n"
+                    "Signed-off-by: A Person <4242424+seathatflowsinourveins@users.noreply.github.com>\n"
+                    "Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>\n")
+
+    def squash_body(self, content):
+        """A new body file holding content, text or bytes."""
+        path = self.dir / f"squash-{next(self.counter)}.md"
+        path.write_bytes(content.encode("utf-8") if isinstance(content, str) else content)
+        return path
+
+    def squash_names(self, text=SQUASH_NAMES):
+        path = self.dir / f"names-{next(self.counter)}.env"
+        path.write_text(text, encoding="utf-8")
+        return path
+
+    def land_squash(self, script, body, *, tmp=None, names=None, **extra):
+        """A landing with SQUASH_BODY_FILE set to the body file, the real squash_body_scan.py and scripts/validate.py (loaded for its
+        PRIVATE_CONTENT table), a synthetic names file, and a canned clean answer from `validate.py --scan-file` (FAKE_SCAN_RC and
+        FAKE_SCAN_OUT change it, FAKE_VALIDATE_SCAN_PYTHON makes it real). Returns (exit code, output, log, TMPDIR)."""
+        if tmp is None:
+            tmp = self.dir / f"tmp-{next(self.counter)}"
+            tmp.mkdir()
+        settings = {"SQUASH_BODY_FILE": str(body), "TMPDIR": str(tmp), "FAKE_BODY_SCAN_PYTHON": sys.executable,
+                    "LANDING_SCANNER": str(ROOT / "scripts/validate.py"), "LANDING_NAMES_FILE": str(names if names is not None else self.squash_names()),
+                    **extra}
+        code, out, log = self.land(script, **settings)
+        return code, out, log, tmp
+
+    def assert_squash_stopped(self, message, code, out, log, tmp, secrets=(), tolerated=()):
+        """The landing stopped with exit 2 and the fixed line, before any gh or git call (so before the lock), with no merge, no snapshot
+        left, no path and nothing of the body printed. A failure message never holds a secret."""
+        self.assertEqual(code, 2, out)
+        self.assertIn(f"#{PR} {message}", out)
+        calls = [line for line in log if line.startswith(("gh ", "git ")) and not line.startswith(tolerated)]
+        self.assertEqual(calls, [], "the scans come before the lock and every gh and git call")
+        self.assertEqual(self.merge_calls(log), [])
+        self.assertEqual(sorted(tmp.glob("squash-body-*")), [], "the snapshot is removed when the script exits")
+        self.assertNotIn(str(self.dir), out, "no path is printed")
+        self.assertFalse([secret for secret in secrets if secret in out], "the output holds text of the body")
+
+    def refused_forms(self, forms):
+        """Each form, {label: (text, the part of it that must not be printed)}, is refused by both scripts with the fixed line."""
+        for script in (self.uet, self.nas):
+            for label, (text, secret) in forms.items():
+                with self.subTest(script=script.key, form=label):
+                    code, out, log, tmp = self.land_squash(script, self.squash_body(text))
+                    self.assert_squash_stopped(self.SQUASH_REFUSED, code, out, log, tmp, secrets=(secret,))
+
+    def test_a_squash_body_with_a_home_path_is_refused_by_both_scripts_before_any_call(self):
+        # #1027: a home path in the body would be published in main's history. At d6be1b02 each of these landed (exit 0, one merge call).
+        # PRIVATE_CONTENT knows the forward-slash forms; it does not match the UNC form of a WSL path (squash_body_scan.py does).
+        user, bs = "zqx" + "other", "\\"  # not `example`, the placeholder account, which PRIVATE_CONTENT exempts
+        self.refused_forms({label: (text, user) for label, text in {
+            "a Linux home path": "see /" + "home" + f"/{user}/project\n",
+            "a macOS home path": "see /" + "Users" + f"/{user}/project\n",
+            "a Windows profile path": "opened C:" + bs + "Users" + bs + user + bs + "repo\n",
+            "a Windows profile path with forward slashes": "opened C:/" + "Users" + f"/{user}/repo\n",
+            "a Windows profile through the WSL mount": "cd /mnt/c/" + "Users" + f"/{user}/repo\n",
+            "a WSL UNC path": "opened " + bs * 2 + "wsl.localhost" + bs + "Ubuntu" + bs + "home" + bs + user + bs + "repo\n",
+            "a WSL UNC path of the older form": "opened " + bs * 2 + "wsl$" + bs + "Ubuntu" + bs + "home" + bs + user + "\n",
+            "a WSL UNC path with doubled backslashes (JSON, Markdown)":
+                "opened " + bs * 4 + "wsl.localhost" + bs * 2 + "Ubuntu" + bs * 2 + "home" + bs * 2 + user + "\n",
+            "the dash-encoded home path": "dir -" + "home" + f"-{user}-code-repo\n",
+            "the graph project id": "project=" + "-".join(("home", user, "code", "repo")) + " indexed\n",
+            "a percent-encoded home path": "file=%2F" + "home" + f"%2F{user}%2Fproject\n",
+        }.items()})
+
+    def test_a_squash_body_with_a_name_of_the_names_file_is_refused_by_both_scripts_before_any_call(self):
+        # #1027: the names file (the list the tests read as LANDING_PROHIBITED_NAMES) holds identities that must not reach main. At d6be1b02
+        # each of these landed. A name is refused as a whole token, in any letter case, and percent-encoded.
+        self.refused_forms({label: (text, secret) for label, (text, secret) in {
+            "a bare word": ("the account zqxsynth ran it\n", "zqxsynth"),
+            "the second name of the file": ("ask qvortex about it\n", "qvortex"),
+            "upper case": ("ZQXSYNTH did\n", "ZQXSYNTH"),
+            "an identifier": ("dir=project-zqxsynth-tools\n", "zqxsynth"),
+            "a path": ("cd work/zqxsynth/src\n", "zqxsynth"),
+            "percent-encoded": ("u=zqx%73ynth\n", "zqx%73ynth"),
+        }.items()})
+
+    def test_a_squash_body_with_an_address_that_is_not_a_no_reply_one_is_refused_by_both_scripts_before_any_call(self):
+        # #1027 (the non-no-reply email of Astra's payloads, and the point of correction #148: no personal address in public history). At
+        # d6be1b02 each of these landed. GitHub's no-reply forms and a noreply or no-reply local part pass (the control test below).
+        self.refused_forms({label: (text, "example.invalid") for label, text in {
+            "a plain address": "ask person@example.invalid\n",
+            "mixed case": "ask Person.Name@Example.Invalid\n",
+            "an address in a trailer": "Signed-off-by: A Person <person@example.invalid>\n",
+            "percent-encoded": "ask person%40example.invalid\n",
+            "a look-alike: noreply is not the whole local part": "ask noreply.person@example.invalid\n",
+            "a look-alike: a no-reply local part after a quote": "ask x'noreply@example.invalid\n",
+            "a look-alike: the plus form of another domain": "ask 4242424+noreply@example.invalid\n",
+            "a look-alike: the GitHub no-reply domain as the start of another": "ask person@users.noreply.github.com.example.invalid\n",
+        }.items()})
+
+    def test_a_squash_body_with_a_token_shape_is_refused_by_both_scripts_before_any_call(self):
+        # #1027: a credential in the body would be published. At d6be1b02 each of these landed. Built from parts, as the existing
+        # PRIVATE_CONTENT tests do.
+        self.refused_forms({label: (text, secret) for label, (text, secret) in {
+            "a GitHub token": ("token " + "gh" + "p_" + "a" * 36 + "\n", "a" * 36),
+            "a fine-grained GitHub token": ("token " + "github" + "_pat_" + "A" * 40 + "\n", "A" * 40),
+            "an API secret": ("key " + "sk-" + "ant-" + "b" * 30 + "\n", "b" * 30),
+            "a Hugging Face token": ("key " + "hf" + "_" + "c" * 24 + "\n", "c" * 24),
+            "a bearer credential": ("Authorization: " + "Bearer " + "d" * 40 + "\n", "d" * 40),
+            "a private key header": ("-----BEGIN " + "PRIVATE KEY-----\n", "PRIVATE KEY"),
+            "a session identifier": ("session " + "-".join(("123e4567", "e89b", "12d3", "a456", "426614174000")) + "\n", "426614174000"),
+        }.items()})
+
+    def test_a_squash_body_that_names_this_host_lands_with_a_count_and_the_other_names_still_refuse(self):
+        # #1027, the CC's ruling of 2026-10-12: a names-list entry equal to the running host's own name is a warning and never a refusal
+        # (the host name is hygiene, not a blocker); the count is printed, the name is not. Every other identity still refuses. The name is
+        # the live `hostname`, read here as the scan reads it; no message of this test can hold it.
+        host = socket.gethostname()
+        names = self.squash_names(f"LANDING_PROHIBITED_NAMES=zqxsynth,{host},qvortex\n")
+        whole = re.compile(r"(?<![^\W_])" + re.escape(host) + r"(?![^\W_])", re.IGNORECASE)
+        named = f"{self.SQUASH_CLEAN}\nThe host {host} ran it, and {host.upper()} again.\n"
+        count = len(whole.findall(named))
+        for script in (self.uet, self.nas):
+            with self.subTest(script=script.key, body="names the host"):
+                code, out, log, tmp = self.land_squash(script, self.squash_body(named), names=names)
+                self.assertEqual((code, len(self.merge_calls(log))), (0, 1), "a body that names the host did not land")
+                self.assertIn(f"#{PR} SQUASH_BODY_FILE names this host's own name {count} time(s): a warning, not a refusal (the name is not printed)", out)
+                self.assertFalse(len(host) >= 6 and whole.search(out.replace("this host's own name", "")), "the output holds the host's name")
+            with self.subTest(script=script.key, body="does not name it"):
+                code, out, log, tmp = self.land_squash(script, self.squash_body(self.SQUASH_CLEAN), names=names)
+                self.assertEqual((code, len(self.merge_calls(log))), (0, 1), out)
+                self.assertNotIn("own name", out)
+            with self.subTest(script=script.key, body="names the host and another listed name"):
+                code, out, log, tmp = self.land_squash(script, self.squash_body(named + "and zqxsynth, too\n"), names=names)
+                self.assert_squash_stopped(self.SQUASH_REFUSED, code, out, log, tmp, secrets=("zqxsynth",))
+                self.assertFalse(len(host) >= 6 and whole.search(out), "the output holds the host's name")
+            with self.subTest(script=script.key, body="names the host, and the list does not"):
+                code, out, log, tmp = self.land_squash(script, self.squash_body(named), names=self.squash_names())
+                self.assertEqual((code, len(self.merge_calls(log))), (0, 1), out)
+                self.assertNotIn("own name", out)
+
+    def test_a_squash_body_with_a_systemd_unit_instance_lands_and_a_look_alike_does_not(self):
+        # #1027, the CC's ruling of 2026-10-12: <name>@<instance>.<type> with a type of service, timer, socket, target, path or mount is a
+        # unit instance (systemd/systemd man/systemd.unit.xml:121-136), not an address. At d6be1b02 the scripts read no body at all; the
+        # first scan of this change refused these. The look-alikes are still addresses, and a provider address is the control.
+        units = ("getty@tty1.service", "serial-getty@ttyS0.service", "user@1000.service", "app@one.socket", "app@dev-sda1.timer",
+                 "fsck@dev.target", "watch@some.path", "mnt@data.mount")
+        for script in (self.uet, self.nas):
+            with self.subTest(script=script.key, body="unit instances"):
+                text = self.SQUASH_CLEAN + "\nThe units " + ", ".join(units) + " were restarted.\n"
+                code, out, log, tmp = self.land_squash(script, self.squash_body(text))
+                self.assertEqual((code, len(self.merge_calls(log))), (0, 1), out)
+        self.refused_forms({label: (text, "tty1") for label, text in {
+            "a provider address, the control": "ask " + "fictional.person" + "@gmail.com\n",
+            "a service name that is a domain": "ask person@service.com\n",
+            "a unit type that is not in the ruling": "ask person@host.device\n",
+            "a local part that no unit name has": "ask jane+x@host.service\n",
+            "a unit suffix inside a longer domain": "ask person@tty1.service.example.invalid\n",
+        }.items()})
+
+    def test_a_squash_body_with_a_vendor_co_author_trailer_lands_and_a_provider_address_does_not(self):
+        # #1027, the CC's ruling of 2026-10-12: a short cited list of vendor co-author trailer addresses that are not no-reply ones. Codex's is
+        # codex@openai.com, as the vendor's own repository carries it (openai/codex@db22c91e61cc80defa5bbafc22bd8a8c7672e5e1, message line 38);
+        # the vendor's current trailer, Codex <noreply@openai.com>, passes as a no-reply address. Only the exact address passes.
+        trailers = ("Co-authored-by: Codex <codex@openai.com>\n", "Co-Authored-By: OpenAI Codex <Codex@OpenAI.com>\n",
+                    "Co-authored-by: Codex <noreply@openai.com>\n")
+        for script in (self.uet, self.nas):
+            for trailer in trailers:
+                with self.subTest(script=script.key, trailer=trailer.strip()):
+                    code, out, log, tmp = self.land_squash(script, self.squash_body(self.SQUASH_CLEAN + trailer))
+                    self.assertEqual((code, len(self.merge_calls(log))), (0, 1), out)
+        self.refused_forms({label: (text, "openai") for label, text in {
+            "a provider address, the control": "Co-authored-by: Fictional Person <" + "fictional.person" + "@gmail.com>\n",
+            "another local part at the vendor's domain": "Co-authored-by: Someone <someone@openai.com>\n",
+            "the vendor's local part at another domain": "Co-authored-by: Codex <codex@openai.com.example.invalid>\n",
+            "a longer local part": "Co-authored-by: Codex <xcodex@openai.com>\n",
+        }.items()})
+
+    def test_a_squash_body_is_not_landed_when_a_scanner_or_the_names_file_is_missing_or_fails(self):
+        # #1027, fail closed: a missing or failing scanner, an answer that is not a scan's own clean line (a scanner that exits 0 and prints
+        # nothing, as an emptied file would) and a names file that names nobody all stop the landing, the body being clean. At d6be1b02
+        # each of these landed.
+        def stub(text):  # a stand-in for squash_body_scan.py, named as the real one so that the fake python3 runs it
+            directory = self.dir / f"stub-{next(self.counter)}"
+            directory.mkdir()
+            (directory / "squash_body_scan.py").write_text(text, encoding="utf-8")
+            return str(directory / "squash_body_scan.py")
+        missing, passed = self.dir / "does-not-exist", self.SQUASH_CLI_CLEAN
+        cases = [
+            ("validate.py is missing", {"LANDING_SCANNER": str(missing)}, self.SQUASH_UNSCANNABLE),
+            ("squash_body_scan.py is missing", {"LANDING_BODY_SCAN": str(missing)}, self.SQUASH_UNSCANNABLE),
+            ("the names file is missing", {"names": missing}, self.SQUASH_UNSCANNABLE),
+            ("the names file names nobody", {"names": self.squash_names("LANDING_PROHIBITED_NAMES= , ,\n")}, self.SQUASH_UNSCANNABLE),
+            ("the names file has no assignment", {"names": self.squash_names("# nothing\n")}, self.SQUASH_UNSCANNABLE),
+            ("squash_body_scan.py exits 2", {"LANDING_BODY_SCAN": stub('print("squash body scan: could not run")\nraise SystemExit(2)\n')},
+             self.SQUASH_UNSCANNABLE),
+            ("squash_body_scan.py exits 0 and prints nothing", {"LANDING_BODY_SCAN": stub("")}, self.SQUASH_UNSCANNABLE),
+            ("squash_body_scan.py exits 0 and prints another line", {"LANDING_BODY_SCAN": stub('print("all good")\n')}, self.SQUASH_UNSCANNABLE),
+            ("squash_body_scan.py prints a warning count that is not a number",
+             {"LANDING_BODY_SCAN": stub('print("squash body scan: clean (names_checked=3, warnings=x)")\n')}, self.SQUASH_UNSCANNABLE),
+            ("squash_body_scan.py has a syntax error (exit 1, a traceback, no status line)", {"LANDING_BODY_SCAN": stub("def broken(:\n")},
+             self.SQUASH_UNSCANNABLE),
+            ("squash_body_scan.py refuses", {"LANDING_BODY_SCAN": stub('print("squash body scan: refused: x (line 1)")\nraise SystemExit(1)\n')},
+             self.SQUASH_REFUSED),
+            ("validate.py --scan-file exits 1", {"FAKE_SCAN_RC": "1", "FAKE_SCAN_OUT": passed.replace("0,", "1,").replace("passed", "failed") + "body:1\n"},
+             self.SQUASH_REFUSED),
+            ("validate.py --scan-file exits 2", {"FAKE_SCAN_RC": "2", "FAKE_SCAN_OUT": '{"scanned_files": 1, "source": "host", "status": "error"}\n'},
+             self.SQUASH_UNSCANNABLE),
+            ("validate.py --scan-file exits 0 and prints nothing", {"FAKE_SCAN_OUT": ""}, self.SQUASH_UNSCANNABLE),
+            ("validate.py --scan-file exits 0 on the synthetic override's sources", {"FAKE_SCAN_OUT": passed.replace('"host"', '"synthetic"')},
+             self.SQUASH_UNSCANNABLE),
+            ("validate.py --scan-file exits 0 and reports a match", {"FAKE_SCAN_OUT": passed.replace("0,", "1,")}, self.SQUASH_UNSCANNABLE),
+            ("validate.py --scan-file exits 0 and adds a line", {"FAKE_SCAN_OUT": passed + "body:1\n"}, self.SQUASH_UNSCANNABLE),
+        ]
+        if os.geteuid() != 0:  # root reads a file with mode 000
+            unreadable = self.squash_names()
+            unreadable.chmod(0)
+            self.addCleanup(unreadable.chmod, 0o600)
+            cases.append(("the names file is unreadable", {"names": unreadable}, self.SQUASH_UNSCANNABLE))
+        for script in (self.uet, self.nas):
+            for label, settings, message in cases:
+                with self.subTest(script=script.key, case=label):
+                    code, out, log, tmp = self.land_squash(script, self.squash_body(self.SQUASH_CLEAN), **settings)
+                    self.assert_squash_stopped(message, code, out, log, tmp)
+                    self.assertNotIn("Traceback", out)
+
     def test_a_squash_body_file_is_passed_to_the_merge_as_one_body_file_argument(self):
         # SQUASH_BODY_FILE (the CC, 2026-10-12): both repositories' squash default is COMMIT_MESSAGES, so a commit message that carries a
         # claim corrected after review would land; the merge takes its body from the file instead. At 86fa3844 the merge call had no
-        # --body-file. An empty value is the same as none, and the path is never printed.
-        body = self.dir / f"body {next(self.counter)}/squash body.md"
-        body.parent.mkdir()
-        body.write_text("The squash body, corrected after review.\n", encoding="utf-8")
+        # --body-file. An empty value is the same as none, and no path is printed.
+        # #1027 (this test is the valid-body control, changed at d6be1b02, where the merge was given the caller's file itself): the merge is
+        # given a private snapshot of a clean body, which both scanners read before any gh or git call. It is a new file that mktemp made in
+        # TMPDIR (here a directory whose name has a space: still one --body-file argument), mode 0600, holding the body's bytes, and it is
+        # removed when the script exits. The body tells a correct address rule from one that refuses every address: it carries GitHub's
+        # no-reply form and the vendor's noreply trailer, a synthetic name inside a longer word and the placeholder account's home path.
+        body = self.squash_body(self.SQUASH_CLEAN)
+        spaced = self.dir / f"tmp {next(self.counter)}"
+        spaced.mkdir()
+        real_landing, validate = os.path.realpath(LANDING), ROOT / "scripts/validate.py"
         for script, repo in ((self.uet, UET_REPO), (self.nas, NAS_REPO)):
             merge = f"gh pr merge {PR} -R {repo} --squash --match-head-commit {self.head} -A {NOREPLY}"
-            with self.subTest(script=script.key, body="a file whose path has a space"):
-                argv = self.dir / f"argv-{next(self.counter)}"
-                code, out, log = self.land(script, SQUASH_BODY_FILE=str(body), FAKE_MERGE_ARGV=str(argv))
-                self.assertEqual((code, self.merge_calls(log)), (0, [f"{merge} --body-file {body}"]), out)
-                self.assertEqual(argv.read_bytes().split(b"\0")[:-1], [os.fsencode(part) for part in (
-                    "pr", "merge", PR, "-R", repo, "--squash", "--match-head-commit", self.head, "-A", NOREPLY, "--body-file", str(body))])
+            with self.subTest(script=script.key, body="a clean body, a snapshot in a directory whose name has a space"):
+                names, argv, copy = self.squash_names(), self.dir / f"argv-{next(self.counter)}", self.dir / f"copy-{next(self.counter)}"
+                code, out, log, _ = self.land_squash(script, body, tmp=spaced, names=names, FAKE_MERGE_ARGV=str(argv), FAKE_MERGE_BODY=str(copy))
+                self.assertEqual(code, 0, out)
+                arguments = [os.fsdecode(part) for part in argv.read_bytes().split(b"\0")[:-1]]
+                self.assertEqual(arguments[:-1], ["pr", "merge", PR, "-R", repo, "--squash", "--match-head-commit", self.head, "-A", NOREPLY,
+                                                  "--body-file"])
+                snapshot = Path(arguments[-1])
+                self.assertEqual(self.merge_calls(log), [f"{merge} --body-file {snapshot}"])
+                self.assertEqual(snapshot.parent, spaced)
+                self.assertRegex(snapshot.name, r"^squash-body-[A-Za-z0-9]{6}$")
+                self.assertNotEqual(snapshot, body, "the merge is not given the caller's file")
+                self.assertEqual(copy.read_bytes(), body.read_bytes(), "the bytes the merge reads are the body's, byte for byte")
+                self.assertEqual(Path(f"{copy}.mode").read_text(encoding="utf-8").strip(), "600")
+                self.assertFalse(snapshot.exists(), "the snapshot is removed when the script exits")
+                self.assertEqual(sorted(spaced.glob("squash-body-*")), [])
                 self.assertNotIn(str(body), out)
+                self.assertNotIn(str(snapshot), out)
+                scans = [(index, line) for index, line in enumerate(log) if line.startswith("python3 -E -s -B ")
+                         and ("squash_body_scan.py" in line or "--scan-file" in line)]
+                self.assertEqual([line for _, line in scans], [
+                    f"python3 -E -s -B {real_landing}/squash_body_scan.py {snapshot} {validate} {names}",
+                    f"python3 -E -s -B {validate} --scan-file {snapshot}"], "both scans, of the one snapshot")
+                first_call = min(index for index, line in enumerate(log) if line.startswith(("gh ", "git ")))
+                self.assertLess(max(index for index, _ in scans), first_call, "the scans come before the lock and every gh and git call")
             with self.subTest(script=script.key, body="an empty value"):
                 code, out, log = self.land(script, SQUASH_BODY_FILE="")
                 self.assertEqual((code, self.merge_calls(log)), (0, [merge]), out)
+                self.assertEqual([line for line in log if "squash_body_scan.py" in line or "--scan-file" in line], [], "no scan, no snapshot")
+
+    def test_the_merge_reads_the_scanned_bytes_even_when_the_file_changes_after_the_scan(self):
+        # #1027: gh reads the body file when the merge call starts (cli v2.102.0 pkg/cmd/pr/merge/merge.go:146-153), minutes after the
+        # scan (the CI wait takes up to 50). A file rewritten in between is not what was scanned; the snapshot is. At d6be1b02 the merge
+        # was given the caller's file, and this rewrite, made as the merge call starts, reached main.
+        for script in (self.uet, self.nas):
+            with self.subTest(script=script.key):
+                body = self.squash_body(self.SQUASH_CLEAN)
+                clean, copy = body.read_bytes(), self.dir / f"copy-{next(self.counter)}"
+                code, out, log, _ = self.land_squash(script, body, FAKE_MERGE_BODY=str(copy), FAKE_GH_HOOK_ON="pr merge*",
+                                                     FAKE_GH_HOOK=f"printf '%s' 'rewritten after the scan' > {q(body)}")
+                self.assertEqual((code, len(self.merge_calls(log))), (0, 1), out)
+                self.assertEqual(body.read_bytes(), b"rewritten after the scan", "the hook ran")
+                self.assertEqual(copy.read_bytes(), clean, "the merge read the scanned bytes")
+
+    def test_the_snapshot_exists_while_the_landing_runs_and_is_removed_wherever_it_stops(self):
+        # #1027: the snapshot is removed on every exit (an EXIT trap), not only after the merge. A gh call lists TMPDIR while the landing
+        # runs. At d6be1b02 there was no snapshot.
+        cases = (("the head moved, exit 3", {"head": self.other}, 3, 0), ("the merge failed, exit 7", {"FAKE_MERGE_RC": "1"}, 7, 1))
+        for script in (self.uet, self.nas):
+            for label, settings, expected, merges in cases:
+                with self.subTest(script=script.key, stop=label):
+                    tmp, seen, argv = (self.dir / f"{name}-{next(self.counter)}" for name in ("tmp", "seen", "argv"))
+                    tmp.mkdir()
+                    code, out, log, _ = self.land_squash(script, self.squash_body(self.SQUASH_CLEAN), tmp=tmp, FAKE_GH_HOOK_ON="pr view*",
+                                                         FAKE_GH_HOOK=f"ls -1 {q(tmp)} >> {q(seen)}", FAKE_MERGE_ARGV=str(argv), **settings)
+                    self.assertEqual((code, len(self.merge_calls(log))), (expected, merges), out)
+                    self.assertRegex(seen.read_text(encoding="utf-8"), r"(?m)^squash-body-[A-Za-z0-9]{6}$", "the snapshot existed during the run")
+                    self.assertEqual(sorted(tmp.glob("squash-body-*")), [], "and is gone")
+                    if merges:
+                        self.assertFalse(Path(os.fsdecode(argv.read_bytes().split(b"\0")[:-1][-1])).exists(), "the file the merge was given")
+
+    def test_the_snapshot_is_removed_when_a_signal_ends_the_landing(self):
+        # #1027: bash runs an EXIT trap when SIGTERM or SIGHUP ends the shell, once the call it waits for returns (measured 2026-10-12, bash
+        # 5.3.9). The wrapper execs the script, so the PID it records is the script's; a gh call signals it.
+        for script in (self.uet, self.nas):
+            for name in ("TERM", "HUP"):
+                with self.subTest(script=script.key, signal=name):
+                    pidfile, wrapper, seen = (self.dir / f"{kind}-{next(self.counter)}" for kind in ("pid", "wrapper", "seen"))
+                    wrapper.write_text(f'#!/bin/sh\necho $$ > {q(pidfile)}\nexec {q(script.path)} "$@"\n', encoding="utf-8")
+                    wrapper.chmod(0o755)
+                    tmp = self.dir / f"tmp-{next(self.counter)}"
+                    tmp.mkdir()
+                    code, out, log, _ = self.land_squash(script, self.squash_body(self.SQUASH_CLEAN), tmp=tmp, via=wrapper, FAKE_GH_HOOK_ON="pr view*",
+                                                         FAKE_GH_HOOK=f'ls -1 {q(tmp)} >> {q(seen)}; kill -{name} "$(cat {q(pidfile)})"')
+                    self.assertRegex(seen.read_text(encoding="utf-8"), r"(?m)^squash-body-[A-Za-z0-9]{6}$", "the snapshot existed when the signal came")
+                    self.assertEqual((code, self.merge_calls(log)), (-getattr(signal, f"SIG{name}"), []), out)  # bash runs the trap, then dies of the signal
+                    self.assertEqual(sorted(tmp.glob("squash-body-*")), [], "the snapshot is gone")
+
+    def test_the_scanner_and_the_names_default_to_the_clone_and_the_coordination_tree(self):
+        # #1027: without LANDING_SCANNER the scan loads scripts/validate.py of the clone of this repository (LANDING_NAS_REPO, the CC's
+        # checkout, which the live copies in the CC's tools directory share), and without LANDING_NAMES_FILE it reads
+        # command-center/cc-tools/landing-prohibited-names.env under LANDING_COORD, the file the CC keeps there. Absent, the scan fails closed.
+        scripts = self.repo / "scripts"
+        scripts.mkdir(exist_ok=True)
+        link = scripts / "validate.py"
+        link.symlink_to(ROOT / "scripts/validate.py")
+        self.addCleanup(scripts.rmdir)
+        self.addCleanup(link.unlink)
+        for script in (self.uet, self.nas):
+            coord = self.dir / f"coord-{next(self.counter)}"
+            listed = coord / "command-center/cc-tools/landing-prohibited-names.env"
+            settings = {"LANDING_COORD": str(coord), "FAKE_BODY_SCAN_PYTHON": sys.executable}
+            with self.subTest(script=script.key, names="absent"):
+                code, out, log = self.land(script, SQUASH_BODY_FILE=str(self.squash_body(self.SQUASH_CLEAN)), **settings)
+                self.assertEqual((code, self.merge_calls(log)), (2, []), out)
+                self.assertIn(f"#{PR} {self.SQUASH_UNSCANNABLE}", out)
+            listed.parent.mkdir(parents=True)
+            listed.write_text(self.SQUASH_NAMES, encoding="utf-8")
+            with self.subTest(script=script.key, names="present"):
+                code, out, log = self.land(script, SQUASH_BODY_FILE=str(self.squash_body(self.SQUASH_CLEAN)), **settings)
+                self.assertEqual((code, len(self.merge_calls(log))), (0, 1), out)
+                scan = next(line for line in log if "squash_body_scan.py" in line)
+                self.assertTrue(scan.endswith(f" {link} {listed}"), "the clone's validate.py and the coordination tree's names file")
+            with self.subTest(script=script.key, names="present, and the body holds one"):
+                code, out, log = self.land(script, SQUASH_BODY_FILE=str(self.squash_body("the account zqxsynth ran it\n")), **settings)
+                self.assertEqual((code, self.merge_calls(log)), (2, []), out)
+                self.assertIn(f"#{PR} {self.SQUASH_REFUSED}", out)
+
+    def test_the_repository_scanner_runs_on_the_snapshot_with_the_hosts_own_sources(self):
+        # #1027: `validate.py --scan-file` is the scan the pre-push hook runs: PRIVATE_CONTENT and the runtime host-local names, here the
+        # account that runs this test, which the synthetic names file does not list. It needs Betterleaks at host_name_scan.py's pin, which
+        # CI does not install for this module, so the other tests answer it with a canned line. Run with -I it cannot import its sibling
+        # and exits 2 (measured 2026-10-12), which is why the scripts run it with -E -s -B.
+        if not betterleaks_pinned():
+            self.skipTest("native Betterleaks at host_name_scan.py's pin is unavailable")
+        account, real = account_name(), {"FAKE_VALIDATE_SCAN_PYTHON": sys.executable, "HOME": os.environ["HOME"]}  # the shim finds its install under HOME
+        for script in (self.uet, self.nas):
+            with self.subTest(script=script.key, body="clean"):
+                code, out, log, tmp = self.land_squash(script, self.squash_body(self.SQUASH_CLEAN), **real)
+                self.assertEqual((code, len(self.merge_calls(log))), (0, 1), "the real scan refused or failed a clean body")
+            with self.subTest(script=script.key, body="holds the running account's name"):
+                code, out, log, tmp = self.land_squash(script, self.squash_body(f"the account {account} ran it\n"), **real)
+                self.assertEqual(code, 2, "the real scan let a body with the running account's name through")
+                self.assertIn(f"#{PR} {self.SQUASH_REFUSED}", out)
+                self.assertEqual(self.merge_calls(log), [])
+                self.assertFalse(account in out, "the output holds the account's name")
+                self.assertEqual(sorted(tmp.glob("squash-body-*")), [])
+
+
+class SquashBodyScanTests(unittest.TestCase):
+    """squash_body_scan.py by itself (#1027): the names file's format, the address rule's controls, a name as a whole token and the output."""
+
+    @classmethod
+    def setUpClass(cls):
+        spec = importlib.util.spec_from_file_location("squash_body_scan", LANDING / "squash_body_scan.py")
+        cls.module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(cls.module)
+        cls.table = cls.module.read_table(ROOT / "scripts/validate.py")
+        scratch = tempfile.TemporaryDirectory(prefix="squash-scan-")
+        cls.addClassCleanup(scratch.cleanup)
+        cls.dir = Path(scratch.name)
+
+    def refusal(self, text, names=("zqxsynth",), host=""):
+        return self.module.scan(text, self.table, list(names), host)[0]
+
+    def test_the_names_file_is_parsed_and_never_executed(self):
+        marker = self.dir / "executed"
+        for index, (label, content, expected) in enumerate((
+                ("a plain assignment", "LANDING_PROHIBITED_NAMES=alpha,Beta,gamma\n", ["alpha", "Beta", "gamma"]),
+                ("an export, quotes and spaces", "export LANDING_PROHIBITED_NAMES=' alpha , Beta ,,gamma '\n", ["alpha", "Beta", "gamma"]),
+                ("double quotes and CRLF", 'LANDING_PROHIBITED_NAMES="alpha,Beta"\r\n', ["alpha", "Beta"]),
+                ("the last assignment wins", "LANDING_PROHIBITED_NAMES=alpha\n# a comment\nLANDING_PROHIBITED_NAMES=Beta\n", ["Beta"]),
+                ("lines that would run if the file were sourced",
+                 f"LANDING_PROHIBITED_NAMES=alpha\ntouch {q(marker)}\n$(touch {q(marker)})\nLANDING_X=`touch {q(marker)}`\n", ["alpha"]))):
+            with self.subTest(label):
+                path = self.dir / f"names-parsed-{index}.env"
+                path.write_text(content, encoding="utf-8")
+                self.assertEqual(self.module.read_names(path), expected)
+        self.assertFalse(marker.exists(), "no line of the names file ran")
+        for index, (label, content) in enumerate((("no assignment", "# nothing\n"), ("an empty value", "LANDING_PROHIBITED_NAMES=\n"),
+                                                  ("only commas and spaces", "LANDING_PROHIBITED_NAMES= , ,\n"), ("an empty file", ""))):
+            with self.subTest(label):
+                path = self.dir / f"names-refused-{index}.env"
+                path.write_text(content, encoding="utf-8")
+                with self.assertRaises(ValueError):
+                    self.module.read_names(path)
+
+    def test_the_address_rule_passes_no_reply_addresses_and_refuses_every_other(self):
+        # the pairs are the control: a rule that refused every address would fail the first list, one that passed every address the second
+        passing = ("Co-Authored-By: Claude <noreply@anthropic.com>", "Co-authored-by: GitHub <NoReply@GitHub.com>", "<no-reply@example.invalid>",
+                   "4242424+seathatflowsinourveins@users.noreply.github.com", "seathatflowsinourveins@users.noreply.github.com.",
+                   "ssh user@localhost", "an import of `@AGENTS.md`", "a mention @someone", "foo@bar",
+                   "`noreply@anthropic.com`", "**no-reply@example.invalid**", "\"NoReply@GitHub.com\"", "`getty@tty1.service`",
+                   "`codex@openai.com`", "'4242424+seathatflowsinourveins@users.noreply.github.com'")
+        refused = ("person@example.invalid", "(person@example.invalid)", "mailto:person@example.invalid.", "<Person.Name+tag@Example.Invalid>",
+                   "noreply.person@example.invalid", "x'noreply@example.invalid", "person@users.noreply.github.com.example.invalid",
+                   "pérson@exämple.invalid", "`person@example.invalid`", "**person@example.invalid**", "'person@example.invalid'",
+                   "`xnoreply@anthropic.com`", "`x'noreply@example.invalid`")
+        for text in passing:
+            with self.subTest(passing=text):
+                self.assertIsNone(self.refusal(text))
+        for text in refused:
+            with self.subTest(refused=text):
+                self.assertEqual(self.refusal(text), "email other than a no-reply address (line 1)")
+
+    def test_systemd_unit_instances_are_not_addresses_and_their_look_alikes_are(self):
+        # the CC's ruling of 2026-10-12: <name>@<instance>.<type>, the type one of six, with the characters a unit name has
+        passing = ("getty@tty1.service", "serial-getty@ttyS0.service", "user@1000.service", "app@one.socket", "app@dev-sda1.timer",
+                   "fsck@dev.target", "watch@some.path", "mnt@data.mount", "a.b-c_d@e.f-g.service", "GETTY@TTY1.SERVICE", "(getty@tty1.service)")
+        refused = ("person@service.com", "person@host.device", "person@host.automount", "person@host.swap", "person@host.slice", "person@host.scope",
+                   "jane+x@host.service", "jane'x@host.service", "pérson@tty1.service", "person@tty1.service.example.invalid",
+                   "person@tty1.servic", "person@tty1.services")
+        for text in passing:
+            with self.subTest(passing=text):
+                self.assertIsNone(self.refusal(text))
+        for text in refused:
+            with self.subTest(refused=text):
+                self.assertEqual(self.refusal(text), "email other than a no-reply address (line 1)")
+
+    def test_a_vendor_trailer_address_passes_only_as_the_exact_address(self):
+        # the CC's ruling of 2026-10-12; every entry names the vendor source it comes from, and the list is short
+        table = self.module.VENDOR_TRAILER_ADDRESSES
+        self.assertEqual(sorted(table), ["codex@openai.com"])
+        self.assertTrue(all(source.startswith("openai/codex@") for source in table.values()))
+        for text in ("Co-authored-by: Codex <codex@openai.com>", "co-authored-by: codex <CODEX@OPENAI.COM>", "Co-authored-by: Codex <noreply@openai.com>"):
+            with self.subTest(passing=text):
+                self.assertIsNone(self.refusal(text))
+        for text in ("someone@openai.com", "xcodex@openai.com", "codex@openai.com.example.invalid", "codex@mail.openai.com", "codex@openai.org",
+                     "fictional.person" + "@gmail.com", "codex+1@openai.com"):
+            with self.subTest(refused=text):
+                self.assertEqual(self.refusal(text), "email other than a no-reply address (line 1)")
+
+    def test_a_name_equal_to_the_hosts_own_name_is_counted_and_never_refused(self):
+        # the CC's ruling of 2026-10-12: compared when the scan runs, without regard to case; every other name still refuses
+        names = ["zqxsynth", "zqxhost", "qvortex"]
+        for label, text, host, expected in (
+                ("the host twice, in two cases", "the host zqxhost ran it, ZQXHOST again", "ZqxHost", (None, 2)),
+                ("the host percent-encoded", "the host zqx%68ost ran it", "zqxhost", (None, 1)),
+                ("the host inside a longer word", "zqxhosting", "zqxhost", (None, 0)),
+                ("the host and another name", "zqxhost and zqxsynth", "zqxhost", ("prohibited name (line 1)", 1)),
+                ("another name only", "qvortex", "zqxhost", ("prohibited name (line 1)", 0)),
+                ("no host name known", "zqxhost", "", ("prohibited name (line 1)", 0)),
+                ("a host name that is not on the list", "zqxhost", "another-host", ("prohibited name (line 1)", 0))):
+            with self.subTest(label):
+                self.assertEqual(self.module.scan(text, self.table, names, host), expected)
+
+    def test_a_name_is_refused_as_a_whole_token_in_any_case(self):
+        for text in ("zqxsynth", "the ZqxSynth did", "project-zqxsynth-tools", "zqxsynth_id", "~zqxsynth/src", "u=zqx%73ynth"):
+            with self.subTest(refused=text):
+                self.assertIn("prohibited name", self.refusal(text) or "")
+        for text in ("zqxsynthesis", "myzqxsynth", "zqxsynth2", "éqzqxsynth", "zqxsyn th"):
+            with self.subTest(passing=text):
+                self.assertIsNone(self.refusal(text))
+
+    def test_the_output_is_a_class_and_a_line_never_the_text(self):
+        names = self.dir / "names-output.env"
+        names.write_text("LANDING_PROHIBITED_NAMES=zqxsynth,zqxhost\n", encoding="utf-8")
+        validate = str(ROOT / "scripts/validate.py")
+        body = self.dir / "body-output.md"
+        for text, code, line in (
+                ("clean\n", 0, "squash body scan: clean (names_checked=1)"),
+                ("the host zqxhost ran it, ZQXHOST again\n", 0, "squash body scan: clean (names_checked=1, warnings=2)"),
+                ("zqxhost and ask person@example.invalid\n", 1,
+                 "squash body scan: refused: email other than a no-reply address (line 1) (warnings=1)"),
+                ("clean\nsee /" + "home" + "/zqx" + "other/x\n", 1, "squash body scan: refused: personal home path (line 2)"),
+                ("zqxsynth\nzqxsynth\nask person@example.invalid\n", 1,
+                 "squash body scan: refused: email other than a no-reply address (line 3); prohibited name (line 1); prohibited name (line 2)"),
+                ("file=%2F" + "home" + "%2Fzqx" + "other\n", 1, "squash body scan: refused: personal home path (percent-encoded)")):
+            with self.subTest(text=text[:12]):
+                body.write_text(text, encoding="utf-8")
+                shown = io.StringIO()
+                with contextlib.redirect_stdout(shown), mock.patch.object(self.module.socket, "gethostname", return_value="zqxhost"):
+                    result = self.module.run(["squash_body_scan.py", str(body), validate, str(names)])
+                self.assertEqual((result, shown.getvalue()), (code, line.replace("names_checked=1", "names_checked=2") + "\n"))
+        for label, arguments in (("a missing body", [str(self.dir / "missing.md"), validate, str(names)]),
+                                 ("a missing names file", [str(body), validate, str(self.dir / "missing.env")]),
+                                 ("a missing validate.py", [str(body), str(self.dir / "missing.py"), str(names)]),
+                                 ("a validate.py with no table", [str(body), str(names), str(names)]),
+                                 ("too few arguments", [str(body)])):
+            with self.subTest(label):
+                shown = io.StringIO()
+                with contextlib.redirect_stdout(shown):
+                    result = self.module.run(["squash_body_scan.py", *arguments])
+                self.assertEqual((result, shown.getvalue()), (2, "squash body scan: could not run\n"))
 
 
 if __name__ == "__main__":
