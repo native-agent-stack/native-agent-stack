@@ -387,7 +387,7 @@ have no ecosystem_ prefix; the workstation exporter adds that namespace.
 | skill | native Claude skill_activated skill.name -> skill_name, guarded G:201 and retained298; metric skill is permitted343,356, with no proven named emitting source | `sum by (skill_name,invocation_trigger) (count_over_time({service_name="claude-code"} | event_name="skill_activated" | skill_name!="" [1h]))` | Dotted metric identity moves to activation logs; model-typed Skill input is not exported (README:532). Codex aggregate injection/shadow counters have no proven named successful-use identity; neither a skill metric nor an identity is manufactured from the permitted key. |
 | hook runs | Codex codex.hooks.run/duration with bounded hook_name,source,status,handler_type,execution_mode; G:316-325,346,357; Claude hook_execution_complete num_hooks/outcomes G:281-286,298 | `sum by (ecosystem_lane,hook_name,status) (increase(codex_hooks_run_total[1h]))`; `sum by (ecosystem_lane,hook_event) (sum_over_time({service_name="claude-code"} | event_name="hook_execution_complete" | unwrap num_hooks | __error__="" [1h]))` | No native hook-count dimension removed. Lifecycle is not script/repository identity; a configuration-derived join remains separate and ambiguous matches unknown. |
 | shell through rtk | recorded tool-result shell_rtk boolean, derived G:145-146/177-178, bounded212 and kept298 | `sum by (service_name,shell_rtk) (count_over_time({service_name=~"claude-code|codex-app-server|codex_exec|codex_cli_rs"} | event_name=~"tool_result|codex.tool_result" | shell_rtk=~"true|false" [1h]))` | No metric move. This is submitted-parameter/prefix classification, not proof of actual Claude hook rewrites or every shell form; actual execution requires the vendor audit/native-record join. |
-| tokens | configured codex.sse_event/response.completed input_token_count/output_token_count/cached_token_count and Claude api_request input/output/cache fields; G:298,343,356; event queries lanes_dashboard.py:124-135 | `sum by (conversation_id) (sum_over_time({service_name=~"codex-app-server|codex_exec|codex_cli_rs"} | event_name="codex.sse_event" | event_kind="response.completed" | unwrap input_token_count | __error__="" [1h]))`; Claude uses api_request/input_tokens | Configured token categories/model labels survive; this table does not re-measure the native field schema. Cache categories keep their client's counter contract; no native/cache/tool-estimate summation and no invented per-invocation token join. |
+| tokens | configured codex.sse_event/response.completed input_token_count/output_token_count/cached_token_count and Claude api_request input/output/cache fields; G:298,343,356; event queries in `observability/lanes_dashboard.py`, `dashboard()` (the "Codex request usage by native conversation" and "Claude request usage by native session" panels), with native counter aggregation in `usage()` | `sum by (conversation_id) (sum_over_time({service_name=~"codex-app-server|codex_exec|codex_cli_rs"} | event_name="codex.sse_event" | event_kind="response.completed" | unwrap input_token_count | __error__="" [1h]))`; Claude uses api_request/input_tokens | Configured token categories/model labels survive; this table does not re-measure the native field schema. Cache categories keep their client's counter contract; no native/cache/tool-estimate summation and no invented per-invocation token join. |
 
 COLUMNS: all derivable
 
@@ -396,9 +396,14 @@ Named successful Codex skill use, per-repository hook-script identity and actual
 Claude rewrite share are not established by these surviving fields and remain
 explicitly unmeasured. Those limits existed independently of the five dotted
 metric removals. Organic acceptance still needs the qualified native oracle.
-The Lanes MCP queries at lanes_dashboard.py:119-122,169 use retained Loki names;
+The Lanes MCP queries in `observability/lanes_dashboard.py`, `dashboard()` (the "Per-session MCP server and tool results" panel and the MCP inventory `observed` expression), use retained Loki names; `records()` builds the per-session aggregates.
 the complete INVOKE-RATES report/panels remain separately prepared, not claimed
 deployed by this source table.
+
+File-plus-symbol references avoid dependence on a PR-branch commit after
+squash. Installed Git 2.53.0 documents that `--squash` creates the working
+tree and index state without recording `MERGE_HEAD`, permitting one new
+commit: [git/git v2.53.0, `Documentation/merge-options.adoc:119-127`](https://github.com/git/git/blob/67ad42147a7acc2af6074753ebd03d904476118f/Documentation/merge-options.adoc#L119-L127).
 
 The source-table critic corrected two allowlist-to-emission promotions in this
 amendment: retained `server` and `skill` keys are permissions, not evidence that

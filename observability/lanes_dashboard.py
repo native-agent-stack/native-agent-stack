@@ -32,6 +32,163 @@ def usage(selector, event, identity, field, extra=""):
             f'| __error__="" [{WINDOW}]))')
 
 
+def claude_usage_panels(base):
+    """Insert the textfile usage row after request tokens, keeping existing panel IDs.
+
+    Grafana v13.2.3 bargauge uses percentunit (0..1); datetime units use ms.
+    Source timestamps are gauge values. Unknown transitions never become zeros.
+    """
+    panels = base['panels']
+    anchor = next(i for i, p in enumerate(panels) if p['title'] == 'Claude request usage by native session')
+    start = panels[anchor]['gridPos']['y'] + panels[anchor]['gridPos']['h']
+    added = []
+    first_id = max(p['id'] for p in panels) + 1
+    link = {'title': 'GPT pool in OmniRoute', 'url': 'http://127.0.0.1:21128/dashboard/analytics',
+            'targetBlank': True}
+    collected = '(claude_usage_collection_timestamp_seconds > time() - 1800)'
+    collection_gate = f' and on(job, instance) {collected}'
+
+    def row(title, offset):
+        added.append({'id': first_id + len(added), 'type': 'row', 'title': title, 'collapsed': False,
+                      'panels': [], 'gridPos': {'x': 0, 'y': start + offset, 'w': 24, 'h': 1}})
+
+    def chart(title, expressions, description, kind, unit, x, y, w, h):
+        item = {'id': first_id + len(added), 'title': title, 'type': kind, 'datasource': PROMETHEUS,
+                'gridPos': {'x': x, 'y': start + y, 'w': w, 'h': h},
+                'description': description, 'links': [link.copy()],
+                'targets': [{'refId': chr(65 + i), 'expr': expr, 'legendFormat': label,
+                             'instant': True, 'range': False, 'format': 'time_series',
+                             'datasource': PROMETHEUS} for i, (label, expr) in enumerate(expressions)],
+                'fieldConfig': {'defaults': {'unit': unit, 'noValue': 'UNKNOWN'}, 'overrides': []},
+                'options': {'reduceOptions': {'values': True, 'calcs': ['lastNotNull'], 'fields': ''},
+                            'orientation': 'horizontal', 'showUnfilled': True, 'displayMode': 'basic',
+                            'textMode': 'value_and_name'}}
+        if kind == 'bargauge':
+            item['fieldConfig']['defaults'].update(min=0, max=1, thresholds={
+                'mode': 'absolute', 'steps': [{'color': 'green', 'value': None},
+                                             {'color': 'orange', 'value': .8}, {'color': 'red', 'value': 1}]},
+                color={'mode': 'thresholds'})
+        added.append(item)
+        return item
+
+    row('Claude usage', 0)
+    for x, window in ((0, 'five_hour'), (12, 'seven_day')):
+        selector = f'{{window="{window}"}}'
+        stamp = f'claude_max_observed_timestamp_seconds{selector}'
+        expression = (f'max by (account) (claude_max_utilization_ratio{selector}'
+                      f' and on(job,instance,account,window) ({stamp} > time() - 1800)'
+                      f' and on(job,instance,account,window) ({stamp} <= time())'
+                      ' and on(job,instance,account) (claude_max_capture_success == 1)'
+                      ' and on(job,instance,account) (claude_max_input_errors == 0)'
+                      f' unless on(job,instance,account,window) (claude_max_reset_timestamp_seconds{selector} <= time())'
+                      f'{collection_gate})')
+        marker = f'max by(account) (claude_max_rejection_assumed{selector})'
+        chart(f'Claude Max · {window}', [
+              ('{{account}} · measured', f'({expression}) and on(account) ({marker} == 0)'),
+              ('{{account}} · assumed 100%', f'({expression}) and on(account) ({marker} == 1)')],
+              'Native rate_limit_event utilization (fraction), collected by the CC at most every 15 minutes. '
+              'Rejected/exhausted limits show 100%; rejection without a supported scope conservatively shows '
+              '100% only for windows without confirmed allowed observations, marked assumed. '
+              'Missing utilization stays UNKNOWN; transitions do not refresh absent '
+              'fields. Observations older than 30 minutes are hidden. This is Max headroom, separate from '
+              'request token counts and API-equivalent cost.', 'bargauge', 'percentunit', x, 1, 12, 8)
+    reset_stamp = 'claude_max_reset_observed_timestamp_seconds'
+    reset_expr = ('max by (account,window) (claude_max_reset_timestamp_seconds'
+                  f' and on(job,instance,account,window) ({reset_stamp} > time() - 1800)'
+                  f' and on(job,instance,account,window) ({reset_stamp} <= time())'
+                  ' and on(job,instance,account) (claude_max_capture_success == 1)'
+                  ' and on(job,instance,account) (claude_max_input_errors == 0)'
+                  f'{collection_gate}) * 1000')
+    chart('Claude Max · reset time', [('{{account}} · {{window}}', reset_expr)],
+          'Native resetsAt seconds converted to Grafana milliseconds. No reset is inferred for a rejection '
+          'or missing field. Reset observations expire after 30 minutes.', 'stat', 'dateTimeAsIso', 0, 9, 12, 6)
+    chart('Claude Max · utilization observation age', [('{{account}} · {{window}}',
+          'time() - max by (account,window) (claude_max_observed_timestamp_seconds)')],
+          'Age of the actual utilization observation, including retained stale values. A new capture without '
+          'utilization does not refresh this age. UNKNOWN means the window has never been observed.',
+          'stat', 'dtdurations', 12, 9, 12, 6)
+    ledger_gate = f' and on(job,instance) (claude_usage_ledger_success == 1){collection_gate}'
+    chart('Anthropic API · $200 edge', [('{{key}}',
+          f'max by (key) ((claude_api_spend_usd / claude_api_edge_usd){ledger_gate})')],
+          'Ledger accounted charges against each key’s $200 edge. This includes uncertain charges retained '
+          'pending provider reconciliation; open reservations are shown separately below. Subscription '
+          'limits, provider snapshots and API-equivalent OTel cost are separate sources. Key labels are '
+          'persistent opaque indexes. Unattributed legacy rows receive no guessed key or $200 denominator.',
+          'bargauge', 'percentunit', 0, 15, 12, 8)
+    amounts = chart('Anthropic API · ledger amounts', [
+        (label, f'max by (key) ({metric}{ledger_gate})') for label, metric in (
+            ('Accounted charges', 'claude_api_spend_usd'), ('Open reservations', 'claude_api_pending_usd'),
+            ('Uncertain subset of charges', 'claude_api_uncertain_usd'))],
+        'USD from api-actions ledger values only. Uncertain is a subset of accounted charges; do not add it '
+        'again. Settlement attribution follows the original debit, including after a key switch. '
+        'Provider snapshots and notes do not add charges.', 'table', 'currencyUSD', 12, 15, 12, 8)
+    amounts['options'] = {'showHeader': True}
+    for target in amounts['targets']:
+        target['format'] = 'table'
+    amounts['transformations'] = [{'id': 'joinByField', 'options': {'byField': 'key', 'mode': 'outer'}}]
+    chart('Claude usage · collection time', [('Collected',
+          'max(claude_usage_collection_timestamp_seconds) * 1000')],
+          'Latest collection of recorded limits and ledger amounts, distinct from per-window observation '
+          'age. Missing or failed sources remain UNKNOWN.',
+          'stat', 'dateTimeFromNow', 0, 23, 12, 5)
+    chart('Anthropic API · unattributed ledger charges', [('Unattributed USD',
+          f'max(claude_api_unattributed_spend_usd{ledger_gate})')],
+          'Legacy rows without a key alias remain unattributed until the CC supplies the producer’s confirmed '
+          'legacy alias. This amount is excluded from per-key bars, not silently lost.',
+          'stat', 'currencyUSD', 12, 23, 12, 5)
+    # Keep account inventory visible even after an observation disappears from
+    # the fraction bars. The 7d window matches this host's Prometheus retention.
+    def last(metric, groups='account,window'):
+        return f'max by ({groups}) (last_over_time({metric}[7d]))'
+
+    inventory = last('claude_max_account_present')
+    present = last('claude_max_window_present')
+    observed = last('claude_max_observed_timestamp_seconds')
+    assumed = last('claude_max_rejection_assumed')
+    success = last('claude_max_capture_success', 'account')
+    input_errors = last('claude_max_input_errors', 'account')
+    capture_time = last('claude_max_capture_timestamp_seconds', 'account')
+    collected_time = 'max(last_over_time(claude_usage_collection_timestamp_seconds[7d]))'
+    source_ok = f'({success} == 1) and on(account) ({input_errors} == 0)'
+    known = f'({present} == 1) and on(account) ({source_ok})'
+    fresh = (f'({known}) and on(account,window) ({observed} > time() - 1800)'
+             f' and on(account) ({capture_time} > time() - 1800)'
+             f' and on() ({collected_time} > time() - 1800)')
+    reset_deadline = last('claude_max_reset_timestamp_seconds')
+    expired = f'({reset_deadline} <= time()) and on(account,window) ({reset_deadline} > {observed})'
+    not_expired = f'({known}) unless on(account,window) ({expired})'
+    fresh = f'({fresh}) and on(account,window) ({not_expired})'
+    measured = f'({fresh}) and on(account,window) ({assumed} == 0)'
+    inferred = f'2 * (({fresh}) and on(account,window) ({assumed} == 1))'
+    stale = (f'3 * (({not_expired}) unless on(account,window) ({fresh}))')
+    status = f'({measured}) or on(account,window) ({inferred}) or on(account,window) ({stale}) or on(account,window) (0 * {inventory})'
+    status_panel = chart('Claude Max · account status', [('{{account}} · {{window}}', status)],
+          'Every configured account/window remains visible: UNKNOWN for failed, never observed or reset '
+          'expired data; STALE when the source or observation is older than 30 minutes; MEASURED for a '
+          'fresh numeric observation; ASSUMED 100% for an unscoped rejection without confirmed window '
+          'utilization. Status uses capture success, per-account errors and independent timestamps. '
+          'Inventory remains visible for the 7-day retention window if the sampler stops.',
+          'stat', 'none', 0, 28, 12, 7)
+    status_panel['fieldConfig']['defaults']['mappings'] = [{'type': 'value', 'options': {
+        '0': {'text': 'UNKNOWN', 'color': 'gray'}, '1': {'text': 'MEASURED', 'color': 'green'},
+        '2': {'text': 'ASSUMED 100%', 'color': 'orange'}, '3': {'text': 'STALE', 'color': 'red'}}}]
+    age = f'(time() - ({capture_time} > 0)) or on(account) (-1 * max by(account) ({inventory}))'
+    age_panel = chart('Claude Max · capture age', [('{{account}}', age)],
+          'Age of the last capture, including failed and stale accounts. UNKNOWN means no capture has '
+          'ever been recorded; a new failed attempt does not refresh the age.',
+          'stat', 'dtdurations', 12, 28, 12, 7)
+    age_panel['fieldConfig']['defaults']['mappings'] = [{'type': 'value', 'options': {'-1': {'text': 'UNKNOWN', 'color': 'gray'}}}]
+    chart('Claude usage · input errors', [('{{source}}', 'max by(source) (last_over_time(claude_usage_input_errors[7d]))')],
+          'Bounded capture and ledger input error counts, without raw error text. Per-account capture '
+          'failures produce UNKNOWN in account status; ledger errors suppress partial spend totals.',
+          'stat', 'short', 0, 35, 24, 5)
+    # An expanded Grafana row extends until the next row. Bound this new section.
+    row('Native records and telemetry', 40)
+    for existing in panels[anchor + 1:]:
+        existing['gridPos']['y'] += 41
+    panels[anchor + 1:anchor + 1] = added
+
+
 def dashboard():
     base = json.loads((REPO / 'observability/backends/templates/ecosystem-dashboard.json.example').read_text())
     base.update(uid='cc-lanes', title='Lanes', editable=False, tags=['native', 'lanes'],
@@ -360,4 +517,6 @@ def dashboard():
         'the gateway does not set span status. Native status 0 means unknown, not success. '
         'The existing metrics/spans export guard preserves these dimensions. Deployment '
         'and received-event coverage remain the CC host read-back.', 'ops', PROMETHEUS)
+    claude_usage_panels(base)
+    base['timezone'] = 'utc'
     return base
