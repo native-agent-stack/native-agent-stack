@@ -106,18 +106,19 @@ def stage_config(root, sdk_from):
 
 def checks(args, repo, tasks):
     """Every refusal that needs no write; returns what the manifest records about the tools."""
-    claude = Path(args.claude)
+    claude = Path(os.path.abspath(args.claude))      # absolute: e1_run.py starts promptfoo from <root>/config
     if not claude.is_file() or not os.access(claude, os.X_OK):
         raise Refusal("--claude is not an executable file")
     reported = run([str(claude), "--version"]).strip()
     if version_tuple(reported) != version_tuple(C.CLIENT_VERSION):
         raise Refusal(f"--claude reports {reported!r}, the preregistered client is {C.CLIENT_VERSION}")
-    semble = Path(args.semble_model)
+    semble = Path(os.path.abspath(args.semble_model))
     if not semble.is_dir():
         raise Refusal("--semble-model is not a directory")
     promptfoo = args.promptfoo or shutil.which("promptfoo")
     if not promptfoo:
         raise Refusal("promptfoo is not on PATH; pass --promptfoo")
+    promptfoo = os.path.abspath(promptfoo)
     pf_text = run([promptfoo, "--version"])
     pf_version = next((line.strip() for line in pf_text.splitlines() if re.fullmatch(r"\d+\.\d+\.\d+", line.strip())), None)
     if pf_version is None or version_tuple(pf_version) < version_tuple(C.PROMPTFOO_MINIMUM):

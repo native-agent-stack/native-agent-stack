@@ -604,6 +604,24 @@ class DecideTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             e1_decide.decide(self.cells("A1", 4), "A0a")
 
+    def test_equal_run_counts_over_different_question_repeat_pairs_are_refused(self):
+        """Review of #1046 at 38f4151a (P1): three repeats of q1 and one of q2 against one of q1 and three of q2 have equal counts and weight the questions differently."""
+        base = [self.run_of("A0a", q, repeat=str(r)) for q, r in (("q1", 1), ("q1", 2), ("q1", 3), ("q2", 1))]
+        arm = [self.run_of("A1", q, repeat=str(r)) for q, r in (("q1", 1), ("q2", 1), ("q2", 2), ("q2", 3))]
+        with self.assertRaisesRegex(ValueError, "do not hold the same"):
+            e1_decide.decide(base + arm, "A0a")
+        same = [self.run_of("A1", q, repeat=str(r)) for q, r in (("q1", 1), ("q1", 2), ("q1", 3), ("q2", 1))]
+        self.assertIn("A1", e1_decide.decide(base + same, "A0a")["verdicts"], "the same pairs in another order are comparable")
+        doubled = base + [self.run_of("A0a", "q2", repeat="1")]
+        with self.assertRaisesRegex(ValueError, "do not hold the same"):
+            e1_decide.decide(doubled + same + [self.run_of("A1", "q2", repeat="2")], "A0a")
+
+    def test_the_carrying_cost_needs_the_same_pairs_in_a0b_and_a5(self):
+        a0b = [self.run_of("A0b", q, repeat=str(r)) for q, r in (("q1", 1), ("q1", 2), ("q2", 1))]
+        a5 = [self.run_of("A5", q, repeat=str(r)) for q, r in (("q1", 1), ("q2", 1), ("q2", 2))]
+        with self.assertRaisesRegex(ValueError, "A0b and A5 do not hold the same"):
+            e1_decide.decide(self.cells("A0a", 2, repeats=2) + a0b + a5, "A0a")
+
     def test_the_carrying_cost_of_the_servers_is_a0b_against_a5(self):
         runs = self.cells("A0a", 4) + self.cells("A0b", 4, cost=0.0716) + self.cells("A5", 4, cost=0.0625)
         carrying = e1_decide.decide(runs, "A0a")["carrying"]
@@ -977,6 +995,56 @@ class PrepareTests(unittest.TestCase):
         self.assertEqual(done.returncode, 2)
         self.assertIn("not at the commit", done.stderr)
 
+    def test_a_failed_preflight_row_keeps_promptfoos_exit_status_and_a_failed_question_row_does_not(self):
+        """Review of #1046 at 38f4151a (P1): promptfoo exits 100 when at least one test failed (promptfoo@30949931ee90 site/docs/usage/command-line.md L171); a pre-flight row that fails is a wiring
+        defect that automation must see, a question row whose answer is wrong is a measurement."""
+        s = self.s
+        failing = s.script("promptfoo-failing", 'if [ "$1" = "eval" ]; then exit 100; fi\necho "0.124.0"')
+        self.assertEqual(s.prepare(promptfoo=failing).returncode, 0)
+        pre = s.run("--preflight")
+        self.assertEqual(pre.returncode, 100, pre.stderr)
+        self.assertIn("promptfoo exited 100", pre.stderr)
+        questions = s.run("--questions")
+        self.assertEqual(questions.returncode, 0, questions.stderr)
+        broken = s.script("promptfoo-broken", 'if [ "$1" = "eval" ]; then exit 1; fi\necho "0.124.0"')
+        self.assertEqual(s.prepare("--rebuild", promptfoo=broken).returncode, 0)
+        self.assertEqual(s.run("--preflight").returncode, 1)
+        self.assertEqual(s.run("--questions").returncode, 1, "any other status is kept in both stages")
+
+    def test_run_refuses_a_root_that_was_copied_or_moved_but_accepts_another_name_for_the_same_directory(self):
+        """Review of #1046 at 38f4151a (P2): settings.json is bound to the recorded root and its siblings."""
+        s = self.s
+        self.assertEqual(s.prepare().returncode, 0)
+        copy = s.work / "copy"
+        shutil.copytree(s.root, copy, symlinks=True)
+
+        def run_at(root):
+            return subprocess.run([sys.executable, "-I", str(s.e1 / "e1_run.py"), "--root", str(root), "--preflight", "--dry-run"], capture_output=True, text=True, env=s.env, timeout=120)
+        done = run_at(copy)
+        self.assertEqual(done.returncode, 2, done.stdout)
+        self.assertIn("manifest recorded", done.stderr)
+        self.assertIn("--rebuild", done.stderr)
+        link = s.work / "link"
+        link.symlink_to(s.root)
+        self.assertEqual(run_at(link).returncode, 0, "a symbolic link to the prepared directory is the same directory")
+        moved = s.work / "moved"
+        s.root.rename(moved)
+        self.assertEqual(run_at(moved).returncode, 2)
+
+    def test_prepare_records_absolute_paths_for_tools_given_relative_to_the_working_directory(self):
+        """Review of #1046 at 38f4151a (P2): e1_run.py starts promptfoo from <root>/config, so a relative spelling recorded by prepare would not resolve."""
+        s = self.s
+        cmd = [sys.executable, "-I", str(s.e1 / "e1_prepare.py"), "--root", "work/root", "--claude", "bin/claude", "--semble-model", "semble-model", "--repo", str(s.repo),
+               "--promptfoo", "bin/promptfoo-bin", "--sdk-from", "sdk"]
+        done = subprocess.run(cmd, capture_output=True, text=True, env=s.env, cwd=s.tmp, timeout=120)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        manifest = json.loads((s.root / "manifest.json").read_text())
+        self.assertEqual((manifest["claude"]["path"], manifest["promptfoo"]["path"], manifest["semble_model"]), (str(s.claude), str(s.promptfoo), str(s.semble)))
+        for path in (manifest["claude"]["path"], manifest["promptfoo"]["path"], manifest["semble_model"], *manifest["servers"].values()):
+            self.assertTrue(os.path.isabs(path), path)
+        plan = json.loads(s.run("--preflight", "--dry-run").stdout)
+        self.assertEqual(plan["command"][0], str(s.promptfoo))
+
     def test_run_dry_run_prints_the_command_the_variables_it_sets_and_removes(self):
         s = self.s
         self.assertEqual(s.prepare().returncode, 0)
@@ -1016,7 +1084,7 @@ class PrepareTests(unittest.TestCase):
             self.assertIn(reason, done.stderr, args)
         self.assertEqual(s.run("--preflight", "--questions").returncode, 2, "the two stages are exclusive")
 
-    def test_run_starts_promptfoo_in_the_staged_config_with_a_clean_environment_and_treats_exit_100_as_a_result(self):
+    def test_run_starts_promptfoo_in_the_staged_config_with_a_clean_environment_and_treats_exit_100_of_the_questions_as_a_result(self):
         s = self.s
         self.assertEqual(s.prepare().returncode, 0)
         record = s.work / "seen.json"
@@ -1024,7 +1092,7 @@ class PrepareTests(unittest.TestCase):
                                    f'{sys.executable} -I -c \'import json,os,sys; json.dump({{"argv": sys.argv[1:], "cwd": os.getcwd(), "env": {{k: os.environ.get(k) for k in ("E1_ROOT","TMPDIR","CLAUDE_CODE_EFFORT_LEVEL","ANTHROPIC_BASE_URL","MCP_TIMEOUT","PROMPTFOO_DISABLE_SHARING")}}}}, open("{record}", "w"))\' "$@"\n'
                                    "exit ${FAKE_STATUS:-0}")
         env = {**s.env, "CLAUDE_CODE_EFFORT_LEVEL": "max", "ANTHROPIC_BASE_URL": "http://127.0.0.1:1", "FAKE_STATUS": "100"}
-        done = s.run("--preflight", env=env)
+        done = s.run("--questions", env=env)
         self.assertEqual(done.returncode, 0, done.stderr)
         seen = json.loads(record.read_text())
         self.assertEqual(seen["cwd"], str((s.root / "config").resolve()))
@@ -1035,7 +1103,8 @@ class PrepareTests(unittest.TestCase):
         self.assertEqual(seen["env"]["TMPDIR"], str(s.root / "tmp"))
         self.assertEqual(seen["env"]["MCP_TIMEOUT"], "120000")
         self.assertEqual(seen["env"]["PROMPTFOO_DISABLE_SHARING"], "1")
-        self.assertEqual(s.run("--preflight", env={**env, "FAKE_STATUS": "7"}).returncode, 7, "any other status is a fault and is passed on")
+        self.assertEqual(s.run("--questions", env={**env, "FAKE_STATUS": "7"}).returncode, 7, "any other status is a fault and is passed on")
+        self.assertEqual(s.run("--preflight", env=env).returncode, 100, "a failed pre-flight row keeps promptfoo's status (review of #1046, P1)")
 
     def test_the_test_pattern_selects_the_descriptions_of_the_asked_questions_and_repeats_only(self):
         pattern = re.compile(e1_run.test_pattern(["p-def"], 2))

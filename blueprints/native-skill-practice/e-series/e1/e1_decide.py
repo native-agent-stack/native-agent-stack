@@ -8,13 +8,14 @@ the tool names from `response.metadata.toolCalls`. Per arm, over the questions i
   (iii) code-navigation use: the share of questions on which at least half of the arm's repeats called a tool of the code-navigation servers (passes at 70 percent or more).
 An arm is adopted as the default of a worktree workflow only when (i), (ii) and (iii) all pass; otherwise the outcome is "correct non-use or no gain". A5 (no server) is a cost and correctness reference, not an
 adoption candidate. Also printed: use by run, the carrying cost of the servers (A0b against A5) and each arm's median seconds and turns. The statistics are descriptive. A run that ended in a provider error is a
-fault: it is listed, left out of the figures, and the exit status is 3 so that someone reads it before the figures are used; arms with unequal numbers of runs over the shared questions are refused (exit 2).
+fault: it is listed, left out of the figures, and the exit status is 3 so that someone reads it before the figures are used; arms that do not hold the same (question, repeat) runs over the shared questions are refused (exit 2).
 Exit 0 decided, 2 a refusal, 3 faults present.
 """
 import argparse
 import json
 import statistics
 import sys
+from collections import Counter
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -65,6 +66,17 @@ def summary(runs, questions):
             "median_seconds": statistics.median(r["seconds"] for r in runs) if runs else None, "median_turns": statistics.median(r["turns"] for r in runs) if runs else None}
 
 
+def same_samples(candidate, other, questions, names):
+    """A refusal text unless both arms hold the same (question, repeat) runs over `questions`: equal counts do not make samples comparable (three repeats of one question and one of another are not one of each)."""
+    def pairs(runs):
+        return Counter((r["q"], r.get("repeat")) for r in runs if r["q"] in questions)
+    a, b = pairs(candidate), pairs(other)
+    if a == b:
+        return None
+    extra, missing = sorted((a - b).elements()), sorted((b - a).elements())
+    return f"{names[0]} and {names[1]} do not hold the same (question, repeat) runs over their shared questions (only in {names[0]}: {extra[:3]}; only in {names[1]}: {missing[:3]}): the figures are not comparable"
+
+
 def decide(runs, baseline="A0a"):
     by_arm = {}
     for r in runs:
@@ -80,8 +92,9 @@ def decide(runs, baseline="A0a"):
         if arm in (baseline, "A5"):
             continue
         base = summary(by_arm[baseline], common)
-        if rows[arm]["runs"] != base["runs"]:
-            raise ValueError(f"{arm} has {rows[arm]['runs']} runs and {baseline} {base['runs']} over their shared questions: the correct-answer counts are not comparable")
+        refusal = same_samples(by_arm[arm], by_arm[baseline], common, (arm, baseline))
+        if refusal:
+            raise ValueError(refusal)
         i = rows[arm]["correct"] >= base["correct"]
         ii = rows[arm]["median_cost"] <= COST_FACTOR * base["median_cost"]
         iii = rows[arm]["use_share"] >= USE_SHARE
@@ -91,6 +104,9 @@ def decide(runs, baseline="A0a"):
     carrying = None
     if "A0b" in by_arm and "A5" in by_arm:
         shared = {r["q"] for r in by_arm["A0b"]} & {r["q"] for r in by_arm["A5"]}
+        refusal = same_samples(by_arm["A0b"], by_arm["A5"], shared, ("A0b", "A5"))
+        if refusal:
+            raise ValueError(refusal)
         a, b = summary(by_arm["A0b"], shared), summary(by_arm["A5"], shared)
         carrying = {"questions": len(shared), "median_cost_A0b": a["median_cost"], "median_cost_A5": b["median_cost"], "cost_change_percent": round((a["median_cost"] / b["median_cost"] - 1) * 100, 1),
                     "correct_A0b": a["correct"], "correct_A5": b["correct"], "median_seconds_A0b": a["median_seconds"], "median_seconds_A5": b["median_seconds"]}

@@ -31,6 +31,8 @@ def verify_root(root):
     if not path.is_file():
         raise Refusal("the root holds no manifest.json: run e1_prepare.py first")
     manifest = json.loads(path.read_text(encoding="utf-8"))
+    if os.path.realpath(root) != os.path.realpath(manifest["root"]):
+        raise Refusal(f"this root is {root} but the manifest recorded {manifest['root']}: the sandbox fence and the sibling paths are bound to the recorded path; prepare again with --rebuild")
     for name, digest in manifest["staged"].items():
         if not (root / "config" / name).is_file() or sha256_file(root / "config" / name) != digest:
             raise Refusal(f"staged file {name} no longer matches the manifest: prepare again with --rebuild")
@@ -107,6 +109,8 @@ def main(argv=None):
             return 0
         status = subprocess.run(cmd, cwd=root / "config", env=env, stdin=subprocess.DEVNULL).returncode
         print(f"promptfoo exited {status}; results: {out}", file=sys.stderr)
+        if args.preflight:
+            return status           # exit 100 is "at least one test failed" (promptfoo@30949931ee90 site/docs/usage/command-line.md L171): for a pre-flight row that is a wiring defect, not a result
         return 0 if status in (0, PROMPTFOO_FAILED_TESTS) else status
     except Refusal as refusal:
         print(f"refused: {refusal}", file=sys.stderr)

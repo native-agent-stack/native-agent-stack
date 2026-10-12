@@ -61,7 +61,7 @@ repository's other instructions, so a null result is a strong null and a positiv
 | Pre-flight row, five arms | 5 of 5 pass: the four servers listed by A0a, A0b, A1 and A3, none by A5; the serena sentence quoted by A1 only, the path sentence by A3 only; 0.054 to 0.079 USD and 3.7 to 7.2 s per row; each session ran in `<root>/tmp/promptfoo-workspace-*/workspace`. An earlier run on the tree before the last edits (below) passed 5 of 5 as well |
 | A0b on `p-def` and `p-callers`, three repeats each | 5 of 6 correct (the wrong answer names the nested helper `accept` instead of its enclosing function `boundary_self_check`, an error the runner's A3 and A4 arms and the first parity attempt made too and that the grader keeps wrong); no code-navigation tool in 6 of 6; median cost 0.0454 and 0.0804 USD against the runner's 0.0457 and 0.0748 (-0.7 and +7.5 percent); median turns 3 and 5, equal to the runner's. An earlier run of the same cell, before the last edits to three staged or run files that change nothing an arm does (a comment, the repository-root lookup, the credential-runner lookup), gave 6 of 6 correct, 0.0452 and 0.0765 USD (-1.1 and +2.3 percent) |
 | Parity cell without `copy_working_dir` (runner's own worktrees) | +3.5 and +8.2 percent over the runner |
-| Offline, no model: the config, the four skeletons, the generator, the assertions and the decision script against a stub provider | `tests/test_e_series.py`, 73 tests |
+| Offline, no model: the config, the four skeletons, the generator, the assertions and the decision script against a stub provider | `tests/test_e_series.py`, 73 tests at the first head and 78 after review round 1 (below) |
 
 The harness check is descriptive: two rounds of three repeats on two questions of one arm (11 of 12 correct, no code-navigation call in 12 of 12), medians. It shows that this route reproduces the runner for the arm without a directive or a hook; it does not measure A1 or A3. The pre-flight and the cell above are the run of the committed bytes: the root was prepared from the committed tree, without `--repo` or `--credential-runner`, and its manifest digests equal the committed files.
 
@@ -90,13 +90,28 @@ The harness check is descriptive: two rounds of three repeats on two questions o
 - The corrected A1 and A3 re-run, or a production-like arm, showing a directive effect: the E1 conclusion about FIX-2 changes, and this record is superseded by the result.
 - A cell in which the provider and the runner disagree on an arm without a directive or a hook.
 
+## Review round 1 (the Codex review of 2026-10-12T18:49Z at `38f4151aa`: two P1, two P2)
+
+Each finding was reproduced as a gap in a guard rail of the scripts, not in the measured path (the config, the tasks, the grader, the generator and the assertions). One commit fixes all four, with a test each that fails before it:
+
+| Finding | Fix | Test (fails before the fix) |
+| --- | --- | --- |
+| P1 `e1_run.py`: a failed pre-flight row ended with exit 0, like a question row whose answer is wrong | `--preflight` returns promptfoo's own status (100 is "at least one test failed", `promptfoo/promptfoo@30949931ee90` `site/docs/usage/command-line.md` L171): a failed pre-flight row is a wiring defect, not a result. `--questions` still maps 100 to 0 | `test_a_failed_preflight_row_keeps_promptfoos_exit_status_and_a_failed_question_row_does_not` |
+| P1 `e1_decide.py`: equal run counts were taken as comparable samples | the arms must hold the same (question, repeat) runs over their shared questions, for the adoption rule and for the carrying contrast (A0b against A5) | `test_equal_run_counts_over_different_question_repeat_pairs_are_refused`, `test_the_carrying_cost_needs_the_same_pairs_in_a0b_and_a5` |
+| P2 `e1_run.py`: a copied or moved root was accepted | refused unless the root's real path equals the manifest's; another name for the same directory (a symbolic link) is accepted | `test_run_refuses_a_root_that_was_copied_or_moved_but_accepts_another_name_for_the_same_directory` |
+| P2 `e1_prepare.py`: a relative `--claude`, `--semble-model` or `--promptfoo` was recorded as given | stored absolute, since the run starts promptfoo from `<root>/config` | `test_prepare_records_absolute_paths_for_tools_given_relative_to_the_working_directory` |
+
+`--questions` still does not require a passing pre-flight receipt: the order is the caller's, and the corrected stage's script runs the gate before and after the questions and stops on a failed start gate. The corrected A1 and A3 stage
+(addendum 2 of the comparison's record) ran at the frozen digests of `38f4151aa`; this round changes `e1_run.py`, `e1_prepare.py` and `e1_decide.py` and not the config, the tasks, the grader, the generator or the assertions, so the
+stage's evidence is unaffected. 12 of 12 mutants of the fixes are killed; the 78 tests pass, and 6 of them (the 5 new ones and the updated exit-status test) fail on the sources of `38f4151aa`.
+
 ## Sources
 
 - `promptfoo/promptfoo@30949931ee90` (0.124.0): `src/providers/agentWorkspace.ts` L89-L99 (modes), L637-L725 (a workspace per call: `git clone --shared` when the tree is clean, `fs.cp` otherwise); `site/docs/guides/evaluate-coding-agents.md`
   L288-L346 (isolated workspaces); `site/docs/providers/claude-agent-sdk.md` L22-L27 (the SDK package), L146-L206 (options), L485-L560 (skills); `src/providers/mcp/transform.ts` L205-L225;
   `src/providers/claude-agent-sdk.ts` L2503-L2509 (`toolCalls`, `numTurns`, `durationMs`); `site/docs/configuration/test-cases.md` L486-L530 (Python generators with config);
   `site/docs/configuration/expected-outputs/python.md` L60-L135 (assertion context); `src/types/index.ts` L380-L386 (`ResultFailureReason`: an assertion that rejects an answer is 1, a provider error 2);
-  `site/docs/guides/test-agent-skills.md` (`skill-used`).
+  `site/docs/guides/test-agent-skills.md` (`skill-used`); `site/docs/usage/command-line.md` L171 (`eval` exits 100 when at least one test case fails).
 - `promptfoo/promptfoo@34f74d34e140b5e17d23770dfb2340057b1936b8` (0.123.1, the pin the repository mirrors elsewhere): no `copy_working_dir` in `src` or `site`.
 - `anthropics/claude-code@3deb873687379f0c199a69fdaccc65f0865f7a29`, `CHANGELOG.md` L1378, L2960, L5879, L6759, L7962 (`--setting-sources` restricts the settings sources a session loads); what a source loads is the
   probe above, run on the installed client.
