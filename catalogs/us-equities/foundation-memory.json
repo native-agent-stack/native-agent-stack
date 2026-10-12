@@ -277,7 +277,7 @@
         "evidence/receipts/desktop-cli-workflows.json"
       ],
       "native_workflow": [
-        "mcporter --config \"${MCPORTER_CONFIG}\" call codebase-memory.search_graph --args \"${GRAPH_QUERY_ARGS}\" --output json --no-oauth"
+        "mcporter --config \"${MCPORTER_CONFIG}\" call codebase-memory-mcp.search_graph --args \"${GRAPH_QUERY_ARGS}\" --output json --no-oauth"
       ],
       "workflow_pin_scope": "Native receipt replays have their own pinned environments. Commands without explicit versions are moving upstream entry points, not reproducible installs of this reviewed snapshot; select and lock the named version/commit before deployment.",
       "requirements": [

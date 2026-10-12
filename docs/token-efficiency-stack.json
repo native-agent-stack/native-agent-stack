@@ -4727,8 +4727,8 @@
           "tar -xf \"$DOWNLOAD_DIR/codebase-memory-mcp-linux-amd64.tar.gz\" -C \"$PREFIX\""
         ],
         "use": [
-          "mcporter --config \"${MCPORTER_CONFIG}\" call codebase-memory.search_graph --args '{\"project\":\"agent-lab\",\"name_pattern\":\"^collect$\",\"file_pattern\":\"tools/ecosystem/linux-usage-report.cjs\",\"format\":\"json\",\"limit\":1}' --output json --no-oauth",
-          "mcporter --config \"${MCPORTER_CONFIG}\" call codebase-memory.trace_path --args '{\"project\":\"agent-lab\",\"function_name\":\"agent-lab.tools.ecosystem.linux-usage-report.collect\",\"direction\":\"outbound\",\"depth\":1,\"format\":\"json\",\"limit\":5}' --output json --no-oauth"
+          "mcporter --config \"${MCPORTER_CONFIG}\" call codebase-memory-mcp.search_graph --args '{\"project\":\"agent-lab\",\"name_pattern\":\"^collect$\",\"file_pattern\":\"tools/ecosystem/linux-usage-report.cjs\",\"format\":\"json\",\"limit\":1}' --output json --no-oauth",
+          "mcporter --config \"${MCPORTER_CONFIG}\" call codebase-memory-mcp.trace_path --args '{\"project\":\"agent-lab\",\"function_name\":\"agent-lab.tools.ecosystem.linux-usage-report.collect\",\"direction\":\"outbound\",\"depth\":1,\"format\":\"json\",\"limit\":5}' --output json --no-oauth"
         ],
         "statistics": [],
         "command_kind": "Upstream CLI/MCP commands and portable placeholders from linked recipes; documentation is not execution evidence.",

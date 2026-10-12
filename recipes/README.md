@@ -787,10 +787,10 @@ Check that the returned passage matches the source. A fresh MCP connection may r
 The MCPorter example limits the native codebase-memory server to `CBM_ALLOWED_ROOT=/ABSOLUTE/PROJECT_ROOT`. Its native database/daemon is persistent outside the repository; the allowlist does not make index data ephemeral. No automatic all-client installation is needed.
 
 ```sh
-mcporter --config "$MCPORTER_CONFIG" list codebase-memory --schema --no-oauth
+mcporter --config "$MCPORTER_CONFIG" list codebase-memory-mcp --schema --no-oauth
 GRAPH_ARGS=$(python3 -c 'import json,sys; print(json.dumps({"repo_path":sys.argv[1],"name":"native-stack-demo","mode":"fast","persistence":False}))' "$PROJECT_ROOT")
-mcporter --config "$MCPORTER_CONFIG" call codebase-memory.index_repository --args "$GRAPH_ARGS" --output text --no-oauth
-mcporter --config "$MCPORTER_CONFIG" call codebase-memory.search_graph \
+mcporter --config "$MCPORTER_CONFIG" call codebase-memory-mcp.index_repository --args "$GRAPH_ARGS" --output text --no-oauth
+mcporter --config "$MCPORTER_CONFIG" call codebase-memory-mcp.search_graph \
   --args '{"project":"native-stack-demo","name_pattern":"^greeting$","file_pattern":"fixtures/","limit":5,"format":"json"}' --output text --no-oauth
 ```
 

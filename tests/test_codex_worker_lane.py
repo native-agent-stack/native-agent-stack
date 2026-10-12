@@ -588,7 +588,7 @@ class TemplateTests(unittest.TestCase):
         # config/src/config_layer_source.rs: profile 21 < project 25 < session 30.
         profile = tomllib.loads((TEMPLATES / "codex.stack-worker.config.toml").read_text(encoding="utf-8"))
         user = tomllib.loads((TEMPLATES / "codex.config.template.toml").read_text(encoding="utf-8"))
-        for name in ("serena", "codebase-memory"):
+        for name in ("serena", "codebase-memory-mcp"):
             with self.subTest(server=name):
                 self.assertIn("command", user["mcp_servers"][name])
                 expected = {"startup_timeout_sec": 60}
@@ -1120,7 +1120,7 @@ class ApplyFlowTests(unittest.TestCase):
         # FakeHost registers socraticode without startup_timeout_sec; add serena the same way (a `codex mcp add`
         # registration). codebase-memory has no template allowance and is left alone.
         self.host.config["mcp_servers"]["serena"] = {"command": f"{self.host.eco}/bin/serena"}
-        self.host.config["mcp_servers"]["codebase-memory"] = {"command": f"{self.host.eco}/bin/codebase-memory-mcp"}
+        self.host.config["mcp_servers"]["codebase-memory-mcp"] = {"command": f"{self.host.eco}/bin/codebase-memory-mcp"}
         self.host.write_config(self.host.config)
         before = self.host.read_config()
         code, out = self.host.run()
@@ -1132,7 +1132,7 @@ class ApplyFlowTests(unittest.TestCase):
         after = self.host.read_config()
         self.assertEqual(after["mcp_servers"]["serena"]["startup_timeout_sec"], 60)
         self.assertEqual(after["mcp_servers"]["socraticode"]["startup_timeout_sec"], 120)
-        self.assertNotIn("startup_timeout_sec", after["mcp_servers"]["codebase-memory"])
+        self.assertNotIn("startup_timeout_sec", after["mcp_servers"]["codebase-memory-mcp"])
         code, out = self.host.run("--rollback", str(self.host.latest_run()))
         self.assertEqual(code, 0, out)
         self.assertEqual(self.host.read_config(), before)
@@ -1371,7 +1371,7 @@ class SerenaReadbackTests(unittest.TestCase):
         self.assertIn("-p stack-worker serena required is False (default)", out)
 
     def test_a_recorded_lookup_error_fails_the_read_back(self):
-        for name in ("serena", "codebase-memory"):  # neither table has a key the old comparisons read
+        for name in ("serena", "codebase-memory-mcp"):  # neither table has a key the old comparisons read
             with self.subTest(server=name):
                 host = FakeHost(self)
                 (host.codex.parent / "mcp-get-fail").write_text(name + "\n")

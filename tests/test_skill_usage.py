@@ -1085,8 +1085,9 @@ def materialize_lanes_root(dest: Path) -> Path:
 # sections up to the line `Output:` and then the output (core/src/tools/context.rs:524-575).
 CLI_CARRIERS = ("bash", "rtk_proxy", "ctx", "nested")
 DECLINED_TEXT = "exec command rejected by user"  # core/src/tools/events.rs:456-458
-STACK_280 = ('mcporter --config "${MCPORTER_CONFIG}" call codebase-memory.search_graph'
-             ' --args "${GRAPH_QUERY_ARGS}" --output json --no-oauth')  # manifests/stack.json:280
+STACK_280 = ('mcporter --config "${MCPORTER_CONFIG}" call codebase-memory-mcp.search_graph'
+             ' --args "${GRAPH_QUERY_ARGS}" --output json --no-oauth')  # manifests/stack.json:283
+STACK_280_HISTORICAL = STACK_280.replace("codebase-memory-mcp.", "codebase-memory.")  # the short key the published command used before 2026-10-12; old transcripts still carry it
 
 
 def cli_lane_row(carrier="bash", **counts):
@@ -1386,11 +1387,12 @@ class CodexLanes(unittest.TestCase):
         declined_direct = exec_command_call("call_priv_iii_direct", "qmd search x", DECLINED_TEXT)
         declined_direct.insert(1, command_item("call_priv_iii_direct", ["bash", "-lc", "qmd search x"],
                                                "declined", -1, DECLINED_TEXT))
-        local_shell = [codex_row("response_item", {"type": "local_shell_call", "call_id": "call_priv_vii",
-                                                   "status": "completed", "action": {
-                                                       "type": "exec", "command": ["bash", "-lc", STACK_280]}}),
-                       codex_row("response_item", {"type": "function_call_output", "call_id": "call_priv_vii",
-                                                   "output": "[]"})]
+        def local_shell_of(command):
+            return [codex_row("response_item", {"type": "local_shell_call", "call_id": "call_priv_vii",
+                                                "status": "completed", "action": {
+                                                    "type": "exec", "command": ["bash", "-lc", command]}}),
+                    codex_row("response_item", {"type": "function_call_output", "call_id": "call_priv_vii",
+                                                "output": "[]"})]
         cases = {
             "(i) code mode, completed": (
                 code_mode_command("call_priv_i", ["bash", "-lc", "cd repo && rtk proxy pytest -q"], "completed", 0,
@@ -1415,8 +1417,12 @@ class CodexLanes(unittest.TestCase):
             "(vi) no header and no item": (
                 exec_command_call("call_priv_vi", "qmd search x", "notes.md:3: qmd search x"),
                 {"qmd": cli_lane_row(unknown=1)}, {}, None),
-            "(vii) local shell call, stack.json:280": (
-                local_shell, {"codebase-memory-mcp": cli_lane_row(unknown=1, via_mcporter=1)},
+            "(vii) local shell call, stack.json:283": (
+                local_shell_of(STACK_280), {"codebase-memory-mcp": cli_lane_row(unknown=1, via_mcporter=1)},
+                {"codebase-memory-mcp": {"calls": 1, "succeeded": 0, "failed": 0, "not_executed": 0, "unfinished": 0,
+                                         "unknown": 1, "interrupted": 0}}, None),
+            "(vii) local shell call, the short key of earlier transcripts": (
+                local_shell_of(STACK_280_HISTORICAL), {"codebase-memory-mcp": cli_lane_row(unknown=1, via_mcporter=1)},
                 {"codebase-memory": {"calls": 1, "succeeded": 0, "failed": 0, "not_executed": 0, "unfinished": 0,
                                      "unknown": 1, "interrupted": 0}}, None),
         }
