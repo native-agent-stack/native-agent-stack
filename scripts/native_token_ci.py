@@ -64,19 +64,21 @@ REDACTIONS = (
     # Like its original, it leaves out local parts made only of RFC 5322 atext symbols (not detected; no observed
     # instance is identity-bearing).
     ("email address", re.compile(
-        r"(?<![\w.!#$%&'*+/=?^`{|}~-])(?![.!#$%&'*+/=?^_`{|}~-]*@)(?!noreply@(?:anthropic|github)\.com(?![\w-]|\.\w))"
+        r"(?<![\w.!#$%&'*+/=?^`{|}~-])(?![.!#$%&'*+/=?^_`{|}~-]*@)(?!(?-i:noreply)@(?:anthropic|github)\.com(?![\w-]|\.\w))"
         r"[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@"
         r"(?!(?:[A-Za-z0-9-]+\.)*(?:users\.noreply\.github\.com|example\.(?:com|net|org)"
         r"|[A-Za-z0-9-]+\.(?:test|example|invalid|localhost))(?![\w-]|\.\w))"
         r"(?:[A-Za-z0-9-]+\.)+(?!(?:service|socket|device|mount|automount|swap|path|timer|slice|scope)"
         r"(?![\w-]|\.\w))(?:[A-Za-z]{2,}|xn--[A-Za-z0-9-]{0,58}[A-Za-z0-9])(?![\w-]|\.\w)", re.I), "<EMAIL>"),
 )
-# Run.publish decodes JSON text nested in string values this many levels deep; deeper JSON text is refused with this
-# fixed message, and nothing is published (the command center's micro at 4c916e14; real receipts nest at most two).
+# Run.publish decodes JSON text nested in string values this many levels deep, and publication_views() decodes string
+# escapes this many passes over; deeper JSON text, escaping still undone after that, and JSON too deep for Python's
+# decoder are refused with this fixed message, and nothing is published (the command center's micro at 4c916e14 and
+# addendum 04; real receipts nest at most two and need at most two passes).
 PUBLISH_DEPTH = 4
 PUBLISH_REFUSED = ("publish: output a reader could decode to private content (JSON nested in string values deeper than "
-                   "4 levels, an object with a duplicate name, or JSON a reader splits differently) is refused; nothing "
-                   "is published")
+                   "4 levels or escaped more than 4 times over, an object with a duplicate name, or JSON a reader "
+                   "splits differently) is refused; nothing is published")
 
 
 def unique_members(pairs: list) -> dict:
@@ -87,28 +89,36 @@ def unique_members(pairs: list) -> dict:
     return dict(pairs)
 
 
+class Unverifiable(ValueError):
+    """Text publication_views() cannot finish within PUBLISH_DEPTH, or JSON with a duplicate name: refused, never
+    certified."""
+
+
 class JsonNumber(str):
     """A JSON number kept as its text, so a reader's view of it has no length limit (CPython's int() refuses more than
     4300 digits: Objects/longobject.c:2957 at cbc944f4)."""
 
 
 def unique_pairs(pairs: list) -> list:
-    """The verifier's object_pairs_hook: the same duplicate-name refusal as unique_members, in every framing the
-    verifier reads (the command center's addendum 03), keeping every member for inspection."""
-    require(len({name for name, _ in pairs}) == len(pairs), PUBLISH_REFUSED)
+    """publication_views()' object_pairs_hook: json.loads keeps only the last member of a duplicate name, so an
+    earlier one would go unread; such an object is refused (RFC 8259 4: names SHOULD be unique), and every member is
+    kept for reading."""
+    if len({name for name, _ in pairs}) != len(pairs):
+        raise Unverifiable("an object with a duplicate name")
     return pairs
 
 
 VERIFY_DECODER = json.JSONDecoder(object_pairs_hook=unique_pairs, parse_int=JsonNumber, parse_float=JsonNumber,
                                   parse_constant=JsonNumber)
-# RFC 8259 7 string escapes (rfc8259.txt:461-475): a surrogate pair, a code unit, or one of the eight short forms.
+# RFC 8259 7 string escapes (rfc8259.txt:455-475): a surrogate pair (:455-459), a code unit, or one of the eight
+# short forms (:461-475).
 JSON_ESCAPE = re.compile(r"\\(?:u([dD][89abAB][0-9a-fA-F]{2})\\u([dD][c-fC-F][0-9a-fA-F]{2})|u([0-9a-fA-F]{4})|([\"\\/bfnrt]))")
 SHORT_ESCAPES = {'"': '"', "\\": "\\", "/": "/", "b": "\b", "f": "\f", "n": "\n", "r": "\r", "t": "\t"}
 
 
 def unescaped(text: str) -> str:
-    """One pass of RFC 8259 7's string escapes over the whole text, whatever frames it (the command center's addendum
-    03): a surrogate pair becomes its character, a lone surrogate's escape is left as it is."""
+    """One pass of RFC 8259 7's string escapes over the whole text, whatever frames it: a surrogate pair becomes its
+    character, a lone surrogate's escape is left as it is."""
     def one(match: re.Match) -> str:
         high, low, unit, short = match.groups()
         if high:
@@ -119,52 +129,97 @@ def unescaped(text: str) -> str:
     return JSON_ESCAPE.sub(one, text)
 
 
+def reader_pieces(text: str) -> set:
+    """The text as each reader frames it: whole; at line feeds; at str.splitlines() breaks; under universal newlines
+    (Lib/_pyio.py:153-154 at cbc944f4); and as records split at RS (RFC 7464 2; a parser SHOULD continue after a
+    malformed record, rfc7464.txt:153-155, as jq does, jqlang/jq@4467af70 src/jv_parse.c:785-807), each record whole
+    across its line breaks, so a pretty-printed object after malformed text and an RS on one line is read complete.
+    A lone CR is a line break where json_texts() resumes, so a pretty-printed object after a progress line is too."""
+    return {text, *text.split("\n"), *text.splitlines(), *io.StringIO(text, newline=None), *text.split("\x1e")}
+
+
+LINE_BREAK = re.compile("[\r\n]")
+BETWEEN_TEXTS = " \t\x1e\ufeff"  # within a line; the line breaks end it
+
+
+def decoded(text: str, index: int):
+    """VERIFY_DECODER.raw_decode, with JSON too deep for Python's decoder raised as Unverifiable."""
+    try:
+        return VERIFY_DECODER.raw_decode(text, index)
+    except RecursionError as error:
+        raise Unverifiable("JSON too deep to decode") from error
+
+
 def json_texts(piece: str) -> list:
-    """The JSON texts a stream reader (jq, RFC 7464 json-seq) takes from piece, in order: JSON whitespace and the RS
-    record separator between texts are skipped, and reading stops at the first byte that starts no JSON text."""
-    texts, index = [], 0
-    while True:
-        while index < len(piece) and piece[index] in " \t\n\r\x1e":
-            index += 1
-        if index >= len(piece):
-            return texts
-        try:
-            node, index = VERIFY_DECODER.raw_decode(piece, index)
-        except ValueError:
-            return texts
-        texts.append(node)
+    """The JSON texts a reader takes from piece, in order: JSON whitespace, the RS record separator and a byte order
+    mark between texts are skipped (RFC 8259 8.1: a parser MAY ignore a byte order mark, rfc8259.txt:494-498, as jq
+    does); where no JSON text starts, reading resumes at the next line, as a reader that reads a line and then parses
+    the rest does (readline, then json.load). Each line is decoded alone first, so a failure costs that line's length
+    (a JSONDecodeError counts lines up to its position); the rest of piece is read only when the line ends inside a JSON
+    text, where a text that fails inside the line fails the same way across lines."""
+    texts, start = [], 0
+    while start < len(piece):
+        following = LINE_BREAK.search(piece, start)
+        line, index = piece[start:following.start() if following else len(piece)], 0
+        resumed = None
+        while True:
+            while index < len(line) and line[index] in BETWEEN_TEXTS:
+                index += 1
+            if index >= len(line):
+                break
+            try:
+                node, index = decoded(line, index)
+            except json.JSONDecodeError as error:
+                if error.pos < len(line):
+                    break
+                try:  # the line ends inside a JSON text: read it across the lines that follow
+                    node, resumed = decoded(piece, start + index)
+                except json.JSONDecodeError:
+                    break
+                texts.append(node)
+                break
+            texts.append(node)
+        if resumed is not None:
+            start = resumed
+        else:
+            start = following.end() if following else len(piece)
+    return texts
 
 
-def recoverable(text: str, depth: int = 0) -> bool:
-    """Whether a reader can decode private content from published text (the command center's micro at adc2adb2, N1):
-    REDACTIONS over the text, and over every key and string value of each JSON text in it, as split by a line feed, by
-    str.splitlines() and by universal newlines (Lib/_pyio.py:153-154 at cbc944f4), nested JSON PUBLISH_DEPTH levels
-    deep; an object with a duplicate name is refused. JSON text nested deeper counts as recoverable. At the top, the
-    whole text is also read with every RFC 8259 7 escape decoded, framing aside, up to PUBLISH_DEPTH times over (the
-    command center's addendum 03: a pretty-printed object after a lone CR or behind RS framing, RFC 7464 2)."""
-    if any(pattern.search(text) for _, pattern, _ in REDACTIONS):
-        return True
+def publication_views(text: str, depth: int = 0):
+    """Every view a reader can take of text this repository publishes, for its publication checks: Run.publish here
+    and the receipt scan in scripts/host_receipts.py (the command center's addendum 04 at 4c916e14: one shared verifier
+    for every published surface, failing closed). Yields the text itself; the text with every RFC 8259 7 string escape
+    decoded, framing aside, pass after pass; and every key and string value of every JSON text a reader can decode
+    from it under any framing it uses (reader_pieces), nested JSON in a string value too. A check that cannot finish
+    within the bound raises Unverifiable, so an incomplete check never certifies text: escaping still undone after
+    PUBLISH_DEPTH passes, JSON nested deeper than PUBLISH_DEPTH levels, an object with a duplicate name, or a JSON text
+    too deep to decode. Standard library only, so this file still runs without scripts/validate.py."""
+    yield text
     projected = text
-    for _ in range(PUBLISH_DEPTH if depth == 0 else 0):
+    for passes in range(PUBLISH_DEPTH + 1):
         following = unescaped(projected)
         if following == projected:
             break
+        if passes == PUBLISH_DEPTH:
+            raise Unverifiable("escaping deeper than the bound")
         projected = following
-        if any(pattern.search(projected) for _, pattern, _ in REDACTIONS):
-            return True
-    pieces = {text, *text.split("\n"), *text.splitlines(), *io.StringIO(text, newline=None)}
-    for piece in pieces:
+        yield projected
+    for piece in reader_pieces(text):
         for node in json_texts(piece):
-            if depth >= PUBLISH_DEPTH and not isinstance(node, (JsonNumber, bool, type(None))):
-                return True
+            if isinstance(node, (JsonNumber, bool, type(None))):
+                continue
+            if depth >= PUBLISH_DEPTH:
+                raise Unverifiable("JSON nested deeper than the bound")
             stack = [node]
             while stack:
                 item = stack.pop()
                 if isinstance(item, (list, tuple)):
                     stack.extend(item)
-                elif isinstance(item, str) and not isinstance(item, JsonNumber) and recoverable(item, depth + 1):
-                    return True
-    return False
+                elif isinstance(item, str) and not isinstance(item, JsonNumber):
+                    yield from publication_views(item, depth + 1)
+
+
 # Serena declares 2.0.0.dev0 for every commit, so its manifest version names the commit after " @ "
 # and the commit is its identity (adoption/pins-linux-x86_64.json, kind uv-tool-from-git).
 SERENA_COMMIT = "c6fbd1c5932df2494ffa0020af5a9fbe80b82143"
@@ -717,8 +772,9 @@ class Run:
                        "Retained text replaces local paths and private content, in JSON and JSON Lines values as "
                        "decoded too (JSON text nested in strings up to four levels; deeper, or an object with a "
                        "duplicate name, is refused, and a line ends only at a line feed); the output is then read back "
-                       "under line feeds, splitlines, universal newlines and RS framing, and with every JSON string escape "
-                       "decoded across it, and refused if any reader recovers private content; "
+                       "under line feeds, splitlines, universal newlines, RS and lone-CR records and line resumption, "
+                       "and with every JSON string escape decoded across it up to four passes, and refused if one of "
+                       "these JSON readings recovers private content or cannot be finished within those bounds; "
                        "command, artifact and MCP digests are of the published text, while the RTK exactness and "
                        "Serena parity digests are of fixture output before sanitization"],
         }
@@ -801,12 +857,16 @@ class Run:
         """clean() for text this run publishes, and for JSON or JSON Lines text also each decoded key and string value,
         so what a JSON escape hides (\\u0040 for "@", RFC 8259 7) is removed too; a string value that is itself
         JSON is read the same way, PUBLISH_DEPTH levels deep, and JSON text nested deeper is refused (PUBLISH_REFUSED),
-        never passed through, as is an object with a duplicate name. Finally the output itself is verified: if any
-        reader recovers private content from it (recoverable(): every framing the verifier reads, and every JSON string
-        escape decoded across the whole text, framing aside), it is refused. A JSON Lines line ends only at a line feed (a trailing carriage return is kept): RFC 8259
-        7 allows U+2028, U+2029 and U+0085 raw in a string, and str.splitlines() would break there. Text whose decoded
-        values clean() leaves alone is returned as clean() gives it; otherwise the document is written again from the
-        cleaned values. host_receipts.py judges a receipt's decoded values the same way."""
+        never passed through, as is an object with a duplicate name. A JSON Lines line ends only at a line feed (a
+        trailing carriage return is kept): RFC 8259 7 allows U+2028, U+2029 and U+0085 raw in a string. Text whose
+        decoded values clean() leaves alone is returned as clean() gives it; otherwise the document is written again
+        from the cleaned values, and refused instead when that would merge two names or change a number as written
+        (the GPT read at 6aaa204a: 1e400, -0 and long decimals). Finally the output itself is verified with every view
+        publication_views() gives (the text, its RFC 8259 7 escapes decoded framing aside, and every key and string
+        value of every JSON text under each framing reader_pieces() and json_texts() read, nested JSON too; the views
+        scripts/host_receipts.py judges too, the command center's addendum 04), and refused if any recovers private
+        content or cannot be finished within the bound (Unverifiable). JSON too deep for Python's decoder is refused
+        too."""
         cleaned = self.clean(value)
 
         def parsed(text: str):
@@ -826,12 +886,30 @@ class Run:
             if isinstance(node, list):
                 return [walk(item) for item in node]
             if isinstance(node, dict):
-                return {walk(key): walk(item) for key, item in node.items()}
+                pairs = [(walk(key), walk(item)) for key, item in node.items()]
+                # Two names that cleaning makes equal would merge, and one member would be lost: refuse instead.
+                require(len({key for key, _ in pairs}) == len(pairs), PUBLISH_REFUSED)
+                return dict(pairs)
             return node
 
         def document(text: str) -> str:
+            lossy = []
+
+            def number(kind):
+                def parse(lexeme: str):
+                    value = kind(lexeme)
+                    if json.dumps(value) != lexeme:  # json.dumps would not write this number back as it is written
+                        lossy.append(lexeme)
+                    return value
+                return parse
+
+            def constant(name: str):
+                lossy.append(name)  # Infinity, -Infinity and NaN are not JSON (RFC 8259 6)
+                return float(name)
+
             try:
-                node = json.loads(text, object_pairs_hook=unique_members)
+                node = json.loads(text, object_pairs_hook=unique_members, parse_int=number(int),
+                                  parse_float=number(float), parse_constant=constant)
             except ValueError:
                 return text
             if not isinstance(node, (dict, list, str)):
@@ -839,17 +917,27 @@ class Run:
             walked = walk(node)
             if walked == node:
                 return text
+            require(not lossy, PUBLISH_REFUSED)
             return json.dumps(walked, ensure_ascii=False, indent=2 if "\n" in text.strip() else None)
 
-        whole = document(cleaned)
-        if whole is not cleaned:
-            published = whole + "\n" * (len(cleaned) - len(cleaned.rstrip("\n")))
-        else:
-            published = "\n".join(document(line[:-1]) + "\r" if line.endswith("\r") else document(line)
-                                  for line in cleaned.split("\n"))
+        try:
+            whole = document(cleaned)
+            if whole is not cleaned:
+                published = whole + "\n" * (len(cleaned) - len(cleaned.rstrip("\n")))
+            else:
+                published = "\n".join(document(line[:-1]) + "\r" if line.endswith("\r") else document(line)
+                                      for line in cleaned.split("\n"))
+        except RecursionError:  # JSON too deep for Python's decoder (the CC's micro at 6aaa204a): refused, not raised
+            require(False, PUBLISH_REFUSED)
         # Verify the output, not the input (the command center's addendum 02): refuse when any reader recovers what
-        # clean() removes.
-        require(depth > 0 or not recoverable(published), PUBLISH_REFUSED)
+        # clean() removes, or when the views cannot be finished within their bound.
+        if depth == 0:
+            try:
+                leaked = any(pattern.search(view) for view in publication_views(published)
+                             for _, pattern, _ in REDACTIONS)
+            except Unverifiable:
+                leaked = True
+            require(not leaked, PUBLISH_REFUSED)
         return published
 
     def flush(self) -> None:
@@ -1539,7 +1627,9 @@ def mcp_stdio_session(run: Run, label: str, argv: list[str], requests: list[tupl
                 process.wait()
         for reader in readers:
             reader.join(timeout=5)
-        if not any(reader.is_alive() for reader in readers):  # the readers are done: close the parent's pipe ends
+        # The readers are done: close the parent's pipe ends. Popen closes them only in __exit__
+        # (python/cpython@cbc944f4 Lib/subprocess.py:1106-1113), and this session does not use it as a context manager.
+        if not any(reader.is_alive() for reader in readers):
             for pipe in (process.stdout, process.stderr):
                 pipe.close()
         entry = {"label": label, "argv": [run.publish(arg) for arg in argv], "cwd": run.clean(str(cwd or run.work)),

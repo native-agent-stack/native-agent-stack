@@ -220,6 +220,15 @@ class PublicationValidationTests(unittest.TestCase):
                 validate(self.root)
         self.assertIn(relative + ": contains possible email address", str(refused.exception))
 
+    def test_the_noreply_exemption_keeps_the_local_part_case(self):
+        # Codex's thread at 6aaa204a: the noreply trailer exemption folded the local part's case (RFC 5321 2.4 makes
+        # NoReply another mailbox); only the domain is compared without case.
+        rule = dict(PRIVATE_CONTENT)["email address"]
+        for local, domain, exempt in (("noreply", "anthropic.com", True), ("noreply", "GITHUB.com", True),
+                                      ("NoReply", "anthropic.com", False), ("NOREPLY", "github.com", False)):
+            with self.subTest(local=local, domain=domain):
+                self.assertEqual(rule.search("trailer <" + address(local, domain) + ">") is None, exempt)
+
     def test_a_local_part_case_variant_is_not_waived(self):
         # The co-op's GPT read at 51f45b5d (P2) and Codex's thread: the waiver lowered the whole match, so a local part
         # differing only in case passed as the reviewed address. RFC 5321 2.4: "the local-part of a mailbox MUST BE

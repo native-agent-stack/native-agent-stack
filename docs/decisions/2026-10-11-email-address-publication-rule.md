@@ -307,38 +307,96 @@ beside a lone CR, or after RS, FF, VT, FS, GS, U+0085, U+2028 or U+2029, undecod
 splitting always leaves a reader that splits differently (rule 4), so `publish()` now verifies its own output:
 `recoverable()` reads the exact text to be published under a line feed, `str.splitlines()` and universal newlines,
 decodes every JSON text in each piece as a stream reader does (JSON whitespace and RFC 7464's RS between texts),
-reads every member of every object, duplicates included, and nested JSON to the same depth, and applies the
+reads every member of every object it decodes (one with a duplicate name is refused since addendum 03), and nested
+JSON to the same depth, and applies the
 sanitizer's rules to each decoded value. Numbers are kept as their text, so the micro's N2 (an integer past CPython's
 4,300-digit limit beside the address, which `json.loads` refuses with a plain `ValueError` while jq and Node read
-on) is read too. If any reader recovers private content, the output is refused with `PUBLISH_REFUSED`; clean output
-keeps every byte. Over the committed native-token receipts, 765 published streams pass unchanged; a 1.1 MB JSON
+on) is read too. If one of these readers recovers private content, the output is refused with `PUBLISH_REFUSED`
+(this said any reader until addendum 04, which lists the readers and refuses what they cannot finish); clean output
+keeps every byte. Over the committed native-token receipts, the published streams pass unchanged (the count first given
+here, 765, came from a selector that was not recorded and does not reproduce; addendum 04 states its census); a 1.1 MB
+JSON
 document is verified in 1.6 s. Each regression (the micro's lone-CR, separator, json-seq and long-number shapes,
 through `publish()`, an artifact, a command and an MCP answer) fails on `adc2adb2` and passes here; its byte-for-byte
 controls pass on both. Forms readable only by a person, such as `\x40`, a fullwidth at sign or `%40`, are follow-ups
 for the shared email detector. (Until addendum 03 this sentence also put two values on one line, a BOM, a trailing
-comma, a log prefix and duplicate names outside `publish()`'s scope; the stream decoder and the escape projection below
-read the first four, and duplicate names are refused.)
+comma, a log prefix and duplicate names outside `publish()`'s scope. For an address, the escape projection below reads
+all four; the JSON reading takes two values on a line and a trailing comma, and a BOM since addendum 04; a duplicate
+name is refused in every JSON text the views read, which a log prefix on the same line is not.)
 
 **Addendum 03 (the command center's, from a shadow review the co-op reproduced at `66036a74`):** the verifier still
 depended on framing. A pretty-printed object after a lone CR (a progress line, then JSON), or behind RS framing (RFC 7464
 2, rfc7464.txt:119-185, <https://www.rfc-editor.org/rfc/rfc7464.txt>, read 2026-10-12T08:30:42Z,
 `a8eadbcdce5fc508b9e014299621562da041232af13848632092164d50b3f482`), was cut by every split view, so its escaped address
 went out while readline-then-`json.load` and `jq --seq` read it back. The fourth recurrence of the class, so the
-verifier now also reads the output with framing ignored: every RFC 8259 7 string escape (rfc8259.txt:461-475: a
-surrogate pair, a code unit, and the eight short forms; a lone surrogate's escape is left as it is) is decoded across
-the whole text, up to `PUBLISH_DEPTH` times over for nested escaping, and the sanitizer's rules run on each projection.
+verifier now also reads the output with framing ignored: every RFC 8259 7 string escape (rfc8259.txt:455-475: a
+surrogate pair at :455-459, a code unit and the eight short forms at :461-475; a lone surrogate's escape is left as it
+is) is decoded across
+the whole text, up to `PUBLISH_DEPTH` times over for nested escaping (and refused past that since addendum 04 below),
+and the sanitizer's rules run on each projection.
 A duplicate name is refused wherever the verifier decodes JSON too, in every framing it reads, numbers kept as text, so
 an RS-framed duplicate object or duplicates after a long number are refused as well. Over the committed native-token
-receipts, the same 765 published streams pass unchanged. Each regression (the two framings through `publish()`, an
-artifact, a command and an MCP answer; a doubly escaped address; the two duplicate shapes) fails on `66036a74` and passes
-here, and escaped text with nothing private keeps every byte. A test of the earlier fix had put the escaped address in
+receipts, the published streams pass unchanged (the unreproduced 765 again; see addendum 04's census). The regressions
+fail on `66036a74` (13 failures: the two framings and a doubly escaped address through `publish()`; the two framings
+through an artifact, a command and an MCP answer; three duplicate shapes, one after a lone CR; and the receipt's own
+check) and pass here, and escaped text with nothing private keeps every byte. A test of the earlier fix had put the escaped address in
 a command's own argv, which is published too; the child now reads it from a file.
 
 The GPT read at `66036a74` (ACK, three P3s) asked to keep the refusal and recovery ordering and to close the MCP
 session's pipe handles behind the tests' `ResourceWarning`s: the session now closes the parent's ends of the child's
-stdout and stderr once its readers have finished (24 warnings in `tests.test_native_token_ci` before, 0 after). Its other
+stdout and stderr once its readers have finished (12 warnings in `tests.test_native_token_ci` before, printed on 24
+lines, 0 after): `Popen` closes them only in `__exit__` (python/cpython@`cbc944f4bc59639a444dd971c737788ba2283a91`
+`Lib/subprocess.py:1106-1113`), and the session does not use it as a context manager; since addendum 04 a test asserts
+both ends are closed. Its other
 P3s (retained source captures, and the locator, strict-consumer and hostname follow-ups) are in the pull request's
 Follow-ups.
+
+**Addendum 04 (the command center's, from the GPT read and its Claude micro at `6aaa204a`):** more P1s in the class,
+each the verifier certifying what it had not finished. An address escaped five or more times, or JSON nested four or
+more times in string values, behind a lone CR or RS framing (also an ordinary document whose lower levels are
+CR-framed, and an MCP answer one level up) went out, because the escape projection stopped after `PUBLISH_DEPTH` passes
+and the record views cut the multiline object, so the depth rule was never reached; and a host receipt's command
+`output_excerpt` holding JSON kept its escaped address, because the receipt scan decoded once. The class's fifth
+recurrence, so the verifier is one function now, `publication_views()` in `scripts/native_token_ci.py`, shared by
+`Run.publish` and the host-receipt scan (which imports it), and it fails closed:
+
+- the views are the text; the text with RFC 8259 7 escapes decoded, pass after pass; and every key and string value of
+  every JSON text under each framing the views read: the whole text, a line feed, `str.splitlines()`, universal
+  newlines, and records at RS, each whole across its line breaks (RFC 7464 2: a parser SHOULD continue past a
+  malformed record, rfc7464.txt:153-155, as jq does at jqlang/jq@`4467af7068b1bcd7f882defff6e7ea674c5357f4`
+  `src/jv_parse.c:785-807`). Within each, JSON texts are read in turn, a byte order mark between them is skipped
+  (RFC 8259 8.1, rfc8259.txt:494-498, as jq 1.8.1 does), and where none starts, reading resumes at the next line, a
+  lone CR included, as readline-then-`json.load` does; a line is decoded alone first, and the text after it only when
+  the line ends inside a JSON text, so the reading stays linear. Nested JSON in a string value is read too;
+- a check it cannot finish raises `Unverifiable`, which both surfaces refuse: escaping still undone after
+  `PUBLISH_DEPTH` passes, JSON nested deeper than `PUBLISH_DEPTH` levels, an object with a duplicate name, or JSON too
+  deep for Python's decoder (`RecursionError`). Text past the bound is refused whatever it holds;
+- the host-receipt scan judges every view with the reviewed-email waiver applied to each, so JSON held in a string is
+  read, and a receipt the views cannot finish is refused.
+
+The function sits in `native_token_ci.py` rather than a module of its own. The push gate's read analysis
+(`blueprints/runtime-workers/openhands/resolver/gate_reads.py`, `_executes`) counts a call into a module imported from
+outside the standard library as running its argument, so a separate module added an advisory unclassified location at
+`Run.publish`; a function in the analyzed file is read instead, and the advisory baseline is unchanged (line moves
+only). Because `host_receipts.py` imports it, `native_token_ci.py` joins the verdict-review gate's `TRUST_PATHS`, which
+lists every module the validators import (`tests/test_verdict_review_gate.py` derives that set).
+
+`Run.publish` also refuses a rewrite that would merge two names (an escaped address key beside a literal `<EMAIL>` key)
+or change a number as written (`1e400` to `Infinity`, a long decimal losing digits, `-0` to `0`, or a non-JSON
+constant); with nothing to clean, such a document keeps every byte. It rewrites only JSON it reads whole or by line
+feed; JSON in another framing that would need cleaning is refused by the verifier instead (none of the committed
+streams below is). JSON too deep for Python's decoder is refused with `PUBLISH_REFUSED` rather than raised. And the
+`noreply@` trailer exemption now keeps the local part's case (`(?-i:noreply)`), as RFC 5321 2.4 requires, so
+`NoReply@` is detected; only the domain ignores case.
+
+The regressions fail on `6aaa204a` (46 failures and 4 errors across the native-token, host-receipt and validate tests)
+and pass here. The command tests now read their payloads from files, so the argv publishes and the refusal is the
+output's (the GPT read's P3-6). 14 of 14 weakened copies fail them. A census on both heads
+gives the same result. Selector A takes every string under a `stdout` or `stderr` key, at any depth, in the tracked
+JSON files whose top-level `kind` is `native_cli_e2e` (26 files, 1,518 strings, 629 non-empty): all are published
+unchanged. Selector B takes the same strings in every tracked JSON file (198 files, 4,867 strings): none is refused,
+and `clean()` rewrites 17. On inputs of about 1.1 MB, one `publish()` takes at most 1.9 s here (1.65 s at `6aaa204a`).
+A truncated pretty document 300 levels deep takes 1.2 s (0.17 s), because each unclosed level is read across lines once.
 
 ## SOTA sources
 

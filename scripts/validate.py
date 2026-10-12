@@ -95,14 +95,15 @@ PRIVATE_CONTENT = (
     # not detected, though they are valid (CPython 3.13.16's email parser accepts them); no observed instance is
     # identity-bearing (at main 900835c6 this rule without the guard, over every tracked blob, finds 125 in 76 files,
     # each a backtick, quote or slash before an `@`-name such as `@AGENTS.md`; none is an address). Exempt: GitHub's
-    # users.noreply.github.com addresses, the noreply commit trailers of Anthropic and GitHub, the RFC 2606 reserved
-    # names exactly (example.com, example.net, example.org and their subdomains, and the .test, .example, .invalid and
-    # .localhost TLDs), and a systemd instance unit (systemd.unit(5): name@instance.service, the suffix a unit type
-    # that is not also a TLD; target is one, IANA list 2026101001). A "(" after a match exempts nothing. The last label
+    # users.noreply.github.com addresses, the noreply commit trailers of Anthropic and GitHub (the local part as written,
+    # RFC 5321 2.4), the RFC 2606 reserved names exactly (example.com, example.net, example.org and their subdomains,
+    # and the .test, .example, .invalid and .localhost TLDs), and a systemd instance unit (systemd.unit(5):
+    # name@instance.service, the suffix a unit type that is not also a TLD; target is one, IANA list 2026101001). A "("
+    # after a match exempts nothing. The last label
     # is letters or an IDNA A-label (RFC 5890 2.3.2.1: "xn--" and at most 59 more characters), as every TLD in the IANA
     # list is. DNS names ignore case (RFC 4343), so the rule does; Python lookbehinds are fixed-width.
     ("email address", re.compile(
-        r"(?<![\w.!#$%&'*+/=?^`{|}~-])(?![.!#$%&'*+/=?^_`{|}~-]*@)(?!noreply@(?:anthropic|github)\.com(?![\w-]|\.\w))"
+        r"(?<![\w.!#$%&'*+/=?^`{|}~-])(?![.!#$%&'*+/=?^_`{|}~-]*@)(?!(?-i:noreply)@(?:anthropic|github)\.com(?![\w-]|\.\w))"
         r"[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@"
         r"(?!(?:[A-Za-z0-9-]+\.)*(?:users\.noreply\.github\.com|example\.(?:com|net|org)"
         r"|[A-Za-z0-9-]+\.(?:test|example|invalid|localhost))(?![\w-]|\.\w))"

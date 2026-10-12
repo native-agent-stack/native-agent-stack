@@ -158,7 +158,8 @@ PUBLISHED_ALTERNATIVE_FIELDS = ("name", "repository", "disposition", "why_not_de
 # that runs it). A pull request that changes one of these and a verdict row, wave or sealed artifact
 # in the same comparison fails: the rules change first, on its own.
 # The list covers every repository module the gate and the validators it runs import, transitively
-# (scripts/host_receipts.py imports scripts/validate.py), and the rule inputs they read from a
+# (scripts/host_receipts.py imports scripts/validate.py, and scripts/native_token_ci.py for the
+# publication views it judges receipts with), and the rule inputs they read from a
 # checkout: the lane-provenance registry scripts/landscape.py reads from --root, the host-receipt
 # schema scripts/host_receipts.py reads and the lane-return schema record_verdicts.py reads.
 # tests/test_verdict_review_gate.py derives both: the imports by walking the modules' ast, and the
@@ -168,7 +169,7 @@ PUBLISHED_ALTERNATIVE_FIELDS = ("name", "repository", "disposition", "why_not_de
 TRUST_PATHS = (
     "scripts/verdict_review_gate.py", "scripts/landscape.py", "scripts/platform_status.py",
     "scripts/catalog_decisions.py", "scripts/host_receipts.py", "scripts/validate.py",
-    "scripts/host_name_scan.py",
+    "scripts/host_name_scan.py", "scripts/native_token_ci.py",
     "scripts/public_starred.py", "scripts/starred_convergence.py",
     "tools/sota-convergence/build_verdicts.py", "tools/sota-convergence/record_verdicts.py",
     "tools/sota-convergence/build_manifest.py", "tools/sota-convergence/lane_packets.py",

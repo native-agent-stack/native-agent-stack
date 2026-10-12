@@ -510,6 +510,56 @@ class ValidateFixtureTests(_ReceiptFixtureCase):
         self.assertIn("email address (decoded JSON value or key)", output)
         self.assertNotIn(an_address, output)
 
+    def test_an_escaped_address_in_json_held_by_an_excerpt_is_rejected(self):
+        # The GPT read at 6aaa204a (P1-2) and Codex's thread: the scan decoded the receipt once, so JSON held in a
+        # command's output excerpt kept its escaped address; json.loads(excerpt) gave it back. The receipt is now
+        # judged by every view native_token_ci.publication_views() gives, nested JSON in a string value too, in a value
+        # and a key.
+        backslash = chr(92)
+        an_address = "operator" + "@" + "company.com"
+        escaped = json.dumps({"email": an_address}).replace("@", backslash + "u0040")
+        for name, excerpt in (("value", escaped),
+                              ("key", json.dumps({an_address: 1}).replace("@", backslash + "u0040")),
+                              ("nested", json.dumps({"inner": escaped}))):
+            with self.subTest(where=name):
+                data = json.loads((FIXTURES / "valid.json").read_text(encoding="utf-8"))
+                data["catalog_revision"] = self.commit
+                data["commands"][0]["output_excerpt"] = excerpt
+                data["commands"][0]["output_sha256"] = hashlib.sha256(excerpt.encode()).hexdigest()
+                text = json.dumps(data, indent=2) + "\n"
+                self.assertNotIn(an_address, text)
+                host_dir = self.root / "evidence" / "hosts" / data["host"]["host_id"]
+                host_dir.mkdir(parents=True, exist_ok=True)
+                path = host_dir / f"{data['id']}.json"
+                path.write_text(text, encoding="utf-8")
+                _register(self.root, path.relative_to(self.root).as_posix())
+                exit_code, output = self._validate()
+                self.assertEqual(exit_code, 1, output)
+                self.assertIn("email address (decoded JSON value or key)", output)
+                self.assertNotIn(an_address, output)
+
+    def test_a_receipt_the_views_cannot_finish_is_rejected(self):
+        # The command center's addendum 04 at 4c916e14: a receipt whose views cannot be finished within the bound is
+        # refused, never certified. JSON nested past PUBLISH_DEPTH in an output excerpt (its innermost text has no
+        # quotes, so the receipt holds three levels of escaping and only the nesting bound applies), and escaping
+        # still undone after PUBLISH_DEPTH passes.
+        backslash = chr(92)
+        for name, excerpt in (("nested past the bound", json.dumps({"n": json.dumps({"n": json.dumps({"n": "[1]"})})})),
+                              ("escaped past the bound", "a" + backslash * 8 + "n")):
+            with self.subTest(shape=name):
+                data = json.loads((FIXTURES / "valid.json").read_text(encoding="utf-8"))
+                data["catalog_revision"] = self.commit
+                data["commands"][0]["output_excerpt"] = excerpt
+                data["commands"][0]["output_sha256"] = hashlib.sha256(excerpt.encode()).hexdigest()
+                host_dir = self.root / "evidence" / "hosts" / data["host"]["host_id"]
+                host_dir.mkdir(parents=True, exist_ok=True)
+                path = host_dir / f"{data['id']}.json"
+                path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+                _register(self.root, path.relative_to(self.root).as_posix())
+                exit_code, output = self._validate()
+                self.assertEqual(exit_code, 1, output)
+                self.assertIn("content the publication views cannot finish", output)
+
     def test_json_escaped_personal_home_path_in_key_is_rejected(self):
         # The same JSON-escape hiding technique, but in an object *key* (tool_versions is an
         # open object per the schema); the privacy scan must walk keys, not only values.

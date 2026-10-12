@@ -35,9 +35,11 @@ from pathlib import Path
 try:
     from .validate import PRIVATE_CONTENT, unreviewed_email
     from .catalog_decisions import InvalidDecisionIndex, safe_file, unique_json
+    from .native_token_ci import Unverifiable, publication_views
 except ImportError:  # running as a plain script, not a package
     from validate import PRIVATE_CONTENT, unreviewed_email
     from catalog_decisions import InvalidDecisionIndex, safe_file, unique_json
+    from native_token_ci import Unverifiable, publication_views
 
 
 SCHEMA_RELATIVE_PATH = "adoption/host-receipt.schema.json"
@@ -1440,12 +1442,20 @@ def validate_receipt_cross_references(root: Path, host_dir_name: str, path: Path
     for description in private(content):
         errors.append(f"{label}: contains possible {description}")
     # The raw-text scan above misses content a JSON escape hides (for example / in
-    # place of a literal '/', or \/ ): scan every decoded string value AND every key,
-    # recursively, from the parsed receipt as well.
-    if isinstance(receipt, dict):
-        for decoded_string in iter_receipt_strings(receipt):
-            for description in private(decoded_string):
-                errors.append(f"{label}: contains possible {description} (decoded JSON value or key)")
+    # place of a literal '/', or \/ ), JSON held in a string value (a command's output
+    # excerpt), and any framing a reader may use: judge every view
+    # native_token_ci.publication_views() gives, the views Run.publish's verifier reads
+    # too (the command center's addendum 04 at 4c916e14), and refuse a receipt whose
+    # views cannot be finished within their bound.
+    found = []
+    try:
+        for view in publication_views(content):
+            if view is not content:
+                found += [description for description in private(view) if description not in found]
+    except Unverifiable as refused:
+        errors.append(f"{label}: content the publication views cannot finish ({refused})")
+    for description in found:
+        errors.append(f"{label}: contains possible {description} (decoded JSON value or key)")
 
 
 def grandfather_file_expected(root: Path, relative_path: str) -> bool:
