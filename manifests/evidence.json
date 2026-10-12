@@ -18862,8 +18862,8 @@
     },
     {
       "path": "docs/decisions/2026-10-11-landscape-postrun-accounting.md",
-      "sha256": "4a442360a0b2c06e65845ac9825826fffdaa4427aff73e9da9d035deea7be9b4",
-      "bytes": 25738
+      "sha256": "9de5dd1f7185cc45a78cc18ebc6fa67fdbae9717c257743f1c0bcf932c72a0a4",
+      "bytes": 28149
     },
     {
       "path": "docs/decisions/2026-10-11-layer-resolution-protocol.md",
@@ -61987,8 +61987,8 @@
     },
     {
       "path": "tests/test_landscape_postrun.py",
-      "sha256": "96c8a527d6c4ec89656aa7a4c12aeaa6b93b768572891bf41511eedc535fa564",
-      "bytes": 27206
+      "sha256": "cbba81f4e89244236fff40cc397a108633ddf5a2d5840b8e8dae1def0340bf6a",
+      "bytes": 30013
     },
     {
       "path": "tests/test_landscape_sweep_harness.py",
@@ -63337,8 +63337,8 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/usage_record.py",
-      "sha256": "82fb8577634549dd2a4d4e8dc9ab5f8d4cad2f62a452924e58582743d2931546",
-      "bytes": 29929
+      "sha256": "07541f631bdb45a825ed23387b898bf30582042866385a553764acb1aa1f92bc",
+      "bytes": 30182
     },
     {
       "path": "tools/sota-convergence/lane-prompt.md",

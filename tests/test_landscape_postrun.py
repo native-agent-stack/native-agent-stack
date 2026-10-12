@@ -106,6 +106,44 @@ class CompletedSupersessionTests(unittest.TestCase):
         self.assertEqual(provenance["proof_sha256"], hashlib.sha256(published_preimage).hexdigest())
         self.assertNotIn(private_digest, published)
 
+    def test_public_cli_omits_unvalidated_metadata_inside_supersession_pairs(self):
+        identity = "pair-fixture-" + self.work.name + "@" + "example.org"
+        self.proof["supersessionPairs"][0]["capture_metadata"] = {
+            "nested": [{"contact": identity, "private_note": "synthetic pair capture"}]}
+        self.write("proof.json", self.proof)
+        done = self.run_usage(explicit=True)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        receipt = (self.work / "usage.json").read_text()
+        with self.subTest(publication="receipt"):
+            self.assertFalse(identity in receipt, "unvalidated pair metadata reaches the receipt")
+        with self.subTest(publication="cli"):
+            self.assertFalse(identity in done.stdout + done.stderr, "unvalidated pair metadata reaches CLI output")
+        provenance = json.loads(receipt)["measurement"]["post_processing"]["explicit_supersession"]
+        fields = {"label", "superseded_agent_id", "superseded_key", "superseded_by_agent_id", "superseded_by_key"}
+        for location in ("pairs", "proof"):
+            pairs = provenance["pairs"] if location == "pairs" else provenance["proof"]["supersessionPairs"]
+            with self.subTest(publication=location):
+                self.assertTrue(all(set(pair) == fields for pair in pairs), "published pairs exceed validated fields")
+        self.assertEqual(provenance["proof"]["supersessionPairs"], provenance["pairs"])
+        preimage = (json.dumps(provenance["proof"], indent=1, ensure_ascii=False) + "\n").encode()
+        self.assertEqual(provenance["proof_sha256"], hashlib.sha256(preimage).hexdigest())
+
+    def test_public_cli_omits_private_contract_and_journal_seals_and_prefixes(self):
+        done = self.run_usage(explicit=True)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        receipt = (self.work / "usage.json").read_text()
+        publications = {"receipt": receipt, "stdout": done.stdout, "stderr": done.stderr}
+        for source, field in (("contract.json", "contract_sha256"), ("journal.jsonl", "journal_sha256")):
+            digest = self.sha(source)
+            for location, text in publications.items():
+                with self.subTest(source=source, publication=location):
+                    self.assertFalse(digest[:7] in text.lower(), "private input seal or prefix reaches publication")
+                    self.assertNotIn(field, text)
+        provenance = json.loads(receipt)["measurement"]["post_processing"]["explicit_supersession"]
+        self.assertEqual(set(provenance), {"proof", "proof_sha256", "processor_sha256", "pairs"})
+        processor = HARNESS / "usage_record.py"
+        self.assertEqual(provenance["processor_sha256"], hashlib.sha256(processor.read_bytes()).hexdigest())
+
     def test_native_cli_requires_every_request_effort_to_be_known(self):
         run = self.work / "native"
         run.mkdir()
@@ -195,7 +233,8 @@ console.log(JSON.stringify(summarizeChild({agentId: 'fixture', label: 'fixture'}
         provenance = document["measurement"]["post_processing"]["explicit_supersession"]
         proof_bytes = (json.dumps(provenance["proof"], indent=1, ensure_ascii=False) + "\n").encode()
         self.assertEqual(provenance["proof_sha256"], hashlib.sha256(proof_bytes).hexdigest())
-        self.assertEqual(provenance["contract_sha256"], self.sha("contract.json"))
+        self.assertNotIn("contract_sha256", provenance)
+        self.assertNotIn("journal_sha256", provenance)
         by_id = {c["agent_id"]: c for c in usage["superseded_attempts"]}
         for child in self.raw["children"][:12]:
             retained = copy.deepcopy(by_id[child["agent_id"]])

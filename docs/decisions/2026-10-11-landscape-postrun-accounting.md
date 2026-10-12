@@ -312,3 +312,33 @@ excluded from the published proof preimage. Contract/journal authentication seal
 a usage receipt must stay private unless its publication representation binds only published safe bytes.
 The runtime synthetic-identity regression exercises the public CLI and distinguishes this digest from
 the original private proof digest. Public-file digests and the vendor executable identity are unchanged.
+
+## 2026-10-12 terminal correction: nested pair projection and private input seals
+
+The CC's 07:52:34Z gate addendum confirmed two publication defects at `43f3008e`:
+the validated pair dictionaries still carried caller-supplied extra fields, and the provenance object emitted
+the private contract and journal digests. The earlier projection claim was therefore incomplete. This
+correction follows that ruling and the native receipt path at
+`43f3008e:tools/sota-convergence/landscape-sweep/usage_record.py:143` (validated pair identities) and
+`43f3008e:tools/sota-convergence/landscape-sweep/sweep_common.py:56` (supported `json_text` serialization).
+The latter calls the standard library JSON writer and retains its final newline; no alternate writer or
+decoder is introduced.
+
+Every published pair now contains only the five validated identity fields, in both the redacted proof and
+the provenance pair list. Contract/journal hashes remain checked against the input proof before acceptance,
+but neither input seal is emitted. The published provenance retains only the redacted proof, its digest,
+the public processor digest and the validated pair list. The proof digest still authenticates the exact
+embedded redacted preimage; original input authentication stays in the private input files. No native
+history, chronology check, supersession identity or usage counter is changed.
+
+Two public-CLI regressions fail against `43f3008e` (two tests, six failures, exit 1): nested synthetic
+example.org metadata reaches the receipt and both pair lists, and the private input seals reach the receipt.
+After correction, all 15 postrun tests pass (exit 0). The regressions check the receipt and CLI streams,
+including each input seal's first seven hex characters, which also detects any longer leading fragment.
+They also retain positive checks for the embedded proof digest and public processor digest. Test fixtures
+and scratch are synthetic and use `/var/tmp`; the private originals and their digests are not published here.
+
+This moves #1032's already prepared pair projection into the owning publication-path fix in #995.
+#1032 retains the receipt sweep, append-only redaction bindings and wording cleanup; it is retargeted only
+after this corrected #995 lands. The reviewed heads and their historical residual remain subject to the
+previously recorded #161/#177 acceptance; no history rewrite or purge is claimed.
