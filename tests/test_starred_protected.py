@@ -36,8 +36,12 @@ class ProtectedCaptureTests(unittest.TestCase):
             path = root / "pyproject.toml"
             path.write_text('dependencies = ["pytest==9.1.1"]\n')
             git("add", "pyproject.toml")
-            git("-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid",
+            fixture_identity = "fixture" + "@" + "users.noreply.github.com"
+            git("-c", "user.name=Fixture", "-c", "user.email=" + fixture_identity,
                 "-c", "core.hooksPath=/dev/null", "commit", "-qm", "fixture")
+            address = git("show", "-s", "--format=%ae", "HEAD").decode().strip()
+            self.assertEqual(address.rpartition("@")[2], "users.noreply.github.com",
+                             "fixture commits require a public no-reply identity")
             head = git("rev-parse", "HEAD").decode().strip()
             path.write_text('dependencies = []\n')
             trees = [("fixture", root, head)]

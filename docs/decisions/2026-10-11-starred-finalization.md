@@ -53,10 +53,15 @@ Markdown decision records and their JSON attachments, workflow `uses:` pins,
 and dependency manifests and lockfiles from both repositories. It retains the
 first witness per repository per source, with its line, Git head and file hash.
 The public mirror projection contains 220 entries, matching 55 listed repositories.
-All 373 are conservatively protected because the retained decision attachment
-`docs/decisions/memory-adoption-835/g5-grand-catalog-ae6cc228.json` cites the
-whole list; 141 also have a mirror, Markdown decision, workflow or dependency
-witness. This does not change the 45 KEEP-MIRROR/328 KEEP decisions.
+All 373 are conservatively protected by the union of recorded witnesses. The
+retained decision attachment
+`docs/decisions/memory-adoption-835/g5-grand-catalog-ae6cc228.json` cites 368
+listed repositories. The other five have separate witnesses: astral-sh/ty,
+HKUDS/nanobot, languagetool-org/languagetool and microsoft/pyright are cited by
+`docs/decisions/2026-10-10-starred-repository-convergence.md`; microsoft/playwright
+has mirror, decision and dependency witnesses. Across the full union, 141 have
+a mirror, Markdown decision, workflow or dependency witness. This does not
+change the 45 KEEP-MIRROR/328 KEEP decisions.
 
 `scripts/starred_protected.py` is the committed producer. It replays the named
 Git trees and the embedded public repository/ref mirror projection without

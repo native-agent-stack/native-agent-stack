@@ -18937,8 +18937,8 @@
     },
     {
       "path": "docs/decisions/2026-10-11-starred-finalization.md",
-      "sha256": "1b68db23c42787d4b4cfdd661c0966459d981b562258f9b0071b9b81f7a2fe0a",
-      "bytes": 12144
+      "sha256": "76ad490df969d0ea9972b315fe0632e412380df1c43adc18b1369f0e7ac482a2",
+      "bytes": 12464
     },
     {
       "path": "docs/decisions/2026-10-12-mcp-template-live-reconciliation.md",
@@ -62912,8 +62912,8 @@
     },
     {
       "path": "tests/test_starred_protected.py",
-      "sha256": "f045395b855362eadf9efd2c685565c887639a791675e4c3fa7a58ca4b3a5aa1",
-      "bytes": 2676
+      "sha256": "9d389e681e9505922e62ef62c7abf3a959d69ca93ecf82df04adddb914e1677a",
+      "bytes": 2997
     },
     {
       "path": "tests/test_start_closure_sampler.py",
@@ -63407,8 +63407,8 @@
     },
     {
       "path": "tools/local-pages/source_policy.json",
-      "sha256": "78a4c1a3cd052d6a3a389894616cdffdfcde251e120ab673310a85c62b0dfa9e",
-      "bytes": 759542
+      "sha256": "d9d83f49c84e79f469f98af9c63ea098b98a8259a4b3bea67eabec265080ebc4",
+      "bytes": 759622
     },
     {
       "path": "tools/omniroute/gateway_record.py",
