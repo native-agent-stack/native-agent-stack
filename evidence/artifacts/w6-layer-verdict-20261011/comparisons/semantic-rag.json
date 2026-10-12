@@ -19,66 +19,88 @@
     {
       "repository": "https://github.com/giancarloerra/SocratiCode",
       "pin": "2218f25153d0f3f4a76ee240a5643dbc873e80be",
-      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
-      "upstream_role_ref": "README.md:36",
-      "upstream_install_ref": "README.md:793",
-      "upstream_test_ref": "README.md:1355"
+      "upstream_role_ref": "README.md:44",
+      "upstream_install_ref": "CONTRIBUTING.md:22",
+      "upstream_test_ref": "CONTRIBUTING.md:36",
+      "role_ids": [
+        "project_semantic_index",
+        "semantic_code_retrieval"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
     },
     {
       "repository": "https://github.com/qdrant/qdrant",
       "pin": "6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de",
-      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
       "upstream_role_ref": "README.md:22",
       "upstream_install_ref": null,
-      "upstream_test_ref": null
+      "upstream_test_ref": null,
+      "role_ids": [
+        "vector_storage"
+      ],
+      "dependency": true,
+      "selection_scope": "dependency qualification only; not ranked as a standalone end-to-end layer winner"
     },
     {
       "repository": "https://github.com/vllm-project/vllm",
       "pin": "db9527a46873454610df6dbedf79a36d6bf1a7f6",
-      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
-      "upstream_role_ref": "README.md:14",
+      "upstream_role_ref": "README.md:24",
       "upstream_install_ref": "README.md:69",
-      "upstream_test_ref": "pyproject.toml:63"
+      "upstream_test_ref": null,
+      "role_ids": [
+        "model_serving"
+      ],
+      "dependency": true,
+      "selection_scope": "dependency qualification only; not ranked as a standalone end-to-end layer winner"
     },
     {
       "repository": "https://github.com/ollama/ollama",
       "pin": "eab97e9f92b9a25c2d52d2cc6c1b1c99bd9fae21",
-      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
       "upstream_role_ref": "README.md:58",
       "upstream_install_ref": "README.md:16",
-      "upstream_test_ref": null
+      "upstream_test_ref": null,
+      "role_ids": [
+        "model_serving"
+      ],
+      "dependency": true,
+      "selection_scope": "dependency qualification only; not ranked as a standalone end-to-end layer winner"
     },
     {
       "repository": "https://github.com/OSU-NLP-Group/HippoRAG",
       "pin": "d5c8329422e0a0b834a15874545cb6a74b4f9b26",
-      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
-      "upstream_role_ref": "README.md:6",
+      "upstream_role_ref": "README.md:13",
       "upstream_install_ref": "README.md:48",
-      "upstream_test_ref": null
+      "upstream_test_ref": null,
+      "role_ids": [
+        "associative_semantic_retrieval"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
     },
     {
       "repository": "https://github.com/lightonai/next-plaid",
       "pin": "c6c091d7ee14c81206bb28af90d8ff506fd0235e",
-      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
       "upstream_role_ref": "README.md:22",
       "upstream_install_ref": "README.md:35",
-      "upstream_test_ref": "Makefile:15"
+      "upstream_test_ref": "Makefile:15",
+      "role_ids": [
+        "multivector_semantic_index"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
     },
     {
       "repository": "https://github.com/minishlab/semble",
       "pin": "0e5e02832ae0340c0feb637d2b7213fe065571fd",
-      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
       "upstream_role_ref": "README.md:3",
       "upstream_install_ref": "README.md:41",
-      "upstream_test_ref": "pyproject.toml:52"
-    },
-    {
-      "repository": "https://github.com/giancarloerra/SocratiCode",
-      "pin": "2218f25153d0f3f4a76ee240a5643dbc873e80be",
-      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
-      "upstream_role_ref": "README.md:36",
-      "upstream_install_ref": "README.md:793",
-      "upstream_test_ref": "README.md:1355"
+      "upstream_test_ref": "pyproject.toml:52",
+      "role_ids": [
+        "project_semantic_index",
+        "semantic_code_retrieval"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
     }
   ],
   "fixture_seal": [
@@ -96,7 +118,10 @@
     "which prefixes does embedding use (query: and passage:)",
     "which tool retrieves Markdown separately (QMD)",
     "negative query unsupported by sealed text",
-    "isolated add/update/delete/rename and restore"
+    "isolated add/update/delete/rename and restore",
+    "Native vector-store fixture: upsert the same sealed source payload/IDs, get exact values, delete/verify absence, restart and restore into an empty store",
+    "Native serving fixture: single/batched embedding of the sealed source/query text under the committed model seal; compare finite shape, identity and the seal's fixed parity oracle",
+    "Native multivector fixture: index/query exact sealed source membership, then add/delete/rename isolated copies and verify source membership and no cross-project result"
   ],
   "mandatory_checks": [
     "grounded answer accuracy and supporting source locations",
@@ -133,11 +158,78 @@
     "protected_window": "Heavy E2E during the CC's Monday window uses systemd-run --user --scope -p CPUWeight=idle; a full suite additionally needs SUITE-REQUEST and SUITE-GO."
   },
   "fixed_decision_rule": {
-    "eligibility": "Only arms passing every applicable mandatory check in all three repetitions with complete usage and upstream E2E at the run pin may qualify for their declared role",
+    "eligibility": "For each predeclared role, every mapped role check must pass in all three repetitions with complete usage and upstream E2E at the comparison's immutable source pin. Dependency arms qualify only their mapped interface and are never scored as standalone end-to-end candidates.",
     "rank": "For each role, maximize exact grounded-correct cases, then minimize total provider cost, then median elapsed time, then peak RSS. Compare only arms covering that same role; dependency components keep their own qualification receipts.",
     "tie": "Retain the existing qualified incumbent for that role if tied. Otherwise retain all exactly tied qualified arms with their measured equality; do not claim superiority.",
     "none_qualify": "Record RETIRED for the unsupported role with all failure/retirement reasons; do not promote an unqualified arm.",
-    "terminal": "Record FINAL only once the four protocol conditions hold for each selected role's winner; otherwise record the concrete unmet condition without claiming FINAL.",
+    "terminal": "FINAL requires every selected deployed winner's actual final-stack runs[] pin to match its adopted tested source, with verdict/wave/next_review, upstream E2E at that operational run pin and invoke evidence/role reason. An experimental source-pin receipt does not qualify a different historical operational run pin.",
     "amendments": "No new candidates or changed metrics after first run. Any necessary input correction requires a separately reviewed, hashed amendment before affected scoring."
-  }
+  },
+  "role_checks": {
+    "project_semantic_index": {
+      "case_ids": [
+        4
+      ],
+      "mandatory_checks": [
+        "Add/update/delete/rename catch-up in the deliberately indexed project",
+        "No cross-project leakage and empty-target restore equality"
+      ]
+    },
+    "semantic_code_retrieval": {
+      "case_ids": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "mandatory_checks": [
+        "Grounded answer/supporting location against the sealed source oracle",
+        "Correct absence for unsupported concept"
+      ]
+    },
+    "associative_semantic_retrieval": {
+      "case_ids": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "mandatory_checks": [
+        "Source-grounded associative retrieval on the same corpus",
+        "Isolation, deletion and restore retain exact source membership"
+      ]
+    },
+    "multivector_semantic_index": {
+      "case_ids": [
+        7
+      ],
+      "mandatory_checks": [
+        "Index/query exact sealed source membership with upstream's native multivector path",
+        "Incremental add/delete and project isolation preserve source oracle"
+      ]
+    },
+    "vector_storage": {
+      "case_ids": [
+        5
+      ],
+      "mandatory_checks": [
+        "Native upsert/get/delete preserves payload/ID set and rejects absent IDs",
+        "Scoped persistence/restart/empty-target restore preserve exact values"
+      ]
+    },
+    "model_serving": {
+      "case_ids": [
+        6
+      ],
+      "mandatory_checks": [
+        "Upstream native serving returns declared model identity and finite embedding shape",
+        "Use sealed model's prefixes/dimensions; batch and single results satisfy its fixed parity oracle",
+        "No provider identity substitution"
+      ]
+    }
+  },
+  "refrozen_at": "2026-10-12T00:52:20Z",
+  "amendment_authority": "CC adjudication-pr1021-4ddd4822-20261012.md: B1/B2/A1/A2, before any run",
+  "role_assignment_rule": "role_ids, dependency and role_checks are frozen here; no assignment or applicability change at execution/scoring time."
 }

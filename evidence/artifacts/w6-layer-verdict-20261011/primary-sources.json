@@ -2,10 +2,11 @@
   "schema_version": 1,
   "kind": "w6_mirror_primary_sources",
   "recorded_at": "2026-10-11T23:15:50Z",
+  "corrected_at": "2026-10-12T00:52:20Z",
   "mirror_root": "~/code/upstream",
-  "read_command": "GIT_NO_LAZY_FETCH=1 GIT_OPTIONAL_LOCKS=0 git show HEAD:<path>",
-  "scope": "Source review at actual HEAD, checked against MIRRORS.lock.json. Mirror pins are frozen comparison/source-review inputs; neither installed-run pins nor reused historical E2E qualifications.",
-  "missing_test_ref": "null means the reviewed primary files do not yet supply a supported test/E2E path; it is an explicit qualification gap, not a claim the upstream has no tests.",
+  "read_command": "GIT_NO_LAZY_FETCH=1 GIT_OPTIONAL_LOCKS=0 git show <MIRRORS.lock.json SHA>:<path>",
+  "scope": "Corrected advertised capability/install/test references at the lock commit. Source review is not measured performance or E2E.",
+  "missing_test_ref": "null is an explicit withdrawn/unbound qualification gap; not a claim the upstream has no tests.",
   "sources": [
     {
       "repository": "https://github.com/abhigyanpatwari/GitNexus",
@@ -28,7 +29,7 @@
       "pin": "f359d43b406057f1a8cdbc4ea93b827642c162e6",
       "manifest_ref": "f359d43b406057f1a8cdbc4ea93b827642c162e6",
       "mirror_status": "MIRRORED",
-      "role_ref": "README.md:5",
+      "role_ref": "plugins/pyright-lsp/README.md:3",
       "install_ref": null,
       "test_ref": null,
       "reviewed_files": [
@@ -46,14 +47,15 @@
       "mirror_status": "MIRRORED",
       "role_ref": "README.md:7",
       "install_ref": "README.md:116",
-      "test_ref": "README.md:187",
+      "test_ref": null,
       "reviewed_files": [
         {
           "path": "README.md",
           "sha256": "48b46aa50dd7803bc30a7ae85c6e8c4f560e6b765973698d8ddced3b6e3ad378"
         }
       ],
-      "evidence_class": "source_review"
+      "evidence_class": "source_review",
+      "test_gap": "The prior citation did not establish this claim and is withdrawn. Qualification requires a retained primary witness before execution."
     },
     {
       "repository": "https://github.com/datalab-to/marker",
@@ -77,7 +79,7 @@
       "manifest_ref": "b7f3dd0c5f6e6d66a298239ffd02b328b873918e",
       "mirror_status": "MIRRORED",
       "role_ref": "README.md:3",
-      "install_ref": "README.md:74",
+      "install_ref": "README.md:84",
       "test_ref": "pyproject.toml:90",
       "reviewed_files": [
         {
@@ -221,7 +223,7 @@
       "manifest_ref": "d75d42dbd92c518a4def19ac5895792828138d35",
       "mirror_status": "MIRRORED",
       "role_ref": "README.md:11",
-      "install_ref": "README.md:137",
+      "install_ref": "README.md:138",
       "test_ref": null,
       "reviewed_files": [
         {
@@ -236,7 +238,7 @@
       "pin": "d49ff64afffc1f47ab563dc1c589bc2f78808fa4",
       "manifest_ref": "d49ff64afffc1f47ab563dc1c589bc2f78808fa4",
       "mirror_status": "MIRRORED",
-      "role_ref": "README.md:85",
+      "role_ref": null,
       "install_ref": "README.md:159",
       "test_ref": null,
       "reviewed_files": [
@@ -245,7 +247,8 @@
           "sha256": "08e531fef07276bb5bb036d675c991d3fbf39dc3cc985a8dda1b4c468bacdb9f"
         }
       ],
-      "evidence_class": "source_review"
+      "evidence_class": "source_review",
+      "role_gap": "The prior citation did not establish this claim and is withdrawn. Qualification requires a retained primary witness before execution."
     },
     {
       "repository": "https://github.com/datalab-to/chandra",
@@ -284,7 +287,7 @@
       "pin": "d5c8329422e0a0b834a15874545cb6a74b4f9b26",
       "manifest_ref": "d5c8329422e0a0b834a15874545cb6a74b4f9b26",
       "mirror_status": "MIRRORED",
-      "role_ref": "README.md:6",
+      "role_ref": "README.md:13",
       "install_ref": "README.md:48",
       "test_ref": null,
       "reviewed_files": [
@@ -350,14 +353,15 @@
       "mirror_status": "MIRRORED",
       "role_ref": "README.md:7",
       "install_ref": "README.md:143",
-      "test_ref": "README.md:922",
+      "test_ref": null,
       "reviewed_files": [
         {
           "path": "README.md",
           "sha256": "8802e3a1a402f994ee847fbb541fef75e955f4bcdb9377887d1ad875db6eefa7"
         }
       ],
-      "evidence_class": "source_review"
+      "evidence_class": "source_review",
+      "test_gap": "The prior citation did not establish this claim and is withdrawn. Qualification requires a retained primary witness before execution."
     },
     {
       "repository": "https://github.com/MemPalace/MemPalace",
@@ -382,14 +386,15 @@
       "mirror_status": "MIRRORED",
       "role_ref": "README.md:12",
       "install_ref": "README.md:21",
-      "test_ref": "README.md:274",
+      "test_ref": null,
       "reviewed_files": [
         {
           "path": "README.md",
           "sha256": "bf91e7f924919337e9bc66538c5f987f0913b8557dead28cec8b10debf07faa7"
         }
       ],
-      "evidence_class": "source_review"
+      "evidence_class": "source_review",
+      "test_gap": "The prior citation did not establish this claim and is withdrawn. Qualification requires a retained primary witness before execution."
     },
     {
       "repository": "https://github.com/vbcherepanov/total-agent-memory",
@@ -412,7 +417,7 @@
       "pin": "a9eeed77f9bce99d8f97d39a30d3281747300824",
       "manifest_ref": "a9eeed77f9bce99d8f97d39a30d3281747300824",
       "mirror_status": "MIRRORED",
-      "role_ref": "README.md:5",
+      "role_ref": "README.md:24",
       "install_ref": "README.md:98",
       "test_ref": "CONTRIBUTING.md:94",
       "reviewed_files": [
@@ -445,12 +450,16 @@
       "manifest_ref": "e9c3b0126a3373eb1aeaca162e84d0791ff4c7f7",
       "mirror_status": "MIRRORED",
       "role_ref": "README.md:4",
-      "install_ref": "package.json:41",
+      "install_ref": "package.json:42",
       "test_ref": "package.json:48",
       "reviewed_files": [
         {
           "path": "README.md",
           "sha256": "08a2ffb7efbfd07dbadac74435f8cabb2a265cc3389dfcc4a3303b42c21a934f"
+        },
+        {
+          "path": "package.json",
+          "sha256": "bfd63123eb43f536b29ec35425a5fe807b293a3e1fcee34f63f73eedb2c9350b"
         }
       ],
       "evidence_class": "source_review"
@@ -524,13 +533,17 @@
       "pin": "092d3acd6bec3e3a14bdc7e7a2810ab628ab759d",
       "manifest_ref": "rust-v0.162.1",
       "mirror_status": "MIRRORED",
-      "role_ref": "README.md:64",
-      "install_ref": "README.md:19",
-      "test_ref": "justfile:47",
+      "role_ref": "README.md:1",
+      "install_ref": "README.md:42",
+      "test_ref": "justfile:87",
       "reviewed_files": [
         {
           "path": "README.md",
           "sha256": "ba4e1f69ff48386e72a9c5e1edaf76aad64a475c2d51af79ccba6d1128261ba7"
+        },
+        {
+          "path": "justfile",
+          "sha256": "9d7a65a494c2b771471c1bfd2edef164a4d22e27015966ad3d4b7af4f3ae2402"
         }
       ],
       "evidence_class": "source_review"
@@ -572,8 +585,8 @@
       "pin": "fd239d5d2be43d9b68329730206b9312c7d5a388",
       "manifest_ref": "v0.1.7",
       "mirror_status": "MIRRORED",
-      "role_ref": "README.md:8",
-      "install_ref": "README.md:51",
+      "role_ref": "README.md:10",
+      "install_ref": "README.md:63",
       "test_ref": null,
       "reviewed_files": [
         {
@@ -588,13 +601,17 @@
       "pin": "5b97e475790a11012ec6095d9a47c23f7f229cb9",
       "manifest_ref": "HEAD",
       "mirror_status": "MIRRORED",
-      "role_ref": "README.md:16",
+      "role_ref": "utils/pdftotext.cc:130",
       "install_ref": null,
       "test_ref": null,
       "reviewed_files": [
         {
           "path": "README.md",
           "sha256": "3a6d2dfa541596d6aac3eb0ea67cdfba1d015681e4c8283e6989c7bfb48f9d8a"
+        },
+        {
+          "path": "utils/pdftotext.cc",
+          "sha256": "e323a5939ee807d452e7f138156829d270dd7d93d92667eab22acc7eb09d83dc"
         }
       ],
       "evidence_class": "source_review"
@@ -604,13 +621,17 @@
       "pin": "2218f25153d0f3f4a76ee240a5643dbc873e80be",
       "manifest_ref": "v1.14.0",
       "mirror_status": "MIRRORED",
-      "role_ref": "README.md:36",
-      "install_ref": "README.md:793",
-      "test_ref": "README.md:1355",
+      "role_ref": "README.md:44",
+      "install_ref": "CONTRIBUTING.md:22",
+      "test_ref": "CONTRIBUTING.md:36",
       "reviewed_files": [
         {
           "path": "README.md",
           "sha256": "280f3c7b8415953c00885f489cb59bab10d6e3bc8637a32f7196165cc4cb700d"
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "sha256": "3eaf1d84b2d95288abe990dd2b4da3e7caf43c4dfafc0ee328fefd894c3cf758"
         }
       ],
       "evidence_class": "source_review"
@@ -636,16 +657,17 @@
       "pin": "db9527a46873454610df6dbedf79a36d6bf1a7f6",
       "manifest_ref": "v0.31.0",
       "mirror_status": "MIRRORED",
-      "role_ref": "README.md:14",
+      "role_ref": "README.md:24",
       "install_ref": "README.md:69",
-      "test_ref": "pyproject.toml:63",
+      "test_ref": null,
       "reviewed_files": [
         {
           "path": "README.md",
           "sha256": "8d2e7cd8d120bcd91ddfa85ef957f7246021b4a3f46f2e1f4ccf084ec6c20026"
         }
       ],
-      "evidence_class": "source_review"
+      "evidence_class": "source_review",
+      "test_gap": "The prior citation did not establish this claim and is withdrawn. Qualification requires a retained primary witness before execution."
     },
     {
       "repository": "https://github.com/akitaonrails/ai-memory",

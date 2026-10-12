@@ -19,58 +19,86 @@
     {
       "repository": "https://github.com/tavily-ai/tavily-cli",
       "pin": "fd745230e6756933e3a190bfdc61ea1eb2db3993",
-      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
       "upstream_role_ref": "README.md:3",
       "upstream_install_ref": "README.md:28",
-      "upstream_test_ref": "pyproject.toml:52"
+      "upstream_test_ref": "pyproject.toml:52",
+      "role_ids": [
+        "web_primary_source_retrieval"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
     },
     {
       "repository": "https://github.com/vercel-labs/agent-browser",
       "pin": "aff6125c023b810ea3f2e5deec5379e9a4270bdc",
-      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
       "upstream_role_ref": "README.md:1",
       "upstream_install_ref": "README.md:20",
-      "upstream_test_ref": "package.json:33"
+      "upstream_test_ref": "package.json:33",
+      "role_ids": [
+        "interactive_browser_retrieval"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
     },
     {
       "repository": "https://github.com/alphaXiv/OpenResearch",
       "pin": "24e404ecbe19cb9184ea8177e8e9f90d4f3205b0",
-      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
       "upstream_role_ref": "README.md:5",
       "upstream_install_ref": "README.md:36",
-      "upstream_test_ref": null
+      "upstream_test_ref": null,
+      "role_ids": [
+        "paper_primary_source_retrieval"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
     },
     {
       "repository": "https://github.com/exa-labs/exa-mcp-server",
       "pin": "e9c3b0126a3373eb1aeaca162e84d0791ff4c7f7",
-      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
       "upstream_role_ref": "README.md:4",
-      "upstream_install_ref": "package.json:41",
-      "upstream_test_ref": "package.json:48"
+      "upstream_install_ref": "package.json:42",
+      "upstream_test_ref": "package.json:48",
+      "role_ids": [
+        "web_primary_source_retrieval"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
     },
     {
       "repository": "https://github.com/adbar/trafilatura",
       "pin": "e2f85c965662c7df26b73290ef175b2c2a5fdca6",
-      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
       "upstream_role_ref": "README.md:1",
       "upstream_install_ref": "CONTRIBUTING.md:30",
-      "upstream_test_ref": "CONTRIBUTING.md:31"
+      "upstream_test_ref": "CONTRIBUTING.md:31",
+      "role_ids": [
+        "web_content_extraction"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
     },
     {
       "repository": "https://github.com/openai/codex",
       "pin": "092d3acd6bec3e3a14bdc7e7a2810ab628ab759d",
-      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
-      "upstream_role_ref": "README.md:64",
-      "upstream_install_ref": "README.md:19",
-      "upstream_test_ref": "justfile:47"
+      "upstream_role_ref": "README.md:1",
+      "upstream_install_ref": "README.md:42",
+      "upstream_test_ref": "justfile:87",
+      "role_ids": [
+        "web_primary_source_retrieval"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
     },
     {
       "repository": "https://github.com/webrecorder/browsertrix-crawler",
       "pin": "b8c38c4da141e855212d65ac714bfe663d178557",
-      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
       "upstream_role_ref": "README.md:1",
       "upstream_install_ref": null,
-      "upstream_test_ref": "package.json:15"
+      "upstream_test_ref": "package.json:15",
+      "role_ids": [
+        "web_evidence_capture"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
     }
   ],
   "fixture_seal": [
@@ -87,7 +115,8 @@
     "local greeting form: Ready then Hello, W6!",
     "extract the sealed public RAG note served from disposable loopback server",
     "invalid page retained as failure",
-    "close owned browser/crawler session"
+    "close owned browser/crawler session",
+    "Use the fixed primary source identities from the already-retained wave and the sealed local source artifact; return exact identity/version or retained invalid-ID failure, without new paper discovery"
   ],
   "mandatory_checks": [
     "exact browser status text",
@@ -124,11 +153,66 @@
     "protected_window": "Heavy E2E during the CC's Monday window uses systemd-run --user --scope -p CPUWeight=idle; a full suite additionally needs SUITE-REQUEST and SUITE-GO."
   },
   "fixed_decision_rule": {
-    "eligibility": "Only arms passing every applicable mandatory check in all three repetitions with complete usage and upstream E2E at the run pin may qualify for their declared role",
+    "eligibility": "For each predeclared role, every mapped role check must pass in all three repetitions with complete usage and upstream E2E at the comparison's immutable source pin. Dependency arms qualify only their mapped interface and are never scored as standalone end-to-end candidates.",
     "rank": "For each role, maximize exact grounded-correct cases, then minimize total provider cost, then median elapsed time, then peak RSS. Compare only arms covering that same role; dependency components keep their own qualification receipts.",
     "tie": "Retain the existing qualified incumbent for that role if tied. Otherwise retain all exactly tied qualified arms with their measured equality; do not claim superiority.",
     "none_qualify": "Record RETIRED for the unsupported role with all failure/retirement reasons; do not promote an unqualified arm.",
-    "terminal": "Record FINAL only once the four protocol conditions hold for each selected role's winner; otherwise record the concrete unmet condition without claiming FINAL.",
+    "terminal": "FINAL requires every selected deployed winner's actual final-stack runs[] pin to match its adopted tested source, with verdict/wave/next_review, upstream E2E at that operational run pin and invoke evidence/role reason. An experimental source-pin receipt does not qualify a different historical operational run pin.",
     "amendments": "No new candidates or changed metrics after first run. Any necessary input correction requires a separately reviewed, hashed amendment before affected scoring."
-  }
+  },
+  "role_checks": {
+    "interactive_browser_retrieval": {
+      "case_ids": [
+        0,
+        3
+      ],
+      "mandatory_checks": [
+        "Exact Ready then Hello, W6! DOM state",
+        "All per-step exits/failures retained and owned browser closes"
+      ]
+    },
+    "web_primary_source_retrieval": {
+      "case_ids": [
+        1,
+        2
+      ],
+      "mandatory_checks": [
+        "Return the intended frozen primary target and attributable exact extraction",
+        "Retain invalid-target failure and complete provider/runtime usage"
+      ]
+    },
+    "web_content_extraction": {
+      "case_ids": [
+        1,
+        2
+      ],
+      "mandatory_checks": [
+        "Exact sealed page text/metadata extraction",
+        "Invalid page/fetch is retained as failure"
+      ]
+    },
+    "paper_primary_source_retrieval": {
+      "case_ids": [
+        4
+      ],
+      "mandatory_checks": [
+        "Retrieve only the fixed retained paper/source identity, never a new discovery search",
+        "Exact source/version attribution and invalid-ID failure retained"
+      ]
+    },
+    "web_evidence_capture": {
+      "case_ids": [
+        1,
+        2,
+        3
+      ],
+      "mandatory_checks": [
+        "Owned crawler/archive preserves exact frozen page bytes and attribution",
+        "Invalid capture and session cleanup retained; archival evidence is not a QA answer"
+      ]
+    }
+  },
+  "refrozen_at": "2026-10-12T00:52:20Z",
+  "amendment_authority": "CC adjudication-pr1021-4ddd4822-20261012.md: B1/B2/A1/A2, before any run",
+  "role_assignment_rule": "role_ids, dependency and role_checks are frozen here; no assignment or applicability change at execution/scoring time."
 }

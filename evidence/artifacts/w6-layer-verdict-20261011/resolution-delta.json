@@ -40,14 +40,11 @@
   },
   "grand_catalog_handling": "Hash-bound boundary retained. WATCH/reference rows are inventory, not measured qualified survivors; admission requires a named changed-evidence/requirement gap and a pre-run amendment. No row is silently promoted or re-surveyed.",
   "count_basis": "33 pre-revote cumulative ledger inputs reconstructed using saturation_ledger.refuted_by_absence and case-insensitive GitHub repository identity; each gets an explicit disposition. Pi is additional changed evidence from the scoped re-vote. This is a conservative carry-forward input census, not a claim of 33 currently undecided merits after later adjudications.",
-  "later_adjudication_boundary": "The 10-02 native-memory deployment verdict settles the listed deployment roles. Do not relaunch that closed decision unit or infer a benchmark failure. Remaining named survivor roles form the new bounded W6 comparison.",
+  "later_adjudication_boundary": "The Mac-only 10-02 verdict is background, not a current-host merit disposition. Every cumulative memory input, including the four A2 candidates, is in durable-memory's comparison. Newest-model measured merit and no incumbent protection govern.",
   "layers": [
     {
       "catalog": "foundation",
       "layer_id": "native-clients",
-      "wave_ref": "catalogs/sota-convergence/layer-verdicts-20260922.json#/catalogs/foundation/10",
-      "next_review": null,
-      "next_review_gap": "Absent in the consumed catalog row and applicable verdict wave; condition 1 cannot be claimed complete from those records.",
       "catalog_ref": "catalogs/landscape/foundation.json#/layers/0",
       "catalog_sha256": "868d193a31080ab913400725140bd0d01e0afe97e28564fd12777f737d22951a",
       "row_sha256": "481be0025e5459cb48b93f94e056ce00ccfcbd1122ba2b29d929d293ad3c0a4d",
@@ -146,18 +143,132 @@
       ],
       "comparison_id": "w6-foundation-native-clients-20261011",
       "preregistration_ref": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/native-clients.json",
-      "terminal_state": null,
-      "terminal_readiness": "#1007 LANDED relay; then apply the protocol to the recorded evidence",
+      "terminal_state": "SCHEDULED",
+      "terminal_readiness": "#1007 LANDED satisfied; remaining pinned-runtime comparison inputs are explicitly unmet",
       "bounded_next_action": "Qualify only the frozen existing candidates on the retained cases through the named native/upstream paths. No new discovery.",
       "evidence_class": "source_review",
-      "preregistration_sha256": "218bf9847e57c5a4ec80b306b9a58bea38b64ade614456b536c1531b284f6c37"
+      "preregistration_sha256": "521b7cd99c4570a18a1481a9b07959084641b79fe810fab958632d0ffbf4004d",
+      "wave_ref": "catalogs/sota-convergence/layer-verdicts-20260922.json#/catalogs/foundation/10",
+      "next_review": "2026-10-22",
+      "next_review_gap": null,
+      "terminal_evidence": {
+        "state": "SCHEDULED",
+        "recorded_at": "2026-10-12T00:11:19Z",
+        "readiness_relay": {
+          "pr": 1007,
+          "merge_commit": "c2dee173",
+          "co_op_direction_at": "2026-10-11T23:35:52Z",
+          "satisfied": true
+        },
+        "comparison_id": "w6-foundation-native-clients-20261011",
+        "preregistration_ref": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/native-clients.json",
+        "preregistration_sha256": "521b7cd99c4570a18a1481a9b07959084641b79fe810fab958632d0ffbf4004d",
+        "resolution_winners": [],
+        "final_stack_source": {
+          "commit": "c2dee173",
+          "path": "catalogs/landscape/final-stack.json",
+          "sha256": "2dd68f39d3a0ab12894cf49343f49ff9e22c2fdef9a0d6d4e751ef88ef1f1eab",
+          "reader_script_sha256": "82742dea85a9d2f9c7579a1069947975b4033265cf55f1e1baa232d10767a317",
+          "reader_api": [
+            "run_pin",
+            "is_definitive"
+          ],
+          "row": {
+            "catalog": "foundation",
+            "layer_id": "native-clients",
+            "manifest_status": "reopened",
+            "next_review": "2026-10-22",
+            "winners": [
+              {
+                "component_id": "claude-code",
+                "repository": "https://github.com/anthropics/claude-code",
+                "historical_verdict_pin": "2.1.278",
+                "pin_drift": "differs",
+                "run_id": "claude-code",
+                "run_pin": "2.1.295",
+                "run_source": "adoption/pins-linux-x86_64.json#/tools/4",
+                "reader_result": {
+                  "definitive": false,
+                  "reason": "reopened",
+                  "layers": [
+                    "foundation/native-clients"
+                  ]
+                }
+              },
+              {
+                "component_id": "codex",
+                "repository": "https://github.com/openai/codex",
+                "historical_verdict_pin": "0.155.1",
+                "pin_drift": "differs",
+                "run_id": "codex",
+                "run_pin": "0.160.0",
+                "run_source": "adoption/pins-linux-x86_64.json#/tools/3",
+                "reader_result": {
+                  "definitive": false,
+                  "reason": "reopened",
+                  "layers": [
+                    "foundation/native-clients"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        "reason": "Historical winner run-pin entries are present, but the landed reader returns reopened rather than definitive. The cited fixtures/source review do not establish every winner's upstream-owned E2E at the run pin and invoke qualification. The frozen role-scoped comparison supplies the committed procedure; the catalog's historical winners are not newly qualified W6 winners.",
+        "readiness_trigger": [
+          "Exact arm binaries and their source pins verified in disposable environments through their own supported install paths",
+          "Each arm has its upstream-owned test/E2E recipe and a pinned receipt, or a retained substantive reason its scoped role is retired",
+          "Fixture hashes and complete usage instrumentation reproduce before the first arm",
+          "An isolated native runner is available without modifying the paper units, sealed bundles, Monday recorders or other lanes"
+        ],
+        "readiness_satisfied": [
+          "#1007 LANDED relay",
+          "retained fixture seals and exact source pins"
+        ],
+        "readiness_unmet": [
+          "arm runtime/upstream E2E receipts at the frozen pins",
+          "complete usage-instrumentation freeze and scoped native invoke/role evidence",
+          "isolated queued native runner"
+        ],
+        "comparison_ready": false,
+        "fixed_decision_rule": {
+          "eligibility": "For each predeclared role, every mapped role check must pass in all three repetitions with complete usage and upstream E2E at the comparison's immutable source pin. Dependency arms qualify only their mapped interface and are never scored as standalone end-to-end candidates.",
+          "rank": "For each role, maximize exact grounded-correct cases, then minimize total provider cost, then median elapsed time, then peak RSS. Compare only arms covering that same role; dependency components keep their own qualification receipts.",
+          "tie": "Retain the existing qualified incumbent for that role if tied. Otherwise retain all exactly tied qualified arms with their measured equality; do not claim superiority.",
+          "none_qualify": "Record RETIRED for the unsupported role with all failure/retirement reasons; do not promote an unqualified arm.",
+          "terminal": "FINAL requires every selected deployed winner's actual final-stack runs[] pin to match its adopted tested source, with verdict/wave/next_review, upstream E2E at that operational run pin and invoke evidence/role reason. An experimental source-pin receipt does not qualify a different historical operational run pin.",
+          "amendments": "No new candidates or changed metrics after first run. Any necessary input correction requires a separately reviewed, hashed amendment before affected scoring."
+        },
+        "frozen_scope": "Refrozen under B1/B2/A2 with explicit roles/dependencies/checks/cases and corrected citations before any run; current hash above supersedes original.",
+        "evidence_class": "source_review",
+        "final_claim": false,
+        "next_review": "2026-10-22",
+        "run_pin_reconciliation": {
+          "claude-code": {
+            "operational_run_pin": "2.1.295",
+            "operational_run_source": "adoption/pins-linux-x86_64.json#/tools/4",
+            "comparison_source_pin": "3deb873687379f0c199a69fdaccc65f0865f7a29",
+            "comparison_source_release": "HEAD",
+            "reason": "The locked exact source governs the experiment; HEAD/version-only pin equivalence is not assumed. The deployed winner's four FINAL conditions remain separately required.",
+            "receipt_transfer_allowed": false,
+            "final_requirement": "Supported adoption into matching runs[] then upstream E2E and invoke at that operational pin."
+          },
+          "codex": {
+            "operational_run_pin": "0.160.0",
+            "operational_run_source": "adoption/pins-linux-x86_64.json#/tools/3",
+            "comparison_source_pin": "092d3acd6bec3e3a14bdc7e7a2810ab628ab759d",
+            "comparison_source_release": "rust-v0.162.1",
+            "reason": "Frozen 0.162.1 is the current locked changed-mechanism candidate; operational 0.160.0 is historical. Comparison evidence governs the experimental source only. FINAL needs supported adoption into matching runs[] plus E2E and invoke at that operational pin.",
+            "receipt_transfer_allowed": false,
+            "final_requirement": "Supported adoption into matching runs[] then upstream E2E and invoke at that operational pin."
+          }
+        }
+      },
+      "next_review_ref": "c2dee173:catalogs/landscape/final-stack.json (this layer's verdict.next_review)"
     },
     {
       "catalog": "foundation",
       "layer_id": "code-navigation",
-      "wave_ref": "catalogs/sota-convergence/layer-verdicts-20260922.json#/catalogs/foundation/2",
-      "next_review": null,
-      "next_review_gap": "Absent in the consumed catalog row and applicable verdict wave; condition 1 cannot be claimed complete from those records.",
       "catalog_ref": "catalogs/landscape/foundation.json#/layers/4",
       "catalog_sha256": "868d193a31080ab913400725140bd0d01e0afe97e28564fd12777f737d22951a",
       "row_sha256": "e3ac6021ddfc66be26dd8f784c5172256e375682bebc3c8f9b83eb9377b94b0d",
@@ -224,13 +335,13 @@
           "origin_sweep": "landscape-sweep-20260929",
           "input_kind": "survivor",
           "disposition": "included_in_frozen_comparison",
-          "reason": "Retained survivor or missing vote leaves a scoped qualification gap; source review does not establish a winner.",
+          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
           "comparison_id": "w6-foundation-code-navigation-20261011",
           "adjudication_ref": null,
           "source": {
             "repository": "https://github.com/anthropics/claude-plugins-official",
             "pin": "f359d43b406057f1a8cdbc4ea93b827642c162e6",
-            "ref": "README.md:5",
+            "ref": "README.md:3",
             "evidence_class": "source_review"
           }
         },
@@ -239,7 +350,7 @@
           "origin_sweep": "landscape-sweep-20260929",
           "input_kind": "survivor",
           "disposition": "included_in_frozen_comparison",
-          "reason": "Retained survivor or missing vote leaves a scoped qualification gap; source review does not establish a winner.",
+          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
           "comparison_id": "w6-foundation-code-navigation-20261011",
           "adjudication_ref": null,
           "source": {
@@ -254,7 +365,7 @@
           "origin_sweep": "landscape-sweep-20260929",
           "input_kind": "survivor",
           "disposition": "included_in_frozen_comparison",
-          "reason": "Retained survivor or missing vote leaves a scoped qualification gap; source review does not establish a winner.",
+          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
           "comparison_id": "w6-foundation-code-navigation-20261011",
           "adjudication_ref": null,
           "source": {
@@ -268,18 +379,107 @@
       "changed_evidence": [],
       "comparison_id": "w6-foundation-code-navigation-20261011",
       "preregistration_ref": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/code-navigation.json",
-      "terminal_state": null,
-      "terminal_readiness": "#1007 LANDED relay; then apply the protocol to the recorded evidence",
+      "terminal_state": "SCHEDULED",
+      "terminal_readiness": "#1007 LANDED satisfied; remaining pinned-runtime comparison inputs are explicitly unmet",
       "bounded_next_action": "Qualify only the frozen existing candidates on the retained cases through the named native/upstream paths. No new discovery.",
       "evidence_class": "source_review",
-      "preregistration_sha256": "9f560c450c03c6c5f8315afa5d995b6e0de4591f59dbb3b5716a1f738309a84a"
+      "preregistration_sha256": "6a67cd1a1b024b83f4ac2240c6ae0e38e8e8f852fa4bbdbd5f0e2aaa9ce9ca5a",
+      "wave_ref": "catalogs/sota-convergence/layer-verdicts-20260922.json#/catalogs/foundation/2",
+      "next_review": "2026-10-22",
+      "next_review_gap": null,
+      "terminal_evidence": {
+        "state": "SCHEDULED",
+        "recorded_at": "2026-10-12T00:11:19Z",
+        "readiness_relay": {
+          "pr": 1007,
+          "merge_commit": "c2dee173",
+          "co_op_direction_at": "2026-10-11T23:35:52Z",
+          "satisfied": true
+        },
+        "comparison_id": "w6-foundation-code-navigation-20261011",
+        "preregistration_ref": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/code-navigation.json",
+        "preregistration_sha256": "6a67cd1a1b024b83f4ac2240c6ae0e38e8e8f852fa4bbdbd5f0e2aaa9ce9ca5a",
+        "resolution_winners": [],
+        "final_stack_source": {
+          "commit": "c2dee173",
+          "path": "catalogs/landscape/final-stack.json",
+          "sha256": "2dd68f39d3a0ab12894cf49343f49ff9e22c2fdef9a0d6d4e751ef88ef1f1eab",
+          "reader_script_sha256": "82742dea85a9d2f9c7579a1069947975b4033265cf55f1e1baa232d10767a317",
+          "reader_api": [
+            "run_pin",
+            "is_definitive"
+          ],
+          "row": {
+            "catalog": "foundation",
+            "layer_id": "code-navigation",
+            "manifest_status": "reopened",
+            "next_review": "2026-10-22",
+            "winners": [
+              {
+                "component_id": "serena",
+                "repository": "https://github.com/oraios/serena",
+                "historical_verdict_pin": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+                "pin_drift": "same",
+                "run_id": "serena",
+                "run_pin": "2.0.0.dev0",
+                "run_source": "adoption/pins-linux-x86_64.json#/tools/19",
+                "reader_result": {
+                  "definitive": false,
+                  "reason": "reopened",
+                  "layers": [
+                    "foundation/code-navigation"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        "reason": "Historical winner run-pin entries are present, but the landed reader returns reopened rather than definitive. The cited fixtures/source review do not establish every winner's upstream-owned E2E at the run pin and invoke qualification. The frozen role-scoped comparison supplies the committed procedure; the catalog's historical winners are not newly qualified W6 winners.",
+        "readiness_trigger": [
+          "Exact arm binaries and their source pins verified in disposable environments through their own supported install paths",
+          "Each arm has its upstream-owned test/E2E recipe and a pinned receipt, or a retained substantive reason its scoped role is retired",
+          "Fixture hashes and complete usage instrumentation reproduce before the first arm",
+          "An isolated native runner is available without modifying the paper units, sealed bundles, Monday recorders or other lanes"
+        ],
+        "readiness_satisfied": [
+          "#1007 LANDED relay",
+          "retained fixture seals and exact source pins"
+        ],
+        "readiness_unmet": [
+          "arm runtime/upstream E2E receipts at the frozen pins",
+          "complete usage-instrumentation freeze and scoped native invoke/role evidence",
+          "isolated queued native runner"
+        ],
+        "comparison_ready": false,
+        "fixed_decision_rule": {
+          "eligibility": "For each predeclared role, every mapped role check must pass in all three repetitions with complete usage and upstream E2E at the comparison's immutable source pin. Dependency arms qualify only their mapped interface and are never scored as standalone end-to-end candidates.",
+          "rank": "For each role, maximize exact grounded-correct cases, then minimize total provider cost, then median elapsed time, then peak RSS. Compare only arms covering that same role; dependency components keep their own qualification receipts.",
+          "tie": "Retain the existing qualified incumbent for that role if tied. Otherwise retain all exactly tied qualified arms with their measured equality; do not claim superiority.",
+          "none_qualify": "Record RETIRED for the unsupported role with all failure/retirement reasons; do not promote an unqualified arm.",
+          "terminal": "FINAL requires every selected deployed winner's actual final-stack runs[] pin to match its adopted tested source, with verdict/wave/next_review, upstream E2E at that operational run pin and invoke evidence/role reason. An experimental source-pin receipt does not qualify a different historical operational run pin.",
+          "amendments": "No new candidates or changed metrics after first run. Any necessary input correction requires a separately reviewed, hashed amendment before affected scoring."
+        },
+        "frozen_scope": "Refrozen under B1/B2/A2 with explicit roles/dependencies/checks/cases and corrected citations before any run; current hash above supersedes original.",
+        "evidence_class": "source_review",
+        "final_claim": false,
+        "next_review": "2026-10-22",
+        "run_pin_reconciliation": {
+          "serena": {
+            "operational_run_pin": "2.0.0.dev0",
+            "operational_run_source": "adoption/pins-linux-x86_64.json#/tools/19",
+            "comparison_source_pin": "1de556f71569f3acfc0743e526dd60aca40a545e",
+            "comparison_source_release": "HEAD",
+            "reason": "The locked exact source governs the experiment; HEAD/version-only pin equivalence is not assumed. The deployed winner's four FINAL conditions remain separately required.",
+            "receipt_transfer_allowed": false,
+            "final_requirement": "Supported adoption into matching runs[] then upstream E2E and invoke at that operational pin."
+          }
+        }
+      },
+      "next_review_ref": "c2dee173:catalogs/landscape/final-stack.json (this layer's verdict.next_review)"
     },
     {
       "catalog": "foundation",
       "layer_id": "document-retrieval",
-      "wave_ref": "catalogs/sota-convergence/layer-verdicts-20260922.json#/catalogs/foundation/3",
-      "next_review": null,
-      "next_review_gap": "Absent in the consumed catalog row and applicable verdict wave; condition 1 cannot be claimed complete from those records.",
       "catalog_ref": "catalogs/landscape/foundation.json#/layers/5",
       "catalog_sha256": "868d193a31080ab913400725140bd0d01e0afe97e28564fd12777f737d22951a",
       "row_sha256": "d218028aa6536cf129c2b8928cea120a38fcfc8ab1f192c4d0025043ea12f197",
@@ -357,7 +557,7 @@
           "origin_sweep": "landscape-sweep-20260923",
           "input_kind": "survivor",
           "disposition": "included_in_frozen_comparison",
-          "reason": "Retained survivor or missing vote leaves a scoped qualification gap; source review does not establish a winner.",
+          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
           "comparison_id": "w6-foundation-document-retrieval-20261011",
           "adjudication_ref": null,
           "source": {
@@ -372,7 +572,7 @@
           "origin_sweep": "landscape-sweep-20260929",
           "input_kind": "survivor",
           "disposition": "included_in_frozen_comparison",
-          "reason": "Retained survivor or missing vote leaves a scoped qualification gap; source review does not establish a winner.",
+          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
           "comparison_id": "w6-foundation-document-retrieval-20261011",
           "adjudication_ref": null,
           "source": {
@@ -387,7 +587,7 @@
           "origin_sweep": "landscape-sweep-20260929",
           "input_kind": "survivor",
           "disposition": "included_in_frozen_comparison",
-          "reason": "Retained survivor or missing vote leaves a scoped qualification gap; source review does not establish a winner.",
+          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
           "comparison_id": "w6-foundation-document-retrieval-20261011",
           "adjudication_ref": null,
           "source": {
@@ -402,7 +602,7 @@
           "origin_sweep": "landscape-sweep-20260926",
           "input_kind": "missing_vote",
           "disposition": "included_in_frozen_comparison",
-          "reason": "Retained survivor or missing vote leaves a scoped qualification gap; source review does not establish a winner.",
+          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
           "comparison_id": "w6-foundation-document-retrieval-20261011",
           "adjudication_ref": null,
           "source": {
@@ -417,7 +617,7 @@
           "origin_sweep": "landscape-sweep-20260926",
           "input_kind": "missing_vote",
           "disposition": "included_in_frozen_comparison",
-          "reason": "Retained survivor or missing vote leaves a scoped qualification gap; source review does not establish a winner.",
+          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
           "comparison_id": "w6-foundation-document-retrieval-20261011",
           "adjudication_ref": null,
           "source": {
@@ -432,7 +632,7 @@
           "origin_sweep": "landscape-sweep-20260929",
           "input_kind": "survivor",
           "disposition": "included_in_frozen_comparison",
-          "reason": "Retained survivor or missing vote leaves a scoped qualification gap; source review does not establish a winner.",
+          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
           "comparison_id": "w6-foundation-document-retrieval-20261011",
           "adjudication_ref": null,
           "source": {
@@ -447,7 +647,7 @@
           "origin_sweep": "landscape-sweep-20260929",
           "input_kind": "survivor",
           "disposition": "included_in_frozen_comparison",
-          "reason": "Retained survivor or missing vote leaves a scoped qualification gap; source review does not establish a winner.",
+          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
           "comparison_id": "w6-foundation-document-retrieval-20261011",
           "adjudication_ref": null,
           "source": {
@@ -462,7 +662,7 @@
           "origin_sweep": "landscape-sweep-20260929",
           "input_kind": "missing_vote",
           "disposition": "included_in_frozen_comparison",
-          "reason": "Retained survivor or missing vote leaves a scoped qualification gap; source review does not establish a winner.",
+          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
           "comparison_id": "w6-foundation-document-retrieval-20261011",
           "adjudication_ref": null,
           "source": {
@@ -477,7 +677,7 @@
           "origin_sweep": "landscape-sweep-20260929",
           "input_kind": "missing_vote",
           "disposition": "included_in_frozen_comparison",
-          "reason": "Retained survivor or missing vote leaves a scoped qualification gap; source review does not establish a winner.",
+          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
           "comparison_id": "w6-foundation-document-retrieval-20261011",
           "adjudication_ref": null,
           "source": {
@@ -492,7 +692,7 @@
           "origin_sweep": "landscape-sweep-20260929",
           "input_kind": "missing_vote",
           "disposition": "included_in_frozen_comparison",
-          "reason": "Retained survivor or missing vote leaves a scoped qualification gap; source review does not establish a winner.",
+          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
           "comparison_id": "w6-foundation-document-retrieval-20261011",
           "adjudication_ref": null,
           "source": {
@@ -507,7 +707,7 @@
           "origin_sweep": "landscape-sweep-20260929",
           "input_kind": "missing_vote",
           "disposition": "included_in_frozen_comparison",
-          "reason": "Retained survivor or missing vote leaves a scoped qualification gap; source review does not establish a winner.",
+          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
           "comparison_id": "w6-foundation-document-retrieval-20261011",
           "adjudication_ref": null,
           "source": {
@@ -522,13 +722,13 @@
           "origin_sweep": "landscape-sweep-20260929",
           "input_kind": "missing_vote",
           "disposition": "included_in_frozen_comparison",
-          "reason": "Retained survivor or missing vote leaves a scoped qualification gap; source review does not establish a winner.",
+          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
           "comparison_id": "w6-foundation-document-retrieval-20261011",
           "adjudication_ref": null,
           "source": {
             "repository": "https://github.com/baidu/Unlimited-OCR",
             "pin": "d49ff64afffc1f47ab563dc1c589bc2f78808fa4",
-            "ref": "README.md:85",
+            "ref": null,
             "evidence_class": "source_review"
           }
         },
@@ -537,7 +737,7 @@
           "origin_sweep": "landscape-sweep-20260929",
           "input_kind": "missing_vote",
           "disposition": "included_in_frozen_comparison",
-          "reason": "Retained survivor or missing vote leaves a scoped qualification gap; source review does not establish a winner.",
+          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
           "comparison_id": "w6-foundation-document-retrieval-20261011",
           "adjudication_ref": null,
           "source": {
@@ -551,18 +751,157 @@
       "changed_evidence": [],
       "comparison_id": "w6-foundation-document-retrieval-20261011",
       "preregistration_ref": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/document-retrieval.json",
-      "terminal_state": null,
-      "terminal_readiness": "#1007 LANDED relay; then apply the protocol to the recorded evidence",
+      "terminal_state": "SCHEDULED",
+      "terminal_readiness": "#1007 LANDED satisfied; remaining pinned-runtime comparison inputs are explicitly unmet",
       "bounded_next_action": "Qualify only the frozen existing candidates on the retained cases through the named native/upstream paths. No new discovery.",
       "evidence_class": "source_review",
-      "preregistration_sha256": "2b6e26e8da25204c63acc1b5c3aff730d419665c7852c2128dedb9f270a4877f"
+      "preregistration_sha256": "96514687937dd0541f5736e4f6f7a438a351405daaf3afe704c2c0f5fec59667",
+      "wave_ref": "catalogs/sota-convergence/layer-verdicts-20260922.json#/catalogs/foundation/3",
+      "next_review": "2026-10-22",
+      "next_review_gap": null,
+      "terminal_evidence": {
+        "state": "SCHEDULED",
+        "recorded_at": "2026-10-12T00:11:19Z",
+        "readiness_relay": {
+          "pr": 1007,
+          "merge_commit": "c2dee173",
+          "co_op_direction_at": "2026-10-11T23:35:52Z",
+          "satisfied": true
+        },
+        "comparison_id": "w6-foundation-document-retrieval-20261011",
+        "preregistration_ref": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/document-retrieval.json",
+        "preregistration_sha256": "96514687937dd0541f5736e4f6f7a438a351405daaf3afe704c2c0f5fec59667",
+        "resolution_winners": [],
+        "final_stack_source": {
+          "commit": "c2dee173",
+          "path": "catalogs/landscape/final-stack.json",
+          "sha256": "2dd68f39d3a0ab12894cf49343f49ff9e22c2fdef9a0d6d4e751ef88ef1f1eab",
+          "reader_script_sha256": "82742dea85a9d2f9c7579a1069947975b4033265cf55f1e1baa232d10767a317",
+          "reader_api": [
+            "run_pin",
+            "is_definitive"
+          ],
+          "row": {
+            "catalog": "foundation",
+            "layer_id": "document-retrieval",
+            "manifest_status": "reopened",
+            "next_review": "2026-10-22",
+            "winners": [
+              {
+                "component_id": "qmd",
+                "repository": "https://github.com/tobi/qmd",
+                "historical_verdict_pin": "2.8.3",
+                "pin_drift": "same",
+                "run_id": "qmd",
+                "run_pin": "2.8.3",
+                "run_source": "adoption/pins-linux-x86_64.json#/tools/5",
+                "reader_result": {
+                  "definitive": false,
+                  "reason": "reopened",
+                  "layers": [
+                    "foundation/document-retrieval"
+                  ]
+                }
+              },
+              {
+                "component_id": "markitdown",
+                "repository": "https://github.com/microsoft/markitdown",
+                "historical_verdict_pin": "0.1.7",
+                "pin_drift": "differs",
+                "run_id": "markitdown",
+                "run_pin": "0.1.8",
+                "run_source": "adoption/pins-linux-x86_64.json#/tools/11",
+                "reader_result": {
+                  "definitive": false,
+                  "reason": "reopened",
+                  "layers": [
+                    "foundation/document-retrieval"
+                  ]
+                }
+              },
+              {
+                "component_id": "poppler",
+                "repository": "https://github.com/tsdgeos/poppler_mirror",
+                "historical_verdict_pin": "26.09.0",
+                "pin_drift": "same",
+                "run_id": "poppler",
+                "run_pin": "26.09.0",
+                "run_source": "manifests/stack.json#/components/63",
+                "reader_result": {
+                  "definitive": false,
+                  "reason": "reopened",
+                  "layers": [
+                    "foundation/document-retrieval"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        "reason": "Historical winner run-pin entries are present, but the landed reader returns reopened rather than definitive. The cited fixtures/source review do not establish every winner's upstream-owned E2E at the run pin and invoke qualification. The frozen role-scoped comparison supplies the committed procedure; the catalog's historical winners are not newly qualified W6 winners.",
+        "readiness_trigger": [
+          "Exact arm binaries and their source pins verified in disposable environments through their own supported install paths",
+          "Each arm has its upstream-owned test/E2E recipe and a pinned receipt, or a retained substantive reason its scoped role is retired",
+          "Fixture hashes and complete usage instrumentation reproduce before the first arm",
+          "An isolated native runner is available without modifying the paper units, sealed bundles, Monday recorders or other lanes"
+        ],
+        "readiness_satisfied": [
+          "#1007 LANDED relay",
+          "retained fixture seals and exact source pins"
+        ],
+        "readiness_unmet": [
+          "arm runtime/upstream E2E receipts at the frozen pins",
+          "complete usage-instrumentation freeze and scoped native invoke/role evidence",
+          "isolated queued native runner"
+        ],
+        "comparison_ready": false,
+        "fixed_decision_rule": {
+          "eligibility": "For each predeclared role, every mapped role check must pass in all three repetitions with complete usage and upstream E2E at the comparison's immutable source pin. Dependency arms qualify only their mapped interface and are never scored as standalone end-to-end candidates.",
+          "rank": "For each role, maximize exact grounded-correct cases, then minimize total provider cost, then median elapsed time, then peak RSS. Compare only arms covering that same role; dependency components keep their own qualification receipts.",
+          "tie": "Retain the existing qualified incumbent for that role if tied. Otherwise retain all exactly tied qualified arms with their measured equality; do not claim superiority.",
+          "none_qualify": "Record RETIRED for the unsupported role with all failure/retirement reasons; do not promote an unqualified arm.",
+          "terminal": "FINAL requires every selected deployed winner's actual final-stack runs[] pin to match its adopted tested source, with verdict/wave/next_review, upstream E2E at that operational run pin and invoke evidence/role reason. An experimental source-pin receipt does not qualify a different historical operational run pin.",
+          "amendments": "No new candidates or changed metrics after first run. Any necessary input correction requires a separately reviewed, hashed amendment before affected scoring."
+        },
+        "frozen_scope": "Refrozen under B1/B2/A2 with explicit roles/dependencies/checks/cases and corrected citations before any run; current hash above supersedes original.",
+        "evidence_class": "source_review",
+        "final_claim": false,
+        "next_review": "2026-10-22",
+        "run_pin_reconciliation": {
+          "qmd": {
+            "operational_run_pin": "2.8.3",
+            "operational_run_source": "adoption/pins-linux-x86_64.json#/tools/5",
+            "comparison_source_pin": "facd35e01359e59d938bc9418e93fb9318addee3",
+            "comparison_source_release": "v2.8.3",
+            "reason": "The locked exact source governs the experiment; HEAD/version-only pin equivalence is not assumed. The deployed winner's four FINAL conditions remain separately required.",
+            "receipt_transfer_allowed": false,
+            "final_requirement": "Supported adoption into matching runs[] then upstream E2E and invoke at that operational pin."
+          },
+          "markitdown": {
+            "operational_run_pin": "0.1.8",
+            "operational_run_source": "adoption/pins-linux-x86_64.json#/tools/11",
+            "comparison_source_pin": "fd239d5d2be43d9b68329730206b9312c7d5a388",
+            "comparison_source_release": "v0.1.7",
+            "reason": "Frozen 0.1.7 is the source-qualified conversion control consumed by the catalog; operational 0.1.8 is distinct and not qualified by that control. The fixed experimental control governs scoring. No receipt transfers: a selected deployment requires matching adopted runs[]/E2E/invoke proof.",
+            "receipt_transfer_allowed": false,
+            "final_requirement": "Supported adoption into matching runs[] then upstream E2E and invoke at that operational pin."
+          },
+          "poppler": {
+            "operational_run_pin": "26.09.0",
+            "operational_run_source": "manifests/stack.json#/components/63",
+            "comparison_source_pin": "5b97e475790a11012ec6095d9a47c23f7f229cb9",
+            "comparison_source_release": "HEAD",
+            "reason": "The locked exact source governs the experiment; HEAD/version-only pin equivalence is not assumed. The deployed winner's four FINAL conditions remain separately required.",
+            "receipt_transfer_allowed": false,
+            "final_requirement": "Supported adoption into matching runs[] then upstream E2E and invoke at that operational pin."
+          }
+        }
+      },
+      "next_review_ref": "c2dee173:catalogs/landscape/final-stack.json (this layer's verdict.next_review)"
     },
     {
       "catalog": "foundation",
       "layer_id": "semantic-rag",
-      "wave_ref": "catalogs/sota-convergence/layer-verdicts-20260922.json#/catalogs/foundation/16",
-      "next_review": null,
-      "next_review_gap": "Absent in the consumed catalog row and applicable verdict wave; condition 1 cannot be claimed complete from those records.",
       "catalog_ref": "catalogs/landscape/foundation.json#/layers/6",
       "catalog_sha256": "868d193a31080ab913400725140bd0d01e0afe97e28564fd12777f737d22951a",
       "row_sha256": "2940d763fb9b2d5efe92116489fbd541fc4a19131dc4ecf047d56ad2ddb3da07",
@@ -656,7 +995,7 @@
           "origin_sweep": "landscape-sweep-20260929",
           "input_kind": "survivor",
           "disposition": "included_in_frozen_comparison",
-          "reason": "Retained survivor or missing vote leaves a scoped qualification gap; source review does not establish a winner.",
+          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
           "comparison_id": "w6-foundation-semantic-rag-20261011",
           "adjudication_ref": null,
           "source": {
@@ -671,13 +1010,13 @@
           "origin_sweep": "landscape-sweep-20260926",
           "input_kind": "missing_vote",
           "disposition": "included_in_frozen_comparison",
-          "reason": "Retained survivor or missing vote leaves a scoped qualification gap; source review does not establish a winner.",
+          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
           "comparison_id": "w6-foundation-semantic-rag-20261011",
           "adjudication_ref": null,
           "source": {
             "repository": "https://github.com/OSU-NLP-Group/HippoRAG",
             "pin": "d5c8329422e0a0b834a15874545cb6a74b4f9b26",
-            "ref": "README.md:6",
+            "ref": "README.md:13",
             "evidence_class": "source_review"
           }
         },
@@ -686,7 +1025,7 @@
           "origin_sweep": "landscape-sweep-20260929",
           "input_kind": "survivor",
           "disposition": "included_in_frozen_comparison",
-          "reason": "Retained survivor or missing vote leaves a scoped qualification gap; source review does not establish a winner.",
+          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
           "comparison_id": "w6-foundation-semantic-rag-20261011",
           "adjudication_ref": null,
           "source": {
@@ -701,7 +1040,7 @@
           "origin_sweep": "landscape-sweep-20260929",
           "input_kind": "survivor",
           "disposition": "included_in_frozen_comparison",
-          "reason": "Retained survivor or missing vote leaves a scoped qualification gap; source review does not establish a winner.",
+          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
           "comparison_id": "w6-foundation-semantic-rag-20261011",
           "adjudication_ref": null,
           "source": {
@@ -716,13 +1055,13 @@
           "origin_sweep": "landscape-sweep-20260926",
           "input_kind": "missing_vote",
           "disposition": "included_in_frozen_comparison",
-          "reason": "Retained survivor or missing vote leaves a scoped qualification gap; source review does not establish a winner.",
+          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
           "comparison_id": "w6-foundation-semantic-rag-20261011",
           "adjudication_ref": null,
           "source": {
             "repository": "https://github.com/giancarloerra/SocratiCode",
             "pin": "2218f25153d0f3f4a76ee240a5643dbc873e80be",
-            "ref": "README.md:36",
+            "ref": "README.md:44",
             "evidence_class": "source_review"
           }
         }
@@ -730,18 +1069,157 @@
       "changed_evidence": [],
       "comparison_id": "w6-foundation-semantic-rag-20261011",
       "preregistration_ref": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/semantic-rag.json",
-      "terminal_state": null,
-      "terminal_readiness": "#1007 LANDED relay; then apply the protocol to the recorded evidence",
+      "terminal_state": "SCHEDULED",
+      "terminal_readiness": "#1007 LANDED satisfied; remaining pinned-runtime comparison inputs are explicitly unmet",
       "bounded_next_action": "Qualify only the frozen existing candidates on the retained cases through the named native/upstream paths. No new discovery.",
       "evidence_class": "source_review",
-      "preregistration_sha256": "b2a379a1709fbc4498312c968780e21c622618f05c223721cd4fd8f9a1b854ed"
+      "preregistration_sha256": "71ecd57ce3c49064500ed918737686bdfbdd10577c1087c77ea685a12edc92bb",
+      "wave_ref": "catalogs/sota-convergence/layer-verdicts-20260922.json#/catalogs/foundation/16",
+      "next_review": "2026-10-22",
+      "next_review_gap": null,
+      "terminal_evidence": {
+        "state": "SCHEDULED",
+        "recorded_at": "2026-10-12T00:11:19Z",
+        "readiness_relay": {
+          "pr": 1007,
+          "merge_commit": "c2dee173",
+          "co_op_direction_at": "2026-10-11T23:35:52Z",
+          "satisfied": true
+        },
+        "comparison_id": "w6-foundation-semantic-rag-20261011",
+        "preregistration_ref": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/semantic-rag.json",
+        "preregistration_sha256": "71ecd57ce3c49064500ed918737686bdfbdd10577c1087c77ea685a12edc92bb",
+        "resolution_winners": [],
+        "final_stack_source": {
+          "commit": "c2dee173",
+          "path": "catalogs/landscape/final-stack.json",
+          "sha256": "2dd68f39d3a0ab12894cf49343f49ff9e22c2fdef9a0d6d4e751ef88ef1f1eab",
+          "reader_script_sha256": "82742dea85a9d2f9c7579a1069947975b4033265cf55f1e1baa232d10767a317",
+          "reader_api": [
+            "run_pin",
+            "is_definitive"
+          ],
+          "row": {
+            "catalog": "foundation",
+            "layer_id": "semantic-rag",
+            "manifest_status": "reopened",
+            "next_review": "2026-10-22",
+            "winners": [
+              {
+                "component_id": "socraticode",
+                "repository": "https://github.com/giancarloerra/SocratiCode",
+                "historical_verdict_pin": "1.14.0",
+                "pin_drift": "differs",
+                "run_id": "socraticode",
+                "run_pin": "1.15.0",
+                "run_source": "adoption/pins-linux-x86_64.json#/tools/20",
+                "reader_result": {
+                  "definitive": false,
+                  "reason": "reopened",
+                  "layers": [
+                    "foundation/semantic-rag"
+                  ]
+                }
+              },
+              {
+                "component_id": "qdrant",
+                "repository": "https://github.com/qdrant/qdrant",
+                "historical_verdict_pin": "1.19.1",
+                "pin_drift": "same",
+                "run_id": "qdrant",
+                "run_pin": "1.19.1",
+                "run_source": "adoption/pins-macos-arm64.json#/tools/10",
+                "reader_result": {
+                  "definitive": false,
+                  "reason": "reopened",
+                  "layers": [
+                    "foundation/semantic-rag"
+                  ]
+                }
+              },
+              {
+                "component_id": "vllm",
+                "repository": "https://github.com/vllm-project/vllm",
+                "historical_verdict_pin": "0.25.0",
+                "pin_drift": "differs",
+                "run_id": "vllm",
+                "run_pin": "0.30.0",
+                "run_source": "manifests/stack.json#/components/34",
+                "reader_result": {
+                  "definitive": false,
+                  "reason": "reopened",
+                  "layers": [
+                    "foundation/semantic-rag"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        "reason": "Historical winner run-pin entries are present, but the landed reader returns reopened rather than definitive. The cited fixtures/source review do not establish every winner's upstream-owned E2E at the run pin and invoke qualification. The frozen role-scoped comparison supplies the committed procedure; the catalog's historical winners are not newly qualified W6 winners.",
+        "readiness_trigger": [
+          "Exact arm binaries and their source pins verified in disposable environments through their own supported install paths",
+          "Each arm has its upstream-owned test/E2E recipe and a pinned receipt, or a retained substantive reason its scoped role is retired",
+          "Fixture hashes and complete usage instrumentation reproduce before the first arm",
+          "An isolated native runner is available without modifying the paper units, sealed bundles, Monday recorders or other lanes"
+        ],
+        "readiness_satisfied": [
+          "#1007 LANDED relay",
+          "retained fixture seals and exact source pins"
+        ],
+        "readiness_unmet": [
+          "arm runtime/upstream E2E receipts at the frozen pins",
+          "complete usage-instrumentation freeze and scoped native invoke/role evidence",
+          "isolated queued native runner"
+        ],
+        "comparison_ready": false,
+        "fixed_decision_rule": {
+          "eligibility": "For each predeclared role, every mapped role check must pass in all three repetitions with complete usage and upstream E2E at the comparison's immutable source pin. Dependency arms qualify only their mapped interface and are never scored as standalone end-to-end candidates.",
+          "rank": "For each role, maximize exact grounded-correct cases, then minimize total provider cost, then median elapsed time, then peak RSS. Compare only arms covering that same role; dependency components keep their own qualification receipts.",
+          "tie": "Retain the existing qualified incumbent for that role if tied. Otherwise retain all exactly tied qualified arms with their measured equality; do not claim superiority.",
+          "none_qualify": "Record RETIRED for the unsupported role with all failure/retirement reasons; do not promote an unqualified arm.",
+          "terminal": "FINAL requires every selected deployed winner's actual final-stack runs[] pin to match its adopted tested source, with verdict/wave/next_review, upstream E2E at that operational run pin and invoke evidence/role reason. An experimental source-pin receipt does not qualify a different historical operational run pin.",
+          "amendments": "No new candidates or changed metrics after first run. Any necessary input correction requires a separately reviewed, hashed amendment before affected scoring."
+        },
+        "frozen_scope": "Refrozen under B1/B2/A2 with explicit roles/dependencies/checks/cases and corrected citations before any run; current hash above supersedes original.",
+        "evidence_class": "source_review",
+        "final_claim": false,
+        "next_review": "2026-10-22",
+        "run_pin_reconciliation": {
+          "socraticode": {
+            "operational_run_pin": "1.15.0",
+            "operational_run_source": "adoption/pins-linux-x86_64.json#/tools/20",
+            "comparison_source_pin": "2218f25153d0f3f4a76ee240a5643dbc873e80be",
+            "comparison_source_release": "v1.14.0",
+            "reason": "Frozen 1.14.0 is the version-qualified semantic-index control; operational 1.15.0 is distinct. This bounded source control governs scoring, not current-run acceptance. The selected deployment requires supported adoption and matching operational E2E/invoke.",
+            "receipt_transfer_allowed": false,
+            "final_requirement": "Supported adoption into matching runs[] then upstream E2E and invoke at that operational pin."
+          },
+          "qdrant": {
+            "operational_run_pin": "1.19.1",
+            "operational_run_source": "adoption/pins-macos-arm64.json#/tools/10",
+            "comparison_source_pin": "6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de",
+            "comparison_source_release": "v1.19.1",
+            "reason": "The locked exact source governs the experiment; HEAD/version-only pin equivalence is not assumed. The deployed winner's four FINAL conditions remain separately required.",
+            "receipt_transfer_allowed": false,
+            "final_requirement": "Supported adoption into matching runs[] then upstream E2E and invoke at that operational pin."
+          },
+          "vllm": {
+            "operational_run_pin": "0.30.0",
+            "operational_run_source": "manifests/stack.json#/components/34",
+            "comparison_source_pin": "db9527a46873454610df6dbedf79a36d6bf1a7f6",
+            "comparison_source_release": "v0.31.0",
+            "reason": "Frozen 0.31.0 is the changed current serving dependency source; operational 0.30.0 is distinct. It is not a QA competitor, and its experimental receipt cannot qualify another run pin.",
+            "receipt_transfer_allowed": false,
+            "final_requirement": "Supported adoption into matching runs[] then upstream E2E and invoke at that operational pin."
+          }
+        }
+      },
+      "next_review_ref": "c2dee173:catalogs/landscape/final-stack.json (this layer's verdict.next_review)"
     },
     {
       "catalog": "foundation",
       "layer_id": "durable-memory",
-      "wave_ref": "catalogs/sota-convergence/layer-verdicts-20260922.json#/catalogs/foundation/4",
-      "next_review": null,
-      "next_review_gap": "Absent in the consumed catalog row and applicable verdict wave; condition 1 cannot be claimed complete from those records.",
       "catalog_ref": "catalogs/landscape/foundation.json#/layers/7",
       "catalog_sha256": "868d193a31080ab913400725140bd0d01e0afe97e28564fd12777f737d22951a",
       "row_sha256": "6b34abbbc3400a816ca185c2d44ac748348be93b084e2b9a16cb3bf6818f0df4",
@@ -828,10 +1306,10 @@
           "repository": "https://github.com/anthropics/claude-code",
           "origin_sweep": "landscape-sweep-20260926",
           "input_kind": "survivor",
-          "disposition": "retained_substantive_deployment_disposition",
-          "reason": "retain existing native-file continuity role; no replacement capture owner",
-          "comparison_id": null,
-          "adjudication_ref": "blueprints/memory-stack/native-qualification/VERDICT.md#candidate-dispositions",
+          "disposition": "included_in_frozen_comparison",
+          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
+          "comparison_id": "w6-foundation-durable-memory-20261011",
+          "adjudication_ref": null,
           "source": {
             "repository": "https://github.com/anthropics/claude-code",
             "pin": "3deb873687379f0c199a69fdaccc65f0865f7a29",
@@ -843,10 +1321,10 @@
           "repository": "https://github.com/langchain-ai/langmem",
           "origin_sweep": "landscape-sweep-20260926",
           "input_kind": "survivor",
-          "disposition": "retained_substantive_deployment_disposition",
-          "reason": "not selected for shared capture by the retained 10-02 deployment verdict; no new default memory owner",
-          "comparison_id": null,
-          "adjudication_ref": "blueprints/memory-stack/native-qualification/VERDICT.md#candidate-dispositions",
+          "disposition": "included_in_frozen_comparison",
+          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
+          "comparison_id": "w6-foundation-durable-memory-20261011",
+          "adjudication_ref": null,
           "source": {
             "repository": "https://github.com/langchain-ai/langmem",
             "pin": "48e3c11f5bb527282c7d5339c6a87a0b35abccfc",
@@ -858,10 +1336,10 @@
           "repository": "https://github.com/rohitg00/agentmemory",
           "origin_sweep": "landscape-sweep-20260929",
           "input_kind": "survivor",
-          "disposition": "retained_substantive_deployment_disposition",
-          "reason": "not selected for shared capture by the retained 10-02 deployment verdict; native hook/handoff replacement comparison absent",
-          "comparison_id": null,
-          "adjudication_ref": "blueprints/memory-stack/native-qualification/VERDICT.md#candidate-dispositions",
+          "disposition": "included_in_frozen_comparison",
+          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
+          "comparison_id": "w6-foundation-durable-memory-20261011",
+          "adjudication_ref": null,
           "source": {
             "repository": "https://github.com/rohitg00/agentmemory",
             "pin": "7ee162844956626d8b00ba459df169d542d4af9d",
@@ -873,10 +1351,10 @@
           "repository": "https://github.com/mempalace/mempalace",
           "origin_sweep": "landscape-sweep-20260929",
           "input_kind": "survivor",
-          "disposition": "retained_substantive_deployment_disposition",
-          "reason": "not selected for this deployment by the retained 10-02 verdict; no accepted same-host replacement result",
-          "comparison_id": null,
-          "adjudication_ref": "blueprints/memory-stack/native-qualification/VERDICT.md#candidate-dispositions",
+          "disposition": "included_in_frozen_comparison",
+          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
+          "comparison_id": "w6-foundation-durable-memory-20261011",
+          "adjudication_ref": null,
           "source": {
             "repository": "https://github.com/MemPalace/MemPalace",
             "pin": "1f0803a31958b30320418356b2db88c4ed9c27f9",
@@ -889,7 +1367,7 @@
           "origin_sweep": "landscape-sweep-20260929",
           "input_kind": "survivor",
           "disposition": "included_in_frozen_comparison",
-          "reason": "Retained survivor or missing vote leaves a scoped qualification gap; source review does not establish a winner.",
+          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
           "comparison_id": "w6-foundation-durable-memory-20261011",
           "adjudication_ref": null,
           "source": {
@@ -904,7 +1382,7 @@
           "origin_sweep": "landscape-sweep-20260926",
           "input_kind": "missing_vote",
           "disposition": "included_in_frozen_comparison",
-          "reason": "Retained survivor or missing vote leaves a scoped qualification gap; source review does not establish a winner.",
+          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
           "comparison_id": "w6-foundation-durable-memory-20261011",
           "adjudication_ref": null,
           "source": {
@@ -918,14 +1396,14 @@
           "repository": "https://github.com/vectorize-io/hindsight",
           "origin_sweep": "landscape-sweep-20260929",
           "input_kind": "survivor",
-          "disposition": "retained_substantive_deployment_disposition",
-          "reason": "not selected as the default by the retained 10-02 verdict; isolated staging preserved",
-          "comparison_id": null,
-          "adjudication_ref": "blueprints/memory-stack/native-qualification/VERDICT.md#candidate-dispositions",
+          "disposition": "included_in_frozen_comparison",
+          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
+          "comparison_id": "w6-foundation-durable-memory-20261011",
+          "adjudication_ref": null,
           "source": {
             "repository": "https://github.com/vectorize-io/hindsight",
             "pin": "a9eeed77f9bce99d8f97d39a30d3281747300824",
-            "ref": "README.md:5",
+            "ref": "README.md:24",
             "evidence_class": "source_review"
           }
         },
@@ -934,7 +1412,7 @@
           "origin_sweep": "landscape-sweep-20260929",
           "input_kind": "survivor",
           "disposition": "included_in_frozen_comparison",
-          "reason": "Retained survivor or missing vote leaves a scoped qualification gap; source review does not establish a winner.",
+          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
           "comparison_id": "w6-foundation-durable-memory-20261011",
           "adjudication_ref": null,
           "source": {
@@ -948,18 +1426,110 @@
       "changed_evidence": [],
       "comparison_id": "w6-foundation-durable-memory-20261011",
       "preregistration_ref": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/durable-memory.json",
-      "terminal_state": null,
-      "terminal_readiness": "#1007 LANDED relay; then apply the protocol to the recorded evidence",
+      "terminal_state": "SCHEDULED",
+      "terminal_readiness": "#1007 LANDED satisfied; remaining pinned-runtime comparison inputs are explicitly unmet",
       "bounded_next_action": "Qualify only the frozen existing candidates on the retained cases through the named native/upstream paths. No new discovery.",
       "evidence_class": "source_review",
-      "preregistration_sha256": "bd42f3d21c96df47a1b134673b0b52670769b55a6b6e4bc6d273f58f78d9c55d"
+      "preregistration_sha256": "4393b7454f2642160156aa71db5ad63928c8ea272ac269f60b4dece2eb01d468",
+      "wave_ref": "catalogs/sota-convergence/layer-verdicts-20260922.json#/catalogs/foundation/4",
+      "next_review": "2026-10-22",
+      "next_review_gap": null,
+      "terminal_evidence": {
+        "state": "SCHEDULED",
+        "recorded_at": "2026-10-12T00:11:19Z",
+        "readiness_relay": {
+          "pr": 1007,
+          "merge_commit": "c2dee173",
+          "co_op_direction_at": "2026-10-11T23:35:52Z",
+          "satisfied": true
+        },
+        "comparison_id": "w6-foundation-durable-memory-20261011",
+        "preregistration_ref": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/durable-memory.json",
+        "preregistration_sha256": "4393b7454f2642160156aa71db5ad63928c8ea272ac269f60b4dece2eb01d468",
+        "resolution_winners": [],
+        "final_stack_source": {
+          "commit": "c2dee173",
+          "path": "catalogs/landscape/final-stack.json",
+          "sha256": "2dd68f39d3a0ab12894cf49343f49ff9e22c2fdef9a0d6d4e751ef88ef1f1eab",
+          "reader_script_sha256": "82742dea85a9d2f9c7579a1069947975b4033265cf55f1e1baa232d10767a317",
+          "reader_api": [
+            "run_pin",
+            "is_definitive"
+          ],
+          "row": {
+            "catalog": "foundation",
+            "layer_id": "durable-memory",
+            "manifest_status": "reopened",
+            "next_review": "2026-10-22",
+            "winners": [
+              {
+                "component_id": "ai-memory",
+                "repository": "https://github.com/akitaonrails/ai-memory",
+                "historical_verdict_pin": "2.3.2",
+                "pin_drift": "differs",
+                "run_id": "ai-memory",
+                "run_pin": "2.4.1",
+                "run_source": "adoption/pins-linux-x86_64.json#/tools/7",
+                "reader_result": {
+                  "definitive": false,
+                  "reason": "reopened",
+                  "layers": [
+                    "foundation/durable-memory"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        "reason": "Historical winner run-pin entries are present, but the landed reader returns reopened rather than definitive. The cited fixtures/source review do not establish every winner's upstream-owned E2E at the run pin and invoke qualification. The frozen role-scoped comparison supplies the committed procedure; the catalog's historical winners are not newly qualified W6 winners.",
+        "readiness_trigger": [
+          "The shared newest-supported model/revision/license/prompt/settings seal from the fixed retained universe is committed before any capture or scoring",
+          "Exact arm binaries and their source pins verified in disposable environments through their own supported install paths",
+          "Each arm has its upstream-owned test/E2E recipe and a pinned receipt, or a retained substantive reason its scoped role is retired",
+          "Fixture hashes and complete usage instrumentation reproduce before the first arm",
+          "An isolated native runner is available without modifying the paper units, sealed bundles, Monday recorders or other lanes"
+        ],
+        "readiness_satisfied": [
+          "#1007 LANDED relay",
+          "retained fixture seals and exact source pins"
+        ],
+        "readiness_unmet": [
+          "Committed primary-source model/prompt/settings seal; no unresolved model alias is a pin.",
+          "arm runtime/upstream E2E receipts at the frozen pins",
+          "complete usage-instrumentation freeze and scoped native invoke/role evidence",
+          "isolated queued native runner"
+        ],
+        "comparison_ready": false,
+        "fixed_decision_rule": {
+          "eligibility": "For each predeclared role, every mapped role check must pass in all three repetitions with complete usage and upstream E2E at the comparison's immutable source pin. Dependency arms qualify only their mapped interface and are never scored as standalone end-to-end candidates.",
+          "rank": "Within each real role, rank all qualifying arms by pooled exact grounded-correct recall/usefulness on the same presealed newest-supported-model panels, then complete provider cost, median elapsed time and peak RSS. Native-file controls are diagnostic, not protected incumbents.",
+          "tie": "Record equal qualified results as co-qualified for the measured role; no automatic incumbent retention and no superiority claim. No memory backend or default is preselected.",
+          "none_qualify": "Record RETIRED for the unsupported role with all failure/retirement reasons; do not promote an unqualified arm.",
+          "terminal": "FINAL requires every selected deployed winner's actual final-stack runs[] pin to match its adopted tested source, with verdict/wave/next_review, upstream E2E at that operational run pin and invoke evidence/role reason. An experimental source-pin receipt does not qualify a different historical operational run pin.",
+          "amendments": "No new candidates or changed metrics after first run. Any necessary input correction requires a separately reviewed, hashed amendment before affected scoring.",
+          "incumbent_protection": false
+        },
+        "frozen_scope": "Refrozen under B1/B2/A2 with explicit roles/dependencies/checks/cases and corrected citations before any run; current hash above supersedes original.",
+        "evidence_class": "source_review",
+        "final_claim": false,
+        "next_review": "2026-10-22",
+        "run_pin_reconciliation": {
+          "ai-memory": {
+            "operational_run_pin": "2.4.1",
+            "operational_run_source": "adoption/pins-linux-x86_64.json#/tools/7",
+            "comparison_source_pin": "89bd8ded3c1ab8b769cf99417d038ed0364403c8",
+            "comparison_source_release": "v2.6.0",
+            "reason": "Frozen 2.6.0 is the newer maintained source for the newest-model merit trial; operational 2.4.1 is historical. No incumbent or older default is protected; the selected operational winner needs a matching runs[] pin and E2E/invoke.",
+            "receipt_transfer_allowed": false,
+            "final_requirement": "Supported adoption into matching runs[] then upstream E2E and invoke at that operational pin."
+          }
+        }
+      },
+      "next_review_ref": "c2dee173:catalogs/landscape/final-stack.json (this layer's verdict.next_review)"
     },
     {
       "catalog": "foundation",
       "layer_id": "web-research",
-      "wave_ref": "catalogs/sota-convergence/layer-verdicts-20260922.json#/catalogs/foundation/18",
-      "next_review": null,
-      "next_review_gap": "Absent in the consumed catalog row and applicable verdict wave; condition 1 cannot be claimed complete from those records.",
       "catalog_ref": "catalogs/landscape/foundation.json#/layers/8",
       "catalog_sha256": "868d193a31080ab913400725140bd0d01e0afe97e28564fd12777f737d22951a",
       "row_sha256": "c7a864e360ecdf5f9be0392ca6908609de71a13cbdfedca7c65c0c69c5b0d3d8",
@@ -1037,7 +1607,7 @@
           "origin_sweep": "landscape-sweep-20260923",
           "input_kind": "survivor",
           "disposition": "included_in_frozen_comparison",
-          "reason": "Retained survivor or missing vote leaves a scoped qualification gap; source review does not establish a winner.",
+          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
           "comparison_id": "w6-foundation-web-research-20261011",
           "adjudication_ref": null,
           "source": {
@@ -1052,7 +1622,7 @@
           "origin_sweep": "landscape-sweep-20260929",
           "input_kind": "survivor",
           "disposition": "included_in_frozen_comparison",
-          "reason": "Retained survivor or missing vote leaves a scoped qualification gap; source review does not establish a winner.",
+          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
           "comparison_id": "w6-foundation-web-research-20261011",
           "adjudication_ref": null,
           "source": {
@@ -1067,13 +1637,13 @@
           "origin_sweep": "landscape-sweep-20260926",
           "input_kind": "missing_vote",
           "disposition": "included_in_frozen_comparison",
-          "reason": "Retained survivor or missing vote leaves a scoped qualification gap; source review does not establish a winner.",
+          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
           "comparison_id": "w6-foundation-web-research-20261011",
           "adjudication_ref": null,
           "source": {
             "repository": "https://github.com/openai/codex",
             "pin": "092d3acd6bec3e3a14bdc7e7a2810ab628ab759d",
-            "ref": "README.md:64",
+            "ref": "README.md:1",
             "evidence_class": "source_review"
           }
         },
@@ -1082,7 +1652,7 @@
           "origin_sweep": "landscape-sweep-20260929",
           "input_kind": "missing_vote",
           "disposition": "included_in_frozen_comparison",
-          "reason": "Retained survivor or missing vote leaves a scoped qualification gap; source review does not establish a winner.",
+          "reason": "This W6 current-host role is in the comparison; Mac deployment nonselection is background, not a merit adjudication.",
           "comparison_id": "w6-foundation-web-research-20261011",
           "adjudication_ref": null,
           "source": {
@@ -1096,11 +1666,159 @@
       "changed_evidence": [],
       "comparison_id": "w6-foundation-web-research-20261011",
       "preregistration_ref": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/web-research.json",
-      "terminal_state": null,
-      "terminal_readiness": "#1007 LANDED relay; then apply the protocol to the recorded evidence",
+      "terminal_state": "SCHEDULED",
+      "terminal_readiness": "#1007 LANDED satisfied; remaining pinned-runtime comparison inputs are explicitly unmet",
       "bounded_next_action": "Qualify only the frozen existing candidates on the retained cases through the named native/upstream paths. No new discovery.",
       "evidence_class": "source_review",
-      "preregistration_sha256": "348d09fb50a0a78b976d35f33d0971f66f747be10d8e96357bde2770016a750a"
+      "preregistration_sha256": "4a40ea5731d59bdc82be5d18da88b9e9acaf0fb61443afa2ed8756bb74535a38",
+      "wave_ref": "catalogs/sota-convergence/layer-verdicts-20260922.json#/catalogs/foundation/18",
+      "next_review": "2026-10-22",
+      "next_review_gap": null,
+      "terminal_evidence": {
+        "state": "SCHEDULED",
+        "recorded_at": "2026-10-12T00:11:19Z",
+        "readiness_relay": {
+          "pr": 1007,
+          "merge_commit": "c2dee173",
+          "co_op_direction_at": "2026-10-11T23:35:52Z",
+          "satisfied": true
+        },
+        "comparison_id": "w6-foundation-web-research-20261011",
+        "preregistration_ref": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/web-research.json",
+        "preregistration_sha256": "4a40ea5731d59bdc82be5d18da88b9e9acaf0fb61443afa2ed8756bb74535a38",
+        "resolution_winners": [],
+        "final_stack_source": {
+          "commit": "c2dee173",
+          "path": "catalogs/landscape/final-stack.json",
+          "sha256": "2dd68f39d3a0ab12894cf49343f49ff9e22c2fdef9a0d6d4e751ef88ef1f1eab",
+          "reader_script_sha256": "82742dea85a9d2f9c7579a1069947975b4033265cf55f1e1baa232d10767a317",
+          "reader_api": [
+            "run_pin",
+            "is_definitive"
+          ],
+          "row": {
+            "catalog": "foundation",
+            "layer_id": "web-research",
+            "manifest_status": "reopened",
+            "next_review": "2026-10-22",
+            "winners": [
+              {
+                "component_id": "tavily-cli",
+                "repository": "https://github.com/tavily-ai/tavily-cli",
+                "historical_verdict_pin": "0.1.8",
+                "pin_drift": "same",
+                "run_id": "tavily-cli",
+                "run_pin": "0.1.8",
+                "run_source": "adoption/pins-linux-x86_64.json#/tools/12",
+                "reader_result": {
+                  "definitive": false,
+                  "reason": "reopened",
+                  "layers": [
+                    "foundation/web-research"
+                  ]
+                }
+              },
+              {
+                "component_id": "agent-browser",
+                "repository": "https://github.com/vercel-labs/agent-browser",
+                "historical_verdict_pin": "0.38.1",
+                "pin_drift": "differs",
+                "run_id": "agent-browser",
+                "run_pin": "0.38.2",
+                "run_source": "adoption/pins-linux-x86_64.json#/tools/14",
+                "reader_result": {
+                  "definitive": false,
+                  "reason": "reopened",
+                  "layers": [
+                    "foundation/web-research"
+                  ]
+                }
+              },
+              {
+                "component_id": "openresearch",
+                "repository": "https://github.com/alphaXiv/OpenResearch",
+                "historical_verdict_pin": "0.2.7",
+                "pin_drift": "differs",
+                "run_id": "openresearch",
+                "run_pin": "0.2.15",
+                "run_source": "adoption/pins-linux-x86_64.json#/tools/13",
+                "reader_result": {
+                  "definitive": false,
+                  "reason": "reopened",
+                  "layers": [
+                    "foundation/web-research"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        "reason": "Historical winner run-pin entries are present, but the landed reader returns reopened rather than definitive. The cited fixtures/source review do not establish every winner's upstream-owned E2E at the run pin and invoke qualification. The frozen role-scoped comparison supplies the committed procedure; the catalog's historical winners are not newly qualified W6 winners.",
+        "readiness_trigger": [
+          "Exact arm binaries and their source pins verified in disposable environments through their own supported install paths",
+          "Each arm has its upstream-owned test/E2E recipe and a pinned receipt, or a retained substantive reason its scoped role is retired",
+          "Fixture hashes and complete usage instrumentation reproduce before the first arm",
+          "An isolated native runner is available without modifying the paper units, sealed bundles, Monday recorders or other lanes"
+        ],
+        "readiness_satisfied": [
+          "#1007 LANDED relay",
+          "retained fixture seals and exact source pins"
+        ],
+        "readiness_unmet": [
+          "arm runtime/upstream E2E receipts at the frozen pins",
+          "complete usage-instrumentation freeze and scoped native invoke/role evidence",
+          "isolated queued native runner"
+        ],
+        "comparison_ready": false,
+        "fixed_decision_rule": {
+          "eligibility": "For each predeclared role, every mapped role check must pass in all three repetitions with complete usage and upstream E2E at the comparison's immutable source pin. Dependency arms qualify only their mapped interface and are never scored as standalone end-to-end candidates.",
+          "rank": "For each role, maximize exact grounded-correct cases, then minimize total provider cost, then median elapsed time, then peak RSS. Compare only arms covering that same role; dependency components keep their own qualification receipts.",
+          "tie": "Retain the existing qualified incumbent for that role if tied. Otherwise retain all exactly tied qualified arms with their measured equality; do not claim superiority.",
+          "none_qualify": "Record RETIRED for the unsupported role with all failure/retirement reasons; do not promote an unqualified arm.",
+          "terminal": "FINAL requires every selected deployed winner's actual final-stack runs[] pin to match its adopted tested source, with verdict/wave/next_review, upstream E2E at that operational run pin and invoke evidence/role reason. An experimental source-pin receipt does not qualify a different historical operational run pin.",
+          "amendments": "No new candidates or changed metrics after first run. Any necessary input correction requires a separately reviewed, hashed amendment before affected scoring."
+        },
+        "frozen_scope": "Refrozen under B1/B2/A2 with explicit roles/dependencies/checks/cases and corrected citations before any run; current hash above supersedes original.",
+        "evidence_class": "source_review",
+        "final_claim": false,
+        "next_review": "2026-10-22",
+        "run_pin_reconciliation": {
+          "tavily-cli": {
+            "operational_run_pin": "0.1.8",
+            "operational_run_source": "adoption/pins-linux-x86_64.json#/tools/12",
+            "comparison_source_pin": "fd745230e6756933e3a190bfdc61ea1eb2db3993",
+            "comparison_source_release": "HEAD",
+            "reason": "The locked exact source governs the experiment; HEAD/version-only pin equivalence is not assumed. The deployed winner's four FINAL conditions remain separately required.",
+            "receipt_transfer_allowed": false,
+            "final_requirement": "Supported adoption into matching runs[] then upstream E2E and invoke at that operational pin."
+          },
+          "agent-browser": {
+            "operational_run_pin": "0.38.2",
+            "operational_run_source": "adoption/pins-linux-x86_64.json#/tools/14",
+            "comparison_source_pin": "aff6125c023b810ea3f2e5deec5379e9a4270bdc",
+            "comparison_source_release": "v0.38.1",
+            "reason": "Frozen 0.38.1 is the explicitly versioned browser control consumed by the catalog/fixture; operational 0.38.2 is distinct. Scoring remains at the controlled source; current-run FINAL needs matching adopted runs[]/E2E/invoke.",
+            "receipt_transfer_allowed": false,
+            "final_requirement": "Supported adoption into matching runs[] then upstream E2E and invoke at that operational pin."
+          },
+          "openresearch": {
+            "operational_run_pin": "0.2.15",
+            "operational_run_source": "adoption/pins-linux-x86_64.json#/tools/13",
+            "comparison_source_pin": "24e404ecbe19cb9184ea8177e8e9f90d4f3205b0",
+            "comparison_source_release": "v0.2.7",
+            "reason": "Frozen 0.2.7 is the source-reviewed paper-retrieval control; operational 0.2.15 is distinct without transferable smoke/E2E qualification. This fixed control governs the bounded task; no current-run FINAL follows.",
+            "receipt_transfer_allowed": false,
+            "final_requirement": "Supported adoption into matching runs[] then upstream E2E and invoke at that operational pin."
+          }
+        }
+      },
+      "next_review_ref": "c2dee173:catalogs/landscape/final-stack.json (this layer's verdict.next_review)"
     }
-  ]
+  ],
+  "correction_authority": {
+    "record": "adjudication-pr1021-4ddd4822-20261012.md",
+    "held_head": "4ddd4822d57be3c7ae07b5e0cf4666538166a3ad",
+    "before_any_run": true,
+    "refrozen_at": "2026-10-12T00:52:20Z"
+  }
 }

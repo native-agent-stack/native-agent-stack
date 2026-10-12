@@ -19,34 +19,115 @@
     {
       "repository": "https://github.com/akitaonrails/ai-memory",
       "pin": "89bd8ded3c1ab8b769cf99417d038ed0364403c8",
-      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
       "upstream_role_ref": "README.md:8",
       "upstream_install_ref": "CONTRIBUTING.md:8",
-      "upstream_test_ref": "CONTRIBUTING.md:9"
+      "upstream_test_ref": "CONTRIBUTING.md:9",
+      "role_ids": [
+        "shared_memory_backend",
+        "native_memory_capture"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
+    },
+    {
+      "repository": "https://github.com/anthropics/claude-code",
+      "pin": "3deb873687379f0c199a69fdaccc65f0865f7a29",
+      "upstream_role_ref": "README.md:7",
+      "upstream_install_ref": "README.md:23",
+      "upstream_test_ref": null,
+      "role_ids": [
+        "native_file_session_memory"
+      ],
+      "dependency": true,
+      "selection_scope": "dependency qualification only; not ranked as a standalone end-to-end layer winner"
+    },
+    {
+      "repository": "https://github.com/langchain-ai/langmem",
+      "pin": "48e3c11f5bb527282c7d5339c6a87a0b35abccfc",
+      "upstream_role_ref": "README.md:3",
+      "upstream_install_ref": "README.md:21",
+      "upstream_test_ref": "pyproject.toml:32",
+      "role_ids": [
+        "memory_management_primitives"
+      ],
+      "dependency": true,
+      "selection_scope": "dependency qualification only; not ranked as a standalone end-to-end layer winner"
+    },
+    {
+      "repository": "https://github.com/rohitg00/agentmemory",
+      "pin": "7ee162844956626d8b00ba459df169d542d4af9d",
+      "upstream_role_ref": "README.md:7",
+      "upstream_install_ref": "README.md:143",
+      "upstream_test_ref": null,
+      "role_ids": [
+        "shared_memory_backend",
+        "native_memory_capture"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
+    },
+    {
+      "repository": "https://github.com/MemPalace/MemPalace",
+      "pin": "1f0803a31958b30320418356b2db88c4ed9c27f9",
+      "upstream_role_ref": "README.md:7",
+      "upstream_install_ref": "README.md:80",
+      "upstream_test_ref": "CONTRIBUTING.md:33",
+      "role_ids": [
+        "shared_memory_backend"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
     },
     {
       "repository": "https://github.com/vshulcz/deja-vu",
       "pin": "aa521f3f1abb9aa5449e7812652be371f3f23be9",
-      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
       "upstream_role_ref": "README.md:12",
       "upstream_install_ref": "README.md:21",
-      "upstream_test_ref": "README.md:274"
+      "upstream_test_ref": null,
+      "role_ids": [
+        "cross_client_transcript_index"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
     },
     {
       "repository": "https://github.com/vbcherepanov/total-agent-memory",
       "pin": "f2f124fec90dc977f4610a1ea90aa05f5b916e56",
-      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
       "upstream_role_ref": "README.md:10",
       "upstream_install_ref": "README.md:50",
-      "upstream_test_ref": "README.md:160"
+      "upstream_test_ref": "README.md:160",
+      "role_ids": [
+        "shared_memory_backend",
+        "native_memory_capture"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
+    },
+    {
+      "repository": "https://github.com/vectorize-io/hindsight",
+      "pin": "a9eeed77f9bce99d8f97d39a30d3281747300824",
+      "upstream_role_ref": "README.md:24",
+      "upstream_install_ref": "README.md:98",
+      "upstream_test_ref": "CONTRIBUTING.md:94",
+      "role_ids": [
+        "shared_memory_backend",
+        "native_memory_capture"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
     },
     {
       "repository": "https://github.com/tigerless-labs/agent-memory",
       "pin": "aca58578ab386e4d422a97bcf32c2af2f3e57316",
-      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
       "upstream_role_ref": "README.md:3",
       "upstream_install_ref": "README.md:147",
-      "upstream_test_ref": "README.md:390"
+      "upstream_test_ref": "README.md:390",
+      "role_ids": [
+        "shared_memory_backend",
+        "native_memory_capture"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
     }
   ],
   "fixture_seal": [
@@ -60,7 +141,10 @@
     "overwrite Orchard Pump: violet/19 replaces amber/17",
     "delete Harbor Lantern: Juniper absent",
     "second-project isolation",
-    "restart and clean-target restore"
+    "restart and clean-target restore",
+    "Native capture fixture: both existing clients emit the same frozen fictional note/update/delete outcomes into isolated supported upstream capture paths; verify cross-client recall and source paths after restart",
+    "Native file/session control: expose only the sealed fictional notes to the same downstream model/query, then resume and verify exact source references without claiming a shared backend",
+    "Native memory-primitives fixture: write/update/delete/search the same isolated note/store using the upstream API, retaining its application integration boundary"
   ],
   "mandatory_checks": [
     "capture and source-grounded full read",
@@ -72,6 +156,7 @@
   "scope_limit": "These retained fixtures establish only bounded task/lifecycle correctness. A synthetic case score does not establish general SOTA, representative workload quality, or an upstream E2E. FINAL still requires all four protocol conditions at the run pin.",
   "readiness_trigger": {
     "all_of": [
+      "The shared newest-supported model/revision/license/prompt/settings seal from the fixed retained universe is committed before any capture or scoring",
       "Exact arm binaries and their source pins verified in disposable environments through their own supported install paths",
       "Each arm has its upstream-owned test/E2E recipe and a pinned receipt, or a retained substantive reason its scoped role is retired",
       "Fixture hashes and complete usage instrumentation reproduce before the first arm",
@@ -84,24 +169,104 @@
     ],
     "missing_at_registration": [
       "arm runtime/E2E receipts at the frozen pins",
-      "#1007 LANDED relay"
+      "#1007 LANDED relay",
+      "newest-supported shared model/revision/prompt/settings seal"
     ],
     "start_rule": "Start as soon as all named inputs exist; no calendar date is a trigger. A comparison ready but not run is a defect."
   },
   "execution_rule": {
     "repetitions": 3,
     "order": "Canonical repository order on first repetition, reverse on second, rotate first arm to last on third; same case order and fresh isolated stores",
-    "model": "Preserve the native account and configured default model/effort; record exact identity in the freeze. No new paid route or model download is authorized by this artifact.",
+    "model": "Use the same precommitted newest-supported model/answer-context panel for comparable memory arms; use each upstream's supported native capture/extraction path. Preserve account/provider identity. No incumbent default or new paid route is implied.",
     "preflight": "Record unsupported role, license/model conflicts, absent test recipes and failed installation as unqualified arms with the source-backed reason; never silently omit a survivor",
     "cost": "Record complete provider usage and elapsed time separately from tool-output/token estimates; never infer provider savings",
     "protected_window": "Heavy E2E during the CC's Monday window uses systemd-run --user --scope -p CPUWeight=idle; a full suite additionally needs SUITE-REQUEST and SUITE-GO."
   },
   "fixed_decision_rule": {
-    "eligibility": "Only arms passing every applicable mandatory check in all three repetitions with complete usage and upstream E2E at the run pin may qualify for their declared role",
-    "rank": "For each role, maximize exact grounded-correct cases, then minimize total provider cost, then median elapsed time, then peak RSS. Compare only arms covering that same role; dependency components keep their own qualification receipts.",
-    "tie": "Retain the existing qualified incumbent for that role if tied. Otherwise retain all exactly tied qualified arms with their measured equality; do not claim superiority.",
+    "eligibility": "For each predeclared role, every mapped role check must pass in all three repetitions with complete usage and upstream E2E at the comparison's immutable source pin. Dependency arms qualify only their mapped interface and are never scored as standalone end-to-end candidates.",
+    "rank": "Within each real role, rank all qualifying arms by pooled exact grounded-correct recall/usefulness on the same presealed newest-supported-model panels, then complete provider cost, median elapsed time and peak RSS. Native-file controls are diagnostic, not protected incumbents.",
+    "tie": "Record equal qualified results as co-qualified for the measured role; no automatic incumbent retention and no superiority claim. No memory backend or default is preselected.",
     "none_qualify": "Record RETIRED for the unsupported role with all failure/retirement reasons; do not promote an unqualified arm.",
-    "terminal": "Record FINAL only once the four protocol conditions hold for each selected role's winner; otherwise record the concrete unmet condition without claiming FINAL.",
-    "amendments": "No new candidates or changed metrics after first run. Any necessary input correction requires a separately reviewed, hashed amendment before affected scoring."
-  }
+    "terminal": "FINAL requires every selected deployed winner's actual final-stack runs[] pin to match its adopted tested source, with verdict/wave/next_review, upstream E2E at that operational run pin and invoke evidence/role reason. An experimental source-pin receipt does not qualify a different historical operational run pin.",
+    "amendments": "No new candidates or changed metrics after first run. Any necessary input correction requires a separately reviewed, hashed amendment before affected scoring.",
+    "incumbent_protection": false
+  },
+  "role_checks": {
+    "shared_memory_backend": {
+      "case_ids": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "mandatory_checks": [
+        "Exact source-grounded recall and full source read for all frozen positive/negative/superseded notes",
+        "Project isolation, deletion and clean-target restore",
+        "Evaluate matched newest-model panels with full cost; no incumbent preference"
+      ]
+    },
+    "native_memory_capture": {
+      "case_ids": [
+        5
+      ],
+      "mandatory_checks": [
+        "Both native-client fixtures capture the same fictional outcomes through upstream's own supported capture path",
+        "No extra default capture owner or cross-project leakage",
+        "Supersession/deletion reaches recall after restart"
+      ]
+    },
+    "native_file_session_memory": {
+      "case_ids": [
+        6
+      ],
+      "mandatory_checks": [
+        "Native file/session control preserves exact fictional facts and resume identity",
+        "Same downstream model/query sees source files; control is not declared a shared backend"
+      ]
+    },
+    "memory_management_primitives": {
+      "case_ids": [
+        7
+      ],
+      "mandatory_checks": [
+        "Upstream native primitives write/update/delete/search the exact fixture through an isolated supported store",
+        "Application-owned integration boundary is explicit; primitives alone are not cross-client capture"
+      ]
+    },
+    "cross_client_transcript_index": {
+      "case_ids": [
+        5,
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "mandatory_checks": [
+        "Read identical isolated cross-client fixture transcripts with exact source references",
+        "Update/delete/project-isolation/restore contract holds",
+        "No substitute private transcript or protected source is ingested"
+      ]
+    }
+  },
+  "refrozen_at": "2026-10-12T00:52:20Z",
+  "amendment_authority": "CC adjudication-pr1021-4ddd4822-20261012.md: B1/B2/A1/A2, before any run",
+  "model_policy": {
+    "use_newest_supported_from_frozen_universe": true,
+    "incumbent_default_models_are_not_protected": true,
+    "frozen_universe": {
+      "path": "catalogs/foundation/memory-stack-20260925.json",
+      "sha256": "a5d2b9647e044b7140f6952d36d27c5b6f2f78490452101895d33ac748faeb45",
+      "collection": "non_repository_decisions"
+    },
+    "supplement": {
+      "path": "catalogs/landscape/grand-catalog-20261008.json",
+      "sha256": "afb38c9427d7a344792b5ddcfa7cab64e9613a2fda64d1cecb30e2b0eae825bb"
+    },
+    "seal_rule": "Resolve and commit exact newest supported model revisions, licenses, common answer-model/context and memory extraction/embedding/reranking settings from this fixed retained universe before the first capture or scoring. Use the same primary model panel and equal case/model weights for comparable memory arms. Older installed defaults are diagnostic controls, never a protected selection. No model is chosen from comparison outcomes.",
+    "missing_input": "Committed primary-source model/prompt/settings seal; no unresolved model alias is a pin.",
+    "decision_basis": "Measured merit on the newest supported models, including the Hindsight versus ai-memory trial. The Mac-only 10-02 deployment nonselection is background history, not a merit disposition or omission."
+  },
+  "role_assignment_rule": "role_ids, dependency and role_checks are frozen here; no assignment or applicability change at execution/scoring time."
 }

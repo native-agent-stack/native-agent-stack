@@ -19,34 +19,54 @@
     {
       "repository": "https://github.com/oraios/serena",
       "pin": "1de556f71569f3acfc0743e526dd60aca40a545e",
-      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
       "upstream_role_ref": "README.md:7",
       "upstream_install_ref": "README.md:229",
-      "upstream_test_ref": "pyproject.toml:76"
+      "upstream_test_ref": "pyproject.toml:76",
+      "role_ids": [
+        "symbol_navigation",
+        "reference_graph_navigation"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
     },
     {
       "repository": "https://github.com/anthropics/claude-plugins-official",
       "pin": "f359d43b406057f1a8cdbc4ea93b827642c162e6",
-      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
-      "upstream_role_ref": "README.md:5",
+      "upstream_role_ref": "plugins/pyright-lsp/README.md:3",
       "upstream_install_ref": null,
-      "upstream_test_ref": null
+      "upstream_test_ref": null,
+      "role_ids": [
+        "native_lsp_distribution"
+      ],
+      "dependency": true,
+      "selection_scope": "dependency qualification only; not ranked as a standalone end-to-end layer winner"
     },
     {
       "repository": "https://github.com/abhigyanpatwari/GitNexus",
       "pin": "191a954bf67583447dac5c71cc8d679aabd101d8",
-      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
       "upstream_role_ref": "README.md:31",
       "upstream_install_ref": "README.md:68",
-      "upstream_test_ref": null
+      "upstream_test_ref": null,
+      "role_ids": [
+        "symbol_navigation",
+        "reference_graph_navigation",
+        "navigation_index_maintenance"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
     },
     {
       "repository": "https://github.com/mibayy/token-savior",
       "pin": "0a4a2e126530ff1222b7f9c62c290e517a738328",
-      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
       "upstream_role_ref": "README.md:7",
       "upstream_install_ref": "README.md:116",
-      "upstream_test_ref": "README.md:187"
+      "upstream_test_ref": null,
+      "role_ids": [
+        "symbol_navigation",
+        "navigation_index_maintenance"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
     }
   ],
   "fixture_seal": [
@@ -96,11 +116,58 @@
     "protected_window": "Heavy E2E during the CC's Monday window uses systemd-run --user --scope -p CPUWeight=idle; a full suite additionally needs SUITE-REQUEST and SUITE-GO."
   },
   "fixed_decision_rule": {
-    "eligibility": "Only arms passing every applicable mandatory check in all three repetitions with complete usage and upstream E2E at the run pin may qualify for their declared role",
+    "eligibility": "For each predeclared role, every mapped role check must pass in all three repetitions with complete usage and upstream E2E at the comparison's immutable source pin. Dependency arms qualify only their mapped interface and are never scored as standalone end-to-end candidates.",
     "rank": "For each role, maximize exact grounded-correct cases, then minimize total provider cost, then median elapsed time, then peak RSS. Compare only arms covering that same role; dependency components keep their own qualification receipts.",
     "tie": "Retain the existing qualified incumbent for that role if tied. Otherwise retain all exactly tied qualified arms with their measured equality; do not claim superiority.",
     "none_qualify": "Record RETIRED for the unsupported role with all failure/retirement reasons; do not promote an unqualified arm.",
-    "terminal": "Record FINAL only once the four protocol conditions hold for each selected role's winner; otherwise record the concrete unmet condition without claiming FINAL.",
+    "terminal": "FINAL requires every selected deployed winner's actual final-stack runs[] pin to match its adopted tested source, with verdict/wave/next_review, upstream E2E at that operational run pin and invoke evidence/role reason. An experimental source-pin receipt does not qualify a different historical operational run pin.",
     "amendments": "No new candidates or changed metrics after first run. Any necessary input correction requires a separately reviewed, hashed amendment before affected scoring."
-  }
+  },
+  "role_checks": {
+    "symbol_navigation": {
+      "case_ids": [
+        0,
+        2,
+        3
+      ],
+      "mandatory_checks": [
+        "Original definition span exact",
+        "Renamed/deleted symbol freshness and correct old-symbol absence"
+      ]
+    },
+    "reference_graph_navigation": {
+      "case_ids": [
+        1,
+        2,
+        3
+      ],
+      "mandatory_checks": [
+        "Exact caller/reference set, including empty-set oracle",
+        "No stale edge after rename/delete"
+      ]
+    },
+    "navigation_index_maintenance": {
+      "case_ids": [
+        2,
+        3
+      ],
+      "mandatory_checks": [
+        "Rename/delete index changes track isolated source changes",
+        "No unrelated project result"
+      ]
+    },
+    "native_lsp_distribution": {
+      "case_ids": [
+        0,
+        1
+      ],
+      "mandatory_checks": [
+        "Upstream plugin install/config activates its native LSP in an isolated client",
+        "Integrated native client returns the same source-span/reference oracle; distribution alone is not navigation evidence"
+      ]
+    }
+  },
+  "refrozen_at": "2026-10-12T00:52:20Z",
+  "amendment_authority": "CC adjudication-pr1021-4ddd4822-20261012.md: B1/B2/A1/A2, before any run",
+  "role_assignment_rule": "role_ids, dependency and role_checks are frozen here; no assignment or applicability change at execution/scoring time."
 }

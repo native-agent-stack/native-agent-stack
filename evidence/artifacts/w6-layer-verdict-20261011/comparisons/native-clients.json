@@ -19,26 +19,41 @@
     {
       "repository": "https://github.com/anthropics/claude-code",
       "pin": "3deb873687379f0c199a69fdaccc65f0865f7a29",
-      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
       "upstream_role_ref": "README.md:7",
       "upstream_install_ref": "README.md:23",
-      "upstream_test_ref": null
+      "upstream_test_ref": null,
+      "role_ids": [
+        "coding_research_client",
+        "session_recovery_client"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
     },
     {
       "repository": "https://github.com/openai/codex",
       "pin": "092d3acd6bec3e3a14bdc7e7a2810ab628ab759d",
-      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
-      "upstream_role_ref": "README.md:64",
-      "upstream_install_ref": "README.md:19",
-      "upstream_test_ref": "justfile:47"
+      "upstream_role_ref": "README.md:1",
+      "upstream_install_ref": "README.md:42",
+      "upstream_test_ref": "justfile:87",
+      "role_ids": [
+        "coding_research_client",
+        "session_recovery_client"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
     },
     {
       "repository": "https://github.com/earendil-works/pi",
       "pin": "04566631c2b51fb688486bc1f040f60d1518c126",
-      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
       "upstream_role_ref": "README.md:15",
       "upstream_install_ref": "README.md:28",
-      "upstream_test_ref": "package.json:39"
+      "upstream_test_ref": "package.json:39",
+      "role_ids": [
+        "coding_research_client",
+        "session_recovery_client"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
     }
   ],
   "fixture_seal": [
@@ -92,11 +107,37 @@
     "protected_window": "Heavy E2E during the CC's Monday window uses systemd-run --user --scope -p CPUWeight=idle; a full suite additionally needs SUITE-REQUEST and SUITE-GO."
   },
   "fixed_decision_rule": {
-    "eligibility": "Only arms passing every applicable mandatory check in all three repetitions with complete usage and upstream E2E at the run pin may qualify for their declared role",
+    "eligibility": "For each predeclared role, every mapped role check must pass in all three repetitions with complete usage and upstream E2E at the comparison's immutable source pin. Dependency arms qualify only their mapped interface and are never scored as standalone end-to-end candidates.",
     "rank": "For each role, maximize exact grounded-correct cases, then minimize total provider cost, then median elapsed time, then peak RSS. Compare only arms covering that same role; dependency components keep their own qualification receipts.",
     "tie": "Retain the existing qualified incumbent for that role if tied. Otherwise retain all exactly tied qualified arms with their measured equality; do not claim superiority.",
     "none_qualify": "Record RETIRED for the unsupported role with all failure/retirement reasons; do not promote an unqualified arm.",
-    "terminal": "Record FINAL only once the four protocol conditions hold for each selected role's winner; otherwise record the concrete unmet condition without claiming FINAL.",
+    "terminal": "FINAL requires every selected deployed winner's actual final-stack runs[] pin to match its adopted tested source, with verdict/wave/next_review, upstream E2E at that operational run pin and invoke evidence/role reason. An experimental source-pin receipt does not qualify a different historical operational run pin.",
     "amendments": "No new candidates or changed metrics after first run. Any necessary input correction requires a separately reviewed, hashed amendment before affected scoring."
-  }
+  },
+  "role_checks": {
+    "coding_research_client": {
+      "case_ids": [
+        3
+      ],
+      "mandatory_checks": [
+        "Bounded source task returns attributable tool results with no tool-result errors",
+        "Existing native account, configured model and effort remain unchanged"
+      ]
+    },
+    "session_recovery_client": {
+      "case_ids": [
+        0,
+        1,
+        2
+      ],
+      "mandatory_checks": [
+        "Checkpoint unchanged and executes once",
+        "Interrupted pending wait is retained and resume finishes the same native session/thread",
+        "Owned process cleanup succeeds"
+      ]
+    }
+  },
+  "refrozen_at": "2026-10-12T00:52:20Z",
+  "amendment_authority": "CC adjudication-pr1021-4ddd4822-20261012.md: B1/B2/A1/A2, before any run",
+  "role_assignment_rule": "role_ids, dependency and role_checks are frozen here; no assignment or applicability change at execution/scoring time."
 }

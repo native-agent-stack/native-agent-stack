@@ -19317,8 +19317,8 @@
     },
     {
       "path": "docs/w6-layer-verdict-delta-20261011.md",
-      "sha256": "72ad3c0bc0d64194149cf05c5ac145681e59f2f0d9e20ca02a0d437b8dbf9624",
-      "bytes": 6863
+      "sha256": "40dad8a1e36b3a54841f10938afd14fcb6f211929bca35eb41faa0c06bdfffae",
+      "bytes": 12491
     },
     {
       "path": "evidence/artifacts/actionlint-successor-parity-20260927/README.md",
@@ -57271,44 +57271,49 @@
       "bytes": 14901
     },
     {
+      "path": "evidence/artifacts/w6-layer-verdict-20261011/citation-corrections.json",
+      "sha256": "6f101b782ea6d5d74c71c9359410c2f294c7473d5b203db7310447bbb591d9d1",
+      "bytes": 11528
+    },
+    {
       "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/code-navigation.json",
-      "sha256": "9f560c450c03c6c5f8315afa5d995b6e0de4591f59dbb3b5716a1f738309a84a",
-      "bytes": 6401
+      "sha256": "6a67cd1a1b024b83f4ac2240c6ae0e38e8e8f852fa4bbdbd5f0e2aaa9ce9ca5a",
+      "bytes": 8280
     },
     {
       "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/document-retrieval.json",
-      "sha256": "2b6e26e8da25204c63acc1b5c3aff730d419665c7852c2128dedb9f270a4877f",
-      "bytes": 11968
+      "sha256": "96514687937dd0541f5736e4f6f7a438a351405daaf3afe704c2c0f5fec59667",
+      "bytes": 15227
     },
     {
       "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/durable-memory.json",
-      "sha256": "bd42f3d21c96df47a1b134673b0b52670769b55a6b6e4bc6d273f58f78d9c55d",
-      "bytes": 6458
+      "sha256": "4393b7454f2642160156aa71db5ad63928c8ea272ac269f60b4dece2eb01d468",
+      "bytes": 13644
     },
     {
       "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/native-clients.json",
-      "sha256": "218bf9847e57c5a4ec80b306b9a58bea38b64ade614456b536c1531b284f6c37",
-      "bytes": 6114
+      "sha256": "521b7cd99c4570a18a1481a9b07959084641b79fe810fab958632d0ffbf4004d",
+      "bytes": 7449
     },
     {
       "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/semantic-rag.json",
-      "sha256": "b2a379a1709fbc4498312c968780e21c622618f05c223721cd4fd8f9a1b854ed",
-      "bytes": 8300
+      "sha256": "71ecd57ce3c49064500ed918737686bdfbdd10577c1087c77ea685a12edc92bb",
+      "bytes": 10921
     },
     {
       "path": "evidence/artifacts/w6-layer-verdict-20261011/comparisons/web-research.json",
-      "sha256": "348d09fb50a0a78b976d35f33d0971f66f747be10d8e96357bde2770016a750a",
-      "bytes": 7816
+      "sha256": "4a40ea5731d59bdc82be5d18da88b9e9acaf0fb61443afa2ed8756bb74535a38",
+      "bytes": 10103
     },
     {
       "path": "evidence/artifacts/w6-layer-verdict-20261011/primary-sources.json",
-      "sha256": "91a7a67a808f38acb5b459267a01a036e257296f340d202f2b64d494d0226ba7",
-      "bytes": 24458
+      "sha256": "23fd7c8939b89ea1b5d113caeab357cc0102d2bb7d6c9c8a38cd3cb4e2083235",
+      "bytes": 25723
     },
     {
       "path": "evidence/artifacts/w6-layer-verdict-20261011/resolution-delta.json",
-      "sha256": "c0edef512232a944625bc031846ea535d4d73ced9bcbc954463ddfe7bca8fee5",
-      "bytes": 58047
+      "sha256": "cfe1749323b61c98ffb64004678e01c26a931c2faf3153d91a6c96ad8525d2cd",
+      "bytes": 102291
     },
     {
       "path": "evidence/artifacts/workstation-lane-20260925/nemotron-qualification/model_card_check.py",
@@ -62784,6 +62789,11 @@
       "path": "tests/test_verify_sources_row_limits.py",
       "sha256": "d49f34160c9bc266a6c0ef0e9970e2f14f8fcce9e5b4777011ff036363c78d1a",
       "bytes": 4042
+    },
+    {
+      "path": "tests/test_w6_layer_verdict_records.py",
+      "sha256": "4ca3f3d84a91c619efd64bc538fb126175726b4fc280c71b7f2a3be592245edc",
+      "bytes": 4629
     },
     {
       "path": "tests/test_windows_terminal_defaults.py",

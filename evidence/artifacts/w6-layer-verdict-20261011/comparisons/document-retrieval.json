@@ -19,130 +19,200 @@
     {
       "repository": "https://github.com/tobi/qmd",
       "pin": "facd35e01359e59d938bc9418e93fb9318addee3",
-      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
       "upstream_role_ref": "README.md:1",
       "upstream_install_ref": "README.md:32",
-      "upstream_test_ref": "package.json:31"
+      "upstream_test_ref": "package.json:31",
+      "role_ids": [
+        "document_retrieval"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
     },
     {
       "repository": "https://github.com/microsoft/markitdown",
       "pin": "fd239d5d2be43d9b68329730206b9312c7d5a388",
-      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
-      "upstream_role_ref": "README.md:8",
-      "upstream_install_ref": "README.md:51",
-      "upstream_test_ref": null
+      "upstream_role_ref": "README.md:10",
+      "upstream_install_ref": "README.md:63",
+      "upstream_test_ref": null,
+      "role_ids": [
+        "document_conversion"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
     },
     {
       "repository": "https://github.com/tsdgeos/poppler_mirror",
       "pin": "5b97e475790a11012ec6095d9a47c23f7f229cb9",
-      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
-      "upstream_role_ref": "README.md:16",
+      "upstream_role_ref": "utils/pdftotext.cc:130",
       "upstream_install_ref": null,
-      "upstream_test_ref": null
+      "upstream_test_ref": null,
+      "role_ids": [
+        "pdf_text_layout_extraction"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
     },
     {
       "repository": "https://github.com/datalab-to/marker",
       "pin": "e7c67f1d239ea6a805cbf4ed6c6b2056d435e22d",
-      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
       "upstream_role_ref": "README.md:23",
       "upstream_install_ref": "README.md:78",
-      "upstream_test_ref": "pyproject.toml:64"
+      "upstream_test_ref": "pyproject.toml:64",
+      "role_ids": [
+        "document_conversion",
+        "document_ocr_layout"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
     },
     {
       "repository": "https://github.com/opendatalab/MinerU",
       "pin": "b7f3dd0c5f6e6d66a298239ffd02b328b873918e",
-      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
       "upstream_role_ref": "README.md:3",
-      "upstream_install_ref": "README.md:74",
-      "upstream_test_ref": "pyproject.toml:90"
+      "upstream_install_ref": "README.md:84",
+      "upstream_test_ref": "pyproject.toml:90",
+      "role_ids": [
+        "document_conversion",
+        "document_ocr_layout"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
     },
     {
       "repository": "https://github.com/docling-project/docling",
       "pin": "21588f5261d0a5a051102356d9babb35e790f33e",
-      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
       "upstream_role_ref": "README.md:31",
       "upstream_install_ref": "README.md:70",
-      "upstream_test_ref": "CONTRIBUTING.md:79"
+      "upstream_test_ref": "CONTRIBUTING.md:79",
+      "role_ids": [
+        "document_conversion",
+        "document_ocr_layout"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
     },
     {
       "repository": "https://github.com/Cinnamon/kotaemon",
       "pin": "9ad3e4e49aa35b8acddd235918a5d9753c1cfdf9",
-      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
       "upstream_role_ref": "README.md:5",
       "upstream_install_ref": "README.md:157",
-      "upstream_test_ref": "CONTRIBUTING.md:50"
+      "upstream_test_ref": "CONTRIBUTING.md:50",
+      "role_ids": [
+        "document_retrieval"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
     },
     {
       "repository": "https://github.com/huggingface/sentence-transformers",
       "pin": "ff69486771998c07008ebd3c7e05e827f03df46f",
-      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
       "upstream_role_ref": "README.md:13",
       "upstream_install_ref": "README.md:26",
-      "upstream_test_ref": "CONTRIBUTING.md:62"
+      "upstream_test_ref": "CONTRIBUTING.md:62",
+      "role_ids": [
+        "document_embedding_reranking"
+      ],
+      "dependency": true,
+      "selection_scope": "dependency qualification only; not ranked as a standalone end-to-end layer winner"
     },
     {
       "repository": "https://github.com/arabold/docs-mcp-server",
       "pin": "b8447383cfe5f9933da0a2f16a84c1a663e2d216",
-      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
       "upstream_role_ref": "README.md:1",
       "upstream_install_ref": "CONTRIBUTING.md:26",
-      "upstream_test_ref": "CONTRIBUTING.md:32"
+      "upstream_test_ref": "CONTRIBUTING.md:32",
+      "role_ids": [
+        "versioned_documentation_retrieval"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
     },
     {
       "repository": "https://github.com/VectifyAI/PageIndex",
       "pin": "1a060dfc5c512ece03aeaa9cb80d76dbb5358bdf",
-      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
       "upstream_role_ref": "README.md:33",
       "upstream_install_ref": "README.md:33",
-      "upstream_test_ref": "pyproject.toml:57"
+      "upstream_test_ref": "pyproject.toml:57",
+      "role_ids": [
+        "document_retrieval"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
     },
     {
       "repository": "https://github.com/xberg-io/xberg",
       "pin": "b4bdf0b9346188c8b540698f80b359fb9ff60ed0",
-      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
       "upstream_role_ref": "README.md:103",
       "upstream_install_ref": "README.md:150",
-      "upstream_test_ref": "pyproject.toml:10"
+      "upstream_test_ref": "pyproject.toml:10",
+      "role_ids": [
+        "document_conversion",
+        "document_ocr_layout"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
     },
     {
       "repository": "https://github.com/pymupdf/pymupdf4llm",
       "pin": "ed515362c37554244a20a0fd3ef12d53760249a8",
-      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
       "upstream_role_ref": "README.md:26",
       "upstream_install_ref": "README.md:58",
-      "upstream_test_ref": null
+      "upstream_test_ref": null,
+      "role_ids": [
+        "document_conversion",
+        "document_ocr_layout"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
     },
     {
       "repository": "https://github.com/datalab-to/surya",
       "pin": "a2363d3311773a2b6145a40458043211c50c52f4",
-      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
       "upstream_role_ref": "README.md:31",
       "upstream_install_ref": "README.md:76",
-      "upstream_test_ref": "pyproject.toml:51"
+      "upstream_test_ref": "pyproject.toml:51",
+      "role_ids": [
+        "document_ocr_layout"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
     },
     {
       "repository": "https://github.com/alibaba/Logics-Parsing",
       "pin": "d75d42dbd92c518a4def19ac5895792828138d35",
-      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
       "upstream_role_ref": "README.md:11",
-      "upstream_install_ref": "README.md:137",
-      "upstream_test_ref": null
+      "upstream_install_ref": "README.md:138",
+      "upstream_test_ref": null,
+      "role_ids": [
+        "document_ocr_layout"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
     },
     {
       "repository": "https://github.com/baidu/Unlimited-OCR",
       "pin": "d49ff64afffc1f47ab563dc1c589bc2f78808fa4",
-      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
-      "upstream_role_ref": "README.md:85",
+      "upstream_role_ref": null,
       "upstream_install_ref": "README.md:159",
-      "upstream_test_ref": null
+      "upstream_test_ref": null,
+      "role_ids": [
+        "document_ocr_layout"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
     },
     {
       "repository": "https://github.com/datalab-to/chandra",
       "pin": "d4f7467435aa4137d9539f000ddf0b7ced3eb43f",
-      "role": "Layer requirement and case-relevant native interface; conversion, retrieval, serving and client dependencies are not ranked as interchangeable tools",
       "upstream_role_ref": "README.md:23",
       "upstream_install_ref": "README.md:58",
-      "upstream_test_ref": "pyproject.toml:58"
+      "upstream_test_ref": "pyproject.toml:58",
+      "role_ids": [
+        "document_conversion",
+        "document_ocr_layout"
+      ],
+      "dependency": false,
+      "selection_scope": "role-specific candidate; never rank across different role ids"
     }
   ],
   "fixture_seal": [
@@ -164,7 +234,10 @@
     "retrieve authored positive facts with page citation",
     "negative answer absent from sealed PDFs",
     "invalid input",
-    "search-then-get exact body"
+    "search-then-get exact body",
+    "Rasterize the already-sealed lumen PDF once with the same supported renderer/settings; OCR each common image and compare text, table cells and page layout with authored-source.json",
+    "Serve the already-sealed authored source under one declared local documentation version; index/search/get and query a nonexistent version",
+    "Run native embedding/reranking APIs on the common normalized sealed corpus/query text and preserve model identity, shapes and downstream source ranks"
   ],
   "mandatory_checks": [
     "exact page text and table cells against authored-source oracle",
@@ -201,11 +274,76 @@
     "protected_window": "Heavy E2E during the CC's Monday window uses systemd-run --user --scope -p CPUWeight=idle; a full suite additionally needs SUITE-REQUEST and SUITE-GO."
   },
   "fixed_decision_rule": {
-    "eligibility": "Only arms passing every applicable mandatory check in all three repetitions with complete usage and upstream E2E at the run pin may qualify for their declared role",
+    "eligibility": "For each predeclared role, every mapped role check must pass in all three repetitions with complete usage and upstream E2E at the comparison's immutable source pin. Dependency arms qualify only their mapped interface and are never scored as standalone end-to-end candidates.",
     "rank": "For each role, maximize exact grounded-correct cases, then minimize total provider cost, then median elapsed time, then peak RSS. Compare only arms covering that same role; dependency components keep their own qualification receipts.",
     "tie": "Retain the existing qualified incumbent for that role if tied. Otherwise retain all exactly tied qualified arms with their measured equality; do not claim superiority.",
     "none_qualify": "Record RETIRED for the unsupported role with all failure/retirement reasons; do not promote an unqualified arm.",
-    "terminal": "Record FINAL only once the four protocol conditions hold for each selected role's winner; otherwise record the concrete unmet condition without claiming FINAL.",
+    "terminal": "FINAL requires every selected deployed winner's actual final-stack runs[] pin to match its adopted tested source, with verdict/wave/next_review, upstream E2E at that operational run pin and invoke evidence/role reason. An experimental source-pin receipt does not qualify a different historical operational run pin.",
     "amendments": "No new candidates or changed metrics after first run. Any necessary input correction requires a separately reviewed, hashed amendment before affected scoring."
-  }
+  },
+  "role_checks": {
+    "document_conversion": {
+      "case_ids": [
+        0,
+        3
+      ],
+      "mandatory_checks": [
+        "Converted text/table values match authored PDF oracle",
+        "Invalid input is rejected with failed attempt retained"
+      ]
+    },
+    "pdf_text_layout_extraction": {
+      "case_ids": [
+        0,
+        3
+      ],
+      "mandatory_checks": [
+        "Extracted PDF text and page/layout references match authored oracle",
+        "Invalid PDF input is rejected"
+      ]
+    },
+    "document_ocr_layout": {
+      "case_ids": [
+        5
+      ],
+      "mandatory_checks": [
+        "Use one common frozen rasterization of the sealed PDF",
+        "OCR text/table cells and page layout match authored oracle; no per-arm image tuning"
+      ]
+    },
+    "document_retrieval": {
+      "case_ids": [
+        1,
+        2,
+        4
+      ],
+      "mandatory_checks": [
+        "Same sealed normalized document corpus and positive/negative queries",
+        "Correct facts, absence and source/page citations",
+        "Search-then-get body equality"
+      ]
+    },
+    "versioned_documentation_retrieval": {
+      "case_ids": [
+        6
+      ],
+      "mandatory_checks": [
+        "Index the same sealed local documentation artifact under the declared version",
+        "Return exact source body/version and abstain from nonexistent version or fact"
+      ]
+    },
+    "document_embedding_reranking": {
+      "case_ids": [
+        7
+      ],
+      "mandatory_checks": [
+        "Supported licensed checkpoint/revision sealed before use",
+        "Native embedding/reranking primitives work on the identical corpus/query text",
+        "Record finite shapes and deterministic ranking; assess downstream retrieval in the common fixed pipeline, not by parser score"
+      ]
+    }
+  },
+  "refrozen_at": "2026-10-12T00:52:20Z",
+  "amendment_authority": "CC adjudication-pr1021-4ddd4822-20261012.md: B1/B2/A1/A2, before any run",
+  "role_assignment_rule": "role_ids, dependency and role_checks are frozen here; no assignment or applicability change at execution/scoring time."
 }
