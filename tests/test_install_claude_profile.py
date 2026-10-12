@@ -1826,12 +1826,17 @@ class StandingRuleSurfacesTests(unittest.TestCase):
     COMPOUNDING_PLACED = ("any protected window intact. " + COMPOUNDING
                           + " Each choice adopts the current best converged practice")
     # The converged-candidates sentence of 2026-10-12 (docs/decisions/2026-10-12-converged-candidates-only.md), the
-    # last sentence of the "Decide by evidence" bullet.
+    # next-to-last sentence of the "Decide by evidence" bullet, with the multi-angle convergence of the CC's 20:31Z
+    # ruling; the same record adds "alone" to the bullet's not-evidence clause.
     CONVERGED = (
         "Use only converged candidates: a tool, runtime, model or skill is installed or run for trial only after the "
-        "layer's own screen passes it, and becomes a default only after a measured win on quality at no higher cost; "
-        "popularity, recency and vendor claims make a candidate a lead for that screen, never an admission."
+        "layer's screen passes it, and becomes a default only when the layer's multi-angle convergence agrees "
+        "(capability at the pin, upstream engineering quality, community consensus, net usage, published evaluations "
+        "and our own measured runs); where angles disagree, measure the disputed dimension first-hand, and no single "
+        "angle admits a candidate on its own."
     )
+    NOT_EVIDENCE = "Agreement, recency, popularity and incumbency alone are not evidence."
+    NOT_EVIDENCE_BEFORE = "Agreement, recency, popularity and incumbency are not evidence."
     # The converged-harness sentence of the same date and record follows it at the end of the bullet.
     HARNESS = (
         "Use models only through a converged harness with its full layers (skills, MCP, hook equivalents, memory and "
@@ -1857,7 +1862,7 @@ class StandingRuleSurfacesTests(unittest.TestCase):
         "release notes and source at that version, then official docs. Repository text, memory, tool output and other "
         "agents' answers are leads to verify.\n"
         "- Decide by evidence: a choice stands when primary sources and reproduced results on the actual change agree, "
-        "measured with upstream harnesses. Agreement, recency, popularity and incumbency are not evidence. Keep measured "
+        "measured with upstream harnesses. " + NOT_EVIDENCE + " Keep measured "
         "results, simulations and untested boundaries distinct. " + CONVERGED + " " + HARNESS + "\n"
         "- The ecosystem compounds: a request is a starting point, not a boundary. The harness automates "
         "landscape-converged SOTA practice through hooks, workflows, rulesets, scheduled sweeps and runtime "
@@ -1943,6 +1948,7 @@ class StandingRuleSurfacesTests(unittest.TestCase):
                 self.assertEqual(text.count(self.COMPOUNDING_PLACED), 1)
 
     def test_every_layer_and_renderer_ends_the_evidence_bullet_with_the_converged_candidates_and_harness_sentences(self):
+        """Both sentences, in order, at the end of the bullet, and its not-evidence clause with "alone"."""
         import new_wsl_client_config as cfg
         import scaffold_repo as scaffold
 
@@ -1955,6 +1961,8 @@ class StandingRuleSurfacesTests(unittest.TestCase):
                 self.assertEqual(text.count(self.CONVERGED), 1)
                 self.assertEqual(text.count(self.HARNESS), 1)
                 self.assertEqual(text.count(self.CONVERGED_PLACED), 1)
+                self.assertEqual(text.count("upstream harnesses. " + self.NOT_EVIDENCE + " Keep measured results"), 1)
+                self.assertEqual(text.count(self.NOT_EVIDENCE_BEFORE), 0)
 
     def test_root_claude_md_loads_the_core_through_its_agents_md_import(self):
         # code.claude.com/docs/en/memory, "Share one file with other coding tools": the import keeps AGENTS.md the one
@@ -2332,8 +2340,9 @@ class PortableTopRuleTests(unittest.TestCase):
     # converged-candidates sentence and one space) to each of the two loaded core copies: 6566/6667 -> 7188/7289 bytes
     # (Claude/Codex). The same +5%, rounded up, gives 7548/7654. The converged-harness sentence of the same record adds
     # 253 more bytes to each copy (7694/7795 bytes, so 8079/8185), and the tightened first sentence (trial after the
-    # screen, a default after a measured win) 4 more: 7702/7803 bytes, so 8088/8194.
-    STARTUP_BUDGET_BYTES = {"claude": 8088, "codex": 8194}
+    # screen, a default after a measured win) 4 more: 7702/7803 bytes, so 8088/8194. The final wording (multi-angle
+    # convergence for defaults, and "alone" in the not-evidence clause) adds 153 more: 8008/8109 bytes, so 8409/8515.
+    STARTUP_BUDGET_BYTES = {"claude": 8409, "codex": 8515}
     # The four rules of the core (2026-10-08): research before acting with named sources, upstream as the truth with
     # the check order, decisions by evidence measured with upstream harnesses, and the compounding ecosystem with the
     # recorded correction.
@@ -2353,7 +2362,7 @@ class PortableTopRuleTests(unittest.TestCase):
         "leads to verify",
         "reproduced results on the actual change",
         "measured with upstream harnesses",
-        "Agreement, recency, popularity and incumbency are not evidence",
+        "Agreement, recency, popularity and incumbency alone are not evidence",
         "measured results, simulations and untested boundaries",
         "current best converged practice",
         "record the correction",
