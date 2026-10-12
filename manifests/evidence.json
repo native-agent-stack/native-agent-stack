@@ -18966,6 +18966,11 @@
       "bytes": 7413
     },
     {
+      "path": "docs/decisions/2026-10-12-mcp-instruction-cap.md",
+      "sha256": "05ba8f79bb696837b91aed7ae38a9b8bdf66d23fb1abe5427a8618299a966f77",
+      "bytes": 7437
+    },
+    {
       "path": "docs/decisions/2026-10-12-mcp-template-live-reconciliation.md",
       "sha256": "a796423cb4464f5e74f538808c598b782e6d9bf05ad6035536796c0736ae68f1",
       "bytes": 13096
@@ -39624,6 +39629,21 @@
       "path": "evidence/artifacts/macos-token-pins-20260926/verify_pins_fail_closed.py",
       "sha256": "16a90804f3246f7ed35269e50cebed99eda4860eba66864d142413b4264212ec",
       "bytes": 15432
+    },
+    {
+      "path": "evidence/artifacts/mcp-instruction-cap-20261012/README.md",
+      "sha256": "c2fc07747c12f695d8b710b478258ad1a79cad0786b75024e1d752fe0ca4d475",
+      "bytes": 974
+    },
+    {
+      "path": "evidence/artifacts/mcp-instruction-cap-20261012/measurement.json",
+      "sha256": "8396c0f2053dd399c6aeac63a05dd8f3538eba35b0deb922c0192df87f172def",
+      "bytes": 1567
+    },
+    {
+      "path": "evidence/artifacts/mcp-instruction-cap-20261012/tools_list_lengths.py",
+      "sha256": "3bd26ac267c07356d5c63dc3bd63e3bde87c53095d78f00dd896575b0963415b",
+      "bytes": 1755
     },
     {
       "path": "evidence/artifacts/mcp-surfaces-trials-20261009/README.md",
@@ -62406,6 +62426,11 @@
       "bytes": 34229
     },
     {
+      "path": "tests/test_mcp_instruction_cap.py",
+      "sha256": "396456541b77d51ac83c607da58d7916464fd9c79b0554f6e7ae6a609cb84403",
+      "bytes": 10917
+    },
+    {
       "path": "tests/test_mcp_template_drift.py",
       "sha256": "b6dbd8de87a49822ce9e0da2bd35adbb8b2736033c81241808e9222233df24e8",
       "bytes": 61270
@@ -63219,6 +63244,11 @@
       "path": "tools/adoption/managed_block.py",
       "sha256": "9ff471014c52bfd58e89edf41a6664b7a079f578520a208bb4672e2d001e4f28",
       "bytes": 24723
+    },
+    {
+      "path": "tools/adoption/mcp_instructions_length.py",
+      "sha256": "3125959f180fac0f7c3b96d67443362c5eb09d03b99221bbca9c41d2241e5cf9",
+      "bytes": 5706
     },
     {
       "path": "tools/adoption/mcp_template_drift.py",
