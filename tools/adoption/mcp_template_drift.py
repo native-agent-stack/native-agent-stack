@@ -10,15 +10,16 @@ The live side is the user scope of Claude Code (`mcpServers` in ~/.claude.json, 
 that a plugin provides are not read. Nothing is written.
 
 One row per client and server name: SAME; DIFFERS (the differing fields named); TEMPLATE-ONLY (rendered, not registered); LIVE-ONLY (registered, not rendered). --acknowledged names a JSON file of the differences a decision record
-accepts (client, name, row, for DIFFERS the exact fields, a reason and a source: a regular file beneath this repository, named by a relative path and optionally followed by #heading): such a row is reported `ack <row>`
-and does not fail the run, and an entry that matches no current row is reported STALE-ACK and does fail it, so an exception cannot outlive its cause. There is no default file: the entries describe one host.
+accepts (client, name, row, for DIFFERS the exact fields, a reason that is text and a source: a regular file beneath this repository, named by a relative path and optionally followed by #heading): such a row is reported `ack <row>`
+and does not fail the run, and an entry that matches no current row is reported STALE-ACK and does fail it, so an exception cannot outlive its cause. An entry holds those keys and no other: a key the schema does not define, or a
+value of another kind, ends the run with exit 2 and a message that names the entry and never the value, and the report is built from the defined keys, never by copying an entry. There is no default file: the entries describe one host.
 
 No value of a registration is printed, in either format or on either stream, error messages included. Values are compared in memory and withheld from every description: environment variable and header NAMES are shown,
 never their values; a URL is shown as scheme://host (no userinfo, port, path, query or fragment) and withheld whole when it holds an `@`; a command as its file name (no directory); the transport from a fixed set
 (stdio, http, sse); arguments by count only, because a token that looks like an option can be the value of the option before it. The host label and the command's file name are printed as names, not as values: they are
 the two places where text of a registration still reaches a description. A description is built from those names, counts and fixed words, so a value cannot reach it by taking a shape the report did not foresee; a field
 of a shape that the checks name (a non-numeric timeout, a list that is a string, a table that is a list, a registration that is not a table, an argument that is not a string) ends the run with exit 2 and a message that names the server, never the value;
-a `type` or `command` of another kind is compared and withheld. Paths are printed relative to the home.
+a `type` or a `command` that is not text is compared and withheld. Paths are printed relative to the home.
 Exit 0: every difference is acknowledged; 1: an unacknowledged difference or a stale acknowledgement; 2: an input cannot be read.
 """
 from __future__ import annotations
@@ -51,6 +52,7 @@ TRANSPORTS = ("stdio", "http", "sse")                                      # the
 LIST_FIELDS = ("args", "env_vars", "enabled_tools", "disabled_tools")
 TABLE_FIELDS = ("env", "headers", "http_headers")
 CLAUDE_FIELDS = ("type", "url", "command", "args", "env", "headers")
+ACK_FIELDS = ("client", "name", "row", "fields", "reason", "source")         # the keys of an acknowledgement: any other is refused, and the report is built from these, never by copying an entry
 
 
 class DriftError(ValueError):
@@ -117,6 +119,9 @@ def read_codex(path: Path, home: Path | None = None) -> dict:
     return servers
 
 
+# Mechanisms at python/cpython@v3.13.16 (cbc944f4bc59639a444dd971c737788ba2283a91): sorted() over a list that mixes kinds raises TypeError (Objects/object.c L1032, do_richcompare: "'%s' not supported between instances
+# of '%.100s' and '%.100s'"); a JSON or TOML input nested beyond the interpreter's limit raises RecursionError (Modules/_json.c L1033 and L1041, _Py_EnterRecursiveCall while decoding an object and an array;
+# Lib/tomllib/_parser.py L432 and L628, parse_array and parse_value call each other with no depth guard of their own); Path.is_file re-raises an OSError outside _IGNORED_ERRNOS (Lib/pathlib/_abc.py L31 and L476-L488).
 def check_shape(spec) -> None:
     """Raise TypeError (compare turns it into a value-free DriftError) when a registration is not a table, a list field is not a list, a table field is not a table or an argument is not a string."""
     if not isinstance(spec, dict):
@@ -191,10 +196,12 @@ def shown_url(url) -> str:
 
 
 def shown_command(command) -> str:
-    """The file name of the program; the directory (which holds the account's home) is not printed."""
-    if not command:
+    """The file name of the program; the directory (which holds the account's home) is not printed. A command that is not text (a number, a boolean, a list, a table) is withheld: str() would give it the shape of a file name."""
+    if command is None or command == "":
         return "(no command)"
-    name = os.path.basename(str(command).rstrip("/"))
+    if not isinstance(command, str):
+        return WITHHELD
+    name = os.path.basename(command.rstrip("/"))
     return name if COMMAND.fullmatch(name) else WITHHELD
 
 
@@ -254,22 +261,28 @@ def load_acknowledged(path: Path, home: Path | None = None) -> list[dict]:
         if not isinstance(entry, dict):
             problems.append(f"{where} is not an object")
             continue
+        if not set(entry) <= set(ACK_FIELDS):
+            problems.append(f"{where}: the entry has keys that the schema does not define")
         if entry.get("client") not in CLIENTS:
             problems.append(f"{where}: client must be one of {CLIENTS}")
         if not isinstance(entry.get("name"), str) or not entry.get("name"):
             problems.append(f"{where}: name is missing")
         if entry.get("row") not in ROWS:
             problems.append(f"{where}: row must be one of {ROWS}")
-        if entry.get("row") == "DIFFERS" and not (isinstance(entry.get("fields"), list) and entry["fields"] and all(isinstance(field, str) for field in entry["fields"])):
+        fields = entry.get("fields")
+        named = isinstance(fields, list) and all(isinstance(field, str) for field in fields)
+        if entry.get("row") == "DIFFERS" and not (named and fields):
             problems.append(f"{where}: a DIFFERS entry names the differing fields, as a list of strings")
-        if not str(entry.get("reason") or "").strip():
-            problems.append(f"{where}: reason is missing")
+        elif fields is not None and not named:
+            problems.append(f"{where}: fields, when given, are a list of strings")
+        if not isinstance(entry.get("reason"), str) or not entry["reason"].strip():
+            problems.append(f"{where}: reason must be text")
         if not isinstance(entry.get("source"), str) or not repository_file(entry["source"]):
             # The value is input, and it may be a path of the account or any text: the refusal names the entry and the field, never what was given (CPython `!r` formats the operand, it does not redact it).
             problems.append(f"{where}: source must be a relative path to a regular file beneath this repository")
     if problems:
         raise DriftError(f"{shown_path(path, home)}: " + "; ".join(problems))
-    return data["acknowledged"]
+    return [{key: entry[key] for key in ACK_FIELDS if key in entry} for entry in data["acknowledged"]]
 
 
 def apply_acknowledged(rows: list[dict], entries: list[dict], clients: tuple) -> list[dict]:
@@ -346,7 +359,7 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     failed = any(r["row"] != "SAME" and not r.get("acknowledged") for r in rows) or bool(stale)
     shown_rows = [{**r, "name": safe_name(r["name"]), "fields": [safe_name(f) for f in r["fields"]]} for r in rows]
-    shown_stale = [{**e, "name": safe_name(e["name"]), "fields": [safe_name(f) for f in e.get("fields") or []]} for e in stale]
+    shown_stale = [{"client": e["client"], "name": safe_name(e["name"]), "row": e["row"], "fields": [safe_name(f) for f in e.get("fields") or []], "reason": e["reason"], "source": e["source"]} for e in stale]
     if args.json:
         print(json.dumps({"ok": not failed, "notes": notes, "rows": shown_rows, "stale": shown_stale}, indent=1, sort_keys=True))
     else:

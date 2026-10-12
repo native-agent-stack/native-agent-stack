@@ -18922,8 +18922,8 @@
     },
     {
       "path": "docs/decisions/2026-10-12-mcp-template-live-reconciliation.md",
-      "sha256": "ed92cb68097fd0bea65eef5279e5cd751127e521fd57364d042e6b7e1c2c91ab",
-      "bytes": 12876
+      "sha256": "a796423cb4464f5e74f538808c598b782e6d9bf05ad6035536796c0736ae68f1",
+      "bytes": 13096
     },
     {
       "path": "docs/decisions/w6-practice-closeout-20261011/README.md",
@@ -62332,8 +62332,8 @@
     },
     {
       "path": "tests/test_mcp_template_drift.py",
-      "sha256": "67d978be835876dcf38cec48e468c64dfe642f9e128fe02f4944f2ae02d4bef3",
-      "bytes": 51602
+      "sha256": "b6dbd8de87a49822ce9e0da2bd35adbb8b2736033c81241808e9222233df24e8",
+      "bytes": 61270
     },
     {
       "path": "tests/test_mcporter_selectors.py",
@@ -63142,8 +63142,8 @@
     },
     {
       "path": "tools/adoption/mcp_template_drift.py",
-      "sha256": "81d580b481cb272e9bb7fdc0f788e7e65671afdc76d6d5c9e0c3fdb6b486c8a2",
-      "bytes": 23055
+      "sha256": "f3a284e1db5f88515ddbfd55f3d17bba91ceca760abee65fc7ee60361b2a7e69",
+      "bytes": 24847
     },
     {
       "path": "tools/adoption/new_wsl_client_config.py",

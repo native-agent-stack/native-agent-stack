@@ -369,6 +369,19 @@ class DriftTests(unittest.TestCase):
                 self.assertNotIn("Traceback", err)
                 self.assertNotIn(self.tmp.name, err)
 
+    def test_a_deeply_nested_acknowledged_file_ends_the_run_with_exit_two_and_a_fixed_message(self):
+        """The CC's P3-6: the RecursionError catch of load_acknowledged had no test (dropping it left the module green). CPython Modules/_json.c L1033 and L1041: _Py_EnterRecursiveCall while decoding an object and an array."""
+        claude_path, codex_path = self.live()
+        nested = Path(tempfile.mkdtemp(dir=self.tmp.name)) / "ack.json"
+        nested.write_text("[" * 200000, encoding="utf-8")
+        for extra in ((), ("--json",)):
+            with self.subTest(json=bool(extra)):
+                code, out, err = self.run_tool(claude_path, codex_path, "--acknowledged", str(nested), *extra)
+                self.assertEqual((code, out), (2, ""))
+                self.assertIn("RecursionError", err)
+                self.assertNotIn("Traceback", err)
+                self.assertNotIn(self.tmp.name, err)
+
     @unittest.skipIf(os.geteuid() == 0, "root can search any directory")
     def test_a_home_whose_codex_directory_cannot_be_searched_ends_the_run_with_exit_two(self):
         home = Path(tempfile.mkdtemp(dir=self.tmp.name))
@@ -608,6 +621,112 @@ class DriftTests(unittest.TestCase):
                         self.assertNotIn(needle, done.stdout + done.stderr)
                     self.assertIn("acknowledged[0]", done.stderr)
                     self.assertIn("source must be a relative path", done.stderr)
+
+    def run_with_acknowledgement(self, entry, *extra):
+        """The real command as a subprocess with one acknowledgement entry; returns (code, stdout, stderr)."""
+        claude_path, codex_path = self.live()
+        path = self.acknowledgements(entry)
+        done = subprocess.run([sys.executable, "-I", str(SCRIPT), "--home", str(self.home), "--eco-root", str(self.eco), "--claude-json", str(claude_path), "--codex-config", str(codex_path),
+                               "--acknowledged", str(path), *extra], capture_output=True, text=True, timeout=180, env={"PATH": os.environ["PATH"], "HOME": str(self.home)})
+        return done.returncode, done.stdout, done.stderr
+
+    def test_an_acknowledgement_with_a_key_the_schema_does_not_define_is_refused_and_never_published(self):
+        """Astra's read of 55dba7f4 (~/.cache/ns2604-gpt-reads/fix3-pr1034-55dba7f4c/VERDICT.md, blocker 1): `shown_stale` copied the whole entry (`{**e, ...}`), so a nested key of the acknowledged file that is not
+        a defined field reached stdout in JSON (CPython Doc/reference/expressions.rst L359: dictionary unpacking copies every item; Lib/json/encoder.py L354 iterates them). The entry is refused at load with a message
+        that names it and never what it holds, and the report is built from the defined keys."""
+        base = self.entry("claude", "review-absent", "LIVE-ONLY")
+        shapes = {"a nested object": {"private_context": {"token": "private-review-token"}}, "a text key": {"note": "private-review-token"}, "a list": {"extra": ["private-review-token"]},
+                  "a key that spells a defined one": {"Reason": "private-review-token"}, "a null": {"owner": None}}
+        for label, extra_keys in shapes.items():
+            for extra in ((), ("--json",)):
+                with self.subTest(keys=label, json=bool(extra)):
+                    code, out, err = self.run_with_acknowledgement({**base, **extra_keys}, *extra)
+                    self.assertEqual((code, out), (2, ""), err)
+                    self.assertNotIn("private-review-token", out + err)
+                    self.assertNotIn("Traceback", err)
+                    self.assertIn("acknowledged[0]", err)
+                    self.assertIn("keys that the schema does not define", err)
+
+    def test_the_reason_of_an_acknowledgement_is_text(self):
+        """The same read, the adjacent probe: a `reason` that is an object holding a token was accepted and serialised in the stale entry."""
+        base = self.entry("claude", "review-absent", "LIVE-ONLY")
+        reasons = {"an object": {"token": "private-review-token"}, "a list": ["private-review-token"], "a number": 90817263, "a boolean": True, "a null": None, "blank text": "   ", "empty text": ""}
+        for label, reason in reasons.items():
+            for extra in ((), ("--json",)):
+                with self.subTest(reason=label, json=bool(extra)):
+                    code, out, err = self.run_with_acknowledgement({**base, "reason": reason}, *extra)
+                    self.assertEqual((code, out), (2, ""), err)
+                    for needle in ("private-review-token", "90817263"):
+                        self.assertNotIn(needle, out + err)
+                    self.assertNotIn("Traceback", err)
+                    self.assertIn("reason must be text", err)
+
+    def test_fields_of_an_acknowledgement_are_a_list_of_names_for_every_kind_of_row(self):
+        """Astra's follow-up 1 and the CC's P3-7: `fields` was checked for DIFFERS only, and a stale LIVE-ONLY entry with `fields: 42` ended in a TypeError traceback (exit 1) while the report was built."""
+        for row in ("LIVE-ONLY", "TEMPLATE-ONLY"):
+            for label, fields in (("a number", 42), ("a float", 4.5), ("a boolean", True), ("text", "args"), ("a list of numbers", [1]), ("a list of lists", [["args"]]), ("a table", {"args": "x"})):
+                for extra in ((), ("--json",)):
+                    with self.subTest(row=row, fields=label, json=bool(extra)):
+                        code, out, err = self.run_with_acknowledgement({**self.entry("claude", "review-absent", row), "fields": fields}, *extra)
+                        self.assertEqual((code, out), (2, ""), err)
+                        self.assertNotIn("Traceback", err)
+                        self.assertIn("fields, when given, are a list of strings", err)
+        for fields in (None, [], ["args"]):
+            with self.subTest(accepted=fields):
+                entry = self.entry("claude", "review-absent", "LIVE-ONLY")
+                code, out, err = self.run_with_acknowledgement({**entry, "fields": fields}, "--json")
+                self.assertEqual((code, err), (1, ""), "the entry is valid and stale: exit 1, nothing on stderr")
+
+    def test_a_stale_acknowledgement_is_published_from_its_defined_keys_only(self):
+        """The report is built from the defined keys: the stale entry of the JSON output holds exactly those, with the name and the fields as names."""
+        entry = {**self.entry("claude", "review absent!", "LIVE-ONLY", reason="a decision accepts it"), "fields": ["args", "bad name!"]}
+        code, out, err = self.run_with_acknowledgement(entry, "--json")
+        self.assertEqual((code, err), (1, ""))
+        stale = json.loads(out)["stale"]
+        self.assertEqual(len(stale), 1)
+        self.assertEqual(sorted(stale[0]), sorted(drift.ACK_FIELDS))
+        self.assertEqual((stale[0]["name"], stale[0]["fields"], stale[0]["row"], stale[0]["client"]), (drift.WITHHELD, ["args", drift.WITHHELD], "LIVE-ONLY", "claude"))
+        self.assertEqual(stale[0]["source"], SOURCE)
+        loaded = drift.load_acknowledged(self.acknowledgements(entry))
+        self.assertEqual(sorted(loaded[0]), sorted(drift.ACK_FIELDS), "the loaded entries hold the defined keys")
+
+    def test_the_report_copies_no_entry_whatever_the_loader_returned(self):
+        """Defence in depth: the stale entry of both formats is built from the defined keys, so a loader that let a key through (here a stub that returns one) still publishes none of it."""
+        claude_path, codex_path = self.live()
+        leaking = [{**self.entry("claude", "review-absent", "LIVE-ONLY"), "private_context": {"token": "private-review-token"}, "fields": ["args"]}]
+        for extra in ((), ("--json",)):
+            with self.subTest(json=bool(extra)), mock.patch.object(drift, "load_acknowledged", return_value=leaking):
+                code, out, err = self.run_tool(claude_path, codex_path, "--acknowledged", str(self.acknowledgements()), *extra)
+                self.assertEqual((code, err), (1, ""))
+                self.assertNotIn("private-review-token", out)
+                self.assertNotIn("private_context", out)
+                if extra:
+                    self.assertEqual(sorted(json.loads(out)["stale"][0]), sorted(drift.ACK_FIELDS))
+
+    def test_a_command_that_is_not_text_is_withheld_for_either_client_in_either_format(self):
+        """Astra's P2 and the CC's B6 (55dba7f4): `shown_command` called str() on the command, so a number or a boolean, which has the shape of a file name, was printed (90817263 in all four combinations of
+        client and format) although the docstring, the record and the body said a command of another kind is withheld."""
+        needle = "90817263"
+        for label, value in (("an integer", 90817263), ("a float", 90817263.5), ("true", True), ("false", False), ("a list", [90817263]), ("a table", {"command": 90817263})):
+            for client in ("claude", "codex"):
+                if client == "claude":
+                    servers = json.loads(json.dumps(self.claude))
+                    servers["semble"]["command"] = value
+                    paths = self.live(servers)
+                else:
+                    paths = self.live(codex_text=self.codex_with(lambda servers, value=value: servers["semble"].update(command=value)))
+                for extra in ((), ("--json",)):
+                    with self.subTest(command=label, client=client, json=bool(extra)):
+                        code, out, err = self.run_tool(*paths, *extra)
+                        self.assertEqual(code, 1, err)
+                        self.assertNotIn(needle, out + err)
+                        self.assertIn("semble", out)
+                        self.assertIn(drift.WITHHELD, out)
+        self.assertEqual(drift.shown_command(90817263), drift.WITHHELD)
+        self.assertEqual(drift.shown_command(None), "(no command)")
+        self.assertEqual(drift.shown_command(""), "(no command)")
+        self.assertEqual(drift.shown_command("/opt/tools/bin/server"), "server", "a string keeps its file name")
+        self.assertEqual(drift.describe({"command": 90817263, "args": [], "env": {}, "headers": {}}), f"stdio {drift.WITHHELD}")
 
     def test_the_committed_acknowledgements_agree_with_the_render_and_cite_sections_of_their_record(self):
         """What can be checked without a live host: the file is well formed, each source is a heading of the record, a LIVE-ONLY entry names a server the render does not have and a DIFFERS entry one it has."""
