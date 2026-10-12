@@ -83,7 +83,16 @@ class ManualRuntimeReadLock(unittest.TestCase):
                 # stands at the entry boundary before any private/order state.
                 function.body = [ast.Return(ast.Call(ast.Name("entry_probe", ast.Load()), [], []))]
                 function.returns = None
+                # Use the real new receipt decorator while preserving main's
+                # complete production decorator stack and native lock probes.
+                sys.path.insert(0,str(PAPER))
+                try:
+                    import runner as receipt_runner
+                finally:
+                    sys.path.pop(0)
                 namespace = {"runtime_read_locked": helper.runtime_read_locked,
+                             "receipt_scope": receipt_runner.receipt_scope,
+                             "runner_module": receipt_runner,
                              "entry_probe": lambda: self.assertEqual(self.writer(project.parent / ".us-equities-runtime.lock"), 1)}
                 exec(compile(ast.fix_missing_locations(ast.Module([function], [])), name, "exec"), namespace)
                 with patch.object(helper.Path, "home", return_value=root), patch.object(sys, "prefix", str(project / ".venv")):

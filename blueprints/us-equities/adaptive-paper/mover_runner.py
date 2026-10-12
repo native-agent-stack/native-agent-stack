@@ -47,7 +47,8 @@ if _HERE not in sys.path:
     sys.path.insert(0, _HERE)
 import safety  # noqa: E402
 import runner as runner_module
-from exploration import config_digest, is_exploratory, receipt_labels, validate_exploratory_paths
+from exploration import (active_trial_metadata, config_digest, is_exploratory,
+                         publish_trial_projection, receipt_labels, validate_exploratory_paths)
 from mover import (EXIT_HEADROOM_FACTOR, PROTOCOL_ID, X1_FLATTEN_AT_ET, X2_HOLD_SECONDS,  # noqa: E402
                    X3_TRAIL_FRACTION, X4_STOP_FRACTION, X4_TARGET_FRACTION, MoverBook, MoverRefusal, Timing,
                    build_plan, engine_config, load_mover_config, load_scan, plan_session, session_state_after, text)
@@ -663,6 +664,8 @@ def command_check(args):
                            "caps_usd": {k: text(v) for k, v in s.caps_usd.items()},
                            "intended_notional_usd": text(s.notional_usd), "binding": s.binding,
                            "skip_reason": s.skip_reason} for s in plan.symbols]}
+    result['raw_config_sha256']=_sha256(args.config.read_bytes())
+    result.update(runner_module.RECEIPT_LABELS)
     if args.output:
         save(args.output, result)
     print(json.dumps(result, indent=2, default=str))
@@ -751,7 +754,8 @@ def command_paper(args):
             # tolerate another ledger's orders or cash changes on its account (see README-mover.md).
             return not_started(args.output, evidence_class="PAPER", reason="account_shared_with_adaptive_lane",
                                stage="trial_start", config_sha256=config_sha, scan_sha256=scan_sha, preflight=summary)
-        previous = json.loads(metadata_path.read_text()) if metadata_path.exists() else None
+        previous = (active_trial_metadata(state_dir) if exploratory else
+                    json.loads(metadata_path.read_text()) if metadata_path.exists() else None)
         if exploratory and previous is not None and (not isinstance(previous, dict)
                 or previous.get("paper_lane") != "B" or previous.get("evidence_class") != "exploratory"):
             raise SafetyError("exploratory_trial_lineage_required")
@@ -760,7 +764,7 @@ def command_paper(args):
                                stage="trial_start", config_sha256=config_sha, scan_sha256=scan_sha, preflight=summary)
         try:
             ledger = Ledger(state_dir / "ledger.sqlite3", limits,
-                            **({"exploratory": True} if exploratory else {}))
+                            **({"exploratory": True, "rotation": True} if exploratory else {}))
         except SafetyError as exc:
             return not_started(args.output, evidence_class="PAPER", reason=str(exc), stage="trial_start",
                                config_sha256=config_sha, scan_sha256=scan_sha, preflight=summary)
@@ -817,23 +821,23 @@ def command_paper(args):
                 scan = replace(scan, symbols=tuple(s for s in scan.symbols if s.symbol in tradable))
                 plan = build_plan(settings, limits, scan, session_plan, trial_id=args.trial, evidence_class="PAPER",
                                   t0=now, equity=equity, engine_leverage_multiple=multiple)
+                metadata = {"lane": "mover", "protocol": PROTOCOL_ID, "trial_id": args.trial,
+                    "config_sha256": config_sha, "scan_sha256": scan_sha, "symbols": list(plan.symbol_names()),
+                    "shared_account_override": bool(args.allow_shared_account),
+                    "started_at": (previous or {}).get("started_at", now), "current_trial_started_at": now,
+                    "fee_window_start": window_start, "baseline_cash": format(baseline, "f"), "phase": "starting",
+                    "inter_trial_cash_change_usd": None if inter_trial is None else format(inter_trial, "f"),
+                    "lane_state": session_state_after(session_plan, equity_end=equity),
+                    "history": list((previous or {}).get("history", []))}
+                if exploratory:
+                    metadata.update(engine_kind='mover', **runner_module.RECEIPT_LABELS)
                 ledger.begin_next_trial(now, args.trial,
-                    **({"config_sha256": config_sha, "limits": limits} if exploratory else {}))
+                    **({"config_sha256": config_sha, "limits": limits, "metadata": metadata} if exploratory else {}))
             except (SafetyError, TransportError) as exc:
                 return not_started(args.output, evidence_class="PAPER", reason=str(exc), stage="trial_start",
                                    config_sha256=config_sha, scan_sha256=scan_sha, preflight=summary)
-            history = list((previous or {}).get("history", []))
-            metadata = {"lane": "mover", "protocol": PROTOCOL_ID, "trial_id": args.trial, "config_sha256": config_sha,
-                        "scan_sha256": scan_sha, "symbols": list(plan.symbol_names()),
-                        "shared_account_override": bool(args.allow_shared_account),
-                        "started_at": (previous or {}).get("started_at", now), "current_trial_started_at": now,
-                        "fee_window_start": window_start,
-                        "baseline_cash": format(baseline, "f"), "phase": "starting",
-                        "inter_trial_cash_change_usd": None if inter_trial is None else format(inter_trial, "f"),
-                        "lane_state": session_state_after(session_plan, equity_end=equity), "history": history}
-            if exploratory:
-                metadata["engine_kind"] = "mover"
-            save(metadata_path, metadata)
+            history = metadata['history']
+            publish_trial_projection(ledger,metadata_path,metadata,save)
             fee_window = fee_window_start(metadata)
             controller_close, market_open = _controller_session(close, now, session_policy)
             controller = MoverController(ledger, controller_close, market_open=market_open,
@@ -911,7 +915,7 @@ def command_paper(args):
                             "equity_start_usd": format(equity, "f"), "equity_end_usd": format(equity_end, "f"),
                             "config_sha256": config_sha, "scan_sha256": scan_sha})
             metadata["history"] = history
-            save(metadata_path, metadata)
+            publish_trial_projection(ledger,metadata_path,metadata,save)
             save(args.output, receipt)
             print(json.dumps({k: receipt.get(k) for k in ("status", "flat", "evidence_class")}, default=str))
             return exit_code
@@ -947,9 +951,10 @@ def command_recover(args):
     with account_lock_fingerprint(fingerprint):
         state_dir = args.state_root / fingerprint / ("adaptive" if exploratory else "mover")
         metadata_path = state_dir / "trial.json"
-        if not metadata_path.exists():
+        metadata = active_trial_metadata(state_dir) if exploratory else (
+            json.loads(metadata_path.read_text()) if metadata_path.exists() else None)
+        if metadata is None:
             raise SafetyError("no_owned_trial_to_recover")
-        metadata = json.loads(metadata_path.read_text())
         # Identity discovery above is read-only. Bind the retained trial under
         # its account mutex before Ledger initialization or durable reservations.
         if not isinstance(metadata, dict) or metadata.get("config_sha256") != config_sha:
@@ -993,7 +998,7 @@ def command_recover(args):
                                                      if row["activity_id"] not in known_fees]))
             phase, exit_code = trial_phase_and_exit_code(result)
             metadata.update(phase=phase, status=result["status"], recovered_at=time.time())
-            save(metadata_path, metadata)
+            publish_trial_projection(ledger,metadata_path,metadata,save)
             save(args.output, result)
             print(json.dumps({k: result.get(k) for k in ("status", "flat")}))
             return exit_code

@@ -27,15 +27,27 @@ Check (c) is satisfied by config-specific registrations in that SAME journal:
 `exploratory_config_history` retains the namespace order. The effective digest
 binds public config values, resolved preset values and registry digest, and the
 effective RiskLimits, rather than just the config's input bytes. Raw deployment
-hashes remain separately checkable; the runner's preflight records
-`raw_config_sha256`. Recovery requires the active effective config and the
-engine that owned the trial (`engine_kind`); it never rotates.
+hashes remain separately checkable: mover `check` reports `raw_config_sha256`
+beside the effective `config_sha256`, and paper preflight also records it.
+Recovery requires the active effective config and engine (`engine_kind`); it
+never rotates. Default reopening requires exactly the stored limits; only an
+explicit paper-rotation open may retain the old bounds pending reconciliation.
 
 A completed trial must be flat and terminal. Fresh broker preflight and the
 account writer lock still apply. The next trial books fee activities over the
 original fee window and compares broker cash against the original baseline plus
 cumulative ledger cash delta. Only then does trial admission atomically register
-the new config and install its limits. Duplicate identities, backward clocks,
+the new config, install its limits and persist the active trial's config digest,
+engine, identity, cash baseline and fee lineage in SQLite. `trial.json` is a
+recoverable projection. Every exploratory startup/recovery reads and validates
+the committed active record before accepting a config, and completed/recovered
+phase updates commit there before the JSON write. A failed JSON publication
+cannot authorize the prior config or engine; recovery with the committed new
+config repairs the projection. Unbound pre-change projections fail closed.
+The standalone registration API is restricted to bootstrap before any trial;
+rotation callers must use atomic admission. Empty files without tables can
+bootstrap, but existing unmarked account journals still refuse adoption.
+Duplicate identities, backward clocks,
 unfinished/held state, unresolved orders, cash drift, changed capital, exhausted
 risk budgets and latched halts refuse. A refusal cannot publish new limits or
 clear the old trial. Fills, fee identities, cash deltas, risk history and request
@@ -51,9 +63,12 @@ flattening-window and range validation still run; an X1/chain preset is refused
 when its close exit cannot actually occur in that trial. These are selectable
 candidate mechanics, not a historically selected optimum.
 
-The generic runner also resolves baseline, partial-take-profit, volatility and
-time-decay candidates using the pre-existing tested exit fields. The partial
-fraction is the existing 0.5 fixture. Volatility and time-decay use the exact
+The generic runner also resolves baseline, volatility and time-decay candidates
+using the pre-existing tested exit fields. Partial take-profit is unregistered:
+the existing stateless half-fraction mechanics sell 2, 1 and 1 shares from a
+four-share position on successive profitable ticks. A one-shot partial preset
+needs a persisted consumed-state design and repeat/restart tests before its
+registration. Volatility and time-decay use the exact
 numeric fixture parameters cited below; deterministic code selects every value.
 The registry's full effective parameters and digest appear in B receipts. T22's
 family-specific ATR/preset definitions remain with its dispatch owner.
@@ -71,8 +86,8 @@ marketable LIMIT/DAY path; no broker stop, market or multi-leg order is added.
   `runner.py:2520` config-hash barrier; `safety.py:476-481` frozen limits;
   `safety.py:631-638` same-journal trial transition; `mover_runner.py:730-812`
   separate mover journal and fee/cash checks; `exits.py` existing rule chain.
-- The same pin's `config.json:32-36`, `mover.py:77-81` and
-  `tests/test_adaptive_paper_exits.py:147-161,193-203,234-250` supply the retained
+- The same pin's `config.json:30-34`, `mover.py:77-81` and
+  `tests/test_adaptive_paper_exits.py:147-161,234-250` supply the retained
   deterministic numeric candidates. No empirical fit was inferred from them.
 - Official `alpacahq/alpaca-py` v0.44.0 at
   `cc4cb3b7ba50ae250e621983c2779047fb16bb28`,
@@ -97,3 +112,8 @@ decision through a cited regression, not through silent state replacement.
   owning studies; exploratory results are not qualification evidence.
 - Relative, privacy-safe live diagnostics need a supported manifest reader;
   the first exploratory caller does not require them.
+- A partial take-profit candidate requires persisted consumed state before
+  registration; the removed half-fraction selector is refused explicitly.
+- Historical bare locators in the strategy/native-fault READMEs need source
+  pins in their own update; inherited manifest hostname labels are separate
+  hygiene (18 matching lines), never an identity printed here.

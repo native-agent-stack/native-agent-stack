@@ -2,6 +2,7 @@
 from pathlib import Path
 import hashlib
 import json
+import sqlite3
 
 PRESET_VERSION = "paper-exits-v1-20261012"
 
@@ -48,6 +49,53 @@ def config_digest(config, raw, *, limits=None):
     if limits is not None:
         effective["effective_risk_limits"] = json.loads(limits.frozen_json())
     return hashlib.sha256(json.dumps(effective, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+
+
+def active_trial_metadata(state_dir):
+    """Read SQLite's active admission before using the JSON projection.
+
+    Pre-change B state can be read only when its JSON identity and registered
+    limits match the active journal. Historical namespaces alone are insufficient.
+    This performs no writes; the account lock protects the caller's second read.
+    """
+    from safety import SafetyError
+    state_dir=Path(state_dir)
+    db_path=state_dir/'ledger.sqlite3'
+    projection=state_dir/'trial.json'
+    try:
+        metadata=json.loads(projection.read_text()) if projection.exists() else None
+    except (OSError,ValueError):
+        metadata=None
+    if not db_path.exists() or db_path.stat().st_size == 0:
+        return metadata
+    if db_path.is_symlink():
+        raise SafetyError('ledger_symlink_refused')
+    db=sqlite3.connect(db_path.resolve().as_uri()+'?mode=ro',uri=True)
+    try:
+        if not db.execute("SELECT 1 FROM sqlite_master WHERE name='meta'").fetchone():
+            return metadata
+        rows=dict(db.execute('SELECT key,value FROM meta'))
+        record=rows.get('exploratory_active_trial')
+        if record is not None:
+            active=json.loads(record)
+            if (active.get('trial_id') != rows.get('trial_id')
+                    or rows.get('exploratory_config:'+str(active.get('config_sha256'))) != rows.get('limits')):
+                raise SafetyError('active_trial_journal_mismatch')
+            return active
+        if rows.get('trial_id') is not None:
+            if (not isinstance(metadata,dict) or metadata.get('trial_id') != rows['trial_id']
+                    or rows.get('exploratory_config:'+str(metadata.get('config_sha256'))) != rows.get('limits')):
+                raise SafetyError('active_trial_projection_unbound')
+        return metadata
+    finally:
+        db.close()
+
+
+def publish_trial_projection(ledger, path, metadata, save):
+    """Commit active phase/lineage to SQLite, then publish the recoverable JSON copy."""
+    if ledger.exploratory is True:
+        ledger.update_exploratory_trial(metadata)
+    save(path,metadata)
 
 
 def is_exploratory(config):

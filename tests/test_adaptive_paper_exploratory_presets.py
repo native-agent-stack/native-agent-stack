@@ -4,12 +4,15 @@ import json
 import sys
 import tempfile
 import unittest
+import io
+import contextlib
 from decimal import Decimal
 
 SOURCE = Path(__file__).resolve().parents[1] / "blueprints/us-equities/adaptive-paper"
 sys.path.insert(0, str(SOURCE))
 import runner
 import mover
+import mover_runner
 from exploration import config_digest
 from safety import RiskLimits, SafetyError
 from exits import ExitContext, DEFAULT_PLAN
@@ -26,11 +29,9 @@ class ExploratoryExitPresets(unittest.TestCase):
             path=Path(root)/"config.json";path.write_text(json.dumps(data))
             return (mover.load_mover_config if name=="config-mover.json" else runner.load_config)(path)
 
-    def test_partial_take_profit_preset_reaches_the_actual_exit_rule(self):
-        _, _, policy=self.load("config.json",preset="partial-take-profit")
-        context=ExitContext(now=1000,entered_at=990,pnl_bps=50,trail_bps=0,quote_fresh=True,
-                            risk_off=False,force_exit=False,force_exit_reason="trial_end",volatility_bps=None)
-        self.assertEqual(DEFAULT_PLAN.evaluate(context,policy).fraction,.5)
+    def test_partial_take_profit_requires_a_persisted_consumed_state_before_registration(self):
+        with self.assertRaisesRegex(ValueError,"unregistered_exploratory_exit_preset"):
+            self.load("config.json",preset="partial-take-profit")
 
     def test_time_decay_preset_tightens_the_actual_stop(self):
         _,_,policy=self.load("config.json",preset="time-decay",stop_bps=100,max_hold_seconds=100)
@@ -71,3 +72,23 @@ class ExploratoryExitPresets(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'exploratory_live_diagnostics_not_registered'):
             validate_exploratory_paths(config,'/var/tmp/exploratory/state','/var/tmp/exploratory/out.json',
                                        live_dir='/var/tmp/exploratory/live')
+
+    def test_mover_check_reports_separate_raw_and_effective_config_digests(self):
+        from tests.test_adaptive_paper_mover import scan_dict
+        import hashlib
+        with tempfile.TemporaryDirectory(dir='/var/tmp') as directory:
+            root=Path(directory)/'exploratory';root.mkdir()
+            data=json.loads((SOURCE/'config-mover.json').read_text())
+            data.update(paper_lane='B',evidence_class='exploratory')
+            data['exploratory_exit_preset']={'version':'paper-exits-v1-20261012','name':'X3'}
+            config=root/'config.json';config.write_text(json.dumps(data))
+            scan=root/'scan.json';scan.write_text(json.dumps(scan_dict(regime={'factor':'1'})))
+            stream=io.StringIO()
+            with contextlib.redirect_stdout(stream):
+                rc=mover_runner.main(['check','--config',str(config),'--scan',str(scan),'--assume-fresh'])
+            self.assertEqual(rc,0)
+            result=json.loads(stream.getvalue())
+            loaded,limits,_=mover.load_mover_config(config)
+            self.assertEqual(result.get('raw_config_sha256'),hashlib.sha256(config.read_bytes()).hexdigest())
+            self.assertEqual(result['config_sha256'],config_digest(loaded,config.read_bytes(),limits=limits))
+            self.assertNotEqual(result['config_sha256'],result['raw_config_sha256'])

@@ -45,7 +45,8 @@ from credential_source import (BASE_URL_VARIABLE, SOURCE_ENV_FILE, SOURCES as CR
                                CredentialSourceError, paper_base_url_reason, select_credentials, selection_error)
 from financing import MARGIN_RATES, overnight_financing_projection
 from feeds import require_qualified_stream
-from exploration import apply_exit_preset, config_digest, is_exploratory, receipt_labels, validate_exploratory_paths
+from exploration import (active_trial_metadata, apply_exit_preset, config_digest, is_exploratory,
+                         publish_trial_projection, receipt_labels, validate_exploratory_paths)
 from leverage import LeveragePolicyError, next_lower_rung_ceiling, validate_leverage_policy
 from safety import (Ledger, Quote, RiskLimits, SafetyError, account_lock_fingerprint, DEFAULT_STOP,
                     execution_from_observation)
@@ -2448,7 +2449,8 @@ def main():
     # phase is re-read under the account lock below and must still agree.
     prior_path = args.state_root / observation["account_identity_sha256"] / "adaptive" / "trial.json"
     try:
-        prior_metadata = json.loads(prior_path.read_text()) if prior_path.exists() else None
+        prior_metadata = (active_trial_metadata(prior_path.parent) if exploratory else
+                          json.loads(prior_path.read_text()) if prior_path.exists() else None)
     except (OSError, ValueError):
         prior_metadata = None
     # A non-object state file (e.g. [] or null) is treated as no resumable phase,
@@ -2490,7 +2492,8 @@ def main():
             raise SafetyError("global_stop_latched")
         state_dir = args.state_root / fingerprint / "adaptive"
         metadata_path = state_dir / "trial.json"
-        previous_metadata = json.loads(metadata_path.read_text()) if metadata_path.exists() else None
+        previous_metadata = (active_trial_metadata(state_dir) if exploratory else
+                             json.loads(metadata_path.read_text()) if metadata_path.exists() else None)
         # D2: a prior run that ended "held_overnight" (a reconciled, non-flat,
         # intentional hold, not a fault) is a resumable start for the next
         # overnight_holds invocation -- the D1 ledger-adoption path handles
@@ -2503,16 +2506,18 @@ def main():
         if (previous_metadata and args.command != "recover"
                 and previous_metadata.get("phase") != "finished" and not resumable_hold):
             raise SafetyError("existing_trial_requires_explicit_recovery")
-        if args.command == "recover" and not metadata_path.exists():
+        if args.command == "recover" and previous_metadata is None:
             raise SafetyError("no_owned_trial_to_recover")
         if exploratory and args.command == "recover" and previous_metadata.get("engine_kind", "adaptive") != "adaptive":
             raise SafetyError("recovery_engine_differs_from_frozen_trial")
+        if exploratory and args.command == "recover" and previous_metadata['config_sha256'] != summary['config_sha256']:
+            raise SafetyError('recovery_config_differs_from_frozen_trial')
         if exploratory and previous_metadata is not None and (
                 previous_metadata.get("paper_lane") != "B"
                 or previous_metadata.get("evidence_class") != "exploratory"):
             raise SafetyError("exploratory_trial_lineage_required")
         ledger = Ledger(state_dir / "ledger.sqlite3", limits,
-                        **({"exploratory": True} if exploratory else {}))
+                        **({"exploratory": True, "rotation": args.command == 'paper'} if exploratory else {}))
         try:
             now = time.time()
             for attempt in attempts:
@@ -2597,12 +2602,6 @@ def main():
                 # internal flat check would otherwise raise
                 # next_trial_requires_flat_and_terminal against exactly
                 # that, defeating the bypass above.
-                if resumable_hold:
-                    held_resume_matches_ledger(ledger, observation)
-                    ledger.resume_held_trial(now, args.trial)
-                else:
-                    ledger.begin_next_trial(now, args.trial,
-                        **({"config_sha256": summary["config_sha256"], "limits": limits} if exploratory else {}))
                 metadata = {**({k: previous_metadata[k] for k in ("lane_state", "history")
                                if previous_metadata and k in previous_metadata} if exploratory else {}),
                             "trial_id": args.trial,
@@ -2612,7 +2611,14 @@ def main():
                             "baseline_cash": previous_metadata["baseline_cash"] if previous_metadata else baseline_cash,
                             "phase": "starting"}
                 if exploratory:
-                    metadata["engine_kind"] = "adaptive"
+                    metadata.update(engine_kind="adaptive", **RECEIPT_LABELS)
+                if resumable_hold:
+                    held_resume_matches_ledger(ledger, observation)
+                    ledger.resume_held_trial(now, args.trial)
+                else:
+                    ledger.begin_next_trial(now, args.trial,
+                        **({"config_sha256": summary["config_sha256"], "limits": limits,
+                            "metadata": metadata} if exploratory else {}))
                 save(metadata_path, metadata)
             def fresh_port(recovering=False):
                 needed = sorted(set(ledger.positions()) | {i.symbol for i in ledger.unresolved()})
@@ -2702,7 +2708,7 @@ def main():
             phase, exit_code = trial_phase_and_exit_code(result)
             metadata["phase"] = phase
             metadata["status"] = result["status"]
-            save(metadata_path, metadata)
+            publish_trial_projection(ledger,metadata_path,metadata,save)
             save(args.output, result)
             print(json.dumps({k: result.get(k) for k in ("status", "flat", "native_fill_events")}, default=str))
             return exit_code

@@ -440,7 +440,7 @@ class Ledger:
     SQLite transactions protect risk reservations even across connections. The
     caller also holds account_lock for the entire account-writer lifetime.
     """
-    def __init__(self, db_path, limits=None, *, exploratory=False):
+    def __init__(self, db_path, limits=None, *, exploratory=False, rotation=False):
         self.path = Path(db_path)
         self.limits = limits or RiskLimits()
         if not isinstance(self.limits, RiskLimits):
@@ -458,7 +458,8 @@ class Ledger:
                 has_meta = probe.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='meta'").fetchone()
                 row = probe.execute("SELECT value FROM meta WHERE key='paper_lane'").fetchone() if has_meta else None
                 lane = row[0] if row else None
-                if exploratory and lane != "B":
+                has_tables=probe.execute("SELECT 1 FROM sqlite_master WHERE type='table' LIMIT 1").fetchone()
+                if exploratory and has_tables and lane != "B":
                     raise SafetyError("exploratory_journal_required")
                 if not exploratory and lane == "B":
                     raise SafetyError("exploratory_journal_requires_lane_b")
@@ -504,7 +505,7 @@ class Ledger:
                 if not exploratory and lane == "B":
                     raise SafetyError("exploratory_journal_requires_lane_b")
                 if previous is not None and previous != frozen:
-                    if not exploratory:
+                    if not exploratory or not rotation:
                         raise SafetyError("persisted_risk_limits_differ")
                     # Open under the OLD bounds. The runner must reconcile fees/cash
                     # before register_exploratory_config may install the next bounds.
@@ -672,12 +673,14 @@ class Ledger:
             return now
 
     def register_exploratory_config(self, config_sha256, limits, now):
-        """Register a config namespace on the SAME journal after external reconciliation.
+        """Bootstrap a new journal's namespace; existing trials use atomic admission.
 
         Caller holds the account lock, has a finished trial and fresh flat broker
         state, and has booked/reconciled fees and baseline cash. No accounting,
         request history, halt or STOP state is reset. Default journals stay frozen.
         """
+        if self._get('trial_id') is not None:
+            raise SafetyError('configuration_registration_requires_atomic_admission')
         with self._limits_transaction():
             self._register_exploratory_config(config_sha256, limits, now)
 
@@ -724,7 +727,32 @@ class Ledger:
         """Registered namespaces in order; all share this journal's account lineage."""
         return json.loads(self._get("exploratory_config_history") or "[]")
 
-    def begin_next_trial(self, now, trial_id, *, config_sha256=None, limits=None):
+    def update_exploratory_trial(self, metadata):
+        """Update the active trial projection's phase; identity stays journal-bound."""
+        with self._transaction():
+            self._store_exploratory_trial(metadata)
+
+    def _store_exploratory_trial(self, metadata):
+        if not self.exploratory or not isinstance(metadata,dict):
+            raise SafetyError('exploratory_trial_lineage_required')
+        if (metadata.get('paper_lane') != 'B' or metadata.get('evidence_class') != 'exploratory'
+                or metadata.get('engine_kind') not in ('adaptive','mover')
+                or metadata.get('trial_id') != self._get('trial_id')
+                or self._get('exploratory_config:'+str(metadata.get('config_sha256'))) != self._get('limits')
+                or not all(k in metadata for k in ('started_at','fee_window_start','baseline_cash','phase'))):
+            raise SafetyError('active_trial_journal_mismatch')
+        old=self._get('exploratory_active_trial')
+        if old is not None:
+            prior=json.loads(old)
+            if any(prior.get(k) != metadata.get(k) for k in ('started_at','fee_window_start','baseline_cash')):
+                raise SafetyError('active_trial_lineage_changed')
+            if prior['trial_id'] == metadata['trial_id'] and any(
+                    prior.get(k) != metadata.get(k) for k in ('engine_kind','config_sha256','started_at',
+                                                             'fee_window_start','baseline_cash')):
+                raise SafetyError('active_trial_lineage_changed')
+        self._set('exploratory_active_trial',json.dumps(metadata,sort_keys=True,default=str))
+
+    def begin_next_trial(self, now, trial_id, *, config_sha256=None, limits=None, metadata=None):
         """Start an explicitly requested new bounded trial in the SAME account DB.
 
         Caller must have stopped admissions, held the writer lock, and observed
@@ -732,7 +760,7 @@ class Ledger:
         Durable risk, fill accounting and request history are never reset.
         """
         return self._begin_trial(now, trial_id, require_flat=True, event_kind="next_trial_started",
-                                 config_sha256=config_sha256, limits=limits)
+                                 config_sha256=config_sha256, limits=limits, metadata=metadata)
 
     def resume_held_trial(self, now, trial_id):
         """S2: start an explicitly requested new bounded trial that
@@ -753,7 +781,7 @@ class Ledger:
         """
         return self._begin_trial(now, trial_id, require_flat=False, event_kind="held_trial_resumed")
 
-    def _begin_trial(self, now, trial_id, *, require_flat, event_kind, config_sha256=None, limits=None):
+    def _begin_trial(self, now, trial_id, *, require_flat, event_kind, config_sha256=None, limits=None, metadata=None):
         now = instant(now)
         if type(trial_id) is not str or not re.fullmatch(r"[a-z0-9-]{1,24}", trial_id):
             raise SafetyError("invalid_trial_id")
@@ -778,6 +806,8 @@ class Ledger:
             self.db.execute("INSERT INTO trials VALUES (?,?)", (trial_id, now))
             self._set("trial_start", now)
             self._set("trial_id", trial_id)
+            if metadata is not None:
+                self._store_exploratory_trial(metadata)
             self.db.execute("DELETE FROM meta WHERE key IN ('recovery_start','recovery_only')")
             if state.halted_reason == "recovery_only":
                 self.db.execute("DELETE FROM meta WHERE key='halted_reason'")

@@ -40,7 +40,9 @@ readiness checks.
   Use one stable `<state>/exploratory/account-state` root for baseline and mover
   trials; both share its account journal. Finished, flat trials can rotate
   configurations only after fee/cash reconciliation, with effective-config
-  namespaces registered in the same ledger. Lane A and recovery stay frozen.
+  namespaces registered in the same ledger. SQLite also binds the active trial,
+  engine and recovery lineage; the JSON projection is repaired from that
+  authority after an interrupted publication. Lane A and recovery stay frozen.
   Broker-paper acceptance for rotation is **NOT_RUN**; focused CLI/journal
   tests are synthetic evidence, not a verified live account alias.
 - `exploratory_exit_preset` selects a versioned candidate in
