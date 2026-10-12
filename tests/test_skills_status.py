@@ -274,6 +274,81 @@ class SkillsStatusTests(unittest.TestCase):
         self.assertEqual((link["state"], link["kind"]), ("not_a_symlink", "copy"))
         self.assertEqual(report["result"], "fail")
 
+    def layout_report(self, alpha):
+        manifest = self.build_manifest([alpha])
+        self.write_lock(self.lock_entries_for([alpha]))
+        self.write_claude_settings({})
+        self.write_codex_config([])
+        report = self.report(manifest)
+        return report, self.skill_result(report, alpha["name"])
+
+    def test_a_claude_skills_folder_linked_onto_the_canonical_one_is_the_layout_createsymlink_accepts(self):
+        """skills@7407f389 src/installer.ts L240-250: createSymlink returns without touching anything when the link path and the canonical folder are one real path, which is what a
+        parent link makes them. install_skills.py has accepted it since 2026-10-11; the status check reported it as not_a_symlink (Astra's read of 0d5272df7, follow-up 1)."""
+        alpha = self.make_skill("alpha-skill")
+        (self.home / ".claude").mkdir()
+        (self.home / ".claude" / "skills").symlink_to(self.home / ".agents" / "skills", target_is_directory=True)
+        report, skill = self.layout_report(alpha)
+        self.assertEqual(skill["claude_link"], {"state": "ok", "kind": "parent_link"})
+        self.assertEqual((skill["canonical"]["state"], skill["pass"], report["result"]), ("ok", True, "ok"))
+
+    def test_a_canonical_skills_folder_linked_onto_the_claude_one_is_accepted_too(self):
+        alpha = self.make_skill("alpha-skill")
+        real = self.home / ".claude" / "skills"
+        real.parent.mkdir(parents=True, exist_ok=True)
+        shutil.move(str(self.home / ".agents" / "skills"), str(real))  # the folder, with the skill, now lives under .claude
+        (self.home / ".agents" / "skills").symlink_to(real, target_is_directory=True)
+        report, skill = self.layout_report(alpha)
+        self.assertEqual(skill["claude_link"], {"state": "ok", "kind": "parent_link"})
+        self.assertEqual((skill["canonical"]["state"], report["result"]), ("ok", "ok"))
+
+    def test_a_canonical_leaf_that_is_a_link_is_not_the_folder_the_cli_writes(self):
+        """install_skills.py refuses a link at the canonical skill path (the add removes it first, src/installer.ts L389) as local-modified; the status check followed it and said ok
+        (Astra's read of 0d5272df7, follow-up 1, and the Codex review in GitHub, thread 2). Both required checks now enforce the same rule."""
+        alpha = self.make_skill("alpha-skill")
+        content = (self.home / ".agents" / "skills" / "alpha-skill" / "SKILL.md").read_bytes()
+        shutil.rmtree(self.home / ".agents" / "skills" / "alpha-skill")
+        elsewhere = self.home / "dotfiles" / "alpha-skill"
+        elsewhere.mkdir(parents=True)
+        (elsewhere / "SKILL.md").write_bytes(content)
+        (self.home / ".agents" / "skills" / "alpha-skill").symlink_to(elsewhere, target_is_directory=True)
+        self.write_claude_link("alpha-skill", kind="relative")
+        report, skill = self.layout_report(alpha)
+        self.assertEqual(skill["canonical"]["state"], "canonical_link")
+        self.assertEqual((skill["pass"], report["result"]), (False, "fail"))
+
+    def test_a_canonical_link_onto_a_real_claude_folder_is_not_ok_in_either_check(self):
+        """The reverse alias of #1024: the canonical path links onto the real folder at the Claude path, so the two resolve equal while the Claude entry is no link of the CLI's."""
+        alpha = self.make_skill("alpha-skill")
+        content = (self.home / ".agents" / "skills" / "alpha-skill" / "SKILL.md").read_bytes()
+        shutil.rmtree(self.home / ".agents" / "skills" / "alpha-skill")
+        real = self.home / ".claude" / "skills" / "alpha-skill"
+        real.mkdir(parents=True)
+        (real / "SKILL.md").write_bytes(content)
+        (self.home / ".agents" / "skills" / "alpha-skill").symlink_to(real, target_is_directory=True)
+        report, skill = self.layout_report(alpha)
+        self.assertEqual(skill["canonical"]["state"], "canonical_link")
+        self.assertEqual(skill["claude_link"]["state"], "not_a_symlink")
+        self.assertEqual(report["result"], "fail")
+
+    def test_a_real_folder_that_cannot_be_resolved_is_not_accepted_as_a_parent_alias(self):
+        link, canonical = self.home / ".claude" / "skills" / "alpha-skill", self.home / ".agents" / "skills" / "alpha-skill"
+        link.mkdir(parents=True)
+        canonical.mkdir(parents=True)
+        with mock.patch.object(ss.Path, "resolve", side_effect=RuntimeError("Symlink loop from 'x'")):
+            result = ss.check_claude_link(link, canonical, parent_alias=True)
+        self.assertEqual(result, {"state": "not_a_symlink", "kind": "copy"})
+
+    def test_a_claude_code_copy_is_still_a_real_folder_in_its_own_place(self):
+        """A parent link must not turn the copy check around: a copy entry compares the Claude path with itself."""
+        alpha = dict(self.make_skill("alpha-skill"), copy=True, agents=["claude-code"])
+        real = self.home / ".claude" / "skills" / "alpha-skill"
+        real.mkdir(parents=True)
+        shutil.copy(self.home / ".agents" / "skills" / "alpha-skill" / "SKILL.md", real / "SKILL.md")
+        shutil.rmtree(self.home / ".agents" / "skills" / "alpha-skill")
+        report, skill = self.layout_report(alpha)
+        self.assertEqual(skill["claude_link"], {"state": "ok", "kind": "copy"})
+
     def test_wrong_target_link_fails(self):
         alpha = self.make_skill("alpha-skill")
         manifest = self.build_manifest([alpha])

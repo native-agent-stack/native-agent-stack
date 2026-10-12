@@ -343,6 +343,10 @@ def list_agent_skill_dirs(agents_skills: Path) -> set[str]:
 # ---------------------------------------------------------------------------
 
 def check_canonical(agents_skills: Path, skill: dict) -> dict:
+    # `skills add` removes whatever sits at the skill folder and writes a real folder there (skills@7407f389 src/installer.ts L389-390), so a link at the leaf was made by someone
+    # else: tools/adoption/install_skills.py refuses it as local-modified (claude_link_problem), and this check no longer follows it to a SKILL.md that happens to match.
+    if (agents_skills / skill["name"]).is_symlink():
+        return {"state": "canonical_link"}
     path = agents_skills / skill["name"] / SKILL_MD
     if path.is_file():
         digest = sha256_file(path)
@@ -398,7 +402,9 @@ def check_lock_entry(lock_data: dict | None, lock_state: str, skill: dict) -> di
     return {"state": "ok" if entry.get("skillFolderHash") == skill["tree_sha"] else "hash_mismatch"}
 
 
-def check_claude_link(link: Path, canonical: Path) -> dict:
+def check_claude_link(link: Path, canonical: Path, parent_alias: bool = False) -> dict:
+    """The Claude Code entry of a global skill. parent_alias accepts what createSymlink accepts (skills@7407f389 src/installer.ts L240-250): a real folder at the link path that is the
+    canonical folder itself because a parent of one path is a link onto the other (~/.claude/skills onto ~/.agents/skills, or the reverse), with a canonical leaf that is no link."""
     if not os.path.lexists(link):
         return {"state": "missing", "kind": "missing"}
     if os.path.islink(link):
@@ -412,6 +418,12 @@ def check_claude_link(link: Path, canonical: Path) -> dict:
             # skill is reported, not an uncaught crash of the whole status check.
             return {"state": "cannot_resolve", "kind": kind}
         return {"state": "ok" if resolved == expected else "wrong_target", "kind": kind}
+    if parent_alias and not os.path.islink(canonical):
+        try:
+            if link.resolve(strict=True) == canonical.resolve(strict=True):
+                return {"state": "ok", "kind": "parent_link"}
+        except (OSError, RuntimeError):
+            pass
     return {"state": "not_a_symlink", "kind": "copy"}
 
 
@@ -674,7 +686,7 @@ def inspect(manifest: dict, home: Path, env=None, skills_bin: str | None = None)
         checks = {
             "canonical": check_canonical(agents_skills, skill),
             "lock": check_lock_entry(lock_data, lock_state, skill),
-            "claude_link": check_claude_link(claude_skills / name, agents_skills / name),
+            "claude_link": check_claude_link(claude_skills / name, agents_skills / name, parent_alias=True),
             "claude_listing": check_claude_listing(overrides, overrides_state, skill),
             # skills 1.7.0 installs a global Codex skill only at this canonical folder (src/installer.ts L392-402),
             # which Codex loads from its $HOME/.agents/skills root (ext/skills/src/host_roots.rs L103-108).
