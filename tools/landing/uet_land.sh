@@ -219,11 +219,14 @@ lg_keep() {  # <file name prefix> <text>
 # SQUASH_BODY_FILE (the CC, 2026-10-12; the scan is the P1 of #1027 at d6be1b02, Astra). The file becomes the squash commit's message in main's
 # history for good, and gh sends the bytes it holds when the merge call starts (cli v2.102.0 pkg/cmd/pr/merge/merge.go:146-153 reads the file,
 # :292-293 and http.go:72-75 send it as CommitBody; pkg/cmdutil/file_input.go:8-16), minutes after any check made here. So the file is copied
-# once to a snapshot (mktemp under TMPDIR, mode 0600; the EXIT trap removes it on any exit, a signal included: measured, README), the snapshot is
-# scanned, and the merge is given the snapshot, never the file. Two scans, both of the snapshot: squash_body_scan.py (the repository's
+# once to a snapshot (mktemp under TMPDIR, mode 0600; the EXIT trap removes it on every exit, SIGTERM, SIGHUP and SIGINT included: measured,
+# README; SIGKILL, which no trap catches, leaves it, and the README says how to remove it), the snapshot is scanned, and the merge is given
+# the snapshot, never the file. Two scans, both of the snapshot: squash_body_scan.py (the repository's
 # PRIVATE_CONTENT table, a WSL UNC home path, an address that is no no-reply one, a name of the names file; the file is parsed there, never
 # sourced) and scripts/validate.py --scan-file (PRIVATE_CONTENT and the runtime host-local names, the scan the pre-push hook runs; its answer
-# counts only when it says source "host", never the synthetic override's). Both run with -E -s -B, as merge_validate runs validate.py: with -I
+# counts only when it says source "host", never the synthetic override's; it runs with NATIVE_AGENT_PUBLIC_HOSTNAME=1, which drops the
+# host's own name only (the hostname source, scripts/host_name_scan.py), so that name is a warning on any host and an identity of the same spelling
+# still refuses: #1027 round 3, the GPT family's blocker 3 at 37e242c0). Both run with -E -s -B, as merge_validate runs validate.py: with -I
 # the script's directory is off sys.path and validate.py cannot import host_name_scan.py (measured 2026-10-12: exit 2). Fail closed: a match,
 # a copy that fails, a scanner or names file that is missing or unreadable, and any answer but a scan's own clean line stop the landing with
 # exit 2 and one fixed line. No path, name, text or scanner output is printed, but one count: a name of the names file that is the host's own
@@ -246,7 +249,7 @@ lg_body_snapshot() {  # <file> : sets SB to the scanned snapshot and returns 0 o
     o=$(python3 -E -s -B "$scan" "$SB" "$val" "$names" 2>/dev/null); r=$?
     if [ "$r" = 0 ] && [[ "$o" =~ $clean_scan ]]; then
       w=${BASH_REMATCH[2]:-0}
-      o=$(python3 -E -s -B "$val" --scan-file "$SB" 2>/dev/null); r=$?
+      o=$(NATIVE_AGENT_PUBLIC_HOSTNAME=1 python3 -E -s -B "$val" --scan-file "$SB" 2>/dev/null); r=$?
       if [ "$r" = 0 ] && [[ "$o" =~ $clean_cli ]]; then
         [ "$w" = 0 ] || echo "#$N SQUASH_BODY_FILE names this host's own name $w time(s): a warning, not a refusal (the name is not printed)"
         return 0

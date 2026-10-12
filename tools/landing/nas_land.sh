@@ -12,7 +12,7 @@
 # proceeds here): a review running or not finished since its latest trigger (its 3, after the 20-minute wait, before the validation or at
 # the final gate), a review that ended other than Completed or a summary last edited by another account (its 4), a gate that failed or is
 # missing, 10 the merge onto CURRENT origin/main fails scripts/validate.py or does not merge cleanly (2026-10-10), or fails one of
-# validate.yml's shard-0 currency checks whose script it holds (CC correction #176, 2026-10-12).
+# the shard-0 currency checks of its own validate.yml (CC correction #176, 2026-10-12; read from the merge since #1027 round 3).
 # 11 the no-reply author address could not be formed (nothing merged), 12 merged, but the merge commit's author is not that address (correction #148).
 # 13 origin/main moved after each of three validations, moved after the last validation (final gate) or is unreadable (nothing merged; #975).
 # 14 another landing of this repository holds the landing lock, or the lock cannot be taken (nothing merged; #975 round 4).
@@ -227,11 +227,14 @@ lg_keep() {  # <file name prefix> <text>
 # SQUASH_BODY_FILE (the CC, 2026-10-12; the scan is the P1 of #1027 at d6be1b02, Astra). The file becomes the squash commit's message in main's
 # history for good, and gh sends the bytes it holds when the merge call starts (cli v2.102.0 pkg/cmd/pr/merge/merge.go:146-153 reads the file,
 # :292-293 and http.go:72-75 send it as CommitBody; pkg/cmdutil/file_input.go:8-16), minutes after any check made here. So the file is copied
-# once to a snapshot (mktemp under TMPDIR, mode 0600; the EXIT trap removes it on any exit, a signal included: measured, README), the snapshot is
-# scanned, and the merge is given the snapshot, never the file. Two scans, both of the snapshot: squash_body_scan.py (the repository's
+# once to a snapshot (mktemp under TMPDIR, mode 0600; the EXIT trap removes it on every exit, SIGTERM, SIGHUP and SIGINT included: measured,
+# README; SIGKILL, which no trap catches, leaves it, and the README says how to remove it), the snapshot is scanned, and the merge is given
+# the snapshot, never the file. Two scans, both of the snapshot: squash_body_scan.py (the repository's
 # PRIVATE_CONTENT table, a WSL UNC home path, an address that is no no-reply one, a name of the names file; the file is parsed there, never
 # sourced) and scripts/validate.py --scan-file (PRIVATE_CONTENT and the runtime host-local names, the scan the pre-push hook runs; its answer
-# counts only when it says source "host", never the synthetic override's). Both run with -E -s -B, as merge_validate runs validate.py: with -I
+# counts only when it says source "host", never the synthetic override's; it runs with NATIVE_AGENT_PUBLIC_HOSTNAME=1, which drops the
+# host's own name only (the hostname source, scripts/host_name_scan.py), so that name is a warning on any host and an identity of the same spelling
+# still refuses: #1027 round 3, the GPT family's blocker 3 at 37e242c0). Both run with -E -s -B, as merge_validate runs validate.py: with -I
 # the script's directory is off sys.path and validate.py cannot import host_name_scan.py (measured 2026-10-12: exit 2). Fail closed: a match,
 # a copy that fails, a scanner or names file that is missing or unreadable, and any answer but a scan's own clean line stop the landing with
 # exit 2 and one fixed line. No path, name, text or scanner output is printed, but one count: a name of the names file that is the host's own
@@ -254,7 +257,7 @@ lg_body_snapshot() {  # <file> : sets SB to the scanned snapshot and returns 0 o
     o=$(python3 -E -s -B "$scan" "$SB" "$val" "$names" 2>/dev/null); r=$?
     if [ "$r" = 0 ] && [[ "$o" =~ $clean_scan ]]; then
       w=${BASH_REMATCH[2]:-0}
-      o=$(python3 -E -s -B "$val" --scan-file "$SB" 2>/dev/null); r=$?
+      o=$(NATIVE_AGENT_PUBLIC_HOSTNAME=1 python3 -E -s -B "$val" --scan-file "$SB" 2>/dev/null); r=$?
       if [ "$r" = 0 ] && [[ "$o" =~ $clean_cli ]]; then
         [ "$w" = 0 ] || echo "#$N SQUASH_BODY_FILE names this host's own name $w time(s): a warning, not a refusal (the name is not printed)"
         return 0
@@ -406,11 +409,39 @@ codex_wait() {
 # VBASE is the main the validation ran on.
 # CC correction #176 (2026-10-12): two PRs, each green on its own base, left main red when one changed a source of a generated artifact
 # that the other had bound (#1018 after #1007: final-stack.json), and validate.py does not run that check. After validate.py, the merge
-# runs validate.yml's shard-0 currency checks in the workflow's order (validate.yml:135-177), each only when its script is in the merge:
-# every shard-0 step that runs a Python script with --check, the gap-wave ledger's included (the CC's ruling of 2026-10-12; #176 had
-# left it out). A failing check is exit 10 as well, named by its command, its output kept as validate.py's is.
+# runs validate.yml's shard-0 currency checks in the workflow's order: every shard-0 step that runs a Python script with --check, the
+# gap-wave ledger's included (the CC's ruling of 2026-10-12; #176 had left it out). A failing check is exit 10 as well, named by its
+# command, its output kept as validate.py's is.
+# #1027 round 3 (the Codex connector's thread on nas:430 at e203d014, reproduced at 37e242c0): the checks are read from the merge's own
+# .github/workflows/validate.yml, the file main's CI runs once the merge lands, so a merge is validated with the steps it adds or
+# changes and not with a list fixed in the script that lands it. shard0_checks prints them, in the workflow's order: each step with
+# `if: matrix.shard == 0` whose run, on one line or as a folded `>-` block (whose lines YAML joins with spaces), is exactly
+# `python3 <script>.py [arguments] --check`. Fail closed: a validate.yml in which it finds none, and a step whose words are not plain
+# ones (letters, digits and _ . / = : , + -; a script path that is relative and has no `..`), stop the landing with exit 10; the
+# step's text is not printed. A merge with no validate.yml has no check to run.
+shard0_checks() {  # <workflow file> : one command per line, without `python3 `
+  local line shard=0 run= have=0 folded=0 fold='^          [^[:space:]]' check='^python3 ([^[:space:]]+\.py( .+)? --check)$'
+  while IFS= read -r line || [ -n "$line" ]; do
+    if [[ $line == "      - "* ]]; then
+      [ $shard = 1 ] && [[ $run =~ $check ]] && printf '%s\n' "${BASH_REMATCH[1]}"
+      shard=0 run= have=0 folded=0
+    fi
+    if [ $folded = 1 ] && [[ $line =~ $fold ]]; then
+      line=${line#"${line%%[![:space:]]*}"}; line=${line%"${line##*[![:space:]]}"}
+      run=${run:+$run }$line; continue
+    fi
+    folded=0
+    if [[ $line == "        if: matrix.shard == 0" ]]; then shard=1
+    elif [ $have = 0 ] && [[ $line == "        run: >-" ]]; then have=1 folded=1
+    elif [ $have = 0 ] && [[ $line == "        run: "[!\>\|]* ]]; then have=1 run=${line:13}
+    fi
+  done < "$1"
+  [ $shard = 1 ] && [[ $run =~ $check ]] && printf '%s\n' "${BASH_REMATCH[1]}"
+  return 0
+}
 merge_validate() {
-  local wt rc err chk what=validate.py
+  local wt rc err chk stop= what=validate.py plain='^[A-Za-z0-9_][A-Za-z0-9_./-]*\.py( [A-Za-z0-9_./=:,+-]+)*$'
+  local -a checks=() argv=()
   VBASE=
   $G fetch -q origin main "pull/$N/head" 2>/dev/null || { echo "#$N fetch failed: stop"; return 1; }
   wt=$(mktemp -d /var/tmp/nas-land-$N-XXXXXX 2>/dev/null) || { echo "#$N no temporary directory for the validation worktree: stop"; return 1; }
@@ -422,25 +453,31 @@ merge_validate() {
   fi
   err=$(mktemp "${TMPDIR:-/tmp}/nas-validate-XXXXXX" 2>/dev/null) || err=/dev/null
   (cd "$wt" 2>/dev/null && python3 -E -s -B scripts/validate.py >"$err" 2>&1); rc=$?
-  if [ "$rc" = 0 ]; then
-    for chk in "blueprints/blind-catalog-convergence/audit_reports.py --check" "tools/sota-convergence/build_verdicts.py --check" \
-               "scripts/component_matrix.py --check" "scripts/new_host_grand_list.py --check" "scripts/final_stack.py --check" \
-               "tools/sota-convergence/gap_crosswalk.py build --check" \
-               "tools/sota-convergence/gap_wave_ledger.py --wave gap-wave2-20260923 --wave gap-wave3-20260923 --owner gap-resolution --check" \
-               "scripts/build_ecosystem.py --check"; do
-      [ -f "$wt/${chk%% *}" ] || continue
+  if [ "$rc" = 0 ] && [ -f "$wt/.github/workflows/validate.yml" ]; then
+    mapfile -t checks < <(shard0_checks "$wt/.github/workflows/validate.yml" 2>/dev/null)
+    [ "${#checks[@]}" -gt 0 ] || { stop="no shard-0 currency check could be read from the merge's validate.yml"; rc=1; }
+    for chk in "${checks[@]}"; do  # every check is judged before the first one runs
+      [[ $chk =~ $plain ]] && [[ ${chk%% *} != *..* ]] && continue
+      stop="a shard-0 currency check of the merge's validate.yml is not one this script can run as written (its text is not printed)"; rc=1; break
+    done
+    [ -n "$stop" ] || for chk in "${checks[@]}"; do
       what="the currency check $chk"
-      (cd "$wt" 2>/dev/null && python3 -E -s -B $chk >"$err" 2>&1); rc=$?
+      read -r -a argv <<< "$chk"
+      (cd "$wt" 2>/dev/null && python3 -E -s -B "${argv[@]}" >"$err" 2>&1); rc=$?
       [ "$rc" = 0 ] || break
     done
   fi
   git -C "$wt" merge --abort >/dev/null 2>&1; $G worktree remove --force "$wt" >/dev/null 2>&1
+  if [ -n "$stop" ]; then
+    [ "$err" = /dev/null ] || rm -f -- "$err"
+    echo "#$N $stop: stop"; return 1
+  fi
   if [ "$rc" != 0 ]; then
     [ "$err" = /dev/null ] && { echo "#$N $what on the merge with current main exited $rc; its output could not be kept, and is not echoed: stop"; return 1; }
     echo "#$N $what on the merge with current main exited $rc; its output is kept only in local file ${err##*/} in the temp directory (0600), never echoed: stop"; return 1
   fi
   [ "$err" = /dev/null ] || rm -f -- "$err"
-  echo "#$N the merge onto current main validates (rc 0: validate.py and the shard-0 currency checks whose scripts it holds)"; return 0
+  echo "#$N the merge onto current main validates (rc 0: validate.py and the ${#checks[@]} shard-0 currency check(s) of its validate.yml)"; return 0
 }
 # #975 round 4 (the CC's micro at 761810d7: each gate could change between its last read and the merge, and each round-3 fix left the next
 # gap): after every slow step, final_gate reads every gate again, fast reads only and in this order, and nothing but the merge follows it:

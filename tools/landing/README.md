@@ -23,8 +23,8 @@ with the verdict files as arguments (at least one) and these differences: `manif
 identity (CI arbitrates the registry), a BEHIND branch is updated server-side (merge method), the aggregate `validate` check
 must have succeeded at the head (every page of check runs is read; the rule is below), the Codex gate is asked again before the
 validation, and the head is then merged into the current `origin/main` in a temporary worktree
-under `/var/tmp` where `scripts/validate.py` must exit 0, and after it each currency check of `validate.yml`'s shard 0 whose script the
-merge holds (exit 10 otherwise; CC correction #176, below). Their output is never printed: it goes to a file made by
+under `/var/tmp` where `scripts/validate.py` must exit 0, and after it each shard-0 currency check of the merge's own `validate.yml`
+(exit 10 otherwise; CC correction #176, below). Their output is never printed: it goes to a file made by
 `mktemp "${TMPDIR:-/tmp}/nas-validate-XXXXXX"` (mode 0600) outside the worktree, and exit 10 names that file, the exit code and, for a
 currency check, its command. `gh pr
 merge --match-head-commit` pins only the head ("Commit SHA that the pull request head must match to allow merge", sources below), so
@@ -53,9 +53,17 @@ workflow's order (`validate.yml:135-177`). They are every shard-0 step that runs
 `blueprints/blind-catalog-convergence/audit_reports.py`, `tools/sota-convergence/build_verdicts.py`, `scripts/component_matrix.py`,
 `scripts/new_host_grand_list.py`, `scripts/final_stack.py`, `tools/sota-convergence/gap_crosswalk.py build`,
 `tools/sota-convergence/gap_wave_ledger.py` with its step's `--wave` and `--owner` arguments (`validate.yml:166-174`, a folded `run: >-`)
-and `scripts/build_ecosystem.py`, each with `--check`. #176 named seven; the CC's ruling of 2026-10-12 added the ledger check, and a
-test keeps the list equal to the workflow's steps. A check runs only when its script is in the merge; the first that fails stops the
-landing with exit 10, named by its command, and its output stays in the validation's file. On `main` at `86fa3844` the eight exit 0 in
+and `scripts/build_ecosystem.py`, each with `--check`. #176 named seven, and the CC's ruling of 2026-10-12 added the ledger check. Since
+#1027's round 3 the script holds no list, so that a merge is validated with the checks `main`'s CI will run on it, the ones it adds or
+changes included (the Codex connector's thread on `nas:430` at e203d014, reproduced at 37e242c0 through this harness). `shard0_checks`
+reads the checks from the merge's `.github/workflows/validate.yml`, the file `main`'s CI runs once the merge lands: each step whose
+condition is `if: matrix.shard == 0` and whose `run`, on one line or as a folded `>-` block, is exactly `python3 <script>.py [arguments]
+--check`, in the workflow's order; a test holds its answer on this repository's workflow to the eight above. The reader fails closed: a
+`validate.yml` in which it finds no such step, and a step whose words are not plain ones (letters, digits and `_ . / = : , + -`, a script
+path that is relative and has no `..`; the script runs a check's words as arguments, with no shell to read quotes or expansions), stop the
+landing with exit 10 and one fixed line, the step's text not printed. A merge with no `validate.yml` has no check to run. The first check
+that fails stops the landing with exit 10, named by its command, and its output stays in the validation's file. On `main` at `86fa3844`
+the eight exit 0 in
 about 8 s, 6.3 s of it `build_ecosystem.py` (measured 2026-10-12T02:18Z with `python3 -E -s -B`). `uet_land.sh` needs no such step: the trading repository's `main` rules count `ci-gate` only on a head that is up
 to date with `main` (`strict_required_status_checks_policy: true`), so its CI, `uv lock --check` included (`ci.yml` at `0e987311`), ran
 on the tree the squash merge makes. This repository's rules do not require that (`false`; both read from `GET
@@ -76,8 +84,10 @@ landed (four synthetic payloads, each exit 0 with one merge call). `gh` reads th
 any check made on it in the worst case (the Codex wait takes up to 20 minutes, the CI wait up to 50), so the scanned bytes must be the
 bytes `gh` reads. A set `SQUASH_BODY_FILE` is therefore copied once to a snapshot (`mktemp "${TMPDIR:-/tmp}/squash-body-XXXXXX"`, mode 0600),
 the snapshot is scanned twice, and the merge is given the snapshot, never the file; the final gate has nothing of the caller's file to read
-again. An `EXIT` trap removes the snapshot on every exit, a terminating signal included (measured 2026-10-12 with bash 5.3.9: after
-SIGTERM and SIGHUP sent to a script holding a snapshot, none was left). Both scans run before the lock and before any `gh` or `git` call,
+again. An `EXIT` trap removes the snapshot on every exit, SIGINT, SIGTERM and SIGHUP included (measured 2026-10-12 with bash 5.3.9:
+after each sent to a script holding a snapshot, none was left). SIGKILL, which no trap catches, leaves the snapshot, mode 0600, in
+`TMPDIR` (measured the same day, both scripts): after a landing that SIGKILL ended, remove the `squash-body-*` files in that directory
+that no running landing holds (the GPT family's follow-up 3 at 37e242c0). Both scans run before the lock and before any `gh` or `git` call,
 with `-E -s -B` as `merge_validate` runs `validate.py` (with `-I` the script's directory is off `sys.path`, `validate.py` cannot import its
 sibling `host_name_scan.py` and exits 2: measured 2026-10-12, and CPython's documentation of `-I`, sources below):
 
@@ -86,21 +96,29 @@ sibling `host_name_scan.py` and exits 2: measured 2026-10-12, and CPython's docu
    and graph-id forms, Windows user paths, tokens and session identifiers); for a WSL UNC home path, `\\wsl.localhost\<distro>\home\<user>`
    or `\\wsl$\<distro>\home\<user>`, which that table does not match (it knows the forward-slash forms), any run of backslashes counting
    for one because JSON and Markdown double them; for an email address that is not a no-reply one (GitHub's `ID+USERNAME` and `USERNAME`
-   forms at `users.noreply.github.com`, or a local part of exactly `noreply` or `no-reply`, pass; the shape is the native private-email
-   rule of `scripts/host_name_scan.py`, with a lookbehind so that a long run costs one pass, and since #1027's round 2 a local part may
-   also hold quoted strings, as in `"x"@<domain>` (RFC 5322 3.2.4, sources below). Each address is read as CPython's RFC 5322 parser
-   reads it (`get_addr_spec`): quotes and quoted pairs undone, so `"x"@<domain>` is the address `x@<domain>` and is refused or passed as
-   that address is, and the whole local part and the whole domain kept, so the allowances compare the complete address and `+codex` or
-   `!codex` is not `codex`. Backticks, asterisks and quotes are outside an address only when they wrap it, closing right after it, and an
-   `@` with nothing but them before it, such as the backticked `@AGENTS.md` import, is no address; an address that the parser reads with a
-   defect, an obsolete form included, passes no allowance. Two shapes that are not addresses pass, by the CC's ruling of 2026-10-12: a
-   systemd unit instance, `<name>@<instance>.<type>` with a type of `service`, `timer`, `socket`, `path` or `mount`, only the characters a
-   unit name has and an instance that is not an address's domain (so `<name>@<instance>` is no address), as the instance `tty1` of the
-   template `getty@.service` is (the ruling also named `target`, which round 2 dropped: `.target` is a top-level domain), and an address
-   of the short list `VENDOR_TRAILER_ADDRESSES`, each entry with the vendor source it comes from, now one: the Codex co-author address in
-   the vendor's own history (sources below), which #1002's email registry will replace); and for each name of the names file as a whole
-   token in any letter case (not inside a longer run of letters or digits, the boundary rule of `host_name_scan.py`). A name equal to the
-   running host's own name (`hostname`, as `socket.gethostname()` returns it,
+   forms at `users.noreply.github.com`, or a local part of exactly `noreply` or `no-reply`, pass). Since #1027's round 3 every `@` is
+   judged by CPython's RFC 5322 parser itself, so no address passes for want of a pattern that finds it: on the `@`'s line, the local part
+   before it and the domain after it are read as the parser reads an addr-spec (`get_addr_spec`), with quoted strings, comments and white
+   space around the `@`, domain literals and domains of any form, and an `@` inside a quoted string is judged inside it as well (sources
+   below). An `@` with no local part before it (the start of a line, a special such as `<`, `(` or `:`, or markup that wraps the name
+   after it, such as the backticked `@AGENTS.md` import) or no domain after it is no address; text around an `@` that the parser cannot
+   read whole and without a defect, an obsolete form included, is refused. The parser undoes quotes and quoted pairs, so `"x"@<domain>` is
+   the address `x@<domain>` and is refused or passed as that address is, and it keeps the whole local part and the whole domain, so the
+   allowances compare the complete address and `+codex` or `!codex` is not `codex`; an allowed address passes only when its local part
+   holds no `@` and neither a quote nor an `@` follows its domain. Backticks, asterisks and quotes are outside an address only when they
+   wrap it, closing right after it. Four shapes that the parser reads as addresses pass, by the CC's rulings of 2026-10-12: a systemd unit
+   instance, `<name>@<instance>.<type>` with a type of `service`, `timer`, `socket`, `path` or `mount`, only the characters a unit name
+   has and an instance that is not an address's domain, as the instance `tty1` of the template `getty@.service` is (the ruling also named
+   `target`, which round 2 dropped: `.target` is a top-level domain), and the template `<name>@.<type>` itself, which the parser reads as
+   no address at all; an address of the short list `VENDOR_TRAILER_ADDRESSES`, each entry with the vendor source it comes from, now one:
+   the Codex co-author address in the vendor's own history (sources below), which #1002's email registry will replace; and, by the ruling
+   on round 3, a source locator, `<repository>@<object name>`, this repository's `repo@pin` form: the whole domain is a git object name, 7
+   to 64 hex digits, and the local part has only the characters of a repository's path, markup in front of it aside (a code span may close
+   after the locator's path); and the one address of `REPOSITORY_TRAILER_ADDRESSES`, the co-author address of this repository's synthetic
+   scratch identity, with its source in the repository. A tag, a branch or any other revision after an `@`, a shorter or longer run of hex
+   digits, and any other local part or domain beside the scratch identity's are refused. It reads the text, lastly, for each name of the
+   names file as a whole token in any letter case (not inside a longer run of letters or digits, the boundary rule of
+   `host_name_scan.py`). A name equal to the running host's own name (`hostname`, as `socket.gethostname()` returns it,
    compared when the scan runs without regard to case, and never printed) is a warning and not a refusal, by the CC's ruling that the host
    name is hygiene and never a blocker: its occurrences are counted. Every other name still refuses. The names file is
    `$LANDING_COORD/command-center/cc-tools/landing-prohibited-names.env`: one `LANDING_PROHIBITED_NAMES=<name>,<name>,...` assignment, the
@@ -112,9 +130,12 @@ sibling `host_name_scan.py` and exits 2: measured 2026-10-12, and CPython's docu
 2. `scripts/validate.py --scan-file <snapshot>`, the scan the pre-push hook runs: `PRIVATE_CONTENT` and the runtime host-local names
    (the account, the host, the Windows profiles) through Betterleaks at `host_name_scan.py`'s pin. Its answer counts only as the exact
    line `{"matching_locations": 0, "scanned_files": <n>, "source": "host", "status": "passed"}`; the synthetic sources of
-   `NATIVE_AGENT_HOST_NAMES_JSON` (`"source": "synthetic"`) never pass. It leaves the host's own name alone on a WSL host whose hostname is
-   its `WSL_DISTRO_NAME`: `scripts/host_name_scan.py:65-68` drops the hostname source then, and on the CC's host it does (measured
-   2026-10-12: a body naming the host passed both scans). Where the two differ, this scan would refuse a mention.
+   `NATIVE_AGENT_HOST_NAMES_JSON` (`"source": "synthetic"`) never pass. The scripts run it with `NATIVE_AGENT_PUBLIC_HOSTNAME=1`, which
+   drops the hostname source on any host the way `scripts/host_name_scan.py` drops it on a WSL host whose hostname is its
+   `WSL_DISTRO_NAME`, together with a Windows computer name of the same spelling (on WSL the hostname is by default that name), and
+   keeps every other source. So a body whose only hit is the host's own name lands with the warning on any host, and an account,
+   profile or email identity spelled as the host is still refused (#1027 round 3: the GPT family's blocker 3 at 37e242c0 and the Codex
+   connector's thread on `nas:259`).
 
 A match stops the landing with exit 2 and the line `SQUASH_BODY_FILE holds text the publication scan refuses (details withheld;
 squash_body_scan.py names the classes and lines): stop, nothing merged`. A snapshot that cannot be made or copied, a scanner or names file
@@ -320,8 +341,9 @@ the 20-minute wait or at the final gate), a review that ended other than Complet
 4), a gate that failed or is missing; or a 5 without an accepted `GPT_VERDICT` (#975 P3-7 at 761810d7: the header named only some of
 these). `nas_land.sh`: 2 as above, 3 head moved, 4 `update-branch` refused or the change differs after it or at the final gate, 5 CI
 failing (also at the final gate), 6 timeout, 7 merge failed, 8 blocked by policy, 9 as above, but a 5 proceeds, and a 3 before the
-validation stops too, 10 the merge onto current `origin/main` does not merge cleanly, fails `scripts/validate.py` or fails one of the
-shard-0 currency checks whose script it holds (CC correction #176), 13 origin/main moved
+validation stops too, 10 the merge onto current `origin/main` does not merge cleanly, fails `scripts/validate.py`, fails one of the
+shard-0 currency checks of its own `validate.yml` (CC correction #176) or holds one that the script cannot read or run as written,
+13 origin/main moved
 after each of three validations, moved after the last validation (read at the final gate) or could not be read, so nothing is merged
 (#975, new in round 3). Both scripts also exit 11 when the no-reply author address cannot be formed (nothing is merged), 12 when the
 merge landed but its commit's author is not that address or the commit could not be read (CC correction #148), and 14 when another
@@ -385,7 +407,10 @@ checked `SQUASH_BODY_FILE` before the group that is parsed whole and accepted an
 statement after the arguments, still before the lock and any call, and also refuses a directory, an unreadable file and `-`. They kept
 the validation's output beside the worktree and a failed merge's under the CC's tools directory; here both go to `${TMPDIR:-/tmp}`, as
 before. The CC's regression for #176 (`test_merge_validate_currency.sh` in its tools directory, which cuts `merge_validate` out of a
-script and runs it on a scratch repository whose merge fails `final_stack.py --check`) passes on this `merge_validate`. At
+script and runs it on a scratch repository whose merge fails `final_stack.py --check`) passed on `merge_validate` up to 37e242c0. Since
+round 3 the checks come from the merge's own `validate.yml`, which that scratch repository does not hold, so the regression as it stands
+reports a failure on this `merge_validate` (measured 2026-10-12); a copy whose scratch repository holds a `validate.yml` with that step,
+and which cuts `shard0_checks` out with `merge_validate`, passes (measured the same day), and the CC's copy needs that change. At
 2026-10-12T03:15:27Z (the files' times) the CC replaced the live copies whole with d6be1b02's scripts, the three host paths filled in (472
 and 394 lines, each 3 changed lines from d6be1b02), and its `codex_gate.py` byte for byte, with no `squash_body_scan.py`, so they scanned
 no squash body (read on 2026-10-12): until #1027 lands the CC scans each squash body by hand, and it then syncs the copies again (ruling C).
@@ -404,8 +429,8 @@ this section are the repository copies' (a test checks that).
 
 | File | Before correction #136 | Live copy, after #148 | Live copy of 2026-10-11T05:03:28Z (replaced on 2026-10-12) | Here |
 | --- | --- | --- | --- | --- |
-| `uet_land.sh` | withheld (CC #161: a digest of a file whose only non-public bytes are host paths confirms a guessed path) (115 lines) | withheld (CC #161: a digest of a file whose only non-public bytes are host paths confirms a guessed path) (232 lines) | withheld (CC #161: a digest of a file whose only non-public bytes are host paths confirms a guessed path) (233 lines) | `74c570a82c15c5f987528ff7b36f1d0f53d93475b113e6c0922bb0ff928fdfba` (447 lines) |
-| `nas_land.sh` | withheld (CC #161: a digest of a file whose only non-public bytes are host paths confirms a guessed path) (135 lines) | withheld (CC #161: a digest of a file whose only non-public bytes are host paths confirms a guessed path) (243 lines) | withheld (CC #161: a digest of a file whose only non-public bytes are host paths confirms a guessed path) (246 lines) | `9dc4fd51c4b31d08a2cd7507197651076ed3c02671c4254d3191fa0a795e4808` (525 lines) |
+| `uet_land.sh` | withheld (CC #161: a digest of a file whose only non-public bytes are host paths confirms a guessed path) (115 lines) | withheld (CC #161: a digest of a file whose only non-public bytes are host paths confirms a guessed path) (232 lines) | withheld (CC #161: a digest of a file whose only non-public bytes are host paths confirms a guessed path) (233 lines) | `d0626aa2177be3994b2b815e24979156a4aa2c0cd6cb290bc5acb1927086810a` (450 lines) |
+| `nas_land.sh` | withheld (CC #161: a digest of a file whose only non-public bytes are host paths confirms a guessed path) (135 lines) | withheld (CC #161: a digest of a file whose only non-public bytes are host paths confirms a guessed path) (243 lines) | withheld (CC #161: a digest of a file whose only non-public bytes are host paths confirms a guessed path) (246 lines) | `e96c14a94a2f45823dd1b8901719f0636b82159519fb9782fd2404566cfc4e0a` (562 lines) |
 | `codex_gate.py` | (unchanged) | withheld (CC #161: a digest of a file whose only non-public bytes are host paths confirms a guessed path) (108 lines) | the same | `e2132ab71b6e55fea8922b9c5b0b8c17bde87b1d37f11bf384b785bef6f96b6a` (226 lines) |
 
 Corrections the scripts carry: #118 (every gate before the merge, in order), #121 (a verdict file that states a landing gate needs
@@ -432,7 +457,14 @@ and 4). These stay until a change with its own tests fixes them:
   `scripts/validate_catalogs.py` and `scripts/validate_convergence.py`) and its checks that are not one Python command (the example
   workflows' `sha256sum --check`, the contract suites, zizmor and actionlint) do not run on the merge, so a merge that fails only one of
   them still lands. Each check runs on the merge as the worktree holds it, uncommitted, so a check that read the committed tree would
-  read `main`; none of the eight does (they read files, and `gap_crosswalk.py` a fixed revision).
+  read `main`; none of the eight does (they read files, and `gap_crosswalk.py` a fixed revision). Since round 3 the steps are read from
+  the merge's `validate.yml` in the one form this repository writes them (`if: matrix.shard == 0` on its own line, a `run` of one line
+  or a folded `>-` block): a `--check` step written another way (a literal `|` block, a pipe, another spelling of the condition, a step
+  with no condition, which every shard runs) is not read. The reader fails closed on a `validate.yml` in which it reads no check, and
+  open on a merge that holds no `validate.yml`, which runs none (the success line says "0"): `main`'s CI has no such workflow to run on
+  that merge either, and a head that removes the file has no `validate` check run, which the CI gate requires at the head before the
+  validation and again at the final gate. The steps and their scripts are the merge's own, as `scripts/validate.py` already was: the
+  landing runs code of the pull request it lands (the sandboxing follow-up).
 - A call whose failure never stopped a landing still does not: an unreadable draft flag (both scripts) leaves a draft unmarked, and
   an unreadable `mergeStateStatus` (`nas_land.sh`) skips the BEHIND update and the BLOCKED stop, so the merge call itself is the check
   (exit 7 when GitHub refuses it). `nas_land.sh`'s final gate does not read `mergeStateStatus`; thread resolution is required
@@ -460,22 +492,41 @@ and 4). These stay until a change with its own tests fixes them:
   HTML-entity encodings, a name glued to letters or digits (`host=<name>01`, the letter and digit boundary of
   `scripts/host_name_scan.py`), or a generic running account joined by a character outside the joiner class.
 - The squash body scan is conservative (#1027), and fails closed where it is unsure. Run on the last 600 commit messages of `main` at
-  3a8a8461ee60 (2026-10-12; counts only), it refuses 8: 0 names, 5 addresses, 3 home paths. The 5 addresses are 3 at a mail provider and 2
-  at a reserved test domain. It warns, without refusing, about 26 messages (66 occurrences) that name the host's own name; it passes the
-  2 that carry a systemd unit instance, the 1 that carries the vendor co-author address and the 402 that carry the vendor `noreply`
-  trailer. (Before the CC's three allowances of 2026-10-12 it refused 37: 26 names, 8 addresses, 3 home paths.) Round 2's address rule
-  gives the same counts there, and on the last 600 at bb945f1cf9cb (re-measured 2026-10-12): the 2 unit instances are of `.service`. A
-  refused body is rewritten, or the names file edited; the scan has no other allow-list. It decodes percent-escapes and not hex, base64,
-  `\u`, HTML entities or doubly encoded text, finds a WSL UNC home path but not other UNC shares, and reads the names file's last
-  `LANDING_PROHIBITED_NAMES` assignment only (the tests' scan, by contrast, also finds a name's hex and base64 spellings).
-- The address rule (#1027 round 2) finds an address whose local part, unquoted or quoted, touches the `@` and whose domain follows it.
-  RFC 5322 also lets comments and white space stand around the `@` (it says they "SHOULD NOT be used", `rfc5322.txt:939-940`), and
-  CPython's parser reads `x @<domain>` and `x(c)@<domain>` as addresses, but it reads `with @functools.cache`, a Python decorator in
-  prose, as an address too, so the scan does not look for those forms, nor for a domain literal (`x@[192.0.2.1]`); a quoted local part
-  that runs over a line end is not found either. It fails closed on a unit instance whose instance is dotted like a domain (an instance
-  `client.conf` is refused), on a vendor or no-reply address that markup opens and does not close, and on any address the parser reads
-  with a defect. Text that runs letters and quotes together is scanned in more than linear time (15 KB of `a"b` repeated took 1.5 s,
-  measured 2026-10-12); prose is not.
+  3a8a8461ee60 (2026-10-12; counts only), round 2's rule refused 8: 0 names, 5 addresses, 3 home paths; the 5 addresses are 3 at a mail
+  provider and 2 at a reserved test domain, and it gave the same counts on the last 600 at bb945f1cf9cb and at 5421e5d67017. Round 3's
+  rule, on the last 600 at 5421e5d67017 (2026-10-12; counts only), refuses 70: 0 names, 67 addresses, 3 home paths. By the kind of `@`
+  the 67 hold (a message may hold several; in brackets, how many hold no other kind): 31 a tag or a version after the `@`, as in
+  `<repo>@v1.2.3` (25); 21 another domain without a dot, such as a placeholder `<repo>@pin` or an `@` in a URL's path (15); 13 white
+  space or a comment at the `@` (12); 5 the addresses round 2 refused (5); 3 text that the parser reads with a defect (3); and 1 a
+  commit id after a local part that is no repository path (0). It warns, without refusing, about 26 messages (66 occurrences) that name
+  the host's own name; it passes the 400 that carry a no-reply local part (the vendor trailers), the 341 that carry the scratch
+  identity's co-author trailer, the 78 that carry GitHub's no-reply domain, the 62 that carry a source locator, the 2 that carry a
+  systemd unit instance (both `.service`), the 1 that names a template unit and the 1 that carries the vendor co-author address.
+  (Without the CC's allowances of 2026-10-12, the host's name, the units, the vendor address, the locator and the scratch identity, it
+  refuses 417 there: 26 names, 400 addresses, 3 home paths; without the last two alone, its address rule refuses 399.) A refused body is
+  rewritten, or the names file edited; the scan has no other allow-list, so a body writes a tag as `<repo>` at `<tag>`, puts a mention
+  in a code span of its own and leaves out a co-author whose address is not an allowed one. It decodes percent-escapes and not hex,
+  base64, `\u`, HTML entities or
+  doubly encoded text, finds a WSL UNC home path but not other UNC shares, and reads the names file's last `LANDING_PROHIBITED_NAMES`
+  assignment only, in a form that a shell reads as the same list (any other fails closed; the tests' scan, by contrast, also finds a
+  name's hex and base64 spellings).
+- The address rule (#1027 round 3) judges every `@` by CPython's parser, so an address that the parser reads on one line is found,
+  whatever its form. It does not join lines: a local part or a domain split by a line end is judged as two pieces (the parser reads a line
+  end inside a word or a quoted string as a defect), and text that spells an address without an `@` (`at`, an HTML entity; `%40` is
+  decoded) is not an address to it. It refuses some text that names no one, which a body then writes another way: a word, white space
+  and an `@` (`Thanks @someone`, `with @functools.cache`, and an `@` that stands alone between two words; in a code span of its own,
+  as `` `@someone` `` or `` `@` ``, the `@` has no local part and passes, while a span that holds more, as `` `@someone review` ``, is
+  refused: markup is outside an address only when it wraps it),
+  an address at `localhost`, a placeholder such as `<repo>@pin`, a locator whose revision is a tag or a branch (`<repo>@<tag>`:
+  nothing tells such a revision from a host name), and a URL whose path holds an `@`. The locator ruling passes any `<path>@<7 to 64
+  hex digits>`, so an address whose whole domain is such a run passes as a locator; no top-level domain of IANA's list is one (sources
+  below), so it is no address at a delegated domain. It fails closed on a unit
+  instance whose instance is dotted like a domain (an instance `client.conf` is refused), on a vendor or no-reply address that markup
+  opens and does not close, and on any address the parser reads with a defect. The unit ruling keeps `<name>@<instance>.<type>` whose
+  instance is not dotted like a domain, so an address at a host name without a dot, followed by a unit type, passes as a unit instance
+  (`tty1` is such an instance). The scan's cost is linear in the text: 15 KB on one line took at most 0.05 s and 60 KB at most 0.18 s
+  (measured 2026-10-12, three runs, on fourteen texts, each repeated: `a"b`, `"k":"v",`, prose with quoted words, allowed addresses,
+  and `@` with and without an address; round 2's rule took 1.5 s and 24 s on `a"b`, measured the same day, Claude's P3-A at 37e242c0).
 - The history residual (#1027): the 3 messages with a home path and the 3 with an address at a mail provider counted above already sit in
   `main`'s commit history (the whole history at that base, 1229 messages, holds 5 and 4). History is immutable, as for CC correction #177,
   and this change rewrites none of it. Whether any of them is identity-bearing is a follow-up.
@@ -532,12 +583,13 @@ page 1 supersedes land; check runs that jq cannot judge print neither jq's error
 in both scripts: a `trading-cc-read` failure or pending status behind 100 newer statuses of 100 other contexts, or of one, stops with 2
 (at 3e6e7e46 the gate gave "no status", exit 0 with nothing printed, and both scripts landed: exit 0, one merge), a success behind them
 has its record checked, and a reply that is not an array of pages with statuses, an empty one included, stops with 2 and prints nothing
-of it. The CC's patches of 2026-10-12 add, each failing at 86fa3844: the checks `merge_validate` names are exactly the shard-0 steps of
+of it. The CC's patches of 2026-10-12 add, each failing at 86fa3844: the checks `merge_validate` runs are exactly the shard-0 steps of
 `validate.yml` that run a Python script with `--check`, as those steps run them and in their order, a folded `run: >-` step included
-(at 86fa3844 it named none; the reader is also run on a synthetic workflow); the provenance section carries a 64-hex digest only in
+(at 86fa3844 it named none; since round 3 the script's own reader, `shard0_checks`, is held to the eight on this repository's workflow
+and to the test module's reader on a synthetic one); the provenance section carries a 64-hex digest only in
 its "Here" column (CC #161; at 86fa3844 seven digests of live copies stood beside them); a merge that passes `validate.py` and fails
 `scripts/final_stack.py --check` stops with 10 naming that check, the checks after it not run and its output only in the 0600 file (it
-merged at 86fa3844); a check runs only when its script is in the merge, and a landing whose checks pass merges; a `SQUASH_BODY_FILE`
+merged at 86fa3844); a landing whose checks pass merges, each check of the merge's workflow run once; a `SQUASH_BODY_FILE`
 that is missing, empty, a directory, `-` or unreadable stops both scripts with 2 before any call, printing no path (each landed at
 86fa3844); and a body file reaches the merge as one `--body-file` argument (the merge had none at 86fa3844; since #1027 it is the snapshot, in a
 `TMPDIR` whose name may have a space), while an empty value adds none. The fake `python3` answers a currency check itself, so it never takes one of the gate's answers, and
@@ -584,6 +636,38 @@ do not close), 3,672 cases, in which the scan must refuse exactly the addresses 
 on e203d014 with this test module (measured 2026-10-12), `SquashBodyScanTests` and the six end-to-end tests of the unit, vendor and round 2
 cases (14 tests) gave 2,685 failing cases in 8 tests, each new or changed test but the controls': 106 of them landings (exit 0 where 2 was
 due, 52 in each scan mode and the 2 of the `target` look-alike) and 2,544 in the oracle's test. At the fix all 14 pass.
+
+**Round 3 of #1027.** Its inputs are the CC's Claude micro at 37e242c0 (W1, W2, P3-A to P3-C), the GPT family's fix3 verdict at
+37e242c0 (blockers 1 to 3, follow-ups 2 and 3), the Codex connector's three threads on e203d014 (`nas:430`, `nas:259` and the address
+rule) and the CC's rulings of 2026-10-12 on the allowances; the reproductions are theirs and are not repeated here. Each guarantee below
+is tested through both scripts, with the canned `validate.py --scan-file` answer and, where Betterleaks is at its pin, with the real scan:
+a refusal is exit 2 with the fixed line, before any `gh` or `git` call and with no snapshot left.
+
+- An allowance passes only a whole address that holds no other address and that no other touches: an address inside an allowed one's
+  quoted local part, or directly after an allowed one, is refused.
+- An address is refused whatever the form of its domain (no dot, letters of another script, a domain literal) and whatever stands around
+  its `@` (comments, white space), and so is a local part that a line end splits inside its quotes.
+- A source locator and the scratch co-author trailer land, and what only resembles them is refused (a tag or a branch after the `@`,
+  too few hex digits, an object name inside a longer domain, another local part or a longer domain beside the scratch identity's).
+- The names file is read only in a form that a shell reads as the same list; any other stops both scripts as unscannable.
+- A body whose only hit is the host's own name lands through the real second scan with the warning on a host that is not WSL, and is
+  refused when another identity (the git email's local part) has the host's spelling. The test skips where another source of the host
+  already has that spelling, as `host_name_scan.py` itself reports; `tests/test_host_name_scan.py` tests `NATIVE_AGENT_PUBLIC_HOSTNAME`
+  by itself.
+- The controls land: an `@` with no local part, a mention and a decorator in code spans, a template unit, a quoted no-reply address and
+  one in parentheses, a body with CRLF line ends. The signal test also sends SIGINT.
+- `nas_land.sh` validates a merge with the shard-0 checks of the merge's own `validate.yml`: a failing check that the merge adds stops it
+  with 10, a step whose arguments the merge changes runs as the merge writes it, and a `validate.yml` in which no check can be read, or
+  one of whose steps is not plain words, stops it with 10 before any check runs, the step's text not printed. Its reader is held to the
+  eight checks of this repository's workflow and to the test module's reader.
+
+The oracle's test runs 29 local parts at 29 domains in nine forms, 7,569 cases. Run on a git archive of 37e242c0 with this test module and
+`tests/test_host_name_scan.py` (measured 2026-10-12), the 19 new or changed tests gave 2,254 failing cases and one error in 16 tests, the
+three that pass there being the controls' test, the signal test and #176's own test: 100 landings of a refused address (52, 28 and 20, in
+both scan modes), 12 landings past a names file read otherwise, 2 refusals of the host's own name, 2,100 cases of the oracle's test, 12
+of the per-`@` test, 9 of the names file's, 3 of the address rule's controls, 3 of `host_name_scan.py`'s, 13 of the currency checks' five
+tests (a landing with a failing added check among them) and the error of the allowances' own test, whose table 37e242c0 does not have.
+At the fix all 19 pass, on CPython 3.12.3, 3.13.16 and 3.14.4.
 
 **The privacy scan (#975 P2-1).** Two kinds of identity are scanned for, each in these forms: the bare word, an identifier or path
 form (joined to other text by `-`, `_`, `.`, `/`, `\`, `@`, `:`, `~` or `=`, as in `project-<name>-tools` or `<name>@host`), a
@@ -648,7 +732,7 @@ above still hold; the schema's bytes are unchanged, sha256 `3ed09565…`); insta
 | A check run's recency is its completion (Astra's follow-up 1 at 5b8ba3b2) | `github/rest-api-description@58b1e0c00b39:descriptions/api.github.com/api.github.com.json`, `da3d22e4…` (the local upstream mirror at that commit) | `:55504-55514` the list-for-ref `filter` parameter: "Filters check runs by their `completed_at` timestamp. `latest` returns the most recent check runs" (default `latest`), so `nas_checks` asks for `filter=latest`, and until A1 (below) it judged a name on the completed run with the greatest `completed_at`; `:146097-146107` `check-run.started_at` and `completed_at` are both `"nullable": true`, so a completed run without `completed_at` counts as incomplete (a tie with two conclusions did too until A1) |
 | Where an edit is, which the change identity ignores (Codex F1 at 5b8ba3b2, declared) | `git/git@v2.53.0:Documentation/git-patch-id.adoc`, `e835ca2a7a11b54e3db93221466928c887ef9529a9b34b475d746888e43af410` (the local upstream mirror at `67ad4214`) | `:17-18` a patch ID is "a sum of SHA-1 of the file diffs associated with a patch, with line numbers ignored" |
 | A failing run stands unless a run of its name started and completed after it (A1, the CC's Claude micro at 3e6e7e46) | `jqlang/jq@jq-1.8.1:docs/content/manual/v1.8/manual.yml`, `e0eb9a08…` (the local upstream mirror at `jq-1.8.1`, read on 2026-10-11) | `:1544-1552` jq orders `null` before every other value and strings by code point, and `:2425-2433` `>` uses that order, so a run whose `started_at` or `completed_at` is null is never later than another run (the program also gives such a failing run no superseder); `:1334-1347` `any(generator; condition)`, `:1579-1590` `group_by`. The times REST gives order as strings: all 2,072 runs on the 70 heads replayed on 2026-10-11 have both in the form `YYYY-MM-DDTHH:MM:SSZ`, none with a fraction or a null (112 of them, all skipped, completed before they started; the rule compares a run's times only with another run's) |
-| Every page of check runs (Codex P2 at nas:289) | `cli/cli@v2.102.0` (the local upstream mirror at `fc4b137c`): `pkg/cmd/api/api.go`, `030eda84…`; `pkg/cmd/api/pagination.go`, `0565f3040ed1843875732e5df5dbc50fdbc90bb3b45685eabfd83c133b4c79b0`; `go.mod`, `115bc54638dc4fa5a72da79d9f87fca699ee5b1fc7e21ea9314a517fb18fb40b`; `github/rest-api-description@58b1e0c00b39:descriptions/api.github.com/api.github.com.json`, `da3d22e4…`; `github/docs@be38ec5d78e24172587e61b3c6ff40ace1865c71:content/rest/using-the-rest-api/using-pagination-in-the-rest-api.md`, `418bdf281d74a89c7dabedc4af53a6f7b286f2416e7670d9cc71453db08d8640` (the local upstream mirrors, read on 2026-10-11) | `api.github.com.json:55518`, `:55521` the list-for-ref endpoint takes `per_page` and `page`, `:344577-344585` `per_page` is "(max 100)", `:344616-344624` `page`, `:55563-55564` its reply carries a `Link` header, `:347322-347327` whose example names the next page with `rel="next"`; the docs, `:22` "You can use the `link` header from the response to request additional pages of data", `:28` the header is omitted "if all results fit on a single page", `:49` "The URL for the next page is followed by `rel="next"`"; `api.go:358-360` `--paginate` keeps a `per_page` the path has (`pagination.go:94-110`), `:431-470` asks for page after page while `pagination.go:17-24` finds `rel="next"`, `:362-371` with `--slurp` writes every page into one JSON array, `:260-273` `--slurp` needs `--paginate` and refuses `--jq`, so `nas_checks` runs jq itself on the array (gh's own `--jq` is go-gh's, `api.go:28`, on gojq, `go.mod:21`, `:141`), and `:546`, `:553-565` the body of a failed page is still written and gh exits non-zero, so its exit code is checked before jq reads. Measured on 2026-10-11 at `26f551b1` (43 runs): `per_page=10` gave 5 pages of 10, 10, 10, 10 and 3 runs, `total_count` 43 on each, the same 43 ids as one `per_page=100` page, the next link `filter=latest&per_page=10&page=2`, and the same four counts |
+| Every page of check runs (Codex P2 at nas:289) | `cli/cli@v2.102.0` (`fc4b137c`; read again on 2026-10-12 from the local mirror `cli/cli-2.102.0`, which is at that commit, with the same three digests: the `cli/cli` mirror is a blobless clone at `ec5b5120`): `pkg/cmd/api/api.go`, `030eda84…`; `pkg/cmd/api/pagination.go`, `0565f3040ed1843875732e5df5dbc50fdbc90bb3b45685eabfd83c133b4c79b0`; `go.mod`, `115bc54638dc4fa5a72da79d9f87fca699ee5b1fc7e21ea9314a517fb18fb40b`; `github/rest-api-description@58b1e0c00b39:descriptions/api.github.com/api.github.com.json`, `da3d22e4…`; `github/docs@be38ec5d78e24172587e61b3c6ff40ace1865c71:content/rest/using-the-rest-api/using-pagination-in-the-rest-api.md`, `418bdf281d74a89c7dabedc4af53a6f7b286f2416e7670d9cc71453db08d8640` (the local upstream mirrors, read on 2026-10-11) | `api.github.com.json:55518`, `:55521` the list-for-ref endpoint takes `per_page` and `page`, `:344577-344585` `per_page` is "(max 100)", `:344616-344624` `page`, `:55563-55564` its reply carries a `Link` header, `:347322-347327` whose example names the next page with `rel="next"`; the docs, `:22` "You can use the `link` header from the response to request additional pages of data", `:28` the header is omitted "if all results fit on a single page", `:49` "The URL for the next page is followed by `rel="next"`"; `api.go:358-360` `--paginate` keeps a `per_page` the path has (`pagination.go:94-110`), `:431-470` asks for page after page while `pagination.go:17-24` finds `rel="next"`, `:362-371` with `--slurp` writes every page into one JSON array, `:260-273` `--slurp` needs `--paginate` and refuses `--jq`, so `nas_checks` runs jq itself on the array (gh's own `--jq` is go-gh's, `api.go:28`, on gojq, `go.mod:21`, `:141`), and `:546`, `:553-565` the body of a failed page is still written and gh exits non-zero, so its exit code is checked before jq reads. Measured on 2026-10-11 at `26f551b1` (43 runs): `per_page=10` gave 5 pages of 10, 10, 10, 10 and 3 runs, `total_count` 43 on each, the same 43 ids as one `per_page=100` page, the next link `filter=latest&per_page=10&page=2`, and the same four counts |
 | The newest status of each context, on every page (Codex P1 at nas:234) | `github/rest-api-description@58b1e0c00b39:descriptions/api.github.com/api.github.com.json`, `da3d22e4…`; `github/docs@be38ec5d78e24172587e61b3c6ff40ace1865c71:src/rest/data/fpt-2022-11-28/commits.json`, `57f0a021883f869390a022e41bdbe77267d5ebbdbf59849d2891380f5e363247` (the local upstream mirrors, read on 2026-10-11) | `api.github.com.json:55664-55667` `GET /repos/{owner}/{repo}/commits/{ref}/status`, "a combined view of commit statuses for a given ref", whose `state` is success "if the latest status for all contexts is `success`"; `:55687`, `:55690` it takes `per_page` and `page`; `:55694-55699` its reply is a `combined-commit-status`, `:148666-148707`, with `statuses` of `simple-commit-status` (`:148606`: `context`, `state` and a nullable `description`) and `total_count`; the docs' REST data, `commits.json:9530`, give the same text and parameters. Neither says the entries are one per context. Measured on 2026-10-11, read only: on 8 public heads (`kubernetes/kubernetes`, 2 to 35 statuses in 2 to 15 contexts) and on the 12 of our 80 heads that have statuses, every context appeared once, as the list's first (newest) status of it, and `total_count` was the number of contexts; with `per_page=5`, the first page of each of the 5 heads with 13 to 15 contexts carried a `Link` `rel="next"`, and `--paginate --slurp` gave the same entries as one page of 100 on all 8; on our 80 heads the combined read and the 3e6e7e46 read gave the same `trading-cc-read` state and description |
 | The connector's own layout and footer | `tests/fixtures/landing/codex-summary-comment.json`, `3918a25359d64ea4b2bcf31ec9ac9d92ff681270c072da6af625575eab720792` (the summary comment of nas#975 with its four revisions, masked by `mask_packet.py`'s rule with nothing to replace; the body's sha256 is `1236fe482740fa1ccdaac6d50d4e1e77f6a6e961d64e8dd5377a4923a6f8d0dc`) | a row of four cells (the review kind "📝 Code Review", the status "✅ Completed" with its time, the commit 761810d in backticks, the trigger kind "Manual request"), the Running form "🔄 Running since" with its time, the newest revision equal to the body, every editor the Bot `chatgpt-codex-connector`, and the footer "Codex reacts with 👀 while any review is running, comments if it has suggestions, and reacts with 👍 once all reviews finish with no findings" |
 
@@ -664,11 +748,14 @@ row names another source; installed: `gh` 2.102.0.
 | How `gh` takes the body file, for the snapshot (#1027) | the three `cli/cli` files above, read on 2026-10-12 through the GitHub contents API at `fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd` (the commit of `v2.102.0`): the local mirror, a blobless clone at `ec5b5120`, held no tag and not that commit when they were read; the digests equal the ones above (read again through the contents API on 2026-10-12 for #1027's round 2: the same three) | `merge.go:146-153` is in the command's `RunE`, so `gh` reads the file when `gh pr merge` starts, however long before that the landing checked it; `:292-293` and `http.go:72-75` send what it read. A scan of the caller's file is therefore a scan of other bytes than `gh` may read, which is why the scripts scan a snapshot and give `gh` the snapshot |
 | A WSL UNC home path (#1027) | `MicrosoftDocs/WSL@a1473a69d10c` (HEAD on 2026-10-12, read through the contents API): `WSL/release-notes.md`, `7c8890227146c81681f8d743ad9ff8a1675310c52c22d7e54f4b4c08c89a57dd`; `WSL/wsl-config.md`, `2f84606529d3486b0b62dadea3afcbcb26cbccdd20ceb6cc0e4470b1520eee74` | `release-notes.md:24` "Switch the \\wsl prefix to \\wsl.localhost to avoid issues when there is a machine on the network named "wsl". \\wsl$ will continue to work."; `wsl-config.md:162` the path of a distribution's file is `\\wsl.localhost\<distro>\etc\wsl.conf` (the page's example names a stock distribution). So a home directory is `\\wsl.localhost\<distro>\home\<user>` or `\\wsl$\<distro>\home\<user>`. `scripts/validate.py:38-61` (`PRIVATE_CONTENT`) matches neither (measured 2026-10-12: no finding for either, one for the same path with forward slashes) |
 | The no-reply addresses (#1027) | `github/docs@be38ec5d78e24172587e61b3c6ff40ace1865c71:content/account-and-profile/reference/email-addresses-reference.md`, `fbbf1c5f700d977f8672462859621f9412e65531a57790fa779e191a4d1c0949` | `:47` an account created after July 18, 2017 has `ID+USERNAME@users.noreply.github.com`, `:48` an older one that kept its address private `USERNAME@users.noreply.github.com`. The vendor trailer `Co-Authored-By: ... <noreply@anthropic.com>` is this repository's convention, not GitHub's: 402 of the last 600 commit messages of `main` at 3a8a8461ee60 carry it (measured 2026-10-12) |
-| The address shape and a name's boundary (#1027) | this repository, `scripts/host_name_scan.py` at the base | `:164` the native `private-email` rule (RFC 5322 atext characters, `@`, letters, digits, dots and hyphens, a TLD of two letters or more) that the scanner's email check uses; `:144-150` `boundary_filter` drops a match with a letter or digit just before or after it, which is the whole-token rule of the name check; `scripts/validate.py:316-345` `scan_file_for_private_content` reads a file as UTF-8, else Latin-1, as `squash_body_scan.py` does, and `:737-780` is the `--scan-file` mode (exit 0 clean, 1 findings, 2 unavailable) |
+| The address shape and a name's boundary (#1027) | this repository, `scripts/host_name_scan.py` at the base | `:164` the native `private-email` rule (RFC 5322 atext characters, `@`, letters, digits, dots and hyphens, a TLD of two letters or more), which the scanner's unit rule uses to tell an instance that is an address's domain (since round 3 the parser, not this shape, finds addresses); `:144-150` `boundary_filter` drops a match with a letter or digit just before or after it, which is the whole-token rule of the name check; `scripts/validate.py:316-345` `scan_file_for_private_content` reads a file as UTF-8, else Latin-1, as `squash_body_scan.py` does, and `:737-780` is the `--scan-file` mode (exit 0 clean, 1 findings, 2 unavailable) |
 | An `EXIT` trap on a terminating signal (#1027) | `bash.git@bash-5.3:doc/bashref.texi` (git.savannah.gnu.org, `plain/doc/bashref.texi?h=bash-5.3`, read 2026-10-12), `f3d37d57a1061e24d266051de9bd47ffa43dc86584afea11576c535ad2be32d5`; installed: bash 5.3.9 | `:4777-4778` "If a sigspec is 0 or EXIT, action is executed when the shell exits", `:4358` "Any trap on EXIT is executed before the shell terminates". The manual does not say a signal counts, so it was measured: a script that made a file and set the trap, killed with SIGTERM and with SIGHUP while it waited on a child, ran the trap each time (the file was gone) and then died of the signal (a Python parent sees `-15` and `-1`); `test_the_snapshot_is_removed_when_a_signal_ends_the_landing` repeats it on both scripts |
 | Isolated mode (#1027) | `python/cpython@v3.13.16:Doc/using/cmdline.rst`, `ef999234d959b0a1d9a96a7f1f047170a77cd89fee9ffaa2a3db1af412a8ef0b` (the local upstream mirror at `cbc944f4bc59`) | `:308-316` `-I` "also implies -E, -P and -s", and "sys.path contains neither the script's directory nor the user's site-packages directory"; `:254-257` `-B`; `:392-395` `-s`. Measured 2026-10-12: `python3 -I scripts/validate.py --scan-file <file>` exits 2 (`"status": "error"`: `host_name_scan` is not importable), `python3 -E -s -B` exits 0 |
-| A systemd unit instance is no address (#1027) | `systemd/systemd@c7a8e871de3427cf654d9a608dc58663874197bb` (the local upstream mirror, HEAD on 2026-10-12): `man/systemd.unit.xml`, `520150b19c123762db6405bd68442bb72c8a5ea6e56cd383b99e9774e1c874b4` | `:121-124` the unit name prefix is ASCII letters, digits, `:`, `-`, `_`, `.` and `\`; `:125-128` the type suffix is one of `.service`, `.socket`, `.device`, `.mount`, `.automount`, `.swap`, `.target`, `.path`, `.timer`, `.slice` or `.scope` (the CC's ruling named six; round 2 keeps five, below); `:130-135` an instance name is inserted between the `@` and the type suffix. So an instance of a template such as `getty@.service` has the shape of an address (an `@`, a dot, a suffix of two letters or more) and is a unit; 2 of the last 600 commit messages of `main` carry one (measured 2026-10-12) |
+| A systemd unit instance is no address (#1027) | `systemd/systemd@c7a8e871de3427cf654d9a608dc58663874197bb` (the local upstream mirror, HEAD on 2026-10-12): `man/systemd.unit.xml`, `520150b19c123762db6405bd68442bb72c8a5ea6e56cd383b99e9774e1c874b4` | `:121-124` the unit name prefix is ASCII letters, digits, `:`, `-`, `_`, `.` and `\`; `:125-128` the type suffix is one of `.service`, `.socket`, `.device`, `.mount`, `.automount`, `.swap`, `.target`, `.path`, `.timer`, `.slice` or `.scope` (the CC's ruling named six; round 2 keeps five, below); `:130-135` an instance name is inserted between the `@` and the type suffix. So an instance of a template such as `getty@.service` has the shape of an address (an `@`, a dot, a suffix of two letters or more) and is a unit; 2 of the last 600 commit messages of `main` carry one (measured 2026-10-12). `:130-135` also says "A template unit must have a single `@` at the end of the unit name prefix (right before the type suffix)", and `:2402-2404` names `getty@.service`: the template itself, `<name>@.<type>`, which the parser reads as no address (#1027 round 3) |
 | A quoted local part, and how an address is read (#1027 round 2) | RFC 5322, `rfc5322.txt` from www.rfc-editor.org (fetched 2026-10-12), `cb459acca15a2aa895863eaeff6f1d5b9c4ca15578ae3e3706f757787a385969`; `python/cpython@v3.13.16:Lib/email/_header_value_parser.py`, `7beea37afd292ebc963afec0efb6e003638ec93d894dbd2ce631fd989c5106b7` (the local upstream mirror at `cbc944f4bc59`; the installed 3.13.16 file has the same bytes) | `rfc5322.txt:961` `local-part = dot-atom / quoted-string / obs-local-part`; `:735-744` a quoted-string is qtext or quoted pairs between two DQUOTEs; `:746-757` "quoted-string is identical to atom, semantically", and the quote characters are not part of it; `:939-940` "Comments and folding white space SHOULD NOT be used around the "@" in the addr-spec"; `:1939` `obs-local-part = word *("." word)`. `_header_value_parser.py:1682-1696` `get_addr_spec`, `:1486-1523` `get_local_part` (a dot-atom, a quoted string or an obsolete local part, the last with a defect), `:1525-1575` `get_obs_local_part`, `:1235-1275` `get_bare_quoted_string`, `:1315-1331` `get_quoted_string`, `:1644-1680` `get_domain`, `:634-654` `LocalPart.local_part` (the value without quotes or quoted pairs), `:544-547` `AddrSpec.domain`. The scan reads each address with it, and the tests take it as the oracle (the parser Astra ran): measured 2026-10-12 on CPython 3.12.3, 3.13.16 and 3.14.4, it gives the same answer on every text the tests give it; it reads a quoted local part at a provider as the unquoted address with no defect, keeps `+codex` and `!codex` whole, and reads `with @functools.cache` as an address as well |
+| Every `@` is judged by the parser (#1027 round 3) | RFC 5322, `rfc5322.txt`, `cb459acc…` (above); `python/cpython@v3.13.16:Lib/email/_header_value_parser.py`, `7beea37a…` (above) | `rfc5322.txt:959-969` `addr-spec = local-part "@" domain`, `domain = dot-atom / domain-literal / obs-domain`, `domain-literal = [CFWS] "[" *([FWS] dtext) [FWS] "]" [CFWS]`; `:695` `dot-atom = [CFWS] dot-atom-text [CFWS]`, so comments and white space may stand on either side of the `@`; `:939-940` they "SHOULD NOT be used around the "@"", which leaves them valid. `_header_value_parser.py:83-97` the parser's specials and white space, `:1219-1233` `get_atext`: an atom's text is any character that is neither (letters of any script included), `:1027-1057` and `:1187-1202` a backslash quotes the next character in a quoted string or a comment, `:1277-1300` `get_comment` (nested), `:1302-1313` `get_cfws`, `:1539-1546` a backslash outside a quoted string is kept with a defect, `:1605-1642` `get_domain_literal`, `:1644-1680` `get_domain` (a domain needs no dot), `:1059-1069` `get_fws` reads unfolded text. Measured 2026-10-12 on 3.13.16: it reads an address at an undotted domain, at a domain of CJK labels, with a comment or white space before the `@`, with a comment after it, at a domain literal, and with an address inside its quoted local part, each with no defect, and a quoted local part over a line end with a `NonPrintableDefect`; the tests assert each |
+| A source locator and the scratch identity are no addresses (#1027 round 3, the CC's ruling of 2026-10-12) | `git/git@v2.53.0` (the local upstream mirror at `67ad4214`): `Documentation/revisions.adoc`, `3835ec56…` (above); `object-name.h`, `6703e4d1e8aeb75cfc9baccb94a75bb3dfccbcd1533beb7eb3a8d6940ca8ee9b`; `object-name.c`, `9fcb9e549e5ed61999ffbd3e56b3df1edc425e2720330513b11f40bb76cd6540`; `hash.h`, `d7467a59d772c705cbe174847806081366723780f275ebc5a668a289887cbcfa`; IANA's list, version 2026101200, `45d9f126…` (below; fetched again 2026-10-12, the same bytes); this repository, `CLAUDE.md` and `evidence/artifacts/omniroute-post-terminal-drain-20261005/scripts/build-drain.sh.txt` | `revisions.adoc:14-16` an object name is "the full SHA-1 object name (40-byte hexadecimal string), or a leading substring that is unique within the repository"; `object-name.h:137` `FALLBACK_DEFAULT_ABBREV 7` and `object-name.c:857-858` an abbreviation is never shorter; `hash.h:201-202`, `:208` the longest name is SHA-256's 64 hex digits (`GIT_MAX_HEXSZ`). `CLAUDE.md:7` this repository's locator form, `repo@pin:path:line`. A domain without a dot is a top-level domain, and none of the 1,437 in IANA's list is a run of 7 to 64 hex digits (the longest of hex digits alone has 4), so no address at a delegated domain has a locator's form. `build-drain.sh.txt:36` the scratch commits' name `Scout` and address `scout@local` (`local` is no top-level domain of that list); 341 of the last 600 commit messages of `main` at 5421e5d67017 carry `Co-authored-by: Scout <scout@local>`, and 62 carry a locator (measured 2026-10-12) |
+| The merge's own workflow gives its currency checks (#1027 round 3, Codex P1 at nas:430) | `github/docs@be38ec5d78e24172587e61b3c6ff40ace1865c71` (the local upstream mirror): `data/reusables/actions/about-triggers.md`, `76d0a30b41e551320ad83b3cdcfaeffc74fb5c412b83c56e831dee631c15b154`; `content/actions/reference/workflows-and-actions/events-that-trigger-workflows.md`, `69e251c1510f84d7b0a05ff8a4146456e657f175133081213805e02b0a655f50`; `content/actions/reference/workflows-and-actions/workflow-syntax.md`, `50c73cf50995a0c7641988b1f72ca9e3447ce2920f4a48cb468d7765eff0b6f1`; YAML 1.2.2 (2021-10-01), `https://yaml.org/spec/1.2.2/` (fetched 2026-10-12), `2fe1bf40792df22ef8b8a5972a34c48e639969222e0bbae605aa9bb2ca85e9ab` | `about-triggers.md:18` "Each workflow run will use the version of the workflow that is present in the associated commit SHA or Git ref of the event", and `events-that-trigger-workflows.md:780-784` a `push` runs at the "Tip commit pushed to the ref": once a merge lands, `main`'s CI runs the merge's `validate.yml`, not the one the landing script was written against. `workflow-syntax.md:619-621` a step's `if` keeps it from running unless its condition is met, `:849-851` its `run` is the command line. YAML 6.5 "the line break is converted to a single space", 8.1.3 the folded style is the `>` indicator, 8.1.1.2 `-` strips the final line break: a folded `>-` run is its lines joined by spaces |
 | `target` is a top-level domain (#1027 round 2) | IANA, `https://data.iana.org/TLD/tlds-alpha-by-domain.txt`, version 2026101200 (fetched 2026-10-12), `45d9f126c1f5af44e41a40bbf84feafd38ca16806cb094618fa0ef6371cbdd16` | the list holds `TARGET` and none of `SERVICE`, `TIMER`, `SOCKET`, `PATH` and `MOUNT` (nor the other five unit types), so an address at `<x>.target` has the shape of a `target` instance, and round 2 keeps the other five |
 | Vendor co-author trailer addresses (#1027) | `openai/codex` (the local upstream mirror): the commit `db22c91e61cc80defa5bbafc22bd8a8c7672e5e1` (2026-05-05); `openai/codex@092d3acd6bec`, `codex-rs/ext/git-attribution/src/world_state.rs`, `5d202fa01fcc99d301dd5e330065b2100168819ef5d4c625e7a3b963940f7490` | the message of `db22c91e61`, line 38, is `Co-authored-by: Codex <codex@openai.com>`: the vendor's own repository carries that form, which is why it is on the list. The vendor's current attribution code writes `Co-authored-by: Codex <noreply@openai.com>` (`world_state.rs:11` and `:19`), which passes as a no-reply address. No other primary source holds the older form: the five `openai/*` mirrors at their HEADs and the 36 Codex pages of developers.openai.com hold no `codex@openai.com` (measured 2026-10-12). GitHub code search finds the exact trailer in 988 files (a count, not a source). `main`'s history holds it once, in four lines of one commit message |
-| The host's own name (#1027) | `python/cpython@v3.13.16:Doc/library/socket.rst`, `fa1ad5f48c9a9d9317a9502aacb068b73dbbdefb5894e61a59ae19838cf07bfe` (the local upstream mirror); this repository, `scripts/host_name_scan.py` at the base | `socket.rst:988-991` `socket.gethostname()` returns "the hostname of the machine where the Python interpreter is currently executing" (measured equal to `uname -n` on the CC's host); `host_name_scan.py:65-68` the repository's own scan drops the hostname source when it equals `WSL_DISTRO_NAME`: "WSL can expose its public distro/project label as the Linux hostname. Exclude that hostname source only; coincident private sources remain." |
+| The host's own name (#1027) | `python/cpython@v3.13.16:Doc/library/socket.rst`, `fa1ad5f48c9a9d9317a9502aacb068b73dbbdefb5894e61a59ae19838cf07bfe` (the local upstream mirror); this repository, `scripts/host_name_scan.py` at the base | `socket.rst:988-991` `socket.gethostname()` returns "the hostname of the machine where the Python interpreter is currently executing" (measured equal to `uname -n` on the CC's host); `host_name_scan.py:65-68` the repository's own scan drops the hostname source when it equals `WSL_DISTRO_NAME`: "WSL can expose its public distro/project label as the Linux hostname. Exclude that hostname source only; coincident private sources remain." Since #1027 round 3, `NATIVE_AGENT_PUBLIC_HOSTNAME=1` (`host_name_scan.py:66-75` and `:100-103` at this change) drops it the same way on any host, with a Windows computer name of the same spelling, and the scripts set it for their second scan |

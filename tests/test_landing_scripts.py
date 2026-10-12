@@ -461,8 +461,15 @@ def round_2_allows(local, domain):
     """The allowances of the CC's rulings of 2026-10-12 and of #1027 round 2, on an address as the oracle reads it, lower-cased: GitHub's
     no-reply domain, a local part of exactly noreply or no-reply, the one vendor trailer address, and a unit instance <name>@<instance>.<type>
     of service, timer, socket, path or mount (no longer target) whose <name>@<instance> does not have the repository's address shape
-    (scripts/host_name_scan.py:164: a domain that ends in a dot and two letters or more), the whole address compared."""
+    (scripts/host_name_scan.py:174: a domain that ends in a dot and two letters or more), the whole address compared; since round 3 (Claude's
+    W1 at 37e242c0), none for a local part that holds an @, and (the CC's ruling on round 3) the repository's scratch identity, exactly,
+    and a source locator: a domain that is a git object name, 7 to 64 hex digits, after a local part of a repository path's characters,
+    markup in front of it aside."""
+    if "@" in local:
+        return False
     if domain == "users.noreply.github.com" or local in ("noreply", "no-reply") or (local, domain) == ("codex", "openai.com"):
+        return True
+    if (local, domain) == ("scout", "local") or (re.fullmatch(r"[0-9a-f]{7,64}", domain) and re.fullmatch(r"[A-Za-z0-9._/-]+", local.lstrip("`*'"))):
         return True
     instance, _, kind = domain.rpartition(".")
     unit = re.compile(r"[A-Za-z0-9:_.-]+")
@@ -764,9 +771,20 @@ class ScriptTextTests(LandingCase):
         # CC correction #176 (2026-10-12): merge_validate ran validate.py alone, and #1018 landed on #1007 with final_stack.py --check
         # failing. It runs every shard-0 step of .github/workflows/validate.yml that runs a Python script with --check, as that step runs
         # it and in its order; the CC's ruling of 2026-10-12 added the gap-wave ledger's, a folded `run: >-` step #176's list left out.
+        # #1027 round 3 (the Codex connector's thread on nas:430): merge_validate holds no list. It reads the checks from the merge's own
+        # validate.yml with shard0_checks, which on this repository's workflow gives the eight, as the reader of this module does. At
+        # 37e242c0 the script had no reader and held the eight as a literal list.
         body = self.nas.cut(r"^merge_validate\(\) \{$", r"^\}$")
-        self.assertEqual(tuple(re.findall(r'"([^"]+ --check)"', body)), CURRENCY_CHECKS)
+        self.assertEqual(re.findall(r"--check", body), [], "no check is named in the script")
+        self.assertIn('shard0_checks "$wt/.github/workflows/validate.yml"', body)
+        self.assertEqual(self.script_checks(ROOT / ".github/workflows/validate.yml"), CURRENCY_CHECKS)
         self.assertEqual(shard_0_python_checks(ROOT / ".github/workflows/validate.yml"), CURRENCY_CHECKS)
+
+    def script_checks(self, workflow):
+        """nas_land.sh's own reader, shard0_checks, cut out of the script and run on a workflow file: the commands it prints."""
+        code, out = self.bash(self.nas.cut(r"^shard0_checks\(\) \{", r"^\}$"), f"shard0_checks {q(workflow)}")
+        self.assertEqual(code, 0, out)
+        return tuple(out.splitlines())
 
     def test_the_workflow_reader_takes_one_line_and_folded_runs_and_nothing_else(self):
         # The reader behind the test above, on a synthetic workflow: a one-line and a folded --check step of shard 0 count, in order; a
@@ -780,6 +798,12 @@ class ScriptTextTests(LandingCase):
                               "      - name: e\n        if: matrix.shard == 0\n        run: python3 e/report.py --check --today x | tee s\n"
                               "      - name: f\n        if: matrix.shard == 0\n        run: sha256sum --check --strict SHA256SUMS\n")
         self.assertEqual(shard_0_python_checks(workflow), ("a/one.py --check", "c/folded.py --wave w --check"))
+        # #1027 round 3: the script's reader takes the same steps, also when the last step is one and the file ends without a line end
+        self.assertEqual(self.script_checks(workflow), ("a/one.py --check", "c/folded.py --wave w --check"))
+        last = self.write("validate.yml", "jobs:\n  validate:\n    steps:\n      - name: a\n        if: matrix.shard == 0\n"
+                          "        run: >-\n          python3 a/one.py\n          --check")
+        self.assertEqual((self.script_checks(last), shard_0_python_checks(last)), (("a/one.py --check",), ("a/one.py --check",)))
+        self.assertEqual(self.script_checks(self.write("validate.yml", "jobs: {}\n")), ())
 
     def test_the_provenance_section_carries_a_digest_only_for_the_repository_copies(self):
         # CC correction #161 and the CC's ruling of 2026-10-12: a digest of a file whose only non-public bytes are host paths confirms a
@@ -3023,10 +3047,15 @@ class EndToEndTests(LandingCase):
                 self.assertNotIn("/home/example", out)
 
     # ------------------------------------------------------------------------------------------ the CC's live patches of 2026-10-12
-    def plant(self, checks):
-        """A FAKE_VALIDATE_HOOK that puts each check's script into the validation's worktree, where the hook runs, as a merge holds it."""
+    def plant(self, checks, workflow=None):
+        """A FAKE_VALIDATE_HOOK that puts each check's script into the validation's worktree, where the hook runs, as a merge holds it,
+        and (#1027 round 3) a validate.yml whose shard-0 steps run the checks, or the given workflow text."""
         scripts = [check.split(" ", 1)[0] for check in checks]
-        return " && ".join(f"mkdir -p {q(Path(script).parent)} && : > {q(script)}" for script in scripts)
+        if workflow is None:
+            workflow = "jobs:\n  validate:\n    steps:\n" + "".join(
+                f"      - name: check {index}\n        if: matrix.shard == 0\n        run: python3 {check}\n" for index, check in enumerate(checks))
+        made = [f"mkdir -p {q(Path(script).parent)} && : > {q(script)}" for script in scripts]
+        return " && ".join(made + [f"mkdir -p .github/workflows && printf '%s' {q(workflow)} > .github/workflows/validate.yml"])
 
     def check_calls(self, log):
         prefix = "python3 -E -s -B "
@@ -3054,15 +3083,59 @@ class EndToEndTests(LandingCase):
             self.assertNotIn(text, out)
         self.assertEqual(sorted(Path("/var/tmp").glob(f"nas-land-{PR}-*")), [], "the worktree is removed")
 
-    def test_nas_runs_each_currency_check_whose_script_the_merge_holds_and_then_lands(self):
-        # CC correction #176, the other side: a check runs only when its script is in the merge (the fixture's tree holds none, and none
-        # runs), once per validation, and a landing whose checks all pass merges.
+    def test_nas_runs_each_currency_check_of_the_merges_own_workflow_and_then_lands(self):
+        # CC correction #176, the other side: a landing whose checks all pass merges, each check run once per validation. Since #1027
+        # round 3 the checks are the ones the merge's own validate.yml runs (the fixture's tree holds no workflow, and none runs).
         code, out, log = self.land(self.nas)
         self.assertEqual((code, len(self.merge_calls(log)), self.check_calls(log)), (0, 1, []), out)
+        self.assertIn(f"#{PR} the merge onto current main validates (rc 0: validate.py and the 0 shard-0 currency check(s) of its validate.yml)", out)
         held = [check for check in CURRENCY_CHECKS if "gap_crosswalk" not in check]
         code, out, log = self.land(self.nas, FAKE_VALIDATE_HOOK=self.plant(held))
         self.assertEqual((code, len(self.merge_calls(log)), self.check_calls(log)), (0, 1, held), out)
-        self.assertIn(f"#{PR} the merge onto current main validates (rc 0: validate.py and the shard-0 currency checks whose scripts it holds)", out)
+        self.assertIn(f"#{PR} the merge onto current main validates (rc 0: validate.py and the 7 shard-0 currency check(s) of its validate.yml)", out)
+
+    def test_nas_validates_a_merge_with_the_checks_that_its_own_workflow_adds_or_changes(self):
+        # #1027 round 3, the Codex connector's thread on nas:430 at e203d014: the checks were a list in the script, so a merge whose
+        # validate.yml added a shard-0 --check step, or changed one's arguments, was validated with the list of the script that landed
+        # it. At 37e242c0 the first two cases here landed (exit 0, one merge call) without running the step as the merge writes it.
+        added = (*CURRENCY_CHECKS, "scripts/new_currency.py --check")
+        code, out, log = self.land(self.nas, FAKE_VALIDATE_HOOK=self.plant(added), FAKE_CHECK_FAIL="*scripts/new_currency.py --check")
+        self.assertEqual((code, self.merge_calls(log)), (10, []), out)
+        self.assertEqual(self.check_calls(log), list(added), "every check of the merge's workflow, the added one last")
+        self.assertIn(f"#{PR} the currency check scripts/new_currency.py --check on the merge with current main exited 1", out)
+        changed = tuple(check.replace("final_stack.py --check", "final_stack.py --strict --check") for check in CURRENCY_CHECKS)
+        code, out, log = self.land(self.nas, FAKE_VALIDATE_HOOK=self.plant(changed), FAKE_CHECK_FAIL="*scripts/final_stack.py --strict --check")
+        self.assertEqual((code, self.merge_calls(log)), (10, []), out)
+        self.assertEqual(self.check_calls(log), list(changed[:5]), "the step as the merge's workflow writes it")
+        code, out, log = self.land(self.nas, FAKE_VALIDATE_HOOK=self.plant(added))
+        self.assertEqual((code, len(self.merge_calls(log)), self.check_calls(log)), (0, 1, list(added)), out)
+
+    def test_nas_stops_with_10_when_it_cannot_read_or_run_the_merges_currency_checks_as_written(self):
+        # #1027 round 3: the reader fails closed. A validate.yml in which it finds no shard-0 check (a workflow it can no longer read
+        # would otherwise drop correction #176's checks without a word), and a step whose words are not plain ones (the script runs a
+        # check's words as arguments, with no shell to read quotes, expansions or redirections), stop the landing with exit 10 before
+        # any check runs, and the step's text is not printed.
+        step = ("jobs:\n  validate:\n    steps:\n      - name: first\n        if: matrix.shard == 0\n        run: python3 b/two.py --check\n"
+                "      - name: a\n        if: matrix.shard == 0\n        run: python3 {} --check\n")  # a plain check, then the step under test
+        unread = "jobs:\n  validate:\n    steps:\n      - name: a\n        if: ${{ matrix.shard == 0 }}\n        run: python3 a/one.py --check\n"
+        cases = [("no shard-0 check that the reader takes", unread, "no shard-0 currency check could be read from the merge's validate.yml")]
+        cannot = "a shard-0 currency check of the merge's validate.yml is not one this script can run as written (its text is not printed)"
+        for label, command in (("a quoted argument", "a/one.py --note 'zqx marker'"), ("an expansion", "a/one.py --dir $HOME/zqxmarker"),
+                               ("a command substitution", "a/one.py --at $(zqxmarker)"), ("a glob", "a/one.py zqxmarker*"),
+                               ("an absolute script", "/zqxmarker/one.py"), ("a script above the worktree", "../zqxmarker/one.py"),
+                               ("a script that is an option", "-zqxmarker.py"), ("a redirection", "a/one.py > zqxmarker")):
+            cases.append((label, step.format(command), cannot))
+        for label, workflow, message in cases:
+            with self.subTest(workflow=label):
+                tmp = self.dir / f"tmp-{next(self.counter)}"
+                tmp.mkdir()
+                code, out, log = self.land(self.nas, FAKE_VALIDATE_HOOK=self.plant(("a/one.py --check", "b/two.py --check"), workflow),
+                                           TMPDIR=str(tmp))
+                self.assertEqual((code, self.merge_calls(log), self.check_calls(log)), (10, [], []), "not even the plain check before it ran")
+                self.assertIn(f"#{PR} {message}: stop", out)
+                self.assertNotIn("zqxmarker", out)
+                self.assertEqual(sorted(tmp.glob("nas-validate-*")), [], "no output file is left for a check that never ran")
+                self.assertEqual(sorted(Path("/var/tmp").glob(f"nas-land-{PR}-*")), [], "the worktree is removed")
 
     def test_a_squash_body_file_that_is_not_a_readable_non_empty_file_stops_both_scripts_with_2_before_any_call(self):
         # SQUASH_BODY_FILE (the CC, 2026-10-12): the CC's live copies check the file before any gate. At 86fa3844 the scripts did not read
@@ -3389,6 +3462,97 @@ class EndToEndTests(LandingCase):
                         self.assertEqual((code, len(self.merge_calls(log))), (0, 1), out)
                         self.assertEqual(sorted(tmp.glob("squash-body-*")), [], "the snapshot is removed when the script exits")
 
+    # #1027 round 3 (Claude's micro and the GPT family's verdict at 37e242c0, and the Codex connector's address thread on e203d014): every @
+    # is judged by the oracle itself, its local part and domain read as the parser reads an addr-spec, so no address passes for want of a
+    # shape that finds it, and an allowance passes only a whole address that holds no other address and that no other touches. Each refusal
+    # below landed at 37e242c0 (exit 0, one merge call) in both scripts, with the canned answer and with the real scan.
+    def test_an_address_in_a_quoted_local_part_or_glued_to_an_allowed_one_is_refused_by_both_scripts(self):
+        # Claude's W1 and W2 at 37e242c0: an address inside an allowed one's quoted local part, or right after an allowed one, is judged by
+        # itself and refused. The oracle reads the quoted local part whole, the @ in it included.
+        person, provider = self.ROUND_2_PERSON, self.ROUND_2_PROVIDER
+        address, noreply = f"{person}@{provider}", "users.noreply.github.com"
+        self.assertEqual(rfc5322(f'"{address}"@{noreply}'), (address, noreply, ()))
+        joints = {"a slash": "/", "a plus": "+", "a query": "?cc=", "a dot": ".", "a hyphen": "-", "an apostrophe": "'", "a backtick": "`"}
+        allowed = {"a no-reply address": "noreply@anthropic.com", "the vendor trailer address": self.ROUND_2_VENDOR,
+                   "a unit instance": "getty" + "@tty1.service"}
+        self.refused_by_both_scans({
+            "an address in the quoted local part of a no-reply one, in a trailer": (f'Co-authored-by: A Person <"{address}"@{noreply}>\n', person),
+            "an address in the quoted local part of a no-reply one, in prose": (f'He wrote "mail {address} today"@{noreply} here.\n', person),
+            **{f"an address after a no-reply one and {label}": (f"Contacts: noreply@anthropic.com{joint}{address}\n", person)
+               for label, joint in joints.items()},
+            "an address after a no-reply local part at another domain": (f"Write to mailto:no-reply@example.invalid?cc={address} for help.\n", person),
+            **{f"a quoted local part right after {label}": (f'Contacts: {spec}"{person}"@{provider}\n', person) for label, spec in allowed.items()},
+        })
+
+    def test_an_address_at_any_domain_or_with_comments_or_white_space_around_its_at_is_refused_by_both_scripts(self):
+        # The Codex connector's thread on e203d014 and the GPT family's blockers 1 and 2 at 37e242c0: a domain needs neither a dot nor ASCII,
+        # RFC 5322 lets comments and white space stand around the @ (3.4.1, rfc5322.txt:939-940, :959-965), and a domain literal is a domain.
+        # The oracle reads each with no defect. A quoted local part that runs over a line end has a defect, and is refused too.
+        person, provider = self.ROUND_2_PERSON, self.ROUND_2_PROVIDER
+        international = "".join(map(chr, (0x4F8B, 0x5B50, 0x2E, 0x4E2D, 0x56FD)))  # two CJK labels, built from code points
+        forms = {
+            "a domain without a dot": (f"{person}@corp", (person, "corp", ())),
+            "an internationalized domain": (f"{person}@{international}", (person, international, ())),
+            "a comment before the @": (f"{person}(work)@{provider}", (person, provider, ())),
+            "white space before the @": (f"{person} @{provider}", (person, provider, ())),
+            "a comment after the @": (f"{person}@(work){provider}", (person, provider, ())),
+            "a domain literal": (f"{person}@[192.0.2.1]", (person, "[192.0.2.1]", ())),
+        }
+        for label, (spec, read) in forms.items():
+            with self.subTest(oracle=label):
+                self.assertEqual(rfc5322(spec), read)
+        self.assertEqual(rfc5322(f'"review\r\n {person}"@{provider}')[1:], (provider, ("NonPrintableDefect",)))
+        self.refused_by_both_scans({
+            **{label: (f"Contact {spec} today.\n", person) for label, (spec, _) in forms.items()},
+            "a quoted local part over a line end": (f'Contact "review\r\n {person}"@{provider}\n', person),
+        })
+
+    def test_an_at_with_no_address_and_the_allowed_forms_of_round_3_still_land_through_both_scripts(self):
+        # #1027 round 3's controls: an @ with no local part before it, a mention and a decorator in code spans, a template unit, a quoted
+        # no-reply address, one in parentheses, and a body with CRLF line ends land, with exit 0 and one merge call, in each scan mode. A
+        # rule that refused every @ would fail here.
+        controls = {
+            "an @ at the start of a line and after a colon": "@codex review\ncc: @someone",
+            "a mention and a decorator in code spans": "Asked `@codex` for a review, and kept `@functools.cache`.",
+            "a template unit": "The serial-getty" + "@.service template is unchanged.",
+            "a quoted no-reply address, and one in parentheses": 'See "noreply@anthropic.com" (and noreply@openai.com).',
+        }
+        for mode, real in self.scan_modes():
+            for script in (self.uet, self.nas):
+                for label, text in {**controls, "a body with CRLF line ends": None}.items():
+                    body = self.SQUASH_CLEAN.replace("\n", "\r\n") if text is None else f"{self.SQUASH_CLEAN}{text}\n"
+                    with self.subTest(script=script.key, control=label, scan=mode):
+                        code, out, log, tmp = self.land_squash(script, self.squash_body(body), **real)
+                        self.assertEqual((code, len(self.merge_calls(log))), (0, 1), out)
+                        self.assertEqual(sorted(tmp.glob("squash-body-*")), [], "the snapshot is removed when the script exits")
+
+    def test_a_source_locator_and_the_scratch_identity_land_and_their_look_alikes_are_refused_by_both_scripts(self):
+        # The CC's ruling of 2026-10-12 on #1027 round 3: a locator <repository>@<object name> (this repository's repo@pin form, the pin a
+        # git object name of 7 to 64 hex digits) and the scratch co-author address land; a tag or a branch after the @, an object name
+        # that is too short or a label of a longer domain, and another local part at the scratch identity's domain are refused. At
+        # 37e242c0 each refusal here landed (exit 0, one merge call): a domain without a dot was never matched.
+        full = "db22c91e61cc80defa5bbafc22bd8a8c7672e5e1"
+        controls = {
+            "locators, bare, with a path and in a code span": f"Sources: openai/codex@{full}, native-agent-stack@{full[:12]}:scripts/validate.py:316 "
+                                                              f"and `cli/cli@{full[:8]}:pkg/cmd/pr/merge/merge.go:146-153`.",
+            "the scratch co-author trailer": "Co-authored-by: Scout <scout" + "@local>",
+        }
+        for mode, real in self.scan_modes():
+            for script in (self.uet, self.nas):
+                for label, text in controls.items():
+                    with self.subTest(script=script.key, control=label, scan=mode):
+                        code, out, log, tmp = self.land_squash(script, self.squash_body(f"{self.SQUASH_CLEAN}{text}\n"), **real)
+                        self.assertEqual((code, len(self.merge_calls(log))), (0, 1), out)
+                        self.assertEqual(sorted(tmp.glob("squash-body-*")), [], "the snapshot is removed when the script exits")
+        self.refused_by_both_scans({
+            "a tag after the @": ("Source: cli/cli@v2.102.0\n", "v2.102.0"),
+            "a branch after the @": ("Source: zqxrepo@main\n", "zqxrepo"),
+            "six hex digits": (f"Source: zqxrepo@{full[:6]}\n", "zqxrepo"),
+            "an object name as a label of a longer domain": (f"Source: zqxrepo@{full[:12]}.example.invalid\n", "zqxrepo"),
+            "another local part at the scratch identity's domain": ("Co-authored-by: Someone <zqxsomeone" + "@local>\n", "zqxsomeone"),
+            "a longer domain after the scratch identity's": ("Co-authored-by: Scout <scout" + "@localhost>\n", "localhost"),
+        })
+
     def test_a_squash_body_is_not_landed_when_a_scanner_or_the_names_file_is_missing_or_fails(self):
         # #1027, fail closed: a missing or failing scanner, an answer that is not a scan's own clean line (a scanner that exits 0 and prints
         # nothing, as an emptied file would) and a names file that names nobody all stop the landing, the body being clean. At d6be1b02
@@ -3514,10 +3678,11 @@ class EndToEndTests(LandingCase):
                         self.assertFalse(Path(os.fsdecode(argv.read_bytes().split(b"\0")[:-1][-1])).exists(), "the file the merge was given")
 
     def test_the_snapshot_is_removed_when_a_signal_ends_the_landing(self):
-        # #1027: bash runs an EXIT trap when SIGTERM or SIGHUP ends the shell, once the call it waits for returns (measured 2026-10-12, bash
-        # 5.3.9). The wrapper execs the script, so the PID it records is the script's; a gh call signals it.
+        # #1027: bash runs an EXIT trap when SIGTERM, SIGHUP or SIGINT ends the shell, once the call it waits for returns (measured
+        # 2026-10-12, bash 5.3.9; SIGINT since round 3, as the README now says). The wrapper execs the script, so the PID it records is the
+        # script's; a gh call signals it. SIGKILL, which no trap catches, leaves the snapshot (README).
         for script in (self.uet, self.nas):
-            for name in ("TERM", "HUP"):
+            for name in ("TERM", "HUP", "INT"):
                 with self.subTest(script=script.key, signal=name):
                     pidfile, wrapper, seen = (self.dir / f"{kind}-{next(self.counter)}" for kind in ("pid", "wrapper", "seen"))
                     wrapper.write_text(f'#!/bin/sh\necho $$ > {q(pidfile)}\nexec {q(script.path)} "$@"\n', encoding="utf-8")
@@ -3580,6 +3745,54 @@ class EndToEndTests(LandingCase):
                 self.assertFalse(account in out, "the output holds the account's name")
                 self.assertEqual(sorted(tmp.glob("squash-body-*")), [])
 
+    def test_a_body_whose_only_hit_is_the_hosts_name_lands_through_the_real_second_scan_on_any_host(self):
+        # The GPT family's blocker 3 at 37e242c0 (the Codex connector's thread on nas:259): the host's own name is a warning through both
+        # real scans on a host that is not WSL, and an identity spelled as the host (here the git email's local part, a source the second
+        # scan keeps) is still refused. The harness passes no WSL_DISTRO_NAME, which is the case of another host. The name is read as the
+        # scans read it; no message of this test holds it.
+        if not betterleaks_pinned():
+            self.skipTest("native Betterleaks at host_name_scan.py's pin is unavailable")
+        host = socket.gethostname()
+        with mock.patch.dict(os.environ, {"NATIVE_AGENT_PUBLIC_HOSTNAME": "1"}):
+            others = {name.casefold() for name in host_name_scan.host_names(ROOT)}
+        if host.casefold() in others:
+            self.skipTest("another runtime source of this host has the host's own spelling")
+        names = self.squash_names(f"LANDING_PROHIBITED_NAMES=zqxsynth,{host},qvortex\n")
+        whole = re.compile(r"(?<![^\W_])" + re.escape(host) + r"(?![^\W_])", re.IGNORECASE)
+        named = f"{self.SQUASH_CLEAN}\nThe host {host} ran it.\n"
+        real = {"FAKE_VALIDATE_SCAN_PYTHON": sys.executable, "HOME": os.environ["HOME"]}
+        coincident = {"GIT_CONFIG_COUNT": "1", "GIT_CONFIG_KEY_0": "user.email", "GIT_CONFIG_VALUE_0": f"{host}@example.invalid"}
+        for script in (self.uet, self.nas):
+            with self.subTest(script=script.key, body="names only the host"):
+                code, out, log, tmp = self.land_squash(script, self.squash_body(named), names=names, **real)
+                self.assertEqual((code, len(self.merge_calls(log))), (0, 1), "a body whose only hit is the host's own name did not land")
+                self.assertIn(f"#{PR} SQUASH_BODY_FILE names this host's own name {len(whole.findall(named))} time(s): a warning, not a "
+                              "refusal (the name is not printed)", out)
+                self.assertFalse(len(host) >= 6 and whole.search(out.replace("this host's own name", "")), "the output holds the host's name")
+            with self.subTest(script=script.key, body="names the host, and the git email's local part has its spelling"):
+                code, out, log, tmp = self.land_squash(script, self.squash_body(named), names=names, **real, **coincident)
+                # the second scan reads the email source with git config itself (Claude's P3-3 at e203d014), before the landing's calls
+                self.assert_squash_stopped(self.SQUASH_REFUSED, code, out, log, tmp, tolerated=("git config --get user.email",))
+                self.assertFalse(len(host) >= 6 and whole.search(out), "the output holds the host's name")
+
+    def test_a_names_file_that_a_shell_would_read_otherwise_stops_both_scripts_before_any_call(self):
+        # Claude's P3-1 at e203d014 and the GPT family's follow-up 2 at 37e242c0: the scan reads only the documented forms of the names file,
+        # so no listed identity goes unchecked for a shell clause, a comment or a quote after the value; any other form fails closed. The
+        # body names the file's second identity, which a shell reading each of these files would list, and each landed at 37e242c0 (exit
+        # 0, one merge call): the name was parsed with the trailing text, so the body's name matched none.
+        body = self.squash_body(f"{self.SQUASH_CLEAN}qvortex ran it\n")
+        forms = {
+            "a shell clause after a quoted value": 'LANDING_PROHIBITED_NAMES="zqxsynth,qvortex"; touch x\n',
+            "a comment after a bare value": "LANDING_PROHIBITED_NAMES=zqxsynth,qvortex # the two identities\n",
+            "an expansion in double quotes": 'LANDING_PROHIBITED_NAMES="zqxsynth,qvortex$SUFFIX"\n',
+        }
+        for mode, real in self.scan_modes():
+            for script in (self.uet, self.nas):
+                for label, text in forms.items():
+                    with self.subTest(script=script.key, names=label, scan=mode):
+                        code, out, log, tmp = self.land_squash(script, body, names=self.squash_names(text), **real)
+                        self.assert_squash_stopped(self.SQUASH_UNSCANNABLE, code, out, log, tmp, secrets=("qvortex",))
+
 
 class SquashBodyScanTests(unittest.TestCase):
     """squash_body_scan.py by itself (#1027): the names file's format, the address rule's controls, a name as a whole token and the output."""
@@ -3611,8 +3824,25 @@ class SquashBodyScanTests(unittest.TestCase):
                 path.write_text(content, encoding="utf-8")
                 self.assertEqual(self.module.read_names(path), expected)
         self.assertFalse(marker.exists(), "no line of the names file ran")
+        # #1027 round 3 (Claude's P3-1 at e203d014, the GPT family's follow-up 2 at 37e242c0): a value a shell would read otherwise fails closed
+        for index, (label, content, expected) in enumerate((
+                ("white space after a quoted value", "LANDING_PROHIBITED_NAMES='alpha,Beta'  \n", ["alpha", "Beta"]),
+                ("a bare value with symbols a name may hold", "LANDING_PROHIBITED_NAMES=al.pha,Be-ta_1,ga+ma\n", ["al.pha", "Be-ta_1", "ga+ma"]))):
+            with self.subTest(label):
+                path = self.dir / f"names-round-3-{index}.env"
+                path.write_text(content, encoding="utf-8")
+                self.assertEqual(self.module.read_names(path), expected)
         for index, (label, content) in enumerate((("no assignment", "# nothing\n"), ("an empty value", "LANDING_PROHIBITED_NAMES=\n"),
-                                                  ("only commas and spaces", "LANDING_PROHIBITED_NAMES= , ,\n"), ("an empty file", ""))):
+                                                  ("only commas and spaces", "LANDING_PROHIBITED_NAMES= , ,\n"), ("an empty file", ""),
+                                                  ("a shell clause after a quoted value", 'LANDING_PROHIBITED_NAMES="alpha,Beta"; touch x\n'),
+                                                  ("a comment after a bare value", "LANDING_PROHIBITED_NAMES=alpha,Beta # two\n"),
+                                                  ("white space in a bare value", "LANDING_PROHIBITED_NAMES=alpha, Beta\n"),
+                                                  ("a quote that does not close", "LANDING_PROHIBITED_NAMES='alpha,Beta\n"),
+                                                  ("quotes that differ", "LANDING_PROHIBITED_NAMES='alpha,Beta\"\n"),
+                                                  ("a quote inside a bare value", "LANDING_PROHIBITED_NAMES=alpha,Be'ta'\n"),
+                                                  ("an expansion in double quotes", 'LANDING_PROHIBITED_NAMES="alpha,$BETA"\n'),
+                                                  ("a command substitution", "LANDING_PROHIBITED_NAMES=alpha,`beta`\n"),
+                                                  ("a semicolon in a bare value", "LANDING_PROHIBITED_NAMES=alpha;beta\n"))):
             with self.subTest(label):
                 path = self.dir / f"names-refused-{index}.env"
                 path.write_text(content, encoding="utf-8")
@@ -3623,13 +3853,16 @@ class SquashBodyScanTests(unittest.TestCase):
         # the pairs are the control: a rule that refused every address would fail the first list, one that passed every address the second
         passing = ("Co-Authored-By: Claude <noreply@anthropic.com>", "Co-authored-by: GitHub <NoReply@GitHub.com>", "<no-reply@example.invalid>",
                    "4242424+seathatflowsinourveins@users.noreply.github.com", "seathatflowsinourveins@users.noreply.github.com.",
-                   "ssh user@localhost", "an import of `@AGENTS.md`", "a mention @someone", "foo@bar",
+                   "an import of `@AGENTS.md`", "@someone, a mention at the start of a line", "a mention in a code span, `@someone`",
                    "`noreply@anthropic.com`", "**no-reply@example.invalid**", "\"NoReply@GitHub.com\"", "`getty@tty1.service`",
                    "`codex@openai.com`", "'4242424+seathatflowsinourveins@users.noreply.github.com'")
         refused = ("person@example.invalid", "(person@example.invalid)", "mailto:person@example.invalid.", "<Person.Name+tag@Example.Invalid>",
                    "noreply.person@example.invalid", "x'noreply@example.invalid", "person@users.noreply.github.com.example.invalid",
                    "pérson@exämple.invalid", "`person@example.invalid`", "**person@example.invalid**", "'person@example.invalid'",
                    "`xnoreply@anthropic.com`", "`x'noreply@example.invalid`")
+        # #1027 round 3: the parser finds every address, so a domain without a dot and white space before the @ are addresses too (the
+        # Codex connector's thread on e203d014 and the GPT family's blockers 1 and 2 at 37e242c0). These three passed until round 3.
+        refused += ("ssh user@localhost", "a mention @someone", "foo@bar")
         # #1027 round 2 (Astra's P1s at e203d014): a quoted local part is the address its unquoted form is (RFC 5322 3.2.4), alone, with a
         # space, a quoted pair or nothing in it, or mixed with atoms; markup that wraps an address is no part of it, and any other character
         # in front of a no-reply local part is
@@ -3706,6 +3939,15 @@ class SquashBodyScanTests(unittest.TestCase):
                        "getty", "user", "fsck", "a.b-c_d")
         domains = ("openai.com", "OpenAI.com", "anthropic.com", provider, "users.noreply.github.com", "tty1.service", "1000.service", "e.f-g.timer",
                    "dev.target", "corp.target", "host.device", *(f"{provider}.{kind}" for kind in ("service", "timer", "socket", "target", "path", "mount")))
+        # #1027 round 3 (Claude's W1 and the GPT family's blockers 1 and 2 at 37e242c0): a quoted local part that holds an address, and the
+        # domains the parser reads that the round-2 shape did not (no dot, letters of another script, a domain literal)
+        local_parts += (f'"{person}@{provider}"', '"a@b"')
+        domains += ("corp", "localhost", "".join(map(chr, (0x4F8B, 0x5B50, 0x2E, 0x4E2D, 0x56FD))), "[192.0.2.1]")
+        # the CC's ruling on round 3: the scratch identity and a source locator, with a repository's path, and their look-alikes (a
+        # tag, six hex digits, sixty-five, an object name as a label of a longer domain)
+        local_parts += ("scout", "x.scout", "openai/codex")
+        domains += ("local", "local.example", "db22c91e61cc", "DB22C91E61CC80DEFA5BBAFC22BD8A8C7672E5E1", "db22c9", "a" * 65, "v2.102.0",
+                    f"db22c91e61cc.{provider}")
         wrapped = ("see {} today", "Co-authored-by: Someone <{}>", "see `{}` today", "see **{}** today", "see '{}' today", "see `**{}**`.")
         unclosed = ("see `{} today", "see *{} today", "see '{} today")  # the mark is part of the local part, as the oracle reads it
         refused = "email other than a no-reply address (line 1)"
@@ -3719,6 +3961,59 @@ class SquashBodyScanTests(unittest.TestCase):
                         self.assertIsNotNone(read, "the oracle reads the address whole")
                         allowed = not read[2] and round_2_allows(read[0].lower(), read[1].lower())
                         self.assertEqual(self.refusal(form.format(spec)), None if allowed else refused)
+
+    def test_a_source_locator_and_the_scratch_identity_pass_only_in_their_whole_forms(self):
+        # The CC's ruling of 2026-10-12 on #1027 round 3: <repository>@<object name>, this repository's repo@pin form, is a locator when
+        # the whole domain is 7 to 64 hex digits (git's object names, abbreviated or full), and the repository's scratch co-author
+        # address passes as that exact address. Every other revision after an @ and every look-alike is refused, as any address at a
+        # domain without a dot is since round 3 (at 37e242c0 each of these refusals passed, a domain without a dot never being matched).
+        table = self.module.REPOSITORY_TRAILER_ADDRESSES
+        self.assertEqual(sorted(table), ["scout" + "@local"])
+        source = table["scout" + "@local"].split(":")[0].removeprefix("this repository, ")
+        self.assertIn("user.email=scout" + "@local", (ROOT / source).read_text(encoding="utf-8").splitlines()[35], "the cited line holds it")
+        full, person, provider = "db22c91e61cc80defa5bbafc22bd8a8c7672e5e1", "zq" + "probe", "gm" + "ail.com"
+        passing = (f"openai/codex@{full}", "openai/codex@db22c91", f"native-agent-stack@{full[:12]}:tools/landing/README.md:12",
+                   f"see `cli/cli@{full[:8]}`.", f"see `native-agent-stack@{full}:scripts/validate.py:316-345` and more",
+                   f"**systemd/systemd@{full[:12]}** man/systemd.unit.xml", f"python/cpython@{full.upper()}", f"repo@{'a' * 64}",
+                   f"(betterleaks/betterleaks@{full[:8]})", "Co-authored-by: Scout <scout" + "@local>", "co-authored-by: scout <SCOUT" + "@LOCAL>",
+                   "`scout" + "@local`")
+        refused = (f"openai/codex@{full[:6]}", f"repo@{'a' * 65}", "cli/cli@v2.102.0", "openai/codex@rust-v0.160.1", "cli/cli@refs/tags/v2.102.0",
+                   "repo@main", "repo@pin", f"repo@{full[:12]}.{provider}", f"repo@{provider}.{full[:12]}", f"repo@{full[:12]}-x",
+                   f"repo@{full[:11]}g", f"+repo@{full[:12]}", f'"zq {person}"@{full[:12]}', f"#12@{full[:12]}",
+                   f'repo@{full[:12]}"{person}"@{provider}', f"repo@{full[:12]}@{provider}", f"{person}@{provider}/{full[:12]}",
+                   "x.scout" + "@local", "scout" + "@localhost", "scout" + "@local.example.invalid", "+scout" + "@local", "scout" + "@local-x",
+                   f"{person}@local", "scout" + f"@local@{provider}")
+        for text in passing:
+            with self.subTest(passing=text):
+                self.assertIsNone(self.refusal(text))
+        for text in refused:
+            with self.subTest(refused=text.replace(provider, "<provider>").replace(person, "<person>")):
+                self.assertEqual(self.refusal(text), "email other than a no-reply address (line 1)")
+
+    def test_every_at_is_judged_and_an_allowance_passes_only_a_whole_address_that_holds_no_other(self):
+        # #1027 round 3 (Claude's micro at 37e242c0, W1 and W2; the GPT family's verdict at 37e242c0, blockers 1 and 2): each @ is judged by
+        # the oracle on its own line, and inside a quoted string too; an allowance passes only an address whose local part holds no @ and
+        # that neither a quote nor an @ follows; an @ with no local part before it or no domain after it is no address; a template unit is
+        # no unit instance and no address; and a carriage return ends a line as a line feed does.
+        person, provider = "zq" + "probe", "gm" + "ail.com"
+        address = f"{person}@{provider}"
+        passing = ("@codex review, at the start of a line", "cc: @someone", "(@someone)", "see `@codex` review today", "with `@functools.cache`",
+                   "the serial-getty" + "@.service template", "see `getty" + "@.service`", "Reply to no-reply@example.invalid\r\nnext",
+                   "Co-Authored-By: Claude <noreply@anthropic.com>\r", '{"email": "noreply@anthropic.com"}', 'see "noreply@anthropic.com" now',
+                   "(see noreply@anthropic.com)", '(see "noreply@anthropic.com")', "noreply@anthropic.com, noreply@openai.com",
+                   "see `noreply@[192.0.2.1]` today", "a trailing @", "an @, and an @; before specials")
+        refused = (f'"{address}"@users.noreply.github.com', '"a@b"@users.noreply.github.com', f'"zq \\"{address}"',
+                   f"noreply@anthropic.com@{provider}", f'noreply@anthropic.com"{person}"@{provider}', f"x@.{provider}", f"zq\\@{provider}",
+                   f'"zq\\@{provider}"', f"{address}..", f"next\r{address}", f"{address}\r", f"(c){address}", f"see ({address})",
+                   f"x(note)  @  (note){provider}", f"zq . {person}@{provider}", f"{person}.@{provider}", f"{person}@{provider}.service.",
+                   f"{person}@{provider}(", f"{person}@[192.0.2.1", f'5"{address}', f'he said "{address}', "Thanks @someone", "with @functools.cache",
+                   "see `@codex review` today", f"`@{provider}", f"*@{provider} and", f"'@{provider}")  # markup that does not wrap is a local part
+        for text in passing:
+            with self.subTest(passing=text.replace(provider, "<provider>")):
+                self.assertIsNone(self.refusal(text))
+        for text in refused:
+            with self.subTest(refused=text.replace(provider, "<provider>").replace(person, "<person>")):
+                self.assertEqual(self.refusal(text), "email other than a no-reply address (line 1)")
 
     def test_a_name_equal_to_the_hosts_own_name_is_counted_and_never_refused(self):
         # the CC's ruling of 2026-10-12: compared when the scan runs, without regard to case; every other name still refuses
