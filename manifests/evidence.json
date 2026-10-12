@@ -18967,8 +18967,8 @@
     },
     {
       "path": "docs/decisions/2026-10-12-converged-candidates-only.md",
-      "sha256": "62a15fe837007a535d29483e00ff22f3c0d83145a7a3593c7de69fe16ca25a83",
-      "bytes": 17261
+      "sha256": "b68d531bb4e74dec10e1c5b5d8a7bf5ae782213ba08e2b6df8eca594ae2f704e",
+      "bytes": 23296
     },
     {
       "path": "docs/decisions/2026-10-12-exploratory-account-rotation-and-exits.md",

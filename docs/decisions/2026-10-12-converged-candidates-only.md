@@ -110,6 +110,107 @@ The CC records above are private and outside this repository; this record restat
 
 No tool, hook, check or runtime behavior changes in this PR, and it reopens no settled record.
 
+## How the rule applies: every layer, the freeze and the north star
+
+Facts in this section were read at main `489b26328`. Every file cited here is byte-identical at this PR's base
+`7151664c9` (`git diff --quiet` between the two commits), so the line numbers hold at either commit. This section
+describes how the rule is used; it changes no surface, pin or check.
+
+**1. Meaning.** Per the command center's multi-angle ruling of 2026-10-12, a candidate is converged when independent
+angles agree:
+
+| Angle | What it covers |
+| --- | --- |
+| A1 | Capability at the pin. |
+| A2 | Upstream engineering quality: releases, CI, tests, maintainers, responsiveness, licence. |
+| A3 | Community consensus: star and fork trajectory, credible adopters, independent reviews. |
+| A4 | Net usage: OpenRouter app and model rankings, package downloads. |
+| A5 | Published evaluations: Terminal-Bench, SWE-bench and its successors, Harbor registry results, Artificial Analysis for models. Vendor evaluations are marked as such. |
+| A6 | Our own measured runs, with confounds stated. |
+
+- **Weights** are stated per layer before scoring.
+- **No single angle admits or rejects.** The exception is a hard disqualifier: a missing required capability, an
+  abandoned project or an incompatible licence.
+- **Where angles disagree,** the disputed dimension is measured first-hand.
+
+**2. Scope.** The rule covers every layer of both repositories:
+- native clients, runtimes and harnesses, worker SDKs, orchestration and research runtimes;
+- review, landing and CI, memory, token efficiency, evaluation, observability and skills;
+- the trading layers. `catalogs/landscape/us-equities.json:7` lists 12 of them, from `market-data-reference` to
+  `security-supply-chain`.
+
+`catalogs/landscape/final-stack.json` carries 34 layer rows: 20 foundation and 14 us-equities. Models run only through
+converged harnesses (the second sentence).
+
+**3. Waves.** Each layer runs this cycle, and each wave dispatches only the delta
+(`docs/decisions/2026-10-11-layer-resolution-protocol.md:55-60`):
+1. Discovery: the landscape sweep, the stars manifest, usage rankings and releases.
+2. The screen (A1).
+3. Angle scoring (A2 to A5).
+4. Refutation by blind and other-family reviewers.
+5. First-hand measurement where the angles disagree (A6).
+6. A terminal state under the protocol (`:69-113`): FINAL, SCHEDULED or RETIRED.
+
+**4. The freeze.** `catalogs/landscape/final-stack.json` is the architecture freeze record. A layer is frozen only when
+two things hold:
+- the protocol's four FINAL conditions (`docs/decisions/2026-10-11-layer-resolution-protocol.md:78-85`): a recorded
+  verdict, a run pin in `runs[]`, an E2E receipt at that pin, and invoke evidence;
+- its angle record converges.
+
+The freeze is evidence, not assertion. Each layer's angle table lands by pull request: weights, scores, and sources with
+repo@pin and read times. Both model families read it, it is registered in `manifests/evidence.json`, and CI checks it.
+
+The file's current numbers:
+- `checked_at` is `2026-10-11` (`:2`), and it has 34 layers (`:4831`).
+- Status counts: converged 0, current 0, reopened 30, no-winner 2, unswept 2 (`:10707-10713`).
+- This "converged" status is the component-matrix status the file defines (`:139`), not the protocol's FINAL.
+- No layer carries angle weights: neither "weight" nor "angle" appears in the file.
+
+The next wave is filling that record layer by layer.
+
+What `scripts/final_stack.py` does today:
+- **Its job** (its docstring, `:1-21`): it joins the recorded verdicts, sweeps and run pins into that file. It never
+  selects a winner.
+- **`--check`** exits 1 when the committed file differs from the rebuild, when a source hash changed, or when the
+  document is inconsistent.
+- **Report-only flags.** Winners without a run pin, pin drift and past-`next_review` verdicts are flags only, exiting
+  0 in v1.
+- **What it does not check.** It does not test the FINAL conditions 3 and 4 (E2E receipts and invoke evidence), and it
+  reads no angle record.
+- **What counts as definitive.** `is_definitive` (`:856`) treats a winner as definitive in a layer whose status is
+  current or converged; no layer has either status today.
+
+CI runs it on every validate run, shard 0 (`.github/workflows/validate.yml:152-158`):
+- `python3 scripts/final_stack.py --check`, which gates;
+- `--check --today "$(date -u +%F)"`, which reports to the step summary.
+
+Run locally, `--check` printed `"status": "checked"` with the same counts. The protocol's line that these files "are
+not present" at its base (`:115-117`) is stale at `489b26328`: both files exist, and CI runs the generator. That line
+still correctly says that no layer is claimed FINAL.
+
+**5. Revisit.** A frozen layer reopens only on new evidence or a landscape change (`:62-67`):
+- a new release of a pinned winner;
+- a new entrant passing the screen;
+- a contradiction found in review;
+- a changed angle, such as a usage shift or a new published evaluation.
+
+The reopen is bound to the record that detected it, dispatches only the delta, and ends in a recorded supersession.
+
+**6. PRs keep sourcing the finals.** The required SOTA sources section (`.github/pull_request_template.md:11-13`) names
+the exact upstream repo@pin.
+- In a layer with a FINAL winner, a PR cites that winner's pin from `final-stack.json` `runs[]` (`:9601`).
+- Anything else is TRIAL only and says so.
+- Replacing a winner needs a supersession record.
+
+The `sota-sources` job (`.github/workflows/pr-metadata.yml:145-161`) enforces only that the section is present and not
+empty. The pin rule here is a review rule, not yet a CI check.
+
+**7. The north star.** The converged foundation is the means, and the trading north star is the object.
+- Harnessed runtime workers run the same cycle on the trading layers: data, ranking (including the live top-100
+  movers), exits, leverage and sizing, and engines.
+- The workers are the Codex lanes, Claude Code, the research runtimes and two-family review.
+- Paper results are A6 for the trading layers.
+
 ## Surfaces
 
 The six always-loaded surfaces of `StandingRuleSurfacesTests.LAYERS` (`tests/test_install_claude_profile.py`) each hold
