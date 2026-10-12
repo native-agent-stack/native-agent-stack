@@ -7,8 +7,9 @@ docs/models.md:21, docs/mcp.md:104, docs/cli.md:47, docs/prompt-templates.md:51.
 anomalyco/opencode@53d1eabb:packages/web/src/content/docs/{config,providers,
 agents,mcp-servers,skills}.mdx; current mirror 4d9678a7 retains the v1 contract.
 RTK owns shell rewriting; native MCP, model transports and sessions stay native.
-All writes are scoped to new private profile roots or new launcher/fragment files.
-No live credential/auth/config store is read, copied, hashed or published.
+Generated files and persistent MCP stores are scoped to private profile roots.
+No credential/auth store is copied, hashed or published. Native vendor ephemeral
+files retain their documented behavior; hermetic boot evidence is scoped below.
 """
 
 from __future__ import annotations
@@ -37,7 +38,15 @@ CLAUDE_MODEL = "claude-opus-5-5"
 GPT_MODEL = "cx/gpt-6.1-sol"
 GATEWAY = "http://127.0.0.1:21128/v1"
 SUPERPOWERS = "bb92a77741419a4ab5f06e711a283343f1ada0c3"
+SUPERPOWERS_PLUGIN = "superpowers@git+https://github.com/obra/superpowers.git#" + SUPERPOWERS
 PI_OTEL = "npm:@b1tank/pi-otel@0.5.0"  # b1tank/pi-otel@3cd674533a8d24c9b8a2a6a94072eec25466e128
+CONTEXT_MODE_VERSION = "1.0.169"  # mksglu/context-mode@6f0cc6841c687e754059f36714a11233fda1a02b
+SUPERPOWERS_SKILLS = (
+    "brainstorming", "diagnosing-superpowers", "dispatching-parallel-agents", "executing-plans",
+    "finishing-a-development-branch", "receiving-code-review", "requesting-code-review",
+    "subagent-driven-development", "systematic-debugging", "test-driven-development",
+    "using-git-worktrees", "using-superpowers", "verification-before-completion", "writing-plans", "writing-skills",
+)  # obra/superpowers@bb92a777:skills/ (unchanged package inventory)
 ROLE_SCOPES = {
     "builder": ("isolated-builder", ["test-driven-development", "writing-plans", "executing-plans",
                                     "using-git-worktrees", "finishing-a-development-branch"]),
@@ -99,6 +108,68 @@ def native_name(value: str, runtime="pi", *, pattern=False) -> str:
     if pattern:
         allowed += r"*?"
     return re.sub("[^" + allowed + "]", "_", value)
+
+
+def agent_vendor_skills(name: str) -> list[str]:
+    return next((skills for _, (role, skills) in ROLE_SCOPES.items() if role == name), [])
+
+
+def opencode_role_skill_directories(destination: Path, role_scope: str | None, agent_name=None) -> list[Path]:
+    """Pinned native Linux plugin layout, narrowed to the selected role skills.
+
+    OpenCode53d1eabb core/src/global.ts:12 resolves XDG_CACHE_HOME/opencode;
+    core/src/npm.ts:45-50,87,133 uses packages/sanitize(spec)/node_modules/name
+    (sanitize is identity on Linux). plugin/shared.ts:207-212 passes this exact
+    pinned Git spec. Superpowersbb92a777 .opencode/plugins/superpowers.js:25,223
+    registers packageRoot/skills. Do not allow the whole cache/package tree.
+    """
+    if not role_scope or not ROLE_SCOPES[role_scope][1]:
+        return []
+    package = destination / "cache/opencode/packages" / SUPERPOWERS_PLUGIN / "node_modules/superpowers/skills"
+    selected = agent_vendor_skills(agent_name) if agent_name else ROLE_SCOPES[role_scope][1]
+    return [package / name for name in ["using-superpowers", *selected]]
+
+
+def context_mode_package(destination: Path) -> Path:
+    return destination / "vendor/context-mode/node_modules/context-mode"
+
+
+def context_mode_environment(profile: str, state: Path, role_scope=None) -> dict:
+    """MCP-child HOME only; runtime canonical Agent Skills HOME stays native."""
+    root = state / profile
+    if role_scope:
+        root = root / "roles" / role_scope
+    environment = profile_environment(profile, state, role_scope)
+    return {**{key: environment[key] for key in ("CLAUDE_CONFIG_DIR", "CONTEXT_MODE_DATA_DIR",
+              "CONTEXT_MODE_DIR", "CONTEXT_MODE_PLATFORM")},
+            "HOME": str(root / "context-home"), "TMPDIR": str(root / "tmp")}
+
+
+def role_preloads(metadata: dict, home: Path, destination: Path) -> list[dict]:
+    """Native file references to canonical/vendor skills; never copied text."""
+    result = []
+    for name in metadata.get("skills", []):
+        if name == "context-mode:context-mode":
+            path = context_mode_package(destination) / "skills/context-mode/SKILL.md"
+            native = "context-mode"
+            source = "mksglu/context-mode@6f0cc6841c687e754059f36714a11233fda1a02b"
+        elif name == "security-best-practices":
+            path = home / ".agents/skills" / name / "SKILL.md"
+            native, source = name, "adoption/skills/manifest.json"
+        else:
+            raise ProfileError("unknown canonical role preload")
+        result.append({"canonical_name": name, "name": native, "path": str(path), "source": source})
+    return result
+
+
+def invocation_inventory(manifest: dict, metadata: dict, runtime: str) -> tuple[set, dict]:
+    """Managed plus pinned role/vendor inventory, with source attribution."""
+    names = {s["name"] for s in manifest["skills"]}
+    sources = {name: "adoption/skills/manifest.json" for name in names}
+    for name, source in metadata.get("skill_sources", {}).items():
+        names.add(name)
+        sources[name] = source
+    return names, sources
 
 
 def role_source(name: str) -> tuple[dict, str]:
@@ -231,6 +302,15 @@ def profile_environment(profile: str, state: Path, role_scope: str | None = None
     telemetry = {"OTEL_EXPORTER_OTLP_ENDPOINT": endpoint,
                  "OTEL_EXPORTER_OTLP_PROTOCOL": "http/protobuf",
                  "OTEL_RESOURCE_ATTRIBUTES": "service.name=ns-" + profile + ",deployment.environment=trial"}
+    # mksglu/context-mode@6f0cc684:start.mjs:19-28,308-311,387-389;
+    # src/adapters/base.ts:55; src/session/db.ts:28.
+    # Context Mode start.mjs self-heals Claude plugin config even on other
+    # runtime platforms. Its standalone DB uses DIR while adapter sessions
+    # and memory use DATA_DIR: keep both plus its config root profile-private.
+    telemetry.update(CLAUDE_CONFIG_DIR=str(root / "claude"),
+                     CONTEXT_MODE_DATA_DIR=str(root / "context-state"),
+                     CONTEXT_MODE_DIR=str(root / "context-state/context-mode"),
+                     CONTEXT_MODE_PLATFORM="pi" if profile.startswith("pi-") else "opencode")
     # XDG isolation also changes mise's config lookup. MCP subprocesses must
     # reach the already selected interpreter/node directly, not depend on a
     # host shim finding its now-hidden global config. No extra runtime install.
@@ -256,7 +336,8 @@ def profile_environment(profile: str, state: Path, role_scope: str | None = None
             "XDG_CACHE_HOME": str(root / "cache"), "XDG_STATE_HOME": str(root / "state"),
             "OPENCODE_CONFIG": str(root / "config/opencode/opencode.json"),
             "OPENCODE_CONFIG_DIR": str(root / "config/opencode"),
-            "OPENCODE_DISABLE_CLAUDE_CODE_SKILLS": "1", "OPENCODE_DISABLE_MODELS_FETCH": "1"}
+            "OPENCODE_DISABLE_CLAUDE_CODE_SKILLS": "1", "OPENCODE_DISABLE_MODELS_FETCH": "1",
+            "OPENCODE_DISABLE_CLAUDE_CODE_PROMPT": "1"}
 
 
 def render(profile: str, *, state: Path, home: Path, eco_root: Path, templates: list[Path],
@@ -299,12 +380,26 @@ def render(profile: str, *, state: Path, home: Path, eco_root: Path, templates: 
         if name in servers:
             excluded_servers[name] = "awaiting committed route/pin or lane grant"
             servers.pop(name)
+    token_environment = profile_environment(profile, state, role_scope)
+    servers["context-mode"] = {**servers["context-mode"],
+        "args": [str(context_mode_package(destination) / "start.mjs")],
+        "env": {**servers["context-mode"].get("env", {}), **context_mode_environment(profile, state, role_scope)}}
+    if runtime == "opencode":
+        # Context Mode1.0.169 server.ts:167-180 checks legacy opencode.json
+        # from cwd before real HOME/.config/opencode. Start it beside this
+        # profile's native config, while project attribution comes from the
+        # inherited per-run CONTEXT_MODE_PROJECT_DIR/CLAUDE_PROJECT_DIR.
+        servers["context-mode"]["cwd"] = str(destination / "config/opencode")
     destination.mkdir(mode=0o700, parents=True)
+    (destination / "context-home").mkdir(mode=0o700)
+    (destination / "tmp").mkdir(mode=0o700)
     roles = {}
     for name in ROLES:
         metadata, prompt = role_source(name)
+        preloads = role_preloads(metadata, home, destination)
         tools, omitted = granted_tools(metadata, runtime)
         roles[name] = {"tools": tools, "omitted_unmapped_tools": omitted,
+                       "preloads": preloads,
                        "source": "adoption/agents/claude/" + name + ".md"}
         if runtime == "pi":
             front = yaml.safe_dump({"description": metadata["description"]}, sort_keys=False).strip()
@@ -318,10 +413,33 @@ def render(profile: str, *, state: Path, home: Path, eco_root: Path, templates: 
                 # permission patterns keep filesystem reads and deny the
                 # ungranted resource surface; no custom permission hook.
                 permissions["read"] = {"*": "allow", "mcp:*": "deny"}
-                permissions["external_directory"] = {
-                    "*": "deny", str(home / ".agents/skills") + "/*": "allow"}
+                permissions["external_directory"] = {"*": "deny"}
+                # The later deny above overrides native discovered-skill
+                # defaults. Restore only selected vendor skill directories;
+                # named Skill grants below supply canonical discovery without
+                # opening the whole host skills directory to arbitrary Read.
+                permissions["external_directory"].update({
+                    str(directory) + "/*": "allow"
+                    for directory in opencode_role_skill_directories(destination, role_scope, name)})
+                permissions["external_directory"].update({
+                    str(Path(s["path"]).parent) + "/*": "allow" for s in preloads
+                    if Path(s["path"]).is_relative_to(destination)})
+            managed = json.loads((ROOT / "adoption/skills/manifest.json").read_text())["skills"]
+            allowed = [s["name"] for s in managed if s.get("status") != "held"
+                       and not s.get("native_plugin") and s.get("agents") != ["claude-code"]]
+            if role_scope and ROLE_SCOPES[role_scope][1]:
+                allowed += ["using-superpowers", *agent_vendor_skills(name)]
+            allowed += [s["name"] for s in preloads]
+            # CC09:55 B1: OpenCode's read-only Skill loader is the native
+            # discoverability mechanism. Explicit named grants supersede the
+            # earlier blanket-deny interpretation; no arbitrary tool grant.
+            permissions["skill"] = {"*": "deny", **{skill: "allow" for skill in sorted(set(allowed))}}
             roles[name]["agent"] = {"description": metadata["description"], "mode": "primary",
-                                    "prompt": prompt, "permission": permissions,
+                                    "prompt": prompt + "\nOpenCode's lowercase skill tool is a read-only instruction loader, "
+                                              "explicitly allowed only for this agent's named managed/role skills. "
+                                              "It changes no other role tool fence.\n"
+                                              + "".join("\n\n{file:" + skill["path"] + "}" for skill in preloads),
+                                    "permission": permissions,
                                     "options": {"reasoningEffort": "xhigh" if route == "claude" else "high"}}
     if runtime == "pi":
         private_write(destination / "agent/models.json", json.dumps(pi_models(route), indent=2) + "\n")
@@ -333,11 +451,13 @@ def render(profile: str, *, state: Path, home: Path, eco_root: Path, templates: 
         private_write(destination / "agent/settings.json", json.dumps({
             "retry": {"enabled": False, "provider": {"maxRetries": 0}},
             "cacheWarming": "off", "enableInstallTelemetry": False,
+            "skills": [str(context_mode_package(destination) / "skills/context-mode")],
         }, indent=2) + "\n")
         (destination / "sessions").mkdir(mode=0o700)
     else:
         config = {"$schema": "https://opencode.ai/config.json", "provider": opencode_provider(route),
                   "experimental": {"openTelemetry": True},
+                  "skills": {"paths": [str(context_mode_package(destination) / "skills/context-mode")]},
                   "model": "anthropic/" + CLAUDE_MODEL if route == "claude" else "omniroute/" + GPT_MODEL,
                   "enabled_providers": ["anthropic" if route == "claude" else "omniroute"],
                   "share": "disabled", "snapshot": False, "autoupdate": False,
@@ -351,20 +471,7 @@ def render(profile: str, *, state: Path, home: Path, eco_root: Path, templates: 
             # obra/superpowers@bb92a777 .opencode/INSTALL.md:15: the native
             # V1 plugin manager installs pinned Git dependencies. Native skill
             # permissions below narrow the pack into the assigned role set.
-            config["plugin"].append("superpowers@git+https://github.com/obra/superpowers.git#" + SUPERPOWERS)
-            manifest = json.loads((ROOT / "adoption/skills/manifest.json").read_text())
-            skills = [s["name"] for s in manifest["skills"]
-                      if s.get("status") != "held" and not s.get("native_plugin")
-                      and s.get("agents") != ["claude-code"]]
-            allowed_skills = [*skills, *ROLE_SCOPES[role_scope][1], "using-superpowers"]
-            skill_permission = {"*": "deny", **{name: "allow" for name in allowed_skills}}
-            for name in ROLES:
-                if "skill" in roles[name]["tools"]:
-                    config["agent"][name]["permission"]["skill"] = skill_permission
-            # These imported roles grant Read but not Claude Skill. Preserve
-            # that fence: SKILL.md reads count through the native tracker.
-            # The vendor bootstrap remains, while its native skill helper is
-            # unavailable unless the canonical role explicitly grants Skill.
+            config["plugin"].append(SUPERPOWERS_PLUGIN)
         # Keep the same SKILL.md sources, loaded through OpenCode's native
         # Agent Skills paths; no copied skills or rewritten skill bodies.
         private_write(destination / "config/opencode/opencode.json", json.dumps(config, indent=2) + "\n")
@@ -381,7 +488,28 @@ def render(profile: str, *, state: Path, home: Path, eco_root: Path, templates: 
     metadata["tier1_slots"] = [s["layer_id"] for s in tier1["slots"]] if tier1 else []
     metadata["skills_bin"] = str(skills_bin) if skills_bin else None
     metadata["tier2"] = "unmodified skills find; SKILLS_API_URL unset uses skills.sh; pinned project installs via install_skills.py --project-dir"
+    metadata["skill_sources"] = {"context-mode": "mksglu/context-mode@6f0cc6841c687e754059f36714a11233fda1a02b"}
+    if role_scope and ROLE_SCOPES[role_scope][1]:
+        metadata["skill_sources"].update({name: "obra/superpowers@" + SUPERPOWERS for name in SUPERPOWERS_SKILLS})
     private_write(destination / "profile.json", json.dumps(metadata, indent=2) + "\n")
+    # The unchanged vendor bootstrap also normalizes its own package files.
+    # A private native npm install keeps that write surface inside the profile.
+    # scripts/postinstall.mjs:211-227 at6f0cc684 writes host HOME otherwise;
+    # npm's documented --ignore-scripts disables that install hook.
+    install_env = {**os.environ, **token_environment,
+                   "npm_config_cache": str(destination / "vendor/npm-cache"),
+                   "npm_config_devdir": str(destination / "vendor/node-gyp"),
+                   "TMPDIR": str(destination / "tmp")}
+    subprocess.run(["npm", "install", "--no-audit", "--no-fund", "--ignore-scripts", "--prefix",
+                    str(destination / "vendor/context-mode"), "context-mode@" + CONTEXT_MODE_VERSION],
+                   env=install_env, check=True,
+                   stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+    # npm's supported named rebuild runs only the native SQLite dependency's
+    # install script, never context-mode's host-repair postinstall. Native
+    # caches, headers and temporary build files remain in this profile.
+    subprocess.run(["npm", "rebuild", "--prefix", str(destination / "vendor/context-mode"),
+                    "better-sqlite3"], env=install_env, check=True,
+                   stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
     # RTK 0.51.0 e001f773 src/hooks/init/{pi,opencode}.rs: vendor installer
     # owns these extension bytes. Pi honors its agent-dir override; OpenCode's
     # installer uses HOME/.config, so give *that installer only* a private HOME
@@ -495,10 +623,78 @@ def fresh_worktree(repository: Path, profile: str) -> Path:
     # synthesized here. Unapproved hooks fail closed through native Worktrunk.
     subprocess.run(["git", "-C", str(repository), "fetch", "origin", "main"],
                    stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, check=True)
-    completed = subprocess.run(["wt", "-C", str(repository), "switch", "--create", branch,
+    # max-sixty/worktrunk@b49ca7ee:docs/src/content/docs/config.md:675-698.
+    # Worktrunk's documented invocation-local worktree-path override keeps
+    # scratch below /var/tmp without changing user/project configuration.
+    path = Path("/var/tmp") / ("native-agent-stack.runtime-" + profile + "-" + run_id)
+    completed = subprocess.run(["wt", "-C", str(repository), "--config-set",
+                                "worktree-path=" + json.dumps(str(path)), "switch", "--create", branch,
                                 "--base", "origin/main", "--no-cd", "--format=json"],
                                capture_output=True, text=True, check=True)
     return Path(json.loads(completed.stdout)["path"])
+
+
+def worktree_permissions(root: Path, workspace: Path) -> dict:
+    """Native last-loaded config: filesystem Read is worktree-relative.
+
+    anomalyco/opencode@53d1eabb: tool/read.ts:250-258;
+    project/instance-store.ts:54-58; config/config.ts:482-489;
+    permission/index.ts:28-38. No permission extension or evaluator is shipped.
+    Selected vendor directories remain readable; generic host directories do not.
+    """
+    config = json.loads((root / "config/opencode/opencode.json").read_text())
+    read = {"*": "allow", "../*": "deny", "mcp:*": "deny"}
+    external = {"*": "deny", str(workspace) + "/*": "allow"}
+    agents = {}
+    for name, agent in config.get("agent", {}).items():
+        permission = agent.get("permission", {})
+        if "read" not in permission:
+            continue
+        scoped_read, scoped_external = dict(read), dict(external)
+        for directory, action in permission.get("external_directory", {}).items():
+            if action != "allow" or not directory.endswith("/*"):
+                continue
+            target = Path(directory[:-2])
+            if not target.is_relative_to(root):
+                continue
+            scoped_external[directory] = "allow"
+            scoped_read[os.path.relpath(target, workspace) + "/*"] = "allow"
+        agents[name] = {"permission": {**permission, "read": scoped_read,
+                                       "external_directory": scoped_external}}
+    return {"permission": {"read": read, "external_directory": external}, "agent": agents}
+
+
+def active_worktree(workspace: Path) -> bool:
+    """Inspect cwd links only; never argv, environment or native session data."""
+    for process in Path("/proc").iterdir():
+        if not process.name.isdigit():
+            continue
+        try:
+            cwd = (process / "cwd").resolve(strict=True)
+        except (FileNotFoundError, ProcessLookupError):
+            continue
+        except PermissionError:
+            # Other users' processes cannot be runtime children of this lane.
+            continue
+        if cwd == workspace or cwd.is_relative_to(workspace):
+            return True
+    return False
+
+
+def cleanup_worktree(repository: Path, workspace: Path) -> dict:
+    """Remove clean inactive native worktrees only, never using --force."""
+    if active_worktree(workspace):
+        return {"status": "retained_active"}
+    status = subprocess.run(["git", "-C", str(workspace), "status", "--porcelain=v1", "-z",
+                             "--untracked-files=all", "--ignored"], capture_output=True)
+    if status.returncode:
+        return {"status": "retained_status_error", "exit_code": status.returncode}
+    if status.stdout:
+        return {"status": "retained_dirty", "dirty_entries": status.stdout.count(b"\0")}
+    result = subprocess.run(["git", "-C", str(repository), "worktree", "remove", str(workspace)],
+                            stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+    return {"status": "removed" if result.returncode == 0 else "retained_remove_error",
+            "exit_code": result.returncode}
 
 
 def launch(args):
@@ -516,6 +712,11 @@ def launch(args):
     workspace = fresh_worktree(args.repository.resolve(), profile)
     aux = Path(meta["auxiliary_root"]) if meta.get("auxiliary_root") else None
     runtime_env = profile_environment(profile, args.state_root, role_scope, aux)
+    runtime_env["CONTEXT_MODE_PROJECT_DIR"] = str(workspace)
+    runtime_env["CLAUDE_PROJECT_DIR"] = str(workspace)
+    if runtime == "opencode":
+        runtime_env["OPENCODE_DISABLE_PROJECT_CONFIG"] = "1"
+        runtime_env["OPENCODE_CONFIG_CONTENT"] = json.dumps(worktree_permissions(root, workspace))
     if meta.get("skills_bin"):
         runtime_env["PATH"] = str(Path(meta["skills_bin"]).parent) + os.pathsep + runtime_env["PATH"]
     if meta.get("tier1_input"):
@@ -534,6 +735,10 @@ def launch(args):
                    "--session-dir", str(root / "sessions" if args.print else interactive_run / "sessions")]
         if args.role:
             grant = meta["roles"][args.role]["tools"]
+            for preload in meta["roles"][args.role].get("preloads", []):
+                # Each canonical role currently has exactly one preload;
+                # Pi045 docs/cli.md:231 supports native file input here.
+                command += ["--append-system-prompt", preload["path"]]
             command += ["--tools", ",".join(grant)]
             if not any(tool.startswith("mcp__") for tool in grant):
                 command += ["--no-mcp"]
@@ -594,7 +799,7 @@ def launch(args):
         from runtime_usage import scan
         from skill_usage import skillmd_hits
         inventory = json.loads((ROOT / "adoption/skills/manifest.json").read_text())
-        names = {s["name"] for s in inventory["skills"]}
+        names, skill_sources = invocation_inventory(inventory, meta, runtime)
         report = scan([(runtime, log)], names, skillmd_hits=skillmd_hits)[runtime]
         tracker_code = 0
         private_write(run / "invocations.json", json.dumps(report, indent=2) + "\n")
@@ -607,6 +812,8 @@ def launch(args):
             "inference": inference_facts(log, runtime),
             "runtime_exit_code": exit_code, "tracker_exit_code": tracker_code,
             "invocations": report, "publication_boundary": "derived facts only; native state remains private",
+            "configured_preloads": [{"name": p["name"], "source": p["source"]}
+                                    for p in meta["roles"][args.role].get("preloads", [])] if args.role else [],
         }, indent=2) + "\n")
         # Explicit JSON-mode output is read in place, never copied or hashed.
         # The response record stays private and requires the usual publication
@@ -635,8 +842,14 @@ def launch(args):
         elif not re.search(r"Verdict: [A-Z_-]+ at " + re.escape(head[:8]) + r"\s*$", record):
             record += f"\nVerdict: UNVERIFIED at {head[:8]}\n"
         private_write(run / "CC-RECORD.md", record)
+        # Receipts and handoff are complete before native cleanup. The cleanup
+        # result is a separate receipt so no earlier evidence is overwritten.
+        cleanup = cleanup_worktree(args.repository.resolve(), workspace)
+        private_write(run / "worktree-cleanup.json", json.dumps(cleanup, indent=2) + "\n")
         print(json.dumps({"runtime_exit_code": exit_code, "tracker_exit_code": tracker_code,
-                          "receipt": str(run / "receipt.json"), "record": str(run / "CC-RECORD.md")}))
+                          "receipt": str(run / "receipt.json"), "record": str(run / "CC-RECORD.md"),
+                          "worktree_cleanup": cleanup,
+                          "retained_worktree": str(workspace) if cleanup["status"] != "removed" else None}))
         return exit_code or (2 if tracker_code else 0)
     else:
         result = subprocess.run(command, cwd=workspace, env=env)
@@ -644,7 +857,7 @@ def launch(args):
         from runtime_usage import scan, scan_opencode_export
         from skill_usage import skillmd_hits
         inventory = json.loads((ROOT / "adoption/skills/manifest.json").read_text())
-        names = {s["name"] for s in inventory["skills"]}
+        names, skill_sources = invocation_inventory(inventory, meta, runtime)
         if runtime == "pi":
             explicit_logs = [("pi", path) for path in (interactive_run / "sessions").rglob("*.jsonl")]
             measured = scan(explicit_logs, names, skillmd_hits=skillmd_hits)
@@ -671,8 +884,11 @@ def launch(args):
                         stream.seek(0)
                         measured.append(scan_opencode_export(json.load(stream), names, skillmd_hits=skillmd_hits))
         private_write(interactive_run / "invocations.json", json.dumps(measured, indent=2) + "\n")
+        cleanup = cleanup_worktree(args.repository.resolve(), workspace)
+        private_write(interactive_run / "worktree-cleanup.json", json.dumps(cleanup, indent=2) + "\n")
         print(json.dumps({"invocations": str(interactive_run / "invocations.json"),
-                          "runtime_exit_code": result.returncode}))
+                          "runtime_exit_code": result.returncode, "worktree_cleanup": cleanup,
+                          "retained_worktree": str(workspace) if cleanup["status"] != "removed" else None}))
     return result.returncode
 
 

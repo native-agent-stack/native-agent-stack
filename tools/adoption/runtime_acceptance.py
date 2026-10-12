@@ -118,6 +118,8 @@ def check(args, profile):
     descriptor = json.loads((root / "profile.json").read_text())
     aux = Path(descriptor["auxiliary_root"]) if descriptor.get("auxiliary_root") else None
     env = {**os.environ, **profile_environment(profile, args.state_root, args.role_scope, aux)}
+    env["CONTEXT_MODE_PROJECT_DIR"] = str(args.workspace)
+    env["CLAUDE_PROJECT_DIR"] = str(args.workspace)
     if descriptor.get("skills_bin"):
         env["PATH"] = str(Path(descriptor["skills_bin"]).parent) + os.pathsep + env["PATH"]
     binary = descriptor[runtime + "_bin"]

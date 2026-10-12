@@ -9,9 +9,17 @@ Claude MCP renderer and the existing new-WSL wiring map. It installs unchanged
 RTK hooks with RTK0.51.0 and Superpowers7.0.0 at its pinned vendor ref. Pi's
 package bootstrap re-exposes all15 skills after package filtering; the CC
 accepted package-level role scope and requires listing-size measurement.
-OpenCode's native `permission.skill` is restricted only when the imported
-canonical role explicitly grants Skill. Current imported roles grant Read,
-so their native Skill helper stays denied; SKILL.md reads remain available.
+The CC's B1 ruling explicitly authorizes OpenCode's native read-only skill
+loader. Each agent's `permission.skill` grants the27 managed names, its own
+role's vendor set and its canonical preloads; the wildcard remains denied.
+Security-reviewer preloads security-best-practices and isolated-builder
+preloads Context Mode through native file references. Native Read allows
+only selected vendor skill directories under the private profile; canonical
+managed skills use the named native loader without opening the host directory.
+Unselected vendor skills and unrelated external directories stay denied.
+The cache layout comes from OpenCode53d1eabb `core/src/global.ts:12`,
+`core/src/npm.ts:45-50,87,133` and `plugin/shared.ts:207-212`; the Superpowers
+skills directory comes from bb92a777 `.opencode/plugins/superpowers.js:25,223`.
 Tier1 uses CNP's13-slot input by path, validates its27managed names against
 the manifest and preserves its open gaps. Tier2 uses the pinned Skills1.7.0
 CLI's unchanged `skills find` path; unset SKILLS_API_URL means skills.sh today.
@@ -27,9 +35,42 @@ an explicit capability omission.
 `ns-run <profile> <builder|reviewer|auditor|researcher> <brief.md>` fetches main,
 creates a fresh Worktrunk worktree from origin/main, and runs the native client
 headlessly. It writes private native events, derived invocation/usage receipts
-and a CC handoff. Interactive launchers create fresh worktrees too; native Pi
+and a CC handoff. Scratch worktrees are created under `/var/tmp` using the
+invocation-local Worktrunk path override. After receipts are written, native
+`git worktree remove` removes clean inactive worktrees without force; dirty,
+ignored-file or active worktrees remain with a derived cleanup receipt and
+their retained path. Interactive launchers create fresh worktrees too; native Pi
 session files and transient OpenCode exports feed the existing tracker. Counts
 represent prompted or unclassified native calls, never organic-use rates.
+The tracker includes the pinned Superpowers15-name and Context Mode inventory
+and attributes completed native loader/read calls to those sources. Configured
+preloads are recorded separately and never counted as completed tool calls.
+
+OpenCode starts in the fresh worktree. Its last-loaded native
+`OPENCODE_CONFIG_CONTENT` narrows each role's filesystem read patterns and
+external-directory rules to that worktree plus selected profile skill dirs;
+project configuration is disabled so it cannot broaden the profile fence.
+Primary-checkout and unrelated-directory reads are denied by the pinned
+evaluator regression. These are native tool permissions, not an OS sandbox
+for builder shell commands or arbitrary MCP implementations.
+
+Each profile and role owns `CLAUDE_CONFIG_DIR`, `CONTEXT_MODE_DATA_DIR` and
+`CONTEXT_MODE_DIR`; the token layer has the actual Pi/OpenCode platform and a
+private MCP-child HOME/cwd. Context Mode1.0.169 installs unchanged through
+native npm under the profile with `--ignore-scripts`, because its postinstall
+repairs HOME/.claude independently of platform. A named native
+`npm rebuild better-sqlite3` then enables only its SQLite dependency's installer,
+with private npm/header/temp caches. Clean-prefix SQLite execution and the
+native boot regression verify that skipping the parent hook keeps stores usable.
+The runtime's HOME stays native
+for canonical Agent Skills discovery. OpenCode disables Claude prompt fallback
+with `OPENCODE_DISABLE_CLAUDE_CODE_PROMPT`; AGENTS.md remains native context.
+The hermetic native MCP boot test verifies all4 profiles preserve every writable
+fixture entry outside their profile, including the original HOME's settings.
+It mounts no host config and leaves /tmp unmounted. The vendor's hardcoded
+ephemeral `/tmp/context-mode-mcp-ready-<pid>` sentinel is therefore outside the
+production-wide claim: TMPDIR does not redirect it. Persistent host-store
+isolation is fixed; no production-wide zero-ephemeral-write claim is made.
 
 Claude slots are selected fill-first4/3/2 using the existing no-token health
 probe. Only credential_run injects the credential. OpenCode XDG isolation is
@@ -78,8 +119,9 @@ reads' configuration (instructions present)"**, with these limits verbatim:
 - The ~8-token no-instruction default is not attributed (OmniRoute or the provider).
 - The effort evidence is directional.
 - The header evidence is self-reported by OmniRoute.
-- The result holds for OmniRoute 3.8.51 and this route. A version or route change needs a re-run (the scripts here
-  re-run as-is: `probe2.py cx/gpt-6-astra 3 out.json`, `probe4.py out.json 2 <dir>`).
+- The result holds for OmniRoute 3.8.51 and this route. A version or route change needs a re-run. The record is
+  `$STACK_STATE/coordination/ns2604-coop/notes/omniroute-passthrough-20261012/README.md`;
+  `probe2.py` and `probe4.py` are beside that external record, not in this repository.
 
 The measurement used cx/gpt-6-astra; these profiles' GPT model is
 cx/gpt-6.1-sol. It does not prove every model/route combination unchanged.
@@ -93,3 +135,32 @@ collection environment, preserves imported grants, uses LF-only JSON framing
 and requires each mandatory MCP name to be connected. Regression fixtures fail
 at58a05d03 and pass with these fixes. Native historical smokes remain bound to
 their original profile generation and main head, not relabeled as new runs.
+
+Astra FIRST atc9597fbe confirmed those four repairs and reproduced a further
+P2: the generic external-directory deny also blocked selected vendor skill
+reads. The CC's read at7a09a808 widened it to zero native role-skill listings
+and explicitly reversed the earlier no-Skill interpretation. Round2 repairs
+B1 skill discovery/preloads, B2 persistent store and native read containment
+plus worktree lifecycle, B3 vendor invocation attribution and B4 the external
+measurement pointer. [Round2 receipt](receipts/round2-b1-b4-20261012.json) records
+fail-before and final focused results; no new model calls or W6 arms ran.
+
+Pinned mechanisms: anomalyco/opencode@53d1eabb `src/tool/read.ts:250-258`,
+`src/config/config.ts:482-489`, `src/project/instance-store.ts:54-58`,
+`src/permission/index.ts:28-38`; `src/config/variable.ts:33,61` for preload files;
+earendil-works/pi@04566631 `packages/coding-agent/docs/cli.md:231` for preload
+files; mksglu/context-mode@6f0cc684 `start.mjs:19-28,308-311,387-389`,
+`scripts/postinstall.mjs:211-227`, `src/server.ts:167-180,4861`,
+`src/adapters/base.ts:55` and `src/session/db.ts:28` for private stores.
+OpenCode source paths above are under `packages/opencode/`.
+Worktrunk invocation-local overrides use max-sixty/worktrunk@b49ca7eea9b03145791a5b94eccaf9c59412ed37,
+`docs/src/content/docs/config.md:675-698`. Worktrunk and Context Mode references
+were checked through pinned vendor URLs; those objects are absent from the host mirrors.
+The dependency rebuild uses the installed npm11.19.0 command's supported
+named-package form ([npm rebuild](https://docs.npmjs.com/cli/v11/commands/npm-rebuild)).
+
+Follow-ups remain: Pi discovery does not gate on auth readiness; interactive
+Pi selects role tools without loading role text; inherited hostname references;
+briefs >=128KiB hit the Linux per-argument limit with a generic error. The W6
+comparison arms wait until B2 lands; historical inference receipts remain
+bound to their original generation and heads.

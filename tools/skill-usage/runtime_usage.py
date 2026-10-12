@@ -34,6 +34,16 @@ MCP_NAMES = (
     "chrome-devtools", "codebase-memory", "context-mode", "ai-memory", "hindsight",
     "socraticode", "jcodemunch", "headroom", "promptfoo", "serena", "semble", "qmd",
 )
+VENDOR_SKILL_SOURCES = {
+    name: "obra/superpowers@bb92a77741419a4ab5f06e711a283343f1ada0c3"
+    for name in (
+        "brainstorming", "diagnosing-superpowers", "dispatching-parallel-agents", "executing-plans",
+        "finishing-a-development-branch", "receiving-code-review", "requesting-code-review",
+        "subagent-driven-development", "systematic-debugging", "test-driven-development",
+        "using-git-worktrees", "using-superpowers", "verification-before-completion", "writing-plans", "writing-skills",
+    )
+}  # pinned package skills/ inventory; metadata, not installed/copied skill text
+VENDOR_SKILL_SOURCES["context-mode"] = "mksglu/context-mode@6f0cc6841c687e754059f36714a11233fda1a02b"
 
 
 def mcp_server(name: str, runtime: str) -> str | None:
@@ -159,6 +169,10 @@ class _Ledger:
             self.finish(session, call_id, tool, is_error)
 
     def report(self, runtime, names, skillmd_hits):
+        # The canonical manifest omits vendor role packages. Their pinned
+        # inventory is a known public attribution set, not an arbitrary name
+        # extracted from output. Successful native calls remain the oracle.
+        names = set(names) | set(VENDOR_SKILL_SOURCES)
         skills, mcp = Counter(), Counter()
         completed = failed = pending = conflicts = 0
         orphans = len(self.detached_results)
@@ -204,6 +218,8 @@ class _Ledger:
             "conflicting_tool_calls": conflicts,
             "completed_tool_calls": completed,
             "successful_skill_uses": dict(sorted(skills.items())),
+            "skill_source_attribution": {name: VENDOR_SKILL_SOURCES.get(name, "adoption/skills/manifest.json")
+                                         for name in sorted(skills)},
             "successful_mcp_calls": dict(sorted(mcp.items())),
         }
 

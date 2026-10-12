@@ -53,6 +53,21 @@ def exported_message(*events, session="private-session", role="assistant"):
 
 
 class RuntimeUsageTests(unittest.TestCase):
+    def test_completed_role_vendor_reads_and_native_loader_are_counted_and_attributed(self):
+        vendor = "test-driven-development"
+        pi = self.log("vendor-pi.jsonl", [{"type": "session", "id": "vendor-session"},
+            pi_start("vendor-read", args={"path": f"/fixture/skills/{vendor}/SKILL.md"}), pi_end("vendor-read"),
+            pi_start("context-read", args={"path": "/fixture/skills/context-mode/SKILL.md"}), pi_end("context-read")])
+        native = self.log("vendor-opencode.jsonl", [opencode("vendor-skill", inputs={"name": vendor}),
+            opencode("not-a-skill", inputs={"name": "unknown-private-name"}),
+            opencode("failed-vendor", inputs={"name": "using-superpowers"}, status="error")])
+        reports = self.scan(("pi", pi), ("opencode", native))
+        self.assertEqual(reports["pi"]["successful_skill_uses"], {vendor: 1, "context-mode": 1})
+        self.assertEqual(reports["opencode"]["successful_skill_uses"], {vendor: 1})
+        self.assertEqual(reports["pi"]["skill_source_attribution"][vendor],
+                         "obra/superpowers@bb92a77741419a4ab5f06e711a283343f1ada0c3")
+        self.assertNotIn("unknown-private-name", json.dumps(reports))
+
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary.cleanup)

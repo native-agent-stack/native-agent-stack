@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "kind": "runtime-profile-round2-regression",
+  "recorded_at": "2026-10-12T10:32:12Z",
+  "clock": "date -u",
+  "baseline": "7a09a8089c1946e5ffde2a015cbe8bc4328bdd35",
+  "review_round": "2 of 2; one released commit",
+  "model_calls_this_round": 0,
+  "api_spend_this_round_usd": 0,
+  "w6_comparative_arms": "not run; wait until B2 lands",
+  "results": [
+    {
+      "blocker": "B1",
+      "evidence_class": "local_integration",
+      "change": "Per-agent named native skill grants, narrow vendor-directory reads and both canonical preloads restored",
+      "red": {
+        "log": "sdk-harness-ready-pr1033-round2-config-red.log",
+        "exit_code": 1,
+        "result": "6 pinned-evaluator role failures and 2 missing-profile-feature errors",
+        "output_sha256": "8d412f533d1627e0ba2c15cf8d6b108eca003f3f3ca8aac1c01178ae93a49ecb"
+      },
+      "green": {
+        "command": "TMPDIR=/var/tmp PYTHONDONTWRITEBYTECODE=1 python3 -B -m unittest discover -s tests -p test_runtime_profiles.py -q",
+        "log": "sdk-harness-ready-pr1033-round2-profiles-final.log",
+        "exit_code": 0,
+        "tests": 22,
+        "output_sha256": "8304d42849256f20fe0da6b44734f613b1b2748ef69a6ecc8e4420300bda1c5f",
+        "controls": "Native skill helper visible; listed set equals managed plus role/preload grants; selected vendor read allowed; unselected vendor, primary checkout, arbitrary directory and MCP resource reads denied"
+      }
+    },
+    {
+      "blocker": "B2",
+      "evidence_class": "local_integration",
+      "change": "Private Claude config, Context Mode stores, actual platform, MCP-child HOME/cwd, unchanged private npm prefix with install scripts disabled, and Claude prompt fallback disabled",
+      "red": {
+        "command": "NS_RUNTIME_BOOT_BASELINE_SOURCE=<git-show-7a09a808-runtime_profiles.py> TMPDIR=/var/tmp PYTHONDONTWRITEBYTECODE=1 NS_CONTEXT_MODE_TEST_PACKAGE=<installed-public-context-mode-1.0.169-package> python3 -B -m unittest discover -s tests -p test_runtime_boot.py -q",
+        "log": "sdk-harness-ready-pr1033-round2-boot-final-red.log",
+        "exit_code": 1,
+        "profile_failures": 4,
+        "output_sha256": "d3da253cca2bc7fb7b1643dd9dddce07c76a0ed173c0ff31d24f88f599181663"
+      },
+      "green": {
+        "command": "TMPDIR=/var/tmp PYTHONDONTWRITEBYTECODE=1 NS_CONTEXT_MODE_TEST_PACKAGE=<installed-public-context-mode-1.0.169-package> python3 -B -m unittest discover -s tests -p test_runtime_boot.py -q",
+        "log": "sdk-harness-ready-pr1033-round2-boot-final.log",
+        "exit_code": 0,
+        "tests": 1,
+        "native_profile_boots": 4,
+        "outside_fixture_changes": 0,
+        "output_sha256": "4fb7344f52b384fe8b642b94428d1280d431f104fc7e34d5cb790b61cef56e3f"
+      },
+      "boundary": "Native MCP initialize and EOF, no provider or network, original fixture HOME settings sentinel unchanged and every writable scratch entry outside profile unchanged. Host config unmounted; /tmp unmounted. Vendor hardcoded ephemeral readiness sentinel ignores TMPDIR; this does not prove production-wide zero ephemeral writes.",
+      "clean_prefix_dependency_probe": {
+        "install": "npm install --ignore-scripts --no-audit --no-fund --prefix <scratch-vendor-prefix> context-mode@1.0.169; exit 0",
+        "before_dependency_rebuild": "Native better-sqlite3 in-memory select 1 exited 1: no binding. MCP initialize alone had passed because the store is lazy.",
+        "repair": "systemd-run --user --scope -p CPUWeight=idle npm rebuild --prefix <scratch-vendor-prefix> better-sqlite3; exit 0; private npm/header/temp caches",
+        "after_dependency_rebuild": "Native better-sqlite3 in-memory select 1 exited 0 and printed 1",
+        "native_boot_command": "TMPDIR=/var/tmp PYTHONDONTWRITEBYTECODE=1 NS_CONTEXT_MODE_TEST_PACKAGE=<clean-private-prefix>/node_modules/context-mode python3 -B -m unittest discover -s tests -p test_runtime_boot.py -q",
+        "native_boot_exit_code": 0,
+        "native_boots": 4,
+        "log": "sdk-harness-ready-pr1033-round2-clean-install-boot.log",
+        "output_sha256": "2e7a4bc5bb1de40c07a723a1dabc20a5b112ab54bcccd966886556f06f045083"
+      },
+      "lifecycle": {
+        "red_log": "sdk-harness-ready-pr1033-round2-lifecycle-red.log",
+        "red_exit_code": 1,
+        "red_output_sha256": "4e0aec843ca7bfcdbd45580c2241d3f8b75d58cb2a53bab281ded93b89b5f170",
+        "green": "Included in 22 profile tests: native clean-worktree removal, dirty/active retention, primary/outside read denial and receipt-before-cleanup ordering",
+        "historical_worktrees_inspected": 11,
+        "historical_clean_inactive_worktrees_removed": 5,
+        "historical_dirty_worktrees_retained": 6,
+        "force_used": false,
+        "main_context_mode_residue": "retained per CC"
+      }
+    },
+    {
+      "blocker": "B3",
+      "evidence_class": "synthetic",
+      "change": "Known pinned vendor inventory counted from successful native read/skill calls, with source attribution; failed calls and unknown names excluded; configured preloads do not fabricate invocation",
+      "red": {
+        "log": "sdk-harness-ready-pr1033-round2-tracker-red.log",
+        "exit_code": 1,
+        "failures": 1,
+        "output_sha256": "56bf336faa5ea85a2510325c7452b2c8bc8357106051f389f3b01b2bd7c5ace0"
+      },
+      "green": {
+        "command": "TMPDIR=/var/tmp PYTHONDONTWRITEBYTECODE=1 python3 -B -m unittest discover -s tests -p test_runtime_usage.py -q",
+        "log": "sdk-harness-ready-pr1033-round2-tracker-final.log",
+        "exit_code": 0,
+        "tests": 18,
+        "output_sha256": "36c87e3635a2b6d3bee3a60defa040f600dcd80b7f1ce27cadc5b178bf7ce1b2"
+      }
+    },
+    {
+      "blocker": "B4",
+      "evidence_class": "source_review",
+      "change": "README points to coordination/ns2604-coop/notes/omniroute-passthrough-20261012/README.md; probe scripts are beside that external record"
+    }
+  ],
+  "sources": [
+    "anomalyco/opencode@53d1eabb61e21162157817bf677da0a4ad3332e3:packages/opencode/src/permission/index.ts:28-38,178-214",
+    "anomalyco/opencode@53d1eabb61e21162157817bf677da0a4ad3332e3:packages/opencode/src/skill/index.ts:310-314",
+    "anomalyco/opencode@53d1eabb61e21162157817bf677da0a4ad3332e3:packages/opencode/src/tool/read.ts:250-258",
+    "anomalyco/opencode@53d1eabb61e21162157817bf677da0a4ad3332e3:packages/opencode/src/config/config.ts:482-489",
+    "anomalyco/opencode@53d1eabb61e21162157817bf677da0a4ad3332e3:packages/opencode/src/config/variable.ts:33,61",
+    "obra/superpowers@bb92a77741419a4ab5f06e711a283343f1ada0c3:.opencode/plugins/superpowers.js:25,223",
+    "earendil-works/pi@04566631c2b51fb688486bc1f040f60d1518c126:packages/coding-agent/docs/cli.md:231",
+    "mksglu/context-mode@6f0cc6841c687e754059f36714a11233fda1a02b:start.mjs:19-28,308-311,387-389",
+    "mksglu/context-mode@6f0cc6841c687e754059f36714a11233fda1a02b:scripts/postinstall.mjs:211-227",
+    "mksglu/context-mode@6f0cc6841c687e754059f36714a11233fda1a02b:src/adapters/base.ts:55",
+    "mksglu/context-mode@6f0cc6841c687e754059f36714a11233fda1a02b:src/session/db.ts:28",
+    "mksglu/context-mode@6f0cc6841c687e754059f36714a11233fda1a02b:src/server.ts:167-180,4861-4862",
+    "max-sixty/worktrunk@b49ca7eea9b03145791a5b94eccaf9c59412ed37:docs/src/content/docs/config.md:675-698",
+    "npm11.19.0 supported named dependency rebuild: https://docs.npmjs.com/cli/v11/commands/npm-rebuild"
+  ],
+  "unmirrored_source_objects": ["mksglu/context-mode@6f0cc684", "max-sixty/worktrunk@b49ca7ee"],
+  "source_boundary": "Pinned vendor source URLs and unchanged installed public package; no private native configuration, auth, session or lock state copied or hashed",
+  "follow_ups": [
+    "Pi discovery does not require auth readiness",
+    "Interactive Pi selects role tools without loading role text",
+    "Inherited hostname references",
+    "Briefs >=128 KiB exceed Linux per-argument limit and get a generic error"
+  ]
+}
