@@ -504,7 +504,7 @@ provides it.
   is ambiguous and links nothing. It uses the tool's journal order, retains `superseded_by` and the observed
   reason (call keys are not compared), and leaves `by_resolved_model` unchanged. The wrapper's exit code follows the
   post-processed status and uncovered effort mismatches; `measurement.exit_code` remains the raw tool exit and
-  `raw_output_sha256` remains the hash of its original stdout. `measurement.post_processing` retains
+  raw stdout authentication stays private and is omitted from the receipt. `measurement.post_processing` retains
   `source_status`, `source_reason`, `linked_agent_ids`, `covered_agent_ids` and `covered_effort_mismatches`, along
   with the linking and coverage counts. `multi_model_children` is recomputed after a move. The printed summary
   distinguishes `raw_exit_code` from the wrapper's `exit_code`. A linked attempt's `usage_issues` still keep the record incomplete.

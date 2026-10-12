@@ -4928,7 +4928,7 @@ class UsageRecordTests(unittest.TestCase):
                     "--out", work / "usage.json"])
         document = json.loads((work / "usage.json").read_text())
         self.assertEqual(document["measurement"]["exit_code"], 1)
-        self.assertEqual(document["measurement"]["raw_output_sha256"], hashlib.sha256(stdout).hexdigest())
+        self.assertNotIn("raw_output_sha256", document["measurement"])
         return done, document
 
     def test_killed_critic_rerun_under_changed_call_key_is_superseded(self):
@@ -5134,7 +5134,7 @@ class UsageRecordTests(unittest.TestCase):
             with self.assertRaisesRegex(AssertionError, "node is required for the native child-usage.mjs"):
                 self.test_native_changed_keys_link_two_critics_and_a_followup_and_count_usage_once()
 
-    def test_record_sanitizes_the_transcript_dir_and_hashes_the_raw_output(self):
+    def test_record_sanitizes_the_transcript_dir_and_keeps_raw_output_seals_private(self):
         work = temp_dir(self)
         raw = child_usage_raw("wf_fixture-1", ["discover:alpha"])
         (work / "raw.json").write_bytes(raw)
@@ -5143,7 +5143,7 @@ class UsageRecordTests(unittest.TestCase):
         self.assertEqual(done.returncode, 0, done.stderr)
         document = json.loads((work / "usage.json").read_text())
         self.assertEqual(document["child_usage"]["transcript_dir"], "<session-transcripts>/subagents/workflows/wf_fixture-1")
-        self.assertEqual(document["measurement"]["raw_output_sha256"], hashlib.sha256(raw).hexdigest())
+        self.assertNotIn("raw_output_sha256", document["measurement"])
         self.assertEqual(document["measurement"]["tool_sha256"], hashlib.sha256(
             (ROOT / usage_record.TOOL).read_bytes()).hexdigest())
         self.assertEqual(document["measurement"]["command"], "node examples/claude-native/workflows/child-usage.mjs "

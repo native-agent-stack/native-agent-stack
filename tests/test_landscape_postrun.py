@@ -128,12 +128,13 @@ class CompletedSupersessionTests(unittest.TestCase):
         preimage = (json.dumps(provenance["proof"], indent=1, ensure_ascii=False) + "\n").encode()
         self.assertEqual(provenance["proof_sha256"], hashlib.sha256(preimage).hexdigest())
 
-    def test_public_cli_omits_private_contract_and_journal_seals_and_prefixes(self):
+    def test_public_cli_omits_private_raw_contract_and_journal_seals_and_prefixes(self):
         done = self.run_usage(explicit=True)
         self.assertEqual(done.returncode, 0, done.stderr)
         receipt = (self.work / "usage.json").read_text()
         publications = {"receipt": receipt, "stdout": done.stdout, "stderr": done.stderr}
-        for source, field in (("contract.json", "contract_sha256"), ("journal.jsonl", "journal_sha256")):
+        for source, field in (("raw.json", "raw_output_sha256"), ("contract.json", "contract_sha256"),
+                              ("journal.jsonl", "journal_sha256")):
             digest = self.sha(source)
             for location, text in publications.items():
                 with self.subTest(source=source, publication=location):
@@ -206,7 +207,7 @@ console.log(JSON.stringify(summarizeChild({agentId: 'fixture', label: 'fixture'}
                     receipt = json.loads((self.work / "usage.json").read_text())
                     self.assertEqual(next(c for c in receipt["child_usage"]["children"]
                                           if c["agent_id"] == "new0")["unknown_effort_requests"], 0)
-                    self.assertEqual(receipt["measurement"]["raw_output_sha256"], self.sha("raw.json"))
+                    self.assertNotIn("raw_output_sha256", receipt["measurement"])
                     self.assertEqual(receipt["child_usage"]["by_resolved_model"], raw["by_resolved_model"])
                 else:
                     self.assertEqual(done.returncode, 2, done.stderr)
@@ -229,7 +230,7 @@ console.log(JSON.stringify(summarizeChild({agentId: 'fixture', label: 'fixture'}
         self.assertEqual(usage["by_resolved_model"], self.raw["by_resolved_model"])
         self.assertEqual(usage["web_search"], self.raw["web_search"])
         self.assertEqual(document["measurement"]["exit_code"], 1)
-        self.assertEqual(document["measurement"]["raw_output_sha256"], self.sha("raw.json"))
+        self.assertNotIn("raw_output_sha256", document["measurement"])
         provenance = document["measurement"]["post_processing"]["explicit_supersession"]
         proof_bytes = (json.dumps(provenance["proof"], indent=1, ensure_ascii=False) + "\n").encode()
         self.assertEqual(provenance["proof_sha256"], hashlib.sha256(proof_bytes).hexdigest())

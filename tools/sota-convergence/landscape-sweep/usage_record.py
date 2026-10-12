@@ -12,7 +12,7 @@ which Claude Code keeps under <config dir>/projects/<project>/<session id>/subag
 writes {schema_version, measurement, child_usage} in the shape of
 evidence/artifacts/landscape-sweep-20260923-attempts/child-usage-*.json:
   measurement  tool, tool_commit (null when the tool differs from HEAD), tool_sha256, command, exit_code,
-               raw_output_sha256 (of the unsanitized stdout), measured_at_utc, note, post_processing when applicable
+               measured_at_utc, note, post_processing when applicable; unsanitized stdout hashes stay private
   child_usage  the post-processed output with transcript_dir rewritten to <session-transcripts>/subagents/workflows/<run id>
 The ledger needs child_usage.status "complete" for a completed sweep, reads workflow_run from the last segment of
 transcript_dir, and requires lost_workers to equal the incomplete children. An attempt the runtime re-ran under the
@@ -30,7 +30,7 @@ nor timestamps, so linking observes only a missing result and a later complete s
 keep their superseded_by and observed reason; their usage already counts in by_resolved_model and is never added again. With no
 incomplete children or superseded usage_issues left, status becomes complete and reason counts the new links.
 An effort mismatch of a superseded attempt is covered only by its same-label re-run completed at the required
-effort. measurement.exit_code and raw_output_sha256 remain the tool's raw result; post_processing names the
+effort. measurement.exit_code remains the tool's raw exit code; raw-output seals stay private. post_processing names the
 links and covered mismatches, including source_status, source_reason, linked_agent_ids, covered_agent_ids and
 covered_effort_mismatches. multi_model_children is recomputed over the remaining children after a move.
 Refuses to write (exit 3) when the
@@ -365,7 +365,7 @@ def record(raw: bytes, exit_code: int, command: str, repo_root: Path, measured_a
     return {"schema_version": 1,
             "measurement": {"tool": f"native-agent-stack {TOOL}", "tool_commit": tool_commit(repo_root),
                             "tool_sha256": sha256_bytes((repo_root / TOOL).read_bytes()), "command": command,
-                            "exit_code": exit_code, "raw_output_sha256": sha256_bytes(raw),
+                            "exit_code": exit_code,
                             "measured_at_utc": measured_at or datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
                             "note": NOTE, "post_processing": processing},
             "child_usage": output}
