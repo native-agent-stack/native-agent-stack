@@ -28,7 +28,8 @@ contract/journal authentication and native call keys stay local; they are checke
 processor hash authenticates this published script. No native record or usage counter is changed. The ordinary record carries neither call keys
 nor timestamps, so linking observes only a missing result and a later complete same-label attempt. These attempts
 keep their superseded_by and observed reason; their usage already counts in by_resolved_model and is never added again. With no
-incomplete children or superseded usage_issues left, status becomes complete and reason counts the new links.
+incomplete children or superseded usage_issues left, status becomes complete. The published reason counts incomplete
+children and all superseded attempts; post_processing.linked_attempts counts the new links.
 An effort mismatch of a superseded attempt is covered only by its same-label re-run completed at the required
 effort. measurement.exit_code remains the tool's raw exit code; raw-output seals stay private. post_processing names the
 links and covered mismatches, including source_status, linked_agent_ids, covered_agent_ids and

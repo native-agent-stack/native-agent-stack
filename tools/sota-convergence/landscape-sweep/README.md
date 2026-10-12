@@ -505,7 +505,7 @@ provides it.
   reason (call keys are not compared), and leaves `by_resolved_model` unchanged. The wrapper's exit code follows the
   post-processed status and uncovered effort mismatches; `measurement.exit_code` remains the raw tool exit and
   raw stdout authentication stays private and is omitted from the receipt. `measurement.post_processing` retains
-  `source_status`, `source_reason`, `linked_agent_ids`, `covered_agent_ids` and `covered_effort_mismatches`, along
+  `source_status`, `linked_agent_ids`, `covered_agent_ids` and `covered_effort_mismatches`, along
   with the linking and coverage counts. `multi_model_children` is recomputed after a move. The printed summary
   distinguishes `raw_exit_code` from the wrapper's `exit_code`. A linked attempt's `usage_issues` still keep the record incomplete.
   `make_result.py` also needs every attempt measured at effort `max` alone, covered by its completed same-label
@@ -675,7 +675,7 @@ With no incomplete children or superseded usage-integrity gaps left, it reports 
 number linked, and can exit 0 while preserving the tool's raw exit 1 in the measurement. Superseded attempts
 whose re-run completed at max remain under `superseded_retained` per layer; they do not reopen a layer for effort.
 Uncovered effort deviations and capped WebSearch calls still retain their failures and reopen entries.
-`measurement.post_processing` preserves the tool's original `source_status` and `source_reason`, the
+`measurement.post_processing` preserves the tool's original `source_status`, the
 `linked_agent_ids`, `covered_agent_ids`, and full `covered_effort_mismatches`. It records the counts alongside
 these details, including when only some attempts link and the status stays incomplete. `multi_model_children`
 reflects the remaining children. The printed `raw_exit_code` names the tool's result; `exit_code` names the wrapper's.
