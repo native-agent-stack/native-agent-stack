@@ -28,10 +28,14 @@ value and restores over top of it.
 """
 from __future__ import annotations
 
+from contextlib import contextmanager
+from datetime import datetime, timezone
 import os
 import sys
 import tempfile
+import time
 from pathlib import Path
+from unittest.mock import patch
 
 # Names under which the engine modules this suite cares about are commonly
 # already present in sys.modules by the time setUpModule runs: safety.py
@@ -110,3 +114,49 @@ def real_tmp_root(name) -> Path:
     contains none.
     """
     return Path(os.path.realpath(name))
+
+
+# Wednesday 2026-10-07 10:00 ET (RTH), later than every instant the fixtures embed (the mover
+# scan day 2026-09-24, the legacy fee window 2026-09-29T20:25:19Z), as the real clock was.
+FIXTURE_CLOCK_START = datetime(2026, 10, 7, 14, 0, tzinfo=timezone.utc).timestamp()
+
+
+class FixtureClock:
+    """The wall clock moved to ``start`` (epoch seconds) when constructed.
+
+    runner.Controller._check_overnight_status classifies the controller's own
+    clock (sessions.session_at). In the OVERNIGHT session, 20:00 ET on the
+    prior civil day to 04:00 ET of an XNYS trade date, it refuses every order
+    on an extended-hours port that lacks an Alpaca overnight asset status,
+    and no SYN fixture supplies one. A trial on the real clock therefore ended
+    completed_no_signals on Sunday to Thursday nights from 20:00 ET.
+
+    The moved clock still advances in real time, and one instance keeps one
+    offset, so the successive commands of one test share a timeline.
+    ``patched()`` installs it as time.time and time.time_ns and as the
+    ``clock=`` default of runner.Controller and mover_strategy.MoverStrategy,
+    which bound the time.time builtin at import. The controller's clock cannot
+    move alone: the ledger compares it with every quote's timestamp
+    (RiskLimits.quote_max_age_seconds). NautilusTrader's own clock and
+    time.monotonic stay real; the fixtures pin the native dispatch clock
+    separately (native_pre_dispatch).
+    """
+
+    def __init__(self, start=FIXTURE_CLOCK_START):
+        self._source_ns = time.time_ns
+        self.offset_ns = round(start * 1e9) - self._source_ns()
+
+    def time_ns(self):
+        return self._source_ns() + self.offset_ns
+
+    def time(self):
+        return self.time_ns() / 1e9
+
+    @contextmanager
+    def patched(self):
+        import mover_strategy
+        import runner
+        with patch.object(time, "time", self.time), patch.object(time, "time_ns", self.time_ns), \
+             patch.dict(runner.Controller.__init__.__kwdefaults__, clock=self.time), \
+             patch.dict(mover_strategy.MoverStrategy.__init__.__kwdefaults__, clock=self.time):
+            yield self

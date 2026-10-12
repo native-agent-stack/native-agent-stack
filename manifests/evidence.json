@@ -13247,7 +13247,7 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "b56175b9083f530afb56781d03ed0fce58b89f8cb4587f00a30479f67fb30cbb",
+      "sha256": "563f02e8849a8e212419b01e0abdb15471374313e2bd56236bf5702e8f8da4aa",
       "bytes": 8744
     },
     {
@@ -60882,8 +60882,8 @@
     },
     {
       "path": "tests/adaptive_paper_hermetic.py",
-      "sha256": "0f41601cd10abf10ccba4f17d9c35716bb766a5e9951a4390649d6c9387fc1da",
-      "bytes": 5384
+      "sha256": "ee3fe5d3f97143e9361281f2c4d95076b758ec8d245a942bd7470412673558cd",
+      "bytes": 7648
     },
     {
       "path": "tests/canary_mutants.py",
@@ -61192,8 +61192,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_fees.py",
-      "sha256": "9ad92465984b770861e4c22aab3ebe358e58ec04ea9c862770dfdc318a42bc87",
-      "bytes": 78559
+      "sha256": "a3a6fa9b19897e6dc7204f799aa41da7412085fc30e21da765cb78998c755459",
+      "bytes": 79622
     },
     {
       "path": "tests/test_adaptive_paper_financing.py",
@@ -61222,8 +61222,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_mover_native.py",
-      "sha256": "7b586bba996336d41be308e81dab1ce8a5901da59b431418152e139de34480f4",
-      "bytes": 64059
+      "sha256": "588c1e206ac93449495e1103b250d42ff352ec3cbd5af2465c3d15cc0cd79968",
+      "bytes": 68355
     },
     {
       "path": "tests/test_adaptive_paper_native.py",

@@ -27,15 +27,16 @@ try:
     from mover_simulation import MoverSimulatedPort, piecewise_path
     from runner import _apply_forced_recovery_outcome
     from safety import Ledger
-    from transport import normalize_intent
+    from sessions import SessionKind, session_at
+    from transport import normalize_intent, normalize_overnight_status
     NATIVE = True
 except ImportError:
     NATIVE = False
 
 try:  # package mode (python -m unittest tests.x) or discover -s tests (top-level modules)
-    from .adaptive_paper_hermetic import patch_default_stop, restore_default_stop
+    from .adaptive_paper_hermetic import FixtureClock, patch_default_stop, restore_default_stop
 except ImportError:
-    from adaptive_paper_hermetic import patch_default_stop, restore_default_stop  # noqa: E402
+    from adaptive_paper_hermetic import FixtureClock, patch_default_stop, restore_default_stop  # noqa: E402
 
 _HERMETIC_TOKEN = None
 
@@ -52,6 +53,7 @@ def tearDownModule():
 CONFIG = SOURCE / "config-mover.json"
 SCAN_TIME = datetime(2026, 9, 24, 12, 0, 5, tzinfo=timezone.utc).timestamp()  # 08:00:05 ET
 PRE_TS = datetime(2026, 9, 24, 12, 30, tzinfo=timezone.utc)                   # 08:30 ET
+NIGHT = datetime(2026, 10, 12, 0, 5, tzinfo=timezone.utc)                     # Sunday 20:05 ET, OVERNIGHT
 UUID = re.compile(r"[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}", re.I)
 
 
@@ -89,6 +91,9 @@ def native_pre_dispatch():
 
 @unittest.skipUnless(NATIVE, "requires pinned combined native runtime")
 class MoverNativeEndToEnd(unittest.TestCase):
+    def setUp(self):
+        self.clock = FixtureClock()
+
     def run_trial(self, rows, points, *, exit_rule="X2", hold=1.5, flatten=6.0, window=10.0, entry_timeout=1.0,
                   partial_fill=None, stop_after=None, extended_hours=False, block_sells=False, trial="t1",
                   snapshot_latency=0.0, reconcile_every=None, exit_orders=None, quote_path=None, halt_seed=None):
@@ -96,12 +101,14 @@ class MoverNativeEndToEnd(unittest.TestCase):
         the residual then goes through mover_runner.recover_mover on a fresh port on the
         same synthetic account (sells fill), as command_paper does. ``self.outcome`` keeps
         run_mover's own outcome and ``self.recovery_port`` the recovery port. ``quote_path``
-        replaces ``piecewise_path(points)`` (e.g. a price gap)."""
+        replaces ``piecewise_path(points)`` (e.g. a price gap). The trial runs on
+        ``self.clock``, never the real clock."""
         data = json.loads(CONFIG.read_text())
         data["mover"]["exit"] = exit_rule
         data["mover"]["exit_orders"].update(exit_orders or {})
         self.recovery_port = None
-        with tempfile.TemporaryDirectory() as root:
+        clock = getattr(self, "clock", None) or FixtureClock()   # test_mover_exit_chain passes its own TestCase
+        with clock.patched(), tempfile.TemporaryDirectory() as root:
             path = Path(root) / "config.json"
             path.write_text(json.dumps(data))
             config, limits, settings = mover.load_mover_config(path)
@@ -271,6 +278,18 @@ class MoverNativeEndToEnd(unittest.TestCase):
                     D(order["reference_price"]), D(50), leg["sizing"]["price_decimals"]))
         self.assertEqual(self.legs(receipt)["PNY"]["entry"]["limit_price"][-5:-4], ".")  # sub-penny 4-decimal limit
 
+    def test_an_extended_hours_trial_keeps_the_fixture_clock_after_20_et(self):
+        # Around the trial the clock reads Sunday 20:05 ET, Monday's OVERNIGHT session, where the
+        # controller refuses every order that lacks an overnight asset status (none is supplied):
+        # a trial on that clock would end completed_no_signals.
+        fixture_now = datetime.fromtimestamp(self.clock.time(), timezone.utc)
+        self.assertEqual((session_at(NIGHT).kind, session_at(fixture_now).kind), (SessionKind.OVERNIGHT, SessionKind.RTH))
+        with native_pre_dispatch(), FixtureClock(NIGHT.timestamp()).patched():
+            receipt, port, held, unresolved = self.run_trial([row("AAA", 1, "10.00")], {"AAA": flat("10.00")},
+                                                             extended_hours=True)
+        self.assert_clean(receipt, held, unresolved)
+        self.assertEqual(self.buys_per_symbol(port), {"AAA": 1})
+
     def test_forced_recovery_flattens_when_exits_cannot_complete(self):
         rows = [row("AAA", 1, "10.00")]
         receipt, port, held, unresolved = self.run_trial(rows, {"AAA": flat("10.00")}, hold=1.0, flatten=4.0,
@@ -360,6 +379,33 @@ class MoverNativeEndToEnd(unittest.TestCase):
                 self.assertEqual([(i.side, i.qty) for i in ledger.intents()], [("buy", D(1))])
                 with self.assertRaises(TypeError):
                     mover_runner.MoverController(ledger, now + 36000, market_open=True)   # no default entry cap
+            finally:
+                ledger.close()
+
+    def test_the_mover_controller_admits_an_overnight_entry_only_with_an_eligible_asset_status(self):
+        # The gate the fixture clock keeps the trials out of, on the controller's own clock at
+        # Sunday 20:05 ET: no entry without an alpaca_assets overnight status, and the entry is
+        # reserved once a fresh, tradable, unhalted one arrives.
+        config, limits, settings = mover.load_mover_config(CONFIG)
+        now = NIGHT.timestamp()
+        self.assertEqual(session_at(NIGHT).kind, SessionKind.OVERNIGHT)
+        with tempfile.TemporaryDirectory() as root:
+            ledger = Ledger(Path(root) / "ledger.sqlite3", limits)
+            try:
+                ledger.begin_next_trial(now, "t1")
+                controller = mover_runner.MoverController(ledger, now + 36000, market_open=True, clock=lambda: now,
+                                                          max_entry_notional_usd=settings.max_entry_notional_usd)
+                controller.port = type("Ready", (), {"ready": True, "extended_hours_allowed": True})()
+                controller.quote({"symbol": "AAA", "bid": "100.00", "ask": "100.02", "ts_ns": int(now * 1e9)})
+                order = {"client_order_id": "mvr-t1-0000001", "symbol": "AAA", "side": "buy", "qty": "1",
+                         "limit_price": "100.52"}
+                with self.assertRaisesRegex(native_adapter.NativeOrderRejected, "^overnight_status_unknown$"):
+                    controller.before_submit(order)
+                self.assertEqual(ledger.intents(), [])
+                controller.trading_status(normalize_overnight_status(
+                    {"symbol": "AAA", "attributes": ["overnight_tradable"]}, int(now * 1e9)))
+                controller.before_submit(order)
+                self.assertEqual([(i.side, i.qty) for i in ledger.intents()], [("buy", D(1))])
             finally:
                 ledger.close()
 
@@ -513,7 +559,7 @@ class MoverNativeEndToEnd(unittest.TestCase):
         # resumption; BBB, not halted, enters normally.
         from transport import normalize_trading_status
         rows = [row("AAA", 1, "10.00"), row("BBB", 2, "5.50")]
-        halted_at, reads = time.time_ns() - 60 * 10 ** 9, []
+        halted_at, reads = self.clock.time_ns() - 60 * 10 ** 9, []        # on the trial's clock
 
         def seed(symbols):
             reads.append(list(symbols))
@@ -528,7 +574,7 @@ class MoverNativeEndToEnd(unittest.TestCase):
             async def resume():
                 await asyncio.sleep(0.6)
                 port.resumed_at = time.time()
-                now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+                now = datetime.fromtimestamp(port.resumed_at, timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
                 port.controller.trading_status(normalize_trading_status(
                     {"T": "s", "S": "AAA", "sc": "T", "sm": "Trading Resumption", "rc": "C11",
                      "rm": "Trade Halt Concluded By Other Regulatory Auth,; Quotes/Trades Resume", "t": now, "z": "C"}))
@@ -653,6 +699,7 @@ class MoverPaperCommandWiring(unittest.TestCase):
                  patch.object(mover_runner, "build_plan", compressed_plan), \
                  patch.object(mover_runner, "_controller_session", lambda close, now, policy: (now + 36000, True)), \
                  native_pre_dispatch(), \
+                 self.clock.patched(), \
                  patch("builtins.print"):
                 code = mover_runner.main(args + list(extra))
         finally:
@@ -668,6 +715,7 @@ class MoverPaperCommandWiring(unittest.TestCase):
         self.transport_timeouts = []
         self.path_points = None
         self.checkpoint_fees = []
+        self.clock = FixtureClock()     # every command of the test runs on it (run_paper)
 
     def fast_config(self, root):
         """config-mover.json with a 1 s recovery order timeout (the example uses 10 s)."""
@@ -823,6 +871,17 @@ class MoverPaperCommandWiring(unittest.TestCase):
             self.assertEqual((code, receipt["status"], receipt["shared_account_override"]), (0, "passed", True))
             trial = json.loads((state / "mover" / "trial.json").read_text())
             self.assertEqual([h["session_number"] for h in trial["history"]], [1, 2, 3])
+
+    def test_the_paper_command_keeps_the_fixture_clock_after_20_et(self):
+        # Around the command the clock reads Sunday 20:05 ET, Monday's OVERNIGHT session, where the
+        # controller refuses every order that lacks an overnight asset status (none is supplied):
+        # a trial on that clock would end completed_no_signals.
+        with tempfile.TemporaryDirectory() as root:
+            (Path(root) / "scan.json").write_bytes(scan_raw([row("AAA", 1, "10.00")]))
+            with FixtureClock(NIGHT.timestamp()).patched():
+                code, receipt = self.run_paper(root, "night-1")
+            self.assertEqual((code, receipt["status"], receipt["flat"]), (0, "passed", True), receipt.get("reason"))
+            self.assertEqual({leg["exit_reason"] for leg in receipt["symbols"]}, {"x2_time"})
 
     def test_a_later_session_on_other_symbols_recovers_and_recover_clears_the_lane(self):
         # The mover ledger keeps every session's intents; session 2 trades other symbols than
