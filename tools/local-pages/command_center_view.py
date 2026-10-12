@@ -1219,7 +1219,10 @@ def _derive(status: str, detail: str, body: str) -> tuple[str, str]:
     plain = [unescape(re.sub(r"<[^>]+>", "", match)) for match in _RENDERED_GAP.findall(body)]
     not_wired = [unescape(re.sub(r"<[^>]+>", "", match)) for match in _RENDERED_NOT_WIRED.findall(body)]
     stale = body.count('class="cc-stale">stale<')
-    reasons = (["missing input: " + "; ".join(plain)] if plain else []) + (["not wired: " + ", ".join(not_wired)] if not_wired else []) + ([_plural(stale, "stale report", "stale reports")] if stale else [])
+    # A value the shared sanitizer dropped because an at sign beside a word remained after masking (fail-closed).
+    omitted = body.count(_sanitization.RESIDUE_OMITTED)
+    reasons = (["missing input: " + "; ".join(plain)] if plain else []) + (["not wired: " + ", ".join(not_wired)] if not_wired else []) + ([_plural(stale, "stale report", "stale reports")] if stale else []) \
+        + ([_plural(omitted, "value omitted", "values omitted") + " after masking"] if omitted else [])
     derived = "partial" if reasons else "wired"
     final = max(status, derived, key=SEVERITY.__getitem__)
     if reasons and final != "wired":
@@ -1276,6 +1279,9 @@ def render(current: Any, fleet: Any, inputs: Any, *, adoption: Any = None, refre
         headline = '<p class="now-headline">' + esc(current["headline"]) + '</p>' if isinstance(current.get("headline"), str) else _gap("cc-now.json#/headline")
     except PANEL_ERRORS as error:
         stamp, headline = 'Current view snapshot not reported', _gap("cc-now.json#/headline (" + type(error).__name__ + ")")
-    markup = (f'<section id="cc-view" class="cc-view" aria-labelledby="cc-title"><header class="page-header"><h1 id="cc-title">Command center</h1><p class="current-stamp">{stamp}</p>{headline}</header>'
+    omitted = sum(section.count(_sanitization.RESIDUE_OMITTED) for section in sections) + counts.count(_sanitization.RESIDUE_OMITTED) + headline.count(_sanitization.RESIDUE_OMITTED)
+    # The page states how many values it dropped, so a fail-closed omission is never silent.
+    residue = _gap(_plural(omitted, "value", "values") + " omitted because an at sign beside a word remained after masking") if omitted else ''
+    markup = (f'<section id="cc-view" class="cc-view" aria-labelledby="cc-title"><header class="page-header"><h1 id="cc-title">Command center</h1><p class="current-stamp">{stamp}</p>{headline}{residue}</header>'
               + counts + '<div class="cc-grid">' + "".join(sections) + '</div></section>')
     return markup, statuses

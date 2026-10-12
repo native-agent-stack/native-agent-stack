@@ -8,22 +8,34 @@ Account filtering comes from tools/local-pages/build_pages.py ACCOUNT_URL at
 the same pin; urllib.parse supplies host/path normalization for owner links.
 Email addresses are omitted after the same per-token decoding, so percent and
 HTML-entity forms are matched in their decoded text. The match is anchored at
-the at sign and its domain, then takes the whole local part that ends there,
-in either form RFC 5322 section 3.4.1 allows: a run of atext (letters, digits
-and !#$%&'*+-=?^_`{|}~ with dots, taken from its first letter or digit, so a
-quote or backtick around an address stays and a Markdown `@AGENTS.md` is not an
-address; the slash is left out, so a URL path such as /@handle is not one
-either), or a quoted string such as "reviewer" or
-"john doe", whose quotes may also be percent- or entity-encoded in place.
-CPython's own address parser accepts the quoted form (Lib/email/_parseaddr.py
-getaddrspec, lines 365-379, and getquote, line 463, at the same mirror). The
+the at sign and its domain, then takes the whole local part that ends there, in
+either form RFC 5322 section 3.4.1 allows: any nonempty run of atext (letters,
+digits and !#$%&'*+-=?^_`{|}~ with dots, so !!!@d is one), or a quoted string
+such as "reviewer", "john doe" or the empty "", whose quotes may be percent- or
+entity-encoded in place or JSON-escaped as \". CPython's own address parser
+accepts all of these (Lib/email/_parseaddr.py at the mirror named below:
+getaddrspec, lines 365-385, reads atoms through getatom, lines 475-493, and
+quoted strings through getquote, line 463, whose getdelimited loop, lines
+426-461, ends an empty one at line 449). Two contexts are set aside: the slash
+is not taken, so a URL path such as /@handle is not an address, and leading
+backticks open a Markdown code span, so `@AGENTS.md` is not one either. The
 mask reads the whole text with each token decoded, so a local part that a
 quote, a space or an apostrophe splits across tokens is found whole. Text that
-decoding leaves unchanged is masked exactly from the start of the local part
-to the end of the domain; a token that decoding changes is omitted whole when
-the address touches it. It walks the at signs once, so the cost stays linear in
-the text's length. The decoders are CPython's own, cited at the v3.13.16
-mirror (cbc944f4bc59639a444dd971c737788ba2283a91):
+decoding leaves unchanged is masked exactly from the start of the local part to
+the end of the domain; a token that decoding changes is omitted whole when the
+address touches it; overlapping matches merge from their earliest start, so a
+quoted local part that itself holds an at sign is omitted whole. From each at
+sign the walk back over atext stops after 256 characters (RFC 5321 section
+4.5.3.1.1 limits a local part to 64 octets) and never passes the address before
+it, so the cost is linear in the text's length: three adversarial
+50,000-character forms (%40 and &#64 written in atext, and apostrophe-joined
+%252540 tokens) each take under 0.5 s. A local part over 256 characters keeps
+its leading part visible. After masking, a value that still holds an at sign,
+raw or encoded, followed by a domain and directly after a word character, or
+after a quote with only whitespace between, is dropped whole and replaced by
+RESIDUE_OMITTED, so a form the mask cannot classify fails closed. The decoders
+are CPython's own, cited at the v3.13.16 mirror
+(cbc944f4bc59639a444dd971c737788ba2283a91):
 html.unescape (Lib/html/__init__.py:118 accepts a reference without its
 semicolon, :122), whose HTML5 table maps 'commat;' to '@' and 'period;' to '.'
 (Lib/html/entities.py:567, :1736), and urllib.parse.unquote (Lib/urllib/parse.py:694).
@@ -67,14 +79,27 @@ _UNIT_TYPES = ("service", "socket", "device", "mount", "automount", "swap", "pat
 _UNIT = r"(?:" + "|".join(_UNIT_TYPES) + r")(?![A-Za-z])"
 _DOMAIN = r"[A-Za-z0-9-]+(?:" + _DOT + r"[A-Za-z0-9-]+)*" + _DOT + r"(?!" + _UNIT + r")[A-Za-z]{2,}"
 _ADDRESS_TAIL = re.compile(_AT + _DOMAIN)
+RESIDUE_OMITTED = "[value omitted: an at sign beside a word remained after masking]"
 # RFC 5322 3.2.3 atext plus the dot of a dot-atom, and 3.2.4 quoted strings, whose quotes may be encoded in place.
 # Without the slash: a URL path such as medium.com/@handle.name would otherwise read as an address.
 _ATEXT = frozenset("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!#$%&'*+-=?^_`{|}~.")
 _QUOTE = r'(?:"|%(?:25)?22|&quot;?|&#0*34;?|&#[xX]0*22;?)'
+# After masking, an at sign, raw or encoded, followed by a domain and directly after a word character, or after a
+# quote with only whitespace between, is residue the mask could not classify (whitespace before the at sign, a
+# quoted local part over 256 characters): the value is dropped instead. Prose such as "imports @AGENTS.md" or
+# "pin @ 2.0.0" has a space after a word, not a quote, so it stays.
+_AT_FORMS = r"(?:@|%(?:25)?40|&#0*64;?|&#[xX]0*40;?|&commat;|\\u0040)"
+_RESIDUE = re.compile(r"(?:\w|(?:" + _QUOTE + r"|'|\\\")\s*)" + _AT_FORMS + _DOMAIN)
 _OMITTED = "[email omitted]"
+# RFC 5321 4.5.3.1.1 limits a local part to 64 octets; the walk back from an at sign stops after 256 characters,
+# which leaves room for encodings, so a run of atext never costs more than that per at sign.
+_LOCAL_PART_LIMIT = 256
+# A JSON-serialized string writes the quotes of "w1 w2"@d.example.org as \", so an escaped quote also opens and
+# closes a quoted local part. Content excludes the escaped quote, so each character has one parse.
+_ESCAPED_QUOTED_LOCAL = re.compile(r'\\"(?:(?!\\")[^\r\n]){0,256}\\"\Z')
 # A backslash always opens a quoted pair, so each character has one parse and the search stays linear in the window.
-_QUOTED_LOCAL = re.compile(_QUOTE + r"(?:\\.|(?!" + _QUOTE + r")[^\\\r\n]){1,256}" + _QUOTE + r"\Z")
-_PRESERVED = re.compile(r"\$\{(?:USER_HOME|LOCAL_SESSION_ID|LOCAL_TASK_HANDLE)\}|\[personal identifier omitted\]|\[account artifact omitted\]|\[email omitted\]|native-agent-stack-1a")
+_QUOTED_LOCAL = re.compile(_QUOTE + r"(?:\\.|(?!" + _QUOTE + r")[^\\\r\n]){0,256}" + _QUOTE + r"\Z")
+_PRESERVED = re.compile(r"\$\{(?:USER_HOME|LOCAL_SESSION_ID|LOCAL_TASK_HANDLE)\}|\[personal identifier omitted\]|\[account artifact omitted\]|\[email omitted\]|\[value omitted: an at sign beside a word remained after masking\]|native-agent-stack-1a")
 
 
 def _home_name() -> str | None:
@@ -93,31 +118,52 @@ def _without_preserved(value: str) -> str:
     return _PRESERVED.sub("", value)
 
 
-def _local_start(value: str, at: int) -> int | None:
-    """Where the local part ending at value[at], the at sign, begins: a quoted string, else a run of atext."""
-    quoted = _QUOTED_LOCAL.search(value, max(0, at - 300), at)
+def _local_start(value: str, at: int, floor: int = 0) -> int | None:
+    """Where the local part ending at value[at], the at sign, begins: a quoted string, else a run of atext.
+
+    The atext walk stops after _LOCAL_PART_LIMIT characters and never passes floor, the end of the address
+    before it; a run that continues into that address is glued to it and starts at floor, so the two merge.
+    """
+    window = max(0, at - 300)
+    quoted = _QUOTED_LOCAL.search(value, window, at) or _ESCAPED_QUOTED_LOCAL.search(value, window, at)
     if quoted:
         return quoted.start()
-    start = at
-    while start > 0 and value[start - 1] in _ATEXT:
+    start, stop = at, max(floor, at - _LOCAL_PART_LIMIT)
+    while start > stop and value[start - 1] in _ATEXT:
         start -= 1
-    # The local part starts at its first letter or digit, so a quote or backtick around an address stays, and one
-    # with none, such as the backtick of a Markdown `@AGENTS.md`, is not an address.
-    first = next((index for index in range(start, at) if value[index].isascii() and value[index].isalnum()), None)
-    return first
+    if start == floor > 0 and value[floor - 1] in _ATEXT:
+        return floor
+    # Any nonempty atext run is a local part, letters or not (!!!@d is valid). Only Markdown context is set
+    # aside: leading backticks open a code span, so `foo@bar.md` keeps its backtick and `@AGENTS.md` is no address.
+    while start < at and value[start] == "`":
+        start += 1
+    return start if start < at else None
 
 
 def _email_spans(value: str):
+    floor = 0
     for tail in _ADDRESS_TAIL.finditer(value):
-        start = _local_start(value, tail.start())
+        start = _local_start(value, tail.start(), floor)
         if start is not None:
             yield start, tail.end()
+            floor = tail.end()
+
+
+def _merged(spans) -> list[tuple[int, int]]:
+    """Overlapping or touching spans as one, each from its minimum start, so no part of an outer local part survives."""
+    merged: list[tuple[int, int]] = []
+    for low, high in sorted(spans):
+        if merged and low <= merged[-1][1]:
+            merged[-1] = (merged[-1][0], max(high, merged[-1][1]))
+        else:
+            merged.append((low, high))
+    return merged
 
 
 def _mask_email(value: str) -> str:
     pieces, cursor = [], 0
-    for start, end in _email_spans(value):
-        pieces += [value[cursor:max(start, cursor)], _OMITTED]
+    for start, end in _merged(_email_spans(value)):
+        pieces += [value[cursor:start], _OMITTED]
         cursor = end
     return "".join(pieces) + value[cursor:]
 
@@ -154,12 +200,9 @@ def _mask_decoded_email(value: str) -> str:
         first, last = bisect_right(offsets, start) - 1, bisect_left(offsets, end) - 1
         low = pieces[first][0] if pieces[first][3] else pieces[first][0] + start - offsets[first]
         high = pieces[last][1] if pieces[last][3] else pieces[last][0] + end - offsets[last]
-        if ranges and low <= ranges[-1][1]:
-            ranges[-1] = (ranges[-1][0], max(high, ranges[-1][1]))
-        else:
-            ranges.append((low, high))
+        ranges.append((low, high))
     out, cursor = [], 0
-    for low, high in ranges:
+    for low, high in _merged(ranges):
         out += [value[cursor:low], _OMITTED]
         cursor = high
     return "".join(out) + value[cursor:]
@@ -231,7 +274,8 @@ def sanitize(value: Any) -> Any:
         identity = _identity_pattern(_home_name())
         value = _mask_decoded_email(value)
         value = _TOKEN.sub(lambda match: _encoded_token(match.group(), identity), value)
-        return _portable_text(value, identity)
+        value = _portable_text(value, identity)
+        return RESIDUE_OMITTED if _RESIDUE.search(value) else value
     if isinstance(value, dict):
         return {key: sanitize(child) for key, child in value.items()}
     if isinstance(value, list):

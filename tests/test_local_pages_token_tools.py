@@ -129,6 +129,19 @@ class TokenToolsTests(unittest.TestCase):
         self.assertNotIn("zqdomain", serialized)
         self.assertIn("[email omitted]", serialized)
 
+    def test_empty_quoted_and_punctuation_only_local_parts_are_masked_in_keys_and_values(self):
+        # Astra's read of 51f85b5b, P1 1: the token report shares the mask, so these forms must not reach the file as a
+        # key or a value, in plain, percent or entity form; residue the mask cannot classify is dropped whole.
+        keyed = {'""' + "@" + "zqdomain.example.target": "!!!" + "@" + "zqdomain.example.target", "p": ["%22%22%40zqdomain.example.target", "&#33;&#33;&#33;&#64;zqdomain.example.target"],
+                 "residue": '"zqsp" ' + "@" + "zqdomain.example.org"}
+        runner = Runner({"headroom " + AGENT: completed(0, json.dumps(keyed))})
+        serialized = json.dumps(tools.collect("rtk", "headroom", "node", None, timeout=5, runner=runner))
+        for _ in range(2):
+            serialized = html.unescape(unquote(serialized))
+        self.assertNotIn("zqdomain", serialized)
+        self.assertNotIn("zqsp", serialized)
+        self.assertIn("[value omitted: an at sign beside a word remained after masking]", serialized)
+
     def test_destination_refuses_a_parent_or_ancestor_that_links_into_the_repository(self):
         # Codex token_tools_now.py:160 and the micro's (a)2 at 50977b00: abspath() follows no symlink, so
         # <tmp>/state linked to the checkout let --out land inside the repository.

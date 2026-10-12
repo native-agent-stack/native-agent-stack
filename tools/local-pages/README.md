@@ -199,8 +199,12 @@ already makes, `cc-now.json`, and sixteen files read through
 
 `CommandCenterReads` extends the Architecture reader: the same bounded,
 no-follow, protected-name checks, with repo and state roots only. Each read's
-path, role, hash, byte count and modification time join the custody table and
-the receipt's `command_center.inputs`. A missing or malformed input renders
+path, role, hash, byte count and modification time join the receipt's
+`command_center.inputs`, and its path joins the custody table on
+`sources.html`: a repository input with its SHA-256, a command-center state
+input (and `cc-now.json` and `adoption-now.json`) with a note that the page
+withholds its digest, since the digest of private raw bytes would confirm a
+guessed masked value (#161). A missing or malformed input renders
 `missing input: <name>`, an unapproved one `unreadable (SourcePolicyError)`;
 neither stops the refresh. An `in_review` row that is not an object is rejected
 with a stated gap naming how many were rejected: PR waves reads partial, and the
@@ -280,11 +284,22 @@ The shared sanitizer omits email addresses on every page and in
 paths and identifiers, so percent-encoded, double-encoded and HTML-entity forms,
 with or without the semicolon, are matched in their decoded text. It reads the
 whole text with each token decoded and takes the whole local part RFC 5322
-allows: a run of atext (letters, digits and ``!#$%&'*+-=?^_`{|}~`` with dots,
-from its first letter or digit; the slash is left out, so a URL path such as
-`/@handle` is not an address) or a quoted string such as `"reviewer"` or
-`"john doe"`, whose quotes may be encoded too. So no part of a local part is left beside the placeholder, and the
-cost stays linear in the text's length. A token over 4,096 characters is not
+allows: any nonempty run of atext (letters, digits and
+``!#$%&'*+-=?^_`{|}~`` with dots, so `!!!@d` is one) or a quoted string such as
+`"reviewer"`, `"john doe"` or the empty `""`, whose quotes may be percent- or
+entity-encoded or JSON-escaped as `\"`. Two contexts are set aside: the slash is
+not taken, so a URL path such as `/@handle` is not an address, and leading
+backticks open a Markdown code span, so `` `@AGENTS.md` `` is not one either.
+Overlapping matches merge from their earliest start, so a quoted local part that
+itself holds an at sign is omitted whole. From each at sign the walk back stops
+after 256 characters (RFC 5321 section 4.5.3.1.1 limits a local part to 64
+octets) and never passes the address before it, so the cost is linear in the
+text's length; a local part over 256 characters keeps its leading part visible.
+After masking, a value that still holds an at sign, raw or encoded, followed by
+a domain and directly after a word character, or after a quote with only
+whitespace between, is dropped whole and reads `[value omitted: an at sign
+beside a word remained after masking]`; the command-center page counts those
+values and names their sections partial. A token over 4,096 characters is not
 decoded, so there the mask matches these forms in place: for the at sign `%40`,
 `%2540`, `&#64` and `&#x40` (with or without the semicolon) and `&commat;`, for
 the dot `%2E`, `%252E`, `&#46`, `&#x2E` and `&period;`, and for the quotes `%22`,

@@ -185,7 +185,11 @@ class SanitizationTests(unittest.TestCase):
         for form in ("owner%40example.org", "owner&#64;example.org", "owner&#64example.org", "owner&#x40;example.org", "owner&commat;example.org",
                      "owner%2540example.org", "owner" + at + "example%2Eorg", "owner" + at + "example&#46;org", "owner" + at + "example&period;org"):
             with self.subTest(form=form):
-                self.assertEqual(helper.text(long + form + " tail"), "[email omitted] tail")
+                out = helper.text(long + form + " tail")
+                self.assertTrue(out.endswith("[email omitted] tail"), out[-60:])
+                self.assertNotIn("owner", out)
+                self.assertNotIn("example", out)
+                self.assertEqual(set(out[:-len("[email omitted] tail")]), {"x"})
         for public in ("https://registry.npmjs.org/%40openai%2fcodex", "https://www.npmjs.com/package/%40anthropic-ai/claude-code", "100%40 off", "a&#64b"):
             with self.subTest(public=public):
                 self.assertEqual(helper.text(long + " " + public), long + " " + public)
@@ -252,6 +256,87 @@ class SanitizationTests(unittest.TestCase):
         result = subprocess.run([sys.executable, "-B", "-c", child, str(ROOT / "tools/local-pages/sanitization.py")], capture_output=True, text=True, timeout=30)
         self.assertEqual((result.returncode, result.stdout.strip()), (0, "True"), result.stderr[-400:])
 
+    def test_empty_quoted_and_punctuation_only_local_parts_are_masked(self):
+        # Astra's read of 51f85b5b, P1 1: a quoted local part needed at least one character and an atext one a letter
+        # or digit, so ""@example.target and !!!@example.target stayed readable. CPython's parser accepts both
+        # (Lib/email/_parseaddr.py getaddrspec, lines 365-385, getatom, lines 475-493, and getdelimited, line 449, at cbc944f4).
+        helper = load_helper()
+        at = "@"
+        forms = ('""' + at + "zqdomain.example.target", "!!!" + at + "zqdomain.example.target", "%22%22%40zqdomain.example.target",
+                 "&quot;&quot;&#64;zqdomain.example.target", "%21%21%21%40zqdomain.example.target", "&#33;&#33;&#33;" + at + "zqdomain.example.target",
+                 "''" + at + "zqdomain.example.target", "{}" + at + "zqdomain.example.target", '\\"\\"' + at + "zqdomain.example.target")
+        for form in forms:
+            for prefix in ("Reply to ", "x" * 4100 + " "):
+                with self.subTest(form=form, long=len(prefix) > 10):
+                    out = helper.text(prefix + form)
+                    self.assertNotIn("zqdomain", out)
+                    self.assertTrue(out.endswith("[email omitted]"), out[-40:])
+
+    def test_long_atext_runs_with_encoded_at_signs_stay_fast(self):
+        # The 51f85b5b micro's B1: the walk back over atext had no bound, and %40 and &#64 are themselves atext, so
+        # each at sign rescanned the run: 9.6 s for one 50,000-character token. Each form here must finish under 0.5 s,
+        # timed in a child process with a hard timeout so a regression cannot hang the suite.
+        import subprocess
+        import sys
+        child = (
+            "import importlib.util, sys, time\n"
+            "spec = importlib.util.spec_from_file_location('helper', sys.argv[1])\n"
+            "helper = importlib.util.module_from_spec(spec)\n"
+            "spec.loader.exec_module(helper)\n"
+            "forms = {'pct': 'a%40b.cc' * 6250, 'ent': 'a&#64b.cc' * 5556, 'apos': chr(39).join(['a%252540b.cc'] * 3847)}\n"
+            "for name, value in forms.items():\n"
+            "    started = time.perf_counter()\n"
+            "    out = helper.text(value)\n"
+            "    print(name, round(time.perf_counter() - started, 3), 'b.cc' in out)\n")
+        result = subprocess.run([sys.executable, "-B", "-c", child, str(ROOT / "tools/local-pages/sanitization.py")], capture_output=True, text=True, timeout=60)
+        self.assertEqual(result.returncode, 0, result.stderr[-400:])
+        rows = [line.split() for line in result.stdout.split("\n") if line.strip()]
+        self.assertEqual([row[0] for row in rows], ["pct", "ent", "apos"])
+        for name, seconds, left in rows:
+            with self.subTest(form=name):
+                self.assertLess(float(seconds), 0.5)
+                self.assertEqual(left, "False")
+
+    def test_a_quoted_local_part_holding_an_at_sign_is_omitted_whole(self):
+        # The 51f85b5b micro's B2: the inner match started later than the outer quoted string, and the merge kept the
+        # inner start, so the first quoted word survived. Spans now merge from their earliest start.
+        helper = load_helper()
+        at = "@"
+        for value in ('"zqmh zqmi' + at + 'zqdmh.example.org"' + at + "zqdmi.example.org", 'Mail "zqa zqb' + at + 'zqc.example.org"%40zqd.example.org now'):
+            with self.subTest(value=value):
+                out = helper.text(value)
+                self.assertNotIn("zq", out)
+                self.assertIn("[email omitted]", out)
+
+    def test_json_escaped_quotes_open_and_close_a_quoted_local_part(self):
+        # The 51f85b5b micro's (c)1, ruled a P1: a JSON-serialized string writes the quotes of a quoted local part as \",
+        # which read as a quoted pair, so \"w1 w2\"@d.example.org stayed readable on three pages.
+        import json
+        helper = load_helper()
+        at = "@"
+        address = '"zqmb zqmc"' + at + "zqdmb.example.org"
+        for value in (json.dumps(address)[1:-1], json.dumps({"to": address}), json.dumps(json.dumps({"to": address})), "note: " + json.dumps(address)):
+            with self.subTest(value=value):
+                out = helper.text(value)
+                self.assertNotIn("zqmb", out)
+                self.assertNotIn("zqdmb", out)
+
+    def test_residue_after_masking_drops_the_value(self):
+        # The 51f85b5b adjudication's fail-closed guard: a value that still holds an at sign, raw or encoded, followed by
+        # a domain and directly after a word character, or after a quote with only whitespace between, is dropped.
+        helper = load_helper()
+        at = "@"
+        for value in ('"zqsp" ' + at + "zqdsp.example.org", '"zq' + "w" * 300 + '"' + at + "zqdlong.example.org", "'zqq' %40zqdq.example.org"):
+            with self.subTest(value=value[:30]):
+                self.assertEqual(helper.text(value), helper.RESIDUE_OMITTED)
+                self.assertEqual(helper.sanitize({"k": [value]}), {"k": [helper.RESIDUE_OMITTED]})
+        for public in ("imports " + at + "AGENTS.md", "- serena " + at + " 2.0.0.dev0 " + at + " c6fbd1c5", "as " + at + "DBOS.workflow", "--body " + at + "preview.json",
+                       "fixture/skills" + at + "0123456789ab", "git-maintenance" + at + "daily.timer", "npm i " + at + "anthropic-ai/claude-code" + at + "2.1.296",
+                       "actions/checkout" + at + "v4", "`CLAUDE.md` that imports `" + at + "AGENTS.md`", "@codex review", "https://medium.com/" + at + "someone.handle/post"):
+            with self.subTest(public=public):
+                self.assertEqual(helper.text(public), public)
+        self.assertEqual(helper.text(helper.RESIDUE_OMITTED), helper.RESIDUE_OMITTED)
+
     def test_addresses_on_the_target_domain_are_masked(self):
         # The micro at bdc09788, (a)1: `target` is a delegated top-level domain (public_suffix_list.dat:10339-10341),
         # so exempting it as a systemd unit type left an address there readable in every form, short or long.
@@ -260,7 +345,10 @@ class SanitizationTests(unittest.TestCase):
         for form in ("owner" + at + "example.target", "owner%40example.target", "owner&#64;example.target"):
             with self.subTest(form=form):
                 self.assertEqual(helper.text("mail " + form + " now"), "mail [email omitted] now")
-                self.assertEqual(helper.text("x" * 4100 + form), "[email omitted]")
+                out = helper.text("x" * 4100 + form)
+                self.assertTrue(out.endswith("[email omitted]"))
+                self.assertNotIn("owner", out)
+                self.assertNotIn("target", out)
 
     def test_exempt_unit_types_are_not_public_suffixes(self):
         # Class guard for the same finding: a unit type exempted from the mask must not be a top-level domain in the

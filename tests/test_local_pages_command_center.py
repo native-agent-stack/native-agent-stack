@@ -455,6 +455,21 @@ class CommandCenterViewTests(unittest.TestCase):
         self.assertIn('<strong>UNKNOWN</strong> <span>tokens saved (RTK estimate)</span>', strip(markup))
         self.assertNotIn("999M", strip(markup))
 
+    def test_values_dropped_after_masking_are_counted_on_the_page(self):
+        # The fail-closed residue guard drops a value whole; the page states how many, and the section reads partial.
+        current = current_fixture()
+        current["in_review"][0]["state"] = '"zqsp" ' + AT + "zqdsp.example.org"
+        current["waiting_on_owner"][2]["what"] = '"zq' + "w" * 300 + '"' + AT + "zqdlong.example.org"
+        markup, statuses = self.render(current=current)
+        self.assertNotIn("zqsp", markup)
+        self.assertNotIn("zqdlong", markup)
+        self.assertIn("missing input: 2 values omitted because an at sign beside a word remained after masking", markup)
+        self.assertEqual(statuses["cc-prs"]["status"], "partial")
+        self.assertIn("1 value omitted after masking", statuses["cc-prs"]["detail"])
+        self.assertIn("1 value omitted after masking", statuses["cc-owner"]["detail"])
+        clean, _ = self.render()
+        self.assertNotIn("omitted because an at sign", clean)
+
     def test_malformed_pr_rows_are_rejected_with_a_stated_gap(self):
         # Astra's first read of a737ef98 (P2, review_probes.py:31): rows that are not objects rendered "No pull requests
         # in review." as wired, while the strip counted them as two PRs.
@@ -979,6 +994,52 @@ class CommandCenterComposerTests(unittest.TestCase):
         self.assertEqual(surviving_parts(page), [])
         self.assertIn("[email omitted]", page)
         self.assertEqual(surviving_parts(json.dumps(receipt)), [])
+
+    def test_empty_quoted_and_punctuation_only_addresses_never_reach_the_page(self):
+        # Astra's read of 51f85b5b, P1 1, with her probe inputs (review_probes.py): both stayed readable on the page.
+        self.add_sections()
+        self.write_inputs()
+        for address in ('""' + AT + "example.target", "!!!" + AT + "example.target"):
+            with self.subTest(address=address):
+                self.current["in_review"][0]["state"] = "Reply to " + address
+                self.write_json(self.current_path, self.current)
+                self.refresh()
+                page = decoded_text((self.output / "command-center.html").read_text())
+                self.assertNotIn(address, page)
+                self.assertNotIn(AT + "example.target", page)
+
+    def test_composer_pages_withhold_every_digest_the_receipt_marks_private(self):
+        # Astra's read of 51f85b5b, P1 2 (#161): sources.html published the SHA-256 of research-queue.tsv's raw bytes, so a
+        # guessed private line could be confirmed. The command-center state inputs and cc-now.json are marked private and
+        # keep their digests in the nonserved receipt only. Scope: the pages this composer builds. Other state-root rows
+        # on sources.html (gaps, roadmap, readiness receipts) keep their raw digests, as on main; the architecture
+        # builder's custody pages are not in this output.
+        self.add_sections()
+        self.write_inputs()
+        queue = self.state / "coordination/ns2604-coop/research-queue.tsv"
+        raw = ("date_utc\tquestion\n2026-10-11\tContact zqprivate" + AT + "example.org\n").encode()
+        queue.write_bytes(raw)
+        receipt = self.refresh()
+        private = {"command_center:" + name: hashlib.sha256(((self.state if base == "state" else self.root) / relative).read_bytes()).hexdigest()
+                   for name, base, relative, _, _ in BUILDER.COMMAND_CENTER_INPUTS if base == "state" and ((self.state / relative).is_file())}
+        # cc-now.json is the CC's private state too; the composer's notes and custody rows keep its digest in the receipt.
+        private["cc_now"] = hashlib.sha256(self.current_path.read_bytes()).hexdigest()
+        self.assertIn("command_center:research_queue", private)
+        for name, digest in private.items():
+            with self.subTest(input=name):
+                self.assertEqual(receipt["inputs"][name]["sha256"], digest)
+                self.assertTrue(receipt["inputs"][name]["private"])
+        pages = sorted(self.output.rglob("*.html"))
+        self.assertIn("sources.html", [page.name for page in pages])
+        for page in pages:
+            text = page.read_text()
+            with self.subTest(page=page.name):
+                self.assertEqual([name for name, digest in private.items() if digest in text], [])
+                self.assertNotIn("zqprivate", decoded_text(text))
+        sources = (self.output / "sources.html").read_text()
+        self.assertIn("private state input; this page withholds its digest, which the nonserved receipt keeps", sources)
+        for name in ("readiness", "evidence"):
+            self.assertIn(hashlib.sha256((self.root / dict((n, r) for n, _, r, _, _ in BUILDER.COMMAND_CENTER_INPUTS)[name]).read_bytes()).hexdigest(), sources)
 
     def test_unapproved_input_is_a_gap_not_a_stop(self):
         self.write_inputs()
