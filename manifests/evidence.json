@@ -18736,6 +18736,11 @@
       "bytes": 2668
     },
     {
+      "path": "docs/decisions/2026-10-11-research-convergence-practice.md",
+      "sha256": "18c527a058b4e9cb85d0d00221109c52e3dff54137674ff06357126c2f4f4198",
+      "bytes": 14811
+    },
+    {
       "path": "docs/direct-results.md",
       "sha256": "12a511fee11f22c90b9b622701d5485be9c8247167102b5768d694244f939a5b",
       "bytes": 4022
@@ -43317,8 +43322,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/research-harnesses-skill.md",
-      "sha256": "c1687bd15def737c16898d43b6429d413c051f94e0d0964021f3e6af709f0cb8",
-      "bytes": 2275
+      "sha256": "cea12f75b7702a417ffa453723309b0bba0769e2ae579d31e3543c88169a1282",
+      "bytes": 3438
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/rtk-config.toml",
@@ -62219,6 +62224,11 @@
       "path": "tests/test_render_config.py",
       "sha256": "03d31001eef58ba1d6cf1498d9a7e9c6d6fe391d5ff9a4d02a9174bdc89dc136",
       "bytes": 47826
+    },
+    {
+      "path": "tests/test_research_convergence_practice.py",
+      "sha256": "53a1200f7455f9a26e3d9a81110b0b238ea843582b5c3cd1075acc8a40c9478a",
+      "bytes": 884
     },
     {
       "path": "tests/test_research_dispatch.py",

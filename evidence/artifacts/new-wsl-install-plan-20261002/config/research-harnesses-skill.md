@@ -3,6 +3,23 @@ name: native-stack-research
 description: Use for current public facts, source-backed technical research, and comparisons of upstream tools with GPT Researcher. Use DeerFlow when the task requires two independent research outputs.
 ---
 
+For ecosystem discovery, upstream comparison or layer convergence, first read
+`docs/decisions/2026-10-11-research-convergence-practice.md` in the owned source
+checkout and the layer's recorded verdict and latest retained sweep, including
+the pending-observation recovery once #978 lands and WS1's pending category
+outputs once published. Disclose those gaps meanwhile. Research the unresolved delta; a CLOSED practice reopens
+on a new practice-tool release or a measured practice failure. If the source
+checkout or those inputs are unavailable, obtain their pointers from the research
+owner before dispatch. Ordinary public-fact questions use the routes below.
+
+Gathering ends with sources and retained usage/failures. Candidate decisions use
+the blind layer-verdict lane, with #993's collection enforcement pending landing;
+a gatherer's answer is an input to that lane. Read the decision's canonical
+authority pointers for terminal states and review rules instead of treating
+this skill as another definition. Candidate changes enter
+`catalogs/landscape/research-state.json` with a layer id through the research
+owner; the co-op's research-queue.tsv is intake.
+
 For authorized public research, run the installed GPT Researcher route:
 
 ```bash
