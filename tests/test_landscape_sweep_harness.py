@@ -5026,7 +5026,7 @@ class UsageRecordTests(unittest.TestCase):
         self.assertEqual(usage["effort_mismatches"], [{"child": orphan["label"], "efforts": []}])
         self.assertEqual(document["measurement"]["post_processing"]["linked_attempts"], 1)
 
-    def test_post_processing_retains_source_reason_and_covered_attempt_provenance(self):
+    def test_post_processing_withholds_source_reason_and_retains_covered_attempt_provenance(self):
         raw = paused_child_usage("critic")
         retry = next(c for c in raw["children"] if c["label"] == "critic" and c["complete"])
         same_key_target = next(c for c in raw["children"] if c["label"] == "discover:alpha")
@@ -5041,7 +5041,7 @@ class UsageRecordTests(unittest.TestCase):
         self.assertEqual(done.returncode, 0, done.stderr)
         processing = document["measurement"]["post_processing"]
         self.assertEqual(processing["source_status"], raw["status"])
-        self.assertEqual(processing["source_reason"], raw["reason"])
+        self.assertNotIn("source_reason", processing)
         self.assertEqual(processing["linked_agent_ids"], ["killed"])
         self.assertEqual(processing["covered_agent_ids"], ["same-key-killed", "killed"])
         self.assertEqual(processing["covered_effort_mismatches"],
@@ -5093,7 +5093,8 @@ class UsageRecordTests(unittest.TestCase):
         self.assertEqual(done.returncode, 1)
         usage = document["child_usage"]
         self.assertEqual(usage["status"], "incomplete")
-        self.assertEqual(usage["superseded_attempts"][0]["usage_issues"], raw["children"][0]["usage_issues"])
+        self.assertEqual(usage["superseded_attempts"][0]["usage_issues"], ["provider_usage_incomplete"])
+        self.assertEqual(usage["superseded_attempts"][0]["usage_issues_count"], 1)
 
     def test_native_changed_keys_link_two_critics_and_a_followup_and_count_usage_once(self):
         self.assertTrue(NODE, "node is required for the native child-usage.mjs changed-key recovery fixture")
@@ -5144,10 +5145,11 @@ class UsageRecordTests(unittest.TestCase):
         document = json.loads((work / "usage.json").read_text())
         self.assertEqual(document["child_usage"]["transcript_dir"], "<session-transcripts>/subagents/workflows/wf_fixture-1")
         self.assertNotIn("raw_output_sha256", document["measurement"])
+        self.assertEqual(document["measurement"]["processor_sha256"], hashlib.sha256(
+            (HARNESS / "usage_record.py").read_bytes()).hexdigest())
         self.assertEqual(document["measurement"]["tool_sha256"], hashlib.sha256(
             (ROOT / usage_record.TOOL).read_bytes()).hexdigest())
-        self.assertEqual(document["measurement"]["command"], "node examples/claude-native/workflows/child-usage.mjs "
-                         "<session-transcripts>/subagents/workflows/wf_fixture-1 --require-effort max")
+        self.assertNotIn("command", document["measurement"])
         self.assertEqual(json.loads(done.stdout)["workflow_run"], "wf_fixture-1")
 
     def test_incomplete_usage_is_written_with_exit_1_and_private_content_is_refused(self):

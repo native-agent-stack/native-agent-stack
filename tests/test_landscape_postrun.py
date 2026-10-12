@@ -100,7 +100,9 @@ class CompletedSupersessionTests(unittest.TestCase):
             "nativeRun": {"runId": "wf_fixture-1", "status": "completed"},
             "originalPrefix": {"byteEqual": True},
             "reexecutedResultEqualsNative": True,
-            "supersessionPairs": self.proof["supersessionPairs"],
+            "supersessionPairs": [{field: pair[field] for field in
+                                   ("label", "superseded_agent_id", "superseded_by_agent_id")}
+                                  for pair in self.proof["supersessionPairs"]],
         })
         published_preimage = (json.dumps(redacted, indent=1, ensure_ascii=False) + "\n").encode()
         self.assertEqual(provenance["proof_sha256"], hashlib.sha256(published_preimage).hexdigest())
@@ -119,7 +121,7 @@ class CompletedSupersessionTests(unittest.TestCase):
         with self.subTest(publication="cli"):
             self.assertFalse(identity in done.stdout + done.stderr, "unvalidated pair metadata reaches CLI output")
         provenance = json.loads(receipt)["measurement"]["post_processing"]["explicit_supersession"]
-        fields = {"label", "superseded_agent_id", "superseded_key", "superseded_by_agent_id", "superseded_by_key"}
+        fields = {"label", "superseded_agent_id", "superseded_by_agent_id"}
         for location in ("pairs", "proof"):
             pairs = provenance["pairs"] if location == "pairs" else provenance["proof"]["supersessionPairs"]
             with self.subTest(publication=location):
@@ -144,6 +146,122 @@ class CompletedSupersessionTests(unittest.TestCase):
         self.assertEqual(set(provenance), {"proof", "proof_sha256", "processor_sha256", "pairs"})
         processor = HARNESS / "usage_record.py"
         self.assertEqual(provenance["processor_sha256"], hashlib.sha256(processor.read_bytes()).hexdigest())
+
+    def test_public_cli_digest_audit_accepts_only_known_public_authentication(self):
+        done = self.run_usage(explicit=True)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        pairs = [{field: pair[field] for field in
+                  ("label", "superseded_agent_id", "superseded_by_agent_id")}
+                 for pair in self.proof["supersessionPairs"]]
+        public_proof = {"status": "proved-actual-resumed-run",
+                        "nativeRun": {"runId": "wf_fixture-1", "status": "completed"},
+                        "originalPrefix": {"byteEqual": True}, "reexecutedResultEqualsNative": True,
+                        "supersessionPairs": pairs}
+        public_bytes = (json.dumps(public_proof, indent=1, ensure_ascii=False) + "\n").encode()
+        root = Path(__file__).resolve().parents[1]
+        known_public = {hashlib.sha256(public_bytes).hexdigest(),
+                        hashlib.sha256((HARNESS / "usage_record.py").read_bytes()).hexdigest(),
+                        hashlib.sha256((root / "examples/claude-native/workflows/child-usage.mjs").read_bytes()).hexdigest(),
+                        subprocess.check_output(["git", "-C", str(root), "rev-parse", "HEAD"], text=True).strip()}
+        for location, text in (("receipt", (self.work / "usage.json").read_text()),
+                               ("stdout", done.stdout), ("stderr", done.stderr)):
+            with self.subTest(publication=location):
+                tokens = set(re.findall(r"(?:v2:)?[0-9a-fA-F]{7,}", text))
+                unknown = tokens - known_public
+                native_keys = sum(token.startswith("v2:") for token in unknown)
+                self.assertEqual(len(unknown), 0,
+                                 f"{len(unknown)} unknown authentication tokens, including {native_keys} native keys")
+
+    def test_public_cli_output_allowlist_withholds_unknown_nested_native_fields(self):
+        private = "v2:" + hashlib.sha256(b"synthetic unpublished native prompt").hexdigest()
+        self.raw["private_capture"] = {"key": private}
+        self.raw["children"][0]["final_return"] = {"prompt_key": private}
+        self.raw["children"][0]["usage"] = {"output_tokens": 5, "private_capture": private}
+        self.raw["children"][0]["web_search"]["private_capture"] = private
+        self.raw["by_resolved_model"]["fixture"]["private_capture"] = private
+        self.raw["web_search"]["private_capture"] = private
+        self.raw["effort_mismatches"][0]["private_capture"] = private
+        self.write("raw.json", self.raw)
+        done = self.run_usage(explicit=True)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        receipt = (self.work / "usage.json").read_text()
+        for location, text in (("receipt", receipt), ("stdout", done.stdout), ("stderr", done.stderr)):
+            with self.subTest(publication=location):
+                self.assertFalse(private[3:10] in text, "non-allowlisted native metadata reaches publication")
+        value = json.loads(receipt)
+        self.assertEqual(set(value), {"schema_version", "measurement", "child_usage"})
+        self.assertEqual(set(value["measurement"]),
+                         {"tool", "tool_sha256", "processor_sha256", "exit_code", "post_processing"})
+        self.assertEqual(value["child_usage"]["by_resolved_model"]["fixture"]["output_tokens"], 4321)
+        old = next(x for x in value["child_usage"]["superseded_attempts"] if x["agent_id"] == "old0")
+        self.assertEqual(set(old["usage"]), {"output_tokens"})
+        self.assertEqual(old["usage"]["output_tokens"], 5)
+
+    def test_explicit_supersession_never_accepts_a_nonmax_required_effort(self):
+        for child in self.raw["children"]:
+            child["efforts"] = ["high"]
+        self.raw["effort_mismatches"] = []
+        self.write("raw.json", self.raw)
+        done = self.run_usage(explicit=True, required="high")
+        self.assertEqual(done.returncode, 2)
+        self.assertIn("max effort", done.stderr)
+        self.assertFalse((self.work / "usage.json").exists())
+
+    def test_native_authentication_cannot_be_relabelled_as_a_public_status_or_label(self):
+        private = "v2:" + hashlib.sha256(b"synthetic private prompt identity").hexdigest()
+        for field, explicit in (("status", True), ("label", False)):
+            with self.subTest(field=field):
+                raw = copy.deepcopy(self.raw)
+                if field == "status":
+                    raw["status"] = private
+                else:
+                    raw["children"][0]["label"] = private
+                self.write("raw.json", raw)
+                done = self.run_usage(explicit=explicit)
+                self.assertEqual(done.returncode, 2)
+                self.assertEqual(done.stdout, "")
+                self.assertFalse(private[3:10] in done.stderr)
+                self.assertFalse((self.work / "usage.json").exists())
+
+    def test_unhashable_native_journal_identities_refuse_without_a_traceback(self):
+        original = (self.work / "journal.jsonl").read_text()
+        for row_type in ("started", "result"):
+            for field in ("agentId", "key"):
+                for invalid in ([], {}):
+                    with self.subTest(row_type=row_type, field=field, value_type=type(invalid).__name__):
+                        rows = [json.loads(line) for line in original.splitlines()]
+                        next(row for row in rows if row.get("type") == row_type)[field] = invalid
+                        (self.work / "journal.jsonl").write_text("".join(json.dumps(row) + "\n" for row in rows))
+                        proof = copy.deepcopy(self.proof)
+                        proof["finalJournalSha256"] = self.sha("journal.jsonl")
+                        self.write("proof.json", proof)
+                        done = self.run_usage(explicit=True)
+                        self.assertEqual(done.returncode, 2)
+                        self.assertIn("invalid native identity", done.stderr)
+                        self.assertNotIn("Traceback", done.stderr)
+                        self.assertFalse((self.work / "usage.json").exists())
+
+    def test_nontext_measured_agent_ids_refuse_on_explicit_and_ordinary_paths(self):
+        for explicit in (False, True):
+            for invalid in ([], {}):
+                for prior_receipt in (False, True):
+                    with self.subTest(explicit=explicit, value_type=type(invalid).__name__, prior=prior_receipt):
+                        raw = copy.deepcopy(self.raw)
+                        raw["children"][0]["agent_id"] = invalid
+                        self.write("raw.json", raw)
+                        path = self.work / "usage.json"
+                        if prior_receipt:
+                            path.write_text("previous receipt stays unchanged\n")
+                        else:
+                            path.unlink(missing_ok=True)
+                        done = self.run_usage(explicit=explicit)
+                        self.assertEqual(done.returncode, 2)
+                        self.assertNotIn("Traceback", done.stderr)
+                        self.assertEqual(done.stdout, "")
+                        if prior_receipt:
+                            self.assertEqual(path.read_text(), "previous receipt stays unchanged\n")
+                        else:
+                            self.assertFalse(path.exists())
 
     def test_native_cli_requires_every_request_effort_to_be_known(self):
         run = self.work / "native"

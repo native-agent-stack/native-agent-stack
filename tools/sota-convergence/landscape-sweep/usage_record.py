@@ -11,9 +11,9 @@ Runs this checkout's vendored examples/claude-native/workflows/child-usage.mjs (
 which Claude Code keeps under <config dir>/projects/<project>/<session id>/subagents/workflows/<run id>/, and
 writes {schema_version, measurement, child_usage} in the shape of
 evidence/artifacts/landscape-sweep-20260923-attempts/child-usage-*.json:
-  measurement  tool, tool_commit (null when the tool differs from HEAD), tool_sha256, command, exit_code,
-               measured_at_utc, note, post_processing when applicable; unsanitized stdout hashes stay private
-  child_usage  the post-processed output with transcript_dir rewritten to <session-transcripts>/subagents/workflows/<run id>
+  measurement  fixed tool label, public tool_sha256/processor_sha256, raw exit_code and allowlisted post_processing
+  child_usage  allowlisted labels/agent IDs, model/effort labels, statuses and numeric counters; transcript_dir is
+               rewritten to <session-transcripts>/subagents/workflows/<run id>; unlisted fields stay private
 The ledger needs child_usage.status "complete" for a completed sweep, reads workflow_run from the last segment of
 transcript_dir, and requires lost_workers to equal the incomplete children. An attempt the runtime re-ran under the
 same call key (after a usage-limit pause) is under child_usage.superseded_attempts, not a lost child. Before
@@ -24,14 +24,14 @@ Without an explicit proven pair list, a label with more than one complete child 
 linked. The optional explicit path validates the proof/contract/journal hashes, native started/result identities,
 same-label completed children, temporal order and a measured max-only terminal, including explicitly proved
 completed replacement chains. Its provenance publishes a redacted proof preimage and hashes those exact serialized bytes;
-contract/journal authentication stays in the local inputs; their hashes are checked but never emitted. The
+contract/journal authentication and native call keys stay local; they are checked but never emitted. The
 processor hash authenticates this published script. No native record or usage counter is changed. The ordinary record carries neither call keys
 nor timestamps, so linking observes only a missing result and a later complete same-label attempt. These attempts
 keep their superseded_by and observed reason; their usage already counts in by_resolved_model and is never added again. With no
 incomplete children or superseded usage_issues left, status becomes complete and reason counts the new links.
 An effort mismatch of a superseded attempt is covered only by its same-label re-run completed at the required
 effort. measurement.exit_code remains the tool's raw exit code; raw-output seals stay private. post_processing names the
-links and covered mismatches, including source_status, source_reason, linked_agent_ids, covered_agent_ids and
+links and covered mismatches, including source_status, linked_agent_ids, covered_agent_ids and
 covered_effort_mismatches. multi_model_children is recomputed over the remaining children after a move.
 Refuses to write (exit 3) when the
 sanitized record still matches a scripts/validate.py PRIVATE_CONTENT pattern. Exit 1, with the record still written
@@ -47,10 +47,10 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import subprocess
 import sys
 from collections import Counter
-from datetime import datetime, timezone
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -59,12 +59,139 @@ from sweep_common import REPO_ROOT, json_text, private_content, private_findings
 
 TOOL = "examples/claude-native/workflows/child-usage.mjs"
 MARKER = "/subagents/workflows/"
-NOTE = ("Per-request provider usage of the Claude workflow children, from the retained native transcripts (message "
-        "ids counted once). web_search counts each child's WebSearch calls and those the session's WebSearch cap "
-        "refused (capped). The GPT-6 jobs are Codex usage, retained per job in the run's returns (raw and "
-        "gpt6_usage); the two counters are never summed.")
 SAME_LABEL_REASON = "no result entry; a later complete attempt with the same label returned; call keys not compared"
 EXPLICIT_REASON = "completed attempt superseded by the proven later same-label changed-key rerun"
+PUBLIC_PAIR_FIELDS = ("label", "superseded_agent_id", "superseded_by_agent_id")
+TOKEN_COUNTERS = ("input_tokens", "output_tokens", "cache_read_input_tokens", "cache_creation_input_tokens")
+
+
+def public_counts(value: dict, fields: tuple) -> dict:
+    """The maintained adapter's named numeric counters, never caller-defined metadata."""
+    if not isinstance(value, dict):
+        raise ValueError("native counter record must be an object")
+    result = {}
+    for field in fields:
+        if field in value:
+            count = value[field]
+            if count is not None and (type(count) is not int or count < 0):
+                raise ValueError("native counter must be a nonnegative integer or unknown")
+            result[field] = count
+    return result
+
+
+def public_labels(value: dict, fields: tuple) -> dict:
+    result = {}
+    for field in fields:
+        if field in value:
+            label = value[field]
+            if label is not None and not isinstance(label, str):
+                raise ValueError("native public label must be text or unknown")
+            if isinstance(label, str) and re.search(r"v2:[0-9a-fA-F]{7,}|[0-9a-fA-F]{64}", label):
+                raise ValueError("native authentication is not a public label")
+            result[field] = label
+    return result
+
+
+def public_label_list(value) -> list:
+    if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
+        raise ValueError("native public label list must contain only text")
+    return [public_labels({"label": item}, ("label",))["label"] for item in value]
+
+
+def public_web_search(value: dict) -> dict:
+    result = public_counts(value, ("calls", "capped"))
+    if "capped_children" in value:
+        result["capped_children"] = public_label_list(value["capped_children"])
+    if "first_capped_at" in value:
+        result["first_capped_at"] = None  # Native timestamps remain in the private source.
+    return result
+
+
+def public_model_usage(value: dict, *, aggregate: bool = False) -> dict:
+    if not isinstance(value, dict) or not all(isinstance(model, str) for model in value):
+        raise ValueError("native model usage must be a labeled counter object")
+    return {public_labels({"model": model}, ("model",))["model"]:
+            public_counts(counters, (("children",) if aggregate else ()) + TOKEN_COUNTERS)
+            for model, counters in value.items()}
+
+
+def public_attempt(value: dict) -> dict:
+    """Allow only typed native identities, statuses and measured counters from summarizeChild."""
+    if not isinstance(value, dict):
+        raise ValueError("native attempt must be an object")
+    result = public_labels(value, ("label", "agent_id", "superseded_by", "phase", "agent_type", "requested_model"))
+    result.update(public_counts(value, ("requests", "unknown_effort_requests", "first_request_cache_read",
+                                        "first_request_prompt_tokens")))
+    if "complete" in value:
+        if type(value["complete"]) is not bool:
+            raise ValueError("native attempt completion must be a boolean")
+        result["complete"] = value["complete"]
+    for field in ("resolved_models", "efforts"):
+        if field in value:
+            result[field] = public_label_list(value[field])
+    if "web_search" in value:
+        result["web_search"] = public_web_search(value["web_search"])
+    if "usage" in value:
+        result["usage"] = public_counts(value["usage"], TOKEN_COUNTERS)
+    if "usage_by_model" in value:
+        result["usage_by_model"] = public_model_usage(value["usage_by_model"])
+    for field, status in (("issues", "incomplete_native_attempt"), ("usage_issues", "provider_usage_incomplete")):
+        if field in value:
+            if not isinstance(value[field], list):
+                raise ValueError("native issue record must be a list")
+            result[field] = [status] if value[field] else []
+            result[field + "_count"] = len(value[field])
+    if value.get("reason") in (SAME_LABEL_REASON, EXPLICIT_REASON):
+        result["reason"] = value["reason"]
+    return result
+
+
+def public_mismatch(value: dict) -> dict:
+    if not isinstance(value, dict):
+        raise ValueError("native effort mismatch must be an object")
+    result = public_labels(value, ("child", "superseded_by"))
+    if "efforts" in value:
+        result["efforts"] = public_label_list(value["efforts"])
+    return result
+
+
+def public_run(value: dict) -> dict:
+    """Build the publication representation by allowlist; never recursively copy raw native output."""
+    if value.get("status") not in ("complete", "incomplete"):
+        raise ValueError("native run status must be complete or incomplete")
+    locator = value.get("transcript_dir") or ""
+    if not isinstance(locator, str):
+        raise ValueError("native transcript locator must be text")
+    public_labels({"run": locator.rsplit("/", 1)[-1]}, ("run",))
+    result = {"transcript_dir": sanitize_transcript_dir(locator), "status": value["status"],
+              "children": [public_attempt(child) for child in value.get("children") or []]}
+    if "superseded_attempts" in value:
+        result["superseded_attempts"] = [public_attempt(child) for child in value["superseded_attempts"]]
+    if "by_resolved_model" in value:
+        result["by_resolved_model"] = public_model_usage(value["by_resolved_model"], aggregate=True)
+    if "web_search" in value:
+        result["web_search"] = public_web_search(value["web_search"])
+    if "effort_mismatches" in value:
+        result["effort_mismatches"] = [public_mismatch(item) for item in value["effort_mismatches"]]
+    if "multi_model_children" in value:
+        result["multi_model_children"] = public_label_list(value["multi_model_children"])
+    result["reason"] = (f"{sum(child.get('complete') is not True for child in result['children'])} child(ren) incomplete; "
+                        f"{len(result.get('superseded_attempts', []))} superseded attempt(s)")
+    return result
+
+
+def public_processing(value: dict) -> dict:
+    if value["source_status"] not in ("complete", "incomplete"):
+        raise ValueError("native source status must be complete or incomplete")
+    result = {field: value[field] for field in ("name", "linked_attempts", "effort_mismatches_covered", "source_status")}
+    for field in ("linked_agent_ids", "covered_agent_ids"):
+        result[field] = public_label_list(value[field])
+    result["covered_effort_mismatches"] = [public_mismatch(item) for item in value["covered_effort_mismatches"]]
+    if "explicit_supersession" in value:
+        provenance = value["explicit_supersession"]
+        result["explicit_supersession"] = {field: provenance[field]
+                                           for field in ("proof", "proof_sha256", "processor_sha256", "pairs")}
+    return result
 
 
 def measured_at_required_effort(attempt: dict, required: str = "max") -> bool:
@@ -112,7 +239,7 @@ def proven_supersessions(output: dict, proof_path: Path, contract_path: Path, jo
             or len(pairs) != len(calls) or len(pairs) != len(reruns)
             or not all(isinstance(row, dict) for row in [*pairs, *calls, *reruns])):
         raise ValueError("supersession proof needs one pair and rerun for every contract call")
-    if required != "max" and any(call.get("require_actual_later_complete_max_child") is True for call in calls):
+    if required != "max":
         raise ValueError("the bound supersession contract requires max effort")
     children = output.get("children") or []
     measured_ids = [c.get("agent_id") for c in children if isinstance(c, dict) and c.get("agent_id")]
@@ -126,6 +253,9 @@ def proven_supersessions(output: dict, proof_path: Path, contract_path: Path, jo
         row = json.loads(line)
         if not isinstance(row, dict):
             raise ValueError("supersession journal has a non-object row")
+        if row.get("type") in ("started", "result") and not all(
+                isinstance(row.get(field), str) and row[field] for field in ("agentId", "key")):
+            raise ValueError("supersession journal has invalid native identity")
         if row.get("type") == "started":
             identity = (row.get("key"), row.get("label"), index)
             if row.get("agentId") in starts:
@@ -207,10 +337,8 @@ def proven_supersessions(output: dict, proof_path: Path, contract_path: Path, jo
         active = [child["agent_id"] for child in completed if child["agent_id"] not in old_ids]
         if active != [terminal_id]:
             raise ValueError("supersession label does not have exactly one authorized active terminal")
-    # Project each pair as well as the proof: caller extras and private input seals are never published.
-    pairs = [{field: pair[field] for field in
-              ("label", "superseded_agent_id", "superseded_key", "superseded_by_agent_id", "superseded_by_key")}
-             for pair in pairs]
+    # Keys authenticate unpublished prompts. Validate them above, but publish only labels and agent IDs.
+    pairs = [{field: pair[field] for field in PUBLIC_PAIR_FIELDS} for pair in pairs]
     # Publish only the validated proof projection, excluding private capture metadata and input seals.
     # Retain its exact preimage in the receipt so the digest authenticates redacted, available bytes.
     redacted_proof = {"status": proof["status"], "nativeRun": {"runId": run, "status": native["status"]},
@@ -356,18 +484,26 @@ def record(raw: bytes, exit_code: int, command: str, repo_root: Path, measured_a
     if not isinstance(output, dict) or "status" not in output:
         raise ValueError("child-usage output is not a run summary (no status)")
     output = dict(output)
+    # Validate public identities before either the explicit set lookup or ordinary retry lookup.
+    for field in ("children", "superseded_attempts"):
+        if field in output and not isinstance(output[field], list):
+            raise ValueError("native attempts must be a list")
+        for child in output.get(field) or []:
+            if not isinstance(child, dict):
+                raise ValueError("native attempt must be an object")
+            public_labels(child, ("agent_id", "superseded_by", "label"))
     supplied = (supersession_proof, supersession_contract, supersession_journal)
     if any(path is not None for path in supplied) and not all(path is not None for path in supplied):
         raise ValueError("explicit supersession requires the proof, contract and native journal")
     pairs, provenance = proven_supersessions(output, *supplied, required_effort) if all(supplied) else ((), None)
     processing = post_process(output, required_effort, pairs, provenance)
-    output["transcript_dir"] = sanitize_transcript_dir(output.get("transcript_dir") or "")
+    output = public_run(output)
     return {"schema_version": 1,
-            "measurement": {"tool": f"native-agent-stack {TOOL}", "tool_commit": tool_commit(repo_root),
-                            "tool_sha256": sha256_bytes((repo_root / TOOL).read_bytes()), "command": command,
+            "measurement": {"tool": "native-agent-stack usage_record.py",
+                            "tool_sha256": sha256_bytes((repo_root / TOOL).read_bytes()),
+                            "processor_sha256": sha256_bytes(Path(__file__).read_bytes()),
                             "exit_code": exit_code,
-                            "measured_at_utc": measured_at or datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-                            "note": NOTE, "post_processing": processing},
+                            "post_processing": public_processing(processing)},
             "child_usage": output}
 
 
@@ -390,8 +526,7 @@ def main(argv=None) -> int:
             done = subprocess.run(["node", str(repo / TOOL), args.transcript_dir, "--require-effort", args.require_effort],
                                   capture_output=True, check=False)
             if not done.stdout.strip():
-                raise ValueError(f"child-usage.mjs printed nothing (exit {done.returncode}): "
-                                 f"{done.stderr.decode('utf-8', 'replace').strip()[:300]}")
+                raise ValueError("native child-usage adapter produced no summary")
             raw, code, run_dir = done.stdout, done.returncode, args.transcript_dir
         else:
             if args.exit_code is None:
@@ -403,7 +538,10 @@ def main(argv=None) -> int:
                           supersession_proof=args.supersession_proof, supersession_contract=args.supersession_contract,
                           supersession_journal=args.supersession_journal)
         findings = private_findings(document, private_content(repo))
-    except (ValueError, OSError) as error:
+    except (OSError, UnicodeError, json.JSONDecodeError):
+        print("usage_record.py: input unavailable or invalid JSON", file=sys.stderr)
+        return 2
+    except ValueError as error:
         print(f"usage_record.py: {error}", file=sys.stderr)
         return 2
     if findings:
@@ -423,7 +561,7 @@ def main(argv=None) -> int:
     recovered = processing["linked_attempts"] or processing["effort_mismatches_covered"]
     wrapper_code = 0 if (usage.get("status") == "complete" and not mismatches and not off
                          and (code == 0 or code == 1 and recovered)) else 1
-    print(json.dumps({"out": str(args.out), "status": usage.get("status"), "raw_exit_code": code, "exit_code": wrapper_code,
+    print(json.dumps({"status": usage.get("status"), "raw_exit_code": code, "exit_code": wrapper_code,
                       "workflow_run": usage["transcript_dir"].rsplit("/", 1)[-1], "children": len(children),
                       "incomplete": [c.get("label") for c in children if isinstance(c, dict) and c.get("complete") is not True],
                       "superseded_attempts": [c.get("label") for c in usage.get("superseded_attempts") or []

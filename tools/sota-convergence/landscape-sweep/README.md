@@ -555,7 +555,7 @@ The prerequisites:
 - the `landscape-sweep-worker` agent installed (`python3 tools/adoption/install_claude_profile.py --only agents`); hosts that opted into the held-out token-lanes carriers also refresh both with `python3 tools/adoption/install_claude_profile.py --only guard --hook token-lanes-subagent-start.py --hook token-lanes-session-start.py` (these carriers remain opt-in);
 - `gh` signed in;
 - `codex` on PATH, signed in natively;
-- node and python3.
+- node, python3 and Betterleaks 1.9.0 on PATH (the pinned native publication scanner described below).
 
 The work directory `W` holds prompts, host paths and raw Codex output, so it must sit outside every git repository.
 Every tool here refuses a work directory inside one; Codex would also load that repository's `AGENTS.md` into the
@@ -704,11 +704,11 @@ at c2dee173: Betterleaks 1.9.0 (`81aff7a638638aae3a659845d089043e1d8fe9ac`,
 Percent-encoded and base64 identities are checked in values and keys of all emitted records, including
 the printed summary. No encoded candidate or native diagnostic is printed; a match, oversized record
 or unavailable native scanner refuses before creating or changing output. No new decoder is added.
-Repeated completed labels alone never select a winner. The record
-retains every original under `superseded_attempts`, every aggregate counter, raw exit/hash, and transformation
-provenance with proof, contract, journal and processor hashes. A malformed or unbound proof, non-max replacement
-terminal, cycle, ambiguous terminal or missing native result refuses before writing (exit 2). This does not rerun
-workers or edit native state.
+Repeated completed labels alone never select a winner. An explicit publication allowlist retains labels,
+agent IDs, measured counters, booleans and statuses; private call keys, input seals and free-form metadata stay
+local. Only proof, processor and adapter digests authenticate public preimages. A malformed or unbound proof,
+non-max terminal, cycle, ambiguous terminal or missing native result refuses before writing (exit 2). This does
+not rerun workers or edit native state; every original identity and measured aggregate counter remains.
 
 Requested `effort: max` is not measured max-only effort: a loaded skill may change subsequent request effort.
 The October 10 proof established call options and cache/prompt/result identity, but its quality-evaluation fit

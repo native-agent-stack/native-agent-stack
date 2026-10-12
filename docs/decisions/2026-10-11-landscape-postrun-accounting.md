@@ -35,16 +35,17 @@ unrelated evidence identifiers.
 `usage_record.py` accepts all three explicit inputs: `--supersession-proof`, `--supersession-contract` and
 `--supersession-journal`. Every supplied pair must match a contract call, a proved rerun, exact native started and
 result identities/keys, a common label, and chronological order. An explicit chain must terminate at a complete
-child measured at the required effort only; completed intermediate replacements remain retained. Duplicate
+child measured at max effort only; completed intermediate replacements remain retained. Duplicate
 identities, cycles, ambiguous same-label terminals, unbound files, non-max terminals and absent
 results refuse before writing. Without these inputs, completed repeated labels keep the existing refusal.
-The CLI's optional required-effort value cannot weaken a contract that explicitly requires max; that guard
-also has a public regression observed failing before the fix.
+The explicit CLI requires max even when the contract's optional max flag is absent; the required-effort
+option cannot weaken that policy. Both forms have public regressions observed failing before correction.
 
-Validated originals move intact into `superseded_attempts`, with only `superseded_by` and an explicit reason added.
-Aggregate model usage and WebSearch counters are unchanged. Raw tool exit code and raw output hash are preserved.
-Transformation provenance retains the proof, contract, journal and processor hashes, exact pair list, covered
-findings and original status/reason. Dynamic keys require the proof's `dynamic-recomputed` classification.
+Private originals remain intact in the input; public `superseded_attempts` retain identities, effort, counters
+and the replacement link. Aggregate model usage and WebSearch counts are unchanged. The raw exit code remains;
+raw, contract and journal seals are withheld. Published provenance retains the allowlisted proof, its digest,
+public code digests, three-field pair list, covered findings and source status. Opaque source reasons stay local.
+Dynamic keys require the proof's `dynamic-recomputed` classification and remain validated only locally.
 
 The converter redacts the UUID only in a native session scratchpad path under `.claude/projects` or
 `/tmp/claude-*`, replacing it with `<session-id>` while preserving the scratch file suffix. It handles strings,
@@ -326,8 +327,9 @@ correction follows that ruling and the native receipt path at
 The latter calls the standard library JSON writer and retains its final newline; no alternate writer or
 decoder is introduced.
 
-Every published pair now contains only the five validated identity fields, in both the redacted proof and
-the provenance pair list. Contract/journal hashes remain checked against the input proof before acceptance,
+The earlier correction at `a6335653` projected pairs to five validated identity fields. Two of those fields
+were private native keys; the allowlist correction below supersedes that publication representation.
+Contract/journal hashes remain checked against the input proof before acceptance,
 but neither input seal is emitted. The measurement likewise omits raw stdout authentication. The published provenance retains only the redacted proof, its digest,
 the public processor digest and the validated pair list. The proof digest still authenticates the exact
 embedded redacted preimage; original input authentication stays in the private input files. No native
@@ -338,12 +340,48 @@ example.org metadata reaches the receipt and both pair lists, and all three priv
 After correction, all 15 postrun tests pass (exit 0). The regressions check the receipt and CLI streams,
 including the raw-output, contract and journal seals' first seven hex characters, which also detect any longer leading fragment.
 They also retain positive checks for the embedded proof digest and public processor digest. Test fixtures
-and scratch are synthetic and use `/var/tmp`; the private originals and their digests are not published here.
+are synthetic; these verification commands set `TMPDIR=/var/tmp`, which the fixtures honor. Originals stay private.
 
 This moves #1032's already prepared pair projection into the owning publication-path fix in #995.
 #1032 retains the receipt sweep, append-only redaction bindings and wording cleanup; it is retargeted only
 after this corrected #995 lands. The reviewed heads and their historical residual remain subject to the
 previously recorded #161/#177 acceptance; no history rewrite or purge is claimed.
-The CC's #177 residual census records 22 raw-output digest values in 16 committed files on main, counts only.
+The CC's corrected #177 census at `bb945f1c` records 22 raw-output digest values in 17 committed files, counts only.
 The follow-up is to determine which raw outputs were identity-bearing before deciding whether to scrub the
 current copies; other tools' outputs are outside this publication-path correction.
+
+## 2026-10-12 correction: allowlisted publication and local native keys
+
+The CC's 09:11:16Z addendum reopens `a6335653` for a new reproduced P1: validated native call keys still
+reached both published pair lists. The versioned Claude Code 2.1.296 executable matches the public executable
+digest cited above. Its `No(e,r,s)` at byte 228287282, following `var Br="v2"` at 228286436, hashes the previous
+key, prompt and options with NUL separators. Those prompts are private, so the keys must remain local.
+
+The correction builds the complete receipt through an explicit output allowlist, following the
+maintained adapter's `summarizeChild` fields and four `COUNTERS` at
+`a6335653:examples/claude-native/workflows/child-usage.mjs:3304` and `:45`, and the repository's supported
+`json_text` writer at `a6335653:tools/sota-convergence/landscape-sweep/sweep_common.py:56`. Public pairs contain
+only labels and the two agent IDs. Native keys remain necessary for contract/journal identity and chronology
+validation but are never serialized. Known token, request and search counters and completion/effort statuses
+remain available to the converter, result builder and ledger. Unknown nested fields, final returns, opaque
+source reasons, input seals, command metadata and private timestamps stay in the raw inputs. Usage issues
+are published as fixed status codes and counts. The CLI summary also withholds its private output path.
+
+Only `proof_sha256` over the embedded allowlisted proof and the public `processor_sha256`/`tool_sha256`
+code digests remain as authentication fields. The digest-audit regression scans receipt, stdout and stderr for every hex or
+`v2:` token of at least seven hex characters and compares against independently identified public preimages.
+At `a6335653`, it finds 25 unapproved tokens including all 24 native keys. Its diagnostics report counts only.
+An additional regression plants synthetic authentication under unknown nested native fields, and another
+checks that native authentication cannot be relabeled as a public status or label. No real identity or
+private native input is used in these fixtures.
+
+The explicit path always requires max effort, including contracts without the optional max flag.
+Malformed journal agent IDs or keys and measured child IDs refuse with exit 2 and a fixed diagnostic before
+an explicit or ordinary identity lookup or write. A pre-existing output remains untouched on refusal.
+The README names Betterleaks 1.9.0 as a prerequisite and describes only public proof/code digests.
+The repo-wide residual is 17 files, verified by filename-only Git search at `bb945f1c`; no digest values are
+republished in this record. Historical native inputs and their authentication remain private.
+
+The CC's addendum-03 governs the wave: both reads at `a6335653` finish before one released correction commit
+and its delta reads. Their additional reproduced findings belong in that same correction. #1032's readiness
+trigger is #995 landing. No landing or production acceptance is inferred from the local fixtures.
