@@ -337,6 +337,9 @@ def load_mover_config(path):
         config = json.loads(Path(path).read_text())
     except (OSError, ValueError) as error:
         raise ValueError("invalid_mover_config_json") from error
+    from exploration import apply_exit_preset, is_exploratory
+    is_exploratory(config)
+    apply_exit_preset(config, "mover")
     if (not isinstance(config, dict) or config.get("schema_version") != 1
             or isinstance(config.get("schema_version"), bool)
             or config.get("mode") != "mover_paper" or config.get("protocol") != PROTOCOL_ID):

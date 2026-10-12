@@ -341,8 +341,10 @@ class RunnerCli(_NoLeakMixin, unittest.TestCase):
         self.tmp.cleanup()
 
     def main(self, *extra):
+        config_path=self.root / 'config.json'
+        config_path.write_text(json.dumps(self.CONFIG))
         argv = ["runner.py", "preflight", "--output", str(self.output), "--state-root", str(self.root / "state"),
-                "--config", str(self.root / "unused-config.json"), *extra]
+                "--config", str(config_path), *extra]
         network = Mock(side_effect=runner_module.TransportError("fixture preflight stop"))
         loader = Mock(return_value=(dict(self.CONFIG), None, None))
         with patch.object(sys, "argv", argv), \

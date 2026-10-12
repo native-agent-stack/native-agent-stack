@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "version": "paper-exits-v1-20261012",
+  "authority": "CC paper-plan ruling 2026-10-12 and addendum 01; lane B exploratory only; no empirical selection",
+  "evidence_class": "exploratory",
+  "status": "candidate_mechanics; historical_selection_NOT_RUN",
+  "risk_ceiling": "existing RiskLimits code ceilings unchanged; over-ceiling configurations refuse",
+  "sources": [
+    "native-agent-stack@d8f7e205:adaptive-paper/config.json:30-34 and tests/test_adaptive_paper_exits.py:147-161,234-250",
+    "native-agent-stack@d8f7e205:adaptive-paper/mover.py:77-81; X1-X4 mechanisms at existing registered values"
+  ],
+  "adaptive": {
+    "baseline": {"stop_bps": 25, "take_profit_bps": 40, "trailing_bps": 15, "min_hold_seconds": 5, "max_hold_seconds": 90, "take_profit_fraction": 1.0},
+    "volatility": {"stop_bps": 20, "take_profit_bps": 40, "trailing_bps": 15, "min_hold_seconds": 5, "max_hold_seconds": 90, "vol_stop_multiplier": 2.0, "vol_reference_bps": 10, "stop_min_bps": 1, "stop_max_bps": 1000},
+    "time-decay": {"stop_bps": 100, "take_profit_bps": 40, "trailing_bps": 100, "min_hold_seconds": 5, "max_hold_seconds": 100, "stop_min_bps": 1, "stop_max_bps": 1000, "trailing_min_bps": 1, "trailing_max_bps": 1000, "time_decay_start_seconds": 50, "time_decay_min_multiplier": 0.2}
+  },
+  "mover": {
+    "X1": {"exit": "X1"},
+    "X2": {"exit": "X2", "x2_hold_seconds": 3600},
+    "X3": {"exit": "X3", "x3_trail_fraction": "0.85"},
+    "X4": {"exit": "X4", "x4_stop_fraction": "0.85", "x4_target_fraction": "1.50"},
+    "chain": {"exit": ["X1", "X4", "X3", "X2"], "x2_hold_seconds": 3600, "x3_trail_fraction": "0.85", "x4_stop_fraction": "0.85", "x4_target_fraction": "1.50"}
+  }
+}
