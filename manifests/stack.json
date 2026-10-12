@@ -2014,6 +2014,28 @@
         "https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-docs/docs/developer/installation.md#L229"
       ],
       "freshness": "Recorded NativeStack2604 vendor installation, CPU retrieval, gateway startup verification and synthetic native round trips accepted on 2026-10-08. Repository template recovery/allowlist fixes await a separate CC-cued host apply; recall quality, point-in-time exclusion and unchanged upstream tests remain outside this acceptance."
+    },
+    {
+      "id": "harbor",
+      "repository": "https://github.com/harbor-framework/harbor",
+      "version": "0.24.0",
+      "license": "Apache-2.0",
+      "profile": "optional",
+      "role": "Container harness that runs each agent runtime in its own Docker container through upstream-shipped adapters, for parallel runtime work",
+      "commands": [
+        "harbor --version",
+        "harbor run --help"
+      ],
+      "evidence_ids": [
+        "harbor-smoke-20261012"
+      ],
+      "upstream_sources": [
+        "https://github.com/harbor-framework/harbor",
+        "https://github.com/harbor-framework/harbor/releases/tag/v0.24.0"
+      ],
+      "source_pin": "b53b8134e1241686dca7759af188f987ecc48e8b",
+      "freshness": "2026-10-12 native acceptance on this host (Linux x86_64 WSL2, rootless Docker 29.8.2) in a private tool scope: wheel 0.24.0 (SHA256 23b7ba616a3aae4eff561ced5e2c51c7186f2981e53a770dea9c689d3969877c) installed with uv tool install, harbor --version printed 0.24.0 (exit 0), and the oracle agent and the claude-code adapter (claude-haiku-5-5, Anthropic key injected per command) each passed Harbor's hello-world task with reward 1.0 in Docker. One container-to-gateway TCP probe timed out (rootless --disable-host-loopback), so container adapters use route a only and gateway routes use terminus-2 with api_base. Agent CLIs install latest unless pinned with --ak version=; the upstream acceptance command was not run. Scope and limits are in the receipt.",
+      "optional_reason": "Useful specialist/reference component; not a required condition for the demonstrated native core."
     }
   ],
   "profiles": [
@@ -2096,7 +2118,8 @@
         "worktrunk",
         "llama-cpp",
         "omniroute",
-        "nautilus-trader"
+        "nautilus-trader",
+        "harbor"
       ]
     },
     {

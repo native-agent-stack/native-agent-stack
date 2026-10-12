@@ -4891,6 +4891,24 @@
         "No catalogue/workflow/credential/configuration/frozen native evidence or N2 gate changed."
       ],
       "path": "evidence/receipts/srt-source-citations-20261008.json"
+    },
+    {
+      "id": "harbor-smoke-20261012",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "harbor"
+      ],
+      "claim": "Harbor 0.24.0 was installed through its documented uv tool route into a private tool directory and ran its own hello-world example task through the Docker environment: one zero-spend oracle trial and one claude-code trial (claude-haiku-5-5, Anthropic API key injected per command by the repository credential runner). Both trials ended with reward 1.0 and 0 exceptions. One TCP connect from a throwaway container to the local gateway port at the gvisor-tap-vsock gateway address timed out, so container-resident adapters have no measured route to the gateway.",
+      "limitations": [
+        "One trial of Harbor's trivial hello-world task with one adapter (claude-code) on one route (Anthropic API). Route b (an OpenAI-compatible base URL) and the other seven adapters in the route table were read from source and have no live result.",
+        "The Claude Code CLI inside the container was the latest at run time (2.1.296) because the adapter installs latest unless --ak version= is given; the agent CLI is not pinned by this receipt.",
+        "The upstream mirror head dc933be7 is 31 commits after v0.24.0 and was not installed. The installed artifact is the v0.24.0 wheel; the source files cited for the route table are identical between the wheel and the mirror head except installed/base.py, codex.py, mini_swe_agent.py, environments/docker/docker.py and cli/jobs.py.",
+        "Container-to-gateway reachability was measured once: one TCP connect from a throwaway ubuntu:24.04 container on the default bridge network to 10.0.2.1:21128 timed out after 5 s (silently dropped, not refused) while a control connect to 10.0.2.1:53 opened. The probe covers one image, one network path and one port; it does not test other addresses, compose networks or a changed daemon configuration.",
+        "Agent setup took 171.34 s of the 204.17 s trial on a bare ubuntu:24.04 image. No prebuilt-image run was measured.",
+        "Isolation from <HOME>/.claude was checked by modification time and size plus a construction argument. A live Claude Code session and sibling agents rewrite <HOME>/.claude.json and <HOME>/.claude/projects continuously, so those two before/after values do not discriminate on their own.",
+        "The docker container count moved from 67 to 66 during the smoke window. No container named for Harbor, hello-world or hb__ existed before or after; the change is attributed to a process outside this lane."
+      ],
+      "path": "evidence/receipts/harbor-smoke-20261012.json"
     }
   ],
   "files": [
@@ -5471,8 +5489,8 @@
     },
     {
       "path": "adoption/manifest.json",
-      "sha256": "a6df838a2d56945fb95535e56a9c229aaac0518cfbbc2db32b45102556e48e61",
-      "bytes": 20210
+      "sha256": "2cdec6a1b92580527226c2c2196b8d5de809ee81877bdc6d95bf43481e388ee5",
+      "bytes": 20245
     },
     {
       "path": "adoption/mcp/claude-user.json",
@@ -11572,8 +11590,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "62af01df711becb1bfa95c41410308fe8c236df281d1b60fc09eaac5f0bfc3d6",
-      "bytes": 507941
+      "sha256": "6c222e9ea08d3afe14eec5e86efa2df0f9e2d07730bdf64c86901a4ab8834937",
+      "bytes": 512938
     },
     {
       "path": "blueprints/trials-20260926/README.md",
@@ -17287,7 +17305,7 @@
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
-      "sha256": "b7b2c18ee782d0bb9168357960ceb0e39c11b561261861f87a4ff7295d5e8033",
+      "sha256": "14fd038fb205c6a4ffb54c49c4d3a86b04d9b917b28a39e3866c9b43e56810ce",
       "bytes": 326277
     },
     {
@@ -17342,13 +17360,13 @@
     },
     {
       "path": "catalogs/landscape/final-stack.json",
-      "sha256": "a41b418f6f16b79b77f45dcb58a976d2ba506275c67bddabcb01e7d2467e9424",
-      "bytes": 309186
+      "sha256": "643f13cc543b4f3214774e8e2d13bea298dc7e30e723f7fcb115cbbb0e7d66a4",
+      "bytes": 309707
     },
     {
       "path": "catalogs/landscape/foundation.json",
-      "sha256": "868d193a31080ab913400725140bd0d01e0afe97e28564fd12777f737d22951a",
-      "bytes": 479154
+      "sha256": "bc7d5a739f1965b0c2275cff3a1fa223f8a6a45d16c335fcc767935235a55bb5",
+      "bytes": 479807
     },
     {
       "path": "catalogs/landscape/gap-closeouts/README.md",
@@ -17447,8 +17465,8 @@
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
-      "sha256": "244d2659a3ee3c6c8efc05c87a5b9a1ac4c5eeb159430b92987c7e2434868182",
-      "bytes": 299857
+      "sha256": "48d6fe6c417ad5182e26c0434a8c4c9ac6c0c135c092320c475334d0178829e8",
+      "bytes": 303756
     },
     {
       "path": "catalogs/landscape/us-equities.json",
@@ -17682,8 +17700,8 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "852ef3b60b709e08d199067d13b45461df560273868fc6b0d9bb33a5c7ccaa5f",
-      "bytes": 1158392
+      "sha256": "23d750c008debcc0ffb59b6460869397a705ff56c728a0328c3c9cb2f1974a03",
+      "bytes": 1158790
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
@@ -19342,12 +19360,12 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "fe0b6628bc589e59dc71a5a0fb6805ecab067e3f06043702919bf7f09ef9cba4",
+      "sha256": "4ce5f261562807cc0eca8e31aaf65cb7bf4c42bc115cf994905fc5ea1dd0bb6e",
       "bytes": 699356
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "f532931c1fa916096f458259d24c8f205d89991d531427d932c773a4fe703bbc",
+      "sha256": "46043b18cade9b754a5a0c8cd6a02e0a39296230de94d5820866a39734f5dc72",
       "bytes": 369789
     },
     {
@@ -43267,8 +43285,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "c1228aa2fab7222aba4bbc7df17fd68bf1acf77b208b329b366a0488a15beee9",
-      "bytes": 76747
+      "sha256": "dad311e1a21d3d05ecb371ef3c1d2c49bba31a85dea75e44724c880826a27dda",
+      "bytes": 78495
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/slot-state-and-core-recipes.json",
@@ -59391,6 +59409,11 @@
       "bytes": 44466
     },
     {
+      "path": "evidence/receipts/harbor-smoke-20261012.json",
+      "sha256": "42a7ee44a1e5100a482b4bcddcb57af451bce7372cc015435facd9c0eb9b8137",
+      "bytes": 20150
+    },
+    {
       "path": "evidence/receipts/headroom-039-qualification-20260925.json",
       "sha256": "3a8e162765fa57f4aa6c06cb30b2a28e7ad7d32aaf0920f46720075e234b061d",
       "bytes": 9318
@@ -60662,8 +60685,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "17c6d6d62b4d9c86b6a4b76d5bd6ca2327f16bb2b3a9b7d3878723f12e92561a",
-      "bytes": 130809
+      "sha256": "f12df017667a032d6841920a1cba81ee46775f79aeb2d84fb1e210e168130617",
+      "bytes": 132446
     },
     {
       "path": "observability/README.md",
@@ -61017,8 +61040,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "8409c0b698949540b0af3e376e65e21e9ad3453557f44512ac1ec7a59c54d8d6",
-      "bytes": 133408
+      "sha256": "403c52fe11591ffb2472d55131ea271a4a837c8a26d9dbcb3f04fc9b73567209",
+      "bytes": 134510
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",

@@ -447,10 +447,10 @@
     "repositories": 901,
     "public_star_repositories": 373,
     "beyond_public_stars": 528,
-    "references": 2845,
+    "references": 2847,
     "repositories_by_record_type": {
       "catalog_card": 148,
-      "component_record": 70,
+      "component_record": 71,
       "legacy_candidate": 34,
       "public_star": 385,
       "research_supplement": 849,
@@ -11357,6 +11357,7 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
+        "component_record",
         "research_supplement"
       ],
       "references": [
@@ -11372,6 +11373,18 @@
           "decision": "investigate",
           "review_level": "source_review",
           "evidence_level": "pinned_source_review"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/10/candidates/9",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "component_record",
+          "path": "manifests/stack.json",
+          "pointer": "/components/70",
+          "id": "harbor"
         }
       ]
     },

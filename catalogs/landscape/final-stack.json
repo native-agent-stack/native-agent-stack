@@ -2137,6 +2137,13 @@
           "role": "candidate"
         }
       ],
+      "github.com/harbor-framework/harbor": [
+        {
+          "catalog": "foundation",
+          "layer_id": "quality-evaluation",
+          "role": "candidate"
+        }
+      ],
       "github.com/headroomlabs-ai/headroom": [
         {
           "catalog": "foundation",
@@ -9987,6 +9994,18 @@
     },
     {
       "conflicts": [],
+      "id": "harbor",
+      "pin": "0.24.0",
+      "pin_parsed": {
+        "commit": "b53b8134e1241686dca7759af188f987ecc48e8b",
+        "version": "0.24.0"
+      },
+      "platforms": [],
+      "repository": "github.com/harbor-framework/harbor",
+      "source": "manifests/stack.json#/components/70"
+    },
+    {
+      "conflicts": [],
       "id": "headroom",
       "pin": "0.40.0",
       "pin_parsed": {
@@ -10655,12 +10674,12 @@
   "schema_version": 1,
   "scope": "One row per layer of the final stack: the landscape verdict rows and the planned layers, each with its status, verdict wave and next review, winners with their verdict and run pins, alternates, unadjudicated sweep survivors, open gaps, research state, saturation and the found-to-adopted funnel; the run pins; the intake; and a repository and component index. A read-only join of evidence recorded elsewhere; it selects nothing.",
   "sources": {
-    "adoption/manifest.json": "a6df838a2d56945fb95535e56a9c229aaac0518cfbbc2db32b45102556e48e61",
+    "adoption/manifest.json": "2cdec6a1b92580527226c2c2196b8d5de809ee81877bdc6d95bf43481e388ee5",
     "adoption/pins-linux-x86_64.json": "964d085d8fe2cb8aba3d44678938e34a2b1d8b6e320227db4152352a0d0e2449",
     "adoption/pins-macos-arm64.json": "539a4840e1c5e2d5377685c274932f697d22bd16e28f99e70c12b2f86dc9f24c",
     "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock": "f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989",
     "catalogs/landscape/component-evidence-matrix.json": "7c68cc6e9e0001e4953ad08c6dec86cca462a5ca9787e5d1035a90f515f27885",
-    "catalogs/landscape/foundation.json": "868d193a31080ab913400725140bd0d01e0afe97e28564fd12777f737d22951a",
+    "catalogs/landscape/foundation.json": "bc7d5a739f1965b0c2275cff3a1fa223f8a6a45d16c335fcc767935235a55bb5",
     "catalogs/landscape/manifest.json": "8f2795612616853c92db1571de32d5ffb2019c32b3376ef0ed3b28fe9a8cc077",
     "catalogs/landscape/planned-layers.json": "b24e06efe5a029e4187af803701a56bdd74319e6b2d8fd82daa243b33294fb5d",
     "catalogs/landscape/research-state.json": "fe142c1b8b8ec8b92d69ec5971d68028225899c101ffc43cea618883b119332a",
@@ -10674,7 +10693,7 @@
     "evidence/artifacts/landscape-sweep-20260926/returns.json": "ea7e8ed285639a247df91d0c64d9378e080bc820170e9fc773434488397f4600",
     "evidence/artifacts/landscape-sweep-20260929/returns.json": "2f93067652c0f1e8e4f3d726895d2017eafef018412e47e9bc9b48e7ef931a9c",
     "evidence/artifacts/landscape-sweep-20261009-pine/returns.json": "8b91d1acc81d71d8a911916cd1869a4d0a5742f95bb529c76d321c9793e2f961",
-    "manifests/stack.json": "17c6d6d62b4d9c86b6a4b76d5bd6ca2327f16bb2b3a9b7d3878723f12e92561a",
+    "manifests/stack.json": "f12df017667a032d6841920a1cba81ee46775f79aeb2d84fb1e210e168130617",
     "tools/sota-convergence/landscape-sweep/seeds-20260926.json": "bf564498e96b7d926543a4957f4eec3e81e3aa723299a5752bf7d01efde9c91c"
   },
   "summary": {
@@ -10700,7 +10719,7 @@
       "unpinned": 3,
       "unresolved": 3
     },
-    "runs": 80,
+    "runs": 81,
     "runs_with_conflicts": 6,
     "skills_layers": 13,
     "skills_swept": 0,

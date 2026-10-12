@@ -1,0 +1,409 @@
+{
+  "schema_version": 1,
+  "id": "harbor-smoke-20261012",
+  "kind": "native_model_e2e",
+  "component_ids": [
+    "harbor"
+  ],
+  "claim": "Harbor 0.24.0 was installed through its documented uv tool route into a private tool directory and ran its own hello-world example task through the Docker environment: one zero-spend oracle trial and one claude-code trial (claude-haiku-5-5, Anthropic API key injected per command by the repository credential runner). Both trials ended with reward 1.0 and 0 exceptions. One TCP connect from a throwaway container to the local gateway port at the gvisor-tap-vsock gateway address timed out, so container-resident adapters have no measured route to the gateway.",
+  "limitations": [
+    "One trial of Harbor's trivial hello-world task with one adapter (claude-code) on one route (Anthropic API). Route b (an OpenAI-compatible base URL) and the other seven adapters in the route table were read from source and have no live result.",
+    "The Claude Code CLI inside the container was the latest at run time (2.1.296) because the adapter installs latest unless --ak version= is given; the agent CLI is not pinned by this receipt.",
+    "The upstream mirror head dc933be7 is 31 commits after v0.24.0 and was not installed. The installed artifact is the v0.24.0 wheel; the source files cited for the route table are identical between the wheel and the mirror head except installed/base.py, codex.py, mini_swe_agent.py, environments/docker/docker.py and cli/jobs.py.",
+    "Container-to-gateway reachability was measured once: one TCP connect from a throwaway ubuntu:24.04 container on the default bridge network to 10.0.2.1:21128 timed out after 5 s (silently dropped, not refused) while a control connect to 10.0.2.1:53 opened. The probe covers one image, one network path and one port; it does not test other addresses, compose networks or a changed daemon configuration.",
+    "Agent setup took 171.34 s of the 204.17 s trial on a bare ubuntu:24.04 image. No prebuilt-image run was measured.",
+    "Isolation from <HOME>/.claude was checked by modification time and size plus a construction argument. A live Claude Code session and sibling agents rewrite <HOME>/.claude.json and <HOME>/.claude/projects continuously, so those two before/after values do not discriminate on their own.",
+    "The docker container count moved from 67 to 66 during the smoke window. No container named for Harbor, hello-world or hb__ existed before or after; the change is attributed to a process outside this lane."
+  ],
+  "checked_at": "2026-10-12",
+  "recorded_at_utc": "2026-10-12T18:08:27Z",
+  "timezone": "America/New_York",
+  "source_base": "d8f7e2051b61bde6361a85b64f41413798015353",
+  "data": {
+    "pin": {
+      "mirror_head": "dc933be707feafbb9efcdf092cb8a0e391332617",
+      "mirror_head_committed_at": "2026-10-10T21:40:12-07:00",
+      "mirror_is_shallow_and_tagless": true,
+      "pyproject_version_at_mirror_head": "0.24.0",
+      "release_tag": "v0.24.0",
+      "release_tag_object": "bf8996ef6d97d014924dc1a5e4acc7e9b19b27a1",
+      "release_peeled_commit": "b53b8134e1241686dca7759af188f987ecc48e8b",
+      "release_published_at": "2026-10-05T05:04:52Z",
+      "mirror_head_equals_release": false,
+      "github_compare_release_to_mirror_head": {
+        "status": "ahead",
+        "ahead_by": 31,
+        "behind_by": 0,
+        "merge_base": "b53b8134e1241686dca7759af188f987ecc48e8b"
+      },
+      "latest_github_release": "v0.24.0",
+      "pypi_latest_stable": "0.24.0",
+      "pypi_newest_dev_build": "0.24.1.dev202610120805",
+      "license": "Apache-2.0",
+      "license_source": "pyproject.toml:6 and LICENSE at the mirror head",
+      "requires_python": ">=3.12",
+      "installed_vs_mirror_head_source_drift": {
+        "identical": [
+          "agents/model_connection.py",
+          "agents/base.py",
+          "agents/factory.py",
+          "agents/options.py",
+          "agents/installed/claude_code.py",
+          "agents/installed/opencode.py",
+          "agents/installed/pi.py",
+          "agents/installed/goose.py",
+          "agents/installed/openhands_sdk.py",
+          "agents/installed/openhands_sdk_runner.py",
+          "agents/installed/deerflow.py",
+          "agents/installed/antigravity_base_url.py",
+          "agents/terminus_2/terminus_2.py",
+          "llms/lite_llm.py",
+          "models/trial/config.py",
+          "trial/network_policy.py",
+          "environments/docker/docker-compose-build.yaml",
+          "cli/notifications.py",
+          "skills.py",
+          "telemetry.py",
+          "constants.py",
+          "models/agent/name.py"
+        ],
+        "different": {
+          "agents/installed/base.py": "+48/-0 lines",
+          "agents/installed/codex.py": "+53/-16 lines",
+          "agents/installed/mini_swe_agent.py": "+1/-1 lines (line 51, no route effect)",
+          "environments/docker/docker.py": "+5/-0 lines (mirror head adds DOCKER_CONFIG handling at 646-647)",
+          "cli/jobs.py": "+4/-0 lines (after the cited line 2260; no cited line moves)"
+        }
+      }
+    },
+    "host": {
+      "docker_client": "29.8.2",
+      "docker_server": "29.8.2",
+      "docker_compose": "5.6.0",
+      "docker_buildx": "0.37.1",
+      "docker_mode": "rootless",
+      "rootlesskit_version": "3.1.0",
+      "rootlesskit_flags_observed": "--net=gvisor-tap-vsock --disable-host-loopback --port-driver=builtin",
+      "uv": "0.12.22",
+      "python": "3.13.16"
+    },
+    "install": {
+      "documented_command": "uv tool install harbor",
+      "profile_command": "uv tool install harbor==0.24.0",
+      "command_run": "uv tool install --no-build --python <mise python 3.13.16> harbor==0.24.0",
+      "scope_environment": {
+        "UV_TOOL_DIR": "/var/tmp/cc-harbor-tmp/uv-tools",
+        "UV_TOOL_BIN_DIR": "/var/tmp/cc-harbor-tmp/bin",
+        "UV_CACHE_DIR": "/var/tmp/cc-harbor-tmp/uv-cache",
+        "UV_PYTHON_INSTALL_DIR": "/var/tmp/cc-harbor-tmp/uv-python",
+        "UV_PYTHON_DOWNLOADS": "never",
+        "UV_NO_CONFIG": "1",
+        "HOME": "/var/tmp/cc-harbor-tmp/home",
+        "TMPDIR": "/var/tmp/cc-harbor-tmp/tmp"
+      },
+      "exit_code": 0,
+      "started_utc": "2026-10-12T17:06:35Z",
+      "ended_utc": "2026-10-12T17:06:37Z",
+      "resolved_distributions": 91,
+      "executables": [
+        "harbor",
+        "hb",
+        "hr"
+      ],
+      "harbor_version_output": "0.24.0",
+      "harbor_version_exit_code": 0,
+      "wheel_sha256": "23b7ba616a3aae4eff561ced5e2c51c7186f2981e53a770dea9c689d3969877c",
+      "wheel_bytes": 2331740,
+      "wheel_matches_published_digest_and_size": true,
+      "wheel_published_source": "https://pypi.org/pypi/harbor/0.24.0/json",
+      "record_files_ok": 488,
+      "record_files_bad": 0,
+      "record_files_missing": 0,
+      "installed_tree_vs_wheel": {
+        "same": 479,
+        "different": 0,
+        "only_in_wheel": 0,
+        "only_installed": 0
+      },
+      "freeze_sha256": "51a14f564eb8991e7d7f3331a7b19d2dc320290796e4cfc1997685a8d47a6a5d",
+      "key_versions": {
+        "litellm": "1.105.0",
+        "pydantic": "2.14.1",
+        "typer": "0.27.3",
+        "supabase": "2.32.0",
+        "fastapi": "0.143.0",
+        "httpx": "0.28.1",
+        "requests": "2.34.2",
+        "PyJWT": "2.15.1"
+      },
+      "pre_existing_user_scope_install": {
+        "present": true,
+        "version_specifier": "==0.24.0",
+        "options": "no-build",
+        "tool_receipt_mtime_utc": "2026-10-08T02:22:45Z",
+        "used_by_this_lane": false,
+        "modified_by_this_lane": false
+      }
+    },
+    "harbor_run_environment": {
+      "HOME": "/var/tmp/cc-harbor-tmp/home (Harbor 0.24.0 hard-codes ~/.cache/harbor at constants.py:4; no setting exists for it)",
+      "DOCKER_HOST": "unix:///run/user/1000/docker.sock (the redirected HOME hides the rootless docker context)",
+      "TMPDIR": "/var/tmp/cc-harbor-tmp/tmp",
+      "HARBOR_TELEMETRY": "off",
+      "jobs_dir": "--jobs-dir /var/tmp/cc-harbor-tmp/jobs",
+      "working_directory": "/var/tmp/cc-harbor-tmp/work",
+      "confirmation_flag": "-y",
+      "env_shim_disclosure": "Every harbor invocation ran through a short environment shim kept only in the scratch tree: it exports HOME, DOCKER_HOST and TMPDIR, sets HARBOR_TELEMETRY=off, changes to the scratch working directory and execs harbor. It contains no Harbor logic and is never committed. The CC accepted it on 2026-10-12 as a disclosed, scratch-only isolation measure.",
+      "telemetry": "HARBOR_TELEMETRY=off is standing for every Harbor run (CC ruling 2026-10-12); Harbor 0.24.0 has telemetry on by default (telemetry.py:40-45, 479-480)."
+    },
+    "route_b_probe": {
+      "ruling": "CC 2026-10-12: one probe from a throwaway ubuntu:24.04 container from the local image, no pull, no change to the Docker daemon or its rootlesskit flags.",
+      "started_utc": "2026-10-12T18:03:31Z",
+      "ended_utc": "2026-10-12T18:03:37Z",
+      "image": "ubuntu:24.04, already local, run with --pull=never",
+      "network": "default bridge network of the rootless daemon (container default gateway 172.17.0.1), the same tap0 egress as Harbor's compose networks",
+      "gateway_listen_address": "127.0.0.1:21128",
+      "address_used": "10.0.2.1, the gvisor-tap-vsock gateway address",
+      "probe": {
+        "target": "10.0.2.1:21128",
+        "result": "not open: the connect timed out and was silently dropped; no refusal was received",
+        "timeout_exit_code": 124,
+        "elapsed_ms": 5004
+      },
+      "control": {
+        "target": "10.0.2.1:53",
+        "result": "open",
+        "exit_code": 0,
+        "elapsed_ms": 7
+      },
+      "data_sent": false,
+      "daemon_or_rootlesskit_changed": false,
+      "cause_source": "rootless-containers/rootlesskit v3.1.0 (tag object 4fab82caf726318cef33bf82912546b8a529eaab, commit 62d2101fbbe4f79bc845a337c4e868d27ff602c9), pkg/network/gvisortapvsock/gvisortapvsock.go:106-124 (gateway is the network base plus 1, 10.0.2.1) and 142-148 (NAT from 10.0.2.1 to host 127.0.0.1 is configured only when --disable-host-loopback is absent)",
+      "route_policy_ruled": "Gateway routes in the comparison use terminus-2 with --ak api_base= (the model client runs in the Harbor process on the host); container adapters use route a only until a measured route exists."
+    },
+    "oracle_dry_run": {
+      "purpose": "Harbor's own oracle agent runs the task's reference solution through the same Docker environment and verifier as the live smoke; no model call and no key.",
+      "job_name": "cc-harbor-oracle-0",
+      "trial_name": "hello-world__DKsfXtE",
+      "started_utc": "2026-10-12T17:08:24Z",
+      "ended_utc": "2026-10-12T17:09:01Z",
+      "wall_seconds": 37,
+      "exit_code": 0,
+      "trials": 1,
+      "exceptions": 0,
+      "reward": 1.0,
+      "phases_seconds": {
+        "environment_setup": 4.29,
+        "agent_setup": 0.0,
+        "agent_execution": 0.36,
+        "verifier": 19.28
+      }
+    },
+    "smoke": {
+      "credential_slot": "anthropic-api-4",
+      "fallback_slots_tried": [],
+      "command_shape": "python3 -I tools/credentials/credential_run.py anthropic-api-4 -- <harbor-env wrapper> run -p /var/tmp/cc-harbor-tmp/tasks/hello-world -a claude-code -m anthropic/claude-haiku-5-5 -e docker -o /var/tmp/cc-harbor-tmp/jobs --job-name cc-harbor-smoke-cc-haiku-a4 -n 1 -y",
+      "task": {
+        "source": "examples/tasks/hello-world at the mirror head, copied to a scratch directory; file bytes unchanged after the run",
+        "base_image": "ubuntu:24.04",
+        "instruction": "Create a file called hello.txt with \"Hello, world!\" as the content.",
+        "file_sha256_first16": {
+          "environment/Dockerfile": "4569411ab1edf9b0",
+          "instruction.md": "2a753a51dba6bdec",
+          "solution/solve.sh": "7e830a7de2f007b0",
+          "task.toml": "8df59d13077f5da3",
+          "tests/test.sh": "0aefd5b238180717",
+          "tests/test_state.py": "f219416b41d95245"
+        }
+      },
+      "started_utc": "2026-10-12T17:09:58Z",
+      "ended_utc": "2026-10-12T17:13:24Z",
+      "wall_seconds": 206,
+      "exit_code": 0,
+      "harbor_reported_total_runtime": "3m 24s",
+      "trial": {
+        "name": "hello-world__8NxiCZF",
+        "reward": 1.0,
+        "trials": 1,
+        "exceptions": 0,
+        "agent": "claude-code",
+        "agent_cli_version_in_container": "2.1.296",
+        "configured_model": "anthropic/claude-haiku-5-5",
+        "api_key_source_reported_by_cli": "ANTHROPIC_API_KEY",
+        "environment": "docker",
+        "wall_seconds": 204.17,
+        "phases_seconds": {
+          "environment_setup": 3.55,
+          "agent_setup": 171.34,
+          "agent_execution": 3.91,
+          "verifier": 5.71
+        }
+      },
+      "usage": {
+        "harbor_n_input_tokens": 32704,
+        "harbor_n_cache_tokens": 26847,
+        "harbor_n_output_tokens": 106,
+        "harbor_cost_usd": 0.001053495,
+        "claude_result_event": {
+          "input_tokens": 4,
+          "cache_creation_input_tokens": 5853,
+          "cache_read_input_tokens": 26847,
+          "output_tokens": 106,
+          "total_cost_usd": 0.001053495,
+          "num_turns": 2,
+          "duration_ms": 2931,
+          "duration_api_ms": 2726,
+          "stop_reason": "end_turn",
+          "tools_used": [
+            "Write"
+          ]
+        },
+        "derivation": "Harbor n_input_tokens = input_tokens + cache_creation_input_tokens + cache_read_input_tokens = 4 + 5853 + 26847 = 32704; n_cache_tokens is cache_read_input_tokens only."
+      },
+      "timestamp_note": "The job-level result.json started_at and finished_at are naive local time (13:09:59 to 13:13:23); trial-level phase fields are UTC with a Z suffix. This receipt cites the trial fields and the date -u run meta."
+    },
+    "isolation": {
+      "method": "Before/after snapshots of modification time and size only (never contents), plus a marker file and find -newer under the scratch tree, plus the redirected HOME's own listing.",
+      "settings_json": {
+        "mtime_utc_before": "2026-10-11T05:08:40Z",
+        "mtime_utc_after": "2026-10-11T05:08:40Z",
+        "size": 20489,
+        "changed": false
+      },
+      "claude_json": {
+        "mtime_utc_before": "2026-10-12T17:09:49Z",
+        "mtime_utc_after": "2026-10-12T17:13:18Z",
+        "size_before": 116761,
+        "size_after": 116761,
+        "changed": true,
+        "attribution": "Rewritten by this live Claude Code session and sibling agents; the redirected HOME holds no .claude* entry."
+      },
+      "claude_projects_newest_file": {
+        "files_before": 12088,
+        "files_after": 12089,
+        "newest_mtime_utc_before": "2026-10-12T17:09:51Z",
+        "newest_mtime_utc_after": "2026-10-12T17:13:43Z",
+        "changed": true,
+        "attribution": "Session transcripts of this and sibling agents."
+      },
+      "unchanged_in_real_home": [
+        ".cache/harbor",
+        ".config/harbor",
+        ".docker",
+        ".local/share/uv/tools",
+        ".local/bin",
+        ".cache/uv"
+      ],
+      "primary_checkout_status_lines_before_and_after": [
+        "?? .agents/",
+        "?? blobs/"
+      ],
+      "docker_images_unchanged": true,
+      "docker_image_count": 24,
+      "docker_containers_before": 67,
+      "docker_containers_after": 66,
+      "docker_containers_named_for_harbor_before_and_after": 0,
+      "redirected_home_contents_after_smoke": [
+        ".cache/harbor/notifications.json (Harbor first-run hint, written during the oracle run)",
+        ".docker/buildx/** (docker CLI build state)"
+      ],
+      "redirected_home_has_claude_codex_or_config_entries": false,
+      "scratch_tmp_entries_after": 0,
+      "tmp_entries_for_harbor_newer_than_marker": 0,
+      "leftover_processes": 0,
+      "gitleaks_over_job_directory": {
+        "exit_code": 0,
+        "findings": 0
+      },
+      "gitleaks_over_receipt_logs": {
+        "exit_code": 7,
+        "findings": 1,
+        "disposition": "False positive: the generic-api-key rule matched the job-name field of the run-meta line; no key material."
+      },
+      "construction": "claude_code.py:1895 pins CLAUDE_CONFIG_DIR to the container logs directory; the only host-side <HOME>/.claude access is ClaudeCode.handoff at claude_code.py:202-226, which harbor run never calls."
+    },
+    "adapters": {
+      "registered_in_factory": 45,
+      "agent_name_enum_members": 47,
+      "enum_members_not_registered": [
+        "terminus",
+        "terminus-1"
+      ],
+      "with_model_connection_spec": 18,
+      "custom_env_contract": 27,
+      "registry_source": "harbor/agents/factory.py:40-90 and harbor/models/agent/name.py:4-51"
+    }
+  },
+  "provenance": [
+    {
+      "name": "install.log",
+      "sha256": "6656c6ef3e275aca086af59f13904c5af2d998156e0c6e303987a0e150b7657b",
+      "disclosure": "Retained in the lane's private scratch tree; only factual result exported."
+    },
+    {
+      "name": "freeze.txt",
+      "sha256": "51a14f564eb8991e7d7f3331a7b19d2dc320290796e4cfc1997685a8d47a6a5d",
+      "disclosure": "Resolved distribution list of the private install; retained privately; versions of eight packages exported."
+    },
+    {
+      "name": "verify-install.json",
+      "sha256": "197805d5fb5ee14f1e49e4e646d8da3cb0da4a5280afe1abcab5deeff314da35",
+      "disclosure": "Output of the install verification script; retained privately; values exported."
+    },
+    {
+      "name": "oracle-run.log",
+      "sha256": "2de6bfff524e1264141a42e35d4832d5dc2a92780fb1a3703e5e8d7a1b36fc9e",
+      "disclosure": "Harbor console output of the oracle trial; retained privately."
+    },
+    {
+      "name": "oracle-trial-result.json",
+      "sha256": "9803f03a03bdd6bb09e94e6f33e5ac83525982e52f630f8bb975347f97c802f5",
+      "disclosure": "Trial result.json of the oracle trial; retained privately; timings and reward exported."
+    },
+    {
+      "name": "smoke-run.log",
+      "sha256": "5f9d6e3f12ed3e0d9ede4dea8d205432c55d275622781e859eeb4c7d9af7582a",
+      "disclosure": "Harbor console output of the smoke relayed through the credential runner's masking; retained privately."
+    },
+    {
+      "name": "smoke-trial-result.json",
+      "sha256": "0e05b7ea92d568f3102ac59fe430b96c34932e22e95f4fd68991195d87c54adb",
+      "disclosure": "Trial result.json of the smoke; retained privately; timings, tokens, cost and reward exported."
+    },
+    {
+      "name": "smoke-claude-code.txt",
+      "sha256": "59492eede1218112d4260aab853c8e9a5b53c1c7f1270a93a207b30b895dc959",
+      "disclosure": "Claude Code stream-json output of the smoke; retained privately; result-event numbers exported."
+    },
+    {
+      "name": "snapshot-pre-smoke.json",
+      "sha256": "c6d30d6e31a3ab00947fbf8f7a0b30bfc9687e15cc0534350a73d566d89ad3da",
+      "disclosure": "Isolation snapshot (modification times, sizes, counts); retained privately; values exported."
+    },
+    {
+      "name": "snapshot-post-smoke.json",
+      "sha256": "984abff519b3490a775ca048aab92c7ae044d149c40827710df9bb8098adfc4b",
+      "disclosure": "Isolation snapshot (modification times, sizes, counts); retained privately; values exported."
+    },
+    {
+      "name": "adapter-matrix.json",
+      "sha256": "80c99730d87d9309b2042d3e05c799626d0b3844c064a1d4ba3f63e50e08f5e3",
+      "disclosure": "Mechanical per-adapter matrix over the 45 registered adapters; counts exported, matrix summarized in the decision draft."
+    },
+    {
+      "name": "gitleaks-jobs.json",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "disclosure": "Secret scan report over the job directory; zero findings."
+    },
+    {
+      "name": "probe.out",
+      "sha256": "1f56e7fc0bcd5ab6526ae8e804ddd00951cc8fe74e61fcdf01779ba321c065a4",
+      "disclosure": "Output of the single route-b probe (addresses, exit codes, elapsed milliseconds); retained privately; values exported."
+    },
+    {
+      "name": "gvisortapvsock.go",
+      "sha256": "2e90a482578391b09f17ce8a87fab57c96babbe7f06962169542c43865d3157a",
+      "disclosure": "Upstream rootlesskit v3.1.0 source file fetched through the GitHub contents API; public; retained privately."
+    }
+  ]
+}

@@ -23,12 +23,12 @@
     "change_rule": "Retain accepted selections until a named capability gap and representative comparison justify an adjustment. Metadata recency alone is insufficient."
   },
   "summary": {
-    "selected_components": 70,
-    "unique_github_repositories": 70,
-    "repository_metadata_successes": 70,
+    "selected_components": 71,
+    "unique_github_repositories": 71,
+    "repository_metadata_successes": 71,
     "archived_repositories": 0,
     "disabled_repositories": 0,
-    "latest_stable_release_successes": 65,
+    "latest_stable_release_successes": 66,
     "unavailable_latest_stable_endpoints": [
       "shanraisshan/claude-code-best-practice",
       "skills-ref",
@@ -36,7 +36,7 @@
       "poppler",
       "tavily-cli"
     ],
-    "api_commands": 293,
+    "api_commands": 297,
     "api_nonzero_results": 8,
     "corrected_invalid_archive_digest_ref_attempts": 2,
     "newer_stable_release_review_queue": [
@@ -53,7 +53,7 @@
       }
     ],
     "recommendation": "Retain current qualified pins; review the 4 newer stable releases against actual capability gaps before upgrading. Dagu 2.16.6 remains held by the trading lane; the separate new-WSL profile selects 2.18.2. Refresh canonical Headroom identity in future manifest maintenance without treating its transfer as a functional replacement.",
-    "selected_component_api_commands": 276,
+    "selected_component_api_commands": 280,
     "initial_star_delta_commands": 1,
     "complete_star_snapshot_commands": 7,
     "added_candidate_source_screen_commands": 9,
@@ -5632,6 +5632,80 @@
       "primary_repository": "https://github.com/vectorize-io/hindsight",
       "release_relationship": "selected_version_matches_latest_stable",
       "selected_pin_matches_latest_release_commit": true
+    },
+    {
+      "component_id": "harbor",
+      "repository": "https://github.com/harbor-framework/harbor",
+      "selected_repository_url": "https://github.com/harbor-framework/harbor",
+      "selected_version": "0.24.0",
+      "selected_source_pin": "b53b8134e1241686dca7759af188f987ecc48e8b",
+      "checked_at": "2026-10-12T18:20:02.293Z",
+      "checks": [
+        {
+          "endpoint": "repos/harbor-framework/harbor",
+          "exit_code": 0,
+          "started_at": "2026-10-12T18:20:00.855Z",
+          "ended_at": "2026-10-12T18:20:01.280Z",
+          "stdout_sha256": "b9ede3e5db9257358459ecb8ad8a396dd9c048e5ab89c81976f4555b68d96ed4",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/harbor-framework/harbor/releases/latest",
+          "exit_code": 0,
+          "started_at": "2026-10-12T18:20:01.281Z",
+          "ended_at": "2026-10-12T18:20:01.571Z",
+          "stdout_sha256": "01f61dc75ea9ab6966ae51cf4571ace7dfbc67b0f999175d6cd57102fcad3544",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/harbor-framework/harbor/commits/b53b8134e1241686dca7759af188f987ecc48e8b",
+          "exit_code": 0,
+          "started_at": "2026-10-12T18:20:01.572Z",
+          "ended_at": "2026-10-12T18:20:01.956Z",
+          "stdout_sha256": "909f6206adf6172dce9f77a1bea4492368cc75a45af3db477b8c91849d666873",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/harbor-framework/harbor/commits/v0.24.0",
+          "exit_code": 0,
+          "started_at": "2026-10-12T18:20:01.956Z",
+          "ended_at": "2026-10-12T18:20:02.293Z",
+          "stdout_sha256": "909f6206adf6172dce9f77a1bea4492368cc75a45af3db477b8c91849d666873",
+          "status": "ok"
+        }
+      ],
+      "canonical_repository": "https://github.com/harbor-framework/harbor",
+      "archived": false,
+      "disabled": false,
+      "default_branch": "main",
+      "pushed_at": "2026-10-12T17:55:32Z",
+      "license_spdx": "Apache-2.0",
+      "latest_stable_release": {
+        "tag_name": "v0.24.0",
+        "published_at": "2026-10-05T05:04:52Z",
+        "html_url": "https://github.com/harbor-framework/harbor/releases/tag/v0.24.0",
+        "target_commitish": "main",
+        "prerelease": false,
+        "draft": false
+      },
+      "selected_pin_source": {
+        "ref": "b53b8134e1241686dca7759af188f987ecc48e8b",
+        "sha": "b53b8134e1241686dca7759af188f987ecc48e8b",
+        "html_url": "https://github.com/harbor-framework/harbor/commit/b53b8134e1241686dca7759af188f987ecc48e8b",
+        "committed_at": "2026-10-05T05:04:47Z"
+      },
+      "latest_release_source": {
+        "ref": "v0.24.0",
+        "sha": "b53b8134e1241686dca7759af188f987ecc48e8b",
+        "html_url": "https://github.com/harbor-framework/harbor/commit/b53b8134e1241686dca7759af188f987ecc48e8b",
+        "committed_at": "2026-10-05T05:04:47Z"
+      },
+      "status": "metadata_checked",
+      "adoption_recommendation": "retain_selected_pending_capability_comparison",
+      "source_pin_kind": "git_commit",
+      "primary_repository": "https://github.com/harbor-framework/harbor",
+      "release_relationship": "selected_version_matches_latest_stable",
+      "selected_pin_matches_latest_release_commit": true
     }
   ],
   "stars": {
@@ -6987,6 +7061,13 @@
       "evidence_class": "local_integration",
       "source": "docs/decisions/2026-10-09-claude-code-floor.md",
       "methodology": "Synchronize the selected-version mirror with the 2.1.295 native installer minimum and current stack manifest. The selected release is newer than the retained September 29 upstream observation; no new latest-release observation is asserted. Original checks, release metadata, timestamps and summary retain their recorded scope."
+    },
+    {
+      "checked_at": "2026-10-12T18:20:02.293Z",
+      "component_ids": ["harbor"],
+      "api_commands": 4,
+      "api_nonzero_results": 0,
+      "methodology": "Add the selected Harbor component using the existing native gh api endpoint method: repository, latest stable release, selected commit and release tag commit. The latest release (v0.24.0) and both commit responses agree at b53b8134e1241686dca7759af188f987ecc48e8b. Summary counts include this four-call addition; every earlier component, star observation and dated refresh remains unchanged. This is public metadata verification, not a new host or provider acceptance run."
     }
   ]
 }

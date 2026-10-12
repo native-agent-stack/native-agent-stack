@@ -2898,6 +2898,16 @@
           "evidence_refs": [
             "evidence/receipts/token-native-retained-functional-20260920.json"
           ]
+        },
+        {
+          "name": "Harbor",
+          "repository": "https://github.com/harbor-framework/harbor",
+          "disposition": "conditional",
+          "rationale": "Container harness that runs each agent runtime in its own Docker container through upstream-shipped adapters; on this host its oracle trial and one claude-code trial of its hello-world task passed, a container-to-gateway probe timed out, and benchmark scoring, trajectory analysis and the other adapters are unqualified.",
+          "evidence_kind": "native_execution",
+          "evidence_refs": [
+            "evidence/receipts/harbor-smoke-20261012.json"
+          ]
         }
       ],
       "verdict_status": "recorded",

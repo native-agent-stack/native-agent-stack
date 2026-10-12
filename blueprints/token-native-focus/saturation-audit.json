@@ -31,9 +31,9 @@
     ]
   },
   "counts": {
-    "selected_components": 70,
+    "selected_components": 71,
     "catalog_identities": 901,
-    "nonselected_catalog_identities": 831,
+    "nonselected_catalog_identities": 830,
     "exclusive_identity_groups": {
       "star_review": 281,
       "component_record": 69,
@@ -9690,6 +9690,93 @@
       "baseline_applicability": {
         "category": "supporting_workflow",
         "scope": "Research record storage/retrieval has no matched provider-token saving baseline in these receipts.",
+        "retained_artifact_comparisons": 0,
+        "matched_lifetime_provider_baseline": "not_established",
+        "regression_policy": "Recheck the affected native operation when inputs change; preserve historical failures and scoped acceptance."
+      }
+    },
+    {
+      "component_id": "harbor",
+      "repository": "https://github.com/harbor-framework/harbor",
+      "version": "0.24.0",
+      "profile": "optional",
+      "role": "Container harness that runs each agent runtime in its own Docker container through upstream-shipped adapters, for parallel runtime work",
+      "installation_assessment": "Vendor uv tool installation recorded on this host on 2026-10-12 in a private tool scope; this row reuses that execution.",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/harbor",
+        "documented_commands": [
+          "harbor --version",
+          "harbor run --help"
+        ],
+        "scope": "Per-run CLI that builds each task's container and installs the agent inside it; the recorded runs used a private tool scope, a redirected HOME and a loopback-free Docker socket path.",
+        "recipe_document": "recipes/README.md",
+        "lifecycle_guide": "adoption/lifecycle.md"
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "harbor-smoke-20261012",
+            "path": "evidence/receipts/harbor-smoke-20261012.json",
+            "kind": "native_model_e2e"
+          }
+        ],
+        "retained_operation_ids": [],
+        "scope": "One zero-spend oracle trial and one claude-code trial of Harbor's hello-world task through Docker (reward 1.0 each), plus one container-to-gateway TCP probe that timed out; no benchmark scoring, trajectory analysis or other adapter is established."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse the scoped receipt; run a measured container route or the terminus-2 api_base route before any gateway comparison, and pin agent CLI versions with --ak version= for reproducible runs.",
+      "integration_mode": "Explicit per-run CLI invocation with a task directory; no resident service.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Install, version readback, one oracle trial and one claude-code trial are retained; persistence, restart and recovery are not exercised and the upstream acceptance command was not run.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; route b for container adapters, pinned agent CLIs and prebuilt images remain open questions in the decision record.",
+      "source_pin": "b53b8134e1241686dca7759af188f987ecc48e8b",
+      "lifecycle_stages": {
+        "install": {
+          "status": "accepted_within_scope",
+          "scope": "uv tool install --no-build harbor==0.24.0 into a private tool scope: exit 0, version readback 0.24.0, wheel digest and RECORD verified. A user-scope install of the same version was neither used nor changed.",
+          "evidence_refs": [
+            "evidence/receipts/harbor-smoke-20261012.json"
+          ]
+        },
+        "use": {
+          "status": "accepted_within_scope",
+          "scope": "Oracle and claude-code (claude-haiku-5-5) trials of the hello-world task through Docker and the verifier, reward 1.0 each; the claude-code trial spent about $0.001 on one Anthropic key slot.",
+          "evidence_refs": [
+            "evidence/receipts/harbor-smoke-20261012.json"
+          ]
+        },
+        "persistence": {
+          "status": "not_established",
+          "scope": "Job directories are plain files under the chosen jobs directory; no separate persistence or resume assertion was made.",
+          "evidence_refs": []
+        },
+        "restart": {
+          "status": "not_applicable",
+          "scope": "The selected role is a per-run CLI with no resident service.",
+          "evidence_refs": []
+        },
+        "cleanup": {
+          "status": "accepted_within_scope",
+          "scope": "After both trials no Harbor-named container or image remained (teardown ran docker compose down with --rmi local). Uninstalling the private tool scope was not exercised.",
+          "evidence_refs": [
+            "evidence/receipts/harbor-smoke-20261012.json"
+          ]
+        },
+        "recovery": {
+          "status": "not_established",
+          "scope": "No failure-recovery or interrupted-run assertion was made.",
+          "evidence_refs": []
+        }
+      },
+      "baseline_applicability": {
+        "category": "supporting_workflow",
+        "scope": "Container harness for runtime comparison work; it has no matched provider-token saving baseline in these receipts.",
         "retained_artifact_comparisons": 0,
         "matched_lifetime_provider_baseline": "not_established",
         "regression_policy": "Recheck the affected native operation when inputs change; preserve historical failures and scoped acceptance."
