@@ -314,9 +314,31 @@ on) is read too. If any reader recovers private content, the output is refused w
 keeps every byte. Over the committed native-token receipts, 765 published streams pass unchanged; a 1.1 MB JSON
 document is verified in 1.6 s. Each regression (the micro's lone-CR, separator, json-seq and long-number shapes,
 through `publish()`, an artifact, a command and an MCP answer) fails on `adc2adb2` and passes here; its byte-for-byte
-controls pass on both. Shapes outside `publish()`'s stated scope (two values on one line, a BOM, a trailing comma,
-a log prefix, forms readable only by a person such as `\x40`, a fullwidth at sign or `%40`, duplicate names) are
-follow-ups for the shared email detector.
+controls pass on both. Forms readable only by a person, such as `\x40`, a fullwidth at sign or `%40`, are follow-ups
+for the shared email detector. (Until addendum 03 this sentence also put two values on one line, a BOM, a trailing
+comma, a log prefix and duplicate names outside `publish()`'s scope; the stream decoder and the escape projection below
+read the first four, and duplicate names are refused.)
+
+**Addendum 03 (the command center's, from a shadow review the co-op reproduced at `66036a74`):** the verifier still
+depended on framing. A pretty-printed object after a lone CR (a progress line, then JSON), or behind RS framing (RFC 7464
+2, rfc7464.txt:119-185, <https://www.rfc-editor.org/rfc/rfc7464.txt>, read 2026-10-12T08:30:42Z,
+`a8eadbcdce5fc508b9e014299621562da041232af13848632092164d50b3f482`), was cut by every split view, so its escaped address
+went out while readline-then-`json.load` and `jq --seq` read it back. The fourth recurrence of the class, so the
+verifier now also reads the output with framing ignored: every RFC 8259 7 string escape (rfc8259.txt:461-475: a
+surrogate pair, a code unit, and the eight short forms; a lone surrogate's escape is left as it is) is decoded across
+the whole text, up to `PUBLISH_DEPTH` times over for nested escaping, and the sanitizer's rules run on each projection.
+A duplicate name is refused wherever the verifier decodes JSON too, in every framing it reads, numbers kept as text, so
+an RS-framed duplicate object or duplicates after a long number are refused as well. Over the committed native-token
+receipts, the same 765 published streams pass unchanged. Each regression (the two framings through `publish()`, an
+artifact, a command and an MCP answer; a doubly escaped address; the two duplicate shapes) fails on `66036a74` and passes
+here, and escaped text with nothing private keeps every byte. A test of the earlier fix had put the escaped address in
+a command's own argv, which is published too; the child now reads it from a file.
+
+The GPT read at `66036a74` (ACK, three P3s) asked to keep the refusal and recovery ordering and to close the MCP
+session's pipe handles behind the tests' `ResourceWarning`s: the session now closes the parent's ends of the child's
+stdout and stderr once its readers have finished (24 warnings in `tests.test_native_token_ci` before, 0 after). Its other
+P3s (retained source captures, and the locator, strict-consumer and hostname follow-ups) are in the pull request's
+Follow-ups.
 
 ## SOTA sources
 

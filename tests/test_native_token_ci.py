@@ -508,8 +508,11 @@ class NativeTokenCIContracts(unittest.TestCase):
 
         with tempfile.TemporaryDirectory() as directory:
             run = self._new_run(Path(directory))
-            program = "import sys\n" + "".join(f"print({line!r})\nprint({line!r}, file=sys.stderr)\n" for line in lines)
-            run.command("prints-an-escaped-address", [sys.executable, "-c", program])
+            # The child reads the text from a file: an argv holding the escaped address would itself be published.
+            text_file = Path(directory) / "work" / "lines.txt"
+            text_file.write_text("\n".join(lines) + "\n")
+            program = "import sys; data = open(sys.argv[1]).read(); sys.stdout.write(data); sys.stderr.write(data)"
+            run.command("prints-an-escaped-address", [sys.executable, "-c", program, str(text_file)])
             source = Path(directory) / "work" / "page.json"
             source.write_text("\n".join(lines) + "\n")
             run.artifact("page.json", source)
@@ -725,6 +728,80 @@ class NativeTokenCIContracts(unittest.TestCase):
                     source.write_bytes(text.encode())
                     run.artifact(f"control-{index}.txt", source)
                     self.assertEqual((Path(directory) / "result" / f"control-{index}.txt").read_bytes(), text.encode())
+
+    def test_an_escaped_address_is_refused_whatever_frames_it(self):
+        # The command center's addendum 03 (a shadow review, reproduced by the co-op at 66036a74): the verifier decoded
+        # JSON texts under a few framings, so a pretty-printed object after a lone CR, or behind RS framing (RFC 7464),
+        # was never decoded, while readline-then-json.load and jq --seq read the address back. The verifier now also
+        # decodes every RFC 8259 7 string escape across the whole output, framing aside, up to PUBLISH_DEPTH times.
+        operator = "@".join(("first.last", "mail-host.com"))
+        pretty = json.dumps({"email": operator, "n": 1}, indent=2).replace("@", "\\u0040")
+        shapes = {
+            "CR_MULTILINE": "progress 50%\r" + pretty + "\n",
+            "JSONSEQ_RECOVERY": "\x1e!\n\x1e" + pretty + "\n",
+            "a doubly escaped address": '{"email": "' + operator.replace("@", "\\\\u0040") + '"}',
+            "a surrogate-escaped neighbour": '{"note": "\\ud83d\\ude00", "email": "' + operator.replace("@", "\\u0040")
+                                            + '"}\r' + "tail",
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            run = self._new_run(Path(directory))
+            for name, text in shapes.items():
+                with self.subTest(shape=name):
+                    with self.assertRaises(AssertionError) as refused:
+                        run.publish(text)
+                    self.assertEqual(str(refused.exception), ci.PUBLISH_REFUSED)
+            for index, name in enumerate(("CR_MULTILINE", "JSONSEQ_RECOVERY")):
+                with self.subTest(artifact=name):
+                    source = Path(directory) / "work" / f"framed-{index}.json"
+                    source.write_bytes(shapes[name].encode())
+                    with self.assertRaises(AssertionError):
+                        run.artifact(f"framed-{index}.json", source)
+                    self.assertFalse((Path(directory) / "result" / f"framed-{index}.json").exists())
+                with self.subTest(command=name):
+                    with self.assertRaises(AssertionError):
+                        run.command(f"prints-framed-{index}", [sys.executable, "-c",
+                                                               "import sys; sys.stdout.write(" + repr(shapes[name]) + ")"])
+                with self.subTest(mcp=name):
+                    server = Path(directory) / f"server-{index}.py"
+                    server.write_text("import json, sys\n"
+                                      "for line in sys.stdin:\n"
+                                      "    message = json.loads(line)\n"
+                                      "    if 'id' in message:\n"
+                                      "        print(json.dumps({'jsonrpc': '2.0', 'id': message['id'], 'result': {'text': "
+                                      + repr(shapes[name]) + "}}), flush=True)\n")
+                    with self.assertRaises(AssertionError):
+                        ci.mcp_stdio_session(run, f"mcp-answers-framed-{index}", [sys.executable, str(server)],
+                                             [("initialize", {}), ("tools/list", {})], timeout=30)
+            published = (Path(directory) / "result" / "receipt.json").read_text()
+        self.assertNotIn("mail-host", published)
+        for label in ("prints-framed-0", "prints-framed-1", "mcp-answers-framed-0", "mcp-answers-framed-1"):
+            self.assertNotIn(label, published)
+
+    def test_a_duplicate_name_is_refused_in_every_framing(self):
+        # The same addendum (P2): an RS-framed duplicate object, and duplicates after a number past CPython's
+        # 4300-digit limit, went out unchanged, though duplicate names are refused. The verifier's own decoder, which
+        # reads RS framing and keeps numbers as text, now refuses them too.
+        with tempfile.TemporaryDirectory() as directory:
+            run = self._new_run(Path(directory))
+            for name, text in (("DUPLICATE_RS", '\x1e{"k": 1, "k": 2}\n'),
+                               ("DUPLICATE_LONG_NUMBER", '{"n": ' + "9" * 4401 + ', "k": 1, "k": 2}'),
+                               ("a duplicate after a lone CR", 'progress\r{"k": 1, "k": 2}')):
+                with self.subTest(shape=name):
+                    with self.assertRaises(AssertionError) as refused:
+                        run.publish(text)
+                    self.assertEqual(str(refused.exception), ci.PUBLISH_REFUSED)
+
+    def test_escaped_text_without_private_content_is_published_byte_for_byte(self):
+        # Controls for the escape projection: escapes that decode to nothing private keep every byte.
+        controls = ['{"k": "\\u00e9\\n\\t\\"x\\"\\\\"}', "a literal \\u0041 in prose, and C:\\temp\\n",
+                    '{"path": "\\/srv\\/data"}', "\\ud800 a lone high surrogate escape, and \\udc00 a low one",
+                    '{"email": "user\\u0040example.com"}', "progress 10%\r" + json.dumps({"a": [1, 2]}, indent=2) + "\n",
+                    "\x1e" + '{"a": 1}' + "\n", '{"n": ' + "9" * 4401 + ', "k": "v"}']
+        with tempfile.TemporaryDirectory() as directory:
+            run = self._new_run(Path(directory))
+            for index, text in enumerate(controls):
+                with self.subTest(control=index):
+                    self.assertEqual(run.publish(text), text)
 
     def test_publish_leaves_plain_and_clean_json_text_as_clean_gives_it(self):
         # Retained output keeps its bytes unless a decoded value hides something clean() removes.

@@ -92,8 +92,31 @@ class JsonNumber(str):
     4300 digits: Objects/longobject.c:2957 at cbc944f4)."""
 
 
-VERIFY_DECODER = json.JSONDecoder(object_pairs_hook=list, parse_int=JsonNumber, parse_float=JsonNumber,
+def unique_pairs(pairs: list) -> list:
+    """The verifier's object_pairs_hook: the same duplicate-name refusal as unique_members, in every framing the
+    verifier reads (the command center's addendum 03), keeping every member for inspection."""
+    require(len({name for name, _ in pairs}) == len(pairs), PUBLISH_REFUSED)
+    return pairs
+
+
+VERIFY_DECODER = json.JSONDecoder(object_pairs_hook=unique_pairs, parse_int=JsonNumber, parse_float=JsonNumber,
                                   parse_constant=JsonNumber)
+# RFC 8259 7 string escapes (rfc8259.txt:461-475): a surrogate pair, a code unit, or one of the eight short forms.
+JSON_ESCAPE = re.compile(r"\\(?:u([dD][89abAB][0-9a-fA-F]{2})\\u([dD][c-fC-F][0-9a-fA-F]{2})|u([0-9a-fA-F]{4})|([\"\\/bfnrt]))")
+SHORT_ESCAPES = {'"': '"', "\\": "\\", "/": "/", "b": "\b", "f": "\f", "n": "\n", "r": "\r", "t": "\t"}
+
+
+def unescaped(text: str) -> str:
+    """One pass of RFC 8259 7's string escapes over the whole text, whatever frames it (the command center's addendum
+    03): a surrogate pair becomes its character, a lone surrogate's escape is left as it is."""
+    def one(match: re.Match) -> str:
+        high, low, unit, short = match.groups()
+        if high:
+            return chr(0x10000 + ((int(high, 16) - 0xD800) << 10) + (int(low, 16) - 0xDC00))
+        if unit:
+            return match.group(0) if 0xD800 <= int(unit, 16) <= 0xDFFF else chr(int(unit, 16))
+        return SHORT_ESCAPES[short]
+    return JSON_ESCAPE.sub(one, text)
 
 
 def json_texts(piece: str) -> list:
@@ -116,9 +139,19 @@ def recoverable(text: str, depth: int = 0) -> bool:
     """Whether a reader can decode private content from published text (the command center's micro at adc2adb2, N1):
     REDACTIONS over the text, and over every key and string value of each JSON text in it, as split by a line feed, by
     str.splitlines() and by universal newlines (Lib/_pyio.py:153-154 at cbc944f4), nested JSON PUBLISH_DEPTH levels
-    deep; an object's members are all read, duplicates too. JSON text nested deeper counts as recoverable."""
+    deep; an object with a duplicate name is refused. JSON text nested deeper counts as recoverable. At the top, the
+    whole text is also read with every RFC 8259 7 escape decoded, framing aside, up to PUBLISH_DEPTH times over (the
+    command center's addendum 03: a pretty-printed object after a lone CR or behind RS framing, RFC 7464 2)."""
     if any(pattern.search(text) for _, pattern, _ in REDACTIONS):
         return True
+    projected = text
+    for _ in range(PUBLISH_DEPTH if depth == 0 else 0):
+        following = unescaped(projected)
+        if following == projected:
+            break
+        projected = following
+        if any(pattern.search(projected) for _, pattern, _ in REDACTIONS):
+            return True
     pieces = {text, *text.split("\n"), *text.splitlines(), *io.StringIO(text, newline=None)}
     for piece in pieces:
         for node in json_texts(piece):
@@ -684,8 +717,8 @@ class Run:
                        "Retained text replaces local paths and private content, in JSON and JSON Lines values as "
                        "decoded too (JSON text nested in strings up to four levels; deeper, or an object with a "
                        "duplicate name, is refused, and a line ends only at a line feed); the output is then read back "
-                       "under line feeds, splitlines and universal newlines, and refused if any reader recovers private "
-                       "content; "
+                       "under line feeds, splitlines, universal newlines and RS framing, and with every JSON string escape "
+                       "decoded across it, and refused if any reader recovers private content; "
                        "command, artifact and MCP digests are of the published text, while the RTK exactness and "
                        "Serena parity digests are of fixture output before sanitization"],
         }
@@ -769,7 +802,8 @@ class Run:
         so what a JSON escape hides (\\u0040 for "@", RFC 8259 7) is removed too; a string value that is itself
         JSON is read the same way, PUBLISH_DEPTH levels deep, and JSON text nested deeper is refused (PUBLISH_REFUSED),
         never passed through, as is an object with a duplicate name. Finally the output itself is verified: if any
-        reader recovers private content from it (recoverable()), it is refused. A JSON Lines line ends only at a line feed (a trailing carriage return is kept): RFC 8259
+        reader recovers private content from it (recoverable(): every framing the verifier reads, and every JSON string
+        escape decoded across the whole text, framing aside), it is refused. A JSON Lines line ends only at a line feed (a trailing carriage return is kept): RFC 8259
         7 allows U+2028, U+2029 and U+0085 raw in a string, and str.splitlines() would break there. Text whose decoded
         values clean() leaves alone is returned as clean() gives it; otherwise the document is written again from the
         cleaned values. host_receipts.py judges a receipt's decoded values the same way."""
@@ -1505,6 +1539,9 @@ def mcp_stdio_session(run: Run, label: str, argv: list[str], requests: list[tupl
                 process.wait()
         for reader in readers:
             reader.join(timeout=5)
+        if not any(reader.is_alive() for reader in readers):  # the readers are done: close the parent's pipe ends
+            for pipe in (process.stdout, process.stderr):
+                pipe.close()
         entry = {"label": label, "argv": [run.publish(arg) for arg in argv], "cwd": run.clean(str(cwd or run.work)),
                  "exit_code": process.returncode, "expected_exit": "any",
                  "timed_out": failure == "timed out waiting for an answer",
