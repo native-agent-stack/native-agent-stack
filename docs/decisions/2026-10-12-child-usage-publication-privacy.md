@@ -60,7 +60,23 @@ The redacted-state regression fails on the old checker and passes after this
 extension. Controls cover tampering, missing history, successive bindings and
 counter changes. Bindings are inert to saturation derivation. The old raw field
 remains in immutable published history, as the CC's ruling notes; no new private
-authentication is published. #995 still lands first because it supplies the writer.
+authentication is published. Landed #995 supplies the unchanged public writer.
+
+## Dated native advisory accounting
+
+The new historical-blob reads also extend the native resolver's monitoring
+inventory. The append-only advisory index retains #949 and #1016 in order, then
+adds #1032's dated delta through the existing GitTree/derive_ci_protected path.
+The unchanged #1016 baseline and every earlier delta remain intact. The native
+derivation binds the replayed source commit, script/shape multiplicities and
+location differences; the two added ledger reads have no permission change.
+Other location changes are recorded as source movement, not new authority.
+
+The exact owning push-gate regression fails before the new dated entry and
+passes with it. This is monitoring accounting, not a resolver grant or runtime
+acceptance. The mechanism is documented in
+blueprints/runtime-workers/openhands/evidence/advisory-gate-deltas.md at
+7151664c96f3ef70c20a65f54df7c90cea088d84; it is reused without changing the gate.
 
 ## Follow-ups
 

@@ -11397,8 +11397,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-read-deltas.json",
-      "sha256": "71680301005e030ac0371d175ccbe8eba365a55560f71299c71d09fc4ffca625",
-      "bytes": 371
+      "sha256": "060ef1dfefe0e6c27087852ff0269a1bec839621c85d6b328e0f7737483ef618",
+      "bytes": 479
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261004.json",
@@ -11419,6 +11419,11 @@
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261012-pr1016.json",
       "sha256": "6df6bb62e1bde5843ba77a800af2e889a4affb1c4c4bb6389234697c2755df05",
       "bytes": 24739
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261012-pr1032-delta.json",
+      "sha256": "d9c9cecb7b93a8aee9867364c5678a859cb6ba4ae7c82631bcc73660075fbe4f",
+      "bytes": 9734
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261012-pr949-delta.json",
@@ -18967,8 +18972,8 @@
     },
     {
       "path": "docs/decisions/2026-10-12-child-usage-publication-privacy.md",
-      "sha256": "d67c0aaf23ebcd1f2aa0ed6f76d15ffa484b41bd3e32cc52d071176b96707404",
-      "bytes": 4852
+      "sha256": "e7c43306f7a72b65aa608adca79496287e77be989bb20bf1bb9ad307bed4c2c7",
+      "bytes": 5780
     },
     {
       "path": "docs/decisions/2026-10-12-exploratory-account-rotation-and-exits.md",
