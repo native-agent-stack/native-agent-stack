@@ -62322,6 +62322,11 @@
       "bytes": 6566
     },
     {
+      "path": "tests/test_e_series.py",
+      "sha256": "2f12634eae247c790f18e84932231d924eafa404da5a271beecd843e03f02dcc",
+      "bytes": 72673
+    },
+    {
       "path": "tests/test_ecosystem_manifest.py",
       "sha256": "7abbcc021219b62e4ab223963008cf64834fecf88fdf27316c211945e8dde908",
       "bytes": 148079

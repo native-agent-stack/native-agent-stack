@@ -1,0 +1,69 @@
+# E3, Headroom parity: SKELETON. Nothing is frozen and nothing has run. It fails closed: the tests below come from ../frozen_inputs.py, which raises (and promptfoo stops before any provider call) until
+# frozen/e3.json names the tasks and the proxy, each with a matching sha256.
+#
+# Design (invoke-gap cause table, section 7): the same 12 E1 tasks, headless, with and without the Headroom proxy in front of the API (API-key runs only: an interactive OAuth session cannot use a base-URL proxy as
+# configured); metrics: input tokens, cost, answer equality; rule: adopt for headless lanes only at equal correctness and at least 15 percent fewer input tokens. The tasks are E1's tasks.json (the frozen file
+# names its sha256), graded by ../e1/e1_grade.py; the trees are E1's (e1_prepare.py), so E3_ROOT may be an E1 root.
+description: E3 Headroom parity (skeleton; fails closed until the inputs are frozen)
+
+evaluateOptions:
+  maxConcurrency: 1
+  cache: false
+
+x-fence: &fence
+  model: claude-opus-5-5
+  effort: medium
+  permission_mode: dontAsk
+  tools: [Bash, Read, Glob, Grep, ToolSearch]
+  custom_allowed_tools: []
+  disallowed_tools: [Agent, Task, Workflow, ScheduleWakeup, Edit, Write, NotebookEdit, WebFetch, WebSearch]
+  setting_sources: [local]
+  settings: '{{ env.E3_ROOT }}/settings.json'
+  strict_mcp_config: true
+  max_budget_usd: 4
+  path_to_claude_code_executable: '{{ env.E_CLAUDE }}'
+  copy_working_dir: copy
+  working_dir: '{{ env.E3_ROOT }}/trees/base'
+  output_format:
+    type: json_schema
+    schema:
+      type: object
+      properties:
+        answer: {type: string}
+        citations:
+          type: array
+          items:
+            type: object
+            properties:
+              file: {type: string}
+              line: {type: integer}
+            required: [file, line]
+        functions:
+          type: array
+          items: {type: string}
+      required: [answer, citations]
+
+prompts:
+  - label: worktree-start
+    raw: |-
+      The repository for this task is the current directory (a checkout of one commit). Answer the question about this checkout only.
+
+      Question: {{ question }}
+
+providers:
+  - id: anthropic:claude-agent-sdk
+    label: direct
+    config:
+      <<: *fence
+  # freeze: the proxy address (E3_PROXY_URL) and the Headroom version are inputs; the base URL reaches only the session's environment.
+  - id: anthropic:claude-agent-sdk
+    label: headroom-proxy
+    config:
+      <<: *fence
+      env:
+        ANTHROPIC_BASE_URL: '{{ env.E3_PROXY_URL }}'
+
+tests:
+  - path: file://../frozen_inputs.py:create_tests
+    config:
+      experiment: e3
