@@ -71,7 +71,8 @@ KEYRING_PREFIX = "native-agent-stack:"  # scripts/kernel_keyring.py PREFIX
 STATUSES = {"required", "optional", "user_only_paid", "generated_local", "native",
             "interactive_only", "ci_only", "test_only"}
 CLASSES = {"broker_api_key_pair", "contact_identity", "provider_api_key",
-           "local_service_secret", "native_signin", "ci_secret", "test_canary"}
+           "local_service_secret", "native_signin", "ci_secret", "test_canary",
+           "github_app_private_key"}  # a GitHub App's PEM key, a private_file (set_credential.py --from-file)
 TEMPLATE_PREFIXES = ("${XDG_CONFIG_HOME:-$HOME/.config}/", "${CODEX_HOME:-$HOME/.codex}/",
                      "${HF_HOME:-${XDG_CACHE_HOME:-$HOME/.cache}/huggingface}/", "$HOME/")
 NAME = re.compile(r"^[A-Z][A-Z0-9_]*$")

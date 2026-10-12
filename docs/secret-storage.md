@@ -39,6 +39,7 @@ against it.
 | `huggingface-native`, `huggingface-native-stored` | Hugging Face sign-in: the active token and every saved token | stored by `hf auth login`, one token per host ([Hugging Face sign-in](#hugging-face-sign-in)) | `$HF_HOME/token` and `$HF_HOME/stored_tokens`; `HF_HOME` defaults to `${XDG_CACHE_HOME:-$HOME/.cache}/huggingface` | none |
 | `ibkr-gateway` | IB Gateway / TWS login | typed in at login, nothing stored | none | none |
 | `github-actions` | `FOUNDATION_RESTORE_FIXTURE_20260920` and the per-job `github.token` | CI only | GitHub's encrypted secret store | none locally |
+| `github-review-app` | GitHub App private key (PEM) for the review worker's status; stored with `open_credential_terminal.sh github-review-app --from-file`, never read by an agent | optional | `<store>/github-review-app.pem` (a key file, 0600), pointer `GITHUB_REVIEW_APP_KEY_PATH` | none in the file; `GITHUB_REVIEW_APP_ID` (the App's ID, not secret) is set beside its loader |
 
 `<store>` means `${XDG_CONFIG_HOME:-$HOME/.config}/native-agent-stack`.
 
@@ -439,12 +440,25 @@ Never paste a key into a chat, an issue, a prompt or a command line. Run:
 ```sh
 tools/credentials/open_credential_terminal.sh <inventory-id>              # store or rotate a stored key
 tools/credentials/open_credential_terminal.sh alpaca-paper --probe       # ...then probe the paper rate limit
+tools/credentials/open_credential_terminal.sh github-review-app --from-file   # move a downloaded key file into the store
 ```
 
 The command opens a new terminal window: Windows Terminal on WSL2 (or a console window if Windows Terminal is missing), Terminal.app on macOS, or an X terminal on a Linux desktop. If it cannot open one, it prints the one command to run yourself. An agent may open the window, but it never sees what you type.
 
 - **Before anything is typed**, the window prints the checkout's commit. It refuses if `tools/credentials/`, `scripts/credential_status.py` or `adoption/credential-inventory.json` has uncommitted changes, so you only ever type into committed code. It clears `PYTHONPATH`, `LD_PRELOAD` and similar variables, and runs Python with `-I`.
 - **Stored keys:** `tools/credentials/set_credential.py <inventory-id>` accepts only operator-supplied entries (required, optional or paid) whose file sits directly in the store. It asks for each variable with hidden input, and refuses if the terminal cannot hide input. It writes `export NAME=value` lines atomically: a `0600` file in the `0700` store, outside Git, written through a directory handle opened without following symlinks. To replace an existing file you type `replace`, also hidden. Its one form without a terminal, `--from-env`, is create-only and exists for a key that already lives in the kernel keyring ([Kernel keyring](#kernel-keyring-transport-and-per-boot-spare-2026-09-29)).
+- **Key files** (2026-10-12): `tools/credentials/set_credential.py <inventory-id> --from-file` takes custody of a key
+  file you downloaded, for an operator-supplied entry whose store is a private key file (`github-review-app`, a GitHub
+  App's PEM key; GitHub keeps only the public part and the key downloads once). In the window you type the downloaded
+  file's path at a visible prompt (a path is not secret; it is never written into the session script or onto a command
+  line). The tool opens the file without following a symlink, refuses anything but a regular file of 1 byte to 64 KiB,
+  copies it unread and unprinted into a new 0600 file in the store (through the same checked directory handle as stored
+  keys), and checks the stored copy with `openssl pkey -noout -passin pass:` on its standard input, using only the exit
+  status (a passphrase-protected key fails instead of prompting). If the check fails, the copy is removed and the
+  downloaded file stays where it was. If it passes, the copy takes the final name (an existing key needs `replace` at
+  the hidden prompt first) and only then is the downloaded file removed, provided the typed path still names the file
+  that was copied. Neither the hidden prompt nor `--from-env` accepts a key-file entry, so no `export` line is ever
+  written to a key file.
 - **Paper rate limit:** `tools/credentials/alpaca_rate_limit_probe.py` sends one read-only `GET /v2/account` to the fixed paper host. It follows no redirect, reads no response body and places no order. It saves only the HTTP status and the `x-ratelimit-*` headers, under `${XDG_STATE_HOME:-$HOME/.local/state}/native-agent-stack/rate-limit/`, where a later session can read them. `x-ratelimit-limit` is Alpaca's own per-account calls-per-minute figure (200 on the standard tier), so measuring it never needs order traffic. Agents may run it with `--env-file "$PAPER_ENV_FILE"`.
 
 Live broker keys are out of scope for this repository. Live trading is handled outside it, and no tool here accepts a live endpoint.
@@ -461,6 +475,7 @@ export PAPER_ENV_FILE_2="$_nas_store/alpaca-paper-2.env"   # second paper accoun
 export PAPER_ENV_FILE_C="$_nas_store/alpaca-paper-c.env"   # paper account C, where this host holds one
 export SEC_CONTACT_ENV="$_nas_store/sec-contact.env"
 export PIT_ALPACA_ENV_PATH="$PAPER_ENV_FILE" PIT_SEC_ENV_PATH="$SEC_CONTACT_ENV"
+export GITHUB_REVIEW_APP_KEY_PATH="$_nas_store/github-review-app.pem"   # the review App's key file, where this host holds one
 unset _nas_store
 ```
 

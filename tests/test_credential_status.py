@@ -144,6 +144,22 @@ class CredentialStatusTests(unittest.TestCase):
                   for name in e["pointer_variables"]}
         self.assertFalse(set(account_c["pointer_variables"]) & others)
 
+    def test_github_review_app_is_a_private_key_file_with_a_public_app_id(self):
+        # The GitHub App's PEM key (2026-10-12): a private_file of its own class, directly under the store root, holding no
+        # export line; its App ID is a public optional variable outside the file, its pointer is guarded, and no loader yet.
+        row = next(e for e in self.inventory["entries"] if e["id"] == "github-review-app")
+        self.assertEqual((row["class"], row["status"], row["store"]["kind"]),
+                         ("github_app_private_key", "optional", "private_file"))
+        self.assertEqual(row["store"]["path_template"],
+                         "${XDG_CONFIG_HOME:-$HOME/.config}/native-agent-stack/github-review-app.pem")
+        self.assertEqual(row["variables"], [])
+        self.assertEqual(row["optional_variables"], ["GITHUB_REVIEW_APP_ID"])
+        self.assertEqual(row["public_variables"], ["GITHUB_REVIEW_APP_ID"])
+        self.assertEqual(row["pointer_variables"], ["GITHUB_REVIEW_APP_KEY_PATH"])
+        self.assertEqual((row["loaders"], row["environment_only_consumers"]), ([], []))
+        self.assertIn("github_app_private_key", cs.CLASSES)
+        self.assertIn("--from-file", row["notes"])
+
     def test_public_variables_classify_every_optional_stored_variable(self):
         # 2026-09-29 (tools/credentials/credential_run.py): the key runner masks every variable it injects except the
         # names in the entry's optional public_variables, which may name only optional variables that are not secret,
