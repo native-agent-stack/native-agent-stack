@@ -18,18 +18,20 @@ host install, model/E2E run, qualified winner or live configuration change.
 
 | Layer | State | Comparison and frozen scope/rule | Exact preregistration SHA256 |
 | --- | --- | --- | --- |
-| git-github-automation | SCHEDULED | [w6-git-github-automation-20261011](git-github-automation.comparison.json) | `cd2cf214d5e0d625bd1119d7b2d833b7886e5a319f0428ca860b9eb19d82230d` |
-| instructions-skills | SCHEDULED | [w6-instructions-skills-20261011](instructions-skills.comparison.json) | `b8c61150368204bc7f381bc8e250fd8cef3880e32cd178ec03471c132865d03d` |
-| observation-inference | SCHEDULED | [w6-observation-inference-20261011](observation-inference.comparison.json) | `c7e0fff63c3695472be8dbfb366bdede2b65bb3ee22fb39d879e257591bee9df` |
-| quality-evaluation | SCHEDULED | [w6-quality-evaluation-20261011](quality-evaluation.comparison.json) | `a2f7d85167bec0bcc2f08eab35397a436dce0c1bf8c0657163d7cc5610c14dd6` |
-| recovery-portability | SCHEDULED | [w6-recovery-portability-20261011](recovery-portability.comparison.json) | `6596dbfba2fbb158b05f3d801a090937d7d8cd20a8cde3dd538fd47df8bda167` |
-| scheduling-supervision | SCHEDULED | [w6-scheduling-supervision-20261011](scheduling-supervision.comparison.json) | `c534d3ad24a3312219ea4107ae9f18a42af12bfa70acf8676263d5adbcaa7135` |
-| token-efficiency | SCHEDULED | [w6-token-efficiency-20261011](token-efficiency.comparison.json) | `3948be402612b61940ff3b00cb6be5e308d48d798700aa417118cb7538480761` |
+| git-github-automation | SCHEDULED | [w6-git-github-automation-20261011](git-github-automation.comparison.json) | `7645182ce8a46711cf31a904c7f603d2bd15b8ed4dfe36da01f990c0e39affd5` |
+| instructions-skills | SCHEDULED | [w6-instructions-skills-20261011](instructions-skills.comparison.json) | `0ca6e570c4dac8416b96125e2acf5fc75a0f89a8a4dfbabf587d77f789b5f751` |
+| observation-inference | SCHEDULED | [w6-observation-inference-20261011](observation-inference.comparison.json) | `c23fdfa225861aefbb3f404355542bf8abcf4299e4c32503f7e41ce674a53806` |
+| quality-evaluation | SCHEDULED | [w6-quality-evaluation-20261011](quality-evaluation.comparison.json) | `ec4f4271e07c76f0eef2fa5787efa4cf96e862e126e6892c08b5f88f398a7167` |
+| recovery-portability | SCHEDULED | [w6-recovery-portability-20261011](recovery-portability.comparison.json) | `14dae35c0e84e071caa54b8ba559f3f2cab202b43e6eee843cdab3322627a2bf` |
+| scheduling-supervision | SCHEDULED | [w6-scheduling-supervision-20261011](scheduling-supervision.comparison.json) | `fdc5a6ee76f5d76c9dbbae510565a6e5a9c4632b19eaa4bda6d1fd2f776459c3` |
+| token-efficiency | SCHEDULED | [w6-token-efficiency-20261011](token-efficiency.comparison.json) | `0c6cd76ede091d0c799135da66cf98bb33a2e2540fbcb180e6901a17f73bcb05` |
 
 The comparison files name their required source, case/oracle and owner-receipt
 inputs. The readiness event is retention of the hash-bound input packet for the
 named comparison with every listed input present; the review-and-landing replay
-also requires #953 and #975 to land. Both PRs remained OPEN at the source check.
+also requires #953 and #975 to land. Both were OPEN at the original source check; they have since
+landed as 3a8a8461 and 86fa3844. The case/source/owner inputs remain required, and #1027 is OPEN
+at the subsequent source check.
 Sixteen retained candidate source mirrors were still missing from the observed
 source snapshot, and the corresponding immutable source packets remain required.
 No comparison whose complete inputs exist may be delayed or replaced by research.
@@ -53,7 +55,7 @@ source hash, reader hash, verdicts, winners and joined run records.
 | Layer | Run pins recorded in c2dee173 |
 | --- | --- |
 | git-github-automation | worktrunk: 0.80.0; candidate:cli-cli: 2.101.0; difftastic: 0.71.0 |
-| instructions-skills | affaan-m/ECC: dd6ee538aee0f548d4a6b520118f875431fd749e; candidate:typesafe-ai-skills: no run pin; candidate:openai-skills: no run pin |
+| instructions-skills | affaan-m/ECC: dd6ee538aee0f548d4a6b520118f875431fd749e; candidate:typesafe-ai-skills: no run pin; candidate:openai-skills: historical no run pin, now RETIRED |
 | observation-inference | opentelemetry-collector-contrib: 0.162.0; prometheus: 3.15.0; loki: 3.7.8 |
 | quality-evaluation | promptfoo: 0.123.1; playwright-test: 1.63.0 |
 | recovery-portability | restic: 0.19.1; candidate:astral-sh-uv: 0.12.17 |
@@ -112,10 +114,12 @@ not survivors, qualified choices or native acceptance. No discovery ran.
 
 The review-and-landing role compares the current pinned #953/connector/exec/GPT
 kit/#975/ruleset/#947 path with gh-aw, codex-action, reviewdog, mergify-cli,
-coderabbit skills, the OpenHands resolver and SWE-agent. W1 replays
+coderabbit skills and PR-Agent on its local CLI path. Landing compares the #975/#1027 scripts,
+rulesets and #947 with mergify-cli using a sealed incident replay. Reviewdog is a reporting adapter;
+OpenHands and both SWE-agent resolvers are excluded from these roles. W1 review replays
 #974, #978, #970, #989, #982 and #992: block every known P1/P2, then minimize false
 blockers and complete measured cost. The sem subcomparison follows the existing
-[10-02 P2 decision](../2026-10-02-github-automation-practice.md#decision):
+[10-02 P2 decision](../2026-10-02-github-automation-practice.md#preregistered-checks):
 difftastic sample files and frozen repository PR diffs, scored by promptfoo;
 a tie goes to the user.
 
@@ -148,7 +152,8 @@ pins and named evidence gaps.
 
 [primary-source-refs.json](primary-source-refs.json) retains the 13 initial
 central mirrors at full MIRRORS.lock SHAs, exact public source hashes and
-documentation section locations. Locked HEADs matched.
+documentation section locations. Locked HEADs matched at the original check. Historical lock-snapshot
+digests with unavailable preimages are omitted; individual repository pins and source-byte digests remain.
 [ollama-source-recovery-20261011.json](ollama-source-recovery-20261011.json)
 adds Ollama at `eab97e9f92b9a25c2d52d2cc6c1b1c99bd9fae21`, with lazy fetch and
 optional locks disabled. These are source_review observations.
@@ -193,3 +198,20 @@ Heavy suites in Monday 08:00Z–20:00Z use the T2 idle wrapper; full suites also
 require SUITE-REQUEST/SUITE-GO. No heavy E2E, mutation run or model replay ran
 for this source/decision closeout.
 
+## Role corrections and retained reopening inputs
+
+[arm-dispositions.json](arm-dispositions.json) records five Review arms and two Landing arms,
+the native resolver retirement, SWE-agent supersession by mini-swe-agent, the reporting-only
+reviewdog boundary and candidate:openai-skills **RETIRED** with openai/plugins as successor.
+The resolver sources stay in the workers closeout; OpenHands/extensions belongs to W7.
+The native merge queue becomes eligible only after the organization move and its qualification.
+No successor is installed or adopted by this closeout.
+
+GPU exporters are additive GPU-field trials beside the unchanged guard; llama-swap is a routing
+comparison with backend inference held constant. agent-console is an attribution observer; MCP
+deferral has explicit permission, hook, approval, invoke and server-instruction gates. Dagu tests
+2.17.2 with its scheduler and default/tuned liveness; Restate tests cross-host leader loss. SQL
+and Conductor recovery keep their retained job/cancellation scopes and resource controls.
+Inspect tests mutations, empty/cancelled controls, failure localization and 20-case top-up.
+Each retained not-adopted condition is a named readiness input; missing votes remain missing.
+All seven preregistrations, decision-rule copies and readiness copies are re-frozen together.

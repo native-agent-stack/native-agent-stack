@@ -1,0 +1,159 @@
+{
+  "schema_version": 1,
+  "evidence_class": "source_review",
+  "boundary": "No installation, E2E, paid call, runtime adoption or new discovery.",
+  "sources": [
+    {
+      "repository": "https://github.com/SWE-agent/SWE-agent",
+      "commit": "3ea751c087f32b16e039a2233dd6eefecef325d5",
+      "path": "README.md",
+      "sha256": "dcd880557720efbab0f5c0e68f2bc742309efecfce83244c9e670ec1f1adf76f",
+      "bytes": 8158,
+      "line_ranges": [
+        [
+          20,
+          24
+        ]
+      ]
+    },
+    {
+      "repository": "https://github.com/SWE-agent/mini-swe-agent",
+      "commit": "a83fcae82d2a08f0ee0c688f9d137b3566c097f8",
+      "path": "README.md",
+      "sha256": "9982d90b7566f2f3fa5e9811b475d5e8e2a84e2df80cf3f1e4be6e820b129835",
+      "bytes": 11106,
+      "line_ranges": [
+        [
+          154,
+          175
+        ]
+      ]
+    },
+    {
+      "repository": "https://github.com/SWE-agent/mini-swe-agent",
+      "commit": "04d809ceab9df28f9adaed044884180159172930",
+      "path": "README.md",
+      "sha256": "9982d90b7566f2f3fa5e9811b475d5e8e2a84e2df80cf3f1e4be6e820b129835",
+      "bytes": 11106,
+      "line_ranges": [
+        [
+          154,
+          175
+        ]
+      ]
+    },
+    {
+      "repository": "https://github.com/openai/skills",
+      "commit": "49f948faa9258a0c61caceaf225e179651397431",
+      "path": "README.md",
+      "sha256": "0f6a07580f3c627253e15a58dd0439e135049ec38eb16cf3587f7e50abc6f590",
+      "bytes": 1840,
+      "line_ranges": [
+        [
+          1,
+          2
+        ]
+      ]
+    },
+    {
+      "repository": "https://github.com/openai/plugins",
+      "commit": "0722921d5542fc593105c27bd52630babd8b8c2a",
+      "path": "README.md",
+      "sha256": "b3681ebd15797bdee1d638c6520c7ba10a36e676760ea5c251530f53f843c852",
+      "bytes": 1283,
+      "line_ranges": [
+        [
+          1,
+          7
+        ]
+      ]
+    },
+    {
+      "repository": "https://github.com/The-PR-Agent/pr-agent",
+      "commit": "1bf73e5d8fcfc25925f3773f8582fe5421ca7d80",
+      "path": "README.md",
+      "sha256": "47903df85332f845ef43bd64b20cb1af027241170036d4844a0a1bc5bfbfd401",
+      "bytes": 9269,
+      "line_ranges": [
+        [
+          88,
+          98
+        ],
+        [
+          189,
+          191
+        ],
+        [
+          213,
+          215
+        ]
+      ]
+    },
+    {
+      "repository": "https://github.com/reviewdog/reviewdog",
+      "commit": "cfb9ce1577e1e86f66bdfef6113d27340340923e",
+      "path": "README.md",
+      "sha256": "1c638e40f19eefc75e4bb1812f849583e21c0dc08d84ae3eb74422ccbd185b22",
+      "bytes": 46042,
+      "line_ranges": [
+        [
+          61,
+          65
+        ],
+        [
+          165,
+          169
+        ]
+      ]
+    }
+  ],
+  "review": {
+    "arms": 5,
+    "pr_agent_retained_ref": "catalogs/landscape/grand-catalog-20261008.json#/rows/3875",
+    "pr_agent_retained_disposition": "PENDING"
+  },
+  "landing": {
+    "arms": 2,
+    "native_merge_queue": "Not an arm until the repository joins the intended organization and its native queue is qualified."
+  },
+  "excluded_arms": [
+    {
+      "repository": "https://github.com/OpenHands/OpenHands",
+      "role": "issue-to-PR resolver",
+      "terminal_state": "RETIRED",
+      "reason": "The CC retires the resolver execution role under W6 section 3(b); the source names the retired resolver and the derivation has been monitoring only since the 10-04 decision. OpenHands remains in the workers closeout.",
+      "authority": "CC adjudication-pr1023-b9ee9e6b-20261012.md",
+      "source": "3a8a8461:blueprints/runtime-workers/openhands/RESOLVER.md:244-253",
+      "monitoring_source": "3a8a8461:blueprints/runtime-workers/openhands/RESOLVER.md:5-7",
+      "later_intake": "OpenHands/extensions github-pr-reviewer and github-issue-to-pr go to W7."
+    },
+    {
+      "repository": "https://github.com/SWE-agent/SWE-agent",
+      "role": "issue-to-PR resolver",
+      "disposition": "superseded by SWE-agent/mini-swe-agent",
+      "source": "SWE-agent/SWE-agent@3ea751c087f32b16e039a2233dd6eefecef325d5:README.md:20-24",
+      "boundary": "Neither resolver is a Review or Landing arm; mini-swe-agent belongs to the workers closeout.",
+      "successor_retained_pins": [
+        "a83fcae82d2a08f0ee0c688f9d137b3566c097f8",
+        "04d809ceab9df28f9adaed044884180159172930"
+      ]
+    },
+    {
+      "repository": "https://github.com/reviewdog/reviewdog",
+      "role": "reporting adapter",
+      "disposition": "no analyzer or landing role in this comparison",
+      "source": "reviewdog/reviewdog@cfb9ce1577e1e86f66bdfef6113d27340340923e:README.md:61-65"
+    }
+  ],
+  "component_retirements": [
+    {
+      "component_id": "candidate:openai-skills",
+      "repository": "https://github.com/openai/skills",
+      "terminal_state": "RETIRED",
+      "reason": "Upstream deprecates this repository and names openai/plugins as its successor. No successor adoption is inferred.",
+      "source": "openai/skills@49f948faa9258a0c61caceaf225e179651397431:README.md:2",
+      "successor": "https://github.com/openai/plugins",
+      "successor_source_pin": "0722921d5542fc593105c27bd52630babd8b8c2a"
+    }
+  ]
+}

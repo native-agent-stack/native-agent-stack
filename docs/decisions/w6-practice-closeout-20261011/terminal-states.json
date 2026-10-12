@@ -23,6 +23,16 @@
       "reason": "Retired by #981; HARNESS-WIF-FIX-PROPOSAL is superseded.",
       "authority_commit": "8bffa2c41692ef483e91b68e3b15aeb331423d2c",
       "boundary": "This retires a role, not the entire git-github-automation layer or the local review-and-landing path."
+    },
+    {
+      "repository": "https://github.com/OpenHands/OpenHands",
+      "role": "issue-to-PR resolver",
+      "terminal_state": "RETIRED",
+      "reason": "The CC retires the resolver execution role under W6 section 3(b); the source names the retired resolver and the derivation has been monitoring only since the 10-04 decision. OpenHands remains in the workers closeout.",
+      "authority": "CC adjudication-pr1023-b9ee9e6b-20261012.md",
+      "source": "3a8a8461:blueprints/runtime-workers/openhands/RESOLVER.md:244-253",
+      "monitoring_source": "3a8a8461:blueprints/runtime-workers/openhands/RESOLVER.md:5-7",
+      "later_intake": "OpenHands/extensions github-pr-reviewer and github-issue-to-pr go to W7."
     }
   ],
   "layers": [
@@ -32,20 +42,27 @@
       "terminal_state": "SCHEDULED",
       "comparison_id": "w6-git-github-automation-20261011",
       "preregistration_ref": "docs/decisions/w6-practice-closeout-20261011/git-github-automation.comparison.json",
-      "preregistration_sha256": "cd2cf214d5e0d625bd1119d7b2d833b7886e5a319f0428ca860b9eb19d82230d",
+      "preregistration_sha256": "7645182ce8a46711cf31a904c7f603d2bd15b8ed4dfe36da01f990c0e39affd5",
       "readiness_trigger": {
-        "event": "The existing native harness owner retains the hash-bound w6-git-github-automation-20261011 input packet with all named inputs below; for review-and-landing, #953 and #975 must also be landed.",
+        "event": "The existing evidence owner retains the hash-bound w6-git-github-automation-20261011 packet with all source, oracle and retained-reopen inputs listed below.",
         "required_inputs": [
           "#953 and #975 land for the review-and-landing replay",
           "Archived W1 defective-head/oracle packet and P2 labeled case packet are retained with immutable hashes",
-          "Exact runtime pins, primary source and native acceptance boundaries are captured"
+          "Exact runtime pins, primary source and native acceptance boundaries are captured",
+          "The lane-sealed landing-incident heads, merge bases, thread states, verdict bindings and oracle packet are retained",
+          "#1027 landing implementation has its final immutable execution pin and source/acceptance boundary retained",
+          "The sem 0.25.0 comparison release commit and source/case oracle seals are retained"
         ],
         "met_at_closeout": false
       },
       "decision_rule": [
         {
-          "role": "review-and-landing",
-          "rule": "Reject any arm that fails to block any known P1 or P2; among all complete arms, choose fewest false blockers, then lowest complete measured provider cost; exact ties retain the qualified current path. Retain failures, incomplete reads and costs."
+          "role": "review",
+          "rule": "Reject any arm that fails to block any known P1 or P2; among all complete arms, choose fewest false blockers, then lowest complete measured provider cost; exact ties retain the qualified current path. Retain failures, incomplete reads and costs. If every arm is rejected, no arm is selected and the current path gains no new acceptance; retain the failed packet for adjudication."
+        },
+        {
+          "role": "landing",
+          "rule": "Reject an arm that permits a merge-skew head, unresolved review threads, or stale-verdict head. Among complete passing arms choose the fewest false stops, then lowest median time-to-land in milliseconds on the identical sealed cases. Exact ties retain the qualified current path. If all arms fail, retain failures and select none."
         },
         {
           "role": "structural-diff",
@@ -138,9 +155,9 @@
       "terminal_state": "SCHEDULED",
       "comparison_id": "w6-instructions-skills-20261011",
       "preregistration_ref": "docs/decisions/w6-practice-closeout-20261011/instructions-skills.comparison.json",
-      "preregistration_sha256": "b8c61150368204bc7f381bc8e250fd8cef3880e32cd178ec03471c132865d03d",
+      "preregistration_sha256": "0ca6e570c4dac8416b96125e2acf5fc75a0f89a8a4dfbabf587d77f789b5f751",
       "readiness_trigger": {
-        "event": "The existing native harness owner retains the hash-bound w6-instructions-skills-20261011 input packet with all named inputs below; for review-and-landing, #953 and #975 must also be landed.",
+        "event": "The existing evidence owner retains the hash-bound w6-instructions-skills-20261011 packet with all source, oracle and retained-reopen inputs listed below.",
         "required_inputs": [
           "Selected-file source pin/digests and owner trial task/oracle seals are retained",
           "cc-native-practice and co-op provide client-specific row/launcher qualification receipts",
@@ -151,7 +168,7 @@
       "decision_rule": [
         {
           "role": "selected-skills",
-          "rule": "Require every baseline correctness/safety oracle to remain satisfied. Prefer fewer task errors, then lower complete provider tokens/cost at equal quality; an exact tie or an unmeasured gain does not expand adoption. Whole-pack installation is not an arm."
+          "rule": "Require every baseline correctness/safety oracle to remain satisfied. Prefer fewer task errors, then lower complete provider tokens/cost at equal quality; an exact tie or an unmeasured gain does not expand adoption. Whole-pack installation is not an arm. Retain per-client invoke counts: a selected role with measured zero invokes gains no acceptance; repair its owning launcher or retire the uninvoked role under the protocol."
         }
       ],
       "frozen_scope_ref": "docs/decisions/w6-practice-closeout-20261011/instructions-skills.comparison.json",
@@ -217,9 +234,12 @@
               "run_pin": null,
               "run_pin_source": null,
               "pin_drift": null,
-              "run_reason": "unpinned"
+              "run_reason": "unpinned",
+              "terminal_state": "RETIRED",
+              "retirement_ref": "docs/decisions/w6-practice-closeout-20261011/arm-dispositions.json#/component_retirements/0"
             }
-          ]
+          ],
+          "boundary": "Historical c2dee173 snapshot is retained; candidate:openai-skills is RETIRED and excluded from future winner qualification."
         },
         "upstream_e2e": {
           "qualified_join": false,
@@ -240,24 +260,35 @@
       "terminal_state": "SCHEDULED",
       "comparison_id": "w6-observation-inference-20261011",
       "preregistration_ref": "docs/decisions/w6-practice-closeout-20261011/observation-inference.comparison.json",
-      "preregistration_sha256": "c7e0fff63c3695472be8dbfb366bdede2b65bb3ee22fb39d879e257591bee9df",
+      "preregistration_sha256": "c23fdfa225861aefbb3f404355542bf8abcf4299e4c32503f7e41ce674a53806",
       "readiness_trigger": {
-        "event": "The existing native harness owner retains the hash-bound w6-observation-inference-20261011 input packet with all named inputs below; for review-and-landing, #953 and #975 must also be landed.",
+        "event": "The existing evidence owner retains the hash-bound w6-observation-inference-20261011 packet with all source, oracle and retained-reopen inputs listed below.",
         "required_inputs": [
           "All six retained candidate primary sources and exact pins are recovered",
           "Native task/counter and inference task/model/hardware case seals are retained",
-          "Existing inference account/hardware and Monday paper execution gates permit the scoped run"
+          "GPU field/window/interop and routing admission/reload/error oracle packets are retained with identical backend pins",
+          "A required lane is evidenced making in-process Anthropic SDK calls outside Claude Code, with a content-disabled single-collector qualification packet.",
+          "NVIDIA documents WSL2/full-GeForce support, or retained native discovery shows additional memory/utilization/power fields on the declared WSL GPU; only then run the paired exporter trial.",
+          "The owner retains approved embeddings eviction or a second non-llama.cpp engine, or a documented multi-model need that native llama-server router mode fails on the same host."
         ],
         "met_at_closeout": false
       },
       "decision_rule": [
         {
-          "role": "telemetry",
-          "rule": "Reject lost/double-counted requests, sensitive-content capture or incomplete source attribution. Compare reconciled counts/fidelity first, then measured collection overhead; exact ties retain the qualified current route."
+          "role": "provider-telemetry",
+          "rule": "Reject missing/double-counted request or token totals, sensitive-content capture or missing model/error attribution. Require exact integer-counter reconciliation against the frozen native receipt; then choose the lowest median collection overhead in milliseconds. An exact tie retains the qualified route."
+        },
+        {
+          "role": "gpu-field-telemetry",
+          "rule": "Require memory agreement within 1 MiB for at least 99% of pairs, an explicit failure series, utilization agreement within 5 percentage points, no guard timeout or increased paired median query latency, and a useful cross-signal query absent from ad-hoc files. Compare eligible exporters on additional correct field coverage, then median collection overhead; do not score an exporter on provider request attribution."
         },
         {
           "role": "local-inference",
-          "rule": "Require all existing correctness/privacy/recovery oracles, then compare measured latency and resource cost under identical workload constraints. Any unsupported host/model combination is retained as a bounded non-result, not a winner."
+          "rule": "Require all frozen correctness/privacy/recovery oracles at identical model, quantization and host scope. Among complete passing arms rank p95 task-completion latency in milliseconds, then peak resident bytes; exact ties retain the qualified route. Unsupported host/model combinations remain bounded non-results."
+        },
+        {
+          "role": "model-service-routing",
+          "rule": "Reject a route that misses the documented routing need, fails C1 admission or adds embedding-lane errors. Rank passing routes by p95 reload latency in milliseconds; ties retain the qualified router/window. Attribute results to routing only, never to a replacement inference engine."
         }
       ],
       "frozen_scope_ref": "docs/decisions/w6-practice-closeout-20261011/observation-inference.comparison.json",
@@ -346,24 +377,27 @@
       "terminal_state": "SCHEDULED",
       "comparison_id": "w6-quality-evaluation-20261011",
       "preregistration_ref": "docs/decisions/w6-practice-closeout-20261011/quality-evaluation.comparison.json",
-      "preregistration_sha256": "a2f7d85167bec0bcc2f08eab35397a436dce0c1bf8c0657163d7cc5610c14dd6",
+      "preregistration_sha256": "ec4f4271e07c76f0eef2fa5787efa4cf96e862e126e6892c08b5f88f398a7167",
       "readiness_trigger": {
-        "event": "The existing native harness owner retains the hash-bound w6-quality-evaluation-20261011 input packet with all named inputs below; for review-and-landing, #953 and #975 must also be landed.",
+        "event": "The existing evidence owner retains the hash-bound w6-quality-evaluation-20261011 packet with all source, oracle and retained-reopen inputs listed below.",
         "required_inputs": [
           "60-case advice packet has an independent label seal and immutable case hash",
           "MTEB retained source and matching embedding-evaluation case packet are recovered",
-          "Upstream install/test paths at the selected source pins are available"
+          "Upstream install/test paths at the selected source pins are available",
+          "Mutation, empty/cancelled control, per-sample localization and 20-case growth/top-up oracle seals are retained",
+          "Embedding metric tolerances and the independent shuffled-ranking oracle are fixed before execution",
+          "A concrete embedding/retrieval change and privacy-filtered independent relevance/metric packet are retained."
         ],
         "met_at_closeout": false
       },
       "decision_rule": [
         {
           "role": "semantic-advice-evaluation",
-          "rule": "Reject an arm that loses a case or hides an error/cancellation; compare grading disagreements against the same sealed labels, then false positive count, then complete provider cost. Exact ties retain the qualified incumbent. No adoption from runtime/installation alone."
+          "rule": "Reject missing cases or hidden errors/cancellations. Inspect joins or replaces only if it detects more injected mutations or correctly distinguishes empty/cancelled controls where Promptfoo does not, while preserving per-sample failure-localizing logs and running only the 20 growth cases during top-up. At detection/localization parity Promptfoo stays and Inspect remains keep_but_compare; compare complete provider USD only after the correctness criteria."
         },
         {
           "role": "embedding-evaluation",
-          "rule": "Reject missing/error or mismatched inputs; use identical retrieval relevance labels and existing task acceptance thresholds, then lowest complete execution cost among equal-quality arms. This auxiliary role does not substitute for the Promptfoo-versus-Inspect decision."
+          "rule": "Reject missing/mismatched inputs, failed relevance thresholds, metric disagreement beyond the sealed per-query tolerance, or an undetected shuffled-ranking control. Equal quality means every shared oracle passes on the same labels. Rank such complete arms by provider USD, then elapsed milliseconds; ties retain the qualified task path. This does not substitute for the advice comparison."
         }
       ],
       "frozen_scope_ref": "docs/decisions/w6-practice-closeout-20261011/quality-evaluation.comparison.json",
@@ -443,20 +477,21 @@
       "terminal_state": "SCHEDULED",
       "comparison_id": "w6-recovery-portability-20261011",
       "preregistration_ref": "docs/decisions/w6-practice-closeout-20261011/recovery-portability.comparison.json",
-      "preregistration_sha256": "6596dbfba2fbb158b05f3d801a090937d7d8cd20a8cde3dd538fd47df8bda167",
+      "preregistration_sha256": "14dae35c0e84e071caa54b8ba559f3f2cab202b43e6eee843cdab3322627a2bf",
       "readiness_trigger": {
-        "event": "The existing native harness owner retains the hash-bound w6-recovery-portability-20261011 input packet with all named inputs below; for review-and-landing, #953 and #975 must also be landed.",
+        "event": "The existing evidence owner retains the hash-bound w6-recovery-portability-20261011 packet with all source, oracle and retained-reopen inputs listed below.",
         "required_inputs": [
           "WSL retained primary source and missing GPT-fit outcome are recovered or substantively adjudicated",
           "The declared restoration profile and synthetic input/oracle seal are retained",
-          "A destination host and its normal native sign-ins exist before any genuine destination-host acceptance"
+          "A destination host and its normal native sign-ins exist before any genuine destination-host acceptance",
+          "A WSL release documents selective export allowlist/exclude support at WslClient.cpp and official commands, with synthetic auth-store canaries and the equal-profile restore oracle packet."
         ],
         "met_at_closeout": false
       },
       "decision_rule": [
         {
           "role": "portable-owned-recovery",
-          "rule": "Reject a route that cannot restore the same declared paths/types/bytes/modes or isolate the declared scope, or that requires copying credential contents. Compare only equal restoration scopes, then recovery effort/cost; exact ties retain the smaller qualified current path. Full-distro export cannot prove selective profile portability."
+          "rule": "Reject unequal declared paths/types/bytes/modes, failed isolation or any need to copy credential contents. Among passing equal restoration scopes rank required operator-command count, then median restore milliseconds, then complete provider USD; ties retain the smaller qualified profile. Full-distro export cannot prove selective portability."
         }
       ],
       "frozen_scope_ref": "docs/decisions/w6-practice-closeout-20261011/recovery-portability.comparison.json",
@@ -536,20 +571,35 @@
       "terminal_state": "SCHEDULED",
       "comparison_id": "w6-scheduling-supervision-20261011",
       "preregistration_ref": "docs/decisions/w6-practice-closeout-20261011/scheduling-supervision.comparison.json",
-      "preregistration_sha256": "c534d3ad24a3312219ea4107ae9f18a42af12bfa70acf8676263d5adbcaa7135",
+      "preregistration_sha256": "fdc5a6ee76f5d76c9dbbae510565a6e5a9c4632b19eaa4bda6d1fd2f776459c3",
       "readiness_trigger": {
-        "event": "The existing native harness owner retains the hash-bound w6-scheduling-supervision-20261011 input packet with all named inputs below; for review-and-landing, #953 and #975 must also be landed.",
+        "event": "The existing evidence owner retains the hash-bound w6-scheduling-supervision-20261011 packet with all source, oracle and retained-reopen inputs listed below.",
         "required_inputs": [
-          "Three retained alternative source pins and upstream-supported test paths are recovered",
-          "Existing shared recovery workload and its input/oracle hashes are sealed for all arms",
-          "Owning runtime/client moved-pin receipts and execution capacity gate are satisfied"
+          "All retained runtime source pins, including the Dagu 2.17.2 release commit, scheduler mechanism and upstream-owned install/test paths, are recovered",
+          "Checkpoint A/B, SQL-job, Conductor cancellation and three-host finalize/leader-kill oracle packets and host scopes are sealed",
+          "Owning runtime/client moved-pin qualification receipts are retained",
+          "The owning recovery lane qualifies an upstream-supported Dagu 2.17.2 scheduler execution path against the retained A/B oracles; the accepted 2.16.6-only runner is not reused unchanged.",
+          "A real SQL-centric research job documents the needed advantage over Dagu plus ordinary transactions and its supported intended-host installation boundary.",
+          "A retained native four-case recovery qualification or documented subprocess-cancellation primitive supplies the reopening evidence for the Conductor comparison."
         ],
         "met_at_closeout": false
       },
       "decision_rule": [
         {
-          "role": "owned-checkpoint-recovery",
-          "rule": "Reject lost accepted checkpoints, duplicate effects in the declared scope, ineffective cancellation or failed recovery. Among passing equal-scope arms compare operational/resource cost; exact ties retain the qualified current pair. Do not promote synthetic checkpoint recovery to real host-loss or exactly-once external-effects acceptance."
+          "role": "scheduler-checkpoint-crash-recovery",
+          "rule": "Tuned Dagu qualifies only if marked failed and retried to success within 150 seconds with checkpoint reuse and zero owned processes, with default attribution retained and no scenario-A regression. Temporal is a measurement control only; its later substantive refutation is preserved. If Dagu fails, retain the failure for adjudication rather than silently adopting a refuted runtime."
+        },
+        {
+          "role": "cross-host-finalize-recovery",
+          "rule": "Require a surviving host to complete within 150 seconds with checkpoint reuse, no duplicate completed.json, zero descendants on every host and bounded subprocess cancellation. Adoption candidacy additionally requires a real job needing server-host-loss continuity. Failed cluster formation or kill recovery preserves not-adopted; no single-host fixture proves this role."
+        },
+        {
+          "role": "sql-job-recovery",
+          "rule": "Require equal correctness/recovery/cancellation and inspectable history. A pg_durable advantage must address the retained real SQL-job need; rank passing equal-scope arms by resident process count, then setup-command count, then median recovery milliseconds. Equal results retain ordinary PostgreSQL plus Dagu."
+        },
+        {
+          "role": "single-host-workflow-recovery",
+          "rule": "Reject lost checkpoints, duplicate in-scope effects, ineffective cancellation or missed 150-second recovery. Conductor must improve the retained process/setup burden at equal recovery; rank resident process count, then setup-command count, then median recovery milliseconds. Exact ties retain the qualified path."
         }
       ],
       "frozen_scope_ref": "docs/decisions/w6-practice-closeout-20261011/scheduling-supervision.comparison.json",
@@ -629,20 +679,30 @@
       "terminal_state": "SCHEDULED",
       "comparison_id": "w6-token-efficiency-20261011",
       "preregistration_ref": "docs/decisions/w6-practice-closeout-20261011/token-efficiency.comparison.json",
-      "preregistration_sha256": "3948be402612b61940ff3b00cb6be5e308d48d798700aa417118cb7538480761",
+      "preregistration_sha256": "0c6cd76ede091d0c799135da66cf98bb33a2e2540fbcb180e6901a17f73bcb05",
       "readiness_trigger": {
-        "event": "The existing native harness owner retains the hash-bound w6-token-efficiency-20261011 input packet with all named inputs below; for review-and-landing, #953 and #975 must also be landed.",
+        "event": "The existing evidence owner retains the hash-bound w6-token-efficiency-20261011 packet with all source, oracle and retained-reopen inputs listed below.",
         "required_inputs": [
           "All five retained candidate primary sources and immutable pins are recovered",
           "Matched-task input/oracle and original-context packet is sealed by its existing evidence owner",
-          "Existing usage path captures complete provider totals and retained failures"
+          "Existing usage path captures complete provider totals and retained failures",
+          "Usage-attribution corpus and MCP permission/hook/approval/invoke/server-instruction canaries, schema recovery oracles and price table are sealed before execution",
+          "A retained maintained default-branch commit satisfies the historical post-2026-07-01 criterion, with the staged-discovery/native-deferral case packet and its complete accounting oracles."
         ],
         "met_at_closeout": false
       },
       "decision_rule": [
         {
-          "role": "context-and-usage",
-          "rule": "Reject loss of task correctness, unavailable exact original recovery, duplicate/missing provider accounting or privacy failure. Among equal-quality complete arms choose lower total provider tokens/cost including recovery and failures. Artifact token estimates and cache subsets never substitute for provider totals; ties retain the qualified current path."
+          "role": "context-reduction",
+          "rule": "Reject correctness/fidelity loss, unavailable exact-original recovery, incomplete provider accounting or privacy failure. Among complete equal-oracle arms rank total billed-equivalent provider USD under the frozen price table, then complete provider tokens; ties retain the qualified path. Include failed attempts and recovery; never substitute artifact estimates or cache subsets."
+        },
+        {
+          "role": "usage-attribution",
+          "rule": "Require exact reconciliation of integer request/token totals at the common source precision and no privacy loss. Keep agent-console only if it adds correct cache-lifetime and child attribution missing from ccusage and meets the retained maintenance qualification; no token-saving requirement is applied to an observer."
+        },
+        {
+          "role": "mcp-tool-definition-deferral",
+          "rule": "Every Claude deny rule and mcp__server__tool PreToolUse matcher, Codex per-tool approval, backend invoke attribution and backend server instruction must survive; failure rejects regardless of savings. Reject extra proxy hops wherever native deferral works. For routes where it does not, require non-inferior selection/task success and lower complete billed-equivalent USD, then provider tokens; ties retain the qualified native route."
         }
       ],
       "frozen_scope_ref": "docs/decisions/w6-practice-closeout-20261011/token-efficiency.comparison.json",
@@ -724,6 +784,17 @@
       },
       "why_not_final": "Unresolved candidate roles are included in the preregistered comparison, and this closeout does not join all four FINAL conditions for every winner.",
       "execution_policy": "Run when named inputs exist; do not re-research or delay to a calendar date. Existing W5 harnesses only. Monday heavy runs use T2 and the full-suite queue."
+    }
+  ],
+  "component_retirements": [
+    {
+      "component_id": "candidate:openai-skills",
+      "repository": "https://github.com/openai/skills",
+      "terminal_state": "RETIRED",
+      "reason": "Upstream deprecates this repository and names openai/plugins as its successor. No successor adoption is inferred.",
+      "source": "openai/skills@49f948faa9258a0c61caceaf225e179651397431:README.md:2",
+      "successor": "https://github.com/openai/plugins",
+      "successor_source_pin": "0722921d5542fc593105c27bd52630babd8b8c2a"
     }
   ]
 }

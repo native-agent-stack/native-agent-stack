@@ -871,5 +871,16 @@
         }
       ]
     }
+  ],
+  "component_terminal_dispositions": [
+    {
+      "component_id": "candidate:openai-skills",
+      "repository": "https://github.com/openai/skills",
+      "terminal_state": "RETIRED",
+      "reason": "Upstream deprecates this repository and names openai/plugins as its successor. No successor adoption is inferred.",
+      "source": "openai/skills@49f948faa9258a0c61caceaf225e179651397431:README.md:2",
+      "successor": "https://github.com/openai/plugins",
+      "successor_source_pin": "0722921d5542fc593105c27bd52630babd8b8c2a"
+    }
   ]
 }

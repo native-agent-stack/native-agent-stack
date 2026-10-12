@@ -17,25 +17,157 @@
   "harness": "Existing token-e2e/cc-native-practice paired-task paths with exact original-context recovery; no new proxy or capture path.",
   "scenarios": [
     {
-      "role": "context-and-usage",
+      "role": "context-reduction",
       "case_scope": {
         "oracle": "Existing matched-task workload with original output/context bytes, independent task correctness and fidelity oracles, including retained failure/growth cases."
       },
       "arms": [
-        "existing task-selected native context path",
-        "sqz",
-        "paritok-4b-v1",
-        "agent-console",
-        "mcp-compressor",
-        "klavis"
+        {
+          "source": "existing task-selected native context path",
+          "roles": [
+            "context-reduction"
+          ]
+        },
+        {
+          "source": "sqz",
+          "roles": [
+            "context-reduction"
+          ]
+        },
+        {
+          "source": "paritok-4b-v1",
+          "roles": [
+            "context-reduction"
+          ]
+        }
       ],
-      "rule": "Reject loss of task correctness, unavailable exact original recovery, duplicate/missing provider accounting or privacy failure. Among equal-quality complete arms choose lower total provider tokens/cost including recovery and failures. Artifact token estimates and cache subsets never substitute for provider totals; ties retain the qualified current path."
+      "rule": "Reject correctness/fidelity loss, unavailable exact-original recovery, incomplete provider accounting or privacy failure. Among complete equal-oracle arms rank total billed-equivalent provider USD under the frozen price table, then complete provider tokens; ties retain the qualified path. Include failed attempts and recovery; never substitute artifact estimates or cache subsets.",
+      "retained_candidate_protocols": [
+        {
+          "repository": "https://github.com/ojuschugh1/sqz",
+          "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/9/candidates/0/comparison_that_would_overturn",
+          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate before scenario tie-breaking."
+        },
+        {
+          "repository": "https://github.com/paritok-official/paritok-4b-v1",
+          "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/9/candidates/2/comparison_that_would_overturn",
+          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate before scenario tie-breaking."
+        }
+      ]
+    },
+    {
+      "role": "usage-attribution",
+      "case_scope": {
+        "oracle": "A frozen Claude Code/Codex session corpus with subagents, complete integer counters, cache lifetime and child attribution; preserve every source and failure."
+      },
+      "arms": [
+        {
+          "source": "native OTel api_request sums and ccusage on the frozen corpus",
+          "roles": [
+            "usage-attribution"
+          ]
+        },
+        {
+          "source": "agent-console transcript totals and OTel panel on that identical corpus",
+          "roles": [
+            "usage-attribution"
+          ]
+        }
+      ],
+      "rule": "Require exact reconciliation of integer request/token totals at the common source precision and no privacy loss. Keep agent-console only if it adds correct cache-lifetime and child attribution missing from ccusage and meets the retained maintenance qualification; no token-saving requirement is applied to an observer.",
+      "retained_comparison_refs": [
+        "catalogs/sota-convergence/manifest-20260929.json#/foundation/9/candidates/1"
+      ],
+      "retained_candidate_protocols": [
+        {
+          "repository": "https://github.com/lockedinlabs-ai/agent-console",
+          "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/9/candidates/1/comparison_that_would_overturn",
+          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate before scenario tie-breaking."
+        }
+      ]
+    },
+    {
+      "role": "mcp-tool-definition-deferral",
+      "case_scope": {
+        "oracle": "Freeze 20-30 exact-name/multi-server tool-selection prompts, including a turn after compaction, from the retained MCP-Atlas overlap. Use the recorded promptfoo/Inspect/Harbor mapping, fixed model and at least three repeats per route. Score first tool selection, task success, complete provider totals and exact tools/list schema recovery.",
+        "accounting": "Retain schema, deferred-name and server-instruction costs separately; native per-subagent first-turn input and Codex enabled-minus-disabled token_count measurements remain distinct from complete provider totals.",
+        "exclusions": "TOON, CLI mode, Code Mode, mcporter and mcp2cli remain off; do not double count another output-compression or MCP-to-CLI route."
+      },
+      "arms": [
+        {
+          "source": "Claude first-party native deferral control",
+          "roles": [
+            "mcp-tool-definition-deferral"
+          ]
+        },
+        {
+          "source": "Claude via OmniRoute default eager control",
+          "roles": [
+            "mcp-tool-definition-deferral"
+          ]
+        },
+        {
+          "source": "Claude via OmniRoute ENABLE_TOOL_SEARCH=true (native fix first)",
+          "roles": [
+            "mcp-tool-definition-deferral"
+          ]
+        },
+        {
+          "source": "Claude via OmniRoute with mcp-compressor medium",
+          "roles": [
+            "mcp-tool-definition-deferral"
+          ]
+        },
+        {
+          "source": "Claude via OmniRoute with mcp-compressor high",
+          "roles": [
+            "mcp-tool-definition-deferral"
+          ]
+        },
+        {
+          "source": "Codex 0.158.0 native deferral control",
+          "roles": [
+            "mcp-tool-definition-deferral"
+          ]
+        },
+        {
+          "source": "Codex with mcp-compressor omit_tools_from=[deferred]",
+          "roles": [
+            "mcp-tool-definition-deferral"
+          ]
+        },
+        {
+          "source": "Klavis Strata staged discovery at its recovered maintained pin",
+          "roles": [
+            "mcp-tool-definition-deferral"
+          ]
+        }
+      ],
+      "rule": "Every Claude deny rule and mcp__server__tool PreToolUse matcher, Codex per-tool approval, backend invoke attribution and backend server instruction must survive; failure rejects regardless of savings. Reject extra proxy hops wherever native deferral works. For routes where it does not, require non-inferior selection/task success and lower complete billed-equivalent USD, then provider tokens; ties retain the qualified native route.",
+      "retained_comparison_refs": [
+        "catalogs/sota-convergence/manifest-20260929.json#/foundation/9/candidates/3",
+        "catalogs/sota-convergence/manifest-20260929.json#/foundation/9/candidates/10"
+      ],
+      "retained_candidate_protocols": [
+        {
+          "repository": "https://github.com/atlassian-labs/mcp-compressor",
+          "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/9/candidates/3/comparison_that_would_overturn",
+          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate before scenario tie-breaking."
+        },
+        {
+          "repository": "https://github.com/klavis-ai/klavis",
+          "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/9/candidates/10/comparison_that_would_overturn",
+          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate before scenario tie-breaking."
+        }
+      ]
     }
   ],
   "readiness": [
     "All five retained candidate primary sources and immutable pins are recovered",
     "Matched-task input/oracle and original-context packet is sealed by its existing evidence owner",
-    "Existing usage path captures complete provider totals and retained failures"
+    "Existing usage path captures complete provider totals and retained failures",
+    "Usage-attribution corpus and MCP permission/hook/approval/invoke/server-instruction canaries, schema recovery oracles and price table are sealed before execution",
+    "A retained maintained default-branch commit satisfies the historical post-2026-07-01 criterion, with the staged-discovery/native-deferral case packet and its complete accounting oracles."
   ],
   "deltas": [
     "Recover the GPT-fit missing votes for mcp-compressor and klavis or settle their roles from primary evidence; missing returns do not refute either."
@@ -45,6 +177,15 @@
     "Seal exact case/oracle/source-pin bytes before execution; do not tune acceptance after results.",
     "Retain failures, errors, cancellations and complete effort/cost; upstream tests and native invoke evidence remain distinct.",
     "Heavy suites in Monday 08:00Z\u201320:00Z require T2 idle wrapper; full suites also require SUITE-GO.",
-    "Terminal classification authority is the co-op #1007 LANDED relay and c2dee173 final-stack contract. A winner requires all four conditions before FINAL."
+    "Terminal classification authority is the co-op #1007 LANDED relay and c2dee173 final-stack contract. A winner requires all four conditions before FINAL.",
+    "Publish authentication digests only over privacy-safe preimages that are themselves published; original captures and their seals stay private.",
+    "Run a scenario when its own named source/oracle/reopening inputs exist; an unmet condition for another role cannot delay a ready scenario. The layer remains SCHEDULED until its remaining obligations close."
+  ],
+  "retained_reopen_conditions": [
+    {
+      "repository": "https://github.com/klavis-ai/klavis",
+      "event": "A retained maintained default-branch commit satisfies the historical post-2026-07-01 criterion, with the staged-discovery/native-deferral case packet and its complete accounting oracles.",
+      "retained_ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/9/candidates/10/comparison_that_would_overturn"
+    }
   ]
 }

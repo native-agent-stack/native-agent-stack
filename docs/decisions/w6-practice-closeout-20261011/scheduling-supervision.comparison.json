@@ -16,24 +16,154 @@
   "harness": "Existing W5 paired runs and blueprints/convergence-practice/job-recovery plus upstream-supported durable-runtime test paths.",
   "scenarios": [
     {
-      "role": "owned-checkpoint-recovery",
+      "role": "scheduler-checkpoint-crash-recovery",
       "case_scope": {
-        "source": "blueprints/convergence-practice/job-recovery/plan.json and blueprints/convergence-practice/native-worker/seed/test_planner.py",
-        "oracle": "Same accepted deterministic checkpoint/oracle and explicit stop/retry/finalize cases; preserve the original workload's no-external-effects limit."
+        "oracle": "Existing compare.py scenarios A and B, including executor-tree SIGKILL, checkpoint reuse and the 150-second bound, on WSL2 and macOS. The default control tests the retained liveness attribution.",
+        "tuned_settings": {
+          "proc.heartbeat_interval": "2s",
+          "proc.heartbeat_sync_interval": "2s",
+          "proc.stale_threshold": "15s",
+          "scheduler.zombie_detection_interval": "5s",
+          "scheduler.failure_threshold": 2
+        }
       },
       "arms": [
-        "dagu@58fed633d58c1dd1319091fdb2c2f6158ecfa053 with existing systemd boundary",
-        "pg_durable",
-        "restate",
-        "conductor"
+        {
+          "source": "Dagu 2.17.2 with scheduler and default liveness",
+          "roles": [
+            "scheduler-checkpoint-crash-recovery"
+          ]
+        },
+        {
+          "source": "Dagu 2.17.2 with scheduler and tuned liveness",
+          "roles": [
+            "scheduler-checkpoint-crash-recovery"
+          ]
+        },
+        {
+          "source": "retained Temporal five-second-heartbeat measurement control",
+          "roles": [
+            "scheduler-checkpoint-crash-recovery"
+          ]
+        }
       ],
-      "rule": "Reject lost accepted checkpoints, duplicate effects in the declared scope, ineffective cancellation or failed recovery. Among passing equal-scope arms compare operational/resource cost; exact ties retain the qualified current pair. Do not promote synthetic checkpoint recovery to real host-loss or exactly-once external-effects acceptance."
+      "rule": "Tuned Dagu qualifies only if marked failed and retried to success within 150 seconds with checkpoint reuse and zero owned processes, with default attribution retained and no scenario-A regression. Temporal is a measurement control only; its later substantive refutation is preserved. If Dagu fails, retain the failure for adjudication rather than silently adopting a refuted runtime.",
+      "retained_comparison_refs": [
+        "catalogs/sota-convergence/manifest-20260929.json#/foundation/12/candidates/0"
+      ],
+      "retained_candidate_protocols": [
+        {
+          "repository": "https://github.com/dagucloud/dagu",
+          "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/12/candidates/0/comparison_that_would_overturn",
+          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate before scenario tie-breaking."
+        }
+      ]
+    },
+    {
+      "role": "cross-host-finalize-recovery",
+      "case_scope": {
+        "oracle": "Port the four frozen compare.py cases; WSL2 plus two Macs, replication 2 and snapshot repository. Journal the checkpoint or use a shared work mount; kill the finalize-partition leader mid-finalize and exercise bounded cancellation."
+      },
+      "arms": [
+        {
+          "source": "Restate Python service adapter in the retained three-node cluster",
+          "roles": [
+            "cross-host-finalize-recovery"
+          ]
+        }
+      ],
+      "rule": "Require a surviving host to complete within 150 seconds with checkpoint reuse, no duplicate completed.json, zero descendants on every host and bounded subprocess cancellation. Adoption candidacy additionally requires a real job needing server-host-loss continuity. Failed cluster formation or kill recovery preserves not-adopted; no single-host fixture proves this role.",
+      "resource_baseline": {
+        "source": "retained Temporal single-server arm",
+        "role": "single-server-resource-control",
+        "boundary": "Measure process/setup/snapshot-store burden separately; this is not an eligible cross-host recovery arm."
+      },
+      "retained_comparison_refs": [
+        "catalogs/sota-convergence/manifest-20260929.json#/foundation/12/candidates/1"
+      ],
+      "retained_candidate_protocols": [
+        {
+          "repository": "https://github.com/restatedev/restate",
+          "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/12/candidates/1/comparison_that_would_overturn",
+          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate before scenario tie-breaking."
+        }
+      ]
+    },
+    {
+      "role": "sql-job-recovery",
+      "case_scope": {
+        "oracle": "An owner-retained real SQL-centric job and identical failure/retry/cancellation/history oracles; preserve intended-host install/upgrade and external-worker boundaries without an unnecessary HTTP wrapper."
+      },
+      "arms": [
+        {
+          "source": "Dagu with ordinary PostgreSQL transactions on the same SQL job",
+          "roles": [
+            "sql-job-recovery"
+          ]
+        },
+        {
+          "source": "pg_durable with its native SQL job and supported worker boundary",
+          "roles": [
+            "sql-job-recovery"
+          ]
+        }
+      ],
+      "rule": "Require equal correctness/recovery/cancellation and inspectable history. A pg_durable advantage must address the retained real SQL-job need; rank passing equal-scope arms by resident process count, then setup-command count, then median recovery milliseconds. Equal results retain ordinary PostgreSQL plus Dagu.",
+      "retained_comparison_refs": [
+        "catalogs/sota-convergence/manifest-20260929.json#/foundation/12/candidates/3"
+      ],
+      "retained_candidate_protocols": [
+        {
+          "repository": "https://github.com/microsoft/pg_durable",
+          "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/12/candidates/3/comparison_that_would_overturn",
+          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate before scenario tie-breaking."
+        }
+      ]
+    },
+    {
+      "role": "single-host-workflow-recovery",
+      "case_scope": {
+        "oracle": "The same four compare.py cases, SIGKILL recovery within 150 seconds, checkpoint reuse and a native subprocess-cancellation probe."
+      },
+      "arms": [
+        {
+          "source": "existing qualified Dagu/systemd checkpoint path",
+          "roles": [
+            "single-host-workflow-recovery"
+          ]
+        },
+        {
+          "source": "Conductor PostgreSQL backend with Python worker",
+          "roles": [
+            "single-host-workflow-recovery"
+          ]
+        }
+      ],
+      "rule": "Reject lost checkpoints, duplicate in-scope effects, ineffective cancellation or missed 150-second recovery. Conductor must improve the retained process/setup burden at equal recovery; rank resident process count, then setup-command count, then median recovery milliseconds. Exact ties retain the qualified path.",
+      "retained_comparison_refs": [
+        "catalogs/sota-convergence/manifest-20260929.json#/foundation/12/candidates/2"
+      ],
+      "resource_baseline": {
+        "source": "retained Temporal dev-server arm",
+        "role": "single-server-resource-control",
+        "boundary": "Retain the historical burden comparison without reversing the later substantive refutation."
+      },
+      "retained_candidate_protocols": [
+        {
+          "repository": "https://github.com/conductor-oss/conductor",
+          "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/12/candidates/2/comparison_that_would_overturn",
+          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate before scenario tie-breaking."
+        }
+      ]
     }
   ],
   "readiness": [
-    "Three retained alternative source pins and upstream-supported test paths are recovered",
-    "Existing shared recovery workload and its input/oracle hashes are sealed for all arms",
-    "Owning runtime/client moved-pin receipts and execution capacity gate are satisfied"
+    "All retained runtime source pins, including the Dagu 2.17.2 release commit, scheduler mechanism and upstream-owned install/test paths, are recovered",
+    "Checkpoint A/B, SQL-job, Conductor cancellation and three-host finalize/leader-kill oracle packets and host scopes are sealed",
+    "Owning runtime/client moved-pin qualification receipts are retained",
+    "The owning recovery lane qualifies an upstream-supported Dagu 2.17.2 scheduler execution path against the retained A/B oracles; the accepted 2.16.6-only runner is not reused unchanged.",
+    "A real SQL-centric research job documents the needed advantage over Dagu plus ordinary transactions and its supported intended-host installation boundary.",
+    "A retained native four-case recovery qualification or documented subprocess-cancellation primitive supplies the reopening evidence for the Conductor comparison."
   ],
   "deltas": [
     "Apply only pin/evidence changes and surviving alternatives, preserving later substantive refutations of Temporal and Absurd."
@@ -43,6 +173,21 @@
     "Seal exact case/oracle/source-pin bytes before execution; do not tune acceptance after results.",
     "Retain failures, errors, cancellations and complete effort/cost; upstream tests and native invoke evidence remain distinct.",
     "Heavy suites in Monday 08:00Z\u201320:00Z require T2 idle wrapper; full suites also require SUITE-GO.",
-    "Terminal classification authority is the co-op #1007 LANDED relay and c2dee173 final-stack contract. A winner requires all four conditions before FINAL."
+    "Terminal classification authority is the co-op #1007 LANDED relay and c2dee173 final-stack contract. A winner requires all four conditions before FINAL.",
+    "The existing execution-capacity and protected paper gates permit the scoped run.",
+    "Publish authentication digests only over privacy-safe preimages that are themselves published; original captures and their seals stay private.",
+    "Run a scenario when its own named source/oracle/reopening inputs exist; an unmet condition for another role cannot delay a ready scenario. The layer remains SCHEDULED until its remaining obligations close."
+  ],
+  "retained_reopen_conditions": [
+    {
+      "repository": "https://github.com/microsoft/pg_durable",
+      "event": "A real SQL-centric research job documents the needed advantage over Dagu plus ordinary transactions and its supported intended-host installation boundary.",
+      "retained_ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/12/candidates/3/comparison_that_would_overturn"
+    },
+    {
+      "repository": "https://github.com/conductor-oss/conductor",
+      "event": "A retained native four-case recovery qualification or documented subprocess-cancellation primitive supplies the reopening evidence for the Conductor comparison.",
+      "retained_ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/12/candidates/2/comparison_that_would_overturn"
+    }
   ]
 }

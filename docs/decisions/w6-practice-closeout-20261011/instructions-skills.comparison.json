@@ -18,10 +18,27 @@
         "oracle": "Existing adopted trial tasks and independently frozen task oracles; paired identical task inputs without versus with selected mattpocock skill files, retaining all attempts."
       },
       "arms": [
-        "baseline native instructions",
-        "selected mattpocock/skills files at recovered immutable pin"
+        {
+          "source": "baseline native instructions",
+          "roles": [
+            "selected-skills"
+          ]
+        },
+        {
+          "source": "selected mattpocock/skills files at recovered immutable pin",
+          "roles": [
+            "selected-skills"
+          ]
+        }
       ],
-      "rule": "Require every baseline correctness/safety oracle to remain satisfied. Prefer fewer task errors, then lower complete provider tokens/cost at equal quality; an exact tie or an unmeasured gain does not expand adoption. Whole-pack installation is not an arm."
+      "rule": "Require every baseline correctness/safety oracle to remain satisfied. Prefer fewer task errors, then lower complete provider tokens/cost at equal quality; an exact tie or an unmeasured gain does not expand adoption. Whole-pack installation is not an arm. Retain per-client invoke counts: a selected role with measured zero invokes gains no acceptance; repair its owning launcher or retire the uninvoked role under the protocol.",
+      "retained_candidate_protocols": [
+        {
+          "repository": "https://github.com/mattpocock/skills",
+          "ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/1/candidates/0/comparison_that_would_overturn",
+          "authority": "The retained scope, acceptance gates and reopening condition govern this candidate before scenario tie-breaking."
+        }
+      ]
     }
   ],
   "readiness": [
@@ -31,13 +48,16 @@
   ],
   "deltas": [
     "Retain contradictory historical winner/discovery evidence as qualified observations.",
-    "Consume the 09-29 substantive mattpocock survival; do not count its older missing vote as a new refutation."
+    "Consume the 09-29 substantive mattpocock survival; do not count its older missing vote as a new refutation.",
+    "candidate:openai-skills is RETIRED at openai/skills 49f948fa README.md:2; the named successor is openai/plugins, routed to later intake without new W6 discovery or adoption."
   ],
   "execution_constraints": [
     "No new discovery; only retained 09-29/10-08 candidates and explicitly dispatched review-and-landing arms.",
     "Seal exact case/oracle/source-pin bytes before execution; do not tune acceptance after results.",
     "Retain failures, errors, cancellations and complete effort/cost; upstream tests and native invoke evidence remain distinct.",
     "Heavy suites in Monday 08:00Z\u201320:00Z require T2 idle wrapper; full suites also require SUITE-GO.",
-    "Terminal classification authority is the co-op #1007 LANDED relay and c2dee173 final-stack contract. A winner requires all four conditions before FINAL."
+    "Terminal classification authority is the co-op #1007 LANDED relay and c2dee173 final-stack contract. A winner requires all four conditions before FINAL.",
+    "Publish authentication digests only over privacy-safe preimages that are themselves published; original captures and their seals stay private.",
+    "Run a scenario when its own named source/oracle/reopening inputs exist; an unmet condition for another role cannot delay a ready scenario. The layer remains SCHEDULED until its remaining obligations close."
   ]
 }

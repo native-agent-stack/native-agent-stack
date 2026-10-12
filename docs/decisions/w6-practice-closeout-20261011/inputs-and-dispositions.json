@@ -46,6 +46,14 @@
     "catalogs/landscape/research-state.json": {
       "sha256": "fe142c1b8b8ec8b92d69ec5971d68028225899c101ffc43cea618883b119332a",
       "bytes": 21449
+    },
+    "catalogs/sota-convergence/manifest-20260923.json": {
+      "sha256": "304d75dd0dabb02ba46191161732c17d234c3608a194f538c6bee6b64b8069c8",
+      "bytes": 1118651
+    },
+    "catalogs/sota-convergence/manifest-20260926.json": {
+      "sha256": "a72177d162f84ba827028a7bff5ebc78ea9195c7a99ed2b411c75f7869b20e0e",
+      "bytes": 1548502
     }
   },
   "layers": [
@@ -147,8 +155,8 @@
           },
           "disposition": {
             "action": "retire_role",
-            "role": "in-GitHub Claude OIDC execution",
-            "reason": "Superseded by #981 retirement, merge 8bffa2c4; review-and-landing alternatives remain in the separate frozen comparison.",
+            "role": "in-GitHub Claude OIDC review",
+            "reason": "Superseded by #981 retirement; Review and Landing are separate frozen scenarios.",
             "authority": "CC ruling-w6-wave-dispatch-20261011.md section 3(a)"
           }
         },
@@ -209,17 +217,28 @@
           },
           "disposition": {
             "action": "include_in_frozen_comparison",
-            "comparison_id": "w6-git-github-automation-20261011"
+            "comparison_id": "w6-git-github-automation-20261011",
+            "scenario_roles": [
+              "structural-diff"
+            ],
+            "retained_comparison_ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/19/candidates/0/comparison_that_would_overturn",
+            "retained_proposal_label": "targeted_candidate",
+            "retained_disposition": "targeted_candidate",
+            "missing_vote_boundary": "Retained substantive vote evidence is unchanged.",
+            "rule_authority": "The CC-directed 10-02 P2 comparison governs; the 0.26.0 source observation does not change its 0.25.0 execution version."
           }
         }
       ],
       "terminal_state": "SCHEDULED",
       "terminal_readiness_trigger": {
-        "event": "The existing native harness owner retains the hash-bound w6-git-github-automation-20261011 input packet with all named inputs below; for review-and-landing, #953 and #975 must also be landed.",
+        "event": "The existing evidence owner retains the hash-bound w6-git-github-automation-20261011 packet with all source, oracle and retained-reopen inputs listed below.",
         "required_inputs": [
           "#953 and #975 land for the review-and-landing replay",
           "Archived W1 defective-head/oracle packet and P2 labeled case packet are retained with immutable hashes",
-          "Exact runtime pins, primary source and native acceptance boundaries are captured"
+          "Exact runtime pins, primary source and native acceptance boundaries are captured",
+          "The lane-sealed landing-incident heads, merge bases, thread states, verdict bindings and oracle packet are retained",
+          "#1027 landing implementation has its final immutable execution pin and source/acceptance boundary retained",
+          "The sem 0.25.0 comparison release commit and source/case oracle seals are retained"
         ],
         "met_at_closeout": false
       },
@@ -316,7 +335,14 @@
           },
           "disposition": {
             "action": "include_in_frozen_comparison",
-            "comparison_id": "w6-quality-evaluation-20261011"
+            "comparison_id": "w6-quality-evaluation-20261011",
+            "scenario_roles": [
+              "semantic-advice-evaluation"
+            ],
+            "retained_comparison_ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/10/candidates/0/comparison_that_would_overturn",
+            "retained_proposal_label": "targeted_candidate",
+            "retained_disposition": "targeted_candidate",
+            "missing_vote_boundary": "Retained substantive vote evidence is unchanged."
           }
         },
         {
@@ -359,17 +385,32 @@
           },
           "disposition": {
             "action": "include_in_frozen_comparison",
-            "comparison_id": "w6-quality-evaluation-20261011"
+            "comparison_id": "w6-quality-evaluation-20261011",
+            "scenario_roles": [
+              "embedding-evaluation"
+            ],
+            "retained_comparison_ref": "catalogs/sota-convergence/manifest-20260926.json#/foundation/10/candidates/4/comparison_that_would_overturn",
+            "retained_proposal_label": "not_adopted",
+            "retained_disposition": "not_adopted_confirmed",
+            "missing_vote_boundary": "Retained substantive vote evidence is unchanged.",
+            "retained_reopen_input": {
+              "repository": "https://github.com/embeddings-benchmark/mteb",
+              "event": "A concrete embedding/retrieval change and privacy-filtered independent relevance/metric packet are retained.",
+              "retained_ref": "catalogs/sota-convergence/manifest-20260926.json#/foundation/10/candidates/4/comparison_that_would_overturn"
+            }
           }
         }
       ],
       "terminal_state": "SCHEDULED",
       "terminal_readiness_trigger": {
-        "event": "The existing native harness owner retains the hash-bound w6-quality-evaluation-20261011 input packet with all named inputs below; for review-and-landing, #953 and #975 must also be landed.",
+        "event": "The existing evidence owner retains the hash-bound w6-quality-evaluation-20261011 packet with all source, oracle and retained-reopen inputs listed below.",
         "required_inputs": [
           "60-case advice packet has an independent label seal and immutable case hash",
           "MTEB retained source and matching embedding-evaluation case packet are recovered",
-          "Upstream install/test paths at the selected source pins are available"
+          "Upstream install/test paths at the selected source pins are available",
+          "Mutation, empty/cancelled control, per-sample localization and 20-case growth/top-up oracle seals are retained",
+          "Embedding metric tolerances and the independent shuffled-ranking oracle are fixed before execution",
+          "A concrete embedding/retrieval change and privacy-filtered independent relevance/metric packet are retained."
         ],
         "met_at_closeout": false
       },
@@ -399,7 +440,9 @@
           "component_id": "candidate:openai-skills",
           "repository": "https://github.com/openai/skills",
           "pin": "unpinned",
-          "evidence_class": "local_integration"
+          "evidence_class": "local_integration",
+          "terminal_state": "RETIRED",
+          "retirement_ref": "docs/decisions/w6-practice-closeout-20261011/arm-dispositions.json#/component_retirements/0"
         }
       ],
       "latest_sweep": {
@@ -491,13 +534,20 @@
           },
           "disposition": {
             "action": "include_in_frozen_comparison",
-            "comparison_id": "w6-instructions-skills-20261011"
+            "comparison_id": "w6-instructions-skills-20261011",
+            "scenario_roles": [
+              "selected-skills"
+            ],
+            "retained_comparison_ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/1/candidates/0/comparison_that_would_overturn",
+            "retained_proposal_label": "targeted_candidate",
+            "retained_disposition": "targeted_candidate",
+            "missing_vote_boundary": "Retained substantive vote evidence is unchanged."
           }
         }
       ],
       "terminal_state": "SCHEDULED",
       "terminal_readiness_trigger": {
-        "event": "The existing native harness owner retains the hash-bound w6-instructions-skills-20261011 input packet with all named inputs below; for review-and-landing, #953 and #975 must also be landed.",
+        "event": "The existing evidence owner retains the hash-bound w6-instructions-skills-20261011 packet with all source, oracle and retained-reopen inputs listed below.",
         "required_inputs": [
           "Selected-file source pin/digests and owner trial task/oracle seals are retained",
           "cc-native-practice and co-op provide client-specific row/launcher qualification receipts",
@@ -592,7 +642,14 @@
           },
           "disposition": {
             "action": "include_in_frozen_comparison",
-            "comparison_id": "w6-token-efficiency-20261011"
+            "comparison_id": "w6-token-efficiency-20261011",
+            "scenario_roles": [
+              "context-reduction"
+            ],
+            "retained_comparison_ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/9/candidates/0/comparison_that_would_overturn",
+            "retained_proposal_label": "targeted_candidate",
+            "retained_disposition": "targeted_candidate",
+            "missing_vote_boundary": "Retained substantive vote evidence is unchanged."
           }
         },
         {
@@ -635,7 +692,14 @@
           },
           "disposition": {
             "action": "include_in_frozen_comparison",
-            "comparison_id": "w6-token-efficiency-20261011"
+            "comparison_id": "w6-token-efficiency-20261011",
+            "scenario_roles": [
+              "context-reduction"
+            ],
+            "retained_comparison_ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/9/candidates/2/comparison_that_would_overturn",
+            "retained_proposal_label": "keep_but_compare",
+            "retained_disposition": "keep_but_compare",
+            "missing_vote_boundary": "Retained substantive vote evidence is unchanged."
           }
         },
         {
@@ -678,7 +742,14 @@
           },
           "disposition": {
             "action": "include_in_frozen_comparison",
-            "comparison_id": "w6-token-efficiency-20261011"
+            "comparison_id": "w6-token-efficiency-20261011",
+            "scenario_roles": [
+              "usage-attribution"
+            ],
+            "retained_comparison_ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/9/candidates/1/comparison_that_would_overturn",
+            "retained_proposal_label": "keep_but_compare",
+            "retained_disposition": "keep_but_compare",
+            "missing_vote_boundary": "Retained substantive vote evidence is unchanged."
           }
         },
         {
@@ -713,7 +784,14 @@
           },
           "disposition": {
             "action": "include_in_frozen_comparison",
-            "comparison_id": "w6-token-efficiency-20261011"
+            "comparison_id": "w6-token-efficiency-20261011",
+            "scenario_roles": [
+              "mcp-tool-definition-deferral"
+            ],
+            "retained_comparison_ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/9/candidates/3/comparison_that_would_overturn",
+            "retained_proposal_label": "targeted_candidate",
+            "retained_disposition": "refuted_targeted_candidate",
+            "missing_vote_boundary": "Missing returns do not establish a substantive refutation."
           }
         },
         {
@@ -748,17 +826,31 @@
           },
           "disposition": {
             "action": "include_in_frozen_comparison",
-            "comparison_id": "w6-token-efficiency-20261011"
+            "comparison_id": "w6-token-efficiency-20261011",
+            "scenario_roles": [
+              "mcp-tool-definition-deferral"
+            ],
+            "retained_comparison_ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/9/candidates/10/comparison_that_would_overturn",
+            "retained_proposal_label": "not_adopted",
+            "retained_disposition": "refuted_not_adopted",
+            "missing_vote_boundary": "Missing returns do not establish a substantive refutation.",
+            "retained_reopen_input": {
+              "repository": "https://github.com/klavis-ai/klavis",
+              "event": "A retained maintained default-branch commit satisfies the historical post-2026-07-01 criterion, with the staged-discovery/native-deferral case packet and its complete accounting oracles.",
+              "retained_ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/9/candidates/10/comparison_that_would_overturn"
+            }
           }
         }
       ],
       "terminal_state": "SCHEDULED",
       "terminal_readiness_trigger": {
-        "event": "The existing native harness owner retains the hash-bound w6-token-efficiency-20261011 input packet with all named inputs below; for review-and-landing, #953 and #975 must also be landed.",
+        "event": "The existing evidence owner retains the hash-bound w6-token-efficiency-20261011 packet with all source, oracle and retained-reopen inputs listed below.",
         "required_inputs": [
           "All five retained candidate primary sources and immutable pins are recovered",
           "Matched-task input/oracle and original-context packet is sealed by its existing evidence owner",
-          "Existing usage path captures complete provider totals and retained failures"
+          "Existing usage path captures complete provider totals and retained failures",
+          "Usage-attribution corpus and MCP permission/hook/approval/invoke/server-instruction canaries, schema recovery oracles and price table are sealed before execution",
+          "A retained maintained default-branch commit satisfies the historical post-2026-07-01 criterion, with the staged-discovery/native-deferral case packet and its complete accounting oracles."
         ],
         "met_at_closeout": false
       },
@@ -861,7 +953,19 @@
           },
           "disposition": {
             "action": "include_in_frozen_comparison",
-            "comparison_id": "w6-observation-inference-20261011"
+            "comparison_id": "w6-observation-inference-20261011",
+            "scenario_roles": [
+              "provider-telemetry"
+            ],
+            "retained_comparison_ref": "catalogs/sota-convergence/manifest-20260926.json#/foundation/15/candidates/4/comparison_that_would_overturn",
+            "retained_proposal_label": "not_adopted",
+            "retained_disposition": "not_adopted_confirmed",
+            "missing_vote_boundary": "Retained substantive vote evidence is unchanged.",
+            "retained_reopen_input": {
+              "repository": "https://github.com/traceloop/openllmetry",
+              "event": "A required lane is evidenced making in-process Anthropic SDK calls outside Claude Code, with a content-disabled single-collector qualification packet.",
+              "retained_ref": "catalogs/sota-convergence/manifest-20260926.json#/foundation/15/candidates/4/comparison_that_would_overturn"
+            }
           }
         },
         {
@@ -906,7 +1010,14 @@
           },
           "disposition": {
             "action": "include_in_frozen_comparison",
-            "comparison_id": "w6-observation-inference-20261011"
+            "comparison_id": "w6-observation-inference-20261011",
+            "scenario_roles": [
+              "local-inference"
+            ],
+            "retained_comparison_ref": "catalogs/sota-convergence/manifest-20260926.json#/foundation/15/candidates/2/comparison_that_would_overturn",
+            "retained_proposal_label": "keep_but_compare",
+            "retained_disposition": "keep_but_compare",
+            "missing_vote_boundary": "Retained substantive vote evidence is unchanged."
           }
         },
         {
@@ -949,7 +1060,14 @@
           },
           "disposition": {
             "action": "include_in_frozen_comparison",
-            "comparison_id": "w6-observation-inference-20261011"
+            "comparison_id": "w6-observation-inference-20261011",
+            "scenario_roles": [
+              "gpu-field-telemetry"
+            ],
+            "retained_comparison_ref": "catalogs/sota-convergence/manifest-20260926.json#/foundation/15/candidates/0/comparison_that_would_overturn",
+            "retained_proposal_label": "targeted_candidate",
+            "retained_disposition": "targeted_candidate",
+            "missing_vote_boundary": "Retained substantive vote evidence is unchanged."
           }
         },
         {
@@ -992,7 +1110,19 @@
           },
           "disposition": {
             "action": "include_in_frozen_comparison",
-            "comparison_id": "w6-observation-inference-20261011"
+            "comparison_id": "w6-observation-inference-20261011",
+            "scenario_roles": [
+              "gpu-field-telemetry"
+            ],
+            "retained_comparison_ref": "catalogs/sota-convergence/manifest-20260926.json#/foundation/15/candidates/3/comparison_that_would_overturn",
+            "retained_proposal_label": "not_adopted",
+            "retained_disposition": "not_adopted_confirmed",
+            "missing_vote_boundary": "Retained substantive vote evidence is unchanged.",
+            "retained_reopen_input": {
+              "repository": "https://github.com/nvidia/dcgm-exporter",
+              "event": "NVIDIA documents WSL2/full-GeForce support, or retained native discovery shows additional memory/utilization/power fields on the declared WSL GPU; only then run the paired exporter trial.",
+              "retained_ref": "catalogs/sota-convergence/manifest-20260926.json#/foundation/15/candidates/3/comparison_that_would_overturn"
+            }
           }
         },
         {
@@ -1027,7 +1157,14 @@
           },
           "disposition": {
             "action": "include_in_frozen_comparison",
-            "comparison_id": "w6-observation-inference-20261011"
+            "comparison_id": "w6-observation-inference-20261011",
+            "scenario_roles": [
+              "local-inference"
+            ],
+            "retained_comparison_ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/15/candidates/4/comparison_that_would_overturn",
+            "retained_proposal_label": "targeted_candidate",
+            "retained_disposition": "refuted_targeted_candidate",
+            "missing_vote_boundary": "Missing returns do not establish a substantive refutation."
           }
         },
         {
@@ -1062,17 +1199,32 @@
           },
           "disposition": {
             "action": "include_in_frozen_comparison",
-            "comparison_id": "w6-observation-inference-20261011"
+            "comparison_id": "w6-observation-inference-20261011",
+            "scenario_roles": [
+              "model-service-routing"
+            ],
+            "retained_comparison_ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/15/candidates/15/comparison_that_would_overturn",
+            "retained_proposal_label": "not_adopted",
+            "retained_disposition": "refuted_not_adopted",
+            "missing_vote_boundary": "Missing returns do not establish a substantive refutation.",
+            "retained_reopen_input": {
+              "repository": "https://github.com/mostlygeek/llama-swap",
+              "event": "The owner retains approved embeddings eviction or a second non-llama.cpp engine, or a documented multi-model need that native llama-server router mode fails on the same host.",
+              "retained_ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/15/candidates/15/comparison_that_would_overturn"
+            }
           }
         }
       ],
       "terminal_state": "SCHEDULED",
       "terminal_readiness_trigger": {
-        "event": "The existing native harness owner retains the hash-bound w6-observation-inference-20261011 input packet with all named inputs below; for review-and-landing, #953 and #975 must also be landed.",
+        "event": "The existing evidence owner retains the hash-bound w6-observation-inference-20261011 packet with all source, oracle and retained-reopen inputs listed below.",
         "required_inputs": [
           "All six retained candidate primary sources and exact pins are recovered",
           "Native task/counter and inference task/model/hardware case seals are retained",
-          "Existing inference account/hardware and Monday paper execution gates permit the scoped run"
+          "GPU field/window/interop and routing admission/reload/error oracle packets are retained with identical backend pins",
+          "A required lane is evidenced making in-process Anthropic SDK calls outside Claude Code, with a content-disabled single-collector qualification packet.",
+          "NVIDIA documents WSL2/full-GeForce support, or retained native discovery shows additional memory/utilization/power fields on the declared WSL GPU; only then run the paired exporter trial.",
+          "The owner retains approved embeddings eviction or a second non-llama.cpp engine, or a documented multi-model need that native llama-server router mode fails on the same host."
         ],
         "met_at_closeout": false
       },
@@ -1182,7 +1334,14 @@
           },
           "disposition": {
             "action": "include_in_frozen_comparison",
-            "comparison_id": "w6-scheduling-supervision-20261011"
+            "comparison_id": "w6-scheduling-supervision-20261011",
+            "scenario_roles": [
+              "scheduler-checkpoint-crash-recovery"
+            ],
+            "retained_comparison_ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/12/candidates/0/comparison_that_would_overturn",
+            "retained_proposal_label": "targeted_candidate",
+            "retained_disposition": "targeted_candidate",
+            "missing_vote_boundary": "Retained substantive vote evidence is unchanged."
           }
         },
         {
@@ -1241,7 +1400,19 @@
           },
           "disposition": {
             "action": "include_in_frozen_comparison",
-            "comparison_id": "w6-scheduling-supervision-20261011"
+            "comparison_id": "w6-scheduling-supervision-20261011",
+            "scenario_roles": [
+              "sql-job-recovery"
+            ],
+            "retained_comparison_ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/12/candidates/3/comparison_that_would_overturn",
+            "retained_proposal_label": "not_adopted",
+            "retained_disposition": "not_adopted_confirmed",
+            "missing_vote_boundary": "Retained substantive vote evidence is unchanged.",
+            "retained_reopen_input": {
+              "repository": "https://github.com/microsoft/pg_durable",
+              "event": "A real SQL-centric research job documents the needed advantage over Dagu plus ordinary transactions and its supported intended-host installation boundary.",
+              "retained_ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/12/candidates/3/comparison_that_would_overturn"
+            }
           }
         },
         {
@@ -1299,7 +1470,14 @@
           },
           "disposition": {
             "action": "include_in_frozen_comparison",
-            "comparison_id": "w6-scheduling-supervision-20261011"
+            "comparison_id": "w6-scheduling-supervision-20261011",
+            "scenario_roles": [
+              "cross-host-finalize-recovery"
+            ],
+            "retained_comparison_ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/12/candidates/1/comparison_that_would_overturn",
+            "retained_proposal_label": "keep_but_compare",
+            "retained_disposition": "keep_but_compare",
+            "missing_vote_boundary": "Retained substantive vote evidence is unchanged."
           }
         },
         {
@@ -1342,17 +1520,32 @@
           },
           "disposition": {
             "action": "include_in_frozen_comparison",
-            "comparison_id": "w6-scheduling-supervision-20261011"
+            "comparison_id": "w6-scheduling-supervision-20261011",
+            "scenario_roles": [
+              "single-host-workflow-recovery"
+            ],
+            "retained_comparison_ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/12/candidates/2/comparison_that_would_overturn",
+            "retained_proposal_label": "not_adopted",
+            "retained_disposition": "not_adopted_confirmed",
+            "missing_vote_boundary": "Retained substantive vote evidence is unchanged.",
+            "retained_reopen_input": {
+              "repository": "https://github.com/conductor-oss/conductor",
+              "event": "A retained native four-case recovery qualification or documented subprocess-cancellation primitive supplies the reopening evidence for the Conductor comparison.",
+              "retained_ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/12/candidates/2/comparison_that_would_overturn"
+            }
           }
         }
       ],
       "terminal_state": "SCHEDULED",
       "terminal_readiness_trigger": {
-        "event": "The existing native harness owner retains the hash-bound w6-scheduling-supervision-20261011 input packet with all named inputs below; for review-and-landing, #953 and #975 must also be landed.",
+        "event": "The existing evidence owner retains the hash-bound w6-scheduling-supervision-20261011 packet with all source, oracle and retained-reopen inputs listed below.",
         "required_inputs": [
-          "Three retained alternative source pins and upstream-supported test paths are recovered",
-          "Existing shared recovery workload and its input/oracle hashes are sealed for all arms",
-          "Owning runtime/client moved-pin receipts and execution capacity gate are satisfied"
+          "All retained runtime source pins, including the Dagu 2.17.2 release commit, scheduler mechanism and upstream-owned install/test paths, are recovered",
+          "Checkpoint A/B, SQL-job, Conductor cancellation and three-host finalize/leader-kill oracle packets and host scopes are sealed",
+          "Owning runtime/client moved-pin qualification receipts are retained",
+          "The owning recovery lane qualifies an upstream-supported Dagu 2.17.2 scheduler execution path against the retained A/B oracles; the accepted 2.16.6-only runner is not reused unchanged.",
+          "A real SQL-centric research job documents the needed advantage over Dagu plus ordinary transactions and its supported intended-host installation boundary.",
+          "A retained native four-case recovery qualification or documented subprocess-cancellation primitive supplies the reopening evidence for the Conductor comparison."
         ],
         "met_at_closeout": false
       },
@@ -1449,21 +1642,35 @@
           },
           "disposition": {
             "action": "include_in_frozen_comparison",
-            "comparison_id": "w6-recovery-portability-20261011"
+            "comparison_id": "w6-recovery-portability-20261011",
+            "scenario_roles": [
+              "portable-owned-recovery"
+            ],
+            "retained_comparison_ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/14/candidates/12/comparison_that_would_overturn",
+            "retained_proposal_label": "not_adopted",
+            "retained_disposition": "refuted_not_adopted",
+            "missing_vote_boundary": "Missing returns do not establish a substantive refutation.",
+            "retained_reopen_input": {
+              "repository": "https://github.com/microsoft/wsl",
+              "event": "A WSL release documents selective export allowlist/exclude support at WslClient.cpp and official commands, with synthetic auth-store canaries and the equal-profile restore oracle packet.",
+              "retained_ref": "catalogs/sota-convergence/manifest-20260929.json#/foundation/14/candidates/12/comparison_that_would_overturn"
+            }
           }
         }
       ],
       "terminal_state": "SCHEDULED",
       "terminal_readiness_trigger": {
-        "event": "The existing native harness owner retains the hash-bound w6-recovery-portability-20261011 input packet with all named inputs below; for review-and-landing, #953 and #975 must also be landed.",
+        "event": "The existing evidence owner retains the hash-bound w6-recovery-portability-20261011 packet with all source, oracle and retained-reopen inputs listed below.",
         "required_inputs": [
           "WSL retained primary source and missing GPT-fit outcome are recovered or substantively adjudicated",
           "The declared restoration profile and synthetic input/oracle seal are retained",
-          "A destination host and its normal native sign-ins exist before any genuine destination-host acceptance"
+          "A destination host and its normal native sign-ins exist before any genuine destination-host acceptance",
+          "A WSL release documents selective export allowlist/exclude support at WslClient.cpp and official commands, with synthetic auth-store canaries and the equal-profile restore oracle packet."
         ],
         "met_at_closeout": false
       },
       "terminal_state_ref": "docs/decisions/w6-practice-closeout-20261011/terminal-states.json#/layers/4"
     }
-  ]
+  ],
+  "stopped_sweep_boundary": "Stopped-sweep proposals remain dated inputs for later intake; no stopped sweep supplies a new adjudication for this W6 candidate set."
 }

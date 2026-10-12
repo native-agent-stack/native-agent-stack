@@ -1,5 +1,4 @@
 {
-  "mirror_lock_sha256": "be5a213cacf1873b4e7a44e8ed37c08b7a05bb7aebed672bd6a3cb162dabb729",
   "sources": [
     {
       "repository": "https://github.com/anthropics/claude-code-action",
@@ -230,7 +229,7 @@
             },
             {
               "line": 85,
-              "text": "## 🌍 Community Contributions"
+              "text": "## \ud83c\udf0d Community Contributions"
             }
           ]
         },
@@ -276,23 +275,23 @@
             },
             {
               "line": 25,
-              "text": "## 🤖 How Development Works"
+              "text": "## \ud83e\udd16 How Development Works"
             },
             {
               "line": 43,
-              "text": "## 🚀 Quick Start for Community Contributors"
+              "text": "## \ud83d\ude80 Quick Start for Community Contributors"
             },
             {
               "line": 128,
-              "text": "## 📝 How to Contribute as a Community Member"
+              "text": "## \ud83d\udcdd How to Contribute as a Community Member"
             },
             {
               "line": 327,
-              "text": "## 🔄 Pull Request Process for Community Contributions"
+              "text": "## \ud83d\udd04 Pull Request Process for Community Contributions"
             },
             {
               "line": 531,
-              "text": "## 🧪 Testing"
+              "text": "## \ud83e\uddea Testing"
             }
           ]
         }
@@ -386,7 +385,7 @@
             },
             {
               "line": 40,
-              "text": "### Install script (recommended for Linux; also macOS — x86_64 and aarch64)"
+              "text": "### Install script (recommended for Linux; also macOS \u2014 x86_64 and aarch64)"
             },
             {
               "line": 136,
