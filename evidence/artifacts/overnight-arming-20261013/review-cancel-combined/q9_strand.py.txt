@@ -1,0 +1,119 @@
+"""trading-cc nas1081-reader: can a halt-driven overnight entry cancel that FAILS leave the resting BUY with no canceller?
+
+Real runner.Controller / safety.Ledger / Controller.bind (the overnight latch the strategy reads is the controller's own set,
+bound as port.overnight_cancel_pending) and the REAL native_strategy.AdaptiveStrategy.cancel_expired function, called on a stub
+owner that holds `pending`, `transport`, `cancel_order` (records engine cancels) and `_halted` = Controller.is_halted, in
+run_native's order: overnight_tick, then cancel_expired in the same loop pass. The broker DELETE is a stub that is in flight
+across the pass (it awaits) and then fails, as AlpacaPaperTransport.cancel's DELETE runs in a worker thread.
+Sequence (OVERNIGHT, Wed 01:00 ET): resting 1-share BUY 'entry'; asset carrier halted -> pass 1; the cancel fails; the halt
+clears -> passes 2..4 at +130 s (order timeout 60 s elapsed), with all_entries=True on pass 4 (kill switch / force exit).
+usage: python -B q9_strand.py TREE SCRATCH"""
+import asyncio
+import sys
+import tempfile
+from datetime import datetime
+from pathlib import Path
+from types import SimpleNamespace
+from zoneinfo import ZoneInfo
+
+TREE, SCRATCH = Path(sys.argv[1]).resolve(), Path(sys.argv[2]).resolve()
+SOURCE = TREE / "blueprints/us-equities/adaptive-paper"
+sys.dont_write_bytecode = True
+sys.path[:0] = [str(TREE), str(SOURCE)]
+
+import runner  # noqa: E402
+from runner import Controller  # noqa: E402
+from safety import Ledger, RiskLimits  # noqa: E402
+from native_strategy import AdaptiveStrategy  # noqa: E402
+
+ET = ZoneInfo("America/New_York")
+T0 = datetime(2026, 3, 11, 1, 0, tzinfo=ET).timestamp()
+
+
+def status(at, halted):
+    return {"symbol": "SPY", "source": "alpaca_assets", "ts_ns": int(at * 1e9), "overnight_tradable": True,
+            "overnight_halted": halted, "tradable": True, "asset_status": "active"}
+
+
+async def scenario():
+    root = Path(tempfile.mkdtemp(dir=SCRATCH))
+    ledger = Ledger(root / "ledger.sqlite3", RiskLimits(trial_seconds=3600, cleanup_seconds=600, min_entry_close_seconds=600))
+    ledger.start_trial(T0)
+    clock = [T0]
+    close, market_open = runner._controller_session(T0, T0, {"extended_hours": True, "overnight_enabled": True,
+                                                             "flatten_minutes_before_pre": 10})
+    c = Controller(ledger, close, market_open=market_open, clock=lambda: clock[0])
+    deletes = []
+
+    async def failing_delete(cid):
+        deletes.append((round(clock[0] - T0, 1), cid))
+        if MODE == "timeout":
+            await asyncio.sleep(3600)                  # never answers; the task's own timeout ends it
+        await asyncio.sleep(0.05)                      # in flight across the owner's loop pass
+        raise RuntimeError("synthetic DELETE failure")
+
+    async def submit(order):
+        return order
+
+    c.port = c.bind(SimpleNamespace(ready=True, overnight_enabled=True, feed="boats", quote_source_mode="boats_rest",
+                                    extended_hours_allowed=True, flatten_minutes_before_pre=10, quote_timeout=3,
+                                    cancel=failing_delete, submit=submit))
+    c.quote({"symbol": "SPY", "bid": "10", "ask": "10.01", "ts_ns": int(T0 * 1e9)})
+    c.trading_status(status(T0, False))
+    c.before_submit({"client_order_id": "entry", "symbol": "SPY", "side": "buy", "qty": "1", "limit_price": "10.01",
+                     "type": "limit", "time_in_force": "day", "extended_hours": True})
+    ledger.record_order("entry", "broker-entry", "accepted", "0", None, timestamp=T0)
+    engine_cancels = []
+    owner = SimpleNamespace(pending={"entry": {"side": "buy", "symbol": "SPY", "created": T0, "cancel_requested": False}},
+                            transport=c.port, _halted=c.is_halted,
+                            cancel_order=lambda cid: engine_cancels.append((round(clock[0] - T0, 1), str(cid))))
+    log = []
+
+    async def loop_pass(label, *, all_entries=False):
+        force = await c.overnight_tick(clock[0])                       # run_native: overnight_tick first
+        AdaptiveStrategy.cancel_expired(owner, clock[0], 60, all_entries=all_entries)   # then cancel_expired
+        log.append(f"{label}: t+{clock[0] - T0:.0f}s halted={c.is_halted('SPY')} force={force} "
+                   f"latch={'entry' in c._overnight_cancel_pending} strategy_mark={owner.pending['entry']['cancel_requested']} "
+                   f"broker_deletes={len(deletes)} engine_cancels={len(engine_cancels)}")
+
+    clock[0] = T0 + 10
+    c.quote({"symbol": "SPY", "bid": "10", "ask": "10.01", "ts_ns": int(clock[0] * 1e9)})
+    c.trading_status(status(clock[0], True))                          # the venue halts SPY
+    await loop_pass("pass 1 halt seen")
+    await asyncio.sleep(0.2)                                          # the DELETE fails
+    log.append(f"after DELETE failure: latch={'entry' in c._overnight_cancel_pending} "
+               f"events={[e['type'] for e in c.events if e['type'].startswith('overnight_cancel') or e['type'] == 'overnight_entry_cancel']}")
+    clock[0] = T0 + 12
+    c.trading_status(status(clock[0], False))                         # the halt clears
+    c.quote({"symbol": "SPY", "bid": "10", "ask": "10.01", "ts_ns": int(clock[0] * 1e9)})
+    await loop_pass("pass 2 halt cleared")
+    await asyncio.sleep(0.2)
+    clock[0] = T0 + 130
+    c.quote({"symbol": "SPY", "bid": "10", "ask": "10.01", "ts_ns": int(clock[0] * 1e9)})
+    c.trading_status(status(clock[0], False))
+    await loop_pass("pass 3 order timeout (60 s) elapsed")
+    await loop_pass("pass 4 kill switch / force exit (all_entries=True)", all_entries=True)
+    await asyncio.sleep(0.2)
+    flatten_at = datetime(2026, 3, 11, 3, 50, tzinfo=ET).timestamp()
+    clock[0] = flatten_at
+    c.quote({"symbol": "SPY", "bid": "10", "ask": "10.01", "ts_ns": int(clock[0] * 1e9)})
+    c.trading_status(status(clock[0], False))
+    await loop_pass("pass 5 at flatten_at 03:50 ET (carry-cutoff retry)")
+    await asyncio.sleep(0.2)
+    if hasattr(c, "stop_overnight_cancels"):
+        await c.stop_overnight_cancels()
+    unresolved = [i.client_id for i in ledger.unresolved()]
+    for line in log:
+        print("  " + line)
+    print(f"  RESULT: broker DELETE attempts={len(deletes)}, strategy engine cancels={len(engine_cancels)}, "
+          f"entry still unresolved in the ledger={'entry' in unresolved}")
+
+
+for MODE in ("exception", "timeout"):
+    if MODE == "timeout":
+        if not hasattr(runner, "OVERNIGHT_CANCEL_TIMEOUT_SECONDS"):
+            print("tree", TREE.name, "mode timeout: not applicable (the tick awaits the cancel inline)")
+            continue
+        runner.OVERNIGHT_CANCEL_TIMEOUT_SECONDS = 0.1   # the production 5 s bound, scaled
+    print("tree", TREE.name, "mode", MODE)
+    asyncio.run(scenario())

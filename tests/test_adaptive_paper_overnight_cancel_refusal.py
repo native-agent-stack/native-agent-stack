@@ -62,6 +62,7 @@ class OvernightCancelRefusal(unittest.TestCase):
             try:
                 self.assertTrue(await c.overnight_tick(clock[0]))
                 await asyncio.wait_for(observed.wait(),5)
+                await asyncio.gather(*list(c._overnight_cancel_tasks.values()))
                 self.assertNotIn('entry',c.port.overnight_cancel_pending,
                                  'REST422 with a live lookup must release cutoff retry latch')
                 self.assertEqual(c.ledger.unresolved()[0].status,'accepted')
@@ -69,6 +70,7 @@ class OvernightCancelRefusal(unittest.TestCase):
                 observed.clear()
                 self.assertTrue(await c.overnight_tick(clock[0]))
                 await asyncio.wait_for(observed.wait(),5)
+                await asyncio.gather(*list(c._overnight_cancel_tasks.values()))
                 self.assertEqual(deletes,['synthetic-entry','synthetic-entry'])
                 self.assertEqual(c.ledger.intents()[0].status,'canceled')
                 self.assertEqual(c.ledger.unresolved(),[])

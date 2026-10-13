@@ -1068,7 +1068,7 @@ class Controller:
                                  order.get("filled_avg_price"), timestamp=order["updated_at_ns"] / 1e9,
                                  execution=execution_from_observation(order))
         if order["status"] in ("filled", "canceled", "expired", "rejected") or order.get("event") == "order_cancel_rejected":
-            self._overnight_cancel_pending.discard(order["client_order_id"])
+            self._release_overnight_cancel(order["client_order_id"])
         basis = (self.ledger.overnight_submission_basis(order["client_order_id"])
                  if getattr(self.port, "overnight_enabled", False) is True else None)
         execution = execution_from_observation(order)
@@ -1160,16 +1160,21 @@ class Controller:
             async with asyncio.timeout(OVERNIGHT_CANCEL_TIMEOUT_SECONDS):
                 await self.port.cancel(cid)
         except asyncio.CancelledError:
-            self._overnight_cancel_pending.discard(cid)
+            self._release_overnight_cancel(cid)
             raise
         except Exception:
-            self._overnight_cancel_pending.discard(cid)
+            self._release_overnight_cancel(cid)
             self.events.append({"type": "overnight_cancel_refused", "client_id": cid, "at": now})
         else:
             self.events.append({"type": "overnight_entry_cancel", "client_id": cid,
                                 "reason": reason, "at": now})
         finally:
             self._overnight_cancel_tasks.pop(cid, None)
+
+    def _release_overnight_cancel(self, cid):
+        live = getattr(self.port, "cancel_in_flight", None)
+        if not callable(live) or not live(cid):
+            self._overnight_cancel_pending.discard(cid)
 
     async def stop_overnight_cancels(self):
         """Join this controller's bounded cancellation tasks before stopping the port."""
@@ -1180,7 +1185,7 @@ class Controller:
         for cid, task in tasks:
             if self._overnight_cancel_tasks.get(cid) is task:
                 self._overnight_cancel_tasks.pop(cid)
-            self._overnight_cancel_pending.discard(cid)
+            self._release_overnight_cancel(cid)
 
     def overnight_reprice_allowed(self, symbol, now):
         if getattr(self.port, "overnight_enabled", False) is not True:

@@ -1,0 +1,45 @@
+test_late_completion_cannot_launch_a_duplicate_delete (tests.test_adaptive_paper_cancel_worker_ownership.CancelWorkerOwnership.test_late_completion_cannot_launch_a_duplicate_delete) ... FAIL
+
+======================================================================
+FAIL: test_late_completion_cannot_launch_a_duplicate_delete (tests.test_adaptive_paper_cancel_worker_ownership.CancelWorkerOwnership.test_late_completion_cannot_launch_a_duplicate_delete)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_worker_ownership.py", line 42, in test_late_completion_cannot_launch_a_duplicate_delete
+    self._exercise('http', .05, shutdown_before_release=False)
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_worker_ownership.py", line 193, in _exercise
+    asyncio.run(exercise())
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_worker_ownership.py", line 182, in exercise
+    self.assertEqual(c.ledger.unresolved(), [])
+AssertionError: Lists differ: [Intent(client_id='entry', symbol='SPY', s[214 chars]lse)] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+Intent(client_id='entry', symbol='SPY', side='buy', qty=Decimal('1'), limit_price=Decimal('10.01'), status='accepted', filled_qty=Decimal('0'), average_price=None, broker_id='[redacted]', newly_reserved=False, submit_attempted=False)
+
++ []
+- [Intent(client_id='entry',
+-         symbol='SPY',
+-         side='buy',
+-         qty=Decimal('1'),
+-         limit_price=Decimal('10.01'),
+-         status='accepted',
+-         filled_qty=Decimal('0'),
+-         average_price=None,
+-         broker_id='[redacted]',
+-         newly_reserved=False,
+-         submit_attempted=False)]
+
+----------------------------------------------------------------------
+Ran 1 test in 4.266s
+
+FAILED (failures=1)
+ASSERTION_FAILURES 1 ERRORS 0 SKIPS 0

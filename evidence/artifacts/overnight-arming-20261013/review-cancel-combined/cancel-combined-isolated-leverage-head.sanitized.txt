@@ -1,0 +1,8 @@
+test_2x_rung_next_lower_ceiling_is_the_1x_rung (tests.test_adaptive_paper_runner.AchievedLeverageReceiptIntegrationTests.test_2x_rung_next_lower_ceiling_is_the_1x_rung) ... ok
+test_2x_rung_next_lower_ceiling_is_the_1x_rung (tests.test_adaptive_paper_runner.AchievedLeverageReceiptIntegrationTests.test_2x_rung_next_lower_ceiling_is_the_1x_rung) ... ok
+test_2x_rung_next_lower_ceiling_is_the_1x_rung (tests.test_adaptive_paper_runner.AchievedLeverageReceiptIntegrationTests.test_2x_rung_next_lower_ceiling_is_the_1x_rung) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 7.979s
+
+OK

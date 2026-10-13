@@ -1,0 +1,420 @@
+{
+  "base_revision": "8f64d5a49a38989e8578e4e2c9681e5a372f6ed3",
+  "evidence_class": "synthetic",
+  "input_hashes": {
+    "blueprints/us-equities/adaptive-paper/mover.py": "d2663a99532925ddd071147297cd51bc44cbfd9b4c69c4f316f3bb4efb5a716d",
+    "blueprints/us-equities/adaptive-paper/mover_runner.py": "22542292fe2e3f18bee55fad845d48caf97487eedc4ef83e346a451de1345988",
+    "blueprints/us-equities/adaptive-paper/native_strategy.py": "98f30ac68a71088c616965db840a022c4ed979fdb87e52e5e1a8a6efba812e3c",
+    "blueprints/us-equities/adaptive-paper/runner.py": "d1f305f57c2b6be8cdf0e4de996d9b6caaf7cc5eb6f623605879dad6743d067d",
+    "blueprints/us-equities/adaptive-paper/transport.py": "03da21ee42abcae082abb1d4bafb80ab96858a35c4b1b59f149339ea0b32b743",
+    "docs/decisions/2026-10-13-overnight-rest-arming.md": "6e13db2c87366eaf99e370a591f0c5215fa6a51488047f52f7342a114970970f",
+    "tests/test_adaptive_paper_cancel_worker_ownership.py": "55f23fb4f52f6704ee2ac649392852f5aeeca3436d99bf91d06f9281efa6d694",
+    "tests/test_adaptive_paper_overnight_cancel_marks.py": "bb740ec5fc4df0ac3d794521f65f4c942bdaa999503db9ec81231928f63b3386",
+    "tests/test_adaptive_paper_overnight_cancel_refusal.py": "9a62e4ff229fb83324eca859390c5660a115c7c77f3d3e242875225e051f8962",
+    "tests/test_overnight_published_preimages.py": "9dd21844ce5c727ddaacc1261e31a752e8eed3a9ce249a7efc5a19175f92bc96"
+  },
+  "limitations": [
+    "Actual SDK, GuardedSession, Controller, ledger, budget, DELETE, lookup and teardown use synthetic HTTP.",
+    "The strand case executes the production AdaptiveStrategy method on a protocol owner, not a running rc5 node.",
+    "Five SDK tests include the actual5s timeout; four method controls are CI-visible without native dependencies.",
+    "Pending controller state is retained until the actual operation resolves; the next strategy pass clears only its mirrored mark.",
+    "Prior worker-only782 failures and exact input preimages are separately preserved; their runs are not retargeted to combined sources.",
+    "Combined native787 has one unchanged achieved-leverage fixture failure (zero achieved leverage/no entries); the same failure reproduces1/3 at exact8f64 production and0/3 at the combined sources. The full native run is retained as rc1, not called a pass.",
+    "Published q9 recipe substitutes the local probe locator with its exact public capture.",
+    "No actual credential, broker access, broker latency, paper acceptance or strategy-result claim."
+  ],
+  "paper_acceptance": "NOT_RUN",
+  "prior_stage": "evidence/artifacts/overnight-arming-20261013/review-cancel-worker/worker-only/validation.json",
+  "runs": [
+    {
+      "assertion_failures": 4,
+      "command": "CPUWeight=idle cancel-worker-check.py base",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 10.203,
+      "errors": 0,
+      "exit_code": 1,
+      "output_bytes": 8178,
+      "output_sha256": "5554009e9645a0075590d663123b6c9f0e0fcd0e34f0a96181edddb3aeae168d",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-combined-base-five-final.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-combined-base-five-final.sanitized.txt",
+      "published_runner": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-worker-check.py.txt",
+      "python_argv": [
+        "<scratch>/cancel-worker-check.py",
+        "base"
+      ],
+      "scope_argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle"
+      ],
+      "skipped": 0,
+      "tests_run": 5
+    },
+    {
+      "assertion_failures": 0,
+      "command": "CPUWeight=idle cancel-worker-check.py green",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 9.822,
+      "errors": 0,
+      "exit_code": 0,
+      "output_bytes": 1187,
+      "output_sha256": "9f11aaa16b6eeec72503c858659e71449c90692df93427444cac7564274d20e6",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-combined-final-green5.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-combined-final-green5.sanitized.txt",
+      "published_runner": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-worker-check.py.txt",
+      "python_argv": [
+        "<scratch>/cancel-worker-check.py",
+        "green"
+      ],
+      "scope_argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle"
+      ],
+      "skipped": 0,
+      "tests_run": 5
+    },
+    {
+      "assertion_failures": 4,
+      "command": "CPUWeight=idle cancel-marks-check.py base",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 0.313,
+      "errors": 0,
+      "exit_code": 1,
+      "output_bytes": 5314,
+      "output_sha256": "cb20b161fd6aef39c5bed53112416f100e1486d9b786baf74a5b1de4f3658f3b",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-combined-marks-base.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-combined-marks-base.sanitized.txt",
+      "published_runner": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-marks-check.py.txt",
+      "python_argv": [
+        "<scratch>/cancel-marks-check.py",
+        "base"
+      ],
+      "scope_argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle"
+      ],
+      "skipped": 0,
+      "tests_run": 4
+    },
+    {
+      "assertion_failures": 0,
+      "command": "CPUWeight=idle python -m unittest tests.test_adaptive_paper_overnight_cancel_marks",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 0.09,
+      "errors": 0,
+      "exit_code": 0,
+      "output_bytes": 890,
+      "output_sha256": "06819f7dde2248a915b2eca0ae23cb48254486685418f5e4c9d24b08a0457ed8",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-combined-marks-ci-green.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-combined-marks-ci-green.sanitized.txt",
+      "python_argv": [
+        "-m",
+        "unittest",
+        "-v",
+        "tests.test_adaptive_paper_overnight_cancel_marks"
+      ],
+      "scope_argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle"
+      ],
+      "skipped": 0,
+      "tests_run": 4
+    },
+    {
+      "assertion_failures": 1,
+      "command": "CPUWeight=idle cancel-worker-check.py release-live",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 1.669,
+      "errors": 0,
+      "exit_code": 1,
+      "output_bytes": 2101,
+      "output_sha256": "509d45b9ec659376140a1a374c6ae23acbc8e3bd3b3a1b3c7435a5c209818d81",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-combined-mutant-release-live.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-combined-mutant-release-live.sanitized.txt",
+      "published_runner": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-worker-check.py.txt",
+      "python_argv": [
+        "<scratch>/cancel-worker-check.py",
+        "release-live"
+      ],
+      "scope_argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle"
+      ],
+      "skipped": 0,
+      "tests_run": 1
+    },
+    {
+      "assertion_failures": 1,
+      "command": "CPUWeight=idle cancel-worker-check.py unshielded",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 1.833,
+      "errors": 0,
+      "exit_code": 1,
+      "output_bytes": 2095,
+      "output_sha256": "3d4d7748ecdde16cdbbdf543d07cc46935232912f8a1e22c4be13c70162a98e7",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-combined-mutant-unshielded.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-combined-mutant-unshielded.sanitized.txt",
+      "published_runner": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-worker-check.py.txt",
+      "python_argv": [
+        "<scratch>/cancel-worker-check.py",
+        "unshielded"
+      ],
+      "scope_argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle"
+      ],
+      "skipped": 0,
+      "tests_run": 1
+    },
+    {
+      "assertion_failures": 1,
+      "command": "CPUWeight=idle cancel-worker-check.py keep-queued",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 1.511,
+      "errors": 0,
+      "exit_code": 1,
+      "output_bytes": 2120,
+      "output_sha256": "87d82fef5e6b464bd777739a0941f3b26153066ccfc199bf8b2f8a2432f2f1a1",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-combined-mutant-queued.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-combined-mutant-queued.sanitized.txt",
+      "published_runner": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-worker-check.py.txt",
+      "python_argv": [
+        "<scratch>/cancel-worker-check.py",
+        "keep-queued"
+      ],
+      "scope_argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle"
+      ],
+      "skipped": 0,
+      "tests_run": 1
+    },
+    {
+      "assertion_failures": 3,
+      "command": "CPUWeight=idle cancel-marks-check.py adaptive-sticky",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 0.208,
+      "errors": 0,
+      "exit_code": 1,
+      "output_bytes": 4408,
+      "output_sha256": "2d0d4d5556f72dda38d2efb56478b7d43dec4f364e2751d7d7b6ec02b6fba4c3",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-combined-mutant-adaptive-sticky.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-combined-mutant-adaptive-sticky.sanitized.txt",
+      "published_runner": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-marks-check.py.txt",
+      "python_argv": [
+        "<scratch>/cancel-marks-check.py",
+        "adaptive-sticky"
+      ],
+      "scope_argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle"
+      ],
+      "skipped": 0,
+      "tests_run": 4
+    },
+    {
+      "assertion_failures": 1,
+      "command": "CPUWeight=idle cancel-marks-check.py mover-sticky",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 0.323,
+      "errors": 0,
+      "exit_code": 1,
+      "output_bytes": 1851,
+      "output_sha256": "21734ea7d95821d5b04e078cbfb5c4dacf177efd15f7631bf2f79965a3e6bb2b",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-combined-mutant-mover-sticky.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-combined-mutant-mover-sticky.sanitized.txt",
+      "published_runner": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-marks-check.py.txt",
+      "python_argv": [
+        "<scratch>/cancel-marks-check.py",
+        "mover-sticky"
+      ],
+      "scope_argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle"
+      ],
+      "skipped": 0,
+      "tests_run": 4
+    },
+    {
+      "assertion_failures": 1,
+      "command": "CPUWeight=idle post-rebase-suite.py native",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 260.185,
+      "errors": 0,
+      "exit_code": 1,
+      "output_bytes": 156484,
+      "output_sha256": "238609538e53a6af8a4836d487fd4443b0f3ee96b10ffcb72e78783fcd0a78e2",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-combined-final-native787.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-combined-final-native787.sanitized.txt",
+      "published_runner": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/post-rebase-suite.py.txt",
+      "python_argv": [
+        "<scratch>/post-rebase-suite.py",
+        "native"
+      ],
+      "scope_argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle"
+      ],
+      "skipped": 0,
+      "tests_run": 787
+    },
+    {
+      "assertion_failures": 0,
+      "command": "CPUWeight=idle post-rebase-suite.py ci",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 111.087,
+      "errors": 0,
+      "exit_code": 0,
+      "output_bytes": 164541,
+      "output_sha256": "2fedbd173aaee252d9339192a49fa4c41e8d14e8d8da84641482b44a3148960a",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-combined-final-ci787.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-combined-final-ci787.sanitized.txt",
+      "published_runner": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/post-rebase-suite.py.txt",
+      "python_argv": [
+        "<scratch>/post-rebase-suite.py",
+        "ci"
+      ],
+      "scope_argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle"
+      ],
+      "skipped": 225,
+      "tests_run": 787
+    },
+    {
+      "assertion_failures": 1,
+      "command": "CPUWeight=idle cancel-worker-isolated-mover.py base leverage",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 7.71,
+      "errors": 0,
+      "exit_code": 1,
+      "output_bytes": 1952,
+      "output_sha256": "cd1dd8148a9848d7e0bb09c13c1724b0a824af10c8e81342ebe8baf52ef14341",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-combined-isolated-leverage-base.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-combined-isolated-leverage-base.sanitized.txt",
+      "published_runner": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-worker-isolated-mover.py.txt",
+      "python_argv": [
+        "<scratch>/cancel-worker-isolated-mover.py",
+        "base",
+        "leverage"
+      ],
+      "scope_argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle"
+      ],
+      "skipped": 0,
+      "tests_run": 3
+    },
+    {
+      "assertion_failures": 0,
+      "command": "CPUWeight=idle cancel-worker-isolated-mover.py head leverage",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 7.979,
+      "errors": 0,
+      "exit_code": 0,
+      "output_bytes": 626,
+      "output_sha256": "e523905f6d927a435977ca6c183f9eb0182b07d1ec3b91a5f4b0783dfb3fe0d1",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-combined-isolated-leverage-head.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-combined-isolated-leverage-head.sanitized.txt",
+      "published_runner": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-worker-isolated-mover.py.txt",
+      "python_argv": [
+        "<scratch>/cancel-worker-isolated-mover.py",
+        "head",
+        "leverage"
+      ],
+      "scope_argv": [
+        "systemd-run",
+        "--user",
+        "--scope",
+        "-p",
+        "CPUWeight=idle"
+      ],
+      "skipped": 0,
+      "tests_run": 3
+    },
+    {
+      "command": "CPUWeight=idle q9-check.py base",
+      "digest_scope": "sanitized published bytes",
+      "engine_cancels_before_flatten_each": 0,
+      "exit_code": 0,
+      "output_bytes": 1842,
+      "output_sha256": "bc16301891082b6e2dcfe67654407832b64260f6378850dd562a2d72c8cc0847",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-combined-q9-base.sanitized.txt",
+      "probe_modes": [
+        "exception",
+        "timeout"
+      ],
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-combined-q9-base.sanitized.txt",
+      "published_runner": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/q9-check.py.txt",
+      "python_argv": [
+        "<scratch>/q9-check.py",
+        "base"
+      ]
+    },
+    {
+      "command": "CPUWeight=idle q9-check.py head",
+      "digest_scope": "sanitized published bytes",
+      "engine_cancels_before_flatten_each": 1,
+      "exit_code": 0,
+      "output_bytes": 1844,
+      "output_sha256": "dfb9ce4d82413b9fd84996d7fa705486bf31583fdb4a17191f0ab7c74e372aee",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-combined-q9-head.sanitized.txt",
+      "probe_modes": [
+        "exception",
+        "timeout"
+      ],
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/cancel-combined-q9-head.sanitized.txt",
+      "published_runner": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/q9-check.py.txt",
+      "python_argv": [
+        "<scratch>/q9-check.py",
+        "head"
+      ]
+    }
+  ],
+  "schema_version": 1,
+  "scope": "Combined SDK worker ownership and adaptive/mover cancel-mark lifecycle; one forward P1 correction",
+  "sources": {
+    "alpaca_py_pin": "cc4cb3b7ba50ae250e621983c2779047fb16bb28",
+    "cpython_pin": "f6650f9ad73359051f3e558c2431a109bc016664",
+    "executor_shutdown": "Lib/concurrent/futures/thread.py:219-241",
+    "future_cancel": "Lib/concurrent/futures/_base.py:364-372",
+    "owning_strand_probe": "evidence/artifacts/overnight-arming-20261013/review-cancel-combined/q9_strand.py.txt",
+    "sdk_cancel": "alpaca/trading/client.py:217",
+    "to_thread": "Lib/asyncio/threads.py:12-25"
+  }
+}

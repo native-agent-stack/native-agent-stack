@@ -1042,6 +1042,7 @@ class OrderRecord:
     status: str = "submitted"
     terminal: bool = False
     cancel_requested: bool = False
+    overnight_cancel_requested: bool = False
     cancel_reason: str | None = None
     detail: str | None = None
     # Refused before any broker request (no ledger intent was reserved, or it was proven
@@ -1387,8 +1388,13 @@ class MoverBook:
         halted = self._halted(symbol)
         for record in self.open_orders(symbol):
             if self._cancel_pending(record.client_id):
+                if not record.cancel_requested:
+                    record.overnight_cancel_requested = True
                 record.cancel_requested = True
                 continue
+            if record.overnight_cancel_requested:
+                record.overnight_cancel_requested = False
+                record.cancel_requested = False
             if record.cancel_requested:
                 continue
             why = None

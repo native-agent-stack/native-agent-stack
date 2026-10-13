@@ -1422,8 +1422,14 @@ class AdaptiveStrategy(Strategy):
         after the block was decided."""
         for client_id, info in list(self.pending.items()):
             if client_id in getattr(getattr(self, "transport", None), "overnight_cancel_pending", ()):
+                if not info.get("cancel_requested"):
+                    info["overnight_cancel_requested"] = True
                 info["cancel_requested"] = True
                 continue
+            if info.pop("overnight_cancel_requested", False):
+                # The shared per-order operation resolved. Release only the mark
+                # this background cancellation owns, never an engine cancel.
+                info["cancel_requested"] = False
             if info.get("cancel_requested"):
                 continue
             if info["side"] == "sell" and self._halted(info["symbol"]):

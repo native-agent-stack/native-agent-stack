@@ -1,0 +1,28 @@
+test_late_completion_cannot_launch_a_duplicate_delete (tests.test_adaptive_paper_cancel_worker_ownership.CancelWorkerOwnership.test_late_completion_cannot_launch_a_duplicate_delete) ... FAIL
+
+======================================================================
+FAIL: test_late_completion_cannot_launch_a_duplicate_delete (tests.test_adaptive_paper_cancel_worker_ownership.CancelWorkerOwnership.test_late_completion_cannot_launch_a_duplicate_delete)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_worker_ownership.py", line 43, in test_late_completion_cannot_launch_a_duplicate_delete
+    self._exercise('http', .05, shutdown_before_release=False)
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_worker_ownership.py", line 252, in _exercise
+    asyncio.run(exercise())
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/projects/us-equities-runtime/.python/cpython-3.12-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_cancel_worker_ownership.py", line 212, in exercise
+    self.assertTrue(live_pending, 'controller must retain ownership beyond the wrapper timeout')
+AssertionError: False is not true : controller must retain ownership beyond the wrapper timeout
+
+----------------------------------------------------------------------
+Ran 1 test in 1.833s
+
+FAILED (failures=1)
+ASSERTION_FAILURES 1 ERRORS 0 SKIPS 0

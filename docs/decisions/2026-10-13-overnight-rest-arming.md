@@ -169,7 +169,10 @@ context bounds each coroutine to five seconds; timeout or broker refusal
 releases its retry latch. Both native runners cancel and join these tasks before
 stopping their port. This is a synthetic owner-loop guarantee, not measured
 broker latency or proof that cancelling an asyncio wrapper interrupts SDK I/O.
-The transport's existing worker and HTTP teardown still owns that I/O.
+The original transport teardown did not retain or join the synchronous SDK
+DELETE worker after that timeout. Astra's pinned-SDK probe reproduced a second
+DELETE and session closure while the first worker remained live. That ownership
+claim is superseded by the correction below.
 
 CC correction216 at 18:29Z withdraws correction215's proposed history rewrite.
 This correction is a normal fast-forward child of448db566 and preserves published
@@ -195,3 +198,59 @@ no broker acceptance or cancellation-latency bound is claimed.
 The CC's20:12Z cue approves one blocker commit and a leased conflict-only rebase
 onto the named main base in one push. Historical public inputs that main changes
 are preserved before rebasing, so old execution receipts remain verifiable.
+
+### SDK cancellation ownership correction
+
+Astra's real-SDK probe at ea0a51a6 and the builder's regression at published
+8f64d5a4 establish the missing boundary: cancelling an asyncio await does not
+interrupt a synchronous SDK DELETE. The supported CPython3.12.3 implementation
+uses executor work for `asyncio.to_thread`
+([threads.py:12-25](https://github.com/python/cpython/blob/f6650f9ad73359051f3e558c2431a109bc016664/Lib/asyncio/threads.py#L12-L25));
+a running concurrent future cannot be cancelled
+([_base.py:364-372](https://github.com/python/cpython/blob/f6650f9ad73359051f3e558c2431a109bc016664/Lib/concurrent/futures/_base.py#L364-L372)).
+The installed pinned SDK's synchronous `TradingClient.cancel_order_by_id`
+remains the DELETE implementation
+([alpaca-py0.44.0 client.py:217](https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/alpaca/trading/client.py#L217)).
+
+The transport now retains one shielded cancellation operation per owned client
+ID, including its actual concurrent future and final-state reconciliation. The
+controller's five-second timeout releases only its wait; another tick awaits
+that same transport operation instead of authorizing another DELETE. Its
+pending latch stays set until the actual operation resolves, including if a
+terminal stream observation arrives while the SDK call is still running. A late
+completion still forwards the final broker observation. The owner tick remains
+nonblocking and continues cutoff, expiry and flatten decisions.
+
+On shutdown, the transport refuses new cancellations, cancels operations still
+waiting for its operation lock and cancels executor futures not yet started.
+It awaits started operations and their final lookups, then joins its supported
+ThreadPoolExecutor before closing the SDK HTTP session
+([thread.py:219-241](https://github.com/python/cpython/blob/f6650f9ad73359051f3e558c2431a109bc016664/Lib/concurrent/futures/thread.py#L219-L241)).
+The copied ContextVar preserves the existing per-order budget identity. This
+joins existing work; it does not claim that a running HTTP request is interruptible.
+
+The adaptive strategy and mover book mirror the background operation's pending
+mark separately from their own engine cancellation mark. When the shared
+operation resolves, the next strategy pass clears only that mirrored mark;
+failure therefore leaves timeout, halt, kill-switch and corporate-action cancel
+paths available before the carry cutoff. A pre-existing engine cancel mark is
+preserved. This closes the reader's q9 strand case under the CC's21:37Z ruling.
+
+The real-SDK regressions control only synthetic HTTP/budget boundaries and seed
+the durable fixture with the SDK's required UUID. A blocked DELETE uses the real
+five-second owner timeout; a blocked budget and late completion cover the retry
+and shutdown races. A queued operation is cancelled before any SDK request.
+Guard-removal controls separately exercise loss of shielding and loss of queued
+operation cancellation. No broker, actual credential or paper acceptance runs.
+The CC's21:13Z P1-exception approval authorizes one normal forward correction on
+8f64d5a4, followed by one delta review wave. The separate mover child stays held.
+
+The combined five-case SDK module drives a real422/live lookup after a halt,
+lets that operation resolve after its owner timeout, clears the halt, and drives
+the production `AdaptiveStrategy.cancel_expired` method on a protocol owner.
+It proves a second cancellation can start through the ordinary order-timeout
+path before `flatten_at`, after the first operation has finished. The owning
+reader's q9 probe is measured separately at exact8f64 and the combined sources.
+Four CI-visible production-method controls cover both strategy mirrors and the
+preservation of unrelated engine cancels. This is deterministic fixture evidence,
+not an rc5 node or live-broker acceptance claim for that particular strand case.

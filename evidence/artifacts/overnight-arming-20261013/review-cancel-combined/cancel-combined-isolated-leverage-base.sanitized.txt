@@ -1,0 +1,16 @@
+test_2x_rung_next_lower_ceiling_is_the_1x_rung (tests.test_adaptive_paper_runner.AchievedLeverageReceiptIntegrationTests.test_2x_rung_next_lower_ceiling_is_the_1x_rung) ... ok
+test_2x_rung_next_lower_ceiling_is_the_1x_rung (tests.test_adaptive_paper_runner.AchievedLeverageReceiptIntegrationTests.test_2x_rung_next_lower_ceiling_is_the_1x_rung) ... ok
+test_2x_rung_next_lower_ceiling_is_the_1x_rung (tests.test_adaptive_paper_runner.AchievedLeverageReceiptIntegrationTests.test_2x_rung_next_lower_ceiling_is_the_1x_rung) ... FAIL
+
+======================================================================
+FAIL: test_2x_rung_next_lower_ceiling_is_the_1x_rung (tests.test_adaptive_paper_runner.AchievedLeverageReceiptIntegrationTests.test_2x_rung_next_lower_ceiling_is_the_1x_rung)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_runner.py", line 3524, in test_2x_rung_next_lower_ceiling_is_the_1x_rung
+    self.assertGreater(peak_achieved, Decimal("1"), lev)
+AssertionError: Decimal('0') not greater than Decimal('1') : {'policy_version': 'leverage-schedule-v1-20260922', 'config_max_leverage': '2', 'account_multiplier': None, 'peak_gross_exposure_usd': '0', 'peak_pending_buy_notional_usd': '0', 'peak_effective_leverage': '0', 'ceiling_changes': [{'t': 1791928469.307684, 'session': 'RTH', 'regime': 'unavailable', 'drawdown_fraction': '0', 'ceiling': '0.0'}, {'t': 1791928469.8455648, 'session': 'RTH', 'regime': 'trend', 'drawdown_fraction': '0', 'ceiling': '2.0'}], 'broker_cash_at_start': '100000', 'broker_margin_used': False, 'next_lower_rung_ceiling': '1', 'peak_achieved_leverage': '0', 'ceiling_at_peak_achieved_leverage': '0', 'seconds_above_next_lower_rung_ceiling': 0.0}
+
+----------------------------------------------------------------------
+Ran 3 tests in 7.710s
+
+FAILED (failures=1)

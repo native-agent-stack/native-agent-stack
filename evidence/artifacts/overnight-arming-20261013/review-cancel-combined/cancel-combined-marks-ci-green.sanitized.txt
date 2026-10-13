@@ -1,0 +1,9 @@
+test_adaptive_background_failure_allows_timeout_and_kill_switch_retry (tests.test_adaptive_paper_overnight_cancel_marks.OvernightCancelMarks.test_adaptive_background_failure_allows_timeout_and_kill_switch_retry) ... ok
+test_adaptive_resolution_clears_only_its_background_mark (tests.test_adaptive_paper_overnight_cancel_marks.OvernightCancelMarks.test_adaptive_resolution_clears_only_its_background_mark) ... ok
+test_mover_background_failure_allows_entry_timeout_retry (tests.test_adaptive_paper_overnight_cancel_marks.OvernightCancelMarks.test_mover_background_failure_allows_entry_timeout_retry) ... ok
+test_mover_resolution_preserves_an_engine_cancel_mark (tests.test_adaptive_paper_overnight_cancel_marks.OvernightCancelMarks.test_mover_resolution_preserves_an_engine_cancel_mark) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.090s
+
+OK

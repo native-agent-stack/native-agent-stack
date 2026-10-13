@@ -1,0 +1,21 @@
+test_periodic_reconciliation_with_snapshot_latency_while_holding (tests.test_adaptive_paper_mover_native.MoverNativeEndToEnd.test_periodic_reconciliation_with_snapshot_latency_while_holding) ... FAIL
+test_periodic_reconciliation_with_snapshot_latency_while_holding (tests.test_adaptive_paper_mover_native.MoverNativeEndToEnd.test_periodic_reconciliation_with_snapshot_latency_while_holding) ... ok
+test_periodic_reconciliation_with_snapshot_latency_while_holding (tests.test_adaptive_paper_mover_native.MoverNativeEndToEnd.test_periodic_reconciliation_with_snapshot_latency_while_holding) ... ok
+
+======================================================================
+FAIL: test_periodic_reconciliation_with_snapshot_latency_while_holding (tests.test_adaptive_paper_mover_native.MoverNativeEndToEnd.test_periodic_reconciliation_with_snapshot_latency_while_holding)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_mover_native.py", line 462, in test_periodic_reconciliation_with_snapshot_latency_while_holding
+    self.assert_clean(receipt, held, unresolved)
+  File "/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013/tests/test_adaptive_paper_mover_native.py", line 172, in assert_clean
+    self.assertEqual(receipt["status"], status, receipt.get("adapter_errors"))
+AssertionError: 'completed_no_signals' != 'passed'
+- completed_no_signals
++ passed
+ : []
+
+----------------------------------------------------------------------
+Ran 3 tests in 16.334s
+
+FAILED (failures=1)

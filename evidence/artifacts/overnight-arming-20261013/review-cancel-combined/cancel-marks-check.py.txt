@@ -1,0 +1,30 @@
+"""Run cancel-mark behaviors against exact base methods or a removed guard."""
+import ast
+from pathlib import Path
+import subprocess
+import sys
+import unittest
+ROOT = Path('/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013')
+sys.path.insert(0, str(ROOT))
+from tests import test_adaptive_paper_overnight_cancel_marks as tests
+mode = sys.argv[1]
+def method(filename, classname, name):
+    if mode == 'base':
+        source = subprocess.check_output(['git', 'show', '8f64d5a49:blueprints/us-equities/adaptive-paper/' + filename], cwd=ROOT).decode()
+    else:
+        source = (ROOT / 'blueprints/us-equities/adaptive-paper' / filename).read_text()
+    if mode == 'adaptive-sticky' and filename == 'native_strategy.py':
+        source = source.replace('if info.pop("overnight_cancel_requested", False):', 'if False:')
+    if mode == 'mover-sticky' and filename == 'mover.py':
+        source = source.replace('if record.overnight_cancel_requested:', 'if False:')
+    tree = ast.parse(source)
+    cls = next(n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == classname)
+    node = next(n for n in cls.body if isinstance(n, ast.FunctionDef) and n.name == name)
+    scope = {'ClientOrderId': str, 'Action': lambda kind, cid: (kind, cid)}
+    exec(compile(ast.fix_missing_locations(ast.Module(body=[node], type_ignores=[])), filename, 'exec'), scope)
+    return scope[name]
+tests.production_method = method
+suite = unittest.defaultTestLoader.loadTestsFromModule(tests)
+result = unittest.TextTestRunner(verbosity=2).run(suite)
+print('ASSERTION_FAILURES', len(result.failures), 'ERRORS', len(result.errors), 'SKIPS', len(result.skipped))
+sys.exit(not result.wasSuccessful())

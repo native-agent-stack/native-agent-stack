@@ -1,0 +1,33 @@
+"""Run real-SDK worker regressions or an isolated transport guard mutation."""
+import subprocess
+import sys
+import types
+import unittest
+from pathlib import Path
+ROOT = Path('/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013')
+sys.path[:0] = [str(ROOT), str(ROOT / 'blueprints/us-equities/adaptive-paper')]
+from runtime_lock import runtime_read_lock
+mode = sys.argv[1]
+with runtime_read_lock():
+    if mode == 'base':
+        source = subprocess.check_output(['git', 'show', '8f64d5a49:blueprints/us-equities/adaptive-paper/transport.py'], cwd=ROOT).decode()
+    else:
+        source = (ROOT / 'blueprints/us-equities/adaptive-paper/transport.py').read_text()
+    if mode == 'unshielded':
+        assert source.count('return await asyncio.shield(task)') == 1
+        source = source.replace('return await asyncio.shield(task)', 'return await task')
+    if mode == 'keep-queued':
+        assert source.count('if cid not in self._cancel_started:\n                task.cancel()') == 1
+        source = source.replace('if cid not in self._cancel_started:\n                task.cancel()', 'if False:\n                task.cancel()')
+    module = types.ModuleType('transport')
+    module.__file__ = str(ROOT / 'blueprints/us-equities/adaptive-paper/transport.py')
+    sys.modules['transport'] = module
+    exec(compile(source, module.__file__, 'exec'), module.__dict__)
+    name = 'tests.test_adaptive_paper_cancel_worker_ownership'
+    if mode == 'unshielded':
+        name += '.CancelWorkerOwnership.test_late_completion_cannot_launch_a_duplicate_delete'
+    if mode == 'keep-queued':
+        name += '.CancelWorkerOwnership.test_shutdown_cancels_an_operation_still_waiting_for_the_owner_lock'
+    result = unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromName(name))
+    print('ASSERTION_FAILURES', len(result.failures), 'ERRORS', len(result.errors), 'SKIPS', len(result.skipped))
+sys.exit(0 if result.wasSuccessful() else 1)

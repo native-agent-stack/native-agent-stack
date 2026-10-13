@@ -6,8 +6,8 @@ The caller owns durable intent/risk accounting and the shared request limiter.
 from __future__ import annotations
 
 import asyncio
-from concurrent.futures import TimeoutError as FutureTimeout
-from contextvars import ContextVar
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutureTimeout
+from contextvars import ContextVar, copy_context
 from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
 import hashlib
@@ -1384,6 +1384,10 @@ class AlpacaPaperTransport:
         self._threads = []
         self._tasks = []
         self._operation_lock = asyncio.Lock()
+        self._cancel_operations = {}
+        self._cancel_started = set()
+        self._cancel_workers = {}
+        self._cancel_executor = None
         self._observation_lock = asyncio.Lock()
         self._http_lock = threading.Lock()
         self._client = _sdk_client(api_key, secret_key, self._budget_sync,
@@ -1898,6 +1902,42 @@ class AlpacaPaperTransport:
             return await self._observe(observed)
 
     async def cancel(self, client_order_id):
+        """Await the one transport-owned cancellation for this order.
+
+        A caller timeout cancels only its wait. The operation retains its lock,
+        SDK future and reconciliation until completion or transport shutdown.
+        """
+        if getattr(self, "_stopping", False):
+            raise TransportError("transport stopping")
+        # Protocol fixtures may construct the transport without SDK startup.
+        if not hasattr(self, "_cancel_operations"):
+            self._cancel_operations = {}
+            self._cancel_started = set()
+            self._cancel_workers = {}
+            self._cancel_executor = None
+        task = self._cancel_operations.get(client_order_id)
+        if task is None:
+            task = asyncio.create_task(self._cancel_owned(client_order_id))
+            self._cancel_operations[client_order_id] = task
+
+            def completed(operation):
+                if self._cancel_operations.get(client_order_id) is operation:
+                    self._cancel_operations.pop(client_order_id)
+                self._cancel_started.discard(client_order_id)
+                pending = getattr(self, "overnight_cancel_pending", None)
+                if pending is not None:
+                    pending.discard(client_order_id)
+                if not operation.cancelled():
+                    operation.exception()  # Retrieve failures even after the caller timed out.
+
+            task.add_done_callback(completed)
+        return await asyncio.shield(task)
+
+    def cancel_in_flight(self, client_order_id):
+        operation = getattr(self, "_cancel_operations", {}).get(client_order_id)
+        return operation is not None and not operation.done()
+
+    async def _cancel_owned(self, client_order_id):
         """Send the broker DELETE for an owned order and return its queried final state.
 
         The caller asks to cancel an order it believes open or whose state is
@@ -1912,6 +1952,9 @@ class AlpacaPaperTransport:
         already-canceled order changes no ledger state.
         """
         async with self._operation_lock:
+            if getattr(self, "_stopping", False):
+                raise TransportError("transport stopping")
+            self._cancel_started.add(client_order_id)
             if client_order_id not in self._intents:
                 raise TransportError("cancellation requires an owned durable intent")
             order = self._observed.get(client_order_id)
@@ -1923,16 +1966,25 @@ class AlpacaPaperTransport:
             self._assert_matches(order, self._intents[client_order_id])
             answer = 204
             try:
-                # The worker's copied context retains this DELETE's owned identity
-                # even if task cancellation releases the operation lock early.
+                if getattr(self, "_stopping", False):
+                    raise TransportError("transport stopping")
                 self._client._session.announce_cancel(order["id"], client_order_id)
-                await asyncio.to_thread(self._client.cancel_order_by_id, order["id"])
+                if self._cancel_executor is None:
+                    self._cancel_executor = ThreadPoolExecutor(
+                        max_workers=1, thread_name_prefix="paper-cancel")
+                # CPython3.12 Future.cancel() refuses a running call; shutdown
+                # retains and joins it. Preserve the SDK session's ContextVar.
+                worker = self._cancel_executor.submit(
+                    copy_context().run, self._client.cancel_order_by_id, order["id"])
+                self._cancel_workers[client_order_id] = worker
+                await asyncio.wrap_future(worker)
             except Exception as exc:
                 answer = getattr(exc, "status_code", None)
                 if answer not in (404, 422):
                     self.freeze_health("cancellation_unresolved")
             finally:
                 self._client._session.withdraw_cancel()
+                self._cancel_workers.pop(client_order_id, None)
             # A successful DELETE is only an acknowledgement; query cumulative state.
             final = await self._lookup(client_order_id)
             if final is None:
@@ -2042,6 +2094,20 @@ class AlpacaPaperTransport:
         if self._terminal_stream_health is None:
             self._terminal_stream_health = self.stream_health()
         self._stopping = True
+        # Cancel operations still waiting for the operation lock or executor.
+        # Started calls cannot be interrupted: join them and their reconciliation
+        # before closing the SDK session. A controller timeout never owns these.
+        operations = list(getattr(self, "_cancel_operations", {}).items())
+        for cid, task in operations:
+            if cid not in self._cancel_started:
+                task.cancel()
+        for worker in getattr(self, "_cancel_workers", {}).values():
+            worker.cancel()
+        await asyncio.gather(*(task for _, task in operations), return_exceptions=True)
+        executor = getattr(self, "_cancel_executor", None)
+        if executor is not None:
+            await asyncio.to_thread(executor.shutdown, wait=True, cancel_futures=True)
+            self._cancel_executor = None
         futures = []
         for stream in (self._orders_stream, self._quotes_stream):
             if stream is None:

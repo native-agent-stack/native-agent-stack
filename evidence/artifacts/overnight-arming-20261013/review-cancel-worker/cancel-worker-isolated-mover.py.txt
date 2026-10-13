@@ -1,0 +1,22 @@
+"""Measure the unchanged synthetic mover timing fixture at exact base and head."""
+from pathlib import Path
+import subprocess
+import sys
+import types
+import unittest
+ROOT = Path('/var/tmp/native-agent-stack-ns-seeds-overnight-arming-20261013')
+sys.path[:0] = [str(ROOT), str(ROOT / 'blueprints/us-equities/adaptive-paper')]
+from runtime_lock import runtime_read_lock
+with runtime_read_lock():
+    if sys.argv[1] == 'base':
+        module = types.ModuleType('transport')
+        module.__file__ = str(ROOT / 'blueprints/us-equities/adaptive-paper/transport.py')
+        sys.modules['transport'] = module
+        source = subprocess.check_output(['git', 'show', '8f64d5a49:blueprints/us-equities/adaptive-paper/transport.py'], cwd=ROOT)
+        exec(compile(source, module.__file__, 'exec'), module.__dict__)
+    method = ('test_stop_file_stops_entries_and_flattens' if len(sys.argv) > 2 else
+              'test_periodic_reconciliation_with_snapshot_latency_while_holding')
+    name = 'tests.test_adaptive_paper_mover_native.MoverNativeEndToEnd.' + method
+    suite = unittest.TestSuite(unittest.defaultTestLoader.loadTestsFromName(name) for _ in range(3))
+    result = unittest.TextTestRunner(verbosity=2).run(suite)
+sys.exit(not result.wasSuccessful())
