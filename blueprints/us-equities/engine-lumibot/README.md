@@ -140,7 +140,8 @@ python3 -B blueprints/us-equities/engine-lumibot/acceptance/run_acceptance.py \
   --python <ISOLATED_RUNTIME_PYTHON> --offline-hook <ENGINE_QUAL_OFFLINE_HOOK> \
   --output <VAR_TMP_PRIVATE_RUN>
 python3 -B blueprints/us-equities/engine-lumibot/acceptance/mutate_guards.py \
-  --python <STDLIB_CI_PYTHON> --output <VAR_TMP_MUTATION_RESULTS>
+  --python <STDLIB_CI_PYTHON> --native-python <ISOLATED_RUNTIME_PYTHON> \
+  --offline-hook <ENGINE_QUAL_OFFLINE_HOOK> --output <VAR_TMP_MUTATION_RESULTS>
 ```
 
 run_acceptance uses an explicit nonsecret child environment, retains the actual
@@ -163,10 +164,18 @@ installed Lumibot/alpaca Python source inventories. Export captures the requeste
 runtime under the same sanitized environment and requires exact equality with
 the observed acceptance snapshot before publishing. Runtime paths stay private.
 Every receipt names the strategy version and caps-file configuration hash.
+The native bridge requires the originating strategy name and carries it into
+Order.strategy, so strategy-filtered tracking/cancellation and fill dispatch use
+the same identity. This follows Lumibot4.6.18 at730d5608f3ee625f0a30dc15e8cc512205dd2a2b:
+strategies/strategy.py894–895, brokers/broker.py2567–2582,2908–2922,3262–3297
+and entities/order.py459. The behavior is tested through the installed4.6.11
+classes; no engine/runtime version change is made. Malformed final limit-price
+conversion refusals take the governor's journaled rejection path before any SDK
+call, keeping the reservation and recording the bounded number reason.
 
 ## Observed evidence and limits
 
-The current receipt records 55 L0/L1 cases and 13 native/stub seam cases passing
+The current acceptance run records 56 L0/L1 cases and 13 native/stub seam cases passing
 in the isolated runtime, zero skips, including 500 seeded model-hint invariance
 cases (seed 260413). The 500-case numerical test suppresses only repeated fsync
 calls; the separate A6 durability test observes real fsync before the SDK.
@@ -174,7 +183,7 @@ Stdlib-only CI executes the three seam tests and explicitly skips10native
 cases; those skips are not native acceptance. Tests are unittest-discovered,
 not silently collected through pytest alone.
 
-A8: 86 selected exact-site mutants killed, 0 survived, 0 not-applied, 0 invalid-runs,
+A8: 88 selected exact-site mutants killed, 0 survived, 0 not-applied, 0 invalid-runs,
 0 baseline-failures, including a paired removal of both final-payload equality
 checks. Each probe first runs its unmutated named case successfully, then must
 execute that same case with AssertionError and that test's id in the output.

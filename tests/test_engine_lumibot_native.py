@@ -111,7 +111,7 @@ class NativeCase(CoreCase):
         broker=self.make_broker()
         for session in ("PRE","RTH","POST","OVERNIGHT"):
             decision=self.decision(quote=replace(self.quote,session=session))
-            broker.submit_decision(decision)
+            broker.submit_decision(decision,strategy="NativeFixture")
             self.assertEqual(self.sdk.writes[-1][1],decision.payload())
             self.gov.reconcile(decision.client_order_id,terminal="filled",account=self.account)
 
@@ -203,8 +203,19 @@ class NativeCase(CoreCase):
                           parameters={"inbox":inbox,"governor":self.gov,
                                       "snapshot":lambda symbol:(self.quote,self.account),"clock":lambda:NOW})
         strategy._executor._initialize()
-        strategy.on_trading_iteration()
+        order=strategy.on_trading_iteration()
         self.assertEqual(self.sdk.writes[-1][1]["qty"],"20")
+        self.assertEqual(order.strategy,strategy.name)
+        self.assertIn(order,broker.get_tracked_orders(strategy))
+        self.assertFalse(broker.get_tracked_orders("DifferentStrategy"))
+        broker.cancel_open_orders(strategy.name)
+        self.assertEqual(self.sdk.writes[-1],("cancel",order.identifier))
+        with patch.object(strategy._executor,"add_event") as dispatch:
+            broker._on_filled_order(None,order,D("10"),D("20"),1)
+        dispatch.assert_called_once()
+        event,payload=dispatch.call_args.args
+        self.assertEqual(event,strategy._executor.FILLED_ORDER)
+        self.assertIs(payload["order"],order)
         with self.assertRaisesRegex(GuardRefusal,"^agent_runtime$"):strategy.agents
         with self.assertRaisesRegex(GuardRefusal,"^agent_runtime$"):strategy.agents=object()
         self.assertIsNone(strategy.on_trading_iteration())

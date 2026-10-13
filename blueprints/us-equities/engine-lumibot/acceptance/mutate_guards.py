@@ -35,7 +35,7 @@ MUTANTS = [
  ("tif", "guarded_api.py", 'if payload["time_in_force"] != "day":', 'if False:', 'test_A2_payload_refusals_exact'),
  ("side", "guarded_api.py", 'if payload["side"] not in ("buy", "sell"):', 'if False:', 'test_A2_payload_refusals_exact'),
  ("qty", "guarded_api.py", 'if not isinstance(payload["qty"], str) or not re.fullmatch(r"[1-9][0-9]*", payload["qty"]):', 'if False:', 'test_A2_payload_refusals_exact'),
- ("price", "guarded_api.py", 'if dec(payload["limit_price"]) != dec(expected["limit_price"]):', 'if False:', 'test_A2_payload_refusals_exact'),
+ ("price", "guarded_api.py", 'if price != expected_price:', 'if False:', 'test_A2_payload_refusals_exact'),
  ("flag", "guarded_api.py", 'if payload["extended_hours"] != expected["extended_hours"]:', 'if False:', 'test_A2_payload_refusals_exact'),
  ("cancel", "guarded_api.py", 'str(args[0]) not in owned', 'False', 'test_A2_proxy_capabilities_and_cancel_ownership'),
  ("paper_config", "stock_only_alpaca.py", 'config.get("PAPER") is not True', 'False', 'test_A5_stub_constructor_no_paper_and_wrong_url'),
@@ -104,6 +104,8 @@ MUTANTS += [
  ("runtime_identity", "acceptance/runtime_snapshot.py", 'if recorded != observed:', 'if False:', 'test_J5_export_refuses_a_different_acceptance_runtime'),
  ("runtime_pin", "acceptance/runtime_snapshot.py", 'if observed["runtime"] != {"python":"3.12.4","lumibot":"4.6.11","alpaca-py":"0.44.0"}:', 'if False:', 'test_J6_runtime_pins_and_package_sources_are_required'),
  ("runtime_sources", "acceptance/runtime_snapshot.py", 'if not rows:raise SystemExit("runtime_sources_missing")', 'pass', 'test_J6_runtime_pins_and_package_sources_are_required'),
+ ("malformed_price_journal", "guarded_api.py", 'governor.reject(str(error))', 'raise', 'test_J7_malformed_final_prices_are_journaled_before_refusal'),
+ ("native_strategy_identity", "stock_only_alpaca.py", 'Order(strategy, Asset(decision.symbol', 'Order("closed-inbox", Asset(decision.symbol', 'test_A1_closed_inbox_native_strategy_routes_only_governor_decision'),
 ]
 MUTANTS += [("seam_"+name,"stock_only_alpaca.py",name+" = _deny",
              name+" = lambda self, *a, **k: None","test_A2_each_committed_seam_override_independently")
@@ -114,6 +116,8 @@ MUTANTS += [("seam_"+name,"stock_only_alpaca.py",name+" = _deny",
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--python",required=True)
+    parser.add_argument("--native-python",required=True)
+    parser.add_argument("--offline-hook",required=True,type=Path)
     parser.add_argument("--output",required=True,type=Path)
     args=parser.parse_args()
     root=Path(__file__).resolve().parents[4]
@@ -127,14 +131,22 @@ def main():
     check_hashes={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in check_sources}
     results=[]
     for name, file, old, new, test in MUTANTS:
-        module = ("test_engine_lumibot_governor.ReviewRecovery" if test.startswith("test_J")
+        native = name == "native_strategy_identity"
+        module = ("test_engine_lumibot_native.NativeCase" if native
+                  else "test_engine_lumibot_governor.ReviewRecovery" if test.startswith("test_J")
                   else "test_engine_lumibot_governor.ExitPolicyMatrix" if test.startswith("test_E4b")
                   else "test_engine_lumibot_governor.RestageAdditions" if test.startswith(("test_R13", "test_R14", "test_E"))
                   else "test_engine_lumibot_governor.ReviewerAdditions" if test.startswith("test_R")
                   else "test_engine_lumibot_native.SeamCI" if file=="stock_only_alpaca.py"
                   else "test_engine_lumibot_governor.CoreCase")
-        command=[args.python,"-B","-m","unittest",module+"."+test,"-q"]
-        baseline_env=dict(os.environ,ENGINE_LUMIBOT_ROOT=str(code),PYTHONDONTWRITEBYTECODE="1",TMPDIR="/var/tmp")
+        command=[args.native_python if native else args.python,"-B","-m","unittest",module+"."+test,"-q"]
+        run_env={"PATH":os.defpath,"HOME":str(Path.home()),"TMPDIR":"/var/tmp",
+                 "PYTHONPATH":str(args.offline_hook),"PYTHONDONTWRITEBYTECODE":"1",
+                 "LUMIBOT_DISABLE_DOTENV":"1","LUMIBOT_DISABLE_DOTENV_LOCAL":"1",
+                 "PYTHON_DOTENV_DISABLED":"1","LUMIBOT_LAZY_CREDENTIALS":"1",
+                 "LUMIBOT_CONNECT_STREAM":"false","LUMIBOT_START_ORDERS_THREAD":"false",
+                 "LUMIBOT_TELEMETRY":"0","ENGINE_QUAL_OFFLINE":"1","BACKTESTING_DATA_SOURCE":"none"}
+        baseline_env=dict(run_env,ENGINE_LUMIBOT_ROOT=str(code))
         baseline=subprocess.run(command,cwd=tests,env=baseline_env,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,check=False)
         ran_baseline = re.search(rb"Ran 1 test\b",baseline.stdout) is not None
         if baseline.returncode or not ran_baseline:
@@ -155,7 +167,7 @@ def main():
                 content=(target/extra_file).read_text()
                 if content.count(old_extra)!=1:raise RuntimeError("paired_site_not_unique")
                 (target/extra_file).write_text(content.replace(old_extra,new_extra,1))
-            environment=dict(os.environ,ENGINE_LUMIBOT_ROOT=str(target),PYTHONDONTWRITEBYTECODE="1",TMPDIR="/var/tmp")
+            environment=dict(run_env,ENGINE_LUMIBOT_ROOT=str(target))
             result=subprocess.run(command,cwd=tests,env=environment,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,check=False)
             log=args.output/(name+".private.log");log.write_bytes(result.stdout);os.chmod(log,0o600)
             ran = re.search(rb"Ran 1 test\b",result.stdout) is not None

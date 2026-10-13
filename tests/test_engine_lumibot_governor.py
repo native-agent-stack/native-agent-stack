@@ -633,6 +633,22 @@ class RestageAdditions(CoreCase):
 
 
 class ReviewRecovery(CoreCase):
+    def test_J7_malformed_final_prices_are_journaled_before_refusal(self):
+        for value,code in [("NaN","number"),("text","number"),(None,"number")]:
+            with self.subTest(value=value):
+                decision=self.decision()
+                payload=dict(decision.payload(),limit_price=value)
+                before=len(self.journal.rows)
+                try:
+                    with self.assertRaisesRegex(GuardRefusal,"^"+code+"$"):
+                        self.api.submit_order(order_data=OrderData(**payload))
+                    self.assertEqual(len(self.journal.rows),before+1)
+                    self.assertEqual(self.journal.rows[-1]["event"],"refusal")
+                    self.assertEqual(self.journal.rows[-1]["reason"],code)
+                    self.assertFalse(self.sdk.writes)
+                    self.assertIn(decision.reservation,self.gov.reservations)
+                finally:self.gov.reconcile(decision.client_order_id,terminal="not_sent",account=self.account)
+
     def test_J1_journal_failure_latches_and_prevents_later_submit(self):
         for mode in ("fsync", "short", "write"):
             with self.subTest(mode=mode):

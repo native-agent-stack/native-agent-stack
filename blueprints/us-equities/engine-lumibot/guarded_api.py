@@ -111,7 +111,12 @@ class GuardedApi:
                     expected = governor.reservations.get(token)
                     if expected is None:
                         governor.reject("reservation")
-                    if dec(payload["limit_price"]) != dec(expected["limit_price"]):
+                    try:
+                        price = dec(payload["limit_price"])
+                        expected_price = dec(expected["limit_price"])
+                    except GuardRefusal as error:
+                        governor.reject(str(error))
+                    if price != expected_price:
                         governor.reject("price_equality")
                     if payload["extended_hours"] != expected["extended_hours"]:
                         governor.reject("session_flag")

@@ -117,10 +117,13 @@ def load_classes():
                 self.governor.reject("quantity")
             return super()._submit_order(order)
 
-        def submit_decision(self, decision):
+        def submit_decision(self, decision, *, strategy):
             if not isinstance(decision, Decision):
                 self.governor.reject("reservation")
-            order = Order("closed-inbox", Asset(decision.symbol, asset_type="stock"),
+            # Lumibot identifies tracked orders and fill subscribers by this
+            # name (4.6.18/730d5608 strategy.py:894-895, broker.py:2567-2582,
+            # :2908-2922,:3262-3297); preserve the originating strategy.
+            order = Order(strategy, Asset(decision.symbol, asset_type="stock"),
                           decision.qty, decision.side, order_type="limit",
                           time_in_force="day", limit_price=decision.limit_price)
             self.api.bind(decision)
@@ -151,7 +154,7 @@ def load_classes():
             quote, account = self._snapshot(intent.symbol)
             decision = self._governor.decide(intent, quote, account, self._clock())
             if isinstance(decision, Decision):
-                return self.broker.submit_decision(decision)
+                return self.broker.submit_decision(decision, strategy=self.name)
             return decision
 
     return StockOnlyAlpaca, IntentStrategy
