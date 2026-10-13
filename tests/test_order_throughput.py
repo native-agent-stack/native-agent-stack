@@ -549,6 +549,10 @@ class CapacityRunTests(unittest.TestCase):
 class PaperEnvURLTests(unittest.TestCase):
     """Fake-key env files exercise the URL gate; no broker or network calls."""
 
+    def test_capacity_source_receipt_binds_the_shared_url_gate(self):
+        row=c.source_provenance()["source_sha256"]["adaptive-paper/credential_source.py"]
+        self.assertEqual(row,c.hashlib.sha256((c.ADAPTIVE/"credential_source.py").read_bytes()).hexdigest())
+
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory(dir="/var/tmp", prefix="capacity-url-")
         self.addCleanup(self.tmp.cleanup)
@@ -573,15 +577,27 @@ class PaperEnvURLTests(unittest.TestCase):
         return config.base_url
 
     def test_paper_host_forms_normalize_to_the_pinned_request_host(self):
-        for port in ("", ":443"):
+        for port in ("",):
             for path in ("", "/", "/v2", "/v2/"):
                 url = "https://paper-api.alpaca.markets" + port + path
                 with self.subTest(url=url):
                     self.assertEqual(self.validate_env(url), c.PAPER_URL)
 
+    def test_explicit_default_port_refuses_before_any_broker_call(self):
+        for path in ("", "/", "/v2", "/v2/"):
+            url="https://paper-api.alpaca.markets:443"+path
+            with self.subTest(url=url):
+                with self.assertRaisesRegex(c.HarnessRefusal,"^non_paper_base_url$"):
+                    self.validate_env(url)
+
     def test_other_origins_and_url_components_still_refuse(self):
         for url in (
                 "https://api.alpaca.markets",
+                "https://paper-api.alpaca.markets@foreign.invalid/v2",
+                "https://Paper-Api.alpaca.markets/v2",
+                "https://paper-api.alpaca.markets/V2",
+                "https://paper-api.alpaca.markets./v2",
+                "https://xn--paper-api-2jg.alpaca.markets/v2",
                 "https://paper-api.alpaca.markets.example.com",
                 "https://paper-api-alpaca.markets",
                 "https://paper-api.alpaca.markets/v1",
@@ -601,6 +617,16 @@ class PaperEnvURLTests(unittest.TestCase):
                 "https://paper-api.alpaca.markets/v2 "):
             with self.subTest(url=url):
                 with self.assertRaisesRegex(c.HarnessRefusal, "^non_paper_base_url$"):
+                    self.validate_env(url)
+
+    def test_unicode_urls_refuse_at_the_prior_credential_file_encoding_gate(self):
+        from safety import SafetyError
+
+        for url in ("https://paper-api.alpaca.markets/v2\u00a0",
+                    "https://p\u0430per-api.alpaca.markets/v2",
+                    "https://\uff50aper-api.alpaca.markets/v2"):
+            with self.subTest(url=url):
+                with self.assertRaisesRegex(SafetyError,"^credential_file_permissions:encoding$"):
                     self.validate_env(url)
 
     def test_cli_accepts_v2_and_keeps_the_pinned_host_without_a_broker_call(self):
@@ -1104,7 +1130,7 @@ class ReviewFixTests(unittest.TestCase):
         for key in ("git_revision", "source_sha256", "alpaca_py_version", "python_version", "argv",
                     "ended_at", "exit_code"):
             self.assertIn(key, prov)
-        self.assertEqual(len(prov["source_sha256"]), 8)
+        self.assertEqual(len(prov["source_sha256"]), 9)
         self.assertTrue(all(re.fullmatch(r"[0-9a-f]{64}", v) for v in prov["source_sha256"].values()))
         self.assertEqual(c.sanitize_argv(["paper", "--env-file", "/srv/private/p.env", "--output=/x/y.json",
                                           "--cap", "1000"]),

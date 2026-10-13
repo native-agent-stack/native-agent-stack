@@ -181,9 +181,13 @@ secret run APCA_API_KEY_ID APCA_API_SECRET_KEY -- python runner.py preflight --c
 ```
 
 `market_research.py` takes the same `--credentials keychain-env`. Both sources are
-paper-only: an `APCA_API_BASE_URL` in the environment or env file that is not
-`https://paper-api.alpaca.markets` is refused before any request. See the
-2026-09-25 addendum to `docs/decisions/2026-09-22-broker-credential-handling.md`.
+paper-only: `APCA_API_BASE_URL` in the environment or env file accepts only
+`https://paper-api.alpaca.markets` with a path of empty, `/`, `/v2` or `/v2/`.
+Every explicit port (including `:443`), noncanonical case, other authority or
+path, userinfo, whitespace/control character and query/fragment delimiter is
+refused before any request. Requests keep the canonical pinned host. See
+`docs/decisions/2026-10-13-strict-paper-url-gates.md`, which supersedes the
+bare-host spelling rule in the 2026-09-25 credential-source addendum.
 
 `paper` is bounded and fails closed when the regular session, account, data,
 frozen configuration or durable state is not ready. No live endpoint is exposed.

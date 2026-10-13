@@ -35,7 +35,6 @@ import signal
 import subprocess
 import sys
 import time
-from urllib.parse import urlsplit
 
 HERE = Path(__file__).resolve().parent
 ADAPTIVE = HERE.parent / "adaptive-paper"
@@ -45,6 +44,7 @@ for _path in (str(HERE), str(ADAPTIVE)):
 
 from rate_governor import GovernorError, RateGovernor  # noqa: E402
 from safety import DEFAULT_STOP  # noqa: E402
+from credential_source import normalize_paper_base_url  # noqa: E402
 from sessions import SessionKind, session_at  # noqa: E402
 from transport import PAPER_URL, TERMINAL  # noqa: E402
 
@@ -76,7 +76,7 @@ FROZEN_REQUIRED_WINDOWS = 5
 FROZEN_TARGET_ACTIONS_RATIO = 0.85
 PATH_OPTIONS = frozenset({"--env-file", "--output", "--journal", "--adaptive-state-root", "--stop-file"})
 SOURCE_FILES = ("capacity.py", "rate_governor.py", "alpaca_capacity_port.py", "capacity_fixture.py")
-ADAPTIVE_SOURCE_FILES = ("transport.py", "safety.py", "sessions.py", "runner.py")
+ADAPTIVE_SOURCE_FILES = ("transport.py", "safety.py", "sessions.py", "runner.py", "credential_source.py")
 
 
 class HarnessRefusal(RuntimeError):
@@ -291,19 +291,7 @@ def env_base_url(path):
                 values = shlex.split(value, comments=True)
                 if len(values) != 1:
                     return ""
-                base = values[0]
-                # urlsplit removes some raw controls; reject them before parsing.
-                # Empty query/fragment delimiters also represent forbidden components.
-                if any(char.isspace() or ord(char) < 32 or ord(char) == 127 for char in base) \
-                        or "?" in base or "#" in base:
-                    return ""
-                parsed = urlsplit(base)
-                if (parsed.scheme == "https" and parsed.hostname == "paper-api.alpaca.markets"
-                        and parsed.port in (None, 443) and not parsed.netloc.endswith(":")
-                        and parsed.username is None and parsed.password is None
-                        and not parsed.query and not parsed.fragment
-                        and parsed.path in ("", "/", "/v2", "/v2/")):
-                    return PAPER_URL
+                return normalize_paper_base_url(values[0]) or ""
             except ValueError:
                 pass
             return ""

@@ -270,6 +270,11 @@ reason codes, and `credentials(path)` keeps its default behavior for every other
 python ... --credentials keychain-env` builds from the macOS login Keychain. The shared logic lives in
 `blueprints/us-equities/adaptive-paper/credential_source.py`.
 
+2026-10-13 URL comparison correction: the strict shared normalizer now accepts
+the canonical paper authority with no explicit port and paths empty, `/`,
+`/v2` or `/v2/`. It retains fixed request-host pins and
+refusal codes. See [the version-path correction and override-free unit bindings](2026-10-13-strict-paper-url-gates.md).
+
 **Why.** The operator's hosts now include macOS, and the operator's standing rule keeps API keys in the login
 Keychain and gives each only to the command that needs it. The "OS keychain" alternative above was deferred
 "to a macOS-specific profile if one is adopted"; that condition now holds for this operator. Later sessions
@@ -299,12 +304,15 @@ resolving symlinks (`keychain_env:worktree`). A location that cannot be inspecte
 worktree. `--env-file` together with `keychain-env`, or `env-file` without `--env-file`, is an argparse usage
 error.
 
-**Paper-only on both sources.** The base URL is pinned to `https://paper-api.alpaca.markets`, with an optional
-trailing `/`. An `APCA_API_BASE_URL` in the process environment (both sources) or in the env file
-(`env-file`, via `credentials(path, paper_only=True)`) with any other value is refused before any request:
+**Paper-only on both sources.** The request base stays pinned to `https://paper-api.alpaca.markets`.
+The strict spelling rules below apply to `APCA_API_BASE_URL` in the process environment (both sources)
+or in the env file (`env-file`, via `credentials(path, paper_only=True)`); other values refuse before any request:
 `alpaca_paper_only:live_host` for `api.alpaca.markets`, and `alpaca_paper_only:not_paper_host` for everything
-else, including an empty value, `http`, a port, userinfo, a path such as `/v2` and the paper URL in another
-letter case. The transport already sends every request to the paper host (`PAPER_URL`, `paper=True`) and
+else, including an empty value, `http`, any explicit port, userinfo,
+an unsupported path and a noncanonical letter case. As corrected on 2026-10-13,
+the canonical HTTPS paper authority refuses all ports and accepts paths empty,
+`/`, `/v2` or `/v2/`, while raw controls/whitespace and query/fragment delimiters
+refuse. The transport already sends every request to the paper host (`PAPER_URL`, `paper=True`) and
 `runner.load_config` already requires the paper endpoint. This rule makes a live setting in the shell or the file stop the run
 before any request, where it would otherwise be ignored without notice.
 
