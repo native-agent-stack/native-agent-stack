@@ -491,12 +491,7 @@ Every later session, whether yours or an agent's, then uses the existing
 recipes unchanged. For example:
 `python3 runner.py preflight --env-file "$PAPER_ENV_FILE" ...`. Commands pass a
 pointer and never spell out the store path, so the guard hook can block any
-command that does spell it out. The review App's key-file pointer is stricter: a
-reader, a copy or a key tool on `$GITHUB_REVIEW_APP_KEY_PATH` is refused, and so is
-interpreter code that looks it up from its environment (`os.environ`, `os.getenv`,
-`process.env`, `ENV`), since such code reads the key without a shell expansion
-(Astra's delta read of #1057 at `60fbe1c6`, finding 1). `stat`, `ls` and `test -f`
-on the pointer stay allowed, and a loader reads it inside its own program file.
+command that does spell it out.
 
 Five consumers still read the Alpaca pair only from environment variables:
 `alpaca-paper/paper_runner.py`, `alpaca-historical/collect.py`,

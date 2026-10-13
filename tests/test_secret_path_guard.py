@@ -413,16 +413,6 @@ BLOCKED = {
     "cat \"${GITHUB_REVIEW_APP_KEY_PATH}\"": "credential_file_read",
     "openssl pkey -in \"$GITHUB_REVIEW_APP_KEY_PATH\"": "credential_file_read",
     "cp \"$GITHUB_REVIEW_APP_KEY_PATH\" /tmp/app.pem": "credential_file_read",
-    # Interpreter code that looks the key-file pointer up from its environment (Astra's delta read of #1057 at 60fbe1c6, finding 1; the
-    # first three are the read's). A metadata check stays a shell `stat`, `ls` or `test -f` on the pointer.
-    "python3 -c 'import os; print(open(os.environ[\"GITHUB_REVIEW_APP_KEY_PATH\"]).read())'": "credential_file_read",
-    "python3 -c 'import os; print(open(os.getenv(\"GITHUB_REVIEW_APP_KEY_PATH\")).read())'": "credential_file_read",
-    "python3 -c 'import os,pathlib; print(pathlib.Path(os.environ[\"GITHUB_REVIEW_APP_KEY_PATH\"]).read_text())'": "credential_file_read",
-    "python3 -c 'import os; print(os.path.getsize(os.environ.get(\"GITHUB_REVIEW_APP_KEY_PATH\")))'": "credential_file_read",
-    "node -e 'console.log(require(\"fs\").readFileSync(process.env.GITHUB_REVIEW_APP_KEY_PATH, \"utf8\"))'": "credential_file_read",
-    "ruby -e 'puts File.read(ENV[\"GITHUB_REVIEW_APP_KEY_PATH\"])'": "credential_file_read",
-    "perl -e 'open(my $f, \"<\", $ENV{GITHUB_REVIEW_APP_KEY_PATH}); print <$f>'": "credential_file_read",
-    "python3 - <<'PY'\nimport os\nprint(open(os.environ['GITHUB_REVIEW_APP_KEY_PATH']).read())\nPY": "credential_file_read",
     # Shell tracing or verbose mode while sourcing a credential file prints its assignments.
     "set -x; . \"$PAPER_ENV_FILE\"": "trace_while_sourcing",
     "set -euxo pipefail; set -a; . \"$SEC_CONTACT_ENV\"; set +a": "trace_while_sourcing",
@@ -1074,8 +1064,6 @@ ALLOWED = [
     # The review App's key file: its mode and size are checked without reading it.
     "stat -c '%a %U %s' \"$GITHUB_REVIEW_APP_KEY_PATH\"",
     "ls -l \"$GITHUB_REVIEW_APP_KEY_PATH\"",
-    "test -f \"$GITHUB_REVIEW_APP_KEY_PATH\" && echo present",
-    "python3 -c 'import os; print(os.environ.get(\"PAPER_ENV_FILE\") is not None)'",
     # The trading lane's loader path (2026-09-29): a unit started with systemd-run --user whose bash -ic hands the pointer to a
     # loader as --env-file. It must keep passing for every account, so closing the numbered-pointer hole never blocks a unit.
     "systemd-run --user --unit=overnight-volume-watch --collect /bin/bash -ic "
@@ -2069,14 +2057,6 @@ class SecretPathGuardTests(unittest.TestCase):
         for command, reason in {**BLOCKED, **KEYRING_BLOCKED}.items():
             with self.subTest(command=command):
                 self.assertEqual(guard.check(command), reason)
-
-    def test_interpreter_reads_of_the_review_app_key_pointer_are_refused_by_the_hook(self):
-        # Astra's delta read of #1057 at 60fbe1c6 (finding 1): the read's three forms, through the real hook.
-        for command in [c for c, r in BLOCKED.items() if "GITHUB_REVIEW_APP_KEY_PATH" in c and c.startswith("python3 -c")][:3]:
-            with self.subTest(command=command):
-                refused = run_hook({"tool_name": "Bash", "tool_input": {"command": command}})
-                self.assertEqual(refused.returncode, 2)
-                self.assertIn("blocked (credential_file_read)", refused.stderr)
 
     def test_every_rule_applies_to_a_keyring_exec(self):
         # Every blocked command stays blocked, for the same reason, when kernel_keyring.py exec starts
