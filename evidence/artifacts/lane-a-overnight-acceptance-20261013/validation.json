@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "evidence_class": "synthetic",
+  "main_probe_commit": "04f64a056cade587f804da60f6a94f7852f7624d",
+  "implementation_parent": "ea0a51a6b2a485977d8aaf8e11dc0e93fe820a06",
+  "implementation_pr": 1081,
+  "exact_final_test_main_probe": {
+    "command": "TMPDIR=/var/tmp python3 -B -m unittest tests.test_adaptive_paper_overnight_acceptance.OvernightStartAcceptance.test_overnight_stage_start_is_admitted_only_with_qualified_flags",
+    "tests": 1,
+    "exit_code": 1,
+    "errors": 1,
+    "reason": "regular_session_window_unavailable",
+    "scope": "The exact final positive regression was copied into a genuine detached, sparse main worktree at main_probe_commit. The owned probe file was removed and the clean temporary worktree was removed without force. No deployed file was changed."
+  },
+  "main_fail_before": {
+    "command": "TMPDIR=/var/tmp python3 -B -m unittest tests.test_adaptive_paper_overnight_acceptance",
+    "tests_at_probe": 4,
+    "exit_code": 1,
+    "errors": 1,
+    "failing_test": "OvernightStartAcceptance.test_overnight_stage_start_is_admitted_only_with_qualified_flags",
+    "reason": "regular_session_window_unavailable",
+    "scope": "The initial four-test module was run in the genuine main-based worktree before stacking; the positive test body is unchanged in the final six-test module. Two additional port-contract tests were added after stacking."
+  },
+  "final_checks": [
+    {
+      "command": "TMPDIR=/var/tmp python3 -B -m unittest tests.test_adaptive_paper_overnight_acceptance",
+      "exit_code": 0,
+      "tests": 6,
+      "skipped": 0
+    },
+    {
+      "command": "TMPDIR=/var/tmp python3 -B -m unittest tests.test_adaptive_paper_sessions",
+      "exit_code": 0,
+      "tests": 151,
+      "skipped": 34,
+      "scope": "The installed shell lacks the optional native runtime. Non-native session and configuration controls ran; skipped native cases establish no native acceptance."
+    },
+    {
+      "command": "TMPDIR=/var/tmp python3 -B -m unittest tests.test_adaptive_paper_leverage.RefusalTests.test_overnight_max_leverage_above_2_refused tests.test_adaptive_paper_leverage.RefusalTests.test_overnight_gross_exceeds_regt_refused tests.test_adaptive_paper_leverage.PropertyGridTests.test_overnight_cap_bounds_ceiling_at_2_in_every_session",
+      "exit_code": 0,
+      "tests": 3,
+      "skipped": 0
+    },
+    {
+      "command": "TMPDIR=/var/tmp python3 -B -m unittest tests.test_adaptive_paper_overnight_arming.OvernightArming.test_pre_entry_remains_refused tests.test_adaptive_paper_overnight_arming.OvernightArming.test_held_overnight_position_exits_at_pre_as_extended_hours_limit",
+      "exit_code": 0,
+      "tests": 2,
+      "skipped": 0,
+      "scope": "Executes the committed native dispatch AST with protocol fixtures and real ledger/wire guards; this is not an installed native-engine or broker run."
+    }
+  ],
+  "deployment": "NOT_RUN",
+  "unit_actions": "NOT_RUN",
+  "broker_account_calls": "NOT_RUN",
+  "production_source_changes_against_parent": [],
+  "frozen_configuration_changes_against_parent": [],
+  "limitations": [
+    "Stack depends on #1081's reviewed landing.",
+    "No entitlement, data transport, order execution, broker reconciliation or paper acceptance is established.",
+    "Vendor 2x is a maximum buying-power bound, not a position-sizing target or account entitlement."
+  ]
+}
