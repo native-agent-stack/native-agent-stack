@@ -62323,8 +62323,8 @@
     },
     {
       "path": "tests/test_e_series.py",
-      "sha256": "10309e4b6ebac404512cbe967e31e44ba5d82927ddcc84e2c928837bf032bdc7",
-      "bytes": 116779
+      "sha256": "8c24d27bd20eeb5666f0d389c56e5d882a6daa880908aa148496d566c0c1dd93",
+      "bytes": 137377
     },
     {
       "path": "tests/test_ecosystem_manifest.py",

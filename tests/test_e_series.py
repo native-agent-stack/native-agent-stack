@@ -731,6 +731,49 @@ class DecideTests(unittest.TestCase):
         self.assertTrue(all("appears twice" in fault for fault in faults), faults)
         self.assertEqual((len(twice_in_one), len(within)), (2, 2))
 
+    def test_a_run_a_fault_left_out_is_named_so_that_its_comparison_gets_no_verdict(self):
+        """Review of #1046 at a461c2d76 (P2): the faults were texts, so the figures could not tell that a question had been dropped."""
+        q = QUESTIONS["p-def"]
+        good = promptfoo_item("A0a", "p-def", 1, good_output(q))
+        no_cost = promptfoo_item("A1", "p-def", 1, good_output(q))
+        del no_cost["response"]["cost"]
+        failed = promptfoo_item("A1", "p-def", 2, None, error="x")
+        again = promptfoo_item("A0a", "p-def", 1, good_output(q))
+        stranger = promptfoo_item("A9", "p-def", 1, good_output(q))
+        with tempfile.TemporaryDirectory() as tmp:
+            runs, faults = e1_decide.load_runs([write_results(Path(tmp) / "r.json", [good, no_cost, failed, again, stranger])], TASKS)
+        self.assertEqual(len(runs), 1)
+        self.assertEqual(sorted(e1_decide.lost_runs(faults)), [("A1", "p-def", "1"), ("A1", "p-def", "2")], "the two runs that were left out; a replayed run keeps its first copy and an unknown arm is no sample")
+        self.assertEqual(len(faults), 4)
+        self.assertTrue(all(isinstance(fault, str) for fault in faults))
+
+    def test_a_comparison_with_a_lost_run_has_no_verdict_and_an_unaffected_one_keeps_its_own(self):
+        base = self.cells("A0a", 3) + self.cells("A1", 3, nav_questions=3)
+        kept = [r for r in base if not (r["arm"] == "A1" and r["q"] == "q2")]       # what the loader leaves when A1's only run of q2 is lost
+        self.assertTrue(e1_decide.decide(kept, "A0a")["verdicts"]["A1"]["adopt"], "without the fault the shrunken set is compared as before: this is the defect")
+        result = e1_decide.decide(kept, "A0a", lost=[("A1", "q2", "1")])
+        self.assertEqual(set(result["verdicts"]["A1"]), {"adopt", "withheld"})
+        self.assertIsNone(result["verdicts"]["A1"]["adopt"])
+        self.assertIn("A1 q2 r1", result["verdicts"]["A1"]["withheld"])
+        self.assertIn("no verdict", e1_decide.render(result))
+        self.assertNotIn("ADOPT", e1_decide.render(result))
+        both = e1_decide.decide(kept + self.cells("A3", 3, nav_questions=3), "A0a", lost=[("A1", "q2", "1")])
+        self.assertIsNone(both["verdicts"]["A1"]["adopt"])
+        self.assertIs(both["verdicts"]["A3"]["adopt"], True, "a loss in another arm does not touch this comparison")
+        baseline_lost = e1_decide.decide(self.cells("A0a", 2) + self.cells("A1", 3, nav_questions=3), "A0a", lost=[("A0a", "q2", "1")])
+        self.assertIsNone(baseline_lost["verdicts"]["A1"]["adopt"], "the baseline's lost run withholds every candidate's verdict")
+        partial = self.cells("A0a", 2, repeats=2) + [r for r in self.cells("A1", 2, repeats=2, nav_questions=2) if not (r["q"] == "q1" and r["repeat"] == "2")]
+        self.assertIsNone(e1_decide.decide(partial, "A0a", lost=[("A1", "q1", "2")])["verdicts"]["A1"]["adopt"], "one repeat lost: withheld, not refused")
+        with self.assertRaises(ValueError):
+            e1_decide.decide(partial, "A0a")
+
+    def test_the_carrying_figure_is_withheld_when_a_run_of_a0b_or_a5_was_lost(self):
+        runs = self.cells("A0a", 3) + self.cells("A0b", 3, cost=0.0716) + [r for r in self.cells("A5", 3, cost=0.0625) if r["q"] != "q2"]
+        self.assertIsNotNone(e1_decide.decide(runs, "A0a")["carrying"].get("cost_change_percent"), "the defect: the shrunken set is compared")
+        result = e1_decide.decide(runs, "A0a", lost=[("A5", "q2", "1")])
+        self.assertEqual(set(result["carrying"]), {"withheld"})
+        self.assertIn("not given", e1_decide.render(result))
+
     def test_the_carrying_cost_needs_the_same_pairs_in_a0b_and_a5(self):
         a0b = [self.run_of("A0b", q, repeat=str(r)) for q, r in (("q1", 1), ("q1", 2), ("q2", 1))]
         a5 = [self.run_of("A5", q, repeat=str(r)) for q, r in (("q1", 1), ("q2", 1), ("q2", 2))]
@@ -765,10 +808,18 @@ class DecideTests(unittest.TestCase):
 
 
 class FrozenInputsTests(unittest.TestCase):
-    def test_the_docstring_cites_the_rule_in_agents_md_and_does_not_quote_the_owner(self):
-        """Review of #1046 at 30639cdc1 (P3): the sentence was repeated as the owner's words."""
+    def test_the_docstring_cites_the_rule_in_agents_md_and_does_not_copy_its_text(self):
+        """Review of #1046 at 30639cdc1 (P3): the sentence was repeated as the owner's words. Review of a461c2d76 (P3): the first version of this check repeated a clause of it in the assertion, so the rule's text
+        is read from AGENTS.md here and compared by runs of words."""
         self.assertIn("AGENTS.md", F.__doc__)
-        self.assertNotIn("Work starts when its named inputs exist", F.__doc__)
+
+        def runs(source, length=8):
+            words = re.findall(r"[a-z0-9']+", source.lower())
+            return {" ".join(words[i:i + length]) for i in range(len(words) - length + 1)}
+        rule = runs((ROOT / "AGENTS.md").read_text(encoding="utf-8"))
+        self.assertGreater(len(rule), 100, "AGENTS.md was read")
+        self.assertEqual(runs(F.__doc__) & rule, set(), "a run of eight words of AGENTS.md is in the docstring: cite the rule, do not copy it")
+        self.assertNotEqual(runs(F.__doc__ + " " + sorted(rule)[0]) & rule, set(), "the comparison sees a copied run")
 
     def freeze(self, folder: Path, experiment="e2", status="frozen", drop=None, tamper=False, rows=None):
         design = F.DESIGNS[experiment]
@@ -1111,6 +1162,95 @@ class GatedDecideTests(unittest.TestCase):
         zero = self.decide(self.gated.add_results(self.pair(cost=0.0)))
         self.assertEqual(zero.returncode, 0, "a cost of 0 that is present is a measurement")
 
+    def test_a_comparison_that_lost_a_run_gets_no_verdict_in_the_table_or_the_json(self):
+        """Review of #1046 at a461c2d76 (P2): A0a and A1 on two questions, A1 correct with a Serena call, and A1's p-refs response without cost: the CLI returned rc 3 and still printed `ADOPT`, from the one
+        question left ("1 vs 1"), because leaving the run out removed the question from the compared set. promptfoo makes the cost undefined when usage is unavailable and returns it with a success response
+        (promptfoo@30949931ee90 src/providers/claude-agent-sdk.ts L2445-L2447, L2487-L2498)."""
+        define, refs = QUESTIONS["p-def"], QUESTIONS["p-refs"]
+        navigating = ("mcp__serena__find_symbol",)
+
+        def rows(arm, calls=(), **refs_changes):
+            first = promptfoo_item(arm, "p-def", 1, good_output(define), calls=calls)
+            second = promptfoo_item(arm, "p-refs", 1, good_output(refs), calls=calls, **refs_changes)
+            return [first, second]
+
+        def without_cost(row):
+            del row["response"]["cost"]
+            return row
+
+        def decided(label, items):
+            out = Path(self._tmp.name) / f"{label}.json"
+            done = self.decide(self.gated.add_results(items), "--json", out)
+            return done, json.loads(out.read_text())
+
+        done, data = decided("complete", rows("A0a") + rows("A1", navigating))
+        self.assertEqual(done.returncode, 0, done.stderr)
+        self.assertIn("ADOPT", done.stdout)
+        self.assertIs(data["verdicts"]["A1"]["adopt"], True)
+        done, data = decided("zero", rows("A0a") + rows("A1", navigating, cost=0.0))
+        self.assertEqual((done.returncode, data["verdicts"]["A1"]["adopt"]), (0, True), "a cost of 0 that is present is a measurement")
+        cases = {"the candidate's cost is missing": rows("A0a") + [rows("A1", navigating)[0], without_cost(rows("A1", navigating)[1])],
+                 "the baseline's cost is missing": [rows("A0a")[0], without_cost(rows("A0a")[1])] + rows("A1", navigating),
+                 "the candidate's run ended in a provider error": rows("A0a") + [rows("A1", navigating)[0], promptfoo_item("A1", "p-refs", 1, None, error="overloaded")]}
+        for label, items in cases.items():
+            with self.subTest(case=label):
+                done, data = decided(label.replace(" ", "-").replace("'", ""), items)
+                self.assertEqual(done.returncode, 3, done.stdout + done.stderr)
+                self.assertNotIn("ADOPT", done.stdout)
+                self.assertNotIn("correct non-use", done.stdout)
+                self.assertIn("no verdict", done.stdout)
+                self.assertIn("A1 ", done.stdout, "the table is still printed")
+                self.assertIsNone(data["verdicts"]["A1"].get("adopt"))
+                self.assertIn("incomplete", data["verdicts"]["A1"]["withheld"])
+                self.assertNotIn('"adopt": true', json.dumps(data))
+        # a loss in another arm withholds only that arm's verdict
+        done, data = decided("other-arm", rows("A0a") + rows("A1", navigating) + [rows("A3", navigating)[0], without_cost(rows("A3", navigating)[1])])
+        self.assertEqual(done.returncode, 3, done.stdout + done.stderr)
+        self.assertIs(data["verdicts"]["A1"]["adopt"], True)
+        self.assertIsNone(data["verdicts"]["A3"]["adopt"])
+        self.assertIn("ADOPT", done.stdout)
+
+    def test_the_gate_after_the_last_run_must_have_checked_the_arms_of_the_run(self):
+        """Review of #1046 at a461c2d76 (P2): after a gated A0a/A1 result a later `--preflight --arms A5` passed and `--require-after-gate` returned rc 0 and `ADOPT`, although neither evaluated arm was checked after
+        the run: only that a later passing pre-flight existed was tested."""
+        result = self.gated.add_results(self.pair(), "--arms", "A0a,A1")
+        self.assertEqual(self.decide(result, "--require-after-gate").returncode, 2, "no later pre-flight at all")
+        for label, arms in (("another arm only", ("A5",)), ("one of the two arms", ("A0a",))):
+            with self.subTest(later=label):
+                self.s.passing_preflight(*arms)
+                problems = e1_gate.verify_result(result, require_after=True)
+                self.assertEqual(len(problems), 1, problems)
+                self.assertIn("checked its arms (A0a, A1)", problems[0])
+                done = self.decide(result, "--require-after-gate")
+                self.assertEqual(done.returncode, 2, done.stdout)
+                self.assertIn("did not cover arm(s)", done.stderr)
+                self.assertNotIn("ADOPT", done.stdout)
+        self.assertEqual(self.decide(result).returncode, 0, "without the option the result is decided as before")
+        self.s.passing_preflight("A0a", "A1")
+        self.assertEqual(e1_gate.verify_result(result, require_after=True), [])
+        done = self.decide(result, "--require-after-gate")
+        self.assertEqual(done.returncode, 0, done.stderr)
+        self.assertIn("ADOPT", done.stdout)
+        # the gate that closes the run must still match its own result file, and belong to this preparation
+        closing = self.s.gate_files("preflight")[-1]
+        record = json.loads(closing.read_text())
+        closing_result = self.s.root / "out" / record["result"]
+        original = closing_result.read_bytes()
+        closing_result.write_bytes(original + b" ")
+        problems = e1_gate.verify_result(result, require_after=True)
+        self.assertEqual(len(problems), 1, problems)
+        self.assertIn("is gone or has changed", problems[0])
+        closing_result.write_bytes(original)
+        self.assertEqual(e1_gate.verify_result(result, require_after=True), [])
+        record["manifest_sha256"] = "0" * 64
+        closing.write_text(json.dumps(record))
+        self.assertIn("another preparation", " ".join(e1_gate.verify_result(result, require_after=True)))
+        # a questions record that names no arms cannot be shown to be covered by any later pre-flight
+        sidecar = result.with_name(result.stem + ".gate")
+        recorded = json.loads(sidecar.read_text())
+        sidecar.write_text(json.dumps({**recorded, "arms": []}))
+        self.assertIn("names no arms", " ".join(e1_gate.verify_result(result, require_after=True)))
+
     def test_a_replayed_result_file_is_a_fault_with_its_exit_status(self):
         first = self.gated.add_results(self.pair())
         second = self.gated.add_results(self.pair())
@@ -1331,6 +1471,163 @@ class PrepareTests(unittest.TestCase):
         self.assertEqual(e1_prepare.validate_manifest(replaced), [])
         self.assertNotEqual(replaced["generation"], generation, "every preparation is a new generation")
         self.assertTrue((s.root / "trees" / "base").is_dir())
+
+    def tree_state(self, folder):
+        """{path under `folder`: the bytes of a file, "dir" or ("link", target)} for everything in it; no link is followed."""
+        found = {}
+        for here, folders, files in os.walk(folder, followlinks=False):
+            for name in sorted(folders + files):
+                path = Path(here) / name
+                relative = str(path.relative_to(folder))
+                if path.is_symlink():
+                    found[relative] = ("link", os.readlink(path))
+                elif path.is_dir():
+                    found[relative] = "dir"
+                else:
+                    found[relative] = path.read_bytes()
+        return found
+
+    def test_a_rebuild_never_follows_a_link_of_an_owned_root(self):
+        """Review of #1046 at a461c2d76 (P1): `--rebuild` removed config/ with errors ignored, which leaves a link to a directory in place (shutil.rmtree raises on one, python/cpython@cbc944f4 Lib/shutil.py L676,
+        and L736 swallows the error), and the copies then opened the link's target for writing (L262): an unrelated promptfooconfig.yaml was overwritten and the staged files were written beside it, exit 0. The same
+        holds for every entry the script removes or writes, and for a manifest.json that is a link: another directory's manifest would stand for this root's and be overwritten."""
+        s = self.s
+        entries = e1_prepare.OWNED_DIRS + e1_prepare.OWNED_FILES
+        self.assertEqual(set(entries), {"trees", "config", "settings.json", "manifest.json", *e1_prepare.WORK_DIRS})
+        for name in entries:
+            slug = name.replace(".", "-")
+            root, foreign = s.work / f"root-{slug}", s.work / f"foreign-{slug}"
+            self.assertEqual(s.prepare(root=root).returncode, 0)
+            if name in e1_prepare.OWNED_DIRS:
+                foreign.mkdir()
+                (foreign / "promptfooconfig.yaml").write_text("someone else's file\n")
+                (foreign / "keep.txt").write_text("kept\n")
+                shutil.rmtree(root / name)
+            else:
+                foreign.write_bytes((root / name).read_bytes() if name == e1_prepare.MANIFEST else b"someone else's file\n")   # a valid manifest behind the link: the old check read through it
+                (root / name).unlink()
+            (root / name).symlink_to(foreign)
+
+            def observed(root=root, foreign=foreign):
+                return self.tree_state(root), (self.tree_state(foreign) if foreign.is_dir() else foreign.read_bytes())
+            before = observed()
+            for extra in ((), ("--rebuild",), ("--rebuild", "--dry-run")):
+                with self.subTest(entry=name, arguments=extra):
+                    done = s.prepare(*extra, root=root)
+                    self.assertEqual(done.returncode, 2, done.stdout + done.stderr)
+                    self.assertIn(f"{name} is a link", done.stderr)
+                    self.assertIn("nothing was changed", done.stderr)
+                    self.assertEqual(observed(), before, "the root is as it was, link included, and nothing behind the link was written or removed")
+
+    def test_an_entry_of_the_wrong_kind_is_refused_before_anything_is_changed(self):
+        """The same rule for an entry that is not a link but is not what the script makes either: a file where a directory is kept, a directory where a file is written."""
+        s = self.s
+        cases = (("config", lambda path: path.write_text("a file\\n"), "config is not a directory"), ("out", lambda path: path.write_text("a file\\n"), "out is not a directory"),
+                 ("settings.json", lambda path: path.mkdir(), "settings.json is not a regular file"))
+        for name, make, expected in cases:
+            root = s.work / f"root-kind-{name.replace('.', '-')}"
+            self.assertEqual(s.prepare(root=root).returncode, 0)
+            if (root / name).is_dir():
+                shutil.rmtree(root / name)
+            else:
+                (root / name).unlink()
+            make(root / name)
+            before = self.tree_state(root)
+            for extra in (("--rebuild",), ("--rebuild", "--dry-run")):
+                with self.subTest(entry=name, arguments=extra):
+                    done = s.prepare(*extra, root=root)
+                    self.assertEqual(done.returncode, 2, done.stdout + done.stderr)
+                    self.assertIn(expected, done.stderr)
+                    self.assertEqual(self.tree_state(root), before, "nothing was changed")
+
+    def test_a_rebuild_of_an_owned_root_replaces_trees_and_config_keeps_out_and_leaves_the_sdk_copy_alone(self):
+        """The control of the containment test above: with no link in the root a rebuild still replaces trees/ and config/ (the link INSIDE config/ to the SDK copy is removed as a link, its target is not followed)
+        and keeps out/."""
+        s = self.s
+        self.assertEqual(s.prepare().returncode, 0)
+        generation = json.loads((s.root / "manifest.json").read_text())["generation"]
+        kept = s.root / "out" / "questions-19990101T000000000000Z.json"
+        kept.write_text("kept\n")
+        (s.root / "config" / "stray.txt").write_text("stale\n")
+        (s.root / "trees" / "base" / "stray.txt").write_text("stale\n")
+        sdk_before = self.tree_state(s.sdk)
+        done = s.prepare("--rebuild")
+        self.assertEqual(done.returncode, 0, done.stderr)
+        self.assertFalse((s.root / "config" / "stray.txt").exists())
+        self.assertFalse((s.root / "trees" / "base" / "stray.txt").exists())
+        self.assertEqual(kept.read_text(), "kept\n")
+        self.assertEqual(self.tree_state(s.sdk), sdk_before, "the SDK copy that config/ links to is not followed by the removal")
+        self.assertTrue((s.root / "config" / "node_modules" / "@anthropic-ai" / "claude-agent-sdk").is_symlink())
+        self.assertNotEqual(json.loads((s.root / "manifest.json").read_text())["generation"], generation)
+
+    @unittest.skipIf(os.geteuid() == 0, "root can remove an entry of a directory whose mode forbids it")
+    def test_a_removal_that_fails_stops_the_rebuild_before_anything_is_written(self):
+        """Review of #1046 at a461c2d76 (P1, the cause): the removals ignored their errors (`ignore_errors=True`, shutil.py L736), so a path that could not be cleared was populated over."""
+        s = self.s
+        for entry in ("config", "trees"):
+            root = s.work / f"root-locked-{entry}"
+            self.assertEqual(s.prepare(root=root).returncode, 0)
+            locked = root / entry / "locked"
+            locked.mkdir()
+            (locked / "old.txt").write_text("old\n")
+            if entry == "trees":
+                (root / "trees" / "base" / "stray.txt").write_text("the old tree\n")
+            locked.chmod(0o500)      # its entries cannot be removed
+
+            def unlock(locked=locked):
+                if locked.exists():
+                    locked.chmod(0o700)
+            self.addCleanup(unlock)
+            manifest, settings = (root / "manifest.json").read_bytes(), (root / "settings.json").read_bytes()
+            other = "trees" if entry == "config" else "config"
+            with self.subTest(entry=entry):
+                done = s.prepare("--rebuild", root=root)
+                self.assertEqual(done.returncode, 2, done.stdout + done.stderr)
+                self.assertIn(f"{entry}/ could not be removed", done.stderr)
+                self.assertEqual((root / "manifest.json").read_bytes(), manifest, "the manifest, which marks the root as ours, is as it was")
+                self.assertEqual((root / "settings.json").read_bytes(), settings)
+                self.assertEqual((locked / "old.txt").read_text(), "old\n")
+                if entry == "config":
+                    self.assertFalse((root / "config" / "promptfooconfig.yaml").exists(), "nothing was staged into the config that could not be cleared")
+                else:
+                    base = root / "trees" / "base"
+                    self.assertTrue(not base.exists() or (base / "stray.txt").exists(), "no tree was built into the trees/ that could not be cleared (an old tree is either gone or still the old one)")
+                    self.assertTrue((root / other / "promptfooconfig.yaml").is_file(), "the config, removed after the trees, was not reached")
+                locked.chmod(0o700)
+                self.assertEqual(s.prepare("--rebuild", root=root).returncode, 0, "the root is still ours: the rebuild runs again once the cause is gone")
+
+    def test_remove_tree_clears_a_directory_without_following_a_link_inside_it_and_refuses_a_link(self):
+        folder = Path(self._tmp.name)
+        target = folder / "target"
+        target.mkdir()
+        (target / "keep.txt").write_text("kept\n")
+        tree = folder / "tree"
+        (tree / "sub").mkdir(parents=True)
+        (tree / "sub" / "inner").symlink_to(target)
+        e1_prepare.remove_tree(tree)
+        self.assertFalse(tree.exists())
+        self.assertEqual((target / "keep.txt").read_text(), "kept\n")
+        e1_prepare.remove_tree(tree)       # already absent: nothing to clear
+        link = folder / "link"
+        link.symlink_to(target)
+        with self.assertRaises(e1_prepare.Refusal):
+            e1_prepare.remove_tree(link)
+        self.assertTrue(link.is_symlink())
+        self.assertEqual((target / "keep.txt").read_text(), "kept\n")
+
+    def test_write_owned_rewrites_a_regular_file_and_refuses_a_link_whose_target_it_leaves_alone(self):
+        folder = Path(self._tmp.name)
+        target = folder / "target.txt"
+        target.write_text("foreign\n")
+        link = folder / "link.json"
+        link.symlink_to(target)
+        with self.assertRaises(e1_prepare.Refusal):
+            e1_prepare.write_owned(link, "overwritten\n")
+        self.assertEqual(target.read_text(), "foreign\n")
+        plain = folder / "plain.json"
+        e1_prepare.write_owned(plain, "one long line\n")
+        e1_prepare.write_owned(plain, "two\n")
+        self.assertEqual(plain.read_text(), "two\n", "an existing regular file is truncated and rewritten")
 
     def test_each_field_a_later_step_reads_is_checked_in_an_otherwise_valid_manifest(self):
         s = self.s

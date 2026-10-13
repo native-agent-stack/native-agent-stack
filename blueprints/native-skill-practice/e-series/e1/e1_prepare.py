@@ -12,6 +12,10 @@ The root must be outside the repository and outside $HOME (the fence denies read
 manifest of this harness (validate_manifest), and replacing it takes --rebuild, which replaces its trees and config and keeps out/ (each result file there is bound to the preparation that produced it by
 e1_gate.py, so a rebuild does not let an older generation's files be decided with a newer one's). Any other non-empty directory is refused, with or without --rebuild, and left as it was. Nothing here calls
 a model or reads a key. Exit 0 prepared, 2 a refusal with the reason on stderr.
+A rebuild never follows a link: each entry it removes, creates or writes (trees/, config/, the work directories, settings.json, manifest.json) is looked at with lstat before anything is changed, and an owned
+root in which one of them is a link, or is not what the script makes (a directory; a regular file for settings.json and manifest.json), is refused and left as it was. shutil.rmtree stops at a link to a directory and the copies that follow
+open the link's target for writing (CPython cbc944f4 Lib/shutil.py L676, L736, L262), so removing with errors ignored and then populating would write into whatever the link names. A removal that fails stops
+the rebuild: nothing is written into a path that could not be cleared.
 """
 import argparse
 import hashlib
@@ -19,6 +23,7 @@ import json
 import os
 import re
 import shutil
+import stat
 import subprocess
 import sys
 import uuid
@@ -30,6 +35,8 @@ import e1_common as C  # noqa: E402
 
 MANIFEST = "manifest.json"
 WORK_DIRS = ("tmp", "claude-tmp", "cache", "out", "promptfoo-state")
+OWNED_DIRS = ("trees", "config", *WORK_DIRS)     # the entries of a root that this script removes, creates or keeps: each is absent or a real directory
+OWNED_FILES = ("settings.json", MANIFEST)         # and the two files it writes: each is absent or a regular file
 
 
 class Refusal(Exception):
@@ -96,12 +103,54 @@ def validate_manifest(manifest):
 
 
 def owner_problems(root):
-    """Why `root` (a non-empty directory) is not a root of this harness, or an empty list when its manifest.json is a manifest of this harness."""
+    """Why `root` (a non-empty directory) is not a root of this harness, or an empty list when its manifest.json is a manifest of this harness. A manifest.json that is a link is refused by entry_problems,
+    which check_root asks next: this script always writes a regular file."""
     try:
         manifest = json.loads((root / MANIFEST).read_text(encoding="utf-8"))
     except (OSError, ValueError):
         return ["it holds no readable manifest.json"]
     return validate_manifest(manifest)
+
+
+def entry_problems(root):
+    """The entries of `root` that are not the ones this script makes: each of OWNED_DIRS must be absent or a real directory and each of OWNED_FILES absent or a regular file. lstat, so a link is seen as one and
+    never followed: a rebuild removes and writes into what these names lead to, and a link leads out of the root."""
+    problems = []
+    for names, wanted, kind in ((OWNED_DIRS, stat.S_ISDIR, "a directory"), (OWNED_FILES, stat.S_ISREG, "a regular file")):
+        for name in names:
+            try:
+                mode = os.lstat(root / name).st_mode
+            except FileNotFoundError:
+                continue
+            except OSError:
+                problems.append(f"{name} cannot be inspected")
+                continue
+            if stat.S_ISLNK(mode):
+                problems.append(f"{name} is a link")
+            elif not wanted(mode):
+                problems.append(f"{name} is not {kind}")
+    return problems
+
+
+def remove_tree(path):
+    """Clear the directory `path` of the root, or stop: a removal that failed leaves what it was meant to clear, and populating that path would mix the old files into the new preparation (no ignore_errors).
+    A link was refused before anything changed (entry_problems), and shutil.rmtree does not follow one either (it raises)."""
+    try:
+        shutil.rmtree(path)
+    except FileNotFoundError:
+        pass
+    except OSError as error:
+        raise Refusal(f"{path.name}/ could not be removed ({error.strerror or type(error).__name__}); the rebuild stopped before writing into it") from None
+
+
+def write_owned(path, text):
+    """Write `text` to the file `path` of the root without following a link at `path` (O_NOFOLLOW), even if one appeared after entry_problems looked."""
+    try:
+        descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC | getattr(os, "O_NOFOLLOW", 0), 0o666)
+    except OSError as error:
+        raise Refusal(f"{Path(path).name} could not be written without following a link ({error.strerror or type(error).__name__})") from None
+    with os.fdopen(descriptor, "w", encoding="utf-8") as stream:
+        stream.write(text)
 
 
 def check_root(root, repo, home, rebuild=False):
@@ -120,6 +169,9 @@ def check_root(root, repo, home, rebuild=False):
     problems = owner_problems(root)
     if problems:   # a file named manifest.json does not make a directory ours: nothing in a directory that is not a root of this harness is changed, with or without --rebuild
         raise Refusal(f"the root exists, is not empty and is not a root of this harness ({problems[0]}); nothing was changed")
+    problems = entry_problems(root)
+    if problems:   # a rebuild removes and writes into what these names lead to: a link, or an entry of the wrong kind, is refused before anything is changed, with or without --rebuild
+        raise Refusal(f"the root holds an entry that is not the one this script makes ({problems[0]}): a rebuild would remove or write through it; nothing was changed")
     if not rebuild:
         raise Refusal("the root already holds a prepared E1 root; pass --rebuild to replace its trees, config and manifest")
 
@@ -146,7 +198,7 @@ def build_tree(repo, dest, commit, directive):
 
 def stage_config(root, sdk_from):
     config = root / "config"
-    shutil.rmtree(config, ignore_errors=True)
+    remove_tree(config)
     for name in C.STAGED_FILES:
         (config / name).parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(C.HERE / name, config / name)
@@ -223,19 +275,19 @@ def main(argv=None):
             return 0
         root.mkdir(parents=True, exist_ok=True)
         for name in ("trees", "config"):
-            shutil.rmtree(root / name, ignore_errors=True)
+            remove_tree(root / name)
         (root / "trees").mkdir()
         heads = {name: build_tree(repo, root / "trees" / name, tasks[commit], directive) for name, (commit, directive) in C.TREES.items()}
         for name in WORK_DIRS:
             (root / name).mkdir(mode=0o700, exist_ok=True)
-        (root / "settings.json").write_text(json.dumps(settings_for(root, home), indent=1) + "\n", encoding="utf-8")
+        write_owned(root / "settings.json", json.dumps(settings_for(root, home), indent=1) + "\n")
         route = stage_config(root, args.sdk_from)
         directives = {name: sha256_file(root / "trees" / name / "CLAUDE.local.md") for name, (_, directive) in C.TREES.items() if directive}
         manifest = {"harness": C.HARNESS, "schema": C.MANIFEST_SCHEMA, "generation": uuid.uuid4().hex, "created_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "root": str(root),
                     "commits": {"base": tasks["base"], "stale": tasks["stale"]}, "trees": heads,
                     **tools, "directives": directives, "sdk": {"version": C.SDK_VERSION, "route": route}, "staged": {name: sha256_file(root / "config" / name) for name in C.STAGED_FILES},
                     "settings_sha256": sha256_file(root / "settings.json")}
-        (root / MANIFEST).write_text(json.dumps(manifest, indent=1) + "\n", encoding="utf-8")
+        write_owned(root / MANIFEST, json.dumps(manifest, indent=1) + "\n")
         print(json.dumps({"root": str(root), "trees": heads, "sdk": route, "manifest": str(root / MANIFEST)}, indent=1))
         return 0
     except Refusal as refusal:

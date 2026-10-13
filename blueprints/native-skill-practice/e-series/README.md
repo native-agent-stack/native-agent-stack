@@ -39,7 +39,9 @@ python3 $E/e1_decide.py <root>/out/questions-*.json --baseline A0a              
 A question run starts only behind a passing pre-flight: `--preflight` records its outcome in `<root>/out/preflight-<time>.gate` (read from the result file, not from promptfoo's exit status, which two environment
 variables can set to 0 and which the runner therefore removes from the child's environment), and `--questions` refuses unless the newest record passed, belongs to this preparation of the root and covers the asked-for
 arms. `e1_decide.py` decides only a result file that `e1_run.py` produced behind such a record (`<result>.gate` beside it); a file without one is refused, and `--ungated` prints the table without a verdict. A failed
-pre-flight after a run voids it, so the preregistered gates before the first and after the last run are `--preflight` before and after, and `--require-after-gate` makes the decision ask for the second.
+pre-flight after a run voids it, so the preregistered gates before the first and after the last run are `--preflight` before and after, and `--require-after-gate` makes the decision ask for the second: a later pre-flight that passed, belongs to this
+preparation, covers the arms the run was asked for and still matches its result file (a pre-flight of other arms does not close the run). A comparison from which a run was left out as a fault (a provider error, or a response
+without a usable cost) gets no verdict, because leaving the run out can remove a question from the compared set.
 
 `e1_prepare.py` replaces only a root of this harness (a non-empty directory must hold a `manifest.json` of schema 2 that names the harness, and replacing it takes `--rebuild`; any other directory is refused and left as
 it was). It builds four trees under `<root>/trees` (the base commit, the base commit with the serena paragraph in `CLAUDE.local.md`, the stale commit, the stale commit with the path paragraph), the sandbox and

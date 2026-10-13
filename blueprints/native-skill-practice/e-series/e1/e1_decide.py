@@ -3,7 +3,7 @@
 
 A result file is decided only if e1_run.py produced it behind a passing pre-flight of the root's current preparation (e1_gate.py: its <name>.gate record is present and matches, and no later pre-flight failed);
 otherwise the run refuses (exit 2). --ungated reads files without that record for description only: the table is printed and no verdict is, and the JSON says so. --require-after-gate also asks for
-a passing pre-flight made after each file (the preregistered gate after the last run).
+a pre-flight made after each file that stands for the arms of that file's run (passed, this preparation, those arms covered, its result file unchanged: the start gate's own check; the preregistered gate after the last run).
 
 Reads the `question` rows of promptfoo's `-o` files (the `preflight` row is not a measurement), regrades every stored answer with e1_grade.py as it is now, and takes cost, turns and seconds from the response and
 the tool names from `response.metadata.toolCalls`. Per arm, over the questions it shares with the baseline arm:
@@ -13,6 +13,9 @@ the tool names from `response.metadata.toolCalls`. Per arm, over the questions i
 An arm is adopted as the default of a worktree workflow only when (i), (ii) and (iii) all pass; otherwise the outcome is "correct non-use or no gain". A5 (no server) is a cost and correctness reference, not an
 adoption candidate. Also printed: use by run, the carrying cost of the servers (A0b against A5) and each arm's median seconds and turns. The statistics are descriptive. A run that ended in a provider error, or whose response has no usable cost (missing, not a finite number or negative: a missing cost must not read as a free run), is a
 fault: it is listed, left out of the figures, and the exit status is 3 so that someone reads it before the figures are used; arms that do not hold the same (question, repeat) runs over the shared questions are refused (exit 2).
+Leaving a run out can remove a whole question from the compared set (an arm whose only run of a question was lost is then compared over the other questions and can still pass), so a comparison from which a run of
+either of its arms was left out gets no verdict: the table is printed, the verdict line says that the comparison is incomplete, the JSON holds `adopt: null` with the reason, and the carrying figure of A0b against A5 is
+withheld the same way. Only a fault that left a run out does this; a replayed run keeps its first copy.
 A (arm, question, repeat) that appears twice, across files or within one, is a fault: the first is kept and the exit status is 3, so a replayed file is read before its figures are used.
 Exit 0 decided, 2 a refusal, 3 faults present.
 """
@@ -35,8 +38,22 @@ COST_FACTOR = 1.1
 USE_SHARE = 0.7
 
 
+class Fault(str):
+    """A fault: a one-line text that also says which (arm, question, repeat) it concerns and whether it left that run out of the figures (`lost`), so that a comparison that lost a run can be told from one that did not."""
+
+    def __new__(cls, text, arm=None, question=None, repeat=None, lost=False):
+        self = super().__new__(cls, text)
+        self.arm, self.question, self.repeat, self.lost = arm, question, repeat, lost
+        return self
+
+
+def lost_runs(faults):
+    """The (arm, question, repeat) identities of the runs the faults left out."""
+    return [(f.arm, f.question, f.repeat) for f in faults if getattr(f, "lost", False)]
+
+
 def load_runs(paths, tasks):
-    """(runs, faults) from promptfoo result files; a run is a dict, a fault is a one-line text."""
+    """(runs, faults) from promptfoo result files; a run is a dict, a fault is a one-line text (a Fault, which also names the run and whether it was left out: lost_runs)."""
     questions = {q["id"]: q for q in tasks["questions"]}
     runs, faults, seen = [], [], set()
     for path in paths:
@@ -46,19 +63,20 @@ def load_runs(paths, tasks):
             arm = (item.get("provider") or {}).get("label")
             qid = (item.get("vars") or {}).get("question_id")
             response = item.get("response") or {}
+            repeat = str((item.get("vars") or {}).get("repeat"))
             tag = f"{arm} {qid} r{(item.get('vars') or {}).get('repeat')}"
             if qid not in questions or arm not in C.ARMS:
                 faults.append(f"{tag}: an arm or question this config does not define")
                 continue
             if item.get("failureReason") == PROVIDER_ERROR or response.get("error"):  # an assertion that rejects an answer is failureReason 1 and a result; its text is also in item["error"]
-                faults.append(f"{tag}: provider error ({str(response.get('error') or item.get('error'))[:80]})")
+                faults.append(Fault(f"{tag}: provider error ({str(response.get('error') or item.get('error'))[:80]})", arm, qid, repeat, lost=True))
                 continue
             cost = response.get("cost")
             if not isinstance(cost, (int, float)) or isinstance(cost, bool) or not math.isfinite(cost) or cost < 0:
-                faults.append(f"{tag}: the response has no usable cost ({type(cost).__name__}); the run is left out")   # a missing cost must not read as a free run (criterion ii)
+                faults.append(Fault(f"{tag}: the response has no usable cost ({type(cost).__name__}); the run is left out", arm, qid, repeat, lost=True))   # a missing cost must not read as a free run (criterion ii)
                 continue
             if (arm, qid, str((item.get("vars") or {}).get("repeat"))) in seen:
-                faults.append(f"{tag}: the same run appears twice (a replayed result file?); the first is kept")
+                faults.append(Fault(f"{tag}: the same run appears twice (a replayed result file?); the first is kept", arm, qid, repeat))
                 continue
             seen.add((arm, qid, str((item.get("vars") or {}).get("repeat"))))
             meta = response.get("metadata") or {}
@@ -92,7 +110,16 @@ def same_samples(candidate, other, questions, names):
     return f"{names[0]} and {names[1]} do not hold the same (question, repeat) runs over their shared questions (only in {names[0]}: {extra[:3]}; only in {names[1]}: {missing[:3]}): the figures are not comparable"
 
 
-def decide(runs, baseline="A0a"):
+def withheld(lost, arms):
+    """A text when a run of one of `arms` was left out as a fault (`lost`: (arm, question, repeat) identities), else None: the comparison of those arms is then incomplete and gets no verdict."""
+    gone = sorted(f"{arm} {qid} r{repeat}" for arm, qid, repeat in lost if arm in arms)
+    if not gone:
+        return None
+    return f"{len(gone)} run(s) left out as faults ({', '.join(gone[:3])}{', ...' if len(gone) > 3 else ''}): the comparison is incomplete and no verdict is given"
+
+
+def decide(runs, baseline="A0a", lost=()):
+    """The table, the verdicts and the carrying figure of `runs`. `lost` names the runs that faults left out: a comparison with one of its arms' runs lost gets `adopt: None` and the reason, not a verdict."""
     by_arm = {}
     for r in runs:
         by_arm.setdefault(r["arm"], []).append(r)
@@ -106,6 +133,10 @@ def decide(runs, baseline="A0a"):
         rows[arm] = summary(by_arm[arm], common)
         if arm in (baseline, "A5"):
             continue
+        reason = withheld(lost, (arm, baseline))
+        if reason:   # before the sample check: a lost run makes the samples differ, and it can also remove a whole question from `common`
+            verdicts[arm] = {"adopt": None, "withheld": reason}
+            continue
         base = summary(by_arm[baseline], common)
         refusal = same_samples(by_arm[arm], by_arm[baseline], common, (arm, baseline))
         if refusal:
@@ -117,7 +148,9 @@ def decide(runs, baseline="A0a"):
                          "correct_vs_baseline": f"{rows[arm]['correct']} vs {base['correct']}", "median_cost_vs_baseline": f"{rows[arm]['median_cost']:.4f} vs {base['median_cost']:.4f}",
                          "use_share": round(rows[arm]["use_share"], 3)}
     carrying = None
-    if "A0b" in by_arm and "A5" in by_arm:
+    if "A0b" in by_arm and "A5" in by_arm and withheld(lost, ("A0b", "A5")):
+        carrying = {"withheld": withheld(lost, ("A0b", "A5"))}
+    elif "A0b" in by_arm and "A5" in by_arm:
         shared = {r["q"] for r in by_arm["A0b"]} & {r["q"] for r in by_arm["A5"]}
         refusal = same_samples(by_arm["A0b"], by_arm["A5"], shared, ("A0b", "A5"))
         if refusal:
@@ -134,10 +167,15 @@ def render(result):
         lines.append(f"{arm:4s} {s['runs']:4d} {s['questions']:3d} {s['correct']:7d} {s['median_cost']:9.4f} {s['use_runs']:8d} {s['use_questions']:6d} {s['median_seconds']:6.1f} {s['median_turns']:5.1f}")
     lines.append("")
     for arm, v in result["verdicts"].items():
+        if v.get("withheld"):
+            lines.append(f"{arm:4s} no verdict: {v['withheld']}")
+            continue
         lines.append(f"{arm:4s} (i) {v['i_correct_not_fewer']!s:5s} {v['correct_vs_baseline']:10s} (ii) {v['ii_median_cost_at_most_1.1x']!s:5s} {v['median_cost_vs_baseline']:20s} "
                      f"(iii) {v['iii_use_on_70_percent_of_questions']!s:5s} use {v['use_share']:.2f}  {'ADOPT' if v['adopt'] else 'correct non-use or no gain'}")
     c = result["carrying"]
-    if c:
+    if c and c.get("withheld"):
+        lines.append(f"\ncarrying the four servers (A0b against A5): not given, {c['withheld']}")
+    elif c:
         lines.append(f"\ncarrying the four servers (A0b against A5, {c['questions']} questions): median cost {c['median_cost_A0b']:.4f} vs {c['median_cost_A5']:.4f} ({c['cost_change_percent']:+.1f} percent), "
                      f"correct {c['correct_A0b']} vs {c['correct_A5']}, median seconds {c['median_seconds_A0b']} vs {c['median_seconds_A5']}")
     return "\n".join(lines)
@@ -161,7 +199,7 @@ def main(argv=None):
     for fault in faults:
         print("fault:", fault, file=sys.stderr)
     try:
-        result = decide(runs, args.baseline)
+        result = decide(runs, args.baseline, lost_runs(faults))
     except ValueError as error:
         print(f"refused: {error}", file=sys.stderr)
         return 2

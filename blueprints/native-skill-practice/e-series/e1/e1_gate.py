@@ -4,7 +4,9 @@ e1_run.py --preflight reads the result file promptfoo wrote, not promptfoo's exi
 PROMPTFOO_PASS_RATE_THRESHOLD (promptfoo/promptfoo@30949931ee90 src/node/doEval.ts L1271-L1286). It writes <root>/out/preflight-<stamp>.gate, a JSON record that says whether every requested arm's row passed, for
 which preparation of the root (the sha256 of manifest.json, which holds a fresh `generation` on every prepare) and from which result file (its sha256). e1_run.py --questions starts promptfoo only when the newest
 such record passed, belongs to this preparation and covers the requested arms; it then writes <root>/out/questions-<stamp>.gate, which names that record and the result file's sha256. e1_decide.py refuses a
-result file without a record that still matches, so an unmet gate, an older preparation, a replayed or edited file and a run that a later failed pre-flight voids cannot become a result. Standard library only.
+result file without a record that still matches, so an unmet gate, an older preparation, a replayed or edited file and a run that a later failed pre-flight voids cannot become a result. With --require-after-gate it
+also asks for a later pre-flight that stands for the arms the run was asked for, by the start gate's own check (preflight_problem): a pre-flight of other arms, of another preparation or whose result file changed
+does not close the run. Standard library only.
 ASCII only.
 """
 import hashlib
@@ -91,24 +93,35 @@ def preflight_records(out_dir):
     return sorted(Path(out_dir).glob("preflight-*" + SUFFIX))
 
 
+def preflight_problem(root, path, arms, label):
+    """Why the pre-flight record at `path` does not stand for `arms` in `root`, or None: it must have passed, belong to the root's current preparation, cover every arm and still match the result file it was
+    made from. `label` words the text ("the newest pre-flight"). GateError when the record is not readable."""
+    root = Path(root)
+    record = read_record(path, "preflight")
+    name = Path(path).name
+    if not record.get("passed"):
+        return f"{label} ({name}) did not pass ({'; '.join(record.get('reasons') or ['no reason recorded'])}): fix the cause and run it again"
+    if record.get("manifest_sha256") != sha256_file(root / "manifest.json"):
+        return f"{label} ({name}) was made for another preparation of this root: run it again"
+    missing = [arm for arm in arms if arm not in (record.get("arms") or [])]
+    if missing:
+        return f"{label} ({name}) did not cover arm(s) {', '.join(missing)}: run it for them"
+    result = root / "out" / str(record.get("result"))
+    if not result.is_file() or sha256_file(result) != record.get("result_sha256"):
+        return f"the result file of {label} ({name}) is gone or has changed"
+    return None
+
+
 def require_preflight(root, arms):
-    """The newest pre-flight record of the root, or GateError: it must have passed, belong to the root's current preparation, cover every arm asked for and still match the result file it was made from."""
+    """The newest pre-flight record of the root, or GateError: it must stand for `arms` (preflight_problem)."""
     root = Path(root)
     records = preflight_records(root / "out")
     if not records:
         raise GateError("no pre-flight has run in this root: run e1_run.py --preflight first")
     newest = records[-1]
-    record = read_record(newest, "preflight")
-    if not record.get("passed"):
-        raise GateError(f"the newest pre-flight ({newest.name}) did not pass ({'; '.join(record.get('reasons') or ['no reason recorded'])}): fix the cause and run it again")
-    if record.get("manifest_sha256") != sha256_file(root / "manifest.json"):
-        raise GateError(f"the newest pre-flight ({newest.name}) was made for another preparation of this root: run it again")
-    missing = [arm for arm in arms if arm not in (record.get("arms") or [])]
-    if missing:
-        raise GateError(f"the newest pre-flight ({newest.name}) did not cover arm(s) {', '.join(missing)}: run it for them")
-    result = root / "out" / str(record.get("result"))
-    if not result.is_file() or sha256_file(result) != record.get("result_sha256"):
-        raise GateError(f"the result file of the newest pre-flight ({newest.name}) is gone or has changed")
+    problem = preflight_problem(root, newest, arms, "the newest pre-flight")
+    if problem:
+        raise GateError(problem)
     return newest
 
 
@@ -122,9 +135,26 @@ def write_questions_record(result_path, gate_path, manifest_path, arms, ids, rep
     return path
 
 
+def after_gate_problem(root, result, record, later):
+    """Why no pre-flight made after the run closes it, or None. The gate after the last run is the start gate's check made again: one of `later` must stand for every arm the run was asked for
+    (`record["arms"]`: preflight_problem, the same requirements as e1_run.py --questions), so a pre-flight of other arms does not close a run of these."""
+    arms = record.get("arms") or []
+    if not later:
+        return f"no pre-flight after {result.name}: the gate after the last run is part of the protocol"
+    if not arms:
+        return f"the gate record of {result.name} names no arms, so no later pre-flight can be shown to cover them"
+    problems = []
+    for gate in reversed(later):
+        problem = preflight_problem(root, gate, arms, "the pre-flight")
+        if problem is None:
+            return None
+        problems.append(problem)
+    return f"no pre-flight after {result.name} checked its arms ({', '.join(arms)}): {problems[0]}"
+
+
 def verify_result(result_path, require_after=False):
-    """Problems (texts; none means the file was produced behind a passing pre-flight of this root's current preparation, is unchanged, and no pre-flight after it failed). With `require_after`, a passing
-    pre-flight made after the run is also needed (the preregistered gate after the last run)."""
+    """Problems (texts; none means the file was produced behind a passing pre-flight of this root's current preparation, is unchanged, and no pre-flight after it failed). With `require_after`, a pre-flight
+    made after the run that stands for the run's arms is also needed (the preregistered gate after the last run: after_gate_problem)."""
     path = Path(result_path).resolve()
     root = path.parent.parent
     if path.parent.name != "out" or not (root / "manifest.json").is_file():
@@ -147,8 +177,10 @@ def verify_result(result_path, require_after=False):
         failed = [p.name for p in later if not read_record(p, "preflight").get("passed")]
         if failed:
             return [f"a pre-flight after {path.name} did not pass ({failed[0]}): the runs since the last passing pre-flight are void"]
-        if require_after and not later:
-            return [f"no pre-flight after {path.name}: the gate after the last run is part of the protocol"]
+        if require_after:
+            problem = after_gate_problem(root, path, record, later)
+            if problem:
+                return [problem]
     except GateError as error:
         return [str(error)]
     return []
