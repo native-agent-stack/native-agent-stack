@@ -1,17 +1,20 @@
 #!/usr/bin/env bash
 # CC landing for native-agent-stack (correction #118): the merge runs only after every gate passes, in this order.
-# usage: nas_land.sh <pr> <read-head-sha-prefix> <verdict-file> [<verdict-file> ...]
-# Order (#975 round 4): the repository's shape and the local reviews (#1061 round 2), before any call -> the landing lock -> early refusals
-# (the head carries the read head's change, trading-cc-read, the verdict files and the local review waiver) -> slow steps (update-branch
-# when BEHIND, ready, the Codex wait, the CI wait, the Codex gate before the validation, the merge onto the current origin/main validated
-# (again while main moves), a waiver's squash body, the author address) -> final_gate, fast reads only (the head and its change, the
-# verdict files and the waiver, trading-cc-read, the Codex gate, the check runs, origin/main) -> the squash merge pinned to the head -> its
-# author.
+# usage: [SQUASH_BODY_FILE=<file>] nas_land.sh <pr> <read-head-sha-prefix> <verdict-file> [<verdict-file> ...]
+# Order (#975 round 4): the repository's shape, the local reviews (#1061 round 2) and SQUASH_BODY_FILE, before any call -> the landing lock
+# -> early refusals (the head carries the read head's change, trading-cc-read, the verdict files and the local review waiver or
+# adjudication) -> slow steps (update-branch when BEHIND, ready, the Codex wait, the CI wait, the Codex gate before the validation, the
+# merge onto the current origin/main validated (again while main moves), the squash body of a waiver or an adjudication, the author
+# address) -> final_gate, fast reads only (the head and its change, the verdict files and the waiver or adjudication, trading-cc-read, the
+# Codex gate, the check runs, origin/main) -> the squash merge pinned to the head -> its author.
 # Exit codes: 2 verdict gate (a verdict file, GATES_DONE or trading-cc-read; a file, record or status that cannot be read included; also,
-# before any call, a LANDING_REPO that is not of the owner/name shape and neither local review variable nor LOCAL_REVIEW_WAIVER set; and a
-# waiver that does not name the pull request at the read head), 3 head
+# before any call, a LANDING_REPO that is not of the owner/name shape, neither local review variable nor LOCAL_REVIEW_WAIVER set, and a
+# SQUASH_BODY_FILE that is not a readable, non-empty regular file; a waiver that does not name the pull request at the read head; and an
+# adjudication that is missing or unreadable, does not name the pull request at the read head and a listed review file, or names another
+# file than at its first read), 3 head
 # moved, 4 change differs (after update-branch, or at the final gate) or update-branch refused, 5 CI failing (at the final gate also: no
-# longer complete and green), 6 timeout, 7 merge failed (also: a waiver's squash body could not be read, nothing merged), 8 blocked by
+# longer complete and green), 6 timeout, 7 merge failed (also: the squash body of a waiver or an adjudication could not be read, nothing
+# merged), 8 blocked by
 # policy, 9 the Codex gate (codex_gate.py) gave neither 0 nor 5 (a 5
 # proceeds here): a review running or not finished since its latest trigger (its 3, after the 20-minute wait, before the validation or at
 # the final gate), a review that ended other than Completed or a summary last edited by another account (its 4), a gate that failed or is
@@ -31,6 +34,13 @@
 # LG_AUTHOR_LOGIN, and when LOCAL_REVIEWS (or CODEX_LOCAL_REVIEW) names review files the Codex gate decides from them alone (README).
 # #1061 round 2 (the CC's ruling at 974090cf): local reviews are required here, and only a waiver bound to the pull request and the read
 # head lets a landing on without them (LOCAL_REVIEW_WAIVER; below, verdict_gate and the squash body).
+# The CC's ruling of 2026-10-13: after a pull request's bounded rounds, a local re-review that says "patch is incorrect" with only P2 and P3
+# findings is decided by the CC. LOCAL_REVIEW_ADJUDICATION names the CC's record, which codex_gate.py reads to decide it (README, Local
+# reviews); verdict_gate binds it to the pull request, the read head and a listed review file, and the squash body records it.
+# SQUASH_BODY_FILE (the CC, 2026-10-12): when set, the squash commit's body is that file (gh pr merge --body-file), for a PR whose commit
+# messages carry a claim corrected after review (the repository's squash default is COMMIT_MESSAGES). A value that is not a readable,
+# non-empty regular file stops with exit 2 before the lock and any call. With a waiver or an adjudication, the body is the file's text and
+# then that line (below).
 set -u
 # Parsed whole before it runs: an edit while a landing runs cannot shift what the running copy executes (2026-10-09).
 {
@@ -61,6 +71,13 @@ RO=${R%%/*}
 [ -n "${LOCAL_REVIEWS+x}${CODEX_LOCAL_REVIEW+x}" ] || [ -n "${LOCAL_REVIEW_WAIVER:-}" ] \
   || { echo "#$N local reviews are required: set LOCAL_REVIEWS=<review file>[:<review file>...], or LOCAL_REVIEW_WAIVER=<waiver file> (README, Local reviews): stop, nothing merged"; exit 2; }
 VF=("$@")  # #975 round 4: the verdict files, kept for final_gate (the CI loop's `set --` replaces the positional parameters)
+# gh reads the body file when the merge call starts, and "-" would make it read standard input (cli v2.102.0 pkg/cmd/pr/merge/merge.go:146-153,
+# :177; pkg/cmdutil/file_input.go:8-15), so "-" is refused with every other value that is not a readable, non-empty regular file. The path is
+# not printed. A set but empty value is refused too (the CC's copy took it for unset, and the merge fell back to the default body: as #1061
+# P1, an empty LOCAL_REVIEWS that fell back to the connector).
+[ -z "${SQUASH_BODY_FILE+x}" ] || { [ "$SQUASH_BODY_FILE" != - ] && [ -f "$SQUASH_BODY_FILE" ] && [ -r "$SQUASH_BODY_FILE" ] && [ -s "$SQUASH_BODY_FILE" ]; } \
+  || { echo "#$N SQUASH_BODY_FILE is set but is not a readable, non-empty file (path withheld): stop, nothing merged"; exit 2; }
+ADJ_SHA=  # the review file's sha256 that LOCAL_REVIEW_ADJUDICATION names at its first read (verdict_gate), which the squash body records
 # 2026-10-10: same-change tolerance (as uet_land.sh). A head that is a pure rebase or merge-update of the read head
 # (per-file changed lines identical, manifests/evidence.json excluded; CI arbitrates the registry) keeps the reads, and
 # a BEHIND branch is updated server-side (gh pr update-branch, merge method) instead of waiting for a lane push.
@@ -332,8 +349,13 @@ tcc_read_gate() {
 # for #<pr> at <the read head's first 8 hex digits>", bound to the pull request and the head as uet_land.sh binds GPT_VERDICT; a waiver
 # for another pull request or head, a revoked one (a later Waiver line) and a missing or unreadable one stop. With either variable set
 # it is not read: the gate decides from the review files alone.
+# The CC's ruling of 2026-10-13: with either variable set, LOCAL_REVIEW_ADJUDICATION (when not empty) is read here once at each check
+# (lg_text), as the waiver is, and its LAST line that starts with "Adjudication:" must read exactly "Adjudication: local review <sha256> for
+# #<pr> at <the read head's first 8 hex digits>": the sha256 of a file that LOCAL_REVIEWS or CODEX_LOCAL_REVIEW names (each hashed once, split
+# as lg_gate splits them) and, at the final gate, the one its first read named, which the squash body records. Anything else stops (exit 2),
+# the file named by its file name only and nothing of it printed; codex_gate.py decides whether the record decides its review (a 4: exit 9).
 verdict_gate() {
-  local v t w why re='landing gate|path to pass|before landing|landing condition'
+  local v t w s f ok part more=() why re='landing gate|path to pass|before landing|landing condition'
   for v in "${VF[@]}"; do
     # #975 P2-C: a verdict file is named by its file name only (its directory can be under a home directory).
     [ -f "$v" ] || { echo "#$N verdict file missing: ${v##*/}"; exit 2; }
@@ -349,7 +371,29 @@ verdict_gate() {
         || { echo "#$N verdict ${v##*/} states a landing gate: set GATES_DONE=<receipt naming ${EF:0:8}> after running it"; exit 2; }
     fi
   done
-  [ -z "${LOCAL_REVIEWS+x}${CODEX_LOCAL_REVIEW+x}" ] || return 0
+  if [ -n "${LOCAL_REVIEWS+x}${CODEX_LOCAL_REVIEW+x}" ]; then
+    v=${LOCAL_REVIEW_ADJUDICATION:-}
+    [ -n "$v" ] || return 0
+    [ -f "$v" ] || { echo "#$N local review adjudication missing: ${v##*/}"; exit 2; }
+    t=$(lg_text "$v") || { echo "#$N local review adjudication ${v##*/} is unreadable: stop"; exit 2; }
+    w=$(printf '%s\n' "$t" | grep -E '^Adjudication:' | tail -n 1); w=${w%$'\r'}
+    s=${w#Adjudication: local review }; s=${s%" for #$N at ${EF:0:8}"}
+    [[ "$s" =~ ^[0-9a-f]{64}$ ]] && [ "$w" = "Adjudication: local review $s for #$N at ${EF:0:8}" ] \
+      || { echo "#$N local review adjudication ${v##*/} does not adjudicate #$N at ${EF:0:8} (its last Adjudication line must read 'Adjudication: local review <sha256 of the review file> for #$N at ${EF:0:8}'): stop"; exit 2; }
+    ok=
+    for part in "${LOCAL_REVIEWS-}" "${CODEX_LOCAL_REVIEW-}"; do
+      IFS=: read -r -a more <<< "$part"
+      for f in ${more[@]+"${more[@]}"}; do
+        [ -n "$f" ] && [ "$({ sha256sum < "$f"; } 2>/dev/null | cut -d' ' -f1)" = "$s" ] && ok=1
+      done
+    done
+    [ -n "$ok" ] || { echo "#$N local review adjudication ${v##*/} names the sha256 of no file of LOCAL_REVIEWS or CODEX_LOCAL_REVIEW: stop"; exit 2; }
+    [ -z "${ADJ_SHA:-}" ] || [ "$s" = "$ADJ_SHA" ] \
+      || { echo "#$N local review adjudication ${v##*/} names another review file than at its first read: stop"; exit 2; }
+    ADJ_SHA=$s
+    echo "#$N local review adjudication ${v##*/} names #$N at ${EF:0:8} and a listed review file: the Codex gate decides with it"
+    return 0
+  fi
   v=${LOCAL_REVIEW_WAIVER:-}
   [ -f "$v" ] || { echo "#$N local review waiver missing: ${v##*/}"; exit 2; }
   t=$(lg_text "$v") || { echo "#$N local review waiver ${v##*/} is unreadable: stop"; exit 2; }
@@ -528,13 +572,28 @@ done
 # which is where gh's own "edit the commit message" step starts (cli v2.102.0 pkg/cmd/pr/merge/merge.go:721-735, http.go:121-158).
 # --body sets the body in place of that default (merge.go:146-147, :176; http.go:72-75; MergePullRequestInput.commitBody, "if omitted, a
 # default message will be used", schema :26079-26082). A failed read stops (exit 7, nothing merged); without a waiver nothing is read.
-MERGE_BODY=()
+# The CC's ruling of 2026-10-13: an adjudication that verdict_gate bound is recorded the same way, by its line and the sha256 of its first
+# read. SQUASH_BODY_FILE: alone, it is the body (--body-file, as the CC's copy passes it); with a waiver or an adjudication its text, read once
+# here (lg_text), takes the place of the offered body, then a blank line and that line, because gh takes --body or --body-file, never both
+# (merge.go:138-143, "specify only one of `--body` or `--body-file`"). A failed read stops (exit 7, nothing merged).
+MERGE_BODY=(); bl=; what=; mb=; nl=$'\n'
 if [ -z "${LOCAL_REVIEWS+x}${CODEX_LOCAL_REVIEW+x}" ]; then
+  bl="Waiver: local reviews for #$N at ${EF:0:8} (LOCAL_REVIEW_WAIVER)"; what=waiver
+elif [ -n "${ADJ_SHA:-}" ]; then
+  bl="Adjudication: local review $ADJ_SHA for #$N at ${EF:0:8} (LOCAL_REVIEW_ADJUDICATION)"; what=adjudication
+fi
+if [ -n "$bl" ] && [ -n "${SQUASH_BODY_FILE+x}" ]; then
+  mb=$(lg_text "$SQUASH_BODY_FILE") || { echo "#$N SQUASH_BODY_FILE could not be read for the squash body (path withheld): stop, nothing merged"; exit 7; }
+elif [ -n "$bl" ]; then
   mb=$(gh api graphql -f query='query($owner: String!, $name: String!, $number: Int!) { repository(owner: $owner, name: $name) { pullRequest(number: $number) { viewerMergeBodyText(mergeType: SQUASH) } } }' \
     -f owner="${R%%/*}" -f name="${R#*/}" -F number="$N" --jq '.data.repository.pullRequest.viewerMergeBodyText | strings | "body:" + .' 2>/dev/null) \
-    && [[ "$mb" == body:* ]] || { echo "#$N the squash body for the local review waiver could not be read (output withheld): stop, nothing merged"; exit 7; }
-  mb=${mb#body:}; nl=$'\n'
-  MERGE_BODY=(--body "${mb:+$mb$nl$nl}Waiver: local reviews for #$N at ${EF:0:8} (LOCAL_REVIEW_WAIVER)")
+    && [[ "$mb" == body:* ]] || { echo "#$N the squash body for the local review $what could not be read (output withheld): stop, nothing merged"; exit 7; }
+  mb=${mb#body:}
+fi
+if [ -n "$bl" ]; then
+  MERGE_BODY=(--body "${mb:+$mb$nl$nl}$bl")
+elif [ -n "${SQUASH_BODY_FILE+x}" ]; then
+  MERGE_BODY=(--body-file "$SQUASH_BODY_FILE")
 fi
 ae=$(lg_author_email "$R") || { echo "#$N cannot form the no-reply author address (correction #148): stop, nothing merged"; exit 11; }
 final_gate "$cur"

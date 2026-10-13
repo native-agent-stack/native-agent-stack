@@ -527,6 +527,8 @@ PUBLIC_DIGESTS = {
     "5a46b6cc199fd025f914f39a39199745bad9fbbf540246abcb658671899be77e": "python/cpython@v3.13.16:Doc/library/math.rst",
     "18560b0a37dfb90b4712fba97668d44a1328c5566b10deffaee292ba12cc21ff": "python/cpython@v3.13.16:Lib/os.py",
     "87601195497fde3b7cea03bce396e1b713c17af3d273298d99d3bc0147f745b9": "python/cpython@v3.13.16:Lib/_collections_abc.py",
+    # 2026-10-13, SQUASH_BODY_FILE: what gh does with --body-file "-" (the local upstream mirror at v2.102.0)
+    "94076f6234180f85f2a555a5733e024146ea2c0cac54af19c86c72b015252828": "cli/cli@v2.102.0:pkg/cmdutil/file_input.go",
 }
 
 
@@ -545,6 +547,7 @@ PUBLIC_COMMITS = {
     "a6c8bf7cfd90f3dd76d6314355e434fa6afb9ae3": "native-agent-stack/native-agent-stack: #1061's first commit",
     "c999eee50e7ef1a4be45cee3f90e417e72868148": "native-agent-stack/native-agent-stack: #1061's second commit",
     "974090cfdccc284741a26147d306ef4a0e1debdd": "native-agent-stack/native-agent-stack: #1061's third commit",
+    "993cc890b3ff3fc95fa7cdba51edd726565f9ace": "native-agent-stack/native-agent-stack: the base of the adjudication change (#1068's merge)",
     "58b1e0c00b39b9e46c24dc4a0ba6a2669c90e9c1": "github/rest-api-description",
     "be38ec5d78e24172587e61b3c6ff40ace1865c71": "github/docs",
     "092d3acd6bec3e3a14bdc7e7a2810ab628ab759d": "openai/codex: the upstream mirror of 2026-10-09",
@@ -819,6 +822,26 @@ class ScriptTextTests(LandingCase):
             with self.subTest(text=name):
                 self.assertNotIn("LOCAL_REVIEW_WAIVER", text)
 
+    def test_squash_body_file_and_the_adjudication_are_nas_inputs_outside_the_shared_block_and_cite_their_sources(self):
+        # The CC's ruling of 2026-10-13 and the CC's copy's SQUASH_BODY_FILE: nas_land.sh reads both outside the shared block, which uet_land.sh
+        # carries too; the body file is checked before the shared block and the lock; codex_gate.py alone decides with the adjudication.
+        # At 993cc890 neither variable was read anywhere.
+        lines, nas = self.nas.lines, self.nas.text
+        check = ('[ -z "${SQUASH_BODY_FILE+x}" ] || { [ "$SQUASH_BODY_FILE" != - ] && [ -f "$SQUASH_BODY_FILE" ] && [ -r "$SQUASH_BODY_FILE" ] '
+                 '&& [ -s "$SQUASH_BODY_FILE" ]; } \\')
+        self.assertEqual(lines.count(check), 1)
+        self.assertLess(lines.index(check), lines.index("# >>> land-gate-fns"))
+        self.assertLess(lines.index(check), lines.index('lg_lock "${LANDING_LOCK_DIR:-$COORD/command-center/landing-locks}" || exit 14'))
+        self.assertIn("LOCAL_REVIEW_ADJUDICATION", nas[nas.index("verdict_gate() {"):])
+        self.assertIn('ADJUDICATION = "LOCAL_REVIEW_ADJUDICATION"', (LANDING / "codex_gate.py").read_text(encoding="utf-8"))
+        for name, text in (("the shared block", self.nas.block), ("uet_land.sh", self.uet.text)):
+            for variable in ("LOCAL_REVIEW_ADJUDICATION", "SQUASH_BODY_FILE"):
+                with self.subTest(text=name, variable=variable):
+                    self.assertNotIn(variable, text)
+        for cited in ("cli v2.102.0 pkg/cmd/pr/merge/merge.go:146-153", "pkg/cmdutil/file_input.go:8-15", "merge.go:138-143"):
+            with self.subTest(cited=cited):
+                self.assertIn(cited, nas)
+
     def test_the_users_type_the_repository_name_and_the_environment_tests_cite_their_sources(self):
         # #1061 round 2 (the CC's P3s and Astra's follow-up 4 at 974090cf): the type filter, the repository-name rule and the set-or-unset
         # tests cited no source for the mechanism; nor did the file replacement and the finiteness check.
@@ -850,7 +873,8 @@ class ScriptTextTests(LandingCase):
             with self.subTest(script=script.key):
                 for name in sorted(set(re.findall(r"\bLANDING_[A-Z_]+\b", script.text))):
                     self.assertIn(f"`{name}`", readme)
-                for name in ("VERDICT_FILES", "GATES_DONE", "GPT_VERDICT", "LG_AUTHOR_LOGIN", "LOCAL_REVIEWS", "CODEX_LOCAL_REVIEW", "LOCAL_REVIEW_WAIVER"):
+                for name in ("VERDICT_FILES", "GATES_DONE", "GPT_VERDICT", "LG_AUTHOR_LOGIN", "LOCAL_REVIEWS", "CODEX_LOCAL_REVIEW", "LOCAL_REVIEW_WAIVER",
+                             "LOCAL_REVIEW_ADJUDICATION", "SQUASH_BODY_FILE"):
                     if name in script.text:
                         self.assertIn(f"`{name}`", readme)
                 section = readme.split("## Exit codes", 1)[1].split("\n## ", 1)[0]
@@ -1875,16 +1899,17 @@ def limit_notice(when):
 
 
 LOCAL_VARIABLES = ("LOCAL_REVIEWS", "CODEX_LOCAL_REVIEW")  # 2026-10-13: the gate's local review set and its alias
+ADJUDICATION_VARIABLE = "LOCAL_REVIEW_ADJUDICATION"  # the CC's ruling of 2026-10-13: the CC's adjudication record (codex_gate.py, nas_land.sh)
 SHA_RE = re.compile(r"[0-9a-f]{40}")
 LOCAL_LINE = re.compile(r"Local reviews: [A-Za-z0-9 :;,.()_+'-]*")  # what lg_gate echoes (its status-line characters)
 
 
 @contextlib.contextmanager
 def local_reviews_env(values=None):
-    """os.environ with the local review variables as given and otherwise unset: the gate reads them, and the shell that runs the tests may
-    have set them. patch.dict restores the environment afterwards."""
+    """os.environ with the local review variables (and the adjudication's) as given and otherwise unset: the gate reads them, and the shell
+    that runs the tests may have set them. patch.dict restores the environment afterwards."""
     with mock.patch.dict(os.environ):
-        for name in LOCAL_VARIABLES:
+        for name in (*LOCAL_VARIABLES, ADJUDICATION_VARIABLE):
             os.environ.pop(name, None)
         os.environ.update(values or {})
         yield
@@ -1909,6 +1934,16 @@ def normalized(head, findings=(), completed=True, reviewer="codex-review", versi
 
 def finding(priority, title="A finding", location="tools/landing/x.py:3-5"):
     return {"priority": priority, "location": location, "title": title}
+
+
+def adjudication_text(digest, pr, head, findings=(), words="fixed", extra=()):
+    """The CC's adjudication record (README "Local reviews", the CC's ruling of 2026-10-13): a heading, the line that binds the review file's
+    sha256, the pull request and the read head's first 8 hex digits, one Finding line per finding with its disposition (`words`, one word
+    for all or one per finding), then `extra` lines. Line 3 is the binding line, line 4 the first Finding line."""
+    words = [words] * len(findings) if isinstance(words, str) else list(words)
+    lines = ["# Adjudication", "", f"Adjudication: local review {digest} for #{pr} at {head[:8]}"]
+    lines += [f"Finding: P{item['priority']} at {item['location']}: {item['title']} ({word})" for item, word in zip(findings, words)]
+    return "\n".join([*lines, *extra]) + "\n"
 
 
 class CodexGateTests(unittest.TestCase):
@@ -1960,11 +1995,12 @@ class CodexGateTests(unittest.TestCase):
             code = self.gate.main("o/r", "7", *([read] if read else []))
         return code, out.getvalue().strip()
 
-    def run_local(self, *reviews, read=GATE_HEAD, same=(), variables=None, names=None, facts=None):
+    def run_local(self, *reviews, read=GATE_HEAD, same=(), variables=None, names=None, facts=None, adjudication=None):
         """The gate with a local review set: each review (a dict, or the file's bytes) in a file of its own, LOCAL_REVIEWS naming them in
         order unless `variables` maps the variables to lists of review numbers (or `names` gives the value as is). After the read head come
         the facts lg_gate passes, "<head>:<merge base>": by default the read head's and each head of `same`, all with GATE_BASE (or
-        `facts` as given). No command may run."""
+        `facts` as given). `adjudication`, a function of the files' sha256 in order, gives the text (or bytes) of the CC's record, a file
+        that LOCAL_REVIEW_ADJUDICATION names; a string is that variable's value as is ({dir} the scratch directory). No command may run."""
         if facts is None:
             facts = [f"{head}:{GATE_BASE}" for head in ([read] if read and SHA_RE.fullmatch(read) else []) + list(same)]
         with tempfile.TemporaryDirectory(prefix="local-reviews-") as scratch:
@@ -1976,6 +2012,13 @@ class CodexGateTests(unittest.TestCase):
             values = {"LOCAL_REVIEWS": ":".join(paths)} if variables is None else {k: ":".join(paths[i] for i in v) for k, v in variables.items()}
             if names is not None:
                 values = {"LOCAL_REVIEWS": names.replace("{dir}", scratch)}
+            if callable(adjudication):
+                record = Path(scratch) / "adjudication.md"
+                text = adjudication([hashlib.sha256(Path(path).read_bytes()).hexdigest() for path in paths])
+                record.write_bytes(text if isinstance(text, bytes) else text.encode("utf-8"))
+                values[ADJUDICATION_VARIABLE] = str(record)
+            elif adjudication is not None:
+                values[ADJUDICATION_VARIABLE] = adjudication.replace("{dir}", scratch)
 
             def no_command(*args, **kwargs):
                 raise AssertionError("the gate ran a command although a local review set was given")
@@ -2517,6 +2560,82 @@ class CodexGateTests(unittest.TestCase):
                     with mock.patch.object(self.gate.subprocess, "run", side_effect=AssertionError("no command")), contextlib.redirect_stdout(out):
                         self.assertEqual(self.gate.main("o/r", "7", GATE_HEAD, f"{GATE_HEAD}:{GATE_BASE}"), 2)
                 self.assertEqual(out.getvalue().strip(), "Local reviews: LOCAL_REVIEWS or CODEX_LOCAL_REVIEW is set but names no file; stop")
+
+    def test_the_ccs_adjudication_decides_a_review_that_says_incorrect_with_only_p2_and_p3_findings(self):
+        # The CC's ruling of 2026-10-13: after a pull request's bounded rounds, a local re-review that says "patch is incorrect" with only P2
+        # and P3 findings is decided by the CC, through a record (LOCAL_REVIEW_ADJUDICATION) bound to the review file's bytes, the pull
+        # request and the read head, that gives each finding a disposition. At 993cc890 the gate read no record: each case gave 4, "a person
+        # decides", with none of these reasons (the empty value, the control, gave the same line there).
+        p2, p3 = finding(2, "[P2] Cite the source", "tools/landing/x.py:3-5"), finding(3, "[P3] Name the variable", "tools/landing/y.sh:9-9")
+        wrong, h8 = normalized(GATE_HEAD, [p2, p3], correctness="patch is incorrect"), GATE_HEAD[:8]
+
+        def record(findings=(p2, p3), words=("fixed", "follow-ups"), pr="7", head=GATE_HEAD, extra=(), file=0, edit=None):
+            def text(digests):
+                written = adjudication_text(digests[file], pr, head, findings, words, extra)
+                return edit(written) if edit else written
+            return text
+        accepted = "no P0 or P1 finding; adjudicated (LOCAL_REVIEW_ADJUDICATION): review file 1, one disposition for each P2 and P3 finding, "
+        refused = "patch is incorrect, P0 findings 0, P1 findings 0; a person decides; LOCAL_REVIEW_ADJUDICATION does not decide it: "
+        unbound = refused + f"its last Adjudication line does not name the sha256 of review file 1, this pull request and the read head {h8}"
+        binding_last = lambda written: "\n".join(sorted(written.splitlines(), key=lambda line: line.startswith("Adjudication:"))) + "\n"
+        cases = [
+            ("every finding listed, fixed and follow-ups", (wrong,), record(), 0, accepted + "fixed 1, follow-ups 1, rejected 0; P2 findings 1, P3 findings 1"),
+            ("rejected, with CRLF line ends", (wrong,), record(words="rejected", edit=lambda t: t.replace("\n", "\r\n")), 0,
+             accepted + "fixed 0, follow-ups 0, rejected 2"),
+            ("the binding line last, as a record's section ends", (wrong,), record(edit=binding_last), 0, accepted + "fixed 1, follow-ups 1"),
+            ("no finding at all, the binding line alone", (normalized(GATE_HEAD, correctness="patch is incorrect"),), record(findings=()), 0,
+             accepted + "fixed 0, follow-ups 0, rejected 0"),
+            ("the incorrect review beside a correct one", (normalized(GATE_HEAD), wrong), record(file=1), 0,
+             "patch is incorrect in 1 of 2, no P0 or P1 finding; adjudicated (LOCAL_REVIEW_ADJUDICATION): review file 2,"),
+            ("one P2 unlisted", (wrong,), record(findings=(p3,), words="follow-ups"), 4, refused + "1 of the 2 P2 and P3 findings of review file 1 have no disposition"),
+            ("an indented Finding line, which does not count", (wrong,), record(edit=lambda t: t.replace("Finding: P3", " Finding: P3")), 4,
+             refused + "1 of the 2 P2 and P3 findings of review file 1 have no disposition"),
+            ("the sha256 of other bytes", (wrong,), lambda digests: adjudication_text(hashlib.sha256(b"other bytes").hexdigest(), "7", GATE_HEAD, [p2, p3]), 4, unbound),
+            ("another pull request", (wrong,), record(pr="8"), 4, unbound),
+            ("another head", (wrong,), record(head=OTHER), 4, unbound),
+            ("revoked by a later Adjudication line", (wrong,), record(extra=("Adjudication: revoked",)), 4, unbound),
+            ("no Adjudication line", (wrong,), record(edit=lambda t: t.replace("Adjudication: local", "Adjudicated: local")), 4, refused + "it has no Adjudication line"),
+            ("an indented Adjudication line", (wrong,), record(edit=lambda t: t.replace("Adjudication: local", "  Adjudication: local")), 4,
+             refused + "it has no Adjudication line"),
+            ("a file that does not exist", (wrong,), "{dir}/absent.md", 4, refused + "it cannot be read"),
+            ("a file that is not UTF-8", (wrong,), lambda digests: b"\xff" + record()(digests).encode("utf-8"), 4, refused + "it cannot be read"),
+            ("a disposition other than the three", (wrong,), record(words=("fixed", "wontfix")), 4,
+             refused + "its line 5 names no finding of review file 1, or a disposition other than fixed, follow-ups or rejected"),
+            ("a finding the review does not have", (wrong,), record(extra=("Finding: P2 at tools/landing/z.py:1-1: [P2] Another (fixed)",)), 4,
+             refused + "its line 6 names no finding of review file 1"),
+            ("a finding with two dispositions", (wrong,), record(extra=(f"Finding: P2 at {p2['location']}: {p2['title']} (rejected)",)), 4,
+             refused + "a finding of review file 1 has two dispositions"),
+            ("two findings that render as one line", (normalized(GATE_HEAD, [finding(2, "b: c", "a"), finding(2, "c", "a: b")], correctness="patch is incorrect"),),
+             record(findings=()), 4, refused + "two findings of review file 1 render as one Finding line"),
+            ("two reviews say patch is incorrect", (wrong, wrong), record(), 4, "patch is incorrect in 2 of 2, P0 findings 0, P1 findings 0; a person decides; "
+             "LOCAL_REVIEW_ADJUDICATION does not decide it: 2 codex-reviews say patch is incorrect, and an adjudication decides one"),
+            ("a P1 beside them", (normalized(GATE_HEAD, [p2, p3, finding(1)], correctness="patch is incorrect"),), record(), 4,
+             "P1 findings 1; a person decides; LOCAL_REVIEW_ADJUDICATION decides no P0 or P1 finding"),
+            ("a P0 with patch is correct", (normalized(GATE_HEAD, [finding(0)]),), record(findings=()), 4, "P0 findings 1, P1 findings 0; a person decides; "
+             "LOCAL_REVIEW_ADJUDICATION decides no P0 or P1 finding"),
+            ("a record where no review says patch is incorrect (it is not read)", (normalized(GATE_HEAD, [p2]),), "{dir}/absent.md", 4,
+             "patch is correct, no P0 or P1 finding; a person decides; LOCAL_REVIEW_ADJUDICATION is set, but no codex-review says patch is "
+             "incorrect, so it decides nothing (unset it)"),
+            ("the control: an empty value is no record", (wrong,), "", 4,
+             "patch is incorrect, P0 findings 0, P1 findings 0; a person decides; P2 findings 1, P3 findings 1 (for the Follow-ups)"),
+        ]
+        for name, reviews, adjudication, code, text in cases:
+            with self.subTest(case=name):
+                got, line = self.run_local(*reviews, adjudication=adjudication)
+                self.assertEqual((got, text in line), (code, True), line)
+                self.assertTrue(LOCAL_LINE.fullmatch(line), f"every local line is one lg_gate echoes: {line}")
+                for item in (p2, p3):
+                    self.assertNotIn(item["title"], line, "no finding's text is printed")
+        with self.subTest(case="the record is read once in a call, and only for an incorrect review"):
+            real_open, opened = open, []
+
+            def counting_open(path, *args, **kwargs):
+                opened.append(Path(path).name)
+                return real_open(path, *args, **kwargs)
+            with mock.patch("builtins.open", counting_open):
+                self.assertEqual(self.run_local(wrong, adjudication=record())[0], 0)
+                self.assertEqual(self.run_local(normalized(GATE_HEAD, [finding(1)], correctness="patch is incorrect"), adjudication=record(findings=()))[0], 4)
+            self.assertEqual(opened.count("adjudication.md"), 1, opened)
 
     def test_command_line_needs_two_or_three_arguments(self):
         # #975 round 4: the third is the read head (the scripts pass it), whose review counts as well as the current head's. 2026-10-13: with
@@ -3835,6 +3954,199 @@ class EndToEndTests(LandingCase):
                 code, out, log = self.land(script, FAKE_USER_TYPE="Organization")
                 self.assertEqual((code, self.merge_calls(log)), (11, []), out)
                 self.assertIn("cannot form the no-reply author address", out)
+
+    # ------------------------------------------------------------------------------------------ the CC's ruling of 2026-10-13, SQUASH_BODY_FILE
+    def adjudication(self, review, text=None, *, name=None, pr=PR, head=None, findings=(), words="fixed", extra=()):
+        """The CC's adjudication record of the review file `review` (bound to its sha256 as written), in a new file named `name` (default
+        adjudication.md) of its own directory, or `text` as given; returns the record's path and the review file's sha256."""
+        digest = hashlib.sha256(Path(review).read_bytes()).hexdigest()
+        path = self.dir / f"adjudication-{next(self.counter)}" / (name or "adjudication.md")
+        path.parent.mkdir()
+        path.write_text(adjudication_text(digest, pr, head or self.head, findings, words, extra) if text is None else text, encoding="utf-8")
+        return str(path), digest
+
+    def body_merge(self, body, head=None):
+        """The merge call as the fake gh logs it, with `body` (its newlines as \\n) as the squash body."""
+        return f"gh pr merge {PR} -R {NAS_REPO} --squash --body {body} --match-head-commit {head or self.head} -A {NOREPLY}"
+
+    def test_an_adjudicated_review_that_says_incorrect_with_only_p2_and_p3_findings_lands_and_the_squash_body_records_it(self):
+        # The CC's ruling of 2026-10-13: the record decides the review, and the squash body records it after the body GitHub offers, as it
+        # records a waiver (viewerMergeBodyText, read once). At 993cc890 the gate gave 4 whatever the record said (exit 9, no merge).
+        p2, p3 = finding(2, "[P2] Cite the source", "change.txt:1-1"), finding(3, "[P3] Name it", "change.txt:1-1")
+        review = self.local_review(self.head, [p2, p3], correctness="patch is incorrect")
+        record, digest = self.adjudication(review, findings=[p2, p3], words=("fixed", "follow-ups"))
+        code, out, log = self.land(self.nas, FAKE_REAL_PYTHON=sys.executable, LOCAL_REVIEWS=review, LOCAL_REVIEW_ADJUDICATION=record)
+        h8 = self.head[:8]
+        self.assertEqual((code, self.merge_calls(log)), (0, [self.body_merge(
+            f"* the change\\n\\nAdjudication: local review {digest} for #{PR} at {h8} (LOCAL_REVIEW_ADJUDICATION)")]), out)
+        self.assertEqual(out.count(f"#{PR} local review adjudication adjudication.md names #{PR} at {h8} and a listed review file: the Codex gate "
+                                   "decides with it"), 2, "at the early refusals and at the final gate")
+        self.assertIn(f"Local reviews: codex-review of {h8}: patch is incorrect, no P0 or P1 finding; adjudicated (LOCAL_REVIEW_ADJUDICATION): review "
+                      "file 1, one disposition for each P2 and P3 finding, fixed 1, follow-ups 1, rejected 0", out)
+        self.assertEqual(len(self.gate_calls(log)), 3, "at the wait, before the validation and in the final gate")
+        self.assertEqual(len([line for line in log if "viewerMergeBodyText" in line]), 1)
+        self.assertNotIn(digest, out, "nothing of the record is printed")
+        self.assertNotIn(str(self.dir), out, "no path is printed")
+        with self.subTest(case="the offered body's read fails"):
+            code, out, log = self.land(self.nas, FAKE_REAL_PYTHON=sys.executable, LOCAL_REVIEWS=review, LOCAL_REVIEW_ADJUDICATION=record,
+                                       FAKE_FAIL="api graphql*", FAKE_FAIL_STDOUT='{"message": "a detail of the reply"}', FAKE_FAIL_STDERR="gh: a detail")
+            self.assertEqual((code, self.merge_calls(log)), (7, []), out)
+            self.assertIn(f"#{PR} the squash body for the local review adjudication could not be read (output withheld): stop, nothing merged", out)
+            self.assertNotIn("a detail", out)
+
+    def test_the_readmes_commands_write_a_record_that_the_adjudication_accepts(self):
+        # The README's two lines write the record from the normalized file (jq renders each finding as the gate does), so the CC sets only
+        # the dispositions; they run here with their placeholders filled in. At 993cc890 the README had no such lines.
+        readme = (LANDING / "README.md").read_text(encoding="utf-8").splitlines()
+        first = next(i for i, line in enumerate(readme) if line.startswith("{ printf 'Adjudication: local review %s for #%s at %s\\n' "))
+        p2, p3 = finding(2, '[P2] Cite "the" source `x`', "change.txt:1-1"), finding(3, "[P3] Name it", "change.txt:2-2")
+        review = self.local_review(self.head, [p2, p3], correctness="patch is incorrect")
+        record = self.dir / f"adjudication-{next(self.counter)}.md"
+        script = "\n".join(readme[first:first + 2])
+        for placeholder, value in (("<codex file>", q(review)), ("<pr>", PR), ("<head8>", self.head[:8]), ("<adjudication file>", q(record))):
+            script = script.replace(placeholder, value)
+        subprocess.run(["bash", "-c", script], check=True, timeout=30, env=self.env())
+        code, out, log = self.land(self.nas, FAKE_REAL_PYTHON=sys.executable, LOCAL_REVIEWS=review, LOCAL_REVIEW_ADJUDICATION=str(record))
+        self.assertEqual((code, len(self.merge_calls(log))), (0, 1), out)
+        self.assertIn("one disposition for each P2 and P3 finding, fixed 2, follow-ups 0, rejected 0", out)
+
+    def test_an_adjudication_not_bound_to_the_pull_request_the_read_head_and_a_listed_review_stops_with_2_before_github_state_changes(self):
+        # verdict_gate reads the record after the lock and before update-branch and ready, as it reads a waiver, so a draft that is BEHIND
+        # gets neither, no gate runs and nothing is merged. At 993cc890 the record was not read: each landing was updated, marked ready and
+        # stopped by the gate's 4 (exit 9).
+        p2 = finding(2, "[P2] Cite the source", "change.txt:1-1")
+        review = self.local_review(self.head, [p2], correctness="patch is incorrect")
+        digest, h8 = hashlib.sha256(Path(review).read_bytes()).hexdigest(), self.head[:8]
+        bound = (f"#{PR} local review adjudication adjudication.md does not adjudicate #{PR} at {h8} (its last Adjudication line must read "
+                 f"'Adjudication: local review <sha256 of the review file> for #{PR} at {h8}'): stop")
+        cases = [
+            ("another pull request", adjudication_text(digest, str(int(PR) + 1), self.head, [p2]), bound),
+            ("another head", adjudication_text(digest, PR, self.other, [p2]), bound),
+            ("a longer head prefix than the agreed line's", f"Adjudication: local review {digest} for #{PR} at {self.head[:12]}\n", bound),
+            ("revoked by a later Adjudication line", adjudication_text(digest, PR, self.head, [p2], extra=("Adjudication: revoked",)), bound),
+            ("an indented Adjudication line", "  " + adjudication_text(digest, PR, self.head, [p2]).split("\n", 2)[2], bound),
+            ("a sha256 cut short", adjudication_text(digest[:40], PR, self.head, [p2]), bound),
+            ("the sha256 of no listed file", adjudication_text(hashlib.sha256(b"other bytes").hexdigest(), PR, self.head, [p2]),
+             f"#{PR} local review adjudication adjudication.md names the sha256 of no file of LOCAL_REVIEWS or CODEX_LOCAL_REVIEW: stop"),
+        ]
+        for name, text, phrase in cases:
+            with self.subTest(case=name):
+                record, _ = self.adjudication(review, text)
+                code, out, log = self.land(self.nas, FAKE_REAL_PYTHON=sys.executable, LOCAL_REVIEWS=review, LOCAL_REVIEW_ADJUDICATION=record,
+                                           draft=True, merge_state="BEHIND")
+                self.assertEqual((code, self.merge_calls(log), self.gate_calls(log)), (2, [], []), out)
+                self.assertIn(phrase, out)
+                self.assertEqual([line for line in log if line.startswith(("gh pr ready", "gh pr update-branch"))], [])
+                self.assertNotIn(str(self.dir), out, "the record is named by its file name only")
+        with self.subTest(case="missing"):
+            code, out, log = self.land(self.nas, FAKE_REAL_PYTHON=sys.executable, LOCAL_REVIEWS=review,
+                                       LOCAL_REVIEW_ADJUDICATION=str(self.dir / "absent-adjudication.md"), draft=True, merge_state="BEHIND")
+            self.assertEqual((code, self.merge_calls(log), self.gate_calls(log)), (2, [], []), out)
+            self.assertIn(f"#{PR} local review adjudication missing: absent-adjudication.md", out)
+            self.assertNotIn(str(self.dir), out)
+
+    def test_an_adjudication_that_does_not_decide_the_review_keeps_the_gates_4(self):
+        # The gate decides whether the record decides the review: an unlisted finding, a P1, a disposition other than the three, or a record
+        # where no review says "patch is incorrect" stop the landing at the wait (the gate's 4, exit 9), its own line echoed. At 993cc890
+        # the gate gave its 4 without these reasons, and the last landing merged.
+        p1, p2, p3 = (finding(n, f"[P{n}] A finding", "change.txt:1-1") for n in (1, 2, 3))
+        incorrect = dict(correctness="patch is incorrect")
+        cases = [
+            ("one P2 unlisted", [p2, p3], incorrect, dict(findings=[p3], words="follow-ups"), "1 of the 2 P2 and P3 findings of review file 1 have no disposition"),
+            ("a P1 beside a listed P2", [p1, p2], incorrect, dict(findings=[p2]), "P1 findings 1; a person decides; LOCAL_REVIEW_ADJUDICATION decides no P0 or P1 finding"),
+            ("a disposition other than the three", [p2], incorrect, dict(findings=[p2], words="later"),
+             "its line 4 names no finding of review file 1, or a disposition other than fixed, follow-ups or rejected"),
+            ("no review says patch is incorrect", [p2], {}, dict(findings=[p2]), "LOCAL_REVIEW_ADJUDICATION is set, but no codex-review says patch is "
+             "incorrect, so it decides nothing (unset it)"),
+        ]
+        for name, findings, kwargs, options, phrase in cases:
+            with self.subTest(case=name):
+                review = self.local_review(self.head, findings, **kwargs)
+                record, _ = self.adjudication(review, **options)
+                code, out, log = self.land(self.nas, FAKE_REAL_PYTHON=sys.executable, LOCAL_REVIEWS=review, LOCAL_REVIEW_ADJUDICATION=record)
+                self.assertEqual((code, self.merge_calls(log), len(self.gate_calls(log))), (9, [], 1), out)
+                self.assertIn(phrase, out)
+                self.assertNotIn("details withheld", out, "the gate's own line is echoed")
+                self.assertNotIn("[P2] A finding", out, "no finding's text is printed")
+
+    def test_the_final_gate_reads_the_adjudication_again(self):
+        # As the waiver: the record is read again at the final gate, by verdict_gate and by the gate. Each change is made after the slow
+        # steps (at the author lookup, the last of them). At 993cc890 none of these landings got past the wait (the gate's 4, exit 9).
+        p2 = finding(2, "[P2] Cite the source", "change.txt:1-1")
+        review = self.local_review(self.head, [p2], correctness="patch is incorrect")
+        advisory = self.local_review(self.head, reviewer="claude-code-review")
+        h8 = self.head[:8]
+        other = hashlib.sha256(Path(advisory).read_bytes()).hexdigest()
+        for name, rewrite, code, phrase in (
+                ("revoked", lambda record, digest: f"printf 'Adjudication: revoked\\n' >> {q(record)}", 2,
+                 f"#{PR} local review adjudication adjudication.md does not adjudicate #{PR} at {h8}"),
+                ("its Finding line removed", lambda record, digest: f"printf 'Adjudication: local review %s for #%s at %s\\n' {digest} {PR} {h8} > {q(record)}", 9,
+                 "1 of the 1 P2 and P3 findings of review file 1 have no disposition"),
+                ("bound to another listed file", lambda record, digest: f"printf 'Adjudication: local review %s for #%s at %s\\n' {other} {PR} {h8} > {q(record)}", 2,
+                 f"#{PR} local review adjudication adjudication.md names another review file than at its first read: stop")):
+            with self.subTest(case=name):
+                record, digest = self.adjudication(review, findings=[p2])
+                code_, out, log = self.land(self.nas, FAKE_REAL_PYTHON=sys.executable, LOCAL_REVIEWS=f"{review}:{advisory}",
+                                            LOCAL_REVIEW_ADJUDICATION=record, FAKE_GH_HOOK_ON="api users/*", FAKE_GH_HOOK=rewrite(record, digest))
+                self.assertEqual((code_, self.merge_calls(log)), (code, []), out)
+                self.assertIn(phrase, out)
+                self.assertIn(f"#{PR} local review adjudication adjudication.md names #{PR} at {h8} and a listed review file", out, "the early check passed")
+                if code == 9:
+                    self.assertIn("at the final gate: stop", out)
+                    self.assertEqual(len(self.gate_calls(log)), 3, "the wait and the call before the validation passed")
+
+    def test_squash_body_file_is_the_body_and_its_text_comes_first_beside_a_waiver_or_an_adjudication(self):
+        # SQUASH_BODY_FILE, ported from the CC's copy: alone it is passed as --body-file (cli v2.102.0 pkg/cmd/pr/merge/merge.go:177), and
+        # nothing is read for the body. gh takes --body or --body-file, never both (merge.go:138-143), so beside a waiver or an adjudication
+        # the body is the file's text, read once, a blank line and that line, and the body GitHub offers is not read. At 993cc890 the
+        # variable was not read: the merges named no body, or the offered body and the waiver line.
+        body = self.dir / f"squash-body-{next(self.counter)}.md"
+        body.write_text("Land the change.\n\nThe corrected claim.\n", encoding="utf-8")
+        h8, text = self.head[:8], "Land the change.\\n\\nThe corrected claim.\\n\\n"
+        p2 = finding(2, "[P2] Cite the source", "change.txt:1-1")
+        review = self.local_review(self.head, [p2], correctness="patch is incorrect")
+        record, digest = self.adjudication(review, findings=[p2])
+        real = {"FAKE_REAL_PYTHON": sys.executable}  # the real gate decides a local review set; the waiver's landing asks the canned one
+        cases = [
+            ("alone, with a local review", {**real, "LOCAL_REVIEWS": self.local_review(self.head)},
+             f"gh pr merge {PR} -R {NAS_REPO} --squash --body-file {body} --match-head-commit {self.head} -A {NOREPLY}"),
+            ("with the waiver", {}, self.body_merge(f"{text}Waiver: local reviews for #{PR} at {h8} (LOCAL_REVIEW_WAIVER)")),
+            ("with an adjudication", {**real, "LOCAL_REVIEWS": review, "LOCAL_REVIEW_ADJUDICATION": record},
+             self.body_merge(f"{text}Adjudication: local review {digest} for #{PR} at {h8} (LOCAL_REVIEW_ADJUDICATION)")),
+        ]
+        for name, extra, merge in cases:
+            with self.subTest(case=name):
+                code, out, log = self.land(self.nas, SQUASH_BODY_FILE=str(body), **extra)
+                self.assertEqual((code, self.merge_calls(log)), (0, [merge]), out)
+                self.assertFalse([line for line in log if "viewerMergeBodyText" in line], "the file takes the offered body's place")
+                self.assertNotIn(str(self.dir), out)
+        with self.subTest(case="the file is gone when the body is built"):
+            gone = self.dir / f"squash-body-{next(self.counter)}.md"
+            gone.write_text("Land the change.\n", encoding="utf-8")
+            code, out, log = self.land(self.nas, SQUASH_BODY_FILE=str(gone), FAKE_VALIDATE_HOOK=f"rm -f {q(gone)}")
+            self.assertEqual((code, self.merge_calls(log)), (7, []), out)
+            self.assertIn(f"#{PR} SQUASH_BODY_FILE could not be read for the squash body (path withheld): stop, nothing merged", out)
+            self.assertNotIn(str(self.dir), out)
+
+    def test_squash_body_file_that_is_not_a_readable_non_empty_regular_file_stops_with_2_before_any_call(self):
+        # The CC's copy :40-41: "-" would make gh read standard input (pkg/cmdutil/file_input.go:8-15), and every value that is not a
+        # readable, non-empty regular file stops before the lock and any call; a set but empty value too (the CC's copy took it for unset,
+        # and the merge fell back to the default body). At 993cc890 the variable was not read and each landing merged.
+        import fcntl
+        empty = self.dir / f"squash-body-{next(self.counter)}.md"
+        empty.write_text("", encoding="utf-8")
+        stop = f"#{PR} SQUASH_BODY_FILE is set but is not a readable, non-empty file (path withheld): stop, nothing merged"
+        for name, value in (("-", "-"), ("a missing file", str(self.dir / "absent-body.md")), ("an empty file", str(empty)),
+                            ("a directory", str(self.dir)), ("a set but empty value", "")):
+            with self.subTest(case=name):
+                code, out, log = self.land(self.nas, SQUASH_BODY_FILE=value, draft=True, merge_state="BEHIND")
+                self.assertEqual((code, out, log), (2, stop, []))
+        path = self.lock_path(self.nas)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with open(path, "a", encoding="utf-8") as held:
+            fcntl.flock(held, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            code, out, log = self.land(self.nas, SQUASH_BODY_FILE="-")
+        self.assertEqual((code, out, log), (2, stop, []), "the check comes before the lock")
 
 
 # ---------------------------------------------------------------------------------------------- 8. review_normalize.py
