@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 import sys
 import time
+import types
 import unittest
 from unittest.mock import Mock,patch
 
@@ -17,7 +18,13 @@ import runner
 
 class StreamBackpressure(unittest.IsolatedAsyncioTestCase):
     def port(self,**kwargs):
-        with patch.object(t,'_sdk_client',return_value=Mock()),patch.object(t,'_stream_classes',return_value=(Mock,Mock)):
+        enums=types.ModuleType('alpaca.data.enums')
+        enums.DataFeed=lambda value:value
+        stubs={'alpaca':types.ModuleType('alpaca'),'alpaca.data':types.ModuleType('alpaca.data'),
+               'alpaca.data.enums':enums}
+        with patch.dict(sys.modules,stubs),patch.object(t,'_sdk_client',return_value=Mock()), \
+                patch.object(t,'_protocol_factory',return_value=None), \
+                patch.object(t,'_stream_classes',return_value=(Mock,Mock)):
             port=t.AlpacaPaperTransport('fixture-key','fixture-secret',['SPY'],
                 before_request=lambda *a,**k:None,before_submit=lambda *a:None,
                 sink_observation=lambda *a:None,**kwargs)

@@ -13473,8 +13473,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/recovery.py",
-      "sha256": "b981de3c78f8fc5e29fbc49d8aeb158d3a6759155a267f128084c1b8636b94ef",
-      "bytes": 18561
+      "sha256": "999de26090de0c6baf8a767be06c500ae6dc9d27e020171c4c2b445dbc87ef74",
+      "bytes": 18588
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/registry.json",
@@ -13528,7 +13528,7 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "3d50b17705fef29c0d6c41fe7816f973692ec6bf6daf1b3d11b43c1e4123826a",
+      "sha256": "a284e1912bbccd71de78e1f5b935bd449b56a1aeccf0e16821da49aa8528f471",
       "bytes": 9996
     },
     {
@@ -19153,8 +19153,8 @@
     },
     {
       "path": "docs/decisions/2026-10-13-paper-stream-backpressure.md",
-      "sha256": "5c0c4c72f967bbd0ac5474df17f4140b3735e451088739f68da83ab6b0d97e67",
-      "bytes": 4949
+      "sha256": "31e5740d0f0ff4e58b0e62ab01fc05a17155c3fe9dadb8fecf69d8d444728a37",
+      "bytes": 5607
     },
     {
       "path": "docs/decisions/2026-10-13-plugin-skill-identity.md",
@@ -62278,8 +62278,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_recovery.py",
-      "sha256": "688e23f102249d170bf03d6a8d06196a42472cea049453228e4831a436c602ce",
-      "bytes": 45949
+      "sha256": "5956e41c720abc3f07376ffcbaf6f0ad7194e3c67203aae16c014d1c7bbc9af5",
+      "bytes": 46666
     },
     {
       "path": "tests/test_adaptive_paper_runner.py",
@@ -62318,8 +62318,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_stream_backpressure.py",
-      "sha256": "7303f2052c4327894cf34f2c46a97d06c0199c651da8188eada22df63ce82353",
-      "bytes": 8140
+      "sha256": "4dce317a3af63b5e5119b058d643a7ed980c2a804b9f522020480ed7ffd68851",
+      "bytes": 8509
     },
     {
       "path": "tests/test_adaptive_paper_transport.py",

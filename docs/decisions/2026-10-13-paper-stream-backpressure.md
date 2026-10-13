@@ -76,6 +76,16 @@ owner loop, all four channels, timeout and shutdown, cancellation, healthy
 no-signal status, frozen status and recovery/phase/exit composition.
 These tests do not demonstrate real feed throughput or broker readiness.
 
+The first local read reproduced two gaps, corrected in one review commit.
+The constructor fixture now scopes the SDK DataFeed import and protocol
+factory as well as clients/streams, following the existing SDK-free transport
+fixture. All nine stream tests run in the SDK-free validation interpreter.
+Recovery treats queue_enqueue_cancelled as observation-integrity loss,
+alongside queue_overflow, before cancellation or residual sells. A real
+Ledger/fake-port regression injects the reason after a snapshot: the old
+head submits an exit and reports passed; the correction submits no exit and
+returns needs_attention with recovery_observation_integrity_lost.
+
 Follow-ups: measure owner-loop startup latency and queue occupancy on a
 new pinned paper run; distinguish synchronous startup from sink delay;
 measure sustained backpressure and SDK reconnect behavior. Raising the

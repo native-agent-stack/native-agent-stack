@@ -413,6 +413,22 @@ class RecoveryTests(unittest.TestCase):
         result = self.recover()
         self.assertEqual(result["status"], "passed")
 
+    def test_cancelled_enqueue_after_snapshot_refuses_any_residual_exit(self):
+        self.original_buy()
+        original_snapshot = self.port.snapshot
+
+        async def snapshot_with_event_loss():
+            snapshot = await original_snapshot()
+            self.port.health["reasons"] = ["queue_enqueue_cancelled"]
+            return snapshot
+
+        with patch.object(self.port, "snapshot", side_effect=snapshot_with_event_loss):
+            result = self.recover()
+        self.assertEqual(result["status"], "needs_attention")
+        self.assertIn("recovery_observation_integrity_lost", result["errors"])
+        self.assertEqual(self.port.submissions, [])
+        self.assertEqual(self.port.cancelled, [])
+
     def test_receipt_carries_the_message_and_its_context(self):
         # 2026-10-06 (the command center's item for account 2): `errors` keeps the code; `error_details` adds the
         # message and the chained or suppressed context, with home paths and long tokens redacted

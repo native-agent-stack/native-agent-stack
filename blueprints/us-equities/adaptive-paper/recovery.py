@@ -181,7 +181,7 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
         # using a fresh quote. Event loss/identity conflicts cannot: a stream sink
         # may detect these before invoking our order callback.
         reasons = set(getattr(port, "health", {}).get("reasons", []))
-        if reasons & {"callback_failure", "queue_overflow", "client_id_collision",
+        if reasons & {"callback_failure", "queue_overflow", "queue_enqueue_cancelled", "client_id_collision",
                       "snapshot_incomplete", "replay_unresolved"}:
             raise SafetyError("recovery_observation_integrity_lost")
 
