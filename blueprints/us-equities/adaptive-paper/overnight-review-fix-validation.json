@@ -1,0 +1,198 @@
+{
+  "evidence_class": "synthetic",
+  "fix_parent": "2658e7b8b8dc526d037eaac33574e7681558de82",
+  "functional_fail_before": {
+    "assertion_failures": 18,
+    "base": "2658e7b8b8dc526d037eaac33574e7681558de82",
+    "errors": 0,
+    "output_bytes": 19381,
+    "output_sha256": "b380b32b0dc9b5c73eb1685df80aea5d257e51fbe76d308518f2df3be15a118f",
+    "path": "evidence/artifacts/overnight-arming-20261013/review-fix/review-parent-2658-final-red.sanitized.txt",
+    "published_log": "evidence/artifacts/overnight-arming-20261013/review-fix/review-parent-2658-final-red.sanitized.txt",
+    "tests_run": 10
+  },
+  "initial_failed_run": {
+    "errors": 0,
+    "explanation": "Non-reproducing short-trial timing failure; code not changed for it. Isolated case passed on head and exact 9cb; related repeat passed. No claim the initial run passed.",
+    "failures": 1,
+    "output_bytes": 25524,
+    "output_sha256": "e5113c3ab785edd6cc9c43f9ef83cd4b9a70602af729c8acabb37d8fb6995a16",
+    "path": "evidence/artifacts/overnight-arming-20261013/review-fix/review-functional-native-related.sanitized.txt",
+    "published_log": "evidence/artifacts/overnight-arming-20261013/review-fix/review-functional-native-related.sanitized.txt",
+    "test": "IntegratedRunner.test_native_adaptive_policy_reaches_ledger_and_flat_reconciliation",
+    "tests_run": 547
+  },
+  "input_hashes": {
+    ".gitleaks.toml": "dfef1ed7a1be7f8a7146f8a84bf2be050a431b9be3f04aabb9c1981bbdaeec24",
+    "blueprints/us-equities/adaptive-paper/native_strategy.py": "769b5084a2e0ae9597d650a3a54e18f46074a4ee5371301d4fcadfeb2c70613a",
+    "blueprints/us-equities/adaptive-paper/overnight.py": "fa3917d5a423bd873dd6f64805bd4755c1b0da6de132911906f7267476a22c1d",
+    "blueprints/us-equities/adaptive-paper/recovery.py": "7eb26ce910f35e9e820c8320a7e806c9932ad04eab7093ed2c71a4307de6381a",
+    "blueprints/us-equities/adaptive-paper/runner.py": "e708e8275c63c8a0cda226c7575916045642fb2c3de3ba393be482a8e92fbdbe",
+    "blueprints/us-equities/adaptive-paper/source-hashes.json": "3f835b3bb6b3a394907241a76c02d7be1547c49c4aa480569f56382eab4461eb",
+    "blueprints/us-equities/adaptive-paper/transport.py": "76af68629b6792801f2bd07c514e470d77cbd32eb52e666ac7177cdd35469bf3",
+    "scripts/published_preimages.py": "86f47a20e287fc433f901c1c9ee71e1bad58ce22cb42e391e2747b8e08987e59",
+    "tests/test_adaptive_paper_overnight_guard_pins.py": "eaab736bb6bd9c6a6ffdd5dae076b4f71af5155808db77fecce12d4f0e316aad",
+    "tests/test_adaptive_paper_overnight_transition.py": "2dbd14ff97713792e6c2d3a501ff214960aaff0577957fb03686a01cdb941003",
+    "tests/test_gitleaks_config.py": "3802dff4c595d1d2531c58e43233728d1f71241fa3ee4852b8cf767e39719314",
+    "tests/test_overnight_published_preimages.py": "920f59dcd3b84f3be965cebd784d17f11111bd51103172171ba1645ca5e062c7"
+  },
+  "isolated_timing_checks": [
+    {
+      "command": "idle isolated legacy timing case at fix source",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 2.673,
+      "exit_code": 0,
+      "output_bytes": 191,
+      "output_sha256": "370c4a333d3677a76a0b75db8f44644a659eb701fab039bad71a985f459ae7a1",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-fix/review-native-timing-head-alone.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-fix/review-native-timing-head-alone.sanitized.txt",
+      "skipped": 0,
+      "tests_run": 1
+    },
+    {
+      "command": "idle isolated legacy timing case at exact 9cb",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 2.503,
+      "exit_code": 0,
+      "output_bytes": 191,
+      "output_sha256": "f5b682fce7ffa4680613ecefb218d1c201881e1350f3adf681498d6f5c4fee12",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-fix/review-native-timing-base-alone.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-fix/review-native-timing-base-alone.sanitized.txt",
+      "skipped": 0,
+      "tests_run": 1
+    }
+  ],
+  "limitations": [
+    "Synthetic fixture observations and broker ports only; no broker or paper acceptance.",
+    "Related native repeat ran before the final test-only split/held-exit extension; the separate final native/CI shards exercise final tests. Production mechanism unchanged between these runs.",
+    "Historical receipts bind published sanitized logs and separately published public historical source preimages.",
+    "Standing halt delivery outside OVERNIGHT still requires owning-lane native acceptance."
+  ],
+  "mutations": {
+    "F1_F4_plans_preserved": 19,
+    "assertion_failures": 16,
+    "errors": 0,
+    "killed": 7,
+    "original_overnight_plans_preserved": 37,
+    "survived": 0,
+    "transition_plans": 7
+  },
+  "paper_acceptance": "NOT_RUN",
+  "privacy_fail_before": {
+    "assertion_failures": 2,
+    "base": "9cb7c0d3338af2689ca7e489ac06e95873bf3848",
+    "errors": 0,
+    "output_bytes": 3607,
+    "output_sha256": "3de81b2bee2c1d8c6690903786d14421de0f52f300be7ff8b3cafdd22e61e25b",
+    "path": "evidence/artifacts/overnight-arming-20261013/review-fix/privacy-red-exact-9cb-record-scope.sanitized.txt",
+    "published_log": "evidence/artifacts/overnight-arming-20261013/review-fix/privacy-red-exact-9cb-record-scope.sanitized.txt",
+    "receipt_scope": "only original arming receipt published at that head",
+    "tests_run": 3
+  },
+  "publication": {
+    "old_retained_log_rows_sanitized": 13,
+    "policy": "A receipt digest must resolve to bytes inside the git publication inventory; host-local preimages are refused",
+    "raw_private_digest_values_retained": false,
+    "redactor": "scripts/host_receipts.py:sanitize; home-prefix and old private-digest-prefix purging"
+  },
+  "runs": [
+    {
+      "command": "idle scope pinned native/runtime read lock: affected+related modules",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 292.515,
+      "exit_code": 0,
+      "output_bytes": 11584,
+      "output_sha256": "dc857324991fbec6c45236bc3fa274bbe3228eca6ccd7dc19d83a964abd7b3a1",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-fix/review-native-related-repeat.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-fix/review-native-related-repeat.sanitized.txt",
+      "skipped": 0,
+      "tests_run": 547
+    },
+    {
+      "command": "idle scope pinned native/runtime read lock: final split boundary+publication modules",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 7.031,
+      "exit_code": 0,
+      "output_bytes": 699,
+      "output_sha256": "afa6de9a7f98c369033a645d6771ac5e12932210c5a0e31c9d34d85c39c14bbd",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-fix/review-final-transition-native.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-fix/review-final-transition-native.sanitized.txt",
+      "skipped": 0,
+      "tests_run": 11
+    },
+    {
+      "command": "idle env-i CPython3.12.3: final transition+arming+F1-F4+old mutants+recovery+publication",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 48.975,
+      "exit_code": 0,
+      "output_bytes": 5802,
+      "output_sha256": "6c19cb8a58b9acd6755a421102bca537ce7214c4857db8eab3ce31c07966a93f",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-fix/review-functional-ci-final.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-fix/review-functional-ci-final.sanitized.txt",
+      "skipped": 2,
+      "tests_run": 138
+    },
+    {
+      "command": "idle PUBLISHED_DIGEST_GUARD_HOST_NAMES=1: repository published-digest module plus new publication module",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 30.809,
+      "exit_code": 0,
+      "output_bytes": 194,
+      "output_sha256": "aacebebe98e56ac540ae565489849da91a49c05b0d5bbf34629b694ee8aa96cf",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-fix/review-published-digest-guard.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-fix/review-published-digest-guard.sanitized.txt",
+      "skipped": 0,
+      "tests_run": 18
+    },
+    {
+      "command": "idle: publication-inventory tests before historical-map extension",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 0.051,
+      "exit_code": 0,
+      "output_bytes": 192,
+      "output_sha256": "8a0ab1f280f5f50c9972f7a84ce9028801db190658604d2b37bec403488e429b",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-fix/review-publication-inventory-final.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-fix/review-publication-inventory-final.sanitized.txt",
+      "skipped": 0,
+      "tests_run": 3
+    },
+    {
+      "command": "idle: final publication inventory and all historical-map digest preimages",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 0.051,
+      "exit_code": 0,
+      "output_bytes": 193,
+      "output_sha256": "3289ab1b1b6f01e5e4c36fe9475c98e4e13c267215a39f85f1a32078f3cceeaf",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-fix/review-snapshot-publication-final.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-fix/review-snapshot-publication-final.sanitized.txt",
+      "skipped": 0,
+      "tests_run": 3
+    },
+    {
+      "command": "idle: exact historical hash-map scanner scopes retain credential and other-path detection",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 0.481,
+      "exit_code": 0,
+      "output_bytes": 192,
+      "output_sha256": "511e9a0a6df6d3cd079ee745437cf457d1ca4ad598cff63f0b2225b2200b554c",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-fix/review-gitleaks-historical-scopes.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-fix/review-gitleaks-historical-scopes.sanitized.txt",
+      "skipped": 0,
+      "tests_run": 1
+    },
+    {
+      "command": "idle: complete native gitleaks context-restriction regression class",
+      "digest_scope": "sanitized published bytes",
+      "elapsed_seconds": 25.778,
+      "exit_code": 0,
+      "output_bytes": 195,
+      "output_sha256": "f42eb49cf942bb53c5290839adbfc4972379e6510b8c10c9f2b939a61092892b",
+      "path": "evidence/artifacts/overnight-arming-20261013/review-fix/review-gitleaks-config-full.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/review-fix/review-gitleaks-config-full.sanitized.txt",
+      "skipped": 0,
+      "tests_run": 31
+    }
+  ],
+  "schema_version": 1,
+  "scope": "Cross-family same-controller exit, recovery, halt delivery, polling and published-preimage corrections"
+}

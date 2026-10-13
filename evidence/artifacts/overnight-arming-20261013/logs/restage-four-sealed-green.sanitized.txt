@@ -1,0 +1,9 @@
+test_stale_overnight_entry_keeps_native_node_and_other_position_alive (tests.test_adaptive_paper_runner.IntegratedRunner.test_stale_overnight_entry_keeps_native_node_and_other_position_alive) ... ok
+test_held_overnight_native_reduce_only_exit_routes_in_pre (tests.test_adaptive_paper_runner.IntegratedRunner.test_held_overnight_native_reduce_only_exit_routes_in_pre) ... ok
+test_pre_entry_remains_refused (tests.test_adaptive_paper_overnight_arming.OvernightArming.test_pre_entry_remains_refused) ... ok
+test_overnight_recovery_outside_overnight_exits_owned_position (tests.test_adaptive_paper_recovery.RecoveryTests.test_overnight_recovery_outside_overnight_exits_owned_position) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 2.043s
+
+OK

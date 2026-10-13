@@ -961,6 +961,15 @@ class Controller:
         # latch when present so an explicit diagnostic path cannot bypass it.
         return {"stop_file": DEFAULT_STOP if DEFAULT_STOP.exists() else self.stop_file}
 
+    def refresh_exit_session(self, now=None):
+        """Refresh market availability only; immutable carry and cleanup stay fixed."""
+        if getattr(self.port, "overnight_enabled", False) is True:
+            now = self.clock() if now is None else now
+            self.close, self.market_open = _controller_session(self.close, now,
+                {"extended_hours": True, "overnight_enabled": True,
+                 "flatten_minutes_before_pre": self.port.flatten_minutes_before_pre})
+        return self.close, self.market_open
+
     async def before_request(self, kind, client_id=None):
         if kind == "data_read":
             return
@@ -973,6 +982,8 @@ class Controller:
                 self._check_overnight_status(intent.symbol)
                 if getattr(self.port, "overnight_enabled", False) is True:
                     self._check_overnight_admission(intent.symbol, self.clock(), intent.side)
+                    if intent.side == "sell":
+                        self.refresh_exit_session()
                 self.ledger.validate_pending(client_id, quote=self.quotes[intent.symbol], now=self.clock(),
                                              market_open=self.market_open, session_close=self.close,
                                              **self._stop_options())
@@ -1012,6 +1023,8 @@ class Controller:
             quote = self.quotes.get(order["symbol"])
             if quote is None:
                 raise SafetyError("no_current_quote")
+            if order["side"] == "sell":
+                self.refresh_exit_session()
             intent = self.ledger.reserve_intent(order["client_order_id"], order["symbol"], order["side"],
                                                 order["qty"], order["limit_price"], quote=quote,
                                                 now=self.clock(), market_open=self.market_open,
@@ -1115,6 +1128,7 @@ class Controller:
         """Cutoff/halt cancellation is independent of repricing exemptions."""
         if getattr(self.port, "overnight_enabled", False) is not True:
             return False
+        self.refresh_exit_session(now)
         windows = self.ledger.overnight_windows()
         from overnight import overnight_bounds
         try:
@@ -2988,6 +3002,7 @@ def main():
                     is_final_boundary = _final_boundary_from_run_status(outcome)
                     if must_end_flat(session_policy, is_final_boundary=is_final_boundary):
                         controller.port = fresh_port(True)
+                        controller.refresh_exit_session()
                         recovery = await recover(controller, metadata, config)
                         outcome = _apply_forced_recovery_outcome(outcome, recovery)
                     else:

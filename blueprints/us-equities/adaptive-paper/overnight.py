@@ -133,7 +133,7 @@ class BoatsQuoteSource:
         # Join this source's bounded workers before the port closes their Sessions.
         await asyncio.to_thread(self.executor.shutdown, wait=True, cancel_futures=True)
 
-    async def sweep(self, now):
+    async def sweep(self, now, *, symbols=None, on_asset=None, on_quote=None):
         async def one(symbol):
             if now < self.retry_at.get(symbol, 0):
                 return None
@@ -142,6 +142,8 @@ class BoatsQuoteSource:
                     if now - self.asset_at.get(symbol, float("-inf")) >= self.asset_timeout:
                         self.assets[symbol] = await self._read(self.asset_read, symbol)
                         self.asset_at[symbol] = now
+                        if on_asset is not None:
+                            on_asset(self.assets[symbol])
                     asset = self.assets[symbol]
                     quote = await self._read(self.quote_read, symbol)
                 except Exception as error:
@@ -160,5 +162,7 @@ class BoatsQuoteSource:
                 self.retry_at.pop(symbol, None)
                 row = {"symbol": symbol, "asset": asset, "quote": quote}
                 self.last[symbol] = row
+                if on_quote is not None:
+                    on_quote(row)
                 return row
-        return [row for row in await asyncio.gather(*(one(s) for s in self.symbols)) if row is not None]
+        return [row for row in await asyncio.gather(*(one(s) for s in (self.symbols if symbols is None else symbols))) if row is not None]

@@ -1,0 +1,76 @@
+adaptive-paper metrics exporter listening on http://127.0.0.1:57521/metrics (read-only; ledger=/var/tmp/ns-seeds-overnight-arming-20261013/tmprf2lrivq/ledger.sqlite3; file_sd=/var/tmp/ns-seeds-overnight-arming-20261013/tmprf2lrivq/config/adaptive-paper-targets.json)
+adaptive-paper metrics exporter 127.0.0.1:57521 deregistered
+~/code/gh-resolution-20261003/uv-python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmpd7a0fqme'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/code/gh-resolution-20261003/uv-python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmpmv46_dsg'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/code/gh-resolution-20261003/uv-python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmpdc96rvuv'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/code/gh-resolution-20261003/uv-python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmp3vzfncro'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/code/gh-resolution-20261003/uv-python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmprfsyso4i'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/code/gh-resolution-20261003/uv-python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmpl4ofsvep'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/code/gh-resolution-20261003/uv-python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmpmnkppaa0'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/code/gh-resolution-20261003/uv-python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmply36oxmx'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/code/gh-resolution-20261003/uv-python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmp60loztme'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/code/gh-resolution-20261003/uv-python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmp51o8gl8d'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/code/gh-resolution-20261003/uv-python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmphfm41zu_'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/code/gh-resolution-20261003/uv-python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmp__6mdnzh'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/code/gh-resolution-20261003/uv-python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmpdk0e7_8e'>
+  _warnings.warn(warn_message, ResourceWarning)
+~/code/gh-resolution-20261003/uv-python/cpython-3.12.3-linux-x86_64-gnu/lib/python3.12/tempfile.py:936: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/tmp/ns-seeds-overnight-arming-20261013/tmpsxp72hj9'>
+  _warnings.warn(warn_message, ResourceWarning)
+refused: canonical runtime lock unavailable
+refused: canonical runtime lock unavailable
+----------------------------------------------------------------------
+Ran 1511 tests in 145.898s
+
+OK (skipped=439)
+
+real mutation-kill report (subprocess-executed, pristine-baseline-verified):
+  allow_ancestor_writable_without_sticky: KILLED (test_ids=['tests.test_adaptive_paper_credential_race.AncestorRenameResistance.test_attacker_writable_non_sticky_ancestor_is_rejected_even_when_the_parent_is_fine'], returncode=1, diff_lines=11)
+  disable_hardlink_check: KILLED (test_ids=['tests.test_adaptive_paper_runner.CredentialFilePermissions.test_hard_link_is_rejected'], returncode=1, diff_lines=11)
+  disable_o_nofollow: KILLED (test_ids=['tests.test_adaptive_market_research.MarketResearchCredentialFilePermissions.test_symlink_is_rejected'], returncode=1, diff_lines=22)
+  disable_o_nonblock: KILLED (test_ids=['tests.test_adaptive_paper_runner.CredentialFilePermissions.test_fifo_is_rejected_and_does_not_hang'], returncode=1, diff_lines=11)
+  disable_parent_directory_check: KILLED (test_ids=['tests.test_adaptive_paper_runner.CredentialFilePermissions.test_world_writable_parent_directory_is_rejected'], returncode=1, diff_lines=11)
+  disable_root_ancestor_check: KILLED (test_ids=['tests.test_adaptive_paper_credential_race.RootDirectoryOwnershipIsChecked.test_foreign_owned_world_writable_root_is_rejected'], returncode=1, diff_lines=19)
+  disable_runner_size_check: KILLED (test_ids=['tests.test_adaptive_paper_runner.CredentialFilePermissions.test_oversized_file_is_rejected_not_silently_truncated_and_accepted'], returncode=1, diff_lines=11)
+  disable_worktree_check: KILLED (test_ids=['tests.test_adaptive_paper_runner.CredentialFilePermissions.test_inside_git_worktree_is_rejected'], returncode=1, diff_lines=10)
+  double_close_on_bufferedreader_failure: KILLED (test_ids=['tests.test_adaptive_paper_credential_race.FdOpenFailureCleanup.test_wrap_failure_does_not_double_close_a_reused_fd'], returncode=1, diff_lines=9)
+  extra_close_after_raw_close: KILLED (test_ids=['tests.test_adaptive_paper_credential_race.FdOpenFailureCleanup.test_wrap_failure_does_not_double_close_a_reused_fd'], returncode=1, diff_lines=8)
+  narrow_symlink_component_exception_handler: KILLED (test_ids=['tests.test_adaptive_paper_credential_race.NoPathLeakInErrors.test_surrogate_in_an_ancestor_directory_component_never_leaks'], returncode=1, diff_lines=11)
+  normalize_dotdot_lexically: KILLED (test_ids=['tests.test_adaptive_paper_credential_race.DotDotIsRejected.test_dotdot_through_a_symlinked_component_is_refused_not_normalized_away'], returncode=1, diff_lines=13)
+  read_whole_file_market_research: KILLED (test_ids=['tests.test_adaptive_paper_credential_race.BoundedReadIsActuallyBounded.test_market_research_reads_at_most_cap_plus_one'], returncode=1, diff_lines=11)
+  revert_strict_parent_rule: KILLED (test_ids=['tests.test_adaptive_paper_credential_race.ImmediateParentStrictRule.test_sticky_1777_parent_is_refused'], returncode=1, diff_lines=28)
+  skip_fstat_owner_identity: KILLED (test_ids=['tests.test_adaptive_paper_credential_race.ForeignFileOwnerAloneIsRejected.test_foreign_file_owner_is_rejected_with_a_correctly_owned_parent'], returncode=1, diff_lines=11)
+  skip_fstat_use_prestat: KILLED (test_ids=['tests.test_adaptive_paper_credential_race.FstatNotPathnameStat.test_rejection_uses_the_fds_own_metadata_not_a_pathname_restat'], returncode=1, diff_lines=24)
+  worktree_final_path_by_name: KILLED (test_ids=['tests.test_adaptive_paper_credential_race.HookInjectedRaces.test_worktree_marker_added_just_before_ancestor_open_is_caught_by_the_per_fd_check'], returncode=1, diff_lines=11)
+{"status": "completed_no_signals", "flat": true, "evidence_class": "exploratory"}
+{"status": "completed_no_signals", "flat": true, "native_fill_events": 0}
+{"status": "not_started", "stage": "validation", "reason": "scan_stale", "orders_submitted": 0}
+{"status": "not_started", "stage": "validation", "reason": "scan_empty", "orders_submitted": 0}
+{"status": "not_started", "stage": "validation", "reason": "scan_from_future", "orders_submitted": 0}
+overnight_guard_mutations 37 killed_by_assertions 118 secondary_errors 2
+{"status": "not_started", "reason": "promotion_gate_failed_check", "orders_submitted": 0}
+{"status": "not_started", "reason": "promotion_gate_missing", "orders_submitted": 0}
+{"status": "not_started", "reason": "promotion_gate_missing", "orders_submitted": 0}
+{"status": "not_started", "reason": "promotion_gate_failed", "orders_submitted": 0}
+{"status": "not_started", "reason": "promotion_gate_mismatch", "orders_submitted": 0}
+{"status": "not_started", "reason": "promotion_gate_empty", "orders_submitted": 0}
+{"status": "not_started", "reason": "account_not_ready", "orders_submitted": 0}
+{"status": "ready", "orders_submitted": 0}
+{"status": "ready", "orders_submitted": 0}
+{"status": "not_started", "stage": "order_contract", "reason": "order_contract_boundary_inactive:invalid_sentinel_accepted", "orders_submitted": 0}
+{"status": "not_started", "stage": "order_contract", "reason": "order_contract_boundary_inactive:invalid_sentinel_accepted", "orders_submitted": 0}
+{"status": "not_started", "stage": "order_contract", "reason": "order_contract_boundary_inactive:invalid_sentinel_accepted", "orders_submitted": 0}
+{"status": "not_started", "reason": "clean_native_start_requires_flat_account", "orders_submitted": 0}
+{"status": "not_started", "reason": "clean_native_start_requires_flat_account", "orders_submitted": 0}
+{"status": "not_started", "reason": "clean_native_start_requires_flat_account", "orders_submitted": 0}

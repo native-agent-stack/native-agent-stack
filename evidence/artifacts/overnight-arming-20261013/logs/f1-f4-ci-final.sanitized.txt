@@ -1,0 +1,25 @@
+Running as unit: run-p744696-i155598760.scope; invocation ID: 35b2598ef4f6452a93316b2242c390bd
+----------------------------------------------------------------------
+Ran 15 tests in 8.809s
+
+OK (skipped=2)
+followup_mutant M2-reserve assertion_failures 1 errors 0
+followup_mutant M3-wire assertion_failures 1 errors 0
+followup_mutant M4-admission assertion_failures 1 errors 0
+followup_mutant M6-emitter assertion_failures 1 errors 0
+followup_mutant M8-active assertion_failures 1 errors 0
+followup_mutant M8-tradable assertion_failures 1 errors 0
+followup_mutant M9-halt assertion_failures 1 errors 0
+followup_mutant M10-window assertion_failures 1 errors 0
+followup_mutant M11-normalize assertion_failures 1 errors 0
+followup_mutant M15-preflight assertion_failures 3 errors 0
+followup_mutant F1-adaptive-direct assertion_failures 1 errors 0
+followup_mutant F1-adaptive-replacement assertion_failures 1 errors 0
+followup_mutant F3-admission-side assertion_failures 1 errors 0
+followup_mutant F3-admission-owned assertion_failures 1 errors 0
+followup_mutant F3-admission-calendar assertion_failures 1 errors 0
+followup_mutant M2-reserve+M3-wire assertion_failures 2 errors 0
+followup_mutant M2-reserve+M4-admission assertion_failures 2 errors 0
+followup_mutant M3-wire+M4-admission assertion_failures 2 errors 0
+followup_mutant M2-reserve+M3-wire+M4-admission assertion_failures 3 errors 0
+followup_mutants_killed 19 survived 0

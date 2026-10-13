@@ -1,0 +1,533 @@
+diff --git a/tests/test_adaptive_paper_overnight_order_contract.py b/tests/test_adaptive_paper_overnight_order_contract.py
+new file mode 100644
+index 000000000..e52f1bf0b
+--- /dev/null
++++ b/tests/test_adaptive_paper_overnight_order_contract.py
+@@ -0,0 +1,527 @@
++"""Synthetic OVERNIGHT order contract; no SDK, broker, credentials or arming.
++
++Alpaca's Orders at Alpaca contract, captured in the builder brief: extended
++orders are LIMIT with DAY/GTC, and broker trailing stops do not trigger outside
++RTH. SDK vocabulary: alpacahq/alpaca-py cc4cb3b7ba50ae250e621983c2779047fb16bb28,
++alpaca/trading/enums.py (OrderType, OrderClass, TimeInForce).
++The public pure overnight.py seam is supplied by the primary builder.
++"""
++import asyncio
++from dataclasses import replace
++from datetime import date, datetime, time as time_of_day
++from decimal import Decimal
++from pathlib import Path
++from types import SimpleNamespace
++import importlib
++import importlib.util
++import sys
++import unittest
++from unittest.mock import Mock, patch
++from zoneinfo import ZoneInfo
++
++SOURCE=Path(__file__).resolve().parents[1]/"blueprints/us-equities/adaptive-paper"
++sys.path.insert(0,str(SOURCE))
++import exits
++import feeds
++import runner
++import sessions
++import transport
++from safety import Quote, SafetyError
++from strategies import PolicyConfig
++from tests.adaptive_paper_hermetic import patch_default_stop, restore_default_stop
++
++NY=ZoneInfo("America/New_York")
++_STOP_TOKEN=None
++
++
++def setUpModule():
++    global _STOP_TOKEN
++    _STOP_TOKEN=patch_default_stop()
++
++
++def tearDownModule():
++    restore_default_stop(_STOP_TOKEN)
++
++
++def order(**changes):
++    return {"client_order_id":"offline-overnight-1","symbol":"SPY","side":"sell",
++            "qty":"1","limit_price":"99.98","type":"limit","time_in_force":"day",
++            "extended_hours":True,"order_class":"simple",**changes}
++
++
++def policy_config():
++    return PolicyConfig(symbols=("SPY","QQQ","IWM","DIA"),max_positions=4)
++
++
++def basic_contract():
++    path=SOURCE.parent/"order-contract"/"order_contract.py"
++    spec=importlib.util.spec_from_file_location("overnight_basic_order_contract",path)
++    module=importlib.util.module_from_spec(spec)
++    spec.loader.exec_module(module)
++    return module
++
++
++class OvernightBrokerOrderShape(unittest.TestCase):
++    def guard(self,payload):
++        return importlib.import_module("overnight").check_overnight_order(payload)
++
++    def refused(self,payload):
++        with self.assertRaises(ValueError) as caught:
++            self.guard(payload)
++        self.assertEqual(str(caught.exception),"overnight_order_contract_refused")
++
++    def test_limit_day_and_gtc_are_the_only_extended_order_shapes(self):
++        for side in ("buy","sell"):
++            for tif in ("day","gtc"):
++                with self.subTest(side=side,tif=tif):
++                    payload=order(side=side,time_in_force=tif)
++                    before=dict(payload)
++                    self.guard(payload)
++                    self.assertEqual(payload,before)
++
++    def test_non_object_payloads_are_refused_with_the_contract_reason(self):
++        for payload in (None,[],(),"limit",True):
++            with self.subTest(payload=payload):
++                self.refused(payload)
++
++    def test_every_non_limit_type_is_refused_including_broker_trailing_stop(self):
++        for value in ("market","stop","stop_limit","trailing_stop","LIMIT",None):
++            for tif in ("day","gtc"):
++                with self.subTest(order_type=value,tif=tif):
++                    self.refused(order(type=value,time_in_force=tif))
++
++    def test_every_other_time_in_force_is_refused(self):
++        for value in ("ioc","fok","opg","cls","gtd","DAY","GTC",None,""):
++            with self.subTest(tif=value):
++                self.refused(order(time_in_force=value))
++
++    def test_bracket_oco_and_oto_do_not_become_simple_extended_orders(self):
++        for value in ("bracket","oco","oto",None,""):
++            with self.subTest(order_class=value):
++                self.refused(order(order_class=value))
++
++    def test_extended_hours_must_be_literal_true(self):
++        for value in (False,None,0,1,"true","false"):
++            with self.subTest(flag=value):
++                self.refused(order(extended_hours=value))
++
++    def test_nested_stop_bracket_and_trailing_fields_cannot_be_smuggled_into_a_simple_limit(self):
++        for field in ("take_profit","stop_loss","trail_price","trail_percent","legs"):
++            with self.subTest(field=field):
++                self.refused(order(**{field:{"synthetic":"field"}}))
++
++    def test_legacy_transport_keeps_its_day_only_subset(self):
++        payload=order()
++        payload.pop("order_class")
++        self.assertTrue(transport.normalize_intent(payload,{"SPY"},allow_extended_hours=True)["extended_hours"])
++        for changed in ({"time_in_force":"gtc"},{"type":"trailing_stop"},{"extended_hours":1}):
++            with self.subTest(changed=changed),self.assertRaises(transport.TransportError) as caught:
++                transport.normalize_intent({**payload,**changed},{"SPY"},allow_extended_hours=True)
++            self.assertEqual(str(caught.exception),"only owned DAY limits with whole-share entries are supported")
++        for advanced in ("order_class","stop_loss","take_profit","legs"):
++            with self.subTest(field=advanced),self.assertRaises(transport.TransportError) as caught:
++                transport.normalize_intent({**payload,advanced:"bracket"},{"SPY"},allow_extended_hours=True)
++            self.assertEqual(str(caught.exception),"unsupported order fields")
++
++
++class OvernightCalendarAndFeedContract(unittest.TestCase):
++    def test_session_boundaries_and_extended_flag_are_half_open(self):
++        cases=(
++            (datetime(2026,3,9,19,59,59,tzinfo=NY),"POST",True),
++            (datetime(2026,3,9,20,0,tzinfo=NY),"OVERNIGHT",True),
++            (datetime(2026,3,10,3,59,59,tzinfo=NY),"OVERNIGHT",True),
++            (datetime(2026,3,10,4,0,tzinfo=NY),"PRE",True),
++            (datetime(2026,3,10,10,0,tzinfo=NY),"RTH",False),
++            (datetime(2026,3,13,20,0,tzinfo=NY),"CLOSED",False),
++        )
++        for stamp,kind,extended in cases:
++            with self.subTest(stamp=stamp):
++                self.assertEqual(sessions.session_at(stamp).kind.value,kind)
++                self.assertIs(sessions.order_extended_hours_flag(stamp,{"extended_hours":True}),extended)
++                self.assertFalse(sessions.order_extended_hours_flag(stamp,{"extended_hours":False}))
++
++    def test_full_holiday_weekend_and_unclassifiable_times_never_create_an_order_window(self):
++        for stamp in (datetime(2026,3,14,22,0,tzinfo=NY),
++                      datetime(2026,4,2,21,0,tzinfo=NY)):
++            with self.subTest(stamp=stamp):
++                self.assertEqual(sessions.session_at(stamp).kind.value,"CLOSED")
++                with self.assertRaises(ValueError) as caught:
++                    sessions.extended_session_close(stamp)
++                self.assertEqual(str(caught.exception),"no_active_extended_session")
++
++    def test_fresh_boats_vocabulary_does_not_qualify_an_sdk_stream_or_delayed_feed(self):
++        self.assertTrue(feeds.is_qualified_feed("boats"))
++        for feed,reason in (("boats","boats_stream_unqualified_sdk"),
++                            ("overnight","unqualified_data_feed")):
++            with self.subTest(feed=feed),self.assertRaises(ValueError) as caught:
++                feeds.require_qualified_stream(feed)
++            self.assertEqual(str(caught.exception),reason)
++
++
++class OvernightEnvelopeExtension(unittest.TestCase):
++    def test_day_gtc_extension_keeps_an_offline_envelope_and_requires_explicit_opt_in(self):
++        contract=basic_contract()
++        for tif in ("day","gtc"):
++            payload=order(time_in_force=tif)
++            envelope=contract.build_envelope(payload,extended_hours_allowed=True,overnight_allowed=True)
++            self.assertEqual(envelope["mode"],"offline")
++            self.assertFalse(envelope["submission_enabled"])
++            self.assertEqual(envelope["intent"]["time_in_force"],tif)
++            self.assertEqual(envelope["intent"]["type"],"limit")
++            self.assertIs(envelope["intent"]["extended_hours"],True)
++        with self.assertRaises(contract.ContractError) as caught:
++            contract.build_envelope(order(time_in_force="gtc"),extended_hours_allowed=True)
++        self.assertEqual(str(caught.exception),"time_in_force: unsupported value")
++
++    def test_envelope_extension_preserves_tif_class_and_advanced_field_refusals(self):
++        contract=basic_contract()
++        for tif in ("ioc","fok","opg","cls"):
++            with self.subTest(tif=tif),self.assertRaises(contract.ContractError) as caught:
++                contract.build_envelope(order(time_in_force=tif),extended_hours_allowed=True,overnight_allowed=True)
++            self.assertEqual(str(caught.exception),"time_in_force: unsupported value")
++        for value in ("bracket","oco","oto"):
++            with self.subTest(order_class=value),self.assertRaises(contract.ContractError) as caught:
++                contract.build_envelope(order(order_class=value),extended_hours_allowed=True,overnight_allowed=True)
++            self.assertEqual(str(caught.exception),"order_class: unsupported value")
++        for key in ("stop_loss","take_profit","legs"):
++            with self.subTest(key=key),self.assertRaises(contract.ContractError) as caught:
++                contract.build_envelope(order(**{key:{"synthetic":"field"}}),
++                                        extended_hours_allowed=True,overnight_allowed=True)
++            self.assertEqual(str(caught.exception),"intent: unsupported or unknown field")
++
++    def test_transport_day_gtc_extension_is_explicit_and_uses_the_order_shape_guard(self):
++        for tif in ("day","gtc"):
++            payload=order(time_in_force=tif)
++            payload.pop("order_class")
++            normalized=transport.normalize_intent(payload,{"SPY"},allow_extended_hours=True,overnight_allowed=True)
++            self.assertIs(normalized["extended_hours"],True)
++        for changes in ({"type":"market"},{"time_in_force":"ioc"},{"extended_hours":False}):
++            payload=order(**changes)
++            payload.pop("order_class")
++            with self.subTest(changes=changes),self.assertRaises(ValueError) as caught:
++                transport.normalize_intent(payload,{"SPY"},allow_extended_hours=True,overnight_allowed=True)
++            self.assertEqual(str(caught.exception),"overnight_order_contract_refused")
++
++
++class OvernightCarrierAtDispatch(unittest.TestCase):
++    def setUp(self):
++        self.now=datetime(2026,3,9,21,0,tzinfo=NY).timestamp()
++        self.ledger=Mock()
++        self.ledger.request_budget.return_value=0
++        self.ledger.limits=SimpleNamespace(quote_max_age_seconds=3,effective_exit_quote_max_age_seconds=5)
++        self.controller=runner.Controller(self.ledger,self.now+3600,market_open=True,clock=lambda:self.now)
++        self.controller.port=SimpleNamespace(ready=True,extended_hours_allowed=True,feed="boats",quote_timeout=5)
++        self.controller.quotes["SPY"]=Quote("SPY","99","100",self.now)
++        self.intent=SimpleNamespace(client_id="offline-overnight-1",symbol="SPY",side="buy")
++        self.ledger.intents.return_value=[self.intent]
++
++    def carrier(self,attributes,delta=0):
++        observation=transport.normalize_overnight_status(
++            {"symbol":"SPY","attributes":attributes},int((self.now+delta)*1_000_000_000))
++        self.controller.trading_status(observation)
++
++    def submit_refused(self,reason):
++        with self.assertRaises(SafetyError) as caught:
++            asyncio.run(self.controller.before_request("submit",self.intent.client_id))
++        self.assertEqual(str(caught.exception),reason)
++        self.ledger.validate_pending.assert_not_called()
++        self.ledger.request_budget.assert_not_called()
++
++    def test_fresh_eligible_unhalted_carrier_allows_pending_validation_for_both_sides(self):
++        self.carrier(["overnight_tradable"])
++        for side in ("buy","sell"):
++            with self.subTest(side=side):
++                self.intent.side=side
++                asyncio.run(self.controller.before_request("submit",self.intent.client_id))
++        self.assertEqual(self.ledger.validate_pending.call_count,2)
++
++    def test_missing_unknown_ineligible_halted_stale_and_future_refuse_with_specific_reasons(self):
++        cases=((None,"overnight_status_unknown",0),
++               ([],"overnight_not_tradable",0),
++               (["overnight_tradable","overnight_halted"],"overnight_halted",0),
++               (["overnight_tradable"],"overnight_status_stale",-6),
++               (["overnight_tradable"],"overnight_status_stale",1))
++        for attributes,reason,delta in cases:
++            for side in ("buy","sell"):
++                with self.subTest(attributes=attributes,side=side,delta=delta):
++                    self.setUp()
++                    self.intent.side=side
++                    self.carrier(attributes,delta)
++                    self.submit_refused(reason)
++
++    def test_manual_quote_and_top_level_flags_cannot_supply_the_asset_carrier(self):
++        observation=transport.normalize_overnight_status(
++            {"symbol":"SPY","overnight_tradable":True,"overnight_halted":False},
++            int(self.now*1_000_000_000))
++        self.controller.trading_status(observation)
++        self.submit_refused("overnight_status_unknown")
++
++    def test_stale_resume_and_timestamp_tie_cannot_clear_a_newer_halt(self):
++        self.carrier(["overnight_tradable","overnight_halted"])
++        for delta in (-1,0):
++            with self.subTest(delta=delta):
++                self.carrier(["overnight_tradable"],delta)
++                self.submit_refused("overnight_halted")
++
++    def test_calendar_failure_refuses_instead_of_skipping_the_carrier_check(self):
++        self.carrier(["overnight_tradable"])
++        with patch.object(runner,"session_at",side_effect=ValueError("synthetic-calendar-unavailable")):
++            self.submit_refused("session_classification_failed")
++
++
++class OvernightClientSideExitContract(unittest.TestCase):
++    def context(self,*,qualified=False,**changes):
++        base=exits.ExitContext(now=1800000000.,entered_at=1799999995.,pnl_bps=0,
++            trail_bps=0,quote_fresh=True,risk_off=False,force_exit=False,
++            force_exit_reason="trial_end",session="OVERNIGHT",bid="99.99",ask="100.01")
++        if "overnight_qualified" in exits.ExitContext.__dataclass_fields__:
++            changes["overnight_qualified"]=qualified
++        return replace(base,**changes)
++
++    def test_client_trail_time_and_forced_exits_are_marketable_limit_sells(self):
++        config=policy_config()
++        cases=(({"trail_bps":-16},"trailing_stop"),
++               ({"entered_at":1799999800.},"time_exit"),
++               ({"force_exit":True},"trial_end"))
++        for changes,reason in cases:
++            with self.subTest(reason=reason):
++                result=exits.DEFAULT_PLAN.evaluate(self.context(qualified=True,**changes),config)
++                self.assertIsNotNone(result)
++                self.assertEqual(result.reason,reason)
++                self.assertTrue(result.submit)
++                self.assertEqual(result.price_rule,"limit")
++                self.assertLessEqual(Decimal(result.limit_price),Decimal("99.99"))
++
++    def test_stale_quotes_block_even_forced_liquidation_with_the_quote_reason(self):
++        result=exits.DEFAULT_PLAN.evaluate(self.context(qualified=True,quote_fresh=False,force_exit=True),
++                                         policy_config())
++        self.assertEqual(result.reason,"quote_stale")
++        self.assertFalse(result.submit)
++        self.assertTrue(result.flag_position)
++
++    def test_session_failure_and_closed_session_have_deterministic_exit_refusals(self):
++        for kind,reason in (("CLASSIFICATION_FAILED","session_classification_failed"),
++                            ("CLOSED","session_unavailable")):
++            with self.subTest(session=kind):
++                result=exits.DEFAULT_PLAN.evaluate(self.context(qualified=True,session=kind,force_exit=True),
++                                                 policy_config())
++                self.assertEqual(result.reason,reason)
++                self.assertFalse(result.submit)
++                self.assertTrue(result.flag_position)
++
++    def test_unqualified_or_non_boolean_qualification_never_arms_an_overnight_exit(self):
++        for qualified in (False,None,1,"true"):
++            with self.subTest(qualified=qualified):
++                result=exits.DEFAULT_PLAN.evaluate(self.context(qualified=qualified,force_exit=True),
++                                                  policy_config())
++                self.assertEqual(result.reason,"overnight_unqualified")
++                self.assertFalse(result.submit)
++                self.assertTrue(result.flag_position)
++
++    def test_invalid_bid_refuses_instead_of_manufacturing_a_sell_price(self):
++        for bid in ("NaN","-1","0"):
++            with self.subTest(bid=bid):
++                result=exits.DEFAULT_PLAN.evaluate(self.context(qualified=True,bid=bid,force_exit=True),
++                                                  policy_config())
++                self.assertEqual(result.reason,"quote_invalid")
++                self.assertFalse(result.submit)
++                self.assertTrue(result.flag_position)
++
++    def test_subpenny_and_fractional_bid_prices_never_round_above_the_sell_bid(self):
++        for bid in ("99.9999","0.9349","0.9999"):
++            with self.subTest(bid=bid):
++                result=exits.DEFAULT_PLAN.evaluate(self.context(qualified=True,bid=bid,force_exit=True),
++                                                  policy_config())
++                self.assertEqual(result.reason,"trial_end")
++                self.assertTrue(result.submit)
++                self.assertLessEqual(Decimal(result.limit_price),Decimal(bid))
++
++    def test_mover_x1_close_is_regular_only_and_refuses_an_overnight_plan(self):
++        import mover
++        settings=SimpleNamespace(trial_end_et=time_of_day(3,50),flatten_reserve_seconds=60,
++            entry_window_seconds=10,entry_timeout_seconds=10,exit_timeout_seconds=10,
++            exit_rule=("X1",),x2_hold_seconds=3600)
++        limits=SimpleNamespace(trial_seconds=36000,cleanup_seconds=60)
++        stamp=datetime(2026,3,9,21,0,tzinfo=NY).timestamp()
++        with self.assertRaises(mover.MoverRefusal) as caught:
++            mover.plan_timing(settings,limits,t0=stamp,session_date=date(2026,3,10))
++        self.assertEqual(str(caught.exception),"mover_x1_overnight_refused")
++
++
++class OvernightDispatchSeam(unittest.TestCase):
++    def setUp(self):
++        self.now=datetime(2026,3,9,21,0,tzinfo=NY).timestamp()
++        self.check=Mock(return_value=None)
++        self.port=SimpleNamespace(overnight_enabled=True,feed="boats",quote_source_mode="boats_rest",
++                                  overnight_check=self.check)
++        self.policy={"extended_hours":True,"overnight_enabled":True}
++
++    def refusal(self,side="buy",*,now=None):
++        return importlib.import_module("overnight").overnight_dispatch_refusal(
++            self.port,"SPY",self.now if now is None else now,self.policy,side)
++
++    def test_qualified_overnight_calls_the_controller_guard_for_both_sides(self):
++        for side in ("buy","sell"):
++            with self.subTest(side=side):
++                self.assertIsNone(self.refusal(side))
++                self.check.assert_called_with("SPY",self.now,side)
++        self.assertEqual(self.check.call_count,2)
++
++    def test_every_missing_prerequisite_keeps_the_original_dispatch_refusal(self):
++        for field,value in (("overnight_enabled",False),("feed","sip"),
++                            ("feed","overnight"),("quote_source_mode","stream"),
++                            ("overnight_check",None)):
++            for side in ("buy","sell"):
++                with self.subTest(field=field,value=value,side=side):
++                    self.setUp()
++                    setattr(self.port,field,value)
++                    prefix="exit" if side=="sell" else "entry"
++                    self.assertEqual(self.refusal(side),prefix+"_dispatch_session_unavailable")
++                    self.check.assert_not_called()
++        for value in (False,None,1,"true"):
++            for side in ("buy","sell"):
++                with self.subTest(policy_opt_in=value,side=side):
++                    self.setUp()
++                    self.policy["overnight_enabled"]=value
++                    prefix="exit" if side=="sell" else "entry"
++                    self.assertEqual(self.refusal(side),prefix+"_dispatch_session_unavailable")
++                    self.check.assert_not_called()
++
++    def test_stale_quote_missing_carrier_halt_and_cutoff_do_not_bypass_controller_refusals(self):
++        for reason in ("overnight_quote_stale","overnight_status_unknown",
++                       "overnight_status_stale","overnight_halted","overnight_cutoff"):
++            for side in ("buy","sell"):
++                with self.subTest(controller_reason=reason,side=side):
++                    self.setUp()
++                    self.check.side_effect=SafetyError(reason)
++                    prefix="exit" if side=="sell" else "entry"
++                    self.assertEqual(self.refusal(side),prefix+"_dispatch_session_unavailable")
++                    self.check.assert_called_once_with("SPY",self.now,side)
++
++    def test_closed_trade_date_and_calendar_failure_keep_specific_refusal_codes(self):
++        for stamp in (datetime(2026,3,13,21,0,tzinfo=NY),
++                      datetime(2026,4,2,21,0,tzinfo=NY)):
++            for side in ("buy","sell"):
++                with self.subTest(stamp=stamp,side=side):
++                    prefix="exit" if side=="sell" else "entry"
++                    self.assertEqual(self.refusal(side,now=stamp.timestamp()),prefix+"_dispatch_session_unavailable")
++        module=importlib.import_module("overnight")
++        with patch.object(module,"session_at",side_effect=ValueError("synthetic-calendar-unavailable")):
++            for side in ("buy","sell"):
++                prefix="exit" if side=="sell" else "entry"
++                self.assertEqual(self.refusal(side),prefix+"_dispatch_session_classification_failed")
++        self.check.assert_not_called()
++
++    def test_overnight_instance_cannot_migrate_into_pre_while_legacy_sessions_stay_supported(self):
++        for stamp in (datetime(2026,3,10,4,0,tzinfo=NY),
++                      datetime(2026,3,10,10,0,tzinfo=NY),
++                      datetime(2026,3,10,17,0,tzinfo=NY)):
++            for side in ("buy","sell"):
++                with self.subTest(stamp=stamp,side=side):
++                    self.setUp()
++                    prefix="exit" if side=="sell" else "entry"
++                    self.assertEqual(self.refusal(side,now=stamp.timestamp()),prefix+"_dispatch_session_unavailable")
++                    self.port.overnight_enabled=False
++                    self.assertIsNone(self.refusal(side,now=stamp.timestamp()))
++
++    def test_default_flatten_is_0350_and_day_expiry_uses_the_upcoming_trade_date(self):
++        module=importlib.import_module("overnight")
++        bounds=module.overnight_bounds(self.now)
++        self.assertEqual(bounds["flatten_at"],datetime(2026,3,10,3,50,tzinfo=NY).timestamp())
++        self.assertEqual(bounds["boundary_at"],datetime(2026,3,10,4,0,tzinfo=NY).timestamp())
++        self.assertEqual(bounds["day_expiry"],datetime(2026,3,10,20,0,tzinfo=NY).timestamp())
++        configured=module.overnight_bounds(self.now,flatten_minutes=15)
++        self.assertEqual(configured["flatten_at"],datetime(2026,3,10,3,45,tzinfo=NY).timestamp())
++        with self.assertRaises(ValueError) as caught:
++            module.overnight_bounds(datetime(2026,3,10,4,0,tzinfo=NY).timestamp())
++        self.assertEqual(str(caught.exception),"overnight_session_unavailable")
++
++
++class OvernightConfigurationContract(unittest.TestCase):
++    def config(self,**changes):
++        return {"feed":"boats","quote_source":"boats_rest",
++                "overnight":{"enabled":True},"extended_hours_enabled":True,
++                "regular_session_only":False,
++                "sessions":{"extended_hours":True,"overnight_holds":False},**changes}
++
++    def test_explicit_rest_opt_in_derives_the_default_flatten_reserve(self):
++        module=importlib.import_module("overnight")
++        self.assertEqual(module.overnight_config(self.config()),{"flatten_minutes_before_pre":10})
++        self.assertEqual(module.overnight_config(self.config(
++            overnight={"enabled":True,"flatten_minutes_before_pre":15})),
++            {"flatten_minutes_before_pre":15})
++
++    def test_missing_opt_in_and_any_carry_to_pre_configuration_are_refused(self):
++        module=importlib.import_module("overnight")
++        with self.assertRaises(ValueError) as caught:
++            module.overnight_config(self.config(overnight=None))
++        self.assertEqual(str(caught.exception),"overnight_configuration_required")
++        bad=(
++            {"overnight":{"enabled":False}},
++            {"extended_hours_enabled":False},
++            {"regular_session_only":True},
++            {"sessions":{"extended_hours":True,"overnight_holds":True}},
++        )
++        for changes in bad:
++            with self.subTest(changes=changes),self.assertRaises(ValueError) as caught:
++                module.overnight_config(self.config(**changes))
++            self.assertEqual(str(caught.exception),"unqualified_overnight_configuration")
++        for value in (0,61,True,"10"):
++            with self.subTest(flatten_minutes=value),self.assertRaises(ValueError) as caught:
++                module.overnight_config(self.config(
++                    overnight={"enabled":True,"flatten_minutes_before_pre":value}))
++            self.assertEqual(str(caught.exception),"unqualified_overnight_configuration")
++
++
++class OvernightAdmissionReasons(OvernightCarrierAtDispatch):
++    def setUp(self):
++        super().setUp()
++        self.controller.port.overnight_enabled=True
++        self.controller.port.quote_source_mode="boats_rest"
++        self.controller.port.flatten_minutes_before_pre=10
++
++    def admission_refused(self,reason,side="buy"):
++        with self.assertRaises(SafetyError) as caught:
++            self.controller._check_overnight_admission("SPY",self.now,side)
++        self.assertEqual(str(caught.exception),reason)
++        self.ledger.reserve_intent.assert_not_called()
++        self.ledger.request_budget.assert_not_called()
++
++    def test_missing_stale_and_future_quote_refuse_before_any_order_reservation(self):
++        self.carrier(["overnight_tradable"])
++        self.controller.quotes.clear()
++        self.admission_refused("no_current_quote")
++        for side in ("buy","sell"):
++            for delta in (-6,1):
++                with self.subTest(side=side,delta=delta):
++                    self.controller.quotes["SPY"]=Quote("SPY","99","100",self.now+delta)
++                    self.admission_refused("overnight_quote_stale",side)
++
++    def test_entry_age_and_sell_age_remain_separate_inside_the_quote_timeout(self):
++        self.carrier(["overnight_tradable"])
++        self.controller.quotes["SPY"]=Quote("SPY","99","100",self.now-4)
++        self.admission_refused("overnight_quote_stale","buy")
++        self.controller._check_overnight_admission("SPY",self.now,"sell")
++        self.ledger.reserve_intent.assert_not_called()
++
++    def test_flatten_cutoff_refuses_entries_but_allows_fresh_marketability_checks_for_sells(self):
++        for stamp,refused in ((datetime(2026,3,10,3,49,59,tzinfo=NY),False),
++                              (datetime(2026,3,10,3,50,tzinfo=NY),True)):
++            with self.subTest(stamp=stamp):
++                self.now=stamp.timestamp()
++                self.carrier(["overnight_tradable"])
++                self.controller.quotes["SPY"]=Quote("SPY","99","100",self.now)
++                if refused:
++                    self.admission_refused("overnight_entry_cutoff","buy")
++                else:
++                    self.controller._check_overnight_admission("SPY",self.now,"buy")
++                self.controller._check_overnight_admission("SPY",self.now,"sell")
++
++    def test_every_unqualified_port_attribute_refuses_direct_controller_admission(self):
++        for field,value in (("overnight_enabled",False),("feed","sip"),
++                            ("quote_source_mode","stream")):
++            with self.subTest(field=field):
++                self.setUp()
++                self.carrier(["overnight_tradable"])
++                setattr(self.controller.port,field,value)
++                self.admission_refused("overnight_unqualified")

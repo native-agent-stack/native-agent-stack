@@ -62,31 +62,37 @@
   "runs": [
     {
       "command": "idle scope env-i CPython3.12.3: python -m unittest tests.test_adaptive_paper_overnight_guard_pins -q",
+      "digest_scope": "sanitized published bytes",
       "elapsed_seconds": 8.809,
       "exit_code": 0,
       "output_bytes": 1427,
       "output_sha256": "1130c694cc08cf8d043a93e6d0fb11daf6ca9c2ec6ef59600eec9a866754202e",
-      "retained_log": "/var/tmp/ns-seeds-overnight-arming-20261013/logs/f1-f4-ci-final.log",
+      "path": "evidence/artifacts/overnight-arming-20261013/logs/f1-f4-ci-final.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/logs/f1-f4-ci-final.sanitized.txt",
       "skipped": 2,
       "tests_run": 15
     },
     {
       "command": "idle scope pinned native python/runtime_read_lock: guard_pins, arming, guard_mutations, order_contract, recovery modules -q",
+      "digest_scope": "sanitized published bytes",
       "elapsed_seconds": 35.316,
       "exit_code": 0,
-      "output_bytes": 5382,
-      "output_sha256": "a71627d5af1acbe173a7ca85bee8a382152981a5d6257090f92027eacbf0417a",
-      "retained_log": "/var/tmp/ns-seeds-overnight-arming-20261013/logs/f1-f4-native-final.log",
+      "output_bytes": 5242,
+      "output_sha256": "146dfdb26ba78f80e8c88aba236a319f59a85c98565fe2b9a0441585f70c5b4f",
+      "path": "evidence/artifacts/overnight-arming-20261013/logs/f1-f4-native-final.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/logs/f1-f4-native-final.sanitized.txt",
       "skipped": 0,
       "tests_run": 127
     },
     {
       "command": "idle scope env-i CPython3.12.3: same modules plus source_hashes_manifest -q",
+      "digest_scope": "sanitized published bytes",
       "elapsed_seconds": 28.268,
       "exit_code": 0,
-      "output_bytes": 5436,
-      "output_sha256": "bf5bf7d99c22ed7b380efc2f7c4aec757cd21be85d621d4cd11655b2d11cac56",
-      "retained_log": "/var/tmp/ns-seeds-overnight-arming-20261013/logs/f1-f4-ci-related.log",
+      "output_bytes": 5296,
+      "output_sha256": "c27c95279ecf0e90994a537c95330793369e16f155012df2dec51023bbc824e9",
+      "path": "evidence/artifacts/overnight-arming-20261013/logs/f1-f4-ci-related.sanitized.txt",
+      "published_log": "evidence/artifacts/overnight-arming-20261013/logs/f1-f4-ci-related.sanitized.txt",
       "skipped": 2,
       "tests_run": 135
     }

@@ -1448,16 +1448,20 @@ class AlpacaPaperTransport:
         return normalize_overnight_status(raw, time.time_ns())
 
     async def _poll_boats(self):
-        while not self._stopping:
-            started = time.monotonic()
-            rows = await self._boats_source.sweep(started)
-            for row in rows:
-                self._enqueue("asset_status", row["asset"])
-                self._enqueue("quote", {**row["quote"], "S": row["symbol"]})
-            if rows:
-                self._authorized("quotes")
-                self._ack("quotes", True)
-            await asyncio.sleep(max(0, 1 - (time.monotonic() - started)))
+        def asset(status):
+            self._enqueue("asset_status", status)
+        def quote(row):
+            self._enqueue("quote", {**row["quote"], "S": row["symbol"]})
+            self._authorized("quotes")
+            self._ack("quotes", True)
+        async def symbol_loop(symbol):
+            while not self._stopping:
+                started = time.monotonic()
+                await self._boats_source.sweep(started, symbols=(symbol,), on_asset=asset, on_quote=quote)
+                await asyncio.sleep(max(0, 1 - (time.monotonic() - started)))
+        # Each symbol delivers and reschedules independently. A five-second
+        # SDK read on one carrier cannot age completed observations for others.
+        await asyncio.gather(*(symbol_loop(s) for s in self._boats_source.symbols))
 
     @property
     def health(self):

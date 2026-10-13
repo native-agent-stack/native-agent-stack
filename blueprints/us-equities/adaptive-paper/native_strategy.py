@@ -852,7 +852,7 @@ class AdaptiveStrategy(Strategy):
         """Fresh acknowledgement/dispatch-time disposition for an owned exit."""
         if getattr(self, "_exit_session_at", None) is None:
             return None
-        if self._exit_session(now) == "OVERNIGHT" and getattr(getattr(self, "transport", None), "overnight_enabled", False) is True:
+        if getattr(getattr(self, "transport", None), "overnight_enabled", False) is True:
             try:
                 self.transport.overnight_check(symbol, now, "sell")
             except (ValueError, RuntimeError) as error:
