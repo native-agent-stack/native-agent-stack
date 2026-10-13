@@ -167,7 +167,10 @@ lg_follow_head() {  # <read head> <new head> <follows so far>
 # user account, "ID+USERNAME@users.noreply.github.com" (github/docs@be38ec5d email-addresses-reference.md:47). A login of another shape than
 # GitHub's (at most 39 alphanumerics and single inner dashes, username-considerations-for-external-authentication.md:94, :103, :126-127)
 # is refused before any call. #1061 P3: users/<login> answers for an organization too, whose address then failed at the merge (exit 7, as
-# in #198); only an account of type User gives an id (otherwise exit 11, nothing merged).
+# in #198); only an account of type User gives an id (otherwise exit 11, nothing merged). GET /users/{username} returns the private or the
+# public user schema (github/rest-api-description@58b1e0c0 api.github.com.json:88612-88614), whose `type` is a free string, "User" in the
+# example (:126248-126250, :160055-160058), while an organization's account reads "Organization" (the example at :311038); the check
+# takes the literal "User" alone, so another value or none gives no id.
 lg_author_email() {  # <owner/repo> : the account's no-reply address; rc 1 and nothing printed when the login or the id is not well formed
   local login=${LG_AUTHOR_LOGIN:-${1%%/*}} id
   [[ "$login" =~ ^[A-Za-z0-9](-?[A-Za-z0-9])*$ ]] && [ "${#login}" -le 39 ] || return 1
@@ -202,8 +205,9 @@ lg_have() {  # <commit>
 # the current head (#975 round 4).
 # Local reviews (2026-10-13, the owner's direction: reviews run locally, the connector cannot reach the organization's repository): when
 # LOCAL_REVIEWS or its alias CODEX_LOCAL_REVIEW is set (an empty value included, #1061 P1: it fell back to the connector, which cannot
-# answer), the gate decides from the normalized review files they name (colon-separated). A file whose head_sha is not the read head counts
-# only when that head carries the read head's change, by this block's change identity (lg_same_change). The read head and each such head
+# answer; ${VAR+x} is empty only for an unset VAR, bash(1) Parameter Expansion: "Omitting the colon tests only for a parameter that is
+# unset", bash 5.3), the gate decides from the normalized review files they name (colon-separated). A file whose head_sha is not the read
+# head counts only when that head carries the read head's change, by this block's change identity (lg_same_change). The read head and each such head
 # go to the gate after the read head as "<head>:<git merge-base <head> origin/main>" (#1061 P1: a codex-review must have been reviewed
 # against that merge base; the first call fetches a head the clone lacks, lg_have). The gate's 2 (no file, a file malformed, incomplete,
 # of another head or of another base) is echoed when it is one of its "Local reviews: " lines; python3's own 2 is not.

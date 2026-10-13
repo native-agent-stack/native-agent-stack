@@ -6,9 +6,9 @@ Prints one status line. Exit codes:
      trigger, and no review is running;
   3  a review is running (a Running row, or the connector's eyes reaction on the PR), none of the read head or the current head
      that started since the latest trigger has finished, or a summary's newest revision is not its body (poll again);
-  4  the latest review ended in a state other than Completed, the summary comment was last edited by an account other than the
-     connector (a person decides), or the gate itself failed: any exception prints one fixed line naming only its class, never a
-     traceback (which prints file paths) or gh's output (#975 P2);
+  4  the latest review of those heads ended in a state other than Completed, the summary comment was last edited by an account other
+     than the connector (a person decides), or the gate itself failed: any exception prints one fixed line naming only its class,
+     never a traceback (which prints file paths) or gh's output (#975 P2);
   5  Codex is unavailable: since the latest trigger it posted a usage-limit or account notice, or showed no
      activity at all for NOSTART_MINUTES (the landing proceeds on its other reviews and logs this line).
      Measured 2026-10-09: the connector answered "You have reached your Codex usage limits" at 22:42:34Z (uet#51)
@@ -24,9 +24,12 @@ connector note other than a summary, a connector reaction, or an edit of a summa
 reaction within seconds, so the age runs from the LAST activity. #1061 (the Claude read and the CC's /code-review probe at c999eee5):
   - the age runs from the later of the last activity and the latest trigger, and a trigger that comes after the review had already gone
     stale gets the NOSTART_MINUTES grace, as a first trigger does (before, a new "@codex review" after a stall gave 5 at once);
-  - the connector's eyes reaction with no Running row is the same running review, under the same rule (before, 3 for ever);
-  - when the running review is stale, a review of the read head or the current head that ended other than Completed since the trigger
-    gives 4 before the 5 (before, the stale 5 hid it).
+  - of the reviews of the read head or the current head that started since the trigger and ended, the LATEST decides (#1061 round 2,
+    Astra's P2 at 974090cf: any completion among them hid a later Cancelled review, so a stale row of another commit gave 5, and with no
+    row running the earlier completion gave 0). One that ended other than Completed gives 4, before the stale 5 and before a 0; a later
+    completion still supersedes an earlier failure (0).
+The connector's eyes reaction with no Running row is a review running with no bound (3), as at c999eee5: 974090cf bounded it too, which
+gave a 5 that nas_land.sh proceeded on with no Codex verdict, and the CC's delta read at 974090cf had the 3 back (#1061 round 2).
 The value: OpenAI's Codex docs state no review time limit and no behaviour for a stalled review (developers.openai.com/codex/llms.txt
 points code review to learn.chatgpt.com/docs/third-party/github.md, read 2026-10-13: "Wait for Codex to react (👀) and post a
 review", :52; troubleshooting only for "If Codex doesn't react or post a review", :196). Its basis is measured: on nas#1056 the row went
@@ -200,7 +203,8 @@ def local_review_files():
     """The files LOCAL_REVIEWS and its alias CODEX_LOCAL_REVIEW name (colon-separated, each list in order, empty names dropped), or None
     when neither is set: the connector decides then, as before. A set variable selects local mode even when it is empty (#1061 P1: an
     empty value fell back to the connector, which cannot reach the organization's repository, and nas proceeds on its 5); it names no
-    file, which stops (2)."""
+    file, which stops (2). os.environ is a mapping (python/cpython@v3.13.16 Doc/library/os.rst:184-186, Lib/os.py:704), whose get gives
+    None only for a missing key (Lib/_collections_abc.py:808-813), so `is None` tells an unset variable from a set empty one."""
     values = [os.environ.get(name) for name in LOCAL]
     if all(value is None for value in values):
         return None
@@ -234,7 +238,9 @@ def review_problem(review):
             return "its base_sha is not 40 lower-case hex digits"
         if "overall_confidence_score" in review and (type(review["overall_confidence_score"]) not in (int, float)
                                                      or not math.isfinite(review["overall_confidence_score"])):
-            return "its overall_confidence_score is not a finite number"  # #1061 (Astra's follow-up 2): 1e999 parses as inf
+            # #1061 (Astra's follow-up 2): json.loads parses a number with float(num_str) (cpython@v3.13.16 Doc/library/json.rst:308-311),
+            # so 1e999 gives inf (measured); math.isfinite is False for an infinity or a NaN (Doc/library/math.rst:370-373)
+            return "its overall_confidence_score is not a finite number"
     elif set(review) != REVIEW_KEYS:
         return "its fields are not those of a claude-code-review: reviewer, reviewer_version, head_sha, completed, findings"
     if not isinstance(review["reviewer_version"], str) or not review["reviewer_version"].strip():
@@ -367,10 +373,17 @@ def main(repo, pr, read=None, *same):
     if begun:  # the all-reviews-finished +1, once a review of our heads has started for this trigger
         done += [when(r["created_at"]) for r in reactions
                  if r["user"]["login"] == BOT and r["content"] == "+1" and when(r["created_at"]) >= min(begun)]
+    # #1061 round 2 (Astra's P2 at 974090cf): the LATEST of our heads' reviews since the trigger decides. The stale branch asked for a
+    # failure and no completion at all, so a completion hid a later Cancelled review: with a stale row of another commit the gate gave 5,
+    # and with no row running the completion gave 0. A failure now counts unless a completion (a Completed row, or the +1 above) is later;
+    # a failure wins a tie.
+    failures = [(s, t) for s, t in ours if not running(s) and not s.lower().startswith("completed")]
+    failed = max(failures, key=lambda x: x[1], default=None)
+    if failed is not None and done and max(done) > failed[1]:
+        failed = None
     now_running = [t for _, s, t in current if running(s)]
-    eyes = [when(r["created_at"]) for r in reactions if r["user"]["login"] == BOT and r["content"] == "eyes"]
-    if now_running or eyes:  # a review shown running: a Running row, or the connector's eyes reaction with none (#1061 P3: also bounded)
-        start = max(now_running) if now_running else max(eyes)
+    if now_running:
+        start = max(now_running)
         # progress after the start: a non-summary connector note, a connector reaction, or an edit of a summary
         later = [created for _, bot, created, body, _ in notes if bot and created > start and SUMMARY not in body]
         later += [e[0] for _, _, edits in summaries for e in edits if e[0] > start]
@@ -382,30 +395,26 @@ def main(repo, pr, read=None, *same):
         since = max(last, trigger)
         age = (datetime.now(timezone.utc) - since).total_seconds() / 60
         if age >= (NOSTART_MINUTES if stalled else STALE_RUNNING_MINUTES):
-            failed = [(s, t) for s, t in ours if not running(s) and not s.lower().startswith("completed")]
-            if failed and not done:  # #1061 P2: a review of our heads that ended other than Completed is for a person, before the 5
-                s, t = max(failed, key=lambda x: x[1])
-                print(f"Codex review ended '{s}' at {t:%Y-%m-%dT%H:%M:%SZ}; not Completed")
+            if failed:  # #1061 P2: the latest review of our heads ended other than Completed: a person decides, before the 5
+                print(f"Codex review ended '{failed[0]}' at {failed[1]:%Y-%m-%dT%H:%M:%SZ}; not Completed")
                 return 4
-            what = (f"a review shown running since {start:%Y-%m-%dT%H:%M:%SZ}" if now_running else
-                    f"the connector's eyes reaction since {start:%Y-%m-%dT%H:%M:%SZ}, with no Running row,")
             mark = f"the latest trigger {trigger:%Y-%m-%dT%H:%M:%SZ}" if trigger > last else f"{last:%Y-%m-%dT%H:%M:%SZ}"
-            print(f"Codex unavailable: {what} has had no connector activity since {mark} ({age:.0f} min; stale); "
-                  "proceeding on the other reviews")
+            print(f"Codex unavailable: a review shown running since {start:%Y-%m-%dT%H:%M:%SZ} has had no connector activity since {mark} "
+                  f"({age:.0f} min; stale); proceeding on the other reviews")
             return 5
-        if now_running:
-            print(f"Codex review running since {start:%Y-%m-%dT%H:%M:%SZ}")
-            return 3
-        print(f"Codex review running: the connector's eyes reaction is on the pull request since {start:%Y-%m-%dT%H:%M:%SZ}")
+        print(f"Codex review running since {start:%Y-%m-%dT%H:%M:%SZ}")
         return 3
+    eyes = [when(r["created_at"]) for r in reactions if r["user"]["login"] == BOT and r["content"] == "eyes"]
+    if eyes:  # a review running with no Running row: waited for with no bound (#1061 round 2: bounding it opened a 5 that nas proceeded on)
+        print(f"Codex review running: the connector's eyes reaction is on the pull request since {max(eyes):%Y-%m-%dT%H:%M:%SZ}")
+        return 3
+    if failed:  # #1061 round 2: the latest review of our heads ended other than Completed, whatever completed before it
+        print(f"Codex review ended '{failed[0]}' at {failed[1]:%Y-%m-%dT%H:%M:%SZ}; not Completed")
+        return 4
     if done:
         print(f"Codex review finished at {max(done):%Y-%m-%dT%H:%M:%SZ} after the latest trigger "
               f"{trigger:%Y-%m-%dT%H:%M:%SZ}")
         return 0
-    if ours:
-        s, t = max(ours, key=lambda x: x[1])
-        print(f"Codex review ended '{s}' at {t:%Y-%m-%dT%H:%M:%SZ}; not Completed")
-        return 4
     other = [(t, commit_of(row)) for row, s, t in attributed]
     if other:
         t, sha = max(other, key=lambda x: x[0])

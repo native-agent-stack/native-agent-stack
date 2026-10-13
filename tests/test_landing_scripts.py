@@ -108,9 +108,11 @@ def q(path):
 # (internal/ghcmd/cmd.go:214, :285); a test sets FAKE_FAIL_STDOUT for `api` calls only.
 # #975 round 4: FAKE_GH_HOOK runs (sh -c) before every call that matches the glob FAKE_GH_HOOK_ON, so a test can change GitHub-side or
 # local data at one step (the flip suite does it at the author-address lookup, the last slow step before final_gate). `gh api graphql`
-# answers only the review-thread count; any other query fails, as for a gate that runs against this fake.
+# answers the review-thread count and, #1061 round 2, the squash body GitHub offers (viewerMergeBodyText: FAKE_SQUASH_BODY, default
+# "* the change"); any other query fails, as for a gate that runs against this fake. A newline in an argument (a waived landing's merge
+# body) is logged as \n, so each call stays one line of the log.
 FAKE_GH = r'''#!/usr/bin/env bash
-[ -n "${FAKE_LOG:-}" ] && printf 'gh %s\n' "$*" >> "$FAKE_LOG"
+[ -n "${FAKE_LOG:-}" ] && printf 'gh %s\n' "${*//$'\n'/\\n}" >> "$FAKE_LOG"
 if [ -n "${FAKE_GH_HOOK:-}" ] && [[ "$*" == ${FAKE_GH_HOOK_ON:-} ]]; then sh -c "$FAKE_GH_HOOK"; fi
 if [ -n "${FAKE_FAIL:-}" ] && [ -n "${FAKE_LOG:-}" ] && [[ "$*" == $FAKE_FAIL ]]; then
   failed=$(cat "$FAKE_LOG.fail" 2>/dev/null || echo 0); failed=$((failed + 1)); echo "$failed" > "$FAKE_LOG.fail"
@@ -146,7 +148,11 @@ case "$1 $2" in
     esac ;;
   "api users/"*) [ "${FAKE_USER_RC:-0}" = 0 ] || exit "$FAKE_USER_RC"  # #1061: the users API answers for organizations too (type)
                  printf '{"id": %s, "type": "%s"}\n' "${FAKE_USER_ID-4242424}" "${FAKE_USER_TYPE-User}" | jq -r "$prog"; exit 0 ;;
-  "api graphql") [[ "$*" == *reviewThreads* ]] || exit 1; echo "${FAKE_OPEN_THREADS:-0}"; exit 0 ;;
+  "api graphql")
+    if [[ "$*" == *viewerMergeBodyText* ]]; then
+      jq -n --arg b "${FAKE_SQUASH_BODY-* the change}" '{data: {repository: {pullRequest: {viewerMergeBodyText: $b}}}}' | jq -r "$prog"; exit 0
+    fi
+    [[ "$*" == *reviewThreads* ]] || exit 1; echo "${FAKE_OPEN_THREADS:-0}"; exit 0 ;;
   "pr view")
     if [ -n "${FAKE_HEADS:-}" ] && [[ "$*" == *headRefOid* ]]; then
       heads=($FAKE_HEADS); n=$(cat "$FAKE_LOG.heads" 2>/dev/null || echo 0); echo $((n + 1)) > "$FAKE_LOG.heads"
@@ -303,15 +309,17 @@ class LandingCase(unittest.TestCase):
         return path
 
     # -- the sites
+    # #1061 round 2: nas's verdict_gate also reads the local review waiver when neither local review variable is set; these sites test
+    # the verdict files alone, so they set LOCAL_REVIEWS (empty), and the waiver has its own end-to-end tests.
     def verdict_files(self, script, path, head, gates_done=None):
         gates = f"GATES_DONE={q(gates_done)}" if gates_done else "unset GATES_DONE"
         prelude = f"R=x/y; N=1; E={head}; EF={head}\n{gates}\n{script.block}\n"
-        prelude += f"VERDICT_FILES={q(path)}\n" if script.key == "uet" else f"VF=({q(path)})\n"
+        prelude += f"VERDICT_FILES={q(path)}\n" if script.key == "uet" else f"VF=({q(path)}); LOCAL_REVIEWS=\n"
         return self.bash(prelude, f"{script.verdict_gate}\nverdict_gate")
 
     def receipt_loop(self, path, read, head, gates_done):
         """nas's verdict gate when the caller gave the read head as `read` (a prefix) and it resolved to `head`."""
-        prelude = f"R=x/y; N=1; E={read}; EF={head}\nGATES_DONE={q(gates_done)}\n{self.nas.block}\nVF=({q(path)})\n"
+        prelude = f"R=x/y; N=1; E={read}; EF={head}\nGATES_DONE={q(gates_done)}\n{self.nas.block}\nVF=({q(path)}); LOCAL_REVIEWS=\n"
         return self.bash(prelude, f"{self.nas.verdict_gate}\nverdict_gate")
 
     def gpt_block(self, path, head):
@@ -449,9 +457,10 @@ def legacy_findings(root):
 
 
 # #1061 P1-3 (Astra at c999eee5; correction #161's custody rule): a published digest binds published bytes. Each digest the README cites is
-# a tracked file's (a file under tools/landing or tests/fixtures/landing, the files the README documents, hashed here as they are now, so
-# the guard needs no registry and no earlier check), the captured summary comment's body, or one of these named public artifacts; a digest
-# of a host-only file, such as the CC's live copies, is an offline oracle for a guessed path and may not be published, in full or as a prefix.
+# a tracked file's (a file under tools/landing or tests/fixtures/landing that git tracks, the files the README documents, hashed here as
+# they are now, so the guard needs no registry and no earlier check), the captured summary comment's body, or one of these named public
+# artifacts; a digest of a host-only file, such as the CC's live copies, is an offline oracle for a guessed path and may not be published,
+# in full or as a prefix. #1061 round 2 (the CC's Claude delta at 974090cf): an untracked file there is host-only, so it is not known.
 PUBLIC_DIGESTS = {
     "4ce5cdb31c15dad95e0a7e18e6d0f0c49a07603cea0d5f4e08bc51f530a5d7e1": "cli/cli@v2.102.0:internal/ghcmd/cmd.go",
     "030eda84dcfdb52e3bba2cadfc0243a7b47d3098b64f8c12c665550733d72ca1": "cli/cli@v2.102.0:pkg/cmd/api/api.go",
@@ -510,23 +519,87 @@ PUBLIC_DIGESTS = {
     "72459eb4e2e6d3b1a143f3c40860b7dd65fb061cdec3b18470ed8867382d8552": "https://developers.openai.com/codex/llms.txt (fetched 2026-10-13)",
     "c18b2fe184104facf5d044631ee151b2394baab1c44218be8b9d60c7dbd33020": "https://learn.chatgpt.com/docs/code-review.md (fetched 2026-10-13)",
     "1ab502138a121ac571faa37f161bf79224e1e23cdc0e70f7a0be835f2c2d3c9f": "https://learn.chatgpt.com/docs/third-party/github.md (fetched 2026-10-13)",
+    # #1061 round 2: the waiver's squash body, the repository name, and the mechanisms of Astra's follow-up 4 (the local upstream mirrors)
+    "17eb5418a1771692864b8f7476947f088252ccde0037d089c9faf441ff7c8877": "cli/cli@v2.102.0:pkg/cmd/pr/merge/http.go",
+    "5a1343a0acb89ef1811e5fa93202ac452a0cbeef97656ead236f87910bb2a08d": "github/docs@be38ec5d:data/reusables/repositories/repo-name.md",
+    "1d54f83bb3f583e37bae07d820d16206cf02f4fb2ef281338635b4b7fd01ebe4": "python/cpython@v3.13.16:Doc/library/os.rst",
+    "1dabdd646bfbf961c3ffcf79dd41bd81dc6a2e1ed59428b32662ed16acff08df": "python/cpython@v3.13.16:Doc/library/json.rst",
+    "5a46b6cc199fd025f914f39a39199745bad9fbbf540246abcb658671899be77e": "python/cpython@v3.13.16:Doc/library/math.rst",
+    "18560b0a37dfb90b4712fba97668d44a1328c5566b10deffaee292ba12cc21ff": "python/cpython@v3.13.16:Lib/os.py",
+    "87601195497fde3b7cea03bce396e1b713c17af3d273298d99d3bc0147f745b9": "python/cpython@v3.13.16:Lib/_collections_abc.py",
 }
 
 
+# #1061 round 2 (the CC's Claude delta at 974090cf, P3): a hex word is a digest, a digest's prefix or a commit id, so a bare prefix is
+# checked too, and a commit id must be one of these named public commits (each read on GitHub on 2026-10-13 with
+# `gh api repos/<repository>/commits/<id>`; a commit that only a host holds would be an unpublished hash as well).
+PUBLIC_COMMITS = {
+    "af9d190113e1046f2ce51d008fc161f6265cc73b": "native-agent-stack/native-agent-stack: #975 round 3's head",
+    "754a194f0c37483b017bf31ba2fa9ed417a58634": "native-agent-stack/native-agent-stack: #975, the head of the GPT micro",
+    "761810d703bae174331d03ffc922316dd92d1712": "native-agent-stack/native-agent-stack: #975 round 4's head",
+    "5b8ba3b20ef446c1ed36ebc103f6256afcacb8e0": "native-agent-stack/native-agent-stack: #975 round 4's fix",
+    "3e6e7e46663c3b9af06dd018c96e916dbb32873d": "native-agent-stack/native-agent-stack: #975's final round",
+    "26f551b1b1b62eb1843604c8af3fefab5822bb40": "native-agent-stack/native-agent-stack: the head of the 43-run check-run measurement",
+    "8eb4b532780661dfbe9c654a275c437445a977af": "native-agent-stack/native-agent-stack: the head of the first local baseBranch review",
+    "c63c83a822f2687c3e7aed2d3b3ede0413119c9b": "native-agent-stack/native-agent-stack: #1061's base",
+    "a6c8bf7cfd90f3dd76d6314355e434fa6afb9ae3": "native-agent-stack/native-agent-stack: #1061's first commit",
+    "c999eee50e7ef1a4be45cee3f90e417e72868148": "native-agent-stack/native-agent-stack: #1061's second commit",
+    "974090cfdccc284741a26147d306ef4a0e1debdd": "native-agent-stack/native-agent-stack: #1061's third commit",
+    "58b1e0c00b39b9e46c24dc4a0ba6a2669c90e9c1": "github/rest-api-description",
+    "be38ec5d78e24172587e61b3c6ff40ace1865c71": "github/docs",
+    "092d3acd6bec3e3a14bdc7e7a2810ab628ab759d": "openai/codex: the upstream mirror of 2026-10-09",
+    "67ad42147a7acc2af6074753ebd03d904476118f": "git/git: the upstream mirror",
+    "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd": "cli/cli: the upstream mirror",
+    "f359d43b406057f1a8cdbc4ea93b827642c162e6": "anthropics/claude-plugins-official",
+}
+HEX_FULL = re.compile(r"(?<![0-9A-Fa-f])[0-9A-Fa-f]{64}(?![0-9A-Fa-f])")
+HEX_MARKED = re.compile(r"(?<![0-9A-Fa-f])([0-9A-Fa-f]{6,})…")  # a prefix written `<hex>…`
+HEX_BARE = re.compile(r"(?<![0-9A-Za-z])([0-9A-Fa-f]{7,})(?![0-9A-Za-z])")  # a hex word of 7 digits or more
+
+
+def published_digests(root=ROOT):
+    """sha256 -> what, for each digest a landing text may cite: every file git tracks under tools/landing and tests/fixtures/landing as it
+    is now (#1061 round 2: an untracked file there is host-only; a tree that is not a git work tree, such as a `git archive` extraction,
+    has its files listed), the captured summary comment's body, and PUBLIC_DIGESTS."""
+    root, known = Path(root), dict(PUBLIC_DIGESTS)
+    directories = ("tools/landing", "tests/fixtures/landing")
+    top = subprocess.run(["git", "-C", str(root), "rev-parse", "--show-toplevel"], capture_output=True, text=True)
+    if top.returncode == 0 and Path(top.stdout.strip()).resolve() == root.resolve():
+        listed = subprocess.run(["git", "-C", str(root), "ls-files", "-z", "--", *directories], capture_output=True, check=True).stdout
+        names = sorted(name for name in listed.decode("utf-8").split("\0") if name)
+    else:
+        names = sorted(str(path.relative_to(root)) for directory in directories if (root / directory).is_dir()
+                       for path in (root / directory).iterdir() if path.is_file())
+    for name in names:
+        known[hashlib.sha256((root / name).read_bytes()).hexdigest()] = name
+    fixture = root / "tests/fixtures/landing/codex-summary-comment.json"
+    if fixture.is_file():
+        body = json.loads(fixture.read_text(encoding="utf-8"))["graphql"]["node"]["body"]
+        known[hashlib.sha256(body.encode("utf-8")).hexdigest()] = "the captured summary comment's body"
+    return known
+
+
+def digest_custody(text, known, commits=PUBLIC_COMMITS):
+    """The hex values in text that bind no published bytes, as (full digests, prefixes), each by its first 8 hex digits in lower case, so a
+    failure prints no full digest. Case-insensitive (#1061 round 2): a value of 64 hex digits must be a known digest (a longer run binds
+    nothing); a prefix written `<hex>…` (6 digits or more) and a bare hex word of 7 digits or more with a letter and a digit, a prefix
+    written without "…" included, must start a known digest or a named public commit. A bare word of digits alone or of letters alone (a
+    date such as 20261010, a count, a word) is not checked."""
+    tokens = set(HEX_FULL.findall(text)) | set(HEX_MARKED.findall(text))
+    tokens |= {word for word in HEX_BARE.findall(text) if len(word) >= 64 or (re.search("[A-Fa-f]", word) and re.search("[0-9]", word))}
+    full, prefixes = set(), set()
+    for token in {token.lower() for token in tokens}:
+        if len(token) >= 64:
+            if token not in known:
+                full.add(token[:8])
+        elif not any(value.startswith(token) for value in (*known, *commits)):
+            prefixes.add(token[:8])
+    return sorted(full), sorted(prefixes)
+
+
 def readme_digest_custody(readme, root=ROOT):
-    """The digests the README cites that are neither a tracked file's nor a named public artifact's: (64-hex values, prefixes written
-    `<hex>…`), each as its first 8 hex digits only, so a failure prints no full digest."""
-    known = dict(PUBLIC_DIGESTS)
-    for directory in ("tools/landing", "tests/fixtures/landing"):
-        for path in sorted((root / directory).iterdir()):
-            if path.is_file():
-                known[hashlib.sha256(path.read_bytes()).hexdigest()] = str(path.relative_to(root))
-    body = json.loads((root / "tests/fixtures/landing/codex-summary-comment.json").read_text(encoding="utf-8"))["graphql"]["node"]["body"]
-    known[hashlib.sha256(body.encode("utf-8")).hexdigest()] = "the captured summary comment's body"
-    full = set(re.findall(r"(?<![0-9a-f])[0-9a-f]{64}(?![0-9a-f])", readme))
-    prefixes = set(re.findall(r"(?<![0-9a-f])([0-9a-f]{6,63})…", readme))
-    return (sorted(digest[:8] for digest in full if digest not in known),
-            sorted(prefix[:8] for prefix in prefixes if not any(digest.startswith(prefix) for digest in known)))
+    """The README's unpublished hex values (digest_custody on the digests published_digests gives)."""
+    return digest_custody(readme, published_digests(root))
 
 
 class ScriptTextTests(LandingCase):
@@ -732,6 +805,35 @@ class ScriptTextTests(LandingCase):
                 self.assertLess(lock, first, "the lock is taken before the first git or gh call")
                 self.assertLess(script.lines.index("# <<< land-gate-fns"), lock)
 
+    def test_nas_alone_requires_local_reviews_before_the_lock_and_outside_the_shared_block(self):
+        # #1061 round 2: the CC kept the requirement and the waiver out of the shared block and out of codex_gate.py, which uet uses too; the
+        # requirement is the first thing after the arguments, before the shared block and the lock.
+        presence = '[ -n "${LOCAL_REVIEWS+x}${CODEX_LOCAL_REVIEW+x}" ] || [ -n "${LOCAL_REVIEW_WAIVER:-}" ] \\'
+        lines = self.nas.lines
+        self.assertEqual(lines.count(presence), 1)
+        self.assertLess(lines.index(presence), lines.index("# >>> land-gate-fns"))
+        self.assertLess(lines.index(presence), lines.index('lg_lock "${LANDING_LOCK_DIR:-$COORD/command-center/landing-locks}" || exit 14'))
+        self.assertIn('[ "$w" = "Waiver: local reviews for #$N at ${EF:0:8}" ]', self.nas.text[self.nas.text.index("verdict_gate() {"):])
+        for name, text in (("the shared block", self.nas.block), ("uet_land.sh", self.uet.text),
+                           ("codex_gate.py", (LANDING / "codex_gate.py").read_text(encoding="utf-8"))):
+            with self.subTest(text=name):
+                self.assertNotIn("LOCAL_REVIEW_WAIVER", text)
+
+    def test_the_users_type_the_repository_name_and_the_environment_tests_cite_their_sources(self):
+        # #1061 round 2 (the CC's P3s and Astra's follow-up 4 at 974090cf): the type filter, the repository-name rule and the set-or-unset
+        # tests cited no source for the mechanism; nor did the file replacement and the finiteness check.
+        for script in (self.uet, self.nas):
+            with self.subTest(script=script.key):
+                self.assertIn("github/rest-api-description@58b1e0c0 api.github.com.json:88612-88614", script.block)
+                self.assertIn('reads "Organization" (the example at :311038)', script.block)
+                self.assertIn('bash(1) Parameter Expansion: "Omitting the colon tests only for a parameter that is', script.block)
+        self.assertIn("api.github.com.json:344898-344915", self.nas.text)
+        self.assertIn("github/docs@be38ec5d data/reusables/repositories/repo-name.md:1", self.nas.text)
+        gate = (LANDING / "codex_gate.py").read_text(encoding="utf-8")
+        self.assertIn("Lib/_collections_abc.py:808-813", gate)
+        self.assertIn("Doc/library/json.rst:308-311", gate)
+        self.assertIn("Doc/library/os.rst:2754-2760", (LANDING / "review_normalize.py").read_text(encoding="utf-8"))
+
     def test_the_final_gate_runs_after_the_last_slow_step_and_right_before_the_merge(self):
         # #975 round 4: the author lookup is the last slow step, final_gate the only thing between it and the pinned merge.
         for script, pinned in ((self.uet, '"$H"'), (self.nas, '"$cur"')):
@@ -748,7 +850,7 @@ class ScriptTextTests(LandingCase):
             with self.subTest(script=script.key):
                 for name in sorted(set(re.findall(r"\bLANDING_[A-Z_]+\b", script.text))):
                     self.assertIn(f"`{name}`", readme)
-                for name in ("VERDICT_FILES", "GATES_DONE", "GPT_VERDICT", "LG_AUTHOR_LOGIN", "LOCAL_REVIEWS", "CODEX_LOCAL_REVIEW"):
+                for name in ("VERDICT_FILES", "GATES_DONE", "GPT_VERDICT", "LG_AUTHOR_LOGIN", "LOCAL_REVIEWS", "CODEX_LOCAL_REVIEW", "LOCAL_REVIEW_WAIVER"):
                     if name in script.text:
                         self.assertIn(f"`{name}`", readme)
                 section = readme.split("## Exit codes", 1)[1].split("\n## ", 1)[0]
@@ -772,12 +874,67 @@ class ScriptTextTests(LandingCase):
     def test_every_digest_in_the_readme_binds_published_bytes(self):
         # #1061 P1-3 (Astra at c999eee5): the README published the sha256 of the CC's live copies, which carry the host's paths, in six full
         # digests of the provenance table (and a seventh of the live gate) and in four prefixes; a digest of a host-only file is an offline
-        # oracle for a guessed path (correction #161). At c999eee5 this found 7 full digests and 4 prefixes.
-        self.assertEqual(readme_digest_custody((LANDING / "README.md").read_text(encoding="utf-8")), ([], []))
+        # oracle for a guessed path (correction #161). At c999eee5 this found 7 full digests and 4 prefixes. #1061 round 2 (the CC's Claude
+        # delta at 974090cf): the scripts' own text is published too, and their comments cite digests and commits.
+        known = published_digests()
+        for name in ("README.md", "uet_land.sh", "nas_land.sh", "codex_gate.py", "review_normalize.py"):
+            with self.subTest(file=name):
+                self.assertEqual(digest_custody((LANDING / name).read_text(encoding="utf-8"), known), ([], []))
         planted = (f"a live copy `{hashlib.sha256(b'host-only bytes').hexdigest()}`, a prefix `{hashlib.sha256(b'more').hexdigest()[:8]}…`, "
                    f"a tracked file's prefix `{next(iter(PUBLIC_DIGESTS))[:8]}…`")
         found = readme_digest_custody(planted)
         self.assertEqual((len(found[0]), len(found[1])), (1, 1), "the rule finds a planted digest and prefix, and passes a public one")
+
+    def test_the_custody_guard_reads_upper_case_bare_prefixes_and_comments(self):
+        # #1061 round 2 (the CC's Claude delta at 974090cf, P3; Astra's follow-up 5): the guard read lower-case hex only, a prefix only when
+        # written with "…", and the README only. Each probe is found now; the guard at 974090cf (readme_digest_custody there) finds none.
+        host = hashlib.sha256(b"host-only bytes").hexdigest()
+        known = published_digests()
+        tracked = next(digest for digest, what in known.items() if what == "tools/landing/nas_land.sh")
+        commit = next(iter(PUBLIC_COMMITS))
+        probes = [
+            ("an upper-case digest", f"sha256 `{host.upper()}`", ([host[:8]], [])),
+            ("an upper-case prefix written with an ellipsis", f"`{host[:8].upper()}…`", ([], [host[:8]])),
+            ("a bare prefix", f"the live copy {host[:8]} differs", ([], [host[:8]])),
+            ("a prefix written with ASCII dots", f"({host[:10]}...)", ([], [host[:8]])),
+            ("a digest in a shell comment", f"# the live copy's sha256: {host}\n", ([host[:8]], [])),
+            ("a run longer than a digest", f"{host}{host[:4]}", ([host[:8]], [])),
+        ]
+        for name, text, expected in probes:
+            with self.subTest(probe=name):
+                self.assertEqual(digest_custody(text, known), expected)
+        for name, text in (("a tracked file's digest in upper case", tracked.upper()), ("its bare prefix", f"at {tracked[:8]}"),
+                           ("a named public commit, short and in full", f"at {commit[:8]} and {commit.upper()}"),
+                           ("dates, counts and words", "20261010, 1234567 and defaced")):
+            with self.subTest(passes=name):
+                self.assertEqual(digest_custody(text, known), ([], []))
+
+    def test_an_untracked_file_under_tools_landing_is_not_published(self):
+        # #1061 round 2 (the CC's Claude delta at 974090cf): the known digests took every file in tools/landing, so a host-only file left
+        # there untracked (a live copy, say) passed the guard. A work tree's known files are the ones git tracks; a tree that is not one
+        # lists its files.
+        root = self.dir / f"custody-{next(self.counter)}"
+        (root / "tools/landing").mkdir(parents=True)
+        (root / "tools/landing/tracked.md").write_text("tracked\n", encoding="utf-8")
+        (root / "tools/landing/live-copy.sh").write_text("host-only\n", encoding="utf-8")
+        tracked, live = hashlib.sha256(b"tracked\n").hexdigest(), hashlib.sha256(b"host-only\n").hexdigest()
+        plain = published_digests(root)
+        self.assertTrue({tracked, live} <= set(plain), "outside a work tree every file is listed")
+        git(root, "init", "-q")
+        git(root, "add", "--", "tools/landing/tracked.md")
+        known = published_digests(root)
+        self.assertIn(tracked, known)
+        self.assertNotIn(live, known)
+        self.assertEqual(digest_custody(f"`{tracked}` and `{live[:8]}…`", known), ([], [live[:8]]))
+
+    def test_the_pull_request_body_binds_published_bytes(self):
+        # #1061 round 2 (the CC's Claude delta at 974090cf): the body is published too. LANDING_PR_BODY names its file. CI does not set it:
+        # every pull request's CI runs this module (validate.yml runs the whole suite), an edit of a body does not run it again (its
+        # pull_request types are opened, synchronize and reopened), and a body may cite an earlier head's files, which this tree does not hold.
+        path = os.environ.get("LANDING_PR_BODY")
+        if not path:
+            self.skipTest("LANDING_PR_BODY names no body file")
+        self.assertEqual(digest_custody(Path(path).read_text(encoding="utf-8"), published_digests()), ([], []))
 
     def test_readme_states_the_failed_merge_message_the_gate_error_the_gh_rule_and_the_privacy_scan(self):
         # #975 (review of the P2 fix commit): the README said the failed-merge message names the file's path (it names the file only), listed
@@ -1835,8 +1992,13 @@ class CodexGateTests(unittest.TestCase):
         cases = [
             # (name, kwargs, expected exit code, text the status line must contain)
             ("a Completed row after the trigger", dict(comments=[completed]), 0, "finished at 2026-10-10T12:01:00Z"),
-            ("Completed at 12:01 then Cancelled at 12:02 after the same trigger: any completion evidence passes",
-             dict(comments=[summary(row("Completed", "2026-10-10T12:01:00Z"), row("Cancelled", "2026-10-10T12:02:00Z"))]), 0, "finished at 2026-10-10T12:01:00Z"),
+            # #1061 round 2 (Astra's P2 at 974090cf, the CC's ruling: the latest review decides): "any completion evidence passes" gave 0
+            # here; the later Cancelled review is for a person now
+            ("Completed at 12:01 then Cancelled at 12:02 after the same trigger: the later Cancelled review decides",
+             dict(comments=[summary(row("Completed", "2026-10-10T12:01:00Z"), row("Cancelled", "2026-10-10T12:02:00Z"))]), 4,
+             "Codex review ended 'Cancelled' at 2026-10-10T12:02:00Z; not Completed"),
+            ("Cancelled at 12:01 then Completed at 12:02: the later completion decides",
+             dict(comments=[summary(row("Cancelled", "2026-10-10T12:01:00Z"), row("Completed", "2026-10-10T12:02:00Z"))]), 0, "finished at 2026-10-10T12:02:00Z"),
             ("a lone Cancelled row", dict(comments=[summary(row("Cancelled", "2026-10-10T12:02:00Z"))]), 4, "ended 'Cancelled'"),
             ("Completed then Running: a running row always blocks",
              dict(comments=[summary(row("Completed", "2026-10-10T12:01:00Z"), row("Running since", "2026-10-10T12:03:00Z"))]), 3, "running since 2026-10-10T12:03:00Z"),
@@ -2177,10 +2339,13 @@ class CodexGateTests(unittest.TestCase):
              3, "running since"),
             ("the same, 90 minutes after that trigger", dict(comments=[stalled, live], now="2026-10-10T14:00:00Z"), 5,
              "since the latest trigger 2026-10-10T12:30:00Z (90 min; stale)"),
-            # #1061 P3: the connector's eyes reaction with no Running row is the same running review, bounded the same way (3 for ever before)
+            # #1061 round 2 (the CC's delta read at 974090cf): the connector's eyes reaction with no Running row waits (3) with no bound, as at
+            # c999eee5; 974090cf bounded it, and its 5 after 90 minutes was a new opening, which nas proceeded on (5 at 974090cf, 3 now)
             ("an eyes reaction with no Running row, 89:59", dict(reactions=[eyes(start)], now="2026-10-10T13:32:59Z"), 3, "eyes reaction is on the pull request"),
-            ("an eyes reaction with no Running row, 90 minutes", dict(reactions=[eyes(start)], now="2026-10-10T13:33:00Z"), 5,
-             f"the connector's eyes reaction since {start}, with no Running row, has had no connector activity since {start} (90 min; stale)"),
+            ("an eyes reaction with no Running row, 90 minutes", dict(reactions=[eyes(start)], now="2026-10-10T13:33:00Z"), 3,
+             f"Codex review running: the connector's eyes reaction is on the pull request since {start}"),
+            ("an eyes reaction with no Running row, ten hours", dict(reactions=[eyes(start)], now="2026-10-10T22:03:00Z"), 3,
+             f"Codex review running: the connector's eyes reaction is on the pull request since {start}"),
             ("a stale row of another commit and our head's review Cancelled", dict(comments=[mixed, trigger], now="2026-10-10T13:45:00Z"), 4,
              "Codex review ended 'Cancelled' at 2026-10-10T12:20:00Z; not Completed"),
             ("the same before it is stale still waits", dict(comments=[mixed, trigger], now="2026-10-10T13:00:00Z"), 3, f"running since {start}"),
@@ -2192,9 +2357,44 @@ class CodexGateTests(unittest.TestCase):
                 got, line = self.run_gate(**kwargs)
                 self.assertEqual((got, text in line), (code, True), line)
 
+    def test_the_latest_review_of_our_head_decides_so_an_earlier_completion_hides_no_later_failure(self):
+        # #1061 round 2 (Astra's P2 at 974090cf): "if failed and not done" let any completion of our head since the trigger hide a later
+        # Cancelled review of it. Astra's sequence: a row of another commit Running since 12:03, the trigger at 12:10, review 2 of our head
+        # Running from 12:10:20 and Completed at 12:20, review 3 Running from 12:21 and Cancelled at 12:30; at 14:05 the connector's last
+        # edit is 95 minutes old. The gate gave 5 there at 974090cf (nas proceeds), and with no row running the completion gave 0. The
+        # latest review of our head decides: 4 for both. A later completion still supersedes an earlier failure (0, or the stale 5).
+        stale = row("Running since", "2026-10-10T12:03:00Z", review=1, commit=OTHER[:7])
+        trigger = comment("someone", "2026-10-10T12:10:00Z", "@codex review")
+
+        def summarized(first, second, *others):
+            """The summary comment of review 2 (`first`, then `second`) and review 3 (`second`), each first shown Running, beside the
+            rows `others`; its revisions oldest first, the last its body, each by the connector."""
+            steps = [("2026-10-10T12:10:20Z", (*others, row("Running since", "2026-10-10T12:10:20Z", review=2))),
+                     ("2026-10-10T12:21:00Z", (*others, row(first, "2026-10-10T12:20:00Z", review=2), row("Running since", "2026-10-10T12:21:00Z", review=3))),
+                     ("2026-10-10T12:30:00Z", (*others, row(first, "2026-10-10T12:20:00Z", review=2), row(second, "2026-10-10T12:30:00Z", review=3)))]
+            bodies = [(at, summary_body(*cells)) for at, cells in steps]
+            return {**comment(BOT, "2026-10-10T12:03:00Z", bodies[-1][1]), "edits": [{"editedAt": at, "diff": body} for at, body in reversed(bodies)]}
+
+        cancelled = "Codex review ended 'Cancelled' at 2026-10-10T12:30:00Z; not Completed"
+        cases = [
+            ("a completion, a later Cancelled review and a stale row of another commit (Astra's sequence)",
+             summarized("Completed", "Cancelled", stale), "2026-10-10T14:05:00Z", 4, cancelled),
+            ("the same before the row is stale waits", summarized("Completed", "Cancelled", stale), "2026-10-10T13:00:00Z", 3,
+             "Codex review running since 2026-10-10T12:03:00Z"),
+            ("a completion and a later Cancelled review, no row running", summarized("Completed", "Cancelled"), "2026-10-10T12:35:00Z", 4, cancelled),
+            ("a Cancelled review and a later completion: the completion decides", summarized("Cancelled", "Completed"), "2026-10-10T12:35:00Z", 0,
+             "Codex review finished at 2026-10-10T12:30:00Z"),
+            ("the same beside a stale row of another commit is the stale 5", summarized("Cancelled", "Completed", stale), "2026-10-10T14:05:00Z", 5,
+             "Codex unavailable: a review shown running since 2026-10-10T12:03:00Z has had no connector activity since 2026-10-10T12:30:00Z"),
+        ]
+        for name, note, now, code, text in cases:
+            with self.subTest(case=name):
+                got, line = self.run_gate(comments=[note, trigger], now=now)
+                self.assertEqual((got, text in line), (code, True), line)
+
     # ------------------------------------------------------------------------------------------ local reviews (2026-10-13)
     def test_a_local_review_set_decides_from_the_files_alone(self):
-        # The owner's direction: reviews run locally (the connector cannot reach the organization's repository). The gate reads the files and
+        # The owner's direction of 2026-10-13: reviews run locally (the connector cannot reach the organization's repository). The gate reads the files and
         # nothing else: 2 for a file that is not a normalized review of the read head, a codex-review that did not complete or whose verdict is
         # not exactly one of the rubric's two, or no codex-review at all; else 4 for "patch is incorrect" or a P0 or P1 codex finding; else 0.
         # The CC, 2026-10-13: the /code-review plugin arm is advisory (its issues and a missing comment never block).
@@ -2396,11 +2596,18 @@ class EndToEndTests(LandingCase):
         cls.home.mkdir()
 
     def land(self, script, *, args=None, via=None, head=None, merge_state="CLEAN", rollup=None, checkruns=None, pages=None, statuses=None,
-             verdict=None, draft=False, merge_commit="f" * 40, **extra):
+             verdict=None, draft=False, merge_commit="f" * 40, waiver=True, **extra):
         """Run a landing; returns (exit code, stdout+stderr, the fake commands' log lines). pages, a list of lists of check runs, stands
-        for checkruns (one page)."""
+        for checkruns (one page). #1061 round 2: nas requires local reviews, so a nas landing with neither local review variable nor
+        LOCAL_REVIEW_WAIVER given gets a waiver bound to the read head (waiver=True; a string is the waiver's text; False gives none),
+        and the connector-path tests keep their meaning."""
         run = self.dir / f"run-{next(self.counter)}"
         run.mkdir()
+        if script.key == "nas" and waiver is not False and not {"LOCAL_REVIEWS", "CODEX_LOCAL_REVIEW", "LOCAL_REVIEW_WAIVER"} & set(extra):
+            read = (args[1] if args and len(args) > 1 else self.head)[:8]
+            (run / "waiver.md").write_text(waiver if isinstance(waiver, str) else f"# Waiver\n\nWaiver: local reviews for #{PR} at {read}\n",
+                                           encoding="utf-8")
+            extra["LOCAL_REVIEW_WAIVER"] = str(run / "waiver.md")
         gate = [check_run("ci-gate")] if rollup is None else rollup
         (run / "prview.json").write_text(json.dumps({
             "headRefOid": head or self.head, "isDraft": draft, "mergeStateStatus": merge_state, "statusCheckRollup": gate,
@@ -2429,6 +2636,14 @@ class EndToEndTests(LandingCase):
     def merge_calls(self, log):
         return [line for line in log if line.startswith("gh pr merge")]
 
+    def merge_line(self, script, head, *, repo=None, waived=True, read=None):
+        """The merge call as the fake gh logs it. #1061 round 2: a waived nas landing names its squash body, the body GitHub offers (the
+        fake's "* the change") and then the waiver line, before --match-head-commit; every other landing names none."""
+        repo = repo or (UET_REPO if script.key == "uet" else NAS_REPO)
+        body = (f"--body * the change\\n\\nWaiver: local reviews for #{PR} at {(read or self.head)[:8]} (LOCAL_REVIEW_WAIVER) "
+                if script.key == "nas" and waived else "")
+        return f"gh pr merge {PR} -R {repo} --squash {body}--match-head-commit {head} -A {NOREPLY}"
+
     def test_uet_lands_when_every_gate_passes_pinned_to_the_head(self):
         code, out, log = self.land(self.uet)
         self.assertEqual(code, 0, out)
@@ -2441,7 +2656,7 @@ class EndToEndTests(LandingCase):
         code, out, log = self.land(self.nas)
         self.assertEqual(code, 0, out)
         self.assertIn("the merge onto current main validates", out)
-        self.assertEqual(self.merge_calls(log), [f"gh pr merge {PR} -R {NAS_REPO} --squash --match-head-commit {self.head} -A {NOREPLY}"])
+        self.assertEqual(self.merge_calls(log), [self.merge_line(self.nas, self.head)])
         gate = f"{os.path.realpath(LANDING)}/codex_gate.py"
         self.assertEqual(self.gate_calls(log), [f"python3 -I {gate} {NAS_REPO} {PR} {self.head}"] * 3, "at the wait, before the validation and in the final gate")
         self.assertEqual([line for line in log if "validate.py" in line], ["python3 -E -s -B scripts/validate.py"])
@@ -2602,7 +2817,7 @@ class EndToEndTests(LandingCase):
                 code, out, log = self.land(script, head=self.rebased)
                 self.assertEqual(code, 0, out)
                 self.assertNotEqual(self.rebased, self.head)
-                self.assertEqual(self.merge_calls(log), [f"gh pr merge {PR} -R {repo} --squash --match-head-commit {self.rebased} -A {NOREPLY}"])
+                self.assertEqual(self.merge_calls(log), [self.merge_line(script, self.rebased, repo=repo)])
 
     def test_a_failed_address_lookup_stops_before_the_merge_with_11(self):
         for script in (self.uet, self.nas):
@@ -2659,7 +2874,7 @@ class EndToEndTests(LandingCase):
                 code, out, log = self.land(script, FAKE_HEADS=heads)
                 self.assertEqual(code, 0, out)
                 self.assertIn("carries the read head's change: following it", out)
-                self.assertEqual(self.merge_calls(log), [f"gh pr merge {PR} -R {repo} --squash --match-head-commit {self.rebased} -A {NOREPLY}"])
+                self.assertEqual(self.merge_calls(log), [self.merge_line(script, self.rebased, repo=repo)])
 
     def test_a_head_that_keeps_moving_is_followed_three_times_and_then_stops_with_3(self):
         v = self.variants
@@ -2709,7 +2924,7 @@ class EndToEndTests(LandingCase):
                 self.assertEqual(code, 9, out)
                 self.assertEqual((len(self.gate_calls(log)), self.merge_calls(log)), (1, []))
 
-    def test_codex_unavailable_needs_the_gpt_verdict_in_uet_and_proceeds_in_nas(self):
+    def test_codex_unavailable_needs_the_gpt_verdict_in_uet_and_a_head_bound_waiver_in_nas(self):
         unavailable = {"FAKE_GATE_RC": "5", "FAKE_GATE_LINE": "Codex unavailable: usage-limit or account notice"}
         code, out, log = self.land(self.uet, **unavailable)
         self.assertEqual(code, 9, out)
@@ -2726,9 +2941,14 @@ class EndToEndTests(LandingCase):
         code, out, log = self.land(self.uet, GPT_VERDICT=str(refused), **unavailable)
         self.assertEqual(code, 9, out)
         self.assertEqual(self.merge_calls(log), [])
+        # #1061 round 2 (the CC's ruling on its Claude delta at 974090cf): nas proceeded on the 5 with no local review set (exit 0 and one
+        # merge at 974090cf). Local reviews are required there now: it stops with 2 before any call, and only a waiver bound to the read
+        # head lets it proceed on the connector's 5, recorded in the squash body.
+        code, out, log = self.land(self.nas, waiver=False, **unavailable)
+        self.assertEqual((code, log), (2, []), out)
+        self.assertIn(f"#{PR} local reviews are required: set LOCAL_REVIEWS=", out)
         code, out, log = self.land(self.nas, **unavailable)
-        self.assertEqual(code, 0, out)
-        self.assertEqual(len(self.merge_calls(log)), 1)
+        self.assertEqual((code, self.merge_calls(log)), (0, [self.merge_line(self.nas, self.head)]), out)
 
     def test_head_that_is_not_the_read_head_nor_its_rebase_stops_with_3(self):
         for script in (self.uet, self.nas):
@@ -3339,7 +3559,7 @@ class EndToEndTests(LandingCase):
             with self.subTest(repo=repo):
                 code, out, log = self.land(self.nas, **extra)
                 self.assertEqual(code, 0, out)
-                self.assertEqual(self.merge_calls(log), [f"gh pr merge {PR} -R {repo} --squash --match-head-commit {self.head} -A {NOREPLY}"])
+                self.assertEqual(self.merge_calls(log), [self.merge_line(self.nas, self.head, repo=repo)])
                 self.assertEqual([line for line in log if line.startswith("gh api users/")], [f"gh api users/{MERGING_ACCOUNT} {USER_JQ}"])
                 scoped = [line for line in log if line.startswith("gh ") and (" -R " in line or " repos/" in line)]
                 self.assertTrue(scoped)
@@ -3358,6 +3578,106 @@ class EndToEndTests(LandingCase):
                 code, out, log = self.land(script, LG_AUTHOR_LOGIN="not/a/login")
                 self.assertEqual((code, self.merge_calls(log)), (11, []), out)
                 self.assertEqual([line for line in log if line.startswith("gh api users/")], [], "refused before any call")
+
+    # ------------------------------------------------------------------------------------------ #1061 round 2: local reviews required on nas
+    def test_nas_without_local_reviews_or_a_waiver_stops_with_2_before_any_call(self):
+        # The CC's ruling on its Claude delta at 974090cf: with LOCAL_REVIEWS and CODEX_LOCAL_REVIEW both unset, nas asked the connector and
+        # proceeded on its 5 (exit 0 and one merge at 974090cf). It stops now, before any call: before the lock (held, it still gives 2, not
+        # 14), update-branch and ready. An empty waiver is no waiver.
+        import fcntl
+        stop = (f"#{PR} local reviews are required: set LOCAL_REVIEWS=<review file>[:<review file>...], or LOCAL_REVIEW_WAIVER=<waiver file> "
+                "(README, Local reviews): stop, nothing merged")
+        for extra in ({}, {"LOCAL_REVIEW_WAIVER": ""}, {"FAKE_GATE_RC": "5", "FAKE_GATE_LINE": "Codex unavailable: usage-limit or account notice"}):
+            with self.subTest(extra=extra):
+                code, out, log = self.land(self.nas, waiver=False, draft=True, merge_state="BEHIND", **extra)
+                self.assertEqual((code, out, log), (2, stop, []))
+        path = self.lock_path(self.nas)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with open(path, "a", encoding="utf-8") as held:
+            fcntl.flock(held, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            code, out, log = self.land(self.nas, waiver=False)
+        self.assertEqual((code, out, log), (2, stop, []), "the requirement comes before the lock")
+
+    def test_a_waiver_not_bound_to_the_pull_request_and_the_read_head_stops_with_2_before_github_state_changes(self):
+        # The waiver binds the pull request and the read head's first 8 hex digits, as uet_land.sh binds GPT_VERDICT. verdict_gate reads it
+        # after the lock and before update-branch and ready, so a draft that is BEHIND gets neither, no gate runs, and nothing is merged.
+        h8 = self.head[:8]
+        cases = [
+            ("another pull request", f"Waiver: local reviews for #{int(PR) + 1} at {h8}\n"),
+            ("another head", f"Waiver: local reviews for #{PR} at {self.other[:8]}\n"),
+            ("a longer head prefix than the agreed line's", f"Waiver: local reviews for #{PR} at {self.head[:12]}\n"),
+            ("revoked by a later Waiver line", f"Waiver: local reviews for #{PR} at {h8}\nWaiver: revoked\n"),
+            ("an indented line", f"  Waiver: local reviews for #{PR} at {h8}\n"),
+            ("no Waiver line, a PASS verdict", f"Verdict: PASS at {h8}\n"),
+        ]
+        for name, text in cases:
+            with self.subTest(case=name):
+                code, out, log = self.land(self.nas, waiver=text, draft=True, merge_state="BEHIND")
+                self.assertEqual((code, self.merge_calls(log), self.gate_calls(log)), (2, [], []), out)
+                self.assertIn(f"#{PR} local review waiver waiver.md does not waive #{PR} at {h8} (its last Waiver line must read "
+                              f"'Waiver: local reviews for #{PR} at {h8}'): stop", out)
+                self.assertEqual([line for line in log if line.startswith(("gh pr ready", "gh pr update-branch"))], [])
+                self.assertNotIn(str(self.dir), out, "the waiver is named by its file name only")
+        with self.subTest(case="missing"):
+            code, out, log = self.land(self.nas, LOCAL_REVIEW_WAIVER=str(self.dir / "absent-waiver.md"), draft=True, merge_state="BEHIND")
+            self.assertEqual((code, self.merge_calls(log), self.gate_calls(log)), (2, [], []), out)
+            self.assertIn(f"#{PR} local review waiver missing: absent-waiver.md", out)
+            self.assertNotIn(str(self.dir), out)
+
+    def test_a_head_bound_waiver_lands_on_the_connector_and_the_squash_body_records_it(self):
+        # The squash body is the body GitHub offers for the squash (viewerMergeBodyText, read once, before the author lookup), then the
+        # waiver line; the merge is otherwise the one before. CRLF line ends count; an empty default leaves the waiver line alone; a failed
+        # read stops with 7, nothing merged and nothing of gh's printed.
+        crlf = f"# Waiver\r\n\r\nWaiver: local reviews for #{PR} at {self.head[:8]}\r\n"
+        for name, waiver in (("LF", True), ("CRLF", crlf)):
+            with self.subTest(case=name):
+                code, out, log = self.land(self.nas, waiver=waiver)
+                self.assertEqual((code, self.merge_calls(log)), (0, [self.merge_line(self.nas, self.head)]), out)
+                self.assertEqual(out.count(f"#{PR} local reviews waived at {self.head[:8]} by waiver.md: the Codex gate reads the connector"), 2,
+                                 "at the early refusals and at the final gate")
+                reads = [i for i, line in enumerate(log) if line.startswith("gh api graphql") and "viewerMergeBodyText(mergeType: SQUASH)" in line]
+                self.assertEqual(len(reads), 1)
+                self.assertLess(reads[0], max(i for i, line in enumerate(log) if line.startswith("gh api users/")))
+        with self.subTest(case="an empty default body"):
+            code, out, log = self.land(self.nas, FAKE_SQUASH_BODY="")
+            self.assertEqual((code, self.merge_calls(log)), (0, [f"gh pr merge {PR} -R {NAS_REPO} --squash --body Waiver: local reviews for #{PR} at "
+                                                                 f"{self.head[:8]} (LOCAL_REVIEW_WAIVER) --match-head-commit {self.head} -A {NOREPLY}"]), out)
+        with self.subTest(case="the read fails"):
+            code, out, log = self.land(self.nas, FAKE_FAIL="api graphql*", FAKE_FAIL_STDOUT='{"message": "a detail of the reply"}',
+                                       FAKE_FAIL_STDERR="gh: a detail of the reply")
+            self.assertEqual((code, self.merge_calls(log)), (7, []), out)
+            self.assertIn(f"#{PR} the squash body for the local review waiver could not be read (output withheld): stop, nothing merged", out)
+            self.assertNotIn("a detail of the reply", out)
+
+    def test_the_final_gate_reads_the_waiver_again(self):
+        # A waiver rebound to another head after the slow steps (here at the author lookup, the last of them) stops at the final gate.
+        waiver = self.dir / f"waiver-{next(self.counter)}.md"
+        waiver.write_text(f"Waiver: local reviews for #{PR} at {self.head[:8]}\n", encoding="utf-8")
+        hook = f"printf 'Waiver: local reviews for #{PR} at {self.other[:8]}\\n' > {q(str(waiver))}"
+        code, out, log = self.land(self.nas, LOCAL_REVIEW_WAIVER=str(waiver), FAKE_GH_HOOK_ON="api users/*", FAKE_GH_HOOK=hook)
+        self.assertEqual((code, self.merge_calls(log)), (2, []), out)
+        self.assertIn(f"#{PR} local reviews waived at {self.head[:8]} by {waiver.name}", out, "the early check passed")
+        self.assertIn(f"#{PR} local review waiver {waiver.name} does not waive #{PR} at {self.head[:8]}", out)
+
+    def test_with_a_local_review_set_the_waiver_is_not_read_and_the_merge_names_no_body(self):
+        # Local mode decides from the review files alone: a waiver that would stop is not read, and nothing is added to the merge.
+        waiver = self.dir / f"waiver-{next(self.counter)}.md"
+        waiver.write_text(f"Waiver: local reviews for #{int(PR) + 1} at {self.other[:8]}\n", encoding="utf-8")
+        code, out, log = self.land(self.nas, FAKE_REAL_PYTHON=sys.executable, LOCAL_REVIEWS=self.local_review(self.head), LOCAL_REVIEW_WAIVER=str(waiver))
+        self.assertEqual((code, self.merge_calls(log)), (0, [self.merge_line(self.nas, self.head, waived=False)]), out)
+        self.assertNotIn("waive", out)
+        self.assertFalse([line for line in log if "viewerMergeBodyText" in line])
+
+    def test_uet_with_the_local_review_variables_unset_is_unchanged_and_ignores_a_waiver(self):
+        # The CC: uet keeps the connector path; the requirement and the waiver are nas_land.sh's alone.
+        waiver = self.dir / f"waiver-{next(self.counter)}.md"
+        waiver.write_text(f"Waiver: local reviews for #{int(PR) + 1} at {self.other[:8]}\n", encoding="utf-8")
+        for extra in ({}, {"LOCAL_REVIEW_WAIVER": str(waiver)}):
+            with self.subTest(extra=sorted(extra)):
+                code, out, log = self.land(self.uet, **extra)
+                self.assertEqual((code, self.merge_calls(log)), (0, [f"gh pr merge {PR} -R {UET_REPO} --squash --match-head-commit {self.head} -A {NOREPLY}"]), out)
+                self.assertNotIn("waive", out)
+                self.assertFalse([line for line in log if "viewerMergeBodyText" in line])
 
     def merge_base(self, head):
         return git(self.repo, "merge-base", head, "origin/main")

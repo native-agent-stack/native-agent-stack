@@ -263,7 +263,9 @@ def claude_review(repo, pr, head, since, author, version):
 
 
 def write(review, out):
-    """The file, written whole: a new file made by mkstemp (mode 0600) beside the target, then renamed over it."""
+    """The file, written whole: a new file made by mkstemp (mode 0600) beside the target, then renamed over it. os.replace replaces an
+    existing file "silently", and "the renaming will be an atomic operation" on POSIX (python/cpython@v3.13.16 Doc/library/os.rst:2754-2760),
+    so the gate reads the old file or the new one, never part of one."""
     text = json.dumps(review, indent=1, ensure_ascii=False) + "\n"
     descriptor, temporary = tempfile.mkstemp(prefix=".review-normalize-", dir=os.path.dirname(os.path.abspath(out)))
     try:
@@ -309,7 +311,8 @@ def arguments(argv):
 
 def discard(out):
     """#1061 (Astra's follow-up 1): a refused run removes an older file at --out, so a retry that fails cannot leave the previous run's
-    review for the gate; returns the note for the summary line."""
+    review for the gate; returns the note for the summary line. os.unlink is os.remove, which deletes the file and raises an OSError
+    (FileNotFoundError when it is gone) when it cannot (cpython@v3.13.16 Doc/library/os.rst:3671-3676, :2661-2665); the note reports it."""
     if os.path.isfile(out) or os.path.islink(out):
         try:
             os.unlink(out)
