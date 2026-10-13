@@ -1,0 +1,40 @@
+The 37 mutants of the round-11 change of #1043 (the fix9 verdict file's blocker 1, the last-used column of a successful capture): the two call sites (the parser, the report, both), the function (any text, a short word, match, search, strip, a non-string read as its text) and each part of the closed set (never, today, the singular, the plural, a count ahead of the clock, `ago` absent, required or repeated, any case, the singular for the plural and the reverse, zero, leading zeros, the digits and their bound in either sign, digits of any script, an absolute date, another unit, a word before `ago`, any whitespace, a plus sign, a space after the sign). Each is one exact change to tools/skill-usage/skill_usage.py in a scratch copy of the minimal tree (the tests and the receipt they read), and the run is LastUsedBoundaryTests, the two earlier native classes and the parser class; a mutant is killed when the run fails. The unmutated copy passes first. The first run of this set (with the earlier, narrower grammar) left two: a mutant that returns the matched text in lower case, which is the same function (the set holds only lower case; dropped as equivalent), and a non-string read as its text, which the test now meets with an object whose text is a spelling.
+
+killed    skill_usage.py             the parser keeps the column's text
+killed    skill_usage.py             the report keeps the row's text
+killed    skill_usage.py             neither the parser nor the report closes the column
+killed    skill_usage.py             any text passes
+killed    skill_usage.py             a short word passes (a character filter instead of the set)
+killed    skill_usage.py             a spelling at the start is enough (match)
+killed    skill_usage.py             a spelling anywhere is enough (search)
+killed    skill_usage.py             the value is stripped before the test
+killed    skill_usage.py             a non-string is read as its text
+killed    skill_usage.py             never is not a spelling
+killed    skill_usage.py             today is not a spelling
+killed    skill_usage.py             the singular is not a spelling
+killed    skill_usage.py             the plural is not a spelling
+killed    skill_usage.py             a count ahead of the clock is not a spelling
+killed    skill_usage.py             the ago spelling is not kept
+killed    skill_usage.py             ago is required
+killed    skill_usage.py             ago may repeat
+killed    skill_usage.py             any case
+killed    skill_usage.py             one day takes the plural
+killed    skill_usage.py             other counts take the singular
+killed    skill_usage.py             zero days
+killed    skill_usage.py             leading zeros
+killed    skill_usage.py             any count of digits
+killed    skill_usage.py             a bound that is too low for a valid count
+killed    skill_usage.py             digits of any script
+killed    skill_usage.py             an absolute date
+killed    skill_usage.py             another unit
+killed    skill_usage.py             any word before ago
+killed    skill_usage.py             a separator of any whitespace
+killed    skill_usage.py             negative zero
+killed    skill_usage.py             negative leading zeros
+killed    skill_usage.py             negative counts of any length
+killed    skill_usage.py             a negative bound that is too low
+killed    skill_usage.py             a negative count takes the singular
+killed    skill_usage.py             a negative count takes ago
+killed    skill_usage.py             a plus sign
+killed    skill_usage.py             a space after the sign
+37 mutants, 37 killed, survivors: none

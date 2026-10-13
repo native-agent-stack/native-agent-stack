@@ -1,0 +1,60 @@
+The last-used column of the native /skill-doctor table on the three installed clients (review round 11 of #1043; the fix9 verdict file's blocker 1). Measured on the first host, 2026-10-13.
+
+Method: a scratch home holds one synthetic skill per name below (a SKILL.md with a one-line description) and a synthetic usage store in the global config (skillUsage[name] = {usageCount: 3, lastUsedAt: <ms>}),
+the store that the client's own table reads (VQo, daysSinceUse = Math.floor((Date.now() - lastUsedAt) / 86400000), in the 2.1.296 binary). zz-never has no entry. The client runs `/skill-doctor` with the
+module's own argv (SKILL_DOCTOR_ARGV: -p /skill-doctor --output-format json --permission-mode dontAsk --permission-prompts none --tools '' --strict-mcp-config --max-turns 1 --max-budget-usd 0.05), stdin from /dev/null,
+the API address a dead loopback port and the key a placeholder, so that no model call could be made or paid; each result is subtype success, is_error false, total_cost_usd 0 and num_turns 0 (below).
+Nothing here holds an account name, a host name or a path: synthetic skill names, counts and the table's own words.
+
+Days since use per synthetic skill (the use time is that many days before the run; a negative number is ahead of it): zz-d0 0.2, zz-d1 1.5, zz-d2 2.5, zz-d9 9.5, zz-d10 10.5, zz-d30 30.5, zz-d365 365.5, zz-d1000 1000.5, zz-d99999 99999.5, zz-d1234567890 1.23457e+09, zz-f1 -0.5, zz-f3 -2.5, zz-f1000 -1000.5.
+
+== Claude Code 2.1.294: exit 0, subtype success, is_error false, total_cost_usd 0, num_turns 0
+  zz-never        userSettings     < 20          -     0×  never
+  zz-d1234567890  userSettings     < 20          -     3×  1234567890 days
+  zz-d99999       userSettings     < 20          -     3×  99999 days
+  zz-d1000        userSettings     < 20          -     3×  1000 days
+  zz-d365         userSettings     < 20          -     3×  365 days
+  zz-d30          userSettings     < 20          -     3×  30 days
+  zz-d10          userSettings     < 20          -     3×  10 days
+  zz-d9           userSettings     < 20          -     3×  9 days
+  zz-d2           userSettings     < 20          -     3×  2 days
+  zz-d1           userSettings     < 20          -     3×  1 day
+  zz-d0           userSettings     < 20          -     3×  today
+  zz-f1           userSettings     < 20          -     3×  -1 days
+  zz-f3           userSettings     < 20          -     3×  -3 days
+  zz-f1000        userSettings     < 20          -     3×  -1001 days
+-- read by tools/skill-usage/skill_usage.py parse_skill_doctor_text: 14 rows, last_used kept for 14, unknown (None) for 0
+
+== Claude Code 2.1.295: exit 0, subtype success, is_error false, total_cost_usd 0, num_turns 0
+  zz-never        userSettings     < 20          -     0×  never
+  zz-d1234567890  userSettings     < 20          -     3×  1234567890 days
+  zz-d99999       userSettings     < 20          -     3×  99999 days
+  zz-d1000        userSettings     < 20          -     3×  1000 days
+  zz-d365         userSettings     < 20          -     3×  365 days
+  zz-d30          userSettings     < 20          -     3×  30 days
+  zz-d10          userSettings     < 20          -     3×  10 days
+  zz-d9           userSettings     < 20          -     3×  9 days
+  zz-d2           userSettings     < 20          -     3×  2 days
+  zz-d1           userSettings     < 20          -     3×  1 day
+  zz-d0           userSettings     < 20          -     3×  today
+  zz-f1           userSettings     < 20          -     3×  -1 days
+  zz-f3           userSettings     < 20          -     3×  -3 days
+  zz-f1000        userSettings     < 20          -     3×  -1001 days
+-- read by tools/skill-usage/skill_usage.py parse_skill_doctor_text: 14 rows, last_used kept for 14, unknown (None) for 0
+
+== Claude Code 2.1.296: exit 0, subtype success, is_error false, total_cost_usd 0, num_turns 0
+  zz-never        userSettings     < 20          -     0×  never
+  zz-d1234567890  userSettings     < 20          -     3×  1234567890 days
+  zz-d99999       userSettings     < 20          -     3×  99999 days
+  zz-d1000        userSettings     < 20          -     3×  1000 days
+  zz-d365         userSettings     < 20          -     3×  365 days
+  zz-d30          userSettings     < 20          -     3×  30 days
+  zz-d10          userSettings     < 20          -     3×  10 days
+  zz-d9           userSettings     < 20          -     3×  9 days
+  zz-d2           userSettings     < 20          -     3×  2 days
+  zz-d1           userSettings     < 20          -     3×  1 day
+  zz-d0           userSettings     < 20          -     3×  today
+  zz-f1           userSettings     < 20          -     3×  -1 days
+  zz-f3           userSettings     < 20          -     3×  -3 days
+  zz-f1000        userSettings     < 20          -     3×  -1001 days
+-- read by tools/skill-usage/skill_usage.py parse_skill_doctor_text: 14 rows, last_used kept for 14, unknown (None) for 0

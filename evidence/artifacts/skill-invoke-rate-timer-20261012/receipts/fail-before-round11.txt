@@ -1,0 +1,32 @@
+Round 11 of #1043 (the fix9 verdict file's blocker 1, sha256 975cc574..., and the command center's adjudication: one more commit): the tests of the round against the sources of 8e93415fe, the head that was read, and against this head, and the reproduction as counts. A test is listed once with the number of its failing subtests.
+
+== 8e93415fe, the head that was read (its sources, this test module)
+   test_skill_usage.LastUsedBoundaryTests: Ran 6, FAILED (failures=10, errors=135)
+      LastUsedBoundaryTests.test_a_successful_capture_publishes_no_text_of_the_last_used_column_that_the_client_does_not_print: 4 failing subtests, e.g. route='text', value='Account9mark'
+      LastUsedBoundaryTests.test_every_spelling_the_installed_clients_printed_is_kept: 42 failing subtests, e.g. printed='never'
+      LastUsedBoundaryTests.test_the_parser_keeps_a_rows_numbers_and_reads_an_unknown_last_used_as_none: 4 failing subtests, e.g. route='text', value='Account9mark'
+      LastUsedBoundaryTests.test_the_report_carries_a_last_used_value_only_from_the_closed_set_whatever_the_caller_passes: 2 failing subtests, e.g. value="'Account9marker'"
+      LastUsedBoundaryTests.test_the_spellings_the_client_prints_pass_unchanged_and_no_other_text_does: 93 failing subtests, e.g. spelling='never'
+== this head
+   test_skill_usage.LastUsedBoundaryTests: Ran 6, OK
+== the reproduction (the fix9 verdict file, blocker 1), as counts of the account's name per stream; the real account name is used and never written here
+-- at 8e93415fe
+   plain text, bare name: rc 0, measured True, the account name in stdout 1, in stderr 0, in the --out file 1, last_used in the report: the column's text, uses 6
+   plain text, path: rc 0, measured True, the account name in stdout 1, in stderr 0, in the --out file 1, last_used in the report: the column's text, uses 6
+   plain text, never: rc 0, measured True, the account name in stdout 0, in stderr 0, in the --out file 0, last_used in the report: never, uses 6
+   plain text, 2 days ago: rc 0, measured True, the account name in stdout 0, in stderr 0, in the --out file 0, last_used in the report: 2 days ago, uses 6
+   JSON, bare name: rc 0, measured True, the account name in stdout 1, in stderr 0, in the --out file 1, last_used in the report: the column's text, uses 6
+   JSON, path: rc 0, measured True, the account name in stdout 1, in stderr 0, in the --out file 1, last_used in the report: the column's text, uses 6
+   JSON, never: rc 0, measured True, the account name in stdout 0, in stderr 0, in the --out file 0, last_used in the report: never, uses 6
+   JSON, 2 days ago: rc 0, measured True, the account name in stdout 0, in stderr 0, in the --out file 0, last_used in the report: 2 days ago, uses 6
+-- at this head
+   plain text, bare name: rc 0, measured True, the account name in stdout 0, in stderr 0, in the --out file 0, last_used in the report: null, uses 6
+   plain text, path: rc 0, measured True, the account name in stdout 0, in stderr 0, in the --out file 0, last_used in the report: null, uses 6
+   plain text, never: rc 0, measured True, the account name in stdout 0, in stderr 0, in the --out file 0, last_used in the report: never, uses 6
+   plain text, 2 days ago: rc 0, measured True, the account name in stdout 0, in stderr 0, in the --out file 0, last_used in the report: 2 days ago, uses 6
+   JSON, bare name: rc 0, measured True, the account name in stdout 0, in stderr 0, in the --out file 0, last_used in the report: null, uses 6
+   JSON, path: rc 0, measured True, the account name in stdout 0, in stderr 0, in the --out file 0, last_used in the report: null, uses 6
+   JSON, never: rc 0, measured True, the account name in stdout 0, in stderr 0, in the --out file 0, last_used in the report: never, uses 6
+   JSON, 2 days ago: rc 0, measured True, the account name in stdout 0, in stderr 0, in the --out file 0, last_used in the report: 2 days ago, uses 6
+
+Tests that fail or raise on 8e93415fe: 5 of the class's 6 (the clean controls pass at both heads by design: they hold the values the client prints).

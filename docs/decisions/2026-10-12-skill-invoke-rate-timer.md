@@ -251,6 +251,31 @@ streams and the file and a traceback there and neither here); 19 of 19 mutants o
 the lines of the former `main`), so no line number cited by another record moves. Documented statuses of the native collector's command line: an argument that argparse refuses, a manifest that cannot be read
 or decoded and any exception below the parser end in one fixed line and exit 2; a capture that is refused is reported (`claude.refused`) with exit 0, as before.
 
+## Review round 11 (Astra's read of `8e93415fe`: one P1 and five follow-ups; the command center's adjudication: one more commit for the blocker, the follow-ups to the list)
+
+Astra's read (verdict file `GPT-VERDICT.md` of the read of `8e93415fe`, sha256 `975cc574...`) is CHANGES_REQUESTED for its blocker 1, of the privacy class, in the native collector's report; the two blockers of the
+read before it are fixed at that head. It blocks whatever the round bound. The shape of the input is in that file and its reproduction; it is not restated here. The command center ruled one commit, the fix
+with a test that fails before it, no rewrite of a pushed head, and items 2 to 6 follow-ups.
+
+| Finding | Fix | Test (fails before the fix) |
+| --- | --- | --- |
+| Blocker 1 (verdict file; `skill_usage.py:137` and `:645`, the report's `skills[].claude.last_used`): the last-used column of a successful capture is a time/status field of the native table, and the report carried its text as it came | the column is one of the spellings the client prints, else unknown: `closed_last_used` returns the value when it is `never`, `today`, `1 day`, `N days` (N of 1 to 12 digits, no leading zero), `-N days` (a use time ahead of the clock) or the older `1 day ago` / `N days ago` of the retained fixture, and None for every other text; the set is the client's own table cell, not a character filter; the parser closes the column when it reads the row (`:137`) and the report closes it again where it enters the published structure (`:645`), so a caller that builds a row by hand is held too | `LastUsedBoundaryTests` (6): the set and its near misses at the function; the parser's rows in both capture shapes; the report with hand-built rows; the actual collector in a plain-text and in a JSON capture, through `--json` and `--out`, with the clean controls; and the tables the three installed clients printed (the receipt) |
+
+Where the set comes from, primary source first. The client's table cell, in the installed 2.1.294, 2.1.295 and 2.1.296 (the same text in each binary, read without running it; byte offsets 226011685, 228220398 and
+228552415): `lastUsed: daysSinceUse === null ? "never" : daysSinceUse === 0 ? "today" : `${daysSinceUse} ${I(daysSinceUse, "day")}``, with `daysSinceUse = Math.floor((Date.now() - lastUsedAt) / 86400000)` from the
+global config's `skillUsage[name]` (`VQo`, byte 217643457 of 2.1.296). Measured on each of the three at $0 and 0 turns over a synthetic usage store in a scratch home (the module's own argv, a dead loopback
+API address, a placeholder key; `receipts/native-last-used-spellings.txt`): `never`, `today`, `1 day`, `2 days`, up to `1234567890 days`, and `-1 days`, `-3 days`, `-1001 days` for a use time ahead of the clock (reachable
+after a backward clock step; the store here was written ahead of the clock, not stepped); no spelling carries `ago`, so `N days ago` stays only as the retained fixture's older spelling. Of the 42 rows the three clients printed, the module keeps 42. The count is 1 to 12 digits: the
+client prints any integer, and the cap only bounds the shape.
+
+Not covered, and why that is safe. An absolute time: this module has no source that the client prints one (the earlier comment named one without a source), and the three clients print none, so it is unknown (None), as
+is any other word. Older clients (the collector was written against 2.1.282 and 2.1.283): not run here; a spelling they print that is not in the set reads as unknown, never as text. The set changes with its source:
+a client release that prints another spelling adds it with its measurement (see the overturn conditions).
+
+The case was reproduced on `8e93415fe` and passes on this head (`receipts/fail-before-round11.txt`: five of the class's six tests fail or raise there, and the reproduction, as counts, gives the account's name once in the
+standard output and once in the `--out` file there and nowhere here); 37 of 37 mutants of the round's change are killed (`receipts/mutants-round11-37.txt`). The two call sites change in place and the new code sits
+after `decode_capture`, so no line number cited by another record moves.
+
 ## Follow-ups
 
 - Corrected in review round 3 (it was a follow-up here): a native report with the right `kind` and an inner field of the wrong type raised in `project_reports`, and the traceback named the home path and the account. Every container of a native report is now read through `table()`, so a field of the wrong shape reads as absent and the half is unmeasured; an error nobody foresaw is a fixed diagnostic without its text.
@@ -262,10 +287,12 @@ or decoded and any exception below the parser end in one fixed line and exit 2; 
 - From review round 7. `ServiceSandboxTests` cites the `systemd.exec(5)` locations of round 1 at `systemd/systemd@e846bbad`, a commit of main (2026-10-12), beside "systemd 259.5 installed"; the tag v259.5 is `b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a`. Trigger: the next edit of that docstring re-pins its four locations to the tag.
 
 - From Astra's read of `cb42f789c` (items 3 to 8 of the verdict file; each with its trigger, none changing code in round 10): (3, P3) the observation reader of the test module (`ObserveTests`) accepts frames out of order and duplicate keys and raises on a framing nested beyond the decoder's limit: the existing follow-up above, at its trigger; (4, P3) the closed schema's time leaf accepts spellings that the independent contract of the tests does not (a date without a time, a time without a zone): normalize the accepted times to the program's own spelling or make the schema and the contract agree, with those two cases added, at the next change of the schema; (5, P3) missing timestamps, the publication's share of the timeout margin and the native fixtures' home dependence stay at their recorded triggers; (6, P3) custody: the cited sanitized captures and source references of the older rows and a distinct pinned reference for the round-9 schema are not in the packet (the next measurement supplies them); (7, P3 hygiene) the 18 inherited hostname lines of the registry wait for the separately authorized registry cleanup; (8, P3) the body's description of the live-base merge is a record correction (done in the body: the merge base, tip and tree identity replace the word).
+- From Astra's read of `8e93415fe` (items 2 to 6 of the verdict file; each with its trigger, none changing code in round 11): (2, P3) the observation reader of the test module (`ObserveTests`) accepts frames out of order and duplicate keys and raises on a framing nested beyond the decoder's limit: the existing follow-up above, at its trigger; (3, P3) the closed schema's time leaf accepts spellings that the independent contract of the tests does not: the existing follow-up of round 10 (its item 4), at its trigger; (4, P3) missing timestamps, the publication's share of the timeout margin and the native fixtures' home dependence stay at their recorded triggers; (5, P3) custody: the pages, pinned files and private drivers that the packet lacked are supplied at the next measurement; (6, P3 hygiene) the 18 inherited hostname lines of the registry wait for the separately authorized registry cleanup.
 
 ## Overturn conditions
 
 - A client release that makes `/skill-doctor` cheap or slow: re-measure the capture (the method is the table above) and revise the timeout.
+- A client release that prints another spelling in the last-used column (an absolute time, another unit): re-run the probe of `receipts/native-last-used-spellings.txt`, add the spelling to `LAST_USED_SPELLING` with its measurement, and extend the near misses.
 - The command center changes how the live clone is kept (for example attaches it to a branch): the test still passes for a branch that is at a commit of `origin/main`.
 - A week of load samples that puts a different span lowest: move the two `OnCalendar` lines.
 - A systemd release or a source change that stops `insist_on_sandboxing()` counting `TemporaryFileSystem=`, or a supported host class whose manager makes no mount namespace and does not refuse the marked unit: `NativeManagerTests` fails on it (they must), and the marker is replaced by another member of the list, measured on both host classes first.

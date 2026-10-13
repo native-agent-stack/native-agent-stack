@@ -4052,5 +4052,141 @@ class NativeBoundaryTests(unittest.TestCase):
             self.assertEqual((done.returncode, done.stderr), (2, "skill_usage: invalid manifest (JSONDecodeError)\n"))
 
 
+class LastUsedBoundaryTests(unittest.TestCase):
+    """Review round 11 (the fix9 verdict file of #1043, sha256 975cc574..., blocker 1): the last-used column of a successful capture is a time/status field with a closed set of spellings, not a name, and
+    the report carries it only from that set. The client's formatter prints `never`, `today`, `1 day` and `N days` (anthropics/claude-code, the installed 2.1.294, 2.1.295 and 2.1.296: the table cell
+    `lastUsed:o.daysSinceUse===null?"never":o.daysSinceUse===0?"today":`${o.daysSinceUse} ${I(o.daysSinceUse,"day")}``); the retained fixture's older `N days ago` spelling stays. Every other text is unknown
+    (None), at the parser and at the report. The account name is a synthetic marker here; the verdict file is cited by number and not restated."""
+
+    MARK = "Account9marker"
+    TIMES = chr(0xD7)
+
+    class Looks:
+        """An object whose text is a spelling of the column, which is no spelling: only a string is read."""
+
+        def __str__(self):
+            return "never"
+
+    SPELLINGS = ("never", "today", "1 day", "2 days", "9 days", "10 days", "365 days", "99999 days", "1234567890 days", "999999999999 days", "-1 days", "-3 days", "-1001 days", "-999999999999 days",
+                 "1 day ago", "2 days ago", "30 days ago")
+    HOSTILE = (MARK, f"/home/example/{MARK}/private")
+    # near misses of the grammar: a character filter would pass several of these
+    NOT_SPELLINGS = (
+        MARK, "root", "a", "nev", "tod", "never_", "/home/example/" + MARK + "/private", "~/" + MARK, "../" + MARK, "C:" + chr(92) + "Users" + chr(92) + MARK,
+        "never " + MARK, MARK + " never", "2 days ago " + MARK, MARK + " 2 days ago", "never/" + MARK, "never; " + MARK, "today:" + MARK, "2 days " + MARK,
+        "Never", "NEVER", "Today", "2 Days", "2 days Ago",
+        "0 days", "1 days", "2 day", "02 days", "+2 days", "2.5 days", "2,000 days", "1000000000000 days", "-1000000000000 days", "2 days ago ago", "2 days ago ",
+        "-0 days", "-1 day", "-01 days", "--1 days", "- 1 days", "-1 days ago", "-1" + chr(0x662) + " days", chr(0x2212) + "1 days", "-1  days", "-1 Days",
+        "2  days", "2" + chr(9) + "days", " never", "never ", "never" + chr(10), "2 days  ago", "2 days" + chr(9) + "ago", "2" + chr(0xA0) + "days",
+        chr(0x662) + " days", chr(0xFF12) + " days", "1" + chr(0x662) + " days", "1" + chr(0xFF12) + " days", "2 days " + chr(0x430) + "go",
+        "2026-10-12", "2026-10-12T10:00:00Z", "Oct 12", "12 Oct 2026", "yesterday", "just now", "1 hour ago", "3 weeks ago",
+        "", " ", None, 3, 2.5, True, ["never"], ("never",), b"never", {"never": 1}, Looks(),
+    )
+
+    def table(self, last_used, second="never"):
+        return ("Skills loaded this session\n\n"
+                "  skill                           source          context  7d tokens   uses  last used\n"
+                f"  gh-fix-ci                       userSettings       ~110         340    6{self.TIMES}  {last_used}\n"
+                f"  typesafe-ai                     userSettings       ~230           -    0{self.TIMES}  {second}\n")
+
+    def capture(self, route, table):
+        if route == "text":
+            return table
+        return json.dumps({"type": "result", "subtype": "success", "is_error": False, "total_cost_usd": 0, "num_turns": 0, "result": table})
+
+    def run_cli(self, arguments, cwd):
+        return subprocess.run([sys.executable, "-B", str(ROOT / "tools/skill-usage/skill_usage.py"), *arguments], capture_output=True, text=True, timeout=180, cwd=cwd)
+
+    def report_of(self, work, route, last_used):
+        capture = work / f"{route}-{abs(hash(str(last_used)))}.capture"
+        capture.write_text(self.capture(route, self.table(last_used)), encoding="utf-8")
+        out = work / (capture.name + ".report.json")
+        done = self.run_cli(["--claude-skill-doctor", str(capture), "--json", "--out", str(out), "--now", "2026-10-12T10:00:00+00:00"], work)
+        return done, out
+
+    def test_the_spellings_the_client_prints_pass_unchanged_and_no_other_text_does(self):
+        for value in self.SPELLINGS:
+            with self.subTest(spelling=value):
+                self.assertEqual(S.closed_last_used(value), value)
+        for value in self.NOT_SPELLINGS:
+            with self.subTest(not_a_spelling=repr(value)[:40]):
+                self.assertIsNone(S.closed_last_used(value))
+
+    def test_the_parser_keeps_a_rows_numbers_and_reads_an_unknown_last_used_as_none(self):
+        for route in ("text", "json"):
+            for value in self.HOSTILE:
+                with self.subTest(route=route, value=value[:12]):
+                    raw = self.capture(route, self.table(value))
+                    rows = S.parse_claude_output(raw)["rows"]
+                    self.assertEqual(rows["gh-fix-ci"], {"source": "userSettings", "context_tokens": 110, "tokens_7d": 340, "uses": 6, "last_used": None})
+                    self.assertEqual(rows["typesafe-ai"]["last_used"], "never", "the other row of the table is read as before")
+        for value in self.SPELLINGS:
+            with self.subTest(spelling=value):
+                self.assertEqual(S.parse_skill_doctor_text(self.table(value))["gh-fix-ci"]["last_used"], value)
+
+    def test_the_report_carries_a_last_used_value_only_from_the_closed_set_whatever_the_caller_passes(self):
+        manifest = S.load_manifest(FIXTURES / "manifest.json")
+        skill = dict(manifest["skills"][0], name="claude-api", claude_skill_name="claude-api:claude-api", codex_enabled=False)
+        manifest["skills"] = [skill]
+        now = S.parse_iso("2026-10-11T00:00:00Z")
+        for value in self.SPELLINGS + self.HOSTILE:
+            with self.subTest(value=repr(value)[:30]):
+                report = S.build_report(manifest, claude={"rows": {"claude-api:claude-api": {"uses": 3, "context_tokens": 10, "last_used": value}}},
+                                        codex_scan=S.scan_codex_roots([], ["claude-api"], now=now, windows=[7, 30]), lock_installed_at={"claude-api": "2026-10-10T00:00:00Z"},
+                                        now=now, windows=[7])
+                carried = report["skills"][0]["claude"]
+                self.assertEqual((carried["uses"], carried["context_tokens"]), (3, 10))
+                self.assertEqual(carried["last_used"], value if value in self.SPELLINGS else None)
+                self.assertNotIn(self.MARK, json.dumps(report))
+
+    def test_every_spelling_the_installed_clients_printed_is_kept(self):
+        """The receipt holds the tables that Claude Code 2.1.294, 2.1.295 and 2.1.296 printed for a synthetic usage store (their last-used column: `never`, `today`, `1 day`, `N days` and, for a use time ahead
+        of the clock, `-N days`); the module keeps every one of them, so a closed set that is narrower than the client's own output fails here."""
+        receipt = ROOT / "evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/native-last-used-spellings.txt"
+        text = receipt.read_text(encoding="utf-8")
+        printed = [line.split(self.TIMES, 1)[1].strip() for line in text.splitlines() if line.lstrip().startswith("zz-")]
+        self.assertEqual(len(printed), 42, "14 rows from each of the three clients")
+        for value in printed:
+            with self.subTest(printed=value):
+                self.assertEqual(S.closed_last_used(value), value)
+        rows = S.parse_skill_doctor_text(text)
+        self.assertEqual(len(rows), 14)
+        self.assertEqual(sorted(row["last_used"] for row in rows.values() if row["last_used"] is None), [])
+
+    def test_a_successful_capture_publishes_no_text_of_the_last_used_column_that_the_client_does_not_print(self):
+        """Through the actual native collector (`--claude-skill-doctor <capture> --json --out <report>`), in a plain-text capture and in an otherwise clean zero-cost JSON capture: text that the client
+        does not print in the last-used column reaches neither stream nor the JSON report written with --out, and the row's numbers are kept."""
+        with tempfile.TemporaryDirectory() as temp:
+            work = Path(temp)
+            for route in ("text", "json"):
+                for value in self.HOSTILE:
+                    with self.subTest(route=route, value=value[:12]):
+                        done, out = self.report_of(work, route, value)
+                        self.assertEqual(done.returncode, 0, done.stderr[-300:])
+                        for label, content in (("stdout", done.stdout), ("stderr", done.stderr), ("the --out file", out.read_text(encoding="utf-8"))):
+                            self.assertNotIn(self.MARK, content, f"{route}: {label}")
+                        report = json.loads(out.read_text(encoding="utf-8"))
+                        self.assertEqual(json.loads(done.stdout), report, "both JSON routes carry the one report")
+                        self.assertTrue(report["claude"]["measured"])
+                        row = {entry["name"]: entry for entry in report["skills"]}["gh-fix-ci"]["claude"]
+                        self.assertEqual((row["in_table"], row["uses"], row["context_tokens"], row["last_used"]), (True, 6, 110, None))
+            plain = work / "plain.capture"
+            plain.write_text(self.table(self.MARK), encoding="utf-8")
+            done = self.run_cli(["--claude-skill-doctor", str(plain), "--now", "2026-10-12T10:00:00+00:00"], work)
+            self.assertEqual(done.returncode, 0)
+            self.assertNotIn(self.MARK, done.stdout + done.stderr, "the text rendering carries it neither")
+
+    def test_the_clean_controls_keep_their_last_used_value_through_the_native_collector(self):
+        with tempfile.TemporaryDirectory() as temp:
+            work = Path(temp)
+            for route in ("text", "json"):
+                for value in ("never", "today", "1 day", "2 days ago"):
+                    with self.subTest(route=route, value=value):
+                        done, out = self.report_of(work, route, value)
+                        self.assertEqual(done.returncode, 0, done.stderr[-300:])
+                        row = {entry["name"]: entry for entry in json.loads(out.read_text(encoding="utf-8"))["skills"]}["gh-fix-ci"]["claude"]
+                        self.assertEqual((row["in_table"], row["uses"], row["context_tokens"], row["last_used"]), (True, 6, 110, value))
+
+
 if __name__ == "__main__":
     unittest.main()

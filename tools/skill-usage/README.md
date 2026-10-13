@@ -116,6 +116,9 @@ one root is explicitly given. The report itself contains only skill names and co
   never the matched string, the surrounding message, or any other field of the line.
 - the Claude side is limited to native `/skill-doctor`'s own table (skill, source, context tokens,
   7-day tokens, uses, last used); it is never asked to read `~/.claude/skills` or any transcript.
+  The report carries from that table the counts of the manifest's skills and, for last used, one
+  of the spellings the client prints (`never`, `today`, `1 day`, `N days`, and the older
+  `N days ago`); any other text in that column is reported as `null` (`closed_last_used`).
 
 ## Commands
 

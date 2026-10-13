@@ -134,7 +134,7 @@ def parse_skill_doctor_text(text: str) -> dict[str, dict]:
             "context_tokens": parse_approx_count(groups["context"]),
             "tokens_7d": parse_approx_count(groups["tokens_7d"]),
             "uses": int(groups["uses"]),
-            "last_used": groups["last_used"].strip(),
+            "last_used": closed_last_used(groups["last_used"].strip()),
         }
     return rows
 
@@ -642,7 +642,7 @@ def build_report(manifest: dict, *, claude: dict | None, codex_scan: dict,
             else:
                 claude_out = {"listing": claude_listing, "in_table": True,
                               "context_tokens": row["context_tokens"], "uses": row["uses"],
-                              "last_used": row["last_used"]}
+                              "last_used": closed_last_used(row["last_used"])}
             claude_zero = claude_out["uses"] == 0 if claude_out["uses"] is not None else None
             claude_evaluated = claude_listed and claude_out["uses"] is not None
 
@@ -2667,7 +2667,7 @@ def lanes_main(args, manifest: dict, now: datetime) -> int:
     return 0
 
 
-# These sit at the end of the module so that no line number cited by another record (ledger_path_issue, the native metadata) moves; build_parser and parse_claude_output use them at call time.
+# These sit at the end of the module so that no line number cited by another record (ledger_path_issue, the native metadata) moves; build_parser, parse_claude_output, parse_skill_doctor_text and build_report use them at call time.
 ARGUMENT_REFUSAL = "skill_usage: the command line has an argument this version does not take, or lacks one it needs; nothing was run"
 
 
@@ -2720,6 +2720,20 @@ def decode_capture(raw: str):
         raise
     except (RecursionError, ValueError):
         return None
+
+
+# What the last-used column of a captured table may put into the report (review round 11, the fix9 verdict file, blocker 1): the column is a time/status field of the native table, not a name, so no test of
+# its characters decides it; it is one of the spellings the client prints, else unknown (None). The client's table cell is `lastUsed: daysSinceUse === null ? "never" : daysSinceUse === 0 ? "today" :
+# `${daysSinceUse} ${I(daysSinceUse, "day")}``, daysSinceUse being Math.floor((Date.now() - lastUsedAt) / 86400000) (anthropics/claude-code, the installed 2.1.294, 2.1.295 and 2.1.296: the same text in each
+# binary), and measured on each of the three at $0 and 0 turns over a synthetic usage store: `never`, `today`, `1 day`, `N days` (to 10 digits) and, for a use time ahead of the clock, `-N days`
+# (evidence/artifacts/skill-invoke-rate-timer-20261012/receipts/native-last-used-spellings.txt). The count is 1 to 12 digits here: the client prints any integer, and the cap only bounds the shape.
+# `N day(s) ago` is the older spelling of the retained fixture, kept. An absolute time, a name, a path or any other word is not a spelling of the column: this module has no source that the client prints one.
+LAST_USED_SPELLING = re.compile(r"never|today|1 day(?: ago)?|(?:[2-9]|[1-9][0-9]{1,11}) days(?: ago)?|-[1-9][0-9]{0,11} days")
+
+
+def closed_last_used(value):
+    """The last-used value of a row as the report may carry it: a spelling of LAST_USED_SPELLING, as it is, else None."""
+    return value if isinstance(value, str) and LAST_USED_SPELLING.fullmatch(value) else None
 
 
 PROCESSING_REFUSAL = "skill_usage: an input could not be read or processed; the program stopped (exit 2)"
