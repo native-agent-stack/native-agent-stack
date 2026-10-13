@@ -87,6 +87,15 @@ systemd-run --user --scope -p CPUWeight=idle --quiet -- env TMPDIR=/var/tmp pyth
 `--duplicate-tags` and `--separate-budgets` are intentional failing controls.
 Each now asserts its exact expected reason before returning rc 1; an unrelated
 failure does not satisfy the control. A/B are assertions in the successful run.
+Every probe uses the existing `tests.adaptive_paper_hermetic` helper to isolate
+all imported canonical STOP bindings under a private SYN root and restore them
+in finally. Passing a private trial stop_file alone does not isolate the
+canonical latch. No host STOP is read, created or cleared by the probe.
+The focused native module `tests.integration.concurrent_preset_probe` reproduces
+both regressions before the fix: a private stand-in canonical STOP made the
+coupling slice refuse, and an unrelated outstanding-order refusal was reported
+as aggregate-risk success. The fix preserves the SYN sentinel and requires
+exactly `aggregate_exposure_cap_exceeded` before reporting that success.
 Absent/wrong Nautilus runtime fails, never skips. Raw logs are private; this
 proposal publishes no hash or prefix committing to withheld output bytes.
 

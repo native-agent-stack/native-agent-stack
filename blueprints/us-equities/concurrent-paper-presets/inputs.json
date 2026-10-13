@@ -177,6 +177,14 @@
       "bytes": 15281,
       "sha256": "7ae6034d75b71b755578996911c2db82cd2201295d01492bcb2ea1779abdec46",
       "locators_at_pin": "100-105"
+    },
+    {
+      "repository": "native-agent-stack",
+      "pin": "993cc890b3ff3fc95fa7cdba51edd726565f9ace",
+      "path": "tests/adaptive_paper_hermetic.py",
+      "bytes": 7648,
+      "sha256": "ee3fe5d3f97143e9361281f2c4d95076b758ec8d245a942bd7470412673558cd",
+      "locators_at_pin": "52-90"
     }
   ],
   "financial_input_scope": "Existing published configs/retained receipts only; no new data acquisition, paid calls or private preimages."

@@ -6,6 +6,7 @@ Managed Nautilus2.0.0rc5 is required; absent runtime is a failure, not a skip.
 """
 import asyncio
 from decimal import Decimal
+from functools import wraps
 from importlib.metadata import version
 import json
 from pathlib import Path
@@ -21,6 +22,26 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "blueprints/us-equities/adaptive-paper"))
 
 
+def hermetic_probe(function):
+    """Isolate every imported canonical latch; restore even on a failed probe."""
+    @wraps(function)
+    def run(*args, **kwargs):
+        # Import bindings before the shared helper captures them. Passing a
+        # private stop_file alone does not isolate canonical DEFAULT_STOP.
+        import safety
+        import runner
+        import native_strategy
+        from tests.adaptive_paper_hermetic import patch_default_stop, restore_default_stop
+        with patch.object(tempfile, "tempdir", "/var/tmp"):
+            token = patch_default_stop(safety, runner, native_strategy)
+        try:
+            return function(*args, **kwargs)
+        finally:
+            restore_default_stop(token)
+    return run
+
+
+@hermetic_probe
 def native_probe(*, duplicate_tags=False):
     from tests.test_adaptive_paper_native import ADAPTER, FakePort
     from nautilus_trader.config import StrategyConfig
@@ -74,6 +95,7 @@ def native_probe(*, duplicate_tags=False):
             "distinct_order_ids": len(set(ids)), "data": "SYN_SAME_SYMBOL_QUOTES"}
 
 
+@hermetic_probe
 def ledger_probe(*, separate_budgets=False):
     from safety import Ledger, RiskLimits, Quote, SafetyError
     # Independent preset counters are the unsafe comparator: 100 requests each
@@ -113,6 +135,8 @@ def ledger_probe(*, separate_budgets=False):
                                       now=now + 61, market_open=True, session_close=now + 3600, stop_file=stop)
             except SafetyError as error:
                 gross_refusal = str(error)
+                if gross_refusal != "aggregate_exposure_cap_exceeded":
+                    raise AssertionError("unexpected_aggregate_gross_refusal") from error
             else:
                 raise AssertionError("aggregate_pending_gross_not_enforced")
             if ledger.accounting().pending_buy_notional_usd != Decimal("100.01"):
@@ -126,6 +150,7 @@ def ledger_probe(*, separate_budgets=False):
             "pending_after_refusal": "100.01", "data": "SYN_QUOTES_AND_REQUEST_CLOCK"}
 
 
+@hermetic_probe
 def adaptive_controls():
     """A: actual class cannot register twice. B: identity-only repair is unsafe.
 
@@ -202,6 +227,7 @@ def adaptive_controls():
             "port_starts": 0, "external_submissions": 0}
 
 
+@hermetic_probe
 def coupling_probe():
     """Exercise the real shared Controller and 429 freeze methods, no SDK client."""
     from runner import Controller

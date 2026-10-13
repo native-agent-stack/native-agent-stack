@@ -11,6 +11,14 @@
   "native_version": "2.0.0rc5",
   "upstream_pin": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
   "status": "passed",
+  "regression_checks": {
+    "command": "python -E -s -B -m unittest tests.integration.concurrent_preset_probe -v",
+    "runtime": "selected managed NautilusTrader 2.0.0rc5",
+    "before_at_569243fa": {"rc": 1, "cases": 2, "failures": 1, "errors": 1},
+    "after": {"rc": 0, "cases": 2, "skips": 0},
+    "canonical_stop": "private SYN sentinel preserved; imported bindings restored",
+    "aggregate_gross_refusal": "unrelated guard errors cannot report passed"
+  },
   "broker_execution": "NOT_RUN",
   "commands": [
     {"arguments": [], "rc": 0, "fresh_processes": 2, "equal_structured_results": true},
