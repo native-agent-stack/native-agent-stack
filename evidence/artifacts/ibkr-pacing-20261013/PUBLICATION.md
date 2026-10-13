@@ -32,6 +32,9 @@ journals; revision 2 fails each corresponding check. The producer reports
 82 passing checks and zero failures on the true revision 2 inputs. Those checks
 derive the missing-order kinds from journal events and venue text, compare the
 headline with recomputed counters, and check the third broker-count arithmetic.
+The per-ID ownership assertion in the sealed addendum is superseded by the
+verification limit below; aggregate classified-count equality does not enforce
+ownership in exactly one run.
 The internal probe scripts and output are not included in this publication.
 
 The 38 missing orders now split into **35 duplicate-order-ID refusals (103),
@@ -44,6 +47,39 @@ The unchanged revision 1 README is historical methodology. Its 36-[103]
 classification and its statement that the cross-client rule was undocumented
 are superseded by revision 2 and [ADDENDUM-02.txt](ADDENDUM-02.txt), respectively.
 All measured rates, latencies and test counts remain unchanged.
+
+## Claim limits adjudicated on 2026-10-13
+
+These definitions govern the handbook and interpretation of the retained sealed
+projection, README, addendum and script assertion labels. The generator and
+verifier remain byte-identical to the approved v2 seal. Their wording and the
+copied metadata are historical producer text; a passing check supports only the
+measurement described here. No headline number is changed by these corrections.
+
+| Field or assertion | Supported claim at the sealed v2 head | Limit |
+| --- | --- | --- |
+| Whole-run `max_1s`, including combined connection estimates | Maximum count in UTC-aligned one-second buckets, for each counted/refined/upper-bound series | A rolling-window maximum is unmeasured. |
+| `best_5s_mean` | Highest mean over five consecutive UTC-aligned buckets evaluated by the producer | Arbitrarily positioned five-second windows are unmeasured. |
+| `peak_open_orders` wherever reported in the linked projection | Reported submission/cancellation counter **including rejected orders**; the adapter increments on submission and decrements on cancellation without removing rejections | It does not establish broker-confirmed accepted open orders or exposure. |
+| Missing-ID ownership assertion | Aggregate classified-count equality with the missing total | **Per-ID ownership in exactly one run is not enforced**; omission and duplication can offset. |
+
+The aligned-bucket definitions supersede the broader window wording in
+`README.md:38–39`, the two rate-estimate `headline_numbers[].unit` labels and
+the sealed generator/verifier's rate assertion labels. The peak qualification
+applies to all linked `peak_open_orders` fields and `README.md:37`. The ownership
+limit supersedes `ADDENDUM-03.txt:20` and the verifier's line 180 assertion label.
+
+Primary sources at the unchanged v2 commit
+`2d433d4c3a66678305ea047cc6c11136b9724d78`:
+
+- [Generator, UTC bucket and five-bucket calculations](https://github.com/native-agent-stack/native-agent-stack/blob/2d433d4c3a66678305ea047cc6c11136b9724d78/evidence/artifacts/ibkr-pacing-20261013/generate_ibkr_pacing_evidence.py#L129-L151).
+- [Verifier, independent aligned-bucket calculation](https://github.com/native-agent-stack/native-agent-stack/blob/2d433d4c3a66678305ea047cc6c11136b9724d78/evidence/artifacts/ibkr-pacing-20261013/verify_ibkr_pacing_evidence.py#L53-L75).
+- [Generator, submitted/canceled peak counter](https://github.com/native-agent-stack/native-agent-stack/blob/2d433d4c3a66678305ea047cc6c11136b9724d78/evidence/artifacts/ibkr-pacing-20261013/generate_ibkr_pacing_evidence.py#L159-L180).
+- [Verifier, missing-ID classification and aggregate comparison](https://github.com/native-agent-stack/native-agent-stack/blob/2d433d4c3a66678305ea047cc6c11136b9724d78/evidence/artifacts/ibkr-pacing-20261013/verify_ibkr_pacing_evidence.py#L161-L181).
+
+Rolling-window computation, rejected-order peak handling and explicit per-ID
+ownership enforcement are trading-cc v3 code follow-ups. They are not fixes
+implemented by this documentation correction.
 
 ## Official source captures
 

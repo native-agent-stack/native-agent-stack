@@ -89,6 +89,28 @@ Sources: projection `/facts/message_counting`, `/headline_numbers` entries
 `adapter_r6_rung40` and `adapter_r6_rung50`, `/caveats`, and
 [pinned cancel resolution][cancel-source].
 
+## Read the measurement limits with the figures
+
+The projection's whole-run `max_1s` rates use **UTC-aligned one-second buckets**.
+Its `best_5s_mean` is computed from five consecutive aligned buckets. These
+statistics do not measure a rolling-window maximum or establish a cap for every
+possible interval. The rung-average headline rates above retain their stated
+20-second scope. Source: [publication claim limits and pinned producer source][publication].
+
+The reported `peak_open_orders` **includes rejected orders**. The adapter's
+counter increments on submission and decrements on cancellation; rejection does
+not remove an entry. Read that field as the reported counter, rather than a
+broker-confirmed count of accepted open orders or a verified exposure maximum.
+This qualification accompanies every use of that field in the linked projection.
+Source: [publication claim limits and pinned counter][publication].
+
+The v2 verifier compares the aggregate classified missing-order count with the
+missing total. It **does not enforce per-ID ownership in exactly one run**;
+an omitted ID and a duplicated ID can balance in the aggregate. Its passing
+checks therefore do not establish that invariant. The headline figures remain
+the retained producer results with this verification limit. Source:
+[publication claim limits and pinned verifier][publication].
+
 ## Error 103 and the order-writing connection
 
 For this trial policy, retain **one order-writing connection per account**.
