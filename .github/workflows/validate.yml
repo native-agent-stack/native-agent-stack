@@ -380,6 +380,67 @@ jobs:
         if: matrix.shard == 0
         run: node --test blueprints/native-skill-practice/test-contract.cjs
 
+  integration:
+    name: integration
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - name: Check out integration sources
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install the locked native integration runtime
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends bubblewrap python3.12-venv libnuma1
+          python3.12 -m venv "$RUNNER_TEMP/integration-venv"
+          "$RUNNER_TEMP/integration-venv/bin/python" -m pip --isolated install \
+            --disable-pip-version-check --no-input --only-binary=:all: --require-hashes \
+            --index-url https://pypi.org/simple \
+            -r blueprints/us-equities/adaptive-paper/requirements-linux-x86_64-py312.lock
+      - name: Run every integration module without network or host state
+        shell: bash
+        # Native unittest owns discovery/execution; *.py includes existing non-test-prefixed modules.
+        # CPython v3.12.3@f6650f9ad73359051f3e558c2431a109bc016664:
+        # Lib/unittest/loader.py:229-340, runner.py:193-258 (public loader/runner APIs).
+        # containers/bubblewrap v0.9.0@8e51677abd7e3338e4952370bf7d902e37d8cbb6:
+        # bubblewrap.c:314-367 documents namespace/env/readonly/tempfs controls;
+        # reuse native-foundation-e2e.yml's mandatory namespace isolation, with no fallback.
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/integration"
+          /usr/bin/time -f 'integration elapsed_seconds=%e' \
+            timeout --signal=ABRT --kill-after=10s 10m \
+            sudo --non-interactive bwrap \
+              --unshare-all --unshare-net --die-with-parent --new-session --clearenv \
+              --uid "$(id -u)" --gid "$(id -g)" --cap-drop ALL \
+              --ro-bind /usr /usr --symlink usr/bin /bin --symlink usr/lib /lib \
+              --symlink usr/lib64 /lib64 --proc /proc --dev /dev \
+              --tmpfs /tmp --perms 1777 --tmpfs /var/tmp \
+              --ro-bind "$RUNNER_TEMP/integration-venv" /venv \
+              --ro-bind "$GITHUB_WORKSPACE" /workspace --chdir /workspace \
+              --setenv HOME /var/tmp --setenv TMPDIR /var/tmp \
+              --setenv LANG C.UTF-8 --setenv PATH /venv/bin:/usr/bin:/bin \
+              --setenv PYTHONDONTWRITEBYTECODE 1 --setenv PYTHONFAULTHANDLER 1 \
+              --setenv OPENBLAS_NUM_THREADS 1 --setenv OMP_NUM_THREADS 1 \
+              /venv/bin/python scripts/run_integration_tests.py \
+              2>&1 | tee "$RUNNER_TEMP/integration/unittest.log"
+      - name: Retain the integration log and duration
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: integration-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/integration/unittest.log
+          if-no-files-found: warn
+          retention-days: 30
+
   validate-result:
     name: validate
     if: always()

@@ -5237,8 +5237,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "a026b23a199814534e94acd948dc11b01ac53bfbd90b292d9ab3c73032eadd9a",
-      "bytes": 46696
+      "sha256": "332647c04d1fe3ff0940337f0600af38db3bfa3303fdeb9f9cd8bfb5e18ac5af",
+      "bytes": 49961
     },
     {
       "path": ".gitignore",
@@ -62097,6 +62097,11 @@
       "bytes": 14662
     },
     {
+      "path": "scripts/run_integration_tests.py",
+      "sha256": "af5d54d3d75550ea4587347e2de4bd7907e0402c4fd7e879cb0fd1411bbcbc7d",
+      "bytes": 1112
+    },
+    {
       "path": "scripts/saturation_ledger.py",
       "sha256": "611b5640c92b3985675f3405770405cdc2a9552a8b5e6bc3b3f7a868168f6b76",
       "bytes": 110935
@@ -63205,6 +63210,11 @@
       "path": "tests/test_install_skills.py",
       "sha256": "6d939894cbcde3839bcbb373a4a985d37387704d5badff69718c2bb32e279682",
       "bytes": 233774
+    },
+    {
+      "path": "tests/test_integration_ci.py",
+      "sha256": "34522388b02df1c0d10a95420478d783e646eb2ec7130c9084ba41b8583497f1",
+      "bytes": 4497
     },
     {
       "path": "tests/test_j775_panel_contracts.py",
