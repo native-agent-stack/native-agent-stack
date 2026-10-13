@@ -8,7 +8,8 @@ their tests.
 ## What each does
 
 **`uet_land.sh <pr> <read-head-prefix>`** lands a pull request of `seathatflowsinourveins/us-equities-trading` by squash
-merge. In order: the landing lock of the repository (exit 14 when another landing holds it; below); the `trading-cc-read` commit
+merge. In order: `nas_land.sh`'s two inputs refused when either is set (exit 2 before any call; "A nas input in a uet landing", below);
+the landing lock of the repository (exit 14 when another landing holds it; below); the `trading-cc-read` commit
 status and its record (below); each file in `VERDICT_FILES` (and `GATES_DONE` when such a file states a landing gate); the head is
 the read head or a pure rebase of it; a draft is marked ready and `codex_gate.py` must report the latest review finished (polled for
 up to 20 minutes); when Codex reports its usage limit, `GPT_VERDICT` (the co-op's verdict naming the read head) stands in for it; the
@@ -21,7 +22,9 @@ the head with `--match-head-commit` and names the account's no-reply address as 
 since its transfer to the organization on 2026-10-12 (`LANDING_REPO` overrides it; "The repository", below),
 with the verdict files as arguments (at least one) and these differences: local reviews are required (`LOCAL_REVIEWS`, or a waiver
 bound to the pull request and the read head, `LOCAL_REVIEW_WAIVER`; exit 2 before any call otherwise; "Local reviews", below; #1061
-round 2), `manifests/evidence.json` is left out of the change
+round 2), a local review that says `patch is incorrect` with only P2 and P3 findings passes only on the CC's adjudication
+(`LOCAL_REVIEW_ADJUDICATION`, the CC's ruling of 2026-10-13; "Local reviews", below), the squash body can be a file (`SQUASH_BODY_FILE`;
+"The squash body", below), `manifests/evidence.json` is left out of the change
 identity (CI arbitrates the registry), a BEHIND branch is updated server-side (merge method), the aggregate `validate` check
 must have succeeded at the head (every page of check runs is read; the rule is below), the Codex gate is asked again before the
 validation, and the head is then merged into the current `origin/main` in a temporary worktree
@@ -55,7 +58,8 @@ account notice since the trigger, no connector activity for 10 minutes, or a rev
 minutes, below). Both scripts stop with exit 9 on a 4 at any call, and on a 3
 at any call but the wait, which polls a 3 for up to 20 minutes. A trigger is the pull request's creation, a ready-for-review event, or a comment by anyone but the connector that
 starts with `@codex review` or `@codex security review`; a push is not a trigger. A Running row gives 3 until it is stale (below). When
-`LOCAL_REVIEWS` names review files, the gate reads no connector data and decides from the files alone ("Local reviews", below).
+`LOCAL_REVIEWS` names review files, the gate reads no connector data and decides from the files alone, and from the CC's adjudication
+record when `LOCAL_REVIEW_ADJUDICATION` names one ("Local reviews", below).
 
 **A stale running review (CC correction #200, 2026-10-13).** The transfer of this repository to the organization cut the connector's
 access in the middle of a review, and its summary row stayed Running, so the gate gave 3 for as long as it stayed so (a landing stopped
@@ -137,6 +141,45 @@ measured REST, GraphQL and `gh -R` on the moved repository), but a repository cr
 `R` must have GitHub's owner/name shape (an owner of at most 39 alphanumerics and single inner dashes, a name of letters, digits, `.`, `_`
 and `-` other than `.` and `..`), or the landing stops with exit 2 before any call, and every `-R "$R"` is quoted (#1061 P3: a value with
 whitespace was split into extra `gh` arguments).
+
+**The squash body (`nas_land.sh`; #1061 round 2 and 2026-10-13).** A landing names a body only to record a waiver or an adjudication, or
+when `SQUASH_BODY_FILE` is set; otherwise GitHub's default stands (the repository's squash default is the pull request's commit messages).
+The waiver's line or the adjudication's ("Local reviews", below) follows a blank line after the body GitHub offers the merging account
+(`viewerMergeBodyText(mergeType: SQUASH)`, read once before the author lookup; exit 7 when the read fails). `SQUASH_BODY_FILE` is the CC's
+(2026-10-12: for a pull request whose commit messages carry a claim corrected after review), ported from its live copy on 2026-10-13. When
+set, it must name a readable, non-empty regular file other than `-`, or the landing stops with exit 2 before the lock and any call, the path
+not printed: `gh` reads a body file when the merge call starts, and reads standard input for `-` (`cli/cli@v2.102.0`
+`pkg/cmd/pr/merge/merge.go:146-153`, `:177`, "Read body text from `file` (use "-" to read from standard input)";
+`pkg/cmdutil/file_input.go:8-15`). A set but empty value stops too: the live copy took it for unset, and the merge fell back to the
+default body, which is what the file is there to prevent (#1061 P1 was the same fallback, an empty `LOCAL_REVIEWS` taken for unset).
+
+The file's content is checked, not only its metadata (#1075: Astra's P2-1 and the co-op's codex review, P2 at `nas_land.sh:585-586`, at
+ca6f880b, where bytes that are not UTF-8, 1 MiB, a NUL byte alone beside the waiver and a file emptied after the start all merged). One
+bounded reader (`SB_READER`, `nas_land.sh:89-113`) reads at most 64 KiB and one byte, and refuses a NUL byte, more than 64 KiB, anything but
+strict UTF-8 (Python's decoder; glibc's iconv 2.43 took code points above U+10FFFF, measured) and a file that holds no text; it writes the
+file's bytes, their trailing CR and LF bytes dropped, through `sys.stdout.buffer`, so the locale's encoding never touches them (#1075, the
+co-op's re-review at f3f1cabe, P2 at `nas_land.sh:95`: it wrote the decoded text through `sys.stdout`, whose encoding is the locale's,
+`python/cpython@v3.13.16` `Doc/library/sys.rst:1838-1839`, and under an ISO-8859-1 locale "é" came out as one byte and "€" ended it with
+nothing written; under `LC_ALL=C` Python turns on its UTF-8 Mode, `Doc/library/os.rst:142-144`, so the test compiles an ISO-8859-1 locale
+into a scratch `LOCPATH`, which glibc reads, `locale(7)`). It reads the file three times: before the lock and any call (exit 2), when the squash body is built
+(exit 7, nothing merged), and at the final gate (`nas_land.sh:581-586`; exit 7, also when the text changed after the body was built). The
+merge takes the text of the second read as `--body`, whether the file is the whole body or comes before a waiver's or an adjudication's line,
+because `--body-file` would read the file again when the merge call starts (`merge.go:146-153`), after the final gate. This differs from
+the live copy, which passes `--body-file`. The bound: the body is one argument to `gh`, and Linux bounds one argument at `MAX_ARG_STRLEN`,
+"(PAGE_SIZE * 32)" (`torvalds/linux@v6.18` `include/uapi/linux/binfmts.h:15`), 131072 bytes on this host's 4 KiB pages with the
+terminating NUL (measured: 131071 bytes passed, 131072 did not); 64 KiB leaves room for the line.
+
+Beside a waiver or an adjudication the body is the file's text, a blank line and that line, and the offered body is not read, because `gh`
+takes `--body` or `--body-file`, never both ("specify only one of `--body` or `--body-file`", `merge.go:138-143`). The waiver and the
+adjudication never meet: the waiver is read only without a local review set, the adjudication only with one (`nas_land.sh` refuses an
+adjudication set without one, below). When the body is built, the waiver or the adjudication is read and checked again too (`waiver_check`,
+`adjudication_check`; the CC on the co-op's codex review), so the line is never taken from an earlier read (`nas_land.sh:660-682`).
+
+**A nas input in a uet landing (#1075, the CC's read).** `LOCAL_REVIEW_ADJUDICATION` and `SQUASH_BODY_FILE` are `nas_land.sh`'s inputs
+alone. `codex_gate.py`, which `uet_land.sh` runs too, decides with the adjudication wherever it is set, while `uet_land.sh` would neither
+bind it to the pull request and the head nor record it in a squash body, nor read a body file; and either variable can be inherited, for
+example from a nas landing in the same shell. So `uet_land.sh` stops with exit 2 when either is set, an empty value included (`${VAR+x}`,
+the #1061 P1 test), before the lock and any call, and prints one line that names the variable as nas-only (`uet_land.sh:34-40`).
 
 **The CI gate (#975 P2-3).** A completed check fails unless its conclusion is success, neutral or skipped; any other conclusion, null
 included, stops a landing with exit 5 even when the aggregate check (`ci-gate` in `uet_land.sh`, `validate` in `nas_land.sh`)
@@ -265,6 +308,9 @@ expected head:
 | `LOCAL_REVIEWS` | none | both, through `codex_gate.py` | colon-separated normalized review files; when set (an empty value included), the Codex gate decides from them alone ("Local reviews"); `nas_land.sh` requires it or the waiver |
 | `CODEX_LOCAL_REVIEW` | none | both, through `codex_gate.py` | an alias of `LOCAL_REVIEWS`: its files are added to the set |
 | `LOCAL_REVIEW_WAIVER` | none | `nas_land.sh` | with neither variable above set, a waiver file whose last `Waiver:` line reads `Waiver: local reviews for #<pr> at <head8>` (the read head); the landing then asks the connector, and its squash body records the waiver (#1061 round 2) |
+| `LOCAL_REVIEW_ADJUDICATION` | none | `nas_land.sh`, through `codex_gate.py`; refused by `uet_land.sh` | with a local review set, the CC's adjudication record: it decides a `codex-review` that says `patch is incorrect` with only P2 and P3 findings, at least one, its last `Adjudication:` line bound to that file's sha256, the pull request and the read head, each finding listed after it with its disposition ("Local reviews"); set where no review says `patch is incorrect`, the gate gives 4; the squash body records it (the CC's ruling of 2026-10-13); in `nas_land.sh` an empty value is none with a local review set, and with none set (the waiver path) it stops with exit 2 before any call, an empty value included; `uet_land.sh` stops with exit 2 before any call when it is set, an empty value included ("A nas input in a uet landing", above) |
+| `LG_ADJUDICATION_SHA256` | unset when `nas_land.sh` starts | `nas_land.sh`, for `codex_gate.py` | not an input: `nas_land.sh` sets it to the review file's sha256 that the record named at its first read, and the gate then adjudicates only the file whose bytes have it (#1075; "Local reviews") |
+| `SQUASH_BODY_FILE` | none | `nas_land.sh`; refused by `uet_land.sh` | the squash commit's body; when set, a readable, non-empty regular file other than `-` whose content is UTF-8 text of at most 64 KiB without a NUL byte, or exit 2 before any call; read again when the body is built and at the final gate (exit 7); passed as `--body`, alone or before a waiver's or an adjudication's line ("The squash body"); `uet_land.sh` stops with exit 2 before any call when it is set, an empty value included |
 | `LANDING_COORD` | `${XDG_STATE_HOME:-$HOME/.local/state}/native-agent-stack/coordination` | both | coordination tree; a status description `PASS: trading-cc/reads/<record>.md` names `$LANDING_COORD/trading-cc/reads/<record>.md` |
 | `LANDING_GATE` | `codex_gate.py` in the directory of the script, symlinks resolved (`readlink -f "$0"`) | both | the Codex gate; it works through a symlink or a wrapper that `exec`s the real path, and not when the script is read from a pipe or a process substitution (set this variable then) |
 | `LANDING_LOCK_DIR` | `$LANDING_COORD/command-center/landing-locks` | both | where the landing lock of each repository is kept (`us-equities-trading.lock`, `native-agent-stack.lock`); created when missing, and outside every worktree |
@@ -284,26 +330,36 @@ one, and the script then reports exit 10, "does not merge cleanly".
 ## Exit codes
 
 From the script headers. `uet_land.sh`: 2 verdict gate (a verdict file, `GATES_DONE` or `trading-cc-read`, also when a file, record or
-status cannot be read), 3 head moved, 4 change differs, 5 CI failed (at the final gate also: no longer complete and green), 6 timeout,
+status cannot be read; and, before any call, `LOCAL_REVIEW_ADJUDICATION` or `SQUASH_BODY_FILE` set, an empty value included, since both
+are `nas_land.sh`'s alone; #1075), 3 head moved, 4 change differs, 5 CI failed (at the final gate also: no longer complete and green), 6 timeout,
 7 merge failed, 8 blocked, 9 the Codex gate gave neither 0 nor 5: a review running or not finished since its latest trigger (its 3, after
 the 20-minute wait or at the final gate), a review that ended other than Completed or a summary last edited by another account (its
 4), a gate that failed or is missing; or a 5 without an accepted `GPT_VERDICT` (#975 P3-7 at 761810d7: the header named only some of
 these). `nas_land.sh`: 2 as above, and a `LANDING_REPO` that is not of the owner/name shape (before any call; #1061 P3), neither local
-review variable nor `LOCAL_REVIEW_WAIVER` set (before any call), and a waiver that is missing, unreadable or does not name the pull
-request at the read head (after the lock, before `update-branch` and `ready`, and again at the final gate; #1061 round 2), 3 head moved,
-4 `update-branch` refused or the change differs after it or at the final gate, 5 CI
-failing (also at the final gate), 6 timeout, 7 merge failed, or a waived landing's squash body could not be read (nothing merged), 8
-blocked by policy, 9 as above, but a 5 proceeds (it is reachable only under a waiver), and a 3 before the
-validation stops too, 10 the merge onto current `origin/main` fails `scripts/validate.py` or does not merge cleanly, 13 origin/main moved
+review variable nor `LOCAL_REVIEW_WAIVER` set (before any call), `LOCAL_REVIEW_ADJUDICATION` set, an empty value included, with neither
+local review variable set (before any call; #1075 P3-4), a `SQUASH_BODY_FILE` that is not a readable, non-empty regular file other than
+`-`, an empty value included, or whose content holds a NUL byte, is not UTF-8, is longer than 64 KiB or holds no text (before any call;
+"The squash body"), a waiver that is missing, unreadable or does not name the pull request at the read head (after the lock, before
+`update-branch` and `ready`, when the squash body is built and again at the final gate; #1061 round 2), and, with a local review set, a
+`LOCAL_REVIEW_ADJUDICATION` that is missing, unreadable or holds a NUL byte, does not name the pull request at the read head and the
+sha256 of a listed review file, or after its first read names another file (read as the waiver is; the CC's ruling of 2026-10-13), 3 head
+moved, 4 `update-branch` refused or the change differs after it or at the final gate, 5 CI
+failing (also at the final gate), 6 timeout, 7 merge failed, or the squash body of a waived or an adjudicated landing could not be read
+(the body GitHub offers), or `SQUASH_BODY_FILE`'s content, read when the squash body is built and again at the final gate, cannot be read,
+holds a NUL byte, is not UTF-8, is longer than 64 KiB or holds no text, or changed after the body was built (nothing merged), 8
+blocked by policy, 9 as above (an adjudication that the gate does not accept is its 4), but a 5 proceeds (it is reachable only under a
+waiver), and a 3 before the validation stops too, 10 the merge onto current `origin/main` fails `scripts/validate.py` or does not merge cleanly, 13 origin/main moved
 after each of three validations, moved after the last validation (read at the final gate) or could not be read, so nothing is merged
 (#975, new in round 3). Both scripts also exit 11 when the no-reply author address cannot be formed (nothing is merged), 12 when the
 merge landed but its commit's author is not that address or the commit could not be read (CC correction #148), and 14 when another
 landing of the same repository holds the landing lock or the lock cannot be opened or taken (nothing has run; #975 round 4).
 `codex_gate.py`: 0, 3, 4 and 5 as above; a gate that fails itself exits 4, which both scripts stop on with 9. With a local review set
 ("Local reviews"): 0 (every file a review of the read head or of a head with its change, every `codex-review` completed with `patch is
-correct` and no P0 or P1 finding), 2 (no file named; a file unreadable, malformed or of another head; a `codex-review` against another
-base than its head's merge base with `origin/main`, not completed or with another verdict; or no completed `codex-review`) and 4 (`patch is
-incorrect`, or a P0 or P1 finding of a `codex-review`); the advisory plugin arm never stops it; both scripts stop with 9 on its 2 and its 4.
+correct` and no P0 or P1 finding, or one that says `patch is incorrect` with only P2 and P3 findings, at least one, and that the CC's
+adjudication decides), 2 (no file named; a file unreadable, malformed or of another head; a `codex-review` against another base than its
+head's merge base with `origin/main`, not completed or with another verdict; or no completed `codex-review`) and 4 (a P0 or P1 finding of a
+`codex-review`, `patch is incorrect` that no adjudication decides (one with no finding never is), or an adjudication set where no
+`codex-review` says `patch is incorrect`); the advisory plugin arm never stops it; both scripts stop with 9 on its 2 and its 4.
 `review_normalize.py`: 0 the file was written, 1 the input was refused (nothing written), 2 usage.
 
 ## The record convention
@@ -334,7 +390,7 @@ it only under a waiver (below). A file name cannot hold `:` or a newline.
 `CODEX_LOCAL_REVIEW` both unset, nas asked the connector, which cannot reach the organization's repository, and merged on its 5
 ("unavailable") with no Codex verdict (P1-1: no connector activity in 10 minutes, a usage notice, a stale Running row, or the 👀 that
 974090cf bounded). In local mode the gate gives only 0, 2 or 4, so a landing passes only on a completed `codex-review` of the head at its
-merge base with no P0 or P1 finding. So `nas_land.sh` stops with exit 2 before any call (before the lock, `update-branch` and `ready`)
+merge base with no P0 or P1 finding (and, when it says `patch is incorrect`, the CC's adjudication; below). So `nas_land.sh` stops with exit 2 before any call (before the lock, `update-branch` and `ready`)
 when neither variable is set, unless `LOCAL_REVIEW_WAIVER` names a waiver file. The file is read once at each check (`lg_text`), in
 `verdict_gate` after the verdict files and again at the final gate, and its last line that starts with `Waiver:` must read exactly:
 
@@ -349,8 +405,10 @@ waiver: its body is the body GitHub offers the merging account for the squash (`
 request's commit messages, read once before the author lookup; exit 7 when the read fails), then a blank line and `Waiver: local reviews
 for #<pr> at <head8> (LOCAL_REVIEW_WAIVER)`. That is how gh's own "edit the commit message" step starts (cli v2.102.0
 `pkg/cmd/pr/merge/merge.go:721-735`, `http.go:121-158`), and `--body` sets the body in place of the default (`merge.go:146-147`, `:176`;
-`http.go:72-75`). With either variable set the waiver is not read and the merge names no body. `uet_land.sh` keeps the connector path; the
-requirement and the waiver are in neither the shared block nor `codex_gate.py`, which uet uses too.
+`http.go:72-75`). With either variable set the waiver is not read, and the merge names a body only for an adjudication (below) or
+`SQUASH_BODY_FILE` ("The squash body", above). `uet_land.sh` keeps the connector path and refuses the adjudication and `SQUASH_BODY_FILE`
+("A nas input in a uet landing", above); the requirement and the waiver are in neither the shared block nor `codex_gate.py`, which uet
+uses too.
 
 **The normalized review** is one JSON object with exactly these fields; a finding carries no prose body, and another field, a repeated
 key or `NaN` is refused:
@@ -390,8 +448,8 @@ request's own branch (not on `main`), each covering 1, 1 and 2 commits and leavi
 reviewed against another base than its head's merge base with `origin/main`, or that did not complete, or whose `overall_correctness` is not
 exactly `patch is correct` or `patch is incorrect` (fail closed); and when no completed `codex-review` is listed. In `codex_wait`, a 2
 says to correct or write again the local review files, not to wait for Codex (the probe's finding 8). Otherwise it gives 4 when a
-`codex-review` says `patch is incorrect`, whatever its findings'
-priorities, or has a finding of priority 0 or 1 ("a person decides": the CC adjudicates); otherwise 0. The P2 and P3 findings are printed as
+`codex-review` has a finding of priority 0 or 1, or says `patch is incorrect`, whatever its findings' priorities, and the CC's
+adjudication does not decide it ("a person decides": the CC adjudicates, below); otherwise 0. The P2 and P3 findings are printed as
 counts, for the pull request's Follow-ups. The plugin's arm never stops the gate: its issues are printed as a count, each scored 80 or more
 by the plugin's filter (its comment carries no score), and a run without a comment (`completed` false) is counted with the citation above,
 both marked advisory. The pure-rebase check is the scripts' own: `lg_gate` runs `lg_same_change` (the change
@@ -400,6 +458,69 @@ passes the heads that carry the read head's change to the gate after the read he
 with `Local reviews: `, which `lg_gate` echoes for a 2 as well (python3's own exit 2 keeps its fixed line), and name a file by its place
 in the list, never by its path, and no finding's text. Both scripts stop with exit 9 on a 2 or a 4, and read the files at every gate call,
 so they must stay in place for the whole landing.
+
+**The CC's adjudication (`LOCAL_REVIEW_ADJUDICATION`; the CC's ruling of 2026-10-13).** After a pull request's bounded rounds, a local
+re-review that says `patch is incorrect` with only P2 and P3 findings is decided by the CC, not looped; a P0 or P1 still blocks. Until this
+input the gate gave 4 for `patch is incorrect` whatever the priorities (`codex_gate.py:52` and `:327-329` at 993cc890), and no input
+carried the CC's decision, so such a review could block a landing for good. `LOCAL_REVIEW_ADJUDICATION=<file>` names the CC's record (an
+empty value names none):
+
+```
+Adjudication: local review <sha256 of the normalized review file> for #<pr> at <the read head's first 8 hex digits>
+Finding: P<priority> at <location>: <title> (fixed|follow-ups|rejected)
+```
+
+with, after that line, one `Finding:` line for each finding of that review (an identical finding twice needs two lines), its priority,
+location and title as the file holds them, and one disposition: `fixed` (fixed in this landing), `follow-ups` (the pull request's
+Follow-ups) or `rejected` (with its evidence in the record, which the CC reviews: the gate checks no evidence text; Astra's P3 at ca6f880b,
+Known gaps). Only lines that start with `Adjudication:` or `Finding:` count, and of the `Finding:` lines only those after the last
+`Adjudication:` line, the section it opens; a line may end in CR, and the rest of the record is free. The gate (`codex_gate.py:412-435`;
+the record is read and matched by `adjudication`, `:281-337`) turns the 4 into 0 only when all of these hold:
+
+- no `codex-review` has a P0 or P1 finding, and exactly one says `patch is incorrect` and has at least one finding: one with no finding has
+  nothing to dispose of, so a person decides (the CC's ruling on the Claude read's P3-5 at ca6f880b);
+- the record holds no NUL byte (`lg_text` would drop it in `nas_land.sh`, and the two would read different lines: P3-1);
+- its last `Adjudication:` line names that file's sha256 (of the bytes the gate parsed, `:360-362`, `:391-395`; "The sha256 forms",
+  below), the pull request and the read head, and that sha256 is the one `nas_land.sh` recorded at the record's first read, when it set
+  `LG_ADJUDICATION_SHA256` (#1075, the co-op's codex review and Astra's P2-2: both files replaced between `nas_land.sh`'s final read and the
+  gate's could pass on review B while the squash body recorded review A);
+- the `Finding:` lines after it are that review's findings, one line each: the gate renders each finding's three possible lines and
+  compares whole lines, so nothing of the free text is parsed, and two findings that would render alike (a location that holds `: `) stop
+  it; a stale section's lines do not count (P3-2), and an identical finding counts once for each time the review holds it (P3-3).
+
+Anything else stays 4 and says why in fixed words, never the record's text or path: a P0 or P1, two reviews that say `patch is incorrect`,
+a review with no finding, a record that cannot be read, holds a NUL byte or has no `Adjudication:` line, another file, pull request or
+head, another file than `nas_land.sh` recorded, a later `Adjudication:` line (it revokes), a finding unlisted, a line that names no finding
+or another disposition, a finding named more often than the review holds it (so two dispositions for one finding too). A record set where
+no `codex-review` says `patch is incorrect` decides nothing and gives 4 too, so a landing that carries one passes only where it decided, and
+no squash body records a record that no gate checked. The gate reads the record once per call, and only for an incorrect review with a
+finding; the dispositions it prints are counted a line each.
+
+`nas_land.sh` reads it as it reads the waiver (`verdict_gate` and `adjudication_check`, `nas_land.sh:415-450`): once at each check
+(`nas_read`, `:392-404`, which also tells a NUL byte: exit 2), after the lock and before `update-branch` and `ready`, when the squash body is
+built, and again at the final gate. Its last `Adjudication:` line must read exactly as above for the pull request and the read head, with
+the sha256 of a file that `LOCAL_REVIEWS` or `CODEX_LOCAL_REVIEW` names (each hashed once), and after the first read the sha256 that read
+named, which it gives the gate as `LG_ADJUDICATION_SHA256` (unset at the start, `:114-118`, so never the caller's); otherwise exit 2, the
+record named by its file name only. The squash body then records it as it records a waiver: the body GitHub offers, a blank line and
+`Adjudication: local review <sha256> for #<pr> at <head8> (LOCAL_REVIEW_ADJUDICATION)` ("The squash body", above). With no local review set
+(the waiver path), a set `LOCAL_REVIEW_ADJUDICATION`, an empty value included, stops with exit 2 before any call (`:77-80`; the Claude read's
+P3-4: nothing would read it). The record of one review is written from its normalized file, each disposition then set by the CC (the
+commands below).
+
+**The sha256 forms (#1075, the Claude read's P2-1).** The binding compares one digest in three places, so each is 64 lowercase hex digits,
+and `nas_land.sh` refuses any other form in the record. The gate's is `hashlib.sha256(raw).hexdigest()`; Python's docs say only that it
+contains "only hexadecimal digits" (`python/cpython@v3.13.16` `Doc/library/hashlib.rst:217-220`), and the case comes from the code:
+`Modules/_hashopenssl.c:652` returns `_Py_strhex`, which (`Python/pystrhex.c:145-148`) writes each byte as two of `Py_hexdigits`
+(`:88-89`), the digits 0 to 9 and the letters a to f in lower case (`Python/codecs.c:20`); this host's `hashlib.sha256` is that OpenSSL type (`openssl_sha256`, measured with
+Python 3.13.16). `nas_land.sh` takes the first field of `sha256sum < <file>`, here uutils coreutils 0.10.0 (`/usr/bin/sha256sum`, measured):
+`sha256sum` is a standalone checksum (`src/uu/sha256sum/src/sha256sum.rs:6`), whose `standalone_main` (`src/uu/checksum_common/src/lib.rs:39-43`)
+takes the Text mode unless `--binary` (`:91-93`) and the untagged hexadecimal line (`src/uucore/src/lib/features/checksum/compute.rs:119-131`):
+the digest, a space, the mode's character, `' '` for Text (`checksum/mod.rs:509-512`), and the name (`compute.rs:203-220`), so the first
+field is the digest. The digest is `to_hex`, `hex::encode` (`src/uucore/src/lib/features/sum.rs:46-48`), lowercase in the crate the lock
+file pins, `hex` 0.4.3 (`Cargo.lock:1295-1298`): `encode` calls `encode_hex` (`KokaKiwi/rust-hex@v0.4.3` `src/lib.rs:259-261`), which uses
+`HEX_CHARS_LOWER`, the same sixteen lowercase characters (`:137-140`, `:83`; "Encodes `data` as hex string using lowercase characters", `:244`), the same
+bytes as the published crate whose checksum the lock file names. Measured on this host: `printf x | sha256sum` printed 64 lowercase hex
+digits, two spaces and `-`, the digits those of `hashlib.sha256(b"x").hexdigest()`.
 
 **`review_normalize.py`** (stdlib only) writes the file from each reviewer's own output and changes neither reviewer; it writes the file
 whole (a new 0600 file, renamed over the target) and prints one line, never a path, a body or a title. A refused run writes nothing and
@@ -461,6 +582,15 @@ LOCAL_REVIEWS=<codex file>:<claude file> nas_land.sh <pr> <read head prefix> <ve
 # only when the CC waives the local reviews for this pull request at this head (#1061 round 2)
 printf 'Waiver: local reviews for #%s at %s\n' <pr> <head8> > <waiver file>
 LOCAL_REVIEW_WAIVER=<waiver file> nas_land.sh <pr> <read head prefix> <verdict file>
+
+# only when the CC adjudicates a codex-review that says "patch is incorrect" with only P2 and P3 findings (the CC's ruling of 2026-10-13):
+# the record's two kinds of line, written from the normalized file, then each disposition set to fixed, follow-ups or rejected
+{ printf 'Adjudication: local review %s for #%s at %s\n' "$(sha256sum < <codex file> | cut -d' ' -f1)" <pr> <head8>
+  jq -r '.findings[] | "Finding: P\(.priority) at \(.location): \(.title) (fixed)"' <codex file>; } > <adjudication file>
+LOCAL_REVIEWS=<codex file> LOCAL_REVIEW_ADJUDICATION=<adjudication file> nas_land.sh <pr> <read head prefix> <verdict file>
+
+# SQUASH_BODY_FILE: the squash commit's body, here beside the adjudication's line (alone, it is the whole body)
+SQUASH_BODY_FILE=<body file> LOCAL_REVIEWS=<codex file> LOCAL_REVIEW_ADJUDICATION=<adjudication file> nas_land.sh <pr> <read head prefix> <verdict file>
 ```
 
 Measured on 2026-10-13 (read only): of the 15 local rollouts with an `ExitedReviewMode` item (codex-cli 0.160.0 to 0.162.1), every one had
@@ -511,9 +641,9 @@ scripts that is neither a tracked file's, a named public artifact's nor a named 
 
 | File | As committed |
 | --- | --- |
-| `uet_land.sh` | `4bb70e7540c72d91ed7cf7edeb481ddc71ac98f459ebb386c4d2bf4b4c3cb2b6` (432 lines) |
-| `nas_land.sh` | `ff960fff21fb3df2d1bde625663a6e3f5a035eea3025a92ee8fd6007c8927637` (546 lines) |
-| `codex_gate.py` | `a8e1ccc9d2d3639d865f937dc18d19a55082a08c5534654cb9e9cd37dc74af41` (455 lines) |
+| `uet_land.sh` | `95a4e1634b6a53b14d7736d2d40a3f0058a15aec9c9178e528ca44cfb74324ce` (441 lines) |
+| `nas_land.sh` | `1ca0dabc6c535a08fb45f6956cf4549cc956ca6b25e798bb60c6a95cd398f511` (690 lines) |
+| `codex_gate.py` | `7afaa831c0763dd14c584d76b17465fa50993656cd63eec9fd0c4412fddb74b2` (559 lines) |
 | `review_normalize.py` | `b553d9cb67ca196bd587e980e01295e28e8ea0e2bcb3d0015fc5d040735a1594` (348 lines) |
 
 On 2026-10-13 three fixes the CC had made in its live copies were ported here alone: the repository slug and the merging account in
@@ -521,7 +651,12 @@ On 2026-10-13 three fixes the CC had made in its live copies were ported here al
 running review in `codex_gate.py` (CC correction #200, its block and constant byte for byte). The live copies' other local differences
 (`SQUASH_BODY_FILE`, correction #176's currency checks, the host paths) were not taken. Read at 2026-10-13T01:50Z, the live copies were
 `nas_land.sh` (474 lines, changed 2026-10-12T23:07:56Z) and `codex_gate.py` (241 lines, changed 2026-10-13T00:47:19Z); no digest of
-them is published. The local review set, `lg_gate`'s heads with the read head's change and `review_normalize.py` are new here.
+them is published. The local review set, `lg_gate`'s heads with the read head's change and `review_normalize.py` are new here. Later on
+2026-10-13 (the CC's ruling on local reviews that say `patch is incorrect` with only P2 and P3 findings, which asked for both in one change)
+`SQUASH_BODY_FILE` was taken from the live `nas_land.sh` too, its five references (the usage line, the header at `:18-20`, the check at
+`:38-41` and the merge call), with the changes in "The squash body" (above: an empty value refused, and since #1075's third commit the
+content checked and passed as `--body`); the adjudication is new here. Correction #176's currency
+checks and the host paths were still not taken.
 
 Corrections the scripts carry: #118 (every gate before the merge, in order), #121 (a verdict file that states a landing gate needs
 a receipt), #122 and #123 (a Codex review must have finished; uet#40 and uet#47 merged while one was running), #136
@@ -532,8 +667,10 @@ and #975's P2-3 (the CI allow-list), P2-2 (no text from `gh` or its API is print
 call), the gate error (P2: exit 4 and one fixed line, no traceback), the commit-status allow-list (P3) and P2-1 (the privacy scan
 checks every prohibited identity), round 3 (above: the completion bound to the latest request, the gates read again before the merge,
 typed values, no local diagnostics, the base re-read) and round 4 (above: the lock, the final gate, one read per file, the gate's
-snapshot), and since 2026-10-13 #198 (the merging account) and #200 (a stale running review). The block is identical in both scripts,
-apart from `lg_ci_state`, which only `uet_land.sh` has.
+snapshot), and since 2026-10-13 #198 (the merging account), #200 (a stale running review) and the CC's ruling on local reviews that
+say `patch is incorrect` with only P2 and P3 findings (the adjudication, and `SQUASH_BODY_FILE` from the CC's copy, both of which
+`uet_land.sh` refuses: #1075). The block is
+identical in both scripts, apart from `lg_ci_state`, which only `uet_land.sh` has.
 
 ## Known gaps, left as they were
 
@@ -582,6 +719,12 @@ and 4). These stay until a change with its own tests fixes them:
   - The files are read at every gate call, each once, so a file rewritten between two calls is decided on its new text at the later one.
   - A Legacy rollout is refused (fail closed, above), so a review whose `codex exec` fell back to Legacy history gives no file; it has to
     be run again where the server serves paginated threads.
+  - The record is matched a line at a time, so a finding whose location or title holds a newline cannot be listed, and its review stays 4
+    (fail closed).
+  - A `rejected` disposition is "rejected with evidence" in the CC's ruling, but the gate checks no evidence text: the record is free beside
+    its `Adjudication:` and `Finding:` lines, so the evidence is the CC's to write and to review in the record (Astra's P3 at ca6f880b). No
+    evidence field is defined; one would need a format and a presence check of its own.
+  - The record has no size bound of its own (`nas_read` and the gate read it whole); the body file's bound is the merge argument's.
 - The digest guard (Tests, below; #1061 round 2): a bare hex word of digits alone or of letters alone is not checked, since dates,
   counts and words are such words, so a digest prefix written bare that happens to have no letter (or no digit) passes; written with `…`
   it is checked whatever its digits. A pull request's body is checked only when `LANDING_PR_BODY` names it (below).
@@ -731,6 +874,61 @@ errors):
     tree that is not a work tree lists its files); and with `LANDING_PR_BODY=<file>` the pull request's body is checked the same way.
     CI does not set it: every pull request's CI runs this module, a body edit does not run validate again (its `pull_request` types are
     opened, synchronize and reopened), and a body may cite an earlier head's files, whose bytes this tree does not hold.
+- The CC's ruling of 2026-10-13 (a local re-review that says `patch is incorrect` with only P2 and P3 findings) and the CC's
+  `SQUASH_BODY_FILE` add, each failing at 993cc890 (measured as above against that commit's `tools/landing`: 51 failures and 1 error, all
+  in the 9 new tests; each case's result is in the pull request):
+  - the gate on canned files: the record accepted for such a review when it lists every finding (fixed and follow-ups; rejected, with CRLF
+    line ends; beside a correct review; the binding line last and no finding at all were accepted too until #1075's third commit, below,
+    which refuses both), and 4 with its reason for an unlisted P2, an indented
+    `Finding:` line, the sha256 of other bytes, another pull request or head, a later `Adjudication:` line, none or an indented one, a
+    missing or a non-UTF-8 file, another disposition, a finding the review does not have, two dispositions, two findings on one line, two
+    incorrect reviews, a P1 or a P0, and a record where no review says `patch is incorrect`; the record read once, and only for an
+    incorrect review; and a control that gives 993cc890's line there too, an empty value;
+  - `nas_land.sh` end to end through the real gate: an adjudicated landing, whose squash body records the record's line after the offered
+    body; the README's commands writing a record that lands; a record for another pull request or head, with a longer head prefix,
+    revoked, indented, cut short, of no listed file or missing stopping with 2 before `update-branch` and `ready`; an unlisted finding, a
+    P1, another disposition and a record where no review says `patch is incorrect` stopping at the wait (the gate's 4, exit 9); the final
+    gate reading the record again (revoked: 2; its `Finding:` line removed: the gate's 4, exit 9; bound to another listed file: 2);
+  - `SQUASH_BODY_FILE`: alone as the whole body (`--body-file` until #1075's third commit, `--body` since); beside the waiver and beside an
+    adjudication as the file's text and the line, the offered
+    body not read; a file gone when the body is built (exit 7); `-`, a missing file, an empty file, a directory and an empty value
+    stopping with 2 before any call, a held lock included; the check before the shared block and the lock, both variables outside the
+    shared block, and the `gh` sources cited.
+- The CC's read of #1075 adds, each failing at 25a9b48e (#1075's first commit; measured as above against its `tools/landing`: 7 failures,
+  all in these 2 tests):
+  - `uet_land.sh` with `LOCAL_REVIEW_ADJUDICATION` set, to a valid record beside the local review it decides and to an empty value, and
+    with `SQUASH_BODY_FILE` set, to a body file and to an empty value: one line naming the variable as nas-only and exit 2, with no call
+    of any kind, a held lock included (each landing merged at 25a9b48e, the valid record on the gate's adjudicated 0); and a control, the
+    same landing with neither set, which merges;
+  - the script text: each refusal once, after the arguments and before the shared block and the lock, and neither variable read anywhere
+    else in `uet_land.sh` (this replaced the check that `uet_land.sh` did not mention them).
+- #1075's third commit, for the three reads at ca6f880b (the Claude read, the co-op's local codex review and Astra's read), adds, each
+  failing at ca6f880b unless it says otherwise (measured as above against its `tools/landing`: 30 failures and 1 error, all in the 13 new or
+  changed tests; each case's result is in the pull request):
+  - the record (the Claude read): a NUL-prefixed second `Adjudication:` line, in the gate (4) and in `nas_land.sh` (exit 2 before any
+    gate call; it merged, its squash body naming the other file); a stale section's `(fixed)` that no longer disposes of a recurring
+    finding; two identical findings that need a line each, and a `Finding:` line repeated beyond the review's count of it, with the
+    counts printed a line each; an adjudication on the waiver path, set and empty, stopping with 2 before any call, a held lock included;
+    a review that says `patch is incorrect` with no finding, refused in the gate and end to end (it merged); and the binding line last,
+    whose earlier `Finding:` lines no longer count;
+  - the digest the gate decides on (the co-op's codex review, Astra's P2-2): the gate adjudicating only the file `nas_land.sh` recorded
+    (`LG_ADJUDICATION_SHA256`), and end to end, the review and its record replaced together on the final gate's statuses call, after its
+    `verdict_gate`: exit 9 at the final gate (it merged, its squash body recording the earlier review);
+  - the body (the co-op's codex review, Astra's P2-1): bytes that are not UTF-8, a code point above U+10FFFF, 1 MiB, a NUL byte alone beside
+    the waiver and white space alone stopping with 2 before any call; a file emptied while the merge is validated, alone and beside the
+    waiver, stopping with 7 when the body is built; emptied, or rewritten to other valid text, at the author lookup stopping with 7 at the
+    final gate (each merged); the standalone file passed as `--body`; and the waiver or the adjudication revoked while the merge is
+    validated, stopping with 2 when the body is built, before the author lookup (the final gate stopped it, after the author lookup);
+  - coverage the Claude read asked for, the same at ca6f880b: a record bound from the start to another listed file, which stops at the
+    wait (exit 9) on the gate's binding check (measured against a mutant whose binding check returns nothing: the gate's case gave 0, and
+    end to end the recorded-digest check stopped it with another reason, so both cases fail), an adjudicated landing through
+    `CODEX_LOCAL_REVIEW`, a title holding `(` and `)`, and a record and a body file of mode 000.
+- #1075's fourth commit (the co-op's re-review at f3f1cabe, its one P2, adjudicated fix in this landing) adds, failing at f3f1cabe (measured
+  as above against its `tools/landing`: 3 failures, all in this test): the body reader under an ISO-8859-1 locale compiled into a scratch
+  `LOCPATH`, whose output must be the file's bytes, its trailing line ends dropped ("é" came out as the one byte `e9`, and "€" ended the
+  reader with nothing written, exit 1), the same under `C.UTF-8` as the control (it passed at f3f1cabe too), and a landing under that
+  locale whose merge call carries the body's UTF-8 bytes (it stopped with 2 at f3f1cabe). Where no ISO-8859-1 locale can be compiled, the
+  test is skipped and says why.
 
 ## Upstream sources for the #975 corrections
 
@@ -817,3 +1015,24 @@ above still hold; the schema's bytes are unchanged, sha256 `3ed09565…`); insta
 | A set or an unset variable (Astra's follow-up 4) | the installed `bash(1)`; `python/cpython@v3.13.16`: `Doc/library/os.rst`, `1d54f83bb3f583e37bae07d820d16206cf02f4fb2ef281338635b4b7fd01ebe4`, `Lib/os.py`, `18560b0a37dfb90b4712fba97668d44a1328c5566b10deffaee292ba12cc21ff`, `Lib/_collections_abc.py`, `87601195497fde3b7cea03bce396e1b713c17af3d273298d99d3bc0147f745b9` | `bash(1)`, Parameter Expansion: "When not performing substring expansion, using the forms documented below (e.g., `:-`), bash tests for a parameter that is unset or null. Omitting the colon tests only for a parameter that is unset.", so `${VAR+x}` is empty only for an unset `VAR`; `os.rst:184-186` `os.environ` is "A mapping object", `os.py:704` `class _Environ(MutableMapping)`, and `_collections_abc.py:808-813` its `get` gives `None` only for a missing key |
 | A waived landing's squash body | `cli/cli@v2.102.0`: `pkg/cmd/pr/merge/merge.go`, `ca3849b4…`, `pkg/cmd/pr/merge/http.go`, `17eb5418a1771692864b8f7476947f088252ccde0037d089c9faf441ff7c8877`; the GraphQL schema, `3ed09565…` | `merge.go:146-147` `--body` or `--body-file` sets `BodySet`, `:176` "Body `text` for the merge commit"; `http.go:72-75` only a set body becomes the mutation's `CommitBody`; `merge.go:721-735` the "edit the commit message" step starts from `getMergeText` (`http.go:121-158`, the query `viewerMergeBodyText(mergeType: $method)` at `:136`) and then sets the body; `schema.docs.graphql:45597-45605` `viewerMergeBodyText(mergeType: PullRequestMergeMethod): String!`, "The merge body text for the viewer and method", and `:26079-26082` `MergePullRequestInput.commitBody`, "if omitted, a default message will be used". Measured on 2026-10-13 with the script's query on #1061: the reply is the pull request's commit messages (the repository's `squashMergeCommitMessage` is `COMMIT_MESSAGES`), and `--jq` prints the string raw |
 | Replacing and removing a file, and a finite confidence (Astra's follow-up 4) | `python/cpython@v3.13.16`: `Doc/library/os.rst`, `1d54f83b…`; `Doc/library/json.rst`, `1dabdd646bfbf961c3ffcf79dd41bd81dc6a2e1ed59428b32662ed16acff08df`; `Doc/library/math.rst`, `5a46b6cc199fd025f914f39a39199745bad9fbbf540246abcb658671899be77e` | `os.rst:2754-2760` `os.replace` replaces an existing file "silently", and "the renaming will be an atomic operation (this is a POSIX requirement)"; `:3671-3676` `unlink` is `remove`, which `:2661-2665` raises `FileNotFoundError` for a file that does not exist; `json.rst:308-311` a JSON number is parsed with `float(num_str)` by default, so `1e999` gives `inf` (measured with Python 3.13.16); `math.rst:370-373` `isfinite` is false for an infinity or a NaN |
+
+2026-10-13, `SQUASH_BODY_FILE` (the CC's ruling on local reviews that say `patch is incorrect` with only P2 and P3 findings). Read in the
+local upstream mirror of `cli/cli` at `v2.102.0` (the commit `fc4b137c`, clean), and each file fetched on 2026-10-13 between 12:45Z and
+12:48Z with `curl -fsSL https://raw.githubusercontent.com/cli/cli/v2.102.0/<path>`: the same bytes (installed: `gh` 2.102.0):
+
+| Mechanism | Source at the pin, sha256 | Lines read and what they say |
+| --- | --- | --- |
+| A body file, `-`, and one body flag (`SQUASH_BODY_FILE`) | `cli/cli@v2.102.0`: `pkg/cmd/pr/merge/merge.go`, `ca3849b4…`; `pkg/cmdutil/file_input.go`, `94076f6234180f85f2a555a5733e024146ea2c0cac54af19c86c72b015252828`; `pkg/cmd/pr/merge/http.go`, `17eb5418…` | `merge.go:177` `--body-file`, "Read body text from `file` (use "-" to read from standard input)"; `:138-143` "specify only one of `--body` or `--body-file`" (`cmdutil.MutuallyExclusive`), which is why a waiver's or an adjudication's line goes with the file's text in one `--body`; `:146-153` either flag sets `BodySet`, and a body file is read with `cmdutil.ReadFile` when the command runs, its bytes the body (`opts.Body = string(b)`); `file_input.go:8-15` `ReadFile` reads standard input for `-` and the named file otherwise (`os.ReadFile`); `http.go:72-75` a set body becomes the mutation's `CommitBody` |
+
+#1075's third commit (the three reads at ca6f880b). Each file was fetched on 2026-10-13 between 13:50Z and 14:09Z with `curl -fsSL
+https://raw.githubusercontent.com/<owner>/<repo>/<tag>/<path>` and read at the lines given; the cpython files are the same bytes in the local
+upstream mirror at `v3.13.16` (the commit `cbc944f4`, clean). Installed: Python 3.13.16, uutils coreutils 0.10.0 (`sha256sum --version`),
+bash 5.3.9 (Ubuntu's `bash` 5.3-2ubuntu1, whose `bash.1.gz` is the manual quoted), glibc 2.43's `iconv`, Linux 6.18 (WSL2).
+
+| Mechanism | Source at the pin, sha256 | Lines read and what they say |
+| --- | --- | --- |
+| hexdigest's case (the Claude read's P2-1) | `python/cpython@v3.13.16`: `Doc/library/hashlib.rst`, `bf23b9b1e5dc9ff5b0b86a7c88637d73e2c8496681dca125aa3df1da631ee106`; `Modules/_hashopenssl.c`, `3805805cbb3153bf89e785c6e861b51a09a5a4c3d8747e4e3086c6c9befbf648`; `Python/pystrhex.c`, `7842f6d7d9b58bcbf10cbb24d29f6d1f36668e20f935689e197bbe0abdccd4ed`; `Python/codecs.c`, `244f9bebae318b08bc062d20c00b945a7f11fac55599a2b32a0d25944bcc3c6f` | `hashlib.rst:217-220` `hexdigest()` returns a string "containing only hexadecimal digits" (no case); `_hashopenssl.c:652` `EVP_hexdigest_impl` returns `_Py_strhex((const char *)digest, (Py_ssize_t)digest_size)`; `pystrhex.c:145-148` `_Py_strhex` calls `_Py_strhex_impl` with no separator, whose `:88-89` write `Py_hexdigits[c >> 4]` and `Py_hexdigits[c & 0x0f]`; `codecs.c:20` `const char *Py_hexdigits` is the string of the digits 0 to 9 and the letters a to f, in lower case |
+| `sha256sum`'s line and case (the Claude read's P2-1) | `uutils/coreutils@0.10.0`: `src/uu/sha256sum/src/sha256sum.rs`, `48254a0adf102ceaa5ab91c1146fb3a7d21f79de3396b89be6f9480025ae6d6e`; `src/uu/checksum_common/src/lib.rs`, `ad05144f9d1663e79fa2f579a3fdbbef4820373ab6bcb4028d897e891d3e37d3`; `src/uucore/src/lib/features/checksum/compute.rs`, `077a6b11783d23f507ccc5f94d39916ce8d1caf5993e75e87218ac7576c7b932`; `src/uucore/src/lib/features/checksum/mod.rs`, `362f62dd0ceb60b5b2c107ae078d276c33b727354fd2d8576aab2ef1780c27f7`; `src/uucore/src/lib/features/sum.rs`, `f03de154b8899af73adbc7fa866a77113aef1e500df24b77f59802e4c1ebea8b`; `Cargo.lock`, `0833b527…` (above); `KokaKiwi/rust-hex@v0.4.3`: `src/lib.rs`, `bc16c851822629225d2d2653ea080f131b0f2c4704d3ff27fed955c9b8b42f71`, the same bytes as `src/lib.rs` of `https://static.crates.io/crates/hex/hex-0.4.3.crate`, `7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70` | `sha256sum.rs:6` `declare_standalone!("sha256sum", …Sha256)`; `lib.rs:39-43` the macro calls `standalone_main`, `:91-93` `text = !BINARY` and `OutputFormat::from_standalone(text, tag)`; `compute.rs:119-131` without `--tag`, `Untagged(DigestFormat::Hexadecimal, Text or Binary)`, `:203-220` `write!(w, "{prefix}{sum} {}", reading_mode.as_char())` then the name; `mod.rs:509-512` `Binary => '*'`, `Text => ' '`; `compute.rs:294-299` a hexadecimal digest is `sum.to_hex()`, `sum.rs:46-48` `Self::Vec(buf) => Ok(hex::encode(buf))`; `Cargo.lock:1295-1298` `hex` 0.4.3 with that crate's checksum; `rust-hex` `lib.rs:259-261` `encode` is `data.encode_hex()`, `:137-140` `encode_to_iter(HEX_CHARS_LOWER, …)`, `:83` `HEX_CHARS_LOWER: &[u8; 16]`, the same sixteen characters in lower case, `:244` "Encodes `data` as hex string using lowercase characters" |
+| One argument's bound (Astra's P2-1, the body's ceiling) | `torvalds/linux@v6.18:include/uapi/linux/binfmts.h`, `6f435af082f135d9171035ffe88fe826a81c0c7880f2ec3b4e048644fe7c704d` | `:15` `#define MAX_ARG_STRLEN (PAGE_SIZE * 32)`; `getconf PAGESIZE` printed 4096, and `/bin/true` took an argument of 131071 bytes and refused one of 131072 (rc 126), measured |
+| A NUL byte read in bash (the Claude read's P3-1) | the installed `bash(1)`, Ubuntu's `bash` 5.3-2ubuntu1, `read` (UNMIRRORED: the installed manual, not a pinned upstream file) | "If *delim* is the empty string, **read** will terminate a line when it reads a NUL character", and "Other than the case where *delim* is the empty string, **read** ignores any NUL characters in the input"; `help read`: "The return code is zero, unless end-of-file is encountered", so `nas_read`'s zero is a NUL and a non-zero the end of the file |
+| Strict UTF-8 (Astra's P2-1) | `python/cpython@v3.13.16`, measured with Python 3.13.16 and glibc 2.43's `iconv -f UTF-8 -t UTF-8` | of 13 probes Python's strict decoder and `iconv` agreed on 11; `iconv` took a code point above U+10FFFF (`f4 90 80 80`) and an `f5` lead byte that Python refuses, so `SB_READER` decodes with Python, as `codex_gate.py` decodes a record |

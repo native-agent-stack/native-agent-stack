@@ -49,9 +49,24 @@ calls nothing:
      base at the head, or at a commit of the pull request's own branch, reviews part of the change or none); a codex-review did not
      complete, or its overall_correctness is not exactly "patch is correct" or "patch is incorrect" (fail closed); or no completed
      codex-review is listed (the required arm);
-  4  otherwise, a codex-review says "patch is incorrect", whatever its findings' priorities, or has a finding of priority 0 or 1: a person
-     decides (the CC adjudicates);
-  0  otherwise; the P2 and P3 findings are printed as counts, for the pull request's Follow-ups.
+  4  otherwise, a codex-review has a finding of priority 0 or 1, or says "patch is incorrect" (whatever its findings' priorities) and the
+     CC's adjudication does not decide it (below): a person decides (the CC adjudicates);
+  0  otherwise, an adjudicated review included; the P2 and P3 findings are printed as counts, for the pull request's Follow-ups.
+The CC's adjudication (the CC's ruling of 2026-10-13: after a pull request's bounded rounds, a local re-review that says "patch is incorrect"
+with only P2 and P3 findings is decided by the CC, not looped; until then the 4 above held whatever the priorities, and no input carried the
+CC's decision): LOCAL_REVIEW_ADJUDICATION names the CC's record (set but empty, it names none). It turns that 4 into 0 only when no
+codex-review has a P0 or P1 finding, exactly one says "patch is incorrect" and has a finding (one with none has nothing to dispose of: #1075,
+the CC's ruling on the Claude read's P3-5), that review's file is the one whose sha256 nas_land.sh recorded when it sets
+LG_ADJUDICATION_SHA256 (#1075, the co-op's codex review), and the record, read once in this call (adjudication, below), holds no NUL byte and:
+  - has as its last line that starts with "Adjudication:" exactly "Adjudication: local review <the sha256 of that review file's bytes, as
+    read above> for #<pr> at <the read head's first 8 hex digits>", so a later Adjudication line revokes it;
+  - lists, in the lines after that one, each finding of that review, matched by its priority, location and title, on a line "Finding:
+    P<priority> at <location>: <title> (<disposition>)", the disposition fixed, follow-ups or rejected, one line for each finding (an
+    identical finding twice needs two); a line that starts with "Finding:" and names no finding, or a finding more often than the review
+    holds it, stops.
+Anything else stays 4, and the line says why in fixed words (the record's path and text are never printed). A record set when no codex-review
+says "patch is incorrect" decides nothing and gives 4 as well, so a landing that carries one passes only where it decided. nas_land.sh reads
+the record too: its verdict_gate binds it to the pull request, the read head and a listed review file, and its squash body records it.
 The verdict: openai/codex@rust-v0.162.1 codex-rs/prompts/templates/review/rubric.md:85 fixes "overall_correctness": "patch is correct" |
 "patch is incorrect", while the wire type is a free String (codex-rs/protocol/src/protocol.rs:3507); the mirror at 092d3acd6 holds the same
 bytes of both files. The claude-code-review arm (the /code-review plugin) is ADVISORY until the CC's review-replay addendum measures it
@@ -98,6 +113,7 @@ nothing. Without such a revision nothing is attributed (fail closed: exit 3, or 
 usage: codex_gate.py <owner/repo> <pr> [<read head>]
        with LOCAL_REVIEWS: codex_gate.py <owner/repo> <pr> <read head> [<head>:<its merge base with origin/main> ...]
 """
+import hashlib
 import json
 import math
 import os
@@ -138,6 +154,10 @@ CORRECT, INCORRECT = "patch is correct", "patch is incorrect"
 FINDING_KEYS = frozenset({"priority", "location", "title"})
 SHA = re.compile(r"[0-9a-f]{40}")
 FACT = re.compile(r"(?P<head>[0-9a-f]{40}):(?P<base>[0-9a-f]{40})?")  # lg_gate's "<head>:<merge base with origin/main>" (empty: unknown)
+# The CC's ruling of 2026-10-13: the variable that names the CC's adjudication record, and the dispositions a finding may have in it.
+ADJUDICATION = "LOCAL_REVIEW_ADJUDICATION"
+DISPOSITIONS = ("fixed", "follow-ups", "rejected")
+RECORDED = "LG_ADJUDICATION_SHA256"  # #1075: the review file's sha256 that nas_land.sh recorded from the record's first read (it sets it)
 
 
 def gh(path):
@@ -258,12 +278,72 @@ def review_problem(review):
     return None
 
 
-def local_gate(paths, read, facts):
+def adjudication(path, pr, read, number, digest, review, recorded=None):
+    """The CC's adjudication of one codex-review that says "patch is incorrect" with only P2 and P3 findings (the CC's ruling of 2026-10-13):
+    (None, the count of each disposition) when the record decides it, else (why not, in fixed words, None). #1075 (the Claude read at
+    ca6f880b and the CC's ruling on it):
+      - a review with no finding has nothing to dispose of and is not adjudicable (P3-5): a person decides, and the record is not read;
+      - with the sha256 nas_land.sh recorded (LG_ADJUDICATION_SHA256, `recorded`), only the review file whose bytes have it is adjudicated
+        (the co-op's codex review, P2 at :391-392): files rewritten between nas_land.sh's read and this one cannot pass on another review;
+      - the record is read once, and one that holds a NUL byte stops (P3-1), as it stops nas_land.sh's verdict_gate: bash cannot hold the
+        byte and lg_text drops it, so the two layers would read different lines;
+      - its last line that starts with "Adjudication:" must bind the review file's bytes (digest), the pull request and the read head;
+      - only the lines AFTER it that start with "Finding:" count (P3-2: a stale section's lines do not dispose of a recurring finding), and
+        they must be the review's findings, one line for each, an identical finding twice on two lines (P3-3); each is rendered here as
+        "Finding: P<priority> at <location>: <title> (<disposition>)" and compared whole, so nothing of the free text is parsed.
+    A line may end in CR, as the waiver's may (nas_land.sh)."""
+    if not review["findings"]:
+        return f"review file {number} says patch is incorrect with no finding, so there is nothing to dispose of", None
+    try:
+        with open(path, "rb") as handle:
+            raw = handle.read()
+    except OSError:
+        return "it cannot be read", None
+    if b"\x00" in raw:
+        return "it holds a NUL byte", None
+    try:
+        text = raw.decode("utf-8")
+    except UnicodeDecodeError:
+        return "it cannot be read", None
+    lines = [line[:-1] if line.endswith("\r") else line for line in text.split("\n")]
+    bound = [at for at, line in enumerate(lines) if line.startswith("Adjudication:")]
+    if not bound:
+        return "it has no Adjudication line", None
+    if lines[bound[-1]] != f"Adjudication: local review {digest} for #{pr} at {read[:8]}":
+        return f"its last Adjudication line does not name the sha256 of review file {number}, this pull request and the read head {read[:8]}", None
+    if recorded is not None and digest != recorded:  # the record names these bytes, but nas_land.sh recorded others: both were replaced
+        return f"review file {number} is not the file nas_land.sh recorded at the record's first read (LG_ADJUDICATION_SHA256)", None
+    held = Counter((item["priority"], item["location"], item["title"]) for item in review["findings"])
+    lines_of, stems = {}, Counter()
+    for key in held:  # the distinct findings: identical ones share their three lines
+        stem = f"Finding: P{key[0]} at {key[1]}: {key[2]}"
+        stems[stem] += 1
+        lines_of.update({f"{stem} ({word})": (key, word) for word in DISPOSITIONS})
+    if any(count > 1 for count in stems.values()):  # a location holding ": " could render two findings alike: fail closed
+        return f"two findings of review file {number} render as one Finding line", None
+    given, words = Counter(), Counter()
+    for at, line in enumerate(lines[bound[-1] + 1:], bound[-1] + 2):  # the section the last Adjudication line opens, by file line number
+        if line.startswith("Finding:"):
+            if line not in lines_of:
+                return f"its line {at} names no finding of review file {number}, or a disposition other than fixed, follow-ups or rejected", None
+            key, word = lines_of[line]
+            given[key] += 1
+            words[word] += 1
+    if any(given[key] > count for key, count in held.items()):
+        return f"its Finding lines name a finding of review file {number} more times than the review holds it", None
+    missing = sum(count - given[key] for key, count in held.items())
+    if missing:
+        return f"{missing} of the {sum(held.values())} P2 and P3 findings of review file {number} have no disposition", None
+    return None, words
+
+
+def local_gate(paths, pr, read, facts):
     """The decision from the local review files alone (README "Local reviews"): one line, and 0, 2 or 4. Every file must be a normalized
     review of the read head or of a head lg_gate passed as carrying its change; every codex-review must have been reviewed against its
     head's merge base with origin/main (the facts "<head>:<merge base>" lg_gate passes after the read head) and completed with a verdict
-    of "patch is correct" or "patch is incorrect", and one must be listed. Then "patch is incorrect" or a P0 or P1 finding of a codex-review
-    is 4; the claude-code-review arm is advisory (its issues and a missing comment are noted, never blocking)."""
+    of "patch is correct" or "patch is incorrect", and one must be listed. Then a P0 or P1 finding of a codex-review is 4, and so is "patch is
+    incorrect" unless the CC's adjudication decides it (adjudication, above; the file's sha256 is taken of the bytes parsed here); the
+    claude-code-review arm is advisory (its issues and a missing comment are noted, never blocking)."""
     if not paths:
         print("Local reviews: LOCAL_REVIEWS or CODEX_LOCAL_REVIEW is set but names no file; stop")
         return 2
@@ -278,7 +358,8 @@ def local_gate(paths, read, facts):
         which = f"review file {number} of {len(paths)}"  # by its place in the list, never by its path
         try:
             with open(path, "rb") as handle:
-                review = json.loads(handle.read().decode("utf-8"), object_pairs_hook=unique_keys, parse_constant=no_constant)
+                raw = handle.read()
+            review = json.loads(raw.decode("utf-8"), object_pairs_hook=unique_keys, parse_constant=no_constant)
         except (OSError, UnicodeDecodeError, ValueError):
             print(f"Local reviews: {which} cannot be read as JSON; stop")
             return 2
@@ -307,9 +388,13 @@ def local_gate(paths, read, facts):
             print(f"Local reviews: {which} (codex-review) of {review['head_sha'][:8]} has an overall_correctness that is not exactly "
                   f"patch is correct or patch is incorrect (rubric.md:85); stop")
             return 2
-        reviews.append(review)
-    required = [review for review in reviews if review["reviewer"] == REQUIRED]
-    advisory = [review for review in reviews if review["reviewer"] != REQUIRED]
+        # #1075 (the Claude read's P2-1): the record names this digest in lowercase hex, the form hexdigest gives: cpython v3.13.16
+        # Modules/_hashopenssl.c:652 returns _Py_strhex (Python/pystrhex.c:145-148), which writes each byte as two of Py_hexdigits (:88-89),
+        # the sixteen lowercase hex digits (Python/codecs.c:20), where the docs say only "hexadecimal digits" (Doc/library/hashlib.rst:217-220);
+        # measured with this host's openssl_sha256. nas_land.sh compares it with sha256sum's, also lowercase (README, "The sha256 forms").
+        reviews.append((number, hashlib.sha256(raw).hexdigest(), review))
+    required = [review for _, _, review in reviews if review["reviewer"] == REQUIRED]
+    advisory = [review for _, _, review in reviews if review["reviewer"] != REQUIRED]
     if not required:
         print("Local reviews: no completed codex-review is listed (the required arm; claude-code-review is advisory); stop")
         return 2
@@ -324,8 +409,27 @@ def local_gate(paths, read, facts):
         missing = sum(not review["completed"] for review in advisory)
         notes = (f"; advisory, not blocking: claude-code-review issues {issues} (each scored 80 or more, code-review.md:26), "
                  f"runs without a comment {missing} (code-review.md:26, :11)")
+    record = os.environ.get(ADJUDICATION) or None  # the CC's ruling of 2026-10-13; set but empty, no record
     if incorrect or counts[0] or counts[1]:
-        print(f"Local reviews: {names} of {read[:8]}: {verdict}, P0 findings {counts[0]}, P1 findings {counts[1]}; a person decides; {tail}{notes}")
+        why = ""
+        if record and (counts[0] or counts[1]):
+            why = "; LOCAL_REVIEW_ADJUDICATION decides no P0 or P1 finding"
+        elif record:
+            wrong = [(number, digest, review) for number, digest, review in reviews
+                     if review["reviewer"] == REQUIRED and review["overall_correctness"] == INCORRECT]
+            reason, decided = ((f"{len(wrong)} codex-reviews say patch is incorrect, and an adjudication decides one", None) if len(wrong) > 1
+                               else adjudication(record, pr, read, *wrong[0], recorded=os.environ.get(RECORDED)))
+            if reason is None:
+                print(f"Local reviews: {names} of {read[:8]}: {verdict}, no P0 or P1 finding; adjudicated (LOCAL_REVIEW_ADJUDICATION): review "
+                      f"file {wrong[0][0]}, one disposition for each P2 and P3 finding, fixed {decided['fixed']}, follow-ups "
+                      f"{decided['follow-ups']}, rejected {decided['rejected']}; {tail}{notes}")
+                return 0
+            why = f"; LOCAL_REVIEW_ADJUDICATION does not decide it: {reason}"
+        print(f"Local reviews: {names} of {read[:8]}: {verdict}, P0 findings {counts[0]}, P1 findings {counts[1]}; a person decides{why}; {tail}{notes}")
+        return 4
+    if record:  # a record that decides nothing is not accepted (the ruling: "accepted only when"), so no squash body records it unchecked
+        print(f"Local reviews: {names} of {read[:8]}: {verdict}, no P0 or P1 finding; a person decides; LOCAL_REVIEW_ADJUDICATION is set, but no "
+              f"codex-review says patch is incorrect, so it decides nothing (unset it); {tail}{notes}")
         return 4
     print(f"Local reviews: {names} of {read[:8]}: {verdict}, no P0 or P1 finding; {tail}{notes}")
     return 0
@@ -334,7 +438,7 @@ def local_gate(paths, read, facts):
 def main(repo, pr, read=None, *same):
     files = local_review_files()
     if files is not None:  # the owner's direction of 2026-10-13: a local review set decides alone, and nothing is called
-        return local_gate(files, read, same)
+        return local_gate(files, pr, read, same)
     notes = comments(repo, pr)  # first: what comes after this snapshot is newer than every start in it
     pull = json.loads(subprocess.run(["gh", "api", f"repos/{repo}/pulls/{pr}"],
                                      capture_output=True, text=True, check=True).stdout)
