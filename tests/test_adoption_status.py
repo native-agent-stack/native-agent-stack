@@ -2124,6 +2124,51 @@ class AgentNamesTests(unittest.TestCase):
         self.assertEqual(adoption_status.find_bun({"PATH": str(other), adoption_status.BUN_ENV: "/nonexistent/bun"}), "/nonexistent/bun")
         self.assertIsNone(adoption_status.find_bun({"PATH": "/nonexistent"}))
 
+    def test_a_relative_bun_is_made_absolute_before_either_launch(self):
+        """Review of #1062 at b3da64d7 (the local codex review, P2): both launches run with cwd=scratch, and subprocess looks for a relative executable relative to cwd (python/cpython@cbc944f4bc59639a444dd971c737788ba2283a91
+        Doc/library/subprocess.rst L572-L576), so a relative AGENT_FRONTMATTER_BUN, or a bun found through a relative PATH entry such as ./bin, named a file of the caller's directory and was searched for in the scratch one:
+        the same bun gave Unknown from its relative path (reproduced with bun 1.4.3) and parsed from its absolute one."""
+        bin_directory = self.directory / "bin"
+        bin_directory.mkdir()
+        make_fake_bun(bin_directory)
+        variable = adoption_status.BUN_ENV
+        cases = (("a relative value of the variable", {"PATH": "/usr/bin:/bin", variable: "bin/bun"}, self.directory),
+                 ("a value of the variable that starts with ./", {"PATH": "/usr/bin:/bin", variable: "./bin/bun"}, self.directory),
+                 ("a value of the variable that climbs out of the directory and back", {"PATH": "/usr/bin:/bin", variable: "../" + self.directory.name + "/bin/bun"}, self.directory),
+                 ("a PATH entry ./bin", {"PATH": "./bin"}, self.directory),
+                 ("a PATH entry bin", {"PATH": "bin"}, self.directory),
+                 ("an empty PATH entry, which is the caller's directory", {"PATH": ":/usr/bin"}, bin_directory))
+        for label, environ, working in cases:
+            (bin_directory / "calls.jsonl").unlink(missing_ok=True)
+            with self.subTest(case=label), contextlib.chdir(working):
+                found = adoption_status.find_bun(environ)
+                self.assertTrue(found and os.path.isabs(found), found)
+                self.assertEqual(Path(found).resolve(), (bin_directory / "bun").resolve())
+                self.assertEqual(adoption_status.agent_names([b"---\nname: a\n---\n"], environ=environ), ["a"])
+                self.assertEqual([call["call"] for call in fake_calls(bin_directory)], ["version", "parse"], "both launches ran the stand-in")
+
+    def test_a_value_with_no_directory_is_a_name_looked_up_on_path_and_never_in_the_callers_directory(self):
+        bun = make_fake_bun(self.directory)
+        variable = adoption_status.BUN_ENV
+        self.assertEqual(adoption_status.find_bun({"PATH": str(self.directory), variable: "bun"}), str(bun))
+        self.assertIsNone(adoption_status.find_bun({"PATH": str(self.directory), variable: "no-such-bun"}))
+        with contextlib.chdir(self.directory):
+            self.assertIsNone(adoption_status.find_bun({"PATH": "/nonexistent", variable: "bun"}), "a name is not a file of the caller's directory")
+            missing = adoption_status.find_bun({"PATH": "/usr/bin:/bin", variable: "bin/absent"})
+            self.assertTrue(os.path.isabs(missing), "a relative path to a file that is not there is still named, not replaced")
+            with self.assertRaises(adoption_status.Unknown):
+                adoption_status.agent_names([b"---\nname: a\n---\n"], environ={"PATH": "/usr/bin:/bin", variable: "bin/absent"})
+
+    def test_a_relative_bun_of_a_caller_whose_directory_is_gone_is_unknown(self):
+        """A relative path cannot be made absolute without the caller's directory (os.getcwd raises FileNotFoundError): None from find_bun, Unknown from agent_names, never a traceback."""
+        gone = Path(tempfile.mkdtemp(prefix="gone-", dir=self.directory))
+        environ = {"PATH": "/usr/bin:/bin", adoption_status.BUN_ENV: "bin/bun"}
+        with contextlib.chdir(gone):
+            gone.rmdir()
+            self.assertIsNone(adoption_status.find_bun(environ))
+            with self.assertRaises(adoption_status.Unknown):
+                adoption_status.agent_names([b"---\nname: a\n---\n"], environ=environ)
+
     def test_a_bun_that_is_not_the_version_the_client_embeds_is_unknown(self):
         for version in ("1.4.2", "1.4.4", "1.4", "1.4.3-canary", "", "bun 1.4.3"):
             with self.subTest(version=version):
@@ -2209,6 +2254,14 @@ class RealBunTests(unittest.TestCase):
                             ("a left-margin comment and a blank line", f"---\nname:\n# role\n\n  {name}\ndescription: x\n---\n"), ("an indented comment", f"---\nname:\n  # role\n  {name}\ndescription: x\n---\n")):
             with self.subTest(case=label):
                 self.assertEqual(self.names(text), [name])
+
+    def test_a_bun_named_by_a_path_relative_to_the_callers_directory_is_the_same_bun(self):
+        """The case of the local codex review of #1062 at b3da64d7 (P2), with the real binary: the bun that parses from its absolute path gave Unknown from a relative path to the same file, a relative value of the
+        variable or a relative PATH entry, because both launches run in the scratch directory."""
+        bun = Path(real_bun())
+        for label, environ in (("a relative value of the variable", {"PATH": "/usr/bin:/bin", adoption_status.BUN_ENV: "./" + bun.name}), ("a relative PATH entry", {"PATH": ".", adoption_status.BUN_ENV: bun.name})):
+            with self.subTest(case=label), contextlib.chdir(bun.parent):   # from the bun's own directory, where nothing of the scratch directory's can answer
+                self.assertEqual(adoption_status.agent_names([b"---\nname: a\n---\n"], environ=environ), ["a"])
 
     def test_a_bunfig_in_the_working_directory_is_not_read(self):
         """bun reads a bunfig.toml of its working directory and runs its preload (measured with 1.4.3); the call runs in an empty directory, so a caller's directory cannot change what it does."""

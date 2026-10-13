@@ -1,0 +1,24 @@
+The tests of the local codex re-review round of #1062 (CPA-V-10; the selected bun is made absolute before either launch) against the sources of b3da64d76, the head that the review read, and against this head (GITHUB_ACTIONS=true, the bun 1.4.3 named in AGENT_FRONTMATTER_BUN, which the real-bun test turns into a relative path itself).
+
+== b3da64d76, the head that was reviewed (its sources, this test file)
+   test_a_relative_bun_is_made_absolute_before_either_launch: Ran 1, FAILED (failures=6)
+      AssertionError: False is not true : bin/bun
+   test_a_value_with_no_directory_is_a_name_looked_up_on_path_and_never_in_the_callers_directory: Ran 1, FAILED (failures=1)
+      AssertionError: 'bun' != '/tmp/fake-bun-gj601jzs/bun'
+   test_a_relative_bun_of_a_caller_whose_directory_is_gone_is_unknown: Ran 1, FAILED (failures=1)
+      AssertionError: 'bin/bun' is not None
+   test_a_bun_named_by_a_path_relative_to_the_callers_directory_is_the_same_bun: Ran 1, FAILED (errors=2)
+      scripts.adoption_status.Unknown
+== this head
+   test_a_relative_bun_is_made_absolute_before_either_launch: Ran 1, OK
+   test_a_value_with_no_directory_is_a_name_looked_up_on_path_and_never_in_the_callers_directory: Ran 1, OK
+   test_a_relative_bun_of_a_caller_whose_directory_is_gone_is_unknown: Ran 1, OK
+   test_a_bun_named_by_a_path_relative_to_the_callers_directory_is_the_same_bun: Ran 1, OK
+
+The reviewer's scenario, run from the directory of the bun 1.4.3 binary:
+agent_names at b3da64d76, bun selected by the absolute path: ['reviewer-case']
+agent_names at b3da64d76, bun selected by a relative path to the same file (./bun, from its directory): Unknown
+agent_names at b3da64d76, bun selected by a relative PATH entry to its directory (., from its directory): Unknown
+agent_names at this head, bun selected by the absolute path: ['reviewer-case']
+agent_names at this head, bun selected by a relative path to the same file (./bun, from its directory): ['reviewer-case']
+agent_names at this head, bun selected by a relative PATH entry to its directory (., from its directory): ['reviewer-case']
