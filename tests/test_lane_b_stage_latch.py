@@ -2,6 +2,7 @@
 from contextlib import nullcontext
 import hashlib
 import json
+import os
 from pathlib import Path
 import sys
 import tempfile
@@ -139,8 +140,9 @@ class StageLatch(unittest.TestCase):
             with self.subTest(scope=stop.parent.name):
                 stop.parent.mkdir(exist_ok=True)
                 stop.touch()
-                with self.assertRaisesRegex(self.launch.Refused, "STOP_present"):
-                    issuer.build("sip", "syn-next")
+                with patch.object(self.launch, "assert_seq2_watchers_retired", return_value=[], create=True):
+                    with self.assertRaisesRegex(self.launch.Refused, "STOP_present"):
+                        issuer.build("sip", "syn-next")
                 stop.unlink()
 
     def test_unit_rewrite_removes_host_touch_instead_of_retargeting_it(self):
@@ -175,7 +177,7 @@ class StageLatch(unittest.TestCase):
         units.mkdir()
         for stage in ("record", "scan", "pre", "pre-skip", "sip", "lev1", "lev2", "lev4", "edge2", "edge8", "iex"):
             for extension in ("path", "service"):
-                body = "# SYN unit\nExecStart=" + str(source) + "/launch.py\n"
+                body = "# SYN unit\nWorkingDirectory=" + str(source) + "\nExecStart=" + str(source) + "/launch.py\n"
                 if extension == "service" and stage not in ("record", "scan", "pre-skip"):
                     body += "ExecStopPost=/usr/bin/bash -c '/usr/bin/touch /SYN/alpaca-paper/STOP'\n"
                 path = units / ("paper-ready-" + stage + "-8c95a50d-seq2." + extension)
@@ -193,6 +195,45 @@ class StageLatch(unittest.TestCase):
         self.assertEqual(len(result["units"]), 22)
         self.assertEqual((source / "launch.py").read_text(), BASE)
         self.assertEqual((source / "SHA256SUMS").read_bytes(), inventory)
+
+    def test_replaced_lane_directory_cannot_redirect_mark_to_another_directory(self):
+        import lane_latch
+        lane = self.root / "alpaca-paper/lane-b/STOP"
+        lane.parent.mkdir()
+        foreign = self.root / "SYN-foreign"; foreign.mkdir()
+        saved = self.root / "SYN-original-directory"
+        real_open = os.open
+        replaced = False
+        def replace_before_open(path, *args, **kwargs):
+            nonlocal replaced
+            if not replaced and (Path(path) == lane or (str(path) == "STOP" and "dir_fd" in kwargs)):
+                lane.parent.rename(saved)
+                lane.parent.symlink_to(foreign, target_is_directory=True)
+                replaced = True
+            return real_open(path, *args, **kwargs)
+        with patch.object(lane_latch.os, "open", side_effect=replace_before_open):
+            try:
+                lane_latch.mark(lane, self.launch.HOST_STOP, "syn-trial")
+            except ValueError:
+                pass  # A directory swap may refuse; it must not write outside.
+        self.assertTrue(replaced)
+        self.assertFalse((foreign / "STOP").exists())
+
+    def test_replaced_lane_directory_cannot_redirect_clear_to_a_human_stop(self):
+        import lane_latch
+        lane = self.root / "alpaca-paper/lane-b/STOP"
+        proof = lane_latch.mark(lane, self.launch.HOST_STOP, "syn-trial")
+        foreign = self.root / "SYN-foreign";foreign.mkdir()
+        human = foreign / "STOP";human.write_text("SYN human unchanged\n")
+        saved = self.root / "SYN-original-directory"
+        real_unlink = os.unlink
+        def replace_before_unlink(path, *args, **kwargs):
+            lane.parent.rename(saved)
+            lane.parent.symlink_to(foreign, target_is_directory=True)
+            return real_unlink(path, *args, **kwargs)
+        with patch.object(lane_latch.os, "unlink", side_effect=replace_before_unlink):
+            lane_latch.clear(lane, self.launch.HOST_STOP, proof, "syn-trial")
+        self.assertEqual(human.read_text(), "SYN human unchanged\n")
 
 
 if __name__ == "__main__":

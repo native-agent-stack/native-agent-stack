@@ -3,6 +3,8 @@
 Test source remains immutable. Only fixture latch paths and the now-two-hook
 unit expectation adapt in memory. The real credential pointer is never called.
 """
+import sys
+sys.dont_write_bytecode = True
 import argparse
 import contextlib
 import hashlib
@@ -11,18 +13,28 @@ import io
 import json
 from pathlib import Path
 import subprocess
-import sys
 import types
 import unittest
 
 
 def run(bundle):
+    sys.dont_write_bytecode = True
     bundle = Path(bundle).resolve()
+    if any(p.name == "__pycache__" or p.suffix in (".pyc", ".pyo") for p in bundle.rglob("*")):
+        raise ValueError("bytecode_in_bundle")
     strict = subprocess.run(["sha256sum", "--check", "--strict", "--quiet", "SHA256SUMS"], cwd=bundle)
     if strict.returncode:
         raise ValueError("strict_manifest_refused")
+    for name in ("launch", "lane_latch", "seq2_retirement", "issue_go", "launch_data", "data_worker"):
+        existing = sys.modules.get(name)
+        if existing is not None and (not getattr(existing, "__file__", None)
+                or Path(existing.__file__).resolve() != bundle / (name + ".py")):
+            raise ValueError("foreign_bundle_module")
     sys.path.insert(0, str(bundle))
     launch = importlib.import_module("launch")
+    # Operational retirement is checked live by the issuer; this replay uses
+    # SYN unit state and makes no user-manager mutation or production claim.
+    launch.assert_seq2_watchers_retired = lambda: []
     pointer_calls = []
     def fixture_pointer():
         pointer_calls.append("SYN-placeholder")
@@ -68,6 +80,7 @@ def run(bundle):
         "status": "passed" if result.wasSuccessful() else "failed", "cases": result.testsRun,
         "failures": len(result.failures), "errors": len(result.errors), "skips": len(result.skipped),
         "fixture_adaptations": adaptations, "credential_pointer": "real implementation replaced before tests",
+        "seq2_retirement": "SYN fixture only; live retirement proof required before installation",
         "placeholder_calls": len(pointer_calls), "services_started": 0, "broker_execution": "NOT_RUN"}
     if not result.wasSuccessful():
         # SYN traceback only; no credential pointer/broker call is reachable.
@@ -80,6 +93,8 @@ def main():
     parser.add_argument("--bundle", type=Path, required=True)
     parser.add_argument("--receipt", type=Path, required=True)
     args = parser.parse_args()
+    if args.receipt.resolve().is_relative_to(args.bundle.resolve()):
+        raise ValueError("receipt_inside_bundle")
     receipt = run(args.bundle)
     args.receipt.write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n")
     print(json.dumps(receipt, sort_keys=True))
