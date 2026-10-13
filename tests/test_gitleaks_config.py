@@ -1028,6 +1028,63 @@ class GitleaksFixtureHookIsolationTests(unittest.TestCase):
                              "the fixture exception must not persist a disabled hook configuration")
 
 
+class GitleaksMergeCommitFingerprintTests(unittest.TestCase):
+    """The reviewed narrative commit ids, found again in the two merge commits that brought them into main.
+
+    The CI history scan reads merge commits as first-parent diffs (--diff-merges=first-parent, since the 2026-10-09
+    out-of-memory fix), so it reaches 9b7a67b9 and 5cfed346, which the 2026-09-22 --log-opts=HEAD generation of
+    .gitleaksignore did not. Each merge commit is scanned alone (its first-parent diff, `<commit>^!`), with the
+    repository's .gitleaksignore, so the check stays bounded; removing or mistyping one of the 2026-10-13 entries fails it.
+    The structural test needs no scanner: every reviewed narrative line is fingerprinted for each commit that carries it.
+    """
+
+    # The two merge commits by prefix, resolved with git at test time: a full 40-hex id in this file would itself match
+    # the sourcegraph-access-token rule's 40-hex form.
+    MERGE_COMMIT_PREFIXES = ("9b7a67b9", "5cfed346")
+    REVIEWED_LINES = {
+        "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json":
+            (338, 424, 462, 468, 525, 682, 1439, 1445, 2567, 2915, 2950),
+        "evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json": (9360, 10815, 10890),
+    }
+
+    def _merge_commits(self):
+        """The full ids of the two merge commits, or a skip when the history does not hold them (a shallow clone)."""
+        commits = []
+        for prefix in self.MERGE_COMMIT_PREFIXES:
+            done = subprocess.run(["git", "-C", str(ROOT), "rev-parse", "--verify", "--quiet", f"{prefix}^{{commit}}"],
+                                  capture_output=True, text=True)
+            if done.returncode != 0:
+                self.skipTest(f"merge commit {prefix} is absent (shallow clone)")
+            commits.append(done.stdout.strip())
+        return commits
+
+    def test_every_reviewed_narrative_line_is_fingerprinted_for_both_merge_commits(self):
+        lines = {line.strip() for line in (ROOT / ".gitleaksignore").read_text().splitlines()
+                 if line.strip() and not line.strip().startswith("#")}
+        missing = [f"{commit[:8]}:{path.rsplit('/', 1)[-1]}:{number}"
+                   for commit in self._merge_commits() for path, numbers in self.REVIEWED_LINES.items() for number in numbers
+                   if f"{commit}:{path}:sourcegraph-access-token:{number}" not in lines]
+        self.assertEqual(missing, [])
+
+    def test_each_merge_commit_scans_clean_with_the_ignore_file(self):
+        if GITLEAKS is None:
+            self.skipTest("gitleaks not found on PATH")
+        located = []
+        for commit in self._merge_commits():
+            report_path = Path(tempfile.mkstemp(suffix=".json")[1])
+            try:
+                # Redacted like the secret-scan job; the failure message names only non-secret fields.
+                try:
+                    findings = _scan_findings(["git", ".", "--config", str(CONFIG_PATH),
+                                               f"--log-opts=--diff-merges=first-parent {commit}^!"], report_path, cwd=ROOT)
+                except _LockBusy as exc:
+                    self.skipTest(f"gitleaks per-user lock held by another scan: {exc}")
+                located += [(f.get("RuleID"), f.get("File"), f.get("StartLine"), f.get("Fingerprint")) for f in findings]
+            finally:
+                report_path.unlink(missing_ok=True)
+        self.assertEqual(located, [], f"the reviewed merge commits must scan clean with .gitleaksignore: {located}")
+
+
 class GitleaksLocalPrHistoryTests(unittest.TestCase):
     """Real-history acceptance on the actual PR range, without a full-history scan.
 

@@ -62458,8 +62458,8 @@
     },
     {
       "path": "tests/test_gitleaks_config.py",
-      "sha256": "4237c687d13336ad8a42a36c997cccdef752cde9b27851cb4b1f65ec894f7d1e",
-      "bytes": 87478
+      "sha256": "b668888f4ddafd075e144d9c6f483150d8588a138c2545c4d91c8249937e84f7",
+      "bytes": 91041
     },
     {
       "path": "tests/test_gitleaks_guarded_macos.py",
