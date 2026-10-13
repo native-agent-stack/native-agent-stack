@@ -16,7 +16,7 @@ import re
 import shutil
 import tempfile
 
-VERSION = "acct-sized-generator-v1"
+VERSION = "acct-sized-generator-v2"
 STAGES = {"sip", "lev1", "lev2", "lev4", "edge2", "edge8", "iex", "pre"}
 DOLLAR_CAPS = {"capital_usd", "max_gross_exposure_usd", "max_order_notional_usd",
                "max_gross_loss_usd", "max_drawdown_usd"}
@@ -108,22 +108,22 @@ def scaled_config(control, equity):
                 raise Refused("unregistered_dollar_field")
     visit(config)
     config["capital_usd"] = format(capital, ".2f")
-    unclamped = config["max_order_notional_usd"]
-    clamped = min(Decimal(unclamped), Decimal("10000"))
-    config["max_order_notional_usd"] = format(clamped, ".2f")
-    scaled["max_order_notional_usd"]["derived"] = config["max_order_notional_usd"]
-    # D7 changes the experimental sizing mode; CONTROL is untouched. Retain
-    # PolicyConfig's stricter unleveraged bound instead of silently installing
-    # a leverage schedule in a feed preset that never had one.
-    quantity_ceiling = 100 if "leverage_policy" in config or "mover" in config else 10
+    # CC r1: adopt the landed #1088 explicit lane envelope. The parser's
+    # largest whole-share ceiling removes the old 10/100-share truncation;
+    # NOTIONAL sizing and the scaled dollar cap determine the actual order.
+    # Capital retains D7's 1M bound. CONTROL gets no overrides or byte edits.
+    quantity_ceiling = 1000000000
+    config["risk_ceilings"] = {"capital_usd": "1000000",
+        "max_order_notional_usd": config["max_order_notional_usd"],
+        "max_order_quantity": quantity_ceiling}
     config["max_order_quantity"] = quantity_ceiling
     config["max_order_qty_mode"] = "notional"
     return config, {"factor": str(factor), "rounding": "ROUND_DOWN cents",
-                    "order_notional_ceiling": {"unclamped_usd": unclamped,
-                        "effective_usd": config["max_order_notional_usd"], "code_ceiling_usd": "10000.00",
-                        "clamped": Decimal(unclamped) > clamped},
-                    "quantity_ceiling": {"effective": quantity_ceiling, "code_maximum": 100,
-                        "basis": "canonical_policy_or_mover" if quantity_ceiling == 100 else "unleveraged_policy"},
+                    "order_notional_ceiling": {"effective_usd": config["max_order_notional_usd"],
+                        "registered_risk_ceiling_usd": config["max_order_notional_usd"],
+                        "basis": "scaled_control_cap", "clamped": False},
+                    "quantity_ceiling": {"effective": quantity_ceiling, "code_maximum": 1000000000,
+                        "basis": "D6b_explicit_lane_envelope_parser_bound"},
                     "sizing_mode": "notional", "fields": scaled}
 
 
@@ -177,12 +177,15 @@ def freeze(*, controls, stages, fact, pass_id, preset_set, output, now):
         generator = regular_bytes(Path(__file__))
         (scratch / "generator.py").write_bytes(generator)
         manifest = {"schema_version": 1, "paper_lane": "B", "evidence_class": "exploratory",
-                    "helper_version": "preset-helpers-v1",
+                    "helper_version": "preset-helpers-v2",
                     "data_class": fact["evidence_class"], "preset_set_version": preset_set,
                     "generator_version": VERSION, "generator_sha256": sha(generator),
                     "pass_id": pass_id, "pass_start_receipt_sha256": sha(fact_bytes),
                     "pass_start_equity_usd": str(equity), "equity_observed_at_utc": fact["observed_at_utc"],
                     "stage_order": stages, "configs": rows,
+                    "capital_transition": {"version": "per-arm-rebasing-v1", "status": "NOT_IMPLEMENTED",
+                        "journal": "same_account", "preserve_lifetime_totals": True,
+                        "preserve_per_arm_loss_and_drawdown": True, "activation": "REFUSED"},
                     "runtime_acceptance": "NOT_RUN", "activation": "requires_new_helpers_and_validity_binding"}
         (scratch / "preset-manifest.json").write_bytes(canonical(manifest))
         # Strict inventory of all packet bytes except the inventory itself.
@@ -214,6 +217,8 @@ def binding(packet, *, stage, pass_id, preset_set, manifest_sha256, inventory_sh
     root = Path(packet)
     if root.is_symlink() or not root.is_dir():
         raise Refused("preset_packet_directory_refused")
+    if any(parent.is_symlink() for parent in root.parents):
+        raise Refused("preset_packet_symlink")
     inventory = regular_bytes(root / "SHA256SUMS")
     if sha(inventory) != inventory_sha256:
         raise Refused("preset_inventory_binding_mismatch")
@@ -226,7 +231,7 @@ def binding(packet, *, stage, pass_id, preset_set, manifest_sha256, inventory_sh
         if path.is_absolute() or any(p in (".", "..") for p in path.parts) or name in listed:
             raise Refused("preset_inventory_schema")
         listed.add(name)
-        if any(parent.is_symlink() for parent in (root / path).parents if parent != root.parent):
+        if any(parent.is_symlink() for parent in (root / path).parents):
             raise Refused("preset_packet_symlink")
         if sha(regular_bytes(root / path)) != expected:
             raise Refused("preset_packet_hash_mismatch")
@@ -251,7 +256,6 @@ def binding(packet, *, stage, pass_id, preset_set, manifest_sha256, inventory_sh
             "preset_manifest_sha256": manifest_sha256, "inventory_sha256": inventory_sha256,
             "pass_start_receipt_sha256": manifest["pass_start_receipt_sha256"],
             "config_sha256": rows[0]["config_sha256"],
-            "pass_start_equity_usd": manifest["pass_start_equity_usd"],
             "equity_observed_at_utc": manifest["equity_observed_at_utc"], "runtime_acceptance": "NOT_RUN"}
 
 
@@ -275,6 +279,8 @@ def main():
             if not all((args.controls, args.stages, args.pass_start_receipt, args.output)):
                 raise Refused("missing_preset_generation_argument")
             fact = json.loads(regular_bytes(args.pass_start_receipt))
+            if not isinstance(fact, dict):
+                raise Refused("pass_start_fact_schema")
             if args.now and fact.get("evidence_class") != "synthetic":
                 raise Refused("native_clock_override_refused")
             result = freeze(controls=args.controls, stages=args.stages.split(","), fact=fact,

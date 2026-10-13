@@ -893,6 +893,88 @@ class LiveEventLog(list):
             self.write_errors += 1
 
 
+def public_order_sizing(sizing):
+    return {k: sizing[k] for k in ("version", "binding_ceilings", "code_binding_ceilings",
+            "allocation_below_quantity_and_order_caps", "capital_at_code_ceiling") if k in sizing}
+
+
+def public_paper_output(result):
+    """Publication boundary: allow listed counters/labels and ratios only.
+
+    Keep the complete engine result private. Filtering just the new exposure
+    keys would still reveal equity through accounting, fills, preflight or
+    existing leverage-dollar fields. New nested engine fields are private by
+    default, and cannot silently extend the public schema.
+    """
+    scalar_keys = ("status", "flat", "engine", "mode", "feed", "config_sha256",
+                   "paper_lane", "evidence_class", "execution_evidence_class",
+                   "preset_set_version", "pass_id", "native_quotes", "native_fill_events",
+                   "native_rejections", "elapsed_seconds", "error_type")
+    public = {k: result[k] for k in scalar_keys if k in result}
+    schemas = {
+        "exposure": ("equity_basis", "sampling", "peak_deployed_to_account_equity",
+                     "peak_pending_to_account_equity"),
+        "leverage": ("policy_version", "config_max_leverage", "account_multiplier",
+                     "broker_margin_used", "next_lower_rung_ceiling",
+                     "ceiling_at_peak_achieved_leverage",
+                     "seconds_above_next_lower_rung_ceiling")}
+    for name, keys in schemas.items():
+        if name in result:
+            public[name] = {k: result[name][k] for k in keys if k in result[name]}
+    public["order_ceiling_events"] = [
+        public_order_sizing(event.get("sizing", {}))
+        for event in result.get("events", []) if event.get("type") == "intent"]
+    return public
+
+
+def publish_paper_output(journal, output, result, trial):
+    """Durably save dollar diagnostics beside the PRIVATE account journal.
+
+    Never put this sidecar under a public evidence/output directory. A failed
+    private write prevents publication, rather than discarding the evidence.
+    """
+    name = hashlib.sha256(trial.encode()).hexdigest()
+    private = Path(journal).parent / ("paper-output-" + name + ".private.json")
+    if private.resolve().is_relative_to(SOURCE.resolve().parents[2]):
+        raise ValueError("private_journal_outside_repository_required")
+    if Path(output).resolve() == private.resolve():
+        raise ValueError("private_and_public_output_must_differ")
+    save(private, result)
+    save(output, public_paper_output(result))
+
+
+def order_sizing_receipt(limits, order):
+    """Diagnostic on an admitted intent, never an alternate risk admission.
+
+    Whole-share rounding means equality to a dollar cap is not necessary: the
+    next whole share can exceed it. Other policy/portfolio allocations can be
+    smaller; do not attribute those orders to a code cap they did not reach.
+    """
+    qty, price = Decimal(order["qty"]), Decimal(order["limit_price"])
+    next_qty = qty + 1
+    binding = []
+    if next_qty > limits.max_order_qty:
+        binding.append("configured_order_quantity")
+    if next_qty * price > limits.max_order_notional_usd:
+        binding.append("configured_order_notional")
+    code = []
+    if next_qty > limits.effective_order_quantity_ceiling:
+        code.append("order_quantity_ceiling")
+    if next_qty * price > limits.effective_order_notional_ceiling:
+        code.append("order_notional_ceiling")
+    return {"version": "order-sizing-ceilings-v1", "quantity": str(qty), "limit_price": str(price),
+            "submitted_notional_usd": str(qty * price),
+            "configured_quantity_ceiling": str(limits.max_order_qty),
+            "configured_order_notional_ceiling_usd": str(limits.max_order_notional_usd),
+            "registered_order_notional_ceiling_usd": str(limits.effective_order_notional_ceiling),
+            "registered_order_quantity_ceiling": limits.effective_order_quantity_ceiling,
+            "binding_ceilings": binding, "code_binding_ceilings": code,
+            "allocation_below_quantity_and_order_caps": not binding,
+            "capital_at_code_ceiling": limits.capital_usd == (
+                limits.capital_ceiling_usd if limits.capital_ceiling_usd is not None else Decimal("1000000")),
+            "definition": "next whole share at submitted limit price"}
+
+
 class Controller:
     def __init__(self, ledger, close, *, market_open, clock=time.time, stop_file=None):
         self.ledger, self.close, self.market_open, self.clock = ledger, close, market_open, clock
@@ -902,8 +984,11 @@ class Controller:
         self.quotes = {}
         self.requests = []
         self.events = []
+        self.private_order_sizing = []
         self.stop = False
         self.defer_until = 0
+        self.preset_set_version = None
+        self.pass_id = None
         self.halted_symbols = set()
         self.last_status_ts = {}
         self.halt_states = {}      # symbol -> last applied trading status (receipts)
@@ -987,8 +1072,12 @@ class Controller:
                 raise SafetyError("duplicate_intent_not_resubmitted")
         except SafetyError as exc:
             raise NativeOrderRejected(str(exc)) from None
+        sizing = order_sizing_receipt(self.ledger.limits, order)
+        self.private_order_sizing.append({"client_id": intent.client_id, **sizing})
         self.events.append({"type": "intent", "client_id": intent.client_id, "symbol": intent.symbol,
-                            "side": intent.side, "strategy": order.get("strategy"), "reason": order.get("reason")})
+                            "side": intent.side, "strategy": order.get("strategy"), "reason": order.get("reason"),
+                            "preset_set_version": self.preset_set_version, "pass_id": self.pass_id,
+                            "sizing": public_order_sizing(sizing)})
 
     def observe(self, order):
         known = {i.client_id for i in self.ledger.intents()}
@@ -1713,8 +1802,8 @@ def _final_corporate_action_guard_summary(strategy, held_symbols, now):
 
 async def run_native(controller, policy_config, assets, trial_id, config, baseline_cash, *, account_fingerprint="simulation",
                      log_directory=None, ca_refresh_state=None, broker_equity_usd=None,
-                     preset_set_version="control-v1", pass_id=None, pass_start_equity_usd=None):
-    if preset_set_version not in ("control-v1", "acct-sized-v1"):
+                     preset_set_version=None, pass_id=None, pass_start_equity_usd=None):
+    if preset_set_version not in (None, "control-v1", "acct-sized-v1"):
         raise ValueError("unknown_preset_set")
     if preset_set_version == "acct-sized-v1" and (not pass_id or pass_start_equity_usd is None):
         raise ValueError("acct_sized_pass_context_required")
@@ -1734,6 +1823,7 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
     if registry_entries is None:
         registry_entries = load_registry(Path(config.get("_registry_path", SOURCE / "registry.json")))
     pool, selector = strategy_pool_and_selector(config, registry_entries)
+    controller.preset_set_version, controller.pass_id = preset_set_version, pass_id
     leverage_policy = config.get("_leverage_policy")
     policy = AdaptivePolicy(policy_config, strategy_pool=pool, selector=selector, leverage_policy=leverage_policy)
     # MEDIUM finding 8 (2026-09-24 fix round): moved up from further below
@@ -2041,6 +2131,7 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
                   strategy, held_symbols_now, time.time())}
     outcome["preset_set_version"] = preset_set_version
     outcome["pass_id"] = pass_id
+    outcome["private_order_sizing"] = controller.private_order_sizing
     outcome["exposure"] = {
         "peak_filled_gross_usd": str(peak_gross_exposure_usd),
         "peak_pending_buy_notional_usd": str(peak_pending_buy_notional_usd),
@@ -2049,6 +2140,8 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
                          "trial_preflight" if broker_equity_usd is not None else "unavailable"),
         "peak_deployed_to_account_equity": (None if measured_equity is None else
                                             str(peak_gross_exposure_usd / measured_equity)),
+        "peak_pending_to_account_equity": (None if measured_equity is None else
+                                            str(peak_pending_buy_notional_usd / measured_equity)),
         "sampling": "native owner-loop ticks; filled and pending separate"}
     if leverage_policy is not None:
         capital = Decimal(config["capital_usd"])
@@ -2716,7 +2809,7 @@ def main():
                                                config, metadata["baseline_cash"], account_fingerprint=fingerprint,
                                                log_directory=None if args.live_dir is None else args.live_dir / "nautilus",
                                                ca_refresh_state=ca_refresh_state,
-                                               broker_equity_usd=observation["account"]["equity"])
+                                               broker_equity_usd=observation["account"].get("equity"))
                 except Exception as exc:
                     outcome = {"status": "needs_attention", "flat": False, "native_fill_events": 0,
                                "error_type": type(exc).__name__}
@@ -2776,7 +2869,9 @@ def main():
                 metadata["config_sha256"]=summary["config_sha256"]
                 metadata["frozen_trading_config_sha256"]=frozen_trading_config_sha256(raw_config)
             publish_trial_projection(ledger,metadata_path,metadata,save)
-            save(args.output, result)
+            result.setdefault("preset_set_version", None)
+            result.setdefault("pass_id", None)
+            publish_paper_output(state_dir / "ledger.sqlite3", args.output, result, args.trial)
             print(json.dumps({k: result.get(k) for k in ("status", "flat", "native_fill_events")}, default=str))
             return exit_code
         finally:

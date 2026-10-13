@@ -29,7 +29,7 @@
   "blueprints/us-equities/adaptive-paper/recovery.py": "b981de3c78f8fc5e29fbc49d8aeb158d3a6759155a267f128084c1b8636b94ef",
   "blueprints/us-equities/adaptive-paper/registry.json": "60da73b985e718bd1dece7a3350f34636bda0fb38e766a44ae71c5a8c532282a",
   "blueprints/us-equities/adaptive-paper/requirements.txt": "6859f3c7362730fb1e1f023777863dc70650607c90873836b99c4e7d63982216",
-  "blueprints/us-equities/adaptive-paper/runner.py": "000991de0f76db2eb529f8dd6546ee2f32fa2ff09b81ce9c88765932eaead9c9",
+  "blueprints/us-equities/adaptive-paper/runner.py": "5fb3ad3d44cd0652b8feaf2195c7a5b84f2c2b9e8defece3f83fae45ef8ab122",
   "blueprints/us-equities/adaptive-paper/runtime_lock.py": "fa785cf3b5d43da95a68a11cb71385e355c7b2cdc4de82a5fd0b19a744fea9a2",
   "blueprints/us-equities/adaptive-paper/safety.py": "e63f76d1298133a9af7f2c36dff6d55f3489e61dd051d827a37456f5af328860",
   "blueprints/us-equities/adaptive-paper/scheduled_trial.sh": "8ed83e48dcc8106eda5e7cf3863b48cc2c6d68a79c029e17c461470564b1a475",
@@ -79,7 +79,7 @@
   "tests/test_mover_exit_chain.py": "74d91bd14ffb76ab2a499072a756d0b4bfdf9af70ac88905ac075bcdd9028e7a",
   "tests/test_runtime_directory_identity.py": "9a5db043d9d2837d3319a95a69bfe6c514a5ef99057bd4c7a0e7a171fd348814",
   "tests/test_scheduled_trial.py": "85cac37a4230533135eb2c680430a814278ad578b90bc4e7a3f3ea5f02acf9ce",
-  "blueprints/us-equities/adaptive-paper/preset_sets.py": "ab7bc2d7d5aaea56641407b21797ff142951e6a387fdb653f2cbedbd1b83df9d",
-  "tests/test_paper_preset_sets.py": "73724fbffc5489f8cc528121aaedbc62348d3eb46126486e6b939318227e0197",
-  "tests/integration/paper_preset_output.py": "69b114c5fb47f5e1610f80b7770ec316a4a16e07b03109b7d4704a74ebcea416"
+  "blueprints/us-equities/adaptive-paper/preset_sets.py": "4787976e732775c97d5812e096ccd2e0b1763e9e00c92bdce50b727e19eb0816",
+  "tests/test_paper_preset_sets.py": "187c880a2a6b4ad7dd5b9ec93e9e330071bb04efb834308a1f2c59cc425c2971",
+  "tests/integration/paper_preset_output.py": "c8e7a5b2480c838c603f40031440c3f0da46190b81e3d3c951af018e0afba720"
 }

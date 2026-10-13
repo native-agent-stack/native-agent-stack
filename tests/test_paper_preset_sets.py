@@ -6,6 +6,8 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
+from tests.adaptive_paper_hermetic import real_tmp_root
 
 ROOT = Path(__file__).resolve().parents[1]
 ENGINE = ROOT / "blueprints/us-equities/adaptive-paper"
@@ -14,10 +16,14 @@ NOW = "2026-10-13T16:15:00+00:00"
 
 
 class PresetSetCLI(unittest.TestCase):
+    def test_public_record_does_not_cite_a_private_sealed_packet_digest(self):
+        record = (ROOT / "docs/decisions/2026-10-13-lane-b-acct-sized-v1.md").read_text()
+        self.assertNotRegex(record, r"sealed [0-9a-f]{8,64} deployment")
+
     def setUp(self):
         self.scratch = tempfile.TemporaryDirectory(dir="/var/tmp")
         self.addCleanup(self.scratch.cleanup)
-        self.root = Path(self.scratch.name)
+        self.root = real_tmp_root(self.scratch.name)
         self.controls = self.root / "controls"
         self.controls.mkdir()
         self.base = json.loads((ENGINE / "config-sip.json").read_text())
@@ -47,10 +53,103 @@ class PresetSetCLI(unittest.TestCase):
                           "max_order_notional_usd": "2000.00", "max_gross_loss_usd": "50.00",
                           "max_drawdown_usd": "50.00"})
         self.assertEqual(config["max_order_qty_mode"], "notional")
-        self.assertEqual(config["max_order_quantity"], 10)
+        self.assertEqual(config["max_order_quantity"], 1000000000)
+        self.assertEqual(config["risk_ceilings"], {"capital_usd": "1000000",
+            "max_order_notional_usd": "2000.00", "max_order_quantity": 1000000000})
         for key in self.base.keys() - {"capital_usd", "max_gross_exposure_usd", "max_order_notional_usd",
                                       "max_gross_loss_usd", "max_drawdown_usd", "max_order_quantity", "max_order_qty_mode"}:
             self.assertEqual(config[key], self.base[key], key)
+
+    def test_nonobject_fact_is_a_structured_refusal(self):
+        for fact in ([], None):
+            with self.subTest(fact=fact):
+                self.fact = fact
+                result = self.run_cli()
+                self.assertEqual(result.returncode, 2, result.stderr)
+                self.assertEqual(json.loads(result.stdout)["reason"], "pass_start_fact_schema")
+                self.assertNotIn("Traceback", result.stderr)
+                self.assertFalse(self.out.exists())
+
+    def test_fixture_resolves_a_platform_symlink_ancestor(self):
+        alias = self.root / "platform-var-alias"
+        alias.symlink_to(self.root, target_is_directory=True)
+        factory = tempfile.TemporaryDirectory
+        with patch.object(tempfile, "TemporaryDirectory", side_effect=lambda **_: factory(dir=alias)):
+            fixture = PresetSetCLI()
+            fixture.setUp()
+        try:
+            self.assertEqual(fixture.root, fixture.root.resolve())
+            result = fixture.run_cli()
+            self.assertEqual(result.returncode, 0, result.stderr)
+            receipt = json.loads(result.stdout)
+            checked = subprocess.run([sys.executable, "-E", "-s", "-B", str(SCRIPT),
+                "--check-packet", str(fixture.out), "--stage", "sip", "--pass-id", "pass-2",
+                "--preset-set", "acct-sized-v1", "--preset-manifest-sha256", receipt["preset_manifest_sha256"],
+                "--inventory-sha256", receipt["inventory_sha256"]], capture_output=True, text=True)
+            self.assertEqual(checked.returncode, 0, checked.stderr)
+        finally:
+            fixture.doCleanups()
+
+    def test_public_binding_omits_private_equity(self):
+        result = self.run_cli()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        receipt = json.loads(result.stdout)
+        checked = subprocess.run([sys.executable, "-E", "-s", "-B", str(SCRIPT),
+            "--check-packet", str(self.out), "--stage", "sip", "--pass-id", "pass-2",
+            "--preset-set", "acct-sized-v1", "--preset-manifest-sha256", receipt["preset_manifest_sha256"],
+            "--inventory-sha256", receipt["inventory_sha256"]], capture_output=True, text=True)
+        self.assertEqual(checked.returncode, 0, checked.stderr)
+        self.assertNotIn("pass_start_equity_usd", json.loads(checked.stdout))
+        # The retained private packet still binds the actual denominator.
+        manifest = json.loads((self.out / "preset-manifest.json").read_text())
+        self.assertEqual(manifest["pass_start_equity_usd"], "40000")
+
+    def test_activation_contract_requires_recorded_rebasing_before_alternation(self):
+        result = self.run_cli()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        manifest = json.loads((self.out / "preset-manifest.json").read_text())
+        self.assertEqual(manifest["capital_transition"], {
+            "version": "per-arm-rebasing-v1", "status": "NOT_IMPLEMENTED",
+            "journal": "same_account", "preserve_lifetime_totals": True,
+            "preserve_per_arm_loss_and_drawdown": True, "activation": "REFUSED"})
+
+    def test_tampered_file_extra_file_and_wrong_manifest_digest_are_refused(self):
+        for case, reason in (("bytes", "preset_packet_hash_mismatch"),
+                             ("extra", "preset_packet_inventory_differs"),
+                             ("manifest", "preset_manifest_binding_mismatch")):
+            with self.subTest(case=case):
+                self.out = self.root / case
+                generated = self.run_cli()
+                self.assertEqual(generated.returncode, 0, generated.stderr)
+                receipt = json.loads(generated.stdout)
+                if case == "bytes":
+                    target = self.out / "configs/sip.json"
+                    target.chmod(0o600)
+                    target.write_bytes(target.read_bytes() + b"\n")
+                elif case == "extra":
+                    self.out.chmod(0o700)
+                    (self.out / "uninventoried.json").write_text("{}")
+                else:
+                    receipt["preset_manifest_sha256"] = "0" * 64
+                checked = subprocess.run([sys.executable, "-E", "-s", "-B", str(SCRIPT),
+                    "--check-packet", str(self.out), "--stage", "sip", "--pass-id", "pass-2",
+                    "--preset-set", "acct-sized-v1", "--preset-manifest-sha256", receipt["preset_manifest_sha256"],
+                    "--inventory-sha256", receipt["inventory_sha256"]], capture_output=True, text=True)
+                self.assertEqual(checked.returncode, 2, checked.stderr)
+                self.assertEqual(json.loads(checked.stdout)["reason"], reason)
+
+    def test_packet_binding_refuses_a_symlinked_parent(self):
+        generated = self.run_cli()
+        self.assertEqual(generated.returncode, 0, generated.stderr)
+        receipt = json.loads(generated.stdout)
+        alias = self.root / "alias"
+        alias.symlink_to(self.root, target_is_directory=True)
+        checked = subprocess.run([sys.executable, "-E", "-s", "-B", str(SCRIPT),
+            "--check-packet", str(alias / "packet"), "--stage", "sip", "--pass-id", "pass-2",
+            "--preset-set", "acct-sized-v1", "--preset-manifest-sha256", receipt["preset_manifest_sha256"],
+            "--inventory-sha256", receipt["inventory_sha256"]], capture_output=True, text=True)
+        self.assertEqual(checked.returncode, 2, checked.stderr)
+        self.assertEqual(json.loads(checked.stdout)["reason"], "preset_packet_symlink")
 
     def test_control_preserves_exact_bytes_and_receipts_label_version(self):
         result = self.run_cli("control-v1")
@@ -76,8 +175,7 @@ class PresetSetCLI(unittest.TestCase):
             before = json.loads((self.controls / (stage + ".json")).read_text())
             after = json.loads((self.out / "configs" / (stage + ".json")).read_text())
             self.assertEqual(after["capital_usd"], "20000.00")
-            self.assertEqual(after["max_order_quantity"],
-                             100 if "leverage_policy" in before or stage == "pre" else 10)
+            self.assertEqual(after["max_order_quantity"], 1000000000)
             self.assertEqual(after["max_order_qty_mode"], "notional")
             self.assertEqual(after.get("leverage_policy"), before.get("leverage_policy"))
         pre = json.loads((self.out / "configs/pre.json").read_text())
@@ -118,17 +216,18 @@ class PresetSetCLI(unittest.TestCase):
                 self.assertFalse(self.out.exists())
                 self.fact[field] = before
 
-    def test_D6_order_ceiling_clamps_and_records_the_derivation(self):
+    def test_landed_D6b_ceilings_preserve_account_sized_notional(self):
         self.fact["equity_usd"] = "400000"
         result = self.run_cli()
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         config = json.loads((self.out / "configs/sip.json").read_text())
         self.assertEqual(config["capital_usd"], "200000.00")
-        self.assertEqual(config["max_order_notional_usd"], "10000.00")
+        self.assertEqual(config["max_order_notional_usd"], "20000.00")
+        self.assertEqual(config["risk_ceilings"]["max_order_notional_usd"], "20000.00")
         manifest = json.loads((self.out / "preset-manifest.json").read_text())
         self.assertEqual(manifest["configs"][0]["derivation"]["order_notional_ceiling"],
-                         {"unclamped_usd": "20000.00", "effective_usd": "10000.00",
-                          "code_ceiling_usd": "10000.00", "clamped": True})
+                         {"effective_usd": "20000.00", "basis": "scaled_control_cap",
+                          "registered_risk_ceiling_usd": "20000.00", "clamped": False})
 
     def test_capital_over_existing_ceiling_still_refuses(self):
         self.fact["equity_usd"] = "3000000"
@@ -213,7 +312,7 @@ class PresetSetCLI(unittest.TestCase):
         self.assertEqual([v["preset_set_version"] for v in bindings], ["control-v1", "acct-sized-v1"])
         self.assertEqual([v["pass_id"] for v in bindings], ["pass-1", "pass-2"])
         self.assertNotEqual(bindings[0]["config_sha256"], bindings[1]["config_sha256"])
-        self.assertEqual([v["pass_start_equity_usd"] for v in bindings], ["40000", "40000"])
+        self.assertTrue(all("pass_start_equity_usd" not in v for v in bindings))
 
 
 if __name__ == "__main__":
