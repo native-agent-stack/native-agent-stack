@@ -398,10 +398,18 @@ jobs:
       - name: Install the locked native integration runtime
         shell: bash
         run: |
+          umask 022
+          integration_root=$(mktemp --directory /var/tmp/native-integration-ci.XXXXXX)
+          chmod 0755 -- "$integration_root"
+          mkdir --mode=0755 -- "$integration_root/source" "$integration_root/reports"
+          printf 'INTEGRATION_ROOT=%s\n' "$integration_root" >> "$GITHUB_ENV"
+          # As in native-foundation-e2e.yml, namespace inputs must be outside
+          # the runner's restricted home. Git archive includes only committed sources.
+          git archive HEAD | tar -x -C "$integration_root/source"
           sudo apt-get update
           sudo apt-get install --yes --no-install-recommends bubblewrap python3.12-venv libnuma1
-          python3.12 -m venv "$RUNNER_TEMP/integration-venv"
-          "$RUNNER_TEMP/integration-venv/bin/python" -m pip --isolated install \
+          python3.12 -m venv "$integration_root/venv"
+          "$integration_root/venv/bin/python" -m pip --isolated install \
             --disable-pip-version-check --no-input --only-binary=:all: --require-hashes \
             --index-url https://pypi.org/simple \
             -r blueprints/us-equities/adaptive-paper/requirements-linux-x86_64-py312.lock
@@ -415,7 +423,6 @@ jobs:
         # reuse native-foundation-e2e.yml's mandatory namespace isolation, with no fallback.
         run: |
           set -euo pipefail
-          mkdir -p "$RUNNER_TEMP/integration"
           /usr/bin/time -f 'integration elapsed_seconds=%e' \
             timeout --signal=ABRT --kill-after=10s 10m \
             sudo --non-interactive bwrap \
@@ -424,20 +431,20 @@ jobs:
               --ro-bind /usr /usr --symlink usr/bin /bin --symlink usr/lib /lib \
               --symlink usr/lib64 /lib64 --proc /proc --dev /dev \
               --tmpfs /tmp --perms 1777 --tmpfs /var/tmp \
-              --ro-bind "$RUNNER_TEMP/integration-venv" /venv \
-              --ro-bind "$GITHUB_WORKSPACE" /workspace --chdir /workspace \
+              --ro-bind "$INTEGRATION_ROOT/venv" /venv \
+              --ro-bind "$INTEGRATION_ROOT/source" /workspace --chdir /workspace \
               --setenv HOME /var/tmp --setenv TMPDIR /var/tmp \
               --setenv LANG C.UTF-8 --setenv PATH /venv/bin:/usr/bin:/bin \
               --setenv PYTHONDONTWRITEBYTECODE 1 --setenv PYTHONFAULTHANDLER 1 \
               --setenv OPENBLAS_NUM_THREADS 1 --setenv OMP_NUM_THREADS 1 \
               /venv/bin/python scripts/run_integration_tests.py \
-              2>&1 | tee "$RUNNER_TEMP/integration/unittest.log"
+              2>&1 | tee "$INTEGRATION_ROOT/reports/unittest.log"
       - name: Retain the integration log and duration
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: integration-${{ github.run_id }}-${{ github.run_attempt }}
-          path: ${{ runner.temp }}/integration/unittest.log
+          path: ${{ env.INTEGRATION_ROOT }}/reports/unittest.log
           if-no-files-found: warn
           retention-days: 30
 

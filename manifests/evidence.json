@@ -5237,8 +5237,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "332647c04d1fe3ff0940337f0600af38db3bfa3303fdeb9f9cd8bfb5e18ac5af",
-      "bytes": 49961
+      "sha256": "2625973cbe8b5aa17d84a9e2309ce90bdd06872afddcd005b58b40bd5b786fb4",
+      "bytes": 50453
     },
     {
       "path": ".gitignore",
@@ -63213,8 +63213,8 @@
     },
     {
       "path": "tests/test_integration_ci.py",
-      "sha256": "34522388b02df1c0d10a95420478d783e646eb2ec7130c9084ba41b8583497f1",
-      "bytes": 4497
+      "sha256": "afcfbce01c4f8c19f3ddd5c9bbe29cd91d081e1bdf70c8b799ff811477186633",
+      "bytes": 6871
     },
     {
       "path": "tests/test_j775_panel_contracts.py",

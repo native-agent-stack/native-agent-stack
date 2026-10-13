@@ -1,5 +1,6 @@
 """Exercise the integration entry point against hermetic native unittest fixtures."""
 from pathlib import Path
+import os
 import shutil
 import subprocess
 import sys
@@ -63,6 +64,38 @@ class IntegrationEntryPoint(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertEqual(sentinel.read_text(), "fixture preserved\n")
 
+    @unittest.skipUnless(sys.platform == "linux" and shutil.which("bwrap") and shutil.which("sudo"),
+                         "actual namespace command requires Linux bubblewrap and sudo")
+    def test_actual_step_uses_public_inputs_outside_a_restricted_runner_home(self):
+        if subprocess.run(["sudo", "--non-interactive", "true"], capture_output=True).returncode:
+            self.skipTest("the hosted namespace command requires noninteractive sudo")
+        self.root.chmod(0o755)
+        (self.root / "tests/integration/preset.py").write_text(
+            "import unittest\nclass Preset(unittest.TestCase):\n def test_output(self): pass\n")
+        inputs = self.root / "inputs"
+        shutil.copytree(self.root / "scripts", inputs / "source/scripts")
+        shutil.copytree(self.root / "tests", inputs / "source/tests")
+        (inputs / "venv/bin").mkdir(parents=True)
+        (inputs / "venv/bin/python").symlink_to("/usr/bin/python3")
+        (inputs / "reports").mkdir()
+        restricted = self.root / "restricted-runner-home"
+        restricted.mkdir(mode=0o700)
+        (restricted / "integration-venv").symlink_to(inputs / "venv")
+        tools = self.root / "tools"
+        tools.mkdir()
+        if Path("/usr/bin/gnutee").exists():
+            (tools / "tee").symlink_to("/usr/bin/gnutee")
+        workflow = jobs((ROOT / ".github/workflows/validate.yml").read_text())
+        script = run_block(step_block(workflow["integration"],
+                          "Run every integration module without network or host state"))
+        environment = dict(os.environ, INTEGRATION_ROOT=str(inputs), RUNNER_TEMP=str(restricted),
+                           GITHUB_WORKSPACE=str(restricted), PATH=str(tools) + os.pathsep + os.environ["PATH"])
+        result = subprocess.run(["bash", "-e", "-c", script], env=environment,
+                                capture_output=True, text=True, timeout=30)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("Ran 1 test", result.stdout)
+        self.assertTrue((inputs / "reports/unittest.log").is_file())
+
 
 class IntegrationWorkflow(unittest.TestCase):
     def test_job_runs_the_entrypoint_inside_mandatory_isolation(self):
@@ -70,7 +103,7 @@ class IntegrationWorkflow(unittest.TestCase):
         job = workflow["integration"]
         script = run_block(step_block(job, "Run every integration module without network or host state"))
         for required in ("--unshare-all", "--unshare-net", "--clearenv", "--cap-drop ALL",
-                         '--ro-bind "$GITHUB_WORKSPACE" /workspace', "--perms 1777 --tmpfs /var/tmp",
+                         '--ro-bind "$INTEGRATION_ROOT/source" /workspace', "--perms 1777 --tmpfs /var/tmp",
                          "--setenv HOME /var/tmp", "/venv/bin/python scripts/run_integration_tests.py",
                          "set -euo pipefail", "/usr/bin/time"):
             self.assertIn(required, script)
@@ -79,6 +112,9 @@ class IntegrationWorkflow(unittest.TestCase):
         install = run_block(step_block(job, "Install the locked native integration runtime"))
         self.assertIn("--require-hashes", install)
         self.assertIn("adaptive-paper/requirements-linux-x86_64-py312.lock", install)
+        self.assertIn("mktemp --directory /var/tmp/native-integration-ci.XXXXXX", install)
+        self.assertIn('chmod 0755 -- "$integration_root"', install)
+        self.assertIn('git archive HEAD | tar -x -C "$integration_root/source"', install)
         # Required-check expansion is a CC decision; preserve the existing aggregate dependency.
         self.assertIn("needs: validate\n", workflow["validate-result"])
 
