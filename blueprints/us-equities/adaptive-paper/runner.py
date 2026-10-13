@@ -44,7 +44,7 @@ from credential_guard import CredentialGuardError, MAX_CREDENTIAL_BYTES, REASON_
 from credential_source import (BASE_URL_VARIABLE, SOURCE_ENV_FILE, SOURCES as CREDENTIAL_SOURCES,
                                CredentialSourceError, paper_base_url_reason, select_credentials, selection_error)
 from financing import MARGIN_RATES, overnight_financing_projection
-from feeds import require_qualified_stream
+from feeds import require_qualified_quote_source
 from exploration import (active_trial_metadata, apply_exit_preset, config_digest, is_exploratory,
                          publish_trial_projection, receipt_labels, validate_exploratory_paths)
 from leverage import LeveragePolicyError, next_lower_rung_ceiling, validate_leverage_policy
@@ -419,7 +419,7 @@ def load_config(path, *, registry_path=None, config_bytes=None):
     c = json.loads(config_bytes if config_bytes is not None else Path(path).read_text())
     is_exploratory(c)
     apply_exit_preset(c, "adaptive")
-    require_qualified_stream(c["feed"])
+    require_qualified_quote_source(c["feed"], c.get("quote_source", "stream"))
     # G-e: leverage above 1x is refused exactly as before UNLESS a
     # "leverage_policy" block is present, in which case it is deferred to
     # validate_leverage_policy below (which raises its own, more specific
@@ -790,9 +790,16 @@ def validate_preflight(observation, config, *, require_open, allow_existing=Fals
     # required_window before the next RTH close) is wrongly refused.
     if session_policy.get("extended_hours"):
         now_dt = datetime.fromtimestamp(server, timezone.utc)
-        session_open_ok = session_at(now_dt).kind in (SessionKind.PRE, SessionKind.RTH, SessionKind.POST)
+        info = session_at(now_dt)
+        session_open_ok = info.kind in (SessionKind.PRE, SessionKind.RTH, SessionKind.POST)
+        if session_policy.get("overnight_enabled") is True:
+            session_open_ok = (info.kind == SessionKind.OVERNIGHT or
+                               (allow_existing and info.kind in (SessionKind.PRE, SessionKind.RTH, SessionKind.POST)))
         try:
             close = extended_session_close(now_dt).astimezone(timezone.utc).timestamp()
+            if session_policy.get("overnight_enabled") is True and info.kind == SessionKind.OVERNIGHT:
+                from overnight import overnight_bounds
+                close = overnight_bounds(server, session_policy["flatten_minutes_before_pre"])["boundary_at"]
         except ValueError:
             # CLOSED (no active extended session): session_open_ok is
             # already False above, which alone fails the require_open check
@@ -920,6 +927,8 @@ class Controller:
         self.halt_seed = {"status": "not_configured"}
         self._halt_seed_task = None
         self._halt_seed_deadline = 0.0
+        self._overnight_cancel_pending = set()
+        self._overnight_handoff = None
 
     def stop_requested(self):
         """Keep the global abort effective alongside an optional per-run latch."""
@@ -943,6 +952,8 @@ class Controller:
                 if intent is None:
                     raise SafetyError("submit_without_intent")
                 self._check_overnight_status(intent.symbol)
+                if getattr(self.port, "overnight_enabled", False) is True:
+                    self._check_overnight_admission(intent.symbol, self.clock(), intent.side)
                 self.ledger.validate_pending(client_id, quote=self.quotes[intent.symbol], now=self.clock(),
                                              market_open=self.market_open, session_close=self.close,
                                              **self._stop_options())
@@ -971,6 +982,11 @@ class Controller:
         from native_adapter import NativeOrderRejected
         try:
             self._check_overnight_status(order["symbol"])
+            if getattr(self.port, "overnight_enabled", False) is True:
+                if (session_at(datetime.fromtimestamp(self.clock(), timezone.utc)).kind != SessionKind.OVERNIGHT
+                        and order.get("reduce_only") is not True):
+                    raise SafetyError("overnight_exit_requires_reduce_only")
+                self._check_overnight_admission(order["symbol"], self.clock(), order["side"])
             if order["side"] == "buy" and (self.stop or not self.port.ready
                     or (self.stop_file is not None and self.stop_requested())):
                 raise SafetyError("admissions_not_ready")
@@ -983,10 +999,29 @@ class Controller:
                                                 session_close=self.close, **self._stop_options())
             if not intent.newly_reserved:
                 raise SafetyError("duplicate_intent_not_resubmitted")
+            if getattr(self.port, "overnight_enabled", False) is True:
+                from overnight import overnight_bounds
+                if order["side"] == "buy" or session_at(datetime.fromtimestamp(self.clock(), timezone.utc)).kind == SessionKind.OVERNIGHT:
+                    window = overnight_bounds(self.clock(), self.port.flatten_minutes_before_pre)
+                else:
+                    # The residual exit inherits the held entry's immutable carry
+                    # deadlines, including when recovery runs after the boundary.
+                    windows = self.ledger.overnight_windows()
+                    held_entries = [i for i in self.ledger.intents()
+                                    if i.symbol == intent.symbol and i.side == "buy" and i.filled_qty
+                                    and i.client_id in windows]
+                    if not held_entries:
+                        raise SafetyError("overnight_exit_without_owned_window")
+                    window = windows[held_entries[-1].client_id]
+                self.ledger.record_overnight_window(intent.client_id, window)
         except SafetyError as exc:
             raise NativeOrderRejected(str(exc)) from None
-        self.events.append({"type": "intent", "client_id": intent.client_id, "symbol": intent.symbol,
-                            "side": intent.side, "strategy": order.get("strategy"), "reason": order.get("reason")})
+        event = {"type": "intent", "client_id": intent.client_id, "symbol": intent.symbol,
+                 "side": intent.side, "strategy": order.get("strategy"), "reason": order.get("reason")}
+        if getattr(self.port, "overnight_enabled", False) is True:
+            event.update(limit_price=str(intent.limit_price), qty=str(intent.qty),
+                         midpoint_at_submit=str((quote.bid + quote.ask) / 2), at=self.clock())
+        self.events.append(event)
 
     def observe(self, order):
         known = {i.client_id for i in self.ledger.intents()}
@@ -997,25 +1032,151 @@ class Controller:
         self.ledger.record_order(order["client_order_id"], order["id"], order["status"], order["filled_qty"],
                                  order.get("filled_avg_price"), timestamp=order["updated_at_ns"] / 1e9,
                                  execution=execution_from_observation(order))
+        if order["status"] in ("filled", "canceled", "expired", "rejected") or order.get("event") == "cancel_rejected":
+            self._overnight_cancel_pending.discard(order["client_order_id"])
+        basis = (self.ledger.overnight_submission_basis(order["client_order_id"])
+                 if getattr(self.port, "overnight_enabled", False) is True else None)
+        execution = execution_from_observation(order)
+        if basis is not None and execution is not None:
+            midpoint, price = Decimal(basis["midpoint"]), Decimal(execution["price"])
+            stamp = execution.get("timestamp_ns")
+            latency = None if stamp is None else stamp / 1e9 - basis["sent_at"]
+            receipt = {"type": "overnight_execution_receipt", "client_id": order["client_order_id"],
+                "execution_id": execution["execution_id"], "qty": execution["qty"], "price": str(price),
+                "midpoint_at_submit": str(midpoint), "observed_at": self.clock(),
+                "execution_time_ns": stamp, "latency_seconds": latency,
+                "slippage_bps": str((price - midpoint) / midpoint * 10000 *
+                                    (1 if order["side"] == "buy" else -1))}
+            if self.ledger.record_overnight_execution_receipt(order["client_order_id"], receipt):
+                self.events.append(receipt)
+        if (order["status"] == "expired" and hasattr(self.ledger, "overnight_windows")
+                and order["client_order_id"] in self.ledger.overnight_windows()
+                and order["symbol"] in self.ledger.positions()):
+            self._overnight_freeze("overnight_day_expiry", order["symbol"])
 
-    def _check_overnight_status(self, symbol):
+    def _overnight_freeze(self, reason, symbol=None):
+        if self._overnight_handoff is None:
+            self._overnight_handoff = reason
+            self.stop = True
+            self.ledger.freeze(reason)
+            self.events.append({"type": "exit_attention", "symbol": symbol, "reason": reason})
+            self.events.append({"type": "overnight_handoff", "reason": reason,
+                                "positions": sorted(self.ledger.positions()), "at": self.clock()})
+
+    def _check_overnight_admission(self, symbol, now, side):
+        """A second dispatch-time check, then again immediately before POST."""
+        from overnight import overnight_bounds
+        if (getattr(self.port, "overnight_enabled", False) is not True
+                or getattr(self.port, "quote_source_mode", None) != "boats_rest"
+                or getattr(self.port, "feed", None) != "boats"):
+            raise SafetyError("overnight_unqualified")
+        kind = session_at(datetime.fromtimestamp(now, timezone.utc)).kind
+        if kind == SessionKind.OVERNIGHT:
+            bounds = overnight_bounds(now, self.port.flatten_minutes_before_pre)
+            if side == "buy" and now >= bounds["flatten_at"]:
+                raise SafetyError("overnight_entry_cutoff")
+        elif (kind not in (SessionKind.PRE, SessionKind.RTH, SessionKind.POST)
+              or side != "sell" or symbol not in self.ledger.positions()):
+            raise SafetyError("overnight_session_unavailable")
+        quote = self.current_quote(symbol)
+        if quote is None:
+            raise SafetyError("no_current_quote")
+        max_age = min(self.port.quote_timeout, self.ledger.limits.quote_max_age_seconds
+                      if side == "buy" else self.ledger.limits.effective_exit_quote_max_age_seconds)
+        if not 0 <= now - quote.timestamp <= max_age:
+            raise SafetyError("overnight_quote_stale")
+        self._check_overnight_status(symbol, now=now)
+        status = self.overnight_states[symbol]
+        self.events.append({"type": "overnight_decision", "symbol": symbol, "side": side,
+                            "at": now, "quote_age_seconds": now - quote.timestamp,
+                            "carrier_age_seconds": now - status["ts_ns"] / 1e9,
+                            "midpoint": str((quote.bid + quote.ask) / 2)})
+
+    async def overnight_tick(self, now):
+        """Cutoff/halt cancellation is independent of repricing exemptions."""
+        if getattr(self.port, "overnight_enabled", False) is not True:
+            return False
+        windows = self.ledger.overnight_windows()
+        from overnight import overnight_bounds
+        try:
+            force = now >= overnight_bounds(now, self.port.flatten_minutes_before_pre)["flatten_at"]
+        except ValueError:
+            force = True
+            if self.ledger.positions() or self.ledger.unresolved():
+                self._overnight_freeze("overnight_boundary_handoff")
+        unresolved = {i.client_id: i for i in self.ledger.unresolved()}
+        for cid, window in windows.items():
+            intent = unresolved.get(cid)
+            force |= now >= window["flatten_at"]
+            if (intent is not None and intent.side == "buy"
+                    and (self.is_halted(intent.symbol) or now >= window["flatten_at"])):
+                if cid not in self._overnight_cancel_pending:
+                    self._overnight_cancel_pending.add(cid)
+                    try:
+                        await self.port.cancel(cid)
+                    except Exception:
+                        self._overnight_cancel_pending.discard(cid)
+                        self.events.append({"type": "overnight_cancel_refused", "client_id": cid,
+                                            "at": now})
+                    else:
+                        self.events.append({"type": "overnight_entry_cancel", "client_id": cid,
+                                            "reason": "halt" if self.is_halted(intent.symbol) else "carry_cutoff",
+                                            "at": now})
+            if now >= window["day_expiry"] and self.ledger.positions():
+                self._overnight_freeze("overnight_day_expiry")
+        return force
+
+    def overnight_reprice_allowed(self, symbol, now):
+        if getattr(self.port, "overnight_enabled", False) is not True:
+            return True
+        try:
+            self._check_overnight_admission(symbol, now, "sell")
+        except (ValueError, RuntimeError):
+            return False
+        return True
+
+    def _overnight_before_wire(self, order):
+        """Runs on the owner loop even when the SDK POST originates in a worker."""
+        now = self.clock()
+        if (session_at(datetime.fromtimestamp(now, timezone.utc)).kind != SessionKind.OVERNIGHT
+                and (order.get("side") != "sell" or order.get("reduce_only") is not True)):
+            raise SafetyError("overnight_exit_requires_reduce_only")
+        self._check_overnight_admission(order["symbol"], now, order["side"])
+        quote = self.current_quote(order["symbol"])
+        midpoint = (quote.bid + quote.ask) / 2
+        self.ledger.record_overnight_submission(order["client_order_id"], midpoint, now)
+        self.events.append({"type": "overnight_wire_submit", "client_id": order["client_order_id"],
+                            "at": now, "midpoint_at_submit": str(midpoint)})
+
+    def _check_overnight_status(self, symbol, *, now=None):
         # Default RTH diagnostics retain their calendar-free admission path.
         if (getattr(self.port, "extended_hours_allowed", False) is not True
                 and getattr(self.port, "feed", None) != "boats"):
             return
-        now = self.clock()
+        now = self.clock() if now is None else now
         try:
             info = session_at(datetime.fromtimestamp(now, timezone.utc))
         except ValueError:
             raise SafetyError("session_classification_failed") from None
-        if info.kind != SessionKind.OVERNIGHT:
+        if info.kind != SessionKind.OVERNIGHT and getattr(self.port, "overnight_enabled", False) is not True:
             return
         status = self.overnight_states.get(symbol)
         if status is None or status.get("source") != "alpaca_assets":
             raise SafetyError("overnight_status_unknown")
         age = now - status["ts_ns"] / 1_000_000_000
-        if not 0 <= age <= getattr(self.port, "quote_timeout", 5):
+        status_timeout = getattr(self.port, "quote_timeout", 5)
+        if getattr(self.port, "overnight_enabled", False) is True:
+            status_timeout = min(status_timeout, self.ledger.limits.quote_max_age_seconds)
+        if not 0 <= age <= status_timeout:
             raise SafetyError("overnight_status_stale")
+        if info.kind != SessionKind.OVERNIGHT:
+            if info.kind not in (SessionKind.PRE, SessionKind.RTH, SessionKind.POST):
+                raise SafetyError("overnight_session_unavailable")
+            if status.get("tradable") is not True or status.get("asset_status") != "active":
+                raise SafetyError("exit_asset_not_tradable")
+            if self.is_halted(symbol):
+                raise SafetyError("exit_asset_halted")
+            return
         if (type(status.get("overnight_tradable")) is not bool
                 or type(status.get("overnight_halted")) is not bool):
             raise SafetyError("overnight_status_unknown")
@@ -1249,7 +1410,9 @@ class Controller:
         best-effort condition flag is not read here: it blocks entries only, through the
         stored quote, and never an exit."""
         self._expire_seeded_halts()
-        return symbol in self.halted_symbols
+        return (symbol in self.halted_symbols
+                or (getattr(self.port, "overnight_enabled", False) is True
+                    and self.overnight_states.get(symbol, {}).get("overnight_halted") is True))
 
     def halt_summary(self):
         self._expire_seeded_halts()
@@ -1260,6 +1423,10 @@ class Controller:
 
     def bind(self, port):
         """Retain proven negative outcomes before native/recovery callbacks."""
+        if getattr(port, "overnight_enabled", False) is True:
+            port.overnight_check = self._check_overnight_admission
+            port.overnight_before_wire = self._overnight_before_wire
+            port.overnight_cancel_pending = self._overnight_cancel_pending
         submit = port.submit
         async def observed_submit(order):
             try:
@@ -1725,6 +1892,7 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
     pool, selector = strategy_pool_and_selector(config, registry_entries)
     leverage_policy = config.get("_leverage_policy")
     policy = AdaptivePolicy(policy_config, strategy_pool=pool, selector=selector, leverage_policy=leverage_policy)
+    policy.trail_event_sink = controller.events.append
     # MEDIUM finding 8 (2026-09-24 fix round): moved up from further below
     # so it is available here -- the corporate-action guard is now wired
     # into the strategy ONLY when overnight_holds is actually enabled. No
@@ -1843,6 +2011,7 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
             force_exit = (controller.stop_requested() or bool(session.errors)
                           or bool(state.halted_reason) or elapsed >= config["duration_seconds"]
                           or controller.close - now <= config["cleanup_seconds"])
+            force_exit |= await controller.overnight_tick(now)
             if force_exit and cleanup_started is None:
                 cleanup_started = time.monotonic()
             # A connection or integrity gap ends this bounded run. Quote silence
@@ -2344,11 +2513,22 @@ def trial_phase_and_exit_code(result):
 
 
 def _controller_session(close, now, session_policy):
-    """The controller's entry window. By default the broker's RTH close and an always-open market. Under extended hours the continuous
-    PRE->RTH->POST window while one is active; OVERNIGHT is a market session but not an admitted one (mover_runner._controller_session)."""
+    """Market availability for reservation and explicit residual recovery.
+
+    The opted-in port admits OVERNIGHT entries and PRE/RTH/POST exits; its
+    admission guard, rather than this clock, enforces the exit-only boundary.
+    Other extended-hours ports retain their continuous PRE->RTH->POST window.
+    """
     if not session_policy["extended_hours"]:
         return close, True
     moment = datetime.fromtimestamp(now, timezone.utc)
+    if session_policy.get("overnight_enabled") is True:
+        from overnight import overnight_bounds
+        try:
+            return overnight_bounds(now, session_policy["flatten_minutes_before_pre"])["boundary_at"], True
+        except ValueError:
+            if session_at(moment).kind not in (SessionKind.PRE, SessionKind.RTH, SessionKind.POST):
+                return close, False
     market_open = session_at(moment).kind in (SessionKind.PRE, SessionKind.RTH, SessionKind.POST)
     if market_open:
         close = extended_session_close(moment).astimezone(timezone.utc).timestamp()
@@ -2433,8 +2613,11 @@ def main():
     # read to include margin fields (transport.normalize_account); the
     # default (no "leverage_policy" block) preflight is unchanged.
     include_margin = config.get("_leverage_policy") is not None
+    from overnight import overnight_quote_feed
+    preflight_feed = overnight_quote_feed(config["feed"], time.time(),
+        enabled=args.command == "recover" and session_policy.get("overnight_enabled") is True)
     try:
-        observation = preflight(key, secret, config["symbols"], feed=config["feed"],
+        observation = preflight(key, secret, config["symbols"], feed=preflight_feed,
                                 before_request=observe_request, request_observer=responses.append,
                                 include_margin=include_margin)
     except TransportError as exc:
@@ -2668,6 +2851,9 @@ def main():
                     sink_observation=controller.observe, sink_status=controller.trading_status,
                     request_observer=responses.append,
                     quote_timeout=config["quote_max_age_seconds"], feed=config["feed"],
+                    **({"quote_source_mode": "boats_rest", "overnight_enabled": True,
+                        "flatten_minutes_before_pre": session_policy["flatten_minutes_before_pre"]}
+                       if session_policy.get("overnight_enabled") is True else {}),
                     order_quote_max_age_seconds=config["quote_max_age_seconds"],
                     **({"exit_quote_max_age_seconds": ledger.limits.exit_quote_max_age_seconds}
                        if ledger.limits.exit_quote_max_age_seconds is not None else {}),

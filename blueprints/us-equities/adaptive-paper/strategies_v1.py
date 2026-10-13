@@ -304,6 +304,8 @@ class AdaptivePolicy:
         # Rich exit dispositions stay outside Decision's golden serialization.
         # A session-aware native caller supplies the session before decide().
         self.exit_session = "RTH"
+        self.exit_overnight_qualified = False
+        self.trail_event_sink = None
         self.last_exit_decisions = {}
 
     def observe(self, symbol: str, bid: float, ask: float, timestamp: float) -> bool:
@@ -435,7 +437,12 @@ class AdaptivePolicy:
                 quote_fresh = bool(quote_fresh and
                                    now >= latest.timestamp - QUOTE_FUTURE_TOLERANCE_SECONDS)
             if quote_fresh:
+                prior_high = holding.high_bid
                 holding.high_bid = max(holding.high_bid, latest.bid)
+                if self.trail_event_sink is not None and holding.high_bid != prior_high:
+                    self.trail_event_sink({"type": "trail_high", "symbol": symbol,
+                                           "high_bid": str(holding.high_bid),
+                                           "quote_timestamp": latest.timestamp, "at": now})
                 pnl_bps = (latest.bid / holding.average_price - 1) * 10000
                 trail_bps = (latest.bid / holding.high_bid - 1) * 10000
             else:
@@ -445,6 +452,7 @@ class AdaptivePolicy:
                               force_exit=force_exit, force_exit_reason=force_exit_reason,
                               volatility_bps=(features.get(symbol) or {}).get("vol"),
                               session=self.exit_session,
+                              overnight_qualified=self.exit_overnight_qualified,
                               bid=latest.bid if latest else None,
                               ask=latest.ask if latest else None)
             decision = DEFAULT_PLAN.evaluate(ctx, c)

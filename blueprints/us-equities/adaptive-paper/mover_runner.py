@@ -267,7 +267,9 @@ def make_book(plan, controller):
     ledger = controller.ledger
     return MoverBook(plan, positions=ledger.positions, quote=controller.current_quote, limits=ledger.limits,
                      trial_id=plan.trial_id, existing_client_ids=[i.client_id for i in ledger.intents()],
-                     event_sink=controller.events.append, halted=controller.is_halted)
+                     event_sink=controller.events.append, halted=controller.is_halted,
+                     reprice_allowed=controller.overnight_reprice_allowed,
+                     cancel_pending=lambda cid: cid in controller._overnight_cancel_pending)
 
 
 async def run_mover(controller, plan, config, baseline_cash, *, account_fingerprint="simulation",
@@ -294,7 +296,7 @@ async def run_mover(controller, plan, config, baseline_cash, *, account_fingerpr
     from mover_strategy import MoverStrategy
     ledger = controller.ledger
     book = make_book(plan, controller)
-    strategy = MoverStrategy(book, ledger)
+    strategy = MoverStrategy(book, ledger, overnight_enabled=getattr(controller.port, "overnight_enabled", False) is True)
     port = controller.port
     start = port.start
 
@@ -332,6 +334,8 @@ async def run_mover(controller, plan, config, baseline_cash, *, account_fingerpr
                 now = time.time()
                 if task.done() or now >= plan.timing.sell_window_end:
                     break
+                if await controller.overnight_tick(now):
+                    book.set_force("overnight_cutoff", now)
                 state = ledger.accounting()
                 health = getattr(port, "health", {})
                 serious_gap = any("stale" not in str(reason) for reason in health.get("reasons", []))
@@ -603,13 +607,7 @@ def not_started(output, *, evidence_class, reason, config_sha256=None, scan_sha2
 
 def _controller_session(close, now, session_policy):
     """Controller close/market_open exactly as runner.main derives them."""
-    if not session_policy["extended_hours"]:
-        return close, True
-    moment = datetime.fromtimestamp(now, timezone.utc)
-    market_open = session_at(moment).kind in (SessionKind.PRE, SessionKind.RTH, SessionKind.POST)
-    if market_open:
-        close = extended_session_close(moment).astimezone(timezone.utc).timestamp()
-    return close, market_open
+    return runner_module._controller_session(close, now, session_policy)
 
 
 def _bounded_reason(exc):
@@ -863,6 +861,9 @@ def command_paper(args):
                     **({"exit_quote_max_age_seconds": limits.exit_quote_max_age_seconds}
                        if limits.exit_quote_max_age_seconds is not None else {}),
                     feed=config["feed"],
+                    **({"quote_source_mode": "boats_rest", "overnight_enabled": True,
+                        "flatten_minutes_before_pre": session_policy["flatten_minutes_before_pre"]}
+                       if session_policy.get("overnight_enabled") is True else {}),
                     required_quote_symbols=list(settings.benchmarks),
                     # As runner.main: from the lane's first trial, so reconcile sees every owned intent.
                     history_start=datetime.fromtimestamp(metadata["started_at"], timezone.utc),
@@ -937,13 +938,16 @@ def command_recover(args):
     attempts, responses = [], []
     observe = _preflight_observer(attempts)
     include_margin = config.get("_leverage_policy") is not None
+    from overnight import overnight_quote_feed
+    preflight_feed = overnight_quote_feed(config["feed"], time.time(),
+        enabled=session_policy.get("overnight_enabled") is True)
     try:
-        observation = preflight(key, secret, list(settings.benchmarks), feed=config["feed"], before_request=observe,
+        observation = preflight(key, secret, list(settings.benchmarks), feed=preflight_feed, before_request=observe,
                                 request_observer=responses.append, include_margin=include_margin)
         needed = sorted({p["symbol"] for p in observation["positions"]} | {o["symbol"] for o in observation["orders"]}
                         | set(settings.benchmarks))
         if needed != sorted(settings.benchmarks):
-            observation = preflight(key, secret, needed, feed=config["feed"], before_request=observe,
+            observation = preflight(key, secret, needed, feed=preflight_feed, before_request=observe,
                                     request_observer=responses.append, include_margin=include_margin)
     except TransportError as exc:
         return not_started(args.output, evidence_class="PAPER", reason=str(exc), stage="preflight")
@@ -988,6 +992,9 @@ def command_recover(args):
                 **({"exit_quote_max_age_seconds": limits.exit_quote_max_age_seconds}
                    if limits.exit_quote_max_age_seconds is not None else {}),
                 feed=config["feed"], required_quote_symbols=list(settings.benchmarks),
+                **({"quote_source_mode": "boats_rest", "overnight_enabled": True,
+                    "flatten_minutes_before_pre": session_policy["flatten_minutes_before_pre"]}
+                   if session_policy.get("overnight_enabled") is True else {}),
                 history_start=datetime.fromtimestamp(metadata["started_at"], timezone.utc),
                 fee_history_start=fee_window,
                 extended_hours_allowed=session_policy["extended_hours"], include_margin=include_margin))

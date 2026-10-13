@@ -538,12 +538,13 @@ class IntegratedRunner(unittest.TestCase):
 
         native_submit = AlpacaExecutionClient._submit_order
         native_denied = AlpacaExecutionClient.generate_order_denied
-        cases = (("CLOSED", 24, False), ("RTH", 15, False), ("PRE", 12, True), ("POST", 22, True))
+        cases = (("OVERNIGHT_REFUSED", 24, False), ("OVERNIGHT_ADMITTED", 24, True),
+                 ("RTH", 15, False), ("PRE", 12, True), ("POST", 22, True))
         for kind, utc_hour, expected_extended in cases:
             with self.subTest(session=kind), tempfile.TemporaryDirectory() as root:
                 dispatch_now = datetime(2026, 3, 11, tzinfo=timezone.utc).timestamp() if utc_hour == 24 else \
                     datetime(2026, 3, 10, utc_hour, tzinfo=timezone.utc).timestamp()
-                owner_now = dispatch_now - .1 if kind == "CLOSED" else dispatch_now
+                owner_now = dispatch_now - .1 if kind == "OVERNIGHT_REFUSED" else dispatch_now
                 dispatch_ns = int(dispatch_now * 1e9)
                 seen, generated_denials = [], []
 
@@ -570,9 +571,18 @@ class IntegratedRunner(unittest.TestCase):
                 controller = Controller(ledger, owner_now + 3600, market_open=True, clock=lambda: owner_now)
                 port = SimulatedPort(controller, ("SPY",))
                 controller.port = port
+                if kind == "OVERNIGHT_ADMITTED":
+                    port.feed, port.quote_source_mode = "boats", "boats_rest"
+                    port.overnight_enabled, port.extended_hours_allowed = True, True
+                    port.flatten_minutes_before_pre, port.quote_timeout = 10, 3
+                    controller.bind(port)
+                    controller.trading_status({"symbol": "SPY", "source": "alpaca_assets",
+                        "ts_ns": int(owner_now * 1e9), "overnight_tradable": True,
+                        "overnight_halted": False})
                 watcher = QueuedEntry()
                 session = build_node(port, [{"symbol": "SPY"}], [watcher],
-                                     session_policy={"extended_hours": True, "overnight_holds": False})
+                                     session_policy={"extended_hours": True, "overnight_holds": False,
+                                                     "overnight_enabled": kind == "OVERNIGHT_ADMITTED"})
 
                 async def exercise():
                     await asyncio.wait_for(session.run_async(), timeout=5)
@@ -583,14 +593,14 @@ class IntegratedRunner(unittest.TestCase):
                      patch.object(AlpacaExecutionClient, "_submit_order", delayed_dispatch):
                     asyncio.run(exercise())
                 self.assertEqual(seen, [("buy", dispatch_ns)])
-                if kind == "CLOSED":
+                if kind == "OVERNIGHT_REFUSED":
                     self.assertEqual(port.orders, {})
                     self.assertEqual(port.submitted_at, [])
                     self.assertEqual(watcher.fills, 0)
-                    # The real pinned method queues native output. Fault stop can
-                    # precede custom strategy callback delivery, which is not required.
+                    # The real pinned method denies only the ENTRY; the strategy
+                    # itself ends this synthetic fixture after receiving the denial.
                     self.assertEqual(generated_denials, [("entry_dispatch_session_unavailable", dispatch_ns)])
-                    self.assertTrue(any(e.startswith("entry_dispatch_session_unavailable:") for e in session.errors))
+                    self.assertEqual(session.errors, [])
                     self.assertEqual(ledger.intents(), [])
                 else:
                     self.assertEqual(generated_denials, [])
@@ -599,6 +609,187 @@ class IntegratedRunner(unittest.TestCase):
                     self.assertEqual(watcher.fills, 1)
                     self.assertEqual(len(port.orders), 1)
                     self.assertEqual(next(iter(port.orders.values()))["extended_hours"], expected_extended)
+
+    def test_held_overnight_native_reduce_only_exit_routes_in_pre(self):
+        from nautilus_trader.common import Clock
+        from nautilus_trader.config import StrategyConfig
+        from nautilus_trader.model import InstrumentId, OrderSide, Quantity, TimeInForce
+        from nautilus_trader.trading import Strategy
+        from native_adapter import AlpacaExecutionClient, build_node
+        from runner import _controller_session
+        now = [datetime(2026, 3, 11, 7, 49, tzinfo=timezone.utc).timestamp()]
+        policy = {'extended_hours': True, 'overnight_enabled': True, 'flatten_minutes_before_pre': 10}
+        native_submit = AlpacaExecutionClient._submit_order
+        async def fixed_dispatch(client, command):
+            old = client.clock
+            client.clock = Clock.new_test()
+            client.clock.set_time(int(now[0] * 1e9))
+            try:
+                await native_submit(client, command)
+            finally:
+                client.clock = old
+        with tempfile.TemporaryDirectory(dir='/var/tmp') as root:
+            ledger = Ledger(Path(root) / 'journal.db', RiskLimits(trial_seconds=3600, cleanup_seconds=600,
+                                                               min_entry_close_seconds=600))
+            self.addCleanup(ledger.close)
+            ledger.start_trial(now[0])
+            controller = Controller(ledger, now[0] + 3600, market_open=True, clock=lambda: now[0])
+            port = SimulatedPort(controller, ('SPY',))
+            port.feed, port.quote_source_mode = 'boats', 'boats_rest'
+            port.overnight_enabled, port.extended_hours_allowed = True, True
+            port.flatten_minutes_before_pre, port.quote_timeout = 10, 3
+            controller.port = controller.bind(port)
+            def carrier():
+                controller.trading_status({'symbol': 'SPY', 'source': 'alpaca_assets', 'ts_ns': int(now[0] * 1e9),
+                    'overnight_tradable': True, 'overnight_halted': False, 'tradable': True, 'asset_status': 'active'})
+            carrier()
+            class EnterThenExit(Strategy):
+                def __init__(self):
+                    super().__init__(StrategyConfig(log_events=False, log_commands=False))
+                    self.sent, self.fills = 0, 0
+                    self.refusals = []
+                def on_start(self):
+                    self.subscribe_quotes(InstrumentId.from_str('SPY.ALPACA'))
+                def on_quote(self, tick):
+                    if controller.quotes['SPY'].timestamp != now[0]:
+                        return
+                    if self.sent == 0 or (self.fills == 1 and self.sent == 1):
+                        exit_order = self.sent == 1
+                        self.sent += 1
+                        order = self.order_factory.limit(tick.instrument_id,
+                            OrderSide.SELL if exit_order else OrderSide.BUY, Quantity.from_int(1),
+                            tick.bid_price if exit_order else tick.ask_price, time_in_force=TimeInForce.DAY,
+                            reduce_only=exit_order)
+                        self.submit_order(order)
+                def on_order_filled(self, event):
+                    self.fills += 1
+                    if self.fills == 1:
+                        now[0] = datetime(2026, 3, 11, 8, 0, 1, tzinfo=timezone.utc).timestamp()
+                        controller.close, controller.market_open = _controller_session(now[0], now[0], policy)
+                        carrier()
+                def on_order_denied(self, event):
+                    self.refusals.append(str(event.reason))
+                def on_order_rejected(self, event):
+                    self.refusals.append(str(event.reason))
+            strategy = EnterThenExit()
+            session = build_node(port, [{'symbol': 'SPY'}], [strategy], session_policy=policy)
+            async def exercise():
+                task = asyncio.create_task(session.run_async())
+                try:
+                    deadline = time.monotonic() + 5
+                    while strategy.fills < 2 and not task.done() and time.monotonic() < deadline:
+                        await asyncio.sleep(.01)
+                    self.assertEqual(session.errors, [])
+                    self.assertEqual(strategy.fills, 2, strategy.refusals)
+                    self.assertEqual(ledger.positions(), {})
+                    sells = [o for o in port.orders.values() if o['side'] == 'sell']
+                    self.assertEqual(len(sells), 1)
+                    self.assertIs(sells[0]['reduce_only'], True)
+                    self.assertIs(sells[0]['extended_hours'], True)
+                    self.assertEqual(sells[0]['type'], 'limit')
+                finally:
+                    if session.handle.is_running:
+                        session.handle.stop()
+                    await asyncio.wait_for(task, 5)
+            with patch.object(runner_module.time, 'time', side_effect=lambda: now[0]), \
+                 patch.object(runner_module.time, 'time_ns', side_effect=lambda: int(now[0] * 1e9)), \
+                 patch.object(AlpacaExecutionClient, '_submit_order', fixed_dispatch):
+                asyncio.run(exercise())
+
+    def test_stale_overnight_entry_keeps_native_node_and_other_position_alive(self):
+        from nautilus_trader.common import Clock
+        from nautilus_trader.config import StrategyConfig
+        from nautilus_trader.model import InstrumentId, OrderSide, Price, Quantity, TimeInForce
+        from nautilus_trader.trading import Strategy
+        from native_adapter import AlpacaExecutionClient, build_node
+        now = datetime(2026, 3, 11, 1, tzinfo=timezone.utc).timestamp()
+        class HeldThenEntry(Strategy):
+            def __init__(self):
+                super().__init__(StrategyConfig(log_events=False, log_commands=False))
+                self.first = False
+            def on_start(self):
+                self.subscribe_quotes(InstrumentId.from_str("QQQ.ALPACA"))
+                self.subscribe_quotes(InstrumentId.from_str("SPY.ALPACA"))
+            def on_quote(self, tick):
+                if str(tick.instrument_id) == "QQQ.ALPACA" and not self.first:
+                    self.first = True
+                    self.submit_order(self.order_factory.limit(tick.instrument_id, OrderSide.BUY,
+                        Quantity.from_int(1), tick.ask_price, time_in_force=TimeInForce.DAY))
+            def on_order_filled(self, event):
+                if str(event.instrument_id) == "QQQ.ALPACA":
+                    self.submit_order(self.order_factory.limit(InstrumentId.from_str("SPY.ALPACA"), OrderSide.BUY,
+                        Quantity.from_int(1), Price.from_str("100.02"), time_in_force=TimeInForce.DAY))
+        native_submit = AlpacaExecutionClient._submit_order
+        native_denied = AlpacaExecutionClient.generate_order_denied
+        denials = []
+        async def fixed_dispatch(client, command):
+            old = client.clock
+            client.clock = Clock.new_test()
+            client.clock.set_time(int(now * 1e9))
+            try:
+                await native_submit(client, command)
+            finally:
+                client.clock = old
+        def denied(client, order, reason):
+            denials.append(reason)
+            native_denied(client, order, reason)
+        with tempfile.TemporaryDirectory() as root:
+            ledger = Ledger(Path(root) / "journal.db", RiskLimits())
+            self.addCleanup(ledger.close)
+            ledger.start_trial(now)
+            controller = Controller(ledger, now + 3600, market_open=True, clock=lambda: now)
+            port = SimulatedPort(controller, ("QQQ", "SPY"))
+            port.feed, port.quote_source_mode = "boats", "boats_rest"
+            port.overnight_enabled, port.extended_hours_allowed = True, True
+            port.flatten_minutes_before_pre, port.quote_timeout = 10, 3
+            controller.port = controller.bind(port)
+            for symbol, age in (("QQQ", 0), ("SPY", 4)):
+                controller.trading_status({"symbol": symbol, "source": "alpaca_assets",
+                    "ts_ns": int((now - age) * 1e9), "overnight_tradable": True, "overnight_halted": False})
+            strategy = HeldThenEntry()
+            session = build_node(port, [{"symbol": "QQQ"}, {"symbol": "SPY"}], [strategy],
+                                 session_policy={"extended_hours": True, "overnight_holds": False,
+                                                 "overnight_enabled": True})
+            async def exercise():
+                task = asyncio.create_task(session.run_async())
+                try:
+                    deadline = time.monotonic() + 5
+                    while not denials and not task.done() and time.monotonic() < deadline:
+                        await asyncio.sleep(.01)
+                    self.assertEqual(denials, ["entry_dispatch_session_unavailable"])
+                    self.assertEqual(session.errors, [])
+                    self.assertFalse(task.done())
+                    self.assertTrue(session.handle.is_running)
+                    self.assertEqual(port.positions["QQQ"]["qty"], Decimal(1))
+                    self.assertEqual(ledger.positions()["QQQ"].qty, Decimal(1))
+                    self.assertEqual(len(port.orders), 1)
+                    self.assertTrue(all(order["side"] == "buy" for order in port.orders.values()))
+                    # A transient dispatch denial must not freeze subsequent
+                    # submissions. Refresh the carrier and submit another entry.
+                    controller.trading_status({"symbol": "SPY", "source": "alpaca_assets",
+                        "ts_ns": int(now * 1e9), "overnight_tradable": True, "overnight_halted": False})
+                    strategy.submit_order(strategy.order_factory.limit(InstrumentId.from_str("SPY.ALPACA"),
+                        OrderSide.BUY, Quantity.from_int(1), Price.from_str("100.02"), time_in_force=TimeInForce.DAY))
+                    deadline = time.monotonic() + 5
+                    while "SPY" not in ledger.positions() and not task.done() and time.monotonic() < deadline:
+                        await asyncio.sleep(.01)
+                    self.assertEqual(denials, ["entry_dispatch_session_unavailable"])
+                    self.assertEqual(session.errors, [])
+                    self.assertTrue(session.handle.is_running)
+                    self.assertEqual(ledger.positions()["SPY"].qty, Decimal(1))
+                    self.assertEqual(ledger.positions()["QQQ"].qty, Decimal(1))
+                    self.assertEqual(port.positions["QQQ"]["qty"], Decimal(1))
+                    self.assertEqual(len(port.orders), 2)
+                    self.assertTrue(all(order["side"] == "buy" for order in port.orders.values()))
+                finally:
+                    if session.handle.is_running:
+                        session.handle.stop()
+                    await asyncio.wait_for(task, 5)
+            with patch.object(runner_module.time, "time", return_value=now), \
+                 patch.object(runner_module.time, "time_ns", return_value=int(now * 1e9)), \
+                 patch.object(AlpacaExecutionClient, "_submit_order", fixed_dispatch), \
+                 patch.object(AlpacaExecutionClient, "generate_order_denied", denied):
+                asyncio.run(exercise())
 
     def test_native_cleanup_reports_an_unchanged_exit_attention_reason_once(self):
         """Repeated native cleanup ticks preserve the hold without journal spam."""

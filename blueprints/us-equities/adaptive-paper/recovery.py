@@ -218,6 +218,10 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
                 ledger.mark_not_sent(intent.client_id, "recovery_proven_never_attempted")
         adoption_extended_hours = order_extended_hours_flag(
             datetime.fromtimestamp(controller.clock(), timezone.utc), session_policy)
+        if session_policy.get("overnight_enabled") is True:
+            # Adoption is lookup/cancel only, never a resubmit. The held BOATS
+            # entry was extended-hours even if recovery now runs during RTH.
+            adoption_extended_hours = True
         port.adopt_intents([_payload(i, adoption_extended_hours) for i in ledger.intents()
                             if i.status not in {"not_sent", "broker_refused"}])
         await bounded(port.start(quote, order))
@@ -285,6 +289,8 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
                        "qty": format(quantity, "f"), "limit_price": format(price, "f"),
                        "type": "limit", "time_in_force": "day", "extended_hours": exit_extended_hours,
                        "strategy": "recovery", "reason": "owned_residual_exit"}
+            if session_policy.get("overnight_enabled") is True:
+                payload["reduce_only"] = True
             try:
                 guard_observation_integrity()
                 # Position reads and payload preparation may consume the budget

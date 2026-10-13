@@ -280,8 +280,15 @@ def validate_session_policy(config: dict) -> dict:
         raise ValueError("unqualified_lane_configuration") from None
     if max_gross_exposure_usd * multiple > capital_usd * max_leverage:
         raise ValueError("unqualified_lane_configuration")
-    return {"extended_hours": extended, "overnight_holds": overnight,
-            "overnight_gross_multiple": multiple}
+    result = {"extended_hours": extended, "overnight_holds": overnight,
+              "overnight_gross_multiple": multiple}
+    if config.get("overnight") is not None or config.get("quote_source", "stream") != "stream":
+        from overnight import overnight_config
+        selected = overnight_config(config)
+        if not extended or selected is None:
+            raise ValueError("unqualified_overnight_configuration")
+        result.update(overnight_enabled=True, **selected)
+    return result
 
 
 def order_extended_hours_flag(ts: datetime, policy: dict) -> bool:

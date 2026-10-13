@@ -152,7 +152,7 @@ class OrderContractRefused(SubmissionNotSent):
         super().__init__("order contract refused submission before HTTP: " + self.refusal)
 
 
-def order_envelope(intent, *, extended_hours_allowed=False):
+def order_envelope(intent, *, extended_hours_allowed=False, overnight_allowed=False):
     """Validate the exact SDK-bound projection of a normalized intent.
 
     Only the fields the SDK request receives are validated (attribution metadata
@@ -161,9 +161,11 @@ def order_envelope(intent, *, extended_hours_allowed=False):
     """
     try:
         fields = {key: intent[key] for key in ("symbol", "qty", "side", "client_order_id", "limit_price")}
-        fields.update(type="limit", time_in_force="day", extended_hours=intent.get("extended_hours", False))
+        fields.update(type="limit", time_in_force=intent.get("time_in_force", "day"),
+                      extended_hours=intent.get("extended_hours", False))
         return order_contract.build_envelope(fields, fractional_sell_qty=True,
-                                             extended_hours_allowed=bool(extended_hours_allowed))
+                                             extended_hours_allowed=bool(extended_hours_allowed),
+                                             overnight_allowed=overnight_allowed)
     except order_contract.ContractError as exc:
         raise OrderContractRefused(str(exc)) from None
     except (KeyError, TypeError, AttributeError):
@@ -176,7 +178,7 @@ def limit_order_request(envelope):
     intent = envelope["intent"]
     try:
         return LimitOrderRequest(symbol=intent["symbol"], qty=intent["qty"], side=intent["side"],
-                                 type="limit", time_in_force="day", limit_price=intent["limit_price"],
+                                 type="limit", time_in_force=intent["time_in_force"], limit_price=intent["limit_price"],
                                  client_order_id=intent["client_order_id"],
                                  extended_hours=intent["extended_hours"])
     except Exception:
@@ -623,6 +625,7 @@ def normalize_overnight_status(asset, observed_at_ns):
     known = isinstance(attributes, list) and all(type(value) is str for value in attributes)
     return {"symbol": symbol, "ts_ns": observed_at_ns, "source": "alpaca_assets",
             "state": "overnight_asset_status", "halted": None,
+            "asset_status": asset.get("status"), "tradable": asset.get("tradable"),
             "overnight_tradable": "overnight_tradable" in attributes if known else None,
             "overnight_halted": "overnight_halted" in attributes if known else None}
 
@@ -833,9 +836,9 @@ def normalize_account(raw, *, include_margin=False):
     return result
 
 
-def normalize_intent(order, symbols, *, allow_extended_hours=False):
+def normalize_intent(order, symbols, *, allow_extended_hours=False, overnight_allowed=False):
     allowed = {"client_order_id", "symbol", "side", "qty", "limit_price", "type", "time_in_force",
-               "extended_hours", "tags", "strategy", "reason"}
+               "extended_hours", "tags", "strategy", "reason", "reduce_only"}
     if set(order) - allowed:
         raise TransportError("unsupported order fields")
     result = {key: str(order.get(key, "")) for key in
@@ -844,6 +847,9 @@ def normalize_intent(order, symbols, *, allow_extended_hours=False):
     result["qty"] = format(qty, "f")
     result["limit_price"] = decimal_string(result["limit_price"], positive=True)
     extended_hours = order.get("extended_hours", False)
+    if overnight_allowed is True:
+        from overnight import check_overnight_order
+        check_overnight_order(order)
     if type(extended_hours) is not bool or (extended_hours and not allow_extended_hours):
         raise TransportError("only owned DAY limits with whole-share entries are supported")
     if ((result["side"] == "buy" and qty != qty.to_integral_value())
@@ -851,9 +857,17 @@ def normalize_intent(order, symbols, *, allow_extended_hours=False):
             or result["side"] not in {"buy", "sell"}
             or not CLIENT_ID.fullmatch(result["client_order_id"])
             or order.get("type", "limit") != "limit"
-            or order.get("time_in_force", "day") != "day"):
+            or order.get("time_in_force", "day") not in (("day", "gtc") if overnight_allowed else ("day",))):
         raise TransportError("only owned DAY limits with whole-share entries are supported")
     result["extended_hours"] = extended_hours
+    if overnight_allowed is True:
+        result["time_in_force"] = order["time_in_force"]
+    if "reduce_only" in order:
+        if overnight_allowed is not True or order["reduce_only"] is not True or result["side"] != "sell":
+            raise TransportError("invalid reduce-only exit")
+        # Internal ownership metadata only; the Alpaca request model does not
+        # carry this flag. The owner reserves no more than its held quantity.
+        result["reduce_only"] = True
     for key in ("strategy", "reason"):
         if key in order:
             if not isinstance(order[key], str) or len(order[key]) > 256:
@@ -1200,7 +1214,8 @@ class AlpacaPaperTransport:
                  order_update_timeout=10.0, request_observer=None, history_start=None,
                  max_snapshot_pages=20, required_quote_symbols=None, feed="iex",
                  extended_hours_allowed=False, include_margin=False, sink_status=None,
-                 fee_history_start=None, order_quote_max_age_seconds=3, exit_quote_max_age_seconds=None):
+                 fee_history_start=None, order_quote_max_age_seconds=3, exit_quote_max_age_seconds=None,
+                 quote_source_mode="stream", overnight_enabled=False, flatten_minutes_before_pre=10):
         # sink_status receives every normalized trading status message of a subscribed
         # symbol (normalize_trading_status) on the owning loop, like sink_observation.
         self.sink_status = sink_status
@@ -1210,7 +1225,20 @@ class AlpacaPaperTransport:
         # keys byte-identical to before G-e.
         self.include_margin = bool(include_margin)
         self.feed = data_feed(feed)
-        if self.feed == "boats":
+        from feeds import require_qualified_quote_source
+        try:
+            require_qualified_quote_source(self.feed, quote_source_mode)
+        except ValueError as error:
+            raise UnsupportedDataFeed(str(error)) from None
+        self.quote_source_mode = quote_source_mode
+        self.overnight_enabled = overnight_enabled is True
+        self.flatten_minutes_before_pre = flatten_minutes_before_pre
+        if (self.overnight_enabled and quote_source_mode != "boats_rest") or (
+                quote_source_mode == "boats_rest" and (not self.overnight_enabled
+                or self.extended_hours_allowed is not True or not callable(sink_status)
+                or type(flatten_minutes_before_pre) is not int or not 1 <= flatten_minutes_before_pre <= 60)):
+            raise UnsupportedDataFeed("overnight_configuration_required")
+        if self.feed == "boats" and quote_source_mode != "boats_rest":
             # alpaca-py 0.44.0 cc4cb3b7, data/live/stock.py:47 rejects BOATS.
             # Its enum and the documented URL do not qualify a native stream.
             # Refuse before opening a client; never substitute IEX/SIP or fork it.
@@ -1218,6 +1246,8 @@ class AlpacaPaperTransport:
         self.data_ws = data_stream_url(self.feed)
         self.halt_statuses = halt_statuses_supported(self.feed)
         self.symbols = _symbols(symbols)
+        if quote_source_mode == "boats_rest" and not 1 <= len(self.symbols) <= 5:
+            raise UnsupportedDataFeed("overnight_symbol_bound")
         self.required_quote_symbols = (self.symbols if required_quote_symbols is None
                                        else _symbols(required_quote_symbols))
         if not set(self.required_quote_symbols).issubset(self.symbols):
@@ -1288,12 +1318,67 @@ class AlpacaPaperTransport:
                                      url_override=PAPER_WS, websocket_params=dict(parameters,
                                      create_protocol=_protocol_factory(PAPER_WS)))
         self.quote_data_timeout = quote_stream_data_timeout(quote_timeout, self.extended_hours_allowed)
-        self._quotes_stream = Quotes(api_key, secret_key, feed=DataFeed(self.feed), raw_data=True,
+        self._quotes_stream = None
+        self._boats_clients = {}
+        self.overnight_status_timeout = min(quote_timeout, order_quote_max_age_seconds)
+        if quote_source_mode == "boats_rest":
+            from overnight import BoatsQuoteSource
+            # Each SDK Session has one owner; concurrent symbols use separate clients.
+            # Reads are guarded by the same supported origin/path and budget hooks.
+            for symbol in self.symbols:
+                self._boats_clients[symbol] = (
+                    _sdk_client(api_key, secret_key, self._poll_budget_sync, self._poll_response_sync,
+                                data=True, read_only=True),
+                    _sdk_client(api_key, secret_key, self._poll_budget_sync, self._poll_response_sync,
+                                read_only=True))
+            self._boats_source = BoatsQuoteSource(self.symbols, self._read_boats_quote, self._read_boats_asset,
+                                                 asset_timeout=self.overnight_status_timeout)
+        else:
+            self._quotes_stream = Quotes(api_key, secret_key, feed=DataFeed(self.feed), raw_data=True,
                                      url_override=self.data_ws, websocket_params=dict(parameters,
                                      create_protocol=_protocol_factory(self.data_ws)),
                                      data_timeout=self.quote_data_timeout)
         self._orders_stream.owner = self
-        self._quotes_stream.owner = self
+        if self._quotes_stream is not None:
+            self._quotes_stream.owner = self
+
+    def _poll_response_sync(self, observation):
+        # A 429 backs off that symbol; state is retained and ages to refusal.
+        # Order HTTP 429 still goes through _response_sync and freezes as before.
+        if self.request_observer:
+            return self._on_owner(self.request_observer, observation)
+
+    def _poll_budget_sync(self, kind, **kwargs):
+        # A refresh may defer, never hold an asset worker through the wire-budget
+        # window or prevent cancellation/shutdown. The next sweep retries it.
+        return self._on_owner(self.before_request, kind, _owner_timeout=.25, _freeze_timeout=False)
+
+    def _read_boats_quote(self, symbol):
+        from alpaca.data.requests import StockLatestQuoteRequest
+        from alpaca.data.enums import DataFeed
+        from overnight import overnight_quote_feed
+        feed = DataFeed(overnight_quote_feed("boats", time.time(), enabled=True))
+        return self._boats_clients[symbol][0].get_stock_latest_quote(
+            StockLatestQuoteRequest(symbol_or_symbols=symbol, feed=feed))[symbol]
+
+    def _read_boats_asset(self, symbol):
+        raw = self._boats_clients[symbol][1].get_asset(symbol)
+        if raw.get("symbol") != symbol:
+            raise TransportError("unexpected asset symbol")
+        # Stamp the asset when its own request completes, before the quote read.
+        return normalize_overnight_status(raw, time.time_ns())
+
+    async def _poll_boats(self):
+        while not self._stopping:
+            started = time.monotonic()
+            rows = await self._boats_source.sweep(started)
+            for row in rows:
+                self._enqueue("asset_status", row["asset"])
+                self._enqueue("quote", {**row["quote"], "S": row["symbol"]})
+            if rows:
+                self._authorized("quotes")
+                self._ack("quotes", True)
+            await asyncio.sleep(max(0, 1 - (time.monotonic() - started)))
 
     @property
     def health(self):
@@ -1405,6 +1490,7 @@ class AlpacaPaperTransport:
 
     def _wire_guard(self, order):
         # Runs after a possibly delayed budget reservation, immediately before POST.
+        # Refuse transport readiness BEFORE the owner journals its boundary.
         quote = self._quote_values.get(order.get("symbol"))
         max_age_ns = (self.exit_quote_max_age_ns if order.get("side") == "sell"
                       else self.order_quote_max_age_ns)
@@ -1412,6 +1498,18 @@ class AlpacaPaperTransport:
                 or not -250_000_000 <= time.time_ns() - quote["ts_ns"] <= max_age_ns
                 or (order.get("side") == "buy" and not self.ready)):
             raise SubmissionNotSent("quote or stream readiness changed before submission")
+        if getattr(self, "overnight_enabled", False) is True:
+            from overnight import check_overnight_order
+            try:
+                # reduce_only is engine/owner metadata, never an Alpaca field.
+                owned = getattr(self, "_intents", {}).get(order.get("client_order_id"), {})
+                guarded = dict(order)
+                if owned.get("reduce_only") is True:
+                    guarded["reduce_only"] = True
+                check_overnight_order(guarded)
+                self._on_owner(self.overnight_before_wire, guarded, _owner_timeout=.25, _freeze_timeout=False)
+            except (ValueError, RuntimeError):
+                raise SubmissionNotSent("overnight admission changed before submission") from None
 
     def _response_sync(self, observation):
         if observation["status"] == 429:
@@ -1495,13 +1593,22 @@ class AlpacaPaperTransport:
                     if quote["symbol"] not in self.symbols:
                         raise TransportError("unexpected quote symbol")
                     age = (time.time_ns() - quote["ts_ns"]) / 1e9
-                    if not -0.25 <= age <= self.quote_timeout:
+                    min_age = 0 if getattr(self, "quote_source_mode", "stream") == "boats_rest" else -0.25
+                    if not min_age <= age <= self.quote_timeout:
                         if quote["symbol"] in self.required_quote_symbols:
                             self.freeze_health("quote_timestamp_stale")
                         continue
+                    if (getattr(self, "quote_source_mode", "stream") == "boats_rest" and
+                            quote["ts_ns"] <= self._quote_values.get(quote["symbol"], {}).get("ts_ns", 0)):
+                        continue
+                    quote["received_at_ns"] = time.time_ns()
                     self._quote_seen[quote["symbol"]] = time.monotonic()
                     self._quote_values[quote["symbol"]] = quote
                     await self._invoke(self._on_quote, quote)
+                elif kind == "asset_status":
+                    if raw["symbol"] not in self.symbols or self.quote_source_mode != "boats_rest":
+                        raise TransportError("unexpected asset status")
+                    await self._invoke(self.sink_status, raw)
                 elif kind == "status":
                     status = normalize_trading_status(raw)
                     if status["symbol"] not in self.symbols:
@@ -1567,7 +1674,8 @@ class AlpacaPaperTransport:
         self._loop = asyncio.get_running_loop()
         self._on_quote, self._on_order = on_quote, on_order
         self._orders_stream.subscribe_trade_updates(self._order_callback)
-        self._quotes_stream.subscribe_quotes(self._quote_callback, *self.symbols)
+        if self._quotes_stream is not None:
+            self._quotes_stream.subscribe_quotes(self._quote_callback, *self.symbols)
         if self.halt_statuses:
             # Halts and LULD bands ride the same data connection as the quotes (one
             # stream per endpoint). alpaca-py 0.44.0 has subscribe_trading_statuses and a
@@ -1579,7 +1687,11 @@ class AlpacaPaperTransport:
                                            self._quotes_stream._handlers["lulds"])
         self._started = True
         self._tasks = [asyncio.create_task(self._consume_events()), asyncio.create_task(self._watchdog())]
+        if self.quote_source_mode == "boats_rest":
+            self._tasks.append(asyncio.create_task(self._poll_boats()))
         for stream, channel in ((self._orders_stream, "orders"), (self._quotes_stream, "quotes")):
+            if stream is None:
+                continue
             thread = threading.Thread(target=self._run_stream, args=(stream, channel),
                                       name="alpaca-paper-" + channel, daemon=False)
             self._threads.append(thread)
@@ -1598,7 +1710,8 @@ class AlpacaPaperTransport:
 
     def adopt_intents(self, intents):
         for order in intents:
-            normalized = normalize_intent(order, self.symbols, allow_extended_hours=self.extended_hours_allowed)
+            normalized = normalize_intent(order, self.symbols, allow_extended_hours=self.extended_hours_allowed,
+                                          overnight_allowed=getattr(self, "overnight_enabled", False))
             key = normalized["client_order_id"]
             if key in self._intents and self._intents[key] != normalized:
                 raise TransportError("durable intent changed")
@@ -1629,11 +1742,13 @@ class AlpacaPaperTransport:
         Overridable only by the native-fault harness (its single C04 client id).
         Raises OrderContractRefused before any network call.
         """
-        envelope = order_envelope(intent, extended_hours_allowed=self.extended_hours_allowed)
+        envelope = order_envelope(intent, extended_hours_allowed=self.extended_hours_allowed,
+                                  overnight_allowed=getattr(self, "overnight_enabled", False))
         return envelope, limit_order_request(envelope)
 
     async def submit(self, order):
-        intent = normalize_intent(order, self.symbols, allow_extended_hours=self.extended_hours_allowed)
+        intent = normalize_intent(order, self.symbols, allow_extended_hours=self.extended_hours_allowed,
+                                  overnight_allowed=getattr(self, "overnight_enabled", False))
         key = intent["client_order_id"]
         async with self._operation_lock:
             if key in self._intents:
@@ -1836,6 +1951,8 @@ class AlpacaPaperTransport:
         self._stopping = True
         futures = []
         for stream in (self._orders_stream, self._quotes_stream):
+            if stream is None:
+                continue
             loop = getattr(stream, "_loop", None)
             if loop and loop.is_running():
                 async def close_stream(s=stream):
@@ -1850,10 +1967,15 @@ class AlpacaPaperTransport:
         for task in self._tasks:
             task.cancel()
         await asyncio.gather(*self._tasks, return_exceptions=True)
+        if getattr(self, "quote_source_mode", "stream") == "boats_rest":
+            await self._boats_source.close()
         for thread in self._threads:
             await asyncio.to_thread(thread.join, 7)
         if any(thread.is_alive() for thread in self._threads):
             self.freeze_health("stream_thread_leak")
             raise TransportError("stream thread failed to terminate")
         self._client._session.close()
+        for clients in getattr(self, "_boats_clients", {}).values():
+            for client in clients:
+                client._session.close()
         self._started = False
