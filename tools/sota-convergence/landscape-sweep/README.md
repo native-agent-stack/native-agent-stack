@@ -827,13 +827,15 @@ catalog (`foundation` or `us-equities`):
   `components_vs_upstream` are empty, and `verdict_note` says so: there is no incumbent, and every proposal is
   judged against the requirement and the acceptance. `--seeds` may name it. `previous_sweep` comes from the ledger,
   as for any layer.
-- **Record.** The sweep's manifest has no row for it: `build_manifest.py` files its lane rows under
-  `lane_groupings`. `saturation_ledger.py --append` marks its entry `planned: true`, and a survivor binds to its
-  retained votes and its source review, as a skills survivor does (`catalogs/saturation/README.md`, Planned
-  layers).
-- **Refusals.** A planned layer that also has a landscape row, or a research-state row, is refused, as
-  `final_stack.py` refuses it. `--contract-version 2` builds no planned layer yet, since its blind fit projection
-  reads a verdict row, and it refuses seeds for one rather than dropping them.
+- **Record.** The sweep's manifest has no section row for it: `build_manifest.py` files its lane rows under
+  `lane_groupings`. `saturation_ledger.py --append` marks its entry `planned: true`, and `--check` binds the entry to
+  that `lane_groupings` row as it binds a landscape layer to its section row; a mark without the row is refused
+  (`catalogs/saturation/README.md`, Planned layers). Every retained vote, for any layer, must sit under the layer's
+  own `#/votes/<layer_id>/`. Append the sweep before a verdict wave promotes the layer to a landscape row.
+- **Refusals.** `build_inputs.py` refuses a planned layer that also has a landscape row, as `final_stack.py` does;
+  `saturation_ledger.py` refuses one that also has a research-state row. `--contract-version 2` builds no planned
+  layer yet, since its blind fit projection reads a verdict row: it refuses seeds for one rather than dropping them,
+  and its summary line counts the planned layers it did not build.
 
 ## Skills modality
 

@@ -42,12 +42,18 @@ Planned layers: the rows of ``catalogs/landscape/planned-layers.json`` (layers a
 that have no landscape row yet) are swept as repository layers of their own catalog, foundation or
 us-equities. ``--scope`` freezes them, ``--report`` lists them after the research-state layers and
 ``--append`` records them. Their requirement hash covers the planned row's requirement and acceptance
-(``planned_requirement_sha256``). A planned layer has no row in its sweep's SOTA-convergence manifest
-(build_manifest.py files its lane rows under lane_groupings), so ``--append`` marks its record
-``planned: true`` and its survivors bind to their retained votes and source reviews, as a skills
-survivor's do. The mark is durable: when a verdict wave later records the layer's landscape row, its
-research-state row supplies the requirement hash (a requirement_changed reset) and the records made
-while it was planned still check.
+(``planned_requirement_sha256``). A planned layer has no row in its catalog's section of the sweep's
+SOTA-convergence manifest: build_manifest.py files its lane rows under lane_groupings. So ``--append``
+marks its record ``planned: true``, and ``--check`` binds a marked record to that lane_groupings row as it
+binds a landscape layer to its section row (proposed equals the lane rows, survival agrees, a survivor
+needs a surviving lane row); a mark without that row is refused. The mark is durable: when a verdict wave
+later records the layer's landscape row, its research-state row supplies the requirement hash (a
+requirement_changed reset) and the records made while it was planned still check. Append a planned
+layer's sweep before that promotion: after it, ``--append`` reads the layer as a landscape layer, which
+its manifest has no row for.
+
+Every retained facts and fit vote ``ref`` points into the layer's own collection,
+``returns_ref#/votes/<layer_id>/...`` (convert.py writes every vote there), whatever the layer's catalog.
 
   python3 scripts/saturation_ledger.py --check                  # schema, chain and bindings
   python3 scripts/saturation_ledger.py --check --base origin/main  # also: base ledger is a prefix
@@ -92,6 +98,8 @@ PROTECTED_PREFIXES = ("catalogs/landscape/", "catalogs/sota-convergence/", "adop
 SCHEMA_VERSION = 1
 MANIFEST_SECTION = {"foundation": "foundation", "us-equities": "trading"}
 SELECTION_KEY = {"foundation": "components", "trading": "entries"}
+# The manifest section build_manifest.py files a lane layer under when the layer has no foundation or trading row.
+LANE_GROUPINGS = "lane_groupings"
 STATUSES = ("completed", "stopped")
 VOTES = ("retained", "not_retained", "not_returned")
 VOTE_VALUES = ("refuted", "not_refuted")
@@ -556,6 +564,12 @@ def platform_profiles_sha256(adoption: dict) -> str:
     return sha256_bytes(canonical(adoption.get("platform_profiles")))
 
 
+def pointer_token(key) -> str:
+    """One RFC 6901 reference token (``~`` written ``~0``, ``/`` written ``~1``), as the landscape-sweep harness
+    writes them (sweep_common.pointer_token)."""
+    return str(key).replace("~", "~0").replace("/", "~1")
+
+
 def resolve_pointer(document, pointer: str):
     """RFC 6901 JSON pointer (``/a/0/b``); raises LedgerError when it does not resolve."""
     if pointer == "":
@@ -659,6 +673,19 @@ def manifest_layer(manifest: dict, catalog: str, layer_id: str):
     return None
 
 
+def binding_layer(manifest: dict, catalog: str, layer_id: str, planned: bool):
+    """(section, index, row) of the manifest row a layer's lane rows bind to, or None. A planned layer has no row in
+    its catalog's section: build_manifest.py files the lane rows of a layer with no foundation or trading row under
+    lane_groupings, in the same candidates shape ({repository, lane, adversarial_verification}). Every other layer
+    binds to its catalog section's row (manifest_layer)."""
+    if not planned:
+        return manifest_layer(manifest, catalog, layer_id)
+    for index, row in enumerate(manifest.get(LANE_GROUPINGS) or []):
+        if isinstance(row, dict) and row.get("layer") == layer_id:
+            return LANE_GROUPINGS, index, row
+    return None
+
+
 def lane_rows(layer_row: dict, lane: str) -> dict:
     """{normalized repository: (candidate index, candidate)} for the lane's candidate rows."""
     rows = {}
@@ -672,7 +699,8 @@ def baseline_repositories(section: str, layer_row: dict, lane: str) -> set:
     """Repositories the manifest layer already names outside this lane (selections, named
     alternatives, candidates from other lanes)."""
     repos = set()
-    for item in layer_row.get(SELECTION_KEY[section]) or []:
+    # A lane_groupings row has no catalog selections; its selected list is what the lanes reported as selected.
+    for item in layer_row.get("selected" if section == LANE_GROUPINGS else SELECTION_KEY[section]) or []:
         if isinstance(item, dict) and isinstance(item.get("repository"), str):
             repos.add(norm_repo(item["repository"]))
     for item in layer_row.get("alternatives_keep_but_compare") or []:
@@ -1111,12 +1139,17 @@ class Checker:
             return
         if layer.get("discovery_ref") is not None:
             self.check_discovery(sweep, layer, f"{label}.discovery_ref", proposed)
-        # known/new partition proposed, recomputed from the manifest baseline and earlier sweeps.
-        located = manifest_layer(manifest, catalog, layer_id) if manifest is not None else None
-        # A manifest has no skills section and no row for a planned layer (build_manifest.py files a planned layer's
-        # lane rows under lane_groupings): such a layer's outcomes bind to its retained votes and source reviews.
-        if manifest is not None and located is None and catalog != SKILLS and not planned:
-            self.error(f"{label}: layer {catalog}/{layer_id} is not in {sweep.get('manifest_ref')}")
+        # known/new partition proposed, recomputed from the manifest baseline and earlier sweeps. A planned layer binds
+        # to its lane_groupings row (binding_layer), so the mark is verified against the sweep's own manifest: the
+        # lane-row, survival and survivor checks below apply to that row. A manifest has no skills section: a skills
+        # layer's outcomes bind to its retained votes and source reviews.
+        located = binding_layer(manifest, catalog, layer_id, planned) if manifest is not None else None
+        if manifest is not None and located is None and catalog != SKILLS:
+            if planned:
+                self.error(f"{label}: planned layer {catalog}/{layer_id} has no {LANE_GROUPINGS} row in "
+                           f"{sweep.get('manifest_ref')}")
+            else:
+                self.error(f"{label}: layer {catalog}/{layer_id} is not in {sweep.get('manifest_ref')}")
         baseline = baseline_repositories(located[0], located[2], lane) if located else set()
         known, new = split_known(proposed, baseline, earlier)
         if lists["known"] != known or lists["new"] != new:
@@ -1141,7 +1174,7 @@ class Checker:
                     self.error(f"{entry_label}: listed as {field} but its votes give "
                                f"{'survived' if entry_survives(entry) else 'refuted'}")
                 if survives:
-                    self.check_survivor(entry, entry_label, layer_id, located, lane, catalog, planned)
+                    self.check_survivor(entry, entry_label, layer_id, located, lane, catalog)
         if sweep.get("status") == "completed":
             missing = [repo for repo in proposed if norm_repo(repo) not in adjudicated]
             if missing:
@@ -1318,6 +1351,11 @@ class Checker:
         if votes == "retained":
             if "lens_votes" in entry:
                 self.error(f"{label}: a layer with retained votes names facts and fit, not lens_votes")
+            # A retained vote is this layer's only inside its own collection: the pointer's reference tokens start
+            # with "votes" and the layer's pointer_token (convert.py writes every vote there). Another layer's vote
+            # on the same repository judged another requirement, so it cannot stand in for this layer's, even when
+            # role, repository and value agree. Tokens are compared, not path strings: a token has no slash.
+            collection = ["", "votes", pointer_token(layer.get("layer_id"))]
             for role in ROLES:
                 vote = entry.get(role)
                 if not (isinstance(vote, dict) and vote.get("vote") in VOTE_VALUES):
@@ -1326,6 +1364,10 @@ class Checker:
                 target = self.pointed(vote.get("ref"), f"{label}.{role}", sweep.get("returns_ref"))
                 if target is None:
                     continue
+                tokens = vote["ref"].partition("#")[2].split("/")
+                if tokens[:3] != collection or len(tokens) < 4:
+                    self.error(f"{label}.{role}: {vote['ref']} is not a vote of layer {layer.get('layer_id')} (a "
+                               "retained vote ref points into its own layer's votes collection of returns_ref)")
                 self.check_vote_value(target, vote["ref"], f"{label}.{role}", vote["vote"])
                 if not isinstance(target, dict) or target.get("role") != role:
                     self.error(f"{label}.{role}: {vote['ref']} is not a {role} vote")
@@ -1355,8 +1397,8 @@ class Checker:
             if candidate.get("lane") != lane or norm_repo(str(candidate.get("repository", ""))) != norm_repo(entry["repo"]):
                 self.error(f"{vote_label}: {vote['ref']} is a vote on a different candidate row")
 
-    def check_survivor(self, entry, label, layer_id, located, lane, catalog=None, planned=False) -> None:
-        if catalog == SKILLS or (planned and located is None):
+    def check_survivor(self, entry, label, layer_id, located, lane, catalog=None) -> None:
+        if catalog == SKILLS:
             pass  # no manifest row to bind to: the retained votes (check_votes) and the source review below bind it
         elif located is None:
             self.error(f"{label}: a survivor needs a manifest layer to bind to")
@@ -1736,7 +1778,8 @@ def complete_result(root: Path, ledger: dict, result: dict) -> dict:
         if key not in requirements:
             raise LedgerError(f"{key[0]}/{key[1]} is not a layer in {RESEARCH_STATE} or {PLANNED_LAYERS} or a task "
                               f"in {SKILLS_CATALOG}")
-        located = manifest_layer(manifest, *key) if manifest is not None else None
+        # The row --check binds the record to (binding_layer): a planned layer's lane_groupings row.
+        located = binding_layer(manifest, *key, key in planned) if manifest is not None else None
         baseline = baseline_repositories(located[0], located[2], record.get("lane")) if located else set()
         known, new = split_known(layer.get("proposed") or [], baseline, earlier.get(key, set()))
         ordered = {"catalog": key[0], "layer_id": key[1],

@@ -254,15 +254,21 @@ RETURN_DATA = {
         "gamma": {"catalog": "foundation", "layer_id": "gamma", "proposed": []},
         "gamma-nonempty": {"catalog": "foundation", "layer_id": "gamma", "proposed": [OTHER]},
     },
+    # Each layer's votes under its own collection, #/votes/<layer_id>/..., as convert.py writes them.
     "votes": {
-        "surv": {"facts": {"role": "facts", "repository": SURV, "refuted": False},
-                 "fit": {"role": "fit", "repository": SURV, "refuted": False}},
-        "ref": {"facts": {"role": "facts", "repository": REF, "refuted": False},
-                "fit": {"role": "fit", "repository": REF, "refuted": True}},
-        "beta": {"facts": {"role": "facts", "repository": BETA, "refuted": True},
-                 "fit": {"role": "fit", "repository": BETA, "refuted": True}},
+        "alpha": {
+            "surv": {"facts": {"role": "facts", "repository": SURV, "refuted": False},
+                     "fit": {"role": "fit", "repository": SURV, "refuted": False}},
+            "ref": {"facts": {"role": "facts", "repository": REF, "refuted": False},
+                    "fit": {"role": "fit", "repository": REF, "refuted": True}},
+        },
+        "beta": {
+            "beta": {"facts": {"role": "facts", "repository": BETA, "refuted": True},
+                     "fit": {"role": "fit", "repository": BETA, "refuted": True}},
+        },
     },
 }
+VOTE_LAYER = {"surv": "alpha", "ref": "alpha", "beta": "beta"}
 
 
 def write(root: Path, relative: str, value) -> None:
@@ -324,8 +330,9 @@ def build_fixture(root: Path) -> None:
 
 
 def vote(name, role, returns=RETURNS):
-    return {"vote": "refuted" if RETURN_DATA["votes"][name][role]["refuted"] else "not_refuted",
-            "ref": f"{returns}#/votes/{name}/{role}"}
+    layer_id = VOTE_LAYER[name]
+    return {"vote": "refuted" if RETURN_DATA["votes"][layer_id][name][role]["refuted"] else "not_refuted",
+            "ref": f"{returns}#/votes/{layer_id}/{name}/{role}"}
 
 
 def result(sweep_id="fx-1", day="2026-10-01", **overrides):
@@ -538,7 +545,8 @@ class IntegrityTests(FixtureCase):
         flipped = copy.deepcopy(ledger)
         flipped["sweeps"][0]["layers"][0]["refuted"][0]["fit"]["vote"] = "not_refuted"
         errors = sl.check_ledger(self.root, sl_rechain(flipped))
-        self.assertTrue(any("disagrees with evidence/artifacts/fx/returns.json#/votes/ref/fit" in e for e in errors), errors)
+        self.assertTrue(any("disagrees with evidence/artifacts/fx/returns.json#/votes/alpha/ref/fit" in e
+                            for e in errors), errors)
         self.assertTrue(any("listed as refuted but its votes give survived" in e for e in errors), errors)
 
     def test_a_completed_sweep_must_adjudicate_every_manifest_lane_row(self):
@@ -576,7 +584,7 @@ class IntegrityTests(FixtureCase):
         # REF's fit vote refutes only because its GPT-6 member never returned ({missing: true}), so fx-1 did not
         # adjudicate it: fx-2 lists it as new, and fx-2's own merit refutation makes it known for fx-3.
         returns = json.loads((self.root / RETURNS).read_text(encoding="utf-8"))
-        returns["votes"]["ref"]["fit"].update(claude={"refuted": False}, gpt6={"missing": True})
+        returns["votes"]["alpha"]["ref"]["fit"].update(claude={"refuted": False}, gpt6={"missing": True})
         write(self.root, RETURNS, returns)
         register(self.root)
         ledger = self.appended(result(), result("fx-2", "2026-10-08"), result("fx-3", "2026-10-15"))
@@ -641,9 +649,13 @@ class IntegrityTests(FixtureCase):
             "pointer-less returns file": (RETURNS, r"needs a #/json/pointer"),
             "usage file": (f"{USAGE}#/child_usage", r"must point into evidence/artifacts/fx/returns\.json"),
             "manifest": (f"{MANIFEST}#/foundation/0", r"must point into evidence/artifacts/fx/returns\.json"),
-            "other role": (f"{RETURNS}#/votes/ref/fit", r"is not a facts vote"),
-            "other repository": (f"{RETURNS}#/votes/surv/facts", r"is a vote on a different repository"),
-            "unresolved": (f"{RETURNS}#/votes/ref/nope", r"does not resolve"),
+            "other role": (f"{RETURNS}#/votes/alpha/ref/fit", r"is not a facts vote"),
+            "other repository": (f"{RETURNS}#/votes/alpha/surv/facts", r"is a vote on a different repository"),
+            "unresolved": (f"{RETURNS}#/votes/alpha/ref/nope", r"does not resolve"),
+            # Another layer's collection: refused whatever the vote says (the planned-layer tests cover the same
+            # repository and value).
+            "other layer": (f"{RETURNS}#/votes/beta/beta/facts", r"is not a vote of layer alpha"),
+            "outside every collection": (f"{RETURNS}#/discovery/alpha", r"is not a vote of layer alpha"),
         }
         for name, (ref, pattern) in cases.items():
             with self.subTest(case=name):
@@ -660,7 +672,8 @@ class IntegrityTests(FixtureCase):
         self.assertEqual(sl.check_ledger(self.root, ledger), [])
         cases = {
             "pointer-less": (MANIFEST, r"needs a #/json/pointer"),
-            "other file": (f"{RETURNS}#/votes/surv/facts", r"must point into catalogs/sota-convergence/manifest-fx\.json"),
+            "other file": (f"{RETURNS}#/votes/alpha/surv/facts",
+                           r"must point into catalogs/sota-convergence/manifest-fx\.json"),
             "other candidate": (f"{MANIFEST}#/foundation/0/candidates/1/adversarial_verification/votes/0",
                                 r"is a vote on a different candidate row"),
             "other layer": (f"{MANIFEST}#/trading/0/candidates/0/adversarial_verification/votes/0",
@@ -930,6 +943,13 @@ class SkillsLayerTests(FixtureCase):
         missing_row["sweeps"][0]["layers"][0]["catalog"] = "foundation"
         self.assertErrorMatches(sl_rechain(missing_row), r"layer foundation/skills-debug is not in")
 
+    def test_a_planned_mark_on_a_skills_layer_is_refused(self):
+        # Claude review of #1066 at f6c4f475, F3: the mark is for a repository layer of the planned-layers catalog.
+        marked = self.appended(skills_result())
+        marked["sweeps"][0]["layers"][0]["planned"] = True
+        self.assertErrorMatches(sl_rechain(marked), r"planned, when present, is true on a foundation or us-equities "
+                                                    r"layer")
+
     def test_without_a_skills_catalog_only_the_research_state_layers_are_reported(self):
         (self.root / sl.SKILLS_CATALOG).unlink()
         report = sl.build_report(self.root, self.ledger())
@@ -977,14 +997,29 @@ def planned_hash(row: dict) -> str:
                                      sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode()).hexdigest()
 
 
+def lane_candidate(repo, survives, lane=PLANNED_SWEEP):
+    """One lane row as build_manifest.py writes it, under a manifest section or a lane_groupings row's candidates."""
+    return {"repository": repo, "lane": lane,
+            "disposition": "keep_but_compare" if survives else "refuted_keep_but_compare",
+            "adversarial_verification": {"survives": survives, "votes": [
+                {"lens": 0, "refuted": False}, {"lens": 1, "refuted": not survives}]}}
+
+
+def planned_grouping(*candidates):
+    """The fleet layer's lane_groupings row in build_manifest.py's shape (no foundation row: a planned layer)."""
+    return {"layer": "fleet", "lane": PLANNED_SWEEP, "selected": [], "alternatives_keep_but_compare": [],
+            "candidates": list(candidates or (lane_candidate(FLEET_SURV, True), lane_candidate(FLEET_REF, False))),
+            "open_gaps": []}
+
+
 def build_planned_fixture(root: Path) -> None:
     """The fixture checkout plus a one-row planned-layers catalog and one sweep of that layer's retained files: its
-    manifest (no foundation row for the planned layer, whose lane rows build_manifest.py files under lane_groupings),
+    manifest (no foundation row for the planned layer: build_manifest.py files its lane rows under lane_groupings),
     usage, returns (frozen scope included) and one source review."""
     write(root, PLANNED_PATH, {"schema_version": 1, "layers": PLANNED_ROWS})
     profiles = sl.platform_profiles_sha256(json.loads((root / sl.ADOPTION).read_text(encoding="utf-8")))
     write(root, PLANNED_MANIFEST_REF, {"checked_at": "2026-10-03", "foundation": [], "trading": [],
-                                       "lane_groupings": [{"layer": "fleet", "selected": []}]})
+                                       "lane_groupings": [planned_grouping()]})
     write(root, PLANNED_USAGE, usage_of(f"wf_{PLANNED_SWEEP}", [
         {"label": f"{role}:fleet", "complete": True} for role in ("discover", "refute-facts", "refute-fit")]))
     write(root, PLANNED_RETURNS, {
@@ -1031,7 +1066,7 @@ class PlannedLayerTests(FixtureCase):
         super().setUp()
         build_planned_fixture(self.root)
 
-    def test_a_planned_layer_sweep_appends_and_checks_without_a_manifest_row(self):
+    def test_a_planned_layer_sweep_appends_and_checks_against_its_lane_groupings_row(self):
         ledger = self.appended(planned_result())
         self.assertEqual(sl.check_ledger(self.root, ledger), [])
         fleet = ledger["sweeps"][0]["layers"][0]
@@ -1085,7 +1120,7 @@ class PlannedLayerTests(FixtureCase):
         # The record keeps the scope frozen before the run.
         self.assertEqual(sl.check_ledger(self.root, ledger), [])
 
-    def test_the_planned_mark_is_computed_and_is_what_lifts_the_manifest_row_rule(self):
+    def test_the_planned_mark_is_computed_and_binds_the_layer_to_its_lane_groupings_row(self):
         forged = planned_result()
         forged["layers"][0]["planned"] = True
         with self.assertRaisesRegex(sl.LedgerError, r"must not set computed field planned"):
@@ -1100,13 +1135,95 @@ class PlannedLayerTests(FixtureCase):
         del unmarked["sweeps"][0]["layers"][0]["planned"]
         self.assertErrorMatches(sl_rechain(unmarked), r"layer foundation/fleet is not in .*manifest-fx-planned")
         self.assertErrorMatches(sl_rechain(unmarked), r"a survivor needs a manifest layer")
-        # A planned survivor still binds to its retained votes and its source review.
+        # A planned survivor binds to its retained votes and its source review...
         other = copy.deepcopy(ledger)
         other["sweeps"][0]["layers"][0]["survived"][0]["source_review"] = REVIEW  # a review of o/surv
         self.assertErrorMatches(sl_rechain(other), r"reviews a different repository")
         vote = copy.deepcopy(ledger)
         vote["sweeps"][0]["layers"][0]["survived"][0]["fit"]["ref"] = f"{PLANNED_RETURNS}#/votes/fleet/1/fit"
         self.assertErrorMatches(sl_rechain(vote), r"vote on a different repository")
+        # ...and the lane_groupings row is checked as a section row is: its lane rows, their survival, the survivor's.
+        for grouping, patterns in (
+                (planned_grouping(lane_candidate(FLEET_SURV, False), lane_candidate(FLEET_REF, False)),
+                 (r"survival disagrees with the manifest", r"is not a surviving manifest row")),
+                (planned_grouping(lane_candidate(FLEET_REF, False)),
+                 (r"proposed does not equal the manifest's fx-planned rows", r"has no fx-planned row")),
+                (None, (r"planned layer foundation/fleet has no lane_groupings row in .*manifest-fx-planned",
+                        r"a survivor needs a manifest layer"))):
+            with self.subTest(patterns=patterns):
+                write(self.root, PLANNED_MANIFEST_REF, {"checked_at": "2026-10-03", "foundation": [], "trading": [],
+                                                        "lane_groupings": [grouping] if grouping else []})
+                register(self.root)
+                for pattern in patterns:
+                    with self.assertRaisesRegex(sl.LedgerError, pattern):
+                        sl.append(self.root, self.ledger(), planned_result())
+
+    def test_a_survivor_cannot_borrow_another_layers_vote_on_the_same_repository(self):
+        # GPT review of #1066 at f6c4f475, P2: a planned survivor whose own fit vote refutes it cited another layer's
+        # successful fit vote on the same repository; the append succeeded and the ledger checked.
+        returns = json.loads((self.root / PLANNED_RETURNS).read_text(encoding="utf-8"))
+        returns["votes"]["alpha"] = copy.deepcopy(returns["votes"]["fleet"])  # alpha judged the same repositories
+        write(self.root, PLANNED_RETURNS, returns)
+        register(self.root)
+        # Own-layer evidence passes.
+        self.assertEqual(sl.check_ledger(self.root, self.appended(planned_result())), [])
+        # The planned layer's own fit vote refutes FLEET_SURV, so its own-layer survivor record is refused...
+        returns["votes"]["fleet"][0]["fit"]["refuted"] = True
+        write(self.root, PLANNED_RETURNS, returns)
+        register(self.root)
+        with self.assertRaisesRegex(sl.LedgerError, r"vote not_refuted disagrees with .*#/votes/fleet/0/fit"):
+            sl.append(self.root, self.ledger(), planned_result())
+        # ...and alpha's successful vote on the same repository cannot stand in for it.
+        borrowed = planned_result()
+        borrowed["layers"][0]["survived"][0]["fit"]["ref"] = f"{PLANNED_RETURNS}#/votes/alpha/0/fit"
+        with self.assertRaisesRegex(sl.LedgerError, r"#/votes/alpha/0/fit is not a vote of layer fleet"):
+            sl.append(self.root, self.ledger(), borrowed)
+
+    def test_a_refuted_entry_cannot_cite_another_layers_vote(self):
+        # Claude review of #1066 at f6c4f475, F1 input A: listed under refuted with another layer's refuting facts
+        # vote, the planned layer's real survivor disappeared and the sweep would count as clean.
+        returns = json.loads((self.root / PLANNED_RETURNS).read_text(encoding="utf-8"))
+        returns["votes"]["alpha"] = [{"facts": {"role": "facts", "repository": FLEET_SURV, "refuted": True},
+                                      "fit": {"role": "fit", "repository": FLEET_SURV, "refuted": True}}]
+        write(self.root, PLANNED_RETURNS, returns)
+        register(self.root)
+        hidden = planned_result()
+        fleet = hidden["layers"][0]
+        survivor = fleet["survived"].pop(0)
+        del survivor["source_review"]
+        survivor["facts"] = {"vote": "refuted", "ref": f"{PLANNED_RETURNS}#/votes/alpha/0/facts"}
+        fleet["refuted"].insert(0, survivor)
+        with self.assertRaisesRegex(sl.LedgerError, r"#/votes/alpha/0/facts is not a vote of layer fleet"):
+            sl.append(self.root, self.ledger(), hidden)
+        # The lane_groupings row records FLEET_SURV as surviving, so the manifest refuses the record too.
+        with self.assertRaisesRegex(sl.LedgerError, r"survival disagrees with the manifest"):
+            sl.append(self.root, self.ledger(), hidden)
+
+    def test_a_forged_planned_mark_without_a_lane_groupings_row_is_refused(self):
+        # Claude review of #1066 at f6c4f475, F1 input B: --check validated only the mark's form, so a hand-written
+        # planned: true lifted the manifest-row rule for a landscape layer that the sweep's manifest has no row for.
+        profiles = sl.platform_profiles_sha256(json.loads((self.root / sl.ADOPTION).read_text(encoding="utf-8")))
+        gamma_sha = sl.scope_hashes(self.root)["requirement_sha256"]["foundation/gamma"]
+        returns = json.loads((self.root / PLANNED_RETURNS).read_text(encoding="utf-8"))
+        returns["discovery"]["gamma"] = {"catalog": "foundation", "layer_id": "gamma", "proposed": [],
+                                         "requirement_sha256": gamma_sha, "platform_profiles_sha256": profiles}
+        write(self.root, PLANNED_RETURNS, returns)
+        usage = json.loads((self.root / PLANNED_USAGE).read_text(encoding="utf-8"))
+        usage["child_usage"]["children"].append({"label": "discover:gamma", "complete": True})
+        write(self.root, PLANNED_USAGE, usage)
+        register(self.root)
+        gamma = {"catalog": "foundation", "layer_id": "gamma", "votes": "retained",
+                 "discovery_ref": f"{PLANNED_RETURNS}#/discovery/gamma", "calls": None, "proposed": [],
+                 "survived": [], "refuted": [], "reopen": []}
+        # Unmarked, the landscape layer gamma needs its foundation row, which this sweep's manifest does not have.
+        with self.assertRaisesRegex(sl.LedgerError, r"layer foundation/gamma is not in .*manifest-fx-planned"):
+            sl.append(self.root, self.ledger(), planned_result(layers=[planned_result()["layers"][0], gamma]))
+        # A hand-written mark does not stand in for the row: a planned layer binds to its lane_groupings row.
+        forged = self.appended(planned_result())
+        forged["sweeps"][0]["layers"].append(dict(gamma, requirement_sha256=gamma_sha,
+                                                  platform_profiles_sha256=profiles, planned=True, known=[], new=[]))
+        self.assertErrorMatches(sl_rechain(forged), r"planned layer foundation/gamma has no lane_groupings row in "
+                                                    r".*manifest-fx-planned")
 
     def test_the_mark_outlives_the_layers_promotion_to_a_landscape_row(self):
         ledger = self.appended(planned_result())
@@ -1236,8 +1353,6 @@ class RepositoryLedgerTests(unittest.TestCase):
         self.assertTrue(all(row["research_status"] is None for row in rows))
         self.assertEqual(set(sl.scope_hashes(ROOT)["requirement_sha256"]),
                          {f"{catalog}/{layer_id}" for catalog, layer_id in research + planned})
-        if not planned:  # planned layers leave the catalog as verdict waves record their rows
-            self.skipTest("this checkout has no planned layer to check in the report")
 
     # The requirement and platform-profile hashes are computed from the research-state and adoption
     # files at append time. They legitimately differ from today's files after a landscape edit, so
@@ -1337,6 +1452,23 @@ class RepositoryLedgerTests(unittest.TestCase):
         ledger = json.loads((ROOT / sl.LEDGER).read_text(encoding="utf-8"))
         jsonschema.Draft202012Validator.check_schema(schema)
         self.assertEqual([e.message for e in jsonschema.Draft202012Validator(schema).iter_errors(ledger)], [])
+
+    def test_the_schema_allows_the_planned_mark_only_as_true_on_a_repository_layer(self):
+        # Claude review of #1066 at f6c4f475, F4: the schema allowed planned on a skills layer.
+        schema = json.loads((ROOT / "catalogs/saturation/ledger.schema.json").read_text(encoding="utf-8"))
+        try:
+            import jsonschema
+        except ImportError:
+            self.skipTest("jsonschema not installed; scripts/saturation_ledger.py --check is the enforced check")
+        validator = jsonschema.Draft202012Validator({"$ref": "#/$defs/layer", "$defs": schema["$defs"]})
+        layer = {"catalog": "skills", "layer_id": "skills-debug", "requirement_sha256": "a" * 64,
+                 "platform_profiles_sha256": "b" * 64, "votes": "retained", "discovery_ref": "r.json#/discovery/x",
+                 "proposed": [], "known": [], "new": [], "survived": [], "refuted": [], "reopen": []}
+        for overrides, valid in (({}, True), ({"catalog": "foundation", "planned": True}, True),
+                                 ({"catalog": "us-equities", "planned": True}, True), ({"planned": True}, False),
+                                 ({"catalog": "foundation", "planned": False}, False)):
+            with self.subTest(overrides=overrides):
+                self.assertEqual(validator.is_valid(dict(layer, **overrides)), valid)
 
 
 # --------------------------------------------------------------------------- workflow

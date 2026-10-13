@@ -29,7 +29,8 @@ planned row's requirement, acceptance and source, its requirement hash from the 
 --scope covers the planned rows; its planned_requirement_sha256), its previous sweep and its seeds. It has no sealed
 verdict, so winners, alternatives, open_gaps and components_vs_upstream are empty and verdict_note says so. A planned
 layer that also has a landscape row is an error (scripts/final_stack.py refuses the same collision). Contract version 2
-builds no planned layer yet, since its blind fit projection reads a verdict row, and refuses seeds for one.
+builds no planned layer yet, since its blind fit projection reads a verdict row: it refuses seeds for one, and its
+summary line counts the planned layers it did not build.
 
 winners, alternatives and open_gaps are copied from the row's sealed verdict, which only a new verdict wave re-records
 (tools/sota-convergence/README.md, "Record verdicts"), so an input dates them: verdict_checked_at is the row's
@@ -1012,8 +1013,12 @@ def main(argv=None) -> int:
                            "fit_input": str(screen_path), "facts_input": str(screen_path)}
                           if args.contract_version == 2 else {})})
     write_json(work / "layers.json", layers)
+    built_planned = sum(1 for x in inputs if "planned" in x)
+    # Contract version 2 builds no planned input (build_layer_inputs); say so rather than skip them silently.
+    unbuilt = len(planned_document.get("layers") or []) - built_planned if args.contract_version == 2 else 0
     print(f"{len(layers)} layers; {sum(1 for x in layers if x['catalog'] == 'foundation')} foundation; "
-          f"{sum(1 for x in inputs if 'planned' in x)} planned; "
+          f"{built_planned} planned"
+          f"{f' ({unbuilt} not built: contract version 2 builds no planned input)' if unbuilt else ''}; "
           f"previous repository sweep {(previous_sweep or {}).get('sweep_id') or 'none'}; "
           f"baseline {baseline_path.name if baseline_path else 'none'}; seeds for "
           f"{sum(1 for x in inputs if x['seeded_candidates'])} layer(s); "

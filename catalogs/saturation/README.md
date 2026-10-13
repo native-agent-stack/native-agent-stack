@@ -84,12 +84,17 @@ layers, `--report` lists it after them, and `--append` records it. A `--report -
 A planned layer that also has a `research-state.json` row is refused, as
 `scripts/final_stack.py` refuses one that has a landscape row.
 
-A planned layer has no row in its sweep's SOTA manifest: `build_manifest.py` files its lane rows
-under `lane_groupings`. So `--append` marks its entry `planned: true`, `--check` does not require
-the manifest row, and a survivor binds to its retained votes and its source review, as a skills
-survivor does. The mark is durable. Once a verdict wave records the layer's landscape row and its
-research-state row, that row supplies the requirement hash, which `--report` shows as a
-`requirement_changed` reset, and the entries recorded while the layer was planned still check.
+A planned layer has no row in its catalog's section of the sweep's SOTA manifest:
+`build_manifest.py` files its lane rows under `lane_groupings`, in the same `candidates` shape. So
+`--append` marks its entry `planned: true`, and `--check` binds a marked entry to that
+`lane_groupings` row as it binds a landscape layer to its section row. `proposed` must equal the
+row's lane rows, survival must agree with them, and a survivor needs a surviving lane row and a
+source review naming the layer. A mark without that row is refused, whatever its form. The mark is
+durable. Once a verdict wave records the layer's landscape row and its research-state row, that row
+supplies the requirement hash, which `--report` shows as a `requirement_changed` reset, and the
+entries recorded while the layer was planned still check. Append a planned layer's sweep before
+that promotion: after it, `--append` reads the layer as a landscape layer, which the sweep's
+manifest has no section row for, and refuses the record.
 
 ## What `--check` verifies
 
@@ -104,8 +109,9 @@ research-state row, that row supplies the requirement hash, which `--report` sho
   frozen `requirement_sha256` and `platform_profiles_sha256` must equal the layer's, so a scope
   change during the sweep stands as a current trigger rather than being recorded as tested. Every vote and discovery
   `ref` needs a JSON pointer: a retained vote must resolve in `returns_ref` (not the manifest, the
-  usage output or the run record) to an object with the same role and repository, and a lens vote
-  must resolve to that lens in this layer's lane row for the same repository.
+  usage output or the run record), under the layer's own collection `#/votes/<layer_id>/`, to an
+  object with the same role and repository, and a lens vote must resolve to that lens in this
+  layer's lane row for the same repository. Another layer's vote on the same repository is refused.
 - `lost_workers` must be exactly the children of `usage_ref` that never completed; leaving one out
   fails, and an absent list means none.
 - `workflow_run` must be the run `usage_ref` measured (the last segment of

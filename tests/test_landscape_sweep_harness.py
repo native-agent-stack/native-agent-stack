@@ -94,6 +94,14 @@ def load(name):
     return module
 
 
+def load_tool(name):
+    """A tools/sota-convergence module, loaded as tests/test_sota_convergence.py loads it."""
+    spec = importlib.util.spec_from_file_location(f"sota_convergence_{name}", HARNESS.parent / f"{name}.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 build_args = load("build_args")
 build_inputs = load("build_inputs")
 codex_job = load("codex_job")
@@ -899,6 +907,18 @@ class NeutralFieldTests(unittest.TestCase):
         model = next(candidate for candidate in screen["candidates"] if candidate["repository"] == repository)
         self.assertEqual(model["primary_sources"], [repository, repository + "/tree/main",
                          "https://huggingface.co/api/models/XiaomiMiMo/MiMo-V2.6-Distill-Qwen-9B"])
+
+    def test_v2_builds_no_planned_layer_and_says_so(self):
+        # Claude review of #1066 at f6c4f475, F2/F3: V2 skipped a planned layer silently, and no test reached the skip.
+        # A planned row, no seed for it and no frozen hash for it: V2 builds the landscape layers only.
+        write_json(self.repo / PLANNED_PATH, {"schema_version": 1, "layers": [BuildInputsTests.PLANNED]})
+        done = self.build("--contract-version", "2")
+        self.assertEqual(done.returncode, 0, done.stderr)
+        self.assertIn("2 layers; 1 foundation; 0 planned (1 not built: contract version 2 builds no planned input);",
+                      done.stdout)
+        self.assertFalse((self.work / "inputs/delta.json").exists())
+        self.assertEqual([row["layer_id"] for row in json.loads((self.work / "layers.json").read_text())],
+                         ["alpha", "beta"])
 
     def test_v2_requirement_keeps_capability_words_that_are_only_repository_owner_fragments(self):
         path = self.repo / "catalogs/landscape/foundation.json"
@@ -5351,25 +5371,34 @@ class LedgerIntegrationTests(unittest.TestCase):
 
     def evidence(self, res, usage=None, planned=()):
         """Converted evidence; with `usage`, converted against that record (votes measured, efforts checked). The
-        manifest gives each layer a row of its catalog's section, except the `planned` layers, which have no landscape
-        row: build_manifest.py files their lane rows under lane_groupings."""
+        manifest gives each layer a row of its catalog's section. A run of `planned` layers, which have no landscape
+        row, gets the manifest the production build_manifest.py writes from the converted lanes: their lane rows
+        under lane_groupings."""
         out = convert.convert(res, self.scope, LANE, convert.resolved_models(usage), usage=usage)
         write_json(self.root / self.base / "returns.json", out["returns"])
         usage = usage or usage_record.record(child_usage_raw("wf_fixture-1", SYNTHETIC_LABELS), 0, "cmd", ROOT)
         write_json(self.root / f"{self.base}-attempts/child-usage-wf_fixture-1.json", usage)
-        sections = {"foundation": [], "trading": []}
-        for layer in out["lanes"]["lanes"][0]["result"]["layers"]:
-            catalog = next(x["catalog"] for x in out["layers"] if x["layer_id"] == layer["layer_id"])
-            rows = [{"repository": p["repository"], "lane": LANE,
-                     "adversarial_verification": {"survives": p["survives"], "votes": p["votes"]}}
-                    for p in out["lanes"]["lanes"][0]["proposals"] if p["layer"] == layer["layer_id"]]
-            if layer["layer_id"] in planned:
-                sections.setdefault("lane_groupings", []).append({"layer": layer["layer_id"], "selected": rows})
-                continue
-            section = sweep_common.MANIFEST_SECTION[catalog]
-            sections[section].append({"layer": layer["layer_id"], "candidates": rows,
-                                      ("components" if section == "foundation" else "entries"): []})
-        write_json(self.root / "catalogs/sota-convergence/manifest-20261026.json", {"checked_at": "2026-10-26", **sections})
+        if planned:
+            self.assertEqual({x["layer_id"] for x in out["layers"]}, set(planned))  # planned layers only
+            manifest = load_tool("build_manifest").build_manifest(
+                checked_at="2026-10-26", manifest_id="fixture", scope="fixture",
+                foundation_layers={"checked_at": "2026-10-26", "layers": []},
+                trading_by_layer={"taxonomy": {}, "layers": {}},
+                freshness_doc={"count": 0, "generated_at": "2026-10-26T00:00:00+00:00", "repositories": {}},
+                lanes_doc=out["lanes"], reconciliations=[], taxonomy={})
+            write_json(self.root / "catalogs/sota-convergence/manifest-20261026.json", manifest)
+        else:
+            sections = {"foundation": [], "trading": []}
+            for layer in out["lanes"]["lanes"][0]["result"]["layers"]:
+                catalog = next(x["catalog"] for x in out["layers"] if x["layer_id"] == layer["layer_id"])
+                rows = [{"repository": p["repository"], "lane": LANE,
+                         "adversarial_verification": {"survives": p["survives"], "votes": p["votes"]}}
+                        for p in out["lanes"]["lanes"][0]["proposals"] if p["layer"] == layer["layer_id"]]
+                section = sweep_common.MANIFEST_SECTION[catalog]
+                sections[section].append({"layer": layer["layer_id"], "candidates": rows,
+                                          ("components" if section == "foundation" else "entries"): []})
+            write_json(self.root / "catalogs/sota-convergence/manifest-20261026.json",
+                       {"checked_at": "2026-10-26", **sections})
         reviews = []
         for survivor in out["survivors"]:
             name = survivor["repository"].rsplit("/", 2)[-2] + "-" + survivor["repository"].rsplit("/", 1)[-1]
@@ -5470,8 +5499,13 @@ class LedgerIntegrationTests(unittest.TestCase):
                                                 "gpt6-refute-fit")] + ["critic"]
         usage = usage_record.record(child_usage_raw("wf_fixture-1", labels), 0, "cmd", ROOT)
         out, reviews = self.evidence(res, usage=usage, planned=("delta",))
+        # The production build_manifest.py output the record binds to: no foundation row, a lane_groupings row whose
+        # candidates are this lane's rows with their survival.
         manifest = json.loads((self.root / "catalogs/sota-convergence/manifest-20261026.json").read_text())
-        self.assertEqual((manifest["foundation"], manifest["lane_groupings"][0]["layer"]), ([], "delta"))
+        grouping = manifest["lane_groupings"][0]
+        self.assertEqual((manifest["foundation"], grouping["layer"], grouping["lane"]), ([], "delta", LANE))
+        self.assertEqual([(row["repository"], row["lane"], row["adversarial_verification"]["survives"])
+                          for row in grouping["candidates"]], [(D1, LANE, True), (D2, LANE, False)])
         empty = json.loads((self.root / sl.LEDGER).read_text())
         self.assertEqual(final_stack.layer_status(any(("foundation", "delta") in sweep["covers"]
                                                       for sweep in final_stack.completed_sweeps(empty)), None, {}),
