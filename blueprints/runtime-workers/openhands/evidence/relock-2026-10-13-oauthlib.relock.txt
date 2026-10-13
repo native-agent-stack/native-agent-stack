@@ -23,7 +23,6 @@ Removed pywin32 v311
 Removed pywin32-ctypes v0.2.3
 Updated soupsieve v2.8.4 -> v2.9.2
 Updated urllib3 v2.7.0 -> v2.8.0
-f355421b055151b75f488ffd6415078f17ccee6926f6ba9c2d3501c2cf7769ef  <scratch-relock>/u3/control/uv.lock
 2837036a2bb832958e2daad6094811610d1fd605a315dacd9a0616841e9e2401  <scratch-relock>/u3/control/requirements.lock.repro
 [2026-10-13T00:29:43Z] new uv lock --upgrade-package anyio==4.14.2 --upgrade-package click==8.5.0 --upgrade-package pypdf==6.19.0 --upgrade-package soupsieve==2.9.2 --upgrade-package pyjwt==2.15.0 --upgrade-package urllib3==2.8.0 --upgrade-package litellm==1.93.2 --upgrade-package fsspec==2026.6.0 --upgrade-package multidict==6.9.1 --upgrade-package oauthlib==4.0.0
 lock exit: 0
@@ -47,7 +46,6 @@ Removed pywin32 v311
 Removed pywin32-ctypes v0.2.3
 Updated soupsieve v2.8.4 -> v2.9.2
 Updated urllib3 v2.7.0 -> v2.8.0
-17295c3e23d9b832b637254ab91fce64a37b96e8c3d11f4233143082d901a111  <scratch-relock>/u3/new/uv.lock
 32bc153428aaef2018adcdca53337e4a74b464ca94a96b9905e1bc6174503400  <scratch-relock>/u3/new/requirements.lock.repro
 control reproduces the committed lock byte for byte
 $ diff control/requirements.lock.repro new/requirements.lock.repro

@@ -26,8 +26,8 @@ POST_PIN_RECEIPT_GRANTS = {
     "evidence/artifacts/harbor-0240-currency-20261009/receipt.json":
         "#1047: cited by path from the Harbor landscape candidate (CC ruling 2026-10-12); the reader follows that pointer",
     "evidence/receipts/osv-openhands-oauthlib-relock-20261013.json":
-        "oauthlib relock of 2026-10-13 (command-center incident brief; the PR read is pending): the new registered receipt; the "
-        "Architecture build refused it without this grant (tests.test_local_pages_architecture_landscape_exclusions)",
+        "#1060, Claude read of e3933560 (names this receipt): the new registered receipt; the Architecture build refused it "
+        "without this grant (tests.test_local_pages_architecture_landscape_exclusions)",
 }
 spec = importlib.util.spec_from_file_location("local_policy_grant_tests", ROOT / "scripts/local_pages_policy_grants.py")
 grants = importlib.util.module_from_spec(spec)

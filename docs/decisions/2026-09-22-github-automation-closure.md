@@ -203,8 +203,10 @@ locally with `GH_TOKEN` set and no `--offline`, using
   (PyJWT 2.13.0, OpenHands lock only); see **oauthlib and PyJWT
   (2026-09-29)** below. The PyJWT one ended on 2026-09-30, leaving two (**PyJWT
   relock (2026-09-30)** below). **Superseded (2026-10-13):** the two oauthlib
-  ignores are deleted and no ordinary ignore covers oauthlib; see **oauthlib
-  relock and the end of the oauthlib ignores (2026-10-13)** at the end of this record.
+  ignores are deleted and no ordinary ignore covers oauthlib; the two Lumibot
+  entries for nltk and setuptools are deleted as well, unused, so the ordinary
+  config holds no ignore; see **oauthlib relock and the end of the oauthlib
+  ignores (2026-10-13)** at the end of this record.
   osv-scanner 2.6.0 matches `[[IgnoredVulns]]` by id and expiry only
   ([`internal/config/config.go:104-112`](https://github.com/google/osv-scanner/blob/v2.6.0/internal/config/config.go#L104-L112)),
   and the workflow's single `--config` replaces every per-directory
@@ -2152,3 +2154,24 @@ GHSA-xpv3-w29h-x7cv (first patched 4.0.0); oauthlib 4.0.0 on PyPI and its
 release notes (tag commit 145a9a46); uv 0.12.22; OSV-Scanner 2.6.0. Evidence:
 `evidence/receipts/osv-openhands-oauthlib-relock-20261013.json` and the
 relock-2026-10-13-oauthlib prefix beside the OpenHands recipe.
+
+**The nltk and setuptools ignores (review fix of #1060).** The GPT read of
+#1060 at e3933560 found the next calendar failure: the two entries of
+2026-09-26 for the Lumibot lock, GHSA-8mgp-746c-j5xp (nltk) and
+GHSA-h35f-9h28-mq5c (setuptools below 83.0.0), expire on 2026-12-24, when
+`ignore_entry_problems` fails the scan step's preflight, as it did for the
+oauthlib pair on 2026-10-13. Both had been unused since the ruling of
+2026-10-06 excluded the Lumibot lockchecks: OSV-Scanner reported them unused,
+and the guard's `affected_pins` finds no ordinary input that pins nltk, or
+setuptools below 83.0.0. Both entries and their `IGNORE_SCOPES` rows are
+deleted. The guard's own mutation tests keep the two scopes as
+`GUARD_FIXTURE_SCOPES`, which grant nothing. This supersedes the **Expiry**
+sentences of the **Ignores** list's 2026-09-26 entries and of the
+**Scoped, digest-bound allowlist (2026-09-27)** above: relocking onto a fixed
+nltk release, or a renewal, is no longer needed. **Result:** the ordinary
+config parses to an empty table, `ignore_entry_problems` returns nothing with
+the date 2026-12-24 (before the deletion it returned "ignoreUntil has expired"
+for both), and the scan step exits 0 with "No issues found" and no unused
+ignore. **Overturn:** a new ordinary ignore needs its own reachability
+review, an `IGNORE_SCOPES` row and, for a lock that pins an affected version,
+an `IGNORE_ALLOWED_LOCKS` entry.

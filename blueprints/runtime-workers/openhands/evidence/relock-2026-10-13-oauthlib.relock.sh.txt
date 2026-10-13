@@ -7,7 +7,9 @@
 # The control (the 2026-10-05 fsspec relock's arguments) must reproduce today's committed
 # lock; only the new variant adds --upgrade-package oauthlib==4.0.0, the first fixed
 # release for GHSA-hj66-6f7g-4r5v and GHSA-xpv3-w29h-x7cv. The uv lock output is kept raw
-# (rtk proxy) so every Updated, Added and Removed line stays visible.
+# (rtk proxy) so every Updated, Added and Removed line stays visible. Only the exported lock,
+# whose new bytes are the committed requirements.lock, is hashed: the scratch uv.lock files
+# are not in the repository, so no digest of them is printed (correction #161, #1060 P1).
 # Usage: bash <this-script> <owned-scratch> <owned-worktree> <rtk-binary> <uv-binary>
 set -euo pipefail
 R=$1; W=$2; OH=blueprints/runtime-workers/openhands; U=$R/u3
@@ -51,7 +53,7 @@ for variant in control new; do
     "$RTK" cat export.txt wheels.txt > requirements.lock.repro
   )
   "$RTK" rg '^(Updated|Resolved|Added|Removed)' "$D/lock.out" || true
-  "$RTK" sha256sum "$D/uv.lock" "$D/requirements.lock.repro"
+  "$RTK" sha256sum "$D/requirements.lock.repro"
 done
 "$RTK" cmp "$U/control/requirements.lock.repro" "$U/base.lock"
 echo 'control reproduces the committed lock byte for byte'

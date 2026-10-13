@@ -179,7 +179,7 @@ First extra element 0:
 Ran 23 tests in 0.321s
 
 FAILED (failures=1)
-### after: this change's tree (full report: relock-2026-10-13-oauthlib.osv-after.ordinary.txt)
+### after: the relock commit's tree, e3933560's content, before the review fixes of section K (full report: relock-2026-10-13-oauthlib.osv-after.ordinary.txt)
 44547b18f6b2551fb488cfeadaf7b1acb4d0432274f0787fe092ce2a7397d937  .github/workflows/security-scan.yml
 bc5680fd3290c1e0c4202c5a5fb1de68a5f09a422faecadf884f55cdae16d5bf  <scratch-relock>/osv-out/after-early.step.sh
 workflow scan step exit: 0
@@ -258,3 +258,72 @@ Ran 1855 tests in 716.294s
 OK (skipped=43)
 exit: 0
 2026-10-13T00:51:40Z
+
+## K. Review fixes on the rebased commit 8d459ce9 (the Claude read and the GPT read of e3933560)
+### P1: the corrected relock script, re-run from the same checksum-verified archive
+$ cmp <scratch-relock>/rerun-p1/u3/new/requirements.lock.repro <worktree>/blueprints/runtime-workers/openhands/requirements.lock
+cmp re-run repro vs committed lock: 0
+$ diff relock-2026-10-13-oauthlib.relock.txt <the re-run output, path-sanitized>     # relock.txt is the first run without its two uv.lock digest lines
+1c1
+< [2026-10-13T00:29:37Z] uv 0.12.22 (x86_64-unknown-linux-gnu)
+---
+> [2026-10-13T03:02:13Z] uv 0.12.22 (x86_64-unknown-linux-gnu)
+5c5
+< [2026-10-13T00:29:39Z] control uv lock --upgrade-package anyio==4.14.2 --upgrade-package click==8.5.0 --upgrade-package pypdf==6.19.0 --upgrade-package soupsieve==2.9.2 --upgrade-package pyjwt==2.15.0 --upgrade-package urllib3==2.8.0 --upgrade-package litellm==1.93.2 --upgrade-package fsspec==2026.6.0 --upgrade-package multidict==6.9.1
+---
+> [2026-10-13T03:02:14Z] control uv lock --upgrade-package anyio==4.14.2 --upgrade-package click==8.5.0 --upgrade-package pypdf==6.19.0 --upgrade-package soupsieve==2.9.2 --upgrade-package pyjwt==2.15.0 --upgrade-package urllib3==2.8.0 --upgrade-package litellm==1.93.2 --upgrade-package fsspec==2026.6.0 --upgrade-package multidict==6.9.1
+9c9
+< Resolved 412 packages in 2.21s
+---
+> Resolved 412 packages in 1.76s
+27c27
+< [2026-10-13T00:29:43Z] new uv lock --upgrade-package anyio==4.14.2 --upgrade-package click==8.5.0 --upgrade-package pypdf==6.19.0 --upgrade-package soupsieve==2.9.2 --upgrade-package pyjwt==2.15.0 --upgrade-package urllib3==2.8.0 --upgrade-package litellm==1.93.2 --upgrade-package fsspec==2026.6.0 --upgrade-package multidict==6.9.1 --upgrade-package oauthlib==4.0.0
+---
+> [2026-10-13T03:02:18Z] new uv lock --upgrade-package anyio==4.14.2 --upgrade-package click==8.5.0 --upgrade-package pypdf==6.19.0 --upgrade-package soupsieve==2.9.2 --upgrade-package pyjwt==2.15.0 --upgrade-package urllib3==2.8.0 --upgrade-package litellm==1.93.2 --upgrade-package fsspec==2026.6.0 --upgrade-package multidict==6.9.1 --upgrade-package oauthlib==4.0.0
+31c31
+< Resolved 412 packages in 730ms
+---
+> Resolved 412 packages in 1.08s
+73c73
+< [2026-10-13T00:29:46Z] new paired lock generated; inspect every pin delta before adoption
+---
+> [2026-10-13T03:02:20Z] new paired lock generated; inspect every pin delta before adoption
+diff exit: 1
+### P1 regression: tests.test_receipt_sha256_key_custody, copied into git clones at e3933560 and 8d459ce9 (TZ=UTC)
+#### e3933560e
+FAIL: test_no_receipt_sha256_key_lacks_a_checkable_preimage (tests.test_receipt_sha256_key_custody.ReceiptSha256KeyCustodyTests.test_no_receipt_sha256_key_lacks_a_checkable_preimage)
+FAIL: test_the_oauthlib_relock_receipt_publishes_no_scratch_digest (tests.test_receipt_sha256_key_custody.ReceiptSha256KeyCustodyTests.test_the_oauthlib_relock_receipt_publishes_no_scratch_digest)
+Ran 12 tests in 4.746s
+FAILED (failures=2)
+- {'evidence/receipts/osv-openhands-oauthlib-relock-20261013.json': ['reproduction.control_uv_lock_sha256',
+-                                                                    'reproduction.new_uv_lock_sha256']} : receipt keys ending in _sha256 wh
+unittest exit: 1
+#### 8d459ce91
+FAIL: test_no_receipt_sha256_key_lacks_a_checkable_preimage (tests.test_receipt_sha256_key_custody.ReceiptSha256KeyCustodyTests.test_no_receipt_sha256_key_lacks_a_checkable_preimage)
+FAIL: test_the_oauthlib_relock_receipt_publishes_no_scratch_digest (tests.test_receipt_sha256_key_custody.ReceiptSha256KeyCustodyTests.test_the_oauthlib_relock_receipt_publishes_no_scratch_digest)
+Ran 12 tests in 10.539s
+FAILED (failures=2)
+- {'evidence/receipts/osv-openhands-oauthlib-relock-20261013.json': ['reproduction.control_uv_lock_sha256',
+-                                                                    'reproduction.new_uv_lock_sha256']} : receipt keys ending in _sha256 wh
+unittest exit: 1
+### GPT read follow-up 1: the nltk and setuptools ignores, before the deletion
+config ids: ['GHSA-8mgp-746c-j5xp', 'GHSA-h35f-9h28-mq5c']
+ignore_entry_problems, real date: []
+ignore_entry_problems, date 2026-12-24: ['GHSA-8mgp-746c-j5xp: ignoreUntil has expired', 'GHSA-h35f-9h28-mq5c: ignoreUntil has expired']
+affected_pins over the 60 ordinary inputs for GHSA-8mgp-746c-j5xp and GHSA-h35f-9h28-mq5c: []
+### after the deletion
+config: {}
+ignore_entry_problems, real date: []
+ignore_entry_problems, date 2026-12-24: []
+active_ignores at 2026-12-24: set()
+IGNORE_SCOPES: {} | GUARD_FIXTURE_SCOPES ids: ['GHSA-8mgp-746c-j5xp', 'GHSA-h35f-9h28-mq5c']
+### the workflow's scan step on the final tree (full report: relock-2026-10-13-oauthlib.osv-final.ordinary.txt; digest lines omitted)
+workflow scan step exit: 0
+ordinary entries 60
+ordinary scan exit: 0
+Ran 23 tests in 0.306s
+OK
+No issues found
+OSV primary exit code: ordinary=0; frozen evidence reports separately
+No issues found
+scan-step script exit: 0
