@@ -41,12 +41,11 @@ class ExtendedAdmission(unittest.TestCase):
         d.save(plan.instance(trial) / "readiness.json", value)
 
     def test_pre_and_post_build_native_extended_one_x_configs(self):
-        # Native alpaca-py LimitOrderRequest exposes extended_hours and DAY;
-        # session/1x ceilings are enforced by the existing NAS engine.
+        # The engine's exact SDK-bound order envelope and wire gate enforce
+        # the pinned Alpaca LIMIT/DAY/extended_hours contract without SDK I/O.
         from runner import load_config
         from sessions import order_extended_hours_flag, validate_session_policy
-        from alpaca.trading.requests import LimitOrderRequest
-        from alpaca.trading.enums import OrderSide, TimeInForce, OrderType
+        from transport import order_envelope, check_wire_submission
         with self.scratch() as root:
             plan = self.plan(root)
             for stage, timestamp in [("pre-1x", "2026-10-13T08:00:00+00:00"),
@@ -58,12 +57,11 @@ class ExtendedAdmission(unittest.TestCase):
                 self.assertEqual(cfg["max_leverage"], "1")
                 self.assertEqual(limits.max_gross_exposure_usd, Decimal("10000"))
                 self.assertTrue(order_extended_hours_flag(datetime.fromisoformat(timestamp), validate_session_policy(cfg)))
-                order = LimitOrderRequest(symbol="SPY", qty=1, side=OrderSide.BUY,
-                                          time_in_force=TimeInForce.DAY, limit_price=100,
-                                          extended_hours=True)
-                self.assertEqual(order.type, OrderType.LIMIT)
-                self.assertEqual(order.time_in_force, TimeInForce.DAY)
-                self.assertTrue(order.extended_hours)
+                body = {"symbol": "SPY", "qty": "1", "side": "buy", "limit_price": "100",
+                        "client_order_id": "syn-prepost", "extended_hours": True}
+                envelope = order_envelope(body, extended_hours_allowed=True)
+                wire = dict(body, type="limit", time_in_force="day")
+                self.assertEqual(check_wire_submission({"syn-prepost": envelope}, wire), envelope)
                 for regime, want in [("trend", Decimal("1")), ("range", Decimal("1")), ("risk_off", Decimal("0"))]:
                     self.assertEqual(cfg["_leverage_policy"].ceiling(session=plan.stage(stage)["session_kind"],
                         regime=regime, drawdown_fraction=Decimal("0"), kill_switch=False), want)
@@ -84,7 +82,10 @@ class ExtendedAdmission(unittest.TestCase):
             self.assertEqual(plan.native_state(), Path(root) / "exploratory/account-state")
             fingerprint = "a" * 64
             state = plan.native_state() / fingerprint / "adaptive/trial.json"
-            d.save(state, {"phase": "finished", "config_sha256": plan.stage("early")["config_sha256"]})
+            d.save(state, {**d.LABEL, "trial_id": "previous", "engine_kind": "adaptive",
+                           "phase": "finished", "config_sha256": plan.stage("early")["config_sha256"]})
+            d.save(plan.state / "account-last.json", {**d.LABEL, "trial": "previous", "flat": True,
+                    "finished_at": datetime(2026, 10, 13, 7, 0, tzinfo=timezone.utc).timestamp()})
             self.assertEqual(plan.namespace_ready("late", fingerprint), "matching_native_namespace")
             before = state.read_bytes()
             self.assertEqual(plan.namespace_ready("early", fingerprint), "matching_native_namespace")
@@ -139,7 +140,8 @@ class ExtendedAdmission(unittest.TestCase):
             config = plan.config("pre-1x")
             for key, value in [("max_leverage", "2"), ("max_gross_exposure_usd", "20000"),
                                ("max_order_notional_usd", "2000"), ("max_gross_loss_usd", "50"),
-                               ("max_drawdown_usd", "50"), ("max_order_quantity", 101)]:
+                               ("max_drawdown_usd", "50"), ("max_order_quantity", 101),
+                               ("capital_usd", "100000"), ("max_order_qty_mode", "fixed")]:
                 with self.subTest(key=key), self.assertRaisesRegex(d.Refused, "^unregistered_sizing_setting$"):
                     d.validate_sizing_and_scope(dict(config, **{key: value}), "adaptive", "PRE")
             with self.assertRaisesRegex(d.Refused, "^unregistered_sizing_setting$"):
@@ -153,6 +155,10 @@ class ExtendedAdmission(unittest.TestCase):
             changed = dict(config, extended_hours_enabled=False)
             with self.assertRaisesRegex(d.Refused, "^extended_session_config_required$"):
                 d.validate_sizing_and_scope(changed, "adaptive", "POST")
+            for changed in [dict(config, regular_session_only=True),
+                            dict(config, sessions=dict(config["sessions"], extended_hours=False))]:
+                with self.assertRaisesRegex(d.Refused, "^extended_session_config_required$"):
+                    d.validate_sizing_and_scope(changed, "adaptive", "PRE")
 
     def test_failed_pre_recovery_cannot_hand_account_to_post(self):
         with self.scratch() as root, patch.object(d, "lane_a_absent", return_value=True):
@@ -174,6 +180,67 @@ class ExtendedAdmission(unittest.TestCase):
                 plan.issue("post-1x", "blocked-post", previous="failed-pre", now=post_time)
             self.assertFalse((plan.slot("post-1x") / "GO.sha256").exists())
             self.assertTrue(plan.active_path("failed-pre").exists())
+
+    def test_missing_policy_pre_alias_cannot_widen_order_or_loss_caps(self):
+        # CC's reproduced SIP-shaped bypass: same low gross/leverage, but
+        # larger capital/order/loss. Native parser accepts the shape; the
+        # deployment's PRE contract must refuse BEFORE any GO exists.
+        from runner import load_config
+        with self.scratch() as root:
+            config = Path(root) / "source.json"
+            value = load_json(PAPER / "config-sip.json")
+            value.update(capital_usd="100000", max_gross_exposure_usd="5000",
+                         max_order_notional_usd="5000", max_gross_loss_usd="10000", max_drawdown_usd="10000")
+            config.write_text(json.dumps(value))
+            load_config(config)
+            specs = {"pre-alias": {"engine_kind": "adaptive", "session_kind": "PRE", "config": str(config)}}
+            with self.assertRaisesRegex(d.Refused, "^unregistered_sizing_setting$"):
+                d.build(Path(root) / "bundle", deployment="bypass", order=list(specs), stage_specs=specs)
+
+    def test_astra_no_policy_custom_pre_order_and_loss_cap_plus_one_refuse(self):
+        from runner import load_config
+        with self.scratch() as root:
+            config = Path(root) / "source.json"
+            value = load_json(PAPER / "config-leverage-1x.json")
+            value.pop("leverage_policy")
+            value.update(max_gross_exposure_usd="5000", max_order_quantity=10,
+                         max_order_notional_usd="1001", max_gross_loss_usd="26", max_drawdown_usd="26")
+            config.write_text(json.dumps(value))
+            load_config(config)
+            specs = {"alias": {"engine_kind": "adaptive", "session_kind": "PRE", "config": str(config)}}
+            with self.assertRaisesRegex(d.Refused, "^unregistered_sizing_setting$"):
+                d.build(Path(root) / "bundle", deployment="missing-policy", order=list(specs), stage_specs=specs)
+
+    def test_registered_post_sip_keeps_only_shipped_caps_and_rejects_each_override(self):
+        with self.scratch() as root:
+            source = load_json(PAPER / "config-sip.json")
+            source.update(regular_session_only=False, extended_hours_enabled=True)
+            source["sessions"] = dict(source["sessions"], extended_hours=True)
+            d.validate_sizing_and_scope(source, "adaptive", "POST")
+            for key, value in [("capital_usd", "100000"), ("max_order_notional_usd", "5000"),
+                               ("max_gross_loss_usd", "10000"), ("max_drawdown_usd", "10000"),
+                               ("max_order_quantity", 10), ("max_order_qty_mode", "notional")]:
+                with self.subTest(key=key), self.assertRaisesRegex(d.Refused, "^unregistered_sizing_setting$"):
+                    d.validate_sizing_and_scope(dict(source, **{key: value}), "adaptive", "POST")
+
+    def test_post1_compatibility_alias_and_pre_engine_manifest_refusals(self):
+        with self.scratch() as root:
+            d.build(Path(root) / "bundle", deployment="aliases", order=["post1", "post-1x"])
+            plan = d.Deployment(Path(root) / "bundle", Path(root) / "exploratory")
+            self.assertEqual(plan.config("post1"), plan.config("post-1x"))
+            self.assertEqual(plan.stage("post1")["state_namespace"], plan.stage("post-1x")["state_namespace"])
+            original = load_json(Path(root) / "bundle/deployment.json")
+            for kind in ["mover", "t22"]:
+                from copy import deepcopy
+                manifest = deepcopy(original)
+                manifest["stages"]["post1"].update(engine_kind=kind, session_kind="PRE")
+                d.save(Path(root) / "bundle/deployment.json", manifest)
+                with self.subTest(kind=kind), self.assertRaisesRegex(d.Refused, "^unsupported_session_kind$"):
+                    d.Deployment(Path(root) / "bundle", Path(root) / "exploratory")
+            specs = {"early-t22": {"engine_kind": "t22", "session_kind": "PRE",
+                                    "config": str(PAPER / "config-leverage-1x.json")}}
+            with self.assertRaisesRegex(d.Refused, "^unsupported_stage_kind$"):
+                d.build(Path(root) / "denied", deployment="denied", order=list(specs), stage_specs=specs)
 
 
 if __name__ == "__main__":

@@ -278,7 +278,7 @@ def validate_sizing_and_scope(config, kind, session):
     if config.get("sessions", {}).get("overnight_holds") is not False:
         raise Refused("unsupported_overnight_policy")
     if kind == "adaptive":
-        if session in ("PRE", "POST") and "leverage_policy" in config:
+        if session == "PRE" or (session == "POST" and "leverage_policy" in config):
             # Admit only the shipped canonical 1x setting outside RTH; no
             # caller alias, larger gross/order/loss cap or different policy.
             from leverage import CANONICAL_V1_BLOCK
@@ -288,6 +288,15 @@ def validate_sizing_and_scope(config, kind, session):
                         "max_gross_loss_usd": "25", "max_drawdown_usd": "25"}
             if (any(config.get(k) != v for k, v in required.items())
                     or config.get("leverage_policy") != CANONICAL_V1_BLOCK):
+                raise Refused("unregistered_sizing_setting")
+        elif session == "POST":
+            # Keep the parent's conservative SIP control as a registered
+            # POST setting, not a generic no-policy escape from frozen caps.
+            required = {"capital_usd": "10000", "max_leverage": "1",
+                        "max_gross_exposure_usd": "5000", "max_order_notional_usd": "1000",
+                        "max_order_quantity": 1, "max_order_qty_mode": "fixed",
+                        "max_gross_loss_usd": "25", "max_drawdown_usd": "25"}
+            if any(config.get(k, "fixed" if k == "max_order_qty_mode" else None) != v for k, v in required.items()):
                 raise Refused("unregistered_sizing_setting")
         elif ("leverage_policy" in config or float(config["max_leverage"]) > 1
                 or float(config["max_gross_exposure_usd"]) > 5000):

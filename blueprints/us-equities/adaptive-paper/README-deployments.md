@@ -22,6 +22,13 @@ session_kind PRE/POST and the same shipped1x limits). The builder freezes the
 three native extended-session flags, no overnight hold, duration1200s and
 150REST/120submit budgets. The source1x policy, capital/gross10000USD,
 order1000USD,100-share notional cap and25USD loss/drawdown are preserved.
+PRE always requires that block and those1x fields, including when the source
+omits leverage_policy. POST also retains one registered conservative SIP
+setting from the parent:10000capital,5000gross,1000order,1share/fixed mode,
+25loss/drawdown and leverage1, with no policy. Every field is pinned; omitting
+the policy does not allow different caps. This keeps the parent's bounded POST
+control without broadening its risk envelope. Builtin post1 is a compatibility
+alias of post-1x and follows the same validation.
 Larger exposure/order/loss settings and leverage above1 are refused; RTH rung
 restrictions remain as before. Native leverage.py owns PRE/POST ceilings and
 sessions.py owns actual venue sessions/early closes, not a new market schedule.
@@ -165,7 +172,7 @@ input.source declares intraday mode, signal_cutoff_utc and observed_at acquisiti
 An omitted source uses the native fixed rule cutoff (09:30 maps09:28).
 Cutoff<=acquisition<=now and cutoff<=scan_time; scan_time need not precede
 acquisition. Both data and generation must be fresh. Morning protocol issuance
-is outside this RTH/POST helper's scope.
+is outside the mover scan consumer's RTH/POST scope; adaptive PRE needs no scan.
 
 Each artifact is read ONCE into bounded bytes, then hashed, parsed and retained.
 Mover stages consume the exact first5 rows of the issued top100 (or all rows
