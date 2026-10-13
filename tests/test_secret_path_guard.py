@@ -2310,6 +2310,9 @@ class SecretPathGuardTests(unittest.TestCase):
             # The separately quoted harmless -vS control is the documented correction; every other baseline refusal must remain.
             if command == 'env -vS "ls -l"':
                 continue
+            # The false-positive repair of 2026-10-12 (GuardFalsePositiveRepairTests) allows these by design; the rest must stay refused.
+            if command in FP_REPAIR_ALLOWED:
+                continue
             for revision, baseline in baselines:
                 try:
                     before = baseline.check(command)
@@ -3342,6 +3345,8 @@ K4_F_ALLOW = [
     "python3 -I - <<'PY'\nprint(set([1]))\nPY",
     "node --input-type=module - <<'JS'\nconst env = 1; console.log(env)\nJS",
 ]
+# F-ineligible rows that L2 (2026-10-12) allows: the body is still Python's, and TAIL-READ reads the text after the terminator.
+K4_L2_ALLOWED_REJECTS = {"python3 - <<'PY'\nprint(set([1]))\nPY\necho done"}
 K4_F_REJECT = [
     "python3 - <<PY\nprint(set([1]))\nPY",
     "python3 - <<-'PY'\n\tprint(set([1]))\n\tPY",
@@ -3464,7 +3469,7 @@ K4_CASES = {
         ('cat <<\'EOF\' > x\n"\nEOF\nprintenv\n"', 'environment_dump'),
     ],
     'f_reference_boundaries': [(text, None) for text in K4_F_ALLOW]
-        + [(text, 'environment_dump') for text in K4_F_REJECT],
+        + [(text, None if text in K4_L2_ALLOWED_REJECTS else 'environment_dump') for text in K4_F_REJECT],
     "manager_environment": [
         ('systemctl --user import-environment', 'manager_environment_write'),
         ('dbus-update-activation-environment --systemd --all', 'manager_environment_write'),
@@ -4415,6 +4420,10 @@ K4_HELPER_FIXTURES = {
     "k4_f_tail": "python3 - <<'PY' 2>/dev/null\npass\nPY",
     "k4_f_header": "python3 - <<'PY'\npass\nPY",
     "k4_form_f": "python3 - <<'PY'\npass\nPY",
+    "k4_code_bodies": "cd /tmp && python3 - <<'PY'\npass\nPY\ngit status",
+    "k4_redirections_after": "python3 - > /dev/null <<'PY'\npass\nPY\ngit status",
+    "k4_reserved_reason": "if true; then git status; fi",
+    "k4_reserved_segments": "if true; then git status; fi; f(1)",
     "k4_tail_reason": "cat <<'EOF' > note.md\ntext\nEOF\ngit status",
     "k4_unescape": "python3 - <<'PY'\nx = 'a\\n'\nPY",
     "k4_code_tokens": "python3 - <<'PY'\nimport os\nprint(os.environ.get('HOME'))\nPY",
@@ -4458,6 +4467,8 @@ K4_CHARGED = {
     "k4_f_header": (lambda: guard.k4_f_header(K4_TEXT), "characters", 300),
     "k4_f_tail": (lambda: guard.k4_f_tail(K4_TEXT), "characters", 200),
     "k4_form_f": (lambda: guard.k4_form_f(K4_TEXT), "characters", 100),
+    "k4_code_bodies": (lambda: guard.k4_code_bodies(K4_TEXT + "<<"), "characters", 100),
+    "k4_redirections_after": (lambda: guard.k4_redirections_after(K4_TEXT), "characters", 100),
     "k4_unescape": (lambda: guard.k4_unescape(K4_TEXT), "characters", 100),
     "k4_code_tokens": (lambda: guard.k4_code_tokens(K4_TEXT, "py"), "characters", 100),
     "k4_derived": (lambda: guard.k4_derived("true " + K4_TEXT), "characters", 100),
@@ -4605,6 +4616,10 @@ K4_SCALING = {
     "k4_f_tail": lambda n: "python3 - <<'PY' " + "> x " * (n // 4) + "\npass\nPY",
     "k4_f_arg": lambda n: "python3 - " + "a" * n + " <<'PY'\npass\nPY",
     "k4_form_f": lambda n: "python3 - <<'PY'\n" + "PYX\n" * (n // 4),
+    "k4_code_bodies": lambda n: "true; python3 - <<'PY'\n" + "PYX\n" * (n // 4) + "PY\ntrue",
+    "k4_redirections_after": lambda n: "true; python3 - " + "> x " * (n // 4) + "<<'PY'\npass\nPY",
+    "k4_reserved_reason": lambda n: "if true; then echo " + "a " * (n // 2) + "; fi",
+    "k4_reserved_segments": lambda n: "if true; then echo " + "a(1) " * (n // 5) + "; fi",
     "k4_code_tokens": lambda n: k4_code_f("import os\n" + "x = os.environ.get('HOME')\n" * (n // 27)),
     "k4_code_structure": lambda n: k4_code_f("import os\n" + "x = os.environ.get('HOME')\n" * (n // 27)),
     "k4_whole_environment": lambda n: k4_code_f("import os\n" + "x = os.environ.get('HOME')\n" * (n // 27)),
@@ -4774,7 +4789,9 @@ for _prefix in ('systemctl --user import-environment ', 'dbus-update-activation-
 K4_OWN_CHARGES = frozenset('''k4_anchors k4_needs_walk k4_names_and_stores k4_shell_words k4_program_operand_scan
 k4_script_position_scan k4_runner_start_scan k4_join k4_runner_mentions k4_runner_commands k4_runner_environment
 k4_visible_words k4_manager_reason k4_literal k4_store_reason k4_store_text k4_literal_input k4_ps_reason k4_canary_reason
-k4_regions k4_resume_contexts k4_f_tail k4_f_header k4_form_f k4_tail_reason k4_unescape k4_code_tokens
+k4_regions k4_resume_contexts k4_f_tail k4_f_header k4_form_f k4_code_bodies k4_redirections_after k4_reserved_reason k4_reserved_segments
+k4_tail_reason
+k4_unescape k4_code_tokens
 k4_code_structure k4_leading_literals k4_derived k4_shell_literals k4_shellouts k4_whole_environment k4_single_key
 k4_code_units k4_unit_environment_reason k4_gateway_reason k4_curl_expansions k4_gateway_url k4_curl_requests
 k4_wget_requests k4_httpie_requests k4_gateway_cli k4_gateway_shell k4_call_parts k4_code_value
@@ -4927,10 +4944,10 @@ class K4GuardTests(unittest.TestCase):
         for command, base_reason in K4_BASE_REFUSED.items():
             with self.subTest(command=command):
                 got = guard.check(command)
-                if reference_form_f(command) is None:
+                if reference_form_f(command) is None and command not in FP_REPAIR_ALLOWED:
                     self.assertEqual(got, base_reason)
                 elif got is None:
-                    self.assertIn(command, K4_F_ALLOW + [text for text, eligible in K4_F_LABELED if eligible])
+                    self.assertIn(command, K4_F_ALLOW + FP_REPAIR_ALLOWED + [text for text, eligible in K4_F_LABELED if eligible])
                 else:
                     self.assertNotEqual(fixtures[command], 'unstated')
                     self.assertEqual(got, fixtures[command])  # A5 CODE reason, explicitly asserted
@@ -5080,7 +5097,7 @@ class K4GuardTests(unittest.TestCase):
         for text, eligible in K4_F_LABELED:
             if "set(" in text:
                 with self.subTest(verdict=eligible, command=text):
-                    self.assertEqual(guard.check(text) is None, eligible)
+                    self.assertEqual(guard.check(text) is None, eligible or text in K4_L2_ALLOWED_REJECTS)
 
     def test_k4_language_comments_and_interpolation(self):
         self.cases('language_comments_and_interpolation')
@@ -5614,6 +5631,229 @@ class K4GuardTests(unittest.TestCase):
                     self.assertIn(word, hint)
                 self.assertNotIn("/api/settings/", hint)
                 self.assertNotIn("$", hint)
+
+
+# The command center's ruling of 2026-10-12 (17:19Z) on the guard's false positives, with the reserved-word segment gap folded in: L2 masks
+# the body of an interpreter here-document beyond form F, L3 reads string literals
+# as bash would before SHELL-LITERAL calls them commands, a printenv of inventory pointers with standard output on /dev/null is a presence
+# check, env and printenv --help or --version print no variable, and RESERVED reads the command after a leading reserved word. Every row
+# below that is allowed was refused by main at 2f59d744 (the guard pinned in adoption/hooks/claude/SHA256SUMS there), and every refused
+# row of RESERVED_REFUSED was allowed by it.
+FP_REPAIR_ALLOWED = [
+    # L2: an interpreter body after a prefix, before trailing text, behind a reserved word, an assignment, timeout or a redirection.
+    "python3 - <<'PY'\nprint(set([1]))\nPY\necho done",
+    "true; python3 - <<'PY'\nfound = sorted(set([1, 2]))\nPY\necho done",
+    "S=/tmp/x; cd /tmp && python3 -I - \"$S\" <<'PY'\nimport sys\nprint(set(sys.argv[1:]))\nPY\nls",
+    "F=$(ls -t | head -1); python3 - \"$F\" <<'PY'\nprint(set([1]))\nPY",
+    "for f in a b; do python3 - \"$f\" <<'PY'\nprint(set([1]))\nPY\ndone",
+    "cd /tmp && PYTHONDONTWRITEBYTECODE=1 python3 - <<'PY'\nprint(set([1]))\nPY",
+    "cd /tmp && timeout 120 python3 - <<'PY' 2>&1 | tail -30\nprint(set([1]))\nPY",
+    "cd /tmp && python3 -I - > out.txt 2>&1 <<'PY'\nprint(set([1]))\nPY",
+    "cd /tmp && node - <<'JS'\nconst env = {}; console.log(Object.keys(env))\nJS\necho done",
+    # Two bodies, and TAIL-READ reads the text between them without the second body.
+    "true; python3 - <<'PY'\nprint(set([1]))\nPY\ncd /tmp && python3 - <<'QQ'\nprint(set([2]))\nQQ\necho done",
+    # L3: Python source in a literal.
+    "python3 - <<'PY'\ns = '''\nfound = sorted(set(m))\n'''\nprint(len(s))\nPY",
+    # Pointer presence checks: the exit status answers, standard output goes to /dev/null.
+    "printenv PAPER_ENV_FILE >/dev/null && echo set || echo unset",
+    "printenv PAPER_ENV_FILE_2 HF_TOKEN_PATH > /dev/null 2>&1 && echo both",
+    "printenv SEC_CONTACT_ENV &>/dev/null || echo unset",
+    "printenv PAPER_ENV_FILE_C >& /dev/null; echo $?",
+    # Usage and version lines.
+    "env --help",
+    "env --version",
+    "printenv --version",
+]
+# Still refused: true positives and the shapes outside the repaired forms.
+FP_REPAIR_REFUSED = [
+    ("cd /tmp && python3 - <<'PY'\nimport os\nprint(dict(os.environ))\nPY", "environment_dump"),
+    ("true; python3 - <<'PY'\nprint(1)\nPY\nprintenv", "environment_dump"),
+    ("true; python3 - <<'PY' | sh\nprint(set([1]))\nPY", "environment_dump"),
+    ("cd /tmp && python3 - <<PY\nprint(set([1]))\nPY", "environment_dump"),
+    ("x=$(python3 - <<'PY'\nprint(set([1]))\nPY\n)", "environment_dump"),
+    ("echo \"\npython3 - <<'PY'\n\"\nprintenv\nPY", "environment_dump"),
+    ("sudo python3 - <<'PY'\nprint(set([1]))\nPY\ntrue", "environment_dump"),
+    ("true; python3 - <<'PY' <<'QQ'\nprint(set([1]))\nPY\nQQ", "environment_dump"),
+    ("true; python3 - <<'PY'\nimport subprocess\nsubprocess.run('printenv', shell=True)\nPY", "environment_dump"),
+    ("true; python3 - <<'PY'\nf = print\nf('printenv')\nPY", "environment_dump"),
+    ("true; python3 - <<'PY'\nx = '''\n(set)\n'''\nPY", "environment_dump"),
+    ("cat > run.sh <<'EOF'\nset\nEOF\nbash run.sh", "environment_dump"),
+    ("cat > notes.md <<'EOF'\nset\nEOF", "environment_dump"),
+    ("cat > check.py <<'EOF'\nprint(1)\nEOF\nprintenv", "environment_dump"),
+    ("cat > check.py <<'EOF' | sh\nset\nEOF", "environment_dump"),
+    ("cat > check.py <<'EOF'; bash check.py\nset\nEOF", "environment_dump"),
+    # A file a `cat` writes keeps both readings of its body, whatever its name, and a literal that is a method's only argument stays a
+    # standalone literal, whatever the method's name (Astra's full read of #1048 at d2fcf5b5, both P1s): these stay refused.
+    ("cat > check.py <<'EOF'\nprint(set([1]))\nEOF", "environment_dump"),
+    ("python3 - <<'PY'\nimport json\nd = json.loads('{}')\nprint(d.get('env'))\nPY", "environment_dump"),
+    ("python3 - <<'PY'\nlines = ['export A=1']\nprint([l for l in lines if l.startswith('export ')])\nPY", "environment_dump"),
+    ("set -a; . \"$PAPER_ENV_FILE\"; set +a; cat > c.py <<'EOF'\nimport os\nprint(os.environ.get('HOME'))\nEOF",
+     "environment_dump_after_source"),
+    ("printenv PAPER_ENV_FILE", "environment_dump"),
+    ("printenv PAPER_ENV_FILE | cat", "environment_dump"),
+    ("printenv PAPER_ENV_FILE >/dev/null 1>&2", "environment_dump"),
+    ("printenv PAPER_ENV_FILE 1 >/dev/null", "environment_dump"),
+    ("printenv PAPER_ENV_FILE >/tmp/out", "environment_dump"),
+    ("printenv -0 PAPER_ENV_FILE >/dev/null", "environment_dump"),
+    ("printenv HOME >/dev/null", "environment_dump"),
+    ("printenv \"$v\" >/dev/null", "environment_dump"),
+    ("env --helpx", "environment_dump"),
+    ("env --help printenv", "environment_dump"),
+]
+# RESERVED (tier k): each was allowed by main at 2f59d744; private record of the finding: the api-actions lane's
+# readers/guard-fp-20261012/FINDING-reserved-word-segments.md.
+RESERVED_REFUSED = [
+    ("if printenv; then :; fi", "environment_dump"),
+    ("while printenv; do break; done", "environment_dump"),
+    ("! printenv", "environment_dump"),
+    ("{ printenv; }", "environment_dump"),
+    ("if true; then printenv; fi", "environment_dump"),
+    ("until env; do :; done", "environment_dump"),
+    ("if set; then :; fi", "environment_dump"),
+    ("coproc printenv", "environment_dump"),
+    # A `name(` elsewhere changes no other segment: the dump on the first line still refuses.
+    ("if printenv; then :; fi\nfound = sorted(set(m))", "environment_dump"),
+    ("if cat ~/.ssh/id_rsa; then :; fi", "credential_file_read"),
+    ("{ cat .env; }", "dotenv_read"),
+    ("if grep -r GH_TOKEN .; then :; fi", "secret_name_search"),
+]
+# Astra's full read of #1048 at d2fcf5b5 (the read's verdict, a private record cited by name; both P1s): the head of that read allowed each of these, which
+# the merge base refused with the reason given. A written file's body can be run by a later command of the same request, and a method
+# name does not prove its receiver inert (an attribute can hold any callable: CPython v3.13.16 Doc/library/types.rst, SimpleNamespace).
+WRITTEN_AND_METHOD_REFUSED = [
+    ("cat > check.py <<'EOF'\nprintenv\nEOF\nbash check.py", "environment_dump"),
+    ("cat > check.py <<'EOF'\ncat .env\nEOF\nbash check.py", "dotenv_read"),
+    ("cat > check.py <<'EOF'\nsystemctl --user show-environment\nEOF\nbash check.py", "service_manager_environment"),
+    ("cat > check.py <<'EOF'\ncat ~/.ssh/id_rsa\nEOF\nbash check.py", "credential_file_read"),
+    ("cat > check.py <<'EOF'\nprintf 'protocol=https\\nhost=example.invalid\\n\\n' | git credential fill\nEOF\nbash check.py",
+     "native_token_print"),
+    ("python3 - <<'PY'\nimport os\nfrom types import SimpleNamespace\nx = SimpleNamespace(get=os.system)\nx.get('printenv')\nPY",
+     "environment_dump"),
+    ("python3 - <<'PY'\nimport os\nfrom types import SimpleNamespace\nx = SimpleNamespace(get=os.system)\nx.get('cat .env')\nPY",
+     "dotenv_read"),
+    ("python3 - <<'PY'\nimport os\nfrom types import SimpleNamespace\nx = SimpleNamespace(get=os.system)\n"
+     "x.get('systemctl --user show-environment')\nPY", "service_manager_environment"),
+    ("python3 - <<'PY'\nimport os\nfrom types import SimpleNamespace\nx = SimpleNamespace(get=os.system)\nx.get('cat ~/.ssh/id_rsa')\nPY",
+     "credential_file_read"),
+]
+# A request that can rebind the interpreter or `timeout` (a function, `function`, alias, `hash`, `enable`, BASH_CMDS or BASH_ALIASES,
+# PATH, a run-time variable name, eval, source, `.`, trap, a command named by an expansion) or names the interpreter by a path keeps both
+# base readings of every body. The first five rows are Astra's delta read of #1048 at b7fc4819 (P1, the read's verdict, a private record
+# cited by name); the rest are the other routes of the bash manual's "COMMAND EXECUTION" and BASH_CMDS/BASH_ALIASES entries.
+REBOUND_DISPATCHER_REFUSED = [
+    ("python3() { bash; }; python3 - <<'PY'\nprintenv\nPY\necho done", "environment_dump"),
+    ("python3() { bash; }\npython3 - <<'PY'\ncat .env\nPY\necho done", "dotenv_read"),
+    ("timeout() { shift; bash; }; timeout 1 python3 - <<'PY'\nprintenv\nPY\necho done", "environment_dump"),
+    ("python3() { bash; }; python3 - <<'PY'\nsystemctl --user show-environment\nPY\necho done", "service_manager_environment"),
+    ("python3() { bash; }; python3 - <<'PY'\ncat ~/.ssh/id_rsa\nPY\necho done", "credential_file_read"),
+    ("python3 ( ) { bash; }; python3 - <<'PY'\nprintenv\nPY\necho done", "environment_dump"),
+    ("function python3 { bash; }; python3 - <<'PY'\nprintenv\nPY\necho done", "environment_dump"),
+    ("shopt -s expand_aliases; alias python3=bash\npython3 - <<'PY'\nprintenv\nPY\necho done", "environment_dump"),
+    ("hash -p /bin/bash python3; python3 - <<'PY'\nprintenv\nPY\necho done", "environment_dump"),
+    ("BASH_CMDS[python3]=/bin/bash; python3 - <<'PY'\nprintenv\nPY\necho done", "environment_dump"),
+    ("a=BAS; b=H_CMDS; printf -v \"$a$b[python3]\" %s /bin/bash; python3 - <<'PY'\nprintenv\nPY\necho done",
+     "environment_dump"),
+    ("ln -s /bin/bash /tmp/w/python3 && PATH=/tmp/w python3 - <<'PY'\nprintenv\nPY\necho done", "environment_dump"),
+    ("ln -s /bin/bash ./python3 && ./python3 - <<'PY'\nprintenv\nPY\necho done", "environment_dump"),
+    ("x='python3() { bash; }'; eval \"$x\"; python3 - <<'PY'\nprintenv\nPY\necho done", "environment_dump"),
+    ("e=ev; ${e}al \"python3() { bash; }\"; python3 - <<'PY'\nprintenv\nPY\necho done", "environment_dump"),
+    (". ./defs.sh; python3 - <<'PY'\nprintenv\nPY\necho done", "environment_dump"),
+    ("for i in 1 2; do python3 - <<'PY'\nprintenv\nPY\nfunction python3 { bash; }; done", "environment_dump"),
+    ("a=PA; b=TH; export \"$a$b=/tmp/w\"; python3 - <<'PY'\nprintenv\nPY\necho done", "environment_dump"),
+    ("v=PA; w=TH; declare -n r=\"$v$w\"; r=/tmp/w; python3 - <<'PY'\nprintenv\nPY\necho done", "environment_dump"),
+]
+# Astra's fix2 delta read of #1048 at 59251ed6 (P1; the read's verdict, a private record cited by name): an operator is read from its
+# unquoted source spelling, and a separator ends any pending redirection target, so the command after it is read. The first two rows
+# are the read's; each also runs through the real hook.
+QUOTED_OPERATOR_REFUSED = [
+    ("e=ev; echo '>'; ${e}al 'python3() { bash; }'; python3 - <<'PY'\nprintenv\nPY\necho done", "environment_dump"),
+    ("e=ev; echo '<'; ${e}al 'python3() { bash; }'; python3 - <<'PY'\nprintenv\nPY\necho done", "environment_dump"),
+    ("e=ev; echo \\>; ${e}al 'python3() { bash; }'; python3 - <<'PY'\nprintenv\nPY\necho done", "environment_dump"),
+    ("e=ev; echo \">\"\n${e}al 'python3() { bash; }'; python3 - <<'PY'\nprintenv\nPY\necho done", "environment_dump"),
+]
+# Controls: without a rebinding an L2 body is code; a rebinding only withdraws the exemption (a clean body stays allowed).
+REBOUND_DISPATCHER_CONTROLS = [
+    ("true; python3 - <<'PY'\nenv = {'a': 1}\nprint(env)\nPY\necho done", None),
+    ("cd /tmp && timeout 5 python3 - <<'PY'\nenv = {'a': 1}\nprint(env)\nPY\necho done", None),
+    ("hash -p /usr/bin/python3 python3; python3 - <<'PY'\nprint(1)\nPY\necho done", None),
+    ("export LC_ALL=C X=\"$HOME/x\"; python3 - <<'PY'\nenv = {'a': 1}\nprint(env)\nPY\necho done", None),
+    ("git commit -m 'fix f()'; echo export; python3 - <<'PY'\nenv = {'a': 1}\nprint(env)\nPY\necho done", None),
+    ("echo '()'; python3 - <<'PY'\nenv = {'a': 1}\nprint(env)\nPY\necho done", None),
+    ("echo '>' '|' ';' \\( \\); python3 - <<'PY'\nenv = {'a': 1}\nprint(env)\nPY\necho done", None),
+]
+# RESERVED stays off inside SHELL-LITERAL readings: Python's conditional expression `a if b else set()` in a literal of Python source
+# would read, after the call's `)`, as the reserved word `else` and the segment `set` (the replay's one such command, 2026-10-12).
+RESERVED_OFF_IN_LITERALS = ["python3 - <<'PY'\nsrc = '''\nseen = found if d.get('k') else set()\n'''\nprint(len(src))\nPY"]
+RESERVED_ALLOWED = [
+    # A data body keeps both shell readings; Python's `if set(a) != set(b):` in it is no `if` followed by a bare `set`, since bash runs
+    # nothing from `set(` (k4_reserved_segments; the replay's one such command, which main allowed, 2026-10-12).
+    "cat > notes.txt <<'EOF'\n    if set(x) != set(y):\nEOF",
+    "if true; then echo ok; fi",
+    "for f in a b; do echo \"$f\"; done",
+    "while read -r line; do echo \"$line\"; done < list.txt",
+    "{ echo a; echo b; } > out.txt",
+    "if ! git diff --quiet; then git status; fi",
+]
+
+
+class GuardFalsePositiveRepairTests(unittest.TestCase):
+    def test_repaired_forms_pass(self):
+        for command in FP_REPAIR_ALLOWED:
+            with self.subTest(command=command):
+                self.assertIsNone(guard.check(command))
+
+    def test_true_positives_and_unrepaired_forms_stay_refused(self):
+        for command, reason in FP_REPAIR_REFUSED:
+            with self.subTest(command=command):
+                self.assertEqual(guard.check(command), reason)
+
+    def test_every_inventory_pointer_has_a_presence_check_and_no_value_print(self):
+        inventory = json.loads((ROOT / "adoption/credential-inventory.json").read_text())
+        pointers = {name for entry in inventory["entries"] for name in entry["pointer_variables"]}
+        for name in sorted(pointers):
+            with self.subTest(name=name):
+                self.assertIsNone(guard.check(f"printenv {name} >/dev/null"))
+                self.assertEqual(guard.check(f"printenv {name}"), "environment_dump")
+
+    def test_a_segment_after_reserved_words_gets_every_rule(self):
+        for command, reason in RESERVED_REFUSED:
+            with self.subTest(command=command):
+                self.assertEqual(guard.check(command), reason)
+        for command in RESERVED_ALLOWED:
+            with self.subTest(command=command):
+                self.assertIsNone(guard.check(command))
+
+    def test_l2_spans_are_the_bodies_bash_reads(self):
+        # Each masked span starts after its operator line and ends where its terminator line starts; a written file's body is none.
+        text = "true; python3 - <<'PY'\nprint(set([1]))\nPY\ncat > c.py <<'EOF'\nx = 1\nEOF\necho done"
+        guard.start_work()
+        try:
+            bodies = guard.k4_code_bodies(text)
+        finally:
+            guard.stop_work()
+        self.assertEqual([(language, text[start:end]) for language, start, end in bodies], [("py", "print(set([1]))\n")])
+
+    def test_a_written_body_and_a_method_argument_keep_their_refusals(self):
+        for command, reason in WRITTEN_AND_METHOD_REFUSED:
+            with self.subTest(command=command):
+                self.assertEqual(guard.check(command), reason)
+
+    def test_a_rebindable_dispatcher_keeps_the_base_readings(self):
+        for command, reason in REBOUND_DISPATCHER_REFUSED + QUOTED_OPERATOR_REFUSED + REBOUND_DISPATCHER_CONTROLS:
+            with self.subTest(command=command):
+                self.assertEqual(guard.check(command), reason)
+
+    def test_a_quoted_operator_hides_no_command_from_the_hook(self):
+        for command, reason in QUOTED_OPERATOR_REFUSED:
+            with self.subTest(command=command):
+                refused = run_hook({"tool_name": "Bash", "tool_input": {"command": command}})
+                self.assertEqual(refused.returncode, 2)
+                self.assertIn(f"blocked ({reason})", refused.stderr)
+
+    def test_reserved_stays_off_inside_literal_readings(self):
+        for command in RESERVED_OFF_IN_LITERALS:
+            with self.subTest(command=command):
+                self.assertIsNone(guard.check(command))
 
 
 if __name__ == "__main__":

@@ -5392,7 +5392,7 @@
     },
     {
       "path": "adoption/hooks/claude/SHA256SUMS",
-      "sha256": "1dd5700d8b131fdc3f7c187abe4cf7931c27d3dd18e027368e8f89b7f8da3afa",
+      "sha256": "e253abf176993dc6b563191fee6bc4e61c97f67427a2071e9b5cf5ca39ca5c68",
       "bytes": 1229
     },
     {
@@ -17338,7 +17338,7 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "04fb844bc79dfae6310cc4def7c40d475d7283707a4ed394155704ff67241955",
+      "sha256": "8f5ef7382698a27c0da068cc7f1541212ae3b6d60a631cc541d8f2ff65227502",
       "bytes": 190328
     },
     {
@@ -18778,8 +18778,8 @@
     },
     {
       "path": "docs/decisions/2026-10-08-guard-hook-fails-closed.md",
-      "sha256": "9a1097a58c45a2e84d177e839a9ef0e4c7a40f4d68a913ba3527aba24438dac3",
-      "bytes": 20420
+      "sha256": "49d63eda659f90db7c3e0b0a6a643a5236b59c6df1ecb1f092e46f8aff90b903",
+      "bytes": 20637
     },
     {
       "path": "docs/decisions/2026-10-08-harness-rules-consolidation.md",
@@ -19413,8 +19413,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "395fef8b4464cbbb92f445be15f8d52e1416a0efe6b2a9d7e6f90e12ad7ae3ed",
-      "bytes": 204416
+      "sha256": "e60b0eb2e23e939b973f2dc8df6fa9978cc8d47cb96e6ad1f8cb9b124092dd6f",
+      "bytes": 217010
     },
     {
       "path": "docs/stack.md",
@@ -61348,8 +61348,8 @@
     },
     {
       "path": "scripts/hooks/secret_path_guard.py",
-      "sha256": "ce9027c56a7006317f52c6cfc2bcb9b267a4f37050269ccdbd001d1371f7d83a",
-      "bytes": 297056
+      "sha256": "097c724fa6921a78274c654a41b04b6c0cce8f0001a667513447046e76fd0cb2",
+      "bytes": 317474
     },
     {
       "path": "scripts/host_name_scan.py",
@@ -63073,8 +63073,8 @@
     },
     {
       "path": "tests/test_secret_path_guard.py",
-      "sha256": "4891bf55e134d01b26491b37b41fba2f1dccac2525c98f984da95fa914e68a53",
-      "bytes": 393630
+      "sha256": "4e7f12f20920f5ea02d010f6032c836d42722cb3c874e8ac73393aa8503028f4",
+      "bytes": 410914
     },
     {
       "path": "tests/test_secret_scan_metrics.py",
