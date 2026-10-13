@@ -1,0 +1,17 @@
+The 14 mutants of round 2 of #1074 (CPA-V-07; the local codex review of f7e0cd70 and Astra's read of 48e083e8): the client's switch for the bundled claude-api (read or not, its key, its variable, its spellings, the precedence of the settings env entry, an unreadable settings file, the name passed, a personal twin) and the not-listed state of a bundled twin that no route lists (its condition, the switches, an unregistered plugin). Each is one exact change in place, restored after each run, then tests.test_skills_manifest, tests.test_skills_status, tests.test_skill_usage_daily and tests.test_plugin_skill_identity_receipts; a mutant is killed when the run fails (the unmutated run passes first).
+
+killed   (failed) the skill's own switch is not read
+killed   (failed) any bundled name has the claude-api switch
+killed   (failed) the switch names another variable
+killed   (failed) the settings env entry does not override the process environment
+killed   (failed) the process environment is ignored
+killed   (failed) the variable's words are not lower-cased
+killed   (failed) the variable's value is not stripped
+killed   (failed) an unreadable settings file lets the switches apply
+killed   (failed) the skill's own switch is passed no name
+killed   (failed) a personal twin is hidden by the switches
+killed   (failed) a bundled twin that no route lists passes
+killed   (failed) a personal twin that is hidden with no plugin is not listed
+killed   (failed) the not-listed state ignores the switches
+killed   (failed) an unregistered plugin is not a missing route
+14 mutants, 14 killed, survivors: none

@@ -1,0 +1,10 @@
+The tests of round 2 of #1074 (CPA-V-07: the local codex review of f7e0cd70 and Astra's read of 48e083e8) against the sources and receipts of f7e0cd703, the head that was read, and against this head. A test is listed once, with the number of its failing subtests and the first message.
+
+== f7e0cd703, the head that was read (its sources and receipts, these test files)
+   tests.test_skills_status: Ran 100, FAILED (failures=16)
+      test_a_bundled_twin_that_no_route_lists_is_not_listed_and_fails_the_row: 6 failing, e.g. hidden_by='skillOverrides off' | {'state': 'ok', 'twin': 'claude-api', 'plugin_present': False} != {'state': 'not_listed', 'twin': 'claude-api'
+      test_the_skill_specific_switch_hides_the_bundled_twin_and_only_that_twin: 10 failing, e.g. process_environment='1' | 'duplicate_listing' != 'ok'
+== this head
+   tests.test_skills_status: Ran 100, OK
+
+Tests that fail or raise on f7e0cd703: 2 (test_skills_status). The tests that hold at both heads are the guards: the personal twin that the skill's own switch leaves visible, a disabled plugin with the bundled copy visible, an enabled plugin with the twin hidden.

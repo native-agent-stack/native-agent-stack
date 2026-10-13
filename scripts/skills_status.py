@@ -484,6 +484,43 @@ def env_text(value):
     return value if isinstance(value, str) else None
 
 
+# The client's own switch for one bundled skill, beside the all-bundled one: `registerClaudeApiSkill({disabled: env.CLAUDE_CODE_DISABLE_CLAUDE_API_SKILL === true})` in the installed 2.1.296 binary (the function that
+# initializes the bundled skills, byte offset 225255110; receipts/skill-switch-init-records.json: 77 skills listed, 76 with the switch, the bundled claude-api gone and the plugin's kept). The documentation lists
+# neither the variable nor the function; the client is the primary source. Keyed by the bundled skill's name.
+BUNDLED_SKILL_SWITCHES = {"claude-api": "CLAUDE_CODE_DISABLE_CLAUDE_API_SKILL"}
+
+
+def env_switch(settings_env: dict, env, name: str) -> bool:
+    """Whether the variable ``name`` reads as set for the client: the settings ``env`` entry (a string, number or boolean) when there is one, else the process environment; 1, true, yes and on in any case, padded
+    or not (measured on 2.1.296 for both switches: 0, 2, false and an empty value do not)."""
+    value = env_text(settings_env[name]) if name in settings_env else env_text(env.get(name))
+    return value is not None and value.strip().lower() in ENV_TRUE_WORDS
+
+
+def read_switches(path: Path):
+    """(disableBundledSkills is the JSON boolean true, the settings ``env`` mapping) of the settings file; None when it cannot be read (the switches then disable nothing: the personal copy's own listing check reports
+    the unreadable file, as for the all-bundled switch before)."""
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    data = data if isinstance(data, dict) else {}
+    return data.get("disableBundledSkills") is True, data.get("env") if isinstance(data.get("env"), dict) else {}
+
+
+def bundled_skill_disabled(path: Path, env, name: str | None = None) -> bool:
+    """Whether Claude Code does not list its bundled skill ``name``: the all-bundled switch (bundled_skills_disabled) or, where the client has one for that skill, the skill's own (BUNDLED_SKILL_SWITCHES). A
+    skill with no switch of its own is hidden only by the all-bundled one."""
+    switches = read_switches(path)
+    if switches is None:
+        return False
+    setting, settings_env = switches
+    if setting or env_switch(settings_env, env, BUNDLED_SKILLS_ENV):
+        return True
+    switch = BUNDLED_SKILL_SWITCHES.get(name or "")
+    return bool(switch) and env_switch(settings_env, env, switch)
+
+
 def bundled_skills_disabled(path: Path, env) -> bool:
     """Whether Claude Code lists none of its bundled skills: ``disableBundledSkills`` in the user settings is the JSON boolean true, or ``CLAUDE_CODE_DISABLE_BUNDLED_SKILLS`` reads as set. The documentation gives the
     variable as equivalent to the setting (code.claude.com/docs/en/env-vars, fetched 2026-10-13: the variable's row; skills.md L29 and L333; anthropics/claude-code@3deb873687379f0c199a69fdaccc65f0865f7a29
@@ -491,14 +528,7 @@ def bundled_skills_disabled(path: Path, env) -> bool:
     kept; only the boolean true counts in the setting (the string "true", the number 1 and null disable nothing); the variable counts as 1, true, TRUE, yes, on and a padded " 1" (not 0, 2 or an empty value); the
     settings ``env`` entry, a string, number or boolean, overrides the process environment (1 in the environment and 0 in the entry: not disabled); the setting and the variable each disable alone. The environment passed
     here stands for the client's, which a launcher may set otherwise. A settings file that cannot be read disables nothing: the personal copy's own listing check reports it."""
-    try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, ValueError):
-        return False
-    data = data if isinstance(data, dict) else {}
-    settings_env = data.get("env") if isinstance(data.get("env"), dict) else {}
-    value = env_text(settings_env[BUNDLED_SKILLS_ENV]) if BUNDLED_SKILLS_ENV in settings_env else env_text(env.get(BUNDLED_SKILLS_ENV))
-    return data.get("disableBundledSkills") is True or (value is not None and value.strip().lower() in ENV_TRUE_WORDS)
+    return bundled_skill_disabled(path, env, None)
 
 
 def claude_twin_ids(skill: dict) -> str | None:
@@ -511,7 +541,8 @@ def check_claude_twin(skill: dict, overrides: dict, enabled: set, plugin: dict |
     """Claude Code lists a plugin's skill as ``<plugin>:<skill>`` and skillOverrides cannot hide it (measured on 2.1.296: docs/decisions/2026-10-13-plugin-skill-identity.md), so a skill that a plugin and the other copy
     (a personal one, or the client's bundled one) both deliver is listed twice, and only the copy that is not the plugin's can be hidden. ``plugin`` is plugin_status of the row's plugin. State "ok" for a row without a
     twin, for a host on which the plugin is not enabled and installed (one copy), and for a host where the twin is hidden: "off" in skillOverrides under the twin's name, or, for the client's bundled twin, bundled
-    skills disabled as a whole (``bundled_disabled``: disableBundledSkills or its environment equivalent, which hide no personal copy); "duplicate_listing" when the plugin is present and the twin is not hidden (also
+    skills disabled as a whole or by the client's switch for that skill (``bundled_disabled``: disableBundledSkills, its environment equivalent or CLAUDE_CODE_DISABLE_CLAUDE_API_SKILL, which hide no personal copy);
+    "not_listed" when the plugin is not listed (not enabled or not registered) and the bundled twin is hidden: no route lists the skill; "duplicate_listing" when the plugin is present and the twin is not hidden (also
     when skillOverrides has the wrong type, which hides nothing); "plugin_invalid" when the plugin is installed and enabled but is not the pinned one (another commit, a folder outside the plugin cache, a SKILL.md
     that is not the pinned bytes or cannot be read): the client lists it all the same, so hiding the other copy would leave an unscreened skill as the only one. A settings.json that cannot be read lists no enabled
     plugin, so no plugin is present: the personal copy's own listing check reports the unreadable file."""
@@ -519,11 +550,15 @@ def check_claude_twin(skill: dict, overrides: dict, enabled: set, plugin: dict |
     if plugin_id is None or plugin is None:
         return {"state": "ok", "twin": None, "plugin_present": None}
     twin_name = skill["bundled_twin"] if skill.get("bundled_twin") else skill["name"]
+    hidden = overrides.get(twin_name) == "off" or (bool(skill.get("bundled_twin")) and bundled_disabled)
     if not (plugin["registered"] and plugin_id in enabled):
+        # No plugin copy is listed. A hidden bundled twin then leaves the skill listed by no route at all (Astra's read of 48e083e8, P2: a disabled plugin and `claude-api: off` passed). A personal twin is
+        # listed by the manifest's own listing check, which says so.
+        if skill.get("bundled_twin") and hidden:
+            return {"state": "not_listed", "twin": twin_name, "plugin_present": False}
         return {"state": "ok", "twin": twin_name, "plugin_present": False}
     if plugin["state"] != "ok":
         return {"state": "plugin_invalid", "twin": twin_name, "plugin_present": True, "plugin": "cache_unreadable" if plugin["state"] == "missing" else plugin["state"]}
-    hidden = overrides.get(twin_name) == "off" or (bool(skill.get("bundled_twin")) and bundled_disabled)
     return {"state": "ok" if hidden else "duplicate_listing", "twin": twin_name, "plugin_present": True}
 
 
@@ -746,7 +781,6 @@ def inspect(manifest: dict, home: Path, env=None, skills_bin: str | None = None)
     settings_file = claude_settings_path(home, env)
     overrides, overrides_state = load_skill_overrides(settings_file)
     enabled_plugins = load_enabled_plugins(settings_file)
-    bundled_disabled = bundled_skills_disabled(settings_file, env)
     claude_config = claude_config_dir(home, env)
     codex_config_file = codex_config_path(home, env)
     codex_config, codex_config_state = load_codex_config(codex_config_file)
@@ -757,7 +791,8 @@ def inspect(manifest: dict, home: Path, env=None, skills_bin: str | None = None)
         plugin_id = skill.get("native_plugin") or skill.get("claude_plugin")
         twin = None
         if claude_twin_ids(skill):
-            twin = check_claude_twin(skill, overrides, enabled_plugins, plugin_status(plugin_id, skill, claude_config), bundled_disabled)
+            twin = check_claude_twin(skill, overrides, enabled_plugins, plugin_status(plugin_id, skill, claude_config),
+                                     bundled_skill_disabled(settings_file, env, skill.get("bundled_twin")))   # a personal twin ignores it: check_claude_twin applies it to a bundled twin only
         # Where a plugin also delivers this skill, the personal copy is hidden (the host's skillOverrides), so the listing expected here is "off".
         listing_row = {**skill, "claude_listing": "off"} if twin and twin["plugin_present"] else skill
         if skill.get("native_plugin"):
