@@ -36,11 +36,38 @@ CATEGORIES = {
     "mcp-code-navigation": "MCP code navigation",
     "evaluation-harnesses": "evaluation harness",
 }
+MANDATORY = (
+    "ccplugins/awesome-claude-code-plugins",
+    "jqueryscript/awesome-claude-code",
+    "VoltAgent/awesome-claude-code-subagents",
+)
+# Own metadata only: README keywords cannot establish category eligibility.
+# These lexical synonyms are selection rules, not target capability judgments.
+EXTENSION_PREDICATES = {
+    "agent-orchestration": (r"orchestrat|multi[ -]agent|agent(?:ic)? (?:framework|platform|workflow)",),
+    "agent-observability": (r"observability|monitoring|tracing", r"agent|agentic|llm|language model|mcp"),
+    "coding-agent-harnesses": (r"coding[ -](?:agent|assistant)|code[ -](?:agent|assistant)|claude[ -]code|codex|agent[ -]harness",),
+    "agent-memory": (r"memory|long[ -]term (?:knowledge|context)", r"agent|agentic|llm|language model|mcp|ai"),
+    "mcp-code-navigation": (r"mcp|model context protocol", r"code[ -](?:navigation|search|analysis|understanding)|codebase|source[ -]code"),
+    "evaluation-harnesses": (r"evaluat|benchmark|\bevals?\b", r"agent|agentic|llm|language model|ai"),
+}
+
+
+def extension_categories(row: dict) -> list[str]:
+    metadata = " ".join([row.get("description") or "", *row.get("topics", [])]).lower()
+    metadata = metadata.replace("-", " ").replace("_", " ")
+    return [category for category, patterns in EXTENSION_PREDICATES.items()
+            if all(re.search(pattern, metadata, re.I) for pattern in patterns)]
+
+
+def extension_top_two(rows: list[dict], category: str) -> list[dict]:
+    return sorted((row for row in rows if category in extension_categories(row)),
+                  key=lambda row: (-row["stargazers_count"], row["full_name"].lower()))[:2]
 RESERVED = {
     "about", "apps", "collections", "contact", "enterprise", "events", "explore",
     "features", "issues", "login", "marketplace", "new", "notifications", "orgs",
     "pricing", "pulls", "readme", "search", "security", "settings", "site",
-    "sponsors", "topics", "users",
+    "sponsors", "topics", "users", "user-attachments",
 }
 SLUG = re.compile(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+\Z")
 RAW_REPOSITORY_URL = re.compile(
@@ -49,6 +76,40 @@ RAW_REPOSITORY_URL = re.compile(
 ATX = re.compile(r"^ {0,3}(#{1,6})(?:[ \t]+|$)(.*)$")
 SETEXT = re.compile(r"^ {0,3}(=+|-+)[ \t]*$")
 FENCE = re.compile(r"^ {0,3}(`{3,}|~{3,})(.*)$")
+REFERENCE_DEFINITION = re.compile(r"^ {0,3}\[([^\]\n]+)\]:[ \t]*<?([^\s>]+)", re.M)
+
+
+def visible_reference_definitions(text: str) -> tuple[set[int], list[dict]]:
+    """Keep used definitions at their source location; audit unused ones.
+
+    Recognize full, collapsed and shortcut references, ignoring code, image
+    references and definition lines when looking for visible reference uses.
+    The native HTML repository-set comparison checks this lexical boundary.
+    """
+    def label(value):
+        return " ".join(value.split()).casefold()
+
+    definitions = list(REFERENCE_DEFINITION.finditer(text))
+    usage = REFERENCE_DEFINITION.sub("", text)
+    usage = re.sub(r"(`+).*?\1", "", usage, flags=re.S)
+    usage = re.sub(r"!\[[^\]\n]*\][ \t]*\[[^\]\n]*\]", "", usage)
+    usage = re.sub(r"!\[[^\]\n]*\](?![\[(])", "", usage)
+    used = set()
+    for match in re.finditer(r"(?<!!)(?<!\\)\[([^\[\]\n]+)\](?:[ \t]*\[([^\[\]\n]*)\])?(?![ \t]*[\[(])", usage):
+        used.add(label(match[2] if match[2] else match[1]))
+    suppressed, unused, seen = set(), [], set()
+    for match in definitions:
+        key = label(match[1])
+        line = text.count("\n", 0, match.start()) + 1
+        if key not in used or key in seen:
+            suppressed.add(line)
+            slug = repository_link(match[2])
+            unused.append({"label": match[1], "normalized_label": key, "line": line,
+                           "requested_repository": slug,
+                           "url": "https://github.com/" + slug if slug else None,
+                           "reason": "duplicate definition" if key in seen else "no visible reference link uses this label"})
+        seen.add(key)
+    return suppressed, unused
 
 
 def strip_comments_and_fences(text: str) -> str:
@@ -73,6 +134,7 @@ def strip_comments_and_fences(text: str) -> str:
 
 def parse_raw(text: str) -> dict:
     cleaned = strip_comments_and_fences(text)
+    suppressed, unused = visible_reference_definitions(cleaned)
     lines = cleaned.splitlines()
     heading_at = {}
     for index, line in enumerate(lines):
@@ -100,7 +162,7 @@ def parse_raw(text: str) -> dict:
                              "headings": [h for _, h, _ in stack], "line": index + 1})
             entry_heading = line.strip()
         section = next(s for s in sections if s["id"] == section_id)
-        for match in RAW_REPOSITORY_URL.finditer(line):
+        for match in RAW_REPOSITORY_URL.finditer(line if index + 1 not in suppressed else ""):
             url = match.group()
             if not url.lower().startswith(("http://", "https://")):
                 url = "https://" + url
@@ -114,10 +176,12 @@ def parse_raw(text: str) -> dict:
                               "section_id": section_id, "section": section["heading"],
                               "entry_heading": entry_heading, "line": index + 1,
                               "occurrence": len(links) + 1, "kind": "link"})
-    local_links = re.findall(r"\]\(\s*<?([^\s)>]+)", cleaned)
-    local_links += re.findall(r"^ {0,3}\[[^\]]+\]:\s*<?([^\s>]+)", cleaned, flags=re.M)
-    local_links += [match.group() for match in RAW_REPOSITORY_URL.finditer(cleaned)]
-    return {"sections": sections, "links": links, "local_links": local_links}
+    visible = "\n".join(line if index + 1 not in suppressed else "" for index, line in enumerate(lines))
+    local_links = re.findall(r"\]\(\s*<?([^\s)>]+)", visible)
+    local_links += re.findall(r"^ {0,3}\[[^\]]+\]:\s*<?([^\s>]+)", visible, flags=re.M)
+    local_links += [match.group() for match in RAW_REPOSITORY_URL.finditer(visible)]
+    return {"sections": sections, "links": links, "local_links": local_links,
+            "unused_reference_definitions": {"count": len(unused), "definitions": unused}}
 
 
 def repository_overlap(raw_links: list[dict], html_links: list[dict]) -> dict:
@@ -521,7 +585,7 @@ def search_lists(github: Github, query: str, purpose: str) -> dict:
     })
     if result.get("incomplete_results"):
         raise ValueError("GitHub search returned incomplete results")
-    fields = ("full_name", "name", "stargazers_count", "pushed_at", "archived", "default_branch")
+    fields = ("full_name", "name", "description", "topics", "stargazers_count", "pushed_at", "archived", "default_branch")
     return {"purpose": purpose, "query": query, "read_at": read_at,
             "total_count": result["total_count"],
             "returned": [{key: row[key] for key in fields} for row in result["items"]]}
@@ -533,7 +597,7 @@ def select_lists(github: Github, directory: Path) -> dict:
     searches = []
     selections: dict[str, list[dict]] = defaultdict(list)
     for name in NAMES:
-        query = f"{name} in:name pushed:>={cutoff} archived:false"
+        query = f"{name} in:name archived:false"
         search = search_lists(github, query, "named:" + name)
         matches = [r for r in search["returned"] if r["name"].lower() == name]
         if not matches:
@@ -542,19 +606,41 @@ def select_lists(github: Github, directory: Path) -> dict:
         search["selected"] = [chosen["full_name"]]
         searches.append(search)
         selections[chosen["full_name"]].append({"named_list": name,
-            "rule": "highest-star exact repository name, nonarchived, pushed within 90 days; named lists have no minimum-star rule"})
-    for category, keywords in CATEGORIES.items():
-        query = (f"awesome {keywords} in:name,description,readme topic:awesome-list "
-                 f"stars:>=1000 pushed:>={cutoff} archived:false")
-        search = search_lists(github, query, "extension:" + category)
-        chosen = search["returned"][:2]
-        if len(chosen) != 2:
-            raise ValueError(f"fewer than two extension lists: {category}")
-        search["selected"] = [r["full_name"] for r in chosen]
-        searches.append(search)
+            "rule": "highest-star exact nonarchived repository name; mandatory inclusion has no star or push threshold"})
+    for repo in MANDATORY:
+        searches.append({"purpose": "mandatory:" + repo, "query": None, "read_at": utc(), "selected": [repo]})
+        selections[repo].append({"mandatory_list": repo, "rule": "unconditional CC inclusion"})
+    query = f"awesome in:name stars:>=1000 pushed:>={cutoff} archived:false is:public"
+    candidates = []
+    fields = ("full_name", "name", "description", "topics", "stargazers_count", "pushed_at", "archived", "default_branch")
+    pages = []
+    page = 1
+    while True:
+        read_at = utc()
+        result = github.api("search/repositories", fields={"q": query, "sort": "stars", "order": "desc", "per_page": 100, "page": page})
+        if result.get("incomplete_results") or result["total_count"] > 1000:
+            raise ValueError("discovery pool is incomplete; partition search before selection")
+        rows = [{key: row[key] for key in fields} for row in result["items"]]
+        pages.append({"page": page, "read_at": read_at, "total_count": result["total_count"], "returned_count": len(rows)})
+        candidates.extend(rows)
+        if page * 100 >= result["total_count"]:
+            break
+        page += 1
+    if len({row["full_name"].lower() for row in candidates}) != len(candidates):
+        raise ValueError("duplicate discovery results across pages")
+    shortfalls = []
+    for category in CATEGORIES:
+        chosen = extension_top_two(candidates, category)
+        eligible = sum(category in extension_categories(row) for row in candidates)
+        searches.append({"purpose": "extension:" + category, "query": query,
+                         "read_at": pages[0]["read_at"], "selected": [r["full_name"] for r in chosen],
+                         "own_metadata_patterns": list(EXTENSION_PREDICATES[category]),
+                         "qualifying_count": eligible, "selected_count": len(chosen)})
+        if len(chosen) < 2:
+            shortfalls.append({"category": category, "actual_selected_count": len(chosen), "qualifying_count": eligible})
         for row in chosen:
             selections[row["full_name"]].append({"extension_category": category,
-                "rule": "top two GitHub results by stars; awesome-list topic restricts search to curated lists"})
+                "rule": "top two by stars from complete awesome-name pool, specific own description/topics predicate; no topic restriction or substitute"})
     lists = []
     for requested, selected_for in sorted(selections.items()):
         resolution = github.repository(requested)
@@ -566,9 +652,13 @@ def select_lists(github: Github, directory: Path) -> dict:
         lists.append({"repository": repo, "repository_id": resolution["repository_id"],
                       "url": resolution["url"], "commit": commit, "read_at": utc(),
                       "stars": metadata["stargazers_count"], "pushed_at": metadata["pushed_at"],
+                      "description": metadata.get("description"), "topics": metadata.get("topics", []),
                       "selected_for": selected_for})
     result = {"schema_version": 1, "kind": "awesome-list-selection", "started_at": started_at,
-              "cutoff": str(cutoff), "searches": searches, "lists": lists}
+              "selection_version": 2, "cutoff": str(cutoff), "searches": searches, "lists": lists,
+              "discovery": {"query": query, "pages": pages, "candidate_count": len(candidates),
+                            "candidates": [{**row, "qualifying_categories": extension_categories(row)} for row in candidates]},
+              "extension_shortfalls": shortfalls}
     write_json(directory / "selection.json", result)
     return result
 
@@ -655,12 +745,15 @@ def collect_raw(github: Github, directory: Path) -> dict:
                 "source": {"kind": "repo", "repository": f"https://github.com/{repo}",
                            "pin": commit, "path": path, "line": 1},
                 "sections": parsed["sections"], "links": parsed["links"]})
+            documents[-1]["unused_reference_definitions"] = parsed["unused_reference_definitions"]
         compared = [doc for doc in documents if doc["html_crosscheck"]["status"] == "rendered"]
         overlap = repository_overlap([r for d in compared for r in d["links"]],
                                      [r for d in compared for r in d["html_links"]])
         overlap["compared_files"] = [d["path"] for d in compared]
         overlap["not_rendered_files"] = [d["path"] for d in documents if d not in compared]
         overlap["status"] = "measured" if compared else "not_available"
+        if not compared:
+            overlap["jaccard"] = None
         lists.append({"repository": repo, "repository_id": resolution["repository_id"],
             "url": resolution["url"], "commit": commit, "read_at": started_at,
             "stars": metadata["stargazers_count"], "pushed_at": metadata["pushed_at"],
@@ -668,9 +761,15 @@ def collect_raw(github: Github, directory: Path) -> dict:
             "raw_media_type": "application/vnd.github.raw", "raw_ref": commit,
             "html_crosscheck_media_type": "application/vnd.github.html+json", "html_crosscheck_ref": commit,
             "overlap": overlap, "unavailable_or_translated_documents": ignored})
+        unused = [{"path": doc["path"], **row} for doc in documents
+                  for row in doc["unused_reference_definitions"]["definitions"]]
+        lists[-1]["unused_reference_definitions"] = {"count": len(unused), "definitions": unused}
         progress = {"schema_version": 1, "kind": "awesome-list-raw-corpus", "started_at": started_at,
             "cutoff": previous["cutoff"], "searches": previous["searches"], "lists": lists,
             "canonicalization": [], "status": "collecting_raw"}
+        if previous.get("selection_version") == 2:
+            progress["selection_version"] = 2
+            progress["extension_shortfalls"] = previous["extension_shortfalls"]
         write_json(directory / "raw-progress.json", progress)
         print(json.dumps({"list": repo, "documents": len(documents), "overlap": overlap["jaccard"],
                           "raw_only": len(overlap["raw_only"]), "html_only": len(overlap["html_only"]),
@@ -690,10 +789,11 @@ def remeasure(github: Github, directory: Path) -> dict:
     """Retain the failed overlap, then re-read the same pins after the two fixes."""
     corpus = read_json(directory / "raw-progress.json")
     before = read_json(directory / "overlap.json")
-    if (directory / "overlap-before-heading-fix.json").exists():
+    correction = "reference-fix" if corpus.get("selection_version") == 2 else "heading-fix"
+    if (directory / f"overlap-before-{correction}.json").exists():
         raise ValueError("retain this measured attempt before another remeasurement")
-    write_json(directory / "overlap-before-heading-fix.json", before)
-    write_json(directory / "raw-before-heading-fix.json", corpus)
+    write_json(directory / f"overlap-before-{correction}.json", before)
+    write_json(directory / f"raw-before-{correction}.json", corpus)
     started_at = utc()
     for listing in corpus["lists"]:
         for doc in listing["documents"]:
@@ -704,10 +804,11 @@ def remeasure(github: Github, directory: Path) -> dict:
             if digest(raw.encode()) != doc["sha256"]:
                 raise ValueError("raw bytes changed at the recorded source pin")
             parsed = parse_raw(raw)
-            if {r["requested_repository"].lower() for r in parsed["links"]} != {
+            if correction == "heading-fix" and {r["requested_repository"].lower() for r in parsed["links"]} != {
                 r["requested_repository"].lower() for r in doc["links"]}:
                 raise ValueError("heading refinement changed the raw URL set")
             doc["sections"], doc["links"] = parsed["sections"], parsed["links"]
+            doc["unused_reference_definitions"] = parsed["unused_reference_definitions"]
             doc["raw_refinement_read_at"] = raw_read_at
             if doc["size_bytes"] <= 1_000_000:
                 html_read_at = utc()
@@ -726,6 +827,9 @@ def remeasure(github: Github, directory: Path) -> dict:
         if not compared:
             overlap["jaccard"] = None
         listing["overlap"] = overlap
+        unused = [{"path": doc["path"], **row} for doc in listing["documents"]
+                  for row in doc["unused_reference_definitions"]["definitions"]]
+        listing["unused_reference_definitions"] = {"count": len(unused), "definitions": unused}
         write_json(directory / "remeasure-progress.json", corpus)
         print(json.dumps({"list": listing["repository"], "jaccard": overlap["jaccard"],
                           "raw_only": len(overlap["raw_only"]), "html_only": len(overlap["html_only"])}), flush=True)
@@ -784,6 +888,9 @@ def sanitize_receipts(directory: Path) -> None:
         if not path.exists():
             continue
         record = read_json(path)
+        for listing in record.get("lists", []):
+            if listing.get("overlap", {}).get("status") == "not_available":
+                listing["overlap"]["jaccard"] = None
         before_bytes += path.stat().st_size
         for listing in record.get("lists", []):
             for doc in listing["documents"]:
@@ -805,6 +912,13 @@ def sanitize_receipts(directory: Path) -> None:
         after_bytes += path.stat().st_size
     print(json.dumps({"status": "sanitized", "before_bytes": before_bytes,
                       "after_bytes": after_bytes, "repository_sets_unchanged": True}))
+    overlap_path = directory / "overlap.json"
+    if overlap_path.exists():
+        record = read_json(overlap_path)
+        for listing in record["lists"]:
+            if listing["status"] == "not_available":
+                listing["jaccard"] = None
+        write_json(overlap_path, record)
 
 
 def mapped_rows(corpus: dict, mapping: dict) -> list[dict]:
@@ -868,7 +982,7 @@ def build(corpus: dict, mapping: dict, corpus_ref: str, mapping_ref: str) -> dic
     if corpus.get("kind") != "awesome-list-raw-corpus" or corpus.get("status") != "complete":
         raise ValueError("only the completed uniform raw corpus can supply a count")
     rows = mapped_rows(corpus, mapping)
-    return {"schema_version": 1, "kind": "awesome-list-community-evidence", "angle": "A3",
+    artifact = {"schema_version": 1, "kind": "awesome-list-community-evidence", "angle": "A3",
         "angle_protocol": "angle-convergence/2", "evidence_class": "source_review",
         "read_at": corpus["completed_at"], "threshold": 3,
         "sources": [{"kind": "receipt", "path": corpus_ref}, {"kind": "receipt", "path": mapping_ref}],
@@ -877,6 +991,16 @@ def build(corpus: dict, mapping: dict, corpus_ref: str, mapping_ref: str) -> dic
         "list_count": len(corpus["lists"]), "category_results": count_rows(rows),
         "rows": rows, "unresolvable_links": [r for r in corpus["canonicalization"] if r["status"] != "resolved"],
         "limitations": mapping["limitations"]}
+    if corpus.get("selection_version") == 2:
+        artifact["selection_version"] = 2
+        artifact["extension_shortfalls"] = corpus["extension_shortfalls"]
+        artifact["unused_reference_definitions"] = [
+            {"list_repository": listing["repository"], "list_commit": listing["commit"],
+             "list_url": listing["url"], "count": listing["unused_reference_definitions"]["count"],
+             "definitions": [{"file": row["path"], **{k: v for k, v in row.items() if k != "path"}}
+                             for row in listing["unused_reference_definitions"]["definitions"]]}
+            for listing in corpus["lists"]]
+    return artifact
 
 
 def summary(artifact: dict) -> str:
@@ -889,8 +1013,14 @@ def summary(artifact: dict) -> str:
         text = ", ".join(f"[{r['repository']}](https://github.com/{r['repository']}) ({r['distinct_list_count']} lists; {r['category_support_distinct_list_count']} supports this category)" for r in results) or "None in this mapped corpus"
         lines.append(f"| {category} | {text} |")
     lines += ["", "`a3.json` references lists/documents by ID; `sources.json` maps those IDs to repository/path metadata, and `identifiers.json` holds the full pins and digests without repository names. `corpus.json` retains source rows and canonical identities. The script resolves references for offline verification.", ""]
-    lines += ["The extension queries selected broad curated lists. Unmapped sections remain uncategorized; empty categories describe this corpus, not the ecosystem. The full method and limitations are in `mapping.json`.", "",
-              "Nine supported HTML cross-checks met the 0.95 overlap threshold after the heading-link fix; the oversized MCP README was counted through raw only. `OVERLAP.md` retains the diagnosis and before/after measurements."]
+    if artifact.get("selection_version") == 2:
+        lines += ["V2 supersedes the earlier broad-list selection. Nine mandatory lists are included unconditionally; extensions use specific-category description/topics eligibility and top-two star order. Short categories have no substitute.", "",
+                  "Unmapped sections remain uncategorized; empty categories describe this corpus, not the ecosystem. `selection.json` retains the complete discovery pool, predicates and shortfalls. `overlap.json` retains every supported HTML cross-check; oversized documents are raw-only."]
+        lines += [f"Extension shortfall: {row['category']} selected {row['actual_selected_count']} of two requested lists ({row['qualifying_count']} qualifying)." for row in artifact["extension_shortfalls"]]
+        lines += ["", f"Unused reference definitions: {sum(row['count'] for row in artifact['unused_reference_definitions'])}, audited per list outside counted rows. Used reference links remain categorized at the definition's section; reserved GitHub owner surfaces are excluded."]
+    else:
+        lines += ["The extension queries selected broad curated lists. Unmapped sections remain uncategorized; empty categories describe this corpus, not the ecosystem. The full method and limitations are in `mapping.json`.", "",
+                  "Nine supported HTML cross-checks met the 0.95 overlap threshold after the heading-link fix; the oversized MCP README was counted through raw only. `OVERLAP.md` retains the diagnosis and before/after measurements."]
     return "\n".join(lines) + "\n"
 
 

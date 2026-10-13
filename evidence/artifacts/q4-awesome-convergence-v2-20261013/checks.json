@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "kind": "awesome-convergence-v2-local-checks",
+  "checks": [
+    {"evidence_class":"synthetic","command":["python3","-m","unittest","tests.test_awesome_convergence","-v"],"exit_code":0,"native_summary":"Ran 36 tests in 1.170s; OK","boundary":"Locally authored controls through upstream CPython unittest, including both published corpus shapes; not an unchanged upstream counter suite."},
+    {"evidence_class":"local_integration","command":["python3","scripts/awesome_convergence.py","check","--directory","evidence/artifacts/q4-awesome-convergence-v2-20261013"],"exit_code":0,"native_result":{"status":"checked","lists":15,"rows":7835,"unresolved":45,"repositories_per_category":{"agent-orchestration":14,"agent-observability":0,"coding-agent-harnesses":12,"agent-memory":4,"mcp-code-navigation":0,"evaluation-harnesses":1}}},
+    {"evidence_class":"local_integration","command":["python3","scripts/awesome_convergence.py","check","--directory","evidence/artifacts/q4-awesome-convergence-20261013"],"exit_code":0,"native_result":{"status":"checked","lists":10,"rows":10311,"unresolved":29},"boundary":"SUPERSEDED v1 remains reproducible from its original corpus and mapping."},
+    {"evidence_class":"local_integration","method":"Independent dictionary/set tally from canonical API identities and corpus links; compare every result, global list membership, category-support list count and returned membership list set against a3.json. Category assignment uses the frozen recorded row mapping, not an independent capability judgment.","result":"agrees","list_count":15,"document_count":328,"unique_requested_targets":6149,"counted_link_occurrences":7835,"unresolved_targets":45,"heading_rules_equal_v1":true},
+    {"evidence_class":"local_integration","command":["python3","scripts/awesome_convergence.py","publish","--directory","evidence/artifacts/q4-awesome-convergence-v2-20261013"],"exit_code":0,"native_result":{"status":"published-references","named_files":11,"lists":15,"documents":328,"identifiers":1004,"round_trips_agree":true},"boundary":"Typed public pin/digest relocation only; no unknown opaque string relocation."}
+  ],
+  "validation_and_publication_boundary":"Full repository validation and native staged/range scanners are reported with actual final results in the PR handoff; this file records the completed fixture/offline/arithmetic checks.",
+  "model_usage":"Counter invokes no model. Coordinator provider usage remains unknown."
+}

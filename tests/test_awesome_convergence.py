@@ -16,6 +16,51 @@ DIRECTORY = ROOT / "evidence/artifacts/q4-awesome-convergence-20261013"
 
 
 class AwesomeConvergenceTests(unittest.TestCase):
+    def test_reserved_owner_image_asset_is_not_repository(self):
+        self.assertIsNone(counter.repository_link("https://github.com/user-attachments/assets/example-image"))
+        self.assertEqual(counter.parse_raw('<img src="https://github.com/user-attachments/assets/example-image">')["links"], [])
+
+    def test_unused_reference_is_audited_outside_counted_rows(self):
+        parsed = counter.parse_raw('# Agents\n[used text][Used Ref]\n[used ref]: https://github.com/org/used\n[unused]: https://github.com/org/unused\n')
+        self.assertEqual([r["requested_repository"] for r in parsed["links"]], ["org/used"])
+        self.assertEqual(parsed["unused_reference_definitions"]["count"], 1)
+        self.assertEqual(parsed["unused_reference_definitions"]["definitions"][0]["label"], "unused")
+
+    def test_collapsed_shortcut_and_code_only_references(self):
+        parsed = counter.parse_raw('[collapsed][] and [shortcut]\n`[code][hidden]`\n![image][image-only]\n[collapsed]: https://github.com/org/collapsed\n[shortcut]: https://github.com/org/shortcut\n[hidden]: https://github.com/org/hidden\n[image-only]: https://github.com/org/image\n')
+        self.assertEqual({r["requested_repository"] for r in parsed["links"]}, {"org/collapsed", "org/shortcut"})
+        self.assertEqual(parsed["unused_reference_definitions"]["count"], 2)
+
+    def test_own_metadata_excludes_general_lists_and_readme_matches(self):
+        for description in ["A curated list of awesome Go frameworks", "A collection of MCP servers."]:
+            row = {"description": description, "topics": ["awesome-list"],
+                   "readme": "agent observability memory evaluation"}
+            self.assertNotIn("agent-observability", counter.extension_categories(row))
+            self.assertNotIn("agent-memory", counter.extension_categories(row))
+
+    def test_specific_category_and_top_two_shortfall(self):
+        rows = [
+            {"full_name": "org/awesome-traces", "stargazers_count": 1001,
+             "description": "LLM observability", "topics": []},
+            {"full_name": "org/awesome-memory", "stargazers_count": 2000,
+             "description": "Agent memory", "topics": []},
+            {"full_name": "org/awesome-general", "stargazers_count": 99999,
+             "description": "All software", "topics": []},
+        ]
+        self.assertEqual([r["full_name"] for r in counter.extension_top_two(rows, "agent-observability")], ["org/awesome-traces"])
+        self.assertEqual(counter.extension_top_two(rows, "mcp-code-navigation"), [])
+        self.assertIn("coding-agent-harnesses", counter.extension_categories({"topics": ["claude-code"]}))
+
+    def test_extension_order_uses_stars_and_retains_specific_category(self):
+        rows = [{"full_name": name, "stargazers_count": stars,
+                 "description": "Agent memory", "topics": []}
+                for name, stars in [("org/z", 3000), ("org/a", 3000), ("org/b", 2000)]]
+        rows += [{"full_name": "org/general", "stargazers_count": 99999,
+                  "description": "A collection of MCP servers.", "topics": ["ai", "mcp"]}]
+        self.assertEqual([r["full_name"] for r in counter.extension_top_two(rows, "agent-memory")], ["org/a", "org/z"])
+        self.assertNotIn("mcp-code-navigation", counter.extension_categories(rows[-1]))
+        self.assertIn("mcp-code-navigation", counter.extension_categories({"description": "MCP servers for codebase search", "topics": []}))
+
     def setUp(self):
         # Paired synthetic READMEs/HTML reflect GitHub's Markdown API contract.
         # The renderer is upstream; this fixture doesn't implement Markdown.
@@ -159,7 +204,7 @@ class AwesomeConvergenceTests(unittest.TestCase):
         self.assertEqual(parsed["links"][0]["line"], 9)
 
     def test_raw_urls_include_definitions_inline_code_and_image_sources(self):
-        parsed = counter.parse_raw('# Agents\n`github.com/org/inline`\n![logo](https://github.com/org/image/blob/main/logo.svg)\n[ref]: https://github.com/org/defined\n')
+        parsed = counter.parse_raw('# Agents\n`github.com/org/inline`\n![logo](https://github.com/org/image/blob/main/logo.svg)\n[visible][ref]\n[ref]: https://github.com/org/defined\n')
         self.assertEqual([r["requested_repository"] for r in parsed["links"]], ["org/inline", "org/image", "org/defined"])
 
     def test_set_overlap_records_both_differences_and_jaccard(self):
@@ -224,20 +269,22 @@ class AwesomeConvergenceTests(unittest.TestCase):
         self.assertEqual([r["url"] for r in parsed.links], ["https://github.com/org/repo"])
 
     def test_published_count_files_contain_no_forty_hex_string(self):
-        for path in DIRECTORY.glob("*.json"):
-            if path.name != "identifiers.json":
-                self.assertIsNone(re.search(r"[0-9a-f]{40}", path.read_text(), re.I), path.name)
+        for directory in (DIRECTORY, ROOT / "evidence/artifacts/q4-awesome-convergence-v2-20261013"):
+            for path in directory.glob("*.json"):
+                if path.name != "identifiers.json":
+                    self.assertIsNone(re.search(r"[0-9a-f]{40}", path.read_text(), re.I), str(path.relative_to(ROOT)))
 
     def test_pin_file_contains_no_repository_name(self):
-        path = DIRECTORY / "identifiers.json"
-        self.assertTrue(path.is_file())
-        data = json.loads(path.read_text())
-        self.assertEqual(set(data), {"schema_version", "identifiers"})
-        for row in data["identifiers"]:
-            self.assertEqual(set(row), {"id", "value"})
-            self.assertRegex(row["id"], r"^I\d+$")
-            self.assertRegex(row["value"], r"^(?:[0-9a-f]{40}|[0-9a-f]{64})$")
-        self.assertNotRegex(path.read_text(), r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+")
+        for directory in (DIRECTORY, ROOT / "evidence/artifacts/q4-awesome-convergence-v2-20261013"):
+            path = directory / "identifiers.json"
+            self.assertTrue(path.is_file())
+            data = json.loads(path.read_text())
+            self.assertEqual(set(data), {"schema_version", "identifiers"})
+            for row in data["identifiers"]:
+                self.assertEqual(set(row), {"id", "value"})
+                self.assertRegex(row["id"], r"^I\d+$")
+                self.assertRegex(row["value"], r"^(?:[0-9a-f]{40}|[0-9a-f]{64})$")
+            self.assertNotRegex(path.read_text(), r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+")
 
     def test_reference_encoding_is_lossless_for_typed_metadata(self):
         original = {"repository": "org/repo", "pin": "a" * 40, "sha256": "b" * 64,

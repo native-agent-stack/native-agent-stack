@@ -1,5 +1,11 @@
 # Decision: pinned awesome-list membership as bounded A3 evidence
 
+**V2 is the current Q4 source read. V1 is SUPERSEDED** and preserved in
+`evidence/artifacts/q4-awesome-convergence-20261013/`, including its original
+failed attempts and reproducible counts. The current artifacts are in
+`evidence/artifacts/q4-awesome-convergence-v2-20261013/`. The historical
+selection and diagnostic narrative below describe v1 where explicitly noted.
+
 This change supplies a deterministic source artifact for community evidence.
 It changes no catalog winner, score, runtime, installation or FINAL state.
 The counter invokes no model. Coordinator provider usage is unknown.
@@ -21,6 +27,62 @@ Its `sources[]` uses committed receipt references; document sources retain
 repository, full pin, path and line. No weights or signs are assigned.
 
 ## Selection and count contract
+
+V2 applies the CC's corrected specific-category predicate: an extension's own
+description or topics must name that category. README keyword hits cannot
+qualify a general list. The recorded lexical synonyms follow the same domain
+terms as the heading mapping; MCP code navigation requires both MCP and a
+code-navigation/codebase term. Observability, memory and evaluation require
+both the category term and an agent/LLM/AI-context term. Coding-agent metadata
+includes explicit Claude Code/Codex names. These rules screen list metadata;
+they do not classify a linked target's capability.
+
+A complete GitHub search for awesome in repository names, at least 1,000
+stars, pushed within 90 days and nonarchived public repositories returned
+671 candidates over seven pages. `selection.json` retains every candidate's
+description/topics, exact query, page read times, predicate matches and star
+order. Top two qualifying candidates are selected per category; ties use
+repository name. One qualifying observability list and zero MCP code-navigation
+lists leave explicit shortfalls. No general-list substitute or awesome-list
+topic restriction applies.
+
+The six exact named lists are resolved by highest stars among nonarchived
+exact-name results, with no mandatory star/push threshold. Three additional
+unconditional lists are ccplugins/awesome-claude-code-plugins,
+jqueryscript/awesome-claude-code and VoltAgent/awesome-claude-code-subagents.
+Selection yields fifteen distinct lists. All fifteen receive fresh pins and
+raw source reads. The heading rules and distinct-list count method remain
+unchanged from v1. Mandatory inclusion, extension eligibility and threshold
+counting are separate rules.
+
+After the first v2 source read, the mandatory subagents list compared 11/13
+(0.846154). At its frozen pin, README line 2 is a GitHub user-attachments
+image asset, and line 514 is an unused codex-link reference definition.
+The correction excludes the reserved nonrepository owner surface and refines
+the lexical rule to visible reference uses. Only definitions used by a full,
+collapsed or shortcut reference link count; code-only and image-only references
+do not qualify a definition. The definition retains its section and source
+line. Unused definitions have their own per-list count and records outside
+counted rows. This supersedes the earlier all-definitions rule for v2 while
+preserving v1's historical source rows and counts. Three fixtures failed
+before the correction and passed afterward. Every v2 list is remeasured at
+the same frozen pin; OVERLAP.md retains both measurements and the diagnosis.
+
+The completed v2 read has fifteen lists, 328 Markdown documents, 6,149 unique
+requested repository targets, 7,835 link occurrences and 45 unresolved
+targets. Fourteen supported raw/HTML comparisons pass 0.95; the oversized
+MCP README is raw-only. Subagents reaches 1.0 and two unused definitions
+are outside counted rows. The frozen heading mapping yields fourteen
+orchestration entries, twelve coding-agent entries, four memory entries and
+one evaluation entry meeting the global three-list threshold. Observability
+and MCP code-navigation have no qualifying mapped entry. These category
+counts can overlap; every result reports category support separately.
+`SUMMARY.md` names the repositories; `a3.json` retains their evidence rows.
+All 36 fixture controls pass, both versioned offline checks reproduce, and
+an independent dictionary/set tally agrees with every membership/support
+count. No linked target capability is verified by this count.
+
+The following paragraph records the **SUPERSEDED v1 selection**:
 
 The bounded upstream check lasted 194 seconds. None of the inspected tools
 provided the full cross-list counter contract. The closest maintained source,
@@ -103,6 +165,8 @@ fail-before control. `OVERLAP.md` retains every list's before/after overlap.
 
 | Mistake | Primary evidence and correction | Regression |
 | --- | --- | --- |
+| Treating a GitHub user-attachments asset as a repository | V2 subagents README line 2 at its frozen pin is an image asset; exclude the reserved first path segment | Reserved-owner fixture fails before correction and passes afterward |
+| Counting a reference definition that no visible link uses | V2 subagents README line 514 has an unused codex-link definition; count used full/collapsed/shortcut references and audit unused definitions separately | Two reference-visibility controls fail before correction and pass afterward |
 | Assuming heading elements contain only category text | e2b's pinned rendered Aider entry contains its repository anchor inside h2; include it in the HTML set and omit permalink anchors | Heading-anchor fixture failed before correction and passes afterward |
 | Treating a heading entry's project name as category evidence | Use the preceding higher-level parent section and retain the entry line separately | Raw heading-entry fixture failed before correction and passes afterward |
 | Applying the three-list threshold to matching-category rows rather than repository membership | The contract counts distinct lists per canonical repository; retain category-support counts separately | Mixed-section three-list fixture failed before correction and passes afterward |
@@ -136,6 +200,7 @@ the source rows needed for offline reproduction; no network is used by
 
 ```sh
 python3 scripts/awesome_convergence.py check --directory evidence/artifacts/q4-awesome-convergence-20261013
+python3 scripts/awesome_convergence.py check --directory evidence/artifacts/q4-awesome-convergence-v2-20261013
 python3 -m unittest tests.test_awesome_convergence -v
 python3 scripts/validate.py
 ```
@@ -163,6 +228,19 @@ in `attempts.json` and `checks.json`; structural consistency is not native
 runtime, model, GPU or whole-ecosystem acceptance.
 
 ## Completeness critic and reopening
+
+The v2 completeness critic finds a different recall boundary: own metadata
+can omit a relevant category even when the README contains it, while a
+lexical category name does not prove that a list specializes in that role.
+The complete search pool avoids broad README-hit substitution and records
+shortfalls. Claude Code/Codex resource and skill lists name coding agents but
+can contain auxiliary UI or domain resources; medical LLM benchmark lists
+name evaluation without specializing in agent evaluation. The unchanged
+heading mapping keeps unrelated rows uncategorized. Future sweeps should
+test the metadata vocabulary and non-awesome-named curated-list classes
+through a new recorded selection rule, rather than altering this frozen read.
+
+The following completeness paragraph records the superseded v1 boundary:
 
 The corpus is finite, and extension queries favor broad high-star lists.
 The exact-name rule can select a small list; topic tags can omit otherwise
