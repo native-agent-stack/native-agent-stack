@@ -1,0 +1,262 @@
+{
+  "evidence_class": "synthetic",
+  "invalid_runs": 0,
+  "killed": 42,
+  "mutants": [
+    {
+      "exit_code": 1,
+      "name": "asset",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_governor.CoreCase.test_A2_assets_and_closed_intent"
+    },
+    {
+      "exit_code": 1,
+      "name": "intent",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_governor.CoreCase.test_A2_assets_and_closed_intent"
+    },
+    {
+      "exit_code": 1,
+      "name": "session",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_governor.CoreCase.test_A2_quote_clocks_and_session"
+    },
+    {
+      "exit_code": 1,
+      "name": "clock_age",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_governor.CoreCase.test_A2_quote_clocks_and_session"
+    },
+    {
+      "exit_code": 1,
+      "name": "account",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_governor.CoreCase.test_A2_caps_account_and_short_refusals"
+    },
+    {
+      "exit_code": 1,
+      "name": "ask_band",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_governor.CoreCase.test_A2_caps_account_and_short_refusals"
+    },
+    {
+      "exit_code": 1,
+      "name": "spread",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_governor.CoreCase.test_A2_caps_account_and_short_refusals"
+    },
+    {
+      "exit_code": 1,
+      "name": "name_cap",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_governor.CoreCase.test_A2_caps_account_and_short_refusals"
+    },
+    {
+      "exit_code": 1,
+      "name": "notional",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_governor.CoreCase.test_A2_caps_account_and_short_refusals"
+    },
+    {
+      "exit_code": 1,
+      "name": "collar",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_governor.CoreCase.test_A2_collar_uses_rounded_final_price"
+    },
+    {
+      "exit_code": 1,
+      "name": "request_budget",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_governor.CoreCase.test_A2_rate_budget_request_and_submit"
+    },
+    {
+      "exit_code": 1,
+      "name": "submit_budget",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_governor.CoreCase.test_A2_rate_budget_request_and_submit"
+    },
+    {
+      "exit_code": 1,
+      "name": "round_buy",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_governor.CoreCase.test_A4_directional_rounding_boundary_and_whole_floor"
+    },
+    {
+      "exit_code": 1,
+      "name": "round_sell",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_governor.CoreCase.test_A4_directional_rounding_boundary_and_whole_floor"
+    },
+    {
+      "exit_code": 1,
+      "name": "journal",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_governor.CoreCase.test_A6_journal_before_sdk_and_all_decisions_refusals"
+    },
+    {
+      "exit_code": 1,
+      "name": "recovery",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_governor.CoreCase.test_A6_hash_chain_unknown_restart_and_no_retry"
+    },
+    {
+      "exit_code": 1,
+      "name": "one_use",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_governor.CoreCase.test_A1_payload_equals_decision_and_one_use"
+    },
+    {
+      "exit_code": 1,
+      "name": "api_allowlist",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_governor.CoreCase.test_A2_proxy_capabilities_and_cancel_ownership"
+    },
+    {
+      "exit_code": 1,
+      "name": "payload_keys",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_governor.CoreCase.test_A2_payload_refusals_exact"
+    },
+    {
+      "exit_code": 1,
+      "name": "type",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_governor.CoreCase.test_A2_payload_refusals_exact"
+    },
+    {
+      "exit_code": 1,
+      "name": "tif",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_governor.CoreCase.test_A2_payload_refusals_exact"
+    },
+    {
+      "exit_code": 1,
+      "name": "side",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_governor.CoreCase.test_A2_payload_refusals_exact"
+    },
+    {
+      "exit_code": 1,
+      "name": "qty",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_governor.CoreCase.test_A2_payload_refusals_exact"
+    },
+    {
+      "exit_code": 1,
+      "name": "price",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_governor.CoreCase.test_A2_payload_refusals_exact"
+    },
+    {
+      "exit_code": 1,
+      "name": "flag",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_governor.CoreCase.test_A2_payload_refusals_exact"
+    },
+    {
+      "exit_code": 1,
+      "name": "cancel",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_governor.CoreCase.test_A2_proxy_capabilities_and_cancel_ownership"
+    },
+    {
+      "exit_code": 1,
+      "name": "paper_config",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_native.SeamCI.test_A5_stub_constructor_no_paper_and_wrong_url"
+    },
+    {
+      "exit_code": 1,
+      "name": "paper_url",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_native.SeamCI.test_A5_stub_constructor_no_paper_and_wrong_url"
+    },
+    {
+      "exit_code": 1,
+      "name": "proxy_paper",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_governor.CoreCase.test_A5_proxy_paper_url_and_retry_cap_independently"
+    },
+    {
+      "exit_code": 1,
+      "name": "retry_ceiling",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_governor.CoreCase.test_A5_proxy_paper_url_and_retry_cap_independently"
+    },
+    {
+      "exit_code": 1,
+      "name": "reservation_expiry",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_governor.CoreCase.test_A2_decision_reservation_expires_before_transport"
+    },
+    {
+      "exit_code": 1,
+      "name": "construction_session",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_native.SeamCI.test_A5_stub_constructor_no_paper_and_wrong_url"
+    },
+    {
+      "exit_code": 1,
+      "name": "construction_clock",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_native.SeamCI.test_A5_stub_constructor_no_paper_and_wrong_url"
+    },
+    {
+      "exit_code": 1,
+      "name": "fsync",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_governor.CoreCase.test_A6_journal_before_sdk_and_all_decisions_refusals"
+    },
+    {
+      "exit_code": 1,
+      "name": "caps_chain",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_governor.CoreCase.test_A6_restart_caps_binding_and_budget_not_reset"
+    },
+    {
+      "exit_code": 1,
+      "name": "caps_bool",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_governor.CoreCase.test_A5_caps_and_journal_fail_closed"
+    },
+    {
+      "exit_code": 1,
+      "name": "seam__submit_orders",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_native.SeamCI.test_A2_each_committed_seam_override_independently"
+    },
+    {
+      "exit_code": 1,
+      "name": "seam__submit_multileg_order",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_native.SeamCI.test_A2_each_committed_seam_override_independently"
+    },
+    {
+      "exit_code": 1,
+      "name": "seam__modify_order",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_native.SeamCI.test_A2_each_committed_seam_override_independently"
+    },
+    {
+      "exit_code": 1,
+      "name": "seam_sell_all",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_native.SeamCI.test_A2_each_committed_seam_override_independently"
+    },
+    {
+      "exit_code": 1,
+      "name": "seam_close_position",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_native.SeamCI.test_A2_each_committed_seam_override_independently"
+    },
+    {
+      "exit_code": 1,
+      "name": "seam_close_positions",
+      "status": "KILLED",
+      "test": "test_engine_lumibot_native.SeamCI.test_A2_each_committed_seam_override_independently"
+    }
+  ],
+  "not_applied": 0,
+  "source_unchanged": true,
+  "survived": 0
+}

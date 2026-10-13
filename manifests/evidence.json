@@ -15012,6 +15012,86 @@
       "bytes": 52839
     },
     {
+      "path": "blueprints/us-equities/engine-lumibot/README.md",
+      "sha256": "15a14656861a826fdc8df8a3a3f8fe8a01240fedd3bbc7e074b7b09bf75dc934",
+      "bytes": 7827
+    },
+    {
+      "path": "blueprints/us-equities/engine-lumibot/acceptance/export_receipt.py",
+      "sha256": "65cb966a3a6fcd29188053646790146183f0b3fcd9b602498747511c6343ceb5",
+      "bytes": 5218
+    },
+    {
+      "path": "blueprints/us-equities/engine-lumibot/acceptance/mutate_guards.py",
+      "sha256": "b5fad0eeee93bca29bba3fb33b0999df961dbfb7efe32346e0e50d3b8a43db33",
+      "bytes": 8344
+    },
+    {
+      "path": "blueprints/us-equities/engine-lumibot/acceptance/mutation-results.json",
+      "sha256": "cb4b264d44d5d120cd6e9477e26829ec09b3ca9b435491f6d0bcba1f6ba69e13",
+      "bytes": 7950
+    },
+    {
+      "path": "blueprints/us-equities/engine-lumibot/acceptance/receipt.json",
+      "sha256": "8273c17c2223dff2551753693e0c52a9bddedc38cdbc4da5f38dc5a5f2f3c9ec",
+      "bytes": 3789
+    },
+    {
+      "path": "blueprints/us-equities/engine-lumibot/acceptance/refresh_sources.py",
+      "sha256": "8cc9807315b8aa8c188a0da1e6bc2f13557bd69ccff62c81988abcb25eaf06c9",
+      "bytes": 2489
+    },
+    {
+      "path": "blueprints/us-equities/engine-lumibot/acceptance/run_acceptance.py",
+      "sha256": "db1a1c37e55b6f3285b1dec04473ef7e97a7a25cd1fca85da38d577a2c22f0c7",
+      "bytes": 3606
+    },
+    {
+      "path": "blueprints/us-equities/engine-lumibot/acceptance/runtime-distributions.json",
+      "sha256": "7c0617f49ad7e00f1f0f0ada3941d7efb147872717de77618ac199284cceb54f",
+      "bytes": 10852
+    },
+    {
+      "path": "blueprints/us-equities/engine-lumibot/acceptance/test_engine_lumibot_governor.result.json",
+      "sha256": "d09ed2831f387d2f66a8d9db1f150c5daf527647daaf6480673245b4ef35d0bf",
+      "bytes": 2225
+    },
+    {
+      "path": "blueprints/us-equities/engine-lumibot/acceptance/test_engine_lumibot_native.result.json",
+      "sha256": "cd193f8544582840d7d904ed7a67181e60e4a22e5d992b8bb6f3e2a700747268",
+      "bytes": 1473
+    },
+    {
+      "path": "blueprints/us-equities/engine-lumibot/acceptance/upstream-sources.json",
+      "sha256": "1ef0f2815e7469b81ef12465c73d8abc4c122e8d378c10072e5321f176534027",
+      "bytes": 3212
+    },
+    {
+      "path": "blueprints/us-equities/engine-lumibot/caps-a6-diagnostic.json",
+      "sha256": "4f4be166bea587f243a96a2a99db75d2eaa99868e388898c4b5ac6befef0ebeb",
+      "bytes": 506
+    },
+    {
+      "path": "blueprints/us-equities/engine-lumibot/governor.py",
+      "sha256": "30b76e23d1bb24634f2189194a446a90698557240edc28aa2e82f7f3f2cb6354",
+      "bytes": 14677
+    },
+    {
+      "path": "blueprints/us-equities/engine-lumibot/guarded_api.py",
+      "sha256": "0b18696a71bbde7ef48677239fbd1e1e67a02c1c955d4c7591cab651dbf5453e",
+      "bytes": 6966
+    },
+    {
+      "path": "blueprints/us-equities/engine-lumibot/stock_only_alpaca.py",
+      "sha256": "2786def035b64280603be303906e8337025b9ee5146432b8dfa8b3399e8d5fc7",
+      "bytes": 6383
+    },
+    {
+      "path": "blueprints/us-equities/engine-lumibot/write-boundaries.json",
+      "sha256": "096039f8ddd88ee7ff986996fdcae1e5f1e9c3b2c4fcb4d6661e2fd2438c8498",
+      "bytes": 2315
+    },
+    {
       "path": "blueprints/us-equities/engine-nautilus/README.md",
       "sha256": "71872bdb51a51c9cb91c70c2aef03c7ded589f7cc2bc549c2479353838e1de88",
       "bytes": 5203
@@ -62350,6 +62430,16 @@
       "path": "tests/test_effort_default_guard.py",
       "sha256": "c1f8824c623e9b18a5002f293a4a4ee67dcd4e41b6752808174ea890d6b76a36",
       "bytes": 31564
+    },
+    {
+      "path": "tests/test_engine_lumibot_governor.py",
+      "sha256": "364c6023d8b2a6b59b58818d6f3ebf2084ccf529ef960fab5e4c1addbec668f3",
+      "bytes": 17980
+    },
+    {
+      "path": "tests/test_engine_lumibot_native.py",
+      "sha256": "3cf3efff61bf19d2f1582e44ad5c9b093550991fed330159d7cf143b2d5225d7",
+      "bytes": 12504
     },
     {
       "path": "tests/test_env_freshness.py",

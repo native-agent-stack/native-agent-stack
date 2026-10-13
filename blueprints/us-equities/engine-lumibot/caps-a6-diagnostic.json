@@ -1,0 +1,17 @@
+{
+  "max_names": 2,
+  "max_notional_usd_per_name": "200",
+  "whole_shares": true,
+  "max_spread_bps": "50",
+  "ask_min_usd": "5",
+  "ask_max_usd": "200",
+  "quote_max_age_seconds": 60,
+  "trade_max_age_seconds": 120,
+  "max_requests_per_minute": 200,
+  "max_submits_per_minute": 180,
+  "collar": {"regular_bps": 50, "extended_bps_over_spread": 50},
+  "short_sales": false,
+  "order_types": ["limit"],
+  "time_in_force": ["day"],
+  "sessions": {"PRE": true, "RTH": false, "POST": true, "OVERNIGHT": true}
+}

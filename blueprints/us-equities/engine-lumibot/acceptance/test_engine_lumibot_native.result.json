@@ -1,0 +1,34 @@
+{
+  "command": [
+    "<ISOLATED_PYTHON>",
+    "-B",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests",
+    "-p",
+    "test_engine_lumibot_native.py",
+    "-v"
+  ],
+  "evidence_class": "synthetic",
+  "exit_code": 0,
+  "skipped": 0,
+  "test_ids": [
+    "test_engine_lumibot_native.SeamCI.test_A2_each_committed_seam_override_independently",
+    "test_engine_lumibot_native.SeamCI.test_A5_stub_constructor_no_paper_and_wrong_url",
+    "test_engine_lumibot_native.SeamCI.test_A2_inbox_is_closed_and_has_no_model_numeric_fields",
+    "test_engine_lumibot_native.NativeCase.test_A1_real_vendor_single_payload_each_session",
+    "test_engine_lumibot_native.NativeCase.test_A5_native_missing_paper",
+    "test_engine_lumibot_native.NativeCase.test_A5_native_false_paper",
+    "test_engine_lumibot_native.NativeCase.test_A5_native_resolved_nonpaper_url",
+    "test_engine_lumibot_native.NativeCase.test_A5_native_false_is_paper",
+    "test_engine_lumibot_native.NativeCase.test_A2_native_seams",
+    "test_engine_lumibot_native.NativeCase.test_A5_no_original_client_or_credential_plain_attributes",
+    "test_engine_lumibot_native.NativeCase.test_A5_actual_sdk_constructor_resolves_paper_without_any_request",
+    "test_engine_lumibot_native.NativeCase.test_A1_closed_inbox_native_strategy_routes_only_governor_decision",
+    "test_engine_lumibot_native.NativeCase.test_A7_audit_guard_blocks_second_sdk_and_secret_open"
+  ],
+  "tests": 13,
+  "wall_seconds": "1.555"
+}

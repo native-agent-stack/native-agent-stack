@@ -1,0 +1,43 @@
+{
+  "command": [
+    "<ISOLATED_PYTHON>",
+    "-B",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests",
+    "-p",
+    "test_engine_lumibot_governor.py",
+    "-v"
+  ],
+  "evidence_class": "synthetic",
+  "exit_code": 0,
+  "skipped": 0,
+  "test_ids": [
+    "test_engine_lumibot_governor.CoreCase.test_A1_all_sessions",
+    "test_engine_lumibot_governor.CoreCase.test_A1_native_missing_fields_bridge",
+    "test_engine_lumibot_governor.CoreCase.test_A1_payload_equals_decision_and_one_use",
+    "test_engine_lumibot_governor.CoreCase.test_A2_assets_and_closed_intent",
+    "test_engine_lumibot_governor.CoreCase.test_A2_caps_account_and_short_refusals",
+    "test_engine_lumibot_governor.CoreCase.test_A2_collar_uses_rounded_final_price",
+    "test_engine_lumibot_governor.CoreCase.test_A2_decision_reservation_expires_before_transport",
+    "test_engine_lumibot_governor.CoreCase.test_A2_owned_cancel_and_mediated_read",
+    "test_engine_lumibot_governor.CoreCase.test_A2_payload_refusals_exact",
+    "test_engine_lumibot_governor.CoreCase.test_A2_proxy_capabilities_and_cancel_ownership",
+    "test_engine_lumibot_governor.CoreCase.test_A2_quote_clocks_and_session",
+    "test_engine_lumibot_governor.CoreCase.test_A2_rate_budget_request_and_submit",
+    "test_engine_lumibot_governor.CoreCase.test_A3_seeded_model_numbers_never_change_size_or_price",
+    "test_engine_lumibot_governor.CoreCase.test_A4_directional_rounding_boundary_and_whole_floor",
+    "test_engine_lumibot_governor.CoreCase.test_A5_caps_and_journal_fail_closed",
+    "test_engine_lumibot_governor.CoreCase.test_A5_no_plain_client_attribute",
+    "test_engine_lumibot_governor.CoreCase.test_A5_proxy_paper_url_and_retry_cap_independently",
+    "test_engine_lumibot_governor.CoreCase.test_A6_hash_chain_unknown_restart_and_no_retry",
+    "test_engine_lumibot_governor.CoreCase.test_A6_journal_before_sdk_and_all_decisions_refusals",
+    "test_engine_lumibot_governor.CoreCase.test_A6_restart_caps_binding_and_budget_not_reset",
+    "test_engine_lumibot_governor.CoreCase.test_A6_tampered_chain_refuses",
+    "test_engine_lumibot_governor.CoreCase.test_A8_inventory_every_row_has_named_enforcement"
+  ],
+  "tests": 22,
+  "wall_seconds": "1.589"
+}

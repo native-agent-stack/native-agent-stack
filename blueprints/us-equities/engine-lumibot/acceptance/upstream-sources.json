@@ -1,0 +1,86 @@
+{
+  "evidence_class": "source_review",
+  "files": [
+    {
+      "bytes": 84443,
+      "path": "lumibot/brokers/alpaca.py",
+      "pin": "862504052407df2586122b752a645f88ce87afa1",
+      "repository": "Lumiwealth/lumibot",
+      "sha256": "e4189adbdec6cdc615415a2527ed2bc0606f5a6de359834952c83263c606e20d"
+    },
+    {
+      "bytes": 158355,
+      "path": "lumibot/brokers/broker.py",
+      "pin": "862504052407df2586122b752a645f88ce87afa1",
+      "repository": "Lumiwealth/lumibot",
+      "sha256": "057c067f6ab085fe4bf9b82df6844906644c3a70afe1ed0601bf5b4b9ca8ceb3"
+    },
+    {
+      "bytes": 67757,
+      "path": "lumibot/entities/order.py",
+      "pin": "862504052407df2586122b752a645f88ce87afa1",
+      "repository": "Lumiwealth/lumibot",
+      "sha256": "a474dd6f8481a886d96beb26ade1c76f9f7f08a3b4f44fa2b78aba807dbc784a"
+    },
+    {
+      "bytes": 12842,
+      "path": "lumibot/entities/position.py",
+      "pin": "862504052407df2586122b752a645f88ce87afa1",
+      "repository": "Lumiwealth/lumibot",
+      "sha256": "7b0ea1e5040815d66883425f31537589e3a78de66837ba560a66b34e6260fc47"
+    },
+    {
+      "bytes": 242881,
+      "path": "lumibot/strategies/strategy.py",
+      "pin": "862504052407df2586122b752a645f88ce87afa1",
+      "repository": "Lumiwealth/lumibot",
+      "sha256": "6f560f433438ead7162dddaa29981b9a5c4527664fcabf2d0cb4839a2791ff4e"
+    },
+    {
+      "bytes": 222283,
+      "path": "lumibot/strategies/_strategy.py",
+      "pin": "862504052407df2586122b752a645f88ce87afa1",
+      "repository": "Lumiwealth/lumibot",
+      "sha256": "25083fd3e874a2878d72ffa3401deff266ab6f5bc0c2a7237fd1002b302f8e9d"
+    },
+    {
+      "bytes": 129591,
+      "path": "lumibot/strategies/strategy_executor.py",
+      "pin": "862504052407df2586122b752a645f88ce87afa1",
+      "repository": "Lumiwealth/lumibot",
+      "sha256": "62fca417722df964106a02fee761d9b63a94b74821ae358f65b92433fa47a2c1"
+    },
+    {
+      "bytes": 143968,
+      "path": "lumibot/components/agents/manager.py",
+      "pin": "862504052407df2586122b752a645f88ce87afa1",
+      "repository": "Lumiwealth/lumibot",
+      "sha256": "01bada791a1d9ea4bfd4c3df6243621f8482b99ad5b455d9cab7995e25395a8e"
+    },
+    {
+      "bytes": 57264,
+      "path": "lumibot/credentials.py",
+      "pin": "862504052407df2586122b752a645f88ce87afa1",
+      "repository": "Lumiwealth/lumibot",
+      "sha256": "779f586ea2b29e9a6788de64caf827b776c188de3cfdc7c06c3d901a86c5d369"
+    },
+    {
+      "basis": "installed0.44.0 equals pinned Git object; package version independently checked",
+      "bytes": 25722,
+      "path": "alpaca/trading/client.py",
+      "pin": "cc4cb3b7ba50ae250e621983c2779047fb16bb28",
+      "repository": "alpacahq/alpaca-py",
+      "sha256": "03f806b3ce6b4fabcc92f9e8eedf5f3ded817b7ec988bc8a854aa9268ea595de"
+    },
+    {
+      "basis": "installed0.44.0 equals pinned Git object; package version independently checked",
+      "bytes": 16523,
+      "path": "alpaca/common/rest.py",
+      "pin": "cc4cb3b7ba50ae250e621983c2779047fb16bb28",
+      "repository": "alpacahq/alpaca-py",
+      "sha256": "887753b055a4b8e8a07468b4702cfad1fa3aa66ac73427fe0c62971aa3b165c5"
+    }
+  ],
+  "lumibot_installed_equals_git": true,
+  "schema_version": 1
+}
