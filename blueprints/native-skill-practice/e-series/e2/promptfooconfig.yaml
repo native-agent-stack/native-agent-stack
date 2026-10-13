@@ -1,0 +1,66 @@
+# E2, records retrieval: SKELETON. Nothing is frozen and nothing has run. It fails closed: the tests below come from ../frozen_inputs.py, which raises (and promptfoo stops before any provider call)
+# until frozen/e2.json names the questions, the qmd collection and the directives, each with a matching sha256.
+#
+# Design (invoke-gap cause table, section 7): 12 frozen questions answerable from rulings, lane records and memory notes, each with a gold path and line; arms: grep as the status quo, qmd with the new
+# collection and its directive, ai-memory with its directive; metrics: a retrieval tool used, correct, cost, turns; rule as E1: adopt an arm only if its correct answers are not fewer than the status quo's,
+# its median cost is at most 1.1 times, and it used the tool on at least 70 percent of the questions. The questions and the corpus are private records, so they are frozen outside the repository (the frozen
+# file holds the rows and the digests of the inputs).
+description: E2 records retrieval (skeleton; fails closed until the inputs are frozen)
+
+evaluateOptions:
+  maxConcurrency: 1
+  cache: false
+
+x-fence: &fence
+  model: claude-opus-5-5
+  effort: medium
+  permission_mode: dontAsk
+  tools: [Bash, Read, Glob, Grep, ToolSearch]
+  custom_allowed_tools: []
+  disallowed_tools: [Agent, Task, Workflow, ScheduleWakeup, Edit, Write, NotebookEdit, WebFetch, WebSearch]
+  setting_sources: [local]
+  settings: '{{ env.E2_ROOT }}/settings.json'
+  strict_mcp_config: true
+  max_budget_usd: 4
+  path_to_claude_code_executable: '{{ env.E_CLAUDE }}'
+  copy_working_dir: copy
+
+prompts:
+  - label: question
+    raw: |-
+      Answer the question from the records in the current directory and the tools you have. Cite the file and line of each record you rely on.
+
+      Question: {{ question }}
+
+providers:
+  - id: anthropic:claude-agent-sdk
+    label: grep-status-quo
+    config:
+      <<: *fence
+      working_dir: '{{ env.E2_ROOT }}/trees/records'
+  # freeze: the server definitions come from adoption/mcp/claude-user.json (qmd and ai-memory are http servers there); the directive is a CLAUDE.local.md in the tree, as in E1.
+  - id: anthropic:claude-agent-sdk
+    label: qmd-directive
+    config:
+      <<: *fence
+      working_dir: '{{ env.E2_ROOT }}/trees/records-qmd'
+      mcp:
+        enabled: true
+        servers:
+          - name: qmd
+            url: '{{ env.E2_QMD_URL }}'
+  - id: anthropic:claude-agent-sdk
+    label: aimemory-directive
+    config:
+      <<: *fence
+      working_dir: '{{ env.E2_ROOT }}/trees/records-aimemory'
+      mcp:
+        enabled: true
+        servers:
+          - name: ai-memory
+            url: '{{ env.E2_AIMEMORY_URL }}'
+
+tests:
+  - path: file://../frozen_inputs.py:create_tests
+    config:
+      experiment: e2

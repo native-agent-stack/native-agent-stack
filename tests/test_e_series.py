@@ -1,0 +1,2263 @@
+"""E-series promptfoo configs (blueprints/native-skill-practice/e-series): the E1 config against its constants, the grader, the test generator, the assertions, the decision rule, the prepare and run
+scripts on a scratch repository, and the fail-closed generator of E2 to E5.
+
+Standard library only (PyYAML for the config-structure tests when installed, promptfoo 0.124.0 or newer for the integration tests when installed; each skips otherwise). No test calls a model or reads a key.
+Every behaviour is paired with a negative control in the same test or in a sibling, as docs/acceptance-evidence-policy.md asks.
+"""
+
+from __future__ import annotations
+
+import errno
+import hashlib
+import json
+import os
+import re
+import shutil
+import stat
+import subprocess
+import sys
+import tempfile
+import unittest
+import uuid
+from pathlib import Path
+from unittest import mock
+
+ROOT = Path(__file__).resolve().parents[1]
+ES = ROOT / "blueprints" / "native-skill-practice" / "e-series"
+E1 = ES / "e1"
+for folder in (ES, E1):
+    if str(folder) not in sys.path:
+        sys.path.insert(0, str(folder))
+
+import e1_assert  # noqa: E402
+import e1_common as C  # noqa: E402
+import e1_decide  # noqa: E402
+import e1_gate  # noqa: E402
+import e1_grade  # noqa: E402
+import e1_prepare  # noqa: E402
+import e1_run  # noqa: E402
+import e1_tests  # noqa: E402
+import frozen_inputs as F  # noqa: E402
+
+try:
+    import yaml
+    HAVE_YAML = True
+except ImportError:
+    HAVE_YAML = False
+
+CREDENTIAL_RUNNER = ROOT / "tools" / "credentials" / "credential_run.py"
+TASKS = json.loads((E1 / "tasks.json").read_text(encoding="utf-8"))
+QUESTIONS = {q["id"]: q for q in TASKS["questions"]}
+CLEAN_ENV = {k: v for k, v in os.environ.items() if not k.startswith(("PROMPTFOO_", "E_SERIES_"))}
+
+
+def sha256_bytes(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def promptfoo_binary():
+    found = os.environ.get("PROMPTFOO_BIN") or shutil.which("promptfoo")
+    if not found:
+        return None
+    try:
+        text = subprocess.run([found, "--version"], capture_output=True, text=True, timeout=60, env={**CLEAN_ENV, "PROMPTFOO_DISABLE_UPDATE": "1"}).stdout
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    version = next((line.strip() for line in text.splitlines() if re.fullmatch(r"\d+\.\d+\.\d+", line.strip())), None)
+    if version is None or e1_prepare.version_tuple(version) < e1_prepare.version_tuple(C.PROMPTFOO_MINIMUM):
+        return None
+    return found
+
+
+PROMPTFOO = promptfoo_binary()
+
+
+FAKE_PROMPTFOO = r"""
+import json, os, shutil, sys
+args = sys.argv[1:]
+if args[:1] == ["--version"]:
+    print("0.124.0")
+    sys.exit(0)
+kind = args[args.index("--filter-metadata") + 1].split("=")[1] if "--filter-metadata" in args else "?"
+arms = args[args.index("--filter-providers") + 1].strip("^()$").split("|") if "--filter-providers" in args else []
+NAMES = ("E1_ROOT", "TMPDIR", "CLAUDE_CODE_EFFORT_LEVEL", "ANTHROPIC_BASE_URL", "MCP_TIMEOUT", "PROMPTFOO_DISABLE_SHARING", "PROMPTFOO_FAILED_TEST_EXIT_CODE", "PROMPTFOO_PASS_RATE_THRESHOLD")
+if os.environ.get("FAKE_LOG"):
+    env = {k: os.environ.get(k) for k in NAMES}
+    with open(os.environ["FAKE_LOG"], "a") as log:
+        log.write(json.dumps({"kind": kind, "arms": arms, "argv": args, "cwd": os.getcwd(), "env": env,
+                              "exit_vars": {k: env[k] for k in ("PROMPTFOO_FAILED_TEST_EXIT_CODE", "PROMPTFOO_PASS_RATE_THRESHOLD")}}) + "\n")
+out = args[args.index("-o") + 1]
+mode = os.environ.get("FAKE_PREFLIGHT", "pass")
+items = []
+for arm in arms if kind == "preflight" else []:
+    if mode == "missing" and arm == arms[-1]:
+        continue
+    ok = not (mode == "fail" and arm == arms[0])
+    items.append({"provider": {"label": arm}, "vars": {"question_id": "preflight", "repeat": "1"}, "testCase": {"metadata": {"kind": "preflight"}}, "response": {"output": "{}"},
+                  "gradingResult": {"pass": ok}, "success": ok, "failureReason": 0 if ok else 1})
+if kind == "preflight" or not os.environ.get("FAKE_RESULTS"):
+    with open(out, "w") as stream:
+        json.dump({"results": {"results": items}}, stream)
+else:
+    shutil.copyfile(os.environ["FAKE_RESULTS"], out)
+if os.environ.get("FAKE_STATUS") is not None:
+    sys.exit(int(os.environ["FAKE_STATUS"]))
+if os.environ.get("FAKE_EMULATE_EXIT") and items and not all(item["success"] for item in items):    # promptfoo@30949931ee90 src/node/doEval.ts L1271-L1286
+    pass_rate = 100.0 * sum(item["success"] for item in items) / len(items)
+    if pass_rate < float(os.environ.get("PROMPTFOO_PASS_RATE_THRESHOLD", "100")):
+        sys.exit(int(os.environ.get("PROMPTFOO_FAILED_TEST_EXIT_CODE", "100")))
+sys.exit(0)
+"""
+
+
+def good_output(question):
+    """An answer the grader accepts for `question`."""
+    gold, kind = question["gold"], question["type"]
+    if kind == "def":
+        return {"answer": "x", "citations": [{"file": gold["file"], "line": gold["line"]}]}
+    if kind == "refs":
+        return {"answer": "x", "citations": [{"file": f, "line": ln} for f, ln in gold["sites"]]}
+    if kind == "explain":
+        return {"answer": "x", "citations": [{"file": gold["file"], "line": ln} for ln in gold["lines"]]}
+    return {"answer": "x", "citations": [], "functions": list(gold["functions"])}
+
+
+def promptfoo_item(arm, qid, repeat, output, cost=0.05, calls=("Grep",), turns=3, millis=2000, kind="question", error=None):
+    item = {"provider": {"id": "anthropic:claude-agent-sdk", "label": arm}, "vars": {"question_id": qid, "repeat": str(repeat)}, "testCase": {"metadata": {"kind": kind}},
+            "response": {"output": output, "cost": cost, "metadata": {"toolCalls": [{"name": n} for n in calls], "numTurns": turns, "durationMs": millis}}, "latencyMs": millis + 5,
+            "gradingResult": {"pass": True}, "failureReason": 0}
+    if error:
+        item["error"] = error
+        item["response"]["error"] = error
+        item["failureReason"] = 2
+    return item
+
+
+def write_results(path: Path, items) -> Path:
+    path.write_text(json.dumps({"evalId": "eval-test", "results": {"version": 3, "results": items}}), encoding="utf-8")
+    return path
+
+
+class InputsTests(unittest.TestCase):
+    def test_tasks_file_is_the_one_the_preregistration_froze(self):
+        digest = sha256_bytes(E1 / "tasks.json")
+        self.assertEqual(digest, "9d2727ad3ba5cb9f05dcfff70efcdf07aaf4908e800988a197a576bf1c1a7109")
+        self.assertTrue(digest.startswith("9d2727ad3ba5cb9f"))  # the sixteen digits recorded in the preregistration before the first run
+
+    def test_twelve_questions_three_of_each_type_with_a_gold_of_the_right_shape(self):
+        self.assertRegex(TASKS["base"], r"^[0-9a-f]{40}$")
+        self.assertRegex(TASKS["stale"], r"^[0-9a-f]{40}$")
+        self.assertNotEqual(TASKS["base"], TASKS["stale"])
+        self.assertEqual(len(TASKS["questions"]), 12)
+        self.assertEqual(len(QUESTIONS), 12)
+        kinds = {}
+        for q in TASKS["questions"]:
+            kinds.setdefault(q["type"], []).append(q["id"])
+            gold = q["gold"]
+            self.assertIn("`" + q["symbol"] + "`", q["prompt"])
+            if q["type"] == "def":
+                self.assertEqual(set(gold), {"file", "line"})
+            elif q["type"] == "refs":
+                self.assertTrue(gold["sites"] and all(len(s) == 2 for s in gold["sites"]))
+            elif q["type"] == "explain":
+                self.assertTrue(gold["file"] and gold["lines"])
+            else:
+                self.assertTrue(gold["functions"] and gold["sites"])
+        self.assertEqual({k: len(v) for k, v in kinds.items()}, {"def": 3, "refs": 3, "explain": 3, "callers": 3})
+        self.assertEqual({"p-def", "p-refs", "p-explain", "p-callers"} - set(QUESTIONS), set())
+
+    def test_the_two_directive_files_are_the_paragraphs_the_runner_appended(self):
+        expected = {"serena": "ee7e592e7ebae0d4a764f57af1916799a18d65ca82ae4c85c1d31f9084e0b149", "path": "e9b5591039d0b32a059aabd17d5db260b08995a91aeeeb272e1c1854c1a29ef6"}
+        for name, digest in expected.items():
+            path = E1 / "directives" / f"{name}.md"
+            self.assertEqual(sha256_bytes(path), digest, name)
+            text = path.read_text(encoding="utf-8")
+            self.assertTrue(text.startswith("## Code navigation\n\n"))
+            first = text.split("\n\n", 1)[1].split(". ", 1)[0] + "."
+            self.assertEqual(first, C.DIRECTIVE_FIRST_SENTENCE[name])
+        self.assertNotEqual(*expected.values())
+
+    def test_the_repository_root_is_found_from_the_folder(self):
+        self.assertEqual(C.REPO_ROOT, ROOT)
+        self.assertEqual(C.find_repo_root(), ROOT)
+
+    def test_the_constants_are_the_preregistered_ones(self):
+        self.assertEqual((C.CLIENT_VERSION, C.PROMPTFOO_MINIMUM, C.SDK_VERSION), ("2.1.296", "0.124.0", "0.3.283"))
+        self.assertEqual((C.MODEL, C.EFFORT, C.BUDGET_USD), ("claude-opus-5-5", "medium", 4))
+        self.assertEqual(C.FENCE_TOOLS, ["Bash", "Read", "Glob", "Grep", "ToolSearch"])
+        self.assertEqual(C.DENIED_TOOLS, ["Agent", "Task", "Workflow", "ScheduleWakeup", "Edit", "Write", "NotebookEdit", "WebFetch", "WebSearch"])
+        self.assertEqual(C.CHILD_ENV, {"MCP_TIMEOUT": "120000", "CLAUDE_CODE_ENABLE_TELEMETRY": "0", "DISABLE_TELEMETRY": "1", "ENABLE_CLAUDEAI_MCP_SERVERS": "false"})
+        self.assertEqual(C.SERVERS, ("serena", "semble", "codebase-memory-mcp", "jcodemunch"))
+        self.assertEqual(C.SERVER_COMMANDS, {"serena": "serena", "semble": "semble", "codebase-memory-mcp": "codebase-memory-mcp", "jcodemunch": "jcodemunch-mcp"})
+        self.assertEqual(C.CODE_NAV_SERVERS, C.SERVERS + ("socraticode",))
+        self.assertEqual(C.BEHAVIOUR_VARS, ["CLAUDECODE", "CLAUDE_CODE_DISABLE_ADVISOR_TOOL", "CLAUDE_CODE_EFFORT_LEVEL", "MAX_THINKING_TOKENS", "CLAUDE_CODE_SUBAGENT_MODEL", "CLAUDE_CODE_SUBAGENT_MODEL_FORCE",
+                                             "ANTHROPIC_MODEL", "ANTHROPIC_SMALL_FAST_MODEL", "ANTHROPIC_DEFAULT_OPUS_MODEL", "ANTHROPIC_DEFAULT_SONNET_MODEL", "ANTHROPIC_DEFAULT_HAIKU_MODEL",
+                                             "CLAUDE_CODE_MAX_OUTPUT_TOKENS", "CLAUDE_CODE_DISABLE_THINKING", "ANTHROPIC_BASE_URL", "ANTHROPIC_AUTH_TOKEN", "CLAUDE_CODE_OAUTH_TOKEN", "ENABLE_TOOL_SEARCH",
+                                             "CLAUDE_CONFIG_DIR"])
+        self.assertEqual(C.STAGED_FILES, ["promptfooconfig.yaml", "tasks.json", "e1_common.py", "e1_grade.py", "e1_tests.py", "e1_assert.py", "directives/serena.md", "directives/path.md"])
+
+    def test_the_exit_variables_the_repeats_and_the_marker_are_the_documented_ones(self):
+        """Review of #1046 at 30639cdc1 (P1, P3): promptfoo/promptfoo@30949931ee90 src/node/doEval.ts L1271-L1286 reads exactly these two variables to decide the exit status; the staged generator makes three repeats."""
+        self.assertEqual(C.EXIT_VARS, ["PROMPTFOO_FAILED_TEST_EXIT_CODE", "PROMPTFOO_PASS_RATE_THRESHOLD"])
+        self.assertEqual(C.GENERATED_REPEATS, 3)
+        self.assertEqual((C.HARNESS, C.MANIFEST_SCHEMA), ("native-skill-practice/e-series/e1", 2))
+        self.assertTrue(set(C.EXIT_VARS).isdisjoint(C.BEHAVIOUR_VARS))
+
+    def test_arms_and_trees_agree(self):
+        self.assertEqual(list(C.ARMS), ["A0a", "A0b", "A1", "A3", "A5"])
+        for arm, spec in C.ARMS.items():
+            self.assertIn(spec["tree"], C.TREES, arm)
+            self.assertEqual(C.TREES[spec["tree"]][1], spec["directive"], f"{arm}: the tree carries the directive the arm names")
+            if spec["add"]:
+                self.assertIn(spec["add"], C.TREES)
+                self.assertEqual(C.TREES[spec["add"]], ("base", None), "the tree opened with --add-dir is the plain base worktree")
+            self.assertEqual(spec["add"] is not None, C.TREES[spec["tree"]][0] == "stale", f"{arm}: the stale-start arms are the ones that open the worktree separately")
+        self.assertEqual({c for c, _ in C.TREES.values()}, {"base", "stale"})
+        self.assertFalse(C.ARMS["A5"]["servers"])
+        self.assertTrue(all(C.ARMS[a]["servers"] for a in ("A0a", "A0b", "A1", "A3")))
+
+    def test_no_file_of_the_folder_holds_a_home_path_a_key_name_or_non_ascii_text(self):
+        for path in sorted(p for p in ES.rglob("*") if p.is_file() and p.suffix in {".py", ".yaml", ".md", ".json"}):
+            text = path.read_text(encoding="utf-8")
+            self.assertTrue(text.isascii(), f"{path.relative_to(ROOT)} holds non-ASCII text")
+            self.assertNotRegex(text, r"/(?:home|Users)/(?!example\b)", f"{path.relative_to(ROOT)} holds a personal home path")
+            self.assertNotIn("sk-ant", text)
+            if path.suffix == ".yaml":
+                self.assertNotIn("API_KEY", text, f"{path.relative_to(ROOT)} names a key variable")
+
+
+@unittest.skipUnless(HAVE_YAML, "PyYAML is not installed")
+class ConfigTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.config = yaml.safe_load((E1 / "promptfooconfig.yaml").read_text(encoding="utf-8"))
+        cls.providers = {p["label"]: p for p in cls.config["providers"]}
+
+    def test_the_providers_are_the_arms_in_order_and_use_the_agent_sdk_provider(self):
+        self.assertEqual([p["label"] for p in self.config["providers"]], list(C.ARMS))
+        self.assertTrue(all(p["id"] == "anthropic:claude-agent-sdk" for p in self.config["providers"]))
+
+    def test_every_arm_carries_the_fence_of_the_runner(self):
+        for arm, provider in self.providers.items():
+            cfg = provider["config"]
+            self.assertEqual(cfg["model"], C.MODEL, arm)
+            self.assertEqual(cfg["effort"], C.EFFORT, arm)
+            self.assertEqual(cfg["permission_mode"], "dontAsk", arm)
+            self.assertEqual(cfg["tools"], C.FENCE_TOOLS, arm)
+            self.assertEqual(cfg["custom_allowed_tools"], [], arm)
+            self.assertEqual(cfg["disallowed_tools"], C.DENIED_TOOLS, arm)
+            self.assertEqual(cfg["setting_sources"], ["local"], arm)
+            self.assertIs(cfg["strict_mcp_config"], True, arm)
+            self.assertEqual(cfg["max_budget_usd"], C.BUDGET_USD, arm)
+            self.assertEqual(cfg["output_format"], {"type": "json_schema", "schema": C.SCHEMA}, arm)
+            self.assertEqual(cfg["copy_working_dir"], "copy", arm)
+            self.assertEqual(cfg["settings"], "{{ env.E1_ROOT }}/settings.json", arm)
+            self.assertEqual(cfg["path_to_claude_code_executable"], "{{ env.E1_CLAUDE }}", arm)
+            self.assertEqual(cfg["env"], {"CLAUDE_CODE_TMPDIR": "{{ env.E1_ROOT }}/claude-tmp", **C.CHILD_ENV}, arm)
+
+    def test_each_arm_starts_in_its_tree_opens_the_worktree_when_it_starts_stale_and_carries_the_servers_or_none(self):
+        for arm, spec in C.ARMS.items():
+            cfg = self.providers[arm]["config"]
+            self.assertEqual(cfg["working_dir"], "{{ env.E1_ROOT }}/trees/" + spec["tree"], arm)
+            if spec["add"]:
+                self.assertEqual(cfg["additional_directories"], ["{{ env.E1_ROOT }}/trees/" + spec["add"]], arm)
+            else:
+                self.assertNotIn("additional_directories", cfg, arm)
+            if spec["servers"]:
+                self.assertIs(cfg["mcp"]["enabled"], True, arm)
+                servers = {s["name"]: s for s in cfg["mcp"]["servers"]}
+                self.assertEqual(list(servers), list(C.SERVERS), arm)
+                self.assertEqual({n: s["command"] for n, s in servers.items()}, C.SERVER_COMMANDS, arm)
+                self.assertTrue(all(set(s) <= {"name", "command", "args", "env"} for s in servers.values()), "only what the provider's structured MCP option carries (no alwaysLoad)")
+            else:
+                self.assertNotIn("mcp", cfg, arm)
+
+    def test_the_prompts_are_the_runners_and_each_arm_runs_the_one_for_its_start(self):
+        prompts = {p["label"]: p["raw"] for p in self.config["prompts"]}
+        self.assertEqual(prompts["worktree-start"], "The repository for this task is the current directory (a checkout of one commit). Answer the question about this checkout only.\n\nQuestion: {{ question }}")
+        stale = prompts["stale-start"]
+        self.assertEqual(stale.count("{{ env.E1_ROOT }}/trees/base"), 2)
+        self.assertIn("older copy of the repository", stale)
+        for arm, spec in C.ARMS.items():
+            self.assertEqual(self.providers[arm]["prompts"], ["stale-start" if spec["add"] else "worktree-start"], arm)
+
+    def test_the_tests_come_from_the_generator_with_three_repeats(self):
+        self.assertEqual(self.config["tests"], [{"path": "file://e1_tests.py:create_tests", "config": {"repeats": C.GENERATED_REPEATS}}])
+        self.assertEqual(self.config["evaluateOptions"], {"maxConcurrency": 1, "cache": False})
+
+    def test_every_staged_file_exists_and_the_config_references_only_staged_files(self):
+        for name in C.STAGED_FILES:
+            self.assertTrue((E1 / name).is_file(), name)
+        text = (E1 / "promptfooconfig.yaml").read_text(encoding="utf-8")
+        for ref in re.findall(r"file://([A-Za-z0-9_./-]+?)(?::|\s|$)", text):
+            self.assertIn(ref, C.STAGED_FILES, f"{ref} is not copied into the staged config directory")
+        for module in ("e1_tests.py", "e1_assert.py"):
+            self.assertIn(module, C.STAGED_FILES)
+        # e1_assert and e1_tests import these two siblings, so a staged copy needs them too
+        self.assertTrue({"e1_common.py", "e1_grade.py", "tasks.json"} <= set(C.STAGED_FILES))
+
+    def test_skeletons_are_the_designs_arms_and_take_their_rows_from_the_frozen_generator(self):
+        for experiment, design in F.DESIGNS.items():
+            cfg = yaml.safe_load((ES / experiment / "promptfooconfig.yaml").read_text(encoding="utf-8"))
+            self.assertEqual([p["label"] for p in cfg["providers"]], design["arms"], experiment)
+            self.assertEqual(cfg["tests"], [{"path": "file://../frozen_inputs.py:create_tests", "config": {"experiment": experiment}}], experiment)
+            for provider in cfg["providers"]:
+                c = provider["config"]
+                self.assertEqual(c["permission_mode"], "dontAsk")
+                self.assertEqual(c["custom_allowed_tools"], [])
+                self.assertEqual(c["disallowed_tools"], C.DENIED_TOOLS)
+                self.assertEqual(c["tools"], C.FENCE_TOOLS)
+                self.assertIs(c["strict_mcp_config"], True)
+                self.assertEqual(c["copy_working_dir"], "copy")
+                self.assertEqual(c["max_budget_usd"], C.BUDGET_USD)
+                self.assertEqual((c["model"], c["effort"]), (C.MODEL, C.EFFORT))
+
+    def test_e3_sends_the_proxy_arm_through_the_base_url_and_the_direct_arm_not(self):
+        cfg = yaml.safe_load((ES / "e3" / "promptfooconfig.yaml").read_text(encoding="utf-8"))
+        arms = {p["label"]: p["config"] for p in cfg["providers"]}
+        self.assertEqual(arms["headroom-proxy"]["env"], {"ANTHROPIC_BASE_URL": "{{ env.E3_PROXY_URL }}"})
+        self.assertNotIn("env", arms["direct"])
+
+
+class GraderTests(unittest.TestCase):
+    def test_the_selftest_of_the_module_passes_against_the_published_tasks(self):
+        done = subprocess.run([sys.executable, "-I", str(E1 / "e1_grade.py")], capture_output=True, text=True, timeout=60)
+        self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
+        self.assertNotIn("FAIL", done.stdout)
+        self.assertEqual(done.stdout.count("ok   "), 12)
+
+    def test_every_question_accepts_its_gold_and_refuses_an_empty_answer(self):
+        for qid, q in QUESTIONS.items():
+            self.assertTrue(e1_grade.grade(q, good_output(q))["correct"], qid)
+            self.assertFalse(e1_grade.grade(q, {"answer": "x", "citations": []})["correct"], qid)
+            self.assertFalse(e1_grade.grade(q, None)["correct"], qid)
+
+    def test_def_needs_the_exact_file_and_line(self):
+        q = QUESTIONS["p-def"]
+        f, ln = q["gold"]["file"], q["gold"]["line"]
+        self.assertTrue(e1_grade.grade(q, {"citations": [{"file": "./" + f, "line": ln}]})["correct"])
+        self.assertTrue(e1_grade.grade(q, {"citations": [{"file": "/var/tmp/x/wt/" + f, "line": ln}]})["correct"])
+        self.assertTrue(e1_grade.grade(q, {"citations": [{"file": "/var/tmp/x/primary/" + f, "line": ln}]})["correct"])
+        for wrong in ({"file": f, "line": ln + 1}, {"file": f, "line": ln - 1}, {"file": f + "x", "line": ln}):
+            self.assertFalse(e1_grade.grade(q, {"citations": [wrong]})["correct"], wrong)
+
+    def test_a_def_answer_that_cites_the_stale_tree_is_flagged_wrong_tree(self):
+        moved = next(q for q in TASKS["questions"] if q["type"] == "def" and q["defined_at_stale"])
+        stale_file, stale_line = moved["defined_at_stale"][0]
+        graded = e1_grade.grade(moved, {"citations": [{"file": stale_file, "line": stale_line}]})
+        self.assertFalse(graded["correct"])
+        self.assertTrue(graded["wrong_tree"])
+        self.assertFalse(e1_grade.grade(moved, {"citations": [{"file": "elsewhere.py", "line": 1}]})["wrong_tree"])
+
+    def test_refs_need_every_gold_site(self):
+        q = QUESTIONS["p-refs"]
+        sites = [{"file": f, "line": ln} for f, ln in q["gold"]["sites"]]
+        self.assertTrue(e1_grade.grade(q, {"citations": sites})["correct"])
+        self.assertFalse(e1_grade.grade(q, {"citations": sites[:-1]})["correct"])
+        self.assertFalse(e1_grade.grade(q, {"citations": [{"file": sites[0]["file"], "line": sites[0]["line"] + 1000}]})["correct"])
+
+    def test_the_extra_sites_allowed_in_refs_are_int_of_a_tenth_of_the_cited_sites(self):
+        q = {"type": "refs", "gold": {"sites": [[f"a{i}.py", i] for i in range(1, 10)]}}
+        nine = [{"file": f"a{i}.py", "line": i} for i in range(1, 10)]
+        extra = lambda n: [{"file": f"z{i}.py", "line": i} for i in range(1, n + 1)]  # noqa: E731
+        self.assertTrue(e1_grade.grade(q, {"citations": nine})["correct"])
+        self.assertTrue(e1_grade.grade(q, {"citations": nine + extra(1)})["correct"], "1 extra of 10 cited: int(1.0) = 1 allowed")
+        self.assertFalse(e1_grade.grade(q, {"citations": nine + extra(2)})["correct"], "2 extra of 11 cited: int(1.1) = 1 allowed")
+        eleven = {"type": "refs", "gold": {"sites": [[f"a{i}.py", i] for i in range(1, 12)]}}
+        base = [{"file": f"a{i}.py", "line": i} for i in range(1, 12)]
+        self.assertTrue(e1_grade.grade(eleven, {"citations": base + extra(1)})["correct"])
+        self.assertFalse(e1_grade.grade(eleven, {"citations": base + extra(3)})["correct"], "3 extra of 14 cited: int(1.4) = 1 allowed")
+
+    def test_explain_needs_eighty_percent_of_the_raise_lines_and_at_most_two_extra(self):
+        q = QUESTIONS["p-explain"]
+        gold = q["gold"]["lines"]
+        cite = lambda lines: {"citations": [{"file": q["gold"]["file"], "line": ln} for ln in lines]}  # noqa: E731
+        need = -(-len(gold) * 8 // 10)
+        self.assertTrue(e1_grade.grade(q, cite(gold[:need]))["correct"])
+        self.assertFalse(e1_grade.grade(q, cite(gold[:need - 1]))["correct"])
+        extras = [max(gold) + 1000 + i for i in range(3)]
+        self.assertTrue(e1_grade.grade(q, cite(gold + extras[:2]))["correct"])
+        self.assertFalse(e1_grade.grade(q, cite(gold + extras))["correct"])
+
+    def test_the_eighty_percent_of_explain_is_ceil_of_point_eight_times_the_gold_lines(self):
+        q = {"type": "explain", "gold": {"file": "f.py", "lines": list(range(10, 20))}}
+        cite = lambda n: {"citations": [{"file": "f.py", "line": ln} for ln in range(10, 10 + n)]}  # noqa: E731
+        self.assertTrue(e1_grade.grade(q, cite(8))["correct"])
+        self.assertFalse(e1_grade.grade(q, cite(7))["correct"])
+        q = {"type": "explain", "gold": {"file": "f.py", "lines": list(range(10, 14))}}
+        self.assertTrue(e1_grade.grade(q, cite(4))["correct"])
+        self.assertFalse(e1_grade.grade(q, cite(3))["correct"], "ceil(3.2) = 4 of 4 gold lines")
+
+    def test_callers_must_equal_the_gold_set_and_name_a_method_by_its_bare_name_deviation_d1(self):
+        q = QUESTIONS["p-callers"]
+        gold = list(q["gold"]["functions"])
+        self.assertTrue(e1_grade.grade(q, {"functions": gold})["correct"])
+        self.assertFalse(e1_grade.grade(q, {"functions": gold[:-1]})["correct"])
+        self.assertFalse(e1_grade.grade(q, {"functions": gold + ["extra_function"]})["correct"])
+        qualified = ["SomeClass." + gold[0] + "()"] + gold[1:]
+        self.assertTrue(e1_grade.grade(q, {"functions": qualified})["correct"])
+        self.assertFalse(e1_grade.grade(q, {"functions": ["nested_helper"] + gold[1:]})["correct"])
+
+    def test_deviation_d1_fails_before_the_fix_the_preregistered_exact_string_grader_refuses_a_qualified_name(self):
+        q = QUESTIONS["p-callers"]
+        gold = list(q["gold"]["functions"])
+        qualified = {"functions": ["SomeClass." + gold[0] + "()"] + gold[1:]}
+
+        def preregistered(question, output):  # the callers rule as first frozen: the named set equals the gold set by exact string
+            return set(output.get("functions") or []) == set(question["gold"]["functions"])
+        self.assertFalse(preregistered(q, qualified))
+        self.assertTrue(e1_grade.grade(q, qualified)["correct"])
+
+    def test_an_absolute_citation_under_a_prepared_tree_or_a_promptfoo_workspace_is_graded_as_the_relative_one(self):
+        """Review of #1046 at 30639cdc1 (P3) and the stored stage: on the matched A0a control 14 of 36 answers cited /<root>/trees/base/<file> with the right lines and were graded wrong (explain 0 of 9 before, 6 of 9 after
+        the prefix is dropped). promptfoo/promptfoo@30949931ee90 src/providers/agentWorkspace.ts L662-L668: a per-call workspace is <tmp>/promptfoo-workspace-<id>/workspace."""
+        q = QUESTIONS["p-def"]
+        f, ln = q["gold"]["file"], q["gold"]["line"]
+        for label, prefix in (("relative", ""), ("the prepared base tree", "/var/tmp/e1/trees/base/"), ("another prepared tree", "/var/tmp/e1/trees/base-serena/"),
+                              ("a promptfoo workspace", "/var/tmp/e1/tmp/promptfoo-workspace-AbC123/workspace/"), ("a ./ prefix", "./")):
+            with self.subTest(prefix=label):
+                self.assertTrue(e1_grade.grade(q, {"citations": [{"file": prefix + f, "line": ln}]})["correct"])
+                self.assertFalse(e1_grade.grade(q, {"citations": [{"file": prefix + f, "line": ln + 1}]})["correct"], "the line still has to be the gold line")
+        e = QUESTIONS["p-explain"]
+        cited = [{"file": "/var/tmp/e1/trees/base/" + e["gold"]["file"], "line": line} for line in e["gold"]["lines"]]
+        self.assertTrue(e1_grade.grade(e, {"citations": cited})["correct"])
+
+    def test_only_a_leading_run_of_directories_ending_in_a_known_name_is_dropped_and_the_stale_tree_stays_distinct(self):
+        """No arbitrary suffix is stripped (review of #1046 at 30639cdc1, P3): a relative path with such a directory in it, an absolute path elsewhere and the stale location stay as they are."""
+        norm = e1_grade.norm
+        self.assertEqual(norm("tools/trees/base/x.py"), "tools/trees/base/x.py", "a relative path is never cut")
+        self.assertEqual(norm("/usr/lib/python3/x.py"), "/usr/lib/python3/x.py")
+        self.assertEqual(norm("/var/tmp/e1/trees/other/x.py"), "/var/tmp/e1/trees/other/x.py", "only the four prepared trees")
+        self.assertEqual(norm("/var/tmp/e1/tmp/promptfoo-workspace-x/other/x.py"), "/var/tmp/e1/tmp/promptfoo-workspace-x/other/x.py", "only the workspace directory itself")
+        self.assertEqual(norm("/a/trees/base/trees/stale/x.py"), "trees/stale/x.py", "the first match ends the run of directories")
+        q = QUESTIONS["p-def"]
+        stale = q["defined_at_stale"]
+        if stale:
+            f, ln = stale[0]
+            graded = e1_grade.grade(q, {"citations": [{"file": "/var/tmp/e1/trees/stale/" + f, "line": ln}]})
+            self.assertFalse(graded["correct"])
+            self.assertTrue(graded["wrong_tree"], "an answer at the stale commit's location is still told apart from one at the base commit's")
+
+    def test_bare_name_and_norm(self):
+        self.assertEqual(e1_grade.bare_name("A.b.c()"), "c")
+        self.assertEqual(e1_grade.bare_name(" `f` "), "f")
+        self.assertEqual(e1_grade.norm(" ./x/y.py "), "x/y.py")
+        self.assertEqual(e1_grade.norm("/a/b/wt/tools/x.py"), "tools/x.py")
+        self.assertEqual(e1_grade.norm(None), "")
+        self.assertEqual(e1_grade.cites({"citations": [{"file": "a", "line": "3"}, {"file": "b", "line": "x"}, {"file": "c"}, "not a dict"]}), [("a", 3)])
+        self.assertFalse(e1_grade.grade({"type": "other", "gold": {}}, {"citations": []})["correct"])
+
+
+class TestGeneratorTests(unittest.TestCase):
+    def test_one_preflight_row_then_every_question_for_every_repeat_in_repeat_major_order(self):
+        rows = e1_tests.create_tests({"repeats": 3})
+        self.assertEqual(len(rows), 1 + 12 * 3)
+        self.assertEqual(rows[0]["metadata"], {"kind": "preflight"})
+        self.assertEqual(rows[0]["vars"]["question_id"], "preflight")
+        order = [(r["vars"]["repeat"], r["vars"]["question_id"]) for r in rows[1:]]
+        ids = [q["id"] for q in TASKS["questions"]]
+        self.assertEqual(order, [(n, i) for n in (1, 2, 3) for i in ids])
+        self.assertEqual(len({r["description"] for r in rows}), len(rows))
+        for row in rows[1:]:
+            q = QUESTIONS[row["vars"]["question_id"]]
+            self.assertEqual(row["description"], f"{q['id']} r{row['vars']['repeat']}")
+            self.assertEqual(row["vars"]["question"], q["prompt"])
+            self.assertEqual(row["metadata"], {"kind": "question", "type": q["type"], "repeat": row["vars"]["repeat"]})
+            self.assertEqual(row["assert"], [{"type": "python", "value": "file://e1_assert.py:correct", "metric": "correct"}])
+        self.assertEqual(rows[0]["assert"], [{"type": "python", "value": "file://e1_assert.py:preflight", "metric": "preflight"}])
+
+    def test_the_default_is_three_repeats_and_the_bounds_are_enforced(self):
+        self.assertEqual(len(e1_tests.create_tests()), 37)
+        self.assertEqual(len(e1_tests.create_tests({"repeats": 1})), 13)
+        self.assertEqual(len(e1_tests.create_tests({"repeats": 9})), 1 + 12 * 9)
+        for bad in (0, 10, -1):
+            with self.assertRaises(ValueError):
+                e1_tests.create_tests({"repeats": bad})
+
+    def test_the_assertion_functions_the_rows_name_exist(self):
+        for name in ("correct", "preflight"):
+            self.assertTrue(callable(getattr(e1_assert, name)))
+
+    def test_the_preflight_prompt_allows_only_toolsearch_and_asks_for_both_lines(self):
+        prompt = e1_tests.PREFLIGHT_PROMPT
+        for needle in ("Do not call any tool except ToolSearch", "TOOLS:", "DIRECTIVE:", "Code navigation", "serena", "semble", "codebase-memory", "jcodemunch"):
+            self.assertIn(needle, prompt)
+
+
+class AssertionTests(unittest.TestCase):
+    TOOLS = "mcp__serena__find_symbol mcp__semble__search mcp__codebase-memory-mcp__search_graph mcp__jcodemunch__search_symbols"
+
+    def answer(self, tools, directive):
+        return {"answer": f"TOOLS: {tools}\nDIRECTIVE: {directive}", "citations": []}
+
+    def check(self, arm, tools, directive, calls=("StructuredOutput",)):
+        return e1_assert.check_preflight(arm, self.answer(tools, directive)["answer"], list(calls))
+
+    def test_correct_grades_a_dict_and_the_same_answer_as_json_text_and_rejects_the_rest(self):
+        q = QUESTIONS["p-def"]
+        ctx = {"vars": {"question_id": "p-def"}}
+        good = good_output(q)
+        self.assertTrue(e1_assert.correct(good, ctx)["pass"])
+        self.assertTrue(e1_assert.correct(json.dumps(good), ctx)["pass"])
+        self.assertEqual(e1_assert.correct(good, ctx)["score"], 1)
+        self.assertFalse(e1_assert.correct({"answer": "x", "citations": []}, ctx)["pass"])
+        self.assertEqual(e1_assert.correct({"answer": "x", "citations": []}, ctx)["score"], 0)
+        self.assertFalse(e1_assert.correct("not json", ctx)["pass"])
+        self.assertFalse(e1_assert.correct(None, ctx)["pass"])
+        self.assertFalse(e1_assert.correct(good, {"vars": {"question_id": "nope"}})["pass"])
+        self.assertFalse(e1_assert.correct(good, {})["pass"])
+        self.assertFalse(e1_assert.correct(good, {"vars": {"question_id": "p-refs"}})["pass"], "the answer of one question does not grade another")
+
+    def test_preflight_passes_each_arm_exactly_when_servers_and_directive_match_its_definition(self):
+        serena, path = C.DIRECTIVE_FIRST_SENTENCE["serena"], C.DIRECTIVE_FIRST_SENTENCE["path"]
+        for arm in ("A0a", "A0b"):
+            self.assertTrue(self.check(arm, self.TOOLS, "NONE")[0], arm)
+        self.assertTrue(self.check("A1", self.TOOLS, f'"{serena}"')[0])
+        self.assertTrue(self.check("A3", self.TOOLS, path)[0])
+        self.assertTrue(self.check("A5", "none", "NONE")[0])
+        # negative controls: each arm refuses the neighbouring arm's answer
+        self.assertFalse(self.check("A1", self.TOOLS, "NONE")[0], "A1 without its paragraph")
+        self.assertFalse(self.check("A1", self.TOOLS, path)[0], "A1 with A3's paragraph")
+        self.assertFalse(self.check("A3", self.TOOLS, serena)[0], "A3 with A1's paragraph")
+        self.assertFalse(self.check("A0b", self.TOOLS, serena)[0], "a paragraph quoted by an arm that carries none")
+        self.assertFalse(self.check("A5", self.TOOLS, "NONE")[0], "A5 listing servers")
+        self.assertFalse(self.check("A0b", "none", "NONE")[0], "an arm with servers listing none")
+
+    def test_every_one_of_the_four_servers_must_have_a_listed_tool(self):
+        names = {"serena": "mcp__serena__find_symbol", "semble": "mcp__semble__search", "codebase-memory-mcp": "mcp__codebase-memory-mcp__search_graph", "jcodemunch": "mcp__jcodemunch__search_symbols"}
+        for missing in names:
+            tools = " ".join(v for k, v in names.items() if k != missing)
+            ok, reason = self.check("A0b", tools, "NONE")
+            self.assertFalse(ok, missing)
+            self.assertIn(missing, reason)
+
+    def test_quotes_backticks_curly_apostrophes_and_case_do_not_matter_but_the_sentence_does(self):
+        sentence = C.DIRECTIVE_FIRST_SENTENCE["serena"]
+        curly = sentence.replace("'", chr(0x2019))
+        for quoted in (f'"{sentence}"', f"`{sentence}`", curly, sentence.upper(), f"  {sentence}  "):
+            self.assertTrue(self.check("A1", self.TOOLS, quoted)[0], quoted)
+        self.assertFalse(self.check("A1", self.TOOLS, "This session's code tools are bound")[0])
+        self.assertTrue(self.check("A0b", self.TOOLS, "none.")[0])
+        self.assertTrue(self.check("A0b", self.TOOLS, "None")[0])
+
+    def test_a_tool_other_than_toolsearch_could_have_read_the_file_so_it_voids_the_row(self):
+        sentence = C.DIRECTIVE_FIRST_SENTENCE["serena"]
+        self.assertTrue(self.check("A1", self.TOOLS, sentence, calls=("ToolSearch", "StructuredOutput"))[0])
+        for tool in ("Read", "Bash", "Grep", "Glob", "mcp__serena__find_symbol"):
+            ok, reason = self.check("A1", self.TOOLS, sentence, calls=(tool, "StructuredOutput"))
+            self.assertFalse(ok, tool)
+            self.assertIn(tool, reason)
+
+    def test_missing_lines_unknown_arms_and_unstructured_output_fail(self):
+        self.assertFalse(e1_assert.check_preflight("A0b", "TOOLS: none", [])[0])
+        self.assertFalse(e1_assert.check_preflight("A0b", "DIRECTIVE: NONE", [])[0])
+        self.assertFalse(e1_assert.check_preflight("A9", "TOOLS: none\nDIRECTIVE: NONE", [])[0])
+        self.assertFalse(e1_assert.check_preflight(None, "TOOLS: none\nDIRECTIVE: NONE", [])[0])
+        ctx = {"provider": {"label": "A5"}, "providerResponse": {"metadata": {"toolCalls": [{"name": "StructuredOutput"}]}}}
+        self.assertTrue(e1_assert.preflight(self.answer("none", "NONE"), ctx)["pass"])
+        self.assertTrue(e1_assert.preflight(json.dumps(self.answer("none", "NONE")), ctx)["pass"])
+        self.assertFalse(e1_assert.preflight("not json", ctx)["pass"])
+        read = {"provider": {"label": "A5"}, "providerResponse": {"metadata": {"toolCalls": [{"name": "Read"}, {"name": "StructuredOutput"}]}}}
+        self.assertFalse(e1_assert.preflight(self.answer("none", "NONE"), read)["pass"], "a Read call voids the row, through the entry point promptfoo calls")
+        self.assertFalse(e1_assert.preflight(self.answer("none", "NONE"), {"providerResponse": ctx["providerResponse"]})["pass"], "no provider label")
+        self.assertEqual(e1_assert.tool_names({"providerResponse": {"metadata": {"toolCalls": [{"name": "Grep"}, "junk", {"name": "Bash"}]}}}), ["Grep", "Bash"])
+        self.assertEqual(e1_assert.tool_names({}), [])
+
+
+class DecideTests(unittest.TestCase):
+    def run_of(self, arm, q, correct=True, cost=0.05, nav=False, repeat="1", turns=3, seconds=2.0):
+        return {"arm": arm, "q": q, "repeat": repeat, "correct": correct, "cost": cost, "turns": turns, "seconds": seconds, "nav": nav}
+
+    def cells(self, arm, questions=10, repeats=1, correct=None, cost=0.05, nav_questions=0):
+        """`questions` questions x `repeats` runs; `correct` = how many runs are correct (default all); the first `nav_questions` questions used a tool in every repeat."""
+        runs = []
+        for qi in range(questions):
+            for r in range(repeats):
+                runs.append(self.run_of(arm, f"q{qi}", True, cost, nav=qi < nav_questions, repeat=str(r + 1)))
+        for k in range(len(runs) - (len(runs) if correct is None else correct)):
+            runs[k]["correct"] = False
+        return runs
+
+    def test_load_runs_keeps_question_rows_regrades_them_and_reads_cost_turns_seconds_and_tool_use(self):
+        q = QUESTIONS["p-def"]
+        wrong = {"answer": "x", "citations": []}
+        items = [promptfoo_item("A0b", "p-def", 1, good_output(q), cost=0.0457, calls=("Grep", "StructuredOutput"), turns=3, millis=4200),
+                 promptfoo_item("A0b", "p-def", 2, wrong, calls=("mcp__serena__find_symbol", "StructuredOutput")),
+                 promptfoo_item("A0b", "preflight", 1, {"answer": "TOOLS: none"}, kind="preflight")]
+        items[1]["gradingResult"] = {"pass": True}  # the stored verdict says pass; the answer is wrong
+        with tempfile.TemporaryDirectory() as tmp:
+            runs, faults = e1_decide.load_runs([write_results(Path(tmp) / "r.json", items)], TASKS)
+        self.assertEqual(faults, [])
+        self.assertEqual(len(runs), 2, "the preflight row is not a measurement")
+        self.assertEqual([r["correct"] for r in runs], [True, False], "regraded from the answer, not read from the stored verdict")
+        self.assertEqual([r["nav"] for r in runs], [False, True])
+        self.assertEqual((runs[0]["cost"], runs[0]["turns"], runs[0]["seconds"]), (0.0457, 3, 4.2))
+        self.assertEqual(runs[0]["repeat"], "1")
+
+    def test_a_provider_error_an_unknown_arm_and_an_unknown_question_are_faults_not_runs(self):
+        q = QUESTIONS["p-def"]
+        items = [promptfoo_item("A0b", "p-def", 1, good_output(q), error="boom"), promptfoo_item("A7", "p-def", 1, good_output(q)), promptfoo_item("A0b", "nope", 1, good_output(q)),
+                 promptfoo_item("A0b", "p-def", 2, good_output(q))]
+        items[3]["response"]["metadata"].pop("durationMs")
+        with tempfile.TemporaryDirectory() as tmp:
+            runs, faults = e1_decide.load_runs([write_results(Path(tmp) / "r.json", items)], TASKS)
+        self.assertEqual(len(runs), 1)
+        self.assertEqual(len(faults), 3)
+        self.assertIn("provider error", faults[0])
+        self.assertEqual(runs[0]["seconds"], 2.005, "falls back to the result's latency when the response has no duration")
+
+    def test_a_wrong_answer_is_a_result_even_though_promptfoo_copies_the_assertion_text_into_error(self):
+        q = QUESTIONS["p-def"]
+        rejected = promptfoo_item("A0b", "p-def", 1, {"answer": "x", "citations": []})
+        rejected["failureReason"] = 1  # ResultFailureReason.ASSERT
+        rejected["error"] = "cited 0 location(s)"
+        rejected["gradingResult"] = {"pass": False}
+        with tempfile.TemporaryDirectory() as tmp:
+            runs, faults = e1_decide.load_runs([write_results(Path(tmp) / "r.json", [rejected, promptfoo_item("A0b", "p-def", 2, good_output(q))])], TASKS)
+        self.assertEqual(faults, [])
+        self.assertEqual([r["correct"] for r in runs], [False, True])
+
+    def test_the_server_prefixes_that_count_as_a_code_navigation_call_are_the_five_servers_only(self):
+        q = QUESTIONS["p-def"]
+        for name, expected in (("mcp__serena__find_symbol", True), ("mcp__semble__search", True), ("mcp__codebase-memory-mcp__search_graph", True), ("mcp__jcodemunch__route", True),
+                               ("mcp__socraticode__codebase_search", True), ("mcp__qmd__query", False), ("Grep", False), ("serena", False), ("mcp__serenax__f", False)):
+            with tempfile.TemporaryDirectory() as tmp:
+                runs, _ = e1_decide.load_runs([write_results(Path(tmp) / "r.json", [promptfoo_item("A1", "p-def", 1, good_output(q), calls=(name,))])], TASKS)
+            self.assertEqual(runs[0]["nav"], expected, name)
+
+    def test_criterion_i_correct_answers_not_fewer_than_the_baseline(self):
+        base = self.cells("A0a", 10)
+        same = e1_decide.decide(base + self.cells("A1", 10, nav_questions=10), "A0a")["verdicts"]["A1"]
+        fewer = e1_decide.decide(base + self.cells("A1", 10, correct=9, nav_questions=10), "A0a")["verdicts"]["A1"]
+        self.assertTrue(same["i_correct_not_fewer"])
+        self.assertFalse(fewer["i_correct_not_fewer"])
+        self.assertFalse(fewer["adopt"])
+        more = e1_decide.decide(self.cells("A0a", 10, correct=8) + self.cells("A1", 10, correct=9, nav_questions=10), "A0a")["verdicts"]["A1"]
+        self.assertTrue(more["i_correct_not_fewer"])
+
+    def test_criterion_ii_median_cost_at_most_one_point_one_times_the_baseline(self):
+        base = self.cells("A0a", 5, cost=0.5)
+        at = e1_decide.decide(base + self.cells("A1", 5, cost=0.55, nav_questions=5), "A0a")["verdicts"]["A1"]  # 1.1 * 0.5 == 0.55 exactly in floating point
+        over = e1_decide.decide(base + self.cells("A1", 5, cost=0.5501, nav_questions=5), "A0a")["verdicts"]["A1"]
+        self.assertTrue(at["ii_median_cost_at_most_1.1x"])
+        self.assertFalse(over["ii_median_cost_at_most_1.1x"])
+        self.assertFalse(over["adopt"])
+        mixed = base + [self.run_of("A1", f"q{i}", cost=c, nav=True) for i, c in enumerate((0.05, 0.05, 0.90, 0.90, 0.90))]
+        self.assertFalse(e1_decide.decide(mixed, "A0a")["verdicts"]["A1"]["ii_median_cost_at_most_1.1x"], "the median, not the mean or the minimum")
+
+    def test_criterion_iii_use_on_at_least_seventy_percent_of_the_questions(self):
+        base = self.cells("A0a", 10)
+        seven = e1_decide.decide(base + self.cells("A1", 10, nav_questions=7), "A0a")["verdicts"]["A1"]
+        six = e1_decide.decide(base + self.cells("A1", 10, nav_questions=6), "A0a")["verdicts"]["A1"]
+        self.assertTrue(seven["iii_use_on_70_percent_of_questions"])
+        self.assertEqual(seven["use_share"], 0.7)
+        self.assertTrue(seven["adopt"])
+        self.assertFalse(six["iii_use_on_70_percent_of_questions"])
+        self.assertFalse(six["adopt"])
+
+    def test_a_question_counts_as_used_when_at_least_half_of_its_repeats_used_a_tool(self):
+        def arm(n_nav):
+            runs = [self.run_of("A1", "q0", nav=i < n_nav, repeat=str(i + 1)) for i in range(3)]
+            return e1_decide.decide([self.run_of("A0a", "q0", repeat=str(i + 1)) for i in range(3)] + runs, "A0a")["rows"]["A1"]["use_questions"]
+        self.assertEqual([arm(n) for n in (0, 1, 2, 3)], [0, 0, 1, 1])
+        two = [self.run_of("A1", "q0", nav=True, repeat="1"), self.run_of("A1", "q0", nav=False, repeat="2")]
+        self.assertEqual(e1_decide.summary(two, {"q0"})["use_questions"], 1, "one of two is at least half")
+
+    def test_adoption_needs_all_three_criteria_and_a5_and_the_baseline_are_never_candidates(self):
+        base = self.cells("A0a", 10)
+        result = e1_decide.decide(base + self.cells("A0b", 10, nav_questions=10) + self.cells("A5", 10, nav_questions=10), "A0a")
+        self.assertEqual(set(result["verdicts"]), {"A0b"})
+        self.assertTrue(result["verdicts"]["A0b"]["adopt"])
+        self.assertEqual(set(result["rows"]), {"A0a", "A0b", "A5"})
+
+    def test_questions_not_shared_with_the_baseline_are_left_out_of_the_comparison(self):
+        base = self.cells("A0a", 4)
+        arm = self.cells("A1", 6, nav_questions=6)
+        row = e1_decide.decide(base + arm, "A0a")["rows"]["A1"]
+        self.assertEqual((row["questions"], row["runs"]), (4, 4))
+
+    def test_unequal_run_counts_over_the_shared_questions_are_refused(self):
+        with self.assertRaises(ValueError):
+            e1_decide.decide(self.cells("A0a", 4, repeats=3) + self.cells("A1", 4, repeats=2), "A0a")
+        with self.assertRaises(ValueError):
+            e1_decide.decide(self.cells("A1", 4), "A0a")
+
+    def test_equal_run_counts_over_different_question_repeat_pairs_are_refused(self):
+        """Review of #1046 at 38f4151a (P1): three repeats of q1 and one of q2 against one of q1 and three of q2 have equal counts and weight the questions differently."""
+        base = [self.run_of("A0a", q, repeat=str(r)) for q, r in (("q1", 1), ("q1", 2), ("q1", 3), ("q2", 1))]
+        arm = [self.run_of("A1", q, repeat=str(r)) for q, r in (("q1", 1), ("q2", 1), ("q2", 2), ("q2", 3))]
+        with self.assertRaisesRegex(ValueError, "do not hold the same"):
+            e1_decide.decide(base + arm, "A0a")
+        same = [self.run_of("A1", q, repeat=str(r)) for q, r in (("q1", 1), ("q1", 2), ("q1", 3), ("q2", 1))]
+        self.assertIn("A1", e1_decide.decide(base + same, "A0a")["verdicts"], "the same pairs in another order are comparable")
+        doubled = base + [self.run_of("A0a", "q2", repeat="1")]
+        with self.assertRaisesRegex(ValueError, "do not hold the same"):
+            e1_decide.decide(doubled + same + [self.run_of("A1", "q2", repeat="2")], "A0a")
+
+    def test_a_response_without_a_usable_cost_is_a_fault_and_left_out_not_a_free_run(self):
+        """Review of #1046 at 30639cdc1 (P1): `float(cost or 0.0)` read a missing cost as zero, which could pass criterion (ii) with no cost measurement at all (promptfoo@30949931ee90
+        src/providers/claude-agent-sdk.ts L2445 makes the cost undefined when usage is unavailable and L2498 returns it with a success response)."""
+        q = QUESTIONS["p-def"]
+        good = promptfoo_item("A0a", "p-def", 1, good_output(q))
+        bad = {}
+        for label, value in (("missing", None), ("null", None), ("an empty string", ""), ("a string", "0.05"), ("a boolean", True), ("negative", -0.05), ("not a number", float("nan")),
+                             ("infinite", float("inf")), ("minus infinite", float("-inf")), ("a list", [0.05])):
+            item = promptfoo_item("A1", "p-def", 1, good_output(q))
+            if label == "missing":
+                del item["response"]["cost"]
+            else:
+                item["response"]["cost"] = value
+            bad[label] = item
+        with tempfile.TemporaryDirectory() as tmp:
+            path = write_results(Path(tmp) / "r.json", [good, *bad.values()])
+            runs, faults = e1_decide.load_runs([path], TASKS)
+        self.assertEqual([r["arm"] for r in runs], ["A0a"], "only the run with a cost is kept")
+        self.assertEqual(len(faults), len(bad))
+        self.assertTrue(all("no usable cost" in fault and "A1 p-def r1" in fault for fault in faults), faults)
+        zero = promptfoo_item("A1", "p-def", 1, good_output(q), cost=0.0)
+        with tempfile.TemporaryDirectory() as tmp:
+            kept, none = e1_decide.load_runs([write_results(Path(tmp) / "z.json", [zero])], TASKS)
+        self.assertEqual((len(kept), none), (1, []), "a cost that is present and numeric is a measurement, even 0")
+
+    def test_a_replayed_result_is_a_duplicate_fault_not_a_second_sample(self):
+        """Review of #1046 at 30639cdc1 (P3): a duplicated matched pair was counted twice with no fault ("2 vs 2")."""
+        q = QUESTIONS["p-def"]
+        items = [promptfoo_item(a, "p-def", 1, good_output(q)) for a in ("A0a", "A1")]
+        with tempfile.TemporaryDirectory() as tmp:
+            once = write_results(Path(tmp) / "once.json", items)
+            again = write_results(Path(tmp) / "again.json", items)
+            runs, faults = e1_decide.load_runs([once, again], TASKS)
+            twice_in_one, within = e1_decide.load_runs([write_results(Path(tmp) / "two.json", items + items)], TASKS)
+        self.assertEqual(len(runs), 2, "the first of each pair is kept")
+        self.assertEqual(len(faults), 2)
+        self.assertTrue(all("appears twice" in fault for fault in faults), faults)
+        self.assertEqual((len(twice_in_one), len(within)), (2, 2))
+
+    def test_a_run_a_fault_left_out_is_named_so_that_its_comparison_gets_no_verdict(self):
+        """Review of #1046 at a461c2d76 (P2): the faults were texts, so the figures could not tell that a question had been dropped."""
+        q = QUESTIONS["p-def"]
+        good = promptfoo_item("A0a", "p-def", 1, good_output(q))
+        no_cost = promptfoo_item("A1", "p-def", 1, good_output(q))
+        del no_cost["response"]["cost"]
+        failed = promptfoo_item("A1", "p-def", 2, None, error="x")
+        again = promptfoo_item("A0a", "p-def", 1, good_output(q))
+        stranger = promptfoo_item("A9", "p-def", 1, good_output(q))
+        with tempfile.TemporaryDirectory() as tmp:
+            runs, faults = e1_decide.load_runs([write_results(Path(tmp) / "r.json", [good, no_cost, failed, again, stranger])], TASKS)
+        self.assertEqual(len(runs), 1)
+        self.assertEqual(sorted(e1_decide.lost_runs(faults)), [("A1", "p-def", "1"), ("A1", "p-def", "2")], "the two runs that were left out; a replayed run keeps its first copy and an unknown arm is no sample")
+        self.assertEqual(len(faults), 4)
+        self.assertTrue(all(isinstance(fault, str) for fault in faults))
+
+    def test_a_comparison_with_a_lost_run_has_no_verdict_and_an_unaffected_one_keeps_its_own(self):
+        base = self.cells("A0a", 3) + self.cells("A1", 3, nav_questions=3)
+        kept = [r for r in base if not (r["arm"] == "A1" and r["q"] == "q2")]       # what the loader leaves when A1's only run of q2 is lost
+        self.assertTrue(e1_decide.decide(kept, "A0a")["verdicts"]["A1"]["adopt"], "without the fault the shrunken set is compared as before: this is the defect")
+        result = e1_decide.decide(kept, "A0a", lost=[("A1", "q2", "1")])
+        self.assertEqual(set(result["verdicts"]["A1"]), {"adopt", "withheld"})
+        self.assertIsNone(result["verdicts"]["A1"]["adopt"])
+        self.assertIn("A1 q2 r1", result["verdicts"]["A1"]["withheld"])
+        self.assertIn("no verdict", e1_decide.render(result))
+        self.assertNotIn("ADOPT", e1_decide.render(result))
+        both = e1_decide.decide(kept + self.cells("A3", 3, nav_questions=3), "A0a", lost=[("A1", "q2", "1")])
+        self.assertIsNone(both["verdicts"]["A1"]["adopt"])
+        self.assertIs(both["verdicts"]["A3"]["adopt"], True, "a loss in another arm does not touch this comparison")
+        baseline_lost = e1_decide.decide(self.cells("A0a", 2) + self.cells("A1", 3, nav_questions=3), "A0a", lost=[("A0a", "q2", "1")])
+        self.assertIsNone(baseline_lost["verdicts"]["A1"]["adopt"], "the baseline's lost run withholds every candidate's verdict")
+        partial = self.cells("A0a", 2, repeats=2) + [r for r in self.cells("A1", 2, repeats=2, nav_questions=2) if not (r["q"] == "q1" and r["repeat"] == "2")]
+        self.assertIsNone(e1_decide.decide(partial, "A0a", lost=[("A1", "q1", "2")])["verdicts"]["A1"]["adopt"], "one repeat lost: withheld, not refused")
+        with self.assertRaises(ValueError):
+            e1_decide.decide(partial, "A0a")
+
+    def test_the_carrying_figure_is_withheld_when_a_run_of_a0b_or_a5_was_lost(self):
+        runs = self.cells("A0a", 3) + self.cells("A0b", 3, cost=0.0716) + [r for r in self.cells("A5", 3, cost=0.0625) if r["q"] != "q2"]
+        self.assertIsNotNone(e1_decide.decide(runs, "A0a")["carrying"].get("cost_change_percent"), "the defect: the shrunken set is compared")
+        result = e1_decide.decide(runs, "A0a", lost=[("A5", "q2", "1")])
+        self.assertEqual(set(result["carrying"]), {"withheld"})
+        self.assertIn("not given", e1_decide.render(result))
+
+    def test_the_carrying_cost_needs_the_same_pairs_in_a0b_and_a5(self):
+        a0b = [self.run_of("A0b", q, repeat=str(r)) for q, r in (("q1", 1), ("q1", 2), ("q2", 1))]
+        a5 = [self.run_of("A5", q, repeat=str(r)) for q, r in (("q1", 1), ("q2", 1), ("q2", 2))]
+        with self.assertRaisesRegex(ValueError, "A0b and A5 do not hold the same"):
+            e1_decide.decide(self.cells("A0a", 2, repeats=2) + a0b + a5, "A0a")
+
+    def test_the_carrying_cost_of_the_servers_is_a0b_against_a5(self):
+        runs = self.cells("A0a", 4) + self.cells("A0b", 4, cost=0.0716) + self.cells("A5", 4, cost=0.0625)
+        carrying = e1_decide.decide(runs, "A0a")["carrying"]
+        self.assertEqual(carrying["questions"], 4)
+        self.assertEqual(carrying["cost_change_percent"], 14.6)
+        self.assertIsNone(e1_decide.decide(self.cells("A0a", 4) + self.cells("A0b", 4), "A0a")["carrying"])
+
+    def test_the_command_line_prints_the_table_writes_json_and_exits_zero_two_or_three(self):
+        q = QUESTIONS["p-def"]
+        with tempfile.TemporaryDirectory() as tmp:
+            gated = GatedRoot(Path(tmp))
+            decide = [sys.executable, "-I", str(gated.s.e1 / "e1_decide.py")]
+            good = gated.add_results([promptfoo_item(a, "p-def", 1, good_output(q)) for a in ("A0a", "A0b")])
+            out = Path(tmp) / "out.json"
+            done = subprocess.run([*decide, str(good), "--json", str(out)], capture_output=True, text=True, timeout=60)
+            self.assertEqual(done.returncode, 0, done.stderr)
+            self.assertIn("A0b", done.stdout)
+            self.assertIn("correct non-use or no gain", done.stdout)
+            self.assertEqual(json.loads(out.read_text())["faults"], [])
+            faulty = gated.add_results([promptfoo_item("A0a", "p-def", 1, good_output(q)), promptfoo_item("A0b", "p-def", 1, good_output(q)), promptfoo_item("A0b", "p-def", 2, None, error="x")])
+            self.assertEqual(subprocess.run([*decide, str(faulty)], capture_output=True, text=True, timeout=60).returncode, 3)
+            no_base = gated.add_results([promptfoo_item("A0b", "p-def", 1, good_output(q))])
+            refused = subprocess.run([*decide, str(no_base)], capture_output=True, text=True, timeout=60)
+            self.assertEqual(refused.returncode, 2)
+            self.assertIn("baseline", refused.stderr)
+
+
+class FrozenInputsTests(unittest.TestCase):
+    def test_the_docstring_cites_the_rule_in_agents_md_and_does_not_copy_its_text(self):
+        """Review of #1046 at 30639cdc1 (P3): the sentence was repeated as the owner's words. Review of a461c2d76 (P3): the first version of this check repeated a clause of it in the assertion, so the rule's text
+        is read from AGENTS.md here and compared by runs of words."""
+        self.assertIn("AGENTS.md", F.__doc__)
+
+        def runs(source, length=8):
+            words = re.findall(r"[a-z0-9']+", source.lower())
+            return {" ".join(words[i:i + length]) for i in range(len(words) - length + 1)}
+        rule = runs((ROOT / "AGENTS.md").read_text(encoding="utf-8"))
+        self.assertGreater(len(rule), 100, "AGENTS.md was read")
+        self.assertEqual(runs(F.__doc__) & rule, set(), "a run of eight words of AGENTS.md is in the docstring: cite the rule, do not copy it")
+        self.assertNotEqual(runs(F.__doc__ + " " + sorted(rule)[0]) & rule, set(), "the comparison sees a copied run")
+
+    def freeze(self, folder: Path, experiment="e2", status="frozen", drop=None, tamper=False, rows=None):
+        design = F.DESIGNS[experiment]
+        inputs = {}
+        for name in design["inputs"]:
+            if name == drop:
+                continue
+            path = folder / f"{experiment}-{name}.txt"
+            path.write_text(f"{experiment} {name}\n")
+            inputs[name] = {"path": path.name, "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
+        if tamper:
+            (folder / f"{experiment}-{design['inputs'][0]}.txt").write_text("changed after the freeze\n")
+        (folder / f"{experiment}.json").write_text(json.dumps({"experiment": experiment, "status": status, "inputs": inputs, "tests": [{"vars": {"question": "q"}}] if rows is None else rows}))
+
+    def test_without_a_frozen_receipt_every_experiment_refuses_and_names_its_inputs(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            for experiment, design in F.DESIGNS.items():
+                with self.assertRaises(F.FrozenInputsError) as ctx:
+                    F.load_frozen(experiment, tmp)
+                for name in design["inputs"]:
+                    self.assertIn(name, str(ctx.exception))
+                self.assertIn("is not frozen", str(ctx.exception))
+
+    def test_the_repository_ships_no_frozen_receipt(self):
+        self.assertFalse((ES / "frozen").exists(), "a frozen receipt is added by the preregistration of an experiment, not by this change")
+        with mock.patch.dict(os.environ, {}, clear=False):
+            os.environ.pop("E_SERIES_FROZEN", None)
+            for experiment in F.DESIGNS:
+                with self.assertRaises(F.FrozenInputsError):
+                    F.create_tests({"experiment": experiment})
+
+    def test_a_complete_receipt_returns_its_rows_for_each_experiment(self):
+        for experiment in F.DESIGNS:
+            with tempfile.TemporaryDirectory() as tmp:
+                self.freeze(Path(tmp), experiment, rows=[{"vars": {"question": "a"}}, {"vars": {"question": "b"}}])
+                self.assertEqual(F.load_frozen(experiment, tmp), [{"vars": {"question": "a"}}, {"vars": {"question": "b"}}], experiment)
+
+    def test_the_environment_variable_names_the_folder(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            self.freeze(Path(tmp), "e3")
+            with mock.patch.dict(os.environ, {"E_SERIES_FROZEN": tmp}):
+                self.assertEqual(F.create_tests({"experiment": "e3"}), [{"vars": {"question": "q"}}])
+            with mock.patch.dict(os.environ, {"E_SERIES_FROZEN": tmp + "-missing"}):
+                with self.assertRaises(F.FrozenInputsError):
+                    F.create_tests({"experiment": "e3"})
+
+    def test_each_defect_of_a_receipt_stops_the_experiment_with_its_reason(self):
+        cases = {
+            "draft status": (dict(status="draft"), "not 'frozen'"),
+            "an input missing": (dict(drop="tasks"), "input tasks"),
+            "an input changed after the freeze": (dict(tamper=True), "no longer matches"),
+            "no rows": (dict(rows=[]), "no test rows"),
+            "rows that are not objects": (dict(rows=["x"]), "no test rows"),
+        }
+        for label, (kwargs, reason) in cases.items():
+            with tempfile.TemporaryDirectory() as tmp:
+                self.freeze(Path(tmp), "e3", **kwargs)
+                with self.assertRaises(F.FrozenInputsError) as ctx:
+                    F.load_frozen("e3", tmp)
+                self.assertIn(reason, str(ctx.exception), label)
+        with tempfile.TemporaryDirectory() as tmp:
+            Path(tmp, "e3.json").write_text("{not json")
+            with self.assertRaises(F.FrozenInputsError):
+                F.load_frozen("e3", tmp)
+            with self.assertRaises(F.FrozenInputsError):
+                F.load_frozen("e9", tmp)
+        with tempfile.TemporaryDirectory() as tmp:
+            self.freeze(Path(tmp), "e3")
+            receipt = json.loads(Path(tmp, "e3.json").read_text())
+            receipt["experiment"] = "e2"  # complete for e3 in every other respect, but it names another experiment
+            Path(tmp, "e3.json").write_text(json.dumps(receipt))
+            with self.assertRaises(F.FrozenInputsError) as ctx:
+                F.load_frozen("e3", tmp)
+            self.assertIn("does not name experiment e3", str(ctx.exception))
+
+    def test_an_input_with_a_malformed_digest_or_an_absolute_path_is_judged_like_any_other(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            self.freeze(Path(tmp), "e3")
+            receipt = json.loads(Path(tmp, "e3.json").read_text())
+            receipt["inputs"]["tasks"]["sha256"] = "abc"
+            Path(tmp, "e3.json").write_text(json.dumps(receipt))
+            with self.assertRaises(F.FrozenInputsError) as ctx:
+                F.load_frozen("e3", tmp)
+            self.assertIn("lacks a path and a 64-digit sha256", str(ctx.exception))
+            self.freeze(Path(tmp), "e3")
+            receipt = json.loads(Path(tmp, "e3.json").read_text())
+            receipt["inputs"]["tasks"]["path"] = str(Path(tmp, "e3-tasks.txt").resolve())
+            Path(tmp, "e3.json").write_text(json.dumps(receipt))
+            self.assertEqual(len(F.load_frozen("e3", tmp)), 1)
+
+    def test_the_designs_are_the_four_experiments_of_the_cause_table_with_their_arms_and_inputs(self):
+        self.assertEqual(F.DESIGNS, {
+            "e2": {"title": "records retrieval", "arms": ["grep-status-quo", "qmd-directive", "aimemory-directive"], "inputs": ["questions", "qmd_collection", "directives"]},
+            "e3": {"title": "headroom parity", "arms": ["direct", "headroom-proxy"], "inputs": ["tasks", "proxy"]},
+            "e4": {"title": "autonomous skills", "arms": ["baseline", "fix7-sentence"], "inputs": ["tasks", "sentence", "skills"]},
+            "e5": {"title": "unresolved triggers", "arms": ["natural"], "inputs": ["trigger_cases", "variants", "skills"]},
+        })
+
+    def test_the_designs_name_the_arms_the_readme_table_lists(self):
+        readme = (ES / "README.md").read_text(encoding="utf-8")
+        for experiment, design in F.DESIGNS.items():
+            for arm in design["arms"]:
+                self.assertIn(f"`{arm}`", readme, f"{experiment}: arm {arm} is in the README table")
+            for name in design["inputs"]:
+                self.assertIn(f"`{name}`", readme, f"{experiment}: input {name} is in the README table")
+
+
+class ScratchRepository:
+    """A repository with a base and a stale commit, a copy of the E1 folder whose tasks.json names them, fake client/promptfoo/server executables and a fake home."""
+
+    def __init__(self, tmp: Path):
+        tmp = Path(os.path.realpath(tmp))
+        self.tmp = tmp
+        self.repo = tmp / "repo"
+        self.repo.mkdir()
+        self.git("init", "-q")
+        (self.repo / "AGENTS.md").write_text("rules\n")
+        (self.repo / "CLAUDE.md").write_text("@AGENTS.md\n")
+        (self.repo / "old.py").write_text("def old():\n    pass\n")
+        self.commit("stale")
+        self.stale = self.git("rev-parse", "HEAD").strip()
+        (self.repo / "new.py").write_text("def new():\n    pass\n")
+        self.commit("base")
+        self.base = self.git("rev-parse", "HEAD").strip()
+        self.e1 = tmp / "e1"
+        shutil.copytree(E1, self.e1, ignore=shutil.ignore_patterns("__pycache__"))
+        tasks = dict(TASKS, base=self.base, stale=self.stale)
+        (self.e1 / "tasks.json").write_text(json.dumps(tasks))
+        self.bin = tmp / "bin"
+        self.bin.mkdir()
+        (self.bin / "git").symlink_to(shutil.which("git"))
+        self.claude = self.script("claude", 'echo "2.1.296 (Claude Code)"')
+        self.promptfoo = self.script("promptfoo-bin", 'echo "banner"; echo "0.124.0"')
+        for command in C.SERVER_COMMANDS.values():
+            self.script(command, "exit 0")
+        self.sdk = tmp / "sdk"
+        self.sdk.mkdir()
+        (self.sdk / "package.json").write_text(json.dumps({"name": "@anthropic-ai/claude-agent-sdk", "version": C.SDK_VERSION}))
+        self.semble = tmp / "semble-model"
+        self.semble.mkdir()
+        self.home = tmp / "home"
+        self.home.mkdir()
+        self.work = tmp / "work"
+        self.work.mkdir()
+        self.root = self.work / "root"
+        self.env = {**CLEAN_ENV, "HOME": str(self.home), "PATH": str(self.bin)}  # only the fake servers and git: no npm, no network
+        self.env.pop("E1_ROOT", None)
+
+    def git(self, *args):
+        return subprocess.run(["git", "-C", str(self.repo), *args], capture_output=True, text=True, check=True).stdout
+
+    def commit(self, message):
+        self.git("add", "-A")
+        subprocess.run(["git", "-C", str(self.repo), "-c", "user.name=scratch", "-c", "user.email=no-address", "commit", "-q", "-m", message], check=True, capture_output=True)
+
+    def script(self, name, body):
+        path = self.bin / name
+        path.write_text(f"#!/bin/sh\n{body}\n")
+        path.chmod(path.stat().st_mode | stat.S_IXUSR)
+        return path
+
+    def prepare(self, *extra, root=None, claude=None, promptfoo=None, sdk=True):
+        cmd = [sys.executable, "-I", str(self.e1 / "e1_prepare.py"), "--root", str(root or self.root), "--claude", str(claude or self.claude), "--semble-model", str(self.semble),
+               "--repo", str(self.repo), "--promptfoo", str(promptfoo or self.promptfoo)]
+        if sdk:
+            cmd += ["--sdk-from", str(self.sdk)]
+        return subprocess.run(cmd + list(extra), capture_output=True, text=True, env=self.env, timeout=120)
+
+    def run(self, *args, env=None):
+        return subprocess.run([sys.executable, "-I", str(self.e1 / "e1_run.py"), "--root", str(self.root), *args], capture_output=True, text=True, env=env or self.env, timeout=120)
+
+    def python_script(self, name, source):
+        path = self.bin / name
+        path.write_text(f"#!{sys.executable}\n{source}")
+        path.chmod(path.stat().st_mode | stat.S_IXUSR)
+        return path
+
+    def use_fake_promptfoo(self):
+        """Make promptfoo an executable that writes result files and logs every call: FAKE_PREFLIGHT (pass, fail or missing), FAKE_STATUS, FAKE_RESULTS (a file copied as the question result), FAKE_LOG."""
+        self.promptfoo = self.python_script("promptfoo-bin", FAKE_PROMPTFOO)
+        self.log = self.work / "promptfoo-calls.jsonl"
+        self.env["FAKE_LOG"] = str(self.log)
+        return self.promptfoo
+
+    def calls(self, kind=None):
+        lines = [json.loads(line) for line in self.log.read_text().splitlines()] if self.log.exists() else []
+        return [call for call in lines if kind is None or call["kind"] == kind]
+
+    def with_env(self, **extra):
+        return {**self.env, **extra}
+
+    def gate_files(self, prefix):
+        return sorted((self.root / "out").glob(f"{prefix}-*.gate"))
+
+    def passing_preflight(self, *arms):
+        done = self.run("--preflight", *(["--arms", ",".join(arms)] if arms else []))
+        assert done.returncode == 0, done.stderr
+        return done
+
+
+class GatedRoot:
+    """A prepared scratch root behind a passing pre-flight (the fake promptfoo), able to add question runs whose result file holds the items given."""
+
+    def __init__(self, tmp):
+        self.s = ScratchRepository(Path(tmp))
+        self.s.use_fake_promptfoo()
+        assert self.s.prepare().returncode == 0
+        self.s.passing_preflight()
+        self.count = 0
+
+    def add_results(self, items, *run_args):
+        self.count += 1
+        items_file = write_results(self.s.work / f"fake-results-{self.count}.json", items)
+        done = self.s.run("--questions", *run_args, env=self.s.with_env(FAKE_RESULTS=str(items_file)))
+        assert done.returncode == 0, done.stderr
+        return sorted((self.s.root / "out").glob("questions-*.json"))[-1]
+
+
+class GatedDecideTests(unittest.TestCase):
+    """Review of #1046 at 30639cdc1 (P1, P3): a result file is decided only if e1_run.py produced it behind a passing pre-flight of the root's current preparation."""
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory(prefix="e-series-gate-")
+        self.addCleanup(self._tmp.cleanup)
+        self.gated = GatedRoot(Path(self._tmp.name))
+        self.s = self.gated.s
+        self.q = QUESTIONS["p-def"]
+
+    def decide(self, *args):
+        return subprocess.run([sys.executable, "-I", str(self.s.e1 / "e1_decide.py"), *map(str, args)], capture_output=True, text=True, timeout=60)
+
+    def pair(self, **a1):
+        return [promptfoo_item("A0a", "p-def", 1, good_output(self.q)), promptfoo_item("A1", "p-def", 1, good_output(self.q), calls=("mcp__serena__find_symbol",), **a1)]
+
+    def test_a_result_behind_a_passing_preflight_is_decided_and_the_record_names_what_it_ran_behind(self):
+        result = self.gated.add_results(self.pair())
+        done = self.decide(result)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        self.assertIn("ADOPT", done.stdout)
+        record = json.loads(result.with_name(result.stem + ".gate").read_text())
+        pre = self.s.gate_files("preflight")[-1]
+        self.assertEqual((record["kind"], record["preflight"], record["preflight_sha256"], record["result_sha256"]), ("questions", pre.name, sha256_bytes(pre), sha256_bytes(result)))
+        self.assertEqual(record["manifest_sha256"], sha256_bytes(self.s.root / "manifest.json"))
+
+    def test_a_file_without_a_record_or_outside_a_root_is_refused_and_ungated_prints_the_table_without_a_verdict(self):
+        result = self.gated.add_results(self.pair())
+        bare = Path(self._tmp.name) / "bare.json"
+        shutil.copyfile(result, bare)
+        done = self.decide(bare)
+        self.assertEqual(done.returncode, 2)
+        self.assertIn("is not in the out directory of a prepared root", done.stderr)
+        loose = self.s.root / "out" / "questions-19990101T000000000000Z.json"
+        shutil.copyfile(result, loose)
+        done = self.decide(loose)
+        self.assertEqual(done.returncode, 2)
+        self.assertIn("has no gate record", done.stderr)
+        described = self.decide(loose, "--ungated")
+        self.assertEqual(described.returncode, 0, described.stderr)
+        self.assertIn("A1", described.stdout)
+        self.assertNotIn("ADOPT", described.stdout)
+        self.assertNotIn("correct non-use", described.stdout)
+        self.assertIn("UNGATED", described.stderr)
+
+    def test_an_edited_file_an_older_preparation_and_a_voided_run_are_refused(self):
+        result = self.gated.add_results(self.pair())
+        self.assertEqual(self.decide(result).returncode, 0)
+        original = result.read_text()
+        result.write_text(original.replace("0.05", "0.01"))
+        done = self.decide(result)
+        self.assertEqual(done.returncode, 2)
+        self.assertIn("has changed", done.stderr)
+        result.write_text(original)
+        self.s.run("--preflight", env=self.s.with_env(FAKE_PREFLIGHT="fail"))
+        done = self.decide(result)
+        self.assertEqual(done.returncode, 2)
+        self.assertIn("did not pass", done.stderr)
+        self.assertIn("void", done.stderr)
+        self.s.passing_preflight()
+        self.assertEqual(self.decide(result).returncode, 2, "a later passing pre-flight does not undo it: the runs since the last passing one before the failure stay void")
+        fresh = self.gated.add_results(self.pair())
+        self.assertEqual(self.decide(fresh).returncode, 0, "a run behind the new passing pre-flight is decided")
+        self.assertEqual(self.s.prepare("--rebuild").returncode, 0)
+        done = self.decide(result)
+        self.assertEqual(done.returncode, 2)
+        self.assertIn("earlier preparation", done.stderr)
+
+    def test_the_pre_flight_record_a_result_ran_behind_must_be_there_unchanged_and_passed(self):
+        result = self.gated.add_results(self.pair())
+        sidecar = result.with_name(result.stem + ".gate")
+        recorded = json.loads(sidecar.read_text())
+        gate = self.s.root / "out" / recorded["preflight"]
+        text = gate.read_text()
+        gate.write_text(text.replace('"passed": true', '"passed": true, "note": "edited"'))
+        done = self.decide(result)
+        self.assertEqual(done.returncode, 2)
+        self.assertIn("is gone or has changed", done.stderr)
+        gate.unlink()
+        self.assertIn("is gone or has changed", self.decide(result).stderr)
+        gate.write_text(text)
+        self.assertEqual(self.decide(result).returncode, 0)
+        # a record that names a pre-flight which failed, even one made before the run, does not open the gate
+        failed = self.s.run("--preflight", env=self.s.with_env(FAKE_PREFLIGHT="fail"))
+        self.assertEqual(failed.returncode, 100)
+        failed_gate = self.s.gate_files("preflight")[-1]
+        self.s.passing_preflight()
+        forged = self.gated.add_results(self.pair())
+        forged_sidecar = forged.with_name(forged.stem + ".gate")
+        record = json.loads(forged_sidecar.read_text())
+        record["preflight"], record["preflight_sha256"] = failed_gate.name, sha256_bytes(failed_gate)
+        forged_sidecar.write_text(json.dumps(record))
+        done = self.decide(forged)
+        self.assertEqual(done.returncode, 2)
+        self.assertIn("ran behind a pre-flight that did not pass", done.stderr)
+
+    def test_the_gate_after_the_last_run_can_be_required(self):
+        result = self.gated.add_results(self.pair())
+        self.assertEqual(e1_gate.verify_result(result), [])
+        self.assertTrue(any("no pre-flight after" in problem for problem in e1_gate.verify_result(result, require_after=True)))
+        self.assertEqual(self.decide(result).returncode, 0)
+        done = self.decide(result, "--require-after-gate")
+        self.assertEqual(done.returncode, 2)
+        self.assertIn("no pre-flight after", done.stderr)
+        self.s.passing_preflight()
+        self.assertEqual(e1_gate.verify_result(result, require_after=True), [])
+        self.assertEqual(self.decide(result, "--require-after-gate").returncode, 0)
+
+    def test_a_missing_cost_never_gives_an_adoption(self):
+        """Review of #1046 at 30639cdc1 (P1): A0a cost 0.05, A1 correct with a Serena call and no cost: the decision CLI returned rc 0 and `ADOPT`."""
+        for label, value in (("missing", "delete"), ("null", None), ("an empty string", ""), ("negative", -0.05), ("minus infinite", float("-inf"))):
+            items = self.pair()
+            if value == "delete":
+                del items[1]["response"]["cost"]
+            else:
+                items[1]["response"]["cost"] = value
+            with self.subTest(cost=label):
+                done = self.decide(self.gated.add_results(items))
+                self.assertEqual(done.returncode, 3, done.stdout + done.stderr)
+                self.assertNotIn("ADOPT", done.stdout)
+                self.assertIn("no usable cost", done.stderr)
+        zero = self.decide(self.gated.add_results(self.pair(cost=0.0)))
+        self.assertEqual(zero.returncode, 0, "a cost of 0 that is present is a measurement")
+
+    def test_a_comparison_that_lost_a_run_gets_no_verdict_in_the_table_or_the_json(self):
+        """Review of #1046 at a461c2d76 (P2): A0a and A1 on two questions, A1 correct with a Serena call, and A1's p-refs response without cost: the CLI returned rc 3 and still printed `ADOPT`, from the one
+        question left ("1 vs 1"), because leaving the run out removed the question from the compared set. promptfoo makes the cost undefined when usage is unavailable and returns it with a success response
+        (promptfoo@30949931ee90 src/providers/claude-agent-sdk.ts L2445-L2447, L2487-L2498)."""
+        define, refs = QUESTIONS["p-def"], QUESTIONS["p-refs"]
+        navigating = ("mcp__serena__find_symbol",)
+
+        def rows(arm, calls=(), **refs_changes):
+            first = promptfoo_item(arm, "p-def", 1, good_output(define), calls=calls)
+            second = promptfoo_item(arm, "p-refs", 1, good_output(refs), calls=calls, **refs_changes)
+            return [first, second]
+
+        def without_cost(row):
+            del row["response"]["cost"]
+            return row
+
+        def decided(label, items):
+            out = Path(self._tmp.name) / f"{label}.json"
+            done = self.decide(self.gated.add_results(items), "--json", out)
+            return done, json.loads(out.read_text())
+
+        done, data = decided("complete", rows("A0a") + rows("A1", navigating))
+        self.assertEqual(done.returncode, 0, done.stderr)
+        self.assertIn("ADOPT", done.stdout)
+        self.assertIs(data["verdicts"]["A1"]["adopt"], True)
+        done, data = decided("zero", rows("A0a") + rows("A1", navigating, cost=0.0))
+        self.assertEqual((done.returncode, data["verdicts"]["A1"]["adopt"]), (0, True), "a cost of 0 that is present is a measurement")
+        cases = {"the candidate's cost is missing": rows("A0a") + [rows("A1", navigating)[0], without_cost(rows("A1", navigating)[1])],
+                 "the baseline's cost is missing": [rows("A0a")[0], without_cost(rows("A0a")[1])] + rows("A1", navigating),
+                 "the candidate's run ended in a provider error": rows("A0a") + [rows("A1", navigating)[0], promptfoo_item("A1", "p-refs", 1, None, error="overloaded")]}
+        for label, items in cases.items():
+            with self.subTest(case=label):
+                done, data = decided(label.replace(" ", "-").replace("'", ""), items)
+                self.assertEqual(done.returncode, 3, done.stdout + done.stderr)
+                self.assertNotIn("ADOPT", done.stdout)
+                self.assertNotIn("correct non-use", done.stdout)
+                self.assertIn("no verdict", done.stdout)
+                self.assertIn("A1 ", done.stdout, "the table is still printed")
+                self.assertIsNone(data["verdicts"]["A1"].get("adopt"))
+                self.assertIn("incomplete", data["verdicts"]["A1"]["withheld"])
+                self.assertNotIn('"adopt": true', json.dumps(data))
+        # a loss in another arm withholds only that arm's verdict
+        done, data = decided("other-arm", rows("A0a") + rows("A1", navigating) + [rows("A3", navigating)[0], without_cost(rows("A3", navigating)[1])])
+        self.assertEqual(done.returncode, 3, done.stdout + done.stderr)
+        self.assertIs(data["verdicts"]["A1"]["adopt"], True)
+        self.assertIsNone(data["verdicts"]["A3"]["adopt"])
+        self.assertIn("ADOPT", done.stdout)
+
+    def test_the_gate_after_the_last_run_must_have_checked_the_arms_of_the_run(self):
+        """Review of #1046 at a461c2d76 (P2): after a gated A0a/A1 result a later `--preflight --arms A5` passed and `--require-after-gate` returned rc 0 and `ADOPT`, although neither evaluated arm was checked after
+        the run: only that a later passing pre-flight existed was tested."""
+        result = self.gated.add_results(self.pair(), "--arms", "A0a,A1")
+        self.assertEqual(self.decide(result, "--require-after-gate").returncode, 2, "no later pre-flight at all")
+        for label, arms in (("another arm only", ("A5",)), ("one of the two arms", ("A0a",))):
+            with self.subTest(later=label):
+                self.s.passing_preflight(*arms)
+                problems = e1_gate.verify_result(result, require_after=True)
+                self.assertEqual(len(problems), 1, problems)
+                self.assertIn("checked its arms (A0a, A1)", problems[0])
+                done = self.decide(result, "--require-after-gate")
+                self.assertEqual(done.returncode, 2, done.stdout)
+                self.assertIn("did not cover arm(s)", done.stderr)
+                self.assertNotIn("ADOPT", done.stdout)
+        self.assertEqual(self.decide(result).returncode, 0, "without the option the result is decided as before")
+        self.s.passing_preflight("A0a", "A1")
+        self.assertEqual(e1_gate.verify_result(result, require_after=True), [])
+        done = self.decide(result, "--require-after-gate")
+        self.assertEqual(done.returncode, 0, done.stderr)
+        self.assertIn("ADOPT", done.stdout)
+        # the gate that closes the run must still match its own result file, and belong to this preparation
+        closing = self.s.gate_files("preflight")[-1]
+        record = json.loads(closing.read_text())
+        closing_result = self.s.root / "out" / record["result"]
+        original = closing_result.read_bytes()
+        closing_result.write_bytes(original + b" ")
+        problems = e1_gate.verify_result(result, require_after=True)
+        self.assertEqual(len(problems), 1, problems)
+        self.assertIn("is gone or has changed", problems[0])
+        closing_result.write_bytes(original)
+        self.assertEqual(e1_gate.verify_result(result, require_after=True), [])
+        record["manifest_sha256"] = "0" * 64
+        closing.write_text(json.dumps(record))
+        self.assertIn("another preparation", " ".join(e1_gate.verify_result(result, require_after=True)))
+        # a questions record that names no arms cannot be shown to be covered by any later pre-flight
+        sidecar = result.with_name(result.stem + ".gate")
+        recorded = json.loads(sidecar.read_text())
+        sidecar.write_text(json.dumps({**recorded, "arms": []}))
+        self.assertIn("names no arms", " ".join(e1_gate.verify_result(result, require_after=True)))
+
+    def test_a_replayed_result_file_is_a_fault_with_its_exit_status(self):
+        first = self.gated.add_results(self.pair())
+        second = self.gated.add_results(self.pair())
+        done = self.decide(first, second)
+        self.assertEqual(done.returncode, 3, done.stdout)
+        self.assertIn("appears twice", done.stderr)
+
+
+class GateUnitTests(unittest.TestCase):
+    """e1_gate.preflight_outcome over promptfoo result files: what counts as a passed pre-flight row."""
+
+    def row(self, arm, ok=True, **changes):
+        item = promptfoo_item(arm, "preflight", 1, {"answer": "TOOLS: none"}, kind="preflight")
+        item["gradingResult"] = {"pass": ok}
+        item["failureReason"] = 0 if ok else 1
+        item.update(changes)
+        return item
+
+    def outcome(self, items, arms=("A0a", "A5")):
+        with tempfile.TemporaryDirectory() as tmp:
+            return e1_gate.preflight_outcome(write_results(Path(tmp) / "r.json", items), arms)
+
+    def test_a_pre_flight_passes_only_when_each_asked_for_arm_has_exactly_one_passing_row(self):
+        self.assertEqual(self.outcome([self.row("A0a"), self.row("A5")]), (True, []))
+        ok, reasons = self.outcome([self.row("A0a"), self.row("A5", ok=False)])
+        self.assertFalse(ok)
+        self.assertEqual(reasons, ["A5: the assertion did not pass, failure reason 1"])
+        ok, reasons = self.outcome([self.row("A0a")])
+        self.assertEqual((ok, reasons), (False, ["A5: 0 pre-flight rows, expected 1"]))
+        ok, reasons = self.outcome([self.row("A0a"), self.row("A0a"), self.row("A5")])
+        self.assertEqual((ok, reasons), (False, ["A0a: 2 pre-flight rows, expected 1"]))
+        ok, reasons = self.outcome([self.row("A0a"), self.row("A5"), self.row("A1")])
+        self.assertEqual((ok, reasons), (False, ["pre-flight rows of arms that were not asked for: A1"]))
+
+    def test_each_sign_of_a_failed_row_counts_by_itself(self):
+        error = {"response": {"error": "provider failed"}}
+        cases = {"the assertion is not a pass": dict(gradingResult={"pass": False}, failureReason=0), "no assertion result": dict(gradingResult={}), "a failure reason": dict(failureReason=2),
+                 "a provider error": error}
+        for label, changes in cases.items():
+            with self.subTest(sign=label):
+                ok, reasons = self.outcome([self.row("A0a"), self.row("A5", **changes)])
+                self.assertFalse(ok)
+                self.assertTrue(reasons and reasons[0].startswith("A5: "), reasons)
+
+    def test_a_question_row_is_not_a_pre_flight_row_and_an_unreadable_result_fails(self):
+        question = promptfoo_item("A5", "p-def", 1, {}, kind="question")
+        self.assertEqual(self.outcome([self.row("A0a"), self.row("A5"), question]), (True, []))
+        with tempfile.TemporaryDirectory() as tmp:
+            missing = Path(tmp) / "none.json"
+            self.assertEqual(e1_gate.preflight_outcome(missing, ("A5",)), (False, ["promptfoo wrote no readable result file"]))
+            broken = Path(tmp) / "broken.json"
+            for text in ("{not json", "[]", json.dumps({"results": {"results": "x"}}), json.dumps({"results": {}})):
+                broken.write_text(text)
+                self.assertFalse(e1_gate.preflight_outcome(broken, ("A5",))[0], text)
+
+
+class PrepareTests(unittest.TestCase):
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory(prefix="e-series-")
+        self.addCleanup(self._tmp.cleanup)
+        self.s = ScratchRepository(Path(self._tmp.name))
+
+    def test_prepare_builds_four_trees_the_fence_the_staged_config_and_a_manifest(self):
+        done = self.s.prepare()
+        self.assertEqual(done.returncode, 0, done.stderr)
+        root = self.s.root
+        manifest = json.loads((root / "manifest.json").read_text())
+        self.assertEqual(manifest["trees"], {"base": self.s.base, "base-serena": self.s.base, "stale": self.s.stale, "stale-path": self.s.stale})
+        for name, (commit, directive) in C.TREES.items():
+            tree = root / "trees" / name
+            self.assertEqual(subprocess.run(["git", "-C", str(tree), "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip(), manifest["trees"][name])
+            local = tree / "CLAUDE.local.md"
+            if directive:
+                self.assertEqual(local.read_text(), (E1 / "directives" / f"{directive}.md").read_text())
+            else:
+                self.assertFalse(local.exists(), name)
+            self.assertTrue((tree / ("new.py" if commit == "base" else "old.py")).is_file())
+            self.assertEqual(not (tree / "new.py").exists(), commit == "stale")
+            self.assertTrue((tree / ".git" / "objects" / "info" / "alternates").is_file(), f"{name}: a shared clone, so that a per-call copy of the tree does not copy the object store")
+        for name in C.STAGED_FILES:
+            self.assertEqual(sha256_bytes(root / "config" / name), manifest["staged"][name], name)
+        self.assertTrue((root / "config" / "node_modules" / "@anthropic-ai" / "claude-agent-sdk").is_symlink())
+        self.assertEqual(manifest["sdk"], {"version": C.SDK_VERSION, "route": "link"})
+        self.assertEqual(manifest["claude"]["version"], "2.1.296 (Claude Code)")
+        self.assertEqual(manifest["promptfoo"]["version"], "0.124.0")
+        self.assertEqual(set(manifest["servers"]), set(C.SERVERS))
+        for name in e1_prepare.WORK_DIRS:
+            self.assertEqual(stat.S_IMODE((root / name).stat().st_mode), 0o700, name)
+        self.assertEqual(sha256_bytes(root / "settings.json"), manifest["settings_sha256"])
+        self.assertEqual((manifest["harness"], manifest["schema"]), (C.HARNESS, C.MANIFEST_SCHEMA))
+        self.assertEqual(e1_prepare.validate_manifest(manifest), [])
+        self.assertRegex(manifest["generation"], r"^[0-9a-f]{32}$")
+
+    def test_the_fence_denies_home_and_every_sibling_of_the_root_but_not_the_root(self):
+        sibling = self.s.work / "another-lanes-files"
+        sibling.mkdir()
+        self.assertEqual(self.s.prepare().returncode, 0)
+        settings = json.loads((self.s.root / "settings.json").read_text())
+        deny, read = settings["permissions"]["deny"], settings["sandbox"]["filesystem"]["denyRead"]
+        self.assertIn("Read(/" + str(self.s.home) + "/**)", deny)
+        self.assertIn("Edit(/" + str(self.s.home) + "/**)", deny)
+        self.assertIn("Read(/" + str(sibling) + "/**)", deny)
+        self.assertIn("Read(//tmp/**)", deny)
+        self.assertIn(str(self.s.home), read)
+        self.assertIn(str(sibling), read)
+        self.assertFalse([d for d in deny if str(self.s.root) in d])
+        self.assertNotIn(str(self.s.root), read)
+        self.assertEqual(settings["sandbox"]["enabled"], True)
+        self.assertEqual(settings["sandbox"]["failIfUnavailable"], True)
+        self.assertEqual(settings["sandbox"]["allowUnsandboxedCommands"], False)
+        self.assertEqual(settings["sandbox"]["network"], {"allowedDomains": [], "strictAllowlist": True})
+        self.assertEqual(settings["permissions"]["allow"], ["Bash", "mcp__serena", "mcp__semble", "mcp__codebase-memory-mcp", "mcp__jcodemunch", "ToolSearch"])
+
+    def test_settings_for_is_a_function_of_the_root_its_siblings_and_the_home_only(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "r"
+            root.mkdir()
+            (Path(tmp) / "s1").mkdir()
+            settings = e1_prepare.settings_for(root, Path("/home/example"))
+            self.assertEqual(settings["sandbox"]["filesystem"]["denyRead"], sorted(["/home/example", str(Path(tmp) / "s1")]))
+            self.assertEqual(settings["sandbox"]["filesystem"]["allowRead"], [])
+
+    def test_prepare_refuses_each_unsafe_or_wrong_input_and_writes_nothing(self):
+        s = self.s
+        wrong_client = s.script("claude-old", 'echo "2.1.295 (Claude Code)"')
+        old_promptfoo = s.script("promptfoo-old", 'echo "0.123.1"')
+        no_version = s.script("promptfoo-none", 'echo "no version here"')
+        cases = {
+            "the root inside the repository": (dict(root=s.repo / "inside"), "inside the repository"),
+            "the root inside HOME": (dict(root=s.home / "root"), "inside $HOME"),
+            "a client of another version": (dict(claude=wrong_client), "preregistered client"),
+            "a promptfoo without copy_working_dir": (dict(promptfoo=old_promptfoo), "older than 0.124.0"),
+            "a promptfoo that reports no version": (dict(promptfoo=no_version), "unknown version"),
+            "no SDK source and no npm": (dict(sdk=False), "npm is not on PATH"),
+        }
+        for label, (kwargs, reason) in cases.items():
+            done = s.prepare(**kwargs)
+            self.assertEqual(done.returncode, 2, label)
+            self.assertIn(reason, done.stderr, label)
+        self.assertFalse(s.root.exists(), "a refusal creates no root")
+        self.assertFalse((s.repo / "inside").exists())
+        self.assertFalse((s.home / "root").exists())
+
+    def test_prepare_refuses_a_wrong_sdk_version_a_missing_server_and_a_missing_commit(self):
+        s = self.s
+        (s.sdk / "package.json").write_text(json.dumps({"name": "x", "version": "0.3.1"}))
+        done = s.prepare()
+        self.assertEqual(done.returncode, 2)
+        self.assertIn(C.SDK_VERSION, done.stderr)
+        self.assertFalse(s.root.exists(), "the SDK is checked before anything is built")
+        (s.sdk / "package.json").unlink()
+        self.assertIn("package.json", s.prepare().stderr)
+        (s.sdk / "package.json").write_text(json.dumps({"name": "x", "version": C.SDK_VERSION}))
+        (s.bin / "semble").unlink()
+        done = s.prepare(root=s.work / "other")
+        self.assertEqual(done.returncode, 2)
+        self.assertIn("semble", done.stderr)
+        self.script_restore = s.script("semble", "exit 0")
+        tasks = json.loads((s.e1 / "tasks.json").read_text())
+        tasks["stale"] = "0" * 40
+        (s.e1 / "tasks.json").write_text(json.dumps(tasks))
+        done = s.prepare(root=s.work / "third")
+        self.assertEqual(done.returncode, 2)
+        self.assertIn("stale commit", done.stderr)
+
+    def test_an_existing_root_needs_rebuild_and_a_foreign_directory_is_never_touched(self):
+        s = self.s
+        self.assertEqual(s.prepare().returncode, 0)
+        again = s.prepare()
+        self.assertEqual(again.returncode, 2)
+        self.assertIn("--rebuild", again.stderr)
+        self.assertEqual(s.prepare("--rebuild").returncode, 0)
+        foreign = s.work / "foreign"
+        foreign.mkdir()
+        (foreign / "keep.txt").write_text("someone else's file\n")
+        done = s.prepare("--rebuild", root=foreign)
+        self.assertEqual(done.returncode, 2)
+        self.assertEqual((foreign / "keep.txt").read_text(), "someone else's file\n")
+        self.assertEqual(sorted(p.name for p in foreign.iterdir()), ["keep.txt"])
+
+    def test_a_directory_with_a_file_named_manifest_json_is_not_a_root_of_this_harness(self):
+        """Review of #1046 at 30639cdc1 (P1): the name of the file was the whole test of ownership, and config/ was then removed without --rebuild."""
+        s = self.s
+        cases = {"an unrelated manifest": json.dumps({"application": "unrelated"}), "not JSON": "{not json", "a list": "[1, 2]", "another harness": json.dumps({"harness": "another/harness", "schema": 2}),
+                 "this harness with an older schema": json.dumps({"harness": C.HARNESS, "schema": 1}), "this harness without its fields": json.dumps({"harness": C.HARNESS, "schema": C.MANIFEST_SCHEMA})}
+        for label, text in cases.items():
+            foreign = s.work / ("foreign-" + re.sub(r"\W+", "-", label))
+            (foreign / "config").mkdir(parents=True)
+            (foreign / "manifest.json").write_text(text)
+            (foreign / "config" / "keep.txt").write_text("someone else's file\n")
+            for extra in ((), ("--rebuild",)):
+                with self.subTest(case=label, rebuild=bool(extra)):
+                    done = s.prepare(*extra, root=foreign)
+                    self.assertEqual(done.returncode, 2, done.stderr)
+                    self.assertIn("is not a root of this harness", done.stderr)
+                    self.assertEqual((foreign / "config" / "keep.txt").read_text(), "someone else's file\n")
+                    self.assertEqual(sorted(p.name for p in foreign.iterdir()), ["config", "manifest.json"])
+                    self.assertEqual((foreign / "manifest.json").read_text(), text)
+        control = s.work / "foreign-without-a-manifest"
+        (control / "config").mkdir(parents=True)
+        (control / "config" / "keep.txt").write_text("kept\n")
+        self.assertEqual(s.prepare(root=control).returncode, 2, "the control of the review: no manifest at all was already refused")
+        self.assertTrue((control / "config" / "keep.txt").exists())
+
+    def test_a_root_of_this_harness_is_replaced_only_with_rebuild_even_when_it_is_partial(self):
+        """Review of #1046 at 30639cdc1 (P1): `trees/` was the only thing the rebuild check looked for, and config/ was removed unconditionally."""
+        s = self.s
+        self.assertEqual(s.prepare().returncode, 0)
+        generation = json.loads((s.root / "manifest.json").read_text())["generation"]
+        shutil.rmtree(s.root / "trees")       # a manifest and config/ but no trees/
+        done = s.prepare()
+        self.assertEqual(done.returncode, 2)
+        self.assertIn("--rebuild", done.stderr)
+        self.assertTrue((s.root / "config" / "promptfooconfig.yaml").is_file(), "config/ is not replaced without --rebuild")
+        done = s.prepare("--rebuild")
+        self.assertEqual(done.returncode, 0, done.stderr)
+        replaced = json.loads((s.root / "manifest.json").read_text())
+        self.assertEqual(e1_prepare.validate_manifest(replaced), [])
+        self.assertNotEqual(replaced["generation"], generation, "every preparation is a new generation")
+        self.assertTrue((s.root / "trees" / "base").is_dir())
+
+    def tree_state(self, folder):
+        """{path under `folder`: the bytes of a file, "dir" or ("link", target)} for everything in it; no link is followed."""
+        found = {}
+        for here, folders, files in os.walk(folder, followlinks=False):
+            for name in sorted(folders + files):
+                path = Path(here) / name
+                relative = str(path.relative_to(folder))
+                if path.is_symlink():
+                    found[relative] = ("link", os.readlink(path))
+                elif path.is_dir():
+                    found[relative] = "dir"
+                else:
+                    found[relative] = path.read_bytes()
+        return found
+
+    def writer_folder(self):
+        """A new empty folder of this test's scratch directory, for the tests of write_owned that list what a call leaves behind."""
+        return Path(tempfile.mkdtemp(prefix="writer-", dir=self._tmp.name))
+
+    def file_identity(self, path):
+        """(bytes, inode, device, link count) of a file, read without following a link: what a file has that a write through another name of its inode would change."""
+        found = os.lstat(path)
+        return Path(path).read_bytes(), found.st_ino, found.st_dev, found.st_nlink
+
+    def test_a_rebuild_never_follows_a_link_of_an_owned_root(self):
+        """Review of #1046 at a461c2d76 (P1): `--rebuild` removed config/ with errors ignored, which leaves a link to a directory in place (shutil.rmtree raises on one, python/cpython@cbc944f4 Lib/shutil.py L676,
+        and L736 swallows the error), and the copies then opened the link's target for writing (L262): an unrelated promptfooconfig.yaml was overwritten and the staged files were written beside it, exit 0. The same
+        holds for every entry the script removes or writes, and for a manifest.json that is a link: another directory's manifest would stand for this root's and be overwritten."""
+        s = self.s
+        entries = e1_prepare.OWNED_DIRS + e1_prepare.OWNED_FILES
+        self.assertEqual(set(entries), {"trees", "config", "settings.json", "manifest.json", *e1_prepare.WORK_DIRS})
+        for name in entries:
+            slug = name.replace(".", "-")
+            root, foreign = s.work / f"root-{slug}", s.work / f"foreign-{slug}"
+            self.assertEqual(s.prepare(root=root).returncode, 0)
+            if name in e1_prepare.OWNED_DIRS:
+                foreign.mkdir()
+                (foreign / "promptfooconfig.yaml").write_text("someone else's file\n")
+                (foreign / "keep.txt").write_text("kept\n")
+                shutil.rmtree(root / name)
+            else:
+                foreign.write_bytes((root / name).read_bytes() if name == e1_prepare.MANIFEST else b"someone else's file\n")   # a valid manifest behind the link: the old check read through it
+                (root / name).unlink()
+            (root / name).symlink_to(foreign)
+
+            def observed(root=root, foreign=foreign):
+                return self.tree_state(root), (self.tree_state(foreign) if foreign.is_dir() else foreign.read_bytes())
+            before = observed()
+            for extra in ((), ("--rebuild",), ("--rebuild", "--dry-run")):
+                with self.subTest(entry=name, arguments=extra):
+                    done = s.prepare(*extra, root=root)
+                    self.assertEqual(done.returncode, 2, done.stdout + done.stderr)
+                    self.assertIn(f"{name} is a link", done.stderr)
+                    self.assertIn("nothing was changed", done.stderr)
+                    self.assertEqual(observed(), before, "the root is as it was, link included, and nothing behind the link was written or removed")
+
+    def test_an_entry_of_the_wrong_kind_is_refused_before_anything_is_changed(self):
+        """The same rule for an entry that is not a link but is not what the script makes either: a file where a directory is kept, a directory where a file is written."""
+        s = self.s
+        cases = (("config", lambda path: path.write_text("a file\\n"), "config is not a directory"), ("out", lambda path: path.write_text("a file\\n"), "out is not a directory"),
+                 ("settings.json", lambda path: path.mkdir(), "settings.json is not a regular file"))
+        for name, make, expected in cases:
+            root = s.work / f"root-kind-{name.replace('.', '-')}"
+            self.assertEqual(s.prepare(root=root).returncode, 0)
+            if (root / name).is_dir():
+                shutil.rmtree(root / name)
+            else:
+                (root / name).unlink()
+            make(root / name)
+            before = self.tree_state(root)
+            for extra in (("--rebuild",), ("--rebuild", "--dry-run")):
+                with self.subTest(entry=name, arguments=extra):
+                    done = s.prepare(*extra, root=root)
+                    self.assertEqual(done.returncode, 2, done.stdout + done.stderr)
+                    self.assertIn(expected, done.stderr)
+                    self.assertEqual(self.tree_state(root), before, "nothing was changed")
+
+    def test_a_hard_link_behind_an_owned_file_is_refused_and_its_other_name_is_never_written(self):
+        """Review of #1046 at 6ee9f2214 (P1): the entry check kept only the mode of an entry, so a settings.json or manifest.json that is a hard link passed it, and `--rebuild` truncated the unrelated file that shares
+        its inode (the reviewer's reproduction: a foreign sentinel hard-linked as the entry, exit 0, the sentinel replaced by the new settings or the new manifest). The writer now replaces the entry, and the check
+        refuses a file with another name first; the sentinel keeps its bytes, its inode and its link count, and the root is as it was, with or without --rebuild and under --dry-run."""
+        s = self.s
+        self.assertEqual(set(e1_prepare.OWNED_FILES), {"settings.json", "manifest.json"})
+        for name in e1_prepare.OWNED_FILES:
+            slug = name.replace(".", "-")
+            root, foreign = s.work / f"root-{slug}", s.work / f"foreign-{slug}"
+            self.assertEqual(s.prepare(root=root).returncode, 0)
+            foreign.write_bytes((root / name).read_bytes() if name == e1_prepare.MANIFEST else b"someone else's file\n")   # a valid manifest behind the link: the ownership check reads through it
+            (root / name).unlink()
+            os.link(foreign, root / name)
+            sentinel = self.file_identity(foreign)
+            self.assertEqual(sentinel[3], 2, "the entry and the sentinel are two names of one inode")
+            before = self.tree_state(root)
+            for extra in ((), ("--rebuild",), ("--rebuild", "--dry-run")):
+                with self.subTest(entry=name, arguments=extra):
+                    done = s.prepare(*extra, root=root)
+                    self.assertEqual(self.file_identity(foreign), sentinel, "the other name of the inode is as it was: bytes, inode, link count")
+                    self.assertEqual(done.returncode, 2, done.stdout + done.stderr)
+                    self.assertIn(f"{name} has more than one hard link", done.stderr)
+                    self.assertIn("nothing was changed", done.stderr)
+                    self.assertEqual(self.tree_state(root), before, "the root is as it was")
+
+    def test_a_hard_link_inside_an_owned_directory_is_not_followed_by_the_rebuild_and_a_file_with_one_name_is_not_refused(self):
+        """The boundary of the second line: it concerns the two files the script writes. A name inside config/ that shares an inode with a foreign file is removed as a name (shutil.rmtree unlinks), the foreign file
+        keeps its bytes and its inode, and a normal rebuild of a root whose files have one name each is not refused."""
+        s = self.s
+        self.assertEqual(s.prepare().returncode, 0)
+        foreign = s.work / "foreign-inside"
+        foreign.write_bytes(b"someone else's file\n")
+        os.link(foreign, s.root / "config" / "shared.txt")
+        sentinel = self.file_identity(foreign)
+        self.assertEqual(sentinel[3], 2)
+        self.assertEqual(e1_prepare.entry_problems(s.root), [], "directories, whose link count is not 1, and files with one name are what the script makes")
+        done = s.prepare("--rebuild")
+        self.assertEqual(done.returncode, 0, done.stderr)
+        self.assertEqual(self.file_identity(foreign), (sentinel[0], sentinel[1], sentinel[2], 1), "only the name inside config/ was removed")
+        self.assertFalse((s.root / "config" / "shared.txt").exists())
+
+    def test_entry_problems_refuses_an_owned_file_with_more_than_one_name_and_nothing_else(self):
+        folder = Path(self._tmp.name) / "root"
+        (folder / "trees" / "base" / "sub").mkdir(parents=True)
+        (folder / "settings.json").write_text("{}\n")
+        (folder / "manifest.json").write_text("{}\n")
+        self.assertEqual(e1_prepare.entry_problems(folder), [])
+        os.link(folder / "manifest.json", folder.parent / "other-name")
+        self.assertEqual(e1_prepare.entry_problems(folder), ["manifest.json has more than one hard link"])
+        os.link(folder / "settings.json", folder.parent / "settings-other-name")
+        self.assertEqual(e1_prepare.entry_problems(folder), ["settings.json has more than one hard link", "manifest.json has more than one hard link"])
+        (folder / "settings.json").unlink()
+        (folder / "settings.json").symlink_to(folder.parent / "settings-other-name")
+        self.assertEqual(e1_prepare.entry_problems(folder), ["settings.json is a link", "manifest.json has more than one hard link"], "a link is a link, and the hard link is still named")
+
+    def test_a_rebuild_of_an_owned_root_replaces_trees_and_config_keeps_out_and_leaves_the_sdk_copy_alone(self):
+        """The control of the containment test above: with no link in the root a rebuild still replaces trees/ and config/ (the link INSIDE config/ to the SDK copy is removed as a link, its target is not followed)
+        and keeps out/."""
+        s = self.s
+        self.assertEqual(s.prepare().returncode, 0)
+        generation = json.loads((s.root / "manifest.json").read_text())["generation"]
+        kept = s.root / "out" / "questions-19990101T000000000000Z.json"
+        kept.write_text("kept\n")
+        (s.root / "config" / "stray.txt").write_text("stale\n")
+        (s.root / "trees" / "base" / "stray.txt").write_text("stale\n")
+        sdk_before = self.tree_state(s.sdk)
+        done = s.prepare("--rebuild")
+        self.assertEqual(done.returncode, 0, done.stderr)
+        self.assertFalse((s.root / "config" / "stray.txt").exists())
+        self.assertFalse((s.root / "trees" / "base" / "stray.txt").exists())
+        self.assertEqual(kept.read_text(), "kept\n")
+        self.assertEqual(self.tree_state(s.sdk), sdk_before, "the SDK copy that config/ links to is not followed by the removal")
+        self.assertTrue((s.root / "config" / "node_modules" / "@anthropic-ai" / "claude-agent-sdk").is_symlink())
+        self.assertNotEqual(json.loads((s.root / "manifest.json").read_text())["generation"], generation)
+
+    @unittest.skipIf(os.geteuid() == 0, "root can remove an entry of a directory whose mode forbids it")
+    def test_a_removal_that_fails_stops_the_rebuild_before_anything_is_written(self):
+        """Review of #1046 at a461c2d76 (P1, the cause): the removals ignored their errors (`ignore_errors=True`, shutil.py L736), so a path that could not be cleared was populated over."""
+        s = self.s
+        for entry in ("config", "trees"):
+            root = s.work / f"root-locked-{entry}"
+            self.assertEqual(s.prepare(root=root).returncode, 0)
+            locked = root / entry / "locked"
+            locked.mkdir()
+            (locked / "old.txt").write_text("old\n")
+            if entry == "trees":
+                (root / "trees" / "base" / "stray.txt").write_text("the old tree\n")
+            else:
+                (root / "config" / "promptfooconfig.yaml").write_text("the old config\n")   # a file staged afresh would not say this
+            locked.chmod(0o500)      # its entries cannot be removed
+
+            def unlock(locked=locked):
+                if locked.exists():
+                    locked.chmod(0o700)
+            self.addCleanup(unlock)
+            manifest, settings = (root / "manifest.json").read_bytes(), (root / "settings.json").read_bytes()
+            other = "trees" if entry == "config" else "config"
+            with self.subTest(entry=entry):
+                done = s.prepare("--rebuild", root=root)
+                self.assertEqual(done.returncode, 2, done.stdout + done.stderr)
+                self.assertIn(f"{entry}/ could not be removed", done.stderr)
+                self.assertEqual((root / "manifest.json").read_bytes(), manifest, "the manifest, which marks the root as ours, is as it was")
+                self.assertEqual((root / "settings.json").read_bytes(), settings)
+                self.assertEqual((locked / "old.txt").read_text(), "old\n")
+                if entry == "config":
+                    staged = root / "config" / "promptfooconfig.yaml"       # whether the removal reached it before the locked directory depends on the order the file system lists them
+                    self.assertTrue(not staged.exists() or staged.read_text() == "the old config\n", "nothing was staged into the config that could not be cleared")
+                else:
+                    base = root / "trees" / "base"
+                    self.assertTrue(not base.exists() or (base / "stray.txt").exists(), "no tree was built into the trees/ that could not be cleared (an old tree is either gone or still the old one)")
+                    self.assertTrue((root / other / "promptfooconfig.yaml").is_file(), "the config, removed after the trees, was not reached")
+                locked.chmod(0o700)
+                self.assertEqual(s.prepare("--rebuild", root=root).returncode, 0, "the root is still ours: the rebuild runs again once the cause is gone")
+
+    def test_remove_tree_clears_a_directory_without_following_a_link_inside_it_and_refuses_a_link(self):
+        folder = Path(self._tmp.name)
+        target = folder / "target"
+        target.mkdir()
+        (target / "keep.txt").write_text("kept\n")
+        tree = folder / "tree"
+        (tree / "sub").mkdir(parents=True)
+        (tree / "sub" / "inner").symlink_to(target)
+        e1_prepare.remove_tree(tree)
+        self.assertFalse(tree.exists())
+        self.assertEqual((target / "keep.txt").read_text(), "kept\n")
+        e1_prepare.remove_tree(tree)       # already absent: nothing to clear
+        link = folder / "link"
+        link.symlink_to(target)
+        with self.assertRaises(e1_prepare.Refusal):
+            e1_prepare.remove_tree(link)
+        self.assertTrue(link.is_symlink())
+        self.assertEqual((target / "keep.txt").read_text(), "kept\n")
+
+    def test_write_owned_replaces_the_entry_and_never_writes_through_a_hard_link_or_a_symbolic_link(self):
+        """Review of #1046 at 6ee9f2214 (P1): the writer opened the entry itself with O_TRUNC, which writes through every other name of its inode. It makes a new file and renames it over the entry (python/cpython@cbc944f4bc59
+        Doc/library/os.rst L2754-L2761; rename(2): any other hard link to the file is unaffected, and a symbolic link at the new name is overwritten), so even a link that appeared after the entry check leaves its target alone."""
+        folder = self.writer_folder()
+        foreign = folder / "foreign.json"
+        foreign.write_text("foreign\n")
+        entry = folder / "settings.json"
+        os.link(foreign, entry)
+        before = self.file_identity(foreign)
+        self.assertEqual(before[3], 2)
+        e1_prepare.write_owned(entry, "new text\n")
+        after = self.file_identity(foreign)
+        self.assertEqual(after, (before[0], before[1], before[2], 1), "the other name keeps its bytes and its inode; the entry is no longer one of its names")
+        self.assertEqual(entry.read_text(), "new text\n")
+        self.assertNotEqual(os.lstat(entry).st_ino, before[1])
+        self.assertEqual(os.lstat(entry).st_nlink, 1)
+        target = folder / "target.txt"
+        target.write_text("foreign\n")
+        link = folder / "link.json"
+        link.symlink_to(target)
+        target_before = self.file_identity(target)
+        e1_prepare.write_owned(link, "overwritten\n")
+        self.assertFalse(link.is_symlink(), "the link itself was replaced")
+        self.assertEqual(link.read_text(), "overwritten\n")
+        self.assertEqual(self.file_identity(target), target_before, "what the link named is as it was")
+        plain = folder / "plain.json"
+        e1_prepare.write_owned(plain, "one long line\n")
+        e1_prepare.write_owned(plain, "two\n")
+        self.assertEqual(plain.read_text(), "two\n", "an existing regular file is rewritten")
+        umask = os.umask(0)
+        os.umask(umask)
+        self.assertEqual(stat.S_IMODE(os.lstat(plain).st_mode), 0o666 & ~umask, "the mode these files always had: 0666 less the umask")
+        self.assertEqual(sorted(p.name for p in folder.iterdir() if p.name.startswith(".")), [], "no new file is left behind")
+
+    def test_write_owned_makes_a_new_file_beside_the_entry_syncs_it_and_renames_it_over_the_entry(self):
+        """The three steps of the ruling, in order: a new file in the same directory created with O_CREAT|O_EXCL|O_NOFOLLOW (and without O_TRUNC), written and fsynced, then os.replace."""
+        folder = self.writer_folder()
+        entry = folder / "manifest.json"
+        entry.write_text("old\n")
+        events = []
+        real_open, real_fsync, real_replace = os.open, os.fsync, os.replace
+
+        def recording_open(path, flags, *rest, **keywords):
+            events.append(("open", Path(path), flags))
+            return real_open(path, flags, *rest, **keywords)
+
+        def recording_fsync(descriptor):
+            events.append(("fsync", descriptor))
+            events.append(("bytes at fsync", events[0][1].read_bytes()))       # the new file, whose name the open recorded
+            return real_fsync(descriptor)
+
+        def recording_replace(source, destination, *rest, **keywords):
+            events.append(("replace", Path(source), Path(destination)))
+            events.append(("bytes at replace", Path(source).read_bytes()))
+            return real_replace(source, destination, *rest, **keywords)
+        with mock.patch.object(os, "open", recording_open), mock.patch.object(os, "fsync", recording_fsync), mock.patch.object(os, "replace", recording_replace):
+            e1_prepare.write_owned(entry, "new text\n")
+        kinds = [event[0] for event in events]
+        self.assertEqual(kinds, ["open", "fsync", "bytes at fsync", "replace", "bytes at replace"], "one new file: created, synced, renamed")
+        opened, replaced = events[0], events[3]
+        temporary = opened[1]
+        self.assertNotEqual(temporary, entry)
+        self.assertEqual(temporary.parent, entry.parent, "the same directory, so the rename does not cross a file system")
+        for flag in ("O_WRONLY", "O_CREAT", "O_EXCL", "O_NOFOLLOW"):
+            self.assertTrue(opened[2] & getattr(os, flag), flag)
+        self.assertFalse(opened[2] & os.O_TRUNC, "the entry is never truncated in place")
+        self.assertEqual(events[2][1], b"new text\n", "the bytes were flushed before the sync")
+        self.assertEqual((replaced[1], replaced[2]), (temporary, entry), "the new file is renamed over the entry")
+        self.assertEqual(events[4][1], b"new text\n")
+        self.assertEqual(entry.read_text(), "new text\n")
+        self.assertFalse(temporary.exists())
+
+    def test_write_owned_leaves_the_entry_as_it_was_and_no_new_file_behind_when_the_replace_fails(self):
+        folder = self.writer_folder()
+        entry = folder / "settings.json"
+        entry.write_text("old\n")
+        before = self.file_identity(entry)
+        with mock.patch.object(os, "replace", side_effect=OSError(errno.EXDEV, "cross-device")):
+            with self.assertRaises(e1_prepare.Refusal) as caught:
+                e1_prepare.write_owned(entry, "new text\n")
+        self.assertIn("settings.json could not be written", str(caught.exception))
+        self.assertEqual(self.file_identity(entry), before, "the entry is as it was")
+        self.assertEqual(sorted(p.name for p in folder.iterdir()), ["settings.json"], "the new file was removed again")
+        with mock.patch.object(os, "fsync", side_effect=KeyboardInterrupt):
+            with self.assertRaises(KeyboardInterrupt):
+                e1_prepare.write_owned(entry, "new text\n")
+        self.assertEqual(sorted(p.name for p in folder.iterdir()), ["settings.json"], "not an OSError either: the new file is removed and the exception goes on")
+        self.assertEqual(self.file_identity(entry), before)
+
+    def test_write_owned_never_opens_a_file_that_already_has_the_name_of_its_new_file(self):
+        """O_EXCL: a planted file or link at the name of the new file is refused, left alone and not removed, and nothing is written through it."""
+        folder = self.writer_folder()
+        entry = folder / "settings.json"
+        fixed = uuid.UUID(int=0x1234)
+        names = []
+        real_open = os.open
+
+        def recording_open(path, flags, *rest, **keywords):
+            names.append(Path(path))
+            return real_open(path, flags, *rest, **keywords)
+        with mock.patch.object(e1_prepare.uuid, "uuid4", return_value=fixed), mock.patch.object(os, "open", recording_open):
+            e1_prepare.write_owned(entry, "learned the name\n")
+        planted = names[0]
+        self.assertEqual(planted.parent, folder)
+        self.assertFalse(planted.exists())
+        entry.write_text("old\n")
+        target = folder / "target.txt"
+        target.write_text("foreign\n")
+        for label, plant in (("a regular file", lambda: planted.write_text("planted\n")), ("a symbolic link", lambda: planted.symlink_to(target))):
+            with self.subTest(planted=label):
+                plant()
+                before = {path.name: (path.is_symlink(), path.read_bytes() if not path.is_symlink() else os.readlink(path)) for path in (planted, target, entry)}
+                with mock.patch.object(e1_prepare.uuid, "uuid4", return_value=fixed):
+                    with self.assertRaises(e1_prepare.Refusal):
+                        e1_prepare.write_owned(entry, "new text\n")
+                after = {path.name: (path.is_symlink(), path.read_bytes() if not path.is_symlink() else os.readlink(path)) for path in (planted, target, entry)}
+                self.assertEqual(after, before, "the planted file, what it names and the entry are as they were")
+                planted.unlink()
+
+    def test_each_field_a_later_step_reads_is_checked_in_an_otherwise_valid_manifest(self):
+        s = self.s
+        self.assertEqual(s.prepare().returncode, 0)
+        good = json.loads((s.root / "manifest.json").read_text())
+        self.assertEqual(e1_prepare.validate_manifest(good), [])
+        edits = {"another harness": lambda m: m.update(harness="another/harness"), "an older schema": lambda m: m.update(schema=1), "no root": lambda m: m.pop("root"), "no generation": lambda m: m.pop("generation"),
+                 "a commit that is not a commit": lambda m: m["commits"].update(base="abc"), "no commits": lambda m: m.pop("commits"), "a tree missing": lambda m: m["trees"].pop("stale"),
+                 "a staged digest that is not one": lambda m: m["staged"].update({"promptfooconfig.yaml": "x"}), "a staged file missing": lambda m: m["staged"].pop("tasks.json"),
+                 "a directive digest missing": lambda m: m["directives"].pop("stale-path"), "no digest of settings": lambda m: m.update(settings_sha256="x"),
+                 "no client version": lambda m: m["claude"].pop("version"), "no promptfoo path": lambda m: m.update(promptfoo={"version": "0.124.0"}), "no semble model": lambda m: m.pop("semble_model"),
+                 "servers that are not a mapping": lambda m: m.update(servers=[])}
+        for label, edit in edits.items():
+            copy = json.loads(json.dumps(good))
+            edit(copy)
+            with self.subTest(defect=label):
+                self.assertTrue(e1_prepare.validate_manifest(copy), "a manifest with this defect is not one of this harness")
+
+    def test_run_refuses_a_manifest_of_another_shape_without_a_traceback(self):
+        s = self.s
+        self.assertEqual(s.prepare().returncode, 0)
+        manifest_path = s.root / "manifest.json"
+        saved = manifest_path.read_text()
+        for text in ("{not json", "[1]", json.dumps({"application": "unrelated"}), json.dumps({**json.loads(saved), "staged": {}})):
+            manifest_path.write_text(text)
+            done = s.run("--preflight", "--dry-run")
+            self.assertEqual(done.returncode, 2, text)
+            self.assertNotIn("Traceback", done.stderr)
+            self.assertIn("manifest", done.stderr)
+        manifest_path.write_text(saved)
+        self.assertEqual(s.run("--preflight", "--dry-run").returncode, 0)
+
+    def test_a_dry_run_checks_and_writes_nothing(self):
+        done = self.s.prepare("--dry-run")
+        self.assertEqual(done.returncode, 0, done.stderr)
+        self.assertTrue(json.loads(done.stdout)["dry_run"])
+        self.assertFalse(self.s.root.exists())
+        bad = self.s.prepare("--dry-run", claude=self.s.script("claude-bad", 'echo "9.9.9"'))
+        self.assertEqual(bad.returncode, 2)
+
+    def test_a_copy_of_the_scripts_outside_a_repository_has_no_repo_root_and_asks_for_the_repo_and_the_credential_runner(self):
+        s = self.s
+        done = subprocess.run([sys.executable, "-I", "-c", "import sys; sys.path.insert(0, sys.argv[1]); import e1_common; print(e1_common.REPO_ROOT)", str(s.e1)], capture_output=True, text=True, env=s.env, timeout=60)
+        self.assertEqual((done.returncode, done.stdout.strip()), (0, "None"), done.stderr)
+        cmd = [sys.executable, "-I", str(s.e1 / "e1_prepare.py"), "--root", str(s.root), "--claude", str(s.claude), "--semble-model", str(s.semble), "--promptfoo", str(s.promptfoo), "--sdk-from", str(s.sdk)]
+        done = subprocess.run(cmd, capture_output=True, text=True, env=s.env, timeout=60)
+        self.assertEqual(done.returncode, 2)
+        self.assertIn("--repo is required", done.stderr)
+        self.assertFalse(s.root.exists())
+        self.assertEqual(s.prepare().returncode, 0)
+        done = s.run("--preflight", "--slot", "some-slot", "--dry-run")
+        self.assertEqual(done.returncode, 2)
+        self.assertIn("credential_run.py was not found", done.stderr)
+        self.assertEqual(s.run("--preflight", "--slot", "some-slot", "--credential-runner", str(CREDENTIAL_RUNNER), "--dry-run").returncode, 0)
+
+    def test_run_refuses_a_root_that_was_not_prepared_or_has_drifted(self):
+        s = self.s
+        self.assertEqual(s.run("--preflight", "--dry-run").returncode, 2)
+        self.assertEqual(s.prepare().returncode, 0)
+        self.assertEqual(s.run("--preflight", "--dry-run").returncode, 0)
+        config = s.root / "config" / "promptfooconfig.yaml"
+        original = config.read_text()
+        config.write_text(original + "\n# edited after prepare\n")
+        done = s.run("--preflight", "--dry-run")
+        self.assertEqual(done.returncode, 2)
+        self.assertIn("promptfooconfig.yaml", done.stderr)
+        config.write_text(original)
+        settings = s.root / "settings.json"
+        saved = settings.read_text()
+        settings.write_text(saved.replace('"enabled": true', '"enabled": false'))
+        self.assertIn("settings.json", s.run("--preflight", "--dry-run").stderr)
+        settings.write_text(saved)
+        (s.root / "trees" / "base" / "stray.txt").write_text("written by a run\n")
+        done = s.run("--preflight", "--dry-run")
+        self.assertEqual(done.returncode, 2)
+        self.assertIn("tree base", done.stderr)
+        (s.root / "trees" / "base" / "stray.txt").unlink()
+        (s.root / "trees" / "base-serena" / "CLAUDE.local.md").unlink()
+        self.assertIn("tree base-serena", s.run("--preflight", "--dry-run").stderr)
+        (s.root / "trees" / "base-serena" / "CLAUDE.local.md").write_text((E1 / "directives" / "serena.md").read_text())
+        self.assertEqual(s.run("--preflight", "--dry-run").returncode, 0)
+        subprocess.run(["git", "-C", str(s.root / "trees" / "stale"), "checkout", "-q", "--detach", s.base], check=True, capture_output=True)  # clean, but at the other commit
+        done = s.run("--preflight", "--dry-run")
+        self.assertEqual(done.returncode, 2)
+        self.assertIn("not at the commit", done.stderr)
+
+    def test_a_failed_preflight_row_keeps_promptfoos_exit_status_and_a_failed_question_row_does_not(self):
+        """Review of #1046 at 38f4151a (P1): promptfoo exits 100 when at least one test failed (promptfoo@30949931ee90 site/docs/usage/command-line.md L171); a pre-flight row that fails is a wiring
+        defect that automation must see, a question row whose answer is wrong is a measurement."""
+        s = self.s
+        s.use_fake_promptfoo()
+        self.assertEqual(s.prepare().returncode, 0)
+        pre = s.run("--preflight", env=s.with_env(FAKE_PREFLIGHT="fail", FAKE_STATUS="100"))
+        self.assertEqual(pre.returncode, 100, pre.stderr)
+        self.assertIn("promptfoo exited 100", pre.stderr)
+        self.assertEqual(s.run("--preflight", env=s.with_env(FAKE_STATUS="1")).returncode, 1, "any other status is kept")
+        self.assertFalse(json.loads(s.gate_files("preflight")[-1].read_text())["passed"], "rows that pass do not open the gate when promptfoo itself failed")
+        self.assertEqual(s.run("--questions").returncode, 2)
+        self.assertEqual(s.run("--preflight").returncode, 0)
+        questions = s.run("--questions", env=s.with_env(FAKE_STATUS="100"))
+        self.assertEqual(questions.returncode, 0, questions.stderr)
+        self.assertEqual(s.run("--questions", env=s.with_env(FAKE_STATUS="1")).returncode, 1, "any other status is kept in the questions too")
+
+    def test_run_refuses_a_directive_file_edited_after_prepare_or_a_manifest_that_does_not_record_it(self):
+        """Review of #1046 at 30639cdc1 (P2): git reports only `?? CLAUDE.local.md` whatever the file holds, so the content is compared with the staged directive and the digest the manifest recorded."""
+        s = self.s
+        self.assertEqual(s.prepare().returncode, 0)
+        manifest_path = s.root / "manifest.json"
+        manifest = json.loads(manifest_path.read_text())
+        self.assertEqual(manifest["directives"], {"base-serena": sha256_bytes(s.e1 / "directives" / "serena.md"), "stale-path": sha256_bytes(s.e1 / "directives" / "path.md")})
+        self.assertEqual(s.run("--preflight", "--dry-run").returncode, 0)
+        for tree in ("base-serena", "stale-path"):
+            live = s.root / "trees" / tree / "CLAUDE.local.md"
+            original = live.read_text()
+            live.write_text(original + "Use grep instead.\n")
+            with self.subTest(tree=tree):
+                done = s.run("--preflight", "--dry-run")
+                self.assertEqual(done.returncode, 2, tree)
+                self.assertIn(f"directive file of tree {tree}", done.stderr)
+                other = "stale-path" if tree == "base-serena" else "base-serena"
+                self.assertNotIn(f"directive file of tree {other}", done.stderr, "the controls are independent: the other tree's file is not blamed")
+            live.write_text(original)
+            self.assertEqual(s.run("--preflight", "--dry-run").returncode, 0, tree)
+        live = s.root / "trees" / "base-serena" / "CLAUDE.local.md"
+        original = live.read_text()
+        live.write_text(original + "Use grep instead.\n")
+        manifest["directives"]["base-serena"] = sha256_bytes(live)       # live file and manifest changed together: the staged directive is the third witness
+        manifest_path.write_text(json.dumps(manifest))
+        done = s.run("--preflight", "--dry-run")
+        self.assertEqual(done.returncode, 2)
+        self.assertIn("directive file of tree base-serena", done.stderr)
+        live.write_text(original)
+        manifest["directives"]["base-serena"] = "0" * 64                  # the live file is the staged one, the manifest records another digest
+        manifest_path.write_text(json.dumps(manifest))
+        done = s.run("--preflight", "--dry-run")
+        self.assertEqual(done.returncode, 2)
+        self.assertIn("directive file of tree base-serena", done.stderr)
+        manifest["directives"]["base-serena"] = sha256_bytes(s.e1 / "directives" / "serena.md")
+        manifest_path.write_text(json.dumps(manifest))
+        self.assertEqual(s.run("--preflight", "--dry-run").returncode, 0)
+        staged = s.root / "config" / "directives" / "serena.md"
+        text = staged.read_text()
+        staged.write_text(text + "an edit of the staged copy\n")
+        self.assertIn("staged file directives/serena.md", s.run("--preflight", "--dry-run").stderr)
+        staged.write_text(text)
+        source = s.e1 / "directives" / "serena.md"
+        source.write_text(source.read_text() + "an edit of the repository's copy after prepare\n")
+        self.assertEqual(s.run("--preflight", "--dry-run").returncode, 0, "the root is held to what was prepared into it, not to the repository's later edits")
+        del manifest["directives"]
+        manifest_path.write_text(json.dumps(manifest))
+        done = s.run("--preflight", "--dry-run")
+        self.assertEqual(done.returncode, 2)
+        self.assertIn("records no directives", done.stderr)
+
+    def test_run_refuses_a_root_that_was_copied_or_moved_but_accepts_another_name_for_the_same_directory(self):
+        """Review of #1046 at 38f4151a (P2): settings.json is bound to the recorded root and its siblings."""
+        s = self.s
+        self.assertEqual(s.prepare().returncode, 0)
+        copy = s.work / "copy"
+        shutil.copytree(s.root, copy, symlinks=True)
+
+        def run_at(root):
+            return subprocess.run([sys.executable, "-I", str(s.e1 / "e1_run.py"), "--root", str(root), "--preflight", "--dry-run"], capture_output=True, text=True, env=s.env, timeout=120)
+        done = run_at(copy)
+        self.assertEqual(done.returncode, 2, done.stdout)
+        self.assertIn("manifest recorded", done.stderr)
+        self.assertIn("--rebuild", done.stderr)
+        link = s.work / "link"
+        link.symlink_to(s.root)
+        self.assertEqual(run_at(link).returncode, 0, "a symbolic link to the prepared directory is the same directory")
+        moved = s.work / "moved"
+        s.root.rename(moved)
+        self.assertEqual(run_at(moved).returncode, 2)
+
+    def test_prepare_records_absolute_paths_for_tools_given_relative_to_the_working_directory(self):
+        """Review of #1046 at 38f4151a (P2): e1_run.py starts promptfoo from <root>/config, so a relative spelling recorded by prepare would not resolve."""
+        s = self.s
+        cmd = [sys.executable, "-I", str(s.e1 / "e1_prepare.py"), "--root", "work/root", "--claude", "bin/claude", "--semble-model", "semble-model", "--repo", str(s.repo),
+               "--promptfoo", "bin/promptfoo-bin", "--sdk-from", "sdk"]
+        done = subprocess.run(cmd, capture_output=True, text=True, env=s.env, cwd=s.tmp, timeout=120)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        manifest = json.loads((s.root / "manifest.json").read_text())
+        self.assertEqual((manifest["claude"]["path"], manifest["promptfoo"]["path"], manifest["semble_model"]), (str(s.claude), str(s.promptfoo), str(s.semble)))
+        for path in (manifest["claude"]["path"], manifest["promptfoo"]["path"], manifest["semble_model"], *manifest["servers"].values()):
+            self.assertTrue(os.path.isabs(path), path)
+        plan = json.loads(s.run("--preflight", "--dry-run").stdout)
+        self.assertEqual(plan["command"][0], str(s.promptfoo))
+
+    def test_run_dry_run_prints_the_command_the_variables_it_sets_and_removes(self):
+        s = self.s
+        self.assertEqual(s.prepare().returncode, 0)
+        env = {**s.env, "CLAUDE_CODE_EFFORT_LEVEL": "max", "ANTHROPIC_BASE_URL": "http://127.0.0.1:1", "PROMPTFOO_FAILED_TEST_EXIT_CODE": "0", "PROMPTFOO_PASS_RATE_THRESHOLD": "0"}
+        done = s.run("--questions", "--arms", "A1,A5", "--ids", "p-def,p-refs", "--repeats", "2", "--slot", "some-slot", "--credential-runner", str(CREDENTIAL_RUNNER), "--dry-run", env=env)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        plan = json.loads(done.stdout)
+        cmd = plan["command"]
+        self.assertEqual(cmd[1:3], ["-I", str(CREDENTIAL_RUNNER)])
+        self.assertEqual(cmd[3:5], ["some-slot", "--"])
+        eval_cmd = cmd[5:]
+        self.assertEqual(eval_cmd[1], "eval")
+        self.assertEqual(eval_cmd[eval_cmd.index("-c") + 1], str(s.root / "config" / "promptfooconfig.yaml"))
+        for flag in ("--no-cache", "--no-share", "--no-write", "--no-table", "--no-progress-bar"):
+            self.assertIn(flag, eval_cmd)
+        self.assertEqual(eval_cmd[eval_cmd.index("--max-concurrency") + 1], "1")
+        self.assertEqual(eval_cmd[eval_cmd.index("--filter-providers") + 1], "^(A1|A5)$")
+        self.assertEqual(eval_cmd[eval_cmd.index("--filter-metadata") + 1], "kind=question")
+        self.assertEqual(eval_cmd[eval_cmd.index("--filter-pattern") + 1], "^(?:p\\-def|p\\-refs) r[1-2]$")
+        self.assertTrue(eval_cmd[eval_cmd.index("-o") + 1].startswith(str(s.root / "out" / "questions-")))
+        self.assertIn("CLAUDE_CODE_EFFORT_LEVEL", plan["removes"])
+        self.assertIn("ANTHROPIC_BASE_URL", plan["removes"])
+        self.assertIn("PROMPTFOO_FAILED_TEST_EXIT_CODE", plan["removes"])
+        self.assertIn("PROMPTFOO_PASS_RATE_THRESHOLD", plan["removes"])
+        self.assertTrue(plan["gate"].startswith("refused: no pre-flight has run"), "a dry run says what a real run would be told, and starts nothing")
+        for name in ("E1_ROOT", "E1_CLAUDE", "E1_SEMBLE_MODEL", "TMPDIR", "PROMPTFOO_CONFIG_DIR", "PROMPTFOO_DISABLE_TELEMETRY", "PROMPTFOO_DISABLE_UPDATE", "PROMPTFOO_DISABLE_SHARING", "CLAUDE_CODE_TMPDIR"):
+            self.assertIn(name, plan["sets"])
+        pre = json.loads(s.run("--preflight", "--dry-run").stdout)["command"]
+        self.assertEqual(pre[pre.index("--filter-metadata") + 1], "kind=preflight")
+        self.assertNotIn("--filter-pattern", pre)
+        self.assertEqual(pre[0], str(s.promptfoo), "without --slot promptfoo is started directly")
+
+    def test_run_refuses_unknown_arms_unknown_questions_and_repeat_counts_out_of_range(self):
+        s = self.s
+        self.assertEqual(s.prepare().returncode, 0)
+        for args, reason in ((("--questions", "--arms", "A1,A2n"), "unknown arm"), (("--questions", "--ids", "p-def,x-none"), "unknown question"), (("--questions", "--repeats", "0"), "--repeats"),
+                             (("--questions", "--repeats", "4"), "makes 3 repeats"), (("--questions", "--repeats", "10"), "--repeats")):
+            done = s.run(*args, "--dry-run")
+            self.assertEqual(done.returncode, 2, args)
+            self.assertIn(reason, done.stderr, args)
+        self.assertEqual(s.run("--questions", "--repeats", "3", "--dry-run").returncode, 0, "the generator's own count is accepted")
+        self.assertEqual(s.run("--preflight", "--questions").returncode, 2, "the two stages are exclusive")
+
+    def test_run_starts_promptfoo_in_the_staged_config_with_a_clean_environment_and_treats_exit_100_of_the_questions_as_a_result(self):
+        s = self.s
+        s.use_fake_promptfoo()
+        self.assertEqual(s.prepare().returncode, 0)
+        env = s.with_env(CLAUDE_CODE_EFFORT_LEVEL="max", ANTHROPIC_BASE_URL="http://127.0.0.1:1", FAKE_STATUS="100", PROMPTFOO_FAILED_TEST_EXIT_CODE="0", PROMPTFOO_PASS_RATE_THRESHOLD="0")
+        s.passing_preflight()
+        done = s.run("--questions", env=env)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        seen = s.calls("question")[-1]
+        self.assertEqual(seen["cwd"], str((s.root / "config").resolve()))
+        self.assertEqual(seen["argv"][0], "eval")
+        for name in ("CLAUDE_CODE_EFFORT_LEVEL", "ANTHROPIC_BASE_URL", "PROMPTFOO_FAILED_TEST_EXIT_CODE", "PROMPTFOO_PASS_RATE_THRESHOLD"):
+            self.assertIsNone(seen["env"][name], f"{name} does not reach promptfoo")
+        self.assertEqual(seen["env"]["E1_ROOT"], str(s.root))
+        self.assertEqual(seen["env"]["TMPDIR"], str(s.root / "tmp"))
+        self.assertEqual(seen["env"]["MCP_TIMEOUT"], "120000")
+        self.assertEqual(seen["env"]["PROMPTFOO_DISABLE_SHARING"], "1")
+        self.assertEqual(s.run("--questions", env={**env, "FAKE_STATUS": "7"}).returncode, 7, "any other status is a fault and is passed on")
+        self.assertEqual(s.run("--preflight", env=env).returncode, 100, "a pre-flight whose promptfoo exits 100 keeps that status (review of #1046, P1)")
+
+    def test_the_exit_status_variables_of_the_caller_do_not_decide_the_preflight(self):
+        """Review of #1046 at 30639cdc1 (P1): promptfoo returns PROMPTFOO_FAILED_TEST_EXIT_CODE (default 100) only if the pass rate is below PROMPTFOO_PASS_RATE_THRESHOLD (default 100)
+        (promptfoo@30949931ee90 src/node/doEval.ts L1271-L1286), so a caller that set either could turn a failed pre-flight into status 0. The fake promptfoo does what that code does."""
+        s = self.s
+        s.use_fake_promptfoo()
+        self.assertEqual(s.prepare().returncode, 0)
+        for label, extra in (("default", {}), ("threshold 0", {"PROMPTFOO_PASS_RATE_THRESHOLD": "0"}), ("exit code 0", {"PROMPTFOO_FAILED_TEST_EXIT_CODE": "0"}),
+                             ("both", {"PROMPTFOO_PASS_RATE_THRESHOLD": "0", "PROMPTFOO_FAILED_TEST_EXIT_CODE": "0"})):
+            with self.subTest(settings=label):
+                done = s.run("--preflight", env=s.with_env(FAKE_PREFLIGHT="fail", FAKE_EMULATE_EXIT="1", **extra))
+                self.assertEqual(done.returncode, 100, done.stderr)
+                self.assertFalse(json.loads(s.gate_files("preflight")[-1].read_text())["passed"])
+                self.assertEqual(s.calls("preflight")[-1]["exit_vars"], {"PROMPTFOO_FAILED_TEST_EXIT_CODE": None, "PROMPTFOO_PASS_RATE_THRESHOLD": None}, "neither variable reaches promptfoo")
+        for label, mode in (("a row failed", "fail"), ("a row is missing", "missing")):
+            with self.subTest(result=label):
+                done = s.run("--preflight", env=s.with_env(FAKE_PREFLIGHT=mode, FAKE_STATUS="0"))
+                self.assertEqual(done.returncode, 100, "promptfoo said 0 and the result says otherwise: the result decides")
+                self.assertIn("pre-flight failed", done.stderr)
+
+    def test_questions_do_not_start_without_a_passing_preflight_of_this_preparation_for_the_asked_arms(self):
+        """Review of #1046 at 30639cdc1 (P1): `--questions` after a failed pre-flight, or with none, started promptfoo."""
+        s = self.s
+        s.use_fake_promptfoo()
+        self.assertEqual(s.prepare().returncode, 0)
+
+        def refused(*args, reason):
+            before = len(s.calls("question"))
+            done = s.run("--questions", *args)
+            self.assertEqual(done.returncode, 2, done.stderr)
+            self.assertIn(reason, done.stderr)
+            self.assertEqual(len(s.calls("question")), before, "promptfoo was not started")
+        refused(reason="no pre-flight has run")                                                      # absent
+        self.assertEqual(s.run("--preflight", env=s.with_env(FAKE_PREFLIGHT="fail")).returncode, 100)
+        refused(reason="did not pass")                                                               # failed
+        self.assertEqual(s.run("--preflight", env=s.with_env(FAKE_PREFLIGHT="missing")).returncode, 100)
+        refused(reason="expected 1")                                                                 # a row missing
+        self.assertEqual(s.run("--preflight", "--arms", "A5").returncode, 0)
+        refused("--arms", "A1", reason="did not cover arm(s) A1")                                    # wrong arm
+        newest = s.gate_files("preflight")[-1]
+        result = s.root / "out" / json.loads(newest.read_text())["result"]
+        text = result.read_text()
+        result.write_text(text + " ")
+        refused("--arms", "A5", reason="gone or has changed")                                        # the result it was made from changed
+        result.write_text(text)
+        done = s.run("--questions", "--arms", "A5")                                                  # control: the arm it covered, behind an unchanged record
+        self.assertEqual(done.returncode, 0, done.stderr)
+        self.assertEqual(s.calls("question")[-1]["arms"], ["A5"])
+        self.assertEqual(s.run("--preflight", "--arms", "A5", env=s.with_env(FAKE_PREFLIGHT="fail")).returncode, 100)
+        refused("--arms", "A5", reason="did not pass")                                               # the newest record decides, not an older passing one
+        self.assertEqual(s.run("--preflight", "--arms", "A5").returncode, 0)
+        self.assertEqual(s.prepare("--rebuild").returncode, 0)
+        refused("--arms", "A5", reason="another preparation")                                        # stale: a new preparation of the root
+
+    def test_a_dry_run_reports_the_gate_and_a_passing_one_is_reported_as_passed(self):
+        s = self.s
+        s.use_fake_promptfoo()
+        self.assertEqual(s.prepare().returncode, 0)
+        self.assertIn("no pre-flight has run", json.loads(s.run("--questions", "--dry-run").stdout)["gate"])
+        s.passing_preflight()
+        self.assertTrue(json.loads(s.run("--questions", "--dry-run").stdout)["gate"].startswith("passed: preflight-"))
+        self.assertNotIn("gate", json.loads(s.run("--preflight", "--dry-run").stdout))
+        self.assertEqual(s.calls("question"), [])
+
+    def test_a_relative_credential_runner_is_resolved_before_promptfoo_is_started_from_the_staged_config(self):
+        """Review of #1046 at 30639cdc1 (P3): the runner was passed as typed and promptfoo is started from <root>/config, so a relative spelling passed the dry run and failed the launch."""
+        s = self.s
+        s.use_fake_promptfoo()
+        self.assertEqual(s.prepare().returncode, 0)
+        (s.work / "fake-runner.py").write_text("import os, sys\nos.execv(sys.argv[3], sys.argv[3:])\n")    # argv: runner, slot, --, the command
+        cmd = [sys.executable, "-I", str(s.e1 / "e1_run.py"), "--root", str(s.root), "--preflight", "--slot", "some-slot", "--credential-runner", "fake-runner.py"]
+        planned = json.loads(subprocess.run([*cmd, "--dry-run"], capture_output=True, text=True, env=s.env, cwd=s.work, timeout=120).stdout)["command"]
+        self.assertEqual(planned[2], str(s.work / "fake-runner.py"))
+        done = subprocess.run(cmd, capture_output=True, text=True, env=s.env, cwd=s.work, timeout=120)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        self.assertEqual(len(s.calls("preflight")), 1, "the runner ran promptfoo")
+
+    def test_the_test_pattern_selects_the_descriptions_of_the_asked_questions_and_repeats_only(self):
+        pattern = re.compile(e1_run.test_pattern(["p-def"], 2))
+        self.assertTrue(pattern.match("p-def r1") and pattern.match("p-def r2"))
+        self.assertFalse(pattern.match("p-def r3"))
+        self.assertFalse(pattern.match("r-def-1 r1"))
+        self.assertFalse(pattern.match("p-defx r1"))
+        every = re.compile(e1_run.test_pattern([], 3))
+        self.assertTrue(every.match("r-callers-2 r3") and not every.match("preflight") and not every.match("p-def r4"))
+
+
+@unittest.skipUnless(PROMPTFOO, "promptfoo 0.124.0 or newer is not installed")
+class PromptfooIntegrationTests(unittest.TestCase):
+    """The configs against the real promptfoo: they load, the skeletons refuse, and a stub provider drives the generator, the assertions and the decision script end to end."""
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory(prefix="e-series-pf-")
+        self.addCleanup(self._tmp.cleanup)
+        self.tmp = Path(self._tmp.name)
+        self.env = {**CLEAN_ENV, "PROMPTFOO_CONFIG_DIR": str(self.tmp / "state"), "PROMPTFOO_DISABLE_TELEMETRY": "1", "PROMPTFOO_DISABLE_UPDATE": "1", "PROMPTFOO_DISABLE_SHARING": "1",
+                    "E1_ROOT": str(self.tmp / "root"), "E1_CLAUDE": "/bin/true", "E1_SEMBLE_MODEL": str(self.tmp)}
+
+    def validate(self, config: Path, extra_env=None):
+        return subprocess.run([PROMPTFOO, "validate", "config", "-c", str(config)], capture_output=True, text=True, env={**self.env, **(extra_env or {})}, timeout=180)
+
+    def test_the_e1_config_is_valid(self):
+        done = self.validate(E1 / "promptfooconfig.yaml")
+        self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
+        self.assertIn("Configuration is valid", done.stdout)
+
+    def test_each_skeleton_refuses_without_frozen_inputs_and_is_valid_with_them(self):
+        frozen = self.tmp / "frozen"
+        frozen.mkdir()
+        for experiment in F.DESIGNS:
+            done = self.validate(ES / experiment / "promptfooconfig.yaml")
+            self.assertNotEqual(done.returncode, 0, experiment)
+            self.assertIn("is not frozen", done.stdout + done.stderr, experiment)
+            FrozenInputsTests.freeze(self, frozen, experiment, rows=[{"vars": {"question": "q", "task": "t", "prompt": "p"}}])
+            ok = self.validate(ES / experiment / "promptfooconfig.yaml", {"E_SERIES_FROZEN": str(frozen)})
+            self.assertEqual(ok.returncode, 0, experiment + ok.stdout + ok.stderr)
+
+    def test_a_stub_provider_drives_the_generator_the_assertions_and_the_decision_script(self):
+        stage = self.tmp / "stage"
+        shutil.copytree(E1, stage, ignore=shutil.ignore_patterns("__pycache__", "promptfooconfig.yaml"))
+        (stage / "stub_provider.py").write_text(STUB_PROVIDER)
+        (stage / "promptfooconfig.yaml").write_text(STUB_CONFIG)
+        out = self.tmp / "out.json"
+        done = subprocess.run([PROMPTFOO, "eval", "-c", str(stage / "promptfooconfig.yaml"), "--no-cache", "--no-share", "--no-write", "--no-table", "--no-progress-bar", "--max-concurrency", "1",
+                               "-o", str(out)], capture_output=True, text=True, env=self.env, cwd=stage, timeout=300)
+        self.assertIn(done.returncode, (0, 100), done.stdout + done.stderr)
+        results = json.loads(out.read_text())["results"]["results"]
+        self.assertEqual(len(results), 2 * 13)  # (1 preflight + 12 questions x 1 repeat) x 2 arms
+        verdicts = {(r["provider"]["label"], r["testCase"]["description"]): r["gradingResult"]["pass"] for r in results}
+        self.assertTrue(verdicts[("A0b", "preflight")])
+        self.assertFalse(verdicts[("A5", "preflight")], "the stub lists servers for A5, which has none: the arm label reaches the assertion")
+        self.assertTrue(verdicts[("A0b", "p-def r1")])
+        self.assertFalse(verdicts[("A5", "p-def r1")], "the stub answers A5 wrongly: the question id reaches the assertion")
+        runs, faults = e1_decide.load_runs([out], TASKS)
+        self.assertEqual(faults, [])
+        self.assertEqual(len(runs), 2 * 12)
+        by = {(r["arm"], r["q"]): r for r in runs}
+        self.assertTrue(by[("A0b", "p-def")]["correct"])
+        self.assertFalse(by[("A5", "p-def")]["correct"])
+        self.assertEqual(by[("A0b", "p-def")]["cost"], 0.05)
+        self.assertEqual(by[("A0b", "p-def")]["turns"], 3)
+        self.assertTrue(by[("A0b", "p-refs")]["nav"], "a tool named mcp__serena__* in toolCalls is a code-navigation call")
+        self.assertFalse(by[("A0b", "p-def")]["nav"])
+
+
+    def test_a_failing_preflight_stays_a_failure_under_the_exit_settings_of_the_caller(self):
+        """Review of #1046 at 30639cdc1 (P1), reproduced with the real promptfoo: the stub lists servers for A5, which has none, so its pre-flight assertion fails; with either exit setting the runner returned 0."""
+        (self.tmp / "scratch").mkdir()
+        s = ScratchRepository(self.tmp / "scratch")
+        s.env["PATH"] = f"{s.bin}{os.pathsep}{os.environ['PATH']}"      # the real promptfoo is a node script; the fake servers and git still come first
+        done = s.prepare(promptfoo=PROMPTFOO)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        config = s.root / "config"
+        (config / "stub_provider.py").write_text(STUB_PROVIDER)
+        (config / "promptfooconfig.yaml").write_text(STUB_CONFIG)
+        manifest_path = s.root / "manifest.json"
+        manifest = json.loads(manifest_path.read_text())
+        manifest["staged"]["promptfooconfig.yaml"] = sha256_bytes(config / "promptfooconfig.yaml")
+        manifest_path.write_text(json.dumps(manifest))
+        env = s.env
+        for label, extra in (("default", {}), ("pass-rate threshold 0", {"PROMPTFOO_PASS_RATE_THRESHOLD": "0"}), ("exit code 0", {"PROMPTFOO_FAILED_TEST_EXIT_CODE": "0"})):
+            with self.subTest(settings=label):
+                done = s.run("--preflight", "--arms", "A5", env={**env, **extra})
+                self.assertEqual(done.returncode, 100, done.stderr)
+                self.assertFalse(json.loads(s.gate_files("preflight")[-1].read_text())["passed"])
+                refused = s.run("--questions", "--arms", "A5", env={**env, **extra})
+                self.assertEqual(refused.returncode, 2, "a failed pre-flight leaves no way to the questions")
+
+
+STUB_CONFIG = """description: stub
+prompts:
+  - label: worktree-start
+    raw: 'Question: {{ question }}'
+providers:
+  - {id: file://stub_provider.py, label: A0b, prompts: [worktree-start], config: {label: A0b}}
+  - {id: file://stub_provider.py, label: A5, prompts: [worktree-start], config: {label: A5}}
+tests:
+  - path: file://e1_tests.py:create_tests
+    config: {repeats: 1}
+"""
+
+STUB_PROVIDER = '''import json
+from pathlib import Path
+
+TASKS = {q["id"]: q for q in json.loads((Path(__file__).with_name("tasks.json")).read_text())["questions"]}
+FOUR = "mcp__serena__find_symbol mcp__semble__search mcp__codebase-memory-mcp__search_graph mcp__jcodemunch__search_symbols"
+
+
+def call_api(prompt, options, context):
+    arm = (options.get("config") or {}).get("label")
+    qid = (context.get("vars") or {}).get("question_id")
+    calls = ["Grep"]
+    if qid == "preflight":
+        output, calls = {"answer": "TOOLS: " + FOUR + "\\nDIRECTIVE: NONE", "citations": []}, ["ToolSearch"]
+    elif qid not in ("p-def", "p-refs", "p-explain", "p-callers"):
+        output = {"answer": "x", "citations": []}
+    else:
+        gold = TASKS[qid]["gold"]
+        output = {"answer": "x", "citations": [{"file": gold["file"], "line": gold["line"]}]} if qid == "p-def" else {"answer": "x", "citations": []}
+        if arm == "A5":
+            output = {"answer": "x", "citations": []}
+        if qid == "p-refs":
+            calls.append("mcp__serena__find_referencing_symbols")
+    return {"output": output, "cost": 0.05, "metadata": {"toolCalls": [{"name": n} for n in calls], "numTurns": 3, "durationMs": 1000}}
+'''
+
+
+if __name__ == "__main__":
+    unittest.main()

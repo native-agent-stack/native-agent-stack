@@ -1,0 +1,44 @@
+# E5, unresolved triggers: SKELETON. Nothing is frozen and nothing has run. It fails closed: the tests below come from ../frozen_inputs.py, which raises (and promptfoo stops before any provider call) until
+# frozen/e5.json names the trigger cases, the natural-language variants and the skills, each with a matching sha256.
+#
+# Design (invoke-gap cause table, section 7): the two skills whose trigger is unresolved, `typesafe-ai` and `claude-native-practice`, on the frozen trigger-case prompts plus 6 natural-language variants of
+# each, to tell "the description does not trigger" from "natural sessions never state the request". One arm: a session with the skill installed and nothing else added. The frozen rows carry the
+# `skill-used` and `not-skill-used` assertions promptfoo ships (site/docs/guides/test-agent-skills.md at promptfoo/promptfoo@30949931ee90); the skill is judged by the Skill tool call, not by the answer.
+description: E5 unresolved triggers (skeleton; fails closed until the inputs are frozen)
+
+evaluateOptions:
+  maxConcurrency: 1
+  cache: false
+
+# freeze: skills are discovered from .claude/skills in the tree (setting_sources project) or through plugins; `skills` lists the two names under test so that the Skill tool is allowed and the others are hidden.
+x-fence: &fence
+  model: claude-opus-5-5
+  effort: medium
+  permission_mode: dontAsk
+  tools: [Bash, Read, Glob, Grep, ToolSearch]
+  custom_allowed_tools: []
+  disallowed_tools: [Agent, Task, Workflow, ScheduleWakeup, Edit, Write, NotebookEdit, WebFetch, WebSearch]
+  setting_sources: [project]
+  skills: [typesafe-ai, claude-native-practice]
+  settings: '{{ env.E5_ROOT }}/settings.json'
+  strict_mcp_config: true
+  max_budget_usd: 4
+  path_to_claude_code_executable: '{{ env.E_CLAUDE }}'
+  copy_working_dir: copy
+
+prompts:
+  - label: prompt
+    raw: |-
+      {{ prompt }}
+
+providers:
+  - id: anthropic:claude-agent-sdk
+    label: natural
+    config:
+      <<: *fence
+      working_dir: '{{ env.E5_ROOT }}/trees/skills'
+
+tests:
+  - path: file://../frozen_inputs.py:create_tests
+    config:
+      experiment: e5

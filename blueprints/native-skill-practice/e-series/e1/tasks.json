@@ -1,0 +1,387 @@
+{
+ "base": "2bdb5731ddec6159d02266af16fe30d4bb677510",
+ "stale": "a30c2188e4423f05a7448e5f7a3bcfd858e0f5b8",
+ "questions": [
+  {
+   "id": "p-def",
+   "type": "def",
+   "reserve": false,
+   "symbol": "comments",
+   "defined_at": [
+    "tools/landing/codex_gate.py",
+    105
+   ],
+   "defined_at_stale": [],
+   "prompt": "In the repository, in which file under tools/ or scripts/ and at which line is the Python function `comments` defined? Cite that one location.",
+   "gold": {
+    "file": "tools/landing/codex_gate.py",
+    "line": 105
+   }
+  },
+  {
+   "id": "r-def-1",
+   "type": "def",
+   "reserve": true,
+   "symbol": "backup_differing",
+   "defined_at": [
+    "tools/adoption/new_wsl_client_config.py",
+    2158
+   ],
+   "defined_at_stale": [
+    [
+     "tools/adoption/new_wsl_client_config.py",
+     2157
+    ]
+   ],
+   "prompt": "In the repository, in which file under tools/ or scripts/ and at which line is the Python function `backup_differing` defined? Cite that one location.",
+   "gold": {
+    "file": "tools/adoption/new_wsl_client_config.py",
+    "line": 2158
+   }
+  },
+  {
+   "id": "r-def-2",
+   "type": "def",
+   "reserve": true,
+   "symbol": "http_script_mentions",
+   "defined_at": [
+    "tools/skill-usage/skill_usage.py",
+    1319
+   ],
+   "defined_at_stale": [
+    [
+     "tools/skill-usage/skill_usage.py",
+     1196
+    ]
+   ],
+   "prompt": "In the repository, in which file under tools/ or scripts/ and at which line is the Python function `http_script_mentions` defined? Cite that one location.",
+   "gold": {
+    "file": "tools/skill-usage/skill_usage.py",
+    "line": 1319
+   }
+  },
+  {
+   "id": "p-refs",
+   "type": "refs",
+   "reserve": false,
+   "symbol": "authorize",
+   "defined_at": [
+    "tools/local-pages/source_policy.py",
+    309
+   ],
+   "defined_at_stale": [
+    [
+     "tools/local-pages/source_policy.py",
+     282
+    ]
+   ],
+   "prompt": "List every call site of the Python function `authorize` in tools/ and scripts/ (file and line of each call; do not list the definition). Cite each call site.",
+   "gold": {
+    "sites": [
+     [
+      "tools/local-pages/architecture_evidence.py",
+      194
+     ],
+     [
+      "tools/local-pages/architecture_evidence.py",
+      197
+     ],
+     [
+      "tools/local-pages/architecture_inventory.py",
+      58
+     ],
+     [
+      "tools/local-pages/architecture_inventory.py",
+      70
+     ],
+     [
+      "tools/local-pages/architecture_inventory.py",
+      92
+     ],
+     [
+      "tools/local-pages/source_policy.py",
+      328
+     ],
+     [
+      "tools/local-pages/source_policy.py",
+      342
+     ]
+    ]
+   }
+  },
+  {
+   "id": "r-refs-1",
+   "type": "refs",
+   "reserve": true,
+   "symbol": "is_table_array",
+   "defined_at": [
+    "tools/adoption/new_wsl_client_config.py",
+    1033
+   ],
+   "defined_at_stale": [
+    [
+     "tools/adoption/new_wsl_client_config.py",
+     1032
+    ]
+   ],
+   "prompt": "List every call site of the Python function `is_table_array` in tools/ and scripts/ (file and line of each call; do not list the definition). Cite each call site.",
+   "gold": {
+    "sites": [
+     [
+      "tools/adoption/new_wsl_client_config.py",
+      1041
+     ],
+     [
+      "tools/adoption/new_wsl_client_config.py",
+      1042
+     ],
+     [
+      "tools/adoption/new_wsl_client_config.py",
+      1060
+     ],
+     [
+      "tools/adoption/new_wsl_client_config.py",
+      1062
+     ],
+     [
+      "tools/adoption/new_wsl_client_config.py",
+      1711
+     ]
+    ]
+   }
+  },
+  {
+   "id": "r-refs-2",
+   "type": "refs",
+   "reserve": true,
+   "symbol": "hmac_sha256_of",
+   "defined_at": [
+    "tools/sota-convergence/blind_checkout.py",
+    305
+   ],
+   "defined_at_stale": [
+    [
+     "tools/sota-convergence/blind_checkout.py",
+     303
+    ]
+   ],
+   "prompt": "List every call site of the Python function `hmac_sha256_of` in tools/ and scripts/ (file and line of each call; do not list the definition). Cite each call site.",
+   "gold": {
+    "sites": [
+     [
+      "tools/sota-convergence/blind_checkout.py",
+      349
+     ],
+     [
+      "tools/sota-convergence/blind_checkout.py",
+      353
+     ],
+     [
+      "tools/sota-convergence/blind_checkout.py",
+      361
+     ],
+     [
+      "tools/sota-convergence/blind_checkout.py",
+      384
+     ]
+    ]
+   }
+  },
+  {
+   "id": "p-explain",
+   "type": "explain",
+   "reserve": false,
+   "symbol": "merge_toml_text",
+   "defined_at": [
+    "tools/adoption/new_wsl_client_config.py",
+    1812
+   ],
+   "defined_at_stale": [
+    [
+     "tools/adoption/new_wsl_client_config.py",
+     1811
+    ]
+   ],
+   "prompt": "In `tools/adoption/new_wsl_client_config.py`, the function `merge_toml_text` raises exceptions. Cite the line of every `raise` statement inside it and say in one sentence per line what condition leads to it.",
+   "gold": {
+    "lines": [
+     1855,
+     1861,
+     1869
+    ],
+    "file": "tools/adoption/new_wsl_client_config.py"
+   }
+  },
+  {
+   "id": "r-explain-1",
+   "type": "explain",
+   "reserve": true,
+   "symbol": "install_workflows",
+   "defined_at": [
+    "tools/adoption/install_claude_profile.py",
+    228
+   ],
+   "defined_at_stale": [
+    [
+     "tools/adoption/install_claude_profile.py",
+     210
+    ]
+   ],
+   "prompt": "In `tools/adoption/install_claude_profile.py`, the function `install_workflows` raises exceptions. Cite the line of every `raise` statement inside it and say in one sentence per line what condition leads to it.",
+   "gold": {
+    "lines": [
+     241,
+     244,
+     267,
+     289
+    ],
+    "file": "tools/adoption/install_claude_profile.py"
+   }
+  },
+  {
+   "id": "r-explain-2",
+   "type": "explain",
+   "reserve": true,
+   "symbol": "tree_sha256",
+   "defined_at": [
+    "tools/sota-convergence/codex_lane.py",
+    1118
+   ],
+   "defined_at_stale": [
+    [
+     "tools/sota-convergence/codex_lane.py",
+     1053
+    ]
+   ],
+   "prompt": "In `tools/sota-convergence/codex_lane.py`, the function `tree_sha256` raises exceptions. Cite the line of every `raise` statement inside it and say in one sentence per line what condition leads to it.",
+   "gold": {
+    "lines": [
+     1125,
+     1139,
+     1149,
+     1157
+    ],
+    "file": "tools/sota-convergence/codex_lane.py"
+   }
+  },
+  {
+   "id": "p-callers",
+   "type": "callers",
+   "reserve": false,
+   "symbol": "sandbox_argv",
+   "defined_at": [
+    "tools/claude-review-worker/worker.py",
+    622
+   ],
+   "defined_at_stale": [],
+   "prompt": "Which functions in tools/ and scripts/ call the Python function `sandbox_argv`? Give the name of each calling function (not the file) and cite one call site per caller.",
+   "gold": {
+    "functions": [
+     "boundary_self_check",
+     "command",
+     "sandbox_self_check",
+     "sandboxed"
+    ],
+    "sites": [
+     [
+      "tools/claude-review-worker/probes.py",
+      367
+     ],
+     [
+      "tools/claude-review-worker/worker.py",
+      785
+     ],
+     [
+      "tools/claude-review-worker/worker.py",
+      886
+     ],
+     [
+      "tools/claude-review-worker/worker.py",
+      913
+     ]
+    ]
+   }
+  },
+  {
+   "id": "r-callers-1",
+   "type": "callers",
+   "reserve": true,
+   "symbol": "wired_files",
+   "defined_at": [
+    "tools/adoption/new_wsl_client_config.py",
+    2155
+   ],
+   "defined_at_stale": [
+    [
+     "tools/adoption/new_wsl_client_config.py",
+     2154
+    ]
+   ],
+   "prompt": "Which functions in tools/ and scripts/ call the Python function `wired_files`? Give the name of each calling function (not the file) and cite one call site per caller.",
+   "gold": {
+    "functions": [
+     "step_claude_agents",
+     "step_claude_hooks",
+     "step_codex_files"
+    ],
+    "sites": [
+     [
+      "tools/adoption/new_wsl_client_config.py",
+      2167
+     ],
+     [
+      "tools/adoption/new_wsl_client_config.py",
+      2176
+     ],
+     [
+      "tools/adoption/new_wsl_client_config.py",
+      2592
+     ]
+    ]
+   }
+  },
+  {
+   "id": "r-callers-2",
+   "type": "callers",
+   "reserve": true,
+   "symbol": "audit_is_flagged",
+   "defined_at": [
+    "tools/sota-convergence/codex_lane.py",
+    409
+   ],
+   "defined_at_stale": [
+    [
+     "tools/sota-convergence/codex_lane.py",
+     355
+    ]
+   ],
+   "prompt": "Which functions in tools/ and scripts/ call the Python function `audit_is_flagged`? Give the name of each calling function (not the file) and cite one call site per caller.",
+   "gold": {
+    "functions": [
+     "call",
+     "existing_output_is_valid",
+     "process",
+     "run_pending"
+    ],
+    "sites": [
+     [
+      "tools/sota-convergence/codex_lane.py",
+      260
+     ],
+     [
+      "tools/sota-convergence/codex_lane.py",
+      1489
+     ],
+     [
+      "tools/sota-convergence/codex_lane.py",
+      1533
+     ],
+     [
+      "tools/token-e2e/judge.py",
+      955
+     ]
+    ]
+   }
+  }
+ ]
+}

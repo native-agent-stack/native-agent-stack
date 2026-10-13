@@ -1,0 +1,50 @@
+# E4, autonomous skills: SKELETON. Nothing is frozen and nothing has run. It fails closed: the tests below come from ../frozen_inputs.py, which raises (and promptfoo stops before any provider call) until
+# frozen/e4.json names the tasks, the sentence and the skills, each with a matching sha256.
+#
+# Design (invoke-gap cause table, section 7): 8 frozen CI-failure and review-thread tasks on synthetic pull requests; arms: without and with FIX-7's sentence ("when no one is present, a skill's approval step
+# is answered by the lane's own ruling"); metrics: the skill invoked, the outcome, tokens; rule as in the daily skill-invoke baseline: the skill invoked in at least 6 of the 8 and no loss of correctness.
+# The frozen rows carry the `skill-used` assertion promptfoo ships (site/docs/guides/test-agent-skills.md at promptfoo/promptfoo@30949931ee90) and the outcome checks.
+description: E4 autonomous skills (skeleton; fails closed until the inputs are frozen)
+
+evaluateOptions:
+  maxConcurrency: 1
+  cache: false
+
+# freeze: skills are discovered from .claude/skills in the tree through setting_sources project, or through plugins; the sentence travels in CLAUDE.local.md (setting source local) or the tree's
+# CLAUDE.md. The discovery route and the filter (`skills`) are part of the preregistration.
+x-fence: &fence
+  model: claude-opus-5-5
+  effort: medium
+  permission_mode: dontAsk
+  tools: [Bash, Read, Glob, Grep, ToolSearch]
+  custom_allowed_tools: []
+  disallowed_tools: [Agent, Task, Workflow, ScheduleWakeup, Edit, Write, NotebookEdit, WebFetch, WebSearch]
+  setting_sources: [project, local]
+  skills: all
+  settings: '{{ env.E4_ROOT }}/settings.json'
+  strict_mcp_config: true
+  max_budget_usd: 4
+  path_to_claude_code_executable: '{{ env.E_CLAUDE }}'
+  copy_working_dir: copy
+
+prompts:
+  - label: task
+    raw: |-
+      {{ task }}
+
+providers:
+  - id: anthropic:claude-agent-sdk
+    label: baseline
+    config:
+      <<: *fence
+      working_dir: '{{ env.E4_ROOT }}/trees/baseline'
+  - id: anthropic:claude-agent-sdk
+    label: fix7-sentence
+    config:
+      <<: *fence
+      working_dir: '{{ env.E4_ROOT }}/trees/fix7-sentence'
+
+tests:
+  - path: file://../frozen_inputs.py:create_tests
+    config:
+      experiment: e4
