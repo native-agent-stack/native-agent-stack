@@ -60378,12 +60378,12 @@
     },
     {
       "path": "examples/claude-native/workflows/README.md",
-      "sha256": "1461d130ea016bd21d46aa8fa40116278a3208d55e495ebc0f833b689e750301",
-      "bytes": 115525
+      "sha256": "dcf56c4346c1c11bb134549db548a129e5ced28537d7361b8d31ac41136a8501",
+      "bytes": 116291
     },
     {
       "path": "examples/claude-native/workflows/SHA256SUMS",
-      "sha256": "04429e08bf9b323aacdade451731d00bf43c646ac76649ed1d5d7abd02ab63da",
+      "sha256": "32dea17c27507e4bb645aac7211d2939b91605b00c5e62bae6e536f15e52e803",
       "bytes": 1217
     },
     {
@@ -60433,13 +60433,13 @@
     },
     {
       "path": "examples/claude-native/workflows/test-contract-mutations.mjs",
-      "sha256": "d99043552aca6fe3c242c6a70c05261e6368d5833c2c7fb6a0d62318d9b91ad1",
-      "bytes": 22874
+      "sha256": "1989ce290ee0b0b9f7c887d98c571c401917881c676509a14e44c9d3a99b846d",
+      "bytes": 24187
     },
     {
       "path": "examples/claude-native/workflows/test-envelope.mjs",
-      "sha256": "b09e1b2748a5dd7da1b44004917106fef1373f351e538a8ad339735df837e4bd",
-      "bytes": 58506
+      "sha256": "e0b640da73ceb36bad225db5c1ad00839c124547f0a0809cf9c18a90b4322f67",
+      "bytes": 59705
     },
     {
       "path": "examples/claude-native/workflows/test-usage-receipts.mjs",

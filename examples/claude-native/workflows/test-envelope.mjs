@@ -23,8 +23,8 @@ const WF = { review: 'workflows/review-changes.js', readiness: 'workflows/readin
 // session started through the ecosystem launcher and at xhigh, saved per model, elsewhere (Ultracode set xhigh on 2.1.281
 // and does not on 2.1.284). A stage with no effort of its own and no agent
 // frontmatter effort runs at the effort the session was given explicitly (--effort, /effort or the model picker), else at
-// its model's saved level or default (the coordinator's xhigh on 2.1.281), and CLAUDE_CODE_EFFORT_LEVEL overrides every child's effort, so max is bound per stage and per agent and the
-// settings leave that variable unset.
+// its model's saved level or default (the coordinator's xhigh on 2.1.281), and CLAUDE_CODE_EFFORT_LEVEL overrides every child's effort, so max is bound per stage (each
+// project agent binds its routed effort, AGENT_EFFORT) and the settings leave that variable unset.
 const STAGE_EFFORT = 'max'
 // Each project agent's own effort since 2026-10-12 (docs/decisions/2026-10-12-model-effort-routing.md, the command
 // center's routing table): a named child (a teammate spawn) drops a per-launch effort and runs at its definition's,
@@ -453,7 +453,7 @@ function agentOptionLiterals(src) {
   const defaultRows = roleRows.filter((r) => r[1] === 'default workflow subagent')
   expect('routing doc: every default workflow subagent row binds a model at effort ' + STAGE_EFFORT, defaultRows.length > 0 && defaultRows.every((r) => new RegExp('^(Sonnet|Opus), ' + STAGE_EFFORT + '$').test(r[2])))
   const coordinatorRows = roleRows.filter((r) => r[1] === 'coordinator')
-  expect('routing doc: the coordinator row states the routing ruling xhigh and the launcher max until relaunch under ultracode', coordinatorRows.length === 1 && coordinatorRows[0][2].includes('Opus 5.5 at xhigh (main-session row of the 2026-10-12 routing ruling; launcher max until each session is relaunched), under `ultracode`'))
+  expect('routing doc: the coordinator row states the routing ruling xhigh and the launcher max that remains under ultracode', coordinatorRows.length === 1 && coordinatorRows[0][2].includes('Opus 5.5 at xhigh (main-session row of the 2026-10-12 routing ruling, launched with `--effort xhigh`; the ecosystem launcher still adds `--effort max` to a launch that names no effort), under `ultracode`'))
   // Effort profile: the saved coordinator effort is xhigh (the launcher adds max), so the settings must not set
   // CLAUDE_CODE_EFFORT_LEVEL (any value overrides every stage's and agent's own effort; on 2.1.281 a value other than
   // xhigh also left ultracode's orchestration inactive) and must not cap effort below the stage effort, either
@@ -464,6 +464,13 @@ function agentOptionLiterals(src) {
   const effortCaps = [settingsJson.maxEffortLevel, ...Object.values(settingsJson.modelSettings && typeof settingsJson.modelSettings === 'object' ? settingsJson.modelSettings : {}).map((m) => (m && typeof m === 'object' ? m.maxEffortLevel : undefined))].filter((v) => v !== undefined)
   expect('settings: CLAUDE_CODE_EFFORT_LEVEL stays unset and no maxEffortLevel caps the stage effort', !Object.prototype.hasOwnProperty.call(settingsEnv, 'CLAUDE_CODE_EFFORT_LEVEL') && effortCaps.every((v) => v === STAGE_EFFORT))
   expect('instructions: the project instructions state the effort literal every stage binds', readOr(configured('instructions')).includes("`effort: '" + STAGE_EFFORT + "'`"))
+  // Each project agent carries its routed effort (AGENT_EFFORT), so guidance that puts every agent at the stage's max contradicts the
+  // agent checks above (Astra's delta read of #1045 at 1bb32f44, P2).
+  expect('instructions: no active guidance puts every project agent at the stage effort', !/project agents? at effort `max`|project agents? that omits? model or effort or binds an effort other than `max`|effort other\s+than one `effort: max` line/.test(readOr(configured('instructions'))))
+  // The repository's ecosystem launcher (adoption/bootstrap-linux.sh, bootstrap-macos.sh; the 2026-09-29 decision) still adds
+  // --effort max to an interactive launch that names no effort, and this change leaves it, so no text may say the launchers
+  // drop it at relaunch (the command center's Claude delta read of #1045 at 1bb32f44, P2-B).
+  expect('routing doc: no text says the launchers drop the max of 2026-09-29 at relaunch', !/dropping the `max` of 2026-09-29 at each session's next relaunch|launcher max until each session is relaunched/.test(readOr(configured('routing_doc'))))
   const reviewer = (readFileSync(join(dir, 'evidence-reviewer.md'), 'utf8').match(/^tools: (.*)$/m) || [null, ''])[1]
   // The reviewer's surface is pinned exactly, so any added tool (for example a Serena
   // create_/replace_ tool) fails here until it is reviewed and listed. Two grants stay

@@ -111,8 +111,10 @@ and a blind role off `max`.
 - **A per-launch `effort` on every Agent call, definitions unchanged at `max`.** Rejected: a named child drops it (P11,
   P12, and all 23 of the command center's children), so it does not reach the children that carry most of the work.
 - **Removing `--effort max` from the launchers only.** Necessary for the sessions themselves and for named children
-  whose definition sets no effort, and the ruling does it at each session's next relaunch; it leaves every definition
-  that says `max` at `max`.
+  whose definition sets no effort. The ruling does it for the command-center and trading launchers at each session's
+  next relaunch; the repository's ecosystem launcher (`adoption/bootstrap-linux.sh`, `adoption/bootstrap-macos.sh`) still
+  adds `--effort max` to an interactive launch that names no effort, which is a separate change. It leaves every
+  definition that says `max` at `max`.
 - **Haiku for `source-scout`.** Not adopted: the only same-packet result (a Haiku inventory, above) failed, and no
   Haiku 5.5 result is recorded; Haiku stays a per-launch choice for mechanical work. This departs from the ruling's
   mechanical row (Haiku, low), which neither the ruling nor its addendum 01 has accepted; the command center decides.
