@@ -111,8 +111,36 @@ jobs:
           tar -xzf "$RUNNER_TEMP/actionlint/archive.tar.gz" -C "$RUNNER_TEMP/actionlint" actionlint
           "$RUNNER_TEMP/actionlint/actionlint" -version
           "$RUNNER_TEMP/actionlint/actionlint" -color
+      - name: Fetch prior PR heads for registration continuity
+        id: registry_history
+        if: matrix.shard == 0 && github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_HISTORY_REPOSITORY: ${{ github.repository }}
+          PR_HISTORY_NUMBER: ${{ github.event.pull_request.number }}
+          REGISTRATION_BEFORE: ${{ github.event.before }}
+        run: |
+          set -euo pipefail
+          # Native gh pagination and GitHub's persistent force-push timeline retain
+          # intent even after a second push whose immediate predecessor lost rows.
+          previous=$(gh api graphql --paginate \
+            -F owner="${PR_HISTORY_REPOSITORY%/*}" -F name="${PR_HISTORY_REPOSITORY#*/}" \
+            -F number="$PR_HISTORY_NUMBER" \
+            -f query='query($owner: String!, $name: String!, $number: Int!, $endCursor: String) { repository(owner: $owner, name: $name) { pullRequest(number: $number) { timelineItems(first: 100, after: $endCursor, itemTypes: [HEAD_REF_FORCE_PUSHED_EVENT]) { nodes { ... on HeadRefForcePushedEvent { beforeCommit { oid } } } pageInfo { hasNextPage endCursor } } } } }' \
+            --jq '.data.repository.pullRequest.timelineItems.nodes[].beforeCommit.oid')
+          refs=()
+          while IFS= read -r ref; do
+            [[ -z "$ref" ]] && continue
+            [[ "$ref" =~ ^[0-9a-f]{40}$ ]] || exit 1
+            git fetch --no-tags origin "$ref"
+            refs+=("$ref")
+          done <<< "${REGISTRATION_BEFORE}${REGISTRATION_BEFORE:+$'\n'}${previous}"
+          printf 'before_refs=%s\n' "${refs[*]}" >> "$GITHUB_OUTPUT"
       - name: Validate manifests and evidence integrity
         if: matrix.shard == 0
+        env:
+          NATIVE_AGENT_REGISTRATION_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+          NATIVE_AGENT_REGISTRATION_BEFORE: ${{ steps.registry_history.outputs.before_refs }}
         run: python3 scripts/validate.py
       - name: Validate host evidence contribution receipts
         if: matrix.shard == 0
